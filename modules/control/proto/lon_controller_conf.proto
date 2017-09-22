@@ -4,13 +4,7 @@ package apollo.control;
 
 import "modules/control/proto/calibration_table.proto";
 
-message PidConf {
-  optional bool integrator_enable = 1;
-  optional double integrator_saturation_level = 2;
-  optional double kp = 3;
-  optional double ki = 4;
-  optional double kd = 5;
-}
+import "modules/control/proto/pid_conf.proto";
 
 message FilterConf {
   optional int32 cutoff_freq = 1;
@@ -32,9 +26,7 @@ message LonControllerConf {
   optional PidConf high_speed_pid_conf = 10;
   optional double switch_speed = 11; // low/high speed controller switch speed
 
-  optional FilterConf throttle_filter_conf = 12;
-  optional FilterConf brake_filter_conf = 13;
-  optional FilterConf acceleration_filter_conf = 14;
+  optional FilterConf pitch_angle_filter_conf = 12;
 
-  optional calibrationtable.ControlCalibrationTable calibration_table = 15;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 13;
 }

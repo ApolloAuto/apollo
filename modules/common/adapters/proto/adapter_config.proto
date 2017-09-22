@@ -18,8 +18,13 @@ message AdapterConfig {
     PERCEPTION_OBSTACLES = 11;
     TRAFFIC_LIGHT_DETECTION = 12;
     CHASSIS_DETAIL = 13;
-    DECISION = 14;
+    DECISION = 14 [deprecated = true];
     CANBUS = 15;
+    ROUTING_REQUEST = 16;
+    ROUTING_RESPONSE = 17;
+    RELATIVE_ODOMETRY = 18;
+    INS_STAT = 19;
+    HMI_COMMAND = 20;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

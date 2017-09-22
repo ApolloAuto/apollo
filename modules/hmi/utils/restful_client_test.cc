@@ -31,7 +31,7 @@ namespace hmi {
 TEST(RestfulClientTest, Post) {
   ModuleStatus module_status;
   module_status.set_name("control");
-  module_status.set_status(::apollo::hmi::ModuleStatus::STARTED);
+  module_status.set_status(hmi::ModuleStatus::STARTED);
 
   RestfulClient client(FLAGS_hmi_runtime_status_api);
   EXPECT_TRUE(client.Post(module_status) == RestfulClient::RUNTIME_ERROR);

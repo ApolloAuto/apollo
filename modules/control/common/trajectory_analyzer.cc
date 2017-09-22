@@ -16,6 +16,7 @@
 
 #include "modules/control/common/trajectory_analyzer.h"
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
@@ -24,7 +25,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/search.h"
 
-namespace math = ::apollo::common::math;
+namespace math = apollo::common::math;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
@@ -35,20 +36,17 @@ namespace {
 // Squared distance from the point to (x, y).
 double PointDistanceSquare(const TrajectoryPoint &point, const double x,
                            const double y) {
-  const double dx = point.x() - x;
-  const double dy = point.y() - y;
+  const double dx = point.path_point().x() - x;
+  const double dy = point.path_point().y() - y;
   return dx * dx + dy * dy;
 }
 
 PathPoint TrajectoryPointToPathPoint(const TrajectoryPoint &point) {
-  PathPoint result;
-  if (point.has_x()) result.set_x(point.x());
-  if (point.has_y()) result.set_y(point.y());
-  if (point.has_z()) result.set_z(point.z());
-  if (point.has_theta()) result.set_theta(point.theta());
-  if (point.has_kappa()) result.set_kappa(point.kappa());
-  if (point.has_s()) result.set_s(point.s());
-  return result;
+  if (point.has_path_point()) {
+    return point.path_point();
+  } else {
+    return PathPoint();
+  }
 }
 
 }  // namespace
@@ -58,22 +56,10 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
   header_time_ = planning_published_trajectory->header().timestamp_sec();
   seq_num_ = planning_published_trajectory->header().sequence_num();
 
-  int num_points = planning_published_trajectory->adc_trajectory_point_size();
-  trajectory_points_.reserve(num_points);
-
-  for (const auto &published_trajectory_point :
-       planning_published_trajectory->adc_trajectory_point()) {
-    TrajectoryPoint point;
-    point.set_s(published_trajectory_point.accumulated_s());
-    point.set_x(published_trajectory_point.x());
-    point.set_y(published_trajectory_point.y());
-    point.set_theta(published_trajectory_point.theta());
-    point.set_kappa(published_trajectory_point.curvature());
-    point.set_v(published_trajectory_point.speed());
-    point.set_a(published_trajectory_point.acceleration_s());
-    point.set_relative_time(published_trajectory_point.relative_time());
-
-    trajectory_points_.push_back(std::move(point));
+  for (int i = 0; i < planning_published_trajectory->trajectory_point_size();
+       ++i) {
+    trajectory_points_.push_back(
+        planning_published_trajectory->trajectory_point(i));
   }
 }
 
@@ -95,8 +81,9 @@ PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
       index_min + 1 == trajectory_points_.size() ? index_min : index_min + 1;
 
   if (index_start == index_end ||
-      math::DoubleCompare(trajectory_points_[index_start].s(),
-                          trajectory_points_[index_end].s()) == 0) {
+      math::DoubleCompare(trajectory_points_[index_start].path_point().s(),
+                          trajectory_points_[index_end].path_point().s()) ==
+          0) {
     return TrajectoryPointToPathPoint(trajectory_points_[index_start]);
   }
 
@@ -182,9 +169,8 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
   auto it_lower = it_low - 1;
   if (it_low->relative_time() - t < t - it_lower->relative_time()) {
     return *it_low;
-  } else {
-    return *it_lower;
   }
+  return *it_lower;
 }
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(
@@ -214,21 +200,28 @@ PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const TrajectoryPoint &p0,
   // given the fact that the discretized trajectory is dense enough,
   // we assume linear trajectory between consecutive trajectory points.
   auto dist_square = [&p0, &p1, &x, &y](const double s) {
-    double px = math::lerp(p0.x(), p0.s(), p1.x(), p1.s(), s);
-    double py = math::lerp(p0.y(), p0.s(), p1.y(), p1.s(), s);
+    double px = math::lerp(p0.path_point().x(), p0.path_point().s(),
+                           p1.path_point().x(), p1.path_point().s(), s);
+    double py = math::lerp(p0.path_point().y(), p0.path_point().s(),
+                           p1.path_point().y(), p1.path_point().s(), s);
     double dx = px - x;
     double dy = py - y;
     return dx * dx + dy * dy;
   };
 
-  PathPoint p = TrajectoryPointToPathPoint(p0);
-  double s = math::GoldenSectionSearch(dist_square, p0.s(), p1.s());
+  PathPoint p = p0.path_point();
+  double s = math::GoldenSectionSearch(dist_square, p0.path_point().s(),
+                                       p1.path_point().s());
   p.set_s(s);
-  p.set_x(math::lerp(p0.x(), p0.s(), p1.x(), p1.s(), s));
-  p.set_y(math::lerp(p0.y(), p0.s(), p1.y(), p1.s(), s));
-  p.set_theta(math::slerp(p0.theta(), p0.s(), p1.theta(), p1.s(), s));
+  p.set_x(math::lerp(p0.path_point().x(), p0.path_point().s(),
+                     p1.path_point().x(), p1.path_point().s(), s));
+  p.set_y(math::lerp(p0.path_point().y(), p0.path_point().s(),
+                     p1.path_point().y(), p1.path_point().s(), s));
+  p.set_theta(math::slerp(p0.path_point().theta(), p0.path_point().s(),
+                          p1.path_point().theta(), p1.path_point().s(), s));
   // approximate the curvature at the intermediate point
-  p.set_kappa(math::lerp(p0.kappa(), p0.s(), p1.kappa(), p1.s(), s));
+  p.set_kappa(math::lerp(p0.path_point().kappa(), p0.path_point().s(),
+                         p1.path_point().kappa(), p1.path_point().s(), s));
   return p;
 }
 

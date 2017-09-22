@@ -6,23 +6,26 @@ cc_library(
     name = "planning_impl",
     srcs = [
         "planning.cc",
-        "planning_node.cc",
     ],
-    hdrs = glob([
-        "*.h",
-    ]),
+    hdrs = [
+        "planning.h",
+    ],
     deps = [
         "//modules/common",
+        "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/proto:path_point_proto",
-        "//modules/common/util:factory",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
-        "//modules/decision/proto:decision_proto",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
-        "//modules/planning/common:lib_planning_common",
-        "//modules/planning/planner:lib_planner",
+        "//modules/planning/common:planning_common",
+        "//modules/planning/planner/em:em_planner",
+        "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/reference_line:reference_line_provider",
+        "//modules/planning/trajectory_stitcher",
         "//modules/prediction/proto:prediction_proto",
         "@ros//:ros_common",
     ],
@@ -41,6 +44,13 @@ filegroup(
     name = "planning_testdata",
     srcs = glob([
         "testdata/**",
+    ]),
+)
+
+filegroup(
+    name = "planning_conf",
+    srcs = glob([
+        "conf/**",
     ]),
 )
 

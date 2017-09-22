@@ -15,17 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-"""Global runtime status."""
+"""Runtime status API."""
 
 import os
 import time
 
 import flask_socketio
 import gflags
-import glog
 import google.protobuf.json_format as json_format
 
-import config
+from config import Config
+from modules.hmi.proto.runtime_status_pb2 import ToolStatus
 import modules.hmi.proto.runtime_status_pb2 as runtime_status_pb2
 
 gflags.DEFINE_string('file_to_play', 'data/log/garage.csv',
@@ -37,19 +37,13 @@ class RuntimeStatus(object):
 
     pb_singleton = runtime_status_pb2.RuntimeStatus()
     pb_fingerprint = 0
-
-    module_dict = {}
-    hardware_dict = {}
     playable_duration = 0
 
     @classmethod
     def reset(cls, check_playable_file=False):
         """Reset runtime status to start."""
-        ToolStatus = runtime_status_pb2.ToolStatus
         cls.pb_singleton.Clear()
         cls.pb_fingerprint = 0
-        cls.module_dict.clear()
-        cls.hardware_dict.clear()
 
         tool_status = cls.get_tools()
         if check_playable_file and cls.stat_playable_duration() > 0:
@@ -61,22 +55,33 @@ class RuntimeStatus(object):
         cls._calculate()
 
     @classmethod
+    def update(cls, status_json):
+        """Update runtime status."""
+        new_status = json_format.ParseDict(status_json,
+                                           runtime_status_pb2.RuntimeStatus())
+        # Merge status.
+        Config.log.debug('RuntimeStatus: Update status:\n%s', str(new_status))
+        for module in new_status.modules:
+            cls.get_module(module.name).MergeFrom(module)
+        for hardware in new_status.hardware:
+            cls.get_hardware(hardware.name).MergeFrom(hardware)
+        cls.get_tools().MergeFrom(new_status.tools)
+
+        cls.broadcast_status_if_changed()
+
+    @classmethod
     def get_module(cls, module_name):
         """Get module status by name."""
-        if cls.module_dict.get(module_name) is None:
-            # Init module status for once.
-            module_status = cls.pb_singleton.modules.add(name=module_name)
-            cls.module_dict[module_name] = module_status
-        return cls.module_dict[module_name]
+        mod = cls.__find_by_name(module_name, cls.pb_singleton.modules)
+        # Init module status if not exist.
+        return mod if mod else cls.pb_singleton.modules.add(name=module_name)
 
     @classmethod
     def get_hardware(cls, hardware_name):
-        """Get harware status by name."""
-        if cls.hardware_dict.get(hardware_name) is None:
-            # Init hardware status for once.
-            hardware_status = cls.pb_singleton.hardware.add(name=hardware_name)
-            cls.hardware_dict[hardware_name] = hardware_status
-        return cls.hardware_dict[hardware_name]
+        """Get hardware status by name."""
+        hdw = cls.__find_by_name(hardware_name, cls.pb_singleton.hardware)
+        # Init hardware status for once.
+        return hdw if hdw else cls.pb_singleton.hardware.add(name=hardware_name)
 
     @classmethod
     def get_tools(cls):
@@ -86,24 +91,10 @@ class RuntimeStatus(object):
     @classmethod
     def status_json(cls):
         """Convert status to json dict."""
-
-        def pb_to_json(pb, include_default_values=False):
-            """Convert proto to json dict."""
-            return json_format.MessageToDict(pb, include_default_values, True)
-
-        def pb_dict_to_json(pb_dict):
-            """Convert {key: value_pb} to {key, value_dict}."""
-            return {
-                key: pb_to_json(value_pb)
-                for key, value_pb in pb_dict.iteritems()
-            }
-
-        return {
-            'timestamp': cls._current_timestamp(),
-            'modules': pb_dict_to_json(cls.module_dict),
-            'hardware': pb_dict_to_json(cls.hardware_dict),
-            'tools': pb_to_json(cls.pb_singleton.tools, True),
-        }
+        json_dict = json_format.MessageToDict(cls.pb_singleton, True, True)
+        # Inject current timestamp.
+        json_dict['timestamp'] = cls._current_timestamp()
+        return json_dict
 
     @classmethod
     def broadcast_status_if_changed(cls):
@@ -111,26 +102,24 @@ class RuntimeStatus(object):
         cls._calculate()
         new_fingerprint = hash(str(cls.pb_singleton))
         if cls.pb_fingerprint != new_fingerprint:
-            flask_socketio.emit('new_status',
-                                cls.status_json(),
-                                broadcast=True,
-                                namespace='/runtime_status')
+            flask_socketio.emit('current_status', cls.status_json(),
+                                broadcast=True, namespace='/io_frontend')
             cls.pb_fingerprint = new_fingerprint
 
     @classmethod
     def _calculate(cls):
         """Update runtime status fields which need to be calculated."""
-        modules_and_hardware_ready = cls.are_all_modules_ready(
+        modules_and_hardware_ready = cls.are_record_replay_modules_ready(
         ) and cls.are_all_hardware_ready()
         cls._calculate_recording_status(modules_and_hardware_ready)
         cls._calculate_playing_status(modules_and_hardware_ready)
         cls._calculate_guide_message()
 
     @classmethod
-    def are_all_modules_ready(cls):
+    def are_record_replay_modules_ready(cls):
         """Check if all modules are ready."""
-        for mod in config.Config.get_pb().modules:
-            mod_status = cls.get_module(mod.name).status
+        for mod in Config.record_replay_required_modules:
+            mod_status = cls.get_module(mod).status
             if mod_status != runtime_status_pb2.ModuleStatus.STARTED:
                 return False
         return True
@@ -138,7 +127,7 @@ class RuntimeStatus(object):
     @classmethod
     def are_all_hardware_ready(cls):
         """Check if all modules are ready."""
-        for hw in config.Config.get_pb().hardware:
+        for hw in Config.get_pb().hardware:
             hw_status = cls.get_hardware(hw.name).status
             if hw_status != int(runtime_status_pb2.HardwareStatus.OK):
                 return False
@@ -147,7 +136,7 @@ class RuntimeStatus(object):
     @classmethod
     def stat_playable_duration(cls):
         """Stat playable duration."""
-        file_to_play = config.Config.get_realpath(gflags.FLAGS.file_to_play)
+        file_to_play = Config.get_realpath(gflags.FLAGS.file_to_play)
         if os.path.exists(file_to_play):
             with open(file_to_play, 'r') as f:
                 kFreq = 100
@@ -159,21 +148,18 @@ class RuntimeStatus(object):
     @classmethod
     def _calculate_recording_status(cls, modules_and_hardware_ready):
         """Calculate recording status."""
-        CHECKING = runtime_status_pb2.ToolStatus.RECORDING_CHECKING
-        READY_TO_START = runtime_status_pb2.ToolStatus.RECORDING_READY_TO_START
-
         tool_status = cls.get_tools()
         recording_status = tool_status.recording_status
-        if recording_status == CHECKING and modules_and_hardware_ready:
-            tool_status.recording_status = READY_TO_START
-        elif recording_status == READY_TO_START and \
-             not modules_and_hardware_ready:
-            tool_status.recording_status = CHECKING
+        if (recording_status == ToolStatus.RECORDING_CHECKING and
+            modules_and_hardware_ready):
+            tool_status.recording_status = ToolStatus.RECORDING_READY_TO_START
+        elif (recording_status == ToolStatus.RECORDING_READY_TO_START and
+              not modules_and_hardware_ready):
+            tool_status.recording_status = ToolStatus.RECORDING_CHECKING
 
     @classmethod
     def _calculate_playing_status(cls, modules_and_hardware_ready):
         """Calculate playing status."""
-        ToolStatus = runtime_status_pb2.ToolStatus
         tool_status = cls.get_tools()
 
         playing_status = tool_status.playing_status
@@ -183,24 +169,23 @@ class RuntimeStatus(object):
                     tool_status.playing_status = \
                     ToolStatus.PLAYING_READY_TO_CHECK
                 else:
-                    glog.info('RuntimeStatus::_calculate_playing_status: ' \
-                              'No file to play')
+                    Config.log.info('RuntimeStatus::_calculate_playing_status: '
+                                    'No file to play')
         elif (playing_status == ToolStatus.PLAYING_CHECKING and
               modules_and_hardware_ready and tool_status.planning_ready):
             tool_status.playing_status = ToolStatus.PLAYING_READY_TO_START
-            glog.info(
-                'RuntimeStatus::_calculate_playing_status: ' \
+            Config.log.info(
+                'RuntimeStatus::_calculate_playing_status: '
                 'All modules/hardware are ready')
         elif playing_status == ToolStatus.PLAYING_READY_TO_START and not (
                 modules_and_hardware_ready and tool_status.planning_ready):
             tool_status.playing_status = ToolStatus.PLAYING_CHECKING
-            glog.info('RuntimeStatus::_calculate_playing_status: ' \
-                      'Not all modules/hardware are ready')
+            Config.log.info('RuntimeStatus::_calculate_playing_status: '
+                            'Not all modules/hardware are ready')
 
     @classmethod
     def _calculate_guide_message(cls):
         """Update guide message according to status."""
-        ToolStatus = runtime_status_pb2.ToolStatus
         tool_status = cls.get_tools()
 
         if tool_status.recording_status == ToolStatus.RECORDING_READY_TO_CHECK:
@@ -241,3 +226,8 @@ class RuntimeStatus(object):
     def _current_timestamp(cls):
         """Current timestamp in milliseconds."""
         return int(time.time() * 1000)
+
+    @staticmethod
+    def __find_by_name(name, value_list):
+        """Find a value in list by name."""
+        return next((value for value in value_list if value.name == name), None)

@@ -16,8 +16,6 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 
-DEFINE_string(adapter_config_path, "", "the file path of adapter config file");
-
 DEFINE_bool(enable_adapter_dump, false,
             "Whether enable dumping the messages to "
             "/tmp/adapters/<topic_name>/<seq_num>.txt for debugging purposes.");
@@ -35,9 +33,20 @@ DEFINE_string(pad_topic, "/apollo/control/pad",
               "control pad message topic name");
 DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
+DEFINE_string(pointcloud_topic, "/apollo/compensator/pointcloud",
+              "pointcloud topic name");
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");
 DEFINE_string(traffic_light_detection_topic, "/apollo/perception/traffic_light",
               "traffic light detection topic name");
-DEFINE_string(decision_topic, "/apollo/decision", "decision topic name");
+DEFINE_string(routing_request_topic, "/apollo/routing_request",
+              "routing request topic name");
+DEFINE_string(routing_response_topic, "/apollo/routing_response",
+              "routing response topic name");
+DEFINE_string(relative_odometry_topic, "/apollo/calibration/relative_odometry",
+              "relative odometry topic name");
+DEFINE_string(ins_stat_topic, "/apollo/sensor/gnss/ins_stat",
+              "ins stat topic name");
+DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
+              "HMI command topic name");

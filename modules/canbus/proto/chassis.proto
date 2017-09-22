@@ -3,20 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 import "modules/common/proto/header.proto";
-
-message Signal {
-  enum TurnSignal {
-    TURN_NONE = 0;
-    TURN_LEFT = 1;
-    TURN_RIGHT = 2;
-  };
-  optional TurnSignal turn_signal = 1;
-  // lights enable command
-  optional bool high_beam = 2;
-  optional bool low_beam = 3;
-  optional bool horn = 4;
-  optional bool emergency_light = 5;
-}
+import "modules/common/proto/vehicle_signal.proto";
 
 // next id :28
 message Chassis {
@@ -94,7 +81,7 @@ message Chassis {
 
   optional int32 chassis_error_mask = 26 [default = 0];
 
-  optional Signal signal = 27;
+  optional apollo.common.VehicleSignal signal = 27;
 
   // Light signals.
   optional bool high_beam_signal = 14 [deprecated = true];

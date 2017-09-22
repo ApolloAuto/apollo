@@ -81,6 +81,9 @@ module.exports = {
                 test: require.resolve("three/examples/js/loaders/MTLLoader.js"),
                 use: "imports-loader?THREE=three"
             }, {
+                test: require.resolve("three/examples/js/loaders/OBJLoader.js"),
+                use: "imports-loader?THREE=three"
+            }, {
                 // Load the images. They goes through image-webpack-loader
                 // first, and then file-loader.
                 //

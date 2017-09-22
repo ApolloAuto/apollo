@@ -22,7 +22,7 @@
 #ifndef MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
 #define MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
 
-#include "modules/control/proto/lon_controller_conf.pb.h"
+#include "modules/control/proto/pid_conf.pb.h"
 
 /**
  * @namespace apollo::control
@@ -34,14 +34,10 @@ namespace control {
 /**
  * @class PIDController
  * @brief A proportional–integral–derivative controller for speed and steering
+ using defualt integral hold
  */
 class PIDController {
  public:
-  /**
-   * @brief constructor
-   */
-  PIDController() = default;
-
   /**
    * @brief initialize pid controller
    * @param pid_conf configuration for pid controller
@@ -67,33 +63,38 @@ class PIDController {
    * @param dt sampling time interval
    * @return control value based on PID terms
    */
-  double Control(const double error, const double dt);
+  virtual double Control(const double error, const double dt);
 
   /**
    * @brief get saturation status
    * @return saturation status
    */
-  int saturation_status() const;
+  int IntegratorSaturationStatus() const;
 
   /**
    * @brief get status that if integrator is hold
    * @return if integrator is hold return true
    */
-  bool integrator_hold() const;
+  bool IntegratorHold() const;
 
- private:
+ protected:
   double kp_ = 0.0;
   double ki_ = 0.0;
   double kd_ = 0.0;
+  double kaw_ = 0.0;
   double previous_error_ = 0.0;
   double previous_output_ = 0.0;
   double integral_ = 0.0;
-  double saturation_high_ = 0.0;
-  double saturation_low_ = 0.0;
+  double integrator_saturation_high_ = 0.0;
+  double integrator_saturation_low_ = 0.0;
   bool first_hit_ = false;
   bool integrator_enabled_ = false;
   bool integrator_hold_ = false;
-  int saturation_status_ = 0;
+  int integrator_saturation_status_ = 0;
+  // Only used for pid_BC_controller and pid_IC_controller
+  double output_saturation_high_ = 0.0;
+  double output_saturation_low_ = 0.0;
+  int output_saturation_status_ = 0;
 };
 
 }  // namespace control

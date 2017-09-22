@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.calibration.republish_msg;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+
+message RelativeOdometry {
+  optional apollo.common.Header header = 1;
+
+  // the relative position to the system start time
+  optional apollo.common.PointENU position = 2;
+
+  // the relative orientation to the system start time
+  optional apollo.common.Quaternion orientation = 3;
+
+  // the localization status
+  optional uint32 position_type = 4;
+}

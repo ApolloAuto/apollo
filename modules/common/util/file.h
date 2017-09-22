@@ -22,6 +22,7 @@
 #define MODULES_COMMON_UTIL_FILE_H_
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -32,7 +33,7 @@
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
 #include "modules/common/log.h"
-#include "modules/common/util/util.h"
+#include "modules/common/util/string_util.h"
 
 /**
  * @namespace apollo::common::util
@@ -41,6 +42,22 @@
 namespace apollo {
 namespace common {
 namespace util {
+
+template <typename MessageType>
+bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {
+  using google::protobuf::io::ZeroCopyOutputStream;
+  using google::protobuf::io::FileOutputStream;
+  using google::protobuf::TextFormat;
+  if (file_descriptor < 0) {
+    AERROR << "Invalid file descriptor";
+    return false;
+  }
+  ZeroCopyOutputStream *output = new FileOutputStream(file_descriptor);
+  bool success = TextFormat::Print(message, output);
+  delete output;
+  close(file_descriptor);
+  return success;
+}
 
 /**
  * @brief Sets the content of the file specified by the file_name to be the
@@ -52,19 +69,8 @@ namespace util {
 template <typename MessageType>
 bool SetProtoToASCIIFile(const MessageType &message,
                          const std::string &file_name) {
-  using google::protobuf::io::ZeroCopyOutputStream;
-  using google::protobuf::io::FileOutputStream;
-  using google::protobuf::TextFormat;
-  int file_descriptor = open(file_name.c_str(), O_WRONLY | O_CREAT, S_IRWXU);
-  if (file_descriptor < 0) {
-    // Failed to open;
-    return false;
-  }
-  ZeroCopyOutputStream *output = new FileOutputStream(file_descriptor);
-  bool success = TextFormat::Print(message, output);
-  delete output;
-  close(file_descriptor);
-  return success;
+  return SetProtoToASCIIFile(
+      message, open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU));
 }
 
 /**
@@ -82,15 +88,34 @@ bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
   using google::protobuf::TextFormat;
   int file_descriptor = open(file_name.c_str(), O_RDONLY);
   if (file_descriptor < 0) {
+    AERROR << "Failed to open file " << file_name;
     // Failed to open;
     return false;
   }
 
   ZeroCopyInputStream *input = new FileInputStream(file_descriptor);
   bool success = TextFormat::Parse(input, message);
+  if (!success) {
+    AERROR << "Failed to parse file " << file_name;
+  }
   delete input;
   close(file_descriptor);
   return success;
+}
+
+/**
+ * @brief Sets the content of the file specified by the file_name to be the
+ *        binary representation of the input protobuf.
+ * @param message The proto to output to the specified file.
+ * @param file_name The name of the target file to set the content.
+ * @return If the action is successful.
+ */
+template <typename MessageType>
+bool SetProtoToBinaryFile(const MessageType &message,
+                          const std::string &file_name) {
+  std::fstream output(file_name,
+                      std::ios::out | std::ios::trunc | std::ios::binary);
+  return message.SerializeToOstream(&output);
 }
 
 /**
@@ -105,7 +130,15 @@ template <typename MessageType>
 bool GetProtoFromBinaryFile(const std::string &file_name,
                             MessageType *message) {
   std::fstream input(file_name, std::ios::in | std::ios::binary);
-  return message->ParseFromIstream(&input);
+  if (!input.good()) {
+    AERROR << "Failed to open file " << file_name;
+    return false;
+  }
+  if (!message->ParseFromIstream(&input)) {
+    AERROR << "Failed to parse file " << file_name;
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -131,6 +164,13 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
   }
   return true;
 }
+
+/**
+ * @brief Check if the path exists.
+ * @return If the path exists.
+ */
+bool PathExists(const std::string &path);
+
 /**
  * @brief Check if the directory specified by directory_path exists
  *        and is indeed a directory.

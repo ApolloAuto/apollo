@@ -54,7 +54,7 @@ bool ProjectByXSlow(const std::vector<Vec2d> &points, double x,
 TEST(Polygon2dTest, polygon_IsPointIn) {
   const Polygon2d poly1(Box2d::CreateAABox({0, 0}, {1, 1}));
   EXPECT_EQ(poly1.DebugString(),
-            "polygon2d (  num_points = 4  points = ( vec2d ( x = 1  y = 0 ) "
+            "polygon2d (  num_points = 4  points = (vec2d ( x = 1  y = 0 ) "
             "vec2d ( x = 1  y = 1 ) vec2d ( x = 0  y = 1 ) vec2d ( x = 0  y = "
             "0 ) )  convex  area = 1 )");
   EXPECT_TRUE(poly1.IsPointIn({0.5, 0.5}));

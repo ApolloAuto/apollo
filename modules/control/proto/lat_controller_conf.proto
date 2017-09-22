@@ -17,6 +17,7 @@ message LatControllerConf {
   repeated double matrix_q = 10;     // matrix_q size = 4 + preview_window
   optional int32 cutoff_freq = 11;   // cutoff frequency
   optional int32 mean_filter_window_size = 12;  // window size of mean filter
+  // for a normal car, it should be in range[16, 18]
   optional int32 max_iteration = 13;  // maximum iteration for lqr solve
   optional double max_lateral_acceleration = 14;  // limit aggressive steering
   optional LatGainScheduler lat_err_gain_scheduler = 15;

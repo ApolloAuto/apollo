@@ -3,85 +3,84 @@ syntax = "proto2";
 package apollo.planning_internal;
 
 import "modules/common/proto/header.proto";
-import "modules/decision/proto/decision.proto";
+import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
-import "modules/localization/proto/pose.proto";
-import "modules/perception/proto/perception_obstacle.proto";
-import "modules/prediction/proto/prediction_obstacle.proto";
-
-message PlanningObstacle {
-  optional int32 perception_id = 1;
-  optional string decision_id = 2;
-
-  optional apollo.perception.Point position =
-      3;  // obstacle position in the world coordinate system.
-  optional double theta = 4;  // heading in the world coordinate system
-  optional apollo.perception.Point velocity = 5;  // obstacle velocity.
-  // obstacle speed ( == sqrt(velocity.x^2 + velocity.y^2)
-  optional double speed = 6;
-
-  // Size of obstacle bounding box.
-  optional double length = 7;  // obstacle length.
-  optional double width = 8;   // obstacle width.
-  optional double height = 9;  // obstacle height.
-
-  // obstacle corner points.
-  repeated apollo.perception.Point polygon_point = 10;
-  // duration of an obstacle since detection.
-  optional double tracking_time = 11;
-
-  // perception timestamp in ms
-  optional double perception_timestamp = 12;
-  // object type in perception
-  optional apollo.perception.PerceptionObstacle.Type perception_object_type =
-      13;
-
-  optional double prediction_timestamp = 14;  // prediction_timestamp in ms
-  // from prediction
-  repeated apollo.prediction.Trajectory prediction_trajectory = 15;
-
-  // object type in decision
-  optional apollo.decision.ObjectDecision.ObjectType decision_object_type = 16;
-  optional apollo.decision.ObjectDecisionType object_decision =
-      17 [deprecated = true];
-  repeated apollo.decision.ObjectDecisionType planning_object_decision = 18;
-}
+import "modules/routing/proto/routing.proto";
 
 message Debug {
-  enum ErrorCode {
-    OK = 0; ERR_NOT_READY = 1; ERR_ESTOP = 2; ERR_PATH_OPTIMIZER = 3;
-    ERR_SPEED_OPTIMIZER = 4;
-    ERR_ST_GRAPH = 5;
-    ERR_SANITY_CHECK = 6;
-  }
-
-  /*
-      PLEASE add id here
-      id = 1: st_graph_info
-  */
-  message DebugMessage {
-    optional ErrorCode error_code = 1 [default = OK];
-    optional int32 id = 2;
-    oneof debug_string {
-      string trace = 3;
-      string info = 4;
-      string warn = 5;
-      string error = 6;
-      string fatal = 7;
-    }
-  }
-
-  optional ErrorCode error_code = 1 [default = OK];
   optional PlanningData planning_data = 2;
-  repeated DebugMessage debug_message = 3;
 }
 
+message SpeedPlan {
+  optional string name = 1;
+  repeated apollo.common.SpeedPoint speed_point = 2;
+}
+
+message StGraphBoundaryDebug {
+  enum StBoundaryType {
+    ST_BOUNDARY_TYPE_UNKNOWN = 1;
+    ST_BOUNDARY_TYPE_STOP = 2;
+    ST_BOUNDARY_TYPE_FOLLOW = 3;
+    ST_BOUNDARY_TYPE_YIELD = 4;
+    ST_BOUNDARY_TYPE_OVERTAKE = 5;
+  }
+  optional string name = 1;
+  repeated apollo.common.SpeedPoint point = 2;
+  optional StBoundaryType type = 3;
+}
+
+message SLFrameDebug {
+  optional string name = 1;
+  repeated double sampled_s = 2;
+  repeated double static_obstacle_lower_bound = 3;
+  repeated double dynamic_obstacle_lower_bound = 4;
+  repeated double static_obstacle_upper_bound = 5;
+  repeated double dynamic_obstacle_upper_bound = 6;
+  repeated double map_lower_bound = 7;
+  repeated double map_upper_bound = 8;
+  repeated apollo.common.SLPoint sl_path = 9;
+  repeated double aggregated_boundary_s = 10;
+  repeated double aggregated_boundary_low = 11;
+  repeated double aggregated_boundary_high = 12;
+}
+
+message STGraphDebug {
+  message STGraphSpeedConstraint {
+    repeated double t = 1;
+    repeated double lower_bound = 2;
+    repeated double upper_bound = 3;
+  }
+  message STGraphKernelCuiseRef {
+    repeated double t = 1;
+    repeated double cruise_line_s = 2;
+  }
+  message STGraphKernelFollowRef {
+    repeated double t = 1;
+    repeated double follow_line_s = 2;
+  }
+
+  optional string name = 1;
+  repeated StGraphBoundaryDebug boundary = 2;
+  repeated apollo.common.SpeedPoint speed_limit = 3;
+  repeated apollo.common.SpeedPoint speed_profile = 4;
+  optional STGraphSpeedConstraint speed_constraint = 5;
+  optional STGraphKernelCuiseRef kernel_cruise_ref = 6;
+  optional STGraphKernelFollowRef kernel_follow_ref = 7;
+}
+
+// next id: 17
 message PlanningData {
-  optional apollo.common.Header header = 1;
-  optional apollo.localization.Pose init_status = 2;  // initial status of adc
-  optional apollo.decision.MainDecision main_decision = 3;  // from decision
-  // processed planning_obstacles
-  repeated PlanningObstacle planning_obstacle = 4;
-  optional apollo.decision.LightSignal light_signal =
-      5;  // light signal from decision
+  // input
+  optional apollo.localization.LocalizationEstimate adc_position = 7;
+  optional apollo.canbus.Chassis chassis = 8;
+  optional apollo.routing.RoutingResponse routing = 9;
+  optional apollo.common.TrajectoryPoint init_point = 10;
+
+  repeated apollo.common.Path path = 6;
+  repeated SpeedPlan speed_plan = 13;
+  repeated STGraphDebug st_graph = 14;
+  repeated SLFrameDebug sl_frame = 15;
+
+  optional apollo.common.Header prediction_header = 16;
 }

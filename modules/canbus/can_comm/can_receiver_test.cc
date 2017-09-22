@@ -31,7 +31,7 @@ TEST(CanReceiverTest, ReceiveOne) {
   CanReceiver receiver;
 
   receiver.Init(&can_client, &pm, false);
-  EXPECT_EQ(receiver.Start(), ::apollo::common::ErrorCode::OK);
+  EXPECT_EQ(receiver.Start(), common::ErrorCode::OK);
   EXPECT_TRUE(receiver.IsRunning());
   receiver.Stop();
   EXPECT_FALSE(receiver.IsRunning());

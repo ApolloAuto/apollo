@@ -4,7 +4,9 @@ import * as THREE from "three";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
+import RouteEditingManager from "store/route_editing_manager";
 import PARAMETERS from "store/config/parameters.yml";
+
 
 class DreamviewStore {
     // Mutable States
@@ -15,11 +17,15 @@ class DreamviewStore {
         height: window.innerHeight,
     };
 
+    @observable isInitialized = false;
+
     @observable meters = new Meters();
 
     @observable monitor = new Monitor();
 
     @observable options = new Options();
+
+    @observable routeEditingManager = new RouteEditingManager();
 
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;
@@ -31,6 +37,11 @@ class DreamviewStore {
             height: window.innerHeight,
         };
     }
+
+    @action setInitializationStatus(status){
+        this.isInitialized = status;
+    }
+
 }
 
 const STORE = new DreamviewStore();

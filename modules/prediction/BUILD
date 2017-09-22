@@ -10,10 +10,33 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common:log",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/adapters/proto:adapter_config_proto",
+        "//modules/common/util",
+        "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/common:prediction_common",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
+    ],
+)
+
+cc_test(
+    name = "prediction_test",
+    size = "small",
+    srcs = ["prediction_test.cc"],
+    data = [
+        "//modules/prediction:prediction_conf",
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction:prediction_lib",
+        "@gtest//:main",
     ],
 )
 
@@ -21,9 +44,24 @@ cc_binary(
     name = "prediction",
     srcs = ["main.cc"],
     deps = [
-        ":prediction_lib",
         "//external:gflags",
+        "//modules/prediction:prediction_lib",
     ],
+)
+
+filegroup(
+    name = "prediction_data",
+    srcs = glob(["data/**"]),
+)
+
+filegroup(
+    name = "prediction_conf",
+    srcs = glob(["conf/**"]),
+)
+
+filegroup(
+    name = "prediction_testdata",
+    srcs = glob(["testdata/**"]),
 )
 
 cpplint()

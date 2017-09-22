@@ -25,11 +25,11 @@
 namespace apollo {
 namespace localization {
 
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::monitor::MonitorBuffer;
-using ::apollo::common::Status;
-using ::apollo::common::time::Clock;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::monitor::MonitorBuffer;
+using apollo::common::Status;
+using apollo::common::time::Clock;
 
 CameraLocalization::CameraLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION) {}
@@ -142,7 +142,7 @@ bool CameraLocalization::CreateLocalizationMsg(
 
   // header
   AdapterManager::FillLocalizationHeader(FLAGS_localization_module_name,
-                                         localization->mutable_header());
+                                         localization);
   if (FLAGS_enable_gps_timestamp) {
     // copy time stamp, do NOT use Clock::Now()
     localization->mutable_header()->set_timestamp_sec(
@@ -186,7 +186,7 @@ bool CameraLocalization::PublishLocalization() {
 
   // publish localization messages
   AdapterManager::PublishLocalization(localization);
-  AINFO << "[OnTimer]: Localization message publish success!";
+  ADEBUG << "[OnTimer]: Localization message publish success!";
   return true;
 }
 

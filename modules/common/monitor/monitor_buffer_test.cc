@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/common/monitor/monitor_buffer.h"
+
 #include <string>
 #include "gtest/gtest.h"
 #include "modules/common/monitor/monitor.h"
@@ -42,7 +44,7 @@ TEST_F(MonitorBufferTest, PrintLog) {
     testing::internal::CaptureStderr();
     buffer_->PrintLog();
     EXPECT_NE(std::string::npos,
-              testing::internal::GetCapturedStderr().find("[INFO] INFO_msg"));
+              testing::internal::GetCapturedStderr().find("INFO_msg"));
   }
   {
     buffer_->ERROR("ERROR_msg");
@@ -111,9 +113,9 @@ TEST_F(MonitorBufferTest, Operator) {
   buffer_->INFO() << 3 << "pieces";
   EXPECT_EQ(MonitorMessageItem::INFO, buffer_->level_);
   ASSERT_EQ(2, buffer_->monitor_msg_items_.size());
-  item = buffer_->monitor_msg_items_.back();
-  EXPECT_EQ(MonitorMessageItem::INFO, item.first);
-  EXPECT_EQ("3pieces", item.second);
+  auto item2 = buffer_->monitor_msg_items_.back();
+  EXPECT_EQ(MonitorMessageItem::INFO, item2.first);
+  EXPECT_EQ("3pieces", item2.second);
 
   const char *fake_input = nullptr;
   EXPECT_TRUE(&(buffer_->INFO() << fake_input) == buffer_);

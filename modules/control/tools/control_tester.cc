@@ -46,28 +46,28 @@ DEFINE_int32(num_seconds, 10, "Length of execution.");
 DEFINE_int32(feed_frequency, 10,
              "Frequency with which protos are fed to control.");
 
-using std::this_thread::sleep_for;
+int main(int argc, char** argv) {
+  using std::this_thread::sleep_for;
 
-using ::apollo::canbus::Chassis;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::control::PadMessage;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::planning::ADCTrajectory;
+  using apollo::canbus::Chassis;
+  using apollo::common::adapter::AdapterManager;
+  using apollo::control::PadMessage;
+  using apollo::localization::LocalizationEstimate;
+  using apollo::planning::ADCTrajectory;
 
-int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;
-  FLAGS_adapter_config_path =
+  const std::string& config_file =
       "modules/control/testdata/control_tester/adapter.conf";
   ros::init(argc, argv, "control_tester");
-  AdapterManager::Init();
+  AdapterManager::Init(config_file);
   AINFO << "AdapterManager is initialized.";
   for (int i = 0; i < FLAGS_num_seconds * FLAGS_feed_frequency; ++i) {
-    AdapterManager::FeedChassisProtoFile(FLAGS_chassis_test_file);
-    AdapterManager::FeedLocalizationProtoFile(FLAGS_l10n_test_file);
-    AdapterManager::FeedPadProtoFile(FLAGS_pad_msg_test_file);
-    AdapterManager::FeedPlanningTrajectoryProtoFile(FLAGS_planning_test_file);
+    AdapterManager::FeedChassisFile(FLAGS_chassis_test_file);
+    AdapterManager::FeedLocalizationFile(FLAGS_l10n_test_file);
+    AdapterManager::FeedPadFile(FLAGS_pad_msg_test_file);
+    AdapterManager::FeedPlanningFile(FLAGS_planning_test_file);
     sleep_for(std::chrono::milliseconds(1000 / FLAGS_feed_frequency));
   }
   AINFO << "Successfully fed proto files.";

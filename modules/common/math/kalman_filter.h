@@ -22,13 +22,13 @@
 #ifndef MODULES_COMMON_MATH_KALMAN_FILTER_H_
 #define MODULES_COMMON_MATH_KALMAN_FILTER_H_
 
-#include <sstream>
 #include <string>
 
 #include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/math/matrix_operations.h"
+#include "modules/common/util/string_util.h"
 
 /**
  * @namespace apollo::common::math
@@ -139,42 +139,35 @@ class KalmanFilter {
    *
    * @return Transition matrix.
    */
-  const Eigen::Matrix<T, XN, XN> &GetTransitionMatrix() { return F_; }
+  const Eigen::Matrix<T, XN, XN> &GetTransitionMatrix() const { return F_; }
 
   /**
    * @brief Get the covariance matrix of the transition noise.
    *
    * @return Covariance matrix
    */
-  const Eigen::Matrix<T, XN, XN> &GetTransitionNoise() { return Q_; }
+  const Eigen::Matrix<T, XN, XN> &GetTransitionNoise() const { return Q_; }
 
   /**
    * @brief Get the observation matrix, which maps states to observations.
    *
    * @return Observation matrix
    */
-  const Eigen::Matrix<T, ZN, XN> &GetObservationMatrix() { return H_; }
+  const Eigen::Matrix<T, ZN, XN> &GetObservationMatrix() const { return H_; }
 
   /**
    * @brief Get the covariance matrix of the observation noise.
    *
    * @return Covariance matrix
    */
-  const Eigen::Matrix<T, ZN, ZN> &GetObservationNoise() { return R_; }
-
-  /**
-   * @brief Get the covariance matrix of current state belief distribution.
-   *
-   * @return State covariance matrix
-   */
-  const Eigen::Matrix<T, XN, XN> &GetStateCovariance() { return P_; }
+  const Eigen::Matrix<T, ZN, ZN> &GetObservationNoise() const { return R_; }
 
   /**
    * @brief Get the control matrix in the state transition rule.
    *
    * @return Control matrix
    */
-  const Eigen::Matrix<T, XN, UN> &GetControlMatrix() { return B_; }
+  const Eigen::Matrix<T, XN, UN> &GetControlMatrix() const { return B_; }
 
   /**
    * @brief Updates the state belief distribution given the control input u.
@@ -273,15 +266,14 @@ inline void KalmanFilter<T, XN, ZN, UN>::Correct(
 template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline std::string KalmanFilter<T, XN, ZN, UN>::DebugString() const {
   Eigen::IOFormat clean_fmt(4, 0, ", ", " ", "[", "]");
-  std::ostringstream strs;
-  strs << "F = " << F_.format(clean_fmt) << "\n";
-  strs << "B = " << B_.format(clean_fmt) << "\n";
-  strs << "H = " << H_.format(clean_fmt) << "\n";
-  strs << "Q = " << Q_.format(clean_fmt) << "\n";
-  strs << "R = " << R_.format(clean_fmt) << "\n";
-  strs << "x = " << x_.format(clean_fmt) << "\n";
-  strs << "P = " << P_.format(clean_fmt) << "\n";
-  return strs.str();
+  return util::StrCat(
+      "F = ", F_.format(clean_fmt), "\n"
+      "B = ", B_.format(clean_fmt), "\n"
+      "H = ", H_.format(clean_fmt), "\n"
+      "Q = ", Q_.format(clean_fmt), "\n"
+      "R = ", R_.format(clean_fmt), "\n"
+      "x = ", x_.format(clean_fmt), "\n"
+      "P = ", P_.format(clean_fmt), "\n");
 }
 
 }  // namespace math

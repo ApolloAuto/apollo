@@ -74,8 +74,8 @@ class RTKLocalization : public LocalizationBase {
   void RunWatchDog();
 
   void PrepareLocalizationMsg(LocalizationEstimate *localization);
-  void ComposeLocalizationMsg(const ::apollo::localization::Gps &gps,
-                              const ::apollo::localization::Imu &imu,
+  void ComposeLocalizationMsg(const localization::Gps &gps,
+                              const localization::Imu &imu,
                               LocalizationEstimate *localization);
   bool FindMatchingIMU(const double gps_timestamp_sec, Imu *imu_msg);
   void InterpolateIMU(const Imu &imu1, const Imu &imu2,

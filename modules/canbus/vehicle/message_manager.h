@@ -84,7 +84,7 @@ class MessageManager {
    * concurrent read/write issue.
    * @param chassis_detail chassis_detail to be filled.
    */
-  ::apollo::common::ErrorCode GetChassisDetail(
+  common::ErrorCode GetChassisDetail(
       ChassisDetail *const chassis_detail);
 
   /*

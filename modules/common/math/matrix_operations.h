@@ -57,6 +57,22 @@ Eigen::Matrix<T, N, N> PseudoInverse(const Eigen::Matrix<T, N, N> &m,
 }
 
 /**
+ * @brief Computes the Moore-Penrose pseudo-inverse of a given matrix,
+ * rounding all eigenvalues with absolute value bounded by epsilon to zero.
+ *
+ * @param m The matrix to be pseudo-inverted
+ * @param epsilon A small positive real number (optional; default is 1.0e-6).
+ *
+ * @return Moore-Penrose pseudo-inverse of the given matrix.
+ */
+template <typename T, unsigned int M, unsigned int N>
+Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N>& m,
+        const double epsilon = 1.0e-6) {
+    Eigen::Matrix<T, M, M> t = m * m.transpose();
+    return m.transpose() * PseudoInverse<T, M>(t);
+}
+
+/**
  * @brief Implements Tustin's method for converting transfer functions from
  * continuous to discrete time domains.
  * https://en.wikipedia.org/wiki/Bilinear_transform

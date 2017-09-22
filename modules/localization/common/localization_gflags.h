@@ -38,7 +38,6 @@ DECLARE_bool(enable_map_reference_unify);
 DECLARE_bool(enable_watchdog);
 
 DECLARE_double(gps_time_delay_tolerance);
-DECLARE_double(imu_time_delay_tolerance);
 DECLARE_double(camera_time_delay_tolerance);
 DECLARE_double(gps_imu_timestamp_sec_diff_tolerance);
 DECLARE_double(timestamp_sec_tolerance);
@@ -46,8 +45,6 @@ DECLARE_double(timestamp_sec_tolerance);
 DECLARE_double(map_offset_x);
 DECLARE_double(map_offset_y);
 DECLARE_double(map_offset_z);
-
-DECLARE_int32(monitor_level);
 
 DECLARE_int32(report_threshold_err_num);
 DECLARE_double(report_gps_imu_time_diff_threshold);

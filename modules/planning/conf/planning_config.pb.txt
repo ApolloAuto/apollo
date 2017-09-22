@@ -1,0 +1,136 @@
+planner_type : EM
+em_planner_config {
+    task : TRAFFIC_DECIDER
+
+    task : DP_POLY_PATH_OPTIMIZER
+
+    task : PATH_DECIDER
+
+    task : DP_ST_SPEED_OPTIMIZER
+
+    task : SPEED_DECIDER
+
+    task : QP_SPLINE_PATH_OPTIMIZER
+    task : QP_SPLINE_ST_SPEED_OPTIMIZER
+
+    dp_poly_path_config {
+        sample_level: 8
+        sample_points_num_each_level: 9
+        step_length_max: 15.0
+        step_length_min: 8.0
+        lateral_sample_offset: 0.5
+        lateral_adjust_coeff: 0.5
+        eval_time_interval: 0.1
+        path_resolution: 0.1
+        obstacle_ignore_distance: 20.0
+        obstacle_collision_distance: 0.2
+        obstacle_risk_distance: 2.0
+        obstacle_collision_cost: 1e3
+    }
+    dp_st_speed_config {
+        total_path_length: 80
+        total_time: 8.0
+        matrix_dimension_s: 200
+        matrix_dimension_t: 20
+
+        speed_weight: 0.0
+        accel_weight: 10.0
+        jerk_weight: 10.0
+        obstacle_weight: 1.0
+        reference_weight: 0.0
+        go_down_buffer: 5.0
+        go_up_buffer: 5.0
+
+        default_obstacle_cost: 1e10
+        obstacle_cost_factor: -300
+
+        default_speed_cost: 1.0
+        exceed_speed_penalty: 10.0
+        low_speed_penalty: 2.5
+
+        accel_penalty: 2.0
+        decel_penalty: 2.0
+
+        positive_jerk_coeff: 1.0
+        negative_jerk_coeff: 300.0
+
+        max_acceleration: 4.5
+        max_deceleration: -4.5
+
+        st_boundary_config {
+            boundary_buffer: 0.1
+            high_speed_centric_acceleration_limit: 1.0
+            low_speed_centric_acceleration_limit: 1.35
+            high_speed_threshold: 20
+            low_speed_threshold: 7
+            minimal_kappa: 0.00001
+            point_extension: 1.0
+            lowest_speed: 2.5
+        }
+    }
+    qp_spline_path_config {
+        spline_order: 6
+        number_of_knots: 6
+        number_of_fx_constraint_knots: 13
+        time_resolution: 0.1
+        regularization_weight: 0.1
+        derivative_weight: 10.0
+        second_derivative_weight: 1.0
+        third_derivative_weight: 1.0
+        reference_line_weight: 0.1
+        num_refline_point: 10
+        num_output: 100
+        cross_lane_extension_buffer: 0.2
+    }
+    qp_spline_st_speed_config {
+        total_path_length: 200.0
+        total_time: 6.0
+        output_time_resolution: 0.05
+        number_of_discrete_graph_t: 4
+        number_of_evaluated_graph_t: 40
+        spline_order: 6
+        speed_kernel_weight: 0.0
+        accel_kernel_weight: 1000.0
+        jerk_kernel_weight: 500.0
+        follow_weight: 2.0
+        stop_weight: 0.2
+        cruise_weight: 0.3
+        regularization_weight: 0.05
+        preferred_max_acceleration: 1.2
+        preferred_min_deceleration: -1.8
+        max_acceleration: 2.0
+        min_deceleration: -4.5
+        follow_drag_distance: 17.0
+
+        st_boundary_config {
+            boundary_buffer: 0.1
+            high_speed_centric_acceleration_limit: 2.0
+            low_speed_centric_acceleration_limit: 2.0
+            high_speed_threshold: 20
+            low_speed_threshold: 7
+            minimal_kappa: 0.00001
+            point_extension: 1.0
+            lowest_speed: 2.5
+        }
+    }
+}
+
+reference_line_smoother_config {
+    num_spline: 7
+    spline_order: 7
+    num_evaluated_points: 36
+    boundary_bound: 0.2
+    derivative_bound: 1.0
+    second_derivative_bound: 1.0
+    third_derivative_bound: 1.0
+    ref_line_weight: 0.0
+    derivative_weight: 0.0
+    second_derivative_weight: 0.0
+    third_derivative_weight: 100.0
+    num_of_total_points: 500
+}
+
+rule_config : {
+    name: "BackSideVehicles"
+}
+
