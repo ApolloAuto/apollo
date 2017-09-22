@@ -98,6 +98,8 @@ class PathObstacle {
 
   bool HasLongitudinalDecision() const;
 
+  bool HasNonIgnoreDecision() const;
+
   /**
    * @brief Check if this object can be safely ignored.
    * The object will be ignored if the lateral decision is ignore and the
@@ -105,6 +107,8 @@ class PathObstacle {
    *  return longitudinal_decision_ == ignore && lateral_decision == ignore.
    */
   bool IsIgnore() const;
+  bool IsLongitudinalIgnore() const;
+  bool IsLateralIgnore() const;
 
  private:
   /**

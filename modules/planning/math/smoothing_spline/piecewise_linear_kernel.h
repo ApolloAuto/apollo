@@ -33,14 +33,16 @@ class PiecewiseLinearKernel {
  public:
   PiecewiseLinearKernel(const uint32_t dimension, const double unit_segment);
 
-  void AddRegularization(const double regularized_param);
+  void AddRegularization(const double param);
 
   const Eigen::MatrixXd& kernel_matrix() const;
   const Eigen::MatrixXd& offset_matrix() const;
 
-  void AddDerivativeKernelMatrix(const double weight);
-  void AddSecondOrderDerivativeMatrix(const double weight);
-  void AddThirdOrderDerivativeMatrix(const double weight);
+  void AddSecondOrderDerivativeMatrix(const double init_derivative,
+                                      const double weight);
+  void AddThirdOrderDerivativeMatrix(const double init_derivative,
+                                     const double init_second_derivative,
+                                     const double weight);
 
   // reference line kernel
   bool AddReferenceLineKernelMatrix(const std::vector<uint32_t>& index_list,

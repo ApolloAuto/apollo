@@ -1712,18 +1712,6 @@ decision {
           distance_l: -0.3
         }
       }
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "DEST"
-      perception_id: -1109540454
-      object_decision {
-        ignore {
-        }
-      }
     }
   }
 }

@@ -86,8 +86,12 @@ bool PiecewiseLinearConstraint::AddBoundary(
 
   for (uint32_t i = 0; i < index_list.size(); ++i) {
     uint32_t index = index_list[i];
+
+    // x(i) < upper_bound[i] ==> -x(i) > -upper_bound[i]
     inequality_matrix(2 * i, index) = -1.0;
     inequality_boundary(2 * i, 0) = -upper_bound[i];
+
+    // x(i) > lower_bound[i]
     inequality_matrix(2 * i + 1, index) = 1.0;
     inequality_boundary(2 * i + 1, 0) = lower_bound[i];
   }
@@ -113,16 +117,14 @@ bool PiecewiseLinearConstraint::AddDerivativeBoundary(
 
   for (uint32_t i = 0; i < index_list.size(); ++i) {
     uint32_t index = index_list[i];
-    if (index == 0) {
-      AERROR << "Index should NOT be 0.";
-      return false;
-    }
 
-    inequality_matrix(2 * i, index - 1) = 1.0;
+    if (index > 0) {
+      inequality_matrix(2 * i, index - 1) = 1.0;
+      inequality_matrix(2 * i + 1, index - 1) = -1.0;
+    }
     inequality_matrix(2 * i, index) = -1.0;
     inequality_boundary(2 * i, 0) = -unit_segment_ * upper_bound[i];
 
-    inequality_matrix(2 * i + 1, index - 1) = -1.0;
     inequality_matrix(2 * i + 1, index) = 1.0;
     inequality_boundary(2 * i, 0) = unit_segment_ * lower_bound[i];
   }
@@ -149,21 +151,25 @@ bool PiecewiseLinearConstraint::AddSecondDerivativeBoundary(
 
   for (uint32_t i = 0; i < index_list.size(); ++i) {
     uint32_t index = index_list[i];
-    if (index == 0) {
-      AERROR << "Index should NOT be 0.";
-      return false;
-    }
-
     const double upper = upper_bound[i];
     const double lower = lower_bound[i];
-    if (index == 1) {
-      inequality_matrix(2 * i, 1) = -1.0;
-      inequality_boundary(2 * i, 1) = -(upper * unit_segment_ * unit_segment_ +
+
+    if (index == 0) {
+      inequality_matrix(2 * i, 0) = -1.0;
+      inequality_boundary(2 * i, 0) = -(upper * unit_segment_ * unit_segment_ +
                                         init_derivative * unit_segment_);
-      inequality_matrix(2 * i + 1, 1) = 1.0;
-      inequality_boundary(2 * i + 1, 1) =
+      inequality_matrix(2 * i + 1, 0) = 1.0;
+      inequality_boundary(2 * i + 1, 0) =
           lower * unit_segment_ * unit_segment_ +
           init_derivative * unit_segment_;
+    } else if (index == 1) {
+      inequality_matrix(2 * i, 0) = 2.0;
+      inequality_matrix(2 * i, 1) = -1.0;
+      inequality_boundary(2 * i, 0) = -upper * unit_segment_ * unit_segment_;
+
+      inequality_matrix(2 * i + 1, 0) = 2.0;
+      inequality_matrix(2 * i + 1, 1) = 1.0;
+      inequality_boundary(2 * i + 1, 0) = lower * unit_segment_ * unit_segment_;
     } else {
       inequality_matrix(2 * i, index - 2) = -1.0;
       inequality_matrix(2 * i, index - 1) = 2.0;
@@ -181,39 +187,42 @@ bool PiecewiseLinearConstraint::AddSecondDerivativeBoundary(
   return true;
 }
 
-bool PiecewiseLinearConstraint::AddPointConstraint(const double x,
-                                                   const double fx) {
-  // TODO(Liangliang): implement this function
+bool PiecewiseLinearConstraint::AddPointConstraint(const uint32_t index,
+                                                   const double val) {
+  Eigen::MatrixXd equality_matrix = Eigen::MatrixXd::Zero(1, dimension_);
+  Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(1, 1);
+
+  equality_matrix(0, index) = 1.0;
+  equality_boundary(0, 0) = val;
+  inequality_matrices_.push_back(equality_matrix);
+  inequality_boundaries_.push_back(equality_boundary);
   return true;
 }
 
-bool PiecewiseLinearConstraint::AddPointDerivativeConstraint(const double x,
-                                                             const double dfx) {
-  // TODO(Liangliang): implement this function
-  return true;
-}
+bool PiecewiseLinearConstraint::AddPointDerivativeConstraint(
+    const uint32_t index, const double val) {
+  CHECK_GE(index, 1);
+  Eigen::MatrixXd equality_matrix = Eigen::MatrixXd::Zero(1, dimension_);
+  Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(1, 1);
 
-bool PiecewiseLinearConstraint::AddPointSecondDerivativeConstraint(
-    const double x, const double ddfx) {
-  // TODO(Liangliang): implement this function
-  return true;
-}
-
-bool PiecewiseLinearConstraint::AddPointThirdDerivativeConstraint(
-    const double x, const double dddfx) {
-  // TODO(Liangliang): implement this function
+  equality_matrix(0, index) = -1.0;
+  equality_matrix(0, index + 1) = 1.0;
+  equality_boundary(0, 0) = val;
   return true;
 }
 
 bool PiecewiseLinearConstraint::AddMonotoneInequalityConstraint() {
   Eigen::MatrixXd inequality_matrix =
-      Eigen::MatrixXd::Zero(dimension_ - 1, dimension_ - 1);
-  Eigen::MatrixXd inequality_boundary =
-      Eigen::MatrixXd::Zero(dimension_ - 1, 1);
+      Eigen::MatrixXd::Zero(dimension_, dimension_);
+  Eigen::MatrixXd inequality_boundary = Eigen::MatrixXd::Zero(dimension_, 1);
 
-  for (uint32_t i = 1; i < dimension_; ++i) {
-    inequality_matrix(i, i - 1) = -1.0;
-    inequality_matrix(i, i) = 1.0;
+  for (uint32_t i = 0; i < dimension_; ++i) {
+    if (i == 0) {
+      inequality_matrix(0, 0) = 1.0;
+    } else {
+      inequality_matrix(i, i - 1) = -1.0;
+      inequality_matrix(i, i) = 1.0;
+    }
   }
   inequality_matrices_.push_back(inequality_matrix);
   inequality_boundaries_.push_back(inequality_boundary);
