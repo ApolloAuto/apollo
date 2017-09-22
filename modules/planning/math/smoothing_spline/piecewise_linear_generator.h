@@ -48,6 +48,9 @@ class PiecewiseLinearGenerator {
   // solve
   bool Solve();
 
+  // results
+  Eigen::MatrixXd params() const { return qp_solver_->params(); }
+
  private:
   const uint32_t num_of_segments_;
   const double unit_segment_;

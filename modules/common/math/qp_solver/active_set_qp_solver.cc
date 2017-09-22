@@ -57,9 +57,19 @@ bool ActiveSetQpSolver::Solve() {
   if (!debug_info_) {
     qp_problem.setPrintLevel(qpOASES::PL_NONE);
   }
+  if (kernel_matrix_.rows() != kernel_matrix_.cols()) {
+    AERROR << "kernel_matrix_.rows() [" << kernel_matrix_.rows()
+           << "] and kernel_matrix_.cols() [" << kernel_matrix_.cols()
+           << "] should be identical.";
+    return false;
+  }
   // definition of qpOASESproblem
-  double h_matrix[kernel_matrix_.rows() * kernel_matrix_.cols()];  // NOLINT
-  double g_matrix[offset_.rows()];                                 // NOLINT
+  const int kNumOfMatrixElements =
+      kernel_matrix_.rows() * kernel_matrix_.cols();
+  double h_matrix[kNumOfMatrixElements];  // NOLINT
+
+  const int kNumOfOffsetRows = offset_.rows();
+  double g_matrix[kNumOfOffsetRows];  // NOLINT
   int index = 0;
 
   for (int r = 0; r < kernel_matrix_.rows(); ++r) {
@@ -69,6 +79,7 @@ bool ActiveSetQpSolver::Solve() {
       h_matrix[index++] = kernel_matrix_(r, c);
     }
   }
+  DCHECK_EQ(index, kernel_matrix_.rows() * kernel_matrix_.cols());
 
   // search space lower bound and uppper bound
   double lower_bound[num_param_];  // NOLINT
@@ -96,6 +107,8 @@ bool ActiveSetQpSolver::Solve() {
     }
   }
 
+  DCHECK_EQ(index, affine_equality_matrix_.rows() * num_param_);
+
   for (int r = 0; r < affine_inequality_matrix_.rows(); ++r) {
     constraint_lower_bound[r + affine_equality_boundary_.rows()] =
         affine_inequality_boundary_(r, 0);
@@ -107,6 +120,8 @@ bool ActiveSetQpSolver::Solve() {
       affine_constraint_matrix[index++] = affine_inequality_matrix_(r, c);
     }
   }
+  DCHECK_EQ(index, affine_equality_matrix_.rows() * num_param_ +
+                       affine_inequality_boundary_.rows() * num_param_);
 
   // initialize problem
   int max_iter = std::max(max_iteration_, num_constraint_);
@@ -125,20 +140,13 @@ bool ActiveSetQpSolver::Solve() {
   }
 
   double result[num_param_];  // NOLINT
-
   qp_problem.getPrimalSolution(result);
 
   params_ = Eigen::MatrixXd::Zero(num_param_, 1);
-
-  if (qp_problem.isSolved() == qpOASES::BT_TRUE) {
-    for (int i = 0; i < num_param_; ++i) {
-      params_(i, 0) = result[i];
-    }
-
-    return true;
+  for (int i = 0; i < num_param_; ++i) {
+    params_(i, 0) = result[i];
   }
-
-  return false;
+  return qp_problem.isSolved() == qpOASES::BT_TRUE;
 }
 
 void ActiveSetQpSolver::set_qp_eps_num(const double eps) { qp_eps_num_ = eps; }
