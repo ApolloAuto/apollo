@@ -38,7 +38,7 @@ apollo::common::Status Routing::Init() {
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
   CHECK(common::util::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
-      << "Unable to load control conf file: " + FLAGS_routing_conf_file;
+      << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
 
