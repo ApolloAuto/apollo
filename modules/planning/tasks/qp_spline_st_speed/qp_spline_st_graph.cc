@@ -212,9 +212,8 @@ Status QpSplineStGraph::ApplyConstraint(
   DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());
 
   if (st_graph_debug_) {
+    auto speed_constraint = st_graph_debug_->mutable_speed_constraint();
     for (size_t i = 0; i < t_evaluated_.size(); ++i) {
-      auto speed_constraint =
-          st_graph_debug_->mutable_speed_constraint()->Add();
       speed_constraint->add_t(t_evaluated_[i]);
       speed_constraint->add_lower_bound(speed_lower_bound[i]);
       speed_constraint->add_upper_bound(speed_upper_bound[i]);

@@ -201,11 +201,16 @@ class Planning:
             st_speed_constraint_s[st_graph.name] = []
             st_speed_constraint_lower[st_graph.name] = []
             st_speed_constraint_upper[st_graph.name] = []
-            for speed_constraint in st_graph.speed_constraint:
-                interp_s = np.interp(speed_constraint.t, st_curve_t[st_graph.name], st_curve_s[st_graph.name])
-                st_speed_constraint_s[st_graph.name].append(interp_s)
-                st_speed_constraint_lower[st_graph.name].append(speed_constraint.lower_bound)
-                st_speed_constraint_upper[st_graph.name].append(speed_constraint.upper_bound)
+
+            speed_constraint = st_graph.speed_constraint
+            interp_s_set = []
+            for t in speed_constraint.t:
+                interp_s = np.interp(t, st_curve_t[st_graph.name],
+                                     st_curve_s[st_graph.name])
+                interp_s_set.append(interp_s)
+            st_speed_constraint_s[st_graph.name].extend(interp_s_set)
+            st_speed_constraint_lower[st_graph.name].extend(speed_constraint.lower_bound)
+            st_speed_constraint_upper[st_graph.name].extend(speed_constraint.upper_bound)
 
             kernel_cruise_t[st_graph.name] = []
             kernel_cruise_s[st_graph.name] = []
