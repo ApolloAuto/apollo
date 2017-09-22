@@ -26,7 +26,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 
-#include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
@@ -36,8 +36,9 @@ class DpStCost {
  public:
   explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config);
 
-  double GetObstacleCost(const STPoint& point,
-                         const std::vector<StBoundary>& st_boundaries) const;
+  double GetObstacleCost(
+      const STPoint& point,
+      const std::vector<const PathObstacle*>& obstacles) const;
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
