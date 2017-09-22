@@ -129,6 +129,8 @@ DEFINE_bool(enable_rule_layer, true,
             "enable rule for trajectory before model computation");
 
 // Traffic decision
+DEFINE_bool(enable_signal_lights, false, "enable signal_lights");
+
 
 DEFINE_string(planning_config_file,
               "modules/planning/conf/planning_config.pb.txt",
