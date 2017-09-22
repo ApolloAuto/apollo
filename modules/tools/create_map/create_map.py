@@ -31,6 +31,8 @@ from modules.map.proto.map_pb2 import Map
 from modules.map.proto.map_lane_pb2 import LaneBoundaryType, Lane
 from modules.map.proto.map_road_pb2 import BoundaryEdge
 
+from modules.routing.proto.routing_pb2 import RoutingRequest
+
 class DataPoint:
 	def __init__(self):
 		self.pos_x = 0.0
@@ -55,17 +57,24 @@ def main():
 		'--input_file',
 		help='Recorded localization and mobileye lane detection in CSV format',
 		type=str,
-		default='lane.csv')
+		default='/tmp/lane.csv')
 	parser.add_argument(
 		'-o',
 		'--output_file',
 		help='Output file name of generated base map',
 		type=str,
-		default='base_map.txt')
+		default='modules/map/data/gen/base_map.txt')
+	parser.add_argument(
+		'-w',
+		'--end_waypoint_file',
+		help='Output file name of default end waypoint',
+		type=str,
+		default='modules/map/data/gen/default_end_way_point.txt')
 	args = vars(parser.parse_args())
 
 	csv_file_name = args['input_file']
 	map_file_name = args['output_file']
+	waypoint_file_name = args['end_waypoint_file']
 
 	rows = []
 	with open(csv_file_name, 'r') as csvfile:
@@ -75,7 +84,7 @@ def main():
 
 	data = []
 	# for row in rows[3201:-3000]:
-	for row in rows[1:-1000]:
+	for row in rows[1:]:
 		entry = DataPoint()
 		entry.pos_x = float(row[0])
 		entry.pos_y = float(row[1])
@@ -158,6 +167,7 @@ def main():
 			entry.conf_left = -1
 			entry.conf_right = -1
 
+	# fixed width
 	# width = 3.5
 
 	mp = Map()
@@ -284,7 +294,6 @@ def main():
 		sample.width = dist_right
 
 		if (current_length > max_lane_length) or (index == len(data) - 1):
-			# cut!
 			lane_central_curve_seg.length = current_length
 			lane_left_boundary_curve_seg.length = current_length
 			lane_right_boundary_curve_seg.length = current_length
@@ -364,6 +373,14 @@ def main():
 
 	with open(map_file_name, "w") as f:
 		f.write(mp.__str__())
+
+	waypoint = RoutingRequest.LaneWaypoint()
+	waypoint.id = "lane_" + str(lane_count)
+	waypoint.s = 0.0
+	waypoint.pose.x = lane_central_curve_seg.start_position.x
+	waypoint.pose.y = lane_central_curve_seg.start_position.y
+	with open(waypoint_file_name, "w") as f:
+		f.write(waypoint.__str__())
 
 if __name__ == '__main__':
     main()

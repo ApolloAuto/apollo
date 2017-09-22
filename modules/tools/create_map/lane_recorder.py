@@ -16,16 +16,17 @@
 # limitations under the License.
 ###############################################################################
 """
-Record lane data
+Record localization and mobileye lane detection in CSV format
 """
 
+import argparse
 import atexit
 import logging
 import math
 import os
+import rospy
 import sys
 
-import rospy
 from gflags import FLAGS
 from std_msgs.msg import String
 
@@ -119,8 +120,25 @@ def main(argv):
     """
     rospy.init_node('lane_recorder', anonymous=True)
 
-    argv = FLAGS(argv)
-    log_dir = "./"
+    parser = argparse.ArgumentParser(
+        description='Record Localization and Mobileye Lane Detection in CSV Format')
+    parser.add_argument(
+        '-d',
+        '--dir',
+        help='Output and log directory',
+        type=str,
+        default='/tmp/')
+    parser.add_argument(
+        '-o',
+        '--output_file',
+        help='Output CSV file name',
+        type=str,
+        default='lane.csv')
+    args = vars(parser.parse_args())
+
+    log_dir = args['dir']
+    record_file = log_dir + "/" + args['output_file']
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     Logger.config(
@@ -128,7 +146,6 @@ def main(argv):
         use_stdout=True,
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "lane_recorder.log"))
-    record_file = log_dir + "/lane.csv"
     recorder = LaneRecord(record_file)
     atexit.register(recorder.shutdown)
     rospy.Subscriber('/apollo/mobileye', mobileye_pb2.Mobileye,
