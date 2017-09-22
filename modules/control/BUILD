@@ -28,7 +28,6 @@ cc_library(
         "//modules/control/common",
         "//modules/control/controller",
         "//modules/control/proto:control_proto",
-        "//modules/decision/proto:decision_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
@@ -56,7 +55,6 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":lib_control",
-        "//modules/common/adapters:adapter_manager",
         "@gtest//:main",
     ],
 )

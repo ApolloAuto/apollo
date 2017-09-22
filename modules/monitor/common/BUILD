@@ -15,4 +15,12 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "log_test",
+    srcs = ["tests/log_test.cc"],
+    deps = [
+        ":platform_common_lib",
+    ],
+)
+
 cpplint()

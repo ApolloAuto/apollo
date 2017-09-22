@@ -76,8 +76,8 @@ class CameraLocalization : public LocalizationBase {
   void RunWatchDog();
 
   bool PrepareLocalizationMsg(LocalizationEstimate *localization);
-  bool CreateLocalizationMsg(const ::apollo::localization::Gps &gps_msg,
-                             const ::apollo::localization::Camera &camera_msg,
+  bool CreateLocalizationMsg(const localization::Gps &gps_msg,
+                             const localization::Camera &camera_msg,
                              LocalizationEstimate *localization);
 
  private:

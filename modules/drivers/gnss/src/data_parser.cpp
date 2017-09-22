@@ -75,14 +75,15 @@ Parser *create_parser(config::Stream::Format format,
 }  // namespace
 
 DataParser::DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
-                       const std::string &gpgga_topic,
+                       const std::string &ins_stat_topic,
                        const std::string &corr_imu_topic,
                        const std::string &odometry_topic,
                        const std::string &gnss_status_topic,
                        const std::string &ins_status_topic)
     : _raw_data_sub(nh.subscribe(raw_data_topic, 256,
                                  &DataParser::raw_data_callback, this)),
-      _gpgga_publisher(nh.advertise<std_msgs::String>(gpgga_topic, 64)),
+      _ins_stat_publisher(
+          nh.advertise<::apollo::drivers::gnss::InsStat>(ins_stat_topic, 64)),
       _imu_publisher(
           nh.advertise<apollo::localization::Imu>(corr_imu_topic, 64)),
       _nav_odometry_publisher(
@@ -92,7 +93,9 @@ DataParser::DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
               gnss_status_topic, 64, true)),
       _ins_status_publisher(
           nh.advertise<apollo::common::gnss_status::InsStatus>(ins_status_topic,
-                                                               64, true)) {
+                                                               64, true)),
+      _ins_publisher(
+          nh.advertise<::apollo::drivers::gnss::Ins>("/apollo/sensor/gnss/ins", 64)) {
   std::string utm_target_param;
   nh.param("proj4_text", utm_target_param, UTM_TARGET);
   ROS_INFO_STREAM("proj4_text : " << utm_target_param);
@@ -206,14 +209,28 @@ void DataParser::dispatch_message(Parser::MessageType type,
       check_ins_status(As<::apollo::drivers::gnss::Ins>(message));
       publish_corrimu_pb_message(message);
       publish_odometry_pb_message(message);
+      //publish_ins_message(message);
       break;
 
-    case Parser::MessageType::GPGGA:
-      publish_message_raw(_gpgga_publisher,
-                          As<::apollo::drivers::gnss::gpgga::GPGGA>(message));
+    case Parser::MessageType::INS_STAT:
+      publish_ins_stat(message);
+      break;
+
     default:
       break;
   }
+}
+
+void DataParser::publish_ins_stat(const MessagePtr message) {
+    boost::shared_ptr<::apollo::drivers::gnss::InsStat> ins_stat(
+        new ::apollo::drivers::gnss::InsStat(*As<::apollo::drivers::gnss::InsStat>(message)));
+    _ins_stat_publisher.publish(ins_stat);
+}
+
+void DataParser::publish_ins_message(const MessagePtr message) {
+    boost::shared_ptr<::apollo::drivers::gnss::Ins> ins(
+        new ::apollo::drivers::gnss::Ins(*As<::apollo::drivers::gnss::Ins>(message)));
+    _ins_publisher.publish(ins);
 }
 
 void DataParser::publish_odometry_pb_message(const MessagePtr message) {
@@ -228,29 +245,20 @@ void DataParser::publish_odometry_pb_message(const MessagePtr message) {
   double unix_sec = apollo::drivers::util::gps2unix(ins->measurement_time());
   gps->mutable_header()->set_timestamp_sec(unix_sec);
   auto *gps_msg = gps->mutable_localization();
-  double pub_sec = ros::Time::now().toSec();
-  ROS_DEBUG_STREAM("gps timeline odometry delay: " << pub_sec - unix_sec
-                                                   << " s.");
 
-  // 1. pose xyz, TODO:
+  // 1. pose xyz
   double x = ins->position().lon();
-  ;
   double y = ins->position().lat();
   x *= DEG_TO_RAD_LOCAL;
   y *= DEG_TO_RAD_LOCAL;
 
-  int ret = pj_transform(_wgs84pj_source, _utm_target, 1, 1, &x, &y, NULL);
-  if (ret != 0) {
-    ROS_ERROR_STREAM("prj transform failed, x: " << x << ", y: " << y
-                                                 << ", ret: " << ret);
-    return;
-  }
+  pj_transform(_wgs84pj_source, _utm_target, 1, 1, &x, &y, NULL);
 
   gps_msg->mutable_position()->set_x(x);
   gps_msg->mutable_position()->set_y(y);
   gps_msg->mutable_position()->set_z(ins->position().height());
 
-  // 2. orientation, TODO: check
+  // 2. orientation
   Eigen::Quaterniond q =
       Eigen::AngleAxisd(ins->euler_angles().z() - 90 * DEG_TO_RAD_LOCAL,
                         Eigen::Vector3d::UnitZ()) *
@@ -266,14 +274,6 @@ void DataParser::publish_odometry_pb_message(const MessagePtr message) {
   gps_msg->mutable_linear_velocity()->set_y(ins->linear_velocity().y());
   gps_msg->mutable_linear_velocity()->set_z(ins->linear_velocity().z());
 
-  gps_msg->mutable_angular_velocity()->set_x(ins->angular_velocity().x());
-  gps_msg->mutable_angular_velocity()->set_y(ins->angular_velocity().y());
-  gps_msg->mutable_angular_velocity()->set_z(ins->angular_velocity().z());
-
-  ROS_DEBUG_STREAM(
-      "local timeline odometry delay: "
-      << (ros::Time::now().toSec() - ins->mutable_header()->timestamp_sec())
-      << " s.");
   _nav_odometry_publisher.publish(gps);
 }
 
@@ -287,8 +287,6 @@ void DataParser::publish_corrimu_pb_message(const MessagePtr message) {
   }
   double unix_sec = apollo::drivers::util::gps2unix(ins->measurement_time());
   imu->mutable_header()->set_timestamp_sec(unix_sec);
-  double pub_sec = ros::Time::now().toSec();
-  ROS_DEBUG_STREAM("gps timeline imu delay: " << pub_sec - unix_sec << " s.");
 
   auto *imu_msg = imu->mutable_imu();
   imu_msg->mutable_linear_acceleration()->set_x(
@@ -300,10 +298,10 @@ void DataParser::publish_corrimu_pb_message(const MessagePtr message) {
   imu_msg->mutable_angular_velocity()->set_y(ins->angular_velocity().x());
   imu_msg->mutable_angular_velocity()->set_z(ins->angular_velocity().z());
 
-  ROS_DEBUG_STREAM(
-      "local timeline imu delay: "
-      << (ros::Time::now().toSec() - ins->mutable_header()->timestamp_sec())
-      << " s.");
+  imu_msg->mutable_euler_angles()->set_x(ins->euler_angles().x());
+  imu_msg->mutable_euler_angles()->set_y(ins->euler_angles().y());
+  imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z());
+
   _imu_publisher.publish(imu);
 }
 

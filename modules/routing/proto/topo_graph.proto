@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/map/proto/map_geometry.proto";
+
+message CurvePoint {
+    optional double s = 1;
+}
+
+message CurveRange {
+    optional CurvePoint start = 1;
+    optional CurvePoint end = 2;
+}
+
+message Node {
+    optional string lane_id = 1;
+    optional double length = 2;
+    repeated CurveRange left_out = 3;
+    repeated CurveRange right_out = 4;
+    optional double cost = 5;
+    optional apollo.hdmap.Curve central_curve = 6;
+    optional bool is_virtual = 7 [default = true];
+    optional string road_id = 8;
+}
+
+message Edge {
+    enum DirectionType {
+        FORWARD = 0;
+        LEFT = 1;
+        RIGHT = 2;
+    }
+
+    optional string from_lane_id = 1;
+    optional string to_lane_id = 2;
+    optional double cost = 3;
+    optional DirectionType direction_type = 4;
+}
+
+message Graph {
+    optional string hdmap_version = 1;
+    optional string hdmap_district = 2;
+    repeated Node node = 3;
+    repeated Edge edge = 4;
+}
+

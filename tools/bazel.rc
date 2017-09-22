@@ -1,12 +1,20 @@
 # +------------------------------------------------------------+
+# | Startup Options                                            |
+# +------------------------------------------------------------+
+startup --batch_cpu_scheduling
+
+# +------------------------------------------------------------+
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
 
-# By default prints output for all tests, including those which passed.
-test --test_output=all
+# By default prints output only from failed tests.
+test --test_output=errors
 
 # Work around the sandbox issue.
 test --spawn_strategy=standalone
+
+# Specify protobuf cc toolchain
+test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
@@ -18,15 +26,13 @@ test --spawn_strategy=standalone
 # To enable the lint test, the BUILD *must* load the cpplint.bzl by having
 # 'load("//tools:cpplint.bzl", "cpplint")' at the beginning and 'cpplint()'
 # at the end.
+test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
-test:cpplint --test_tag_filters=+cpplint
 
 # Regular unit tests.
-test:unit_test --build_tests_only
 test:unit_test --test_tag_filters=-cpplint
 
 # Coverage tests
-test:coverage --build_tests_only
 test:coverage --test_tag_filters=-cpplint
 test:coverage --copt=--coverage
 test:coverage --cxxopt=--coverage
@@ -45,6 +51,9 @@ build --output_filter="^//"
 
 # Work around the sandbox issue.
 build --spawn_strategy=standalone
+
+# Specify protobuf cc toolchain
+build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
 # Enable C++14
 # build --cxxopt="-std=c++14"

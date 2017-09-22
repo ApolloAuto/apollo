@@ -22,6 +22,10 @@
 #ifndef MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_
 #define MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_
 
+#include <cmath>
+
+#include "modules/common/log.h"
+
 /**
  * @namespace apollo::common::math
  * @brief apollo::common::math
@@ -31,33 +35,26 @@ namespace common {
 namespace math {
 
 /**
- * @brief Linear interpolation between two 1-D points.
- * @param x0 The coordinate of the first 1-D point.
- * @param t0 The interpolation parameter of the first 1-D point.
- * @param x1 The coordinate of the second 1-D point.
- * @param t1 The interpolation parameter of the second 1-D point.
+ * @brief Linear interpolation between two points of type T.
+ * @param x0 The coordinate of the first point.
+ * @param t0 The interpolation parameter of the first point.
+ * @param x1 The coordinate of the second point.
+ * @param t1 The interpolation parameter of the second point.
  * @param t The interpolation parameter for interpolation.
- * @param x The coordinate of the interpolated 1-D point.
- * @return Interpolated 1-D point.
+ * @param x The coordinate of the interpolated point.
+ * @return Interpolated point.
  */
-double lerp(const double x0, const double t0, const double x1, const double t1,
-            const double t);
-
-/**
- * @brief Linear interpolation between two 2-D points.
- * @param x0 The x coordinate of the first 2-D point.
- * @param y0 The y coordinate of the first 2-D point.
- * @param t0 The interpolation parameter of the first 2-D point.
- * @param x1 The x coordinate of the second 2-D point.
- * @param y1 The y coordinate of the second 2-D point.
- * @param t1 The interpolation parameter of the second 2-D point.
- * @param t The interpolation parameter for interpolation.
- * @param x The x coordinate of the interpolated 2-D point.
- * @param y The y coordinate of the interpolated 2-D point.
- */
-void lerp(const double x0, const double y0, const double t0, const double x1,
-          const double y1, const double t1, const double t, double *x,
-          double *y);
+template <typename T>
+T lerp(const T& x0, const double t0, const T& x1, const double t1,
+       const double t) {
+  if (std::abs(t1 - t0) <= 1.0e-6) {
+    AERROR << "input time difference is too small";
+    return x0;
+  }
+  const double r = (t - t0) / (t1 - t0);
+  const T x = x0 + r * (x1 - x0);
+  return x;
+}
 
 /**
  * @brief Spherical linear interpolation between two angles.
@@ -77,4 +74,4 @@ double slerp(const double a0, const double t0, const double a1, const double t1,
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_ */
+#endif  // MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_

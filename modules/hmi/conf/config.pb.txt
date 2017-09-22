@@ -1,3 +1,10 @@
+server {
+  https {
+    enabled: false
+    server_key: 'modules/common/data/ssl_keys/server.key'
+    server_cert: 'modules/common/data/ssl_keys/server.crt'
+  }
+}
 modules {
   name: "GPS"
   display_name: "GPS Driver"
@@ -17,6 +24,114 @@ modules {
   }
 }
 modules {
+  name: "velodyne"
+  display_name: "Velodyne"
+  supported_commands {
+    name: "start"
+    command: "scripts/velodyne.sh"
+    command: "start"
+    stdout_file: "data/log/velodyne.stdout"
+    stderr_file: "data/log/velodyne.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/velodyne.sh"
+    command: "stop"
+    stdout_file: "data/log/velodyne.stdout"
+    stderr_file: "data/log/velodyne.stderr"
+  }
+}
+modules {
+  name: "localization"
+  display_name: "Localization"
+  supported_commands {
+    name: "start"
+    command: "scripts/localization.sh"
+    command: "start"
+    stdout_file: "data/log/localization.stdout"
+    stderr_file: "data/log/localization.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/localization.sh"
+    command: "stop"
+    stdout_file: "data/log/localization.stdout"
+    stderr_file: "data/log/localization.stderr"
+  }
+}
+modules {
+  name: "perception"
+  display_name: "Perception"
+  supported_commands {
+    name: "start"
+    command: "scripts/perception.sh"
+    command: "start"
+    stdout_file: "data/log/perception.stdout"
+    stderr_file: "data/log/perception.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/perception.sh"
+    command: "stop"
+    stdout_file: "data/log/perception.stdout"
+    stderr_file: "data/log/perception.stderr"
+  }
+}
+modules {
+  name: "prediction"
+  display_name: "Prediction"
+  supported_commands {
+    name: "start"
+    command: "scripts/prediction.sh"
+    command: "start"
+    stdout_file: "data/log/prediction.stdout"
+    stderr_file: "data/log/prediction.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/prediction.sh"
+    command: "stop"
+    stdout_file: "data/log/prediction.stdout"
+    stderr_file: "data/log/prediction.stderr"
+  }
+}
+modules {
+  name: "planning"
+  display_name: "Planning"
+  supported_commands {
+    name: "start"
+    command: "scripts/planning.sh"
+    command: "start"
+    stdout_file: "data/log/planning.stdout"
+    stderr_file: "data/log/planning.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/planning.sh"
+    command: "stop"
+    stdout_file: "data/log/planning.stdout"
+    stderr_file: "data/log/planning.stderr"
+  }
+}
+modules {
+  name: "routing"
+  display_name: "Routing"
+  supported_commands {
+    name: "start"
+    command: "scripts/routing.sh"
+    command: "start"
+    stdout_file: "data/log/routing.stdout"
+    stderr_file: "data/log/routing.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/routing.sh"
+    command: "stop"
+    stdout_file: "data/log/routing.stdout"
+    stderr_file: "data/log/routing.stderr"
+  }
+}
+modules {
   name: "control"
   display_name: "Control"
   supported_commands {
@@ -25,8 +140,6 @@ modules {
     command: "start"
     stdout_file: "data/log/control.stdout"
     stderr_file: "data/log/control.stderr"
-    log_files: "data/log/control.INFO"
-    log_files: "data/log/control.ERROR"
   }
   supported_commands {
     name: "stop"
@@ -45,8 +158,6 @@ modules {
     command: "start"
     stdout_file: "data/log/canbus.stdout"
     stderr_file: "data/log/canbus.stderr"
-    log_files: "data/log/canbus.INFO"
-    log_files: "data/log/canbus.ERROR"
   }
   supported_commands {
     name: "stop"
@@ -54,26 +165,6 @@ modules {
     command: "stop"
     stdout_file: "data/log/canbus.stdout"
     stderr_file: "data/log/canbus.stderr"
-  }
-}
-modules {
-  name: "localization"
-  display_name: "Localization"
-  supported_commands {
-    name: "start"
-    command: "scripts/localization.sh"
-    command: "start"
-    stdout_file: "data/log/localization.stdout"
-    stderr_file: "data/log/localization.stderr"
-    log_files: "data/log/localization.INFO"
-    log_files: "data/log/localization.ERROR"
-  }
-  supported_commands {
-    name: "stop"
-    command: "scripts/localization.sh"
-    command: "stop"
-    stdout_file: "data/log/localization.stdout"
-    stderr_file: "data/log/localization.stderr"
   }
 }
 modules {
@@ -85,8 +176,6 @@ modules {
     command: "start"
     stdout_file: "data/log/dreamview.stdout"
     stderr_file: "data/log/dreamview.stderr"
-    log_files: "data/log/dreamview.INFO"
-    log_files: "data/log/dreamview.ERROR"
   }
   supported_commands {
     name: "stop"
@@ -97,21 +186,21 @@ modules {
   }
 }
 modules {
-  name: "apollo_record"
-  display_name: "Apollo Data Record"
+  name: "record_bag"
+  display_name: "Record Bag"
   supported_commands {
     name: "start"
-    command: "scripts/apollo_record.sh"
+    command: "scripts/record_bag.sh"
     command: "start"
-    stdout_file: "data/log/apollo_record.stdout"
-    stderr_file: "data/log/apollo_record.stderr"
+    stdout_file: "data/log/record_bag.stdout"
+    stderr_file: "data/log/record_bag.stderr"
   }
   supported_commands {
     name: "stop"
-    command: "scripts/apollo_record.sh"
+    command: "scripts/record_bag.sh"
     command: "stop"
-    stdout_file: "data/log/apollo_record.stdout"
-    stderr_file: "data/log/apollo_record.stderr"
+    stdout_file: "data/log/record_bag.stdout"
+    stderr_file: "data/log/record_bag.stderr"
   }
 }
 tools {
@@ -155,4 +244,15 @@ hardware {
     command: "scripts/hw_check.sh"
     command: "can"
   }
+}
+available_maps {
+  name: "Demo"
+  map_dir: "modules/map/data/demo"
+}
+available_maps {
+  name: "Sunnyvale Loop"
+  map_dir: "modules/map/data/sunnyvale_loop"
+}
+available_vehicles {
+  name: "Lincoln MKZ"
 }

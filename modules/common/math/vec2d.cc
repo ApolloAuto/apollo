@@ -17,8 +17,9 @@
 #include "modules/common/math/vec2d.h"
 
 #include <cmath>
-#include <sstream>
+
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
@@ -58,6 +59,11 @@ double Vec2d::CrossProd(const Vec2d &other) const {
 
 double Vec2d::InnerProd(const Vec2d &other) const {
   return x_ * other.x() + y_ * other.y();
+}
+
+Vec2d Vec2d::rotate(const double angle) const {
+  return Vec2d(x_ * cos(angle) - y_ * sin(angle),
+               x_ * sin(angle) + y_ * cos(angle));
 }
 
 Vec2d Vec2d::operator+(const Vec2d &other) const {
@@ -110,10 +116,7 @@ bool Vec2d::operator==(const Vec2d &other) const {
 Vec2d operator*(const double ratio, const Vec2d &vec) { return vec * ratio; }
 
 std::string Vec2d::DebugString() const {
-  std::ostringstream sout;
-  sout << "vec2d ( x = " << x_ << "  y = " << y_ << " )";
-  sout.flush();
-  return sout.str();
+  return util::StrCat("vec2d ( x = ", x_, "  y = ", y_, " )");
 }
 
 }  // namespace math

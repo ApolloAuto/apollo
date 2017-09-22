@@ -14,20 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planning_node.h"
+#include "modules/common/apollo_app.h"
+#include "modules/planning/planning.h"
 
-#include "gflags/gflags.h"
-#include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
-
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  google::ParseCommandLineFlags(&argc, &argv, true);
-
-  ros::init(argc, argv, "planning");
-
-  ::apollo::planning::PlanningNode planning_node;
-  planning_node.Run();
-
-  return 0;
-}
+APOLLO_MAIN(apollo::planning::Planning)

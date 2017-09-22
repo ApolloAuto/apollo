@@ -140,7 +140,7 @@ class CanSender {
    * @param enable_log whether enable record the send can frame log
    * @return An error code indicating the status of this initialization.
    */
-  ::apollo::common::ErrorCode Init(CanClient *can_client, bool enable_log);
+  common::ErrorCode Init(CanClient *can_client, bool enable_log);
 
   /**
    * @brief Add a message with its ID, protocol data.

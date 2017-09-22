@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common/monitor/proto/monitor.proto";
-import "modules/decision/proto/decision.proto";
+import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
 
 // Next-id: 4
@@ -30,7 +30,7 @@ message Decision {
     FOLLOW = 5; // Follow the object in the same lane
     SIDEPASS = 6; // Pass the object in neighbouring lane
   }
-  required Type type = 1 [default = IGNORE];
+  optional Type type = 1 [default = IGNORE];
 
   // Shape Info
   // Can be used for corners of nudge region
@@ -103,7 +103,7 @@ message Object {
   // Decision Info
   repeated Decision decision = 20;
   // ADC decision results
-  optional .apollo.decision.DecisionResult adc_decision_result = 29;
+  optional .apollo.planning.DecisionResult adc_decision_result = 29;
   // ADC planning trajectory
   optional .apollo.planning.ADCTrajectory adc_trajectory = 31;
 
@@ -116,6 +116,10 @@ message Object {
     DISENGAGE_NONE = 0;
     DISENGAGE_UNKNOWN = 1;
     DISENGAGE_MANUAL = 2;
+    DISENGAGE_EMERGENCY = 3;
+    DISENGAGE_AUTO_STEER_ONLY = 4;
+    DISENGAGE_AUTO_SPEED_ONLY = 5;
+    DISENGAGE_CHASSIS_ERROR = 6;
   };
 
   optional DisengageType disengage_type = 24;
@@ -156,10 +160,13 @@ message Debug {
     optional string novatel_position_type = 1;
 }
 
-// Next-id: 30
+// Next-id: 17
 message SimulationWorld {
   // Time
   optional double timestamp_sec = 1;
+
+  // Sequence number
+  optional uint32 sequence_num = 2;
 
   // Objects in the world and the associated predictions/decisions
   repeated Object object = 3;
@@ -172,27 +179,26 @@ message SimulationWorld {
 
   // Routing path
   repeated PolygonPoint route = 7;
+  // Timestamp of latest routing
+  optional double routing_time = 8;
 
   // Planned trajectory
-  repeated Object planning_trajectory = 8;
+  repeated Object planning_trajectory = 9;
 
   // Main stop
-  optional Object main_stop = 9;
+  optional Object main_stop = 10;
 
   // Speed limit
-  optional double speed_limit = 10;
+  optional double speed_limit = 11;
 
-  // Map Hashcode
-  optional string map_md5 = 11;
-
-  optional Delay delay = 17;
+  optional Delay delay = 12;
 
   // Relative time w.r.t. the begin time of rosbag
-  optional double relative_time_sec = 18;
+  optional double relative_time_sec = 13;
 
-  optional string decision_task_name = 19;
+  optional string decision_task_name = 14;
 
-  optional Debug debug_log = 26;
+  optional Debug debug_log = 15;
 
-  optional .apollo.common.monitor.MonitorMessage monitor = 29;
+  optional .apollo.common.monitor.MonitorMessage monitor = 16;
 }

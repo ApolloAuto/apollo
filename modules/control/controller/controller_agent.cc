@@ -27,6 +27,8 @@ namespace apollo {
 namespace control {
 
 using apollo::common::time::Clock;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 void ControllerAgent::RegisterControllers() {
   controller_factory_.Register(
@@ -43,7 +45,6 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
     return Status(ErrorCode::CONTROL_INIT_ERROR, "Failed to load config");
   }
   control_conf_ = control_conf;
-  AINFO << control_conf_->DebugString();
   for (auto controller_type : control_conf_->active_controllers()) {
     auto controller = controller_factory_.CreateObject(
         static_cast<ControlConf::ControllerType>(controller_type));
@@ -78,18 +79,18 @@ Status ControllerAgent::Init(const ControlConf *control_conf) {
 }
 
 Status ControllerAgent::ComputeControlCommand(
-    const ::apollo::localization::LocalizationEstimate *localization,
-    const ::apollo::canbus::Chassis *chassis,
-    const ::apollo::planning::ADCTrajectory *trajectory,
-    ::apollo::control::ControlCommand *cmd) {
+    const localization::LocalizationEstimate *localization,
+    const canbus::Chassis *chassis,
+    const planning::ADCTrajectory *trajectory,
+    control::ControlCommand *cmd) {
   for (auto &controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
-    double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
+    double start_timestamp = Clock::NowInSecond();
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
-    double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+    double end_timestamp = Clock::NowInSecond();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
-    AINFO << "controller: " << controller->Name()
+    ADEBUG << "controller: " << controller->Name()
           << " calculation time is: " << time_diff_ms << " ms.";
     cmd->mutable_latency_stats()->add_controller_time_ms(time_diff_ms);
   }

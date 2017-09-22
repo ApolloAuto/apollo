@@ -11,7 +11,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "@glog//:glog",
+        "//modules/common",
     ],
 )
 

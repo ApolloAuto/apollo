@@ -16,9 +16,9 @@
 
 #include "modules/common/math/euler_angles_zxy.h"
 
-#include <Eigen/Geometry>
 #include <cmath>
 
+#include "Eigen/Geometry"
 #include "gtest/gtest.h"
 
 namespace apollo {

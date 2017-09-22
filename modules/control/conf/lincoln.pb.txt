@@ -10,6 +10,7 @@ soft_estop_brake: 50.0
 active_controllers: LAT_CONTROLLER
 active_controllers: LON_CONTROLLER
 max_steering_percentage_allowed: 100
+minimum_speed_resolution: 0.2
 lat_controller_conf {
   ts: 0.01
   preview_window: 0
@@ -103,13 +104,7 @@ lon_controller_conf {
     kd: 0.0
   }
   switch_speed: 2.0
-  throttle_filter_conf {
-    cutoff_freq: 10
-  }
-  brake_filter_conf {
-    cutoff_freq: 10
-  }
-  acceleration_filter_conf {
+  pitch_angle_filter_conf {
     cutoff_freq: 5
   }
   calibration_table {

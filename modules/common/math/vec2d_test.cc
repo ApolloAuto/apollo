@@ -64,6 +64,22 @@ TEST(Vec2dTest, NomralCases) {
   EXPECT_NEAR(unit_pt.Angle(), M_PI_4, 1e-5);
 }
 
+TEST(Vec2dTest, rotate) {
+  Vec2d pt(4, 0);
+  auto p1 = pt.rotate(M_PI / 2.0);
+  EXPECT_NEAR(p1.x(), 0.0, 1e-5);
+  EXPECT_NEAR(p1.y(), 4.0, 1e-5);
+  auto p2 = pt.rotate(M_PI);
+  EXPECT_NEAR(p2.x(), -4.0, 1e-5);
+  EXPECT_NEAR(p2.y(), 0.0, 1e-5);
+  auto p3 = pt.rotate(-M_PI / 2.0);
+  EXPECT_NEAR(p3.x(), 0.0, 1e-5);
+  EXPECT_NEAR(p3.y(), -4.0, 1e-5);
+  auto p4 = pt.rotate(-M_PI);
+  EXPECT_NEAR(p4.x(), -4.0, 1e-5);
+  EXPECT_NEAR(p4.y(), 0.0, 1e-5);
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

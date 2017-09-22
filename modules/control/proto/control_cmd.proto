@@ -3,6 +3,7 @@ package apollo.control;
 
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/header.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/control/proto/pad_msg.proto";
 
 enum TurnSignal {
@@ -49,7 +50,7 @@ message ControlCommand {
   optional apollo.canbus.Chassis.GearPosition gear_location = 20;
 
   optional Debug debug = 22;
-  optional apollo.canbus.Signal signal = 23;
+  optional apollo.common.VehicleSignal signal = 23;
   optional LatencyStats latency_stats = 24;
   optional PadMessage pad_msg = 25;
 
