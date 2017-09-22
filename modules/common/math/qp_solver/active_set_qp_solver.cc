@@ -57,9 +57,19 @@ bool ActiveSetQpSolver::Solve() {
   if (!debug_info_) {
     qp_problem.setPrintLevel(qpOASES::PL_NONE);
   }
+  if (kernel_matrix_.rows() != kernel_matrix_.cols()) {
+    AERROR << "kernel_matrix_.rows() [" << kernel_matrix_.rows()
+           << "] and kernel_matrix_.cols() [" << kernel_matrix_.cols()
+           << "] should be identical.";
+    return false;
+  }
   // definition of qpOASESproblem
-  double h_matrix[kernel_matrix_.rows() * kernel_matrix_.cols()];  // NOLINT
-  double g_matrix[offset_.rows()];                                 // NOLINT
+  const int kNumOfMatrixElements =
+      kernel_matrix_.rows() * kernel_matrix_.cols();
+  double* h_matrix = new double[kNumOfMatrixElements];
+
+  const int kNumOfOffsetRows = offset_.rows();
+  double* g_matrix = new double[kNumOfOffsetRows];
   int index = 0;
 
   for (int r = 0; r < kernel_matrix_.rows(); ++r) {
@@ -69,10 +79,11 @@ bool ActiveSetQpSolver::Solve() {
       h_matrix[index++] = kernel_matrix_(r, c);
     }
   }
+  DCHECK_EQ(index, kernel_matrix_.rows() * kernel_matrix_.cols());
 
   // search space lower bound and uppper bound
-  double lower_bound[num_param_];  // NOLINT
-  double upper_bound[num_param_];  // NOLINT
+  double* lower_bound = new double[num_param_];
+  double* upper_bound = new double[num_param_];
 
   // TODO(fanhaoyang): Haoyang Fan change this to a configurable version
   for (int i = 0; i < num_param_; ++i) {
@@ -81,9 +92,9 @@ bool ActiveSetQpSolver::Solve() {
   }
 
   // constraint matrix construction
-  double affine_constraint_matrix[num_param_ * num_constraint_];  // NOLINT
-  double constraint_lower_bound[num_constraint_];                 // NOLINT
-  double constraint_upper_bound[num_constraint_];                 // NOLINT
+  double* affine_constraint_matrix = new double[num_param_ * num_constraint_];
+  double* constraint_lower_bound = new double[num_constraint_];
+  double* constraint_upper_bound = new double[num_constraint_];
   index = 0;
 
   for (int r = 0; r < affine_equality_matrix_.rows(); ++r) {
@@ -96,6 +107,8 @@ bool ActiveSetQpSolver::Solve() {
     }
   }
 
+  DCHECK_EQ(index, affine_equality_matrix_.rows() * num_param_);
+
   for (int r = 0; r < affine_inequality_matrix_.rows(); ++r) {
     constraint_lower_bound[r + affine_equality_boundary_.rows()] =
         affine_inequality_boundary_(r, 0);
@@ -107,6 +120,8 @@ bool ActiveSetQpSolver::Solve() {
       affine_constraint_matrix[index++] = affine_inequality_matrix_(r, c);
     }
   }
+  DCHECK_EQ(index, affine_equality_matrix_.rows() * num_param_ +
+                       affine_inequality_boundary_.rows() * num_param_);
 
   // initialize problem
   int max_iter = std::max(max_iteration_, num_constraint_);
@@ -114,6 +129,14 @@ bool ActiveSetQpSolver::Solve() {
   auto ret = qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix,
                              lower_bound, upper_bound, constraint_lower_bound,
                              constraint_upper_bound, max_iter);
+  delete[] h_matrix;
+  delete[] g_matrix;
+  delete[] affine_constraint_matrix;
+  delete[] lower_bound;
+  delete[] upper_bound;
+  delete[] constraint_lower_bound;
+  delete[] constraint_upper_bound;
+
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
     if (ret == qpOASES::RET_MAX_NWSR_REACHED) {
       AERROR << "qpOASES solver failed due to reached max iteration";
@@ -124,21 +147,15 @@ bool ActiveSetQpSolver::Solve() {
     return false;
   }
 
-  double result[num_param_];  // NOLINT
-
+  double* result = new double[num_param_];
   qp_problem.getPrimalSolution(result);
 
   params_ = Eigen::MatrixXd::Zero(num_param_, 1);
-
-  if (qp_problem.isSolved() == qpOASES::BT_TRUE) {
-    for (int i = 0; i < num_param_; ++i) {
-      params_(i, 0) = result[i];
-    }
-
-    return true;
+  for (int i = 0; i < num_param_; ++i) {
+    params_(i, 0) = result[i];
   }
-
-  return false;
+  delete[] result;
+  return qp_problem.isSolved() == qpOASES::BT_TRUE;
 }
 
 void ActiveSetQpSolver::set_qp_eps_num(const double eps) { qp_eps_num_ = eps; }
