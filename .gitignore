@@ -30,6 +30,9 @@ npm-debug.log
 .settings
 .classpath
 
+# IntelliJ files
+.idea
+
 # Vscode files
 .vscode
 
