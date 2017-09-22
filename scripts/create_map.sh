@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+###############################################################################
+# Copyright 2017 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
+if [ "$1" == "" ]; then
+    echo "Must designate a map name"
+else
+    echo "Generating map ${MAP}"
+	MAP=$1
+	rm -rf modules/map/data/${MAP}
+	mkdir modules/map/data/${MAP}
+	python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -w modules/map/data/${MAP}/default_end_way_point.txt
+	./scripts/generate_routing_topo_graph.sh 
+	./bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/${MAP} --output_dir=modules/map/data/${MAP}
+fi
