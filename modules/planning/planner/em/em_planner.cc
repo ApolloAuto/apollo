@@ -193,7 +193,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
                                                            &sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
-    
+
     double s_diff = sl_point.s() - last_sl_point.s();
     double start_time = 0.0;
     double start_s = 0.0;
