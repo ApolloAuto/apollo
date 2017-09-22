@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_routing_conf_file,
                                                &routing_conf))
-      << "Unable to load control conf file: " + FLAGS_routing_conf_file;
+      << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
 
