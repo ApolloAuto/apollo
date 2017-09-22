@@ -25,6 +25,28 @@ cc_library(
 )
 
 cc_library(
+    name = "qp_piecewise_st_graph",
+    srcs = [
+        "qp_piecewise_st_graph.cc",
+    ],
+    hdrs = [
+        "qp_piecewise_st_graph.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/math",
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util",
+        "//modules/planning/common:planning_util",
+        "//modules/planning/math/smoothing_spline:piecewise_linear_generator",
+        "//modules/planning/tasks/st_graph:st_boundary_mapper",
+        "//modules/planning/tasks/st_graph:st_graph_data",
+    ],
+)
+
+cc_library(
     name = "qp_spline_st_speed_optimizer",
     srcs = [
         "qp_spline_st_speed_optimizer.cc",
