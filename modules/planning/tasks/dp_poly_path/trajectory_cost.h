@@ -40,7 +40,7 @@ class TrajectoryCost {
  public:
   explicit TrajectoryCost(const DpPolyPathConfig &config,
                           const ReferenceLine &reference_line,
-                          const std::vector<const PathObstacle *> &obstacles,
+                          const std::vector<PathObstacle *> &obstacles,
                           const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data);
   double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,

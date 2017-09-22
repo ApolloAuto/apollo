@@ -50,7 +50,7 @@ class ReferenceLineInfo {
 
   bool Init();
 
-  bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
+  bool AddObstacles(const std::vector<Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
 
   PathDecision* path_decision();

@@ -59,7 +59,7 @@ void QpSplinePathGenerator::SetDebugLogger(
 }
 
 bool QpSplinePathGenerator::Generate(
-    const std::vector<const PathObstacle*>& path_obstacles,
+    const std::vector<PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
     PathData* const path_data) {
   if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
