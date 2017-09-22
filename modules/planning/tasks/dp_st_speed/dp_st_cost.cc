@@ -39,10 +39,13 @@ DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
 double DpStCost::GetObstacleCost(
     const STPoint& point, const std::vector<StBoundary>& st_boundaries) const {
   double total_cost = 0.0;
+  constexpr double inf = std::numeric_limits<double>::infinity();
+  if (point.s() < 0) {
+    return inf;
+  }
   for (const StBoundary& boundary : st_boundaries) {
-    if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
-      total_cost = std::numeric_limits<double>::infinity();
-      break;
+    if (boundary.IsPointInBoundary(point)) {
+      return inf;
     } else {
       const double distance = boundary.DistanceS(point);
       total_cost += dp_st_speed_config_.default_obstacle_cost() *
