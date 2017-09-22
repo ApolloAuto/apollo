@@ -86,11 +86,6 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 
   // start to search for best st points
   init_point_ = st_graph_data.init_point();
-  if (st_graph_data.path_data_length() <
-      qp_spline_st_speed_config_.total_path_length()) {
-    qp_spline_st_speed_config_.set_total_path_length(
-        st_graph_data.path_data_length());
-  }
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
