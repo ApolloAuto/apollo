@@ -14,7 +14,9 @@ cc_library(
         "traffic_rule.h",
     ],
     deps = [
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/util:factory",
+        "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
     ],
