@@ -64,7 +64,7 @@ message STGraphDebug {
   repeated StGraphBoundaryDebug boundary = 2;
   repeated apollo.common.SpeedPoint speed_limit = 3;
   repeated apollo.common.SpeedPoint speed_profile = 4;
-  repeated STGraphSpeedConstraint speed_constraint = 5;
+  optional STGraphSpeedConstraint speed_constraint = 5;
   optional STGraphKernelCuiseRef kernel_cruise_ref = 6;
   optional STGraphKernelFollowRef kernel_follow_ref = 7;
 }
