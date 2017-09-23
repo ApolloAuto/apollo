@@ -4,7 +4,6 @@
 
 # Google infras.
 glog
-google-apputils
 protobuf == 3.1
 python-gflags
 
