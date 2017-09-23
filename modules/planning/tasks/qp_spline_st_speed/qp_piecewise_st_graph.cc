@@ -146,9 +146,99 @@ Status QpPiecewiseStGraph::ApplyKernel(
   return Status::OK();
 }
 
+Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
+    const SpeedLimit& speed_limit, const double weight) {
+  auto* ref_kernel = generator_->mutable_kernel();
+  if (speed_limit.speed_limit_points().size() == 0) {
+    std::string msg = "Fail to apply_kernel due to empty speed limits.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  double dist_ref = 0.0;
+  std::vector<uint32_t> index_list;
+
+  for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
+    index_list.push_back(i);
+    dist_ref +=
+        t_evaluated_resolution_ * speed_limit.GetSpeedLimitByS(dist_ref);
+    cruise_.push_back(dist_ref);
+  }
+  if (st_graph_debug_) {
+    auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
+    kernel_cruise_ref->mutable_t()->Add(t_evaluated_[0]);
+    kernel_cruise_ref->mutable_cruise_line_s()->Add(dist_ref);
+    for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
+      kernel_cruise_ref->mutable_t()->Add(t_evaluated_[i]);
+      kernel_cruise_ref->mutable_cruise_line_s()->Add(cruise_[i]);
+    }
+  }
+  DCHECK_EQ(t_evaluated_.size(), cruise_.size());
+
+  for (std::size_t i = 0; i < t_evaluated_.size(); ++i) {
+    ADEBUG << "Cruise Ref S: " << cruise_[i]
+           << " Relative time: " << t_evaluated_[i] << std::endl;
+  }
+
+  if (t_evaluated_.size() > 0) {
+    ref_kernel->AddReferenceLineKernelMatrix(
+        index_list, cruise_,
+        weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
+  }
+
+  ref_kernel->AddRegularization(
+      qp_spline_st_speed_config_.regularization_weight());
+  return Status::OK();
+}
+
 Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
     const std::vector<StBoundary>& boundaries, const double weight) {
-  // TODO(Lianliang): implement this function.
+  auto* follow_kernel = generator_->mutable_kernel();
+  std::vector<double> ref_s;
+  std::vector<double> filtered_evaluate_t;
+  std::vector<uint32_t> index_list;
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    const double curr_t = t_evaluated_[i];
+    double s_min = std::numeric_limits<double>::infinity();
+    bool success = false;
+    for (const auto& boundary : boundaries) {
+      if (boundary.boundary_type() != StBoundary::BoundaryType::FOLLOW) {
+        continue;
+      }
+      if (curr_t < boundary.min_t() || curr_t > boundary.max_t()) {
+        continue;
+      }
+      double s_upper = 0.0;
+      double s_lower = 0.0;
+      if (boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+        success = true;
+        s_min = std::min(s_min,
+                         s_upper - boundary.characteristic_length() -
+                             qp_spline_st_speed_config_.follow_drag_distance());
+      }
+    }
+    if (success && s_min < cruise_[i]) {
+      filtered_evaluate_t.push_back(curr_t);
+      ref_s.push_back(s_min);
+      index_list.push_back(i);
+      if (st_graph_debug_) {
+        auto kernel_follow_ref = st_graph_debug_->mutable_kernel_follow_ref();
+        kernel_follow_ref->mutable_t()->Add(curr_t);
+        kernel_follow_ref->mutable_follow_line_s()->Add(s_min);
+      }
+    }
+  }
+  DCHECK_EQ(filtered_evaluate_t.size(), ref_s.size());
+
+  if (!ref_s.empty()) {
+    follow_kernel->AddReferenceLineKernelMatrix(
+        index_list, ref_s,
+        weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
+  }
+
+  for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
+    ADEBUG << "Follow Ref S: " << ref_s[i]
+           << " Relative time: " << filtered_evaluate_t[i] << std::endl;
+  }
   return Status::OK();
 }
 
@@ -156,7 +246,26 @@ Status QpPiecewiseStGraph::GetSConstraintByTime(
     const std::vector<StBoundary>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
-  // TODO(Lianliang): implement this function.
+  *s_upper_bound = total_path_s;
+
+  for (const StBoundary& boundary : boundaries) {
+    double s_upper = 0.0;
+    double s_lower = 0.0;
+
+    if (!boundary.GetUnblockSRange(time, &s_upper, &s_lower)) {
+      continue;
+    }
+
+    if (boundary.boundary_type() == StBoundary::BoundaryType::STOP ||
+        boundary.boundary_type() == StBoundary::BoundaryType::FOLLOW ||
+        boundary.boundary_type() == StBoundary::BoundaryType::YIELD) {
+      *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
+    } else {
+      DCHECK(boundary.boundary_type() == StBoundary::BoundaryType::OVERTAKE);
+      *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
+    }
+  }
+
   return Status::OK();
 }
 
