@@ -17,8 +17,9 @@
 ###############################################################################
 """Entry point of the server."""
 import ssl
+import sys
 
-import google.apputils.app
+import gflags
 
 from config import Config
 from ros_bridge_api import RosBridgeApi
@@ -26,7 +27,7 @@ from runtime_status import RuntimeStatus
 import handlers
 
 
-def main(argv):
+def main():
     """App entry point."""
     conf = Config.get_pb()
     # Module initialization.
@@ -52,4 +53,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    google.apputils.app.run()
+    # Parse gflags before main function.
+    gflags.FLAGS(sys.argv)
+    main()
