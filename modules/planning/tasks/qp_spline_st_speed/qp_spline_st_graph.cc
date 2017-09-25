@@ -311,11 +311,8 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  double dist_ref = 0.0;
-  cruise_.push_back(dist_ref);
-  for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
-    dist_ref += (t_evaluated_[i] - t_evaluated_[i - 1]) *
-                speed_limit.GetSpeedLimitByS(dist_ref);
+  double dist_ref = qp_spline_st_speed_config_.total_path_length();
+  for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     cruise_.push_back(dist_ref);
   }
   if (st_graph_debug_) {
