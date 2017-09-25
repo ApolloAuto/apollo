@@ -53,5 +53,5 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 }  // namespace l3_perception
 }  // namespace apollo
 
-#endif  // MODULES_L3_PERCEPTION_L3_PERCEPTION_H_
+#endif  // MODULES_L3_PERCEPTION_FUSION_H_
 
