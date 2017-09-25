@@ -36,7 +36,7 @@ class SignalLights : public TrafficRule {
   SignalLights();
   virtual ~SignalLights() = default;
 
-  bool ApplyRule(ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame *frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   void Init();
@@ -44,10 +44,13 @@ class SignalLights : public TrafficRule {
   bool FindValidSignalLights(ReferenceLineInfo* const reference_line_info);
   const apollo::perception::TrafficLight GetSignal(
       const std::string& signal_id);
-  void MakeDecisions(ReferenceLineInfo *const reference_line_info);
+  void MakeDecisions(Frame* frame,
+                     ReferenceLineInfo *const reference_line_info);
   double GetStopDeceleration(ReferenceLineInfo *const reference_line_info,
                              const hdmap::PathOverlap* signal_light);
-  void CreateStopObstacle();
+  void CreateStopObstacle(Frame* frame,
+                          ReferenceLineInfo *const reference_line_info,
+                          const hdmap::PathOverlap* signal_light);
   std::vector<const hdmap::PathOverlap*> signal_lights_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
       signals_;

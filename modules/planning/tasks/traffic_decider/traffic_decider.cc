@@ -54,7 +54,7 @@ Status TrafficDecider::Execute(Frame *frame,
       AERROR << "Could not find rule " << rule_config.DebugString();
       continue;
     }
-    rule->ApplyRule(reference_line_info);
+    rule->ApplyRule(frame, reference_line_info);
     ADEBUG << "Applied rule " << rule_config.name();
   }
   return Status::OK();

@@ -136,6 +136,8 @@ DEFINE_double(max_distance_for_light_stop_buffer, 4.0,
               "length of passing light stop line buffer");
 DEFINE_double(min_speed_for_light_stop, 0.1,
               "min speed for computing signal light stop");
+DEFINE_string(signal_light_virtual_object_prefix, "SL_",
+              "prefix for converting signal id to virtual object id");
 
 DEFINE_string(planning_config_file,
               "modules/planning/conf/planning_config.pb.txt",
