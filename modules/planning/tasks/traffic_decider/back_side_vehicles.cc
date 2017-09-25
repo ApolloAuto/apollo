@@ -26,7 +26,8 @@ namespace planning {
 
 BackSideVehicles::BackSideVehicles() : TrafficRule("BackSideVehicles") {}
 
-bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
+bool BackSideVehicles::ApplyRule(Frame *frame,
+                                 ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   ObjectDecisionType ignore;
