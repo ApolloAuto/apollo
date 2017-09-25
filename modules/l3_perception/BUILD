@@ -20,7 +20,7 @@ cc_library(
     deps = [
         ":l3_perception_gflags",
         ":l3_perception_util",
-        ":l3_perception_convertion",
+        ":l3_perception_conversion",
         ":l3_perception_fusion",
         "//modules/common:apollo_app",
         "//modules/common:log",
@@ -57,12 +57,12 @@ cc_library(
 )
 
 cc_library(
-    name = "l3_perception_convertion",
+    name = "l3_perception_conversion",
     srcs = [
-        "convertion.cc",
+        "conversion.cc",
     ],
     hdrs = [
-        "convertion.h",
+        "conversion.h",
     ],
     deps = [
         ":l3_perception_gflags",
