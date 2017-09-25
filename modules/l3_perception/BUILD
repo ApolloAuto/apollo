@@ -20,13 +20,13 @@ cc_library(
     deps = [
         ":l3_perception_gflags",
         ":l3_perception_util",
+        ":l3_perception_convertion",
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/proto:perception_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
-        "//modules/l3_perception/delphi_esr:radar_obstacle"
     ],
 )
 
@@ -52,6 +52,24 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
+    ],
+)
+
+cc_library(
+    name = "l3_perception_convertion",
+    srcs = [
+        "convertion.cc",
+    ],
+    hdrs = [
+        "convertion.h",
+    ],
+    deps = [
+        ":l3_perception_gflags",
+        ":l3_perception_util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/l3_perception/proto:l3_perception_proto"
     ],
 )
 
