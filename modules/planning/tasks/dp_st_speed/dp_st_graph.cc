@@ -44,11 +44,11 @@ using apollo::common::VehicleParam;
 
 namespace {
 
-bool CheckOverlapOnDpStGraph(const std::vector<StBoundary>& boundaries,
+bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
-  for (const auto& boundary : boundaries) {
+  for (const auto* boundary : boundaries) {
     common::math::LineSegment2d seg(p1.point(), p2.point());
-    if (boundary.HasOverlap(seg)) {
+    if (boundary->HasOverlap(seg)) {
       return true;
     }
   }
@@ -130,7 +130,7 @@ Status DpStGraph::InitCostTable() {
 }
 
 void DpStGraph::CalculatePointwiseCost(
-    const std::vector<StBoundary>& boundaries) {
+    const std::vector<const StBoundary*>& boundaries) {
   // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
   double curr_t = 0.0;

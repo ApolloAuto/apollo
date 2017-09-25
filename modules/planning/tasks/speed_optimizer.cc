@@ -90,8 +90,8 @@ void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
   st_graph_debug->set_name(Name());
   for (const auto& boundary : st_graph_data.st_boundaries()) {
     auto boundary_debug = st_graph_debug->add_boundary();
-    boundary_debug->set_name(boundary.id());
-    switch (boundary.boundary_type()) {
+    boundary_debug->set_name(boundary->id());
+    switch (boundary->boundary_type()) {
       case StBoundary::BoundaryType::FOLLOW:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
         break;
@@ -111,7 +111,7 @@ void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
         break;
     }
 
-    for (const auto& point : boundary.points()) {
+    for (const auto& point : boundary->points()) {
       auto point_debug = boundary_debug->add_point();
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
