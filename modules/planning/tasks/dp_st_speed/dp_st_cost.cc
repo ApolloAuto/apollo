@@ -37,20 +37,21 @@ DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
 
 // TODO(all): normalize cost with time
 double DpStCost::GetObstacleCost(
-    const STPoint& point, const std::vector<StBoundary>& st_boundaries) const {
+    const STPoint& point,
+    const std::vector<const StBoundary*>& st_boundaries) const {
   double total_cost = 0.0;
   constexpr double inf = std::numeric_limits<double>::infinity();
   if (point.s() < 0) {
     return inf;
   }
-  for (const StBoundary& boundary : st_boundaries) {
-    if (boundary.IsPointInBoundary(point)) {
+  for (const StBoundary* boundary : st_boundaries) {
+    if (boundary->IsPointInBoundary(point)) {
       return inf;
     } else {
-      const double distance = boundary.DistanceS(point);
+      const double distance = boundary->DistanceS(point);
       total_cost += dp_st_speed_config_.default_obstacle_cost() *
                     std::exp(dp_st_speed_config_.obstacle_cost_factor() /
-                             boundary.characteristic_length() * distance);
+                             boundary->characteristic_length() * distance);
     }
   }
   return total_cost * unit_t_;
