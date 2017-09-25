@@ -142,7 +142,31 @@ Status QpPiecewiseStGraph::ApplyConstraint(
 
 Status QpPiecewiseStGraph::ApplyKernel(
     const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limit) {
-  // TODO(Lianliang): implement this function.
+  auto* kernel = generator_->mutable_kernel();
+  DCHECK_NOTNULL(kernel);
+
+  if (qp_spline_st_speed_config_.accel_kernel_weight() > 0) {
+    kernel->AddSecondOrderDerivativeMatrix(
+        init_point_.v(), qp_spline_st_speed_config_.accel_kernel_weight());
+  }
+
+  if (qp_spline_st_speed_config_.jerk_kernel_weight() > 0) {
+    kernel->AddThirdOrderDerivativeMatrix(
+        init_point_.v(), init_point_.a(),
+        qp_spline_st_speed_config_.jerk_kernel_weight());
+  }
+
+  if (!AddCruiseReferenceLineKernel(speed_limit,
+                                    qp_spline_st_speed_config_.cruise_weight())
+           .ok()) {
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
+  }
+
+  if (!AddFollowReferenceLineKernel(boundaries,
+                                    qp_spline_st_speed_config_.follow_weight())
+           .ok()) {
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
+  }
   return Status::OK();
 }
 
