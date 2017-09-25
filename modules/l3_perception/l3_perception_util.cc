@@ -117,6 +117,12 @@ Point SLtoXY(const Point point, const double theta) {
   return converted_point;
 }
 
+double Distance(const Point& point1, const Point& point2) {
+  double distance = std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
+                              (point1.y() - point2.y()) * (point1.y() - point2.y()));  
+  return distance;
+} 
+
 }  // namespace l3_perception
 }  // namespace apollo
 
