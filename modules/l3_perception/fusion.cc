@@ -38,9 +38,13 @@ void MobileyeRadarFusion(
     auto* mob = mobileye_obstacles->mutable_perception_obstacle(mobileye_index);
     for (int radar_index = 0; radar_index < radar_obstacles->perception_obstacle_size(); ++radar_index) {
       auto* rob = radar_obstacles->mutable_perception_obstacle(radar_index);
-      if (Distance(mob->position(), rob->position()) < FLAGS_fusion_distance) {
+      if (std::abs(rob->position().x() - mob->position().x()) < FLAGS_fusion_x_distance &&
+          std::abs(rob->position().y() - mob->position().y()) < FLAGS_fusion_y_distance) {
         mob->set_confidence(0.99);
         rob->set_confidence(0.99);
+        // TODO(lizh): here is a hack for display different color
+        mob->set_type(PerceptionObstacle::BICYCLE);
+        rob->set_type(PerceptionObstacle::BICYCLE);
       }
     }
   } 
