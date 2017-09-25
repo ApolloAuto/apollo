@@ -123,6 +123,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
     FillPerceptionPolygon(mob, mid_x, mid_y, mid_z, mob_l, mob_w, mob->height(),
                           heading);
+
+    mob->set_confidence(0.75);
   }
 
   return obstacles;
@@ -241,6 +243,8 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     FillPerceptionPolygon(pob, mid_x, mid_y, mid_z, 
                           pob->length(), pob->width(), pob->height(),
                           heading);
+
+    pob->set_confidence(0.5);
   }
 
   return obstacles;
