@@ -25,6 +25,8 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +37,8 @@ using apollo::perception::TrafficLightDetection;
 
 SignalLights::SignalLights() : TrafficRule("SignalLights") {}
 
-bool SignalLights::ApplyRule(ReferenceLineInfo *const reference_line_info) {
+bool SignalLights::ApplyRule(Frame *frame,
+                             ReferenceLineInfo *const reference_line_info) {
   if (!FLAGS_enable_signal_lights) {
     return true;
   }
@@ -44,7 +47,7 @@ bool SignalLights::ApplyRule(ReferenceLineInfo *const reference_line_info) {
     return true;
   }
   ReadSignals();
-  MakeDecisions(reference_line_info);
+  MakeDecisions(frame, reference_line_info);
   return true;
 }
 
@@ -81,7 +84,8 @@ bool SignalLights::FindValidSignalLights(
   return signal_lights_.size() > 0;
 }
 
-void SignalLights::MakeDecisions(ReferenceLineInfo *const reference_line_info) {
+void SignalLights::MakeDecisions(Frame* frame,
+                                 ReferenceLineInfo *const reference_line_info) {
   for (const hdmap::PathOverlap* signal_light : signal_lights_) {
     const TrafficLight signal = GetSignal(signal_light->object_id);
     double stop_deceleration = GetStopDeceleration(reference_line_info,
@@ -92,7 +96,7 @@ void SignalLights::MakeDecisions(ReferenceLineInfo *const reference_line_info) {
             stop_deceleration < 6) ||
         (signal.color() == TrafficLight::YELLOW &&
             stop_deceleration < 4)) {
-      CreateStopObstacle();
+      CreateStopObstacle(frame, reference_line_info, signal_light);
     }
   }
 }
@@ -127,16 +131,37 @@ double SignalLights::GetStopDeceleration(
     stop_distance = stop_line_s +
         FLAGS_max_distance_for_light_stop_buffer - adc_front_s;
   }
-
   if (stop_distance < 1e-5) {
     return std::numeric_limits<double>::max();
   }
-
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-void SignalLights::CreateStopObstacle() {
-  // TODO(yifei) to be implemented
+void SignalLights::CreateStopObstacle(
+    Frame* frame,
+    ReferenceLineInfo *const reference_line_info,
+    const hdmap::PathOverlap* signal_light) {
+  common::SLPoint sl_point;
+  sl_point.set_s(signal_light->start_s);
+  sl_point.set_l(0);
+  common::math::Vec2d vec2d;
+  reference_line_info->reference_line().SLToXY(sl_point, &vec2d);
+  double heading = reference_line_info->reference_line().
+      GetReferencePoint(signal_light->start_s).heading();
+  double left_lane_width;
+  double right_lane_width;
+  reference_line_info->reference_line().GetLaneWidth(
+      signal_light->start_s, &left_lane_width, &right_lane_width);
+
+  common::math::Box2d stop_box{{vec2d.x(), vec2d.y()},
+                               heading,
+                               FLAGS_virtual_stop_wall_length,
+                               left_lane_width + right_lane_width};
+
+  reference_line_info->AddObstacle(
+      frame->AddStaticVirtualObstacle(
+          FLAGS_signal_light_virtual_object_prefix + signal_light->object_id,
+          stop_box));
 }
 
 }  // namespace planning
