@@ -142,7 +142,7 @@ export default class PerceptionObstacles {
             // Set face scale.
             const edgeDistance = v.distanceTo(vNext);
             if (edgeDistance === 0) {
-                console.error("Cannot display obstacle with an edge length 0!");
+                console.warn("Cannot display obstacle with an edge length 0!");
                 continue;
             }
             faceMesh.scale.set(edgeDistance, 1, height);
