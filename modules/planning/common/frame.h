@@ -79,6 +79,8 @@ class Frame {
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
   const ReferenceLineInfo *DriveReferenceLinfInfo() const;
 
+  const std::vector<const Obstacle*> &obstacles() const;
+
  private:
   /**
    * @brief This is the function that can create one reference lines
