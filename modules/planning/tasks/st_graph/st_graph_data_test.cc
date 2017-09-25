@@ -29,8 +29,9 @@ namespace apollo {
 namespace planning {
 
 TEST(StGraphDataTest, basic_test) {
-  std::vector<StBoundary> boundary_vec;
-  boundary_vec.push_back(StBoundary());
+  std::vector<const StBoundary*> boundary_vec;
+  auto boundary = StBoundary();
+  boundary_vec.push_back(&boundary);
   apollo::common::TrajectoryPoint traj_point;
   traj_point.mutable_path_point()->set_x(1.1);
   traj_point.mutable_path_point()->set_y(2.1);

@@ -56,24 +56,23 @@ class QpSplineStGraph {
   void Init();
 
   // apply st graph constraint
-  common::Status ApplyConstraint(const common::TrajectoryPoint& init_point,
-                                 const SpeedLimit& speed_limit,
-                                 const std::vector<StBoundary>& boundaries,
-                                 const std::pair<double, double>& accel_bound);
+  common::Status ApplyConstraint(
+      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
+      const std::vector<const StBoundary*>& boundaries,
+      const std::pair<double, double>& accel_bound);
 
   // apply objective function
-  common::Status ApplyKernel(const std::vector<StBoundary>& boundaries,
+  common::Status ApplyKernel(const std::vector<const StBoundary*>& boundaries,
                              const SpeedLimit& speed_limit);
 
   // solve
   common::Status Solve();
 
   // extract upper lower bound for constraint;
-  common::Status GetSConstraintByTime(const std::vector<StBoundary>& boundaries,
-                                      const double time,
-                                      const double total_path_s,
-                                      double* const s_upper_bound,
-                                      double* const s_lower_bound) const;
+  common::Status GetSConstraintByTime(
+      const std::vector<const StBoundary*>& boundaries, const double time,
+      const double total_path_s, double* const s_upper_bound,
+      double* const s_lower_bound) const;
 
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
@@ -81,7 +80,7 @@ class QpSplineStGraph {
                                               const double weight);
 
   common::Status AddFollowReferenceLineKernel(
-      const std::vector<StBoundary>& boundaries, const double weight);
+      const std::vector<const StBoundary*>& boundaries, const double weight);
 
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,

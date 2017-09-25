@@ -36,8 +36,9 @@ class DpStCost {
  public:
   explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config);
 
-  double GetObstacleCost(const STPoint& point,
-                         const std::vector<StBoundary>& st_boundaries) const;
+  double GetObstacleCost(
+      const STPoint& point,
+      const std::vector<const StBoundary*>& st_boundaries) const;
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;

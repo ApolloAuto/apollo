@@ -134,7 +134,7 @@ Status QpPiecewiseStGraph::Search(
 
 Status QpPiecewiseStGraph::ApplyConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    const std::vector<StBoundary>& boundaries,
+    const std::vector<const StBoundary*>& boundaries,
     const std::pair<double, double>& accel_bound) {
   auto* constraint = generator_->mutable_constraint();
   // position, velocity, acceleration
@@ -232,7 +232,8 @@ Status QpPiecewiseStGraph::ApplyConstraint(
 }
 
 Status QpPiecewiseStGraph::ApplyKernel(
-    const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limit) {
+    const std::vector<const StBoundary*>& boundaries,
+    const SpeedLimit& speed_limit) {
   auto* kernel = generator_->mutable_kernel();
   DCHECK_NOTNULL(kernel);
 
@@ -306,7 +307,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
 }
 
 Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
-    const std::vector<StBoundary>& boundaries, const double weight) {
+    const std::vector<const StBoundary*>& boundaries, const double weight) {
   auto* follow_kernel = generator_->mutable_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
@@ -315,19 +316,19 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
     const double curr_t = t_evaluated_[i];
     double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
-    for (const auto& boundary : boundaries) {
-      if (boundary.boundary_type() != StBoundary::BoundaryType::FOLLOW) {
+    for (const auto* boundary : boundaries) {
+      if (boundary->boundary_type() != StBoundary::BoundaryType::FOLLOW) {
         continue;
       }
-      if (curr_t < boundary.min_t() || curr_t > boundary.max_t()) {
+      if (curr_t < boundary->min_t() || curr_t > boundary->max_t()) {
         continue;
       }
       double s_upper = 0.0;
       double s_lower = 0.0;
-      if (boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+      if (boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         success = true;
         s_min = std::min(s_min,
-                         s_upper - boundary.characteristic_length() -
+                         s_upper - boundary->characteristic_length() -
                              qp_spline_st_speed_config_.follow_drag_distance());
       }
     }
@@ -358,25 +359,25 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
 }
 
 Status QpPiecewiseStGraph::GetSConstraintByTime(
-    const std::vector<StBoundary>& boundaries, const double time,
+    const std::vector<const StBoundary*>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
   *s_upper_bound = total_path_s;
 
-  for (const StBoundary& boundary : boundaries) {
+  for (const StBoundary* boundary : boundaries) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
-    if (!boundary.GetUnblockSRange(time, &s_upper, &s_lower)) {
+    if (!boundary->GetUnblockSRange(time, &s_upper, &s_lower)) {
       continue;
     }
 
-    if (boundary.boundary_type() == StBoundary::BoundaryType::STOP ||
-        boundary.boundary_type() == StBoundary::BoundaryType::FOLLOW ||
-        boundary.boundary_type() == StBoundary::BoundaryType::YIELD) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::STOP ||
+        boundary->boundary_type() == StBoundary::BoundaryType::FOLLOW ||
+        boundary->boundary_type() == StBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
     } else {
-      DCHECK(boundary.boundary_type() == StBoundary::BoundaryType::OVERTAKE);
+      DCHECK(boundary->boundary_type() == StBoundary::BoundaryType::OVERTAKE);
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
     }
   }
