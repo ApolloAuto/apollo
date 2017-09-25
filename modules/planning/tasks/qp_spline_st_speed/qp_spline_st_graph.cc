@@ -479,8 +479,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
       // (2) The evaluated_t_.size() << number of speed_limit_points.size()
       //
       // If either of the two assumption is failed, a new algorithm must be
-      // used
-      // to replace the binary search.
+      // used to replace the binary search.
 
       const auto& it = std::lower_bound(speed_limit_points.begin(),
                                         speed_limit_points.end(), s, cmp);
