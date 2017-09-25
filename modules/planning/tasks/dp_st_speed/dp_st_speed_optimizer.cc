@@ -110,11 +110,11 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     const std::string msg(Name() +
                           ":Failed to search graph with dynamic programming.");
     AERROR << msg;
-    RecordSTGraphDebug(boundaries, speed_limit, *speed_data, st_graph_debug);
+    RecordSTGraphDebug(st_graph_data, st_graph_debug);
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  RecordSTGraphDebug(boundaries, speed_limit, *speed_data, st_graph_debug);
+  RecordSTGraphDebug(st_graph_data, st_graph_debug);
 
   return Status::OK();
 }
