@@ -41,7 +41,7 @@ DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
 DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
 DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
-DEFINE_double(max_speed, 15.0, "Max speed");
+DEFINE_double(max_speed, 35.0, "Max speed");
 DEFINE_double(q_var, 0.01, "Processing noise covariance");
 DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
