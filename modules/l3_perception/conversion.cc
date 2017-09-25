@@ -18,17 +18,17 @@
  * @file
  */
 
-#include "modules/l3_perception/convertion.h"
+#include "modules/l3_perception/conversion.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
 #include "modules/l3_perception/l3_perception_util.h"
 
 /**
- * @namespace apollo::l3_perception::convertion
+ * @namespace apollo::l3_perception::conversion
  * @brief apollo::l3_perception
  */
 namespace apollo {
 namespace l3_perception {
-namespace convertion {
+namespace conversion {
 
 using ::apollo::l3_perception::GetAngleFromQuaternion;
 using ::apollo::l3_perception::FillPerceptionPolygon;
@@ -250,7 +250,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
   return obstacles;
 }
 
-}  // namespace convertion 
+}  // namespace conversion 
 }  // namespace l3_perception
 }  // namespace apollo
 
