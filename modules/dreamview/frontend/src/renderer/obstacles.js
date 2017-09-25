@@ -60,6 +60,7 @@ export default class PerceptionObstacles {
                                       obstacle.positionY,
                                       (obstacle.height || DEFAULT_HEIGHT) / 2));
             const color = ObstacleColorMapping[obstacle.type] || DEFAULT_COLOR;
+
             if (STORE.options.showObstaclesVelocity && obstacle.type &&
                     obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
                 const arrowMesh = this.updateArrow(position,
@@ -79,16 +80,15 @@ export default class PerceptionObstacles {
                         new THREE.Vector3(position.x, position.y, obstacle.height),
                         scene);
             }
+
             const polygon = obstacle.polygonPoint;
             if (polygon.length > 0) {
-                const scale = this.updatePolygon(polygon, obstacle.height, color, coordinates,
+                this.updatePolygon(polygon, obstacle.height, color, coordinates,
                         extrusionFaceIdx, scene);
                 extrusionFaceIdx += polygon.length;
-                // arrowMesh.scale.set(scale, scale, scale);
             } else if (obstacle.length && obstacle.width && obstacle.height) {
                 this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
                         obstacle.heading, color, cubeIdx++, scene);
-                // arrowMesh.scale.set(obstacle.width, obstacle.length, obstacle.height);
             }
         }
         hideArrayObjects(this.arrows, arrowIdx);
@@ -122,27 +122,35 @@ export default class PerceptionObstacles {
     }
 
     updatePolygon(points, height, color, coordinates, extrusionFaceIdx, scene) {
-        let edgeDistanceSum = 0;
         for (let i = 0; i < points.length; i++) {
+            // Get cached face mesh.
             const faceMesh = this.getFace(extrusionFaceIdx + i, scene);
+
+            // Get the adjecent point.
             const next = (i === points.length - 1) ? 0 : i + 1;
             const v = new THREE.Vector3(points[i].x, points[i].y, points[i].z);
             const vNext = new THREE.Vector3(points[next].x, points[next].y, points[next].z);
+
+            // Set position.
             const facePosition = coordinates.applyOffset(
                     new THREE.Vector2((v.x + vNext.x) / 2.0, (v.y + vNext.y) / 2.0));
-
             if (facePosition === null) {
                 continue;
             }
             faceMesh.position.set(facePosition.x, facePosition.y, 0);
+
+            // Set face scale.
             const edgeDistance = v.distanceTo(vNext);
-            edgeDistanceSum += edgeDistance;
+            if (edgeDistance === 0) {
+                console.warn("Cannot display obstacle with an edge length 0!");
+                continue;
+            }
             faceMesh.scale.set(edgeDistance, 1, height);
+
             faceMesh.material.color.setHex(color);
             faceMesh.rotation.set(0, 0, Math.atan2(vNext.y - v.y, vNext.x - v.x));
             faceMesh.visible = true;
         }
-        return 1.0 * edgeDistanceSum / points.length;
     }
 
     updateCube(length, width, height, position, heading, color, cubeIdx, scene) {
