@@ -352,5 +352,9 @@ const ReferenceLineInfo *Frame::DriveReferenceLinfInfo() const {
   return drive_reference_line_info_;
 }
 
+const std::vector<const Obstacle*> &Frame::obstacles() const {
+  return obstacles_.Items();
+}
+
 }  // namespace planning
 }  // namespace apollo
