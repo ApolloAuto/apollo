@@ -136,7 +136,98 @@ Status QpPiecewiseStGraph::ApplyConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     const std::vector<StBoundary>& boundaries,
     const std::pair<double, double>& accel_bound) {
-  // TODO(Lianliang): implement this function.
+  auto* constraint = generator_->mutable_constraint();
+  // position, velocity, acceleration
+
+  // monotone constraint
+  if (!constraint->AddMonotoneInequalityConstraint()) {
+    const std::string msg = "add monotone inequality constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  std::vector<uint32_t> index_list;
+
+  // boundary constraint
+  std::vector<double> s_upper_bound;
+  std::vector<double> s_lower_bound;
+
+  for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
+    index_list.push_back(i);
+
+    const double curr_t = t_evaluated_[i];
+    double lower_s = 0.0;
+    double upper_s = 0.0;
+    GetSConstraintByTime(boundaries, curr_t,
+                         qp_spline_st_speed_config_.total_path_length(),
+                         &upper_s, &lower_s);
+    s_upper_bound.push_back(upper_s);
+    s_lower_bound.push_back(lower_s);
+    ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
+           << " lower_s: " << lower_s;
+  }
+
+  DCHECK_EQ(index_list.size(), s_lower_bound.size());
+  DCHECK_EQ(index_list.size(), s_upper_bound.size());
+  if (!constraint->AddBoundary(index_list, s_lower_bound, s_upper_bound)) {
+    const std::string msg = "Fail to apply distance constraints.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  // speed constraint
+  std::vector<double> speed_upper_bound;
+  if (!EstimateSpeedUpperBound(init_point, speed_limit, &speed_upper_bound)
+           .ok()) {
+    std::string msg = "Fail to estimate speed upper constraints.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
+
+  DCHECK_EQ(index_list.size(), speed_upper_bound.size());
+  DCHECK_EQ(index_list.size(), speed_lower_bound.size());
+
+  if (st_graph_debug_) {
+    auto speed_constraint = st_graph_debug_->mutable_speed_constraint();
+    for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+      speed_constraint->add_t(t_evaluated_[i]);
+      speed_constraint->add_lower_bound(speed_lower_bound[i]);
+      speed_constraint->add_upper_bound(speed_upper_bound[i]);
+    }
+  }
+
+  if (!constraint->AddDerivativeBoundary(index_list, speed_lower_bound,
+                                         speed_upper_bound)) {
+    const std::string msg = "Fail to apply speed constraints.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    ADEBUG << "t_evaluated_: " << t_evaluated_[i]
+           << "; speed_lower_bound: " << speed_lower_bound[i]
+           << "; speed_upper_bound: " << speed_upper_bound[i];
+  }
+
+  // acceleration constraint
+  std::vector<double> accel_lower_bound(t_evaluated_.size(), accel_bound.first);
+  std::vector<double> accel_upper_bound(t_evaluated_.size(),
+                                        accel_bound.second);
+
+  DCHECK_EQ(index_list.size(), accel_lower_bound.size());
+  DCHECK_EQ(index_list.size(), accel_upper_bound.size());
+  if (!constraint->AddSecondDerivativeBoundary(
+          init_point.v(), index_list, accel_lower_bound, accel_upper_bound)) {
+    const std::string msg = "Fail to apply acceleration constraints.";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    ADEBUG << "t_evaluated_: " << t_evaluated_[i]
+           << "; accel_lower_bound: " << accel_lower_bound[i]
+           << "; accel_upper_bound: " << accel_upper_bound[i];
+  }
+
   return Status::OK();
 }
 
