@@ -39,9 +39,15 @@ class SignalLights : public TrafficRule {
   bool ApplyRule(ReferenceLineInfo* const reference_line_info);
 
  private:
+  void Init();
   void ReadSignals();
   bool FindValidSignalLights(ReferenceLineInfo* const reference_line_info);
-
+  const apollo::perception::TrafficLight GetSignal(
+      const std::string& signal_id);
+  void MakeDecisions(ReferenceLineInfo *const reference_line_info);
+  double GetStopDeceleration(ReferenceLineInfo *const reference_line_info,
+                             const hdmap::PathOverlap* signal_light);
+  void CreateStopObstacle();
   std::vector<const hdmap::PathOverlap*> signal_lights_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
       signals_;

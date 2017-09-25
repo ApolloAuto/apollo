@@ -19,10 +19,12 @@
  **/
 
 #include <vector>
+#include <limits>
 
 #include "modules/planning/tasks/traffic_decider/signal_lights.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 
 namespace apollo {
 namespace planning {
@@ -37,11 +39,18 @@ bool SignalLights::ApplyRule(ReferenceLineInfo *const reference_line_info) {
   if (!FLAGS_enable_signal_lights) {
     return true;
   }
+  Init();
   if (!FindValidSignalLights(reference_line_info)) {
     return true;
   }
   ReadSignals();
+  MakeDecisions(reference_line_info);
   return true;
+}
+
+void SignalLights::Init() {
+  signals_.clear();
+  signal_lights_.clear();
 }
 
 void SignalLights::ReadSignals() {
@@ -64,11 +73,70 @@ bool SignalLights::FindValidSignalLights(
     return false;
   }
   for (const hdmap::PathOverlap &signal_light : signal_lights) {
-    if (signal_light.start_s > reference_line_info->AdcSlBoundary().start_s()) {
+    if (signal_light.start_s + FLAGS_max_distance_for_light_stop_buffer
+        > reference_line_info->AdcSlBoundary().end_s()) {
       signal_lights_.push_back(&signal_light);
     }
   }
   return signal_lights_.size() > 0;
+}
+
+void SignalLights::MakeDecisions(ReferenceLineInfo *const reference_line_info) {
+  for (const hdmap::PathOverlap* signal_light : signal_lights_) {
+    const TrafficLight signal = GetSignal(signal_light->object_id);
+    double stop_deceleration = GetStopDeceleration(reference_line_info,
+                                                   signal_light);
+    if ((signal.color() == TrafficLight::RED &&
+        stop_deceleration < 6) ||
+        (signal.color() == TrafficLight::UNKNOWN &&
+            stop_deceleration < 6) ||
+        (signal.color() == TrafficLight::YELLOW &&
+            stop_deceleration < 4)) {
+      CreateStopObstacle();
+    }
+  }
+}
+
+const TrafficLight SignalLights::GetSignal(const std::string &signal_id) {
+  auto iter = signals_.find(signal_id);
+  if (iter == signals_.end()) {
+    TrafficLight traffic_light;
+    traffic_light.set_id(signal_id);
+    traffic_light.set_color(TrafficLight::UNKNOWN);
+    traffic_light.set_confidence(0.0);
+    traffic_light.set_tracking_time(0.0);
+    return traffic_light;
+  }
+  return *iter->second;
+}
+
+double SignalLights::GetStopDeceleration(
+    ReferenceLineInfo *const reference_line_info,
+    const hdmap::PathOverlap* signal_light) {
+  double adc_speed = common::VehicleState::instance()->linear_velocity();
+  if (adc_speed < FLAGS_min_speed_for_light_stop) {
+    return 0.0;
+  }
+  double stop_distance = 0;
+  double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
+  double stop_line_s = signal_light->start_s;
+
+  if (stop_line_s > adc_front_s) {
+    stop_distance = stop_line_s - adc_front_s;
+  } else {
+    stop_distance = stop_line_s +
+        FLAGS_max_distance_for_light_stop_buffer - adc_front_s;
+  }
+
+  if (stop_distance < 1e-5) {
+    return std::numeric_limits<double>::max();
+  }
+
+  return (adc_speed * adc_speed) / (2 * stop_distance);
+}
+
+void SignalLights::CreateStopObstacle() {
+  // TODO(yifei) to be implemented
 }
 
 }  // namespace planning
