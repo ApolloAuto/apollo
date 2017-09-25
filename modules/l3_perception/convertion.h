@@ -18,59 +18,40 @@
  * @file
  */
 
-#ifndef MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
-#define MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
+#ifndef MODEULES_L3_PERCEPTION_CONVERTION_H_
+#define MODEULES_L3_PERCEPTION_CONVERTION_H_
 
-#include <string>
-#include <map>
-#include <mutex>
-
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/l3_perception/proto/radar_obstacle.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "ros/include/ros/ros.h"
 
 /**
- * @namespace apollo::l3_perception
+ * @namespace apollo::l3_perception::convertion
  * @brief apollo::l3_perception
  */
 namespace apollo {
 namespace l3_perception {
+namespace convertion {
 
-class L3Perception : public apollo::common::ApolloApp {
- public:
-  std::string Name() const override;
-  apollo::common::Status Init() override;
-  apollo::common::Status Start() override;
-  void Stop() override;
+using apollo::perception::PerceptionObstacles;
+using apollo::drivers::Mobileye;
+using apollo::drivers::DelphiESR;
+using apollo::localization::LocalizationEstimate;
+using apollo::l3_perception::RadarObstacles;
 
- private:
-  // Upon receiving mobileye data
-  void OnMobileye(const apollo::drivers::Mobileye& message);
-  // Upon receiving radar data
-  void OnDelphiESR(const apollo::drivers::DelphiESR& message);
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate& message);
-  void OnTimer(const ros::TimerEvent&);
+PerceptionObstacles MobileyeToPerceptionObstacles(
+    const Mobileye& mobileye, const LocalizationEstimate& localization);
 
-  RadarObstacles FilterRadarObstacles(
-      const RadarObstacles& radar_obstacles);
+RadarObstacles DelphiToRadarObstacles(const DelphiESR& delphi_esr);
 
-  double last_timestamp_ = 0;
-  ros::Timer timer_;
-  apollo::drivers::Mobileye mobileye_;
-  apollo::drivers::DelphiESR delphi_esr_;
-  apollo::localization::LocalizationEstimate localization_;
-  RadarObstacles radar_obstacles_;
-  std::mutex l3_mutex_;
+PerceptionObstacles RadarObstaclesToPerceptionObstacles(
+    const RadarObstacles& radar_obstacles, const LocalizationEstimate& localization);
 
-};
-
+}  // namespace convertion 
 }  // namespace l3_perception
 }  // namespace apollo
 
 #endif  // MODULES_L3_PERCEPTION_L3_PERCEPTION_H_
+
