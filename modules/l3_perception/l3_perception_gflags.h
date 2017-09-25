@@ -42,5 +42,6 @@ DECLARE_double(default_ped_width);
 DECLARE_double(default_unknown_width);
 
 DECLARE_double(filter_y_distance);
-DECLARE_double(fusion_distance);
+DECLARE_double(fusion_x_distance);
+DECLARE_double(fusion_y_distance);
 #endif
