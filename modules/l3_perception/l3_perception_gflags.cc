@@ -39,3 +39,4 @@ DEFINE_double(default_ped_width, 0.5, "default ped width for bounding box.");
 DEFINE_double(default_unknown_width, 3.0, "default unknown width for bounding box.");
 
 DEFINE_double(filter_y_distance, 7.5, "fiter the radar objects far away from the main vehicle on y-axis.");
+DEFINE_double(fusion_distance, 3.0, "fuse mobileye and radar if they are away less than this distance.");

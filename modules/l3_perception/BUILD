@@ -21,6 +21,7 @@ cc_library(
         ":l3_perception_gflags",
         ":l3_perception_util",
         ":l3_perception_convertion",
+        ":l3_perception_fusion",
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
@@ -70,6 +71,21 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/l3_perception/proto:l3_perception_proto"
+    ],
+)
+
+cc_library(
+    name = "l3_perception_fusion",
+    srcs = [
+        "fusion.cc",
+    ],
+    hdrs = [
+        "fusion.h",
+    ],
+    deps = [
+        ":l3_perception_gflags",
+        ":l3_perception_util",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 

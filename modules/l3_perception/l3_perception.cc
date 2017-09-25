@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/l3_perception/l3_perception.h"
-#include "modules/l3_perception/convertion.h"
 
 #include <cmath>
 
@@ -23,6 +22,8 @@
 #include "modules/common/log.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
 #include "modules/l3_perception/l3_perception_util.h"
+#include "modules/l3_perception/convertion.h"
+#include "modules/l3_perception/fusion.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
@@ -140,13 +141,16 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
   PerceptionObstacles mobileye_obstacles =
       convertion::MobileyeToPerceptionObstacles(mobileye_, localization_);
-  obstacles.MergeFrom(mobileye_obstacles);
   // }
 
   // if (delphi_esr_.header().timestamp_sec() >= last_timestamp_) {
   RadarObstacles filtered_radar_obstacles = FilterRadarObstacles(radar_obstacles_);
   PerceptionObstacles filtered_delphi_esr_obstacles =
       convertion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles, localization_);
+
+  fusion::MobileyeRadarFusion(&mobileye_obstacles, &filtered_delphi_esr_obstacles);
+
+  obstacles.MergeFrom(mobileye_obstacles);
   obstacles.MergeFrom(filtered_delphi_esr_obstacles);
   // }
 
