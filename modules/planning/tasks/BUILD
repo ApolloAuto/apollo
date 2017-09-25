@@ -55,7 +55,7 @@ cc_library(
         "//modules/planning/common:speed_limit",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
-        "//modules/planning/common/speed:st_boundary",
+        "//modules/planning/tasks/st_graph:st_graph_data",
         "@eigen//:eigen",
     ],
 )

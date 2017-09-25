@@ -115,7 +115,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   auto ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
   if (ret != Status::OK()) {
     AWARN << "Failed to solve with ideal acceleration conditions. Use "
-              "secondary choice instead.";
+             "secondary choice instead.";
 
     accel_bound.first = qp_spline_st_speed_config_.min_deceleration();
     accel_bound.second = qp_spline_st_speed_config_.max_acceleration();
@@ -124,12 +124,12 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     if (ret != Status::OK()) {
       std::string msg = common::util::StrCat(
           Name(), ":Failed to search graph with quadratic programming!");
-      RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
+      RecordSTGraphDebug(st_graph_data, st_graph_debug);
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
   // record debug info
-  RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
+  RecordSTGraphDebug(st_graph_data, st_graph_debug);
   return Status::OK();
 }
 
