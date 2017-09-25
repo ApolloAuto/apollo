@@ -22,7 +22,7 @@
 #include "modules/common/log.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
 #include "modules/l3_perception/l3_perception_util.h"
-#include "modules/l3_perception/convertion.h"
+#include "modules/l3_perception/conversion.h"
 #include "modules/l3_perception/fusion.h"
 #include "ros/include/ros/ros.h"
 
@@ -76,7 +76,7 @@ void L3Perception::OnDelphiESR(const DelphiESR& message) {
   AINFO << "receive DelphiESR callback";
   std::lock_guard<std::mutex> lock(l3_mutex_);
   delphi_esr_.CopyFrom(message);
-  radar_obstacles_ = convertion::DelphiToRadarObstacles(delphi_esr_);
+  radar_obstacles_ = conversion::DelphiToRadarObstacles(delphi_esr_);
 }
 
 void L3Perception::OnLocalization(const LocalizationEstimate& message) {
@@ -140,13 +140,13 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   // TODO(lizh): check timestamp before publish.
   // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
   PerceptionObstacles mobileye_obstacles =
-      convertion::MobileyeToPerceptionObstacles(mobileye_, localization_);
+      conversion::MobileyeToPerceptionObstacles(mobileye_, localization_);
   // }
 
   // if (delphi_esr_.header().timestamp_sec() >= last_timestamp_) {
   RadarObstacles filtered_radar_obstacles = FilterRadarObstacles(radar_obstacles_);
   PerceptionObstacles filtered_delphi_esr_obstacles =
-      convertion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles, localization_);
+      conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles, localization_);
 
   fusion::MobileyeRadarFusion(&mobileye_obstacles, &filtered_delphi_esr_obstacles);
 
