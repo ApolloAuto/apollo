@@ -53,6 +53,8 @@ DECLARE_double(speed_upper_bound);
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
 
+DECLARE_double(lateral_acceleration_bound);
+
 DECLARE_double(lateral_jerk_bound);
 
 DECLARE_double(longitudinal_jerk_lower_bound);
@@ -96,5 +98,7 @@ DECLARE_bool(enable_follow_accel_constraint);
 
 // traffic decision
 DECLARE_bool(enable_signal_lights);
+DECLARE_double(max_distance_for_light_stop_buffer);
+DECLARE_double(min_speed_for_light_stop);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

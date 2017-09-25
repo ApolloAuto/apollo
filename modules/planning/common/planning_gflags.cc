@@ -76,6 +76,8 @@ DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
 
+DEFINE_double(lateral_acceleration_bound, 4.0, "lateral acceleration bound");
+
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
 
@@ -130,7 +132,10 @@ DEFINE_bool(enable_rule_layer, true,
 
 // Traffic decision
 DEFINE_bool(enable_signal_lights, false, "enable signal_lights");
-
+DEFINE_double(max_distance_for_light_stop_buffer, 4.0,
+              "length of passing light stop line buffer");
+DEFINE_double(min_speed_for_light_stop, 0.1,
+              "min speed for computing signal light stop");
 
 DEFINE_string(planning_config_file,
               "modules/planning/conf/planning_config.pb.txt",
