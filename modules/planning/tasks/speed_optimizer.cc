@@ -80,16 +80,15 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
 
-void SpeedOptimizer::RecordSTGraphDebug(
-    const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limits,
-    const SpeedData& speed_data, STGraphDebug* st_graph_debug) {
+void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
+                                        STGraphDebug* st_graph_debug) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
 
   st_graph_debug->set_name(Name());
-  for (const auto boundary : boundaries) {
+  for (const auto& boundary : st_graph_data.st_boundaries()) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
     switch (boundary.boundary_type()) {
@@ -112,20 +111,21 @@ void SpeedOptimizer::RecordSTGraphDebug(
         break;
     }
 
-    for (const auto point : boundary.points()) {
+    for (const auto& point : boundary.points()) {
       auto point_debug = boundary_debug->add_point();
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
   }
 
-  for (const auto point : speed_limits.speed_limit_points()) {
+  for (const auto& point : st_graph_data.speed_limit().speed_limit_points()) {
     common::SpeedPoint speed_point;
     speed_point.set_s(point.first);
     speed_point.set_v(point.second);
     st_graph_debug->add_speed_limit()->CopyFrom(speed_point);
   }
 
+  const auto& speed_data = reference_line_info_->speed_data();
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
