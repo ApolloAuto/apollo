@@ -22,8 +22,9 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "modules/map/proto/map.pb.h"
+#include "modules/common/util/util.h"
 
+#include "modules/map/proto/map.pb.h"
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 
 namespace apollo {
@@ -46,13 +47,6 @@ struct ProtoData {
   std::unordered_map<std::string, StopLineInternal> pb_stop_lines;
 };
 
-struct HashFunc {
-  template <typename T, typename U>
-  size_t operator()(const std::pair<T, U>& k) const {
-    return std::hash<T>()(k.first) ^ std::hash<U>()(k.second);
-  }
-};
-
 class ProtoOrganizer {
  public:
   void GetRoadElements(std::vector<RoadInternal>* roads);
@@ -73,7 +67,8 @@ class ProtoOrganizer {
       const std::vector<OverlapWithLane>& overlap_with_lanes);
   void GetLaneLaneOverlapElements(
       const std::unordered_map<std::pair<std::string, std::string>,
-                               OverlapWithLane, HashFunc>& lane_lane_overlaps);
+                               OverlapWithLane, apollo::common::util::PairHash>&
+          lane_lane_overlaps);
   void GetJunctionObjectOverlapElements(
       const std::vector<JunctionInternal>& junctions);
 

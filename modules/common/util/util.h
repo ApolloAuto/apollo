@@ -53,6 +53,13 @@ bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
   return google::protobuf::util::MessageDifferencer::Equals(a, b);
 }
 
+struct PairHash {
+  template <typename T, typename U>
+  size_t operator()(const std::pair<T, U>& pair) const {
+    return std::hash<T>()(pair.first) ^ std::hash<U>()(pair.second);
+  }
+};
+
 /**
  * @brief create a SL point
  * @param s the s value
