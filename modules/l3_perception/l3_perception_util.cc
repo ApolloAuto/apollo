@@ -45,14 +45,11 @@ void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
                            const double mid_x, const double mid_y, const double mid_z,
                            const double length, const double width, const double height,
                            const double heading) {
-  // Generate a 2.5D cube where vertices 0, 2, 4, 6 are higher vertices, and
-  // vertices 1, 3, 5, 7 are lower vertices. When viewing from the top, vertices
-  // 0/1 are upper right, vertices 2/3 are upper left, vertices 4/5 are lower
-  // left, vertices 6/7 are lower right.
-  const int sign_h[8] = {1, -1, 1, -1, 1, -1, 1, -1};
-  const int sign_l[8] = {1, 1, 1, 1, -1, -1, -1, -1};
-  const int sign_w[8] = {1, 1, -1, -1, -1, -1, 1, 1};
-  for (int i = 0; i < 8; ++i) {
+  // Generate a 2D cube whose vertices are given in counter-clock order when
+  // viewed from top
+  const int sign_l[4] = {1, 1, -1, -1};
+  const int sign_w[4] = {1, -1, -1, 1};
+  for (int i = 0; i < 4; ++i) {
     perception_obstacle->add_polygon_point();
     perception_obstacle->mutable_polygon_point(i)->set_x(
         mid_x + sign_l[i] * length * std::cos(heading) / 2.0 +
@@ -60,8 +57,6 @@ void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
     perception_obstacle->mutable_polygon_point(i)->set_y(
         mid_y + sign_l[i] * length * std::sin(heading) / 2.0 -
         sign_w[i] * width * std::cos(heading) / 2.0);
-    perception_obstacle->mutable_polygon_point(i)->set_z(
-        mid_z + sign_h[i] * height / 2.0);
   }
 }
 
