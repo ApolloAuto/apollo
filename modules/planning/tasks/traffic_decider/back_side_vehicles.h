@@ -33,7 +33,7 @@ class BackSideVehicles : public TrafficRule {
   BackSideVehicles();
   virtual ~BackSideVehicles() = default;
 
-  bool ApplyRule(ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame *frame, ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning
