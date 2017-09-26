@@ -4,12 +4,12 @@ _**Tip**: to read the equations in the document, you are recommended to use Chro
 
 ## 1  Definition 
 
-After finding a path in QP-Spline-Path, Apollo converts all obstacles on the path and the ADV (autonomous driving vehicle) into an ST graph, which represents the station changes over time along the path. The speed optimization task is to find a path on the ST graph that is collision-free and safe. 
+After finding a path in QP-Spline-Path, Apollo converts all obstacles on the path and the ADV (autonomous driving vehicle) into an path-time (S-T) graph, which represents that the station changes over time along the path. The speed optimization task is to find a path on the S-T graph that is collision-free and comfortable. 
 
-Apollo uses spline to define the path. To find the best path, Apollo leverages Quadratic programming with a set of conditions. The QP formulation is defined as: 
+Apollo uses splines to represent speed profiles, which are lists of S-T points in S-T graph. Apollo leverages Quadratic programming to find the best profile. The standard form of QP problem is defined as: 
 <p>
 $$
-\frac{1}{2} \cdot x^T \cdot H \cdot x + f^T \cdot x 
+minimize \frac{1}{2} \cdot x^T \cdot H \cdot x + f^T \cdot x 
 \\
 s.t. LB \leq x \leq UB
 \\
@@ -23,11 +23,11 @@ $$
 
 ### 1.1  Get spline segments
 
-Split the path into **n** segments. Each segment trajectory is defined by a polynomial.
+Split the S-T profile into **n** segments. Each segment trajectory is defined by a polynomial.
 
 ### 1.2  Define function for each spline segment
 
-Each segment ***i*** has accumulated distance $d_i$ along a reference line. And the trajectory for the segment is defined as a polynomial of degree five by default.
+Each segment ***i*** has an accumulated distance $d_i$ along a reference line. And the trajectory for the segment is defined as a polynomial of degree five by default. The degree of the polynomials are adjustable by configuration parameters.
 
 <p>
 $$
@@ -45,13 +45,13 @@ cost_1 = \sum_{i=1}^{n} \Big( w_1 \cdot \int\limits_{0}^{d_i} (f_i')^2(s) ds + w
 $$
 </p>
 
-Then Apollo defines $cost_2$ as the difference between the final ST trajectory and the cruise ST trajectory (with given speed limits — m points):
+Then Apollo defines $cost_2$ as the difference between the final S-T trajectory and the cruise S-T trajectory (with given speed limits — m points):
 <p>
 $$
 cost_2 = \sum_{i=1}^{n}\sum_{j=1}^{m}\Big(f_i(t_j)- s_j\Big)^2
 $$
 </p>
-Similarly, Apollo defines $cost_3$ that is the difference between the first ST path and the follow ST path (o points):
+Similarly, Apollo defines $cost_3$ that is the difference between the first S-T path and the follow S-T path (o points):
 <p>
 $$
 cost_3 = \sum_{i=1}^{n}\sum_{j=1}^{o}\Big(f_i(t_j)- s_j\Big)^2
