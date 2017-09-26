@@ -65,6 +65,35 @@ cc_library(
 )
 
 cc_library(
+    name = "mpc_controller",
+    srcs = [
+        "mpc_controller.cc",
+    ],
+    hdrs = [
+        "mpc_controller.h",
+    ],
+    deps = [
+        ":controller_interface",
+        "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math:euler_angles_zxy",
+        "//modules/common/math:lqr",
+        "//modules/common/math:math_utils",
+        "//modules/common/proto:common_proto",
+        "//modules/common/status",
+        "//modules/common/time",
+        "//modules/control/common:control_gflags",
+        "//modules/control/common:interpolation_1d",
+        "//modules/control/common:trajectory_analyzer",
+        "//modules/control/filters:digital_filter",
+        "//modules/control/filters:digital_filter_coefficients",
+        "//modules/control/filters:mean_filter",
+        "//modules/control/proto:control_proto",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
     name = "controller",
     deps = [
         ":controller_agent",
