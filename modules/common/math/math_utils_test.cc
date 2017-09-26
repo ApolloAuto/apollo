@@ -72,19 +72,6 @@ TEST(MathUtilsTest, Square) {
   EXPECT_EQ(-2147479015, Square(46341));  // Overflow!
 }
 
-TEST(MathUtilsTest, Double) {
-  EXPECT_EQ(DoubleCompare(234.32, 93.9), 1);
-  EXPECT_EQ(DoubleCompare({234.32}, {93.9}), 1);
-  EXPECT_EQ(DoubleCompare(234.32, 93.9, 1e-5), 1);
-  EXPECT_EQ(DoubleCompare({234.32}, {93.9}, 1e-5), 1);
-
-  EXPECT_EQ(DoubleCompare(23.32, 93.9), -1);
-  EXPECT_EQ(DoubleCompare(4.32, 4.32), 0);
-  EXPECT_EQ(DoubleCompare(2.1, 2.0009, 1e-5), 1);
-  EXPECT_EQ(DoubleCompare(1.1, 2.0009, 1e-5), -1);
-  EXPECT_EQ(DoubleCompare(2.1, 2.0009, 1), 0);
-}
-
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
