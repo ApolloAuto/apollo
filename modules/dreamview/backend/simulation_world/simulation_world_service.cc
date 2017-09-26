@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <unordered_set>
 #include <vector>
 
 #include "google/protobuf/util/json_util.h"
@@ -27,6 +28,7 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
@@ -128,11 +130,18 @@ void SetObstaclePolygon(const PerceptionObstacle &obstacle,
     return;
   }
 
+  using apollo::common::util::PairHash;
+  std::unordered_set<std::pair<double, double>, PairHash> seen_points;
   world_object->clear_polygon_point();
   for (const auto &point : obstacle.polygon_point()) {
-    PolygonPoint *poly_pt = world_object->add_polygon_point();
-    poly_pt->set_x(point.x());
-    poly_pt->set_y(point.y());
+    // Filter out duplicate xy pairs.
+    std::pair<double, double> xy_pair = {point.x(), point.y()};
+    if (seen_points.count(xy_pair) == 0) {
+      PolygonPoint *poly_pt = world_object->add_polygon_point();
+      poly_pt->set_x(point.x());
+      poly_pt->set_y(point.y());
+      seen_points.insert(xy_pair);
+    }
   }
 }
 

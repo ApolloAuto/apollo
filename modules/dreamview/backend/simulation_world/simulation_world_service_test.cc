@@ -217,6 +217,9 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   apollo::perception::Point* point3 = obstacle1->add_polygon_point();
   point3->set_x(-1.0);
   point3->set_y(0.0);
+  apollo::perception::Point* point4 = obstacle1->add_polygon_point();
+  point4->set_x(-1.0);
+  point4->set_y(0.0);
   obstacle1->set_timestamp(1489794020.123);
   obstacle1->set_type(apollo::perception::PerceptionObstacle_Type_UNKNOWN);
   PerceptionObstacle* obstacle2 = obstacles.add_perception_obstacle();

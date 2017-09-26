@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/math:quaternion",
         "//modules/common/monitor",
         "//modules/common/proto:common_proto",
+        "//modules/common/util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/util:trajectory_point_collector",
