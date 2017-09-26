@@ -162,12 +162,6 @@ T Clamp(const T value, T bound1, T bound2) {
   return value;
 }
 
-const double kDoubleEpsilon = 0.001;
-
-int DoubleCompare(
-    const double d1, const double d2,
-    const double epsilon = kDoubleEpsilon);
-
 // Gaussian
 double Gaussian(const double u, const double std, const double x);
 
