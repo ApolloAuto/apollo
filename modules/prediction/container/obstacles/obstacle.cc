@@ -129,9 +129,9 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
                       const double timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0 &&
-      common::math::DoubleCompare(timestamp,
-                                  feature_history_.front().timestamp()) <= 0) {
-    AERROR << "Obstacle [" << id_ << "] received an older frame [" << timestamp
+      timestamp <= feature_history_.front().timestamp()) {
+    AERROR << "Obstacle [" << id_ << "] received an older frame ["
+           << std::setprecision(20) << timestamp
            << "] than the most recent timestamp [ "
            << feature_history_.front().timestamp() << "].";
     return;
