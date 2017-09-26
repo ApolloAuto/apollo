@@ -42,7 +42,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       perception_obstacles.header().has_timestamp_sec()) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
-  if (common::math::DoubleCompare(timestamp, timestamp_) < 0) {
+  if (timestamp < timestamp_) {
     AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
            << timestamp_ << "].";
     return;
