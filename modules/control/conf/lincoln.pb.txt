@@ -6595,3 +6595,66 @@ lon_controller_conf {
     }
   }
 }
+mpc_controller_conf {
+  ts: 0.01
+  preview_window: 0
+  cf: 155494.663
+  cr: 155494.663
+  mass_fl: 520
+  mass_fr: 520
+  mass_rl: 520
+  mass_rr: 520
+  eps: 0.01
+  matrix_q: 0.05
+  matrix_q: 0.0
+  matrix_q: 1.0
+  matrix_q: 0.0
+  cutoff_freq: 10
+  mean_filter_window_size: 10
+  max_iteration: 150
+  max_lateral_acceleration: 5.0
+  lat_err_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.3
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.2
+    }
+  }
+  heading_err_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.4
+    }
+  }
+}
