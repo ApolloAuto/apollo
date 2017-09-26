@@ -32,11 +32,17 @@ using apollo::common::ErrorCode;
 
 void ControllerAgent::RegisterControllers() {
   controller_factory_.Register(
+    if(!FLAGS_use_mpc) {
       ControlConf::LAT_CONTROLLER,
       []() -> Controller * { return new LatController(); });
   controller_factory_.Register(
       ControlConf::LON_CONTROLLER,
       []() -> Controller * { return new LonController(); });
+    } else {
+  controller_factory_.Register(
+      ControlConf::LON_CONTROLLER,
+      []() -> Controller * { return new MPCController(); });
+    }
 }
 
 Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {

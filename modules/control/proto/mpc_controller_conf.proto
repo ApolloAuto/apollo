@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.control;
+
+// simple optimal steer control param
+message MPCControllerConf {
+  optional double ts = 1;            // sample time (dt) 0.01 now, configurable
+  // preview window n, preview time = preview window * ts
+  optional int32 preview_window = 2;
+  optional double cf = 3;
+  optional double cr = 4;            // N/rad
+  optional int32 mass_fl = 5;
+  optional int32 mass_fr = 6;
+  optional int32 mass_rl = 7;
+  optional int32 mass_rr = 8;
+  optional double eps = 9;          // converge threshold for lqr solver
+  repeated double matrix_q = 10;     // matrix_q size = 4 + preview_window
+  optional int32 cutoff_freq = 11;   // cutoff frequency
+  optional int32 mean_filter_window_size = 12;  // window size of mean filter
+  // for a normal car, it should be in range[16, 18]
+  optional int32 max_iteration = 13;  // maximum iteration for lqr solve
+  optional double max_lateral_acceleration = 14;  // limit aggressive steering
+}
