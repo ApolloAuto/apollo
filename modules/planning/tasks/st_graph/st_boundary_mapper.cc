@@ -38,7 +38,6 @@
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -449,7 +448,7 @@ Status StBoundaryMapper::GetSpeedLimits(
   CHECK_NOTNULL(speed_limit_data);
 
   for (const auto& path_point : path_data_.discretized_path().path_points()) {
-    if (Double::Compare(path_point.s(), reference_line_.Length()) > 0) {
+    if (path_point.s() > reference_line_.Length()) {
       AWARN << "path length [" << path_data_.discretized_path().Length()
             << "] is LARGER than reference_line_ length ["
             << reference_line_.Length() << "]. Please debug before proceeding.";

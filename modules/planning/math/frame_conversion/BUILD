@@ -14,7 +14,6 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math:math_utils",
         "//modules/common/math:vec2d",
-        "//modules/planning/math:double",
         "@eigen//:eigen",
     ],
 )
