@@ -120,14 +120,12 @@ void LaneSequencePredictor::FilterLaneSequences(
 
     double probability = sequence.probability();
 
-    if (common::math::DoubleCompare(probability, all.second) > 0 ||
-        (common::math::DoubleCompare(probability, all.second) == 0 &&
-         lane_change_type[i] == 0)) {
+    if (probability > all.second ||
+        (probability == all.second && lane_change_type[i] == 0)) {
       all.first = i;
       all.second = probability;
     }
-    if (lane_change_type[i] > 0 &&
-        common::math::DoubleCompare(probability, change.second) > 0) {
+    if (lane_change_type[i] > 0 && probability > change.second) {
       change.first = i;
       change.second = probability;
     }
@@ -137,16 +135,13 @@ void LaneSequencePredictor::FilterLaneSequences(
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
     // The obstacle has interference with ADC within a small distance
-    if (common::math::DoubleCompare(GetLaneChangeDistanceWithADC(sequence),
-                                    FLAGS_lane_change_dist) < 0) {
+    if (GetLaneChangeDistanceWithADC(sequence) < FLAGS_lane_change_dist) {
       (*enable_lane_sequence)[i] = false;
       continue;
     }
 
     double probability = sequence.probability();
-    if (common::math::DoubleCompare(probability,
-                                    FLAGS_lane_sequence_threshold) < 0 &&
-        i != all.first) {
+    if (probability < FLAGS_lane_sequence_threshold && i != all.first) {
       (*enable_lane_sequence)[i] = false;
     } else if (change.first >= 0 && change.first < num_lane_sequence &&
                lane_change_type[i] > 0 &&
@@ -276,8 +271,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
       PathPoint* prev_point = points->back().mutable_path_point();
       double x_diff = point.x() - prev_point->x();
       double y_diff = point.y() - prev_point->y();
-      if (common::math::DoubleCompare(x_diff, 0.0) != 0 ||
-          common::math::DoubleCompare(y_diff, 0.0) != 0) {
+      if (x_diff != 0.0 || y_diff != 0.0) {
         theta = std::atan2(y_diff, x_diff);
         prev_point->set_theta(theta);
       } else {
@@ -286,12 +280,12 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     }
 
     // update state
-    if (common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
+    if (lane_speed <= 0.0) {
       ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
       lane_speed = 0.0;
       lane_acc = 0.0;
       transition(1, 1) = 1.0;
-    } else if (common::math::DoubleCompare(lane_speed, FLAGS_max_speed) >= 0) {
+    } else if (lane_speed >= FLAGS_max_speed) {
       lane_speed = FLAGS_max_speed;
       lane_acc = 0.0;
     }
@@ -313,7 +307,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     state(3, 0) = lane_acc;
 
     state = transition * state;
-    if (common::math::DoubleCompare(lane_s, state(0, 0)) >= 0) {
+    if (lane_s >= state(0, 0)) {
       state(0, 0) = lane_s;
       state(1, 0) = lane_l;
       state(2, 0) = 0.0;
