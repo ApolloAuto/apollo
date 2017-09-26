@@ -8,9 +8,9 @@ protobuf == 3.1
 python-gflags
 
 # Web utils.
-eventlet
 flask
 flask-socketio
+gevent
 requests >= 2.18
 simplejson
 
