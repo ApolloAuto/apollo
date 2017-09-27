@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 """Entry point of the server."""
+import os
 import ssl
 import sys
 
@@ -29,6 +30,10 @@ import handlers
 
 def main():
     """App entry point."""
+
+    # Always take Apollo home as working directory.
+    os.chdir(os.path.join(os.path.dirname(__file__), '../../..'))
+
     conf = Config.get_pb()
     # Module initialization.
     RuntimeStatus.reset(True)
@@ -41,8 +46,8 @@ def main():
         kwargs = {
             'server_side': True,
             'ssl_version': ssl.PROTOCOL_TLSv1,
-            'keyfile': Config.get_realpath(https.server_key),
-            'certfile': Config.get_realpath(https.server_cert)
+            'keyfile': https.server_key,
+            'certfile': https.server_cert
         }
         if https.client_cert_required:
             kwargs['cert_reqs'] = ssl.CERT_REQUIRED
