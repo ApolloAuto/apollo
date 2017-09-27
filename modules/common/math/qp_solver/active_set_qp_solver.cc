@@ -48,7 +48,7 @@ ActiveSetQpSolver::ActiveSetQpSolver(
       debug_info_(FLAGS_default_enable_active_set_debug_info) {}
 
 bool ActiveSetQpSolver::Solve() {
-  ::qpOASES::QProblem qp_problem(num_param_, num_constraint_);
+  ::qpOASES::QProblem qp_problem(num_param_, num_constraint_, hessian_type_);
   ::qpOASES::Options my_options;
   my_options.epsNum = qp_eps_num_;
   my_options.epsDen = qp_eps_den_;
