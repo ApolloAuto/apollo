@@ -3,11 +3,11 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "glfw",    
+    name = "glfw",
     includes = ["."],
     linkopts = [
-      "-lglfw",
-      "-lglapi",
-      "-lglib-2.0",
+        "-lglfw",
+        "-lglapi",
+        "-lglib-2.0",
     ],
 )

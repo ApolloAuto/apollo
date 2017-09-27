@@ -393,7 +393,7 @@ function buildify() {
   local buildifier_url=https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier
   wget $buildifier_url -O ~/.buildifier
   chmod +x ~/.buildifier
-  find . -name BUILD -type f -exec ~/.buildifier -showlog -mode=fix {} +
+  find . -name '*BUILD' -type f -exec ~/.buildifier -showlog -mode=fix {} +
   if [ $? -eq 0 ]; then
     success 'Buildify worked!'
   else
