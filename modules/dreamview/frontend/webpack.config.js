@@ -6,7 +6,6 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 
-
 module.exports = {
     context: path.join(__dirname, "src"),
 
@@ -158,7 +157,7 @@ module.exports = {
             // Include only the app. Do not include the service worker.
             chunks: ["app"]
         }),
-        new FaviconsWebpackPlugin("./favicon.png"),
+        new FaviconsWebpackPlugin("./favicon.png")
     ],
 
     devServer: {

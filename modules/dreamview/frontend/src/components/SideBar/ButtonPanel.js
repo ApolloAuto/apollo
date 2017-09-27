@@ -2,8 +2,6 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-// import DashCamButton from "components/SideBar/DashCamButton";
-
 @observer
 class SideBarButton extends React.Component {
     render() {

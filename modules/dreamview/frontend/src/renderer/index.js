@@ -14,7 +14,6 @@ import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 
-
 class Renderer {
     constructor() {
         // Disable antialias for mobile devices.
