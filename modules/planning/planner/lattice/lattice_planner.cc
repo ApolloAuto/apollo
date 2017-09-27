@@ -148,6 +148,11 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
       continue;
     }
 
+    if (collision_checker.InCollision(combined_trajectory)) {
+      ++collision_failure_count;
+      continue;
+    }
+
     // put combine trajectory into debug data
     num_lattice_traj += 1;
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =

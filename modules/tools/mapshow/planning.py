@@ -426,6 +426,7 @@ class Planning:
         self.path_data_y = path_data_y
         self.path_data_lock.release()
 
+    """
     def replot_path_data(self, path_lines):
         cnt = 0
         self.path_data_lock.acquire()
@@ -443,6 +444,39 @@ class Planning:
             line.set_label(name[0:5])
             cnt += 1
         self.path_data_lock.release()
+    """
+
+    def compute_lattice_path_data(self):
+        print "     --- computing lattice path"
+        lattice_path_data_x = []
+        lattice_path_data_y = []
+        for traj_path in self.planning_pb.debug.planning_data.trajectory_path:
+            print "      getting trajectory_path ......"
+            each_path_x = []
+            each_path_y = []
+            traj_str = ""
+            for traj_path_point in traj_path.trajectory_point:
+                each_path_x.append(traj_path_point.path_point.x)
+                each_path_y.append(traj_path_point.path_point.y)
+                traj_str += "(" + str(traj_path_point.path_point.x) + "," \
+                        + str(traj_path_point.path_point.y) + ")" + " "
+            lattice_path_data_x.append(each_path_x)
+            lattice_path_data_y.append(each_path_y)
+            print "    traj_str " + traj_str
+        # End of for
+        self.lattice_lock.acquire()
+        self.lattice_path_data_x = lattice_path_data_x
+        self.lattice_path_data_y = lattice_path_data_y
+        self.lattice_lock.release()
+        print " lattice_path_data_x list size = " +str(len(self.lattice_path_data_x))
+        if len(self.lattice_path_data_x) > 0:
+            print " lattice_path_data_x[0] size = " +str(len(self.lattice_path_data_x[0]))
+    # End of compute_lattice_path_data
+
+    def replot_lattice_path_data(self, path_lines):
+        # Currently do nothing
+        print "Doing nothing right now ------  Replot_Lattice_Path_Data"
+    # End of replot lattice path_data
 
     def compute_lattice_path_data(self):
         print "     --- computing lattice path"
