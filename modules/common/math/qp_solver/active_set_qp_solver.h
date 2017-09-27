@@ -63,6 +63,8 @@ class ActiveSetQpSolver : public QpSolver {
   double constraint_upper_bound() const;
 
   void set_pos_semi_definite_hessian() override {
+    // If hessianType is set to HST_SEMIDEF, the built-in regularisation scheme
+    // is switched on at no additional computational cost
     hessian_type_ = ::qpOASES::HST_SEMIDEF;
   }
   void set_pos_definite_hessian() override {
