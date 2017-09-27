@@ -42,7 +42,10 @@ class QpSolver {
            const Eigen::MatrixXd& affine_equality_boundary);
   virtual ~QpSolver() = default;
 
+  virtual void set_pos_semi_definite_hessian() {}
+  virtual void set_pos_definite_hessian() {}
   virtual bool Solve() = 0;
+
   const Eigen::MatrixXd& params() const;
   const Eigen::MatrixXd& kernel_matrix() const;
   const Eigen::MatrixXd& offset() const;

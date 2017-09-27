@@ -73,7 +73,7 @@ em_planner_config {
         number_of_knots: 6
         number_of_fx_constraint_knots: 13
         time_resolution: 0.1
-        regularization_weight: 0.1
+        regularization_weight: 0.0
         derivative_weight: 10.0
         second_derivative_weight: 1.0
         third_derivative_weight: 1.0
@@ -95,7 +95,7 @@ em_planner_config {
         follow_weight: 8.0
         stop_weight: 0.2
         cruise_weight: 0.1
-        regularization_weight: 0.1
+        regularization_weight: 0.0
         preferred_max_acceleration: 1.2
         preferred_min_deceleration: -1.8
         max_acceleration: 2.0
