@@ -40,15 +40,15 @@ lat_controller_conf {
     }
     scheduler {
       speed: 12.0
-      ratio: 0.4
+      ratio: 0.2
     }
     scheduler {
       speed: 20.0
-      ratio: 0.3
+      ratio: 0.1
     }
     scheduler {
       speed: 25.0
-      ratio: 0.2
+      ratio: 0.05
     }
   }
   heading_err_gain_scheduler {
@@ -62,15 +62,15 @@ lat_controller_conf {
     }
     scheduler {
       speed: 12.0
-      ratio: 0.6
+      ratio: 0.4
     }
     scheduler {
       speed: 20.0
-      ratio: 0.4
+      ratio: 0.2
     }
     scheduler {
       speed: 25.0
-      ratio: 0.4
+      ratio: 0.1
     }
   }
 }
