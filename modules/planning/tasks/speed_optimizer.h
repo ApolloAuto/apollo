@@ -46,7 +46,8 @@ class SpeedOptimizer : public Task {
       const ReferenceLine& reference_line, PathDecision* const path_decision,
       SpeedData* const speed_data) = 0;
 
-  SpeedData GenerateStopProfile(const double init_speed) const;
+  SpeedData GenerateStopProfile(const double init_speed,
+                                const double init_acc) const;
 
   void RecordSTGraphDebug(const StGraphData& st_graph_data,
                           planning_internal::STGraphDebug* stGraphDebug);
