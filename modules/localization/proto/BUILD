@@ -67,38 +67,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "camera_proto",
-    deps = [
-        ":camera_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "camera_proto_lib",
-    srcs = ["camera.proto"],
-    deps = [
-        ":pose_proto_lib",
-        "//modules/common/proto:common_proto_lib",
-        "//modules/common/proto:header_proto_lib",
-    ],
-)
-
-cc_proto_library(
-    name = "camera_parameter_proto",
-    deps = [
-        ":camera_parameter_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "camera_parameter_proto_lib",
-    srcs = ["camera_parameter.proto"],
-    deps = [
-        "//modules/common/proto:common_proto_lib",
-    ],
-)
-
-cc_proto_library(
     name = "localization_proto",
     deps = [
         ":localization_proto_lib",
