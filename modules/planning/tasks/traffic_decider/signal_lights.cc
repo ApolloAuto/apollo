@@ -158,10 +158,14 @@ void SignalLights::CreateStopObstacle(
                                FLAGS_virtual_stop_wall_length,
                                left_lane_width + right_lane_width};
 
-  reference_line_info->AddObstacle(
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(
       frame->AddStaticVirtualObstacle(
           FLAGS_signal_light_virtual_object_prefix + signal_light->object_id,
           stop_box));
+  auto* path_decision = reference_line_info->path_decision();
+  ObjectDecisionType stop;
+  stop.mutable_stop();
+  path_decision->AddLongitudinalDecision(Name(), stop_wall->Id(), stop);
 }
 
 }  // namespace planning
