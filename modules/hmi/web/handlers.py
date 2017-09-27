@@ -29,8 +29,7 @@ from socketio_api import SocketIOApi
 
 app = flask.Flask(__name__)
 app.secret_key = str(datetime.datetime.now())
-socketio = flask_socketio.SocketIO(app)
-
+socketio = flask_socketio.SocketIO(app, async_mode='gevent')
 
 # Web page handlers.
 @app.route('/')
