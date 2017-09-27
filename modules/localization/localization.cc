@@ -18,7 +18,6 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/localization/camera/camera_localization.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/rtk/rtk_localization.h"
 
@@ -36,10 +35,6 @@ void Localization::RegisterLocalizationMethods() {
   localization_factory_.Register(
       LocalizationConfig::RTK,
       []() -> LocalizationBase* { return new RTKLocalization(); });
-
-  localization_factory_.Register(
-      LocalizationConfig::CAMERA,
-      []() -> LocalizationBase* { return new CameraLocalization(); });
 }
 
 Status Localization::Init() {

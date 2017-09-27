@@ -26,14 +26,6 @@ DEFINE_string(rtk_adapter_config_file,
               "modules/localization/conf/rtk_adapter.conf",
               "rtk adapter configuration");
 
-DEFINE_string(camera_adapter_config_file,
-              "modules/localization/conf/camera_adapter.conf",
-              "camera based localization adapter configuration");
-
-DEFINE_string(camera_parameter_config_file,
-              "modules/localization/conf/camera_parameter.conf",
-              "camera parameter config in camera based localiztion");
-
 DEFINE_string(localization_config_file,
               "modules/localization/conf/localization_config.pb.txt",
               "localization config file");
@@ -46,9 +38,6 @@ DEFINE_bool(enable_watchdog, true, "enable watchdog");
 
 DEFINE_double(gps_time_delay_tolerance, 1.0,
               "gps message time delay tolerance (sec)");
-
-DEFINE_double(camera_time_delay_tolerance, 1.0,
-              "camera imu message time delay tolerance (sec)");
 
 DEFINE_double(gps_imu_timestamp_sec_diff_tolerance, 20e-3,
               "gps/imu timestamp diff tolerance (sec)");
@@ -65,6 +54,3 @@ DEFINE_double(report_gps_imu_time_diff_threshold, 0.02,
 
 DEFINE_bool(enable_gps_timestamp, false,
             "True to set gps timestamp as localization header timestamp");
-
-DEFINE_bool(enable_camera_timestamp, false,
-            "True to set camera timestamp as localization header timestamp");
