@@ -45,7 +45,7 @@ export default class Video {
 
     findMoovAtom(event) {
         if (event.target.error) {
-            console.log("ERROR:", event.target.error);
+            console.error("ERROR:", event.target.error);
             return;
         }
 
@@ -65,13 +65,13 @@ export default class Video {
         if(this.offset <= this.file.size) {
             this.readBlock(nextOnLoadHandler);
         } else {
-            console.log("Cannot find video creation time.");
+            console.warn("Cannot find video creation time.");
         }
     }
 
     findMovieHeaderAtom(event) {
         if (event.target.error) {
-            console.log("ERROR:", event.target.error);
+            console.error("ERROR:", event.target.error);
             return;
         }
 
@@ -81,24 +81,24 @@ export default class Video {
         const atom_size = data.getUint32(0);
 
         if (atom_type === 'cmov') {
-            console.log("Cannot find video creation time: moov atom is compressed.");
+            console.warn("Cannot find video creation time: moov atom is compressed.");
             return;
         } else if (atom_type !== 'mvhd') {
-            console.log("Cannot find video creation time: expected header 'mvhd' not found.");
+            console.warn("Cannot find video creation time: expected header 'mvhd' not found.");
             return;
         } else {
             this.offset = this.offset + event.target.result.byteLength + 4;
             if(this.offset <= this.file.size) {
                 this.readBlock(this.findCreationTime.bind(this));
             } else {
-               console.log("Cannot find video creation time.");
+               console.warn("Cannot find video creation time.");
             }
         }
     }
 
     findCreationTime(event) {
         if (event.target.error) {
-            console.log("ERROR:", event.target.error);
+            console.error("ERROR:", event.target.error);
             return;
         }
 

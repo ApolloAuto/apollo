@@ -21,7 +21,7 @@ export default class DashCamPlayer extends React.Component {
     }
 
     loadVideo(fileURL) {
-        if (fileURL && fileURL.length !== 0){
+        if (fileURL && fileURL.length !== 0) {
             this.videoElement.src = fileURL;
             this.videoElement.load();
         }
