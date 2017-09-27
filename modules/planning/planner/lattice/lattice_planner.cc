@@ -132,22 +132,20 @@ Status LatticePlanner::Plan(
         *lat_trajectory1d_bundle[trajectory_pair.second],
         planning_init_point.relative_time());
 
+    if (collision_checker.InCollision(combined_trajectory)) {
+      ++collision_failure_count;
+      continue;
+    }
+
     // put combine trajectory into debug data
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
       combined_trajectory.trajectory_points();
 
-    /**
     auto combined_trajectory_path = ptr_debug->mutable_planning_data()
       ->add_trajectory_path();
     for (uint i = 0; i < combined_trajectory_points.size(); ++i) {
       combined_trajectory_path->add_trajectory_point()->CopyFrom(
         combined_trajectory_points[i]);
-    }
-    */
-
-    if (collision_checker.InCollision(combined_trajectory)) {
-      ++collision_failure_count;
-      continue;
     }
 
     AINFO << "trajectory not valid for constraint ["
