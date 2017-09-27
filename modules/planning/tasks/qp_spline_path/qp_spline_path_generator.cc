@@ -18,6 +18,7 @@
  * @file qp_spline_path_generator.cc
  **/
 #include <algorithm>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -30,7 +31,6 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/double.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
@@ -117,7 +117,8 @@ bool QpSplinePathGenerator::Generate(
   double s = init_frenet_point_.s();
   double s_resolution =
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
-  while (Double::Compare(s, end_s) < 0) {
+  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+  while (s + kEpsilon < end_s) {
     double l = spline(s);
     if (planning_debug_ &&
         planning_debug_->planning_data().sl_frame().size() >= 1) {
@@ -146,7 +147,7 @@ bool QpSplinePathGenerator::Generate(
           common::util::Distance2D(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
     }
-    if (Double::Compare(path_point.s(), end_s) >= 0) {
+    if (path_point.s() > end_s) {
       break;
     }
     path_points.push_back(std::move(path_point));
