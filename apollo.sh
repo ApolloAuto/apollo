@@ -65,6 +65,10 @@ function check_machine_arch() {
     fail "Unknown machine architecture $MACHINE_ARCH"
     exit 1
   fi
+
+  #setup vtk folder name for different systems.
+  VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | cut -d '-' -f 2)
+  sed -i "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE 
 }
 
 function check_esd_files() {

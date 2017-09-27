@@ -121,7 +121,7 @@ new_local_repository(
 new_local_repository(
     name = "vtk",
     build_file = "third_party/vtk.BUILD",
-    path = "/usr/include/vtk-5.8",
+    path = "/usr/include/vtk-VTK_VERSION",
 )
 
 # Caffe
