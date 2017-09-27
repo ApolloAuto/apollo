@@ -99,11 +99,12 @@ message PlanningData {
   repeated SLFrameDebug sl_frame = 15;
 
   optional apollo.common.Header prediction_header = 16;
+  
   optional SignalLightDebug signal_light = 17;
 
   // Prediction for lattice debug
-  repeated TrajectoryPath trajectory_path = 17;
-  repeated apollo.prediction.PredictionObstacle prediction_obstacle = 18;
+  repeated TrajectoryPath trajectory_path = 18;
+  repeated apollo.prediction.PredictionObstacle prediction_obstacle = 19;
 }
 
 message TrajectoryPath {
