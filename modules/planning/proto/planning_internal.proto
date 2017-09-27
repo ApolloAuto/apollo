@@ -8,6 +8,7 @@ import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -99,4 +100,12 @@ message PlanningData {
 
   optional apollo.common.Header prediction_header = 16;
   optional SignalLightDebug signal_light = 17;
+
+  // Prediction for lattice debug
+  repeated TrajectoryPath trajectory_path = 17;
+  repeated apollo.prediction.PredictionObstacle prediction_obstacle = 18;
+}
+
+message TrajectoryPath {
+  repeated apollo.common.TrajectoryPoint trajectory_point = 1;
 }
