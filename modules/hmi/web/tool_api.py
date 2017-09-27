@@ -76,13 +76,13 @@ class ToolApi(object):
     @classmethod
     def reset_recording(cls):
         """SocketIO Api: reset_recording()"""
-        file_to_play = Config.get_realpath(gflags.FLAGS.file_to_play)
+        file_to_play = gflags.FLAGS.file_to_play
         if os.path.exists(file_to_play):
             os.rename(file_to_play, file_to_play + '.bak')
         # Also stop player in case user has set it up.
         cls.__exec_bash_tool('stop_player')
         tool_status = RuntimeStatus.get_tools()
-        Rtool_status.recording_status = ToolStatus.RECORDING_READY_TO_CHECK
+        tool_status.recording_status = ToolStatus.RECORDING_READY_TO_CHECK
         tool_status.playing_status = ToolStatus.PLAYING_NOT_READY
         tool_status.planning_ready = False
         RuntimeStatus.broadcast_status_if_changed()
@@ -135,7 +135,7 @@ class ToolApi(object):
         if map_conf is None:
             Config.log.critical('Cannot find map %s', map_name)
             return
-        with open(Config.global_flagfile(), 'a') as fout:
+        with open(Config.get_pb().global_flagfile, 'a') as fout:
             fout.write('\n--map_dir={}\n'.format(map_conf.map_dir))
 
         RuntimeStatus.pb_singleton.config.current_map = map_name
@@ -166,22 +166,22 @@ class ToolApi(object):
         if vehicle_conf.HasField('velodyne_params_path'):
             system_cmd.copytree(
                 vehicle_conf.velodyne_params_path,
-                Config.get_realpath(conf_pb.velodyne_params_target_path, True))
+                Config.get_ros_path(conf_pb.velodyne_params_target_path))
         # Copy velodyne launch file.
         if vehicle_conf.HasField('velodyne_launch_path'):
             system_cmd.copyfile(
                 vehicle_conf.velodyne_launch_path,
-                Config.get_realpath(conf_pb.velodyne_launch_target_path, True))
+                Config.get_ros_path(conf_pb.velodyne_launch_target_path))
         # Copy gnss_driver.
         if vehicle_conf.HasField('gnss_driver_path'):
             system_cmd.copyfile(
                 vehicle_conf.gnss_driver_path,
-                Config.get_realpath(conf_pb.gnss_driver_target_path, True))
+                Config.get_ros_path(conf_pb.gnss_driver_target_path))
         # Copy gnss_conf.
         if vehicle_conf.HasField('gnss_conf_path'):
             system_cmd.copyfile(
                 vehicle_conf.gnss_conf_path,
-                Config.get_realpath(conf_pb.gnss_conf_target_path, True))
+                Config.get_ros_path(conf_pb.gnss_conf_target_path))
 
         RuntimeStatus.pb_singleton.config.current_vehicle = vehicle_name
         RuntimeStatus.broadcast_status_if_changed()
