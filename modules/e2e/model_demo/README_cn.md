@@ -1,4 +1,5 @@
 # 快速入门
+**<font color=##FF0000 size=3>model_demo目录提供的是模型的demo示例，意在让开发者快速了解开源数据格式及如何使用已开源的数据，我们也会不断开放end-to-end的模型和算法。</font>**
 ## 训练模型
 	sh run_train.sh
 训练集下载到当前工程./trainsets目录下。
