@@ -77,25 +77,24 @@ def run_train_steering(image_paths, attr_paths, nb_epoch, batch_size, log_type):
             yield np.asarray(buffer_i), np.asarray(buffer_c)
         raise StopIteration
 
-    with tf.device("/gpu:0"):
-        model = steering_model.get_model((320, 320, 3))
-        model.compile(loss='mse', optimizer=Adam(lr=0.00001))
+    model = steering_model.get_model((320, 320, 3))
+    model.compile(loss='mse', optimizer=Adam(lr=0.00001))
 
-        train_log = open('logs/{}_steering.log'.format(log_type), 'w')
-        step = 0
-        for i, c in generate_data_steering():
-            step += 1
-            history = model.fit(i, c, epochs=1)
-            train_log.write('steering Iteration {}, loss = {} \n' \
-                            .format(step, history.history['loss'][0]))
-            if step % 5000 == 0:
-                model.save_weights('models/steering_model.{}'.format(step))
-        # save last step
-        if step % 5000 != 0:
+    train_log = open('logs/{}_steering.log'.format(log_type), 'w')
+    step = 0
+    for i, c in generate_data_steering():
+        step += 1
+        history = model.fit(i, c, batch_size=batch_size, epochs=1)
+        train_log.write('steering Iteration {}, loss = {} \n' \
+                        .format(step, history.history['loss'][0]))
+        if step % 5000 == 0:
             model.save_weights('models/steering_model.{}'.format(step))
+    # save last step
+    if step % 5000 != 0:
+        model.save_weights('models/steering_model.{}'.format(step))
 
-        train_log.write('steering train end')
-        train_log.close()
+    train_log.write('steering train end')
+    train_log.close()
 
 
 def run_train_acc(image_paths, attr_paths, nb_epoch, batch_size, log_type):
@@ -161,26 +160,24 @@ def run_train_acc(image_paths, attr_paths, nb_epoch, batch_size, log_type):
 
         raise StopIteration
 
-    with tf.device("/gpu:0"):
+    model = acc_model.get_model((5, 320, 320, 3))
+    train_log = open('logs/{}_acc.log'.format(log_type), 'w')
 
-        model = acc_model.get_model((5, 320, 320, 3))
-        train_log = open('logs/{}_acc.log'.format(log_type), 'w')
-
-        step = 0
-        for i, a in generate_data_acc():
-            step += 1
-            history = model.fit(i, a, epochs=1)
-            train_log.write('acc Iteration {}, loss = {} \n' \
-                            .format(step, history.history['loss'][0]))
-            if step % 5000 == 0:
-                model.save_weights('models/acc_model.{}'.format(step))
-
-        # save last step
-        if step % 5000 != 0:
+    step = 0
+    for i, a in generate_data_acc():
+        step += 1
+        history = model.fit(i, a, batch_size=batch_size, epochs=1)
+        train_log.write('acc Iteration {}, loss = {} \n' \
+                        .format(step, history.history['loss'][0]))
+        if step % 5000 == 0:
             model.save_weights('models/acc_model.{}'.format(step))
 
-        train_log.write('acc train end')
-        train_log.close()
+    # save last step
+    if step % 5000 != 0:
+        model.save_weights('models/acc_model.{}'.format(step))
+
+    train_log.write('acc train end')
+    train_log.close()
 
 
 def run_predict(steering_model_path, acc_model_path, image_paths, output_path, log_type):
@@ -193,42 +190,41 @@ def run_predict(steering_model_path, acc_model_path, image_paths, output_path, l
     :param log_type: log type
     """
     pred_log = open('logs/{}.log'.format(log_type), 'w')
-    with tf.device("/gpu:0"):
-        model = steering_model.get_model((320, 320, 3))
-        model.load_weights(steering_model_path)
+    model = steering_model.get_model((320, 320, 3))
+    model.load_weights(steering_model_path)
 
-        time_list = []
-        pred_c_list = []
-        for path in image_paths:
-            pred_log.write('run steering predict: {}...\n'.format(path))
-            with h5py.File(path, 'r') as f:
-                for t in f:
-                    img = cv2.imdecode(f[t][:], 1)
-                    img = img.reshape((1,) + img.shape)
-                    pred_c = model.predict(img)
-                    time_list.append(float(t))
-                    pred_c_list.append(pred_c[0][0])
+    time_list = []
+    pred_c_list = []
+    for path in image_paths:
+        pred_log.write('run steering predict: {}...\n'.format(path))
+        with h5py.File(path, 'r') as f:
+            for t in f:
+                img = cv2.imdecode(f[t][:], 1)
+                img = img.reshape((1,) + img.shape)
+                pred_c = model.predict(img)
+                time_list.append(float(t))
+                pred_c_list.append(pred_c[0][0])
 
-        #predict acc
-        steps_size = 5
-        model = acc_model.get_model((steps_size, 320, 320, 3))
-        model.load_weights(acc_model_path)
+    #predict acc
+    steps_size = 5
+    model = acc_model.get_model((steps_size, 320, 320, 3))
+    model.load_weights(acc_model_path)
 
-        pred_a_list = []
-        buffer_i = []
-        for path in image_paths:
-            pred_log.write('run acc predict: {}...\n'.format(path))
-            with h5py.File(path, 'r') as f:
-                for t in f:
-                    img = cv2.imdecode(f[t][:], 1)
-                    buffer_i.append(img)
-                    if len(buffer_i) < steps_size: pred_a_list.append(0)
-                    if len(buffer_i) >= steps_size:
-                        pred_a = model.predict(
-                                 np.asarray(buffer_i).reshape((1,)+np.asarray(buffer_i).shape)
-                                 )
-                        pred_a_list.append(pred_a[0][0])
-                        buffer_i.pop(0)
+    pred_a_list = []
+    buffer_i = []
+    for path in image_paths:
+        pred_log.write('run acc predict: {}...\n'.format(path))
+        with h5py.File(path, 'r') as f:
+            for t in f:
+                img = cv2.imdecode(f[t][:], 1)
+                buffer_i.append(img)
+                if len(buffer_i) < steps_size: pred_a_list.append(0)
+                if len(buffer_i) >= steps_size:
+                    pred_a = model.predict(
+                             np.asarray(buffer_i).reshape((1,)+np.asarray(buffer_i).shape)
+                             )
+                    pred_a_list.append(pred_a[0][0])
+                    buffer_i.pop(0)
 
     pred_log.write('write predictions...\n')
     with h5py.File(output_path, 'w') as f:
