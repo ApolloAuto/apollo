@@ -142,3 +142,29 @@ class Map:
                     px.append(float(p.x))
                     py.append(float(p.y))
                 ax.plot(px, py, ls=':', c=color_val, alpha = 0.5)
+
+    def draw_signal_lights(self, ax):
+        """draw_signal_lights"""
+        for signal in self.map_pb.signal:
+            for stop_line in signal.stop_line:
+                for curve in stop_line.segment:
+                    self._draw_signal(curve.line_segment, signal.id.id, ax)
+
+    @staticmethod
+    def _draw_signal(line_segment, label, ax):
+        """draw a signal"""
+        px = []
+        py = []
+        for p in line_segment.point:
+            px.append(float(p.x))
+            py.append(float(p.y))
+        ax.plot(px, py, 'o-')
+        lxy = [random.randint(20, 80) * random.sample([-1, 1], 1)[0],
+               random.randint(20, 80) * random.sample([-1, 1], 1)[0]]
+        xy = (sum(px)/len(px), sum(py)/len(py))
+        plt.annotate(
+            label,
+            xy = xy, xytext = lxy,
+            textcoords = 'offset points',
+            bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
+            arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
