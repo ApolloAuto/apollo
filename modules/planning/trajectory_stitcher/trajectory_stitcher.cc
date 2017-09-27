@@ -24,7 +24,6 @@
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {

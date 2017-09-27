@@ -25,8 +25,6 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 
-#include "modules/planning/math/double.h"
-
 namespace apollo {
 namespace planning {
 
@@ -134,7 +132,7 @@ double CartesianFrenetConverter::CalculateKappa(const double rkappa,
                                                 const double l, const double dl,
                                                 const double ddl) {
   double denominator = (dl * dl + (1 - l * rkappa) * (1 - l * rkappa));
-  if (Double::Compare(denominator, 0.0, 1e-8) == 0) {
+  if (std::fabs(denominator) < 1e-8) {
     return 0.0;
   }
   denominator = std::pow(denominator, 1.5);

@@ -34,7 +34,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
