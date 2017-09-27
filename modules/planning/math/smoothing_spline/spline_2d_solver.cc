@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 namespace apollo {
@@ -56,6 +57,8 @@ bool Spline2dSolver::Solve() {
       kernel_matrix, offset, inequality_constraint_matrix,
       inequality_constraint_boundary, equality_constraint_matrix,
       equality_constraint_boundary));
+  qp_solver_->set_pos_semi_definite_hessian();
+
   if (!qp_solver_->Solve()) {
     return false;
   }
