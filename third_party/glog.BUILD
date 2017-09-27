@@ -1,32 +1,27 @@
 licenses(["notice"])
 
 cc_library(
-    visibility = ["//visibility:public"],
     name = "glog",
-    includes = [
-        ".",
-        "src",
-    ],
     srcs = [
         "src/base/commandlineflags.h",
         "src/base/googleinit.h",
         "src/demangle.cc",
         "src/logging.cc",
-        "src/symbolize.cc",
-        "src/vlog_is_on.cc",
         "src/raw_logging.cc",
-        "src/utilities.cc"
+        "src/symbolize.cc",
+        "src/utilities.cc",
+        "src/vlog_is_on.cc",
     ],
     hdrs = [
+        "raw_logging_h",
         "src/base/mutex.h",
-        "src/utilities.h",
         "src/demangle.h",
         "src/symbolize.h",
-        ":stl_logging_h",
+        "src/utilities.h",
         ":config_h",
         ":logging_h",
+        ":stl_logging_h",
         ":vlog_is_on_h",
-        "raw_logging_h"
     ],
     copts = [
         # Disable warnings that exists in glog
@@ -59,6 +54,11 @@ cc_library(
         # Necessary for creating soft links of log files
         "-DHAVE_UNISTD_H",
     ],
+    includes = [
+        ".",
+        "src",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//external:gflags",
     ],
@@ -92,7 +92,7 @@ sed -e 's/@ac_cv_have_unistd_h@/1/g' \
     -e 's/@ac_cv___attribute___noinline@/__attribute__((noinline))/g' \
     -e 's/@ac_cv___attribute___noreturn@/__attribute__((noreturn))/g' \
     -e 's/@ac_cv___attribute___printf_4_5@/__attribute__((__format__ (__printf__, 4, 5)))/g'
-EOF"""
+EOF""",
 )
 
 genrule(
