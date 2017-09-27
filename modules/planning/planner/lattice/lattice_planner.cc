@@ -103,11 +103,12 @@ Status LatticePlanner::Plan(
   int collision_failure_count = 0;
 
   planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
+
   // put obstacles into debug data
   // Note : create prediction_obstacles since there is no longer original
   // data exposed. WTF
   // Hence, there might be obstacles with same id but different trajectory
-  /**
+
   for (uint i = 0; i < obstacles.size(); ++i) {
     const Obstacle* obstacle_ptr = obstacles[i];
     apollo::prediction::PredictionObstacle* prediction_obstacle =
@@ -116,7 +117,6 @@ Status LatticePlanner::Plan(
       CopyFrom(obstacle_ptr->Perception());
     prediction_obstacle->add_trajectory()->CopyFrom(obstacle_ptr->Trajectory());
   }
-  **/
 
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
