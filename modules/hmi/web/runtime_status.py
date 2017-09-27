@@ -136,7 +136,7 @@ class RuntimeStatus(object):
     @classmethod
     def stat_playable_duration(cls):
         """Stat playable duration."""
-        file_to_play = Config.get_realpath(gflags.FLAGS.file_to_play)
+        file_to_play = gflags.FLAGS.file_to_play
         if os.path.exists(file_to_play):
             with open(file_to_play, 'r') as f:
                 kFreq = 100
