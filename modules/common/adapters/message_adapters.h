@@ -26,7 +26,6 @@
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/hmi/proto/hmi_message.pb.h"
-#include "modules/localization/proto/camera.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -52,17 +51,14 @@ using ChassisDetailAdapter = Adapter<canbus::ChassisDetail>;
 using ControlCommandAdapter = Adapter<control::ControlCommand>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
 using ImuAdapter = Adapter<localization::Imu>;
-using CameraAdapter = Adapter<localization::Camera>;
 using LocalizationAdapter = Adapter<apollo::localization::LocalizationEstimate>;
 using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
 using PadAdapter = Adapter<control::PadMessage>;
-using PerceptionObstaclesAdapter =
-    Adapter<perception::PerceptionObstacles>;
+using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
-using TrafficLightDetectionAdapter =
-    Adapter<perception::TrafficLightDetection>;
+using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
