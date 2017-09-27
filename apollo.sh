@@ -65,6 +65,10 @@ function check_machine_arch() {
     fail "Unknown machine architecture $MACHINE_ARCH"
     exit 1
   fi
+
+  #setup vtk folder name for different systems.
+  VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | cut -d '-' -f 2)
+  sed -i "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE 
 }
 
 function check_esd_files() {
@@ -393,7 +397,7 @@ function buildify() {
   local buildifier_url=https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier
   wget $buildifier_url -O ~/.buildifier
   chmod +x ~/.buildifier
-  find . -name BUILD -type f -exec ~/.buildifier -showlog -mode=fix {} +
+  find . -name '*BUILD' -type f -exec ~/.buildifier -showlog -mode=fix {} +
   if [ $? -eq 0 ]; then
     success 'Buildify worked!'
   else

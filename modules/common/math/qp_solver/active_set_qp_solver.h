@@ -62,6 +62,15 @@ class ActiveSetQpSolver : public QpSolver {
   double l_upper_bound() const;
   double constraint_upper_bound() const;
 
+  void set_pos_semi_definite_hessian() override {
+    // If hessianType is set to HST_SEMIDEF, the built-in regularisation scheme
+    // is switched on at no additional computational cost
+    hessian_type_ = ::qpOASES::HST_SEMIDEF;
+  }
+  void set_pos_definite_hessian() override {
+    hessian_type_ = ::qpOASES::HST_POSDEF;
+  }
+
  private:
   bool sanity_check() override;
 
@@ -83,6 +92,8 @@ class ActiveSetQpSolver : public QpSolver {
   // constraint search upper bound
   double constraint_upper_bound_ = 1e10;
   int max_iteration_ = 1000;
+
+  ::qpOASES::HessianType hessian_type_ = ::qpOASES::HST_UNKNOWN;
 };
 
 }  // namespace math
