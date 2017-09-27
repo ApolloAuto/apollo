@@ -19,7 +19,6 @@ cc_library(
         "//modules/common/util:string_util",
         "//modules/map/pnc_map:path",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/math:double",
         "//modules/planning/proto:planning_proto",
     ],
 )

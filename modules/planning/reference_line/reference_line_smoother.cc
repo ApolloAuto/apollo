@@ -30,7 +30,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/math/curve_math.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -259,14 +258,15 @@ bool ReferenceLineSmoother::ExtractEvaluatedPoints(
 
 bool ReferenceLineSmoother::GetSFromParamT(const double t,
                                            double* const s) const {
-  if (t_knots_.size() < 2 || Double::Compare(t, t_knots_.back(), 1e-8) > 0) {
+  if (t_knots_.size() < 2 || t - t_knots_.back() > 1e-8) {
     return false;
   }
   std::uint32_t lower = FindIndex(t);
   std::uint32_t upper = lower + 1;
   double weight = 0.0;
-  if (Double::Compare(t_knots_[upper], t_knots_[lower], 1e-8) > 0) {
-    weight = (t - t_knots_[lower]) / (t_knots_[upper] - t_knots_[lower]);
+  const double diff = t_knots_[upper] - t_knots_[lower];
+  if (std::fabs(diff) > 1e-8) {
+    weight = (t - t_knots_[lower]) / diff;
   }
   *s =
       ref_points_[lower].s() * (1.0 - weight) + ref_points_[upper].s() * weight;

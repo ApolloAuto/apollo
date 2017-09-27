@@ -30,7 +30,6 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -336,7 +335,7 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
     const common::SLPoint& start, const common::SLPoint& end,
     const ObjectNudge::Type nudge_type, const double s_start,
     const double s_end) {
-  const double inf = std::numeric_limits<double>::infinity();
+  constexpr double inf = std::numeric_limits<double>::infinity();
   std::pair<double, double> result = std::make_pair(-inf, inf);
 
   if (start.s() > s_end || end.s() < s_start) {
@@ -348,7 +347,7 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
   double weight_back = 0.0;
   double weight_front = 0.0;
 
-  if (Double::Compare((end.s() - start.s()), 0.0) > 0) {
+  if (end.s() - start.s() > std::numeric_limits<double>::epsilon()) {
     weight_back = (s_back - end.s()) / (end.s() - start.s());
     weight_front = (s_front - start.s()) / (end.s() - start.s());
   }
@@ -441,8 +440,7 @@ bool QpFrenetFrame::CalculateObstacleBound() {
 bool QpFrenetFrame::GetBound(
     const double s, const std::vector<std::pair<double, double>>& map_bound,
     std::pair<double, double>* const bound) const {
-  if (Double::Compare(s, start_s_, 1e-8) < 0 ||
-      Double::Compare(s, end_s_, 1e-8) > 0) {
+  if (s + 1e-8 < start_s_ || s - 1e-8 > end_s_) {
     AERROR << "Evaluate s location " << s
            << ", is out of trajectory frenet frame range (" << start_s_ << ", "
            << end_s_ << ")";
@@ -453,9 +451,7 @@ bool QpFrenetFrame::GetBound(
   uint32_t lower_index = FindIndex(s);
   const double s_low = evaluated_knots_[lower_index];
   const double s_high = evaluated_knots_[lower_index + 1];
-  double weight = Double::Compare(s_low, s_high, 1e-8) < 0
-                      ? (s - s_low) / (s_high - s_low)
-                      : 0.0;
+  double weight = s_high - s_low > 1e-8 ? (s - s_low) / (s_high - s_low) : 0.0;
 
   double low_first = map_bound[lower_index].first;
   double low_second = map_bound[lower_index].second;

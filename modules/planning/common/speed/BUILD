@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common/math",
-        "//modules/planning/math:double",
     ],
 )
 
@@ -63,7 +62,6 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:planning_util",
-        "//modules/planning/math:double",
         "//modules/planning/proto:planning_proto",
     ],
 )

@@ -23,7 +23,6 @@
 #include <limits>
 
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -68,15 +67,15 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
                               const double speed_limit) const {
   double cost = 0.0;
   const double speed = (second.s() - first.s()) / unit_t_;
-  if (Double::Compare(speed, 0.0) < 0) {
+  if (speed < 0) {
     return std::numeric_limits<double>::infinity();
   }
   double det_speed = (speed - speed_limit) / speed_limit;
-  if (Double::Compare(det_speed, 0.0) > 0) {
+  if (det_speed > 0) {
     cost = dp_st_speed_config_.exceed_speed_penalty() *
            dp_st_speed_config_.default_speed_cost() * fabs(speed * speed) *
            unit_t_;
-  } else if (Double::Compare(det_speed, 0.0) < 0) {
+  } else if (det_speed < 0) {
     cost = dp_st_speed_config_.low_speed_penalty() *
            dp_st_speed_config_.default_speed_cost() * -det_speed * unit_t_;
   } else {
@@ -122,10 +121,9 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 double DpStCost::JerkCost(const double jerk) const {
   double jerk_sq = jerk * jerk;
   double cost = 0.0;
-  const auto diff = Double::Compare(jerk, 0.0);
-  if (diff > 0) {
+  if (jerk > 0) {
     cost = dp_st_speed_config_.positive_jerk_coeff() * jerk_sq * unit_t_;
-  } else if (diff < 0) {
+  } else {
     cost = dp_st_speed_config_.negative_jerk_coeff() * jerk_sq * unit_t_;
   }
   return cost;
