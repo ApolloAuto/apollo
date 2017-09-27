@@ -60,6 +60,18 @@ cc_library(
 )
 
 cc_library(
+    name = "planning_target",
+    hdrs = [
+        "planning_target.h",
+    ],
+    srcs = [
+        "planning_target.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "end_condition_sampler",
     hdrs = [
         "end_condition_sampler.h",
@@ -70,6 +82,7 @@ cc_library(
     deps = [
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice:planning_target",
         "//modules/planning/lattice:lattice_params",
     ],
 )
@@ -89,6 +102,9 @@ cc_library(
         "//modules/planning/lattice:lattice_params",
         "//modules/planning/lattice:lattice_constraint_checker",
         "//modules/planning/proto:lattice_sampling_config_proto",
+        "//modules/planning/lattice:planning_target",
+        "//modules/planning/lattice:lattice_params",
+        "//modules/planning/lattice:lattice_constraint_checker",
     ],
 )
 
@@ -149,6 +165,23 @@ cc_library(
 )
 
 cc_library(
+    name = "decision_analyzer",
+    srcs = [
+        "decision_analyzer.cc",
+    ],
+    hdrs = [
+        "decision_analyzer.h",
+    ],
+    deps = [
+        "//modules/planning/common:frame",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice:planning_target",
+        "//modules/common/proto:pnc_point_proto",
+        "//external:gflags",
+    ],
+)
+
+cc_library(
     name = "reference_line_matcher",
     hdrs = [
         "reference_line_matcher.h",
@@ -177,7 +210,6 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/reference_line:reference_line",
-
     ],
 )
 
