@@ -7,6 +7,7 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -83,4 +84,12 @@ message PlanningData {
   repeated SLFrameDebug sl_frame = 15;
 
   optional apollo.common.Header prediction_header = 16;
+
+  // Prediction for lattice debug
+  repeated TrajectoryPath trajectory_path = 17;
+  repeated apollo.prediction.PredictionObstacle prediction_obstacle = 18;
+}
+
+message TrajectoryPath {
+  repeated apollo.common.TrajectoryPoint trajectory_point = 1;
 }
