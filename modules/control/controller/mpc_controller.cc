@@ -199,7 +199,8 @@ Status MPCController::Init(const ControlConf *control_conf) {
 
   matrix_state_ = Matrix::Zero(matrix_size, 1);
   matrix_k_ = Matrix::Zero(1, matrix_size);
-  matrix_r_ = Matrix::Identity(1, 1);
+  // TODO: Change it to configs
+  matrix_r_ = Matrix::Identity(2, 2);
   matrix_q_ = Matrix::Zero(matrix_size, matrix_size);
 
   int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
@@ -255,6 +256,69 @@ Status MPCController::ComputeControlCommand(
 
   UpdateMatrix();
 
+  // Solve MPC problem
+  const int STATES = 4;
+  int CONTROLS = 2;
+  const int HORIZON = 10;
+  const double EPS = 0.01;
+  const int MAX_ITER = 100;
+
+  Eigen::MatrixXd A(STATES, STATES);
+  A << 1, 0, 1, 0,
+       0, 1, 0, 1,
+       0, 0, 1, 0,
+       0, 0, 0, 1;
+
+  Eigen::MatrixXd B(STATES, CONTROLS);
+  B << 0, 1,
+       0, 0,
+       1, 0,
+       0, 1;
+
+  Eigen::MatrixXd C(STATES, 1);
+  C << 0,
+       0,
+       0,
+       0.1;
+
+  Eigen::MatrixXd lower_bound(CONTROLS, 1);
+  lower_bound << -10,
+                 -10;
+
+  Eigen::MatrixXd upper_bound(CONTROLS, 1);
+  upper_bound << 10,
+                 10;
+
+  Eigen::MatrixXd initial_state(STATES, 1);
+  initial_state << 0,
+                   0,
+                   0,
+                   0;
+
+  Eigen::MatrixXd reference_state(STATES, 1);
+  reference_state << 200,
+                     200,
+                     0,
+                     0;
+
+  std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
+
+  Eigen::MatrixXd control_matrix(CONTROLS, 1);
+  control_matrix << 0,
+                    0;
+
+  std::vector<Eigen::MatrixXd> control(HORIZON, control_matrix);
+  for (unsigned int i = 0; i < control.size(); ++i) {
+    for (unsigned int i = 1; i < control.size(); ++i) {
+      control[i - 1] = control[i];
+    }
+    SolveLinearMPC(A, B, C, matrix_q_, matrix_r_, lower_bound, upper_bound, initial_state,
+                   reference, EPS, MAX_ITER, &control);
+    EXPECT_FLOAT_EQ(upper_bound(0), control[0](0));
+  }
+  common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_,
+                                matrix_r_, lqr_eps_, lqr_max_iteration_,
+                                &matrix_k_);
   // feedback = - K * state
   // Convert vehicle steer angle from rad to degree and then to steer degree
   // then to 100% ratio
