@@ -426,7 +426,6 @@ class Planning:
         self.path_data_y = path_data_y
         self.path_data_lock.release()
 
-    """
     def replot_path_data(self, path_lines):
         cnt = 0
         self.path_data_lock.acquire()
@@ -444,7 +443,6 @@ class Planning:
             line.set_label(name[0:5])
             cnt += 1
         self.path_data_lock.release()
-    """
 
     def compute_lattice_path_data(self):
         print "     --- computing lattice path"
