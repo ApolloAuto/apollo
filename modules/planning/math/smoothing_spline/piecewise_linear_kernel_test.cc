@@ -62,5 +62,32 @@ TEST(TestPiecewiseLinearKernel, add_regularization) {
   EXPECT_EQ(kernel.kernel_matrix(), mat_golden);
 }
 
+TEST(TestPiecewiseLinearKernel, add_reference_line_kernel_matrix) {
+  PiecewiseLinearKernel kernel(10, 0.1);
+
+  std::vector<uint32_t> index_list;
+  std::vector<double> pos_list;
+  for (int i = 0; i < 10; ++i) {
+    index_list.push_back(i);
+    pos_list.push_back(i * 2);
+  }
+
+  kernel.AddReferenceLineKernelMatrix(index_list, pos_list, 10.0);
+
+  const auto mat = kernel.kernel_matrix();
+  const auto offset = kernel.offset_matrix();
+
+  std::cout << mat << std::endl;
+  std::cout << offset << std::endl;
+
+  MatrixXd mat_golden = MatrixXd::Identity(10, 10) * 10.0;
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd offset_golden(10, 1);
+  offset_golden << 0, -40, -80, -120, -160, -200, -240, -280, -320, -360;
+
+  EXPECT_EQ(offset, offset_golden);
+}
+
 }  // namespace planning
 }  // namespace apollo
