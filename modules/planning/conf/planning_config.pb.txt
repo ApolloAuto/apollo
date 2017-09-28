@@ -116,11 +116,11 @@ em_planner_config {
 }
 
 reference_line_smoother_config {
-    num_spline: 7
+    num_spline: 6
     spline_order: 7
-    num_evaluated_points: 36
+    num_evaluated_points: 37
     boundary_bound: 0.2
-    derivative_bound: 1.0
+    derivative_bound: 0.15
     second_derivative_bound: 1.0
     third_derivative_bound: 1.0
     ref_line_weight: 0.0
