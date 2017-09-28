@@ -131,21 +131,37 @@ DEFINE_bool(enable_rule_layer, true,
             "enable rule for trajectory before model computation");
 
 // Traffic decision
+/// common
+DEFINE_double(stop_max_distance_buffer, 4.0,
+              "distance buffer of passing stop line");
+DEFINE_double(stop_min_speed, 0.1,
+              "min speed for computing stop");
+DEFINE_double(stop_max_deceleration, 6.0,
+              "max deceleration");
+/// traffic light
 DEFINE_bool(enable_signal_lights, false, "enable signal_lights");
-DEFINE_double(max_distance_for_light_stop_buffer, 4.0,
-              "length of passing light stop line buffer");
-DEFINE_double(min_speed_for_light_stop, 0.1,
-              "min speed for computing signal light stop");
-DEFINE_string(signal_light_virtual_object_prefix, "SL_",
+DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
 DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
               "treat yellow light as red when deceleration (abstract value"
                   " in m/s^2) is less than this threshold; otherwise treated"
                   " as green light");
-DEFINE_double(max_deacceleration_for_red_light_stop, 6.0,
-              "treat red light as red when deceleration (abstract value"
-                  " in m/s^2) is less than this threshold, otherwise treated"
-                  " as green light");
+/// crosswalk
+DEFINE_bool(enable_crosswalk, false, "enable crosswalk");
+DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
+              "prefix for converting crosswalk id to virtual object id");
+DEFINE_double(crosswalk_expand_distance, 2.0,
+              "crosswalk expand distance(meter) "
+              "for pedestrian/bicycle detection");
+DEFINE_double(crosswalk_max_l1_distance_to_ignore_pedestrian, 4.0,
+              "max l_distance to ignore pedestrian on crosswalk "
+              "when path not crosses");
+DEFINE_double(crosswalk_max_l2_distance_to_ignore_pedestrian, 5.0,
+              "to smooth stop/ignore decision when pedestrian close to "
+              "crosswalk_max_l1_distance_to_ignore_pedestrian");
+DEFINE_double(crosswalk_min_stop_line_distance, 1.0,
+              "stop distance(m) before indovidual "
+              "pedestrian/bicycle/movable passing crosswalk");
 
 // planning config file
 DEFINE_string(planning_config_file,
