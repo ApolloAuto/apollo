@@ -88,7 +88,7 @@ class QpPiecewiseStGraph {
 
  private:
   // qp st configuration
-  QpSplineStSpeedConfig qp_spline_st_speed_config_;
+  const QpSplineStSpeedConfig qp_spline_st_speed_config_;
 
   // initial status
   common::TrajectoryPoint init_point_;
