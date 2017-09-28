@@ -37,12 +37,11 @@ using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
 
 QpPiecewiseStGraph::QpPiecewiseStGraph(
-    const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-    const VehicleParam& veh_param)
-    : qp_spline_st_speed_config_(qp_spline_st_speed_config),
-      t_evaluated_resolution_(
-          qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_evaluated_graph_t()) {
+    const QpStSpeedConfig& qp_st_speed_config, const VehicleParam& veh_param)
+    : qp_st_speed_config_(qp_st_speed_config),
+      t_evaluated_resolution_(qp_st_speed_config_.total_time() /
+                              qp_st_speed_config_.qp_piecewise_config()
+                                  .number_of_evaluated_graph_t()) {
   Init();
 }
 
@@ -50,7 +49,9 @@ void QpPiecewiseStGraph::Init() {
   // init evaluated t positions
   double curr_t = t_evaluated_resolution_;
   for (uint32_t i = 0;
-       i < qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
+       i <
+       qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t();
+       ++i) {
     t_evaluated_.push_back(curr_t);
     curr_t += t_evaluated_resolution_;
   }
@@ -72,7 +73,7 @@ Status QpPiecewiseStGraph::Search(
 
   // reset piecewise linear generator
   generator_.reset(new PiecewiseLinearGenerator(
-      qp_spline_st_speed_config_.number_of_evaluated_graph_t(),
+      qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t(),
       t_evaluated_resolution_));
 
   // start to search for best st points
@@ -153,8 +154,8 @@ Status QpPiecewiseStGraph::ApplyConstraint(
     double lower_s = 0.0;
     double upper_s = 0.0;
     GetSConstraintByTime(boundaries, curr_t,
-                         qp_spline_st_speed_config_.total_path_length(),
-                         &upper_s, &lower_s);
+                         qp_st_speed_config_.total_path_length(), &upper_s,
+                         &lower_s);
     s_upper_bound.push_back(upper_s);
     s_lower_bound.push_back(lower_s);
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
@@ -231,29 +232,33 @@ Status QpPiecewiseStGraph::ApplyKernel(
   auto* kernel = generator_->mutable_kernel();
   DCHECK_NOTNULL(kernel);
 
-  if (qp_spline_st_speed_config_.accel_kernel_weight() > 0) {
+  if (qp_st_speed_config_.qp_piecewise_config().accel_kernel_weight() > 0) {
     kernel->AddSecondOrderDerivativeMatrix(
-        init_point_.v(), qp_spline_st_speed_config_.accel_kernel_weight());
+        init_point_.v(),
+        qp_st_speed_config_.qp_piecewise_config().accel_kernel_weight());
   }
 
-  if (qp_spline_st_speed_config_.jerk_kernel_weight() > 0) {
+  if (qp_st_speed_config_.qp_piecewise_config().jerk_kernel_weight() > 0) {
     kernel->AddThirdOrderDerivativeMatrix(
         init_point_.v(), init_point_.a(),
-        qp_spline_st_speed_config_.jerk_kernel_weight());
+        qp_st_speed_config_.qp_piecewise_config().jerk_kernel_weight());
   }
 
-  if (!AddCruiseReferenceLineKernel(speed_limit,
-                                    qp_spline_st_speed_config_.cruise_weight())
+  if (!AddCruiseReferenceLineKernel(
+           speed_limit,
+           qp_st_speed_config_.qp_piecewise_config().cruise_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (!AddFollowReferenceLineKernel(boundaries,
-                                    qp_spline_st_speed_config_.follow_weight())
+  if (!AddFollowReferenceLineKernel(
+           boundaries,
+           qp_st_speed_config_.qp_piecewise_config().follow_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
-  kernel->AddRegularization(qp_spline_st_speed_config_.regularization_weight());
+  kernel->AddRegularization(
+      qp_st_speed_config_.qp_piecewise_config().regularization_weight());
   return Status::OK();
 }
 
@@ -269,7 +274,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     index_list.push_back(i);
-    cruise_.push_back(qp_spline_st_speed_config_.total_path_length());
+    cruise_.push_back(qp_st_speed_config_.total_path_length());
   }
   if (st_graph_debug_) {
     auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
@@ -288,7 +293,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
   if (t_evaluated_.size() > 0) {
     ref_kernel->AddReferenceLineKernelMatrix(
         index_list, cruise_,
-        weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
+        weight * t_evaluated_.size() / qp_st_speed_config_.total_time());
   }
 
   return Status::OK();
@@ -315,9 +320,9 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
       double s_lower = 0.0;
       if (boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         success = true;
-        s_min = std::min(s_min,
-                         s_upper - boundary->characteristic_length() -
-                             qp_spline_st_speed_config_.follow_drag_distance());
+        s_min = std::min(s_min, s_upper - boundary->characteristic_length() -
+                                    qp_st_speed_config_.qp_piecewise_config()
+                                        .follow_drag_distance());
       }
     }
     if (success && s_min < cruise_[i]) {
@@ -336,7 +341,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
   if (!ref_s.empty()) {
     follow_kernel->AddReferenceLineKernelMatrix(
         index_list, ref_s,
-        weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
+        weight * t_evaluated_.size() / qp_st_speed_config_.total_time());
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
