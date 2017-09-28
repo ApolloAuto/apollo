@@ -29,7 +29,7 @@
     <arg name="topic" value="/apollo/sensor/velodyne64/VelodyneScanUnified"/>    
   </include>
   
-  <!-- start cloud nodelet using test calibration file -->
+  <!-- start convert nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_convert"/>
     <arg name="model" value="$(arg model)"/>
@@ -43,7 +43,7 @@
     <arg name="topic_packets" value="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   </include>
   
-   <!-- start 64 compensator nodelet -->
+   <!-- start compensator nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/compensator_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_compensator"/>
     <arg name="child_frame_id" value="$(arg velodyne64_frame_id)"/>
@@ -58,7 +58,7 @@
     <arg name="child_frame_id" default="velodyne64"/>
     <arg name="stamp_file" default="$(arg pcd_folder)/stamp.txt"/>
     <arg name="pose_file" default="$(arg pcd_folder)/pose.txt"/>
-    <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
+    <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/compensator/PointCloud2"/>
     <arg name="queue_size" default="10"/>
   </include>
 
