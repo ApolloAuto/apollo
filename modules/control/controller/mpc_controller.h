@@ -101,7 +101,7 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleMPCeralDebug *debug);
+  void UpdateState(SimpleMPCDebug *debug);
 
   void UpdateStateAnalyticalMatching(SimpleMPCDebug *debug);
 
@@ -122,7 +122,7 @@ class MPCController : public Controller {
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LogInitParameters();
-  void ProcessLogs(const SimpleLateralDebug *debug,
+  void ProcessLogs(const SimpleMPCDebug *debug,
                    const canbus::Chassis *chassis);
 
   void CloseLogFile();
@@ -161,20 +161,19 @@ class MPCController : public Controller {
   // number of control cycles look ahead (preview controller)
   int preview_window_ = 0;
   // number of states without previews, includes
-  // lateral error, lateral error rate, heading error, heading error rate
-  const int basic_state_size_ = 4;
+  // lateral error, lateral error rate, heading error, heading error rate, station error,
+  // velocity error,
+  const int basic_state_size_ = 6;
   // vehicle state matrix
   Eigen::MatrixXd matrix_a_;
   // vehicle state matrix (discrete-time)
   Eigen::MatrixXd matrix_ad_;
-  // vehicle state matrix compound; related to preview
-  Eigen::MatrixXd matrix_adc_;
+
   // control matrix
   Eigen::MatrixXd matrix_b_;
   // control matrix (discrete-time)
   Eigen::MatrixXd matrix_bd_;
-  // control matrix compound
-  Eigen::MatrixXd matrix_bdc_;
+
   // gain matrix
   Eigen::MatrixXd matrix_k_;
   // control authority weighting matrix

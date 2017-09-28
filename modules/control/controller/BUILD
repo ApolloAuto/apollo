@@ -100,6 +100,7 @@ cc_library(
         ":controller_interface",
         ":lat_controller",
         ":lon_controller",
+        ":mpc_controller",
         "@eigen//:eigen",
     ],
 )
@@ -116,6 +117,7 @@ cc_library(
         ":controller_interface",
         ":lat_controller",
         ":lon_controller",
+        ":mpc_controller",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "//modules/common/time",
