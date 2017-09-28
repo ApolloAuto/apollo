@@ -68,7 +68,7 @@ function check_machine_arch() {
 
   #setup vtk folder name for different systems.
   VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | cut -d '-' -f 2)
-  sed -i "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE 
+  sed -i "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE
 }
 
 function check_esd_files() {
@@ -86,7 +86,13 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  BUILD_TARGETS=$(bazel query //...)
+  if [ -z NOT_BUILD_PERCEPTION ] ; then
+    BUILD_TARGETS=`bazel query //...`
+  else
+    info 'Skip building perception module!'
+    BUILD_TARGETS=`bazel query //... except //modules/perception/...`
+  fi
+
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -102,9 +108,10 @@ function generate_build_targets() {
 function build() {
   START_TIME=$(get_now)
 
-  echo "Start building, please wait ..."
+  info "Start building, please wait ..."
   generate_build_targets
-  echo "Building on $MACHINE_ARCH..."
+  info "Building on $MACHINE_ARCH..."
+
   echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $@
   if [ $? -eq 0 ]; then
     success 'Build passed!'
@@ -511,6 +518,7 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}build_no_perception${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
@@ -543,6 +551,10 @@ function main() {
       ;;
     build)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      apollo_build_dbg $@
+      ;;
+    build_no_perception)
+      NOT_BUILD_PERCEPTION=true
       apollo_build_dbg $@
       ;;
     cibuild)
