@@ -47,13 +47,7 @@ echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
-    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
-    read -n 1 INCHINA
-    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
-        docker pull "registry.docker-cn.com/${IMG}"
-    else
-        docker pull $IMG
-    fi
+    docker pull $IMG
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
