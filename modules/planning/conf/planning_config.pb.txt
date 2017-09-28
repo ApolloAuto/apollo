@@ -82,26 +82,38 @@ em_planner_config {
         num_output: 100
         cross_lane_extension_buffer: 0.2
     }
-    qp_spline_st_speed_config {
+    qp_st_speed_config {
         total_path_length: 200.0
         total_time: 6.0
         output_time_resolution: 0.05
-        number_of_discrete_graph_t: 4
-        number_of_evaluated_graph_t: 40
-        spline_order: 6
-        speed_kernel_weight: 0.0
-        accel_kernel_weight: 1000.0
-        jerk_kernel_weight: 500.0
-        follow_weight: 8.0
-        stop_weight: 0.2
-        cruise_weight: 0.1
-        regularization_weight: 0.0
         preferred_max_acceleration: 1.2
         preferred_min_deceleration: -1.8
         max_acceleration: 2.0
         min_deceleration: -4.5
-        follow_drag_distance: 17.0
 
+        qp_spline_config {
+            number_of_discrete_graph_t: 4
+            number_of_evaluated_graph_t: 40
+            spline_order: 6
+            speed_kernel_weight: 0.0
+            accel_kernel_weight: 1000.0
+            jerk_kernel_weight: 500.0
+            follow_weight: 8.0
+            stop_weight: 0.2
+            cruise_weight: 0.1
+            regularization_weight: 0.0
+            follow_drag_distance: 17.0
+        }
+        qp_piecewise_config {
+            number_of_evaluated_graph_t: 40
+            accel_kernel_weight: 1000.0
+            jerk_kernel_weight: 500.0
+            follow_weight: 8.0
+            stop_weight: 0.2
+            cruise_weight: 0.1
+            regularization_weight: 0.0
+            follow_drag_distance: 17.0
+        }
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 2.0
