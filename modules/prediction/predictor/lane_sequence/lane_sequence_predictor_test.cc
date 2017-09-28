@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 
 #include <string>
 #include <vector>

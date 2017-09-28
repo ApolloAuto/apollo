@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
+#include "modules/prediction/predictor/regional/regional_predictor.h"
 
 #include <cmath>
 #include <limits>
