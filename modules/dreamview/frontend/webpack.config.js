@@ -84,11 +84,14 @@ module.exports = {
                 test: require.resolve("three/examples/js/loaders/OBJLoader.js"),
                 use: "imports-loader?THREE=three"
             }, {
+                test: require.resolve("three/examples/js/controls/OrbitControls.js"),
+                use: "imports-loader?THREE=three"
+            }, {
                 // Load the images. They goes through image-webpack-loader
                 // first, and then file-loader.
                 //
                 // Now you can import images just like js.
-                test: /\.(png|jpe?g|svg)$/i,
+                test: /\.(png|jpe?g|svg|mp4|mov)$/i,
                 use: [
                     {
                         loader: "file-loader",

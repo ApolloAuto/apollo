@@ -865,3 +865,54 @@ body {
         }
     }
 }
+
+.dashcam-player {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    color: white;
+
+    video {
+        max-width: 380px;
+        max-height: 300px;
+
+        @include small-screen {
+            max-width: 300px;
+            max-height: 200px;
+        }
+    }
+
+    .controls {
+        position: absolute;
+        right: 0px;
+        z-index: 10;
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+            opacity: 0.6;
+            border: none;
+            color: #FFFFFF;
+            background-color: #000000;
+            width: 27px;
+            height: 27px;
+
+            img {
+                width: 15px;
+            }
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .close {
+            font-size: 20px;
+        }
+
+        .syncup {
+            padding-top: 0.5em;
+        }
+    }
+}
+

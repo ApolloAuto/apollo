@@ -18,6 +18,38 @@ class SideBarButton extends React.Component {
     }
 }
 
+class DashCamButton extends React.Component {
+    constructor(props) {
+      super(props);
+      this.onClickHandler = this.onClickHandler.bind(this);
+    }
+
+    onClickHandler() {
+      this.fileInput.value = null;
+      this.fileInput.click();
+    }
+
+    render() {
+        const { onClick, video } = this.props;
+
+        return (
+          <div>
+            <input  style={{display: "none"}}
+                    ref={(input) => {
+                        this.fileInput = input;
+                    }}
+                    type="file"
+                    accept="video/*"
+                    onChange={onClick}/>
+            <button onClick={this.onClickHandler}
+                    className="button">
+                DashCam Video
+            </button>
+          </div>
+        );
+    }
+}
+
 @observer
 export default class ButtonPanel extends React.Component {
     openHMI() {
@@ -32,7 +64,8 @@ export default class ButtonPanel extends React.Component {
         const { showRouteEditingBar,
                 sendDefaultRoutingRequest,
                 onConsole, showConsole,
-                onMenu, showMenu } = this.props;
+                onMenu, showMenu,
+                onVideo } = this.props;
 
         return (
             <div>
@@ -47,6 +80,8 @@ export default class ButtonPanel extends React.Component {
                 <SideBarButton label="Route Editing"
                                onClick={showRouteEditingBar}
                                active={false} />
+                <div className="separator" />
+                <DashCamButton onClick={onVideo}/>
                 <div className="separator" />
                 <SideBarButton label="Notifications"
                                onClick={onConsole}
