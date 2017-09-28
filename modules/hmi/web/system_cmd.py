@@ -17,6 +17,7 @@
 ###############################################################################
 """System command utils."""
 
+import os
 import shutil
 import subprocess
 
@@ -44,16 +45,15 @@ def async_run_command_pb(cmd_pb):
     async_run_command(cmd_str, cmd_pb.stdout_file, cmd_pb.stderr_file)
 
 
-def copyfile(src, dst):
-    """Copy file from src to dst if they are not the same."""
-    if src != dst:
-        shutil.copyfile(src, dst)
-        Config.log.debug('HMI: Copying file from %s to %s', src, dst)
-
-
-def copytree(src, dst):
-    """Copy directory, clear the dst if it existed."""
-    if src != dst:
+def safe_copy(src, dst):
+    """Safely copy from src to dst if they are not the same."""
+    if src == dst:
+        Config.log.debug('Skip copying same path %s', src)
+        return
+    if os.path.isdir(src):
+        Config.log.debug('Copying directory from %s to %s', src, dst)
         shutil.rmtree(dst, ignore_errors=True)
         shutil.copytree(src, dst)
-        Config.log.debug('HMI: Copying directory from %s to %s', src, dst)
+    elif os.path.isfile(src):
+        Config.log.debug('Copying file from %s to %s', src, dst)
+        shutil.copyfile(src, dst)
