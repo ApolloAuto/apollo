@@ -67,6 +67,7 @@ void QpPiecewiseStGraph::SetDebugLogger(
 Status QpPiecewiseStGraph::Search(
     const StGraphData& st_graph_data, SpeedData* const speed_data,
     const std::pair<double, double>& accel_bound) {
+  ADEBUG << init_point_.DebugString();
   cruise_.clear();
 
   // reset piecewise linear generator
@@ -76,13 +77,6 @@ Status QpPiecewiseStGraph::Search(
 
   // start to search for best st points
   init_point_ = st_graph_data.init_point();
-
-  // modified total path length
-  if (st_graph_data.path_data_length() <
-      qp_spline_st_speed_config_.total_path_length()) {
-    qp_spline_st_speed_config_.set_total_path_length(
-        st_graph_data.path_data_length());
-  }
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
@@ -259,6 +253,7 @@ Status QpPiecewiseStGraph::ApplyKernel(
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
+  kernel->AddRegularization(qp_spline_st_speed_config_.regularization_weight());
   return Status::OK();
 }
 
@@ -270,19 +265,14 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  double dist_ref = 0.0;
   std::vector<uint32_t> index_list;
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     index_list.push_back(i);
-    dist_ref +=
-        t_evaluated_resolution_ * speed_limit.GetSpeedLimitByS(dist_ref);
-    cruise_.push_back(dist_ref);
+    cruise_.push_back(qp_spline_st_speed_config_.total_path_length());
   }
   if (st_graph_debug_) {
     auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
-    kernel_cruise_ref->mutable_t()->Add(t_evaluated_[0]);
-    kernel_cruise_ref->mutable_cruise_line_s()->Add(dist_ref);
     for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
       kernel_cruise_ref->mutable_t()->Add(t_evaluated_[i]);
       kernel_cruise_ref->mutable_cruise_line_s()->Add(cruise_[i]);
@@ -301,8 +291,6 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
         weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
   }
 
-  ref_kernel->AddRegularization(
-      qp_spline_st_speed_config_.regularization_weight());
   return Status::OK();
 }
 
@@ -465,6 +453,12 @@ Status QpPiecewiseStGraph::EstimateSpeedUpperBound(
   }
 
   return Status::OK();
+}
+
+Status QpPiecewiseStGraph::Solve() {
+  return generator_->Solve()
+             ? Status::OK()
+             : Status(ErrorCode::PLANNING_ERROR, "QpPiecewiseStGraph::solve");
 }
 
 }  // namespace planning
