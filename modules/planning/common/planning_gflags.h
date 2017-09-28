@@ -97,11 +97,20 @@ DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
 
 // traffic decision
+/// common
+DECLARE_double(stop_max_distance_buffer);
+DECLARE_double(stop_min_speed);
+DECLARE_double(stop_max_deceleration);
+/// triffic light
 DECLARE_bool(enable_signal_lights);
-DECLARE_double(max_distance_for_light_stop_buffer);
-DECLARE_double(min_speed_for_light_stop);
-DECLARE_string(signal_light_virtual_object_prefix);
+DECLARE_string(signal_light_virtual_object_id_prefix);
 DECLARE_double(max_deacceleration_for_yellow_light_stop);
-DECLARE_double(max_deacceleration_for_red_light_stop);
+/// crosswalk
+DECLARE_bool(enable_crosswalk);
+DECLARE_string(crosswalk_virtual_object_id_prefix);
+DECLARE_double(crosswalk_expand_distance);
+DECLARE_double(crosswalk_max_l1_distance_to_ignore_pedestrian);
+DECLARE_double(crosswalk_max_l2_distance_to_ignore_pedestrian);
+DECLARE_double(crosswalk_min_stop_line_distance);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
