@@ -154,5 +154,61 @@ TEST(TestPiecewiseLinearConstraint, add_derivative_boundary) {
   EXPECT_EQ(bd, bd_golden);
 }
 
+TEST(TestPiecewiseLinearConstraint, add_second_derivative_boundary) {
+  PiecewiseLinearConstraint constraint(10, 0.1);
+  std::vector<uint32_t> index_list;
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  for (uint32_t i = 0; i < 10; ++i) {
+    index_list.push_back(i);
+    lower_bound.push_back(-4.0);
+    upper_bound.push_back(2.0);
+  }
+
+  const double init_derivative = 0.1;
+  constraint.AddSecondDerivativeBoundary(init_derivative, index_list,
+                                         lower_bound, upper_bound);
+  const auto mat = constraint.inequality_constraint_matrix();
+  const auto bd = constraint.inequality_constraint_boundary();
+  std::cout << mat << std::endl;
+  std::cout << bd << std::endl;
+
+  MatrixXd mat_golden(20, 10);
+  // clang-format off
+  mat_golden <<
+    -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     2, -1,  0,  0,  0,  0,  0,  0,  0,  0,
+    -2,  1,  0,  0,  0,  0,  0,  0,  0,  0,
+    -1,  2, -1,  0,  0,  0,  0,  0,  0,  0,
+     1, -2,  1,  0,  0,  0,  0,  0,  0,  0,
+     0, -1,  2, -1,  0,  0,  0,  0,  0,  0,
+     0,  1, -2,  1,  0,  0,  0,  0,  0,  0,
+     0,  0, -1,  2, -1,  0,  0,  0,  0,  0,
+     0,  0,  1, -2,  1,  0,  0,  0,  0,  0,
+     0,  0,  0, -1,  2, -1,  0,  0,  0,  0,
+     0,  0,  0,  1, -2,  1,  0,  0,  0,  0,
+     0,  0,  0,  0, -1,  2, -1,  0,  0,  0,
+     0,  0,  0,  0,  1, -2,  1,  0,  0,  0,
+     0,  0,  0,  0,  0, -1,  2, -1,  0,  0,
+     0,  0,  0,  0,  0,  1, -2,  1,  0,  0,
+     0,  0,  0,  0,  0,  0, -1,  2, -1,  0,
+     0,  0,  0,  0,  0,  0,  1, -2,  1,  0,
+     0,  0,  0,  0,  0,  0,  0, -1,  2, -1,
+     0,  0,  0,  0,  0,  0,  0,  1, -2,  1;
+  // clang-format on
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd bd_golden(20, 1);
+  bd_golden << -0.03, -0.03, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02,
+      -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02,
+      -0.04;
+  EXPECT_EQ(bd.rows(), 20);
+  EXPECT_EQ(bd.cols(), 1);
+  for (uint32_t i = 0; i < bd.rows(); ++i) {
+    EXPECT_DOUBLE_EQ(bd(i, 0), bd_golden(i, 0));
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
