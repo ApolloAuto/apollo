@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
+#include "modules/prediction/predictor/free_move/free_move_predictor.h"
 
 #include <cmath>
 #include <limits>

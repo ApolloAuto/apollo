@@ -3,24 +3,26 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "regional_predictor",
-    srcs = ["regional_predictor.cc"],
-    hdrs = ["regional_predictor.h"],
+    name = "free_move_predictor",
+    srcs = ["free_move_predictor.cc"],
+    hdrs = ["free_move_predictor.h"],
     deps = [
-        "//modules/common/math:kalman_filter",
+        "//modules/common:log",
+        "//modules/common/math:math_utils",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",
-        "@glog//:glog",
+        "//modules/prediction/proto:feature_proto",
+        "@eigen//:eigen",
     ],
 )
 
 cc_test(
-    name = "regional_predictor_test",
+    name = "free_move_predictor_test",
     size = "small",
     srcs = [
-        "regional_predictor_test.cc",
+        "free_move_predictor_test.cc",
     ],
     data = [
         "//modules/prediction:prediction_data",
@@ -32,8 +34,9 @@ cc_test(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:road_graph",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/predictor/pedestrian:regional_predictor",
+        "//modules/prediction/predictor/free_move:free_move_predictor",
         "//modules/prediction/proto:prediction_proto",
         "@gtest//:main",
     ],
