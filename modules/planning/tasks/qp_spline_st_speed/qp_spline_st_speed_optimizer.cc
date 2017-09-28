@@ -30,6 +30,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/qp_spline_st_speed/qp_piecewise_st_graph.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_graph.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 
@@ -95,7 +96,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   SpeedLimit speed_limits;
   if (boundary_mapper.GetSpeedLimits(&speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "GetSpeedLimits for dp st speed optimizer failed!");
+                  "GetSpeedLimits for qp st speed optimizer failed!");
   }
 
   // step 2 perform graph search
