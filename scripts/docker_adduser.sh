@@ -40,15 +40,6 @@ if [ "$RELEASE_DOCKER" != "1" ];then
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
 
-  # setup HMI config for internal maps and vehicles.
-  HMI_INTERNAL_PACTH=modules/hmi/conf/internal_config.patch
-  if [ -e /apollo/${HMI_INTERNAL_PACTH} ]; then
-    cd /apollo
-    git apply ${HMI_INTERNAL_PACTH}
-    git update-index --assume-unchanged modules/hmi/conf/config.pb.txt
-    rm ${HMI_INTERNAL_PACTH}
-  fi
-
   # setup car specific configuration
   if [ -e /home/tmp/esd_can ]; then
     cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
