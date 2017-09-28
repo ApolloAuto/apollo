@@ -38,34 +38,28 @@ export default class Meters {
 
     @action update(world) {
         if (world.autoDrivingCar) {
-            if (world.autoDrivingCar.throttlePercentage) {
-                this.throttlePercent = roundToTens(
-                    world.autoDrivingCar.throttlePercentage);
+            if (world.autoDrivingCar.throttlePercentage !== undefined) {
+                this.throttlePercent = roundToTens(world.autoDrivingCar.throttlePercentage);
             }
-            if (world.autoDrivingCar.brakePercentage) {
-                this.brakePercent = roundToTens(
-                    world.autoDrivingCar.brakePercentage);
+            if (world.autoDrivingCar.brakePercentage !== undefined) {
+                this.brakePercent = roundToTens(world.autoDrivingCar.brakePercentage);
             }
 
-            if (world.autoDrivingCar.speed) {
+            if (world.autoDrivingCar.speed !== undefined) {
                 // Convert the unit from m/s to mph.
-                this.speed = meterPerSecondToKmPerHour(
-                    world.autoDrivingCar.speed);
+                this.speed = meterPerSecondToKmPerHour(world.autoDrivingCar.speed);
             }
 
-            if (world.autoDrivingCar.steeringAngle) {
+            if (world.autoDrivingCar.steeringAngle !== undefined) {
                 // TODO(siyangy): Avoid magic number here.
-                this.steeringAngle =
-                    -Math.round(
-                        world.autoDrivingCar.steeringAngle * 4.7);
+                this.steeringAngle = -Math.round(world.autoDrivingCar.steeringAngle * 4.7);
             }
 
-            if (world.autoDrivingCar.disengageType) {
-                this.drivingMode =
-                    toDrivingMode(world.autoDrivingCar.disengageType);
+            if (world.autoDrivingCar.disengageType !== undefined) {
+                this.drivingMode = toDrivingMode(world.autoDrivingCar.disengageType);
             }
 
-            if (world.autoDrivingCar.currentSignal) {
+            if (world.autoDrivingCar.currentSignal !== undefined) {
                 this.turnSignal = world.autoDrivingCar.currentSignal;
             }
         }
