@@ -138,7 +138,16 @@ DEFINE_double(min_speed_for_light_stop, 0.1,
               "min speed for computing signal light stop");
 DEFINE_string(signal_light_virtual_object_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
+DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
+              "treat yellow light as red when deceleration (abstract value"
+                  " in m/s^2) is less than this threshold; otherwise treated"
+                  " as green light");
+DEFINE_double(max_deacceleration_for_red_light_stop, 6.0,
+              "treat red light as red when deceleration (abstract value"
+                  " in m/s^2) is less than this threshold, otherwise treated"
+                  " as green light");
 
+// planning config file
 DEFINE_string(planning_config_file,
               "modules/planning/conf/planning_config.pb.txt",
               "planning config file");

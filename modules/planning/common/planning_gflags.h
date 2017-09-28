@@ -101,5 +101,7 @@ DECLARE_bool(enable_signal_lights);
 DECLARE_double(max_distance_for_light_stop_buffer);
 DECLARE_double(min_speed_for_light_stop);
 DECLARE_string(signal_light_virtual_object_prefix);
+DECLARE_double(max_deacceleration_for_yellow_light_stop);
+DECLARE_double(max_deacceleration_for_red_light_stop);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
