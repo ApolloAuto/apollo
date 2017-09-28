@@ -29,6 +29,9 @@ DECLARE_double(prediction_freq);
 DECLARE_double(double_precision);
 DECLARE_double(min_prediction_length);
 
+// Bag replay timestamp gap
+DECLARE_double(replay_timestamp_gap);
+
 // Map
 DECLARE_double(search_radius);
 
@@ -57,7 +60,7 @@ DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_int32(num_trajectory_still_pedestrian);
 DECLARE_double(still_speed);
 DECLARE_string(vehicle_model_file);
-DECLARE_int32(max_num_obstacles_stored);
+DECLARE_int32(max_num_obstacles);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
