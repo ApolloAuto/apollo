@@ -220,13 +220,11 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
            << num_evaluated_s;
     return false;
   }
-  const auto& x_knots = spline_generator_->spline().x_knots();
-  const double back_s = x_knots.back();
-  const double front_s = x_knots.front();
-  const double ds = (back_s - front_s) / num_evaluated_s;
-  double curr_evaluated_s = front_s;
+
+  const double ds = (end_s - start_s) / num_evaluated_s;
+  double curr_evaluated_s = start_s;
   for (uint32_t i = 0; i < num_evaluated_s;
-       ++i, curr_evaluated_s = std::min(curr_evaluated_s + ds, back_s)) {
+       ++i, curr_evaluated_s = std::min(curr_evaluated_s + ds, end_s)) {
     evaluated_s_.push_back(curr_evaluated_s);
   }
 
