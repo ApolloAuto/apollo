@@ -55,5 +55,104 @@ TEST(TestPiecewiseLinearConstraint, add_monotone_inequality_constraint) {
   EXPECT_EQ(bd, bd_golden);
 }
 
+TEST(TestPiecewiseLinearConstraint, add_boundary) {
+  PiecewiseLinearConstraint constraint(10, 0.1);
+  std::vector<uint32_t> index_list;
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  for (uint32_t i = 0; i < 10; ++i) {
+    index_list.push_back(i);
+    lower_bound.push_back(1.0);
+    upper_bound.push_back(100.0);
+  }
+
+  constraint.AddBoundary(index_list, lower_bound, upper_bound);
+  const auto mat = constraint.inequality_constraint_matrix();
+  const auto bd = constraint.inequality_constraint_boundary();
+  std::cout << mat << std::endl;
+  std::cout << bd << std::endl;
+
+  MatrixXd mat_golden(20, 10);
+  // clang-format off
+  mat_golden <<
+   -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0, -1,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  1,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0, -1,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  1,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0, -1,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  1,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0, -1,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  1,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0, -1,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  1,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0, -1,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  1,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  1,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0, -1,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  1,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0, -1,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  1;
+  // clang-format on
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd bd_golden(20, 1);
+  bd_golden << -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1,
+      -100, 1, -100, 1, -100, 1;
+  EXPECT_EQ(bd, bd_golden);
+}
+
+TEST(TestPiecewiseLinearConstraint, add_derivative_boundary) {
+  PiecewiseLinearConstraint constraint(10, 0.1);
+  std::vector<uint32_t> index_list;
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  for (uint32_t i = 0; i < 10; ++i) {
+    index_list.push_back(i);
+    lower_bound.push_back(1.0);
+    upper_bound.push_back(100.0);
+  }
+
+  constraint.AddDerivativeBoundary(index_list, lower_bound, upper_bound);
+  const auto mat = constraint.inequality_constraint_matrix();
+  const auto bd = constraint.inequality_constraint_boundary();
+  std::cout << mat << std::endl;
+  std::cout << bd << std::endl;
+
+  MatrixXd mat_golden(20, 10);
+  // clang-format off
+  mat_golden <<
+    -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     1, -1,  0,  0,  0,  0,  0,  0,  0,  0,
+    -1,  1,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  1, -1,  0,  0,  0,  0,  0,  0,  0,
+     0, -1,  1,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  1, -1,  0,  0,  0,  0,  0,  0,
+     0,  0, -1,  1,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  1, -1,  0,  0,  0,  0,  0,
+     0,  0,  0, -1,  1,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  1, -1,  0,  0,  0,  0,
+     0,  0,  0,  0, -1,  1,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  1, -1,  0,  0,  0,
+     0,  0,  0,  0,  0, -1,  1,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  1, -1,  0,  0,
+     0,  0,  0,  0,  0,  0, -1,  1,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  1, -1,  0,
+     0,  0,  0,  0,  0,  0,  0, -1,  1,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  1, -1,
+     0,  0,  0,  0,  0,  0,  0,  0, -1,  1;
+  // clang-format on
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd bd_golden(20, 1);
+  bd_golden << -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10,
+      0.1, -10, 0.1, -10, 0.1, -10, 0.1;
+
+  EXPECT_EQ(bd, bd_golden);
+}
+
 }  // namespace planning
 }  // namespace apollo
