@@ -18,7 +18,6 @@
 """Tool API."""
 
 import os
-import shutil
 
 import gflags
 
@@ -72,6 +71,7 @@ class ToolApi(object):
         RuntimeStatus.get_tools().recording_status = (
             ToolStatus.RECORDING_FINISHED)
         RuntimeStatus.stat_playable_duration()
+        RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
     def reset_recording(cls):
