@@ -104,6 +104,26 @@ message SimpleLateralDebug {
   optional double steer_angle_limited = 17;
 }
 
+message SimpleMPCDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+}
+
 message InputDebug {
   optional apollo.common.Header localization_header = 1;
   optional apollo.common.Header canbus_header = 2;
@@ -114,4 +134,5 @@ message Debug {
   optional SimpleLongitudinalDebug simple_lon_debug = 1;
   optional SimpleLateralDebug simple_lat_debug = 2;
   optional InputDebug input_debug = 3;
+  optional SimpleMPCDebug simple_mpc_debug = 4;
 }

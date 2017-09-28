@@ -104,7 +104,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   steer_transmission_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
       vehicle_param_.max_steer_angle() / M_PI * 180;
-  max_lat_acc_ = control_conf->_controller_conf().max_lateral_acceleration();
+  max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
 
   double mass_fl = control_conf->mpc_controller_conf().mass_fl();
   double mass_fr = control_conf->mpc_controller_conf().mass_fr();
@@ -124,7 +124,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   return true;
 }
 
-void MPCController::ProcessLogs(const SimpleLateralDebug *debug,
+void MPCController::ProcessLogs(const SimpleMPCDebug *debug,
                                 const canbus::Chassis *chassis) {
   const std::string log_str = apollo::common::util::StrCat(
       debug->lateral_error(), ",", debug->ref_heading(), ",",
@@ -176,10 +176,9 @@ Status MPCController::Init(const ControlConf *control_conf) {
                   "failed to load control_conf");
   }
   // Matrix init operations.
-  int matrix_size = basic_state_size_ + preview_window_;
+  int matrix_size = basic_state_size_;
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
-  matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
   matrix_a_(0, 1) = 1.0;
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
@@ -194,7 +193,6 @@ Status MPCController::Init(const ControlConf *control_conf) {
 
   matrix_b_ = Matrix::Zero(basic_state_size_, 1);
   matrix_bd_ = Matrix::Zero(basic_state_size_, 1);
-  matrix_bdc_ = Matrix::Zero(matrix_size, 1);
   matrix_b_(1, 0) = cf_ / mass_;
   matrix_b_(3, 0) = lf_ * cf_ / iz_;
   matrix_bd_ = matrix_b_ * ts_;
@@ -248,7 +246,7 @@ Status MPCController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
 
-  SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
+  SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
@@ -332,7 +330,7 @@ Status MPCController::Reset() {
 
 // state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
 // Rate, Preview Lateral1, Preview Lateral2, ...]
-void MPCController::UpdateState(SimpleLateralDebug *debug) {
+void MPCController::UpdateState(SimpleMPCDebug *debug) {
   TrajectoryPoint traj_point;
   const auto &position = VehicleState::instance()->ComputeCOMPosition(lr_);
   double raw_lateral_error = GetLateralError(position, &traj_point);
@@ -376,18 +374,9 @@ void MPCController::UpdateState(SimpleLateralDebug *debug) {
   matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
 
-  // Next elements are depending on preview window size;
-  for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    const auto &future_position_estimate =
-        VehicleState::instance()->EstimateFuturePosition(preview_time);
-    double preview_lateral = GetLateralError(future_position_estimate, nullptr);
-    matrix_state_(basic_state_size_ + i, 0) = preview_lateral;
-  }
-  // preview matrix update;
 }
 
-void MPCController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
+void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
   const auto &com = VehicleState::instance()->ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(), VehicleState::instance()->heading(),
                        VehicleState::instance()->linear_velocity(),
@@ -407,24 +396,6 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
 
-  // Next elements are depending on preview window size;
-  for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    auto preview_point =
-        trajectory_analyzer_.QueryNearestPointByRelativeTime(preview_time);
-
-    auto matched_point = trajectory_analyzer_.QueryNearestPointByPosition(
-        preview_point.path_point().x(), preview_point.path_point().y());
-
-    double dx = preview_point.path_point().x() - matched_point.path_point().x();
-    double dy = preview_point.path_point().y() - matched_point.path_point().y();
-
-    double cos_matched_theta = std::cos(matched_point.path_point().theta());
-    double sin_matched_theta = std::sin(matched_point.path_point().theta());
-    double preview_d_error = cos_matched_theta * dy - sin_matched_theta * dx;
-
-    matrix_state_(basic_state_size_ + i, 0) = preview_d_error;
-  }
 }
 
 void MPCController::UpdateMatrix() {
@@ -479,7 +450,7 @@ double MPCController::GetLateralError(const common::math::Vec2d &point,
 void MPCController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
-    SimpleLateralDebug *debug) const {
+    SimpleMPCDebug *debug) const {
   auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
   double dx = x - matched_point.path_point().x();
