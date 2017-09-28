@@ -21,9 +21,9 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
-#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
-#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/regional/regional_predictor.h"
+#include "modules/prediction/predictor/free_move/free_move_predictor.h"
+#include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 
 namespace apollo {
 namespace prediction {
