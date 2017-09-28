@@ -20,8 +20,10 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/control/common/control_gflags.h"
 #include "modules/control/controller/lat_controller.h"
 #include "modules/control/controller/lon_controller.h"
+#include "modules/control/controller/mpc_controller.h"
 
 namespace apollo {
 namespace control {
@@ -31,8 +33,8 @@ using apollo::common::Status;
 using apollo::common::ErrorCode;
 
 void ControllerAgent::RegisterControllers() {
-  controller_factory_.Register(
-    if(!FLAGS_use_mpc) {
+      if(!FLAGS_use_mpc) {
+      controller_factory_.Register(
       ControlConf::LAT_CONTROLLER,
       []() -> Controller * { return new LatController(); });
   controller_factory_.Register(
