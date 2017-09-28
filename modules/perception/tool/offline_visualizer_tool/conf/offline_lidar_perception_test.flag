@@ -6,24 +6,24 @@
 # Flags from obstacle/lidar/test/offline_lidar_perception_test.cpp
 # pcd path
 # type: string
-# default: ./pcd/
---pcd_path=/data/pcd/
+# default: /apollo/data/pcd/
+--pcd_path=/apollo/data/pcd/
 
 # pose path
 # type: string
-# default: ./pose/
---pose_path=/data/pose/
+# default: /apollo/data/pose/
+--pose_path=/apollo/data/pose/
 
 # output path
 # type: string
-# default: ./output/
+# default: /apollo/data/output/
 --save_obstacles=false
---output_path=/data/output/
+--output_path=/apollo/data/output/
 
 # enable visualization
 # type: bool
 # default: true
---enable_visualization=false
+--enable_visualization=true
 
 ####################################################################
 # Flags from obstacle/onboard/hdmap_input.cc
