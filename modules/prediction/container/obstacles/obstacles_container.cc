@@ -30,19 +30,21 @@ using apollo::perception::PerceptionObstacles;
 std::mutex ObstaclesContainer::g_mutex_;
 
 ObstaclesContainer::ObstaclesContainer()
-    : obstacles_(FLAGS_max_num_obstacles_stored) {}
+    : obstacles_(FLAGS_max_num_obstacles) {}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   ADEBUG << "message: " << message.ShortDebugString();
   const PerceptionObstacles& perception_obstacles =
       dynamic_cast<const PerceptionObstacles&>(message);
-  ADEBUG << "perception obstacles: " << perception_obstacles.ShortDebugString();
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
-  if (timestamp < timestamp_) {
+  if (timestamp <= timestamp_ - FLAGS_replay_timestamp_gap) {
+    obstacles_.Clear();
+    ADEBUG << "Replay mode is enabled.";
+  } else if (timestamp <= timestamp_) {
     AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
            << timestamp_ << "].";
     return;
@@ -52,16 +54,21 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
-    ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "]"
-           << " was detected";
+    ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
+           << "was detected";
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
-    ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "]"
-           << " was inserted";
+    ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
+           << "was inserted";
   }
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
   return obstacles_.GetSilently(id);
+}
+
+void ObstaclesContainer::Clear() {
+  obstacles_.Clear();
+  timestamp_ = -1.0;
 }
 
 void ObstaclesContainer::InsertPerceptionObstacle(
