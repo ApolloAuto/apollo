@@ -31,6 +31,7 @@ class WebSocketEndpoint {
                     this.checkMessage(message);
 
                     STORE.updateTimestamp(message.timestamp);
+                    STORE.updateWorldTimestamp(message.world.timestampSec);
                     RENDERER.maybeInitializeOffest(
                         message.world.autoDrivingCar.positionX,
                         message.world.autoDrivingCar.positionY);
