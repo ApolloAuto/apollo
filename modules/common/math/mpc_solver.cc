@@ -18,8 +18,8 @@
 #include <memory>
 
 #include "modules/common/log.h"
-#include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
+#include "modules/common/math/qp_solver/qp_solver.h"
 
 namespace apollo {
 namespace common {
@@ -113,17 +113,17 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
       -Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
   Matrix matrix_inequality_constrain_uu =
       Matrix::Identity(matrix_uu.rows(), matrix_uu.rows());
-  Matrix matrix_inequality_constrain = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
+  Matrix matrix_inequality_constrain =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
   matrix_inequality_constrain << -matrix_inequality_constrain_ll,
       -matrix_inequality_constrain_uu;
-  Matrix matrix_inequality_boundary = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
+  Matrix matrix_inequality_boundary =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
   matrix_inequality_boundary << matrix_ll, -matrix_uu;
-  Matrix matrix_equality_constrain = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
-  Matrix matrix_equality_boundary = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
+  Matrix matrix_equality_constrain =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
+  Matrix matrix_equality_boundary =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
 
   std::unique_ptr<QpSolver> qp_solver(new ActiveSetQpSolver(
       matrix_m1, matrix_m2, matrix_inequality_constrain,
