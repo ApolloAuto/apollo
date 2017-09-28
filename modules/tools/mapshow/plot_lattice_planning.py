@@ -56,14 +56,17 @@ def lattice_planning_callback(planning_pb):
     print "      --- update_prediction_pb"
     prediction.update_prediction_pb(
         planning_pb.debug.planning_data)
+    prediction.compute_prediction_path_data()
 
     print "      --- planning_pb dp_qp trajectory size = " + \
         str(len(planning_pb.debug.planning_data.path))
-
     print "      --- planning_pb lattice trajectory size = " + \
         str(len(planning_pb.debug.planning_data.trajectory_path))
     #for each_traj in planning_pb.debug.planning_data.trajectory_path:
     #    print "         --- each trajectory point size = " + str(len(each_traj.trajectory_point))
+
+    print "      --- prediction obstacles size = " + \
+        str(len(planning_pb.debug.planning_data.prediction_obstacle))
 
     print "      ### END lattice_planning_callback frame"
     print ""
@@ -81,10 +84,10 @@ if __name__ == '__main__':
     fig = plt.figure()
     #fig.canvas.mpl_connect('key_press_event', press_key)
 
-    ax = plt.subplot2grid((2, 2), (0, 0), rowspan=2, colspan=2)
+    ax = plt.subplot2grid((2, 2), (0, 0), rowspan=3, colspan=3)
     lattice_planning_subplot = LatticeSubPlot(ax)
 
-    ani = animation.FuncAnimation(fig, update, interval=200)
+    ani = animation.FuncAnimation(fig, update, interval=100)
 
     ax.axis('equal')
     plt.show()

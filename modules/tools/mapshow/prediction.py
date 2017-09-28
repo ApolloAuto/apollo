@@ -23,13 +23,79 @@ from modules.planning.proto import planning_internal_pb2
 class Prediction:
     def __init__(self, planning_pb=None):
         """
-        TBD
+        Init
         """
-        print ""
-        #print "Prediction ------ Doing nothing right now"
+        self.prediction_lock = threading.Lock()
+        self.prediction_path_data_x = [] # list of list for each prediction path
+        self.prediction_path_data_y = []
+        self.prediction_polygons = [] # list of polygons
 
     def update_prediction_pb(self, planning_data_pb):
         #self.prediction_pb = planning_pb
         # for each trajectory path, update the trajectory
-        print ""
-        #print "Prediction ------ Doing nothing right now update_prediction_pb"
+        self.planning_pb = planning_pb
+
+    def compute_prediction_path_data(self):
+        print "     --- computing prediction path"
+        prediction_path_data_x = []
+        prediction_path_data_y = []
+        prediction_polygons = []
+
+        for each_prediction_obstacle in planning_data_pb.debug.planning_data.prediction_obstacle:
+            each_path_x = []
+            each_path_y = []
+            each_polygon = []
+            if len(each_prediction_obstacle.trajectory) > 1:
+                print "WARNING: our clever awesome Obstacle should not have more than one trajectory!!!"
+            # the only trajectory
+            for each_prediction_path_point in each_prediction_path.trajectory_point:
+                each_path_x.append(each_prediction_path_point.x)
+                each_path_y.append(each_prediction_path_point.y)
+            pob = each_prediction_obstacle.prediction_obstacle
+            # the polygon
+            each polygon = get_vehicle_polygon( \
+                pob.length, \
+                pob.width, \
+                [pob.position.x, pob.position.y, pob.position.z], \
+                pob.theta)
+            prediction_path_data_x.append(each_path_x)
+            prediction_path_data_y.append(each_path_y)
+            prediction_polygons.append(each_polygon)
+            break
+
+        self.prediction_lock.acquire()
+        self.prediction_path_data_x = prediction_path_data_x
+        self.prediction_path_data_y = prediction_path_data_y
+        self.prediction_polygons = prediction_polygons
+        self.prediction_lock.release()
+    # End of compute_prediction_path_data
+
+    def get_vehicle_polygon(self, length, width, position, heading):
+        front_edge_to_center = length / 2.0
+        back_edge_to_center = length / 2.0
+        left_edge_to_center = width / 2.0
+        right_edge_to_center = width / 2.0
+
+        cos_h = math.cos(heading)
+        sin_h = math.sin(heading)
+        #  (p3)  -------- (p0)
+        #        | o     |
+        #   (p2) -------- (p1)
+        p0_x, p0_y = front_edge_to_center, left_edge_to_center
+        p1_x, p1_y = front_edge_to_center, -right_edge_to_center
+        p2_x, p2_y = -back_edge_to_center, -left_edge_to_center
+        p3_x, p3_y = -back_edge_to_center, right_edge_to_center
+
+        p0_x, p0_y = p0_x * cos_h - p0_y * sin_h, p0_x * sin_h + p0_y * cos_h
+        p1_x, p1_y = p1_x * cos_h - p1_y * sin_h, p1_x * sin_h + p1_y * cos_h
+        p2_x, p2_y = p2_x * cos_h - p2_y * sin_h, p2_x * sin_h + p2_y * cos_h
+        p3_x, p3_y = p3_x * cos_h - p3_y * sin_h, p3_x * sin_h + p3_y * cos_h
+
+        [x, y, z] = position
+        polygon = []
+        polygon.append([p0_x + x, p0_y + y, 0])
+        polygon.append([p1_x + x, p1_y + y, 0])
+        polygon.append([p2_x + x, p2_y + y, 0])
+        polygon.append([p3_x + x, p3_y + y, 0])
+        polygon.append([p0_x + x, p0_y + y, 0])
+        return polygon
