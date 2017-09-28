@@ -43,6 +43,7 @@ bool SignalLights::ApplyRule(Frame *frame,
     return true;
   }
   Init();
+
   if (!FindValidSignalLights(reference_line_info)) {
     return true;
   }
@@ -57,7 +58,7 @@ void SignalLights::Init() {
 }
 
 void SignalLights::ReadSignals() {
-  if (!AdapterManager::GetTrafficLightDetection()->Empty()) {
+  if (AdapterManager::GetTrafficLightDetection()->Empty()) {
     return;
   }
   const TrafficLightDetection& detection =
