@@ -447,7 +447,9 @@ Status StBoundaryMapper::GetSpeedLimits(
     SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
 
-  for (const auto& path_point : path_data_.discretized_path().path_points()) {
+  for (uint32_t i = 0; i < path_data_.discretized_path().path_points().size();
+       ++i) {
+    const auto& path_point = path_data_.discretized_path().path_points()[i];
     if (path_point.s() > reference_line_.Length()) {
       AWARN << "path length [" << path_data_.discretized_path().Length()
             << "] is LARGER than reference_line_ length ["
@@ -458,15 +460,17 @@ Status StBoundaryMapper::GetSpeedLimits(
     double speed_limit_on_reference_line =
         reference_line_.GetSpeedLimitFromS(path_point.s());
 
+    const double avg_kappa =
+        GetAvgKappa(i, path_data_.discretized_path().path_points());
+
     // speed limit from path curvature
     const double centric_acceleration_limit =
-        GetCentricAccLimit(std::fabs(path_point.kappa()));
+        GetCentricAccLimit(std::fabs(avg_kappa));
     ADEBUG << "centric_acceleration_limit : " << centric_acceleration_limit;
 
-    double speed_limit_on_path =
-        std::sqrt(centric_acceleration_limit /
-                  std::fmax(std::fabs(path_point.kappa()),
-                            st_boundary_config_.minimal_kappa()));
+    double speed_limit_on_path = std::sqrt(
+        centric_acceleration_limit /
+        std::fmax(std::fabs(avg_kappa), st_boundary_config_.minimal_kappa()));
 
     const double curr_speed_limit = std::fmax(
         st_boundary_config_.lowest_speed(),
@@ -475,6 +479,30 @@ Status StBoundaryMapper::GetSpeedLimits(
     speed_limit_data->AppendSpeedLimit(path_point.s(), curr_speed_limit);
   }
   return Status::OK();
+}
+
+double StBoundaryMapper::GetAvgKappa(
+    const uint32_t index,
+    const std::vector<common::PathPoint>& path_points) const {
+  const uint32_t kNumPoints = st_boundary_config_.num_points_to_avg_kappa();
+  uint32_t start_index = 0;
+  uint32_t end_index = path_points.size();
+
+  if (index < kNumPoints / 2) {
+    start_index = 0;
+  }
+  if (index + kNumPoints / 2 < path_points.size()) {
+    end_index = index + kNumPoints / 2;
+  }
+  if (start_index == end_index) {
+    return path_points[index].kappa();
+  }
+
+  double sum_kappa = 0.0;
+  for (uint32_t i = start_index; i < end_index; ++i) {
+    sum_kappa += path_points[i].kappa();
+  }
+  return sum_kappa / (end_index - start_index);
 }
 
 double StBoundaryMapper::GetCentricAccLimit(const double kappa) const {
