@@ -129,7 +129,7 @@ bool PiecewiseLinearConstraint::AddDerivativeBoundary(
     inequality_boundary(2 * i, 0) = -unit_segment_ * upper_bound[i];
 
     inequality_matrix(2 * i + 1, index) = 1.0;
-    inequality_boundary(2 * i, 0) = unit_segment_ * lower_bound[i];
+    inequality_boundary(2 * i + 1, 0) = unit_segment_ * lower_bound[i];
   }
   inequality_matrices_.push_back(inequality_matrix);
   inequality_boundaries_.push_back(inequality_boundary);
