@@ -81,5 +81,15 @@ TEST_F(ObstaclesContainerTest, Pedestrian) {
   EXPECT_TRUE(obstacle_ptr103 == nullptr);
 }
 
+TEST_F(ObstaclesContainerTest, ClearAll) {
+  container_.Clear();
+  EXPECT_TRUE(container_.GetObstacle(0) == nullptr);
+  EXPECT_TRUE(container_.GetObstacle(1) == nullptr);
+  EXPECT_TRUE(container_.GetObstacle(2) == nullptr);
+  EXPECT_TRUE(container_.GetObstacle(3) == nullptr);
+  EXPECT_TRUE(container_.GetObstacle(101) == nullptr);
+  EXPECT_TRUE(container_.GetObstacle(102) == nullptr);
+}
+
 }  // namespace prediction
 }  // namespace apollo
