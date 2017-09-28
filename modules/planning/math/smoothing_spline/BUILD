@@ -259,4 +259,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "piecewise_linear_constraint_test",
+    size = "small",
+    srcs = [
+        "piecewise_linear_constraint_test.cc",
+    ],
+    deps = [
+        ":piecewise_linear_constraint",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

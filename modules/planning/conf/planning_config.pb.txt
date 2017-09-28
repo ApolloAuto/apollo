@@ -135,3 +135,6 @@ rule_config : {
     name: "BackSideVehicles"
 }
 
+rule_config : {
+    name: "SignalLights"
+}

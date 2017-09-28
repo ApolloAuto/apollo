@@ -20,6 +20,7 @@ export function drawImage(img, width, height, x = 0, y = 0, z = 0) {
             {map: textureLoader.load(img),
              transparent: true, depthWrite: false});
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+    mesh.material.side = THREE.DoubleSide;
     mesh.position.set(x, y, z);
     mesh.overdraw = true;
 

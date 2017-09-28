@@ -16,57 +16,37 @@
 
 /**
  * @file
- * @brief Define lane sequence predictor
+ * @brief Define move sequence predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
-
-#include <vector>
-
-#include "modules/common/proto/pnc_point.pb.h"
+#ifndef MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
+#define MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
 
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-class FreeMovePredictor : public Predictor {
+class MoveSequencePredictor : public Predictor {
  public:
   /**
    * @brief Constructor
    */
-  FreeMovePredictor() = default;
+  MoveSequencePredictor() = default;
 
   /**
    * @brief Destructor
    */
-  virtual ~FreeMovePredictor() = default;
+  virtual ~MoveSequencePredictor() = default;
 
   /**
    * @brief Make prediction
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
-
- private:
-  /**
-   * @brief Generate free move trajectory
-   * @param Position
-   * @param Velocity
-   * @param Acceleration
-   * @param Kalman Filter
-   * @param Total time
-   * @param Generated trajectory points
-   */
-  void DrawFreeMoveTrajectoryPoints(
-      const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-      const Eigen::Vector2d& acc,
-      const common::math::KalmanFilter<double, 6, 2, 0>& kf, double total_time,
-      double freq, std::vector<common::TrajectoryPoint>* points);
 };
 
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
+#endif  // MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_

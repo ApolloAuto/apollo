@@ -43,6 +43,7 @@ bool SignalLights::ApplyRule(Frame *frame,
     return true;
   }
   Init();
+
   if (!FindValidSignalLights(reference_line_info)) {
     return true;
   }
@@ -57,7 +58,7 @@ void SignalLights::Init() {
 }
 
 void SignalLights::ReadSignals() {
-  if (!AdapterManager::GetTrafficLightDetection()->Empty()) {
+  if (AdapterManager::GetTrafficLightDetection()->Empty()) {
     return;
   }
   const TrafficLightDetection& detection =
@@ -91,11 +92,12 @@ void SignalLights::MakeDecisions(Frame* frame,
     double stop_deceleration = GetStopDeceleration(reference_line_info,
                                                    signal_light);
     if ((signal.color() == TrafficLight::RED &&
-        stop_deceleration < 6) ||
+        stop_deceleration < FLAGS_max_deacceleration_for_red_light_stop) ||
         (signal.color() == TrafficLight::UNKNOWN &&
-            stop_deceleration < 6) ||
+            stop_deceleration < FLAGS_max_deacceleration_for_red_light_stop) ||
         (signal.color() == TrafficLight::YELLOW &&
-            stop_deceleration < 4)) {
+            stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)
+        ) {
       CreateStopObstacle(frame, reference_line_info, signal_light);
     }
   }

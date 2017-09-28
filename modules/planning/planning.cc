@@ -112,7 +112,12 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-
+  if (FLAGS_enable_signal_lights &&
+      AdapterManager::GetTrafficLightDetection() == nullptr) {
+    std::string error_msg("Traffic Light Detection is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
         pnc_map_.get(), config_.reference_line_smoother_config());

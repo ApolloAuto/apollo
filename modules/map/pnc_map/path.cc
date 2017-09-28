@@ -132,7 +132,7 @@ void Path::Init() {
   InitLaneSegments();
   InitPointIndex();
   InitWidth();
-  //  InitOverlaps();
+  InitOverlaps();
 }
 
 void Path::InitPoints() {

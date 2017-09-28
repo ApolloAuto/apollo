@@ -23,6 +23,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
+#include "modules/planning/tasks/traffic_decider/signal_lights.h"
 
 namespace apollo {
 namespace planning {
@@ -34,6 +35,9 @@ TrafficDecider::TrafficDecider() : Task("TrafficDecider") {}
 void TrafficDecider::RegisterRules() {
   rule_factory_.Register("BackSideVehicles", []() -> TrafficRule * {
     return new BackSideVehicles();
+  });
+  rule_factory_.Register("SignalLights", []() -> TrafficRule * {
+    return new SignalLights();
   });
 }
 
