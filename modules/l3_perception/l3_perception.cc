@@ -112,7 +112,8 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
     return false;
   }
   */
-  if (std::abs(radar_obstacle.relative_position().y()) > FLAGS_filter_y_distance) {
+  double nearest_l = GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
+  if (std::abs(nearest_l) > FLAGS_filter_y_distance) {
     return false;
   }
   if (radar_obstacle.count() < 5) {
