@@ -69,14 +69,15 @@ void L3Perception::Stop() { timer_.stop(); }
 void L3Perception::OnMobileye(const Mobileye& message) {
   AINFO << "receive Mobileye callback";
   std::lock_guard<std::mutex> lock(l3_mutex_);
-  mobileye_.CopyFrom(message);
+  mobileye_obstacles_ =
+      conversion::MobileyeToPerceptionObstacles(message, localization_);
 }
 
 void L3Perception::OnDelphiESR(const DelphiESR& message) {
   AINFO << "receive DelphiESR callback";
   std::lock_guard<std::mutex> lock(l3_mutex_);
-  delphi_esr_.CopyFrom(message);
-  radar_obstacles_ = conversion::DelphiToRadarObstacles(delphi_esr_);
+  current_radar_obstacles_ = conversion::DelphiToRadarObstacles(message, localization_,
+                                                        last_radar_obstacles_);
 }
 
 void L3Perception::OnLocalization(const LocalizationEstimate& message) {
@@ -114,18 +115,21 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   if (std::abs(radar_obstacle.relative_position().y()) > FLAGS_filter_y_distance) {
     return false;
   }
+  if (radar_obstacle.count() < 5) {
+    return false;
+  }
   return true;
 }
 
 RadarObstacles L3Perception::FilterRadarObstacles(
     const RadarObstacles& radar_obstacles) {
   RadarObstacles filtered_radar_obstacles;
-  for (int index = 0; index < radar_obstacles.radar_obstacle_size(); ++index) {
-    if (IsPreserved(radar_obstacles.radar_obstacle(index))) {
-      RadarObstacle* filtered_radar_obstacle = filtered_radar_obstacles.add_radar_obstacle();
-      filtered_radar_obstacle->CopyFrom(radar_obstacles.radar_obstacle(index));
+  for (const auto& iter : radar_obstacles.radar_obstacle()) {
+    if (IsPreserved(iter.second)) {
+      (*filtered_radar_obstacles.mutable_radar_obstacle())[iter.first] = iter.second;
     }
   }
+  filtered_radar_obstacles.mutable_header()->CopyFrom(radar_obstacles.header());
   return filtered_radar_obstacles;
 }
 
@@ -133,31 +137,23 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   AINFO << "publish PerceptionObstacles";
 
   std::lock_guard<std::mutex> lock(l3_mutex_);
-  double current_timestamp = apollo::common::time::Clock::NowInSecond();
+
+  RadarObstacles filtered_radar_obstacles = FilterRadarObstacles(current_radar_obstacles_);
+  PerceptionObstacles filtered_delphi_esr_obstacles =
+      conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
+
+  fusion::MobileyeRadarFusion(&mobileye_obstacles_, &filtered_delphi_esr_obstacles);
 
   PerceptionObstacles obstacles;
-
-  // TODO(lizh): check timestamp before publish.
-  // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
-  PerceptionObstacles mobileye_obstacles =
-      conversion::MobileyeToPerceptionObstacles(mobileye_, localization_);
-  // }
-
-  // if (delphi_esr_.header().timestamp_sec() >= last_timestamp_) {
-  RadarObstacles filtered_radar_obstacles = FilterRadarObstacles(radar_obstacles_);
-  PerceptionObstacles filtered_delphi_esr_obstacles =
-      conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles, localization_);
-
-  fusion::MobileyeRadarFusion(&mobileye_obstacles, &filtered_delphi_esr_obstacles);
-
-  obstacles.MergeFrom(mobileye_obstacles);
+  obstacles.MergeFrom(mobileye_obstacles_);
   obstacles.MergeFrom(filtered_delphi_esr_obstacles);
-  // }
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
 
-  last_timestamp_ = current_timestamp;
+  last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
+  current_radar_obstacles_.Clear();
+  mobileye_obstacles_.Clear();
 }
 
 }  // namespace l3_perception

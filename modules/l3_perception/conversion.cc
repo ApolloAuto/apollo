@@ -34,6 +34,7 @@ using ::apollo::l3_perception::GetAngleFromQuaternion;
 using ::apollo::l3_perception::FillPerceptionPolygon;
 using ::apollo::l3_perception::GetDefaultObjectLength;
 using ::apollo::l3_perception::GetDefaultObjectWidth;
+using ::apollo::perception::Point;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization) {
@@ -133,9 +134,14 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
   return obstacles;
 }
 
-RadarObstacles DelphiToRadarObstacles(const DelphiESR& delphi_esr) {
+RadarObstacles DelphiToRadarObstacles(
+    const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
+    const RadarObstacles& last_radar_obstacles) {
   RadarObstacles obstacles;
-  
+
+  const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
+  const double current_timestamp = delphi_esr.header().timestamp_sec();
+
   // assign motion power from 540
   std::vector<apollo::drivers::Esr_trackmotionpower_540::Motionpower>
       motionpowers(64);
@@ -150,6 +156,11 @@ RadarObstacles DelphiToRadarObstacles(const DelphiESR& delphi_esr) {
     }
   }
 
+  const auto adc_pos = localization.pose().position();
+  const auto adc_vel = localization.pose().linear_velocity();
+  const auto adc_quaternion = localization.pose().orientation();
+  const double adc_theta = GetAngleFromQuaternion(adc_quaternion);
+
   for (int index = 0; index < delphi_esr.esr_track01_500_size(); ++index) {
     const auto& data_500 = delphi_esr.esr_track01_500(index);
 
@@ -159,88 +170,97 @@ RadarObstacles DelphiToRadarObstacles(const DelphiESR& delphi_esr) {
       continue;
     }
 
-    auto* rob = obstacles.add_radar_obstacle();
+    RadarObstacle rob;
 
-    rob->set_id(index);
+    rob.set_id(index);
+    rob.set_rcs(static_cast<double>(motionpowers[index].can_tx_track_power()) -
+                10.0);
+    rob.set_theta(adc_theta);
+    rob.set_length(GetDefaultObjectLength(4));
+    rob.set_width(GetDefaultObjectWidth(4));
+    rob.set_height(3.0);
 
-    double range = data_500.can_tx_track_range();
-    double angle = data_500.can_tx_track_angle() * L3_PI / 180.0;
-    rob->mutable_relative_position()->set_x(range * std::cos(angle));
-    rob->mutable_relative_position()->set_y(range * std::sin(angle));
+    const double range = data_500.can_tx_track_range();
+    const double angle = data_500.can_tx_track_angle() * L3_PI / 180.0;
+    Point relative_pos_sl;
+    relative_pos_sl.set_x(range * std::cos(angle) + 
+          FLAGS_delphi_esr_pos_adjust +  // offset: imu <-> mobileye
+          rob.length() / 2.0);  // make x the middle point of the vehicle
+    relative_pos_sl.set_y(range * std::sin(angle));
+    rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
 
-    rob->set_rcs(static_cast<double>(motionpowers[index].can_tx_track_power()) - 10.0);
+    Point relative_pos_xy = SLtoXY(relative_pos_sl, adc_theta);
+    Point absolute_pos;
+    absolute_pos.set_x(adc_pos.x() + relative_pos_xy.x());
+    absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
+    absolute_pos.set_z(adc_pos.z());
+    rob.mutable_absolute_position()->CopyFrom(absolute_pos);
 
-    double range_vel = data_500.can_tx_track_range_rate();
-    double lateral_vel = data_500.can_tx_track_lat_rate();
-    rob->mutable_relative_velocity()->set_x(range_vel * std::cos(angle) - 
+    const double range_vel = data_500.can_tx_track_range_rate();
+    const double lateral_vel = data_500.can_tx_track_lat_rate();
+    rob.mutable_relative_velocity()->set_x(range_vel * std::cos(angle) - 
                                             lateral_vel * std::sin(angle)); 
-    rob->mutable_relative_velocity()->set_y(range_vel * std::sin(angle) + 
+    rob.mutable_relative_velocity()->set_y(range_vel * std::sin(angle) + 
                                             lateral_vel * std::cos(angle)); 
+
+    Point absolute_vel;
+    const auto iter = last_radar_obstacles.radar_obstacle().find(index);
+    if (iter == last_radar_obstacles.radar_obstacle().end()) {
+      // new in the current frame
+      absolute_vel.set_x(0.0);
+      absolute_vel.set_y(0.0);
+      absolute_vel.set_z(0.0);
+      rob.set_count(0);
+    } else {
+      // appeared in the last frame
+      Point instant_absolute_vel;
+      instant_absolute_vel.set_x(
+          (absolute_pos.x() - iter->second.absolute_position().x()) /
+          (current_timestamp - last_timestamp));
+      instant_absolute_vel.set_y(
+          (absolute_pos.y() - iter->second.absolute_position().y()) /
+          (current_timestamp - last_timestamp));
+      const double alpha = 0.0;
+      absolute_vel.set_x(alpha * iter->second.absolute_velocity().x() +
+                         (1.0 - alpha) * instant_absolute_vel.x());
+      absolute_vel.set_y(alpha * iter->second.absolute_velocity().y() +
+                         (1.0 - alpha) * instant_absolute_vel.y());
+      absolute_vel.set_z(0.0);
+      rob.set_count(iter->second.count() + 1);
+    }
+    rob.mutable_absolute_velocity()->CopyFrom(absolute_vel);
+    (*obstacles.mutable_radar_obstacle())[index] = rob;
   }
 
+  obstacles.mutable_header()->CopyFrom(delphi_esr.header());
   return obstacles;
 }
 
 PerceptionObstacles RadarObstaclesToPerceptionObstacles(
-    const RadarObstacles& radar_obstacles, const LocalizationEstimate& localization) {
+    const RadarObstacles& radar_obstacles) {
   PerceptionObstacles obstacles;
-  double adc_x = localization.pose().position().x();
-  double adc_y = localization.pose().position().y();
-  double adc_z = localization.pose().position().z();
-  auto adc_quaternion = localization.pose().orientation();
-  double adc_vx = localization.pose().linear_velocity().x();
-  double adc_vy = localization.pose().linear_velocity().y();
 
-  double adc_theta = GetAngleFromQuaternion(adc_quaternion);
-
-  for (int index = 0; index < radar_obstacles.radar_obstacle_size(); ++index) {
+  for (const auto& iter : radar_obstacles.radar_obstacle()) {
     auto* pob = obstacles.add_perception_obstacle();
-    const auto& radar_obstacle = radar_obstacles.radar_obstacle(index);
+    const auto& radar_obstacle = iter.second;
 
     pob->set_id(radar_obstacle.id());
 
     pob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
-    pob->set_length(GetDefaultObjectLength(4));
-    pob->set_width(GetDefaultObjectWidth(4));
-    pob->set_height(3.0);
+    pob->set_length(radar_obstacle.length());
+    pob->set_width(radar_obstacle.width());
+    pob->set_height(radar_obstacle.height());
 
-    double pob_pos_x = radar_obstacle.relative_position().x();
-    double pob_pos_y = radar_obstacle.relative_position().y();
-    double pob_vel_x = radar_obstacle.relative_velocity().x();
-    double pob_vel_y = radar_obstacle.relative_velocity().y();
-
-    // TODO(lizh): calibrate mobileye and make those consts FLAGS
-    pob_pos_x += FLAGS_delphi_esr_pos_adjust;  // offset: imu <-> mobileye
-    pob_pos_x += pob->length() / 2.0; // make x the middle point of the vehicle.
-
-    // position: sl->xy
-    Point sl_point;
-    sl_point.set_x(pob_pos_x);
-    sl_point.set_y(pob_pos_y);
-    Point xy_point = SLtoXY(sl_point, adc_theta);
-    double converted_x = adc_x + xy_point.x();
-    double converted_y = adc_y + xy_point.y();
-
-    pob->mutable_position()->set_x(converted_x);
-    pob->mutable_position()->set_y(converted_y);
-
-    // velocity: sl->xy
-    sl_point.set_x(pob_vel_x);
-    sl_point.set_y(pob_vel_y);
-    xy_point = SLtoXY(sl_point, adc_theta);
-    double converted_vx = adc_vx + xy_point.x();
-    double converted_vy = adc_vy + xy_point.y();
-
-    pob->mutable_velocity()->set_x(converted_vx);
-    pob->mutable_velocity()->set_y(converted_vy);
+    pob->mutable_position()->CopyFrom(radar_obstacle.absolute_position());
+    pob->mutable_velocity()->CopyFrom(radar_obstacle.absolute_velocity());
     
-    pob->set_theta(adc_theta);
+    pob->set_theta(radar_obstacle.theta());
 
     // create polygon
     pob->clear_polygon_point();
-    double mid_x = converted_x;
-    double mid_y = converted_y;
-    double mid_z = adc_z;
+    double mid_x = pob->position().x();
+    double mid_y = pob->position().y();
+    double mid_z = pob->position().z();
     double heading = pob->theta();
 
     FillPerceptionPolygon(pob, mid_x, mid_y, mid_z, 
