@@ -155,10 +155,35 @@ double GetNearestLaneHeading(const Point& point) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
     return -1.0;
   }
-  AINFO << "Lane id: " << nearest_lane->id().id();
   double lane_heading = nearest_lane->Heading(nearest_s);
-  AINFO << "Lane heading: " << lane_heading;
   return lane_heading;
+}
+
+double GetLateralDistanceToNearestLane(const Point& point) {
+  auto* hdmap = HDMapUtil::BaseMapPtr();
+  if (hdmap == nullptr) {
+    AERROR << "Failed to get nearest lane for point " << point.DebugString();
+    return -1.0;
+  }
+
+  ::apollo::common::PointENU point_enu;
+  point_enu.set_x(point.x());
+  point_enu.set_y(point.y());
+  point_enu.set_z(point.z());
+  hdmap::LaneInfoConstPtr nearest_lane;
+
+  double nearest_s;
+  double nearest_l;
+
+  int status =
+      hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
+  //TODO(lizh): make it a formal status below
+  if (status != 0) {
+    AERROR << "Failed to get nearest lane for point " << point.DebugString();
+    return -1.0;
+  }
+  AINFO << "Dist: " << nearest_l;
+  return nearest_l;
 }
 
 }  // namespace l3_perception
