@@ -32,8 +32,11 @@
 namespace apollo {
 namespace planning {
 
-using apollo::perception::PerceptionObstacle;
+using apollo::common::math::Box2d;
+using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
+using apollo::perception::PerceptionObstacle;
 
 Crosswalk::Crosswalk() : TrafficRule("Crosswalk") {}
 
@@ -74,29 +77,13 @@ bool Crosswalk::ApplyRule(Frame *frame,
 
       // expand crosswalk polygon
       // note: crosswalk expanded area will include sideway area
-      common::math::Vec2d point(perception_obstacle.position().x(),
-                                perception_obstacle.position().y());
-      const common::math::Polygon2d crosswalk_poly = crosswalk_info->polygon();
+      Vec2d point(perception_obstacle.position().x(),
+                  perception_obstacle.position().y());
+      const Polygon2d crosswalk_poly = crosswalk_info->polygon();
       bool in_crosswalk = crosswalk_poly.IsPointIn(point);
-      const common::math::Polygon2d crosswalk_exp_poly =
+      const Polygon2d crosswalk_exp_poly =
           crosswalk_poly.ExpandByDistance(FLAGS_crosswalk_expand_distance);
       bool in_expanded_crosswalk = crosswalk_exp_poly.IsPointIn(point);
-
-      double obstacle_l_distance = std::min(
-          fabs(path_obstacle->perception_sl_boundary().start_l()),
-          fabs(path_obstacle->perception_sl_boundary().end_l()));
-
-      // TODO(all): check if on_road
-      bool on_road = true;
-      // bool on_road = reference_line_info->reference_line().IsOnRoad();
-
-      ADEBUG << "obstacle_id[" << obstacle_id
-          << "]; type[" << obstacle_type_name
-          << "]; crosswalk_id[" << crosswalk_id
-          << "]; obstacle_l_distance[" << obstacle_l_distance
-          << "]; within_crosswalk_area[" << in_crosswalk
-          << "]; within_expanded_crosswalk_area[" << in_expanded_crosswalk
-          << "]; on_road[" << on_road << "]";
 
       if (!in_expanded_crosswalk) {
         ADEBUG << "skip: not in crosswalk expanded area. "
@@ -105,32 +92,50 @@ bool Crosswalk::ApplyRule(Frame *frame,
         continue;
       }
 
-      // TODO(all): check if trajectory crosses with adc
-      bool is_cross = true;
+      common::SLPoint obstacle_sl_point;
+      reference_line_info->reference_line().XYToSL(
+          {perception_obstacle.position().x(),
+            perception_obstacle.position().y()},
+          &obstacle_sl_point);
+      double obstacle_l = obstacle_sl_point.l();
+
+      const Box2d obstacle_box = path_obstacle->obstacle()
+          ->PerceptionBoundingBox();
+      bool is_on_road = reference_line_info->reference_line()
+          .HasOverlap(obstacle_box);
+      bool is_path_cross = path_obstacle->st_boundary().IsEmpty();
+
+      ADEBUG << "obstacle_id[" << obstacle_id
+          << "]; type[" << obstacle_type_name
+          << "]; crosswalk_id[" << crosswalk_id
+          << "]; obstacle_l[" << obstacle_l
+          << "]; within_crosswalk_area[" << in_crosswalk
+          << "]; within_expanded_crosswalk_area[" << in_expanded_crosswalk
+          << "]; is_on_road[" << is_on_road
+          << "]; is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
-      if (obstacle_l_distance >=
-          FLAGS_crosswalk_max_l2_distance_to_ignore_pedestrian) {
-        // (1) when l_distance is big enough(>= l2), STOP only if path crosses
-        if (is_cross) {
+      if (obstacle_l >= FLAGS_crosswalk_loose_l_distance) {
+        // (1) when obstacle_l is big enough(>= loose_l_distance),
+        //     STOP only if path crosses
+        if (is_path_cross) {
           stop = true;
           ADEBUG << "need_stop(>=l2): obstacle_id[" << obstacle_id
               << "]; crosswalk_id[" << crosswalk_id << "]";
         }
-      } else if (obstacle_l_distance <=
-          FLAGS_crosswalk_max_l1_distance_to_ignore_pedestrian) {
-        // (2) when l_distance is <=l1 + on_road(not on sideway),
+      } else if (obstacle_l <= FLAGS_crosswalk_strick_l_distance) {
+        // (2) when l_distance <= strick_l_distance + on_road(not on sideway),
         //     always STOP
-        // (3) when l_distance is <=l1 + not on_road(on sideway),
+        // (3) when l_distance <= strick_l_distance + not on_road(on sideway),
         //     STOP only if path crosses
-        if (on_road || (!on_road && is_cross)) {
+        if (is_on_road || (!is_on_road && is_path_cross)) {
           stop = true;
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
               << "]; crosswalk_id[" << crosswalk_id << "]";
         }
       } else {
         // TODO(all)
-        // (4) when l_distance is between l1 and l2,
+        // (4) when l_distance is between loose_l and strick_l
         //     use history decision of this crosswalk to smooth unsteadiness
       }
 
@@ -145,7 +150,8 @@ bool Crosswalk::ApplyRule(Frame *frame,
       double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
       if (stop_line_start_s + FLAGS_stop_max_distance_buffer
           <= adc_front_edge_s) {
-        ADEBUG << "skip: obstacle_id[" << obstacle_id
+        ADEBUG << "skip: adc_front_edge passes stop_line+buffer. "
+            << "obstacle_id[" << obstacle_id
             << "]; crosswalk_id[" << crosswalk_id
             << "]; crosswalk_start_s[" << stop_line_start_s
             << "]; adc_front_edge_s[" << adc_front_edge_s << "]";
@@ -204,7 +210,7 @@ void Crosswalk::CreateStopObstacle(
   common::SLPoint sl_point;
   sl_point.set_s(crosswalk_overlap->start_s);
   sl_point.set_l(0);
-  common::math::Vec2d vec2d;
+  Vec2d vec2d;
   reference_line_info->reference_line().SLToXY(sl_point, &vec2d);
   double heading = reference_line_info->reference_line().
       GetReferencePoint(crosswalk_overlap->start_s).heading();
@@ -213,10 +219,10 @@ void Crosswalk::CreateStopObstacle(
   reference_line_info->reference_line().GetLaneWidth(
       crosswalk_overlap->start_s, &left_width, &right_width);
 
-  common::math::Box2d stop_wall_box{{vec2d.x(), vec2d.y()},
-                               heading,
-                               FLAGS_virtual_stop_wall_length,
-                               left_width + right_width};
+  Box2d stop_wall_box{{vec2d.x(), vec2d.y()},
+                      heading,
+                      FLAGS_virtual_stop_wall_length,
+                      left_width + right_width};
 
   std::string virtual_object_id = FLAGS_crosswalk_virtual_object_id_prefix
       + crosswalk_overlap->object_id;
