@@ -63,7 +63,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
     double mob_w = 0.0;
     if (mobileye.details_73a_size() <= index) {
-      mob_l = GetDefaultObjectWidth(mob_type);
+      mob_w = GetDefaultObjectWidth(mob_type);
     } else {
       mob_w = mobileye.details_73a(index).obstacle_width();
     }
