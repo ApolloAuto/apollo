@@ -22,6 +22,9 @@
 
 #include "modules/l3_perception/l3_perception_util.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
+#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/hdmap/hdmap_util.h"
+#include "modules/common/log.h"
 
 /**
  * @namespace apollo::l3_perception
@@ -30,6 +33,8 @@
 
 namespace apollo {
 namespace l3_perception {
+
+using apollo::hdmap::HDMapUtil;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
   double theta =
@@ -126,6 +131,35 @@ double Distance(const Point& point1, const Point& point2) {
                               (point1.y() - point2.y()) * (point1.y() - point2.y()));  
   return distance;
 } 
+
+double GetNearestLaneHeading(const Point& point) {
+  auto* hdmap = HDMapUtil::BaseMapPtr();
+  if (hdmap == nullptr) {
+    AERROR << "Failed to get nearest lane for point " << point.DebugString();
+    return -1.0;
+  }
+
+  ::apollo::common::PointENU point_enu;
+  point_enu.set_x(point.x());
+  point_enu.set_y(point.y());
+  point_enu.set_z(point.z());
+  hdmap::LaneInfoConstPtr nearest_lane;
+
+  double nearest_s;
+  double nearest_l;
+
+  int status =
+      hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
+  //TODO(lizh): make it a formal status below
+  if (status != 0) {
+    AERROR << "Failed to get nearest lane for point " << point.DebugString();
+    return -1.0;
+  }
+  AINFO << "Lane id: " << nearest_lane->id().id();
+  double lane_heading = nearest_lane->Heading(nearest_s);
+  AINFO << "Lane heading: " << lane_heading;
+  return lane_heading;
+}
 
 }  // namespace l3_perception
 }  // namespace apollo

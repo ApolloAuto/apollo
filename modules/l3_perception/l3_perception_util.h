@@ -63,6 +63,8 @@ Point SLtoXY(const Point point, const double theta);
 
 double Distance(const Point& point1, const Point& point2); 
 
+double GetNearestLaneHeading(const Point& point); 
+
 }  // namespace l3_perception
 }  // namespace apollo
 
