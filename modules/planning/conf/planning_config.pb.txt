@@ -107,7 +107,7 @@ em_planner_config {
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
             accel_kernel_weight: 1000.0
-            jerk_kernel_weight: 0.0
+            jerk_kernel_weight: 100.0
             follow_weight: 8.0
             stop_weight: 0.2
             cruise_weight: 0.1
@@ -117,7 +117,7 @@ em_planner_config {
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 1.2
-            low_speed_centric_acceleration_limit: 1.5
+            low_speed_centric_acceleration_limit: 1.8
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
