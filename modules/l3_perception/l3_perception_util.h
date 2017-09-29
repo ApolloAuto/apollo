@@ -65,6 +65,7 @@ double Distance(const Point& point1, const Point& point2);
 
 double GetNearestLaneHeading(const Point& point); 
 
+double GetLateralDistanceToNearestLane(const Point& point);
 }  // namespace l3_perception
 }  // namespace apollo
 
