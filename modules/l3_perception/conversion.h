@@ -44,10 +44,12 @@ using apollo::l3_perception::RadarObstacles;
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization);
 
-RadarObstacles DelphiToRadarObstacles(const DelphiESR& delphi_esr);
+RadarObstacles DelphiToRadarObstacles(
+    const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
+    const RadarObstacles& last_radar_obstacles);
 
 PerceptionObstacles RadarObstaclesToPerceptionObstacles(
-    const RadarObstacles& radar_obstacles, const LocalizationEstimate& localization);
+    const RadarObstacles& radar_obstacles);
 
 }  // namespace conversion 
 }  // namespace l3_perception
