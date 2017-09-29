@@ -87,10 +87,26 @@ bool SignalLights::FindValidSignalLights(
 
 void SignalLights::MakeDecisions(Frame* frame,
                                  ReferenceLineInfo *const reference_line_info) {
+  planning_internal::SignalLightsDebug* signal_light_debug =
+      reference_line_info->mutable_debug()
+          ->mutable_planning_data()->mutable_signal_light();
+  signal_light_debug->set_adc_front_s(
+      reference_line_info->AdcSlBoundary().end_s());
+  signal_light_debug->set_adc_speed(
+      common::VehicleState::instance()->linear_velocity());
+
   for (const hdmap::PathOverlap* signal_light : signal_lights_) {
     const TrafficLight signal = GetSignal(signal_light->object_id);
     double stop_deceleration = GetStopDeceleration(reference_line_info,
                                                    signal_light);
+
+    planning_internal::SignalLightsDebug::SignalDebug* signal_debug =
+        signal_light_debug->add_signal();
+    signal_debug->set_adc_stop_deacceleration(stop_deceleration);
+    signal_debug->set_color(signal.color());
+    signal_debug->set_light_id(signal_light->object_id);
+    signal_debug->set_light_stop_s(signal_light->start_s);
+
     if ((signal.color() == TrafficLight::RED &&
         stop_deceleration < FLAGS_stop_max_deceleration) ||
         (signal.color() == TrafficLight::UNKNOWN &&
@@ -99,6 +115,7 @@ void SignalLights::MakeDecisions(Frame* frame,
             stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)
         ) {
       CreateStopObstacle(frame, reference_line_info, signal_light);
+      signal_debug->set_is_stop_wall_created(true);
     }
   }
 }
