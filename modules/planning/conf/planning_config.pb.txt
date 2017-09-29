@@ -107,7 +107,7 @@ em_planner_config {
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
             accel_kernel_weight: 1000.0
-            jerk_kernel_weight: 500.0
+            jerk_kernel_weight: 0.0
             follow_weight: 8.0
             stop_weight: 0.2
             cruise_weight: 0.1
