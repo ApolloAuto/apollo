@@ -86,7 +86,7 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  if [ -z NOT_BUILD_PERCEPTION ] ; then
+  if [ -z $NOT_BUILD_PERCEPTION ] ; then
     BUILD_TARGETS=`bazel query //...`
   else
     info 'Skip building perception module!'
@@ -554,6 +554,7 @@ function main() {
       apollo_build_dbg $@
       ;;
     build_no_perception)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       NOT_BUILD_PERCEPTION=true
       apollo_build_dbg $@
       ;;
