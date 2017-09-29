@@ -125,7 +125,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
     if (ret != Status::OK()) {
       std::string msg = common::util::StrCat(
-          Name(), ":Failed to search graph with quadratic programming!");
+          Name(), ": Failed to search graph with quadratic programming!");
       AERROR << msg;
       RecordSTGraphDebug(st_graph_data, st_graph_debug);
       return Status(ErrorCode::PLANNING_ERROR, msg);
