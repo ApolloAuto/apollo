@@ -151,15 +151,10 @@ DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
 DEFINE_double(crosswalk_expand_distance, 2.0,
               "crosswalk expand distance(meter) "
               "for pedestrian/bicycle detection");
-DEFINE_double(crosswalk_max_l1_distance_to_ignore_pedestrian, 4.0,
-              "max l_distance to ignore pedestrian on crosswalk "
-              "when path not crosses");
-DEFINE_double(crosswalk_max_l2_distance_to_ignore_pedestrian, 5.0,
-              "to smooth stop/ignore decision when pedestrian close to "
-              "crosswalk_max_l1_distance_to_ignore_pedestrian");
-DEFINE_double(crosswalk_min_stop_line_distance, 1.0,
-              "stop distance(m) before indovidual "
-              "pedestrian/bicycle/movable passing crosswalk");
+DEFINE_double(crosswalk_strick_l_distance, 4.0,
+              "strick stop rule within this l_distance");
+DEFINE_double(crosswalk_loose_l_distance, 5.0,
+              "loose stop rule beyond this l_distance");
 
 // planning config file
 DEFINE_string(planning_config_file,

@@ -109,8 +109,7 @@ DECLARE_double(max_deacceleration_for_yellow_light_stop);
 DECLARE_bool(enable_crosswalk);
 DECLARE_string(crosswalk_virtual_object_id_prefix);
 DECLARE_double(crosswalk_expand_distance);
-DECLARE_double(crosswalk_max_l1_distance_to_ignore_pedestrian);
-DECLARE_double(crosswalk_max_l2_distance_to_ignore_pedestrian);
-DECLARE_double(crosswalk_min_stop_line_distance);
+DECLARE_double(crosswalk_strick_l_distance);
+DECLARE_double(crosswalk_loose_l_distance);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
