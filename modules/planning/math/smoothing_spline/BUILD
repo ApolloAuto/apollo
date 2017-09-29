@@ -260,6 +260,18 @@ cc_test(
 )
 
 cc_test(
+    name = "piecewise_linear_kernel_test",
+    size = "small",
+    srcs = [
+        "piecewise_linear_kernel_test.cc",
+    ],
+    deps = [
+        ":piecewise_linear_kernel",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "piecewise_linear_constraint_test",
     size = "small",
     srcs = [
