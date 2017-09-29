@@ -134,6 +134,17 @@ Status Planning::Init() {
   return planner_->Init(config_);
 }
 
+bool Planning::IsVehicleStateValid(const common::VehicleState& vehicle_state) {
+  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
+      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
+      std::isnan(vehicle_state.kappa()) ||
+      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.linear_acceleration())) {
+    return false;
+  }
+  return true;
+}
+
 Status Planning::Start() {
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Start();
@@ -194,6 +205,7 @@ void Planning::RunOnce() {
 
   common::Status status =
       common::VehicleState::instance()->Update(localization, chassis);
+  DCHECK(IsVehicleStateValid(*common::VehicleState::instance()));
 
   if (!status.ok()) {
     AERROR << "Update VehicleState failed.";

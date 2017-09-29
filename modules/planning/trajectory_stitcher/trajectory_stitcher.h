@@ -40,6 +40,10 @@ class TrajectoryStitcher {
       const bool is_on_auto_mode, const double current_timestamp,
       const double planning_cycle_time,
       const PublishableTrajectory& prev_trajectory);
+
+ private:
+  static std::vector<common::TrajectoryPoint>
+  ComputeReinitStitchingTrajectory();
 };
 
 }  // namespace planning
