@@ -82,12 +82,12 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                const std::pair<double, double>& accel_bound) {
   cruise_.clear();
 
+  init_point_ = st_graph_data.init_point();
+  ADEBUG << "init point:" << init_point_.DebugString();
+
   // reset spline generator
   spline_generator_.reset(new Spline1dGenerator(
       t_knots_, qp_st_speed_config_.qp_spline_config().spline_order()));
-
-  // start to search for best st points
-  init_point_ = st_graph_data.init_point();
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
@@ -142,7 +142,6 @@ Status QpSplineStGraph::ApplyConstraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  ADEBUG << "init point constraint:" << init_point.DebugString();
   if (!constraint->AddPointDerivativeConstraint(0.0, init_point_.v())) {
     const std::string msg = "add st start point velocity constraint failed!";
     AERROR << msg;
