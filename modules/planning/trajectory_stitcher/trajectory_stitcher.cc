@@ -31,19 +31,10 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 
-namespace {
-
-std::vector<TrajectoryPoint> ComputeReinitStitchingTrajectory() {
+std::vector<TrajectoryPoint>
+TrajectoryStitcher::ComputeReinitStitchingTrajectory() {
+  const auto& vehicle_state = *common::VehicleState::instance();
   TrajectoryPoint init_point;
-  const auto& vehicle_state = *VehicleState::instance();
-  DCHECK(!std::isnan(vehicle_state.x()));
-  DCHECK(!std::isnan(vehicle_state.y()));
-  DCHECK(!std::isnan(vehicle_state.z()));
-  DCHECK(!std::isnan(vehicle_state.heading()));
-  DCHECK(!std::isnan(vehicle_state.kappa()));
-  DCHECK(!std::isnan(vehicle_state.linear_velocity()));
-  DCHECK(!std::isnan(vehicle_state.linear_acceleration()));
-
   init_point.mutable_path_point()->set_x(vehicle_state.x());
   init_point.mutable_path_point()->set_y(vehicle_state.y());
   init_point.mutable_path_point()->set_z(vehicle_state.z());
@@ -55,7 +46,6 @@ std::vector<TrajectoryPoint> ComputeReinitStitchingTrajectory() {
 
   return std::vector<TrajectoryPoint>(1, init_point);
 }
-}  // namespace
 
 // Planning from current vehicle state:
 // if 1. the auto-driving mode is off or
