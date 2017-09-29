@@ -30,7 +30,7 @@ namespace planning {
 
 class BacksideVehicle : public TrafficRule {
  public:
-  BacksideVehicle();
+  explicit BacksideVehicle(const RuleConfig& config);
   virtual ~BacksideVehicle() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);

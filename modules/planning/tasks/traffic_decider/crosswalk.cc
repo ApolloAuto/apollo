@@ -24,10 +24,10 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -40,7 +40,7 @@ using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
 
-Crosswalk::Crosswalk() : TrafficRule("Crosswalk") {}
+Crosswalk::Crosswalk(const RuleConfig& config) : TrafficRule(config) {}
 
 bool Crosswalk::ApplyRule(Frame* frame,
                           ReferenceLineInfo* const reference_line_info) {
@@ -229,7 +229,8 @@ void Crosswalk::CreateStopObstacle(
   auto* path_decision = reference_line_info->path_decision();
   ObjectDecisionType stop;
   stop.mutable_stop();
-  path_decision->AddLongitudinalDecision(Name(), stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision(
+      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 }
 
 }  // namespace planning

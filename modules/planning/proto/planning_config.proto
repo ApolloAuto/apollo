@@ -19,7 +19,12 @@ enum TaskType {
 };
 
 message RuleConfig {
-    optional string name = 1;
+    enum RuleId {
+        BACKSIDE_VEHICLE = 1;
+        SIGNAL_LIGHT = 2;
+        CROSSWALK = 3;
+    }
+    optional RuleId rule_id = 1;
 }
 
 message EMPlannerConfig {

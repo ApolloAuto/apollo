@@ -82,6 +82,15 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double timestamp,
   return Status::OK();
 }
 
+bool Planning::HasSignalLight(const PlanningConfig& config) {
+  for (const auto& rule_config : config.rule_config()) {
+    if (rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Status Planning::Init() {
   pnc_map_.reset(new hdmap::PncMap(apollo::hdmap::BaseMapFile()));
   Frame::SetMap(pnc_map_.get());
@@ -112,7 +121,7 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (FLAGS_enable_signal_lights &&
+  if (HasSignalLight(config_) &&
       AdapterManager::GetTrafficLightDetection() == nullptr) {
     std::string error_msg("Traffic Light Detection is not registered");
     AERROR << error_msg;
