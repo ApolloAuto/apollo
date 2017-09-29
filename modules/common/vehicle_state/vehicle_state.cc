@@ -55,6 +55,12 @@ Status VehicleState::Update(
 
   InitAdcBoundingBox();
 
+  ADEBUG << x_ << ", " << y_ << ", " << z_ << ", " << roll_ << ", " << pitch_
+         << ", " << yaw_ << ", " << heading_ << ", " << kappa_ << ", "
+         << linear_v_ << ", " << angular_v_ << ", " << timestamp_ << ", "
+         << linear_a_y_ << ", " << pose_.ShortDebugString() << ", "
+         << adc_bounding_box_->DebugString();
+
   return Status::OK();
 }
 

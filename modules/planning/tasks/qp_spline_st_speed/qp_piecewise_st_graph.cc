@@ -68,16 +68,15 @@ void QpPiecewiseStGraph::SetDebugLogger(
 Status QpPiecewiseStGraph::Search(
     const StGraphData& st_graph_data, SpeedData* const speed_data,
     const std::pair<double, double>& accel_bound) {
-  ADEBUG << init_point_.DebugString();
   cruise_.clear();
+
+  init_point_ = st_graph_data.init_point();
+  ADEBUG << "Init point:" << init_point_.DebugString();
 
   // reset piecewise linear generator
   generator_.reset(new PiecewiseLinearGenerator(
       qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t(),
       t_evaluated_resolution_));
-
-  // start to search for best st points
-  init_point_ = st_graph_data.init_point();
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
