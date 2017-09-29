@@ -1,4 +1,4 @@
-planner_type : EM
+planner_type : LATTICE
 em_planner_config {
     task : TRAFFIC_DECIDER
 

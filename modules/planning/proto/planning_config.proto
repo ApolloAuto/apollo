@@ -41,6 +41,7 @@ message PlanningConfig {
   enum PlannerType {
     RTK = 0;
     EM = 1;  // expectation maximization
+    LATTICE = 2;
   };
   optional PlannerType planner_type = 1 [default = EM];
 

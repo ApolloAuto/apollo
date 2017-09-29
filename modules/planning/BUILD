@@ -22,6 +22,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",
         "//modules/planning/planner/em:em_planner",
+        "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
