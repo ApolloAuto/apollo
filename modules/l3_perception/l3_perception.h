@@ -60,12 +60,11 @@ class L3Perception : public apollo::common::ApolloApp {
   RadarObstacles FilterRadarObstacles(
       const RadarObstacles& radar_obstacles);
 
-  double last_timestamp_ = 0;
   ros::Timer timer_;
-  apollo::drivers::Mobileye mobileye_;
-  apollo::drivers::DelphiESR delphi_esr_;
+  apollo::perception::PerceptionObstacles mobileye_obstacles_;
   apollo::localization::LocalizationEstimate localization_;
-  RadarObstacles radar_obstacles_;
+  RadarObstacles current_radar_obstacles_;
+  RadarObstacles last_radar_obstacles_;
   std::mutex l3_mutex_;
 
 };
