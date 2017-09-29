@@ -89,5 +89,41 @@ TEST(TestPiecewiseLinearKernel, add_reference_line_kernel_matrix) {
   EXPECT_EQ(offset, offset_golden);
 }
 
+TEST(TestPiecewiseLinearKernel, add_second_order_derivative_matrix) {
+  PiecewiseLinearKernel kernel(10, 0.1);
+  const double init_derivative = 5.0;
+
+  kernel.AddSecondOrderDerivativeMatrix(init_derivative, 1.0);
+
+  const auto mat = kernel.kernel_matrix() / (2.0 * 1.0 / std::pow(0.1, 4));
+  const auto offset = kernel.offset_matrix();
+
+  std::cout << mat << std::endl;
+  std::cout << offset << std::endl;
+
+  MatrixXd mat_golden(10, 10);
+  // clang-format off
+  mat_golden <<
+      6, -4,  1,  0,  0,  0,  0,  0,  0,  0,
+     -4,  6, -4,  1,  0,  0,  0,  0,  0,  0,
+      1, -4,  6, -4,  1,  0,  0,  0,  0,  0,
+      0,  1, -4,  6, -4,  1,  0,  0,  0,  0,
+      0,  0,  1, -4,  6, -4,  1,  0,  0,  0,
+      0,  0,  0,  1, -4,  6, -4,  1,  0,  0,
+      0,  0,  0,  0,  1, -4,  6, -4,  1,  0,
+      0,  0,  0,  0,  0,  1, -4,  6, -4,  1,
+      0,  0,  0,  0,  0,  0,  1, -4,  5, -2,
+      0,  0,  0,  0,  0,  0,  0,  1, -2,  1;
+  // clang-format on
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd offset_golden = MatrixXd::Zero(10, 1);
+  offset_golden(0, 0) = -10000.0;
+
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_DOUBLE_EQ(offset(i, 0), offset_golden(i, 0));
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
