@@ -55,7 +55,7 @@ def lattice_planning_callback(planning_pb):
         planning_pb.debug.planning_data.adc_position)
     print "      --- update_prediction_pb"
     prediction.update_prediction_pb(
-        planning_pb.debug.planning_data)
+        planning_pb)
     prediction.compute_prediction_path_data()
 
     print "      --- planning_pb dp_qp trajectory size = " + \

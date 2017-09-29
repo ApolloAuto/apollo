@@ -448,6 +448,7 @@ class Planning:
         print "     --- computing lattice path"
         lattice_path_data_x = []
         lattice_path_data_y = []
+        print "planning_data.trajectory_path size=[" + str(len(self.planning_pb.debug.planning_data.trajectory_path)) + "]"
         for traj_path in self.planning_pb.debug.planning_data.trajectory_path:
             print "      getting trajectory_path ......"
             each_path_x = []

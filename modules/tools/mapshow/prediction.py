@@ -29,8 +29,9 @@ class Prediction:
         self.prediction_path_data_x = [] # list of list for each prediction path
         self.prediction_path_data_y = []
         self.prediction_polygons = [] # list of polygons
+        self.planning_pb = planning_pb
 
-    def update_prediction_pb(self, planning_data_pb):
+    def update_prediction_pb(self, planning_pb):
         #self.prediction_pb = planning_pb
         # for each trajectory path, update the trajectory
         self.planning_pb = planning_pb
@@ -41,7 +42,7 @@ class Prediction:
         prediction_path_data_y = []
         prediction_polygons = []
 
-        for each_prediction_obstacle in planning_data_pb.debug.planning_data.prediction_obstacle:
+        for each_prediction_obstacle in self.planning_pb.debug.planning_data.prediction_obstacle:
             each_path_x = []
             each_path_y = []
             each_polygon = []
@@ -53,10 +54,10 @@ class Prediction:
                 each_path_y.append(each_prediction_path_point.y)
             pob = each_prediction_obstacle.prediction_obstacle
             # the polygon
-            each polygon = get_vehicle_polygon( \
-                pob.length, \
-                pob.width, \
-                [pob.position.x, pob.position.y, pob.position.z], \
+            each_polygon = get_vehicle_polygon(
+                pob.length,
+                pob.width,
+                [pob.position.x, pob.position.y, pob.position.z],
                 pob.theta)
             prediction_path_data_x.append(each_path_x)
             prediction_path_data_y.append(each_path_y)
