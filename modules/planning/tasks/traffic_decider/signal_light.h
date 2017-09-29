@@ -34,13 +34,13 @@ namespace planning {
 
 class SignalLight : public TrafficRule {
  public:
-  SignalLight();
+  explicit SignalLight(const RuleConfig& config);
+
   virtual ~SignalLight() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void Init();
   void ReadSignals();
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
   const apollo::perception::TrafficLight GetSignal(
