@@ -84,8 +84,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     xy_point.set_z(adc_z);
     mob->set_theta(GetNearestLaneHeading(xy_point));
     double converted_speed = adc_velocity + mob_vel_x;
-    double converted_vx = converted_speed * std::cos(adc_theta);
-    double converted_vy = converted_speed * std::sin(adc_theta);
+    double converted_vx = converted_speed * std::cos(mob->theta());
+    double converted_vy = converted_speed * std::sin(mob->theta());
 
     mob->set_id(mob_id);
     mob->mutable_position()->set_x(converted_x);
