@@ -137,7 +137,6 @@ DEFINE_double(stop_max_distance_buffer, 4.0,
 DEFINE_double(stop_min_speed, 0.1, "min speed for computing stop");
 DEFINE_double(stop_max_deceleration, 6.0, "max deceleration");
 /// traffic light
-DEFINE_bool(enable_signal_lights, false, "enable signal_lights");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
 DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
