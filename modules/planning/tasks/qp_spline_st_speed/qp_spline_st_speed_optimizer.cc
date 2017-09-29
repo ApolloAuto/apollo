@@ -121,7 +121,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
     accel_bound.first = qp_st_speed_config_.min_deceleration();
     accel_bound.second = qp_st_speed_config_.max_acceleration();
-    ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
+    QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_, veh_param);
+    ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);
 
     if (ret != Status::OK()) {
       std::string msg = common::util::StrCat(

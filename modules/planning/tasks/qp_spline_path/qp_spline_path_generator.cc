@@ -62,6 +62,11 @@ bool QpSplinePathGenerator::Generate(
     const std::vector<const PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
     PathData* const path_data) {
+  knots_.clear();
+  evaluated_s_.clear();
+
+  ADEBUG << "Init point: " << init_point.DebugString();
+
   if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
