@@ -102,7 +102,6 @@ DECLARE_double(stop_max_distance_buffer);
 DECLARE_double(stop_min_speed);
 DECLARE_double(stop_max_deceleration);
 /// triffic light
-DECLARE_bool(enable_signal_lights);
 DECLARE_string(signal_light_virtual_object_id_prefix);
 DECLARE_double(max_deacceleration_for_yellow_light_stop);
 /// crosswalk

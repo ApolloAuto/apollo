@@ -38,26 +38,16 @@ using apollo::common::adapter::AdapterManager;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-SignalLight::SignalLight() : TrafficRule("SignalLight") {}
+SignalLight::SignalLight(const RuleConfig& config) : TrafficRule(config) {}
 
 bool SignalLight::ApplyRule(Frame* frame,
                             ReferenceLineInfo* const reference_line_info) {
-  if (!FLAGS_enable_signal_lights) {
-    return true;
-  }
-  Init();
-
   if (!FindValidSignalLight(reference_line_info)) {
     return true;
   }
   ReadSignals();
   MakeDecisions(frame, reference_line_info);
   return true;
-}
-
-void SignalLight::Init() {
-  signals_.clear();
-  signal_lights_.clear();
 }
 
 void SignalLight::ReadSignals() {
@@ -165,14 +155,15 @@ void SignalLight::CreateStopObstacle(
   sl_point.set_s(signal_light->start_s);
   sl_point.set_l(0);
   common::math::Vec2d vec2d;
-  reference_line_info->reference_line().SLToXY(sl_point, &vec2d);
-  double heading = reference_line_info->reference_line()
-                       .GetReferencePoint(signal_light->start_s)
-                       .heading();
-  double left_lane_width;
-  double right_lane_width;
-  reference_line_info->reference_line().GetLaneWidth(
-      signal_light->start_s, &left_lane_width, &right_lane_width);
+  const auto& reference_line = reference_line_info->reference_line();
+  reference_line.SLToXY(sl_point, &vec2d);
+
+  double heading =
+      reference_line.GetReferencePoint(signal_light->start_s).heading();
+  double left_lane_width = 0.0;
+  double right_lane_width = 0.0;
+  reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
+                              &right_lane_width);
 
   common::math::Box2d stop_box{{vec2d.x(), vec2d.y()},
                                heading,
@@ -186,7 +177,8 @@ void SignalLight::CreateStopObstacle(
   auto* path_decision = reference_line_info->path_decision();
   ObjectDecisionType stop;
   stop.mutable_stop();
-  path_decision->AddLongitudinalDecision(Name(), stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision(
+      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 }
 
 }  // namespace planning

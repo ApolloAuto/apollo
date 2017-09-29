@@ -97,6 +97,8 @@ class Planning : public apollo::common::ApolloApp {
 
   void RegisterPlanners();
 
+  bool HasSignalLight(const PlanningConfig& config);
+
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
 
