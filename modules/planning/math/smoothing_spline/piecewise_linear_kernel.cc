@@ -126,7 +126,7 @@ void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(
     }
   }
 
-  jerk_matrix *= 2.0 * weight / std::pow(unit_segment_, 4);
+  jerk_matrix *= 2.0 * weight / std::pow(unit_segment_, 6);
   kernel_matrix_ += jerk_matrix;
 
   const double quintic = std::pow(unit_segment_, 5);
