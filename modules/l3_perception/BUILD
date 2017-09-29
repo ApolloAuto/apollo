@@ -9,7 +9,9 @@ cc_library(
     deps = [
         ":l3_perception_gflags",
         "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto"
+        "//modules/perception/proto:perception_proto",
+        "//modules/common:log",
+        "//modules/map/hdmap:hdmap_util"
     ],
 )
 
