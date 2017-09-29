@@ -98,6 +98,7 @@ class LatticeSubPlot:
             #lattice_path_line.set_label(name[0:5]) #????
         planning.lattice_lock.release()
 
+        planning.init_point_lock.acquire()
         self.init_point_line.set_xdata(planning.init_point_x)
         self.init_point_line.set_ydata(planning.init_point_y)
         self.init_point_line.set_visible(True)
