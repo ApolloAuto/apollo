@@ -74,7 +74,8 @@ class LatticeSubPlot:
             line.set_visible(visible)
 
     def show(self, planning, localization, prediction):
-        # planning        planning.lattice_lock.acquire()
+        # planning
+        planning.lattice_lock.acquire()
         if len(planning.lattice_path_data_x) != len(planning.lattice_path_data_y):
             # sth is wrong
             print "ERROR lattice_path_data_x size[" + str(len(lattice_path_data_x)) \
@@ -95,7 +96,9 @@ class LatticeSubPlot:
             lattice_path_line.set_xdata(planning.lattice_path_data_x[i])
             lattice_path_line.set_ydata(planning.lattice_path_data_y[i])
             #lattice_path_line.set_label(name[0:5]) #????
+        planning.lattice_lock.release()
 
+        planning.init_point_lock.acquire()
         self.init_point_line.set_xdata(planning.init_point_x)
         self.init_point_line.set_ydata(planning.init_point_y)
         self.init_point_line.set_visible(True)
@@ -115,16 +118,16 @@ class LatticeSubPlot:
 
         # prediction
         prediction.prediction_lock.acquire()
-        if len(prediction.prediction_path_data_x) != len(prediction_path_data_y):
+        if len(prediction.prediction_path_data_x) != len(prediction.prediction_path_data_y):
             print "ERROR prediction_path_data_x size[" + str(len(prediction.prediction_path_data_x)) \
-                + "] != prediction_path_data_y size[" + str(len(prediction_path_data_y)) + "]"
+                + "] != prediction_path_data_y size[" + str(len(prediction.prediction_path_data_y)) + "]"
         if len(prediction.prediction_path_data_x) > self.prediction_path_lines_size:
-            print "ERROR prediction_path_data_x size[" + str(len(prediction_path_data_x)) \
+            print "ERROR prediction_path_data_x size[" + str(len(prediction.prediction_path_data_x)) \
                 + "] > maximum prediction path line size[" + str(len(self.prediction_path_lines_size)) + "]"
         if len(prediction.prediction_polygons) > self.prediction_polygon_lines_size:
             print "ERROR prediction_polygons size[" + str(len(prediction.prediction_polygons)) \
                 + "] != maximum prediction polygon size[" + str(self.prediction_polygon_lines_size) + "]"
-        for i in range(prediction.prediction_path_data_x):
+        for i in range(len(prediction.prediction_path_data_x)):
             if i > len(self.prediction_path_line):
                 break
             prediction_path_line = self.prediction_path_lines[i]
@@ -132,7 +135,7 @@ class LatticeSubPlot:
             prediction_path_line.set_xdata(prediction.prediction_path_data_x[i])
             prediction_path_line.set_ydata(prediction.prediction_path_data_y[i])
 
-        for i in range(prediction.prediction_polygons):
+        for i in range(len(prediction.prediction_polygons)):
             if i > len(self.prediction_polygon_lines_size):
                 break
             prediction_polygon_line = self.prediction_polygon_lines[i]
