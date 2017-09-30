@@ -116,7 +116,7 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   if (std::abs(nearest_l) > FLAGS_filter_y_distance) {
     return false;
   }
-  if (radar_obstacle.count() < 5) {
+  if (radar_obstacle.count() < FLAGS_keep_delphi_esr_frames) {
     return false;
   }
   return true;
@@ -152,7 +152,10 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
 
-  last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
+  last_radar_obstacles_.push(current_radar_obstacles_);
+  while (last_radar_obstacles_.size() > (size_t) FLAGS_keep_delphi_esr_frames) {
+    last_radar_obstacles_.pop();
+  }
   current_radar_obstacles_.Clear();
   mobileye_obstacles_.Clear();
 }

@@ -41,3 +41,5 @@ DEFINE_double(default_unknown_width, 3.0, "default unknown width for bounding bo
 DEFINE_double(filter_y_distance, 7.5, "fiter the radar objects far away from the main vehicle on y-axis.");
 DEFINE_double(fusion_x_distance, 5.0, "fuse mobileye and radar if they are away less than this distance.");
 DEFINE_double(fusion_y_distance, 2.0, "fuse mobileye and radar if they are away less than this distance.");
+
+DEFINE_int32(keep_delphi_esr_frames, 5, "number of delphi esr frames to keep");

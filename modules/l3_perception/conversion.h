@@ -21,6 +21,8 @@
 #ifndef MODEULES_L3_PERCEPTION_CONVERSION_H_
 #define MODEULES_L3_PERCEPTION_CONVERSION_H_
 
+#include <queue>
+
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/l3_perception/proto/radar_obstacle.pb.h"
@@ -46,7 +48,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
 RadarObstacles DelphiToRadarObstacles(
     const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles);
+    const std::queue<RadarObstacles>& last_radar_obstacles);
 
 PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);
@@ -56,4 +58,3 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 }  // namespace apollo
 
 #endif  // MODULES_L3_PERCEPTION_FUSION_H_
-
