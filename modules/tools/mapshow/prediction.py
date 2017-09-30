@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
+import math
 import threading
 import numpy as np
 from modules.planning.proto import planning_internal_pb2
@@ -48,13 +48,16 @@ class Prediction:
             each_polygon = []
             if len(each_prediction_obstacle.trajectory) > 1:
                 print "WARNING: our clever awesome Obstacle should not have more than one trajectory!!!"
+            if len(each_prediction_obstacle.trajectory) != 1:
+                print "WARNING: our clever awesome Obstacle should not have more than one trajectory!!!"
             # the only trajectory
+            each_prediction_path = each_prediction_obstacle.trajectory[0]
             for each_prediction_path_point in each_prediction_path.trajectory_point:
-                each_path_x.append(each_prediction_path_point.x)
-                each_path_y.append(each_prediction_path_point.y)
-            pob = each_prediction_obstacle.prediction_obstacle
+                each_path_x.append(each_prediction_path_point.path_point.x)
+                each_path_y.append(each_prediction_path_point.path_point.y)
+            pob = each_prediction_obstacle.perception_obstacle
             # the polygon
-            each_polygon = get_vehicle_polygon(
+            each_polygon = self.get_vehicle_polygon(
                 pob.length,
                 pob.width,
                 [pob.position.x, pob.position.y, pob.position.z],
@@ -69,6 +72,7 @@ class Prediction:
         self.prediction_path_data_y = prediction_path_data_y
         self.prediction_polygons = prediction_polygons
         self.prediction_lock.release()
+        print "     --- computing prediction path OUTOUTOUT"
     # End of compute_prediction_path_data
 
     def get_vehicle_polygon(self, length, width, position, heading):

@@ -466,10 +466,10 @@ class Planning:
         self.lattice_lock.acquire()
         self.lattice_path_data_x = lattice_path_data_x
         self.lattice_path_data_y = lattice_path_data_y
-        self.lattice_lock.release()
         print " lattice_path_data_x list size = " +str(len(self.lattice_path_data_x))
         if len(self.lattice_path_data_x) > 0:
             print " lattice_path_data_x[0] size = " +str(len(self.lattice_path_data_x[0]))
+        self.lattice_lock.release()
     # End of compute_lattice_path_data
 
     def replot_lattice_path_data(self, path_lines):
