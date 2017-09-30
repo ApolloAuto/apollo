@@ -244,7 +244,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     auto* pob = obstacles.add_perception_obstacle();
     const auto& radar_obstacle = iter.second;
 
-    pob->set_id(radar_obstacle.id());
+    pob->set_id(radar_obstacle.id() + 1000);
 
     pob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
     pob->set_length(radar_obstacle.length());
@@ -254,7 +254,11 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     pob->mutable_position()->CopyFrom(radar_obstacle.absolute_position());
     pob->mutable_velocity()->CopyFrom(radar_obstacle.absolute_velocity());
     
-    pob->set_theta(radar_obstacle.theta());
+    Point xy_point;
+    xy_point.set_x(pob->position().x());
+    xy_point.set_y(pob->position().y());
+    xy_point.set_z(pob->position().z());
+    pob->set_theta(GetNearestLaneHeading(xy_point));
 
     // create polygon
     pob->clear_polygon_point();
