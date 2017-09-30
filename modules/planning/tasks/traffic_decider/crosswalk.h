@@ -34,14 +34,14 @@ class Crosswalk : public TrafficRule {
   Crosswalk();
   virtual ~Crosswalk() = default;
 
-  bool ApplyRule(Frame *frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
-  double GetStopDeceleration(ReferenceLineInfo *const reference_line_info,
+  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const hdmap::PathOverlap* crosswalk_overlap);
   void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo *const reference_line_info,
+                          ReferenceLineInfo* const reference_line_info,
                           const hdmap::PathOverlap* crosswalk_overlap);
 
  private:

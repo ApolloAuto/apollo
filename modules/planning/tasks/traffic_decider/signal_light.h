@@ -18,38 +18,39 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHTS_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHTS_H_
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHT_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHT_H_
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
+
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class SignalLights : public TrafficRule {
+class SignalLight : public TrafficRule {
  public:
-  SignalLights();
-  virtual ~SignalLights() = default;
+  SignalLight();
+  virtual ~SignalLight() = default;
 
-  bool ApplyRule(Frame *frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   void Init();
   void ReadSignals();
-  bool FindValidSignalLights(ReferenceLineInfo* const reference_line_info);
+  bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
   const apollo::perception::TrafficLight GetSignal(
       const std::string& signal_id);
   void MakeDecisions(Frame* frame,
-                     ReferenceLineInfo *const reference_line_info);
-  double GetStopDeceleration(ReferenceLineInfo *const reference_line_info,
+                     ReferenceLineInfo* const reference_line_info);
+  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const hdmap::PathOverlap* signal_light);
   void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo *const reference_line_info,
+                          ReferenceLineInfo* const reference_line_info,
                           const hdmap::PathOverlap* signal_light);
   std::vector<const hdmap::PathOverlap*> signal_lights_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
@@ -59,4 +60,4 @@ class SignalLights : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHTS_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHT_H_
