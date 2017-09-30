@@ -70,7 +70,7 @@ message STGraphDebug {
   optional STGraphKernelFollowRef kernel_follow_ref = 7;
 }
 
-message SignalLightsDebug {
+message SignalLightDebug {
   message SignalDebug {
     optional string light_id = 1;
     optional apollo.perception.TrafficLight.Color color = 2;
@@ -97,5 +97,5 @@ message PlanningData {
   repeated SLFrameDebug sl_frame = 15;
 
   optional apollo.common.Header prediction_header = 16;
-  optional SignalLightsDebug signal_light = 17;
+  optional SignalLightDebug signal_light = 17;
 }
