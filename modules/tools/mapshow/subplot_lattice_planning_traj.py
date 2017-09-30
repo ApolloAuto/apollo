@@ -32,7 +32,7 @@ class LatticeSubPlot:
         for i in range(self.lattice_path_lines_size):
             line, = ax.plot(
                 [0], [0], 'r',
-                lw=3.8,
+                lw=1.8,
                 alpha=0.8)
             self.lattice_path_lines.append(line)
 
@@ -42,7 +42,7 @@ class LatticeSubPlot:
         
         # Prediction obstacle lines and their polygons
         self.prediction_path_lines = []
-        self.prediction_path_lines_size = 10
+        self.prediction_path_lines_size = 5
         for i in range(self.prediction_path_lines_size):
             line, = ax.plot(
                 [0], [0], 'g',
@@ -51,7 +51,7 @@ class LatticeSubPlot:
             self.prediction_path_lines.append(line)
         
         self.prediction_polygon_lines = []
-        self.prediction_polygon_lines_size = 10
+        self.prediction_polygon_lines_size = 5
         for i in range(self.prediction_polygon_lines_size):
             line, = ax.plot(
                 [0], [0], 'k',
@@ -108,10 +108,10 @@ class LatticeSubPlot:
         localization.localization_data_lock.acquire()
         self.draw_vehicle(localization)
         try:
-            self.ax.set_xlim(localization.localization_pb.pose.position.x - 2* self.map_width,
-                        localization.localization_pb.pose.position.x + 2 * self.map_width)
-            self.ax.set_ylim(localization.localization_pb.pose.position.y - 2 * self.map_width,
-                        localization.localization_pb.pose.position.y + 2 * self.map_width)
+            self.ax.set_xlim(localization.localization_pb.pose.position.x -  self.map_width,
+                        localization.localization_pb.pose.position.x + self.map_width)
+            self.ax.set_ylim(localization.localization_pb.pose.position.y - self.map_width,
+                        localization.localization_pb.pose.position.y + self.map_width)
         except:
             pass
         localization.localization_data_lock.release()
@@ -144,6 +144,7 @@ class LatticeSubPlot:
             for pt in prediction.prediction_polygons[i]:
                 polygon_x.append(pt[0])
                 polygon_y.append(pt[1])
+            prediction_polygon_line.set_visible(True)
             prediction_polygon_line.set_xdata(polygon_x)
             prediction_polygon_line.set_ydata(polygon_y)
         prediction.prediction_lock.release()
