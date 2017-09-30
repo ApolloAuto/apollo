@@ -22,9 +22,9 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
+#include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
-#include "modules/planning/tasks/traffic_decider/signal_lights.h"
+#include "modules/planning/tasks/traffic_decider/signal_light.h"
 
 namespace apollo {
 namespace planning {
@@ -34,17 +34,15 @@ using common::VehicleConfigHelper;
 TrafficDecider::TrafficDecider() : Task("TrafficDecider") {}
 
 void TrafficDecider::RegisterRules() {
-  rule_factory_.Register("BackSideVehicles", []() -> TrafficRule * {
-    return new BackSideVehicles();
+  rule_factory_.Register("BacksideVehicle", []() -> TrafficRule * {
+    return new BacksideVehicle();
   });
 
-  rule_factory_.Register("SignalLights", []() -> TrafficRule * {
-    return new SignalLights();
-  });
+  rule_factory_.Register("SignalLight",
+                         []() -> TrafficRule * { return new SignalLight(); });
 
-  rule_factory_.Register("Crosswalk", []() -> TrafficRule * {
-    return new Crosswalk();
-  });
+  rule_factory_.Register("Crosswalk",
+                         []() -> TrafficRule * { return new Crosswalk(); });
 }
 
 bool TrafficDecider::Init(const PlanningConfig &config) {
