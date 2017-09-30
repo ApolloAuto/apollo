@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDE_VEHICE_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDE_VEHICE_H_
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACKSIDE_VEHICE_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACKSIDE_VEHICE_H_
 
 #include <string>
 
@@ -28,15 +28,15 @@
 namespace apollo {
 namespace planning {
 
-class BackSideVehicles : public TrafficRule {
+class BacksideVehicle : public TrafficRule {
  public:
-  BackSideVehicles();
-  virtual ~BackSideVehicles() = default;
+  BacksideVehicle();
+  virtual ~BacksideVehicle() = default;
 
-  bool ApplyRule(Frame *frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDE_VEHICE_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDEVEHICE_H_

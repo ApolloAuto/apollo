@@ -32,7 +32,7 @@ class DiscretizedPath {
  public:
   DiscretizedPath() = default;
 
-  explicit DiscretizedPath(std::vector<common::PathPoint> path_points);
+  explicit DiscretizedPath(const std::vector<common::PathPoint>& path_points);
 
   void set_path_points(const std::vector<common::PathPoint>& path_points);
 
