@@ -136,10 +136,10 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
 RadarObstacles DelphiToRadarObstacles(
     const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles) {
+    const std::queue<RadarObstacles>& last_radar_obstacles) {
   RadarObstacles obstacles;
 
-  const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
+  const double last_timestamp = last_radar_obstacles.front().header().timestamp_sec();
   const double current_timestamp = delphi_esr.header().timestamp_sec();
 
   // assign motion power from 540
@@ -203,30 +203,29 @@ RadarObstacles DelphiToRadarObstacles(
     rob.mutable_relative_velocity()->set_y(range_vel * std::sin(angle) + 
                                             lateral_vel * std::cos(angle)); 
 
+    const auto iter_back = last_radar_obstacles.back().radar_obstacle().find(index);
+    if (iter_back == last_radar_obstacles.back().radar_obstacle().end()) {
+      rob.set_count(0);
+    } else {
+      rob.set_count(iter_back->second.count() + 1);
+    }
+
     Point absolute_vel;
-    const auto iter = last_radar_obstacles.radar_obstacle().find(index);
-    if (iter == last_radar_obstacles.radar_obstacle().end()) {
+    const auto iter_front = last_radar_obstacles.front().radar_obstacle().find(index);
+    if (iter_front == last_radar_obstacles.front().radar_obstacle().end()) {
       // new in the current frame
       absolute_vel.set_x(0.0);
       absolute_vel.set_y(0.0);
       absolute_vel.set_z(0.0);
-      rob.set_count(0);
     } else {
       // appeared in the last frame
-      Point instant_absolute_vel;
-      instant_absolute_vel.set_x(
-          (absolute_pos.x() - iter->second.absolute_position().x()) /
+      absolute_vel.set_x(
+          (absolute_pos.x() - iter_front->second.absolute_position().x()) /
           (current_timestamp - last_timestamp));
-      instant_absolute_vel.set_y(
-          (absolute_pos.y() - iter->second.absolute_position().y()) /
+      absolute_vel.set_y(
+          (absolute_pos.y() - iter_front->second.absolute_position().y()) /
           (current_timestamp - last_timestamp));
-      const double alpha = 0.0;
-      absolute_vel.set_x(alpha * iter->second.absolute_velocity().x() +
-                         (1.0 - alpha) * instant_absolute_vel.x());
-      absolute_vel.set_y(alpha * iter->second.absolute_velocity().y() +
-                         (1.0 - alpha) * instant_absolute_vel.y());
       absolute_vel.set_z(0.0);
-      rob.set_count(iter->second.count() + 1);
     }
     rob.mutable_absolute_velocity()->CopyFrom(absolute_vel);
     (*obstacles.mutable_radar_obstacle())[index] = rob;
@@ -280,6 +279,3 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 }  // namespace conversion 
 }  // namespace l3_perception
 }  // namespace apollo
-
-
-
