@@ -18,16 +18,17 @@
  * @file
  **/
 
-#include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
+#include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-BackSideVehicles::BackSideVehicles() : TrafficRule("BackSideVehicles") {}
+BacksideVehicle::BacksideVehicle() : TrafficRule("BacksideVehicle") {}
 
-bool BackSideVehicles::ApplyRule(Frame *frame,
-                                 ReferenceLineInfo* const reference_line_info) {
+bool BacksideVehicle::ApplyRule(Frame* frame,
+                                ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   ObjectDecisionType ignore;
