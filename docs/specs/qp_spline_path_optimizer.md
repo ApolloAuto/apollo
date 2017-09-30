@@ -39,10 +39,10 @@ QP formulation:
 <p>
 $$
 \begin{aligned}
-& \frac{1}{2}  \cdot x^T \cdot H \cdot x  + f^T \cdot x \\
+minimize  & \frac{1}{2}  \cdot x^T \cdot H \cdot x  + f^T \cdot x \\
 s.t. \qquad & LB \leq x \leq UB \\
       & A_{eq}x = b_{eq} \\
-      & Ax \leq b
+      & Ax \geq b
 \end{aligned}
 $$
 </p>
@@ -60,7 +60,7 @@ And
 <p>
 $$
 f_i'(s) =
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
 \cdot  
 \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix}
 $$
@@ -71,52 +71,46 @@ And
 <p>
 $$
 f_i'(s)^2 =
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5}  \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5}  \end{vmatrix} 
 \cdot 
 \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix}
 $$
 </p>
-And 
+then we have,
 <p>
 $$
 \int\limits_{0}^{d_i} f_i'(s)^2 ds ＝
 \int\limits_{0}^{d_i}
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
 \cdot  
 \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} ds
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix} ds
 $$
 </p>
 
 
-And
+extract the const outside the integration, we have,
 <p>
 $$
 \int\limits_{0}^{d_i} f'(s)^2 ds ＝
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
 \cdot 
 \int\limits_{0}^{d_i}  
 \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} ds 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix}
 $$
-</p>
-
-
-And
-<p>
 $$
-\int\limits_{0}^{d_i} 
-f'(s)^2 ds ＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \int\limits_{0}^{d_i}
 \begin{vmatrix} 
 0  & 0 &0&0&0&0\\ 
@@ -131,7 +125,8 @@ f'(s)^2 ds ＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5
 $$
 </p>
 
-And
+Finally, we have
+
 <p>
 $$
 \int\limits_{0}^{d_i} 
@@ -148,6 +143,14 @@ f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 </p>
+
+Please notice that we got a 10 x 10 matrix to represent the derivative cost of 5th order spline.
+
+
+
+Similar deduction can also be used to calculate the cost of second and third order derivatives.
+
+
 
 ## 2  Constraints  
 
@@ -174,7 +177,7 @@ $$
 f'_i(s_0) = 
 \begin{vmatrix} 0& 1 & s_0 & s_0^2 & s_0^3 & s_0^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix} = l_0
 $$
 </p>
 And 
@@ -183,28 +186,10 @@ $$
 f''_i(s_0) = 
 \begin{vmatrix} 0&0& 1 & s_0 & s_0^2 & s_0^3  \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3\times2a_{i3} \\ 4\times3a_{i4} \\ 5\times4a_{i5} \end{vmatrix} = l_0
 $$
 </p>
-The $i$ is the index of segment that contains the $s_0$.
-
-Therefore the equality constraint is: 
-<p>
-$$
-\begin{vmatrix} 
- 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
- 0&1 & s_0 & s_0^2 & s_0^3 & s_0^4 \\
- 0& 0&1 & s_0 & s_0^2 & s_0^3  
- \end{vmatrix} 
- \cdot 
- \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = 
- \begin{vmatrix}
- l_0\\
- l_0\\
- l_0\\
- \end{vmatrix}
-$$
-</p>
+where i is the index of the segment that contains the $s_0$.
 
 ### 2.2  The end point constraints
 
