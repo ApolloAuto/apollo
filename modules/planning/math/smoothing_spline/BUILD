@@ -283,4 +283,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "spline_2d_solver_test",
+    size = "small",
+    srcs = [
+        "spline_2d_solver_test.cc",
+    ],
+    deps = [
+        ":spline_2d_solver",
+        "//modules/planning/math:curve_math",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
