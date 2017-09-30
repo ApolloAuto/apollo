@@ -21,7 +21,7 @@ Each segment ***i*** has accumulated distance $d_i$ along reference line. The tr
 <p>
 $$
 l = f_i(s)
-  = a_{i0} + a_{i1} * s + a_{i2} * s^2 + a_{i3} * s^3 + a_{i4} * s^4 + a_{i5} * s^5   (0 \leq s \leq d_{i})
+  = a_{i0} + a_{i1} \cdot s + a_{i2} \cdot s^2 + a_{i3} \cdot s^3 + a_{i4} \cdot s^4 + a_{i5} \cdot s^5        (0 \leq s \leq d_{i})
 $$
 </p>
 
@@ -110,7 +110,7 @@ $$
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix}
 $$
 $$
-＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+＝\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
 \cdot \int\limits_{0}^{d_i}
 \begin{vmatrix} 
 0  & 0 &0&0&0&0\\ 
@@ -121,7 +121,7 @@ $$
 0 & s^4 & s^5 & s^6 & s^7 & s^8 
 \end{vmatrix} ds 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix}
 $$
 </p>
 
@@ -130,7 +130,7 @@ Finally, we have
 <p>
 $$
 \int\limits_{0}^{d_i} 
-f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
 \cdot \begin{vmatrix} 
 0 & 0 & 0 & 0 &0&0\\ 
 0 & d_i & \frac{d_i^2}{2} & \frac{d_i^3}{3} & \frac{d_i^4}{4}&\frac{d_i^5}{5}\\
@@ -140,7 +140,7 @@ f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5
 0& \frac{d_i^5}{5} & \frac{d_i^6}{6} & \frac{d_i^7}{7} & \frac{d_i^8}{8}&\frac{d_i^9}{9}
 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix}
 $$
 </p>
 
@@ -156,7 +156,9 @@ Similar deduction can also be used to calculate the cost of second and third ord
 
 ### 2.1  The init point constraints
 
-Assume that the first point is ($s_0$, $l_0$), and that $l_0$ is on the planned path $f_i(s)$, $f'i(s)$, and $f_i(s)''$.  Convert those constraints into QP equality constraints, using: 
+Assume that the first point is ($s_0$, $l_0$), ($s_0$, $l'_0$) and ($s_0$, $l''_0$), where $l_0$ , $l'_0$ and $l''_0$ is the lateral offset and its first and second derivatives on the init point of planned path, and are calculated from $f_i(s)$, $f'_i(s)$, and $f_i(s)''$.  
+
+Convert those constraints into QP equality constraints, using: 
 <p>
 $$
 A_{eq}x = b_{eq}
@@ -177,7 +179,7 @@ $$
 f'_i(s_0) = 
 \begin{vmatrix} 0& 1 & s_0 & s_0^2 & s_0^3 & s_0^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix} = l_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix} = l'_0
 $$
 </p>
 And 
@@ -186,7 +188,7 @@ $$
 f''_i(s_0) = 
 \begin{vmatrix} 0&0& 1 & s_0 & s_0^2 & s_0^3  \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3\times2a_{i3} \\ 4\times3a_{i4} \\ 5\times4a_{i5} \end{vmatrix} = l_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3\times2a_{i3} \\ 4\times3a_{i4} \\ 5\times4a_{i5} \end{vmatrix} = l''_0
 $$
 </p>
 where i is the index of the segment that contains the $s_0$.
@@ -195,27 +197,29 @@ where i is the index of the segment that contains the $s_0$.
 
 Similar to the init point, the end point $(s_e, l_e)$ is known and should produce the same constraint as described in the init point calculations. 
 
+
 Combine the init point and end point, and show the equality constraint as: 
+
 <p>
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
- 0&1 & s_0 & s_0^2 & s_0^3 & s_0^4 \\
- 0& 0&1 & s_0 & s_0^2 & s_0^3  \\
+ 0&1 & 2s_0 & 3s_0^2 & 4s_0^3 & 5s_0^4 \\
+ 0& 0&2 & 3\times2s_0 & 4\times3s_0^2 & 5\times4s_0^3  \\
  1 & s_e & s_e^2 & s_e^3 & s_e^4&s_e^5 \\
- 0&1 & s_e & s_e^2 & s_e^3 & s_e^4 \\
- 0& 0&1 & s_e & s_e^2 & s_e^3  
+ 0&1 & 2s_e & 3s_e^2 & 4s_e^3 & 5s_e^4 \\
+ 0& 0&2 & 3\times2s_e & 4\times3s_e^2 & 5\times4s_e^3  
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} 
  = 
  \begin{vmatrix}
  l_0\\
- l_0\\
- l_0\\
+ l'_0\\
+ l''_0\\
  l_e\\
- l_e\\
- l_e\\
+ l'_e\\
+ l''_e\\
  \end{vmatrix}
 $$
 </p>
@@ -279,7 +283,7 @@ $$
 Evenly sample **m** points along the path, and check the obstacle boundary at those points.  Convert the constraint into QP inequality constraints, using:
 <p>
 $$
-Ax \leq b
+Ax \geq b
 $$
 </p>
 First find the lower boundary $l_{lb,j}$ at those points $(s_j, l_j)$ and  $j\in[0, m]$ based on the road width and surrounding obstacles. Calculate the inequality constraints as:
@@ -291,7 +295,7 @@ $$
  ...&...&...&...&...&... \\
  1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
  \end{vmatrix} \cdot \begin{vmatrix}a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} 
- \leq 
+ \geq 
  \begin{vmatrix}
  l_{lb,0}\\
  l_{lb,1}\\
@@ -306,14 +310,14 @@ Similarly, for the upper boundary $l_{ub,j}$, calculate the inequality constrain
 <p>
 $$
 \begin{vmatrix} 
- 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
-  1 & s_1 & s_1^2 & s_1^3 & s_1^4&s_1^5 \\
- ...&...&...&...&...&... \\
- 1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
+ -1 & -s_0 & -s_0^2 & -s_0^3 & -s_0^4&-s_0^5 \\
+  -1 & -s_1 & -s_1^2 & -s_1^3 & -s_1^4&-s_1^5 \\
+ ...&...-&...&...&...&... \\
+ -1 & -s_m & -s_m^2 & -s_m^3 & -s_m^4&-s_m^5 \\
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} 
- \leq
+ \geq
  -1 \cdot
  \begin{vmatrix}
  l_{ub,0}\\
