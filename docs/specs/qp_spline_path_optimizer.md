@@ -50,9 +50,9 @@ Below is the example for converting the cost function into the QP formulaiton.
 <p>
 $$
 f_i(s) ＝
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
-\cdot  
-\begin{vmatrix} 1 \\ s \\ s^2 \\ s^3 \\ s^4 \\ s^5 \end{vmatrix}
+\begin{vmatrix} 1 & s & s^2 & s^3 & s^4 & s^5 \end{vmatrix}
+\cdot
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
 $$
 </p>
 
@@ -60,9 +60,9 @@ And
 <p>
 $$
 f_i'(s) =
-\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
-\cdot  
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix}
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix}
+\cdot
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
 $$
 </p>
 
@@ -71,13 +71,13 @@ And
 <p>
 $$
 f_i'(s)^2 =
-\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5}  \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5}  \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\begin{vmatrix} 0 \\ 1 \\ 2s \\ 3s^2 \\ 4s^3 \\ 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
 </p>
 then we have,
@@ -85,13 +85,13 @@ then we have,
 $$
 \int\limits_{0}^{d_i} f_i'(s)^2 ds ＝
 \int\limits_{0}^{d_i}
-\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot  
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\begin{vmatrix} 0 \\ 1 \\ 2s \\ 3s^2 \\ 4s^3 \\ 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix} ds
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} ds
 $$
 </p>
 
@@ -100,28 +100,28 @@ extract the const outside the integration, we have,
 <p>
 $$
 \int\limits_{0}^{d_i} f'(s)^2 ds ＝
-\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot 
 \int\limits_{0}^{d_i}  
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\begin{vmatrix} 0 \\ 1 \\ 2s \\ 3s^2 \\ 4s^3 \\ 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} ds 
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} ds 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5}  \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
 $$
-＝\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
+＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \int\limits_{0}^{d_i}
 \begin{vmatrix} 
 0  & 0 &0&0&0&0\\ 
-0 & 1 & s & s^2 & s^3 & s^4\\
-0 & s & s^2 & s^3 & s^4 & s^5\\
-0 & s^2 &  s^3 & s^4&s^5&s^6 \\
-0 & s^3 & s^4 &s^5 &s^6&s^7 \\
-0 & s^4 & s^5 & s^6 & s^7 & s^8 
+0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4\\
+0 & 2s & 4s^2 & 6s^3 & 8s^4 & 10s^5\\
+0 & 3s^2 &  6s^3 & 9s^4 & 12s^5&15s^6 \\
+0 & 4s^3 & 8s^4 &12s^5 &16s^6&20s^7 \\
+0 & 5s^4 & 10s^5 & 15s^6 & 20s^7 & 25s^8 
 \end{vmatrix} ds 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 </p>
 
@@ -130,17 +130,17 @@ Finally, we have
 <p>
 $$
 \int\limits_{0}^{d_i} 
-f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & 2a_{i2} & 3a_{i3} & 4a_{i4} & 5a_{i5} \end{vmatrix} 
+f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \begin{vmatrix} 
 0 & 0 & 0 & 0 &0&0\\ 
-0 & d_i & \frac{d_i^2}{2} & \frac{d_i^3}{3} & \frac{d_i^4}{4}&\frac{d_i^5}{5}\\
-0& \frac{d_i^2}{2} & \frac{d_i^3}{3} & \frac{d_i^4}{4} & \frac{d_i^5}{5}&\frac{d_i^6}{6}\\
-0& \frac{d_i^3}{3} & \frac{d_i^4}{4} & \frac{d_i^5}{5} & \frac{d_i^6}{6}&\frac{d_i^7}{7}\\
-0& \frac{d_i^4}{4} & \frac{d_i^5}{5} & \frac{d_i^6}{6} & \frac{d_i^7}{7}&\frac{d_i^8}{8}\\
-0& \frac{d_i^5}{5} & \frac{d_i^6}{6} & \frac{d_i^7}{7} & \frac{d_i^8}{8}&\frac{d_i^9}{9}
+0 & d_i & d_i^2 & d_i^3 & d_i^4&d_i^5\\
+0& d_i^2 & \frac{4}{3}d_i^3& \frac{6}{4}d_i^4 & \frac{8}{5}d_i^5&\frac{10}{6}d_i^6\\
+0& d_i^3 & \frac{6}{4}d_i^4 & \frac{9}{5}d_i^5 & \frac{12}{6}d_i^6&\frac{15}{7}d_i^7\\
+0& d_i^4 & \frac{8}{5}d_i^5 & \frac{12}{6}d_i^6 & \frac{16}{7}d_i^7&\frac{20}{8}d_i^8\\
+0& d_i^5 & \frac{10}{6}d_i^6 & \frac{15}{7}d_i^7 & \frac{20}{8}d_i^8&\frac{25}{9}d_i^9
 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 </p>
 
@@ -177,18 +177,18 @@ And
 <p>
 $$
 f'_i(s_0) = 
-\begin{vmatrix} 0& 1 & s_0 & s_0^2 & s_0^3 & s_0^4 \end{vmatrix} 
+\begin{vmatrix} 0& 1 & 2s_0 & 3s_0^2 & 4s_0^3 &5 s_0^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3a_{i3} \\ 4a_{i4} \\ 5a_{i5} \end{vmatrix} = l'_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l'_0
 $$
 </p>
 And 
 <p>
 $$
 f''_i(s_0) = 
-\begin{vmatrix} 0&0& 1 & s_0 & s_0^2 & s_0^3  \end{vmatrix} 
+\begin{vmatrix} 0&0& 2 & 3\times2s_0 & 4\times3s_0^2 & 5\times4s_0^3  \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ 2a_{i2} \\ 3\times2a_{i3} \\ 4\times3a_{i4} \\ 5\times4a_{i5} \end{vmatrix} = l''_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l''_0
 $$
 </p>
 where i is the index of the segment that contains the $s_0$.
