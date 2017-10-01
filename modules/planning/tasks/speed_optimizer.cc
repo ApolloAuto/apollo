@@ -130,6 +130,10 @@ void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
       case StBoundary::BoundaryType::YIELD:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
         break;
+      case StBoundary::BoundaryType::KEEP_CLEAR:
+        boundary_debug->set_type(
+            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
+        break;
     }
 
     for (const auto& point : boundary->points()) {

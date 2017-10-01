@@ -98,6 +98,8 @@ class PathObstacle {
 
   void SetStBoundary(const StBoundary& boundary);
 
+  void SetStBoundaryType(const StBoundary::BoundaryType type);
+
   void EraseStBoundary();
 
   bool HasLongitudinalDecision() const;
