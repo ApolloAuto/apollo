@@ -59,6 +59,7 @@ class StBoundary : public common::math::Polygon2d {
     FOLLOW,
     YIELD,
     OVERTAKE,
+    KEEP_CLEAR,
   };
 
   bool IsEmpty() const { return lower_points_.empty(); }
