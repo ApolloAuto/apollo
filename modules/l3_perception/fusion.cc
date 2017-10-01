@@ -32,28 +32,39 @@ namespace fusion {
 
 using ::apollo::l3_perception::Distance;
 
-void MobileyeRadarFusion(
-    PerceptionObstacles* const mobileye_obstacles, PerceptionObstacles* const radar_obstacles) {
-  for (int mobileye_index = 0; mobileye_index < mobileye_obstacles->perception_obstacle_size(); ++mobileye_index) {
-    auto* mob = mobileye_obstacles->mutable_perception_obstacle(mobileye_index);
-    for (int radar_index = 0; radar_index < radar_obstacles->perception_obstacle_size(); ++radar_index) {
-      auto* rob = radar_obstacles->mutable_perception_obstacle(radar_index);
-      if (std::abs(rob->position().x() - mob->position().x()) < FLAGS_fusion_x_distance &&
-          std::abs(rob->position().y() - mob->position().y()) < FLAGS_fusion_y_distance) {
-        mob->set_confidence(0.99);
-        rob->set_confidence(0.99);
-        // TODO(lizh): here is a hack for display different color
-        mob->set_type(PerceptionObstacle::BICYCLE);
-        rob->set_type(PerceptionObstacle::BICYCLE);
-      }
+bool HasOverlap(const PerceptionObstacle& obstacle, const PerceptionObstacles& obstacles) {
+  // TODO(rongqiqiu): compute distances according to bboxes
+  for (const auto& current_obstacle : obstacles.perception_obstacle()) {
+    if (std::abs(current_obstacle.position().x() - obstacle.position().x()) <
+            FLAGS_fusion_x_distance &&
+        std::abs(current_obstacle.position().y() - obstacle.position().y()) <
+            FLAGS_fusion_y_distance) {
+      return true;
     }
-  } 
+  }
+  return false;
+}
+
+PerceptionObstacles MobileyeRadarFusion(
+    const PerceptionObstacles& mobileye_obstacles, const PerceptionObstacles& radar_obstacles) {
+  PerceptionObstacles merged_obstacles;
+  merged_obstacles.MergeFrom(mobileye_obstacles);
+  merged_obstacles.MergeFrom(radar_obstacles);
+
+  PerceptionObstacles obstacles;
+  obstacles.mutable_header()->CopyFrom(merged_obstacles.header());
+  for (const auto& current_obstacle : merged_obstacles.perception_obstacle()) {
+    if (!HasOverlap(current_obstacle, obstacles)) {
+      auto* obstacle = obstacles.add_perception_obstacle();
+      obstacle->CopyFrom(current_obstacle);
+      // TODO(rongqiqiu): compute confidence scores
+      obstacle->set_type(PerceptionObstacle::VEHICLE);
+    }
+  }
+
+  return obstacles;
 }
 
 }  // namespace fusion 
 }  // namespace l3_perception
 }  // namespace apollo
-
-
-
-

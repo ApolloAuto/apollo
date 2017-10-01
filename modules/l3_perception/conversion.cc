@@ -84,6 +84,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     xy_point.set_y(converted_y);
     xy_point.set_z(adc_z);
     mob->set_theta(GetNearestLaneHeading(xy_point));
+    // TODO(rongqiqiu): consider more accurate speed computation
     double converted_speed = adc_velocity + mob_vel_x;
     double converted_vx = converted_speed * std::cos(mob->theta());
     double converted_vy = converted_speed * std::sin(mob->theta());
@@ -130,6 +131,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
     mob->set_confidence(0.75);
   }
+
+  obstacles.mutable_header()->CopyFrom(mobileye.header());
 
   return obstacles;
 }
@@ -272,6 +275,8 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 
     pob->set_confidence(0.5);
   }
+
+  obstacles.mutable_header()->CopyFrom(radar_obstacles.header());
 
   return obstacles;
 }
