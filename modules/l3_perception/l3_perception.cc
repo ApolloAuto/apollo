@@ -112,10 +112,12 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
     return false;
   }
   */
+  // TODO(rongqiqiu): keep those with stable forward velocity
   double nearest_l = GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
   if (std::abs(nearest_l) > FLAGS_filter_y_distance) {
     return false;
   }
+  // TODO(rongqiqiu): create a new gflag for this
   if (radar_obstacle.count() < FLAGS_keep_delphi_esr_frames) {
     return false;
   }
@@ -143,11 +145,8 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   PerceptionObstacles filtered_delphi_esr_obstacles =
       conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
 
-  fusion::MobileyeRadarFusion(&mobileye_obstacles_, &filtered_delphi_esr_obstacles);
-
-  PerceptionObstacles obstacles;
-  obstacles.MergeFrom(mobileye_obstacles_);
-  obstacles.MergeFrom(filtered_delphi_esr_obstacles);
+  PerceptionObstacles obstacles = fusion::MobileyeRadarFusion(
+      mobileye_obstacles_, filtered_delphi_esr_obstacles);
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);

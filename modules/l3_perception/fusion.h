@@ -33,8 +33,8 @@ namespace fusion {
 
 using apollo::perception::PerceptionObstacles;
 
-void MobileyeRadarFusion(
-    PerceptionObstacles* const mobileye_obstacles, PerceptionObstacles* const radar_obstacles);
+PerceptionObstacles MobileyeRadarFusion(
+    const PerceptionObstacles& mobileye_obstacles, const PerceptionObstacles& radar_obstacles);
 
 }  // namespace fusion 
 }  // namespace l3_perception
