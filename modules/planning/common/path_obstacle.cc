@@ -391,5 +391,9 @@ void PathObstacle::SetStBoundary(const StBoundary& boundary) {
   st_boundary_ = boundary;
 }
 
+void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
+  st_boundary_.SetBoundaryType(type);
+}
+
 }  // namespace planning
 }  // namespace apollo
