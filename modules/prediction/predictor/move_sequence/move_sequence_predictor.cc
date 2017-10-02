@@ -19,7 +19,12 @@
 namespace apollo {
 namespace prediction {
 
-void MoveSequencePredictor::Predict(Obstacle* obstacle) {}
+void MoveSequencePredictor::Predict(Obstacle* obstacle) {
+  Clear();
+
+  CHECK_NOTNULL(obstacle);
+  CHECK_GT(obstacle->history_size(), 0);
+}
 
 }  // namespace prediction
 }  // namespace apollo

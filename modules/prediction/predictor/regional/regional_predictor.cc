@@ -68,11 +68,11 @@ double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
 }  // namespace
 
 void RegionalPredictor::Predict(Obstacle* obstacle) {
-  trajectories_.clear();
-  if (obstacle == nullptr) {
-    AERROR << "Missing obstacle.";
-    return;
-  }
+  Clear();
+
+  CHECK_NOTNULL(obstacle);
+  CHECK_GT(obstacle->history_size(), 0);
+
   double speed = 0.0;
   const Feature& feature = obstacle->latest_feature();
   if (feature.has_speed()) {
