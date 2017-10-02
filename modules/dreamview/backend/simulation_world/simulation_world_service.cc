@@ -122,6 +122,7 @@ void SetObstacleInfo(const PerceptionObstacle &obstacle, Object *world_object) {
   world_object->set_speed_heading(
       std::atan2(obstacle.velocity().y(), obstacle.velocity().x()));
   world_object->set_timestamp_sec(obstacle.timestamp());
+  world_object->set_confidence(obstacle.confidence());
 }
 
 void SetObstaclePolygon(const PerceptionObstacle &obstacle,
