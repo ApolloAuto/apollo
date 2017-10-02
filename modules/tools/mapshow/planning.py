@@ -466,7 +466,7 @@ class Planning:
         self.lattice_lock.acquire()
         self.lattice_path_data_x = lattice_path_data_x
         self.lattice_path_data_y = lattice_path_data_y
-        print " lattice_path_data_x list size = " +str(len(self.lattice_path_data_x))
+        #print " lattice_path_data_x list size = " +str(len(self.lattice_path_data_x))
         if len(self.lattice_path_data_x) > 0:
             print " lattice_path_data_x[0] size = " +str(len(self.lattice_path_data_x[0]))
         self.lattice_lock.release()

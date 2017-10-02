@@ -42,7 +42,7 @@ class LatticeSubPlot:
         
         # Prediction obstacle lines and their polygons
         self.prediction_path_lines = []
-        self.prediction_path_lines_size = 5
+        self.prediction_path_lines_size = 20
         for i in range(self.prediction_path_lines_size):
             line, = ax.plot(
                 [0], [0], 'g',
@@ -51,7 +51,7 @@ class LatticeSubPlot:
             self.prediction_path_lines.append(line)
         
         self.prediction_polygon_lines = []
-        self.prediction_polygon_lines_size = 5
+        self.prediction_polygon_lines_size = 20
         for i in range(self.prediction_polygon_lines_size):
             line, = ax.plot(
                 [0], [0], 'k',
@@ -123,12 +123,12 @@ class LatticeSubPlot:
                 + "] != prediction_path_data_y size[" + str(len(prediction.prediction_path_data_y)) + "]"
         if len(prediction.prediction_path_data_x) > self.prediction_path_lines_size:
             print "ERROR prediction_path_data_x size[" + str(len(prediction.prediction_path_data_x)) \
-                + "] > maximum prediction path line size[" + str(len(self.prediction_path_lines_size)) + "]"
+                + "] > maximum prediction path line size[" + str(self.prediction_path_lines_size) + "]"
         if len(prediction.prediction_polygons) > self.prediction_polygon_lines_size:
             print "ERROR prediction_polygons size[" + str(len(prediction.prediction_polygons)) \
                 + "] != maximum prediction polygon size[" + str(self.prediction_polygon_lines_size) + "]"
         for i in range(len(prediction.prediction_path_data_x)):
-            if i > len(self.prediction_path_lines):
+            if i >= len(self.prediction_path_lines):
                 break
             prediction_path_line = self.prediction_path_lines[i]
             prediction_path_line.set_visible(True)
@@ -136,7 +136,7 @@ class LatticeSubPlot:
             prediction_path_line.set_ydata(prediction.prediction_path_data_y[i])
 
         for i in range(len(prediction.prediction_polygons)):
-            if i > self.prediction_polygon_lines_size:
+            if i >= self.prediction_polygon_lines_size:
                 break
             prediction_polygon_line = self.prediction_polygon_lines[i]
             polygon_x = []
