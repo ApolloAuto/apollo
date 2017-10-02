@@ -32,22 +32,32 @@ DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
       unit_s_(dp_st_speed_config_.total_path_length() /
               dp_st_speed_config_.matrix_dimension_s()),
       unit_t_(dp_st_speed_config_.total_time() /
-              dp_st_speed_config_.matrix_dimension_t()) {}
+              dp_st_speed_config_.matrix_dimension_t()) {
+  unit_v_ = unit_s_ / unit_t_;
+}
 
 // TODO(all): normalize cost with time
 double DpStCost::GetObstacleCost(
-    const STPoint& point,
+    const StGraphPoint& st_graph_point,
     const std::vector<const StBoundary*>& st_boundaries) const {
   double total_cost = 0.0;
   constexpr double inf = std::numeric_limits<double>::infinity();
-  if (point.s() < 0) {
+  const double unit_v = unit_s_ / unit_t_;
+  const auto& st_point = st_graph_point.point();
+  if (st_point.s() < 0) {
     return inf;
   }
   for (const StBoundary* boundary : st_boundaries) {
-    if (boundary->IsPointInBoundary(point)) {
-      return inf;
+    if (boundary->IsPointInBoundary(st_point)) {
+      if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+        total_cost += unit_v * ((st_graph_point.index_s() + 1.0) /
+                                (st_graph_point.index_t() + 1.0)) *
+                      dp_st_speed_config_.keep_clear_cost_factor();
+      } else {
+        return inf;
+      }
     } else {
-      const double distance = boundary->DistanceS(point);
+      const double distance = boundary->DistanceS(st_point);
       total_cost += dp_st_speed_config_.default_obstacle_cost() *
                     std::exp(dp_st_speed_config_.obstacle_cost_factor() /
                              boundary->characteristic_length() * distance);
