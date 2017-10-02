@@ -65,6 +65,11 @@ class Predictor {
    */
   int NumOfTrajectories();
 
+  /**
+   * @brief Clear all trajectories
+   */
+  virtual void Clear();
+
  protected:
   /**
    * @brief Generate trajectory from trajectory points
