@@ -26,38 +26,60 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Esrstatus55e4 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrstatus55e4();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
+  // config detail: {'name': 'CAN_TX_SUPPLY_10V_A2D', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // ''}
+  int can_tx_supply_10v_a2d(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SUPPLY_10V_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_supply_10v_a2d(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'CAN_TX_TEMP2_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_TEMP2_A2D', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
+  // 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_temp2_a2d(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_TEMP1_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_TEMP1_A2D', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
+  // 23, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_temp1_a2d(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SWBATT_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_SWBATT_A2D', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_swbatt_a2d(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SUPPLY_5VDX_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 47, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_supply_5vdx_a2d(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_SUPPLY_5VDX_A2D', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 47, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // ''}
+  int can_tx_supply_5vdx_a2d(const std::uint8_t* bytes,
+                             const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SUPPLY_5VA_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_supply_5va_a2d(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_SUPPLY_5VA_A2D', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // ''}
+  int can_tx_supply_5va_a2d(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SUPPLY_3P3V_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_supply_3p3v_a2d(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_SUPPLY_3P3V_A2D', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // ''}
+  int can_tx_supply_3p3v_a2d(const std::uint8_t* bytes,
+                             const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_IGNP_A2D', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 15, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_IGNP_A2D', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 15,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_ignp_a2d(const std::uint8_t* bytes, const int32_t length) const;
 };
 

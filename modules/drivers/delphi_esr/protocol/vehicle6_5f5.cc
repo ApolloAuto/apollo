@@ -16,7 +16,6 @@
 
 #include "modules/drivers/delphi_esr/protocol/vehicle6_5f5.h"
 
-
 #include "glog/logging.h"
 
 #include "modules/canbus/common/byte.h"
@@ -32,16 +31,25 @@ Vehicle65f5::Vehicle65f5() {}
 const int32_t Vehicle65f5::ID = 0x5F5;
 
 void Vehicle65f5::Parse(const std::uint8_t* bytes, int32_t length,
-                         DelphiESR* delphi_esr) const {
-  delphi_esr->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_right(can_rx_inner_funnel_offset_right(bytes, length));
-  delphi_esr->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_left(can_rx_inner_funnel_offset_left(bytes, length));
-  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_range_max_short(can_volvo_fa_range_max_short(bytes, length));
-  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_min_vspeed_short(can_volvo_fa_min_vspeed_short(bytes, length));
-  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_aalign_estimate(can_volvo_fa_aalign_estimate(bytes, length));
+                        DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_right(
+      can_rx_inner_funnel_offset_right(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_left(
+      can_rx_inner_funnel_offset_left(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_range_max_short(
+      can_volvo_fa_range_max_short(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_min_vspeed_short(
+      can_volvo_fa_min_vspeed_short(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_aalign_estimate(
+      can_volvo_fa_aalign_estimate(bytes, length));
 }
 
-// config detail: {'name': 'can_rx_inner_funnel_offset_right', 'offset': 0.0, 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range': '[-2|10]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-double Vehicle65f5::can_rx_inner_funnel_offset_right(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_rx_inner_funnel_offset_right', 'offset': 0.0,
+// 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range':
+// '[-2|10]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit':
+// 'm'}
+double Vehicle65f5::can_rx_inner_funnel_offset_right(const std::uint8_t* bytes,
+                                                     int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
@@ -52,8 +60,12 @@ double Vehicle65f5::can_rx_inner_funnel_offset_right(const std::uint8_t* bytes, 
   return ret;
 }
 
-// config detail: {'name': 'can_rx_inner_funnel_offset_left', 'offset': 0.0, 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range': '[-2|10]', 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-double Vehicle65f5::can_rx_inner_funnel_offset_left(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_rx_inner_funnel_offset_left', 'offset': 0.0,
+// 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range':
+// '[-2|10]', 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit':
+// 'm'}
+double Vehicle65f5::can_rx_inner_funnel_offset_left(const std::uint8_t* bytes,
+                                                    int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
@@ -64,8 +76,12 @@ double Vehicle65f5::can_rx_inner_funnel_offset_left(const std::uint8_t* bytes, i
   return ret;
 }
 
-// config detail: {'name': 'can_volvo_fa_range_max_short', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': 'm'}
-int Vehicle65f5::can_volvo_fa_range_max_short(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_volvo_fa_range_max_short', 'offset': 0.0,
+// 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+// '[0|255]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit':
+// 'm'}
+int Vehicle65f5::can_volvo_fa_range_max_short(const std::uint8_t* bytes,
+                                              int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -73,8 +89,12 @@ int Vehicle65f5::can_volvo_fa_range_max_short(const std::uint8_t* bytes, int32_t
   return ret;
 }
 
-// config detail: {'name': 'can_volvo_fa_min_vspeed_short', 'offset': 0.0, 'precision': 0.125, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|20]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
-double Vehicle65f5::can_volvo_fa_min_vspeed_short(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_volvo_fa_min_vspeed_short', 'offset': 0.0,
+// 'precision': 0.125, 'len': 8, 'is_signed_var': False, 'physical_range':
+// '[0|20]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit':
+// 'm/s'}
+double Vehicle65f5::can_volvo_fa_min_vspeed_short(const std::uint8_t* bytes,
+                                                  int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -82,8 +102,12 @@ double Vehicle65f5::can_volvo_fa_min_vspeed_short(const std::uint8_t* bytes, int
   return ret;
 }
 
-// config detail: {'name': 'can_volvo_fa_aalign_estimate', 'offset': 0.0, 'precision': 0.0625, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|10]', 'bit': 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-double Vehicle65f5::can_volvo_fa_aalign_estimate(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_volvo_fa_aalign_estimate', 'offset': 0.0,
+// 'precision': 0.0625, 'len': 8, 'is_signed_var': False, 'physical_range':
+// '[0|10]', 'bit': 15, 'type': 'double', 'order': 'motorola', 'physical_unit':
+// 'deg'}
+double Vehicle65f5::can_volvo_fa_aalign_estimate(const std::uint8_t* bytes,
+                                                 int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 

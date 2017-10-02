@@ -53,7 +53,7 @@ RadarObstacles DelphiToRadarObstacles(
 PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);
 
-}  // namespace conversion 
+}  // namespace conversion
 }  // namespace l3_perception
 }  // namespace apollo
 

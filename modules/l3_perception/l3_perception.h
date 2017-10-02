@@ -21,10 +21,10 @@
 #ifndef MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
 #define MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
 
-#include <string>
 #include <map>
 #include <mutex>
 #include <queue>
+#include <string>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
@@ -58,8 +58,7 @@ class L3Perception : public apollo::common::ApolloApp {
       const apollo::localization::LocalizationEstimate& message);
   void OnTimer(const ros::TimerEvent&);
 
-  RadarObstacles FilterRadarObstacles(
-      const RadarObstacles& radar_obstacles);
+  RadarObstacles FilterRadarObstacles(const RadarObstacles& radar_obstacles);
 
   ros::Timer timer_;
   apollo::perception::PerceptionObstacles mobileye_obstacles_;
@@ -67,7 +66,6 @@ class L3Perception : public apollo::common::ApolloApp {
   RadarObstacles current_radar_obstacles_;
   std::queue<RadarObstacles> last_radar_obstacles_;
   std::mutex l3_mutex_;
-
 };
 
 }  // namespace l3_perception

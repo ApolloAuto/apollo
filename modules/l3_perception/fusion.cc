@@ -32,7 +32,8 @@ namespace fusion {
 
 using ::apollo::l3_perception::Distance;
 
-bool HasOverlap(const PerceptionObstacle& obstacle, const PerceptionObstacles& obstacles) {
+bool HasOverlap(const PerceptionObstacle& obstacle,
+                const PerceptionObstacles& obstacles) {
   // TODO(rongqiqiu): compute distances according to bboxes
   for (const auto& current_obstacle : obstacles.perception_obstacle()) {
     if (std::abs(current_obstacle.position().x() - obstacle.position().x()) <
@@ -46,7 +47,8 @@ bool HasOverlap(const PerceptionObstacle& obstacle, const PerceptionObstacles& o
 }
 
 PerceptionObstacles MobileyeRadarFusion(
-    const PerceptionObstacles& mobileye_obstacles, const PerceptionObstacles& radar_obstacles) {
+    const PerceptionObstacles& mobileye_obstacles,
+    const PerceptionObstacles& radar_obstacles) {
   PerceptionObstacles merged_obstacles;
   merged_obstacles.MergeFrom(mobileye_obstacles);
   merged_obstacles.MergeFrom(radar_obstacles);
@@ -65,6 +67,6 @@ PerceptionObstacles MobileyeRadarFusion(
   return obstacles;
 }
 
-}  // namespace fusion 
+}  // namespace fusion
 }  // namespace l3_perception
 }  // namespace apollo

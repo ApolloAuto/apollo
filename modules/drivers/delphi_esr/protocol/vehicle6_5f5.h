@@ -26,30 +26,48 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Vehicle65f5 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Vehicle65f5();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
+  // config detail: {'name': 'CAN_RX_INNER_FUNNEL_OFFSET_RIGHT', 'offset': 0.0,
+  // 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range':
+  // '[-2|10]', 'bit': 39, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'm'}
+  double can_rx_inner_funnel_offset_right(const std::uint8_t* bytes,
+                                          const int32_t length) const;
 
-  // config detail: {'name': 'CAN_RX_INNER_FUNNEL_OFFSET_RIGHT', 'offset': 0.0, 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range': '[-2|10]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-  double can_rx_inner_funnel_offset_right(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_RX_INNER_FUNNEL_OFFSET_LEFT', 'offset': 0.0,
+  // 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range':
+  // '[-2|10]', 'bit': 31, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'm'}
+  double can_rx_inner_funnel_offset_left(const std::uint8_t* bytes,
+                                         const int32_t length) const;
 
-  // config detail: {'name': 'CAN_RX_INNER_FUNNEL_OFFSET_LEFT', 'offset': 0.0, 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range': '[-2|10]', 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-  double can_rx_inner_funnel_offset_left(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_VOLVO_FA_RANGE_MAX_SHORT', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|255]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // 'm'}
+  int can_volvo_fa_range_max_short(const std::uint8_t* bytes,
+                                   const int32_t length) const;
 
-  // config detail: {'name': 'CAN_VOLVO_FA_RANGE_MAX_SHORT', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': 'm'}
-  int can_volvo_fa_range_max_short(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_VOLVO_FA_MIN_VSPEED_SHORT', 'offset': 0.0,
+  // 'precision': 0.125, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|20]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit':
+  // 'm/s'}
+  double can_volvo_fa_min_vspeed_short(const std::uint8_t* bytes,
+                                       const int32_t length) const;
 
-  // config detail: {'name': 'CAN_VOLVO_FA_MIN_VSPEED_SHORT', 'offset': 0.0, 'precision': 0.125, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|20]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
-  double can_volvo_fa_min_vspeed_short(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'CAN_VOLVO_FA_AALIGN_ESTIMATE', 'offset': 0.0, 'precision': 0.0625, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|10]', 'bit': 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-  double can_volvo_fa_aalign_estimate(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_VOLVO_FA_AALIGN_ESTIMATE', 'offset': 0.0,
+  // 'precision': 0.0625, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|10]', 'bit': 15, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'deg'}
+  double can_volvo_fa_aalign_estimate(const std::uint8_t* bytes,
+                                      const int32_t length) const;
 };
 
 }  // namespace delphi_esr

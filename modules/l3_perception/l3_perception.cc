@@ -20,10 +20,10 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/l3_perception/l3_perception_gflags.h"
-#include "modules/l3_perception/l3_perception_util.h"
 #include "modules/l3_perception/conversion.h"
 #include "modules/l3_perception/fusion.h"
+#include "modules/l3_perception/l3_perception_gflags.h"
+#include "modules/l3_perception/l3_perception_util.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
@@ -76,8 +76,8 @@ void L3Perception::OnMobileye(const Mobileye& message) {
 void L3Perception::OnDelphiESR(const DelphiESR& message) {
   AINFO << "receive DelphiESR callback";
   std::lock_guard<std::mutex> lock(l3_mutex_);
-  current_radar_obstacles_ = conversion::DelphiToRadarObstacles(message, localization_,
-                                                        last_radar_obstacles_);
+  current_radar_obstacles_ = conversion::DelphiToRadarObstacles(
+      message, localization_, last_radar_obstacles_);
 }
 
 void L3Perception::OnLocalization(const LocalizationEstimate& message) {
@@ -101,8 +101,10 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
       esr_track01_500.can_tx_track_angle() < -25.0) {
     return false;
   }
-  if (esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET ||
-    esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_COASTED_TARGET ) {
+  if (esr_track01_500.can_tx_track_status() ==
+  ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET ||
+    esr_track01_500.can_tx_track_status() ==
+  ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_COASTED_TARGET ) {
     return false;
   }
   if (radar_obstacle.rcs() < -1.0) {
@@ -113,7 +115,8 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   }
   */
   // TODO(rongqiqiu): keep those with stable forward velocity
-  double nearest_l = GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
+  double nearest_l =
+      GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
   if (std::abs(nearest_l) > FLAGS_filter_y_distance) {
     return false;
   }
@@ -129,7 +132,8 @@ RadarObstacles L3Perception::FilterRadarObstacles(
   RadarObstacles filtered_radar_obstacles;
   for (const auto& iter : radar_obstacles.radar_obstacle()) {
     if (IsPreserved(iter.second)) {
-      (*filtered_radar_obstacles.mutable_radar_obstacle())[iter.first] = iter.second;
+      (*filtered_radar_obstacles.mutable_radar_obstacle())[iter.first] =
+          iter.second;
     }
   }
   filtered_radar_obstacles.mutable_header()->CopyFrom(radar_obstacles.header());
@@ -141,7 +145,8 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
 
   std::lock_guard<std::mutex> lock(l3_mutex_);
 
-  RadarObstacles filtered_radar_obstacles = FilterRadarObstacles(current_radar_obstacles_);
+  RadarObstacles filtered_radar_obstacles =
+      FilterRadarObstacles(current_radar_obstacles_);
   PerceptionObstacles filtered_delphi_esr_obstacles =
       conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
 
@@ -152,7 +157,7 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   AdapterManager::PublishPerceptionObstacles(obstacles);
 
   last_radar_obstacles_.push(current_radar_obstacles_);
-  while (last_radar_obstacles_.size() > (size_t) FLAGS_keep_delphi_esr_frames) {
+  while (last_radar_obstacles_.size() > (size_t)FLAGS_keep_delphi_esr_frames) {
     last_radar_obstacles_.pop();
   }
   current_radar_obstacles_.Clear();

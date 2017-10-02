@@ -16,7 +16,6 @@
 
 #include "modules/drivers/delphi_esr/protocol/esr_status9_5e8.h"
 
-
 #include "glog/logging.h"
 
 #include "modules/canbus/common/byte.h"
@@ -32,18 +31,28 @@ Esrstatus95e8::Esrstatus95e8() {}
 const int32_t Esrstatus95e8::ID = 0x5E8;
 
 void Esrstatus95e8::Parse(const std::uint8_t* bytes, int32_t length,
-                         DelphiESR* delphi_esr) const {
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_3(can_tx_path_id_acc_3(bytes, length));
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_2(can_tx_path_id_acc_2(bytes, length));
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_filtered_xohp_acc_cipv(can_tx_filtered_xohp_acc_cipv(bytes, length));
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_water_spray_target_id(can_tx_water_spray_target_id(bytes, length));
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_serial_num_3rd_byte(can_tx_serial_num_3rd_byte(bytes, length));
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_sideslip_angle(can_tx_sideslip_angle(bytes, length));
-  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_avg_pwr_cwblkg(can_tx_avg_pwr_cwblkg(bytes, length));
+                          DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_3(
+      can_tx_path_id_acc_3(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_2(
+      can_tx_path_id_acc_2(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_filtered_xohp_acc_cipv(
+      can_tx_filtered_xohp_acc_cipv(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_water_spray_target_id(
+      can_tx_water_spray_target_id(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_serial_num_3rd_byte(
+      can_tx_serial_num_3rd_byte(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_sideslip_angle(
+      can_tx_sideslip_angle(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_avg_pwr_cwblkg(
+      can_tx_avg_pwr_cwblkg(bytes, length));
 }
 
-// config detail: {'name': 'can_tx_path_id_acc_3', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|64]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Esrstatus95e8::can_tx_path_id_acc_3(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_path_id_acc_3', 'offset': 0.0, 'precision':
+// 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|64]', 'bit': 63,
+// 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+int Esrstatus95e8::can_tx_path_id_acc_3(const std::uint8_t* bytes,
+                                        int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
@@ -51,8 +60,11 @@ int Esrstatus95e8::can_tx_path_id_acc_3(const std::uint8_t* bytes, int32_t lengt
   return ret;
 }
 
-// config detail: {'name': 'can_tx_path_id_acc_2', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|64]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Esrstatus95e8::can_tx_path_id_acc_2(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_path_id_acc_2', 'offset': 0.0, 'precision':
+// 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|64]', 'bit': 55,
+// 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+int Esrstatus95e8::can_tx_path_id_acc_2(const std::uint8_t* bytes,
+                                        int32_t length) const {
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
@@ -60,8 +72,12 @@ int Esrstatus95e8::can_tx_path_id_acc_2(const std::uint8_t* bytes, int32_t lengt
   return ret;
 }
 
-// config detail: {'name': 'can_tx_filtered_xohp_acc_cipv', 'offset': 0.0, 'precision': 0.03125, 'len': 9, 'is_signed_var': True, 'physical_range': '[-8|7.96875]', 'bit': 32, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-double Esrstatus95e8::can_tx_filtered_xohp_acc_cipv(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_filtered_xohp_acc_cipv', 'offset': 0.0,
+// 'precision': 0.03125, 'len': 9, 'is_signed_var': True, 'physical_range':
+// '[-8|7.96875]', 'bit': 32, 'type': 'double', 'order': 'motorola',
+// 'physical_unit': 'm'}
+double Esrstatus95e8::can_tx_filtered_xohp_acc_cipv(const std::uint8_t* bytes,
+                                                    int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 1);
 
@@ -77,8 +93,11 @@ double Esrstatus95e8::can_tx_filtered_xohp_acc_cipv(const std::uint8_t* bytes, i
   return ret;
 }
 
-// config detail: {'name': 'can_tx_water_spray_target_id', 'offset': 0.0, 'precision': 1.0, 'len': 7, 'is_signed_var': False, 'physical_range': '[0|64]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Esrstatus95e8::can_tx_water_spray_target_id(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_water_spray_target_id', 'offset': 0.0,
+// 'precision': 1.0, 'len': 7, 'is_signed_var': False, 'physical_range':
+// '[0|64]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+int Esrstatus95e8::can_tx_water_spray_target_id(const std::uint8_t* bytes,
+                                                int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(1, 7);
 
@@ -86,8 +105,11 @@ int Esrstatus95e8::can_tx_water_spray_target_id(const std::uint8_t* bytes, int32
   return ret;
 }
 
-// config detail: {'name': 'can_tx_serial_num_3rd_byte', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Esrstatus95e8::can_tx_serial_num_3rd_byte(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_serial_num_3rd_byte', 'offset': 0.0,
+// 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+// '[0|0]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+int Esrstatus95e8::can_tx_serial_num_3rd_byte(const std::uint8_t* bytes,
+                                              int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
@@ -95,8 +117,11 @@ int Esrstatus95e8::can_tx_serial_num_3rd_byte(const std::uint8_t* bytes, int32_t
   return ret;
 }
 
-// config detail: {'name': 'can_tx_sideslip_angle', 'offset': 0.0, 'precision': 0.125, 'len': 10, 'is_signed_var': True, 'physical_range': '[-64|63.875]', 'bit': 9, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-double Esrstatus95e8::can_tx_sideslip_angle(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_sideslip_angle', 'offset': 0.0, 'precision':
+// 0.125, 'len': 10, 'is_signed_var': True, 'physical_range': '[-64|63.875]',
+// 'bit': 9, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
+double Esrstatus95e8::can_tx_sideslip_angle(const std::uint8_t* bytes,
+                                            int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 2);
 
@@ -112,8 +137,11 @@ double Esrstatus95e8::can_tx_sideslip_angle(const std::uint8_t* bytes, int32_t l
   return ret;
 }
 
-// config detail: {'name': 'can_tx_avg_pwr_cwblkg', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Esrstatus95e8::can_tx_avg_pwr_cwblkg(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'can_tx_avg_pwr_cwblkg', 'offset': 0.0, 'precision':
+// 1.0, 'len': 12, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7,
+// 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+int Esrstatus95e8::can_tx_avg_pwr_cwblkg(const std::uint8_t* bytes,
+                                         int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 

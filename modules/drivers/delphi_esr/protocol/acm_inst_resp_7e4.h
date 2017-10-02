@@ -26,38 +26,53 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Acminstresp7e4 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Acminstresp7e4();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
-
-  // config detail: {'name': 'Data_7', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'Data_7', 'offset': 0.0, 'precision': 1.0, 'len':
+  // 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type':
+  // 'int', 'order': 'motorola', 'physical_unit': ''}
   int data_7(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'Data_6', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'Data_6', 'offset': 0.0, 'precision': 1.0, 'len':
+  // 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 55, 'type':
+  // 'int', 'order': 'motorola', 'physical_unit': ''}
   int data_6(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'Data_5', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 47, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'Data_5', 'offset': 0.0, 'precision': 1.0, 'len':
+  // 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 47, 'type':
+  // 'int', 'order': 'motorola', 'physical_unit': ''}
   int data_5(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'Data_4', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'Data_4', 'offset': 0.0, 'precision': 1.0, 'len':
+  // 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39, 'type':
+  // 'int', 'order': 'motorola', 'physical_unit': ''}
   int data_4(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'Data_3', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'Data_3', 'offset': 0.0, 'precision': 1.0, 'len':
+  // 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31, 'type':
+  // 'int', 'order': 'motorola', 'physical_unit': ''}
   int data_3(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'rtn_cmd_counter', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'rtn_cmd_counter', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 23,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int rtn_cmd_counter(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'command_return_code', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 15, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int command_return_code(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'command_return_code', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
+  // 15, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  int command_return_code(const std::uint8_t* bytes,
+                          const int32_t length) const;
 
-  // config detail: {'name': 'PID', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'PID', 'offset': 0.0, 'precision': 1.0, 'len': 8,
+  // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int',
+  // 'order': 'motorola', 'physical_unit': ''}
   int pid(const std::uint8_t* bytes, const int32_t length) const;
 };
 
