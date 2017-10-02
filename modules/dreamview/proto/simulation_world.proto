@@ -136,6 +136,9 @@ message Object {
 
   optional Type type = 25;  // obstacle type
   repeated Prediction prediction = 26;
+
+  // perception confidence level. Range: [0,1]
+  optional double confidence = 27 [default = 1];
 }
 
 message DelayItem {
