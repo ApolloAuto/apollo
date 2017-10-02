@@ -35,7 +35,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
-  trajectories_.clear();
+  Clear();
+
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 

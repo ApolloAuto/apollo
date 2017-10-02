@@ -14,17 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
+/**
+ * @file
+ **/
+
+#include "modules/planning/tasks/traffic_decider/object_priority.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
-namespace prediction {
+namespace planning {
 
-void MoveSequencePredictor::Predict(Obstacle* obstacle) {
-  Clear();
+ObjectPriority::ObjectPriority(const RuleConfig& config)
+    : TrafficRule(config) {}
 
-  CHECK_NOTNULL(obstacle);
-  CHECK_GT(obstacle->history_size(), 0);
+bool ObjectPriority::ApplyRule(Frame* frame,
+                                ReferenceLineInfo* const reference_line_info) {
+  return true;
 }
 
-}  // namespace prediction
+}  // namespace planning
 }  // namespace apollo
