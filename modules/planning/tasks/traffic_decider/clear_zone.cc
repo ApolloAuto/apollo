@@ -43,10 +43,17 @@ bool ClearZone::ApplyRule(Frame* frame,
   frame_ = frame;
   reference_line_info_ = reference_line_info;
   const auto& map_path = reference_line_info_->reference_line().map_path();
-  const auto& clear_zones = map_path.junction_overlaps();
-  for (const auto& clear_zone : clear_zones) {
+  for (const auto& clear_zone : map_path.junction_overlaps()) {
     if (!BuildClearZoneObstacle(clear_zone)) {
-      AERROR << "Failed to build clear zone : " << clear_zone.object_id;
+      AERROR << "Failed to build junction clear zone : "
+             << clear_zone.object_id;
+      return false;
+    }
+  }
+  for (const auto& clear_zone : map_path.crosswalk_overlaps()) {
+    if (!BuildClearZoneObstacle(clear_zone)) {
+      AERROR << "Failed to build crosswalk clear zone : "
+             << clear_zone.object_id;
       return false;
     }
   }
