@@ -37,7 +37,7 @@ class Prediction:
         self.planning_pb = planning_pb
 
     def compute_prediction_path_data(self):
-        print "     --- computing prediction path"
+        #print "     --- computing prediction path BEGIN"
         prediction_path_data_x = []
         prediction_path_data_y = []
         prediction_polygons = []
@@ -65,14 +65,12 @@ class Prediction:
             prediction_path_data_x.append(each_path_x)
             prediction_path_data_y.append(each_path_y)
             prediction_polygons.append(each_polygon)
-            break
-
         self.prediction_lock.acquire()
         self.prediction_path_data_x = prediction_path_data_x
         self.prediction_path_data_y = prediction_path_data_y
         self.prediction_polygons = prediction_polygons
         self.prediction_lock.release()
-        print "     --- computing prediction path OUTOUTOUT"
+        #print "     --- computing prediction path END"
     # End of compute_prediction_path_data
 
     def get_vehicle_polygon(self, length, width, position, heading):
