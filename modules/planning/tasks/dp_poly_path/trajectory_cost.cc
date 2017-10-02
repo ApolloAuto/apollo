@@ -54,7 +54,7 @@ TrajectoryCost::TrajectoryCost(
       continue;
     }
     const auto ptr_obstacle = ptr_path_obstacle->obstacle();
-    if (ptr_obstacle->PerceptionId() < 0) {
+    if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obsatcle
       continue;
     }
