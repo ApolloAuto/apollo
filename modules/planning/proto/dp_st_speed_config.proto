@@ -40,4 +40,6 @@ message DpStSpeedConfig {
   optional double max_deceleration = 22 [ default = -4.5 ];
 
   optional apollo.planning.StBoundaryConfig st_boundary_config = 33;
+
+  optional double keep_clear_cost_factor = 50 [ default = 1000.0 ];
 }
