@@ -26,29 +26,42 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Esrstatus34e2 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrstatus34e2();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
+  // config detail: {'name': 'CAN_TX_SW_VERSION_PLD', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // ''}
+  int can_tx_sw_version_pld(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SW_VERSION_PLD', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_sw_version_pld(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_SW_VERSION_HOST', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 24, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 15, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // ''}
+  int can_tx_sw_version_host(const std::uint8_t* bytes,
+                             const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SW_VERSION_HOST', 'offset': 0.0, 'precision': 1.0, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 15, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_sw_version_host(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'CAN_TX_HW_VERSION', 'offset': 0.0, 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 3, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_HW_VERSION', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 4, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 3,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_hw_version(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_INTERFACE_VERSION', 'offset': 0.0, 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_interface_version(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_INTERFACE_VERSION', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  int can_tx_interface_version(const std::uint8_t* bytes,
+                               const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SERIAL_NUM', 'offset': 0.0, 'precision': 1.0, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_SERIAL_NUM', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
+  // 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_serial_num(const std::uint8_t* bytes, const int32_t length) const;
 };
 

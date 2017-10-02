@@ -26,30 +26,46 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Esrvalid25d1 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrvalid25d1();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
-
-  // config detail: {'name': 'CAN_TX_VALID_MR_SN', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_VALID_MR_SN', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_valid_mr_sn(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_VALID_MR_RANGE_RATE', 'offset': 0.0, 'precision': 0.0078125, 'len': 16, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
-  double can_tx_valid_mr_range_rate(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_VALID_MR_RANGE_RATE', 'offset': 0.0,
+  // 'precision': 0.0078125, 'len': 16, 'is_signed_var': True, 'physical_range':
+  // '[-128|127]', 'bit': 31, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'm/s'}
+  double can_tx_valid_mr_range_rate(const std::uint8_t* bytes,
+                                    const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_VALID_MR_RANGE', 'offset': 0.0, 'precision': 0.0078125, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|200]', 'bit': 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-  double can_tx_valid_mr_range(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_VALID_MR_RANGE', 'offset': 0.0,
+  // 'precision': 0.0078125, 'len': 16, 'is_signed_var': False,
+  // 'physical_range': '[0|200]', 'bit': 15, 'type': 'double', 'order':
+  // 'motorola', 'physical_unit': 'm'}
+  double can_tx_valid_mr_range(const std::uint8_t* bytes,
+                               const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_VALID_MR_POWER', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': True, 'physical_range': '[-10|40]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': 'dB'}
-  int can_tx_valid_mr_power(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_VALID_MR_POWER', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': True, 'physical_range':
+  // '[-10|40]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
+  // 'dB'}
+  int can_tx_valid_mr_power(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_VALID_MR_ANGLE', 'offset': 0.0, 'precision': 0.0625, 'len': 16, 'is_signed_var': True, 'physical_range': '[-64|63.9375]', 'bit': 47, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-  double can_tx_valid_mr_angle(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_VALID_MR_ANGLE', 'offset': 0.0,
+  // 'precision': 0.0625, 'len': 16, 'is_signed_var': True, 'physical_range':
+  // '[-64|63.9375]', 'bit': 47, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'deg'}
+  double can_tx_valid_mr_angle(const std::uint8_t* bytes,
+                               const int32_t length) const;
 };
 
 }  // namespace delphi_esr

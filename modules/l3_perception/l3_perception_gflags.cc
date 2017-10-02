@@ -24,22 +24,37 @@ DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
 DEFINE_double(l3_perception_freq, 100, "L3 perception timer frequency.");
 
-DEFINE_double(mobileye_pos_adjust, 3.0, "adjust mobileye objects's position due to distance between mobileye and gps.");
-DEFINE_double(delphi_esr_pos_adjust, 3.0, "adjust radar objects's position due to distance between radar and gps.");
+DEFINE_double(mobileye_pos_adjust, 3.0,
+              "adjust mobileye objects's position due to distance between "
+              "mobileye and gps.");
+DEFINE_double(
+    delphi_esr_pos_adjust, 3.0,
+    "adjust radar objects's position due to distance between radar and gps.");
 
 DEFINE_double(default_car_length, 5.0, "default car length for bounding box.");
-DEFINE_double(default_truck_length, 10.0, "default truck length for bounding box.");
-DEFINE_double(default_bike_length, 2.0, "default bike length for bounding box.");
+DEFINE_double(default_truck_length, 10.0,
+              "default truck length for bounding box.");
+DEFINE_double(default_bike_length, 2.0,
+              "default bike length for bounding box.");
 DEFINE_double(default_ped_length, 0.5, "default ped length for bounding box.");
-DEFINE_double(default_unknown_length, 5.0, "default unknown length for bounding box.");
+DEFINE_double(default_unknown_length, 5.0,
+              "default unknown length for bounding box.");
 DEFINE_double(default_car_width, 3.0, "default car width for bounding box.");
-DEFINE_double(default_truck_width, 5.0, "default truck width for bounding box.");
+DEFINE_double(default_truck_width, 5.0,
+              "default truck width for bounding box.");
 DEFINE_double(default_bike_width, 1.0, "default bike width for bounding box.");
 DEFINE_double(default_ped_width, 0.5, "default ped width for bounding box.");
-DEFINE_double(default_unknown_width, 3.0, "default unknown width for bounding box.");
+DEFINE_double(default_unknown_width, 3.0,
+              "default unknown width for bounding box.");
 
-DEFINE_double(filter_y_distance, 7.5, "fiter the radar objects far away from the main vehicle on y-axis.");
-DEFINE_double(fusion_x_distance, 5.0, "fuse mobileye and radar if they are away less than this distance.");
-DEFINE_double(fusion_y_distance, 2.0, "fuse mobileye and radar if they are away less than this distance.");
+DEFINE_double(
+    filter_y_distance, 7.5,
+    "fiter the radar objects far away from the main vehicle on y-axis.");
+DEFINE_double(
+    fusion_x_distance, 5.0,
+    "fuse mobileye and radar if they are away less than this distance.");
+DEFINE_double(
+    fusion_y_distance, 2.0,
+    "fuse mobileye and radar if they are away less than this distance.");
 
 DEFINE_int32(keep_delphi_esr_frames, 5, "number of delphi esr frames to keep");

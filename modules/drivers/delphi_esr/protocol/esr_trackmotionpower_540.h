@@ -26,24 +26,30 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Esrtrackmotionpower540 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrtrackmotionpower540();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
-
-  // config detail: {'name': 'CAN_TX_TRACK_ROLLING_COUNT_2', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool can_tx_track_rolling_count_2(const std::uint8_t* bytes, const int32_t length) const;
-  int32_t can_tx_track_can_id_group(const std::uint8_t* bytes, int32_t length) const;
-  bool can_tx_track_moving(const std::uint8_t* bytes, int32_t length, int32_t index) const;
-  bool can_tx_track_moving_fast(const std::uint8_t* bytes, int32_t length, int32_t index) const;
-  bool can_tx_track_moving_slow(const std::uint8_t* bytes, int32_t length, int32_t index) const;
-  int32_t can_tx_track_power(const std::uint8_t* bytes, int32_t length, int32_t index) const;
-
+  // config detail: {'name': 'CAN_TX_TRACK_ROLLING_COUNT_2', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
+  bool can_tx_track_rolling_count_2(const std::uint8_t* bytes,
+                                    const int32_t length) const;
+  int32_t can_tx_track_can_id_group(const std::uint8_t* bytes,
+                                    int32_t length) const;
+  bool can_tx_track_moving(const std::uint8_t* bytes, int32_t length,
+                           int32_t index) const;
+  bool can_tx_track_moving_fast(const std::uint8_t* bytes, int32_t length,
+                                int32_t index) const;
+  bool can_tx_track_moving_slow(const std::uint8_t* bytes, int32_t length,
+                                int32_t index) const;
+  int32_t can_tx_track_power(const std::uint8_t* bytes, int32_t length,
+                             int32_t index) const;
 };
 
 }  // namespace delphi_esr
