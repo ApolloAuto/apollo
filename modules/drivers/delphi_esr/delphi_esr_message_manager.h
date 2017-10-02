@@ -50,7 +50,6 @@
 #include "modules/drivers/delphi_esr/protocol/vehicle5_5f4.h"
 #include "modules/drivers/delphi_esr/protocol/vehicle6_5f5.h"
 
-
 namespace apollo {
 namespace drivers {
 
@@ -71,7 +70,8 @@ SensorMessageManager<DelphiESR>::SensorMessageManager() {
   AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrstatus85e7, true>();
   AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrstatus95e8, true>();
   AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrtrack01500, true>();
-  AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrtrackmotionpower540, true>();
+  AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrtrackmotionpower540,
+                      true>();
   AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrvalid15d0, true>();
   AddRecvProtocolData<::apollo::drivers::delphi_esr::Esrvalid25d1, true>();
   AddRecvProtocolData<::apollo::drivers::delphi_esr::Vehicle14f0, true>();

@@ -43,8 +43,9 @@ using ::apollo::perception::PerceptionObstacle;
 double GetAngleFromQuaternion(const Quaternion quaternion);
 
 void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
-                           const double mid_x, const double mid_y, const double mid_z,
-                           const double length, const double width, const double height,
+                           const double mid_x, const double mid_y,
+                           const double mid_z, const double length,
+                           const double width, const double height,
                            const double heading);
 
 // TODO(lizh): change it to PerceptionObstacle::VEHICLE or so
@@ -59,15 +60,14 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
-Point SLtoXY(const Point point, const double theta); 
+Point SLtoXY(const Point point, const double theta);
 
-double Distance(const Point& point1, const Point& point2); 
+double Distance(const Point& point1, const Point& point2);
 
-double GetNearestLaneHeading(const Point& point); 
+double GetNearestLaneHeading(const Point& point);
 
 double GetLateralDistanceToNearestLane(const Point& point);
 }  // namespace l3_perception
 }  // namespace apollo
 
 #endif  // MODULES_L3_PERCEPTION_L3_PERCEPTION_UTIL_H_
-

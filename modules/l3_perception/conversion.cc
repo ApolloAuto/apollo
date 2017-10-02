@@ -18,6 +18,8 @@
  * @file
  */
 
+#include <vector>
+
 #include "modules/l3_perception/conversion.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
 #include "modules/l3_perception/l3_perception_util.h"
@@ -71,7 +73,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
     // TODO(lizh): calibrate mobileye and make those consts FLAGS
     mob_pos_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
-    mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
+    mob_pos_x += mob_l / 2.0;  // make x the middle point of the vehicle.
 
     Point sl_point;
     sl_point.set_x(mob_pos_x);
@@ -142,7 +144,8 @@ RadarObstacles DelphiToRadarObstacles(
     const std::queue<RadarObstacles>& last_radar_obstacles) {
   RadarObstacles obstacles;
 
-  const double last_timestamp = last_radar_obstacles.front().header().timestamp_sec();
+  const double last_timestamp =
+      last_radar_obstacles.front().header().timestamp_sec();
   const double current_timestamp = delphi_esr.header().timestamp_sec();
 
   // assign motion power from 540
@@ -186,9 +189,10 @@ RadarObstacles DelphiToRadarObstacles(
     const double range = data_500.can_tx_track_range();
     const double angle = data_500.can_tx_track_angle() * L3_PI / 180.0;
     Point relative_pos_sl;
-    relative_pos_sl.set_x(range * std::cos(angle) + 
-          FLAGS_delphi_esr_pos_adjust +  // offset: imu <-> mobileye
-          rob.length() / 2.0);  // make x the middle point of the vehicle
+    relative_pos_sl.set_x(
+        range * std::cos(angle) +
+        FLAGS_delphi_esr_pos_adjust +  // offset: imu <-> mobileye
+        rob.length() / 2.0);           // make x the middle point of the vehicle
     relative_pos_sl.set_y(range * std::sin(angle));
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
 
@@ -201,12 +205,13 @@ RadarObstacles DelphiToRadarObstacles(
 
     const double range_vel = data_500.can_tx_track_range_rate();
     const double lateral_vel = data_500.can_tx_track_lat_rate();
-    rob.mutable_relative_velocity()->set_x(range_vel * std::cos(angle) - 
-                                            lateral_vel * std::sin(angle)); 
-    rob.mutable_relative_velocity()->set_y(range_vel * std::sin(angle) + 
-                                            lateral_vel * std::cos(angle)); 
+    rob.mutable_relative_velocity()->set_x(range_vel * std::cos(angle) -
+                                           lateral_vel * std::sin(angle));
+    rob.mutable_relative_velocity()->set_y(range_vel * std::sin(angle) +
+                                           lateral_vel * std::cos(angle));
 
-    const auto iter_back = last_radar_obstacles.back().radar_obstacle().find(index);
+    const auto iter_back =
+        last_radar_obstacles.back().radar_obstacle().find(index);
     if (iter_back == last_radar_obstacles.back().radar_obstacle().end()) {
       rob.set_count(0);
     } else {
@@ -214,7 +219,8 @@ RadarObstacles DelphiToRadarObstacles(
     }
 
     Point absolute_vel;
-    const auto iter_front = last_radar_obstacles.front().radar_obstacle().find(index);
+    const auto iter_front =
+        last_radar_obstacles.front().radar_obstacle().find(index);
     if (iter_front == last_radar_obstacles.front().radar_obstacle().end()) {
       // new in the current frame
       absolute_vel.set_x(0.0);
@@ -255,7 +261,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 
     pob->mutable_position()->CopyFrom(radar_obstacle.absolute_position());
     pob->mutable_velocity()->CopyFrom(radar_obstacle.absolute_velocity());
-    
+
     Point xy_point;
     xy_point.set_x(pob->position().x());
     xy_point.set_y(pob->position().y());
@@ -269,9 +275,8 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     double mid_z = pob->position().z();
     double heading = pob->theta();
 
-    FillPerceptionPolygon(pob, mid_x, mid_y, mid_z, 
-                          pob->length(), pob->width(), pob->height(),
-                          heading);
+    FillPerceptionPolygon(pob, mid_x, mid_y, mid_z, pob->length(), pob->width(),
+                          pob->height(), heading);
 
     pob->set_confidence(0.5);
   }
@@ -281,6 +286,6 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
   return obstacles;
 }
 
-}  // namespace conversion 
+}  // namespace conversion
 }  // namespace l3_perception
 }  // namespace apollo

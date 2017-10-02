@@ -26,36 +26,56 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-
 class Esrstatus14e0 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrstatus14e0();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     DelphiESR* delphi_esr) const override;
+             DelphiESR* delphi_esr) const override;
 
  private:
+  // config detail: {'name': 'CAN_TX_DSP_TIMESTAMP', 'offset': 0.0, 'precision':
+  // 2.0, 'len': 7, 'is_signed_var': False, 'physical_range': '[0|254]', 'bit':
+  // 5, 'type': 'double', 'order': 'motorola', 'physical_unit': 'ms'}
+  double can_tx_dsp_timestamp(const std::uint8_t* bytes,
+                              const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_DSP_TIMESTAMP', 'offset': 0.0, 'precision': 2.0, 'len': 7, 'is_signed_var': False, 'physical_range': '[0|254]', 'bit': 5, 'type': 'double', 'order': 'motorola', 'physical_unit': 'ms'}
-  double can_tx_dsp_timestamp(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'CAN_TX_COMM_ERROR', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 14, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_COMM_ERROR', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
+  // 14, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
   bool can_tx_comm_error(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_YAW_RATE_CALC', 'offset': 0.0, 'precision': 0.0625, 'len': 12, 'is_signed_var': True, 'physical_range': '[-128|127.9375]', 'bit': 47, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg/s'}
-  double can_tx_yaw_rate_calc(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_YAW_RATE_CALC', 'offset': 0.0, 'precision':
+  // 0.0625, 'len': 12, 'is_signed_var': True, 'physical_range':
+  // '[-128|127.9375]', 'bit': 47, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'deg/s'}
+  double can_tx_yaw_rate_calc(const std::uint8_t* bytes,
+                              const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_VEHICLE_SPEED_CALC', 'offset': 0.0, 'precision': 0.0625, 'len': 11, 'is_signed_var': False, 'physical_range': '[0|127.9375]', 'bit': 50, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
-  double can_tx_vehicle_speed_calc(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_VEHICLE_SPEED_CALC', 'offset': 0.0,
+  // 'precision': 0.0625, 'len': 11, 'is_signed_var': False, 'physical_range':
+  // '[0|127.9375]', 'bit': 50, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'm/s'}
+  double can_tx_vehicle_speed_calc(const std::uint8_t* bytes,
+                                   const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_SCAN_INDEX', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'CAN_TX_SCAN_INDEX', 'offset': 0.0, 'precision':
+  // 1.0, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
+  // 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int can_tx_scan_index(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_ROLLING_COUNT_1', 'offset': 0.0, 'precision': 1.0, 'len': 2, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int can_tx_rolling_count_1(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_ROLLING_COUNT_1', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 2, 'is_signed_var': False, 'physical_range':
+  // '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  int can_tx_rolling_count_1(const std::uint8_t* bytes,
+                             const int32_t length) const;
 
-  // config detail: {'name': 'CAN_TX_RADIUS_CURVATURE_CALC', 'offset': 0.0, 'precision': 1.0, 'len': 14, 'is_signed_var': True, 'physical_range': '[-8192|8191]', 'bit': 13, 'type': 'int', 'order': 'motorola', 'physical_unit': 'm'}
-  int can_tx_radius_curvature_calc(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'CAN_TX_RADIUS_CURVATURE_CALC', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 14, 'is_signed_var': True, 'physical_range':
+  // '[-8192|8191]', 'bit': 13, 'type': 'int', 'order': 'motorola',
+  // 'physical_unit': 'm'}
+  int can_tx_radius_curvature_calc(const std::uint8_t* bytes,
+                                   const int32_t length) const;
 };
 
 }  // namespace delphi_esr

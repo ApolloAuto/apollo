@@ -20,11 +20,11 @@
 
 #include <cmath>
 
-#include "modules/l3_perception/l3_perception_util.h"
+#include "modules/common/log.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
+#include "modules/l3_perception/l3_perception_util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/common/log.h"
 
 /**
  * @namespace apollo::l3_perception
@@ -37,18 +37,19 @@ namespace l3_perception {
 using apollo::hdmap::HDMapUtil;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
-  double theta =
-    std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
-                   quaternion.qx() * quaternion.qy(),
-               1.0 - 2.0 * (quaternion.qy() * quaternion.qy() +
-                   quaternion.qz() * quaternion.qz())) +
-                   std::acos(-1.0) / 2.0;
+  double theta = std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
+                                quaternion.qx() * quaternion.qy(),
+                            1.0 -
+                                2.0 * (quaternion.qy() * quaternion.qy() +
+                                       quaternion.qz() * quaternion.qz())) +
+                 std::acos(-1.0) / 2.0;
   return theta;
 }
 
 void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
-                           const double mid_x, const double mid_y, const double mid_z,
-                           const double length, const double width, const double height,
+                           const double mid_x, const double mid_y,
+                           const double mid_z, const double length,
+                           const double width, const double height,
                            const double heading) {
   // Generate a 2D cube whose vertices are given in counter-clock order when
   // viewed from top
@@ -121,16 +122,19 @@ double GetDefaultObjectWidth(const int object_type) {
 
 Point SLtoXY(const Point point, const double theta) {
   Point converted_point;
-  converted_point.set_x(point.x() * std::cos(theta) + point.y() * std::sin(theta));
-  converted_point.set_y(point.x() * std::sin(theta) - point.y() * std::cos(theta));
+  converted_point.set_x(point.x() * std::cos(theta) +
+                        point.y() * std::sin(theta));
+  converted_point.set_y(point.x() * std::sin(theta) -
+                        point.y() * std::cos(theta));
   return converted_point;
 }
 
 double Distance(const Point& point1, const Point& point2) {
-  double distance = std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
-                              (point1.y() - point2.y()) * (point1.y() - point2.y()));  
+  double distance =
+      std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
+                (point1.y() - point2.y()) * (point1.y() - point2.y()));
   return distance;
-} 
+}
 
 double GetNearestLaneHeading(const Point& point) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
@@ -150,7 +154,7 @@ double GetNearestLaneHeading(const Point& point) {
 
   int status =
       hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
-  //TODO(lizh): make it a formal status below
+  // TODO(lizh): make it a formal status below
   if (status != 0) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
     return -1.0;
@@ -177,7 +181,7 @@ double GetLateralDistanceToNearestLane(const Point& point) {
 
   int status =
       hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
-  //TODO(lizh): make it a formal status below
+  // TODO(lizh): make it a formal status below
   if (status != 0) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
     return -1.0;
@@ -188,5 +192,3 @@ double GetLateralDistanceToNearestLane(const Point& point) {
 
 }  // namespace l3_perception
 }  // namespace apollo
-
-
