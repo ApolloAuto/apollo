@@ -87,6 +87,8 @@ cc_library(
     deps = [
         ":l3_perception_gflags",
         ":l3_perception_util",
+        "//modules/common/math:polygon2d",
+        "//modules/common/math:vec2d",
         "//modules/perception/proto:perception_proto",
     ],
 )
