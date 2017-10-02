@@ -25,6 +25,48 @@
 namespace apollo {
 namespace planning {
 
+TEST(Spline1dKernel, add_regularization) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 4;
+  Spline1dKernel kernel(x_knots, spline_order);
+
+  std::vector<double> x_coord = {0.0, 1.0, 2.0, 3.0};
+  kernel.AddRegularization(0.2);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_coord.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(12, 12);
+  // clang-format off
+  ref_kernel_matrix <<
+      0.2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+        0, 0.2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+        0,   0, 0.2,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+        0,   0,   0, 0.2,   0,   0,   0,   0,   0,   0,   0,   0,
+        0,   0,   0,   0, 0.2,   0,   0,   0,   0,   0,   0,   0,
+        0,   0,   0,   0,   0, 0.2,   0,   0,   0,   0,   0,   0,
+        0,   0,   0,   0,   0,   0, 0.2,   0,   0,   0,   0,   0,
+        0,   0,   0,   0,   0,   0,   0, 0.2,   0,   0,   0,   0,
+        0,   0,   0,   0,   0,   0,   0,   0, 0.2,   0,   0,   0,
+        0,   0,   0,   0,   0,   0,   0,   0,   0, 0.2,   0,   0,
+        0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0.2,   0,
+        0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0.2;
+  // clang-format on
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), ref_kernel_matrix(i, j));
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(12, 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
+
 TEST(Spline1dKernel, add_reference_line_kernel) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
   int32_t spline_order = 5;
@@ -36,6 +78,7 @@ TEST(Spline1dKernel, add_reference_line_kernel) {
   std::vector<double> ref_x = {0.0, 0.5, 0.6, 2.0};
   kernel.AddReferenceLineKernelMatrix(x_coord, ref_x, 1.0);
 
+  std::cout << kernel.kernel_matrix() << std::endl;
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(15, 15);
   ref_kernel_matrix << 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
