@@ -19,6 +19,11 @@
  */
 
 #include "modules/l3_perception/fusion.h"
+
+#include <vector>
+
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
 #include "modules/l3_perception/l3_perception_util.h"
 
@@ -30,16 +35,30 @@ namespace apollo {
 namespace l3_perception {
 namespace fusion {
 
-using ::apollo::l3_perception::Distance;
+using ::apollo::common::math::Vec2d;
+
+std::vector<Vec2d> PerceptionObstacleToVectorVec2d(
+    const PerceptionObstacle& obstacle) {
+  std::vector<Vec2d> result;
+  for (const auto& vertex : obstacle.polygon_point()) {
+    result.emplace_back(vertex.x(), vertex.y());
+  }
+  return result;
+}
+
+bool HasOverlap(const PerceptionObstacle& obstacle_1,
+                const PerceptionObstacle& obstacle_2) {
+  common::math::Polygon2d polygon_1(
+      PerceptionObstacleToVectorVec2d(obstacle_1));
+  common::math::Polygon2d polygon_2(
+      PerceptionObstacleToVectorVec2d(obstacle_2));
+  return polygon_1.HasOverlap(polygon_2);
+}
 
 bool HasOverlap(const PerceptionObstacle& obstacle,
                 const PerceptionObstacles& obstacles) {
-  // TODO(rongqiqiu): compute distances according to bboxes
   for (const auto& current_obstacle : obstacles.perception_obstacle()) {
-    if (std::abs(current_obstacle.position().x() - obstacle.position().x()) <
-            FLAGS_fusion_x_distance &&
-        std::abs(current_obstacle.position().y() - obstacle.position().y()) <
-            FLAGS_fusion_y_distance) {
+    if (HasOverlap(obstacle, current_obstacle)) {
       return true;
     }
   }
@@ -49,21 +68,28 @@ bool HasOverlap(const PerceptionObstacle& obstacle,
 PerceptionObstacles MobileyeRadarFusion(
     const PerceptionObstacles& mobileye_obstacles,
     const PerceptionObstacles& radar_obstacles) {
-  PerceptionObstacles merged_obstacles;
-  merged_obstacles.MergeFrom(mobileye_obstacles);
-  merged_obstacles.MergeFrom(radar_obstacles);
+  PerceptionObstacles mobileye_obstacles_fusion;
+  mobileye_obstacles_fusion.CopyFrom(mobileye_obstacles);
+  PerceptionObstacles radar_obstacles_fusion;
+  radar_obstacles_fusion.CopyFrom(radar_obstacles);
 
-  PerceptionObstacles obstacles;
-  obstacles.mutable_header()->CopyFrom(merged_obstacles.header());
-  for (const auto& current_obstacle : merged_obstacles.perception_obstacle()) {
-    if (!HasOverlap(current_obstacle, obstacles)) {
-      auto* obstacle = obstacles.add_perception_obstacle();
-      obstacle->CopyFrom(current_obstacle);
-      // TODO(rongqiqiu): compute confidence scores
-      obstacle->set_type(PerceptionObstacle::VEHICLE);
+  for (auto& mobileye_obstacle :
+       *(mobileye_obstacles_fusion.mutable_perception_obstacle())) {
+    for (auto& radar_obstacle :
+         *(radar_obstacles_fusion.mutable_perception_obstacle())) {
+      if (HasOverlap(mobileye_obstacle, radar_obstacle)) {
+        mobileye_obstacle.set_confidence(0.99);
+        mobileye_obstacle.set_type(PerceptionObstacle::BICYCLE);
+
+        radar_obstacle.set_confidence(0.99);
+        radar_obstacle.set_type(PerceptionObstacle::BICYCLE);
+      }
     }
   }
 
+  PerceptionObstacles obstacles;
+  obstacles.MergeFrom(mobileye_obstacles_fusion);
+  obstacles.MergeFrom(radar_obstacles_fusion);
   return obstacles;
 }
 
