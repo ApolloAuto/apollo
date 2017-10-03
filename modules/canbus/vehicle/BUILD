@@ -16,6 +16,7 @@ cc_library(
         "//modules/canbus/vehicle:message_manager_base",
         "//modules/common/proto:error_code_proto",
         "//modules/control/proto:control_proto",
+        
     ],
 )
 
