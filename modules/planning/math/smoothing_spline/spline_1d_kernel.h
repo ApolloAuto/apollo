@@ -61,7 +61,7 @@ class Spline1dKernel {
                                     const double weight);
 
   // distance offset (for speed optimizer, given time optimize the distance can
-  // go);
+  // go)
   void AddDistanceOffset(const double weight);
 
  private:
