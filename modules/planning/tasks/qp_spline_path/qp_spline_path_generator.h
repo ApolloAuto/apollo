@@ -52,8 +52,8 @@ class QpSplinePathGenerator {
                 PathData* const path_data);
 
  private:
-  bool CalculateInitFrenetPoint(const common::TrajectoryPoint& traj_point,
-                                common::FrenetFramePoint* const sl_point);
+  bool CalculateFrenetPoint(const common::TrajectoryPoint& traj_point,
+                            common::FrenetFramePoint* const sl_point);
 
   bool InitSpline(const double start_s, const double end_s);
 
