@@ -34,6 +34,10 @@ DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 5.0,
               "Minimal length of prediction trajectory");
 
+// Bag replay timestamp gap
+DEFINE_double(replay_timestamp_gap, 10.0,
+              "Max timestamp gap for rosbag replay");
+
 // Map
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 
@@ -41,7 +45,7 @@ DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
 DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
 DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
-DEFINE_double(max_speed, 15.0, "Max speed");
+DEFINE_double(max_speed, 35.0, "Max speed");
 DEFINE_double(q_var, 0.01, "Processing noise covariance");
 DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
@@ -72,7 +76,7 @@ DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(vehicle_model_file,
               "modules/prediction/data/mlp_vehicle_model.bin",
               "Vehicle model file");
-DEFINE_int32(max_num_obstacles_stored, 100,
+DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
 
 // Obstacle trajectory

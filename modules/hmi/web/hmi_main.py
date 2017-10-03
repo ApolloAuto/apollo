@@ -16,9 +16,11 @@
 # limitations under the License.
 ###############################################################################
 """Entry point of the server."""
+import os
 import ssl
+import sys
 
-import google.apputils.app
+import gflags
 
 from config import Config
 from ros_bridge_api import RosBridgeApi
@@ -26,8 +28,12 @@ from runtime_status import RuntimeStatus
 import handlers
 
 
-def main(argv):
+def main():
     """App entry point."""
+
+    # Always take Apollo home as working directory.
+    os.chdir(os.path.join(os.path.dirname(__file__), '../../..'))
+
     conf = Config.get_pb()
     # Module initialization.
     RuntimeStatus.reset(True)
@@ -40,8 +46,8 @@ def main(argv):
         kwargs = {
             'server_side': True,
             'ssl_version': ssl.PROTOCOL_TLSv1,
-            'keyfile': Config.get_realpath(https.server_key),
-            'certfile': Config.get_realpath(https.server_cert)
+            'keyfile': https.server_key,
+            'certfile': https.server_cert
         }
         if https.client_cert_required:
             kwargs['cert_reqs'] = ssl.CERT_REQUIRED
@@ -52,4 +58,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    google.apputils.app.run()
+    # Parse gflags before main function.
+    gflags.FLAGS(sys.argv)
+    main()

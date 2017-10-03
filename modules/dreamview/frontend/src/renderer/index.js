@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
+import OrbitControls from "three/examples/js/controls/OrbitControls.js";
+import Stats from "stats.js";
 
 import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
@@ -12,7 +13,6 @@ import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
-import Stats from "stats.js";
 
 class Renderer {
     constructor() {

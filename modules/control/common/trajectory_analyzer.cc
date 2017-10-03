@@ -80,10 +80,10 @@ PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
   size_t index_end =
       index_min + 1 == trajectory_points_.size() ? index_min : index_min + 1;
 
+  const double kEpsilon = 0.001;
   if (index_start == index_end ||
-      math::DoubleCompare(trajectory_points_[index_start].path_point().s(),
-                          trajectory_points_[index_end].path_point().s()) ==
-          0) {
+      std::fabs(trajectory_points_[index_start].path_point().s() -
+                trajectory_points_[index_end].path_point().s()) <= kEpsilon) {
     return TrajectoryPointToPathPoint(trajectory_points_[index_start]);
   }
 

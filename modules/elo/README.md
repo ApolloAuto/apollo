@@ -84,10 +84,10 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
   448 224
   948.617 628.628 1918.64 1924.48 -3.9 0.6 0
   960 604
-  ../config/model/model_binary.caffemodel
-  ../config/model/net.prototxt
+  ../data/model/model_binary.caffemodel
+  ../data/model/net.prototxt
   0 150
-  ../config/hadmap/hadmap.db
+  ../data/hadmap/hadmap.xml
   ```
 * Output format:
 
@@ -99,10 +99,10 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
   ```
   Sample output:
   ```
-  20170628_000038553.jpg
+  20170628_000039131.jpg
   [+] Begin Localization
   [-] End Localization, misc time: 91.95475700ms ####
-  [INFO] GROUNDTRUTH (115.66500838, 38.97777951)   LOCALIZATION (115.66497835, 38.97775830)
+  [INFO] GROUNDTRUTH (133.02665542, 25.40116628)   LOCALIZATION (133.02666082, 25.40117062)
   ```
 
 ### 5. Installation
@@ -115,14 +115,9 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
    sudo apt-get install cmake libhdf5-dev liblmdb-dev libleveldb-dev libatlas-dev libatlas-base-dev libgflags-dev libgoogle-glog-dev libopencv-dev libmatio-dev libcurl4-openssl-dev
    ```
 
-* b. Clone the `localization` repository:
+* b. Find the `elo` in `modules`:
 
-   ```Shell
-   # Make sure to clone with --recursive
-   git clone --recursive repository_apollo-elo
-   
-   # We'll call the directory that you cloned localization into `P_ROOT`
-   ```
+   We'll call the directory `elo` into `P_ROOT`
 
 * c. Compile and run localization:
    
@@ -147,9 +142,7 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
 
 * Test data path:
 
-  [testdata1.zip](http://pan.baidu.com/s/1eSelklW)
-
-  [testdata2.zip](http://pan.baidu.com/s/1i4Nkn3J)
+  [testdata.zip](http://console.bce.baidu.com/apollo/task/download?locale=zh-cn&_=1506053321431#/apollo/home)
 
   unzip testdata in /data folder.
 

@@ -30,7 +30,6 @@
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -44,11 +43,11 @@ using apollo::common::VehicleParam;
 
 namespace {
 
-bool CheckOverlapOnDpStGraph(const std::vector<StBoundary>& boundaries,
+bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
-  for (const auto& boundary : boundaries) {
+  for (const auto* boundary : boundaries) {
     common::math::LineSegment2d seg(p1.point(), p2.point());
-    if (boundary.HasOverlap(seg)) {
+    if (boundary->HasOverlap(seg)) {
       return true;
     }
   }
@@ -100,17 +99,7 @@ Status DpStGraph::Search(PathDecision* const path_decision,
 Status DpStGraph::InitCostTable() {
   uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();
   uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();
-
-  if (Double::Compare(dp_st_speed_config_.total_path_length(), 0.0) == 0) {
-    unit_s_ = 1e-8;
-    dim_s =
-        std::min(dim_s, static_cast<uint32_t>(
-                            dp_st_speed_config_.total_path_length() / unit_s_) +
-                            1);
-  } else {
-    unit_s_ = dp_st_speed_config_.total_path_length() / dim_s;
-  }
-
+  unit_s_ = dp_st_speed_config_.total_path_length() / dim_s;
   unit_t_ = dp_st_speed_config_.total_time() /
             dp_st_speed_config_.matrix_dimension_t();
   DCHECK_GT(dim_s, 2);
@@ -130,7 +119,7 @@ Status DpStGraph::InitCostTable() {
 }
 
 void DpStGraph::CalculatePointwiseCost(
-    const std::vector<StBoundary>& boundaries) {
+    const std::vector<const StBoundary*>& boundaries) {
   // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
   double curr_t = 0.0;
@@ -144,8 +133,7 @@ void DpStGraph::CalculatePointwiseCost(
     for (auto& st_graph_point : cost_table_[i]) {
       double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
                                                      reference_points[i]);
-      double obs_cost =
-          dp_st_cost_.GetObstacleCost(st_graph_point.point(), boundaries);
+      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point, boundaries);
       st_graph_point.SetReferenceCost(ref_cost);
       st_graph_point.SetObstacleCost(obs_cost);
       st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());
@@ -362,8 +350,9 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
   }
   std::reverse(speed_profile.begin(), speed_profile.end());
 
-  if (Double::Compare(speed_profile.front().t(), 0.0) != 0 ||
-      Double::Compare(speed_profile.front().s(), 0.0) != 0) {
+  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+  if (speed_profile.front().t() > kEpsilon ||
+      speed_profile.front().s() > kEpsilon) {
     const std::string msg = "Fail to retrieve speed profile.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

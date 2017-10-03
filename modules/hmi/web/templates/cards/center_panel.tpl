@@ -36,7 +36,7 @@
   <h2 class="panel_header">Modules</h2>
 
   <ul class="list-group">
-    {% for module in conf_pb.modules %}
+    {% for module in conf.get_pb().modules %}
     <li class="list-group-item debug_item
         {% if loop.index % 2 == 0 %} light {% endif %}">
       <div class="item_content" id="module_{{ module.name }}">
@@ -52,7 +52,11 @@
 
 <script>
   function init_modules_panel() {
-    var modules = [{% for module in conf_pb.modules %} '{{ module.name }}', {% endfor %}];
+    var modules = [
+        {% for module in conf.get_pb().modules %}
+          '{{ module.name }}',
+        {% endfor %}
+    ];
     modules.forEach(function(module_name) {
       // Init module switches.
       $btn = $("#module_" + module_name + " .module_switch");

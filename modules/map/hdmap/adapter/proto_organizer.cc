@@ -40,6 +40,8 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
+using apollo::common::util::PairHash;
+
 void ProtoOrganizer::GetRoadElements(std::vector<RoadInternal>* roads) {
   for (auto& road_internal : *roads) {
     // lanes
@@ -228,7 +230,7 @@ void ProtoOrganizer::GetLaneJunctionOverlapElements(
 
 void ProtoOrganizer::GetLaneLaneOverlapElements(
     const std::unordered_map<std::pair<std::string, std::string>,
-                             OverlapWithLane, HashFunc>& lane_lane_overlaps) {
+                             OverlapWithLane, PairHash>& lane_lane_overlaps) {
   std::unordered_set<std::string> close_set;
   for (auto& overlap_lane_pair : lane_lane_overlaps) {
     auto& lane_id = overlap_lane_pair.first.first;
@@ -313,7 +315,7 @@ void ProtoOrganizer::GetOverlapElements(
     const std::vector<RoadInternal>& roads,
     const std::vector<JunctionInternal>& junctions) {
   std::unordered_map<std::pair<std::string, std::string>, OverlapWithLane,
-                     HashFunc>
+                     PairHash>
       lane_lane_overlaps;
   // overlap
   for (auto& road_internal : roads) {

@@ -87,6 +87,8 @@ class Planning : public apollo::common::ApolloApp {
   common::Status InitFrame(const uint32_t sequence_num, const double time_stamp,
                            const common::TrajectoryPoint& init_adc_point);
 
+  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
+
  private:
   // Watch dog timer
   void OnTimer(const ros::TimerEvent&);
@@ -94,6 +96,8 @@ class Planning : public apollo::common::ApolloApp {
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 
   void RegisterPlanners();
+
+  bool HasSignalLight(const PlanningConfig& config);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;

@@ -21,7 +21,7 @@ Each segment ***i*** has accumulated distance $d_i$ along reference line. The tr
 <p>
 $$
 l = f_i(s)
-  = a_{i0} + a_{i1} * s + a_{i2} * s^2 + a_{i3} * s^3 + a_{i4} * s^4 + a_{i5} * s^5   (0 \leq s \leq d_{i})
+  = a_{i0} + a_{i1} \cdot s + a_{i2} \cdot s^2 + a_{i3} \cdot s^3 + a_{i4} \cdot s^4 + a_{i5} \cdot s^5        (0 \leq s \leq d_{i})
 $$
 </p>
 
@@ -39,10 +39,10 @@ QP formulation:
 <p>
 $$
 \begin{aligned}
-& \frac{1}{2}  \cdot x^T \cdot H \cdot x  + f^T \cdot x \\
+minimize  & \frac{1}{2}  \cdot x^T \cdot H \cdot x  + f^T \cdot x \\
 s.t. \qquad & LB \leq x \leq UB \\
       & A_{eq}x = b_{eq} \\
-      & Ax \leq b
+      & Ax \geq b
 \end{aligned}
 $$
 </p>
@@ -50,9 +50,9 @@ Below is the example for converting the cost function into the QP formulaiton.
 <p>
 $$
 f_i(s) ＝
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
-\cdot  
-\begin{vmatrix} 1 \\ s \\ s^2 \\ s^3 \\ s^4 \\ s^5 \end{vmatrix}
+\begin{vmatrix} 1 & s & s^2 & s^3 & s^4 & s^5 \end{vmatrix}
+\cdot
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
 $$
 </p>
 
@@ -60,9 +60,9 @@ And
 <p>
 $$
 f_i'(s) =
-\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
-\cdot  
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix}
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix}
+\cdot
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
 $$
 </p>
 
@@ -73,87 +73,92 @@ $$
 f_i'(s)^2 =
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5}  \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\begin{vmatrix} 0 \\ 1 \\ 2s \\ 3s^2 \\ 4s^3 \\ 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
 </p>
-And 
+then we have,
 <p>
 $$
 \int\limits_{0}^{d_i} f_i'(s)^2 ds ＝
 \int\limits_{0}^{d_i}
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot  
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\begin{vmatrix} 0 \\ 1 \\ 2s \\ 3s^2 \\ 4s^3 \\ 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} ds
 $$
 </p>
 
 
-And
+extract the const outside the integration, we have,
 <p>
 $$
 \int\limits_{0}^{d_i} f'(s)^2 ds ＝
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot 
 \int\limits_{0}^{d_i}  
-\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\begin{vmatrix} 0 \\ 1 \\ 2s \\ 3s^2 \\ 4s^3 \\ 5s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} ds 
+\begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} ds 
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
-</p>
-
-
-And
-<p>
 $$
-\int\limits_{0}^{d_i} 
-f'(s)^2 ds ＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \int\limits_{0}^{d_i}
 \begin{vmatrix} 
 0  & 0 &0&0&0&0\\ 
-0 & 1 & s & s^2 & s^3 & s^4\\
-0 & s & s^2 & s^3 & s^4 & s^5\\
-0 & s^2 &  s^3 & s^4&s^5&s^6 \\
-0 & s^3 & s^4 &s^5 &s^6&s^7 \\
-0 & s^4 & s^5 & s^6 & s^7 & s^8 
+0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4\\
+0 & 2s & 4s^2 & 6s^3 & 8s^4 & 10s^5\\
+0 & 3s^2 &  6s^3 & 9s^4 & 12s^5&15s^6 \\
+0 & 4s^3 & 8s^4 &12s^5 &16s^6&20s^7 \\
+0 & 5s^4 & 10s^5 & 15s^6 & 20s^7 & 25s^8 
 \end{vmatrix} ds 
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 </p>
 
-And
+Finally, we have
+
 <p>
 $$
 \int\limits_{0}^{d_i} 
 f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \begin{vmatrix} 
 0 & 0 & 0 & 0 &0&0\\ 
-0 & d_i & \frac{d_i^2}{2} & \frac{d_i^3}{3} & \frac{d_i^4}{4}&\frac{d_i^5}{5}\\
-0& \frac{d_i^2}{2} & \frac{d_i^3}{3} & \frac{d_i^4}{4} & \frac{d_i^5}{5}&\frac{d_i^6}{6}\\
-0& \frac{d_i^3}{3} & \frac{d_i^4}{4} & \frac{d_i^5}{5} & \frac{d_i^6}{6}&\frac{d_i^7}{7}\\
-0& \frac{d_i^4}{4} & \frac{d_i^5}{5} & \frac{d_i^6}{6} & \frac{d_i^7}{7}&\frac{d_i^8}{8}\\
-0& \frac{d_i^5}{5} & \frac{d_i^6}{6} & \frac{d_i^7}{7} & \frac{d_i^8}{8}&\frac{d_i^9}{9}
+0 & d_i & d_i^2 & d_i^3 & d_i^4&d_i^5\\
+0& d_i^2 & \frac{4}{3}d_i^3& \frac{6}{4}d_i^4 & \frac{8}{5}d_i^5&\frac{10}{6}d_i^6\\
+0& d_i^3 & \frac{6}{4}d_i^4 & \frac{9}{5}d_i^5 & \frac{12}{6}d_i^6&\frac{15}{7}d_i^7\\
+0& d_i^4 & \frac{8}{5}d_i^5 & \frac{12}{6}d_i^6 & \frac{16}{7}d_i^7&\frac{20}{8}d_i^8\\
+0& d_i^5 & \frac{10}{6}d_i^6 & \frac{15}{7}d_i^7 & \frac{20}{8}d_i^8&\frac{25}{9}d_i^9
 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 </p>
 
+Please notice that we got a 10 x 10 matrix to represent the derivative cost of 5th order spline.
+
+
+
+Similar deduction can also be used to calculate the cost of second and third order derivatives.
+
+
+
 ## 2  Constraints  
 
 ### 2.1  The init point constraints
 
-Assume that the first point is ($s_0$, $l_0$), and that $l_0$ is on the planned path $f_i(s)$, $f'i(s)$, and $f_i(s)''$.  Convert those constraints into QP equality constraints, using: 
+Assume that the first point is ($s_0$, $l_0$), ($s_0$, $l'_0$) and ($s_0$, $l''_0$), where $l_0$ , $l'_0$ and $l''_0$ is the lateral offset and its first and second derivatives on the init point of planned path, and are calculated from $f_i(s)$, $f'_i(s)$, and $f_i(s)''$.  
+
+Convert those constraints into QP equality constraints, using: 
 <p>
 $$
 A_{eq}x = b_{eq}
@@ -172,65 +177,49 @@ And
 <p>
 $$
 f'_i(s_0) = 
-\begin{vmatrix} 0& 1 & s_0 & s_0^2 & s_0^3 & s_0^4 \end{vmatrix} 
+\begin{vmatrix} 0& 1 & 2s_0 & 3s_0^2 & 4s_0^3 &5 s_0^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l'_0
 $$
 </p>
 And 
 <p>
 $$
 f''_i(s_0) = 
-\begin{vmatrix} 0&0& 1 & s_0 & s_0^2 & s_0^3  \end{vmatrix} 
+\begin{vmatrix} 0&0& 2 & 3\times2s_0 & 4\times3s_0^2 & 5\times4s_0^3  \end{vmatrix} 
 \cdot 
-\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l_0
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l''_0
 $$
 </p>
-The $i$ is the index of segment that contains the $s_0$.
-
-Therefore the equality constraint is: 
-<p>
-$$
-\begin{vmatrix} 
- 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
- 0&1 & s_0 & s_0^2 & s_0^3 & s_0^4 \\
- 0& 0&1 & s_0 & s_0^2 & s_0^3  
- \end{vmatrix} 
- \cdot 
- \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = 
- \begin{vmatrix}
- l_0\\
- l_0\\
- l_0\\
- \end{vmatrix}
-$$
-</p>
+where i is the index of the segment that contains the $s_0$.
 
 ### 2.2  The end point constraints
 
 Similar to the init point, the end point $(s_e, l_e)$ is known and should produce the same constraint as described in the init point calculations. 
 
+
 Combine the init point and end point, and show the equality constraint as: 
+
 <p>
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
- 0&1 & s_0 & s_0^2 & s_0^3 & s_0^4 \\
- 0& 0&1 & s_0 & s_0^2 & s_0^3  \\
+ 0&1 & 2s_0 & 3s_0^2 & 4s_0^3 & 5s_0^4 \\
+ 0& 0&2 & 3\times2s_0 & 4\times3s_0^2 & 5\times4s_0^3  \\
  1 & s_e & s_e^2 & s_e^3 & s_e^4&s_e^5 \\
- 0&1 & s_e & s_e^2 & s_e^3 & s_e^4 \\
- 0& 0&1 & s_e & s_e^2 & s_e^3  
+ 0&1 & 2s_e & 3s_e^2 & 4s_e^3 & 5s_e^4 \\
+ 0& 0&2 & 3\times2s_e & 4\times3s_e^2 & 5\times4s_e^3  
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} 
  = 
  \begin{vmatrix}
  l_0\\
- l_0\\
- l_0\\
+ l'_0\\
+ l''_0\\
  l_e\\
- l_e\\
- l_e\\
+ l'_e\\
+ l''_e\\
  \end{vmatrix}
 $$
 </p>
@@ -294,7 +283,7 @@ $$
 Evenly sample **m** points along the path, and check the obstacle boundary at those points.  Convert the constraint into QP inequality constraints, using:
 <p>
 $$
-Ax \leq b
+Ax \geq b
 $$
 </p>
 First find the lower boundary $l_{lb,j}$ at those points $(s_j, l_j)$ and  $j\in[0, m]$ based on the road width and surrounding obstacles. Calculate the inequality constraints as:
@@ -306,7 +295,7 @@ $$
  ...&...&...&...&...&... \\
  1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
  \end{vmatrix} \cdot \begin{vmatrix}a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} 
- \leq 
+ \geq 
  \begin{vmatrix}
  l_{lb,0}\\
  l_{lb,1}\\
@@ -321,14 +310,14 @@ Similarly, for the upper boundary $l_{ub,j}$, calculate the inequality constrain
 <p>
 $$
 \begin{vmatrix} 
- 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
-  1 & s_1 & s_1^2 & s_1^3 & s_1^4&s_1^5 \\
- ...&...&...&...&...&... \\
- 1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
+ -1 & -s_0 & -s_0^2 & -s_0^3 & -s_0^4&-s_0^5 \\
+  -1 & -s_1 & -s_1^2 & -s_1^3 & -s_1^4&-s_1^5 \\
+ ...&...-&...&...&...&... \\
+ -1 & -s_m & -s_m^2 & -s_m^3 & -s_m^4&-s_m^5 \\
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} 
- \leq
+ \geq
  -1 \cdot
  \begin{vmatrix}
  l_{ub,0}\\

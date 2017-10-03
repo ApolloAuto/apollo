@@ -48,7 +48,13 @@ if [ ! -e "${DATA_DIR}/core" ]; then
 fi
 
 function main() {
-    docker pull "$IMG"
+    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
+    read -t 10 -n 1 INCHINA
+    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
+        docker pull "registry.docker-cn.com/${IMG}"
+    else
+        docker pull $IMG
+    fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
     if [ $? == 0 ]; then

@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
+#include "modules/planning/proto/qp_st_speed_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/proto/planning_config.pb.h"
@@ -49,7 +49,7 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
 
-  QpSplineStSpeedConfig qp_spline_st_speed_config_;
+  QpStSpeedConfig qp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
 };
 

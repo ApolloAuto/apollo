@@ -27,6 +27,7 @@ import google.protobuf.json_format as json_format
 from config import Config
 from modules.hmi.proto.runtime_status_pb2 import ToolStatus
 import modules.hmi.proto.runtime_status_pb2 as runtime_status_pb2
+import utils
 
 gflags.DEFINE_string('file_to_play', 'data/log/garage.csv',
                      'File to check existence to determine player status.')
@@ -72,14 +73,14 @@ class RuntimeStatus(object):
     @classmethod
     def get_module(cls, module_name):
         """Get module status by name."""
-        mod = cls.__find_by_name(module_name, cls.pb_singleton.modules)
+        mod = utils.find_by_name(module_name, cls.pb_singleton.modules)
         # Init module status if not exist.
         return mod if mod else cls.pb_singleton.modules.add(name=module_name)
 
     @classmethod
     def get_hardware(cls, hardware_name):
         """Get hardware status by name."""
-        hdw = cls.__find_by_name(hardware_name, cls.pb_singleton.hardware)
+        hdw = utils.find_by_name(hardware_name, cls.pb_singleton.hardware)
         # Init hardware status for once.
         return hdw if hdw else cls.pb_singleton.hardware.add(name=hardware_name)
 
@@ -136,7 +137,7 @@ class RuntimeStatus(object):
     @classmethod
     def stat_playable_duration(cls):
         """Stat playable duration."""
-        file_to_play = Config.get_realpath(gflags.FLAGS.file_to_play)
+        file_to_play = gflags.FLAGS.file_to_play
         if os.path.exists(file_to_play):
             with open(file_to_play, 'r') as f:
                 kFreq = 100
@@ -226,8 +227,3 @@ class RuntimeStatus(object):
     def _current_timestamp(cls):
         """Current timestamp in milliseconds."""
         return int(time.time() * 1000)
-
-    @staticmethod
-    def __find_by_name(name, value_list):
-        """Find a value in list by name."""
-        return next((value for value in value_list if value.name == name), None)

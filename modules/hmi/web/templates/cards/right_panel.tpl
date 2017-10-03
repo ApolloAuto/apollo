@@ -15,6 +15,26 @@
   	margin-top: 5px;
   }
 
+  .panel_header .glyphicon-edit {
+    margin-right: 20px;
+    color: #30a5ff
+  }
+
+  .readonly {
+    opacity: 0.65;
+  }
+
+  .modal:before {
+    display: inline-block;
+    vertical-align: middle;
+    content: " ";
+    height: 25%;
+  }
+
+  #confirm_edit_profile_dialog .modal-body {
+    font-size: 16px;
+  }
+
   .dropdown .dropdown-toggle {
     width: 180px;
   }
@@ -47,7 +67,7 @@
   <h2 class="panel_header">Hardware</h2>
 
   <ul class="list-group">
-    {% for hardware in conf_pb.hardware %}
+    {% for hardware in conf.get_pb().hardware %}
       <li class="list-group-item debug_item
           {% if loop.index % 2 == 0 %} light {% endif %}">
         <div class="item_content" id="hardware_{{ hardware.name }}">
@@ -62,44 +82,41 @@
     {% endfor %}
   </ul>
 
-  <h2 class="panel_header">Profile</h2>
+  <h2 class="panel_header">Profile
+    <span class="pull-right glyphicon glyphicon-edit"
+        data-toggle="modal" data-target="#confirm_edit_profile_dialog"></span>
+  </h2>
   <ul class="list-group">
     <li class="list-group-item debug_item">
       <div class="item_content">Map
-        <div class="dropdown pull-right">
-          <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-            <span class="current_map pull-left">Please select</span>
-            <span class="caret pull-right"></span>
-          </button>
-          <ul class="dropdown-menu">
-            {% for map in conf_pb.available_maps %}
-            <li><a onclick="io_request('tool_api', 'switch_map', ['{{ map.name }}'])">
-              {{ map.name }}</a>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
+        <span class="pull-right current_map readonly"></span>
       </div>
     </li>
 
     <li class="list-group-item debug_item light">
       <div class="item_content">Vehicle
-        <div class="dropdown pull-right">
-          <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-            <span class="current_vehicle pull-left">Please select</span>
-            <span class="caret pull-right vcenter"></span>
-          </button>
-          <ul class="dropdown-menu">
-            {% for vehicle in conf_pb.available_vehicles %}
-            <li><a onclick="io_request('tool_api', 'switch_vehicle', ['{{ vehicle.name }}'])">
-              {{ vehicle.name }}</a>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
+        <span class="pull-right current_vehicle readonly"></span>
       </div>
     </li>
   </ul>
+
+<div id="confirm_edit_profile_dialog" class="modal fade" role="dialog" align="center">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <strong>Attention!</strong> You are about to change profile, which will reset running modules!
+      </div>
+
+      <div class="modal-footer">
+        <div class="text-center">
+          <button class="btn hmi_small_btn" data-dismiss="modal"
+              onclick="io_request('tool_api', 'reset_all');">Edit</button>
+          <button class="btn hmi_small_btn" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="profile_dialog" class="modal fade" role="dialog" align="center">
   <div class="modal-dialog">
@@ -119,9 +136,9 @@
                   <span class="caret pull-right"></span>
                 </button>
                 <ul class="dropdown-menu">
-                {% for map in conf_pb.available_maps %}
-                  <li><a onclick="io_request('tool_api', 'switch_map', ['{{ map.name }}'])">
-                    {{ map.name }}
+                {% for map in conf.maps.keys() | sort %}
+                  <li><a onclick="io_request('tool_api', 'switch_map', ['{{ map }}'])">
+                    {{ map }}
                   </a></li>
                 {% endfor %}
                 </ul>
@@ -137,9 +154,9 @@
                   <span class="caret pull-right"></span>
                 </button>
                 <ul class="dropdown-menu">
-                {% for vehicle in conf_pb.available_vehicles %}
-                  <li><a onclick="io_request('tool_api', 'switch_vehicle', ['{{ vehicle.name }}'])">
-                    {{ vehicle.name }}
+                {% for vehicle in conf.vehicles.keys() %}
+                  <li><a onclick="io_request('tool_api', 'switch_vehicle', ['{{ vehicle }}'])">
+                    {{ vehicle }}
                   </a></li>
                 {% endfor %}
                 </ul>

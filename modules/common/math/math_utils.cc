@@ -75,18 +75,6 @@ double RandomDouble(const double s, const double t, unsigned int rand_seed) {
   return s + (t - s) / 16383.0 * (rand_r(&rand_seed) & 16383);
 }
 
-int DoubleCompare(const double d1, const double d2, const double epsilon) {
-  DCHECK(!std::isnan(d1));
-  DCHECK(!std::isnan(d2));
-
-  if ((d1 - d2) > std::fmax(std::fabs(d1), std::fabs(d2)) * epsilon) {
-    return 1;
-  } else if ((d2 - d1) > std::fmax(std::fabs(d1), std::fabs(d2)) * epsilon) {
-    return -1;
-  } else {
-    return 0;
-  }
-}
 // Gaussian
 double Gaussian(const double u, const double std, const double x) {
   return (1.0 / std::sqrt(2 * M_PI * std * std)) *

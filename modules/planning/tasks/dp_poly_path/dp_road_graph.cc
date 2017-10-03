@@ -35,7 +35,6 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/math/double.h"
 #include "modules/planning/tasks/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
@@ -73,6 +72,8 @@ bool DPRoadGraph::FindPathTunnel(
   double accumulated_s = init_sl_point_.s();
   const double path_resolution = config_.path_resolution();
 
+  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+
   for (std::size_t i = 1; i < min_cost_path.size(); ++i) {
     const auto &prev_node = min_cost_path[i - 1];
     const auto &cur_node = min_cost_path[i];
@@ -80,7 +81,7 @@ bool DPRoadGraph::FindPathTunnel(
     const double path_length = cur_node.sl_point.s() - prev_node.sl_point.s();
     double current_s = 0.0;
     const auto &curve = cur_node.min_cost_curve;
-    while (Double::Compare(current_s, path_length) < 0.0) {
+    while (current_s + kEpsilon < path_length) {
       const double l = curve.Evaluate(0, current_s);
       const double dl = curve.Evaluate(1, current_s);
       const double ddl = curve.Evaluate(2, current_s);

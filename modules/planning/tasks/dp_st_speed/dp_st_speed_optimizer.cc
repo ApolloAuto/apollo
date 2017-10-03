@@ -76,17 +76,18 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
-  std::vector<StBoundary> boundaries;
-  if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
+  if (boundary_mapper.GetGraphBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg =
         "Mapping obstacle for dp st speed optimizer failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
-  for (const auto& boundary : boundaries) {
-    path_decision->SetStBoundary(boundary.id(), boundary);
+  std::vector<const StBoundary*> boundaries;
+  for (const auto* obstacle : path_decision->path_obstacles().Items()) {
+    if (!obstacle->st_boundary().IsEmpty()) {
+      boundaries.push_back(&obstacle->st_boundary());
+    }
   }
 
   // step 2 perform graph search
@@ -110,11 +111,11 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     const std::string msg(Name() +
                           ":Failed to search graph with dynamic programming.");
     AERROR << msg;
-    RecordSTGraphDebug(boundaries, speed_limit, *speed_data, st_graph_debug);
+    RecordSTGraphDebug(st_graph_data, st_graph_debug);
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  RecordSTGraphDebug(boundaries, speed_limit, *speed_data, st_graph_debug);
+  RecordSTGraphDebug(st_graph_data, st_graph_debug);
 
   return Status::OK();
 }

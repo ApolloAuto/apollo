@@ -23,7 +23,6 @@
 #include <limits>
 
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -33,21 +32,35 @@ DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
       unit_s_(dp_st_speed_config_.total_path_length() /
               dp_st_speed_config_.matrix_dimension_s()),
       unit_t_(dp_st_speed_config_.total_time() /
-              dp_st_speed_config_.matrix_dimension_t()) {}
+              dp_st_speed_config_.matrix_dimension_t()) {
+  unit_v_ = unit_s_ / unit_t_;
+}
 
 // TODO(all): normalize cost with time
 double DpStCost::GetObstacleCost(
-    const STPoint& point, const std::vector<StBoundary>& st_boundaries) const {
+    const StGraphPoint& st_graph_point,
+    const std::vector<const StBoundary*>& st_boundaries) const {
   double total_cost = 0.0;
-  for (const StBoundary& boundary : st_boundaries) {
-    if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
-      total_cost = std::numeric_limits<double>::infinity();
-      break;
+  constexpr double inf = std::numeric_limits<double>::infinity();
+  const double unit_v = unit_s_ / unit_t_;
+  const auto& st_point = st_graph_point.point();
+  if (st_point.s() < 0) {
+    return inf;
+  }
+  for (const StBoundary* boundary : st_boundaries) {
+    if (boundary->IsPointInBoundary(st_point)) {
+      if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+        total_cost += unit_v * ((st_graph_point.index_s() + 1.0) /
+                                (st_graph_point.index_t() + 1.0)) *
+                      dp_st_speed_config_.keep_clear_cost_factor();
+      } else {
+        return inf;
+      }
     } else {
-      const double distance = boundary.DistanceS(point);
+      const double distance = boundary->DistanceS(st_point);
       total_cost += dp_st_speed_config_.default_obstacle_cost() *
                     std::exp(dp_st_speed_config_.obstacle_cost_factor() /
-                             boundary.characteristic_length() * distance);
+                             boundary->characteristic_length() * distance);
     }
   }
   return total_cost * unit_t_;
@@ -64,15 +77,15 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
                               const double speed_limit) const {
   double cost = 0.0;
   const double speed = (second.s() - first.s()) / unit_t_;
-  if (Double::Compare(speed, 0.0) < 0) {
+  if (speed < 0) {
     return std::numeric_limits<double>::infinity();
   }
   double det_speed = (speed - speed_limit) / speed_limit;
-  if (Double::Compare(det_speed, 0.0) > 0) {
+  if (det_speed > 0) {
     cost = dp_st_speed_config_.exceed_speed_penalty() *
            dp_st_speed_config_.default_speed_cost() * fabs(speed * speed) *
            unit_t_;
-  } else if (Double::Compare(det_speed, 0.0) < 0) {
+  } else if (det_speed < 0) {
     cost = dp_st_speed_config_.low_speed_penalty() *
            dp_st_speed_config_.default_speed_cost() * -det_speed * unit_t_;
   } else {
@@ -118,10 +131,9 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 double DpStCost::JerkCost(const double jerk) const {
   double jerk_sq = jerk * jerk;
   double cost = 0.0;
-  const auto diff = Double::Compare(jerk, 0.0);
-  if (diff > 0) {
+  if (jerk > 0) {
     cost = dp_st_speed_config_.positive_jerk_coeff() * jerk_sq * unit_t_;
-  } else if (diff < 0) {
+  } else {
     cost = dp_st_speed_config_.negative_jerk_coeff() * jerk_sq * unit_t_;
   }
   return cost;

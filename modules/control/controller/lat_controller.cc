@@ -268,8 +268,7 @@ Status LatController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  VehicleState::instance()->set_linear_velocity(
-      std::max(VehicleState::instance()->linear_velocity(), 1.0));
+  VehicleState::instance()->set_linear_velocity(chassis->speed_mps());
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -474,7 +473,7 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix() {
-  double v = VehicleState::instance()->linear_velocity();
+  double v = std::max(VehicleState::instance()->linear_velocity(), 0.2);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;

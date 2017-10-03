@@ -31,6 +31,9 @@ namespace planning {
 namespace {
 
 Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd>& matrices) {
+  if (matrices.size() == 0) {
+    return Eigen::MatrixXd(0, 0);
+  }
   int32_t d = 0;
   for (const auto& mat : matrices) {
     d += mat.rows();
@@ -126,7 +129,7 @@ bool PiecewiseLinearConstraint::AddDerivativeBoundary(
     inequality_boundary(2 * i, 0) = -unit_segment_ * upper_bound[i];
 
     inequality_matrix(2 * i + 1, index) = 1.0;
-    inequality_boundary(2 * i, 0) = unit_segment_ * lower_bound[i];
+    inequality_boundary(2 * i + 1, 0) = unit_segment_ * lower_bound[i];
   }
   inequality_matrices_.push_back(inequality_matrix);
   inequality_boundaries_.push_back(inequality_boundary);
@@ -137,7 +140,6 @@ bool PiecewiseLinearConstraint::AddSecondDerivativeBoundary(
     const double init_derivative, const std::vector<uint32_t>& index_list,
     const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
-  // TODO(Liangliang): implement this function
   if (index_list.size() != lower_bound.size() ||
       index_list.size() != upper_bound.size()) {
     AERROR << "The sizes of index list, lower_bound, upper_bound are not "
@@ -167,7 +169,7 @@ bool PiecewiseLinearConstraint::AddSecondDerivativeBoundary(
       inequality_matrix(2 * i, 1) = -1.0;
       inequality_boundary(2 * i, 0) = -upper * unit_segment_ * unit_segment_;
 
-      inequality_matrix(2 * i + 1, 0) = 2.0;
+      inequality_matrix(2 * i + 1, 0) = -2.0;
       inequality_matrix(2 * i + 1, 1) = 1.0;
       inequality_boundary(2 * i + 1, 0) = lower * unit_segment_ * unit_segment_;
     } else {
@@ -194,6 +196,7 @@ bool PiecewiseLinearConstraint::AddPointConstraint(const uint32_t index,
 
   equality_matrix(0, index) = 1.0;
   equality_boundary(0, 0) = val;
+
   inequality_matrices_.push_back(equality_matrix);
   inequality_boundaries_.push_back(equality_boundary);
   return true;
@@ -208,6 +211,10 @@ bool PiecewiseLinearConstraint::AddPointDerivativeConstraint(
   equality_matrix(0, index) = -1.0;
   equality_matrix(0, index + 1) = 1.0;
   equality_boundary(0, 0) = val;
+
+  equality_matrices_.push_back(equality_matrix);
+  equality_boundaries_.push_back(equality_boundary);
+
   return true;
 }
 

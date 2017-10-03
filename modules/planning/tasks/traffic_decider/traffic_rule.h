@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
@@ -30,13 +31,14 @@ namespace planning {
 
 class TrafficRule {
  public:
-  explicit TrafficRule(const std::string& name) : name_(name) {}
+  explicit TrafficRule(const RuleConfig& config) : config_(config) {}
   virtual ~TrafficRule() = default;
-  virtual const std::string& Name() const { return name_; }
-  virtual bool ApplyRule(ReferenceLineInfo* const reference_line_info) = 0;
+  virtual RuleConfig::RuleId Id() const { return config_.rule_id(); }
+  virtual bool ApplyRule(Frame* frame,
+                         ReferenceLineInfo* const reference_line_info) = 0;
 
- private:
-  const std::string name_;
+ protected:
+  RuleConfig config_;
 };
 
 }  // namespace planning

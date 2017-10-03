@@ -82,6 +82,15 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double timestamp,
   return Status::OK();
 }
 
+bool Planning::HasSignalLight(const PlanningConfig& config) {
+  for (const auto& rule_config : config.rule_config()) {
+    if (rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Status Planning::Init() {
   pnc_map_.reset(new hdmap::PncMap(apollo::hdmap::BaseMapFile()));
   Frame::SetMap(pnc_map_.get());
@@ -112,7 +121,12 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-
+  if (HasSignalLight(config_) &&
+      AdapterManager::GetTrafficLightDetection() == nullptr) {
+    std::string error_msg("Traffic Light Detection is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
         pnc_map_.get(), config_.reference_line_smoother_config());
@@ -127,6 +141,17 @@ Status Planning::Init() {
   }
 
   return planner_->Init(config_);
+}
+
+bool Planning::IsVehicleStateValid(const common::VehicleState& vehicle_state) {
+  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
+      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
+      std::isnan(vehicle_state.kappa()) ||
+      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.linear_acceleration())) {
+    return false;
+  }
+  return true;
 }
 
 Status Planning::Start() {
@@ -189,6 +214,7 @@ void Planning::RunOnce() {
 
   common::Status status =
       common::VehicleState::instance()->Update(localization, chassis);
+  DCHECK(IsVehicleStateValid(*common::VehicleState::instance()));
 
   if (!status.ok()) {
     AERROR << "Update VehicleState failed.";

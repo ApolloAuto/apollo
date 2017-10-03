@@ -3,19 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "double",
-    srcs = [
-        "double.cc",
-    ],
-    hdrs = [
-        "double.h",
-    ],
-    deps = [
-        "//modules/common:log",
-    ],
-)
-
-cc_library(
     name = "curve_math",
     srcs = [
         "curve_math.cc",

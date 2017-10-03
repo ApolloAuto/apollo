@@ -139,25 +139,20 @@ message Object {
 }
 
 message DelayItem {
-    optional uint32 delay = 1;
-    optional uint32 last_delay = 2;
+  optional uint32 delay = 1;
+  optional uint32 last_delay = 2;
 }
 
 message Delay {
-    optional DelayItem adc_status = 1;
-    optional DelayItem decision = 2;
-    optional DelayItem localization = 3;
-    optional DelayItem localization_pcl = 4;
-    optional DelayItem perception_obstacle = 5;
-    optional DelayItem perception_radar = 6;
-    optional DelayItem planning_trajectory = 7;
-    optional DelayItem prediction= 8;
-    optional DelayItem traffic_light = 10;
-}
-
-// Next-id: 2
-message Debug {
-    optional string novatel_position_type = 1;
+  optional DelayItem adc_status = 1;
+  optional DelayItem decision = 2;
+  optional DelayItem localization = 3;
+  optional DelayItem localization_pcl = 4;
+  optional DelayItem perception_obstacle = 5;
+  optional DelayItem perception_radar = 6;
+  optional DelayItem planning_trajectory = 7;
+  optional DelayItem prediction= 8;
+  optional DelayItem traffic_light = 10;
 }
 
 // Next-id: 17
@@ -193,12 +188,5 @@ message SimulationWorld {
 
   optional Delay delay = 12;
 
-  // Relative time w.r.t. the begin time of rosbag
-  optional double relative_time_sec = 13;
-
-  optional string decision_task_name = 14;
-
-  optional Debug debug_log = 15;
-
-  optional .apollo.common.monitor.MonitorMessage monitor = 16;
+  optional .apollo.common.monitor.MonitorMessage monitor = 13;
 }

@@ -48,9 +48,7 @@ class StBoundaryMapper {
 
   virtual ~StBoundaryMapper() = default;
 
-  apollo::common::Status GetGraphBoundary(
-      const PathDecision& path_decision,
-      std::vector<StBoundary>* const boundary) const;
+  apollo::common::Status GetGraphBoundary(PathDecision* path_decision) const;
 
   virtual apollo::common::Status GetSpeedLimits(
       SpeedLimit* const speed_limit_data) const;
@@ -61,24 +59,25 @@ class StBoundaryMapper {
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
 
+  /**
+   * Creates valid st boundary upper_points and lower_points
+   * If return true, upper_points.size() > 1 and
+   * upper_points.size() = lower_points.size()
+   */
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
-  apollo::common::Status MapWithoutDecision(const PathObstacle& path_obstacle,
-                                            StBoundary* const boundary) const;
+  apollo::common::Status MapWithoutDecision(PathObstacle* path_obstacle) const;
 
-  bool MapStopDecision(const PathObstacle& stop_obstacle,
-                       const ObjectDecisionType& stop_decision,
-                       StBoundary* const boundary) const;
+  bool MapStopDecision(PathObstacle* stop_obstacle) const;
 
   apollo::common::Status MapWithPredictionTrajectory(
-      const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
-      StBoundary* const boundary) const;
+      PathObstacle* path_obstacle) const;
 
-  void AppendBoundary(const StBoundary& boundary,
-                      std::vector<StBoundary>* st_boundaries) const;
+  double GetAvgKappa(const uint32_t index,
+                     const std::vector<common::PathPoint>& path_points) const;
 
   double GetCentricAccLimit(const double kappa) const;
 

@@ -53,6 +53,8 @@ DECLARE_double(speed_upper_bound);
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
 
+DECLARE_double(lateral_acceleration_bound);
+
 DECLARE_double(lateral_jerk_bound);
 
 DECLARE_double(longitudinal_jerk_lower_bound);
@@ -95,6 +97,20 @@ DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
 
 // traffic decision
-DECLARE_bool(enable_signal_lights);
+/// common
+DECLARE_double(stop_max_distance_buffer);
+DECLARE_double(stop_min_speed);
+DECLARE_double(stop_max_deceleration);
+/// Clear Zone
+DECLARE_string(clear_zone_virtual_object_id_prefix);
+/// triffic light
+DECLARE_string(signal_light_virtual_object_id_prefix);
+DECLARE_double(max_deacceleration_for_yellow_light_stop);
+/// crosswalk
+DECLARE_bool(enable_crosswalk);
+DECLARE_string(crosswalk_virtual_object_id_prefix);
+DECLARE_double(crosswalk_expand_distance);
+DECLARE_double(crosswalk_strick_l_distance);
+DECLARE_double(crosswalk_loose_l_distance);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

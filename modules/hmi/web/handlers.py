@@ -29,16 +29,14 @@ from socketio_api import SocketIOApi
 
 app = flask.Flask(__name__)
 app.secret_key = str(datetime.datetime.now())
-socketio = flask_socketio.SocketIO(app, async_mode='eventlet')
-
+socketio = flask_socketio.SocketIO(app, async_mode='gevent')
 
 # Web page handlers.
 @app.route('/')
 def index_page():
     """Handler of index page."""
-    conf = Config.get_pb()
-    protocol = 'https' if conf.server.https.enabled else 'http'
-    return flask.render_template('index.tpl', conf_pb=conf, protocol=protocol)
+    protocol = 'https' if Config.get_pb().server.https.enabled else 'http'
+    return flask.render_template('index.tpl', conf=Config, protocol=protocol)
 
 
 @app.route('/module_card/<string:module_name>')

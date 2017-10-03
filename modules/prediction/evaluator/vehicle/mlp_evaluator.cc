@@ -142,8 +142,7 @@ void MLPEvaluator::SetObstacleFeatureValues(
     if (!feature.IsInitialized()) {
       continue;
     }
-    if (apollo::common::math::DoubleCompare(feature.timestamp(), duration) <
-        0) {
+    if (feature.timestamp() < duration) {
       break;
     }
     if (feature.has_lane() && feature.lane().has_lane_feature()) {

@@ -22,7 +22,6 @@ cc_library(
         "//modules/common:apollo_app",
         "//modules/common/util:factory",
         "//modules/localization:localization_base",
-        "//modules/localization/camera:camera_localization",
         "//modules/localization/rtk:rtk_localization",
     ],
 )

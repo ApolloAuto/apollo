@@ -11,6 +11,7 @@ not because they are easy, but because they are hard.
 Welcome to the Apollo GitHub.
 
 [Apollo](http://apollo.auto) is an open autonomous driving platform. It is a high performance flexible architecture which supports fully autonomous driving capabilities.
+For business contact, please visit http://apollo.auto
 
 
 ## Installation

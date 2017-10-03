@@ -68,6 +68,7 @@ bool Spline1dGenerator::Solve() {
       kernel_matrix, offset, inequality_constraint_matrix,
       inequality_constraint_boundary, equality_constraint_matrix,
       equality_constraint_boundary));
+  qp_solver_->set_pos_semi_definite_hessian();
 
   if (!qp_solver_->Solve()) {
     return false;

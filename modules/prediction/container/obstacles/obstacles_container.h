@@ -66,6 +66,11 @@ class ObstaclesContainer : public Container {
    */
   Obstacle* GetObstacle(const int id);
 
+  /**
+   * @brief Clear obstacle container
+   */
+  void Clear();
+
  private:
   /**
    * @brief Check if an obstacle is predictable
@@ -75,7 +80,7 @@ class ObstaclesContainer : public Container {
   bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
 
  private:
-  double timestamp_ = 0.0;
+  double timestamp_ = -1.0;
   common::util::LRUCache<int, Obstacle> obstacles_;
   static std::mutex g_mutex_;
 };

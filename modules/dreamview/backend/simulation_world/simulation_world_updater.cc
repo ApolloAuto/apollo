@@ -89,8 +89,8 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
         // Publish monitor message.
         if (succeed) {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::INFO, "Routing Request Sent");
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
+                                                   "Routing Request Sent");
         } else {
           sim_world_service_.PublishMonitorMessage(
               MonitorMessageItem::ERROR, "Failed to send routing request");
@@ -126,13 +126,6 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     return false;
   }
 
-  // Try to reload end point if it hasn't be loaded yet.
-  if (!default_end_point_.has_id() &&
-      !GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
-    AERROR << "Failed to load default end point from " << EndWayPointFile();
-    return false;
-  }
-
   // set start point
   auto start = json["start"];
   if (start.find("x") == start.end() || start.find("y") == start.end()) {
@@ -158,6 +151,13 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   // set end point
   RoutingRequest::LaneWaypoint *endLane = routing_request->mutable_end();
   if (json["sendDefaultRoute"]) {
+    // Try to reload end point if it hasn't been loaded yet.
+    if (!default_end_point_.has_id() &&
+        !GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
+      AERROR << "Failed to load default end point from " << EndWayPointFile();
+      return false;
+    }
+
     endLane->set_id(default_end_point_.id());
     endLane->set_s(default_end_point_.s());
     auto *pose = endLane->mutable_pose();

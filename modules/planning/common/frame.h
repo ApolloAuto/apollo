@@ -79,6 +79,11 @@ class Frame {
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
   const ReferenceLineInfo *DriveReferenceLinfInfo() const;
 
+  const std::vector<const Obstacle*> &obstacles() const;
+
+  const Obstacle *AddStaticVirtualObstacle(const std::string &id,
+                                           const common::math::Box2d &box);
+
  private:
   /**
    * @brief This is the function that can create one reference lines
@@ -107,9 +112,6 @@ class Frame {
    * Check if there is collision with obstacles
    */
   bool CheckCollision();
-
-  const Obstacle *AddStaticVirtualObstacle(const std::string &id,
-                                           const common::math::Box2d &box);
 
   const Obstacle *CreateDestinationObstacle();
 

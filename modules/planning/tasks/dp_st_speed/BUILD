@@ -25,10 +25,10 @@ cc_library(
         "dp_st_cost.h",
     ],
     deps = [
+        ":st_graph_point",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common/speed:st_boundary",
-        "//modules/planning/math:double",
         "//modules/planning/proto:dp_st_speed_config_proto",
     ],
 )

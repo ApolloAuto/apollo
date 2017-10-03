@@ -28,6 +28,7 @@
 
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/tasks/dp_st_speed/st_graph_point.h"
 
 namespace apollo {
 namespace planning {
@@ -36,8 +37,9 @@ class DpStCost {
  public:
   explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config);
 
-  double GetObstacleCost(const STPoint& point,
-                         const std::vector<StBoundary>& st_boundaries) const;
+  double GetObstacleCost(
+      const StGraphPoint& point,
+      const std::vector<const StBoundary*>& st_boundaries) const;
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
@@ -69,6 +71,7 @@ class DpStCost {
   const DpStSpeedConfig& dp_st_speed_config_;
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;
+  double unit_v_ = 0.0;
 };
 
 }  // namespace planning

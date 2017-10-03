@@ -1,0 +1,9 @@
+dbc_file: lincoln.dbc
+protocol_conf: lincoln.yml
+car_type: lincoln
+sender_list: []
+sender: MAB
+black_list: []
+
+output_dir: output/
+

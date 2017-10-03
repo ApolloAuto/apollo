@@ -129,9 +129,9 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
                       const double timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0 &&
-      common::math::DoubleCompare(timestamp,
-                                  feature_history_.front().timestamp()) <= 0) {
-    AERROR << "Obstacle [" << id_ << "] received an older frame [" << timestamp
+      timestamp <= feature_history_.front().timestamp()) {
+    AERROR << "Obstacle [" << id_ << "] received an older frame ["
+           << std::setprecision(20) << timestamp
            << "] than the most recent timestamp [ "
            << feature_history_.front().timestamp() << "].";
     return;
@@ -292,7 +292,7 @@ void Obstacle::SetAcceleration(Feature* feature) {
     const Point3D& curr_velocity = feature->velocity();
     const Point3D& prev_velocity = feature_history_.front().velocity();
 
-    if (common::math::DoubleCompare(curr_ts, prev_ts) == 1) {
+    if (curr_ts > prev_ts) {
       double damping_x = Damp(curr_velocity.x(), 0.001);
       double damping_y = Damp(curr_velocity.y(), 0.001);
       double damping_z = Damp(curr_velocity.z(), 0.001);
@@ -1005,18 +1005,17 @@ void Obstacle::SetMotionStatus() {
   double speed = (FLAGS_enable_kf_tracking ? feature_history_.front().t_speed()
                                            : feature_history_.front().speed());
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
-  if (common::math::DoubleCompare(speed, speed_threshold) < 0) {
+  if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_
            << "] has a small speed and is considered stationary.";
-  } else if (common::math::DoubleCompare(speed_sensibility, speed_threshold) <
-             0) {
+  } else if (speed_sensibility < speed_threshold) {
     ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
            << history_size
            << "] considered moving [sensibility = " << speed_sensibility << "]";
   } else {
     double distance = std::hypot(avg_drift_x, avg_drift_y);
     double distance_std = std::sqrt(2.0 / len) * std;
-    if (common::math::DoubleCompare(distance, 2.0 * distance_std) > 0) {
+    if (distance > 2.0 * distance_std) {
       ADEBUG << "Obstacle [" << id_ << "] is moving.";
     } else {
       ADEBUG << "Obstacle [" << id_ << "] is stationary.";
