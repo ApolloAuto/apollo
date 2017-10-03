@@ -125,7 +125,7 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(
   }
 
   for (std::uint32_t i = 0; i < x_coord.size(); ++i) {
-    double cur_index = find_index(x_coord[i]);
+    double cur_index = FindIndex(x_coord[i]);
     double cur_rel_x = x_coord[i] - x_knots_[cur_index];
     // update offset
     double offset_coef = -2.0 * ref_x[i] * weight;
@@ -155,14 +155,14 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(
   return true;
 }
 
-std::uint32_t Spline1dKernel::find_index(const double x) const {
+std::uint32_t Spline1dKernel::FindIndex(const double x) const {
   auto upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
   return std::min(static_cast<std::uint32_t>(x_knots_.size() - 1),
                   static_cast<std::uint32_t>(upper_bound - x_knots_.begin())) -
          1;
 }
 
-void Spline1dKernel::add_distance_offset(const double weight) {
+void Spline1dKernel::AddDistanceOffset(const double weight) {
   for (std::uint32_t i = 1; i < x_knots_.size(); ++i) {
     const double cur_x = x_knots_[i] - x_knots_[i - 1];
     double pw_x = 2.0 * weight;

@@ -50,6 +50,8 @@ ActiveSetQpSolver::ActiveSetQpSolver(
 bool ActiveSetQpSolver::Solve() {
   ::qpOASES::QProblem qp_problem(num_param_, num_constraint_, hessian_type_);
   ::qpOASES::Options my_options;
+
+  my_options.enableCholeskyRefactorisation = cholesky_refactorisation_freq_;
   my_options.epsNum = qp_eps_num_;
   my_options.epsDen = qp_eps_den_;
   my_options.epsIterRef = qp_eps_iter_ref_;
