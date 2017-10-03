@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
@@ -67,7 +68,20 @@ namespace predictor_util {
  * @param point The point to be translated.
  */
 void TranslatePoint(const double translate_x, const double translate_y,
-                    apollo::common::TrajectoryPoint* point);
+                    ::apollo::common::TrajectoryPoint* point);
+
+/**
+ * @brief Generate a set of free move trajectory points
+ * @param state matrix
+ * @param transition matrix
+ * @param generated trajectory points
+ */
+void GenerateFreeMoveTrajectoryPoints(
+    Eigen::Matrix<double, 6, 1> *state,
+    const Eigen::Matrix<double, 6, 6>& transition,
+    std::vector<::apollo::common::TrajectoryPoint> *points,
+    size_t num,
+    double freq);
 
 }  // namespace predictor_util
 }  // namespace prediction
