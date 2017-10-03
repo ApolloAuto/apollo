@@ -310,5 +310,86 @@ TEST(Spline1dKernel, add_second_derivative_kernel_matrix_02) {
     }
   }
 }
+
+TEST(Spline1dKernel, add_third_derivative_kernel_matrix_01) {
+  std::vector<double> x_knots = {0.0, 1.5};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+  kernel.AddThirdOrderDerivativeMatrix(1.0);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(
+      spline_order * (x_knots.size() - 1), spline_order * (x_knots.size() - 1));
+
+  // clang-format off
+  ref_kernel_matrix <<
+      0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,
+      0,   0,   0,  36,  72, 120,
+      0,   0,   0,  72, 192, 360,
+      0,   0,   0, 120, 360, 720;
+  // clang-format on
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      const double param = std::pow(1.5, std::max(0, i % 6 + j % 6 - 5));
+      EXPECT_NEAR(kernel.kernel_matrix()(i, j), param * ref_kernel_matrix(i, j),
+                  1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(kernel.offset().rows(), 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
+
+TEST(Spline1dKernel, add_third_derivative_kernel_matrix_02) {
+  std::vector<double> x_knots = {0.0, 1.5, 3.0};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+  kernel.AddThirdOrderDerivativeMatrix(1.0);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix =
+      Eigen::MatrixXd::Zero(spline_order, spline_order);
+
+  // clang-format off
+  ref_kernel_matrix <<
+      0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,
+      0,   0,   0,  36,  72, 120,
+      0,   0,   0,  72, 192, 360,
+      0,   0,   0, 120, 360, 720;
+  // clang-format on
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      if ((i >= 6 && j < 6) || (i < 6 && j >= 6)) {
+        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 0.0);
+      } else {
+        const double param = std::pow(1.5, std::max(0, i % 6 + j % 6 - 5));
+        EXPECT_NEAR(kernel.kernel_matrix()(i, j),
+                    param * ref_kernel_matrix(i % 6, j % 6), 1e-6);
+      }
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(kernel.offset().rows(), 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
