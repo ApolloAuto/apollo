@@ -156,7 +156,7 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // monotone constraint
-  if (!constraint->AddMonotoneInequalityConstraintAtKnots()) {
+  if (!constraint->AddMonotoneInequalityConstraint(t_evaluated_)) {
     const std::string msg = "add monotone inequality constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
