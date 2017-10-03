@@ -62,10 +62,10 @@ class Spline1dKernel {
 
   // distance offset (for speed optimizer, given time optimize the distance can
   // go);
-  void add_distance_offset(const double weight);
+  void AddDistanceOffset(const double weight);
 
  private:
-  std::uint32_t find_index(const double x) const;
+  std::uint32_t FindIndex(const double x) const;
 
  private:
   Eigen::MatrixXd kernel_matrix_;
