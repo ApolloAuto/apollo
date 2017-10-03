@@ -162,3 +162,7 @@ DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
             "Enable follow acceleration constraint.");
+
+// Lattice Planner
+DEFINE_int32(num_lattice_traj_to_plot, 5,
+             "Number of lattice trajs to plot");
