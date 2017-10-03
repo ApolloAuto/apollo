@@ -22,6 +22,8 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
 
+#include <array>
+
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
@@ -44,6 +46,12 @@ class MoveSequencePredictor : public Predictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+ private:
+  double Cost(const double t, const std::array<double, 6>& coeffs,
+              const double alpha);
+
+  double Weight(const double t);
 };
 
 }  // namespace prediction
