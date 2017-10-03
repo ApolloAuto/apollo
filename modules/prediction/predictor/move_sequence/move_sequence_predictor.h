@@ -48,7 +48,9 @@ class MoveSequencePredictor : public Predictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  double Cost(const double t, const std::array<double, 6>& coeffs,
+  static const size_t COEFF_SIZE = 6;
+  double Cost(const double t,
+              const std::array<double, COEFF_SIZE>& coeffs,
               const double alpha);
 
   double Weight(const double t);
