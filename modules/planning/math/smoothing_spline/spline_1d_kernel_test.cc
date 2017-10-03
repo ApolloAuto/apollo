@@ -78,7 +78,6 @@ TEST(Spline1dKernel, add_reference_line_kernel) {
   std::vector<double> ref_x = {0.0, 0.5, 0.6, 2.0};
   kernel.AddReferenceLineKernelMatrix(x_coord, ref_x, 1.0);
 
-  std::cout << kernel.kernel_matrix() << std::endl;
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(15, 15);
   ref_kernel_matrix << 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -151,7 +150,6 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_02) {
   Spline1dKernel kernel(x_knots, spline_order);
   kernel.AddDerivativeKernelMatrix(1.0);
 
-  std::cout << kernel.kernel_matrix() << std::endl;
   EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
   EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(
@@ -188,5 +186,129 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_02) {
   }
 }
 
+TEST(Spline1dKernel, add_derivative_kernel_matrix_03) {
+  // please see the document at docs/specs/qp_spline_path_optimizer.md for
+  // details.
+  std::vector<double> x_knots = {0.0, 0.5};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+  kernel.AddDerivativeKernelMatrix(1.0);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(6, 6);
+
+  // clang-format off
+  ref_kernel_matrix <<
+      0,       0,       0,       0,       0,       0,
+      0,       1,       1,       1,       1,       1,
+      0,       1, 1.33333,     1.5,     1.6, 1.66667,
+      0,       1,     1.5,     1.8,       2, 2.14286,
+      0,       1,     1.6,       2, 2.28571,     2.5,
+      0,       1, 1.66667, 2.14286,     2.5, 2.77778;
+  // clang-format on
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      double param = std::pow(0.5, i + j - 1);
+      EXPECT_NEAR(kernel.kernel_matrix()(i, j), param * ref_kernel_matrix(i, j),
+                  1e-5);
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(6, 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
+
+TEST(Spline1dKernel, add_second_derivative_kernel_matrix_01) {
+  // please see the document at docs/specs/qp_spline_path_optimizer.md for
+  // details.
+  std::vector<double> x_knots = {0.0, 0.5};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+  kernel.AddSecondOrderDerivativeMatrix(1.0);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(
+      spline_order * (x_knots.size() - 1), spline_order * (x_knots.size() - 1));
+
+  // clang-format off
+  ref_kernel_matrix <<
+      0,       0,       0,       0,       0,       0,
+      0,       0,       0,       0,       0,       0,
+      0,       0,       4,       6,       8,      10,
+      0,       0,       6,      12,      18,      24,
+      0,       0,       8,      18,    28.8,      40,
+      0,       0,      10,      24,      40, 57.1429;
+  // clang-format on
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      const double param = std::pow(0.5, std::max(0, i + j - 3));
+      EXPECT_NEAR(kernel.kernel_matrix()(i, j), param * ref_kernel_matrix(i, j),
+                  1e-5);
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(kernel.offset().rows(), 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
+
+TEST(Spline1dKernel, add_second_derivative_kernel_matrix_02) {
+  // please see the document at docs/specs/qp_spline_path_optimizer.md for
+  // details.
+  std::vector<double> x_knots = {0.0, 0.5, 1.0};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+  kernel.AddSecondOrderDerivativeMatrix(1.0);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(
+      spline_order * (x_knots.size() - 1), spline_order * (x_knots.size() - 1));
+
+  // clang-format off
+  ref_kernel_matrix <<
+     0, 0,  0,  0,    0,       0, 0, 0,  0,  0,    0,       0,
+     0, 0,  0,  0,    0,       0, 0, 0,  0,  0,    0,       0,
+     0, 0,  4,  6,    8,      10, 0, 0,  0,  0,    0,       0,
+     0, 0,  6, 12,   18,      24, 0, 0,  0,  0,    0,       0,
+     0, 0,  8, 18, 28.8,      40, 0, 0,  0,  0,    0,       0,
+     0, 0, 10, 24,   40, 57.1429, 0, 0,  0,  0,    0,       0,
+     0, 0,  0,  0,    0,       0, 0, 0,  0,  0,    0,       0,
+     0, 0,  0,  0,    0,       0, 0, 0,  0,  0,    0,       0,
+     0, 0,  0,  0,    0,       0, 0, 0,  4,  6,    8,      10,
+     0, 0,  0,  0,    0,       0, 0, 0,  6, 12,   18,      24,
+     0, 0,  0,  0,    0,       0, 0, 0,  8, 18, 28.8,      40,
+     0, 0,  0,  0,    0,       0, 0, 0, 10, 24,   40, 57.1429;
+  // clang-format on
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      const double param = std::pow(0.5, std::max(0, i % 6 + j % 6 - 3));
+      EXPECT_NEAR(kernel.kernel_matrix()(i, j), param * ref_kernel_matrix(i, j),
+                  1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(kernel.offset().rows(), 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
 }  // namespace planning
 }  // namespace apollo
