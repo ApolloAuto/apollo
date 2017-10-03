@@ -108,4 +108,5 @@ message PlanningData {
 
 message TrajectoryPath {
   repeated apollo.common.TrajectoryPoint trajectory_point = 1;
+  optional double lattice_trajectory_cost = 2;
 }

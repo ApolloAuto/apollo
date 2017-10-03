@@ -205,3 +205,7 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
+
+// Lattice Planner
+DEFINE_int32(num_lattice_traj_to_plot, 5,
+             "Number of lattice trajs to plot");

@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/vehicle_state",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/planner:planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/lattice:lattice_params",
