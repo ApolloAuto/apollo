@@ -439,5 +439,47 @@ TEST(Spline1dKernel, add_reference_line_kernel_03) {
     EXPECT_DOUBLE_EQ(kernel.offset()(i, 0), ref_offset(i, 0));
   }
 }
+
+TEST(Spline1dKernel, add_reference_line_kernel_04) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+
+  std::vector<double> x_coord = {1.5};
+  std::vector<double> ref_x = {2.0};
+  kernel.AddReferenceLineKernelMatrix(x_coord, ref_x, 1.0);
+
+  Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1, 6);
+  double d = 0.5;
+  for (int i = 0; i < 6; ++i) {
+    res(0, i) = std::pow(d, i);
+  }
+
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(6, 6);
+  ref_kernel_matrix = res.transpose() * res;
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(6, 1);
+  ref_offset = -2.0 * 2.0 * res.transpose();
+
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      if (i < 6 || j < 6) {
+        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 0.0);
+      } else {
+        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j),
+                         ref_kernel_matrix(i % 6, j % 6));
+      }
+    }
+  }
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    if (i < 6) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, 0), 0.0);
+    } else {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, 0), ref_offset(i % 6, 0));
+    }
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
