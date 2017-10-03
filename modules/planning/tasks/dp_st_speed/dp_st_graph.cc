@@ -133,8 +133,7 @@ void DpStGraph::CalculatePointwiseCost(
     for (auto& st_graph_point : cost_table_[i]) {
       double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
                                                      reference_points[i]);
-      double obs_cost =
-          dp_st_cost_.GetObstacleCost(st_graph_point.point(), boundaries);
+      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point, boundaries);
       st_graph_point.SetReferenceCost(ref_cost);
       st_graph_point.SetObstacleCost(obs_cost);
       st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());
