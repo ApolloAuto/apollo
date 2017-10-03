@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
+
 #include <cmath>
 #include <utility>
 #include <limits>
 
 #include "Eigen/Dense"
-
-#include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -289,6 +290,65 @@ std::string MoveSequencePredictor::ToString(const LaneSequence& sequence) {
     str_lane_sequence += ("->" + sequence.lane_segment(i).lane_id());
   }
   return str_lane_sequence;
+}
+
+void MoveSequencePredictor::DrawLaneSequenceTrajectoryPoints(
+    const KalmanFilter<double, 4, 2, 0>& kf,
+    const LaneSequence& lane_sequence,
+    const double total_time, const double freq,
+    std::vector<TrajectoryPoint>* points) {
+
+  points->clear();
+  std::vector<TrajectoryPoint> maneuver_trajectory_points;
+  std::vector<TrajectoryPoint> motion_trajectory_points;
+  DrawManeuverTrajectoryPoints(kf, lane_sequence, total_time, freq,
+      &maneuver_trajectory_points);
+  DrawMotionTrajectoryPoints(kf, lane_sequence, total_time, freq,
+      &motion_trajectory_points);
+  CHECK_EQ(maneuver_trajectory_points.size(),
+           motion_trajectory_points.size());
+  double t = 0.0;
+  for (size_t i = 0; i < maneuver_trajectory_points.size(); ++i) {
+    double motion_weight = MotionWeight(t);
+    const TrajectoryPoint& maneuver_point = maneuver_trajectory_points[i];
+    const TrajectoryPoint& motion_point = motion_trajectory_points[i];
+    TrajectoryPoint trajectory_point;
+    WeightedMean(maneuver_point, motion_point,
+        1 - motion_weight, motion_weight, &trajectory_point);
+    points->push_back(trajectory_point);
+  }
+}
+
+void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
+    const KalmanFilter<double, 4, 2, 0>& kf,
+    const LaneSequence& lane_sequence,
+    const double total_time, const double freq,
+    std::vector<TrajectoryPoint>* points) {
+  // TODO(kechxu) implement
+}
+
+void MoveSequencePredictor::DrawMotionTrajectoryPoints(
+    const KalmanFilter<double, 4, 2, 0>& kf,
+    const LaneSequence& lane_sequence,
+    const double total_time, const double freq,
+    std::vector<TrajectoryPoint>* points) {
+  // TODO(kechxu) implement
+}
+
+double MoveSequencePredictor::Cost(const double t,
+    const std::array<double, COEFF_SIZE>& coeffs,
+    const double alpha) {
+  // TODO(kechxu) implement
+  return 0.0;
+}
+
+double MoveSequencePredictor::MotionWeight(const double t) {
+  // TODO(kechxu) Avoid the following hard-coded constants
+  double a = 1.2;
+  double b = 5.0;
+  double c = 1.5;
+
+  return 1.0 - 1.0 / (1.0 + a * std::exp(-b * (t - c)));
 }
 
 }  // namespace prediction
