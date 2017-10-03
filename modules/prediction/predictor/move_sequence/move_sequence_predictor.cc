@@ -316,6 +316,7 @@ void MoveSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     WeightedMean(maneuver_point, motion_point,
         1 - motion_weight, motion_weight, &trajectory_point);
     points->push_back(trajectory_point);
+    t += freq;
   }
 }
 
