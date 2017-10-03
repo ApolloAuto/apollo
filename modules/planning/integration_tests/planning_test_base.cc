@@ -94,7 +94,7 @@ bool PlanningTestBase::SetUpAdapters() {
 void PlanningTestBase::SetUp() {
   planning_.Stop();
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
-  planning_.Init();
+  CHECK(planning_.Init().ok()) << "Failed to init planning module";
 }
 
 void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
