@@ -48,6 +48,8 @@ class TrajectoryEvaluator {
 
   std::pair<std::size_t, std::size_t> next_top_trajectory_pair();
 
+  std::pair<std::size_t, std::size_t> top_trajectory_pair_index() const;
+
   double top_trajectory_pair_cost() const;
 
  private:
