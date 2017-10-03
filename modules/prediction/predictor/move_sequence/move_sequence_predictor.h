@@ -24,6 +24,7 @@
 
 #include <array>
 #include <vector>
+#include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
@@ -55,20 +56,19 @@ class MoveSequencePredictor : public Predictor {
   static const size_t COEFF_SIZE = 6;
 
   void DrawLaneSequenceTrajectoryPoints(
-      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const Obstacle& obstacle,
       const LaneSequence& lane_sequence,
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void DrawManeuverTrajectoryPoints(
-      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const Obstacle& obstacle,
       const LaneSequence& lane_sequence,
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void DrawMotionTrajectoryPoints(
-      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
-      const LaneSequence& lane_sequence,
+      const Obstacle& obstacle,
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
@@ -77,6 +77,8 @@ class MoveSequencePredictor : public Predictor {
               const double alpha);
 
   double MotionWeight(const double t);
+
+  std::string ToString(const LaneSequence& sequence);
 };
 
 }  // namespace prediction

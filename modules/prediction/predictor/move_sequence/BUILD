@@ -12,6 +12,8 @@ cc_library(
         "//modules/prediction/proto:lane_graph_proto",
         "//modules/common/math:kalman_filter",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
+        "@eigen//:eigen",
     ],
 )
 
