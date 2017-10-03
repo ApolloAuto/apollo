@@ -19,6 +19,7 @@
 #include <cmath>
 #include <limits>
 
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -60,6 +61,7 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
 
 namespace predictor_util {
 
+using ::apollo::common::PathPoint;
 using ::apollo::common::TrajectoryPoint;
 
 void TranslatePoint(const double translate_x, const double translate_y,
@@ -71,6 +73,79 @@ void TranslatePoint(const double translate_x, const double translate_y,
   const double original_y = point->path_point().y();
   point->mutable_path_point()->set_x(original_x + translate_x);
   point->mutable_path_point()->set_y(original_y + translate_y);
+}
+
+void GenerateFreeMoveTrajectoryPoints(
+    Eigen::Matrix<double, 6, 1> *state,
+    const Eigen::Matrix<double, 6, 6>& transition,
+    std::vector<TrajectoryPoint> *points,
+    size_t num,
+    double freq) {
+  double x = (*state)(0, 0);
+  double y = (*state)(1, 0);
+  double v_x = (*state)(2, 0);
+  double v_y = (*state)(3, 0);
+  double acc_x = (*state)(4, 0);
+  double acc_y = (*state)(5, 0);
+  double theta = std::atan2(v_y, v_x);
+
+  for (size_t i = 0; i < num; ++i) {
+    double speed = std::hypot(v_x, v_y);
+    if (speed <= std::numeric_limits<double>::epsilon()) {
+      speed = 0.0;
+      v_x = 0.0;
+      v_y = 0.0;
+      acc_x = 0.0;
+      acc_y = 0.0;
+    } else if (speed > FLAGS_max_speed) {
+      speed = FLAGS_max_speed;
+    }
+
+    // update theta
+    if (speed > std::numeric_limits<double>::epsilon()) {
+      if (points->size() > 0) {
+        PathPoint* prev_point = points->back().mutable_path_point();
+        theta = std::atan2(y - prev_point->y(), x - prev_point->x());
+        prev_point->set_theta(theta);
+      }
+    } else {
+      if (points->size() > 0) {
+        theta = points->back().path_point().theta();
+      }
+    }
+
+    // update state
+    (*state)(2, 0) = v_x;
+    (*state)(3, 0) = v_y;
+    (*state)(4, 0) = acc_x;
+    (*state)(5, 0) = acc_y;
+
+    // obtain position
+    x = (*state)(0, 0);
+    y = (*state)(1, 0);
+
+    // Generate trajectory point
+    TrajectoryPoint trajectory_point;
+    PathPoint path_point;
+    path_point.set_x(x);
+    path_point.set_y(y);
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(speed);
+    trajectory_point.set_a(std::hypot(acc_x, acc_y));
+    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    points->emplace_back(std::move(trajectory_point));
+
+    // Update position, velocity and acceleration
+    (*state) = transition * (*state);
+    x = (*state)(0, 0);
+    y = (*state)(1, 0);
+    v_x = (*state)(2, 0);
+    v_y = (*state)(3, 0);
+    acc_x = (*state)(4, 0);
+    acc_y = (*state)(5, 0);
+  }
 }
 
 }  // namespace predictor_util
