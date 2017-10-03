@@ -8,6 +8,10 @@ cc_library(
     hdrs = ["move_sequence_predictor.h"],
     deps = [
         "//modules/prediction/predictor",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/prediction/proto:lane_graph_proto",
+        "//modules/common/math:kalman_filter",
+        "//modules/prediction/common:prediction_gflags",
     ],
 )
 

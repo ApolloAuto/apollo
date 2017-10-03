@@ -23,8 +23,12 @@
 #define MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
 
 #include <array>
+#include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/common/math/kalman_filter.h"
 
 namespace apollo {
 namespace prediction {
@@ -49,11 +53,30 @@ class MoveSequencePredictor : public Predictor {
 
  private:
   static const size_t COEFF_SIZE = 6;
+
+  void DrawLaneSequenceTrajectoryPoints(
+      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const LaneSequence& lane_sequence,
+      const double total_time, const double freq,
+      std::vector<apollo::common::TrajectoryPoint>* points);
+
+  void DrawManeuverTrajectoryPoints(
+      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const LaneSequence& lane_sequence,
+      const double total_time, const double freq,
+      std::vector<apollo::common::TrajectoryPoint>* points);
+
+  void DrawMotionTrajectoryPoints(
+      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const LaneSequence& lane_sequence,
+      const double total_time, const double freq,
+      std::vector<apollo::common::TrajectoryPoint>* points);
+
   double Cost(const double t,
               const std::array<double, COEFF_SIZE>& coeffs,
               const double alpha);
 
-  double Weight(const double t);
+  double MotionWeight(const double t);
 };
 
 }  // namespace prediction
