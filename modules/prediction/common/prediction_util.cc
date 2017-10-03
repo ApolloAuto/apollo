@@ -23,9 +23,7 @@
 
 namespace apollo {
 namespace prediction {
-namespace util {
-
-using apollo::common::TrajectoryPoint;
+namespace math_util {
 
 double Normalize(const double value, const double mean, const double std) {
   constexpr double eps = 1e-10;
@@ -58,6 +56,12 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   return 0;
 }
 
+}  // namespace math_util
+
+namespace predictor_util {
+
+using ::apollo::common::TrajectoryPoint;
+
 void TranslatePoint(const double translate_x, const double translate_y,
                     TrajectoryPoint* point) {
   if (point == nullptr || !point->has_path_point()) {
@@ -69,6 +73,6 @@ void TranslatePoint(const double translate_x, const double translate_y,
   point->mutable_path_point()->set_y(original_y + translate_y);
 }
 
-}  // namespace util
+}  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
