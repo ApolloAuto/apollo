@@ -80,9 +80,9 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed,
       speed_data.AppendSpeedPoint(s, t, v, a, 0.0);
       pre_s = s;
     } else {
-      s = std::fmax(pre_s,
-                    s_mid + v_mid * (t - t_mid) +
-                        0.5 * FLAGS_slowdown_profile_deceleration * t * t);
+      s = std::fmax(pre_s, s_mid + v_mid * (t - t_mid) +
+                               0.5 * FLAGS_slowdown_profile_deceleration *
+                                   (t - t_mid) * (t - t_mid));
       v = std::fmax(0.0,
                     v_mid + (t - t_mid) * FLAGS_slowdown_profile_deceleration);
       speed_data.AppendSpeedPoint(s, t, v, FLAGS_slowdown_profile_deceleration,

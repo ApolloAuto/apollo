@@ -17,8 +17,10 @@ cc_library(
     srcs = ["prediction_util.cc"],
     hdrs = ["prediction_util.h"],
     deps = [
+        ":prediction_gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "@eigen//:eigen",
     ],
 )
 
