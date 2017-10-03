@@ -217,10 +217,10 @@ void RegionalPredictor::DrawMovingTrajectory(
   UpdateTrajectoryPoints(starting_point, vel, delta_ts, middle_points,
                          boundary_points, left_points, right_points);
   for (size_t i = 0; i < left_points->size(); ++i) {
-    apollo::prediction::util::TranslatePoint(position[0], position[1],
-                                             &(left_points->operator[](i)));
-    apollo::prediction::util::TranslatePoint(position[0], position[1],
-                                             &(right_points->operator[](i)));
+    apollo::prediction::predictor_util::TranslatePoint(
+        position[0], position[1], &(left_points->operator[](i)));
+    apollo::prediction::predictor_util::TranslatePoint(
+        position[0], position[1], &(right_points->operator[](i)));
   }
 }
 
@@ -400,7 +400,7 @@ void RegionalPredictor::GetTwoEllipsePoints(
   GetQuadraticCoefficients(position_x, position_y, direction_x, direction_y,
                            ellipse_len_x, ellipse_len_y, &coefficients);
   std::pair<double, double> roots(position_x, position_y);
-  apollo::prediction::util::SolveQuadraticEquation(coefficients, &roots);
+  apollo::prediction::math_util::SolveQuadraticEquation(coefficients, &roots);
   const double temp_p = 0.0 - direction_x / direction_y;
   const double temp_q = position_y - temp_p * position_x;
 

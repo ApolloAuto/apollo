@@ -24,7 +24,7 @@
 
 namespace apollo {
 namespace prediction {
-namespace util {
+namespace math_util {
 /**
  * @brief Normalize the value by specified mean and standard deviation.
  * @param value The value to be normalized.
@@ -57,6 +57,9 @@ double Relu(const double value);
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots);
 
+}  // namespace math_util
+
+namespace predictor_util {
 /**
  * @brief Translate a point.
  * @param translate_x The translation along x-axis.
@@ -66,7 +69,7 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
 void TranslatePoint(const double translate_x, const double translate_y,
                     apollo::common::TrajectoryPoint* point);
 
-}  // namespace util
+}  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
 
