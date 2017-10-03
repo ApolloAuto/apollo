@@ -16,7 +16,7 @@
 
 /**
  * @file : piecewise_smoothing_spline_constraint.h
- * @brief: wrapp up solver constraint interface with direct methods and preset
+ * @brief: wrap up solver constraint interface with direct methods and preset
  *methods
  **/
 
