@@ -21,7 +21,6 @@
 namespace apollo {
 namespace canbus {
 
-  
 // (SUM(input))^0xFF
 uint8_t ProtocolData::CalculateCheckSum(const uint8_t *input,
                                         const uint32_t length) {
