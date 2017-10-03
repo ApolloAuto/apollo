@@ -160,8 +160,8 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   }
 
   for (size_t i = 0; i < points->size(); ++i) {
-    apollo::prediction::util::TranslatePoint(position[0], position[1],
-                                             &(points->operator[](i)));
+    apollo::prediction::predictor_util::TranslatePoint(
+        position[0], position[1], &(points->operator[](i)));
   }
 }
 
