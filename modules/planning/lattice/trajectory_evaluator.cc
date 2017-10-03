@@ -61,6 +61,10 @@ std::pair<std::size_t, std::size_t> TrajectoryEvaluator::next_top_trajectory_pai
   return top.first;
 }
 
+std::pair<std::size_t, std::size_t> TrajectoryEvaluator::top_trajectory_pair_index() const {
+  return cost_queue_.top().first;
+}
+
 double TrajectoryEvaluator::top_trajectory_pair_cost() const {
   return cost_queue_.top().second;
 }
