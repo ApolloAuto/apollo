@@ -71,6 +71,12 @@ class ActiveSetQpSolver : public QpSolver {
     hessian_type_ = ::qpOASES::HST_POSDEF;
   }
 
+  void EnableCholeskyRefactorisation(const int num) override {
+    // Specifies the frequency of full factorisation refactorisations of the
+    // projected Hessian: 0 turns them off, 1 uses them at each iteration etc
+    cholesky_refactorisation_freq_ = num;
+  }
+
  private:
   bool sanity_check() override;
 
@@ -94,6 +100,7 @@ class ActiveSetQpSolver : public QpSolver {
   int max_iteration_ = 1000;
 
   ::qpOASES::HessianType hessian_type_ = ::qpOASES::HST_UNKNOWN;
+  int cholesky_refactorisation_freq_ = 0;
 };
 
 }  // namespace math
