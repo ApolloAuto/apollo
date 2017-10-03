@@ -67,17 +67,17 @@ bool QpSplinePathGenerator::Generate(
 
   ADEBUG << "Init point: " << init_point.DebugString();
 
-  if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
+  if (!CalculateFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
   double start_s = init_frenet_point_.s();
   double end_s = reference_line_.Length();
 
-  QpFrenetFrame qp_frenet_frame(reference_line_, path_obstacles, speed_data,
-                                init_frenet_point_, start_s, end_s,
+  QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
                                 qp_spline_path_config_.time_resolution());
-  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output())) {
+  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output(),
+                            path_obstacles)) {
     AERROR << "Fail to initialize qp frenet frame";
     return false;
   }
@@ -163,7 +163,7 @@ bool QpSplinePathGenerator::Generate(
   return true;
 }
 
-bool QpSplinePathGenerator::CalculateInitFrenetPoint(
+bool QpSplinePathGenerator::CalculateFrenetPoint(
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
   common::SLPoint sl_point;
