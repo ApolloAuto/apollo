@@ -58,18 +58,22 @@ class MoveSequencePredictor : public Predictor {
 
   void DrawLaneSequenceTrajectoryPoints(
       const Obstacle& obstacle,
+      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
       const LaneSequence& lane_sequence,
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void DrawManeuverTrajectoryPoints(
       const Obstacle& obstacle,
+      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
       const LaneSequence& lane_sequence,
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void DrawMotionTrajectoryPoints(
       const Obstacle& obstacle,
+      const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const LaneSequence& lane_sequence,
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
