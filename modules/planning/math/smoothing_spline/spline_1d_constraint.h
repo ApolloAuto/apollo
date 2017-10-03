@@ -48,8 +48,8 @@ class Spline1dConstraint {
   // preset method
   /**
   *   @brief: inequality boundary constraints
-  *   if no boundary, do specify either by std::infinity or let vector.size() =
-  *0
+  *   if no boundary, do specify either by std::infinity or
+  *   let vector.size() = 0
   **/
   bool AddBoundary(const std::vector<double>& x_coord,
                    const std::vector<double>& lower_bound,
@@ -69,9 +69,9 @@ class Spline1dConstraint {
 
   /**
   *   @brief: equality constraint to guarantee joint smoothness
+  *   boundary equality constriant constraint on fx, dfx, ddfx ... in vector
+  *   form; upto third order
   **/
-  // boundary equality constriant
-  // constraint on fx, dfx, ddfx ... in vector form; upto third order
   bool AddPointConstraint(const double x, const double fx);
   bool AddPointDerivativeConstraint(const double x, const double dfx);
   bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
