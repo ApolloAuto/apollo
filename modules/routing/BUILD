@@ -20,6 +20,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
+        "//modules/routing/graph",
         "//modules/routing/proto:routing_proto",
         "@ros//:ros_common",
     ],
