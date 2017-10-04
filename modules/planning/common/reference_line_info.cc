@@ -33,7 +33,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/decider.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
@@ -43,14 +42,12 @@ using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 
-ReferenceLineInfo::ReferenceLineInfo(
-    const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
-    const TrajectoryPoint& init_adc_point,
-    const ReferenceLineSmootherConfig& smoother_config)
+ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+                                     const ReferenceLine& reference_line,
+                                     const TrajectoryPoint& init_adc_point)
     : pnc_map_(pnc_map),
       reference_line_(reference_line),
-      init_adc_point_(init_adc_point),
-      smoother_config_(smoother_config) {}
+      init_adc_point_(init_adc_point) {}
 
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
