@@ -148,7 +148,7 @@ bool PiecewiseLinearKernel::AddReferenceLineKernelMatrix(
     return false;
   }
   Eigen::MatrixXd ref_kernel = Eigen::MatrixXd::Zero(dimension_, dimension_);
-  for (uint32_t i = 0; i < dimension_; ++i) {
+  for (uint32_t i = 0; i < index_list.size(); ++i) {
     uint32_t index = index_list[i];
     ref_kernel(index, index) += 1.0;
     offset_matrix_(index, 0) += -2.0 * weight * pos_list[i];

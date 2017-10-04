@@ -35,7 +35,6 @@ namespace apollo {
 namespace planning {
 
 using common::SpeedPoint;
-using ConstPathObstacleList = std::vector<const PathObstacle*>;
 
 namespace {
 
@@ -43,23 +42,23 @@ constexpr double kEpsilontol = 1e-6;
 }
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
-                             const ConstPathObstacleList& path_obstacles,
                              const SpeedData& speed_data,
                              const common::FrenetFramePoint& init_frenet_point,
-                             const double start_s, const double end_s,
                              const double time_resolution)
     : reference_line_(reference_line),
-      path_obstacles_(path_obstacles),
       speed_data_(speed_data),
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       init_frenet_point_(init_frenet_point),
       feasible_longitudinal_upper_bound_(reference_line_.map_path().length()),
-      start_s_(start_s),
-      end_s_(end_s),
-      time_resolution_(time_resolution) {}
+      time_resolution_(time_resolution) {
+  start_s_ = init_frenet_point.s();
+  end_s_ = reference_line.Length();
+}
 
-bool QpFrenetFrame::Init(const uint32_t num_points) {
+bool QpFrenetFrame::Init(
+    const uint32_t num_points,
+    const std::vector<const PathObstacle*>& path_obstacles) {
   if (num_points < 2) {
     AERROR << "Number of s points [" << num_points
            << "] is too small to evaluate.";
@@ -91,8 +90,7 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
 
   // initialize calculation here
   CalculateHDMapBound();
-
-  if (!CalculateObstacleBound()) {
+  if (!CalculateObstacleBound(path_obstacles)) {
     AERROR << "Calculate obstacle bound failed!";
     return false;
   }
@@ -236,11 +234,9 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
     AWARN << "only support nudge decision now";
     return true;
   }
-  const auto& nudge = decision.nudge();
-  const auto& box = ptr_obstacle->PerceptionBoundingBox();
-  std::vector<common::math::Vec2d> corners;
-  box.GetAllCorners(&corners);
-  if (!MapPolygon(corners, nudge, &static_obstacle_bound_)) {
+  if (!MapNudgePolygon(
+          common::math::Polygon2d(ptr_obstacle->PerceptionBoundingBox()),
+          decision.nudge(), &static_obstacle_bound_)) {
     AERROR << "fail to map polygon with id " << path_obstacle.Id()
            << " in qp frenet frame";
     return false;
@@ -248,27 +244,27 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
   return true;
 }
 
-bool QpFrenetFrame::MapPolygon(
-    const std::vector<common::math::Vec2d>& corners, const ObjectNudge& nudge,
+bool QpFrenetFrame::MapNudgePolygon(
+    const common::math::Polygon2d& polygon, const ObjectNudge& nudge,
     std::vector<std::pair<double, double>>* const bound_map) {
   std::vector<common::SLPoint> sl_corners;
-
-  for (const auto& corner_xy : corners) {
+  for (const auto& corner_xy : polygon.points()) {
     common::SLPoint cur_point;
     if (!reference_line_.XYToSL(corner_xy, &cur_point)) {
       AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
              << cur_point.DebugString();
       return false;
     }
-    // shift box base on buffer
+    // shift box based on buffer
     cur_point.set_l(cur_point.l() + nudge.distance_l());
     sl_corners.push_back(std::move(cur_point));
   }
 
   const auto corner_size = sl_corners.size();
   for (uint32_t i = 0; i < corner_size; ++i) {
-    if (!MapLine(sl_corners[i % corner_size], sl_corners[(i + 1) % corner_size],
-                 nudge.type(), bound_map)) {
+    if (!MapNudgeLine(sl_corners[i % corner_size],
+                      sl_corners[(i + 1) % corner_size], nudge.type(),
+                      bound_map)) {
       AERROR << "Map box line (sl) " << sl_corners[i].DebugString() << "->"
              << sl_corners[i + 1].DebugString();
       return false;
@@ -277,7 +273,7 @@ bool QpFrenetFrame::MapPolygon(
   return true;
 }
 
-bool QpFrenetFrame::MapLine(
+bool QpFrenetFrame::MapNudgeLine(
     const common::SLPoint& start, const common::SLPoint& end,
     const ObjectNudge::Type nudge_type,
     std::vector<std::pair<double, double>>* const constraint) {
@@ -415,8 +411,9 @@ void QpFrenetFrame::CalculateHDMapBound() {
   }
 }
 
-bool QpFrenetFrame::CalculateObstacleBound() {
-  for (const auto ptr_path_obstacle : path_obstacles_) {
+bool QpFrenetFrame::CalculateObstacleBound(
+    const std::vector<const PathObstacle*>& path_obstacles) {
+  for (const auto ptr_path_obstacle : path_obstacles) {
     if (!ptr_path_obstacle->HasLateralDecision()) {
       continue;
     }

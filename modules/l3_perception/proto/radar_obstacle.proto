@@ -19,6 +19,7 @@ message RadarObstacle {
   optional apollo.perception.Point absolute_position = 10;
   optional apollo.perception.Point absolute_velocity = 11;
   optional int32 count = 12;
+  optional int32 moving_frames_count = 13;
 }
 
 message RadarObstacles {

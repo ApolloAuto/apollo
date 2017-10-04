@@ -18,25 +18,19 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDE_VEHICE_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDE_VEHICE_H_
-
-#include <string>
-
-#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
+#include "modules/planning/tasks/traffic_decider/object_priority.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-class BackSideVehicles : public TrafficRule {
- public:
-  BackSideVehicles();
-  virtual ~BackSideVehicles() = default;
+ObjectPriority::ObjectPriority(const RuleConfig& config)
+    : TrafficRule(config) {}
 
-  bool ApplyRule(Frame *frame, ReferenceLineInfo* const reference_line_info);
-};
+bool ObjectPriority::ApplyRule(Frame* frame,
+                                ReferenceLineInfo* const reference_line_info) {
+  return true;
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDE_VEHICE_H_

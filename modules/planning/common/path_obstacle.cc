@@ -341,7 +341,7 @@ void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
   longitudinal_decision_ =
       MergeLongitudinalDecision(longitudinal_decision_, decision);
   ADEBUG << decider_tag << " added obstacle " << Id()
-         << " a longitudinal decision: " << decision.ShortDebugString()
+         << " longitudinal decision: " << decision.ShortDebugString()
          << ". The merged decision is: "
          << longitudinal_decision_.ShortDebugString();
   decisions_.push_back(decision);
@@ -389,6 +389,10 @@ const SLBoundary& PathObstacle::perception_sl_boundary() const {
 
 void PathObstacle::SetStBoundary(const StBoundary& boundary) {
   st_boundary_ = boundary;
+}
+
+void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
+  st_boundary_.SetBoundaryType(type);
 }
 
 }  // namespace planning

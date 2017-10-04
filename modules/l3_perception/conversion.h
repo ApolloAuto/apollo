@@ -48,7 +48,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
 RadarObstacles DelphiToRadarObstacles(
     const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
-    const std::queue<RadarObstacles>& last_radar_obstacles);
+    const RadarObstacles& last_radar_obstacles);
 
 PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);

@@ -43,7 +43,7 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 
 void LaneSequencePredictor::Clear() {
-  trajectories_.clear();
+  Predictor::Clear();
   adc_lane_id_.clear();
   adc_lane_s_ = 0.0;
 }

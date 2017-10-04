@@ -206,20 +206,15 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
     return Status::OK();
   }
 
-  if (lower_points.size() != upper_points.size()) {
-    std::string msg = common::util::StrCat(
-        "lower_points.size()[", lower_points.size(),
-        "] and upper_points.size()[", upper_points.size(), "] does NOT match.");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+                      .ExpandByS(boundary_s_buffer)
+                      .ExpandByT(boundary_t_buffer);
+  boundary.SetId(path_obstacle->Id());
+  const auto& prev_st_boundary = path_obstacle->st_boundary();
+  if (!prev_st_boundary.IsEmpty()) {
+    boundary.SetBoundaryType(prev_st_boundary.boundary_type());
   }
-
-  if (lower_points.size() > 1 && upper_points.size() > 1) {
-    auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
-                        .ExpandByS(boundary_s_buffer)
-                        .ExpandByT(boundary_t_buffer);
-    boundary.SetId(path_obstacle->Id());
-    path_obstacle->SetStBoundary(boundary);
-  }
+  path_obstacle->SetStBoundary(boundary);
   return Status::OK();
 }
 
@@ -359,7 +354,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
     }
   }
   DCHECK_EQ(lower_points->size(), upper_points->size());
-  return (lower_points->size() > 0 && upper_points->size() > 0);
+  return (lower_points->size() > 1 && upper_points->size() > 1);
 }
 
 Status StBoundaryMapper::MapWithPredictionTrajectory(
@@ -376,55 +371,46 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                                 *(path_obstacle->obstacle()), &upper_points,
                                 &lower_points)) {
-    return Status(ErrorCode::PLANNING_ERROR, "PLANNING_ERROR");
+    return Status::OK();
   }
 
-  if (lower_points.size() != upper_points.size()) {
-    std::string msg = common::util::StrCat(
-        "lower_points.size()[", lower_points.size(),
-        "] and upper_points.size()[", upper_points.size(), "] does NOT match.");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  if (obj_decision.has_follow() && lower_points.back().t() < planning_time_) {
+    const double diff_s = lower_points.back().s() - lower_points.front().s();
+    const double diff_t = lower_points.back().t() - lower_points.front().t();
+    double extend_lower_s =
+        diff_s / diff_t * (planning_time_ - lower_points.front().t()) +
+        lower_points.front().s();
+    const double extend_upper_s =
+        extend_lower_s + (upper_points.back().s() - lower_points.back().s()) +
+        1.0;
+    upper_points.emplace_back(extend_upper_s, planning_time_);
+    lower_points.emplace_back(extend_lower_s, planning_time_);
   }
 
-  if (lower_points.size() > 1 && upper_points.size() > 1) {
-    if (obj_decision.has_follow() && lower_points.back().t() < planning_time_) {
-      const double diff_s = lower_points.back().s() - lower_points.front().s();
-      const double diff_t = lower_points.back().t() - lower_points.front().t();
-      double extend_lower_s =
-          diff_s / diff_t * (planning_time_ - lower_points.front().t()) +
-          lower_points.front().s();
-      const double extend_upper_s =
-          extend_lower_s + (upper_points.back().s() - lower_points.back().s()) +
-          1.0;
-      upper_points.emplace_back(extend_upper_s, planning_time_);
-      lower_points.emplace_back(extend_lower_s, planning_time_);
-    }
+  auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+                      .ExpandByS(boundary_s_buffer)
+                      .ExpandByT(boundary_t_buffer);
 
-    auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
-                        .ExpandByS(boundary_s_buffer)
-                        .ExpandByT(boundary_t_buffer);
-
-    // get characteristic_length and boundary_type.
-    StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
-    double characteristic_length = 0.0;
-    if (obj_decision.has_follow()) {
-      characteristic_length = std::fabs(obj_decision.follow().distance_s());
-      b_type = StBoundary::BoundaryType::FOLLOW;
-    } else if (obj_decision.has_yield()) {
-      characteristic_length = std::fabs(obj_decision.yield().distance_s());
-      b_type = StBoundary::BoundaryType::YIELD;
-    } else if (obj_decision.has_overtake()) {
-      characteristic_length = std::fabs(obj_decision.overtake().distance_s());
-      b_type = StBoundary::BoundaryType::OVERTAKE;
-    } else {
-      DCHECK(false) << "Obj decision should be either yield or overtake: "
-                    << obj_decision.DebugString();
-    }
-    boundary.SetBoundaryType(b_type);
-    boundary.SetId(path_obstacle->obstacle()->Id());
-    boundary.SetCharacteristicLength(characteristic_length);
-    path_obstacle->SetStBoundary(boundary);
+  // get characteristic_length and boundary_type.
+  StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
+  double characteristic_length = 0.0;
+  if (obj_decision.has_follow()) {
+    characteristic_length = std::fabs(obj_decision.follow().distance_s());
+    b_type = StBoundary::BoundaryType::FOLLOW;
+  } else if (obj_decision.has_yield()) {
+    characteristic_length = std::fabs(obj_decision.yield().distance_s());
+    b_type = StBoundary::BoundaryType::YIELD;
+  } else if (obj_decision.has_overtake()) {
+    characteristic_length = std::fabs(obj_decision.overtake().distance_s());
+    b_type = StBoundary::BoundaryType::OVERTAKE;
+  } else {
+    DCHECK(false) << "Obj decision should be either yield or overtake: "
+                  << obj_decision.DebugString();
   }
+  boundary.SetBoundaryType(b_type);
+  boundary.SetId(path_obstacle->obstacle()->Id());
+  boundary.SetCharacteristicLength(characteristic_length);
+  path_obstacle->SetStBoundary(boundary);
   return Status::OK();
 }
 
