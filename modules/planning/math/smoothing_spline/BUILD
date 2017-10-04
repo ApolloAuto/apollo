@@ -260,6 +260,18 @@ cc_test(
 )
 
 cc_test(
+    name = "spline_1d_constraint_test",
+    size = "small",
+    srcs = [
+        "spline_1d_constraint_test.cc",
+    ],
+    deps = [
+        ":spline_1d_constraint",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "piecewise_linear_kernel_test",
     size = "small",
     srcs = [
@@ -279,6 +291,19 @@ cc_test(
     ],
     deps = [
         ":piecewise_linear_constraint",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "spline_2d_solver_test",
+    size = "small",
+    srcs = [
+        "spline_2d_solver_test.cc",
+    ],
+    deps = [
+        ":spline_2d_solver",
+        "//modules/planning/math:curve_math",
         "@gtest//:main",
     ],
 )

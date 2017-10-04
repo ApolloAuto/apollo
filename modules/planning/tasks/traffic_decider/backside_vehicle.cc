@@ -18,20 +18,23 @@
  * @file
  **/
 
-#include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
+#include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-BackSideVehicles::BackSideVehicles() : TrafficRule("BackSideVehicles") {}
+BacksideVehicle::BacksideVehicle(const RuleConfig& config)
+    : TrafficRule(config) {}
 
-bool BackSideVehicles::ApplyRule(Frame *frame,
-                                 ReferenceLineInfo* const reference_line_info) {
+bool BacksideVehicle::ApplyRule(Frame* frame,
+                                ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   ObjectDecisionType ignore;
   ignore.mutable_ignore();
+  const std::string rule_id = RuleConfig::RuleId_Name(config_.rule_id());
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     if (path_obstacle->perception_sl_boundary().end_s() >=
         adc_sl_boundary.end_s()) {
@@ -39,15 +42,15 @@ bool BackSideVehicles::ApplyRule(Frame *frame,
     }
 
     if (path_obstacle->st_boundary().IsEmpty()) {
-      path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
+      path_decision->AddLongitudinalDecision(rule_id, path_obstacle->Id(),
                                              ignore);
-      path_decision->AddLateralDecision(Name(), path_obstacle->Id(), ignore);
+      path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
       continue;
     }
     if (path_obstacle->st_boundary().min_s() < 0) {
-      path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
+      path_decision->AddLongitudinalDecision(rule_id, path_obstacle->Id(),
                                              ignore);
-      path_decision->AddLateralDecision(Name(), path_obstacle->Id(), ignore);
+      path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
       continue;
     }
   }

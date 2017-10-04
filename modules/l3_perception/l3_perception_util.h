@@ -64,6 +64,8 @@ Point SLtoXY(const Point point, const double theta);
 
 double Distance(const Point& point1, const Point& point2);
 
+double Speed(const Point& point);
+
 double GetNearestLaneHeading(const Point& point);
 
 double GetLateralDistanceToNearestLane(const Point& point);

@@ -80,9 +80,9 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed,
       speed_data.AppendSpeedPoint(s, t, v, a, 0.0);
       pre_s = s;
     } else {
-      s = std::fmax(pre_s,
-                    s_mid + v_mid * (t - t_mid) +
-                        0.5 * FLAGS_slowdown_profile_deceleration * t * t);
+      s = std::fmax(pre_s, s_mid + v_mid * (t - t_mid) +
+                               0.5 * FLAGS_slowdown_profile_deceleration *
+                                   (t - t_mid) * (t - t_mid));
       v = std::fmax(0.0,
                     v_mid + (t - t_mid) * FLAGS_slowdown_profile_deceleration);
       speed_data.AppendSpeedPoint(s, t, v, FLAGS_slowdown_profile_deceleration,
@@ -129,6 +129,10 @@ void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
         break;
       case StBoundary::BoundaryType::YIELD:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
+        break;
+      case StBoundary::BoundaryType::KEEP_CLEAR:
+        boundary_debug->set_type(
+            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
         break;
     }
 

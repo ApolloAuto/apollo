@@ -15,38 +15,40 @@
  *****************************************************************************/
 
 /**
- * @file trajectory_stitcher.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
-#define MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
 
+#include <string>
+#include <unordered_map>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 
-#include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-class TrajectoryStitcher {
+/**
+ * This class creates a virtual obstacle for each keep clear region.
+ */
+class ClearZone : public TrafficRule {
  public:
-  TrajectoryStitcher() = delete;
+  explicit ClearZone(const RuleConfig& config);
+  virtual ~ClearZone() = default;
 
-  static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
-      const bool is_on_auto_mode, const double current_timestamp,
-      const double planning_cycle_time,
-      const PublishableTrajectory* prev_trajectory);
+  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  static std::vector<common::TrajectoryPoint>
-  ComputeReinitStitchingTrajectory();
+  bool BuildClearZoneObstacle(const hdmap::PathOverlap& clear_zone_overlap);
+  ReferenceLineInfo* reference_line_info_;
+  Frame* frame_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_

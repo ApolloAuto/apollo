@@ -15,38 +15,28 @@
  *****************************************************************************/
 
 /**
- * @file trajectory_stitcher.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
-#define MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACKSIDE_VEHICE_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACKSIDE_VEHICE_H_
 
-#include <vector>
+#include <string>
 
-#include "modules/common/proto/pnc_point.pb.h"
-
-#include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-class TrajectoryStitcher {
+class BacksideVehicle : public TrafficRule {
  public:
-  TrajectoryStitcher() = delete;
+  explicit BacksideVehicle(const RuleConfig& config);
+  virtual ~BacksideVehicle() = default;
 
-  static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
-      const bool is_on_auto_mode, const double current_timestamp,
-      const double planning_cycle_time,
-      const PublishableTrajectory* prev_trajectory);
-
- private:
-  static std::vector<common::TrajectoryPoint>
-  ComputeReinitStitchingTrajectory();
+  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_BACK_SIDEVEHICE_H_

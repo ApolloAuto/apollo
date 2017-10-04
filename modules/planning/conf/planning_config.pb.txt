@@ -144,9 +144,5 @@ reference_line_smoother_config {
 }
 
 rule_config : {
-    name: "BackSideVehicles"
-}
-
-rule_config : {
-    name: "SignalLights"
+    rule_id: BACKSIDE_VEHICLE
 }

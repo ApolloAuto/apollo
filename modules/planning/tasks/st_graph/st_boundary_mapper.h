@@ -59,6 +59,11 @@ class StBoundaryMapper {
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
 
+  /**
+   * Creates valid st boundary upper_points and lower_points
+   * If return true, upper_points.size() > 1 and
+   * upper_points.size() = lower_points.size()
+   */
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,

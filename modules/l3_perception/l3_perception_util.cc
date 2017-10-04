@@ -190,5 +190,8 @@ double GetLateralDistanceToNearestLane(const Point& point) {
   return nearest_l;
 }
 
+double Speed(const Point& point) {
+  return std::sqrt(point.x() * point.x() + point.y() + point.y());
+}
 }  // namespace l3_perception
 }  // namespace apollo
