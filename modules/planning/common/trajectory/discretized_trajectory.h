@@ -24,6 +24,9 @@
 #include <vector>
 
 #include "glog/logging.h"
+
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/trajectory/trajectory.h"
 
@@ -34,8 +37,13 @@ class DiscretizedTrajectory : public Trajectory {
  public:
   DiscretizedTrajectory() = default;
 
+  /**
+   * Create a DiscretizedTrajectory based on protobuf message
+   */
+  explicit DiscretizedTrajectory(const ADCTrajectory& trajectory);
+
   explicit DiscretizedTrajectory(
-      std::vector<common::TrajectoryPoint> trajectory_points);
+      const std::vector<common::TrajectoryPoint>& trajectory_points);
 
   virtual ~DiscretizedTrajectory() = default;
 

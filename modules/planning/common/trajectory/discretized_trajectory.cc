@@ -33,10 +33,15 @@ namespace planning {
 using common::TrajectoryPoint;
 
 DiscretizedTrajectory::DiscretizedTrajectory(
-    std::vector<TrajectoryPoint> trajectory_points) {
+    const std::vector<TrajectoryPoint>& trajectory_points) {
   CHECK(!trajectory_points.empty())
       << "trajectory_points should NOT be empty()";
-  trajectory_points_ = std::move(trajectory_points);
+  trajectory_points_ = trajectory_points;
+}
+
+DiscretizedTrajectory::DiscretizedTrajectory(const ADCTrajectory& trajectory) {
+  trajectory_points_.assign(trajectory.trajectory_point().begin(),
+                            trajectory.trajectory_point().end());
 }
 
 TrajectoryPoint DiscretizedTrajectory::Evaluate(
