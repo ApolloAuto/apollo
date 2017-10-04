@@ -26,7 +26,7 @@ namespace apollo {
 namespace planning {
 
 Spline2dSolver::Spline2dSolver(const std::vector<double>& t_knots,
-                               const std::uint32_t order)
+                               const uint32_t order)
     : spline_(t_knots, order),
       kernel_(t_knots, order),
       constraint_(t_knots, order) {}
@@ -65,7 +65,7 @@ bool Spline2dSolver::Solve() {
     return false;
   }
 
-  const std::uint32_t spline_order = spline_.spline_order();
+  const uint32_t spline_order = spline_.spline_order();
   const Eigen::MatrixXd solved_params = qp_solver_->params();
   return spline_.set_splines(solved_params, spline_order);
 }

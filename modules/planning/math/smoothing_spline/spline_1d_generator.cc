@@ -29,7 +29,7 @@ namespace apollo {
 namespace planning {
 
 Spline1dGenerator::Spline1dGenerator(const std::vector<double>& x_knots,
-                                     const std::uint32_t spline_order)
+                                     const uint32_t spline_order)
     : spline_(x_knots, spline_order),
       spline_constraint_(x_knots, spline_order),
       spline_kernel_(x_knots, spline_order) {}
@@ -76,7 +76,7 @@ bool Spline1dGenerator::Solve() {
     return false;
   }
 
-  const std::uint32_t spline_order = spline_.spline_order();
+  const uint32_t spline_order = spline_.spline_order();
   const Eigen::MatrixXd solved_params = qp_solver_->params();
   return spline_.SetSplineSegs(solved_params, spline_order);
 }
