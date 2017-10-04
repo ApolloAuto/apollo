@@ -48,17 +48,17 @@ namespace math {
  * @param max_iter The maximum iterations for solving ARE
  * @param control The feedback control matrix (pointer)
  */
-void SolveLinearMPC(const Eigen::MatrixXd &matrix_a,
-                    const Eigen::MatrixXd &matrix_b,
-                    const Eigen::MatrixXd &matrix_c,
-                    const Eigen::MatrixXd &matrix_q,
-                    const Eigen::MatrixXd &matrix_r,
-                    const Eigen::MatrixXd &matrix_lower,
-                    const Eigen::MatrixXd &matrix_upper,
-                    const Eigen::MatrixXd &matrix_initial_state,
-                    const std::vector<Eigen::MatrixXd> &reference,
-                    const double eps,
-                    const int max_iter,
+void SolveLinearMPC(Eigen::MatrixXd &matrix_a,
+                    Eigen::MatrixXd &matrix_b,
+                    Eigen::MatrixXd &matrix_c,
+                    Eigen::MatrixXd &matrix_q,
+                    Eigen::MatrixXd &matrix_r,
+                    Eigen::MatrixXd &matrix_lower,
+                    Eigen::MatrixXd &matrix_upper,
+                    Eigen::MatrixXd &matrix_initial_state,
+                    std::vector<Eigen::MatrixXd> &reference,
+                    double eps,
+                    int max_iter,
                     std::vector<Eigen::MatrixXd> *control);
 
 }  // namespace math

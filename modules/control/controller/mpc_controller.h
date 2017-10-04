@@ -30,6 +30,7 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/control/common/interpolation_1d.h"
+#include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
@@ -109,7 +110,7 @@ class MPCController : public Controller {
 
   void UpdateMatrixCompound();
 
-  double ComputeFeedForward(double ref_curvature) const;
+  double ComputeLateralFeedForward(double ref_curvature) const;
 
   double GetLateralError(
       const common::math::Vec2d &point,
@@ -119,9 +120,14 @@ class MPCController : public Controller {
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleMPCDebug *debug) const;
+
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
+                            SimpleMPCDebug *debug);
+
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LogInitParameters();
+
   void ProcessLogs(const SimpleMPCDebug *debug,
                    const canbus::Chassis *chassis);
 
@@ -132,6 +138,11 @@ class MPCController : public Controller {
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
+
+  void LoadControlCalibrationTable(
+      const MPCControllerConf &mpc_controller_conf);
+
+  std::unique_ptr<Interpolation2D> control_interpolation_;
 
   // the following parameters are vehicle physics related.
   // control time interval
@@ -158,8 +169,6 @@ class MPCController : public Controller {
   // limit steering to maximum theoretical lateral acceleration
   double max_lat_acc_ = 0.0;
 
-  // number of control cycles look ahead (preview controller)
-  int preview_window_ = 0;
   // number of states without previews, includes
   // lateral error, lateral error rate, heading error, heading error rate, station error,
   // velocity error,
@@ -225,6 +234,12 @@ class MPCController : public Controller {
   std::ofstream steer_log_file_;
 
   const std::string name_;
+
+  double standstill_acceleration_ = 0.0;
+
+  double throttle_deadzone_ = 0.0;
+
+  double brake_deadzone_ = 0.0;
 };
 
 }  // namespace control
