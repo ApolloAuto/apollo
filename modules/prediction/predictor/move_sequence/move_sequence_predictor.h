@@ -83,7 +83,7 @@ class MoveSequencePredictor : public Predictor {
       const Obstacle& obstacle,
       const LaneSequence& lane_sequence,
       const double time_to_lane_center,
-      std::array<double, 5>* coefficients);
+      std::array<double, 6>* coefficients);
 
   double Cost(const double t,
               const std::array<double, COEFF_SIZE>& coeffs,
