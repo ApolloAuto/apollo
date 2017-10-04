@@ -84,6 +84,7 @@ cc_library(
         "//modules/common/time",
         "//modules/control/common:control_gflags",
         "//modules/control/common:interpolation_1d",
+        "//modules/control/common:interpolation_2d",
         "//modules/control/common:trajectory_analyzer",
         "//modules/control/filters:digital_filter",
         "//modules/control/filters:digital_filter_coefficients",
