@@ -78,9 +78,9 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1> *state,
     const Eigen::Matrix<double, 6, 6>& transition,
-    std::vector<TrajectoryPoint> *points,
-    size_t num,
-    double freq) {
+    const size_t num,
+    const double freq,
+    std::vector<TrajectoryPoint> *points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
