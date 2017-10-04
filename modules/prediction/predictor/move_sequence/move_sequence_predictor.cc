@@ -42,6 +42,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
+using apollo::common::Point3D;
 
 namespace {
 
@@ -193,8 +194,8 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
 
   double s0 = 0.0;
-  double ds0 = v * std::sin(theta - lane_heading);
-  double dds0 = a * std::sin(theta - lane_heading);
+  double ds0 = v * std::cos(theta - lane_heading);
+  double dds0 = a * std::cos(theta - lane_heading);
   double ds1 = v;
   double dds1 = a;
   double p = time_to_lane_center;
@@ -214,8 +215,51 @@ void MoveSequencePredictor::GetLateralPolynomial(
     const Obstacle& obstacle,
     const LaneSequence& lane_sequence,
     const double time_to_lane_center,
-    std::array<double, 5>* coefficients) {
-  // TODO(kechxu) implement
+    std::array<double, 6>* coefficients) {
+  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+  const Feature& feature = obstacle.latest_feature();
+  // TODO(kechxu) check speed is large enough to get valid velocity_heading
+  double theta = feature.velocity_heading();
+  double v = feature.speed();
+  double a = feature.acc();
+  Point3D position = feature.position();
+  if (FLAGS_enable_kf_tracking) {
+    v = feature.t_speed();
+    a = feature.t_acc();
+    position = feature.t_position();
+  }
+  const LanePoint& start_lane_point =
+      lane_sequence.lane_segment(0).lane_point(0);
+  double pos_delta_x = position.x() - start_lane_point.position().x();
+  double pos_delta_y = position.y() - start_lane_point.position().y();
+  double lane_heading_x = std::cos(start_lane_point.heading());
+  double lane_heading_y = std::sin(start_lane_point.heading());
+  double cross_prod =
+      lane_heading_x * pos_delta_y - lane_heading_y * pos_delta_x;
+  double shift = std::hypot(pos_delta_x, pos_delta_y);
+
+  double l0 = (cross_prod > 0) ? shift : -shift;
+  double dl0 = v * std::sin(theta - start_lane_point.heading());
+  double ddl0 = a * std::sin(theta - start_lane_point.heading());
+  double l1 = 0.0;
+  double dl1 = 0.0;
+  double ddl1 = 0.0;
+
+  coefficients->operator[](0) = l0;
+  coefficients->operator[](1) = dl0;
+  coefficients->operator[](2) = ddl0 / 2.0;
+  double p = time_to_lane_center;
+  double p2 = p * p;
+  double p3 = p2 * p;
+  double c0 = (l1 - 0.5 * p2 * ddl0 - dl0 * p - l0) / p3;
+  double c1 = (dl1 - ddl0 * p - dl0) / p2;
+  double c2 = (ddl1 - ddl0) / p;
+
+  coefficients->operator[](3) = 0.5 * (20.0 * c0 - 8.0 * c1 + c2);
+  coefficients->operator[](4) = (-15.0 * c0 + 7.0 * c1 - c2) / p;
+  coefficients->operator[](5) = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
 }
 
 void MoveSequencePredictor::DrawMotionTrajectoryPoints(
