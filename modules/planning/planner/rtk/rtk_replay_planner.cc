@@ -38,8 +38,7 @@ RTKReplayPlanner::RTKReplayPlanner() {
 Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
 Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
-                              Frame* frame,
-                              ReferenceLineInfo* reference_line_info) {
+                              Frame*, ReferenceLineInfo* reference_line_info) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
         "RTKReplayPlanner doesn't have a recorded trajectory or "
@@ -81,8 +80,7 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
                                  FLAGS_trajectory_resolution);
     trajectory_points.push_back(*new_point);
   }
-  reference_line_info->SetTrajectory(
-      DiscretizedTrajectory(std::move(trajectory_points)));
+  reference_line_info->SetTrajectory(DiscretizedTrajectory(trajectory_points));
   return Status::OK();
 }
 
