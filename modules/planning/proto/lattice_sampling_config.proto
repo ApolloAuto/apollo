@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message LonCondition {
+  optional double s = 1 [default = 0.0];
+  optional double ds = 2 [default = 0.0];
+  optional double dds = 3 [default = 0.0];
+}
+
+message LatCondition {
+  optional double l = 1 [default = 0.0];
+  optional double dl = 2 [default = 0.0];
+  optional double ddl = 3 [default = 0.0];
+}
+
+
+message LonSampleConfig {
+  
+}
+
+message LatSampleConfig {
+
+}
+
+message LatticeSamplingConfig {
+  optional LonSampleConfig lon_sample_config = 1;
+  optional LatSampleConfig lat_sample_config = 2;
+}

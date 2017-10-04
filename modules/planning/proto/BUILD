@@ -23,6 +23,7 @@ proto_library(
         ":dp_poly_path_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
+        ":lattice_sampling_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:common_proto_lib",
@@ -36,6 +37,20 @@ proto_library(
         "//modules/perception/proto:perception_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_sampling_config_proto",
+    deps = [
+        ":lattice_sampling_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lattice_sampling_config_proto_lib",
+    srcs = [
+        "lattice_sampling_config.proto",
     ],
 )
 
