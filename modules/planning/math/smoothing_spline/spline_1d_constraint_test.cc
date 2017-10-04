@@ -224,5 +224,71 @@ TEST(Spline1dConstraint, add_derivative_smooth_constraint) {
   }
 }
 
+TEST(Spline1dConstraint, add_second_derivative_smooth_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 4;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddSecondDerivativeSmoothConstraint();
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+  std::cout << mat << std::endl;
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 12);
+  ref_mat <<
+      1,  1,  1,  1, -1, -0, -0, -0,  0,  0,  0,  0,
+      0,  1,  2,  3,  0, -1, -0, -0,  0,  0,  0,  0,
+      0,  0,  2,  6,  0,  0, -2, -0,  0,  0,  0,  0,
+      0,  0,  0,  0,  1,  1,  1,  1, -1, -0, -0, -0,
+      0,  0,  0,  0,  0,  1,  2,  3,  0, -1, -0, -0,
+      0,  0,  0,  0,  0,  0,  2,  6,  0,  0, -2, -0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  for (int i = 0; i < boundary.rows(); ++i) {
+    EXPECT_DOUBLE_EQ(boundary(i, 0), 0.0);
+  }
+}
+
+TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddThirdDerivativeSmoothConstraint();
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+  std::cout << mat << std::endl;
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(8, 15);
+  ref_mat <<
+      1,  1,  1,  1,  1, -1, -0, -0, -0, -0,  0,  0,  0,  0,  0,
+      0,  1,  2,  3,  4,  0, -1, -0, -0, -0,  0,  0,  0,  0,  0,
+      0,  0,  2,  6, 12,  0,  0, -2, -0, -0,  0,  0,  0,  0,  0,
+      0,  0,  0,  6, 24,  0,  0,  0, -6, -0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  1,  1,  1,  1,  1, -1, -0, -0, -0, -0,
+      0,  0,  0,  0,  0,  0,  1,  2,  3,  4,  0, -1, -0, -0, -0,
+      0,  0,  0,  0,  0,  0,  0,  2,  6, 12,  0,  0, -2, -0, -0,
+      0,  0,  0,  0,  0,  0,  0,  0,  6, 24,  0,  0,  0, -6, -0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  for (int i = 0; i < boundary.rows(); ++i) {
+    EXPECT_DOUBLE_EQ(boundary(i, 0), 0.0);
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
