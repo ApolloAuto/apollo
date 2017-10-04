@@ -89,6 +89,8 @@ class Planning : public apollo::common::ApolloApp {
 
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
 
+  void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
+
  private:
   // Watch dog timer
   void OnTimer(const ros::TimerEvent&);
@@ -110,7 +112,7 @@ class Planning : public apollo::common::ApolloApp {
 
   std::unique_ptr<Planner> planner_;
 
-  PublishableTrajectory last_publishable_trajectory_;
+  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
   ros::Timer timer_;
 };
