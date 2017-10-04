@@ -19,10 +19,20 @@
 #include <cmath>
 #include <utility>
 #include <limits>
+#include <memory>
 
 #include "Eigen/Dense"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -30,6 +40,8 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
+using apollo::common::adapter::AdapterConfig;
+using apollo::hdmap::LaneInfo;
 
 namespace {
 
@@ -81,8 +93,8 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  // FilterLaneSequences(feature.lane().lane_graph(), lane_id,
-  //                     &enable_lane_sequence);
+  FilterLaneSequences(feature.lane().lane_graph(), lane_id,
+                      &enable_lane_sequence);
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
     if (sequence.lane_segment_size() <= 0) {
@@ -176,7 +188,6 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
     acc(1) = feature.t_acceleration().y();
   }
   const KalmanFilter<double, 6, 2, 0>& kf = obstacle.kf_motion_tracker();
-  double theta = std::atan2(velocity(1), velocity(0));
 
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
   state(0, 0) = 0.0;
@@ -194,69 +205,9 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
   transition(2, 4) = freq;
   transition(3, 5) = freq;
 
-  double x = state(0, 0);
-  double y = state(1, 0);
-  double v_x = state(2, 0);
-  double v_y = state(3, 0);
-  double acc_x = state(4, 0);
-  double acc_y = state(5, 0);
-  for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
-    double speed = std::hypot(v_x, v_y);
-    if (speed <= std::numeric_limits<double>::epsilon()) {
-      speed = 0.0;
-      v_x = 0.0;
-      v_y = 0.0;
-      acc_x = 0.0;
-      acc_y = 0.0;
-    } else if (speed > FLAGS_max_speed) {
-      speed = FLAGS_max_speed;
-    }
-
-    // update theta
-    if (speed > std::numeric_limits<double>::epsilon()) {
-      if (points->size() > 0) {
-        PathPoint* prev_point = points->back().mutable_path_point();
-        theta = std::atan2(y - prev_point->y(), x - prev_point->x());
-        prev_point->set_theta(theta);
-      }
-    } else {
-      if (points->size() > 0) {
-        theta = points->back().path_point().theta();
-      }
-    }
-
-    // update velocity and acc
-    state(2, 0) = v_x;
-    state(3, 0) = v_y;
-    state(4, 0) = acc_x;
-    state(5, 0) = acc_y;
-
-    // update position
-    x = state(0, 0);
-    y = state(1, 0);
-
-    // Generate trajectory point
-    TrajectoryPoint trajectory_point;
-    PathPoint path_point;
-    path_point.set_x(x);
-    path_point.set_y(y);
-    path_point.set_z(0.0);
-    path_point.set_theta(theta);
-    trajectory_point.mutable_path_point()->CopyFrom(path_point);
-    trajectory_point.set_v(speed);
-    trajectory_point.set_a(std::hypot(acc_x, acc_y));
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
-    points->emplace_back(std::move(trajectory_point));
-
-    // Update position, velocity and acceleration
-    state = transition * state;
-    x = state(0, 0);
-    y = state(1, 0);
-    v_x = state(2, 0);
-    v_y = state(3, 0);
-    acc_x = state(4, 0);
-    acc_y = state(5, 0);
-  }
+  size_t num = static_cast<size_t>(total_time / freq);
+  apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
+      &state, transition, num, freq, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
@@ -278,6 +229,145 @@ double MoveSequencePredictor::MotionWeight(const double t) {
   double c = 1.5;
 
   return 1.0 - 1.0 / (1.0 + a * std::exp(-b * (t - c)));
+}
+
+void MoveSequencePredictor::FilterLaneSequences(
+    const LaneGraph& lane_graph, const std::string& lane_id,
+    std::vector<bool>* enable_lane_sequence) {
+  int num_lane_sequence = lane_graph.lane_sequence_size();
+  std::vector<int> lane_change_type(num_lane_sequence, -1);
+  std::pair<int, double> change(-1, -1.0);
+  std::pair<int, double> all(-1, -1.0);
+
+  // Get ADC status
+  GetADC();
+
+  for (int i = 0; i < num_lane_sequence; ++i) {
+    const LaneSequence& sequence = lane_graph.lane_sequence(i);
+
+    // Get lane change type
+    lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
+
+    double probability = sequence.probability();
+
+    if (probability > all.second ||
+        (probability == all.second && lane_change_type[i] == 0)) {
+      all.first = i;
+      all.second = probability;
+    }
+    if (lane_change_type[i] > 0 && probability > change.second) {
+      change.first = i;
+      change.second = probability;
+    }
+  }
+
+  for (int i = 0; i < num_lane_sequence; ++i) {
+    const LaneSequence& sequence = lane_graph.lane_sequence(i);
+
+    // The obstacle has interference with ADC within a small distance
+    if (GetLaneChangeDistanceWithADC(sequence) < FLAGS_lane_change_dist) {
+      (*enable_lane_sequence)[i] = false;
+      continue;
+    }
+
+    double probability = sequence.probability();
+    if (probability < FLAGS_lane_sequence_threshold && i != all.first) {
+      (*enable_lane_sequence)[i] = false;
+    } else if (change.first >= 0 && change.first < num_lane_sequence &&
+               lane_change_type[i] > 0 &&
+               lane_change_type[i] != lane_change_type[change.first]) {
+      (*enable_lane_sequence)[i] = false;
+    }
+  }
+}
+
+void MoveSequencePredictor::GetADC() {
+  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::PERCEPTION_OBSTACLES));
+  if (container == nullptr) {
+    AERROR << "Unavailable obstacle container";
+    return;
+  }
+
+  Obstacle* adc = container->GetObstacle(PoseContainer::ID);
+  if (adc != nullptr) {
+    const Feature& feature = adc->latest_feature();
+    if (feature.has_lane() && feature.lane().has_lane_feature()) {
+      adc_lane_id_ = feature.lane().lane_feature().lane_id();
+      adc_lane_s_ = feature.lane().lane_feature().lane_s();
+    }
+    if (feature.has_position()) {
+      adc_position_[0] = feature.position().x();
+      adc_position_[1] = feature.position().y();
+    }
+  }
+}
+
+int MoveSequencePredictor::GetLaneChangeType(
+    const std::string& lane_id, const LaneSequence& lane_sequence) {
+  PredictionMap* map = PredictionMap::instance();
+
+  std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
+  if (lane_id == lane_change_id) {
+    return 0;
+  } else {
+    if (map->IsLeftNeighborLane(map->LaneById(lane_change_id),
+                                map->LaneById(lane_id))) {
+      return 1;
+    } else if (map->IsRightNeighborLane(map->LaneById(lane_change_id),
+                                        map->LaneById(lane_id))) {
+      return 2;
+    }
+  }
+  return -1;
+}
+
+double MoveSequencePredictor::GetLaneChangeDistanceWithADC(
+    const LaneSequence& lane_sequence) {
+  if (adc_lane_id_.empty() || lane_sequence.lane_segment_size() <= 0) {
+    return std::numeric_limits<double>::max();
+  }
+
+  PredictionMap* map = PredictionMap::instance();
+  std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
+  double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
+
+  if (SameLaneSequence(obstacle_lane_id, obstacle_lane_s)) {
+    return std::numeric_limits<double>::max();
+  }
+
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  if (map->GetProjection(adc_position_, map->LaneById(obstacle_lane_id),
+                         &lane_s, &lane_l)) {
+    return std::fabs(lane_s - obstacle_lane_s);
+  }
+  return std::numeric_limits<double>::max();
+}
+
+bool MoveSequencePredictor::SameLaneSequence(const std::string& lane_id,
+                                             double lane_s) {
+  PredictionMap* map = PredictionMap::instance();
+
+  std::shared_ptr<const LaneInfo> obstacle_lane = map->LaneById(lane_id);
+  std::shared_ptr<const LaneInfo> adc_lane = map->LaneById(adc_lane_id_);
+
+  if (obstacle_lane != nullptr && adc_lane != nullptr) {
+    RoadGraph obstacle_road_graph(lane_s, FLAGS_lane_change_dist,
+                                  obstacle_lane);
+    LaneGraph obstacle_lane_graph;
+    obstacle_road_graph.BuildLaneGraph(&obstacle_lane_graph);
+
+    RoadGraph adc_road_graph(adc_lane_s_, FLAGS_lane_change_dist, adc_lane);
+    LaneGraph adc_lane_graph;
+    adc_road_graph.BuildLaneGraph(&adc_lane_graph);
+
+    return obstacle_road_graph.IsOnLaneGraph(adc_lane, obstacle_lane_graph) ||
+           adc_road_graph.IsOnLaneGraph(obstacle_lane, adc_lane_graph);
+  }
+
+  return false;
 }
 
 std::string MoveSequencePredictor::ToString(const LaneSequence& sequence) {

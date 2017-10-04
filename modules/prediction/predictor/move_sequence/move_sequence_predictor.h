@@ -25,6 +25,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include "Eigen/Dense"
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
@@ -78,7 +79,24 @@ class MoveSequencePredictor : public Predictor {
 
   double MotionWeight(const double t);
 
+  void FilterLaneSequences(const LaneGraph& lane_graph,
+                           const std::string& lane_id,
+                           std::vector<bool>* enable_lane_sequence);
+
+  int GetLaneChangeType(const std::string& lane_id,
+                        const LaneSequence& lane_sequence);
+
+  double GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence);
+
+  bool SameLaneSequence(const std::string& lane_id, double lane_s);
+
+  void GetADC();
+
   std::string ToString(const LaneSequence& sequence);
+
+  std::string adc_lane_id_ = "";
+  double adc_lane_s_ = 0.0;
+  Eigen::Vector2d adc_position_;
 };
 
 }  // namespace prediction
