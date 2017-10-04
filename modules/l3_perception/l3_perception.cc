@@ -76,6 +76,8 @@ void L3Perception::OnMobileye(const Mobileye& message) {
 void L3Perception::OnDelphiESR(const DelphiESR& message) {
   AINFO << "receive DelphiESR callback";
   std::lock_guard<std::mutex> lock(l3_mutex_);
+  last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
+  current_radar_obstacles_.Clear();
   current_radar_obstacles_ = conversion::DelphiToRadarObstacles(
       message, localization_, last_radar_obstacles_);
 }
@@ -110,10 +112,10 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   if (radar_obstacle.rcs() < -1.0) {
     return false;
   }
+*/
   if (!radar_obstacle.movable()) {
     return false;
   }
-  */
   // TODO(rongqiqiu): keep those with stable forward velocity
   double nearest_l =
       GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
@@ -156,11 +158,6 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
 
-  last_radar_obstacles_.push(current_radar_obstacles_);
-  while (last_radar_obstacles_.size() > (size_t)FLAGS_keep_delphi_esr_frames) {
-    last_radar_obstacles_.pop();
-  }
-  current_radar_obstacles_.Clear();
   mobileye_obstacles_.Clear();
 }
 
