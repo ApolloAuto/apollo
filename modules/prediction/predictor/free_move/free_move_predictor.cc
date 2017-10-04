@@ -95,7 +95,7 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
 
   size_t num = static_cast<size_t>(total_time / freq);
   ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, points, num, freq);
+      &state, transition, num, freq, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     ::apollo::prediction::predictor_util::TranslatePoint(
