@@ -18,8 +18,10 @@
 
 #include <cmath>
 #include <limits>
+#include <string>
 
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -145,6 +147,94 @@ void GenerateFreeMoveTrajectoryPoints(
     v_y = (*state)(3, 0);
     acc_x = (*state)(4, 0);
     acc_y = (*state)(5, 0);
+  }
+}
+
+void GenerateLaneSequenceTrajectoryPoints(
+    Eigen::Matrix<double, 4, 1> *state,
+    Eigen::Matrix<double, 4, 4> *transition,
+    const LaneSequence& sequence,
+    const size_t num,
+    const double freq,
+    std::vector<TrajectoryPoint> *points) {
+  PredictionMap* map = PredictionMap::instance();
+  double lane_s = (*state)(0, 0);
+  double lane_l = (*state)(1, 0);
+  double lane_speed = (*state)(2, 0);
+  double lane_acc = (*state)(3, 0);
+
+  int lane_segment_index = 0;
+  std::string lane_id = sequence.lane_segment(lane_segment_index).lane_id();
+  for (size_t i = 0; i < num; ++i) {
+    Eigen::Vector2d point;
+    double theta = M_PI;
+    if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
+      AERROR << "Unable to get smooth point from lane [" << lane_id
+             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
+      break;
+    }
+
+    if (points->size() > 0) {
+      PathPoint* prev_point = points->back().mutable_path_point();
+      double x_diff = point.x() - prev_point->x();
+      double y_diff = point.y() - prev_point->y();
+      if (std::fabs(x_diff) > std::numeric_limits<double>::epsilon() ||
+          std::fabs(y_diff) > std::numeric_limits<double>::epsilon()) {
+        theta = std::atan2(y_diff, x_diff);
+        prev_point->set_theta(theta);
+      } else {
+        theta = prev_point->theta();
+      }
+    }
+
+    // update state
+    if (lane_speed <= 0.0) {
+      ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
+      lane_speed = 0.0;
+      lane_acc = 0.0;
+      (*transition)(1, 1) = 1.0;
+    } else if (lane_speed >= FLAGS_max_speed) {
+      lane_speed = FLAGS_max_speed;
+      lane_acc = 0.0;
+    }
+
+    // add trajectory point
+    TrajectoryPoint trajectory_point;
+    PathPoint path_point;
+    path_point.set_x(point.x());
+    path_point.set_y(point.y());
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(lane_speed);
+    trajectory_point.set_a(lane_acc);
+    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    points->emplace_back(std::move(trajectory_point));
+
+    (*state)(2, 0) = lane_speed;
+    (*state)(3, 0) = lane_acc;
+
+    (*state) = (*transition) * (*state);
+    if (lane_s >= (*state)(0, 0)) {
+      (*state)(0, 0) = lane_s;
+      (*state)(1, 0) = lane_l;
+      (*state)(2, 0) = 0.0;
+      (*state)(3, 0) = 0.0;
+      (*transition)(1, 1) = 1.0;
+    }
+    lane_s = (*state)(0, 0);
+    lane_l = (*state)(1, 0);
+    lane_speed = (*state)(2, 0);
+    lane_acc = (*state)(3, 0);
+
+    // find next lane id
+    while (lane_s > map->LaneById(lane_id)->total_length() &&
+           lane_segment_index + 1 < sequence.lane_segment_size()) {
+      lane_segment_index += 1;
+      lane_s = lane_s - map->LaneById(lane_id)->total_length();
+      (*state)(0, 0) = lane_s;
+      lane_id = sequence.lane_segment(lane_segment_index).lane_id();
+    }
   }
 }
 

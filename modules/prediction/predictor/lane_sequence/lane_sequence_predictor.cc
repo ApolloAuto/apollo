@@ -22,11 +22,11 @@
 #include <utility>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
 #include "modules/prediction/container/container_manager.h"
@@ -60,10 +60,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
-  std::string lane_id = "";
-  if (feature.lane().has_lane_feature()) {
-    lane_id = feature.lane().lane_feature().lane_id();
-  }
+  std::string lane_id = feature.lane().lane_feature().lane_id();
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
   FilterLaneSequences(feature.lane().lane_graph(), lane_id,
@@ -243,91 +240,17 @@ bool LaneSequencePredictor::SameLaneSequence(const std::string& lane_id,
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
     double total_time, double freq, std::vector<TrajectoryPoint>* points) {
-  PredictionMap* map = PredictionMap::instance();
+  // PredictionMap* map = PredictionMap::instance();
 
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
-  double lane_s = state(0, 0);
-  double lane_l = state(1, 0);
-  double lane_speed = state(2, 0);
-  double lane_acc = state(3, 0);
-
   Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
   transition(0, 2) = freq;
   transition(0, 3) = 0.5 * freq * freq;
   transition(2, 3) = freq;
 
-  int lane_segment_index = 0;
-  std::string lane_id = sequence.lane_segment(lane_segment_index).lane_id();
-  for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
-    Eigen::Vector2d point;
-    double theta = M_PI;
-    if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
-      AERROR << "Unable to get smooth point from lane [" << lane_id
-             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
-      break;
-    }
-
-    if (points->size() > 0) {
-      PathPoint* prev_point = points->back().mutable_path_point();
-      double x_diff = point.x() - prev_point->x();
-      double y_diff = point.y() - prev_point->y();
-      if (x_diff != 0.0 || y_diff != 0.0) {
-        theta = std::atan2(y_diff, x_diff);
-        prev_point->set_theta(theta);
-      } else {
-        theta = prev_point->theta();
-      }
-    }
-
-    // update state
-    if (lane_speed <= 0.0) {
-      ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
-      lane_speed = 0.0;
-      lane_acc = 0.0;
-      transition(1, 1) = 1.0;
-    } else if (lane_speed >= FLAGS_max_speed) {
-      lane_speed = FLAGS_max_speed;
-      lane_acc = 0.0;
-    }
-
-    // add trajectory point
-    TrajectoryPoint trajectory_point;
-    PathPoint path_point;
-    path_point.set_x(point.x());
-    path_point.set_y(point.y());
-    path_point.set_z(0.0);
-    path_point.set_theta(theta);
-    trajectory_point.mutable_path_point()->CopyFrom(path_point);
-    trajectory_point.set_v(lane_speed);
-    trajectory_point.set_a(lane_acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
-    points->emplace_back(std::move(trajectory_point));
-
-    state(2, 0) = lane_speed;
-    state(3, 0) = lane_acc;
-
-    state = transition * state;
-    if (lane_s >= state(0, 0)) {
-      state(0, 0) = lane_s;
-      state(1, 0) = lane_l;
-      state(2, 0) = 0.0;
-      state(3, 0) = 0.0;
-      transition(1, 1) = 1.0;
-    }
-    lane_s = state(0, 0);
-    lane_l = state(1, 0);
-    lane_speed = state(2, 0);
-    lane_acc = state(3, 0);
-
-    // find next lane id
-    while (lane_s > map->LaneById(lane_id)->total_length() &&
-           lane_segment_index + 1 < sequence.lane_segment_size()) {
-      lane_segment_index += 1;
-      lane_s = lane_s - map->LaneById(lane_id)->total_length();
-      state(0, 0) = lane_s;
-      lane_id = sequence.lane_segment(lane_segment_index).lane_id();
-    }
-  }
+  size_t num = static_cast<size_t>(total_time / freq);
+  ::apollo::prediction::predictor_util::GenerateLaneSequenceTrajectoryPoints(
+      &state, &transition, sequence, num, freq, points);
 }
 
 std::string LaneSequencePredictor::ToString(const LaneSequence& sequence) {
