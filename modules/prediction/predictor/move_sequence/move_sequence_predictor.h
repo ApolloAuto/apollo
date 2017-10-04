@@ -73,6 +73,12 @@ class MoveSequencePredictor : public Predictor {
       const double total_time, const double freq,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
+  void GetLongitudinalEndState(
+      const Obstacle& obstacle,
+      const LaneSequence& lane_sequence,
+      const double time_to_lane_center,
+      std::array<double, 5>* coefficients);
+
   double Cost(const double t,
               const std::array<double, COEFF_SIZE>& coeffs,
               const double alpha);
