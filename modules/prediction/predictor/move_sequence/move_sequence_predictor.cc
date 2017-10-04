@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
+
 #include <cmath>
 #include <utility>
 #include <limits>
 
 #include "Eigen/Dense"
-
-#include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
