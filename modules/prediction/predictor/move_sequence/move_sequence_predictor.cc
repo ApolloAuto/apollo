@@ -159,7 +159,55 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     const LaneSequence& lane_sequence,
     const double total_time, const double freq,
     std::vector<TrajectoryPoint>* points) {
-  // TODO(kechxu) implement
+  // longitudinal polynomial
+
+  // lateral polynomial
+
+  // for t 0 -> prediction_total_time
+  //     get lateral l
+  //     get longitudinal s
+  //     convert (s, l) to (x, y)
+  //     store (x, y) in points
+
+  // extent the points along reference line if needed
+}
+
+void MoveSequencePredictor::GetLongitudinalEndState(
+    const Obstacle& obstacle,
+    const LaneSequence& lane_sequence,
+    const double time_to_lane_center,
+    std::array<double, 5>* coefficients) {
+
+  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+  const Feature& feature = obstacle.latest_feature();
+  // TODO(kechxu) check speed is large enough to get valid velocity_heading
+  double theta = feature.velocity_heading();
+  double v = feature.speed();
+  double a = feature.acc();
+  if (FLAGS_enable_kf_tracking) {
+    v = feature.t_speed();
+    a = feature.t_acc();
+  }
+  double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
+
+  double s0 = 0.0;
+  double ds0 = v * std::sin(theta - lane_heading);
+  double dds0 = a * std::sin(theta - lane_heading);
+  double ds1 = v;
+  double dds1 = a;
+  double p = time_to_lane_center;
+
+  coefficients->operator[](0) = s0;
+  coefficients->operator[](1) = ds0;
+  coefficients->operator[](2) = 0.5 * dds0;
+  double b0 = ds1 - dds0 * p - ds0;
+  double b1 = dds1 - dds0;
+  double p2 = p * p;
+  double p3 = p2 * p;
+  coefficients->operator[](3) = b0 / p2 - b1 / 3.0 / p;
+  coefficients->operator[](4) = -0.5 / p3 * b0 + 0.25 / p2 * b1;
 }
 
 void MoveSequencePredictor::DrawMotionTrajectoryPoints(
