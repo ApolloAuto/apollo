@@ -37,6 +37,7 @@
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/CompressedImage.h"
 
 /**
  * @file message_adapters.h
@@ -69,6 +70,7 @@ using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
+using ImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 
 }  // namespace adapter
 }  // namespace common
