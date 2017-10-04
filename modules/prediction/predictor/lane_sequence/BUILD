@@ -12,6 +12,7 @@ cc_library(
         "//modules/common/math:math_utils",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
