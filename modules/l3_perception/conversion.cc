@@ -141,11 +141,11 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
 RadarObstacles DelphiToRadarObstacles(
     const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
-    const std::queue<RadarObstacles>& last_radar_obstacles) {
+    const RadarObstacles& last_radar_obstacles) {
   RadarObstacles obstacles;
 
   const double last_timestamp =
-      last_radar_obstacles.front().header().timestamp_sec();
+      last_radar_obstacles.header().timestamp_sec();
   const double current_timestamp = delphi_esr.header().timestamp_sec();
 
   // assign motion power from 540
@@ -210,18 +210,21 @@ RadarObstacles DelphiToRadarObstacles(
     rob.mutable_relative_velocity()->set_y(range_vel * std::sin(angle) +
                                            lateral_vel * std::cos(angle));
 
-    const auto iter_back =
-        last_radar_obstacles.back().radar_obstacle().find(index);
-    if (iter_back == last_radar_obstacles.back().radar_obstacle().end()) {
+    const auto iter =
+        last_radar_obstacles.radar_obstacle().find(index);
+    if (iter == last_radar_obstacles.radar_obstacle().end()) {
       rob.set_count(0);
+      rob.set_movable(false);
+      rob.set_moving_frames_count(0);
     } else {
-      rob.set_count(iter_back->second.count() + 1);
+      rob.set_count(iter->second.count() + 1);
+      rob.set_movable(iter->second.movable());
     }
 
     Point absolute_vel;
     const auto iter_front =
-        last_radar_obstacles.front().radar_obstacle().find(index);
-    if (iter_front == last_radar_obstacles.front().radar_obstacle().end()) {
+        last_radar_obstacles.radar_obstacle().find(index);
+    if (iter_front == last_radar_obstacles.radar_obstacle().end()) {
       // new in the current frame
       absolute_vel.set_x(0.0);
       absolute_vel.set_y(0.0);
@@ -237,6 +240,16 @@ RadarObstacles DelphiToRadarObstacles(
       absolute_vel.set_z(0.0);
     }
     rob.mutable_absolute_velocity()->CopyFrom(absolute_vel);
+
+    double v_heading = std::atan2(rob.absolute_velocity().y(), rob.absolute_velocity().x());
+    if (Speed(rob.absolute_velocity()) > 6.7 && std::abs(v_heading - rob.theta()) < 1.5) {
+      rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
+    } else {
+      rob.set_moving_frames_count(0);
+    }
+    if (rob.moving_frames_count() >= 5) {
+      rob.set_movable(true);
+    }
     (*obstacles.mutable_radar_obstacle())[index] = rob;
   }
 

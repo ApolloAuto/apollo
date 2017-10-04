@@ -64,7 +64,7 @@ class L3Perception : public apollo::common::ApolloApp {
   apollo::perception::PerceptionObstacles mobileye_obstacles_;
   apollo::localization::LocalizationEstimate localization_;
   RadarObstacles current_radar_obstacles_;
-  std::queue<RadarObstacles> last_radar_obstacles_;
+  RadarObstacles last_radar_obstacles_;
   std::mutex l3_mutex_;
 };
 
