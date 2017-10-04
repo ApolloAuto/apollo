@@ -97,7 +97,7 @@ bool Frame::InitReferenceLineInfo(
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
     reference_line_info_.emplace_back(pnc_map_, reference_line,
-                                      planning_start_point_, smoother_config_);
+                                      planning_start_point_);
   }
   for (auto &info : reference_line_info_) {
     if (!info.Init()) {
@@ -352,7 +352,7 @@ const ReferenceLineInfo *Frame::DriveReferenceLinfInfo() const {
   return drive_reference_line_info_;
 }
 
-const std::vector<const Obstacle*> &Frame::obstacles() const {
+const std::vector<const Obstacle *> &Frame::obstacles() const {
   return obstacles_.Items();
 }
 
