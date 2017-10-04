@@ -122,6 +122,12 @@ message SimpleMPCDebug {
   optional double steering_position = 15;
   optional double ref_speed = 16;
   optional double steer_angle_limited = 17;
+  optional double station_reference = 18;
+  optional double station_error = 19;
+  optional double speed_reference = 20;
+  optional double speed_error = 21;
+  optional double acceleration_reference = 22;
+  optional bool is_full_stop = 23;
 }
 
 message InputDebug {

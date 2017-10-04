@@ -37,12 +37,12 @@ void ControllerAgent::RegisterControllers() {
       controller_factory_.Register(
       ControlConf::LAT_CONTROLLER,
       []() -> Controller * { return new LatController(); });
-  controller_factory_.Register(
+      controller_factory_.Register(
       ControlConf::LON_CONTROLLER,
       []() -> Controller * { return new LonController(); });
     } else {
-  controller_factory_.Register(
-      ControlConf::LON_CONTROLLER,
+      controller_factory_.Register(
+      ControlConf::MPC_CONTROLLER,
       []() -> Controller * { return new MPCController(); });
     }
 }
