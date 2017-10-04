@@ -172,7 +172,7 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
   // extent the points along reference line if needed
 }
 
-void MoveSequencePredictor::GetLongitudinalEndState(
+void MoveSequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle,
     const LaneSequence& lane_sequence,
     const double time_to_lane_center,
@@ -208,6 +208,14 @@ void MoveSequencePredictor::GetLongitudinalEndState(
   double p3 = p2 * p;
   coefficients->operator[](3) = b0 / p2 - b1 / 3.0 / p;
   coefficients->operator[](4) = -0.5 / p3 * b0 + 0.25 / p2 * b1;
+}
+
+void MoveSequencePredictor::GetLateralPolynomial(
+    const Obstacle& obstacle,
+    const LaneSequence& lane_sequence,
+    const double time_to_lane_center,
+    std::array<double, 5>* coefficients) {
+  // TODO(kechxu) implement
 }
 
 void MoveSequencePredictor::DrawMotionTrajectoryPoints(
