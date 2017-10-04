@@ -26,7 +26,7 @@
 namespace apollo {
 namespace planning {
 
-Spline1dSeg::Spline1dSeg(const std::uint32_t order) {
+Spline1dSeg::Spline1dSeg(const uint32_t order) {
   spline_func_ = PolynomialXd(order);
   derivative_.DerivedFrom(spline_func_);
   second_order_derivative_.DerivedFrom(derivative_);

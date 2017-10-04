@@ -34,7 +34,7 @@ namespace planning {
 
 class Spline2dSolver {
  public:
-  Spline2dSolver(const std::vector<double>& t_knots, const std::uint32_t order);
+  Spline2dSolver(const std::vector<double>& t_knots, const uint32_t order);
 
   // customize setup
   Spline2dConstraint* mutable_constraint();
