@@ -22,6 +22,7 @@
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -74,11 +75,30 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @brief Generate a set of free move trajectory points
  * @param state matrix
  * @param transition matrix
+ * @param total number of generated trajectory points required
+ * @param trajectory point interval frequency
  * @param generated trajectory points
  */
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1> *state,
     const Eigen::Matrix<double, 6, 6>& transition,
+    const size_t num,
+    const double freq,
+    std::vector<::apollo::common::TrajectoryPoint> *points);
+
+/**
+ * @brief Generate a set of lane sequence trajectory points
+ * @param state matrix
+ * @param transition matrix
+ * @param lane sequence
+ * @param total number of generated trajectory points required
+ * @param trajectory point interval frequency
+ * @param generated trajectory points
+ */
+void GenerateLaneSequenceTrajectoryPoints(
+    Eigen::Matrix<double, 4, 1> *state,
+    Eigen::Matrix<double, 4, 4> *transition,
+    const LaneSequence& sequence,
     const size_t num,
     const double freq,
     std::vector<::apollo::common::TrajectoryPoint> *points);
