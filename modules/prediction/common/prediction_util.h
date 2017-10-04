@@ -79,9 +79,9 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1> *state,
     const Eigen::Matrix<double, 6, 6>& transition,
-    std::vector<::apollo::common::TrajectoryPoint> *points,
-    size_t num,
-    double freq);
+    const size_t num,
+    const double freq,
+    std::vector<::apollo::common::TrajectoryPoint> *points);
 
 }  // namespace predictor_util
 }  // namespace prediction
