@@ -128,26 +128,24 @@ TEST(constraint_test, test_suit_one) {
 -1.211413066070579303 ,  434611.70651126321172,   4436960.6103393463418,   3.8086970946064799826,   -10.13763183447815841 ,  2.3217522018132972405e-05; // NOLINT
   // clang-format on
 
-  // double t = 0;
-  // for (int i = 0; i < 51; ++i) {
-  //   auto xy = spline_solver.spline()(t);
-  //   const double heading = std::atan2(spline_solver.spline().derivative_y(t),
-  //                                     spline_solver.spline().DerivativeX(t));
-  //   const double kappa = CurveMath::ComputeCurvature(
-  //       spline_solver.spline().DerivativeX(t),
-  //       spline_solver.spline().SecondDerivativeX(t),
-  //       spline_solver.spline().derivative_y(t),
-  //       spline_solver.spline().second_derivative_y(t));
-  //   EXPECT_NEAR(heading, gold_res(i, 0), 1e-10);
-  //   EXPECT_NEAR(xy.first, gold_res(i, 1), 1e-10);
-  //   EXPECT_NEAR(xy.second, gold_res(i, 2), 1e-10);
-  //   EXPECT_NEAR(spline_solver.spline().DerivativeX(t), gold_res(i, 3),
-  //   1e-10);
-  //   EXPECT_NEAR(spline_solver.spline().derivative_y(t), gold_res(i, 4),
-  //   1e-10);
-  //   EXPECT_NEAR(kappa, gold_res(i, 5), 1e-10);
-  //   t += 0.1;
-  // }
+  double t = 0;
+  for (int i = 0; i < 51; ++i) {
+    auto xy = spline_solver.spline()(t);
+    const double heading = std::atan2(spline_solver.spline().derivative_y(t),
+                                      spline_solver.spline().DerivativeX(t));
+    const double kappa = CurveMath::ComputeCurvature(
+        spline_solver.spline().DerivativeX(t),
+        spline_solver.spline().SecondDerivativeX(t),
+        spline_solver.spline().derivative_y(t),
+        spline_solver.spline().second_derivative_y(t));
+    EXPECT_NEAR(heading, gold_res(i, 0), 1e-6);
+    EXPECT_NEAR(xy.first, gold_res(i, 1), 1e-6);
+    EXPECT_NEAR(xy.second, gold_res(i, 2), 1e-6);
+    EXPECT_NEAR(spline_solver.spline().DerivativeX(t), gold_res(i, 3), 1e-6);
+    EXPECT_NEAR(spline_solver.spline().derivative_y(t), gold_res(i, 4), 1e-6);
+    EXPECT_NEAR(kappa, gold_res(i, 5), 1e-6);
+    t += 0.1;
+  }
 }
 
 }  // namespace planning

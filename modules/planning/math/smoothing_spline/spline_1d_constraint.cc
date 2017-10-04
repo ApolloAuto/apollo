@@ -502,7 +502,7 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
 bool Spline1dConstraint::AddMonotoneInequalityConstraint(
     const std::vector<double>& x_coord) {
   if (x_coord.size() < 2) {
-    // no inequality constraint needed
+    // Skip because NO inequality constraint is needed.
     return false;
   }
 
@@ -519,6 +519,7 @@ bool Spline1dConstraint::AddMonotoneInequalityConstraint(
     std::uint32_t cur_spline_index = FindIndex(x_coord[i]);
     double cur_rel_x = x_coord[i] - x_knots_[cur_spline_index];
     std::vector<double> cur_coef;
+
     GeneratePowerX(cur_rel_x, spline_order_, &cur_coef);
     // if constraint on the same spline
     if (cur_spline_index == prev_spline_index) {
@@ -536,6 +537,7 @@ bool Spline1dConstraint::AddMonotoneInequalityConstraint(
       }
     }
     prev_coef = cur_coef;
+    prev_spline_index = cur_spline_index;
   }
 
   return inequality_constraint_.AddConstraint(inequality_constraint,
