@@ -80,7 +80,7 @@ new_http_archive(
     name = "ros",
     build_file = "third_party/ros.BUILD",
     strip_prefix = "ros",
-    url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.5.0/ros-indigo-apollo-1.5.0-MACHINE_ARCH.tar.gz",
+    url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.5.1/ros-indigo-apollo-1.5.1-MACHINE_ARCH.tar.gz",
 )
 
 # OpenCV 2.4.13.2

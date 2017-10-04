@@ -135,8 +135,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
                         config.message_history_limit());
         break;
       case AdapterConfig::COMPRESSED_IMAGE:
-        EnableImage(FLAGS_compressed_image_topic, config.mode(),
-                    config.message_history_limit());
+        EnableCompressedImage(FLAGS_compressed_image_topic, config.mode(),
+                              config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

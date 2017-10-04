@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_WEBSOCKET_WEBSOCKET_H_
-#define MODULES_DREAMVIEW_BACKEND_WEBSOCKET_WEBSOCKET_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_H_
+#define MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_H_
 
 #include <memory>
 #include <mutex>
@@ -139,4 +139,4 @@ class WebSocketHandler : public CivetWebSocketHandler {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif /* MODULES_DREAMVIEW_BACKEND_WEBSOCKET_WEBSOCKET_H_ */
+#endif /* MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_H_ */

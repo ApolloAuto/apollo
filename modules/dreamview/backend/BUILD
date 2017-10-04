@@ -16,7 +16,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/sim_control",
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
-        "//modules/dreamview/backend/websocket",
+        "//modules/dreamview/backend/handlers:websocket",
         "//modules/map/hdmap:hdmap_util",
         "@civetweb//:civetweb++",
     ],

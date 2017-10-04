@@ -53,5 +53,6 @@ DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
 DEFINE_string(mobileye_topic, "/apollo/mobileye", "mobileye topic name");
 DEFINE_string(delphi_esr_topic, "/apollo/delphi_esr",
               "delphi esr radar topic name");
-DEFINE_string(compressed_image_topic, "sensor_msgs/CompressedImage",
+// TODO(Authors): Change the topic name
+DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
