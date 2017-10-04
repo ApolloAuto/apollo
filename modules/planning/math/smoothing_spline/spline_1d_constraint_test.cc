@@ -202,7 +202,6 @@ TEST(Spline1dConstraint, add_derivative_smooth_constraint) {
   constraint.AddDerivativeSmoothConstraint();
   const auto mat = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
-  std::cout << mat << std::endl;
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(4, 12);
@@ -232,7 +231,6 @@ TEST(Spline1dConstraint, add_second_derivative_smooth_constraint) {
   constraint.AddSecondDerivativeSmoothConstraint();
   const auto mat = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
-  std::cout << mat << std::endl;
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 12);
@@ -264,7 +262,6 @@ TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
   constraint.AddThirdDerivativeSmoothConstraint();
   const auto mat = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
-  std::cout << mat << std::endl;
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(8, 15);
@@ -277,6 +274,68 @@ TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
       0,  0,  0,  0,  0,  0,  1,  2,  3,  4,  0, -1, -0, -0, -0,
       0,  0,  0,  0,  0,  0,  0,  2,  6, 12,  0,  0, -2, -0, -0,
       0,  0,  0,  0,  0,  0,  0,  0,  6, 24,  0,  0,  0, -6, -0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  for (int i = 0; i < boundary.rows(); ++i) {
+    EXPECT_DOUBLE_EQ(boundary(i, 0), 0.0);
+  }
+}
+
+TEST(Spline1dConstraint, add_monotone_inequality_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  std::vector<double> x_coord = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
+  constraint.AddMonotoneInequalityConstraint(x_coord);
+  const auto mat = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary =
+      constraint.inequality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 15);
+  ref_mat <<
+      0,     0.5,    0.25,   0.125,  0.0625,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+     -1,    -0.5,   -0.25,  -0.125, -0.0625,       1,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+      0,       0,       0,       0,       0,       0,     0.5,    0.25,   0.125,  0.0625,       0,       0,       0,       0,       0, // NOLINT
+      0,       0,       0,       0,       0,      -1,    -0.5,   -0.25,  -0.125, -0.0625,       1,       0,       0,       0,       0, // NOLINT
+      0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,     0.5,    0.25,   0.125,  0.0625, // NOLINT
+      0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,     0.5,    0.75,   0.875,  0.9375; // NOLINT
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  for (int i = 0; i < boundary.rows(); ++i) {
+    EXPECT_DOUBLE_EQ(boundary(i, 0), 0.0);
+  }
+}
+
+TEST(Spline1dConstraint, add_monotone_inequality_constraint_at_knots) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddMonotoneInequalityConstraintAtKnots();
+  const auto mat = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary =
+      constraint.inequality_constraint().constraint_boundary();
+
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(3, 15);
+  // clang-format off
+  ref_mat <<
+     -1, -0, -0, -0, -0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0, -1, -0, -0, -0, -0,  1,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1;
   // clang-format on
 
   for (int i = 0; i < mat.rows(); ++i) {
