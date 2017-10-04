@@ -30,7 +30,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
@@ -43,10 +42,9 @@ namespace planning {
 
 class ReferenceLineInfo {
  public:
-  explicit ReferenceLineInfo(
-      const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
-      const common::TrajectoryPoint& init_adc_point,
-      const ReferenceLineSmootherConfig& smoother_config);
+  explicit ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+                             const ReferenceLine& reference_line,
+                             const common::TrajectoryPoint& init_adc_point);
 
   bool Init();
 
@@ -116,7 +114,6 @@ class ReferenceLineInfo {
   DiscretizedTrajectory discretized_trajectory_;
 
   SLBoundary adc_sl_boundary_;
-  const ReferenceLineSmootherConfig smoother_config_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
