@@ -31,7 +31,9 @@ void AdapterManager::Observe() {
   }
 }
 
-bool AdapterManager::Initialized() { return instance()->initialized_; }
+bool AdapterManager::Initialized() {
+  return instance()->initialized_;
+}
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   // Parse config file
@@ -126,11 +128,15 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::MOBILEYE:
         EnableMobileye(FLAGS_mobileye_topic, config.mode(),
-                         config.message_history_limit());
+                       config.message_history_limit());
         break;
       case AdapterConfig::DELPHIESR:
         EnableDelphiESR(FLAGS_delphi_esr_topic, config.mode(),
-                         config.message_history_limit());
+                        config.message_history_limit());
+        break;
+      case AdapterConfig::IMAGE:
+        EnableImage(FLAGS_image_topic, config.mode(),
+                    config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

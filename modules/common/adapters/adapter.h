@@ -40,6 +40,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
+#include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -276,6 +277,10 @@ class Adapter {
   }
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::sensor_msgs::PointCloud2>) {
+    return false;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
 
