@@ -236,7 +236,7 @@ void Planning::RunOnce() {
   const auto& stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
           is_auto_mode, start_timestamp, planning_cycle_time,
-          last_publishable_trajectory_);
+          last_publishable_trajectory_.get());
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, start_timestamp, stitching_trajectory.back());
@@ -274,12 +274,17 @@ void Planning::RunOnce() {
 }
 
 void Planning::Stop() {
-  last_publishable_trajectory_.Clear();
+  last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Stop();
   }
+}
+
+void Planning::SetLastPublishableTrajectory(
+    const ADCTrajectory& adc_trajectory) {
+  last_publishable_trajectory_.reset(new PublishableTrajectory(adc_trajectory));
 }
 
 common::Status Planning::Plan(
@@ -304,7 +309,7 @@ common::Status Planning::Plan(
         "planner failed to make a driving plan because NO best_reference_line "
         "can be provided.");
     AERROR << msg;
-    last_publishable_trajectory_.Clear();
+    last_publishable_trajectory_->Clear();
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -330,17 +335,14 @@ common::Status Planning::Plan(
     }
   }
 
-  PublishableTrajectory publishable_trajectory(
-      current_time_stamp, best_reference_line->trajectory());
+  last_publishable_trajectory_.reset(new PublishableTrajectory(
+      current_time_stamp, best_reference_line->trajectory()));
 
-  publishable_trajectory.PrependTrajectoryPoints(
+  last_publishable_trajectory_->PrependTrajectoryPoints(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
-  publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
+  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-
-  // update last publishable trajectory;
-  last_publishable_trajectory_ = std::move(publishable_trajectory);
 
   return status;
 }
