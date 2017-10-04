@@ -349,5 +349,92 @@ TEST(Spline1dConstraint, add_monotone_inequality_constraint_at_knots) {
   }
 }
 
+TEST(Spline1dConstraint, add_point_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddPointConstraint(2.5, 12.3);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
+  ref_mat << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0.5, 0.25, 0.125, 0.0625;
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  EXPECT_EQ(boundary.rows(), 1);
+  EXPECT_DOUBLE_EQ(boundary(0, 0), 12.3);
+}
+
+TEST(Spline1dConstraint, add_point_derivative_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddPointDerivativeConstraint(2.5, 1.23);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
+  ref_mat << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.75, 0.5;
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  EXPECT_EQ(boundary.rows(), 1);
+  EXPECT_DOUBLE_EQ(boundary(0, 0), 1.23);
+}
+
+TEST(Spline1dConstraint, add_point_second_derivative_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddPointSecondDerivativeConstraint(2.5, 1.23);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
+  ref_mat << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.0, 3.0, 3.0;
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  EXPECT_EQ(boundary.rows(), 1);
+  EXPECT_DOUBLE_EQ(boundary(0, 0), 1.23);
+}
+
+TEST(Spline1dConstraint, add_point_third_derivative_constraint) {
+  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
+  int32_t spline_order = 5;
+  Spline1dConstraint constraint(x_knots, spline_order);
+
+  constraint.AddPointThirdDerivativeConstraint(2.5, 1.23);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
+  ref_mat << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6.0, 12.0;
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_DOUBLE_EQ(mat(i, j), ref_mat(i, j));
+    }
+  }
+
+  EXPECT_EQ(boundary.rows(), 1);
+  EXPECT_DOUBLE_EQ(boundary(0, 0), 1.23);
+}
 }  // namespace planning
 }  // namespace apollo
