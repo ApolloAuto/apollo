@@ -137,6 +137,7 @@ bool Crosswalk::ApplyRule(Frame* frame,
         // TODO(all)
         // (4) when l_distance is between loose_l and strick_l
         //     use history decision of this crosswalk to smooth unsteadiness
+        stop = true;
       }
 
       if (!stop) {
