@@ -44,11 +44,11 @@ INS | /apollo/sensor/gnss/ins_stat	| 1
 
 An ideal calibration field requires no tall buildings around the calibration area. If buildings are near, low-rising building facades are preferred. Finally, the ground should be smooth, not rough, and it should be easy to drive the car following the trajectory that looks like the  ∞ symbol as illustrated in Figure 1. An example of a good calibration field is shown in Figure 2.
 
-![](lidar_calibration/images/calibration/trajectory.png)
+![](lidar_calibration/images/trajectory.png)
 
 <p align="center">Figure 1. The trajectory  for calibration.</p>
 
-![](lidar_calibration/images/calibration/field.png)
+![](lidar_calibration/images/field.png)
 
 <p align="center">Figure 2. Calibration field.</p>
 
