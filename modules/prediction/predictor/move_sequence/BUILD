@@ -37,7 +37,11 @@ cc_test(
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
+        "//modules/prediction/proto:prediction_proto",
         "@gtest//:main",
     ],
 )
