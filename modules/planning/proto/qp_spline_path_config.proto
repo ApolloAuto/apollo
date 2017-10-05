@@ -4,8 +4,8 @@ package apollo.planning;
 
 message QpSplinePathConfig {
   optional uint32 spline_order = 1 [default = 6];
-  optional uint32 number_of_knots = 2 [default = 5];
-  optional uint32 number_of_fx_constraint_knots = 3 [default = 6];
+  optional double knot_distance = 2 [default = 15.0];
+  optional double constraint_point_distance = 3 [default = 10];
   optional double time_resolution = 4 [default = 0.1];
   optional double regularization_weight = 5 [default = 0.001];
   optional double derivative_weight = 6 [default = 0.0];
