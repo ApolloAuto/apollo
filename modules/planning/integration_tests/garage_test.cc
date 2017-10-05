@@ -102,7 +102,8 @@ TEST_F(GarageTest, stop_over_line) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  bool run_planning_success = RunPlanning("stop_over_line", 0);
+  EXPECT_FALSE(run_planning_success);
 }
 
 }  // namespace planning

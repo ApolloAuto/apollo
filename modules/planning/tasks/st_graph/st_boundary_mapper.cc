@@ -112,7 +112,7 @@ Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
       const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
                             decision.stop().distance_s();
       if (stop_s < adc_sl_boundary_.end_s()) {
-        AERROR << "Invalid stop decision. not stop at ahead of current "
+        AERROR << "Invalid stop decision. not stop at behind of current "
                   "position. stop_s : "
                << stop_s << ", and current adc_s is; "
                << adc_sl_boundary_.end_s();
