@@ -66,6 +66,28 @@ bool ReferenceLineInfo::Init() {
   return true;
 }
 
+bool ReferenceLineInfo::HasReachedDestination() {
+  auto* dest_obstacle = path_decision_.Find(FLAGS_destination_obstacle_id);
+  if (!dest_obstacle) {
+    return false;
+  }
+  if (dest_obstacle->perception_sl_boundary().start_s() >
+      reference_line_.Length()) {
+    return false;
+  }
+  if (!reference_line_.HasOverlap(
+          dest_obstacle->obstacle()->PerceptionBoundingBox())) {
+    return false;
+  }
+  const double kDistanceDelta = 0.5;
+  if (dest_obstacle->perception_sl_boundary().start_s() <
+      adc_sl_boundary_.end_s() + FLAGS_stop_distance_destination +
+          kDistanceDelta) {
+    return true;
+  }
+  return false;
+}
+
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;
 }
