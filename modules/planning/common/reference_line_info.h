@@ -48,6 +48,11 @@ class ReferenceLineInfo {
 
   bool Init();
 
+  /**
+   * Check if vehicle has reached destination.
+   */
+  bool HasReachedDestination();
+
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
 
