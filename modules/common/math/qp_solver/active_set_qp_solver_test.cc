@@ -41,7 +41,7 @@ TEST(ActiveSetQpSolver, simple_problem_01) {
                            affine_inequality_boundary, affine_equality_matrix,
                            affine_equality_boundary);
   solver.Solve();
-  EXPECT_DOUBLE_EQ(solver.params()(0, 0), 2.0);
+  EXPECT_NEAR(solver.params()(0, 0), 2.0, 1e-9);
 }
 
 }  // namespace math
