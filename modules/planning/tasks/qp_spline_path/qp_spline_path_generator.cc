@@ -62,9 +62,6 @@ bool QpSplinePathGenerator::Generate(
     const std::vector<const PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
     PathData* const path_data) {
-  knots_.clear();
-  evaluated_s_.clear();
-
   ADEBUG << "Init point: " << init_point.DebugString();
 
   if (!CalculateFrenetPoint(init_point, &init_frenet_point_)) {
@@ -198,42 +195,19 @@ bool QpSplinePathGenerator::CalculateFrenetPoint(
 
 bool QpSplinePathGenerator::InitSpline(const double start_s,
                                        const double end_s) {
-  // set knots
-  if (qp_spline_path_config_.number_of_knots() <= 1) {
-    AERROR << "Too few number of knots: "
-           << qp_spline_path_config_.number_of_knots();
-    return false;
-  }
-  const double delta_s =
-      (end_s - start_s) / qp_spline_path_config_.number_of_knots();
-
-  double curr_knot_s = start_s;
-
-  for (uint32_t i = 0; i < qp_spline_path_config_.number_of_knots();
-       ++i, curr_knot_s = std::min(curr_knot_s + delta_s, end_s)) {
-    knots_.push_back(curr_knot_s);
-  }
-
+  const uint32_t number_of_knots = static_cast<uint32_t>(
+      (end_s - start_s) / qp_spline_path_config_.knot_distance());
+  common::util::uniform_slice(start_s, end_s, number_of_knots, &knots_);
   // spawn a new spline generator
   spline_generator_.reset(
       new Spline1dGenerator(knots_, qp_spline_path_config_.spline_order()));
 
   // set evaluated_s_
-  std::uint32_t num_evaluated_s =
-      qp_spline_path_config_.number_of_fx_constraint_knots();
-  if (num_evaluated_s <= 2) {
-    AERROR << "Too few evaluated positions. Suggest: > 2, current number: "
-           << num_evaluated_s;
-    return false;
-  }
+  const auto delta_s = qp_spline_path_config_.constraint_point_distance();
 
-  const double ds = (end_s - start_s) / num_evaluated_s;
-  double curr_evaluated_s = start_s + ds;
-  for (uint32_t i = 0; i < num_evaluated_s;
-       ++i, curr_evaluated_s = std::min(curr_evaluated_s + ds, end_s)) {
-    evaluated_s_.push_back(curr_evaluated_s);
-  }
-
+  uint32_t evaluated_s_num = static_cast<uint32_t>((end_s - start_s) / delta_s);
+  common::util::uniform_slice(start_s + delta_s, end_s, evaluated_s_num - 1,
+                              &evaluated_s_);
   return true;
 }
 
