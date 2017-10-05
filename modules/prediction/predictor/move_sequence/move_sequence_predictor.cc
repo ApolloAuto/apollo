@@ -20,6 +20,7 @@
 #include <utility>
 #include <limits>
 #include <memory>
+#include <algorithm>
 
 #include "Eigen/Dense"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -481,13 +482,39 @@ double MoveSequencePredictor::ComputeTimeToLaneCenter(
 double MoveSequencePredictor::Cost(const double t,
     const std::array<double, 6>& lateral_coeffs,
     const std::array<double, 5>& longitudinal_coeffs) {
-  // TODO(kechxu) implement
-  return 0.0;
+  // TODO(all) Think about how to introduce lane curvature into cost
+  double alpha = 0.25;
+  double left_end =
+      std::fabs(EvaluateLateralPolynomial(lateral_coeffs, 0.0, 2));
+  double right_end =
+      std::fabs(EvaluateLateralPolynomial(lateral_coeffs, t, 2));
+  double normal_min_acc = std::min(left_end, right_end);
+  std::pair<double, double> mid_t_pair;
+  int solved = apollo::prediction::math_util::SolveQuadraticEquation(
+      {60.0 * lateral_coeffs[5],
+       24.0 * lateral_coeffs[4],
+       6.0 * lateral_coeffs[3]},
+      &mid_t_pair);
+  if (solved != 0) {
+    return normal_min_acc + alpha * t;
+  }
+  double mid_0 = std::fabs(EvaluateLateralPolynomial(
+                               lateral_coeffs, mid_t_pair.first, 2));
+  double mid_1 = std::fabs(EvaluateLateralPolynomial(
+                               lateral_coeffs, mid_t_pair.second, 2));
+  normal_min_acc = std::max(normal_min_acc, std::max(mid_0, mid_1));
+  return normal_min_acc + alpha * t;
 }
 
 void MoveSequencePredictor::GenerateCandidateTimes(
     std::vector<double>* candidate_times) {
-  // TODO(kechxu) implement
+  // TODO(all) Think about better ideas
+  double t = 1.0;
+  double time_gap = 1.0;
+  while (t <= FLAGS_prediction_duration) {
+    candidate_times->push_back(t);
+    t += time_gap;
+  }
 }
 
 double MoveSequencePredictor::MotionWeight(const double t) {
