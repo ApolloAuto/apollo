@@ -99,7 +99,10 @@ typename Container::value_type MinElement(const Container& elements) {
  * @return sqrt((a.x-b.x)^2 + (a.y-b.y)^2), i.e., the Euclid distance on XY
  * dimension
  */
-double Distance2D(const PathPoint& a, const PathPoint& b);
+template <typename U, typename V>
+double DistanceXY(const U& u, const V& v) {
+  return std::hypot(u.x() - v.x(), u.y() - v.y());
+}
 
 }  // namespace util
 }  // namespace common
