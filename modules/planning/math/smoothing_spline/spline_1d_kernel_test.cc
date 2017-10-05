@@ -51,6 +51,7 @@ TEST(Spline1dKernel, add_regularization) {
         0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0.2,   0,
         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0.2;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -88,6 +89,7 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_01) {
       0,       1,     1.6,       2, 2.28571,     2.5,
       0,       1, 1.66667, 2.14286,     2.5, 2.77778;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -132,6 +134,7 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_02) {
       0,       0,       0,       0,       0,       0,       0,       1,     1.6,       2, 2.28571,     2.5,  // NOLINT
       0,       0,       0,       0,       0,       0,       0,       1, 1.66667, 2.14286,     2.5, 2.77778;  // NOLINT
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -169,6 +172,7 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_03) {
       0,       1,     1.6,       2, 2.28571,     2.5,
       0,       1, 1.66667, 2.14286,     2.5, 2.77778;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -199,8 +203,6 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_04) {
   EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(4, 4);
 
-  std::cout << kernel.kernel_matrix() << std::endl;
-
   // clang-format off
   ref_kernel_matrix <<
       0,       0,       0,       0,
@@ -208,6 +210,7 @@ TEST(Spline1dKernel, add_derivative_kernel_matrix_04) {
       0,       1, 1.33333,     1.5,
       0,       1,     1.5,     1.8;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -246,6 +249,7 @@ TEST(Spline1dKernel, add_second_derivative_kernel_matrix_01) {
       0,       0,       8,      18,    28.8,      40,
       0,       0,      10,      24,      40, 57.1429;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -292,6 +296,7 @@ TEST(Spline1dKernel, add_second_derivative_kernel_matrix_02) {
      0, 0,  0,  0,    0,       0, 0, 0,  8, 18, 28.8,      40,
      0, 0,  0,  0,    0,       0, 0, 0, 10, 24,   40, 57.1429;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -330,6 +335,7 @@ TEST(Spline1dKernel, add_third_derivative_kernel_matrix_01) {
       0,   0,   0,  72, 192, 360,
       0,   0,   0, 120, 360, 720;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -368,6 +374,7 @@ TEST(Spline1dKernel, add_third_derivative_kernel_matrix_02) {
       0,   0,   0,  72, 192, 360,
       0,   0,   0, 120, 360, 720;
   // clang-format on
+  ref_kernel_matrix *= 2.0;
 
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
@@ -404,7 +411,7 @@ TEST(Spline1dKernel, add_reference_line_kernel_01) {
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
       if (i == 0 && j == 0) {
-        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 1.0);
+        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 2.0);
       } else {
         EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 0.0);
       }
@@ -428,7 +435,7 @@ TEST(Spline1dKernel, add_reference_line_kernel_02) {
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
       if (i == 0 && j == 0) {
-        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 1.0);
+        EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 2.0);
       } else {
         EXPECT_DOUBLE_EQ(kernel.kernel_matrix()(i, j), 0.0);
       }
@@ -460,8 +467,8 @@ TEST(Spline1dKernel, add_reference_line_kernel_03) {
   }
 
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(6, 6);
-  ref_kernel_matrix = res.transpose() * res;
-  ref_kernel_matrix(0, 0) += 1.0;
+  ref_kernel_matrix = 2.0 * res.transpose() * res;
+  ref_kernel_matrix(0, 0) += 2.0;
 
   Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(6, 1);
   ref_offset = -2.0 * 2.0 * res.transpose();
@@ -493,7 +500,7 @@ TEST(Spline1dKernel, add_reference_line_kernel_04) {
   }
 
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(6, 6);
-  ref_kernel_matrix = res.transpose() * res;
+  ref_kernel_matrix = 2.0 * res.transpose() * res;
 
   Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(6, 1);
   ref_offset = -2.0 * 2.0 * res.transpose();

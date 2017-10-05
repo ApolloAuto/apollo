@@ -49,7 +49,7 @@ Spline1dKernel::Spline1dKernel(const std::vector<double>& x_knots,
 void Spline1dKernel::AddRegularization(const double regularized_param) {
   Eigen::MatrixXd id_matrix =
       Eigen::MatrixXd::Identity(kernel_matrix_.rows(), kernel_matrix_.cols());
-  kernel_matrix_ += id_matrix * regularized_param;
+  kernel_matrix_ += 2.0 * id_matrix * regularized_param;
 }
 
 bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
@@ -89,6 +89,7 @@ void Spline1dKernel::AddNthDerivativekernelMatrix(const uint32_t n,
                                                   const double weight) {
   for (uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
+        2 *
         SplineSegKernel::instance()->NthDerivativeKernel(
             n, spline_order_, x_knots_[i + 1] - x_knots_[i]) *
         weight;
@@ -137,7 +138,7 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(
 
     for (uint32_t r = 0; r < spline_order_; ++r) {
       for (uint32_t c = 0; c < spline_order_; ++c) {
-        ref_kernel(r, c) = power_x[r + c];
+        ref_kernel(r, c) = 2.0 * power_x[r + c];
       }
     }
 
