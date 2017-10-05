@@ -258,12 +258,6 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
   }
 }
 
-bool ConvertSLToXY(const LaneSequence& lane_sequence,
-    const double s, const double l, double* x, double* y) {
-  // TODO(kechxu) implement
-  return true;
-}
-
 void MoveSequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle,
     const LaneSequence& lane_sequence,
