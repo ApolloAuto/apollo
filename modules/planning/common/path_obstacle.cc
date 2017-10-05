@@ -124,7 +124,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
     double total_length =
-        object_length + common::util::Distance2D(first_point, second_point);
+        object_length + common::util::DistanceXY(first_point, second_point);
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
     common::math::Box2d object_moving_box(center, first_point.theta(),
