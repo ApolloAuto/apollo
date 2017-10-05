@@ -9,6 +9,7 @@ cc_library(
     deps = [
         ":third_party_perception_conversion",
         ":third_party_perception_fusion",
+        ":third_party_perception_filter",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/common:apollo_app",
@@ -64,6 +65,21 @@ cc_library(
         "//modules/common/math:polygon2d",
         "//modules/common/math:vec2d",
         "//modules/perception/proto:perception_proto",
+    ],
+)
+
+cc_library(
+    name = "third_party_perception_filter",
+    srcs = [
+        "filter.cc",
+    ],
+    hdrs = [
+        "filter.h",
+    ],
+    deps = [
+        "//modules/third_party_perception/common:third_party_perception_gflags",
+        "//modules/third_party_perception/common:third_party_perception_util",
+        "//modules/third_party_perception/proto:third_party_perception_proto"
     ],
 )
 

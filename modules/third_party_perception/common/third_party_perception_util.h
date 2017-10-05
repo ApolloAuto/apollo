@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODEULES_L3_PERCEPTION_L3_PERCEPTION_UTIL_H_
-#define MODEULES_L3_PERCEPTION_L3_PERCEPTION_UTIL_H_
+#ifndef MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_UTIL_H_
+#define MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_UTIL_H_
 
 #include <cmath>
 
@@ -72,4 +72,4 @@ double GetLateralDistanceToNearestLane(const Point& point);
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_L3_PERCEPTION_L3_PERCEPTION_UTIL_H_
+#endif  // MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_UTIL_H_
