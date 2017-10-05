@@ -28,7 +28,7 @@
 #include "modules/third_party_perception/common/third_party_perception_util.h"
 
 /**
- * @namespace apollo::third_party_perception::convertion
+ * @namespace apollo::third_party_perception::fusion
  * @brief apollo::third_party_perception
  */
 namespace apollo {

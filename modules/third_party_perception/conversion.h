@@ -37,11 +37,11 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
-using apollo::perception::PerceptionObstacles;
-using apollo::drivers::Mobileye;
-using apollo::drivers::DelphiESR;
-using apollo::localization::LocalizationEstimate;
-using apollo::third_party_perception::RadarObstacles;
+using ::apollo::perception::PerceptionObstacles;
+using ::apollo::drivers::Mobileye;
+using ::apollo::drivers::DelphiESR;
+using ::apollo::localization::LocalizationEstimate;
+using ::apollo::third_party_perception::RadarObstacles;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization);
