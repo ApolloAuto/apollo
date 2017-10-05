@@ -34,9 +34,11 @@
 namespace apollo {
 namespace third_party_perception {
 
-const double L3_PI = 3.141592653;
+//TODO(lizh): use common const
+const double PI = 3.141592653;
 
 using ::apollo::common::Quaternion;
+using ::apollo::common::PointENU;
 using ::apollo::perception::Point;
 using ::apollo::perception::PerceptionObstacle;
 
@@ -60,13 +62,21 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
-Point SLtoXY(const Point point, const double theta);
+Point SLtoXY(const double x, const double y, const double theta);
+
+Point SLtoXY(const Point& point, const double theta);
 
 double Distance(const Point& point1, const Point& point2);
 
 double Speed(const Point& point);
 
+double Speed(const double vx, const double vy);
+
+double GetNearestLaneHeading(const PointENU& point_enu);
+
 double GetNearestLaneHeading(const Point& point);
+
+double GetNearestLaneHeading(const double x, const double y, const double z);
 
 double GetLateralDistanceToNearestLane(const Point& point);
 }  // namespace third_party_perception

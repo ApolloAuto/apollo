@@ -34,6 +34,10 @@ DEFINE_double(
     delphi_esr_pos_adjust, 3.0,
     "adjust radar objects's position due to distance between radar and gps.");
 
+// object id offset  
+DEFINE_int32(mobileye_id_offset, 0, "id offset for mobileye");
+DEFINE_int32(delphi_esr_id_offset, 1000, "id offset for delphi_esr");
+
 // flags to create fake bounding box
 DEFINE_double(default_car_length, 5.0, "default car length for bounding box.");
 DEFINE_double(default_truck_length, 10.0,
@@ -50,6 +54,8 @@ DEFINE_double(default_bike_width, 1.0, "default bike width for bounding box.");
 DEFINE_double(default_ped_width, 0.5, "default ped width for bounding box.");
 DEFINE_double(default_unknown_width, 3.0,
               "default unknown width for bounding box.");
+DEFINE_double(default_height, 3.0,
+              "default height for bounding box.");
 
 // flags to filter radar obstacles
 DEFINE_double(

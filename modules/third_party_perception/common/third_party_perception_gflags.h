@@ -33,6 +33,10 @@ DECLARE_bool(enable_delphi_esr);
 DECLARE_double(mobileye_pos_adjust);
 DECLARE_double(delphi_esr_pos_adjust);
 
+// object id offset  
+DECLARE_int32(mobileye_id_offset);
+DECLARE_int32(delphi_esr_id_offset);
+
 // flags to create fake bounding box
 DECLARE_double(default_car_length);
 DECLARE_double(default_truck_length);
@@ -44,6 +48,7 @@ DECLARE_double(default_truck_width);
 DECLARE_double(default_bike_width);
 DECLARE_double(default_ped_width);
 DECLARE_double(default_unknown_width);
+DECLARE_double(default_height);
 
 // flags to filter radar obstacles
 DECLARE_double(filter_y_distance);

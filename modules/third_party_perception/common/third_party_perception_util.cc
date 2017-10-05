@@ -120,12 +120,14 @@ double GetDefaultObjectWidth(const int object_type) {
   return default_object_width;
 }
 
-Point SLtoXY(const Point point, const double theta) {
+Point SLtoXY(const Point& point, const double theta) {
+  return SLtoXY(point.x(), point.y(), theta);
+}
+
+Point SLtoXY(const double x, const double y, const double theta) {
   Point converted_point;
-  converted_point.set_x(point.x() * std::cos(theta) +
-                        point.y() * std::sin(theta));
-  converted_point.set_y(point.x() * std::sin(theta) -
-                        point.y() * std::cos(theta));
+  converted_point.set_x(x * std::cos(theta) + y * std::sin(theta));
+  converted_point.set_y(x * std::sin(theta) - y * std::cos(theta));
   return converted_point;
 }
 
@@ -134,6 +136,29 @@ double Distance(const Point& point1, const Point& point2) {
       std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
                 (point1.y() - point2.y()) * (point1.y() - point2.y()));
   return distance;
+}
+
+double GetNearestLaneHeading(const PointENU& point_enu) {
+  auto* hdmap = HDMapUtil::BaseMapPtr();
+  if (hdmap == nullptr) {
+    AERROR << "Failed to get nearest lane for point " << point_enu.DebugString();
+    return -1.0;
+  }
+
+  hdmap::LaneInfoConstPtr nearest_lane;
+
+  double nearest_s;
+  double nearest_l;
+
+  int status =
+      hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
+  // TODO(lizh): make it a formal status below
+  if (status != 0) {
+    AERROR << "Failed to get nearest lane for point " << point_enu.DebugString();
+    return -1.0;
+  }
+  double lane_heading = nearest_lane->Heading(nearest_s);
+  return lane_heading;
 }
 
 double GetNearestLaneHeading(const Point& point) {
@@ -147,20 +172,24 @@ double GetNearestLaneHeading(const Point& point) {
   point_enu.set_x(point.x());
   point_enu.set_y(point.y());
   point_enu.set_z(point.z());
-  hdmap::LaneInfoConstPtr nearest_lane;
 
-  double nearest_s;
-  double nearest_l;
+  return GetNearestLaneHeading(point_enu);
+}
 
-  int status =
-      hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
-  // TODO(lizh): make it a formal status below
-  if (status != 0) {
-    AERROR << "Failed to get nearest lane for point " << point.DebugString();
+double GetNearestLaneHeading(const double x, const double y, const double z) { 
+  auto* hdmap = HDMapUtil::BaseMapPtr();
+  if (hdmap == nullptr) {
+    AERROR << "Failed to get nearest lane for point ("
+           << x << ", " << y << ", " << z << ")";
     return -1.0;
   }
-  double lane_heading = nearest_lane->Heading(nearest_s);
-  return lane_heading;
+
+  ::apollo::common::PointENU point_enu;
+  point_enu.set_x(x);
+  point_enu.set_y(y);
+  point_enu.set_z(z);
+  
+  return GetNearestLaneHeading(point_enu);
 }
 
 double GetLateralDistanceToNearestLane(const Point& point) {
@@ -193,5 +222,10 @@ double GetLateralDistanceToNearestLane(const Point& point) {
 double Speed(const Point& point) {
   return std::sqrt(point.x() * point.x() + point.y() + point.y());
 }
+
+double Speed(const double vx, const double vy) {
+  return std::sqrt(vx * vx + vy * vy);
+}
+
 }  // namespace third_party_perception
 }  // namespace apollo
