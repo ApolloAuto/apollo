@@ -52,4 +52,9 @@ message Pose {
   // Angular velocity of the vehicle in the vehicle reference frame.
   // Around right/forward/up axes in radians per second.
   optional apollo.common.Point3D angular_velocity_vrf = 8;
+
+  // Roll/pitch/yaw that represents a rotation of the intrinsic sequence z-y-x.
+
+  // Roll/pitch/yaw in radians.
+  optional apollo.common.Point3D euler_angles = 9;
 }

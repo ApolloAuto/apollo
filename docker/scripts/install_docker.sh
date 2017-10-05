@@ -16,21 +16,43 @@
 # limitations under the License.
 ###############################################################################
 
-set -x
+function install_docker_x86() {
+  sudo apt-get -y install curl \
+      "linux-image-extra-$(uname -r)" \
+      linux-image-extra-virtual
 
-sudo apt-get -y install curl \
-    "linux-image-extra-$(uname -r)" \
-    linux-image-extra-virtual
+  sudo apt-get -y install apt-transport-https ca-certificates
 
-sudo apt-get -y install apt-transport-https ca-certificates
+  curl -fsSL https://yum.dockerproject.org/gpg | sudo apt-key add -
 
-curl -fsSL https://yum.dockerproject.org/gpg | sudo apt-key add -
+  sudo add-apt-repository \
+      "deb https://apt.dockerproject.org/repo/ \
+         ubuntu-$(lsb_release -cs) \
+         main"
 
-sudo add-apt-repository \
-    "deb https://apt.dockerproject.org/repo/ \
-       ubuntu-$(lsb_release -cs) \
-       main"
+  sudo apt-get update
+  sudo apt-get -y --force-yes install docker-engine
+  sudo usermod -aG docker "$USER"
+}
 
-sudo apt-get update
-sudo apt-get -y --force-yes install docker-engine
-sudo usermod -aG docker "$USER"
+function install_docker_arm() {
+  sudo apt-get update
+  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+  curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | sudo apt-key add -
+  sudo bash -c 'echo "deb [arch=arm64] https://download.docker.com/linux/ubuntu xenial edge" > /etc/apt/sources.list.d/docker.list'
+
+  sudo apt-get update
+  sudo apt-get install -y docker-ce
+}
+
+# the machine type, currently support x86_64, aarch64
+MACHINE_ARCH=$(uname -m)
+if [ "$MACHINE_ARCH" == 'x86_64' ]; then
+  install_docker_x86
+elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
+  install_docker_arm
+else
+  echo "Unknown machine architecture $MACHINE_ARCH"
+  exit 1
+fi

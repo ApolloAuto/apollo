@@ -23,23 +23,21 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-source "${DIR}/apollo_init.sh"
-
 function start() {
     echo "Start roscore..."
     ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
     nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
 
-    echo "HMI ros node service running at localhost:8887"
-    LOG="${APOLLO_ROOT_DIR}/data/log/hmi_ros_node_service.out"
-    nohup ${APOLLO_BIN_PREFIX}/modules/hmi/ros_node/ros_node_service \
+    echo "Start HMI ros bridge..."
+    LOG="${APOLLO_ROOT_DIR}/data/log/hmi_ros_bridge.out"
+    nohup ${APOLLO_BIN_PREFIX}/modules/hmi/ros_bridge/ros_bridge \
+        --flagfile=modules/common/data/global_flagfile.txt \
         --v=3 \
         --log_dir=${APOLLO_ROOT_DIR}/data/log \
         >${LOG} 2>&1 &
 
     LOG="${APOLLO_ROOT_DIR}/data/log/hmi.out"
-    nohup python modules/hmi/web/hmi_main.py \
-        --conf=modules/hmi/conf/config.pb.txt >"${LOG}" 2>&1 &
+    nohup python modules/hmi/web/hmi_main.py >"${LOG}" 2>&1 &
 
     sleep 1
     HMI_PROCESS="$(pgrep -c -f modules/hmi/web/hmi_main.py)"
@@ -52,8 +50,8 @@ function start() {
 }
 
 function stop() {
-    pkill -f hmi_main.py
-    pkill -f ros_node_service
+    pkill -f -9 hmi_main.py
+    pkill -f ros_bridge
     pkill -f roscore
 }
 

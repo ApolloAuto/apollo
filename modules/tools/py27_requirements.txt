@@ -4,18 +4,15 @@
 
 # Google infras.
 glog
-google-apputils
-grpc >= 0.3
-grpcio
-protobuf == 3.1.0.post1
+protobuf == 3.1
 python-gflags
 
 # Web utils.
-eventlet
 flask
-flask-restful
 flask-socketio
+gevent
 requests >= 2.18
+simplejson
 
 # ROS env.
 PyYAML

@@ -38,7 +38,7 @@ using apollo::common::time::Clock;
 using PlanningTrajectoryPb = planning::ADCTrajectory;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
-using apollo::common::vehicle_state::VehicleState;
+using apollo::common::VehicleState;
 
 class LatControllerTest : public ::testing::Test, LatController {
  public:
@@ -51,7 +51,7 @@ class LatControllerTest : public ::testing::Test, LatController {
                                                  &control_conf));
     lateral_conf_ = control_conf.lat_controller_conf();
 
-    timestamp_ = apollo::common::time::ToSecond(Clock::Now());
+    timestamp_ = Clock::NowInSecond();
   }
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
@@ -90,8 +90,6 @@ class LatControllerTest : public ::testing::Test, LatController {
 
   LatControllerConf lateral_conf_;
 
-  std::unique_ptr<VehicleState> vehicle_state_;
-
   double timestamp_ = 0.0;
 };
 
@@ -102,7 +100,8 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
   auto chassis_pb = LoadChassisPb(
       "modules/control/testdata/longitudinal_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  VehicleState vehicle_state(&localization_pb, &chassis_pb);
+  auto *vehicle_state = VehicleState::instance();
+  vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
       "modules/control/testdata/longitudinal_controller_test/"
@@ -112,10 +111,10 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
   ControlCommand cmd;
   SimpleLateralDebug *debug = cmd.mutable_debug()->mutable_simple_lat_debug();
 
-  ComputeLateralErrors(vehicle_state.x(), vehicle_state.y(),
-                       vehicle_state.heading(), vehicle_state.linear_velocity(),
-                       vehicle_state.angular_velocity(), trajectory_analyzer,
-                       debug);
+  ComputeLateralErrors(
+      vehicle_state->x(), vehicle_state->y(), vehicle_state->heading(),
+      vehicle_state->linear_velocity(), vehicle_state->angular_velocity(),
+      trajectory_analyzer, debug);
 
   double theta_error_expected = -0.03549;
   double theta_error_dot_expected = 0.0044552856731;

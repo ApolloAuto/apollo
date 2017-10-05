@@ -1,26 +1,108 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
-load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
-
 cc_proto_library(
-    name = "prediction_proto",
-    protos = [
-        "prediction_obstacle.proto",
-    ],
+    name = "prediction_conf_proto",
     deps = [
-        "//modules/common/proto:common_proto",
-        "//modules/perception/proto:perception_proto",
+        ":prediction_conf_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "prediction_proto_pylib",
-    protos = [
+proto_library(
+    name = "prediction_conf_proto_lib",
+    srcs = [
+        "prediction_conf.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "prediction_proto",
+    deps = [
+        ":prediction_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "prediction_proto_lib",
+    srcs = [
         "prediction_obstacle.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_pylib",
-        "//modules/perception/proto:perception_proto_pylib",
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "lane_graph_proto",
+    deps = [
+        ":lane_graph_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lane_graph_proto_lib",
+    srcs = [
+        "lane_graph.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "feature_proto",
+    deps = [
+        ":feature_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "feature_proto_lib",
+    srcs = [
+        "feature.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/prediction/proto:lane_graph_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "fnn_model_base_proto",
+    deps = [
+        ":fnn_model_base_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "fnn_model_base_proto_lib",
+    srcs = [
+        "fnn_model_base.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "fnn_vehicle_model_proto",
+    deps = [
+        ":fnn_vehicle_model_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "fnn_vehicle_model_proto_lib",
+    srcs = [
+        "fnn_vehicle_model.proto",
+    ],
+    deps = [
+        "//modules/prediction/proto:fnn_model_base_proto_lib",
     ],
 )

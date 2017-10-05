@@ -22,11 +22,11 @@ cc_library(
     deps = [
         ":controller_interface",
         "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:euler_angles_zxy",
         "//modules/common/math:lqr",
         "//modules/common/math:math_utils",
         "//modules/common/proto:common_proto",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/control/common:control_gflags",
@@ -93,6 +93,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
+        "@ros//:ros_common",
     ],
 )
 

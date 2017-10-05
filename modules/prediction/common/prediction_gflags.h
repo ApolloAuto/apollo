@@ -21,5 +21,49 @@
 
 // System gflags
 DECLARE_string(prediction_module_name);
+DECLARE_string(prediction_conf_file);
+DECLARE_string(adapter_config_filename);
+
+DECLARE_double(prediction_duration);
+DECLARE_double(prediction_freq);
+DECLARE_double(double_precision);
+DECLARE_double(min_prediction_length);
+
+// Bag replay timestamp gap
+DECLARE_double(replay_timestamp_gap);
+
+// Map
+DECLARE_double(search_radius);
+
+// Obstacle features
+DECLARE_bool(enable_kf_tracking);
+DECLARE_double(max_acc);
+DECLARE_double(min_acc);
+DECLARE_double(max_speed);
+DECLARE_double(q_var);
+DECLARE_double(r_var);
+DECLARE_double(p_var);
+DECLARE_double(go_approach_rate);
+DECLARE_double(cutin_approach_rate);
+DECLARE_int32(still_obstacle_history_length);
+DECLARE_double(still_obstacle_speed_threshold);
+DECLARE_double(still_obstacle_position_std);
+DECLARE_double(max_history_time);
+DECLARE_double(target_lane_gap);
+DECLARE_double(max_lane_angle_diff);
+DECLARE_bool(enable_pedestrian_acc);
+DECLARE_double(coeff_mul_sigma);
+DECLARE_double(pedestrian_min_speed);
+DECLARE_double(pedestrian_max_speed);
+DECLARE_double(pedestrian_max_acc);
+DECLARE_double(prediction_pedestrian_total_time);
+DECLARE_int32(num_trajectory_still_pedestrian);
+DECLARE_double(still_speed);
+DECLARE_string(vehicle_model_file);
+DECLARE_int32(max_num_obstacles);
+
+// Obstacle trajectory
+DECLARE_double(lane_sequence_threshold);
+DECLARE_double(lane_change_dist);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

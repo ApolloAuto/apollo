@@ -19,15 +19,14 @@
 X Y Item
 """
 import math
-import numpy
+
+import numpy as np
 from matplotlib import lines
 from matplotlib import patches
 
 
 class Xyitem(object):
-    """
-    XY item to plot
-    """
+    """XY item to plot"""
 
     def __init__(self, ax, windowsize, vehiclelength, title, xlabel, ylabel):
         self.ax = ax
@@ -60,11 +59,7 @@ class Xyitem(object):
         self.planningavailable = False
 
     def reset(self):
-        """
-        Reset
-        """
-        del self.lines[:]
-
+        """Reset"""
         del self.pathstartx[:]
         del self.pathstarty[:]
 
@@ -87,9 +82,7 @@ class Xyitem(object):
         self.planningavailable = False
 
     def new_planning(self, time, x, y):
-        """
-        new planning
-        """
+        """new planning"""
         self.planningtime = time
         self.planningx = x
         self.planningy = y
@@ -115,16 +108,12 @@ class Xyitem(object):
         self.planningavailable = True
 
     def new_carstatus(self, time, x, y, heading, steer_angle, autodriving):
-        """
-        new carstatus
-        """
+        """new carstatus"""
         self.carxhist.append(x)
         self.caryhist.append(y)
 
         angle = math.degrees(heading) - 90
-        carcolor = 'blue'
-        if autodriving:
-            carcolor = 'red'
+        carcolor = 'red' if autodriving else 'blue'
         if self.carxyhistidx == -1:
             self.ax.plot(self.carxhist, self.caryhist, color="blue")
             self.carxyhistidx = len(self.ax.lines) - 1
@@ -146,9 +135,9 @@ class Xyitem(object):
             self.ax.patches[0].remove()
 
         if self.planningavailable:
-            xtarget = numpy.interp(time, self.planningtime, self.planningx)
+            xtarget = np.interp(time, self.planningtime, self.planningx)
             self.targetx.append(xtarget)
-            ytarget = numpy.interp(time, self.planningtime, self.planningy)
+            ytarget = np.interp(time, self.planningtime, self.planningy)
             self.targety.append(ytarget)
 
             if self.targethistidx == -1:
@@ -159,7 +148,6 @@ class Xyitem(object):
                     self.targetx, self.targety)
 
         self.ax.add_patch(self.gen_steer_curve(x, y, heading, steer_angle))
-        #print "add patch"
         # Update Window X, Y Axis Limits
         xcenter = x + math.cos(heading) * 40
         ycenter = y + math.sin(heading) * 40
@@ -180,9 +168,7 @@ class Xyitem(object):
             ])
 
     def gen_steer_curve(self, x, y, heading, steer_angle):
-        """
-        Generate Steering Curve to predict car trajectory
-        """
+        """Generate Steering Curve to predict car trajectory"""
         if abs(math.tan(math.radians(steer_angle))) > 0.0001:
             R = self.vehiclelength / math.tan(math.radians(steer_angle))
         else:
@@ -216,17 +202,9 @@ class Xyitem(object):
         return curve
 
     def draw_lines(self):
-        """
-        plot lines
-        """
-        if self.planningavailable:
-            self.ax.draw_artist(self.ax.lines[self.pathstartidx])
-            self.ax.draw_artist(self.current_line)
+        """plot lines"""
+        for polygon in self.ax.patches:
+            self.ax.draw_artist(polygon)
 
-        if self.targethistidx != -1:
-            self.ax.draw_artist(self.ax.lines[self.targethistidx])
-
-        if self.carposidx != -1:
-            self.ax.draw_artist(self.ax.patches[0])
-            self.ax.draw_artist(self.ax.lines[self.carxyhistidx])
-            self.ax.draw_artist(self.ax.lines[self.carposidx])
+        for line in self.ax.lines:
+            self.ax.draw_artist(line)

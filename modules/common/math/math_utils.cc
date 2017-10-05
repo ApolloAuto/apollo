@@ -24,13 +24,15 @@ namespace apollo {
 namespace common {
 namespace math {
 
-double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
-                 const Vec2d &end_point_2) {
+double Sqr(const double x) { return x * x; }
+
+double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
+                 const Vec2d& end_point_2) {
   return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
 }
 
-double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
-                 const Vec2d &end_point_2) {
+double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1,
+                 const Vec2d& end_point_2) {
   return (end_point_1 - start_point).InnerProd(end_point_2 - start_point);
 }
 
@@ -54,6 +56,14 @@ double NormalizeAngle(const double angle) {
   return (new_angle < 0 ? new_angle + M_PI * 2.0 : new_angle) - M_PI;
 }
 
+double AngleDiff(const double from, const double to) {
+  double angle = std::fmod((to - from) + M_PI, 2.0 * M_PI);
+  if (angle < 0.0) {
+    angle += (2.0 * M_PI);
+  }
+  return angle - M_PI;
+}
+
 int RandomInt(const int s, const int t, unsigned int rand_seed) {
   if (s >= t) {
     return s;
@@ -65,18 +75,14 @@ double RandomDouble(const double s, const double t, unsigned int rand_seed) {
   return s + (t - s) / 16383.0 * (rand_r(&rand_seed) & 16383);
 }
 
-int DoubleCompare(const double d1, const double d2, const double epsilon) {
-  DCHECK(!std::isnan(d1));
-  DCHECK(!std::isnan(d2));
-
-  if ((d1 - d2) > std::fmax(std::fabs(d1), std::fabs(d2)) * epsilon) {
-    return 1;
-  } else if ((d2 - d1) > std::fmax(std::fabs(d1), std::fabs(d2)) * epsilon) {
-    return -1;
-  } else {
-    return 0;
-  }
+// Gaussian
+double Gaussian(const double u, const double std, const double x) {
+  return (1.0 / std::sqrt(2 * M_PI * std * std)) *
+         std::exp(-(x - u) * (x - u) / (2 * std * std));
 }
+
+// Sigmoid
+double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
 
 }  // namespace math
 }  // namespace common

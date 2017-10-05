@@ -57,6 +57,12 @@ class Status {
   Status(ErrorCode code, const std::string &msg) : code_(code), msg_(msg) {}
 
   /**
+   * @brief Create a status with the specified error code and empty msg
+   * @param code the error code.
+   */
+  explicit Status(ErrorCode code) : code_(code), msg_("") {}
+
+  /**
    * @brief generate a success status.
    * @returns a success status
    */

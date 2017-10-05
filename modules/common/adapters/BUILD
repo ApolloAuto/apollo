@@ -45,8 +45,9 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/common/util",
-        "@com_github_google_protobuf//:protobuf",
+        "@com_google_protobuf//:protobuf",
         "@glog//:glog",
+        "@ros//:ros_common",
     ],
 )
 
@@ -64,6 +65,7 @@ cc_test(
         ":adapter_gflags",
         "//modules/localization/proto:localization_proto",
         "@gtest//:main",
+        "@ros//:ros_common",
     ],
 )
 
@@ -74,17 +76,20 @@ cc_library(
     ],
     deps = [
         ":adapter",
+        "//modules/calibration/republish_msg/proto:relative_odometry_proto",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/monitor/proto:monitor_proto",
         "//modules/control/proto:control_proto",
-        "//modules/decision/proto:decision_proto",
-        "//modules/localization/proto:camera_proto",
+        "//modules/drivers/gnss/proto:ins_proto",
+        "//modules/hmi/proto:hmi_message_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/map/proto:map_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/routing/proto:routing_proto",
         "@glog//:glog",
     ],
 )

@@ -15,49 +15,42 @@
   *****************************************************************************/
 #include "modules/control/control.h"
 
+#include <iomanip>
 #include <string>
 
 #include "ros/include/std_msgs/String.h"
 
 #include "modules/localization/proto/localization.pb.h"
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
 namespace control {
 
-using ::apollo::canbus::Chassis;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::time::Clock;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::planning::ADCTrajectory;
-
-#define CHECK_PROTO(a, b)                                          \
-  if (!a.has_##b()) {                                              \
-    AERROR << "PB invalid! [" << #a << "] has NO [" << #b << "]!"; \
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,                \
-                  #a " missing pb field:" #b);                     \
-  }
+using apollo::canbus::Chassis;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::time::Clock;
+using apollo::localization::LocalizationEstimate;
+using apollo::planning::ADCTrajectory;
 
 std::string Control::Name() const { return FLAGS_node_name; }
 
 Status Control::Init() {
   AINFO << "Control init, starting ...";
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                                &control_conf_)) {
-    return Status(
-        ErrorCode::CONTROL_INIT_ERROR,
-        "Unable to load control conf file: " + FLAGS_control_conf_file);
-  }
+  CHECK(common::util::GetProtoFromFile(FLAGS_control_conf_file,
+                                                 &control_conf_))
+      << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
 
@@ -75,16 +68,15 @@ Status Control::Init() {
 
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
 
-  CHECK(AdapterManager::GetPlanningTrajectory())
-      << "PlanningTrajectory is not initialized.";
+  CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
 
   CHECK(AdapterManager::GetPad()) << "Pad is not initialized.";
 
   CHECK(AdapterManager::GetControlCommand())
       << "ControlCommand publisher is not initialized.";
 
-  AdapterManager::SetPadCallback(&Control::OnPad, this);
-  AdapterManager::SetMonitorCallback(&Control::OnMonitor, this);
+  AdapterManager::AddPadCallback(&Control::OnPad, this);
+  AdapterManager::AddMonitorCallback(&Control::OnMonitor, this);
 
   return Status::OK();
 }
@@ -114,15 +106,13 @@ Status Control::Start() {
   return Status::OK();
 }
 
-void Control::OnPad(const apollo::control::PadMessage &pad) {
+void Control::OnPad(const PadMessage &pad) {
   pad_msg_ = pad;
-  AINFO << "Received Pad Msg:" << pad.DebugString();
+  ADEBUG << "Received Pad Msg:" << pad.DebugString();
+  AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
 
-  if (!CheckPad().ok()) {
-    AERROR << "pad message check failed!";
-  }
   // do something according to pad message
-  if (pad_msg_.action() == ::apollo::control::DrivingAction::RESET) {
+  if (pad_msg_.action() == DrivingAction::RESET) {
     AINFO << "Control received RESET action!";
     estop_ = false;
   }
@@ -143,15 +133,14 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   Status status = CheckInput();
   // check data
   if (!status.ok()) {
-    AERROR << "Control input data failed: " << status.error_message();
+    AERROR_EVERY(100) << "Control input data failed: "
+                      << status.error_message();
     estop_ = true;
-    Alert();
   } else {
     Status status_ts = CheckTimestamp();
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
       estop_ = true;
-      Alert();
       status = status_ts;
     }
   }
@@ -161,9 +150,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
 
   // if planning set estop, then no control process triggered
   if (!estop_) {
-    if (chassis_.driving_mode() == ::apollo::canbus::Chassis::COMPLETE_MANUAL) {
+    if (chassis_.driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
-      AINFO << "Reset Controllers in Manual Mode";
+      AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
     }
 
     auto debug = control_command->mutable_debug()->mutable_input_debug();
@@ -187,12 +176,12 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   if (estop_) {
-    AWARN << "Estop triggered! No control core method executed!";
+    AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     // set Estop command
     control_command->set_speed(0);
     control_command->set_throttle(0);
     control_command->set_brake(control_conf_.soft_estop_brake());
-    control_command->set_gear_location(::apollo::canbus::Chassis::GEAR_DRIVE);
+    control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
   if (trajectory_.has_signal()) {
@@ -202,16 +191,15 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
-  double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  double start_timestamp = Clock::NowInSecond();
 
   ControlCommand control_command;
 
   Status status = ProduceControlCommand(&control_command);
-  if (!status.ok()) {
-    AERROR << "Failed to produce control command:" << status.error_message();
-  }
+  AERROR_IF(!status.ok()) << "Failed to produce control command:"
+                          << status.error_message();
 
-  double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  double end_timestamp = Clock::NowInSecond();
 
   if (pad_received_) {
     control_command.mutable_pad_msg()->CopyFrom(pad_msg_);
@@ -220,7 +208,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
 
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  AINFO << "control cycle time is: " << time_diff_ms << " ms.";
+  ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
   SendCmd(&control_command);
@@ -230,7 +218,7 @@ Status Control::CheckInput() {
   AdapterManager::Observe();
   auto localization_adapter = AdapterManager::GetLocalization();
   if (localization_adapter->Empty()) {
-    AINFO << "No Localization msg yet. ";
+    AWARN_EVERY(100) << "No Localization msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No localization msg");
   }
   localization_ = localization_adapter->GetLatestObserved();
@@ -238,18 +226,33 @@ Status Control::CheckInput() {
 
   auto chassis_adapter = AdapterManager::GetChassis();
   if (chassis_adapter->Empty()) {
-    AINFO << "No Chassis msg yet. ";
+    AWARN_EVERY(100) << "No Chassis msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No chassis msg");
   }
   chassis_ = chassis_adapter->GetLatestObserved();
   ADEBUG << "Received chassis:" << chassis_.ShortDebugString();
 
-  auto trajectory_adapter = AdapterManager::GetPlanningTrajectory();
+  auto trajectory_adapter = AdapterManager::GetPlanning();
   if (trajectory_adapter->Empty()) {
-    AINFO << "No planning msg yet. ";
+    AWARN_EVERY(100) << "No planning msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
   trajectory_ = trajectory_adapter->GetLatestObserved();
+  if (!trajectory_.estop().is_estop() &&
+      trajectory_.trajectory_point_size() == 0) {
+    AWARN_EVERY(100) << "planning has no trajectory point. ";
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
+                  "planning has no trajectory point.");
+  }
+
+  for (auto &trajectory_point : *trajectory_.mutable_trajectory_point()) {
+    if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
+      trajectory_point.set_v(0.0);
+      trajectory_point.set_a(0.0);
+    }
+  }
+
+  common::VehicleState::instance()->Update(localization_, chassis_);
 
   return Status::OK();
 }
@@ -259,7 +262,7 @@ Status Control::CheckTimestamp() {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
-  double current_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  double current_timestamp = Clock::NowInSecond();
   double localization_diff =
       current_timestamp - localization_.header().timestamp_sec();
   if (localization_diff >
@@ -290,8 +293,7 @@ Status Control::CheckTimestamp() {
 
 void Control::SendCmd(ControlCommand *control_command) {
   // set header
-  AdapterManager::FillControlCommandHeader(Name(),
-                                           control_command->mutable_header());
+  AdapterManager::FillControlCommandHeader(Name(), control_command);
 
   ADEBUG << control_command->ShortDebugString();
   if (FLAGS_is_control_test_mode) {
@@ -299,24 +301,6 @@ void Control::SendCmd(ControlCommand *control_command) {
     return;
   }
   AdapterManager::PublishControlCommand(*control_command);
-}
-
-Status Control::CheckPad() {
-  CHECK_PROTO(pad_msg_, action)
-  return Status::OK();
-}
-
-void Control::Alert() {
-  // do not alert too frequently
-  // though "0" means first hit
-  if (last_alert_timestamp_ > 0. &&
-      (apollo::common::time::ToSecond(Clock::Now()) - last_alert_timestamp_) <
-          FLAGS_min_alert_interval) {
-    return;
-  }
-
-  // update timestamp
-  last_alert_timestamp_ = apollo::common::time::ToSecond(Clock::Now());
 }
 
 void Control::Stop() {}

@@ -16,8 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-set -x
-
 TIME=$(date  +%Y%m%d_%H%M)
 
 if [ -z "${DOCKER_REPO}" ]; then
@@ -25,11 +23,11 @@ if [ -z "${DOCKER_REPO}" ]; then
 fi
 
 APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-TAG="run-env-${TIME}"
+
+ARCH=$(uname -m)
+TAG="run-${ARCH}-${TIME}"
 
 # Build image from APOLLO_ROOT, while use the specified Dockerfile.
 docker build -t "${DOCKER_REPO}:${TAG}" \
     -f "${APOLLO_ROOT}/docker/run_env.dockerfile" \
     "${APOLLO_ROOT}"
-
-sed -i "s/run-env.*\"/${TAG}\"/g" ${APOLLO_ROOT}/apollo_docker.sh

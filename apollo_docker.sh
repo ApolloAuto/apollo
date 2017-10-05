@@ -4,6 +4,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}"
 
+# the machine type, currently support x86_64, aarch64
+MACHINE_ARCH=$(uname -m)
 source ${DIR}/scripts/apollo_base.sh
 
 TIME=$(date  +%Y%m%d_%H%M)
@@ -12,23 +14,34 @@ if [ -z "${DOCKER_REPO}" ]; then
 fi
 
 function print_usage() {
-  echo 'Usage:
-  ./apollo_docker.sh [OPTION]'
-  echo 'Options:
-  build : run build only
-  buildify: fix style of BUILD files
-  check: run build/lint/test, please make sure it passes before checking in new code
-  clean: runs Bazel clean
-  coverage: generate test coverage report
-  doc: generate doxygen document
-  push: pushes the images to Docker hub
-  gen: release a docker release image
-  lint: run code style check
-  release: to build release version
-  test: run all the unit tests
-  version: current commit and date
-  print_usage: prints this menu
-  '
+  RED='\033[0;31m'
+  BLUE='\033[0;34m'
+  BOLD='\033[1m'
+  NONE='\033[0m'
+
+  echo -e "\n${RED}Usage${NONE}:
+  .${BOLD}/apollo_docker.sh${NONE} [OPTION]"
+
+  echo -e "\n${RED}Options${NONE}:
+  ${BLUE}build${NONE}: run build only
+  ${BLUE}build_opt${NONE}: build optimized binary for the code
+  ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
+  ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}buildify${NONE}: fix style of BUILD files
+  ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
+  ${BLUE}clean${NONE}: run Bazel clean
+  ${BLUE}config${NONE}: run configurator tool
+  ${BLUE}coverage${NONE}: generate test coverage report
+  ${BLUE}doc${NONE}: generate doxygen document
+  ${BLUE}lint${NONE}: run code style check
+  ${BLUE}usage${NONE}: print this menu
+  ${BLUE}release${NONE}: build release version
+  ${BLUE}test${NONE}: run all unit tests
+  ${BLUE}version${NONE}: display current commit and date
+  ${BLUE}push${NONE}: pushes the images to Docker hub
+  ${BLUE}gen${NONE}: release a docker release image
+  "
 }
 
 function start_build_docker() {
@@ -39,10 +52,10 @@ function start_build_docker() {
 }
 
 function gen_docker() {
-  IMG="apolloauto/apollo:run-env-20170712_1738"
+  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20170926_1848"
   RELEASE_DIR=${HOME}/.cache/release
-  RELEASE_NAME="${DOCKER_REPO}:release-${TIME}"
-  DEFAULT_NAME="${DOCKER_REPO}:release-latest"
+  RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
+  DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
   docker pull $IMG
 
   docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
@@ -66,14 +79,14 @@ function gen_docker() {
 }
 
 function push() {
-  local DEFAULT_NAME="${DOCKER_REPO}:release-latest"
-  local RELEASE_NAME="${DOCKER_REPO}:release-${TIME}"
+  local DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
+  local RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
   docker tag "$DEFAULT_NAME" "$RELEASE_NAME"
   docker push "$DEFAULT_NAME"
   docker push "$RELEASE_NAME"
 }
 
-if [ $# != 1 ];then
+if [ $# == 0 ];then
     print_usage
     exit 1
 fi
@@ -91,6 +104,6 @@ case $1 in
     gen_docker
     ;;
   *)
-    docker exec -u $USER apollo_dev bash -c "./apollo.sh $1"
+    docker exec -u $USER apollo_dev bash -c "./apollo.sh $@"
     ;;
 esac

@@ -25,14 +25,14 @@ _Apollo 快速入门指南 1.0_ 提供了所有关于了解、安装以及构建
 
 下表列出了本文档中使用的归约：
 
-| **Icon**                            | **描述**                          |
+| **Icon**                            | **描述**                                   |
 | ----------------------------------- | ---------------------------------------- |
-| **粗体**                            | 重要                                 |
-| `等宽字体`                   | 代码，类型数据                        |
-| _斜体_                            | 文件标题，章节和标题使用的术语 |
-| ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果 |
-| ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于您完成任务的捷径。 |
-| ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息 |
+| **粗体**                              | 重要                                       |
+| `等宽字体`                              | 代码，类型数据                                  |
+| _斜体_                                | 文件标题，章节和标题使用的术语                          |
+| ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果        |
+| ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于您完成任务的捷径。          |
+| ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息     |
 | ![warning](images/warning_icon.png) | **Warning**. 包含**不**能忽略的信息，或者执行某个任务或步骤时，您将面临失败风险 |
 
 # 概览
@@ -140,7 +140,7 @@ bash docker/scripts/release_into.sh
 [Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在北京，中国，你必须设置`+zone=50`。
 
 5. 通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
- `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+   `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
    有关典型的RTK设置，请参阅以下示例：
 
@@ -191,7 +191,7 @@ bash docker/scripts/release_commit.sh
 
 - 打开平台车辆
 - 打开工业PC机（IPC）.
-    ![](images/ipc_power_on.png)
+    ![](images/IPC_powerbutton.png)
 - 通过按住电源按钮打开调制解调器电源，直到指示灯亮起
 - 设置IPC的网络配置：静态IP（例如192.168.10.6），子网掩码（例如255.255.255.0）和网关（例如192.168.10.1）
    - 配置您的DNS服务器IP（例如，8.8.8.8）。

@@ -3,7 +3,6 @@ FROM aarch64/ubuntu:16.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
-## the following commands are OK, skip running again
 RUN apt-get install -y build-essential
 RUN apt-get install -y apt-utils
 RUN apt-get install -y curl
@@ -31,6 +30,13 @@ RUN apt-get install -y git
 RUN apt-get install -y bc
 RUN apt-get install -y apt-transport-https
 RUN apt-get install -y shellcheck
+RUN apt-get install -y cmake
+RUN apt-get install -y gdb
+RUN apt-get install -y psmisc
+RUN apt-get install -y python-empy
+RUN apt-get install -y librosconsole0d
+RUN apt-get install -y librosconsole-dev
+RUN apt-get install -y libtf-conversions0d
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN apt-get update
@@ -39,23 +45,23 @@ RUN apt-get install -y oracle-java8-installer
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
 
-## copy bazel to /usr/local/bin
-RUN mkdir -p /usr/local/bin
-WORKDIR /usr/local/bin/
-RUN wget https://github.com/startcode/bazel-arm64/releases/download/0.4.4/bazel-aarch64 && ln -rs bazel-aarch64 bazel
-
+# Install protobuf 3.3.0
 WORKDIR /tmp
-## install protobuf 3.1.0
-RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
-RUN tar xzf protobuf-cpp-3.1.0.tar.gz
-WORKDIR /tmp/protobuf-3.1.0
+RUN wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz
+RUN tar xzf protobuf-cpp-3.3.0.tar.gz
+WORKDIR /tmp/protobuf-3.3.0
 RUN ./configure --prefix=/usr
 RUN make
 RUN make install
+RUN chmod 755 /usr/bin/protoc
 
-# set up node v8.0.0
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
-RUN apt-get install -y nodejs
+# Set up node v8.0.0
+WORKDIR /tmp
+RUN wget https://github.com/tj/n/archive/v2.1.0.tar.gz
+RUN tar xzf v2.1.0.tar.gz
+WORKDIR /tmp/n-2.1.0
+RUN make install
+RUN n 8.0.0
 
 ## Install required python packages.
 WORKDIR /tmp
@@ -67,12 +73,9 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt-get update && apt-get install -y yarn
 
-# Remove all temporary files.
-RUN rm -fr /tmp/*
-
 ENV ROSCONSOLE_FORMAT '${file}:${line} ${function}() [${severity}] [${time}]: ${message}'
 
-# install dependency for ros build
+# Install dependency for ros build
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
@@ -92,3 +95,35 @@ RUN apt-get install -y zlib1g-dev
 
 ## https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
 RUN ln -s -f /bin/true /usr/bin/chfn
+
+# Install pcl and opencv, prerequisites for Caffe (CPU_ONLY mode)
+RUN apt-get update
+RUN apt-get install -y libatlas-base-dev
+RUN apt-get install -y libflann-dev
+RUN apt-get install -y libhdf5-serial-dev
+RUN apt-get install -y libicu-dev
+RUN apt-get install -y libleveldb-dev
+RUN apt-get install -y liblmdb-dev
+RUN apt-get install -y libopencv-dev
+RUN apt-get install -y libopenni-dev
+RUN apt-get install -y libqhull-dev
+RUN apt-get install -y libsnappy-dev
+RUN apt-get install -y libvtk5-dev
+RUN apt-get install -y libvtk5-qt4-dev
+RUN apt-get install -y mpi-default-dev
+
+# Install Opengl
+RUN echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/fillwave_ext.list
+RUN echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/fillwave_ext.list
+RUN apt-get update && apt-get install -y --force-yes libglfw3 libglfw3-dev freeglut3-dev
+
+# Install GLEW
+WORKDIR /tmp
+RUN wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
+RUN unzip glew-2.0.0.zip
+WORKDIR /tmp/glew-2.0.0
+RUN make && make install
+
+# Remove all temporary files.
+WORKDIR /
+RUN rm -fr /tmp/*

@@ -8,8 +8,10 @@ cc_library(
     hdrs = ["perception.h"],
     deps = [
         "//modules/common:apollo_app",
+        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/common:perception_common",
+        "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
     ],
 )
 
@@ -27,6 +29,20 @@ cc_binary(
         "//modules/perception/proto:perception_proto",
         "@ros//:ros_common",
     ],
+)
+
+filegroup(
+    name = "perception_data",
+    srcs = glob([
+        "data/**",
+    ]),
+)
+
+filegroup(
+    name = "perception_model",
+    srcs = glob([
+        "model/**",
+    ]),
 )
 
 cpplint()

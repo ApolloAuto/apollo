@@ -18,44 +18,49 @@
 """HTTP request handlers."""
 
 import datetime
-import os
+import httplib
 
 import flask
-import flask_restful
 import flask_socketio
 
-import config
-import hardware_api
-import module_api
-import ros_service_api
-import runtime_status_api
-import tool_api
+from config import Config
+from runtime_status import RuntimeStatus
+from socketio_api import SocketIOApi
 
 app = flask.Flask(__name__)
 app.secret_key = str(datetime.datetime.now())
-socketio = flask_socketio.SocketIO(app)
-
+socketio = flask_socketio.SocketIO(app, async_mode='gevent')
 
 # Web page handlers.
 @app.route('/')
 def index_page():
     """Handler of index page."""
-    return flask.render_template('index.tpl', conf_pb=config.Config.get_pb())
+    protocol = 'https' if Config.get_pb().server.https.enabled else 'http'
+    return flask.render_template('index.tpl', conf=Config, protocol=protocol)
 
 
 @app.route('/module_card/<string:module_name>')
 def module_card(module_name):
     """Handler of module card."""
     return flask.render_template(
-        'cards/module_detail.tpl', module=config.Config.get_module(module_name))
+        'cards/module_detail.tpl', module=Config.get_module(module_name))
 
 
-# Restful API handlers.
-api = flask_restful.Api(app)
-api.add_resource(hardware_api.HardwareApi,
-                 '/hardware_api/<string:hardware_name>')
-api.add_resource(module_api.ModuleApi, '/module_api/<string:module_name>')
-api.add_resource(ros_service_api.RosServiceApi,
-                 '/ros_service_api/<string:cmd_name>')
-api.add_resource(runtime_status_api.RuntimeStatusApi, '/runtime_status_api')
-api.add_resource(tool_api.ToolApi, '/tool_api/<string:tool_name>')
+@app.route('/runtime_status', methods=['GET', 'POST'])
+def runtime_status():
+    """
+    Handler of runtime_status.
+    Return current runtime status on GET request.
+    Update runtime status on POST request which brings a RuntimeStatus json.
+    """
+    if flask.request.method == 'GET':
+        return flask.jsonify(RuntimeStatus.status_json())
+    else:
+        RuntimeStatus.update(flask.request.get_json())
+    return ('OK', httplib.OK)
+
+# SocketIO handlers.
+@socketio.on('socketio_api', namespace='/io_frontend')
+def frontend_handler(socketio_request_json):
+    """Handler of SocketIO request for frontend."""
+    SocketIOApi.execute(socketio_request_json)

@@ -18,69 +18,103 @@
 #define MODULES_PLANNING_PLANNING_H_
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/common/apollo_app.h"
+#include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 
+/**
+ * @namespace apollo::planning
+ * @brief apollo::planning
+ */
 namespace apollo {
 namespace planning {
 
-class Planning {
+/**
+ * @class Localization
+ *
+ * @brief Localization module main class. It processes GPS and IMU as input,
+ * to generate localization info.
+ */
+class Planning : public apollo::common::ApolloApp {
  public:
   /**
-   * @brief Constructor
+   * @brief module name
+   * @return module name
    */
-  Planning();
+  std::string Name() const override;
 
   /**
-   * @brief Destructor
+   * @brief module initialization function
+   * @return initialization status
    */
-  ~Planning() = default;
+  apollo::common::Status Init() override;
+
+  /**
+   * @brief module start function
+   * @return start status
+   */
+  apollo::common::Status Start() override;
+
+  /**
+   * @brief module stop function
+   * @return stop status
+   */
+  void Stop() override;
 
   /**
    * @brief Plan the trajectory given current vehicle state
-   * @param vehicle_state variable describes the vehicle state, including
-   * position, velocity, acceleration, heading, etc
    * @param is_on_auto_mode whether the current system is on auto-driving mode
-   * @param publishable_trajectory the computed planning trajectory
    */
-  bool Plan(const common::vehicle_state::VehicleState &vehicle_state,
-            const bool is_on_auto_mode, const double publish_time,
-            std::vector<common::TrajectoryPoint> *discretized_trajectory);
+  common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory);
 
-  /**
-   * @brief Reset the planner to initial state.
-   */
-  void Reset();
+  void RunOnce();
+
+  common::Status InitFrame(const uint32_t sequence_num, const double time_stamp,
+                           const common::TrajectoryPoint& init_adc_point);
+
+  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
+
+  void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 
  private:
+  // Watch dog timer
+  void OnTimer(const ros::TimerEvent&);
+
+  void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
+
   void RegisterPlanners();
 
- private:
-  std::pair<common::TrajectoryPoint, std::size_t>
-  ComputeStartingPointFromLastTrajectory(const double curr_time) const;
+  bool HasSignalLight(const PlanningConfig& config);
 
-  common::TrajectoryPoint ComputeStartingPointFromVehicleState(
-      const common::vehicle_state::VehicleState &vehicle_state,
-      const double forward_time) const;
+  apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
+      planner_factory_;
 
-  std::vector<common::TrajectoryPoint> GetOverheadTrajectory(
-      const std::size_t matched_index, const std::size_t buffer_size);
+  PlanningConfig config_;
 
-  std::unique_ptr<Planner> ptr_planner_;
+  std::unique_ptr<hdmap::PncMap> pnc_map_;
 
-  enum PlannerType {
-    RTK_PLANNER,
-  };
+  std::unique_ptr<Frame> frame_;
 
-  common::util::Factory<PlannerType, Planner> planner_factory_;
+  std::unique_ptr<Planner> planner_;
 
-  std::vector<common::TrajectoryPoint> last_trajectory_;
+  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
-  double last_header_time_ = 0.0;
+  ros::Timer timer_;
 };
 
 }  // namespace planning

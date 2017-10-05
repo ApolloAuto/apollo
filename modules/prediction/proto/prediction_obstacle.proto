@@ -4,27 +4,17 @@ package apollo.prediction;
 
 import "modules/common/proto/error_code.proto";
 import "modules/common/proto/header.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
-
-message TrajectoryPoint {
-  optional double x = 1;  // in meters.
-  optional double y = 2;  // in meters.
-  optional double z = 3;  // height in meters.
-  optional double velocity = 4;  // velocity, in meters / second
-  // in seconds, relative to the time_stamp of this message:
-  //     t = t_this_state - t_timestamp
-  optional double t = 5;
-  optional double heading = 6; // heading in angle
-}
 
 message Trajectory {
   optional double probability = 1;  // probability of this trajectory
-  repeated TrajectoryPoint trajectory_point = 2;
+  repeated apollo.common.TrajectoryPoint trajectory_point = 2;
 }
 
 message PredictionObstacle {
   optional apollo.perception.PerceptionObstacle perception_obstacle = 1;
-  optional double time_stamp = 2;  // GPS time in seconds
+  optional double timestamp = 2;  // GPS time in seconds
   // the length of the time for this prediction (e.g. 10s)
   optional double predicted_period = 3;
   // can have multiple trajectories per obstacle

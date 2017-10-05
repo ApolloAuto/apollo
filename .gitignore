@@ -1,5 +1,6 @@
 # Bazel
 bazel-apollo
+bazel-apollo_dev
 bazel-bin
 bazel-genfiles
 bazel-out
@@ -7,6 +8,8 @@ bazel-testlogs
 /Debug/
 *.pyc
 WORKSPACE
+# temporary files
+*.swp
 
 # javascript
 *bundle.js
@@ -15,6 +18,7 @@ node_modules
 # generated files
 generatedViews
 generatedScripts
+modules/common/data/ssl_keys
 # database/log files
 *.sqlite
 dreamview.log
@@ -25,6 +29,12 @@ npm-debug.log
 .cproject
 .settings
 .classpath
+
+# IntelliJ files
+.idea
+
+# Vscode files
+.vscode
 
 # atom.io files
 *.gch
@@ -54,6 +64,24 @@ data/log
 data/core
 data/bag
 data/cov
+data/pcd
 
 # Doxygen
 docs/doxygen
+
+# Esd can lib
+third_party/can_card_library/esd_can/include
+third_party/can_card_library/esd_can/lib
+
+# Map data files
+modules/map/data
+
+# python proto
+py_proto
+
+# gnss conf files
+modules/drivers/gnss/conf/conf_beijing
+modules/drivers/gnss/conf/conf_us
+
+# calibration files
+modules/calibration/data/mkz056

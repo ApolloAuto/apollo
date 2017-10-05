@@ -18,8 +18,8 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20170707_1129"
-VERSION_AARCH64="dev-aarch64-20170712_1533"
+VERSION_X86_64="dev-x86_64-20170926_1848"
+VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]];then
     VERSION=$1
 elif [ ${ARCH} == "x86_64" ]; then
@@ -36,38 +36,25 @@ if [ -z "${DOCKER_REPO}" ]; then
 fi
 
 IMG=${DOCKER_REPO}:$VERSION
-LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
-if [ ! -e "${LOCAL_DIR}/data/log" ]; then
-    mkdir -p "${LOCAL_DIR}/data/log"
-fi
-if [ ! -e "${LOCAL_DIR}/data/bag" ]; then
-    mkdir -p "${LOCAL_DIR}/data/bag"
-fi
-if [ ! -e "${LOCAL_DIR}/data/core" ]; then
-    mkdir -p "${LOCAL_DIR}/data/core"
+if [ ! -e /apollo ]; then
+    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
 fi
 
-source ${LOCAL_DIR}/scripts/apollo_base.sh
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-function find_device() {
-    # ${1} = device pattern
-    local device_list=$(find /dev -name "${1}")
-    if [ -z "${device_list}" ]; then
-        warning "Failed to find device with pattern \"${1}\" ..."
-    else
-        local devices=""
-        for device in $(find /dev -name "${1}"); do
-            ok "Found device: ${device}."
-            devices="${devices} --device ${device}:${device}"
-        done
-        echo "${devices}"
-    fi
-}
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
-    docker pull $IMG
-    
+    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
+    read -t 10 -n 1 INCHINA
+    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
+        docker pull "registry.docker-cn.com/${IMG}"
+    else
+        docker pull $IMG
+    fi
+
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
         docker stop apollo_dev 1>/dev/null
@@ -80,14 +67,7 @@ function main(){
         display="${DISPLAY}"
     fi
 
-
-    # setup CAN device
-    if [ ! -e /dev/can0 ]; then
-        sudo mknod --mode=a+rw /dev/can0 c 52 0
-    fi
-    # enable coredump
-    echo "${LOCAL_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
-
+    setup_device
 
     local devices=""
     devices="${devices} $(find_device ttyUSB*)"
@@ -95,6 +75,7 @@ function main(){
     devices="${devices} $(find_device can*)"
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
+    devices="${devices} $(find_device nvidia*)"
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
@@ -108,6 +89,7 @@ function main(){
     fi
     docker run -it \
         -d \
+        --privileged \
         --name apollo_dev \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
@@ -116,7 +98,7 @@ function main(){
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-        -v $LOCAL_DIR:/apollo \
+        -v $APOLLO_ROOT_DIR:/apollo \
         -v /media:/media \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
@@ -127,7 +109,9 @@ function main(){
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
         --shm-size 512M \
-        $IMG
+        $IMG \
+        /bin/bash
+
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi

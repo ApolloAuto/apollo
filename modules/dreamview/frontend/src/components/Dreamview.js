@@ -1,10 +1,14 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 
+import DashCamPlayer from "components/DashCamPlayer";
 import SideBar from "components/SideBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
+import RouteEditingBar from "components/RouteEditingBar";
+import Loader from "components/common/Loader";
 import WS from "store/websocket";
+
 
 @inject("store") @observer
 export default class Dreamview extends React.Component {
@@ -16,13 +20,26 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { dimension, meters } = this.props.store;
+        const { dimension, meters, options, video,
+                routeEditingManager, isInitialized} = this.props.store;
+
+        const showBars = !routeEditingManager.inEditingView && isInitialized;
+        const showRoutingBar = routeEditingManager.inEditingView;
+        const showLoader = !isInitialized;
+        const showVideo = (video.path !== undefined && video.path.length !== 0);
 
         return (
             <div>
-                <SideBar />
-                <StatusBar meters={meters} />
-                <Scene width={dimension.width} height={dimension.height} />
+                {showBars ? <SideBar /> : null}
+                {showBars ? <StatusBar meters={meters} /> : null}
+                {showRoutingBar ? <RouteEditingBar /> : null}
+                <Scene
+                    width={dimension.width}
+                    height={dimension.height}
+                    options={options}
+                    invisible={!isInitialized}/>
+                {showLoader ? <Loader /> : null}
+                {showVideo  ? <DashCamPlayer /> : null}
             </div>
         );
     }

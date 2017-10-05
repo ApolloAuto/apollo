@@ -18,10 +18,10 @@
 
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 
@@ -214,11 +214,8 @@ double LineSegment2d::GetPerpendicularFoot(const Vec2d &point,
 }
 
 std::string LineSegment2d::DebugString() const {
-  std::ostringstream sout;
-  sout << "segment2d ( start = " << start_.DebugString()
-       << "  end = " << end_.DebugString() << " )";
-  sout.flush();
-  return sout.str();
+  return util::StrCat("segment2d ( start = ", start_.DebugString(), "  end = ",
+                      end_.DebugString(), " )");
 }
 
 }  // namespace math

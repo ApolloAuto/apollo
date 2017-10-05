@@ -1,18 +1,29 @@
 camera:
-  defaults:
+  viewAngle: 0.5
+  Default:
     fov: 60
     near: 1
     far: 300
-    viewAngle: 0.5
+  Near:
+    fov: 60
+    near: 1
+    far: 200
+  Overhead:
+    fov: 60
+    near: 1
+    far: 100
+  Map:
+    fov: 100
+    near: 1
+    far: 3000
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
-  mpp: 200
+  mpp: 400
   xres: 8192
   yres: 8192
   xorigin: 4096
   yorigin: 4096
-  mapname: SUNNYVALELOOP
   xyoffset: 0
 planning:
   # The minimum interval between two consecutive
@@ -21,8 +32,27 @@ planning:
     width: 1.4
 options:
   defaults:
+    showMenu: false
     showConsole: false
     showPlanning: true
+    showDecisionMain: true
+    showDecisionObstacle: true
+    showRouting: true
+    showPredictionMajor: true
+    showPredictionMinor: true
+    showObstaclesVehicle: true
+    showObstaclesPedestrian: true
+    showObstaclesBicycle: true
+    showObstaclesUnknownMovable: true
+    showObstaclesUnknownUnmovable: true
+    showObstaclesUnknown: true
+    showObstaclesVirtual: false
+    showObstaclesVelocity: true
+    showObstaclesHeading: true
+    showObstaclesId: true
+    cameraAngle: Default
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
+  performanceMonitor: false
+

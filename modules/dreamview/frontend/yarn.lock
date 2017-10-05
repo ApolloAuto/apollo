@@ -3607,6 +3607,16 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
+jDataView@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/jDataView/-/jDataView-2.3.0.tgz#e63c1972fdc9e6ee01c6deb868c6196904e813e0"
+  dependencies:
+    jdataview "*"
+
+jdataview@*:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/jdataview/-/jdataview-2.5.0.tgz#3081b3fea651f9317ec6bd4feb2ddc98aa41d595"
+
 jimp@^0.2.13, jimp@^0.2.21:
   version "0.2.28"
   resolved "https://registry.yarnpkg.com/jimp/-/jimp-0.2.28.tgz#dd529a937190f42957a7937d1acc3a7762996ea2"
@@ -5859,6 +5869,10 @@ stat-mode@^0.2.0:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/stat-mode/-/stat-mode-0.2.2.tgz#e6c80b623123d7d80cf132ce538f346289072502"
 
+stats.js@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/stats.js/-/stats.js-0.17.0.tgz#b1c3dc46d94498b578b7fd3985b81ace7131cc7d"
+
 "statuses@>= 1.3.1 < 2", statuses@~1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.3.1.tgz#faf51b9eb74aaef3b3acf4ad5f61abf24cb7b93e"
@@ -6104,10 +6118,6 @@ three-line-2d@^1.1.6:
     inherits "^2.0.1"
     object-assign "^4.0.1"
     polyline-normals "^2.0.0"
-
-three-obj-loader@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/three-obj-loader/-/three-obj-loader-1.1.2.tgz#d2c0e30a1acfdb344eac014375594429a0e25a53"
 
 three@~0.84.0:
   version "0.84.0"

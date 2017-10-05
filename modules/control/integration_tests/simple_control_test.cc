@@ -37,7 +37,6 @@ class SimpleControlTest : public ControlTestBase {
  public:
   virtual void SetUp() {
     FLAGS_test_data_dir = "modules/control/testdata/simple_control_test/";
-    ControlTestBase::SetUp();
   }
 };
 
@@ -47,6 +46,7 @@ TEST_F(SimpleControlTest, simple_test) {
   FLAGS_test_pad_file = "1_pad.pb.txt";
   FLAGS_test_planning_file = "1_planning.pb.txt";
   FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
@@ -55,6 +55,7 @@ TEST_F(SimpleControlTest, state_exact_match) {
   FLAGS_test_pad_file = "1_pad.pb.txt";
   FLAGS_test_planning_file = "1_planning.pb.txt";
   FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
@@ -63,6 +64,7 @@ TEST_F(SimpleControlTest, pad_reset) {
   FLAGS_test_pad_file = "2_pad.pb.txt";
   FLAGS_test_planning_file = "1_planning.pb.txt";
   FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
@@ -72,10 +74,9 @@ TEST_F(SimpleControlTest, monitor_fatal) {
   FLAGS_test_planning_file = "1_planning.pb.txt";
   FLAGS_test_chassis_file = "1_chassis.pb.txt";
   FLAGS_test_monitor_file = "1_monitor.pb.txt";
+  ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
 }  // namespace control
 }  // namespace apollo
-
-TMAIN;

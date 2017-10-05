@@ -61,27 +61,31 @@ namespace adapter {
   static name##Adapter *Get##name() {                                          \
     return instance()->InternalGet##name();                                    \
   }                                                                            \
-  static void Feed##name##ProtoFile(const std::string &proto_file) {           \
-    CHECK(instance()->name##_)                                                 \
-        << "Initialize adapter before feeding protobuf";                       \
-    Get##name()->FeedProtoFile(proto_file);                                    \
+  static bool Feed##name##File(const std::string &proto_file) {                \
+    if (!instance()->name##_) {                                                \
+      AERROR << "Initialize adapter before feeding protobuf";                  \
+      return false;                                                            \
+    }                                                                          \
+    return Get##name()->FeedFile(proto_file);                                  \
   }                                                                            \
   static void Publish##name(const name##Adapter::DataType &data) {             \
     instance()->InternalPublish##name(data);                                   \
   }                                                                            \
-  static void Fill##name##Header(const std::string &module_name,               \
-                                 apollo::common::Header *header) {             \
-    instance()->name##_->FillHeader(module_name, header);                      \
+  template <typename T>                                                        \
+  static void Fill##name##Header(const std::string &module_name, T *data) {    \
+    static_assert(std::is_same<name##Adapter::DataType, T>::value,             \
+                  "Data type must be the same with adapter's type!");          \
+    instance()->name##_->FillHeader(module_name, data);                        \
   }                                                                            \
-  static void Set##name##Callback(name##Adapter::Callback callback) {          \
+  static void Add##name##Callback(name##Adapter::Callback callback) {          \
     CHECK(instance()->name##_)                                                 \
         << "Initialize adapter before setting callback";                       \
-    instance()->name##_->SetCallback(callback);                                \
+    instance()->name##_->AddCallback(callback);                                \
   }                                                                            \
   template <class T>                                                           \
-  static void Set##name##Callback(                                             \
+  static void Add##name##Callback(                                             \
       void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
-    Set##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
+    Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
                                                                                \
  private:                                                                      \
@@ -108,7 +112,11 @@ namespace adapter {
   }                                                                            \
   name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
-    name##publisher_.publish(data);                                            \
+    /* Only publish ROS msg if node handle is initialized. */                  \
+    if (node_handle_) {                                                        \
+      name##publisher_.publish(data);                                          \
+    }                                                                          \
+    name##_->SetLatestPublished(data);                                         \
   }
 
 /**
@@ -128,11 +136,6 @@ namespace adapter {
 class AdapterManager {
  public:
   /**
-   * @brief Initialize the /class AdapterManager singleton.
-   */
-  static void Init();
-
-  /**
    * @brief Initialize the /class AdapterManager singleton with the
    * provided configuration. The configuration is specified by the
    * file path.
@@ -147,6 +150,12 @@ class AdapterManager {
    * @param configs the adapter manager configuration proto.
    */
   static void Init(const AdapterManagerConfig &configs);
+
+  /**
+   * @brief check if the AdapterManager is initialized
+   */
+  static bool Initialized();
+
   static void Observe();
 
   /**
@@ -175,21 +184,27 @@ class AdapterManager {
   /// of enabled adapters.
   std::vector<std::function<void()>> observers_;
 
+  bool initialized_ = false;
+
   /// The following code registered all the adapters of interest.
   REGISTER_ADAPTER(Chassis);
   REGISTER_ADAPTER(ChassisDetail);
   REGISTER_ADAPTER(ControlCommand);
-  REGISTER_ADAPTER(Decision);
   REGISTER_ADAPTER(Gps);
   REGISTER_ADAPTER(Imu);
-  REGISTER_ADAPTER(Camera);
   REGISTER_ADAPTER(Localization);
   REGISTER_ADAPTER(Monitor);
   REGISTER_ADAPTER(Pad);
   REGISTER_ADAPTER(PerceptionObstacles);
-  REGISTER_ADAPTER(PlanningTrajectory);
+  REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(PointCloud);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
+  REGISTER_ADAPTER(RoutingRequest);
+  REGISTER_ADAPTER(RoutingResponse);
+  REGISTER_ADAPTER(RelativeOdometry);
+  REGISTER_ADAPTER(InsStat);
+  REGISTER_ADAPTER(HMICommand);
 
   DECLARE_SINGLETON(AdapterManager);
 };

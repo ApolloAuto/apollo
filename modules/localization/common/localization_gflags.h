@@ -30,16 +30,12 @@ DECLARE_double(localization_publish_freq);
 
 DECLARE_string(localization_config_file);
 DECLARE_string(rtk_adapter_config_file);
-DECLARE_string(camera_adapter_config_file);
-DECLARE_string(camera_parameter_config_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
 DECLARE_bool(enable_map_reference_unify);
 DECLARE_bool(enable_watchdog);
 
 DECLARE_double(gps_time_delay_tolerance);
-DECLARE_double(imu_time_delay_tolerance);
-DECLARE_double(camera_time_delay_tolerance);
 DECLARE_double(gps_imu_timestamp_sec_diff_tolerance);
 DECLARE_double(timestamp_sec_tolerance);
 
@@ -47,12 +43,9 @@ DECLARE_double(map_offset_x);
 DECLARE_double(map_offset_y);
 DECLARE_double(map_offset_z);
 
-DECLARE_int32(monitor_level);
-
 DECLARE_int32(report_threshold_err_num);
 DECLARE_double(report_gps_imu_time_diff_threshold);
 
 DECLARE_bool(enable_gps_timestamp);
-DECLARE_bool(enable_camera_timestamp);
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

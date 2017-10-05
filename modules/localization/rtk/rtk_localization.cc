@@ -25,11 +25,11 @@ namespace apollo {
 namespace localization {
 
 using ::Eigen::Vector3d;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::adapter::ImuAdapter;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::Status;
-using ::apollo::common::time::Clock;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::ImuAdapter;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::Status;
+using apollo::common::time::Clock;
 
 RTKLocalization::RTKLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION),
@@ -213,6 +213,13 @@ void RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
                                     imu2.imu().linear_acceleration(), frac1);
           imu_msg->mutable_imu()->mutable_linear_acceleration()->CopyFrom(val);
         }
+
+        if (imu1.has_imu() && imu1.imu().has_euler_angles() && imu2.has_imu() &&
+            imu2.imu().has_euler_angles()) {
+          auto val = InterpolateXYZ(imu1.imu().euler_angles(),
+                                    imu2.imu().euler_angles(), frac1);
+          imu_msg->mutable_imu()->mutable_euler_angles()->CopyFrom(val);
+        }
       }
     }
   }
@@ -248,14 +255,13 @@ void RTKLocalization::PrepareLocalizationMsg(
 }
 
 void RTKLocalization::ComposeLocalizationMsg(
-    const ::apollo::localization::Gps &gps_msg,
-    const ::apollo::localization::Imu &imu_msg,
+    const localization::Gps &gps_msg, const localization::Imu &imu_msg,
     LocalizationEstimate *localization) {
   localization->Clear();
 
   // header
   AdapterManager::FillLocalizationHeader(FLAGS_localization_module_name,
-                                         localization->mutable_header());
+                                         localization);
   if (FLAGS_enable_gps_timestamp) {
     // copy time stamp, do NOT use Clock::Now()
     localization->mutable_header()->set_timestamp_sec(
@@ -349,6 +355,11 @@ void RTKLocalization::ComposeLocalizationMsg(
             imu.angular_velocity());
       }
     }
+
+    // euler angle
+    if (imu.has_euler_angles()) {
+      mutable_pose->mutable_euler_angles()->CopyFrom(imu.euler_angles());
+    }
   }
 }
 
@@ -358,7 +369,7 @@ void RTKLocalization::PublishLocalization() {
 
   // publish localization messages
   AdapterManager::PublishLocalization(localization);
-  AINFO << "[OnTimer]: Localization message publish success!";
+  ADEBUG << "[OnTimer]: Localization message publish success!";
 }
 
 void RTKLocalization::RunWatchDog() {

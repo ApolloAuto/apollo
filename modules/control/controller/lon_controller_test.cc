@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
-using VehicleState = common::vehicle_state::VehicleState;
+using VehicleState = common::VehicleState;
 
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";
@@ -59,20 +59,18 @@ class LonControllerTest : public ::testing::Test, LonController {
                                                  &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
-    timestamp_ = apollo::common::time::ToSecond(Clock::Now());
+    timestamp_ = Clock::NowInSecond();
 
     controller_.reset(new LonController());
   }
 
-  void ComputeLongitudinalErrors(
-      const ::apollo::common::vehicle_state::VehicleState &vehicle_state,
-      const TrajectoryAnalyzer *trajectory, const double preview_time,
-      SimpleLongitudinalDebug *debug) {
-    LonController::ComputeLongitudinalErrors(vehicle_state, trajectory,
-                                             preview_time, debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
+                                 const double preview_time,
+                                 SimpleLongitudinalDebug *debug) {
+    LonController::ComputeLongitudinalErrors(trajectory, preview_time, debug);
   }
 
-  Status Init(const ControlConf *control_conf) {
+  common::Status Init(const ControlConf *control_conf) {
     return LonController::Init(control_conf);
   }
 
@@ -116,18 +114,18 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   auto trajectory_pb =
       LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
-  double time_now = apollo::common::time::ToSecond(Clock::Now());
+  double time_now = Clock::NowInSecond();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  VehicleState vehicle_state(&localization_pb, &chassis_pb);
+  auto *vehicle_state = VehicleState::instance();
+  vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 
   double ts = longitudinal_conf_.ts();
   double preview_time = longitudinal_conf_.preview_window() * ts;
 
   SimpleLongitudinalDebug debug;
-  ComputeLongitudinalErrors(vehicle_state, &trajectory_analyzer, preview_time,
-                            &debug);
+  ComputeLongitudinalErrors(&trajectory_analyzer, preview_time, &debug);
 
   double station_reference_expected = 0.16716666937000002;
   double speed_reference_expected = 1.70833337307;
@@ -154,8 +152,8 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
 }
 
 TEST_F(LonControllerTest, Init) {
-  Status status = Init(nullptr);
-  EXPECT_EQ(status.code() == ErrorCode::CONTROL_INIT_ERROR, true);
+  common::Status status = Init(nullptr);
+  EXPECT_EQ(status.code() == common::ErrorCode::CONTROL_INIT_ERROR, true);
 }
 
 }  // namespace control

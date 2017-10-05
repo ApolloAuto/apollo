@@ -1,0 +1,45 @@
+header {
+  timestamp_sec: 0.1
+  module_name: "perception"
+  sequence_num: 1
+}
+perception_obstacle {
+  id: 1
+  position {
+    x: -457.010,
+    y: -160.023,
+    z: 0.0
+  }
+  theta: -0.352
+  velocity {
+    x: 17.994
+    y: -6.839
+    z: 0
+  }
+  length: 4
+  width: 2
+  height: 1
+  tracking_time: 1
+  type: VEHICLE
+  timestamp: 0.1
+}
+perception_obstacle {
+  id: 101
+  position {
+    x: -438.610,
+    y: -161.521,
+    z: 0.0
+  }
+  theta: 1.220
+  velocity {
+    x: 1.710
+    y: 4.699
+    z: 0
+  }
+  length: 0.5
+  width: 0.5
+  height: 1.8
+  tracking_time: 1
+  type: PEDESTRIAN
+  timestamp: 0.1
+}

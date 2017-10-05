@@ -20,12 +20,16 @@
 #include "gflags/gflags.h"
 
 // System gflags
-DECLARE_string(node_namespace);
 DECLARE_string(node_name);
 DECLARE_string(hmi_name);
 
+DECLARE_string(adapter_config_filename);
+
 // data file
 DECLARE_string(canbus_conf_file);
+
+// maximum can port number
+DECLARE_int32(max_port);
 
 // Canbus gflags
 DECLARE_double(chassis_freq);
