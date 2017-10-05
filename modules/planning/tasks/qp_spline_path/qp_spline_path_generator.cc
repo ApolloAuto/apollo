@@ -195,20 +195,20 @@ bool QpSplinePathGenerator::CalculateFrenetPoint(
 
 bool QpSplinePathGenerator::InitSpline(const double start_s,
                                        const double end_s) {
-  uint32_t number_of_knots = static_cast<uint32_t>(
-      (end_s - start_s) / qp_spline_path_config_.knot_distance());
-  number_of_knots = std::max(2u, number_of_knots);
-  common::util::uniform_slice(start_s, end_s, number_of_knots, &knots_);
+  uint32_t number_of_spline = static_cast<uint32_t>(
+      (end_s - start_s) / qp_spline_path_config_.max_spline_length());
+  number_of_spline = std::max(2u, number_of_spline);
+  common::util::uniform_slice(start_s, end_s, number_of_spline, &knots_);
   // spawn a new spline generator
   spline_generator_.reset(
       new Spline1dGenerator(knots_, qp_spline_path_config_.spline_order()));
 
   // set evaluated_s_
-  double delta_s = qp_spline_path_config_.constraint_point_distance();
-  uint32_t evaluated_s_num =
+  double delta_s = qp_spline_path_config_.max_constraint_length();
+  uint32_t constraint_num =
       std::max(3u, static_cast<uint32_t>((end_s - start_s) / delta_s));
   delta_s = (end_s - start_s) / delta_s;
-  common::util::uniform_slice(start_s + delta_s, end_s, evaluated_s_num - 1,
+  common::util::uniform_slice(start_s + delta_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return true;
 }
