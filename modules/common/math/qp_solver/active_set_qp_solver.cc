@@ -77,7 +77,6 @@ bool ActiveSetQpSolver::Solve() {
 
   for (int r = 0; r < kernel_matrix_.rows(); ++r) {
     g_matrix[r] = offset_(r, 0);
-
     for (int c = 0; c < kernel_matrix_.cols(); ++c) {
       h_matrix[index++] = kernel_matrix_(r, c);
     }
