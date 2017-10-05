@@ -85,7 +85,8 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       return st_position;
     }
 
-    double s_upper = dp_st_speed_config_.total_path_length();
+    double s_upper = reference_line_info_->reference_line().Length() -
+                     reference_line_info_->AdcSlBoundary().end_s();
     double s_lower = 0.0;
     if (st_boundary.GetBoundarySRange(speed_point.t(), &s_upper, &s_lower)) {
       if (s_lower > speed_point.s()) {
