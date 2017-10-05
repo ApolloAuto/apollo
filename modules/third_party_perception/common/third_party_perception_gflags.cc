@@ -61,4 +61,14 @@ DEFINE_double(default_height, 3.0,
 DEFINE_double(
     filter_y_distance, 7.5,
     "fiter the radar objects far away from the main vehicle on y-axis.");
+DEFINE_double(movable_speed_threshold, 15.0,
+    "a radar object is considered as moving in a frame " 
+    "if its speed > movable_speed_threshold");
+DEFINE_double(movable_heading_threshold, 1.5,
+    "a radar object is considered as moving in a frame "
+    "if the difference between its heading and the main vehicle's heading "
+    "< movable_speed_threshold");
+DEFINE_int32(movable_frames_count_threshold, 5,
+    "a radar object is considered as a movable "
+    "if it is moving for consecutive movable_frames_count_threshold frames");
 DEFINE_int32(keep_delphi_esr_frames, 5, "number of delphi esr frames to keep");

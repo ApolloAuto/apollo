@@ -52,6 +52,9 @@ DECLARE_double(default_height);
 
 // flags to filter radar obstacles
 DECLARE_double(filter_y_distance);
+DECLARE_double(movable_speed_threshold);
+DECLARE_double(movable_heading_threshold);
+DECLARE_int32(movable_frames_count_threshold);
 DECLARE_int32(keep_delphi_esr_frames);
 
 #endif
