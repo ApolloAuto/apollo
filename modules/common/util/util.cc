@@ -79,10 +79,6 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
   return path_point;
 }
 
-double Distance2D(const PathPoint& a, const PathPoint& b) {
-  return std::hypot(a.x() - b.x(), a.y() - b.y());
-}
-
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

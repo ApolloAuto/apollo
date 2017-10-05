@@ -76,7 +76,7 @@ Obstacle::Obstacle(const std::string& id,
   }
   for (int i = 1; i < trajectory_points.size(); ++i) {
     cumulative_s +=
-        common::util::Distance2D(trajectory_points[i - 1].path_point(),
+        common::util::DistanceXY(trajectory_points[i - 1].path_point(),
                                  trajectory_points[i].path_point());
 
     trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
