@@ -54,18 +54,18 @@ class ThirdPartyPerception : public apollo::common::ApolloApp {
   void OnMobileye(const apollo::drivers::Mobileye& message);
   // Upon receiving radar data
   void OnDelphiESR(const apollo::drivers::DelphiESR& message);
+  // Upon receiving localization data
   void OnLocalization(
       const apollo::localization::LocalizationEstimate& message);
+  // publish perception obstacles when timer is triggered 
   void OnTimer(const ros::TimerEvent&);
 
-  RadarObstacles FilterRadarObstacles(const RadarObstacles& radar_obstacles);
-
   ros::Timer timer_;
+  std::mutex third_party_perception_mutex_;
   apollo::perception::PerceptionObstacles mobileye_obstacles_;
   apollo::localization::LocalizationEstimate localization_;
   RadarObstacles current_radar_obstacles_;
   RadarObstacles last_radar_obstacles_;
-  std::mutex third_party_perception_mutex_;
 };
 
 }  // namespace third_party_perception

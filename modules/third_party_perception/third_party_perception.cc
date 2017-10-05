@@ -68,14 +68,14 @@ Status ThirdPartyPerception::Start() {
 void ThirdPartyPerception::Stop() { timer_.stop(); }
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
-  AINFO << "receive Mobileye callback";
+  AINFO << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   mobileye_obstacles_ =
       conversion::MobileyeToPerceptionObstacles(message, localization_);
 }
 
 void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
-  AINFO << "receive DelphiESR callback";
+  AINFO << "Received delphi esr data: run delphi esr callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_.Clear();
@@ -84,13 +84,13 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
 }
 
 void ThirdPartyPerception::OnLocalization(const LocalizationEstimate& message) {
-  AINFO << "receive Localization callback";
+  AINFO << "Received localization data: run localization callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   localization_.CopyFrom(message);
 }
 
 void ThirdPartyPerception::OnTimer(const ros::TimerEvent&) {
-  AINFO << "publish PerceptionObstacles";
+  AINFO << "Timer is triggered: publish PerceptionObstacles";
 
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
 
