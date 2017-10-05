@@ -122,14 +122,13 @@ class MPCController : public Controller {
                             SimpleMPCDebug *debug) const;
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
-                            SimpleMPCDebug *debug);
+                                 SimpleMPCDebug *debug);
 
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LogInitParameters();
 
-  void ProcessLogs(const SimpleMPCDebug *debug,
-                   const canbus::Chassis *chassis);
+  void ProcessLogs(const SimpleMPCDebug *debug, const canbus::Chassis *chassis);
 
   void CloseLogFile();
 
@@ -170,8 +169,8 @@ class MPCController : public Controller {
   double max_lat_acc_ = 0.0;
 
   // number of states without previews, includes
-  // lateral error, lateral error rate, heading error, heading error rate, station error,
-  // velocity error,
+  // lateral error, lateral error rate, heading error, heading error rate,
+  // station error, velocity error,
   const int basic_state_size_ = 6;
   // vehicle state matrix
   Eigen::MatrixXd matrix_a_;
