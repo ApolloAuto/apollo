@@ -26,10 +26,14 @@ DECLARE_string(hmi_name);
 DECLARE_string(adapter_config_filename);
 
 DECLARE_double(third_party_perception_freq);
+DECLARE_bool(enable_mobileye);
+DECLARE_bool(enable_delphi_esr);
 
+// flags to calibrate mobileye, radar and localization 
 DECLARE_double(mobileye_pos_adjust);
 DECLARE_double(delphi_esr_pos_adjust);
 
+// flags to create fake bounding box
 DECLARE_double(default_car_length);
 DECLARE_double(default_truck_length);
 DECLARE_double(default_bike_length);
@@ -41,10 +45,8 @@ DECLARE_double(default_bike_width);
 DECLARE_double(default_ped_width);
 DECLARE_double(default_unknown_width);
 
+// flags to filter radar obstacles
 DECLARE_double(filter_y_distance);
-DECLARE_double(fusion_x_distance);
-DECLARE_double(fusion_y_distance);
-
 DECLARE_int32(keep_delphi_esr_frames);
 
 #endif

@@ -70,8 +70,10 @@ void ThirdPartyPerception::Stop() { timer_.stop(); }
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   AINFO << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
-  mobileye_obstacles_ =
-      conversion::MobileyeToPerceptionObstacles(message, localization_);
+  if (FLAGS_enable_mobileye) {
+    mobileye_obstacles_ =
+        conversion::MobileyeToPerceptionObstacles(message, localization_);
+  }
 }
 
 void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
@@ -82,8 +84,10 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
       message, localization_, last_radar_obstacles_);
   RadarObstacles filtered_radar_obstacles =
       filter::FilterRadarObstacles(current_radar_obstacles_);
-  delphi_esr_obstacles_ =
-      conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
+  if (FLAGS_enable_delphi_esr) {
+    delphi_esr_obstacles_ =
+        conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
+  }
 }
 
 void ThirdPartyPerception::OnLocalization(const LocalizationEstimate& message) {
