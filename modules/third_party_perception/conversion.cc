@@ -124,7 +124,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
                           mob->position().z(), mob->length(), mob->width(),
                           mob->height(), mob->theta());
 
-    mob->set_confidence(0.75);
+    mob->set_confidence(0.5);
   }
 
   obstacles.mutable_header()->CopyFrom(mobileye.header());
@@ -261,7 +261,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 
     pob->set_id(radar_obstacle.id() + FLAGS_delphi_esr_id_offset);
 
-    pob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
+    pob->set_type(PerceptionObstacle::VEHICLE); 
     pob->set_length(radar_obstacle.length());
     pob->set_width(radar_obstacle.width());
     pob->set_height(radar_obstacle.height());
@@ -278,7 +278,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
                           pob->position().z(), pob->length(), pob->width(),
                           pob->height(), pob->theta());
 
-    pob->set_confidence(0.5);
+    pob->set_confidence(0.01);
   }
 
   obstacles.mutable_header()->CopyFrom(radar_obstacles.header());
