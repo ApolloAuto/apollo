@@ -17,6 +17,7 @@
 #include "modules/common/util/util.h"
 
 #include <cmath>
+#include <vector>
 
 namespace apollo {
 namespace common {
@@ -77,6 +78,20 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
   path_point.set_dkappa(dkappa);
   path_point.set_ddkappa(ddkappa);
   return path_point;
+}
+
+void uniform_slice(double start, double end, uint32_t num,
+                   std::vector<double>* sliced) {
+  if (!sliced || num == 0) {
+    return;
+  }
+  const double delta = (end - start) / num;
+  sliced->resize(num + 1);
+  double s = start;
+  for (uint32_t i = 0; i < num; ++i, s += delta) {
+    sliced->at(i) = s;
+  }
+  sliced->at(num) = end;
 }
 
 }  // namespace util
