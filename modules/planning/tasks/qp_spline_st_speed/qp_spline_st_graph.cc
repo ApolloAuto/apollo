@@ -244,14 +244,6 @@ Status QpSplineStGraph::ApplyConstraint(
   }
   if (FLAGS_enable_follow_accel_constraint && has_follow && delta_s < 0.0) {
     accel_upper_bound.front() = 0.0;
-  } else {
-    constexpr double kInitPointAccelRelaxedSpeed = 1.0;
-
-    if (init_point_.v() > kInitPointAccelRelaxedSpeed) {
-      constexpr double kInitPointAccelRelaxedRange = 0.25;
-      accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
-      accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
-    }
   }
 
   DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
@@ -296,6 +288,16 @@ Status QpSplineStGraph::ApplyKernel(
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
+
+  (*spline_kernel->mutable_kernel_matrix())(2, 2) +=
+      2.0 * 4.0 * qp_st_speed_config_.qp_spline_config().jerk_kernel_weight();
+  (*spline_kernel->mutable_offset())(2, 0) +=
+      -4.0 * init_point_.a() *
+      qp_st_speed_config_.qp_spline_config().jerk_kernel_weight();
+
+  spline_kernel->AddRegularization(
+      qp_st_speed_config_.qp_spline_config().regularization_weight());
+
   return Status::OK();
 }
 
