@@ -1725,5 +1725,20 @@ decision {
         }
       }
     }
+    decision {
+      id: "DEST"
+      perception_id: -1109540454
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_DESTINATION
+          distance_s: -3
+          stop_point {
+            x: 586366.94352479349
+            y: 4140782.386765223
+          }
+          stop_heading: 1.3125450173869
+        }
+      }
+    }
   }
 }
