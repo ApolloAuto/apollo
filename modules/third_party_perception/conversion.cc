@@ -236,12 +236,12 @@ RadarObstacles DelphiToRadarObstacles(
 
     double v_heading = std::atan2(rob.absolute_velocity().y(),
                                   rob.absolute_velocity().x());
-    if (Speed(rob.absolute_velocity()) > 6.7 && std::abs(v_heading - rob.theta()) < 1.5) {
+    if (Speed(rob.absolute_velocity()) > FLAGS_movable_speed_threshold && std::abs(v_heading - rob.theta()) < FLAGS_movable_heading_threshold) {
       rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
     } else {
       rob.set_moving_frames_count(0);
     }
-    if (rob.moving_frames_count() >= 5) {
+    if (rob.moving_frames_count() >= FLAGS_movable_frames_count_threshold) {
       rob.set_movable(true);
     }
     (*obstacles.mutable_radar_obstacle())[index] = rob;
