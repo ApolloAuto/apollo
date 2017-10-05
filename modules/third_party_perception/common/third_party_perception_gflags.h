@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_L3_PERCEPTION_L3_PERCEPTION_GFLAGS_H_
-#define MODULES_L3_PERCEPTION_L3_PERCEPTION_GFLAGS_H_
+#ifndef MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_GFLAGS_H_
+#define MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
 

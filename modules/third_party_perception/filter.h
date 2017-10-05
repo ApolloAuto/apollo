@@ -18,27 +18,27 @@
  * @file
  */
 
-#ifndef MODEULES_THIRD_PARTY_PERCEPTION_FUSION_H_
-#define MODEULES_THIRD_PARTY_PERCEPTION_FUSION_H_
+#ifndef MODEULES_THIRD_PARTY_PERCEPTION_FILTER_H_
+#define MODEULES_THIRD_PARTY_PERCEPTION_FILTER_H_
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 
 /**
- * @namespace apollo::third_party_perception::fusion
+ * @namespace apollo::third_party_perception::filter
  * @brief apollo::third_party_perception
  */
 namespace apollo {
 namespace third_party_perception {
-namespace fusion {
+namespace filter {
 
-using apollo::perception::PerceptionObstacles;
+using ::apollo::third_party_perception::RadarObstacle;
+using ::apollo::third_party_perception::RadarObstacles;
 
-PerceptionObstacles MobileyeRadarFusion(
-    const PerceptionObstacles& mobileye_obstacles,
-    const PerceptionObstacles& radar_obstacles);
+  RadarObstacles FilterRadarObstacles(const RadarObstacles& radar_obstacles);
+  bool IsPreserved(const RadarObstacle& radar_obstacle);
 
-}  // namespace fusion
+}  // namespace filter
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_FUSION_H_
+#endif  // MODULES_THIRD_PARTY_PERCEPTION_FILTER_H_
