@@ -70,11 +70,11 @@ Eigen::MatrixXd* Spline2dKernel::mutable_kernel_matrix() {
 
 Eigen::MatrixXd* Spline2dKernel::mutable_offset() { return &offset_; }
 
-const Eigen::MatrixXd& Spline2dKernel::kernel_matrix() const {
-  return kernel_matrix_;
+const Eigen::MatrixXd Spline2dKernel::kernel_matrix() const {
+  return kernel_matrix_ * 2.0;
 }
 
-const Eigen::MatrixXd& Spline2dKernel::offset() const { return offset_; }
+const Eigen::MatrixXd Spline2dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
 

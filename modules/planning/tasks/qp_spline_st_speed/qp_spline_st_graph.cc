@@ -341,8 +341,6 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
         weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
   }
 
-  spline_kernel->AddRegularization(
-      qp_st_speed_config_.qp_spline_config().regularization_weight());
   return Status::OK();
 }
 

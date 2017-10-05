@@ -77,6 +77,10 @@ class ActiveSetQpSolver : public QpSolver {
     cholesky_refactorisation_freq_ = num;
   }
 
+  void SetTerminationTolerance(const double tolerance) override {
+    termination_tolerance_ = tolerance;
+  }
+
  private:
   bool sanity_check() override;
 
@@ -101,6 +105,7 @@ class ActiveSetQpSolver : public QpSolver {
 
   ::qpOASES::HessianType hessian_type_ = ::qpOASES::HST_UNKNOWN;
   int cholesky_refactorisation_freq_ = 0;
+  double termination_tolerance_ = 1.0e-9;
 };
 
 }  // namespace math
