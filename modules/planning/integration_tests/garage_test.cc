@@ -81,7 +81,7 @@ TEST_F(GarageTest, stop_dest) {
 }
 
 /*
- * test stop for destination
+ * test stop for out of map
  * planning should fail in this case, but the module should not core.
  */
 TEST_F(GarageTest, out_of_map) {
