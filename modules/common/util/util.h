@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "google/protobuf/util/message_differencer.h"
 
@@ -81,6 +82,14 @@ SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
 PathPoint MakePathPoint(const double x, const double y, const double z,
                         const double theta, const double kappa,
                         const double dkappa, const double ddkappa);
+
+/**
+ * uniformly slice a segment [start, end] to num + 1 pieces
+ * the result sliced will contain the n + 1 points that slices the provided
+ * segment. `start` and `end` will be the first and last element in `sliced`.
+ */
+void uniform_slice(double start, double end, uint32_t num,
+                   std::vector<double>* sliced);
 
 template <typename Container>
 typename Container::value_type MaxElement(const Container& elements) {
