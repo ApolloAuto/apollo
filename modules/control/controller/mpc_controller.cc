@@ -27,8 +27,8 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
-#include "modules/common/math/mpc_solver.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/mpc_solver.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
@@ -36,12 +36,12 @@
 namespace apollo {
 namespace control {
 
-using common::TrajectoryPoint;
 using common::Point3D;
+using common::TrajectoryPoint;
 using common::VehicleState;
 using Matrix = Eigen::MatrixXd;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::time::Clock;
 
 namespace {
@@ -188,7 +188,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(2, 3) = 1.0;
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
   matrix_a_(4, 4) = 1.0;
-  matrix_a_(5, 5) = 1.0; //TODO: change to add delays
+  matrix_a_(5, 5) = 1.0;  // TODO: change to add delays
 
   matrix_a_coeff_ = Matrix::Zero(matrix_size, matrix_size);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
@@ -266,55 +266,38 @@ Status MPCController::ComputeControlCommand(
 
   UpdateMatrix();
 
-int CONTROLS = 2;
-const int HORIZON = 10;
+  int CONTROLS = 2;
+  const int HORIZON = 10;
 
-Eigen::MatrixXd control_matrix(CONTROLS, 1);
-control_matrix << 0,
-                  0;
+  Eigen::MatrixXd control_matrix(CONTROLS, 1);
+  control_matrix << 0, 0;
 
-                  Eigen::MatrixXd C(basic_state_size_, 1);
-                  C << 0,
-                       0,
-                       0,
-                       0,
-                       0,
-                       0;
+  Eigen::MatrixXd C(basic_state_size_, 1);
+  C << 0, 0, 0, 0, 0, 0;
 
-Eigen::MatrixXd reference_state(basic_state_size_, 1);
-reference_state << 0,
-                   0,
-                   0,
-                   0,
-                   0,
-                   0;
+  Eigen::MatrixXd reference_state(basic_state_size_, 1);
+  reference_state << 0, 0, 0, 0, 0, 0;
 
-std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
+  std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
 
+  Eigen::MatrixXd lower_bound(CONTROLS, 1);
+  lower_bound << -10, -10;
 
-                  Eigen::MatrixXd lower_bound(CONTROLS, 1);
-                  lower_bound << -10,
-                                 -10;
+  Eigen::MatrixXd upper_bound(CONTROLS, 1);
+  upper_bound << 10, 10;
 
-                  Eigen::MatrixXd upper_bound(CONTROLS, 1);
-                  upper_bound << 10,
-                                 10;
+  Eigen::MatrixXd initial_state(basic_state_size_, 1);
+  initial_state << 0, 0, 0, 0, 0, 0;
+  // TODO: change the init state
 
-                                 Eigen::MatrixXd initial_state(basic_state_size_, 1);
-                                 initial_state << 0,
-                                                  0,
-                                                  0,
-                                                  0,
-                                                  0,
-                                                  0;
   std::vector<Eigen::MatrixXd> control(HORIZON, control_matrix);
-    ::apollo::common::math::SolveLinearMPC(matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound, upper_bound, initial_state,
-                   reference, lqr_eps_, lqr_max_iteration_, &control);
+  ::apollo::common::math::SolveLinearMPC(
+      matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound, upper_bound,
+      initial_state, reference, lqr_eps_, lqr_max_iteration_, &control);
 
-    AERROR << "I am still alive !";
   double steer_angle_feedback = -control[0](1, 0);
-  AERROR << "steer passed !";
-  double steer_angle_feedforward = ComputeLateralFeedForward(debug->curvature());
+  double steer_angle_feedforward =
+      ComputeLateralFeedForward(debug->curvature());
   double steer_angle = steer_angle_feedback + steer_angle_feedforward;
 
   // Clamp the steer angle to -100.0 to 100.0
@@ -340,38 +323,37 @@ std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
   }
 
   double acceleration_cmd =
-      -control[0](0, 0) + debug->acceleration_reference(); //TODO: add pitch angle feedforward
+      -control[0](0, 0) +
+      debug->acceleration_reference();  // TODO: add pitch angle feedforward
   debug->set_is_full_stop(false);
   if (std::abs(debug->acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
-      std::abs(debug->speed_reference()) <=
-          FLAGS_max_abs_speed_when_stopped) {
+      std::abs(debug->speed_reference()) <= FLAGS_max_abs_speed_when_stopped) {
     acceleration_cmd = standstill_acceleration_;
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
   }
-  AERROR << "acceleration passed !";
+
   double calibration_value = 0.0;
   if (FLAGS_use_preview_speed_for_table) {
     calibration_value = control_interpolation_->Interpolate(
         std::make_pair(debug->speed_reference(), acceleration_cmd));
   } else {
-    calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(VehicleState::instance()->linear_velocity(), acceleration_cmd));
+    calibration_value = control_interpolation_->Interpolate(std::make_pair(
+        VehicleState::instance()->linear_velocity(), acceleration_cmd));
   }
 
   double throttle_cmd = 0.0;
   double brake_cmd = 0.0;
   if (calibration_value >= 0) {
     throttle_cmd = calibration_value > throttle_deadzone_ ? calibration_value
-                                                         : throttle_deadzone_;
+                                                          : throttle_deadzone_;
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
     brake_cmd = -calibration_value > brake_deadzone_ ? -calibration_value
-                                                    : brake_deadzone_;
+                                                     : brake_deadzone_;
   }
-
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
   cmd->set_throttle(throttle_cmd);
@@ -455,8 +437,7 @@ void MPCController::UpdateState(SimpleMPCDebug *debug) {
       VehicleState::instance()->heading() - traj_point.path_point().theta()));
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
@@ -489,8 +470,7 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
                        trajectory_analyzer_, debug);
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
@@ -500,7 +480,6 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
   matrix_state_(1, 0) = debug->lateral_error_rate();
   matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
-
 }
 
 void MPCController::UpdateMatrix() {
@@ -586,9 +565,8 @@ void MPCController::ComputeLateralErrors(
   debug->set_curvature(matched_point.path_point().kappa());
 }
 
-  void MPCController::ComputeLongitudinalErrors(
-    const TrajectoryAnalyzer *trajectory_analyzer,
-    SimpleMPCDebug *debug) {
+void MPCController::ComputeLongitudinalErrors(
+    const TrajectoryAnalyzer *trajectory_analyzer, SimpleMPCDebug *debug) {
   // the decomposed vehicle motion onto Frenet frame
   // s: longitudinal accumulated distance along reference trajectory
   // s_dot: longitudinal velocity along reference trajectory
