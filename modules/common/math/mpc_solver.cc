@@ -15,8 +15,8 @@
 #include "modules/common/math/mpc_solver.h"
 
 #include <algorithm>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 #include "modules/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
@@ -30,13 +30,11 @@ using Matrix = Eigen::MatrixXd;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
-void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b,
-                    Matrix &matrix_c, Matrix &matrix_q,
-                    Matrix &matrix_r, Matrix &matrix_lower,
-                    Matrix &matrix_upper,
-                    Matrix &matrix_initial_state,
-                    std::vector<Matrix> &reference, double eps,
-                    int max_iter, std::vector<Matrix> *control) {
+void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
+                    Matrix &matrix_q, Matrix &matrix_r, Matrix &matrix_lower,
+                    Matrix &matrix_upper, Matrix &matrix_initial_state,
+                    std::vector<Matrix> &reference, double eps, int max_iter,
+                    std::vector<Matrix> *control) {
   if (matrix_a.rows() != matrix_a.cols() ||
       matrix_b.rows() != matrix_a.rows() ||
       matrix_lower.rows() != matrix_upper.rows()) {
@@ -69,15 +67,15 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b,
     matrix_a_power[i] = matrix_a * matrix_a_power[i - 1];
   }
 
-  Matrix matrix_k = Matrix::Zero(matrix_b.rows() * horizon,
-                                 matrix_b.cols() * control->size() * control->at(0).rows());
+  Matrix matrix_k =
+      Matrix::Zero(matrix_b.rows() * horizon,
+                   matrix_b.cols() * control->size() * control->at(0).rows());
   for (unsigned int r = 0; r < horizon; ++r) {
     for (unsigned int c = 0; c <= r; ++c) {
       matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(), matrix_b.rows(),
                      matrix_b.cols()) = matrix_a_power[r - c] * matrix_b;
     }
   }
-   std::cout << " matrix_k" << matrix_k;
   // Initialize matrix_k, matrix_m, matrix_t and matrix_v, matrix_qq, matrix_rr,
   // vector of matrix A power
   Matrix matrix_m = Matrix::Zero(matrix_b.rows() * horizon, 1);
@@ -87,48 +85,41 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b,
   Matrix matrix_uu = Matrix::Zero(horizon * matrix_upper.rows(), 1);
 
   AERROR << "pdate augment multiple matrix done.";
-  AERROR << "matrix_a size: ." << matrix_a.rows()  << " "<<  matrix_a.cols();
-  AERROR << "matrix_initial_state size: ." << matrix_initial_state.rows()  << " "<<  matrix_initial_state.cols();
-  AERROR << "matrix_c size: ." << matrix_c.rows()  << " "<<  matrix_c.cols();
-  AERROR << "matrix_m size: ." << matrix_m.rows()  << " "<<  matrix_m.cols();
+  AERROR << "matrix_a size: ." << matrix_a.rows() << " " << matrix_a.cols();
+  AERROR << "matrix_initial_state size: ." << matrix_initial_state.rows() << " "
+         << matrix_initial_state.cols();
+  AERROR << "matrix_c size: ." << matrix_c.rows() << " " << matrix_c.cols();
+  AERROR << "matrix_m size: ." << matrix_m.rows() << " " << matrix_m.cols();
   // Compute matrix_m
   matrix_m.block(0, 0, matrix_a.rows(), 1) =
       matrix_a * matrix_initial_state + matrix_c;
-  AERROR << "suspect1.";
   for (unsigned int i = 1; i < horizon; ++i) {
     matrix_m.block(i * matrix_a.rows(), 0, matrix_a.rows(), 1) =
         matrix_a *
             matrix_m.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(), 1) +
         matrix_c;
-        AERROR << "suspect:." << i;
   }
-   AERROR << "start ll, uu, qq, rr.";
-   AERROR << "matrix_ll size: ." << matrix_ll.rows()  << " "<<  matrix_ll.cols();
-   AERROR << "matrix_uu size: ." << matrix_uu.rows()  << " "<<  matrix_uu.cols();
-   AERROR << "matrix_qq size: ." << matrix_qq.rows()  << " "<<  matrix_qq.cols();
-   AERROR << "matrix_rr size: ." << matrix_rr.rows()  << " "<<  matrix_rr.cols();
+  AERROR << "start ll, uu, qq, rr.";
+  AERROR << "matrix_ll size: ." << matrix_ll.rows() << " " << matrix_ll.cols();
+  AERROR << "matrix_uu size: ." << matrix_uu.rows() << " " << matrix_uu.cols();
+  AERROR << "matrix_qq size: ." << matrix_qq.rows() << " " << matrix_qq.cols();
+  AERROR << "matrix_rr size: ." << matrix_rr.rows() << " " << matrix_rr.cols();
   // Compute matrix_ll, matrix_uu, matrix_qq, matrix_rr
   for (unsigned int i = 0; i < horizon; ++i) {
     matrix_ll.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1) =
         matrix_lower;
-    AERROR << " ll" << i;
     matrix_uu.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1) =
         matrix_upper;
-        AERROR << " uu" << i;
     matrix_qq.block(i * matrix_q.rows(), i * matrix_q.rows(), matrix_q.rows(),
                     matrix_q.rows()) = matrix_q;
-                    AERROR << " qq." << i;
     matrix_rr.block(i * matrix_r.rows(), i * matrix_r.rows(), matrix_r.cols(),
                     matrix_r.cols()) = matrix_r;
-                    AERROR << "rr." << i;
   }
 
   // Update matrix_m1, matrix_m2, convert MPC problem to QP problem done
   Matrix matrix_m1 = matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr;
-    AERROR << "m1.";
   Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
-    AERROR << "m2.";
-   AERROR << "update all done.";
+
   // Method 1: QPOASES
   Matrix matrix_inequality_constrain_ll =
       -Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
@@ -145,7 +136,7 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b,
       Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
   Matrix matrix_equality_boundary =
       Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
- AERROR << "ready to solve.";
+
   std::unique_ptr<QpSolver> qp_solver(new ActiveSetQpSolver(
       matrix_m1, matrix_m2, matrix_inequality_constrain,
       matrix_inequality_boundary, matrix_equality_constrain,
@@ -156,13 +147,11 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b,
     AWARN << "Linear MPC solver failed";
   }
   matrix_v = qp_solver->params();
- AERROR << "solved.";
 
   for (unsigned int i = 0; i < horizon; ++i) {
     (*control)[i] =
         matrix_v.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1);
   }
-   AERROR << "ready to return.";
 }
 
 }  // namespace math
