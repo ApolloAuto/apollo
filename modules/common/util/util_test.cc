@@ -32,6 +32,23 @@ TEST(Util, MinElement) {
   EXPECT_FLOAT_EQ(1.1, MinElement(std::vector<float>{1.1, 2.2, 3.3}));
 }
 
+TEST(Util, DistanceXY) {
+  class TestPoint {
+   public:
+    TestPoint(double x, double y) : x_(x), y_(y) {}
+    double x() const { return x_; }
+    double y() const { return y_; }
+
+   private:
+    double x_ = 0.0;
+    double y_ = 0.0;
+  };
+  EXPECT_FLOAT_EQ(0.0, DistanceXY(TestPoint(0, 0), TestPoint(0, 0)));
+  EXPECT_FLOAT_EQ(1.0, DistanceXY(TestPoint(1, 0), TestPoint(0, 0)));
+  EXPECT_FLOAT_EQ(1.0, DistanceXY(TestPoint(0, 0), TestPoint(1, 0)));
+  EXPECT_FLOAT_EQ(0.0, DistanceXY(TestPoint(1, 0), TestPoint(1, 0)));
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
