@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/math/curve_math.h"
 
 namespace apollo {
@@ -132,19 +133,18 @@ bool ReferenceLineSmoother::Smooth(
 
 bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
-  const double resolution = length / smoother_config_.num_spline();
-  double accumulated_s = 0.0;
-  for (std::uint32_t i = 0; i <= smoother_config_.num_spline();
-       ++i, accumulated_s = std::min(accumulated_s + resolution, length)) {
-    ReferencePoint rlp = raw_reference_line.GetReferencePoint(accumulated_s);
+  uint32_t num_spline = std::max(
+      2u, static_cast<uint32_t>(length / smoother_config_.max_spline_length()));
+  const double delta_s = length / num_spline;
+  double s = 0.0;
+  for (std::uint32_t i = 0; i <= num_spline; ++i, s += delta_s) {
+    ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());
     path_point.set_theta(rlp.heading());
-    path_point.set_s(accumulated_s);
+    path_point.set_s(s);
     ref_points_.push_back(std::move(path_point));
-
-    // use t_knots_: 0.0, 1.0, 2.0, 3.0 ...
     t_knots_.push_back(i * 1.0);
   }
   return true;
@@ -153,13 +153,14 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
 bool ReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
   const double t_length = t_knots_.back() - t_knots_.front();
-  const double dt = t_length / (smoother_config_.num_evaluated_points() - 1);
+  uint32_t constraint_num =
+      std::max(static_cast<uint32_t>(raw_reference_line.Length() /
+                                     smoother_config_.max_constraint_length()),
+               3u);
+  double dt = t_length / constraint_num;
   std::vector<double> evaluated_t;
-  double accumulated_eval_t = 0.0;
-  for (std::uint32_t i = 0; i < smoother_config_.num_evaluated_points();
-       ++i, accumulated_eval_t += dt) {
-    evaluated_t.push_back(accumulated_eval_t);
-  }
+  common::util::uniform_slice(0.0 + dt, t_length, constraint_num - 1,
+                              &evaluated_t);
   std::vector<common::PathPoint> path_points;
   if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {
     AERROR << "Extract evaluated points failed";
