@@ -18,21 +18,21 @@
  * @file
  */
 
-#include "modules/l3_perception/fusion.h"
+#include "modules/third_party_perception/fusion.h"
 
 #include <vector>
 
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/l3_perception/l3_perception_gflags.h"
-#include "modules/l3_perception/l3_perception_util.h"
+#include "modules/third_party_perception/common/third_party_perception_gflags.h"
+#include "modules/third_party_perception/common/third_party_perception_util.h"
 
 /**
- * @namespace apollo::l3_perception::convertion
- * @brief apollo::l3_perception
+ * @namespace apollo::third_party_perception::convertion
+ * @brief apollo::third_party_perception
  */
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 namespace fusion {
 
 using ::apollo::common::math::Vec2d;
@@ -94,5 +94,5 @@ PerceptionObstacles MobileyeRadarFusion(
 }
 
 }  // namespace fusion
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo

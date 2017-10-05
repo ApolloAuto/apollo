@@ -14,10 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gflags/gflags.h"
-#include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
+/**
+ * @file
+ */
 
-#include "modules/l3_perception/l3_perception.h"
+#ifndef MODEULES_L3_PERCEPTION_FUSION_H_
+#define MODEULES_L3_PERCEPTION_FUSION_H_
 
-APOLLO_MAIN(apollo::l3_perception::L3Perception);
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
+/**
+ * @namespace apollo::third_party_perception::fusion
+ * @brief apollo::third_party_perception
+ */
+namespace apollo {
+namespace third_party_perception {
+namespace fusion {
+
+using apollo::perception::PerceptionObstacles;
+
+PerceptionObstacles MobileyeRadarFusion(
+    const PerceptionObstacles& mobileye_obstacles,
+    const PerceptionObstacles& radar_obstacles);
+
+}  // namespace fusion
+}  // namespace third_party_perception
+}  // namespace apollo
+
+#endif  // MODULES_L3_PERCEPTION_FUSION_H_

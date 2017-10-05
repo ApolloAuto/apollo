@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/l3_perception/l3_perception.h"
+#include "modules/third_party_perception/third_party_perception.h"
 
 #include <cmath>
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/l3_perception/conversion.h"
-#include "modules/l3_perception/fusion.h"
-#include "modules/l3_perception/l3_perception_gflags.h"
-#include "modules/l3_perception/l3_perception_util.h"
+#include "modules/third_party_perception/conversion.h"
+#include "modules/third_party_perception/fusion.h"
+#include "modules/third_party_perception/common/third_party_perception_gflags.h"
+#include "modules/third_party_perception/common/third_party_perception_util.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
@@ -40,51 +40,51 @@ using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
 
-std::string L3Perception::Name() const { return FLAGS_hmi_name; }
+std::string ThirdPartyPerception::Name() const { return FLAGS_hmi_name; }
 
-Status L3Perception::Init() {
+Status ThirdPartyPerception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
 
   CHECK(AdapterManager::GetMobileye()) << "Mobileye is not initialized.";
-  AdapterManager::AddMobileyeCallback(&L3Perception::OnMobileye, this);
+  AdapterManager::AddMobileyeCallback(&ThirdPartyPerception::OnMobileye, this);
   CHECK(AdapterManager::GetDelphiESR()) << "DelphiESR is not initialized.";
-  AdapterManager::AddDelphiESRCallback(&L3Perception::OnDelphiESR, this);
+  AdapterManager::AddDelphiESRCallback(&ThirdPartyPerception::OnDelphiESR, this);
   CHECK(AdapterManager::GetLocalization())
       << "Localization is not initialized.";
-  AdapterManager::AddLocalizationCallback(&L3Perception::OnLocalization, this);
+  AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization, this);
 
   return Status::OK();
 }
 
-Status L3Perception::Start() {
-  const double duration = 1.0 / FLAGS_l3_perception_freq;
+Status ThirdPartyPerception::Start() {
+  const double duration = 1.0 / FLAGS_third_party_perception_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &L3Perception::OnTimer, this);
+                                       &ThirdPartyPerception::OnTimer, this);
 
   return Status::OK();
 }
 
-void L3Perception::Stop() { timer_.stop(); }
+void ThirdPartyPerception::Stop() { timer_.stop(); }
 
-void L3Perception::OnMobileye(const Mobileye& message) {
+void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   AINFO << "receive Mobileye callback";
-  std::lock_guard<std::mutex> lock(l3_mutex_);
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   mobileye_obstacles_ =
       conversion::MobileyeToPerceptionObstacles(message, localization_);
 }
 
-void L3Perception::OnDelphiESR(const DelphiESR& message) {
+void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
   AINFO << "receive DelphiESR callback";
-  std::lock_guard<std::mutex> lock(l3_mutex_);
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_.Clear();
   current_radar_obstacles_ = conversion::DelphiToRadarObstacles(
       message, localization_, last_radar_obstacles_);
 }
 
-void L3Perception::OnLocalization(const LocalizationEstimate& message) {
+void ThirdPartyPerception::OnLocalization(const LocalizationEstimate& message) {
   AINFO << "receive Localization callback";
-  std::lock_guard<std::mutex> lock(l3_mutex_);
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   localization_.CopyFrom(message);
 }
 
@@ -129,7 +129,7 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   return true;
 }
 
-RadarObstacles L3Perception::FilterRadarObstacles(
+RadarObstacles ThirdPartyPerception::FilterRadarObstacles(
     const RadarObstacles& radar_obstacles) {
   RadarObstacles filtered_radar_obstacles;
   for (const auto& iter : radar_obstacles.radar_obstacle()) {
@@ -142,10 +142,10 @@ RadarObstacles L3Perception::FilterRadarObstacles(
   return filtered_radar_obstacles;
 }
 
-void L3Perception::OnTimer(const ros::TimerEvent&) {
+void ThirdPartyPerception::OnTimer(const ros::TimerEvent&) {
   AINFO << "publish PerceptionObstacles";
 
-  std::lock_guard<std::mutex> lock(l3_mutex_);
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
 
   RadarObstacles filtered_radar_obstacles =
       FilterRadarObstacles(current_radar_obstacles_);
@@ -161,5 +161,5 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   mobileye_obstacles_.Clear();
 }
 
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo

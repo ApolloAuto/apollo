@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
-#define MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
+#ifndef MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_H_
+#define MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_H_
 
 #include <map>
 #include <mutex>
@@ -30,19 +30,19 @@
 #include "modules/common/macro.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
-#include "modules/l3_perception/proto/radar_obstacle.pb.h"
+#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "ros/include/ros/ros.h"
 
 /**
- * @namespace apollo::l3_perception
- * @brief apollo::l3_perception
+ * @namespace apollo::third_party_perception
+ * @brief apollo::third_party_perception
  */
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 
-class L3Perception : public apollo::common::ApolloApp {
+class ThirdPartyPerception : public apollo::common::ApolloApp {
  public:
   std::string Name() const override;
   apollo::common::Status Init() override;
@@ -65,10 +65,10 @@ class L3Perception : public apollo::common::ApolloApp {
   apollo::localization::LocalizationEstimate localization_;
   RadarObstacles current_radar_obstacles_;
   RadarObstacles last_radar_obstacles_;
-  std::mutex l3_mutex_;
+  std::mutex third_party_perception_mutex_;
 };
 
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_L3_PERCEPTION_L3_PERCEPTION_H_
+#endif  // MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_H_

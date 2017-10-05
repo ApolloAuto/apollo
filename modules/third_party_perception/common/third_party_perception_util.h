@@ -27,12 +27,12 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 /**
- * @namespace apollo::l3_perception
- * @brief apollo::l3_perception
+ * @namespace apollo::third_party_perception
+ * @brief apollo::third_party_perception
  */
 
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 
 const double L3_PI = 3.141592653;
 
@@ -69,7 +69,7 @@ double Speed(const Point& point);
 double GetNearestLaneHeading(const Point& point);
 
 double GetLateralDistanceToNearestLane(const Point& point);
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo
 
 #endif  // MODULES_L3_PERCEPTION_L3_PERCEPTION_UTIL_H_

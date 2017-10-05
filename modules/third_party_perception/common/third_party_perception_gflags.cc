@@ -14,15 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/l3_perception/l3_perception_gflags.h"
+#include "modules/third_party_perception/common/third_party_perception_gflags.h"
 
-DEFINE_string(node_namespace, "/apollo/l3_perception", "Global node namespace");
-DEFINE_string(node_name, "l3_perception", "The chassis module name in proto");
-DEFINE_string(hmi_name, "l3_perception", "Module name in HMI");
+DEFINE_string(node_namespace, "/apollo/third_party_perception", "Global node namespace");
+DEFINE_string(node_name, "third_party_perception", "The chassis module name in proto");
+DEFINE_string(hmi_name, "third_party_perception", "Module name in HMI");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
-DEFINE_double(l3_perception_freq, 100, "L3 perception timer frequency.");
+DEFINE_double(third_party_perception_freq, 100, "L3 perception timer frequency.");
 
 DEFINE_double(mobileye_pos_adjust, 3.0,
               "adjust mobileye objects's position due to distance between "

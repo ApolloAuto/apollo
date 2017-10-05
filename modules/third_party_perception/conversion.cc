@@ -20,22 +20,22 @@
 
 #include <vector>
 
-#include "modules/l3_perception/conversion.h"
-#include "modules/l3_perception/l3_perception_gflags.h"
-#include "modules/l3_perception/l3_perception_util.h"
+#include "modules/third_party_perception/conversion.h"
+#include "modules/third_party_perception/common/third_party_perception_gflags.h"
+#include "modules/third_party_perception/common/third_party_perception_util.h"
 
 /**
- * @namespace apollo::l3_perception::conversion
- * @brief apollo::l3_perception
+ * @namespace apollo::third_party_perception::conversion
+ * @brief apollo::third_party_perception
  */
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 namespace conversion {
 
-using ::apollo::l3_perception::GetAngleFromQuaternion;
-using ::apollo::l3_perception::FillPerceptionPolygon;
-using ::apollo::l3_perception::GetDefaultObjectLength;
-using ::apollo::l3_perception::GetDefaultObjectWidth;
+using ::apollo::third_party_perception::GetAngleFromQuaternion;
+using ::apollo::third_party_perception::FillPerceptionPolygon;
+using ::apollo::third_party_perception::GetDefaultObjectLength;
+using ::apollo::third_party_perception::GetDefaultObjectWidth;
 using ::apollo::perception::Point;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
@@ -300,5 +300,5 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 }
 
 }  // namespace conversion
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo

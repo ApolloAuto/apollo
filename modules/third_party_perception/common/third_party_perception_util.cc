@@ -21,18 +21,18 @@
 #include <cmath>
 
 #include "modules/common/log.h"
-#include "modules/l3_perception/l3_perception_gflags.h"
-#include "modules/l3_perception/l3_perception_util.h"
+#include "modules/third_party_perception/common/third_party_perception_gflags.h"
+#include "modules/third_party_perception/common/third_party_perception_util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 /**
- * @namespace apollo::l3_perception
- * @brief apollo::l3_perception
+ * @namespace apollo::third_party_perception
+ * @brief apollo::third_party_perception
  */
 
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 
 using apollo::hdmap::HDMapUtil;
 
@@ -193,5 +193,5 @@ double GetLateralDistanceToNearestLane(const Point& point) {
 double Speed(const Point& point) {
   return std::sqrt(point.x() * point.x() + point.y() + point.y());
 }
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo

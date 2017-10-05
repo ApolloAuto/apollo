@@ -1,14 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "l3_perception_proto",
+    name = "third_party_perception_proto",
     deps = [
-        ":l3_perception_proto_lib",
+        ":third_party_perception_proto_lib",
     ],
 )
 
 proto_library(
-    name = "l3_perception_proto_lib",
+    name = "third_party_perception_proto_lib",
     srcs = [
         "radar_obstacle.proto",
     ],

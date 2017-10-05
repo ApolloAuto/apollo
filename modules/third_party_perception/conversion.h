@@ -25,23 +25,23 @@
 
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
-#include "modules/l3_perception/proto/radar_obstacle.pb.h"
+#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 /**
- * @namespace apollo::l3_perception::conversion
- * @brief apollo::l3_perception
+ * @namespace apollo::third_party_perception::conversion
+ * @brief apollo::third_party_perception
  */
 namespace apollo {
-namespace l3_perception {
+namespace third_party_perception {
 namespace conversion {
 
 using apollo::perception::PerceptionObstacles;
 using apollo::drivers::Mobileye;
 using apollo::drivers::DelphiESR;
 using apollo::localization::LocalizationEstimate;
-using apollo::l3_perception::RadarObstacles;
+using apollo::third_party_perception::RadarObstacles;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization);
@@ -54,7 +54,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);
 
 }  // namespace conversion
-}  // namespace l3_perception
+}  // namespace third_party_perception
 }  // namespace apollo
 
 #endif  // MODULES_L3_PERCEPTION_FUSION_H_

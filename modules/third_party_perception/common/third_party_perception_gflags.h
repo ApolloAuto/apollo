@@ -25,7 +25,7 @@ DECLARE_string(hmi_name);
 
 DECLARE_string(adapter_config_filename);
 
-DECLARE_double(l3_perception_freq);
+DECLARE_double(third_party_perception_freq);
 
 DECLARE_double(mobileye_pos_adjust);
 DECLARE_double(delphi_esr_pos_adjust);
