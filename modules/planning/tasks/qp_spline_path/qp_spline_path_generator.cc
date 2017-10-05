@@ -149,7 +149,7 @@ bool QpSplinePathGenerator::Generate(
         curr_xy_point.x(), curr_xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
     if (path_points.size() != 0) {
       double distance =
-          common::util::Distance2D(path_points.back(), path_point);
+          common::util::DistanceXY(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
     }
     if (path_point.s() > end_s) {
