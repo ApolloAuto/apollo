@@ -16,6 +16,8 @@
 
 #include "modules/common/util/util.h"
 
+#include <vector>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -47,6 +49,23 @@ TEST(Util, DistanceXY) {
   EXPECT_FLOAT_EQ(1.0, DistanceXY(TestPoint(1, 0), TestPoint(0, 0)));
   EXPECT_FLOAT_EQ(1.0, DistanceXY(TestPoint(0, 0), TestPoint(1, 0)));
   EXPECT_FLOAT_EQ(0.0, DistanceXY(TestPoint(1, 0), TestPoint(1, 0)));
+}
+
+TEST(Util, uniform_slice) {
+  std::vector<double> result;
+  uniform_slice(0.0, 10.0, 3, &result);
+  ASSERT_EQ(4, result.size());
+  EXPECT_FLOAT_EQ(0.0, result[0]);
+  EXPECT_FLOAT_EQ(3.3333333, result[1]);
+  EXPECT_FLOAT_EQ(6.6666666, result[2]);
+  EXPECT_FLOAT_EQ(10.0, result[3]);
+
+  uniform_slice(0.0, -10.0, 3, &result);
+  ASSERT_EQ(4, result.size());
+  EXPECT_FLOAT_EQ(0.0, result[0]);
+  EXPECT_FLOAT_EQ(-3.3333333, result[1]);
+  EXPECT_FLOAT_EQ(-6.6666666, result[2]);
+  EXPECT_FLOAT_EQ(-10.0, result[3]);
 }
 
 }  // namespace util
