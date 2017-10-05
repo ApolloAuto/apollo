@@ -71,6 +71,7 @@ bool Spline1dGenerator::Solve() {
 
   qp_solver_->EnableCholeskyRefactorisation(1);
   qp_solver_->set_pos_definite_hessian();
+  qp_solver_->SetTerminationTolerance(1.0e-4);
 
   if (!qp_solver_->Solve()) {
     return false;
