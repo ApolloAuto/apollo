@@ -17,7 +17,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
-        "//modules/prediction/predictor",
+        "//modules/prediction/predictor/sequence:sequence_predictor",
         "//modules/prediction/proto:lane_graph_proto",
         "@eigen//:eigen",
     ],
