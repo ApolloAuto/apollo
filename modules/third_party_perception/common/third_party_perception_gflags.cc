@@ -61,7 +61,7 @@ DEFINE_double(default_height, 3.0,
 DEFINE_double(
     filter_y_distance, 7.5,
     "fiter the radar objects far away from the main vehicle on y-axis.");
-DEFINE_double(movable_speed_threshold, 15.0,
+DEFINE_double(movable_speed_threshold, 6.7,
     "a radar object is considered as moving in a frame " 
     "if its speed > movable_speed_threshold");
 DEFINE_double(movable_heading_threshold, 1.5,
