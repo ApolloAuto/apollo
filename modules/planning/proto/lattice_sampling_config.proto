@@ -14,13 +14,16 @@ message LatCondition {
   optional double ddl = 3 [default = 0.0];
 }
 
+message TCondition {
+  repeated double t_markers = 1;
+  optional double t_step = 2 [default = 0.5];
+  optional string strategy = 3;
+}
 
 message LonSampleConfig {
-  
 }
 
 message LatSampleConfig {
-
 }
 
 message LatticeSamplingConfig {
