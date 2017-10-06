@@ -55,6 +55,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const bool is_on_auto_mode, const double current_timestamp,
     const double planning_cycle_time,
     const PublishableTrajectory* prev_trajectory) {
+  if (!FLAGS_enable_trajectory_stitcher) {
+    return ComputeReinitStitchingTrajectory();
+  }
   if (!prev_trajectory) {
     return ComputeReinitStitchingTrajectory();
   }
