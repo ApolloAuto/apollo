@@ -81,6 +81,14 @@ class SimulationWorldUpdater {
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
 
+  /**
+ * @brief Tries to load the default routing end point from the file if it has
+ * not been.
+ * @return False if failed to load the default routing end point from file, true
+ * otherwise or if it's already loaded.
+ */
+  bool LoadDefaultEndPoint();
+
   // Time interval, in seconds, between pushing SimulationWorld to frontend.
   static constexpr double kSimWorldTimeInterval = 0.1;
 

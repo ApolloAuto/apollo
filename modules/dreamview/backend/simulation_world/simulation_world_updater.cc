@@ -38,9 +38,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       map_service_(map_service),
       websocket_(websocket) {
   // Initialize default end point
-  if (!GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
-    AWARN << "Failed to load default end point from " << EndWayPointFile();
-  }
+  LoadDefaultEndPoint();
 
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
@@ -115,6 +113,19 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         }
         websocket_->SendData(conn, to_send, true);
       });
+
+  websocket_->RegisterMessageHandler(
+      "GetDefaultEndPoint",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "DefaultEndPoint";
+
+        if (LoadDefaultEndPoint()) {
+          response["end_x"] = default_end_point_.pose().x();
+          response["end_y"] = default_end_point_.pose().y();
+        }
+        websocket_->SendData(conn, response.dump());
+      });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
@@ -152,9 +163,7 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   RoutingRequest::LaneWaypoint *endLane = routing_request->mutable_end();
   if (json["sendDefaultRoute"]) {
     // Try to reload end point if it hasn't been loaded yet.
-    if (!default_end_point_.has_id() &&
-        !GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
-      AERROR << "Failed to load default end point from " << EndWayPointFile();
+    if (!LoadDefaultEndPoint()) {
       return false;
     }
 
@@ -195,6 +204,18 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
     simulation_world_json_ =
         sim_world_service_.GetUpdateAsJson(FLAGS_map_radius).dump();
   }
+}
+
+bool SimulationWorldUpdater::LoadDefaultEndPoint() {
+  bool ret =
+      default_end_point_.has_id()
+          ? true
+          : GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_);
+
+  if (!ret) {
+    AWARN << "Failed to load default end point from " << EndWayPointFile();
+  }
+  return ret;
 }
 
 }  // namespace dreamview

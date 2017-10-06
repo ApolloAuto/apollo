@@ -336,7 +336,7 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
 
   Json update = GetMapElements(radius);
-  update["type"] = "sim_world_update";
+  update["type"] = "SimWorldUpdate";
   update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
   update["world"] = Json::parse(sim_world_json);
 
