@@ -32,6 +32,7 @@ DEFINE_double(trajectory_resolution, 0.01,
               "output trajectory.");
 
 DEFINE_bool(publish_estop, false, "publish estop decision in planning");
+DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
 DEFINE_double(
     look_backward_distance, 10,
