@@ -31,6 +31,8 @@ DEFINE_double(trajectory_resolution, 0.01,
               "The time resolution of "
               "output trajectory.");
 
+DEFINE_bool(publish_estop, false, "publish estop decision in planning");
+
 DEFINE_double(
     look_backward_distance, 10,
     "look backward this distance when creating reference line from routing");

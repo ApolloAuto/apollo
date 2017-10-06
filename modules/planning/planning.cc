@@ -247,11 +247,13 @@ void Planning::RunOnce() {
   trajectory_pb.mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSecond() - start_timestamp);
   if (!status.ok()) {
-    ADCTrajectory estop;
-    estop.mutable_estop();
     AERROR << "Init frame failed";
-    status.Save(estop.mutable_header()->mutable_status());
-    PublishPlanningPb(&estop, start_timestamp);
+    if (FLAGS_publish_estop) {
+      ADCTrajectory estop;
+      estop.mutable_estop();
+      status.Save(estop.mutable_header()->mutable_status());
+      PublishPlanningPb(&estop, start_timestamp);
+    }
     return;
   }
 
@@ -266,7 +268,8 @@ void Planning::RunOnce() {
   if (status.ok()) {
     PublishPlanningPb(&trajectory_pb, start_timestamp);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
-  } else {
+  } else if (FLAGS_publish_estop) {
+    trajectory_pb.mutable_estop();
     status.Save(trajectory_pb.mutable_header()->mutable_status());
     PublishPlanningPb(&trajectory_pb, start_timestamp);
     AERROR << "Planning failed";
