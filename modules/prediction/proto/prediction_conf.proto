@@ -20,6 +20,7 @@ message ObstacleConf {
     LANE_SEQUENCE_PREDICTOR = 0;
     FREE_MOVE_PREDICTOR = 1;
     REGIONAL_PREDICTOR = 2;
+    MOVE_SEQUENCE_PREDICTOR = 3;
   }
 
   optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;
