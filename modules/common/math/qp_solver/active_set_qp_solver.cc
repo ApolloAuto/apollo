@@ -52,7 +52,10 @@ bool ActiveSetQpSolver::Solve() {
   ::qpOASES::Options my_options;
 
   my_options.enableCholeskyRefactorisation = cholesky_refactorisation_freq_;
-  my_options.enableRegularisation = ::qpOASES::BT_TRUE;
+  if (hessian_type_ == ::qpOASES::HST_POSDEF ||
+      hessian_type_ == ::qpOASES::HST_SEMIDEF) {
+    my_options.enableRegularisation = ::qpOASES::BT_TRUE;
+  }
   my_options.epsNum = qp_eps_num_;
   my_options.epsDen = qp_eps_den_;
   my_options.epsIterRef = qp_eps_iter_ref_;
