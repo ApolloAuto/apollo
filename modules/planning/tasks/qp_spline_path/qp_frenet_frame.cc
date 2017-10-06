@@ -158,7 +158,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
   }
   const auto& decision = path_obstacle.LateralDecision();
   if (!decision.has_nudge()) {
-    AWARN << "only support nudge now";
+    ADEBUG << "only support nudge now";
     return true;
   }
   const auto& nudge = decision.nudge();
@@ -231,7 +231,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
   }
   const auto& decision = path_obstacle.LateralDecision();
   if (!decision.has_nudge()) {
-    AWARN << "only support nudge decision now";
+    ADEBUG << "only support nudge decision now";
     return true;
   }
   if (!MapNudgePolygon(
