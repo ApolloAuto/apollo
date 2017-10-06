@@ -52,7 +52,6 @@ void WeightedMean(const TrajectoryPoint& point1,
                   const double weight1,
                   const double weight2,
                   TrajectoryPoint* ret_point) {
-  // TODO(all) Double check if the following CHECK is okay.
   CHECK_DOUBLE_EQ(point1.relative_time(), point2.relative_time());
 
   double ret_x = weight1 * point1.path_point().x() +
@@ -195,13 +194,16 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
   }
 
   size_t total_num = static_cast<size_t>(total_time / freq);
-  // size_t num_to_center = static_cast<size_t>(time_to_lane_center / freq);
+  size_t num_to_center = static_cast<size_t>(time_to_lane_center / freq);
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * freq;
     Eigen::Vector2d point;
     double theta = M_PI;
-    // TODO(kechxu) take care of the situation i > num_to_center
-    lane_l = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 0);
+    if (i < num_to_center) {
+      lane_l = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 0);
+    } else {
+      lane_l = 0.0;
+    }
     double curr_s =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 0);
     double prev_s = (i > 0) ?
@@ -230,12 +232,15 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
 
     double vs = EvaluateLongitudinalPolynomial(longitudinal_coeffs,
                     relative_time, 1);
-    double vl = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 1);
-    double lane_speed = std::hypot(vs, vl);
-
     double as = EvaluateLongitudinalPolynomial(longitudinal_coeffs,
                     relative_time, 2);
-    double al = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 2);
+    double vl = 0.0;
+    double al = 0.0;
+    if (i < num_to_center) {
+      vl = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 1);
+      al = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 2);
+    }
+    double lane_speed = std::hypot(vs, vl);
     double lane_acc = std::hypot(as, al);
 
     TrajectoryPoint trajectory_point;
@@ -510,7 +515,7 @@ void MoveSequencePredictor::GenerateCandidateTimes(
     std::vector<double>* candidate_times) {
   // TODO(all) Think about better ideas
   double t = 1.0;
-  double time_gap = 1.0;
+  double time_gap = 0.2;
   while (t <= FLAGS_prediction_duration) {
     candidate_times->push_back(t);
     t += time_gap;
