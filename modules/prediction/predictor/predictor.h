@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Define the data container base class
+ * @brief Define the predictor base class
  */
 
 #ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_

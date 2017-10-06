@@ -47,13 +47,13 @@ using apollo::common::Point3D;
 
 namespace {
 
-void WeightedMean(
-    const TrajectoryPoint& point1,
-    const TrajectoryPoint& point2,
-    const double weight1, const double weight2,
-    TrajectoryPoint* ret_point) {
+void WeightedMean(const TrajectoryPoint& point1,
+                  const TrajectoryPoint& point2,
+                  const double weight1,
+                  const double weight2,
+                  TrajectoryPoint* ret_point) {
   // TODO(all) Double check if the following CHECK is okay.
-  CHECK_EQ(point1.relative_time(), point2.relative_time());
+  CHECK_DOUBLE_EQ(point1.relative_time(), point2.relative_time());
 
   double ret_x = weight1 * point1.path_point().x() +
                  weight2 * point2.path_point().x();
