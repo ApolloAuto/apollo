@@ -26,10 +26,14 @@ class RouteEditingButton extends React.Component {
 export default class EditingPanel extends React.Component {
 
     render() {
-        const { clickRemoveLast, clickRemoveAll, clickSendRoute  } = this.props;
+        const { clickAddDefaultEndPoint, clickRemoveLast,
+                clickRemoveAll, clickSendRoute  } = this.props;
 
         return (
             <div className="editing-panel">
+                <RouteEditingButton label="Add Default End Point"
+                                    icon={removeLastIcon}   // TODO: use addDefaultEndPointIcon
+                                    onClick={clickAddDefaultEndPoint}/>
 	            <RouteEditingButton label="Remove Last Point"
 	                                icon={removeLastIcon}
                                     onClick={clickRemoveLast}/>

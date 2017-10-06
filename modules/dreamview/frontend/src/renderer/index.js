@@ -56,6 +56,8 @@ class Renderer {
         // The route editor
         this.routingEditor = new RoutingEditor();
 
+        this.defaultRoutingEndPoint = {};
+
         // The Performance Monitor
         this.stats = null;
         if (PARAMETERS.debug.performanceMonitor) {
@@ -212,6 +214,11 @@ class Renderer {
         this.camera.updateProjectionMatrix();
     }
 
+    updateDefaultRoutingEndPoint(data) {
+        this.defaultRoutingEndPoint.x = data.end_x;
+        this.defaultRoutingEndPoint.y = data.end_y;
+    }
+
     enableRouteEditing() {
         this.enableOrbitControls();
         this.routingEditor.enableEditingMode(this.camera, this.adc);
@@ -229,6 +236,17 @@ class Renderer {
                                                                    false);
     }
 
+    addDefaultEndPoint() {
+        if (this.defaultRoutingEndPoint.x === undefined ||
+            this.defaultRoutingEndPoint.y === undefined) {
+            alert("Failed to get default routing end point, make sure there's " +
+                  "a default end point file under the map data directory.");
+            return;
+        }
+        this.routingEditor.addDefaultEndPoint(this.defaultRoutingEndPoint,
+                                              this.coordinates, this.scene);
+    }
+
     removeAllRoutingPoints() {
         this.routingEditor.removeAllRoutePoints(this.scene);
     }
@@ -240,11 +258,11 @@ class Renderer {
     sendRoutingRequest(sendDefaultRoute = false) {
         if (sendDefaultRoute) {
             return this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
-                                                         this.coordinates);
+                                                                this.coordinates);
         } else {
-            return this.routingEditor.sendRoutingRequest(this.Scene,
-                                                  this.adc.mesh.position,
-                                                  this.coordinates);
+            return this.routingEditor.sendRoutingRequest(this.scene,
+                                                         this.adc.mesh.position,
+                                                         this.coordinates);
         }
     }
 

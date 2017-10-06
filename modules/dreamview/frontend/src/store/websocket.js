@@ -11,6 +11,7 @@ class WebSocketEndpoint {
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
         this.currMapRadius = null;
+        this.defaultRoutingEndPointRequested = false;
     }
 
     initialize() {
@@ -27,7 +28,7 @@ class WebSocketEndpoint {
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
             switch (message.type) {
-                case "sim_world_update":
+                case "SimWorldUpdate":
                     this.checkMessage(message);
 
                     STORE.updateTimestamp(message.timestamp);
@@ -55,6 +56,9 @@ class WebSocketEndpoint {
                     RENDERER.updateMap(message.data);
                     STORE.setInitializationStatus(true);
                     break;
+                case "DefaultEndPoint":
+                    RENDERER.updateDefaultRoutingEndPoint(message);
+                    break;
             }
         };
         this.websocket.onclose = event => {
@@ -66,6 +70,11 @@ class WebSocketEndpoint {
         clearInterval(this.timer);
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN) {
+                // Load default routing end point.
+                if (!this.defaultRoutingEndPointRequested) {
+                    this.requestDefaultRoutingEndPoint();
+                    this.defaultRoutingEndPointRequested = true;
+                }
                 this.websocket.send(JSON.stringify({type : "RequestSimulationWorld"}));
             }
         }, 100);
@@ -107,6 +116,12 @@ class WebSocketEndpoint {
             end: end,
             waypoint: waypoint,
             sendDefaultRoute: sendDefaultRoute,
+        }));
+    }
+
+    requestDefaultRoutingEndPoint() {
+        this.websocket.send(JSON.stringify({
+            type: "GetDefaultEndPoint",
         }));
     }
 }

@@ -3,11 +3,9 @@ import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
 
 import routingPointPin from "assets/images/routing/pin.png";
 
-
 import PARAMETERS from "store/config/parameters.yml";
 import WS from "store/websocket.js";
 import { drawImage } from "utils/draw";
-
 
 export default class RoutingEditor {
     constructor() {
@@ -47,11 +45,19 @@ export default class RoutingEditor {
 
         const intersects = raycaster.intersectObject(ground.mesh);
         if (intersects.length > 0) {
-                const point = drawImage(routingPointPin, 3.5, 3.5,
-                                        intersects[0].point.x, intersects[0].point.y, 0.3);
-                this.routePoints.push(point);
-                scene.add(point);
+            const point = drawImage(routingPointPin, 3.5, 3.5,
+                                    intersects[0].point.x, intersects[0].point.y, 0.3);
+            this.routePoints.push(point);
+            scene.add(point);
         }
+    }
+
+    addDefaultEndPoint(defaultRoutingEndPoint, coordinates, scene) {
+        const point = coordinates.applyOffset(new THREE.Vector2(defaultRoutingEndPoint.x,
+                                                                defaultRoutingEndPoint.y));
+        const pointMesh = drawImage(routingPointPin, 3.5, 3.5, point.x, point.y, 0.3);
+        this.routePoints.push(pointMesh);
+        scene.add(pointMesh);
     }
 
     removeLastRoutingPoint(scene) {
