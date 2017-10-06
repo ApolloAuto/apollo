@@ -227,5 +227,10 @@ double Speed(const double vx, const double vy) {
   return std::sqrt(vx * vx + vy * vy);
 }
 
+double HeadingDifference(const double theta1, const double theta2) {
+  double theta_diff = std::abs(theta1 - theta2);
+  return theta_diff > PI ? (2 * PI - theta_diff) : theta_diff;
+}
+
 }  // namespace third_party_perception
 }  // namespace apollo

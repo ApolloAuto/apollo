@@ -79,6 +79,9 @@ double GetNearestLaneHeading(const Point& point);
 double GetNearestLaneHeading(const double x, const double y, const double z);
 
 double GetLateralDistanceToNearestLane(const Point& point);
+
+double HeadingDifference(const double theta1, const double theta2);
+
 }  // namespace third_party_perception
 }  // namespace apollo
 

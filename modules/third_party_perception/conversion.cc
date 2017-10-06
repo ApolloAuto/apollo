@@ -36,6 +36,7 @@ using ::apollo::third_party_perception::GetAngleFromQuaternion;
 using ::apollo::third_party_perception::FillPerceptionPolygon;
 using ::apollo::third_party_perception::GetDefaultObjectLength;
 using ::apollo::third_party_perception::GetDefaultObjectWidth;
+using ::apollo::third_party_perception::HeadingDifference;
 using ::apollo::perception::Point;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
@@ -174,7 +175,6 @@ RadarObstacles DelphiToRadarObstacles(
     rob.set_id(index);
     rob.set_rcs(static_cast<double>(motionpowers[index].can_tx_track_power()) -
                 10.0);
-    rob.set_theta(adc_theta);
     rob.set_length(GetDefaultObjectLength(4));
     rob.set_width(GetDefaultObjectWidth(4));
     rob.set_height(3.0);
@@ -195,6 +195,9 @@ RadarObstacles DelphiToRadarObstacles(
     absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
     absolute_pos.set_z(adc_pos.z());
     rob.mutable_absolute_position()->CopyFrom(absolute_pos);
+
+    double theta = GetNearestLaneHeading(rob.absolute_position());
+    rob.set_theta(theta);
 
     const double range_vel = data_500.can_tx_track_range_rate();
     const double lateral_vel = data_500.can_tx_track_lat_rate();
@@ -236,7 +239,7 @@ RadarObstacles DelphiToRadarObstacles(
 
     double v_heading = std::atan2(rob.absolute_velocity().y(),
                                   rob.absolute_velocity().x());
-    if (Speed(rob.absolute_velocity()) > FLAGS_movable_speed_threshold && std::abs(v_heading - rob.theta()) < FLAGS_movable_heading_threshold) {
+    if (Speed(rob.absolute_velocity()) > FLAGS_movable_speed_threshold && HeadingDifference(v_heading, rob.theta()) < FLAGS_movable_heading_threshold) {
       rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
     } else {
       rob.set_moving_frames_count(0);
@@ -269,9 +272,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     pob->mutable_position()->CopyFrom(radar_obstacle.absolute_position());
     pob->mutable_velocity()->CopyFrom(radar_obstacle.absolute_velocity());
 
-    double theta = GetNearestLaneHeading(pob->position().x(), pob->position().y(),
-                                         pob->position().z());
-    pob->set_theta(theta);
+    pob->set_theta(radar_obstacle.theta());
 
     // create polygon
     FillPerceptionPolygon(pob, pob->position().x(), pob->position().y(),

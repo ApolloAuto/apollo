@@ -79,7 +79,6 @@ PerceptionObstacles MobileyeRadarFusion(
          *(radar_obstacles_fusion.mutable_perception_obstacle())) {
       if (HasOverlap(mobileye_obstacle, radar_obstacle)) {
         mobileye_obstacle.set_confidence(0.99);
-
         radar_obstacle.set_confidence(0.99);
       }
     }
