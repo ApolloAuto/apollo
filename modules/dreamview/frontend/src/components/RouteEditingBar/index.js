@@ -35,6 +35,9 @@ export default class RouteEditingMenu extends React.Component {
                               clickSendRoute={() => {
                                     routeEditingManager.sendRoutingRequest();
                               }}
+                              clickAddDefaultEndPoint={() => {
+                                    routeEditingManager.addDefaultEndPoint();
+                              }}
                 />
                 <EditorExitButton onClick={ () => {
                     routeEditingManager.disableRouteEditing();
