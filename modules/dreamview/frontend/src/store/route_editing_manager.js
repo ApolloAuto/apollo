@@ -24,6 +24,10 @@ export default class RouteEditingManager {
         RENDERER.removeAllRoutingPoints();
     }
 
+    addDefaultEndPoint() {
+        RENDERER.addDefaultEndPoint();
+    }
+
     sendRoutingRequest(sendDefaultRoute = false) {
         if (RENDERER.sendRoutingRequest(sendDefaultRoute)){
             this.disableRouteEditing();
