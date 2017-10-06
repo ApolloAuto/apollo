@@ -77,7 +77,6 @@ em_planner_config {
         second_derivative_weight: 100.0
         third_derivative_weight: 10.0
         reference_line_weight: 0.001
-        num_refline_point: 10
         num_output: 100
         cross_lane_extension_buffer: 0.2
     }
