@@ -519,6 +519,7 @@ function print_usage() {
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
+  ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
@@ -551,6 +552,10 @@ function main() {
       ;;
     build)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      apollo_build_dbg $@
+      ;;
+    build_prof)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY  --copt='-pg' --cxxopt='-pg' --linkopt='-pg'"
       apollo_build_dbg $@
       ;;
     build_no_perception)

@@ -277,6 +277,7 @@ void Planning::RunOnce() {
 }
 
 void Planning::Stop() {
+  AERROR << "Planning Stop is called";
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);

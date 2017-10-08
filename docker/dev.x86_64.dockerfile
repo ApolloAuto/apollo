@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
    software-properties-common \
    unzip \
    vim \
+   google-perftools \
    wget \
    zip
 
