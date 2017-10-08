@@ -227,6 +227,36 @@ function start() {
     fi
 }
 
+function start_prof() {
+    MODULE=$1
+    shift
+
+    echo "Make sure you have built with 'bash apollo.sh build_prof'"
+    LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
+    is_stopped "${MODULE}"
+    if [ $? -eq 1 ]; then
+        PROF_FILE="/tmp/$MODULE.prof"
+        rm -rf $PROF_FILE
+        BINARY=${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE}
+        eval "CPUPROFILE=$PROF_FILE $BINARY \
+            --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
+            --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
+        sleep 0.5
+        is_stopped "${MODULE}"
+        if [ $? -eq 0 ]; then
+            echo -e "Launched module ${MODULE} in prof mode. \nExport profile by command:"
+            echo -e "${YELLOW}google-pprof --pdf $BINARY $PROF_FILE > ${MODULE}_prof.pdf${NO_COLOR}"
+            return 0
+        else
+            echo "Could not launch module ${MODULE}. Is it already built?"
+            return 1
+        fi
+    else
+        echo "Module ${MODULE} is already running - skipping."
+        return 2
+    fi
+}
+
 function start_fe() {
     MODULE=$1
     shift
@@ -268,6 +298,9 @@ function run() {
             ;;
         start_fe)
             start_fe $module "$@"
+            ;;
+        start_prof)
+            start_prof $module "$@"
             ;;
         stop)
             stop $module
