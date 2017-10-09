@@ -152,14 +152,12 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
 
 bool ReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
-  const double t_length = t_knots_.back() - t_knots_.front();
   uint32_t constraint_num =
       std::max(static_cast<uint32_t>(raw_reference_line.Length() /
                                      smoother_config_.max_constraint_length()),
                3u);
-  double dt = t_length / constraint_num;
   std::vector<double> evaluated_t;
-  common::util::uniform_slice(0.0 + dt, t_length, constraint_num - 1,
+  common::util::uniform_slice(t_knots_.front(), t_knots_.back(), constraint_num,
                               &evaluated_t);
   std::vector<common::PathPoint> path_points;
   if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {

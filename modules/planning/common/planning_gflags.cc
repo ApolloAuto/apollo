@@ -35,7 +35,7 @@ DEFINE_bool(publish_estop, false, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
 DEFINE_double(
-    look_backward_distance, 30,
+    look_backward_distance, 10,
     "look backward this distance when creating reference line from routing");
 
 DEFINE_double(
