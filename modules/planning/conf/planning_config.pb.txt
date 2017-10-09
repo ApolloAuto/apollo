@@ -98,7 +98,7 @@ em_planner_config {
             jerk_kernel_weight: 500.0
             follow_weight: 8.0
             stop_weight: 0.2
-            cruise_weight: 0.1
+            cruise_weight: 0.5
             regularization_weight: 0.0
             follow_drag_distance: 17.0
         }
@@ -108,7 +108,7 @@ em_planner_config {
             jerk_kernel_weight: 100.0
             follow_weight: 8.0
             stop_weight: 0.2
-            cruise_weight: 0.1
+            cruise_weight: 0.5
             regularization_weight: 0.0
             follow_drag_distance: 17.0
         }
@@ -128,7 +128,7 @@ em_planner_config {
 
 reference_line_smoother_config {
     spline_order: 7
-    max_spline_length: 15.0
+    max_spline_length: 25.0
     max_constraint_length: 7.5
     boundary_bound: 0.2
     derivative_bound: 0.15
@@ -136,8 +136,8 @@ reference_line_smoother_config {
     third_derivative_bound: 1.0
     ref_line_weight: 0.0
     derivative_weight: 0.0
-    second_derivative_weight: 100.0
-    third_derivative_weight: 100.0
+    second_derivative_weight: 200.0
+    third_derivative_weight: 1000.0
     num_of_total_points: 500
 }
 
