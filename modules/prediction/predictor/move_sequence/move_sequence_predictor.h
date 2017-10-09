@@ -56,7 +56,7 @@ class MoveSequencePredictor : public SequencePredictor {
  private:
   static const size_t COEFF_SIZE = 6;
 
-  void DrawLaneSequenceTrajectoryPoints(
+  void DrawMoveSequenceTrajectoryPoints(
       const Obstacle& obstacle,
       const LaneSequence& lane_sequence,
       const double total_time, const double freq,
