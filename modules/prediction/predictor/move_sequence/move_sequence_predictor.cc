@@ -117,7 +117,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
+    DrawMoveSequenceTrajectoryPoints(*obstacle, sequence,
         FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
@@ -128,7 +128,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
          << trajectories_.size() << " trajectories.";
 }
 
-void MoveSequencePredictor::DrawLaneSequenceTrajectoryPoints(
+void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     const Obstacle& obstacle,
     const LaneSequence& lane_sequence,
     const double total_time, const double freq,
