@@ -71,20 +71,12 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {
     AWARN << "The requested s " << s << " < 0";
-    ReferencePoint ref_point(map_path_.GetSmoothPoint(s), 0.0, 0.0, 0.0, 0.0);
-    if (ref_point.lane_waypoints().empty()) {
-      ref_point.add_lane_waypoints(reference_points_.front().lane_waypoints());
-    }
-    return ref_point;
+    return reference_points_.front();
   }
   if (s > accumulated_s.back()) {
     AWARN << "The requested s " << s << " > reference line length "
           << accumulated_s.back();
-    ReferencePoint ref_point(map_path_.GetSmoothPoint(s), 0.0, 0.0, 0.0, 0.0);
-    if (ref_point.lane_waypoints().empty()) {
-      ref_point.add_lane_waypoints(reference_points_.back().lane_waypoints());
-    }
-    return ref_point;
+    return reference_points_.back();
   }
 
   auto it_lower =
