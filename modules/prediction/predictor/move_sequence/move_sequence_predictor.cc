@@ -24,6 +24,7 @@
 
 #include "Eigen/Dense"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/util/file.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -466,7 +467,7 @@ double MoveSequencePredictor::ComputeTimeToLaneCenter(
   GenerateCandidateTimes(&candidate_times);
   if (candidate_times.empty()) {
     AWARN << "No candidate times found, use default value.";
-    return 2.0;
+    return FLAGS_default_time_to_lane_center;
   }
   double t_best = candidate_times[0];
   double cost_min = std::numeric_limits<double>::max();
@@ -488,7 +489,7 @@ double MoveSequencePredictor::Cost(const double t,
     const std::array<double, 6>& lateral_coeffs,
     const std::array<double, 5>& longitudinal_coeffs) {
   // TODO(all) Think about how to introduce lane curvature into cost
-  double alpha = 0.25;
+  double alpha = FLAGS_cost_alpha;
   double left_end =
       std::fabs(EvaluateLateralPolynomial(lateral_coeffs, 0.0, 2));
   double right_end =
@@ -514,19 +515,18 @@ double MoveSequencePredictor::Cost(const double t,
 void MoveSequencePredictor::GenerateCandidateTimes(
     std::vector<double>* candidate_times) {
   // TODO(all) Think about better ideas
-  double t = 1.0;
-  double time_gap = 0.2;
-  while (t <= FLAGS_prediction_duration) {
+  double t = FLAGS_time_lower_bound_to_lane_center;
+  double time_gap = FLAGS_sample_time_gap;
+  while (t <= FLAGS_time_upper_bound_to_lane_center) {
     candidate_times->push_back(t);
     t += time_gap;
   }
 }
 
 double MoveSequencePredictor::MotionWeight(const double t) {
-  // TODO(kechxu) Avoid the following hard-coded constants
-  double a = 1.2;
-  double b = 5.0;
-  double c = 1.5;
+  double a = FLAGS_motion_weight_a;
+  double b = FLAGS_motion_weight_b;
+  double c = FLAGS_motion_weight_c;
 
   return 1.0 - 1.0 / (1.0 + a * std::exp(-b * (t - c)));
 }
