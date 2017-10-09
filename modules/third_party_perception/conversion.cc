@@ -208,42 +208,37 @@ RadarObstacles DelphiToRadarObstacles(
 
     const auto iter =
         last_radar_obstacles.radar_obstacle().find(index);
+    Point absolute_vel;
     if (iter == last_radar_obstacles.radar_obstacle().end()) {
       rob.set_count(0);
       rob.set_movable(false);
       rob.set_moving_frames_count(0);
-    } else {
-      rob.set_count(iter->second.count() + 1);
-      rob.set_movable(iter->second.movable());
-    }
-
-    Point absolute_vel;
-    const auto iter_front =
-        last_radar_obstacles.radar_obstacle().find(index);
-    if (iter_front == last_radar_obstacles.radar_obstacle().end()) {
-      // new in the current frame
       absolute_vel.set_x(0.0);
       absolute_vel.set_y(0.0);
       absolute_vel.set_z(0.0);
     } else {
-      // appeared in the last frame
+      rob.set_count(iter->second.count() + 1);
+      rob.set_movable(iter->second.movable());
       absolute_vel.set_x(
-          (absolute_pos.x() - iter_front->second.absolute_position().x()) /
+          (absolute_pos.x() - iter->second.absolute_position().x()) /
           (current_timestamp - last_timestamp));
       absolute_vel.set_y(
-          (absolute_pos.y() - iter_front->second.absolute_position().y()) /
+          (absolute_pos.y() - iter->second.absolute_position().y()) /
           (current_timestamp - last_timestamp));
       absolute_vel.set_z(0.0);
+      double v_heading = std::atan2(absolute_vel.y(),
+                                    absolute_vel.x());
+      double heading_diff = HeadingDifference(v_heading, rob.theta());
+      if (heading_diff < FLAGS_movable_heading_threshold &&
+          Speed(absolute_vel) * std::cos(heading_diff) > FLAGS_movable_speed_threshold) {
+        rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
+      } else {
+        rob.set_moving_frames_count(0);
+      }
     }
+
     rob.mutable_absolute_velocity()->CopyFrom(absolute_vel);
 
-    double v_heading = std::atan2(rob.absolute_velocity().y(),
-                                  rob.absolute_velocity().x());
-    if (Speed(rob.absolute_velocity()) > FLAGS_movable_speed_threshold && HeadingDifference(v_heading, rob.theta()) < FLAGS_movable_heading_threshold) {
-      rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
-    } else {
-      rob.set_moving_frames_count(0);
-    }
     if (rob.moving_frames_count() >= FLAGS_movable_frames_count_threshold) {
       rob.set_movable(true);
     }
