@@ -207,7 +207,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   double delta_s = qp_spline_path_config_.max_constraint_length();
   uint32_t constraint_num =
       std::max(3u, static_cast<uint32_t>((end_s - start_s) / delta_s));
-  delta_s = (end_s - start_s) / delta_s;
+  delta_s = (end_s - start_s) / constraint_num;
   common::util::uniform_slice(start_s + delta_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return true;
