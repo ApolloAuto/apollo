@@ -57,6 +57,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_1d",
+        "//modules/common:log",
         "@eigen//:eigen",
     ],
 )
