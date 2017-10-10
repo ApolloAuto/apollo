@@ -320,4 +320,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "spline_2d_constraint_test",
+    size = "small",
+    srcs = [
+        "spline_2d_constraint_test.cc",
+    ],
+    deps = [
+        ":spline_2d_constraint",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
