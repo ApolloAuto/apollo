@@ -142,6 +142,20 @@ bool ActiveSetQpSolver::Solve() {
       AERROR << "qpOASES solver failed due to infeasibility or other internal "
                 "reasons";
     }
+    std::stringstream ss;
+    ss << "ActiveSetQpSolver inputs: " << std::endl;
+    ss << "kernel_matrix:\n" << kernel_matrix_ << std::endl;
+    ss << "offset:\n" << offset_ << std::endl;
+    ss << "affine_inequality_matrix:\n"
+       << affine_inequality_matrix_ << std::endl;
+    ss << "affine_inequality_boundary:\n"
+       << affine_inequality_boundary_ << std::endl;
+    ss << "affine_equality_matrix:\n" << affine_equality_matrix_ << std::endl;
+    ss << "affine_equality_boundary:\n"
+       << affine_equality_boundary_ << std::endl;
+
+    ADEBUG << ss.str();
+
     return false;
   }
 
