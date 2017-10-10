@@ -298,9 +298,9 @@ bool QpSplinePathGenerator::AddConstraint(
   }
 
   // add spline joint third derivative constraint
-  if (knots_.size() >= 2 &&
+  if (knots_.size() >= 3 &&
       !spline_constraint->AddThirdDerivativeSmoothConstraint()) {
-    AERROR << "Add spline joint third derivative constraint failed!";
+    AERROR << "Add spline joint derivative constraint failed!";
     return false;
   }
   return true;
