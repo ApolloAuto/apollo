@@ -71,8 +71,9 @@ def plot_planning(ax, planning_file):
         trajectory[2],
         label="Trajectory:%s" % planning_file)
     paths = get_debug_paths(planning_pb)
-    for name, path in paths:
-        ax.plot(path[0], path[1], label="%s:%s" % (name, planning_file))
+    if paths:
+        for name, path in paths:
+            ax.plot(path[0], path[1], label="%s:%s" % (name, planning_file))
     ax.legend()
 
 

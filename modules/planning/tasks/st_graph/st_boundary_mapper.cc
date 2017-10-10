@@ -450,12 +450,11 @@ Status StBoundaryMapper::GetSpeedLimits(
         GetAvgKappa(i, path_data_.discretized_path().path_points());
 
     // speed limit from path curvature
-    const double centric_acceleration_limit =
-        GetCentricAccLimit(std::fabs(avg_kappa));
-    ADEBUG << "centric_acceleration_limit : " << centric_acceleration_limit;
+    const double centripetal_acceleration_limit =
+        st_boundary_config_.high_speed_centric_acceleration_limit();
 
     double speed_limit_on_path = std::sqrt(
-        centric_acceleration_limit /
+        centripetal_acceleration_limit /
         std::fmax(std::fabs(avg_kappa), st_boundary_config_.minimal_kappa()));
 
     const double curr_speed_limit = std::fmax(
