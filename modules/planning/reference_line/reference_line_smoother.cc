@@ -186,7 +186,6 @@ bool ReferenceLineSmoother::ApplyConstraint(
   }
 
   if (lateral_bound.size() > 0) {
-    lateral_bound.front() = 0.0;
     lateral_bound.back() = kFixedBoundLimit;
   }
 
