@@ -81,8 +81,11 @@ class Obstacle {
    * @param predictions The prediction results
    * @return obstacles The output obstacles saved in a list of unique_ptr.
    */
-  static std::vector<std::unique_ptr<Obstacle>> CreateObstacles(
+  static std::list<std::unique_ptr<Obstacle>> CreateObstacles(
       const prediction::PredictionObstacles &predictions);
+
+  static std::unique_ptr<Obstacle> CreateStaticVirtualObstacles(
+      const std::string &id, const common::math::Box2d &obstacle_box);
 
   static bool IsStaticObstacle(
       const perception::PerceptionObstacle &perception_obstacle);
