@@ -79,9 +79,11 @@ def main():
     mc = MileageCalculator()
     for bag_file in sys.argv[1:]:
         mc.calculate(bag_file)
-    print 'Disengagements:\t', mc.disengagements
-    print 'Auto mileage:\t', mc.auto_mileage, 'miles'
-    print 'Manual mileage:\t', mc.manual_mileage, 'miles'
+    print 'Disengagements: %d' % mc.disengagements
+    print 'Auto mileage:   %.3f km / %.3f miles' % (
+        mc.auto_mileage * 1.60934, mc.auto_mileage)
+    print 'Manual mileage: %.3f km / %.3f miles' % (
+        mc.manual_mileage * 1.60934, mc.manual_mileage)
 
 if __name__ == '__main__':
     main()
