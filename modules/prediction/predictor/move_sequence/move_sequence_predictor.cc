@@ -170,8 +170,11 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     return;
   }
 
-  // TODO(kechxu) take care of enable_kf_tracking
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  if (FLAGS_enable_kf_tracking) {
+    position[0] = feature.t_position().x();
+    position[1] = feature.t_position().y();
+  }
   double time_to_lane_center = ComputeTimeToLaneCenter(obstacle, lane_sequence);
 
   std::array<double, 6> lateral_coeffs;
@@ -275,7 +278,6 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
   const Feature& feature = obstacle.latest_feature();
-  // TODO(kechxu) check speed is large enough to get valid velocity_heading
   double theta = feature.velocity_heading();
   double v = feature.speed();
   double a = feature.acc();
@@ -312,7 +314,6 @@ void MoveSequencePredictor::GetLateralPolynomial(
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
   const Feature& feature = obstacle.latest_feature();
-  // TODO(kechxu) check speed is large enough to get valid velocity_heading
   double theta = feature.velocity_heading();
   double v = feature.speed();
   double a = feature.acc();
@@ -488,7 +489,6 @@ double MoveSequencePredictor::ComputeTimeToLaneCenter(
 double MoveSequencePredictor::Cost(const double t,
     const std::array<double, 6>& lateral_coeffs,
     const std::array<double, 5>& longitudinal_coeffs) {
-  // TODO(all) Think about how to introduce lane curvature into cost
   double alpha = FLAGS_cost_alpha;
   double left_end =
       std::fabs(EvaluateLateralPolynomial(lateral_coeffs, 0.0, 2));
@@ -514,7 +514,6 @@ double MoveSequencePredictor::Cost(const double t,
 
 void MoveSequencePredictor::GenerateCandidateTimes(
     std::vector<double>* candidate_times) {
-  // TODO(all) Think about better ideas
   double t = FLAGS_time_lower_bound_to_lane_center;
   double time_gap = FLAGS_sample_time_gap;
   while (t <= FLAGS_time_upper_bound_to_lane_center) {
