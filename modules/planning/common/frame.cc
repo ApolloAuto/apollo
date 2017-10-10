@@ -77,8 +77,7 @@ void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
 
 void Frame::CreatePredictionObstacles(
     const prediction::PredictionObstacles &prediction) {
-  auto obstacles = Obstacle::CreateObstacles(prediction);
-  for (auto &ptr : obstacles) {
+  for (auto &ptr : Obstacle::CreateObstacles(prediction)) {
     auto id(ptr->Id());
     obstacles_.Add(id, *ptr);
   }
@@ -119,30 +118,8 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
     AWARN << "obstacle " << id << " already exist.";
     return object;
   }
-  // create a "virtual" perception_obstacle
-  perception::PerceptionObstacle perception_obstacle;
-  // simulator needs a valid integer
-  perception_obstacle.set_id(-(std::hash<std::string>{}(id) >> 1));
-  perception_obstacle.mutable_position()->set_x(box.center().x());
-  perception_obstacle.mutable_position()->set_y(box.center().y());
-  perception_obstacle.set_theta(box.heading());
-  perception_obstacle.mutable_velocity()->set_x(0);
-  perception_obstacle.mutable_velocity()->set_y(0);
-  perception_obstacle.set_length(box.length());
-  perception_obstacle.set_width(box.width());
-  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
-  perception_obstacle.set_type(
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
-  perception_obstacle.set_tracking_time(1.0);
-
-  std::vector<common::math::Vec2d> corner_points;
-  box.GetAllCorners(&corner_points);
-  for (const auto &corner_point : corner_points) {
-    auto *point = perception_obstacle.add_polygon_point();
-    point->set_x(corner_point.x());
-    point->set_y(corner_point.y());
-  }
-  auto *ptr = obstacles_.Add(id, Obstacle(id, perception_obstacle));
+  auto *ptr =
+      obstacles_.Add(id, *Obstacle::CreateStaticVirtualObstacles(id, box));
   if (!ptr) {
     AERROR << "Failed to create virtual obstacle " << id;
   }
