@@ -52,6 +52,9 @@ proto_library(
     srcs = [
         "lattice_sampling_config.proto",
     ],
+    deps =[
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
 )
 
 cc_proto_library(
