@@ -326,9 +326,22 @@ const SimulationWorld &SimulationWorldService::Update() {
     *world_.add_object() = kv.second;
   }
 
+  UpdateDelays();
+
   world_.set_sequence_num(world_.sequence_num() + 1);
 
   return world_;
+}
+
+void SimulationWorldService::UpdateDelays() {
+  auto *delays = world_.mutable_delay();
+  delays->set_chassis(AdapterManager::GetChassis()->GetDelayInMs());
+  delays->set_localization(AdapterManager::GetLocalization()->GetDelayInMs());
+  delays->set_perception_obstacle(
+      AdapterManager::GetPerceptionObstacles()->GetDelayInMs());
+  delays->set_planning(AdapterManager::GetPlanning()->GetDelayInMs());
+  delays->set_prediction(AdapterManager::GetPrediction()->GetDelayInMs());
+  // TODO(siyangy): Add traffic light delay when ready.
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
