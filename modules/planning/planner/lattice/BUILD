@@ -24,6 +24,7 @@ cc_library(
         "//modules/planning/lattice:collision_checker",
         "//modules/planning/lattice:lattice_constraint_checker",
         "//modules/planning/lattice:decision_analyzer",
+        "//modules/planning/lattice:lattice_util",
     ],
 )
 
