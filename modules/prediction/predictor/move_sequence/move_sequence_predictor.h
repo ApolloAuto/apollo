@@ -54,8 +54,6 @@ class MoveSequencePredictor : public SequencePredictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  static const size_t COEFF_SIZE = 6;
-
   void DrawMoveSequenceTrajectoryPoints(
       const Obstacle& obstacle,
       const LaneSequence& lane_sequence,
