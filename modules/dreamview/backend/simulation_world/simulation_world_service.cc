@@ -449,8 +449,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
 
   // Updates the timestamp with the timestamp inside the chassis message header.
-  world_.set_timestamp_sec(
-      std::max(world_.timestamp_sec(), chassis.header().timestamp_sec()));
+  world_.set_timestamp_sec(chassis.header().timestamp_sec());
 }
 
 Object &SimulationWorldService::CreateWorldObjectIfAbsent(
