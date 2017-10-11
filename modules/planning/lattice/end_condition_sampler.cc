@@ -94,6 +94,8 @@ const {
   time_sections[num_time_section - 1] = 0.01;
 
   // following three-second rule
+  // TODO: @yajia @kecheng @liyun: fix the case when s on reference line is
+  // small enough to be close to init_s[0]
   double ref_position = obstacle_position - obstacle_velocity * 3.0;
   constexpr std::size_t num_position_section = 5;
   std::array<double, num_position_section> s_offsets =
