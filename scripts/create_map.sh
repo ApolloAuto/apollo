@@ -29,7 +29,7 @@ else
 	else
 		LEFT_LANES=$2
 		RIGHT_LANES=$3
-	    echo "Gererating map with one center lane, ${LEFT_LANES} left lane(s), ${RIGHT_LANES} right lanes"
+	    echo "Gererating map with one center lane, ${LEFT_LANES} left lane(s), ${RIGHT_LANES} right lane(s)"
 		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt --left_lanes ${LEFT_LANES} --right_lanes ${RIGHT_LANES}
 	fi
 	echo "--map_dir=modules/map/data/${MAP}" >> modules/common/data/global_flagfile.txt
