@@ -149,6 +149,24 @@ TEST(AdapterTest, Dump) {
   EXPECT_EQ(23, loaded.header().sequence_num());
 }
 
+TEST(AdapterTest, Delay) {
+  MyLocalizationAdapter adapter("local", "local_topic", 1);
+  EXPECT_TRUE(isnan(adapter.GetDelayInMs()));
+
+  localization::LocalizationEstimate msg;
+  msg.mutable_header()->set_timestamp_sec(12.3);
+  adapter.OnReceive(msg);
+  EXPECT_TRUE(isnan(adapter.GetDelayInMs()));
+
+  msg.mutable_header()->set_timestamp_sec(45.6);
+  adapter.OnReceive(msg);
+  EXPECT_DOUBLE_EQ((45.6 - 12.3) * 1000, adapter.GetDelayInMs());
+
+  msg.mutable_header()->set_timestamp_sec(45.7);
+  adapter.OnReceive(msg);
+  EXPECT_DOUBLE_EQ((45.7 - 45.6) * 1000, adapter.GetDelayInMs());
+}
+
 }  // namespace adapter
 }  // namespace common
 }  // namespace apollo

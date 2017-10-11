@@ -175,6 +175,8 @@ class SimulationWorldService {
 
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
+  void UpdateDelays();
+
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
