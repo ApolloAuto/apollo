@@ -204,6 +204,9 @@ cc_library(
         "lattice_util.cc",
     ],
     deps = [
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/planning/reference_line:reference_line",
+
     ],
 )
 

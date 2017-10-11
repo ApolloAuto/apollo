@@ -25,9 +25,32 @@
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
+#include "modules/planning/lattice/lattice_util.h"
+#include "modules/common/log.h"
 
 namespace apollo{
 namespace planning {
+
+PlanningObject analyze(Frame* frame,
+  const common::TrajectoryPoint& init_planning_point,
+  const std::array<double, 3>& lon_init_state,
+  std::vector<ReferenceLine>& candidate_reference_lines) {
+  PlanningObject ret;
+  CHECK(frame != nullptr);
+  // Only handles one reference line
+  CHECK(candidate_reference_lines.size() > 0);
+  const ReferenceLine& ref_line = candidate_reference_lines[0];
+  const std::vector<ReferencePoint>& ref_points = ref_line.reference_points();
+
+  std::vector<common::PathPoint> discretized_ref_points =
+    apollo::planning::ToDiscretizedReferenceLine(ref_points);
+
+  for (size_t i = 0; i < discretized_ref_points.size(); ++i) {
+    ret.mutable_discretized_reference_line()->add_discretized_reference_line_point()->CopyFrom(
+      discretized_ref_points[i]);
+  }
+  return ret;
+}
 
 } // namespace planning
 } // namespace apollo
