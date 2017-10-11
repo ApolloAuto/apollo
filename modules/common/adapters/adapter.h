@@ -22,6 +22,7 @@
 #define MODULES_ADAPTERS_ADAPTER_H_
 
 #include <functional>
+#include <limits>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -49,6 +50,67 @@
 namespace apollo {
 namespace common {
 namespace adapter {
+
+// Borrowed from C++ 14.
+template <bool B, class T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
+
+namespace internal {
+
+// A few partial template specialzations to get message delays for different
+// message types.
+template <class T, class Enable = void>
+struct MessageDelay {
+  static double Get(const T& new_msg, const T& last_msg) {
+    return 0.0;
+  }
+};
+
+template <class T>
+struct MessageDelay<
+    T, enable_if_t<std::is_base_of<google::protobuf::Message, T>::value>> {
+  static double Get(const T& new_msg, const T& last_msg) {
+    using google::protobuf::Message;
+
+    return (ExtractTimeStampFromMsg(*static_cast<const Message*>(&new_msg)) -
+            ExtractTimeStampFromMsg(*static_cast<const Message*>(&last_msg))) *
+           1000.0;
+  }
+
+  static double ExtractTimeStampFromMsg(
+      const google::protobuf::Message& message) {
+    using gpf = google::protobuf::FieldDescriptor;
+
+    auto descriptor = message.GetDescriptor();
+    auto header_descriptor = descriptor->FindFieldByName("header");
+
+    if (header_descriptor == nullptr ||
+        header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
+      return 0.0;
+    }
+
+    auto timestamp_sec_descriptor =
+        header_descriptor->message_type()->FindFieldByName("timestamp_sec");
+    if (timestamp_sec_descriptor == nullptr ||
+        timestamp_sec_descriptor->cpp_type() != gpf::CPPTYPE_DOUBLE) {
+      return 0.0;
+    }
+
+    const auto& header =
+        message.GetReflection()->GetMessage(message, header_descriptor);
+    return header.GetReflection()->GetDouble(header, timestamp_sec_descriptor);
+  }
+};
+
+template <>
+struct MessageDelay<sensor_msgs::PointCloud2> {
+  static double Get(const sensor_msgs::PointCloud2& new_msg,
+                    const sensor_msgs::PointCloud2& last_msg) {
+    return (new_msg.header.stamp - last_msg.header.stamp).sec * 1000.0;
+  }
+};
+
+}  // namespace internal
 
 /**
  * @class Adapter
@@ -146,6 +208,7 @@ class Adapter {
    * @param message the newly received message.
    */
   void OnReceive(const D& message) {
+    UpdateDelay(message);
     EnqueueData(message);
     FireCallbacks(message);
   }
@@ -260,6 +323,13 @@ class Adapter {
     return latest_published_data_.get();
   }
 
+  /**
+   * @brief Gets message delay in milliseconds.
+   */
+  double GetDelayInMs() {
+    return delay_ms_;
+  }
+
  private:
   template <typename T>
   struct IdentifierType {};
@@ -282,9 +352,9 @@ class Adapter {
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
-      typename std::enable_if<
+      enable_if_t<
           !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type* message = nullptr) {
+          InputMessageType>* message = nullptr) {
     return false;
   }
 
@@ -292,36 +362,29 @@ class Adapter {
   // header.sequence_num.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
-      typename std::enable_if<
+      enable_if_t<
           std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type* message = nullptr) {
+          InputMessageType>* message = nullptr) {
     using gpf = google::protobuf::FieldDescriptor;
     InputMessageType sample;
     auto descriptor = sample.GetDescriptor();
     auto header_descriptor = descriptor->FindFieldByName("header");
-    if (header_descriptor == nullptr) {
+    if (header_descriptor == nullptr ||
+        header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
       return false;
     }
-    if (header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
-      return false;
-    }
+
     auto sequence_num_descriptor =
         header_descriptor->message_type()->FindFieldByName("sequence_num");
-    if (sequence_num_descriptor == nullptr) {
-      return false;
-    }
-    if (sequence_num_descriptor->cpp_type() != gpf::CPPTYPE_UINT32) {
-      return false;
-    }
-    return true;
+    return sequence_num_descriptor != nullptr &&
+           sequence_num_descriptor->cpp_type() == gpf::CPPTYPE_UINT32;
   }
 
   // DumpMessage does nothing for non proto message data type.
   template <typename InputMessageType>
-  bool DumpMessage(
-      const typename std::enable_if<
-          !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type& message) {
+  bool DumpMessage(const enable_if_t<!std::is_base_of<google::protobuf::Message,
+                                                      InputMessageType>::value,
+                                     InputMessageType>& message) {
     return true;
   }
 
@@ -329,10 +392,9 @@ class Adapter {
   // /tmp/<adapter_name>/<name>.pb.txt, where the message is in ASCII
   // mode and <name> is the .header().sequence_num() of the message.
   template <typename InputMessageType>
-  bool DumpMessage(
-      const typename std::enable_if<
-          std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type& message) {
+  bool DumpMessage(const enable_if_t<std::is_base_of<google::protobuf::Message,
+                                                     InputMessageType>::value,
+                                     InputMessageType>& message) {
     using google::protobuf::Message;
     auto descriptor = message.GetDescriptor();
     auto header_descriptor = descriptor->FindFieldByName("header");
@@ -387,6 +449,25 @@ class Adapter {
     data_queue_.push_front(std::make_shared<D>(data));
   }
 
+  /**
+   * @brief Calculates message delay based on message type. The various
+   * template
+   * speacialzations are defined in adapter.cc.
+   */
+  double CalculateDelayInMs(const D& new_msg, const D& last_msg) {
+    return internal::MessageDelay<D>::Get(new_msg, last_msg);
+  }
+
+  /**
+   * @brief Updates the message delay upon receiving a new message.
+   */
+  void UpdateDelay(const D& new_msg) {
+    if (!data_queue_.empty()) {
+      std::lock_guard<std::mutex> lock(mutex_);
+      delay_ms_ = CalculateDelayInMs(new_msg, *data_queue_.front());
+    }
+  }
+
   /// The topic name that the adapter listens to.
   std::string topic_name_;
 
@@ -418,6 +499,9 @@ class Adapter {
 
   /// The most recenct published data.
   std::unique_ptr<D> latest_published_data_;
+
+  /// The interval between receiving two consecutive messages.
+  double delay_ms_ = std::numeric_limits<double>::quiet_NaN();
 };
 
 }  // namespace adapter
