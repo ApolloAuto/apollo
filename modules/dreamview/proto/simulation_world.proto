@@ -138,21 +138,13 @@ message Object {
   repeated Prediction prediction = 26;
 }
 
-message DelayItem {
-  optional uint32 delay = 1;
-  optional uint32 last_delay = 2;
-}
-
-message Delay {
-  optional DelayItem adc_status = 1;
-  optional DelayItem decision = 2;
-  optional DelayItem localization = 3;
-  optional DelayItem localization_pcl = 4;
-  optional DelayItem perception_obstacle = 5;
-  optional DelayItem perception_radar = 6;
-  optional DelayItem planning_trajectory = 7;
-  optional DelayItem prediction= 8;
-  optional DelayItem traffic_light = 10;
+message DelaysInMs {
+  optional double chassis = 1;
+  optional double localization = 3;
+  optional double perception_obstacle = 4;
+  optional double planning = 5;
+  optional double prediction= 7;
+  optional double traffic_light = 8;
 }
 
 // Next-id: 17
@@ -186,7 +178,7 @@ message SimulationWorld {
   // Speed limit
   optional double speed_limit = 11;
 
-  optional Delay delay = 12;
+  optional DelaysInMs delay = 12;
 
   optional .apollo.common.monitor.MonitorMessage monitor = 13;
 }
