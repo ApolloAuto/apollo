@@ -55,63 +55,6 @@ namespace adapter {
 template <bool B, class T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
-namespace internal {
-
-// A few partial template specialzations to get message delays for different
-// message types.
-template <class T, class Enable = void>
-struct MessageDelay {
-  static double Get(const T& new_msg, const T& last_msg) {
-    return 0.0;
-  }
-};
-
-template <class T>
-struct MessageDelay<
-    T, enable_if_t<std::is_base_of<google::protobuf::Message, T>::value>> {
-  static double Get(const T& new_msg, const T& last_msg) {
-    using google::protobuf::Message;
-
-    return (ExtractTimeStampFromMsg(*static_cast<const Message*>(&new_msg)) -
-            ExtractTimeStampFromMsg(*static_cast<const Message*>(&last_msg))) *
-           1000.0;
-  }
-
-  static double ExtractTimeStampFromMsg(
-      const google::protobuf::Message& message) {
-    using gpf = google::protobuf::FieldDescriptor;
-
-    auto descriptor = message.GetDescriptor();
-    auto header_descriptor = descriptor->FindFieldByName("header");
-
-    if (header_descriptor == nullptr ||
-        header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
-      return 0.0;
-    }
-
-    auto timestamp_sec_descriptor =
-        header_descriptor->message_type()->FindFieldByName("timestamp_sec");
-    if (timestamp_sec_descriptor == nullptr ||
-        timestamp_sec_descriptor->cpp_type() != gpf::CPPTYPE_DOUBLE) {
-      return 0.0;
-    }
-
-    const auto& header =
-        message.GetReflection()->GetMessage(message, header_descriptor);
-    return header.GetReflection()->GetDouble(header, timestamp_sec_descriptor);
-  }
-};
-
-template <>
-struct MessageDelay<sensor_msgs::PointCloud2> {
-  static double Get(const sensor_msgs::PointCloud2& new_msg,
-                    const sensor_msgs::PointCloud2& last_msg) {
-    return (new_msg.header.stamp - last_msg.header.stamp).sec * 1000.0;
-  }
-};
-
-}  // namespace internal
-
 /**
  * @class Adapter
  * @brief this class serves as the interface and a layer of
@@ -455,7 +398,7 @@ class Adapter {
    * speacialzations are defined in adapter.cc.
    */
   double CalculateDelayInMs(const D& new_msg, const D& last_msg) {
-    return internal::MessageDelay<D>::Get(new_msg, last_msg);
+    return MessageDelay<D>::Get(new_msg, last_msg);
   }
 
   /**
@@ -467,6 +410,61 @@ class Adapter {
       delay_ms_ = CalculateDelayInMs(new_msg, *data_queue_.front());
     }
   }
+
+  /// A few partial template specialzations to get message delays for different
+  /// message types.
+  template <class T, class Enable = void>
+  struct MessageDelay {
+    static double Get(const T& new_msg, const T& last_msg) {
+      return 0.0;
+    }
+  };
+
+  template <class T>
+  struct MessageDelay<
+      T, enable_if_t<std::is_base_of<google::protobuf::Message, T>::value>> {
+    static double Get(const T& new_msg, const T& last_msg) {
+      using google::protobuf::Message;
+
+      return (ExtractTimeStampFromMsg(*static_cast<const Message*>(&new_msg)) -
+              ExtractTimeStampFromMsg(
+                  *static_cast<const Message*>(&last_msg))) *
+             1000.0;
+    }
+
+    static double ExtractTimeStampFromMsg(
+        const google::protobuf::Message& message) {
+      using gpf = google::protobuf::FieldDescriptor;
+
+      auto descriptor = message.GetDescriptor();
+      auto header_descriptor = descriptor->FindFieldByName("header");
+
+      if (header_descriptor == nullptr ||
+          header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
+        return 0.0;
+      }
+
+      auto timestamp_sec_descriptor =
+          header_descriptor->message_type()->FindFieldByName("timestamp_sec");
+      if (timestamp_sec_descriptor == nullptr ||
+          timestamp_sec_descriptor->cpp_type() != gpf::CPPTYPE_DOUBLE) {
+        return 0.0;
+      }
+
+      const auto& header =
+          message.GetReflection()->GetMessage(message, header_descriptor);
+      return header.GetReflection()->GetDouble(header,
+                                               timestamp_sec_descriptor);
+    }
+  };
+
+  template <class Enable>
+  struct MessageDelay<sensor_msgs::PointCloud2, Enable> {
+    static double Get(const sensor_msgs::PointCloud2& new_msg,
+                      const sensor_msgs::PointCloud2& last_msg) {
+      return (new_msg.header.stamp - last_msg.header.stamp).sec * 1000.0;
+    }
+  };
 
   /// The topic name that the adapter listens to.
   std::string topic_name_;
