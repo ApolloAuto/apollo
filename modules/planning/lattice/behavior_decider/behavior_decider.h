@@ -29,6 +29,7 @@
 #include "modules/planning/lattice/planning_target.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/lattice_sampling_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -39,13 +40,13 @@ public:
 
   virtual ~BehaviorDecider() = default;
 
-  PlanningTarget analyze(Frame* frame,
+  PlanningObject analyze(Frame* frame,
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     std::vector<ReferenceLine>& candidate_reference_lines);
 
 private:
-  PlanningTarget previous_planning_target;
+  PlanningObject previous_planning_target;
 };
 
 } // namespace planning

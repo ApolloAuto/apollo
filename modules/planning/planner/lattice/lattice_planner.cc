@@ -25,6 +25,7 @@
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 #include "modules/planning/lattice/collision_checker.h"
 #include "modules/planning/lattice/lattice_constraint_checker.h"
+#include "modules/planning/lattice/lattice_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -56,8 +57,8 @@ Status LatticePlanner::Plan(
   num_planning_cycles++;
 
   //1. obtain a reference line and transform it to the PathPoint format.
-  auto discretized_reference_line =
-      ToDiscretizedReferenceLine(reference_line_info->reference_line().reference_points());
+  auto discretized_reference_line = apollo::planning::ToDiscretizedReferenceLine(
+    reference_line_info->reference_line().reference_points());
 
   //2. compute the matched point of the init planning point on the reference line.
   PathPoint matched_point = ReferenceLineMatcher::match_to_reference_line(
@@ -280,32 +281,6 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
       t_param = t_param + trajectory_time_resolution;
   }
   return combined_trajectory;
-}
-
-std::vector<PathPoint> LatticePlanner::ToDiscretizedReferenceLine(
-    const std::vector<ReferencePoint>& ref_points) const {
-
-  double s = 0.0;
-  std::vector<PathPoint> path_points;
-  for (const auto& ref_point : ref_points) {
-    PathPoint path_point;
-    path_point.set_x(ref_point.x());
-    path_point.set_y(ref_point.y());
-    path_point.set_theta(ref_point.heading());
-    path_point.set_kappa(ref_point.kappa());
-    path_point.set_dkappa(ref_point.dkappa());
-
-    double dx = 0.0;
-    double dy = 0.0;
-    if (!path_points.empty()) {
-      dx = path_point.x() - path_points.back().x();
-      dy = path_point.y() - path_points.back().y();
-      s += std::sqrt(dx * dx + dy * dy);
-    }
-    path_point.set_s(s);
-    path_points.push_back(std::move(path_point));
-  }
-  return path_points;
 }
 
 }  // namespace planning

@@ -19,8 +19,14 @@
 #ifndef MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
 #define MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
 
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/reference_line/reference_point.h"
+
 namespace apollo {
 namespace planning {
+
+std::vector<common::PathPoint> ToDiscretizedReferenceLine(
+    const std::vector<ReferencePoint>& ref_points);
 
 }  // namespace planning
 }  // namespace apollo

@@ -47,9 +47,6 @@ class LatticePlanner : public Planner {
           const Curve1d& lon_trajectory,
           const Curve1d& lat_trajectory,
           const double init_relative_time = 0.0) const;
-
-  std::vector<common::PathPoint> ToDiscretizedReferenceLine(
-      const std::vector<ReferencePoint>& ref_points) const;
 };
 
 }  // namespace planning
