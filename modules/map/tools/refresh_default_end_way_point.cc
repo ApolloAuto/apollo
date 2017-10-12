@@ -26,23 +26,23 @@
 
 #include <string>
 
-#include "modules/common/util/file.h"
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace hdmap {
 
-apollo::common::PointENU SLToXYZ(const std::string& lane_id,
-                                 const double s, const double l) {
+apollo::common::PointENU SLToXYZ(const std::string& lane_id, const double s,
+                                 const double l) {
   const auto lane_info = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
   CHECK(lane_info);
   return lane_info->GetSmoothPoint(s);
 }
 
-void XYZToSL(const apollo::common::PointENU& point,
-             std::string* lane_id, double* s, double* l) {
+void XYZToSL(const apollo::common::PointENU& point, std::string* lane_id,
+             double* s, double* l) {
   CHECK(lane_id);
   CHECK(s);
   CHECK(l);
@@ -62,7 +62,7 @@ double XYZDistance(const apollo::common::PointENU& p1,
 
 void RefreshDefaultEndPoint() {
   // Read xyz from old point.
-  apollo::routing::RoutingRequest::LaneWaypoint old_end_point;
+  apollo::routing::LaneWaypoint old_end_point;
   CHECK(apollo::common::util::GetProtoFromASCIIFile(EndWayPointFile(),
                                                     &old_end_point));
   apollo::common::PointENU old_xyz;
@@ -80,7 +80,7 @@ void RefreshDefaultEndPoint() {
   const auto new_xyz = SLToXYZ(new_lane, new_s, new_l);
 
   // Update default end way point.
-  apollo::routing::RoutingRequest::LaneWaypoint new_end_point;
+  apollo::routing::LaneWaypoint new_end_point;
   new_end_point.set_id(new_lane);
   new_end_point.set_s(new_s);
   auto* pose = new_end_point.mutable_pose();
@@ -91,14 +91,14 @@ void RefreshDefaultEndPoint() {
                                                   EndWayPointFile()));
   AINFO << "Refreshed default end way point\n ============ from ============ \n"
         << old_end_point.DebugString() << "\n ============ to ============ \n"
-        << new_end_point.DebugString()
-        << "XYZ distance is " << XYZDistance(old_xyz, new_xyz);
+        << new_end_point.DebugString() << "XYZ distance is "
+        << XYZDistance(old_xyz, new_xyz);
 }
 
 }  // namespace hdmap
 }  // namespace apollo
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_logtostderr = true;

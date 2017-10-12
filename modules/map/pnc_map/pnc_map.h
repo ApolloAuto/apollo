@@ -62,9 +62,8 @@ class PncMap {
 
   bool ValidateRouting(const routing::RoutingResponse &routing) const;
 
-  bool AddPathFromPassageRegion(
-      const routing::RoutingResponse::PassageRegion &passage_region,
-      std::vector<Path> *paths) const;
+  bool AddPathFromPassageRegion(const routing::Passage &passage_region,
+                                std::vector<Path> *paths) const;
 
   static void AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
                                  const double end_s,
