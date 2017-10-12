@@ -22,6 +22,7 @@ cc_library(
         "//modules/planning/lattice:trajectory_evaluator",
         "//modules/planning/lattice:collision_checker",
         "//modules/planning/lattice:lattice_constraint_checker",
+        "//modules/planning/lattice:decision_analyzer",
         "//modules/planning/lattice/behavior_decider:behavior_decider",
         "//modules/planning/lattice:lattice_util",
     ],
