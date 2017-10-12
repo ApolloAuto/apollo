@@ -127,11 +127,12 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
 }
 
 const Obstacle *Frame::CreateDestinationObstacle() {
-  if (!routing_response_.routing_request().has_end()) {
+  if (routing_response_.routing_request().waypoint_size() < 2) {
     ADEBUG << "routing_request has no end";
     return nullptr;
   }
-  const auto &routing_end = routing_response_.routing_request().end();
+  const auto &routing_end =
+      *routing_response_.routing_request().waypoint().rbegin();
   common::PointENU dest_point = common::util::MakePointENU(
       routing_end.pose().x(), routing_end.pose().y(), 0.0);
   const auto lane =

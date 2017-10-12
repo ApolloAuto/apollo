@@ -98,7 +98,8 @@ void SimControl::SetStartPoint(const double x, const double y) {
 }
 
 void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
-  const auto& start_pose = routing.routing_request().start().pose();
+  DCHECK_LE(2, routing.routing_request().waypoint_size());
+  const auto& start_pose = routing.routing_request().waypoint(0).pose();
   SetStartPoint(start_pose.x(), start_pose.y());
 }
 
@@ -119,9 +120,7 @@ void SimControl::Start() {
   }
 }
 
-void SimControl::Stop() {
-  sim_control_timer_.stop();
-}
+void SimControl::Stop() { sim_control_timer_.stop(); }
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
   // Reset current trajectory and the indices upon receiving a new trajectory.
