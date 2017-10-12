@@ -31,12 +31,7 @@ bool NodeSRange::IsEnoughForChangeLane(double length) {
   return (length > FLAGS_min_length_for_lane_change);
 }
 
-NodeSRange::NodeSRange() : start_s_(0.0), end_s_(0.0) {}
-
 NodeSRange::NodeSRange(double s1, double s2) : start_s_(s1), end_s_(s2) {}
-
-NodeSRange::NodeSRange(const NodeSRange& other)
-    : start_s_(other.StartS()), end_s_(other.EndS()) {}
 
 bool NodeSRange::operator<(const NodeSRange& other) const {
   return StartS() < other.StartS();

@@ -16,14 +16,11 @@
 
 #include "modules/routing/core/navigator.h"
 
-#include <assert.h>
-
 #include <algorithm>
 #include <fstream>
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/strategy/a_star_strategy.h"
@@ -132,7 +129,7 @@ void PrintDebugData(const std::vector<NodeWithRange>& nodes) {
 
 }  // namespace
 
-Navigator::Navigator(const std::string& topo_file_path) : is_ready_(false) {
+Navigator::Navigator(const std::string& topo_file_path) {
   Graph graph;
   if (!common::util::GetProtoFromFile(topo_file_path, &graph)) {
     AERROR << "Failed to read topology graph from " << topo_file_path;
@@ -173,20 +170,17 @@ bool Navigator::Init(const RoutingRequest& request, const TopoGraph* graph,
 bool Navigator::MergeRoute(
     const std::vector<NodeWithRange>& node_vec,
     std::vector<NodeWithRange>* const result_node_vec) const {
-  bool need_to_merge = false;
-  for (size_t i = 0; i < node_vec.size(); ++i) {
-    if (!need_to_merge) {
-      result_node_vec->push_back(node_vec[i]);
+  for (const auto& node : node_vec) {
+    if (result_node_vec->empty() ||
+        result_node_vec->back().GetTopoNode() != node.GetTopoNode()) {
+      result_node_vec->push_back(node);
     } else {
-      if (result_node_vec->back().EndS() < node_vec[i].StartS()) {
+      if (result_node_vec->back().EndS() < node.StartS()) {
         AERROR << "Result route is not coninuous";
         return false;
+      } else {
+        result_node_vec->back().SetEndS(node.EndS());
       }
-      result_node_vec->back().SetEndS(node_vec[i].EndS());
-    }
-    if (i < node_vec.size() - 1) {
-      need_to_merge =
-          (node_vec[i].GetTopoNode() == node_vec[i + 1].GetTopoNode());
     }
   }
   return true;

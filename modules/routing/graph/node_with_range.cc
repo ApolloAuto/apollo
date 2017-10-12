@@ -19,8 +19,11 @@
 namespace apollo {
 namespace routing {
 
-NodeWithRange::NodeWithRange(const NodeSRange& range, const TopoNode* node)
+NodeWithRange::NodeWithRange(const TopoNode* node, const NodeSRange& range)
     : NodeSRange(range), topo_node_(node) {}
+
+NodeWithRange::NodeWithRange(const TopoNode* node, double start_s, double end_s)
+    : NodeSRange(start_s, end_s), topo_node_(node) {}
 
 NodeWithRange::~NodeWithRange() {}
 
