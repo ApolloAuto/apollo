@@ -147,6 +147,10 @@ message DelaysInMs {
   optional double traffic_light = 8;
 }
 
+message RoutePath {
+  repeated PolygonPoint point = 1;
+}
+
 // Next-id: 17
 message SimulationWorld {
   // Time
@@ -164,8 +168,8 @@ message SimulationWorld {
   // Traffic light status
   optional Object traffic_signal = 6;
 
-  // Routing path
-  repeated PolygonPoint route = 7;
+  // Routing paths
+  repeated RoutePath route_path = 7;
   // Timestamp of latest routing
   optional double routing_time = 8;
 

@@ -37,8 +37,10 @@
 
 namespace apollo {
 namespace hdmap {
-namespace {
+
 using apollo::routing::RoutingResponse;
+
+namespace {
 
 // Minimum error in lane segmentation.
 const double kSegmentationEpsilon = 0.2;
@@ -429,32 +431,46 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
   }
 }
 
-bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
-                                   Path *const path) const {
-  LaneSegments segments;
+bool PncMap::CreatePathsFromRouting(const RoutingResponse &routing,
+                                    std::vector<Path> *paths) const {
   for (const auto &way : routing.route()) {
-    if (way.has_road_info() && !way.road_info().passage_region().empty()) {
-      for (const auto &segment : way.road_info().passage_region(0).segment()) {
-        auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
-        if (!lane_ptr) {
-          AERROR << "Failed to fine lane: " << segment.id();
+    if (way.has_road_info()) {
+      for (const auto &passage_region : way.road_info().passage_region()) {
+        // Each passage region in a road forms a path
+        if (!AddPathFromPassageRegion(passage_region, paths)) {
           return false;
         }
-        segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
       }
     } else if (way.has_junction_info()) {
-      for (const auto &segment :
-           way.junction_info().passage_region().segment()) {
-        auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
-        if (!lane_ptr) {
-          AERROR << "Failed to fine lane: " << segment.id();
-          return false;
-        }
-        segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
+      // Each junction forms a path that connects two roads
+      if (!AddPathFromPassageRegion(way.junction_info().passage_region(),
+                                    paths)) {
+        return false;
       }
     }
   }
-  return CreatePathFromLaneSegments(segments, path);
+  return true;
+}
+
+bool PncMap::AddPathFromPassageRegion(
+    const RoutingResponse::PassageRegion &passage_region,
+    std::vector<Path> *paths) const {
+  LaneSegments segments;
+  for (const auto &segment : passage_region.segment()) {
+    auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
+    if (!lane_ptr) {
+      AERROR << "Failed to find lane: " << segment.id();
+      return false;
+    }
+    segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
+  }
+  Path path;
+  if (!CreatePathFromLaneSegments(segments, &path)) {
+    return false;
+  }
+  paths->push_back(path);
+
+  return true;
 }
 
 bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
@@ -475,7 +491,9 @@ bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
   return true;
 }
 
-const HDMap &PncMap::HDMap() const { return hdmap_; }
+const HDMap &PncMap::HDMap() const {
+  return hdmap_;
+}
 
 }  // namespace hdmap
 }  // namespace apollo

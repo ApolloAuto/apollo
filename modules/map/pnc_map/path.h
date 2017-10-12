@@ -17,8 +17,6 @@
 #ifndef MODULES_MAP_PNC_MAP_PATH_H_
 #define MODULES_MAP_PNC_MAP_PATH_H_
 
-#pragma once
-
 #include <cmath>
 #include <functional>
 #include <memory>
