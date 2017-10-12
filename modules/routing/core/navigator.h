@@ -58,7 +58,7 @@ class Navigator {
                   std::vector<NodeWithRange>* const result_node_vec) const;
 
  private:
-  bool is_ready_;
+  bool is_ready_ = false;
   std::unique_ptr<TopoGraph> graph_;
 
   TopoRangeManager topo_range_manager_;
