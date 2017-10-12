@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import STORE from "store";
 
-import { drawSegmentsFromPoints } from "utils/draw";
+import { drawThickBandFromPoints } from "utils/draw";
 
 const _ = require('lodash');
 
@@ -36,8 +36,8 @@ export default class Routing {
 
         world.routePath.forEach(path => {
             const points = coordinates.applyOffsetToArray(path.point);
-            const pathMesh = drawSegmentsFromPoints(points, 0xFF0000 /* red */,
-                10 /* width */ , 5 /* zOffset */, true, true, 0.6 /* opacity */);
+            const pathMesh = drawThickBandFromPoints(points, 0.3 /* width */,
+                0xFF0000 /* red */, 0.6, 5 /* z offset */);
             pathMesh.visible = STORE.options.showRouting;
             scene.add(pathMesh);
             this.routePaths.push(pathMesh);
