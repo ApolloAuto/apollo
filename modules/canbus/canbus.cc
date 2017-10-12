@@ -16,7 +16,7 @@
 
 #include "modules/canbus/canbus.h"
 
-#include "modules/canbus/can_client/can_client_factory.h"
+#include "modules/common/canbus/can_client/can_client_factory.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_manager.h"

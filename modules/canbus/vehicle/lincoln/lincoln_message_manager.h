@@ -22,7 +22,7 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
 
-#include "modules/canbus/vehicle/message_manager.h"
+#include "modules/common/canbus/can_comm/message_manager.h"
 
 /**
  * @namespace apollo::canbus::lincoln

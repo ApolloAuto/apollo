@@ -16,7 +16,7 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/brakeinfo_74.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/common/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
