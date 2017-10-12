@@ -18,7 +18,7 @@
 
 #include "glog/logging.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/common/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {

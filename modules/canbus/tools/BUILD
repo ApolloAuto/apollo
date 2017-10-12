@@ -7,6 +7,7 @@ cc_binary(
     srcs = ["canbus_tester.cc"],
     deps = [
         "//modules/canbus:canbus_lib",
+        "//modules/canbus/common:canbus_common",
         "//modules/common",
         "@ros//:ros_common",
     ],

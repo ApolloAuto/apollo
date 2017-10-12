@@ -22,7 +22,7 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_66_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_66_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/common/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
