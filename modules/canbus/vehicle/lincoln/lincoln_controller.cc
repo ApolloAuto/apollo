@@ -18,7 +18,7 @@
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
-#include "modules/canbus/can_comm/can_sender.h"
+#include "modules/common/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"

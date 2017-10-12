@@ -22,7 +22,7 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_GPS_6F_H_
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_GPS_6F_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/common/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln

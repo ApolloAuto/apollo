@@ -16,7 +16,7 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/steering_65.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/common/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
