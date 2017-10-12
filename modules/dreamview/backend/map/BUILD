@@ -11,7 +11,6 @@ cc_library(
         "map_service.h",
     ],
     deps = [
-        "//modules/common/util:points_downsampler",
         "//modules/map/pnc_map",
         "//third_party/json",
         "@glog//:glog",
