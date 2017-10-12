@@ -28,6 +28,7 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
@@ -35,6 +36,9 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+namespace apollo {
+namespace dreamview {
 
 using apollo::common::Point3D;
 using apollo::common::adapter::AdapterManager;
@@ -61,12 +65,10 @@ using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
 using apollo::common::util::GetProtoFromFile;
-using apollo::hdmap::MapPathPoint;
+using apollo::common::util::DownsampleByAngle;
+using apollo::hdmap::Path;
 
 using Json = nlohmann::json;
-
-namespace apollo {
-namespace dreamview {
 
 namespace {
 
@@ -657,17 +659,28 @@ void SimulationWorldService::UpdateSimulationWorld(
     const RoutingResponse &routing_response) {
   auto header_time = routing_response.header().timestamp_sec();
 
-  std::vector<MapPathPoint> points;
-  if (!map_service_->GetPointsFromRouting(routing_response, &points)) {
+  std::vector<Path> paths;
+  if (!map_service_->GetPathsFromRouting(routing_response, &paths)) {
     return;
   }
 
-  world_.clear_route();
+  world_.clear_route_path();
   world_.set_routing_time(header_time);
-  for (const auto &point : points) {
-    PolygonPoint *route_point = world_.add_route();
-    route_point->set_x(point.x());
-    route_point->set_y(point.y());
+
+  for (const Path &path : paths) {
+    // Downsample the path points for frontend display.
+    // Angle threshold is about 5.72 degree.
+    constexpr double angle_threshold = 0.1;
+    std::vector<int> sampled_indices =
+        DownsampleByAngle(path.path_points(), angle_threshold);
+
+    RoutePath *route_path = world_.add_route_path();
+    for (int index : sampled_indices) {
+      const auto &path_point = path.path_points()[index];
+      PolygonPoint *route_point = route_path->add_point();
+      route_point->set_x(path_point.x());
+      route_point->set_y(path_point.y());
+    }
   }
 
   world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
