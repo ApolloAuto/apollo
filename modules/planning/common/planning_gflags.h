@@ -130,5 +130,6 @@ DECLARE_string(signal_light_virtual_object_prefix);
 
 // lattice planner
 DECLARE_int32(num_lattice_traj_to_plot);
+DECLARE_double(default_cruise_speed);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

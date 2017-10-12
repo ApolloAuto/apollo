@@ -209,3 +209,5 @@ DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 // Lattice Planner
 DEFINE_int32(num_lattice_traj_to_plot, 5,
              "Number of lattice trajs to plot");
+DEFINE_double(default_cruise_speed, 5.0,
+             "default cruise speed");

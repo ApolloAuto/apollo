@@ -17,6 +17,7 @@
 #include "modules/planning/planner/lattice/lattice_planner.h"
 
 #include "modules/planning/lattice/decision_analyzer.h"
+#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/lattice_params.h"
 #include "modules/planning/lattice/reference_line_matcher.h"
 #include "modules/planning/lattice/planning_target.h"
