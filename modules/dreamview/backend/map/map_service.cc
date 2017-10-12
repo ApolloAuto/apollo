@@ -266,8 +266,7 @@ bool MapService::GetPoseWithRegardToLane(const double x, const double y,
 }
 
 bool MapService::ConstructLaneWayPoint(
-    const double x, const double y,
-    RoutingRequest::LaneWaypoint *laneWayPoint) const {
+    const double x, const double y, routing::LaneWaypoint *laneWayPoint) const {
   double s, l;
   LaneInfoConstPtr lane;
   if (!GetNearestLane(x, y, &lane, &s, &l)) {

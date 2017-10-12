@@ -88,81 +88,11 @@ PncMap::PncMap(const std::string &map_file) {
 }
 
 bool PncMap::ValidateRouting(const RoutingResponse &routing) const {
-  const int num_routes = routing.route_size();
-  if (num_routes == 0) {
+  const int num_road = routing.road_size();
+  if (num_road == 0) {
     AERROR << "Route is empty.";
     return false;
   }
-  /*
-    const double kLargeEps = 1e-3;
-    for (int i = 0; i < num_routes; ++i) {
-      const auto &segment = routing.route(i);
-      const auto lane = hdmap_.get_lane_by_id(MakeMapId(segment.id()));
-      if (lane == nullptr) {
-        AERROR << "Can not find lane with id = " + segment.id() + ".";
-        return false;
-      }
-      if (segment.start_s() > segment.end_s() + kLargeEps) {
-        AERROR << "Segment " << i << " is empty.";
-        return false;
-      }
-      bool start_point_in_lane_change = false;
-      bool end_point_in_lane_change = false;
-      for (const auto &info : routing.lane_change_info()) {
-        if (i > info.start_route_index() && i <= info.end_route_index()) {
-          start_point_in_lane_change = true;
-        }
-        if (i >= info.start_route_index() && i < info.end_route_index()) {
-          end_point_in_lane_change = true;
-        }
-      }
-      if (!start_point_in_lane_change &&
-          ((i > 0 && std::abs(segment.start_s()) > kLargeEps) ||
-           (i == 0 && segment.start_s() < -kLargeEps))) {
-        AERROR << "Segment " << i << " (lane " << segment.id()
-               << ") should start at s = 0.";
-        return false;
-      }
-      if (!end_point_in_lane_change &&
-          ((i < num_routes - 1 &&
-            std::abs(segment.end_s() - lane->total_length()) > kLargeEps) ||
-           (i == num_routes - 1 &&
-            segment.end_s() > lane->total_length() + kLargeEps))) {
-        AERROR << "Segment " << i << " (lane " << segment.id()
-               << ") should end at s = " << lane->total_length() << ".";
-        return false;
-      }
-    }
-    for (int i = 0; i < num_routes - 1; ++i) {
-      bool is_lane_change = false;
-      for (const auto &info : routing.lane_change_info()) {
-        if (i >= info.start_route_index() && i < info.end_route_index()) {
-          is_lane_change = true;
-          break;
-        }
-      }
-      if (is_lane_change) {
-        // TODO: check lane change information.
-        continue;
-      }
-      const auto &segment = routing.route(i);
-      const auto lane = hdmap_.get_lane_by_id(MakeMapId(segment.id()));
-      const std::string next_id = routing.route(i + 1).id();
-      bool is_successor = false;
-      for (const auto &other_lane_id : lane->lane().successor_id()) {
-        if (other_lane_id.id() == next_id) {
-          is_successor = true;
-          break;
-        }
-      }
-      if (!is_successor) {
-        AERROR << "Lane " + segment.id() + " can not connect to Lane " + next_id
-    +
-                      ".";
-        return false;
-      }
-    }
-  */
   return true;
 }
 
@@ -194,16 +124,9 @@ bool PncMap::GetLaneSegmentsFromRouting(
   }
   // get all lanes from routing
   std::unordered_set<std::string> routing_lane_ids;
-  for (const auto &way : routing.route()) {
-    if (way.has_road_info()) {
-      for (const auto &passage_region : way.road_info().passage_region()) {
-        for (const auto &segment : passage_region.segment()) {
-          routing_lane_ids.insert(segment.id());
-        }
-      }
-    } else if (way.has_junction_info()) {
-      for (const auto &segment :
-           way.junction_info().passage_region().segment()) {
+  for (const auto &road_segment : routing.road()) {
+    for (const auto &passage : road_segment.passage()) {
+      for (const auto &segment : passage.segment()) {
         routing_lane_ids.insert(segment.id());
       }
     }
@@ -241,31 +164,9 @@ bool PncMap::GetLaneSegmentsFromRouting(
   double accumulate_s = 0.0;
   LaneSegments connected_lanes;
   LaneSegments cropped_lanes;
-  bool found_region = false;
-  for (const auto &way : routing.route()) {
-    if (!way.has_road_info()) {  // skip checking junction_info
-      continue;
-    }
-    for (const auto &passage_region : way.road_info().passage_region()) {
-      if (passage_region.segment().empty()) {
-        continue;
-      }
-      if (!found_region) {
-        bool on_current_region = false;
-        for (const auto &waypoint : nearest_waypoints) {
-          for (const auto &segment : passage_region.segment()) {
-            if (segment.id() == waypoint.lane->id().id()) {
-              on_current_region = true;
-            }
-          }
-        }
-        if (!on_current_region) {
-          break;
-        } else {
-          found_region = true;
-        }
-      }
-      for (const auto &lane_segment : passage_region.segment()) {
+  for (const auto &road_segment : routing.road()) {
+    for (const auto &passage : road_segment.passage()) {
+      for (const auto &lane_segment : passage.segment()) {
         const double length = lane_segment.end_s() - lane_segment.start_s();
         auto lane = hdmap_.GetLaneById(MakeMapId(lane_segment.id()));
         if (!lane) {
@@ -433,18 +334,10 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
 
 bool PncMap::CreatePathsFromRouting(const RoutingResponse &routing,
                                     std::vector<Path> *paths) const {
-  for (const auto &way : routing.route()) {
-    if (way.has_road_info()) {
-      for (const auto &passage_region : way.road_info().passage_region()) {
-        // Each passage region in a road forms a path
-        if (!AddPathFromPassageRegion(passage_region, paths)) {
-          return false;
-        }
-      }
-    } else if (way.has_junction_info()) {
-      // Each junction forms a path that connects two roads
-      if (!AddPathFromPassageRegion(way.junction_info().passage_region(),
-                                    paths)) {
+  for (const auto &road : routing.road()) {
+    for (const auto &passage_region : road.passage()) {
+      // Each passage region in a road forms a path
+      if (!AddPathFromPassageRegion(passage_region, paths)) {
         return false;
       }
     }
@@ -452,9 +345,8 @@ bool PncMap::CreatePathsFromRouting(const RoutingResponse &routing,
   return true;
 }
 
-bool PncMap::AddPathFromPassageRegion(
-    const RoutingResponse::PassageRegion &passage_region,
-    std::vector<Path> *paths) const {
+bool PncMap::AddPathFromPassageRegion(const routing::Passage &passage_region,
+                                      std::vector<Path> *paths) const {
   LaneSegments segments;
   for (const auto &segment : passage_region.segment()) {
     auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
@@ -491,9 +383,7 @@ bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
   return true;
 }
 
-const HDMap &PncMap::HDMap() const {
-  return hdmap_;
-}
+const HDMap &PncMap::HDMap() const { return hdmap_; }
 
 }  // namespace hdmap
 }  // namespace apollo

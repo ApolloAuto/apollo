@@ -53,11 +53,6 @@ void NodeSRange::SetStartS(double start_s) { start_s_ = start_s; }
 
 void NodeSRange::SetEndS(double end_s) { end_s_ = end_s; }
 
-void NodeSRange::SetRangeS(double start_s, double end_s) {
-  start_s_ = start_s;
-  end_s_ = end_s;
-}
-
 bool NodeSRange::MergeRangeOverlap(const NodeSRange& other) {
   if (!IsValid() || !other.IsValid()) {
     return false;

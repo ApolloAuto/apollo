@@ -68,8 +68,7 @@ void Routing::OnRouting_Request(
   if (!navigator_ptr_->SearchRoute(routing_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
 
-    buffer.WARN("Routing failed! " +
-                routing_response.error_code().error_string());
+    buffer.WARN("Routing failed! " + routing_response.status().msg());
     return;
   }
   buffer.INFO("Routing success!");

@@ -90,14 +90,11 @@ class MapService {
    * @param laneWayPoint RoutingRequest's lane waypoint
    * @return True if the lane waypoint is filled successfully.
    */
-  bool ConstructLaneWayPoint(
-      const double x, const double y,
-      routing::RoutingRequest::LaneWaypoint *laneWayPoint) const;
+  bool ConstructLaneWayPoint(const double x, const double y,
+                             routing::LaneWaypoint *laneWayPoint) const;
 
  private:
-  const hdmap::HDMap &BaseMap() const {
-    return pnc_map_.HDMap();
-  }
+  const hdmap::HDMap &BaseMap() const { return pnc_map_.HDMap(); }
 
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
