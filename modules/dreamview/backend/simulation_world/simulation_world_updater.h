@@ -98,7 +98,7 @@ class SimulationWorldUpdater {
   WebSocketHandler *websocket_;
 
   // End point for requesting default route
-  apollo::routing::RoutingRequest::LaneWaypoint default_end_point_;
+  apollo::routing::LaneWaypoint default_end_point_;
 
   // The json string to be pushed to frontend, which is updated by timer.
   std::string simulation_world_json_;

@@ -111,11 +111,9 @@ void GetNodesOfWays(
 bool ExtractBasicPassages(
     const std::vector<NodeWithRange>& nodes,
     std::vector<std::vector<NodeWithRange>>* const nodes_of_passages,
-    std::vector<RoutingResponse::LaneChangeInfo::Type>* const
-        lane_change_types) {
+    std::vector<ChangeLaneType>* change_lane_type) {
   CHECK(!nodes.empty());
   nodes_of_passages->clear();
-  lane_change_types->clear();
   std::vector<NodeWithRange> nodes_of_passage;
   nodes_of_passage.push_back(nodes.at(0));
   for (size_t i = 1; i < nodes.size(); ++i) {
@@ -127,18 +125,17 @@ bool ExtractBasicPassages(
       return false;
     }
     if (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT) {
+      if (edge->Type() == TET_LEFT) {
+        change_lane_type->emplace_back(LEFT);
+      } else {
+        change_lane_type->emplace_back(RIGHT);
+      }
       nodes_of_passages->push_back(nodes_of_passage);
       nodes_of_passage.clear();
-      if (edge->Type() == TET_LEFT) {
-        lane_change_types->push_back(
-            RoutingResponse::LaneChangeInfo::LEFT_FORWARD);
-      } else {
-        lane_change_types->push_back(
-            RoutingResponse::LaneChangeInfo::RIGHT_FORWARD);
-      }
     }
     nodes_of_passage.push_back(nodes.at(i));
   }
+  change_lane_type->emplace_back(FORWARD);
   nodes_of_passages->push_back(nodes_of_passage);
   return true;
 }
@@ -341,9 +338,9 @@ void ExtendPassages(
 }
 
 void LaneNodesToPassageRegion(const std::vector<NodeWithRange>& nodes,
-                              RoutingResponse::PassageRegion* const region) {
+                              Passage* const passage) {
   for (const auto& node : nodes) {
-    RoutingResponse::LaneSegment* seg = region->add_segment();
+    LaneSegment* seg = passage->add_segment();
     seg->set_id(node.LaneId());
     seg->set_start_s(node.StartS());
     seg->set_end_s(node.EndS());
@@ -363,23 +360,14 @@ double CalculateDistance(const std::vector<NodeWithRange>& nodes) {
   return distance;
 }
 
-void PrintDebugInfo(const std::vector<std::vector<std::vector<NodeWithRange>>>&
-                        nodes_of_passages_of_ways,
-                    const std::vector<std::string>& road_id_of_ways,
-                    const std::vector<bool>& is_virtual_of_ways) {
-  for (size_t i = 0; i < nodes_of_passages_of_ways.size(); ++i) {
-    if (is_virtual_of_ways[i]) {
-      AINFO << "----------Way " << i << " juntion----------";
-    } else {
-      AINFO << "----------Way " << i << " road----------";
-    }
-    AINFO << "road id: " << road_id_of_ways[i].c_str();
-    for (size_t j = 0; j < nodes_of_passages_of_ways[i].size(); ++j) {
-      AINFO << "\tPassage " << j;
-      for (const auto& node : nodes_of_passages_of_ways[i][j]) {
-        AINFO << "\t\t" << node.LaneId() << "   (" << node.StartS() << ", "
-              << node.EndS() << ")";
-      }
+void PrintDebugInfo(const std::string& road_id,
+                    const std::vector<std::vector<NodeWithRange>>& nodes) {
+  AINFO << "road id: " << road_id;
+  for (size_t j = 0; j < nodes.size(); ++j) {
+    AINFO << "\tPassage " << j;
+    for (const auto& node : nodes[j]) {
+      AINFO << "\t\t" << node.LaneId() << "   (" << node.StartS() << ", "
+            << node.EndS() << ")";
     }
   }
 }
@@ -411,87 +399,33 @@ bool ResultGenerator::GeneratePassageRegion(
   } else {
     GetNodesOfWaysBasedOnVirtual(nodes, &nodes_of_ways);
   }
-  std::vector<std::vector<std::vector<NodeWithRange>>>
-      nodes_of_passages_of_ways;
-  std::vector<std::vector<RoutingResponse::LaneChangeInfo::Type>>
-      lane_change_types_of_ways;
   std::vector<std::string> road_id_of_ways;
-  std::vector<bool> is_virtual_of_ways;
   for (const auto& way : nodes_of_ways) {
     std::vector<std::vector<NodeWithRange>> nodes_of_passages;
-    std::vector<RoutingResponse::LaneChangeInfo::Type> lane_change_types;
     if (way.empty()) {
       return false;
     }
-    if (!way[0].IsVirtual()) {
-      is_virtual_of_ways.push_back(false);
-      if (!ExtractBasicPassages(way, &nodes_of_passages, &lane_change_types)) {
-        return false;
-      }
-
-      ExtendPassages(FLAGS_use_road_id, range_manager, &nodes_of_passages);
-
-      road_id_of_ways.push_back(GetRoadId(nodes_of_passages));
-      nodes_of_passages_of_ways.push_back(std::move(nodes_of_passages));
-      lane_change_types_of_ways.push_back(std::move(lane_change_types));
-    } else {
-      is_virtual_of_ways.push_back(true);
-      nodes_of_passages.push_back(way);
-
-      road_id_of_ways.push_back(GetRoadId(nodes_of_passages));
-      nodes_of_passages_of_ways.push_back(std::move(nodes_of_passages));
-      lane_change_types_of_ways.push_back(std::move(lane_change_types));
+    std::vector<ChangeLaneType> change_lane_type;
+    if (!ExtractBasicPassages(way, &nodes_of_passages, &change_lane_type)) {
+      return false;
     }
+
+    ExtendPassages(FLAGS_use_road_id, range_manager, &nodes_of_passages);
+
+    RoadSegment road_segment;
+    const auto road_id = GetRoadId(nodes_of_passages);
+    road_segment.set_id(road_id);
+    int index = -1;
+    for (const auto& nodes_of_passage : nodes_of_passages) {
+      auto* passage = road_segment.add_passage();
+      LaneNodesToPassageRegion(nodes_of_passage, passage);
+      passage->set_change_lane_type(change_lane_type[++index]);
+    }
+    road_segment.mutable_passage()->rbegin()->set_can_exit(true);
+    result->add_road()->CopyFrom(road_segment);
+    PrintDebugInfo(road_id, nodes_of_ways);
   }
 
-  PrintDebugInfo(nodes_of_passages_of_ways, road_id_of_ways,
-                 is_virtual_of_ways);
-
-  for (size_t i = 0; i < nodes_of_passages_of_ways.size(); ++i) {
-    const auto& nodes_of_passages = nodes_of_passages_of_ways[i];
-    if (!is_virtual_of_ways[i]) {
-      RoutingResponse::Road road;
-      road.set_id(road_id_of_ways[i]);
-      const auto& front_node = nodes_of_passages.front().front();
-      road.mutable_in_lane()->set_id(front_node.LaneId());
-      road.mutable_in_lane()->set_s(front_node.StartS());
-      const auto& back_node = nodes_of_passages.back().back();
-      road.mutable_out_lane()->set_id(back_node.LaneId());
-      road.mutable_out_lane()->set_s(back_node.EndS());
-      for (const auto& nodes_of_passage : nodes_of_passages) {
-        LaneNodesToPassageRegion(nodes_of_passage, road.add_passage_region());
-      }
-      for (size_t j = 0; j < lane_change_types_of_ways[i].size(); ++j) {
-        RoutingResponse::LaneChangeInfo* lc_info = road.add_lane_change_info();
-        lc_info->set_type(lane_change_types_of_ways[i][j]);
-        lc_info->set_start_passage_region_index(j);
-        lc_info->set_end_passage_region_index(j + 1);
-      }
-      result->add_route()->mutable_road_info()->CopyFrom(road);
-    } else {
-      RoutingResponse::Junction junction;
-      junction.set_id(road_id_of_ways[i]);
-      if (i > 0) {
-        junction.set_in_road_id(road_id_of_ways[i - 1]);
-      } else {
-        junction.set_in_road_id("UNKNOWN");
-      }
-      if (i < road_id_of_ways.size() - 1) {
-        junction.set_out_road_id(road_id_of_ways[i + 1]);
-      } else {
-        junction.set_out_road_id("UNKNOWN");
-      }
-      RoutingResponse::PassageRegion region;
-      for (const auto& node : nodes_of_passages.front()) {
-        RoutingResponse::LaneSegment* seg = region.add_segment();
-        seg->set_id(node.LaneId());
-        seg->set_start_s(node.StartS());
-        seg->set_end_s(node.EndS());
-      }
-      junction.mutable_passage_region()->CopyFrom(region);
-      result->add_route()->mutable_junction_info()->CopyFrom(junction);
-    }
-  }
   return true;
 }
 

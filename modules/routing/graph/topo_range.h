@@ -39,7 +39,6 @@ class NodeSRange {
 
   void SetStartS(double start_s);
   void SetEndS(double end_s);
-  void SetRangeS(double start_s, double end_s);
   bool MergeRangeOverlap(const NodeSRange& other);
 
  private:
