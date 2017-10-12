@@ -26,10 +26,9 @@ class NodeSRange {
   static bool IsEnoughForChangeLane(double length);
 
  public:
-  NodeSRange();
+  NodeSRange() = default;
   NodeSRange(double s1, double s2);
-  NodeSRange(const NodeSRange& other);
-  ~NodeSRange() = default;
+  virtual ~NodeSRange() = default;
 
   bool operator<(const NodeSRange& other) const;
   bool IsValid() const;
@@ -44,8 +43,8 @@ class NodeSRange {
   bool MergeRangeOverlap(const NodeSRange& other);
 
  private:
-  double start_s_;
-  double end_s_;
+  double start_s_ = 0.0;
+  double end_s_ = 0.0;
 };
 
 }  // namespace routing
