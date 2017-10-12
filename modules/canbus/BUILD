@@ -7,14 +7,15 @@ cc_library(
     srcs = ["canbus.cc"],
     hdrs = ["canbus.h"],
     deps = [
-        "//modules/canbus/can_client:can_client_factory",
-        "//modules/canbus/can_comm:can_receiver",
-        "//modules/canbus/can_comm:can_sender",
+        "//modules/common/canbus/can_client:can_client_factory",
+        "//modules/common/canbus/can_comm:can_receiver",
+        "//modules/common/canbus/can_comm:can_sender",
         "//modules/canbus/vehicle:vehicle_factory",
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor",
+        "//modules/canbus/common:canbus_common",
         "//modules/hmi/utils:hmi_status_helper",
     ],
 )
@@ -35,7 +36,8 @@ cc_binary(
     deps = [
         ":canbus_lib",
         "//external:gflags",
-        "//modules/canbus/can_client",
+        "//modules/common/canbus/can_client",
+        "//modules/common/canbus/common:canbus_common",
         "//modules/canbus/common:canbus_common",
         "//modules/common:log",
         "//modules/common/monitor",
