@@ -31,6 +31,9 @@
 namespace apollo {
 namespace canbus {
 namespace lincoln {
+
+using ::apollo::common::canbus::MessageManager;
+
 /**
  * @class LincolnMessageManager
  *

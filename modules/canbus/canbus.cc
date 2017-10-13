@@ -32,6 +32,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::canbus::CanClientFactory;
 
 using apollo::control::ControlCommand;
 using apollo::common::time::Clock;

@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Misc69::ID = 0x69;
 
 void Misc69::Parse(const std::uint8_t *bytes, int32_t length,

@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Version7f::ID = 0x7f;
 
 void Version7f::Parse(const std::uint8_t *bytes, int32_t length,

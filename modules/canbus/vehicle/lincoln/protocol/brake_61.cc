@@ -25,6 +25,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Brake61::ID = 0x61;
 
 void Brake61::Parse(const std::uint8_t *bytes, int32_t length,
