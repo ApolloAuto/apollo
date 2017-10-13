@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Gps6f::ID = 0x6F;
 
 void Gps6f::Parse(const std::uint8_t *bytes, int32_t length,

@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Steering64::ID = 0x64;
 
 uint32_t Steering64::GetPeriod() const {

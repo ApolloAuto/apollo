@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Tirepressure71::ID = 0x71;
 
 void Tirepressure71::Parse(const std::uint8_t *bytes, int32_t length,

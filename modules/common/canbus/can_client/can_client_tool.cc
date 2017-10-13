@@ -43,6 +43,7 @@ const int32_t MAX_CAN_SEND_FRAME_LEN = 1;
 const int32_t MAX_CAN_RECV_FRAME_LEN = 10;
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 struct TestCanParam {
@@ -244,17 +245,18 @@ class CanAgent {
 };
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
 
 int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  using apollo::canbus::CANCardParameter;
-  using apollo::canbus::CanClient;
-  using apollo::canbus::CanClientFactory;
-  using apollo::canbus::TestCanParam;
-  using apollo::canbus::CanAgent;
+  using apollo::common::canbus::CANCardParameter;
+  using apollo::common::canbus::CanClient;
+  using apollo::common::canbus::CanClientFactory;
+  using apollo::common::canbus::TestCanParam;
+  using apollo::common::canbus::CanAgent;
   using apollo::common::ErrorCode;
   CANCardParameter can_client_conf_a;
   std::shared_ptr<TestCanParam> param_ptr_a(new TestCanParam());

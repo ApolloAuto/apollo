@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Gyro6c::ID = 0x6C;
 
 void Gyro6c::Parse(const std::uint8_t *bytes, int32_t length,

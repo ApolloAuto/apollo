@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Turnsignal68::ID = 0x68;
 
 uint32_t Turnsignal68::GetPeriod() const {

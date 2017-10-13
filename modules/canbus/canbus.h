@@ -47,6 +47,9 @@
 namespace apollo {
 namespace canbus {
 
+using ::apollo::common::canbus::CanClient;
+using ::apollo::common::canbus::CanReceiver;
+
 /**
 * @class Canbus
 *
