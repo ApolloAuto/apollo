@@ -30,6 +30,7 @@
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
@@ -87,6 +88,8 @@ class ReferenceLineProvider {
 
   std::mutex reference_line_groups_mutex_;
   std::list<std::vector<ReferenceLine>> reference_line_groups_;
+
+  std::unique_ptr<Spline2dSolver> spline_solver_;
 };
 
 }  // namespace planning
