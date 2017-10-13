@@ -41,7 +41,8 @@ namespace planning {
 
 class QpSplinePathGenerator {
  public:
-  QpSplinePathGenerator(const ReferenceLine& reference_line,
+  QpSplinePathGenerator(Spline1dGenerator* spline_generator_,
+                        const ReferenceLine& reference_line,
                         const QpSplinePathConfig& qp_spline_path_config);
 
   void SetDebugLogger(apollo::planning_internal::Debug* debug);
@@ -64,12 +65,12 @@ class QpSplinePathGenerator {
   bool Solve();
 
  private:
+  Spline1dGenerator* spline_generator_ = nullptr;
   apollo::planning_internal::Debug* planning_debug_ = nullptr;
   const ReferenceLine& reference_line_;
   const QpSplinePathConfig& qp_spline_path_config_;
 
   common::FrenetFramePoint init_frenet_point_;
-  std::unique_ptr<Spline1dGenerator> spline_generator_;
 
   std::vector<double> knots_;
   std::vector<double> evaluated_s_;
