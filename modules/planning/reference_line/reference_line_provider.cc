@@ -129,7 +129,7 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   std::vector<std::vector<hdmap::LaneSegment>> route_segments;
 
   // additional smooth reference line length, unit: meter
-  const double kForwardAdditionalLength = 30;
+  const double kForwardAdditionalLength = 100;
   if (!pnc_map_->GetLaneSegmentsFromRouting(
           routing, position, FLAGS_look_backward_distance,
           FLAGS_look_forward_distance + kForwardAdditionalLength,

@@ -205,7 +205,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
-  uint32_t constraint_num = 2 * number_of_spline + 1;
+  uint32_t constraint_num = 3 * number_of_spline + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return true;
