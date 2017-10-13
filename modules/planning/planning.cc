@@ -59,13 +59,9 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double timestamp,
     AERROR << "Routing is empty";
     return Status(ErrorCode::PLANNING_ERROR, "routing is empty");
   }
-  frame_->SetVehicleInitPose(VehicleState::instance()->pose());
-  frame_->SetRoutingResponse(
+  frame_->UpdateRoutingResponse(
       AdapterManager::GetRoutingResponse()->GetLatestObserved());
-  ADEBUG << "Get routing: "
-         << AdapterManager::GetRoutingResponse()
-                ->GetLatestObserved()
-                .DebugString();
+  frame_->SetVehicleInitPose(VehicleState::instance()->pose());
 
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     const auto& prediction =
@@ -92,8 +88,10 @@ bool Planning::HasSignalLight(const PlanningConfig& config) {
 }
 
 Status Planning::Init() {
-  pnc_map_.reset(new hdmap::PncMap(apollo::hdmap::BaseMapFile()));
-  Frame::SetMap(pnc_map_.get());
+  const auto& map_file = apollo::hdmap::BaseMapFile();
+  CHECK(!hdmap_.LoadMapFromFile(map_file)) << "Failed to load map file:"
+                                           << map_file;
+  Frame::SetMap(&hdmap_);
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
@@ -129,7 +127,7 @@ Status Planning::Init() {
   }
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
-        pnc_map_.get(), config_.reference_line_smoother_config());
+        &hdmap_, config_.reference_line_smoother_config());
   }
 
   RegisterPlanners();
@@ -223,13 +221,6 @@ void Planning::RunOnce() {
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
-
-  // update routing
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->UpdateRoutingResponse(
-        AdapterManager::GetRoutingResponse()->GetLatestObserved());
-  }
-
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
@@ -278,12 +269,12 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
-  last_publishable_trajectory_.reset(nullptr);
-  frame_.reset(nullptr);
-  planner_.reset(nullptr);
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Stop();
   }
+  last_publishable_trajectory_.reset(nullptr);
+  frame_.reset(nullptr);
+  planner_.reset(nullptr);
 }
 
 void Planning::SetLastPublishableTrajectory(
