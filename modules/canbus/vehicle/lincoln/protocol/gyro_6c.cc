@@ -16,13 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/gyro_6c.h"
 
-#include "modules/common/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::common::canbus::Byte;
+using ::apollo::drivers::canbus::Byte;
 
 const int32_t Gyro6c::ID = 0x6C;
 
