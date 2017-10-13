@@ -48,6 +48,8 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
 bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
   qp_st_speed_config_ = config.em_planner_config().qp_st_speed_config();
   st_boundary_config_ = qp_st_speed_config_.st_boundary_config();
+  std::vector<double> init_knots;
+  spline_generator_.reset(new Spline1dGenerator(init_knots, 5));
   is_init_ = true;
   return true;
 }
@@ -101,7 +103,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   // step 2 perform graph search
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  QpSplineStGraph st_graph(qp_st_speed_config_, veh_param);
+  QpSplineStGraph st_graph(spline_generator_.get(), qp_st_speed_config_,
+                           veh_param);
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.discretized_path().Length());
