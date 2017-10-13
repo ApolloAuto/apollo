@@ -96,25 +96,9 @@ bool PncMap::ValidateRouting(const RoutingResponse &routing) const {
   return true;
 }
 
-bool PncMap::GetLaneSegmentsFromRouting(
-    const RoutingResponse &routing, const common::PointENU &point,
-    const double backward_length, const double forward_length,
-    std::vector<LaneSegments> *const route_segments) const {
-  if (route_segments == nullptr) {
-    AERROR << "the provided proute_segments is null";
-    return false;
-  }
-  if (backward_length < 0.0 || forward_length < 0.0 ||
-      backward_length + forward_length <= 0.0) {
-    AERROR << "backward_length[" << backward_length << "] or forward_length["
-           << forward_length << "] are invalid";
-    return false;
-  }
-  if (!ValidateRouting(routing)) {
-    AERROR << "The provided routing result is invalid";
-    return false;
-  }
-  route_segments->clear();
+bool PncMap::GetNearestPointFromRouting(const RoutingResponse &routing,
+                                        const common::PointENU &point,
+                                        LaneWaypoint *waypoint) const {
   const double kMaxDistance = 20.0;  // meters.
   std::vector<LaneInfoConstPtr> lanes;
   const int status = hdmap_.GetLanes(point, kMaxDistance, &lanes);
@@ -157,8 +141,34 @@ bool PncMap::GetLaneSegmentsFromRouting(
     AERROR << "Failed to find point on routing. Point:" << point.DebugString();
     return false;
   }
+  *waypoint = nearest_waypoints.back();
+  return false;
+}
 
-  const auto &start_waypoint = nearest_waypoints.back();
+bool PncMap::GetLaneSegmentsFromRouting(
+    const RoutingResponse &routing, const common::PointENU &point,
+    const double backward_length, const double forward_length,
+    std::vector<LaneSegments> *const route_segments) const {
+  if (route_segments == nullptr) {
+    AERROR << "the provided proute_segments is null";
+    return false;
+  }
+  if (backward_length < 0.0 || forward_length < 0.0 ||
+      backward_length + forward_length <= 0.0) {
+    AERROR << "backward_length[" << backward_length << "] or forward_length["
+           << forward_length << "] are invalid";
+    return false;
+  }
+  if (!ValidateRouting(routing)) {
+    AERROR << "The provided routing result is invalid";
+    return false;
+  }
+  route_segments->clear();
+  LaneWaypoint start_waypoint;
+  if (!GetNearestPointFromRouting(routing, point, &start_waypoint)) {
+    AERROR << "Failed to find nearest proint: " << point.ShortDebugString()
+           << " routing";
+  }
   double min_overlap_distance = std::numeric_limits<double>::infinity();
   double proj_s = 0.0;
   double accumulate_s = 0.0;
