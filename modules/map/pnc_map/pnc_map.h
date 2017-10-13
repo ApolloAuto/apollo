@@ -56,6 +56,10 @@ class PncMap {
                                          Path *const path);
 
  private:
+  bool GetNearestPointFromRouting(const routing::RoutingResponse &routing,
+                                  const common::PointENU &point,
+                                  LaneWaypoint *waypoint) const;
+
   bool TruncateLaneSegments(const LaneSegments &segments, double start_s,
                             double end_s,
                             LaneSegments *const truncated_segments) const;
