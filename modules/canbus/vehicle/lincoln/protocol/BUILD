@@ -51,9 +51,9 @@ cc_library(
         "wheelspeed_6a.h",
     ],
     deps = [
-        "//modules/common/canbus/common:canbus_common",
+        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
     ],
 )
 

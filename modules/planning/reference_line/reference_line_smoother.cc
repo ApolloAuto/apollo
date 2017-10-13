@@ -132,7 +132,7 @@ bool ReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line,
 
 bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
-  AERROR << "Length = " << length;
+  ADEBUG << "Length = " << length;
   uint32_t num_spline = std::max(
       2u, static_cast<uint32_t>(length / smoother_config_.max_spline_length()));
   const double delta_s = length / num_spline;
