@@ -99,9 +99,23 @@ export function drawBox(dimension, color, linewidth) {
     const material = new THREE.MeshBasicMaterial({color: color});
     const cube = new THREE.Mesh(geometry, material);
     const box = new THREE.BoxHelper(cube);
-    box.material.color = new THREE.Color(color);
     box.material.linewidth = linewidth;
     return box;
+}
+
+export function drawDashedBox(dimension, color, linewidth, dashSize = 0.01, gapSize = 0.02) {
+    let geometry = new THREE.CubeGeometry(dimension.x, dimension.y, dimension.z);
+    geometry = new THREE.EdgesGeometry( geometry );
+    geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+    geometry.computeLineDistances();
+    const material = new THREE.LineDashedMaterial({
+        color: color,
+        linewidth: linewidth,
+        dashSize: dashSize,
+        gapSize: gapSize
+    });
+    const cube = new THREE.LineSegments(geometry, material);
+    return cube;
 }
 
 export function drawArrow(length, linewidth, conelength, conewidth, color) {
