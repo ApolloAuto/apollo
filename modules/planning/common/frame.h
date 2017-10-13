@@ -52,7 +52,6 @@ class Frame {
   explicit Frame(const uint32_t sequence_num);
 
   // functions called out of optimizers
-  void SetRoutingResponse(const routing::RoutingResponse &routing);
   void SetPrediction(const prediction::PredictionObstacles &prediction);
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
   void SetVehicleInitPose(const localization::Pose &pose);
@@ -60,15 +59,17 @@ class Frame {
   common::Status Init(const PlanningConfig &config,
                       const double current_time_stamp);
 
-  static void SetMap(hdmap::PncMap *pnc_map);
+  static void SetMap(const hdmap::HDMap *pnc_map);
 
   uint32_t SequenceNum() const;
+
+  void UpdateRoutingResponse(const routing::RoutingResponse &routing);
+
+  const routing::RoutingResponse &routing_response() const;
 
   std::string DebugString() const;
 
   const PublishableTrajectory &ComputedTrajectory() const;
-
-  const routing::RoutingResponse &routing_response() const;
 
   void RecordInputDebug(planning_internal::Debug *debug);
 
@@ -79,7 +80,7 @@ class Frame {
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
   const ReferenceLineInfo *DriveReferenceLinfInfo() const;
 
-  const std::vector<const Obstacle*> &obstacles() const;
+  const std::vector<const Obstacle *> &obstacles() const;
 
   const Obstacle *AddStaticVirtualObstacle(const std::string &id,
                                            const common::math::Box2d &box);
@@ -94,8 +95,7 @@ class Frame {
    * TODO create multiple reference_lines from this function.
    */
   std::vector<ReferenceLine> CreateReferenceLineFromRouting(
-      const common::PointENU &position,
-      const routing::RoutingResponse &routing);
+      const common::PointENU &position);
 
   /**
    * @brief create obstacles from prediction input.
@@ -125,7 +125,6 @@ class Frame {
    **/
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
-  routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;
 
   std::mutex obstacles_mutex_;
@@ -133,7 +132,7 @@ class Frame {
 
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
-  static const hdmap::PncMap *pnc_map_;
+  static std::unique_ptr<hdmap::PncMap> pnc_map_;
   ReferenceLineSmootherConfig smoother_config_;
 
   std::string collision_obstacle_id_;
