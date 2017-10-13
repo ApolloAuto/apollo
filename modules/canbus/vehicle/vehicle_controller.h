@@ -29,9 +29,9 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#include "modules/common/canbus/can_comm/can_sender.h"
-#include "modules/common/canbus/can_comm/message_manager.h"
-#include "modules/common/canbus/can_comm/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/common/proto/error_code.pb.h"
 
 /**
@@ -41,8 +41,8 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::common::canbus::CanSender;
-using ::apollo::common::canbus::MessageManager;
+using ::apollo::drivers::canbus::CanSender;
+using ::apollo::drivers::canbus::MessageManager;
 
 /**
  * @class VehicleController

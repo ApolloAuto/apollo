@@ -24,7 +24,7 @@
 #include <memory>
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/common/canbus/can_comm/message_manager.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 
 /**
