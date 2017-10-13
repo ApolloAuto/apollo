@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Throttle63::ID = 0x63;
 
 void Throttle63::Parse(const std::uint8_t *bytes, int32_t length,

@@ -24,6 +24,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Wheelspeed6a::ID = 0x6A;
 
 void Wheelspeed6a::Parse(const std::uint8_t *bytes, int32_t length,
