@@ -22,6 +22,7 @@
 #include "modules/common/time/time.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 namespace {
@@ -202,4 +203,5 @@ bool CanSender::NeedSend(const SenderMessage &msg, const int32_t delta_period) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

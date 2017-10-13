@@ -23,6 +23,7 @@
 #include "modules/common/proto/error_code.pb.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 TEST(CanReceiverTest, ReceiveOne) {
@@ -38,4 +39,5 @@ TEST(CanReceiverTest, ReceiveOne) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

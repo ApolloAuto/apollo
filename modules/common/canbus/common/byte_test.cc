@@ -21,6 +21,7 @@
 #include "gtest/gtest.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 TEST(ByteTest, CopyConstructor) {
@@ -103,4 +104,5 @@ TEST(ByteTest, ByteToString) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

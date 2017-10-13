@@ -28,6 +28,7 @@
 #include "modules/common/time/time.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 namespace can {
 
@@ -100,4 +101,5 @@ TEST_F(FakeCanClientTest, ReceiveMessage) {
 
 }  // namespace can
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

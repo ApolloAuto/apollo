@@ -23,6 +23,7 @@
 #include "modules/common/time/time.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 using Clock = common::time::Clock;
@@ -92,4 +93,5 @@ void MessageManager::ResetSendMessages() {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

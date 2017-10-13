@@ -25,10 +25,11 @@
 #include <string>
 
 /**
- * @namespace apollo::canbus
- * @brief apollo::canbus
+ * @namespace apollo::common::canbus
+ * @brief apollo::common::canbus
  */
 namespace apollo {
+namespace common {
 namespace canbus {
 
 /**
@@ -175,6 +176,7 @@ class Byte {
 };
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_CANBUS_COMMON_BYTE_H_

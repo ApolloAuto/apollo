@@ -19,6 +19,7 @@
 #include "modules/common/log.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 // (SUM(input))^0xFF
@@ -52,4 +53,5 @@ void ProtocolData::UpdateData(uint8_t * /*data*/) {}
 void ProtocolData::Reset() {}
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
