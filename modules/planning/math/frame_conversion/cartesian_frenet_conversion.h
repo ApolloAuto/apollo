@@ -40,6 +40,7 @@ namespace planning {
 // l: the same as d.
 class CartesianFrenetConverter {
  public:
+  CartesianFrenetConverter() = delete;
   /**
    * Convert a vehicle state in Cartesian frame to Frenet frame.
    * Decouple a 2d movement to two independent 1d movement w.r.t. reference
