@@ -28,15 +28,25 @@
 #include "modules/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::time::Clock;
 
 Spline1dGenerator::Spline1dGenerator(const std::vector<double>& x_knots,
                                      const uint32_t spline_order)
     : spline_(x_knots, spline_order),
       spline_constraint_(x_knots, spline_order),
       spline_kernel_(x_knots, spline_order) {}
+
+void Spline1dGenerator::Reset(const std::vector<double>& x_knots,
+                              const uint32_t spline_order) {
+  spline_ = Spline1d(x_knots, spline_order);
+  spline_constraint_ = Spline1dConstraint(x_knots, spline_order);
+  spline_kernel_ = Spline1dKernel(x_knots, spline_order);
+}
 
 Spline1dConstraint* Spline1dGenerator::mutable_spline_constraint() {
   return &spline_constraint_;
@@ -79,13 +89,12 @@ bool Spline1dGenerator::Solve() {
   int num_constraint =
       equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
 
-  bool use_hotstart = (sqp_solver_ && num_param == last_num_param_ &&
+  bool use_hotstart = (sqp_solver_ != nullptr && num_param == last_num_param_ &&
                        num_constraint == last_num_constraint_);
 
   if (!use_hotstart) {
     sqp_solver_.reset(new ::qpOASES::SQProblem(num_param, num_constraint,
                                                ::qpOASES::HST_POSDEF));
-
     ::qpOASES::Options my_options;
     my_options.enableCholeskyRefactorisation = 1;
     my_options.enableRegularisation = ::qpOASES::BT_TRUE;
@@ -162,6 +171,7 @@ bool Spline1dGenerator::Solve() {
   int max_iter = std::max(max_iteration_, num_constraint);
 
   ::qpOASES::returnValue ret;
+  const double start_timestamp = Clock::NowInSecond();
   if (use_hotstart) {
     ADEBUG << "using SQP hotstart.";
     ret = sqp_solver_->hotstart(
@@ -173,6 +183,9 @@ bool Spline1dGenerator::Solve() {
                             lower_bound, upper_bound, constraint_lower_bound,
                             constraint_upper_bound, max_iter);
   }
+  const double end_timestamp = Clock::NowInSecond();
+  ADEBUG << "Spline1dGenerator QP solve time: "
+         << (end_timestamp - start_timestamp) * 1000 << " ms.";
 
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
     if (ret == qpOASES::RET_MAX_NWSR_REACHED) {

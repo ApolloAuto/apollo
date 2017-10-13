@@ -107,6 +107,7 @@ cc_library(
         ":spline_1d_kernel",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
+        "//modules/common/time",
         "@eigen//:eigen",
     ],
 )
