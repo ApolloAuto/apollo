@@ -182,7 +182,8 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     map_service_->ConstructLaneWayPoint(end["x"], end["y"], end_point);
   }
 
-  AINFO << "Waypoints: " << routing_request->DebugString();
+  AINFO << "Constructed RoutingRequest to be sent, waypoints: "
+        << routing_request->DebugString();
 
   return true;
 }
