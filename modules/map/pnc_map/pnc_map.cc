@@ -342,39 +342,6 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
   }
 }
 
-bool PncMap::CreatePathsFromRouting(const RoutingResponse &routing,
-                                    std::vector<Path> *paths) const {
-  for (const auto &road : routing.road()) {
-    for (const auto &passage_region : road.passage()) {
-      // Each passage region in a road forms a path
-      if (!AddPathFromPassageRegion(passage_region, paths)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-bool PncMap::AddPathFromPassageRegion(const routing::Passage &passage_region,
-                                      std::vector<Path> *paths) const {
-  LaneSegments segments;
-  for (const auto &segment : passage_region.segment()) {
-    auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
-    if (!lane_ptr) {
-      AERROR << "Failed to find lane: " << segment.id();
-      return false;
-    }
-    segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
-  }
-  Path path;
-  if (!CreatePathFromLaneSegments(segments, &path)) {
-    return false;
-  }
-  paths->push_back(path);
-
-  return true;
-}
-
 bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
                                         Path *const path) {
   std::vector<MapPathPoint> points;
