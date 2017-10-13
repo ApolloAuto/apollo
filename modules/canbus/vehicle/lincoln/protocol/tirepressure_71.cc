@@ -16,13 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/tirepressure_71.h"
 
-#include "modules/common/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::common::canbus::Byte;
+using ::apollo::drivers::canbus::Byte;
 
 const int32_t Tirepressure71::ID = 0x71;
 
