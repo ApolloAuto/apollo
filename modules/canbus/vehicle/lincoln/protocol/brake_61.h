@@ -22,7 +22,7 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_BRAKE_61_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_BRAKE_61_H_
 
-#include "modules/common/canbus/can_comm/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -32,7 +32,7 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::common::canbus::ProtocolData;
+using ::apollo::drivers::canbus::ProtocolData;
 
 /**
  * @class Brake61

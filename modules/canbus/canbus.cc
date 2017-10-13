@@ -16,7 +16,7 @@
 
 #include "modules/canbus/canbus.h"
 
-#include "modules/common/canbus/can_client/can_client_factory.h"
+#include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -32,7 +32,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
-using apollo::common::canbus::CanClientFactory;
+using apollo::drivers::canbus::CanClientFactory;
 
 using apollo::control::ControlCommand;
 using apollo::common::time::Clock;
