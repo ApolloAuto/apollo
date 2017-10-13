@@ -47,6 +47,8 @@ void ReferenceLineProvider::Init(
     const ReferenceLineSmootherConfig &smoother_config) {
   pnc_map_ = pnc_map;
   smoother_config_ = smoother_config;
+  std::vector<double> init_t_knots;
+  spline_solver_.reset(new Spline2dSolver(init_t_knots, 1));
   is_initialized_ = true;
 }
 
@@ -145,7 +147,8 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
-      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
+      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
+                           spline_solver_.get())) {
         AERROR << "Failed to smooth reference line";
         continue;
       }

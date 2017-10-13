@@ -41,6 +41,13 @@ Spline2dSolver::Spline2dSolver(const std::vector<double>& t_knots,
       kernel_(t_knots, order),
       constraint_(t_knots, order) {}
 
+void Spline2dSolver::Reset(const std::vector<double>& t_knots,
+                           const uint32_t order) {
+  spline_ = Spline2d(t_knots, order);
+  kernel_ = Spline2dKernel(t_knots, order);
+  constraint_ = Spline2dConstraint(t_knots, order);
+}
+
 // customize setup
 Spline2dConstraint* Spline2dSolver::mutable_constraint() {
   return &constraint_;
@@ -72,6 +79,10 @@ bool Spline2dSolver::Solve() {
   int num_param = kernel_matrix.rows();
   int num_constraint =
       equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
+  ADEBUG << "num_param: " << num_param
+         << ", last_num_param_: " << last_num_param_;
+  ADEBUG << "num_constraint: " << num_constraint
+         << ", last_num_constraint_: " << last_num_constraint_;
 
   bool use_hotstart = (sqp_solver_ != nullptr && num_param == last_num_param_ &&
                        num_constraint == last_num_constraint_);
@@ -156,18 +167,18 @@ bool Spline2dSolver::Solve() {
   ::qpOASES::returnValue ret;
   const double start_timestamp = Clock::NowInSecond();
   if (use_hotstart) {
-    ADEBUG << "using SQP hotstart.";
+    ADEBUG << "Spline2dSolver is using SQP hotstart.";
     ret = sqp_solver_->hotstart(
         h_matrix, g_matrix, affine_constraint_matrix, lower_bound, upper_bound,
         constraint_lower_bound, constraint_upper_bound, max_iter);
   } else {
-    ADEBUG << "no using SQP hotstart.";
+    ADEBUG << "Spline2dSolver is NOT using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
                             lower_bound, upper_bound, constraint_lower_bound,
                             constraint_upper_bound, max_iter);
   }
   const double end_timestamp = Clock::NowInSecond();
-  ADEBUG << "Spline1dGenerator QP solve time: "
+  ADEBUG << "Spline2dSolver QP time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
 
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
