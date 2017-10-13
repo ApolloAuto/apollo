@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "modules/common/util/string_util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace dreamview {
@@ -33,6 +34,8 @@ using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::hdmap::Path;
+using apollo::hdmap::PncMap;
+using apollo::hdmap::LaneSegments;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
 
@@ -117,10 +120,12 @@ MapService::MapService(const std::string map_filename)
     : MapService(map_filename, map_filename) {}
 
 MapService::MapService(const std::string &base_map_filename,
-                       const std::string &sim_map_filename)
-    : pnc_map_(base_map_filename) {
+                       const std::string &sim_map_filename) {
+  CHECK(hdmap_.LoadMapFromFile(base_map_filename) == 0)
+      << "Failed to load hd map from: " << base_map_filename;
   CHECK(sim_map_.LoadMapFromFile(sim_map_filename) == 0)
       << "Failed to load sim_map from " << sim_map_filename;
+  AINFO << "Map loaded from Map file: " << base_map_filename;
 }
 
 MapElementIds MapService::CollectMapElementIds(const PointENU &point,
@@ -246,7 +251,7 @@ bool MapService::GetNearestLane(const double x, const double y,
 
 bool MapService::GetPathsFromRouting(const RoutingResponse &routing,
                                      std::vector<Path> *paths) const {
-  if (!pnc_map_.CreatePathsFromRouting(routing, paths)) {
+  if (!CreatePathsFromRouting(routing, paths)) {
     AERROR << "Unable to get paths from routing!";
     return false;
   }
@@ -291,6 +296,39 @@ bool MapService::GetStartPoint(apollo::common::PointENU *start_point) const {
   }
 
   *start_point = lane->GetSmoothPoint(0.0);
+  return true;
+}
+
+bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
+                                        std::vector<Path> *paths) const {
+  for (const auto &road : routing.road()) {
+    for (const auto &passage_region : road.passage()) {
+      // Each passage region in a road forms a path
+      if (!AddPathFromPassageRegion(passage_region, paths)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+bool MapService::AddPathFromPassageRegion(
+    const routing::Passage &passage_region, std::vector<Path> *paths) const {
+  LaneSegments segments;
+  for (const auto &segment : passage_region.segment()) {
+    auto lane_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(segment.id()));
+    if (!lane_ptr) {
+      AERROR << "Failed to find lane: " << segment.id();
+      return false;
+    }
+    segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
+  }
+
+  paths->emplace_back();
+  if (!PncMap::CreatePathFromLaneSegments(segments, &paths->back())) {
+    return false;
+  }
+
   return true;
 }
 

@@ -44,9 +44,6 @@ class PncMap {
 
   const hdmap::HDMap &HDMap() const;
 
-  bool CreatePathsFromRouting(const routing::RoutingResponse &routing,
-                              std::vector<Path> *paths) const;
-
   bool GetLaneSegmentsFromRouting(
       const routing::RoutingResponse &routing, const common::PointENU &point,
       const double backward_length, const double forward_length,
@@ -65,9 +62,6 @@ class PncMap {
                             LaneSegments *const truncated_segments) const;
 
   bool ValidateRouting(const routing::RoutingResponse &routing) const;
-
-  bool AddPathFromPassageRegion(const routing::Passage &passage_region,
-                                std::vector<Path> *paths) const;
 
   static void AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
                                  const double end_s,

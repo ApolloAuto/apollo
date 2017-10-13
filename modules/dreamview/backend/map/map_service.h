@@ -94,14 +94,21 @@ class MapService {
                              routing::LaneWaypoint *laneWayPoint) const;
 
  private:
-  const hdmap::HDMap &BaseMap() const { return pnc_map_.HDMap(); }
+  const hdmap::HDMap &BaseMap() const {
+    return hdmap_;
+  }
 
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
                       double *nearest_s, double *nearest_l) const;
 
-  // A wrapper around HDMap to provide some convenient utils dreamview needs.
-  const hdmap::PncMap pnc_map_;
+  bool CreatePathsFromRouting(const routing::RoutingResponse &routing,
+                              std::vector<apollo::hdmap::Path> *paths) const;
+
+  bool AddPathFromPassageRegion(const routing::Passage &passage_region,
+                                std::vector<apollo::hdmap::Path> *paths) const;
+
+  hdmap::HDMap hdmap_;
   // A downsampled map for dreamview frontend display.
   hdmap::HDMap sim_map_;
 };
