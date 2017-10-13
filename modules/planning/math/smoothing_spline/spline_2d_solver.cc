@@ -96,6 +96,7 @@ bool Spline2dSolver::Solve() {
     my_options.epsNum = FLAGS_default_active_set_eps_num;
     my_options.epsDen = FLAGS_default_active_set_eps_den;
     my_options.epsIterRef = FLAGS_default_active_set_eps_iter_ref;
+    my_options.terminationTolerance = 1.0e-4;
     sqp_solver_->setOptions(my_options);
     if (!FLAGS_default_enable_active_set_debug_info) {
       sqp_solver_->setPrintLevel(qpOASES::PL_NONE);
