@@ -32,6 +32,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::ProtocolData;
+
 /**
  * @class Steering64
  *
