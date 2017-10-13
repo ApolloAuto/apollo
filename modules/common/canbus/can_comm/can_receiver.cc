@@ -25,6 +25,7 @@
 #include "modules/common/log.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 using common::ErrorCode;
@@ -131,4 +132,5 @@ void CanReceiver::Stop() {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

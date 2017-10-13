@@ -32,10 +32,11 @@
 #include "modules/common/proto/error_code.pb.h"
 
 /**
- * @namespace apollo::canbus::can
- * @brief apollo::canbus::can
+ * @namespace apollo::common::canbus::can
+ * @brief apollo::common::canbus::can
  */
 namespace apollo {
+namespace common {
 namespace canbus {
 namespace can {
 
@@ -104,6 +105,7 @@ class EsdCanClient : public CanClient {
 
 }  // namespace can
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_CANBUS_CAN_CLIENT_CLIENT_ESD_CAN_CLIENT_H_

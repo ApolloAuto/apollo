@@ -24,10 +24,11 @@
 #include <cstdint>
 
 /**
- * @namespace apollo::canbus
- * @brief apollo::canbus
+ * @namespace apollo::common::canbus
+ * @brief apollo::common::canbus
  */
 namespace apollo {
+namespace common {
 namespace canbus {
 
 const int32_t CAN_FRAME_SIZE = 8;
@@ -38,6 +39,7 @@ const int32_t CANBUS_MESSAGE_LENGTH = 8;
 const int32_t MAX_CAN_PORT = 3;
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_CONSTS_H_

@@ -21,6 +21,7 @@
 #include "modules/common/canbus/proto/can_card_parameter.pb.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 TEST(CanClientFactoryTest, CreateCanClient) {
@@ -40,4 +41,5 @@ TEST(CanClientFactoryTest, CreateCanClient) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

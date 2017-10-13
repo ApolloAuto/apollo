@@ -30,10 +30,11 @@
 #include "modules/common/util/factory.h"
 
 /**
- * @namespace apollo::canbus
- * @brief apollo::canbus
+ * @namespace apollo::common::canbus
+ * @brief apollo::common::canbus
  */
 namespace apollo {
+namespace common {
 namespace canbus {
 
 /**
@@ -64,6 +65,7 @@ class CanClientFactory
 };
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_CANBUS_CAN_CLIENT_CAN_CLIENT_FACTORY_H_

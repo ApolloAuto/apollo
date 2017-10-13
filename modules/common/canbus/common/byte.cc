@@ -20,6 +20,7 @@
 #include <bitset>
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 namespace {
@@ -135,4 +136,5 @@ std::string Byte::to_hex_string() const { return byte_to_hex(*value_); }
 std::string Byte::to_binary_string() const { return byte_to_binary(*value_); }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

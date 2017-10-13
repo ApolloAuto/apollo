@@ -23,6 +23,7 @@
 #include "modules/common/canbus/proto/can_card_parameter.pb.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 namespace can {
 
@@ -51,4 +52,5 @@ TEST(EsdCanClientTest, simple_test) {
 
 }  // namespace can
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

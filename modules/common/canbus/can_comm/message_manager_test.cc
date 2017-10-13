@@ -24,6 +24,7 @@
 #include "modules/common/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 using apollo::common::ErrorCode;
@@ -58,4 +59,5 @@ TEST(MessageManagerTest, GetMutableProtocolDataById) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
