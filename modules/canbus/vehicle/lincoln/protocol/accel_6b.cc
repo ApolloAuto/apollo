@@ -25,6 +25,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Accel6b::ID = 0x6B;
 
 void Accel6b::Parse(const std::uint8_t *bytes, int32_t length,

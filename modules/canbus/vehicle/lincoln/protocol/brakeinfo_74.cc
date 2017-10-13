@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Brakeinfo74::ID = 0x74;
 
 void Brakeinfo74::Parse(const std::uint8_t *bytes, int32_t length,

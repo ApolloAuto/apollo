@@ -22,6 +22,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::canbus::Byte;
+
 const int32_t Steering65::ID = 0x65;
 
 void Steering65::Parse(const std::uint8_t *bytes, int32_t length,
