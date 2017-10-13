@@ -16,11 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/gps_6e.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/common/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
+
+using ::apollo::common::canbus::Byte;
 
 const int32_t Gps6e::ID = 0x6E;
 

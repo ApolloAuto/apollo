@@ -18,12 +18,14 @@
 
 #include "glog/logging.h"
 
-#include "modules/canbus/common/byte.h"
-#include "modules/canbus/common/canbus_consts.h"
+#include "modules/common/canbus/common/byte.h"
+#include "modules/common/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
+
+using ::apollo::common::canbus::Byte;
 
 const int32_t Brake61::ID = 0x61;
 
