@@ -23,6 +23,7 @@
 #include "modules/common/proto/error_code.pb.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 TEST(CanSenderTest, OneRunCase) {
@@ -50,4 +51,5 @@ TEST(CanSenderTest, OneRunCase) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

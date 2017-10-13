@@ -25,6 +25,7 @@
 #include "modules/common/util/util.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 CanClientFactory::CanClientFactory() {}
@@ -52,4 +53,5 @@ std::unique_ptr<CanClient> CanClientFactory::CreateCANClient(
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

@@ -19,6 +19,7 @@
 #include <cstring>
 
 namespace apollo {
+namespace common {
 namespace canbus {
 namespace can {
 
@@ -77,4 +78,5 @@ std::string FakeCanClient::GetErrorString(const int32_t /*status*/) {
 
 }  // namespace can
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
