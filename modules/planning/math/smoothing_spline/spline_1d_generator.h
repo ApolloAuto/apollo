@@ -66,6 +66,8 @@ class Spline1dGenerator {
  public:
   Spline1dGenerator(const std::vector<double>& x_knots, const uint32_t order);
 
+  void Reset(const std::vector<double>& x_knots, const uint32_t order);
+
   // add constraint through pss_constraint
   Spline1dConstraint* mutable_spline_constraint();
 
