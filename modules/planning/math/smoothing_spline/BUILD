@@ -188,6 +188,7 @@ cc_library(
         "//modules/common/math:vec2d",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
+        "//modules/common/time",
         "@eigen//:eigen",
     ],
 )

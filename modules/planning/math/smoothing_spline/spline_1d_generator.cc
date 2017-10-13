@@ -25,6 +25,8 @@
 
 #include <algorithm>
 
+#include "Eigen/Core"
+
 #include "modules/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
@@ -34,6 +36,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::time::Clock;
+using Eigen::MatrixXd;
 
 Spline1dGenerator::Spline1dGenerator(const std::vector<double>& x_knots,
                                      const uint32_t spline_order)
@@ -56,26 +59,16 @@ Spline1dKernel* Spline1dGenerator::mutable_spline_kernel() {
   return &spline_kernel_;
 }
 
-void Spline1dGenerator::SetupInitQpPoint(const Eigen::MatrixXd& x,
-                                         const Eigen::MatrixXd& y,
-                                         const Eigen::MatrixXd& z,
-                                         const Eigen::MatrixXd& s) {
-  init_x_ = x;
-  init_y_ = y;
-  init_z_ = z;
-  init_s_ = s;
-}
-
 bool Spline1dGenerator::Solve() {
-  const Eigen::MatrixXd& kernel_matrix = spline_kernel_.kernel_matrix();
-  const Eigen::MatrixXd& offset = spline_kernel_.offset();
-  const Eigen::MatrixXd& inequality_constraint_matrix =
+  const MatrixXd& kernel_matrix = spline_kernel_.kernel_matrix();
+  const MatrixXd& offset = spline_kernel_.offset();
+  const MatrixXd& inequality_constraint_matrix =
       spline_constraint_.inequality_constraint().constraint_matrix();
-  const Eigen::MatrixXd& inequality_constraint_boundary =
+  const MatrixXd& inequality_constraint_boundary =
       spline_constraint_.inequality_constraint().constraint_boundary();
-  const Eigen::MatrixXd& equality_constraint_matrix =
+  const MatrixXd& equality_constraint_matrix =
       spline_constraint_.equality_constraint().constraint_matrix();
-  const Eigen::MatrixXd& equality_constraint_boundary =
+  const MatrixXd& equality_constraint_boundary =
       spline_constraint_.equality_constraint().constraint_boundary();
 
   if (kernel_matrix.rows() != kernel_matrix.cols()) {
@@ -200,7 +193,7 @@ bool Spline1dGenerator::Solve() {
   double result[num_param];  // NOLINT
   sqp_solver_->getPrimalSolution(result);
 
-  Eigen::MatrixXd solved_params = Eigen::MatrixXd::Zero(num_param, 1);
+  MatrixXd solved_params = MatrixXd::Zero(num_param, 1);
   for (int i = 0; i < num_param; ++i) {
     solved_params(i, 0) = result[i];
   }
