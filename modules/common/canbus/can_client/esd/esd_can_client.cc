@@ -23,6 +23,7 @@
 #include "modules/common/canbus/can_client/esd/esd_can_client.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 namespace can {
 
@@ -289,4 +290,5 @@ std::string EsdCanClient::GetErrorString(const NTCAN_RESULT ntstatus) {
 
 }  // namespace can
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo

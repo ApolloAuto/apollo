@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.canbus;
+package apollo.common.canbus;
 
 message CANCardParameter {
   enum CANCardBrand {

@@ -34,10 +34,11 @@
 #include "modules/common/proto/error_code.pb.h"
 
 /**
- * @namespace apollo::canbus
- * @brief apollo::canbus
+ * @namespace apollo::common::canbus
+ * @brief apollo::common::canbus
  */
 namespace apollo {
+namespace common {
 namespace canbus {
 
 /**
@@ -157,6 +158,7 @@ class CanClient {
 };
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_CANBUS_CAN_CLIENT_CAN_CLIENT_H_

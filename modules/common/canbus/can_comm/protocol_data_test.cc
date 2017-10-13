@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 namespace apollo {
+namespace common {
 namespace canbus {
 
 TEST(ProtocolDataTest, CheckSum) {
@@ -28,4 +29,5 @@ TEST(ProtocolDataTest, CheckSum) {
 }
 
 }  // namespace canbus
+}  // namespace common
 }  // namespace apollo
