@@ -142,7 +142,7 @@ bool PncMap::GetNearestPointFromRouting(const RoutingResponse &routing,
     return false;
   }
   *waypoint = nearest_waypoints.back();
-  return false;
+  return true;
 }
 
 bool PncMap::GetLaneSegmentsFromRouting(
