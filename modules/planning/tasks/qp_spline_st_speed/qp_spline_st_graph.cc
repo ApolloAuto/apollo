@@ -36,9 +36,11 @@ using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
 
-QpSplineStGraph::QpSplineStGraph(const QpStSpeedConfig& qp_st_speed_config,
+QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
+                                 const QpStSpeedConfig& qp_st_speed_config,
                                  const VehicleParam& veh_param)
-    : qp_st_speed_config_(qp_st_speed_config),
+    : spline_generator_(spline_generator),
+      qp_st_speed_config_(qp_st_speed_config),
       t_knots_resolution_(
           qp_st_speed_config_.total_time() /
           qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t()),
@@ -86,8 +88,8 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   ADEBUG << "init point:" << init_point_.DebugString();
 
   // reset spline generator
-  spline_generator_.reset(new Spline1dGenerator(
-      t_knots_, qp_st_speed_config_.qp_spline_config().spline_order()));
+  spline_generator_->Reset(
+      t_knots_, qp_st_speed_config_.qp_spline_config().spline_order());
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
