@@ -463,7 +463,7 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);
-  EXPECT_EQ(23, world.route_size());
+  EXPECT_EQ(1, world.route_path_size());
 
   double points[23][2] = {
       {-1826.41, -3027.52}, {-1839.88, -3023.9},  {-1851.95, -3020.71},
@@ -475,9 +475,11 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
       {-1835.53, -2931.86}, {-1833.36, -2931.52}, {-1831.33, -2931.67},
       {-1827.05, -2932.6},  {-1809.64, -2937.85}};
 
-  for (int i = 0; i < world.route_size(); ++i) {
-    EXPECT_NEAR(world.route(i).x(), points[i][0], kEpsilon);
-    EXPECT_NEAR(world.route(i).y(), points[i][1], kEpsilon);
+  const auto& path = world.route_path(0);
+  EXPECT_EQ(23, path.point_size());
+  for (int i = 0; i < path.point_size(); ++i) {
+    EXPECT_NEAR(path.point(i).x(), points[i][0], kEpsilon);
+    EXPECT_NEAR(path.point(i).y(), points[i][1], kEpsilon);
   }
 }
 

@@ -59,4 +59,4 @@ class CurveMath {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_MATH_CURVE_MATH_H_ */
+#endif  // MODULES_PLANNING_MATH_CURVE_MATH_H_

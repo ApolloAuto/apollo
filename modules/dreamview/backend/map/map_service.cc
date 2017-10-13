@@ -18,14 +18,12 @@
 
 #include <algorithm>
 
-#include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::PointENU;
-using apollo::common::util::DownsampleByAngle;
 using apollo::hdmap::Map;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfoConstPtr;
@@ -35,7 +33,6 @@ using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::hdmap::Path;
-using apollo::hdmap::MapPathPoint;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
 
@@ -247,21 +244,12 @@ bool MapService::GetNearestLane(const double x, const double y,
   return true;
 }
 
-bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
-                                      std::vector<MapPathPoint> *points) const {
-  Path path;
-  if (!pnc_map_.CreatePathFromRouting(routing, &path)) {
-    AERROR << "Unable to get points from routing!";
+bool MapService::GetPathsFromRouting(const RoutingResponse &routing,
+                                     std::vector<Path> *paths) const {
+  if (!pnc_map_.CreatePathsFromRouting(routing, paths)) {
+    AERROR << "Unable to get paths from routing!";
     return false;
   }
-
-  constexpr double angle_threshold = 0.1;  // threshold is about 5.72 degree.
-  std::vector<int> sampled_indices =
-      DownsampleByAngle(path.path_points(), angle_threshold);
-  for (int index : sampled_indices) {
-    points->push_back(path.path_points()[index]);
-  }
-
   return true;
 }
 

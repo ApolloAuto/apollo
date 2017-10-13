@@ -68,9 +68,8 @@ class MapService {
   MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
                                      double raidus) const;
 
-  bool GetPointsFromRouting(
-      const apollo::routing::RoutingResponse &routing,
-      std::vector<apollo::hdmap::MapPathPoint> *points) const;
+  bool GetPathsFromRouting(const apollo::routing::RoutingResponse &routing,
+                           std::vector<apollo::hdmap::Path> *paths) const;
 
   // The returned value is of a hdmap::Map proto. This
   // makes it easy to convert to a JSON object and to send to the

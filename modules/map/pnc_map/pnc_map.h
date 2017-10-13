@@ -42,18 +42,13 @@ class PncMap {
   virtual ~PncMap() = default;
   explicit PncMap(const std::string &map_file);
 
-  const hdmap::HDMap& HDMap() const;
+  const hdmap::HDMap &HDMap() const;
 
-  /**
-   * @brief Warning: this function only works if there is no change lane in
-   *routing.
-   **/
-  bool CreatePathFromRouting(const routing::RoutingResponse &routing,
-                             Path *const path) const;
+  bool CreatePathsFromRouting(const routing::RoutingResponse &routing,
+                              std::vector<Path> *paths) const;
 
   bool GetLaneSegmentsFromRouting(
-      const routing::RoutingResponse &routing,
-      const common::PointENU &point,
+      const routing::RoutingResponse &routing, const common::PointENU &point,
       const double backward_length, const double forward_length,
       std::vector<LaneSegments> *const route_segments) const;
 
@@ -61,14 +56,19 @@ class PncMap {
                                          Path *const path);
 
  private:
-  bool TruncateLaneSegments(const LaneSegments &segments,
-                            double start_s, double end_s,
+  bool TruncateLaneSegments(const LaneSegments &segments, double start_s,
+                            double end_s,
                             LaneSegments *const truncated_segments) const;
 
   bool ValidateRouting(const routing::RoutingResponse &routing) const;
-  static void AppendLaneToPoints(
-      LaneInfoConstPtr lane, const double start_s, const double end_s,
-      std::vector<MapPathPoint> *const points);
+
+  bool AddPathFromPassageRegion(
+      const routing::RoutingResponse::PassageRegion &passage_region,
+      std::vector<Path> *paths) const;
+
+  static void AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
+                                 const double end_s,
+                                 std::vector<MapPathPoint> *const points);
   hdmap::HDMap hdmap_;
 };
 
