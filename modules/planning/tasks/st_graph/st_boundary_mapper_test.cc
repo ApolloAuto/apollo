@@ -86,7 +86,7 @@ TEST_F(StBoundaryMapperTest, check_overlap_test) {
   double planning_distance = 70.0;
   double planning_time = 10.0;
   SLBoundary adc_sl_boundary;
-  hdmap::PncMap pnc_map;
+  hdmap::PncMap pnc_map(&hdmap_);
   StBoundaryMapper mapper(&pnc_map, adc_sl_boundary, config, *reference_line_,
                           path_data_, planning_distance, planning_time);
   common::PathPoint path_point;
