@@ -70,7 +70,10 @@ class ReferenceLineSmootherTest : public ::testing::Test {
 TEST_F(ReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
-  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
+  std::vector<double> t_knots;
+  Spline2dSolver spline_solver(t_knots, 5);
+  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line,
+                               &spline_solver));
   EXPECT_FLOAT_EQ(153.40652, smoothed_reference_line.Length());
 }
 

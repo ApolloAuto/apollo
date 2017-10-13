@@ -251,7 +251,10 @@ std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
-      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
+      std::vector<double> init_t_knots;
+      Spline2dSolver spline_solver(init_t_knots, 5);
+      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
+                           &spline_solver)) {
         AERROR << "Failed to smooth reference line";
         continue;
       }
