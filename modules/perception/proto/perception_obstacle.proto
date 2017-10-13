@@ -42,6 +42,8 @@ message PerceptionObstacle {
   // Just for offline debuging, onboard will not fill this field.
   // Format like : [x0, y0, z0, x1, y1, z1...]
   repeated double point_cloud = 12 [packed = true];
+
+  optional double confidence = 13 [default = 1.0];
 }
 
 message PerceptionObstacles {
