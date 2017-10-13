@@ -41,7 +41,7 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::common::canbus::CarSender;
+using ::apollo::common::canbus::CanSender;
 using ::apollo::common::canbus::MessageManager;
 
 /**
