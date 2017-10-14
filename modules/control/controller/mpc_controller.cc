@@ -75,7 +75,7 @@ void WriteHeaders(std::ofstream &file_stream) {
 }
 }  // namespace
 
-MPCController::MPCController() : name_("LQR-based Lateral Controller") {
+MPCController::MPCController() : name_("MPC Controller") {
   if (FLAGS_enable_csv_debug) {
     steer_log_file_.open(GetLogFileName());
     steer_log_file_ << std::fixed;
@@ -197,10 +197,12 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
 
-  matrix_b_ = Matrix::Zero(basic_state_size_, 1);
-  matrix_bd_ = Matrix::Zero(basic_state_size_, 1);
+  matrix_b_ = Matrix::Zero(basic_state_size_, controls_);
+  matrix_bd_ = Matrix::Zero(basic_state_size_, controls_);
   matrix_b_(1, 0) = cf_ / mass_;
   matrix_b_(3, 0) = lf_ * cf_ / iz_;
+  matrix_b_(4, 1) = 1.0;
+  matrix_b_(5, 1) = 1.0;
   matrix_bd_ = matrix_b_ * ts_;
 
   matrix_state_ = Matrix::Zero(matrix_size, 1);
@@ -229,6 +231,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_q_updated_ = matrix_q_;
   InitializeFilters(control_conf);
   LogInitParameters();
+  AINFO << "[MPCController] init done!";
   return Status::OK();
 }
 
@@ -266,10 +269,7 @@ Status MPCController::ComputeControlCommand(
 
   UpdateMatrix();
 
-  int CONTROLS = 2;
-  const int HORIZON = 10;
-
-  Eigen::MatrixXd control_matrix(CONTROLS, 1);
+  Eigen::MatrixXd control_matrix(controls_, 1);
   control_matrix << 0, 0;
 
   Eigen::MatrixXd C(basic_state_size_, 1);
@@ -278,28 +278,30 @@ Status MPCController::ComputeControlCommand(
   Eigen::MatrixXd reference_state(basic_state_size_, 1);
   reference_state << 0, 0, 0, 0, 0, 0;
 
-  std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
+  std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
 
-  Eigen::MatrixXd lower_bound(CONTROLS, 1);
+  Eigen::MatrixXd lower_bound(controls_, 1);
   lower_bound << -10, -10;
 
-  Eigen::MatrixXd upper_bound(CONTROLS, 1);
+  Eigen::MatrixXd upper_bound(controls_, 1);
   upper_bound << 10, 10;
 
   Eigen::MatrixXd initial_state(basic_state_size_, 1);
   initial_state << 0, 0, 0, 0, 0, 0;
   // TODO: change the init state
 
-  std::vector<Eigen::MatrixXd> control(HORIZON, control_matrix);
-  ::apollo::common::math::SolveLinearMPC(
+  std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
+
+  if (::apollo::common::math::SolveLinearMPC(
       matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound, upper_bound,
-      initial_state, reference, lqr_eps_, lqr_max_iteration_, &control);
+      initial_state, reference, lqr_eps_, lqr_max_iteration_, &control) != true) {
+      AERROR << "MPC failed";
+      }
 
   double steer_angle_feedback = -control[0](1, 0);
   double steer_angle_feedforward =
       ComputeLateralFeedForward(debug->curvature());
   double steer_angle = steer_angle_feedback + steer_angle_feedforward;
-
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
 
@@ -358,6 +360,8 @@ Status MPCController::ComputeControlCommand(
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+
+
   // compute extra information for logging and debugging
   double steer_angle_lateral_contribution =
       -matrix_k_(0, 0) * matrix_state_(0, 0) * 180 / M_PI *
