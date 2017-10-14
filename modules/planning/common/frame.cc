@@ -19,6 +19,7 @@
  **/
 #include "modules/planning/common/frame.h"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <limits>
