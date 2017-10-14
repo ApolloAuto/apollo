@@ -4,7 +4,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "can_receiver",
-    srcs = ["can_receiver.cc"],
     hdrs = ["can_receiver.h"],
     deps = [
         "//modules/drivers/canbus/can_client",
@@ -16,7 +15,6 @@ cc_library(
 
 cc_library(
     name = "can_sender",
-    srcs = ["can_sender.cc"],
     hdrs = ["can_sender.h"],
     deps = [
         "//modules/drivers/canbus/can_client",
@@ -29,20 +27,14 @@ cc_library(
 
 cc_library(
     name = "message_manager_base",
-    srcs = [
-        "message_manager.cc",
-        "protocol_data.cc",
-    ],
     hdrs = [
         "message_manager.h",
         "protocol_data.h",
     ],
     deps = [
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/common/proto:error_code_proto",
         "//modules/common/time",
-        "//modules/control/proto:control_proto",
     ],
 )
 
@@ -56,6 +48,7 @@ cc_test(
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "@gtest//:main",
     ],
@@ -71,6 +64,7 @@ cc_test(
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/common:canbus_common",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "@gtest//:main",
     ],
@@ -83,6 +77,7 @@ cc_test(
         "protocol_data_test.cc",
     ],
     deps = [
+        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "@gtest//:main",
     ],
@@ -93,6 +88,7 @@ cc_test(
     size = "small",
     srcs = ["message_manager_test.cc"],
     deps = [
+        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "@gtest//:main",
     ],

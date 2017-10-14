@@ -20,15 +20,15 @@
 #include <thread>
 
 #include "gflags/gflags.h"
-#include "modules/drivers/canbus/can_client/can_client.h"
-#include "modules/drivers/canbus/can_client/can_client_factory.h"
-#include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/util/file.h"
+#include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/can_client/can_client_factory.h"
+#include "modules/drivers/canbus/common/byte.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
 DEFINE_bool(only_one_send, false, "only send test.");
 DEFINE_string(can_client_conf_file_a,

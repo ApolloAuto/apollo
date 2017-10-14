@@ -18,13 +18,19 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
+
 namespace apollo {
 namespace drivers {
 namespace canbus {
 
+using ::apollo::canbus::ChassisDetail;
+
 TEST(ProtocolDataTest, CheckSum) {
   const uint8_t INPUT[] = {0x00, 0x12, 0x00, 0x13, 0x00, 0xF3, 0x00, 0x00};
-  uint8_t result = ProtocolData::CalculateCheckSum(INPUT, 8);
+  uint8_t result =
+      ProtocolData<::apollo::canbus::ChassisDetail>::CalculateCheckSum(INPUT,
+                                                                       8);
   EXPECT_EQ(0xE7, result);
 }
 
