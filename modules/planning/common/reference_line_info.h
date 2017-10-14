@@ -92,8 +92,6 @@ class ReferenceLineInfo {
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
-  const hdmap::PncMap* pnc_map() const { return pnc_map_; }
-
   void ExportDecision(DecisionResult* decision_result) const;
 
  private:
