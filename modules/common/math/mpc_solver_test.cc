@@ -84,17 +84,17 @@ TEST(MPCSolverTest, MPC) {
   Eigen::MatrixXd control_matrix(CONTROLS, 1);
   control_matrix << 0,
                     0;
-
   std::vector<Eigen::MatrixXd> control(HORIZON, control_matrix);
+
   for (unsigned int i = 0; i < control.size(); ++i) {
     for (unsigned int i = 1; i < control.size(); ++i) {
       control[i - 1] = control[i];
     }
+    control[HORIZON-1] = control_matrix;
     SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state,
                    reference, EPS, MAX_ITER, &control);
     EXPECT_FLOAT_EQ(upper_bound(0), control[0](0));
   }
-
   CONTROLS = 1;
 
   Eigen::MatrixXd B1(STATES, CONTROLS);
@@ -179,6 +179,7 @@ TEST(MPCSolverTest, MPC) {
                    reference2, EPS, MAX_ITER, &control2);
     EXPECT_NEAR(0.0, control2[0](0), 1e-7);
   }
+
 }
 }  // namespace math
 }  // namespace common
