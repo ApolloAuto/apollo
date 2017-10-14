@@ -48,7 +48,7 @@ namespace math {
  * @param max_iter The maximum iterations for solving ARE
  * @param control The feedback control matrix (pointer)
  */
-void SolveLinearMPC(Eigen::MatrixXd &matrix_a,
+bool SolveLinearMPC(Eigen::MatrixXd &matrix_a,
                     Eigen::MatrixXd &matrix_b,
                     Eigen::MatrixXd &matrix_c,
                     Eigen::MatrixXd &matrix_q,
