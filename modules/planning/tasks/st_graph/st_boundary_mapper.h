@@ -39,8 +39,7 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(const hdmap::PncMap* pnc_map,
-                   const SLBoundary& adc_sl_boundary,
+  StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                    const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
@@ -82,7 +81,6 @@ class StBoundaryMapper {
   double GetCentricAccLimit(const double kappa) const;
 
  private:
-  const hdmap::PncMap* pnc_map_ = nullptr;
   const SLBoundary& adc_sl_boundary_;
   StBoundaryConfig st_boundary_config_;
   const ReferenceLine& reference_line_;

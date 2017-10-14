@@ -56,15 +56,13 @@ constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }
 
-StBoundaryMapper::StBoundaryMapper(const hdmap::PncMap* pnc_map,
-                                   const SLBoundary& adc_sl_boundary,
+StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
                                    const double planning_time)
-    : pnc_map_(pnc_map),
-      adc_sl_boundary_(adc_sl_boundary),
+    : adc_sl_boundary_(adc_sl_boundary),
       st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
