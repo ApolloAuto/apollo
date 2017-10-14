@@ -23,9 +23,9 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/drivers/canbus/common/byte.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace drivers {

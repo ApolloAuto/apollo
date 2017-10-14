@@ -25,9 +25,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/factory.h"
+#include "modules/drivers/canbus/can_client/can_client.h"
 
 /**
  * @namespace apollo::drivers::canbus

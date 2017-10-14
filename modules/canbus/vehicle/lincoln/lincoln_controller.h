@@ -31,6 +31,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
@@ -61,8 +62,10 @@ class LincolnController final : public VehicleController {
    * @return init error_code
    */
   common::ErrorCode Init(
-      const VehicleParameter &params, CanSender *const can_sender,
-      MessageManager *const message_manager) override;
+      const VehicleParameter &params,
+      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager)
+      override;
 
   /**
    * @brief start the vehicle controller.
@@ -118,8 +121,7 @@ class LincolnController final : public VehicleController {
   void SetEpbBreak(const control::ControlCommand &command) override;
   void SetBeam(const control::ControlCommand &command) override;
   void SetHorn(const control::ControlCommand &command) override;
-  void SetTurningSignal(
-      const control::ControlCommand &command) override;
+  void SetTurningSignal(const control::ControlCommand &command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
@@ -140,7 +142,7 @@ class LincolnController final : public VehicleController {
   Gear66 *gear_66_ = nullptr;
   Turnsignal68 *turnsignal_68_ = nullptr;
 
-  CanSender *can_sender_ = nullptr;
+  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
   bool is_chassis_error_ = false;

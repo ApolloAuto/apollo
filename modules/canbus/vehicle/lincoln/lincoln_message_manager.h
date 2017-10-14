@@ -22,6 +22,7 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 /**
@@ -39,7 +40,8 @@ using ::apollo::drivers::canbus::MessageManager;
  *
  * @brief implementation of MessageManager for lincoln vehicle
  */
-class LincolnMessageManager : public MessageManager {
+class LincolnMessageManager
+    : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   /**
    * @brief construct a lincoln message manager. protocol data for send and
