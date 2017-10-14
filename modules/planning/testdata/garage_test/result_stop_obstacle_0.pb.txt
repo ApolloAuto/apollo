@@ -1733,10 +1733,10 @@ decision {
           reason_code: STOP_REASON_DESTINATION
           distance_s: -3
           stop_point {
-            x: 586366.92647250474
-            y: 4140782.3906009872
+            x: 586366.1352695371
+            y: 4140779.3961069118
           }
-          stop_heading: 1.3131830979867551
+          stop_heading: 1.3117755566743643
         }
       }
     }
