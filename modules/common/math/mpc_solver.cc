@@ -30,7 +30,7 @@ using Matrix = Eigen::MatrixXd;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
-void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
+bool SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
                     Matrix &matrix_q, Matrix &matrix_r, Matrix &matrix_lower,
                     Matrix &matrix_upper, Matrix &matrix_initial_state,
                     std::vector<Matrix> &reference, double eps, int max_iter,
@@ -39,7 +39,7 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
       matrix_b.rows() != matrix_a.rows() ||
       matrix_lower.rows() != matrix_upper.rows()) {
     AERROR << "One or more matrices have incompatible dimensions. Aborting.";
-    return;
+    return false;
   }
 
   unsigned int horizon = reference.size();
@@ -132,6 +132,7 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
   auto result = qp_solver->Solve();
   if (!result) {
   AERROR << "Linear MPC solver failed";
+  return false;
   }
   matrix_v = qp_solver->params();
 
@@ -139,6 +140,7 @@ void SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
     (*control)[i] =
         matrix_v.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1);
   }
+  return true;
 }
 
 }  // namespace math
