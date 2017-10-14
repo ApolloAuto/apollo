@@ -57,11 +57,7 @@ export function drawCircle(radius, material, segments = 32) {
 
 export function drawThickBandFromPoints(
     points, thickness = 0.5, color = 0xffffff, opacity = 1, zOffset = 0) {
-    // const quality = 5;
-    // const curve = bezier(points.map(p => [p.x, p.y]), quality);
-
     const geometry = Line(points.map(p => [p.x, p.y]));
-
     const material = new THREE.ShaderMaterial(BasicShader({
         side: THREE.DoubleSide,
         diffuse: color,

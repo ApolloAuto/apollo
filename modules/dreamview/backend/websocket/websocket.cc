@@ -31,8 +31,8 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     connections_.emplace(conn, std::make_shared<std::mutex>());
+    AINFO << "Accepted connection. Total connections: " << connections_.size();
   }
-  AINFO << "Accepted connection. Total connections: " << connections_.size();
 }
 
 void WebSocketHandler::handleClose(CivetServer *server,
@@ -48,8 +48,8 @@ void WebSocketHandler::handleClose(CivetServer *server,
       std::unique_lock<std::mutex> lock(*connection_lock);
       connections_.erase(connection);
     }
+    AINFO << "Connection closed. Total connections: " << connections_.size();
   }
-  AINFO << "Connection closed. Total connections: " << connections_.size();
 }
 
 bool WebSocketHandler::BroadcastData(const std::string &data) {

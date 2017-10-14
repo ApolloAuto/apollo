@@ -16,13 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 
-#include "modules/common/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::common::canbus::Byte;
+using ::apollo::drivers::canbus::Byte;
 
 // public
 const int32_t Brake60::ID = 0x60;

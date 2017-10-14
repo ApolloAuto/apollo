@@ -28,11 +28,11 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/canbus/can_client/can_client.h"
-#include "modules/common/canbus/can_comm/can_receiver.h"
-#include "modules/common/canbus/can_comm/can_sender.h"
-#include "modules/common/canbus/proto/can_card_parameter.pb.h"
-#include "modules/common/canbus/can_comm/message_manager.h"
+#include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/can_comm/can_receiver.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
@@ -47,8 +47,8 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::common::canbus::CanClient;
-using ::apollo::common::canbus::CanReceiver;
+using ::apollo::drivers::canbus::CanClient;
+using ::apollo::drivers::canbus::CanReceiver;
 
 /**
 * @class Canbus
