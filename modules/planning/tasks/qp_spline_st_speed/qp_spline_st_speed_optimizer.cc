@@ -131,11 +131,13 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_);
       ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);
 
-      std::string msg = common::util::StrCat(
-          Name(), ": Failed to search graph with quadratic programming!");
-      AERROR << msg;
-      RecordSTGraphDebug(st_graph_data, st_graph_debug);
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      if (ret != Status::OK()) {
+        std::string msg = common::util::StrCat(
+            Name(), ": Failed to search graph with quadratic programming!");
+        AERROR << msg;
+        RecordSTGraphDebug(st_graph_data, st_graph_debug);
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
     }
   }
 
