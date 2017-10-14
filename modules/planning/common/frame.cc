@@ -133,8 +133,6 @@ const Obstacle *Frame::CreateDestinationObstacle() {
   }
   const auto &routing_end =
       *routing_response_.routing_request().waypoint().rbegin();
-  common::PointENU dest_point = common::util::MakePointENU(
-      routing_end.pose().x(), routing_end.pose().y(), 0.0);
   const auto lane =
       pnc_map_->HDMap().GetLaneById(hdmap::MakeMapId(routing_end.id()));
   if (!lane) {
@@ -142,7 +140,11 @@ const Obstacle *Frame::CreateDestinationObstacle() {
            << routing_end.DebugString();
     return nullptr;
   }
-  double dest_lane_s = routing_end.s();
+
+  double dest_lane_s = std::max(0.0,
+      routing_end.s() - FLAGS_virtual_stop_wall_length
+      - FLAGS_stop_distance_destination);
+  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
   // check if destination point is in planning range
   common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
                                       lane->Heading(dest_lane_s),
