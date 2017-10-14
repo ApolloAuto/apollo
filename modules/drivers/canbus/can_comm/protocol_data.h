@@ -22,8 +22,10 @@
 #ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_PROTOCOL_DATA_H_
 #define MODULES_DRIVERS_CANBUS_CAN_COMM_PROTOCOL_DATA_H_
 
+#include <cmath>
+
+#include "modules/common/log.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
-#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::drivers::canbus
@@ -33,13 +35,12 @@ namespace apollo {
 namespace drivers {
 namespace canbus {
 
-using ::apollo::canbus::ChassisDetail;
-
 /**
  * @class ProtocolData
  *
  * @brief This is the base class of protocol data.
  */
+template <typename SensorType>
 class ProtocolData {
  public:
   /**
@@ -76,21 +77,21 @@ class ProtocolData {
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
-   * @param car_status the parsed car_status
+   * @param sensor_data the parsed sensor_data
    */
   virtual void Parse(const uint8_t *bytes, int32_t length,
-                     ChassisDetail *car_status) const;
+                     SensorType *sensor_data) const;
 
   /*
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
    * @param timestamp the timestamp of input data
-   * @param car_status the parsed car_status
+   * @param sensor_data the parsed sensor_data
    */
   virtual void Parse(const uint8_t *bytes, int32_t length,
                      const struct timeval &timestamp,
-                     ChassisDetail *car_status) const;
+                     SensorType *sensor_data) const;
 
   /*
    * @brief update the data
@@ -112,8 +113,9 @@ class ProtocolData {
   const int32_t data_length_ = CANBUS_MESSAGE_LENGTH;
 };
 
+template <typename SensorType>
 template <typename T>
-T ProtocolData::BoundedValue(T lower, T upper, T val) {
+T ProtocolData<SensorType>::BoundedValue(T lower, T upper, T val) {
   if (lower > upper) {
     return val;
   }
@@ -125,6 +127,46 @@ T ProtocolData::BoundedValue(T lower, T upper, T val) {
   }
   return val;
 }
+
+// (SUM(input))^0xFF
+template <typename SensorType>
+uint8_t ProtocolData<SensorType>::CalculateCheckSum(const uint8_t *input,
+                                                    const uint32_t length) {
+  uint8_t sum = 0;
+  for (size_t i = 0; i < length; ++i) {
+    sum += input[i];
+  }
+  return sum ^ 0xFF;
+}
+
+template <typename SensorType>
+uint32_t ProtocolData<SensorType>::GetPeriod() const {
+  const uint32_t CONST_PERIOD = 100 * 1000;
+  return CONST_PERIOD;
+}
+
+template <typename SensorType>
+int32_t ProtocolData<SensorType>::GetLength() const {
+  return data_length_;
+}
+
+template <typename SensorType>
+void ProtocolData<SensorType>::Parse(const uint8_t * /*bytes*/,
+                                     int32_t /*length*/,
+                                     SensorType * /*sensor_data*/) const {}
+
+template <typename SensorType>
+void ProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
+                                     const struct timeval &timestamp,
+                                     SensorType *sensor_data) const {
+  Parse(bytes, length, sensor_data);
+}
+
+template <typename SensorType>
+void ProtocolData<SensorType>::UpdateData(uint8_t * /*data*/) {}
+
+template <typename SensorType>
+void ProtocolData<SensorType>::Reset() {}
 
 }  // namespace canbus
 }  // namespace drivers

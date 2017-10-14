@@ -23,6 +23,7 @@
 #define MODULES_CANBUS_LINCOLN_PROTOCOL_THROTTLE_63_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -32,14 +33,13 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::drivers::canbus::ProtocolData;
-
 /**
  * @class Throttle63
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Throttle63 : public ProtocolData {
+class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

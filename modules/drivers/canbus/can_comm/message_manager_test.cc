@@ -21,6 +21,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -29,13 +30,14 @@ namespace canbus {
 
 using apollo::common::ErrorCode;
 
-class MockProtocolData : public ProtocolData {
+class MockProtocolData : public ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID = 0x111;
   MockProtocolData() {}
 };
 
-class MockMessageManager : public MessageManager {
+class MockMessageManager
+    : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   MockMessageManager() {
     AddRecvProtocolData<MockProtocolData, true>();
@@ -52,10 +54,10 @@ TEST(MessageManagerTest, GetMutableProtocolDataById) {
   EXPECT_TRUE(manager.GetMutableProtocolDataById(MockProtocolData::ID) !=
               nullptr);
 
-  ChassisDetail chassis_detail;
-  chassis_detail.set_car_type(ChassisDetail::QIRUI_EQ_15);
-  EXPECT_EQ(manager.GetChassisDetail(&chassis_detail), ErrorCode::OK);
-  EXPECT_EQ(manager.GetChassisDetail(nullptr), ErrorCode::CANBUS_ERROR);
+  ::apollo::canbus::ChassisDetail chassis_detail;
+  chassis_detail.set_car_type(::apollo::canbus::ChassisDetail::QIRUI_EQ_15);
+  EXPECT_EQ(manager.GetSensorData(&chassis_detail), ErrorCode::OK);
+  EXPECT_EQ(manager.GetSensorData(nullptr), ErrorCode::CANBUS_ERROR);
 }
 
 }  // namespace canbus

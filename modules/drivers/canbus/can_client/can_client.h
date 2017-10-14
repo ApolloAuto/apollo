@@ -28,10 +28,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/drivers/canbus/common/byte.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
 /**
  * @namespace apollo::drivers::canbus
