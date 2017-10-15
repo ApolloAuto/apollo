@@ -108,6 +108,7 @@ cc_library(
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/common/time",
+        "//modules/planning/common:planning_gflags",
         "@eigen//:eigen",
     ],
 )
@@ -189,6 +190,7 @@ cc_library(
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/common/time",
+        "//modules/planning/common:planning_gflags",
         "@eigen//:eigen",
     ],
 )

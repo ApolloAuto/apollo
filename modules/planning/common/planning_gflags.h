@@ -115,4 +115,6 @@ DECLARE_double(crosswalk_expand_distance);
 DECLARE_double(crosswalk_strick_l_distance);
 DECLARE_double(crosswalk_loose_l_distance);
 
+DECLARE_bool(enable_sqp_solver);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

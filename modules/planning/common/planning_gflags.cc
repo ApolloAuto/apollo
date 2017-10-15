@@ -185,3 +185,6 @@ DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
             "Enable follow acceleration constraint.");
+
+// SQP solver
+DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
