@@ -31,6 +31,7 @@
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/common/time/time.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -82,8 +83,9 @@ bool Spline1dGenerator::Solve() {
   int num_constraint =
       equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
 
-  bool use_hotstart = (sqp_solver_ != nullptr && num_param == last_num_param_ &&
-                       num_constraint == last_num_constraint_);
+  bool use_hotstart =
+      (FLAGS_enable_sqp_solver && sqp_solver_ != nullptr &&
+       num_param == last_num_param_ && num_constraint == last_num_constraint_);
 
   if (!use_hotstart) {
     sqp_solver_.reset(new ::qpOASES::SQProblem(num_param, num_constraint,
