@@ -35,38 +35,40 @@
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace dreamview {
 
+using apollo::canbus::Chassis;
 using apollo::common::Point3D;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::MonitorAdapter;
-using apollo::common::adapter::LocalizationAdapter;
 using apollo::common::adapter::ChassisAdapter;
+using apollo::common::adapter::LocalizationAdapter;
+using apollo::common::adapter::MonitorAdapter;
 using apollo::common::adapter::PerceptionObstaclesAdapter;
 using apollo::common::adapter::PlanningAdapter;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::localization::LocalizationEstimate;
-using apollo::planning::ADCTrajectory;
-using apollo::common::TrajectoryPoint;
-using apollo::planning::DecisionResult;
-using apollo::planning::StopReasonCode;
-using apollo::canbus::Chassis;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
-using apollo::prediction::PredictionObstacle;
-using apollo::prediction::PredictionObstacles;
-using apollo::routing::RoutingResponse;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
-using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::DownsampleByAngle;
+using apollo::common::util::GetProtoFromFile;
 using apollo::hdmap::Path;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
+using apollo::planning::ADCTrajectory;
+using apollo::planning::DecisionResult;
+using apollo::planning::StopReasonCode;
+using apollo::planning_internal::PlanningData;
+using apollo::prediction::PredictionObstacle;
+using apollo::prediction::PredictionObstacles;
+using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
 
@@ -623,6 +625,11 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   }
 }
 
+void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
+  auto planning_data = world_.mutable_planning_data();
+  planning_data->CopyFrom(data);
+}
+
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const ADCTrajectory &trajectory) {
@@ -631,6 +638,8 @@ void SimulationWorldService::UpdateSimulationWorld(
   UpdatePlanningTrajectory(trajectory);
 
   UpdateDecision(trajectory.decision(), header_time);
+
+  UpdatePlanningData(trajectory.debug().planning_data());
 
   world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
