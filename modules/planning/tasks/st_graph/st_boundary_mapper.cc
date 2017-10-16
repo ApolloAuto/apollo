@@ -434,15 +434,16 @@ Status StBoundaryMapper::GetSpeedLimits(
   for (uint32_t i = 0; i < path_data_.discretized_path().path_points().size();
        ++i) {
     const auto& path_point = path_data_.discretized_path().path_points()[i];
-    if (path_point.s() > reference_line_.Length()) {
-      AWARN << "path length [" << path_data_.discretized_path().Length()
+    const auto& frenet_point = path_data_.frenet_frame_path().PointAt(i);
+    if (frenet_point.s() > reference_line_.Length()) {
+      AWARN << "path length [" << frenet_point.s()
             << "] is LARGER than reference_line_ length ["
             << reference_line_.Length() << "]. Please debug before proceeding.";
       break;
     }
 
     double speed_limit_on_reference_line =
-        reference_line_.GetSpeedLimitFromS(path_point.s());
+        reference_line_.GetSpeedLimitFromS(frenet_point.s());
 
     const double avg_kappa =
         GetAvgKappa(i, path_data_.discretized_path().path_points());
