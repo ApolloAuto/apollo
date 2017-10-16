@@ -117,7 +117,7 @@ std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
 
 bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     const common::PointENU &position) {
-  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
+  std::vector<hdmap::RouteSegments> route_segments;
 
   // additional smooth reference line length, unit: meter
   const double kForwardAdditionalLength = 100;
