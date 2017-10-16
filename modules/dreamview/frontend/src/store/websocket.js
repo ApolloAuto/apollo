@@ -39,6 +39,9 @@ class WebSocketEndpoint {
                     RENDERER.updateWorld(message.world);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
+                    if (STORE.options.showPNCMonitor) {
+                        STORE.planning.update(message.world);
+                    }
                     if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.
                         this.counter = 0;

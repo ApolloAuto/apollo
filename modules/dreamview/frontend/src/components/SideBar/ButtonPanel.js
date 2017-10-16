@@ -61,11 +61,12 @@ export default class ButtonPanel extends React.Component {
     }
 
     render() {
-        const { showRouteEditingBar,
-                sendDefaultRoutingRequest,
+        const { sendDefaultRoutingRequest,
+                showRouteEditingBar,
+                onVideo,
+                onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
-                onMenu, showMenu,
-                onVideo } = this.props;
+                onMenu, showMenu} = this.props;
 
         return (
             <div>
@@ -82,6 +83,10 @@ export default class ButtonPanel extends React.Component {
                                active={false} />
                 <div className="separator" />
                 <DashCamButton onClick={onVideo}/>
+                <div className="separator" />
+                <SideBarButton label="PNC Monitor"
+                               onClick={onPNCMonitor}
+                               active={showPNCMonitor} />
                 <div className="separator" />
                 <SideBarButton label="Notifications"
                                onClick={onConsole}

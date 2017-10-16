@@ -52,6 +52,9 @@ void TrajectoryPointCollector::Collect(const TrajectoryPoint &point) {
       polygon_point->set_x(corner.x());
       polygon_point->set_y(corner.y());
     }
+
+    trajectory->set_speed(point.v());
+    trajectory->set_timestamp_sec(point.relative_time());
   }
   previous_ = point;
   has_previous_ = true;

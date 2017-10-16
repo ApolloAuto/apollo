@@ -13,23 +13,27 @@ export default class SideBar extends React.Component {
 
         return (
             <div className="sidebar">
-                <ButtonPanel showRouteEditingBar={() => {
-                                     routeEditingManager.enableRouteEditing();
-                                 }}
-                             sendDefaultRoutingRequest={() => {
+                <ButtonPanel sendDefaultRoutingRequest={() => {
                                      routeEditingManager.sendRoutingRequest(true);
                                  }}
-                             showMenu={options.showMenu}
-                             onMenu={() => {
-                                     options.toggleShowMenu();
-                                 }}
-                             showConsole={options.showConsole}
-                             onConsole={() => {
-                                     options.toggleShowConsole();
+                             showRouteEditingBar={() => {
+                                     routeEditingManager.enableRouteEditing();
                                  }}
                              onVideo={(event) => {
                                      video.setVideo(event.target.files[0]);
-                                 }}/>
+                                 }}
+                             onPNCMonitor={() => {
+                                     this.props.store.setPNCMonitor();
+                                 }}
+                             showPNCMonitor={options.showPNCMonitor}
+                             onConsole={() => {
+                                     options.toggleShowConsole();
+                                 }}
+                             showConsole={options.showConsole}
+                             onMenu={() => {
+                                     options.toggleShowMenu();
+                                 }}
+                             showMenu={options.showMenu} />
                 {options.showMenu ? <Menu options={options} /> : <div/>}
                 {options.showConsole ? <Console monitor={monitor} /> :
                  <Notification monitor={monitor} />}

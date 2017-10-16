@@ -135,6 +135,7 @@ class SimulationWorldService {
                       double header_time);
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
                           double update_timestamp_sec, Object *world_main_stop);
+  void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   /**
    * @brief Check whether a particular adapter has been initialized correctly.
