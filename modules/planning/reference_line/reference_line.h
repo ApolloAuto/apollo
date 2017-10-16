@@ -27,6 +27,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/math/vec2d.h"
 #include "modules/map/pnc_map/path.h"
@@ -73,6 +74,10 @@ class ReferenceLine {
 
   double GetSpeedLimitFromS(const double s) const;
 
+  routing::ChangeLaneType change_lane_type() const;
+
+  void set_change_lane_type(routing::ChangeLaneType type);
+
  private:
   /**
    * @brief Linearly interpolate p0 and p1 by s0 and s1.
@@ -103,6 +108,7 @@ class ReferenceLine {
  private:
   std::vector<ReferencePoint> reference_points_;
   hdmap::Path map_path_;
+  routing::ChangeLaneType change_lane_type_ = routing::FORWARD;
 };
 
 }  // namespace planning
