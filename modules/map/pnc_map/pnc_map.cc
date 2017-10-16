@@ -64,6 +64,13 @@ void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
   points->resize(count);
 }
 
+bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
+                       const LaneWaypoint &waypoint) {
+  return lane_segment.id() == waypoint.lane->id().id() &&
+         lane_segment.start_s() - kSegmentationEpsilon <= waypoint.s &&
+         lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s;
+}
+
 void RemoveDuplicates(std::vector<MapPathPoint> *points) {
   CHECK_NOTNULL(points);
   int count = 0;
@@ -80,6 +87,32 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 }
 
 }  // namespace
+
+bool RouteSegments::GetInnerProjection(const common::PointENU &point_enu,
+                                       double *s, double *l) const {
+  const auto point = common::math::Vec2d{point_enu.x(), point_enu.y()};
+  *l = std::numeric_limits<double>::infinity();
+  double accumulate_s = 0.0;
+  bool has_projection = false;
+  for (auto iter = begin(); iter != end();
+       accumulate_s += (iter->end_s - iter->start_s), ++iter) {
+    double lane_s = 0.0;
+    double lane_l = 0.0;
+    if (!iter->lane->GetProjection(point, &lane_s, &lane_l)) {
+      return false;
+    }
+    if (lane_s < iter->start_s - kSegmentationEpsilon ||
+        lane_s > iter->end_s + kSegmentationEpsilon) {
+      continue;
+    }
+    has_projection = true;
+    if (std::fabs(lane_l) < *l) {
+      *l = std::fabs(lane_l);
+      *s = lane_s + accumulate_s;
+    }
+  }
+  return has_projection;
+}
 
 PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
@@ -111,6 +144,85 @@ bool PncMap::ValidateRouting(const RoutingResponse &routing) {
   if (num_road == 0) {
     AERROR << "Route is empty.";
     return false;
+  }
+  return true;
+}
+
+std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
+  int road_index = -1;
+  for (const auto &road_segment : routing_.road()) {
+    ++road_index;
+    int passage_index = -1;
+    for (const auto &passage : road_segment.passage()) {
+      ++passage_index;
+      int lane_index = -1;
+      for (const auto &segment : passage.segment()) {
+        ++lane_index;
+        if (WithinLaneSegment(segment, waypoint)) {
+          return {road_index, passage_index, lane_index};
+        }
+      }
+    }
+  }
+  return {-1, -1, -1};
+}
+
+bool PncMap::PassageToSegments(routing::Passage passage,
+                               RouteSegments *segments) const {
+  CHECK_NOTNULL(segments);
+  segments->clear();
+  for (const auto &lane : passage.segment()) {
+    auto lane_ptr = hdmap_->GetLaneById(hdmap::MakeMapId(lane.id()));
+    if (!lane_ptr) {
+      AERROR << "Failed to find lane : " << lane.id();
+      return false;
+    }
+    segments->emplace_back(lane_ptr, lane.start_s(), lane.end_s());
+  }
+  return true;
+}
+
+bool PncMap::GetRouteSegments(
+    const common::PointENU &point, const double backward_length,
+    const double forward_length,
+    std::vector<RouteSegments> *const route_segments) const {
+  LaneWaypoint waypoint;
+  if (!GetNearestPointFromRouting(point, &waypoint)) {
+    AERROR << "Failed to get waypoint from routing";
+    return false;
+  }
+  auto index = GetWaypointIndex(waypoint);
+  if (index.size() != 3 || index[0] < 0) {
+    AERROR << "Failed to get routing index from waypoint";
+    return false;
+  }
+  int road_index = index[0];
+  int passage_index = index[1];
+  const auto &road = routing_.road(road_index);
+  for (int index :
+       std::vector<int>{passage_index - 1, passage_index, passage_index + 1}) {
+    if (index < 0 || index >= road.passage_size()) {
+      continue;
+    }
+    const auto &passage = road.passage(passage_index - 1);
+    RouteSegments segments;
+    if (!PassageToSegments(passage, &segments)) {
+      AERROR << "Failed to convert passage to lane segments.";
+      return false;
+    }
+    if (index < passage_index) {
+      segments.SetChangeLaneType(routing::ChangeLaneType::LEFT);
+    } else if (index > passage_index) {
+      segments.SetChangeLaneType(routing::ChangeLaneType::RIGHT);
+    }
+    double s = 0.0;
+    double l = 0.0;
+    bool has_projection = segments.GetInnerProjection(point, &s, &l);
+    if (has_projection) {
+      route_segments->emplace_back();
+      TruncateLaneSegments(segments, s - backward_length, s + forward_length,
+                           &route_segments->back());
+    }
   }
   return true;
 }
