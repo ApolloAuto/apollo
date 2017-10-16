@@ -23,7 +23,7 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/routing/proto/routing.pb.h"
@@ -101,8 +101,12 @@ class PncMap {
                                  const double end_s,
                                  std::vector<MapPathPoint> *const points);
 
+  LaneInfoConstPtr GetRoutePredecessor(LaneInfoConstPtr lane) const;
+  LaneInfoConstPtr GetRouteSuccessor(LaneInfoConstPtr lane) const;
+
  private:
   routing::RoutingResponse routing_;
+  std::unordered_set<std::string> routing_lane_ids_;
   std::unique_ptr<LaneWaypoint> last_waypoint_;
   const hdmap::HDMap *hdmap_ = nullptr;
 };
