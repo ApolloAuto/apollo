@@ -5,6 +5,7 @@ import PARAMETERS from "store/config/parameters.yml";
 export default class Options {
     @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showConsole = PARAMETERS.options.defaults.showConsole;
+    @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
     @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
     @observable showDecisionObstacle = PARAMETERS.options.defaults.showDecisionObstacle;
