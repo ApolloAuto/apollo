@@ -32,13 +32,16 @@ from std_msgs.msg import String
 from modules.planning.proto import planning_pb2
 from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
+from modules.perception.proto import perception_obstacle_pb2
 
 g_args = None
 
-toic_msg_dict = {
-"/apollo/planning": planning_pb2.ADCTrajectory,
-"/apollo/prediction": prediction_obstacle_pb2.PredictionObstacles,
-"/apollo/routing_response": routing_pb2.RoutingResponse,
+topic_msg_dict = {
+    "/apollo/planning": planning_pb2.ADCTrajectory,
+    "/apollo/prediction": prediction_obstacle_pb2.PredictionObstacles,
+    "/apollo/perception": perception_obstacle_pb2.PerceptionObstacles,
+    "/apollo/routing_response": routing_pb2.RoutingResponse,
+    "/apollo/routing_request": routing_pb2.RoutingRequest,
 }
 
 
@@ -76,11 +79,9 @@ if __name__ == "__main__":
     g_args = parser.parse_args()
     if not os.path.exists(g_args.out_dir):
         os.makedirs(g_args.out_dir)
-    rospy.init_node('trascribe_node', anonymous=True)
-    if g_args.topic == '/apollo/planning':
-        rospy.Subscriber(g_args.topic, planning_pb2.ADCTrajectory, transcribe)
-    if g_args.topic == '/apollo/prediction':
-        rospy.Subscriber(g_args.topic, planning_pb2.ADCTrajectory, transcribe)
-    else:
+    if g_args.topic not in topic_msg_dict:
         print "Unknown topic name: %s" % (g_args.topic)
+        sys.exit(0)
+    rospy.init_node('trascribe_node', anonymous=True)
+    rospy.Subscriber(g_args.topic, topic_msg_dict[g_args.topic], transcribe)
     rospy.spin()
