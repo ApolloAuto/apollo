@@ -35,7 +35,7 @@ using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PncMap;
-using apollo::hdmap::LaneSegments;
+using apollo::hdmap::RouteSegments;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
 
@@ -314,7 +314,7 @@ bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
 
 bool MapService::AddPathFromPassageRegion(
     const routing::Passage &passage_region, std::vector<Path> *paths) const {
-  LaneSegments segments;
+  RouteSegments segments;
   for (const auto &segment : passage_region.segment()) {
     auto lane_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(segment.id()));
     if (!lane_ptr) {
