@@ -205,6 +205,13 @@ class Renderer {
 
             this.controls.enabled = false;
             break;
+        case "Monitor":
+            this.camera.position.set(target.position.x, target.position.y, 50);
+            this.camera.up.set(0, 1, 0);
+            this.camera.lookAt(target.position.x, target.position.y, 0);
+
+            this.controls.enabled = false;
+            break;
         case "Map":
             if (!this.controls.enabled) {
                 this.enableOrbitControls();
