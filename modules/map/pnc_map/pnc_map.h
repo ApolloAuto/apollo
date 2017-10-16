@@ -37,10 +37,17 @@ namespace hdmap {
 class RouteSegments : public std::vector<LaneSegment> {
  public:
   RouteSegments() = default;
-  explicit RouteSegments(routing::ChangeLaneType type)
-      : change_lane_type_(type) {}
-
+  void SetChangeLaneType(routing::ChangeLaneType type) {
+    change_lane_type_ = type;
+  }
   routing::ChangeLaneType change_lane_type() const { return change_lane_type_; }
+
+  /**
+   * Project a point to route segments.
+   * @return false if error happended or projected outside of the lane segments.
+   */
+  bool GetInnerProjection(const common::PointENU &point_enu, double *s,
+                          double *l) const;
 
  private:
   routing::ChangeLaneType change_lane_type_ = routing::FORWARD;
@@ -65,9 +72,29 @@ class PncMap {
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
+  bool GetRouteSegments(const common::PointENU &point,
+                        const double backward_length,
+                        const double forward_length,
+                        std::vector<RouteSegments> *const route_segments) const;
+
  private:
   bool GetNearestPointFromRouting(const common::PointENU &point,
                                   LaneWaypoint *waypoint) const;
+
+  /**
+   * Find the waypoint index of a routing waypoint.
+   * @return a vector with three values: Road index in RoutingResponse, Passage
+   * index in RoadSegment, and segment index in a Passage. (-1, -1, -1) will be
+   * returned if there is any error.
+   */
+  std::vector<int> GetWaypointIndex(const LaneWaypoint &waypoint) const;
+
+  bool PassageToSegments(routing::Passage passage,
+                         RouteSegments *segments) const;
+
+  bool ProjectToSegments(const common::PointENU &point_enu,
+                         const RouteSegments &segments,
+                         LaneWaypoint *waypoint) const;
 
   bool TruncateLaneSegments(const RouteSegments &segments, double start_s,
                             double end_s,
