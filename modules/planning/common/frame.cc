@@ -242,9 +242,9 @@ std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
     const common::PointENU &position) {
   std::vector<ReferenceLine> reference_lines;
   std::vector<hdmap::RouteSegments> route_segments;
-  if (!pnc_map_->GetLaneSegmentsFromRouting(
-          position, FLAGS_look_backward_distance, FLAGS_look_forward_distance,
-          &route_segments)) {
+  if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
+                                  FLAGS_look_forward_distance,
+                                  &route_segments)) {
     AERROR << "Failed to extract segments from routing";
     return reference_lines;
   }

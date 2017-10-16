@@ -64,11 +64,6 @@ class PncMap {
 
   const routing::RoutingResponse &routing_response() const;
 
-  bool GetLaneSegmentsFromRouting(
-      const common::PointENU &point, const double backward_length,
-      const double forward_length,
-      std::vector<RouteSegments> *const route_segments) const;
-
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
