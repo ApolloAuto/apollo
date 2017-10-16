@@ -39,7 +39,7 @@ DEFINE_double(
     "look backward this distance when creating reference line from routing");
 
 DEFINE_double(
-    look_forward_distance, 100,
+    look_forward_distance, 200,
     "look forward this distance when creating reference line from routing");
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
