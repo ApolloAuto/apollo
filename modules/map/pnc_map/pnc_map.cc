@@ -204,7 +204,7 @@ bool PncMap::GetRouteSegments(
     if (index < 0 || index >= road.passage_size()) {
       continue;
     }
-    const auto &passage = road.passage(passage_index - 1);
+    const auto &passage = road.passage(index);
     RouteSegments segments;
     if (!PassageToSegments(passage, &segments)) {
       AERROR << "Failed to convert passage to lane segments.";
@@ -272,77 +272,6 @@ bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
     }
   }
   return true;
-}
-
-bool PncMap::GetLaneSegmentsFromRouting(
-    const common::PointENU &point, const double backward_length,
-    const double forward_length,
-    std::vector<RouteSegments> *const route_segments) const {
-  if (route_segments == nullptr) {
-    AERROR << "the provided proute_segments is null";
-    return false;
-  }
-  if (backward_length < 0.0 || forward_length < 0.0 ||
-      backward_length + forward_length <= 0.0) {
-    AERROR << "backward_length[" << backward_length << "] or forward_length["
-           << forward_length << "] are invalid";
-    return false;
-  }
-  route_segments->clear();
-  LaneWaypoint start_waypoint;
-  if (!GetNearestPointFromRouting(point, &start_waypoint)) {
-    AERROR << "Failed to find nearest proint: " << point.ShortDebugString()
-           << " routing";
-  }
-  double min_overlap_distance = std::numeric_limits<double>::infinity();
-  double proj_s = 0.0;
-  double accumulate_s = 0.0;
-  RouteSegments connected_lanes;
-  RouteSegments cropped_lanes;
-  for (const auto &road_segment : routing_.road()) {
-    for (const auto &passage : road_segment.passage()) {
-      for (const auto &lane_segment : passage.segment()) {
-        const double length = lane_segment.end_s() - lane_segment.start_s();
-        auto lane = hdmap_->GetLaneById(MakeMapId(lane_segment.id()));
-        if (!lane) {
-          AERROR << "Failed to fine lane " << lane_segment.id();
-          return false;
-        }
-        connected_lanes.emplace_back(lane, lane_segment.start_s(),
-                                     lane_segment.end_s());
-        if (lane_segment.id() == start_waypoint.lane->id().id()) {
-          double overlap_distance = 0.0;
-          if (start_waypoint.s < lane_segment.start_s()) {
-            overlap_distance = lane_segment.start_s() - start_waypoint.s;
-          } else if (start_waypoint.s > lane_segment.end_s()) {
-            overlap_distance = start_waypoint.s - lane_segment.end_s();
-          }
-          if (overlap_distance < min_overlap_distance) {
-            min_overlap_distance = overlap_distance;
-            proj_s =
-                accumulate_s +
-                std::max(0.0, std::min(length, start_waypoint.s -
-                                                   lane_segment.start_s()));
-          }
-        }
-        accumulate_s += length;
-      }
-    }
-  }
-  if (min_overlap_distance < std::numeric_limits<double>::infinity()) {
-    RouteSegments truncated_segments;
-    if (TruncateLaneSegments(connected_lanes, proj_s - backward_length,
-                             proj_s + forward_length, &truncated_segments)) {
-      route_segments->emplace_back(std::move(truncated_segments));
-      return true;
-    } else {
-      AERROR << "Failed to truncate lane segments";
-      return false;
-    }
-  } else {
-    AERROR << "Failed to get lanes from routing";
-    return false;
-  }
 }
 
 bool PncMap::TruncateLaneSegments(
