@@ -199,7 +199,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
     return false;
   }
 
-  if (!spline_constraint->AddThirdDerivativeSmoothConstraint()) {
+  if (!spline_constraint->AddSecondDerivativeSmoothConstraint()) {
     AERROR << "Add jointness constraint failed";
     return false;
   }
