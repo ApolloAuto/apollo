@@ -75,7 +75,7 @@ em_planner_config {
         derivative_weight: 0.1
         second_derivative_weight: 100.0
         third_derivative_weight: 10.0
-        reference_line_weight: 0.001
+        reference_line_weight: 0
         num_output: 100
         cross_lane_extension_buffer: 0.2
     }
@@ -126,7 +126,7 @@ em_planner_config {
 }
 
 reference_line_smoother_config {
-    spline_order: 7
+    spline_order: 5
     max_spline_length: 25.0
     boundary_bound: 0.2
     derivative_bound: 0.15
