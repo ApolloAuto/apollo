@@ -149,13 +149,6 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!constraint->AddPointSecondDerivativeConstraint(
-          spline_generator_->spline().x_knots().back(), 0.0)) {
-    const std::string msg = "add st end point acceleration constraint failed!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
   // monotone constraint
   if (!constraint->AddMonotoneInequalityConstraint(t_evaluated_)) {
     const std::string msg = "add monotone inequality constraint failed!";
