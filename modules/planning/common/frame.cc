@@ -241,7 +241,7 @@ uint32_t Frame::SequenceNum() const { return sequence_num_; }
 std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
     const common::PointENU &position) {
   std::vector<ReferenceLine> reference_lines;
-  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
+  std::vector<hdmap::RouteSegments> route_segments;
   if (!pnc_map_->GetLaneSegmentsFromRouting(
           position, FLAGS_look_backward_distance, FLAGS_look_forward_distance,
           &route_segments)) {

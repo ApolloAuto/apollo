@@ -22,7 +22,6 @@
 #define MODULES_MAP_PNC_MAP_PNC_MAP_H_
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -35,7 +34,17 @@
 namespace apollo {
 namespace hdmap {
 
-using LaneSegments = std::vector<LaneSegment>;
+class RouteSegments : public std::vector<LaneSegment> {
+ public:
+  RouteSegments() = default;
+  explicit RouteSegments(routing::ChangeLaneType type)
+      : change_lane_type_(type) {}
+
+  routing::ChangeLaneType change_lane_type() const { return change_lane_type_; }
+
+ private:
+  routing::ChangeLaneType change_lane_type_ = routing::FORWARD;
+};
 
 class PncMap {
  public:
@@ -51,19 +60,18 @@ class PncMap {
   bool GetLaneSegmentsFromRouting(
       const common::PointENU &point, const double backward_length,
       const double forward_length,
-      std::vector<LaneSegments> *const route_segments) const;
+      std::vector<RouteSegments> *const route_segments) const;
 
-  static bool CreatePathFromLaneSegments(const LaneSegments &segments,
+  static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
-  std::mutex reference_line_groups_mutex_;
 
  private:
   bool GetNearestPointFromRouting(const common::PointENU &point,
                                   LaneWaypoint *waypoint) const;
 
-  bool TruncateLaneSegments(const LaneSegments &segments, double start_s,
+  bool TruncateLaneSegments(const RouteSegments &segments, double start_s,
                             double end_s,
-                            LaneSegments *const truncated_segments) const;
+                            RouteSegments *const truncated_segments) const;
 
   static bool ValidateRouting(const routing::RoutingResponse &routing);
 
