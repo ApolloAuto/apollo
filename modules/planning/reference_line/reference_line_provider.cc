@@ -123,7 +123,7 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   const double kForwardAdditionalLength = 100;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetLaneSegmentsFromRouting(
+    if (!pnc_map_->GetRouteSegments(
             position, FLAGS_look_backward_distance,
             FLAGS_look_forward_distance + kForwardAdditionalLength,
             &route_segments)) {
