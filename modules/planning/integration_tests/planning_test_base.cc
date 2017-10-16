@@ -84,13 +84,18 @@ bool PlanningTestBase::SetUpAdapters() {
     return false;
   }
   AINFO << "Using Chassis file: " << chassis_file;
-  auto prediction_file = FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
-  if (!FLAGS_test_prediction_file.empty() &&
-      !AdapterManager::FeedPredictionFile(prediction_file)) {
-    AERROR << "Failed to load prediction file: " << prediction_file;
-    return false;
+  if (FLAGS_enable_prediction) {
+    auto prediction_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
+    if (!FLAGS_test_prediction_file.empty() &&
+        !AdapterManager::FeedPredictionFile(prediction_file)) {
+      AERROR << "Failed to load prediction file: " << prediction_file;
+      return false;
+    }
+    AINFO << "Using Prediction file: " << prediction_file;
+  } else {
+    AINFO << "Prediction is disabled";
   }
-  AINFO << "Using Prediction file: " << prediction_file;
   return true;
 }
 

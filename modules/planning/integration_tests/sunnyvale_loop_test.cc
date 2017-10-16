@@ -152,5 +152,19 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test change lane
+ * A change lane test case
+ */
+TEST_F(SunnyvaleLoopTest, change_lane) {
+  std::string seq_num = "9";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_enable_prediction = false;
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo

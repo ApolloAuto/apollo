@@ -48,12 +48,11 @@ class PncMapTest : public ::testing::Test {
       CHECK(false);
     }
     pnc_map_.reset(new PncMap(&hdmap_));
-    routing::RoutingResponse routing;
-    if (!common::util::GetProtoFromFile(FLAGS_test_routing_file, &routing)) {
+    if (!common::util::GetProtoFromFile(FLAGS_test_routing_file, &routing_)) {
       AERROR << "Failed to load routing: " << FLAGS_test_routing_file;
       CHECK(false);
     }
-    pnc_map_->UpdateRoutingResponse(routing);
+    pnc_map_->UpdateRoutingResponse(routing_);
   }
 
   static double RouteLength(const RouteSegments& segments) {
@@ -64,12 +63,14 @@ class PncMapTest : public ::testing::Test {
     return s;
   }
 
+  static routing::RoutingResponse routing_;
   static std::unique_ptr<PncMap> pnc_map_;
   static hdmap::HDMap hdmap_;
 };
 
 std::unique_ptr<PncMap> PncMapTest::pnc_map_;
 hdmap::HDMap PncMapTest::hdmap_;
+routing::RoutingResponse PncMapTest::routing_;
 
 TEST_F(PncMapTest, RouteSegments_GetInnerProjection) {
   auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
@@ -132,7 +133,54 @@ TEST_F(PncMapTest, GetRouteSegments) {
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
   EXPECT_NEAR(40, RouteLength(segments[0]), 1e-4);
+  EXPECT_EQ(routing::FORWARD, segments[0].change_lane_type());
   EXPECT_NEAR(40, RouteLength(segments[1]), 1e-4);
+  EXPECT_EQ(routing::RIGHT, segments[1].change_lane_type());
+}
+
+TEST_F(PncMapTest, GetDrivePassages) {
+  const auto& road0 = routing_.road(0);
+  {
+    auto result = pnc_map_->GetDrivePassages(road0, 0);
+    EXPECT_EQ(2, result.size());
+    EXPECT_EQ(0, result[0].first);
+    EXPECT_EQ(routing::FORWARD, result[0].second);
+    EXPECT_EQ(1, result[1].first);
+    EXPECT_EQ(routing::RIGHT, result[1].second);
+  }
+  {
+    auto result = pnc_map_->GetDrivePassages(road0, 1);
+    EXPECT_EQ(3, result.size());
+
+    EXPECT_EQ(1, result[0].first);
+    EXPECT_EQ(routing::FORWARD, result[0].second);
+
+    EXPECT_EQ(0, result[1].first);
+    EXPECT_EQ(routing::LEFT, result[1].second);
+
+    EXPECT_EQ(2, result[2].first);
+    EXPECT_EQ(routing::LEFT, result[1].second);
+  }
+  {
+    auto result = pnc_map_->GetDrivePassages(road0, 2);
+    EXPECT_EQ(3, result.size());
+
+    EXPECT_EQ(2, result[0].first);
+    EXPECT_EQ(routing::FORWARD, result[0].second);
+
+    EXPECT_EQ(1, result[1].first);
+    EXPECT_EQ(routing::RIGHT, result[1].second);
+
+    EXPECT_EQ(3, result[2].first);
+    EXPECT_EQ(routing::RIGHT, result[2].second);
+  }
+  {
+    auto result = pnc_map_->GetDrivePassages(road0, 3);
+    EXPECT_EQ(1, result.size());
+
+    EXPECT_EQ(3, result[0].first);
+    EXPECT_EQ(routing::FORWARD, result[0].second);
+  }
 }
 
 }  // namespace hdmap
