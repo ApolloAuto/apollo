@@ -165,7 +165,7 @@ bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
 bool PncMap::GetLaneSegmentsFromRouting(
     const common::PointENU &point, const double backward_length,
     const double forward_length,
-    std::vector<LaneSegments> *const route_segments) const {
+    std::vector<RouteSegments> *const route_segments) const {
   if (route_segments == nullptr) {
     AERROR << "the provided proute_segments is null";
     return false;
@@ -185,8 +185,8 @@ bool PncMap::GetLaneSegmentsFromRouting(
   double min_overlap_distance = std::numeric_limits<double>::infinity();
   double proj_s = 0.0;
   double accumulate_s = 0.0;
-  LaneSegments connected_lanes;
-  LaneSegments cropped_lanes;
+  RouteSegments connected_lanes;
+  RouteSegments cropped_lanes;
   for (const auto &road_segment : routing_.road()) {
     for (const auto &passage : road_segment.passage()) {
       for (const auto &lane_segment : passage.segment()) {
@@ -218,7 +218,7 @@ bool PncMap::GetLaneSegmentsFromRouting(
     }
   }
   if (min_overlap_distance < std::numeric_limits<double>::infinity()) {
-    LaneSegments truncated_segments;
+    RouteSegments truncated_segments;
     if (TruncateLaneSegments(connected_lanes, proj_s - backward_length,
                              proj_s + forward_length, &truncated_segments)) {
       route_segments->emplace_back(std::move(truncated_segments));
@@ -234,8 +234,8 @@ bool PncMap::GetLaneSegmentsFromRouting(
 }
 
 bool PncMap::TruncateLaneSegments(
-    const LaneSegments &segments, double start_s, double end_s,
-    LaneSegments *const truncated_segments) const {
+    const RouteSegments &segments, double start_s, double end_s,
+    RouteSegments *const truncated_segments) const {
   if (segments.empty()) {
     AERROR << "The input segments is empty";
     return false;
@@ -251,7 +251,7 @@ bool PncMap::TruncateLaneSegments(
   const double kRouteEpsilon = 1e-3;
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
-    const auto &first_segment = segments[0];
+    const auto &first_segment = *segments.begin();
     auto lane = first_segment.lane;
     double s = first_segment.start_s;
     double extend_s = -start_s;
@@ -355,7 +355,7 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
   }
 }
 
-bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
+bool PncMap::CreatePathFromLaneSegments(const RouteSegments &segments,
                                         Path *const path) {
   std::vector<MapPathPoint> points;
   for (const auto &segment : segments) {
