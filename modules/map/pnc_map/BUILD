@@ -47,4 +47,30 @@ cc_test(
     ],
 )
 
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
+cc_test(
+    name = "pnc_map_test",
+    size = "small",
+    srcs = [
+        "pnc_map_test.cc",
+    ],
+    data = [
+        ":testdata",
+        "//modules/map:map_data",
+    ],
+    deps = [
+        ":pnc_map",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
