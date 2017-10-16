@@ -53,6 +53,10 @@ class ReferenceLineInfo {
    */
   bool HasReachedDestination();
 
+  routing::ChangeLaneType change_lane_type() const {
+    return reference_line_.change_lane_type();
+  }
+
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
 
@@ -65,6 +69,7 @@ class ReferenceLineInfo {
   const DiscretizedTrajectory& trajectory() const;
 
   double Cost() const { return cost_; }
+  void AddCost(double cost) { cost_ += cost; }
 
   /**
    * @brief check if current reference line is started from another reference

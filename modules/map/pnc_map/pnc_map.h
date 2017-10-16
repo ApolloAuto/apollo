@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "modules/routing/proto/routing.pb.h"
@@ -103,6 +104,9 @@ class PncMap {
 
   LaneInfoConstPtr GetRoutePredecessor(LaneInfoConstPtr lane) const;
   LaneInfoConstPtr GetRouteSuccessor(LaneInfoConstPtr lane) const;
+
+  std::vector<std::pair<int, routing::ChangeLaneType>> GetDrivePassages(
+      const routing::RoadSegment &road, int start_passage) const;
 
  private:
   routing::RoutingResponse routing_;

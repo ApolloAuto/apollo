@@ -167,9 +167,12 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
       }
       if (is_valid_reference_line) {
         reference_lines.push_back(std::move(reference_line));
+        reference_lines.back().set_change_lane_type(
+            segments.change_lane_type());
       }
     } else {
       reference_lines.emplace_back(hdmap_path);
+      reference_lines.back().set_change_lane_type(segments.change_lane_type());
     }
   }
 
