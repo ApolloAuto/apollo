@@ -152,7 +152,8 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
 
 bool ReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
-  uint32_t constraint_num = 5 * (t_knots_.size() - 1) + 1;
+  uint32_t constraint_num =
+      smoother_config_.constraint_to_knots_ratio() * (t_knots_.size() - 1) + 1;
 
   std::vector<double> evaluated_t;
   common::util::uniform_slice(t_knots_.front(), t_knots_.back(),
@@ -209,15 +210,10 @@ bool ReferenceLineSmoother::ApplyKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
-  if (smoother_config_.derivative_weight() > 0.0) {
-    kernel->AddDerivativeKernelMatrix(smoother_config_.derivative_weight());
-  }
-
   if (smoother_config_.second_derivative_weight() > 0.0) {
     kernel->AddSecondOrderDerivativeMatrix(
         smoother_config_.second_derivative_weight());
   }
-
   if (smoother_config_.third_derivative_weight() > 0.0) {
     kernel->AddThirdOrderDerivativeMatrix(
         smoother_config_.third_derivative_weight());

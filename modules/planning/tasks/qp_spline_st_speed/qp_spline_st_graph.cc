@@ -137,7 +137,6 @@ Status QpSplineStGraph::ApplyConstraint(
     const std::pair<double, double>& accel_bound) {
   Spline1dConstraint* constraint =
       spline_generator_->mutable_spline_constraint();
-  // position, velocity, acceleration
 
   if (!constraint->AddPointConstraint(0.0, 0.0)) {
     const std::string msg = "add st start point constraint failed";
