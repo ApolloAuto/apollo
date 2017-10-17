@@ -80,8 +80,8 @@ em_planner_config {
         cross_lane_extension_buffer: 0.2
     }
     qp_st_speed_config {
-        total_path_length: 200.0
-        total_time: 6.0
+        total_path_length: 250.0
+        total_time: 8.0
         output_time_resolution: 0.05
         preferred_max_acceleration: 1.2
         preferred_min_deceleration: -2.0
