@@ -11,6 +11,7 @@ proto_library(
     name = "canbus_proto_lib",
     srcs = [
         "can_card_parameter.proto",
+        "sensor_canbus_conf.proto",
     ],
     deps = [
         "//modules/common/proto:common_proto_lib",

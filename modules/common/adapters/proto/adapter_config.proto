@@ -25,6 +25,7 @@ message AdapterConfig {
     RELATIVE_ODOMETRY = 18;
     INS_STAT = 19;
     HMI_COMMAND = 20;
+    MOBILEYE = 21;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
