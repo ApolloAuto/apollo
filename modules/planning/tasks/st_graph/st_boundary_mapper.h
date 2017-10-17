@@ -75,10 +75,10 @@ class StBoundaryMapper {
   apollo::common::Status MapWithPredictionTrajectory(
       PathObstacle* path_obstacle) const;
 
-  double GetAvgKappa(const uint32_t index,
-                     const std::vector<common::PathPoint>& path_points) const;
-
   double GetCentricAccLimit(const double kappa) const;
+
+  void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
+                   std::vector<double>* kappa) const;
 
  private:
   const SLBoundary& adc_sl_boundary_;
