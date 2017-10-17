@@ -56,12 +56,51 @@ class PncMapTest : public ::testing::Test {
     pnc_map_->UpdateRoutingResponse(routing);
   }
 
+  static double RouteLength(const RouteSegments& segments) {
+    double s = 0.0;
+    for (const auto& seg : segments) {
+      s += seg.end_s - seg.start_s;
+    }
+    return s;
+  }
+
   static std::unique_ptr<PncMap> pnc_map_;
   static hdmap::HDMap hdmap_;
 };
 
 std::unique_ptr<PncMap> PncMapTest::pnc_map_;
 hdmap::HDMap PncMapTest::hdmap_;
+
+TEST_F(PncMapTest, RouteSegments_GetInnerProjection) {
+  auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
+  RouteSegments route_segments;
+  route_segments.emplace_back(lane1, 10, 20);
+  auto point = lane1->GetSmoothPoint(5);
+  double s = 0.0;
+  double l = 0.0;
+  EXPECT_FALSE(route_segments.GetInnerProjection(point, &s, &l));
+  point = lane1->GetSmoothPoint(10);
+  EXPECT_TRUE(route_segments.GetInnerProjection(point, &s, &l));
+  EXPECT_NEAR(0.0, s, 1e-4);
+  EXPECT_NEAR(0.0, l, 1e-4);
+  point = lane1->GetSmoothPoint(15);
+  EXPECT_TRUE(route_segments.GetInnerProjection(point, &s, &l));
+  EXPECT_NEAR(5.0, s, 1e-4);
+  EXPECT_NEAR(0.0, l, 1e-4);
+  point = lane1->GetSmoothPoint(25);
+  EXPECT_FALSE(route_segments.GetInnerProjection(point, &s, &l));
+  auto lane2 = hdmap_.GetLaneById(hdmap::MakeMapId("13_1_-1"));
+  route_segments.emplace_back(lane2, 20, 30);
+  EXPECT_FALSE(route_segments.GetInnerProjection(point, &s, &l));
+  point = lane2->GetSmoothPoint(0);
+  EXPECT_FALSE(route_segments.GetInnerProjection(point, &s, &l));
+  point = lane2->GetSmoothPoint(25);
+  EXPECT_TRUE(route_segments.GetInnerProjection(point, &s, &l));
+  EXPECT_NEAR(15.0, s, 1e-4);
+  EXPECT_NEAR(0.0, l, 1e-4);
+  point = lane2->GetSmoothPoint(31);
+  EXPECT_FALSE(route_segments.GetInnerProjection(point, &s, &l));
+}
 
 TEST_F(PncMapTest, GetNearestPointFromRouting) {
   common::PointENU point;
@@ -92,6 +131,8 @@ TEST_F(PncMapTest, GetRouteSegments) {
   bool result = pnc_map_->GetRouteSegments(point, 10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
+  EXPECT_NEAR(40, RouteLength(segments[0]), 1e-4);
+  EXPECT_NEAR(40, RouteLength(segments[1]), 1e-4);
 }
 
 }  // namespace hdmap
