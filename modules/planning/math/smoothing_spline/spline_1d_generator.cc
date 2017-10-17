@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include "Eigen/Core"
+#include "Eigen/Eigenvalues"
 
 #include "modules/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
@@ -77,6 +78,12 @@ bool Spline1dGenerator::Solve() {
            << "] and kernel_matrix.cols() [" << kernel_matrix.cols()
            << "] should be identical.";
     return false;
+  }
+
+  auto eigen_values = kernel_matrix.eigenvalues();
+  ADEBUG << "eigenvalues of kernel_matrix:\n" << eigen_values << std::endl;
+  for (int i = 0; i < eigen_values.rows(); ++i) {
+    DCHECK_GT(eigen_values[i].real(), 0.0);
   }
 
   int num_param = kernel_matrix.rows();
