@@ -311,7 +311,24 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_length(vehicle_param.length());
 }
 
-const SimulationWorld &SimulationWorldService::Update() {
+void SimulationWorldService::Update() {
+  if (to_clear_) {
+    // Clears received data.
+    AdapterManager::GetChassis()->ClearData();
+    AdapterManager::GetLocalization()->ClearData();
+    AdapterManager::GetPerceptionObstacles()->ClearData();
+    AdapterManager::GetPlanning()->ClearData();
+    AdapterManager::GetPrediction()->ClearData();
+    AdapterManager::GetRoutingResponse()->ClearData();
+    AdapterManager::GetMonitor()->ClearData();
+
+    // Clears simulation world except for the car information.
+    auto car = world_.auto_driving_car();
+    world_.Clear();
+    *world_.mutable_auto_driving_car() = car;
+    to_clear_ = false;
+  }
+
   AdapterManager::Observe();
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
@@ -334,8 +351,6 @@ const SimulationWorld &SimulationWorldService::Update() {
   UpdateDelays();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
-
-  return world_;
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -713,15 +728,10 @@ void SimulationWorldService::ReadRoutingFromFile(
 }
 
 void SimulationWorldService::RegisterMessageCallbacks() {
-  if (CheckAdapterInitialized("Monitor", AdapterManager::GetMonitor())) {
-    AdapterManager::AddMonitorCallback(
-        &SimulationWorldService::UpdateSimulationWorld, this);
-  }
-  if (CheckAdapterInitialized("RoutingResponse",
-                              AdapterManager::GetRoutingResponse())) {
-    AdapterManager::AddRoutingResponseCallback(
-        &SimulationWorldService::UpdateSimulationWorld, this);
-  }
+  AdapterManager::AddMonitorCallback(
+      &SimulationWorldService::UpdateSimulationWorld, this);
+  AdapterManager::AddRoutingResponseCallback(
+      &SimulationWorldService::UpdateSimulationWorld, this);
 }
 
 }  // namespace dreamview

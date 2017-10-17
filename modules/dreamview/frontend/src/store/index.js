@@ -9,7 +9,6 @@ import RouteEditingManager from "store/route_editing_manager";
 import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
 
-
 class DreamviewStore {
     // Mutable States
     @observable timestamp = 0;
