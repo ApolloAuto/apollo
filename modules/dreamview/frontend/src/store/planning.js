@@ -160,6 +160,12 @@ export default class Planning {
     }
   }
 
+  updateKappaGraph(paths) {
+    for (const path of paths) {
+      this.data.kappaGraph[path.name] =
+        this.extractDataPoints(path.pathPoint, 's', 'kappa');
+    }
+  }
 
   update(world) {
     this.updateSequenceNum(world.sequenceNum);
@@ -178,6 +184,10 @@ export default class Planning {
 
       if (planningData.speedPlan) {
         this.updateSpeed(planningData.speedPlan, world.planningTrajectory);
+      }
+
+      if (planningData.path) {
+        this.updateKappaGraph(planningData.path);
       }
     }
   }
