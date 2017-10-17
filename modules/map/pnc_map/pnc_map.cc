@@ -206,8 +206,8 @@ bool PncMap::GetRouteSegments(
   int road_index = index[0];
   int passage_index = index[1];
   const auto &road = routing_.road(road_index);
-  for (int index :
-       std::vector<int>{passage_index - 1, passage_index, passage_index + 1}) {
+  std::vector<int> indices{passage_index - 1, passage_index, passage_index + 1};
+  for (int index : indices) {
     if (index < 0 || index >= road.passage_size()) {
       continue;
     }
@@ -334,7 +334,7 @@ bool PncMap::TruncateLaneSegments(
         s -= length;
       }
     }
-    truncated_segments->insert(truncated_segments->end(),
+    truncated_segments->insert(truncated_segments->begin(),
                                extended_lane_segments.rbegin(),
                                extended_lane_segments.rend());
   }
