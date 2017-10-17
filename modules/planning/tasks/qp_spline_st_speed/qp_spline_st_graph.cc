@@ -43,29 +43,27 @@ QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
       qp_st_speed_config_(qp_st_speed_config),
       t_knots_resolution_(
           qp_st_speed_config_.total_time() /
-          qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t()),
-      t_evaluated_resolution_(qp_st_speed_config_.total_time() /
-                              qp_st_speed_config_.qp_spline_config()
-                                  .number_of_evaluated_graph_t()) {
+          qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t()) {
   Init();
 }
 
 void QpSplineStGraph::Init() {
   // init knots
   double curr_t = 0.0;
-  for (uint32_t i = 0;
-       i <= qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t();
-       ++i) {
+  uint32_t num_spline =
+      qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t() - 1;
+  for (uint32_t i = 0; i <= num_spline; ++i) {
     t_knots_.push_back(curr_t);
     curr_t += t_knots_resolution_;
   }
 
+  uint32_t num_evaluated_t = 10 * num_spline + 1;
+
   // init evaluated t positions
   curr_t = 0;
-  for (uint32_t i = 0;
-       i <=
-       qp_st_speed_config_.qp_spline_config().number_of_evaluated_graph_t();
-       ++i) {
+  t_evaluated_resolution_ =
+      qp_st_speed_config_.total_time() / (num_evaluated_t - 1);
+  for (uint32_t i = 0; i < num_evaluated_t; ++i) {
     t_evaluated_.push_back(curr_t);
     curr_t += t_evaluated_resolution_;
   }
@@ -143,6 +141,7 @@ Status QpSplineStGraph::ApplyConstraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   if (!constraint->AddPointDerivativeConstraint(0.0, init_point_.v())) {
     const std::string msg = "add st start point velocity constraint failed!";
     AERROR << msg;
@@ -157,7 +156,7 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // smoothness constraint
-  if (!constraint->AddSecondDerivativeSmoothConstraint()) {
+  if (!constraint->AddThirdDerivativeSmoothConstraint()) {
     const std::string msg = "add smoothness joint constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
