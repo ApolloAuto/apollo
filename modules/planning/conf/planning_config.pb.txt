@@ -133,6 +133,7 @@ reference_line_smoother_config {
     second_derivative_weight: 200.0
     third_derivative_weight: 1000.0
     num_of_total_points: 500
+    regularization_weight: 0.2
 }
 
 rule_config : {

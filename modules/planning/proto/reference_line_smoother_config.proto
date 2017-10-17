@@ -10,4 +10,5 @@ message ReferenceLineSmootherConfig {
   optional double second_derivative_weight = 5 [default = 0.0];
   optional double third_derivative_weight = 6 [default = 100];
   optional uint32 num_of_total_points = 7 [default = 500];
+  optional double regularization_weight = 8 [ default = 0.1 ];
 }
