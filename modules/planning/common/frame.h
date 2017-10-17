@@ -30,6 +30,9 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -40,9 +43,6 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {

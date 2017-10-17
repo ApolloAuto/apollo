@@ -31,6 +31,7 @@ DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
+DECLARE_bool(use_planning_cycle_time_in_stitcher);
 
 DECLARE_int32(max_history_frame_num);
 

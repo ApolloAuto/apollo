@@ -68,6 +68,10 @@ template <typename SensorType>
 class MessageManager {
  public:
   /*
+  * @brief constructor function
+  */
+  MessageManager() {}
+  /*
    * @brief destructor function
    */
   virtual ~MessageManager() = default;
@@ -81,6 +85,15 @@ class MessageManager {
    */
   virtual void Parse(const uint32_t message_id, const uint8_t *data,
                      int32_t length, struct timeval timestamp);
+
+  /**
+   * @brief parse data and store parsed info in protocol data
+   * @param message_id the id of the message
+   * @param data a pointer to the data array to be parsed
+   * @param length the length of data array
+   */
+  virtual void Parse(const uint32_t message_id, const uint8_t *data,
+                     int32_t length);
 
   /**
    * @brief get mutable protocol data by message id
@@ -185,6 +198,34 @@ void MessageManager<SensorType>::Parse(const uint32_t message_id,
     std::lock_guard<std::mutex> lock(sensor_data_mutex_);
     protocol_data->Parse(data, length, timestamp, &sensor_data_);
   }
+  received_ids_.insert(message_id);
+  // check if need to check period
+  const auto it = check_ids_.find(message_id);
+  if (it != check_ids_.end()) {
+    const int64_t time = apollo::common::time::AsInt64<micros>(Clock::Now());
+    it->second.real_period = time - it->second.last_time;
+    // if period 1.5 large than base period, inc error_count
+    const double period_multiplier = 1.5;
+    if (it->second.real_period > (it->second.period * period_multiplier)) {
+      it->second.error_count += 1;
+    } else {
+      it->second.error_count = 0;
+    }
+    it->second.last_time = time;
+  }
+}
+
+// TODO(Authors): remove redundant code
+template <typename SensorType>
+void MessageManager<SensorType>::Parse(const uint32_t message_id,
+                                       const uint8_t *data, int32_t length) {
+  ProtocolData<SensorType> *protocol_data =
+      GetMutableProtocolDataById(message_id);
+  if (protocol_data == nullptr) {
+    return;
+  }
+  std::lock_guard<std::mutex> lock(sensor_data_mutex_);
+  protocol_data->Parse(data, length, &sensor_data_);
   received_ids_.insert(message_id);
   // check if need to check period
   const auto it = check_ids_.find(message_id);

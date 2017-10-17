@@ -130,6 +130,13 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
     AERROR << "Invalid routing";
     return false;
   }
+  for (const auto &road : routing.road()) {
+    for (const auto &passage : road.passage()) {
+      for (const auto &lane : passage.segment()) {
+        routing_lane_ids_.insert(lane.id());
+      }
+    }
+  }
   routing_ = routing;
   last_waypoint_.reset(nullptr);
   return true;
@@ -240,19 +247,10 @@ bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
     AERROR << "No valid lane found within " << kMaxDistance << " meters.";
     return false;
   }
-  // get all lanes from routing
-  std::unordered_set<std::string> routing_lane_ids;
-  for (const auto &road_segment : routing_.road()) {
-    for (const auto &passage : road_segment.passage()) {
-      for (const auto &segment : passage.segment()) {
-        routing_lane_ids.insert(segment.id());
-      }
-    }
-  }
   // get nearest_wayponints for current position
   double min_distance = std::numeric_limits<double>::infinity();
   for (const auto &lane : lanes) {
-    if (routing_lane_ids.count(lane->id().id()) == 0) {
+    if (routing_lane_ids_.count(lane->id().id()) == 0) {
       continue;
     }
     double distance = 0.0;
@@ -274,6 +272,34 @@ bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
   return true;
 }
 
+LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
+  if (lane->lane().successor_id_size() == 0) {
+    return nullptr;
+  }
+  hdmap::Id preferred_id = lane->lane().successor_id(0);
+  for (const auto &lane_id : lane->lane().successor_id()) {
+    if (routing_lane_ids_.count(lane_id.id()) != 0) {
+      preferred_id = lane_id;
+      break;
+    }
+  }
+  return hdmap_->GetLaneById(preferred_id);
+}
+
+LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
+  if (lane->lane().predecessor_id_size() == 0) {
+    return nullptr;
+  }
+  hdmap::Id preferred_id = lane->lane().predecessor_id(0);
+  for (const auto &lane_id : lane->lane().predecessor_id()) {
+    if (routing_lane_ids_.count(lane_id.id()) != 0) {
+      preferred_id = lane_id;
+      break;
+    }
+  }
+  return hdmap_->GetLaneById(preferred_id);
+}
+
 bool PncMap::TruncateLaneSegments(
     const RouteSegments &segments, double start_s, double end_s,
     RouteSegments *const truncated_segments) const {
@@ -281,10 +307,7 @@ bool PncMap::TruncateLaneSegments(
     AERROR << "The input segments is empty";
     return false;
   }
-  if (truncated_segments == nullptr) {
-    AERROR << "the output truncated segments buffer is null";
-    return false;
-  }
+  CHECK_NOTNULL(truncated_segments);
   if (start_s >= end_s) {
     AERROR << "start_s(" << start_s << " >= end_s(" << end_s << ")";
     return false;
@@ -299,11 +322,7 @@ bool PncMap::TruncateLaneSegments(
     std::vector<LaneSegment> extended_lane_segments;
     while (extend_s > kRouteEpsilon) {
       if (s <= kRouteEpsilon) {
-        if (lane->lane().predecessor_id_size() == 0) {
-          break;
-        }
-        const auto &next_lane_id = lane->lane().predecessor_id(0);
-        lane = hdmap_->GetLaneById(next_lane_id);
+        lane = GetRoutePredecessor(lane);
         if (lane == nullptr) {
           break;
         }
@@ -337,23 +356,19 @@ bool PncMap::TruncateLaneSegments(
   // Extend the trajectory towards the end of the trajectory.
   if (router_s < end_s) {
     const auto &last_segment = segments.back();
-    std::string last_lane_id = last_segment.lane->id().id();
+    auto last_lane = last_segment.lane;
     double last_s = last_segment.end_s;
     while (router_s < end_s - kRouteEpsilon) {
-      const auto lane = hdmap_->GetLaneById(MakeMapId(last_lane_id));
-      if (lane == nullptr) {
+      if (last_lane == nullptr) {
         break;
       }
-      if (last_s >= lane->total_length() - kRouteEpsilon) {
-        if (lane->lane().successor_id_size() == 0) {
-          break;
-        }
-        last_lane_id = lane->lane().successor_id(0).id();
+      if (last_s >= last_lane->total_length() - kRouteEpsilon) {
+        last_lane = GetRouteSuccessor(last_lane);
         last_s = 0.0;
       } else {
         const double length =
-            std::min(end_s - router_s, lane->total_length() - last_s);
-        truncated_segments->emplace_back(lane, last_s, last_s + length);
+            std::min(end_s - router_s, last_lane->total_length() - last_s);
+        truncated_segments->emplace_back(last_lane, last_s, last_s + length);
         router_s += length;
         last_s += length;
       }

@@ -120,13 +120,11 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   std::vector<hdmap::RouteSegments> route_segments;
 
   // additional smooth reference line length, unit: meter
-  const double kForwardAdditionalLength = 100;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(
-            position, FLAGS_look_backward_distance,
-            FLAGS_look_forward_distance + kForwardAdditionalLength,
-            &route_segments)) {
+    if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
+                                    FLAGS_look_forward_distance,
+                                    &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
     }

@@ -22,6 +22,9 @@ Apollo演示的安装步骤：
 
     ```
     rosbag play docs/demo_guide/demo.bag --loop
+    # 或者
+    bash docs/demo_guide/rosbag_helper.sh download # 下载rosbag
+    rosbag play docs/demo_guide/demo_1.5.np.bag --loop
     ```
 
     选项 `--loop` 用于设置循环回放模式.

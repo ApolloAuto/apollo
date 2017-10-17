@@ -33,13 +33,15 @@ DEFINE_double(trajectory_resolution, 0.01,
 
 DEFINE_bool(publish_estop, false, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
+DEFINE_bool(use_planning_cycle_time_in_stitcher, false,
+            "Use planning_cycle_time in trajectory stitcher.");
 
 DEFINE_double(
     look_backward_distance, 30,
     "look backward this distance when creating reference line from routing");
 
 DEFINE_double(
-    look_forward_distance, 100,
+    look_forward_distance, 250,
     "look forward this distance when creating reference line from routing");
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");

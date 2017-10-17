@@ -134,7 +134,7 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
   ADEBUG << "Length = " << length;
   uint32_t num_spline = std::max(
-      2u, static_cast<uint32_t>(length / smoother_config_.max_spline_length()));
+      1u, static_cast<uint32_t>(length / smoother_config_.max_spline_length()));
   const double delta_s = length / num_spline;
   double s = 0.0;
   for (std::uint32_t i = 0; i <= num_spline; ++i, s += delta_s) {
@@ -152,7 +152,8 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
 
 bool ReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
-  uint32_t constraint_num = 3 * (t_knots_.size() - 1) + 1;
+  uint32_t constraint_num =
+      smoother_config_.constraint_to_knots_ratio() * (t_knots_.size() - 1) + 1;
 
   std::vector<double> evaluated_t;
   common::util::uniform_slice(t_knots_.front(), t_knots_.back(),
@@ -169,10 +170,8 @@ bool ReferenceLineSmoother::ApplyConstraint(
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
-    const double kBoundCoeff = 0.5;
     headings.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(kBoundCoeff *
-                                 smoother_config_.boundary_bound());
+    longitidinal_bound.push_back(smoother_config_.boundary_bound());
     lateral_bound.push_back(smoother_config_.boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
@@ -199,7 +198,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
     return false;
   }
 
-  if (!spline_constraint->AddThirdDerivativeSmoothConstraint()) {
+  if (!spline_constraint->AddSecondDerivativeSmoothConstraint()) {
     AERROR << "Add jointness constraint failed";
     return false;
   }
@@ -211,15 +210,10 @@ bool ReferenceLineSmoother::ApplyKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
-  if (smoother_config_.derivative_weight() > 0.0) {
-    kernel->AddDerivativeKernelMatrix(smoother_config_.derivative_weight());
-  }
-
   if (smoother_config_.second_derivative_weight() > 0.0) {
     kernel->AddSecondOrderDerivativeMatrix(
         smoother_config_.second_derivative_weight());
   }
-
   if (smoother_config_.third_derivative_weight() > 0.0) {
     kernel->AddThirdOrderDerivativeMatrix(
         smoother_config_.third_derivative_weight());
