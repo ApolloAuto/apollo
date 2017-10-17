@@ -65,6 +65,11 @@ bool QpSplinePathGenerator::Generate(
     PathData* const path_data) {
   ADEBUG << "Init point: " << init_point.DebugString();
 
+  const auto& path_data_history = path_data->path_data_history();
+  if (!path_data_history.empty()) {
+    last_discretized_path_ = &path_data_history.back().first;
+  }
+
   if (!CalculateFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
@@ -114,8 +119,8 @@ bool QpSplinePathGenerator::Generate(
   Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
       ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), start_l);
 
-  double x_diff = xy_point.x() - init_point.path_point().x();
-  double y_diff = xy_point.y() - init_point.path_point().y();
+  const double x_diff = xy_point.x() - init_point.path_point().x();
+  const double y_diff = xy_point.y() - init_point.path_point().y();
 
   double s = init_frenet_point_.s();
   double s_resolution =
@@ -304,6 +309,30 @@ bool QpSplinePathGenerator::AddConstraint(
   return true;
 }
 
+void QpSplinePathGenerator::AddHistoryPathKernel() {
+  if (last_discretized_path_ == nullptr) {
+    return;
+  }
+
+  PathData last_path_data;
+  last_path_data.SetReferenceLine(&reference_line_);
+  last_path_data.SetDiscretizedPath(*last_discretized_path_);
+
+  std::vector<double> history_s;
+  std::vector<double> histroy_l;
+
+  for (uint32_t i = 0; i < last_path_data.frenet_frame_path().NumOfPoints();
+       ++i) {
+    const auto p = last_path_data.frenet_frame_path().PointAt(i);
+    history_s.push_back(p.s());
+    histroy_l.push_back(p.l());
+  }
+
+  Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
+  spline_kernel->AddReferenceLineKernelMatrix(
+      history_s, histroy_l, qp_spline_path_config_.history_path_weight());
+}
+
 void QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
@@ -313,6 +342,10 @@ void QpSplinePathGenerator::AddKernel() {
     DCHECK_EQ(evaluated_s_.size(), ref_l.size());
     spline_kernel->AddReferenceLineKernelMatrix(
         evaluated_s_, ref_l, qp_spline_path_config_.reference_line_weight());
+  }
+
+  if (qp_spline_path_config_.history_path_weight() > 0.0) {
+    AddHistoryPathKernel();
   }
 
   if (qp_spline_path_config_.regularization_weight() > 0.0) {
