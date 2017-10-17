@@ -432,7 +432,7 @@ void StBoundaryMapper::GetAvgKappa(
     std::vector<double>* kappa) const {
   CHECK_NOTNULL(kappa);
   const int kHalfNumPoints = st_boundary_config_.num_points_to_avg_kappa() / 2;
-  CHECK(kHalfNumPoints > 0);
+  CHECK_GT(kHalfNumPoints, 0);
   kappa->clear();
   kappa->resize(path_points.size());
   double sum = 0.0;
@@ -442,7 +442,8 @@ void StBoundaryMapper::GetAvgKappa(
          end - start < kHalfNumPoints + 1) {
     sum += path_points[end].kappa();
     ++end;
-  };
+  }
+
   int iter = 0;
   while (iter < static_cast<int>(path_points.size())) {
     kappa->at(iter) = sum / (end - start);
