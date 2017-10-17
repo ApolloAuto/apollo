@@ -31,7 +31,7 @@ function main() {
     shift
     case $cmd in
         download)
-            wget -v $DEMO_BAG_URL -O demo_1.5.np.bag
+            wget -v $DEMO_BAG_URL -O ${DIR}/demo_1.5.np.bag
             ;;
             *)
             print_usage
