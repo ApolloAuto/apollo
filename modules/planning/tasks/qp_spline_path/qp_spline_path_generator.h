@@ -62,6 +62,8 @@ class QpSplinePathGenerator {
 
   void AddKernel();
 
+  void AddHistoryPathKernel();
+
   bool Solve();
 
  private:
@@ -74,6 +76,8 @@ class QpSplinePathGenerator {
 
   std::vector<double> knots_;
   std::vector<double> evaluated_s_;
+
+  const DiscretizedPath* last_discretized_path_ = nullptr;
 };
 
 }  // namespace planning
