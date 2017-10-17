@@ -157,7 +157,7 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // smoothness constraint
-  if (!constraint->AddSecondDerivativeSmoothConstraint()) {
+  if (!constraint->AddThirdDerivativeSmoothConstraint()) {
     const std::string msg = "add smoothness joint constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
