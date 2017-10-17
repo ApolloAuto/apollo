@@ -36,7 +36,7 @@ namespace mobileye {
 
 using ::apollo::drivers::Mobileye;
 
-class Aftermarket669 : public ::apollo::drivers::canbus::ProtocolData<Mobileye> {
+class Aftermarket669 : public apollo::drivers::canbus::ProtocolData<Mobileye> {
  public:
   static const int ID;
 
