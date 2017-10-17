@@ -185,3 +185,27 @@ speedGraph:
                 pointRadius: 1
                 fill: false
                 showLine: false
+kappaGraph:
+    title: 'Planning Kappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                labelString: 'kappa'
+    properties:
+        lines:
+            DpPolyPathOptimizer:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            QpSplinePathOptimizer:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
