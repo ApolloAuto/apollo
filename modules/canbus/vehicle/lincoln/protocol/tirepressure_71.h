@@ -23,6 +23,7 @@
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_TIREPRESSURE_71_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -32,14 +33,13 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::drivers::canbus::ProtocolData;
-
 /**
  * @class Tirepressure71
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Tirepressure71 : public ProtocolData {
+class Tirepressure71 : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

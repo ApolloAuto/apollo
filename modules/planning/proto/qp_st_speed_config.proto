@@ -6,16 +6,15 @@ import "modules/planning/proto/st_boundary_config.proto";
 
 message QpSplineConfig {
   optional uint32 number_of_discrete_graph_t = 1;
-  optional uint32 number_of_evaluated_graph_t = 2;
-  optional uint32 spline_order = 3;
-  optional double speed_kernel_weight = 4;
-  optional double accel_kernel_weight = 5;
-  optional double jerk_kernel_weight = 6;
-  optional double follow_weight = 7;
-  optional double stop_weight = 8;
-  optional double cruise_weight = 9;
-  optional double regularization_weight = 10 [ default = 0.1 ];
-  optional double follow_drag_distance = 11;
+  optional uint32 spline_order = 2;
+  optional double speed_kernel_weight = 3;
+  optional double accel_kernel_weight = 4;
+  optional double jerk_kernel_weight = 5;
+  optional double follow_weight = 6;
+  optional double stop_weight = 7;
+  optional double cruise_weight = 8;
+  optional double regularization_weight = 9 [ default = 0.1 ];
+  optional double follow_drag_distance = 10;
 }
 
 message QpPiecewiseConfig {

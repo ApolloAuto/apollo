@@ -18,9 +18,10 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/common/proto/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/fake/fake_can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/common/proto/error_code.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -28,8 +29,8 @@ namespace canbus {
 
 TEST(CanReceiverTest, ReceiveOne) {
   can::FakeCanClient can_client;
-  MessageManager pm;
-  CanReceiver receiver;
+  MessageManager<::apollo::canbus::ChassisDetail> pm;
+  CanReceiver<::apollo::canbus::ChassisDetail> receiver;
 
   receiver.Init(&can_client, &pm, false);
   EXPECT_EQ(receiver.Start(), common::ErrorCode::OK);

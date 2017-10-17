@@ -31,6 +31,7 @@ DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
+DECLARE_bool(use_planning_cycle_time_in_stitcher);
 
 DECLARE_int32(max_history_frame_num);
 
@@ -114,5 +115,7 @@ DECLARE_string(crosswalk_virtual_object_id_prefix);
 DECLARE_double(crosswalk_expand_distance);
 DECLARE_double(crosswalk_strick_l_distance);
 DECLARE_double(crosswalk_loose_l_distance);
+
+DECLARE_bool(enable_sqp_solver);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

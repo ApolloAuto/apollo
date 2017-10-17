@@ -75,22 +75,21 @@ em_planner_config {
         derivative_weight: 0.1
         second_derivative_weight: 100.0
         third_derivative_weight: 10.0
-        reference_line_weight: 0.001
+        reference_line_weight: 0
         num_output: 100
         cross_lane_extension_buffer: 0.2
     }
     qp_st_speed_config {
-        total_path_length: 200.0
-        total_time: 6.0
+        total_path_length: 250.0
+        total_time: 8.0
         output_time_resolution: 0.05
         preferred_max_acceleration: 1.2
-        preferred_min_deceleration: -1.8
+        preferred_min_deceleration: -2.0
         max_acceleration: 2.0
         min_deceleration: -4.5
 
         qp_spline_config {
             number_of_discrete_graph_t: 4
-            number_of_evaluated_graph_t: 40
             spline_order: 6
             speed_kernel_weight: 0.0
             accel_kernel_weight: 1000.0
@@ -126,14 +125,10 @@ em_planner_config {
 }
 
 reference_line_smoother_config {
-    spline_order: 7
+    spline_order: 6
+    constraint_to_knots_ratio: 5
     max_spline_length: 25.0
-    boundary_bound: 0.2
-    derivative_bound: 0.15
-    second_derivative_bound: 1.0
-    third_derivative_bound: 1.0
-    ref_line_weight: 0.0
-    derivative_weight: 0.0
+    boundary_bound: 0.15
     second_derivative_weight: 200.0
     third_derivative_weight: 1000.0
     num_of_total_points: 500

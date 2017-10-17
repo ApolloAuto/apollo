@@ -23,6 +23,7 @@
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GPS_6D_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -32,14 +33,13 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::drivers::canbus::ProtocolData;
-
 /**
  * @class Gps6d
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Gps6d : public ProtocolData {
+class Gps6d : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

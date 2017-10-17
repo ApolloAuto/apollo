@@ -56,15 +56,13 @@ constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }
 
-StBoundaryMapper::StBoundaryMapper(const hdmap::PncMap* pnc_map,
-                                   const SLBoundary& adc_sl_boundary,
+StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
                                    const double planning_time)
-    : pnc_map_(pnc_map),
-      adc_sl_boundary_(adc_sl_boundary),
+    : adc_sl_boundary_(adc_sl_boundary),
       st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
@@ -429,65 +427,75 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
   return obs_box.HasOverlap(adc_box);
 }
 
+void StBoundaryMapper::GetAvgKappa(
+    const std::vector<common::PathPoint>& path_points,
+    std::vector<double>* kappa) const {
+  CHECK_NOTNULL(kappa);
+  const int kHalfNumPoints = st_boundary_config_.num_points_to_avg_kappa() / 2;
+  CHECK(kHalfNumPoints > 0);
+  kappa->clear();
+  kappa->resize(path_points.size());
+  double sum = 0.0;
+  int start = 0;
+  int end = 0;
+  while (end < static_cast<int>(path_points.size()) &&
+         end - start < kHalfNumPoints + 1) {
+    sum += path_points[end].kappa();
+    ++end;
+  };
+  int iter = 0;
+  while (iter < static_cast<int>(path_points.size())) {
+    kappa->at(iter) = sum / (end - start);
+    if (start < iter - kHalfNumPoints) {
+      sum -= path_points[start].kappa();
+      ++start;
+    }
+    if (end < static_cast<int>(path_points.size())) {
+      sum += path_points[end].kappa();
+      ++end;
+    }
+    ++iter;
+  }
+}
+
 Status StBoundaryMapper::GetSpeedLimits(
     SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
 
-  for (uint32_t i = 0; i < path_data_.discretized_path().path_points().size();
-       ++i) {
-    const auto& path_point = path_data_.discretized_path().path_points()[i];
-    if (path_point.s() > reference_line_.Length()) {
-      AWARN << "path length [" << path_data_.discretized_path().Length()
+  std::vector<double> avg_kappa;
+  GetAvgKappa(path_data_.discretized_path().path_points(), &avg_kappa);
+  const auto& discretized_path_points =
+      path_data_.discretized_path().path_points();
+  const auto& frenet_path_points = path_data_.frenet_frame_path().points();
+  for (uint32_t i = 0; i < discretized_path_points.size(); ++i) {
+    const double path_s = discretized_path_points.at(i).s();
+    const auto& frenet_point_s = frenet_path_points.at(i).s();
+    if (frenet_point_s > reference_line_.Length()) {
+      AWARN << "path length [" << frenet_point_s
             << "] is LARGER than reference_line_ length ["
             << reference_line_.Length() << "]. Please debug before proceeding.";
       break;
     }
 
     double speed_limit_on_reference_line =
-        reference_line_.GetSpeedLimitFromS(path_point.s());
-
-    const double avg_kappa =
-        GetAvgKappa(i, path_data_.discretized_path().path_points());
+        reference_line_.GetSpeedLimitFromS(frenet_point_s);
 
     // speed limit from path curvature
     const double centripetal_acceleration_limit =
         st_boundary_config_.high_speed_centric_acceleration_limit();
 
-    double speed_limit_on_path = std::sqrt(
-        centripetal_acceleration_limit /
-        std::fmax(std::fabs(avg_kappa), st_boundary_config_.minimal_kappa()));
+    double speed_limit_on_path =
+        std::sqrt(centripetal_acceleration_limit /
+                  std::fmax(std::fabs(avg_kappa[i]),
+                            st_boundary_config_.minimal_kappa()));
 
     const double curr_speed_limit = std::fmax(
         st_boundary_config_.lowest_speed(),
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
-    speed_limit_data->AppendSpeedLimit(path_point.s(), curr_speed_limit);
+    speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
   }
   return Status::OK();
-}
-
-double StBoundaryMapper::GetAvgKappa(
-    const uint32_t index,
-    const std::vector<common::PathPoint>& path_points) const {
-  const uint32_t kNumPoints = st_boundary_config_.num_points_to_avg_kappa();
-  uint32_t start_index = 0;
-  uint32_t end_index = path_points.size();
-
-  if (index < kNumPoints / 2) {
-    start_index = 0;
-  }
-  if (index + kNumPoints / 2 < path_points.size()) {
-    end_index = index + kNumPoints / 2;
-  }
-  if (start_index == end_index) {
-    return path_points[index].kappa();
-  }
-
-  double sum_kappa = 0.0;
-  for (uint32_t i = start_index; i < end_index; ++i) {
-    sum_kappa += path_points[i].kappa();
-  }
-  return sum_kappa / (end_index - start_index);
 }
 
 double StBoundaryMapper::GetCentricAccLimit(const double kappa) const {

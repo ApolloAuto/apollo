@@ -19,6 +19,7 @@
  **/
 #include "modules/planning/common/frame.h"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <limits>
@@ -46,9 +47,11 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-const hdmap::PncMap *Frame::pnc_map_ = nullptr;
+std::unique_ptr<hdmap::PncMap> Frame::pnc_map_;
 
-void Frame::SetMap(hdmap::PncMap *pnc_map) { pnc_map_ = pnc_map; }
+void Frame::SetMap(const hdmap::HDMap *hdmap) {
+  pnc_map_.reset(new hdmap::PncMap(hdmap));
+}
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
@@ -57,10 +60,6 @@ Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {}
 
 void Frame::SetVehicleInitPose(const localization::Pose &pose) {
   init_pose_ = pose;
-}
-
-void Frame::SetRoutingResponse(const routing::RoutingResponse &routing) {
-  routing_response_ = routing;
 }
 
 void Frame::SetPlanningStartPoint(const common::TrajectoryPoint &start_point) {
@@ -83,8 +82,14 @@ void Frame::CreatePredictionObstacles(
   }
 }
 
+void Frame::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
+  pnc_map_->UpdateRoutingResponse(routing);
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->UpdateRoutingResponse(routing);
+  }
+}
 const routing::RoutingResponse &Frame::routing_response() const {
-  return routing_response_;
+  return pnc_map_->routing_response();
 }
 
 std::list<ReferenceLineInfo> &Frame::reference_line_info() {
@@ -95,7 +100,7 @@ bool Frame::InitReferenceLineInfo(
     const std::vector<ReferenceLine> &reference_lines) {
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
-    reference_line_info_.emplace_back(pnc_map_, reference_line,
+    reference_line_info_.emplace_back(pnc_map_.get(), reference_line,
                                       planning_start_point_);
   }
   for (auto &info : reference_line_info_) {
@@ -127,22 +132,24 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
 }
 
 const Obstacle *Frame::CreateDestinationObstacle() {
-  if (routing_response_.routing_request().waypoint_size() < 2) {
+  const auto &routing = pnc_map_->routing_response();
+  if (routing.routing_request().waypoint_size() < 2) {
     ADEBUG << "routing_request has no end";
     return nullptr;
   }
-  const auto &routing_end =
-      *routing_response_.routing_request().waypoint().rbegin();
-  common::PointENU dest_point = common::util::MakePointENU(
-      routing_end.pose().x(), routing_end.pose().y(), 0.0);
+  const auto &routing_end = *routing.routing_request().waypoint().rbegin();
   const auto lane =
-      pnc_map_->HDMap().GetLaneById(hdmap::MakeMapId(routing_end.id()));
+      pnc_map_->hdmap()->GetLaneById(hdmap::MakeMapId(routing_end.id()));
   if (!lane) {
     AERROR << "Failed to find lane for destination : "
            << routing_end.DebugString();
     return nullptr;
   }
-  double dest_lane_s = routing_end.s();
+
+  double dest_lane_s =
+      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+                        FLAGS_stop_distance_destination);
+  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
   // check if destination point is in planning range
   common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
                                       lane->Heading(dest_lane_s),
@@ -169,8 +176,7 @@ Status Frame::Init(const PlanningConfig &config,
   if (FLAGS_enable_reference_line_provider_thread) {
     reference_lines = ReferenceLineProvider::instance()->GetReferenceLines();
   } else {
-    reference_lines = CreateReferenceLineFromRouting(init_pose_.position(),
-                                                     routing_response_);
+    reference_lines = CreateReferenceLineFromRouting(init_pose_.position());
   }
 
   if (reference_lines.empty()) {
@@ -233,12 +239,12 @@ bool Frame::CheckCollision() {
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
 std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
-    const common::PointENU &position, const routing::RoutingResponse &routing) {
+    const common::PointENU &position) {
   std::vector<ReferenceLine> reference_lines;
-  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
-  if (!pnc_map_->GetLaneSegmentsFromRouting(
-          routing, position, FLAGS_look_backward_distance,
-          FLAGS_look_forward_distance, &route_segments)) {
+  std::vector<hdmap::RouteSegments> route_segments;
+  if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
+                                  FLAGS_look_forward_distance,
+                                  &route_segments)) {
     AERROR << "Failed to extract segments from routing";
     return reference_lines;
   }
@@ -287,11 +293,8 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  const auto &routing_response =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-
   auto debug_routing = planning_data->mutable_routing();
-  debug_routing->CopyFrom(routing_response);
+  debug_routing->CopyFrom(routing_response());
 
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
 }

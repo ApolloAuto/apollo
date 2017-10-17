@@ -71,10 +71,10 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(
-      reference_line_info_->pnc_map(), adc_sl_boundary, st_boundary_config_,
-      reference_line, path_data, qp_st_speed_config_.total_path_length(),
-      qp_st_speed_config_.total_time());
+  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
+                                   reference_line, path_data,
+                                   qp_st_speed_config_.total_path_length(),
+                                   qp_st_speed_config_.total_time());
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     DCHECK(path_obstacle->HasLongitudinalDecision());
@@ -119,22 +119,28 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   st_graph.SetDebugLogger(st_graph_debug);
   auto ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
   if (ret != Status::OK()) {
-    AERROR << "Failed to solve with ideal acceleration conditions. Use "
-              "secondary choice instead.";
+    AWARN << "Failed to solve with ideal acceleration conditions. Use "
+             "secondary choice instead.";
 
     accel_bound.first = qp_st_speed_config_.min_deceleration();
     accel_bound.second = qp_st_speed_config_.max_acceleration();
-    QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_);
-    ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);
+    ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
 
+    // backup plan: use piecewise_st_graph
     if (ret != Status::OK()) {
-      std::string msg = common::util::StrCat(
-          Name(), ": Failed to search graph with quadratic programming!");
-      AERROR << msg;
-      RecordSTGraphDebug(st_graph_data, st_graph_debug);
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_);
+      ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);
+
+      if (ret != Status::OK()) {
+        std::string msg = common::util::StrCat(
+            Name(), ": Failed to search graph with quadratic programming!");
+        AERROR << msg;
+        RecordSTGraphDebug(st_graph_data, st_graph_debug);
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
     }
   }
+
   // record debug info
   RecordSTGraphDebug(st_graph_data, st_graph_debug);
   return Status::OK();

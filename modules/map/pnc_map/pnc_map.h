@@ -23,7 +23,7 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/routing/proto/routing.pb.h"
@@ -34,39 +34,81 @@
 namespace apollo {
 namespace hdmap {
 
-using LaneSegments = std::vector<LaneSegment>;
+class RouteSegments : public std::vector<LaneSegment> {
+ public:
+  RouteSegments() = default;
+  void SetChangeLaneType(routing::ChangeLaneType type) {
+    change_lane_type_ = type;
+  }
+  routing::ChangeLaneType change_lane_type() const { return change_lane_type_; }
+
+  /**
+   * Project a point to route segments.
+   * @return false if error happended or projected outside of the lane segments.
+   */
+  bool GetInnerProjection(const common::PointENU &point_enu, double *s,
+                          double *l) const;
+
+ private:
+  routing::ChangeLaneType change_lane_type_ = routing::FORWARD;
+};
 
 class PncMap {
  public:
-  PncMap() = default;
   virtual ~PncMap() = default;
-  explicit PncMap(const std::string &map_file);
+  explicit PncMap(const HDMap *hdmap);
 
-  const hdmap::HDMap &HDMap() const;
+  const hdmap::HDMap *hdmap() const;
 
-  bool GetLaneSegmentsFromRouting(
-      const routing::RoutingResponse &routing, const common::PointENU &point,
-      const double backward_length, const double forward_length,
-      std::vector<LaneSegments> *const route_segments) const;
+  bool UpdateRoutingResponse(const routing::RoutingResponse &routing_response);
 
-  static bool CreatePathFromLaneSegments(const LaneSegments &segments,
+  const routing::RoutingResponse &routing_response() const;
+
+  static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
+  bool GetRouteSegments(const common::PointENU &point,
+                        const double backward_length,
+                        const double forward_length,
+                        std::vector<RouteSegments> *const route_segments) const;
+
  private:
-  bool GetNearestPointFromRouting(const routing::RoutingResponse &routing,
-                                  const common::PointENU &point,
+  bool GetNearestPointFromRouting(const common::PointENU &point,
                                   LaneWaypoint *waypoint) const;
 
-  bool TruncateLaneSegments(const LaneSegments &segments, double start_s,
-                            double end_s,
-                            LaneSegments *const truncated_segments) const;
+  /**
+   * Find the waypoint index of a routing waypoint.
+   * @return a vector with three values: Road index in RoutingResponse, Passage
+   * index in RoadSegment, and segment index in a Passage. (-1, -1, -1) will be
+   * returned if there is any error.
+   */
+  std::vector<int> GetWaypointIndex(const LaneWaypoint &waypoint) const;
 
-  bool ValidateRouting(const routing::RoutingResponse &routing) const;
+  bool PassageToSegments(routing::Passage passage,
+                         RouteSegments *segments) const;
+
+  bool ProjectToSegments(const common::PointENU &point_enu,
+                         const RouteSegments &segments,
+                         LaneWaypoint *waypoint) const;
+
+  bool TruncateLaneSegments(const RouteSegments &segments, double start_s,
+                            double end_s,
+                            RouteSegments *const truncated_segments) const;
+
+  static bool ValidateRouting(const routing::RoutingResponse &routing);
 
   static void AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
                                  const double end_s,
                                  std::vector<MapPathPoint> *const points);
-  hdmap::HDMap hdmap_;
+
+  LaneInfoConstPtr GetRoutePredecessor(LaneInfoConstPtr lane) const;
+  LaneInfoConstPtr GetRouteSuccessor(LaneInfoConstPtr lane) const;
+
+ private:
+  routing::RoutingResponse routing_;
+  std::unordered_set<std::string> routing_lane_ids_;
+  std::unique_ptr<LaneWaypoint> last_waypoint_;
+  const hdmap::HDMap *hdmap_ = nullptr;
 };
 
 }  // namespace hdmap
