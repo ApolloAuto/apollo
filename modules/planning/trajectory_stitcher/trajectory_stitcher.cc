@@ -102,7 +102,10 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory();
   }
 
-  double forward_rel_time = veh_rel_time + planning_cycle_time;
+  double forward_rel_time = veh_rel_time;
+  if (FLAGS_use_planning_cycle_time_in_stitcher) {
+    forward_rel_time += planning_cycle_time;
+  }
   std::size_t forward_index =
       prev_trajectory->QueryNearestPoint(forward_rel_time);
 
