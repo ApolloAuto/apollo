@@ -205,6 +205,7 @@ class AdapterManager {
   REGISTER_ADAPTER(RelativeOdometry);
   REGISTER_ADAPTER(InsStat);
   REGISTER_ADAPTER(HMICommand);
+  REGISTER_ADAPTER(Mobileye);
 
   DECLARE_SINGLETON(AdapterManager);
 };
