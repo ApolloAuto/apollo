@@ -60,6 +60,13 @@ class SimControl {
    */
   void Stop();
 
+  /**
+   * @brief Ignores the current received planning data.
+   */
+  void ClearPlanning() {
+    received_planning_ = false;
+  }
+
  private:
   void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
   void OnRoutingResponse(const apollo::routing::RoutingResponse &routing);
