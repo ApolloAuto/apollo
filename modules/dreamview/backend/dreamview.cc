@@ -38,16 +38,28 @@ using apollo::common::util::PathExists;
 using apollo::hdmap::SimMapFile;
 using apollo::hdmap::BaseMapFile;
 
-std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
+std::string Dreamview::Name() const {
+  return FLAGS_dreamview_module_name;
+}
 
 Status Dreamview::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   VehicleConfigHelper::Init();
 
-  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
-  CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
+  // Check the expected adapters are intialized.
+  CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
+  CHECK(AdapterManager::GetPlanning()) << "PlanningAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
-      << "Localization is not initialized.";
+      << "LocalizationAdapter is not initialized.";
+  CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetPrediction())
+      << "PredictionAdapter is not initialized.";
+  CHECK(AdapterManager::GetPerceptionObstacles())
+      << "PerceptionObstaclesAdapter is not initialized.";
+  CHECK(AdapterManager::GetRoutingRequest())
+      << "RoutingRequestAdapter is not initialized.";
+  CHECK(AdapterManager::GetRoutingResponse())
+      << "RoutingResponseAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
