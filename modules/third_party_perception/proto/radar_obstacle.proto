@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.third_party_perception;
+
+import "modules/common/proto/error_code.proto";
+import "modules/common/proto/header.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+
+message RadarObstacle {
+  optional int32 id = 1;  // obstacle ID.
+  optional apollo.perception.Point relative_position = 2;  // obstacle position in the sl coordinate system.
+  optional apollo.perception.Point relative_velocity = 3;  // obstacle relative velocity.
+  optional double rcs = 4;  // radar signal intensity.
+  optional bool movable = 5;  // whether this obstacle is able to move.
+  optional double width = 6;
+  optional double length = 7;
+  optional double height = 8;
+  optional double theta = 9;
+  optional apollo.perception.Point absolute_position = 10;
+  optional apollo.perception.Point absolute_velocity = 11;
+  optional int32 count = 12;
+  optional int32 moving_frames_count = 13;
+}
+
+message RadarObstacles {
+  map<int32, RadarObstacle> radar_obstacle = 1;  // An array of obstacles
+  optional apollo.common.Header header = 2;  // Header
+  optional apollo.common.ErrorCode error_code = 3 [default = OK];
+}

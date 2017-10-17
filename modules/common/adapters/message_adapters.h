@@ -25,6 +25,7 @@
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -67,6 +68,7 @@ using RelativeOdometryAdapter =
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
+using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 
 }  // namespace adapter
 }  // namespace common
