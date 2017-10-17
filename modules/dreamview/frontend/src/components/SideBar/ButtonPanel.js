@@ -66,13 +66,17 @@ export default class ButtonPanel extends React.Component {
                 onVideo,
                 onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
-                onMenu, showMenu} = this.props;
+                onMenu, showMenu, resetBackend} = this.props;
 
         return (
             <div>
                 <SideBarButton label="HMI Setup" active={false}
                                onClick={this.openHMI.bind(this)}
                                extraClasses={["button-corner"]} />
+                <div className="separator" />
+                <SideBarButton label="Reset Backend Data"
+                               onClick={resetBackend}
+                               active={false} />
                 <div className="separator" />
                 <SideBarButton label="Default Routing"
                                onClick={sendDefaultRoutingRequest}

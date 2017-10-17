@@ -2,7 +2,6 @@ import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
-
 class WebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
@@ -125,6 +124,12 @@ class WebSocketEndpoint {
     requestDefaultRoutingEndPoint() {
         this.websocket.send(JSON.stringify({
             type: "GetDefaultEndPoint",
+        }));
+    }
+
+    resetBackend() {
+        this.websocket.send(JSON.stringify({
+            type: "Reset",
         }));
     }
 }

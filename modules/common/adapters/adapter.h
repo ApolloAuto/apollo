@@ -273,6 +273,16 @@ class Adapter {
     return delay_ms_;
   }
 
+  /**
+   * @brief Clear the data received so far
+   */
+  void ClearData() {
+    // Lock the queue.
+    std::lock_guard<std::mutex> lock(mutex_);
+    data_queue_.clear();
+    observed_queue_.clear();
+  }
+
  private:
   template <typename T>
   struct IdentifierType {};
@@ -393,9 +403,7 @@ class Adapter {
   }
 
   /**
-   * @brief Calculates message delay based on message type. The various
-   * template
-   * speacialzations are defined in adapter.cc.
+   * @brief Calculates message delay based on message type.
    */
   double CalculateDelayInMs(const D& new_msg, const D& last_msg) {
     return MessageDelay<D>::Get(new_msg, last_msg);
@@ -426,9 +434,8 @@ class Adapter {
     static double Get(const T& new_msg, const T& last_msg) {
       using google::protobuf::Message;
 
-      return (ExtractTimeStampFromMsg(*static_cast<const Message*>(&new_msg)) -
-              ExtractTimeStampFromMsg(
-                  *static_cast<const Message*>(&last_msg))) *
+      return (ExtractTimeStampFromMsg(static_cast<const Message&>(new_msg)) -
+              ExtractTimeStampFromMsg(static_cast<const Message&>(last_msg))) *
              1000.0;
     }
 

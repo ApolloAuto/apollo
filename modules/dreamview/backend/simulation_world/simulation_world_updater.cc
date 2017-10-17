@@ -126,6 +126,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         }
         websocket_->SendData(conn, response.dump());
       });
+
+  websocket_->RegisterMessageHandler(
+      "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
+        sim_world_service_.SetToClear();
+      });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
