@@ -54,7 +54,9 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory() {
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const bool is_on_auto_mode, const double current_timestamp,
     const double planning_cycle_time,
-    const PublishableTrajectory* prev_trajectory) {
+    const PublishableTrajectory* prev_trajectory,
+    bool* is_replan) {
+  *is_replan = true;
   if (!FLAGS_enable_trajectory_stitcher) {
     return ComputeReinitStitchingTrajectory();
   }
@@ -121,6 +123,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     tp.set_relative_time(tp.relative_time() - zero_time);
     tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
   }
+  *is_replan = false;
   return stitching_trajectory;
 }
 
