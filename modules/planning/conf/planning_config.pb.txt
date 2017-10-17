@@ -78,6 +78,7 @@ em_planner_config {
         reference_line_weight: 0
         num_output: 100
         cross_lane_extension_buffer: 0.2
+        history_path_weight: 0.0;
     }
     qp_st_speed_config {
         total_path_length: 250.0
