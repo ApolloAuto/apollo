@@ -32,11 +32,13 @@ using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               SimControl *sim_control,
                                                const MapService *map_service,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
-      websocket_(websocket) {
+      websocket_(websocket),
+      sim_control_(sim_control) {
   // Initialize default end point
   LoadDefaultEndPoint();
 
@@ -130,6 +132,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
+        sim_control_->ClearPlanning();
       });
 }
 
