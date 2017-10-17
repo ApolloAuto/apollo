@@ -108,7 +108,7 @@ bool RouteSegments::GetInnerProjection(const common::PointENU &point_enu,
     has_projection = true;
     if (std::fabs(lane_l) < *l) {
       *l = std::fabs(lane_l);
-      *s = lane_s + accumulate_s;
+      *s = lane_s - iter->start_s + accumulate_s;
     }
   }
   return has_projection;
