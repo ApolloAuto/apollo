@@ -17,7 +17,7 @@ camera:
     near: 1
     far: 3000
   Monitor:
-    fov: 110
+    fov: 120
     near: 1
     far: 3000
   laneWidth: 4.5 # original 3.32
