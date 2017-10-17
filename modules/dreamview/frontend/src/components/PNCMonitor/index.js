@@ -25,6 +25,21 @@ export default class PNCMonitor extends React.Component {
         return graphs;
     }
 
+    generateScatterGraph(name, data) {
+        if (SETTING[name] === undefined) {
+            console.error("Graph setting not found: ", name);
+            return null;
+        }
+
+        return (
+            <ScatterGraph
+                title={SETTING[name].title}
+                options={SETTING[name].options}
+                properties={SETTING[name].properties}
+                data={data} />
+        );
+    }
+
     render() {
         const { sequenceNum, data } = this.props.store.planning;
         const { dimension } = this.props.store;
@@ -34,22 +49,12 @@ export default class PNCMonitor extends React.Component {
         }
 
         return (
-            <div className="pnc-monitor">
-                <ScatterGraph
-                        title={SETTING.slGraph.title}
-                        options={SETTING.slGraph.options}
-                        properties={SETTING.slGraph.properties}
-                        data={data.slGraph} />
-                <ScatterGraph
-                        title={SETTING.stSpeedGraph.title}
-                        options={SETTING.stSpeedGraph.options}
-                        properties={SETTING.stSpeedGraph.properties}
-                        data={data.stSpeedGraph.QpSplineStSpeedOptimizer} />
-                <ScatterGraph
-                        title={SETTING.speedGraph.title}
-                        options={SETTING.speedGraph.options}
-                        properties={SETTING.speedGraph.properties}
-                        data={data.speedGraph} />
+            <div className='pnc-monitor'>
+                {this.generateScatterGraph('slGraph', data.slGraph)}
+                {this.generateScatterGraph('stSpeedGraph',
+                        data.stSpeedGraph.QpSplineStSpeedOptimizer)}
+                {this.generateScatterGraph('speedGraph', data.speedGraph)}
+                {this.generateScatterGraph('kappaGraph', data.kappaGraph)}
                 {this.generateStGraph(data.stGraph)}
             </div>
         );
