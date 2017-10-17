@@ -68,6 +68,14 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
     yield_sign_table_[yield_sign.id().id()].reset(
         new YieldSignInfo(yield_sign));
   }
+  for (const auto& clear_area : map_.clear_area()) {
+    clear_area_table_[clear_area.id().id()].reset(
+        new ClearAreaInfo(clear_area));
+  }
+  for (const auto& speed_bump : map_.speed_bump()) {
+    speed_bump_table_[speed_bump.id().id()].reset(
+        new SpeedBumpInfo(speed_bump));
+  }
   for (const auto& overlap : map_.overlap()) {
     overlap_table_[overlap.id().id()].reset(new OverlapInfo(overlap));
   }
@@ -96,6 +104,8 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   BuildCrosswalkPolygonKDTree();
   BuildStopSignSegmentKDTree();
   BuildYieldSignSegmentKDTree();
+  BuildClearAreaPolygonKDTree();
+  BuildSpeedBumpSegmentKDTree();
 
   return 0;
 }
@@ -128,6 +138,16 @@ StopSignInfoConstPtr HDMapImpl::GetStopSignById(const Id& id) const {
 YieldSignInfoConstPtr HDMapImpl::GetYieldSignById(const Id& id) const {
   YieldSignTable::const_iterator it = yield_sign_table_.find(id.id());
   return it != yield_sign_table_.end() ? it->second : nullptr;
+}
+
+ClearAreaInfoConstPtr HDMapImpl::GetClearAreaById(const Id& id) const {
+  ClearAreaTable::const_iterator it = clear_area_table_.find(id.id());
+  return it != clear_area_table_.end() ? it->second : nullptr;
+}
+
+SpeedBumpInfoConstPtr HDMapImpl::GetSpeedBumpById(const Id& id) const {
+  SpeedBumpTable::const_iterator it = speed_bump_table_.find(id.id());
+  return it != speed_bump_table_.end() ? it->second : nullptr;
 }
 
 OverlapInfoConstPtr HDMapImpl::GetOverlapById(const Id& id) const {
@@ -309,6 +329,58 @@ int HDMapImpl::GetYieldSigns(
   }
   for (const auto& id : ids) {
     yield_signs->emplace_back(GetYieldSignById(CreateHDMapId(id)));
+  }
+
+  return 0;
+}
+
+int HDMapImpl::GetClearAreas(
+    const PointENU& point, double distance,
+    std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
+  return GetClearAreas({point.x(), point.y()}, distance, clear_areas);
+}
+
+int HDMapImpl::GetClearAreas(
+    const Vec2d& point, double distance,
+    std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
+  if (clear_areas == nullptr || clear_area_polygon_kdtree_ == nullptr) {
+    return -1;
+  }
+  clear_areas->clear();
+  std::vector<std::string> ids;
+  const int status =
+      SearchObjects(point, distance, *clear_area_polygon_kdtree_, &ids);
+  if (status < 0) {
+    return status;
+  }
+  for (const auto& id : ids) {
+    clear_areas->emplace_back(GetClearAreaById(CreateHDMapId(id)));
+  }
+
+  return 0;
+}
+
+int HDMapImpl::GetSpeedBumps(
+    const PointENU& point, double distance,
+    std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
+  return GetSpeedBumps({point.x(), point.y()}, distance, speed_bumps);
+}
+
+int HDMapImpl::GetSpeedBumps(
+    const Vec2d& point, double distance,
+    std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
+  if (speed_bumps == nullptr || speed_bump_segment_kdtree_ == nullptr) {
+    return -1;
+  }
+  speed_bumps->clear();
+  std::vector<std::string> ids;
+  const int status =
+      SearchObjects(point, distance, *speed_bump_segment_kdtree_, &ids);
+  if (status < 0) {
+    return status;
+  }
+  for (const auto& id : ids) {
+    speed_bumps->emplace_back(GetSpeedBumpById(CreateHDMapId(id)));
   }
 
   return 0;
@@ -569,6 +641,22 @@ void HDMapImpl::BuildYieldSignSegmentKDTree() {
                      &yield_sign_segment_kdtree_);
 }
 
+void HDMapImpl::BuildClearAreaPolygonKDTree() {
+  AABoxKDTreeParams params;
+  params.max_leaf_dimension = 5.0;  // meters.
+  params.max_leaf_size = 4;
+  BuildPolygonKDTree(clear_area_table_, params, &clear_area_polygon_boxes_,
+                     &clear_area_polygon_kdtree_);
+}
+
+void HDMapImpl::BuildSpeedBumpSegmentKDTree() {
+  AABoxKDTreeParams params;
+  params.max_leaf_dimension = 5.0;  // meters.
+  params.max_leaf_size = 4;
+  BuildSegmentKDTree(speed_bump_table_, params, &speed_bump_segment_boxes_,
+                     &speed_bump_segment_kdtree_);
+}
+
 template <class KDTree>
 int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
                              const KDTree& kdtree,
@@ -606,6 +694,10 @@ void HDMapImpl::Clear() {
   stop_sign_segment_kdtree_.reset(nullptr);
   yield_sign_segment_boxes_.clear();
   yield_sign_segment_kdtree_.reset(nullptr);
+  clear_area_polygon_boxes_.clear();
+  clear_area_polygon_kdtree_.reset(nullptr);
+  speed_bump_segment_boxes_.clear();
+  speed_bump_segment_kdtree_.reset(nullptr);
 }
 
 }  // namespace hdmap
