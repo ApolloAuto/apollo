@@ -219,8 +219,7 @@ bool ReferenceLineSmoother::ApplyKernel() {
         smoother_config_.third_derivative_weight());
   }
 
-  constexpr double kReferenceLineSmootherKernelWeight = 0.01;
-  kernel->AddRegularization(kReferenceLineSmootherKernelWeight);
+  kernel->AddRegularization(smoother_config_.regularization_weight());
   return true;
 }
 
@@ -248,26 +247,35 @@ bool ReferenceLineSmoother::ExtractEvaluatedPoints(
 
 bool ReferenceLineSmoother::GetSFromParamT(const double t,
                                            double* const s) const {
-  if (t_knots_.size() < 2 || t - t_knots_.back() > 1e-8) {
+  if (t_knots_.size() < 2) {
+    AERROR << "Fail to GetSFromParamT because t_knots_.size() error.";
     return false;
   }
-  std::uint32_t lower = FindIndex(t);
-  std::uint32_t upper = lower + 1;
-  double weight = 0.0;
-  const double diff = t_knots_[upper] - t_knots_[lower];
-  if (std::fabs(diff) > 1e-8) {
-    weight = (t - t_knots_[lower]) / diff;
+
+  if (fabs(t - t_knots_.front()) < 1e-8) {
+    *s = ref_points_.front().s();
+    return true;
   }
-  *s =
-      ref_points_[lower].s() * (1.0 - weight) + ref_points_[upper].s() * weight;
+  if (fabs(t - t_knots_.back()) < 1e-8) {
+    *s = ref_points_.back().s();
+    return true;
+  }
+  if (t < t_knots_.front() || t > t_knots_.back()) {
+    AERROR << "Fail to GetSFromParamT. t = " << t;
+    return false;
+  }
+
+  std::uint32_t upper = FindIndex(t);
+  std::uint32_t lower = upper - 1;
+
+  const double r = (t - t_knots_[lower]) / (t_knots_[upper] - t_knots_[lower]);
+  *s = ref_points_[lower].s() * (1.0 - r) + ref_points_[upper].s() * r;
   return true;
 }
 
 std::uint32_t ReferenceLineSmoother::FindIndex(const double t) const {
-  auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
-  return std::min(t_knots_.size() - 1,
-                  static_cast<std::size_t>(upper_bound - t_knots_.begin())) -
-         1;
+  auto upper_bound = std::upper_bound(t_knots_.begin(), t_knots_.end(), t);
+  return std::distance(t_knots_.begin(), upper_bound);
 }
 
 }  // namespace planning
