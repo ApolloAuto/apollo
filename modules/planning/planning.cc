@@ -259,7 +259,6 @@ void Planning::RunOnce() {
 
   if (status.ok()) {
     trajectory_pb.set_is_replan(is_replan);
-
     PublishPlanningPb(&trajectory_pb, start_timestamp);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else if (FLAGS_publish_estop) {

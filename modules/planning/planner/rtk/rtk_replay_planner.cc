@@ -77,7 +77,7 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
     const auto& last_point = trajectory_points.rbegin();
     auto new_point = last_point;
     new_point->set_relative_time(new_point->relative_time() +
-                                 FLAGS_trajectory_resolution);
+                                 FLAGS_rtk_trajectory_resolution);
     trajectory_points.push_back(*new_point);
   }
   reference_line_info->SetTrajectory(DiscretizedTrajectory(trajectory_points));
