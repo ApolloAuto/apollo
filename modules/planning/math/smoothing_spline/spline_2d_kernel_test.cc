@@ -32,8 +32,6 @@ TEST(Spline2dKernel, add_regularization) {
 
   kernel.AddRegularization(0.2);
 
-  std::cout << kernel.kernel_matrix() << std::endl;
-
   for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
     for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
       if (i == j) {
