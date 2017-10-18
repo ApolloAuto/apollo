@@ -128,6 +128,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableMobileye(FLAGS_mobileye_topic, config.mode(),
                          config.message_history_limit());
         break;
+      case AdapterConfig::DELPHIESR:
+        EnableDelphiESR(FLAGS_delphi_esr_topic, config.mode(),
+                        config.message_history_limit());
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;
