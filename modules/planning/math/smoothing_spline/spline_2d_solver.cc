@@ -189,7 +189,8 @@ bool Spline2dSolver::Solve() {
       AERROR << "qpOASES solver failed due to reached max iteration";
     } else {
       AERROR << "qpOASES solver failed due to infeasibility or other internal "
-                "reasons:" << ret;
+                "reasons:"
+             << ret;
     }
     return false;
   }
