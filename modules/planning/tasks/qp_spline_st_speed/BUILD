@@ -55,6 +55,7 @@ cc_library(
         "qp_spline_st_speed_optimizer.h",
     ],
     deps = [
+        ":qp_piecewise_st_graph",
         ":qp_spline_st_graph",
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",

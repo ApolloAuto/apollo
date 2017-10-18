@@ -39,6 +39,9 @@ DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
+DEFINE_string(test_previous_planning_file, "",
+              "The previous planning test file");
+
 void PlanningTestBase::SetUpTestCase() {
   FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
   FLAGS_adapter_config_filename = "modules/planning/testdata/conf/adapter.conf";
@@ -94,7 +97,14 @@ bool PlanningTestBase::SetUpAdapters() {
 void PlanningTestBase::SetUp() {
   planning_.Stop();
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
-  planning_.Init();
+  CHECK(planning_.Init().ok()) << "Failed to init planning module";
+  if (!FLAGS_test_previous_planning_file.empty()) {
+    const auto prev_planning_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
+    ADCTrajectory prev_planning;
+    CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
+    planning_.SetLastPublishableTrajectory(prev_planning);
+  }
 }
 
 void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {

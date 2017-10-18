@@ -62,6 +62,25 @@ class ActiveSetQpSolver : public QpSolver {
   double l_upper_bound() const;
   double constraint_upper_bound() const;
 
+  void set_pos_semi_definite_hessian() override {
+    // If hessianType is set to HST_SEMIDEF, the built-in regularisation scheme
+    // is switched on at no additional computational cost
+    hessian_type_ = ::qpOASES::HST_SEMIDEF;
+  }
+  void set_pos_definite_hessian() override {
+    hessian_type_ = ::qpOASES::HST_POSDEF;
+  }
+
+  void EnableCholeskyRefactorisation(const int num) override {
+    // Specifies the frequency of full factorisation refactorisations of the
+    // projected Hessian: 0 turns them off, 1 uses them at each iteration etc
+    cholesky_refactorisation_freq_ = num;
+  }
+
+  void SetTerminationTolerance(const double tolerance) override {
+    termination_tolerance_ = tolerance;
+  }
+
  private:
   bool sanity_check() override;
 
@@ -83,6 +102,10 @@ class ActiveSetQpSolver : public QpSolver {
   // constraint search upper bound
   double constraint_upper_bound_ = 1e10;
   int max_iteration_ = 1000;
+
+  ::qpOASES::HessianType hessian_type_ = ::qpOASES::HST_UNKNOWN;
+  int cholesky_refactorisation_freq_ = 0;
+  double termination_tolerance_ = 1.0e-9;
 };
 
 }  // namespace math

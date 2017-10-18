@@ -33,6 +33,8 @@ if [ -e /dev/ttyUSB0 ]; then
     sudo chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
 fi
 
+MACHINE_ARCH=$(uname -m)
+ROS_TAR="ros-indigo-apollo-1.5.0-${MACHINE_ARCH}.tar.gz"
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
@@ -40,23 +42,20 @@ if [ "$RELEASE_DOCKER" != "1" ];then
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
 
-  # setup HMI config for internal maps and vehicles.
-  HMI_INTERNAL_PACTH=modules/hmi/conf/internal_config.patch
-  if [ -e /apollo/${HMI_INTERNAL_PACTH} ]; then
-    cd /apollo
-    git apply ${HMI_INTERNAL_PACTH}
-    git update-index --assume-unchanged modules/hmi/conf/config.pb.txt
-    rm ${HMI_INTERNAL_PACTH}
+  # setup ros package
+  # this is a tempary solution to avoid ros package downloading.
+  MD5="$(echo -n '/apollo' | md5sum | cut -d' ' -f1)"
+  EXTERNAL="/home/${DOCKER_USER}/.cache/bazel/_bazel_${USER}/${MD5}/external"
+  if [ ! -e "$EXTERNAL" ];then
+    mkdir -p $EXTERNAL
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "${EXTERNAL}"
   fi
-
-  # setup car specific configuration
-  if [ -e /home/tmp/esd_can ]; then
-    cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
-    cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
+  ROS="${EXTERNAL}/ros"
+  if [ -e "$ROS" ]; then
+    rm -rf $ROS
   fi
-  if [ -e /home/tmp/gnss_conf ]; then
-    cp -r /home/tmp/gnss_conf/* /apollo/modules/drivers/gnss/conf/
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/drivers/gnss/conf/"
-  fi
+  tar xzf "/home/tmp/${ROS_TAR}" -C $EXTERNAL
+  cd $ROS
+  ln -s /apollo/third_party/ros.BUILD BUILD.bazel
+  chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
 fi

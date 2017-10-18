@@ -4,18 +4,17 @@ cc_library(
         "modules/dynamicuda/include/**/*.hpp",
     ]),
     includes = [
-        "modules/dynamicuda/include"
+        "modules/dynamicuda/include",
     ],
 )
 
 cc_library(
     name = "core",
-    visibility = ["//visibility:public"],
     srcs = glob(["modules/core/src/**/*.cpp"]),
     hdrs = glob([
         "modules/core/src/**/*.hpp",
         "modules/core/include/**/*.hpp",
-     ]) + [
+    ]) + [
         ":module_includes",
         ":cvconfig",
         ":version_string",
@@ -23,11 +22,15 @@ cc_library(
     copts = [
         "-Imodules/dynamicuda/include",
     ],
-    # Note that opencv core requires zlib and pthread to build.
-    linkopts = ["-pthread", "-lz"],
     includes = [
         "modules/core/include",
     ],
+    # Note that opencv core requires zlib and pthread to build.
+    linkopts = [
+        "-pthread",
+        "-lz",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
         ":dynamicuda",
     ],
@@ -35,19 +38,19 @@ cc_library(
 
 cc_library(
     name = "imgproc",
-    visibility = ["//visibility:public"],
     srcs = glob(["modules/imgproc/src/**/*.cpp"]),
     hdrs = glob([
         "modules/imgproc/src/**/*.hpp",
         "modules/imgproc/src/**/*.h",
         "modules/imgproc/include/**/*.hpp",
         "modules/imgproc/include/**/*.h",
-     ]) + [
+    ]) + [
         ":module_includes",
     ],
     includes = [
         "modules/imgproc/include",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":core",
     ],
@@ -55,19 +58,19 @@ cc_library(
 
 cc_library(
     name = "ml",
-    visibility = ["//visibility:public"],
     srcs = glob(["modules/ml/src/**/*.cpp"]),
     hdrs = glob([
         "modules/ml/src/**/*.hpp",
         "modules/ml/src/**/*.h",
         "modules/ml/include/**/*.hpp",
         "modules/ml/include/**/*.h",
-     ]) + [
+    ]) + [
         ":module_includes",
     ],
     includes = [
         "modules/ml/include",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":core",
     ],
@@ -75,19 +78,19 @@ cc_library(
 
 cc_library(
     name = "video",
-    visibility = ["//visibility:public"],
     srcs = glob(["modules/video/src/**/*.cpp"]),
     hdrs = glob([
         "modules/video/src/**/*.hpp",
         "modules/video/src/**/*.h",
         "modules/video/include/**/*.hpp",
         "modules/video/include/**/*.h",
-     ]) + [
+    ]) + [
         ":module_includes",
     ],
     includes = [
         "modules/video/include",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":core",
     ],
@@ -101,7 +104,7 @@ cat > $@ <<"EOF"
 #define HAVE_OPENCV_CORE
 #define HAVE_OPENCV_IMGPROC
 #define HAVE_OPENCV_ML
-EOF"""
+EOF""",
 )
 
 genrule(
@@ -129,7 +132,7 @@ cat > $@ <<"EOF"
 
 // Compile for 'virtual' NVIDIA PTX architectures
 #define CUDA_ARCH_PTX ""
-EOF"""
+EOF""",
 )
 
 genrule(
@@ -244,5 +247,5 @@ cat > $@ <<"EOF"
 "  cvconfig.h is in:              /home/breakds/Downloads/opencv-2.4.13.2/build\\n"
 "-----------------------------------------------------------------\\n"
 "\\n"
-EOF"""
+EOF""",
 )

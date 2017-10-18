@@ -107,8 +107,8 @@ TEST(NodeWithRangeTestSuit, basic_test) {
 
   const TopoNode* tn_1 = &topo_node_1;
   const TopoNode* tn_2 = &topo_node_2;
-  NodeWithRange node_range_from(range_from, tn_1);
-  NodeWithRange node_range_to(range_to, tn_2);
+  NodeWithRange node_range_from(tn_1, range_from);
+  NodeWithRange node_range_to(tn_2, range_to);
 
   ASSERT_FALSE(node_range_from < node_range_to);
 }

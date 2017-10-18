@@ -21,14 +21,16 @@
 #ifndef MODULES_PLANNING_TASKS_QP_SPLINE_ST_QP_SPLINE_ST_SPEED_OPTIMIZER_H_
 #define MODULES_PLANNING_TASKS_QP_SPLINE_ST_QP_SPLINE_ST_SPEED_OPTIMIZER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/qp_st_speed_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/tasks/speed_optimizer.h"
 #include "modules/planning/tasks/st_graph/st_boundary_mapper.h"
 
@@ -49,8 +51,9 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
 
-  QpSplineStSpeedConfig qp_spline_st_speed_config_;
+  QpStSpeedConfig qp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
+  std::unique_ptr<Spline1dGenerator> spline_generator_;
 };
 
 }  // namespace planning

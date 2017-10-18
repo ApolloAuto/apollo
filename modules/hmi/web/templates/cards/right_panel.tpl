@@ -67,7 +67,7 @@
   <h2 class="panel_header">Hardware</h2>
 
   <ul class="list-group">
-    {% for hardware in conf_pb.hardware %}
+    {% for hardware in conf.get_pb().hardware %}
       <li class="list-group-item debug_item
           {% if loop.index % 2 == 0 %} light {% endif %}">
         <div class="item_content" id="hardware_{{ hardware.name }}">
@@ -136,9 +136,9 @@
                   <span class="caret pull-right"></span>
                 </button>
                 <ul class="dropdown-menu">
-                {% for map in conf_pb.available_maps %}
-                  <li><a onclick="io_request('tool_api', 'switch_map', ['{{ map.name }}'])">
-                    {{ map.name }}
+                {% for map in conf.maps.keys() | sort %}
+                  <li><a onclick="io_request('tool_api', 'switch_map', ['{{ map }}'])">
+                    {{ map }}
                   </a></li>
                 {% endfor %}
                 </ul>
@@ -154,9 +154,9 @@
                   <span class="caret pull-right"></span>
                 </button>
                 <ul class="dropdown-menu">
-                {% for vehicle in conf_pb.available_vehicles %}
-                  <li><a onclick="io_request('tool_api', 'switch_vehicle', ['{{ vehicle.name }}'])">
-                    {{ vehicle.name }}
+                {% for vehicle in conf.vehicles.keys() %}
+                  <li><a onclick="io_request('tool_api', 'switch_vehicle', ['{{ vehicle }}'])">
+                    {{ vehicle }}
                   </a></li>
                 {% endfor %}
                 </ul>

@@ -16,14 +16,13 @@
 
 #include "modules/routing/core/navigator.h"
 
-#include <assert.h>
-
 #include <algorithm>
 #include <fstream>
 
+#include "modules/common/proto/error_code.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/strategy/a_star_strategy.h"
@@ -33,20 +32,11 @@ namespace routing {
 
 namespace {
 
-bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
-  const auto& start = request.start();
-  const auto& end = request.end();
-  const auto* node = graph->GetNode(start.id());
-  if (node == nullptr) {
-    AERROR << "Start node is not found in topo graph! ID: " << start.id();
-    return false;
-  }
-  AINFO << "Start point:\tlane id: " << start.id() << " s: " << start.s()
-        << " x: " << start.pose().x() << " y: " << start.pose().y()
-        << " length: " << node->Length();
+using common::ErrorCode;
 
+bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
   for (const auto& wp : request.waypoint()) {
-    node = graph->GetNode(wp.id());
+    const auto* node = graph->GetNode(wp.id());
     if (node == nullptr) {
       AERROR << "Way node is not found in topo graph! ID: " << wp.id();
       return false;
@@ -57,7 +47,7 @@ bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
   }
 
   for (const auto& bl : request.blacklisted_lane()) {
-    node = graph->GetNode(bl.id());
+    const auto* node = graph->GetNode(bl.id());
     if (node == nullptr) {
       AERROR << "Black list node is not found in topo graph! ID: " << bl.id();
       return false;
@@ -67,28 +57,12 @@ bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
           << " length: " << node->Length();
   }
 
-  node = graph->GetNode(end.id());
-  if (node == nullptr) {
-    AERROR << "End node is not found in topo graph! ID: " << end.id();
-    return false;
-  }
-  AINFO << "End point:\tlane id: " << end.id() << " s: " << end.s()
-        << " x: " << end.pose().x() << " y: " << end.pose().y()
-        << " length: " << node->Length();
   return true;
 }
 
 bool GetWayNodes(const RoutingRequest& request, const TopoGraph* graph,
                  std::vector<const TopoNode*>* const way_nodes,
                  std::vector<double>* const way_s) {
-  const auto* start_node = graph->GetNode(request.start().id());
-  if (start_node == nullptr) {
-    AERROR << "Can't find start point in graph! Id: " << request.start().id();
-    return false;
-  }
-  way_nodes->push_back(start_node);
-  way_s->push_back(request.start().s());
-
   for (const auto& point : request.waypoint()) {
     const auto* cur_node = graph->GetNode(point.id());
     if (cur_node == nullptr) {
@@ -98,23 +72,15 @@ bool GetWayNodes(const RoutingRequest& request, const TopoGraph* graph,
     way_nodes->push_back(cur_node);
     way_s->push_back(point.s());
   }
-
-  const auto* end_node = graph->GetNode(request.end().id());
-  if (end_node == nullptr) {
-    AERROR << "Can't find end point in graph! Id: " << request.end().id();
-    return false;
-  }
-  way_nodes->push_back(end_node);
-  way_s->push_back(request.end().s());
   return true;
 }
 
-void SetErrorCode(const RoutingResponse::ErrorCode::ErrorID& error_id,
+void SetErrorCode(const common::ErrorCode& error_code_id,
                   const std::string& error_string,
-                  RoutingResponse::ErrorCode* const error_code) {
-  error_code->set_error_id(error_id);
-  error_code->set_error_string(error_string);
-  if (error_id == RoutingResponse::ErrorCode::SUCCESS) {
+                  common::StatusPb* const error_code) {
+  error_code->set_error_code(error_code_id);
+  error_code->set_msg(error_string);
+  if (error_code_id == common::ErrorCode::OK) {
     AINFO << error_string.c_str();
   } else {
     AERROR << error_string.c_str();
@@ -132,7 +98,7 @@ void PrintDebugData(const std::vector<NodeWithRange>& nodes) {
 
 }  // namespace
 
-Navigator::Navigator(const std::string& topo_file_path) : is_ready_(false) {
+Navigator::Navigator(const std::string& topo_file_path) {
   Graph graph;
   if (!common::util::GetProtoFromFile(topo_file_path, &graph)) {
     AERROR << "Failed to read topology graph from " << topo_file_path;
@@ -173,20 +139,17 @@ bool Navigator::Init(const RoutingRequest& request, const TopoGraph* graph,
 bool Navigator::MergeRoute(
     const std::vector<NodeWithRange>& node_vec,
     std::vector<NodeWithRange>* const result_node_vec) const {
-  bool need_to_merge = false;
-  for (size_t i = 0; i < node_vec.size(); ++i) {
-    if (!need_to_merge) {
-      result_node_vec->push_back(node_vec[i]);
+  for (const auto& node : node_vec) {
+    if (result_node_vec->empty() ||
+        result_node_vec->back().GetTopoNode() != node.GetTopoNode()) {
+      result_node_vec->push_back(node);
     } else {
-      if (result_node_vec->back().EndS() < node_vec[i].StartS()) {
+      if (result_node_vec->back().EndS() < node.StartS()) {
         AERROR << "Result route is not coninuous";
         return false;
+      } else {
+        result_node_vec->back().SetEndS(node.EndS());
       }
-      result_node_vec->back().SetEndS(node_vec[i].EndS());
-    }
-    if (i < node_vec.size() - 1) {
-      need_to_merge =
-          (node_vec[i].GetTopoNode() == node_vec[i + 1].GetTopoNode());
     }
   }
   return true;
@@ -247,46 +210,44 @@ bool Navigator::SearchRouteByStrategy(
 bool Navigator::SearchRoute(const RoutingRequest& request,
                             RoutingResponse* const response) {
   if (!ShowRequestInfo(request, graph_.get())) {
-    SetErrorCode(RoutingResponse::ErrorCode::ERROR_REQUEST,
+    SetErrorCode(ErrorCode::ROUTING_ERROR_REQUEST,
                  "Error encountered when reading request point!",
-                 response->mutable_error_code());
+                 response->mutable_status());
     return false;
   }
 
   if (!IsReady()) {
-    SetErrorCode(RoutingResponse::ErrorCode::ERROR_ROUTER_NOT_READY,
-                 "Navigator is not ready!", response->mutable_error_code());
+    SetErrorCode(ErrorCode::ROUTING_ERROR_NOT_READY, "Navigator is not ready!",
+                 response->mutable_status());
     return false;
   }
   std::vector<const TopoNode*> way_nodes;
   std::vector<double> way_s;
   if (!Init(request, graph_.get(), &way_nodes, &way_s)) {
-    SetErrorCode(RoutingResponse::ErrorCode::ERROR_ROUTER_NOT_READY,
-                 "Failed to initialize navigator!",
-                 response->mutable_error_code());
+    SetErrorCode(ErrorCode::ROUTING_ERROR_NOT_READY,
+                 "Failed to initialize navigator!", response->mutable_status());
     return false;
   }
 
   std::vector<NodeWithRange> result_nodes;
   if (!SearchRouteByStrategy(graph_.get(), way_nodes, way_s, &result_nodes)) {
-    SetErrorCode(RoutingResponse::ErrorCode::ERROR_RESPONSE_FAILED,
+    SetErrorCode(ErrorCode::ROUTING_ERROR_RESPONSE,
                  "Failed to find route with request!",
-                 response->mutable_error_code());
+                 response->mutable_status());
     return false;
   }
-  result_nodes.front().SetStartS(request.start().s());
-  result_nodes.back().SetEndS(request.end().s());
+  result_nodes.front().SetStartS(request.waypoint().begin()->s());
+  result_nodes.back().SetEndS(request.waypoint().rbegin()->s());
 
   if (!result_generator_->GeneratePassageRegion(
           graph_->MapVersion(), request, result_nodes, topo_range_manager_,
           response)) {
-    SetErrorCode(RoutingResponse::ErrorCode::ERROR_RESPONSE_FAILED,
+    SetErrorCode(ErrorCode::ROUTING_ERROR_RESPONSE,
                  "Failed to generate passage regions based on result lanes",
-                 response->mutable_error_code());
+                 response->mutable_status());
     return false;
   }
-  SetErrorCode(RoutingResponse::ErrorCode::SUCCESS, "Success!",
-               response->mutable_error_code());
+  SetErrorCode(ErrorCode::OK, "Success!", response->mutable_status());
 
   PrintDebugData(result_nodes);
   return true;

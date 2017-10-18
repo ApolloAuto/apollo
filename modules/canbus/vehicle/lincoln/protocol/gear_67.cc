@@ -16,11 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/gear_67.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
+
+using ::apollo::drivers::canbus::Byte;
 
 const int32_t Gear67::ID = 0x67;
 

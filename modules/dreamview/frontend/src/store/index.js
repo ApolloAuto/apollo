@@ -4,13 +4,18 @@ import * as THREE from "three";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
+import Planning from "store/planning";
 import RouteEditingManager from "store/route_editing_manager";
+import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
-
 
 class DreamviewStore {
     // Mutable States
     @observable timestamp = 0;
+
+    @observable worldTimestamp = 0;
+
+    @observable widthInPercentage = 1.0;
 
     @observable dimension = {
         width: window.innerWidth,
@@ -19,11 +24,15 @@ class DreamviewStore {
 
     @observable isInitialized = false;
 
+    @observable planning = new Planning();
+
     @observable meters = new Meters();
 
     @observable monitor = new Monitor();
 
     @observable options = new Options();
+
+    @observable video = new Video();
 
     @observable routeEditingManager = new RouteEditingManager();
 
@@ -31,9 +40,18 @@ class DreamviewStore {
         this.timestamp = newTimestamp;
     }
 
+    @action updateWorldTimestamp(newTimestamp) {
+        this.worldTimestamp = newTimestamp;
+    }
+
+    @action updateWidthInPercentage(newWidth) {
+        this.widthInPercentage = newWidth;
+        this.updateDimension();
+    }
+
     @action updateDimension() {
         this.dimension = {
-            width: window.innerWidth,
+            width: window.innerWidth * this.widthInPercentage,
             height: window.innerHeight,
         };
     }
@@ -42,6 +60,22 @@ class DreamviewStore {
         this.isInitialized = status;
     }
 
+    @action updatePlanning(newPlanningData) {
+        this.planning.update(newPlanningData);
+    }
+
+    @action setPNCMonitor() {
+        this.options.toggle('showPNCMonitor');
+        if(this.options.showPNCMonitor) {
+            this.updateWidthInPercentage(0.7);
+            this.options.selectCamera('Monitor');
+            this.options.showPlanning = false;
+        } else {
+            this.updateWidthInPercentage(1.0);
+            this.options.selectCamera('Default');
+            this.options.showPlanning = true;
+        }
+    }
 }
 
 const STORE = new DreamviewStore();

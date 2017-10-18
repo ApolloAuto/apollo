@@ -5,12 +5,18 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "traffic_rules",
     srcs = [
-        "back_side_vehicles.cc",
-        "signal_lights.cc",
+        "backside_vehicle.cc",
+        "clear_zone.cc",
+        "crosswalk.cc",
+        "object_priority.cc",
+        "signal_light.cc",
     ],
     hdrs = [
-        "back_side_vehicles.h",
-        "signal_lights.h",
+        "backside_vehicle.h",
+        "clear_zone.h",
+        "crosswalk.h",
+        "object_priority.h",
+        "signal_light.h",
         "traffic_rule.h",
     ],
     deps = [

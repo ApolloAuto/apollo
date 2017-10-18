@@ -32,15 +32,15 @@ using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               SimControl *sim_control,
                                                const MapService *map_service,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
-      websocket_(websocket) {
+      websocket_(websocket),
+      sim_control_(sim_control) {
   // Initialize default end point
-  if (!GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
-    AWARN << "Failed to load default end point from " << EndWayPointFile();
-  }
+  LoadDefaultEndPoint();
 
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
@@ -89,8 +89,8 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
         // Publish monitor message.
         if (succeed) {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::INFO, "Routing Request Sent");
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
+                                                   "Routing Request Sent");
         } else {
           sim_world_service_.PublishMonitorMessage(
               MonitorMessageItem::ERROR, "Failed to send routing request");
@@ -115,6 +115,25 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         }
         websocket_->SendData(conn, to_send, true);
       });
+
+  websocket_->RegisterMessageHandler(
+      "GetDefaultEndPoint",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "DefaultEndPoint";
+
+        if (LoadDefaultEndPoint()) {
+          response["end_x"] = default_end_point_.pose().x();
+          response["end_y"] = default_end_point_.pose().y();
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
+        sim_world_service_.SetToClear();
+        sim_control_->ClearPlanning();
+      });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
@@ -126,21 +145,15 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     return false;
   }
 
-  // Try to reload end point if it hasn't be loaded yet.
-  if (!default_end_point_.has_id() &&
-      !GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
-    AERROR << "Failed to load default end point from " << EndWayPointFile();
-    return false;
-  }
-
   // set start point
   auto start = json["start"];
   if (start.find("x") == start.end() || start.find("y") == start.end()) {
     AERROR << "Failed to prepare a routing request: start point not found";
     return false;
   }
+  routing_request->clear_waypoint();
   map_service_->ConstructLaneWayPoint(start["x"], start["y"],
-                                      routing_request->mutable_start());
+                                      routing_request->add_waypoint());
 
   // set way point(s) if any
   auto iter = json.find("waypoint");
@@ -156,13 +169,13 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   }
 
   // set end point
-  RoutingRequest::LaneWaypoint *endLane = routing_request->mutable_end();
+  auto *end_point = routing_request->add_waypoint();
   if (json["sendDefaultRoute"]) {
-    endLane->set_id(default_end_point_.id());
-    endLane->set_s(default_end_point_.s());
-    auto *pose = endLane->mutable_pose();
-    pose->set_x(default_end_point_.pose().x());
-    pose->set_y(default_end_point_.pose().y());
+    // Try to reload end point if it hasn't been loaded yet.
+    if (!LoadDefaultEndPoint()) {
+      return false;
+    }
+    end_point->CopyFrom(default_end_point_);
   } else {
     if (json.find("end") == json.end()) {
       AERROR << "Failed to prepare a routing request: end point not found";
@@ -174,8 +187,11 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
       AERROR << "Failed to prepare a routing request: end point not found";
       return false;
     }
-    map_service_->ConstructLaneWayPoint(end["x"], end["y"], endLane);
+    map_service_->ConstructLaneWayPoint(end["x"], end["y"], end_point);
   }
+
+  AINFO << "Constructed RoutingRequest to be sent, waypoints: "
+        << routing_request->DebugString();
 
   return true;
 }
@@ -195,6 +211,18 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
     simulation_world_json_ =
         sim_world_service_.GetUpdateAsJson(FLAGS_map_radius).dump();
   }
+}
+
+bool SimulationWorldUpdater::LoadDefaultEndPoint() {
+  bool ret =
+      default_end_point_.has_id()
+          ? true
+          : GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_);
+
+  if (!ret) {
+    AWARN << "Failed to load default end point from " << EndWayPointFile();
+  }
+  return ret;
 }
 
 }  // namespace dreamview

@@ -24,11 +24,13 @@ DECLARE_string(adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
-DECLARE_double(trajectory_resolution);
+DECLARE_double(rtk_trajectory_resolution);
 DECLARE_double(look_backward_distance);
 DECLARE_double(look_forward_distance);
 DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(max_collision_distance);
+DECLARE_bool(publish_estop);
+DECLARE_bool(enable_trajectory_stitcher);
 
 DECLARE_int32(max_history_frame_num);
 
@@ -106,4 +108,22 @@ DECLARE_string(signal_light_virtual_object_prefix);
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+/// common
+DECLARE_double(stop_max_distance_buffer);
+DECLARE_double(stop_min_speed);
+DECLARE_double(stop_max_deceleration);
+/// Clear Zone
+DECLARE_string(clear_zone_virtual_object_id_prefix);
+/// triffic light
+DECLARE_string(signal_light_virtual_object_id_prefix);
+DECLARE_double(max_deacceleration_for_yellow_light_stop);
+/// crosswalk
+DECLARE_bool(enable_crosswalk);
+DECLARE_string(crosswalk_virtual_object_id_prefix);
+DECLARE_double(crosswalk_expand_distance);
+DECLARE_double(crosswalk_strick_l_distance);
+DECLARE_double(crosswalk_loose_l_distance);
+
+DECLARE_bool(enable_sqp_solver);
+
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

@@ -63,6 +63,42 @@ apollo::common::Status SpeedDecider::Execute(
   return Status::OK();
 }
 
+SpeedDecider::StPosition SpeedDecider::GetStPosition(
+    const SpeedData& speed_profile, const StBoundary& st_boundary) const {
+  StPosition st_position = BELOW;
+  const double start_t = st_boundary.min_t();
+  const double end_t = st_boundary.max_t();
+  for (const auto& speed_point : speed_profile.speed_vector()) {
+    if (speed_point.t() < start_t) {
+      continue;
+    }
+    if (speed_point.t() > end_t) {
+      break;
+    }
+
+    STPoint st_point(speed_point.s(), speed_point.t());
+    if (st_boundary.IsPointInBoundary(st_point)) {
+      const std::string msg =
+          "dp_st_graph failed: speed profile cross st_boundaries.";
+      AERROR << msg;
+      st_position = CROSS;
+      return st_position;
+    }
+
+    double s_upper = reference_line_info_->reference_line().Length() -
+                     reference_line_info_->AdcSlBoundary().end_s();
+    double s_lower = 0.0;
+    if (st_boundary.GetBoundarySRange(speed_point.t(), &s_upper, &s_lower)) {
+      if (s_lower > speed_point.s()) {
+        st_position = BELOW;
+      } else if (s_upper < speed_point.s()) {
+        st_position = ABOVE;
+      }
+    }
+  }
+  return st_position;
+}
+
 Status SpeedDecider::MakeObjectDecision(
     const SpeedData& speed_profile, PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
@@ -70,117 +106,88 @@ Status SpeedDecider::MakeObjectDecision(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+  for (const auto* obstacle : path_decision->path_obstacles().Items()) {
+    auto* path_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = path_obstacle->st_boundary();
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
         boundary.max_t() < 0.0) {
+      AppendIgnoreDecision(path_obstacle);
       continue;
     }
     if (path_obstacle->HasLongitudinalDecision()) {
+      AppendIgnoreDecision(path_obstacle);
       continue;
     }
 
-    double start_t = boundary.min_t();
-    double end_t = boundary.max_t();
-
-    bool go_down = true;
-    for (const auto& speed_point : speed_profile.speed_vector()) {
-      if (speed_point.t() < start_t) {
-        continue;
-      }
-      if (speed_point.t() > end_t) {
-        break;
-      }
-
-      STPoint st_point(speed_point.s(), speed_point.t());
-      if (boundary.IsPointInBoundary(st_point)) {
-        const std::string msg =
-            "dp_st_graph failed: speed profile cross st_boundaries.";
-        AERROR << msg;
-        return Status(ErrorCode::PLANNING_ERROR, msg);
-      }
-
-      double s_upper = dp_st_speed_config_.total_path_length();
-      double s_lower = 0.0;
-      if (boundary.GetBoundarySRange(speed_point.t(), &s_upper, &s_lower)) {
-        if (s_lower > speed_point.s()) {
-          go_down = true;
-        } else if (s_upper < speed_point.s()) {
-          go_down = false;
-        }
-      }
-    }
-    if (go_down) {
-      if (CheckIsFollowByT(boundary)) {
+    auto position = GetStPosition(speed_profile, boundary);
+    if (position == BELOW) {
+      if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+        ObjectDecisionType stop_decision;
+        CreateStopDecision(*path_obstacle, &stop_decision);
+        path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+      } else if (CheckIsFollowByT(boundary)) {
         // FOLLOW decision
         ObjectDecisionType follow_decision;
-        if (!CreateFollowDecision(*path_obstacle, boundary, &follow_decision)) {
-          AERROR << "Failed to create follow decision for boundary with id "
-                 << boundary.id();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "faind to create follow decision");
-        }
-        if (!path_decision->AddLongitudinalDecision(
-                "dp_st_graph", boundary.id(), follow_decision)) {
-          AERROR << "Failed to add follow decision to object " << boundary.id();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "faind to add follow decision");
-        }
+        CreateFollowDecision(*path_obstacle, &follow_decision);
+        path_obstacle->AddLongitudinalDecision("dp_st_graph", follow_decision);
       } else {
         // YIELD decision
         ObjectDecisionType yield_decision;
-        if (!CreateYieldDecision(boundary, &yield_decision)) {
-          AERROR << "Failed to create yield decision for boundary with id "
-                 << boundary.id();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "faind to create yield decision");
-        }
-        if (!path_decision->AddLongitudinalDecision(
-                "dp_st_graph", boundary.id(), yield_decision)) {
-          AERROR << "Failed to add yield decision to object " << boundary.id();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "faind to add yield decision");
-        }
+        CreateYieldDecision(boundary, &yield_decision);
+        path_obstacle->AddLongitudinalDecision("dp_st_graph", yield_decision);
       }
     } else {
-      // OVERTAKE decision
-      ObjectDecisionType overtake_decision;
-      if (!CreateOvertakeDecision(*path_obstacle, boundary,
-                                  &overtake_decision)) {
-        AERROR << "Failed to create overtake decision for boundary with id "
-               << boundary.id();
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "faind to create overtake decision");
-      }
-      if (!path_decision->AddLongitudinalDecision("dp_st_graph", boundary.id(),
-                                                  overtake_decision)) {
-        AERROR << "Failed to add overtake decision to object " << boundary.id();
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "faind to add overtake decision");
+      if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+        ObjectDecisionType ignore;
+        ignore.mutable_ignore();
+        path_obstacle->AddLongitudinalDecision("dp_st_graph", ignore);
+
+      } else {
+        // OVERTAKE decision
+        ObjectDecisionType overtake_decision;
+        CreateOvertakeDecision(*path_obstacle, &overtake_decision);
+        path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                               overtake_decision);
       }
     }
-  }
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    if (!path_obstacle->HasLongitudinalDecision()) {
-      ObjectDecisionType ignore_decision;
-      ignore_decision.mutable_ignore();
-      path_decision->AddLongitudinalDecision("dp_st_graph", path_obstacle->Id(),
-                                             ignore_decision);
-    }
-    if (!path_obstacle->HasLateralDecision()) {
-      ObjectDecisionType ignore_decision;
-      ignore_decision.mutable_ignore();
-      path_decision->AddLateralDecision("dp_st_graph", path_obstacle->Id(),
-                                        ignore_decision);
-    }
+    AppendIgnoreDecision(path_obstacle);
   }
   return Status::OK();
 }
 
-bool SpeedDecider::CreateFollowDecision(
-    const PathObstacle& path_obstacle, const StBoundary& boundary,
+void SpeedDecider::AppendIgnoreDecision(PathObstacle* path_obstacle) const {
+  ObjectDecisionType ignore_decision;
+  ignore_decision.mutable_ignore();
+  if (!path_obstacle->HasLongitudinalDecision()) {
+    path_obstacle->AddLongitudinalDecision("dp_st_graph", ignore_decision);
+  }
+  if (!path_obstacle->HasLateralDecision()) {
+    path_obstacle->AddLateralDecision("dp_st_graph", ignore_decision);
+  }
+}
+
+void SpeedDecider::CreateStopDecision(
+    const PathObstacle& path_obstacle,
+    ObjectDecisionType* const stop_decision) const {
+  const auto& boundary = path_obstacle.st_boundary();
+  auto* stop = stop_decision->mutable_stop();
+  const double kStopDistance = 0.0;
+  stop->set_distance_s(kStopDistance);
+  const double fence_s =
+      adc_sl_boundary_.end_s() + boundary.min_s() + kStopDistance;
+  const auto fence_point = reference_line_->GetReferencePoint(fence_s);
+  auto* stop_point = stop->mutable_stop_point();
+  stop_point->set_x(fence_point.x());
+  stop_point->set_y(fence_point.y());
+  stop_point->set_z(0.0);
+  stop->set_stop_heading(fence_point.heading());
+}
+
+void SpeedDecider::CreateFollowDecision(
+    const PathObstacle& path_obstacle,
     ObjectDecisionType* const follow_decision) const {
   DCHECK_NOTNULL(follow_decision);
+  const auto& boundary = path_obstacle.st_boundary();
 
   auto* follow = follow_decision->mutable_follow();
 
@@ -198,11 +205,9 @@ bool SpeedDecider::CreateFollowDecision(
   fence_point->set_y(ref_point.y());
   fence_point->set_z(0.0);
   follow->set_fence_heading(ref_point.heading());
-
-  return true;
 }
 
-bool SpeedDecider::CreateYieldDecision(
+void SpeedDecider::CreateYieldDecision(
     const StBoundary& boundary,
     ObjectDecisionType* const yield_decision) const {
   auto* yield = yield_decision->mutable_yield();
@@ -221,15 +226,13 @@ bool SpeedDecider::CreateYieldDecision(
   yield->mutable_fence_point()->set_y(ref_point.y());
   yield->mutable_fence_point()->set_z(0.0);
   yield->set_fence_heading(ref_point.heading());
-
-  return true;
 }
 
-bool SpeedDecider::CreateOvertakeDecision(
-    const PathObstacle& path_obstacle, const StBoundary& boundary,
+void SpeedDecider::CreateOvertakeDecision(
+    const PathObstacle& path_obstacle,
     ObjectDecisionType* const overtake_decision) const {
   DCHECK_NOTNULL(overtake_decision);
-
+  const auto& boundary = path_obstacle.st_boundary();
   auto* overtake = overtake_decision->mutable_overtake();
 
   // in seconds
@@ -255,8 +258,6 @@ bool SpeedDecider::CreateOvertakeDecision(
   overtake->mutable_fence_point()->set_y(ref_point.y());
   overtake->mutable_fence_point()->set_z(0.0);
   overtake->set_fence_heading(ref_point.heading());
-
-  return true;
 }
 
 bool SpeedDecider::CheckIsFollowByT(const StBoundary& boundary) const {

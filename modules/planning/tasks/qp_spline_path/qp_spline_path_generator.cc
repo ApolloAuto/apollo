@@ -39,9 +39,10 @@ namespace planning {
 using Vec2d = apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
-    const ReferenceLine& reference_line,
+    Spline1dGenerator* spline_generator, const ReferenceLine& reference_line,
     const QpSplinePathConfig& qp_spline_path_config)
-    : reference_line_(reference_line),
+    : spline_generator_(spline_generator),
+      reference_line_(reference_line),
       qp_spline_path_config_(qp_spline_path_config) {
   CHECK_GE(qp_spline_path_config_.regularization_weight(), 0.0)
       << "regularization_weight should NOT be negative.";
@@ -62,23 +63,30 @@ bool QpSplinePathGenerator::Generate(
     const std::vector<const PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
     PathData* const path_data) {
-  if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
+  ADEBUG << "Init point: " << init_point.DebugString();
+
+  const auto& path_data_history = path_data->path_data_history();
+  if (!path_data_history.empty()) {
+    last_discretized_path_ = &path_data_history.back().first;
+  }
+
+  if (!CalculateFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
   double start_s = init_frenet_point_.s();
   double end_s = reference_line_.Length();
 
-  QpFrenetFrame qp_frenet_frame(reference_line_, path_obstacles, speed_data,
-                                init_frenet_point_, start_s, end_s,
+  QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
                                 qp_spline_path_config_.time_resolution());
-  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output())) {
+  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output(),
+                            path_obstacles)) {
     AERROR << "Fail to initialize qp frenet frame";
     return false;
   }
   qp_frenet_frame.LogQpBound(planning_debug_);
 
-  ADEBUG << "pss path start with " << start_s << ", end with " << end_s;
+  ADEBUG << "path start with " << start_s << ", end with " << end_s;
 
   if (!InitSpline(start_s, end_s)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
@@ -111,8 +119,8 @@ bool QpSplinePathGenerator::Generate(
   Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
       ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), start_l);
 
-  double x_diff = xy_point.x() - init_point.path_point().x();
-  double y_diff = xy_point.y() - init_point.path_point().y();
+  const double x_diff = xy_point.x() - init_point.path_point().x();
+  const double y_diff = xy_point.y() - init_point.path_point().y();
 
   double s = init_frenet_point_.s();
   double s_resolution =
@@ -144,7 +152,7 @@ bool QpSplinePathGenerator::Generate(
         curr_xy_point.x(), curr_xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
     if (path_points.size() != 0) {
       double distance =
-          common::util::Distance2D(path_points.back(), path_point);
+          common::util::DistanceXY(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
     }
     if (path_point.s() > end_s) {
@@ -158,7 +166,7 @@ bool QpSplinePathGenerator::Generate(
   return true;
 }
 
-bool QpSplinePathGenerator::CalculateInitFrenetPoint(
+bool QpSplinePathGenerator::CalculateFrenetPoint(
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
   common::SLPoint sl_point;
@@ -193,43 +201,18 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
 
 bool QpSplinePathGenerator::InitSpline(const double start_s,
                                        const double end_s) {
-  // set knots
-  if (qp_spline_path_config_.number_of_knots() <= 1) {
-    AERROR << "Too few number of knots: "
-           << qp_spline_path_config_.number_of_knots();
-    return false;
-  }
-  const double delta_s =
-      (end_s - start_s) / qp_spline_path_config_.number_of_knots();
-  double curr_knot_s = start_s;
-
-  for (uint32_t i = 0; i <= qp_spline_path_config_.number_of_knots();
-       ++i, curr_knot_s = std::min(curr_knot_s + delta_s, end_s)) {
-    knots_.push_back(curr_knot_s);
-  }
+  uint32_t number_of_spline = static_cast<uint32_t>(
+      (end_s - start_s) / qp_spline_path_config_.max_spline_length() + 1.0);
+  number_of_spline = std::max(1u, number_of_spline);
+  common::util::uniform_slice(start_s, end_s, number_of_spline, &knots_);
 
   // spawn a new spline generator
-  spline_generator_.reset(
-      new Spline1dGenerator(knots_, qp_spline_path_config_.spline_order()));
+  spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
-  std::uint32_t num_evaluated_s =
-      qp_spline_path_config_.number_of_fx_constraint_knots();
-  if (num_evaluated_s <= 2) {
-    AERROR << "Too few evaluated positions. Suggest: > 2, current number: "
-           << num_evaluated_s;
-    return false;
-  }
-  const auto& x_knots = spline_generator_->spline().x_knots();
-  const double back_s = x_knots.back();
-  const double front_s = x_knots.front();
-  const double ds = (back_s - front_s) / num_evaluated_s;
-  double curr_evaluated_s = front_s;
-  for (uint32_t i = 0; i < num_evaluated_s;
-       ++i, curr_evaluated_s = std::min(curr_evaluated_s + ds, back_s)) {
-    evaluated_s_.push_back(curr_evaluated_s);
-  }
-
+  uint32_t constraint_num = 3 * number_of_spline + 1;
+  common::util::uniform_slice(start_s, end_s, constraint_num - 1,
+                              &evaluated_s_);
   return true;
 }
 
@@ -318,11 +301,36 @@ bool QpSplinePathGenerator::AddConstraint(
   }
 
   // add spline joint third derivative constraint
-  if (!spline_constraint->AddThirdDerivativeSmoothConstraint()) {
-    AERROR << "Add spline joint third derivative constraint failed!";
+  if (knots_.size() >= 3 &&
+      !spline_constraint->AddThirdDerivativeSmoothConstraint()) {
+    AERROR << "Add spline joint derivative constraint failed!";
     return false;
   }
   return true;
+}
+
+void QpSplinePathGenerator::AddHistoryPathKernel() {
+  if (last_discretized_path_ == nullptr) {
+    return;
+  }
+
+  PathData last_path_data;
+  last_path_data.SetReferenceLine(&reference_line_);
+  last_path_data.SetDiscretizedPath(*last_discretized_path_);
+
+  std::vector<double> history_s;
+  std::vector<double> histroy_l;
+
+  for (uint32_t i = 0; i < last_path_data.frenet_frame_path().NumOfPoints();
+       ++i) {
+    const auto p = last_path_data.frenet_frame_path().PointAt(i);
+    history_s.push_back(p.s());
+    histroy_l.push_back(p.l());
+  }
+
+  Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
+  spline_kernel->AddReferenceLineKernelMatrix(
+      history_s, histroy_l, qp_spline_path_config_.history_path_weight());
 }
 
 void QpSplinePathGenerator::AddKernel() {
@@ -334,6 +342,10 @@ void QpSplinePathGenerator::AddKernel() {
     DCHECK_EQ(evaluated_s_.size(), ref_l.size());
     spline_kernel->AddReferenceLineKernelMatrix(
         evaluated_s_, ref_l, qp_spline_path_config_.reference_line_weight());
+  }
+
+  if (qp_spline_path_config_.history_path_weight() > 0.0) {
+    AddHistoryPathKernel();
   }
 
   if (qp_spline_path_config_.regularization_weight() > 0.0) {

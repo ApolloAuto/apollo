@@ -42,14 +42,13 @@ namespace planning {
 class QpFrenetFrame {
  public:
   QpFrenetFrame(const ReferenceLine& reference_line,
-                const std::vector<const PathObstacle*>& path_obstacles,
                 const SpeedData& speed_data,
                 const common::FrenetFramePoint& init_frenet_point,
-                const double start_s, const double end_s,
                 const double time_resolution);
   virtual ~QpFrenetFrame() = default;
 
-  bool Init(const uint32_t num_points);
+  bool Init(const uint32_t num_points,
+            const std::vector<const PathObstacle*>& path_obstacles);
 
   void LogQpBound(apollo::planning_internal::Debug* planning_debug);
 
@@ -69,13 +68,13 @@ class QpFrenetFrame {
 
   bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
 
-  bool MapPolygon(const std::vector<common::math::Vec2d>& corners,
-                  const ObjectNudge& nudge,
-                  std::vector<std::pair<double, double>>* const bound_map);
+  bool MapNudgePolygon(const common::math::Polygon2d& polygon,
+                       const ObjectNudge& nudge,
+                       std::vector<std::pair<double, double>>* const bound_map);
 
-  bool MapLine(const common::SLPoint& start, const common::SLPoint& end,
-               const ObjectNudge::Type type,
-               std::vector<std::pair<double, double>>* const constraint);
+  bool MapNudgeLine(const common::SLPoint& start, const common::SLPoint& end,
+                    const ObjectNudge::Type type,
+                    std::vector<std::pair<double, double>>* const constraint);
 
   std::pair<double, double> MapLateralConstraint(
       const common::SLPoint& start, const common::SLPoint& end,
@@ -87,7 +86,8 @@ class QpFrenetFrame {
 
   void CalculateHDMapBound();
 
-  bool CalculateObstacleBound();
+  bool CalculateObstacleBound(
+      const std::vector<const PathObstacle*>& path_obstacles);
 
   bool GetBound(const double s,
                 const std::vector<std::pair<double, double>>& map_bound,
@@ -97,7 +97,6 @@ class QpFrenetFrame {
 
  private:
   const ReferenceLine& reference_line_;
-  const std::vector<const PathObstacle*>& path_obstacles_;
   const SpeedData& speed_data_;
 
   common::VehicleParam vehicle_param_;

@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/control/control.h"
 
 #include <iomanip>
@@ -40,12 +40,13 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const { return FLAGS_node_name; }
+std::string Control::Name() const {
+  return FLAGS_node_name;
+}
 
 Status Control::Init() {
   AINFO << "Control init, starting ...";
-  CHECK(common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                                 &control_conf_))
+  CHECK(common::util::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
@@ -269,6 +270,8 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_localization_miss_num * control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
            << localization_diff << "s";
+    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    buffer.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
@@ -277,6 +280,8 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_chassis_miss_num * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
            << "s";
+    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    buffer.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
 
@@ -286,6 +291,8 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_planning_miss_num * control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
            << trajectory_diff << "s";
+    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    buffer.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }
   return Status::OK();

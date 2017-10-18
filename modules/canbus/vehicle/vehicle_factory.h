@@ -41,7 +41,7 @@ namespace canbus {
  */
 class VehicleFactory
     : public common::util::Factory<VehicleParameter::VehicleBrand,
-                                             AbstractVehicleFactory> {
+                                   AbstractVehicleFactory> {
  public:
   /**
   * @brief register supported vehicle factories.

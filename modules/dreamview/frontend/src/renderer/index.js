@@ -1,18 +1,19 @@
 import * as THREE from "three";
-import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
+import OrbitControls from "three/examples/js/controls/OrbitControls.js";
+import Stats from "stats.js";
 
 import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
 import Ground from "renderer/ground";
 import Map from "renderer/map";
+import PlanningPath from "renderer/path.js";
 import PlanningTrajectory from "renderer/trajectory.js";
 import PerceptionObstacles from "renderer/obstacles.js";
 import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
-import Stats from "stats.js";
 
 class Renderer {
     constructor() {
@@ -38,6 +39,9 @@ class Renderer {
         // takes time to load. It will be added later on.
         this.adcMeshAddedToScene = false;
 
+        // The planning path.
+        this.PlanningPath = new PlanningPath();
+
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
 
@@ -55,6 +59,8 @@ class Renderer {
 
         // The route editor
         this.routingEditor = new RoutingEditor();
+
+        this.defaultRoutingEndPoint = {};
 
         // The Performance Monitor
         this.stats = null;
@@ -203,6 +209,13 @@ class Renderer {
 
             this.controls.enabled = false;
             break;
+        case "Monitor":
+            this.camera.position.set(target.position.x, target.position.y, 50);
+            this.camera.up.set(0, 1, 0);
+            this.camera.lookAt(target.position.x, target.position.y, 0);
+
+            this.controls.enabled = false;
+            break;
         case "Map":
             if (!this.controls.enabled) {
                 this.enableOrbitControls();
@@ -210,6 +223,11 @@ class Renderer {
             break;
         }
         this.camera.updateProjectionMatrix();
+    }
+
+    updateDefaultRoutingEndPoint(data) {
+        this.defaultRoutingEndPoint.x = data.end_x;
+        this.defaultRoutingEndPoint.y = data.end_y;
     }
 
     enableRouteEditing() {
@@ -229,6 +247,17 @@ class Renderer {
                                                                    false);
     }
 
+    addDefaultEndPoint() {
+        if (this.defaultRoutingEndPoint.x === undefined ||
+            this.defaultRoutingEndPoint.y === undefined) {
+            alert("Failed to get default routing end point, make sure there's " +
+                  "a default end point file under the map data directory.");
+            return;
+        }
+        this.routingEditor.addDefaultEndPoint(this.defaultRoutingEndPoint,
+                                              this.coordinates, this.scene);
+    }
+
     removeAllRoutingPoints() {
         this.routingEditor.removeAllRoutePoints(this.scene);
     }
@@ -240,11 +269,11 @@ class Renderer {
     sendRoutingRequest(sendDefaultRoute = false) {
         if (sendDefaultRoute) {
             return this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
-                                                         this.coordinates);
+                                                                this.coordinates);
         } else {
-            return this.routingEditor.sendRoutingRequest(this.Scene,
-                                                  this.adc.mesh.position,
-                                                  this.coordinates);
+            return this.routingEditor.sendRoutingRequest(this.scene,
+                                                         this.adc.mesh.position,
+                                                         this.coordinates);
         }
     }
 
@@ -307,6 +336,7 @@ class Renderer {
 
     updateWorld(world) {
         this.adc.update(world, this.coordinates);
+        this.PlanningPath.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);

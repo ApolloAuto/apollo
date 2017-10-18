@@ -8,6 +8,7 @@ import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
+import "modules/perception/proto/traffic_light_detection.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -25,6 +26,7 @@ message StGraphBoundaryDebug {
     ST_BOUNDARY_TYPE_FOLLOW = 3;
     ST_BOUNDARY_TYPE_YIELD = 4;
     ST_BOUNDARY_TYPE_OVERTAKE = 5;
+    ST_BOUNDARY_TYPE_KEEP_CLEAR = 6;
   }
   optional string name = 1;
   repeated apollo.common.SpeedPoint point = 2;
@@ -70,6 +72,19 @@ message STGraphDebug {
   optional STGraphKernelFollowRef kernel_follow_ref = 7;
 }
 
+message SignalLightDebug {
+  message SignalDebug {
+    optional string light_id = 1;
+    optional apollo.perception.TrafficLight.Color color = 2;
+    optional double light_stop_s = 3;
+    optional double adc_stop_deacceleration = 4;
+    optional bool is_stop_wall_created = 5;
+  }
+  optional double adc_speed = 1;
+  optional double adc_front_s = 2;
+  repeated SignalDebug signal = 3;
+}
+
 // next id: 17
 message PlanningData {
   // input
@@ -88,6 +103,7 @@ message PlanningData {
   // Prediction for lattice debug
   repeated TrajectoryPath trajectory_path = 17;
   repeated apollo.prediction.PredictionObstacle prediction_obstacle = 18;
+  optional SignalLightDebug signal_light = 19;
 }
 
 message TrajectoryPath {

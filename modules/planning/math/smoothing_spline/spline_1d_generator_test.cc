@@ -63,6 +63,7 @@ TEST(Spline1dGenerator, one) {
 
   spline_kernel->AddThirdOrderDerivativeMatrix(1000.0);
   spline_kernel->AddReferenceLineKernelMatrix(x_coord, fx_guide, 0.4);
+  spline_kernel->AddRegularization(1.0);
 
   EXPECT_TRUE(pg.Solve());
   // extract parameters
@@ -106,6 +107,7 @@ TEST(Spline1dGenerator, two) {
 
   spline_kernel->AddThirdOrderDerivativeMatrix(1000.0);
   spline_kernel->AddReferenceLineKernelMatrix(x_coord, fx_guide, 0.4);
+  spline_kernel->AddRegularization(1.0);
 
   EXPECT_TRUE(pg.Solve());
   // extract parameters

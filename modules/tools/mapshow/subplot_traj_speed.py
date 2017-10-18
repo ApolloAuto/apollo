@@ -40,7 +40,7 @@ class TrajSpeedSubplot:
 
         ax.set_xlabel("t (second)")
         #ax.set_xlim([-2, 10])
-        ax.set_ylim([-1, 13])
+        ax.set_ylim([-1, 25])
         self.ax.autoscale_view()
         #self.ax.relim()
         ax.set_ylabel("speed (m/s)")

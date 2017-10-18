@@ -32,7 +32,7 @@ namespace planning {
 class Spline2dSeg {
  public:
   // order represent the number of parameters (not the highest order);
-  explicit Spline2dSeg(const std::uint32_t order);
+  explicit Spline2dSeg(const uint32_t order);
   explicit Spline2dSeg(const std::vector<double>& x_param,
                        const std::vector<double>& y_param);
   ~Spline2dSeg() = default;

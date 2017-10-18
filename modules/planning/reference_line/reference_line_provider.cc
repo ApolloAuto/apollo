@@ -43,11 +43,20 @@ ReferenceLineProvider::~ReferenceLineProvider() {
 }
 
 void ReferenceLineProvider::Init(
-    const hdmap::PncMap *pnc_map,
+    const hdmap::HDMap *hdmap_,
     const ReferenceLineSmootherConfig &smoother_config) {
-  pnc_map_ = pnc_map;
+  pnc_map_.reset(new hdmap::PncMap(hdmap_));
   smoother_config_ = smoother_config;
+  std::vector<double> init_t_knots;
+  spline_solver_.reset(new Spline2dSolver(init_t_knots, 1));
   is_initialized_ = true;
+}
+
+void ReferenceLineProvider::UpdateRoutingResponse(
+    const routing::RoutingResponse &routing) {
+  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  pnc_map_->UpdateRoutingResponse(routing);
+  has_routing_ = true;
 }
 
 bool ReferenceLineProvider::Start() {
@@ -67,14 +76,6 @@ void ReferenceLineProvider::Stop() {
   }
 }
 
-void ReferenceLineProvider::UpdateRoutingResponse(
-    const routing::RoutingResponse &routing_response) {
-  std::lock_guard<std::mutex> lock(routing_response_mutex_);
-  // TODO(all): check if routing needs to be updated before assigning.
-  routing_response_ = routing_response;
-  has_routing_ = true;
-}
-
 void ReferenceLineProvider::Generate() {
   while (!is_stop_) {
     const auto &curr_adc_position =
@@ -83,20 +84,12 @@ void ReferenceLineProvider::Generate() {
         curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
-      constexpr int32_t kRoutingNotReadySleepTime = 1000;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(kRoutingNotReadySleepTime));
+      constexpr int32_t kRoutingNotReadySleepTimeMs = 500;  // milliseconds
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
+          kRoutingNotReadySleepTimeMs));
       continue;
     }
-
-    routing::RoutingResponse routing;
-    {
-      std::lock_guard<std::mutex> lock(routing_response_mutex_);
-      // TODO(all): check if routing needs to be updated before assigning.
-      routing = routing_response_;
-    }
-
-    if (!CreateReferenceLineFromRouting(adc_point_enu, routing)) {
+    if (!CreateReferenceLineFromRouting(adc_point_enu)) {
       AERROR << "Fail to create reference line at position: "
              << curr_adc_position.ShortDebugString();
     }
@@ -123,17 +116,18 @@ std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
 }
 
 bool ReferenceLineProvider::CreateReferenceLineFromRouting(
-    const common::PointENU &position, const routing::RoutingResponse &routing) {
-  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
+    const common::PointENU &position) {
+  std::vector<hdmap::RouteSegments> route_segments;
 
   // additional smooth reference line length, unit: meter
-  const double kForwardAdditionalLength = 30;
-  if (!pnc_map_->GetLaneSegmentsFromRouting(
-          routing, position, FLAGS_look_backward_distance,
-          FLAGS_look_forward_distance + kForwardAdditionalLength,
-          &route_segments)) {
-    AERROR << "Failed to extract segments from routing";
-    return false;
+  {
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
+                                    FLAGS_look_forward_distance,
+                                    &route_segments)) {
+      AERROR << "Failed to extract segments from routing";
+      return false;
+    }
   }
 
   ReferenceLineSmoother smoother;
@@ -142,10 +136,11 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   std::vector<ReferenceLine> reference_lines;
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
-    pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
+    hdmap::PncMap::CreatePathFromLaneSegments(segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
-      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
+      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
+                           spline_solver_.get())) {
         AERROR << "Failed to smooth reference line";
         continue;
       }

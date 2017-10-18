@@ -27,7 +27,7 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
+#include "modules/planning/proto/qp_st_speed_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/string_util.h"
@@ -43,8 +43,7 @@ namespace planning {
 
 class QpPiecewiseStGraph {
  public:
-  QpPiecewiseStGraph(const QpSplineStSpeedConfig& qp_config,
-                     const apollo::common::VehicleParam& veh_param);
+  explicit QpPiecewiseStGraph(const QpStSpeedConfig& qp_st_speed_config);
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 
@@ -88,7 +87,7 @@ class QpPiecewiseStGraph {
 
  private:
   // qp st configuration
-  QpSplineStSpeedConfig qp_spline_st_speed_config_;
+  const QpStSpeedConfig qp_st_speed_config_;
 
   // initial status
   common::TrajectoryPoint init_point_;

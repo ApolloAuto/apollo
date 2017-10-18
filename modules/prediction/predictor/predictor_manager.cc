@@ -21,9 +21,10 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
-#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
-#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/regional/regional_predictor.h"
+#include "modules/prediction/predictor/free_move/free_move_predictor.h"
+#include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,6 +37,7 @@ PredictorManager::PredictorManager() { RegisterPredictors(); }
 
 void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
+  RegisterPredictor(ObstacleConf::MOVE_SEQUENCE_PREDICTOR);
   RegisterPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
 }
@@ -145,6 +147,10 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
   switch (type) {
     case ObstacleConf::LANE_SEQUENCE_PREDICTOR: {
       predictor_ptr.reset(new LaneSequencePredictor());
+      break;
+    }
+    case ObstacleConf::MOVE_SEQUENCE_PREDICTOR: {
+      predictor_ptr.reset(new MoveSequencePredictor());
       break;
     }
     case ObstacleConf::FREE_MOVE_PREDICTOR: {

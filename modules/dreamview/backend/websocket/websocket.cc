@@ -31,8 +31,8 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     connections_.emplace(conn, std::make_shared<std::mutex>());
+    AINFO << "Accepted connection. Total connections: " << connections_.size();
   }
-  AINFO << "Accepted connection. Total connections: " << connections_.size();
 }
 
 void WebSocketHandler::handleClose(CivetServer *server,
@@ -48,8 +48,8 @@ void WebSocketHandler::handleClose(CivetServer *server,
       std::unique_lock<std::mutex> lock(*connection_lock);
       connections_.erase(connection);
     }
+    AINFO << "Connection closed. Total connections: " << connections_.size();
   }
-  AINFO << "Connection closed. Total connections: " << connections_.size();
 }
 
 bool WebSocketHandler::BroadcastData(const std::string &data) {
@@ -139,9 +139,20 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return false;
   }
 
-  auto json = Json::parse(std::string(data, data_len));
-  auto type = json["type"];
+  Json json;
+  try {
+    json = Json::parse(data, data + data_len);
+  } catch (const std::exception &e) {
+    AERROR << "Failed to parse JSON data: " << e.what();
+    return false;
+  }
 
+  if (json.find("type") == json.end()) {
+    AERROR << "Received JSON data without type field: " << json;
+    return true;
+  }
+
+  auto type = json["type"];
   if (message_handlers_.find(type) == message_handlers_.end()) {
     AERROR << "No message handler found for message type " << type
            << ". The message will be discarded!";

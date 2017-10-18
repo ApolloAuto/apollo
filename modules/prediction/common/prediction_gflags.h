@@ -23,11 +23,15 @@
 DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 DECLARE_string(adapter_config_filename);
+DECLARE_string(move_sequence_predictor_conf_file);
 
 DECLARE_double(prediction_duration);
 DECLARE_double(prediction_freq);
 DECLARE_double(double_precision);
 DECLARE_double(min_prediction_length);
+
+// Bag replay timestamp gap
+DECLARE_double(replay_timestamp_gap);
 
 // Map
 DECLARE_double(search_radius);
@@ -57,10 +61,20 @@ DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_int32(num_trajectory_still_pedestrian);
 DECLARE_double(still_speed);
 DECLARE_string(vehicle_model_file);
-DECLARE_int32(max_num_obstacles_stored);
+DECLARE_int32(max_num_obstacles);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
+
+// move sequence prediction
+DECLARE_double(time_upper_bound_to_lane_center);
+DECLARE_double(time_lower_bound_to_lane_center);
+DECLARE_double(sample_time_gap);
+DECLARE_double(motion_weight_a);
+DECLARE_double(motion_weight_b);
+DECLARE_double(motion_weight_c);
+DECLARE_double(cost_alpha);
+DECLARE_double(default_time_to_lane_center);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

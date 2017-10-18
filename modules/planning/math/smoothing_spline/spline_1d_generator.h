@@ -51,7 +51,7 @@
 #include <memory>
 #include <vector>
 
-#include "Eigen/Core"
+#include "qpOASES/include/qpOASES.hpp"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
@@ -63,19 +63,15 @@ namespace planning {
 
 class Spline1dGenerator {
  public:
-  Spline1dGenerator(const std::vector<double>& x_knots,
-                    const std::uint32_t order);
+  Spline1dGenerator(const std::vector<double>& x_knots, const uint32_t order);
+
+  void Reset(const std::vector<double>& x_knots, const uint32_t order);
 
   // add constraint through pss_constraint
   Spline1dConstraint* mutable_spline_constraint();
 
   // add kernel through pss_kernel
   Spline1dKernel* mutable_spline_kernel();
-
-  // setup initialize point, if not,
-  // will use the default primal-dual parameter
-  void SetupInitQpPoint(const Eigen::MatrixXd& x, const Eigen::MatrixXd& y,
-                        const Eigen::MatrixXd& z, const Eigen::MatrixXd& s);
 
   // solve
   bool Solve();
@@ -88,11 +84,10 @@ class Spline1dGenerator {
   Spline1dConstraint spline_constraint_;
   Spline1dKernel spline_kernel_;
 
-  std::unique_ptr<apollo::common::math::QpSolver> qp_solver_ = nullptr;
-  Eigen::MatrixXd init_x_;
-  Eigen::MatrixXd init_y_;
-  Eigen::MatrixXd init_z_;
-  Eigen::MatrixXd init_s_;
+  std::unique_ptr<::qpOASES::SQProblem> sqp_solver_;
+
+  int last_num_constraint_ = 0;
+  int last_num_param_ = 0;
 };
 
 }  // namespace planning

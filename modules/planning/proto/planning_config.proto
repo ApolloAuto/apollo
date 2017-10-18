@@ -5,7 +5,7 @@ package apollo.planning;
 import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
-import "modules/planning/proto/qp_spline_st_speed_config.proto";
+import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/reference_line_smoother_config.proto";
 
 enum TaskType {
@@ -19,7 +19,13 @@ enum TaskType {
 };
 
 message RuleConfig {
-    optional string name = 1;
+    enum RuleId {
+        BACKSIDE_VEHICLE = 1;
+        SIGNAL_LIGHT = 2;
+        CROSSWALK = 3;
+        CLEAR_ZONE = 4;
+    }
+    optional RuleId rule_id = 1;
 }
 
 message EMPlannerConfig {
@@ -27,7 +33,7 @@ message EMPlannerConfig {
   optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
   optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
   optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
-  optional apollo.planning.QpSplineStSpeedConfig qp_spline_st_speed_config = 5;
+  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
 }
 
 message PlanningConfig {

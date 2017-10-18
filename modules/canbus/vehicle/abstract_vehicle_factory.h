@@ -23,9 +23,10 @@
 
 #include <memory>
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/canbus/vehicle/message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
 
 /**
  * @namespace apollo::canbus
@@ -59,7 +60,8 @@ class AbstractVehicleFactory {
    * @brief the interface of creating a MessageManager class
    * @returns a unique pointer that points to the created MessageManager object.
    */
-  virtual std::unique_ptr<MessageManager> CreateMessageManager() = 0;
+  virtual std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
+  CreateMessageManager() = 0;
 
   /**
    * @brief set VehicleParameter.

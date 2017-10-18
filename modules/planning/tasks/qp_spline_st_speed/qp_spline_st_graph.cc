@@ -36,32 +36,34 @@ using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
 
-QpSplineStGraph::QpSplineStGraph(
-    const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-    const VehicleParam& veh_param)
-    : qp_spline_st_speed_config_(qp_spline_st_speed_config),
+QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
+                                 const QpStSpeedConfig& qp_st_speed_config,
+                                 const VehicleParam& veh_param)
+    : spline_generator_(spline_generator),
+      qp_st_speed_config_(qp_st_speed_config),
       t_knots_resolution_(
-          qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_discrete_graph_t()),
-      t_evaluated_resolution_(
-          qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_evaluated_graph_t()) {
+          qp_st_speed_config_.total_time() /
+          qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t()) {
   Init();
 }
 
 void QpSplineStGraph::Init() {
   // init knots
   double curr_t = 0.0;
-  for (uint32_t i = 0;
-       i <= qp_spline_st_speed_config_.number_of_discrete_graph_t(); ++i) {
+  uint32_t num_spline =
+      qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t() - 1;
+  for (uint32_t i = 0; i <= num_spline; ++i) {
     t_knots_.push_back(curr_t);
     curr_t += t_knots_resolution_;
   }
 
+  uint32_t num_evaluated_t = 10 * num_spline + 1;
+
   // init evaluated t positions
   curr_t = 0;
-  for (uint32_t i = 0;
-       i <= qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
+  t_evaluated_resolution_ =
+      qp_st_speed_config_.total_time() / (num_evaluated_t - 1);
+  for (uint32_t i = 0; i < num_evaluated_t; ++i) {
     t_evaluated_.push_back(curr_t);
     curr_t += t_evaluated_resolution_;
   }
@@ -80,12 +82,12 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                const std::pair<double, double>& accel_bound) {
   cruise_.clear();
 
-  // reset spline generator
-  spline_generator_.reset(new Spline1dGenerator(
-      t_knots_, qp_spline_st_speed_config_.spline_order()));
-
-  // start to search for best st points
   init_point_ = st_graph_data.init_point();
+  ADEBUG << "init point:" << init_point_.DebugString();
+
+  // reset spline generator
+  spline_generator_->Reset(
+      t_knots_, qp_st_speed_config_.qp_spline_config().spline_order());
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
@@ -113,9 +115,9 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   const Spline1d& spline = spline_generator_->spline();
 
   const double t_output_resolution =
-      qp_spline_st_speed_config_.output_time_resolution();
+      qp_st_speed_config_.output_time_resolution();
   double time = 0.0;
-  while (time < qp_spline_st_speed_config_.total_time() + t_output_resolution) {
+  while (time < qp_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);
     double v = spline.Derivative(time);
     double a = spline.SecondOrderDerivative(time);
@@ -133,36 +135,28 @@ Status QpSplineStGraph::ApplyConstraint(
     const std::pair<double, double>& accel_bound) {
   Spline1dConstraint* constraint =
       spline_generator_->mutable_spline_constraint();
-  // position, velocity, acceleration
 
   if (!constraint->AddPointConstraint(0.0, 0.0)) {
     const std::string msg = "add st start point constraint failed";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  ADEBUG << "init point constraint:" << init_point.DebugString();
+
   if (!constraint->AddPointDerivativeConstraint(0.0, init_point_.v())) {
     const std::string msg = "add st start point velocity constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!constraint->AddPointSecondDerivativeConstraint(
-          spline_generator_->spline().x_knots().back(), 0.0)) {
-    const std::string msg = "add st end point acceleration constraint failed!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
   // monotone constraint
-  if (!constraint->AddMonotoneInequalityConstraintAtKnots()) {
+  if (!constraint->AddMonotoneInequalityConstraint(t_evaluated_)) {
     const std::string msg = "add monotone inequality constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // smoothness constraint
-  if (!constraint->AddSecondDerivativeSmoothConstraint()) {
+  if (!constraint->AddThirdDerivativeSmoothConstraint()) {
     const std::string msg = "add smoothness joint constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -176,8 +170,8 @@ Status QpSplineStGraph::ApplyConstraint(
     double lower_s = 0.0;
     double upper_s = 0.0;
     GetSConstraintByTime(boundaries, curr_t,
-                         qp_spline_st_speed_config_.total_path_length(),
-                         &upper_s, &lower_s);
+                         qp_st_speed_config_.total_path_length(), &upper_s,
+                         &lower_s);
     s_upper_bound.push_back(upper_s);
     s_lower_bound.push_back(lower_s);
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
@@ -243,14 +237,6 @@ Status QpSplineStGraph::ApplyConstraint(
   }
   if (FLAGS_enable_follow_accel_constraint && has_follow && delta_s < 0.0) {
     accel_upper_bound.front() = 0.0;
-  } else {
-    constexpr double kInitPointAccelRelaxedSpeed = 1.0;
-
-    if (init_point_.v() > kInitPointAccelRelaxedSpeed) {
-      constexpr double kInitPointAccelRelaxedRange = 0.25;
-      accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
-      accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
-    }
   }
 
   DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
@@ -274,27 +260,37 @@ Status QpSplineStGraph::ApplyKernel(
     const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
-  if (qp_spline_st_speed_config_.accel_kernel_weight() > 0) {
+  if (qp_st_speed_config_.qp_spline_config().accel_kernel_weight() > 0) {
     spline_kernel->AddSecondOrderDerivativeMatrix(
-        qp_spline_st_speed_config_.accel_kernel_weight());
+        qp_st_speed_config_.qp_spline_config().accel_kernel_weight());
   }
 
-  if (qp_spline_st_speed_config_.jerk_kernel_weight() > 0) {
+  if (qp_st_speed_config_.qp_spline_config().jerk_kernel_weight() > 0) {
     spline_kernel->AddThirdOrderDerivativeMatrix(
-        qp_spline_st_speed_config_.jerk_kernel_weight());
+        qp_st_speed_config_.qp_spline_config().jerk_kernel_weight());
   }
 
-  if (!AddCruiseReferenceLineKernel(speed_limit,
-                                    qp_spline_st_speed_config_.cruise_weight())
+  if (!AddCruiseReferenceLineKernel(
+           speed_limit, qp_st_speed_config_.qp_spline_config().cruise_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (!AddFollowReferenceLineKernel(boundaries,
-                                    qp_spline_st_speed_config_.follow_weight())
+  if (!AddFollowReferenceLineKernel(
+           boundaries, qp_st_speed_config_.qp_spline_config().follow_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
+
+  (*spline_kernel->mutable_kernel_matrix())(2, 2) +=
+      2.0 * 4.0 * qp_st_speed_config_.qp_spline_config().jerk_kernel_weight();
+  (*spline_kernel->mutable_offset())(2, 0) +=
+      -4.0 * init_point_.a() *
+      qp_st_speed_config_.qp_spline_config().jerk_kernel_weight();
+
+  spline_kernel->AddRegularization(
+      qp_st_speed_config_.qp_spline_config().regularization_weight());
+
   return Status::OK();
 }
 
@@ -312,7 +308,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  double dist_ref = qp_spline_st_speed_config_.total_path_length();
+  double dist_ref = qp_st_speed_config_.total_path_length();
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     cruise_.push_back(dist_ref);
   }
@@ -335,11 +331,9 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
   if (t_evaluated_.size() > 0) {
     spline_kernel->AddReferenceLineKernelMatrix(
         t_evaluated_, cruise_,
-        weight * qp_spline_st_speed_config_.total_time() / t_evaluated_.size());
+        weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
   }
 
-  spline_kernel->AddRegularization(
-      qp_spline_st_speed_config_.regularization_weight());
   return Status::OK();
 }
 
@@ -363,9 +357,10 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
       double s_lower = 0.0;
       if (boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         success = true;
-        s_min = std::min(s_min,
-                         s_upper - boundary->characteristic_length() -
-                             qp_spline_st_speed_config_.follow_drag_distance());
+        s_min = std::min(
+            s_min,
+            s_upper - boundary->characteristic_length() -
+                qp_st_speed_config_.qp_spline_config().follow_drag_distance());
       }
     }
     if (success && s_min < cruise_[i]) {
@@ -383,7 +378,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
   if (!ref_s.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
         filtered_evaluate_t, ref_s,
-        weight * qp_spline_st_speed_config_.total_time() / t_evaluated_.size());
+        weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {

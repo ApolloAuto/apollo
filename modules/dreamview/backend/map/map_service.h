@@ -68,9 +68,8 @@ class MapService {
   MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
                                      double raidus) const;
 
-  bool GetPointsFromRouting(
-      const apollo::routing::RoutingResponse &routing,
-      std::vector<apollo::hdmap::MapPathPoint> *points) const;
+  bool GetPathsFromRouting(const apollo::routing::RoutingResponse &routing,
+                           std::vector<apollo::hdmap::Path> *paths) const;
 
   // The returned value is of a hdmap::Map proto. This
   // makes it easy to convert to a JSON object and to send to the
@@ -91,21 +90,25 @@ class MapService {
    * @param laneWayPoint RoutingRequest's lane waypoint
    * @return True if the lane waypoint is filled successfully.
    */
-  bool ConstructLaneWayPoint(
-      const double x, const double y,
-      routing::RoutingRequest::LaneWaypoint *laneWayPoint) const;
+  bool ConstructLaneWayPoint(const double x, const double y,
+                             routing::LaneWaypoint *laneWayPoint) const;
 
  private:
   const hdmap::HDMap &BaseMap() const {
-    return pnc_map_.HDMap();
+    return hdmap_;
   }
 
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
                       double *nearest_s, double *nearest_l) const;
 
-  // A wrapper around HDMap to provide some convenient utils dreamview needs.
-  const hdmap::PncMap pnc_map_;
+  bool CreatePathsFromRouting(const routing::RoutingResponse &routing,
+                              std::vector<apollo::hdmap::Path> *paths) const;
+
+  bool AddPathFromPassageRegion(const routing::Passage &passage_region,
+                                std::vector<apollo::hdmap::Path> *paths) const;
+
+  hdmap::HDMap hdmap_;
   // A downsampled map for dreamview frontend display.
   hdmap::HDMap sim_map_;
 };

@@ -37,21 +37,21 @@ using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
 
 QpPiecewiseStGraph::QpPiecewiseStGraph(
-    const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-    const VehicleParam& veh_param)
-    : qp_spline_st_speed_config_(qp_spline_st_speed_config),
-      t_evaluated_resolution_(
-          qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_evaluated_graph_t()) {
+    const QpStSpeedConfig& qp_st_speed_config)
+    : qp_st_speed_config_(qp_st_speed_config),
+      t_evaluated_resolution_(qp_st_speed_config_.total_time() /
+                              qp_st_speed_config_.qp_piecewise_config()
+                                  .number_of_evaluated_graph_t()) {
   Init();
 }
 
 void QpPiecewiseStGraph::Init() {
   // init evaluated t positions
   double curr_t = t_evaluated_resolution_;
-  for (uint32_t i = 0;
-       i < qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
-    t_evaluated_.push_back(curr_t);
+  t_evaluated_.resize(
+      qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t());
+  for (auto& t : t_evaluated_) {
+    t = curr_t;
     curr_t += t_evaluated_resolution_;
   }
 }
@@ -69,20 +69,13 @@ Status QpPiecewiseStGraph::Search(
     const std::pair<double, double>& accel_bound) {
   cruise_.clear();
 
+  init_point_ = st_graph_data.init_point();
+  ADEBUG << "Init point:" << init_point_.DebugString();
+
   // reset piecewise linear generator
   generator_.reset(new PiecewiseLinearGenerator(
-      qp_spline_st_speed_config_.number_of_evaluated_graph_t(),
+      qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t(),
       t_evaluated_resolution_));
-
-  // start to search for best st points
-  init_point_ = st_graph_data.init_point();
-
-  // modified total path length
-  if (st_graph_data.path_data_length() <
-      qp_spline_st_speed_config_.total_path_length()) {
-    qp_spline_st_speed_config_.set_total_path_length(
-        st_graph_data.path_data_length());
-  }
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
@@ -146,29 +139,25 @@ Status QpPiecewiseStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  std::vector<uint32_t> index_list;
+  std::vector<uint32_t> index_list(t_evaluated_.size());
 
   // boundary constraint
-  std::vector<double> s_upper_bound;
-  std::vector<double> s_lower_bound;
+  std::vector<double> s_upper_bound(t_evaluated_.size());
+  std::vector<double> s_lower_bound(t_evaluated_.size());
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
-    index_list.push_back(i);
-
+    index_list[i] = i;
     const double curr_t = t_evaluated_[i];
     double lower_s = 0.0;
     double upper_s = 0.0;
     GetSConstraintByTime(boundaries, curr_t,
-                         qp_spline_st_speed_config_.total_path_length(),
-                         &upper_s, &lower_s);
-    s_upper_bound.push_back(upper_s);
-    s_lower_bound.push_back(lower_s);
+                         qp_st_speed_config_.total_path_length(), &upper_s,
+                         &lower_s);
+    s_upper_bound[i] = upper_s;
+    s_lower_bound[i] = lower_s;
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
            << " lower_s: " << lower_s;
   }
-
-  DCHECK_EQ(index_list.size(), s_lower_bound.size());
-  DCHECK_EQ(index_list.size(), s_upper_bound.size());
   if (!constraint->AddBoundary(index_list, s_lower_bound, s_upper_bound)) {
     const std::string msg = "Fail to apply distance constraints.";
     AERROR << msg;
@@ -185,9 +174,6 @@ Status QpPiecewiseStGraph::ApplyConstraint(
   }
 
   std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
-
-  DCHECK_EQ(index_list.size(), speed_upper_bound.size());
-  DCHECK_EQ(index_list.size(), speed_lower_bound.size());
 
   if (st_graph_debug_) {
     auto speed_constraint = st_graph_debug_->mutable_speed_constraint();
@@ -215,8 +201,6 @@ Status QpPiecewiseStGraph::ApplyConstraint(
   std::vector<double> accel_upper_bound(t_evaluated_.size(),
                                         accel_bound.second);
 
-  DCHECK_EQ(index_list.size(), accel_lower_bound.size());
-  DCHECK_EQ(index_list.size(), accel_upper_bound.size());
   if (!constraint->AddSecondDerivativeBoundary(
           init_point.v(), index_list, accel_lower_bound, accel_upper_bound)) {
     const std::string msg = "Fail to apply acceleration constraints.";
@@ -237,28 +221,33 @@ Status QpPiecewiseStGraph::ApplyKernel(
   auto* kernel = generator_->mutable_kernel();
   DCHECK_NOTNULL(kernel);
 
-  if (qp_spline_st_speed_config_.accel_kernel_weight() > 0) {
+  if (qp_st_speed_config_.qp_piecewise_config().accel_kernel_weight() > 0) {
     kernel->AddSecondOrderDerivativeMatrix(
-        init_point_.v(), qp_spline_st_speed_config_.accel_kernel_weight());
+        init_point_.v(),
+        qp_st_speed_config_.qp_piecewise_config().accel_kernel_weight());
   }
 
-  if (qp_spline_st_speed_config_.jerk_kernel_weight() > 0) {
+  if (qp_st_speed_config_.qp_piecewise_config().jerk_kernel_weight() > 0) {
     kernel->AddThirdOrderDerivativeMatrix(
         init_point_.v(), init_point_.a(),
-        qp_spline_st_speed_config_.jerk_kernel_weight());
+        qp_st_speed_config_.qp_piecewise_config().jerk_kernel_weight());
   }
 
-  if (!AddCruiseReferenceLineKernel(speed_limit,
-                                    qp_spline_st_speed_config_.cruise_weight())
+  if (!AddCruiseReferenceLineKernel(
+           speed_limit,
+           qp_st_speed_config_.qp_piecewise_config().cruise_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (!AddFollowReferenceLineKernel(boundaries,
-                                    qp_spline_st_speed_config_.follow_weight())
+  if (!AddFollowReferenceLineKernel(
+           boundaries,
+           qp_st_speed_config_.qp_piecewise_config().follow_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
+  kernel->AddRegularization(
+      qp_st_speed_config_.qp_piecewise_config().regularization_weight());
   return Status::OK();
 }
 
@@ -270,26 +259,20 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  double dist_ref = 0.0;
-  std::vector<uint32_t> index_list;
+  std::vector<uint32_t> index_list(t_evaluated_.size());
+  cruise_.resize(t_evaluated_.size());
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
-    index_list.push_back(i);
-    dist_ref +=
-        t_evaluated_resolution_ * speed_limit.GetSpeedLimitByS(dist_ref);
-    cruise_.push_back(dist_ref);
+    index_list[i] = i;
+    cruise_[i] = qp_st_speed_config_.total_path_length();
   }
   if (st_graph_debug_) {
     auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
-    kernel_cruise_ref->mutable_t()->Add(t_evaluated_[0]);
-    kernel_cruise_ref->mutable_cruise_line_s()->Add(dist_ref);
-    for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
+    for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
       kernel_cruise_ref->mutable_t()->Add(t_evaluated_[i]);
       kernel_cruise_ref->mutable_cruise_line_s()->Add(cruise_[i]);
     }
   }
-  DCHECK_EQ(t_evaluated_.size(), cruise_.size());
-
   for (std::size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "Cruise Ref S: " << cruise_[i]
            << " Relative time: " << t_evaluated_[i] << std::endl;
@@ -298,11 +281,9 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
   if (t_evaluated_.size() > 0) {
     ref_kernel->AddReferenceLineKernelMatrix(
         index_list, cruise_,
-        weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
+        weight * t_evaluated_.size() / qp_st_speed_config_.total_time());
   }
 
-  ref_kernel->AddRegularization(
-      qp_spline_st_speed_config_.regularization_weight());
   return Status::OK();
 }
 
@@ -327,9 +308,9 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
       double s_lower = 0.0;
       if (boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         success = true;
-        s_min = std::min(s_min,
-                         s_upper - boundary->characteristic_length() -
-                             qp_spline_st_speed_config_.follow_drag_distance());
+        s_min = std::min(s_min, s_upper - boundary->characteristic_length() -
+                                    qp_st_speed_config_.qp_piecewise_config()
+                                        .follow_drag_distance());
       }
     }
     if (success && s_min < cruise_[i]) {
@@ -348,7 +329,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
   if (!ref_s.empty()) {
     follow_kernel->AddReferenceLineKernelMatrix(
         index_list, ref_s,
-        weight * t_evaluated_.size() / qp_spline_st_speed_config_.total_time());
+        weight * t_evaluated_.size() / qp_st_speed_config_.total_time());
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
@@ -465,6 +446,12 @@ Status QpPiecewiseStGraph::EstimateSpeedUpperBound(
   }
 
   return Status::OK();
+}
+
+Status QpPiecewiseStGraph::Solve() {
+  return generator_->Solve()
+             ? Status::OK()
+             : Status(ErrorCode::PLANNING_ERROR, "QpPiecewiseStGraph::solve");
 }
 
 }  // namespace planning

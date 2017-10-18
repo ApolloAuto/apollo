@@ -40,7 +40,7 @@ So the resulting horizontal control model that is obtained guides the curvature 
 
 ## Data Classification
 
-The data are divided into two parts, including the training set and the test set. Use the training set to debug algorithms and use the test set to verify results.
+The data are divided into two parts, including the training set and the test set. Use the training set to debug algorithms and use the test set to verify results. The trainsets has **5246135** samples, the testsets is have **125043** samples.
 
 ### Training Sets
 
@@ -125,13 +125,6 @@ The training set contains two parts of data, including image and attr. Image is 
    * hdf5 in the form of a 2D array.
    * Floating-point numbers.
 
-* There are two columns, which are defined as follows:
-
-   | Column: variables | Units                     | Description                              |
-   | ----------------- | ------------------------- | ---------------------------------------- |
-   | 01 : t            | decimal system (Unsigned) | Current UTC timestamp.                   |
-   | 02 : curv         | decimal system (Signed)   | [t,t+1] Curvature, left turning as positive. |
-   | 03: acc           | decimal system (Signed)）  | [t,t+1] Acceleration, acceleration  as positive. |
 
 ## Descriptions of Evaluation Indicators
 

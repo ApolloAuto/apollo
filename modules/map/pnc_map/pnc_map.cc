@@ -37,8 +37,10 @@
 
 namespace apollo {
 namespace hdmap {
-namespace {
+
 using apollo::routing::RoutingResponse;
+
+namespace {
 
 // Minimum error in lane segmentation.
 const double kSegmentationEpsilon = 0.2;
@@ -62,6 +64,13 @@ void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
   points->resize(count);
 }
 
+bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
+                       const LaneWaypoint &waypoint) {
+  return lane_segment.id() == waypoint.lane->id().id() &&
+         lane_segment.start_s() - kSegmentationEpsilon <= waypoint.s &&
+         lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s;
+}
+
 void RemoveDuplicates(std::vector<MapPathPoint> *points) {
   CHECK_NOTNULL(points);
   int count = 0;
@@ -79,138 +88,169 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 }  // namespace
 
-PncMap::PncMap(const std::string &map_file) {
-  CHECK(!hdmap_.LoadMapFromFile(map_file)) << "Failed to load map file:"
-                                           << map_file;
-  AINFO << "map loaded, Map file: " << map_file;
+bool RouteSegments::GetInnerProjection(const common::PointENU &point_enu,
+                                       double *s, double *l) const {
+  const auto point = common::math::Vec2d{point_enu.x(), point_enu.y()};
+  *l = std::numeric_limits<double>::infinity();
+  double accumulate_s = 0.0;
+  bool has_projection = false;
+  for (auto iter = begin(); iter != end();
+       accumulate_s += (iter->end_s - iter->start_s), ++iter) {
+    double lane_s = 0.0;
+    double lane_l = 0.0;
+    if (!iter->lane->GetProjection(point, &lane_s, &lane_l)) {
+      return false;
+    }
+    if (lane_s < iter->start_s - kSegmentationEpsilon ||
+        lane_s > iter->end_s + kSegmentationEpsilon) {
+      continue;
+    }
+    has_projection = true;
+    if (std::fabs(lane_l) < *l) {
+      *l = std::fabs(lane_l);
+      *s = lane_s - iter->start_s + accumulate_s;
+    }
+  }
+  return has_projection;
 }
 
-bool PncMap::ValidateRouting(const RoutingResponse &routing) const {
-  const int num_routes = routing.route_size();
-  if (num_routes == 0) {
-    AERROR << "Route is empty.";
-    return false;
-  }
-  /*
-    const double kLargeEps = 1e-3;
-    for (int i = 0; i < num_routes; ++i) {
-      const auto &segment = routing.route(i);
-      const auto lane = hdmap_.get_lane_by_id(MakeMapId(segment.id()));
-      if (lane == nullptr) {
-        AERROR << "Can not find lane with id = " + segment.id() + ".";
-        return false;
-      }
-      if (segment.start_s() > segment.end_s() + kLargeEps) {
-        AERROR << "Segment " << i << " is empty.";
-        return false;
-      }
-      bool start_point_in_lane_change = false;
-      bool end_point_in_lane_change = false;
-      for (const auto &info : routing.lane_change_info()) {
-        if (i > info.start_route_index() && i <= info.end_route_index()) {
-          start_point_in_lane_change = true;
-        }
-        if (i >= info.start_route_index() && i < info.end_route_index()) {
-          end_point_in_lane_change = true;
-        }
-      }
-      if (!start_point_in_lane_change &&
-          ((i > 0 && std::abs(segment.start_s()) > kLargeEps) ||
-           (i == 0 && segment.start_s() < -kLargeEps))) {
-        AERROR << "Segment " << i << " (lane " << segment.id()
-               << ") should start at s = 0.";
-        return false;
-      }
-      if (!end_point_in_lane_change &&
-          ((i < num_routes - 1 &&
-            std::abs(segment.end_s() - lane->total_length()) > kLargeEps) ||
-           (i == num_routes - 1 &&
-            segment.end_s() > lane->total_length() + kLargeEps))) {
-        AERROR << "Segment " << i << " (lane " << segment.id()
-               << ") should end at s = " << lane->total_length() << ".";
-        return false;
-      }
-    }
-    for (int i = 0; i < num_routes - 1; ++i) {
-      bool is_lane_change = false;
-      for (const auto &info : routing.lane_change_info()) {
-        if (i >= info.start_route_index() && i < info.end_route_index()) {
-          is_lane_change = true;
-          break;
-        }
-      }
-      if (is_lane_change) {
-        // TODO: check lane change information.
-        continue;
-      }
-      const auto &segment = routing.route(i);
-      const auto lane = hdmap_.get_lane_by_id(MakeMapId(segment.id()));
-      const std::string next_id = routing.route(i + 1).id();
-      bool is_successor = false;
-      for (const auto &other_lane_id : lane->lane().successor_id()) {
-        if (other_lane_id.id() == next_id) {
-          is_successor = true;
-          break;
-        }
-      }
-      if (!is_successor) {
-        AERROR << "Lane " + segment.id() + " can not connect to Lane " + next_id
-    +
-                      ".";
-        return false;
-      }
-    }
-  */
-  return true;
-}
+PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
-bool PncMap::GetLaneSegmentsFromRouting(
-    const RoutingResponse &routing, const common::PointENU &point,
-    const double backward_length, const double forward_length,
-    std::vector<LaneSegments> *const route_segments) const {
-  if (route_segments == nullptr) {
-    AERROR << "the provided proute_segments is null";
-    return false;
-  }
-  if (backward_length < 0.0 || forward_length < 0.0 ||
-      backward_length + forward_length <= 0.0) {
-    AERROR << "backward_length[" << backward_length << "] or forward_length["
-           << forward_length << "] are invalid";
+const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
+
+bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
+  if (routing_.has_header() && routing.has_header() &&
+      routing_.header().sequence_num() == routing.header().sequence_num() &&
+      (std::fabs(routing_.header().timestamp_sec() ==
+                 routing.header().timestamp_sec()) < 0.1)) {
+    AINFO << "Same prouting, skip update routing";
     return false;
   }
   if (!ValidateRouting(routing)) {
-    AERROR << "The provided routing result is invalid";
+    AERROR << "Invalid routing";
     return false;
   }
-  route_segments->clear();
+  for (const auto &road : routing.road()) {
+    for (const auto &passage : road.passage()) {
+      for (const auto &lane : passage.segment()) {
+        routing_lane_ids_.insert(lane.id());
+      }
+    }
+  }
+  routing_ = routing;
+  last_waypoint_.reset(nullptr);
+  return true;
+}
+
+const routing::RoutingResponse &PncMap::routing_response() const {
+  return routing_;
+}
+
+bool PncMap::ValidateRouting(const RoutingResponse &routing) {
+  const int num_road = routing.road_size();
+  if (num_road == 0) {
+    AERROR << "Route is empty.";
+    return false;
+  }
+  return true;
+}
+
+std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
+  int road_index = -1;
+  for (const auto &road_segment : routing_.road()) {
+    ++road_index;
+    int passage_index = -1;
+    for (const auto &passage : road_segment.passage()) {
+      ++passage_index;
+      int lane_index = -1;
+      for (const auto &segment : passage.segment()) {
+        ++lane_index;
+        if (WithinLaneSegment(segment, waypoint)) {
+          return {road_index, passage_index, lane_index};
+        }
+      }
+    }
+  }
+  return {-1, -1, -1};
+}
+
+bool PncMap::PassageToSegments(routing::Passage passage,
+                               RouteSegments *segments) const {
+  CHECK_NOTNULL(segments);
+  segments->clear();
+  for (const auto &lane : passage.segment()) {
+    auto lane_ptr = hdmap_->GetLaneById(hdmap::MakeMapId(lane.id()));
+    if (!lane_ptr) {
+      AERROR << "Failed to find lane : " << lane.id();
+      return false;
+    }
+    segments->emplace_back(lane_ptr, lane.start_s(), lane.end_s());
+  }
+  return true;
+}
+
+bool PncMap::GetRouteSegments(
+    const common::PointENU &point, const double backward_length,
+    const double forward_length,
+    std::vector<RouteSegments> *const route_segments) const {
+  LaneWaypoint waypoint;
+  if (!GetNearestPointFromRouting(point, &waypoint)) {
+    AERROR << "Failed to get waypoint from routing";
+    return false;
+  }
+  auto index = GetWaypointIndex(waypoint);
+  if (index.size() != 3 || index[0] < 0) {
+    AERROR << "Failed to get routing index from waypoint";
+    return false;
+  }
+  int road_index = index[0];
+  int passage_index = index[1];
+  const auto &road = routing_.road(road_index);
+  std::vector<int> indices{passage_index - 1, passage_index, passage_index + 1};
+  for (int index : indices) {
+    if (index < 0 || index >= road.passage_size()) {
+      continue;
+    }
+    const auto &passage = road.passage(index);
+    RouteSegments segments;
+    if (!PassageToSegments(passage, &segments)) {
+      AERROR << "Failed to convert passage to lane segments.";
+      return false;
+    }
+    if (index < passage_index) {
+      segments.SetChangeLaneType(routing::ChangeLaneType::LEFT);
+    } else if (index > passage_index) {
+      segments.SetChangeLaneType(routing::ChangeLaneType::RIGHT);
+    }
+    double s = 0.0;
+    double l = 0.0;
+    bool has_projection = segments.GetInnerProjection(point, &s, &l);
+    if (has_projection) {
+      route_segments->emplace_back();
+      TruncateLaneSegments(segments, s - backward_length, s + forward_length,
+                           &route_segments->back());
+    }
+  }
+  return true;
+}
+
+bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
+                                        LaneWaypoint *waypoint) const {
   const double kMaxDistance = 20.0;  // meters.
   std::vector<LaneInfoConstPtr> lanes;
-  const int status = hdmap_.GetLanes(point, kMaxDistance, &lanes);
+  const int status = hdmap_->GetLanes(point, kMaxDistance, &lanes);
   if (status < 0) {
     AERROR << "failed to get lane from point " << point.DebugString();
     return false;
   }
-  // get all lanes from routing
-  std::unordered_set<std::string> routing_lane_ids;
-  for (const auto &way : routing.route()) {
-    if (way.has_road_info()) {
-      for (const auto &passage_region : way.road_info().passage_region()) {
-        for (const auto &segment : passage_region.segment()) {
-          routing_lane_ids.insert(segment.id());
-        }
-      }
-    } else if (way.has_junction_info()) {
-      for (const auto &segment :
-           way.junction_info().passage_region().segment()) {
-        routing_lane_ids.insert(segment.id());
-      }
-    }
+  if (lanes.empty()) {
+    AERROR << "No valid lane found within " << kMaxDistance << " meters.";
+    return false;
   }
   // get nearest_wayponints for current position
   double min_distance = std::numeric_limits<double>::infinity();
-  std::vector<LaneWaypoint> nearest_waypoints;
-  for (const auto lane : lanes) {
-    if (!routing_lane_ids.count(lane->id().id())) {
+  for (const auto &lane : lanes) {
+    if (routing_lane_ids_.count(lane->id().id()) == 0) {
       continue;
     }
     double distance = 0.0;
@@ -225,99 +265,49 @@ bool PncMap::GetLaneSegmentsFromRouting(
                << map_point.DebugString();
         return false;
       }
-      nearest_waypoints.emplace_back(lane, s);
+      waypoint->lane = lane;
+      waypoint->s = s;
     }
   }
-  if (nearest_waypoints.empty()) {
-    AERROR << "Failed to find point on routing. Point:" << point.DebugString();
-    return false;
-  }
+  return true;
+}
 
-  const auto &start_waypoint = nearest_waypoints.back();
-  double min_overlap_distance = std::numeric_limits<double>::infinity();
-  double proj_s = 0.0;
-  double accumulate_s = 0.0;
-  LaneSegments connected_lanes;
-  LaneSegments cropped_lanes;
-  bool found_region = false;
-  for (const auto &way : routing.route()) {
-    if (!way.has_road_info()) {  // skip checking junction_info
-      continue;
-    }
-    for (const auto &passage_region : way.road_info().passage_region()) {
-      if (passage_region.segment().empty()) {
-        continue;
-      }
-      if (!found_region) {
-        bool on_current_region = false;
-        for (const auto &waypoint : nearest_waypoints) {
-          for (const auto &segment : passage_region.segment()) {
-            if (segment.id() == waypoint.lane->id().id()) {
-              on_current_region = true;
-            }
-          }
-        }
-        if (!on_current_region) {
-          break;
-        } else {
-          found_region = true;
-        }
-      }
-      for (const auto &lane_segment : passage_region.segment()) {
-        const double length = lane_segment.end_s() - lane_segment.start_s();
-        auto lane = hdmap_.GetLaneById(MakeMapId(lane_segment.id()));
-        if (!lane) {
-          AERROR << "Failed to fine lane " << lane_segment.id();
-          return false;
-        }
-        connected_lanes.emplace_back(lane, lane_segment.start_s(),
-                                     lane_segment.end_s());
-        if (lane_segment.id() == start_waypoint.lane->id().id()) {
-          double overlap_distance = 0.0;
-          if (start_waypoint.s < lane_segment.start_s()) {
-            overlap_distance = lane_segment.start_s() - start_waypoint.s;
-          } else if (start_waypoint.s > lane_segment.end_s()) {
-            overlap_distance = start_waypoint.s - lane_segment.end_s();
-          }
-          if (overlap_distance < min_overlap_distance) {
-            min_overlap_distance = overlap_distance;
-            proj_s =
-                accumulate_s +
-                std::max(0.0, std::min(length, start_waypoint.s -
-                                                   lane_segment.start_s()));
-          }
-        }
-        accumulate_s += length;
-      }
+LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
+  if (lane->lane().successor_id_size() == 0) {
+    return nullptr;
+  }
+  hdmap::Id preferred_id = lane->lane().successor_id(0);
+  for (const auto &lane_id : lane->lane().successor_id()) {
+    if (routing_lane_ids_.count(lane_id.id()) != 0) {
+      preferred_id = lane_id;
+      break;
     }
   }
-  if (min_overlap_distance < std::numeric_limits<double>::infinity()) {
-    LaneSegments truncated_segments;
-    if (TruncateLaneSegments(connected_lanes, proj_s - backward_length,
-                             proj_s + forward_length, &truncated_segments)) {
-      route_segments->emplace_back(std::move(truncated_segments));
-      return true;
-    } else {
-      AERROR << "Failed to truncate lane segments";
-      return false;
-    }
-  } else {
-    AERROR << "Failed to get lanes from routing";
-    return false;
+  return hdmap_->GetLaneById(preferred_id);
+}
+
+LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
+  if (lane->lane().predecessor_id_size() == 0) {
+    return nullptr;
   }
+  hdmap::Id preferred_id = lane->lane().predecessor_id(0);
+  for (const auto &lane_id : lane->lane().predecessor_id()) {
+    if (routing_lane_ids_.count(lane_id.id()) != 0) {
+      preferred_id = lane_id;
+      break;
+    }
+  }
+  return hdmap_->GetLaneById(preferred_id);
 }
 
 bool PncMap::TruncateLaneSegments(
-    const LaneSegments &segments, double start_s, double end_s,
-    LaneSegments *const truncated_segments) const {
+    const RouteSegments &segments, double start_s, double end_s,
+    RouteSegments *const truncated_segments) const {
   if (segments.empty()) {
     AERROR << "The input segments is empty";
     return false;
   }
-  if (truncated_segments == nullptr) {
-    AERROR << "the output truncated segments buffer is null";
-    return false;
-  }
+  CHECK_NOTNULL(truncated_segments);
   if (start_s >= end_s) {
     AERROR << "start_s(" << start_s << " >= end_s(" << end_s << ")";
     return false;
@@ -325,18 +315,14 @@ bool PncMap::TruncateLaneSegments(
   const double kRouteEpsilon = 1e-3;
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
-    const auto &first_segment = segments[0];
+    const auto &first_segment = *segments.begin();
     auto lane = first_segment.lane;
     double s = first_segment.start_s;
     double extend_s = -start_s;
     std::vector<LaneSegment> extended_lane_segments;
     while (extend_s > kRouteEpsilon) {
       if (s <= kRouteEpsilon) {
-        if (lane->lane().predecessor_id_size() == 0) {
-          break;
-        }
-        const auto &next_lane_id = lane->lane().predecessor_id(0);
-        lane = hdmap_.GetLaneById(next_lane_id);
+        lane = GetRoutePredecessor(lane);
         if (lane == nullptr) {
           break;
         }
@@ -348,7 +334,7 @@ bool PncMap::TruncateLaneSegments(
         s -= length;
       }
     }
-    truncated_segments->insert(truncated_segments->end(),
+    truncated_segments->insert(truncated_segments->begin(),
                                extended_lane_segments.rbegin(),
                                extended_lane_segments.rend());
   }
@@ -370,23 +356,19 @@ bool PncMap::TruncateLaneSegments(
   // Extend the trajectory towards the end of the trajectory.
   if (router_s < end_s) {
     const auto &last_segment = segments.back();
-    std::string last_lane_id = last_segment.lane->id().id();
+    auto last_lane = last_segment.lane;
     double last_s = last_segment.end_s;
     while (router_s < end_s - kRouteEpsilon) {
-      const auto lane = hdmap_.GetLaneById(MakeMapId(last_lane_id));
-      if (lane == nullptr) {
+      if (last_lane == nullptr) {
         break;
       }
-      if (last_s >= lane->total_length() - kRouteEpsilon) {
-        if (lane->lane().successor_id_size() == 0) {
-          break;
-        }
-        last_lane_id = lane->lane().successor_id(0).id();
+      if (last_s >= last_lane->total_length() - kRouteEpsilon) {
+        last_lane = GetRouteSuccessor(last_lane);
         last_s = 0.0;
       } else {
         const double length =
-            std::min(end_s - router_s, lane->total_length() - last_s);
-        truncated_segments->emplace_back(lane, last_s, last_s + length);
+            std::min(end_s - router_s, last_lane->total_length() - last_s);
+        truncated_segments->emplace_back(last_lane, last_s, last_s + length);
         router_s += length;
         last_s += length;
       }
@@ -429,35 +411,7 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
   }
 }
 
-bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
-                                   Path *const path) const {
-  LaneSegments segments;
-  for (const auto &way : routing.route()) {
-    if (way.has_road_info() && !way.road_info().passage_region().empty()) {
-      for (const auto &segment : way.road_info().passage_region(0).segment()) {
-        auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
-        if (!lane_ptr) {
-          AERROR << "Failed to fine lane: " << segment.id();
-          return false;
-        }
-        segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
-      }
-    } else if (way.has_junction_info()) {
-      for (const auto &segment :
-           way.junction_info().passage_region().segment()) {
-        auto lane_ptr = hdmap_.GetLaneById(MakeMapId(segment.id()));
-        if (!lane_ptr) {
-          AERROR << "Failed to fine lane: " << segment.id();
-          return false;
-        }
-        segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
-      }
-    }
-  }
-  return CreatePathFromLaneSegments(segments, path);
-}
-
-bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
+bool PncMap::CreatePathFromLaneSegments(const RouteSegments &segments,
                                         Path *const path) {
   std::vector<MapPathPoint> points;
   for (const auto &segment : segments) {
@@ -474,8 +428,6 @@ bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
   *path = Path(points, segments, kTrajectoryApproximationMaxError);
   return true;
 }
-
-const HDMap &PncMap::HDMap() const { return hdmap_; }
 
 }  // namespace hdmap
 }  // namespace apollo

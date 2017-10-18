@@ -48,7 +48,13 @@ if [ ! -e "${DATA_DIR}/core" ]; then
 fi
 
 function main() {
-    docker pull "$IMG"
+    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
+    read -t 10 -n 1 INCHINA
+    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
+        docker pull "registry.docker-cn.com/${IMG}"
+    else
+        docker pull $IMG
+    fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
     if [ $? == 0 ]; then
@@ -113,6 +119,7 @@ function main() {
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/common/data"
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/gnss_driver"
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
+        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/control/conf"
     fi
     docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
 }

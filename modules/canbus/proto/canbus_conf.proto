@@ -2,12 +2,12 @@ syntax = "proto2";
 
 package apollo.canbus;
 
-import "modules/canbus/proto/can_card_parameter.proto";
+import "modules/drivers/canbus/proto/can_card_parameter.proto";
 import "modules/canbus/proto/vehicle_parameter.proto";
 
 message CanbusConf {
   optional apollo.canbus.VehicleParameter vehicle_parameter = 1;
-  optional apollo.canbus.CANCardParameter can_card_parameter = 2;
+  optional apollo.drivers.canbus.CANCardParameter can_card_parameter = 2;
   optional bool enable_debug_mode = 3 [default = false];
   optional bool enable_receiver_log = 4 [default = false];
   optional bool enable_sender_log = 5 [default = false];

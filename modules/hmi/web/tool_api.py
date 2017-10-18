@@ -18,7 +18,6 @@
 """Tool API."""
 
 import os
-import shutil
 
 import gflags
 
@@ -72,6 +71,7 @@ class ToolApi(object):
         RuntimeStatus.get_tools().recording_status = (
             ToolStatus.RECORDING_FINISHED)
         RuntimeStatus.stat_playable_duration()
+        RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
     def reset_recording(cls):
@@ -131,12 +131,12 @@ class ToolApi(object):
             Config.log.critical('ToolApi::switch_map bad args')
             return
         map_name = args[0]
-        map_conf = Config.get_map(map_name)
-        if map_conf is None:
+        map_dir = Config.maps.get(map_name)
+        if map_dir is None:
             Config.log.critical('Cannot find map %s', map_name)
             return
         with open(Config.get_pb().global_flagfile, 'a') as fout:
-            fout.write('\n--map_dir={}\n'.format(map_conf.map_dir))
+            fout.write('\n--map_dir={}\n'.format(map_dir))
 
         RuntimeStatus.pb_singleton.config.current_map = map_name
         RuntimeStatus.broadcast_status_if_changed()
@@ -148,40 +148,34 @@ class ToolApi(object):
             Config.log.critical('ToolApi::switch_vehicle bad args')
             return
         vehicle_name = args[0]
-        vehicle_conf = Config.get_vehicle(vehicle_name)
-        if vehicle_conf is None:
+        vehicle_path = Config.vehicles.get(vehicle_name)
+        if vehicle_path is None:
             Config.log.critical('Cannot find vehicle %s', vehicle_name)
             return
 
-        conf_pb = Config.get_pb()
         # Copy vehicle_param_pb.
-        if vehicle_conf.HasField('vehicle_param_pb_path'):
-            system_cmd.copyfile(vehicle_conf.vehicle_param_pb_path,
-                                conf_pb.vehicle_param_pb_target_path)
+        conf_pb = Config.get_pb()
+        system_cmd.safe_copy(
+            os.path.join(vehicle_path, 'vehicle_param.pb.txt'),
+            conf_pb.vehicle_param_pb_target_path)
         # Copy calibration_table.
-        if vehicle_conf.HasField('calibration_table_path'):
-            system_cmd.copyfile(vehicle_conf.calibration_table_path,
-                                conf_pb.calibration_table_target_path)
+        system_cmd.safe_copy(
+            os.path.join(vehicle_path, 'calibration_table.pb.txt'),
+            conf_pb.calibration_table_target_path)
         # Copy velodyne_params.
-        if vehicle_conf.HasField('velodyne_params_path'):
-            system_cmd.copytree(
-                vehicle_conf.velodyne_params_path,
-                Config.get_ros_path(conf_pb.velodyne_params_target_path))
-        # Copy velodyne launch file.
-        if vehicle_conf.HasField('velodyne_launch_path'):
-            system_cmd.copyfile(
-                vehicle_conf.velodyne_launch_path,
-                Config.get_ros_path(conf_pb.velodyne_launch_target_path))
-        # Copy gnss_driver.
-        if vehicle_conf.HasField('gnss_driver_path'):
-            system_cmd.copyfile(
-                vehicle_conf.gnss_driver_path,
-                Config.get_ros_path(conf_pb.gnss_driver_target_path))
+        system_cmd.safe_copy(
+            os.path.join(vehicle_path, 'velodyne_params'),
+            Config.get_ros_path(conf_pb.velodyne_params_target_path))
+        system_cmd.safe_copy(
+            os.path.join(vehicle_path, 'start_velodyne.launch'),
+            Config.get_ros_path(conf_pb.velodyne_launch_target_path))
         # Copy gnss_conf.
-        if vehicle_conf.HasField('gnss_conf_path'):
-            system_cmd.copyfile(
-                vehicle_conf.gnss_conf_path,
-                Config.get_ros_path(conf_pb.gnss_conf_target_path))
+        system_cmd.safe_copy(
+            os.path.join(vehicle_path, 'gnss_params/gnss_conf_mkz.txt'),
+            Config.get_ros_path(conf_pb.gnss_conf_target_path))
+        system_cmd.safe_copy(
+            os.path.join(vehicle_path, 'gnss_params/gnss_driver.launch'),
+            Config.get_ros_path(conf_pb.gnss_driver_target_path))
 
         RuntimeStatus.pb_singleton.config.current_vehicle = vehicle_name
         RuntimeStatus.broadcast_status_if_changed()
