@@ -26,7 +26,8 @@ namespace delphi_esr {
 
 using apollo::drivers::DelphiESR;
 
-class Esrtrackmotionpower540 : public apollo::drivers::canbus::ProtocolData<DelphiESR> {
+class Esrtrackmotionpower540 :
+public apollo::drivers::canbus::ProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrtrackmotionpower540();
