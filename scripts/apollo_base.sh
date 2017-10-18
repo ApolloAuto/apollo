@@ -341,7 +341,7 @@ function run_customized_path() {
             help
             ;;
         *)
-            start_customized_path $module_path $module "$@"
+            start_customized_path $module_path $module $cmd "$@"
             ;;
     esac
 }
@@ -349,9 +349,8 @@ function run_customized_path() {
 # run command_name module_name
 function run() {
     local module=$1
-    local cmd=$2
-    shift 2
-    run_customized_path $module $module $cmd "$@"
+    shift
+    run_customized_path $module $module "$@"
 }
 
 check_in_docker
