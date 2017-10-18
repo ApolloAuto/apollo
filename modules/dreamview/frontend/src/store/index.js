@@ -69,11 +69,15 @@ class DreamviewStore {
         if(this.options.showPNCMonitor) {
             this.updateWidthInPercentage(0.7);
             this.options.selectCamera('Monitor');
-            this.options.showPlanning = false;
+            this.options.showPlanningReference = true;
+            this.options.showPlaningDpOptimizer = true;
+            this.options.showPlanningQpOptimizer = true;
         } else {
             this.updateWidthInPercentage(1.0);
             this.options.selectCamera('Default');
-            this.options.showPlanning = true;
+            this.options.showPlanningReference = false;
+            this.options.showPlaningDpOptimizer = false;
+            this.options.showPlanningQpOptimizer = false;
         }
     }
 }
