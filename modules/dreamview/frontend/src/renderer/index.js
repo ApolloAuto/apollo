@@ -7,7 +7,6 @@ import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
 import Ground from "renderer/ground";
 import Map from "renderer/map";
-import PlanningPath from "renderer/path.js";
 import PlanningTrajectory from "renderer/trajectory.js";
 import PerceptionObstacles from "renderer/obstacles.js";
 import Decision from "renderer/decision.js";
@@ -38,9 +37,6 @@ class Renderer {
         // The mesh this.adc.mesh is not added to the scene because it
         // takes time to load. It will be added later on.
         this.adcMeshAddedToScene = false;
-
-        // The planning path.
-        this.PlanningPath = new PlanningPath();
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
@@ -336,7 +332,6 @@ class Renderer {
 
     updateWorld(world) {
         this.adc.update(world, this.coordinates);
-        this.PlanningPath.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
