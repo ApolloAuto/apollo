@@ -121,6 +121,7 @@ bool ReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line,
                             rlp.lane_waypoints()),
         kappa, dkappa, 0.0, 0.0));
   }
+
   ReferencePoint::RemoveDuplicates(&ref_points);
   if (ref_points.size() < 2) {
     AERROR << "Fail to generate smoothed reference line.";
@@ -158,6 +159,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
   std::vector<double> evaluated_t;
   common::util::uniform_slice(t_knots_.front(), t_knots_.back(),
                               constraint_num - 1, &evaluated_t);
+
   std::vector<common::PathPoint> path_points;
   if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {
     AERROR << "Extract evaluated points failed";
