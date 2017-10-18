@@ -27,14 +27,11 @@ DEFINE_uint64(rtk_trajectory_forward, 800,
               "The number of points to be included in RTK trajectory "
               "after the matched point");
 
-DEFINE_double(trajectory_resolution, 0.01,
-              "The time resolution of "
-              "output trajectory.");
+DEFINE_double(rtk_trajectory_resolution, 0.01,
+              "The time resolution of output trajectory for rtk planner.");
 
 DEFINE_bool(publish_estop, false, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
-DEFINE_bool(use_planning_cycle_time_in_stitcher, false,
-            "Use planning_cycle_time in trajectory stitcher.");
 
 DEFINE_double(
     look_backward_distance, 30,
@@ -67,8 +64,8 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
-DEFINE_double(output_trajectory_time_resolution, 0.05,
-              "Trajectory time resolution when publish");
+DEFINE_double(output_trajectory_time_resolution, 0.01,
+              "Trajectory time resolution when publish for EM planner");
 
 DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");

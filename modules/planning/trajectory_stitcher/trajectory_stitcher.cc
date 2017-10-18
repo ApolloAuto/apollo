@@ -54,8 +54,7 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory() {
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const bool is_on_auto_mode, const double current_timestamp,
     const double planning_cycle_time,
-    const PublishableTrajectory* prev_trajectory,
-    bool* is_replan) {
+    const PublishableTrajectory* prev_trajectory, bool* is_replan) {
   *is_replan = true;
   if (!FLAGS_enable_trajectory_stitcher) {
     return ComputeReinitStitchingTrajectory();
@@ -104,10 +103,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory();
   }
 
-  double forward_rel_time = veh_rel_time;
-  if (FLAGS_use_planning_cycle_time_in_stitcher) {
-    forward_rel_time += planning_cycle_time;
-  }
+  double forward_rel_time = veh_rel_time + planning_cycle_time;
   std::size_t forward_index =
       prev_trajectory->QueryNearestPoint(forward_rel_time);
 
