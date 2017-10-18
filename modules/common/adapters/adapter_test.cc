@@ -17,6 +17,7 @@
 #include "modules/common/adapters/adapter.h"
 
 #include <string>
+#include <cmath>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -151,12 +152,12 @@ TEST(AdapterTest, Dump) {
 
 TEST(AdapterTest, Delay) {
   MyLocalizationAdapter adapter("local", "local_topic", 1);
-  EXPECT_TRUE(isnan(adapter.GetDelayInMs()));
+  EXPECT_TRUE(std::isnan(adapter.GetDelayInMs()));
 
   localization::LocalizationEstimate msg;
   msg.mutable_header()->set_timestamp_sec(12.3);
   adapter.OnReceive(msg);
-  EXPECT_TRUE(isnan(adapter.GetDelayInMs()));
+  EXPECT_TRUE(std::isnan(adapter.GetDelayInMs()));
 
   msg.mutable_header()->set_timestamp_sec(45.6);
   adapter.OnReceive(msg);
