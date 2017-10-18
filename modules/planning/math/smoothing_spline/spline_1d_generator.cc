@@ -194,7 +194,7 @@ bool Spline1dGenerator::Solve() {
       AERROR << "qpOASES solver failed due to reached max iteration";
     } else {
       AERROR << "qpOASES solver failed due to infeasibility or other internal "
-                "reasons";
+                "reasons:" << ret;
     }
     return false;
   }
