@@ -28,6 +28,7 @@
 
 #include "modules/common/log.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 #include "modules/dreamview/backend/websocket/websocket.h"
 
@@ -50,11 +51,12 @@ class SimulationWorldUpdater {
    * @brief Constructor with the websocket handler.
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
+   * @param sim_control Pointer of sim control.
    * @param map_service Pointer of the map service to provide a high-level API
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket,
+  SimulationWorldUpdater(WebSocketHandler *websocket, SimControl *sim_control,
                          const MapService *map_service,
                          bool routing_from_file = false);
 
@@ -96,6 +98,7 @@ class SimulationWorldUpdater {
   SimulationWorldService sim_world_service_;
   const MapService *map_service_;
   WebSocketHandler *websocket_;
+  SimControl *sim_control_;
 
   // End point for requesting default route
   apollo::routing::LaneWaypoint default_end_point_;
