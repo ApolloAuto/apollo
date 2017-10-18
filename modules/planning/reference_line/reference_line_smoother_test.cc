@@ -75,7 +75,7 @@ TEST_F(ReferenceLineSmootherTest, smooth) {
   Spline2dSolver spline_solver(t_knots, 5);
   EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line,
                                &spline_solver));
-  EXPECT_FLOAT_EQ(153.49794, smoothed_reference_line.Length());
+  EXPECT_FLOAT_EQ(153.64156, smoothed_reference_line.Length());
 }
 
 }  // namespace planning
