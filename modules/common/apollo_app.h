@@ -65,6 +65,12 @@ class ApolloApp {
    */
   virtual ~ApolloApp() = default;
 
+  /**
+   * @brief set the number of threads to handle ros message callbacks.
+   * The default thread number is 1
+   */
+  void SetCallbackThreadNumber(uint32_t callback_thread_num);
+
  protected:
   /**
    * @brief The module initialization function. This is the first function being
@@ -100,6 +106,10 @@ class ApolloApp {
       const apollo::hmi::ModuleStatus::Status status);
 
   apollo::hmi::ModuleStatus status_;
+
+  /** The callback thread number
+   */
+  uint32_t callback_thread_num_ = 1;
 };
 
 void apollo_app_sigint_handler(int signal_num);
