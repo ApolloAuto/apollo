@@ -29,7 +29,7 @@ message Decision {
     YIELD = 3; // Go after the object
     OVERTAKE = 4; // Go before the object
     FOLLOW = 5; // Follow the object in the same lane
-    SIDEPASS = 6; // Pass the object in neighbouring lane
+    SIDEPASS = 6; // Pass the object in neighboring lane
   }
   optional Type type = 1 [default = IGNORE];
 
@@ -129,7 +129,7 @@ message Object {
     UNKNOWN = 0;
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
-    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behaviour.
+    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behavior.
     BICYCLE = 4;  // bike, motor bike.
     VEHICLE = 5;  // passenger car or truck.
     VIRTUAL = 6; // virtual object created by decision module.

@@ -90,7 +90,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         // Publish monitor message.
         if (succeed) {
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Routing Request Sent");
+                                                   "Routing request Sent");
         } else {
           sim_world_service_.PublishMonitorMessage(
               MonitorMessageItem::ERROR, "Failed to send routing request");
