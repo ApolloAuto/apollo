@@ -64,7 +64,8 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/sim_control",
-        "//modules/dreamview/backend/websocket",
+        "//modules/dreamview/backend/handlers:image",
+        "//modules/dreamview/backend/handlers:websocket",
         "@com_google_protobuf//:protobuf",
     ],
 )
