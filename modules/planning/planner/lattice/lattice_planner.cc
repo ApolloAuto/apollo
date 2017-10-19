@@ -17,10 +17,8 @@
 #include "modules/planning/planner/lattice/lattice_planner.h"
 
 #include "modules/planning/lattice/decision_analyzer.h"
-#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/lattice_params.h"
 #include "modules/planning/lattice/reference_line_matcher.h"
-#include "modules/planning/lattice/planning_target.h"
 #include "modules/planning/lattice/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_evaluator.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
@@ -41,6 +39,10 @@ using apollo::common::TrajectoryPoint;
 
 std::size_t num_planning_cycles = 0;
 std::size_t num_planning_succeeded_cycles = 0;
+
+LatticePlanner::LatticePlanner() {
+  
+}
 
 Status LatticePlanner::Init(const PlanningConfig& config) {
   // TODO(all) implement
@@ -73,26 +75,28 @@ Status LatticePlanner::Plan(
       init_d);
 
   //4. parse the decision and get the planning target.
-  DecisionAnalyzer decision_analyzer;
-  auto planning_objective = decision_analyzer.analyze(frame, planning_init_point,
-      init_s, matched_point, discretized_reference_line);
 
-  AINFO << planning_objective.task_name() << "\t";
+  PlanningObject planning_object = decider_.analyze(frame,
+    planning_init_point,
+    init_s,
+    discretized_reference_line);
+
+  AINFO << "    [---Planning_Object---]: "<<planning_object.decision_type();
 
   //5. generate 1d trajectory bundle for longitudinal and lateral respectively.
   Trajectory1dGenerator trajectory1d_generator;
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
-  trajectory1d_generator.GenerateTrajectoryBundles(planning_objective,
+  trajectory1d_generator.GenerateTrajectoryBundles(planning_object,
       init_s, init_d, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
 
   //6. first, evaluate the feasibility of the 1d trajectories according to dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs and sort them according to the cost.
-  TrajectoryEvaluator trajectory_evaluator(planning_objective,
-      lon_trajectory1d_bundle, lat_trajectory1d_bundle);
+  TrajectoryEvaluator trajectory_evaluator(
+    planning_object, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
 
   AINFO << "number of trajectory pairs = "
-            << trajectory_evaluator.num_of_trajectory_pairs() << "\t";
+            << trajectory_evaluator.num_of_trajectory_pairs();
   AINFO << "";
 
   // Get instance of collision checker and constraint checker
