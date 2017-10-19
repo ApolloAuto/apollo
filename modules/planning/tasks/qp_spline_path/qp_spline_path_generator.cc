@@ -159,13 +159,18 @@ bool QpSplinePathGenerator::Generate(
         ref_point.heading(), ref_point.kappa(), l, dl);
     double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
+
     common::PathPoint path_point = common::util::MakePathPoint(
         curr_xy_point.x(), curr_xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
-    if (path_points.size() != 0) {
+    if (!path_points.empty()) {
       double distance =
           common::util::DistanceXY(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
+      if (distance > 1e-4) {
+        path_point.set_dkappa((kappa - path_points.back().dkappa()) / distance);
+      }
     }
+
     if (path_point.s() > end_s) {
       break;
     }
@@ -257,6 +262,17 @@ bool QpSplinePathGenerator::AddConstraint(
   if (!spline_constraint->AddSecondDerivativeBoundary(
           evaluated_s_, kappa_lower_bound, kappa_upper_bound)) {
     AERROR << "Fail to add second derivative boundary.";
+    return false;
+  }
+
+  // dkappa = d(kappa) / ds <= d3y/dx3
+  std::vector<double> dkappa_lower_bound(evaluated_s_.size(),
+                                         -FLAGS_dkappa_bound);
+  std::vector<double> dkappa_upper_bound(evaluated_s_.size(),
+                                         FLAGS_dkappa_bound);
+  if (!spline_constraint->AddThirdDerivativeBoundary(
+          evaluated_s_, dkappa_lower_bound, dkappa_upper_bound)) {
+    AERROR << "Fail to add third derivative boundary.";
     return false;
   }
 
