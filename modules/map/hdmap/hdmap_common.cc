@@ -417,14 +417,16 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       if (map_instance.GetJunctionById(object_map_id) != nullptr) {
         junctions_.emplace_back(overlap_ptr);
       }
-
-      // TODO(all): support parking and speed bump
+      if (map_instance.GetClearAreaById(object_map_id) != nullptr) {
+        clear_areas_.emplace_back(overlap_ptr);
+      }
+      if (map_instance.GetSpeedBumpById(object_map_id) != nullptr) {
+        speed_bumps_.emplace_back(overlap_ptr);
+      }
+      // TODO(all): support parking
       /*
       if (map_instance.get_parking_space_by_id(object_map_id) != nullptr) {
         parking_spaces_.emplace_back(overlap_ptr);
-      }
-      if (map_instance.get_speed_bump_by_id(object_map_id) != nullptr) {
-        speed_bumps_.emplace_back(overlap_ptr);
       }
       */
     }
@@ -501,6 +503,28 @@ void YieldSignInfo::Init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   // segments_from_curve(yield_sign_.stop_line(), &segments_);
+  CHECK(!segments_.empty());
+}
+
+ClearAreaInfo::ClearAreaInfo(const ClearArea &clear_area)
+    : clear_area_(clear_area) {
+  Init();
+}
+
+void ClearAreaInfo::Init() {
+  polygon_ = ConvertToPolygon2d(clear_area_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
+}
+
+SpeedBumpInfo::SpeedBumpInfo(const SpeedBump &speed_bump)
+    : speed_bump_(speed_bump) {
+  Init();
+}
+
+void SpeedBumpInfo::Init() {
+  for (const auto &stop_line : speed_bump_.position()) {
+    SegmentsFromCurve(stop_line, &segments_);
+  }
   CHECK(!segments_.empty());
 }
 
