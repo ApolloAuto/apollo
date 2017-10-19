@@ -40,9 +40,10 @@ DECLARE_double(replan_distance_threshold);
 // parameter for reference line
 DECLARE_bool(enable_reference_line_provider_thread);
 DECLARE_double(default_reference_line_width);
-DECLARE_double(planning_upper_speed_limit);
+DECLARE_double(smoothed_reference_line_max_diff);
 
 // parameters for trajectory planning
+DECLARE_double(planning_upper_speed_limit);
 DECLARE_double(trajectory_time_length);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(output_trajectory_time_resolution);

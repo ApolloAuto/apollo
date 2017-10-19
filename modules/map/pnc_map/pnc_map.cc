@@ -66,7 +66,8 @@ void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
 
 bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                        const LaneWaypoint &waypoint) {
-  return lane_segment.id() == waypoint.lane->id().id() &&
+  return waypoint.lane != nullptr &&
+         lane_segment.id() == waypoint.lane->id().id() &&
          lane_segment.start_s() - kSegmentationEpsilon <= waypoint.s &&
          lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s;
 }
