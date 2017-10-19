@@ -26,7 +26,8 @@
 #include <queue>
 
 #include "modules/planning/math/curve1d/curve1d.h"
-#include "modules/planning/lattice/planning_target.h"
+#include "modules/planning/proto/lattice_sampling_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -36,7 +37,7 @@ class TrajectoryEvaluator {
 
  public:
   explicit TrajectoryEvaluator(
-      const PlanningTarget& objective,
+      const PlanningObject& objective,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories);
 
@@ -54,7 +55,7 @@ class TrajectoryEvaluator {
 
  private:
   double evaluate(
-      const PlanningTarget& objective,
+      const PlanningObject& objective,
       const std::shared_ptr<Curve1d>& lon_trajectory,
       const std::shared_ptr<Curve1d>& lat_trajectory) const;
 
@@ -67,7 +68,7 @@ class TrajectoryEvaluator {
 
   double compute_lon_trajectory_objective_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory,
-      const PlanningTarget& objective) const;
+      const PlanningObject& objective) const;
 
   struct CostComparator :
       public std::binary_function<const PairCost&, const PairCost&, bool> {

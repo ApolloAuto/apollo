@@ -29,15 +29,20 @@ namespace apollo {
 namespace planning {
 
 void Trajectory1dGenerator::GenerateTrajectoryBundles(
-    const PlanningTarget& planning_target,
+    const PlanningObject& planning_objective,
     const std::array<double, 3>& lon_init_state,
     const std::array<double, 3>& lat_init_state,
     std::vector<std::shared_ptr<Curve1d> >& lon_trajectory_bundle,
     std::vector<std::shared_ptr<Curve1d> >& lat_trajectory_bundle) {
 
-  if (planning_target.task() == PlanningTarget::Task::STOP &&
+  const LatticeSamplingConfig& lattice_sampling_config =
+    planning_objective.lattice_sampling_config();
+  const LonSampleConfig& lon_sample_config = lattice_sampling_config.lon_sample_config();
+  const LatSampleConfig& lat_sample_config = lattice_sampling_config.lat_sample_config();
+
+  if (planning_objective.decision_type() == PlanningObject::STOP &&
       enable_stop_handling == true) {
-    double stop_position = planning_target.stop_target();
+    double stop_position = lon_sample_config.lon_end_condition().s();
     double distance = stop_position - lon_init_state[0];
     double s_dot = lon_init_state[1];
 
@@ -76,40 +81,58 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
 
   // generate the trajectory bundles using polynomial methods.
   GenerateLongitudinalTrajectoryBundle(
-      planning_target, lon_init_state, lon_trajectory_bundle);
+      planning_objective, lon_init_state, lon_trajectory_bundle);
   GenerateLateralTrajectoryBundle(
       lat_init_state, lat_trajectory_bundle);
   return;
 }
-
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
-    const PlanningTarget& planning_target,
-    const std::array<double, 3>& init_state,
-    std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const {
+  const PlanningObject& planning_objective,
+  const std::array<double, 3>& init_state,
+  std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle
+  ) const {
 
-  const auto task = planning_target.task();
-  if (task == PlanningTarget::Task::CRUISE) {
+  const LatticeSamplingConfig& lattice_sampling_config =
+    planning_objective.lattice_sampling_config();
+  const LonSampleConfig& lon_sample_config = lattice_sampling_config.lon_sample_config();
+  const LatSampleConfig& lat_sample_config = lattice_sampling_config.lat_sample_config();
+
+  double s_target = lon_sample_config.lon_end_condition().s();
+  double ds_target = lon_sample_config.lon_end_condition().ds();
+  double dds_target = lon_sample_config.lon_end_condition().dds();
+
+  if (s_target <= std::numeric_limits<double>::epsilon()) {
+    // Quartic
+    // To Be Uniformly Replaced By LatticeSampleConfig
     GenerateSpeedProfilesForCruising(
-        init_state, planning_target.cruise_target(), lon_trajectory_bundle);
-  } else if (task == PlanningTarget::Task::FOLLOW) {
-    GenerateSpeedProfilesForFollowing(init_state,
-        planning_target.follow_target()[0],
-        planning_target.follow_target()[1],
-        planning_target.follow_target()[2],
-        lon_trajectory_bundle);
+        init_state, lon_sample_config, lon_trajectory_bundle);
+  } else if (planning_objective.decision_type() == PlanningObject::GO) {
+    GenerateSpeedProfilesForFollowing(
+        init_state, lon_sample_config, lon_trajectory_bundle);
   } else {
-    CHECK(task == PlanningTarget::Task::STOP);
+    CHECK(planning_objective.decision_type() == PlanningObject::STOP);
     GenerateSpeedProfilesForStopping(
-        init_state, planning_target.stop_target(), lon_trajectory_bundle);
-    GenerateSpeedProfilesForCruising(init_state,
-        planning_target.cruise_target(), lon_trajectory_bundle);
+      init_state,
+      lon_sample_config,
+      lon_trajectory_bundle);
+    GenerateSpeedProfilesForCruising(
+      init_state,
+      lon_sample_config,
+      lon_trajectory_bundle);
   }
+  return;
 }
 
 void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     const std::array<double, 3>& init_state,
-    const double cruise_speed,
+    const LonSampleConfig& lon_sample_config,
     std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const {
+
+  double s_target = lon_sample_config.lon_end_condition().s();
+  double ds_target = lon_sample_config.lon_end_condition().ds();
+  double dds_target = lon_sample_config.lon_end_condition().dds();
+
+  double cruise_speed = ds_target;
 
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions;
   end_condition_sampler_.SampleLonEndConditionsForCruising(
@@ -131,14 +154,15 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
 
 void Trajectory1dGenerator::GenerateSpeedProfilesForFollowing(
     const std::array<double, 3>& init_state,
-    const double target_position,
-    const double target_velocity,
-    const double target_time,
+    const LonSampleConfig& lon_sample_config,
     std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const {
+
+  double target_position = lon_sample_config.lon_end_condition().s();
+  double target_velocity = lon_sample_config.lon_end_condition().ds();
 
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions;
   end_condition_sampler_.SampleLonEndConditionsForFollowing(init_state,
-      target_position, target_velocity, target_time, end_conditions);
+      target_position, target_velocity, end_conditions);
 
   for (const auto& end_condition : end_conditions) {
     std::shared_ptr<Curve1d> ptr_lon_trajectory =
@@ -151,9 +175,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForFollowing(
 
 void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
     const std::array<double, 3>& init_state,
-    const double stop_position,
+    const LonSampleConfig& lon_sample_config,
     std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const {
-
+  double stop_position = lon_sample_config.lon_end_condition().s();
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions;
   end_condition_sampler_.SampleLonEndConditionsForStopping(
       init_state, stop_position, end_conditions);
