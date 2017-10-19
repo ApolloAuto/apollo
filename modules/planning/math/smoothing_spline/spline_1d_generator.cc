@@ -80,12 +80,6 @@ bool Spline1dGenerator::Solve() {
     return false;
   }
 
-  auto eigen_values = kernel_matrix.eigenvalues();
-  ADEBUG << "eigenvalues of kernel_matrix:\n" << eigen_values << std::endl;
-  for (int i = 0; i < eigen_values.rows(); ++i) {
-    DCHECK_GT(eigen_values[i].real(), 0.0);
-  }
-
   int num_param = kernel_matrix.rows();
   int num_constraint =
       equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
@@ -194,7 +188,8 @@ bool Spline1dGenerator::Solve() {
       AERROR << "qpOASES solver failed due to reached max iteration";
     } else {
       AERROR << "qpOASES solver failed due to infeasibility or other internal "
-                "reasons:" << ret;
+                "reasons:"
+             << ret;
     }
     return false;
   }
