@@ -24,7 +24,7 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/lattice/planning_target.h"
+#include "modules/planning/proto/lattice_sampling_config.pb.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/end_condition_sampler.h"
 
@@ -38,7 +38,7 @@ class Trajectory1dGenerator {
   virtual ~Trajectory1dGenerator() = default;
 
   void GenerateTrajectoryBundles(
-      const PlanningTarget& planning_target,
+      const PlanningObject& planning_objective,
       const std::array<double, 3>& lon_init_state,
       const std::array<double, 3>& lat_init_state,
       std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle,
@@ -46,25 +46,23 @@ class Trajectory1dGenerator {
 
  private:
   void GenerateLongitudinalTrajectoryBundle(
-      const PlanningTarget& planning_target,
+      const PlanningObject& planning_objective,
       const std::array<double, 3>& lon_init_state,
       std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForCruising(
       const std::array<double, 3>& lon_init_state,
-      const double cruise_speed,
+      const LonSampleConfig& lon_sample_config,
       std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForFollowing(
       const std::array<double, 3>& lon_init_state,
-      const double target_position,
-      const double target_velocity,
-      const double target_time,
+      const LonSampleConfig& lon_sample_config,
       std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForStopping(
       const std::array<double, 3>& lon_init_state,
-      const double stop_position,
+      const LonSampleConfig& lon_sample_config,
       std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
 
   void GenerateLateralTrajectoryBundle(

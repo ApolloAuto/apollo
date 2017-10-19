@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 
 #include "modules/planning/common/frame.h"
+#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -28,7 +29,7 @@ namespace planning {
 
 class LatticePlanner : public Planner {
  public:
-  LatticePlanner() = default;
+  LatticePlanner();
 
   virtual ~LatticePlanner() = default;
 
@@ -47,6 +48,8 @@ class LatticePlanner : public Planner {
           const Curve1d& lon_trajectory,
           const Curve1d& lat_trajectory,
           const double init_relative_time = 0.0) const;
+
+  BehaviorDecider decider_;
 };
 
 }  // namespace planning
