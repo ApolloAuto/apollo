@@ -191,14 +191,6 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
       return false;
     }
 
-    const double kDkappaThreshold = 0.1;
-    if (point.path_point().dkappa() > kDkappaThreshold ||
-        point.path_point().dkappa() < -kDkappaThreshold) {
-      AERROR << "Invalid trajectory point because dkappa out of range: "
-             << point.DebugString();
-      return false;
-    }
-
     if (i > 0) {
       const double kPathSEpsilon = 1e-3;
       const auto& last_point = trajectory.trajectory_point(i - 1);

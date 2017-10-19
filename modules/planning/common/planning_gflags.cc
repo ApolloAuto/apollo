@@ -100,7 +100,9 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
 
-DEFINE_double(kappa_bound, 1.00, "The bound for vehicle curvature");
+DEFINE_double(kappa_bound, 0.25, "The bound for vehicle curvature");
+DEFINE_double(dkappa_bound, 0.10,
+              "The bound for vehicle curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");

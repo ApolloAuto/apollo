@@ -93,7 +93,11 @@ bool Spline2dSolver::Solve() {
     sqp_solver_.reset(new ::qpOASES::SQProblem(num_param, num_constraint,
                                                ::qpOASES::HST_SEMIDEF));
     ::qpOASES::Options my_options;
-    my_options.setToReliable();
+    my_options.enableCholeskyRefactorisation = 1;
+    my_options.enableRegularisation = ::qpOASES::BT_TRUE;
+    my_options.epsNum = FLAGS_default_active_set_eps_num;
+    my_options.epsDen = FLAGS_default_active_set_eps_den;
+    my_options.epsIterRef = FLAGS_default_active_set_eps_iter_ref;
     sqp_solver_->setOptions(my_options);
     if (!FLAGS_default_enable_active_set_debug_info) {
       sqp_solver_->setPrintLevel(qpOASES::PL_NONE);
