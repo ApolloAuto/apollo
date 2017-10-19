@@ -60,6 +60,8 @@ Status Dreamview::Init() {
       << "RoutingRequestAdapter is not initialized.";
   CHECK(AdapterManager::GetRoutingResponse())
       << "RoutingResponseAdapter is not initialized.";
+  CHECK(AdapterManager::GetCompressedImage())
+      << "CompressedImageAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
@@ -75,6 +77,7 @@ Status Dreamview::Init() {
   }
   server_.reset(new CivetServer(options));
 
+  image_.reset(new ImageHandler());
   websocket_.reset(new WebSocketHandler());
   map_service_.reset(new MapService(BaseMapFile(), SimMapFile()));
   sim_control_.reset(new SimControl(map_service_.get()));
@@ -84,6 +87,7 @@ Status Dreamview::Init() {
                                  map_service_.get(), FLAGS_routing_from_file));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
+  server_->addHandler("/image", *image_);
 
   return Status::OK();
 }

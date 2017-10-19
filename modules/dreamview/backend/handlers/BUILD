@@ -19,6 +19,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "image",
+    srcs = [
+        "image.cc",
+    ],
+    hdrs = [
+        "image.h",
+    ],
+    deps = [
+        "//modules/common/adapters:adapter_manager",
+        "@civetweb//:civetweb++",
+        "@opencv2//:highgui",
+    ],
+)
+
 cc_test(
     name = "websocket_test",
     size = "small",

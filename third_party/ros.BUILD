@@ -21,6 +21,7 @@ cc_library(
         "lib/libtf2.so",
         "lib/libtf2_ros.so",
         "lib/libxmlrpcpp.so",
+        "lib/libcv_bridge.so",
     ],
     hdrs = glob([
         "include/*/*.h",
