@@ -110,7 +110,7 @@ void SimControl::Start() {
     AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
                                                this);
 
-    // Start timer to publish localiztion and chassis messages.
+    // Start timer to publish localization and chassis messages.
     sim_control_timer_ = AdapterManager::CreateTimer(
         ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
 
@@ -182,7 +182,7 @@ void SimControl::TimerCallback(const ros::TimerEvent& event) {
       prev_point_ = current_trajectory_.trajectory_point(prev_point_index_);
 
       // Calculate the ratio based on the the position of current time in
-      // between the previous point and the next point, where lamda =
+      // between the previous point and the next point, where lambda =
       // (current_point - prev_point) / (next_point - prev_point).
       if (next_point_index_ != prev_point_index_) {
         lambda = (current_time - timestamp - prev_point_.relative_time()) /

@@ -46,7 +46,7 @@ Status Dreamview::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   VehicleConfigHelper::Init();
 
-  // Check the expected adapters are intialized.
+  // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
   CHECK(AdapterManager::GetPlanning()) << "PlanningAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
