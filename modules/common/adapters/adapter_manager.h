@@ -207,6 +207,7 @@ class AdapterManager {
   REGISTER_ADAPTER(HMICommand);
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
+  REGISTER_ADAPTER(CompressedImage);
 
   DECLARE_SINGLETON(AdapterManager);
 };

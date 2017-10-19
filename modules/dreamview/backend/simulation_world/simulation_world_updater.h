@@ -30,7 +30,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
-#include "modules/dreamview/backend/websocket/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket.h"
 
 /**
  * @namespace apollo::dreamview
