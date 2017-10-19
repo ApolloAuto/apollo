@@ -640,8 +640,31 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 }
 
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
-  auto planning_data = world_.mutable_planning_data();
-  planning_data->CopyFrom(data);
+  auto *planning_data = world_.mutable_planning_data();
+
+  planning_data->mutable_speed_plan()->CopyFrom(data.speed_plan());
+  planning_data->mutable_st_graph()->CopyFrom(data.st_graph());
+  planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
+
+  planning_data->clear_path();
+  for (const ::apollo::common::Path &path : data.path()) {
+    // Downsample the path points for frontend display.
+    // Angle threshold is about 5.72 degree.
+    constexpr double angle_threshold = 0.1;
+    std::vector<int> sampled_indices =
+        DownsampleByAngle(path.path_point(), angle_threshold);
+
+    auto *downsampled_path = planning_data->add_path();
+    downsampled_path->set_name(path.name());
+    for (int index : sampled_indices) {
+      const auto &path_point = path.path_point()[index];
+      auto *point = downsampled_path->add_path_point();
+      point->set_x(path_point.x());
+      point->set_y(path_point.y());
+      point->set_s(path_point.s());
+      point->set_kappa(path_point.kappa());
+    }
+  }
 }
 
 template <>
