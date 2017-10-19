@@ -101,11 +101,12 @@ bool QpSplinePathGenerator::Generate(
 
   AddKernel();
 
-  if (!Solve()) {
-    AERROR << "Fail to solve the qp problem.";
-    return false;
-  }
+  bool is_solved = Solve();
 
+  if (!is_solved) {
+    AERROR << "Fail to solve qp_spline_path. Use reference line as qp_path "
+              "output.";
+  }
   ADEBUG << common::util::StrCat("Spline dl:", init_frenet_point_.dl(),
                                  ", ddl:", init_frenet_point_.ddl());
 
@@ -113,7 +114,10 @@ bool QpSplinePathGenerator::Generate(
   const Spline1d& spline = spline_generator_->spline();
   std::vector<common::PathPoint> path_points;
 
-  double start_l = spline(init_frenet_point_.s());
+  double start_l = 0.0;
+  if (is_solved) {
+    start_l = spline(init_frenet_point_.s());
+  }
   ReferencePoint ref_point =
       reference_line_.GetReferencePoint(init_frenet_point_.s());
   Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
@@ -127,7 +131,10 @@ bool QpSplinePathGenerator::Generate(
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
   constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
   while (s + kEpsilon < end_s) {
-    double l = spline(s);
+    double l = 0.0;
+    if (is_solved) {
+      l = spline(s);
+    }
     if (planning_debug_ &&
         planning_debug_->planning_data().sl_frame().size() >= 1) {
       auto sl_point = planning_debug_->mutable_planning_data()
@@ -137,8 +144,12 @@ bool QpSplinePathGenerator::Generate(
       sl_point->set_l(l);
       sl_point->set_s(s);
     }
-    double dl = spline.Derivative(s);
-    double ddl = spline.SecondOrderDerivative(s);
+    double dl = 0.0;
+    double ddl = 0.0;
+    if (is_solved) {
+      dl = spline.Derivative(s);
+      ddl = spline.SecondOrderDerivative(s);
+    }
     ReferencePoint ref_point = reference_line_.GetReferencePoint(s);
     Vec2d curr_xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
         ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), l);
