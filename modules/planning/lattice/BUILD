@@ -82,7 +82,6 @@ cc_library(
     deps = [
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice:planning_target",
         "//modules/planning/lattice:lattice_params",
     ],
 )
@@ -105,6 +104,7 @@ cc_library(
         "//modules/planning/lattice:planning_target",
         "//modules/planning/lattice:lattice_params",
         "//modules/planning/lattice:lattice_constraint_checker",
+        "//modules/planning/proto:lattice_sampling_config_proto",
     ],
 )
 

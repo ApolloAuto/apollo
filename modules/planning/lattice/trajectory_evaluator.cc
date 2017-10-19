@@ -30,7 +30,7 @@ namespace apollo {
 namespace planning {
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const PlanningTarget& objective,
+    const PlanningObject& objective,
     const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories) {
   for (std::size_t i = 0; i < lon_trajectories.size(); ++i) {
@@ -77,7 +77,7 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
 }
 
 double TrajectoryEvaluator::evaluate(
-    const PlanningTarget& objective,
+    const PlanningObject& objective,
     const std::shared_ptr<Curve1d>& lon_trajectory,
     const std::shared_ptr<Curve1d>& lat_trajectory) const {
   // currently consider three costs:
