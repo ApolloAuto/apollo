@@ -214,15 +214,13 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
 }
 
 bool SimulationWorldUpdater::LoadDefaultEndPoint() {
-  bool ret =
-      default_end_point_.has_id()
-          ? true
-          : GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_);
-
-  if (!ret) {
-    AWARN << "Failed to load default end point from " << EndWayPointFile();
+  if (default_end_point_.has_id() ||
+      GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
+    return true;
   }
-  return ret;
+
+  AWARN << "Failed to load default end point from " << EndWayPointFile();
+  return false;
 }
 
 }  // namespace dreamview
