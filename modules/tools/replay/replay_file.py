@@ -33,23 +33,18 @@ from modules.planning.proto import planning_pb2
 from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
 
+topic_msg_dict = {
+    "/apollo/planning": planning_pb2.ADCTrajectory,
+    "/apollo/prediction": prediction_obstacle_pb2.PredictionObstacles,
+    "/apollo/perception": perception_obstacle_pb2.PerceptionObstacles,
+    "/apollo/routing_response": routing_pb2.RoutingResponse,
+    "/apollo/routing_request": routing_pb2.RoutingRequest,
+}
 
-def generate_message(topic, filename):
+
+def generate_message(msg_type, filename):
     """generate message from file"""
-    message = None
-    if topic == "/apollo/planning":
-        message = planning_pb2.ADCTrajectory()
-    elif topic == "/apollo/localization/pose":
-        message = localization_pb2.LocalizationEstimate()
-    elif topic == "/apollo/perception/obstacles":
-        message = perception_obstacle_pb2.PerceptionObstacles()
-    elif topic == "/apollo/prediction":
-        message = prediction_obstacle_pb2.PredictionObstacles()
-    elif topic == "/apollo/routing_response":
-        message = routing_pb2.RoutingResponse()
-    if not message:
-        print "Unknown topic:", topic
-        sys.exit(0)
+    message = msg_type()
     if not os.path.exists(filename):
         return None
     f_handle = file(filename, 'r')
@@ -61,11 +56,15 @@ def generate_message(topic, filename):
 def topic_publisher(topic, filename, period):
     """publisher"""
     rospy.init_node('replay_node', anonymous=True)
-    pub = rospy.Publisher(topic, String, queue_size=1)
+    if topic not in topic_msg_dict:
+        print "Unknown topic:", topic
+        sys.exit(0)
+    msg_type = topic_msg_dict[topic]
+    pub = rospy.Publisher(topic, msg_type, queue_size=1)
     rate = rospy.Rate(int(1.0 / period))
-    message = generate_message(topic, filename)
+    message = generate_message(msg_type, filename)
     while not rospy.is_shutdown():
-        pub.publish(str(message))
+        pub.publish(message)
         rate.sleep()
 
 
