@@ -26,7 +26,6 @@
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/lattice/planning_target.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_sampling_config.pb.h"
@@ -44,6 +43,11 @@ public:
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     std::vector<ReferenceLine>& candidate_reference_lines);
+
+  PlanningObject analyze(Frame* frame,
+    const common::TrajectoryPoint& init_planning_point,
+    const std::array<double, 3>& lon_init_state,
+    const std::vector<common::PathPoint>& discretized_reference_line);
 
 private:
   PlanningObject previous_planning_target;

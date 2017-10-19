@@ -24,8 +24,6 @@
 #include <vector>
 #include <array>
 
-#include "modules/planning/lattice/planning_target.h"
-
 namespace apollo {
 namespace planning {
 
@@ -45,8 +43,8 @@ class EndConditionSampler {
       std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions) const;
 
   void SampleLonEndConditionsForFollowing(const std::array<double, 3>& init_s,
-      const double ref_target_position, const double ref_target_speed,
-      const double ref_target_time,
+      const double ref_target_position,
+      const double ref_target_speed,
       std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions) const;
 
   void SampleLonEndConditionsForStopping(const std::array<double, 3>& init_s,

@@ -82,7 +82,6 @@ void EndConditionSampler::SampleLonEndConditionsForFollowing(
     const std::array<double, 3>& init_s,
     const double obstacle_position,
     const double obstacle_velocity,
-    const double ref_time,
     std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions)
 const {
 

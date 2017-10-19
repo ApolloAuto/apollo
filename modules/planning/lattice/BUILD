@@ -82,7 +82,6 @@ cc_library(
     deps = [
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice:planning_target",
         "//modules/planning/lattice:lattice_params",
     ],
 )
@@ -99,9 +98,9 @@ cc_library(
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d:curve1d",
-        "//modules/planning/lattice:planning_target",
         "//modules/planning/lattice:lattice_params",
         "//modules/planning/lattice:lattice_constraint_checker",
+        "//modules/planning/proto:lattice_sampling_config_proto",
     ],
 )
 
@@ -122,6 +121,7 @@ cc_library(
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/lattice:end_condition_sampler",
+        "//modules/planning/proto:lattice_sampling_config_proto",
     ],
 )
 

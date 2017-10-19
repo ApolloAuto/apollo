@@ -26,13 +26,15 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/lattice_util.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
 
 namespace apollo{
 namespace planning {
 
-PlanningObject analyze(Frame* frame,
+BehaviorDecider::BehaviorDecider() {
+}
+
+PlanningObject BehaviorDecider::analyze(Frame* frame,
   const common::TrajectoryPoint& init_planning_point,
   const std::array<double, 3>& lon_init_state,
   std::vector<ReferenceLine>& candidate_reference_lines) {
@@ -60,6 +62,31 @@ PlanningObject analyze(Frame* frame,
   ret.set_decision_type(PlanningObject::GO);
   return ret;
 }
+
+PlanningObject BehaviorDecider::analyze(Frame* frame,
+  const common::TrajectoryPoint& init_planning_point,
+  const std::array<double, 3>& lon_init_state,
+  const std::vector<common::PathPoint>& discretized_reference_line) {
+  PlanningObject ret;
+  CHECK(frame != nullptr);
+  // Only handles one reference line
+  CHECK(discretized_reference_line.size() > 0);
+
+  for (size_t i = 0; i < discretized_reference_line.size(); ++i) {
+    ret.mutable_discretized_reference_line()->add_discretized_reference_line_point()->CopyFrom(
+      discretized_reference_line[i]);
+  }
+
+  LatticeSamplingConfig* lattice_sampling_config = ret.mutable_lattice_sampling_config();
+  LonSampleConfig* lon_sample_config = lattice_sampling_config->mutable_lon_sample_config();
+  LatSampleConfig* lat_sample_config = lattice_sampling_config->mutable_lat_sample_config();
+  //lon_sample_config->mutable_lon_end_condition()->set_s(0.0);
+  lon_sample_config->mutable_lon_end_condition()->set_ds(FLAGS_default_cruise_speed);
+  lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
+  ret.set_decision_type(PlanningObject::GO);
+  return ret;
+}
+
 
 } // namespace planning
 } // namespace apollo
