@@ -119,11 +119,14 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     const common::PointENU &position) {
   std::vector<hdmap::RouteSegments> route_segments;
 
+  const auto &adc_speed = common::VehicleState::instance()->linear_velocity();
+  double look_forward_distance = std::max(
+      FLAGS_look_forward_min_distance, adc_speed * FLAGS_look_forward_time_sec);
   // additional smooth reference line length, unit: meter
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
     if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
-                                    FLAGS_look_forward_distance,
+                                    look_forward_distance,
                                     &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;

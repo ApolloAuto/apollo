@@ -27,6 +27,9 @@ DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(rtk_trajectory_resolution);
 DECLARE_double(look_backward_distance);
 DECLARE_double(look_forward_distance);
+DECLARE_double(look_forward_min_distance);
+DECLARE_double(look_forward_time_sec);
+
 DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);

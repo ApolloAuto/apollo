@@ -40,6 +40,14 @@ DEFINE_double(
 DEFINE_double(
     look_forward_distance, 250,
     "look forward this distance when creating reference line from routing");
+
+DEFINE_double(look_forward_min_distance, 100,
+              "minimal look forward this distance when creating reference line "
+              "from routing");
+DEFINE_double(look_forward_time_sec, 8,
+              "look forward time times adc speed to calculate this distance "
+              "when creating reference line from routing");
+
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
