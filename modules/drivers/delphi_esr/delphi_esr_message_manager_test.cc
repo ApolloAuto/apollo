@@ -21,8 +21,8 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
 
 namespace apollo {
 namespace drivers {

@@ -21,8 +21,8 @@
 #ifndef MODULES_DRIVERS_DELPHI_ESR_DELPHI_ESR_MESSAGE_MANAGER_H_
 #define MODULES_DRIVERS_DELPHI_ESR_DELPHI_ESR_MESSAGE_MANAGER_H_
 
-#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
@@ -84,9 +84,8 @@ MessageManager<DelphiESR>::MessageManager() {
 }
 
 template <>
-ProtocolData<DelphiESR>
-    *MessageManager<DelphiESR>::GetMutableProtocolDataById(
-        const uint32_t message_id) {
+ProtocolData<DelphiESR> *MessageManager<DelphiESR>::GetMutableProtocolDataById(
+    const uint32_t message_id) {
   uint32_t converted_message_id = message_id;
   if (message_id >= 0x500 && message_id <= 0x539) {
     // repeated obstacle info
@@ -104,8 +103,7 @@ ProtocolData<DelphiESR>
 
 template <>
 void MessageManager<DelphiESR>::Parse(const uint32_t message_id,
-                                            const uint8_t *data,
-                                            int32_t length) {
+                                      const uint8_t *data, int32_t length) {
   ProtocolData<DelphiESR> *sensor_protocol_data =
       GetMutableProtocolDataById(message_id);
   if (sensor_protocol_data == nullptr) {

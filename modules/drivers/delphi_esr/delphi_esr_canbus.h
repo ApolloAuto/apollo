@@ -21,9 +21,9 @@
 #ifndef MODULES_DRIVERS_DELPHI_ESR_DELPHI_ESR_CANBUS_H_
 #define MODULES_DRIVERS_DELPHI_ESR_DELPHI_ESR_CANBUS_H_
 
+#include "modules/drivers/canbus/sensor_canbus.h"
 #include "modules/drivers/delphi_esr/delphi_esr_message_manager.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
-#include "modules/drivers/canbus/sensor_canbus.h"
 
 /**
  * @namespace apollo::drivers
