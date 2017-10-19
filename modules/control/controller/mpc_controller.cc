@@ -293,11 +293,13 @@ Status MPCController::ComputeControlCommand(
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
   if (::apollo::common::math::SolveLinearMPC(
-      matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound, upper_bound,
-      initial_state, reference, lqr_eps_, lqr_max_iteration_, &control) != true) {
-      AERROR << "MPC failed";
-      }
+          matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound,
+          upper_bound, initial_state, reference, lqr_eps_, lqr_max_iteration_,
+          &control) != true) {
+    AERROR << "MPC failed";
+  }
 
+  // TODO: Add spline smoothing after the result
   double steer_angle_feedback = -control[0](1, 0);
   double steer_angle_feedforward =
       ComputeLateralFeedForward(debug->curvature());
@@ -360,7 +362,6 @@ Status MPCController::ComputeControlCommand(
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
-
 
   // compute extra information for logging and debugging
   double steer_angle_lateral_contribution =
