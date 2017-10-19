@@ -27,5 +27,5 @@ DEFINE_string(adapter_config_filename, "modules/routing/conf/adapter.conf",
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 DEFINE_double(min_length_for_lane_change, 10.0,
               "min length for lane change, in creater, in meter");
-DEFINE_bool(enable_change_lane_in_result, false,
+DEFINE_bool(enable_change_lane_in_result, true,
             "contain change lane operator in result");
