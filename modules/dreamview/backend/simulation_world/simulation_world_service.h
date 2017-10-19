@@ -60,7 +60,7 @@ class SimulationWorldService {
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
-   * @param routing_from_file whether to read intial routing from file.
+   * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldService(const MapService *map_service,
                          bool routing_from_file = false);
@@ -82,7 +82,7 @@ class SimulationWorldService {
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
-   * within the given radious from the car.
+   * within the given radius from the car.
    * @param radius the search distance from the current car location
    * @return Json object that contains mapElementIds and mapHash.
    */
@@ -144,7 +144,7 @@ class SimulationWorldService {
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   /**
-   * @brief Get the latest observed data from the adatper manager to update the
+   * @brief Get the latest observed data from the adapter manager to update the
    * SimulationWorld object when triggered by refresh timer.
    */
   template <typename AdapterType>
