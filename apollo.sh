@@ -112,7 +112,12 @@ function build() {
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
-  echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $@
+  MACHINE_ARCH=$(uname -m)
+  JOB_ARG=""
+  if [ "$MACHINE_ARCH" == 'aarch64' ]; then
+    JOB_ARG="--jobs=3"
+  fi
+  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
