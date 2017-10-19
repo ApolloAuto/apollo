@@ -170,10 +170,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
       uint8_t len = frame.len;
       uint32_t uid = frame.id;
       const uint8_t *data = frame.data;
-      struct timeval timestamp;
-      timestamp.tv_sec = frame.timestamp.tv_sec;
-      timestamp.tv_usec = frame.timestamp.tv_usec;
-      pt_manager_->Parse(uid, data, len, timestamp);
+      pt_manager_->Parse(uid, data, len);
       if (enable_log_) {
         ADEBUG << "recv_can_frame#" << frame.CanFrameString();
       }

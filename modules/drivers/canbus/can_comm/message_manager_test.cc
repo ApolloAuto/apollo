@@ -46,10 +46,9 @@ class MockMessageManager
 };
 
 TEST(MessageManagerTest, GetMutableProtocolDataById) {
-  struct timeval curr_time;
   uint8_t mock_data = 1;
   MockMessageManager manager;
-  manager.Parse(MockProtocolData::ID, &mock_data, 8, curr_time);
+  manager.Parse(MockProtocolData::ID, &mock_data, 8);
   manager.ResetSendMessages();
   EXPECT_TRUE(manager.GetMutableProtocolDataById(MockProtocolData::ID) !=
               nullptr);

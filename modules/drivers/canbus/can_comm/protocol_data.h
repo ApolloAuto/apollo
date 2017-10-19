@@ -83,17 +83,6 @@ class ProtocolData {
                      SensorType *sensor_data) const;
 
   /*
-   * @brief parse received data
-   * @param bytes a pointer to the input bytes
-   * @param length the length of the input bytes
-   * @param timestamp the timestamp of input data
-   * @param sensor_data the parsed sensor_data
-   */
-  virtual void Parse(const uint8_t *bytes, int32_t length,
-                     const struct timeval &timestamp,
-                     SensorType *sensor_data) const;
-
-  /*
    * @brief update the data
    */
   virtual void UpdateData(uint8_t *data);
@@ -151,15 +140,8 @@ int32_t ProtocolData<SensorType>::GetLength() const {
 }
 
 template <typename SensorType>
-void ProtocolData<SensorType>::Parse(const uint8_t * /*bytes*/,
-                                     int32_t /*length*/,
-                                     SensorType * /*sensor_data*/) const {}
-
-template <typename SensorType>
 void ProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
-                                     const struct timeval &timestamp,
                                      SensorType *sensor_data) const {
-  Parse(bytes, length, sensor_data);
 }
 
 template <typename SensorType>
