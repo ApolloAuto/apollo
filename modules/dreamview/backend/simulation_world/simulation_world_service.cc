@@ -524,8 +524,7 @@ void SimulationWorldService::UpdatePlanningTrajectory(
         // Move on to the last point if the last but one is collected.
         i = trajectory_length - 1;
       } else if (i < trajectory_length - 2) {
-        // When collecting the trajectory points, downsample with a
-        // ratio of 10.
+        // When collecting the trajectory points, downsample with a ratio of 10.
         constexpr double downsample_ratio = 10;
         i += downsample_ratio;
         if (i > trajectory_length - 2) {
