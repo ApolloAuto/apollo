@@ -52,9 +52,9 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   };
 
   double x =
-      p0.x() + common::math::IntegrateByGaussLegendre(func_cos_theta, s0, s);
+      p0.x() + common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
   double y =
-      p0.y() + common::math::IntegrateByGaussLegendre(func_sin_theta, s0, s);
+      p0.y() + common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
   double theta = geometry_spline.Evaluate(0, s);
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
@@ -119,8 +119,8 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   auto func_v = [&dynamic_spline](const double t) {
     return dynamic_spline.Evaluate(0, t);
   };
-  double s1 = common::math::IntegrateByGaussLegendre(func_v, t0, t1);
-  double s = common::math::IntegrateByGaussLegendre(func_v, t0, t);
+  double s1 = common::math::IntegrateByGaussLegendre<5>(func_v, t0, t1);
+  double s = common::math::IntegrateByGaussLegendre<5>(func_v, t0, t);
 
   if (std::abs(tp0.path_point().s() - s1) < 1.0e-4) {
     return tp1;
@@ -141,10 +141,10 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
     return std::sin(theta);
   };
 
-  double x =
-      pp0.x() + common::math::IntegrateByGaussLegendre(func_cos_theta, s0, s);
-  double y =
-      pp0.y() + common::math::IntegrateByGaussLegendre(func_sin_theta, s0, s);
+  double x = pp0.x() +
+      common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
+  double y = pp0.y() +
+      common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
   double theta = geometry_spline.Evaluate(0, s);
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
