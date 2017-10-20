@@ -18,12 +18,14 @@
 
 #include "modules/planning/lattice/lattice_util.h"
 
+#include <utility>
+#include <vector>
+
 namespace apollo {
 namespace planning {
 
 std::vector<common::PathPoint> ToDiscretizedReferenceLine(
     const std::vector<ReferencePoint>& ref_points) {
-
   double s = 0.0;
   std::vector<common::PathPoint> path_points;
   for (const auto& ref_point : ref_points) {

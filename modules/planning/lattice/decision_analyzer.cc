@@ -36,20 +36,19 @@ DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 
 DecisionAnalyzer::DecisionAnalyzer() {}
 
-PlanningTarget DecisionAnalyzer::analyze(Frame* frame,
-  const common::TrajectoryPoint& init_planning_point,
-  const std::array<double, 3>& lon_init_state,
-  const common::PathPoint& matched_reference_line_point,
-  const std::vector<common::PathPoint>& reference_line) {
-
+PlanningTarget DecisionAnalyzer::analyze(
+    Frame* frame, const common::TrajectoryPoint& init_planning_point,
+    const std::array<double, 3>& lon_init_state,
+    const common::PathPoint& matched_reference_line_point,
+    const std::vector<common::PathPoint>& reference_line) {
   PlanningTarget planning_objective;
-  //TODO: currently only support cruising with a fake target speed.
+  // TODO(yajia): currently only support cruising with a fake target speed.
   planning_objective.set_task(PlanningTarget::Task::CRUISE);
 
   // double target_cruise_speed = FLAGS_default_cruise_speed;
-  double target_cruise_speed = AdjustCruiseSpeed(
-      lon_init_state[0], lon_init_state[1],
-      FLAGS_default_cruise_speed, reference_line);
+  double target_cruise_speed =
+      AdjustCruiseSpeed(lon_init_state[0], lon_init_state[1],
+                        FLAGS_default_cruise_speed, reference_line);
   planning_objective.set_cruise_target(target_cruise_speed);
   return planning_objective;
 }
@@ -57,11 +56,11 @@ PlanningTarget DecisionAnalyzer::analyze(Frame* frame,
 double DecisionAnalyzer::AdjustCruiseSpeed(
     double init_s, double init_speed, double init_target_speed,
     const std::vector<common::PathPoint>& reference_line) const {
-  auto comp = [](const common::PathPoint& point, const double s) {
-      return point.s() < s;};
+  auto comp = [](const common::PathPoint& point,
+                 const double s) { return point.s() < s; };
 
-  auto it_lower = std::lower_bound(reference_line.begin(),
-    reference_line.end(), init_s, comp);
+  auto it_lower = std::lower_bound(reference_line.begin(), reference_line.end(),
+                                   init_s, comp);
 
   double target_speed = init_target_speed;
   double s_acc = it_lower->s() - init_s;
@@ -83,5 +82,5 @@ double DecisionAnalyzer::AdjustCruiseSpeed(
   return target_speed;
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo

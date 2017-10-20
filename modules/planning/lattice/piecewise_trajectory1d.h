@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_LATTICE_PIECEWISE_TRAJECTORY1D_H_
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "modules/planning/math/curve1d/curve1d.h"
@@ -35,8 +36,7 @@ class PiecewiseTrajectory1d : public Curve1d {
 
   virtual ~PiecewiseTrajectory1d() = default;
 
-  double Evaluate(const std::uint32_t order,
-                          const double param) const;
+  double Evaluate(const std::uint32_t order, const double param) const;
 
   double param_length() const;
 
@@ -54,7 +54,7 @@ class PiecewiseTrajectory1d : public Curve1d {
   std::vector<double> accumulated_param_lengths_;
 };
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_LATTICE_PIECEWISE_TRAJECTORY1D_H_ */

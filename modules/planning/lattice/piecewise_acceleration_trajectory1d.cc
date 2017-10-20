@@ -31,8 +31,8 @@ ConstantAccelerationTrajectory1d::ConstantAccelerationTrajectory1d(
   a_.push_back(0.0);
 }
 
-void ConstantAccelerationTrajectory1d::AppendSgment(
-    const double a, const double t_duration) {
+void ConstantAccelerationTrajectory1d::AppendSgment(const double a,
+                                                    const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();
   double t0 = t_.back();
@@ -61,7 +61,7 @@ void ConstantAccelerationTrajectory1d::PopSegment() {
 }
 
 double ConstantAccelerationTrajectory1d::param_length() const {
-  CHECK(t_.size() > 1);
+  CHECK_GT(t_.size(), 1);
   return t_.back() - t_.front();
 }
 
@@ -70,12 +70,12 @@ std::string ConstantAccelerationTrajectory1d::to_string() const {
   return "";
 }
 
-double ConstantAccelerationTrajectory1d::Evaluate(
-    const std::uint32_t order, const double param) const {
-  CHECK(t_.size() > 1);
+double ConstantAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
+                                                  const double param) const {
+  CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= param && param <= t_.back());
 
-  switch(order) {
+  switch (order) {
     case 0:
       return Evaluate_s(param);
     case 1:
@@ -130,7 +130,7 @@ double ConstantAccelerationTrajectory1d::Evaluate_j(const double t) const {
 
 std::array<double, 4> ConstantAccelerationTrajectory1d::Evaluate(
     const double t) const {
-  CHECK(t_.size() > 1);
+  CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= t && t <= t_.back());
 
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);

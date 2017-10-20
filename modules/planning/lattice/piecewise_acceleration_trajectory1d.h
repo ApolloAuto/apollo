@@ -58,12 +58,12 @@ class ConstantAccelerationTrajectory1d : public Curve1d {
   double Evaluate_j(const double t) const;
 
  private:
-  //accumulated s
+  // accumulated s
   std::vector<double> s_;
 
   std::vector<double> v_;
 
-  //accumulated t
+  // accumulated t
   std::vector<double> t_;
 
   std::vector<double> a_;

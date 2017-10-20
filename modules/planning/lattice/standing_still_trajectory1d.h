@@ -56,7 +56,7 @@ class StandingStillTrajectory1d : public Curve1d {
   double duration_;
 };
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_LATTICE_STANDING_STILL_TRAJECTORY1D_H_

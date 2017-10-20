@@ -29,8 +29,8 @@ namespace planning {
 
 class ConstantDecelerationTrajectory1d : public Curve1d {
  public:
-  ConstantDecelerationTrajectory1d(
-      const double init_s, const double init_v, const double a);
+  ConstantDecelerationTrajectory1d(const double init_s, const double init_v,
+                                   const double a);
 
   virtual ~ConstantDecelerationTrajectory1d() = default;
 

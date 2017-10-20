@@ -41,38 +41,38 @@ class Trajectory1dGenerator {
       const PlanningObject& planning_objective,
       const std::array<double, 3>& lon_init_state,
       const std::array<double, 3>& lat_init_state,
-      std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle,
-      std::vector<std::shared_ptr<Curve1d>>& lat_trajectory_bundle);
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle);
 
  private:
   void GenerateLongitudinalTrajectoryBundle(
       const PlanningObject& planning_objective,
       const std::array<double, 3>& lon_init_state,
-      std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForCruising(
       const std::array<double, 3>& lon_init_state,
       const LonSampleConfig& lon_sample_config,
-      std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForFollowing(
       const std::array<double, 3>& lon_init_state,
       const LonSampleConfig& lon_sample_config,
-      std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForStopping(
       const std::array<double, 3>& lon_init_state,
       const LonSampleConfig& lon_sample_config,
-      std::vector<std::shared_ptr<Curve1d>>& lon_trajectory_bundle) const;
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateLateralTrajectoryBundle(
       const std::array<double, 3>& lat_init_state,
-      std::vector<std::shared_ptr<Curve1d>>& lat_trajectory_bundle) const;
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const;
 
   EndConditionSampler end_condition_sampler_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_H_
