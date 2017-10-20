@@ -81,11 +81,18 @@ def topic_publisher(topic, filename, period):
         sys.exit(0)
     msg_type = topic_msg_dict[topic]
     pub = rospy.Publisher(topic, msg_type, queue_size=1)
-    rate = rospy.Rate(int(1.0 / period))
     message = generate_message(msg_type, filename)
-    while not rospy.is_shutdown():
-        pub.publish(message)
-        rate.sleep()
+    if period == 0:
+        while not rospy.is_shutdown():
+            raw_input("Press any key to publish one message...")
+            pub.publish(message)
+            print("message published")
+    else:
+        rate = rospy.Rate(int(1.0 / period))
+        print("started to publish message with rate period %s" % period)
+        while not rospy.is_shutdown():
+            pub.publish(message)
+            rate.sleep()
 
 
 if __name__ == '__main__':
@@ -99,11 +106,13 @@ if __name__ == '__main__':
         "--period",
         action="store",
         type=float,
-        default=1,
+        default=0,
         help="set the topic publish time duration")
     args = parser.parse_args()
+    period = 0  # use step by step mode
+    if args.period:  # play with a given period, (1.0 / frequency)
+        period = args.period
     try:
-        topic_publisher(args.topic, args.filename, args.period)
-
+        topic_publisher(args.topic, args.filename, period)
     except rospy.ROSInterruptException:
         print "failed to replay message"
