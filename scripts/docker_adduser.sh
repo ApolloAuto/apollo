@@ -41,21 +41,4 @@ if [ "$RELEASE_DOCKER" != "1" ];then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
-
-  # setup ros package
-  # this is a tempary solution to avoid ros package downloading.
-  MD5="$(echo -n '/apollo' | md5sum | cut -d' ' -f1)"
-  EXTERNAL="/home/${DOCKER_USER}/.cache/bazel/_bazel_${USER}/${MD5}/external"
-  if [ ! -e "$EXTERNAL" ];then
-    mkdir -p $EXTERNAL
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "${EXTERNAL}"
-  fi
-  ROS="${EXTERNAL}/ros"
-  if [ -e "$ROS" ]; then
-    rm -rf $ROS
-  fi
-  tar xzf "/home/tmp/${ROS_TAR}" -C $EXTERNAL
-  cd $ROS
-  ln -s /apollo/third_party/ros.BUILD BUILD.bazel
-  chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
 fi
