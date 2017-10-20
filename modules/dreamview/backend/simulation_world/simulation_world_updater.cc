@@ -134,6 +134,15 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         sim_world_service_.SetToClear();
         sim_control_->ClearPlanning();
       });
+
+  websocket_->RegisterMessageHandler(
+      "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
+        DumpMessage(AdapterManager::GetChassis(), "Chassis");
+        DumpMessage(AdapterManager::GetPrediction(), "Prediction");
+        DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
+        DumpMessage(AdapterManager::GetLocalization(), "Localization");
+        DumpMessage(AdapterManager::GetPlanning(), "Planning");
+      });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
