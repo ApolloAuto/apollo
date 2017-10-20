@@ -308,13 +308,13 @@ void Path::InitOverlaps() {
   GetAllOverlaps(std::bind(&LaneInfo::stop_signs, _1), &stop_sign_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::crosswalks, _1), &crosswalk_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::junctions, _1), &junction_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::clear_areas, _1), &clear_area_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1), &speed_bump_overlaps_);
 
-  // TODO(all): add support for parking and speed bumps.
+  // TODO(all): add support for parking.
   /*
   GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
                    &parking_space_overlaps_);
-  GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1),
-                   &speed_bump_overlaps_);
   */
 }
 
