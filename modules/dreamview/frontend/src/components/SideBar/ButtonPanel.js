@@ -66,7 +66,7 @@ export default class ButtonPanel extends React.Component {
                 onVideo,
                 onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
-                onMenu, showMenu, resetBackend} = this.props;
+                onMenu, showMenu, resetBackend, dumpMessages} = this.props;
 
         return (
             <div>
@@ -76,6 +76,10 @@ export default class ButtonPanel extends React.Component {
                 <div className="separator" />
                 <SideBarButton label="Reset Backend Data"
                                onClick={resetBackend}
+                               active={false} />
+                <div className="separator" />
+                <SideBarButton label="Dump Messages"
+                               onClick={dumpMessages}
                                active={false} />
                 <div className="separator" />
                 <SideBarButton label="Default Routing"

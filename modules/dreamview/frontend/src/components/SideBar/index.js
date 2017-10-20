@@ -17,6 +17,9 @@ export default class SideBar extends React.Component {
                 <ButtonPanel resetBackend={() => {
                                      WS.resetBackend();
                                  }}
+                             dumpMessages={() => {
+                                     WS.dumpMessages();
+                                 }}
                              sendDefaultRoutingRequest={() => {
                                      routeEditingManager.sendRoutingRequest(true);
                                  }}
