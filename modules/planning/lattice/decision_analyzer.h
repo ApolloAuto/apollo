@@ -21,36 +21,37 @@
 #ifndef MODULES_PLANNING_LATTICE_DECISION_ANALYZER_H
 #define MODULES_PLANNING_LATTICE_DECISION_ANALYZER_H
 
-#include "gflags/gflags.h"
+#include <vector>
 
+#include "gflags/gflags.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/lattice/planning_target.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
-namespace apollo{
+namespace apollo {
 namespace planning {
 
 DECLARE_double(default_cruise_speed);
 
 class DecisionAnalyzer {
-public:
+ public:
   DecisionAnalyzer();
 
   virtual ~DecisionAnalyzer() = default;
 
   PlanningTarget analyze(Frame* frame,
-    const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const common::PathPoint& matched_reference_line_point,
-    const std::vector<common::PathPoint>& reference_line);
+                         const common::TrajectoryPoint& init_planning_point,
+                         const std::array<double, 3>& lon_init_state,
+                         const common::PathPoint& matched_reference_line_point,
+                         const std::vector<common::PathPoint>& reference_line);
 
-private:
-  double AdjustCruiseSpeed(double init_s, double init_speed,
-    double init_target_speed,
-    const std::vector<common::PathPoint>& reference_line) const;
+ private:
+  double AdjustCruiseSpeed(
+      double init_s, double init_speed, double init_target_speed,
+      const std::vector<common::PathPoint>& reference_line) const;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_DECISION_ANALYZER_H */
