@@ -76,11 +76,10 @@ new_http_archive(
 )
 
 #ros
-new_http_archive(
+new_local_repository(
     name = "ros",
     build_file = "third_party/ros.BUILD",
-    strip_prefix = "ros",
-    url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.5.1/ros-indigo-apollo-1.5.1-MACHINE_ARCH.tar.gz",
+    path = "/home/tmp/ros",
 )
 
 # OpenCV 2.4.13.2
