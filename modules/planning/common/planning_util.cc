@@ -141,10 +141,10 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
     return std::sin(theta);
   };
 
-  double x =
-      pp0.x() + common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
-  double y =
-      pp0.y() + common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
+  double x = pp0.x() +
+      common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
+  double y = pp0.y() +
+      common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
   double theta = geometry_spline.Evaluate(0, s);
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
