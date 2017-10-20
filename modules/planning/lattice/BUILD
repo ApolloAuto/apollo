@@ -60,18 +60,6 @@ cc_library(
 )
 
 cc_library(
-    name = "planning_target",
-    hdrs = [
-        "planning_target.h",
-    ],
-    srcs = [
-        "planning_target.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "end_condition_sampler",
     hdrs = [
         "end_condition_sampler.h",
@@ -161,23 +149,6 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common:frame",
-    ],
-)
-
-cc_library(
-    name = "decision_analyzer",
-    srcs = [
-        "decision_analyzer.cc",
-    ],
-    hdrs = [
-        "decision_analyzer.h",
-    ],
-    deps = [
-        "//modules/planning/common:frame",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice:planning_target",
-        "//modules/common/proto:pnc_point_proto",
-        "//external:gflags",
     ],
 )
 
