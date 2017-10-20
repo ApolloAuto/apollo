@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message Command {
+  optional string name = 1;
+
+  // Command components, in [cmd, arg1, arg2, ...] format.
+  // Binary path starting with '/' indicates an absolute path, otherwise it will
+  // be taken as a relative path of the Apollo root.
+  repeated string command = 2;
+}
+
+message Component {
+  optional string name = 1;
+  optional string display_name = 2;
+  repeated Command supported_commands = 3;
+}
+
+message Config {
+  repeated Component modules = 1;
+  repeated Component hardware = 2;
+  repeated Command tools = 3;
+}
