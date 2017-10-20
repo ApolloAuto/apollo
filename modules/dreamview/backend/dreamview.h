@@ -27,7 +27,8 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
-#include "modules/dreamview/backend/websocket/websocket.h"
+#include "modules/dreamview/backend/handlers/image.h"
+#include "modules/dreamview/backend/handlers/websocket.h"
 
 /**
  * @namespace apollo::dreamview
@@ -49,6 +50,7 @@ class Dreamview : public apollo::common::ApolloApp {
   std::unique_ptr<CivetServer> server_;
   std::unique_ptr<SimControl> sim_control_;
   std::unique_ptr<WebSocketHandler> websocket_;
+  std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
 };
 

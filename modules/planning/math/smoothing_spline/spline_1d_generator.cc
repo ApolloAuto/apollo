@@ -80,12 +80,6 @@ bool Spline1dGenerator::Solve() {
     return false;
   }
 
-  auto eigen_values = kernel_matrix.eigenvalues();
-  ADEBUG << "eigenvalues of kernel_matrix:\n" << eigen_values << std::endl;
-  for (int i = 0; i < eigen_values.rows(); ++i) {
-    DCHECK_GT(eigen_values[i].real(), 0.0);
-  }
-
   int num_param = kernel_matrix.rows();
   int num_constraint =
       equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
@@ -103,7 +97,6 @@ bool Spline1dGenerator::Solve() {
     my_options.epsNum = FLAGS_default_active_set_eps_num;
     my_options.epsDen = FLAGS_default_active_set_eps_den;
     my_options.epsIterRef = FLAGS_default_active_set_eps_iter_ref;
-    my_options.terminationTolerance = 1.0e-4;
     sqp_solver_->setOptions(my_options);
     if (!FLAGS_default_enable_active_set_debug_info) {
       sqp_solver_->setPrintLevel(qpOASES::PL_NONE);
@@ -194,7 +187,8 @@ bool Spline1dGenerator::Solve() {
       AERROR << "qpOASES solver failed due to reached max iteration";
     } else {
       AERROR << "qpOASES solver failed due to infeasibility or other internal "
-                "reasons";
+                "reasons:"
+             << ret;
     }
     return false;
   }

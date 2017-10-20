@@ -6,9 +6,12 @@ export default class Options {
     @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showConsole = PARAMETERS.options.defaults.showConsole;
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
-    @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
     @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
     @observable showDecisionObstacle = PARAMETERS.options.defaults.showDecisionObstacle;
+    @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
+    @observable showPlanningReference = PARAMETERS.options.defaults.showPlanningReference;
+    @observable showPlaningDpOptimizer = PARAMETERS.options.defaults.showPlaningDpOptimizer;
+    @observable showPlanningQpOptimizer = PARAMETERS.options.defaults.showPlanningQpOptimizer;
     @observable showRouting = PARAMETERS.options.defaults.showRouting;
     @observable showPredictionMajor = PARAMETERS.options.defaults.showPredictionMajor;
     @observable showPredictionMinor = PARAMETERS.options.defaults.showPredictionMinor;

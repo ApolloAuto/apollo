@@ -36,6 +36,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -69,6 +70,7 @@ using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
+using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 
 }  // namespace adapter
 }  // namespace common

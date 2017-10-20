@@ -6,6 +6,7 @@ message CANCardParameter {
   enum CANCardBrand {
     FAKE_CAN = 0;
     ESD_CAN = 1;
+    SOCKET_CAN_RAW = 2;
   }
 
   enum CANCardType {

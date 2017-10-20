@@ -121,6 +121,7 @@ bool ReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line,
                             rlp.lane_waypoints()),
         kappa, dkappa, 0.0, 0.0));
   }
+
   ReferencePoint::RemoveDuplicates(&ref_points);
   if (ref_points.size() < 2) {
     AERROR << "Fail to generate smoothed reference line.";
@@ -158,6 +159,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
   std::vector<double> evaluated_t;
   common::util::uniform_slice(t_knots_.front(), t_knots_.back(),
                               constraint_num - 1, &evaluated_t);
+
   std::vector<common::PathPoint> path_points;
   if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {
     AERROR << "Extract evaluated points failed";
@@ -166,34 +168,36 @@ bool ReferenceLineSmoother::ApplyConstraint(
 
   // Add x, y boundary constraint
   std::vector<double> headings;
-  std::vector<double> longitidinal_bound;
+  std::vector<double> longitudinal_bound;
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
     headings.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(smoother_config_.boundary_bound());
-    lateral_bound.push_back(smoother_config_.boundary_bound());
+    // TODO(all): change the langitudianl and lateral direction in code
+    longitudinal_bound.push_back(smoother_config_.lateral_boundary_bound());
+    lateral_bound.push_back(smoother_config_.longitudinal_boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
   static constexpr double kFixedBoundLimit = 0.01;
-  if (longitidinal_bound.size() > 0) {
-    longitidinal_bound.front() = kFixedBoundLimit;
-    longitidinal_bound.back() = kFixedBoundLimit;
+  if (longitudinal_bound.size() > 0) {
+    longitudinal_bound.front() = kFixedBoundLimit;
+    longitudinal_bound.back() = kFixedBoundLimit;
   }
 
   if (lateral_bound.size() > 0) {
+    lateral_bound.front() = kFixedBoundLimit;
     lateral_bound.back() = kFixedBoundLimit;
   }
 
   CHECK_EQ(evaluated_t.size(), headings.size());
   CHECK_EQ(evaluated_t.size(), xy_points.size());
-  CHECK_EQ(evaluated_t.size(), longitidinal_bound.size());
+  CHECK_EQ(evaluated_t.size(), longitudinal_bound.size());
   CHECK_EQ(evaluated_t.size(), lateral_bound.size());
 
   auto* spline_constraint = spline_solver_->mutable_constraint();
   if (!spline_constraint->Add2dBoundary(evaluated_t, headings, xy_points,
-                                        longitidinal_bound, lateral_bound)) {
+                                        longitudinal_bound, lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
   }

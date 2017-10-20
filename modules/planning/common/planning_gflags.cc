@@ -40,6 +40,14 @@ DEFINE_double(
 DEFINE_double(
     look_forward_distance, 250,
     "look forward this distance when creating reference line from routing");
+
+DEFINE_double(look_forward_min_distance, 100,
+              "minimal look forward this distance when creating reference line "
+              "from routing");
+DEFINE_double(look_forward_time_sec, 8,
+              "look forward time times adc speed to calculate this distance "
+              "when creating reference line from routing");
+
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
@@ -57,6 +65,10 @@ DEFINE_bool(enable_reference_line_provider_thread, false,
 
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
+
+DEFINE_double(smoothed_reference_line_max_diff, 1.0,
+              "Maximum position difference between the smoothed and the raw "
+              "reference lines.");
 
 DEFINE_double(planning_upper_speed_limit, 31.3,
               "Maximum speed (m/s) in planning.");
@@ -88,7 +100,9 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
 
-DEFINE_double(kappa_bound, 1.00, "The bound for vehicle curvature");
+DEFINE_double(kappa_bound, 0.20, "The bound for vehicle curvature");
+DEFINE_double(dkappa_bound, 0.02,
+              "The bound for vehicle curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
