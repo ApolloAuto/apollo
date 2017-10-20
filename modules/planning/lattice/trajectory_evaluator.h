@@ -39,7 +39,7 @@ class TrajectoryEvaluator {
 
  public:
   explicit TrajectoryEvaluator(
-      const PlanningObject& objective,
+      const PlanningTarget& objective,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories);
 
@@ -69,7 +69,7 @@ class TrajectoryEvaluator {
 
   double compute_lon_trajectory_objective_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory,
-      const PlanningObject& objective) const;
+      const PlanningTarget& objective) const;
 
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {
