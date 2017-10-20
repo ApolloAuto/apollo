@@ -17,7 +17,7 @@ message Component {
   repeated Command supported_commands = 3;
 }
 
-message Config {
+message HMIConfig {
   repeated Component modules = 1;
   repeated Component hardware = 2;
   repeated Command tools = 3;
