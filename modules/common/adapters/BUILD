@@ -80,6 +80,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/monitor/proto:monitor_proto",
         "//modules/control/proto:control_proto",
+        "//modules/dreamview/proto:hmi_status_proto",
         "//modules/drivers/gnss/proto:ins_proto",
         "//modules/hmi/proto:hmi_message_proto",
         "//modules/localization/proto:gps_proto",

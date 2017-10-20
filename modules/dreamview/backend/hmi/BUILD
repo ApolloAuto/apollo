@@ -7,6 +7,7 @@ cc_library(
     srcs = ["hmi_status_helper.cc"],
     hdrs = ["hmi_status_helper.h"],
     deps = [
+        "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/proto:hmi_status_proto",
     ],
 )
