@@ -21,9 +21,11 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_EVALUATOR_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY_EVALUATOR_H_
 
-#include <vector>
+#include <functional>
 #include <memory>
 #include <queue>
+#include <utility>
+#include <vector>
 
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_sampling_config.pb.h"
