@@ -30,12 +30,13 @@ namespace apollo {
 namespace planning {
 
 double PiecewiseTrajectory1d::Evaluate(const std::uint32_t order,
-    const double param) const {
-  auto it_lower = std::lower_bound(
-      accumulated_param_lengths_.begin(), accumulated_param_lengths_.end(), param);
+                                       const double param) const {
+  auto it_lower = std::lower_bound(accumulated_param_lengths_.begin(),
+                                   accumulated_param_lengths_.end(), param);
   CHECK(it_lower != accumulated_param_lengths_.end());
 
-  std::size_t index = (std::size_t)(it_lower - accumulated_param_lengths_.begin());
+  std::size_t index =
+      (std::size_t)(it_lower - accumulated_param_lengths_.begin());
 
   double param_overhead = 0.0;
   if (index != 0) {
@@ -51,13 +52,10 @@ double PiecewiseTrajectory1d::param_length() const {
   return accumulated_param_lengths_.back();
 }
 
-std::string PiecewiseTrajectory1d::to_string() const {
-  return "";
-}
+std::string PiecewiseTrajectory1d::to_string() const { return ""; }
 
 void PiecewiseTrajectory1d::AppendSegment(
     const std::shared_ptr<Curve1d> trajectory) {
-
   if (trajectory_segments_.size() > 0) {
     trajectory_segments_.push_back(trajectory);
   } else {
@@ -110,5 +108,5 @@ std::size_t PiecewiseTrajectory1d::NumOfSegments() const {
   return trajectory_segments_.size();
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo

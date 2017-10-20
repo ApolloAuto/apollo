@@ -18,6 +18,8 @@
  * @file collision_checker.cpp
  **/
 
+#include <utility>
+
 #include "modules/planning/lattice/collision_checker.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -32,17 +34,18 @@ CollisionChecker::CollisionChecker(
 }
 
 bool CollisionChecker::InCollision(
-    const DiscretizedTrajectory &discretized_trajectory) {
+    const DiscretizedTrajectory& discretized_trajectory) {
   CHECK_LE(discretized_trajectory.NumOfPoints(), predicted_envs_.size());
-  const auto &vehicle_config =
+  const auto& vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
 
   std::size_t time_index = 0;
-  for (const auto& trajectory_point : discretized_trajectory.trajectory_points()) {
-    common::math::Box2d ego_box( { trajectory_point.path_point().x(),
-        trajectory_point.path_point().y() },
+  for (const auto& trajectory_point :
+       discretized_trajectory.trajectory_points()) {
+    common::math::Box2d ego_box(
+        {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
         trajectory_point.path_point().theta(), ego_length, ego_width);
     for (const auto& obstacle_box : predicted_envs_[time_index]) {
       if (ego_box.HasOverlap(obstacle_box)) {
@@ -62,7 +65,9 @@ void CollisionChecker::BuildPredictedEnv(
   while (relative_time < planned_trajectory_time) {
     std::vector<common::math::Box2d> predicted_env;
     for (const Obstacle* obstacle : obstacles) {
-      // TODO: temp. fix, figure out why some obstacle's predicted trajectory has zero points.
+      // TODO(yajia):
+      // temp. fix, figure out why some obstacle's predicted trajectory
+      // has zero points.
       if (obstacle->Trajectory().trajectory_point_size() == 0) {
         continue;
       }
@@ -75,5 +80,5 @@ void CollisionChecker::BuildPredictedEnv(
   }
 }
 
-} // namespace planning
-} // namespace adu
+}  // namespace planning
+}  // namespace apollo

@@ -17,6 +17,8 @@
 #ifndef MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 
+#include <vector>
+
 #include "modules/planning/common/frame.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -35,19 +37,20 @@ class LatticePlanner : public Planner {
 
   common::Status Init(const PlanningConfig& config) override;
 
-  common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame,
+                      ReferenceLineInfo* reference_line_info) override;
+
  private:
   void ComputeInitFrenetState(const common::PathPoint& matched_point,
-          const common::TrajectoryPoint& cartesian_state,
-          std::array<double, 3>& s, std::array<double, 3>& d) const;
+                              const common::TrajectoryPoint& cartesian_state,
+                              std::array<double, 3>* ptr_s,
+                              std::array<double, 3>* ptr_d) const;
 
   DiscretizedTrajectory CombineTrajectory(
-          const std::vector<common::PathPoint>& reference_line,
-          const Curve1d& lon_trajectory,
-          const Curve1d& lat_trajectory,
-          const double init_relative_time = 0.0) const;
+      const std::vector<common::PathPoint>& reference_line,
+      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
+      const double init_relative_time = 0.0) const;
 
   BehaviorDecider decider_;
 };

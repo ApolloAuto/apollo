@@ -16,6 +16,9 @@
 
 #include "modules/planning/planner/lattice/lattice_planner.h"
 
+#include <memory>
+#include <vector>
+
 #include "modules/planning/lattice/decision_analyzer.h"
 #include "modules/planning/lattice/lattice_params.h"
 #include "modules/planning/lattice/reference_line_matcher.h"
@@ -40,72 +43,70 @@ using apollo::common::TrajectoryPoint;
 std::size_t num_planning_cycles = 0;
 std::size_t num_planning_succeeded_cycles = 0;
 
-LatticePlanner::LatticePlanner() {
-  
-}
+LatticePlanner::LatticePlanner() {}
 
 Status LatticePlanner::Init(const PlanningConfig& config) {
   // TODO(all) implement
   return Status::OK();
 }
 
-Status LatticePlanner::Plan(
-    const common::TrajectoryPoint& planning_init_point,
-    Frame* frame,
-    ReferenceLineInfo* reference_line_info) {
-
+Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
+                            Frame* frame,
+                            ReferenceLineInfo* reference_line_info) {
   AINFO << "-------------------------------------------------";
-  AINFO << "Number of planning cycles:\t" << num_planning_cycles
-      << "\t" << num_planning_succeeded_cycles;
+  AINFO << "Number of planning cycles:\t" << num_planning_cycles << "\t"
+        << num_planning_succeeded_cycles;
   num_planning_cycles++;
 
-  //1. obtain a reference line and transform it to the PathPoint format.
-  auto discretized_reference_line = apollo::planning::ToDiscretizedReferenceLine(
-    reference_line_info->reference_line().reference_points());
+  // 1. obtain a reference line and transform it to the PathPoint format.
+  auto discretized_reference_line =
+      apollo::planning::ToDiscretizedReferenceLine(
+          reference_line_info->reference_line().reference_points());
 
-  //2. compute the matched point of the init planning point on the reference line.
+  // 2. compute the matched point of the init planning point on the reference
+  // line.
   PathPoint matched_point = ReferenceLineMatcher::match_to_reference_line(
       discretized_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
 
-  //3. according to the matched point, compute the init state in Frenet frame.
+  // 3. according to the matched point, compute the init state in Frenet frame.
   std::array<double, 3> init_s;
   std::array<double, 3> init_d;
-  ComputeInitFrenetState(matched_point, planning_init_point, init_s,
-      init_d);
+  ComputeInitFrenetState(matched_point, planning_init_point, &init_s, &init_d);
 
-  //4. parse the decision and get the planning target.
+  // 4. parse the decision and get the planning target.
 
-  PlanningObject planning_object = decider_.analyze(frame,
-    planning_init_point,
-    init_s,
-    discretized_reference_line);
+  PlanningObject planning_object = decider_.analyze(
+      frame, planning_init_point, init_s, discretized_reference_line);
 
-  AINFO << "    [---Planning_Object---]: "<<planning_object.decision_type();
+  AINFO << "    [---Planning_Object---]: " << planning_object.decision_type();
 
-  //5. generate 1d trajectory bundle for longitudinal and lateral respectively.
+  // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
   Trajectory1dGenerator trajectory1d_generator;
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
-  trajectory1d_generator.GenerateTrajectoryBundles(planning_object,
-      init_s, init_d, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
+  trajectory1d_generator.GenerateTrajectoryBundles(
+      planning_object, init_s, init_d, &lon_trajectory1d_bundle,
+      &lat_trajectory1d_bundle);
 
-  //6. first, evaluate the feasibility of the 1d trajectories according to dynamic constraints.
-  //   second, evaluate the feasible longitudinal and lateral trajectory pairs and sort them according to the cost.
+  // 6. first, evaluate the feasibility of the 1d trajectories according to
+  // dynamic constraints.
+  //   second, evaluate the feasible longitudinal and lateral trajectory pairs
+  //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
-    planning_object, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
+      planning_object, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
 
   AINFO << "number of trajectory pairs = "
-            << trajectory_evaluator.num_of_trajectory_pairs();
+        << trajectory_evaluator.num_of_trajectory_pairs();
   AINFO << "";
 
   // Get instance of collision checker and constraint checker
-  const std::vector<const Obstacle*>& obstacles =
-    frame->obstacles();
+  const std::vector<const Obstacle*>& obstacles = frame->obstacles();
 
   CollisionChecker collision_checker(obstacles);
 
-  //7. always get the best pair of trajectories to combine; return the first collision-free trajectory.
+  // 7. always get the best pair of trajectories to combine; return the first
+  // collision-free trajectory.
   int constraint_failure_count = 0;
   int collision_failure_count = 0;
 
@@ -119,9 +120,9 @@ Status LatticePlanner::Plan(
   for (uint i = 0; i < obstacles.size(); ++i) {
     const Obstacle* obstacle_ptr = obstacles[i];
     apollo::prediction::PredictionObstacle* prediction_obstacle =
-      ptr_debug->mutable_planning_data()->add_prediction_obstacle();
-    prediction_obstacle->mutable_perception_obstacle()->
-      CopyFrom(obstacle_ptr->Perception());
+        ptr_debug->mutable_planning_data()->add_prediction_obstacle();
+    prediction_obstacle->mutable_perception_obstacle()->CopyFrom(
+        obstacle_ptr->Perception());
     prediction_obstacle->add_trajectory()->CopyFrom(obstacle_ptr->Trajectory());
   }
 
@@ -131,16 +132,17 @@ Status LatticePlanner::Plan(
     trajectory_pair_cost = trajectory_evaluator.top_trajectory_pair_cost();
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
     if (!LatticeConstraintChecker::IsValidTrajectoryPair(
-        *lat_trajectory1d_bundle[trajectory_pair.second],
-        *lon_trajectory1d_bundle[trajectory_pair.first])) {
+            *lat_trajectory1d_bundle[trajectory_pair.second],
+            *lon_trajectory1d_bundle[trajectory_pair.first])) {
       ++constraint_failure_count;
       continue;
     }
 
-    auto combined_trajectory = CombineTrajectory(discretized_reference_line,
-        *lon_trajectory1d_bundle[trajectory_pair.first],
-        *lat_trajectory1d_bundle[trajectory_pair.second],
-        planning_init_point.relative_time());
+    auto combined_trajectory =
+        CombineTrajectory(discretized_reference_line,
+                          *lon_trajectory1d_bundle[trajectory_pair.first],
+                          *lat_trajectory1d_bundle[trajectory_pair.second],
+                          planning_init_point.relative_time());
 
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
@@ -150,19 +152,19 @@ Status LatticePlanner::Plan(
     // put combine trajectory into debug data
     num_lattice_traj += 1;
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
-      combined_trajectory.trajectory_points();
+        combined_trajectory.trajectory_points();
 
-    auto combined_trajectory_path = ptr_debug->mutable_planning_data()
-      ->add_trajectory_path();
+    auto combined_trajectory_path =
+        ptr_debug->mutable_planning_data()->add_trajectory_path();
     for (uint i = 0; i < combined_trajectory_points.size(); ++i) {
       combined_trajectory_path->add_trajectory_point()->CopyFrom(
-        combined_trajectory_points[i]);
+          combined_trajectory_points[i]);
     }
     combined_trajectory_path->set_lattice_trajectory_cost(trajectory_pair_cost);
 
-    //AINFO << "trajectory not valid for constraint ["
+    // AINFO << "trajectory not valid for constraint ["
     //          << constraint_failure_count << "] times";
-    //AINFO << "trajectory not valid for collision ["
+    // AINFO << "trajectory not valid for collision ["
     //          << collision_failure_count << "] times";
 
     if (num_lattice_traj == 1) {
@@ -174,10 +176,10 @@ Status LatticePlanner::Plan(
     }
   }
 
-  AINFO << "trajectory not valid for constraint ["
-            << constraint_failure_count << "] times";
-  AINFO << "trajectory not valid for collision ["
-            << collision_failure_count << "] times";
+  AINFO << "trajectory not valid for constraint [" << constraint_failure_count
+        << "] times";
+  AINFO << "trajectory not valid for collision [" << collision_failure_count
+        << "] times";
   if (num_lattice_traj > 0) {
     AINFO << "Planning succeeded";
     num_planning_succeeded_cycles += 1;
@@ -188,24 +190,21 @@ Status LatticePlanner::Plan(
   }
 }
 
-void LatticePlanner::ComputeInitFrenetState(const PathPoint& matched_point,
-        const TrajectoryPoint& cartesian_state,
-        std::array<double, 3>& s, std::array<double, 3>& d) const {
-
-  CartesianFrenetConverter::cartesian_to_frenet(matched_point.s(), matched_point.x(),
-      matched_point.y(), matched_point.theta(), matched_point.kappa(),
-      matched_point.dkappa(), cartesian_state.path_point().x(),
-      cartesian_state.path_point().y(), cartesian_state.v(),
-      cartesian_state.a(), cartesian_state.path_point().theta(),
-      cartesian_state.path_point().kappa(), &s, &d);
+void LatticePlanner::ComputeInitFrenetState(
+    const PathPoint& matched_point, const TrajectoryPoint& cartesian_state,
+    std::array<double, 3>* ptr_s, std::array<double, 3>* ptr_d) const {
+  CartesianFrenetConverter::cartesian_to_frenet(
+      matched_point.s(), matched_point.x(), matched_point.y(),
+      matched_point.theta(), matched_point.kappa(), matched_point.dkappa(),
+      cartesian_state.path_point().x(), cartesian_state.path_point().y(),
+      cartesian_state.v(), cartesian_state.a(),
+      cartesian_state.path_point().theta(),
+      cartesian_state.path_point().kappa(), ptr_s, ptr_d);
 }
 
 DiscretizedTrajectory LatticePlanner::CombineTrajectory(
-        const std::vector<PathPoint>& reference_line,
-        const Curve1d& lon_trajectory,
-        const Curve1d& lat_trajectory,
-        const double init_relative_time) const {
-
+    const std::vector<PathPoint>& reference_line, const Curve1d& lon_trajectory,
+    const Curve1d& lat_trajectory, const double init_relative_time) const {
   DiscretizedTrajectory combined_trajectory;
 
   double s0 = lon_trajectory.Evaluate(0, 0.0);
@@ -215,75 +214,75 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
   double t_param = 0.0;
   while (t_param < planned_trajectory_time) {
-      double s = 0.0;
-      double s_dot = 0.0;
-      double s_ddot = 0.0;
+    double s = 0.0;
+    double s_dot = 0.0;
+    double s_ddot = 0.0;
 
-      if (t_param < t_param_max) {
-          s = lon_trajectory.Evaluate(0, t_param);
-          s_dot = lon_trajectory.Evaluate(1, t_param);
-          s_ddot = lon_trajectory.Evaluate(2, t_param);
-      } else {
-          s_dot = lon_trajectory.Evaluate(1, t_param_max);
-          s = lon_trajectory.Evaluate(0, t_param_max) + (t_param - t_param_max) * s_dot;
-          s_ddot = 0.0;
-      }
+    if (t_param < t_param_max) {
+      s = lon_trajectory.Evaluate(0, t_param);
+      s_dot = lon_trajectory.Evaluate(1, t_param);
+      s_ddot = lon_trajectory.Evaluate(2, t_param);
+    } else {
+      s_dot = lon_trajectory.Evaluate(1, t_param_max);
+      s = lon_trajectory.Evaluate(0, t_param_max) +
+          (t_param - t_param_max) * s_dot;
+      s_ddot = 0.0;
+    }
 
-      if (s > s_ref_max) {
-          break;
-      }
+    if (s > s_ref_max) {
+      break;
+    }
 
-      double s_param = s - s0;
-      double d = 0.0;
-      double d_prime = 0.0;
-      double d_pprime = 0.0;
+    double s_param = s - s0;
+    double d = 0.0;
+    double d_prime = 0.0;
+    double d_pprime = 0.0;
 
-      if (s_param < s_param_max) {
-          d = lat_trajectory.Evaluate(0, s_param);
-          d_prime = lat_trajectory.Evaluate(1, s_param);
-          d_pprime = lat_trajectory.Evaluate(2, s_param);
-      } else {
-          d = lat_trajectory.Evaluate(0, s_param_max);
-          d_prime = 0.0;
-          d_pprime = 0.0;
-      }
+    if (s_param < s_param_max) {
+      d = lat_trajectory.Evaluate(0, s_param);
+      d_prime = lat_trajectory.Evaluate(1, s_param);
+      d_pprime = lat_trajectory.Evaluate(2, s_param);
+    } else {
+      d = lat_trajectory.Evaluate(0, s_param_max);
+      d_prime = 0.0;
+      d_pprime = 0.0;
+    }
 
-      PathPoint matched_ref_point = ReferenceLineMatcher::match_to_reference_line(
-              reference_line, s);
+    PathPoint matched_ref_point =
+        ReferenceLineMatcher::match_to_reference_line(reference_line, s);
 
-      double x = 0.0;
-      double y = 0.0;
-      double theta = 0.0;
-      double kappa = 0.0;
-      double v = 0.0;
-      double a = 0.0;
+    double x = 0.0;
+    double y = 0.0;
+    double theta = 0.0;
+    double kappa = 0.0;
+    double v = 0.0;
+    double a = 0.0;
 
-      const double rs = matched_ref_point.s();
-      const double rx = matched_ref_point.x();
-      const double ry = matched_ref_point.y();
-      const double rtheta = matched_ref_point.theta();
-      const double rkappa = matched_ref_point.kappa();
-      const double rdkappa = matched_ref_point.dkappa();
+    const double rs = matched_ref_point.s();
+    const double rx = matched_ref_point.x();
+    const double ry = matched_ref_point.y();
+    const double rtheta = matched_ref_point.theta();
+    const double rkappa = matched_ref_point.kappa();
+    const double rdkappa = matched_ref_point.dkappa();
 
-      std::array<double, 3> s_conditions = {rs, s_dot, s_ddot};
-      std::array<double, 3> d_conditions = {d, d_prime, d_pprime};
-      CartesianFrenetConverter::frenet_to_cartesian(
-              rs, rx, ry, rtheta, rkappa, rdkappa,
-              s_conditions, d_conditions,
-              &x, &y, &theta, &kappa, &v, &a);
+    std::array<double, 3> s_conditions = {rs, s_dot, s_ddot};
+    std::array<double, 3> d_conditions = {d, d_prime, d_pprime};
+    CartesianFrenetConverter::frenet_to_cartesian(
+        rs, rx, ry, rtheta, rkappa, rdkappa, s_conditions, d_conditions, &x, &y,
+        &theta, &kappa, &v, &a);
 
-      TrajectoryPoint trajectory_point;
-      trajectory_point.mutable_path_point()->set_x(x);
-      trajectory_point.mutable_path_point()->set_y(y);
-      trajectory_point.mutable_path_point()->set_theta(theta);
-      trajectory_point.mutable_path_point()->set_kappa(kappa);
-      trajectory_point.set_v(v);
-      trajectory_point.set_a(a);
-      trajectory_point.set_relative_time(t_param + init_relative_time);
+    TrajectoryPoint trajectory_point;
+    trajectory_point.mutable_path_point()->set_x(x);
+    trajectory_point.mutable_path_point()->set_y(y);
+    trajectory_point.mutable_path_point()->set_theta(theta);
+    trajectory_point.mutable_path_point()->set_kappa(kappa);
+    trajectory_point.set_v(v);
+    trajectory_point.set_a(a);
+    trajectory_point.set_relative_time(t_param + init_relative_time);
 
-      combined_trajectory.AppendTrajectoryPoint(trajectory_point);
+    combined_trajectory.AppendTrajectoryPoint(trajectory_point);
 
-      t_param = t_param + trajectory_time_resolution;
+    t_param = t_param + trajectory_time_resolution;
   }
   return combined_trajectory;
 }

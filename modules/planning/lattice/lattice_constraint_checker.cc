@@ -19,9 +19,10 @@
  **/
 
 #include "modules/planning/lattice/lattice_constraint_checker.h"
-#include "modules/planning/common/planning_gflags.h"
 
 #include <iostream>
+
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -29,44 +30,44 @@ namespace planning {
 namespace {
 
 bool fuzzy_within(const double v, const double lower, const double upper,
-    const double e = 1.0e-4) {
+                  const double e = 1.0e-4) {
   if (v < lower - e || v > upper + e) {
     return false;
   }
   return true;
 }
-
 }
 
 bool LatticeConstraintChecker::IsValidTrajectoryPair(
-    const Curve1d& lat_trajectory,
-    const Curve1d& lon_trajectory) {
-
+    const Curve1d& lat_trajectory, const Curve1d& lon_trajectory) {
   return IsValidLateralTrajectory(lat_trajectory, lon_trajectory) &&
-   IsValidLongitudinalTrajectory(lon_trajectory);
+         IsValidLongitudinalTrajectory(lon_trajectory);
 }
 
 bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
     const Curve1d& lon_trajectory) {
   double t = 0.0;
   while (t < lon_trajectory.param_length()) {
-    double v = lon_trajectory.Evaluate(1, t); // evalute_v
+    double v = lon_trajectory.Evaluate(1, t);  // evalute_v
     if (!fuzzy_within(v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
-      //std::cout << "not valid longitudinal trajectory: velocity\t" << v << std::endl;
+      // std::cout << "not valid longitudinal trajectory: velocity\t" << v <<
+      // std::endl;
       return false;
     }
 
-    double a = lon_trajectory.Evaluate(2, t); // evaluat_a
+    double a = lon_trajectory.Evaluate(2, t);  // evaluat_a
     if (!fuzzy_within(a, FLAGS_longitudinal_acceleration_lower_bound,
-        FLAGS_longitudinal_acceleration_upper_bound)) {
-      //std::cout << "not valid longitudinal trajectory: acceleration\t" << a << std::endl;
+                      FLAGS_longitudinal_acceleration_upper_bound)) {
+      // std::cout << "not valid longitudinal trajectory: acceleration\t" << a
+      // << std::endl;
       return false;
     }
 
     double j = lon_trajectory.Evaluate(3, t);
     if (!fuzzy_within(j, FLAGS_longitudinal_jerk_lower_bound,
-        FLAGS_longitudinal_jerk_upper_bound)) {
-      //std::cout << "not valid longitudinal trajectory: jerk\t" << j << std::endl;
+                      FLAGS_longitudinal_jerk_upper_bound)) {
+      // std::cout << "not valid longitudinal trajectory: jerk\t" << j <<
+      // std::endl;
       return false;
     }
     t += FLAGS_trajectory_time_resolution;
@@ -74,9 +75,8 @@ bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
   return true;
 }
 
-bool LatticeConstraintChecker::IsValidLateralTrajectory(const Curve1d& lat_trajectory,
-  const Curve1d& lon_trajectory) {
-
+bool LatticeConstraintChecker::IsValidLateralTrajectory(
+    const Curve1d& lat_trajectory, const Curve1d& lon_trajectory) {
   double t = 0.0;
   while (t < lon_trajectory.param_length()) {
     double s = lon_trajectory.Evaluate(0, t);
@@ -92,8 +92,9 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(const Curve1d& lat_traje
     }
 
     if (!fuzzy_within(a, -FLAGS_lateral_acceleration_bound,
-        FLAGS_lateral_acceleration_bound)) {
-      //std::cout << "not valid lateral trajectory: acceleration\t" << a << std::endl;
+                      FLAGS_lateral_acceleration_bound)) {
+      // std::cout << "not valid lateral trajectory: acceleration\t" << a <<
+      // std::endl;
       return false;
     }
 
@@ -104,7 +105,7 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(const Curve1d& lat_traje
     }
 
     if (!fuzzy_within(j, -FLAGS_lateral_jerk_bound, FLAGS_lateral_jerk_bound)) {
-      //std::cout << "not valid lateral trajectory: jerk\t" << j << std::endl;
+      // std::cout << "not valid lateral trajectory: jerk\t" << j << std::endl;
       return false;
     }
     t += FLAGS_trajectory_time_resolution;
@@ -112,22 +113,5 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(const Curve1d& lat_traje
   return true;
 }
 
-bool LatticeConstraintChecker::CheckAngularAcceleration(
-  const DiscretizedTrajectory& discretized_trajectory) {
-
-  for (std::size_t i = 0; i < discretized_trajectory.trajectory_points().size(); ++i) {
-    const auto& trajectory_point = discretized_trajectory.trajectory_points()[i];
-
-    double lon_v = trajectory_point.v();
-    double kappa = trajectory_point.path_point().kappa();
-
-    double lat_a = lon_v * lon_v * kappa;
-    if (lat_a < -FLAGS_lateral_acceleration_bound || lat_a > FLAGS_lateral_acceleration_bound) {
-      return false;
-    }
-  }
-  return true;
-}
-
-} //namespace planning
-} //namespace adu
+}  // namespace planning
+}  // namespace apollo

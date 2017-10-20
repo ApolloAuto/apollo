@@ -19,18 +19,16 @@
 namespace apollo {
 namespace planning {
 
-PlanningTarget::Task PlanningTarget::task() const {
-  return task_;
-}
+PlanningTarget::Task PlanningTarget::task() const { return task_; }
 
 std::string PlanningTarget::task_name() const {
   switch (task_) {
     case Task::CRUISE:
-        return "cruise";
+      return "cruise";
     case Task::FOLLOW:
-        return "follow";
+      return "follow";
     case Task::STOP:
-        return "stop";
+      return "stop";
   }
   return "undefined";
 }
@@ -47,28 +45,22 @@ void PlanningTarget::set_stop_target(const double stop_position) {
   stop_target_ = stop_position;
 }
 
-void PlanningTarget::set_follow_target(
-    const double follow_target_position,
-    const double follow_target_velocity,
-    const double follow_target_time) {
+void PlanningTarget::set_follow_target(const double follow_target_position,
+                                       const double follow_target_velocity,
+                                       const double follow_target_time) {
   follow_target_position_ = follow_target_position;
   follow_target_velocity_ = follow_target_velocity;
   follow_target_time_ = follow_target_time;
 }
 
-double PlanningTarget::cruise_target() const {
-  return cruise_target_;
-}
+double PlanningTarget::cruise_target() const { return cruise_target_; }
 
-double PlanningTarget::stop_target() const {
-  return stop_target_;
-}
+double PlanningTarget::stop_target() const { return stop_target_; }
 
 std::array<double, 3> PlanningTarget::follow_target() const {
-  return {follow_target_position_,
-          follow_target_velocity_,
+  return {follow_target_position_, follow_target_velocity_,
           follow_target_time_};
 }
 
-} // namespace planning
-} // namespace adu
+}  // namespace planning
+}  // namespace apollo

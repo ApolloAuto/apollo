@@ -21,10 +21,10 @@
 #ifndef MODULES_PLANNING_LATTIC_REFERENCE_LINE_MATCHER_H_
 #define MODULES_PLANNING_LATTIC_REFERENCE_LINE_MATCHER_H_
 
+#include <vector>
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
-
-#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -34,18 +34,16 @@ class ReferenceLineMatcher {
   ReferenceLineMatcher() = delete;
 
   static common::PathPoint match_to_reference_line(
-  	  const std::vector<common::PathPoint>& reference_line,
-      const double x, const double y);
+      const std::vector<common::PathPoint>& reference_line, const double x,
+      const double y);
 
   static common::PathPoint match_to_reference_line(
-  	  const std::vector<common::PathPoint>& reference_line,
-      const double s);
+      const std::vector<common::PathPoint>& reference_line, const double s);
 
  private:
-  static common::PathPoint FindMinDistancePoint(
-  	  const common::PathPoint& p0,
-  	  const common::PathPoint& p1,
-      const double x, const double y);
+  static common::PathPoint FindMinDistancePoint(const common::PathPoint& p0,
+                                                const common::PathPoint& p1,
+                                                const double x, const double y);
 };
 
 }  // namespace planning
