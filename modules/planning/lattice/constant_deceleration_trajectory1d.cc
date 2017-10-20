@@ -22,12 +22,12 @@ namespace apollo {
 namespace planning {
 
 ConstantDecelerationTrajectory1d::ConstantDecelerationTrajectory1d(
-    const double init_s, const double init_v, const double a) :
-    init_s_(init_s), init_v_(init_v), deceleration_(-a) {
-  CHECK(init_v_ > 0);
-  CHECK(deceleration_ > 0);
+    const double init_s, const double init_v, const double a)
+    : init_s_(init_s), init_v_(init_v), deceleration_(-a) {
+  CHECK(init_v_> 0.0);
+  CHECK(deceleration_ > 0.0);
   end_t_ = init_v_ / deceleration_;
-  end_s_ = init_v_ * init_v_  / (2.0 * deceleration_) + init_s_;
+  end_s_ = init_v_ * init_v_ / (2.0 * deceleration_) + init_s_;
 }
 
 double ConstantDecelerationTrajectory1d::Evaluate_s(const double t) const {
@@ -60,18 +60,15 @@ double ConstantDecelerationTrajectory1d::Evaluate_j(const double t) const {
   return 0.0;
 }
 
-double ConstantDecelerationTrajectory1d::param_length() const {
-  return end_t_;
-}
+double ConstantDecelerationTrajectory1d::param_length() const { return end_t_; }
 
 std::string ConstantDecelerationTrajectory1d::to_string() const {
-  //TODO
   return "";
 }
 
-double ConstantDecelerationTrajectory1d::Evaluate(
-    const std::uint32_t order, const double param) const {
-  switch(order) {
+double ConstantDecelerationTrajectory1d::Evaluate(const std::uint32_t order,
+                                                  const double param) const {
+  switch (order) {
     case 0:
       return Evaluate_s(param);
     case 1:
@@ -84,5 +81,5 @@ double ConstantDecelerationTrajectory1d::Evaluate(
   return 0.0;
 }
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo

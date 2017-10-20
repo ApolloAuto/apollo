@@ -21,24 +21,20 @@
 namespace apollo {
 namespace planning {
 
-StandingStillTrajectory1d::StandingStillTrajectory1d(
-	const double p, const double duration)
-  : fixed_position_(p), duration_(duration) {}
+StandingStillTrajectory1d::StandingStillTrajectory1d(const double p,
+                                                     const double duration)
+    : fixed_position_(p), duration_(duration) {}
 
-
-double StandingStillTrajectory1d::param_length() const {
-  return duration_;
-}
+double StandingStillTrajectory1d::param_length() const { return duration_; }
 
 std::string StandingStillTrajectory1d::to_string() const {
-  //TODO
   return "";
 }
 
-double StandingStillTrajectory1d::Evaluate(
-    const std::uint32_t order, const double param) const {
-//  CHECK(param <= duration_);
-  switch(order) {
+double StandingStillTrajectory1d::Evaluate(const std::uint32_t order,
+                                           const double param) const {
+  //  CHECK(param <= duration_);
+  switch (order) {
     case 0:
       return Evaluate_s(param);
     case 1:
@@ -67,5 +63,5 @@ double StandingStillTrajectory1d::Evaluate_j(const double t) const {
   return 0.0;
 }
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo

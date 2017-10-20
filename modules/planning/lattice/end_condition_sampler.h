@@ -21,8 +21,9 @@
 #ifndef MODULES_PLANNING_LATTICE_END_CONDITION_SAMPLER_H_
 #define MODULES_PLANNING_LATTICE_END_CONDITION_SAMPLER_H_
 
-#include <vector>
 #include <array>
+#include <utility>
+#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -35,24 +36,24 @@ class EndConditionSampler {
 
   virtual ~EndConditionSampler() = default;
 
-  void SampleLatEndConditions(const std::array<double, 3>& init_d,
-      std::vector<std::pair<std::array<double, 3>, double>>& end_d_conditions) const;
+  std::vector<std::pair<std::array<double, 3>, double>> SampleLatEndConditions(
+      const std::array<double, 3>& init_d) const;
 
-  void SampleLonEndConditionsForCruising(const std::array<double, 3>& init_s,
-      const double ref_cruise_speed,
-      std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions) const;
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLonEndConditionsForCruising(const std::array<double, 3>& init_s,
+                                    const double ref_cruise_speed) const;
 
-  void SampleLonEndConditionsForFollowing(const std::array<double, 3>& init_s,
-      const double ref_target_position,
-      const double ref_target_speed,
-      std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions) const;
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLonEndConditionsForFollowing(const std::array<double, 3>& init_s,
+                                     const double ref_target_position,
+                                     const double ref_target_speed) const;
 
-  void SampleLonEndConditionsForStopping(const std::array<double, 3>& init_s,
-      const double ref_stop_position,
-      std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions) const;
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLonEndConditionsForStopping(const std::array<double, 3>& init_s,
+                                    const double ref_stop_position) const;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif // MODULES_PLANNING_LATTICE_END_CONDITION_SAMPLER_H_
+#endif  // MODULES_PLANNING_LATTICE_END_CONDITION_SAMPLER_H_

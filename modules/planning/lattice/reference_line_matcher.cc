@@ -35,12 +35,12 @@ using apollo::planning::util::InterpolateUsingLinearApproximation;
 using apollo::common::math::GoldenSectionSearch;
 
 PathPoint ReferenceLineMatcher::match_to_reference_line(
-    const std::vector<PathPoint>& reference_line,
-    const double x, const double y) {
-  CHECK(reference_line.size() > 0);
+    const std::vector<PathPoint>& reference_line, const double x,
+    const double y) {
+  CHECK_GT(reference_line.size(), 0);
 
-  auto func_distance_square = [](const PathPoint& point,
-      const double x, const double y) {
+  auto func_distance_square =
+      [](const PathPoint& point, const double x, const double y) {
     double dx = point.x() - x;
     double dy = point.y() - y;
     return dx * dx + dy * dy;
@@ -58,8 +58,8 @@ PathPoint ReferenceLineMatcher::match_to_reference_line(
   }
 
   std::size_t index_start = index_min == 0 ? index_min : index_min - 1;
-  std::size_t index_end = index_min + 1 == reference_line.size() ?
-      index_min : index_min + 1;
+  std::size_t index_end =
+      index_min + 1 == reference_line.size() ? index_min : index_min + 1;
 
   if (index_start == index_end) {
     return reference_line[index_start];
@@ -70,15 +70,12 @@ PathPoint ReferenceLineMatcher::match_to_reference_line(
 }
 
 PathPoint ReferenceLineMatcher::match_to_reference_line(
-    const std::vector<PathPoint>& reference_line,
-    const double s) {
+    const std::vector<PathPoint>& reference_line, const double s) {
+  auto comp =
+      [](const PathPoint& point, const double s) { return point.s() < s; };
 
-  auto comp = [](const PathPoint& point, const double s) {
-    return point.s() < s;
-  };
-
-  auto it_lower = std::lower_bound(reference_line.begin(),
-                                   reference_line.end(), s, comp);
+  auto it_lower =
+      std::lower_bound(reference_line.begin(), reference_line.end(), s, comp);
   if (it_lower == reference_line.begin()) {
     return reference_line.front();
   } else if (it_lower == reference_line.end()) {
@@ -89,14 +86,14 @@ PathPoint ReferenceLineMatcher::match_to_reference_line(
   return InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower, s);
 }
 
-PathPoint ReferenceLineMatcher::FindMinDistancePoint(
-    const PathPoint& p0, const PathPoint& p1,
-    const double x, const double y) {
-
+PathPoint ReferenceLineMatcher::FindMinDistancePoint(const PathPoint& p0,
+                                                     const PathPoint& p1,
+                                                     const double x,
+                                                     const double y) {
   double heading_geodesic =
       apollo::common::math::NormalizeAngle(p1.theta() - p0.theta());
-  HermiteSpline<double, 3> spline_geodesic({0.0, p0.kappa()},
-      {heading_geodesic, p1.kappa()}, p0.s(), p1.s());
+  HermiteSpline<double, 3> spline_geodesic(
+      {0.0, p0.kappa()}, {heading_geodesic, p1.kappa()}, p0.s(), p1.s());
 
   auto func_dist_square = [&spline_geodesic, &p0, &x, &y](const double s) {
     auto func_cos_theta = [&spline_geodesic, &p0](const double s) {
@@ -117,5 +114,5 @@ PathPoint ReferenceLineMatcher::FindMinDistancePoint(
   return InterpolateUsingLinearApproximation(p0, p1, s);
 }
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo

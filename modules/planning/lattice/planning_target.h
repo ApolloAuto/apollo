@@ -34,11 +34,7 @@ namespace planning {
 // cruise, target speed
 class PlanningTarget {
  public:
-  enum class Task {
-    FOLLOW,
-    STOP,
-    CRUISE
-  };
+  enum class Task { FOLLOW, STOP, CRUISE };
 
   PlanningTarget() = default;
 

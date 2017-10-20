@@ -31,17 +31,18 @@ namespace apollo {
 namespace planning {
 
 class CollisionChecker {
-public:
-  CollisionChecker(const std::vector<const Obstacle*>& obstacles);
+ public:
+  explicit CollisionChecker(const std::vector<const Obstacle*>& obstacles);
 
-  bool InCollision(const DiscretizedTrajectory &discretized_trajectory);
-private:
+  bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
+
+ private:
   void BuildPredictedEnv(const std::vector<const Obstacle*>& obstacles);
 
   std::vector<std::vector<common::math::Box2d>> predicted_envs_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H */
