@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <algorithm>
+#include <utility>
+
 #include "modules/planning/lattice/end_condition_sampler.h"
 
 #include "modules/common/log.h"
@@ -23,14 +26,13 @@
 namespace apollo {
 namespace planning {
 
-//use_bounded_parabolic_adjustment
+// use_bounded_parabolic_adjustment
 EndConditionSampler::EndConditionSampler() {}
 
-void EndConditionSampler::SampleLatEndConditions(
-    const std::array<double, 3>& init_d,
-    std::vector<std::pair<std::array<double, 3>,double>>& end_d_conditions)
-const {
-
+std::vector<std::pair<std::array<double, 3>, double>>
+EndConditionSampler::SampleLatEndConditions(
+    const std::array<double, 3>& init_d) const {
+  std::vector<std::pair<std::array<double, 3>, double>> end_d_conditions;
   std::array<double, 5> end_d_candidates = {0.0, -0.25, -0.5, 0.25, 0.5};
   std::array<double, 5> end_s_candidates = {20.0, 30.0, 40.0, 50.0, 60.0};
 
@@ -40,15 +42,12 @@ const {
       end_d_conditions.emplace_back(end_d_state, s);
     }
   }
-  return;
+  return end_d_conditions;
 }
 
-void EndConditionSampler::SampleLonEndConditionsForCruising(
-    const std::array<double, 3>& init_s,
-    const double ref_cruise_speed,
-    std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions)
-const {
-
+std::vector<std::pair<std::array<double, 3>, double>>
+EndConditionSampler::SampleLonEndConditionsForCruising(
+    const std::array<double, 3>& init_s, const double ref_cruise_speed) const {
   // time interval is one second plus the last one 0.01
   constexpr std::size_t num_time_section = 9;
   std::array<double, num_time_section> time_sections;
@@ -57,15 +56,18 @@ const {
   }
   time_sections[num_time_section - 1] = 0.01;
 
-  // velocity samples consists of 10 equally distributed samples plus ego's current velocity
+  // velocity samples consists of 10 equally distributed samples plus ego's
+  // current velocity
   constexpr std::size_t num_velocity_section = 11;
 
   double velocity_upper = std::max(ref_cruise_speed, init_s[1]);
   double velocity_lower = 0.0;
-  double velocity_seg = (velocity_upper - velocity_lower) / (num_velocity_section - 2);
+  double velocity_seg =
+      (velocity_upper - velocity_lower) / (num_velocity_section - 2);
 
+  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const auto& time : time_sections) {
-    for (std::size_t i = 0; i + 1 < num_velocity_section; ++i) { //velocity
+    for (std::size_t i = 0; i + 1 < num_velocity_section; ++i) {  // velocity
       std::array<double, 3> end_s;
       end_s[0] = 0.0;  // this will not be used in QuarticPolynomial
       end_s[1] = velocity_seg * i;
@@ -75,16 +77,14 @@ const {
     std::array<double, 3> end_s = {0.0, init_s[1], 0.0};
     end_s_conditions.emplace_back(end_s, time);
   }
-  return;
+  return end_s_conditions;
 }
 
-void EndConditionSampler::SampleLonEndConditionsForFollowing(
-    const std::array<double, 3>& init_s,
-    const double obstacle_position,
-    const double obstacle_velocity,
-    std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions)
-const {
-
+std::vector<std::pair<std::array<double, 3>, double>>
+EndConditionSampler::SampleLonEndConditionsForFollowing(
+    const std::array<double, 3>& init_s, const double obstacle_position,
+    const double obstacle_velocity) const {
+  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   constexpr std::size_t num_time_section = 9;
   std::array<double, num_time_section> time_sections;
   for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
@@ -93,12 +93,12 @@ const {
   time_sections[num_time_section - 1] = 0.01;
 
   // following three-second rule
-  // TODO: @yajia @kecheng @liyun: fix the case when s on reference line is
+  // TODO(yajia, kecheng, liyun): fix the case when s on reference line is
   // small enough to be close to init_s[0]
   double ref_position = obstacle_position - obstacle_velocity * 3.0;
   constexpr std::size_t num_position_section = 5;
-  std::array<double, num_position_section> s_offsets =
-      {-10.0, -7.5, -5.0, -2.5, 0.0};
+  std::array<double, num_position_section> s_offsets = {-10.0, -7.5, -5.0, -2.5,
+                                                        0.0};
 
   for (const auto& s_offset : s_offsets) {
     std::array<double, 3> end_s;
@@ -110,14 +110,12 @@ const {
       end_s_conditions.emplace_back(end_s, t);
     }
   }
+  return end_s_conditions;
 }
 
-void EndConditionSampler::SampleLonEndConditionsForStopping(
-    const std::array<double, 3>& init_s,
-    const double ref_stop_position,
-    std::vector<std::pair<std::array<double, 3>, double>>& end_s_conditions)
-const {
-
+std::vector<std::pair<std::array<double, 3>, double>>
+EndConditionSampler::SampleLonEndConditionsForStopping(
+    const std::array<double, 3>& init_s, const double ref_stop_position) const {
   constexpr size_t num_time_section = 9;
   std::array<double, num_time_section> time_sections;
   for (size_t i = 0; i + 1 < num_time_section; ++i) {
@@ -125,16 +123,17 @@ const {
   }
   time_sections[num_time_section - 1] = 0.01;
 
+  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   std::array<double, 4> s_offsets = {-1.5, -1.0, -0.5, 0.0};
   for (const auto& s_offset : s_offsets) {
-    std::array<double, 3> s =
-        {std::max(s_offset + ref_stop_position, init_s[0]), 0.0, 0.0};
+    std::array<double, 3> s = {
+        std::max(s_offset + ref_stop_position, init_s[0]), 0.0, 0.0};
 
     for (const auto& t : time_sections) {
       end_s_conditions.push_back({s, t});
     }
   }
-  return;
+  return end_s_conditions;
 }
 
 }  // namespace planning

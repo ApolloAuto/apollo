@@ -17,11 +17,14 @@
 #include "modules/planning/lattice/trajectory_evaluator.h"
 
 #include <cmath>
+#include <limits>
+#include <utility>
+#include <functional>
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/lattice_params.h"
- #include "modules/planning/lattice/lattice_constraint_checker.h"
+#include "modules/planning/lattice/lattice_constraint_checker.h"
 
 namespace apollo {
 namespace planning {
@@ -30,19 +33,21 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const PlanningObject& objective,
     const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories) {
-
   for (std::size_t i = 0; i < lon_trajectories.size(); ++i) {
-     if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(*lon_trajectories[i])) {
-         continue;
-     }
-     for (std::size_t j = 0; j < lat_trajectories.size(); ++j) {
-         if (!LatticeConstraintChecker::IsValidLateralTrajectory(*lat_trajectories[j],
-                 *lon_trajectories[i])) {
-           continue;
-         }
-       double cost = evaluate(objective, lon_trajectories[i], lat_trajectories[j]);
-       cost_queue_.push(PairCost(std::pair<std::size_t, std::size_t>(i, j), cost));
-     }
+    if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(
+            *lon_trajectories[i])) {
+      continue;
+    }
+    for (std::size_t j = 0; j < lat_trajectories.size(); ++j) {
+      if (!LatticeConstraintChecker::IsValidLateralTrajectory(
+              *lat_trajectories[j], *lon_trajectories[i])) {
+        continue;
+      }
+      double cost =
+          evaluate(objective, lon_trajectories[i], lat_trajectories[j]);
+      cost_queue_.push(
+          PairCost(std::pair<std::size_t, std::size_t>(i, j), cost));
+    }
   }
 }
 
@@ -54,14 +59,16 @@ size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
   return cost_queue_.size();
 }
 
-std::pair<std::size_t, std::size_t> TrajectoryEvaluator::next_top_trajectory_pair() {
+std::pair<std::size_t, std::size_t>
+TrajectoryEvaluator::next_top_trajectory_pair() {
   CHECK(has_more_trajectory_pairs() == true);
   auto top = cost_queue_.top();
   cost_queue_.pop();
   return top.first;
 }
 
-std::pair<std::size_t, std::size_t> TrajectoryEvaluator::top_trajectory_pair_index() const {
+std::pair<std::size_t, std::size_t>
+TrajectoryEvaluator::top_trajectory_pair_index() const {
   return cost_queue_.top().first;
 }
 
@@ -73,7 +80,6 @@ double TrajectoryEvaluator::evaluate(
     const PlanningObject& objective,
     const std::shared_ptr<Curve1d>& lon_trajectory,
     const std::shared_ptr<Curve1d>& lat_trajectory) const {
-
   // currently consider three costs:
   // 1. the cost of jerk, currently only consider longitudinal jerk.
   // 2. the cost of time to achieve the objective
@@ -104,21 +110,19 @@ double TrajectoryEvaluator::evaluate(
 
   double lon_objective_cost =
       compute_lon_trajectory_objective_cost(lon_trajectory, objective);
-  
+
   double lon_jerk_cost = compute_lon_trajectory_jerk_cost(lon_trajectory);
-  
+
   double lat_offset_cost =
       compute_lat_trajectory_offset_cost(lat_trajectory, s_values);
 
   return lon_objective_cost * weight_lon_objective +
-         lon_jerk_cost * weight_lon_jerk +
-         lat_offset_cost * weight_lat_offset;
+         lon_jerk_cost * weight_lon_jerk + lat_offset_cost * weight_lat_offset;
 }
 
 double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
     const std::shared_ptr<Curve1d>& lat_trajectory,
     const std::vector<double>& s_values) const {
-
   double lat_s_max = lat_trajectory->param_length();
   double lat_offset_end = lat_trajectory->Evaluate(0, lat_s_max);
   double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
@@ -149,7 +153,6 @@ double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
 
 double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
     const std::shared_ptr<Curve1d>& lon_trajectory) const {
-
   double cost = 0.0;
   double t = 0.0;
   double lon_t_max = lon_trajectory->param_length();
@@ -171,11 +174,12 @@ double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
 double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Curve1d>& lon_trajectory,
     const PlanningObject& objective) const {
-
   const LatticeSamplingConfig& lattice_sampling_config =
-    objective.lattice_sampling_config();
-  const LonSampleConfig& lon_sample_config = lattice_sampling_config.lon_sample_config();
-  const LatSampleConfig& lat_sample_config = lattice_sampling_config.lat_sample_config();
+      objective.lattice_sampling_config();
+  const LonSampleConfig& lon_sample_config =
+      lattice_sampling_config.lon_sample_config();
+  const LatSampleConfig& lat_sample_config =
+      lattice_sampling_config.lat_sample_config();
 
   double s = lon_sample_config.lon_end_condition().s();
   double ds = lon_sample_config.lon_end_condition().ds();
@@ -184,7 +188,6 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   if (objective.decision_type() == PlanningObject::GO) {
     // zero s target means cruise
     if (s <= std::numeric_limits<double>::epsilon()) {
-
       double target_speed = ds;
       double end_speed =
           lon_trajectory->Evaluate(1, lon_trajectory->param_length());
@@ -206,9 +209,10 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
       return cost;
     } else {
       // Follow
-      //apply the following 3 second rule.
+      // apply the following 3 second rule.
       double target_s = s - 3.0 * ds;
-      double end_s = lon_trajectory->Evaluate(0, lon_trajectory->param_length());
+      double end_s =
+          lon_trajectory->Evaluate(0, lon_trajectory->param_length());
 
       double weight = 10.0;
       return (target_s - end_s) * weight;

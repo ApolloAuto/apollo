@@ -33,8 +33,7 @@ static double enable_stop_handling = true;
 static double longitudinal_acceleration_comfort_factor = 0.7;
 static double trajectory_time_resolution = 0.05;
 
-
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_LATTICE_LATTICE_PARAMS_H_ */

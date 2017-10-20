@@ -21,10 +21,10 @@
 #ifndef MODULES_PLANNING_LATTICE_LATTICE_CONSTRAINT_CHECKER_H
 #define MODULES_PLANNING_LATTICE_LATTICE_CONSTRAINT_CHECKER_H
 
+#include <vector>
+
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/curve1d.h"
-
-#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -33,19 +33,16 @@ class LatticeConstraintChecker {
  public:
   LatticeConstraintChecker() = delete;
 
-  static bool IsValidTrajectoryPair(const Curve1d& lat_trajectory, const Curve1d& lon_trajectory);
+  static bool IsValidTrajectoryPair(const Curve1d& lat_trajectory,
+                                    const Curve1d& lon_trajectory);
 
   static bool IsValidLongitudinalTrajectory(const Curve1d& lon_trajectory);
 
   static bool IsValidLateralTrajectory(const Curve1d& lat_trajectory,
-    const Curve1d& lon_trajectory);
-
-  //TODO: remove this function
-  static bool CheckAngularAcceleration(
-    const DiscretizedTrajectory& discretized_trajectory);
+                                       const Curve1d& lon_trajectory);
 };
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_LATTICE_LATTICE_CONSTRAINT_CHECKER_H */
