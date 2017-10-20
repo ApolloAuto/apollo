@@ -75,7 +75,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
 
   // 4. parse the decision and get the planning target.
 
-  PlanningObject planning_object = decider_.analyze(
+  PlanningTarget planning_object = decider_.analyze(
       frame, planning_init_point, init_s, discretized_reference_line);
 
   AINFO << "    [---Planning_Object---]: " << planning_object.decision_type();

@@ -38,7 +38,7 @@ class Trajectory1dGenerator {
   virtual ~Trajectory1dGenerator() = default;
 
   void GenerateTrajectoryBundles(
-      const PlanningObject& planning_objective,
+      const PlanningTarget& planning_objective,
       const std::array<double, 3>& lon_init_state,
       const std::array<double, 3>& lat_init_state,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
@@ -46,7 +46,7 @@ class Trajectory1dGenerator {
 
  private:
   void GenerateLongitudinalTrajectoryBundle(
-      const PlanningObject& planning_objective,
+      const PlanningTarget& planning_objective,
       const std::array<double, 3>& lon_init_state,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
