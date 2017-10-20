@@ -55,7 +55,7 @@ class MileageCalculator(object):
                 if topic == kChassisTopic:
                     # Mode changed
                     if cur_mode != msg.driving_mode:
-                        if msg.driving_mode == Chassis.EMERGENCY_MODE:
+                        if msg.driving_mode == Chassis.EMERGENCY_MODE and cur_mode == Chassis.COMPLETE_AUTO_DRIVE:
                             self.disengagements += 1
                         cur_mode = msg.driving_mode
                         # Reset start position.
