@@ -37,6 +37,7 @@ PlanningObject BehaviorDecider::analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<ReferenceLine>& candidate_reference_lines) {
+
   PlanningObject ret;
   CHECK(frame != nullptr);
   // Only handles one reference line

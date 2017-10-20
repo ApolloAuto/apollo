@@ -19,7 +19,6 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/lattice/decision_analyzer.h"
 #include "modules/planning/lattice/lattice_params.h"
 #include "modules/planning/lattice/reference_line_matcher.h"
 #include "modules/planning/lattice/trajectory1d_generator.h"
