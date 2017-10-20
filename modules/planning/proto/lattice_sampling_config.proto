@@ -43,7 +43,7 @@ message LatticeSamplingConfig {
   optional LatSampleConfig lat_sample_config = 2;
 }
 
-message PlanningObject {
+message PlanningTarget {
   enum DecisionType {
     STOP = 0;
     GO = 1;

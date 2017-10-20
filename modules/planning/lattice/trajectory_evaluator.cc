@@ -30,7 +30,7 @@ namespace apollo {
 namespace planning {
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const PlanningObject& objective,
+    const PlanningTarget& objective,
     const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories) {
   for (std::size_t i = 0; i < lon_trajectories.size(); ++i) {
@@ -77,7 +77,7 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
 }
 
 double TrajectoryEvaluator::evaluate(
-    const PlanningObject& objective,
+    const PlanningTarget& objective,
     const std::shared_ptr<Curve1d>& lon_trajectory,
     const std::shared_ptr<Curve1d>& lat_trajectory) const {
   // currently consider three costs:
@@ -173,7 +173,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
 
 double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Curve1d>& lon_trajectory,
-    const PlanningObject& objective) const {
+    const PlanningTarget& objective) const {
   const LatticeSamplingConfig& lattice_sampling_config =
       objective.lattice_sampling_config();
   const LonSampleConfig& lon_sample_config =
@@ -185,7 +185,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   double ds = lon_sample_config.lon_end_condition().ds();
   double dds = lon_sample_config.lon_end_condition().dds();
 
-  if (objective.decision_type() == PlanningObject::GO) {
+  if (objective.decision_type() == PlanningTarget::GO) {
     // zero s target means cruise
     if (s <= std::numeric_limits<double>::epsilon()) {
       double target_speed = ds;
@@ -218,7 +218,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
       return (target_s - end_s) * weight;
     }
   } else {
-    CHECK(objective.decision_type() == PlanningObject::STOP);
+    CHECK(objective.decision_type() == PlanningTarget::STOP);
     double target_s = s;
     double t_max = lon_trajectory->param_length();
     double end_s = lon_trajectory->Evaluate(0, t_max);

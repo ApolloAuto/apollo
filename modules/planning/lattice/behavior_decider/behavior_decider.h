@@ -39,18 +39,18 @@ class BehaviorDecider {
 
   virtual ~BehaviorDecider() = default;
 
-  PlanningObject analyze(
+  PlanningTarget analyze(
       Frame* frame, const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<ReferenceLine>& candidate_reference_lines);
 
-  PlanningObject analyze(
+  PlanningTarget analyze(
       Frame* frame, const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
-  PlanningObject previous_planning_target;
+  PlanningTarget previous_planning_target;
 };
 
 }  // namespace planning

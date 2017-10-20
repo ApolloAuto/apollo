@@ -33,12 +33,12 @@ namespace planning {
 
 BehaviorDecider::BehaviorDecider() {}
 
-PlanningObject BehaviorDecider::analyze(
+PlanningTarget BehaviorDecider::analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<ReferenceLine>& candidate_reference_lines) {
 
-  PlanningObject ret;
+  PlanningTarget ret;
   CHECK(frame != nullptr);
   // Only handles one reference line
   CHECK_GT(candidate_reference_lines.size(), 0);
@@ -64,15 +64,15 @@ PlanningObject BehaviorDecider::analyze(
   lon_sample_config->mutable_lon_end_condition()->set_ds(
       FLAGS_default_cruise_speed);
   lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
-  ret.set_decision_type(PlanningObject::GO);
+  ret.set_decision_type(PlanningTarget::GO);
   return ret;
 }
 
-PlanningObject BehaviorDecider::analyze(
+PlanningTarget BehaviorDecider::analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line) {
-  PlanningObject ret;
+  PlanningTarget ret;
   CHECK(frame != nullptr);
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
@@ -93,7 +93,7 @@ PlanningObject BehaviorDecider::analyze(
   lon_sample_config->mutable_lon_end_condition()->set_ds(
       FLAGS_default_cruise_speed);
   lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
-  ret.set_decision_type(PlanningObject::GO);
+  ret.set_decision_type(PlanningTarget::GO);
   return ret;
 }
 
