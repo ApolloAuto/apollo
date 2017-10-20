@@ -16,30 +16,23 @@
 
 #include "modules/dreamview/backend/hmi/hmi_status_helper.h"
 
+#include "modules/common/adapters/adapter_manager.h"
+
 namespace apollo {
 namespace dreamview {
-namespace {
-
-void ReportHMIStatus(const HMIStatus& hmi_status) {
-  // TODO(xiaoxq): Post HMIStatus on topic /apollo/hmi_status, then dreamview
-  // backend will merge it into the global HMIStatus singleton and broadcast to
-  // HMI clients through websocket.
-}
-
-}  // namespace
 
 void HMIStatusHelper::ReportHardwareStatus(
     const std::vector<HardwareStatus> &hardware_status) {
   HMIStatus hmi_status;
   *hmi_status.mutable_hardware() = {hardware_status.begin(),
                                     hardware_status.end()};
-  ReportHMIStatus(hmi_status);
+  common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
 }
 
 void HMIStatusHelper::ReportModuleStatus(const ModuleStatus &module_status) {
   HMIStatus hmi_status;
   *hmi_status.add_modules() = module_status;
-  ReportHMIStatus(hmi_status);
+  common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
 }
 
 }  // namespace dreamview
