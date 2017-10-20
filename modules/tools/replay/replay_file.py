@@ -53,9 +53,29 @@ def generate_message(msg_type, filename):
     return message
 
 
+def identify_topic(filename):
+    f_handle = file(filename, 'r')
+    file_content = f_handle.read()
+    for topic, msg_type in topic_msg_dict.items():
+        message = msg_type()
+        try:
+            if text_format.Merge(file_content, message):
+                print "identified topic %s" % topic
+                f_handle.close()
+                return topic
+        except text_format.ParseError as e:
+            print "Tried %s, failed" % (topic)
+            continue
+    f_handle.close()
+    return None
+
+
 def topic_publisher(topic, filename, period):
     """publisher"""
     rospy.init_node('replay_node', anonymous=True)
+    if not topic:
+        print "Topic not specified, start to guess"
+        topic = identify_topic(filename)
     if topic not in topic_msg_dict:
         print "Unknown topic:", topic
         sys.exit(0)
@@ -74,7 +94,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "filename", action="store", type=str, help="planning result files")
     parser.add_argument(
-        "topic", action="store", type=str, help="set the planning topic")
+        "--topic", action="store", type=str, help="set the planning topic")
     parser.add_argument(
         "--period",
         action="store",
