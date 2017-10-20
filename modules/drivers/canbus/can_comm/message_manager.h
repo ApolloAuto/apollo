@@ -165,7 +165,7 @@ ProtocolData<SensorType>
         const uint32_t message_id) {
   if (protocol_data_map_.find(message_id) == protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
-           << message_id;
+           << Byte::byte_to_hex(message_id);
     return nullptr;
   }
   return protocol_data_map_[message_id];
