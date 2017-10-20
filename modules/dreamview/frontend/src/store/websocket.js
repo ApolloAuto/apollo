@@ -132,6 +132,12 @@ class WebSocketEndpoint {
             type: "Reset",
         }));
     }
+
+    dumpMessages() {
+        this.websocket.send(JSON.stringify({
+            type: "Dump",
+        }));
+    }
 }
 
 // Returns the websocket server address based on the web server address.

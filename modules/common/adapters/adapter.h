@@ -102,9 +102,9 @@ class Adapter {
           size_t message_num, const std::string& dump_dir = "/tmp")
       : topic_name_(topic_name),
         message_num_(message_num),
-        enable_dump_(FLAGS_enable_adapter_dump && HasSequenceNumber<D>()),
-        dump_path_(enable_dump_ ? dump_dir + "/" + adapter_name : "") {
-    if (enable_dump_) {
+        enable_dump_(FLAGS_enable_adapter_dump),
+        dump_path_(dump_dir + "/" + adapter_name) {
+    if (HasSequenceNumber<D>()) {
       if (!apollo::common::util::EnsureDirectory(dump_path_)) {
         AERROR << "Cannot enable dumping for '" << adapter_name
                << "' adapter because the path " << dump_path_
@@ -116,6 +116,8 @@ class Adapter {
                << " contains files that cannot be removed.";
         enable_dump_ = false;
       }
+    } else {
+      enable_dump_ = false;
     }
   }
 
@@ -275,13 +277,27 @@ class Adapter {
   }
 
   /**
-   * @brief Clear the data received so far
+   * @brief Clear the data received so far.
    */
   void ClearData() {
     // Lock the queue.
     std::lock_guard<std::mutex> lock(mutex_);
     data_queue_.clear();
     observed_queue_.clear();
+  }
+
+  /**
+   * @brief Dumps the latest received data to file.
+   */
+  bool DumpLatestMessage() {
+    if (!Empty()) {
+      D msg = GetLatestObserved();
+      return DumpMessage<D>(msg);
+    }
+
+    AWARN << "Unable to dump message with topic " << topic_name_
+          << ". No message received.";
+    return false;
   }
 
  private:
