@@ -14,11 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
-#define MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
+#define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 
+#include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 
 /**
@@ -28,29 +32,28 @@
 namespace apollo {
 namespace dreamview {
 
-/**
- * @class HMIStatusHelper
- *
- * @brief Helper to report status to HMI.
- *        To use it, you must be able to publish to HMI_STATUS channel.
- */
-class HMIStatusHelper {
+class HMI {
  public:
-  /*
-   * @brief Report hardware status to HMI.
-   * @param hardware_status the vector of hardware status
-   */
-  static void ReportHardwareStatus(
-      const std::vector<HardwareStatus> &hardware_status);
+  explicit HMI(WebSocketHandler *websocket);
 
-  /*
-   * @brief Report module status to HMI.
-   * @param module_status the status of the module
-   */
-  static void ReportModuleStatus(const ModuleStatus &module_status);
+  void Start();
+
+ private:
+  void OnHMIStatus(const HMIStatus &hmi_status);
+
+  ModuleStatus* GetModuleStatus(const std::string &module_name);
+  HardwareStatus* GetHardwareStatus(const std::string &hardware_name);
+
+  HMIConfig config_;
+  HMIStatus status_;
+
+  // No ownership.
+  WebSocketHandler *websocket_;
+
+  FRIEND_TEST(HMITest, UpdateHMIStatus);
 };
 
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
+#endif  // MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
