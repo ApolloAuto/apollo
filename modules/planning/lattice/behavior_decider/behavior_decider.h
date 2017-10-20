@@ -34,26 +34,26 @@ namespace apollo {
 namespace planning {
 
 class BehaviorDecider {
-public:
+ public:
   BehaviorDecider();
 
   virtual ~BehaviorDecider() = default;
 
-  PlanningObject analyze(Frame* frame,
-    const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    std::vector<ReferenceLine>& candidate_reference_lines);
+  PlanningObject analyze(
+      Frame* frame, const common::TrajectoryPoint& init_planning_point,
+      const std::array<double, 3>& lon_init_state,
+      const std::vector<ReferenceLine>& candidate_reference_lines);
 
-  PlanningObject analyze(Frame* frame,
-    const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line);
+  PlanningObject analyze(
+      Frame* frame, const common::TrajectoryPoint& init_planning_point,
+      const std::array<double, 3>& lon_init_state,
+      const std::vector<common::PathPoint>& discretized_reference_line);
 
-private:
+ private:
   PlanningObject previous_planning_target;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_H */
