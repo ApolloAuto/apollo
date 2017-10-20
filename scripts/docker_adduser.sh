@@ -34,11 +34,19 @@ if [ -e /dev/ttyUSB0 ]; then
 fi
 
 MACHINE_ARCH=$(uname -m)
-ROS_TAR="ros-indigo-apollo-1.5.0-${MACHINE_ARCH}.tar.gz"
+ROS_TAR="ros-indigo-apollo-1.5.1-${MACHINE_ARCH}.tar.gz"
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
+# setup ros package
+# this is a tempary solution to avoid ros package downloading.
+ROS="/home/tmp/ros"
+if [ -e "$ROS" ]; then
+  rm -rf $ROS
+fi
+tar xzf "/home/tmp/${ROS_TAR}" -C "/home/tmp"
+chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
 fi
