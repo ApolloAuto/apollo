@@ -31,7 +31,7 @@ namespace apollo {
 namespace planning {
 
 void Trajectory1dGenerator::GenerateTrajectoryBundles(
-    const PlanningObject& planning_objective,
+    const PlanningTarget& planning_objective,
     const std::array<double, 3>& lon_init_state,
     const std::array<double, 3>& lat_init_state,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
@@ -43,7 +43,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
   const LatSampleConfig& lat_sample_config =
       lattice_sampling_config.lat_sample_config();
 
-  if (planning_objective.decision_type() == PlanningObject::STOP &&
+  if (planning_objective.decision_type() == PlanningTarget::STOP &&
       enable_stop_handling == true) {
     double stop_position = lon_sample_config.lon_end_condition().s();
     double distance = stop_position - lon_init_state[0];
@@ -90,7 +90,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
   return;
 }
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
-    const PlanningObject& planning_objective,
+    const PlanningTarget& planning_objective,
     const std::array<double, 3>& init_state,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   const LatticeSamplingConfig& lattice_sampling_config =
@@ -109,11 +109,11 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     // To Be Uniformly Replaced By LatticeSampleConfig
     GenerateSpeedProfilesForCruising(init_state, lon_sample_config,
                                      ptr_lon_trajectory_bundle);
-  } else if (planning_objective.decision_type() == PlanningObject::GO) {
+  } else if (planning_objective.decision_type() == PlanningTarget::GO) {
     GenerateSpeedProfilesForFollowing(init_state, lon_sample_config,
                                       ptr_lon_trajectory_bundle);
   } else {
-    CHECK(planning_objective.decision_type() == PlanningObject::STOP);
+    CHECK(planning_objective.decision_type() == PlanningTarget::STOP);
     GenerateSpeedProfilesForStopping(init_state, lon_sample_config,
                                      ptr_lon_trajectory_bundle);
     GenerateSpeedProfilesForCruising(init_state, lon_sample_config,
