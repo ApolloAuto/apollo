@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_library(
-    name = "localization_app",
+    name = "localization_lib",
     srcs = [
         "localization.cc",
     ],
@@ -35,7 +35,7 @@ cc_binary(
         "//modules/localization/conf:localization_adapter_manager_config",
     ],
     deps = [
-        ":localization_app",
+        ":localization_lib",
     ],
 )
 
