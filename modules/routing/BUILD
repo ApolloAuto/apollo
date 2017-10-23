@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "lib_routing",
+    name = "routing_lib",
     srcs = [
         "routing.cc",
     ],
@@ -30,7 +30,7 @@ cc_binary(
     name = "routing",
     srcs = ["main.cc"],
     deps = [
-        ":lib_routing",
+        ":routing_lib",
         "//external:gflags",
     ],
 )

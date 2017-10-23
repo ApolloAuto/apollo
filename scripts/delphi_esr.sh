@@ -21,30 +21,9 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${DIR}/.."
 
-source "${DIR}/apollo_base.sh"
+source "$DIR/apollo_base.sh"
 
-function start() {
-    LOG="${APOLLO_ROOT_DIR}/data/log/gnss_driver.out"
-    nohup roslaunch gnss_driver gnss_driver.launch </dev/null >"${LOG}" 2>&1 &
-}
-
-function stop() {
-    pkill -f gnss_driver
-}
-
+# run function from apollo_base.sh
 # run command_name module_name
-function run() {
-    case $1 in
-        start)
-            start
-            ;;
-        stop)
-            stop
-            ;;
-        *)
-            start
-            ;;
-    esac
-}
+run_customized_path drivers/delphi_esr delphi_esr "$@"
 
-run "$1"

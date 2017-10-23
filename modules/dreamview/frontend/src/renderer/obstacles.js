@@ -91,7 +91,7 @@ export default class PerceptionObstacles {
             confidence = Math.max(0.0, confidence);
             confidence = Math.min(1.0, confidence);
             const polygon = obstacle.polygonPoint;
-            if (polygon.length > 0) {
+            if (polygon !== undefined && polygon.length > 0) {
                 this.updatePolygon(polygon, obstacle.height, color, coordinates, confidence,
                         extrusionFaceIdx, scene);
                 extrusionFaceIdx += polygon.length;
@@ -171,19 +171,23 @@ export default class PerceptionObstacles {
     }
 
     updateCube(length, width, height, position, heading, color, confidence, cubeIdx, scene) {
-        const solidCubeMesh = this.getCube(cubeIdx, scene, true);
-        solidCubeMesh.position.set(position.x, position.y, position.z+height*(confidence-1)/2 );
-        solidCubeMesh.scale.set(length, width, height*confidence);
-        solidCubeMesh.material.color.setHex(color);
-        solidCubeMesh.rotation.set(0, 0, heading);
-        solidCubeMesh.visible = true;
+        if (confidence > 0) {
+            const solidCubeMesh = this.getCube(cubeIdx, scene, true);
+            solidCubeMesh.position.set(position.x, position.y, position.z+height*(confidence-1)/2 );
+            solidCubeMesh.scale.set(length, width, height*confidence);
+            solidCubeMesh.material.color.setHex(color);
+            solidCubeMesh.rotation.set(0, 0, heading);
+            solidCubeMesh.visible = true;
+        }
 
-        const dashedCubeMesh = this.getCube(cubeIdx, scene, false);
-        dashedCubeMesh.position.set(position.x, position.y, position.z+height*confidence/2 );
-        dashedCubeMesh.scale.set(length, width, height*(1-confidence));
-        dashedCubeMesh.material.color.setHex(color);
-        dashedCubeMesh.rotation.set(0, 0, heading);
-        dashedCubeMesh.visible = true;
+        if (confidence < 1) {
+            const dashedCubeMesh = this.getCube(cubeIdx, scene, false);
+            dashedCubeMesh.position.set(position.x, position.y, position.z+height*confidence/2 );
+            dashedCubeMesh.scale.set(length, width, height*(1-confidence));
+            dashedCubeMesh.material.color.setHex(color);
+            dashedCubeMesh.rotation.set(0, 0, heading);
+            dashedCubeMesh.visible = true;
+        }
     }
 
     getArrow(index, scene) {

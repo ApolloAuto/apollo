@@ -29,6 +29,11 @@
 namespace apollo {
 namespace common {
 
+void ApolloApp::SetCallbackThreadNumber(uint32_t callback_thread_num) {
+  CHECK_GE(callback_thread_num, 1);
+  callback_thread_num_ = callback_thread_num;
+}
+
 void ApolloApp::ReportModuleStatus(
     const apollo::hmi::ModuleStatus::Status status) {
   status_.set_name(Name());
@@ -37,7 +42,7 @@ void ApolloApp::ReportModuleStatus(
 }
 
 int ApolloApp::Spin() {
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(callback_thread_num_);
   auto status = Init();
   if (!status.ok()) {
     AERROR << Name() << " Init failed: " << status;

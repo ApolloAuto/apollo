@@ -110,11 +110,16 @@ namespace adapter {
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
+  name##Adapter *InternalGet##name() {                                         \
+    return name##_.get();                                                      \
+  }                                                                            \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (node_handle_) {                                                        \
       name##publisher_.publish(data);                                          \
+    } else {                                                                   \
+      /* For non-ROS mode, just triggers the callback. */                      \
+      name##_->OnReceive(data);                                                \
     }                                                                          \
     name##_->SetLatestPublished(data);                                         \
   }
@@ -168,11 +173,14 @@ class AdapterManager {
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
                                 bool autostart = true) {
-    CHECK(instance()->node_handle_)
-        << "ROS node is only available in ROS mode, "
-           "check your adapter config file!";
-    return instance()->node_handle_->createTimer(period, callback, obj, oneshot,
-                                                 autostart);
+    if (instance()->node_handle_) {
+      return instance()->node_handle_->createTimer(period, callback, obj,
+                                                   oneshot, autostart);
+    } else {
+      AERROR << "ROS timer is only available in ROS mode, check your adapter "
+                "config file! Return a dummy timer that won't function.";
+      return ros::Timer();
+    }
   }
 
  private:
@@ -204,8 +212,12 @@ class AdapterManager {
   REGISTER_ADAPTER(RoutingResponse);
   REGISTER_ADAPTER(RelativeOdometry);
   REGISTER_ADAPTER(InsStat);
+  // TODO(xiaoxq): Retire HMICommand adapter after integration with dreamview.
   REGISTER_ADAPTER(HMICommand);
+  REGISTER_ADAPTER(HMIStatus);
   REGISTER_ADAPTER(Mobileye);
+  REGISTER_ADAPTER(DelphiESR);
+  REGISTER_ADAPTER(CompressedImage);
 
   DECLARE_SINGLETON(AdapterManager);
 };

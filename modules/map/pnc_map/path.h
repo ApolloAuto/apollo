@@ -248,6 +248,9 @@ class Path {
   const std::vector<PathOverlap>& junction_overlaps() const {
     return junction_overlaps_;
   }
+  const std::vector<PathOverlap>& clear_area_overlaps() const {
+    return clear_area_overlaps_;
+  }
   const std::vector<PathOverlap>& speed_bump_overlaps() const {
     return speed_bump_overlaps_;
   }
@@ -302,6 +305,7 @@ class Path {
   std::vector<PathOverlap> crosswalk_overlaps_;
   std::vector<PathOverlap> parking_space_overlaps_;
   std::vector<PathOverlap> junction_overlaps_;
+  std::vector<PathOverlap> clear_area_overlaps_;
   std::vector<PathOverlap> speed_bump_overlaps_;
 };
 

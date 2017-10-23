@@ -254,7 +254,7 @@ std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
 
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
-    pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
+    hdmap::PncMap::CreatePathFromLaneSegments(segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
       std::vector<double> init_t_knots;
@@ -265,8 +265,10 @@ std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
         continue;
       }
       reference_lines.push_back(std::move(reference_line));
+      reference_lines.back().set_change_lane_type(segments.change_lane_type());
     } else {
       reference_lines.emplace_back(hdmap_path);
+      reference_lines.back().set_change_lane_type(segments.change_lane_type());
     }
   }
 
@@ -320,13 +322,12 @@ void Frame::AddObstacle(const Obstacle &obstacle) {
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
-  if (!drive_reference_line_info_) {
-    double reference_line_cost = std::numeric_limits<double>::infinity();
-    for (const auto &reference_line_info : reference_line_info_) {
-      if (reference_line_info.Cost() < reference_line_cost) {
-        drive_reference_line_info_ = &reference_line_info;
-        reference_line_cost = reference_line_info.Cost();
-      }
+  drive_reference_line_info_ = &reference_line_info_.front();
+  double reference_line_cost = drive_reference_line_info_->Cost();
+  for (const auto &reference_line_info : reference_line_info_) {
+    if (reference_line_info.Cost() < reference_line_cost) {
+      drive_reference_line_info_ = &reference_line_info;
+      reference_line_cost = reference_line_info.Cost();
     }
   }
   return drive_reference_line_info_;

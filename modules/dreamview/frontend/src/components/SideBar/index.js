@@ -5,6 +5,7 @@ import ButtonPanel from "components/SideBar/ButtonPanel";
 import Menu from "components/SideBar/Menu";
 import Console from "components/SideBar/Console";
 import Notification from "components/SideBar/Notification";
+import WS from "store/websocket";
 
 @inject("store") @observer
 export default class SideBar extends React.Component {
@@ -13,7 +14,13 @@ export default class SideBar extends React.Component {
 
         return (
             <div className="sidebar">
-                <ButtonPanel sendDefaultRoutingRequest={() => {
+                <ButtonPanel resetBackend={() => {
+                                     WS.resetBackend();
+                                 }}
+                             dumpMessages={() => {
+                                     WS.dumpMessages();
+                                 }}
+                             sendDefaultRoutingRequest={() => {
                                      routeEditingManager.sendRoutingRequest(true);
                                  }}
                              showRouteEditingBar={() => {

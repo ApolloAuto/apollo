@@ -175,6 +175,13 @@ function setup_device() {
     if [ ! -e /dev/can0 ]; then
         sudo mknod --mode=a+rw /dev/can0 c 52 0
     fi
+
+    MACHINE_ARCH=$(uname -m)
+    if [ "$MACHINE_ARCH" == 'aarch64' ]; then
+      sudo ip link set can0 type can bitrate 500000
+      sudo ip link set can0 up
+    fi
+
     # setup nvidia device
     sudo /sbin/modprobe nvidia
     sudo /sbin/modprobe nvidia-uvm
@@ -192,9 +199,10 @@ function setup_device() {
     fi
 }
 
-function is_stopped() {
-    MODULE=${1}
-    NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE}/${MODULE}")"
+function is_stopped_customized_path() {
+    MODULE_PATH=$1
+    MODULE=$2
+    NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE_PATH}/${MODULE}")"
     if [ "${NUM_PROCESSES}" -eq 0 ]; then
         return 1
     else
@@ -202,20 +210,59 @@ function is_stopped() {
     fi
 }
 
+function start_customized_path() {
+    MODULE_PATH=$1
+    MODULE=$2
+    shift 2
+
+    LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
+    is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
+    if [ $? -eq 1 ]; then
+        eval "nohup ${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
+            --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
+            --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
+        sleep 0.5
+        is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
+        if [ $? -eq 0 ]; then
+            echo "Launched module ${MODULE}."
+            return 0
+        else
+            echo "Could not launch module ${MODULE}. Is it already built?"
+            return 1
+        fi
+    else
+        echo "Module ${MODULE} is already running - skipping."
+        return 2
+    fi
+}
+
 function start() {
     MODULE=$1
     shift
 
+    start_customized_path $MODULE $MODULE "$@"
+}
+
+function start_prof_customized_path() {
+    MODULE_PATH=$1
+    MODULE=$2
+    shift 2
+
+    echo "Make sure you have built with 'bash apollo.sh build_prof'"
     LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
-    is_stopped "${MODULE}"
+    is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
     if [ $? -eq 1 ]; then
-        eval "nohup ${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
-            --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
+        PROF_FILE="/tmp/$MODULE.prof"
+        rm -rf $PROF_FILE
+        BINARY=${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE}
+        eval "CPUPROFILE=$PROF_FILE $BINARY \
+            --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
             --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
         sleep 0.5
-        is_stopped "${MODULE}"
+        is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
         if [ $? -eq 0 ]; then
-            echo "Launched module ${MODULE}."
+            echo -e "Launched module ${MODULE} in prof mode. \nExport profile by command:"
+            echo -e "${YELLOW}google-pprof --pdf $BINARY $PROF_FILE > ${MODULE}_prof.pdf${NO_COLOR}"
             return 0
         else
             echo "Could not launch module ${MODULE}. Is it already built?"
@@ -231,49 +278,41 @@ function start_prof() {
     MODULE=$1
     shift
 
-    echo "Make sure you have built with 'bash apollo.sh build_prof'"
-    LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
-    is_stopped "${MODULE}"
-    if [ $? -eq 1 ]; then
-        PROF_FILE="/tmp/$MODULE.prof"
-        rm -rf $PROF_FILE
-        BINARY=${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE}
-        eval "CPUPROFILE=$PROF_FILE $BINARY \
-            --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
-            --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
-        sleep 0.5
-        is_stopped "${MODULE}"
-        if [ $? -eq 0 ]; then
-            echo -e "Launched module ${MODULE} in prof mode. \nExport profile by command:"
-            echo -e "${YELLOW}google-pprof --pdf $BINARY $PROF_FILE > ${MODULE}_prof.pdf${NO_COLOR}"
-            return 0
-        else
-            echo "Could not launch module ${MODULE}. Is it already built?"
-            return 1
-        fi
-    else
-        echo "Module ${MODULE} is already running - skipping."
-        return 2
-    fi
+    start_prof_customized_path $MODULE $MODULE "$@"
+}
+
+function start_fe_customized_path() {
+    MODULE_PATH=$1
+    MODULE=$2
+    shift 2
+
+    eval "${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
+        --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
+        --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
 }
 
 function start_fe() {
     MODULE=$1
     shift
 
-    eval "${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
-        --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
-        --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
+    start_fe_customized_path $MODULE $MODULE "$@"
 }
 
-function stop() {
-    MODULE=$1
-    pkill -SIGINT -f "modules/${MODULE}/${MODULE}"
+function stop_customized_path() {
+    MODULE_PATH=$1
+    MODULE=$2
+
+    pkill -SIGINT -f "modules/${MODULE_PATH}/${MODULE}"
     if [ $? -eq 0 ]; then
         echo "Successfully stopped module ${MODULE}."
     else
         echo "Module ${MODULE} is not running - skipping."
     fi
+}
+
+function stop() {
+    MODULE=$1
+    stop_customized_path $MODULE $MODULE
 }
 
 function help() {
@@ -287,31 +326,38 @@ function help() {
   "
 }
 
-# run command_name module_name
-function run() {
-    local module=$1
-    local cmd=$2
-    shift 2
+function run_customized_path() {
+    local module_path=$1
+    local module=$2
+    local cmd=$3
+    shift 3
     case $cmd in
         start)
-            start $module "$@"
+            start_customized_path $module_path $module "$@"
             ;;
         start_fe)
-            start_fe $module "$@"
+            start_fe_customized_path $module_path $module "$@"
             ;;
         start_prof)
-            start_prof $module "$@"
+            start_prof_customized_path $module_path $module "$@"
             ;;
         stop)
-            stop $module
+            stop_customized_path $module_path $module
             ;;
         help)
             help
             ;;
         *)
-            start $module "$@"
+            start_customized_path $module_path $module $cmd "$@"
             ;;
     esac
+}
+
+# run command_name module_name
+function run() {
+    local module=$1
+    shift
+    run_customized_path $module $module "$@"
 }
 
 check_in_docker

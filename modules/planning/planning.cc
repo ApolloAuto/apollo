@@ -224,10 +224,11 @@ void Planning::RunOnce() {
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
+  bool is_replan = false;
   const auto& stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
           is_auto_mode, start_timestamp, planning_cycle_time,
-          last_publishable_trajectory_.get());
+          last_publishable_trajectory_.get(), &is_replan);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, start_timestamp, stitching_trajectory.back());
@@ -257,6 +258,7 @@ void Planning::RunOnce() {
   ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
 
   if (status.ok()) {
+    trajectory_pb.set_is_replan(is_replan);
     PublishPlanningPb(&trajectory_pb, start_timestamp);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else if (FLAGS_publish_estop) {
@@ -337,7 +339,6 @@ common::Status Planning::Plan(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
-  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
   return status;
 }

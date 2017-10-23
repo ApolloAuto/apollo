@@ -121,6 +121,7 @@ bool ReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line,
                             rlp.lane_waypoints()),
         kappa, dkappa, 0.0, 0.0));
   }
+
   ReferencePoint::RemoveDuplicates(&ref_points);
   if (ref_points.size() < 2) {
     AERROR << "Fail to generate smoothed reference line.";
@@ -158,6 +159,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
   std::vector<double> evaluated_t;
   common::util::uniform_slice(t_knots_.front(), t_knots_.back(),
                               constraint_num - 1, &evaluated_t);
+
   std::vector<common::PathPoint> path_points;
   if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {
     AERROR << "Extract evaluated points failed";
@@ -166,34 +168,36 @@ bool ReferenceLineSmoother::ApplyConstraint(
 
   // Add x, y boundary constraint
   std::vector<double> headings;
-  std::vector<double> longitidinal_bound;
+  std::vector<double> longitudinal_bound;
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
     headings.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(smoother_config_.boundary_bound());
-    lateral_bound.push_back(smoother_config_.boundary_bound());
+    // TODO(all): change the langitudianl and lateral direction in code
+    longitudinal_bound.push_back(smoother_config_.lateral_boundary_bound());
+    lateral_bound.push_back(smoother_config_.longitudinal_boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
   static constexpr double kFixedBoundLimit = 0.01;
-  if (longitidinal_bound.size() > 0) {
-    longitidinal_bound.front() = kFixedBoundLimit;
-    longitidinal_bound.back() = kFixedBoundLimit;
+  if (longitudinal_bound.size() > 0) {
+    longitudinal_bound.front() = kFixedBoundLimit;
+    longitudinal_bound.back() = kFixedBoundLimit;
   }
 
   if (lateral_bound.size() > 0) {
+    lateral_bound.front() = kFixedBoundLimit;
     lateral_bound.back() = kFixedBoundLimit;
   }
 
   CHECK_EQ(evaluated_t.size(), headings.size());
   CHECK_EQ(evaluated_t.size(), xy_points.size());
-  CHECK_EQ(evaluated_t.size(), longitidinal_bound.size());
+  CHECK_EQ(evaluated_t.size(), longitudinal_bound.size());
   CHECK_EQ(evaluated_t.size(), lateral_bound.size());
 
   auto* spline_constraint = spline_solver_->mutable_constraint();
   if (!spline_constraint->Add2dBoundary(evaluated_t, headings, xy_points,
-                                        longitidinal_bound, lateral_bound)) {
+                                        longitudinal_bound, lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
   }
@@ -219,8 +223,7 @@ bool ReferenceLineSmoother::ApplyKernel() {
         smoother_config_.third_derivative_weight());
   }
 
-  constexpr double kReferenceLineSmootherKernelWeight = 0.01;
-  kernel->AddRegularization(kReferenceLineSmootherKernelWeight);
+  kernel->AddRegularization(smoother_config_.regularization_weight());
   return true;
 }
 
@@ -248,26 +251,35 @@ bool ReferenceLineSmoother::ExtractEvaluatedPoints(
 
 bool ReferenceLineSmoother::GetSFromParamT(const double t,
                                            double* const s) const {
-  if (t_knots_.size() < 2 || t - t_knots_.back() > 1e-8) {
+  if (t_knots_.size() < 2) {
+    AERROR << "Fail to GetSFromParamT because t_knots_.size() error.";
     return false;
   }
-  std::uint32_t lower = FindIndex(t);
-  std::uint32_t upper = lower + 1;
-  double weight = 0.0;
-  const double diff = t_knots_[upper] - t_knots_[lower];
-  if (std::fabs(diff) > 1e-8) {
-    weight = (t - t_knots_[lower]) / diff;
+
+  if (fabs(t - t_knots_.front()) < 1e-8) {
+    *s = ref_points_.front().s();
+    return true;
   }
-  *s =
-      ref_points_[lower].s() * (1.0 - weight) + ref_points_[upper].s() * weight;
+  if (fabs(t - t_knots_.back()) < 1e-8) {
+    *s = ref_points_.back().s();
+    return true;
+  }
+  if (t < t_knots_.front() || t > t_knots_.back()) {
+    AERROR << "Fail to GetSFromParamT. t = " << t;
+    return false;
+  }
+
+  std::uint32_t upper = FindIndex(t);
+  std::uint32_t lower = upper - 1;
+
+  const double r = (t - t_knots_[lower]) / (t_knots_[upper] - t_knots_[lower]);
+  *s = ref_points_[lower].s() * (1.0 - r) + ref_points_[upper].s() * r;
   return true;
 }
 
 std::uint32_t ReferenceLineSmoother::FindIndex(const double t) const {
-  auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
-  return std::min(t_knots_.size() - 1,
-                  static_cast<std::size_t>(upper_bound - t_knots_.begin())) -
-         1;
+  auto upper_bound = std::upper_bound(t_knots_.begin(), t_knots_.end(), t);
+  return std::distance(t_knots_.begin(), upper_bound);
 }
 
 }  // namespace planning

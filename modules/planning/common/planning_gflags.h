@@ -24,14 +24,16 @@ DECLARE_string(adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
-DECLARE_double(trajectory_resolution);
+DECLARE_double(rtk_trajectory_resolution);
 DECLARE_double(look_backward_distance);
 DECLARE_double(look_forward_distance);
+DECLARE_double(look_forward_min_distance);
+DECLARE_double(look_forward_time_sec);
+
 DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
-DECLARE_bool(use_planning_cycle_time_in_stitcher);
 
 DECLARE_int32(max_history_frame_num);
 
@@ -41,9 +43,10 @@ DECLARE_double(replan_distance_threshold);
 // parameter for reference line
 DECLARE_bool(enable_reference_line_provider_thread);
 DECLARE_double(default_reference_line_width);
-DECLARE_double(planning_upper_speed_limit);
+DECLARE_double(smoothed_reference_line_max_diff);
 
 // parameters for trajectory planning
+DECLARE_double(planning_upper_speed_limit);
 DECLARE_double(trajectory_time_length);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(output_trajectory_time_resolution);
@@ -64,6 +67,7 @@ DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
 
 DECLARE_double(kappa_bound);
+DECLARE_double(dkappa_bound);
 
 // STBoundary
 DECLARE_double(st_max_s);

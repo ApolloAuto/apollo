@@ -49,7 +49,7 @@ bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {
   using google::protobuf::io::FileOutputStream;
   using google::protobuf::TextFormat;
   if (file_descriptor < 0) {
-    AERROR << "Invalid file descriptor";
+    AERROR << "Invalid file descriptor.";
     return false;
   }
   ZeroCopyOutputStream *output = new FileOutputStream(file_descriptor);
@@ -69,8 +69,12 @@ bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {
 template <typename MessageType>
 bool SetProtoToASCIIFile(const MessageType &message,
                          const std::string &file_name) {
-  return SetProtoToASCIIFile(
-      message, open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU));
+  int fd = open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+  if (fd < 0) {
+    AERROR << "Unable to open file " << file_name << " to write.";
+    return false;
+  }
+  return SetProtoToASCIIFile(message, fd);
 }
 
 /**

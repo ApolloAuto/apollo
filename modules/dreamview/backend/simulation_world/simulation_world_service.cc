@@ -311,7 +311,24 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_length(vehicle_param.length());
 }
 
-const SimulationWorld &SimulationWorldService::Update() {
+void SimulationWorldService::Update() {
+  if (to_clear_) {
+    // Clears received data.
+    AdapterManager::GetChassis()->ClearData();
+    AdapterManager::GetLocalization()->ClearData();
+    AdapterManager::GetPerceptionObstacles()->ClearData();
+    AdapterManager::GetPlanning()->ClearData();
+    AdapterManager::GetPrediction()->ClearData();
+    AdapterManager::GetRoutingResponse()->ClearData();
+    AdapterManager::GetMonitor()->ClearData();
+
+    // Clears simulation world except for the car information.
+    auto car = world_.auto_driving_car();
+    world_.Clear();
+    *world_.mutable_auto_driving_car() = car;
+    to_clear_ = false;
+  }
+
   AdapterManager::Observe();
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
@@ -334,8 +351,6 @@ const SimulationWorld &SimulationWorldService::Update() {
   UpdateDelays();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
-
-  return world_;
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -509,8 +524,7 @@ void SimulationWorldService::UpdatePlanningTrajectory(
         // Move on to the last point if the last but one is collected.
         i = trajectory_length - 1;
       } else if (i < trajectory_length - 2) {
-        // When collecting the trajectory points, downsample with a
-        // ratio of 10.
+        // When collecting the trajectory points, downsample with a ratio of 10.
         constexpr double downsample_ratio = 10;
         i += downsample_ratio;
         if (i > trajectory_length - 2) {
@@ -626,8 +640,31 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 }
 
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
-  auto planning_data = world_.mutable_planning_data();
-  planning_data->CopyFrom(data);
+  auto *planning_data = world_.mutable_planning_data();
+
+  planning_data->mutable_speed_plan()->CopyFrom(data.speed_plan());
+  planning_data->mutable_st_graph()->CopyFrom(data.st_graph());
+  planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
+
+  planning_data->clear_path();
+  for (const ::apollo::common::Path &path : data.path()) {
+    // Downsample the path points for frontend display.
+    // Angle threshold is about 5.72 degree.
+    constexpr double angle_threshold = 0.1;
+    std::vector<int> sampled_indices =
+        DownsampleByAngle(path.path_point(), angle_threshold);
+
+    auto *downsampled_path = planning_data->add_path();
+    downsampled_path->set_name(path.name());
+    for (int index : sampled_indices) {
+      const auto &path_point = path.path_point()[index];
+      auto *point = downsampled_path->add_path_point();
+      point->set_x(path_point.x());
+      point->set_y(path_point.y());
+      point->set_s(path_point.s());
+      point->set_kappa(path_point.kappa());
+    }
+  }
 }
 
 template <>
@@ -713,15 +750,10 @@ void SimulationWorldService::ReadRoutingFromFile(
 }
 
 void SimulationWorldService::RegisterMessageCallbacks() {
-  if (CheckAdapterInitialized("Monitor", AdapterManager::GetMonitor())) {
-    AdapterManager::AddMonitorCallback(
-        &SimulationWorldService::UpdateSimulationWorld, this);
-  }
-  if (CheckAdapterInitialized("RoutingResponse",
-                              AdapterManager::GetRoutingResponse())) {
-    AdapterManager::AddRoutingResponseCallback(
-        &SimulationWorldService::UpdateSimulationWorld, this);
-  }
+  AdapterManager::AddMonitorCallback(
+      &SimulationWorldService::UpdateSimulationWorld, this);
+  AdapterManager::AddRoutingResponseCallback(
+      &SimulationWorldService::UpdateSimulationWorld, this);
 }
 
 }  // namespace dreamview

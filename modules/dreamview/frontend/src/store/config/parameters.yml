@@ -17,9 +17,9 @@ camera:
     near: 1
     far: 3000
   Monitor:
-    fov: 110
+    fov: 70
     near: 1
-    far: 3000
+    far: 100
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
@@ -38,7 +38,9 @@ options:
   defaults:
     showMenu: false
     showConsole: false
-    showPNCMonitor: false
+    showPlanningReference: false
+    showPlaningDpOptimizer: false
+    showPlanningQpOptimizer: false
     showPlanning: true
     showDecisionMain: true
     showDecisionObstacle: true

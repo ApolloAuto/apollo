@@ -32,11 +32,13 @@ using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               SimControl *sim_control,
                                                const MapService *map_service,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
-      websocket_(websocket) {
+      websocket_(websocket),
+      sim_control_(sim_control) {
   // Initialize default end point
   LoadDefaultEndPoint();
 
@@ -88,7 +90,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         // Publish monitor message.
         if (succeed) {
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Routing Request Sent");
+                                                   "Routing request Sent");
         } else {
           sim_world_service_.PublishMonitorMessage(
               MonitorMessageItem::ERROR, "Failed to send routing request");
@@ -125,6 +127,21 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           response["end_y"] = default_end_point_.pose().y();
         }
         websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
+        sim_world_service_.SetToClear();
+        sim_control_->ClearPlanning();
+      });
+
+  websocket_->RegisterMessageHandler(
+      "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
+        DumpMessage(AdapterManager::GetChassis(), "Chassis");
+        DumpMessage(AdapterManager::GetPrediction(), "Prediction");
+        DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
+        DumpMessage(AdapterManager::GetLocalization(), "Localization");
+        DumpMessage(AdapterManager::GetPlanning(), "Planning");
       });
 }
 
@@ -206,15 +223,13 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
 }
 
 bool SimulationWorldUpdater::LoadDefaultEndPoint() {
-  bool ret =
-      default_end_point_.has_id()
-          ? true
-          : GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_);
-
-  if (!ret) {
-    AWARN << "Failed to load default end point from " << EndWayPointFile();
+  if (default_end_point_.has_id() ||
+      GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
+    return true;
   }
-  return ret;
+
+  AWARN << "Failed to load default end point from " << EndWayPointFile();
+  return false;
 }
 
 }  // namespace dreamview

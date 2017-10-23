@@ -9,7 +9,6 @@ import RouteEditingManager from "store/route_editing_manager";
 import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
 
-
 class DreamviewStore {
     // Mutable States
     @observable timestamp = 0;
@@ -70,9 +69,15 @@ class DreamviewStore {
         if(this.options.showPNCMonitor) {
             this.updateWidthInPercentage(0.7);
             this.options.selectCamera('Monitor');
+            this.options.showPlanningReference = true;
+            this.options.showPlaningDpOptimizer = true;
+            this.options.showPlanningQpOptimizer = true;
         } else {
             this.updateWidthInPercentage(1.0);
             this.options.selectCamera('Default');
+            this.options.showPlanningReference = false;
+            this.options.showPlaningDpOptimizer = false;
+            this.options.showPlanningQpOptimizer = false;
         }
     }
 }
