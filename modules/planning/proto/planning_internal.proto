@@ -8,7 +8,6 @@ import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
-import "modules/prediction/proto/prediction_obstacle.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
