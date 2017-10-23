@@ -17,7 +17,6 @@
 #include "modules/dreamview/backend/hmi/hmi.h"
 
 #include "google/protobuf/util/json_util.h"
-#include "third_party/json/json.hpp"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/util.h"
@@ -27,7 +26,22 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
-using Json = nlohmann::json;
+using Json = WebSocketHandler::Json;
+
+namespace {
+
+std::string ProtoToTypedJsonString(const std::string &json_type,
+                                   const google::protobuf::Message &proto) {
+  std::string json_string;
+  google::protobuf::util::MessageToJsonString(proto, &json_string);
+
+  Json json_obj;
+  json_obj["type"] = json_type;
+  json_obj["data"] = Json::parse(json_string);
+  return json_obj.dump();
+}
+
+}  // namespace
 
 HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
@@ -39,6 +53,25 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
   }
   for (const auto &hardware : config_.hardware()) {
     status_.add_hardware()->set_name(hardware.name());
+  }
+
+  // Register websocket message handlers.
+  if (websocket_) {
+    // Newly opened HMI client retrieves current status.
+    websocket_->RegisterMessageHandler(
+        "RetrieveHMIStatus",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          SendHMIStatus(conn);
+        });
+
+    // HMI client asks for executing module commands.
+    websocket_->RegisterMessageHandler(
+        "ExecuteModuleCommand",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          // TODO(xiaoxq): Run the command on module.
+          //   json = {module: 'module_name', command: 'command_name'}
+          //   E.g.: module=planning, command=start
+        });
   }
 }
 
@@ -71,18 +104,14 @@ void HMI::OnHMIStatus(const HMIStatus &hmi_status) {
 
 void HMI::BroadcastHMIStatus() const {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
-  if (websocket_ == nullptr) {
-    return;
+  if (websocket_) {
+    websocket_->BroadcastData(ProtoToTypedJsonString("HMIStatus", status_));
   }
+}
 
-  // Broadcast jsonified HMIStatus to clients via websocket.
-  std::string status_json_string;
-  google::protobuf::util::MessageToJsonString(status_, &status_json_string);
-
-  Json status_json;
-  status_json["type"] = "HMIStatus";
-  status_json["data"] = Json::parse(status_json_string);
-  websocket_->BroadcastData(status_json.dump());
+void HMI::SendHMIStatus(WebSocketHandler::Connection *conn) const {
+  CHECK(websocket_);
+  websocket_->SendData(conn, ProtoToTypedJsonString("HMIStatus", status_));
 }
 
 ModuleStatus* HMI::GetModuleStatus(const std::string &module_name) {

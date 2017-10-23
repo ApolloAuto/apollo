@@ -100,7 +100,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @brief Sends the provided data to all the connected clients.
    * @param data The message string to be sent.
    */
-  bool BroadcastData(const std::string &data);
+  bool BroadcastData(const std::string &data, bool skippable = false);
 
   /**
    * @brief Sends the provided data to a specific connected client.
