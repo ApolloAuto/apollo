@@ -39,8 +39,13 @@ class HMI {
   void Start();
 
  private:
+  // Callback of new HMIStatus message.
   void OnHMIStatus(const HMIStatus &hmi_status);
+
+  // Broadcast HMIStatus to all clients.
   void BroadcastHMIStatus() const;
+  // Send HMIStatus to given client.
+  void SendHMIStatus(WebSocketHandler::Connection *conn) const;
 
   ModuleStatus* GetModuleStatus(const std::string &module_name);
   HardwareStatus* GetHardwareStatus(const std::string &hardware_name);
