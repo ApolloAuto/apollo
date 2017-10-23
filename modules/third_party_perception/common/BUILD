@@ -8,10 +8,10 @@ cc_library(
     hdrs = ["third_party_perception_util.h"],
     deps = [
         ":third_party_perception_gflags",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
         "//modules/common:log",
-        "//modules/map/hdmap:hdmap_util"
+        "//modules/localization/proto:localization_proto",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 

@@ -37,8 +37,8 @@ cc_library(
         "reference_76a.h",
     ],
     deps = [
-        "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/proto:sensor_proto",
     ],
 )
 

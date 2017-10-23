@@ -19,4 +19,3 @@ proto_library(
         "//modules/perception/proto:perception_proto_lib",
     ],
 )
-
