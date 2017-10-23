@@ -40,6 +40,7 @@ class HMI {
 
  private:
   void OnHMIStatus(const HMIStatus &hmi_status);
+  void BroadcastHMIStatus() const;
 
   ModuleStatus* GetModuleStatus(const std::string &module_name);
   HardwareStatus* GetHardwareStatus(const std::string &hardware_name);
