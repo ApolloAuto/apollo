@@ -38,6 +38,7 @@ options:
   defaults:
     showMenu: false
     showConsole: false
+    showPNCMonitor: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
     showPlanningQpOptimizer: false
