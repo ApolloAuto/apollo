@@ -55,7 +55,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   AINFO << "-------------------------------------------------";
   AINFO << "Number of planning cycles:\t" << num_planning_cycles << "\t"
         << num_planning_succeeded_cycles;
-  num_planning_cycles++;
+  ++num_planning_cycles;
 
   // 1. obtain a reference line and transform it to the PathPoint format.
   auto discretized_reference_line =
@@ -75,17 +75,17 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
 
   // 4. parse the decision and get the planning target.
 
-  PlanningTarget planning_object = decider_.analyze(
+  PlanningTarget planning_target = decider_.Analyze(
       frame, planning_init_point, init_s, discretized_reference_line);
 
-  AINFO << "    [---Planning_Object---]: " << planning_object.decision_type();
+  AINFO << "    [---planning_target---]: " << planning_target.decision_type();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
   Trajectory1dGenerator trajectory1d_generator;
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
   trajectory1d_generator.GenerateTrajectoryBundles(
-      planning_object, init_s, init_d, &lon_trajectory1d_bundle,
+      planning_target, init_s, init_d, &lon_trajectory1d_bundle,
       &lat_trajectory1d_bundle);
 
   // 6. first, evaluate the feasibility of the 1d trajectories according to
@@ -93,7 +93,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
-      planning_object, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
+      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
 
   AINFO << "number of trajectory pairs = "
         << trajectory_evaluator.num_of_trajectory_pairs();
@@ -181,7 +181,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
         << "] times";
   if (num_lattice_traj > 0) {
     AINFO << "Planning succeeded";
-    num_planning_succeeded_cycles += 1;
+    ++num_planning_succeeded_cycles;
     return Status::OK();
   } else {
     AINFO << "Planning failed";
