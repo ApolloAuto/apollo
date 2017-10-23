@@ -130,6 +130,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
     AERROR << "Invalid routing";
     return false;
   }
+  routing_lane_ids_.clear();
   for (const auto &road : routing.road()) {
     for (const auto &passage : road.passage()) {
       for (const auto &lane : passage.segment()) {
