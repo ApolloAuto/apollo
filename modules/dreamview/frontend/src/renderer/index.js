@@ -2,6 +2,7 @@ import * as THREE from "three";
 import OrbitControls from "three/examples/js/controls/OrbitControls.js";
 import Stats from "stats.js";
 
+import STORE from "store";
 import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
@@ -68,6 +69,9 @@ class Renderer {
             this.stats.domElement.style.bottom = '0px';
             document.body.appendChild(this.stats.domElement);
         }
+
+        // Geolocation of the mouse
+        this.geolocation = {x: 0, y:0};
     }
 
     initialize(canvasId, width, height, options) {
@@ -250,8 +254,8 @@ class Renderer {
                   "a default end point file under the map data directory.");
             return;
         }
-        this.routingEditor.addDefaultEndPoint(this.defaultRoutingEndPoint,
-                                              this.coordinates, this.scene);
+        this.routingEditor.addRoutingPoint(this.defaultRoutingEndPoint,
+                                           this.coordinates, this.scene);
     }
 
     removeAllRoutingPoints() {
@@ -283,7 +287,8 @@ class Renderer {
             return;
         }
 
-        this.routingEditor.addRoutingPoint(event, this.camera, this.ground, this.scene);
+        const point = this.getGeolocation(event);
+        this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
     }
 
     // Render one frame. This supports the main draw/render loop.
@@ -356,6 +361,26 @@ class Renderer {
             || navigator.userAgent.match(/iPhone/i)
             || navigator.userAgent.match(/iPad/i)
             || navigator.userAgent.match(/iPod/i);
+    }
+
+    updateGeolocation(event) {
+        const geo = this.getGeolocation(event);
+        STORE.setGeolocation(geo);
+    }
+
+    getGeolocation(event) {
+        const vector = new THREE.Vector3(
+            (event.clientX / STORE.dimension.width) * 2 - 1,
+            -(event.clientY / STORE.dimension.height) * 2 + 1,
+            0);
+        vector.unproject(this.camera);
+
+        const direction = vector.sub(this.camera.position).normalize();
+        const distance = -this.camera.position.z / direction.z;
+        const pos = this.camera.position.clone().add(direction.multiplyScalar(distance));
+        const geo = this.coordinates.applyOffset(pos, true);
+
+        return geo;
     }
 }
 

@@ -919,6 +919,15 @@ body {
     }
 }
 
+.geolocation {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    z-index: 1;
+
+    color: white;
+}
+
 .pnc-monitor {
     position: absolute;
     right: 0px;
