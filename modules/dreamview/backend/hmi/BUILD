@@ -22,6 +22,8 @@ cc_library(
         "//modules/dreamview/backend/handlers:websocket",
         "//modules/dreamview/proto:hmi_config_proto",
         "//modules/dreamview/proto:hmi_status_proto",
+        "//third_party/json",
+        "@com_google_protobuf//:protobuf",
         "@gtest//:gtest",
     ],
 )
