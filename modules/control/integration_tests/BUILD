@@ -15,7 +15,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
-        "//modules/control:lib_control",
+        "//modules/control:control_lib",
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
         "@gtest//:main",

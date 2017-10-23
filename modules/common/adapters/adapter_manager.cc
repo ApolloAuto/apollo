@@ -38,8 +38,7 @@ bool AdapterManager::Initialized() {
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   // Parse config file
   AdapterManagerConfig configs;
-  CHECK(
-      apollo::common::util::GetProtoFromFile(adapter_config_filename, &configs))
+  CHECK(util::GetProtoFromFile(adapter_config_filename, &configs))
       << "Unable to parse adapter config file " << adapter_config_filename;
   AINFO << "Init AdapterManger config:" << configs.DebugString();
   Init(configs);
@@ -137,6 +136,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config.mode(),
                               config.message_history_limit());
+        break;
+      case AdapterConfig::HMI_STATUS:
+        EnableHMIStatus(FLAGS_hmi_status_topic, config.mode(),
+                        config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

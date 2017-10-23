@@ -53,7 +53,7 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
 
   std::string to_string() const override;
 
- private:
+ protected:
   void compute_coefficients(const double x0, const double dx0,
                             const double ddx0, const double x1,
                             const double dx1, const double ddx1,

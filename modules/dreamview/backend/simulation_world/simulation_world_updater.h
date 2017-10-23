@@ -27,10 +27,11 @@
 #include "boost/thread/shared_mutex.hpp"
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
+#include "modules/dreamview/backend/handlers/websocket.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
 
 /**
  * @namespace apollo::dreamview
@@ -84,12 +85,32 @@ class SimulationWorldUpdater {
       apollo::routing::RoutingRequest *routing_request);
 
   /**
- * @brief Tries to load the default routing end point from the file if it has
- * not been.
- * @return False if failed to load the default routing end point from file, true
- * otherwise or if it's already loaded.
- */
+   * @brief Tries to load the default routing end point from the file if it has
+   * not been.
+   * @return False if failed to load the default routing end point from file,
+   * true otherwise or if it's already loaded.
+   */
   bool LoadDefaultEndPoint();
+
+  /**
+   * @brief Dumps the latest received message to file.
+   * @param adapter the adapter to perfom dumping
+   * @param adapter_name the name of the adapter
+   */
+  template <typename AdapterType>
+  void DumpMessage(AdapterType *adapter, std::string adapter_name) {
+    if (adapter->DumpLatestMessage()) {
+      sim_world_service_.PublishMonitorMessage(
+          common::monitor::MonitorMessageItem::INFO,
+          common::util::StrCat("Dumped latest ", adapter_name,
+                               " message under /tmp/", adapter_name, "."));
+    } else {
+      sim_world_service_.PublishMonitorMessage(
+          common::monitor::MonitorMessageItem::WARN,
+          common::util::StrCat("Failed to dump latest ", adapter_name,
+                               " message."));
+    }
+  }
 
   // Time interval, in seconds, between pushing SimulationWorld to frontend.
   static constexpr double kSimWorldTimeInterval = 0.1;

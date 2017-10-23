@@ -66,8 +66,7 @@ void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
 
 bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                        const LaneWaypoint &waypoint) {
-  return waypoint.lane != nullptr &&
-         lane_segment.id() == waypoint.lane->id().id() &&
+  return waypoint.lane && lane_segment.id() == waypoint.lane->id().id() &&
          lane_segment.start_s() - kSegmentationEpsilon <= waypoint.s &&
          lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s;
 }
@@ -157,16 +156,15 @@ bool PncMap::ValidateRouting(const RoutingResponse &routing) {
 }
 
 std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
-  int road_index = -1;
-  for (const auto &road_segment : routing_.road()) {
-    ++road_index;
-    int passage_index = -1;
-    for (const auto &passage : road_segment.passage()) {
-      ++passage_index;
-      int lane_index = -1;
-      for (const auto &segment : passage.segment()) {
-        ++lane_index;
-        if (WithinLaneSegment(segment, waypoint)) {
+  for (int road_index = routing_.road_size() - 1; road_index >= 0;
+       --road_index) {
+    const auto &road_segment = routing_.road(road_index);
+    for (int passage_index = road_segment.passage_size() - 1;
+         passage_index >= 0; --passage_index) {
+      const auto &passage = road_segment.passage(passage_index);
+      for (int lane_index = passage.segment_size() - 1; lane_index >= 0;
+           --lane_index) {
+        if (WithinLaneSegment(passage.segment(lane_index), waypoint)) {
           return {road_index, passage_index, lane_index};
         }
       }
@@ -190,6 +188,56 @@ bool PncMap::PassageToSegments(routing::Passage passage,
   return true;
 }
 
+std::vector<std::pair<int, routing::ChangeLaneType>> PncMap::GetDrivePassages(
+    const routing::RoadSegment &road, int start_passage) const {
+  CHECK_GE(start_passage, 0);
+  CHECK_LE(start_passage, road.passage_size());
+  std::vector<std::pair<int, routing::ChangeLaneType>> result;
+  result.emplace_back(start_passage, routing::FORWARD);
+  const auto &source_passage = road.passage(start_passage);
+  if (source_passage.change_lane_type() == routing::FORWARD) {
+    return result;
+  }
+  if (source_passage.can_exit()) {  // no need to change lane
+    return result;
+  }
+  RouteSegments source_segments;
+  DCHECK(PassageToSegments(source_passage, &source_segments))
+      << "failed to convert passage to segments";
+  std::unordered_set<std::string> neighbor_lanes;
+  if (source_passage.change_lane_type() == routing::LEFT) {
+    for (const auto &segment : source_segments) {
+      for (const auto &left_id :
+           segment.lane->lane().left_neighbor_forward_lane_id()) {
+        neighbor_lanes.insert(left_id.id());
+      }
+    }
+  } else if (source_passage.change_lane_type() == routing::RIGHT) {
+    for (const auto &segment : source_segments) {
+      for (const auto &right_id :
+           segment.lane->lane().right_neighbor_forward_lane_id()) {
+        neighbor_lanes.insert(right_id.id());
+      }
+    }
+  }
+
+  for (int i = 0; i < road.passage_size(); ++i) {
+    if (i == start_passage) {
+      continue;
+    }
+    const auto &target_passage = road.passage(i);
+    std::unordered_set<std::string> target_lane_set;
+    target_lane_set.reserve(target_passage.segment_size());
+    for (const auto &segment : target_passage.segment()) {
+      if (neighbor_lanes.count(segment.id())) {
+        result.emplace_back(i, source_passage.change_lane_type());
+        break;
+      }
+    }
+  }
+  return result;
+}
+
 bool PncMap::GetRouteSegments(
     const common::PointENU &point, const double backward_length,
     const double forward_length,
@@ -207,30 +255,26 @@ bool PncMap::GetRouteSegments(
   int road_index = index[0];
   int passage_index = index[1];
   const auto &road = routing_.road(road_index);
-  std::vector<int> indices{passage_index - 1, passage_index, passage_index + 1};
-  for (int index : indices) {
-    if (index < 0 || index >= road.passage_size()) {
-      continue;
-    }
-    const auto &passage = road.passage(index);
+  auto drive_passages = GetDrivePassages(road, passage_index);
+  for (const auto &drive_passage : drive_passages) {
+    auto index = drive_passage.first;
+    auto change_lane_type = drive_passage.second;
+    const auto &passage = road.passage(drive_passage.first);
     RouteSegments segments;
-    if (!PassageToSegments(passage, &segments)) {
-      AERROR << "Failed to convert passage to lane segments.";
-      return false;
-    }
-    if (index < passage_index) {
-      segments.SetChangeLaneType(routing::ChangeLaneType::LEFT);
-    } else if (index > passage_index) {
-      segments.SetChangeLaneType(routing::ChangeLaneType::RIGHT);
-    }
+    DCHECK(PassageToSegments(passage, &segments))
+        << "Failed to convert passage to lane segments.";
     double s = 0.0;
     double l = 0.0;
     bool has_projection = segments.GetInnerProjection(point, &s, &l);
-    if (has_projection) {
-      route_segments->emplace_back();
-      TruncateLaneSegments(segments, s - backward_length, s + forward_length,
-                           &route_segments->back());
+    if (!has_projection) {
+      ADEBUG << "Passage(" << index << ") in road(" << road_index
+             << ") is not in range for lane change";
+      continue;
     }
+    route_segments->emplace_back();
+    TruncateLaneSegments(segments, s - backward_length, s + forward_length,
+                         &route_segments->back());
+    route_segments->back().SetChangeLaneType(change_lane_type);
   }
   return true;
 }
@@ -238,6 +282,7 @@ bool PncMap::GetRouteSegments(
 bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
                                         LaneWaypoint *waypoint) const {
   const double kMaxDistance = 20.0;  // meters.
+  waypoint->lane = nullptr;
   std::vector<LaneInfoConstPtr> lanes;
   const int status = hdmap_->GetLanes(point, kMaxDistance, &lanes);
   if (status < 0) {
@@ -270,7 +315,7 @@ bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
       waypoint->s = s;
     }
   }
-  return true;
+  return waypoint->lane != nullptr;
 }
 
 LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {

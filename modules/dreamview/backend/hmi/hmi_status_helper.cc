@@ -14,31 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
-#define MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
+#include "modules/dreamview/backend/hmi/hmi_status_helper.h"
 
-#include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
 
-DECLARE_string(dreamview_module_name);
+namespace apollo {
+namespace dreamview {
 
-DECLARE_string(adapter_config_filename);
+void HMIStatusHelper::ReportHardwareStatus(
+    const std::vector<HardwareStatus> &hardware_status) {
+  HMIStatus hmi_status;
+  *hmi_status.mutable_hardware() = {hardware_status.begin(),
+                                    hardware_status.end()};
+  common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
+}
 
-DECLARE_string(hmi_config_filename);
+void HMIStatusHelper::ReportModuleStatus(const ModuleStatus &module_status) {
+  HMIStatus hmi_status;
+  *hmi_status.add_modules() = module_status;
+  common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
+}
 
-DECLARE_string(static_file_dir);
-
-DECLARE_string(server_ports);
-
-DECLARE_bool(enable_sim_control);
-
-DECLARE_bool(routing_from_file);
-
-DECLARE_string(routing_response_file);
-
-DECLARE_string(websocket_timeout_ms);
-
-DECLARE_string(ssl_certificate);
-
-DECLARE_double(map_radius);
-
-#endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
+}  // namespace dreamview
+}  // namespace apollo

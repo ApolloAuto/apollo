@@ -250,7 +250,7 @@ function start_prof_customized_path() {
 
     echo "Make sure you have built with 'bash apollo.sh build_prof'"
     LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
-    is_stopped "${MODULE}"
+    is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
     if [ $? -eq 1 ]; then
         PROF_FILE="/tmp/$MODULE.prof"
         rm -rf $PROF_FILE
@@ -259,7 +259,7 @@ function start_prof_customized_path() {
             --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
             --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
         sleep 0.5
-        is_stopped "${MODULE}"
+        is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
         if [ $? -eq 0 ]; then
             echo -e "Launched module ${MODULE} in prof mode. \nExport profile by command:"
             echo -e "${YELLOW}google-pprof --pdf $BINARY $PROF_FILE > ${MODULE}_prof.pdf${NO_COLOR}"

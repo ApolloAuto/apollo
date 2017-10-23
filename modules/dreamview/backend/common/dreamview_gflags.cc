@@ -21,6 +21,9 @@ DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 DEFINE_string(adapter_config_filename, "modules/dreamview/conf/adapter.conf",
               "The adapter config file");
 
+DEFINE_string(hmi_config_filename, "modules/dreamview/conf/hmi.conf",
+              "The HMI config file");
+
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");
