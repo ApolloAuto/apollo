@@ -33,7 +33,7 @@ namespace planning {
 
 BehaviorDecider::BehaviorDecider() {}
 
-PlanningTarget BehaviorDecider::analyze(
+PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<ReferenceLine>& candidate_reference_lines) {
@@ -68,7 +68,7 @@ PlanningTarget BehaviorDecider::analyze(
   return ret;
 }
 
-PlanningTarget BehaviorDecider::analyze(
+PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line) {
