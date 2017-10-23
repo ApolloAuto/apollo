@@ -87,6 +87,10 @@ namespace adapter {
       void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
     Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
+  /* Returns false if there's no callback to pop out, true otherwise. */       \
+  static bool Pop##name##Callback() {                                          \
+    return instance()->name##_->PopCallback();                                 \
+  }                                                                            \
                                                                                \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
