@@ -126,6 +126,7 @@ cc_library(
         "collision_checker.h",
     ],
     deps = [
+        "//modules/common:log",
         "//modules/common/math:box2d",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
