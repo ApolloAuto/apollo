@@ -157,6 +157,12 @@ class AdapterManager {
   static void Init(const AdapterManagerConfig &configs);
 
   /**
+   * @brief Resets the /class AdapterManager so that it could be
+   * re-initiailized.
+   */
+  static void Reset();
+
+  /**
    * @brief check if the AdapterManager is initialized
    */
   static bool Initialized();
