@@ -358,6 +358,7 @@ function citest() {
   //modules/planning/integration_tests:sunnyvale_loop_test
   //modules/control/integration_tests:simple_control_test
   //modules/prediction/container/obstacles:obstacle_test
+  //modules/dreamview/backend/simulation_world:simulation_world_service_test
   "
   bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
