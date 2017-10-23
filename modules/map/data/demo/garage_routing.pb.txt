@@ -4,7 +4,7 @@ header {
   sequence_num: 1
 }
 routing_request {
-    start {
+    waypoint {
         id: "1_-1"
         s: 0.0
         pose {
@@ -12,7 +12,7 @@ routing_request {
             y: 4140673.012320
         }
     }
-    end {
+    waypoint {
         id: "1_-1"
         s: 153.0
         pose {

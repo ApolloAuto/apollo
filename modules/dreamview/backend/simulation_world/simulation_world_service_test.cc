@@ -62,6 +62,7 @@ class SimulationWorldServiceTest : public ::testing::Test {
       sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
       sub_config->set_type(AdapterConfig::ROUTING_RESPONSE);
     }
+    AdapterManager::Reset();
     AdapterManager::Init(config);
 
     FLAGS_routing_response_file =
