@@ -102,13 +102,8 @@ PathPoint ReferenceLineMatcher::FindMinDistancePoint(const PathPoint& p0,
     auto func_sin_theta = [&spline_geodesic, &p0](const double s) {
       return std::sin(spline_geodesic.Evaluate(0, s) + p0.theta());
     };
-<<<<<<< HEAD
     double px = p0.x() + IntegrateByGaussLegendre<5>(func_cos_theta, p0.s(), s);
     double py = p0.y() + IntegrateByGaussLegendre<5>(func_sin_theta, p0.s(), s);
-=======
-    double px = p0.x() + IntegrateByGaussLegendre(func_cos_theta, p0.s(), s);
-    double py = p0.y() + IntegrateByGaussLegendre(func_sin_theta, p0.s(), s);
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
 
     double dx = px - x;
     double dy = py - y;

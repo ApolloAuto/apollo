@@ -24,10 +24,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/lattice/lattice_params.h"
-<<<<<<< HEAD
-=======
 #include "modules/common/log.h"
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
 
 namespace apollo {
 namespace planning {
@@ -38,12 +35,8 @@ CollisionChecker::CollisionChecker(
 }
 
 bool CollisionChecker::InCollision(
-<<<<<<< HEAD
-    const DiscretizedTrajectory& discretized_trajectory) {
-=======
     const DiscretizedTrajectory &discretized_trajectory) {
   AINFO << "      --- into collision_checker";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
   CHECK_LE(discretized_trajectory.NumOfPoints(), predicted_envs_.size());
   const auto& vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
@@ -58,19 +51,13 @@ bool CollisionChecker::InCollision(
         trajectory_point.path_point().theta(), ego_length, ego_width);
     for (const auto& obstacle_box : predicted_envs_[time_index]) {
       if (ego_box.HasOverlap(obstacle_box)) {
-<<<<<<< HEAD
-=======
         AINFO << "      --- exit collision_checker";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
         return true;
       }
     }
     ++time_index;
   }
-<<<<<<< HEAD
-=======
   AINFO << "      --- exit collision_checker";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
   return false;
 }
 

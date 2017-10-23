@@ -122,10 +122,7 @@ cc_library(
         "collision_checker.h",
     ],
     deps = [
-<<<<<<< HEAD
-=======
         "//modules/common:log",
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
         "//modules/common/math:box2d",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",

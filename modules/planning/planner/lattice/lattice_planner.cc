@@ -49,15 +49,6 @@ Status LatticePlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-<<<<<<< HEAD
-Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
-                            Frame* frame,
-                            ReferenceLineInfo* reference_line_info) {
-  AINFO << "-------------------------------------------------";
-  AINFO << "Number of planning cycles:\t" << num_planning_cycles << "\t"
-        << num_planning_succeeded_cycles;
-  ++num_planning_cycles;
-=======
 Status LatticePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point,
     Frame* frame,
@@ -68,7 +59,6 @@ Status LatticePlanner::Plan(
   AINFO << "Number of planning cycles:\t" << num_planning_cycles
       << "\t" << num_planning_succeeded_cycles;
   num_planning_cycles++;
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
 
   // 1. obtain a reference line and transform it to the PathPoint format.
   auto discretized_reference_line =
@@ -84,14 +74,6 @@ Status LatticePlanner::Plan(
   // 3. according to the matched point, compute the init state in Frenet frame.
   std::array<double, 3> init_s;
   std::array<double, 3> init_d;
-<<<<<<< HEAD
-  ComputeInitFrenetState(matched_point, planning_init_point, &init_s, &init_d);
-
-  // 4. parse the decision and get the planning target.
-
-  PlanningTarget planning_target = decider_.Analyze(
-      frame, planning_init_point, init_s, discretized_reference_line);
-=======
 
   ComputeInitFrenetState(matched_point, planning_init_point, &init_s,
       &init_d);
@@ -102,7 +84,6 @@ Status LatticePlanner::Plan(
     planning_init_point,
     init_s,
     discretized_reference_line);
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
 
   AINFO << "    [---planning_target---]: " << planning_target.decision_type();
 
@@ -124,10 +105,8 @@ Status LatticePlanner::Plan(
   AINFO << "number of trajectory pairs = "
         << trajectory_evaluator.num_of_trajectory_pairs();
   AINFO << "";
-<<<<<<< HEAD
-=======
+
   AINFO << "Step 4,5,6 Succeeded";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
 
   // Get instance of collision checker and constraint checker
   const std::vector<const Obstacle*>& obstacles = frame->obstacles();
@@ -154,10 +133,8 @@ Status LatticePlanner::Plan(
         obstacle_ptr->Perception());
     prediction_obstacle->add_trajectory()->CopyFrom(obstacle_ptr->Trajectory());
   }
-<<<<<<< HEAD
-=======
+
   AINFO << "Step Debug Succeeded";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
 
   int num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
@@ -168,19 +145,6 @@ Status LatticePlanner::Plan(
             *lat_trajectory1d_bundle[trajectory_pair.second],
             *lon_trajectory1d_bundle[trajectory_pair.first])) {
       ++constraint_failure_count;
-<<<<<<< HEAD
-      continue;
-    }
-
-    auto combined_trajectory =
-        CombineTrajectory(discretized_reference_line,
-                          *lon_trajectory1d_bundle[trajectory_pair.first],
-                          *lat_trajectory1d_bundle[trajectory_pair.second],
-                          planning_init_point.relative_time());
-
-    if (collision_checker.InCollision(combined_trajectory)) {
-      ++collision_failure_count;
-=======
       AINFO << "------continued from ConstraintChecker";
       continue;
     }
@@ -194,7 +158,6 @@ Status LatticePlanner::Plan(
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
       AINFO << "------continued from CollisionChecker";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
       continue;
     }
 
@@ -211,12 +174,8 @@ Status LatticePlanner::Plan(
     }
     combined_trajectory_path->set_lattice_trajectory_cost(trajectory_pair_cost);
 
-<<<<<<< HEAD
-    // AINFO << "trajectory not valid for constraint ["
-=======
     AINFO << "------(2)set lattice trajectory";
     //AINFO << "trajectory not valid for constraint ["
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
     //          << constraint_failure_count << "] times";
     // AINFO << "trajectory not valid for collision ["
     //          << collision_failure_count << "] times";
@@ -230,18 +189,6 @@ Status LatticePlanner::Plan(
     }
   }
 
-<<<<<<< HEAD
-  AINFO << "trajectory not valid for constraint [" << constraint_failure_count
-        << "] times";
-  AINFO << "trajectory not valid for collision [" << collision_failure_count
-        << "] times";
-  if (num_lattice_traj > 0) {
-    AINFO << "Planning succeeded";
-    ++num_planning_succeeded_cycles;
-    return Status::OK();
-  } else {
-    AINFO << "Planning failed";
-=======
   AINFO << "Step CombineTrajectory Succeeded";
 
   AINFO << "trajectory not valid for constraint ["
@@ -258,7 +205,6 @@ Status LatticePlanner::Plan(
     AINFO << "Planning failed";
     AINFO << "[END]-------------------------------------------------";
     AINFO << "";
->>>>>>> f34eba60ac490994e8a2419f49c9c3404d4abd08
     return Status(ErrorCode::PLANNING_ERROR, "No feasible trajectories");
   }
 }
