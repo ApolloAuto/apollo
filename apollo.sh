@@ -90,7 +90,7 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query //...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //... except //modules/perception/...`
+    BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
   fi
 
   if [ $? -ne 0 ]; then
