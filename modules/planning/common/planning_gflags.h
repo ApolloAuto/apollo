@@ -104,6 +104,15 @@ DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
 
 // traffic decision
+DECLARE_bool(enable_signal_lights);
+DECLARE_double(max_distance_for_light_stop_buffer);
+DECLARE_double(min_speed_for_light_stop);
+DECLARE_string(signal_light_virtual_object_prefix);
+
+// lattice planner
+DECLARE_int32(num_lattice_traj_to_plot);
+DECLARE_double(default_cruise_speed);
+
 /// common
 DECLARE_double(stop_max_distance_buffer);
 DECLARE_double(stop_min_speed);
