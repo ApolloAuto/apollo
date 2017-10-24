@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_COMMON_INDEXED_LIST_H_
 
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -75,6 +76,30 @@ class IndexedList {
  private:
   std::vector<const T*> object_list_;
   std::unordered_map<I, T> object_dict_;
+};
+
+template <typename I, typename T>
+class ThreadSafeIndexedList : public IndexedList<I, T> {
+ public:
+  T* Add(const I id, const T& object) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return IndexedList<I, T>::Add(id, object);
+  }
+
+  T* Find(const I id) {
+    // TODO(all) change to shared mutex to all multiple reader
+    std::lock_guard<std::mutex> lock(mutex_);
+    return IndexedList<I, T>::Find(id);
+  }
+
+  std::vector<const T*> Items() const {
+    // TODO(all) change to shared mutex to all multiple reader
+    std::lock_guard<std::mutex> lock(mutex_);
+    return IndexedList<I, T>::Items();
+  }
+
+ private:
+  mutable std::mutex mutex_;
 };
 
 }  // namespace planning

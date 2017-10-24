@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
 
@@ -80,7 +79,7 @@ class Frame {
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
   const ReferenceLineInfo *DriveReferenceLinfInfo() const;
 
-  const std::vector<const Obstacle *> &obstacles() const;
+  const std::vector<const Obstacle *> obstacles() const;
 
   const Obstacle *AddStaticVirtualObstacle(const std::string &id,
                                            const common::math::Box2d &box);
@@ -127,8 +126,7 @@ class Frame {
 
   prediction::PredictionObstacles prediction_;
 
-  std::mutex obstacles_mutex_;
-  IndexedObstacles obstacles_;
+  ThreadSafeIndexedObstacles obstacles_;
 
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
