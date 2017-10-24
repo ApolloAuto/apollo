@@ -167,10 +167,6 @@ Status Planning::Start() {
 
 void Planning::OnTimer(const ros::TimerEvent&) {
   RunOnce();
-  if (frame_) {
-    auto seq_num = frame_->SequenceNum();
-    FrameHistory::instance()->Add(seq_num, std::move(frame_));
-  }
 }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
@@ -250,6 +246,10 @@ void Planning::RunOnce() {
       status.Save(estop.mutable_header()->mutable_status());
       PublishPlanningPb(&estop, start_timestamp);
     }
+    if (frame_) {
+      auto seq_num = frame_->SequenceNum();
+      FrameHistory::instance()->Add(seq_num, std::move(frame_));
+    }
     return;
   }
 
@@ -270,6 +270,10 @@ void Planning::RunOnce() {
     status.Save(trajectory_pb.mutable_header()->mutable_status());
     PublishPlanningPb(&trajectory_pb, start_timestamp);
     AERROR << "Planning failed";
+  }
+  if (frame_) {
+    auto seq_num = frame_->SequenceNum();
+    FrameHistory::instance()->Add(seq_num, std::move(frame_));
   }
 }
 
