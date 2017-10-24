@@ -51,7 +51,8 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
   QpSplinePathGenerator path_generator(spline_generator_.get(), reference_line,
-                                       qp_spline_path_config_);
+                                       qp_spline_path_config_,
+                                       reference_line_info_->AdcSlBoundary());
   path_generator.SetDebugLogger(reference_line_info_->mutable_debug());
 
   if (!path_generator.Generate(
