@@ -317,7 +317,6 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
 }
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
-  std::lock_guard<std::mutex> lock(obstacles_mutex_);
   obstacles_.Add(obstacle.Id(), obstacle);
 }
 
@@ -337,7 +336,7 @@ const ReferenceLineInfo *Frame::DriveReferenceLinfInfo() const {
   return drive_reference_line_info_;
 }
 
-const std::vector<const Obstacle *> &Frame::obstacles() const {
+const std::vector<const Obstacle *> Frame::obstacles() const {
   return obstacles_.Items();
 }
 
