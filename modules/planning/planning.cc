@@ -88,10 +88,9 @@ bool Planning::HasSignalLight(const PlanningConfig& config) {
 }
 
 Status Planning::Init() {
-  const auto& map_file = apollo::hdmap::BaseMapFile();
-  CHECK(!hdmap_.LoadMapFromFile(map_file)) << "Failed to load map file:"
-                                           << map_file;
-  Frame::SetMap(&hdmap_);
+  hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+  CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
+  Frame::SetMap(hdmap_);
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
@@ -127,7 +126,7 @@ Status Planning::Init() {
   }
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
-        &hdmap_, config_.reference_line_smoother_config());
+        hdmap_, config_.reference_line_smoother_config());
   }
 
   RegisterPlanners();
