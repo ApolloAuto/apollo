@@ -17,12 +17,12 @@
 /**
  * @file qp_spline_path_generator.cc
  **/
+#include "modules/planning/tasks/qp_spline_path/qp_spline_path_generator.h"
+
 #include <algorithm>
 #include <limits>
 #include <utility>
 #include <vector>
-
-#include "modules/planning/tasks/qp_spline_path/qp_spline_path_generator.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -79,15 +79,6 @@ bool QpSplinePathGenerator::Generate(
   double start_s = init_frenet_point_.s();
   double end_s = reference_line_.Length();
 
-  QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
-                                qp_spline_path_config_.time_resolution());
-  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output(),
-                            path_obstacles)) {
-    AERROR << "Fail to initialize qp frenet frame";
-    return false;
-  }
-  qp_frenet_frame.LogQpBound(planning_debug_);
-
   ADEBUG << "path start with " << start_s << ", end with " << end_s;
 
   if (!InitSpline(start_s, end_s)) {
@@ -95,6 +86,15 @@ bool QpSplinePathGenerator::Generate(
            << end_s;
     return false;
   }
+
+  QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
+                                qp_spline_path_config_.time_resolution(),
+                                evaluated_s_);
+  if (!qp_frenet_frame.Init(path_obstacles)) {
+    AERROR << "Fail to initialize qp frenet frame";
+    return false;
+  }
+  qp_frenet_frame.LogQpBound(planning_debug_);
 
   if (!AddConstraint(qp_frenet_frame)) {
     AERROR << "Fail to setup pss path constraint.";
