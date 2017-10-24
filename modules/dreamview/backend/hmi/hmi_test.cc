@@ -21,6 +21,8 @@
 namespace apollo {
 namespace dreamview {
 
+using google::protobuf::RepeatedPtrField;
+
 TEST(HMITest, UpdateHMIStatus) {
   HMI hmi(nullptr);
 
@@ -40,6 +42,39 @@ TEST(HMITest, UpdateHMIStatus) {
   hmi.OnHMIStatus(new_status);
 
   EXPECT_EQ(ModuleStatus::STARTED, hmi.GetModuleStatus(module_name)->status());
+}
+
+TEST(HMITest, ExecuteComponentCommand) {
+  RepeatedPtrField<Component> modules;
+  // Fail.
+  EXPECT_NE(0, HMI::ExecuteComponentCommand(modules, "Module", "Any"));
+
+  auto *module = modules.Add();
+  module->set_name("Module");
+  {
+    auto *command = module->add_supported_commands();
+    command->set_name("SingleCommand");
+    *command->add_command() = "echo OK";
+    // Succeed.
+    EXPECT_EQ(0, HMI::ExecuteComponentCommand(modules, "Module",
+                                              "SingleCommand"));
+  }
+  {
+    auto *command = module->add_supported_commands();
+    command->set_name("ComplexCommand");
+    *command->add_command() = "ls";
+    *command->add_command() = "/dev/null";
+    // Succeed.
+    EXPECT_EQ(0, HMI::ExecuteComponentCommand(modules, "Module",
+                                              "ComplexCommand"));
+  }
+  {
+    auto *command = module->add_supported_commands();
+    command->set_name("BadCommand");
+    *command->add_command() = "ls /dev/null/not_exist";
+    // Fail.
+    EXPECT_NE(0, HMI::ExecuteComponentCommand(modules, "Module", "BadCommand"));
+  }
 }
 
 }  // namespace dreamview

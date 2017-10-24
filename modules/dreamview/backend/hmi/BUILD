@@ -18,6 +18,7 @@ cc_library(
     hdrs = ["hmi.h"],
     deps = [
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/util:string_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket",
         "//modules/dreamview/proto:hmi_config_proto",
