@@ -108,8 +108,9 @@ std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
   // can cover thoroughly the current adc position so that planning can be make
   // with a minimum planning distance of 100 meters ahead and 10 meters
   // backward.
-  while (reference_line_groups_.empty()) {
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
+  std::vector<ReferenceLine> reference_lines;
+  if (reference_line_groups_.empty()) {
+    return reference_lines;
   }
   std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
   return reference_line_groups_.back();
