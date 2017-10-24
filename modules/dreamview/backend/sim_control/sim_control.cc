@@ -111,13 +111,13 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 }
 
 void SimControl::Start() {
-  if (sim_control_timer_) {
+  if (sim_control_timer_ == nullptr) {
     sim_control_timer_.start();
   }
 }
 
 void SimControl::Stop() {
-  if (sim_control_timer_) {
+  if (sim_control_timer_ == nullptr) {
     sim_control_timer_.stop();
   }
 }
