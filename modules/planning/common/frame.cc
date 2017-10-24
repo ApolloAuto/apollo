@@ -82,6 +82,38 @@ void Frame::CreatePredictionObstacles(
   }
 }
 
+bool Frame::Rerouting() {
+  auto *adapter_manager = AdapterManager::instance();
+  const auto *vehicle_state = common::VehicleState::instance();
+  if (adapter_manager->GetRoutingResponse()->Empty()) {
+    AERROR << "No previous routing available";
+    return false;
+  }
+  auto request = adapter_manager->GetRoutingResponse()
+                     ->GetLatestObserved()
+                     .routing_request();
+  request.clear_header();
+  AdapterManager::FillRoutingRequestHeader("planning", &request);
+  auto point = common::util::MakePointENU(
+      vehicle_state->x(), vehicle_state->y(), vehicle_state->z());
+  double s = 0.0;
+  double l = 0.0;
+  hdmap::LaneInfoConstPtr lane;
+  if (pnc_map_->hdmap()->GetNearestLaneWithHeading(
+          point, 5.0, vehicle_state->heading(), M_PI / 3.0, &lane, &s, &l) !=
+      0) {
+    AERROR << "Failed to find nearest lane from map at position: "
+           << point.DebugString() << ", heading:" << vehicle_state->heading();
+    return false;
+  }
+  auto *start_point = request.mutable_waypoint(0);
+  start_point->set_id(lane->id().id());
+  start_point->set_s(s);
+  start_point->mutable_pose()->CopyFrom(point);
+  AdapterManager::PublishRoutingRequest(request);
+  return true;
+}
+
 void Frame::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   pnc_map_->UpdateRoutingResponse(routing);
   if (FLAGS_enable_reference_line_provider_thread) {

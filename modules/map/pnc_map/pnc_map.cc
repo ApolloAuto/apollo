@@ -97,6 +97,25 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 }  // namespace
 
+void RouteSegments::SetCanExit(bool can_exit) { can_exit_ = can_exit; }
+
+bool RouteSegments::CanExit() const { return can_exit_; }
+
+const LaneWaypoint &RouteSegments::RouteEndWaypoint() const {
+  return route_end_waypoint_;
+}
+
+void RouteSegments::SetRouteEndWaypoint(const LaneWaypoint &waypoint) {
+  route_end_waypoint_ = waypoint;
+}
+
+LaneWaypoint RouteSegments::LastWaypoint() const {
+  if (size() > 0) {
+    return LaneWaypoint(back().lane, back().end_s);
+  }
+  return LaneWaypoint();
+}
+
 bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
                                   double *l, LaneWaypoint *waypoint) const {
   const auto point = common::math::Vec2d{point_enu.x(), point_enu.y()};
@@ -127,7 +146,15 @@ bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
   return has_projection;
 }
 
-bool RouteSegments::IsOnSegment(const LaneWaypoint &waypoint) const {
+void RouteSegments::SetNextAction(routing::ChangeLaneType action) {
+  next_action_ = action;
+}
+
+routing::ChangeLaneType RouteSegments::NextAction() const {
+  return next_action_;
+}
+
+bool RouteSegments::IsWaypointOnSegment(const LaneWaypoint &waypoint) const {
   for (auto iter = begin(); iter != end(); ++iter) {
     if (WithinLaneSegment(*iter, waypoint)) {
       return true;
@@ -140,7 +167,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
 
   // 0 if waypoint is on segment, ok
-  if (IsOnSegment(waypoint)) {
+  if (IsWaypointOnSegment(waypoint)) {
     return true;
   }
 
@@ -289,14 +316,19 @@ bool PncMap::PassageToSegments(routing::Passage passage,
   return true;
 }
 
-std::vector<std::pair<int, routing::ChangeLaneType>>
-PncMap::GetNeighborPassages(const routing::RoadSegment &road,
-                            int start_passage) const {
+bool RouteSegments::IsOnSegment() const { return is_on_segment_; }
+
+void RouteSegments::SetIsOnSegment(bool on_segment) {
+  is_on_segment_ = on_segment;
+}
+
+std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
+                                             int start_passage) const {
   CHECK_GE(start_passage, 0);
   CHECK_LE(start_passage, road.passage_size());
-  std::vector<std::pair<int, routing::ChangeLaneType>> result;
-  result.emplace_back(start_passage, routing::FORWARD);
+  std::vector<int> result;
   const auto &source_passage = road.passage(start_passage);
+  result.emplace_back(start_passage);
   if (source_passage.change_lane_type() == routing::FORWARD) {
     return result;
   }
@@ -328,11 +360,9 @@ PncMap::GetNeighborPassages(const routing::RoadSegment &road,
       continue;
     }
     const auto &target_passage = road.passage(i);
-    std::unordered_set<std::string> target_lane_set;
-    target_lane_set.reserve(target_passage.segment_size());
     for (const auto &segment : target_passage.segment()) {
       if (neighbor_lanes.count(segment.id())) {
-        result.emplace_back(i, source_passage.change_lane_type());
+        result.emplace_back(i);
         break;
       }
     }
@@ -359,10 +389,8 @@ bool PncMap::GetRouteSegments(
   const auto &road = routing_.road(road_index);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
-  for (const auto &drive_passage : drive_passages) {
-    auto index = drive_passage.first;
-    auto change_lane_type = drive_passage.second;
-    const auto &passage = road.passage(drive_passage.first);
+  for (const int index : drive_passages) {
+    const auto &passage = road.passage(index);
     RouteSegments segments;
     DCHECK(PassageToSegments(passage, &segments))
         << "Failed to convert passage to lane segments.";
@@ -381,7 +409,15 @@ bool PncMap::GetRouteSegments(
     route_segments->emplace_back();
     TruncateLaneSegments(segments, s - backward_length, s + forward_length,
                          &route_segments->back());
-    route_segments->back().SetChangeLaneType(change_lane_type);
+    const auto last_waypoint = segments.LastWaypoint();
+    if (route_segments->back().IsWaypointOnSegment(last_waypoint)) {
+      route_segments->back().SetRouteEndWaypoint(last_waypoint);
+    }
+    route_segments->back().SetCanExit(passage.can_exit());
+    route_segments->back().SetNextAction(passage.change_lane_type());
+    if (index == passage_index) {
+      route_segments->back().SetIsOnSegment(true);
+    }
   }
   return true;
 }
