@@ -44,13 +44,22 @@ class RouteSegments : public std::vector<LaneSegment> {
   routing::ChangeLaneType change_lane_type() const { return change_lane_type_; }
 
   /**
-   * Project a point to route segments.
+   * Project a point to this route segment.
+   * @param point_enu a map point.
+   * @param s return the longitudinal s relative to the route segment.
+   * @param l return the lateral distance relative to the route segment.
+   * @param waypoint return the LaneWaypoint, which has lane and lane_s on the
+   * route segment.
    * @return false if error happended or projected outside of the lane segments.
    */
-  bool GetInnerProjection(const common::PointENU &point_enu, double *s,
-                          double *l) const;
+  bool GetProjection(const common::PointENU &point_enu, double *s, double *l,
+                     LaneWaypoint *waypoint) const;
+
+  bool CanDriveFrom(const LaneWaypoint &waypoint) const;
 
  private:
+  bool IsOnSegment(const LaneWaypoint &waypoint) const;
+
   routing::ChangeLaneType change_lane_type_ = routing::FORWARD;
 };
 
@@ -105,7 +114,7 @@ class PncMap {
   LaneInfoConstPtr GetRoutePredecessor(LaneInfoConstPtr lane) const;
   LaneInfoConstPtr GetRouteSuccessor(LaneInfoConstPtr lane) const;
 
-  std::vector<std::pair<int, routing::ChangeLaneType>> GetDrivePassages(
+  std::vector<std::pair<int, routing::ChangeLaneType>> GetNeighborPassages(
       const routing::RoadSegment &road, int start_passage) const;
 
  private:
