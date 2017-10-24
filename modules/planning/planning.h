@@ -106,7 +106,7 @@ class Planning : public apollo::common::ApolloApp {
 
   PlanningConfig config_;
 
-  hdmap::HDMap hdmap_;
+  const hdmap::HDMap* hdmap_ = nullptr;
 
   std::unique_ptr<Frame> frame_;
 
