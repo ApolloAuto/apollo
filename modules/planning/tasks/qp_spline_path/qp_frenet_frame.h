@@ -44,11 +44,11 @@ class QpFrenetFrame {
   QpFrenetFrame(const ReferenceLine& reference_line,
                 const SpeedData& speed_data,
                 const common::FrenetFramePoint& init_frenet_point,
-                const double time_resolution);
+                const double time_resolution,
+                const std::vector<double>& evaluated_s);
   virtual ~QpFrenetFrame() = default;
 
-  bool Init(const uint32_t num_points,
-            const std::vector<const PathObstacle*>& path_obstacles);
+  bool Init(const std::vector<const PathObstacle*>& path_obstacles);
 
   void LogQpBound(apollo::planning_internal::Debug* planning_debug);
 
@@ -107,7 +107,7 @@ class QpFrenetFrame {
   double end_s_ = 0.0;
   double time_resolution_ = 0.1;
 
-  std::vector<double> evaluated_knots_;
+  std::vector<double> evaluated_s_;
   std::vector<common::SpeedPoint> discretized_vehicle_location_;
   std::vector<std::pair<double, double>> hdmap_bound_;
   std::vector<std::pair<double, double>> static_obstacle_bound_;
