@@ -119,6 +119,9 @@ class SimControl {
   // Whether there's a planning received after the most recent routing.
   bool received_planning_;
 
+  // Whether the sim control is enabled.
+  bool enabled_;
+
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
 

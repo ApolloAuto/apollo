@@ -57,7 +57,8 @@ SimControl::SimControl(const MapService* map_service)
     : map_service_(map_service),
       prev_point_index_(0),
       next_point_index_(0),
-      received_planning_(false) {}
+      received_planning_(false),
+      enabled_(FLAGS_enable_sim_control) {}
 
 void SimControl::Init(bool set_start_point) {
   // Setup planning and routing result data callback.
@@ -111,15 +112,13 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 }
 
 void SimControl::Start() {
-  if (sim_control_timer_ == nullptr) {
+  if (enabled_) {
     sim_control_timer_.start();
   }
 }
 
 void SimControl::Stop() {
-  if (sim_control_timer_ == nullptr) {
-    sim_control_timer_.stop();
-  }
+  sim_control_timer_.stop();
 }
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
