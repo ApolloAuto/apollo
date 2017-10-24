@@ -36,10 +36,10 @@ Create a new file named `new_evaluator.h` in the folder  `modules/prediction/eva
 namespace apollo {
 namespace prediction {
 
-class MLPEvaluator : public Evaluator {
+class NewEvaluator : public Evaluator {
  public:
-  MLPEvaluator();
-  virtual ~MLPEvaluator();
+  NewEvaluator();
+  virtual ~NewEvaluator();
   void Evaluate(Obstacle* obstacle_ptr) override;
   // Other useful functions and fields.
 };
