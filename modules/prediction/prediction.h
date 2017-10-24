@@ -69,13 +69,17 @@ class Prediction : public apollo::common::ApolloApp {
    */
   void Stop() override;
 
+  /**
+   * @brief Data callback upon receiving a perception obstacle message.
+   * @param perception_obstacles received message.
+   */
+  void OnPerception(
+      const perception::PerceptionObstacles &perception_obstacles);
+
  private:
   common::Status OnError(const std::string &error_msg);
 
   void OnLocalization(const localization::LocalizationEstimate &localization);
-
-  void OnPerception(
-      const perception::PerceptionObstacles &perception_obstacles);
 
  private:
   PredictionConf prediction_conf_;

@@ -30,10 +30,10 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {

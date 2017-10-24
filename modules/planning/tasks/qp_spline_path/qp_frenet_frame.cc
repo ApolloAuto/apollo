@@ -363,7 +363,7 @@ std::pair<uint32_t, uint32_t> QpFrenetFrame::FindInterval(
     const double start, const double end) const {
   double new_start = std::max(start - vehicle_param_.front_edge_to_center(),
                               evaluated_knots_.front());
-  double new_end = std::min(end + vehicle_param_.back_edge_to_center(),
+  double new_end = std::min(end - vehicle_param_.back_edge_to_center(),
                             evaluated_knots_.back());
   uint32_t start_index = FindIndex(new_start);
   uint32_t end_index = FindIndex(new_end);
