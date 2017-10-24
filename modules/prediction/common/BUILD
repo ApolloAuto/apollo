@@ -18,9 +18,9 @@ cc_library(
     deps = [
         ":prediction_gflags",
         ":prediction_map",
-        "//modules/prediction/proto:lane_graph_proto",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/prediction/proto:lane_graph_proto",
         "@eigen//:eigen",
     ],
 )
