@@ -20,6 +20,7 @@
 #include "modules/planning/tasks/qp_spline_path/qp_frenet_frame.h"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -59,23 +60,23 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
       evaluated_s_(evaluated_s),
       hdmap_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)},
       static_obstacle_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)},
-      dynamic_obstacle_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)} {}
+      dynamic_obstacle_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)} {
+  DCHECK_LT(start_s_ + kEpsilonTol, end_s_);
+  DCHECK_GE(evaluated_s_.size(), 2);
+}
 
 bool QpFrenetFrame::Init(
     const std::vector<const PathObstacle*>& path_obstacles) {
-  if (std::fabs(start_s_ - end_s_) < kEpsilonTol) {
-    AERROR << "Not enough s distance. start_s: " << start_s_
-           << ", end_s: " << end_s_ << ", kEpsilonTol: " << kEpsilonTol;
-    return false;
-  }
-
   if (!CalculateDiscretizedVehicleLocation()) {
     AERROR << "Fail to calculate discretized vehicle location!";
     return false;
   }
 
-  // initialize calculation here
-  CalculateHDMapBound();
+  if (!CalculateHDMapBound()) {
+    AERROR << "Calculate HDMap bound failed.";
+    return false;
+  }
+
   if (!CalculateObstacleBound(path_obstacles)) {
     AERROR << "Calculate obstacle bound failed!";
     return false;
@@ -352,15 +353,14 @@ std::pair<uint32_t, uint32_t> QpFrenetFrame::FindInterval(
 
   uint32_t start_index = FindIndex(new_start);
   uint32_t end_index = FindIndex(new_end);
-
-  if (end > evaluated_s_[end_index] && end_index + 1 != evaluated_s_.size()) {
-    ++end_index;
+  if (end_index == evaluated_s_.size()) {
+    --end_index;
   }
 
   return std::make_pair(start_index, end_index);
 }
 
-void QpFrenetFrame::CalculateHDMapBound() {
+bool QpFrenetFrame::CalculateHDMapBound() {
   const double adc_half_width = vehicle_param_.width() / 2.0;
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound = 0.0;
@@ -378,21 +378,26 @@ void QpFrenetFrame::CalculateHDMapBound() {
 
     if (hdmap_bound_[i].first >= hdmap_bound_[i].second) {
       ADEBUG << "HD Map bound at " << evaluated_s_[i] << " is infeasible ("
-             << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second << ") "
-             << std::endl;
-      ADEBUG << "left_bound: " << left_bound;
-      ADEBUG << "right_bound: " << right_bound;
+             << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second << ") ";
+      ADEBUG << "left_bound: " << left_bound
+             << ", right_bound: " << right_bound;
+
       feasible_longitudinal_upper_bound_ =
           std::min(evaluated_s_[i], feasible_longitudinal_upper_bound_);
       common::SLPoint sl;
       sl.set_s(evaluated_s_[i]);
       common::math::Vec2d xy;
-      reference_line_.SLToXY(sl, &xy);
-      ADEBUG << "evaluated_knot x: " << std::fixed << xy.x()
+      if (!reference_line_.SLToXY(sl, &xy)) {
+        AERROR << "Fail to calculate HDMap bound at s: " << sl.s()
+               << ", l: " << sl.l();
+        return false;
+      }
+      ADEBUG << "evaluated point x: " << std::fixed << xy.x()
              << " y: " << xy.y();
       break;
     }
   }
+  return true;
 }
 
 bool QpFrenetFrame::CalculateObstacleBound(
@@ -421,23 +426,35 @@ bool QpFrenetFrame::CalculateObstacleBound(
 bool QpFrenetFrame::GetBound(
     const double s, const std::vector<std::pair<double, double>>& map_bound,
     std::pair<double, double>* const bound) const {
-  if (s + 1e-8 < start_s_ || s - 1e-8 > end_s_) {
+  if (s + kEpsilonTol < start_s_ || s - kEpsilonTol > end_s_) {
     AERROR << "Evaluate s location " << s
            << ", is out of trajectory frenet frame range (" << start_s_ << ", "
            << end_s_ << ")";
     return false;
   }
 
+  if (std::fabs(s - start_s_) < kEpsilonTol) {
+    *bound = map_bound.front();
+    return true;
+  }
+  if (std::fabs(s - end_s_) < kEpsilonTol) {
+    *bound = map_bound.back();
+    return true;
+  }
+
   // linear bound interpolation
-  uint32_t lower_index = FindIndex(s);
+  uint32_t higher_index = FindIndex(s);
+  uint32_t lower_index = higher_index - 1;
   const double s_low = evaluated_s_[lower_index];
-  const double s_high = evaluated_s_[lower_index + 1];
-  double weight = s_high - s_low > 1e-8 ? (s - s_low) / (s_high - s_low) : 0.0;
+  const double s_high = evaluated_s_[higher_index];
+
+  double weight =
+      s_high - s_low > kEpsilonTol ? (s - s_low) / (s_high - s_low) : 0.0;
 
   double low_first = map_bound[lower_index].first;
   double low_second = map_bound[lower_index].second;
-  double high_first = map_bound[lower_index + 1].first;
-  double high_second = map_bound[lower_index + 1].second;
+  double high_first = map_bound[higher_index].first;
+  double high_second = map_bound[higher_index].second;
 
   // If there is only one infinity in low and high point, then make it equal
   // to the not inf one.
@@ -452,27 +469,15 @@ bool QpFrenetFrame::GetBound(
   } else if (!std::isinf(low_second) && std::isinf(high_second)) {
     high_second = low_second;
   }
-
-  if (std::isinf(low_first)) {
-    bound->first = low_first;
-  } else {
-    bound->first = low_first * (1 - weight) + high_first * weight;
-  }
-
-  if (std::isinf(low_second)) {
-    bound->second = low_second;
-  } else {
-    bound->second = low_second * (1 - weight) + high_second * weight;
-  }
+  bound->first = low_first * (1 - weight) + high_first * weight;
+  bound->second = low_second * (1 - weight) + high_second * weight;
   return true;
 }
 
 uint32_t QpFrenetFrame::FindIndex(const double s) const {
-  auto lower_bound =
-      std::lower_bound(evaluated_s_.begin() + 1, evaluated_s_.end(), s);
-  return std::min(static_cast<uint32_t>(evaluated_s_.size() - 1),
-                  static_cast<uint32_t>(lower_bound - evaluated_s_.begin())) -
-         1;
+  auto upper_bound =
+      std::upper_bound(evaluated_s_.begin(), evaluated_s_.end(), s);
+  return std::distance(evaluated_s_.begin(), upper_bound);
 }
 
 }  // namespace planning
