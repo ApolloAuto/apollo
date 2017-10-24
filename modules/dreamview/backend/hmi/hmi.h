@@ -50,6 +50,11 @@ class HMI {
   ModuleStatus* GetModuleStatus(const std::string &module_name);
   HardwareStatus* GetHardwareStatus(const std::string &hardware_name);
 
+  static int ExecuteComponentCommand(
+      const google::protobuf::RepeatedPtrField<Component> &components,
+      const std::string &component_name,
+      const std::string &command_name);
+
   HMIConfig config_;
   HMIStatus status_;
 
@@ -57,6 +62,7 @@ class HMI {
   WebSocketHandler *websocket_;
 
   FRIEND_TEST(HMITest, UpdateHMIStatus);
+  FRIEND_TEST(HMITest, ExecuteComponentCommand);
 };
 
 }  // namespace dreamview
