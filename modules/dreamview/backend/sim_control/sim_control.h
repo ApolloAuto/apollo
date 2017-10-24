@@ -51,10 +51,9 @@ class SimControl {
 
   /**
    * @brief setup callbacks and timer
-   * @param create_timer Timer to automatically publish localiazation and
-   * chassis
+   * @param set_start_point initialize localization.
    */
-  void Init(bool create_timer);
+  void Init(bool set_start_point);
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -119,9 +118,6 @@ class SimControl {
 
   // Whether there's a planning received after the most recent routing.
   bool received_planning_;
-
-  // Whether the sim control is enabled.
-  bool enabled_;
 
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;

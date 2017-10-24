@@ -59,24 +59,24 @@ SimControl::SimControl(const MapService* map_service)
       next_point_index_(0),
       received_planning_(false) {}
 
-void SimControl::Init(bool create_timer) {
+void SimControl::Init(bool set_start_point) {
   // Setup planning and routing result data callback.
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
   AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
                                              this);
 
-  if (create_timer) {
-    // Start timer to publish localization and chassis messages.
-    sim_control_timer_ = AdapterManager::CreateTimer(
-        ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
-  }
+  // Start timer to publish localization and chassis messages.
+  sim_control_timer_ = AdapterManager::CreateTimer(
+      ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
 
-  apollo::common::PointENU start_point;
-  if (!map_service_->GetStartPoint(&start_point)) {
-    AWARN << "Failed to get a dummy start point from map!";
-    return;
+  if (set_start_point) {
+    apollo::common::PointENU start_point;
+    if (!map_service_->GetStartPoint(&start_point)) {
+      AWARN << "Failed to get a dummy start point from map!";
+      return;
+    }
+    SetStartPoint(start_point.x(), start_point.y());
   }
-  SetStartPoint(start_point.x(), start_point.y());
 }
 
 void SimControl::SetStartPoint(const double x, const double y) {
