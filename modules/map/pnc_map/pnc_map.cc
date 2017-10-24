@@ -32,6 +32,7 @@
 #include "modules/map/proto/map_id.pb.h"
 
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 
@@ -64,6 +65,14 @@ void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
   points->resize(count);
 }
 
+bool WithinLaneSegment(const LaneSegment &lane_segment,
+                       const LaneWaypoint &waypoint) {
+  return waypoint.lane &&
+         lane_segment.lane->id().id() == waypoint.lane->id().id() &&
+         lane_segment.start_s - kSegmentationEpsilon <= waypoint.s &&
+         lane_segment.end_s + kSegmentationEpsilon >= waypoint.s;
+}
+
 bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                        const LaneWaypoint &waypoint) {
   return waypoint.lane && lane_segment.id() == waypoint.lane->id().id() &&
@@ -88,8 +97,8 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 }  // namespace
 
-bool RouteSegments::GetInnerProjection(const common::PointENU &point_enu,
-                                       double *s, double *l) const {
+bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
+                                  double *l, LaneWaypoint *waypoint) const {
   const auto point = common::math::Vec2d{point_enu.x(), point_enu.y()};
   *l = std::numeric_limits<double>::infinity();
   double accumulate_s = 0.0;
@@ -105,13 +114,104 @@ bool RouteSegments::GetInnerProjection(const common::PointENU &point_enu,
         lane_s > iter->end_s + kSegmentationEpsilon) {
       continue;
     }
-    has_projection = true;
-    if (std::fabs(lane_l) < *l) {
-      *l = std::fabs(lane_l);
+    lane_s = std::max(iter->start_s, lane_s);
+    lane_s = std::min(iter->end_s, lane_s);
+    if (std::fabs(lane_l) < std::fabs(*l)) {
+      has_projection = true;
+      *l = lane_l;
+      waypoint->lane = iter->lane;
+      waypoint->s = lane_s;
       *s = lane_s - iter->start_s + accumulate_s;
     }
   }
   return has_projection;
+}
+
+bool RouteSegments::IsOnSegment(const LaneWaypoint &waypoint) const {
+  for (auto iter = begin(); iter != end(); ++iter) {
+    if (WithinLaneSegment(*iter, waypoint)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
+  auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
+
+  // 0 if waypoint is on segment, ok
+  if (IsOnSegment(waypoint)) {
+    return true;
+  }
+
+  // 1. should have projection
+  LaneWaypoint segment_waypoint;
+  double route_s = 0.0;
+  double lane_l = 0.0;
+  bool has_projection =
+      GetProjection(point, &route_s, &lane_l, &segment_waypoint);
+  if (!has_projection) {
+    ADEBUG << "No projection from waypoint: " << waypoint.DebugString();
+    return false;
+  }
+  // 2. heading should be the same.
+  double waypoint_heading = waypoint.lane->Heading(waypoint.s);
+  double segment_heading = segment_waypoint.lane->Heading(segment_waypoint.s);
+  double heading_diff =
+      common::math::AngleDiff(waypoint_heading, segment_heading);
+  if (std::fabs(heading_diff) > M_PI / 2) {
+    ADEBUG << "Angle diff too large";
+    return false;
+  }
+
+  // 3. segment waypoint should be waypoint's neighbor
+  // assume waypoint is at left side
+  const auto *neighbor_ids =
+      &(segment_waypoint.lane->lane().left_neighbor_forward_lane_id());
+  if (lane_l < 0) {  // waypoint is at right side
+    neighbor_ids =
+        &(segment_waypoint.lane->lane().right_neighbor_forward_lane_id());
+  }
+  bool is_neighbor = false;
+  for (const auto &id : *neighbor_ids) {
+    if (id.id() == waypoint.lane->id().id()) {
+      is_neighbor = true;
+      break;
+    }
+  }
+  if (!is_neighbor) {
+    ADEBUG << "waypoint is not neighbor of current segment";
+    return false;
+  }
+
+  // 4. the waypoint and the projected lane should not be separated apart.
+  double waypoint_left_width = 0.0;
+  double waypoint_right_width = 0.0;
+  waypoint.lane->GetWidth(waypoint.s, &waypoint_left_width,
+                          &waypoint_right_width);
+  double segment_left_width = 0.0;
+  double segment_right_width = 0.0;
+  segment_waypoint.lane->GetWidth(segment_waypoint.s, &segment_left_width,
+                                  &segment_right_width);
+  auto segment_projected_point =
+      segment_waypoint.lane->GetSmoothPoint(segment_waypoint.s);
+  double dist = common::util::DistanceXY(point, segment_projected_point);
+  const double kLaneSeparationDistance = 0.2;
+  if (lane_l < 0) {  // waypoint at right side
+    if (dist >
+        waypoint_left_width + segment_right_width + kLaneSeparationDistance) {
+      ADEBUG << "waypoint is too far to reach";
+      return false;
+    }
+  } else {  // waypoint at left side
+    if (dist >
+        waypoint_right_width + segment_left_width + kLaneSeparationDistance) {
+      ADEBUG << "waypoint is too far to reach";
+      return false;
+    }
+  }
+
+  return true;
 }
 
 PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
@@ -138,8 +238,8 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       }
     }
   }
-  routing_ = routing;
   last_waypoint_.reset(nullptr);
+  routing_ = routing;
   return true;
 }
 
@@ -189,8 +289,9 @@ bool PncMap::PassageToSegments(routing::Passage passage,
   return true;
 }
 
-std::vector<std::pair<int, routing::ChangeLaneType>> PncMap::GetDrivePassages(
-    const routing::RoadSegment &road, int start_passage) const {
+std::vector<std::pair<int, routing::ChangeLaneType>>
+PncMap::GetNeighborPassages(const routing::RoadSegment &road,
+                            int start_passage) const {
   CHECK_GE(start_passage, 0);
   CHECK_LE(start_passage, road.passage_size());
   std::vector<std::pair<int, routing::ChangeLaneType>> result;
@@ -256,7 +357,8 @@ bool PncMap::GetRouteSegments(
   int road_index = index[0];
   int passage_index = index[1];
   const auto &road = routing_.road(road_index);
-  auto drive_passages = GetDrivePassages(road, passage_index);
+  // raw filter to find all neighboring passages
+  auto drive_passages = GetNeighborPassages(road, passage_index);
   for (const auto &drive_passage : drive_passages) {
     auto index = drive_passage.first;
     auto change_lane_type = drive_passage.second;
@@ -265,11 +367,15 @@ bool PncMap::GetRouteSegments(
     DCHECK(PassageToSegments(passage, &segments))
         << "Failed to convert passage to lane segments.";
     double s = 0.0;
+    LaneWaypoint segment_waypoint;
     double l = 0.0;
-    bool has_projection = segments.GetInnerProjection(point, &s, &l);
-    if (!has_projection) {
-      ADEBUG << "Passage(" << index << ") in road(" << road_index
-             << ") is not in range for lane change";
+    if (!segments.GetProjection(point, &s, &l, &segment_waypoint)) {
+      ADEBUG << "Failed to get projection from point: " << point.DebugString();
+      continue;
+    }
+    // check if possible to drive from current waypoint to the passage.
+    if (!segments.CanDriveFrom(waypoint)) {
+      ADEBUG << "You cannot drive from current waypoint to passage: " << index;
       continue;
     }
     route_segments->emplace_back();
@@ -315,6 +421,9 @@ bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
       waypoint->lane = lane;
       waypoint->s = s;
     }
+  }
+  if (waypoint->lane == nullptr) {
+    AERROR << "failed to find nearest point";
   }
   return waypoint->lane != nullptr;
 }
