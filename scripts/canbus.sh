@@ -23,11 +23,6 @@ cd "${DIR}/.."
 
 source "$DIR/apollo_base.sh"
 
-MACHINE_ARCH=$(uname -m)
-if [ "$MACHINE_ARCH" == 'aarch64' ]; then
-  sudo ip link set can0 type can bitrate 500000
-  sudo ip link set can0 up
-fi
 # run function from apollo_base.sh
 # run command_name module_name
 run canbus "$@"
