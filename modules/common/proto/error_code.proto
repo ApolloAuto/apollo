@@ -42,6 +42,9 @@ enum ErrorCode {
   ROUTING_ERROR_REQUEST = 8001;
   ROUTING_ERROR_RESPONSE = 8002;
   ROUTING_ERROR_NOT_READY = 8003;
+
+  // Indicates an input has been exhausted.
+  END_OF_INPUT = 9000;
 }
 
 message StatusPb {
