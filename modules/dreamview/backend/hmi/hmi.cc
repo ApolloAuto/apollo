@@ -22,12 +22,15 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
+#include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
 namespace dreamview {
 
+using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
+using apollo::control::DrivingAction;
 using google::protobuf::RepeatedPtrField;
 using Json = WebSocketHandler::Json;
 
@@ -47,7 +50,7 @@ std::string ProtoToTypedJsonString(const std::string &json_type,
 // NamedValue is a proto that has "string name;" field.
 // We'll find the first value with the given name, or NULL if none exists.
 template <class NamedValue>
-const NamedValue* FindByName(const RepeatedPtrField<NamedValue> &named_values,
+const NamedValue *FindByName(const RepeatedPtrField<NamedValue> &named_values,
                              const std::string &name) {
   for (const auto &value : named_values) {
     if (value.name() == name) {
@@ -55,6 +58,32 @@ const NamedValue* FindByName(const RepeatedPtrField<NamedValue> &named_values,
     }
   }
   return nullptr;
+}
+
+void ChangeDrivingModeTo(const std::string &target_mode) {
+  Chassis::DrivingMode mode;
+  if (!Chassis::DrivingMode_Parse(target_mode, &mode)) {
+    AERROR << "Unknown target driving mode " << target_mode;
+    return;
+  }
+
+  auto driving_action = DrivingAction::RESET;
+  switch (mode) {
+    case Chassis::COMPLETE_MANUAL:
+      // Default driving action: RESET.
+      break;
+    case Chassis::COMPLETE_AUTO_DRIVE:
+      driving_action = DrivingAction::START;
+      break;
+    default:
+      AERROR << "Unknown action to change driving mode to " << target_mode;
+      return;
+  }
+
+  control::PadMessage pad;
+  pad.set_action(driving_action);
+  AdapterManager::FillPadHeader("HMI", &pad);
+  AdapterManager::PublishPad(pad);
 }
 
 }  // namespace
@@ -84,6 +113,8 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
     websocket_->RegisterMessageHandler(
         "ExecuteModuleCommand",
         [this](const Json &json, WebSocketHandler::Connection *conn) {
+          // json should contain
+          // {module: "module_name", command: "command_name"}.
           const auto module = json.find("module");
           const auto command = json.find("command");
           if (module == json.end() || command == json.end()) {
@@ -97,6 +128,8 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
     websocket_->RegisterMessageHandler(
         "ExecuteHardwareCommand",
         [this](const Json &json, WebSocketHandler::Connection *conn) {
+          // json should contain
+          // {hardware: "hardware_name", command: "command_name"}.
           const auto hardware = json.find("hardware");
           const auto command = json.find("command");
           if (hardware == json.end() || command == json.end()) {
@@ -104,6 +137,21 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
             return;
           }
           ExecuteComponentCommand(config_.hardware(), *hardware, *command);
+        });
+
+    // HMI client asks for changing driving mode.
+    websocket_->RegisterMessageHandler(
+        "ChangeDrivingMode",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          // json should contain {target_mode: "DrivingModeName"}.
+          // DrivingModeName should be one of canbus::Chassis::DrivingMode.
+          // For now it is either COMPLETE_MANUAL or COMPLETE_AUTO_DRIVE.
+          const auto target_mode_value = json.find("target_mode");
+          if (target_mode_value == json.end()) {
+            AERROR << "Truncated ChangeDrivingMode request.";
+            return;
+          }
+          ChangeDrivingModeTo(*target_mode_value);
         });
   }
 }
