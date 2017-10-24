@@ -17,13 +17,16 @@
 #include "modules/dreamview/backend/hmi/hmi.h"
 
 #include <cstdlib>
+#include "gflags/gflags.h"
 #include "google/protobuf/util/json_util.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+
+DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
+              "Global flagfile shared by all modules.");
 
 namespace apollo {
 namespace dreamview {
@@ -31,7 +34,7 @@ namespace dreamview {
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::control::DrivingAction;
-using google::protobuf::RepeatedPtrField;
+using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
 
 namespace {
@@ -47,45 +50,6 @@ std::string ProtoToTypedJsonString(const std::string &json_type,
   return json_obj.dump();
 }
 
-// NamedValue is a proto that has "string name;" field.
-// We'll find the first value with the given name, or NULL if none exists.
-template <class NamedValue>
-const NamedValue *FindByName(const RepeatedPtrField<NamedValue> &named_values,
-                             const std::string &name) {
-  for (const auto &value : named_values) {
-    if (value.name() == name) {
-      return &value;
-    }
-  }
-  return nullptr;
-}
-
-void ChangeDrivingModeTo(const std::string &target_mode) {
-  Chassis::DrivingMode mode;
-  if (!Chassis::DrivingMode_Parse(target_mode, &mode)) {
-    AERROR << "Unknown target driving mode " << target_mode;
-    return;
-  }
-
-  auto driving_action = DrivingAction::RESET;
-  switch (mode) {
-    case Chassis::COMPLETE_MANUAL:
-      // Default driving action: RESET.
-      break;
-    case Chassis::COMPLETE_AUTO_DRIVE:
-      driving_action = DrivingAction::START;
-      break;
-    default:
-      AERROR << "Unknown action to change driving mode to " << target_mode;
-      return;
-  }
-
-  control::PadMessage pad;
-  pad.set_action(driving_action);
-  AdapterManager::FillPadHeader("HMI", &pad);
-  AdapterManager::PublishPad(pad);
-}
-
 }  // namespace
 
 HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
@@ -93,20 +57,27 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
 
   // Init status of modules and hardware.
-  for (const auto &module : config_.modules()) {
-    status_.add_modules()->set_name(module.name());
+  for (const auto iter : config_.modules()) {
+    status_.mutable_modules()->insert({iter.first, {}});
   }
-  for (const auto &hardware : config_.hardware()) {
-    status_.add_hardware()->set_name(hardware.name());
+  for (const auto iter : config_.hardware()) {
+    status_.mutable_hardware()->insert({iter.first, {}});
   }
 
   // Register websocket message handlers.
   if (websocket_) {
-    // Newly opened HMI client retrieves current status.
+    // Newly opened HMI client retrieves current config and status.
+    websocket_->RegisterMessageHandler(
+        "RetrieveHMIConfig",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          CHECK_NOTNULL(websocket_)->SendData(
+              conn, ProtoToTypedJsonString("HMIConfig", config_));
+        });
     websocket_->RegisterMessageHandler(
         "RetrieveHMIStatus",
         [this](const Json &json, WebSocketHandler::Connection *conn) {
-          SendHMIStatus(conn);
+          CHECK_NOTNULL(websocket_)->SendData(
+              conn, ProtoToTypedJsonString("HMIStatus", status_));
         });
 
     // HMI client asks for executing module command.
@@ -143,15 +114,43 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
     websocket_->RegisterMessageHandler(
         "ChangeDrivingMode",
         [this](const Json &json, WebSocketHandler::Connection *conn) {
-          // json should contain {target_mode: "DrivingModeName"}.
+          // json should contain {new_mode: "DrivingModeName"}.
           // DrivingModeName should be one of canbus::Chassis::DrivingMode.
           // For now it is either COMPLETE_MANUAL or COMPLETE_AUTO_DRIVE.
-          const auto target_mode_value = json.find("target_mode");
-          if (target_mode_value == json.end()) {
+          const auto new_mode = json.find("new_mode");
+          if (new_mode == json.end()) {
             AERROR << "Truncated ChangeDrivingMode request.";
             return;
           }
-          ChangeDrivingModeTo(*target_mode_value);
+          ChangeDrivingModeTo(*new_mode);
+        });
+
+    // HMI client asks for changing map.
+    websocket_->RegisterMessageHandler(
+        "ChangeMap",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          // json should contain {new_map: "MapName"}.
+          // MapName should be a key of config_.available_maps.
+          const auto new_map = json.find("new_map");
+          if (new_map == json.end()) {
+            AERROR << "Truncated ChangeMap request.";
+            return;
+          }
+          ChangeMapTo(*new_map);
+        });
+
+    // HMI client asks for changing vehicle.
+    websocket_->RegisterMessageHandler(
+        "ChangeVehicle",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          // json should contain {new_vehicle: "VehicleName"}.
+          // VehicleName should be a key of config_.available_vehicles.
+          const auto new_vehicle = json.find("new_vehicle");
+          if (new_vehicle == json.end()) {
+            AERROR << "Truncated ChangeVehicle request.";
+            return;
+          }
+          ChangeVehicleTo(*new_vehicle);
         });
   }
 }
@@ -164,19 +163,21 @@ void HMI::OnHMIStatus(const HMIStatus &hmi_status) {
   // Note that we only merged status of modules and hardware, which matches the
   // hmi_status_helper.
   for (const auto &new_status : hmi_status.modules()) {
-    auto *old_status = GetModuleStatus(new_status.name());
-    if (old_status) {
-      old_status->MergeFrom(new_status);
+    const std::string &module_name = new_status.first;
+    auto iter = status_.mutable_modules()->find(module_name);
+    if (iter != status_.mutable_modules()->end()) {
+      iter->second.MergeFrom(new_status.second);
     } else {
-      AERROR << "Updating HMIStatus, unknown module " << new_status.name();
+      AERROR << "Updating HMIStatus, unknown module " << module_name;
     }
   }
   for (const auto &new_status : hmi_status.hardware()) {
-    auto *old_status = GetHardwareStatus(new_status.name());
-    if (old_status) {
-      old_status->MergeFrom(new_status);
+    const std::string &hardware_name = new_status.first;
+    auto iter = status_.mutable_hardware()->find(hardware_name);
+    if (iter != status_.mutable_hardware()->end()) {
+      iter->second.MergeFrom(new_status.second);
     } else {
-      AERROR << "Updating HMIStatus, unknown hardware " << new_status.name();
+      AERROR << "Updating HMIStatus, unknown hardware " << hardware_name;
     }
   }
 
@@ -190,50 +191,79 @@ void HMI::BroadcastHMIStatus() const {
   }
 }
 
-void HMI::SendHMIStatus(WebSocketHandler::Connection *conn) const {
-  CHECK(websocket_);
-  websocket_->SendData(conn, ProtoToTypedJsonString("HMIStatus", status_));
-}
-
-ModuleStatus* HMI::GetModuleStatus(const std::string &module_name) {
-  for (auto &module_status : *status_.mutable_modules()) {
-    if (module_status.name() == module_name) {
-      return &module_status;
-    }
-  }
-  return nullptr;
-}
-
-HardwareStatus* HMI::GetHardwareStatus(const std::string &hardware_name) {
-  for (auto &hardware_status : *status_.mutable_hardware()) {
-    if (hardware_status.name() == hardware_name) {
-      return &hardware_status;
-    }
-  }
-  return nullptr;
-}
-
-int HMI::ExecuteComponentCommand(const RepeatedPtrField<Component> &components,
+int HMI::ExecuteComponentCommand(const Map<std::string, Component> &components,
                                  const std::string &component_name,
                                  const std::string &command_name) {
-  const auto* component = FindByName(components, component_name);
-  if (component == nullptr) {
+  const auto component = components.find(component_name);
+  if (component == components.end()) {
     AERROR << "Cannot find component with name " << component_name;
     return -1;
   }
-  const auto* cmd = FindByName(component->supported_commands(), command_name);
-  if (cmd == nullptr) {
+  const auto &supported_commands = component->second.supported_commands();
+  const auto cmd = supported_commands.find(command_name);
+  if (cmd == supported_commands.end()) {
     AERROR << "Cannot find command with name " << command_name
            << " for component " << component_name;
     return -1;
   }
-  const std::string cmd_string = common::util::StrCat(
-      common::util::PrintIter(cmd->command()));
-  AINFO << "Execute system command: " << cmd_string;
-  int ret = std::system(cmd_string.c_str());
+  AINFO << "Execute system command: " << cmd->second;
+  int ret = std::system(cmd->second.c_str());
 
-  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << cmd_string;
+  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << cmd->second;
   return ret;
+}
+
+void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
+  Chassis::DrivingMode mode;
+  if (!Chassis::DrivingMode_Parse(new_mode, &mode)) {
+    AERROR << "Unknown driving mode " << new_mode;
+    return;
+  }
+
+  auto driving_action = DrivingAction::RESET;
+  switch (mode) {
+    case Chassis::COMPLETE_MANUAL:
+      // Default driving action: RESET.
+      break;
+    case Chassis::COMPLETE_AUTO_DRIVE:
+      driving_action = DrivingAction::START;
+      break;
+    default:
+      AERROR << "Unknown action to change driving mode to " << new_mode;
+      return;
+  }
+
+  control::PadMessage pad;
+  pad.set_action(driving_action);
+  AdapterManager::FillPadHeader("HMI", &pad);
+  AdapterManager::PublishPad(pad);
+}
+
+void HMI::ChangeMapTo(const std::string &map_name) {
+  const auto iter = config_.available_maps().find(map_name);
+  if (iter == config_.available_maps().end()) {
+    AERROR << "Unknown map " << map_name;
+    return;
+  }
+  // Append new map_dir flag to global flagfile.
+  std::ofstream fout(FLAGS_global_flagfile, std::ios_base::app);
+  CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
+  fout << "\n--map_dir=" << iter->second << std::endl;
+
+  // TODO(xiaoxq): Reset all modules.
+  status_.set_current_map(map_name);
+}
+
+void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
+  const auto iter = config_.available_vehicles().find(vehicle_name);
+  if (iter == config_.available_vehicles().end()) {
+    AERROR << "Unknown vehicle " << vehicle_name;
+    return;
+  }
+
+  // TODO(xiaoxq): Copy vehicle params to target position, and reset all modules
+  // and hardware.
+  status_.set_current_vehicle(vehicle_name);
 }
 
 }  // namespace dreamview
