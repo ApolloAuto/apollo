@@ -9,8 +9,8 @@ slGraph:
                 max: 200
                 labelString: 's - ref_line (m)'
             y:
-                min: -2.5
-                max: 2.5
+                min: -5
+                max: 5
                 labelString: 'l (m)'
     properties:
         lines:
