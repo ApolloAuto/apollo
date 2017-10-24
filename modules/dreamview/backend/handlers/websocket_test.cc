@@ -56,20 +56,18 @@ std::vector<std::string> MockClient::received_messages_;
 static WebSocketHandler handler;
 
 TEST(WebSocketTest, IntegrationTest) {
-  // NOTE: Here a magic number is picked up as the port, which is not
-  // ideal but in almost all cases this should be fine for a small
-  // integration test.
+  // NOTE: Here a magic number is picked up as the port, which is not ideal but
+  // in almost all cases this should be fine for a small integration test.
   CivetServer server({"listening_ports", "32695"});
   server.addWebSocketHandler("/websocket", handler);
 
-  // Wait for a small amount of time to make sure that the server is
-  // up.
+  // Wait for a small amount of time to make sure that the server is up.
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
   MockClient client("localhost", 32695);
 
-  // Wait for a small amount of time to make sure that the client is
-  // up and connected.
+  // Wait for a small amount of time to make sure that the client is up and
+  // connected.
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
   // Send 3 messages.
@@ -80,8 +78,7 @@ TEST(WebSocketTest, IntegrationTest) {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-  // Check that the 3 messages are successfully received and
-  // processed.
+  // Check that the 3 messages are successfully received and processed.
   EXPECT_THAT(client.GetReceivedMessages(), ElementsAre("0", "1", "2"));
 }
 
