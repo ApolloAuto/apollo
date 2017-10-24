@@ -17,7 +17,7 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
 
-#include <vector>
+#include <string>
 
 #include "modules/dreamview/proto/hmi_status.pb.h"
 
@@ -38,16 +38,18 @@ class HMIStatusHelper {
  public:
   /*
    * @brief Report hardware status to HMI.
-   * @param hardware_status the vector of hardware status
+   * @param hw_status the map of hardware name and hardware status entries.
    */
   static void ReportHardwareStatus(
-      const std::vector<HardwareStatus> &hardware_status);
+      const google::protobuf::Map<std::string, HardwareStatus> &hw_status);
 
   /*
    * @brief Report module status to HMI.
    * @param module_status the status of the module
+   * @param module_status the status of the module
    */
-  static void ReportModuleStatus(const ModuleStatus &module_status);
+  static void ReportModuleStatus(const std::string &module_name,
+                                 const ModuleStatus &module_status);
 };
 
 }  // namespace dreamview
