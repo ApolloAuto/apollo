@@ -79,7 +79,14 @@ bool QpSplinePathGenerator::Generate(
   double start_s = init_frenet_point_.s();
   double end_s = reference_line_.Length();
 
-  ADEBUG << "path start with " << start_s << ", end with " << end_s;
+  const double kMinPathLength = 1.0e-6;
+  if (start_s + kMinPathLength > end_s) {
+    AERROR << "Path length is too small. Path start_s: " << start_s
+           << ", end_s: " << end_s;
+    return false;
+  } else {
+    ADEBUG << "path start with " << start_s << ", end with " << end_s;
+  }
 
   if (!InitSpline(start_s, end_s)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
@@ -292,8 +299,7 @@ bool QpSplinePathGenerator::AddConstraint(
     qp_frenet_frame.GetDynamicObstacleBound(s, &dynamic_obs_boundary);
 
     road_boundary.first =
-        std::fmin(road_boundary.first,
-          init_frenet_point_.l() - lateral_buf);
+        std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
     road_boundary.first = std::fmin(road_boundary.first,
                                     adc_sl_boundary_.start_l() - lateral_buf);
     road_boundary.second =
