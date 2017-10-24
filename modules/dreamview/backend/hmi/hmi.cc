@@ -16,9 +16,11 @@
 
 #include "modules/dreamview/backend/hmi/hmi.h"
 
+#include <cstdlib>
 #include "google/protobuf/util/json_util.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
@@ -26,6 +28,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
+using google::protobuf::RepeatedPtrField;
 using Json = WebSocketHandler::Json;
 
 namespace {
@@ -39,6 +42,19 @@ std::string ProtoToTypedJsonString(const std::string &json_type,
   json_obj["type"] = json_type;
   json_obj["data"] = Json::parse(json_string);
   return json_obj.dump();
+}
+
+// NamedValue is a proto that has "string name;" field.
+// We'll find the first value with the given name, or NULL if none exists.
+template <class NamedValue>
+const NamedValue* FindByName(const RepeatedPtrField<NamedValue> &named_values,
+                             const std::string &name) {
+  for (const auto &value : named_values) {
+    if (value.name() == name) {
+      return &value;
+    }
+  }
+  return nullptr;
 }
 
 }  // namespace
@@ -64,13 +80,30 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
           SendHMIStatus(conn);
         });
 
-    // HMI client asks for executing module commands.
+    // HMI client asks for executing module command.
     websocket_->RegisterMessageHandler(
         "ExecuteModuleCommand",
         [this](const Json &json, WebSocketHandler::Connection *conn) {
-          // TODO(xiaoxq): Run the command on module.
-          //   json = {module: 'module_name', command: 'command_name'}
-          //   E.g.: module=planning, command=start
+          const auto module = json.find("module");
+          const auto command = json.find("command");
+          if (module == json.end() || command == json.end()) {
+            AERROR << "Truncated module command.";
+            return;
+          }
+          ExecuteComponentCommand(config_.modules(), *module, *command);
+        });
+
+    // HMI client asks for executing hardware command.
+    websocket_->RegisterMessageHandler(
+        "ExecuteHardwareCommand",
+        [this](const Json &json, WebSocketHandler::Connection *conn) {
+          const auto hardware = json.find("hardware");
+          const auto command = json.find("command");
+          if (hardware == json.end() || command == json.end()) {
+            AERROR << "Truncated hardware command.";
+            return;
+          }
+          ExecuteComponentCommand(config_.hardware(), *hardware, *command);
         });
   }
 }
@@ -130,6 +163,29 @@ HardwareStatus* HMI::GetHardwareStatus(const std::string &hardware_name) {
     }
   }
   return nullptr;
+}
+
+int HMI::ExecuteComponentCommand(const RepeatedPtrField<Component> &components,
+                                 const std::string &component_name,
+                                 const std::string &command_name) {
+  const auto* component = FindByName(components, component_name);
+  if (component == nullptr) {
+    AERROR << "Cannot find component with name " << component_name;
+    return -1;
+  }
+  const auto* cmd = FindByName(component->supported_commands(), command_name);
+  if (cmd == nullptr) {
+    AERROR << "Cannot find command with name " << command_name
+           << " for component " << component_name;
+    return -1;
+  }
+  const std::string cmd_string = common::util::StrCat(
+      common::util::PrintIter(cmd->command()));
+  AINFO << "Execute system command: " << cmd_string;
+  int ret = std::system(cmd_string.c_str());
+
+  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << cmd_string;
+  return ret;
 }
 
 }  // namespace dreamview
