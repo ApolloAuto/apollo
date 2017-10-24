@@ -16,7 +16,7 @@ before_script:
     - if [ ! -d "${HOME}/.cache" ]; then mkdir ${HOME}/.cache; fi
     - cp scripts/AGREEMENT.txt ${HOME}/.cache/.apollo_agreement.txt
 script:
-    - ./docker/scripts/dev_start.sh dev-x86_64-20171020_1159-ci
+    - ./docker/scripts/dev_start.sh dev-x86_64-20171024_1113-ci
     - ./apollo_docker.sh ${JOB}
     - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
 notifications:
