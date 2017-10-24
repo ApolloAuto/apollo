@@ -147,6 +147,13 @@ new_http_archive(
     url = "https://github.com/startcode/qp-oases/releases/download/v3.2.1/qpOASES-3.2.1.zip",
 )
 
+#IpOpt
+new_local_repository(
+    name = "ipopt",
+    build_file = "third_party/ipopt.BUILD",
+    path = "/usr/local/ipopt/include/coin",
+)
+
 # Proj.4
 new_http_archive(
     name = "proj4",
