@@ -42,7 +42,9 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const { return "planning"; }
+std::string Planning::Name() const {
+  return "planning";
+}
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
