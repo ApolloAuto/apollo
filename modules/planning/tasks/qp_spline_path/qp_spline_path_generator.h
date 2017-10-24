@@ -28,6 +28,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
@@ -41,9 +42,10 @@ namespace planning {
 
 class QpSplinePathGenerator {
  public:
-  QpSplinePathGenerator(Spline1dGenerator* spline_generator_,
+  QpSplinePathGenerator(Spline1dGenerator* spline_generator,
                         const ReferenceLine& reference_line,
-                        const QpSplinePathConfig& qp_spline_path_config);
+                        const QpSplinePathConfig& qp_spline_path_config,
+                        const SLBoundary& adc_sl_boundary);
 
   void SetDebugLogger(apollo::planning_internal::Debug* debug);
 
@@ -78,6 +80,7 @@ class QpSplinePathGenerator {
   std::vector<double> evaluated_s_;
 
   const DiscretizedPath* last_discretized_path_ = nullptr;
+  SLBoundary adc_sl_boundary_;
 };
 
 }  // namespace planning

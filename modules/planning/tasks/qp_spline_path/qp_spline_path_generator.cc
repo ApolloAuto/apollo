@@ -40,10 +40,12 @@ using Vec2d = apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
     Spline1dGenerator* spline_generator, const ReferenceLine& reference_line,
-    const QpSplinePathConfig& qp_spline_path_config)
+    const QpSplinePathConfig& qp_spline_path_config,
+    const SLBoundary& adc_sl_boundary)
     : spline_generator_(spline_generator),
       reference_line_(reference_line),
-      qp_spline_path_config_(qp_spline_path_config) {
+      qp_spline_path_config_(qp_spline_path_config),
+      adc_sl_boundary_(adc_sl_boundary) {
   CHECK_GE(qp_spline_path_config_.regularization_weight(), 0.0)
       << "regularization_weight should NOT be negative.";
   CHECK_GE(qp_spline_path_config_.derivative_weight(), 0.0)
@@ -290,9 +292,14 @@ bool QpSplinePathGenerator::AddConstraint(
     qp_frenet_frame.GetDynamicObstacleBound(s, &dynamic_obs_boundary);
 
     road_boundary.first =
-        std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+        std::fmin(road_boundary.first,
+          init_frenet_point_.l() - lateral_buf);
+    road_boundary.first = std::fmin(road_boundary.first,
+                                    adc_sl_boundary_.start_l() - lateral_buf);
     road_boundary.second =
         std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
+    road_boundary.second =
+        std::fmax(road_boundary.second, adc_sl_boundary_.end_l() + lateral_buf);
 
     boundary_low.emplace_back(common::util::MaxElement(
         std::vector<double>{road_boundary.first, static_obs_boundary.first,
