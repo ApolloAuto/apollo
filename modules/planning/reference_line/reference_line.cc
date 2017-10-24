@@ -58,14 +58,6 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
   }
 }
 
-routing::ChangeLaneType ReferenceLine::change_lane_type() const {
-  return change_lane_type_;
-}
-
-void ReferenceLine::set_change_lane_type(routing::ChangeLaneType type) {
-  change_lane_type_ = type;
-}
-
 ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {
