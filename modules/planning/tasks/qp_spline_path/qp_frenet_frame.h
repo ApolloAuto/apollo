@@ -84,7 +84,7 @@ class QpFrenetFrame {
   std::pair<uint32_t, uint32_t> FindInterval(const double start,
                                              const double end) const;
 
-  void CalculateHDMapBound();
+  bool CalculateHDMapBound();
 
   bool CalculateObstacleBound(
       const std::vector<const PathObstacle*>& path_obstacles);
