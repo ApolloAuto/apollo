@@ -194,7 +194,7 @@ class AdapterManager {
       return instance()->node_handle_->createTimer(period, callback, obj,
                                                    oneshot, autostart);
     } else {
-      AERROR << "ROS timer is only available in ROS mode, check your adapter "
+      AWARN << "ROS timer is only available in ROS mode, check your adapter "
                 "config file! Return a dummy timer that won't function.";
       return ros::Timer();
     }
