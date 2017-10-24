@@ -37,5 +37,11 @@ if [ -e /dev/can0 ]; then
     sudo chown ${USER}:${USER} /dev/can0
 fi
 
+MACHINE_ARCH=$(uname -m)
+    if [ "$MACHINE_ARCH" == 'aarch64' ]; then
+      sudo ip link set can0 type can bitrate 500000
+      sudo ip link set can0 up
+    fi
+
 # enable coredump
 echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null 2>&1

@@ -16,6 +16,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/util:factory",
         "//modules/canbus/can_client/fake:fake_can_client",
+        "//modules/canbus/can_client/fake:socket_can_client_raw",
     ] + select({
         "//tools/platforms:use_esd_can": [
             "//modules/canbus/can_client/esd:esd_can_client",

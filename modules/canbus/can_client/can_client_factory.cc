@@ -21,6 +21,8 @@
 #include "modules/canbus/can_client/esd/esd_can_client.h"
 #endif
 
+#include "modules/drivers/canbus/can_client/socket/socket_can_client_raw.h"
+
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 
@@ -31,15 +33,17 @@ CanClientFactory::CanClientFactory() {}
 
 void CanClientFactory::RegisterCanClients() {
   Register(CANCardParameter::FAKE_CAN,
-           []() -> CanClient* { return new can::FakeCanClient(); });
+           []() -> CanClient * { return new can::FakeCanClient(); });
 #if USE_ESD_CAN
   Register(CANCardParameter::ESD_CAN,
-           []() -> CanClient* { return new can::EsdCanClient(); });
+           []() -> CanClient * { return new can::EsdCanClient(); });
 #endif
+  Register(CANCardParameter::SOCKET_CAN_RAW,
+           []() -> CanClient * { return new can::SocketCanClientRaw(); });
 }
 
-std::unique_ptr<CanClient> CanClientFactory::CreateCANClient(
-    const CANCardParameter& parameter) {
+std::unique_ptr<CanClient>
+CanClientFactory::CreateCANClient(const CANCardParameter &parameter) {
   auto factory = CreateObject(parameter.brand());
   if (!factory) {
     AERROR << "Failed to create can client with parameter: "
@@ -51,5 +55,5 @@ std::unique_ptr<CanClient> CanClientFactory::CreateCANClient(
   return factory;
 }
 
-}  // namespace canbus
-}  // namespace apollo
+} // namespace canbus
+} // namespace apollo
