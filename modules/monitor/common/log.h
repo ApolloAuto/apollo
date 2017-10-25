@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_LOG_H_
-#define MODULES_PLATFORM_LOG_H_
+#ifndef MODULES_MONITOR_COMMON_LOG_H_
+#define MODULES_MONITOR_COMMON_LOG_H_
 
 #include <stdarg.h>
 #include <syslog.h>
@@ -23,11 +23,11 @@
 #include "modules/monitor/common/common_defs.h"
 
 /**
- * @namespace apollo::platform::log
- * @brief apollo::platform::log
+ * @namespace apollo::monitor::log
+ * @brief apollo::monitor::log
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 
 /// Logging support.
 /// Features: (1) modules -- different modules may have different logging levels
@@ -119,7 +119,7 @@ void init_syslog(const char *tag = "apollo-pl");
   } while (0)
 #endif
 
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_LOG_H_
+#endif  // MODULES_MONITOR_COMMON_LOG_H_

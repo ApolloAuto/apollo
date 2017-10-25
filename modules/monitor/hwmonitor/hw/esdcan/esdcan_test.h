@@ -14,17 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_HW_ESDCAN_TEST_H_
-#define MODULES_PLATFORM_HW_ESDCAN_TEST_H_
+#ifndef MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_TEST_H_
+#define MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_TEST_H_
 
 #include "esd_can/include/ntcan.h"
 
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * @namespace apollo::monitor::hw
+ * @brief apollo::monitor::hw
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 /// A collection of details data about a given ESD-CAN interface.
@@ -63,7 +63,7 @@ struct EsdCanDetails {
 NTCAN_RESULT esdcan_do_test(int id, EsdCanDetails *details);
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_HW_ESDCAN_TEST_H_
+#endif  // MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_TEST_H_

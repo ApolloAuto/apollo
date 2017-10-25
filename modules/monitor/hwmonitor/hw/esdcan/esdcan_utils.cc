@@ -25,7 +25,7 @@
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details) {
@@ -146,5 +146,5 @@ void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate) {
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
