@@ -41,9 +41,7 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -115,6 +113,11 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
+  if (AdapterManager::GetRoutingRequest() == nullptr) {
+    std::string error_msg("RoutingRequest is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
     std::string error_msg("Prediction is not registered");
     AERROR << error_msg;
@@ -162,9 +165,7 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-}
+void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
@@ -210,7 +211,6 @@ void Planning::RunOnce() {
   common::Status status =
       common::VehicleState::instance()->Update(localization, chassis);
   DCHECK(IsVehicleStateValid(*common::VehicleState::instance()));
-
   if (!status.ok()) {
     AERROR << "Update VehicleState failed.";
     not_ready->set_reason("Update VehicleState failed.");
@@ -218,6 +218,18 @@ void Planning::RunOnce() {
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
+  // if reference line is not ready, continue;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->UpdateRoutingResponse(
+        AdapterManager::GetRoutingResponse()->GetLatestObserved());
+    if (!ReferenceLineProvider::instance()->HasReferenceLine()) {
+      not_ready->set_reason("reference line not ready");
+      AERROR << not_ready->reason() << "; skip the planning cycle.";
+      PublishPlanningPb(&not_ready_pb, start_timestamp);
+      return;
+    }
+  }
+
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
@@ -308,7 +320,8 @@ common::Status Planning::Plan(
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(
-        "planner failed to make a driving plan because NO best_reference_line "
+        "planner failed to make a driving plan because NO "
+        "best_reference_line "
         "can be provided.");
     AERROR << msg;
     last_publishable_trajectory_->Clear();

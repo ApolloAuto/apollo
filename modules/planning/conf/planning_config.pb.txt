@@ -140,3 +140,6 @@ reference_line_smoother_config {
 rule_config : {
     rule_id: BACKSIDE_VEHICLE
 }
+rule_config : {
+    rule_id: REROUTING
+}
