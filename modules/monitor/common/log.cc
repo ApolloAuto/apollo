@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace log {
 
 void platform_log_printf(int, const char *format, va_list ap) {
@@ -39,5 +39,5 @@ void init_syslog(const char *tag) {
 }
 
 }  // namespace log
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
