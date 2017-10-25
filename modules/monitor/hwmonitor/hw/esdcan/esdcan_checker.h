@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_HW_ESDCAN_CHECKER_H_
-#define MODULES_PLATFORM_HW_ESDCAN_CHECKER_H_
+#ifndef MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_CHECKER_H_
+#define MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_CHECKER_H_
 
 #include <string>
 #include <vector>
@@ -26,11 +26,11 @@
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * @namespace apollo::monitor::hw
+ * @brief apollo::monitor::hw
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 class EsdCanChecker : public HwCheckerInterface {
@@ -62,7 +62,7 @@ class EsdCanChecker : public HwCheckerInterface {
 };
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_INTERFACE_HW_CHECKER_H_
+#endif  // MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_CHECKER_H_

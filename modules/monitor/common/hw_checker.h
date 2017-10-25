@@ -25,11 +25,11 @@
 #include "modules/monitor/proto/hardware_status.pb.h"
 
 /**
- * @namespace apollo::platform
- * @brief apollo::platform
+ * @namespace apollo::monitor
+ * @brief apollo::monitor
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 
 static const int HW_CLASS_UNDEF = 0;
 
@@ -83,7 +83,7 @@ class HwCheckerInterface {
   virtual void run_check(std::vector<HwCheckResult> *results) = 0;
 };
 
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
 #endif  // MODULES_MONITOR_COMMON_HW_CHECKER_H_

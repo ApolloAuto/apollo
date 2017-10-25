@@ -20,8 +20,8 @@
 #include "modules/monitor/common/log.h"
 
 int main() {
-  apollo::platform::log::LogModule m1 = {
-      "test", 5, 10, apollo::platform::log::platform_log_printf};
+  apollo::monitor::log::LogModule m1 = {
+      "test", 5, 10, apollo::monitor::log::platform_log_printf};
   m1.set_log_lvl(7);
 
   PLATFORM_LOG(&m1, 3, "test");

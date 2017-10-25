@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_ANNOTATIONS_H_
-#define MODULES_PLATFORM_ANNOTATIONS_H_
+#ifndef MODULES_MONITOR_COMMON_ANNOTATIONS_H_
+#define MODULES_MONITOR_COMMON_ANNOTATIONS_H_
 
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName &);              \
@@ -63,4 +63,4 @@
 /// directly.
 #define PRIVATE
 
-#endif  // MODULES_PLATFORM_ANNOTATIONS_H_
+#endif  // MODULES_MONITOR_COMMON_ANNOTATIONS_H_

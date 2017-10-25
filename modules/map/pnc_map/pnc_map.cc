@@ -401,12 +401,12 @@ bool PncMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
-    double s = 0.0;
-    double l = 0.0;
     auto nearest_point = point;
     if (index == passage_index) {
       nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
     }
+    double s = 0.0;
+    double l = 0.0;
     LaneWaypoint segment_waypoint;
     if (!segments.GetProjection(nearest_point, &s, &l, &segment_waypoint)) {
       ADEBUG << "Failed to get projection from point: "
