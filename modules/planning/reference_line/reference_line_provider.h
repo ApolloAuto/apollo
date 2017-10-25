@@ -62,7 +62,8 @@ class ReferenceLineProvider {
 
   void Stop();
 
-  std::vector<ReferenceLine> GetReferenceLines();
+  bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
+                         std::list<hdmap::RouteSegments>* segments);
 
  private:
   void Generate();
@@ -86,6 +87,7 @@ class ReferenceLineProvider {
 
   std::mutex reference_line_groups_mutex_;
   std::list<std::vector<ReferenceLine>> reference_line_groups_;
+  std::list<std::vector<hdmap::RouteSegments>> route_segment_groups_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };
