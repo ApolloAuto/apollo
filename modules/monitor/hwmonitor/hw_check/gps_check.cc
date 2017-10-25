@@ -24,10 +24,11 @@
 #include "modules/common/proto/gnss_status.pb.h"
 #include "ros/include/ros/ros.h"
 
-using apollo::platform::HwCheckResult;
-using apollo::platform::hw::Status;
 using apollo::hmi::HMIStatusHelper;
 using apollo::hmi::HardwareStatus;
+using apollo::platform::HwCheckResult;
+using apollo::platform::hw::set_hmi_status;
+using HWStatus = apollo::platform::HardwareStatus;
 
 namespace {
 volatile bool g_ins_detected = false;
@@ -83,26 +84,26 @@ int main(int argc, char *argv[]) {
 
   HardwareStatus gps_st;
   if (timeout) {
-    set_hmi_status(&gps_st, "GPS", Status::ERR, "GPS CHECK TIMEOUT");
+    set_hmi_status(&gps_st, "GPS", HWStatus::ERR, "GPS CHECK TIMEOUT");
     std::cout << "gps check timeout." << std::endl;
   } else if (g_gnss_status.solution_completed() != true) {
-    set_hmi_status(&gps_st, "GPS", Status::ERR, "GPS SOLUTION UNCOMPUTED");
+    set_hmi_status(&gps_st, "GPS", HWStatus::ERR, "GPS SOLUTION UNCOMPUTED");
     std::cout << "gps solution not computed." << std::endl;
   } else {
     switch (g_ins_status.type()) {
       case apollo::common::gnss_status::InsStatus::CONVERGING:
-        set_hmi_status(&gps_st, "GPS", Status::NOT_READY, "INS ALIGNING");
+        set_hmi_status(&gps_st, "GPS", HWStatus::NOT_READY, "INS ALIGNING");
         std::cout << "ins is aligning." << std::endl;
         break;
 
       case apollo::common::gnss_status::InsStatus::GOOD:
-        set_hmi_status(&gps_st, "GPS", Status::OK, "OK");
+        set_hmi_status(&gps_st, "GPS", HWStatus::OK, "OK");
         std::cout << "ins is good." << std::endl;
         break;
 
       case apollo::common::gnss_status::InsStatus::INVALID:
       default:
-        set_hmi_status(&gps_st, "GPS", Status::ERR, "INS INACTIVE");
+        set_hmi_status(&gps_st, "GPS", HWStatus::ERR, "INS INACTIVE");
         std::cout << "ins is inactive." << std::endl;
         break;
     }

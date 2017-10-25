@@ -7,6 +7,7 @@ cc_library(
     srcs = ["hw_log_module.cc"],
     hdrs = ["hw_log_module.h"],
     deps = [
+        "//modules/monitor/common:hw_checker",
         "//modules/monitor/common:log",
     ],
 )

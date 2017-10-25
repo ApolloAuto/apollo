@@ -39,7 +39,7 @@ def mobileye_callback(mobileye_pb):
 
 def add_listener():
     rospy.init_node('mobileye_plot', anonymous=True)
-    rospy.Subscriber('/apollo/mobileye', mobileye_pb2.Mobileye,
+    rospy.Subscriber('/apollo/sensor/mobileye', mobileye_pb2.Mobileye,
                      mobileye_callback)
 
 
