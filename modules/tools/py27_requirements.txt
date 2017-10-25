@@ -18,3 +18,7 @@ simplejson
 PyYAML
 catkin_pkg
 rospkg
+
+# RTK tools
+numpy == 1.11.0
+scipy == 0.17.0
