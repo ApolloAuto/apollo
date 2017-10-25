@@ -6,7 +6,11 @@ cc_library(
     name = "ipopt",
     includes = ["."],
     linkopts = [
-        "-lcoinmumps",
-        "-lipopt",
+        "-L/usr/local/ipopt/lib -lipopt",
+        "-L/usr/local/ipopt/lib -lcoinmumps",
+        "-lblas",
+        "-llapack",
+        "-ldl",
+        "-lgfortran",
     ],
 )
