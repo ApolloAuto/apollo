@@ -52,14 +52,9 @@ class QpFrenetFrame {
 
   void LogQpBound(apollo::planning_internal::Debug* planning_debug);
 
-  bool GetMapBound(const double s,
-                   std::pair<double, double>* const bound) const;
-
-  bool GetStaticObstacleBound(const double s,
-                              std::pair<double, double>* const bound) const;
-
-  bool GetDynamicObstacleBound(const double s,
-                               std::pair<double, double>* const bound) const;
+  const std::vector<std::pair<double, double>>& GetMapBound() const;
+  const std::vector<std::pair<double, double>>& GetStaticObstacleBound() const;
+  const std::vector<std::pair<double, double>>& GetDynamicObstacleBound() const;
 
  private:
   bool CalculateDiscretizedVehicleLocation();
@@ -88,10 +83,6 @@ class QpFrenetFrame {
 
   bool CalculateObstacleBound(
       const std::vector<const PathObstacle*>& path_obstacles);
-
-  bool GetBound(const double s,
-                const std::vector<std::pair<double, double>>& map_bound,
-                std::pair<double, double>* const bound) const;
 
   uint32_t FindIndex(const double s) const;
 
