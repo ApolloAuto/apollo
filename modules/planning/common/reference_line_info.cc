@@ -44,10 +44,12 @@ using apollo::common::VehicleConfigHelper;
 
 ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                                      const ReferenceLine& reference_line,
+                                     const hdmap::RouteSegments& segments,
                                      const TrajectoryPoint& init_adc_point)
     : pnc_map_(pnc_map),
       reference_line_(reference_line),
-      init_adc_point_(init_adc_point) {}
+      init_adc_point_(init_adc_point),
+      lanes_(segments) {}
 
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -65,6 +67,8 @@ bool ReferenceLineInfo::Init() {
   }
   return true;
 }
+
+const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
 
 bool ReferenceLineInfo::HasReachedDestination() {
   auto* dest_obstacle = path_decision_.Find(FLAGS_destination_obstacle_id);
