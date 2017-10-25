@@ -316,7 +316,7 @@ bool PncMap::PassageToSegments(routing::Passage passage,
     }
     segments->emplace_back(lane_ptr, lane.start_s(), lane.end_s());
   }
-  return true;
+  return !segments->empty();
 }
 
 bool RouteSegments::IsOnSegment() const { return is_on_segment_; }
@@ -339,8 +339,10 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
     return result;
   }
   RouteSegments source_segments;
-  DCHECK(PassageToSegments(source_passage, &source_segments))
-      << "failed to convert passage to segments";
+  if (!PassageToSegments(source_passage, &source_segments)) {
+    AERROR << "failed to convert passage to segments";
+    return result;
+  }
   std::unordered_set<std::string> neighbor_lanes;
   if (source_passage.change_lane_type() == routing::LEFT) {
     for (const auto &segment : source_segments) {
@@ -395,8 +397,10 @@ bool PncMap::GetRouteSegments(
   for (const int index : drive_passages) {
     const auto &passage = road.passage(index);
     RouteSegments segments;
-    DCHECK(PassageToSegments(passage, &segments))
-        << "Failed to convert passage to lane segments.";
+    if (!PassageToSegments(passage, &segments)) {
+      ADEBUG << "Failed to convert passage to lane segments.";
+      continue;
+    }
     double s = 0.0;
     double l = 0.0;
     auto nearest_point = point;
