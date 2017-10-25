@@ -64,8 +64,7 @@ bool ReferenceLineProvider::Start() {
     AERROR << "ReferenceLineProvider has NOT been initiated.";
     return false;
   }
-  const auto &func = [this] { Generate(); };
-  thread_.reset(new std::thread(func));
+  thread_.reset(new std::thread(&ReferenceLineProvider::Generate, this));
   return true;
 }
 
@@ -100,6 +99,11 @@ void ReferenceLineProvider::Generate() {
     std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
         kReferenceLineProviderSleepTime));
   }
+}
+
+bool ReferenceLineProvider::HasReferenceLine() {
+  std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
+  return !reference_line_groups_.empty();
 }
 
 bool ReferenceLineProvider::GetReferenceLines(
