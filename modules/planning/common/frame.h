@@ -84,6 +84,8 @@ class Frame {
   const Obstacle *AddStaticVirtualObstacle(const std::string &id,
                                            const common::math::Box2d &box);
 
+  static bool Rerouting();
+
  private:
   /**
    * @brief This is the function that can create one reference lines
