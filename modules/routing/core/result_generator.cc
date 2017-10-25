@@ -417,9 +417,13 @@ bool ResultGenerator::GeneratePassageRegion(
     road_segment.set_id(road_id);
     int index = -1;
     for (const auto& nodes_of_passage : nodes_of_passages) {
+      ++index;
       auto* passage = road_segment.add_passage();
       LaneNodesToPassageRegion(nodes_of_passage, passage);
-      passage->set_change_lane_type(change_lane_type[++index]);
+      passage->set_change_lane_type(change_lane_type[index]);
+      if (change_lane_type[index] == routing::FORWARD) {
+        passage->set_can_exit(true);
+      }
     }
     road_segment.mutable_passage()->rbegin()->set_can_exit(true);
     result->add_road()->CopyFrom(road_segment);
