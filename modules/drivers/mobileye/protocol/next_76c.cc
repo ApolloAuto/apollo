@@ -83,7 +83,7 @@ double Next76c::position(const uint8_t* bytes, int32_t length) const {
   x <<= 16;
   x >>= 16;
 
-  return x * 0.003906;
+  return x * 0.00390625;
 }
 
 // config detail: {'name': 'curvature', 'offset': -0.031999023438, 'precision':
@@ -99,7 +99,7 @@ double Next76c::curvature(const uint8_t* bytes, int32_t length) const {
   x <<= 8;
   x |= t;
 
-  return x * 0.000001 + -0.031999;
+  return x * 9.765625e-07 + -0.031999023438;
 }
 
 // config detail: {'name': 'curvature_derivative', 'offset': -0.00012206658721,
@@ -116,7 +116,7 @@ double Next76c::curvature_derivative(const uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  return x * 0.000000 + -0.000122;
+  return x * 3.7252902985e-09 + -0.00012206658721;
 }
 
 // config detail: {'name': 'lane_mark_width', 'offset': 0.0, 'precision': 0.01,
