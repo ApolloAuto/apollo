@@ -50,6 +50,17 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
+  // Given a reference line, compute the nearest forward state and
+  // backward state. Here state includes obstacles and necessary
+  // traffic signals.
+  void GetNearbyObstacles(
+      const common::TrajectoryPoint& init_planning_point,
+      const Frame* frame,
+      const std::vector<common::PathPoint>& discretized_reference_line,
+      std::array<double, 3>* forward_state,
+      std::array<double, 3>* backward_state);
+
+ private:
   PlanningTarget previous_planning_target;
 };
 

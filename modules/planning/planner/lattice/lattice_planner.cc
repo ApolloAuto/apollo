@@ -79,7 +79,7 @@ Status LatticePlanner::Plan(
       &init_d);
   AINFO << "Step 1,2,3 Succeeded";
 
-  //4. parse the decision and get the planning target.
+  // 4. parse the decision and get the planning target.
   PlanningTarget planning_target = decider_.Analyze(frame,
     planning_init_point,
     init_s,
@@ -178,7 +178,7 @@ Status LatticePlanner::Plan(
     combined_trajectory_path->set_lattice_trajectory_cost(trajectory_pair_cost);
 
     AINFO << "------(2)set lattice trajectory";
-    //AINFO << "trajectory not valid for constraint ["
+    // AINFO << "trajectory not valid for constraint ["
     //          << constraint_failure_count << "] times";
     // AINFO << "trajectory not valid for collision ["
     //          << collision_failure_count << "] times";
