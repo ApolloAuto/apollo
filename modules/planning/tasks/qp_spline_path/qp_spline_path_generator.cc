@@ -285,7 +285,8 @@ bool QpSplinePathGenerator::AddConstraint(
   }
 
   // add map bound constraint
-  const auto lateral_buf = qp_spline_path_config_.cross_lane_extension_buffer();
+  const double lateral_buf =
+      qp_spline_path_config_.cross_lane_extension_buffer();
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
 
@@ -294,14 +295,13 @@ bool QpSplinePathGenerator::AddConstraint(
     auto static_obs_boundary = qp_frenet_frame.GetStaticObstacleBound().at(i);
     auto dynamic_obs_boundary = qp_frenet_frame.GetDynamicObstacleBound().at(i);
 
-    road_boundary.first =
-        std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
-    road_boundary.first = std::fmin(road_boundary.first,
-                                    adc_sl_boundary_.start_l() - lateral_buf);
-    road_boundary.second =
-        std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
-    road_boundary.second =
-        std::fmax(road_boundary.second, adc_sl_boundary_.end_l() + lateral_buf);
+    constexpr double kLength = 50.0;
+    if (evaluated_s_.at(i) < kLength) {
+      road_boundary.first = std::fmin(road_boundary.first,
+                                      adc_sl_boundary_.start_l() - lateral_buf);
+      road_boundary.second = std::fmax(road_boundary.second,
+                                       adc_sl_boundary_.end_l() + lateral_buf);
+    }
 
     boundary_low.emplace_back(common::util::MaxElement(
         std::vector<double>{road_boundary.first, static_obs_boundary.first,
