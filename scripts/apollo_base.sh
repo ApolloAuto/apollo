@@ -110,7 +110,8 @@ function set_lib_path() {
       PY_TOOLS_PATH=/apollo/modules/tools
   else
       local MD5=`echo -n $APOLLO_ROOT_DIR | md5sum | cut -d' ' -f1`
-      local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
+      #local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
+      local ROS_SETUP="/home/tmp/ros/setup.bash"
       if [ -e "${ROS_SETUP}" ]; then
          source "${ROS_SETUP}"
       fi
