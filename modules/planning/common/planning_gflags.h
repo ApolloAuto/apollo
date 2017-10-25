@@ -20,7 +20,7 @@
 #include "gflags/gflags.h"
 
 DECLARE_string(planning_config_file);
-DECLARE_string(adapter_config_filename);
+DECLARE_string(planning_adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);

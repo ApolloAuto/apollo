@@ -17,7 +17,8 @@
 #include "modules/planning/common/planning_gflags.h"
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
-DEFINE_string(adapter_config_filename, "modules/planning/conf/adapter.conf",
+DEFINE_string(planning_adapter_config_filename,
+              "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
