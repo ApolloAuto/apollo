@@ -41,7 +41,7 @@ def dump_bag(in_bag, out_dir, filter_topic):
     bag = rosbag.Bag(in_bag, 'r')
     seq = 0
     for topic, msg, t in bag.read_messages():
-        if topic == "/apollo/mobileye":
+        if topic == "/apollo/sensor/mobileye":
             continue
         if not filter_topic or (filter_topic and topic == filter_topic):
             message_file = topic.replace("/", "_")
