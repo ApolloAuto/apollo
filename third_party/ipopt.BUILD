@@ -6,7 +6,7 @@ cc_library(
     name = "ipopt",
     includes = ["."],
     linkopts = [
-        "-llibcoinmumps.a",
-        "-llibipopt.a",
+        "-lcoinmumps",
+        "-lipopt",
     ],
 )
