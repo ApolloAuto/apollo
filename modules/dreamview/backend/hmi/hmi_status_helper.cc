@@ -22,9 +22,10 @@ namespace apollo {
 namespace dreamview {
 
 void HMIStatusHelper::ReportHardwareStatus(
-    const google::protobuf::Map<std::string, HardwareStatus> &hw_status) {
+    const std::string &hardware_name,
+    const monitor::HardwareStatus &hw_status) {
   HMIStatus hmi_status;
-  *hmi_status.mutable_hardware() = hw_status;
+  hmi_status.mutable_hardware()->insert({hardware_name, hw_status});
   common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
 }
 

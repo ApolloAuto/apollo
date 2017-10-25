@@ -20,6 +20,7 @@
 #include <string>
 
 #include "modules/dreamview/proto/hmi_status.pb.h"
+#include "modules/monitor/proto/hardware_status.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -38,15 +39,16 @@ class HMIStatusHelper {
  public:
   /*
    * @brief Report hardware status to HMI.
-   * @param hw_status the map of hardware name and hardware status entries.
+   * @param hardware_name the name of the hardware.
+   * @param hw_status the status of the hardware.
    */
-  static void ReportHardwareStatus(
-      const google::protobuf::Map<std::string, HardwareStatus> &hw_status);
+  static void ReportHardwareStatus(const std::string &hardware_name,
+                                   const monitor::HardwareStatus &hw_status);
 
   /*
    * @brief Report module status to HMI.
-   * @param module_status the status of the module
-   * @param module_status the status of the module
+   * @param module_name the name of the module.
+   * @param module_status the status of the module.
    */
   static void ReportModuleStatus(const std::string &module_name,
                                  const ModuleStatus &module_status);
