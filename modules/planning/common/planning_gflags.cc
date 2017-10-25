@@ -52,6 +52,9 @@ DEFINE_double(look_forward_time_sec, 8,
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
+DEFINE_bool(enable_spiral_reference_line, false,
+            "enable new spiral based reference line");
+
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
 DEFINE_double(max_collision_distance, 0.1,
