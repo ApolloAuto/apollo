@@ -24,7 +24,7 @@
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 const char EsdCanChecker::ESD_CAN_NAME[] = "ESD_CAN";
@@ -57,5 +57,5 @@ void EsdCanChecker::run_check(std::vector<HwCheckResult> *results) {
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
