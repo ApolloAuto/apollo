@@ -148,6 +148,10 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   ReferenceLineSmoother smoother;
   smoother.Init(smoother_config_);
 
+  SpiralReferenceLineSmoother spiral_smoother;
+  double max_spiral_smoother_dev = 0.1;
+  spiral_smoother.set_max_point_deviation(max_spiral_smoother_dev);
+
   std::vector<ReferenceLine> reference_lines;
   std::vector<hdmap::RouteSegments> segments;
   for (const auto &lanes : route_segments) {
@@ -156,10 +160,17 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine raw_reference_line(hdmap_path);
       ReferenceLine reference_line;
-      if (!smoother.Smooth(raw_reference_line, &reference_line,
-                           spline_solver_.get())) {
-        AERROR << "Failed to smooth reference line";
-        continue;
+      if (FLAGS_enable_spiral_reference_line) {
+        if (!spiral_smoother.Smooth(raw_reference_line,
+          &reference_line)) {
+          AERROR << "Failed to smooth reference_line with spiral smoother";
+        }
+      } else {
+        if (!smoother.Smooth(raw_reference_line, &reference_line,
+                             spline_solver_.get())) {
+          AERROR << "Failed to smooth reference line";
+          continue;
+        }
       }
 
       bool is_valid_reference_line = true;

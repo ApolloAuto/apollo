@@ -31,6 +31,7 @@ DECLARE_double(look_forward_min_distance);
 DECLARE_double(look_forward_time_sec);
 
 DECLARE_bool(enable_smooth_reference_line);
+DECLARE_bool(enable_spiral_reference_line);
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
