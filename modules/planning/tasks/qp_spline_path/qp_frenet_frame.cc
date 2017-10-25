@@ -106,19 +106,19 @@ void QpFrenetFrame::LogQpBound(
   }
 }
 
-bool QpFrenetFrame::GetMapBound(const double s,
-                                std::pair<double, double>* const bound) const {
-  return GetBound(s, hdmap_bound_, bound);
+const std::vector<std::pair<double, double>>& QpFrenetFrame::GetMapBound()
+    const {
+  return hdmap_bound_;
 }
 
-bool QpFrenetFrame::GetStaticObstacleBound(
-    const double s, std::pair<double, double>* const bound) const {
-  return GetBound(s, static_obstacle_bound_, bound);
+const std::vector<std::pair<double, double>>&
+QpFrenetFrame::GetStaticObstacleBound() const {
+  return static_obstacle_bound_;
 }
 
-bool QpFrenetFrame::GetDynamicObstacleBound(
-    const double s, std::pair<double, double>* const bound) const {
-  return GetBound(s, dynamic_obstacle_bound_, bound);
+const std::vector<std::pair<double, double>>&
+QpFrenetFrame::GetDynamicObstacleBound() const {
+  return dynamic_obstacle_bound_;
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
@@ -420,57 +420,6 @@ bool QpFrenetFrame::CalculateObstacleBound(
       }
     }
   }
-  return true;
-}
-
-bool QpFrenetFrame::GetBound(
-    const double s, const std::vector<std::pair<double, double>>& map_bound,
-    std::pair<double, double>* const bound) const {
-  if (s + kEpsilonTol < start_s_ || s - kEpsilonTol > end_s_) {
-    AERROR << "Evaluate s location " << s
-           << ", is out of trajectory frenet frame range (" << start_s_ << ", "
-           << end_s_ << ")";
-    return false;
-  }
-
-  if (std::fabs(s - start_s_) < kEpsilonTol) {
-    *bound = map_bound.front();
-    return true;
-  }
-  if (std::fabs(s - end_s_) < kEpsilonTol) {
-    *bound = map_bound.back();
-    return true;
-  }
-
-  // linear bound interpolation
-  uint32_t higher_index = FindIndex(s);
-  uint32_t lower_index = higher_index - 1;
-  const double s_low = evaluated_s_[lower_index];
-  const double s_high = evaluated_s_[higher_index];
-
-  double weight =
-      s_high - s_low > kEpsilonTol ? (s - s_low) / (s_high - s_low) : 0.0;
-
-  double low_first = map_bound[lower_index].first;
-  double low_second = map_bound[lower_index].second;
-  double high_first = map_bound[higher_index].first;
-  double high_second = map_bound[higher_index].second;
-
-  // If there is only one infinity in low and high point, then make it equal
-  // to the not inf one.
-  if (std::isinf(low_first) && !std::isinf(high_first)) {
-    low_first = high_first;
-  } else if (!std::isinf(low_first) && std::isinf(high_first)) {
-    high_first = low_first;
-  }
-
-  if (std::isinf(low_second) && !std::isinf(high_second)) {
-    low_second = high_second;
-  } else if (!std::isinf(low_second) && std::isinf(high_second)) {
-    high_second = low_second;
-  }
-  bound->first = low_first * (1 - weight) + high_first * weight;
-  bound->second = low_second * (1 - weight) + high_second * weight;
   return true;
 }
 
