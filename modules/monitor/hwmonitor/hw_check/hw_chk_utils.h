@@ -20,18 +20,26 @@
 #include <vector>
 
 #include "modules/hmi/utils/hmi_status_helper.h"
-#include "modules/monitor/common/interface/hw_checker.h"
-#include "modules/monitor/common/interface/hw_status.h"
+#include "modules/monitor/common/hw_checker.h"
 
 namespace apollo {
 namespace platform {
 namespace hw {
 
 void set_hmi_status(apollo::hmi::HardwareStatus *hs, const std::string &name,
-                    int status, const std::string &mssg) {
+                    const HardwareStatus::Status status,
+                    const std::string &msg) {
+  hs->set_name(name);
+  hs->set_status(static_cast<int>(status));
+  hs->set_message(msg);
+}
+
+// TODO(xiaoxq): Retire non-enum hardware status.
+void set_hmi_status(apollo::hmi::HardwareStatus *hs, const std::string &name,
+                    int status, const std::string &msg) {
   hs->set_name(name);
   hs->set_status(status);
-  hs->set_message(mssg);
+  hs->set_message(msg);
 }
 
 void hw_chk_result_to_hmi_status(
