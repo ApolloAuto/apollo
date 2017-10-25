@@ -34,6 +34,7 @@
 #include "modules/common/macro.h"
 
 #include "ros/include/ros/ros.h"
+#include "tf/transform_listener.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -181,6 +182,15 @@ class AdapterManager {
   }
 
   /**
+   * @brief Returns a reference to static tf2 buffer.
+   */
+  static tf2_ros::Buffer &Tf2Buffer() {
+    static tf2_ros::Buffer tf2_buffer;
+    static tf2_ros::TransformListener tf2Listener(tf2_buffer);
+    return tf2_buffer;
+  }
+
+  /**
    * @brief create a timer which will call a callback at the specified
    * rate. It takes a class member function, and a bare pointer to the
    * object to call the method on.
@@ -195,7 +205,7 @@ class AdapterManager {
                                                    oneshot, autostart);
     } else {
       AWARN << "ROS timer is only available in ROS mode, check your adapter "
-                "config file! Return a dummy timer that won't function.";
+               "config file! Return a dummy timer that won't function.";
       return ros::Timer();
     }
   }
