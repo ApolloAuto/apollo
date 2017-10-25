@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.platform;
+package apollo.monitor;
 
 message HardwareStatus {
   enum Status {
@@ -18,4 +18,6 @@ message HardwareStatus {
   }
 
   optional Status status = 1;
+  // Additional message for current status.
+  optional string msg = 2;
 }

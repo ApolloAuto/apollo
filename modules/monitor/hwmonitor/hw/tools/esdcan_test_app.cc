@@ -24,8 +24,8 @@
 DEFINE_bool(details, false, "prints detailed stats if true, default is false");
 DEFINE_int32(can_id, 0, "can device id, default is 0");
 
-using apollo::platform::hw::EsdCanDetails;
-namespace _hw = apollo::platform::hw;
+using apollo::monitor::hw::EsdCanDetails;
+namespace _hw = apollo::monitor::hw;
 
 int main(int argc, char *argv[]) {
   google::SetUsageMessage(

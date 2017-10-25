@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_HW_LOG_MODULE_H_
-#define MODULES_PLATFORM_HW_LOG_MODULE_H_
+#ifndef MODULES_MONITOR_HWMONITOR_HW_HW_LOG_MODULE_H_
+#define MODULES_MONITOR_HWMONITOR_HW_HW_LOG_MODULE_H_
 
 #include "modules/monitor/common/annotations.h"
 #include "modules/monitor/common/log.h"
 
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * @namespace apollo::monitor::hw
+ * @brief apollo::monitor::hw
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 // Shared HW log module; each component has the option to use this shared module
@@ -42,7 +42,7 @@ inline log::LogModule *get_log_module() { return &_shrd_hw_log_mod; }
 void config_log(int log_lvl, int dbg_lvl, log::LogFn *log_fn = nullptr);
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_HW_LOG_MODULE_H_
+#endif  // MODULES_MONITOR_HWMONITOR_HW_HW_LOG_MODULE_H_

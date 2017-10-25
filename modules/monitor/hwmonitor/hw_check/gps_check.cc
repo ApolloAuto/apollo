@@ -24,13 +24,13 @@
 #include "modules/common/proto/gnss_status.pb.h"
 #include "ros/include/ros/ros.h"
 
+namespace {
 using apollo::hmi::HMIStatusHelper;
 using apollo::hmi::HardwareStatus;
-using apollo::platform::HwCheckResult;
-using apollo::platform::hw::set_hmi_status;
-using HWStatus = apollo::platform::HardwareStatus;
+using apollo::monitor::HwCheckResult;
+using apollo::monitor::hw::set_hmi_status;
+using HWStatus = apollo::monitor::HardwareStatus;
 
-namespace {
 volatile bool g_ins_detected = false;
 volatile bool g_gnss_detected = false;
 apollo::common::gnss_status::InsStatus g_ins_status;
