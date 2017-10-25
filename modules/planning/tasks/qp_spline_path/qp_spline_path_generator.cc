@@ -257,11 +257,10 @@ bool QpSplinePathGenerator::AddConstraint(
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint, equality constraint
-  spline_constraint->AddPointConstraint(knots_.back(), 0.0);
-
-  spline_constraint->AddPointDerivativeConstraint(knots_.back(), 0.0);
-
-  spline_constraint->AddPointSecondDerivativeConstraint(knots_.back(), 0.0);
+  spline_constraint->AddPointConstraint(evaluated_s_.back(), 0.0);
+  spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
+  spline_constraint->AddPointSecondDerivativeConstraint(evaluated_s_.back(),
+                                                        0.0);
 
   // kappa bound is based on the inequality:
   // kappa = d(phi)/ds <= d(phi)/dx = d2y/dx2
@@ -310,7 +309,6 @@ bool QpSplinePathGenerator::AddConstraint(
     boundary_high.emplace_back(common::util::MinElement(
         std::vector<double>{road_boundary.second, static_obs_boundary.second,
                             dynamic_obs_boundary.second}));
-
     ADEBUG << "s:" << evaluated_s_[i] << " boundary_low:" << boundary_low.back()
            << " boundary_high:" << boundary_high.back()
            << " road_boundary_low: " << road_boundary.first
