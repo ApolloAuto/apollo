@@ -88,13 +88,17 @@ class Frame {
   /**
    * @brief This is the function that can create one reference lines
    * from routing result.
-   * In current implementation, only one reference line will be returned.
-   * But this is insufficient when multiple driving options exist.
-   *
-   * TODO create multiple reference_lines from this function.
+   * @param position: the position near routing ( distance < 20m in current
+   * config).
+   * @param reference_line return the reference line
+   * @param segments : return the connected lanes corresponding to each
+   * reference line.
+   * @return true if at least one reference line is successfully created.
    */
-  std::vector<ReferenceLine> CreateReferenceLineFromRouting(
-      const common::PointENU &position);
+  bool CreateReferenceLineFromRouting(
+      const common::PointENU &position,
+      std::list<ReferenceLine> *reference_lines,
+      std::list<hdmap::RouteSegments> *segments);
 
   /**
    * @brief create obstacles from prediction input.
@@ -103,7 +107,7 @@ class Frame {
   void CreatePredictionObstacles(
       const prediction::PredictionObstacles &prediction);
 
-  bool InitReferenceLineInfo(const std::vector<ReferenceLine> &reference_lines);
+  bool InitReferenceLineInfo();
 
   void AlignPredictionTime(const double trajectory_header_time);
 
