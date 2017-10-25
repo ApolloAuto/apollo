@@ -18,8 +18,6 @@
 
 #include "glog/logging.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
-#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
-#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_utils.h"
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
