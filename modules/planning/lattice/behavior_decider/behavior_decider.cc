@@ -97,6 +97,15 @@ PlanningTarget BehaviorDecider::Analyze(
   return ret;
 }
 
+void BehaviorDecider::GetNearbyObstacles(
+    const common::TrajectoryPoint& init_planning_point,
+    const Frame* frame,
+    const std::vector<common::PathPoint>& discretized_reference_line,
+    std::array<double, 3>* forward_state,
+    std::array<double, 3>* backward_state) {
+  // TODO(kechxu) implement
+}
+
 }  // namespace planning
 }  // namespace apollo
 
