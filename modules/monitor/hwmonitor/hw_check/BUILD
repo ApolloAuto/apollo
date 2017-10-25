@@ -8,7 +8,7 @@ cc_inc_library(
         "hw_chk_utils.h",
     ],
     deps = [
-        "//modules/monitor/common/interface",
+        "//modules/monitor/common:hw_checker",
     ],
 )
 

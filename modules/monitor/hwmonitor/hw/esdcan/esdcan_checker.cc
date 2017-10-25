@@ -33,9 +33,10 @@ EsdCanChecker::EsdCanChecker(int id) : can_id_(id) {
   name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", id);
 }
 
-hw::Status EsdCanChecker::esdcan_result_to_hw_status(NTCAN_RESULT ntstatus) {
+HardwareStatus::Status EsdCanChecker::esdcan_result_to_hw_status(
+    NTCAN_RESULT ntstatus) {
   // @todo: device not present detection in esd_can_test.
-  return ntstatus == NTCAN_SUCCESS ? hw::Status::OK : hw::Status::ERR;
+  return ntstatus == NTCAN_SUCCESS ? HardwareStatus::OK : HardwareStatus::ERR;
 }
 
 std::string EsdCanChecker::esdcan_result_to_message(NTCAN_RESULT ntstatus) {
