@@ -20,7 +20,6 @@
 import math
 import sys
 import threading
-import time
 
 import gflags
 import matplotlib.pyplot as plt

@@ -96,13 +96,32 @@ std::list<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
 
-bool Frame::InitReferenceLineInfo(
-    const std::vector<ReferenceLine> &reference_lines) {
-  reference_line_info_.clear();
-  for (const auto &reference_line : reference_lines) {
-    reference_line_info_.emplace_back(pnc_map_.get(), reference_line,
-                                      planning_start_point_);
+bool Frame::InitReferenceLineInfo() {
+  std::list<ReferenceLine> reference_lines;
+  std::list<hdmap::RouteSegments> segments;
+  bool has_ref_line = false;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    has_ref_line = ReferenceLineProvider::instance()->GetReferenceLines(
+        &reference_lines, &segments);
+  } else {
+    has_ref_line = CreateReferenceLineFromRouting(init_pose_.position(),
+                                                  &reference_lines, &segments);
   }
+  if (!has_ref_line) {
+    AERROR << "Failed to create reference line from position: "
+           << init_pose_.DebugString();
+    return false;
+  }
+  reference_line_info_.clear();
+  auto ref_line_iter = reference_lines.begin();
+  auto segments_iter = segments.begin();
+  while (ref_line_iter != reference_lines.end()) {
+    reference_line_info_.emplace_back(pnc_map_.get(), *ref_line_iter,
+                                      *segments_iter, planning_start_point_);
+    ++ref_line_iter;
+    ++segments_iter;
+  }
+
   for (auto &info : reference_line_info_) {
     if (!info.Init()) {
       AERROR << "Failed to init adc sl boundary";
@@ -172,20 +191,6 @@ Status Frame::Init(const PlanningConfig &config,
   }
   smoother_config_ = config.reference_line_smoother_config();
 
-  std::vector<ReferenceLine> reference_lines;
-  if (FLAGS_enable_reference_line_provider_thread) {
-    reference_lines = ReferenceLineProvider::instance()->GetReferenceLines();
-  } else {
-    reference_lines = CreateReferenceLineFromRouting(init_pose_.position());
-  }
-
-  if (reference_lines.empty()) {
-    AERROR << "Failed to create reference line from position: "
-           << init_pose_.DebugString();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Failed to create reference line from routing");
-  }
-
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
   if (FLAGS_align_prediction_time) {
@@ -205,8 +210,7 @@ Status Frame::Init(const PlanningConfig &config,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Collision found with " + collision_obstacle_id_);
   }
-
-  if (!InitReferenceLineInfo(reference_lines)) {
+  if (!InitReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";
     return Status(ErrorCode::PLANNING_ERROR,
                   "failed to init reference line info");
@@ -238,23 +242,25 @@ bool Frame::CheckCollision() {
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
-std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
-    const common::PointENU &position) {
-  std::vector<ReferenceLine> reference_lines;
+bool Frame::CreateReferenceLineFromRouting(
+    const common::PointENU &position, std::list<ReferenceLine> *reference_lines,
+    std::list<hdmap::RouteSegments> *segments) {
+  DCHECK_NOTNULL(reference_lines);
+  DCHECK_NOTNULL(segments);
   std::vector<hdmap::RouteSegments> route_segments;
   if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
                                   FLAGS_look_forward_distance,
                                   &route_segments)) {
     AERROR << "Failed to extract segments from routing";
-    return reference_lines;
+    return false;
   }
 
   ReferenceLineSmoother smoother;
   smoother.Init(smoother_config_);
 
-  for (const auto &segments : route_segments) {
+  for (const auto &each_segments : route_segments) {
     hdmap::Path hdmap_path;
-    hdmap::PncMap::CreatePathFromLaneSegments(segments, &hdmap_path);
+    hdmap::PncMap::CreatePathFromLaneSegments(each_segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
       std::vector<double> init_t_knots;
@@ -264,16 +270,14 @@ std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
         AERROR << "Failed to smooth reference line";
         continue;
       }
-      reference_lines.push_back(std::move(reference_line));
-      reference_lines.back().set_change_lane_type(segments.change_lane_type());
+      reference_lines->emplace_back(std::move(reference_line));
+      segments->emplace_back(each_segments);
     } else {
-      reference_lines.emplace_back(hdmap_path);
-      reference_lines.back().set_change_lane_type(segments.change_lane_type());
+      reference_lines->emplace_back(hdmap_path);
+      segments->emplace_back(each_segments);
     }
   }
-
-  AERROR_IF(reference_lines.empty()) << "No smooth reference lines available";
-  return reference_lines;
+  return !reference_lines->empty();
 }
 
 std::string Frame::DebugString() const {
