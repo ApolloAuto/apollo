@@ -24,6 +24,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
+#include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 
 namespace apollo {
@@ -47,6 +48,11 @@ void TrafficDecider::RegisterRules() {
   rule_factory_.Register(RuleConfig::CROSSWALK,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Crosswalk(config);
+                         });
+
+  rule_factory_.Register(RuleConfig::REROUTING,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new Rerouting(config);
                          });
 }
 

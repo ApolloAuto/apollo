@@ -41,9 +41,7 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -115,6 +113,11 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
+  if (AdapterManager::GetRoutingRequest() == nullptr) {
+    std::string error_msg("RoutingRequest is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
     std::string error_msg("Prediction is not registered");
     AERROR << error_msg;
@@ -162,9 +165,7 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-}
+void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {

@@ -132,17 +132,19 @@ TEST_F(PncMapTest, GetWaypointIndex) {
 }
 
 TEST_F(PncMapTest, GetRouteSegments) {
-  common::PointENU point;
-  point.set_x(587174.662136);
-  point.set_y(4140933.06302);
+  auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
+  ASSERT_TRUE(lane);
+  auto point = lane->GetSmoothPoint(0);
   std::vector<RouteSegments> segments;
   bool result = pnc_map_->GetRouteSegments(point, 10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
   EXPECT_NEAR(40, RouteLength(segments[0]), 1e-4);
-  EXPECT_EQ(routing::FORWARD, segments[0].change_lane_type());
+  EXPECT_EQ(routing::LEFT, segments[0].NextAction());
+  EXPECT_TRUE(segments[0].IsOnSegment());
   EXPECT_NEAR(40, RouteLength(segments[1]), 1e-4);
-  EXPECT_EQ(routing::RIGHT, segments[1].change_lane_type());
+  EXPECT_EQ(routing::RIGHT, segments[1].NextAction());
+  EXPECT_FALSE(segments[1].IsOnSegment());
 }
 
 TEST_F(PncMapTest, GetNeighborPassages) {
@@ -150,43 +152,27 @@ TEST_F(PncMapTest, GetNeighborPassages) {
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 0);
     EXPECT_EQ(2, result.size());
-    EXPECT_EQ(0, result[0].first);
-    EXPECT_EQ(routing::FORWARD, result[0].second);
-    EXPECT_EQ(1, result[1].first);
-    EXPECT_EQ(routing::RIGHT, result[1].second);
+    EXPECT_EQ(0, result[0]);
+    EXPECT_EQ(1, result[1]);
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 1);
     EXPECT_EQ(3, result.size());
-
-    EXPECT_EQ(1, result[0].first);
-    EXPECT_EQ(routing::FORWARD, result[0].second);
-
-    EXPECT_EQ(0, result[1].first);
-    EXPECT_EQ(routing::LEFT, result[1].second);
-
-    EXPECT_EQ(2, result[2].first);
-    EXPECT_EQ(routing::LEFT, result[1].second);
+    EXPECT_EQ(1, result[0]);
+    EXPECT_EQ(0, result[1]);
+    EXPECT_EQ(2, result[2]);
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 2);
     EXPECT_EQ(3, result.size());
-
-    EXPECT_EQ(2, result[0].first);
-    EXPECT_EQ(routing::FORWARD, result[0].second);
-
-    EXPECT_EQ(1, result[1].first);
-    EXPECT_EQ(routing::RIGHT, result[1].second);
-
-    EXPECT_EQ(3, result[2].first);
-    EXPECT_EQ(routing::RIGHT, result[2].second);
+    EXPECT_EQ(2, result[0]);
+    EXPECT_EQ(1, result[1]);
+    EXPECT_EQ(3, result[2]);
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 3);
     EXPECT_EQ(1, result.size());
-
-    EXPECT_EQ(3, result[0].first);
-    EXPECT_EQ(routing::FORWARD, result[0].second);
+    EXPECT_EQ(3, result[0]);
   }
 }
 
