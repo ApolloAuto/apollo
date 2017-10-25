@@ -289,14 +289,11 @@ bool QpSplinePathGenerator::AddConstraint(
   const auto lateral_buf = qp_spline_path_config_.cross_lane_extension_buffer();
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
-  for (const double s : evaluated_s_) {
-    std::pair<double, double> road_boundary(0.0, 0.0);
-    std::pair<double, double> static_obs_boundary(0.0, 0.0);
-    std::pair<double, double> dynamic_obs_boundary(0.0, 0.0);
 
-    qp_frenet_frame.GetMapBound(s, &road_boundary);
-    qp_frenet_frame.GetStaticObstacleBound(s, &static_obs_boundary);
-    qp_frenet_frame.GetDynamicObstacleBound(s, &dynamic_obs_boundary);
+  for (uint32_t i = 0; i < evaluated_s_.size(); ++i) {
+    auto road_boundary = qp_frenet_frame.GetMapBound().at(i);
+    auto static_obs_boundary = qp_frenet_frame.GetStaticObstacleBound().at(i);
+    auto dynamic_obs_boundary = qp_frenet_frame.GetDynamicObstacleBound().at(i);
 
     road_boundary.first =
         std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
@@ -314,7 +311,7 @@ bool QpSplinePathGenerator::AddConstraint(
         std::vector<double>{road_boundary.second, static_obs_boundary.second,
                             dynamic_obs_boundary.second}));
 
-    ADEBUG << "s:" << s << " boundary_low:" << boundary_low.back()
+    ADEBUG << "s:" << evaluated_s_[i] << " boundary_low:" << boundary_low.back()
            << " boundary_high:" << boundary_high.back()
            << " road_boundary_low: " << road_boundary.first
            << " road_boundary_high: " << road_boundary.second
