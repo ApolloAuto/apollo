@@ -43,7 +43,7 @@ std::string Dreamview::Name() const {
 }
 
 Status Dreamview::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_filename);
+  AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
   VehicleConfigHelper::Init();
 
   // Check the expected adapters are initialized.

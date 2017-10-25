@@ -98,7 +98,7 @@ Status Planning::Init() {
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   if (!AdapterManager::Initialized()) {
-    AdapterManager::Init(FLAGS_adapter_config_filename);
+    AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
   if (AdapterManager::GetLocalization() == nullptr) {
     std::string error_msg("Localization is not registered");
