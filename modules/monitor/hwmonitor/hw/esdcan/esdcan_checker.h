@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "modules/monitor/common/annotations.h"
-#include "modules/monitor/common/interface/hw_checker.h"
+#include "modules/monitor/common/hw_checker.h"
 
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
@@ -38,7 +38,8 @@ class EsdCanChecker : public HwCheckerInterface {
   static const char ESD_CAN_NAME[];
 
   /// Returns a HW status code from ntstatus.
-  static hw::Status esdcan_result_to_hw_status(NTCAN_RESULT ntstatus);
+  static HardwareStatus::Status esdcan_result_to_hw_status(
+      NTCAN_RESULT ntstatus);
 
   /// Returns a HW status message from ntstatus.
   static std::string esdcan_result_to_message(NTCAN_RESULT ntstatus);
