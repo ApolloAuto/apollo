@@ -127,20 +127,23 @@ bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
     double lane_s = 0.0;
     double lane_l = 0.0;
     if (!iter->lane->GetProjection(point, &lane_s, &lane_l)) {
+      ADEBUG << "Failed to get projection from point " << point.DebugString()
+             << " on lane " << iter->lane->id().id();
       return false;
     }
     if (lane_s < iter->start_s - kSegmentationEpsilon ||
         lane_s > iter->end_s + kSegmentationEpsilon) {
+      ADEBUG << "point " << point.DebugString() << " not in range";
       continue;
     }
-    lane_s = std::max(iter->start_s, lane_s);
-    lane_s = std::min(iter->end_s, lane_s);
     if (std::fabs(lane_l) < std::fabs(*l)) {
       has_projection = true;
+      lane_s = std::max(iter->start_s, lane_s);
+      lane_s = std::min(iter->end_s, lane_s);
       *l = lane_l;
+      *s = lane_s - iter->start_s + accumulate_s;
       waypoint->lane = iter->lane;
       waypoint->s = lane_s;
-      *s = lane_s - iter->start_s + accumulate_s;
     }
   }
   return has_projection;
@@ -171,7 +174,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
     return true;
   }
 
-  // 1. should have projection
+  // 1. should have valid projection.
   LaneWaypoint segment_waypoint;
   double route_s = 0.0;
   double lane_l = 0.0;
@@ -395,14 +398,19 @@ bool PncMap::GetRouteSegments(
     DCHECK(PassageToSegments(passage, &segments))
         << "Failed to convert passage to lane segments.";
     double s = 0.0;
-    LaneWaypoint segment_waypoint;
     double l = 0.0;
-    if (!segments.GetProjection(point, &s, &l, &segment_waypoint)) {
-      ADEBUG << "Failed to get projection from point: " << point.DebugString();
+    auto nearest_point = point;
+    if (index == passage_index) {
+      nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
+    }
+    LaneWaypoint segment_waypoint;
+    if (!segments.GetProjection(nearest_point, &s, &l, &segment_waypoint)) {
+      ADEBUG << "Failed to get projection from point: "
+             << nearest_point.DebugString();
       continue;
     }
     // check if possible to drive from current waypoint to the passage.
-    if (!segments.CanDriveFrom(waypoint)) {
+    if (index != passage_index && !segments.CanDriveFrom(waypoint)) {
       ADEBUG << "You cannot drive from current waypoint to passage: " << index;
       continue;
     }
@@ -419,7 +427,7 @@ bool PncMap::GetRouteSegments(
       route_segments->back().SetIsOnSegment(true);
     }
   }
-  return true;
+  return !route_segments->empty();
 }
 
 bool PncMap::GetNearestPointFromRouting(const common::PointENU &point,
