@@ -116,10 +116,8 @@ bool Frame::Rerouting() {
 
 void Frame::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   pnc_map_->UpdateRoutingResponse(routing);
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->UpdateRoutingResponse(routing);
-  }
 }
+
 const routing::RoutingResponse &Frame::routing_response() const {
   return pnc_map_->routing_response();
 }
