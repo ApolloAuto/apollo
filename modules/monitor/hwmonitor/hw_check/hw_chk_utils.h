@@ -23,7 +23,7 @@
 #include "modules/monitor/common/hw_checker.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 void set_hmi_status(apollo::hmi::HardwareStatus *hs, const std::string &name,
@@ -43,7 +43,7 @@ void set_hmi_status(apollo::hmi::HardwareStatus *hs, const std::string &name,
 }
 
 void hw_chk_result_to_hmi_status(
-    const std::vector<apollo::platform::HwCheckResult> &rslt,
+    const std::vector<apollo::monitor::HwCheckResult> &rslt,
     std::vector<apollo::hmi::HardwareStatus> *v_hs) {
   for (const auto &el : rslt) {
     apollo::hmi::HardwareStatus hs;
@@ -53,5 +53,5 @@ void hw_chk_result_to_hmi_status(
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo

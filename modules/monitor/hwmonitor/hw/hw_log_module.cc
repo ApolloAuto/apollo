@@ -17,7 +17,7 @@
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 log::LogModule _shrd_hw_log_mod = {"HW", log::LVL_WARN, log::DBG_VERBOSE,
@@ -32,5 +32,5 @@ void config_log(int log_lvl, int dbg_lvl, log::LogFn *log_fn) {
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
