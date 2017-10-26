@@ -37,18 +37,13 @@ namespace third_party_perception {
 // TODO(lizh): use common const
 const double PI = 3.141592653;
 
-using ::apollo::common::Quaternion;
-using ::apollo::common::PointENU;
-using ::apollo::perception::Point;
-using ::apollo::perception::PerceptionObstacle;
+double GetAngleFromQuaternion(const apollo::common::Quaternion quaternion);
 
-double GetAngleFromQuaternion(const Quaternion quaternion);
-
-void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
-                           const double mid_x, const double mid_y,
-                           const double mid_z, const double length,
-                           const double width, const double height,
-                           const double heading);
+void FillPerceptionPolygon(
+    apollo::perception::PerceptionObstacle* const perception_obstacle,
+    const double mid_x, const double mid_y, const double mid_z,
+    const double length, const double width, const double height,
+    const double heading);
 
 // TODO(lizh): change it to PerceptionObstacle::VEHICLE or so
 //             when perception obstacle type is extended.
@@ -62,23 +57,26 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
-Point SLtoXY(const double x, const double y, const double theta);
+apollo::perception::Point SLtoXY(const double x, const double y,
+                                 const double theta);
 
-Point SLtoXY(const Point& point, const double theta);
+apollo::perception::Point SLtoXY(const apollo::perception::Point& point,
+                                 const double theta);
 
-double Distance(const Point& point1, const Point& point2);
+double Distance(const apollo::perception::Point& point1,
+                const apollo::perception::Point& point2);
 
-double Speed(const Point& point);
+double Speed(const apollo::perception::Point& point);
 
 double Speed(const double vx, const double vy);
 
-double GetNearestLaneHeading(const PointENU& point_enu);
+double GetNearestLaneHeading(const apollo::common::PointENU& point_enu);
 
-double GetNearestLaneHeading(const Point& point);
+double GetNearestLaneHeading(const apollo::perception::Point& point);
 
 double GetNearestLaneHeading(const double x, const double y, const double z);
 
-double GetLateralDistanceToNearestLane(const Point& point);
+double GetLateralDistanceToNearestLane(const apollo::perception::Point& point);
 
 double HeadingDifference(const double theta1, const double theta2);
 
