@@ -20,9 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/macro.h"
 #include "modules/monitor/common/annotations.h"
 #include "modules/monitor/common/hw_checker.h"
-
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 /**
@@ -44,12 +44,15 @@ class EsdCanChecker : public HwCheckerInterface {
   /// Returns a HW status message from ntstatus.
   static std::string esdcan_result_to_message(NTCAN_RESULT ntstatus);
 
-  explicit EsdCanChecker(int id);
+  explicit EsdCanChecker();
 
   virtual ~EsdCanChecker() {}
 
   /// Returns the name of the HW this checker checks.
   const std::string &get_name() const override { return name_; };
+
+  // Returns the can id
+  const int &get_id() const { return can_id_; };
 
   /// Runs HW status check, stores results in results.
   void run_check(std::vector<HwCheckResult> *results) override;

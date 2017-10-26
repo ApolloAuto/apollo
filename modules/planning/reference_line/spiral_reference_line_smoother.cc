@@ -106,7 +106,8 @@ bool SpiralReferenceLineSmoother::Smooth(
   //  app->Options()->SetNumericValue("derivative_test_perturbation", 1.0e-7);
   //  app->Options()->SetStringValue("derivative_test", "second-order");
   app->Options()->SetIntegerValue("print_level", 0);
-  app->Options()->SetIntegerValue("max_iter", 1000);
+  int num_iterations = 10;
+  app->Options()->SetIntegerValue("max_iter", num_iterations);
 
   //  app->Options()->SetNumericValue("acceptable_tol", 0.5);
   //  app->Options()->SetNumericValue("acceptable_obj_change_tol", 0.5);
