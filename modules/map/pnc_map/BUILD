@@ -27,6 +27,7 @@ cc_library(
         "pnc_map.h",
     ],
     deps = [
+        "//external:gflags",
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
     ],
