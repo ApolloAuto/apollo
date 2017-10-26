@@ -29,8 +29,8 @@ namespace hw {
 
 const char EsdCanChecker::ESD_CAN_NAME[] = "ESD_CAN";
 
-EsdCanChecker::EsdCanChecker(int id) : can_id_(id) {
-  name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", id);
+EsdCanChecker::EsdCanChecker() {
+  name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", can_id_);
 }
 
 HardwareStatus::Status EsdCanChecker::esdcan_result_to_hw_status(
