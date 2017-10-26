@@ -57,3 +57,4 @@ class CanCheckerFactory
 }  // namespace apollo
 
 #endif  // MODULES_MONITOR_COMMON_CAN_CHECKER_FACTORY_H_
+

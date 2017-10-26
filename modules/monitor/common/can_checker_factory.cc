@@ -48,3 +48,4 @@ std::unique_ptr<HwCheckerInterface> CanCheckerFactory::CreateCanChecker(
 
 }  // namespace monitor
 }  // namespace apollo
+
