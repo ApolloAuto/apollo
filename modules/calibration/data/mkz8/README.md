@@ -1,1 +1,0 @@
-# Default Dummy Vehicle
