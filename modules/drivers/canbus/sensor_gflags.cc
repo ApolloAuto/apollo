@@ -24,9 +24,7 @@ DEFINE_string(adapter_config_filename, "modules/canbus/conf/adapter.conf",
               "The adapter config file");
 
 // data file
-DEFINE_string(sensor_conf_file,
-              "",
-              "Sensor conf file");
+DEFINE_string(sensor_conf_file, "", "Sensor conf file");
 
 // Canbus gflags
 DEFINE_double(sensor_freq, 100,

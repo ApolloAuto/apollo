@@ -40,7 +40,7 @@ namespace can {
 
 /**
  * @class FakeCanClient
- * @brief The class which defines a fake CAN client which inherites CanClient.
+ * @brief The class which defines a fake CAN client which inherits CanClient.
  *        This fake CAN client is used for testing.
  */
 class FakeCanClient : public CanClient {
