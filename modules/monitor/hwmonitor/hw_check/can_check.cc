@@ -65,7 +65,9 @@ int main(int argc, const char *argv[]) {
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
-  can_rslt[0].details->print_summary(std::cout);
+  if (can_chk->get_name() == "ESD_CAN") {
+    can_rslt[0].details->print_summary(std::cout);
+  }
 #else
   PLATFORM_LOG(apollo::monitor::hw::get_log_module(),
                apollo::monitor::log::LVL_DBG, "Done checking %s, status: %d",
