@@ -22,6 +22,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "can_checker_factory",
+    srcs = ["can_checker_factory.cc"],
+    hdrs = ["can_checker_factory.h"],
+    deps = [
+        "//modules/common:macro",
+        "//modules/common/util:factory",
+        "//modules/drivers/canbus/proto:canbus_proto",
+        "//modules/monitor/common:hw_checker",
+        "//modules/monitor/hwmonitor/hw/esdcan:esdcan_checker_lib",
+    ],
+)
+
 cc_binary(
     name = "log_test",
     srcs = ["log_test.cc"],

@@ -12,6 +12,7 @@ cc_library(
     ],
     hdrs = glob(["*.h"]),
     deps = [
+        "//modules/common:macro",
         "//modules/common/util:string_util",
         "//modules/monitor/common:hw_checker",
         "//modules/monitor/common:log",
@@ -30,6 +31,7 @@ cc_library(
     ],
     hdrs = glob(["*.h"]),
     deps = [
+        "//modules/common:macro",
         "//modules/common/util:string_util",
         "//modules/monitor/common:hw_checker",
         "//modules/monitor/common:log",
