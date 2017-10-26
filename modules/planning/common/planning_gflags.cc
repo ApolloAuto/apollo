@@ -31,7 +31,7 @@ DEFINE_uint64(rtk_trajectory_forward, 800,
 DEFINE_double(rtk_trajectory_resolution, 0.01,
               "The time resolution of output trajectory for rtk planner.");
 
-DEFINE_bool(publish_estop, false, "publish estop decision in planning");
+DEFINE_bool(publish_estop, true, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
 DEFINE_double(
