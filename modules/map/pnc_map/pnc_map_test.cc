@@ -29,6 +29,8 @@
 #define private public
 #include "modules/map/pnc_map/pnc_map.h"
 
+DECLARE_double(min_lane_keeping_distance);
+
 namespace apollo {
 namespace hdmap {
 
@@ -131,13 +133,33 @@ TEST_F(PncMapTest, GetWaypointIndex) {
   EXPECT_EQ(0, result[2]);
 }
 
-TEST_F(PncMapTest, GetRouteSegments) {
+TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
+  pnc_map_->route_index_.clear();
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
   auto point = lane->GetSmoothPoint(0);
   std::vector<RouteSegments> segments;
-  pnc_map_->route_index_.clear();
   EXPECT_FALSE(pnc_map_->GetRouteSegments(10, 30, &segments));
+  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
+  bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
+  ASSERT_TRUE(result);
+  // first time on this passage, should not immediately change lane
+  ASSERT_EQ(1, segments.size());
+  EXPECT_NEAR(40, RouteLength(segments[0]), 1e-4);
+  EXPECT_EQ(routing::LEFT, segments[0].NextAction());
+  EXPECT_TRUE(segments[0].IsOnSegment());
+}
+
+TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
+  auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
+  ASSERT_TRUE(lane);
+  pnc_map_->route_index_.clear();
+  auto point = lane->GetSmoothPoint(0);
+  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
+  FLAGS_min_lane_keeping_distance = 30.0;
+  point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
+  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
+  std::vector<RouteSegments> segments;
   EXPECT_TRUE(pnc_map_->UpdatePosition(point));
   bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
   ASSERT_TRUE(result);
