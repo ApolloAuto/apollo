@@ -35,7 +35,9 @@ namespace apollo {
 namespace third_party_perception {
 namespace fusion {
 
-using ::apollo::common::math::Vec2d;
+using apollo::common::math::Vec2d;
+using apollo::perception::PerceptionObstacles;
+using apollo::perception::PerceptionObstacle;
 
 std::vector<Vec2d> PerceptionObstacleToVectorVec2d(
     const PerceptionObstacle& obstacle) {
@@ -68,10 +70,8 @@ bool HasOverlap(const PerceptionObstacle& obstacle,
 PerceptionObstacles MobileyeRadarFusion(
     const PerceptionObstacles& mobileye_obstacles,
     const PerceptionObstacles& radar_obstacles) {
-  PerceptionObstacles mobileye_obstacles_fusion;
-  mobileye_obstacles_fusion.CopyFrom(mobileye_obstacles);
-  PerceptionObstacles radar_obstacles_fusion;
-  radar_obstacles_fusion.CopyFrom(radar_obstacles);
+  PerceptionObstacles mobileye_obstacles_fusion = mobileye_obstacles;
+  PerceptionObstacles radar_obstacles_fusion = radar_obstacles;
 
   for (auto& mobileye_obstacle :
        *(mobileye_obstacles_fusion.mutable_perception_obstacle())) {
@@ -84,10 +84,8 @@ PerceptionObstacles MobileyeRadarFusion(
     }
   }
 
-  PerceptionObstacles obstacles;
-  obstacles.MergeFrom(mobileye_obstacles_fusion);
-  obstacles.MergeFrom(radar_obstacles_fusion);
-  return obstacles;
+  mobileye_obstacles_fusion.MergeFrom(radar_obstacles_fusion);
+  return mobileye_obstacles_fusion;
 }
 
 }  // namespace fusion
