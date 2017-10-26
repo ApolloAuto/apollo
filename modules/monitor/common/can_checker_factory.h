@@ -44,9 +44,9 @@ class CanCheckerFactory
   /**
    * @brief Create a pointer to a can checker
    * @param The parameter to create a can checker
-   * @return A pointer to the crated can checker
+   * @return A pointer to the created can checker
    */
-  std::unique_ptr<::apollo::monitor::HwCheckerInterface> CreateCanChecker(
+  std::unique_ptr<HwCheckerInterface> CreateCanChecker(
       const ::apollo::drivers::canbus::CANCardParameter &parameter);
 
  private:
