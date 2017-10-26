@@ -18,19 +18,21 @@
 #include <iostream>
 
 #include "glog/logging.h"
+#include "modules/canbus/common/canbus_gflags.h"
+#include "modules/canbus/proto/canbus_conf.pb.h"
+#include "modules/common/util/file.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 #include "modules/monitor/common/annotations.h"
+#include "modules/monitor/common/can_checker_factory.h"
 #include "modules/monitor/common/log.h"
-#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
-#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_utils.h"
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
-using apollo::hmi::HMIStatusHelper;
-using apollo::hmi::HardwareStatus;
-using apollo::monitor::HwCheckResult;
-using apollo::monitor::hw::EsdCanChecker;
-using apollo::monitor::hw::EsdCanDetails;
+using ::apollo::canbus::CanbusConf;
+using ::apollo::hmi::HMIStatusHelper;
+using ::apollo::hmi::HardwareStatus;
+using ::apollo::monitor::CanCheckerFactory;
+using ::apollo::monitor::HwCheckResult;
 
 int main(int argc, const char *argv[]) {
   // For other modules that uses glog.
@@ -46,19 +48,28 @@ int main(int argc, const char *argv[]) {
                                   apollo::monitor::log::DBG_VERBOSE);
 #endif
 
-  // We only have can0 for now.
-  EsdCanChecker can_chk;
+  CanbusConf canbus_conf;
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
+                                                &canbus_conf)) {
+    return -1;
+  }
+  auto *can_chk_factory = CanCheckerFactory::instance();
+  can_chk_factory->RegisterCanCheckers();
+  auto can_chk =
+      can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());
+  if (!can_chk) {
+    return -1;
+  }
   std::vector<HwCheckResult> can_rslt;
-  can_chk.run_check(&can_rslt);
+  can_chk->run_check(&can_rslt);
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
-  apollo::monitor::hw::esdcan_print_summary(
-      std::cout, *(const EsdCanDetails *)((can_rslt[0].details.get())));
+  can_rslt[0].details->print_summary(std::cout);
 #else
   PLATFORM_LOG(apollo::monitor::hw::get_log_module(),
                apollo::monitor::log::LVL_DBG, "Done checking %s, status: %d",
-               can_chk.get_name().c_str(), can_rslt[0].status);
+               can_chk->get_name().c_str(), can_rslt[0].status);
 #endif
 
   std::vector<HardwareStatus> hw_status;

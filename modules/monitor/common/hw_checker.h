@@ -18,6 +18,7 @@
 #define MODULES_MONITOR_COMMON_HW_CHECKER_H_
 
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -33,6 +34,12 @@ namespace monitor {
 
 static const int HW_CLASS_UNDEF = 0;
 
+class HwCheckResultDetails {
+ public:
+  virtual void print_summary(std::ostream &os) = 0;
+  virtual void print_test_result(std::ostream &os) = 0;
+};
+
 struct HwCheckResult {
   /// Name of the HW component.
   std::string name;
@@ -44,29 +51,18 @@ struct HwCheckResult {
   // @todo: it is confusing and doesn't support copy operation here;
   // consider to use a common base class with a deeep copy function.
   /// HW-specific details, may or may not be present.
-  std::unique_ptr<void, void (*)(void *)> details;
+  std::shared_ptr<HwCheckResultDetails> details;
 
-  HwCheckResult()
-      : status(HardwareStatus::UNDEF), details(nullptr, [](void *) {}) {}
+  HwCheckResult() : status(HardwareStatus::UNDEF), details(nullptr) {}
 
   HwCheckResult(const std::string &_name, int _status,
                 const std::string &_mssg = std::string("OK"))
-      : name(_name),
-        status(_status),
-        mssg(_mssg),
-        details(nullptr, [](void *) {}) {}
+      : name(_name), status(_status), mssg(_mssg), details(nullptr) {}
 
-  template <typename DetailType>
   HwCheckResult(const std::string &_name, int _status,
-                DetailType *_details PTR_OWNER_XFR,
+                HwCheckResultDetails *_details PTR_OWNER_XFR,
                 const std::string &_mssg = std::string("OK"))
-      : name(_name),
-        status(_status),
-        mssg(_mssg),
-        details(_details, [](void *value) {
-          DetailType *detail = static_cast<DetailType *>(value);
-          delete detail;
-        }) {}
+      : name(_name), status(_status), mssg(_mssg), details(_details) {}
 };
 
 class HwCheckerInterface {

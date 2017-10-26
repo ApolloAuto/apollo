@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   EsdCanDetails can_details;
-  esdcan_do_test(FLAGS_can_id, &can_details);
+  can_details.esdcan_do_test(FLAGS_can_id);
   if (FLAGS_details) {
-    esdcan_print_test_result(std::cout, can_details);
+    can_details.print_test_result(std::cout);
 
     if (can_details.valid_flag & EsdCanDetails::IF_STATUS) {
       _hw::esdcan_print_if_status(FLAGS_can_id, can_details.if_status);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
       _hw::esdcan_print_bitrate(can_details.bitrate);
     }
   } else {
-    esdcan_print_summary(std::cout, can_details);
+    can_details.print_summary(std::cout);
   }
 
   return 0;

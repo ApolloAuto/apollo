@@ -28,47 +28,6 @@ namespace apollo {
 namespace monitor {
 namespace hw {
 
-void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details) {
-  if (details.result == NTCAN_SUCCESS) {
-    os << "ESD-CAN test PASSED, CAN bus statistics:\n"
-       << "Rcv frames      : Std(Data/RTR): "
-       << details.stats.rcv_count.std_data << "/"
-       << details.stats.rcv_count.std_rtr
-       << ", Ext(Data/RTR): " << details.stats.rcv_count.ext_data << "/"
-       << details.stats.rcv_count.ext_rtr << std::endl
-       << "Xmit frames     : Std(Data/RTR): "
-       << details.stats.xmit_count.std_data << "/"
-       << details.stats.xmit_count.std_rtr
-       << ", Ext(Data/RTR): " << details.stats.xmit_count.ext_data << "/"
-       << details.stats.xmit_count.ext_rtr << std::endl
-       << "Bytes           : (Rcv/Xmit): " << details.stats.rcv_byte_count
-       << "/" << details.stats.xmit_byte_count << std::endl
-       << "Overruns        : (Controller/FIFO): " << details.stats.ctrl_ovr
-       << "/" << details.stats.fifo_ovr << std::endl
-       << "Err frames      : " << details.stats.err_frames << std::endl
-       << "Aborted frames  : " << details.stats.aborted_frames << std::endl
-       << "Err counter     : (Rx/Tx): "
-       << static_cast<int>(details.ctrl_state.rcv_err_counter) << "/"
-       << static_cast<int>(details.ctrl_state.xmit_err_counter) << std::endl
-       << "Status          : " << std::hex
-       << static_cast<int>(details.ctrl_state.status) << std::endl
-       << "Rcv bits        : " << std::dec << details.stats.bit_count
-       << std::endl;
-  } else {
-    os << "ESD-CAN test FAILED with error " << details.result << ": "
-       << esdcan_err_to_str(details.result) << std::endl;
-  }
-}
-
-void esdcan_print_test_result(std::ostream &os, const EsdCanDetails &details) {
-  if (details.result == NTCAN_SUCCESS) {
-    os << "ESD-CAN test PASSED\n" << std::endl;
-  } else {
-    os << "ESD-CAN test FAILED with error " << details.result << ": "
-       << esdcan_err_to_str(details.result) << std::endl;
-  }
-}
-
 // @todo: clean up print functions
 
 void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status) {
@@ -134,7 +93,7 @@ void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate) {
     printf("Additional flags               : 0x%08lX\n",
            static_cast<int64_t>(bitrate.flags));
     int64_t sp = static_cast<int64_t>(bitrate.tq_pre_sp * 10000) /
-               static_cast<int64_t>(bitrate.tq_pre_sp + bitrate.tq_post_sp);
+                 static_cast<int64_t>(bitrate.tq_pre_sp + bitrate.tq_post_sp);
     printf("Position samplepoint           : %ld.%ld%%\n", sp / 100, sp % 100);
     printf("Deviation from configured rate : %ld.%02ld%%\n",
            static_cast<int64_t>(bitrate.error / 100),
