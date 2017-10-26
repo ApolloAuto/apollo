@@ -28,10 +28,6 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/drivers/canbus/can_client/can_client.h"
-#include "modules/drivers/canbus/can_client/can_client_factory.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/apollo_app.h"
@@ -40,9 +36,13 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/control_cmd.pb.h"
+#include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
-#include "modules/drivers/canbus/sensor_gflags.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
+#include "modules/drivers/canbus/sensor_gflags.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 
 /**
@@ -178,7 +178,7 @@ Status SensorCanbus<SensorType>::Start() {
   }
   AINFO << "Can receiver is started.";
 
-  // 3. set timer to triger publish info periodly
+  // 3. set timer to trigger publish info periodically
   // if sensor_freq == 0, then it is event-triggered publishment.
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
