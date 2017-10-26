@@ -31,11 +31,9 @@ namespace apollo {
 namespace third_party_perception {
 namespace fusion {
 
-using apollo::perception::PerceptionObstacles;
-
-PerceptionObstacles MobileyeRadarFusion(
-    const PerceptionObstacles& mobileye_obstacles,
-    const PerceptionObstacles& radar_obstacles);
+apollo::perception::PerceptionObstacles MobileyeRadarFusion(
+    const apollo::perception::PerceptionObstacles& mobileye_obstacles,
+    const apollo::perception::PerceptionObstacles& radar_obstacles);
 
 }  // namespace fusion
 }  // namespace third_party_perception
