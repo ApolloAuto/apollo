@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Defines the EsdCanClient class which inherites CanClient.
+ * @brief Defines the EsdCanClient class which inherits CanClient.
  */
 
 #ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_ESD_CAN_CLIENT_H_
@@ -42,7 +42,7 @@ namespace can {
 
 /**
  * @class EsdCanClient
- * @brief The class which defines a ESD CAN client which inherites CanClient.
+ * @brief The class which defines a ESD CAN client which inherits CanClient.
  */
 class EsdCanClient : public CanClient {
  public:
