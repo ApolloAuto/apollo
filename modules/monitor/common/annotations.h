@@ -17,10 +17,6 @@
 #ifndef MODULES_MONITOR_COMMON_ANNOTATIONS_H_
 #define MODULES_MONITOR_COMMON_ANNOTATIONS_H_
 
-#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-  TypeName(const TypeName &);              \
-  TypeName &operator=(const TypeName &)
-
 /// Indicating a pointer class member is not owned by an object of the class; it
 /// is the
 /// responsibility of the programmer to make sure the given pointer is valid
