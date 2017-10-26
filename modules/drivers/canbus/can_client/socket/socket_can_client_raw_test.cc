@@ -31,7 +31,7 @@ using apollo::common::ErrorCode;
 
 TEST(SocketCanClientRawTest, simple_test) {
   CANCardParameter param;
-  param.set_brand(CANCardParameter::ESD_CAN);
+  param.set_brand(CANCardParameter::SOCKET_CAN_RAW);
   param.set_channel_id(CANCardParameter::CHANNEL_ID_ZERO);
 
   SocketCanClientRaw socket_can_client;
