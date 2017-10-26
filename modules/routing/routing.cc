@@ -42,8 +42,8 @@ apollo::common::Status Routing::Init() {
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
 
-  AdapterManager::Init(FLAGS_adapter_config_filename);
-  AdapterManager::AddRoutingRequestCallback(&Routing::OnRouting_Request, this);
+  AdapterManager::Init(FLAGS_routing_adapter_config_filename);
+  AdapterManager::AddRoutingRequestCallback(&Routing::OnRoutingRequest, this);
   return apollo::common::Status::OK();
 }
 
@@ -60,7 +60,7 @@ apollo::common::Status Routing::Start() {
   return apollo::common::Status::OK();
 }
 
-void Routing::OnRouting_Request(
+void Routing::OnRoutingRequest(
     const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
   routing::RoutingResponse routing_response;

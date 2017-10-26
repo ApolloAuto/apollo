@@ -14,12 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_ANNOTATIONS_H_
-#define MODULES_PLATFORM_ANNOTATIONS_H_
-
-#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-  TypeName(const TypeName &);              \
-  TypeName &operator=(const TypeName &)
+#ifndef MODULES_MONITOR_COMMON_ANNOTATIONS_H_
+#define MODULES_MONITOR_COMMON_ANNOTATIONS_H_
 
 /// Indicating a pointer class member is not owned by an object of the class; it
 /// is the
@@ -63,4 +59,4 @@
 /// directly.
 #define PRIVATE
 
-#endif  // MODULES_PLATFORM_ANNOTATIONS_H_
+#endif  // MODULES_MONITOR_COMMON_ANNOTATIONS_H_

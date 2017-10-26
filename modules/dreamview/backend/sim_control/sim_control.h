@@ -44,10 +44,16 @@ namespace dreamview {
 class SimControl {
  public:
   /**
- * @brief Constructor of SimControl.
- * @param map_service the pointer of MapService.
- */
+   * @brief Constructor of SimControl.
+   * @param map_service the pointer of MapService.
+   */
   explicit SimControl(const MapService *map_service);
+
+  /**
+   * @brief setup callbacks and timer
+   * @param set_start_point initialize localization.
+   */
+  void Init(bool set_start_point);
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -66,6 +72,11 @@ class SimControl {
   void ClearPlanning() {
     received_planning_ = false;
   }
+
+  /**
+   * @brief Publish simulated localization and chassis.
+   */
+  void RunOnce();
 
  private:
   void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
@@ -107,9 +118,6 @@ class SimControl {
 
   // Whether there's a planning received after the most recent routing.
   bool received_planning_;
-
-  // Whether it is the first time the SimControl gets started.
-  bool initial_start_;
 
   // Whether the sim control is enabled.
   bool enabled_;

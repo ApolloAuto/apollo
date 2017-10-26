@@ -77,7 +77,8 @@ em_planner_config {
         third_derivative_weight: 10.0
         reference_line_weight: 0
         num_output: 100
-        cross_lane_extension_buffer: 0.2
+        cross_lane_lateral_extension: 1.2
+        cross_lane_longitudinal_extension: 50.0
         history_path_weight: 0.0;
     }
     qp_st_speed_config {
@@ -139,4 +140,7 @@ reference_line_smoother_config {
 
 rule_config : {
     rule_id: BACKSIDE_VEHICLE
+}
+rule_config : {
+    rule_id: REROUTING
 }

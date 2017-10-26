@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+import "modules/monitor/proto/hardware_status.proto";
+
 message ModuleStatus {
   enum Status {
     UNINITIALIZED = 0;
@@ -10,19 +12,12 @@ message ModuleStatus {
     STOPPED = 3;
   }
 
-  optional string name = 1;
-  optional Status status = 2 [default = UNINITIALIZED];
-}
-
-message HardwareStatus {
-  optional string name = 1;
-  // Defined in modules/monitor/common/interface/hw_status.h.
-  optional int32 status = 2 [default = -1];
+  optional Status status = 1 [default = UNINITIALIZED];
 }
 
 message HMIStatus {
   optional string current_map = 1;
   optional string current_vehicle = 2;
-  repeated ModuleStatus modules = 3;
-  repeated HardwareStatus hardware = 4;
+  map<string, ModuleStatus> modules = 3;
+  map<string, apollo.monitor.HardwareStatus> hardware = 4;
 }

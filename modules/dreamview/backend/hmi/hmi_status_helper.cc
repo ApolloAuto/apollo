@@ -22,16 +22,17 @@ namespace apollo {
 namespace dreamview {
 
 void HMIStatusHelper::ReportHardwareStatus(
-    const std::vector<HardwareStatus> &hardware_status) {
+    const std::string &hardware_name,
+    const monitor::HardwareStatus &hw_status) {
   HMIStatus hmi_status;
-  *hmi_status.mutable_hardware() = {hardware_status.begin(),
-                                    hardware_status.end()};
+  hmi_status.mutable_hardware()->insert({hardware_name, hw_status});
   common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
 }
 
-void HMIStatusHelper::ReportModuleStatus(const ModuleStatus &module_status) {
+void HMIStatusHelper::ReportModuleStatus(const std::string &module_name,
+                                         const ModuleStatus &module_status) {
   HMIStatus hmi_status;
-  *hmi_status.add_modules() = module_status;
+  hmi_status.mutable_modules()->insert({module_name, module_status});
   common::adapter::AdapterManager::PublishHMIStatus(hmi_status);
 }
 

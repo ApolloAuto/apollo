@@ -26,9 +26,7 @@ import os
 import sys
 
 import rospy
-import tf
 from gflags import FLAGS
-from std_msgs.msg import String
 
 from logger import Logger
 from modules.canbus.proto import chassis_pb2

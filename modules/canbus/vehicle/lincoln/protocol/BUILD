@@ -26,6 +26,7 @@ cc_library(
         "turnsignal_68.cc",
         "version_7f.cc",
         "wheelspeed_6a.cc",
+        "license_7e.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -49,11 +50,12 @@ cc_library(
         "turnsignal_68.h",
         "version_7f.h",
         "wheelspeed_6a.h",
+        "license_7e.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 

@@ -14,22 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_INTERFACE_HW_CHECKER_H_
-#define MODULES_PLATFORM_INTERFACE_HW_CHECKER_H_
+#ifndef MODULES_MONITOR_COMMON_HW_CHECKER_H_
+#define MODULES_MONITOR_COMMON_HW_CHECKER_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "modules/monitor/common/annotations.h"
-#include "modules/monitor/common/interface/hw_status.h"
+#include "modules/monitor/proto/hardware_status.pb.h"
 
 /**
- * @namespace apollo::platform
- * @brief apollo::platform
+ * @namespace apollo::monitor
+ * @brief apollo::monitor
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 
 static const int HW_CLASS_UNDEF = 0;
 
@@ -47,7 +47,7 @@ struct HwCheckResult {
   std::unique_ptr<void, void (*)(void *)> details;
 
   HwCheckResult()
-      : status(hw::Status::UNDEF), details(nullptr, [](void *) {}) {}
+      : status(HardwareStatus::UNDEF), details(nullptr, [](void *) {}) {}
 
   HwCheckResult(const std::string &_name, int _status,
                 const std::string &_mssg = std::string("OK"))
@@ -83,7 +83,7 @@ class HwCheckerInterface {
   virtual void run_check(std::vector<HwCheckResult> *results) = 0;
 };
 
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_INTERFACE_HW_CHECKER_H_
+#endif  // MODULES_MONITOR_COMMON_HW_CHECKER_H_

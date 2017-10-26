@@ -34,6 +34,7 @@
 #include "modules/common/macro.h"
 
 #include "ros/include/ros/ros.h"
+#include "tf/transform_listener.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -87,6 +88,10 @@ namespace adapter {
       void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
     Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
+  /* Returns false if there's no callback to pop out, true otherwise. */       \
+  static bool Pop##name##Callback() {                                          \
+    return instance()->name##_->PopCallback();                                 \
+  }                                                                            \
                                                                                \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
@@ -98,12 +103,12 @@ namespace adapter {
                             int message_history_limit) {                       \
     name##_.reset(                                                             \
         new name##Adapter(#name, topic_name, message_history_limit));          \
-    if (mode != AdapterConfig::PUBLISH_ONLY && node_handle_) {                 \
+    if (mode != AdapterConfig::PUBLISH_ONLY && IsRos()) {                      \
       name##subscriber_ =                                                      \
           node_handle_->subscribe(topic_name, message_history_limit,           \
                                   &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
-    if (mode != AdapterConfig::RECEIVE_ONLY && node_handle_) {                 \
+    if (mode != AdapterConfig::RECEIVE_ONLY && IsRos()) {                      \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
           topic_name, message_history_limit);                                  \
     }                                                                          \
@@ -115,7 +120,7 @@ namespace adapter {
   }                                                                            \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
-    if (node_handle_) {                                                        \
+    if (IsRos()) {                                                             \
       name##publisher_.publish(data);                                          \
     } else {                                                                   \
       /* For non-ROS mode, just triggers the callback. */                      \
@@ -170,6 +175,22 @@ class AdapterManager {
   static void Observe();
 
   /**
+   * @brief Returns whether AdapterManager is running ROS mode.
+   */
+  static bool IsRos() {
+    return instance()->node_handle_ != nullptr;
+  }
+
+  /**
+   * @brief Returns a reference to static tf2 buffer.
+   */
+  static tf2_ros::Buffer &Tf2Buffer() {
+    static tf2_ros::Buffer tf2_buffer;
+    static tf2_ros::TransformListener tf2Listener(tf2_buffer);
+    return tf2_buffer;
+  }
+
+  /**
    * @brief create a timer which will call a callback at the specified
    * rate. It takes a class member function, and a bare pointer to the
    * object to call the method on.
@@ -179,12 +200,12 @@ class AdapterManager {
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
                                 bool autostart = true) {
-    if (instance()->node_handle_) {
+    if (IsRos()) {
       return instance()->node_handle_->createTimer(period, callback, obj,
                                                    oneshot, autostart);
     } else {
-      AERROR << "ROS timer is only available in ROS mode, check your adapter "
-                "config file! Return a dummy timer that won't function.";
+      AWARN << "ROS timer is only available in ROS mode, check your adapter "
+               "config file! Return a dummy timer that won't function.";
       return ros::Timer();
     }
   }

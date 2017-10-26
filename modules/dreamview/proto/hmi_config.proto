@@ -2,23 +2,14 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-message Command {
-  optional string name = 1;
-
-  // Command components, in [cmd, arg1, arg2, ...] format.
-  // Binary path starting with '/' indicates an absolute path, otherwise it will
-  // be taken as a relative path of the Apollo root.
-  repeated string command = 2;
-}
-
 message Component {
-  optional string name = 1;
-  optional string display_name = 2;
-  repeated Command supported_commands = 3;
+  optional string display_name = 1;
+  map<string, string> supported_commands = 2;
 }
 
 message HMIConfig {
-  repeated Component modules = 1;
-  repeated Component hardware = 2;
-  repeated Command tools = 3;
+  map<string, Component> modules = 1;          // {module_name: module}
+  map<string, Component> hardware = 2;         // {hardware_name: hardware}
+  map<string, string> available_maps = 3;      // {map_name: map_dir}
+  map<string, string> available_vehicles = 4;  // {vehicle_name: vehicle_dir}
 }

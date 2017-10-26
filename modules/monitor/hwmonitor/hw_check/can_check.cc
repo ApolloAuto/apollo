@@ -26,44 +26,43 @@
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
-using apollo::platform::HwCheckResult;
-using apollo::platform::hw::EsdCanChecker;
-using apollo::platform::hw::EsdCanDetails;
 using apollo::hmi::HMIStatusHelper;
 using apollo::hmi::HardwareStatus;
+using apollo::monitor::HwCheckResult;
+using apollo::monitor::hw::EsdCanChecker;
+using apollo::monitor::hw::EsdCanDetails;
 
 int main(int argc, const char *argv[]) {
   // For other modules that uses glog.
   ::google::InitGoogleLogging("platform");
-  apollo::platform::log::init_syslog();
+  apollo::monitor::log::init_syslog();
 // @todo make log level configurable or set lower level here.
 #ifdef DEBUG
-  apollo::platform::hw::config_log(apollo::platform::log::LVL_DBG,
-                                   apollo::platform::log::DBG_VERBOSE,
-                                   apollo::platform::log::platform_log_printf);
+  apollo::monitor::hw::config_log(apollo::monitor::log::LVL_DBG,
+                                  apollo::monitor::log::DBG_VERBOSE,
+                                  apollo::monitor::log::platform_log_printf);
 #else
-  apollo::platform::hw::config_log(apollo::platform::log::LVL_DBG,
-                                   apollo::platform::log::DBG_VERBOSE);
+  apollo::monitor::hw::config_log(apollo::monitor::log::LVL_DBG,
+                                  apollo::monitor::log::DBG_VERBOSE);
 #endif
 
   // We only have can0 for now.
-  int can_id = 0;
-  EsdCanChecker can_chk(can_id);
+  EsdCanChecker can_chk;
   std::vector<HwCheckResult> can_rslt;
   can_chk.run_check(&can_rslt);
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
-  apollo::platform::hw::esdcan_print_summary(
+  apollo::monitor::hw::esdcan_print_summary(
       std::cout, *(const EsdCanDetails *)((can_rslt[0].details.get())));
 #else
-  PLATFORM_LOG(
-      apollo::platform::hw::get_log_module(), apollo::platform::log::LVL_DBG,
-      "Done checking ESD-CAN-%d, status: %d", can_id, can_rslt[0].status);
+  PLATFORM_LOG(apollo::monitor::hw::get_log_module(),
+               apollo::monitor::log::LVL_DBG, "Done checking %s, status: %d",
+               can_chk.get_name().c_str(), can_rslt[0].status);
 #endif
 
   std::vector<HardwareStatus> hw_status;
-  apollo::platform::hw::hw_chk_result_to_hmi_status(can_rslt, &hw_status);
+  apollo::monitor::hw::hw_chk_result_to_hmi_status(can_rslt, &hw_status);
 
   HMIStatusHelper::ReportHardwareStatus(hw_status);
 

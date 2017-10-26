@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.monitor;
+
+message HardwareStatus {
+  enum Status {
+    OK = 0;
+    // HW device is present and in working order, but not ready for service
+    // (e.g., no GPS lock).
+    NOT_READY = 1;
+    // HW is not present.
+    NOT_PRESENT = 2;
+    // HW error, can't be used.
+    ERR = 3;
+
+    // For internal use only.
+    UNDEF = -1;
+  }
+
+  optional Status status = 1;
+  // Additional message for current status.
+  optional string msg = 2;
+}

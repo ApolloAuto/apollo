@@ -244,6 +244,18 @@ class Adapter {
   }
 
   /**
+   * @brief Pops out the latest added callback.
+   * @return false if there's no callback to pop out, true otherwise.
+   */
+  bool PopCallback() {
+    if (receive_callbacks_.empty()) {
+      return false;
+    }
+    receive_callbacks_.pop_back();
+    return true;
+  }
+
+  /**
    * @brief fills the fields module_name, timestamp_sec and
    * sequence_num in the header.
    */

@@ -57,7 +57,28 @@ cc_library(
     deps = [
         "reference_line",
         "reference_line_smoother",
+        "spiral_reference_line_smoother",
         "//modules/map/pnc_map",
+    ],
+)
+
+cc_library(
+    name = "spiral_reference_line_smoother",
+    srcs = [
+        "spiral_problem_interface.cc",
+        "spiral_reference_line_smoother.cc",
+    ],
+    hdrs = [
+        "spiral_problem_interface.h",
+        "spiral_reference_line_smoother.h",
+    ],
+    deps = [
+        ":reference_line",
+        "//modules/planning/proto:planning_proto",
+        "//modules/common/math:math",
+        "//modules/planning/math/curve1d:quintic_spiral_path",
+        "@eigen//:eigen",
+        "@ipopt//:ipopt",
     ],
 )
 

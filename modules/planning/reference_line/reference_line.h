@@ -41,9 +41,6 @@ class ReferenceLine {
   ReferenceLine() = default;
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
-  ReferenceLine(const std::vector<ReferencePoint>& reference_points,
-                const std::vector<hdmap::LaneSegment>& lane_segments,
-                const double max_approximation_error);
 
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;
@@ -73,10 +70,6 @@ class ReferenceLine {
   std::string DebugString() const;
 
   double GetSpeedLimitFromS(const double s) const;
-
-  routing::ChangeLaneType change_lane_type() const;
-
-  void set_change_lane_type(routing::ChangeLaneType type);
 
  private:
   /**
@@ -108,7 +101,6 @@ class ReferenceLine {
  private:
   std::vector<ReferencePoint> reference_points_;
   hdmap::Path map_path_;
-  routing::ChangeLaneType change_lane_type_ = routing::FORWARD;
 };
 
 }  // namespace planning

@@ -14,35 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_INTERFACE_HW_STATUS_H_
-#define MODULES_PLATFORM_INTERFACE_HW_STATUS_H_
+/**
+ * @file
+ **/
+
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REROUTING_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REROUTING_H_
+
+#include <string>
+
+#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
+
+namespace apollo {
+namespace planning {
 
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * This class decides whether we should send rerouting request based on traffic
+ * situation.
  */
-namespace apollo {
-namespace platform {
-namespace hw {
+class Rerouting : public TrafficRule {
+ public:
+  explicit Rerouting(const RuleConfig& config);
+  virtual ~Rerouting() = default;
 
-/// Status of HW component (CAN, Camera, ...).
-enum Status {
-  /// This code may only be used for initialization, may never be returned by a
-  /// function.
-  UNDEF = -1,
-  /// HW is OK.
-  OK = 0,
-  /// HW device is present and in working order, but not ready for service
-  /// (e.g., no GPS lock).
-  NOT_READY = 1,
-  /// HW is not preent.
-  NOT_PRESENT = 2,
-  /// HW error, can't be used.
-  ERR = 3
+  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+
+ private:
+  bool ChangeLaneFailRerouting(const ReferenceLineInfo* reference_line_info);
+
+  ReferenceLineInfo* reference_line_info_;
+  Frame* frame_;
 };
 
-}  // namespace hw
-}  // namespace platform
+}  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_INTERFACE_HW_STATUS_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REROUTING_H_

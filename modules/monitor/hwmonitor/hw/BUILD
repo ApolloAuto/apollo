@@ -3,11 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "platform_hw_log_module_lib",
+    name = "hw_log_module",
     srcs = ["hw_log_module.cc"],
     hdrs = ["hw_log_module.h"],
     deps = [
-        "//modules/monitor/common:platform_common_lib",
+        "//modules/monitor/common:hw_checker",
+        "//modules/monitor/common:log",
     ],
 )
 

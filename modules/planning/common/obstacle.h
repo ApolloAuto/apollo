@@ -106,6 +106,7 @@ class Obstacle {
 };
 
 typedef IndexedList<std::string, Obstacle> IndexedObstacles;
+typedef ThreadSafeIndexedList<std::string, Obstacle> ThreadSafeIndexedObstacles;
 
 }  // namespace planning
 }  // namespace apollo

@@ -67,6 +67,10 @@ double Interpolation2D::Interpolate(const KeyType &xy) const {
 
 double Interpolation2D::InterpolateYz(const std::map<double, double> &yz_table,
                                       double y) const {
+  if (yz_table.empty()) {
+    AERROR << "Unable to interpolateYz because yz_table is empty.";
+    return y;
+  }
   double max_y = yz_table.rbegin()->first;
   double min_y = yz_table.begin()->first;
   if (y >= max_y - kDoubleEpsilon) {

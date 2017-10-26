@@ -17,7 +17,7 @@
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 NTCAN_RESULT esdcan_do_test(int id, EsdCanDetails *details) {
@@ -27,5 +27,5 @@ NTCAN_RESULT esdcan_do_test(int id, EsdCanDetails *details) {
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
