@@ -115,16 +115,22 @@ namespace adapter {
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() {                                         \
-    return name##_.get();                                                      \
-  }                                                                            \
+  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (IsRos()) {                                                             \
-      name##publisher_.publish(data);                                          \
+      if (!name##publisher_.getTopic().empty()) {                              \
+        name##publisher_.publish(data);                                        \
+      } else {                                                                 \
+        AERROR << #name << " is not valid.";                                   \
+      }                                                                        \
     } else {                                                                   \
       /* For non-ROS mode, just triggers the callback. */                      \
-      name##_->OnReceive(data);                                                \
+      if (name##_) {                                                           \
+        name##_->OnReceive(data);                                              \
+      } else {                                                                 \
+        AERROR << #name << " is null.";                                        \
+      }                                                                        \
     }                                                                          \
     name##_->SetLatestPublished(data);                                         \
   }
@@ -177,9 +183,7 @@ class AdapterManager {
   /**
    * @brief Returns whether AdapterManager is running ROS mode.
    */
-  static bool IsRos() {
-    return instance()->node_handle_ != nullptr;
-  }
+  static bool IsRos() { return instance()->node_handle_ != nullptr; }
 
   /**
    * @brief Returns a reference to static tf2 buffer.

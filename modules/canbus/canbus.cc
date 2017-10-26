@@ -46,6 +46,9 @@ Status Canbus::Init() {
                    FLAGS_canbus_conf_file);
   }
 
+  AdapterManager::Init(FLAGS_adapter_config_filename);
+  AINFO << "The adapter manager is successfully initialized.";
+
   AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
@@ -95,10 +98,6 @@ Status Canbus::Init() {
     return OnError("Failed to init vehicle controller.");
   }
   AINFO << "The vehicle controller is successfully initialized.";
-
-  AdapterManager::Init(FLAGS_adapter_config_filename);
-
-  AINFO << "The adapter manager is successfully initialized.";
 
   return Status::OK();
 }
