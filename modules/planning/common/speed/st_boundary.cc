@@ -291,7 +291,7 @@ bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
   if (boundary_type_ == BoundaryType::STOP ||
       boundary_type_ == BoundaryType::YIELD ||
       boundary_type_ == BoundaryType::FOLLOW) {
-    *s_upper = std::fmin(*s_upper, lower_cross_s);
+    *s_upper = lower_cross_s;
   } else if (boundary_type_ == BoundaryType::OVERTAKE) {
     *s_lower = std::fmax(*s_lower, upper_cross_s);
   } else {
