@@ -24,9 +24,10 @@
 #include <iomanip>
 #include <utility>
 
-#include "glog/logging.h"
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
+#include "glog/logging.h"
+
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/reference_line/spiral_problem_interface.h"
 
@@ -132,8 +133,8 @@ bool SpiralReferenceLineSmoother::Smooth(
     ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
 
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    ADEBUG
-    << "*** The final value of the objective function is " << final_obj << '.';
+    ADEBUG << "*** The final value of the objective function is " << final_obj
+           << '.';
   } else {
     ADEBUG << "Return status: " << int(status);
   }
