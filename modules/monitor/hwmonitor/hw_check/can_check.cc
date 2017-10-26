@@ -26,11 +26,11 @@
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
+using apollo::hmi::HMIStatusHelper;
+using apollo::hmi::HardwareStatus;
 using apollo::monitor::HwCheckResult;
 using apollo::monitor::hw::EsdCanChecker;
 using apollo::monitor::hw::EsdCanDetails;
-using apollo::hmi::HMIStatusHelper;
-using apollo::hmi::HardwareStatus;
 
 int main(int argc, const char *argv[]) {
   // For other modules that uses glog.
@@ -47,8 +47,7 @@ int main(int argc, const char *argv[]) {
 #endif
 
   // We only have can0 for now.
-  int can_id = 0;
-  EsdCanChecker can_chk(can_id);
+  EsdCanChecker can_chk;
   std::vector<HwCheckResult> can_rslt;
   can_chk.run_check(&can_rslt);
   assert(can_rslt.size() == 1);
@@ -57,9 +56,9 @@ int main(int argc, const char *argv[]) {
   apollo::monitor::hw::esdcan_print_summary(
       std::cout, *(const EsdCanDetails *)((can_rslt[0].details.get())));
 #else
-  PLATFORM_LOG(
-      apollo::monitor::hw::get_log_module(), apollo::monitor::log::LVL_DBG,
-      "Done checking ESD-CAN-%d, status: %d", can_id, can_rslt[0].status);
+  PLATFORM_LOG(apollo::monitor::hw::get_log_module(),
+               apollo::monitor::log::LVL_DBG, "Done checking %s, status: %d",
+               can_chk.get_name().c_str(), can_rslt[0].status);
 #endif
 
   std::vector<HardwareStatus> hw_status;
