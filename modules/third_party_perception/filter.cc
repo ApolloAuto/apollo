@@ -51,8 +51,7 @@ RadarObstacles FilterRadarObstacles(const RadarObstacles& radar_obstacles) {
   RadarObstacles filtered_radar_obstacles;
   for (const auto& iter : radar_obstacles.radar_obstacle()) {
     if (IsPreserved(iter.second)) {
-      (*filtered_radar_obstacles.mutable_radar_obstacle())[iter.first] =
-          iter.second;
+      filtered_radar_obstacles.mutable_radar_obstacle()->insert(iter);
     }
   }
   filtered_radar_obstacles.mutable_header()->CopyFrom(radar_obstacles.header());
