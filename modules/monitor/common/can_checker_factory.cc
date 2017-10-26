@@ -32,7 +32,7 @@ using ::apollo::monitor::hw::EsdCanChecker;
 CanCheckerFactory::CanCheckerFactory() {}
 
 void CanCheckerFactory::RegisterCanCheckers() {
-  Register(CANCardParameter::FAKE_CAN,
+  Register(CANCardParameter::ESD_CAN,
            []() -> HwCheckerInterface* { return new EsdCanChecker(); });
 }
 
