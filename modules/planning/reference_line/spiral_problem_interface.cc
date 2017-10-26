@@ -313,103 +313,103 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
       // theta0
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 0;
-      nz_index++;
+      ++nz_index;
 
       // kappa0
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 1;
-      nz_index++;
+      ++nz_index;
 
       // dkappa0
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 2;
-      nz_index++;
+      ++nz_index;
 
       // x0
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 3;
-      nz_index++;
+      ++nz_index;
 
       // theta1
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 5;
-      nz_index++;
+      ++nz_index;
 
       // kappa1
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 6;
-      nz_index++;
+      ++nz_index;
 
       // dkappa1
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 7;
-      nz_index++;
+      ++nz_index;
 
       // x1
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_index + 8;
-      nz_index++;
+      ++nz_index;
 
       // s
       iRow[nz_index] = i * 2;
       jCol[nz_index] = variable_offset + i;
-      nz_index++;
+      ++nz_index;
 
       // theta0
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 0;
-      nz_index++;
+      ++nz_index;
 
       // kappa0
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 1;
-      nz_index++;
+      ++nz_index;
 
       // dkappa0
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 2;
-      nz_index++;
+      ++nz_index;
 
       // y0
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 4;
-      nz_index++;
+      ++nz_index;
 
       // theta1
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 5;
-      nz_index++;
+      ++nz_index;
 
       // kappa1
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 6;
-      nz_index++;
+      ++nz_index;
 
       // dkappa1
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 7;
-      nz_index++;
+      ++nz_index;
 
       // y1
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_index + 9;
-      nz_index++;
+      ++nz_index;
 
       // s
       iRow[nz_index] = i * 2 + 1;
       jCol[nz_index] = variable_offset + i;
-      nz_index++;
+      ++nz_index;
     }
 
     std::size_t constraint_offset = 2 * (num_of_points_ - 1);
     for (std::size_t i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = constraint_offset + i;
       jCol[nz_index] = i * 5 + 3;
-      nz_index++;
+      ++nz_index;
 
       iRow[nz_index] = constraint_offset + i;
       jCol[nz_index] = i * 5 + 4;
-      nz_index++;
+      ++nz_index;
     }
 
     CHECK_EQ(nz_index, nnz_jac_g_);
@@ -452,84 +452,84 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
       // for x coordinate
       // theta0
       values[nz_index] += 2.0 * x_diff * (-pos_theta0.first);
-      nz_index++;
+      ++nz_index;
 
       // kappa0
       values[nz_index] += 2.0 * x_diff * (-pos_kappa0.first);
-      nz_index++;
+      ++nz_index;
 
       // dkappa0
       values[nz_index] += 2.0 * x_diff * (-pos_dkappa0.first);
-      nz_index++;
+      ++nz_index;
 
       // x0
       values[nz_index] += 2.0 * x_diff * (-1.0);
-      nz_index++;
+      ++nz_index;
 
       // theta1
       values[nz_index] += 2.0 * x_diff * (-pos_theta1.first);
-      nz_index++;
+      ++nz_index;
 
       // kappa1
       values[nz_index] += 2.0 * x_diff * (-pos_kappa1.first);
-      nz_index++;
+      ++nz_index;
 
       // dkappa1
       values[nz_index] += 2.0 * x_diff * (-pos_dkappa1.first);
-      nz_index++;
+      ++nz_index;
 
       // x1
       values[nz_index] += 2.0 * x_diff;
-      nz_index++;
+      ++nz_index;
 
       // delta_s
       values[nz_index] += 2.0 * x_diff * (-pos_delta_s.first);
-      nz_index++;
+      ++nz_index;
 
       // for y coordinate
       // theta0
       values[nz_index] += 2.0 * y_diff * (-pos_theta0.second);
-      nz_index++;
+      ++nz_index;
 
       // kappa0
       values[nz_index] += 2.0 * y_diff * (-pos_kappa0.second);
-      nz_index++;
+      ++nz_index;
 
       // dkappa0
       values[nz_index] += 2.0 * y_diff * (-pos_dkappa0.second);
-      nz_index++;
+      ++nz_index;
 
       // y0
       values[nz_index] += 2.0 * y_diff * (-1.0);
-      nz_index++;
+      ++nz_index;
 
       // theta1
       values[nz_index] += 2.0 * y_diff * (-pos_theta1.second);
-      nz_index++;
+      ++nz_index;
 
       // kappa1
       values[nz_index] += 2.0 * y_diff * (-pos_kappa1.second);
-      nz_index++;
+      ++nz_index;
 
       // dkappa1
       values[nz_index] += 2.0 * y_diff * (-pos_dkappa1.second);
-      nz_index++;
+      ++nz_index;
 
       // y1
       values[nz_index] += 2.0 * y_diff;
-      nz_index++;
+      ++nz_index;
 
       // delta_s
       values[nz_index] += 2.0 * y_diff * (-pos_delta_s.second);
-      nz_index++;
+      ++nz_index;
     }
 
     for (std::size_t i = 0; i < num_of_points_; ++i) {
       values[nz_index] = 2.0 * (x[i * 5 + 3] - points_[i].x());
-      nz_index++;
+      ++nz_index;
 
       values[nz_index] = 2.0 * (x[i * 5 + 4] - points_[i].y());
-      nz_index++;
+      ++nz_index;
     }
 
     CHECK_EQ(nz_index, nnz_jac_g_);
@@ -549,98 +549,98 @@ bool SpiralProblemInterface::eval_h(int n, const double* x, bool new_x,
 
       iRow[index] = variable_index;
       jCol[index] = variable_index;
-      index++;
+      ++index;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index + 1;
-      index++;
+      ++index;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index + 2;
-      index++;
+      ++index;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index + 3;
-      index++;
+      ++index;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index + 5;
-      index++;
+      ++index;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index + 6;
-      index++;
+      ++index;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index + 7;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 1;
       jCol[index] = variable_index + 1;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 1;
       jCol[index] = variable_index + 2;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 1;
       jCol[index] = variable_index + 5;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 1;
       jCol[index] = variable_index + 6;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 1;
       jCol[index] = variable_index + 7;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 2;
       jCol[index] = variable_index + 2;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 2;
       jCol[index] = variable_index + 5;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 2;
       jCol[index] = variable_index + 6;
-      index++;
+      ++index;
 
       iRow[index] = variable_index + 2;
       jCol[index] = variable_index + 7;
-      index++;
+      ++index;
     }
 
     std::size_t variable_offset = 5 * num_of_points_;
     for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
       iRow[index] = i * 5;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
 
       iRow[index] = i * 5 + 1;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
 
       iRow[index] = i * 5 + 2;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
 
       iRow[index] = i * 5 + 5;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
 
       iRow[index] = i * 5 + 6;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
 
       iRow[index] = i * 5 + 7;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
 
       iRow[index] = i + variable_offset;
       jCol[index] = i + variable_offset;
-      index++;
+      ++index;
     }
 
     CHECK_EQ(index, nnz_h_lag_);

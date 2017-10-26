@@ -47,10 +47,10 @@ bool SpiralReferenceLineSmoother::Smooth(
   double s = 0.0;
 
   std::vector<Eigen::Vector2d> raw_point2d;
-  for (std::uint32_t i = 0; i <= num_of_pieces; ++i) {
+  for (std::uint32_t i = 0; i <= num_of_pieces;
+       ++i, s = std::fmin(s + delta_s, length)) {
     ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
     raw_point2d.emplace_back(rlp.x(), rlp.y());
-    s += delta_s;
   }
 
   std::vector<common::PathPoint> smoothed_point2d;
@@ -117,8 +117,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   //  app->Options()->SetIntegerValue("print_level", 0);
   // app->Options()->SetStringValue("fast_step_computation", "yes");
 
-  Ipopt::ApplicationReturnStatus status;
-  status = app->Initialize();
+  Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
     ADEBUG << "*** Error during initialization!";
     return static_cast<int>(status);
@@ -168,10 +167,8 @@ bool SpiralReferenceLineSmoother::Smooth(
     start_s = ptr_smoothed_point2d->back().s();
   }
 
-  if (status == Ipopt::Solve_Succeeded ||
-      status == Ipopt::Solved_To_Acceptable_Level)
-    return true;
-  return false;
+  return status == Ipopt::Solve_Succeeded ||
+         status == Ipopt::Solved_To_Acceptable_Level;
 }
 
 void SpiralReferenceLineSmoother::set_max_point_deviation(const double d) {
@@ -190,13 +187,14 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::to_path_points(
                                  dkappa1, delta_s);
   std::size_t num_of_points = std::ceil(delta_s / resolution) + 1;
   for (std::size_t i = 1; i <= num_of_points; ++i) {
-    double inter_s = delta_s / num_of_points * i;
-    double dx = spiral_curve.ComputeCartesianDeviationX<10>(inter_s);
-    double dy = spiral_curve.ComputeCartesianDeviationY<10>(inter_s);
+    const double inter_s = delta_s / num_of_points * i;
+    const double dx = spiral_curve.ComputeCartesianDeviationX<10>(inter_s);
+    const double dy = spiral_curve.ComputeCartesianDeviationY<10>(inter_s);
 
-    double theta = spiral_curve.Evaluate(0, inter_s);  // need to be normalized.
-    double kappa = spiral_curve.Evaluate(1, inter_s);
-    double dkappa = spiral_curve.Evaluate(2, inter_s);
+    const double theta =
+        spiral_curve.Evaluate(0, inter_s);  // need to be normalized.
+    const double kappa = spiral_curve.Evaluate(1, inter_s);
+    const double dkappa = spiral_curve.Evaluate(2, inter_s);
 
     auto path_point = to_path_point(start_x + dx, start_y + dy,
                                     start_s + inter_s, theta, kappa, dkappa);
