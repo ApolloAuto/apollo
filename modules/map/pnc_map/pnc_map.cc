@@ -248,6 +248,27 @@ PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
 const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
+bool PncMap::UpdatePosition(const common::PointENU &point) {
+  if (!GetNearestPointFromRouting(point, &current_waypoint_)) {
+    AERROR << "Failed to get waypoint from routing";
+    return false;
+  }
+  auto current_route_index = GetWaypointIndex(current_waypoint_);
+  if (current_route_index.size() != 3 || current_route_index[0] < 0) {
+    AERROR << "Failed to get routing index from waypoint";
+    return false;
+  }
+
+  // on the same passage as last time, don't update
+  if (route_index_.size() != 3 || route_index_[0] != current_route_index[0] ||
+      route_index_[1] != current_route_index[1]) {
+    passage_start_point_ = point;
+  }
+  current_point_ = point;
+  route_index_ = current_route_index;
+  return true;
+}
+
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   if (routing_.has_header() && routing.has_header() &&
       routing_.header().sequence_num() == routing.header().sequence_num() &&
@@ -268,7 +289,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       }
     }
   }
-  last_waypoint_.reset(nullptr);
+  current_waypoint_.lane = nullptr;
+  route_index_.clear();
+  current_point_.Clear();
+  passage_start_point_.Clear();
   routing_ = routing;
   return true;
 }
@@ -376,21 +400,15 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
 }
 
 bool PncMap::GetRouteSegments(
-    const common::PointENU &point, const double backward_length,
-    const double forward_length,
+    const double backward_length, const double forward_length,
     std::vector<RouteSegments> *const route_segments) const {
-  LaneWaypoint waypoint;
-  if (!GetNearestPointFromRouting(point, &waypoint)) {
-    AERROR << "Failed to get waypoint from routing";
+  if (!current_waypoint_.lane || route_index_.size() != 3 ||
+      route_index_[0] < 0) {
+    AERROR << "Invalid position, use UpdatePosition() function first";
     return false;
   }
-  auto index = GetWaypointIndex(waypoint);
-  if (index.size() != 3 || index[0] < 0) {
-    AERROR << "Failed to get routing index from waypoint";
-    return false;
-  }
-  int road_index = index[0];
-  int passage_index = index[1];
+  const int road_index = route_index_[0];
+  const int passage_index = route_index_[1];
   const auto &road = routing_.road(road_index);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
@@ -401,9 +419,10 @@ bool PncMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
-    auto nearest_point = point;
+    auto nearest_point = current_point_;
     if (index == passage_index) {
-      nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
+      nearest_point =
+          current_waypoint_.lane->GetSmoothPoint(current_waypoint_.s);
     }
     double s = 0.0;
     double l = 0.0;
@@ -414,7 +433,7 @@ bool PncMap::GetRouteSegments(
       continue;
     }
     // check if possible to drive from current waypoint to the passage.
-    if (index != passage_index && !segments.CanDriveFrom(waypoint)) {
+    if (index != passage_index && !segments.CanDriveFrom(current_waypoint_)) {
       ADEBUG << "You cannot drive from current waypoint to passage: " << index;
       continue;
     }
