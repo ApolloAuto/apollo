@@ -11262,3 +11262,8 @@ decision {
     }
   }
 }
+routing_header {
+  timestamp_sec: 1234.5
+  module_name: "routing"
+  sequence_num: 1
+}
