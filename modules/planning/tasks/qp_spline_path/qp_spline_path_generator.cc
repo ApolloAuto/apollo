@@ -249,6 +249,7 @@ bool QpSplinePathGenerator::AddConstraint(
   // add init status constraint, equality constraint
   spline_constraint->AddPointConstraint(init_frenet_point_.s(),
                                         init_frenet_point_.l());
+
   spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
                                                   init_frenet_point_.dl());
   spline_constraint->AddPointSecondDerivativeConstraint(
@@ -373,8 +374,10 @@ void QpSplinePathGenerator::AddKernel() {
 
   if (qp_spline_path_config_.reference_line_weight() > 0.0) {
     std::vector<double> ref_l(evaluated_s_.size(), 0.0);
-
-    DCHECK_EQ(evaluated_s_.size(), ref_l.size());
+    const double delta_l = init_frenet_point_.l() / (evaluated_s_.size() - 1);
+    for (uint32_t i = 0; i < ref_l.size(); ++i) {
+      ref_l[i] = delta_l * (evaluated_s_.size() - 1 - i);
+    }
     spline_kernel->AddReferenceLineKernelMatrix(
         evaluated_s_, ref_l, qp_spline_path_config_.reference_line_weight());
   }
