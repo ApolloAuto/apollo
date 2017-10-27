@@ -270,16 +270,18 @@ void Planning::RunOnce() {
   trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
 
-  if (status.ok()) {
-    trajectory_pb.set_is_replan(is_replan);
-    PublishPlanningPb(&trajectory_pb, start_timestamp);
-    ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
-  } else if (FLAGS_publish_estop) {
-    trajectory_pb.mutable_estop();
+  if (!status.ok()) {
     status.Save(trajectory_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&trajectory_pb, start_timestamp);
-    AERROR << "Planning failed";
+    AERROR << "Planning failed and set estop";
+    if (FLAGS_publish_estop) {
+      trajectory_pb.mutable_estop();
+    }
   }
+
+  trajectory_pb.set_is_replan(is_replan);
+  PublishPlanningPb(&trajectory_pb, start_timestamp);
+  ADEBUG << "Planning pb:" << trajectory_pb.header().DebugString();
+
   if (frame_) {
     auto seq_num = frame_->SequenceNum();
     FrameHistory::instance()->Add(seq_num, std::move(frame_));
