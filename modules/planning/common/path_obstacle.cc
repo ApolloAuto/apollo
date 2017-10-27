@@ -103,6 +103,12 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     StBoundary* const st_boundary) {
   const auto& object_id = obstacle_->Id();
   const auto& perception = obstacle_->Perception();
+  if (!IsValidObstacle(perception)) {
+    AERROR << "Fail to build trajectory st boundary because object is not "
+              "valid. PerceptionObstacle: "
+           << perception.DebugString();
+    return false;
+  }
   const double object_width = perception.width();
   const double object_length = perception.length();
   const auto& trajectory_points = obstacle_->Trajectory().trajectory_point();
@@ -393,6 +399,17 @@ void PathObstacle::SetStBoundary(const StBoundary& boundary) {
 
 void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
   st_boundary_.SetBoundaryType(type);
+}
+
+bool PathObstacle::IsValidObstacle(
+    const perception::PerceptionObstacle& perception_obstacle) {
+  const double object_width = perception_obstacle.width();
+  const double object_length = perception_obstacle.length();
+
+  const double kMinObjectDimension = 1.0e-6;
+  return !std::isnan(object_width) && !std::isnan(object_length) &&
+         object_width > kMinObjectDimension &&
+         object_length > kMinObjectDimension;
 }
 
 }  // namespace planning
