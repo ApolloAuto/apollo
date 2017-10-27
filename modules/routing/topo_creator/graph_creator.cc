@@ -20,6 +20,7 @@
 
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
+#include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
 
@@ -117,7 +118,7 @@ bool GraphCreator::Create() {
     const auto& from_node = graph_.node(node_index_map_[lane_id]);
 
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
-    if (lane.length() < routing_conf_->min_length_for_lane_change()) {
+    if (lane.length() < FLAGS_min_length_for_lane_change) {
       continue;
     }
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
