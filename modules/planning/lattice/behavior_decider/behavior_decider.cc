@@ -26,6 +26,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/lattice_util.h"
+#include "modules/planning/lattice/lattice_params.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -65,6 +66,13 @@ PlanningTarget BehaviorDecider::Analyze(
       FLAGS_default_cruise_speed);
   lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
   ret.set_decision_type(PlanningTarget::GO);
+
+  double v = lon_init_state[1];
+  double res_s = ref_line.Length() - lon_init_state[0];
+  double stop_acc = 2.0 * res_s / (v * v);
+  if (stop_acc > stop_acc_thred) {
+    ret.set_decision_type(PlanningTarget::STOP);
+  }
   return ret;
 }
 

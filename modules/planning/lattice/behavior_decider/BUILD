@@ -18,6 +18,7 @@ cc_library(
         "//modules/planning/reference_line",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/lattice:lattice_util",
+        "//modules/planning/lattice:lattice_params",
         "//external:gflags",
     ],
 )
