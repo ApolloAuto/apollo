@@ -142,6 +142,8 @@ class PathObstacle {
   bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
                                  const double adc_start_s,
                                  StBoundary* const st_boundary);
+  bool IsValidObstacle(
+      const perception::PerceptionObstacle& perception_obstacle);
 
   std::string id_;
   const Obstacle* obstacle_ = nullptr;
