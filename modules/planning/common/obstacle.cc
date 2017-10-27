@@ -174,7 +174,8 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
       bool is_valid_trajectory = true;
       for (const auto& point : trajectory.trajectory_point()) {
         if (!IsValidTrajectoryPoint(point)) {
-          AERROR << "TrajectoryPoint: " << point.ShortDebugString()
+          AERROR << "obj:" << perception_id
+                 << " TrajectoryPoint: " << trajectory.ShortDebugString()
                  << " is NOT valid.";
           is_valid_trajectory = false;
           break;
@@ -195,22 +196,14 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
 }
 
 bool Obstacle::IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
-  if (point.has_path_point()) {
-    if (std::isnan(point.path_point().x()) ||
-        std::isnan(point.path_point().y()) ||
-        std::isnan(point.path_point().z()) ||
-        std::isnan(point.path_point().kappa()) ||
-        std::isnan(point.path_point().s()) ||
-        std::isnan(point.path_point().dkappa()) ||
-        std::isnan(point.path_point().ddkappa())) {
-      return false;
-    }
-  }
-  if (std::isnan(point.v()) || std::isnan(point.a()) ||
-      std::isnan(point.relative_time())) {
-    return false;
-  }
-  return true;
+  return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
+           std::isnan(point.path_point().y()) ||
+           std::isnan(point.path_point().z()) ||
+           std::isnan(point.path_point().kappa()) ||
+           std::isnan(point.path_point().s()) ||
+           std::isnan(point.path_point().dkappa()) ||
+           std::isnan(point.path_point().ddkappa()) || std::isnan(point.v()) ||
+           std::isnan(point.a()) || std::isnan(point.relative_time()));
 }
 
 std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
