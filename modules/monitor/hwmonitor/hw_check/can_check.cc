@@ -65,7 +65,7 @@ int main(int argc, const char *argv[]) {
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
-  if (can_chk->get_name() == "ESD_CAN") {
+  if (can_rslt[0].details != nullptr) {
     can_rslt[0].details->print_summary(std::cout);
   }
 #else
