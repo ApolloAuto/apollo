@@ -178,6 +178,10 @@ DEFINE_double(crosswalk_strick_l_distance, 4.0,
 DEFINE_double(crosswalk_loose_l_distance, 5.0,
               "loose stop rule beyond this l_distance");
 
+DEFINE_double(
+    turn_signal_distance, 80,
+    "meters. If there is a turn within this distance, use turn signal");
+
 // planning config file
 DEFINE_string(planning_config_file,
               "modules/planning/conf/planning_config.pb.txt",

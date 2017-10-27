@@ -98,6 +98,8 @@ DECLARE_double(decision_valid_stop_range);
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
 
+DECLARE_double(turn_signal_distance);
+
 // QpSt optimizer
 DECLARE_bool(enable_slowdown_profile_generator);
 DECLARE_double(slowdown_speed_threshold);
