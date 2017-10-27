@@ -11234,6 +11234,9 @@ decision {
       }
     }
   }
+  vehicle_signal {
+    turn_signal: TURN_NONE
+  }
 }
 routing_header {
   timestamp_sec: 1505164877.88

@@ -99,6 +99,8 @@ class ReferenceLineInfo {
   void ExportDecision(DecisionResult* decision_result) const;
 
  private:
+  void ExportTurnSignal(common::VehicleSignal* signal) const;
+
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
