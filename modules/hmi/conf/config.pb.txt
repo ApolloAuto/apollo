@@ -237,7 +237,7 @@ hardware {
   }
 }
 hardware {
-  name: "ESD_CAN-0"
+  name: "CAN"
   display_name: "CAN"
   supported_commands {
     name: "health_check"
