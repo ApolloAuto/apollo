@@ -35,11 +35,7 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
-
-DEFINE_double(min_lane_keeping_distance, 30.48,
-              "meters, which is 100 feet.  Minimum distance needs to travel on "
-              "a lane before making a lane change. Recommended by "
-              "https://www.oregonlaws.org/ors/811.375");
+#include "modules/routing/common/routing_gflags.h"
 
 namespace apollo {
 namespace hdmap {
@@ -445,7 +441,7 @@ bool PncMap::GetRouteSegments(
       }
       const double dist_on_passage =
           common::util::DistanceXY(current_point_, passage_start_point_);
-      if (dist_on_passage < FLAGS_min_lane_keeping_distance) {
+      if (dist_on_passage < FLAGS_min_length_for_lane_change) {
         continue;
       }
     }
