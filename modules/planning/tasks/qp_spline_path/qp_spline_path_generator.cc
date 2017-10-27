@@ -297,10 +297,10 @@ bool QpSplinePathGenerator::AddConstraint(
 
     if (evaluated_s_.at(i) - evaluated_s_.at(0) <
         qp_spline_path_config_.cross_lane_longitudinal_extension()) {
-      road_boundary.first = std::fmin(road_boundary.first,
-                                      adc_sl_boundary_.start_l() - lateral_buf);
-      road_boundary.second = std::fmax(road_boundary.second,
-                                       adc_sl_boundary_.end_l() + lateral_buf);
+      road_boundary.first =
+          std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+      road_boundary.second =
+          std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
     }
 
     boundary_low.emplace_back(common::util::MaxElement(
