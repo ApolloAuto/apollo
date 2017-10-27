@@ -130,7 +130,7 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
 DEFINE_double(follow_min_distance, 10,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(
-    follow_time_buffer, 4.0,
+    follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
 
 DEFINE_string(destination_obstacle_id, "DEST",
