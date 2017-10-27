@@ -124,6 +124,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d min_box({0, 0}, 1.0, 1.0, 1.0);
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
+
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
