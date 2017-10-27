@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/prediction/proto/network_layers.proto";
+
+message VerificationSample {
+  repeated TensorParameter features = 1;
+  optional double probability = 2;
+  optional double acceleration = 3;
+}
+
+message NetParameter {
+  optional int32 id = 1;
+  optional string name = 2;
+  optional double time_dumped = 3;        //time [s] of dumped the model
+
+  repeated LayerParameter layers = 5;
+  repeated VerificationSample verification_samples = 8;
+}
