@@ -36,6 +36,11 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 
+DEFINE_double(min_lane_keeping_distance, 30.48,
+              "meters, which is 100 feet.  Minimum distance needs to travel on "
+              "a lane before making a lane change. Recommended by "
+              "https://www.oregonlaws.org/ors/811.375");
+
 namespace apollo {
 namespace hdmap {
 
@@ -259,9 +264,9 @@ bool PncMap::UpdatePosition(const common::PointENU &point) {
     return false;
   }
 
-  // on the same passage as last time, don't update
+  // only update passage_start_point_ when route passage changes
   if (route_index_.size() != 3 || route_index_[0] != current_route_index[0] ||
-      route_index_[1] != current_route_index[1]) {
+      route_index_[1] != current_route_index[1]) {  //  different passage
     passage_start_point_ = point;
   }
   current_point_ = point;
@@ -272,9 +277,9 @@ bool PncMap::UpdatePosition(const common::PointENU &point) {
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   if (routing_.has_header() && routing.has_header() &&
       routing_.header().sequence_num() == routing.header().sequence_num() &&
-      (std::fabs(routing_.header().timestamp_sec() ==
+      (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
-    AINFO << "Same prouting, skip update routing";
+    ADEBUG << "Same prouting, skip update routing";
     return false;
   }
   if (!ValidateRouting(routing)) {
@@ -432,10 +437,17 @@ bool PncMap::GetRouteSegments(
              << nearest_point.DebugString();
       continue;
     }
-    // check if possible to drive from current waypoint to the passage.
-    if (index != passage_index && !segments.CanDriveFrom(current_waypoint_)) {
-      ADEBUG << "You cannot drive from current waypoint to passage: " << index;
-      continue;
+    if (index != passage_index) {  // the change lane case
+      if (!segments.CanDriveFrom(current_waypoint_)) {
+        ADEBUG << "You cannot drive from current waypoint to passage: "
+               << index;
+        continue;
+      }
+      const double dist_on_passage =
+          common::util::DistanceXY(current_point_, passage_start_point_);
+      if (dist_on_passage < FLAGS_min_lane_keeping_distance) {
+        continue;
+      }
     }
     route_segments->emplace_back();
     TruncateLaneSegments(segments, s - backward_length, s + forward_length,

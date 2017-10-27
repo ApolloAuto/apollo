@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include "gflags/gflags.h"
+
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
