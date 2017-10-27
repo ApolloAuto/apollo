@@ -96,7 +96,7 @@ modules {
   }
 }
 modules {
-  name: "third_paryt_perception"
+  name: "third_party_perception"
   display_name: "Third Party Perception"
   supported_commands {
     name: "start"
