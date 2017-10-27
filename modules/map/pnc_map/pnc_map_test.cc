@@ -29,7 +29,7 @@
 #define private public
 #include "modules/map/pnc_map/pnc_map.h"
 
-DECLARE_double(min_lane_keeping_distance);
+DECLARE_double(min_length_for_lane_change);
 
 namespace apollo {
 namespace hdmap {
@@ -156,7 +156,7 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   pnc_map_->route_index_.clear();
   auto point = lane->GetSmoothPoint(0);
   EXPECT_TRUE(pnc_map_->UpdatePosition(point));
-  FLAGS_min_lane_keeping_distance = 30.0;
+  FLAGS_min_length_for_lane_change = 30.0;
   point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
   EXPECT_TRUE(pnc_map_->UpdatePosition(point));
   std::vector<RouteSegments> segments;
