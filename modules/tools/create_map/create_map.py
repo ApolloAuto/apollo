@@ -31,7 +31,7 @@ from modules.map.proto.map_pb2 import Map
 from modules.map.proto.map_lane_pb2 import LaneBoundaryType, Lane
 from modules.map.proto.map_road_pb2 import BoundaryEdge, Road
 
-from modules.routing.proto.routing_pb2 import RoutingRequest
+from modules.routing.proto.routing_pb2 import LaneWaypoint
 
 class DataPoint:
     """
@@ -253,7 +253,7 @@ def smooth_dimension(data, dim):
     if dim == 'width':
         laplacian_smooth(extracted_data, 1.0, 1000)
     else:
-        laplacian_smooth(extracted_data, 0.5, 10)
+        laplacian_smooth(extracted_data, 1.0, 1000)
     update_data(data, dim, extracted_data)
 
 def smooth_center_width(data):
@@ -667,7 +667,7 @@ def main():
     # Create default end_way_point using the farthest point of last central lane 
     last_central_lane = lane_sets[-1][left_lanes]
 
-    waypoint = RoutingRequest.LaneWaypoint()
+    waypoint = LaneWaypoint()
     waypoint.id = last_central_lane.id.id
     waypoint.s = last_central_lane.length
     waypoint.pose.x = last_central_lane.central_curve.segment[0].line_segment.point[-1].x
