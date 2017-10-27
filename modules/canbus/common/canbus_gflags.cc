@@ -24,7 +24,7 @@ DEFINE_string(adapter_config_filename, "modules/canbus/conf/adapter.conf",
               "The adapter config file");
 
 // data file
-DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf_dev.pb.txt",
+DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf.pb.txt",
               "Default canbus conf file");
 
 // Canbus gflags
