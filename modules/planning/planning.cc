@@ -173,6 +173,11 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+
+  if (frame_) {
+    trajectory_pb->mutable_routing_header()->CopyFrom(
+        frame_->routing_response().header());
+  }
   AdapterManager::PublishPlanning(*trajectory_pb);
 }
 
