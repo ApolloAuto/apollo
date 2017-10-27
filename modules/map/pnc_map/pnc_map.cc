@@ -36,6 +36,11 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 
+DEFINE_double(min_lane_keeping_distance, 30.48,
+              "meters, which is 100 feet.  Minimum distance needs to travel on "
+              "a lane before making a lane change. Recommended by "
+              "https://www.oregonlaws.org/ors/811.375");
+
 namespace apollo {
 namespace hdmap {
 
@@ -248,12 +253,33 @@ PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
 const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
+bool PncMap::UpdatePosition(const common::PointENU &point) {
+  if (!GetNearestPointFromRouting(point, &current_waypoint_)) {
+    AERROR << "Failed to get waypoint from routing";
+    return false;
+  }
+  auto current_route_index = GetWaypointIndex(current_waypoint_);
+  if (current_route_index.size() != 3 || current_route_index[0] < 0) {
+    AERROR << "Failed to get routing index from waypoint";
+    return false;
+  }
+
+  // only update passage_start_point_ when route passage changes
+  if (route_index_.size() != 3 || route_index_[0] != current_route_index[0] ||
+      route_index_[1] != current_route_index[1]) {  //  different passage
+    passage_start_point_ = point;
+  }
+  current_point_ = point;
+  route_index_ = current_route_index;
+  return true;
+}
+
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   if (routing_.has_header() && routing.has_header() &&
       routing_.header().sequence_num() == routing.header().sequence_num() &&
-      (std::fabs(routing_.header().timestamp_sec() ==
+      (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
-    AINFO << "Same prouting, skip update routing";
+    ADEBUG << "Same prouting, skip update routing";
     return false;
   }
   if (!ValidateRouting(routing)) {
@@ -268,7 +294,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       }
     }
   }
-  last_waypoint_.reset(nullptr);
+  current_waypoint_.lane = nullptr;
+  route_index_.clear();
+  current_point_.Clear();
+  passage_start_point_.Clear();
   routing_ = routing;
   return true;
 }
@@ -376,21 +405,15 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
 }
 
 bool PncMap::GetRouteSegments(
-    const common::PointENU &point, const double backward_length,
-    const double forward_length,
+    const double backward_length, const double forward_length,
     std::vector<RouteSegments> *const route_segments) const {
-  LaneWaypoint waypoint;
-  if (!GetNearestPointFromRouting(point, &waypoint)) {
-    AERROR << "Failed to get waypoint from routing";
+  if (!current_waypoint_.lane || route_index_.size() != 3 ||
+      route_index_[0] < 0) {
+    AERROR << "Invalid position, use UpdatePosition() function first";
     return false;
   }
-  auto index = GetWaypointIndex(waypoint);
-  if (index.size() != 3 || index[0] < 0) {
-    AERROR << "Failed to get routing index from waypoint";
-    return false;
-  }
-  int road_index = index[0];
-  int passage_index = index[1];
+  const int road_index = route_index_[0];
+  const int passage_index = route_index_[1];
   const auto &road = routing_.road(road_index);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
@@ -401,9 +424,10 @@ bool PncMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
-    auto nearest_point = point;
+    auto nearest_point = current_point_;
     if (index == passage_index) {
-      nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
+      nearest_point =
+          current_waypoint_.lane->GetSmoothPoint(current_waypoint_.s);
     }
     double s = 0.0;
     double l = 0.0;
@@ -413,10 +437,17 @@ bool PncMap::GetRouteSegments(
              << nearest_point.DebugString();
       continue;
     }
-    // check if possible to drive from current waypoint to the passage.
-    if (index != passage_index && !segments.CanDriveFrom(waypoint)) {
-      ADEBUG << "You cannot drive from current waypoint to passage: " << index;
-      continue;
+    if (index != passage_index) {  // the change lane case
+      if (!segments.CanDriveFrom(current_waypoint_)) {
+        ADEBUG << "You cannot drive from current waypoint to passage: "
+               << index;
+        continue;
+      }
+      const double dist_on_passage =
+          common::util::DistanceXY(current_point_, passage_start_point_);
+      if (dist_on_passage < FLAGS_min_lane_keeping_distance) {
+        continue;
+      }
     }
     route_segments->emplace_back();
     TruncateLaneSegments(segments, s - backward_length, s + forward_length,

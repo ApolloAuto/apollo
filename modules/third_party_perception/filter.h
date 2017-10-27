@@ -31,9 +31,6 @@ namespace apollo {
 namespace third_party_perception {
 namespace filter {
 
-using ::apollo::third_party_perception::RadarObstacle;
-using ::apollo::third_party_perception::RadarObstacles;
-
 RadarObstacles FilterRadarObstacles(const RadarObstacles& radar_obstacles);
 bool IsPreserved(const RadarObstacle& radar_obstacle);
 

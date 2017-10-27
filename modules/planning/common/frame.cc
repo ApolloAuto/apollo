@@ -77,8 +77,7 @@ void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
 void Frame::CreatePredictionObstacles(
     const prediction::PredictionObstacles &prediction) {
   for (auto &ptr : Obstacle::CreateObstacles(prediction)) {
-    auto id(ptr->Id());
-    obstacles_.Add(id, *ptr);
+    AddObstacle(*ptr);
   }
 }
 
@@ -284,9 +283,13 @@ bool Frame::CreateReferenceLineFromRouting(
                                      ? FLAGS_look_forward_distance
                                      : FLAGS_look_forward_min_distance;
 
-  if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
-                                  look_forward_distance,
-                                  &route_segments)) {
+  if (!pnc_map_->UpdatePosition(position)) {
+    AERROR << "Failed to update position: " << position.ShortDebugString()
+           << " in pnc map.";
+    return false;
+  }
+  if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
+                                  look_forward_distance, &route_segments)) {
     AERROR << "Failed to extract segments from routing";
     return false;
   }
@@ -294,17 +297,28 @@ bool Frame::CreateReferenceLineFromRouting(
   ReferenceLineSmoother smoother;
   smoother.Init(smoother_config_);
 
+  SpiralReferenceLineSmoother spiral_smoother;
+  double max_spiral_smoother_dev = 0.1;
+  spiral_smoother.set_max_point_deviation(max_spiral_smoother_dev);
+
   for (const auto &each_segments : route_segments) {
     hdmap::Path hdmap_path;
     hdmap::PncMap::CreatePathFromLaneSegments(each_segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
-      std::vector<double> init_t_knots;
-      Spline2dSolver spline_solver(init_t_knots, 5);
-      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
-                           &spline_solver)) {
-        AERROR << "Failed to smooth reference line";
-        continue;
+      if (FLAGS_enable_spiral_reference_line) {
+        if (!spiral_smoother.Smooth(ReferenceLine(hdmap_path),
+                                    &reference_line)) {
+          AERROR << "Failed to smooth reference_line with spiral smoother";
+        }
+      } else {
+        std::vector<double> init_t_knots;
+        Spline2dSolver spline_solver(init_t_knots, 5);
+        if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
+                             &spline_solver)) {
+          AERROR << "Failed to smooth reference line";
+          continue;
+        }
       }
       reference_lines->emplace_back(std::move(reference_line));
       segments->emplace_back(each_segments);

@@ -42,6 +42,24 @@ modules {
   }
 }
 modules {
+  name: "mobileye"
+  display_name: "Mobileye"
+  supported_commands {
+    name: "start"
+    command: "scripts/mobileye.sh"
+    command: "start"
+    stdout_file: "data/log/mobileye.stdout"
+    stderr_file: "data/log/mobileye.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/mobileye.sh"
+    command: "stop"
+    stdout_file: "data/log/mobileye.stdout"
+    stderr_file: "data/log/mobileye.stderr"
+  }
+}
+modules {
   name: "localization"
   display_name: "Localization"
   supported_commands {
@@ -75,6 +93,24 @@ modules {
     command: "stop"
     stdout_file: "data/log/perception.stdout"
     stderr_file: "data/log/perception.stderr"
+  }
+}
+modules {
+  name: "third_paryt_perception"
+  display_name: "Third Party Perception"
+  supported_commands {
+    name: "start"
+    command: "scripts/third_party_perception.sh"
+    command: "start"
+    stdout_file: "data/log/third_party_perception.stdout"
+    stderr_file: "data/log/third_party_perception.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/third_party_perception.sh"
+    command: "stop"
+    stdout_file: "data/log/third_party_perception.stdout"
+    stderr_file: "data/log/third_party_perception.stderr"
   }
 }
 modules {
@@ -237,7 +273,7 @@ hardware {
   }
 }
 hardware {
-  name: "ESD_CAN-0"
+  name: "CAN"
   display_name: "CAN"
   supported_commands {
     name: "health_check"

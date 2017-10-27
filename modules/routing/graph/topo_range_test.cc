@@ -95,7 +95,9 @@ TEST(NodeSRangeTestSuit, basic_test) {
 
 TEST(NodeWithRangeTestSuit, basic_test) {
   Node node_1;
+  node_1.set_length(20);
   Node node_2;
+  node_2.set_length(20);
   TopoNode topo_node_1(node_1);
   TopoNode topo_node_2(node_2);
   double start_s_1 = 0.0;

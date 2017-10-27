@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include "gflags/gflags.h"
+
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
@@ -139,14 +141,14 @@ class PncMap {
   const hdmap::HDMap *hdmap() const;
 
   bool UpdateRoutingResponse(const routing::RoutingResponse &routing_response);
+  bool UpdatePosition(const common::PointENU &point);
 
   const routing::RoutingResponse &routing_response() const;
 
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
-  bool GetRouteSegments(const common::PointENU &point,
-                        const double backward_length,
+  bool GetRouteSegments(const double backward_length,
                         const double forward_length,
                         std::vector<RouteSegments> *const route_segments) const;
 
@@ -195,7 +197,10 @@ class PncMap {
  private:
   routing::RoutingResponse routing_;
   std::unordered_set<std::string> routing_lane_ids_;
-  std::unique_ptr<LaneWaypoint> last_waypoint_;
+  LaneWaypoint current_waypoint_;
+  common::PointENU current_point_;
+  std::vector<int> route_index_;
+  common::PointENU passage_start_point_;
   const hdmap::HDMap *hdmap_ = nullptr;
 };
 

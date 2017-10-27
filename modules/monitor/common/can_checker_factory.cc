@@ -15,9 +15,10 @@
  *****************************************************************************/
 
 #include "modules/monitor/common/can_checker_factory.h"
-
+#if USE_ESD_CAN
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
-
+#endif
+#include "modules/monitor/hwmonitor/hw/socketcan/socketcan_checker.h"
 /**
  * @file: hw_checker_factory.cc
  */
@@ -25,15 +26,17 @@
 namespace apollo {
 namespace monitor {
 
-using ::apollo::drivers::canbus::CANCardParameter;
-using ::apollo::monitor::HwCheckerInterface;
-using ::apollo::monitor::hw::EsdCanChecker;
+using apollo::drivers::canbus::CANCardParameter;
 
 CanCheckerFactory::CanCheckerFactory() {}
 
 void CanCheckerFactory::RegisterCanCheckers() {
-  Register(CANCardParameter::FAKE_CAN,
-           []() -> HwCheckerInterface* { return new EsdCanChecker(); });
+#if USE_ESD_CAN
+  Register(CANCardParameter::ESD_CAN,
+           []() -> HwCheckerInterface* { return new hw::EsdCanChecker(); });
+#endif
+  Register(CANCardParameter::SOCKET_CAN_RAW,
+           []() -> HwCheckerInterface* { return new hw::SocketCanChecker(); });
 }
 
 std::unique_ptr<HwCheckerInterface> CanCheckerFactory::CreateCanChecker(

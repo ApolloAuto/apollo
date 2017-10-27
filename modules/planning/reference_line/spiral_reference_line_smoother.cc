@@ -24,9 +24,10 @@
 #include <iomanip>
 #include <utility>
 
-#include "glog/logging.h"
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
+#include "glog/logging.h"
+
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/reference_line/spiral_problem_interface.h"
 
@@ -46,10 +47,10 @@ bool SpiralReferenceLineSmoother::Smooth(
   double s = 0.0;
 
   std::vector<Eigen::Vector2d> raw_point2d;
-  for (std::uint32_t i = 0; i <= num_of_pieces; ++i) {
+  for (std::uint32_t i = 0; i <= num_of_pieces;
+       ++i, s = std::fmin(s + delta_s, length)) {
     ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
     raw_point2d.emplace_back(rlp.x(), rlp.y());
-    s += delta_s;
   }
 
   std::vector<common::PathPoint> smoothed_point2d;
@@ -116,8 +117,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   //  app->Options()->SetIntegerValue("print_level", 0);
   // app->Options()->SetStringValue("fast_step_computation", "yes");
 
-  Ipopt::ApplicationReturnStatus status;
-  status = app->Initialize();
+  Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
     ADEBUG << "*** Error during initialization!";
     return static_cast<int>(status);
@@ -132,8 +132,8 @@ bool SpiralReferenceLineSmoother::Smooth(
     ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
 
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    ADEBUG
-    << "*** The final value of the objective function is " << final_obj << '.';
+    ADEBUG << "*** The final value of the objective function is " << final_obj
+           << '.';
   } else {
     ADEBUG << "Return status: " << int(status);
   }
@@ -167,10 +167,8 @@ bool SpiralReferenceLineSmoother::Smooth(
     start_s = ptr_smoothed_point2d->back().s();
   }
 
-  if (status == Ipopt::Solve_Succeeded ||
-      status == Ipopt::Solved_To_Acceptable_Level)
-    return true;
-  return false;
+  return status == Ipopt::Solve_Succeeded ||
+         status == Ipopt::Solved_To_Acceptable_Level;
 }
 
 void SpiralReferenceLineSmoother::set_max_point_deviation(const double d) {

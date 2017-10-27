@@ -22,7 +22,10 @@ cc_binary(
         "//external:gflags",
         "//modules/hmi/utils:hmi_status_helper",
         "//modules/monitor/hwmonitor/hw:hw_log_module",
-        "//modules/monitor/hwmonitor/hw/esdcan:esdcan_checker_lib",
+        "//modules/monitor/common:can_checker_factory",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/common:canbus_common",
+        "//modules/common/util:util",
     ],
 )
 
@@ -52,7 +55,10 @@ cc_binary(
         "//external:gflags",
         "//modules/hmi/utils:hmi_status_helper",
         "//modules/monitor/hwmonitor/hw:hw_log_module",
-        "//modules/monitor/hwmonitor/hw/esdcan:mock_esdcan_checker_lib",
+        "//modules/monitor/common:can_checker_factory",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/common:canbus_common",
+        "//modules/common/util:util",
     ],
 )
 

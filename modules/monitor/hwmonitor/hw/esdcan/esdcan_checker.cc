@@ -48,9 +48,9 @@ void EsdCanChecker::run_check(std::vector<HwCheckResult> *results) {
   PLATFORM_DBG(get_log_module(), log::LVL_INFO, "To check ESD-CAN-%d", can_id_);
 
   EsdCanDetails *details = new EsdCanDetails();
-  NTCAN_RESULT result = esdcan_do_test(can_id_, details);
+  NTCAN_RESULT result = details->esdcan_do_test(can_id_);
 
-  HwCheckResult rslt(name_, esdcan_result_to_hw_status(result), details,
+  HwCheckResult rslt("CAN", esdcan_result_to_hw_status(result), details,
                      std::move(esdcan_result_to_message(result)));
 
   results->emplace_back(std::move(rslt));

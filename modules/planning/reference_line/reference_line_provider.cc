@@ -138,7 +138,12 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
                                      : FLAGS_look_forward_min_distance;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
+    if (!pnc_map_->UpdatePosition(position)) {
+      AERROR << "Failed to update pnc_map position: "
+             << position.ShortDebugString();
+      return false;
+    }
+    if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
                                     look_forward_distance, &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;

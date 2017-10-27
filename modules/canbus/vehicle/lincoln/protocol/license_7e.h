@@ -16,8 +16,9 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_LICENSE_7E_H
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_LICENSE_7E_H
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include <string>
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
