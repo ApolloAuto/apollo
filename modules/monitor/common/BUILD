@@ -31,8 +31,13 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/drivers/canbus/proto:canbus_proto",
         "//modules/monitor/common:hw_checker",
-        "//modules/monitor/hwmonitor/hw/esdcan:esdcan_checker_lib",
-    ],
+        "//modules/monitor/hwmonitor/hw/socketcan:socketcan_checker_lib",
+      ] + select({
+            "//tools/platforms:use_esd_can": [
+                "//modules/monitor/hwmonitor/hw/esdcan:esdcan_checker_lib",
+            ],
+            "//conditions:default": [],
+        }),
 )
 
 cc_binary(

@@ -97,7 +97,7 @@ function generate_build_targets() {
     fail 'Build failed!'
   fi
   if ! $USE_ESD_CAN; then
-     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "modules\/monitor" | grep -v "esd")
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "modules\/monitor\/hwmonitor\/hw\/esdcan" | grep -v "esd")
   fi
 }
 
