@@ -24,7 +24,9 @@
 #include <vector>
 
 #include "Eigen/Dense"
+
 #include "modules/planning/proto/planning.pb.h"
+
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 

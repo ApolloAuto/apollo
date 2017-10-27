@@ -106,9 +106,13 @@ void SimControl::SetStartPoint(const double x, const double y) {
 }
 
 void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
-  DCHECK_LE(2, routing.routing_request().waypoint_size());
+  CHECK_LE(2, routing.routing_request().waypoint_size());
   const auto& start_pose = routing.routing_request().waypoint(0).pose();
-  SetStartPoint(start_pose.x(), start_pose.y());
+
+  // If this is from a planning re-routing request, don't reset car's location.
+  if (routing.routing_request().header().module_name() != "planning") {
+    SetStartPoint(start_pose.x(), start_pose.y());
+  }
 }
 
 void SimControl::Start() {

@@ -34,7 +34,11 @@
 namespace apollo {
 namespace third_party_perception {
 
+using apollo::common::Quaternion;
+using apollo::common::PointENU;
 using apollo::hdmap::HDMapUtil;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::Point;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
   double theta = std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
@@ -170,7 +174,7 @@ double GetNearestLaneHeading(const Point& point) {
     return -1.0;
   }
 
-  ::apollo::common::PointENU point_enu;
+  PointENU point_enu;
   point_enu.set_x(point.x());
   point_enu.set_y(point.y());
   point_enu.set_z(point.z());
@@ -186,7 +190,7 @@ double GetNearestLaneHeading(const double x, const double y, const double z) {
     return -1.0;
   }
 
-  ::apollo::common::PointENU point_enu;
+  PointENU point_enu;
   point_enu.set_x(x);
   point_enu.set_y(y);
   point_enu.set_z(z);
@@ -201,7 +205,7 @@ double GetLateralDistanceToNearestLane(const Point& point) {
     return -1.0;
   }
 
-  ::apollo::common::PointENU point_enu;
+  PointENU point_enu;
   point_enu.set_x(point.x());
   point_enu.set_y(point.y());
   point_enu.set_z(point.z());

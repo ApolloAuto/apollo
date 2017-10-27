@@ -176,6 +176,12 @@ function setup_device() {
     if [ ! -e /dev/can0 ]; then
         sudo mknod --mode=a+rw /dev/can0 c 52 0
     fi
+    if [ ! -e /dev/can1 ]; then
+        sudo mknod --mode=a+rw /dev/can1 c 52 1
+    fi
+    if [ ! -e /dev/can2 ]; then
+        sudo mknod --mode=a+rw /dev/can2 c 52 2
+    fi
 
     MACHINE_ARCH=$(uname -m)
     if [ "$MACHINE_ARCH" == 'aarch64' ]; then

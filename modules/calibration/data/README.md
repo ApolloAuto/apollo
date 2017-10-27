@@ -1,4 +1,6 @@
-= Vehicle Calibration Configs =
+# Vehicle Calibration Configs
+
+HMI will list the subfolders as vehicles available to use.
 
 For a well functioning vehicle, generally you need the following config files:
 
@@ -14,3 +16,6 @@ For a well functioning vehicle, generally you need the following config files:
       - gnss_conf_mkz.txt     # GNSS config file
       - gnss_driver.launch    # GNSS launch file for ROS.
 ```
+
+Take mkz8 as an example, but don't forget to fill the rtk_from.ntrip in
+gnss_params/gnss_conf_mkz.txt.
