@@ -14,14 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file: can_checker_factory.cc
+ */
+
 #include "modules/monitor/common/can_checker_factory.h"
 #if USE_ESD_CAN
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
 #endif
 #include "modules/monitor/hwmonitor/hw/socketcan/socketcan_checker.h"
-/**
- * @file: hw_checker_factory.cc
- */
 
 namespace apollo {
 namespace monitor {
