@@ -80,6 +80,10 @@ template <typename Points>
 std::vector<int> DownsampleByAngle(const Points &points,
                                    const double angle_threshold) {
   std::vector<int> sampled_indices;
+  if (points.size() == 0) {
+    return sampled_indices;
+  }
+
   if (angle_threshold < 0.0) {
     AERROR << "Input angle threshold is negative.";
     return sampled_indices;
