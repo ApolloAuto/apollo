@@ -174,7 +174,8 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
       bool is_valid_trajectory = true;
       for (const auto& point : trajectory.trajectory_point()) {
         if (!IsValidTrajectoryPoint(point)) {
-          AERROR << "TrajectoryPoint: " << point.ShortDebugString()
+          AERROR << "obj:" << perception_id
+                 << " TrajectoryPoint: " << trajectory.ShortDebugString()
                  << " is NOT valid.";
           is_valid_trajectory = false;
           break;
