@@ -678,6 +678,8 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdatePlanningData(trajectory.debug().planning_data());
 
+  world_.mutable_latency()->set_planning(
+      trajectory.latency_stats().total_time_ms());
   world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
 
