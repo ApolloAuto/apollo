@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-// @todo: complete this using gmock & gtest, capture logging contents and do
-// checks.
+// TODO(xiaoxq): complete this using gmock & gtest, capture logging contents and
+// do checks.
 
 #include "modules/monitor/common/log.h"
 

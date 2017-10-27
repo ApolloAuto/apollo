@@ -14,16 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/monitor/hwmonitor/hw/socketcan/socketcan_test.h"
+#ifndef MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
+#define MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
 
+#include "modules/data/proto/task.pb.h"
+
+/**
+ * @namespace apollo::data
+ * @brief apollo::data
+ */
 namespace apollo {
-namespace monitor {
-namespace hw {
+namespace data {
 
-int socket_do_test(int id) {
-  return 0;
-}
+class InfoCollector {
+ public:
+  // Get task information, which doesn't contain TaskData.
+  static Task GetTaskInfo();
 
-}  // namespace hw
-}  // namespace monitor
+  static VehicleInfo GetVehicleInfo();
+  static EnvironmentInfo GetEnvironmentInfo();
+  static HardwareInfo GetHardwareInfo();
+  static SoftwareInfo GetSoftwareInfo();
+  static UserInfo GetUserInfo();
+};
+
+}  // namespace data
 }  // namespace apollo
+
+#endif  // MODULES_DATA_RECORDER_INFO_COLLECTOR_H_

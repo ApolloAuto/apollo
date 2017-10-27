@@ -24,9 +24,9 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::perception::PerceptionObstacles;
-using apollo::perception::PerceptionObstacle;
 using apollo::common::adapter::AdapterConfig;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 
@@ -75,7 +75,16 @@ void EvaluatorManager::Run(
   Evaluator* evaluator = nullptr;
   for (const auto& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
+    if (!perception_obstacle.has_id()) {
+      AERROR << "A perception obstacle has no id.";
+      continue;
+    }
+
     int id = perception_obstacle.id();
+    if (id < 0) {
+      AERROR << "A perception obstacle has invalid id [" << id << "].";
+      continue;
+    }
     Obstacle* obstacle = container->GetObstacle(id);
 
     if (obstacle == nullptr) {

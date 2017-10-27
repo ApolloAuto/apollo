@@ -18,20 +18,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "mock_socketcan_checker_lib",
-    srcs = [
-        "socketcan_checker.cc",
-        "socketcan_test_mock.cc",
-    ],
-    hdrs = glob(["*.h"]),
-    deps = [
-        "//modules/common:macro",
-        "//modules/common/util:string_util",
-        "//modules/monitor/common:hw_checker",
-        "//modules/monitor/common:log",
-        "//modules/monitor/hwmonitor/hw:hw_log_module",
-    ],
-)
-
 cpplint()

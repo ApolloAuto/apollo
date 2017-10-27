@@ -19,6 +19,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/node_with_range.h"
 #include "modules/routing/graph/range_utils.h"
 #include "modules/routing/graph/topo_test_utils.h"
@@ -58,6 +59,7 @@ void GetRangeVec(std::vector<NodeSRange>* range_vec) {
 }  // namespace
 
 TEST(NodeSRangeTestSuit, basic_test) {
+  FLAGS_min_length_for_lane_change = 10.0;
   double start_s_1 = 0.0;
   double start_s_2 = 5.0;
   double end_s_1 = 10.1;
@@ -95,7 +97,9 @@ TEST(NodeSRangeTestSuit, basic_test) {
 
 TEST(NodeWithRangeTestSuit, basic_test) {
   Node node_1;
+  node_1.set_length(20);
   Node node_2;
+  node_2.set_length(20);
   TopoNode topo_node_1(node_1);
   TopoNode topo_node_2(node_2);
   double start_s_1 = 0.0;
