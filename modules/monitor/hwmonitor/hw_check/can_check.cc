@@ -49,10 +49,12 @@ int main(int argc, const char *argv[]) {
 #endif
 
   CanbusConf canbus_conf;
+
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
                                                 &canbus_conf)) {
     return -1;
   }
+
   auto *can_chk_factory = CanCheckerFactory::instance();
   can_chk_factory->RegisterCanCheckers();
   auto can_chk =
@@ -60,6 +62,7 @@ int main(int argc, const char *argv[]) {
   if (!can_chk) {
     return -1;
   }
+
   std::vector<HwCheckResult> can_rslt;
   can_chk->run_check(&can_rslt);
   assert(can_rslt.size() == 1);
@@ -76,7 +79,6 @@ int main(int argc, const char *argv[]) {
 
   std::vector<HardwareStatus> hw_status;
   apollo::monitor::hw::hw_chk_result_to_hmi_status(can_rslt, &hw_status);
-
   HMIStatusHelper::ReportHardwareStatus(hw_status);
 
   return 0;

@@ -16,6 +16,7 @@
 
 #include "modules/monitor/hwmonitor/hw/socketcan/socketcan_checker.h"
 
+#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -49,7 +50,7 @@ void SocketCanChecker::run_check(std::vector<HwCheckResult> *results) {
 
   int result = socketcan_do_test(can_id_);
 
-  HwCheckResult rslt(name_, socketcan_result_to_hw_status(result),
+  HwCheckResult rslt("CAN", socketcan_result_to_hw_status(result),
                      std::move(socketcan_result_to_message(result)));
 
   results->emplace_back(std::move(rslt));
