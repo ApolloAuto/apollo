@@ -155,6 +155,10 @@ message RoutePath {
   repeated PolygonPoint point = 1;
 }
 
+message Latency { // ms
+  optional double planning = 1;
+}
+
 // Next-id: 17
 message SimulationWorld {
   // Time
@@ -191,4 +195,7 @@ message SimulationWorld {
   optional .apollo.common.monitor.MonitorMessage monitor = 13;
 
   optional .apollo.planning_internal.PlanningData planning_data = 14;
+
+  // Module latency
+  optional Latency latency = 15;
 }
