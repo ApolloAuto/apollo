@@ -144,6 +144,7 @@ class PathObstacle {
                                  StBoundary* const st_boundary);
   bool IsValidObstacle(
       const perception::PerceptionObstacle& perception_obstacle);
+  bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 
   std::string id_;
   const Obstacle* obstacle_ = nullptr;

@@ -124,6 +124,15 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d min_box({0, 0}, 1.0, 1.0, 1.0);
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
+
+  for (const auto& point : trajectory_points) {
+    if (!IsValidTrajectoryPoint(point)) {
+      AERROR << "TrajectoryPoint: " << point.ShortDebugString()
+             << " is NOT valid.";
+      return false;
+    }
+  }
+
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
@@ -410,6 +419,26 @@ bool PathObstacle::IsValidObstacle(
   return !std::isnan(object_width) && !std::isnan(object_length) &&
          object_width > kMinObjectDimension &&
          object_length > kMinObjectDimension;
+}
+
+bool PathObstacle::IsValidTrajectoryPoint(
+    const common::TrajectoryPoint& point) {
+  if (point.has_path_point()) {
+    if (std::isnan(point.path_point().x()) ||
+        std::isnan(point.path_point().y()) ||
+        std::isnan(point.path_point().z()) ||
+        std::isnan(point.path_point().kappa()) ||
+        std::isnan(point.path_point().s()) ||
+        std::isnan(point.path_point().dkappa()) ||
+        std::isnan(point.path_point().ddkappa())) {
+      return false;
+    }
+  }
+  if (std::isnan(point.v()) || std::isnan(point.a()) ||
+      std::isnan(point.relative_time())) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace planning
