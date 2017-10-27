@@ -19,9 +19,9 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
 namespace monitor {
@@ -40,12 +40,11 @@ HardwareStatus::Status EsdCanChecker::esdcan_result_to_hw_status(
 }
 
 std::string EsdCanChecker::esdcan_result_to_message(NTCAN_RESULT ntstatus) {
-  return ntstatus == NTCAN_SUCCESS ? std::string("OK")
-                                   : std::string(esdcan_err_to_str(ntstatus));
+  return ntstatus == NTCAN_SUCCESS ? "OK" : esdcan_err_to_str(ntstatus);
 }
 
 void EsdCanChecker::run_check(std::vector<HwCheckResult> *results) {
-  PLATFORM_DBG(get_log_module(), log::LVL_INFO, "To check ESD-CAN-%d", can_id_);
+  AINFO << "To check ESD-CAN-" << can_id_;
 
   EsdCanDetails *details = new EsdCanDetails();
   NTCAN_RESULT result = details->esdcan_do_test(can_id_);
