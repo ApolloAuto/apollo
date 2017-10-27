@@ -82,7 +82,10 @@ double Interpolation2D::InterpolateYz(const std::map<double, double> &yz_table,
 
   auto itr_after = yz_table.lower_bound(y);
   auto itr_before = itr_after;
-  --itr_before;
+
+  if (itr_before != yz_table.begin()) {
+    --itr_before;
+  }
 
   double y_before = itr_before->first;
   double z_before = itr_before->second;
