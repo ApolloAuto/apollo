@@ -272,8 +272,9 @@ void Planning::RunOnce() {
 
   if (!status.ok()) {
     status.Save(trajectory_pb.mutable_header()->mutable_status());
-    AERROR << "Planning failed and set estop";
+    AERROR << "Planning failed:" << status.ToString();
     if (FLAGS_publish_estop) {
+      AERROR << "Planning failed and set estop";
       trajectory_pb.mutable_estop();
     }
   }
