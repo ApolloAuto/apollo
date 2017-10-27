@@ -6,6 +6,10 @@ export default class Planning {
 
   data = this.initData();
 
+  latencyGraph = {
+      planning: []
+  };
+
   @action updateSequenceNum(newSequenceNum) {
     this.sequenceNum = newSequenceNum;
   }
@@ -167,6 +171,33 @@ export default class Planning {
     }
   }
 
+  updadteLatencyGraph(currentTime, latencyStates) {
+    const timeRange = 300000; // 5 min
+    for (const moduleName in this.latencyGraph) {
+      let graph = this.latencyGraph[moduleName];
+
+      if (graph.length > 1 ) {
+        const startTime = graph[0].x;
+        const endTime = graph[graph.length - 1].x;
+        const diff = currentTime - startTime;
+        if (currentTime < endTime) {
+          // new data set, clean up existing one
+          this.latencyGraph[moduleName] = [];
+          graph = this.latencyGraph[moduleName];
+
+        } else if (diff > timeRange) {
+          // shift out old data
+          graph.shift();
+        }
+      }
+
+      if (graph.length === 0 ||
+          graph[graph.length - 1].x !== currentTime) {
+          graph.push({x: currentTime, y: latencyStates.planning});
+      }
+    }
+  }
+
   update(world) {
     this.updateSequenceNum(world.sequenceNum);
     this.data = this.initData();
@@ -189,6 +220,10 @@ export default class Planning {
       if (planningData.path) {
         this.updateKappaGraph(planningData.path);
       }
+    }
+
+    if (world.latency) {
+      this.updadteLatencyGraph(world.timestampSec, world.latency);
     }
   }
 }

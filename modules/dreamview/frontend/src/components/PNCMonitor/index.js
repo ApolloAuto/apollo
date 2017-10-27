@@ -41,7 +41,7 @@ export default class PNCMonitor extends React.Component {
     }
 
     render() {
-        const { sequenceNum, data } = this.props.store.planning;
+        const { sequenceNum, data, latencyGraph } = this.props.store.planning;
         const { dimension } = this.props.store;
 
         if (!sequenceNum) {
@@ -56,6 +56,7 @@ export default class PNCMonitor extends React.Component {
                 {this.generateScatterGraph('speedGraph', data.speedGraph)}
                 {this.generateScatterGraph('kappaGraph', data.kappaGraph)}
                 {this.generateStGraph(data.stGraph)}
+                {this.generateScatterGraph('latencyGraph', latencyGraph)}
             </div>
         );
     }
