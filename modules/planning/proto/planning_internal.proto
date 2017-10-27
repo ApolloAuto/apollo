@@ -7,6 +7,7 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 
 message Debug {

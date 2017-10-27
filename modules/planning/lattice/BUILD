@@ -89,10 +89,6 @@ cc_library(
         "//modules/planning/lattice:lattice_params",
         "//modules/planning/lattice:lattice_constraint_checker",
         "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/lattice:planning_target",
-        "//modules/planning/lattice:lattice_params",
-        "//modules/planning/lattice:lattice_constraint_checker",
-        "//modules/planning/proto:lattice_sampling_config_proto",
     ],
 )
 
@@ -182,6 +178,7 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/reference_line:reference_line",
+
     ],
 )
 
