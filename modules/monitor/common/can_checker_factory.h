@@ -25,7 +25,7 @@
 #include "modules/monitor/common/hw_checker.h"
 
 /**
- * @file: hw_checker_factory.h
+ * @file: can_checker_factory.h
  */
 
 namespace apollo {

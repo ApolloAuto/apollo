@@ -48,7 +48,7 @@ struct HwCheckResult {
   /// Specific status message for human consumption.
   std::string mssg;
 
-  // @todo: it is confusing and doesn't support copy operation here;
+  // TODO(xiaoxq): it is confusing and doesn't support copy operation here;
   // consider to use a common base class with a deeep copy function.
   /// HW-specific details, may or may not be present.
   std::shared_ptr<HwCheckResultDetails> details;

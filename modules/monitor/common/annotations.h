@@ -18,26 +18,21 @@
 #define MODULES_MONITOR_COMMON_ANNOTATIONS_H_
 
 /// Indicating a pointer class member is not owned by an object of the class; it
-/// is the
-/// responsibility of the programmer to make sure the given pointer is valid
-/// during the life time
-/// of the object.
+/// is the responsibility of the programmer to make sure the given pointer is
+/// valid during the life time of the object.
 #define PTR_NOT_OWNED
 
 /// Indicating a pointer function argument is used by the object of the function
-/// for the lifetime
-/// of the object; it is the responsibility of the programmer to make sure the
-/// given pointer
-/// is valid during the life time of the object.
+/// for the lifetime of the object; it is the responsibility of the programmer
+/// to make sure the given pointer is valid during the life time of the object.
 #define PTR_LIFETIME
 
 /// Indicating ownership of a pointer argument is transferred to the callee.
 #define PTR_OWNER_XFR
 
 /// Indicating a pointer function argument is used only in the scope of this
-/// function,
-/// will not be used after this function is done (e.g., not saved for future
-/// use).
+/// function, will not be used after this function is done (e.g., not saved for
+/// future use).
 /// This is the default behavior of any pointer argument of a function.
 #define PTR_USE_ONCE
 
@@ -55,8 +50,7 @@
 #define THREAD_SAFE
 
 /// Indicating private global variable that is implementation specific and
-/// should not be used
-/// directly.
+/// should not be used directly.
 #define PRIVATE
 
 #endif  // MODULES_MONITOR_COMMON_ANNOTATIONS_H_
