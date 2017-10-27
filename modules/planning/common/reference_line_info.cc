@@ -41,6 +41,7 @@ using apollo::common::math::Vec2d;
 using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
+using apollo::common::VehicleSignal;
 
 ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                                      const ReferenceLine& reference_line,
@@ -209,9 +210,62 @@ std::string ReferenceLineInfo::PathSpeedDebugString() const {
                                       "speed_data:", speed_data_.DebugString());
 }
 
+void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
+  // set vehicle change lane signal
+  CHECK(signal) << "signal is null";
+  signal->Clear();
+  signal->set_turn_signal(VehicleSignal::TURN_NONE);
+  const auto& next_action = Lanes().NextAction();
+  if (next_action != routing::FORWARD) {  // change lane case
+    if (next_action == routing::LEFT) {
+      signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+    } else if (next_action == routing::RIGHT) {
+      signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+    }
+    return;
+  }
+  // check lane's turn type
+  double route_s = 0.0;
+  const double adc_s = adc_sl_boundary_.end_s();
+  for (const auto& seg : Lanes()) {
+    if (route_s > adc_s + FLAGS_turn_signal_distance) {
+      break;
+    }
+    route_s += seg.end_s - seg.start_s;
+    if (route_s < adc_s) {
+      continue;
+    }
+    const auto& turn = seg.lane->lane().turn();
+    if (turn == hdmap::Lane::LEFT_TURN) {
+      signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+      break;
+    } else if (turn == hdmap::Lane::RIGHT_TURN) {
+      signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+      break;
+    } else if (turn == hdmap::Lane::U_TURN) {
+      // check left or right by geometry.
+      auto start_xy =
+          common::util::MakeVec2d(seg.lane->GetSmoothPoint(seg.start_s));
+      auto middle_xy = common::util::MakeVec2d(
+          seg.lane->GetSmoothPoint((seg.start_s + seg.end_s) / 2.0));
+      auto end_xy =
+          common::util::MakeVec2d(seg.lane->GetSmoothPoint(seg.end_s));
+      auto start_to_middle = middle_xy - start_xy;
+      auto start_to_end = end_xy - start_xy;
+      if (start_to_middle.CrossProd(start_to_end) < 0) {
+        signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+      } else {
+        signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+      }
+      break;
+    }
+  }
+}
+
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
   Decider decider;
   decider.MakeDecision(*this, decision_result);
+  ExportTurnSignal(decision_result->mutable_vehicle_signal());
 }
 
 }  // namespace planning
