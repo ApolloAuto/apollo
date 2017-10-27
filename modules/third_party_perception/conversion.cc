@@ -32,12 +32,12 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
-using ::apollo::third_party_perception::GetAngleFromQuaternion;
-using ::apollo::third_party_perception::FillPerceptionPolygon;
-using ::apollo::third_party_perception::GetDefaultObjectLength;
-using ::apollo::third_party_perception::GetDefaultObjectWidth;
-using ::apollo::third_party_perception::HeadingDifference;
-using ::apollo::perception::Point;
+using apollo::drivers::DelphiESR;
+using apollo::drivers::Mobileye;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacles;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::Point;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization) {
