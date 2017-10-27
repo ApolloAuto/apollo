@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package apollo.data;
+
+import "modules/canbus/proto/chassis_detail.proto";
+import "modules/canbus/proto/vehicle_parameter.proto";
+
+message VehicleInfo {
+  optional apollo.canbus.License license = 1;
+  optional apollo.canbus.VehicleParameter parameter = 2;
+}
+
+message EnvironmentInfo {
+  // TODO(xiaoxq): weather, temperature, etc.
+}
+
+message HardwareInfo {
+  // TODO(xiaoxq): GPS, Radar, Lidar, Camera, IMU, etc.
+}
+
+message SoftwareInfo {
+  optional string docker_image = 1;
+  optional string commit_id = 2;
+  // TODO(xiaoxq): modules' configuration.
+}
+
+message UserInfo {
+  optional string entity = 1;  // Company, university, organization, etc.
+  optional string driver = 2;
+  optional string co_driver = 3;
+}
+
+// A task is typically a piece of data which is recorded continuously.
+message Task {
+  optional VehicleInfo vehicle = 1;
+  optional EnvironmentInfo environment = 2;
+  optional HardwareInfo hardware = 3;
+  optional SoftwareInfo software = 4;
+  optional UserInfo user = 5;
+
+  optional string task_id = 6;
+  optional double start_time = 7;
+  optional double duration = 8;
+  // Raw bag files uri, such as file://, http://, ftp://, hdfs://, etc.
+  repeated string rosbags = 9;
+}
