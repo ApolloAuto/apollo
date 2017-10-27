@@ -185,20 +185,6 @@ function check() {
   fi
 }
 
-function cicheck() {
-  local check_start_time=$(get_now)
-  cibuild $@ && citest $@ && run_lint
-
-  START_TIME=$check_start_time
-  if [ $? -eq 0 ]; then
-    success 'Check passed!'
-    return 0
-  else
-    fail 'Check failed!'
-    return 1
-  fi
-}
-
 function warn_proprietary_sw() {
   echo -e "${RED}The release built contains proprietary software provided by other parties.${NO_COLOR}"
   echo -e "${RED}Make sure you have obtained proper licensing agreement for redistribution${NO_COLOR}"
@@ -585,6 +571,10 @@ function main() {
       NOT_BUILD_PERCEPTION=true
       apollo_build_dbg $@
       ;;
+    cibuild)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      cibuild $@
+      ;;
     build_opt)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_opt $@
@@ -612,10 +602,6 @@ function main() {
     buildvelodyne)
       build_velodyne
       ;;
-    cicheck)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      cicheck $@
-      ;;
     config)
       config
       ;;
@@ -628,6 +614,10 @@ function main() {
     test)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       run_test $@
+      ;;
+    citest)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
