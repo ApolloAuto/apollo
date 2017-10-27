@@ -503,5 +503,5 @@ message BasicInfo {
 }
 
 message License {
-    optional string vin = 1;
+  optional string vin = 1;
 }
