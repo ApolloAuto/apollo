@@ -17,15 +17,13 @@
 #include <assert.h>
 #include <iostream>
 
-#include "glog/logging.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
+#include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 #include "modules/monitor/common/annotations.h"
 #include "modules/monitor/common/can_checker_factory.h"
-#include "modules/monitor/common/log.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
 using ::apollo::canbus::CanbusConf;
@@ -36,17 +34,7 @@ using ::apollo::monitor::HwCheckResult;
 
 int main(int argc, const char *argv[]) {
   // For other modules that uses glog.
-  ::google::InitGoogleLogging("platform");
-  apollo::monitor::log::init_syslog();
-// @todo make log level configurable or set lower level here.
-#ifdef DEBUG
-  apollo::monitor::hw::config_log(apollo::monitor::log::LVL_DBG,
-                                  apollo::monitor::log::DBG_VERBOSE,
-                                  apollo::monitor::log::platform_log_printf);
-#else
-  apollo::monitor::hw::config_log(apollo::monitor::log::LVL_DBG,
-                                  apollo::monitor::log::DBG_VERBOSE);
-#endif
+  google::InitGoogleLogging("platform");
 
   CanbusConf canbus_conf;
 
@@ -72,9 +60,8 @@ int main(int argc, const char *argv[]) {
     can_rslt[0].details->print_summary(std::cout);
   }
 #else
-  PLATFORM_LOG(apollo::monitor::hw::get_log_module(),
-               apollo::monitor::log::LVL_DBG, "Done checking %s, status: %d",
-               can_chk->get_name().c_str(), can_rslt[0].status);
+  ADEBUG << "Done checking " << can_chk->get_name() << ", "
+            "status: " << can_rslt[0].status;
 #endif
 
   std::vector<HardwareStatus> hw_status;
