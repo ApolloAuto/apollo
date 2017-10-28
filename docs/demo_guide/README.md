@@ -22,6 +22,9 @@ Setup steps:
 
     ```
     rosbag play docs/demo_guide/demo.bag --loop
+    # or 
+    bash docs/demo_guide/rosbag_helper.sh download #download rosbag
+    rosbag play docs/demo_guide/demo_1.5.np.bag --loop
     ```
 
     The `--loop` option enables rosbag to keep playing the bag in a loop playback mode.

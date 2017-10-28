@@ -187,5 +187,22 @@ TEST_F(ObstacleTest, Perception) {
   const auto& perception_obstacle = obstacle->Perception();
   EXPECT_EQ(2156, perception_obstacle.id());
 }
+
+TEST(Obstacle, CreateStaticVirtualObstacle) {
+  common::math::Box2d box({0, 0}, 0.0, 4.0, 2.0);
+  std::unique_ptr<Obstacle> obstacle =
+      Obstacle::CreateStaticVirtualObstacles("abc", box);
+  EXPECT_EQ("abc", obstacle->Id());
+  EXPECT_EQ(-1990122780, obstacle->PerceptionId());
+  EXPECT_TRUE(Obstacle::IsStaticObstacle(obstacle->Perception()));
+  EXPECT_TRUE(Obstacle::IsVirtualObstacle(obstacle->Perception()));
+  auto& perception_box = obstacle->PerceptionBoundingBox();
+  EXPECT_FLOAT_EQ(0.0, perception_box.center().x());
+  EXPECT_FLOAT_EQ(0.0, perception_box.center().y());
+  EXPECT_FLOAT_EQ(4.0, perception_box.length());
+  EXPECT_FLOAT_EQ(2.0, perception_box.width());
+  EXPECT_FLOAT_EQ(0.0, perception_box.heading());
+}
+
 }  // namespace planning
 }  // namespace apollo

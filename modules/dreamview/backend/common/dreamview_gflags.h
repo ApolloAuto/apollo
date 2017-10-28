@@ -21,7 +21,9 @@
 
 DECLARE_string(dreamview_module_name);
 
-DECLARE_string(adapter_config_filename);
+DECLARE_string(dreamview_adapter_config_filename);
+
+DECLARE_string(hmi_config_filename);
 
 DECLARE_string(static_file_dir);
 

@@ -10,14 +10,17 @@
         "start": "node_modules/.bin/webpack-dev-server --watch-poll"
     },
     "dependencies": {
+        "chart.js": "^2.7.0",
+        "chartjs-plugin-zoom": "^0.5.0",
         "classnames": "^2.2.5",
         "font-awesome": "^4.7.0",
         "imports-loader": "0.6.5",
         "jDataView": "^2.3.0",
         "mobx": "^3.1.10",
         "mobx-react": "^4.1.8",
-        "react": "^15.5.4",
-        "react-dom": "^15.5.4",
+        "react": "^16.0.0",
+        "react-dom": "^16.0.0",
+        "react-split-pane": "^0.1.66",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
         "three-line-2d": "^1.1.6"

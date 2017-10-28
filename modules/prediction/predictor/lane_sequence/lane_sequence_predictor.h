@@ -22,19 +22,19 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_LANE_SEQUENCE_LANE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_LANE_SEQUENCE_LANE_SEQUENCE_PREDICTOR_H_
 
-#include <string>
+// #include <string>
 #include <vector>
-#include "Eigen/Dense"
+// #include "Eigen/Dense"
 
+#include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
-
-#include "modules/prediction/predictor/predictor.h"
+#include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-class LaneSequencePredictor : public Predictor {
+class LaneSequencePredictor : public SequencePredictor {
  public:
   /**
    * @brief Constructor
@@ -54,54 +54,6 @@ class LaneSequencePredictor : public Predictor {
 
  protected:
   /**
-   * @brief Clear private members
-   */
-  void Clear();
-
-  /**
-   * @brief Filter lane sequences
-   * @param Lane graph
-   * @param Current lane id
-   * @param Vector of boolean indicating if a lane sequence is disqualified
-   */
-  void FilterLaneSequences(const LaneGraph& lane_graph,
-                           const std::string& lane_id,
-                           std::vector<bool>* enable_lane_sequence);
-
-  /**
-   * @brief Get lane change type
-   * @param Current lane id
-   * @param Lane sequence
-   * @return Integer indicating lane change type:
-   *         0: no lane change
-   *         1: left lane change
-   *         2: right lane change
-   *        -1: other
-   */
-  int GetLaneChangeType(const std::string& lane_id,
-                        const LaneSequence& lane_sequence);
-
-  /**
-   * @brief Get lane change distance with ADC
-   * @param Target lane sequence
-   * @return Lane change distance with ADC
-   */
-  double GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence);
-
-  /**
-   * @brief Check if the given lane id and s is on the same lane sequence as ADC
-   * @param Lane ID
-   * @param Lane s
-   * @return If the given lane id and s is on the same lane sequence as ADC
-   */
-  bool SameLaneSequence(const std::string& lane_id, double lane_s);
-
-  /**
-   * @brief Get ADC status
-   */
-  void GetADC();
-
-  /**
    * @brief Draw lane sequence trajectory points
    * @param Kalman filter
    * @param Lane sequence
@@ -113,18 +65,6 @@ class LaneSequencePredictor : public Predictor {
       const common::math::KalmanFilter<double, 4, 2, 0>& kf,
       const LaneSequence& sequence, double total_time, double freq,
       std::vector<common::TrajectoryPoint>* points);
-
-  /**
-   * @brief Convert a lane sequence to string
-   * @param Lane sequence
-   * @return String describing the lane sequence
-   */
-  std::string ToString(const LaneSequence& sequence);
-
- private:
-  std::string adc_lane_id_ = "";
-  double adc_lane_s_ = 0.0;
-  Eigen::Vector2d adc_position_;
 };
 
 }  // namespace prediction

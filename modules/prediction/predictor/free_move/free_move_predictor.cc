@@ -35,7 +35,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
-  trajectories_.clear();
+  Clear();
+
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
@@ -76,8 +77,6 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
     const Eigen::Vector2d& acc, const KalmanFilter<double, 6, 2, 0>& kf,
     double total_time, double freq, std::vector<TrajectoryPoint>* points) {
-  double theta = std::atan2(velocity(1), velocity(0));
-
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
   state(0, 0) = 0.0;
   state(1, 0) = 0.0;
@@ -94,73 +93,13 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   transition(2, 4) = freq;
   transition(3, 5) = freq;
 
-  double x = state(0, 0);
-  double y = state(1, 0);
-  double v_x = state(2, 0);
-  double v_y = state(3, 0);
-  double acc_x = state(4, 0);
-  double acc_y = state(5, 0);
-  for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
-    double speed = std::hypot(v_x, v_y);
-    if (speed <= std::numeric_limits<double>::epsilon()) {
-      speed = 0.0;
-      v_x = 0.0;
-      v_y = 0.0;
-      acc_x = 0.0;
-      acc_y = 0.0;
-    } else if (speed > FLAGS_max_speed) {
-      speed = FLAGS_max_speed;
-    }
-
-    // update theta
-    if (speed > std::numeric_limits<double>::epsilon()) {
-      if (points->size() > 0) {
-        PathPoint* prev_point = points->back().mutable_path_point();
-        theta = std::atan2(y - prev_point->y(), x - prev_point->x());
-        prev_point->set_theta(theta);
-      }
-    } else {
-      if (points->size() > 0) {
-        theta = points->back().path_point().theta();
-      }
-    }
-
-    // update velocity and acc
-    state(2, 0) = v_x;
-    state(3, 0) = v_y;
-    state(4, 0) = acc_x;
-    state(5, 0) = acc_y;
-
-    // update position
-    x = state(0, 0);
-    y = state(1, 0);
-
-    // Generate trajectory point
-    TrajectoryPoint trajectory_point;
-    PathPoint path_point;
-    path_point.set_x(x);
-    path_point.set_y(y);
-    path_point.set_z(0.0);
-    path_point.set_theta(theta);
-    trajectory_point.mutable_path_point()->CopyFrom(path_point);
-    trajectory_point.set_v(speed);
-    trajectory_point.set_a(std::hypot(acc_x, acc_y));
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
-    points->emplace_back(std::move(trajectory_point));
-
-    // Update position, velocity and acceleration
-    state = transition * state;
-    x = state(0, 0);
-    y = state(1, 0);
-    v_x = state(2, 0);
-    v_y = state(3, 0);
-    acc_x = state(4, 0);
-    acc_y = state(5, 0);
-  }
+  size_t num = static_cast<size_t>(total_time / freq);
+  ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
+      &state, transition, num, freq, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
-    apollo::prediction::util::TranslatePoint(position[0], position[1],
-                                             &(points->operator[](i)));
+    ::apollo::prediction::predictor_util::TranslatePoint(
+        position[0], position[1], &(points->operator[](i)));
   }
 }
 

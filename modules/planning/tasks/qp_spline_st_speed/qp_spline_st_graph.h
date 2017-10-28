@@ -43,7 +43,8 @@ namespace planning {
 
 class QpSplineStGraph {
  public:
-  QpSplineStGraph(const QpStSpeedConfig& qp_st_speed_config,
+  QpSplineStGraph(Spline1dGenerator* spline_generator,
+                  const QpStSpeedConfig& qp_st_speed_config,
                   const apollo::common::VehicleParam& veh_param);
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
@@ -87,14 +88,14 @@ class QpSplineStGraph {
       std::vector<double>* speed_upper_bound) const;
 
  private:
+  // solver
+  Spline1dGenerator* spline_generator_ = nullptr;
+
   // qp st configuration
   const QpStSpeedConfig qp_st_speed_config_;
 
   // initial status
   common::TrajectoryPoint init_point_;
-
-  // solver
-  std::unique_ptr<Spline1dGenerator> spline_generator_ = nullptr;
 
   // t knots resolution
   double t_knots_resolution_ = 0.0;

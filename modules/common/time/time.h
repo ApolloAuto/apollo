@@ -175,25 +175,19 @@ class Clock {
    * @brief gets the current time in second.
    * @return the current time in second.
    */
-  static double NowInSecond() {
-    return ToSecond(Clock::Now());
-  }
+  static double NowInSecond() { return ToSecond(Clock::Now()); }
 
   /**
    * @brief Set the behavior of the \class Clock.
    * @param The new clock mode to be set.
    */
-  static void SetMode(ClockMode mode) {
-    instance()->mode_ = mode;
-  }
+  static void SetMode(ClockMode mode) { instance()->mode_ = mode; }
 
   /**
    * @brief Gets the current clock mode.
    * @return The current clock mode.
    */
-  static ClockMode mode() {
-    return instance()->mode_;
-  }
+  static ClockMode mode() { return instance()->mode_; }
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp

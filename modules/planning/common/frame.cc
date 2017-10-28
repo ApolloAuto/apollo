@@ -19,6 +19,7 @@
  **/
 #include "modules/planning/common/frame.h"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <limits>
@@ -46,9 +47,11 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-const hdmap::PncMap *Frame::pnc_map_ = nullptr;
+std::unique_ptr<hdmap::PncMap> Frame::pnc_map_;
 
-void Frame::SetMap(hdmap::PncMap *pnc_map) { pnc_map_ = pnc_map; }
+void Frame::SetMap(const hdmap::HDMap *hdmap) {
+  pnc_map_.reset(new hdmap::PncMap(hdmap));
+}
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
@@ -57,10 +60,6 @@ Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {}
 
 void Frame::SetVehicleInitPose(const localization::Pose &pose) {
   init_pose_ = pose;
-}
-
-void Frame::SetRoutingResponse(const routing::RoutingResponse &routing) {
-  routing_response_ = routing;
 }
 
 void Frame::SetPlanningStartPoint(const common::TrajectoryPoint &start_point) {
@@ -77,28 +76,81 @@ void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
 
 void Frame::CreatePredictionObstacles(
     const prediction::PredictionObstacles &prediction) {
-  auto obstacles = Obstacle::CreateObstacles(prediction);
-  for (auto &ptr : obstacles) {
-    auto id(ptr->Id());
-    obstacles_.Add(id, *ptr);
+  for (auto &ptr : Obstacle::CreateObstacles(prediction)) {
+    AddObstacle(*ptr);
   }
 }
 
+bool Frame::Rerouting() {
+  auto *adapter_manager = AdapterManager::instance();
+  const auto *vehicle_state = common::VehicleState::instance();
+  if (adapter_manager->GetRoutingResponse()->Empty()) {
+    AERROR << "No previous routing available";
+    return false;
+  }
+  auto request = adapter_manager->GetRoutingResponse()
+                     ->GetLatestObserved()
+                     .routing_request();
+  request.clear_header();
+  AdapterManager::FillRoutingRequestHeader("planning", &request);
+  auto point = common::util::MakePointENU(
+      vehicle_state->x(), vehicle_state->y(), vehicle_state->z());
+  double s = 0.0;
+  double l = 0.0;
+  hdmap::LaneInfoConstPtr lane;
+  if (pnc_map_->hdmap()->GetNearestLaneWithHeading(
+          point, 5.0, vehicle_state->heading(), M_PI / 3.0, &lane, &s, &l) !=
+      0) {
+    AERROR << "Failed to find nearest lane from map at position: "
+           << point.DebugString() << ", heading:" << vehicle_state->heading();
+    return false;
+  }
+  auto *start_point = request.mutable_waypoint(0);
+  start_point->set_id(lane->id().id());
+  start_point->set_s(s);
+  start_point->mutable_pose()->CopyFrom(point);
+  AdapterManager::PublishRoutingRequest(request);
+  return true;
+}
+
+void Frame::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
+  pnc_map_->UpdateRoutingResponse(routing);
+}
+
 const routing::RoutingResponse &Frame::routing_response() const {
-  return routing_response_;
+  return pnc_map_->routing_response();
 }
 
 std::list<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
 
-bool Frame::InitReferenceLineInfo(
-    const std::vector<ReferenceLine> &reference_lines) {
-  reference_line_info_.clear();
-  for (const auto &reference_line : reference_lines) {
-    reference_line_info_.emplace_back(pnc_map_, reference_line,
-                                      planning_start_point_, smoother_config_);
+bool Frame::InitReferenceLineInfo() {
+  std::list<ReferenceLine> reference_lines;
+  std::list<hdmap::RouteSegments> segments;
+  bool has_ref_line = false;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    has_ref_line = ReferenceLineProvider::instance()->GetReferenceLines(
+        &reference_lines, &segments);
+  } else {
+    has_ref_line = CreateReferenceLineFromRouting(init_pose_.position(),
+                                                  &reference_lines, &segments);
   }
+  if (!has_ref_line) {
+    AERROR << "Failed to create reference line from position: "
+           << init_pose_.DebugString();
+    return false;
+  }
+  reference_line_info_.clear();
+  auto ref_line_iter = reference_lines.begin();
+  auto segments_iter = segments.begin();
+  while (ref_line_iter != reference_lines.end()) {
+    reference_line_info_.emplace_back(pnc_map_.get(), *ref_line_iter,
+                                      *segments_iter, planning_start_point_);
+    ++ref_line_iter;
+    ++segments_iter;
+  }
+
   for (auto &info : reference_line_info_) {
     if (!info.Init()) {
       AERROR << "Failed to init adc sl boundary";
@@ -119,30 +171,8 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
     AWARN << "obstacle " << id << " already exist.";
     return object;
   }
-  // create a "virtual" perception_obstacle
-  perception::PerceptionObstacle perception_obstacle;
-  // simulator needs a valid integer
-  perception_obstacle.set_id(-(std::hash<std::string>{}(id) >> 1));
-  perception_obstacle.mutable_position()->set_x(box.center().x());
-  perception_obstacle.mutable_position()->set_y(box.center().y());
-  perception_obstacle.set_theta(box.heading());
-  perception_obstacle.mutable_velocity()->set_x(0);
-  perception_obstacle.mutable_velocity()->set_y(0);
-  perception_obstacle.set_length(box.length());
-  perception_obstacle.set_width(box.width());
-  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
-  perception_obstacle.set_type(
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
-  perception_obstacle.set_tracking_time(1.0);
-
-  std::vector<common::math::Vec2d> corner_points;
-  box.GetAllCorners(&corner_points);
-  for (const auto &corner_point : corner_points) {
-    auto *point = perception_obstacle.add_polygon_point();
-    point->set_x(corner_point.x());
-    point->set_y(corner_point.y());
-  }
-  auto *ptr = obstacles_.Add(id, Obstacle(id, perception_obstacle));
+  auto *ptr =
+      obstacles_.Add(id, *Obstacle::CreateStaticVirtualObstacles(id, box));
   if (!ptr) {
     AERROR << "Failed to create virtual obstacle " << id;
   }
@@ -150,21 +180,24 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
 }
 
 const Obstacle *Frame::CreateDestinationObstacle() {
-  if (!routing_response_.routing_request().has_end()) {
+  const auto &routing = pnc_map_->routing_response();
+  if (routing.routing_request().waypoint_size() < 2) {
     ADEBUG << "routing_request has no end";
     return nullptr;
   }
-  const auto &routing_end = routing_response_.routing_request().end();
-  common::PointENU dest_point = common::util::MakePointENU(
-      routing_end.pose().x(), routing_end.pose().y(), 0.0);
+  const auto &routing_end = *routing.routing_request().waypoint().rbegin();
   const auto lane =
-      pnc_map_->HDMap().GetLaneById(hdmap::MakeMapId(routing_end.id()));
+      pnc_map_->hdmap()->GetLaneById(hdmap::MakeMapId(routing_end.id()));
   if (!lane) {
     AERROR << "Failed to find lane for destination : "
            << routing_end.DebugString();
     return nullptr;
   }
-  double dest_lane_s = routing_end.s();
+
+  double dest_lane_s =
+      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+                        FLAGS_stop_distance_destination);
+  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
   // check if destination point is in planning range
   common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
                                       lane->Heading(dest_lane_s),
@@ -187,21 +220,6 @@ Status Frame::Init(const PlanningConfig &config,
   }
   smoother_config_ = config.reference_line_smoother_config();
 
-  std::vector<ReferenceLine> reference_lines;
-  if (FLAGS_enable_reference_line_provider_thread) {
-    reference_lines = ReferenceLineProvider::instance()->GetReferenceLines();
-  } else {
-    reference_lines = CreateReferenceLineFromRouting(init_pose_.position(),
-                                                     routing_response_);
-  }
-
-  if (reference_lines.empty()) {
-    AERROR << "Failed to create reference line from position: "
-           << init_pose_.DebugString();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Failed to create reference line from routing");
-  }
-
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
   if (FLAGS_align_prediction_time) {
@@ -221,8 +239,7 @@ Status Frame::Init(const PlanningConfig &config,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Collision found with " + collision_obstacle_id_);
   }
-
-  if (!InitReferenceLineInfo(reference_lines)) {
+  if (!InitReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";
     return Status(ErrorCode::PLANNING_ERROR,
                   "failed to init reference line info");
@@ -254,37 +271,63 @@ bool Frame::CheckCollision() {
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
-std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
-    const common::PointENU &position, const routing::RoutingResponse &routing) {
-  std::vector<ReferenceLine> reference_lines;
-  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
-  if (!pnc_map_->GetLaneSegmentsFromRouting(
-          routing, position, FLAGS_look_backward_distance,
-          FLAGS_look_forward_distance, &route_segments)) {
+bool Frame::CreateReferenceLineFromRouting(
+    const common::PointENU &position, std::list<ReferenceLine> *reference_lines,
+    std::list<hdmap::RouteSegments> *segments) {
+  DCHECK_NOTNULL(reference_lines);
+  DCHECK_NOTNULL(segments);
+  std::vector<hdmap::RouteSegments> route_segments;
+  const auto &adc_speed = common::VehicleState::instance()->linear_velocity();
+  double look_forward_distance = (adc_speed * FLAGS_look_forward_time_sec >
+                                  FLAGS_look_forward_min_distance)
+                                     ? FLAGS_look_forward_distance
+                                     : FLAGS_look_forward_min_distance;
+
+  if (!pnc_map_->UpdatePosition(position)) {
+    AERROR << "Failed to update position: " << position.ShortDebugString()
+           << " in pnc map.";
+    return false;
+  }
+  if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
+                                  look_forward_distance, &route_segments)) {
     AERROR << "Failed to extract segments from routing";
-    return reference_lines;
+    return false;
   }
 
   ReferenceLineSmoother smoother;
   smoother.Init(smoother_config_);
 
-  for (const auto &segments : route_segments) {
+  SpiralReferenceLineSmoother spiral_smoother;
+  double max_spiral_smoother_dev = 0.1;
+  spiral_smoother.set_max_point_deviation(max_spiral_smoother_dev);
+
+  for (const auto &each_segments : route_segments) {
     hdmap::Path hdmap_path;
-    pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
+    hdmap::PncMap::CreatePathFromLaneSegments(each_segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
-      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
-        AERROR << "Failed to smooth reference line";
-        continue;
+      if (FLAGS_enable_spiral_reference_line) {
+        if (!spiral_smoother.Smooth(ReferenceLine(hdmap_path),
+                                    &reference_line)) {
+          AERROR << "Failed to smooth reference_line with spiral smoother";
+        }
+      } else {
+        std::vector<double> init_t_knots;
+        Spline2dSolver spline_solver(init_t_knots, 5);
+        if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
+                             &spline_solver)) {
+          AERROR << "Failed to smooth reference line";
+          continue;
+        }
       }
-      reference_lines.push_back(std::move(reference_line));
+      reference_lines->emplace_back(std::move(reference_line));
+      segments->emplace_back(each_segments);
     } else {
-      reference_lines.emplace_back(hdmap_path);
+      reference_lines->emplace_back(hdmap_path);
+      segments->emplace_back(each_segments);
     }
   }
-
-  AERROR_IF(reference_lines.empty()) << "No smooth reference lines available";
-  return reference_lines;
+  return !reference_lines->empty();
 }
 
 std::string Frame::DebugString() const {
@@ -306,11 +349,8 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  const auto &routing_response =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-
   auto debug_routing = planning_data->mutable_routing();
-  debug_routing->CopyFrom(routing_response);
+  debug_routing->CopyFrom(routing_response());
 
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
 }
@@ -331,18 +371,16 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
 }
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
-  std::lock_guard<std::mutex> lock(obstacles_mutex_);
   obstacles_.Add(obstacle.Id(), obstacle);
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
-  if (!drive_reference_line_info_) {
-    double reference_line_cost = std::numeric_limits<double>::infinity();
-    for (const auto &reference_line_info : reference_line_info_) {
-      if (reference_line_info.Cost() < reference_line_cost) {
-        drive_reference_line_info_ = &reference_line_info;
-        reference_line_cost = reference_line_info.Cost();
-      }
+  drive_reference_line_info_ = &reference_line_info_.front();
+  double reference_line_cost = drive_reference_line_info_->Cost();
+  for (const auto &reference_line_info : reference_line_info_) {
+    if (reference_line_info.Cost() < reference_line_cost) {
+      drive_reference_line_info_ = &reference_line_info;
+      reference_line_cost = reference_line_info.Cost();
     }
   }
   return drive_reference_line_info_;
@@ -352,7 +390,7 @@ const ReferenceLineInfo *Frame::DriveReferenceLinfInfo() const {
   return drive_reference_line_info_;
 }
 
-const std::vector<const Obstacle*> &Frame::obstacles() const {
+const std::vector<const Obstacle *> Frame::obstacles() const {
   return obstacles_.Items();
 }
 

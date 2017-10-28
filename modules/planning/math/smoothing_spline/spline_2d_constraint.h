@@ -34,7 +34,7 @@ namespace planning {
 class Spline2dConstraint {
  public:
   Spline2dConstraint(const std::vector<double>& t_knots,
-                     const std::uint32_t order);
+                     const uint32_t order);
 
   // direct method
   bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
@@ -97,7 +97,7 @@ class Spline2dConstraint {
   const AffineConstraint& equality_constraint() const;
 
  private:
-  std::uint32_t FindIndex(const double t) const;
+  uint32_t FindIndex(const double t) const;
   std::vector<double> AffineCoef(const double angle, const double t) const;
   std::vector<double> AffineDerivativeCoef(const double angle,
                                            const double t) const;
@@ -116,8 +116,8 @@ class Spline2dConstraint {
   AffineConstraint inequality_constraint_;
   AffineConstraint equality_constraint_;
   std::vector<double> t_knots_;
-  std::uint32_t spline_order_;
-  std::uint32_t total_param_;
+  uint32_t spline_order_;
+  uint32_t total_param_;
 };
 
 }  // namespace planning

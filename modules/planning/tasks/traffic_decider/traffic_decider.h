@@ -56,7 +56,9 @@ class TrafficDecider : public Task {
  private:
   void RegisterRules();
 
-  apollo::common::util::Factory<std::string, TrafficRule> rule_factory_;
+  apollo::common::util::Factory<RuleConfig::RuleId, TrafficRule,
+                                TrafficRule *(*)(const RuleConfig &config)>
+      rule_factory_;
   google::protobuf::RepeatedPtrField<RuleConfig> rule_configs_;
 };
 

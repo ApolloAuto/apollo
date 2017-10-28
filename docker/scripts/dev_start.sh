@@ -18,7 +18,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20170926_1848"
+VERSION_X86_64="dev-x86_64-20171025_1428"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -47,7 +47,13 @@ echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
-    docker pull $IMG
+    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
+    read -t 10 -n 1 INCHINA
+    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
+        docker pull "registry.docker-cn.com/${IMG}"
+    else
+        docker pull $IMG
+    fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then

@@ -21,9 +21,12 @@ Data Collector
 import os
 import sys
 import time
+import signal
 
 import rospy
 from std_msgs.msg import String
+
+from plot_data import Plotter
 
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
@@ -35,30 +38,46 @@ class DataCollector(object):
     DataCollector Class
     """
 
-    def __init__(self, file):
-        self.proc = [line.rstrip('\n') for line in open(file)]
-        self.index = 0
-        outfile = file + '_recorded.csv'
-        i = 0
-        outfile = file + str(i) + '_recorded.csv'
-        while os.path.exists(outfile):
-            i += 1
-            outfile = file + str(i) + '_recorded.csv'
-
-        self.file = open(outfile, 'w')
-        self.file.write(
-            "time,io,ctlmode,ctlbrake,ctlthrottle,ctlgear_location,vehicle_speed,"
-            +
-            "engine_rpm,driving_mode,throttle_percentage,brake_percentage,gear_location, imu\n"
-        )
-
+    def __init__(self):
         self.sequence_num = 0
         self.control_pub = rospy.Publisher(
             '/apollo/control', control_cmd_pb2.ControlCommand, queue_size=1)
         rospy.sleep(0.3)
         self.controlcmd = control_cmd_pb2.ControlCommand()
 
-        # Send First Reset Message
+        self.canmsg_received = False
+        self.localization_received = False
+
+        self.outfile = ""
+
+    def run(self, cmd):
+        signal.signal(signal.SIGINT, self.signal_handler)
+
+        self.in_session = True
+        self.cmd = map(float, cmd)
+        out = ''
+        if self.cmd[0] > 0:
+            out = out + 't'
+        else:
+            out = out + 'b'
+        out = out + str(int(self.cmd[0]))
+        if self.cmd[2] > 0:
+            out = out + 't'
+        else:
+            out = out + 'b'
+        out = out + str(int(self.cmd[2])) + 'r'
+        i = 0
+        self.outfile = out + str(i) + '.csv'
+        while os.path.exists(self.outfile):
+            i += 1
+            self.outfile = out + str(i) + '.csv'
+        self.file = open(self.outfile, 'w')
+        self.file.write(
+            "time,io,ctlmode,ctlbrake,ctlthrottle,ctlgear_location,vehicle_speed,"
+            +
+            "engine_rpm,driving_mode,throttle_percentage,brake_percentage,gear_location, imu\n"
+        )
+
         print "Send Reset Command"
         self.controlcmd.header.module_name = "control"
         self.controlcmd.header.sequence_num = self.sequence_num
@@ -67,7 +86,7 @@ class DataCollector(object):
         self.controlcmd.pad_msg.action = 2
         self.control_pub.publish(self.controlcmd)
 
-        rospy.sleep(0.3)
+        rospy.sleep(0.2)
         # Set Default Message
         print "Send Default Command"
         self.controlcmd.pad_msg.action = 1
@@ -75,12 +94,17 @@ class DataCollector(object):
         self.controlcmd.brake = 0
         self.controlcmd.steering_rate = 100
         self.controlcmd.steering_target = 0
-        self.controlcmd.gear_location = chassis_pb2.Chassis.GEAR_NEUTRAL
+        self.controlcmd.gear_location = chassis_pb2.Chassis.GEAR_DRIVE
 
-        self.printedcondition = False
-        self.runtimer = False
         self.canmsg_received = False
-        self.localization_received = False
+
+        rate = rospy.Rate(100)
+        while self.in_session:
+            self.publish_control()
+            rate.sleep()
+
+    def signal_handler(self, signal, frame):
+        self.in_session = False
 
     def callback_localization(self, data):
         """
@@ -104,8 +128,9 @@ class DataCollector(object):
         self.gear_location = data.gear_location
         self.driving_mode = data.driving_mode
 
-        self.write_file(timenow, 0)
         self.canmsg_received = True
+        if self.in_session:
+            self.write_file(timenow, 0)
 
     def publish_control(self):
         """
@@ -118,53 +143,30 @@ class DataCollector(object):
         self.controlcmd.header.sequence_num = self.sequence_num
         self.sequence_num = self.sequence_num + 1
 
-        while self.index < len(self.proc):
-            cmdtype = self.proc[self.index][0]
-            proc = self.proc[self.index][2:].lstrip()
-            if cmdtype == 'a':
-                command = 'self.controlcmd.' + proc
-                exec (command)
-                self.index = self.index + 1
-                self.printedcondition = False
-                print proc
-            elif cmdtype == 'c':
-                condition = 'self.' + proc
-                if eval(condition):
-                    self.index = self.index + 1
-                    self.printedcondition = False
-                    print proc
-                else:
-                    if not self.printedcondition:
-                        print "Waiting for condition: ", proc
-                        self.printedcondition = True
-                    break
-            elif cmdtype == 't':
-                delaytime = float(proc)
-                if not self.runtimer:
-                    self.starttime = rospy.get_time()
-                    self.runtimer = True
-                    print "Waiting for time: ", delaytime
-                    break
-                elif rospy.get_time() > (self.starttime + delaytime):
-                    self.index = self.index + 1
-                    self.runtimer = False
-                    print "Delayed for: ", delaytime
-                else:
-                    break
+        if self.case == 'a':
+            if self.cmd[0] > 0:
+                self.controlcmd.throttle = self.cmd[0]
+                self.controlcmd.brake = 0
             else:
-                print "Invalid Command, What are you doing?"
-                print "Exiting"
-                self.file.close()
-                rospy.signal_shutdown("Shutting down")
+                self.controlcmd.throttle = 0
+                self.controlcmd.brake = -self.cmd[0]
+            if self.vehicle_speed >= self.cmd[1]:
+                self.case = 'd'
+        elif self.case == 'd':
+            if self.cmd[2] > 0:
+                self.controlcmd.throttle = self.cmd[0]
+                self.controlcmd.brake = 0
+            else:
+                self.controlcmd.throttle = 0
+                self.controlcmd.brake = -self.cmd[0]
+            if self.vehicle_speed == 0:
+                self.in_session = False
 
         self.controlcmd.header.timestamp_sec = rospy.get_time()
-        #self.control_pub.publish(self.controlcmd.SerializeToString())
         self.control_pub.publish(self.controlcmd)
         self.write_file(self.controlcmd.header.timestamp_sec, 1)
-        if self.index >= len(self.proc):
-            print "Reached end of commands, shutting down"
+        if self.in_session == False:
             self.file.close()
-            rospy.signal_shutdown("Shutting down")
 
     def write_file(self, time, io):
         """
@@ -182,26 +184,45 @@ def main():
     """
     Main function
     """
-    if len(sys.argv) <= 1:
-        print "Require Command Script"
-        return
-    elif len(sys.argv) > 2:
-        print "Too many inputs"
-        return
-    file = sys.argv[1]
     rospy.init_node('data_collector', anonymous=True)
 
-    data_collector = DataCollector(file)
+    data_collector = DataCollector()
+    plotter = Plotter()
     localizationsub = rospy.Subscriber('/apollo/localization/pose',
                                        localization_pb2.LocalizationEstimate,
                                        data_collector.callback_localization)
     canbussub = rospy.Subscriber('/apollo/canbus/chassis', chassis_pb2.Chassis,
                                  data_collector.callback_canbus)
 
-    rate = rospy.Rate(100)
-    while not rospy.is_shutdown():
-        data_collector.publish_control()
-        rate.sleep()
+    print "Enter q to quit"
+    print "Enter p to plot result from last run"
+    print "Enter x to remove result from last run"
+    print "Enter x y z, where x is acceleration command, y is speed limit, z is decceleration command"
+    print "Positive number for throttle and negative number for brake"
+
+    while True:
+        cmd = raw_input("Enter commands: ").split()
+        if len(cmd) == 0:
+            print "Quiting"
+            break
+        elif len(cmd) == 1:
+            if cmd[0] == "q":
+                break
+            elif cmd[0] == "p":
+                print "Plotting result"
+                if os.path.exists(data_collector.outfile):
+                    plotter.process_data(data_collector.outfile)
+                    plotter.plot_result()
+                else:
+                    print "File does not exist"
+            elif cmd[0] == "x":
+                print "Removing last result"
+                if os.path.exists(data_collector.outfile):
+                    os.remove(data_collector.outfile)
+                else:
+                    print "File does not exist"
+        elif len(cmd) == 3:
+            data_collector.run(cmd)
 
 
 if __name__ == '__main__':

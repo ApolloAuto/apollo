@@ -69,10 +69,10 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(
-      reference_line_info_->pnc_map(), adc_sl_boundary, st_boundary_config_,
-      reference_line, path_data, dp_st_speed_config_.total_path_length(),
-      dp_st_speed_config_.total_time());
+  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
+                                   reference_line, path_data,
+                                   dp_st_speed_config_.total_path_length(),
+                                   dp_st_speed_config_.total_time());
 
   // step 1 get boundaries
   path_decision->EraseStBoundaries();

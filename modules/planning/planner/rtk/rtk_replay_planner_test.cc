@@ -40,6 +40,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_y(4140674.76063);
 
   ReferenceLine reference_line;
+  hdmap::RouteSegments segments;
   localization::LocalizationEstimate localization;
   canbus::Chassis chassis;
   localization.mutable_pose()->mutable_position()->set_x(586385.782842);
@@ -51,8 +52,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
   common::VehicleState::instance()->Update(localization, chassis);
-  ReferenceLineSmootherConfig smooth_config;
-  ReferenceLineInfo info(nullptr, reference_line, start_point, smooth_config);
+  ReferenceLineInfo info(nullptr, reference_line, segments, start_point);
   auto status = planner.Plan(start_point, nullptr, &info);
 
   const auto& trajectory = info.trajectory();
@@ -92,8 +92,8 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
   common::VehicleState::instance()->Update(localization, chassis);
   ReferenceLine ref;
-  ReferenceLineSmootherConfig smooth_config;
-  ReferenceLineInfo info(nullptr, ref, start_point, smooth_config);
+  hdmap::RouteSegments segments;
+  ReferenceLineInfo info(nullptr, ref, segments, start_point);
   EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &info)).ok());
 }
 

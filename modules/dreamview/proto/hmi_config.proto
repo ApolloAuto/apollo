@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message Component {
+  optional string display_name = 1;
+  map<string, string> supported_commands = 2;
+}
+
+message HMIConfig {
+  map<string, Component> modules = 1;          // {module_name: module}
+  map<string, Component> hardware = 2;         // {hardware_name: hardware}
+  map<string, string> available_maps = 3;      // {map_name: map_dir}
+  map<string, string> available_vehicles = 4;  // {vehicle_name: vehicle_dir}
+}

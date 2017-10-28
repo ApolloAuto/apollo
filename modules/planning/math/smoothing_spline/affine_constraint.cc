@@ -53,6 +53,10 @@ bool AffineConstraint::AddConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
   if (constraint_matrix.rows() != constraint_boundary.rows()) {
+    AERROR << "Fail to add constraint because constraint matrix rows != "
+              "constraint boundary rows.";
+    AERROR << "constraint matrix rows = " << constraint_matrix.rows();
+    AERROR << "constraint boundary rows = " << constraint_boundary.rows();
     return false;
   }
 
@@ -61,11 +65,18 @@ bool AffineConstraint::AddConstraint(
     constraint_boundary_ = constraint_boundary;
     return true;
   }
-
-  if (constraint_matrix_.cols() != constraint_matrix.cols() ||
-      constraint_boundary.cols() != 1) {
+  if (constraint_matrix_.cols() != constraint_matrix.cols()) {
+    AERROR
+        << "constraint_matrix_ cols and constraint_matrix cols do not match.";
+    AERROR << "constraint_matrix_.cols() = " << constraint_matrix_.cols();
+    AERROR << "constraint_matrix.cols() = " << constraint_matrix.cols();
     return false;
   }
+  if (constraint_boundary.cols() != 1) {
+    AERROR << "constraint_boundary.cols() should be 1.";
+    return false;
+  }
+
   Eigen::MatrixXd n_matrix(constraint_matrix_.rows() + constraint_matrix.rows(),
                            constraint_matrix_.cols());
   Eigen::MatrixXd n_boundary(

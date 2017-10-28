@@ -33,7 +33,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/decider.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
@@ -43,14 +42,14 @@ using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 
-ReferenceLineInfo::ReferenceLineInfo(
-    const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
-    const TrajectoryPoint& init_adc_point,
-    const ReferenceLineSmootherConfig& smoother_config)
+ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+                                     const ReferenceLine& reference_line,
+                                     const hdmap::RouteSegments& segments,
+                                     const TrajectoryPoint& init_adc_point)
     : pnc_map_(pnc_map),
       reference_line_(reference_line),
       init_adc_point_(init_adc_point),
-      smoother_config_(smoother_config) {}
+      lanes_(segments) {}
 
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -67,6 +66,30 @@ bool ReferenceLineInfo::Init() {
     return false;
   }
   return true;
+}
+
+const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
+
+bool ReferenceLineInfo::HasReachedDestination() {
+  auto* dest_obstacle = path_decision_.Find(FLAGS_destination_obstacle_id);
+  if (!dest_obstacle) {
+    return false;
+  }
+  if (dest_obstacle->perception_sl_boundary().start_s() >
+      reference_line_.Length()) {
+    return false;
+  }
+  if (!reference_line_.HasOverlap(
+          dest_obstacle->obstacle()->PerceptionBoundingBox())) {
+    return false;
+  }
+  const double kDistanceDelta = 0.5;
+  if (dest_obstacle->perception_sl_boundary().start_s() <
+      adc_sl_boundary_.end_s() + FLAGS_stop_distance_destination +
+          kDistanceDelta) {
+    return true;
+  }
+  return false;
 }
 
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {

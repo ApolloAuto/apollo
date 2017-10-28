@@ -26,10 +26,10 @@ cc_library(
         "lincoln_message_manager.h",
     ],
     deps = [
-        "//modules/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle:message_manager_base",
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -43,12 +43,12 @@ cc_library(
     ],
     deps = [
         ":lincoln_message_manager",
-        "//modules/canbus/can_comm:can_sender",
-        "//modules/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
         "@gtest//:gtest",
     ],
 )

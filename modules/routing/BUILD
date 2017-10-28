@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "lib_routing",
+    name = "routing_lib",
     srcs = [
         "routing.cc",
     ],
@@ -20,6 +20,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
+        "//modules/routing/graph",
         "//modules/routing/proto:routing_proto",
         "@ros//:ros_common",
     ],
@@ -29,7 +30,7 @@ cc_binary(
     name = "routing",
     srcs = ["main.cc"],
     deps = [
-        ":lib_routing",
+        ":routing_lib",
         "//external:gflags",
     ],
 )

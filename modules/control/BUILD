@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_library(
-    name = "lib_control",
+    name = "control_lib",
     srcs = [
         "control.cc",
     ],
@@ -40,7 +40,7 @@ cc_binary(
     name = "control",
     srcs = ["main.cc"],
     deps = [
-        ":lib_control",
+        ":control_lib",
         "//external:gflags",
         "//modules/control/common",
     ],
@@ -54,7 +54,7 @@ cc_test(
     ],
     data = ["//modules/control:control_testdata"],
     deps = [
-        ":lib_control",
+        ":control_lib",
         "@gtest//:main",
     ],
 )

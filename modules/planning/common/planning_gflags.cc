@@ -17,7 +17,8 @@
 #include "modules/planning/common/planning_gflags.h"
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
-DEFINE_string(adapter_config_filename, "modules/planning/conf/adapter.conf",
+DEFINE_string(planning_adapter_config_filename,
+              "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
@@ -27,19 +28,32 @@ DEFINE_uint64(rtk_trajectory_forward, 800,
               "The number of points to be included in RTK trajectory "
               "after the matched point");
 
-DEFINE_double(trajectory_resolution, 0.01,
-              "The time resolution of "
-              "output trajectory.");
+DEFINE_double(rtk_trajectory_resolution, 0.01,
+              "The time resolution of output trajectory for rtk planner.");
+
+DEFINE_bool(publish_estop, false, "publish estop decision in planning");
+DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
 DEFINE_double(
-    look_backward_distance, 10,
+    look_backward_distance, 30,
     "look backward this distance when creating reference line from routing");
 
 DEFINE_double(
-    look_forward_distance, 100,
+    look_forward_distance, 250,
     "look forward this distance when creating reference line from routing");
+
+DEFINE_double(look_forward_min_distance, 100,
+              "minimal look forward this distance when creating reference line "
+              "from routing");
+DEFINE_double(look_forward_time_sec, 8,
+              "look forward time times adc speed to calculate this distance "
+              "when creating reference line from routing");
+
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
+
+DEFINE_bool(enable_spiral_reference_line, false,
+            "enable new spiral based reference line");
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
@@ -50,11 +64,15 @@ DEFINE_double(max_collision_distance, 0.1,
 DEFINE_double(replan_distance_threshold, 5.0,
               "The distance threshold of replan");
 
-DEFINE_bool(enable_reference_line_provider_thread, false,
+DEFINE_bool(enable_reference_line_provider_thread, true,
             "Enable reference line provider thread.");
 
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
+
+DEFINE_double(smoothed_reference_line_max_diff, 1.0,
+              "Maximum position difference between the smoothed and the raw "
+              "reference lines.");
 
 DEFINE_double(planning_upper_speed_limit, 31.3,
               "Maximum speed (m/s) in planning.");
@@ -62,8 +80,8 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
-DEFINE_double(output_trajectory_time_resolution, 0.05,
-              "Trajectory time resolution when publish");
+DEFINE_double(output_trajectory_time_resolution, 0.01,
+              "Trajectory time resolution when publish for EM planner");
 
 DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");
@@ -86,7 +104,9 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
 
-DEFINE_double(kappa_bound, 1.00, "The bound for vehicle curvature");
+DEFINE_double(kappa_bound, 0.20, "The bound for vehicle curvature");
+DEFINE_double(dkappa_bound, 0.02,
+              "The bound for vehicle curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
@@ -110,7 +130,7 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
 DEFINE_double(follow_min_distance, 10,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(
-    follow_time_buffer, 4.0,
+    follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
 
 DEFINE_string(destination_obstacle_id, "DEST",
@@ -134,18 +154,18 @@ DEFINE_bool(enable_rule_layer, true,
 /// common
 DEFINE_double(stop_max_distance_buffer, 4.0,
               "distance buffer of passing stop line");
-DEFINE_double(stop_min_speed, 0.1,
-              "min speed for computing stop");
-DEFINE_double(stop_max_deceleration, 6.0,
-              "max deceleration");
+DEFINE_double(stop_min_speed, 0.1, "min speed for computing stop");
+DEFINE_double(stop_max_deceleration, 6.0, "max deceleration");
+/// Clear Zone
+DEFINE_string(clear_zone_virtual_object_id_prefix, "CZ_",
+              "prefix for converting clear zone id to virtual object id");
 /// traffic light
-DEFINE_bool(enable_signal_lights, false, "enable signal_lights");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
 DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
               "treat yellow light as red when deceleration (abstract value"
-                  " in m/s^2) is less than this threshold; otherwise treated"
-                  " as green light");
+              " in m/s^2) is less than this threshold; otherwise treated"
+              " as green light");
 /// crosswalk
 DEFINE_bool(enable_crosswalk, false, "enable crosswalk");
 DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
@@ -153,15 +173,10 @@ DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
 DEFINE_double(crosswalk_expand_distance, 2.0,
               "crosswalk expand distance(meter) "
               "for pedestrian/bicycle detection");
-DEFINE_double(crosswalk_max_l1_distance_to_ignore_pedestrian, 4.0,
-              "max l_distance to ignore pedestrian on crosswalk "
-              "when path not crosses");
-DEFINE_double(crosswalk_max_l2_distance_to_ignore_pedestrian, 5.0,
-              "to smooth stop/ignore decision when pedestrian close to "
-              "crosswalk_max_l1_distance_to_ignore_pedestrian");
-DEFINE_double(crosswalk_min_stop_line_distance, 1.0,
-              "stop distance(m) before indovidual "
-              "pedestrian/bicycle/movable passing crosswalk");
+DEFINE_double(crosswalk_strick_l_distance, 4.0,
+              "strick stop rule within this l_distance");
+DEFINE_double(crosswalk_loose_l_distance, 5.0,
+              "loose stop rule beyond this l_distance");
 
 // planning config file
 DEFINE_string(planning_config_file,
@@ -187,3 +202,6 @@ DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
             "Enable follow acceleration constraint.");
+
+// SQP solver
+DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");

@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Define the data container base class
+ * @brief Define the predictor base class
  */
 
 #ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
@@ -64,6 +64,11 @@ class Predictor {
    * @return Size of trajectories
    */
   int NumOfTrajectories();
+
+  /**
+   * @brief Clear all trajectories
+   */
+  virtual void Clear();
 
  protected:
   /**

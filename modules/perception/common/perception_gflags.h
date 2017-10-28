@@ -19,7 +19,7 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_string(adapter_config_filename);
+DECLARE_string(perception_adapter_config_filename);
 
 /// lib/config_manager/config_manager.cc
 DECLARE_string(config_manager_path);

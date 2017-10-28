@@ -46,6 +46,25 @@ class Map:
         res = proto_utils.get_pb_from_file(map_file_name, self.map_pb)
         return res != None
 
+    def draw_roads(self, ax):
+        cnt = 1
+        for road in self.map_pb.road:
+            color_val = self.colors[cnt % len(self.colors)]
+            self.draw_road(ax, road, color_val)
+            cnt += 1
+
+    def draw_road(self, ax, road, color_val):
+        for section in road.section:
+            for edge in section.boundary.outer_polygon.edge:
+                for segment in edge.curve.segment:
+                    if segment.HasField('line_segment'):
+                        px = []
+                        py = []
+                        for p in segment.line_segment.point:
+                            px.append(float(p.x))
+                            py.append(float(p.y))
+                        ax.plot(px, py, ls='-', c=color_val, alpha = 0.5)
+
     def draw_lanes(self, ax, is_show_lane_ids, laneids):
         cnt = 1
         for lane in  self.map_pb.lane:

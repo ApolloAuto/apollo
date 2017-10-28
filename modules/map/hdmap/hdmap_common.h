@@ -35,6 +35,8 @@ limitations under the License.
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/map/proto/map_clear_area.pb.h"
+#include "modules/map/proto/map_speed_bump.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -77,6 +79,7 @@ class StopSignInfo;
 class YieldSignInfo;
 class OverlapInfo;
 class ClearAreaInfo;
+class SpeedBumpInfo;
 
 class HDMapImpl;
 
@@ -121,6 +124,12 @@ class LaneInfo {
   }
   const std::vector<OverlapInfoConstPtr> &junctions() const {
     return junctions_;
+  }
+  const std::vector<OverlapInfoConstPtr> &clear_areas() const {
+    return clear_areas_;
+  }
+  const std::vector<OverlapInfoConstPtr> &speed_bumps() const {
+    return speed_bumps_;
   }
   double total_length() const { return total_length_; }
   using SampledWidth = std::pair<double, double>;
@@ -175,6 +184,8 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> crosswalks_;
   std::vector<OverlapInfoConstPtr> parking_spaces_;
   std::vector<OverlapInfoConstPtr> junctions_;
+  std::vector<OverlapInfoConstPtr> clear_areas_;
+  std::vector<OverlapInfoConstPtr> speed_bumps_;
   double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;
@@ -193,7 +204,6 @@ class JunctionInfo {
   const Id &id() const { return junction_.id(); }
   const Junction &junction() const { return junction_; }
   const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
-  const apollo::common::math::AABox2d &mbr() const { return mbr_; }
 
  private:
   void Init();
@@ -201,7 +211,6 @@ class JunctionInfo {
  private:
   const Junction &junction_;
   apollo::common::math::Polygon2d polygon_;
-  apollo::common::math::AABox2d mbr_;
 };
 using JunctionPolygonBox =
     ObjectWithAABox<JunctionInfo, apollo::common::math::Polygon2d>;
@@ -294,6 +303,47 @@ using YieldSignSegmentBox =
 using YieldSignSegmentKDTree =
     apollo::common::math::AABoxKDTree2d<YieldSignSegmentBox>;
 
+class ClearAreaInfo {
+ public:
+  explicit ClearAreaInfo(const ClearArea &clear_area);
+
+  const Id &id() const { return clear_area_.id(); }
+  const ClearArea &clear_area() const { return clear_area_; }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+
+ private:
+  void Init();
+
+ private:
+  const ClearArea &clear_area_;
+  apollo::common::math::Polygon2d polygon_;
+};
+using ClearAreaPolygonBox =
+    ObjectWithAABox<ClearAreaInfo, apollo::common::math::Polygon2d>;
+using ClearAreaPolygonKDTree =
+    apollo::common::math::AABoxKDTree2d<ClearAreaPolygonBox>;
+
+class SpeedBumpInfo {
+ public:
+  explicit SpeedBumpInfo(const SpeedBump &speed_bump);
+
+  const Id &id() const { return speed_bump_.id(); }
+  const SpeedBump &speed_bump() const { return speed_bump_; }
+  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
+    return segments_;
+  }
+ private:
+  void Init();
+
+ private:
+  const SpeedBump &speed_bump_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
+};
+using SpeedBumpSegmentBox =
+    ObjectWithAABox<SpeedBumpInfo, apollo::common::math::LineSegment2d>;
+using SpeedBumpSegmentKDTree =
+    apollo::common::math::AABoxKDTree2d<SpeedBumpSegmentBox>;
+
 class OverlapInfo {
  public:
   explicit OverlapInfo(const Overlap &overlap);
@@ -324,14 +374,16 @@ class RoadInfo {
   std::vector<RoadBoundary> road_boundaries_;
 };
 
-typedef std::shared_ptr<const LaneInfo> LaneInfoConstPtr;
-typedef std::shared_ptr<const JunctionInfo> JunctionInfoConstPtr;
-typedef std::shared_ptr<const SignalInfo> SignalInfoConstPtr;
-typedef std::shared_ptr<const CrosswalkInfo> CrosswalkInfoConstPtr;
-typedef std::shared_ptr<const StopSignInfo> StopSignInfoConstPtr;
-typedef std::shared_ptr<const YieldSignInfo> YieldSignInfoConstPtr;
-typedef std::shared_ptr<const RoadInfo> RoadInfoConstPtr;
-typedef std::shared_ptr<RoadROIBoundary> RoadROIBoundaryPtr;
+using LaneInfoConstPtr = std::shared_ptr<const LaneInfo>;
+using JunctionInfoConstPtr = std::shared_ptr<const JunctionInfo>;
+using SignalInfoConstPtr = std::shared_ptr<const SignalInfo>;
+using CrosswalkInfoConstPtr = std::shared_ptr<const CrosswalkInfo>;
+using StopSignInfoConstPtr = std::shared_ptr<const StopSignInfo>;
+using YieldSignInfoConstPtr = std::shared_ptr<const YieldSignInfo>;
+using ClearAreaInfoConstPtr = std::shared_ptr<const ClearAreaInfo>;
+using SpeedBumpInfoConstPtr = std::shared_ptr<const SpeedBumpInfo>;
+using RoadInfoConstPtr = std::shared_ptr<const RoadInfo>;
+using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
 
 struct JunctionBoundary {
   JunctionInfoConstPtr junction_info;

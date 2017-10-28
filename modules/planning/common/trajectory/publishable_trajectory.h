@@ -31,8 +31,13 @@ namespace planning {
 class PublishableTrajectory : public DiscretizedTrajectory {
  public:
   PublishableTrajectory() = default;
+
   PublishableTrajectory(const double header_time,
                         const DiscretizedTrajectory& discretized_trajectory);
+  /**
+   * Create a publishable trajectory based on a trajectory protobuf
+   */
+  explicit PublishableTrajectory(const ADCTrajectory& trajectory_pb);
 
   double header_time() const;
 

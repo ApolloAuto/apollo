@@ -42,10 +42,10 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class Localization
+ * @class planning
  *
- * @brief Localization module main class. It processes GPS and IMU as input,
- * to generate localization info.
+ * @brief Planning module main class. It processes GPS and IMU as input,
+ * to generate planning info.
  */
 class Planning : public apollo::common::ApolloApp {
  public:
@@ -87,6 +87,10 @@ class Planning : public apollo::common::ApolloApp {
   common::Status InitFrame(const uint32_t sequence_num, const double time_stamp,
                            const common::TrajectoryPoint& init_adc_point);
 
+  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
+
+  void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
+
  private:
   // Watch dog timer
   void OnTimer(const ros::TimerEvent&);
@@ -95,18 +99,20 @@ class Planning : public apollo::common::ApolloApp {
 
   void RegisterPlanners();
 
+  bool HasSignalLight(const PlanningConfig& config);
+
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
 
   PlanningConfig config_;
 
-  std::unique_ptr<hdmap::PncMap> pnc_map_;
+  const hdmap::HDMap* hdmap_ = nullptr;
 
   std::unique_ptr<Frame> frame_;
 
   std::unique_ptr<Planner> planner_;
 
-  PublishableTrajectory last_publishable_trajectory_;
+  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
   ros::Timer timer_;
 };

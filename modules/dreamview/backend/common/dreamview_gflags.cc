@@ -18,8 +18,11 @@
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
-DEFINE_string(adapter_config_filename, "modules/dreamview/conf/adapter.conf",
-              "The adapter config file");
+DEFINE_string(dreamview_adapter_config_filename,
+              "modules/dreamview/conf/adapter.conf", "The adapter config file");
+
+DEFINE_string(hmi_config_filename, "modules/dreamview/conf/hmi.conf",
+              "The HMI config file");
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
@@ -30,9 +33,9 @@ DEFINE_string(server_ports, "8888",
               "a letter s must be appended, for example, 80,443s will open "
               "port 80 and port 443.");
 
-DEFINE_bool(
-    enable_sim_control, false,
-    "Whether to enable SimControl to publish localiztion and chassis message.");
+DEFINE_bool(enable_sim_control, false,
+            "Whether to enable SimControl to publish localization and chassis "
+            "message.");
 
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");

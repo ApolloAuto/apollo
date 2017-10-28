@@ -16,14 +16,12 @@
 
 #include "modules/routing/core/black_list_range_generator.h"
 
-#include <assert.h>
-
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace routing {
 
-double S_GAP_FOR_BLACK = 0.01;
+constexpr double S_GAP_FOR_BLACK = 0.01;
 
 namespace {
 
@@ -55,11 +53,10 @@ void GetOutParallelLane(const TopoNode* node,
                         std::unordered_set<const TopoNode*>* const node_set) {
   for (const auto* edge : node->OutToLeftOrRightEdge()) {
     const auto* to_node = edge->ToNode();
-    if (node_set->find(to_node) != node_set->end()) {
-      continue;
+    if (node_set->count(to_node) == 0) {
+      node_set->emplace(to_node);
+      GetOutParallelLane(to_node, node_set);
     }
-    node_set->emplace(to_node);
-    GetOutParallelLane(to_node, node_set);
   }
 }
 
@@ -67,11 +64,10 @@ void GetInParallelLane(const TopoNode* node,
                        std::unordered_set<const TopoNode*>* const node_set) {
   for (const auto* edge : node->InFromLeftOrRightEdge()) {
     const auto* from_node = edge->FromNode();
-    if (node_set->find(from_node) != node_set->end()) {
-      continue;
+    if (node_set->count(from_node) == 0) {
+      node_set->emplace(from_node);
+      GetInParallelLane(from_node, node_set);
     }
-    node_set->emplace(from_node);
-    GetInParallelLane(from_node, node_set);
   }
 }
 
@@ -92,10 +88,9 @@ void AddBlackMapFromLane(const RoutingRequest& request, const TopoGraph* graph,
                          TopoRangeManager* const range_manager) {
   for (const auto& lane : request.blacklisted_lane()) {
     const auto* node = graph->GetNode(lane.id());
-    if (node == nullptr) {
-      continue;
+    if (node) {
+      range_manager->Add(node, lane.start_s(), lane.end_s());
     }
-    range_manager->Add(node, lane.start_s(), lane.end_s());
   }
 }
 
@@ -103,9 +98,7 @@ void AddBlackMapFromOutParallel(const TopoNode* node, double cut_ratio,
                                 TopoRangeManager* const range_manager) {
   std::unordered_set<const TopoNode*> par_node_set;
   GetOutParallelLane(node, &par_node_set);
-  if (par_node_set.find(node) != par_node_set.end()) {
-    par_node_set.erase(node);
-  }
+  par_node_set.erase(node);
   for (const auto* par_node : par_node_set) {
     double par_cut_s = cut_ratio * par_node->Length();
     range_manager->Add(par_node, par_cut_s, par_cut_s);
@@ -116,9 +109,7 @@ void AddBlackMapFromInParallel(const TopoNode* node, double cut_ratio,
                                TopoRangeManager* const range_manager) {
   std::unordered_set<const TopoNode*> par_node_set;
   GetInParallelLane(node, &par_node_set);
-  if (par_node_set.find(node) != par_node_set.end()) {
-    par_node_set.erase(node);
-  }
+  par_node_set.erase(node);
   for (const auto* par_node : par_node_set) {
     double par_cut_s = cut_ratio * par_node->Length();
     range_manager->Add(par_node, par_cut_s, par_cut_s);

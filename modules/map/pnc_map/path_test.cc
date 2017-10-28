@@ -44,9 +44,6 @@ namespace apollo {
 namespace hdmap {
 namespace {
 
-const char kMapFilename[] =
-    "modules/map/pnc_map/testdata/example_intersection.graph";
-
 Point MakePoint(double x, double y, double z) {
   Point pt;
   pt.set_x(x);

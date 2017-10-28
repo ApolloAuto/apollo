@@ -57,11 +57,7 @@ export function drawCircle(radius, material, segments = 32) {
 
 export function drawThickBandFromPoints(
     points, thickness = 0.5, color = 0xffffff, opacity = 1, zOffset = 0) {
-    // const quality = 5;
-    // const curve = bezier(points.map(p => [p.x, p.y]), quality);
-
     const geometry = Line(points.map(p => [p.x, p.y]));
-
     const material = new THREE.ShaderMaterial(BasicShader({
         side: THREE.DoubleSide,
         diffuse: color,
@@ -99,9 +95,23 @@ export function drawBox(dimension, color, linewidth) {
     const material = new THREE.MeshBasicMaterial({color: color});
     const cube = new THREE.Mesh(geometry, material);
     const box = new THREE.BoxHelper(cube);
-    box.material.color = new THREE.Color(color);
     box.material.linewidth = linewidth;
     return box;
+}
+
+export function drawDashedBox(dimension, color, linewidth, dashSize = 0.01, gapSize = 0.02) {
+    let geometry = new THREE.CubeGeometry(dimension.x, dimension.y, dimension.z);
+    geometry = new THREE.EdgesGeometry( geometry );
+    geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+    geometry.computeLineDistances();
+    const material = new THREE.LineDashedMaterial({
+        color: color,
+        linewidth: linewidth,
+        dashSize: dashSize,
+        gapSize: gapSize
+    });
+    const cube = new THREE.LineSegments(geometry, material);
+    return cube;
 }
 
 export function drawArrow(length, linewidth, conelength, conewidth, color) {

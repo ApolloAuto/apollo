@@ -3,16 +3,13 @@ syntax = "proto2";
 package apollo.planning;
 
 message ReferenceLineSmootherConfig {
-  optional uint32 num_spline = 1 [default =  6];
-  optional uint32 spline_order = 2 [default =  6];
-  optional uint32 num_evaluated_points = 3 [default =  13];
-  optional double boundary_bound = 4 [default =  0.2];
-  optional double derivative_bound = 5 [default =  1.0];
-  optional double second_derivative_bound = 6 [default =  1.0];
-  optional double third_derivative_bound = 7 [default =  1.0];
-  optional double ref_line_weight = 8 [default =  0.0];
-  optional double derivative_weight = 9 [default =  0.0];
-  optional double second_derivative_weight = 10 [default =  0.0];
-  optional double third_derivative_weight = 11 [default =  100];
-  optional uint32 num_of_total_points = 12 [default = 500];
+  optional uint32 spline_order = 1 [default = 6];
+  optional double max_spline_length = 2 [default = 25];
+  optional uint32 constraint_to_knots_ratio = 3 [default = 5];
+  optional double longitudinal_boundary_bound = 4 [default = 1.0];
+  optional double lateral_boundary_bound = 5 [default = 0.1];
+  optional double second_derivative_weight = 6 [default = 0.0];
+  optional double third_derivative_weight = 7 [default = 100];
+  optional uint32 num_of_total_points = 8 [default = 500];
+  optional double regularization_weight = 9 [ default = 0.1 ];
 }

@@ -48,6 +48,14 @@ YieldSignInfoConstPtr HDMap::GetYieldSignById(const Id& id) const {
   return impl_.GetYieldSignById(id);
 }
 
+ClearAreaInfoConstPtr HDMap::GetClearAreaById(const Id& id) const {
+  return impl_.GetClearAreaById(id);
+}
+
+SpeedBumpInfoConstPtr HDMap::GetSpeedBumpById(const Id& id) const {
+  return impl_.GetSpeedBumpById(id);
+}
+
 OverlapInfoConstPtr HDMap::GetOverlapById(const Id& id) const {
   return impl_.GetOverlapById(id);
 }
@@ -85,6 +93,18 @@ int HDMap::GetYieldSigns(
     const apollo::common::PointENU& point, double distance,
     std::vector<YieldSignInfoConstPtr>* yield_signs) const {
   return impl_.GetYieldSigns(point, distance, yield_signs);
+}
+
+int HDMap::GetClearAreas(
+    const apollo::common::PointENU& point, double distance,
+    std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
+  return impl_.GetClearAreas(point, distance, clear_areas);
+}
+
+int HDMap::GetSpeedBumps(
+    const apollo::common::PointENU& point, double distance,
+    std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
+  return impl_.GetSpeedBumps(point, distance, speed_bumps);
 }
 
 int HDMap::GetRoads(const apollo::common::PointENU& point, double distance,

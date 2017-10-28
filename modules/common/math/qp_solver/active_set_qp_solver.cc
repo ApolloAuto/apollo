@@ -50,9 +50,16 @@ ActiveSetQpSolver::ActiveSetQpSolver(
 bool ActiveSetQpSolver::Solve() {
   ::qpOASES::QProblem qp_problem(num_param_, num_constraint_, hessian_type_);
   ::qpOASES::Options my_options;
+
+  my_options.enableCholeskyRefactorisation = cholesky_refactorisation_freq_;
+  if (hessian_type_ == ::qpOASES::HST_POSDEF ||
+      hessian_type_ == ::qpOASES::HST_SEMIDEF) {
+    my_options.enableRegularisation = ::qpOASES::BT_TRUE;
+  }
   my_options.epsNum = qp_eps_num_;
   my_options.epsDen = qp_eps_den_;
   my_options.epsIterRef = qp_eps_iter_ref_;
+  my_options.terminationTolerance = termination_tolerance_;
   qp_problem.setOptions(my_options);
   if (!debug_info_) {
     qp_problem.setPrintLevel(qpOASES::PL_NONE);
@@ -74,7 +81,6 @@ bool ActiveSetQpSolver::Solve() {
 
   for (int r = 0; r < kernel_matrix_.rows(); ++r) {
     g_matrix[r] = offset_(r, 0);
-
     for (int c = 0; c < kernel_matrix_.cols(); ++c) {
       h_matrix[index++] = kernel_matrix_(r, c);
     }
@@ -136,6 +142,20 @@ bool ActiveSetQpSolver::Solve() {
       AERROR << "qpOASES solver failed due to infeasibility or other internal "
                 "reasons";
     }
+    std::stringstream ss;
+    ss << "ActiveSetQpSolver inputs: " << std::endl;
+    ss << "kernel_matrix:\n" << kernel_matrix_ << std::endl;
+    ss << "offset:\n" << offset_ << std::endl;
+    ss << "affine_inequality_matrix:\n"
+       << affine_inequality_matrix_ << std::endl;
+    ss << "affine_inequality_boundary:\n"
+       << affine_inequality_boundary_ << std::endl;
+    ss << "affine_equality_matrix:\n" << affine_equality_matrix_ << std::endl;
+    ss << "affine_equality_boundary:\n"
+       << affine_equality_boundary_ << std::endl;
+
+    ADEBUG << ss.str();
+
     return false;
   }
 

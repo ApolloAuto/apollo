@@ -41,10 +41,11 @@ class ReferenceLineSmoother {
   bool Init(const std::string& config_file);
   void Init(const ReferenceLineSmootherConfig& refline_smooth_config);
   bool Smooth(const ReferenceLine& raw_reference_line,
-              ReferenceLine* const smoothed_reference_line);
+              ReferenceLine* const smoothed_reference_line,
+              Spline2dSolver* const spline_solver);
 
  private:
-  void Reset();
+  void Clear();
 
   bool Sampling(const ReferenceLine& raw_reference_line);
 
@@ -66,7 +67,7 @@ class ReferenceLineSmoother {
   ReferenceLineSmootherConfig smoother_config_;
   std::vector<double> t_knots_;
   std::vector<common::PathPoint> ref_points_;
-  std::unique_ptr<Spline2dSolver> spline_solver_;
+  Spline2dSolver* spline_solver_ = nullptr;
 };
 
 }  // namespace planning

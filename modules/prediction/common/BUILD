@@ -8,7 +8,6 @@ cc_library(
     hdrs = ["prediction_gflags.h"],
     deps = [
         "//external:gflags",
-        "//modules/prediction/proto:prediction_proto",
     ],
 )
 
@@ -17,8 +16,12 @@ cc_library(
     srcs = ["prediction_util.cc"],
     hdrs = ["prediction_util.h"],
     deps = [
+        ":prediction_gflags",
+        ":prediction_map",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/prediction/proto:lane_graph_proto",
+        "@eigen//:eigen",
     ],
 )
 

@@ -24,13 +24,8 @@ DEFINE_string(adapter_config_filename, "modules/canbus/conf/adapter.conf",
               "The adapter config file");
 
 // data file
-DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf_dev.pb.txt",
+DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf.pb.txt",
               "Default canbus conf file");
-
-// maximum can port number
-DEFINE_int32(
-    max_port, 3,
-    "The maximum can port number (available can ports are 0 - max_port)");
 
 // Canbus gflags
 DEFINE_double(chassis_freq, 100, "Chassis feedback timer frequency.");

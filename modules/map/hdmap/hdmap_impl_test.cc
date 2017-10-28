@@ -102,6 +102,23 @@ TEST_F(HDMapImplTestSuite, GetYieldSignById) {
   EXPECT_STREQ(yield_sign_id.id().c_str(), yield_sign_ptr->id().id().c_str());
 }
 
+TEST_F(HDMapImplTestSuite, GetClearAreaById) {
+  Id clear_area_id;
+  clear_area_id.set_id("1");
+  EXPECT_TRUE(nullptr == hdmap_impl_.GetClearAreaById(clear_area_id));
+  clear_area_id.set_id("1254");
+  ClearAreaInfoConstPtr clear_area_ptr =
+      hdmap_impl_.GetClearAreaById(clear_area_id);
+  EXPECT_TRUE(nullptr != clear_area_ptr);
+  EXPECT_STREQ(clear_area_id.id().c_str(), clear_area_ptr->id().id().c_str());
+}
+
+TEST_F(HDMapImplTestSuite, GetSpeedBumpById) {
+  Id speed_bump_id;
+  speed_bump_id.set_id("1");
+  EXPECT_TRUE(nullptr == hdmap_impl_.GetSpeedBumpById(speed_bump_id));
+}
+
 TEST_F(HDMapImplTestSuite, GetOverlapById) {
   Id overlap_id;
   overlap_id.set_id("1");
@@ -238,6 +255,29 @@ TEST_F(HDMapImplTestSuite, GetYieldSigns) {
   EXPECT_EQ(0, hdmap_impl_.GetYieldSigns(point, 100.0, &yield_signs));
   EXPECT_EQ(1, yield_signs.size());
   EXPECT_EQ("1275", yield_signs[0]->id().id());
+}
+
+TEST_F(HDMapImplTestSuite, GetClearAreas) {
+  std::vector<ClearAreaInfoConstPtr> clear_areas;
+
+  apollo::common::PointENU point;
+  point.set_x(586426.24);
+  point.set_y(4140680.01);
+  point.set_z(0.0);
+  EXPECT_EQ(0, hdmap_impl_.GetClearAreas(point, 4.0, &clear_areas));
+  EXPECT_EQ(1, clear_areas.size());
+  EXPECT_EQ("1254", clear_areas[0]->id().id());
+}
+
+TEST_F(HDMapImplTestSuite, GetSpeedBumps) {
+  std::vector<SpeedBumpInfoConstPtr> speed_bumps;
+
+  apollo::common::PointENU point;
+  point.set_x(586410.13);
+  point.set_y(4140679.01);
+  point.set_z(0.0);
+  EXPECT_EQ(0, hdmap_impl_.GetSpeedBumps(point, 4.0, &speed_bumps));
+  EXPECT_EQ(0, speed_bumps.size());
 }
 
 TEST_F(HDMapImplTestSuite, GetRoads) {

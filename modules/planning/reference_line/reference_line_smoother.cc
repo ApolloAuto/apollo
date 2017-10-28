@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/math/curve_math.h"
 
 namespace apollo {
@@ -46,24 +47,23 @@ void ReferenceLineSmoother::Init(const ReferenceLineSmootherConfig& config) {
   smoother_config_ = config;
 }
 
-void ReferenceLineSmoother::Reset() {
+void ReferenceLineSmoother::Clear() {
   t_knots_.clear();
   ref_points_.clear();
-  spline_solver_.reset(nullptr);
 }
 
-bool ReferenceLineSmoother::Smooth(
-    const ReferenceLine& raw_reference_line,
-    ReferenceLine* const smoothed_reference_line) {
-  Reset();
+bool ReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line,
+                                   ReferenceLine* const smoothed_reference_line,
+                                   Spline2dSolver* const spline_solver) {
+  Clear();
+  spline_solver_ = spline_solver;
   std::vector<ReferencePoint> ref_points;
   if (!Sampling(raw_reference_line)) {
     AERROR << "Fail to sample reference line smoother points!";
     return false;
   }
 
-  spline_solver_.reset(
-      new Spline2dSolver(t_knots_, smoother_config_.spline_order()));
+  spline_solver_->Reset(t_knots_, smoother_config_.spline_order());
 
   if (!ApplyConstraint(raw_reference_line)) {
     AERROR << "Add constraint for spline smoother failed";
@@ -121,6 +121,7 @@ bool ReferenceLineSmoother::Smooth(
                             rlp.lane_waypoints()),
         kappa, dkappa, 0.0, 0.0));
   }
+
   ReferencePoint::RemoveDuplicates(&ref_points);
   if (ref_points.size() < 2) {
     AERROR << "Fail to generate smoothed reference line.";
@@ -132,19 +133,19 @@ bool ReferenceLineSmoother::Smooth(
 
 bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
-  const double resolution = length / smoother_config_.num_spline();
-  double accumulated_s = 0.0;
-  for (std::uint32_t i = 0; i <= smoother_config_.num_spline();
-       ++i, accumulated_s = std::min(accumulated_s + resolution, length)) {
-    ReferencePoint rlp = raw_reference_line.GetReferencePoint(accumulated_s);
+  ADEBUG << "Length = " << length;
+  uint32_t num_spline = std::max(
+      1u, static_cast<uint32_t>(length / smoother_config_.max_spline_length()));
+  const double delta_s = length / num_spline;
+  double s = 0.0;
+  for (std::uint32_t i = 0; i <= num_spline; ++i, s += delta_s) {
+    ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());
     path_point.set_theta(rlp.heading());
-    path_point.set_s(accumulated_s);
+    path_point.set_s(s);
     ref_points_.push_back(std::move(path_point));
-
-    // use t_knots_: 0.0, 1.0, 2.0, 3.0 ...
     t_knots_.push_back(i * 1.0);
   }
   return true;
@@ -152,14 +153,13 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
 
 bool ReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
-  const double t_length = t_knots_.back() - t_knots_.front();
-  const double dt = t_length / (smoother_config_.num_evaluated_points() - 1);
+  uint32_t constraint_num =
+      smoother_config_.constraint_to_knots_ratio() * (t_knots_.size() - 1) + 1;
+
   std::vector<double> evaluated_t;
-  double accumulated_eval_t = 0.0;
-  for (std::uint32_t i = 0; i < smoother_config_.num_evaluated_points();
-       ++i, accumulated_eval_t += dt) {
-    evaluated_t.push_back(accumulated_eval_t);
-  }
+  common::util::uniform_slice(t_knots_.front(), t_knots_.back(),
+                              constraint_num - 1, &evaluated_t);
+
   std::vector<common::PathPoint> path_points;
   if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {
     AERROR << "Extract evaluated points failed";
@@ -168,42 +168,41 @@ bool ReferenceLineSmoother::ApplyConstraint(
 
   // Add x, y boundary constraint
   std::vector<double> headings;
-  std::vector<double> longitidinal_bound;
+  std::vector<double> longitudinal_bound;
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
-    const double kBoundCoeff = 0.5;
     headings.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(kBoundCoeff *
-                                 smoother_config_.boundary_bound());
-    lateral_bound.push_back(smoother_config_.boundary_bound());
+    // TODO(all): change the langitudianl and lateral direction in code
+    longitudinal_bound.push_back(smoother_config_.lateral_boundary_bound());
+    lateral_bound.push_back(smoother_config_.longitudinal_boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
   static constexpr double kFixedBoundLimit = 0.01;
-  if (longitidinal_bound.size() > 0) {
-    longitidinal_bound.front() = kFixedBoundLimit;
-    longitidinal_bound.back() = kFixedBoundLimit;
+  if (longitudinal_bound.size() > 0) {
+    longitudinal_bound.front() = kFixedBoundLimit;
+    longitudinal_bound.back() = kFixedBoundLimit;
   }
 
   if (lateral_bound.size() > 0) {
-    lateral_bound.front() = 0.0;
+    lateral_bound.front() = kFixedBoundLimit;
     lateral_bound.back() = kFixedBoundLimit;
   }
 
   CHECK_EQ(evaluated_t.size(), headings.size());
   CHECK_EQ(evaluated_t.size(), xy_points.size());
-  CHECK_EQ(evaluated_t.size(), longitidinal_bound.size());
+  CHECK_EQ(evaluated_t.size(), longitudinal_bound.size());
   CHECK_EQ(evaluated_t.size(), lateral_bound.size());
 
   auto* spline_constraint = spline_solver_->mutable_constraint();
   if (!spline_constraint->Add2dBoundary(evaluated_t, headings, xy_points,
-                                        longitidinal_bound, lateral_bound)) {
+                                        longitudinal_bound, lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
   }
 
-  if (!spline_constraint->AddThirdDerivativeSmoothConstraint()) {
+  if (!spline_constraint->AddSecondDerivativeSmoothConstraint()) {
     AERROR << "Add jointness constraint failed";
     return false;
   }
@@ -215,22 +214,16 @@ bool ReferenceLineSmoother::ApplyKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
-  if (smoother_config_.derivative_weight() > 0.0) {
-    kernel->AddDerivativeKernelMatrix(smoother_config_.derivative_weight());
-  }
-
   if (smoother_config_.second_derivative_weight() > 0.0) {
     kernel->AddSecondOrderDerivativeMatrix(
         smoother_config_.second_derivative_weight());
   }
-
   if (smoother_config_.third_derivative_weight() > 0.0) {
     kernel->AddThirdOrderDerivativeMatrix(
         smoother_config_.third_derivative_weight());
   }
 
-  constexpr double kReferenceLineSmootherKernelWeight = 0.01;
-  kernel->AddRegularization(kReferenceLineSmootherKernelWeight);
+  kernel->AddRegularization(smoother_config_.regularization_weight());
   return true;
 }
 
@@ -258,26 +251,35 @@ bool ReferenceLineSmoother::ExtractEvaluatedPoints(
 
 bool ReferenceLineSmoother::GetSFromParamT(const double t,
                                            double* const s) const {
-  if (t_knots_.size() < 2 || t - t_knots_.back() > 1e-8) {
+  if (t_knots_.size() < 2) {
+    AERROR << "Fail to GetSFromParamT because t_knots_.size() error.";
     return false;
   }
-  std::uint32_t lower = FindIndex(t);
-  std::uint32_t upper = lower + 1;
-  double weight = 0.0;
-  const double diff = t_knots_[upper] - t_knots_[lower];
-  if (std::fabs(diff) > 1e-8) {
-    weight = (t - t_knots_[lower]) / diff;
+
+  if (fabs(t - t_knots_.front()) < 1e-8) {
+    *s = ref_points_.front().s();
+    return true;
   }
-  *s =
-      ref_points_[lower].s() * (1.0 - weight) + ref_points_[upper].s() * weight;
+  if (fabs(t - t_knots_.back()) < 1e-8) {
+    *s = ref_points_.back().s();
+    return true;
+  }
+  if (t < t_knots_.front() || t > t_knots_.back()) {
+    AERROR << "Fail to GetSFromParamT. t = " << t;
+    return false;
+  }
+
+  std::uint32_t upper = FindIndex(t);
+  std::uint32_t lower = upper - 1;
+
+  const double r = (t - t_knots_[lower]) / (t_knots_[upper] - t_knots_[lower]);
+  *s = ref_points_[lower].s() * (1.0 - r) + ref_points_[upper].s() * r;
   return true;
 }
 
 std::uint32_t ReferenceLineSmoother::FindIndex(const double t) const {
-  auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
-  return std::min(t_knots_.size() - 1,
-                  static_cast<std::size_t>(upper_bound - t_knots_.begin())) -
-         1;
+  auto upper_bound = std::upper_bound(t_knots_.begin(), t_knots_.end(), t);
+  return std::distance(t_knots_.begin(), upper_bound);
 }
 
 }  // namespace planning

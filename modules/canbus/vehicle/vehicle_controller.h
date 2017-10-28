@@ -29,10 +29,10 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#include "modules/canbus/can_comm/can_sender.h"
-#include "modules/canbus/vehicle/message_manager.h"
-#include "modules/canbus/vehicle/protocol_data.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus
@@ -40,6 +40,9 @@
  */
 namespace apollo {
 namespace canbus {
+
+using ::apollo::drivers::canbus::CanSender;
+using ::apollo::drivers::canbus::MessageManager;
 
 /**
  * @class VehicleController
@@ -58,8 +61,10 @@ class VehicleController {
    * @return error_code
    */
   virtual common::ErrorCode Init(
-      const VehicleParameter &params, CanSender *const can_sender,
-      MessageManager *const message_manager) = 0;
+      const VehicleParameter &params,
+      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>
+          *const message_manager) = 0;
 
   /**
    * @brief start the vehicle controller.
@@ -83,8 +88,7 @@ class VehicleController {
    * @param command the control command
    * @return error_code
    */
-  virtual common::ErrorCode Update(
-      const control::ControlCommand &command);
+  virtual common::ErrorCode Update(const control::ControlCommand &command);
 
   /**
     * @brief set vehicle to appointed driving mode.
@@ -137,12 +141,10 @@ class VehicleController {
   /*
    * @brief set Electrical Park Brake
    */
-  virtual void SetEpbBreak(
-      const control::ControlCommand &command) = 0;
+  virtual void SetEpbBreak(const control::ControlCommand &command) = 0;
   virtual void SetBeam(const control::ControlCommand &command) = 0;
   virtual void SetHorn(const control::ControlCommand &command) = 0;
-  virtual void SetTurningSignal(
-      const control::ControlCommand &command) = 0;
+  virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
 
  protected:
   virtual Chassis::DrivingMode driving_mode();
@@ -150,8 +152,8 @@ class VehicleController {
 
  protected:
   canbus::VehicleParameter params_;
-  CanSender *can_sender_ = nullptr;
-  MessageManager *message_manager_ = nullptr;
+  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
+  MessageManager<::apollo::canbus::ChassisDetail> *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
   bool is_reset_ = false;  // reset command from control command

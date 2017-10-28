@@ -37,7 +37,7 @@ class Spline1dConstraint {
  public:
   explicit Spline1dConstraint(const Spline1d& pss);
   Spline1dConstraint(const std::vector<double>& x_knots,
-                     const std::uint32_t order);
+                     const uint32_t order);
 
   // direct methods
   bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
@@ -48,8 +48,8 @@ class Spline1dConstraint {
   // preset method
   /**
   *   @brief: inequality boundary constraints
-  *   if no boundary, do specify either by std::infinity or let vector.size() =
-  *0
+  *   if no boundary, do specify either by std::infinity or
+  *   let vector.size() = 0
   **/
   bool AddBoundary(const std::vector<double>& x_coord,
                    const std::vector<double>& lower_bound,
@@ -69,9 +69,9 @@ class Spline1dConstraint {
 
   /**
   *   @brief: equality constraint to guarantee joint smoothness
+  *   boundary equality constriant constraint on fx, dfx, ddfx ... in vector
+  *   form; upto third order
   **/
-  // boundary equality constriant
-  // constraint on fx, dfx, ddfx ... in vector form; upto third order
   bool AddPointConstraint(const double x, const double fx);
   bool AddPointDerivativeConstraint(const double x, const double dfx);
   bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
@@ -107,7 +107,7 @@ class Spline1dConstraint {
   const AffineConstraint& equality_constraint() const;
 
  private:
-  std::uint32_t FindIndex(const double x) const;
+  uint32_t FindIndex(const double x) const;
 
   bool FilterConstraints(const std::vector<double>& x_coord,
                          const std::vector<double>& lower_bound,
@@ -116,14 +116,14 @@ class Spline1dConstraint {
                          std::vector<double>* const filtered_lower_bound,
                          std::vector<double>* const filtered_upper_bound_x,
                          std::vector<double>* const filtered_upper_bound);
-  void GeneratePowerX(const double x, const std::uint32_t order,
+  void GeneratePowerX(const double x, const uint32_t order,
                       std::vector<double>* const power_x) const;
 
  private:
   AffineConstraint inequality_constraint_;
   AffineConstraint equality_constraint_;
   std::vector<double> x_knots_;
-  std::uint32_t spline_order_;
+  uint32_t spline_order_;
 };
 
 }  // namespace planning

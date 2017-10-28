@@ -180,12 +180,10 @@ bool DPRoadGraph::SamplePathWaypoints(
                 std::fmin(init_point.v(), config_.step_length_max()));
 
   double accumulated_s = init_sl_point.s();
-  for (std::size_t i = 0;
-       i < config_.sample_level() && accumulated_s < reference_line_length;
-       ++i) {
+  for (std::size_t i = 0; accumulated_s < reference_line_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
-    double s = std::fmin(accumulated_s, reference_line_length);
+    const double s = std::fmin(accumulated_s, reference_line_length);
 
     int32_t num =
         static_cast<int32_t>(config_.sample_points_num_each_level() / 2);
@@ -198,7 +196,7 @@ bool DPRoadGraph::SamplePathWaypoints(
       }
     }
     if (!level_points.empty()) {
-      points->push_back(level_points);
+      points->emplace_back(level_points);
     }
   }
   return true;

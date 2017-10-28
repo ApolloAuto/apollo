@@ -18,7 +18,6 @@
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
-#include "modules/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
@@ -28,6 +27,8 @@
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
@@ -35,6 +36,7 @@ namespace lincoln {
 
 using common::ErrorCode;
 using control::ControlCommand;
+using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
@@ -43,9 +45,10 @@ const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }
 
-ErrorCode LincolnController::Init(const VehicleParameter &params,
-                                  CanSender *const can_sender,
-                                  MessageManager *const message_manager) {
+ErrorCode LincolnController::Init(
+    const VehicleParameter &params,
+    CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+    MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) {
   if (is_initialized_) {
     AINFO << "LincolnController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -144,7 +147,7 @@ Chassis LincolnController::chassis() {
   chassis_.Clear();
 
   ChassisDetail chassis_detail;
-  message_manager_->GetChassisDetail(&chassis_detail);
+  message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
   if (driving_mode() == Chassis::EMERGENCY_MODE) {
@@ -441,9 +444,10 @@ void LincolnController::Steer(double angle, double angle_spd) {
     return;
   }
   const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd = ProtocolData::BoundedValue(
-      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-      params_.max_steer_angle_spd() * angle_spd / 100.0);
+  const double real_angle_spd =
+      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+          params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
+          params_.max_steer_angle_spd() * angle_spd / 100.0);
   steering_64_->set_steering_angle(real_angle)
       ->set_steering_angle_speed(real_angle_spd);
 }
@@ -493,7 +497,7 @@ void LincolnController::ResetProtocol() {
 bool LincolnController::CheckChassisError() {
   // steer fault
   ChassisDetail chassis_detail;
-  message_manager_->GetChassisDetail(&chassis_detail);
+  message_manager_->GetSensorData(&chassis_detail);
 
   int32_t error_cnt = 0;
   int32_t chassis_error_mask = 0;
@@ -624,8 +628,7 @@ void LincolnController::SecurityDogThreadFunc() {
 
   std::chrono::duration<double, std::micro> default_period{50000};
   int64_t start =
-      common::time::AsInt64<common::time::micros>(
-          common::time::Clock::Now());
+      common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
 
   int32_t speed_ctrl_fail = 0;
   int32_t steer_ctrl_fail = 0;
@@ -668,8 +671,7 @@ void LincolnController::SecurityDogThreadFunc() {
       Emergency();
     }
     int64_t end =
-        common::time::AsInt64<common::time::micros>(
-            common::time::Clock::Now());
+        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
@@ -693,7 +695,7 @@ bool LincolnController::CheckResponse(const int32_t flags, bool need_wait) {
   bool is_esp_online = false;
 
   do {
-    if (message_manager_->GetChassisDetail(&chassis_detail) != ErrorCode::OK) {
+    if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
       AERROR_EVERY(100) << "get chassis detail failed.";
       return false;
     }

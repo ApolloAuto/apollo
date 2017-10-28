@@ -58,36 +58,16 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
   }
 }
 
-ReferenceLine::ReferenceLine(
-    const std::vector<ReferencePoint>& reference_points,
-    const std::vector<hdmap::LaneSegment>& lane_segments,
-    const double max_approximation_error)
-    : reference_points_(reference_points),
-      map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
-                            reference_points.begin(), reference_points.end()),
-                        lane_segments, max_approximation_error)) {}
-
 ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {
-    AWARN << "The requested s is before the start point of the reference "
-             "line; reference line starts at "
-          << accumulated_s.front() << ", requested " << s << ".";
-    ReferencePoint ref_point(map_path_.GetSmoothPoint(s), 0.0, 0.0, 0.0, 0.0);
-    if (ref_point.lane_waypoints().empty()) {
-      ref_point.add_lane_waypoints(reference_points_.front().lane_waypoints());
-    }
-    return ref_point;
+    AWARN << "The requested s " << s << " < 0";
+    return reference_points_.front();
   }
   if (s > accumulated_s.back()) {
-    AWARN << "The requested s exceeds the reference line; reference line "
-             "ends at "
-          << accumulated_s.back() << "requested " << s << " .";
-    ReferencePoint ref_point(map_path_.GetSmoothPoint(s), 0.0, 0.0, 0.0, 0.0);
-    if (ref_point.lane_waypoints().empty()) {
-      ref_point.add_lane_waypoints(reference_points_.back().lane_waypoints());
-    }
-    return ref_point;
+    AWARN << "The requested s " << s << " > reference line length "
+          << accumulated_s.back();
+    return reference_points_.back();
   }
 
   auto it_lower =

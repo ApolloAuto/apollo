@@ -97,7 +97,7 @@ export default class DashCamPlayer extends React.Component {
                         showSyncup={showSyncup}
                         onSyncup={this.setVideoPlayTime}
                         onClose={this.closeVideo} />
-                    <video preload controls
+                    <video controls
                            ref = {(input) => {
                                 this.videoElement = input;
                            }}

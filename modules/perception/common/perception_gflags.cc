@@ -18,7 +18,8 @@
 
 DEFINE_string(node_name, "perception", "The perception module name in proto");
 
-DEFINE_string(adapter_config_filename, "modules/perception/conf/adapter.conf",
+DEFINE_string(perception_adapter_config_filename,
+              "modules/perception/conf/adapter.conf",
               "The adapter config filename");
 
 /// lib/config_manager/config_manager.cc

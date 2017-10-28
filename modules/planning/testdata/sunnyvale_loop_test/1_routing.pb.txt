@@ -3,295 +3,165 @@ header {
   module_name: "routing"
   sequence_num: 1
 }
-route {
-  road_info {
-    id: "r0"
-    in_lane {
+road {
+  id: "r0"
+  passage {
+    can_exit: true
+    segment {
       id: "752_1_-1"
-      s: 0.0
-    }
-    out_lane {
-      id: "752_1_-1"
-      s: 20.1963
-    }
-    passage_region {
-      segment {
-        id: "752_1_-1"
-        start_s: 0.0
-        end_s: 20.1963
-      }
+      start_s: 0.0
+      end_s: 20.1963
     }
   }
 }
-route {
-  road_info {
-    id: "r1"
-    in_lane {
+road {
+  id: "r1"
+  passage {
+    can_exit: true
+    segment {
       id: "753_1_-1"
-      s: 0.0
-    }
-    out_lane {
-      id: "753_1_-1"
-      s: 21.6437
-    }
-    passage_region {
-      segment {
-        id: "753_1_-1"
-        start_s: 0.0
-        end_s: 21.6437
-      }
+      start_s: 0.0
+      end_s: 21.6437
     }
   }
 }
-route {
-  road_info {
-    id: "r2"
-    in_lane {
+road {
+  id: "r2"
+  passage {
+    can_exit: true
+    segment {
       id: "6_1_-2"
-      s: 0.0
-    }
-    out_lane {
-      id: "6_1_-2"
-      s: 194.692
-    }
-    passage_region {
-      segment {
-        id: "6_1_-2"
-        start_s: 0.0
-        end_s: 194.692
-      }
+      start_s: 0.0
+      end_s: 194.692
     }
   }
 }
-route {
-  road_info {
-    id: "r3"
-    in_lane {
+road {
+  id: "r3"
+  passage {
+    can_exit: true
+    segment {
       id: "7_1_-2"
-      s: 0.0
-    }
-    out_lane {
-      id: "7_1_-2"
-      s: 32.89
-    }
-    passage_region {
-      segment {
-        id: "7_1_-2"
-        start_s: 0.0
-        end_s: 32.89
-      }
+      start_s: 0.0
+      end_s: 32.89
     }
   }
 }
-route {
-  road_info {
-    id: "r4"
-    in_lane {
+road {
+  id: "r4"
+  passage {
+    can_exit: true
+    segment {
       id: "1_1_-3"
-      s: 0.0
-    }
-    out_lane {
-      id: "1_1_-3"
-      s: 65.2454
-    }
-    passage_region {
-      segment {
-        id: "1_1_-3"
-        start_s: 0.0
-        end_s: 65.2454
-      }
+      start_s: 0.0
+      end_s: 65.2454
     }
   }
 }
-route {
-  road_info {
-    id: "r5"
-    in_lane {
+road {
+  id: "r5"
+  passage {
+    can_exit: true
+    segment {
       id: "151_1_-2"
-      s: 0.0
-    }
-    out_lane {
-      id: "151_1_-2"
-      s: 43.8648
-    }
-    passage_region {
-      segment {
-        id: "151_1_-2"
-        start_s: 0.0
-        end_s: 43.8648
-      }
+      start_s: 0.0
+      end_s: 43.8648
     }
   }
 }
-route {
-  road_info {
-    id: "r6"
-    in_lane {
+road {
+  id: "r6"
+  passage {
+    can_exit: true
+    segment {
       id: "9_1_-2"
-      s: 0.0
-    }
-    out_lane {
-      id: "9_1_-2"
-      s: 161.962
-    }
-    passage_region {
-      segment {
-        id: "9_1_-2"
-        start_s: 0.0
-        end_s: 161.962
-      }
+      start_s: 0.0
+      end_s: 161.962
     }
   }
 }
-route {
-  road_info {
-    id: "r7"
-    in_lane {
+road {
+  id: "r7"
+  passage {
+    can_exit: true
+    segment {
       id: "13_1_-2"
-      s: 0.0
-    }
-    out_lane {
-      id: "13_1_-2"
-      s: 35.3398
-    }
-    passage_region {
-      segment {
-        id: "13_1_-2"
-        start_s: 0.0
-        end_s: 35.3398
-      }
+      start_s: 0.0
+      end_s: 35.3398
     }
   }
 }
-route {
-  road_info {
-    id: "r8"
-    in_lane {
+road {
+  id: "r8"
+  passage {
+    can_exit: true
+    segment {
       id: "12_1_-3"
-      s: 0.0
-    }
-    out_lane {
-      id: "12_1_-3"
-      s: 122.494
-    }
-    passage_region {
-      segment {
-        id: "12_1_-3"
-        start_s: 0.0
-        end_s: 122.494
-      }
+      start_s: 0.0
+      end_s: 122.494
     }
   }
 }
-route {
-  road_info {
-    id: "r9"
-    in_lane {
+road {
+  id: "r9"
+  passage {
+    can_exit: true
+    segment {
       id: "133_1_-3"
-      s: 0.0
-    }
-    out_lane {
-      id: "133_1_-3"
-      s: 3.63182
-    }
-    passage_region {
-      segment {
-        id: "133_1_-3"
-        start_s: 0.0
-        end_s: 3.63182
-      }
+      start_s: 0.0
+      end_s: 3.63182
     }
   }
 }
-route {
-  road_info {
-    id: "r10"
-    in_lane {
+road {
+  id: "r10"
+  passage {
+    can_exit: true
+    segment {
       id: "88_1_-1"
-      s: 0.0
-    }
-    out_lane {
-      id: "88_1_-1"
-      s: 19.7333
-    }
-    passage_region {
-      segment {
-        id: "88_1_-1"
-        start_s: 0.0
-        end_s: 19.7333
-      }
+      start_s: 0.0
+      end_s: 19.7333
     }
   }
 }
-route {
-  road_info {
-    id: "r11"
-    in_lane {
+road {
+  id: "r11"
+  passage {
+    can_exit: true
+    segment {
       id: "21_1_-1"
-      s: 0.0
-    }
-    out_lane {
-      id: "21_1_-1"
-      s: 128.73
-    }
-    passage_region {
-      segment {
-        id: "21_1_-1"
-        start_s: 0.0
-        end_s: 128.73
-      }
+      start_s: 0.0
+      end_s: 128.73
     }
   }
 }
-route {
-  road_info {
-    id: "r12"
-    in_lane {
+road {
+  id: "r12"
+  passage {
+    can_exit: true
+    segment {
       id: "22_1_-1"
-      s: 0.0
-    }
-    out_lane {
-      id: "22_1_-1"
-      s: 31.9409
-    }
-    passage_region {
-      segment {
-        id: "22_1_-1"
-        start_s: 0.0
-        end_s: 31.9409
-      }
+      start_s: 0.0
+      end_s: 31.9409
     }
   }
 }
-route {
-  road_info {
-    id: "r13"
-    in_lane {
+road {
+  id: "r13"
+  passage {
+    can_exit: true
+    segment {
       id: "23_1_-1"
-      s: 0.0
+      start_s: 0.0
+      end_s: 0.0
     }
-    out_lane {
+  }
+  passage {
+    can_exit: true
+    segment {
       id: "23_1_-2"
-      s: 0.0
-    }
-    passage_region {
-      segment {
-        id: "23_1_-1"
-        start_s: 0.0
-        end_s: 0.0
-      }
-    }
-    passage_region {
-      segment {
-        id: "23_1_-2"
-        start_s: 0.0
-        end_s: 0.0
-      }
-    }
-    lane_change_info {
-      type: RIGHT_FORWARD
-      start_passage_region_index: 0
-      end_passage_region_index: 1
+      start_s: 0.0
+      end_s: 0.0
     }
   }
 }
@@ -304,7 +174,7 @@ routing_request {
     module_name: "hmi_ros_bridge"
     sequence_num: 8
   }
-  start {
+  waypoint {
     id: "752_1_-1"
     s: 19.2379743058
     pose {
@@ -313,7 +183,7 @@ routing_request {
       z: -29.8966481164
     }
   }
-  end {
+  waypoint {
     id: "23_1_-2"
     s: 0.0
     pose {

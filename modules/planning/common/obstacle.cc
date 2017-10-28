@@ -76,7 +76,7 @@ Obstacle::Obstacle(const std::string& id,
   }
   for (int i = 1; i < trajectory_points.size(); ++i) {
     cumulative_s +=
-        common::util::Distance2D(trajectory_points[i - 1].path_point(),
+        common::util::DistanceXY(trajectory_points[i - 1].path_point(),
                                  trajectory_points[i].path_point());
 
     trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
@@ -157,9 +157,9 @@ const common::math::Polygon2d& Obstacle::PerceptionPolygon() const {
   return perception_polygon_;
 }
 
-std::vector<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
+std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const prediction::PredictionObstacles& predictions) {
-  std::vector<std::unique_ptr<Obstacle>> obstacles;
+  std::list<std::unique_ptr<Obstacle>> obstacles;
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
@@ -171,6 +171,20 @@ std::vector<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
 
     int trajectory_index = 0;
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
+      bool is_valid_trajectory = true;
+      for (const auto& point : trajectory.trajectory_point()) {
+        if (!IsValidTrajectoryPoint(point)) {
+          AERROR << "obj:" << perception_id
+                 << " TrajectoryPoint: " << trajectory.ShortDebugString()
+                 << " is NOT valid.";
+          is_valid_trajectory = false;
+          break;
+        }
+      }
+      if (!is_valid_trajectory) {
+        continue;
+      }
+
       const std::string obstacle_id =
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
       obstacles.emplace_back(new Obstacle(
@@ -179,6 +193,45 @@ std::vector<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     }
   }
   return obstacles;
+}
+
+bool Obstacle::IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
+  return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
+           std::isnan(point.path_point().y()) ||
+           std::isnan(point.path_point().z()) ||
+           std::isnan(point.path_point().kappa()) ||
+           std::isnan(point.path_point().s()) ||
+           std::isnan(point.path_point().dkappa()) ||
+           std::isnan(point.path_point().ddkappa()) || std::isnan(point.v()) ||
+           std::isnan(point.a()) || std::isnan(point.relative_time()));
+}
+
+std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
+    const std::string& id, const common::math::Box2d& obstacle_box) {
+  // create a "virtual" perception_obstacle
+  perception::PerceptionObstacle perception_obstacle;
+  // simulator needs a valid integer
+  perception_obstacle.set_id(-(std::hash<std::string>{}(id) >> 1));
+  perception_obstacle.mutable_position()->set_x(obstacle_box.center().x());
+  perception_obstacle.mutable_position()->set_y(obstacle_box.center().y());
+  perception_obstacle.set_theta(obstacle_box.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(obstacle_box.length());
+  perception_obstacle.set_width(obstacle_box.width());
+  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  std::vector<common::math::Vec2d> corner_points;
+  obstacle_box.GetAllCorners(&corner_points);
+  for (const auto& corner_point : corner_points) {
+    auto* point = perception_obstacle.add_polygon_point();
+    point->set_x(corner_point.x());
+    point->set_y(corner_point.y());
+  }
+  return std::unique_ptr<Obstacle>(new Obstacle(id, perception_obstacle));
 }
 
 }  // namespace planning

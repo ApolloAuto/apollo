@@ -22,6 +22,7 @@
 #define MODULES_ADAPTERS_ADAPTER_H_
 
 #include <functional>
+#include <limits>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -40,6 +41,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
+#include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -49,6 +51,10 @@
 namespace apollo {
 namespace common {
 namespace adapter {
+
+// Borrowed from C++ 14.
+template <bool B, class T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
 
 /**
  * @class Adapter
@@ -96,9 +102,9 @@ class Adapter {
           size_t message_num, const std::string& dump_dir = "/tmp")
       : topic_name_(topic_name),
         message_num_(message_num),
-        enable_dump_(FLAGS_enable_adapter_dump && HasSequenceNumber<D>()),
-        dump_path_(enable_dump_ ? dump_dir + "/" + adapter_name : "") {
-    if (enable_dump_) {
+        enable_dump_(FLAGS_enable_adapter_dump),
+        dump_path_(dump_dir + "/" + adapter_name) {
+    if (HasSequenceNumber<D>()) {
       if (!apollo::common::util::EnsureDirectory(dump_path_)) {
         AERROR << "Cannot enable dumping for '" << adapter_name
                << "' adapter because the path " << dump_path_
@@ -110,6 +116,8 @@ class Adapter {
                << " contains files that cannot be removed.";
         enable_dump_ = false;
       }
+    } else {
+      enable_dump_ = false;
     }
   }
 
@@ -146,6 +154,7 @@ class Adapter {
    * @param message the newly received message.
    */
   void OnReceive(const D& message) {
+    UpdateDelay(message);
     EnqueueData(message);
     FireCallbacks(message);
   }
@@ -235,6 +244,18 @@ class Adapter {
   }
 
   /**
+   * @brief Pops out the latest added callback.
+   * @return false if there's no callback to pop out, true otherwise.
+   */
+  bool PopCallback() {
+    if (receive_callbacks_.empty()) {
+      return false;
+    }
+    receive_callbacks_.pop_back();
+    return true;
+  }
+
+  /**
    * @brief fills the fields module_name, timestamp_sec and
    * sequence_num in the header.
    */
@@ -260,6 +281,37 @@ class Adapter {
     return latest_published_data_.get();
   }
 
+  /**
+   * @brief Gets message delay in milliseconds.
+   */
+  double GetDelayInMs() {
+    return delay_ms_;
+  }
+
+  /**
+   * @brief Clear the data received so far.
+   */
+  void ClearData() {
+    // Lock the queue.
+    std::lock_guard<std::mutex> lock(mutex_);
+    data_queue_.clear();
+    observed_queue_.clear();
+  }
+
+  /**
+   * @brief Dumps the latest received data to file.
+   */
+  bool DumpLatestMessage() {
+    if (!Empty()) {
+      D msg = GetLatestObserved();
+      return DumpMessage<D>(msg);
+    }
+
+    AWARN << "Unable to dump message with topic " << topic_name_
+          << ". No message received.";
+    return false;
+  }
+
  private:
   template <typename T>
   struct IdentifierType {};
@@ -278,13 +330,17 @@ class Adapter {
                 IdentifierType<::sensor_msgs::PointCloud2>) {
     return false;
   }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<::sensor_msgs::CompressedImage>) {
+    return false;
+  }
 
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
-      typename std::enable_if<
+      enable_if_t<
           !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type* message = nullptr) {
+          InputMessageType>* message = nullptr) {
     return false;
   }
 
@@ -292,36 +348,29 @@ class Adapter {
   // header.sequence_num.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
-      typename std::enable_if<
+      enable_if_t<
           std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type* message = nullptr) {
+          InputMessageType>* message = nullptr) {
     using gpf = google::protobuf::FieldDescriptor;
     InputMessageType sample;
     auto descriptor = sample.GetDescriptor();
     auto header_descriptor = descriptor->FindFieldByName("header");
-    if (header_descriptor == nullptr) {
+    if (header_descriptor == nullptr ||
+        header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
       return false;
     }
-    if (header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
-      return false;
-    }
+
     auto sequence_num_descriptor =
         header_descriptor->message_type()->FindFieldByName("sequence_num");
-    if (sequence_num_descriptor == nullptr) {
-      return false;
-    }
-    if (sequence_num_descriptor->cpp_type() != gpf::CPPTYPE_UINT32) {
-      return false;
-    }
-    return true;
+    return sequence_num_descriptor != nullptr &&
+           sequence_num_descriptor->cpp_type() == gpf::CPPTYPE_UINT32;
   }
 
   // DumpMessage does nothing for non proto message data type.
   template <typename InputMessageType>
-  bool DumpMessage(
-      const typename std::enable_if<
-          !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type& message) {
+  bool DumpMessage(const enable_if_t<!std::is_base_of<google::protobuf::Message,
+                                                      InputMessageType>::value,
+                                     InputMessageType>& message) {
     return true;
   }
 
@@ -329,10 +378,9 @@ class Adapter {
   // /tmp/<adapter_name>/<name>.pb.txt, where the message is in ASCII
   // mode and <name> is the .header().sequence_num() of the message.
   template <typename InputMessageType>
-  bool DumpMessage(
-      const typename std::enable_if<
-          std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type& message) {
+  bool DumpMessage(const enable_if_t<std::is_base_of<google::protobuf::Message,
+                                                     InputMessageType>::value,
+                                     InputMessageType>& message) {
     using google::protobuf::Message;
     auto descriptor = message.GetDescriptor();
     auto header_descriptor = descriptor->FindFieldByName("header");
@@ -387,6 +435,77 @@ class Adapter {
     data_queue_.push_front(std::make_shared<D>(data));
   }
 
+  /**
+   * @brief Calculates message delay based on message type.
+   */
+  double CalculateDelayInMs(const D& new_msg, const D& last_msg) {
+    return MessageDelay<D>::Get(new_msg, last_msg);
+  }
+
+  /**
+   * @brief Updates the message delay upon receiving a new message.
+   */
+  void UpdateDelay(const D& new_msg) {
+    if (!data_queue_.empty()) {
+      std::lock_guard<std::mutex> lock(mutex_);
+      delay_ms_ = CalculateDelayInMs(new_msg, *data_queue_.front());
+    }
+  }
+
+  /// A few partial template specialzations to get message delays for different
+  /// message types.
+  template <class T, class Enable = void>
+  struct MessageDelay {
+    static double Get(const T& new_msg, const T& last_msg) {
+      return 0.0;
+    }
+  };
+
+  template <class T>
+  struct MessageDelay<
+      T, enable_if_t<std::is_base_of<google::protobuf::Message, T>::value>> {
+    static double Get(const T& new_msg, const T& last_msg) {
+      using google::protobuf::Message;
+
+      return (ExtractTimeStampFromMsg(static_cast<const Message&>(new_msg)) -
+              ExtractTimeStampFromMsg(static_cast<const Message&>(last_msg))) *
+             1000.0;
+    }
+
+    static double ExtractTimeStampFromMsg(
+        const google::protobuf::Message& message) {
+      using gpf = google::protobuf::FieldDescriptor;
+
+      auto descriptor = message.GetDescriptor();
+      auto header_descriptor = descriptor->FindFieldByName("header");
+
+      if (header_descriptor == nullptr ||
+          header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
+        return 0.0;
+      }
+
+      auto timestamp_sec_descriptor =
+          header_descriptor->message_type()->FindFieldByName("timestamp_sec");
+      if (timestamp_sec_descriptor == nullptr ||
+          timestamp_sec_descriptor->cpp_type() != gpf::CPPTYPE_DOUBLE) {
+        return 0.0;
+      }
+
+      const auto& header =
+          message.GetReflection()->GetMessage(message, header_descriptor);
+      return header.GetReflection()->GetDouble(header,
+                                               timestamp_sec_descriptor);
+    }
+  };
+
+  template <class Enable>
+  struct MessageDelay<sensor_msgs::PointCloud2, Enable> {
+    static double Get(const sensor_msgs::PointCloud2& new_msg,
+                      const sensor_msgs::PointCloud2& last_msg) {
+      return (new_msg.header.stamp - last_msg.header.stamp).sec * 1000.0;
+    }
+  };
+
   /// The topic name that the adapter listens to.
   std::string topic_name_;
 
@@ -418,6 +537,9 @@ class Adapter {
 
   /// The most recenct published data.
   std::unique_ptr<D> latest_published_data_;
+
+  /// The interval between receiving two consecutive messages.
+  double delay_ms_ = std::numeric_limits<double>::quiet_NaN();
 };
 
 }  // namespace adapter

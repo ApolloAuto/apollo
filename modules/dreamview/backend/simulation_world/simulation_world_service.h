@@ -60,7 +60,7 @@ class SimulationWorldService {
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
-   * @param routing_from_file whether to read intial routing from file.
+   * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldService(const MapService *map_service,
                          bool routing_from_file = false);
@@ -82,7 +82,7 @@ class SimulationWorldService {
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
-   * within the given radious from the car.
+   * within the given radius from the car.
    * @param radius the search distance from the current car location
    * @return Json object that contains mapElementIds and mapHash.
    */
@@ -92,9 +92,15 @@ class SimulationWorldService {
    * @brief The function Update() is periodically called to check for updates
    * from the adapters. All the updates will be written to the SimulationWorld
    * object to reflect the latest status.
-   * @return Constant reference to the SimulationWorld object.
    */
-  const SimulationWorld &Update();
+  void Update();
+
+  /**
+   * @brief Sets the flag to clear the owned simulation world object.
+  */
+  void SetToClear() {
+    to_clear_ = true;
+  }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
@@ -135,33 +141,15 @@ class SimulationWorldService {
                       double header_time);
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
                           double update_timestamp_sec, Object *world_main_stop);
+  void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   /**
-   * @brief Check whether a particular adapter has been initialized correctly.
-   */
-  template <typename AdapterType>
-  bool CheckAdapterInitialized(const std::string &adapter_name,
-                               AdapterType *adapter) {
-    if (adapter == nullptr) {
-      AERROR << adapter_name << " adapter is not correctly initialized. "
-                                "Please check the adapter manager "
-                                "configuration.";
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * @brief Get the latest observed data from the adatper manager to update the
+   * @brief Get the latest observed data from the adapter manager to update the
    * SimulationWorld object when triggered by refresh timer.
    */
   template <typename AdapterType>
   void UpdateWithLatestObserved(const std::string &adapter_name,
                                 AdapterType *adapter) {
-    if (!CheckAdapterInitialized(adapter_name, adapter)) {
-      return;
-    }
-
     if (adapter->Empty()) {
       AINFO_EVERY(100) << adapter_name
                        << " adapter has not received any data yet.";
@@ -175,6 +163,8 @@ class SimulationWorldService {
 
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
+  void UpdateDelays();
+
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
@@ -187,6 +177,10 @@ class SimulationWorldService {
 
   // The SIMULATOR monitor for publishing messages.
   apollo::common::monitor::Monitor monitor_;
+
+  // Whether to clear the SimulationWorld in the next timer cycle, set by
+  // frontend request.
+  bool to_clear_ = false;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

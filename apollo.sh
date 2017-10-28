@@ -90,14 +90,14 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query //...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //... except //modules/perception/...`
+    BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
   fi
 
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
   if ! $USE_ESD_CAN; then
-     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "modules\/monitor\/hwmonitor\/hw\/esdcan" | grep -v "esd")
   fi
 }
 
@@ -112,7 +112,12 @@ function build() {
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
-  echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $@
+  MACHINE_ARCH=$(uname -m)
+  JOB_ARG=""
+  if [ "$MACHINE_ARCH" == 'aarch64' ]; then
+    JOB_ARG="--jobs=3"
+  fi
+  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -160,7 +165,9 @@ function build_py_proto() {
   fi
   mkdir py_proto
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
-  find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=py_proto
+  find modules/ -name "*.proto" \
+      | grep -v modules/drivers/gnss \
+      | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
@@ -353,6 +360,7 @@ function citest() {
   //modules/planning/integration_tests:sunnyvale_loop_test
   //modules/control/integration_tests:simple_control_test
   //modules/prediction/container/obstacles:obstacle_test
+  //modules/dreamview/backend/simulation_world:simulation_world_service_test
   "
   bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
@@ -519,6 +527,7 @@ function print_usage() {
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
+  ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
@@ -551,6 +560,10 @@ function main() {
       ;;
     build)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      apollo_build_dbg $@
+      ;;
+    build_prof)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY  --copt='-pg' --cxxopt='-pg' --linkopt='-pg'"
       apollo_build_dbg $@
       ;;
     build_no_perception)

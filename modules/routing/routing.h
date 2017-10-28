@@ -64,7 +64,7 @@ class Routing : public apollo::common::ApolloApp {
   virtual ~Routing() = default;
 
  private:
-  void OnRouting_Request(const RoutingRequest &routing_request);
+  void OnRoutingRequest(const RoutingRequest &routing_request);
 
  private:
   std::unique_ptr<Navigator> navigator_ptr_;

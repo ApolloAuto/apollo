@@ -38,24 +38,29 @@ namespace planning {
 class SplineSegKernel {
  public:
   // generating kernel matrix
-  Eigen::MatrixXd Kernel(const std::uint32_t order, const double accumalated_x);
-  Eigen::MatrixXd DerivativeKernel(const std::uint32_t order,
-                                   const double accumalated_x);
-  Eigen::MatrixXd SecondOrderDerivativeKernel(const std::uint32_t order,
-                                              const double accumalated_x);
-  Eigen::MatrixXd ThirdOrderDerivativeKernel(const std::uint32_t order,
-                                             const double accumalated_x);
+  Eigen::MatrixXd Kernel(const uint32_t order, const double accumulated_x);
+
+  // only support N <= 3 cases
+  Eigen::MatrixXd NthDerivativeKernel(const uint32_t n, const uint32_t order,
+                                      const double accumulated_x);
 
  private:
-  void integrated_term_matrix(const std::uint32_t order, const double x,
+  Eigen::MatrixXd DerivativeKernel(const uint32_t order,
+                                   const double accumulated_x);
+  Eigen::MatrixXd SecondOrderDerivativeKernel(const uint32_t order,
+                                              const double accumulated_x);
+  Eigen::MatrixXd ThirdOrderDerivativeKernel(const uint32_t order,
+                                             const double accumulated_x);
+
+  void integrated_term_matrix(const uint32_t order, const double x,
                               const std::string& type,
                               Eigen::MatrixXd* term_matrix) const;
-  void calculate_fx(const std::uint32_t order);
-  void CalculateDerivative(const std::uint32_t order);
-  void CalculateSecondOrderDerivative(const std::uint32_t order);
-  void CalculateThirdOrderDerivative(const std::uint32_t order);
+  void calculate_fx(const uint32_t order);
+  void CalculateDerivative(const uint32_t order);
+  void CalculateSecondOrderDerivative(const uint32_t order);
+  void CalculateThirdOrderDerivative(const uint32_t order);
 
-  std::uint32_t reserved_order_;
+  uint32_t reserved_order_;
   Eigen::MatrixXd kernel_fx_;
   Eigen::MatrixXd kernel_derivative_;
   Eigen::MatrixXd kernel_second_order_derivative_;

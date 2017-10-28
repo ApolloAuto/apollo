@@ -19,42 +19,42 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 const char EsdCanChecker::ESD_CAN_NAME[] = "ESD_CAN";
 
-EsdCanChecker::EsdCanChecker(int id) : can_id_(id) {
-  name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", id);
+EsdCanChecker::EsdCanChecker() {
+  name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", can_id_);
 }
 
-hw::Status EsdCanChecker::esdcan_result_to_hw_status(NTCAN_RESULT ntstatus) {
+HardwareStatus::Status EsdCanChecker::esdcan_result_to_hw_status(
+    NTCAN_RESULT ntstatus) {
   // @todo: device not present detection in esd_can_test.
-  return ntstatus == NTCAN_SUCCESS ? hw::Status::OK : hw::Status::ERR;
+  return ntstatus == NTCAN_SUCCESS ? HardwareStatus::OK : HardwareStatus::ERR;
 }
 
 std::string EsdCanChecker::esdcan_result_to_message(NTCAN_RESULT ntstatus) {
-  return ntstatus == NTCAN_SUCCESS ? std::string("OK")
-                                   : std::string(esdcan_err_to_str(ntstatus));
+  return ntstatus == NTCAN_SUCCESS ? "OK" : esdcan_err_to_str(ntstatus);
 }
 
 void EsdCanChecker::run_check(std::vector<HwCheckResult> *results) {
-  PLATFORM_DBG(get_log_module(), log::LVL_INFO, "To check ESD-CAN-%d", can_id_);
+  AINFO << "To check ESD-CAN-" << can_id_;
 
   EsdCanDetails *details = new EsdCanDetails();
-  NTCAN_RESULT result = esdcan_do_test(can_id_, details);
+  NTCAN_RESULT result = details->esdcan_do_test(can_id_);
 
-  HwCheckResult rslt(name_, esdcan_result_to_hw_status(result), details,
+  HwCheckResult rslt("CAN", esdcan_result_to_hw_status(result), details,
                      std::move(esdcan_result_to_message(result)));
 
   results->emplace_back(std::move(rslt));
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo

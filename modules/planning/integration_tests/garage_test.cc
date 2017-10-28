@@ -81,7 +81,7 @@ TEST_F(GarageTest, stop_dest) {
 }
 
 /*
- * test stop for destination
+ * test stop for out of map
  * planning should fail in this case, but the module should not core.
  */
 TEST_F(GarageTest, out_of_map) {
@@ -89,8 +89,7 @@ TEST_F(GarageTest, out_of_map) {
   FLAGS_test_localization_file = "out_of_map_localization.pb.txt";
   FLAGS_test_chassis_file = "out_of_map_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  bool run_planning_success = RunPlanning("out_of_map", 0);
-  EXPECT_FALSE(run_planning_success);
+  RUN_GOLDEN_TEST;
 }
 
 /*

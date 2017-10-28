@@ -61,17 +61,26 @@ export default class ButtonPanel extends React.Component {
     }
 
     render() {
-        const { showRouteEditingBar,
-                sendDefaultRoutingRequest,
+        const { sendDefaultRoutingRequest,
+                showRouteEditingBar,
+                onVideo,
+                onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
-                onMenu, showMenu,
-                onVideo } = this.props;
+                onMenu, showMenu, resetBackend, dumpMessages} = this.props;
 
         return (
             <div>
                 <SideBarButton label="HMI Setup" active={false}
                                onClick={this.openHMI.bind(this)}
                                extraClasses={["button-corner"]} />
+                <div className="separator" />
+                <SideBarButton label="Reset Backend Data"
+                               onClick={resetBackend}
+                               active={false} />
+                <div className="separator" />
+                <SideBarButton label="Dump Messages"
+                               onClick={dumpMessages}
+                               active={false} />
                 <div className="separator" />
                 <SideBarButton label="Default Routing"
                                onClick={sendDefaultRoutingRequest}
@@ -82,6 +91,10 @@ export default class ButtonPanel extends React.Component {
                                active={false} />
                 <div className="separator" />
                 <DashCamButton onClick={onVideo}/>
+                <div className="separator" />
+                <SideBarButton label="PNC Monitor"
+                               onClick={onPNCMonitor}
+                               active={showPNCMonitor} />
                 <div className="separator" />
                 <SideBarButton label="Notifications"
                                onClick={onConsole}

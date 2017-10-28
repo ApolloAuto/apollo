@@ -43,8 +43,8 @@ namespace util {
  * @return The angle between the directions of the start point and the end
  * point.
  */
-template <typename PointType>
-double GetPathAngle(const std::vector<PointType> &points, const size_t start,
+template <typename Points>
+double GetPathAngle(const Points &points, const size_t start,
                     const size_t end) {
   if (start >= points.size() - 1 || end >= points.size() - 1) {
     AERROR << "Input indices are out of the range of the points vector: "
@@ -76,10 +76,14 @@ double GetPathAngle(const std::vector<PointType> &points, const size_t start,
  * change exceeds the threshold.
  * @return sampled_indices Indices of all sampled points, or empty when fail.
  */
-template <typename PointType>
-std::vector<int> DownsampleByAngle(const std::vector<PointType> &points,
+template <typename Points>
+std::vector<int> DownsampleByAngle(const Points &points,
                                    const double angle_threshold) {
   std::vector<int> sampled_indices;
+  if (points.size() == 0) {
+    return sampled_indices;
+  }
+
   if (angle_threshold < 0.0) {
     AERROR << "Input angle threshold is negative.";
     return sampled_indices;
@@ -116,8 +120,8 @@ std::vector<int> DownsampleByAngle(const std::vector<PointType> &points,
  * @param steepTurnDownsampleDistance downsample rate for a steep turn path
  * @return sampled_indices Indices of all sampled points, or empty when fail.
  */
-template <typename PointType>
-std::vector<int> DownsampleByDistance(const std::vector<PointType> &points,
+template <typename Points>
+std::vector<int> DownsampleByDistance(const Points &points,
                                       int downsampleDistance,
                                       int steepTurnDownsampleDistance) {
   std::vector<int> sampled_indices;

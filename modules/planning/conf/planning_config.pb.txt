@@ -14,7 +14,6 @@ em_planner_config {
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
-        sample_level: 8
         sample_points_num_each_level: 9
         step_length_max: 15.0
         step_length_min: 8.0
@@ -59,7 +58,7 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.0
+            high_speed_centric_acceleration_limit: 1.8
             low_speed_centric_acceleration_limit: 1.35
             high_speed_threshold: 20
             low_speed_threshold: 7
@@ -70,83 +69,79 @@ em_planner_config {
     }
     qp_spline_path_config {
         spline_order: 6
-        number_of_knots: 6
-        number_of_fx_constraint_knots: 37
+        max_spline_length: 20.0
         time_resolution: 0.1
         regularization_weight: 0.1
-        derivative_weight: 0.1
-        second_derivative_weight: 100.0
+        first_spline_weight_factor: 10.0
+        derivative_weight: 100.0
+        second_derivative_weight: 10.0
         third_derivative_weight: 10.0
-        reference_line_weight: 0.001
-        num_refline_point: 10
+        reference_line_weight: 0.0
         num_output: 100
-        cross_lane_extension_buffer: 0.2
+        cross_lane_lateral_extension: 1.2
+        cross_lane_longitudinal_extension: 100.0
+        history_path_weight: 0.0;
     }
     qp_st_speed_config {
-        total_path_length: 200.0
-        total_time: 6.0
-        output_time_resolution: 0.05
+        total_path_length: 250.0
+        total_time: 8.0
+        output_time_resolution: 0.01
         preferred_max_acceleration: 1.2
-        preferred_min_deceleration: -1.8
+        preferred_min_deceleration: -2.0
         max_acceleration: 2.0
         min_deceleration: -4.5
 
         qp_spline_config {
             number_of_discrete_graph_t: 4
-            number_of_evaluated_graph_t: 40
             spline_order: 6
             speed_kernel_weight: 0.0
             accel_kernel_weight: 1000.0
-            jerk_kernel_weight: 500.0
+            jerk_kernel_weight: 1000.0
             follow_weight: 8.0
             stop_weight: 0.2
-            cruise_weight: 0.1
-            regularization_weight: 0.0
+            cruise_weight: 0.5
+            regularization_weight: 0.1
             follow_drag_distance: 17.0
         }
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
             accel_kernel_weight: 1000.0
-            jerk_kernel_weight: 500.0
+            jerk_kernel_weight: 100.0
             follow_weight: 8.0
             stop_weight: 0.2
-            cruise_weight: 0.1
-            regularization_weight: 0.0
+            cruise_weight: 0.5
+            regularization_weight: 0.1
             follow_drag_distance: 17.0
         }
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 2.0
-            low_speed_centric_acceleration_limit: 2.0
+            high_speed_centric_acceleration_limit: 1.2
+            low_speed_centric_acceleration_limit: 1.6
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
-            num_points_to_avg_kappa: 20
+            num_points_to_avg_kappa: 10
         }
     }
 }
 
 reference_line_smoother_config {
-    num_spline: 6
-    spline_order: 7
-    num_evaluated_points: 37
-    boundary_bound: 0.2
-    derivative_bound: 0.15
-    second_derivative_bound: 1.0
-    third_derivative_bound: 1.0
-    ref_line_weight: 0.0
-    derivative_weight: 0.0
-    second_derivative_weight: 100.0
-    third_derivative_weight: 100.0
+    spline_order: 6
+    constraint_to_knots_ratio: 5
+    max_spline_length: 25.0
+    longitudinal_boundary_bound: 2.0
+    lateral_boundary_bound: 0.10
+    second_derivative_weight: 200.0
+    third_derivative_weight: 1000.0
     num_of_total_points: 500
+    regularization_weight: 0.2
 }
 
 rule_config : {
-    name: "BackSideVehicles"
+    rule_id: BACKSIDE_VEHICLE
 }
-
 rule_config : {
-    name: "SignalLights"
+    rule_id: REROUTING
 }

@@ -50,3 +50,10 @@ DEFINE_string(ins_stat_topic, "/apollo/sensor/gnss/ins_stat",
               "ins stat topic name");
 DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
               "HMI command topic name");
+DEFINE_string(hmi_status_topic, "/apollo/hmi_status", "HMI status topic name");
+DEFINE_string(mobileye_topic, "/apollo/sensor/mobileye", "mobileye topic name");
+DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
+              "delphi esr radar topic name");
+// TODO(Authors): Change the topic name
+DEFINE_string(compressed_image_topic, "camera/image_raw",
+              "CompressedImage topic name");

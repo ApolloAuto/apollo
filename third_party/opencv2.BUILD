@@ -96,6 +96,41 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "highgui",
+    srcs = glob(
+        [
+            "modules/highgui/src/**/*.cpp",
+        ],
+        exclude = [
+            "modules/highgui/src/cap*.cpp",
+            "modules/highgui/src/window_carbon.cpp",
+        ],
+    ),
+    hdrs = glob([
+        "modules/highgui/src/**/*.hpp",
+        "modules/highgui/src/**/*.h",
+        "modules/highgui/include/**/*.hpp",
+        "modules/highgui/include/**/*.h",
+    ]) + [
+        ":module_includes",
+    ],
+    includes = [
+        "modules/highgui/include",
+    ],
+    linkopts = [
+        "-ljpeg",
+        "-ltiff",
+        "-lpng",
+        "-ljasper",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":core",
+        ":imgproc",
+    ],
+)
+
 genrule(
     name = "module_includes",
     outs = ["opencv2/opencv_modules.hpp"],

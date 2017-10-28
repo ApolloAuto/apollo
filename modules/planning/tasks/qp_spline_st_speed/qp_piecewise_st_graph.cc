@@ -37,7 +37,7 @@ using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
 
 QpPiecewiseStGraph::QpPiecewiseStGraph(
-    const QpStSpeedConfig& qp_st_speed_config, const VehicleParam& veh_param)
+    const QpStSpeedConfig& qp_st_speed_config)
     : qp_st_speed_config_(qp_st_speed_config),
       t_evaluated_resolution_(qp_st_speed_config_.total_time() /
                               qp_st_speed_config_.qp_piecewise_config()
@@ -48,11 +48,10 @@ QpPiecewiseStGraph::QpPiecewiseStGraph(
 void QpPiecewiseStGraph::Init() {
   // init evaluated t positions
   double curr_t = t_evaluated_resolution_;
-  for (uint32_t i = 0;
-       i <
-       qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t();
-       ++i) {
-    t_evaluated_.push_back(curr_t);
+  t_evaluated_.resize(
+      qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t());
+  for (auto& t : t_evaluated_) {
+    t = curr_t;
     curr_t += t_evaluated_resolution_;
   }
 }
@@ -68,16 +67,15 @@ void QpPiecewiseStGraph::SetDebugLogger(
 Status QpPiecewiseStGraph::Search(
     const StGraphData& st_graph_data, SpeedData* const speed_data,
     const std::pair<double, double>& accel_bound) {
-  ADEBUG << init_point_.DebugString();
   cruise_.clear();
+
+  init_point_ = st_graph_data.init_point();
+  ADEBUG << "Init point:" << init_point_.DebugString();
 
   // reset piecewise linear generator
   generator_.reset(new PiecewiseLinearGenerator(
       qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t(),
       t_evaluated_resolution_));
-
-  // start to search for best st points
-  init_point_ = st_graph_data.init_point();
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
@@ -141,29 +139,25 @@ Status QpPiecewiseStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  std::vector<uint32_t> index_list;
+  std::vector<uint32_t> index_list(t_evaluated_.size());
 
   // boundary constraint
-  std::vector<double> s_upper_bound;
-  std::vector<double> s_lower_bound;
+  std::vector<double> s_upper_bound(t_evaluated_.size());
+  std::vector<double> s_lower_bound(t_evaluated_.size());
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
-    index_list.push_back(i);
-
+    index_list[i] = i;
     const double curr_t = t_evaluated_[i];
     double lower_s = 0.0;
     double upper_s = 0.0;
     GetSConstraintByTime(boundaries, curr_t,
                          qp_st_speed_config_.total_path_length(), &upper_s,
                          &lower_s);
-    s_upper_bound.push_back(upper_s);
-    s_lower_bound.push_back(lower_s);
+    s_upper_bound[i] = upper_s;
+    s_lower_bound[i] = lower_s;
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
            << " lower_s: " << lower_s;
   }
-
-  DCHECK_EQ(index_list.size(), s_lower_bound.size());
-  DCHECK_EQ(index_list.size(), s_upper_bound.size());
   if (!constraint->AddBoundary(index_list, s_lower_bound, s_upper_bound)) {
     const std::string msg = "Fail to apply distance constraints.";
     AERROR << msg;
@@ -180,9 +174,6 @@ Status QpPiecewiseStGraph::ApplyConstraint(
   }
 
   std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
-
-  DCHECK_EQ(index_list.size(), speed_upper_bound.size());
-  DCHECK_EQ(index_list.size(), speed_lower_bound.size());
 
   if (st_graph_debug_) {
     auto speed_constraint = st_graph_debug_->mutable_speed_constraint();
@@ -210,8 +201,6 @@ Status QpPiecewiseStGraph::ApplyConstraint(
   std::vector<double> accel_upper_bound(t_evaluated_.size(),
                                         accel_bound.second);
 
-  DCHECK_EQ(index_list.size(), accel_lower_bound.size());
-  DCHECK_EQ(index_list.size(), accel_upper_bound.size());
   if (!constraint->AddSecondDerivativeBoundary(
           init_point.v(), index_list, accel_lower_bound, accel_upper_bound)) {
     const std::string msg = "Fail to apply acceleration constraints.";
@@ -270,21 +259,20 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  std::vector<uint32_t> index_list;
+  std::vector<uint32_t> index_list(t_evaluated_.size());
+  cruise_.resize(t_evaluated_.size());
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
-    index_list.push_back(i);
-    cruise_.push_back(qp_st_speed_config_.total_path_length());
+    index_list[i] = i;
+    cruise_[i] = qp_st_speed_config_.total_path_length();
   }
   if (st_graph_debug_) {
     auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
-    for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
+    for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
       kernel_cruise_ref->mutable_t()->Add(t_evaluated_[i]);
       kernel_cruise_ref->mutable_cruise_line_s()->Add(cruise_[i]);
     }
   }
-  DCHECK_EQ(t_evaluated_.size(), cruise_.size());
-
   for (std::size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "Cruise Ref S: " << cruise_[i]
            << " Relative time: " << t_evaluated_[i] << std::endl;

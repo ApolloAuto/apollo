@@ -17,6 +17,7 @@
 #include "modules/planning/planner/em/em_planner.h"
 
 #include <fstream>
+#include <limits>
 #include <utility>
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -108,6 +109,12 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
   }
 
+  const double kStraightForwardLineCost = 10000.0;
+  if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
+      reference_line_info->Lanes().IsOnSegment()) {
+    reference_line_info->AddCost(kStraightForwardLineCost);
+  }
+
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
   auto speed_profile =
@@ -125,6 +132,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     const double start_timestamp = Clock::NowInSecond();
     ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
+      reference_line_info->AddCost(std::numeric_limits<double>::infinity());
       AERROR << "Failed to run tasks[" << optimizer->Name()
              << "], Error message: " << ret.error_message();
       break;

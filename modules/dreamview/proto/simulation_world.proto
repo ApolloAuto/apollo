@@ -5,6 +5,7 @@ package apollo.dreamview;
 import "modules/common/monitor/proto/monitor.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
+import "modules/planning/proto/planning_internal.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -28,7 +29,7 @@ message Decision {
     YIELD = 3; // Go after the object
     OVERTAKE = 4; // Go before the object
     FOLLOW = 5; // Follow the object in the same lane
-    SIDEPASS = 6; // Pass the object in neighbouring lane
+    SIDEPASS = 6; // Pass the object in neighboring lane
   }
   optional Type type = 1 [default = IGNORE];
 
@@ -128,7 +129,7 @@ message Object {
     UNKNOWN = 0;
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
-    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behaviour.
+    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behavior.
     BICYCLE = 4;  // bike, motor bike.
     VEHICLE = 5;  // passenger car or truck.
     VIRTUAL = 6; // virtual object created by decision module.
@@ -136,23 +137,26 @@ message Object {
 
   optional Type type = 25;  // obstacle type
   repeated Prediction prediction = 26;
+
+  // perception confidence level. Range: [0,1]
+  optional double confidence = 27 [default = 1];
 }
 
-message DelayItem {
-  optional uint32 delay = 1;
-  optional uint32 last_delay = 2;
+message DelaysInMs {
+  optional double chassis = 1;
+  optional double localization = 3;
+  optional double perception_obstacle = 4;
+  optional double planning = 5;
+  optional double prediction= 7;
+  optional double traffic_light = 8;
 }
 
-message Delay {
-  optional DelayItem adc_status = 1;
-  optional DelayItem decision = 2;
-  optional DelayItem localization = 3;
-  optional DelayItem localization_pcl = 4;
-  optional DelayItem perception_obstacle = 5;
-  optional DelayItem perception_radar = 6;
-  optional DelayItem planning_trajectory = 7;
-  optional DelayItem prediction= 8;
-  optional DelayItem traffic_light = 10;
+message RoutePath {
+  repeated PolygonPoint point = 1;
+}
+
+message Latency { // ms
+  optional double planning = 1;
 }
 
 // Next-id: 17
@@ -172,8 +176,8 @@ message SimulationWorld {
   // Traffic light status
   optional Object traffic_signal = 6;
 
-  // Routing path
-  repeated PolygonPoint route = 7;
+  // Routing paths
+  repeated RoutePath route_path = 7;
   // Timestamp of latest routing
   optional double routing_time = 8;
 
@@ -186,7 +190,12 @@ message SimulationWorld {
   // Speed limit
   optional double speed_limit = 11;
 
-  optional Delay delay = 12;
+  optional DelaysInMs delay = 12;
 
   optional .apollo.common.monitor.MonitorMessage monitor = 13;
+
+  optional .apollo.planning_internal.PlanningData planning_data = 14;
+
+  // Module latency
+  optional Latency latency = 15;
 }

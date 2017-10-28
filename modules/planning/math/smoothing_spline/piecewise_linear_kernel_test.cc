@@ -34,9 +34,6 @@ TEST(TestPiecewiseLinearKernel, add_regularization) {
   const auto mat = kernel.kernel_matrix();
   const auto offset = kernel.offset_matrix();
 
-  std::cout << mat << std::endl;
-  std::cout << offset << std::endl;
-
   MatrixXd mat_golden(10, 10);
   // clang-format off
   mat_golden <<
@@ -62,7 +59,7 @@ TEST(TestPiecewiseLinearKernel, add_regularization) {
   EXPECT_EQ(kernel.kernel_matrix(), mat_golden);
 }
 
-TEST(TestPiecewiseLinearKernel, add_reference_line_kernel_matrix) {
+TEST(TestPiecewiseLinearKernel, add_reference_line_kernel_matrix_01) {
   PiecewiseLinearKernel kernel(10, 0.1);
 
   std::vector<uint32_t> index_list;
@@ -77,14 +74,48 @@ TEST(TestPiecewiseLinearKernel, add_reference_line_kernel_matrix) {
   const auto mat = kernel.kernel_matrix();
   const auto offset = kernel.offset_matrix();
 
-  std::cout << mat << std::endl;
-  std::cout << offset << std::endl;
-
   MatrixXd mat_golden = MatrixXd::Identity(10, 10) * 10.0;
   EXPECT_EQ(mat, mat_golden);
 
   MatrixXd offset_golden(10, 1);
   offset_golden << 0, -40, -80, -120, -160, -200, -240, -280, -320, -360;
+
+  EXPECT_EQ(offset, offset_golden);
+}
+
+TEST(TestPiecewiseLinearKernel, add_reference_line_kernel_matrix_02) {
+  PiecewiseLinearKernel kernel(10, 0.1);
+
+  std::vector<uint32_t> index_list;
+  std::vector<double> pos_list;
+  for (int i = 0; i < 8; i += 2) {
+    index_list.push_back(i);
+    pos_list.push_back(i * 2);
+  }
+
+  kernel.AddReferenceLineKernelMatrix(index_list, pos_list, 10.0);
+
+  const auto mat = kernel.kernel_matrix();
+  const auto offset = kernel.offset_matrix();
+
+  MatrixXd mat_golden = MatrixXd::Zero(10, 10);
+  // clang-format off
+  mat_golden <<
+     10,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0, 10,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0, 10,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0, 10,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0;
+  // clang-format on
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd offset_golden(10, 1);
+  offset_golden << 0, 0, -80, 0, -160, 0, -240, 0, 0, 0;
 
   EXPECT_EQ(offset, offset_golden);
 }
@@ -97,9 +128,6 @@ TEST(TestPiecewiseLinearKernel, add_second_order_derivative_matrix) {
 
   const auto mat = kernel.kernel_matrix() / (2.0 * 1.0 / std::pow(0.1, 4));
   const auto offset = kernel.offset_matrix();
-
-  std::cout << mat << std::endl;
-  std::cout << offset << std::endl;
 
   MatrixXd mat_golden(10, 10);
   // clang-format off
@@ -119,6 +147,45 @@ TEST(TestPiecewiseLinearKernel, add_second_order_derivative_matrix) {
 
   MatrixXd offset_golden = MatrixXd::Zero(10, 1);
   offset_golden(0, 0) = -10000.0;
+
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_DOUBLE_EQ(offset(i, 0), offset_golden(i, 0));
+  }
+}
+
+TEST(TestPiecewiseLinearKernel, add_third_order_derivative_matrix) {
+  PiecewiseLinearKernel kernel(10, 0.1);
+  const double init_derivative = 5.0;
+  const double init_second_derivative = 2.0;
+
+  kernel.AddThirdOrderDerivativeMatrix(init_derivative, init_second_derivative,
+                                       1.0);
+
+  const auto mat = kernel.kernel_matrix() / (2.0 * 1.0 / std::pow(0.1, 6));
+  const auto offset = kernel.offset_matrix();
+
+  MatrixXd mat_golden(10, 10);
+  // clang-format off
+  mat_golden <<
+     20, -15,   6,  -1,   0,   0,   0,   0,   0,   0,
+    -15,  20, -15,   6,  -1,   0,   0,   0,   0,   0,
+      6, -15,  20, -15,   6,  -1,   0,   0,   0,   0,
+     -1,   6, -15,  20, -15,   6,  -1,   0,   0,   0,
+      0,  -1,   6, -15,  20, -15,   6,  -1,   0,   0,
+      0,   0,  -1,   6, -15,  20, -15,   6,  -1,   0,
+      0,   0,   0,  -1,   6, -15,  20, -15,   6,  -1,
+      0,   0,   0,   0,  -1,   6, -15,  19, -12,   3,
+      0,   0,   0,   0,   0,  -1,   6, -12,  10,  -3,
+      0,   0,   0,   0,   0,   0,  -1,   3,  -3,   1;
+  // clang-format on
+  EXPECT_EQ(mat, mat_golden);
+
+  MatrixXd offset_golden = MatrixXd::Zero(10, 1);
+  offset_golden(0, 0) = -2.0 * 1.0 *
+                            (init_derivative + init_second_derivative * 0.1) /
+                            std::pow(0.1, 5) -
+                        6.0 * 1.0 * init_derivative / std::pow(0.1, 5);
+  offset_golden(1, 0) = 2.0 * 1.0 * init_derivative / std::pow(0.1, 5);
 
   for (int i = 0; i < 10; ++i) {
     EXPECT_DOUBLE_EQ(offset(i, 0), offset_golden(i, 0));

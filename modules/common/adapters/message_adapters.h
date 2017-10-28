@@ -24,7 +24,10 @@
 #include "modules/common/monitor/proto/monitor.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
+#include "modules/dreamview/proto/hmi_status.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
+#include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -34,6 +37,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -46,8 +50,8 @@ namespace apollo {
 namespace common {
 namespace adapter {
 
-using ChassisAdapter = Adapter<canbus::Chassis>;
-using ChassisDetailAdapter = Adapter<canbus::ChassisDetail>;
+using ChassisAdapter = Adapter<::apollo::canbus::Chassis>;
+using ChassisDetailAdapter = Adapter<::apollo::canbus::ChassisDetail>;
 using ControlCommandAdapter = Adapter<control::ControlCommand>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
 using ImuAdapter = Adapter<localization::Imu>;
@@ -64,7 +68,12 @@ using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
     Adapter<calibration::republish_msg::RelativeOdometry>;
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
+// TODO(xiaoxq): Retire HMICommandAdapter after integration with dreamview.
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
+using HMIStatusAdapter = Adapter<dreamview::HMIStatus>;
+using MobileyeAdapter = Adapter<drivers::Mobileye>;
+using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
+using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 
 }  // namespace adapter
 }  // namespace common

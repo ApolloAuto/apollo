@@ -31,6 +31,10 @@ PublishableTrajectory::PublishableTrajectory(
     : DiscretizedTrajectory(discretized_trajectory),
       header_time_(header_time) {}
 
+PublishableTrajectory::PublishableTrajectory(const ADCTrajectory& trajectory_pb)
+    : DiscretizedTrajectory(trajectory_pb),
+      header_time_(trajectory_pb.header().timestamp_sec()) {}
+
 double PublishableTrajectory::header_time() const { return header_time_; }
 
 void PublishableTrajectory::PopulateTrajectoryProtobuf(

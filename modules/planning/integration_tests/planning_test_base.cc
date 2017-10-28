@@ -39,9 +39,13 @@ DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
+DEFINE_string(test_previous_planning_file, "",
+              "The previous planning test file");
+
 void PlanningTestBase::SetUpTestCase() {
   FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
-  FLAGS_adapter_config_filename = "modules/planning/testdata/conf/adapter.conf";
+  FLAGS_planning_adapter_config_filename =
+      "modules/planning/testdata/conf/adapter.conf";
   FLAGS_map_dir = "modules/planning/testdata";
   FLAGS_test_localization_file = "garage_localization.pb.txt";
   FLAGS_test_chassis_file = "garage_chassis.pb.txt";
@@ -53,12 +57,12 @@ void PlanningTestBase::SetUpTestCase() {
 
 bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
-    AdapterManager::Init(FLAGS_adapter_config_filename);
+    AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
   if (!AdapterManager::GetRoutingResponse()) {
     AERROR << "routing is not registered in adapter manager, check adapter "
               "config file."
-           << FLAGS_adapter_config_filename;
+           << FLAGS_planning_adapter_config_filename;
     return false;
   }
   auto routing_response_file =
@@ -81,20 +85,32 @@ bool PlanningTestBase::SetUpAdapters() {
     return false;
   }
   AINFO << "Using Chassis file: " << chassis_file;
-  auto prediction_file = FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
-  if (!FLAGS_test_prediction_file.empty() &&
-      !AdapterManager::FeedPredictionFile(prediction_file)) {
-    AERROR << "Failed to load prediction file: " << prediction_file;
-    return false;
+  if (FLAGS_enable_prediction) {
+    auto prediction_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
+    if (!FLAGS_test_prediction_file.empty() &&
+        !AdapterManager::FeedPredictionFile(prediction_file)) {
+      AERROR << "Failed to load prediction file: " << prediction_file;
+      return false;
+    }
+    AINFO << "Using Prediction file: " << prediction_file;
+  } else {
+    AINFO << "Prediction is disabled";
   }
-  AINFO << "Using Prediction file: " << prediction_file;
   return true;
 }
 
 void PlanningTestBase::SetUp() {
   planning_.Stop();
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
-  planning_.Init();
+  CHECK(planning_.Init().ok()) << "Failed to init planning module";
+  if (!FLAGS_test_previous_planning_file.empty()) {
+    const auto prev_planning_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
+    ADCTrajectory prev_planning;
+    CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
+    planning_.SetLastPublishableTrajectory(prev_planning);
+  }
 }
 
 void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
@@ -177,14 +193,6 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
     if (!point.has_path_point()) {
       AERROR << "Invalid trajectory point because NO path_point in "
                 "trajectory_point: "
-             << point.DebugString();
-      return false;
-    }
-
-    const double kDkappaThreshold = 0.1;
-    if (point.path_point().dkappa() > kDkappaThreshold ||
-        point.path_point().dkappa() < -kDkappaThreshold) {
-      AERROR << "Invalid trajectory point because dkappa out of range: "
              << point.DebugString();
       return false;
     }

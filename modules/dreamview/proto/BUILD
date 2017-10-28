@@ -15,3 +15,30 @@ proto_library(
         "//modules/planning/proto:planning_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "hmi_config_proto",
+    deps = [
+        ":hmi_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "hmi_config_proto_lib",
+    srcs = ["hmi_config.proto"],
+)
+
+cc_proto_library(
+    name = "hmi_status_proto",
+    deps = [
+        ":hmi_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "hmi_status_proto_lib",
+    srcs = ["hmi_status.proto"],
+    deps = [
+        "//modules/monitor/proto:hardware_status_proto_lib",
+    ]
+)

@@ -38,7 +38,9 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
-std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+std::string Prediction::Name() const {
+  return FLAGS_prediction_module_name;
+}
 
 Status Prediction::Init() {
   // Load prediction conf
@@ -53,17 +55,17 @@ Status Prediction::Init() {
   }
 
   adapter_conf_.Clear();
-  if (!common::util::GetProtoFromFile(FLAGS_adapter_config_filename,
+  if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
                                       &adapter_conf_)) {
     return OnError("Unable to load adapter conf file: " +
-                   FLAGS_adapter_config_filename);
+                   FLAGS_prediction_adapter_config_filename);
   } else {
     ADEBUG << "Adapter config file is loaded into: "
            << adapter_conf_.ShortDebugString();
   }
 
   // Initialization of all managers
-  AdapterManager::instance()->Init(adapter_conf_);
+  AdapterManager::Init(adapter_conf_);
   ContainerManager::instance()->Init(adapter_conf_);
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
@@ -80,7 +82,9 @@ Status Prediction::Init() {
   return Status::OK();
 }
 
-Status Prediction::Start() { return Status::OK(); }
+Status Prediction::Start() {
+  return Status::OK();
+}
 
 void Prediction::Stop() {}
 

@@ -36,6 +36,8 @@ function start() {
             /apollo/sensor/gnss/odometry \
             /apollo/sensor/gnss/ins_stat \
             /apollo/sensor/gnss/corrected_imu \
+            /apollo/sensor/mobileye \
+            /apollo/sensor/delphi_esr \
             /apollo/canbus/chassis \
             /apollo/canbus/chassis_detail \
             /apollo/control \

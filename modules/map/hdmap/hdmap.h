@@ -33,6 +33,8 @@
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/map/proto/map_clear_area.pb.h"
+#include "modules/map/proto/map_speed_bump.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -61,6 +63,8 @@ class HDMap {
   CrosswalkInfoConstPtr GetCrosswalkById(const Id& id) const;
   StopSignInfoConstPtr GetStopSignById(const Id& id) const;
   YieldSignInfoConstPtr GetYieldSignById(const Id& id) const;
+  ClearAreaInfoConstPtr GetClearAreaById(const Id& id) const;
+  SpeedBumpInfoConstPtr GetSpeedBumpById(const Id& id) const;
   OverlapInfoConstPtr GetOverlapById(const Id& id) const;
   RoadInfoConstPtr GetRoadById(const Id& id) const;
 
@@ -118,6 +122,24 @@ class HDMap {
    */
   int GetYieldSigns(const apollo::common::PointENU& point, double distance,
                     std::vector<YieldSignInfoConstPtr>* yield_signs) const;
+  /**
+   * @brief get all clear areas in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param clear_areas store all clear areas in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetClearAreas(const apollo::common::PointENU& point, double distance,
+                    std::vector<ClearAreaInfoConstPtr>* clear_areas) const;
+  /**
+   * @brief get all speed bumps in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param speed_bumps store all speed bumps in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetSpeedBumps(const apollo::common::PointENU& point, double distance,
+                    std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const;
   /**
    * @brief get all roads in certain range
    * @param point the central point of the range

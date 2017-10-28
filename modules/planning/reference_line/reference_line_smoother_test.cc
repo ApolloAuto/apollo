@@ -19,10 +19,11 @@
  **/
 #include "gtest/gtest.h"
 
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -70,8 +71,11 @@ class ReferenceLineSmootherTest : public ::testing::Test {
 TEST_F(ReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
-  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_FLOAT_EQ(153.52477, smoothed_reference_line.Length());
+  std::vector<double> t_knots;
+  Spline2dSolver spline_solver(t_knots, 5);
+  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line,
+                               &spline_solver));
+  EXPECT_FLOAT_EQ(153.64156, smoothed_reference_line.Length());
 }
 
 }  // namespace planning

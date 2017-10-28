@@ -48,34 +48,6 @@ double IntegrateByTrapezoidal(const std::vector<double>& func, const double dx,
   return dx * sum + 0.5 * dx * (func[0] + func[nsteps - 1]);
 }
 
-double IntegrateByGaussLegendre(const std::function<double(double)>& func,
-                                const double lower_bound,
-                                const double upper_bound) {
-  const double t = (upper_bound - lower_bound) * 0.5;
-  const double m = (upper_bound + lower_bound) * 0.5;
-
-  std::array<double, 5> w;
-  w[0] = 0.5688888889;
-  w[1] = 0.4786286705;
-  w[2] = 0.4786286705;
-  w[3] = 0.2369268851;
-  w[4] = 0.2369268851;
-
-  std::array<double, 5> x;
-  x[0] = 0.0;
-  x[1] = 0.5384693101;
-  x[2] = -0.5384693101;
-  x[3] = 0.9061798459;
-  x[4] = -0.9061798459;
-
-  double integral = 0.0;
-  for (size_t i = 0; i < 5; ++i) {
-    integral += w[i] * func(t * x[i] + m);
-  }
-
-  return integral * t;
-}
-
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

@@ -31,8 +31,6 @@ TEST(TestPiecewiseLinearConstraint, add_monotone_inequality_constraint) {
   constraint.AddMonotoneInequalityConstraint();
   const auto mat = constraint.inequality_constraint_matrix();
   const auto bd = constraint.inequality_constraint_boundary();
-  std::cout << mat << std::endl;
-  std::cout << bd << std::endl;
 
   MatrixXd mat_golden(10, 10);
   // clang-format off
@@ -69,8 +67,6 @@ TEST(TestPiecewiseLinearConstraint, add_boundary) {
   constraint.AddBoundary(index_list, lower_bound, upper_bound);
   const auto mat = constraint.inequality_constraint_matrix();
   const auto bd = constraint.inequality_constraint_boundary();
-  std::cout << mat << std::endl;
-  std::cout << bd << std::endl;
 
   MatrixXd mat_golden(20, 10);
   // clang-format off
@@ -118,8 +114,6 @@ TEST(TestPiecewiseLinearConstraint, add_derivative_boundary) {
   constraint.AddDerivativeBoundary(index_list, lower_bound, upper_bound);
   const auto mat = constraint.inequality_constraint_matrix();
   const auto bd = constraint.inequality_constraint_boundary();
-  std::cout << mat << std::endl;
-  std::cout << bd << std::endl;
 
   MatrixXd mat_golden(20, 10);
   // clang-format off
@@ -170,8 +164,6 @@ TEST(TestPiecewiseLinearConstraint, add_second_derivative_boundary) {
                                          lower_bound, upper_bound);
   const auto mat = constraint.inequality_constraint_matrix();
   const auto bd = constraint.inequality_constraint_boundary();
-  std::cout << mat << std::endl;
-  std::cout << bd << std::endl;
 
   MatrixXd mat_golden(20, 10);
   // clang-format off

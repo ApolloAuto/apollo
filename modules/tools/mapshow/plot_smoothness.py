@@ -5,12 +5,14 @@ from planning import Planning
 import matplotlib.animation as animation
 from subplot_traj_speed import TrajSpeedSubplot
 from subplot_traj_acc import TrajAccSubplot
+from subplot_traj_path import TrajPathSubplot
 
 planning = Planning()
 
 def update(frame_number):
     traj_speed_subplot.show(planning)
     traj_acc_subplot.show(planning)
+    traj_path_subplot.show(planning)
 
 def planning_callback(planning_pb):
     planning.update_planning_pb(planning_pb)
@@ -29,11 +31,14 @@ if __name__ == '__main__':
     fig = plt.figure(figsize=(14, 6))
     fig.canvas.mpl_connect('key_press_event', press_key)
 
-    ax = plt.subplot2grid((1, 2), (0, 0))
+    ax = plt.subplot2grid((2, 2), (0, 0))
     traj_speed_subplot = TrajSpeedSubplot(ax)
 
-    ax2 = plt.subplot2grid((1, 2), (0, 1))
+    ax2 = plt.subplot2grid((2, 2), (0, 1))
     traj_acc_subplot = TrajAccSubplot(ax2)
+
+    ax3 = plt.subplot2grid((2, 2), (1, 0))
+    traj_path_subplot = TrajPathSubplot(ax3)
 
     ani = animation.FuncAnimation(fig, update, interval=100)
 

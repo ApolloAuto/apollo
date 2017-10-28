@@ -28,9 +28,6 @@ DECLARE_string(adapter_config_filename);
 // data file
 DECLARE_string(canbus_conf_file);
 
-// maximum can port number
-DECLARE_int32(max_port);
-
 // Canbus gflags
 DECLARE_double(chassis_freq);
 DECLARE_int64(min_cmd_interval);

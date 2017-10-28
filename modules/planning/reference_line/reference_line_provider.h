@@ -30,8 +30,10 @@
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 /**
  * @namespace apollo::planning
@@ -52,22 +54,24 @@ class ReferenceLineProvider {
    */
   ~ReferenceLineProvider();
 
-  void Init(const hdmap::PncMap* pnc_map_,
+  void Init(const hdmap::HDMap* hdmap_,
             const ReferenceLineSmootherConfig& smoother_config);
+
+  void UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
   bool Start();
 
   void Stop();
 
-  void UpdateRoutingResponse(const routing::RoutingResponse& routing_response);
+  bool HasReferenceLine();
 
-  std::vector<ReferenceLine> GetReferenceLines();
+  bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
+                         std::list<hdmap::RouteSegments>* segments);
 
  private:
   void Generate();
   void IsValidReferenceLine();
-  bool CreateReferenceLineFromRouting(const common::PointENU& position,
-                                      const routing::RoutingResponse& routing);
+  bool CreateReferenceLineFromRouting(const common::PointENU& position);
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -75,11 +79,10 @@ class ReferenceLineProvider {
   bool is_initialized_ = false;
   std::unique_ptr<std::thread> thread_;
 
-  const hdmap::PncMap* pnc_map_ = nullptr;
+  std::mutex pnc_map_mutex_;
+  std::unique_ptr<hdmap::PncMap> pnc_map_;
 
   bool has_routing_ = false;
-  std::mutex routing_response_mutex_;
-  routing::RoutingResponse routing_response_;
 
   ReferenceLineSmootherConfig smoother_config_;
 
@@ -87,6 +90,9 @@ class ReferenceLineProvider {
 
   std::mutex reference_line_groups_mutex_;
   std::list<std::vector<ReferenceLine>> reference_line_groups_;
+  std::list<std::vector<hdmap::RouteSegments>> route_segment_groups_;
+
+  std::unique_ptr<Spline2dSolver> spline_solver_;
 };
 
 }  // namespace planning

@@ -43,8 +43,7 @@ namespace planning {
 
 class QpPiecewiseStGraph {
  public:
-  QpPiecewiseStGraph(const QpStSpeedConfig& qp_st_speed_config,
-                     const apollo::common::VehicleParam& veh_param);
+  explicit QpPiecewiseStGraph(const QpStSpeedConfig& qp_st_speed_config);
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 

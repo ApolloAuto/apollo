@@ -25,16 +25,18 @@ class HDMapCommonTestSuite : public ::testing::Test {
   virtual ~HDMapCommonTestSuite() {}
   virtual void SetUp() {}
   virtual void TearDown() {}
-  void init_lane_obj(Lane* lane);
-  void init_junction_obj(Junction* junction);
-  void init_signal_obj(Signal* signal);
-  void init_crosswalk_obj(Crosswalk* crosswalk);
-  void init_stop_sign_obj(StopSign* stop_sign);
-  void init_yield_sign_obj(YieldSign* yield_sign);
-  void init_road_obj(Road* road);
+  void InitLaneObj(Lane* lane);
+  void InitJunctionObj(Junction* junction);
+  void InitSignalObj(Signal* signal);
+  void InitCrosswalkObj(Crosswalk* crosswalk);
+  void InitStopSignObj(StopSign* stop_sign);
+  void InitYieldSignObj(YieldSign* yield_sign);
+  void InitClearAreaObj(ClearArea* clear_area);
+  void InitSpeedBumpObj(SpeedBump* speed_bump);
+  void InitRoadObj(Road* road);
 };
 
-void HDMapCommonTestSuite::init_lane_obj(Lane* lane) {
+void HDMapCommonTestSuite::InitLaneObj(Lane* lane) {
   lane->mutable_id()->set_id("lane_1");
   CurveSegment* curve_segment = lane->mutable_central_curve()->add_segment();
   LineSegment* line_segment = curve_segment->mutable_line_segment();
@@ -88,7 +90,7 @@ void HDMapCommonTestSuite::init_lane_obj(Lane* lane) {
   lane->set_type(Lane::CITY_DRIVING);
 }
 
-void HDMapCommonTestSuite::init_junction_obj(Junction* junction) {
+void HDMapCommonTestSuite::InitJunctionObj(Junction* junction) {
   junction->mutable_id()->set_id("junction_1");
   Polygon* polygon = junction->mutable_polygon();
   apollo::common::PointENU* pt = polygon->add_point();
@@ -120,7 +122,7 @@ void HDMapCommonTestSuite::init_junction_obj(Junction* junction) {
   pt->set_y(1.0);
 }
 
-void HDMapCommonTestSuite::init_signal_obj(Signal* signal) {
+void HDMapCommonTestSuite::InitSignalObj(Signal* signal) {
   signal->mutable_id()->set_id("signal_1");
   Polygon* polygon = signal->mutable_boundary();
   apollo::common::PointENU* pt = polygon->add_point();
@@ -189,7 +191,7 @@ void HDMapCommonTestSuite::init_signal_obj(Signal* signal) {
   pt->set_y(4.0);
   pt->set_z(0.0);
 }
-void HDMapCommonTestSuite::init_crosswalk_obj(Crosswalk* crosswalk) {
+void HDMapCommonTestSuite::InitCrosswalkObj(Crosswalk* crosswalk) {
   crosswalk->mutable_id()->set_id("crosswalk_1");
   Polygon* polygon = crosswalk->mutable_polygon();
   apollo::common::PointENU* pt = polygon->add_point();
@@ -209,7 +211,7 @@ void HDMapCommonTestSuite::init_crosswalk_obj(Crosswalk* crosswalk) {
   pt->set_y(3.0);
   pt->set_z(0.0);
 }
-void HDMapCommonTestSuite::init_stop_sign_obj(StopSign* stop_sign) {
+void HDMapCommonTestSuite::InitStopSignObj(StopSign* stop_sign) {
   stop_sign->mutable_id()->set_id("stop_sign_1");
   CurveSegment* curve_segment = stop_sign->add_stop_line()->add_segment();
   LineSegment* line_segment = curve_segment->mutable_line_segment();
@@ -226,7 +228,7 @@ void HDMapCommonTestSuite::init_stop_sign_obj(StopSign* stop_sign) {
   pt->set_y(0.0);
   pt->set_z(0.0);
 }
-void HDMapCommonTestSuite::init_yield_sign_obj(YieldSign* yield_sign) {
+void HDMapCommonTestSuite::InitYieldSignObj(YieldSign* yield_sign) {
   yield_sign->mutable_id()->set_id("yield_sign_1");
   CurveSegment* curve_segment = yield_sign->add_stop_line()->add_segment();
   LineSegment* line_segment = curve_segment->mutable_line_segment();
@@ -243,8 +245,45 @@ void HDMapCommonTestSuite::init_yield_sign_obj(YieldSign* yield_sign) {
   pt->set_y(0.0);
   pt->set_z(0.0);
 }
+void HDMapCommonTestSuite::InitClearAreaObj(ClearArea* clear_area) {
+  clear_area->mutable_id()->set_id("clear_area_1");
+  Polygon* polygon = clear_area->mutable_polygon();
+  apollo::common::PointENU* pt = polygon->add_point();
+  pt->set_x(0.0);
+  pt->set_y(0.0);
+  pt->set_z(0.0);
+  pt = polygon->add_point();
+  pt->set_x(3.0);
+  pt->set_y(0.0);
+  pt->set_z(0.0);
+  pt = polygon->add_point();
+  pt->set_x(3.0);
+  pt->set_y(3.0);
+  pt->set_z(0.0);
+  pt = polygon->add_point();
+  pt->set_x(0.0);
+  pt->set_y(3.0);
+  pt->set_z(0.0);
+}
+void HDMapCommonTestSuite::InitSpeedBumpObj(SpeedBump* speed_bump) {
+  speed_bump->mutable_id()->set_id("speed_bump_1");
+  CurveSegment* curve_segment = speed_bump->add_position()->add_segment();
+  LineSegment* line_segment = curve_segment->mutable_line_segment();
+  apollo::common::PointENU* pt = line_segment->add_point();
+  pt->set_x(0.0);
+  pt->set_y(0.0);
+  pt->set_z(0.0);
+  pt = line_segment->add_point();
+  pt->set_x(1.0);
+  pt->set_y(0.0);
+  pt->set_z(0.0);
+  pt = line_segment->add_point();
+  pt->set_x(2.0);
+  pt->set_y(0.0);
+  pt->set_z(0.0);
+}
 
-void HDMapCommonTestSuite::init_road_obj(Road* road) {
+void HDMapCommonTestSuite::InitRoadObj(Road* road) {
   road->mutable_id()->set_id("road_1");
   road->mutable_junction_id()->set_id("junction_1");
 
@@ -258,9 +297,9 @@ void HDMapCommonTestSuite::init_road_obj(Road* road) {
   section->add_lane_id()->set_id("section_2_1");
 }
 
-TEST_F(HDMapCommonTestSuite, lane_info) {
+TEST_F(HDMapCommonTestSuite, TestLaneInfo) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
   EXPECT_EQ(lane.id().id(), lane_info.id().id());
   EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
@@ -304,25 +343,25 @@ TEST_F(HDMapCommonTestSuite, lane_info) {
   EXPECT_NEAR(4.0, lane_info.total_length(), 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, lane_info_get_width) {
+TEST_F(HDMapCommonTestSuite, GetWidth) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
   EXPECT_NEAR(3.0, lane_info.GetWidth(2.0), 1E-3);
   EXPECT_NEAR(2.4, lane_info.GetWidth(3.5), 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, lane_info_get_effective_width) {
+TEST_F(HDMapCommonTestSuite, GetEffectiveWidth) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
   EXPECT_NEAR(3.0, lane_info.GetEffectiveWidth(2.0), 1E-3);
   EXPECT_NEAR(2.4, lane_info.GetEffectiveWidth(3.5), 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, point_is_on_lane) {
+TEST_F(HDMapCommonTestSuite, PointIsOnLane) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   EXPECT_TRUE(lane_info.IsOnLane({1.5, 1.5}));
@@ -331,9 +370,9 @@ TEST_F(HDMapCommonTestSuite, point_is_on_lane) {
   EXPECT_TRUE(!lane_info.IsOnLane({1.5, 3}));
 }
 
-TEST_F(HDMapCommonTestSuite, box_is_on_lane) {
+TEST_F(HDMapCommonTestSuite, BoxIsOnLane) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   apollo::common::math::Box2d target_in_box(
@@ -347,7 +386,7 @@ TEST_F(HDMapCommonTestSuite, box_is_on_lane) {
 
 TEST_F(HDMapCommonTestSuite, GetSmoothPoint) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   auto smooth_point = lane_info.GetSmoothPoint(1.5);
@@ -357,7 +396,7 @@ TEST_F(HDMapCommonTestSuite, GetSmoothPoint) {
 
 TEST_F(HDMapCommonTestSuite, DistanceTo) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   double distance = lane_info.DistanceTo({2.5, 3.0});
@@ -367,9 +406,9 @@ TEST_F(HDMapCommonTestSuite, DistanceTo) {
   EXPECT_NEAR(distance, 2.0615, 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, distance_to_with_more_info) {
+TEST_F(HDMapCommonTestSuite, DistanceToWithMoreInfo) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   apollo::common::math::Vec2d foot_point;
@@ -392,7 +431,7 @@ TEST_F(HDMapCommonTestSuite, distance_to_with_more_info) {
 
 TEST_F(HDMapCommonTestSuite, GetNearestPoint) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   double distance = 0.0;
@@ -411,7 +450,7 @@ TEST_F(HDMapCommonTestSuite, GetNearestPoint) {
 
 TEST_F(HDMapCommonTestSuite, GetProjection) {
   Lane lane;
-  init_lane_obj(&lane);
+  InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
   double accumulate_s = 0.0;
@@ -432,9 +471,9 @@ TEST_F(HDMapCommonTestSuite, GetProjection) {
   EXPECT_NEAR(lateral, 2.0, 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, junction_info) {
+TEST_F(HDMapCommonTestSuite, TestJunctionInfo) {
   Junction junction;
-  init_junction_obj(&junction);
+  InitJunctionObj(&junction);
   JunctionInfo junction_info(junction);
   EXPECT_EQ(junction.id().id(), junction_info.id().id());
   EXPECT_EQ(7, junction_info.polygon().points().size());
@@ -447,9 +486,9 @@ TEST_F(HDMapCommonTestSuite, junction_info) {
   EXPECT_NEAR(2.0, junction_info.polygon().points()[6].y(), 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, signal_info) {
+TEST_F(HDMapCommonTestSuite, TestSignalInfo) {
   Signal signal;
-  init_signal_obj(&signal);
+  InitSignalObj(&signal);
   SignalInfo signal_info(signal);
   EXPECT_EQ(signal.id().id(), signal_info.id().id());
   EXPECT_EQ(4, signal_info.signal().boundary().point_size());
@@ -464,9 +503,9 @@ TEST_F(HDMapCommonTestSuite, signal_info) {
   }
 }
 
-TEST_F(HDMapCommonTestSuite, crosswalk_info) {
+TEST_F(HDMapCommonTestSuite, TestCrosswalkInfo) {
   Crosswalk crosswalk;
-  init_crosswalk_obj(&crosswalk);
+  InitCrosswalkObj(&crosswalk);
   CrosswalkInfo crosswalk_info(crosswalk);
   EXPECT_EQ(crosswalk.id().id(), crosswalk_info.id().id());
   EXPECT_EQ(4, crosswalk_info.crosswalk().polygon().point_size());
@@ -480,9 +519,9 @@ TEST_F(HDMapCommonTestSuite, crosswalk_info) {
   EXPECT_NEAR(3.0, crosswalk_info.polygon().points()[3].y(), 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, stop_sign_info) {
+TEST_F(HDMapCommonTestSuite, TestStopSignInfo) {
   StopSign stop_sign;
-  init_stop_sign_obj(&stop_sign);
+  InitStopSignObj(&stop_sign);
   StopSignInfo stop_sign_info(stop_sign);
   EXPECT_EQ(stop_sign.id().id(), stop_sign_info.id().id());
   EXPECT_EQ(stop_sign.stop_line(0).segment(0).line_segment().point_size() - 1,
@@ -492,9 +531,9 @@ TEST_F(HDMapCommonTestSuite, stop_sign_info) {
   }
 }
 
-TEST_F(HDMapCommonTestSuite, yield_sign_info) {
+TEST_F(HDMapCommonTestSuite, TestYieldSignInfo) {
   YieldSign yield_sign;
-  init_yield_sign_obj(&yield_sign);
+  InitYieldSignObj(&yield_sign);
   YieldSignInfo yield_sign_info(yield_sign);
   EXPECT_EQ(yield_sign.id().id(), yield_sign_info.id().id());
   EXPECT_EQ(yield_sign.stop_line(0).segment(0).line_segment().point_size() - 1,
@@ -504,9 +543,37 @@ TEST_F(HDMapCommonTestSuite, yield_sign_info) {
   }
 }
 
-TEST_F(HDMapCommonTestSuite, road_info) {
+TEST_F(HDMapCommonTestSuite, TestClearAreaInfo) {
+  ClearArea clear_area;
+  InitClearAreaObj(&clear_area);
+  ClearAreaInfo clear_area_info(clear_area);
+  EXPECT_EQ(clear_area.id().id(), clear_area_info.id().id());
+  EXPECT_EQ(4, clear_area_info.clear_area().polygon().point_size());
+  EXPECT_NEAR(0.0, clear_area_info.polygon().points()[0].x(), 1E-3);
+  EXPECT_NEAR(0.0, clear_area_info.polygon().points()[0].y(), 1E-3);
+  EXPECT_NEAR(3.0, clear_area_info.polygon().points()[1].x(), 1E-3);
+  EXPECT_NEAR(0.0, clear_area_info.polygon().points()[1].y(), 1E-3);
+  EXPECT_NEAR(3.0, clear_area_info.polygon().points()[2].x(), 1E-3);
+  EXPECT_NEAR(3.0, clear_area_info.polygon().points()[2].y(), 1E-3);
+  EXPECT_NEAR(0.0, clear_area_info.polygon().points()[3].x(), 1E-3);
+  EXPECT_NEAR(3.0, clear_area_info.polygon().points()[3].y(), 1E-3);
+}
+
+TEST_F(HDMapCommonTestSuite, TestSpeedBumpInfo) {
+  SpeedBump speed_bump;
+  InitSpeedBumpObj(&speed_bump);
+  SpeedBumpInfo speed_bump_info(speed_bump);
+  EXPECT_EQ(speed_bump.id().id(), speed_bump_info.id().id());
+  EXPECT_EQ(speed_bump.position(0).segment(0).line_segment().point_size() - 1,
+            speed_bump_info.segments().size());
+  for (const auto& segment : speed_bump_info.segments()) {
+    EXPECT_NEAR(1.0, segment.length(), 1E-4);
+  }
+}
+
+TEST_F(HDMapCommonTestSuite, TestRoadInfo) {
   Road road;
-  init_road_obj(&road);
+  InitRoadObj(&road);
   RoadInfo road_info(road);
   EXPECT_EQ(road.id().id(), road_info.id().id());
   EXPECT_EQ(2, road_info.sections().size());

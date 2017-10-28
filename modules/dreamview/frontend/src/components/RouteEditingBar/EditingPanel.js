@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import removeAllIcon from "assets/images/icons/remove_all.png";
 import removeLastIcon from "assets/images/icons/remove_last.png";
 import sendRouteIcon from "assets/images/icons/send_request.png";
-
+import AddDefaultEndPointIcon from "assets/images/icons/add_default_end_point.png";
 
 @observer
 class RouteEditingButton extends React.Component {
@@ -26,10 +26,14 @@ class RouteEditingButton extends React.Component {
 export default class EditingPanel extends React.Component {
 
     render() {
-        const { clickRemoveLast, clickRemoveAll, clickSendRoute  } = this.props;
+        const { clickAddDefaultEndPoint, clickRemoveLast,
+                clickRemoveAll, clickSendRoute  } = this.props;
 
         return (
             <div className="editing-panel">
+                <RouteEditingButton label="Add Default End Point"
+                                    icon={AddDefaultEndPointIcon}
+                                    onClick={clickAddDefaultEndPoint}/>
 	            <RouteEditingButton label="Remove Last Point"
 	                                icon={removeLastIcon}
                                     onClick={clickRemoveLast}/>

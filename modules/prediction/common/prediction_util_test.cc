@@ -20,9 +20,7 @@
 
 namespace apollo {
 namespace prediction {
-namespace util {
-
-using apollo::common::TrajectoryPoint;
+namespace math_util {
 
 TEST(PredictionUtilTest, normalize) {
   double value = 3.0;
@@ -58,6 +56,12 @@ TEST(PredictionUtilTest, non_solvable_quadratic_equation) {
   EXPECT_EQ(SolveQuadraticEquation(coefficients, &roots), -1);
 }
 
+}  // namespace math_util
+
+namespace predictor_util {
+
+using ::apollo::common::TrajectoryPoint;
+
 TEST(PredictionUtilTest, translate_point) {
   double x = 1.0;
   double y = 2.0;
@@ -67,6 +71,6 @@ TEST(PredictionUtilTest, translate_point) {
   EXPECT_DOUBLE_EQ(trajectory_point.path_point().y(), 2.0);
 }
 
-}  // namespace util
+}  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo

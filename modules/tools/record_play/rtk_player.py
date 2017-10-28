@@ -46,11 +46,11 @@ import hmi_status_helper
 
 SEARCH_INTERVAL = 1000
 
+
 class RtkPlayer(object):
     """
     rtk player class
     """
-
 
     def __init__(self, record_file, speedmultiplier, completepath, replan):
         """Init player."""
@@ -82,7 +82,7 @@ class RtkPlayer(object):
 
         b, a = signal.butter(6, 0.05, 'low')
         self.data['acceleration'] = signal.filtfilt(b, a,
-            self.data['acceleration'])
+                                                    self.data['acceleration'])
 
         self.start = 0
         self.end = 0
@@ -143,8 +143,7 @@ class RtkPlayer(object):
 
     def closest_dist(self):
         shortest_dist_sqr = float('inf')
-        self.logger.info("before closest self.start=%s" %
-                         (self.start))
+        self.logger.info("before closest self.start=%s" % (self.start))
         search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
         search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
         start = self.start
@@ -162,8 +161,7 @@ class RtkPlayer(object):
         time_diff = self.data['time'][closest_time] - \
            self.data['time'][self.closestpoint]
 
-        while time_diff < time_elapsed and closest_time < (
-                len(self.data) - 1):
+        while time_diff < time_elapsed and closest_time < (len(self.data) - 1):
             closest_time = closest_time + 1
             time_diff = self.data['time'][closest_time] - \
                 self.data['time'][self.closestpoint]
@@ -220,11 +218,9 @@ class RtkPlayer(object):
             adc_point.path_point.y = self.data['y'][i]
             adc_point.path_point.z = self.data['z'][i]
             adc_point.v = self.data['speed'][i] * self.speedmultiplier
-            adc_point.a = self.data['acceleration'][
-                i] * self.speedmultiplier
+            adc_point.a = self.data['acceleration'][i] * self.speedmultiplier
             adc_point.path_point.kappa = self.data['curvature'][i]
-            adc_point.path_point.dkappa = self.data[
-                'curvature_change_rate'][i]
+            adc_point.path_point.dkappa = self.data['curvature_change_rate'][i]
 
             time_diff = self.data['time'][i] - \
                 self.data['time'][self.closestpoint]

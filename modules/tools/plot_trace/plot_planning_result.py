@@ -36,6 +36,26 @@ from modules.planning.proto import planning_pb2
 g_args = None
 
 
+def get_3d_trajectory(planning_pb):
+    x = [p.path_point.x for p in planning_pb.trajectory_point]
+    y = [p.path_point.y for p in planning_pb.trajectory_point]
+    z = [p.v for p in planning_pb.trajectory_point]
+    return (x, y, z)
+
+
+def get_debug_paths(planning_pb):
+    if not planning_pb.HasField("debug"):
+        return None
+    if not planning_pb.debug.HasField("planning_data"):
+        return None
+    results = []
+    for path in planning_pb.debug.planning_data.path:
+        x = [p.x for p in path.path_point]
+        y = [p.y for p in path.path_point]
+        results.append((path.name, (x, y)))
+    return results
+
+
 def plot_planning(ax, planning_file):
     try:
         fhandle = file(planning_file, 'r')
@@ -44,10 +64,16 @@ def plot_planning(ax, planning_file):
         return
     planning_pb = planning_pb2.ADCTrajectory()
     text_format.Merge(fhandle.read(), planning_pb)
-    x = [p.path_point.x for p in planning_pb.trajectory_point]
-    y = [p.path_point.y for p in planning_pb.trajectory_point]
-    z = [p.v for p in planning_pb.trajectory_point]
-    ax.plot(x, y, z, label=planning_file)
+    trajectory = get_3d_trajectory(planning_pb)
+    ax.plot(
+        trajectory[0],
+        trajectory[1],
+        trajectory[2],
+        label="Trajectory:%s" % planning_file)
+    paths = get_debug_paths(planning_pb)
+    if paths:
+        for name, path in paths:
+            ax.plot(path[0], path[1], label="%s:%s" % (name, planning_file))
     ax.legend()
 
 

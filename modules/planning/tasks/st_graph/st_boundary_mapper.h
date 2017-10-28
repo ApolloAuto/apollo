@@ -39,8 +39,7 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(const hdmap::PncMap* pnc_map,
-                   const SLBoundary& adc_sl_boundary,
+  StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                    const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
@@ -59,6 +58,11 @@ class StBoundaryMapper {
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
 
+  /**
+   * Creates valid st boundary upper_points and lower_points
+   * If return true, upper_points.size() > 1 and
+   * upper_points.size() = lower_points.size()
+   */
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
@@ -71,13 +75,12 @@ class StBoundaryMapper {
   apollo::common::Status MapWithPredictionTrajectory(
       PathObstacle* path_obstacle) const;
 
-  double GetAvgKappa(const uint32_t index,
-                     const std::vector<common::PathPoint>& path_points) const;
-
   double GetCentricAccLimit(const double kappa) const;
 
+  void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
+                   std::vector<double>* kappa) const;
+
  private:
-  const hdmap::PncMap* pnc_map_ = nullptr;
   const SLBoundary& adc_sl_boundary_;
   StBoundaryConfig st_boundary_config_;
   const ReferenceLine& reference_line_;

@@ -3,130 +3,60 @@ syntax = "proto2";
 package apollo.routing;
 
 import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/error_code.proto";
 
-message RoutingRequest {
-  message Pose {
-    optional double x = 1;
-    optional double y = 2;
-    optional double z = 3;
-  }
+message LaneWaypoint {
+  optional string id = 1;
+  optional double s = 2;
+  optional apollo.common.PointENU pose = 3;
+}
 
-  message LaneWaypoint {
-    optional string id = 1;
-    optional double s = 2;
-    optional Pose pose = 3;
-  }
-
-  message Lane {
+message LaneSegment {
     optional string id = 1;
     optional double start_s = 2;
     optional double end_s = 3;
   }
 
+message RoutingRequest {
   optional apollo.common.Header header = 1;
-  optional LaneWaypoint start = 2;
-  optional LaneWaypoint end = 3;
+  // at least two points. The first is start point, the end is final point.
+  // The routing must go through each point in waypoint.
+  repeated LaneWaypoint waypoint = 2;
+  repeated LaneSegment blacklisted_lane = 3;
+  repeated string blacklisted_road = 4;
+  optional bool broadcast = 5 [default = true];
+}
 
-  //Route must go through each waypoint in the order from start to end.
-  //Ignored if empty.
-  repeated LaneWaypoint waypoint = 4;
-  repeated Lane blacklisted_lane = 5;
-  repeated string blacklisted_road = 6;
-  optional bool broadcast = 7 [default = true];
+message Measurement {
+  optional double distance = 1;
+}
+
+enum ChangeLaneType {
+    FORWARD = 0;
+    LEFT = 1;
+    RIGHT = 2;
+};
+
+
+message Passage {
+   repeated LaneSegment segment = 1;
+   optional bool can_exit = 2;
+   optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
+}
+
+message RoadSegment {
+  optional string id = 1;
+  repeated Passage passage = 2;
 }
 
 message RoutingResponse {
-  message Measurement {
-    optional double distance = 1;
-  }
-
-  message Lane {
-    optional string id = 1;
-    optional double s = 2;
-  }
-
-  message Trajectory {
-    message TrajectoryPoint {
-      message Point {
-        optional double x = 1;
-        optional double y = 2;
-        optional double z = 3;
-      }
-      optional Point point = 1;
-      optional double curvature = 2;
-      optional double curvature_change_rate = 3;
-      optional double theta = 4;
-      optional double accumulated_s = 5;
-    }
-    repeated TrajectoryPoint point = 1;
-    optional double length = 2;
-  }
-
-  message LaneSegment {
-    optional string id = 1;
-    optional double start_s = 2;
-    optional double end_s = 3;
-  }
-
-  message PassageRegion {
-    repeated LaneSegment segment = 1;
-    optional Trajectory trajectory = 2;
-  }
-
-  message LaneChangeInfo {
-    enum Type {
-      UNKNOWN = 0;
-      LEFT_FORWARD = 1;
-      LEFT_REVERSE = 2;
-      RIGHT_FORWARD = 3;
-      RIGHT_REVERSE = 4;
-      FORWARD = 5;
-      REVERSE = 6;
-    }
-    optional Type type = 1 [default = UNKNOWN];
-    optional int32 start_passage_region_index = 2;
-    optional int32 end_passage_region_index = 3;
-  }
-
-  message Road {
-    optional string id = 1;
-    optional Lane in_lane = 2;
-    optional Lane out_lane = 3;
-    repeated PassageRegion passage_region = 4;
-    repeated LaneChangeInfo lane_change_info = 5;
-  }
-
-  message Junction {
-    optional string id = 1;
-    optional string in_road_id = 2;
-    optional string out_road_id = 3;
-    optional PassageRegion passage_region = 4;
-  }
-
-  message Way {
-    oneof way_info {
-      Road road_info = 1;
-      Junction junction_info = 2;
-    }
-  }
-
-  message ErrorCode {
-    enum ErrorID {
-        SUCCESS = 0;
-        ERROR_REQUEST = 1;
-        ERROR_RESPONSE_FAILED = 2;
-        ERROR_ROUTER_NOT_READY = 3;
-    }
-    optional ErrorID error_id = 1 [default = SUCCESS];
-    optional string error_string = 2;
-  }
-
   optional apollo.common.Header header = 1;
-  repeated Way route = 2;
+  repeated RoadSegment road = 2;
   optional Measurement measurement = 3;
   optional RoutingRequest routing_request = 4;
 
   // the map version which is used to build road graph
   optional bytes map_version = 5;
-  optional ErrorCode error_code = 6;
+  optional apollo.common.StatusPb status = 6;
 }

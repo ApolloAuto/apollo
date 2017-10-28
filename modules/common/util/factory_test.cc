@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/common/util/factory.h"
 #include <string>
 #include "gtest/gtest.h"
+#include "modules/common/util/factory.h"
 
 namespace apollo {
 namespace common {
@@ -53,6 +53,44 @@ TEST(FactoryTest, Unregister) {
   auto non_exist_ptr = factory.CreateObject("derived_class");
   EXPECT_TRUE(non_exist_ptr == nullptr);
 }
+
+class ArgConstructor {
+ public:
+  explicit ArgConstructor(const std::string& name) : name_(name) {}
+  explicit ArgConstructor(const std::string& name, int value)
+      : name_(name), value_(value) {}
+  std::string Name() const { return name_; }
+  int Value() const { return value_; }
+
+ private:
+  std::string name_;
+  int value_ = 0;
+};
+
+TEST(FactoryTest, OneArgConstructor) {
+  Factory<std::string, ArgConstructor, ArgConstructor* (*)(const std::string&)>
+      factory;
+  EXPECT_TRUE(factory.Register(
+      "arg_1", [](const std::string& arg) { return new ArgConstructor(arg); }));
+  auto ptr = factory.CreateObject("arg_1", "name_1");
+  EXPECT_TRUE(ptr != nullptr);
+  EXPECT_EQ("name_1", ptr->Name());
+  EXPECT_EQ(0, ptr->Value());
+}
+
+TEST(FactoryTest, TwoArgConstructor) {
+  Factory<std::string, ArgConstructor,
+          ArgConstructor* (*)(const std::string&, int)>
+      factory;
+  EXPECT_TRUE(factory.Register("arg_2", [](const std::string& arg, int value) {
+    return new ArgConstructor(arg, value);
+  }));
+  auto ptr = factory.CreateObject("arg_2", "name_2", 10);
+  EXPECT_TRUE(ptr != nullptr);
+  EXPECT_EQ("name_2", ptr->Name());
+  EXPECT_EQ(10, ptr->Value());
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

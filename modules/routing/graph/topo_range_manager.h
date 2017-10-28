@@ -29,7 +29,7 @@ namespace routing {
 class TopoRangeManager {
  public:
   TopoRangeManager() = default;
-  ~TopoRangeManager() = default;
+  virtual ~TopoRangeManager() = default;
 
   const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>& RangeMap()
       const;

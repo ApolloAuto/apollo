@@ -34,6 +34,9 @@ const MenuIdOptionMapping = {
         routing: 'showRouting',
         decisionMain: 'showDecisionMain',
         decisionObstacle: 'showDecisionObstacle',
+        planningReference: 'showPlanningReference',
+        planingDpOptimizer: 'showPlaningDpOptimizer',
+        planningQpOptimizer: 'showPlanningQpOptimizer',
         planningLine: 'showPlanning'
 };
 

@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.drivers.canbus;
+
+import "modules/drivers/canbus/proto/can_card_parameter.proto";
+
+message SensorCanbusConf {
+  optional apollo.drivers.canbus.CANCardParameter can_card_parameter = 1;
+  optional bool enable_debug_mode = 2 [default = false];
+  optional bool enable_receiver_log = 3 [default = false];
+}

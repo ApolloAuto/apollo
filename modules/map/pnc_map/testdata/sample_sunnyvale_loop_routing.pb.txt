@@ -1,0 +1,158 @@
+header {
+  timestamp_sec: 1508173542.66
+  module_name: "routing"
+  sequence_num: 8
+}
+road {
+  id: "13-9-696-171-12-6-153-751-752-7-753-1-151"
+  passage {
+    segment {
+      id: "696_1_-1"
+      start_s: 47.5174207497
+      end_s: 299.734
+    }
+    change_lane_type: RIGHT
+  }
+  passage {
+    segment {
+      id: "696_1_-2"
+      start_s: 47.5139330464
+      end_s: 299.712
+    }
+    segment {
+      id: "171_1_-1"
+      start_s: 0.0
+      end_s: 42.8949
+    }
+    segment {
+      id: "153_1_-4"
+      start_s: 0.0
+      end_s: 22.1195
+    }
+    segment {
+      id: "751_1_-1"
+      start_s: 0.0
+      end_s: 12.6363
+    }
+    segment {
+      id: "752_1_-1"
+      start_s: 0.0
+      end_s: 20.1963
+    }
+    segment {
+      id: "753_1_-1"
+      start_s: 0.0
+      end_s: 21.6437
+    }
+    segment {
+      id: "6_1_-2"
+      start_s: 0.0
+      end_s: 194.692
+    }
+    segment {
+      id: "7_1_-2"
+      start_s: 0.0
+      end_s: 32.89
+    }
+    segment {
+      id: "1_1_-3"
+      start_s: 0.0
+      end_s: 65.2454
+    }
+    segment {
+      id: "151_1_-2"
+      start_s: 0.0
+      end_s: 43.8648
+    }
+    segment {
+      id: "9_1_-2"
+      start_s: 0.0
+      end_s: 84.2850948446
+    }
+    segment {
+      id: "13_1_-2"
+      start_s: 0.0
+      end_s: 35.3398
+    }
+    segment {
+      id: "12_1_-3"
+      start_s: 0.0
+      end_s: 63.7359305757
+    }
+    change_lane_type: LEFT
+  }
+  passage {
+    segment {
+      id: "9_1_-1"
+      start_s: 0.0
+      end_s: 161.99
+    }
+    segment {
+      id: "13_1_-1"
+      start_s: 0.0
+      end_s: 35.237
+    }
+    segment {
+      id: "12_1_-2"
+      start_s: 0.0
+      end_s: 63.7265648374
+    }
+    change_lane_type: RIGHT
+  }
+  passage {
+    segment {
+      id: "12_1_-3"
+      start_s: 0.0
+      end_s: 63.7359305757
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 868.129638
+}
+routing_request {
+  header {
+    timestamp_sec: 1508173542.66
+    module_name: "dreamview"
+    sequence_num: 11
+  }
+  waypoint {
+    id: "696_1_-1"
+    s: 47.5174207497
+    pose {
+      x: 587617.970437
+      y: 4141036.81869
+    }
+  }
+  waypoint {
+    id: "7_1_-2"
+    s: 31.0353727109
+    pose {
+      x: 587338.801489
+      y: 4140884.97963
+    }
+  }
+  waypoint {
+    id: "9_1_-1"
+    s: 60.757098986
+    pose {
+      x: 587174.662136
+      y: 4140933.06302
+    }
+  }
+  waypoint {
+    id: "12_1_-3"
+    s: 63.7359305757
+    pose {
+      x: 586981.555312
+      y: 4140986.16722
+    }
+  }
+}
+map_version: "1.000000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

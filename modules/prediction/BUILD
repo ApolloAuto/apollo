@@ -30,12 +30,12 @@ cc_test(
     size = "small",
     srcs = ["prediction_test.cc"],
     data = [
-        "//modules/prediction:prediction_conf",
-        "//modules/prediction:prediction_data",
-        "//modules/prediction:prediction_testdata",
+        ":prediction_conf",
+        ":prediction_data",
+        ":prediction_testdata",
     ],
     deps = [
-        "//modules/prediction:prediction_lib",
+        ":prediction_lib",
         "@gtest//:main",
     ],
 )
@@ -44,8 +44,8 @@ cc_binary(
     name = "prediction",
     srcs = ["main.cc"],
     deps = [
+        ":prediction_lib",
         "//external:gflags",
-        "//modules/prediction:prediction_lib",
     ],
 )
 

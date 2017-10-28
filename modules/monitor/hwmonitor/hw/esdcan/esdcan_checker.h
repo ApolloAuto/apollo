@@ -14,23 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_HW_ESDCAN_CHECKER_H_
-#define MODULES_PLATFORM_HW_ESDCAN_CHECKER_H_
+#ifndef MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_CHECKER_H_
+#define MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_CHECKER_H_
 
 #include <string>
 #include <vector>
 
+#include "modules/common/macro.h"
 #include "modules/monitor/common/annotations.h"
-#include "modules/monitor/common/interface/hw_checker.h"
-
+#include "modules/monitor/common/hw_checker.h"
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * @namespace apollo::monitor::hw
+ * @brief apollo::monitor::hw
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 class EsdCanChecker : public HwCheckerInterface {
@@ -38,17 +38,21 @@ class EsdCanChecker : public HwCheckerInterface {
   static const char ESD_CAN_NAME[];
 
   /// Returns a HW status code from ntstatus.
-  static hw::Status esdcan_result_to_hw_status(NTCAN_RESULT ntstatus);
+  static HardwareStatus::Status esdcan_result_to_hw_status(
+      NTCAN_RESULT ntstatus);
 
   /// Returns a HW status message from ntstatus.
   static std::string esdcan_result_to_message(NTCAN_RESULT ntstatus);
 
-  explicit EsdCanChecker(int id);
+  EsdCanChecker();
 
   virtual ~EsdCanChecker() {}
 
   /// Returns the name of the HW this checker checks.
-  const std::string &get_name() const override { return name_; };
+  const std::string &get_name() const override { return name_; }
+
+  // Returns the can id
+  const int &get_id() const { return can_id_; }
 
   /// Runs HW status check, stores results in results.
   void run_check(std::vector<HwCheckResult> *results) override;
@@ -61,7 +65,7 @@ class EsdCanChecker : public HwCheckerInterface {
 };
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_INTERFACE_HW_CHECKER_H_
+#endif  // MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_CHECKER_H_

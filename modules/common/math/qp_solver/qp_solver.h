@@ -44,6 +44,8 @@ class QpSolver {
 
   virtual void set_pos_semi_definite_hessian() {}
   virtual void set_pos_definite_hessian() {}
+  virtual void EnableCholeskyRefactorisation(const int) {}
+  virtual void SetTerminationTolerance(const double) {}
   virtual bool Solve() = 0;
 
   const Eigen::MatrixXd& params() const;

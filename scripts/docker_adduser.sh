@@ -33,21 +33,20 @@ if [ -e /dev/ttyUSB0 ]; then
     sudo chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
 fi
 
+MACHINE_ARCH=$(uname -m)
+ROS_TAR="ros-indigo-apollo-1.5.1-${MACHINE_ARCH}.tar.gz"
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
-
-  # setup car specific configuration
-  if [ -e /home/tmp/esd_can ]; then
-    cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
-    cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
-  fi
-  if [ -e /home/tmp/gnss_conf ]; then
-    cp -r /home/tmp/gnss_conf/* /apollo/modules/drivers/gnss/conf/
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/drivers/gnss/conf/"
-  fi
+# setup ros package
+# this is a tempary solution to avoid ros package downloading.
+ROS="/home/tmp/ros"
+if [ -e "$ROS" ]; then
+  rm -rf $ROS
+fi
+tar xzf "/home/tmp/${ROS_TAR}" -C "/home/tmp"
+chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
 fi

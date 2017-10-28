@@ -103,6 +103,12 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     StBoundary* const st_boundary) {
   const auto& object_id = obstacle_->Id();
   const auto& perception = obstacle_->Perception();
+  if (!IsValidObstacle(perception)) {
+    AERROR << "Fail to build trajectory st boundary because object is not "
+              "valid. PerceptionObstacle: "
+           << perception.DebugString();
+    return false;
+  }
   const double object_width = perception.width();
   const double object_length = perception.length();
   const auto& trajectory_points = obstacle_->Trajectory().trajectory_point();
@@ -118,13 +124,14 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d min_box({0, 0}, 1.0, 1.0, 1.0);
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
+
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
     double total_length =
-        object_length + common::util::Distance2D(first_point, second_point);
+        object_length + common::util::DistanceXY(first_point, second_point);
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
     common::math::Box2d object_moving_box(center, first_point.theta(),
@@ -341,7 +348,7 @@ void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
   longitudinal_decision_ =
       MergeLongitudinalDecision(longitudinal_decision_, decision);
   ADEBUG << decider_tag << " added obstacle " << Id()
-         << " a longitudinal decision: " << decision.ShortDebugString()
+         << " longitudinal decision: " << decision.ShortDebugString()
          << ". The merged decision is: "
          << longitudinal_decision_.ShortDebugString();
   decisions_.push_back(decision);
@@ -389,6 +396,21 @@ const SLBoundary& PathObstacle::perception_sl_boundary() const {
 
 void PathObstacle::SetStBoundary(const StBoundary& boundary) {
   st_boundary_ = boundary;
+}
+
+void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
+  st_boundary_.SetBoundaryType(type);
+}
+
+bool PathObstacle::IsValidObstacle(
+    const perception::PerceptionObstacle& perception_obstacle) {
+  const double object_width = perception_obstacle.width();
+  const double object_length = perception_obstacle.length();
+
+  const double kMinObjectDimension = 1.0e-6;
+  return !std::isnan(object_width) && !std::isnan(object_length) &&
+         object_width > kMinObjectDimension &&
+         object_length > kMinObjectDimension;
 }
 
 }  // namespace planning

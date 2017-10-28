@@ -29,8 +29,10 @@ LincolnVehicleFactory::CreateVehicleController() {
   return std::unique_ptr<VehicleController>(new lincoln::LincolnController());
 }
 
-std::unique_ptr<MessageManager> LincolnVehicleFactory::CreateMessageManager() {
-  return std::unique_ptr<MessageManager>(new lincoln::LincolnMessageManager());
+std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
+LincolnVehicleFactory::CreateMessageManager() {
+  return std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>(
+      new lincoln::LincolnMessageManager());
 }
 
 }  // namespace canbus

@@ -28,6 +28,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
@@ -41,8 +42,10 @@ namespace planning {
 
 class QpSplinePathGenerator {
  public:
-  QpSplinePathGenerator(const ReferenceLine& reference_line,
-                        const QpSplinePathConfig& qp_spline_path_config);
+  QpSplinePathGenerator(Spline1dGenerator* spline_generator,
+                        const ReferenceLine& reference_line,
+                        const QpSplinePathConfig& qp_spline_path_config,
+                        const SLBoundary& adc_sl_boundary);
 
   void SetDebugLogger(apollo::planning_internal::Debug* debug);
 
@@ -52,8 +55,8 @@ class QpSplinePathGenerator {
                 PathData* const path_data);
 
  private:
-  bool CalculateInitFrenetPoint(const common::TrajectoryPoint& traj_point,
-                                common::FrenetFramePoint* const sl_point);
+  bool CalculateFrenetPoint(const common::TrajectoryPoint& traj_point,
+                            common::FrenetFramePoint* const sl_point);
 
   bool InitSpline(const double start_s, const double end_s);
 
@@ -61,18 +64,23 @@ class QpSplinePathGenerator {
 
   void AddKernel();
 
+  void AddHistoryPathKernel();
+
   bool Solve();
 
  private:
+  Spline1dGenerator* spline_generator_ = nullptr;
   apollo::planning_internal::Debug* planning_debug_ = nullptr;
   const ReferenceLine& reference_line_;
   const QpSplinePathConfig& qp_spline_path_config_;
 
   common::FrenetFramePoint init_frenet_point_;
-  std::unique_ptr<Spline1dGenerator> spline_generator_;
 
   std::vector<double> knots_;
   std::vector<double> evaluated_s_;
+
+  const DiscretizedPath* last_discretized_path_ = nullptr;
+  SLBoundary adc_sl_boundary_;
 };
 
 }  // namespace planning

@@ -138,8 +138,8 @@ class TopoEdge {
 
  private:
   Edge pb_edge_;
-  const TopoNode* from_node_;
-  const TopoNode* to_node_;
+  const TopoNode* from_node_ = nullptr;
+  const TopoNode* to_node_ = nullptr;
 };
 
 }  // namespace routing

@@ -4,10 +4,10 @@ import * as THREE from "three";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
-import Video from "store/video";
+import Planning from "store/planning";
 import RouteEditingManager from "store/route_editing_manager";
+import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
-
 
 class DreamviewStore {
     // Mutable States
@@ -15,12 +15,16 @@ class DreamviewStore {
 
     @observable worldTimestamp = 0;
 
+    @observable widthInPercentage = 1.0;
+
     @observable dimension = {
         width: window.innerWidth,
         height: window.innerHeight,
     };
 
     @observable isInitialized = false;
+
+    @observable planning = new Planning();
 
     @observable meters = new Meters();
 
@@ -32,6 +36,8 @@ class DreamviewStore {
 
     @observable routeEditingManager = new RouteEditingManager();
 
+    @observable geolocation = {};
+
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;
     }
@@ -40,15 +46,45 @@ class DreamviewStore {
         this.worldTimestamp = newTimestamp;
     }
 
+    @action updateWidthInPercentage(newWidth) {
+        this.widthInPercentage = newWidth;
+        this.updateDimension();
+    }
+
     @action updateDimension() {
         this.dimension = {
-            width: window.innerWidth,
+            width: window.innerWidth * this.widthInPercentage,
             height: window.innerHeight,
         };
     }
 
     @action setInitializationStatus(status){
         this.isInitialized = status;
+    }
+
+    @action updatePlanning(newPlanningData) {
+        this.planning.update(newPlanningData);
+    }
+
+    @action setGeolocation(newGeolocation) {
+        this.geolocation = newGeolocation;
+    }
+
+    @action setPNCMonitor() {
+        this.options.toggle('showPNCMonitor');
+        if(this.options.showPNCMonitor) {
+            this.updateWidthInPercentage(0.7);
+            this.options.selectCamera('Monitor');
+            this.options.showPlanningReference = true;
+            this.options.showPlaningDpOptimizer = true;
+            this.options.showPlanningQpOptimizer = true;
+        } else {
+            this.updateWidthInPercentage(1.0);
+            this.options.selectCamera('Default');
+            this.options.showPlanningReference = false;
+            this.options.showPlaningDpOptimizer = false;
+            this.options.showPlanningQpOptimizer = false;
+        }
     }
 }
 

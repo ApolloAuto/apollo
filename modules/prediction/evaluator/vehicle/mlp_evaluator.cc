@@ -341,7 +341,7 @@ double MLPEvaluator::ComputeProbability(
     double mean = model_ptr_->samples_mean().columns(i);
     double std = model_ptr_->samples_std().columns(i);
     layer_input.push_back(
-        apollo::prediction::util::Normalize(feature_values[i], mean, std));
+        apollo::prediction::math_util::Normalize(feature_values[i], mean, std));
   }
 
   for (int i = 0; i < model_ptr_->num_layer(); ++i) {
@@ -357,16 +357,16 @@ double MLPEvaluator::ComputeProbability(
         neuron_output += (layer_input[row] * weight);
       }
       if (layer.layer_activation_func() == Layer::RELU) {
-        neuron_output = apollo::prediction::util::Relu(neuron_output);
+        neuron_output = apollo::prediction::math_util::Relu(neuron_output);
       } else if (layer.layer_activation_func() == Layer::SIGMOID) {
-        neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
+        neuron_output = apollo::prediction::math_util::Sigmoid(neuron_output);
       } else if (layer.layer_activation_func() == Layer::TANH) {
         neuron_output = std::tanh(neuron_output);
       } else {
         AERROR << "Undefined activation function ["
                << layer.layer_activation_func()
                << "]. A default sigmoid will be used instead.";
-        neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
+        neuron_output = apollo::prediction::math_util::Sigmoid(neuron_output);
       }
       layer_output.push_back(neuron_output);
     }

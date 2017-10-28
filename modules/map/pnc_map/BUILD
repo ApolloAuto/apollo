@@ -29,6 +29,7 @@ cc_library(
     deps = [
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
+        "//modules/routing/common:routing_gflags",
     ],
 )
 
@@ -40,6 +41,32 @@ cc_test(
     ],
     deps = [
         ":path",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
+cc_test(
+    name = "pnc_map_test",
+    size = "small",
+    srcs = [
+        "pnc_map_test.cc",
+    ],
+    data = [
+        ":testdata",
+        "//modules/map:map_data",
+    ],
+    deps = [
+        ":pnc_map",
         "//modules/common:log",
         "//modules/common/time",
         "//modules/common/util",

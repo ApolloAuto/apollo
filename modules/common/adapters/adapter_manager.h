@@ -34,6 +34,7 @@
 #include "modules/common/macro.h"
 
 #include "ros/include/ros/ros.h"
+#include "tf/transform_listener.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -87,6 +88,10 @@ namespace adapter {
       void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
     Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
+  /* Returns false if there's no callback to pop out, true otherwise. */       \
+  static bool Pop##name##Callback() {                                          \
+    return instance()->name##_->PopCallback();                                 \
+  }                                                                            \
                                                                                \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
@@ -98,12 +103,12 @@ namespace adapter {
                             int message_history_limit) {                       \
     name##_.reset(                                                             \
         new name##Adapter(#name, topic_name, message_history_limit));          \
-    if (mode != AdapterConfig::PUBLISH_ONLY && node_handle_) {                 \
+    if (mode != AdapterConfig::PUBLISH_ONLY && IsRos()) {                      \
       name##subscriber_ =                                                      \
           node_handle_->subscribe(topic_name, message_history_limit,           \
                                   &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
-    if (mode != AdapterConfig::RECEIVE_ONLY && node_handle_) {                 \
+    if (mode != AdapterConfig::RECEIVE_ONLY && IsRos()) {                      \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
           topic_name, message_history_limit);                                  \
     }                                                                          \
@@ -113,8 +118,19 @@ namespace adapter {
   name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
-    if (node_handle_) {                                                        \
-      name##publisher_.publish(data);                                          \
+    if (IsRos()) {                                                             \
+      if (!name##publisher_.getTopic().empty()) {                              \
+        name##publisher_.publish(data);                                        \
+      } else {                                                                 \
+        AERROR << #name << " is not valid.";                                   \
+      }                                                                        \
+    } else {                                                                   \
+      /* For non-ROS mode, just triggers the callback. */                      \
+      if (name##_) {                                                           \
+        name##_->OnReceive(data);                                              \
+      } else {                                                                 \
+        AERROR << #name << " is null.";                                        \
+      }                                                                        \
     }                                                                          \
     name##_->SetLatestPublished(data);                                         \
   }
@@ -152,11 +168,31 @@ class AdapterManager {
   static void Init(const AdapterManagerConfig &configs);
 
   /**
+   * @brief Resets the /class AdapterManager so that it could be
+   * re-initiailized.
+   */
+  static void Reset();
+
+  /**
    * @brief check if the AdapterManager is initialized
    */
   static bool Initialized();
 
   static void Observe();
+
+  /**
+   * @brief Returns whether AdapterManager is running ROS mode.
+   */
+  static bool IsRos() { return instance()->node_handle_ != nullptr; }
+
+  /**
+   * @brief Returns a reference to static tf2 buffer.
+   */
+  static tf2_ros::Buffer &Tf2Buffer() {
+    static tf2_ros::Buffer tf2_buffer;
+    static tf2_ros::TransformListener tf2Listener(tf2_buffer);
+    return tf2_buffer;
+  }
 
   /**
    * @brief create a timer which will call a callback at the specified
@@ -168,11 +204,14 @@ class AdapterManager {
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
                                 bool autostart = true) {
-    CHECK(instance()->node_handle_)
-        << "ROS node is only available in ROS mode, "
-           "check your adapter config file!";
-    return instance()->node_handle_->createTimer(period, callback, obj, oneshot,
-                                                 autostart);
+    if (IsRos()) {
+      return instance()->node_handle_->createTimer(period, callback, obj,
+                                                   oneshot, autostart);
+    } else {
+      AWARN << "ROS timer is only available in ROS mode, check your adapter "
+               "config file! Return a dummy timer that won't function.";
+      return ros::Timer();
+    }
   }
 
  private:
@@ -204,7 +243,12 @@ class AdapterManager {
   REGISTER_ADAPTER(RoutingResponse);
   REGISTER_ADAPTER(RelativeOdometry);
   REGISTER_ADAPTER(InsStat);
+  // TODO(xiaoxq): Retire HMICommand adapter after integration with dreamview.
   REGISTER_ADAPTER(HMICommand);
+  REGISTER_ADAPTER(HMIStatus);
+  REGISTER_ADAPTER(Mobileye);
+  REGISTER_ADAPTER(DelphiESR);
+  REGISTER_ADAPTER(CompressedImage);
 
   DECLARE_SINGLETON(AdapterManager);
 };

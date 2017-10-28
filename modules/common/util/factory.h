@@ -83,14 +83,18 @@ class Factory {
    * @brief Creates and transfers membership of an object of type matching id.
    * Need to register id before CreateObject is called.
    * @param id The identifier of the class we which to instantiate
+   * @param args the object construction arguments
    */
-  std::unique_ptr<AbstractProduct> CreateObject(const IdentifierType &id) {
+  template <typename... Args>
+  std::unique_ptr<AbstractProduct> CreateObject(const IdentifierType &id,
+                                                Args... args) {
     auto id_iter = producers_.find(id);
     if (id_iter == producers_.end()) {
       AERROR << "Factory could not create Object of type : " << id;
       return nullptr;
     } else {
-      return std::unique_ptr<AbstractProduct>((id_iter->second)());
+      return std::unique_ptr<AbstractProduct>(
+          (id_iter->second)(std::forward<Args>(args)...));
     }
   }
 

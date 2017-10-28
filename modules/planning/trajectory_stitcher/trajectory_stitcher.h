@@ -39,7 +39,12 @@ class TrajectoryStitcher {
   static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
       const bool is_on_auto_mode, const double current_timestamp,
       const double planning_cycle_time,
-      const PublishableTrajectory& prev_trajectory);
+      const PublishableTrajectory* prev_trajectory,
+      bool* is_replan);
+
+ private:
+  static std::vector<common::TrajectoryPoint>
+  ComputeReinitStitchingTrajectory();
 };
 
 }  // namespace planning

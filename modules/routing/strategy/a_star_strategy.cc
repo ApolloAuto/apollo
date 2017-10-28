@@ -32,17 +32,16 @@ namespace routing {
 
 namespace {
 
-const double LANE_CHANGE_SKIP_S = 10.0;
+constexpr double LANE_CHANGE_SKIP_S = 10.0;
 
 struct SearchNode {
-  const TopoNode* topo_node;
-  double f;
+  const TopoNode* topo_node = nullptr;
+  double f = std::numeric_limits<double>::max();
 
-  SearchNode() : topo_node(nullptr), f(std::numeric_limits<double>::max()) {}
+  SearchNode() = default;
   explicit SearchNode(const TopoNode* node)
       : topo_node(node), f(std::numeric_limits<double>::max()) {}
-  SearchNode(const SearchNode& search_node)
-      : topo_node(search_node.topo_node), f(search_node.f) {}
+  SearchNode(const SearchNode& search_node) = default;
 
   bool operator<(const SearchNode& node) const {
     // in order to let the top of priority queue is the smallest one!
@@ -59,21 +58,16 @@ double GetCostToNeighbor(const TopoEdge* edge) {
 }
 
 const TopoNode* GetLargestNode(const std::vector<const TopoNode*>& nodes) {
-  if (nodes.empty()) {
-    return nullptr;
-  } else if (nodes.size() < 2) {
-    return nodes[0];
-  }
-  double max_range = nodes[0]->EndS() - nodes[0]->StartS();
-  size_t max_idx = 0;
-  for (size_t i = 1; i < nodes.size(); ++i) {
-    double temp_range = nodes[i]->EndS() - nodes[i]->StartS();
+  double max_range = 0.0;
+  const TopoNode* largest = nullptr;
+  for (const auto* node : nodes) {
+    const double temp_range = node->EndS() - node->StartS();
     if (temp_range > max_range) {
       max_range = temp_range;
-      max_idx = i;
+      largest = node;
     }
   }
-  return nodes[max_idx];
+  return largest;
 }
 
 bool AdjustLaneChangeBackward(
@@ -204,9 +198,8 @@ bool Reconstruct(
   }
   result_nodes->clear();
   for (const auto* node : result_node_vec) {
-    NodeSRange range(node->StartS(), node->EndS());
-    NodeWithRange node_with_range(range, node->OriginNode());
-    result_nodes->push_back(node_with_range);
+    result_nodes->emplace_back(node->OriginNode(), node->StartS(),
+                               node->EndS());
   }
   return true;
 }

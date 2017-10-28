@@ -35,7 +35,7 @@ class Spline1dKernel {
  public:
   explicit Spline1dKernel(const Spline1d& spline1d);
   explicit Spline1dKernel(const std::vector<double>& x_knots,
-                          const std::uint32_t spline_order);
+                          const uint32_t spline_order);
 
   // customized input / output method
   void AddRegularization(const double regularized_param);
@@ -53,6 +53,12 @@ class Spline1dKernel {
   void AddDerivativeKernelMatrix(const double weight);
   void AddSecondOrderDerivativeMatrix(const double weight);
   void AddThirdOrderDerivativeMatrix(const double weight);
+  void AddDerivativeKernelMatrixForSplineK(const uint32_t k,
+                                           const double weight);
+  void AddSecondOrderDerivativeMatrixForSplineK(const uint32_t k,
+                                                const double weight);
+  void AddThirdOrderDerivativeMatrixForSplineK(const uint32_t k,
+                                               const double weight);
 
   // reference line kernel, x_coord in strictly increasing order (for path
   // optimizer)
@@ -61,18 +67,22 @@ class Spline1dKernel {
                                     const double weight);
 
   // distance offset (for speed optimizer, given time optimize the distance can
-  // go);
-  void add_distance_offset(const double weight);
+  // go)
+  void AddDistanceOffset(const double weight);
 
  private:
-  std::uint32_t find_index(const double x) const;
+  void AddNthDerivativekernelMatrix(const uint32_t n, const double weight);
+  void AddNthDerivativekernelMatrixForSplineK(const uint32_t n,
+                                              const uint32_t k,
+                                              const double weight);
+  uint32_t FindIndex(const double x) const;
 
  private:
   Eigen::MatrixXd kernel_matrix_;
   Eigen::MatrixXd offset_;
   std::vector<double> x_knots_;
-  std::uint32_t spline_order_;
-  std::uint32_t total_params_;
+  uint32_t spline_order_;
+  uint32_t total_params_;
 };
 
 }  // namespace planning

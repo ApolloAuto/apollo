@@ -1,13 +1,13 @@
 # Apollo HMI (Human Machine Interface)
 
+### Deprecation Notice
+HMI and Dreamview will be combined to one module soon. So you may see some
+out-of-date as well as redundency code in these two modules during the
+migration.
 
 ### Prerequisite
-Make sure you have installed the required python packages by:
-```bash
-# All bash commands should be run from Apollo root directory.
-sudo pip install modules/tools/py27_requirements.txt
-```
-
+Make sure you are in the docker container, and running bash commands from Apollo
+root directory.
 
 ### Start the server
 Start the server with default settings by:

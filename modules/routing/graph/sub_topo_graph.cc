@@ -185,8 +185,7 @@ void SubTopoGraph::InitSubNodeByValidRange(
     }
     std::shared_ptr<TopoNode> sub_topo_node_ptr;
     sub_topo_node_ptr.reset(new TopoNode(topo_node, range));
-    NodeWithRange node_with_range(range, sub_topo_node_ptr.get());
-    sub_node_vec.push_back(std::move(node_with_range));
+    sub_node_vec.emplace_back(sub_topo_node_ptr.get(), range);
     sub_node_set.insert(sub_topo_node_ptr.get());
     sub_node_sorted_vec.push_back(sub_topo_node_ptr.get());
     topo_nodes_.push_back(std::move(sub_topo_node_ptr));

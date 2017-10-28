@@ -42,7 +42,10 @@ export default [
         title: 'Planning',
         type: 'checkbox',
         data: {
-            planningLine: 'Planning Line'
+            planningReference: 'Reference Line',
+            planingDpOptimizer: 'Dp Optimizer Line',
+            planningQpOptimizer: 'Qp Optimizer Line',
+            planningLine: 'Planning Line',
         }
     }, {
         id: 'camera',

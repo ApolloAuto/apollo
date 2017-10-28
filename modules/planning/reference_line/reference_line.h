@@ -27,6 +27,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/math/vec2d.h"
 #include "modules/map/pnc_map/path.h"
@@ -40,9 +41,6 @@ class ReferenceLine {
   ReferenceLine() = default;
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
-  ReferenceLine(const std::vector<ReferencePoint>& reference_points,
-                const std::vector<hdmap::LaneSegment>& lane_segments,
-                const double max_approximation_error);
 
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;

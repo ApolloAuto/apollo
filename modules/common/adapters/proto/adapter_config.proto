@@ -24,7 +24,12 @@ message AdapterConfig {
     ROUTING_RESPONSE = 17;
     RELATIVE_ODOMETRY = 18;
     INS_STAT = 19;
+    // TODO(xiaoxq): Retire HMI_COMMAND after integration with dreamview.
     HMI_COMMAND = 20;
+    MOBILEYE = 21;
+    DELPHIESR = 22;
+    COMPRESSED_IMAGE = 23;
+    HMI_STATUS = 24;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

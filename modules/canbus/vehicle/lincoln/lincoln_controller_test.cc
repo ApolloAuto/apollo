@@ -18,12 +18,13 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/common/util/file.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
@@ -52,7 +53,7 @@ class LincolnControllerTest : public ::testing::Test {
   LincolnController controller_;
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
-  CanSender sender_;
+  CanSender<::apollo::canbus::ChassisDetail> sender_;
   LincolnMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;

@@ -29,8 +29,9 @@
 namespace apollo {
 namespace planning {
 
-DiscretizedPath::DiscretizedPath(std::vector<common::PathPoint> path_points) {
-  path_points_ = std::move(path_points);
+DiscretizedPath::DiscretizedPath(
+    const std::vector<common::PathPoint> &path_points) {
+  path_points_ = path_points;
 }
 
 void DiscretizedPath::set_path_points(

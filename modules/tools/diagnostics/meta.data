@@ -12,3 +12,5 @@ Odometry        gps_pb2.Gps()                           /apollo/sensor/gnss/odom
 IMU             imu_pb2.Imu()                           /apollo/sensor/gnss/corrected_imu   10
 ROUTING_RES     routing_pb2.RoutingResponse()           /apollo/routing_response            1
 ROUTING_REQ     routing_pb2.RoutingRequest()            /apollo/routing_request             1
+MOBILEYE        mobileye_pb2.Mobileye()                 /apollo/sensor/mobileye                    10
+DELPHI_ESR      delphi_esr_pb2.DelphiESR()              /apollo/sensor/delphi_esr                  10

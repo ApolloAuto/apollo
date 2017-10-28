@@ -57,6 +57,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_1d",
+        "//modules/common:log",
         "@eigen//:eigen",
     ],
 )
@@ -106,6 +107,8 @@ cc_library(
         ":spline_1d_kernel",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
+        "//modules/common/time",
+        "//modules/planning/common:planning_gflags",
         "@eigen//:eigen",
     ],
 )
@@ -186,6 +189,8 @@ cc_library(
         "//modules/common/math:vec2d",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
+        "//modules/common/time",
+        "//modules/planning/common:planning_gflags",
         "@eigen//:eigen",
     ],
 )
@@ -260,6 +265,18 @@ cc_test(
 )
 
 cc_test(
+    name = "spline_1d_constraint_test",
+    size = "small",
+    srcs = [
+        "spline_1d_constraint_test.cc",
+    ],
+    deps = [
+        ":spline_1d_constraint",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "piecewise_linear_kernel_test",
     size = "small",
     srcs = [
@@ -279,6 +296,43 @@ cc_test(
     ],
     deps = [
         ":piecewise_linear_constraint",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "spline_2d_solver_test",
+    size = "small",
+    srcs = [
+        "spline_2d_solver_test.cc",
+    ],
+    deps = [
+        ":spline_2d_solver",
+        "//modules/planning/math:curve_math",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "spline_2d_kernel_test",
+    size = "small",
+    srcs = [
+        "spline_2d_kernel_test.cc",
+    ],
+    deps = [
+        ":spline_2d_kernel",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "spline_2d_constraint_test",
+    size = "small",
+    srcs = [
+        "spline_2d_constraint_test.cc",
+    ],
+    deps = [
+        ":spline_2d_constraint",
         "@gtest//:main",
     ],
 )

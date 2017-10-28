@@ -15,5 +15,5 @@ The predict model
 
 ## About
 * Data Set Download: [Data Download](https://console.bce.baidu.com/apollo/task/download#/apollo/home)
-* Data Set Summary：See  [Data Overview](https://github.com/ApolloAuto/apollo/blob/master/modules/e2e/model/data_overview.md)
-* Model Summary：See  [Model Overview](https://github.com/ApolloAuto/apollo/blob/master/modules/e2e/model/model_overview.md)
+* Data Set Summary：See  [Data Overview](https://github.com/ApolloAuto/apollo/blob/master/modules/e2e/model_demo/data_overview.md)
+* Model Summary：See  [Model Overview](https://github.com/ApolloAuto/apollo/blob/master/modules/e2e/model_demo/model_overview.md)

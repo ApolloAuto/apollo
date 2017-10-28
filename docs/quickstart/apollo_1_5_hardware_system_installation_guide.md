@@ -294,7 +294,7 @@ Follow these steps:
   a. Locate and unscrew the eight screws (shown in the brown squares or	pointed by brown arrows) on the side of computer:
   ![Positions_of_Screws](images/IPC-6108GC-Screw-Positions_labeled.png)b. Remove the cover from the IPC. 3 PCI slots (one occupied by the	graphic card) locate on the base:
 
-  ![removing the cover](images\Removing_the_cover.JPG)
+  ![removing the cover](images/Removing_the_cover.JPG)
 
   ![Before installing the CAN card](images/Before_installing_the_can_card.png)
 
@@ -306,7 +306,7 @@ Follow these steps:
 
   d. Insert the CAN card into the slot in the IPC:
 
-  ![installed CAN](images/After installing the CAN Card.png)
+  ![installed CAN](images/After%20installing%20the%20CAN%20Card.png)
 
    e. Reinstall the cover for the IPC
 
