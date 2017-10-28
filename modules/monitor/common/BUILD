@@ -14,15 +14,6 @@ cc_inc_library(
 )
 
 cc_library(
-    name = "log",
-    srcs = ["log.cc"],
-    hdrs = [
-        "log.h",
-        "common_defs.h",
-    ],
-)
-
-cc_library(
     name = "can_checker_factory",
     srcs = ["can_checker_factory.cc"],
     hdrs = ["can_checker_factory.h"],
@@ -38,14 +29,6 @@ cc_library(
             ],
             "//conditions:default": [],
         }),
-)
-
-cc_binary(
-    name = "log_test",
-    srcs = ["log_test.cc"],
-    deps = [
-        ":log",
-    ],
 )
 
 cpplint()

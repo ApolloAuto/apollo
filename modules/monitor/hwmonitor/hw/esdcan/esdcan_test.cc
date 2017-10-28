@@ -18,8 +18,8 @@
 
 #include <ostream>
 
+#include "modules/common/log.h"
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
 namespace monitor {
@@ -33,61 +33,50 @@ NTCAN_RESULT EsdCanDetails::esdcan_do_test(int id) {
 
   ret = canOpen(id, 0, 1, 1, 0, 0, &h0);
   if (ret == NTCAN_SUCCESS) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO,
-                 "Successfully opened ESD-CAN device %d", id);
+    AINFO << "Successfully opened ESD-CAN device " << id;
 
     ret = canStatus(h0, &if_status);
     if (ret != NTCAN_SUCCESS) {
-      PLATFORM_LOG(get_log_module(), log::LVL_ERR,
-                   "Cannot get status of ESD-CAN device %d, ret=%d (%s)\n", id,
-                   ret, esdcan_err_to_str(ret));
+      AERROR << "Cannot get status of ESD-CAN device " << id
+             << ", ret=" << ret << " (" << esdcan_err_to_str(ret) << ")";
       goto err;
     }
 
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO,
-                 "Got ESD-CAN-%d interface status", id);
+    AINFO << "Got ESD-CAN-" << id << " interface status";
     add_valid_field(EsdCanDetails::IF_STATUS);
     // else: fall-out to continue
   } else {
-    PLATFORM_LOG(get_log_module(), log::LVL_ERR,
-                 "Failed to open ESD-CAN device %d, error: %d (%s)\n", id, ret,
-                 esdcan_err_to_str(ret));
+    AERROR << "Failed to open ESD-CAN device " << id
+           << ", error: " << ret << " (" << esdcan_err_to_str(ret) << ")";
     goto err;
   }
 
   ret = canIoctl(h0, NTCAN_IOCTL_GET_BUS_STATISTIC, &stats);
   if (ret != NTCAN_SUCCESS) {
-    PLATFORM_LOG(get_log_module(), log::LVL_ERR,
-                 "NTCAN_IOCTL_GET_BUS_STATISTIC failed for device %d with "
-                 "error: %d (%s)\n",
-                 id, ret, esdcan_err_to_str(ret));
+    AERROR << "NTCAN_IOCTL_GET_BUS_STATISTIC failed for device " << id
+           << " with error: " << ret << " (" << esdcan_err_to_str(ret) << ")";
     goto err;
   }
   add_valid_field(EsdCanDetails::STATS);
-  PLATFORM_DBG(get_log_module(), log::LVL_INFO, "Got ESD-CAN-%d statistics",
-               id);
+  AINFO << "Got ESD-CAN-" << id << " statistics";
 
   ret = canIoctl(h0, NTCAN_IOCTL_GET_CTRL_STATUS, &ctrl_state);
   if (ret != NTCAN_SUCCESS) {
-    PLATFORM_LOG(get_log_module(), log::LVL_ERR,
-                 "NTCAN_IOCTL_GET_CTRL_STATUS failed for device %d with error: "
-                 "%d (%s)\n",
-                 id, ret, esdcan_err_to_str(ret));
+    AERROR << "NTCAN_IOCTL_GET_CTRL_STATUS failed for device " << id
+           << "with error: " << ret << " (" << esdcan_err_to_str(ret) << ")";
     goto err;
   }
   add_valid_field(EsdCanDetails::CTRL_STATE);
-  PLATFORM_DBG(get_log_module(), log::LVL_INFO, "Got ESD-CAN-%d strl-state",
-               id);
+  AINFO << "Got ESD-CAN-" << id << " strl-state";
 
   ret = canIoctl(h0, NTCAN_IOCTL_GET_BITRATE_DETAILS, &bitrate);
   if (ret != NTCAN_SUCCESS) {
-    PLATFORM_LOG(get_log_module(), log::LVL_ERR,
-                 "NTCAN_IOCTL_GET_BITRATE_ for device %d with error: %d (%s)\n",
-                 id, ret, esdcan_err_to_str(ret));
+    AERROR << "NTCAN_IOCTL_GET_BITRATE_ for device " << id
+           << " with error: " << ret << " (" << esdcan_err_to_str(ret) << ")";
     goto err;
   }
   add_valid_field(EsdCanDetails::BITRATE);
-  PLATFORM_DBG(get_log_module(), log::LVL_INFO, "Got ESD-CAN-%d bitrate", id);
+  AINFO << "Got ESD-CAN-" << id << " bitrate";
 
 err:
   canClose(h0);

@@ -16,7 +16,7 @@
 
 #include "modules/monitor/hwmonitor/hw/socketcan/socketcan_test.h"
 
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace monitor {
@@ -29,14 +29,13 @@ int socketcan_do_test(int id) {
   // Check open device
 
   if (id < 0) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO,
-                 "can port number %d not valid", id);
+    AERROR << "can port number " << id << " not valid";
     return -1;
   }
 
   int dev_handler = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (dev_handler < 0) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO, "open can device failed");
+    AERROR << "open can device failed";
     return -1;
   }
 
@@ -49,7 +48,7 @@ int socketcan_do_test(int id) {
   int ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
                        sizeof(filter));
   if (ret < 0) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO, "set message filter failed");
+    AERROR << "set message filter failed";
     return -1;
   }
 
@@ -58,15 +57,14 @@ int socketcan_do_test(int id) {
   ret = ::setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable,
                      sizeof(enable));
   if (ret < 0) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO,
-                 "enable reception of can frames failed");
+    AERROR << "enable reception of can frames failed";
     return -1;
   }
 
   // strcpy(ifr.ifr_name, "can0");
   std::strncpy(ifr.ifr_name, "can0", IFNAMSIZ);
   if (ioctl(dev_handler, SIOCGIFINDEX, &ifr) < 0) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO, "ioctl failed");
+    AERROR << "ioctl failed";
     return -1;
   }
 
@@ -77,7 +75,7 @@ int socketcan_do_test(int id) {
                sizeof(addr));
 
   if (ret < 0) {
-    PLATFORM_DBG(get_log_module(), log::LVL_INFO, "bind socket can failed");
+    AERROR << "bind socket can failed";
     return -1;
   }
 
