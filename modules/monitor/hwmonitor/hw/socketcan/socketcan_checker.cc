@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
 namespace monitor {
@@ -41,12 +41,11 @@ HardwareStatus::Status SocketCanChecker::socketcan_result_to_hw_status(
 
 std::string SocketCanChecker::socketcan_result_to_message(
     int socketcan_status) {
-  return socketcan_status == 0 ? std::string("OK") : std::string("Failed");
+  return socketcan_status == 0 ? "OK" : "Failed";
 }
 
 void SocketCanChecker::run_check(std::vector<HwCheckResult> *results) {
-  PLATFORM_DBG(get_log_module(), log::LVL_INFO, "To check SOCKET-CAN-%d",
-               can_id_);
+  AINFO << "To check SOCKET-CAN-" << can_id_;
 
   int result = socketcan_do_test(can_id_);
 

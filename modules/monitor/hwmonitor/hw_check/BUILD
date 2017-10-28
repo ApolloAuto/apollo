@@ -21,7 +21,6 @@ cc_binary(
         ":hw_chk_utils",
         "//external:gflags",
         "//modules/hmi/utils:hmi_status_helper",
-        "//modules/monitor/hwmonitor/hw:hw_log_module",
         "//modules/monitor/common:can_checker_factory",
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/common:canbus_common",
@@ -37,9 +36,9 @@ cc_binary(
     deps = [
         ":hw_chk_utils",
         "//external:gflags",
+        "//modules/common:log",
         "//modules/common/proto:gnss_status_proto",
         "//modules/hmi/utils:hmi_status_helper",
-        "//modules/monitor/hwmonitor/hw:hw_log_module",
         "@ros//:ros_common",
     ],
 )
@@ -54,7 +53,6 @@ cc_binary(
         ":hw_chk_utils",
         "//external:gflags",
         "//modules/hmi/utils:hmi_status_helper",
-        "//modules/monitor/hwmonitor/hw:hw_log_module",
         "//modules/monitor/common:can_checker_factory",
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/common:canbus_common",

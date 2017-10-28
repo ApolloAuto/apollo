@@ -16,13 +16,12 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include "glog/logging.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
-#include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
-
-#include "modules/common/proto/gnss_status.pb.h"
 #include "ros/include/ros/ros.h"
+
+#include "modules/common/log.h"
+#include "modules/common/proto/gnss_status.pb.h"
+#include "modules/hmi/utils/hmi_status_helper.h"
+#include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
 namespace {
 using apollo::hmi::HMIStatusHelper;
