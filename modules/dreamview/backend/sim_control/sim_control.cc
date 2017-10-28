@@ -31,6 +31,7 @@ using apollo::common::Point3D;
 using apollo::common::Quaternion;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::Header;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
@@ -49,6 +50,11 @@ void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation,
   point_vrf->set_x(v_vrf.x());
   point_vrf->set_y(v_vrf.y());
   point_vrf->set_z(v_vrf.z());
+}
+
+bool CompareHeader(const Header& lhs, const Header& rhs) {
+  return lhs.sequence_num() == rhs.sequence_num() &&
+         lhs.timestamp_sec() == rhs.timestamp_sec();
 }
 
 }  // namespace
@@ -111,6 +117,8 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 
   // If this is from a planning re-routing request, don't reset car's location.
   if (routing.routing_request().header().module_name() != "planning") {
+    current_routing_header_ = routing.header();
+    received_planning_ = false;
     SetStartPoint(start_pose.x(), start_pose.y());
   }
 }
@@ -126,11 +134,14 @@ void SimControl::Stop() {
 }
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
-  // Reset current trajectory and the indices upon receiving a new trajectory.
-  current_trajectory_ = trajectory;
-  prev_point_index_ = 0;
-  next_point_index_ = 0;
-  received_planning_ = true;
+  if (CompareHeader(trajectory.routing_header(), current_routing_header_)) {
+    // Reset current trajectory and the indices upon receiving a new trajectory.
+    // The routing SimControl owns must match with the one Planning has.
+    current_trajectory_ = trajectory;
+    prev_point_index_ = 0;
+    next_point_index_ = 0;
+    received_planning_ = true;
+  }
 }
 
 void SimControl::Freeze() {
