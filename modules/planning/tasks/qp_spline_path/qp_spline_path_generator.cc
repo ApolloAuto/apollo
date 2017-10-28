@@ -394,16 +394,23 @@ void QpSplinePathGenerator::AddKernel() {
   if (qp_spline_path_config_.derivative_weight() > 0.0) {
     spline_kernel->AddDerivativeKernelMatrix(
         qp_spline_path_config_.derivative_weight());
+    spline_kernel->AddDerivativeKernelMatrixForSplineK(
+        0, qp_spline_path_config_.first_spline_weight_factor() *
+               qp_spline_path_config_.derivative_weight());
   }
 
   if (qp_spline_path_config_.second_derivative_weight() > 0.0) {
     spline_kernel->AddSecondOrderDerivativeMatrix(
         qp_spline_path_config_.second_derivative_weight());
+    spline_kernel->AddSecondOrderDerivativeMatrixForSplineK(
+        0, qp_spline_path_config_.second_derivative_weight());
   }
 
   if (qp_spline_path_config_.third_derivative_weight() > 0.0) {
     spline_kernel->AddThirdOrderDerivativeMatrix(
         qp_spline_path_config_.third_derivative_weight());
+    spline_kernel->AddThirdOrderDerivativeMatrixForSplineK(
+        0, qp_spline_path_config_.third_derivative_weight());
   }
 }
 
