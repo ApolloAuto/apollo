@@ -72,13 +72,14 @@ em_planner_config {
         max_spline_length: 20.0
         time_resolution: 0.1
         regularization_weight: 0.1
-        derivative_weight: 1000.0
+        first_spline_weight_factor: 10.0
+        derivative_weight: 100.0
         second_derivative_weight: 10.0
         third_derivative_weight: 10.0
         reference_line_weight: 0.0
         num_output: 100
         cross_lane_lateral_extension: 1.2
-        cross_lane_longitudinal_extension: 50.0
+        cross_lane_longitudinal_extension: 100.0
         history_path_weight: 0.0;
     }
     qp_st_speed_config {

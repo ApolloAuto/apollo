@@ -7,12 +7,13 @@ message QpSplinePathConfig {
   optional double max_spline_length = 2 [default = 15.0];
   optional double time_resolution = 3 [default = 0.1];
   optional double regularization_weight = 4 [default = 0.001];
-  optional double derivative_weight = 5 [default = 0.0];
-  optional double second_derivative_weight = 6 [default = 0.0];
-  optional double third_derivative_weight = 7 [default = 100.0];
-  optional double reference_line_weight = 8 [default = 0.0];
-  optional uint32 num_output = 9 [default = 100];
-  optional double cross_lane_lateral_extension = 10 [default = 1.2];
-  optional double cross_lane_longitudinal_extension = 11 [default = 50.0];
-  optional double history_path_weight = 12 [default = 0.0];
+  optional double first_spline_weight_factor = 5 [default = 10.0];
+  optional double derivative_weight = 6 [default = 0.0];
+  optional double second_derivative_weight = 7 [default = 0.0];
+  optional double third_derivative_weight = 8 [default = 100.0];
+  optional double reference_line_weight = 9 [default = 0.0];
+  optional uint32 num_output = 10 [default = 100];
+  optional double cross_lane_lateral_extension = 11 [default = 1.2];
+  optional double cross_lane_longitudinal_extension = 12 [default = 50.0];
+  optional double history_path_weight = 13 [default = 0.0];
 }
