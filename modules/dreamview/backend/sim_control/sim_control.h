@@ -122,6 +122,9 @@ class SimControl {
   // Whether the sim control is enabled.
   bool enabled_;
 
+  // The header of the routing planning is following.
+  apollo::common::Header current_routing_header_;
+
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
 
