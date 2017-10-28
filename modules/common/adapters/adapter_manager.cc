@@ -37,6 +37,7 @@ bool AdapterManager::Initialized() {
 
 void AdapterManager::Reset() {
   instance()->initialized_ = false;
+  instance()->observers_.clear();
 }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
