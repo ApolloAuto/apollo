@@ -2,6 +2,8 @@
 
 This document describes the data format and relevant evaluation criteria of the end-to-end driving platform in the Baidu Apollo Project.
 
+Data Set Download: [Data Download](https://console.bce.baidu.com/apollo/task/download#/apollo/home)
+
 ## Introduction of datasets
 
 The data are collected through Baidu’s own map collection vehicles. At present, the data cover the entire road network in China with a total length of millions of kilometers. The dataset provides two types of data, including images in front of vehicles and the vehicle motion status. The map collection vehicles capture 360-degree view images. However, due to the limits of file sizes, Apollo provides only the .jpg format of images with the 320 * 320 resolution in front of vehicles. The vehicle motion status data include the current speed and the track curvature.
