@@ -9,7 +9,7 @@ message TensorParameter {
 
 message InputParameter {
   repeated int32 input_shape = 1;
-  optional string dtype = 2;
+  optional string dtype = 2;      //data type of the input
   optional bool sparse = 3;
 }
 
