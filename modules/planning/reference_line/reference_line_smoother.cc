@@ -35,16 +35,20 @@
 namespace apollo {
 namespace planning {
 
-bool ReferenceLineSmoother::Init(const std::string& config_file) {
+bool ReferenceLineSmoother::Init(const std::string& config_file,
+                                 Spline2dSolver* const spline_solver) {
   if (!common::util::GetProtoFromFile(config_file, &smoother_config_)) {
     AERROR << "failed to load config file " << config_file;
     return false;
   }
+  spline_solver_ = spline_solver;
   return true;
 }
 
-void ReferenceLineSmoother::Init(const ReferenceLineSmootherConfig& config) {
+void ReferenceLineSmoother::Init(const ReferenceLineSmootherConfig& config,
+                                 Spline2dSolver* const spline_solver) {
   smoother_config_ = config;
+  spline_solver_ = spline_solver;
 }
 
 void ReferenceLineSmoother::Clear() {
@@ -52,11 +56,10 @@ void ReferenceLineSmoother::Clear() {
   ref_points_.clear();
 }
 
-bool ReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line,
-                                   ReferenceLine* const smoothed_reference_line,
-                                   Spline2dSolver* const spline_solver) {
+bool ReferenceLineSmoother::Smooth(
+    const ReferenceLine& raw_reference_line,
+    ReferenceLine* const smoothed_reference_line) {
   Clear();
-  spline_solver_ = spline_solver;
   std::vector<ReferencePoint> ref_points;
   if (!Sampling(raw_reference_line)) {
     AERROR << "Fail to sample reference line smoother points!";
