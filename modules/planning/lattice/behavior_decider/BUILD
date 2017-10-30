@@ -15,9 +15,12 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice:lattice_params",
         "//modules/planning/reference_line",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:common_proto",
         "//modules/planning/lattice:lattice_util",
+        "//modules/planning/lattice:reference_line_matcher",
         "//external:gflags",
     ],
 )

@@ -24,12 +24,18 @@
 #include "gflags/gflags.h"
 
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/lattice/lattice_params.h"
+#include "modules/planning/lattice/reference_line_matcher.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/lattice_util.h"
 #include "modules/common/log.h"
+#include "modules/common/proto/geometry.pb.h"
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::PointENU;
+using apollo::common::PathPoint;
 
 BehaviorDecider::BehaviorDecider() {}
 
@@ -94,6 +100,24 @@ PlanningTarget BehaviorDecider::Analyze(
       FLAGS_default_cruise_speed);
   lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
   ret.set_decision_type(PlanningTarget::GO);
+
+  PointENU routing_end = frame->GetRoutingDestination();
+
+  PathPoint routing_end_on_ref_line =
+      ReferenceLineMatcher::match_to_reference_line(
+          discretized_reference_line, routing_end.x(), routing_end.y());
+
+  if (routing_end_on_ref_line.s() <
+        discretized_reference_line.back().s() - 0.2) {
+    double res_s = routing_end_on_ref_line.s() - lon_init_state[0];
+    double v = lon_init_state[1];
+    double target_acc = (v * v) / (2.0 * res_s);
+    if (target_acc > stop_acc_thred) {
+      lon_sample_config->mutable_lon_end_condition()->set_s(
+          routing_end_on_ref_line.s());
+      ret.set_decision_type(PlanningTarget::STOP);
+    }
+  }
   return ret;
 }
 
