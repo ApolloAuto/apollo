@@ -54,4 +54,3 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
 }  // namespace apollo
 
 #endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_UTIL_H_
-

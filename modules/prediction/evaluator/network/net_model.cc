@@ -17,8 +17,8 @@
 #include "modules/prediction/evaluator/network/net_model.h"
 
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "modules/common/log.h"
@@ -29,12 +29,9 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-NetModel::NetModel() : ok_(false) {
-}
+NetModel::NetModel() : ok_(false) {}
 
-NetModel::~NetModel() {
-  Clear();
-}
+NetModel::~NetModel() { Clear(); }
 
 bool NetModel::LoadFromProtobuf(const std::string& model_filename) {
   std::fstream ifs(model_filename, std::ios::in | std::ios::binary);
@@ -53,31 +50,31 @@ bool NetModel::LoadFromProtobuf(const std::string& model_filename) {
     ADEBUG << i << "-th layer name: " << layer_pb.name().c_str();
     Layer* layer = nullptr;
     switch (layer_pb.oneof_layers_case()) {
-    case LayerParameter::kInput:
-      layer = new Input();
-      break;
-    case LayerParameter::kActivation:
-      layer = new Activation();
-      break;
-    case LayerParameter::kDense:
-      layer = new Dense();
-      break;
-    case LayerParameter::kBatchNormalization:
-      layer = new BatchNormalization();
-      break;
-    case LayerParameter::kLstm:
-      layer = new LSTM();
-      break;
-    case LayerParameter::kFlatten:
-      layer = new Flatten();
-      break;
-    case LayerParameter::kConcatenate:
-      layer = new Concatenate();
-      break;
-    default:
-      AERROR << "Fail to load layer: " << layer_pb.type().c_str();
-      Clear();
-      break;
+      case LayerParameter::kInput:
+        layer = new Input();
+        break;
+      case LayerParameter::kActivation:
+        layer = new Activation();
+        break;
+      case LayerParameter::kDense:
+        layer = new Dense();
+        break;
+      case LayerParameter::kBatchNormalization:
+        layer = new BatchNormalization();
+        break;
+      case LayerParameter::kLstm:
+        layer = new LSTM();
+        break;
+      case LayerParameter::kFlatten:
+        layer = new Flatten();
+        break;
+      case LayerParameter::kConcatenate:
+        layer = new Concatenate();
+        break;
+      default:
+        AERROR << "Fail to load layer: " << layer_pb.type().c_str();
+        Clear();
+        break;
     }
     if (!layer->Load(layer_pb)) {
       AERROR << "Fail to load " << i << "-layer: " << layer_pb.name().c_str();
@@ -110,7 +107,7 @@ std::string NetModel::PerformanceString() const {
   }
   ss << "\n test: accuracy = ";
   for (int i = 0; i < net_parameter_.performance().accuracy_size(); ++i) {
-    ss <<  net_parameter_.performance().accuracy(i) << ",  ";
+    ss << net_parameter_.performance().accuracy(i) << ",  ";
   }
   ss << "\n recall = ";
   for (int i = 0; i < net_parameter_.performance().recall_size(); ++i) {
@@ -124,17 +121,11 @@ std::string NetModel::PerformanceString() const {
   return ss.str();
 }
 
-const std::string& NetModel::Name() const {
-  return net_parameter_.name();
-}
+const std::string& NetModel::Name() const { return net_parameter_.name(); }
 
-int NetModel::Id() const {
-  return net_parameter_.id();
-}
+int NetModel::Id() const { return net_parameter_.id(); }
 
-bool NetModel::IsOk() const {
-  return ok_;
-}
+bool NetModel::IsOk() const { return ok_; }
 
 }  // namespace network
 }  // namespace prediction
