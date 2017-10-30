@@ -263,6 +263,15 @@ bool QpSplinePathGenerator::AddConstraint(
   spline_constraint->AddPointSecondDerivativeConstraint(evaluated_s_.back(),
                                                         0.0);
 
+  // add first derivative bound to improve lane change smoothness
+  std::vector<double> dl_lower_bound(evaluated_s_.size(), -FLAGS_dl_bound);
+  std::vector<double> dl_upper_bound(evaluated_s_.size(), FLAGS_dl_bound);
+  if (!spline_constraint->AddDerivativeBoundary(evaluated_s_, dl_lower_bound,
+                                                dl_upper_bound)) {
+    AERROR << "Fail to add second derivative boundary.";
+    return false;
+  }
+
   // kappa bound is based on the inequality:
   // kappa = d(phi)/ds <= d(phi)/dx = d2y/dx2
   std::vector<double> kappa_lower_bound(evaluated_s_.size(),
