@@ -105,8 +105,8 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
     ADEBUG << "Invalid pose found.";
   }
 
-  // ADEBUG << "Received a localization message ["
-  //        << localization.ShortDebugString() << "].";
+  ADEBUG << "Received a localization message ["
+         << localization.ShortDebugString() << "].";
 }
 
 void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
@@ -130,6 +130,8 @@ void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
       }
     }
   }
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
