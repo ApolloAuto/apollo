@@ -67,6 +67,7 @@ DECLARE_double(lateral_jerk_bound);
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
 
+DECLARE_double(dl_bound);
 DECLARE_double(kappa_bound);
 DECLARE_double(dkappa_bound);
 
