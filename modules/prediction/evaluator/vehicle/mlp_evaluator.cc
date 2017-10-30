@@ -20,10 +20,9 @@
 #include <limits>
 #include <numeric>
 
-#include "modules/map/proto/map_lane.pb.h"
-
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 

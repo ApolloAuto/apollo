@@ -14,21 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
+
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
 
-#include "modules/prediction/evaluator/network/rnn_model.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/common/kml_map_based_test.h"
 
 namespace apollo {
 namespace prediction {
-namespace network {
 
-class NetModelTest : public ::testing::Test {
+class RNNEvaluatorTest : public KMLMapBasedTest {
  public:
-  void SetUp() override {}
+  void SetUp() override {
+    std::string file =
+        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+    CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
+  }
+
+ protected:
+  apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
-TEST(NetModelTest, verification_test) {}
+TEST_F(RNNEvaluatorTest, OnLaneCase) {}
 
-}  // namespace network
 }  // namespace prediction
 }  // namespace apollo
