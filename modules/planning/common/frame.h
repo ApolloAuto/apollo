@@ -86,6 +86,8 @@ class Frame {
 
   static bool Rerouting();
 
+  apollo::common::PointENU GetRoutingDestination();
+
  private:
   /**
    * @brief This is the function that can create one reference lines

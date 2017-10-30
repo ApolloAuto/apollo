@@ -394,5 +394,11 @@ const std::vector<const Obstacle *> Frame::obstacles() const {
   return obstacles_.Items();
 }
 
+apollo::common::PointENU Frame::GetRoutingDestination() {
+  const auto &routing = pnc_map_->routing_response();
+  const auto &routing_end = *routing.routing_request().waypoint().rbegin();
+  return routing_end.pose();
+}
+
 }  // namespace planning
 }  // namespace apollo
