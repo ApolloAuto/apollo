@@ -1,5 +1,5 @@
 can_card_parameter {
-  brand:FAKE_CAN
+  brand:ESD_CAN
   type: PCI_CARD
   channel_id: CHANNEL_ID_TWO
 }
