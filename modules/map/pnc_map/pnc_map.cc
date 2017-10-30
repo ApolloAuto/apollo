@@ -275,7 +275,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       routing_.header().sequence_num() == routing.header().sequence_num() &&
       (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
-    ADEBUG << "Same prouting, skip update routing";
+    ADEBUG << "Same routing, skip update routing";
     return false;
   }
   if (!ValidateRouting(routing)) {
@@ -430,7 +430,7 @@ bool PncMap::GetRouteSegments(
     LaneWaypoint segment_waypoint;
     if (!segments.GetProjection(nearest_point, &s, &l, &segment_waypoint)) {
       ADEBUG << "Failed to get projection from point: "
-             << nearest_point.DebugString();
+             << nearest_point.ShortDebugString();
       continue;
     }
     if (index != passage_index) {  // the change lane case
