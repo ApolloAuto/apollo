@@ -9,7 +9,7 @@ cc_inc_library(
         "annotations.h",
     ],
     deps = [
-        "//modules/monitor/proto:hardware_status_proto",
+        "//modules/monitor/proto:system_status_proto",
     ]
 )
 

@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "modules/monitor/common/annotations.h"
-#include "modules/monitor/proto/hardware_status.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 /**
  * @namespace apollo::monitor
