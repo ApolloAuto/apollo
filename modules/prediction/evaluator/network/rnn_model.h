@@ -36,7 +36,7 @@ namespace network {
 
 class RnnModel : public NetModel {
  public:
-  virtual void Run(const std::vector<Eigen::MatrixXf >& inputs,
+  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output) const;
 
   virtual bool VerifyModel() const;

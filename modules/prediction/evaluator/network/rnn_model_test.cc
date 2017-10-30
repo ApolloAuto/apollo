@@ -25,8 +25,8 @@ namespace network {
 const char* rnn_model_filename = "../../data/rnn_vehicle_model.bin";
 
 TEST(RnnModel, verification_test) {
-    RnnModel::instance()->LoadFromProtobuf(rnn_model_filename);
-    EXPECT_TRUE(RnnModel::instance()->VerifyModel());
+  RnnModel::instance()->LoadFromProtobuf(rnn_model_filename);
+  EXPECT_TRUE(RnnModel::instance()->VerifyModel());
 }
 
 }  // namespace network

@@ -40,7 +40,7 @@ class NetModel {
 
   ~NetModel();
 
-  virtual void Run(const std::vector<Eigen::MatrixXf >& inputs,
+  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output) const = 0;
 
   virtual bool VerifyModel() const = 0;

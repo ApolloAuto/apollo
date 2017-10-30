@@ -21,21 +21,21 @@
 
 #include "modules/prediction/evaluator/network/layer.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "Eigen/Dense"
 
 #include "modules/common/log.h"
-#include "modules/prediction/proto/network_layers.pb.h"
 #include "modules/prediction/evaluator/network/util.h"
+#include "modules/prediction/proto/network_layers.pb.h"
 
 namespace apollo {
 namespace prediction {
 namespace network {
 
-using apollo::prediction::LayerParameter;
 using apollo::prediction::DenseParameter;
+using apollo::prediction::LayerParameter;
 
 bool Layer::Load(const LayerParameter& layer_pb) {
   if (!layer_pb.has_name()) {
@@ -127,26 +127,22 @@ bool BatchNormalization::Load(const LayerParameter& layer_pb) {
   center_ = bn_pb.center();
   scale_ = bn_pb.scale();
   momentum_ = bn_pb.momentum();
-  if (!bn_pb.has_mu() ||
-        !LoadTensor(bn_pb.mu(), &mu_)) {
+  if (!bn_pb.has_mu() || !LoadTensor(bn_pb.mu(), &mu_)) {
     AERROR << "Fail to Load mu!";
     return false;
   }
-  if (!bn_pb.has_sigma() ||
-        !LoadTensor(bn_pb.sigma(), &sigma_)) {
+  if (!bn_pb.has_sigma() || !LoadTensor(bn_pb.sigma(), &sigma_)) {
     AERROR << "Fail to Load sigma!";
     return false;
   }
   if (scale_) {
-    if (!bn_pb.has_gamma() ||
-          !LoadTensor(bn_pb.gamma(), &gamma_)) {
+    if (!bn_pb.has_gamma() || !LoadTensor(bn_pb.gamma(), &gamma_)) {
       AERROR << "Fail to Load gamma!";
       return false;
     }
   }
   if (center_) {
-    if (!bn_pb.has_beta() ||
-          !LoadTensor(bn_pb.beta(), &beta_)) {
+    if (!bn_pb.has_beta() || !LoadTensor(bn_pb.beta(), &beta_)) {
       AERROR << "Fail to Load beta!";
       return false;
     }
@@ -158,8 +154,8 @@ void BatchNormalization::Run(const std::vector<Eigen::MatrixXf>& inputs,
                              Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1);
   Eigen::MatrixXf temp = (inputs[0].rowwise() - mu_.transpose());
-  Eigen::MatrixXf norm = temp.array().rowwise() /
-               (sigma_.array().sqrt() + epsilon_).transpose();
+  Eigen::MatrixXf norm =
+      temp.array().rowwise() / (sigma_.array().sqrt() + epsilon_).transpose();
   if (scale_) {
     norm = norm.array().rowwise() * gamma_.transpose().array();
   }
@@ -218,23 +214,23 @@ bool LSTM::Load(const LayerParameter& layer_pb) {
   } else {
     unit_forget_bias_ = lstm_pb.unit_forget_bias();
   }
-  if (!lstm_pb.has_weights_input()
-              || !LoadTensor(lstm_pb.weights_input(), &wi_)) {
+  if (!lstm_pb.has_weights_input() ||
+      !LoadTensor(lstm_pb.weights_input(), &wi_)) {
     AERROR << "Fail to Load input weights!";
     return false;
   }
-  if (!lstm_pb.has_weights_forget()
-              || !LoadTensor(lstm_pb.weights_forget(), &wf_)) {
+  if (!lstm_pb.has_weights_forget() ||
+      !LoadTensor(lstm_pb.weights_forget(), &wf_)) {
     AERROR << "Fail to Load forget weights!";
     return false;
   }
-  if (!lstm_pb.has_weights_cell()
-              || !LoadTensor(lstm_pb.weights_cell(), &wc_)) {
+  if (!lstm_pb.has_weights_cell() ||
+      !LoadTensor(lstm_pb.weights_cell(), &wc_)) {
     AERROR << "Fail to Load cell weights!";
     return false;
   }
-  if (!lstm_pb.has_weights_output()
-              || !LoadTensor(lstm_pb.weights_output(), &wo_)) {
+  if (!lstm_pb.has_weights_output() ||
+      !LoadTensor(lstm_pb.weights_output(), &wo_)) {
     AERROR << "Fail to Load output weights!";
     return false;
   }
@@ -255,22 +251,22 @@ bool LSTM::Load(const LayerParameter& layer_pb) {
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_input() ||
-        !LoadTensor(lstm_pb.recurrent_weights_input(), &r_wi_)) {
+      !LoadTensor(lstm_pb.recurrent_weights_input(), &r_wi_)) {
     AERROR << "Fail to Load reccurent input weights!";
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_forget() ||
-        !LoadTensor(lstm_pb.recurrent_weights_forget(), &r_wf_)) {
+      !LoadTensor(lstm_pb.recurrent_weights_forget(), &r_wf_)) {
     AERROR << "Fail to Load reccurent forget weights!";
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_cell() ||
-        !LoadTensor(lstm_pb.recurrent_weights_cell(), &r_wc_)) {
+      !LoadTensor(lstm_pb.recurrent_weights_cell(), &r_wc_)) {
     AERROR << "Fail to Load reccurent cell weights!";
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_output() ||
-        !LoadTensor(lstm_pb.recurrent_weights_output(), &r_wo_)) {
+      !LoadTensor(lstm_pb.recurrent_weights_output(), &r_wo_)) {
     AERROR << "Fail to Load reccurent output weights!";
     return false;
   }
@@ -287,8 +283,9 @@ void LSTM::Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
 
   Eigen::MatrixXf i = (x_i + (*ht_1) * r_wi_).unaryExpr(krecurrent_activation_);
   Eigen::MatrixXf f = (x_f + (*ht_1) * r_wf_).unaryExpr(krecurrent_activation_);
-  Eigen::MatrixXf c = f.array() * ct_1->array()
-    + i.array() * ((x_c + (*ht_1) * r_wc_).unaryExpr(kactivation_)).array();
+  Eigen::MatrixXf c =
+      f.array() * ct_1->array() +
+      i.array() * ((x_c + (*ht_1) * r_wc_).unaryExpr(kactivation_)).array();
   Eigen::MatrixXf o = (x_o + (*ht_1) * r_wo_).unaryExpr(krecurrent_activation_);
   Eigen::MatrixXf h = o.array() * (c.unaryExpr(kactivation_)).array();
 
@@ -347,8 +344,8 @@ bool Flatten::Load(const LayerParameter& layer_pb) {
 void Flatten::Run(const std::vector<Eigen::MatrixXf>& inputs,
                   Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1);
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
-          inp(inputs[0]);
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> inp(
+      inputs[0]);
   inp.resize(1, inp.size());
   *output = inp;
 }
