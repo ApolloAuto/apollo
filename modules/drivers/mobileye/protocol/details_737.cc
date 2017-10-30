@@ -131,7 +131,7 @@ double Details737::yaw_angle(const uint8_t* bytes, int32_t length) const {
   x <<= 16;
   x >>= 16;
 
-  return x * 0.000977;
+  return x * 0.0009765625;
 }
 
 // config detail: {'name': 'pitch_angle', 'offset': 0.0, 'precision':
@@ -150,7 +150,7 @@ double Details737::pitch_angle(const uint8_t* bytes, int32_t length) const {
   x <<= 16;
   x >>= 16;
 
-  return x * 0.000002;
+  return x * 1.90734e-06;
 }
 
 }  // namespace mobileye

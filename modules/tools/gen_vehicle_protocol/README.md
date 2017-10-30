@@ -11,7 +11,7 @@ You only have to do is to have the dbc file (which is a communication protocol f
 
 The tool's input is :
 
-* `vehicle dbc file `: like lincoln's dbc file
+* `vehicle dbc file `: like lincoln's dbc file, put it under this folder
 * `generator tool config file`: for an example, a lincoln's is lincoln_conf.yml, detail you can see the example file of lincoln_conf.yml
 
 Run:

@@ -44,8 +44,8 @@ cc_binary(
     name = "prediction",
     srcs = ["main.cc"],
     deps = [
-        "//external:gflags",
         ":prediction_lib",
+        "//external:gflags",
     ],
 )
 

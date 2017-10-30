@@ -9,6 +9,7 @@ cc_library(
         "clear_zone.cc",
         "crosswalk.cc",
         "object_priority.cc",
+        "rerouting.cc",
         "signal_light.cc",
     ],
     hdrs = [
@@ -16,6 +17,7 @@ cc_library(
         "clear_zone.h",
         "crosswalk.h",
         "object_priority.h",
+        "rerouting.h",
         "signal_light.h",
         "traffic_rule.h",
     ],

@@ -42,10 +42,10 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class Localization
+ * @class planning
  *
- * @brief Localization module main class. It processes GPS and IMU as input,
- * to generate localization info.
+ * @brief Planning module main class. It processes GPS and IMU as input,
+ * to generate planning info.
  */
 class Planning : public apollo::common::ApolloApp {
  public:
@@ -106,7 +106,7 @@ class Planning : public apollo::common::ApolloApp {
 
   PlanningConfig config_;
 
-  hdmap::HDMap hdmap_;
+  const hdmap::HDMap* hdmap_ = nullptr;
 
   std::unique_ptr<Frame> frame_;
 

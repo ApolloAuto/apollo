@@ -9,8 +9,8 @@ slGraph:
                 max: 200
                 labelString: 's - ref_line (m)'
             y:
-                min: -2.5
-                max: 2.5
+                min: -5
+                max: 5
                 labelString: 'l (m)'
     properties:
         lines:
@@ -208,6 +208,24 @@ kappaGraph:
             QpSplinePathOptimizer:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
+latencyGraph:
+    title: 'Latency'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 'timestampe (sec)'
+            y:
+                labelString: 'latency (ms)'
+    properties:
+        lines:
+            planning:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
                 pointRadius: 0
                 fill: false
                 showLine: true

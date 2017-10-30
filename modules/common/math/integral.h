@@ -49,7 +49,7 @@ template <std::size_t N>
 std::pair<std::array<double, N>, std::array<double, N>>
 GetGaussLegendrePoints();
 
-template <>
+template <> inline
 std::pair<std::array<double, 2>, std::array<double, 2>>
 GetGaussLegendrePoints<2>() {
   std::array<double, 2> x;
@@ -63,7 +63,7 @@ GetGaussLegendrePoints<2>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 3>, std::array<double, 3>>
 GetGaussLegendrePoints<3>() {
   std::array<double, 3> x;
@@ -79,7 +79,7 @@ GetGaussLegendrePoints<3>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 4>, std::array<double, 4>>
 GetGaussLegendrePoints<4>() {
   std::array<double, 4> x;
@@ -97,7 +97,7 @@ GetGaussLegendrePoints<4>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 5>, std::array<double, 5>>
 GetGaussLegendrePoints<5>() {
   std::array<double, 5> x;
@@ -117,7 +117,7 @@ GetGaussLegendrePoints<5>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 6>, std::array<double, 6>>
 GetGaussLegendrePoints<6>() {
   std::array<double, 6> x;
@@ -139,7 +139,7 @@ GetGaussLegendrePoints<6>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 7>, std::array<double, 7>>
 GetGaussLegendrePoints<7>() {
   std::array<double, 7> x;
@@ -163,7 +163,7 @@ GetGaussLegendrePoints<7>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 8>, std::array<double, 8>>
 GetGaussLegendrePoints<8>() {
   std::array<double, 8> x;
@@ -189,7 +189,7 @@ GetGaussLegendrePoints<8>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 9>, std::array<double, 9>>
 GetGaussLegendrePoints<9>() {
   std::array<double, 9> x;
@@ -217,7 +217,7 @@ GetGaussLegendrePoints<9>() {
   return std::make_pair(x, w);
 }
 
-template <>
+template <> inline
 std::pair<std::array<double, 10>, std::array<double, 10>>
 GetGaussLegendrePoints<10>() {
   std::array<double, 10> x;

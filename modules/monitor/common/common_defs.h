@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_COMMON_DEFS_H_
-#define MODULES_PLATFORM_COMMON_DEFS_H_
+#ifndef MODULES_MONITOR_COMMON_COMMON_DEFS_H_
+#define MODULES_MONITOR_COMMON_COMMON_DEFS_H_
 
 #include <utility>
 
@@ -70,4 +70,4 @@
     return old_val;                   \
   }
 
-#endif  // MODULES_PLATFORM_COMMON_DEFS_H_
+#endif  // MODULES_MONITOR_COMMON_COMMON_DEFS_H_

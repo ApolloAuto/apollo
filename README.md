@@ -23,8 +23,10 @@ See the following instructions on how to set up the docker environment and build
 
 ```
 bash docker/scripts/install_docker.sh
-# logout and login to make sure to run docker command without sudo
+# logout and login the computer to make sure to run docker command without sudo
 docker ps  # to verify docker works without sudo
+# in case you forgot to logout and login back, do so, remove ~/.docker/config.json
+# and check again with `docker ps`
 bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 ```
@@ -46,13 +48,6 @@ Access HMI by opening your favorite browser, e.g. Chrome, go to http://localhost
 ![HMI Enable Dreamview](docs/demo_guide/images/dreamview_enable.png)
 
 
-Click upper-right Dreamview button
-![HMI Launch Dreamview](docs/demo_guide/images/dreamview_launch.png)
-
-to load Dreamview UI.
-
-![Open Dreamview](docs/quickstart/images/hmi_open_dreamview.png)
-
 ### Replay demo rosbag
 ```
 # in a different terminal, in the apollo directory
@@ -60,6 +55,14 @@ bash docker/scripts/dev_into.sh # jump into the docker container
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
 rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
 ```
+
+Click upper-right Dreamview button
+![HMI Launch Dreamview](docs/demo_guide/images/dreamview_launch.png)
+
+to load Dreamview UI.
+
+![Open Dreamview](docs/quickstart/images/hmi_open_dreamview.png)
+
 Dreamview should show a running vehicle with trajectory now.
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_1.5.png)
 

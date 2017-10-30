@@ -36,6 +36,8 @@ class DreamviewStore {
 
     @observable routeEditingManager = new RouteEditingManager();
 
+    @observable geolocation = {};
+
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;
     }
@@ -62,6 +64,10 @@ class DreamviewStore {
 
     @action updatePlanning(newPlanningData) {
         this.planning.update(newPlanningData);
+    }
+
+    @action setGeolocation(newGeolocation) {
+        this.geolocation = newGeolocation;
     }
 
     @action setPNCMonitor() {

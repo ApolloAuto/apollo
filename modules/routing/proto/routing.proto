@@ -19,7 +19,6 @@ message LaneSegment {
   }
 
 message RoutingRequest {
-
   optional apollo.common.Header header = 1;
   // at least two points. The first is start point, the end is final point.
   // The routing must go through each point in waypoint.

@@ -64,8 +64,7 @@ bool ReferenceLineProvider::Start() {
     AERROR << "ReferenceLineProvider has NOT been initiated.";
     return false;
   }
-  const auto &func = [this] { Generate(); };
-  thread_.reset(new std::thread(func));
+  thread_.reset(new std::thread(&ReferenceLineProvider::Generate, this));
   return true;
 }
 
@@ -102,17 +101,30 @@ void ReferenceLineProvider::Generate() {
   }
 }
 
-std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
+bool ReferenceLineProvider::HasReferenceLine() {
+  std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
+  return !reference_line_groups_.empty();
+}
+
+bool ReferenceLineProvider::GetReferenceLines(
+    std::list<ReferenceLine> *reference_lines,
+    std::list<hdmap::RouteSegments> *segments) {
   // TODO(all): implement this function using the current adc position and the
   // existing reference lines. It is required that the current reference lines
   // can cover thoroughly the current adc position so that planning can be make
   // with a minimum planning distance of 100 meters ahead and 10 meters
   // backward.
-  while (reference_line_groups_.empty()) {
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
-  }
+  CHECK_NOTNULL(reference_lines);
+  CHECK_NOTNULL(segments);
   std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
-  return reference_line_groups_.back();
+  if (reference_line_groups_.empty()) {
+    return false;
+  }
+  reference_lines->assign(reference_line_groups_.back().begin(),
+                          reference_line_groups_.back().end());
+  segments->assign(route_segment_groups_.back().begin(),
+                   route_segment_groups_.back().end());
+  return true;
 }
 
 bool ReferenceLineProvider::CreateReferenceLineFromRouting(
@@ -126,7 +138,12 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
                                      : FLAGS_look_forward_min_distance;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(position, FLAGS_look_backward_distance,
+    if (!pnc_map_->UpdatePosition(position)) {
+      AERROR << "Failed to update pnc_map position: "
+             << position.ShortDebugString();
+      return false;
+    }
+    if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
                                     look_forward_distance, &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
@@ -136,17 +153,28 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   ReferenceLineSmoother smoother;
   smoother.Init(smoother_config_);
 
+  SpiralReferenceLineSmoother spiral_smoother;
+  double max_spiral_smoother_dev = 0.1;
+  spiral_smoother.set_max_point_deviation(max_spiral_smoother_dev);
+
   std::vector<ReferenceLine> reference_lines;
-  for (const auto &segments : route_segments) {
+  std::vector<hdmap::RouteSegments> segments;
+  for (const auto &lanes : route_segments) {
     hdmap::Path hdmap_path;
-    hdmap::PncMap::CreatePathFromLaneSegments(segments, &hdmap_path);
+    hdmap::PncMap::CreatePathFromLaneSegments(lanes, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine raw_reference_line(hdmap_path);
       ReferenceLine reference_line;
-      if (!smoother.Smooth(raw_reference_line, &reference_line,
-                           spline_solver_.get())) {
-        AERROR << "Failed to smooth reference line";
-        continue;
+      if (FLAGS_enable_spiral_reference_line) {
+        if (!spiral_smoother.Smooth(raw_reference_line, &reference_line)) {
+          AERROR << "Failed to smooth reference_line with spiral smoother";
+        }
+      } else {
+        if (!smoother.Smooth(raw_reference_line, &reference_line,
+                             spline_solver_.get())) {
+          AERROR << "Failed to smooth reference line";
+          continue;
+        }
       }
 
       bool is_valid_reference_line = true;
@@ -167,12 +195,11 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
       }
       if (is_valid_reference_line) {
         reference_lines.push_back(std::move(reference_line));
-        reference_lines.back().set_change_lane_type(
-            segments.change_lane_type());
+        segments.emplace_back(lanes);
       }
     } else {
       reference_lines.emplace_back(hdmap_path);
-      reference_lines.back().set_change_lane_type(segments.change_lane_type());
+      segments.emplace_back(lanes);
     }
   }
 
@@ -183,10 +210,12 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
 
   if (!reference_lines.empty()) {
     std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
-    reference_line_groups_.push_back(reference_lines);
+    reference_line_groups_.emplace_back(reference_lines);
+    route_segment_groups_.emplace_back(route_segments);
     const size_t kMaxStoredReferenceLineGroups = 3;
     while (reference_line_groups_.size() > kMaxStoredReferenceLineGroups) {
       reference_line_groups_.pop_front();
+      route_segment_groups_.pop_front();
     }
   }
 

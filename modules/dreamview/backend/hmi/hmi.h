@@ -18,7 +18,6 @@
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 
 #include <string>
-#include <vector>
 
 #include "gtest/gtest_prod.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
@@ -39,10 +38,19 @@ class HMI {
   void Start();
 
  private:
+  // Callback of new HMIStatus message.
   void OnHMIStatus(const HMIStatus &hmi_status);
+  // Broadcast HMIStatus to all clients.
+  void BroadcastHMIStatus() const;
 
-  ModuleStatus* GetModuleStatus(const std::string &module_name);
-  HardwareStatus* GetHardwareStatus(const std::string &hardware_name);
+  static int ExecuteComponentCommand(
+      const google::protobuf::Map<std::string, Component> &components,
+      const std::string &component_name,
+      const std::string &command_name);
+
+  static void ChangeDrivingModeTo(const std::string &new_mode);
+  void ChangeMapTo(const std::string &new_map);
+  void ChangeVehicleTo(const std::string &new_vehicle);
 
   HMIConfig config_;
   HMIStatus status_;
@@ -51,6 +59,7 @@ class HMI {
   WebSocketHandler *websocket_;
 
   FRIEND_TEST(HMITest, UpdateHMIStatus);
+  FRIEND_TEST(HMITest, ExecuteComponentCommand);
 };
 
 }  // namespace dreamview

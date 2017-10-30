@@ -44,6 +44,7 @@ class ReferenceLineInfo {
  public:
   explicit ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                              const ReferenceLine& reference_line,
+                             const hdmap::RouteSegments& segments,
                              const common::TrajectoryPoint& init_adc_point);
 
   bool Init();
@@ -52,10 +53,6 @@ class ReferenceLineInfo {
    * Check if vehicle has reached destination.
    */
   bool HasReachedDestination();
-
-  routing::ChangeLaneType change_lane_type() const {
-    return reference_line_.change_lane_type();
-  }
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
@@ -97,9 +94,13 @@ class ReferenceLineInfo {
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
+  const hdmap::RouteSegments& Lanes() const;
+
   void ExportDecision(DecisionResult* decision_result) const;
 
  private:
+  void ExportTurnSignal(common::VehicleSignal* signal) const;
+
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
@@ -125,6 +126,8 @@ class ReferenceLineInfo {
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
+
+  hdmap::RouteSegments lanes_;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

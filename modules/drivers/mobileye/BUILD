@@ -67,4 +67,3 @@ cc_binary(
 )
 
 cpplint()
-

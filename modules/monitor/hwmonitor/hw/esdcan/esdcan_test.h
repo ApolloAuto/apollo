@@ -14,27 +14,43 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_HW_ESDCAN_TEST_H_
-#define MODULES_PLATFORM_HW_ESDCAN_TEST_H_
+#ifndef MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_TEST_H_
+#define MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_TEST_H_
+
+#include <ostream>
+#include <string>
 
 #include "esd_can/include/ntcan.h"
+#include "modules/monitor/common/hw_checker.h"
 
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * @namespace apollo::monitor::hw
+ * @brief apollo::monitor::hw
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 /// A collection of details data about a given ESD-CAN interface.
-struct EsdCanDetails {
+class EsdCanDetails : public ::apollo::monitor::HwCheckResultDetails {
+ public:
   enum ValidMasks {
     IF_STATUS = 0x1u,
     STATS = 0x2u,
     CTRL_STATE = 0x4u,
     BITRATE = 0x8u
   };
+
+  EsdCanDetails() : result(NTCAN_NET_NOT_FOUND), valid_flag(0) {}
+
+  void print_summary(std::ostream &os) override;
+
+  void print_test_result(std::ostream &os) override;
+
+  /// Test (check) esdcan of the given id.
+  /// @param stats where to store can bus stats.
+  /// @param details where to store detailed can stats/state information.
+  NTCAN_RESULT esdcan_do_test(int id);
 
   CAN_IF_STATUS if_status;
   NTCAN_BUS_STATISTIC stats;
@@ -45,8 +61,7 @@ struct EsdCanDetails {
   /// Bits flag indicating which fields are valid.
   unsigned int valid_flag;
 
-  EsdCanDetails() : result(NTCAN_NET_NOT_FOUND), valid_flag(0) {}
-
+ private:
   /// Invalidates all fields.
   inline void invalidate() {
     result = NTCAN_NET_NOT_FOUND;
@@ -57,13 +72,8 @@ struct EsdCanDetails {
   inline void add_valid_field(ValidMasks mask) { valid_flag |= mask; }
 };
 
-/// Test (check) esdcan of the given id.
-/// @param stats where to store can bus stats.
-/// @param details where to store detailed can stats/state information.
-NTCAN_RESULT esdcan_do_test(int id, EsdCanDetails *details);
-
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_HW_ESDCAN_TEST_H_
+#endif  // MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_TEST_H_

@@ -52,7 +52,7 @@ void WebSocketHandler::handleClose(CivetServer *server,
   }
 }
 
-bool WebSocketHandler::BroadcastData(const std::string &data) {
+bool WebSocketHandler::BroadcastData(const std::string &data, bool skippable) {
   std::vector<Connection *> connections_to_send;
   {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -67,7 +67,7 @@ bool WebSocketHandler::BroadcastData(const std::string &data) {
 
   bool all_success = true;
   for (Connection *conn : connections_to_send) {
-    if (!SendData(conn, data, true)) {
+    if (!SendData(conn, data, skippable)) {
       all_success = false;
     }
   }

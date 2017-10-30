@@ -46,7 +46,7 @@ double Lka767::heading_angle(const uint8_t* bytes, int32_t length) const {
   x <<= 8;
   x |= t;
 
-  return x * 0.000977 + -31.999023;
+  return x * 0.0009765625 + -31.9990234375;
 }
 
 // config detail: {'name': 'view_range', 'offset': 0.0, 'precision': 0.00390625,
@@ -62,7 +62,7 @@ double Lka767::view_range(const uint8_t* bytes, int32_t length) const {
   x <<= 8;
   x |= t;
 
-  return x * 0.003906;
+  return x * 0.00390625;
 }
 
 // config detail: {'name': 'view_range_availability', 'offset': 0.0,

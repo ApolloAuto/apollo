@@ -23,9 +23,6 @@
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
-#include "tf/transform_broadcaster.h"
-#include "tf/transform_listener.h"
-#include "tf_conversions/tf_eigen.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
@@ -324,8 +321,7 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   }
 
   ros::Time query_stamp(query_time);
-  static tf2_ros::Buffer tf2_buffer;
-  static tf2_ros::TransformListener tf2Listener(tf2_buffer);
+  const auto& tf2_buffer = AdapterManager::Tf2Buffer();
 
   const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
   string err_msg;

@@ -82,6 +82,7 @@ cc_library(
         "//modules/control/proto:control_proto",
         "//modules/dreamview/proto:hmi_status_proto",
         "//modules/drivers/gnss/proto:ins_proto",
+        "//modules/drivers/proto:sensor_proto",
         "//modules/hmi/proto:hmi_message_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
@@ -91,7 +92,6 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//modules/routing/proto:routing_proto",
-        "//modules/drivers/proto:sensor_proto",
         "@glog//:glog",
     ],
 )

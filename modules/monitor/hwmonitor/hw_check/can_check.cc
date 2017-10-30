@@ -17,54 +17,55 @@
 #include <assert.h>
 #include <iostream>
 
-#include "glog/logging.h"
+#include "modules/canbus/common/canbus_gflags.h"
+#include "modules/canbus/proto/canbus_conf.pb.h"
+#include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 #include "modules/monitor/common/annotations.h"
-#include "modules/monitor/common/log.h"
-#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
-#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_utils.h"
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
+#include "modules/monitor/common/can_checker_factory.h"
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
-using apollo::platform::HwCheckResult;
-using apollo::platform::hw::EsdCanChecker;
-using apollo::platform::hw::EsdCanDetails;
-using apollo::hmi::HMIStatusHelper;
-using apollo::hmi::HardwareStatus;
+using ::apollo::canbus::CanbusConf;
+using ::apollo::hmi::HMIStatusHelper;
+using ::apollo::hmi::HardwareStatus;
+using ::apollo::monitor::CanCheckerFactory;
+using ::apollo::monitor::HwCheckResult;
 
 int main(int argc, const char *argv[]) {
   // For other modules that uses glog.
-  ::google::InitGoogleLogging("platform");
-  apollo::platform::log::init_syslog();
-// @todo make log level configurable or set lower level here.
-#ifdef DEBUG
-  apollo::platform::hw::config_log(apollo::platform::log::LVL_DBG,
-                                   apollo::platform::log::DBG_VERBOSE,
-                                   apollo::platform::log::platform_log_printf);
-#else
-  apollo::platform::hw::config_log(apollo::platform::log::LVL_DBG,
-                                   apollo::platform::log::DBG_VERBOSE);
-#endif
+  google::InitGoogleLogging("platform");
 
-  // We only have can0 for now.
-  int can_id = 0;
-  EsdCanChecker can_chk(can_id);
+  CanbusConf canbus_conf;
+
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
+                                                &canbus_conf)) {
+    return -1;
+  }
+
+  auto *can_chk_factory = CanCheckerFactory::instance();
+  can_chk_factory->RegisterCanCheckers();
+  auto can_chk =
+      can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());
+  if (!can_chk) {
+    return -1;
+  }
+
   std::vector<HwCheckResult> can_rslt;
-  can_chk.run_check(&can_rslt);
+  can_chk->run_check(&can_rslt);
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
-  apollo::platform::hw::esdcan_print_summary(
-      std::cout, *(const EsdCanDetails *)((can_rslt[0].details.get())));
+  if (can_rslt[0].details != nullptr) {
+    can_rslt[0].details->print_summary(std::cout);
+  }
 #else
-  PLATFORM_LOG(
-      apollo::platform::hw::get_log_module(), apollo::platform::log::LVL_DBG,
-      "Done checking ESD-CAN-%d, status: %d", can_id, can_rslt[0].status);
+  ADEBUG << "Done checking " << can_chk->get_name() << ", "
+            "status: " << can_rslt[0].status;
 #endif
 
   std::vector<HardwareStatus> hw_status;
-  apollo::platform::hw::hw_chk_result_to_hmi_status(can_rslt, &hw_status);
-
+  apollo::monitor::hw::hw_chk_result_to_hmi_status(can_rslt, &hw_status);
   HMIStatusHelper::ReportHardwareStatus(hw_status);
 
   return 0;

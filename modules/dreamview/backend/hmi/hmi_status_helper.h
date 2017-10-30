@@ -17,9 +17,10 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_STATUS_HELPER_H_
 
-#include <vector>
+#include <string>
 
 #include "modules/dreamview/proto/hmi_status.pb.h"
+#include "modules/monitor/proto/hardware_status.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -38,16 +39,19 @@ class HMIStatusHelper {
  public:
   /*
    * @brief Report hardware status to HMI.
-   * @param hardware_status the vector of hardware status
+   * @param hardware_name the name of the hardware.
+   * @param hw_status the status of the hardware.
    */
-  static void ReportHardwareStatus(
-      const std::vector<HardwareStatus> &hardware_status);
+  static void ReportHardwareStatus(const std::string &hardware_name,
+                                   const monitor::HardwareStatus &hw_status);
 
   /*
    * @brief Report module status to HMI.
-   * @param module_status the status of the module
+   * @param module_name the name of the module.
+   * @param module_status the status of the module.
    */
-  static void ReportModuleStatus(const ModuleStatus &module_status);
+  static void ReportModuleStatus(const std::string &module_name,
+                                 const ModuleStatus &module_status);
 };
 
 }  // namespace dreamview

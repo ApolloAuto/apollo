@@ -8,16 +8,16 @@ cc_library(
     hdrs = ["third_party_perception.h"],
     deps = [
         ":third_party_perception_conversion",
-        ":third_party_perception_fusion",
         ":third_party_perception_filter",
-        "//modules/third_party_perception/common:third_party_perception_gflags",
-        "//modules/third_party_perception/common:third_party_perception_util",
+        ":third_party_perception_fusion",
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/perception/proto:perception_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/perception/proto:perception_proto",
+        "//modules/third_party_perception/common:third_party_perception_gflags",
+        "//modules/third_party_perception/common:third_party_perception_util",
     ],
 )
 
@@ -42,12 +42,12 @@ cc_library(
         "conversion.h",
     ],
     deps = [
-        "//modules/third_party_perception/common:third_party_perception_gflags",
-        "//modules/third_party_perception/common:third_party_perception_util",
-        "//modules/perception/proto:perception_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
-        "//modules/third_party_perception/proto:third_party_perception_proto"
+        "//modules/perception/proto:perception_proto",
+        "//modules/third_party_perception/common:third_party_perception_gflags",
+        "//modules/third_party_perception/common:third_party_perception_util",
+        "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
 )
 
@@ -60,11 +60,11 @@ cc_library(
         "fusion.h",
     ],
     deps = [
-        "//modules/third_party_perception/common:third_party_perception_gflags",
-        "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/common/math:polygon2d",
         "//modules/common/math:vec2d",
         "//modules/perception/proto:perception_proto",
+        "//modules/third_party_perception/common:third_party_perception_gflags",
+        "//modules/third_party_perception/common:third_party_perception_util",
     ],
 )
 
@@ -79,7 +79,7 @@ cc_library(
     deps = [
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
-        "//modules/third_party_perception/proto:third_party_perception_proto"
+        "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
 )
 

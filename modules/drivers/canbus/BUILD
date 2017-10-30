@@ -20,13 +20,13 @@ cc_library(
     hdrs = ["sensor_canbus.h"],
     deps = [
         ":sensor_gflags",
-        "//modules/drivers/canbus/can_client:can_client_factory",
-        "//modules/drivers/canbus/can_comm:can_receiver",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor",
+        "//modules/drivers/canbus/can_client:can_client_factory",
+        "//modules/drivers/canbus/can_comm:can_receiver",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/hmi/utils:hmi_status_helper",
     ],
 )

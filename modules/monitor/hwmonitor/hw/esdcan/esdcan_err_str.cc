@@ -17,7 +17,7 @@
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
 
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
 
 const char *esdcan_err_to_str(NTCAN_RESULT ntstatus) {
@@ -128,5 +128,5 @@ const char *esdcan_err_to_str(NTCAN_RESULT ntstatus) {
 }
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo

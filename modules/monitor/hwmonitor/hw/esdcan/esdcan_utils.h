@@ -14,24 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
-#define MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
+#ifndef MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_UTILS_H_
+#define MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_UTILS_H_
 
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
-#include <ostream>
-
 /**
- * @namespace apollo::platform::hw
- * @brief apollo::platform::hw
+ * @namespace apollo::monitor::hw
+ * @brief apollo::monitor::hw
  */
 namespace apollo {
-namespace platform {
+namespace monitor {
 namespace hw {
-
-void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details);
-
-void esdcan_print_test_result(std::ostream &os, const EsdCanDetails &details);
 
 void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status);
 
@@ -42,7 +36,7 @@ void esdcan_print_ctrl_state(const NTCAN_CTRL_STATE &c_state);
 void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate);
 
 }  // namespace hw
-}  // namespace platform
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
+#endif  // MODULES_MONITOR_HWMONITOR_HW_ESDCAN_ESDCAN_UTILS_H_

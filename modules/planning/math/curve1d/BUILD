@@ -60,8 +60,8 @@ cc_library(
     deps = [
         ":quintic_polynomial_curve1d",
         "//modules/common:log",
+        "//modules/common/math",
         "//modules/common/util:string_util",
-        "//modules/common/math:math"
     ],
 )
 

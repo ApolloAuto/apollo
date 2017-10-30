@@ -22,9 +22,9 @@ cc_test(
         "fake_can_client_test.cc",
     ],
     deps = [
+        "//modules/common:log",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/common:log",
         "@gtest//:main",
     ],
 )

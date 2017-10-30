@@ -23,6 +23,7 @@ message ChassisDetail {
   optional Light light = 13;                // Light
   optional Battery battery = 14;            // Battery info
   optional CheckResponseSignal check_response = 15;
+  optional License license = 16;            // License info
 }
 
 // CheckResponseSignal
@@ -499,4 +500,8 @@ message BasicInfo {
   optional GpsQuality quality = 37;
   optional int32 num_satellites = 38;
   optional double gps_speed = 39;
+}
+
+message License {
+  optional string vin = 1;
 }

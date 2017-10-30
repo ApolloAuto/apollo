@@ -24,6 +24,7 @@ message RuleConfig {
         SIGNAL_LIGHT = 2;
         CROSSWALK = 3;
         CLEAR_ZONE = 4;
+        REROUTING = 5;
     }
     optional RuleId rule_id = 1;
 }

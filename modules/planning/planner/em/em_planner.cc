@@ -110,7 +110,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   const double kStraightForwardLineCost = 10000.0;
-  if (reference_line_info->change_lane_type() == routing::FORWARD) {
+  if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
+      reference_line_info->Lanes().IsOnSegment()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
 

@@ -90,14 +90,14 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query //...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //... except //modules/perception/...`
+    BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
   fi
 
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
   if ! $USE_ESD_CAN; then
-     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "modules\/monitor\/hwmonitor\/hw\/esdcan" | grep -v "esd")
   fi
 }
 
@@ -165,7 +165,9 @@ function build_py_proto() {
   fi
   mkdir py_proto
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
-  find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=py_proto
+  find modules/ -name "*.proto" \
+      | grep -v modules/drivers/gnss \
+      | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
@@ -358,6 +360,7 @@ function citest() {
   //modules/planning/integration_tests:sunnyvale_loop_test
   //modules/control/integration_tests:simple_control_test
   //modules/prediction/container/obstacles:obstacle_test
+  //modules/dreamview/backend/simulation_world:simulation_world_service_test
   "
   bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then

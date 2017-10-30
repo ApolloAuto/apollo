@@ -20,6 +20,7 @@
 #include "modules/planning/tasks/qp_spline_path/qp_frenet_frame.h"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -38,63 +39,48 @@ using common::SpeedPoint;
 
 namespace {
 
-constexpr double kEpsilontol = 1e-6;
+constexpr double kEpsilonTol = 1e-6;
+const auto inf = std::numeric_limits<double>::infinity();
 }
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
                              const SpeedData& speed_data,
                              const common::FrenetFramePoint& init_frenet_point,
-                             const double time_resolution)
+                             const double time_resolution,
+                             const std::vector<double>& evaluated_s)
     : reference_line_(reference_line),
       speed_data_(speed_data),
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       init_frenet_point_(init_frenet_point),
       feasible_longitudinal_upper_bound_(reference_line_.map_path().length()),
-      time_resolution_(time_resolution) {
-  start_s_ = init_frenet_point.s();
-  end_s_ = reference_line.Length();
+      start_s_(init_frenet_point.s()),
+      end_s_(reference_line.Length()),
+      time_resolution_(time_resolution),
+      evaluated_s_(evaluated_s),
+      hdmap_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)},
+      static_obstacle_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)},
+      dynamic_obstacle_bound_{evaluated_s_.size(), std::make_pair(-inf, inf)} {
+  DCHECK_LT(start_s_ + kEpsilonTol, end_s_);
+  DCHECK_GE(evaluated_s_.size(), 2);
 }
 
 bool QpFrenetFrame::Init(
-    const uint32_t num_points,
     const std::vector<const PathObstacle*>& path_obstacles) {
-  if (num_points < 2) {
-    AERROR << "Number of s points [" << num_points
-           << "] is too small to evaluate.";
-    return false;
-  }
-
-  constexpr double kMinDistance = 1.0e-8;
-  if (std::fabs(start_s_ - end_s_) < kMinDistance) {
-    AERROR << "Not enough s distance. start_s: " << start_s_
-           << ", end_s: " << end_s_ << ", kMinDistance: " << kMinDistance;
-    return false;
-  }
-
   if (!CalculateDiscretizedVehicleLocation()) {
     AERROR << "Fail to calculate discretized vehicle location!";
     return false;
   }
 
-  const auto inf = std::numeric_limits<double>::infinity();
-  const double resolution = (end_s_ - start_s_) / num_points;
-  double s = start_s_;
-  for (uint32_t i = 0; i < num_points;
-       ++i, s = std::min(s + resolution, end_s_)) {
-    evaluated_knots_.push_back(s);
-    hdmap_bound_.emplace_back(-inf, inf);
-    static_obstacle_bound_.emplace_back(-inf, inf);
-    dynamic_obstacle_bound_.emplace_back(-inf, inf);
+  if (!CalculateHDMapBound()) {
+    AERROR << "Calculate HDMap bound failed.";
+    return false;
   }
 
-  // initialize calculation here
-  CalculateHDMapBound();
   if (!CalculateObstacleBound(path_obstacles)) {
     AERROR << "Calculate obstacle bound failed!";
     return false;
   }
-
   return true;
 }
 
@@ -105,8 +91,8 @@ void QpFrenetFrame::LogQpBound(
   }
   apollo::planning_internal::SLFrameDebug* sl_frame =
       planning_debug->mutable_planning_data()->mutable_sl_frame()->Add();
-  for (size_t i = 0; i < evaluated_knots_.size(); ++i) {
-    sl_frame->mutable_sampled_s()->Add(evaluated_knots_[i]);
+  for (size_t i = 0; i < evaluated_s_.size(); ++i) {
+    sl_frame->mutable_sampled_s()->Add(evaluated_s_[i]);
     sl_frame->mutable_map_lower_bound()->Add(hdmap_bound_[i].first);
     sl_frame->mutable_map_upper_bound()->Add(hdmap_bound_[i].second);
     sl_frame->mutable_static_obstacle_lower_bound()->Add(
@@ -120,19 +106,19 @@ void QpFrenetFrame::LogQpBound(
   }
 }
 
-bool QpFrenetFrame::GetMapBound(const double s,
-                                std::pair<double, double>* const bound) const {
-  return GetBound(s, hdmap_bound_, bound);
+const std::vector<std::pair<double, double>>& QpFrenetFrame::GetMapBound()
+    const {
+  return hdmap_bound_;
 }
 
-bool QpFrenetFrame::GetStaticObstacleBound(
-    const double s, std::pair<double, double>* const bound) const {
-  return GetBound(s, static_obstacle_bound_, bound);
+const std::vector<std::pair<double, double>>&
+QpFrenetFrame::GetStaticObstacleBound() const {
+  return static_obstacle_bound_;
 }
 
-bool QpFrenetFrame::GetDynamicObstacleBound(
-    const double s, std::pair<double, double>* const bound) const {
-  return GetBound(s, dynamic_obstacle_bound_, bound);
+const std::vector<std::pair<double, double>>&
+QpFrenetFrame::GetDynamicObstacleBound() const {
+  return dynamic_obstacle_bound_;
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
@@ -203,8 +189,8 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
           init_frenet_point_.s() + veh_point.s() - s_resolution;
       double updated_end_s =
           init_frenet_point_.s() + veh_point.s() + s_resolution;
-      if (updated_end_s > evaluated_knots_.back() ||
-          updated_start_s < evaluated_knots_.front()) {
+      if (updated_end_s > evaluated_s_.back() ||
+          updated_start_s < evaluated_s_.front()) {
         continue;
       }
       std::pair<uint32_t, uint32_t> update_index_range =
@@ -291,9 +277,8 @@ bool QpFrenetFrame::MapNudgeLine(
       std::max(further_point.s() - near_point.s(), common::math::kMathEpsilon);
   const double adc_half_width = vehicle_param_.width() / 2;
   for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
-    double weight = std::abs((evaluated_knots_[i] - near_point.s())) / distance;
-    weight = std::max(weight, 0.0);
-    weight = std::min(weight, 1.0);
+    double weight = std::abs((evaluated_s_[i] - near_point.s())) / distance;
+    weight = std::min(1.0, std::max(weight, 0.0));
     double boundary =
         near_point.l() * (1 - weight) + further_point.l() * weight;
 
@@ -308,7 +293,7 @@ bool QpFrenetFrame::MapNudgeLine(
     if ((*constraint)[i].second < (*constraint)[i].first + 0.3) {
       if (i > 0) {
         feasible_longitudinal_upper_bound_ =
-            std::min(evaluated_knots_[i - 1] - kEpsilontol,
+            std::min(evaluated_s_[i - 1] - kEpsilonTol,
                      feasible_longitudinal_upper_bound_);
       } else {
         feasible_longitudinal_upper_bound_ = start_s_;
@@ -362,29 +347,28 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
 std::pair<uint32_t, uint32_t> QpFrenetFrame::FindInterval(
     const double start, const double end) const {
   double new_start = std::max(start - vehicle_param_.front_edge_to_center(),
-                              evaluated_knots_.front());
-  double new_end = std::min(end + vehicle_param_.back_edge_to_center(),
-                            evaluated_knots_.back());
+                              evaluated_s_.front());
+  double new_end =
+      std::min(end + vehicle_param_.back_edge_to_center(), evaluated_s_.back());
+
   uint32_t start_index = FindIndex(new_start);
   uint32_t end_index = FindIndex(new_end);
-
-  if (end > evaluated_knots_[end_index] &&
-      end_index + 1 != evaluated_knots_.size()) {
-    end_index++;
+  if (end_index == evaluated_s_.size()) {
+    --end_index;
   }
 
   return std::make_pair(start_index, end_index);
 }
 
-void QpFrenetFrame::CalculateHDMapBound() {
+bool QpFrenetFrame::CalculateHDMapBound() {
   const double adc_half_width = vehicle_param_.width() / 2.0;
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound = 0.0;
     double right_bound = 0.0;
-    bool suc = reference_line_.GetLaneWidth(evaluated_knots_[i], &left_bound,
+    bool suc = reference_line_.GetLaneWidth(evaluated_s_[i], &left_bound,
                                             &right_bound);
     if (!suc) {
-      AWARN << "Extracting lane width failed at s = " << evaluated_knots_[i];
+      AWARN << "Extracting lane width failed at s = " << evaluated_s_[i];
       right_bound = FLAGS_default_reference_line_width / 2;
       left_bound = FLAGS_default_reference_line_width / 2;
     }
@@ -393,22 +377,27 @@ void QpFrenetFrame::CalculateHDMapBound() {
     hdmap_bound_[i].second = left_bound - adc_half_width;
 
     if (hdmap_bound_[i].first >= hdmap_bound_[i].second) {
-      ADEBUG << "HD Map bound at " << evaluated_knots_[i] << " is infeasible ("
-             << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second << ") "
-             << std::endl;
-      ADEBUG << "left_bound: " << left_bound;
-      ADEBUG << "right_bound: " << right_bound;
+      ADEBUG << "HD Map bound at " << evaluated_s_[i] << " is infeasible ("
+             << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second << ") ";
+      ADEBUG << "left_bound: " << left_bound
+             << ", right_bound: " << right_bound;
+
       feasible_longitudinal_upper_bound_ =
-          std::min(evaluated_knots_[i], feasible_longitudinal_upper_bound_);
+          std::min(evaluated_s_[i], feasible_longitudinal_upper_bound_);
       common::SLPoint sl;
-      sl.set_s(evaluated_knots_[i]);
+      sl.set_s(evaluated_s_[i]);
       common::math::Vec2d xy;
-      reference_line_.SLToXY(sl, &xy);
-      ADEBUG << "evaluated_knot x: " << std::fixed << xy.x()
+      if (!reference_line_.SLToXY(sl, &xy)) {
+        AERROR << "Fail to calculate HDMap bound at s: " << sl.s()
+               << ", l: " << sl.l();
+        return false;
+      }
+      ADEBUG << "evaluated point x: " << std::fixed << xy.x()
              << " y: " << xy.y();
       break;
     }
   }
+  return true;
 }
 
 bool QpFrenetFrame::CalculateObstacleBound(
@@ -434,62 +423,10 @@ bool QpFrenetFrame::CalculateObstacleBound(
   return true;
 }
 
-bool QpFrenetFrame::GetBound(
-    const double s, const std::vector<std::pair<double, double>>& map_bound,
-    std::pair<double, double>* const bound) const {
-  if (s + 1e-8 < start_s_ || s - 1e-8 > end_s_) {
-    AERROR << "Evaluate s location " << s
-           << ", is out of trajectory frenet frame range (" << start_s_ << ", "
-           << end_s_ << ")";
-    return false;
-  }
-
-  // linear bound interpolation
-  uint32_t lower_index = FindIndex(s);
-  const double s_low = evaluated_knots_[lower_index];
-  const double s_high = evaluated_knots_[lower_index + 1];
-  double weight = s_high - s_low > 1e-8 ? (s - s_low) / (s_high - s_low) : 0.0;
-
-  double low_first = map_bound[lower_index].first;
-  double low_second = map_bound[lower_index].second;
-  double high_first = map_bound[lower_index + 1].first;
-  double high_second = map_bound[lower_index + 1].second;
-
-  // If there is only one infinity in low and high point, then make it equal
-  // to the not inf one.
-  if (std::isinf(low_first) && !std::isinf(high_first)) {
-    low_first = high_first;
-  } else if (!std::isinf(low_first) && std::isinf(high_first)) {
-    high_first = low_first;
-  }
-
-  if (std::isinf(low_second) && !std::isinf(high_second)) {
-    low_second = high_second;
-  } else if (!std::isinf(low_second) && std::isinf(high_second)) {
-    high_second = low_second;
-  }
-
-  if (std::isinf(low_first)) {
-    bound->first = low_first;
-  } else {
-    bound->first = low_first * (1 - weight) + high_first * weight;
-  }
-
-  if (std::isinf(low_second)) {
-    bound->second = low_second;
-  } else {
-    bound->second = low_second * (1 - weight) + high_second * weight;
-  }
-  return true;
-}
-
 uint32_t QpFrenetFrame::FindIndex(const double s) const {
-  auto lower_bound =
-      std::lower_bound(evaluated_knots_.begin() + 1, evaluated_knots_.end(), s);
-  return std::min(
-             static_cast<uint32_t>(evaluated_knots_.size() - 1),
-             static_cast<uint32_t>(lower_bound - evaluated_knots_.begin())) -
-         1;
+  auto upper_bound =
+      std::upper_bound(evaluated_s_.begin(), evaluated_s_.end(), s);
+  return std::distance(evaluated_s_.begin(), upper_bound);
 }
 
 }  // namespace planning

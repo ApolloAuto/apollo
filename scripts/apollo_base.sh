@@ -110,7 +110,8 @@ function set_lib_path() {
       PY_TOOLS_PATH=/apollo/modules/tools
   else
       local MD5=`echo -n $APOLLO_ROOT_DIR | md5sum | cut -d' ' -f1`
-      local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
+      #local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
+      local ROS_SETUP="/home/tmp/ros/setup.bash"
       if [ -e "${ROS_SETUP}" ]; then
          source "${ROS_SETUP}"
       fi
@@ -174,6 +175,12 @@ function setup_device() {
     # setup CAN device
     if [ ! -e /dev/can0 ]; then
         sudo mknod --mode=a+rw /dev/can0 c 52 0
+    fi
+    if [ ! -e /dev/can1 ]; then
+        sudo mknod --mode=a+rw /dev/can1 c 52 1
+    fi
+    if [ ! -e /dev/can2 ]; then
+        sudo mknod --mode=a+rw /dev/can2 c 52 2
     fi
 
     MACHINE_ARCH=$(uname -m)

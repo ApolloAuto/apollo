@@ -77,7 +77,7 @@ void SequencePredictor::FilterLaneSequences(
     lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
 
     if (lane_change_type[i] == LaneChangeType::INVALID) {
-        continue;
+      continue;
     }
 
     double probability = sequence.probability();
@@ -98,7 +98,9 @@ void SequencePredictor::FilterLaneSequences(
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
     // The obstacle has interference with ADC within a small distance
-    if (GetLaneChangeDistanceWithADC(sequence) < FLAGS_lane_change_dist) {
+    if (GetLaneChangeDistanceWithADC(sequence) < FLAGS_lane_change_dist &&
+        (lane_change_type[i] == LaneChangeType::LEFT ||
+         lane_change_type[i] == LaneChangeType::RIGHT)) {
       (*enable_lane_sequence)[i] = false;
       continue;
     }

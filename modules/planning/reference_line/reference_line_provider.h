@@ -33,6 +33,7 @@
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 /**
  * @namespace apollo::planning
@@ -62,7 +63,10 @@ class ReferenceLineProvider {
 
   void Stop();
 
-  std::vector<ReferenceLine> GetReferenceLines();
+  bool HasReferenceLine();
+
+  bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
+                         std::list<hdmap::RouteSegments>* segments);
 
  private:
   void Generate();
@@ -86,6 +90,7 @@ class ReferenceLineProvider {
 
   std::mutex reference_line_groups_mutex_;
   std::list<std::vector<ReferenceLine>> reference_line_groups_;
+  std::list<std::vector<hdmap::RouteSegments>> route_segment_groups_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };

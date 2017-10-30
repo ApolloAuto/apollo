@@ -35,6 +35,11 @@ bool AdapterManager::Initialized() {
   return instance()->initialized_;
 }
 
+void AdapterManager::Reset() {
+  instance()->initialized_ = false;
+  instance()->observers_.clear();
+}
+
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   // Parse config file
   AdapterManagerConfig configs;
@@ -45,6 +50,10 @@ void AdapterManager::Init(const std::string &adapter_config_filename) {
 }
 
 void AdapterManager::Init(const AdapterManagerConfig &configs) {
+  if (Initialized()) {
+    return;
+  }
+
   instance()->initialized_ = true;
   if (configs.is_ros()) {
     instance()->node_handle_.reset(new ros::NodeHandle());

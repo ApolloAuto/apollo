@@ -88,16 +88,15 @@ bool Planning::HasSignalLight(const PlanningConfig& config) {
 }
 
 Status Planning::Init() {
-  const auto& map_file = apollo::hdmap::BaseMapFile();
-  CHECK(!hdmap_.LoadMapFromFile(map_file)) << "Failed to load map file:"
-                                           << map_file;
-  Frame::SetMap(&hdmap_);
+  hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+  CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
+  Frame::SetMap(hdmap_);
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   if (!AdapterManager::Initialized()) {
-    AdapterManager::Init(FLAGS_adapter_config_filename);
+    AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
   if (AdapterManager::GetLocalization() == nullptr) {
     std::string error_msg("Localization is not registered");
@@ -114,6 +113,11 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
+  if (AdapterManager::GetRoutingRequest() == nullptr) {
+    std::string error_msg("RoutingRequest is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
     std::string error_msg("Prediction is not registered");
     AERROR << error_msg;
@@ -127,7 +131,7 @@ Status Planning::Init() {
   }
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
-        &hdmap_, config_.reference_line_smoother_config());
+        hdmap_, config_.reference_line_smoother_config());
   }
 
   RegisterPlanners();
@@ -161,13 +165,7 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-  if (frame_) {
-    auto seq_num = frame_->SequenceNum();
-    FrameHistory::instance()->Add(seq_num, std::move(frame_));
-  }
-}
+void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
@@ -175,6 +173,11 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+
+  if (frame_) {
+    trajectory_pb->mutable_routing_header()->CopyFrom(
+        frame_->routing_response().header());
+  }
   AdapterManager::PublishPlanning(*trajectory_pb);
 }
 
@@ -213,7 +216,6 @@ void Planning::RunOnce() {
   common::Status status =
       common::VehicleState::instance()->Update(localization, chassis);
   DCHECK(IsVehicleStateValid(*common::VehicleState::instance()));
-
   if (!status.ok()) {
     AERROR << "Update VehicleState failed.";
     not_ready->set_reason("Update VehicleState failed.");
@@ -221,6 +223,18 @@ void Planning::RunOnce() {
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
+  // if reference line is not ready, continue;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->UpdateRoutingResponse(
+        AdapterManager::GetRoutingResponse()->GetLatestObserved());
+    if (!ReferenceLineProvider::instance()->HasReferenceLine()) {
+      not_ready->set_reason("reference line not ready");
+      AERROR << not_ready->reason() << "; skip the planning cycle.";
+      PublishPlanningPb(&not_ready_pb, start_timestamp);
+      return;
+    }
+  }
+
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
@@ -246,6 +260,10 @@ void Planning::RunOnce() {
       status.Save(estop.mutable_header()->mutable_status());
       PublishPlanningPb(&estop, start_timestamp);
     }
+    if (frame_) {
+      auto seq_num = frame_->SequenceNum();
+      FrameHistory::instance()->Add(seq_num, std::move(frame_));
+    }
     return;
   }
 
@@ -257,15 +275,22 @@ void Planning::RunOnce() {
   trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
 
-  if (status.ok()) {
-    trajectory_pb.set_is_replan(is_replan);
-    PublishPlanningPb(&trajectory_pb, start_timestamp);
-    ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
-  } else if (FLAGS_publish_estop) {
-    trajectory_pb.mutable_estop();
+  if (!status.ok()) {
     status.Save(trajectory_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&trajectory_pb, start_timestamp);
-    AERROR << "Planning failed";
+    AERROR << "Planning failed:" << status.ToString();
+    if (FLAGS_publish_estop) {
+      AERROR << "Planning failed and set estop";
+      trajectory_pb.mutable_estop();
+    }
+  }
+
+  trajectory_pb.set_is_replan(is_replan);
+  PublishPlanningPb(&trajectory_pb, start_timestamp);
+  ADEBUG << "Planning pb:" << trajectory_pb.header().DebugString();
+
+  if (frame_) {
+    auto seq_num = frame_->SequenceNum();
+    FrameHistory::instance()->Add(seq_num, std::move(frame_));
   }
 }
 
@@ -303,7 +328,8 @@ common::Status Planning::Plan(
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(
-        "planner failed to make a driving plan because NO best_reference_line "
+        "planner failed to make a driving plan because NO "
+        "best_reference_line "
         "can be provided.");
     AERROR << msg;
     last_publishable_trajectory_->Clear();

@@ -12,10 +12,10 @@ cc_library(
     ],
     hdrs = glob(["*.h"]),
     deps = [
+        "//modules/common:log",
+        "//modules/common:macro",
         "//modules/common/util:string_util",
-        "//modules/monitor/common:interface",
-        "//modules/monitor/common:platform_common_lib",
-        "//modules/monitor/hwmonitor/hw:platform_hw_log_module_lib",
+        "//modules/monitor/common:hw_checker",
         "//third_party/can_card_library/esd_can",
     ],
 )
@@ -30,10 +30,10 @@ cc_library(
     ],
     hdrs = glob(["*.h"]),
     deps = [
+        "//modules/common:log",
+        "//modules/common:macro",
         "//modules/common/util:string_util",
-        "//modules/monitor/common:interface",
-        "//modules/monitor/common:platform_common_lib",
-        "//modules/monitor/hwmonitor/hw:platform_hw_log_module_lib",
+        "//modules/monitor/common:hw_checker",
         "//third_party/can_card_library/esd_can",
     ],
 )

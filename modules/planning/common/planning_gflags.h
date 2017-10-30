@@ -20,7 +20,7 @@
 #include "gflags/gflags.h"
 
 DECLARE_string(planning_config_file);
-DECLARE_string(adapter_config_filename);
+DECLARE_string(planning_adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
@@ -31,6 +31,7 @@ DECLARE_double(look_forward_min_distance);
 DECLARE_double(look_forward_time_sec);
 
 DECLARE_bool(enable_smooth_reference_line);
+DECLARE_bool(enable_spiral_reference_line);
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
@@ -96,6 +97,8 @@ DECLARE_double(decision_valid_stop_range);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
+
+DECLARE_double(turn_signal_distance);
 
 // QpSt optimizer
 DECLARE_bool(enable_slowdown_profile_generator);

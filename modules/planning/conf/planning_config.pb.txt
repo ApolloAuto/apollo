@@ -58,7 +58,7 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.0
+            high_speed_centric_acceleration_limit: 1.8
             low_speed_centric_acceleration_limit: 1.35
             high_speed_threshold: 20
             low_speed_threshold: 7
@@ -72,12 +72,14 @@ em_planner_config {
         max_spline_length: 20.0
         time_resolution: 0.1
         regularization_weight: 0.1
-        derivative_weight: 0.0
-        second_derivative_weight: 1000.0
+        first_spline_weight_factor: 10.0
+        derivative_weight: 100.0
+        second_derivative_weight: 10.0
         third_derivative_weight: 10.0
-        reference_line_weight: 0
+        reference_line_weight: 0.0
         num_output: 100
-        cross_lane_extension_buffer: 0.2
+        cross_lane_lateral_extension: 1.2
+        cross_lane_longitudinal_extension: 100.0
         history_path_weight: 0.0;
     }
     qp_st_speed_config {
@@ -113,8 +115,8 @@ em_planner_config {
         }
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.0
-            low_speed_centric_acceleration_limit: 1.8
+            high_speed_centric_acceleration_limit: 1.2
+            low_speed_centric_acceleration_limit: 1.6
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
@@ -139,4 +141,7 @@ reference_line_smoother_config {
 
 rule_config : {
     rule_id: BACKSIDE_VEHICLE
+}
+rule_config : {
+    rule_id: REROUTING
 }

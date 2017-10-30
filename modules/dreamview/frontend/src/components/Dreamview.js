@@ -9,8 +9,8 @@ import Scene from "components/Scene";
 import RouteEditingBar from "components/RouteEditingBar";
 import Loader from "components/common/Loader";
 import PNCMonitor from "components/PNCMonitor";
+import Geolocation from "components/common/Geolocation";
 import WS from "store/websocket";
-
 
 @inject("store") @observer
 export default class Dreamview extends React.Component {
@@ -45,6 +45,10 @@ export default class Dreamview extends React.Component {
         const showBars = !routeEditingManager.inEditingView;
         const showRoutingBar = routeEditingManager.inEditingView;
         const showVideo = (video.path !== undefined && video.path.length !== 0);
+        const showGeo = (showRoutingBar ||
+                options.cameraAngle === 'Map' ||
+                options.cameraAngle === 'Overhead' ||
+                options.cameraAngle === 'Monitor');
 
         return (
             <SplitPane split="vertical"
@@ -60,6 +64,7 @@ export default class Dreamview extends React.Component {
                         height={dimension.height}
                         options={options}
                         invisible={false}/>
+                    {showGeo ? <Geolocation /> : null}
                     {showVideo  ? <DashCamPlayer /> : null}
                 </div>
                 {options.showPNCMonitor ? <PNCMonitor /> : <div></div>}

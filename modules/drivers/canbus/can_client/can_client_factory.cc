@@ -34,20 +34,20 @@ CanClientFactory::CanClientFactory() {}
 
 void CanClientFactory::RegisterCanClients() {
   Register(CANCardParameter::FAKE_CAN,
-           []() -> CanClient * { return new can::FakeCanClient(); });
+           []() -> CanClient* { return new can::FakeCanClient(); });
 #if USE_ESD_CAN
   Register(CANCardParameter::ESD_CAN,
-           []() -> CanClient * { return new can::EsdCanClient(); });
+           []() -> CanClient* { return new can::EsdCanClient(); });
 #endif
   Register(CANCardParameter::SOCKET_CAN_RAW,
-           []() -> CanClient * { return new can::SocketCanClientRaw(); });
+           []() -> CanClient* { return new can::SocketCanClientRaw(); });
 }
 
 std::unique_ptr<CanClient> CanClientFactory::CreateCANClient(
-    const CANCardParameter &parameter) {
+    const CANCardParameter& parameter) {
   auto factory = CreateObject(parameter.brand());
   if (!factory) {
-    AERROR << "Failed to create can client with parameter: "
+    AERROR << "Failed to create CAN client with parameter: "
            << parameter.DebugString();
   } else if (!factory->Init(parameter)) {
     AERROR << "Failed to initialize CAN card with parameter: "

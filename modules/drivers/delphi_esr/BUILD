@@ -10,10 +10,10 @@ cc_library(
         "delphi_esr_message_manager.h",
     ],
     deps = [
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus:sensor_gflags",
-        "//modules/drivers/delphi_esr/protocol:drivers_delphi_esr_protocol",
         "//modules/common/adapters:adapter_manager",
+        "//modules/drivers/canbus:sensor_gflags",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/delphi_esr/protocol:drivers_delphi_esr_protocol",
     ],
 )
 
@@ -61,12 +61,11 @@ cc_binary(
     deps = [
         ":delphi_esr_canbus_lib",
         "//external:gflags",
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/common:log",
         "//modules/common/monitor",
+        "//modules/drivers/canbus/common:canbus_common",
         "@ros//:ros_common",
     ],
 )
 
 cpplint()
-

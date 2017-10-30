@@ -29,6 +29,7 @@ cc_library(
     deps = [
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
+        "//modules/routing/common:routing_gflags",
     ],
 )
 

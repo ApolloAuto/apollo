@@ -98,12 +98,15 @@ cc_library(
 
 cc_library(
     name = "highgui",
-    srcs = glob([
-        "modules/highgui/src/**/*.cpp"
-    ], exclude=[
-        "modules/highgui/src/cap*.cpp",
-        "modules/highgui/src/window_carbon.cpp",
-    ]),
+    srcs = glob(
+        [
+            "modules/highgui/src/**/*.cpp",
+        ],
+        exclude = [
+            "modules/highgui/src/cap*.cpp",
+            "modules/highgui/src/window_carbon.cpp",
+        ],
+    ),
     hdrs = glob([
         "modules/highgui/src/**/*.hpp",
         "modules/highgui/src/**/*.h",
@@ -115,16 +118,16 @@ cc_library(
     includes = [
         "modules/highgui/include",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":core",
-        ":imgproc",
-    ],
     linkopts = [
         "-ljpeg",
         "-ltiff",
         "-lpng",
         "-ljasper",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":core",
+        ":imgproc",
     ],
 )
 

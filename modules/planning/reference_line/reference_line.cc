@@ -58,23 +58,6 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
   }
 }
 
-ReferenceLine::ReferenceLine(
-    const std::vector<ReferencePoint>& reference_points,
-    const std::vector<hdmap::LaneSegment>& lane_segments,
-    const double max_approximation_error)
-    : reference_points_(reference_points),
-      map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
-                            reference_points.begin(), reference_points.end()),
-                        lane_segments, max_approximation_error)) {}
-
-routing::ChangeLaneType ReferenceLine::change_lane_type() const {
-  return change_lane_type_;
-}
-
-void ReferenceLine::set_change_lane_type(routing::ChangeLaneType type) {
-  change_lane_type_ = type;
-}
-
 ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {

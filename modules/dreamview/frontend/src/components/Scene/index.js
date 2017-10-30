@@ -24,7 +24,10 @@ export default class Scene extends React.Component {
             <div id = "canvas"
                  className={classNames({
                             "dreamview-canvas" : true,
-                             "hidden" : invisible})}/>
+                             "hidden" : invisible})}
+                 onMouseMove={(event) => {
+                    RENDERER.updateGeolocation(event);
+                 }}/>
 
         );
     }

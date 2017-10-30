@@ -36,7 +36,7 @@ cc_library(
         "//modules/planning/math/smoothing_spline:spline_1d_generator",
         "//modules/planning/math/smoothing_spline:spline_1d_kernel",
         "//modules/planning/math/smoothing_spline:spline_1d_seg",
-        "//modules/planning/proto:qp_spline_path_config_proto",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/tasks:path_optimizer",
         "@eigen//:eigen",

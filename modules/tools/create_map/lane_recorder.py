@@ -148,7 +148,7 @@ def main(argv):
     print("runtime log is in %s%s" % (log_dir, "lane_recorder.log"))
     recorder = LaneRecord(record_file)
     atexit.register(recorder.shutdown)
-    rospy.Subscriber('/apollo/mobileye', mobileye_pb2.Mobileye,
+    rospy.Subscriber('/apollo/sensor/mobileye', mobileye_pb2.Mobileye,
                      recorder.mobileye_callback)
 
     rospy.Subscriber('/apollo/localization/pose',

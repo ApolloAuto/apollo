@@ -10,11 +10,6 @@ running is (from the main apollo directory):
 bash docker/scripts/{dev/release}_start.sh
 bash docker/scripts/{dev/release}_into.sh
 ```
-Advanced users wishing to create their own build/release
-images can do this by running:
-```bash
-bash docker/scripts/{dev/release}_create.sh
-```
 Note that, within the scripts in this directory,
 only standard tools that are expected
 to be available in most Linux distributions

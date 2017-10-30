@@ -9,13 +9,13 @@ cc_library(
         "vehicle_controller.h",
     ],
     deps = [
-        "//modules/drivers/canbus/can_client",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/common/proto:error_code_proto",
         "//modules/control/proto:control_proto",
+        "//modules/drivers/canbus/can_client",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -28,10 +28,10 @@ cc_library(
         "abstract_vehicle_factory.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 

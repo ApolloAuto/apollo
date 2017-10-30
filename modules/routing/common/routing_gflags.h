@@ -22,7 +22,7 @@
 DECLARE_string(routing_conf_file);
 DECLARE_string(node_name);
 
-DECLARE_string(adapter_config_filename);
+DECLARE_string(routing_adapter_config_filename);
 
 DECLARE_bool(use_road_id);
 DECLARE_double(min_length_for_lane_change);

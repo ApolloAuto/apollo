@@ -6,10 +6,10 @@ cc_library(
     name = "can_receiver",
     hdrs = ["can_receiver.h"],
     deps = [
-        "//modules/drivers/canbus/can_client",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/common",
         "//modules/common/proto:error_code_proto",
+        "//modules/drivers/canbus/can_client",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
     ],
 )
 
@@ -17,10 +17,10 @@ cc_library(
     name = "can_sender",
     hdrs = ["can_sender.h"],
     deps = [
-        "//modules/drivers/canbus/can_client",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/common",
         "//modules/common/proto:error_code_proto",
+        "//modules/drivers/canbus/can_client",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
         "@gtest//:gtest",
     ],
 )
@@ -32,9 +32,9 @@ cc_library(
         "protocol_data.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/common/proto:error_code_proto",
         "//modules/common/time",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -45,11 +45,11 @@ cc_test(
         "can_sender_test.cc",
     ],
     deps = [
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common:log",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/common:log",
         "@gtest//:main",
     ],
 )
@@ -61,11 +61,11 @@ cc_test(
         "can_receiver_test.cc",
     ],
     deps = [
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common:log",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/common:log",
         "@gtest//:main",
     ],
 )

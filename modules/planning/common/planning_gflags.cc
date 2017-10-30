@@ -17,7 +17,8 @@
 #include "modules/planning/common/planning_gflags.h"
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
-DEFINE_string(adapter_config_filename, "modules/planning/conf/adapter.conf",
+DEFINE_string(planning_adapter_config_filename,
+              "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
@@ -51,6 +52,9 @@ DEFINE_double(look_forward_time_sec, 8,
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
+DEFINE_bool(enable_spiral_reference_line, false,
+            "enable new spiral based reference line");
+
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
 DEFINE_double(max_collision_distance, 0.1,
@@ -60,7 +64,7 @@ DEFINE_double(max_collision_distance, 0.1,
 DEFINE_double(replan_distance_threshold, 5.0,
               "The distance threshold of replan");
 
-DEFINE_bool(enable_reference_line_provider_thread, false,
+DEFINE_bool(enable_reference_line_provider_thread, true,
             "Enable reference line provider thread.");
 
 DEFINE_double(default_reference_line_width, 4.0,
@@ -126,7 +130,7 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
 DEFINE_double(follow_min_distance, 10,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(
-    follow_time_buffer, 4.0,
+    follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
 
 DEFINE_string(destination_obstacle_id, "DEST",
@@ -173,6 +177,10 @@ DEFINE_double(crosswalk_strick_l_distance, 4.0,
               "strick stop rule within this l_distance");
 DEFINE_double(crosswalk_loose_l_distance, 5.0,
               "loose stop rule beyond this l_distance");
+
+DEFINE_double(
+    turn_signal_distance, 80,
+    "meters. If there is a turn within this distance, use turn signal");
 
 // planning config file
 DEFINE_string(planning_config_file,
