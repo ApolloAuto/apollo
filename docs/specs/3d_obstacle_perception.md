@@ -16,7 +16,7 @@ HDMap Region of Interest (ROI) Filter
 -------------------------------------
 
 The Region of Interest (ROI) specifies the drivable area that includes
-road surfaces and junctions and are retrieved from the HD
+road surfaces and junctions are retrieved from the HD
 (hi-resolution) map. The HDMap ROI filter processes LiDAR points that
 are outside ROI, removing background objects, e.g., buildings and trees
 around the road. What remains are the point cloud in the ROI for
@@ -95,7 +95,7 @@ table below on the usage of parameters for HDMap ROI Filter.
 
   |Parameter Name      |Usage                                                                          |Default	    |
   |------------------- |------------------------------------------------------------------------------ |------------|
-  |rectangle           |The range of ROI LUT (the 2D grid) with respect to the origin (LiDAR sensor).  |70.0 meters |
+  |range           |The range of ROI LUT (the 2D grid) with respect to the origin (LiDAR sensor).  |70.0 meters |
   |cell_size           |The size of cells for quantizing the 2D grid.                                  |0.25 meter  |
   |extend_dist         |The distance of extending the ROI from the polygon boundary.                   |0.0 meter   |
 
