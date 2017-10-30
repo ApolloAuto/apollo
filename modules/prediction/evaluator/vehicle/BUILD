@@ -21,7 +21,6 @@ cc_library(
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
         "//modules/prediction/proto:lane_graph_proto",
-        "@gtest//:main",
     ],
 )
 
@@ -45,5 +44,42 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_library(
+    name = "rnn_evaluator",
+    srcs = [
+        "rnn_evaluator.cc",
+    ],
+    hdrs = [
+        "rnn_evaluator.h",
+    ],
+    deps = [
+        "//modules/common/util",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/evaluator",
+        "//modules/prediction/proto:network_model_proto",
+    ],
+)
+
+cc_test(
+    name = "rnn_evaluator_test",
+    size = "small",
+    srcs = [
+        "rnn_evaluator_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/common/util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/evaluator/vehicle:rnn_evaluator",
+        "@gtest//:main",
+    ],
+)
+
 
 cpplint()
