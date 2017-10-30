@@ -525,5 +525,48 @@ TEST(Spline1dKernel, add_reference_line_kernel_04) {
   }
 }
 
+TEST(Spline1dKernel, add_derivative_kernel_matrix_for_spline_k_01) {
+  // please see the document at docs/specs/qp_spline_path_optimizer.md for
+  // details.
+  std::vector<double> x_knots = {0.0, 1.0, 2.0};
+  int32_t spline_order = 6;
+  Spline1dKernel kernel(x_knots, spline_order);
+  kernel.AddDerivativeKernelMatrixForSplineK(0, 1.0);
+
+  EXPECT_EQ(kernel.kernel_matrix().rows(), kernel.kernel_matrix().cols());
+  EXPECT_EQ(kernel.kernel_matrix().rows(), spline_order * (x_knots.size() - 1));
+  Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(
+      spline_order * (x_knots.size() - 1), spline_order * (x_knots.size() - 1));
+
+  // clang-format off
+  ref_kernel_matrix <<
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       2,       2,       2,       2,       2,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       2, 2.66667,       3,     3.2, 3.33333,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       2,       3,     3.6,       4, 4.28571,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       2,     3.2,       4, 4.57143,       5,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       2, 3.33333, 4.28571,       5, 5.55556,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0, // NOLINT
+0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0; // NOLINT
+  // clang-format on
+  for (int i = 0; i < kernel.kernel_matrix().rows(); ++i) {
+    for (int j = 0; j < kernel.kernel_matrix().cols(); ++j) {
+      EXPECT_NEAR(kernel.kernel_matrix()(i, j), ref_kernel_matrix(i, j), 1e-5);
+    }
+  }
+
+  Eigen::MatrixXd ref_offset = Eigen::MatrixXd::Zero(kernel.offset().rows(), 1);
+
+  for (int i = 0; i < kernel.offset().rows(); ++i) {
+    for (int j = 0; j < kernel.offset().cols(); ++j) {
+      EXPECT_DOUBLE_EQ(kernel.offset()(i, j), ref_offset(i, j));
+    }
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
