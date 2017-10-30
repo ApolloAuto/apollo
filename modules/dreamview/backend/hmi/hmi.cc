@@ -56,14 +56,6 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
 
-  // Init status of modules and hardware.
-  for (const auto iter : config_.modules()) {
-    status_.mutable_modules()->insert({iter.first, {}});
-  }
-  for (const auto iter : config_.hardware()) {
-    status_.mutable_hardware()->insert({iter.first, {}});
-  }
-
   // Register websocket message handlers.
   if (websocket_) {
     // Newly opened HMI client retrieves current config and status.
@@ -156,32 +148,6 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
 }
 
 void HMI::Start() {
-  AdapterManager::AddHMIStatusCallback(&HMI::OnHMIStatus, this);
-}
-
-void HMI::OnHMIStatus(const HMIStatus &hmi_status) {
-  // Note that we only merged status of modules and hardware, which matches the
-  // hmi_status_helper.
-  for (const auto &new_status : hmi_status.modules()) {
-    const std::string &module_name = new_status.first;
-    auto iter = status_.mutable_modules()->find(module_name);
-    if (iter != status_.mutable_modules()->end()) {
-      iter->second.MergeFrom(new_status.second);
-    } else {
-      AERROR << "Updating HMIStatus, unknown module " << module_name;
-    }
-  }
-  for (const auto &new_status : hmi_status.hardware()) {
-    const std::string &hardware_name = new_status.first;
-    auto iter = status_.mutable_hardware()->find(hardware_name);
-    if (iter != status_.mutable_hardware()->end()) {
-      iter->second.MergeFrom(new_status.second);
-    } else {
-      AERROR << "Updating HMIStatus, unknown hardware " << hardware_name;
-    }
-  }
-
-  BroadcastHMIStatus();
 }
 
 void HMI::BroadcastHMIStatus() const {

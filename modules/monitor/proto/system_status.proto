@@ -21,3 +21,16 @@ message HardwareStatus {
   // Additional message for current status.
   optional string msg = 2;
 }
+
+message ModuleStatus {
+  optional bool process_running = 1;
+  optional float message_efficiency = 2;  // frequency / expected_frequency
+
+  // Additional message for current status.
+  optional string msg = 3;
+}
+
+message SystemStatus {
+  map<string, ModuleStatus> modules = 1;
+  map<string, HardwareStatus> hardware = 2;
+}
