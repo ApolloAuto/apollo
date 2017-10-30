@@ -26,6 +26,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
@@ -80,6 +81,9 @@ class Prediction : public apollo::common::ApolloApp {
   common::Status OnError(const std::string &error_msg);
 
   void OnLocalization(const localization::LocalizationEstimate &localization);
+
+  bool IsValidTrajectoryPoint(
+      const ::apollo::common::TrajectoryPoint &trajectory_point);
 
  private:
   PredictionConf prediction_conf_;

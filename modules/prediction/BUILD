@@ -14,6 +14,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/util",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
