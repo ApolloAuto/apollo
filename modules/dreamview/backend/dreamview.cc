@@ -35,7 +35,6 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::Status;
 using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
-using apollo::hdmap::SimMapFile;
 using apollo::hdmap::BaseMapFile;
 
 std::string Dreamview::Name() const {
@@ -79,7 +78,7 @@ Status Dreamview::Init() {
 
   image_.reset(new ImageHandler());
   websocket_.reset(new WebSocketHandler());
-  map_service_.reset(new MapService(BaseMapFile(), SimMapFile()));
+  map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 
   sim_world_updater_.reset(
