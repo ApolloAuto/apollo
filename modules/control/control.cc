@@ -253,6 +253,12 @@ Status Control::CheckInput() {
     }
   }
 
+  // Add tempprary flag for test
+  if (FLAGS_use_relative_position) {
+    localization_.mutable_pose()->mutable_position()->set_x(0.0);
+    localization_.mutable_pose()->mutable_position()->set_y(0.0);
+    localization_.mutable_pose()->set_heading(0.0);
+  }
   common::VehicleState::instance()->Update(localization_, chassis_);
 
   return Status::OK();
