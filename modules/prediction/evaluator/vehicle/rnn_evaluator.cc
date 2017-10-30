@@ -14,21 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 
-#include "modules/prediction/evaluator/network/rnn_model.h"
+#include "modules/common/util/file.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
-namespace network {
 
-class NetModelTest : public ::testing::Test {
- public:
-  void SetUp() override {}
-};
+RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
 
-TEST(NetModelTest, verification_test) {}
+void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+  Clear();
+  CHECK_NOTNULL(obstacle_ptr);
+}
 
-}  // namespace network
+void RNNEvaluator::Clear() {}
+
+void RNNEvaluator::LoadModel(const std::string& model_file) {
+  model_ptr_.reset(new NetParameter());
+  CHECK(model_ptr_ != nullptr);
+  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+      << "Unable to load model file: " << model_file << ".";
+
+  AINFO << "Succeeded in loading the model file: " << model_file << ".";
+}
+
 }  // namespace prediction
 }  // namespace apollo

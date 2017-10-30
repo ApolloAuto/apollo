@@ -33,16 +33,8 @@ NetModel::NetModel() : ok_(false) {}
 
 NetModel::~NetModel() { Clear(); }
 
-bool NetModel::LoadFromProtobuf(const std::string& model_filename) {
-  std::fstream ifs(model_filename, std::ios::in | std::ios::binary);
-  if (!ifs) {
-    AERROR << "Fail to open file: " << model_filename.c_str();
-    return false;
-  }
-  if (!net_parameter_.ParseFromIstream(&ifs)) {
-    AERROR << "Fail to load model: " << model_filename.c_str();
-    return false;
-  }
+bool NetModel::LoadModel(const NetParameter& net_parameter) {
+  net_parameter_.CopyFrom(net_parameter);
   layers_.clear();
 
   for (int i = 0; i < net_parameter_.layers_size(); ++i) {

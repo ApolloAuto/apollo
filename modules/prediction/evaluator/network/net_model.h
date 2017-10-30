@@ -51,7 +51,7 @@ class NetModel {
 
   virtual void ResetState() const {}
 
-  bool LoadFromProtobuf(const std::string& filename);
+  bool LoadModel(const NetParameter& net_parameter);
 
   std::string PerformanceString() const;
 
