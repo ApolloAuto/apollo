@@ -25,6 +25,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
 
 #include "ros/include/ros/ros.h"
 
@@ -103,6 +105,7 @@ class SensorCanbus : public apollo::common::ApolloApp {
  private:
   void PublishSensorData();
   void OnTimer(const ros::TimerEvent &event);
+  void DataTrigger();
   apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
@@ -114,6 +117,7 @@ class SensorCanbus : public apollo::common::ApolloApp {
   int64_t last_timestamp_ = 0;
   ros::Timer timer_;
   apollo::common::monitor::Monitor monitor_;
+  std::mutex mutex_;
 };
 
 // method implementations
@@ -185,6 +189,8 @@ Status SensorCanbus<SensorType>::Start() {
     const double duration = 1.0 / FLAGS_sensor_freq;
     timer_ = AdapterManager::CreateTimer(
         ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
+  } else {
+    DataTrigger();
   }
 
   // last step: publish monitor messages
@@ -197,6 +203,17 @@ Status SensorCanbus<SensorType>::Start() {
 template <typename SensorType>
 void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
   PublishSensorData();
+}
+
+template <typename SensorType>
+void SensorCanbus<SensorType>::DataTrigger() {
+  std::condition_variable* cvar = sensor_message_manager_->GetMutableCVar();
+  while (true) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    cvar->wait(lock);
+    PublishSensorData();
+    sensor_message_manager_->ClearSensorData();
+  }
 }
 
 template <typename SensorType>
