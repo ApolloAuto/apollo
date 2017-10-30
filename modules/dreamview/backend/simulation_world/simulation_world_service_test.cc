@@ -68,15 +68,18 @@ class SimulationWorldServiceTest : public ::testing::Test {
     FLAGS_routing_response_file =
         "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
-    sim_world_service_.reset(new SimulationWorldService(&map_service_));
+    sim_world_service_.reset(new SimulationWorldService(map_service_.get()));
   }
 
  protected:
-  SimulationWorldServiceTest()
-      : map_service_("modules/dreamview/backend/testdata/garage.bin") {}
+  SimulationWorldServiceTest() {
+    FLAGS_map_dir = "modules/dreamview/backend/testdata";
+    FLAGS_base_map_filename = "garage.bin";
+    map_service_.reset(new MapService(false));
+  }
 
-  MapService map_service_;
   std::unique_ptr<SimulationWorldService> sim_world_service_;
+  std::unique_ptr<MapService> map_service_;
 };
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
@@ -450,7 +453,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   // Load routing from file
-  sim_world_service_.reset(new SimulationWorldService(&map_service_, true));
+  sim_world_service_.reset(
+      new SimulationWorldService(map_service_.get(), true));
   sim_world_service_->UpdateSimulationWorld(
       *AdapterManager::GetRoutingResponse()->GetLatestPublished());
 
