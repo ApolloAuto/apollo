@@ -143,6 +143,7 @@ class Input : public Layer {
   virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
   virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output);
+
  private:
   std::vector<int> input_shape_;
   std::string dtype_;
@@ -154,6 +155,7 @@ class Concatenate : public Layer {
   virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
   virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output);
+
  private:
   int axis_;
 };

@@ -29,8 +29,7 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-RnnModel::RnnModel() {
-}
+RnnModel::RnnModel() {}
 
 void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output) const {
@@ -60,7 +59,7 @@ void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   layers_[9]->Run({bn1}, &act);
   layers_[10]->Run({act}, &dense2);
   layers_[11]->Run({dense2}, &bn1);
-  layers_[12]->Run({bn1}, output);    // sigmoid activation
+  layers_[12]->Run({bn1}, output);  // sigmoid activation
 }
 
 bool RnnModel::VerifyModel() const {
