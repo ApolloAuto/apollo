@@ -20,9 +20,18 @@ import threading
 
 class PlanningData:
     def __init__(self, planning_pb=None):
+        self.path_lock = threading.Lock()
+        self.path_param_lock = threading.Lock()
+
         self.planning_pb = planning_pb
         self.path_x = []
         self.path_y = []
+
+        self.relative_time = []
+        self.speed = []
+        self.s = []
+        self.theta = []
+
 
     def update(self, planning_pb):
         self.planning_pb = planning_pb
@@ -35,5 +44,27 @@ class PlanningData:
         for point in self.planning_pb.trajectory_point:
             path_x.append(point.path_point.x)
             path_y.append(point.path_point.y)
+        self.path_lock.acquire()
         self.path_x = path_x
         self.path_y = path_y
+        self.path_lock.release()
+
+    def compute_path_param(self):
+        if self.planning_pb is None:
+            return
+        relative_time = []
+        speed = []
+        s = []
+        theta = []
+        for point in self.planning_pb.trajectory_point:
+            relative_time.append(point.relative_time)
+            speed.append(point.v)
+            s.append(point.path_point.s)
+            theta.append(point.path_point.theta)
+        self.path_param_lock.acquire()
+        self.relative_time = relative_time
+        self.speed = speed
+        self.s = s
+        self.theta = theta
+        self.path_param_lock.release()
+
