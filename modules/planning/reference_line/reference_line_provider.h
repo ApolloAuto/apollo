@@ -28,7 +28,6 @@
 #include <vector>
 
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -59,6 +58,8 @@ class ReferenceLineProvider {
 
   void UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
+  bool UpdateVehicleStatus(const common::PointENU& position, double speed);
+
   bool Start();
 
   void Stop();
@@ -71,7 +72,7 @@ class ReferenceLineProvider {
  private:
   void Generate();
   void IsValidReferenceLine();
-  bool CreateReferenceLineFromRouting(const common::PointENU& position);
+  bool CreateReferenceLineFromRouting();
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -81,6 +82,7 @@ class ReferenceLineProvider {
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
+  double vehicle_speed_ = 0.0;
 
   bool has_routing_ = false;
 

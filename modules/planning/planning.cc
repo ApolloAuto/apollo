@@ -227,6 +227,9 @@ void Planning::RunOnce() {
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->UpdateRoutingResponse(
         AdapterManager::GetRoutingResponse()->GetLatestObserved());
+    ReferenceLineProvider::instance()->UpdateVehicleStatus(
+        common::VehicleState::instance()->pose().position(),
+        common::VehicleState::instance()->linear_velocity());
     if (!ReferenceLineProvider::instance()->HasReferenceLine()) {
       not_ready->set_reason("reference line not ready");
       AERROR << not_ready->reason() << "; skip the planning cycle.";

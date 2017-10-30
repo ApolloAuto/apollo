@@ -33,7 +33,6 @@ cc_library(
     ],
     deps = [
         ":reference_line",
-        "//modules/common/vehicle_state",
         "//modules/planning/math:curve_math",
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/smoothing_spline:spline_2d",
@@ -74,9 +73,9 @@ cc_library(
     ],
     deps = [
         ":reference_line",
-        "//modules/planning/proto:planning_proto",
-        "//modules/common/math:math",
+        "//modules/common/math",
         "//modules/planning/math/curve1d:quintic_spiral_path",
+        "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
         "@ipopt//:ipopt",
     ],
