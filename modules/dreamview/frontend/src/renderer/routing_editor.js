@@ -98,4 +98,4 @@ export default class RoutingEditor {
     }
 }
 
-RoutingEditor.prototype.EDITING_MAP_RADIUS = 1000.0; //meters
+RoutingEditor.prototype.EDITING_MAP_RADIUS = 1500.0; //meters
