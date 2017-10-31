@@ -22,25 +22,25 @@ namespace drivers {
 namespace velodyne {
 
 Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
-    : _tf2_transform_listener(_tf2_buffer, node),
-      _x_offset(-1),
-      _y_offset(-1),
-      _z_offset(-1),
-      _timestamp_offset(-1),
-      _timestamp_data_size(0) {
-  private_nh.param("child_frame_id", _child_frame_id,
+    : tf2_transform_listener_(tf2_buffer_, node),
+      x_offset_(-1),
+      y_offset_(-1),
+      z_offset_(-1),
+      timestamp_offset_(-1),
+      timestamp_data_size_(0) {
+  private_nh.param("child_frame_id", child_frame_id_,
                    std::string("velodyne64"));
   private_nh.param("topic_compensated_pointcloud",
-                   _topic_compensated_pointcloud, TOPIC_COMPENSATED_POINTCLOUD);
-  private_nh.param("topic_pointcloud", _topic_pointcloud, TOPIC_POINTCLOUD);
-  private_nh.param("queue_size", _queue_size, 10);
-  private_nh.param("tf_query_timeout", _tf_timeout, float(0.1));
+                   topic_compensated_pointcloud_, TOPIC_COMPENSATED_POINTCLOUD);
+  private_nh.param("topic_pointcloud", topic_pointcloud_, TOPIC_POINTCLOUD);
+  private_nh.param("queue_size", queue_size_, 10);
+  private_nh.param("tf_query_timeout", tf_timeout_, float(0.1));
 
   // advertise output point cloud (before subscribing to input data)
-  _compensation_pub = node.advertise<sensor_msgs::PointCloud2>(
-      _topic_compensated_pointcloud, _queue_size);
-  _pointcloud_sub =
-      node.subscribe(_topic_pointcloud, _queue_size,
+  compensation_pub_ = node.advertise<sensor_msgs::PointCloud2>(
+      topic_compensated_pointcloud_, queue_size_);
+  pointcloud_sub_ =
+      node.subscribe(topic_pointcloud_, queue_size_,
                      &Compensator::pointcloud_callback, (Compensator*)this);
 }
 
@@ -67,7 +67,7 @@ void Compensator::pointcloud_callback(
     motion_compensation<float>(q_msg, timestamp_min, timestamp_max,
                                pose_min_time, pose_max_time);
     q_msg->header.stamp.fromSec(timestamp_max);
-    _compensation_pub.publish(q_msg);
+    compensation_pub_.publish(q_msg);
   }
 }
 
@@ -81,8 +81,8 @@ inline void Compensator::get_timestamp_interval(
   // get min time and max time
   for (int i = 0; i < total; ++i) {
     double timestamp = 0.0;
-    memcpy(&timestamp, &msg->data[i * msg->point_step + _timestamp_offset],
-           _timestamp_data_size);
+    memcpy(&timestamp, &msg->data[i * msg->point_step + timestamp_offset_],
+           timestamp_data_size_);
 
     if (timestamp < timestamp_min) {
       timestamp_min = timestamp;
@@ -111,28 +111,28 @@ inline bool Compensator::check_message(
     const sensor_msgs::PointField& f = msg->fields[i];
 
     if (f.name == "x") {
-      _x_offset = f.offset;
+      x_offset_ = f.offset;
       x_data_type = f.datatype;
       if ((x_data_type != 7 && x_data_type != 8) || f.count != 1 ||
-          _x_offset == -1) {
+          x_offset_ == -1) {
         return false;
       }
     } else if (f.name == "y") {
-      _y_offset = f.offset;
+      y_offset_ = f.offset;
       y_data_type = f.datatype;
-      if (f.count != 1 || _y_offset == -1) {
+      if (f.count != 1 || y_offset_ == -1) {
         return false;
       }
     } else if (f.name == "z") {
-      _z_offset = f.offset;
+      z_offset_ = f.offset;
       z_data_type = f.datatype;
-      if (f.count != 1 || _z_offset == -1) {
+      if (f.count != 1 || z_offset_ == -1) {
         return false;
       }
     } else if (f.name == "timestamp") {
-      _timestamp_offset = f.offset;
-      _timestamp_data_size = f.count * get_field_size(f.datatype);
-      if (_timestamp_offset == -1 || _timestamp_data_size == -1) {
+      timestamp_offset_ = f.offset;
+      timestamp_data_size_ = f.count * get_field_size(f.datatype);
+      if (timestamp_offset_ == -1 || timestamp_data_size_ == -1) {
         return false;
       }
     } else {
@@ -141,8 +141,8 @@ inline bool Compensator::check_message(
   }
 
   // check offset if valid
-  if (_x_offset == -1 || _y_offset == -1 || _z_offset == -1 ||
-      _timestamp_offset == -1 || _timestamp_data_size == -1) {
+  if (x_offset_ == -1 || y_offset_ == -1 || z_offset_ == -1 ||
+      timestamp_offset_ == -1 || timestamp_data_size_ == -1) {
     return false;
   }
   if (!(x_data_type == y_data_type && y_data_type == z_data_type)) {
@@ -155,8 +155,8 @@ bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
                                              Eigen::Affine3d& pose) {
   ros::Time query_time(timestamp);
   std::string err_string;
-  if (!_tf2_buffer.canTransform("world", _child_frame_id, query_time,
-                                ros::Duration(_tf_timeout), &err_string)) {
+  if (!tf2_buffer_.canTransform("world", child_frame_id_, query_time,
+                                ros::Duration(tf_timeout_), &err_string)) {
     ROS_WARN_STREAM("Can not find transform. "
                     << std::fixed << timestamp
                     << " Error info: " << err_string);
@@ -167,7 +167,7 @@ bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
 
   try {
     stamped_transform =
-        _tf2_buffer.lookupTransform("world", _child_frame_id, query_time);
+        tf2_buffer_.lookupTransform("world", child_frame_id_, query_time);
   } catch (tf2::TransformException& ex) {
     ROS_ERROR_STREAM(ex.what());
     return false;
@@ -243,20 +243,20 @@ void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
     for (int i = 0; i < total; ++i) {
       size_t offset = i * msg->point_step;
       Scalar* x_scalar =
-          reinterpret_cast<Scalar*>(&msg->data[offset + _x_offset]);
+          reinterpret_cast<Scalar*>(&msg->data[offset + x_offset_]);
       if (std::isnan(*x_scalar)) {
         ROS_DEBUG_STREAM("nan point do not need motion compensation");
         continue;
       }
       Scalar* y_scalar =
-          reinterpret_cast<Scalar*>(&msg->data[offset + _y_offset]);
+          reinterpret_cast<Scalar*>(&msg->data[offset + y_offset_]);
       Scalar* z_scalar =
-          reinterpret_cast<Scalar*>(&msg->data[offset + _z_offset]);
+          reinterpret_cast<Scalar*>(&msg->data[offset + z_offset_]);
       Eigen::Vector3d p(*x_scalar, *y_scalar, *z_scalar);
 
       double tp = 0.0;
-      memcpy(&tp, &msg->data[i * msg->point_step + _timestamp_offset],
-             _timestamp_data_size);
+      memcpy(&tp, &msg->data[i * msg->point_step + timestamp_offset_],
+             timestamp_data_size_);
       double t = (timestamp_max - tp) * f;
 
       Eigen::Translation3d ti(t * translation);
@@ -276,20 +276,20 @@ void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
   // Not a "significant" rotation. Do translation only.
   for (int i = 0; i < total; ++i) {
     Scalar* x_scalar =
-        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + _x_offset]);
+        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + x_offset_]);
     if (std::isnan(*x_scalar)) {
       ROS_DEBUG_STREAM("nan point do not need motion compensation");
       continue;
     }
     Scalar* y_scalar =
-        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + _y_offset]);
+        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + y_offset_]);
     Scalar* z_scalar =
-        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + _z_offset]);
+        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + z_offset_]);
     Eigen::Vector3d p(*x_scalar, *y_scalar, *z_scalar);
 
     double tp = 0.0;
-    memcpy(&tp, &msg->data[i * msg->point_step + _timestamp_offset],
-           _timestamp_data_size);
+    memcpy(&tp, &msg->data[i * msg->point_step + timestamp_offset_],
+           timestamp_data_size_);
     double t = (timestamp_max - tp) * f;
     Eigen::Translation3d ti(t * translation);
 

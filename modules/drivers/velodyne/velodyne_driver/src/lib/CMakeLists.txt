@@ -1,5 +1,6 @@
 add_library(
     velodyne_input 
+    input.cpp
     socket_input.cpp
     # pcap_input.cpp
 )
