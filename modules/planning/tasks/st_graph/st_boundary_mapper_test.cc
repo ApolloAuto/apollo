@@ -41,7 +41,6 @@ class StBoundaryMapperTest : public ::testing::Test {
       return;
     }
     ReferenceLineSmootherConfig config;
-    smoother_.Init(config);  // use the default value in config.
 
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
