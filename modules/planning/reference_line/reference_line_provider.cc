@@ -146,7 +146,7 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
   }
 
   ReferenceLineSmoother smoother;
-  smoother.Init(smoother_config_);
+  smoother.Init(smoother_config_, spline_solver_.get());
 
   SpiralReferenceLineSmoother spiral_smoother;
   double max_spiral_smoother_dev = 0.1;
@@ -165,8 +165,7 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
           AERROR << "Failed to smooth reference_line with spiral smoother";
         }
       } else {
-        if (!smoother.Smooth(raw_reference_line, &reference_line,
-                             spline_solver_.get())) {
+        if (!smoother.Smooth(raw_reference_line, &reference_line)) {
           AERROR << "Failed to smooth reference line";
           continue;
         }

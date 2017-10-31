@@ -42,7 +42,8 @@ class ReferenceLineSmootherTest : public ::testing::Test {
       return;
     }
     ReferenceLineSmootherConfig config;
-    smoother_.Init(config);  // use the default value in config.
+    smoother_.Init(config,
+                   &spline_solver_);  // use the default value in config.
 
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
@@ -64,6 +65,8 @@ class ReferenceLineSmootherTest : public ::testing::Test {
   hdmap::HDMap hdmap_;
   ReferenceLineSmoother smoother_;
   common::math::Vec2d vehicle_position_;
+  std::vector<double> t_knots_;
+  Spline2dSolver spline_solver_{t_knots_, 5};
   std::unique_ptr<ReferenceLine> reference_line_;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
 };
@@ -71,10 +74,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
 TEST_F(ReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
-  std::vector<double> t_knots;
-  Spline2dSolver spline_solver(t_knots, 5);
-  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line,
-                               &spline_solver));
+  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
   EXPECT_FLOAT_EQ(153.64156, smoothed_reference_line.Length());
 }
 
