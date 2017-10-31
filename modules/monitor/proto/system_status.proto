@@ -18,6 +18,7 @@ message HardwareStatus {
   }
 
   optional Status status = 1;
+
   // Additional message for current status.
   optional string msg = 2;
 }

@@ -33,6 +33,11 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
     connections_.emplace(conn, std::make_shared<std::mutex>());
     AINFO << "Accepted connection. Total connections: " << connections_.size();
   }
+
+  // Trigger registered new connection handlers.
+  for (const auto handler : connection_ready_handlers_) {
+    handler(conn);
+  }
 }
 
 void WebSocketHandler::handleClose(CivetServer *server,
