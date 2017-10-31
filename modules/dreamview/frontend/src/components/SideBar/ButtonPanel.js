@@ -61,8 +61,7 @@ export default class ButtonPanel extends React.Component {
     }
 
     render() {
-        const { sendDefaultRoutingRequest,
-                showRouteEditingBar,
+        const { onPOI, showPOI, showRouteEditingBar,
                 onVideo,
                 onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
@@ -83,8 +82,8 @@ export default class ButtonPanel extends React.Component {
                                active={false} />
                 <div className="separator" />
                 <SideBarButton label="Default Routing"
-                               onClick={sendDefaultRoutingRequest}
-                               active={false} />
+                               onClick={onPOI}
+                               active={showPOI} />
                 <div className="separator" />
                 <SideBarButton label="Route Editing"
                                onClick={showRouteEditingBar}

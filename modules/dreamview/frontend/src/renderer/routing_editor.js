@@ -68,7 +68,7 @@ export default class RoutingEditor {
         this.routePoints = [];
     }
 
-    sendRoutingRequest(scene, carOffsetPosition, coordinates) {
+    sendRoutingRequest(carOffsetPosition, coordinates) {
         if (this.routePoints.length === 0) {
             alert("Please provide at least an end point.");
             return false;
@@ -79,20 +79,11 @@ export default class RoutingEditor {
             return coordinates.applyOffset(object.position, true);
         });
 
-        const start    = (this.routePoints.length > 1) ?
-                                points[0] : coordinates.applyOffset(carOffsetPosition, true);
-        const end      = (this.routePoints.length > 1) ? points[points.length-1] : points[0];
-        const waypoint = (this.routePoints.length > 1) ? points.slice(1,-1) : [];
+        const start    = (points.length > 1) ? points[0]
+                         : coordinates.applyOffset(carOffsetPosition, true);
+        const end      = points[points.length-1];
+        const waypoint = (points.length > 1) ? points.slice(1,-1) : [];
         WS.requestRoute(start, waypoint, end);
-
-        return true;
-    }
-
-    sendDefaultRoutingRequest(carOffsetPosition, coordinates) {
-        const start    = coordinates.applyOffset(carOffsetPosition, true);
-        const end      = undefined;
-        const waypoint = undefined;
-        WS.requestRoute(start, waypoint, end, true);
 
         return true;
     }
