@@ -36,7 +36,7 @@ namespace planning {
 
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
-    ReferenceLine* const smoothed_reference_line) const {
+    ReferenceLine* const smoothed_reference_line) {
   const double piecewise_length = 10.0;
   const double length = raw_reference_line.Length();
   ADEBUG << "Length = " << length;
@@ -171,9 +171,9 @@ bool SpiralReferenceLineSmoother::Smooth(
          status == Ipopt::Solved_To_Acceptable_Level;
 }
 
-void SpiralReferenceLineSmoother::set_max_point_deviation(const double d) {
-  CHECK(d >= 0.0);
-  max_point_deviation_ = d;
+void SpiralReferenceLineSmoother::Init(const double max_point_deviation) {
+  CHECK(max_point_deviation >= 0.0);
+  max_point_deviation_ = max_point_deviation;
 }
 
 std::vector<common::PathPoint> SpiralReferenceLineSmoother::to_path_points(

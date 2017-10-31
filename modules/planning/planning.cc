@@ -131,7 +131,7 @@ Status Planning::Init() {
   }
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
-        hdmap_, config_.reference_line_smoother_config());
+        hdmap_, config_.qp_spline_reference_line_smoother_config());
   }
 
   RegisterPlanners();

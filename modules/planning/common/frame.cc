@@ -37,8 +37,8 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
@@ -218,7 +218,7 @@ Status Frame::Init(const PlanningConfig &config,
     AERROR << "init point is not set";
     return Status(ErrorCode::PLANNING_ERROR, "init point is not set");
   }
-  smoother_config_ = config.reference_line_smoother_config();
+  smoother_config_ = config.qp_spline_reference_line_smoother_config();
 
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
@@ -294,14 +294,14 @@ bool Frame::CreateReferenceLineFromRouting(
     return false;
   }
 
-  ReferenceLineSmoother smoother;
+  QpSplineReferenceLineSmoother smoother;
   std::vector<double> init_t_knots;
   Spline2dSolver spline_solver(init_t_knots, smoother_config_.spline_order());
   smoother.Init(smoother_config_, &spline_solver);
 
   SpiralReferenceLineSmoother spiral_smoother;
   double max_spiral_smoother_dev = 0.1;
-  spiral_smoother.set_max_point_deviation(max_spiral_smoother_dev);
+  spiral_smoother.Init(max_spiral_smoother_dev);
 
   for (const auto &each_segments : route_segments) {
     hdmap::Path hdmap_path;
