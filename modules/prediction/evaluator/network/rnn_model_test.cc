@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string>
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"
@@ -29,11 +30,12 @@ class NetModelTest : public ::testing::Test {
 };
 
 TEST(NetModelTest, verification_test) {
-    const char* rnn_filename = "modules/prediction/data/rnn_vehicle_model.bin";
-    NetParameter net_parameter = NetParameter();
-    EXPECT_TRUE(common::util::GetProtoFromFile(rnn_filename, &net_parameter));
-    EXPECT_TRUE(RnnModel::instance()->LoadModel(net_parameter));
-    EXPECT_TRUE(RnnModel::instance()->VerifyModel());
+  const std::string rnn_filename =
+      "modules/prediction/data/rnn_vehicle_model.bin";
+  NetParameter net_parameter = NetParameter();
+  EXPECT_TRUE(common::util::GetProtoFromFile(rnn_filename, &net_parameter));
+  EXPECT_TRUE(RnnModel::instance()->LoadModel(net_parameter));
+  EXPECT_TRUE(RnnModel::instance()->VerifyModel());
 }
 
 }  // namespace network
