@@ -19,6 +19,9 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
+
+#include "Eigen/Dense"
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
@@ -44,6 +47,17 @@ class RNNEvaluator : public Evaluator {
    * @param Obstacle pointer
    */
   void Evaluate(Obstacle* obstacle_ptr) override;
+
+  /**
+   * @brief Extract feature vector
+   * @param obstacle a pointer to the target obstacle
+   * @param obstacle_feature_mat feature matrix
+   * @param lane_feature_mats lane feature matrices
+   */
+  void ExtractFeatureValues(
+      Obstacle* obstacle,
+      Eigen::MatrixXf* const obstacle_feature_mat,
+      std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats);
 
   /**
    * @brief Clear
