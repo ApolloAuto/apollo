@@ -56,8 +56,7 @@ class RNNEvaluator : public Evaluator {
    * @param lane_feature_mats lane feature matrices
    */
   int ExtractFeatureValues(
-      Obstacle* obstacle,
-      Eigen::MatrixXf* const obstacle_feature_mat,
+      Obstacle* obstacle, Eigen::MatrixXf* const obstacle_feature_mat,
       std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats);
 
   /**
@@ -72,18 +71,15 @@ class RNNEvaluator : public Evaluator {
    */
   void LoadModel(const std::string& model_file);
 
-  int SetupObstacleFeature(
-      Obstacle* obstacle,
-      std::vector<float>* const feature_values);
+  int SetupObstacleFeature(Obstacle* obstacle,
+                           std::vector<float>* const feature_values);
 
-  int SetupLaneFeature(
-      const Feature& feature,
-      const LaneSequence& lane_sequence,
-      std::vector<float>* const feature_values);
+  int SetupLaneFeature(const Feature& feature,
+                       const LaneSequence& lane_sequence,
+                       std::vector<float>* const feature_values);
 
-  bool IsCutinInHistory(
-      const std::string& lane_id,
-      const std::string& lane_id_pre);
+  bool IsCutinInHistory(const std::string& lane_id,
+                        const std::string& lane_id_pre);
 
  private:
   std::unique_ptr<NetParameter> model_ptr_;

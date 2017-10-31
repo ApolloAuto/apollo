@@ -16,8 +16,8 @@
 
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -68,8 +68,7 @@ void RNNEvaluator::LoadModel(const std::string& model_file) {
 }
 
 int RNNEvaluator::ExtractFeatureValues(
-    Obstacle* obstacle,
-    Eigen::MatrixXf* const obstacle_feature_mat,
+    Obstacle* obstacle, Eigen::MatrixXf* const obstacle_feature_mat,
     std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats) {
   std::vector<float> obstacle_features;
   std::vector<float> lane_feature;
@@ -110,8 +109,7 @@ int RNNEvaluator::ExtractFeatureValues(
 }
 
 int RNNEvaluator::SetupObstacleFeature(
-      Obstacle* obstacle,
-      std::vector<float>* const feature_values) {
+    Obstacle* obstacle, std::vector<float>* const feature_values) {
   feature_values->clear();
   feature_values->reserve(dim_obstacle_feature_);
 
@@ -136,8 +134,7 @@ int RNNEvaluator::SetupObstacleFeature(
       ADEBUG << "Fail to get " << i << "-th feature from obstacle";
       continue;
     }
-    if (!fea->has_lane() ||
-        !fea->lane().has_lane_feature() ||
+    if (!fea->has_lane() || !fea->lane().has_lane_feature() ||
         !fea->lane().lane_feature().has_lane_id()) {
       ADEBUG << "Fail to access lane feature from " << i << "-the feature";
       continue;
@@ -165,10 +162,9 @@ int RNNEvaluator::SetupObstacleFeature(
         std::string lane_id_pre = fea_pre->lane().lane_feature().lane_id();
         if (lane_id_pre != p_lane_fea->lane_id() &&
             IsCutinInHistory(p_lane_fea->lane_id(), lane_id_pre)) {
-            ADEBUG << "Obstacle [" << fea->id() << "] cut in from "
-                   << lane_id_pre << " to " << p_lane_fea->lane_id()
-                   << ", reset";
-            ret = -1;
+          ADEBUG << "Obstacle [" << fea->id() << "] cut in from " << lane_id_pre
+                 << " to " << p_lane_fea->lane_id() << ", reset";
+          ret = -1;
         }
       }
     }
@@ -191,17 +187,15 @@ int RNNEvaluator::SetupObstacleFeature(
   return ret;
 }
 
-int RNNEvaluator::SetupLaneFeature(
-    const Feature& feature,
-    const LaneSequence& lane_sequence,
-    std::vector<float>* const feature_values) {
+int RNNEvaluator::SetupLaneFeature(const Feature& feature,
+                                   const LaneSequence& lane_sequence,
+                                   std::vector<float>* const feature_values) {
   // TODO(all) implement
   return 0;
 }
 
-bool RNNEvaluator::IsCutinInHistory(
-    const std::string& lane_id,
-    const std::string& lane_id_pre) {
+bool RNNEvaluator::IsCutinInHistory(const std::string& lane_id,
+                                    const std::string& lane_id_pre) {
   // TODO(all) implement
   return true;
 }
