@@ -294,30 +294,25 @@ bool Frame::CreateReferenceLineFromRouting(
     return false;
   }
 
-  QpSplineReferenceLineSmoother smoother;
+  std::unique_ptr<ReferenceLineSmoother> smoother;
   std::vector<double> init_t_knots;
   Spline2dSolver spline_solver(init_t_knots, smoother_config_.spline_order());
-  smoother.Init(smoother_config_, &spline_solver);
-
-  SpiralReferenceLineSmoother spiral_smoother;
-  double max_spiral_smoother_dev = 0.1;
-  spiral_smoother.Init(max_spiral_smoother_dev);
+  if (FLAGS_enable_spiral_reference_line) {
+    double max_deviation = 0.1;
+    smoother.reset(new SpiralReferenceLineSmoother(max_deviation));
+  } else {
+    smoother.reset(
+        new QpSplineReferenceLineSmoother(smoother_config_, &spline_solver));
+  }
 
   for (const auto &each_segments : route_segments) {
     hdmap::Path hdmap_path;
     hdmap::PncMap::CreatePathFromLaneSegments(each_segments, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine reference_line;
-      if (FLAGS_enable_spiral_reference_line) {
-        if (!spiral_smoother.Smooth(ReferenceLine(hdmap_path),
-                                    &reference_line)) {
-          AERROR << "Failed to smooth reference_line with spiral smoother";
-        }
-      } else {
-        if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
-          AERROR << "Failed to smooth reference line";
-          continue;
-        }
+      if (!smoother->Smooth(ReferenceLine(hdmap_path), &reference_line)) {
+        AERROR << "Failed to smooth reference line";
+        continue;
       }
       reference_lines->emplace_back(std::move(reference_line));
       segments->emplace_back(each_segments);
