@@ -50,7 +50,7 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
-  void StopDecisionNearDestination(
+  bool StopDecisionNearDestination(
       Frame* frame,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
