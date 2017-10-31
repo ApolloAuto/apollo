@@ -120,7 +120,7 @@ class SensorCanbus : public apollo::common::ApolloApp {
   ros::Timer timer_;
   apollo::common::monitor::Monitor monitor_;
   std::mutex mutex_;
-  bool data_trigger_running_ = false;
+  volatile bool data_trigger_running_ = false;
 };
 
 // method implementations
@@ -220,7 +220,7 @@ void SensorCanbus<SensorType>::DataTrigger() {
     std::unique_lock<std::mutex> lock(mutex_);
     cvar->wait(lock);
     // TODO(lizh): this log is for test. Please remove it after onboard test.
-    AINFO << "===== Pulibsh Sensor Data =====";
+    AINFO << "===== Publish Sensor Data =====";
     PublishSensorData();
     sensor_message_manager_->ClearSensorData();
   }
