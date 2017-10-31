@@ -16,6 +16,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/util/file.h"
 #include "modules/prediction/evaluator/network/rnn_model.h"
 
 namespace apollo {
@@ -27,7 +28,13 @@ class NetModelTest : public ::testing::Test {
   void SetUp() override {}
 };
 
-TEST(NetModelTest, verification_test) {}
+TEST(NetModelTest, verification_test) {
+    const char* rnn_filename = "modules/prediction/data/rnn_vehicle_model.bin";
+    NetParameter net_parameter = NetParameter();
+    EXPECT_TRUE(common::util::GetProtoFromFile(rnn_filename, &net_parameter));
+    EXPECT_TRUE(RnnModel::instance()->LoadModel(net_parameter));
+    EXPECT_TRUE(RnnModel::instance()->VerifyModel());
+}
 
 }  // namespace network
 }  // namespace prediction

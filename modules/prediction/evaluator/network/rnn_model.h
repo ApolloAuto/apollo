@@ -20,7 +20,7 @@
 #include "Eigen/Dense"
 
 #include "modules/common/macro.h"
-#include "modules/prediction/evaluator/network/layer.h"
+#include "modules/prediction/evaluator/network/layer/layer.h"
 #include "modules/prediction/evaluator/network/net_model.h"
 
 #ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_RNN_MODEL_H_
@@ -54,4 +54,4 @@ class RnnModel : public NetModel {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif
+#endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_RNN_MODEL_H_

@@ -19,11 +19,11 @@
 
 #include "Eigen/Dense"
 
-#include "modules/prediction/evaluator/network/util.h"
+#include "modules/prediction/evaluator/network/layer/util.h"
 #include "modules/prediction/proto/network_layers.pb.h"
 
-#ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_H_
-#define MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_H_
+#ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_LAYER_H_
+#define MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_LAYER_H_
 
 /**
  * @namespace apollo::prediction::network
@@ -164,4 +164,4 @@ class Concatenate : public Layer {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_H_
+#endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_LAYER_H_

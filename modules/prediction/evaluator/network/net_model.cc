@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/prediction/evaluator/network/layer.h"
+#include "modules/prediction/evaluator/network/layer/layer.h"
 #include "modules/prediction/proto/network_model.pb.h"
 
 namespace apollo {

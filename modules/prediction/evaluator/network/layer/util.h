@@ -19,8 +19,8 @@
  * @brief
  */
 
-#ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_UTIL_H_
-#define MODULES_PREDICTION_EVALUATOR_NETWORK_UTIL_H_
+#ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_LAYRE_UTIL_H_
+#define MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_UTIL_H_
 
 #include <functional>
 #include <string>
@@ -53,4 +53,4 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_UTIL_H_
+#endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_LAYER_UTIL_H_

@@ -23,7 +23,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "modules/prediction/evaluator/network/layer.h"
+#include "modules/prediction/evaluator/network/layer/layer.h"
 
 namespace apollo {
 namespace prediction {
