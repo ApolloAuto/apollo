@@ -61,7 +61,7 @@ def get_central_line(mobileye_pb, path_length):
     return ref_lane_x, ref_lane_y
 
 def get_path(x, y, path_length):
-    ind = int(math.floor((x[0] * 100.0) / 1) + 1)
+    ind = int(math.floor((abs(x[0]) * 100.0) / 1) + 1)
     newx = [0]
     newy = [0]
     w = [1000]
@@ -96,9 +96,9 @@ def euclidean_distance(point1, point2):
     sum += (point1[1] - point2[1]) * (point1[1] - point2[1])
     return math.sqrt(sum)
 
-def get_theta(point):
+def get_theta(point, point_base):
     #print point
-    return math.atan2(point[1], point[0]) - math.atan2(1, 0)
+    return math.atan2(point[1] - point_base[1], point[0] - point_base[0]) - math.atan2(1, 0)
 
 def mobileye_callback(mobileye_pb):
     global x, y, nx ,ny
@@ -107,7 +107,7 @@ def mobileye_callback(mobileye_pb):
     if path_length < SPEED * 2:
         path_length = math.ceil(SPEED * 2)
     x, y = get_central_line(mobileye_pb, path_length)
-    nx, ny = get_path(x, y, path_length)
+    nx, ny = x, y#get_path(x, y, path_length)
 
     adc_trajectory = planning_pb2.ADCTrajectory()
     adc_trajectory.header.timestamp_sec = rospy.get_rostime().secs
@@ -126,7 +126,7 @@ def mobileye_callback(mobileye_pb):
             s += dist
             relative_time += dist / CRUISE_SPEED
 
-        traj_point.path_point.theta = get_theta((nx[i], ny[i]))
+        traj_point.path_point.theta = get_theta((nx[i], ny[i]), (nx[0], ny[0]))
         if i == 0:
             traj_point.path_point.theta = 0
         traj_point.path_point.s = s
