@@ -46,32 +46,32 @@ class PCDExporter {
 
  private:
   // An exist folder to save pcd files
-  std::string _pcd_folder;
-  // File name of _stamp_file;
-  std::string _stamp_file;
-  FILE *_stamp_file_handle;
+  std::string pcd_folder_;
+  // File name of stamp_file_;
+  std::string stamp_file_;
+  FILE *stamp_file_handle_;
   // File name of pcd_pose file
-  std::string _pose_file;
-  FILE *_pose_file_handle;
-  pcl::PCDWriter _writer;
+  std::string pose_file_;
+  FILE *pose_file_handle_;
+  pcl::PCDWriter writer_;
   // Default "velodyne"
-  std::string _child_frame_id;
-  ros::Subscriber _sub;
+  std::string child_frame_id_;
+  ros::Subscriber sub_;
 
-  boost::shared_ptr<tf2_ros::Buffer> _tf_buffer_ptr;
-  boost::shared_ptr<tf2_ros::TransformListener> _tf_listener_ptr;
+  boost::shared_ptr<tf2_ros::Buffer> tf_buffer_ptr_;
+  boost::shared_ptr<tf2_ros::TransformListener> tf_listener_ptr_;
 
-  bool _skip_static_frames;
+  bool skip_static_frames_;
   // use the seq of a message as index or not
-  bool _use_seq_as_index;
-  float _time_offset;
-  float _loc_threshold;
-  // Message counter, use as index when _use_seq = false
-  unsigned int _pc_msg_count;
-  std::string _topic_pointcloud;
-  int _queue_size;
+  bool use_seq_as_index_;
+  float time_offset_;
+  float loc_threshold_;
+  // Message counter, use as index when use_seq_ = false
+  unsigned int pc_msg_count_;
+  std::string topic_pointcloud_;
+  int queue_size_;
 
-  std::list<sensor_msgs::PointCloud2ConstPtr> _queue;
+  std::list<sensor_msgs::PointCloud2ConstPtr> queue_;
 
   /**
    * @brief Query pose

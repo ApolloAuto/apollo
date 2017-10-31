@@ -3,7 +3,7 @@ add_library(velodyne_parser
     velodyne_parser.cpp  
     velodyne64_parser.cpp 
     # velodyne32_parser.cpp  
-    # velodyne16_parser.cpp
+    velodyne16_parser.cpp
     calibration.cpp
     online_calibration.cpp
     util.cpp
