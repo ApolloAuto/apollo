@@ -202,9 +202,9 @@ void ExtendBackward(bool enable_use_road_id,
          nodes_of_curr_passage->front().GetTopoNode()->InFromPreEdge()) {
       const auto& pred_node = edge->FromNode();
       // if pred node is not in the same road
-      if (pred_node->RoadId() != nodes_of_curr_passage->front().RoadId()) {
-        continue;
-      }
+      // if (pred_node->RoadId() != nodes_of_curr_passage->front().RoadId()) {
+      //   continue;
+      // }
       // if pred node has been inserted
       if (enable_use_road_id &&
           node_set_of_curr_passage.find(pred_node) !=
