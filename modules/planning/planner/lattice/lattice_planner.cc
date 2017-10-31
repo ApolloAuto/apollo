@@ -58,7 +58,7 @@ Status LatticePlanner::Plan(
   AINFO << "[BEGIN]-------------------------------------------------";
   AINFO << "Number of planning cycles:\t" << num_planning_cycles
       << "\t" << num_planning_succeeded_cycles;
-  num_planning_cycles++;
+  ++num_planning_cycles;
 
   // 1. obtain a reference line and transform it to the PathPoint format.
   auto discretized_reference_line =
@@ -162,7 +162,7 @@ Status LatticePlanner::Plan(
     }
 
     // put combine trajectory into debug data
-    num_lattice_traj += 1;
+    ++num_lattice_traj;
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
         combined_trajectory.trajectory_points();
 

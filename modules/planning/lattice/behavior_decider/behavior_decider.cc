@@ -101,8 +101,20 @@ PlanningTarget BehaviorDecider::Analyze(
   lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
   ret.set_decision_type(PlanningTarget::GO);
 
-  PointENU routing_end = frame->GetRoutingDestination();
+  StopDecisionNearDestination(frame, lon_init_state,
+      discretized_reference_line, lon_sample_config, &ret);
 
+  return ret;
+}
+
+void BehaviorDecider::StopDecisionNearDestination(
+    Frame* frame,
+    const std::array<double, 3>& lon_init_state,
+    const std::vector<common::PathPoint>& discretized_reference_line,
+    LonSampleConfig* lon_sample_config,
+    PlanningTarget* planning_target) {
+
+  PointENU routing_end = frame->GetRoutingDestination();
   PathPoint routing_end_on_ref_line =
       ReferenceLineMatcher::match_to_reference_line(
           discretized_reference_line, routing_end.x(), routing_end.y());
@@ -115,10 +127,11 @@ PlanningTarget BehaviorDecider::Analyze(
     if (target_acc > stop_acc_thred) {
       lon_sample_config->mutable_lon_end_condition()->set_s(
           routing_end_on_ref_line.s());
-      ret.set_decision_type(PlanningTarget::STOP);
+      lon_sample_config->mutable_lon_end_condition()->set_ds(0.0);
+      lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
+      planning_target->set_decision_type(PlanningTarget::STOP);
     }
   }
-  return ret;
 }
 
 void BehaviorDecider::GetNearbyObstacles(
