@@ -219,7 +219,7 @@ void SensorCanbus<SensorType>::DataTrigger() {
   while (data_trigger_running_) {
     std::unique_lock<std::mutex> lock(mutex_);
     cvar->wait(lock);
-    //TODO: this is a log for test.  Please remove it after onboard test.
+    // TODO(lizh): this log is for test. Please remove it after onboard test.
     AINFO << "===== Pulibsh Sensor Data =====";
     PublishSensorData();
     sensor_message_manager_->ClearSensorData();
