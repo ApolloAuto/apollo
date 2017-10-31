@@ -209,6 +209,7 @@ void MessageManager<SensorType>::Parse(const uint32_t message_id,
 
 template <typename SensorType>
 void MessageManager<SensorType>::ClearSensorData() {
+  std::lock_guard<std::mutex> lock(sensor_data_mutex_);
   sensor_data_.Clear();
 }
 
