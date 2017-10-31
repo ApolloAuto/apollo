@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "Eigen/Dense"
 
@@ -54,7 +55,7 @@ class RNNEvaluator : public Evaluator {
    * @param obstacle_feature_mat feature matrix
    * @param lane_feature_mats lane feature matrices
    */
-  void ExtractFeatureValues(
+  int ExtractFeatureValues(
       Obstacle* obstacle,
       Eigen::MatrixXf* const obstacle_feature_mat,
       std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats);
@@ -71,8 +72,24 @@ class RNNEvaluator : public Evaluator {
    */
   void LoadModel(const std::string& model_file);
 
+  int SetupObstacleFeature(
+      Obstacle* obstacle,
+      std::vector<float>* const feature_values);
+
+  int SetupLaneFeature(
+      const Feature& feature,
+      const LaneSequence& lane_sequence,
+      std::vector<float>* const feature_values);
+
+  bool IsCutinInHistory(
+      const std::string& lane_id,
+      const std::string& lane_id_pre);
+
  private:
   std::unique_ptr<NetParameter> model_ptr_;
+  int dim_obstacle_feature_ = 10;
+  int dim_lane_point_feature_ = 4;
+  int length_lane_point_sequence_ = 20;
 };
 
 }  // namespace prediction
