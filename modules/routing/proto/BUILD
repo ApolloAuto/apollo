@@ -10,6 +10,7 @@ cc_proto_library(
 proto_library(
     name = "routing_proto_lib",
     srcs = [
+        "poi.proto",
         "routing.proto",
         "routing_config.proto",
         "topo_graph.proto",
