@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 
 #include "ros/include/ros/ros.h"
@@ -113,11 +114,13 @@ class SensorCanbus : public apollo::common::ApolloApp {
   std::unique_ptr<CanClient> can_client_;
   CanReceiver<SensorType> can_receiver_;
   std::unique_ptr<canbus::MessageManager<SensorType>> sensor_message_manager_;
+  std::unique_ptr<std::thread> thread_;
 
   int64_t last_timestamp_ = 0;
   ros::Timer timer_;
   apollo::common::monitor::Monitor monitor_;
   std::mutex mutex_;
+  bool data_trigger_running_ = false;
 };
 
 // method implementations
@@ -190,7 +193,12 @@ Status SensorCanbus<SensorType>::Start() {
     timer_ = AdapterManager::CreateTimer(
         ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
   } else {
-    DataTrigger();
+    data_trigger_running_ = true;
+    thread_.reset(new std::thread([this] { DataTrigger(); }));
+    if (thread_ == nullptr) {
+      AERROR << "Unable to create data trigger thread.";
+      return OnError("Failed to start data trigger thread.");
+    }
   }
 
   // last step: publish monitor messages
@@ -208,9 +216,11 @@ void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
 template <typename SensorType>
 void SensorCanbus<SensorType>::DataTrigger() {
   std::condition_variable* cvar = sensor_message_manager_->GetMutableCVar();
-  while (true) {
+  while (data_trigger_running_) {
     std::unique_lock<std::mutex> lock(mutex_);
     cvar->wait(lock);
+    //TODO: this is a log for test.  Please remove it after onboard test.
+    AINFO << "===== Pulibsh Sensor Data =====";
     PublishSensorData();
     sensor_message_manager_->ClearSensorData();
   }
@@ -222,6 +232,16 @@ void SensorCanbus<SensorType>::Stop() {
 
   can_receiver_.Stop();
   can_client_->Stop();
+
+  if (data_trigger_running_) {
+    data_trigger_running_ = false;
+    if (thread_ != nullptr && thread_->joinable()) {
+      sensor_message_manager_->GetMutableCVar()->notify_all();
+      thread_->join();
+    }
+    thread_.reset();
+  }
+  AINFO << "Data trigger stopped [ok].";
 }
 
 // Send the error to monitor and return it
