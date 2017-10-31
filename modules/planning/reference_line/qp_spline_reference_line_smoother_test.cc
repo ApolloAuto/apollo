@@ -15,23 +15,24 @@
  *****************************************************************************/
 
 /**
- * @file reference_line_smooother_test.cpp
+ * @file qp_spline_reference_line_smoother_test.cc
  **/
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
+
 #include "gtest/gtest.h"
 
-#include "modules/planning/proto/reference_line_smoother_config.pb.h"
+#include "modules/planning/proto/qp_spline_reference_line_smoother_config.pb.h"
 
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
 namespace planning {
 
-class ReferenceLineSmootherTest : public ::testing::Test {
+class QpSplineReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     hdmap_.LoadMapFromFile(map_file);
@@ -41,7 +42,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
       AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
     }
-    ReferenceLineSmootherConfig config;
+    QpSplineReferenceLineSmootherConfig config;
     smoother_.Init(config,
                    &spline_solver_);  // use the default value in config.
 
@@ -63,7 +64,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
       "modules/planning/testdata/garage_map/base_map.txt";
 
   hdmap::HDMap hdmap_;
-  ReferenceLineSmoother smoother_;
+  QpSplineReferenceLineSmoother smoother_;
   common::math::Vec2d vehicle_position_;
   std::vector<double> t_knots_;
   Spline2dSolver spline_solver_{t_knots_, 5};
@@ -71,7 +72,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
 };
 
-TEST_F(ReferenceLineSmootherTest, smooth) {
+TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
   EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));

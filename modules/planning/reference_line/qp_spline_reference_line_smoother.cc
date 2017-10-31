@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 #include <algorithm>
 #include <limits>
@@ -35,28 +35,28 @@
 namespace apollo {
 namespace planning {
 
-bool ReferenceLineSmoother::Init(const std::string& config_file,
-                                 Spline2dSolver* const spline_solver) {
+void QpSplineReferenceLineSmoother::Init(const std::string& config_file,
+                                         Spline2dSolver* const spline_solver) {
   if (!common::util::GetProtoFromFile(config_file, &smoother_config_)) {
     AERROR << "failed to load config file " << config_file;
-    return false;
+    return;
   }
   spline_solver_ = spline_solver;
-  return true;
 }
 
-void ReferenceLineSmoother::Init(const ReferenceLineSmootherConfig& config,
-                                 Spline2dSolver* const spline_solver) {
+void QpSplineReferenceLineSmoother::Init(
+    const QpSplineReferenceLineSmootherConfig& config,
+    Spline2dSolver* const spline_solver) {
   smoother_config_ = config;
   spline_solver_ = spline_solver;
 }
 
-void ReferenceLineSmoother::Clear() {
+void QpSplineReferenceLineSmoother::Clear() {
   t_knots_.clear();
   ref_points_.clear();
 }
 
-bool ReferenceLineSmoother::Smooth(
+bool QpSplineReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
   Clear();
@@ -134,7 +134,8 @@ bool ReferenceLineSmoother::Smooth(
   return true;
 }
 
-bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
+bool QpSplineReferenceLineSmoother::Sampling(
+    const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
   ADEBUG << "Length = " << length;
   uint32_t num_spline = std::max(
@@ -154,7 +155,7 @@ bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
   return true;
 }
 
-bool ReferenceLineSmoother::ApplyConstraint(
+bool QpSplineReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
   uint32_t constraint_num =
       smoother_config_.constraint_to_knots_ratio() * (t_knots_.size() - 1) + 1;
@@ -213,7 +214,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
   return true;
 }
 
-bool ReferenceLineSmoother::ApplyKernel() {
+bool QpSplineReferenceLineSmoother::ApplyKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
@@ -230,9 +231,9 @@ bool ReferenceLineSmoother::ApplyKernel() {
   return true;
 }
 
-bool ReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
+bool QpSplineReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
 
-bool ReferenceLineSmoother::ExtractEvaluatedPoints(
+bool QpSplineReferenceLineSmoother::ExtractEvaluatedPoints(
     const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,
     std::vector<common::PathPoint>* const path_points) const {
   for (const auto t : vec_t) {
@@ -252,8 +253,8 @@ bool ReferenceLineSmoother::ExtractEvaluatedPoints(
   return true;
 }
 
-bool ReferenceLineSmoother::GetSFromParamT(const double t,
-                                           double* const s) const {
+bool QpSplineReferenceLineSmoother::GetSFromParamT(const double t,
+                                                   double* const s) const {
   if (t_knots_.size() < 2) {
     AERROR << "Fail to GetSFromParamT because t_knots_.size() error.";
     return false;
@@ -280,7 +281,7 @@ bool ReferenceLineSmoother::GetSFromParamT(const double t,
   return true;
 }
 
-std::uint32_t ReferenceLineSmoother::FindIndex(const double t) const {
+std::uint32_t QpSplineReferenceLineSmoother::FindIndex(const double t) const {
   auto upper_bound = std::upper_bound(t_knots_.begin(), t_knots_.end(), t);
   return std::distance(t_knots_.begin(), upper_bound);
 }

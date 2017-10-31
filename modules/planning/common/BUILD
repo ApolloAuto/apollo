@@ -208,9 +208,9 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "//modules/planning/proto:qp_spline_reference_line_smoother_config_proto",
+        "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "//modules/planning/reference_line:reference_line_provider",
-        "//modules/planning/reference_line:reference_line_smoother",
     ],
 )
 
