@@ -59,6 +59,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:network_model_proto",
+        "@eigen//:eigen",
     ],
 )
 
