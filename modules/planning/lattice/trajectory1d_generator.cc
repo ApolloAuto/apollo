@@ -113,11 +113,14 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     GenerateSpeedProfilesForFollowing(init_state, lon_sample_config,
                                       ptr_lon_trajectory_bundle);
   } else {
+    AINFO << "generate speed profile for STOP";
     CHECK(planning_objective.decision_type() == PlanningTarget::STOP);
+    AINFO << "target [s, ds, dds] = [" << s_target << ", "
+          << ds_target << ", " << dds_target << "]";
     GenerateSpeedProfilesForStopping(init_state, lon_sample_config,
                                      ptr_lon_trajectory_bundle);
-    GenerateSpeedProfilesForCruising(init_state, lon_sample_config,
-                                     ptr_lon_trajectory_bundle);
+    // GenerateSpeedProfilesForCruising(init_state, lon_sample_config,
+    //                                  ptr_lon_trajectory_bundle);
   }
   return;
 }
@@ -175,10 +178,12 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
     const LonSampleConfig& lon_sample_config,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   double stop_position = lon_sample_config.lon_end_condition().s();
+  AINFO << "stop position s = " << stop_position;
+  AINFO << "init_state s = " << init_state[0];
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForStopping(init_state,
                                                                stop_position);
-
+  AINFO << "end condition size = " << end_conditions.size();
   for (const auto& end_condition : end_conditions) {
     std::shared_ptr<Curve1d> ptr_lon_trajectory =
         std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
