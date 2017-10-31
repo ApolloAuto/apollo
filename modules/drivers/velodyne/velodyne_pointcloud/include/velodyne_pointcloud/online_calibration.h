@@ -36,16 +36,20 @@ class OnlineCalibration {
   int decode(const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msgs);
   void dump(const std::string& file_path);
   void get_unit_index();
-  bool inited() const { return _inited; }
-  Calibration calibration() const { return _calibration; }
+  bool inited() const {
+    return inited_;
+  }
+  Calibration calibration() const {
+    return calibration_;
+  }
 
  private:
-  bool _inited;
-  Calibration _calibration;
-  std::vector<uint8_t> _status_types;
-  std::vector<uint8_t> _status_values;
+  bool inited_;
+  Calibration calibration_;
+  std::vector<uint8_t> status_types_;
+  std::vector<uint8_t> status_values_;
   // store first two "unit#" value index
-  std::vector<int> _unit_indexs;
+  std::vector<int> unit_indexs_;
 };
 
 }  // namespace velodyne

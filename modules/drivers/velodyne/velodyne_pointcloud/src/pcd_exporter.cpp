@@ -21,49 +21,49 @@ namespace drivers {
 namespace velodyne {
 
 PCDExporter::PCDExporter(ros::NodeHandle node, ros::NodeHandle private_nh)
-    : _time_offset(0.1),
-      _loc_threshold(0.1),
-      _pc_msg_count(1),
-      _stamp_file_handle(NULL),
-      _pose_file_handle(NULL) {
-  private_nh.param("pcd_folder", _pcd_folder, std::string(""));
-  private_nh.param("stamp_file", _stamp_file, std::string(""));
-  private_nh.param("pose_file", _pose_file, std::string(""));
-  private_nh.param("skip_static_frames", _skip_static_frames, false);
-  private_nh.param("child_frame_id", _child_frame_id, std::string("velodyne"));
-  private_nh.param("use_seq", _use_seq_as_index, false);
-  private_nh.param("topic_pointcloud", _topic_pointcloud,
+    : time_offset_(0.1),
+      loc_threshold_(0.1),
+      pc_msg_count_(1),
+      stamp_file_handle_(NULL),
+      pose_file_handle_(NULL) {
+  private_nh.param("pcd_folder", pcd_folder_, std::string(""));
+  private_nh.param("stamp_file", stamp_file_, std::string(""));
+  private_nh.param("pose_file", pose_file_, std::string(""));
+  private_nh.param("skip_static_frames", skip_static_frames_, false);
+  private_nh.param("child_frame_id", child_frame_id_, std::string("velodyne"));
+  private_nh.param("use_seq", use_seq_as_index_, false);
+  private_nh.param("topic_pointcloud", topic_pointcloud_,
                    velodyne::TOPIC_POINTCLOUD);
-  private_nh.param("queue_size", _queue_size, 10);
+  private_nh.param("queue_size", queue_size_, 10);
 
-  _sub = node.subscribe(_topic_pointcloud, _queue_size,
+  sub_ = node.subscribe(topic_pointcloud_, queue_size_,
                         &PCDExporter::pcd_writer_callback, (PCDExporter *)this);
 }
 
 PCDExporter::~PCDExporter() {
-  if (_stamp_file_handle != NULL) {
-    fclose(_stamp_file_handle);
+  if (stamp_file_handle_ != NULL) {
+    fclose(stamp_file_handle_);
   }
-  if (_pose_file_handle != NULL) {
-    fclose(_pose_file_handle);
+  if (pose_file_handle_ != NULL) {
+    fclose(pose_file_handle_);
   }
 }
 
 void PCDExporter::init() {
-  _tf_buffer_ptr = boost::shared_ptr<tf2_ros::Buffer>(new tf2_ros::Buffer());
-  _tf_listener_ptr = boost::shared_ptr<tf2_ros::TransformListener>(
-      new tf2_ros::TransformListener(*_tf_buffer_ptr));
-  if (_pcd_folder == "") {
+  tf_buffer_ptr_ = boost::shared_ptr<tf2_ros::Buffer>(new tf2_ros::Buffer());
+  tf_listener_ptr_ = boost::shared_ptr<tf2_ros::TransformListener>(
+      new tf2_ros::TransformListener(*tf_buffer_ptr_));
+  if (pcd_folder_ == "") {
     ROS_ERROR_STREAM("No pcd_folder input");
     ROS_BREAK();
   }
 
-  ROS_INFO_STREAM("pcd_folder :" << _pcd_folder);
+  ROS_INFO_STREAM("pcd_folder :" << pcd_folder_);
   // check output directory, if not exist create it
-  if (!boost::filesystem::exists(_pcd_folder)) {
-    ROS_INFO_STREAM("The directory " << _pcd_folder
+  if (!boost::filesystem::exists(pcd_folder_)) {
+    ROS_INFO_STREAM("The directory " << pcd_folder_
                                      << " is not exists, create now");
-    if (boost::filesystem::create_directory(_pcd_folder)) {
+    if (boost::filesystem::create_directory(pcd_folder_)) {
       ROS_INFO("Create directory success.");
     } else {
       ROS_ERROR("Create directory failed! ");
@@ -71,20 +71,20 @@ void PCDExporter::init() {
     }
   }
 
-  if (boost::filesystem::exists(_pose_file)) {
-    boost::filesystem::remove(_pose_file);
+  if (boost::filesystem::exists(pose_file_)) {
+    boost::filesystem::remove(pose_file_);
     ROS_INFO_STREAM("Remove the legacy pose file in pcd folder");
   }
-  if ((_pose_file_handle = fopen(_pose_file.c_str(), "a")) == NULL) {
+  if ((pose_file_handle_ = fopen(pose_file_.c_str(), "a")) == NULL) {
     ROS_ERROR_STREAM("Cannot open pose file!");
     ROS_BREAK();
   }
 
-  if (boost::filesystem::exists(_stamp_file)) {
-    boost::filesystem::remove(_stamp_file);
+  if (boost::filesystem::exists(stamp_file_)) {
+    boost::filesystem::remove(stamp_file_);
     ROS_INFO("Remove the legacy stamp file in pcd folder");
   }
-  if ((_stamp_file_handle = fopen(_stamp_file.c_str(), "a")) == NULL) {
+  if ((stamp_file_handle_ = fopen(stamp_file_.c_str(), "a")) == NULL) {
     ROS_ERROR_STREAM("Cannot open stamp file!");
     ROS_BREAK();
   }
@@ -95,7 +95,7 @@ void PCDExporter::write_pcd_file(const sensor_msgs::PointCloud2::ConstPtr &msg,
   ROS_INFO_STREAM("export pcd filename :" << filename);
   pcl::PCLPointCloud2 pcl_cloud;
   pcl_conversions::toPCL(*msg, pcl_cloud);
-  _writer.writeBinaryCompressed(filename, pcl_cloud);
+  writer_.writeBinaryCompressed(filename, pcl_cloud);
 }
 
 int PCDExporter::write_pcd_pose_file(
@@ -107,9 +107,9 @@ int PCDExporter::write_pcd_pose_file(
     return -1;
   }
 
-  if (_skip_static_frames) {
+  if (skip_static_frames_) {
     // check pose around time, if transform is small, then skip the frame
-    double time2 = time - _time_offset;
+    double time2 = time - time_offset_;
     ros::Time query_time(time2);
     Eigen::Matrix4d pose2;
     if (!get_pose(query_time, pose2)) {
@@ -119,7 +119,7 @@ int PCDExporter::write_pcd_pose_file(
     // compute transform
     Eigen::Matrix4d transform = pose.inverse() * pose2;
     double loc = transform.topRightCorner(3, 1).norm();
-    if (loc <= _loc_threshold) {
+    if (loc <= loc_threshold_) {
       ROS_INFO("[SUCCESS] : skip static frames...");
       return 0;
     }
@@ -132,13 +132,13 @@ int PCDExporter::write_pcd_pose_file(
   t[2] = affine.translation()[2];
   Eigen::Quaterniond quat = (Eigen::Quaterniond)affine.linear();
 
-  fprintf(_pose_file_handle, "%d %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+  fprintf(pose_file_handle_, "%d %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
           time, t(0), t(1), t(2), quat.x(), quat.y(), quat.z(), quat.w());
   return 0;
 }
 
 bool PCDExporter::get_pose(const ros::Time &time, Eigen::Matrix4d &pose) {
-  if (!_tf_buffer_ptr->canTransform("world", _child_frame_id, time,
+  if (!tf_buffer_ptr_->canTransform("world", child_frame_id_, time,
                                     ros::Duration(0.1))) {
     ROS_ERROR_STREAM("Cannot get correspondence pose!");
     return false;
@@ -147,7 +147,7 @@ bool PCDExporter::get_pose(const ros::Time &time, Eigen::Matrix4d &pose) {
   try {
     geometry_msgs::TransformStamped stamped_transform;
     stamped_transform =
-        _tf_buffer_ptr->lookupTransform("world", _child_frame_id, time);
+        tf_buffer_ptr_->lookupTransform("world", child_frame_id_, time);
     Eigen::Affine3d affine;
     tf::transformMsgToEigen(stamped_transform.transform, affine);
     pose = affine.matrix();
@@ -164,26 +164,26 @@ bool PCDExporter::get_pose(const ros::Time &time, Eigen::Matrix4d &pose) {
 
 void PCDExporter::pcd_writer_callback(
     const sensor_msgs::PointCloud2::ConstPtr &cloud) {
-  _queue.push_back(cloud);
-  for (auto iter = _queue.begin(); iter != _queue.end();) {
+  queue_.push_back(cloud);
+  for (auto iter = queue_.begin(); iter != queue_.end();) {
     sensor_msgs::PointCloud2ConstPtr &msg = *iter;
 
-    int index = _use_seq_as_index ? msg->header.seq : _pc_msg_count;
+    int index = use_seq_as_index_ ? msg->header.seq : pc_msg_count_;
     std::string pcd_filename =
-        _pcd_folder + "/" + boost::lexical_cast<std::string>(index) + ".pcd";
+        pcd_folder_ + "/" + boost::lexical_cast<std::string>(index) + ".pcd";
 
     int ret = write_pcd_pose_file(msg, index);
     if (ret == 0) {
       write_pcd_file(msg, pcd_filename);
-      fprintf(_stamp_file_handle, "%d %lf\n", index, msg->header.stamp.toSec());
-      ++_pc_msg_count;
-      iter = _queue.erase(iter);
+      fprintf(stamp_file_handle_, "%d %lf\n", index, msg->header.stamp.toSec());
+      ++pc_msg_count_;
+      iter = queue_.erase(iter);
       // Once there is a successful compensated PCD, all PCDs before that should
       // be discarded from the queue
       std::list<sensor_msgs::PointCloud2ConstPtr>::iterator iter_inside =
-          _queue.begin();
+          queue_.begin();
       while (iter_inside != iter) {
-        iter_inside = _queue.erase(iter_inside);
+        iter_inside = queue_.erase(iter_inside);
       }
     } else if (ret == -1) {
       ++iter;
