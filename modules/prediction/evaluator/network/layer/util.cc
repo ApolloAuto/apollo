@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/network/util.h"
+#include "modules/prediction/evaluator/network/layer/util.h"
 
 #include <string>
 #include <unordered_map>
