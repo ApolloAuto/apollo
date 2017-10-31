@@ -27,6 +27,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <condition_variable>
 
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -85,6 +86,10 @@ class MessageManager {
   virtual void Parse(const uint32_t message_id, const uint8_t *data,
                      int32_t length);
 
+  void ClearSensorData();
+
+  std::condition_variable* GetMutableCVar();
+
   /**
    * @brief get mutable protocol data by message id
    * @param message_id the id of the message
@@ -123,6 +128,8 @@ class MessageManager {
   std::mutex sensor_data_mutex_;
   SensorType sensor_data_;
   bool is_received_on_time_ = false;
+
+  std::condition_variable cvar_;
 };
 
 template <typename SensorType>
@@ -198,6 +205,17 @@ void MessageManager<SensorType>::Parse(const uint32_t message_id,
     }
     it->second.last_time = time;
   }
+}
+
+template <typename SensorType>
+void MessageManager<SensorType>::ClearSensorData() {
+  std::lock_guard<std::mutex> lock(sensor_data_mutex_);
+  sensor_data_.Clear();
+}
+
+template <typename SensorType>
+std::condition_variable* MessageManager<SensorType>::GetMutableCVar() {
+  return &cvar_;
 }
 
 template <typename SensorType>
