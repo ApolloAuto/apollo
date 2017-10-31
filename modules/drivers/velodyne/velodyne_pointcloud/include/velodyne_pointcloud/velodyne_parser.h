@@ -180,7 +180,6 @@ struct Config {
   std::string calibration_file;
   std::string model;  // VLP16,32E, 64E_32
   bool organized;     // is point cloud order
-  int time_zone;      // base time zone
 };
 
 enum Mode { STRONGEST, LAST, DUAL };
@@ -212,20 +211,24 @@ class VelodyneParser {
   // order point cloud fod IDL by velodyne model
   virtual void order(VPointCloud::Ptr &cloud) = 0;
 
-  const Calibration &get_calibration() { return _calibration; }
-  const double get_last_timestamp() { return _last_time_stamp; }
+  const Calibration &get_calibration() {
+    return calibration_;
+  }
+  const double get_last_timestamp() {
+    return last_time_stamp_;
+  }
 
  protected:
-  const float (*_inner_time)[12][32];
+  const float (*inner_time_)[12][32];
 
-  Calibration _calibration;
-  float _sin_rot_table[ROTATION_MAX_UNITS];
-  float _cos_rot_table[ROTATION_MAX_UNITS];
-  Config _config;
+  Calibration calibration_;
+  float sin_rot_table_[ROTATION_MAX_UNITS];
+  float cos_rot_table_[ROTATION_MAX_UNITS];
+  Config config_;
   // Last Velodyne packet time stamp. (Full time)
-  double _last_time_stamp;
-  bool _need_two_pt_correction;
-  Mode _mode;
+  double last_time_stamp_;
+  bool need_two_pt_correction_;
+  Mode mode_;
 
   VPoint get_nan_point(double timestamp);
   void init_angle_params(double view_direction, double view_width);
@@ -277,14 +280,34 @@ class Velodyne64Parser : public VelodyneParser {
   int intensity_compensate(const LaserCorrection &corrections,
                            const uint16_t &raw_distance, int intensity);
   // Previous Velodyne packet time stamp. (offset to the top hour)
-  double _previous_packet_stamp[4];
-  uint64_t _gps_base_usec[4];  // full time
-  bool _is_s2;
-  int _offsets[64];
+  double previous_packet_stamp_[4];
+  uint64_t gps_base_usec_[4];  // full time
+  bool is_s2_;
+  int offsets_[64];
 
-  OnlineCalibration _online_calibration;
+  OnlineCalibration online_calibration_;
 
 };  // class Velodyne64Parser
+
+class Velodyne16Parser : public VelodyneParser {
+ public:
+  Velodyne16Parser(Config config);
+  ~Velodyne16Parser() {}
+
+  void generate_pointcloud(
+      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      VPointCloud::Ptr &out_msg);
+  void order(VPointCloud::Ptr &cloud);
+
+ private:
+  double get_timestamp(double base_time, float time_offset,
+                       uint16_t laser_block_id);
+  void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
+  // Previous Velodyne packet time stamp. (offset to the top hour)
+  double previous_packet_stamp_;
+  uint64_t gps_base_usec_;  // full time
+
+};  // class Velodyne16Parser
 
 class VelodyneParserFactory {
  public:

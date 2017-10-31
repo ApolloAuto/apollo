@@ -35,6 +35,7 @@ struct Config {
   int npackets;  ///< number of packets to collect
   double rpm;    ///< device rotation rate (RPMs)
   int firing_data_port;
+  int positioning_data_port;
 };
 
 class VelodyneDriver {
@@ -46,14 +47,18 @@ class VelodyneDriver {
   virtual void init(ros::NodeHandle &node) = 0;
 
  protected:
-  Config _config;
-  boost::shared_ptr<Input> _input;
-  ros::Publisher _output;
-  std::string _topic;
+  Config config_;
+  boost::shared_ptr<Input> input_;
+  ros::Publisher output_;
+  std::string topic_;
 
-  uint64_t _basetime;
-  uint32_t _last_gps_time;
+  uint64_t basetime_;
+  uint32_t last_gps_time_;
   int poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr &scan);
+  bool set_base_time();
+  void set_base_time_from_nmea_time(const NMEATimePtr &nmea_time,
+                                    uint64_t &basetime);
+  void update_gps_top_hour(unsigned int current_time);
 };
 
 class Velodyne64Driver : public VelodyneDriver {
@@ -67,6 +72,18 @@ class Velodyne64Driver : public VelodyneDriver {
  private:
 };
 
+class Velodyne16Driver : public VelodyneDriver {
+ public:
+  Velodyne16Driver(Config config);
+  ~Velodyne16Driver() {}
+
+  void init(ros::NodeHandle &node);
+  bool poll(void);
+  void poll_positioning_packet();
+
+ private:
+  boost::shared_ptr<Input> positioning_input_;
+};
 class VelodyneDriverFactory {
  public:
   static VelodyneDriver *create_driver(ros::NodeHandle private_nh);
@@ -76,4 +93,4 @@ class VelodyneDriverFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // _VELODYNE_DRIVER_H_
+#endif  // VELODYNE_DRIVER_H__
