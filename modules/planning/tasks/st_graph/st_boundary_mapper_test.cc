@@ -25,7 +25,7 @@
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path_obstacle.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
@@ -40,7 +40,7 @@ class StBoundaryMapperTest : public ::testing::Test {
       AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
     }
-    ReferenceLineSmootherConfig config;
+    QpSplineReferenceLineSmootherConfig config;
 
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
@@ -72,7 +72,7 @@ class StBoundaryMapperTest : public ::testing::Test {
   const std::string map_file =
       "modules/planning/testdata/garage_map/base_map.txt";
   hdmap::HDMap hdmap_;
-  ReferenceLineSmoother smoother_;
+  QpSplineReferenceLineSmoother smoother_;
   common::math::Vec2d vehicle_position_;
   std::unique_ptr<ReferenceLine> reference_line_;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;

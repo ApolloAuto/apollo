@@ -42,7 +42,7 @@ ReferenceLineProvider::~ReferenceLineProvider() {
 
 void ReferenceLineProvider::Init(
     const hdmap::HDMap *hdmap_,
-    const ReferenceLineSmootherConfig &smoother_config) {
+    const QpSplineReferenceLineSmootherConfig &smoother_config) {
   pnc_map_.reset(new hdmap::PncMap(hdmap_));
   smoother_config_ = smoother_config;
   std::vector<double> init_t_knots;
@@ -145,12 +145,12 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
     }
   }
 
-  ReferenceLineSmoother smoother;
+  QpSplineReferenceLineSmoother smoother;
   smoother.Init(smoother_config_, spline_solver_.get());
 
   SpiralReferenceLineSmoother spiral_smoother;
   double max_spiral_smoother_dev = 0.1;
-  spiral_smoother.set_max_point_deviation(max_spiral_smoother_dev);
+  spiral_smoother.Init(max_spiral_smoother_dev);
 
   std::vector<ReferenceLine> reference_lines;
   std::vector<hdmap::RouteSegments> segments;

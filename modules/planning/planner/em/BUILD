@@ -26,7 +26,7 @@ cc_library(
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
-        "//modules/planning/reference_line:reference_line_smoother",
+        "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "//modules/planning/tasks:path_optimizer",
         "//modules/planning/tasks:speed_optimizer",
         "//modules/planning/tasks:task",

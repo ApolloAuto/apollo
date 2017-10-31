@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message ReferenceLineSmootherConfig {
+message QpSplineReferenceLineSmootherConfig {
   optional uint32 spline_order = 1 [default = 6];
   optional double max_spline_length = 2 [default = 25];
   optional uint32 constraint_to_knots_ratio = 3 [default = 5];

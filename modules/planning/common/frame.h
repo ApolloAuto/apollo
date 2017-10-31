@@ -32,7 +32,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/proto/reference_line_smoother_config.pb.h"
+#include "modules/planning/proto/qp_spline_reference_line_smoother_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -137,7 +137,7 @@ class Frame {
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
   static std::unique_ptr<hdmap::PncMap> pnc_map_;
-  ReferenceLineSmootherConfig smoother_config_;
+  QpSplineReferenceLineSmootherConfig smoother_config_;
 
   std::string collision_obstacle_id_;
 };
