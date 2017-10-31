@@ -115,12 +115,7 @@ void MessageManager<DelphiESR>::Parse(const uint32_t message_id,
 
   // trigger publishment
   if (message_id == 0x5E5) {
-    ADEBUG << sensor_data_.ShortDebugString();
-
-    AdapterManager::FillDelphiESRHeader(FLAGS_sensor_node_name, &sensor_data_);
-    AdapterManager::PublishDelphiESR(sensor_data_);
-
-    sensor_data_.Clear();
+    cvar_.notify_all();
   }
 
   received_ids_.insert(message_id);
