@@ -36,16 +36,12 @@
 namespace apollo {
 namespace planning {
 
-class QpSplineReferenceLineSmoother : ReferenceLineSmoother {
+class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  QpSplineReferenceLineSmoother() = default;
+  QpSplineReferenceLineSmoother(
+      const QpSplineReferenceLineSmootherConfig& config,
+      Spline2dSolver* const spline_solver);
   virtual ~QpSplineReferenceLineSmoother() = default;
-
-  void Init(const std::string& config_file,
-            Spline2dSolver* const spline_solver) override;
-
-  void Init(const QpSplineReferenceLineSmootherConfig& refline_smooth_config,
-            Spline2dSolver* const spline_solver) override;
 
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;

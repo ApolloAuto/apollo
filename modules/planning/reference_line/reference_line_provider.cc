@@ -145,12 +145,14 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
     }
   }
 
-  QpSplineReferenceLineSmoother smoother;
-  smoother.Init(smoother_config_, spline_solver_.get());
-
-  SpiralReferenceLineSmoother spiral_smoother;
-  double max_spiral_smoother_dev = 0.1;
-  spiral_smoother.Init(max_spiral_smoother_dev);
+  std::unique_ptr<ReferenceLineSmoother> smoother;
+  if (FLAGS_enable_spiral_reference_line) {
+    double max_deviation = 0.1;
+    smoother.reset(new SpiralReferenceLineSmoother(max_deviation));
+  } else {
+    smoother.reset(new QpSplineReferenceLineSmoother(smoother_config_,
+                                                     spline_solver_.get()));
+  }
 
   std::vector<ReferenceLine> reference_lines;
   std::vector<hdmap::RouteSegments> segments;
@@ -160,15 +162,9 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
     if (FLAGS_enable_smooth_reference_line) {
       ReferenceLine raw_reference_line(hdmap_path);
       ReferenceLine reference_line;
-      if (FLAGS_enable_spiral_reference_line) {
-        if (!spiral_smoother.Smooth(raw_reference_line, &reference_line)) {
-          AERROR << "Failed to smooth reference_line with spiral smoother";
-        }
-      } else {
-        if (!smoother.Smooth(raw_reference_line, &reference_line)) {
-          AERROR << "Failed to smooth reference line";
-          continue;
-        }
+      if (!smoother->Smooth(raw_reference_line, &reference_line)) {
+        AERROR << "Failed to smooth reference line";
+        continue;
       }
 
       bool is_valid_reference_line = true;

@@ -35,20 +35,11 @@
 namespace apollo {
 namespace planning {
 
-void QpSplineReferenceLineSmoother::Init(const std::string& config_file,
-                                         Spline2dSolver* const spline_solver) {
-  if (!common::util::GetProtoFromFile(config_file, &smoother_config_)) {
-    AERROR << "failed to load config file " << config_file;
-    return;
-  }
-  spline_solver_ = spline_solver;
-}
-
-void QpSplineReferenceLineSmoother::Init(
+QpSplineReferenceLineSmoother::QpSplineReferenceLineSmoother(
     const QpSplineReferenceLineSmootherConfig& config,
-    Spline2dSolver* const spline_solver) {
-  smoother_config_ = config;
-  spline_solver_ = spline_solver;
+    Spline2dSolver* const spline_solver)
+    : smoother_config_(config), spline_solver_(spline_solver) {
+  CHECK_NOTNULL(spline_solver);
 }
 
 void QpSplineReferenceLineSmoother::Clear() {

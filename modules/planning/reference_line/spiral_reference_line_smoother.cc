@@ -34,6 +34,12 @@
 namespace apollo {
 namespace planning {
 
+SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
+    const double max_point_deviation)
+    : max_point_deviation_(max_point_deviation) {
+  CHECK(max_point_deviation >= 0.0);
+}
+
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
@@ -169,11 +175,6 @@ bool SpiralReferenceLineSmoother::Smooth(
 
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
-}
-
-void SpiralReferenceLineSmoother::Init(const double max_point_deviation) {
-  CHECK(max_point_deviation >= 0.0);
-  max_point_deviation_ = max_point_deviation;
 }
 
 std::vector<common::PathPoint> SpiralReferenceLineSmoother::to_path_points(
