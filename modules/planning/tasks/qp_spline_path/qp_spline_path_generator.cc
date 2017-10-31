@@ -258,7 +258,7 @@ bool QpSplinePathGenerator::AddConstraint(
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint, equality constraint
-  spline_constraint->AddPointConstraint(evaluated_s_.back(), 0.0);
+  // spline_constraint->AddPointConstraint(evaluated_s_.back(), 0.0);
   spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
   spline_constraint->AddPointSecondDerivativeConstraint(evaluated_s_.back(),
                                                         0.0);
@@ -403,23 +403,34 @@ void QpSplinePathGenerator::AddKernel() {
   if (qp_spline_path_config_.derivative_weight() > 0.0) {
     spline_kernel->AddDerivativeKernelMatrix(
         qp_spline_path_config_.derivative_weight());
-    spline_kernel->AddDerivativeKernelMatrixForSplineK(
-        0, qp_spline_path_config_.first_spline_weight_factor() *
-               qp_spline_path_config_.derivative_weight());
+    if (std::fabs(init_frenet_point_.l()) >
+        qp_spline_path_config_.lane_change_mid_l()) {
+      spline_kernel->AddDerivativeKernelMatrixForSplineK(
+          0, qp_spline_path_config_.first_spline_weight_factor() *
+                 qp_spline_path_config_.derivative_weight());
+    }
   }
 
   if (qp_spline_path_config_.second_derivative_weight() > 0.0) {
     spline_kernel->AddSecondOrderDerivativeMatrix(
         qp_spline_path_config_.second_derivative_weight());
-    spline_kernel->AddSecondOrderDerivativeMatrixForSplineK(
-        0, qp_spline_path_config_.second_derivative_weight());
+    if (std::fabs(init_frenet_point_.l()) >
+        qp_spline_path_config_.lane_change_mid_l()) {
+      spline_kernel->AddSecondOrderDerivativeMatrixForSplineK(
+          0, qp_spline_path_config_.first_spline_weight_factor() *
+                 qp_spline_path_config_.second_derivative_weight());
+    }
   }
 
   if (qp_spline_path_config_.third_derivative_weight() > 0.0) {
     spline_kernel->AddThirdOrderDerivativeMatrix(
         qp_spline_path_config_.third_derivative_weight());
-    spline_kernel->AddThirdOrderDerivativeMatrixForSplineK(
-        0, qp_spline_path_config_.third_derivative_weight());
+    if (std::fabs(init_frenet_point_.l()) >
+        qp_spline_path_config_.lane_change_mid_l()) {
+      spline_kernel->AddThirdOrderDerivativeMatrixForSplineK(
+          0, qp_spline_path_config_.first_spline_weight_factor() *
+                 qp_spline_path_config_.third_derivative_weight());
+    }
   }
 }
 
