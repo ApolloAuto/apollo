@@ -144,6 +144,7 @@ cc_library(
     deps = [
         "//modules/planning/math/curve1d:curve1d",
         "//modules/planning/common:planning_gflags",
+        "//modules/common:log",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common:frame",
     ],

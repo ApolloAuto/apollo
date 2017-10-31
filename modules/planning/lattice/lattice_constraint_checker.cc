@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -50,24 +51,21 @@ bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
   while (t < lon_trajectory.param_length()) {
     double v = lon_trajectory.Evaluate(1, t);  // evalute_v
     if (!fuzzy_within(v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
-      // std::cout << "not valid longitudinal trajectory: velocity\t" << v <<
-      // std::endl;
+      // AINFO << "not valid longitudinal trajectory: velocity\t" << v;
       return false;
     }
 
     double a = lon_trajectory.Evaluate(2, t);  // evaluat_a
     if (!fuzzy_within(a, FLAGS_longitudinal_acceleration_lower_bound,
                       FLAGS_longitudinal_acceleration_upper_bound)) {
-      // std::cout << "not valid longitudinal trajectory: acceleration\t" << a
-      // << std::endl;
+      // AINFO << "not valid longitudinal trajectory: acceleration\t" << a;
       return false;
     }
 
     double j = lon_trajectory.Evaluate(3, t);
     if (!fuzzy_within(j, FLAGS_longitudinal_jerk_lower_bound,
                       FLAGS_longitudinal_jerk_upper_bound)) {
-      // std::cout << "not valid longitudinal trajectory: jerk\t" << j <<
-      // std::endl;
+      // AINFO << "not valid longitudinal trajectory: jerk\t" << j;
       return false;
     }
     t += FLAGS_trajectory_time_resolution;

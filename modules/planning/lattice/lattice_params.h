@@ -33,6 +33,7 @@ static double enable_stop_handling = true;
 static double longitudinal_acceleration_comfort_factor = 0.7;
 static double trajectory_time_resolution = 0.05;
 static double stop_acc_thred = 0.5;
+static double dist_thred_omit_routing_end = 3.0;
 
 }  // namespace planning
 }  // namespace apollo
