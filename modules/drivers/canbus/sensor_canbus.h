@@ -25,6 +25,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 #include "ros/include/ros/ros.h"
 
@@ -103,6 +106,7 @@ class SensorCanbus : public apollo::common::ApolloApp {
  private:
   void PublishSensorData();
   void OnTimer(const ros::TimerEvent &event);
+  void DataTrigger();
   apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
@@ -110,10 +114,13 @@ class SensorCanbus : public apollo::common::ApolloApp {
   std::unique_ptr<CanClient> can_client_;
   CanReceiver<SensorType> can_receiver_;
   std::unique_ptr<canbus::MessageManager<SensorType>> sensor_message_manager_;
+  std::unique_ptr<std::thread> thread_;
 
   int64_t last_timestamp_ = 0;
   ros::Timer timer_;
   apollo::common::monitor::Monitor monitor_;
+  std::mutex mutex_;
+  volatile bool data_trigger_running_ = false;
 };
 
 // method implementations
@@ -185,6 +192,13 @@ Status SensorCanbus<SensorType>::Start() {
     const double duration = 1.0 / FLAGS_sensor_freq;
     timer_ = AdapterManager::CreateTimer(
         ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
+  } else {
+    data_trigger_running_ = true;
+    thread_.reset(new std::thread([this] { DataTrigger(); }));
+    if (thread_ == nullptr) {
+      AERROR << "Unable to create data trigger thread.";
+      return OnError("Failed to start data trigger thread.");
+    }
   }
 
   // last step: publish monitor messages
@@ -200,11 +214,34 @@ void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
 }
 
 template <typename SensorType>
+void SensorCanbus<SensorType>::DataTrigger() {
+  std::condition_variable* cvar = sensor_message_manager_->GetMutableCVar();
+  while (data_trigger_running_) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    cvar->wait(lock);
+    // TODO(lizh): this log is for test. Please remove it after onboard test.
+    AINFO << "===== Publish Sensor Data =====";
+    PublishSensorData();
+    sensor_message_manager_->ClearSensorData();
+  }
+}
+
+template <typename SensorType>
 void SensorCanbus<SensorType>::Stop() {
   timer_.stop();
 
   can_receiver_.Stop();
   can_client_->Stop();
+
+  if (data_trigger_running_) {
+    data_trigger_running_ = false;
+    if (thread_ != nullptr && thread_->joinable()) {
+      sensor_message_manager_->GetMutableCVar()->notify_all();
+      thread_->join();
+    }
+    thread_.reset();
+  }
+  AINFO << "Data trigger stopped [ok].";
 }
 
 // Send the error to monitor and return it
