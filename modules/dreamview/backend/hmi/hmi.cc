@@ -39,8 +39,8 @@ using Json = WebSocketHandler::Json;
 
 namespace {
 
-std::string ProtoToTypedJsonString(const std::string &json_type,
-                                   const google::protobuf::Message &proto) {
+std::string ProtoToTypedJson(const std::string &json_type,
+                             const google::protobuf::Message &proto) {
   std::string json_string;
   google::protobuf::util::MessageToJsonString(proto, &json_string);
 
@@ -58,18 +58,11 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
 
   // Register websocket message handlers.
   if (websocket_) {
-    // Newly opened HMI client retrieves current config and status.
-    websocket_->RegisterMessageHandler(
-        "RetrieveHMIConfig",
-        [this](const Json &json, WebSocketHandler::Connection *conn) {
-          CHECK_NOTNULL(websocket_)->SendData(
-              conn, ProtoToTypedJsonString("HMIConfig", config_));
-        });
-    websocket_->RegisterMessageHandler(
-        "RetrieveHMIStatus",
-        [this](const Json &json, WebSocketHandler::Connection *conn) {
-          CHECK_NOTNULL(websocket_)->SendData(
-              conn, ProtoToTypedJsonString("HMIStatus", status_));
+    // Send current config and status to new HMI client.
+    websocket_->RegisterConnectionReadyHandler(
+        [this](WebSocketHandler::Connection *conn) {
+          websocket_->SendData(conn, ProtoToTypedJson("HMIConfig", config_));
+          websocket_->SendData(conn, ProtoToTypedJson("HMIStatus", status_));
         });
 
     // HMI client asks for executing module command.
@@ -153,7 +146,7 @@ void HMI::Start() {
 void HMI::BroadcastHMIStatus() const {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
   if (websocket_) {
-    websocket_->BroadcastData(ProtoToTypedJsonString("HMIStatus", status_));
+    websocket_->BroadcastData(ProtoToTypedJson("HMIStatus", status_));
   }
 }
 

@@ -71,8 +71,8 @@ em_planner_config {
         spline_order: 6
         max_spline_length: 20.0
         time_resolution: 0.1
-        regularization_weight: 0.1
-        first_spline_weight_factor: 10.0
+        regularization_weight: 2.0
+        first_spline_weight_factor: 3.0
         derivative_weight: 100.0
         second_derivative_weight: 10.0
         third_derivative_weight: 10.0
@@ -116,7 +116,7 @@ em_planner_config {
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 1.2
-            low_speed_centric_acceleration_limit: 1.6
+            low_speed_centric_acceleration_limit: 1.4
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
