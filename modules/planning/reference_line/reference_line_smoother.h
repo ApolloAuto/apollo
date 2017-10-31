@@ -38,11 +38,12 @@ namespace planning {
 class ReferenceLineSmoother {
  public:
   ReferenceLineSmoother() = default;
-  bool Init(const std::string& config_file);
-  void Init(const ReferenceLineSmootherConfig& refline_smooth_config);
+  bool Init(const std::string& config_file,
+            Spline2dSolver* const spline_solver);
+  void Init(const ReferenceLineSmootherConfig& refline_smooth_config,
+            Spline2dSolver* const spline_solver);
   bool Smooth(const ReferenceLine& raw_reference_line,
-              ReferenceLine* const smoothed_reference_line,
-              Spline2dSolver* const spline_solver);
+              ReferenceLine* const smoothed_reference_line);
 
  private:
   void Clear();

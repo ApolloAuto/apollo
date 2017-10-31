@@ -295,7 +295,9 @@ bool Frame::CreateReferenceLineFromRouting(
   }
 
   ReferenceLineSmoother smoother;
-  smoother.Init(smoother_config_);
+  std::vector<double> init_t_knots;
+  Spline2dSolver spline_solver(init_t_knots, smoother_config_.spline_order());
+  smoother.Init(smoother_config_, &spline_solver);
 
   SpiralReferenceLineSmoother spiral_smoother;
   double max_spiral_smoother_dev = 0.1;
@@ -312,10 +314,7 @@ bool Frame::CreateReferenceLineFromRouting(
           AERROR << "Failed to smooth reference_line with spiral smoother";
         }
       } else {
-        std::vector<double> init_t_knots;
-        Spline2dSolver spline_solver(init_t_knots, 5);
-        if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line,
-                             &spline_solver)) {
+        if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
           AERROR << "Failed to smooth reference line";
           continue;
         }
