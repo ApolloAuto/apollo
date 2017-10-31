@@ -34,12 +34,11 @@
 namespace apollo {
 namespace planning {
 
-class SpiralReferenceLineSmoother : ReferenceLineSmoother {
+class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  SpiralReferenceLineSmoother() = default;
+  explicit SpiralReferenceLineSmoother(
+      const double max_point_deviation_distance);
   virtual ~SpiralReferenceLineSmoother() = default;
-
-  void Init(const double max_point_deviation_distance) override;
 
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;

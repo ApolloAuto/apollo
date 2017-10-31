@@ -42,10 +42,6 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
       AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
     }
-    QpSplineReferenceLineSmootherConfig config;
-    smoother_.Init(config,
-                   &spline_solver_);  // use the default value in config.
-
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
     const auto& headings = lane_info_ptr->headings();
@@ -64,10 +60,11 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
       "modules/planning/testdata/garage_map/base_map.txt";
 
   hdmap::HDMap hdmap_;
-  QpSplineReferenceLineSmoother smoother_;
   common::math::Vec2d vehicle_position_;
   std::vector<double> t_knots_;
   Spline2dSolver spline_solver_{t_knots_, 5};
+  QpSplineReferenceLineSmootherConfig config_;
+  QpSplineReferenceLineSmoother smoother_{config_, &spline_solver_};
   std::unique_ptr<ReferenceLine> reference_line_;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
 };

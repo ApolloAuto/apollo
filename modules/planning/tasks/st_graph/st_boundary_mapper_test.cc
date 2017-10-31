@@ -72,7 +72,6 @@ class StBoundaryMapperTest : public ::testing::Test {
   const std::string map_file =
       "modules/planning/testdata/garage_map/base_map.txt";
   hdmap::HDMap hdmap_;
-  QpSplineReferenceLineSmoother smoother_;
   common::math::Vec2d vehicle_position_;
   std::unique_ptr<ReferenceLine> reference_line_;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
