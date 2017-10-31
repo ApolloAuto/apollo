@@ -19,8 +19,8 @@
 
 #include "Eigen/Dense"
 
-#include "modules/prediction/evaluator/network/layer.h"
-#include "modules/prediction/evaluator/network/util.h"
+#include "modules/prediction/evaluator/network/layer/layer.h"
+#include "modules/prediction/evaluator/network/layer/util.h"
 #include "modules/prediction/proto/network_model.pb.h"
 
 #ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_NET_MODEL_H_
