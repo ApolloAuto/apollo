@@ -21,6 +21,7 @@
 #ifndef MODULES_MAP_PNC_MAP_PNC_MAP_H_
 #define MODULES_MAP_PNC_MAP_PNC_MAP_H_
 
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -201,6 +202,7 @@ class PncMap {
   common::PointENU current_point_;
   std::vector<int> route_index_;
   common::PointENU passage_start_point_;
+  double min_l_to_lane_center_ = std::numeric_limits<double>::max();
   const hdmap::HDMap *hdmap_ = nullptr;
 };
 
