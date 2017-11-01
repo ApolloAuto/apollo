@@ -98,6 +98,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   const double end_timestamp = Clock::NowInSecond();
   ADEBUG << "Spiral reference line smoother time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
+
   return true;
 }
 
@@ -129,7 +130,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   //  app->Options()->SetNumericValue("constr_viol_tol", 0.01);
   //  app->Options()->SetIntegerValue("acceptable_iter", 10);
   //  app->Options()->SetIntegerValue("print_level", 0);
-  // app->Options()->SetStringValue("fast_step_computation", "yes");
+  //  app->Options()->SetStringValue("fast_step_computation", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {

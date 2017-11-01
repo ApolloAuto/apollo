@@ -24,7 +24,7 @@
 #include <utility>
 
 #include "modules/common/math/math_utils.h"
-#include "modules/planning/math/curve1d/quintic_spiral_path.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -56,6 +56,8 @@ SpiralProblemInterface::SpiralProblemInterface(
         common::math::AngleDiff(relative_theta_.back(), normalized_theta[i]);
     relative_theta_.push_back(relative_theta_.back() + theta_diff);
   }
+
+  piecewise_paths_.resize(num_of_points_ - 1);
 }
 
 void SpiralProblemInterface::get_optimization_results(
@@ -103,7 +105,6 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
   CHECK_EQ(std::size_t(m), num_of_constraints_);
 
   // variables
-  double large_value = 1.0e6;
   // a. for theta, kappa, dkappa, x, y
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     std::size_t index = i * 5;
@@ -113,12 +114,12 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
     x_u[index] = relative_theta_[i] + M_PI * 0.5;
 
     // kappa
-    x_l[index + 1] = -0.3;
-    x_u[index + 1] = 0.3;
+    x_l[index + 1] = -0.25;
+    x_u[index + 1] = 0.25;
 
     // dkappa
-    x_l[index + 2] = -large_value;
-    x_u[index + 2] = large_value;
+    x_l[index + 2] = -0.25;
+    x_u[index + 2] = 0.25;
 
     // x
     x_l[index + 3] = points_[i].x() - max_point_deviation_;
@@ -138,7 +139,7 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // constraints
   // a. positional equality constraints
-  double pos_diff_tolerance = 0.0;
+  double pos_diff_tolerance = FLAGS_spiral_smoother_piecewise_length / 1000.0;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     // for x
     g_l[i * 2] = 0.0;
@@ -186,20 +187,16 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
 bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
                                     double& obj_value) {
   CHECK_EQ(std::size_t(n), num_of_variables_);
+  if (new_x) {
+    update_piecewise_spiral_paths(x, n);
+  }
 
   obj_value = 0.0;
-  std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-    std::size_t index0 = i * 5;
-    std::size_t index1 = (i + 1) * 5;
-
-    std::array<double, 3> x0 = {x[index0], x[index0 + 1], x[index0 + 2]};
-    std::array<double, 3> x1 = {x[index1], x[index1 + 1], x[index1 + 2]};
-    double delta_s = x[variable_offset + i];
-
-    QuinticSpiralPath spiral_curve(x0, x1, delta_s);
-
+    const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
+    double delta_s = spiral_curve.param_length();
     double s_segment = delta_s / num_of_internal_points_;
+
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
       double dkappa = spiral_curve.Evaluate(2, s_segment * j);
       obj_value += dkappa * dkappa;
@@ -213,16 +210,17 @@ bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
   CHECK_EQ(std::size_t(n), num_of_variables_);
   std::fill(grad_f, grad_f + n, 0.0);
 
+  if (new_x) {
+    update_piecewise_spiral_paths(x, n);
+  }
+
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     std::size_t index0 = i * 5;
     std::size_t index1 = (i + 1) * 5;
 
-    std::array<double, 3> x0 = {x[index0], x[index0 + 1], x[index0 + 2]};
-    std::array<double, 3> x1 = {x[index1], x[index1 + 1], x[index1 + 2]};
-    double delta_s = x[variable_offset + i];
-    QuinticSpiralPath spiral_curve(x0, x1, delta_s);
-
+    const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
+    double delta_s = spiral_curve.param_length();
     double s_segment = delta_s / num_of_internal_points_;
 
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
@@ -262,16 +260,17 @@ bool SpiralProblemInterface::eval_g(int n, const double* x, bool new_x, int m,
   CHECK_EQ(std::size_t(n), num_of_variables_);
   CHECK_EQ(std::size_t(m), num_of_constraints_);
 
-  std::size_t variable_offset = num_of_points_ * 5;
+  if (new_x) {
+    update_piecewise_spiral_paths(x, n);
+  }
+
   // first, fill in the positional equality constraints
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     std::size_t index0 = i * 5;
     std::size_t index1 = (i + 1) * 5;
 
-    std::array<double, 3> x0 = {x[index0], x[index0 + 1], x[index0 + 2]};
-    std::array<double, 3> x1 = {x[index1], x[index1 + 1], x[index1 + 2]};
-    double delta_s = x[variable_offset + i];
-    QuinticSpiralPath spiral_curve(x0, x1, delta_s);
+    const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
+    double delta_s = spiral_curve.param_length();
 
     double x_diff = x[index1 + 3] - x[index0 + 3] -
                     spiral_curve.ComputeCartesianDeviationX<N>(delta_s);
@@ -414,19 +413,21 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
 
     CHECK_EQ(nz_index, nnz_jac_g_);
   } else {
+    if (new_x) {
+      update_piecewise_spiral_paths(x, n);
+    }
+
     std::fill(values, values + nnz_jac_g_, 0.0);
     // first, positional equality constraints
     std::size_t nz_index = 0;
 
-    std::size_t variable_offset = num_of_points_ * 5;
     for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
       std::size_t index0 = i * 5;
       std::size_t index1 = (i + 1) * 5;
-      std::array<double, 3> x0 = {x[index0 + 0], x[index0 + 1], x[index0 + 2]};
-      std::array<double, 3> x1 = {x[index1 + 0], x[index1 + 1], x[index1 + 2]};
-      double delta_s = x[variable_offset + i];
 
-      QuinticSpiralPath spiral_curve(x0, x1, delta_s);
+      const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
+      double delta_s = spiral_curve.param_length();
+
       double x_diff = x[index1 + 3] - x[index0 + 3] -
                       spiral_curve.ComputeCartesianDeviationX<N>(delta_s);
       double y_diff = x[index1 + 4] - x[index0 + 4] -
@@ -679,6 +680,20 @@ void SpiralProblemInterface::finalize_solution(
 void SpiralProblemInterface::set_max_point_deviation(
     const double max_point_deviation) {
   max_point_deviation_ = max_point_deviation;
+}
+
+void SpiralProblemInterface::update_piecewise_spiral_paths(
+    const double* x, const int n) {
+  std::size_t variable_offset = num_of_points_ * 5;
+  for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
+    std::size_t index0 = i * 5;
+    std::size_t index1 = (i + 1) * 5;
+
+    std::array<double, 3> x0 = {x[index0], x[index0 + 1], x[index0 + 2]};
+    std::array<double, 3> x1 = {x[index1], x[index1 + 1], x[index1 + 2]};
+    double delta_s = x[variable_offset + i];
+    piecewise_paths_[i] = std::move(QuinticSpiralPath(x0, x1, delta_s));
+  }
 }
 
 }  // namespace planning
