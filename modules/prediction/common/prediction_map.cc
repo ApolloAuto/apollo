@@ -34,10 +34,10 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::hdmap::LaneInfo;
-using apollo::hdmap::Id;
-using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::Id;
+using apollo::hdmap::LaneInfo;
+using apollo::hdmap::MapPathPoint;
 
 PredictionMap::PredictionMap() {}
 
