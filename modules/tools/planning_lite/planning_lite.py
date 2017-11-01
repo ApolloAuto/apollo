@@ -112,7 +112,7 @@ def mobileye_callback(mobileye_pb):
     nx, ny = x, y#get_path(x, y, path_length)
 
     adc_trajectory = planning_pb2.ADCTrajectory()
-    adc_trajectory.header.timestamp_sec = rospy.get_rostime().secs
+    adc_trajectory.header.timestamp_sec = rospy.Time.now().to_sec()
     adc_trajectory.header.module_name = "planning"
     adc_trajectory.gear = chassis_pb2.Chassis.GEAR_DRIVE
     adc_trajectory.latency_stats.total_time_ms = (time.time() - start_timestamp) * 1000
@@ -121,8 +121,8 @@ def mobileye_callback(mobileye_pb):
 
     for i in range(len(nx)):
         traj_point = adc_trajectory.trajectory_point.add()
-        traj_point.path_point.x = nx[i]
-        traj_point.path_point.y = ny[i]
+        traj_point.path_point.x = ny[i]
+        traj_point.path_point.y = -nx[i]
         if i > 0:
             dist =  euclidean_distance((nx[i], ny[i]), (nx[i-1], ny[i-1]))
             s += dist

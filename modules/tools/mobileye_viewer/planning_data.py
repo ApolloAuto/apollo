@@ -42,8 +42,8 @@ class PlanningData:
         path_x = []
         path_y = []
         for point in self.planning_pb.trajectory_point:
-            path_x.append(point.path_point.x)
-            path_y.append(point.path_point.y)
+            path_x.append(-1 * point.path_point.y)
+            path_y.append(point.path_point.x)
         self.path_lock.acquire()
         self.path_x = path_x
         self.path_y = path_y
