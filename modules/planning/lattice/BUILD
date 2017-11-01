@@ -169,6 +169,24 @@ cc_library(
 )
 
 cc_library(
+    name = "adc_neighborhood",
+    hdrs = [
+        "adc_neighborhood.h",
+    ],
+    srcs = [
+        "adc_neighborhood.cc",
+    ],
+    deps = [
+        "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/reference_line:reference_line",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:obstacle",
+        "@glog//:glog",
+    ],
+)
+
+cc_library(
     name = "lattice_util",
     hdrs = [
         "lattice_util.h",
@@ -179,7 +197,6 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/reference_line:reference_line",
-
     ],
 )
 
