@@ -334,6 +334,81 @@ body {
     background-color: rgba(74, 5, 24, 0.3);
 }
 
+.menu-bar {
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 50;
+
+    font-size: 14px;
+    color: #ffffff;
+    text-align: left;
+    background: #000000;
+
+    display: flex;
+
+    /* The Apollo logo on the status bar. */
+    .apollo-logo {
+        top: 15px;
+        left: 23px;
+        height: 24px;
+        width: 73px;
+
+        flex: 0 0 auto;
+        margin-top: 15px;
+        margin-left: 10px;
+        margin-right: auto;
+    }
+
+    .selector {
+        position: relative;
+        border: 1px solid #383838;
+        margin: 10px;
+
+        flex: 0 0 auto;
+
+        select {
+            display: block;
+            padding: 0.5em 3em 0.5em 0.5em;
+            border: none;
+
+            background: #000000;
+            color: #ffffff;
+
+            outline: none;
+            cursor: pointer;
+
+            /* remove default arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 30px;
+            height: 100%;
+
+            background: #181818;
+            border-left: 1px solid #383838;
+            pointer-events: none;
+        }
+        .arrow:before {
+            content: '';
+            position: absolute;
+            top: 55%;
+            right: 7px;
+            margin-top: -5px;
+            pointer-events: none;
+            border-top: 8px solid #666666;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+        }
+    }
+}
+
 .status-bar {
     position: relative;
     top: 0;
