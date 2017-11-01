@@ -18,12 +18,18 @@
 
 #include <utility>
 #include <vector>
+#include <cmath>
+#include <memory>
+#include <string>
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::hdmap::LaneInfo;
 
 RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
 
@@ -190,14 +196,59 @@ int RNNEvaluator::SetupObstacleFeature(
 int RNNEvaluator::SetupLaneFeature(const Feature& feature,
                                    const LaneSequence& lane_sequence,
                                    std::vector<float>* const feature_values) {
-  // TODO(all) implement
+  feature_values->clear();
+  feature_values->reserve(
+      dim_lane_point_feature_ * length_lane_point_sequence_);
+  LanePoint* p_lane_point = nullptr;
+  int counter = 0;
+  for (int seg_i = 0; seg_i < lane_sequence.lane_segment_size(); ++seg_i) {
+    if (counter > length_lane_point_sequence_) {
+      break;
+    }
+    LaneSegment lane_seg = lane_sequence.lane_segment(seg_i);
+    for (int pt_i = 0; pt_i < lane_seg.lane_point_size(); ++pt_i) {
+      p_lane_point = lane_seg.mutable_lane_point(pt_i);
+      if (p_lane_point->has_relative_s() && p_lane_point->relative_s() < 5) {
+        continue;
+      }
+      if (!feature.has_position() || !p_lane_point->has_position()) {
+        ADEBUG << "Feature or lane_point has no position!";
+        continue;
+      }
+      float diff_x = p_lane_point->position().x() - feature.position().x();
+      float diff_y = p_lane_point->position().y() - feature.position().y();
+      float angle = std::atan2(diff_y, diff_x);
+      feature_values->push_back(p_lane_point->heading());
+      feature_values->push_back(p_lane_point->angle_diff());
+      feature_values->push_back(
+          p_lane_point->relative_l() - feature.lane().lane_feature().lane_l());
+      feature_values->push_back(angle);
+      ++counter;
+      if (counter > length_lane_point_sequence_) {
+        ADEBUG << "Full the lane point sequence";
+        break;
+      }
+    }
+  }
+  ADEBUG << "Lane sequence feature size: " << counter;
+  if (counter < dim_lane_point_feature_) {
+    ADEBUG << "Fail to setup lane feature!";
+    return -1;
+  }
   return 0;
 }
 
-bool RNNEvaluator::IsCutinInHistory(const std::string& lane_id,
-                                    const std::string& lane_id_pre) {
-  // TODO(all) implement
-  return true;
+bool RNNEvaluator::IsCutinInHistory(const std::string& curr_lane_id,
+                                    const std::string& prev_lane_id) {
+  PredictionMap* p_map = PredictionMap::instance();
+  std::shared_ptr<const LaneInfo> curr_lane_info =
+      p_map->LaneById(curr_lane_id);
+  std::shared_ptr<const LaneInfo> prev_lane_info =
+      p_map->LaneById(prev_lane_id);
+  if (!p_map->IsSuccessorLane(curr_lane_info, prev_lane_info)) {
+    return true;
+  }
+  return false;
 }
 
 }  // namespace prediction
