@@ -40,6 +40,8 @@ class Decider {
 
  private:
   int MakeMainStopDecision(const ReferenceLineInfo &reference_line_info);
+  void MakeMainMissionCompleteDecision(
+      const ReferenceLineInfo &reference_line_info);
   void MakeEStopDecision(const PathDecision &path_decision);
   void SetObjectDecisions(const PathDecision &path_decision);
 

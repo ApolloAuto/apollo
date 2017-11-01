@@ -28,11 +28,10 @@
 #include <vector>
 
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 /**
@@ -55,9 +54,11 @@ class ReferenceLineProvider {
   ~ReferenceLineProvider();
 
   void Init(const hdmap::HDMap* hdmap_,
-            const ReferenceLineSmootherConfig& smoother_config);
+            const QpSplineReferenceLineSmootherConfig& smoother_config);
 
   void UpdateRoutingResponse(const routing::RoutingResponse& routing);
+
+  bool UpdateVehicleStatus(const common::PointENU& position, double speed);
 
   bool Start();
 
@@ -71,7 +72,7 @@ class ReferenceLineProvider {
  private:
   void Generate();
   void IsValidReferenceLine();
-  bool CreateReferenceLineFromRouting(const common::PointENU& position);
+  bool CreateReferenceLineFromRouting();
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -81,10 +82,11 @@ class ReferenceLineProvider {
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
+  double vehicle_speed_ = 0.0;
 
   bool has_routing_ = false;
 
-  ReferenceLineSmootherConfig smoother_config_;
+  QpSplineReferenceLineSmootherConfig smoother_config_;
 
   bool is_stop_ = false;
 

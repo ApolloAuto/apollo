@@ -35,13 +35,11 @@ class HMI {
  public:
   explicit HMI(WebSocketHandler *websocket);
 
-  void Start();
-
  private:
-  // Callback of new HMIStatus message.
-  void OnHMIStatus(const HMIStatus &hmi_status);
   // Broadcast HMIStatus to all clients.
   void BroadcastHMIStatus() const;
+
+  void RegisterMessageHandlers();
 
   static int ExecuteComponentCommand(
       const google::protobuf::Map<std::string, Component> &components,
@@ -58,7 +56,6 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
 
-  FRIEND_TEST(HMITest, UpdateHMIStatus);
   FRIEND_TEST(HMITest, ExecuteComponentCommand);
 };
 

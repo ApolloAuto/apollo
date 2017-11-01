@@ -2,33 +2,25 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_inc_library(
-    name = "hw_checker",
-    hdrs = [
-        "hw_checker.h",
-        "annotations.h",
-    ],
+cc_library(
+    name = "recurrent_runner",
+    srcs = ["recurrent_runner.cc"],
+    hdrs = ["recurrent_runner.h"],
     deps = [
-        "//modules/monitor/proto:hardware_status_proto",
-    ]
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/monitor/proto:system_status_proto",
+    ],
 )
 
 cc_library(
-    name = "can_checker_factory",
-    srcs = ["can_checker_factory.cc"],
-    hdrs = ["can_checker_factory.h"],
+    name = "monitor",
+    srcs = ["monitor.cc"],
+    hdrs = ["monitor.h"],
     deps = [
-        "//modules/common:macro",
-        "//modules/common/util:factory",
-        "//modules/drivers/canbus/proto:canbus_proto",
-        "//modules/monitor/common:hw_checker",
-        "//modules/monitor/hwmonitor/hw/socketcan:socketcan_checker_lib",
-      ] + select({
-            "//tools/platforms:use_esd_can": [
-                "//modules/monitor/hwmonitor/hw/esdcan:esdcan_checker_lib",
-            ],
-            "//conditions:default": [],
-        }),
+        ":recurrent_runner",
+        "//modules/monitor/proto:system_status_proto",
+    ],
 )
 
 cpplint()

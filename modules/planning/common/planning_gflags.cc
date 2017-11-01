@@ -104,6 +104,8 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
 
+DEFINE_double(dl_bound, 0.10,
+              "The bound for derivative l in s-l coordinate system.");
 DEFINE_double(kappa_bound, 0.20, "The bound for vehicle curvature");
 DEFINE_double(dkappa_bound, 0.02,
               "The bound for vehicle curvature change rate");
@@ -125,6 +127,9 @@ DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 3.0,
               "stop distance from destination line");
+DEFINE_double(destination_check_distance, 5.0,
+              "if the distance between destination and ADC is less than this,"
+              " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 10,

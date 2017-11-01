@@ -31,6 +31,7 @@ class InfoCollector {
   // Get task information, which doesn't contain TaskData.
   static Task GetTaskInfo();
 
+  // Listening topics: ChassisDetail.
   static VehicleInfo GetVehicleInfo();
   static EnvironmentInfo GetEnvironmentInfo();
   static HardwareInfo GetHardwareInfo();

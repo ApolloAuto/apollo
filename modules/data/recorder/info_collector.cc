@@ -16,6 +16,9 @@
 
 #include "modules/data/recorder/info_collector.h"
 
+#include "modules/canbus/common/canbus_gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
+
 namespace apollo {
 namespace data {
 
@@ -29,12 +32,22 @@ Task InfoCollector::GetTaskInfo() {
   return task;
 }
 
-// TODO(xiaoxq): Implement the info getters.
 VehicleInfo InfoCollector::GetVehicleInfo() {
   VehicleInfo vehicle;
+  static auto *chassis_detail = CHECK_NOTNULL(
+      apollo::common::adapter::AdapterManager::GetChassisDetail());
+  if (!chassis_detail->Empty()) {
+    *vehicle.mutable_license() = chassis_detail->GetLatestObserved().license();
+  }
+
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_canbus_conf_file, vehicle.mutable_canbus_conf()));
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_vehicle_config_path, vehicle.mutable_vehicle_config()));
   return vehicle;
 }
 
+// TODO(xiaoxq): Implement the info getters.
 EnvironmentInfo InfoCollector::GetEnvironmentInfo() {
   EnvironmentInfo environment;
   return environment;

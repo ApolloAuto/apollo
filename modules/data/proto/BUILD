@@ -10,5 +10,6 @@ proto_library(
     srcs = ["task.proto"],
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/configs/proto:vehicle_config_proto_lib",
     ]
 )

@@ -128,13 +128,12 @@ bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
     double lane_s = 0.0;
     double lane_l = 0.0;
     if (!iter->lane->GetProjection(point, &lane_s, &lane_l)) {
-      ADEBUG << "Failed to get projection from point " << point.DebugString()
+      AERROR << "Failed to get projection from point " << point.DebugString()
              << " on lane " << iter->lane->id().id();
       return false;
     }
     if (lane_s < iter->start_s - kSegmentationEpsilon ||
         lane_s > iter->end_s + kSegmentationEpsilon) {
-      ADEBUG << "point " << point.DebugString() << " not in range";
       continue;
     }
     if (std::fabs(lane_l) < std::fabs(*l)) {
@@ -264,9 +263,18 @@ bool PncMap::UpdatePosition(const common::PointENU &point) {
   if (route_index_.size() != 3 || route_index_[0] != current_route_index[0] ||
       route_index_[1] != current_route_index[1]) {  //  different passage
     passage_start_point_ = point;
+    min_l_to_lane_center_ = std::numeric_limits<double>::max();
   }
   current_point_ = point;
   route_index_ = current_route_index;
+  double s = 0.0;
+  double l = 0.0;
+  if (!current_waypoint_.lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+    AERROR << "Failed to project poin " << point.ShortDebugString()
+           << " onto lane " << current_waypoint_.lane->id().id();
+    return false;
+  }
+  min_l_to_lane_center_ = std::min(min_l_to_lane_center_, std::fabs(l));
   return true;
 }
 
@@ -275,7 +283,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       routing_.header().sequence_num() == routing.header().sequence_num() &&
       (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
-    ADEBUG << "Same prouting, skip update routing";
+    ADEBUG << "Same routing, skip update routing";
     return false;
   }
   if (!ValidateRouting(routing)) {
@@ -403,6 +411,8 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
 bool PncMap::GetRouteSegments(
     const double backward_length, const double forward_length,
     std::vector<RouteSegments> *const route_segments) const {
+  // vehicle has to be this close to lane center before considering change lane
+  constexpr double kMaxDistanceToLaneCenter = 0.5;
   if (!current_waypoint_.lane || route_index_.size() != 3 ||
       route_index_[0] < 0) {
     AERROR << "Invalid position, use UpdatePosition() function first";
@@ -411,6 +421,11 @@ bool PncMap::GetRouteSegments(
   const int road_index = route_index_[0];
   const int passage_index = route_index_[1];
   const auto &road = routing_.road(road_index);
+  const double dist_on_passage =
+      common::util::DistanceXY(current_point_, passage_start_point_);
+  const bool allow_change_lane =
+      (min_l_to_lane_center_ < kMaxDistanceToLaneCenter) &&
+      (dist_on_passage > FLAGS_min_length_for_lane_change);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
   for (const int index : drive_passages) {
@@ -430,18 +445,16 @@ bool PncMap::GetRouteSegments(
     LaneWaypoint segment_waypoint;
     if (!segments.GetProjection(nearest_point, &s, &l, &segment_waypoint)) {
       ADEBUG << "Failed to get projection from point: "
-             << nearest_point.DebugString();
+             << nearest_point.ShortDebugString();
       continue;
     }
-    if (index != passage_index) {  // the change lane case
+    if (index != passage_index) {
+      if (!allow_change_lane) {
+        continue;
+      }
       if (!segments.CanDriveFrom(current_waypoint_)) {
         ADEBUG << "You cannot drive from current waypoint to passage: "
                << index;
-        continue;
-      }
-      const double dist_on_passage =
-          common::util::DistanceXY(current_point_, passage_start_point_);
-      if (dist_on_passage < FLAGS_min_length_for_lane_change) {
         continue;
       }
     }

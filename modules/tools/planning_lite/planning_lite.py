@@ -29,6 +29,8 @@ from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 
 planning_pub = None
+PUB_NODE_NAME = "planning"
+PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
 f = open("benchmark.txt","w")
 SPEED = 0 #m/s
 CRUISE_SPEED = 10 #m/s
@@ -61,13 +63,20 @@ def get_central_line(mobileye_pb, path_length):
     return ref_lane_x, ref_lane_y
 
 def get_path(x, y, path_length):
-    ind = int(math.floor((x[0] * 3.0) / 1) + 1)
+    ind = int(math.floor((abs(x[0]) * 100.0) / 1) + 1)
     newx = [0]
     newy = [0]
-    for i in range(len(y)-ind):
-        newx.append(x[i+ind])
-        newy.append(y[i+ind])
-    coefs = poly.polyfit(newy, newx, 4) #x = f(y)
+    w = [1000]
+    if len(y)-ind > 0:
+        for i in range(len(y)-ind):
+            newx.append(x[i+ind])
+            newy.append(y[i+ind])
+            w.append(w[-1]-10)
+    else:
+        newx.append(x[-1])
+        newy.append(y[-1])
+        w.append(w[-1]-10)
+    coefs = poly.polyfit(newy, newx, 4, w=w) #x = f(y)
     nx = poly.polyval(y, coefs)
     return nx, y
 
@@ -84,6 +93,15 @@ def chassis_callback(chassis_pb):
     global SPEED
     SPEED = chassis_pb.speed_mps
 
+def euclidean_distance(point1, point2):
+    sum = (point1[0] - point2[0]) * (point1[0] - point2[0])
+    sum += (point1[1] - point2[1]) * (point1[1] - point2[1])
+    return math.sqrt(sum)
+
+def get_theta(point, point_base):
+    #print point
+    return math.atan2(point[1] - point_base[1], point[0] - point_base[0]) - math.atan2(1, 0)
+
 def mobileye_callback(mobileye_pb):
     global x, y, nx ,ny
     start_timestamp = time.time()
@@ -91,28 +109,38 @@ def mobileye_callback(mobileye_pb):
     if path_length < SPEED * 2:
         path_length = math.ceil(SPEED * 2)
     x, y = get_central_line(mobileye_pb, path_length)
-    nx, ny = get_path(x, y, path_length)
+    nx, ny = x, y#get_path(x, y, path_length)
 
     adc_trajectory = planning_pb2.ADCTrajectory()
     adc_trajectory.header.timestamp_sec = rospy.get_rostime().secs
     adc_trajectory.header.module_name = "planning"
     adc_trajectory.gear = chassis_pb2.Chassis.GEAR_DRIVE
     adc_trajectory.latency_stats.total_time_ms = (time.time() - start_timestamp) * 1000
+    s = 0
+    relative_time = 0
+
     for i in range(len(nx)):
         traj_point = adc_trajectory.trajectory_point.add()
         traj_point.path_point.x = nx[i]
         traj_point.path_point.y = ny[i]
-        traj_point.path_point.theta = 0 ## TODO
-        traj_point.path_point.s = 0 ##TODO
-        traj_point.v = 0 #TODO
-        traj_point.relative_time = 0#TODO
+        if i > 0:
+            dist =  euclidean_distance((nx[i], ny[i]), (nx[i-1], ny[i-1]))
+            s += dist
+            relative_time += dist / CRUISE_SPEED
+
+        traj_point.path_point.theta = get_theta((nx[i], ny[i]), (nx[0], ny[0]))
+        if i == 0:
+            traj_point.path_point.theta = 0
+        traj_point.path_point.s = s
+        traj_point.v = CRUISE_SPEED
+        traj_point.relative_time = relative_time
 
     planning_pub.publish(adc_trajectory)
     f.write("duration: " + str(time.time() - start_timestamp) + "\n")
 
 def add_listener():
     global planning_pub
-    rospy.init_node('planning_lite', anonymous=True)
+    rospy.init_node(PUB_NODE_NAME, anonymous=True)
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
@@ -124,7 +152,7 @@ def add_listener():
                      chassis_callback)
 
     planning_pub = rospy.Publisher(
-        '/apollo/planning_lite', planning_pb2.ADCTrajectory, queue_size=1)
+        PUB_TOPIC, planning_pb2.ADCTrajectory, queue_size=1)
 
 
 def update(frame_number):
@@ -146,6 +174,9 @@ if __name__ == '__main__':
         line1, = ax.plot([-10, 10, -10, 10], [-10, 150, 150, -10])
         line2, = ax.plot([0], [0])
         ani = animation.FuncAnimation(fig, update, interval=100)
+        ax.axvline(x=0.0, alpha=0.3)
+        ax.axhline(y=0.0, alpha=0.3)
+
         plt.show()
     else:
         rospy.spin()

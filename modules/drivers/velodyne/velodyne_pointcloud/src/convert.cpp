@@ -28,47 +28,46 @@ namespace velodyne {
 // void connected(const ros::SingleSubscriberPublisher&) {}
 
 void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
-  private_nh.param("max_range", _config.max_range, 130.0);
-  private_nh.param("min_range", _config.min_range, 0.9);
-  private_nh.param("view_direction", _config.view_direction, 0.0);
-  private_nh.param("view_width", _config.view_width, 2.0 * M_PI);
-  private_nh.param("model", _config.model, std::string("64E_S2"));
-  private_nh.param("calibration_online", _config.calibration_online, true);
-  private_nh.param("calibration", _config.calibration_file, std::string(""));
-  private_nh.param("organized", _config.organized, false);
-  private_nh.param("topic_packets", _topic_packets, TOPIC_PACKTES);
-  private_nh.param("topic_pointcloud", _topic_pointcloud, TOPIC_POINTCLOUD);
+  private_nh.param("max_range", config_.max_range, 130.0);
+  private_nh.param("min_range", config_.min_range, 0.9);
+  private_nh.param("view_direction", config_.view_direction, 0.0);
+  private_nh.param("view_width", config_.view_width, 2.0 * M_PI);
+  private_nh.param("model", config_.model, std::string("64E_S2"));
+  private_nh.param("calibration_online", config_.calibration_online, true);
+  private_nh.param("calibration", config_.calibration_file, std::string(""));
+  private_nh.param("organized", config_.organized, false);
+  private_nh.param("topic_packets", topic_packets_, TOPIC_PACKTES);
+  private_nh.param("topic_pointcloud", topic_pointcloud_, TOPIC_POINTCLOUD);
   // we use beijing time by default
-  private_nh.param("time_zone", _config.time_zone, 8);
-  private_nh.param("queue_size", _queue_size, 10);
+  private_nh.param("queue_size", queue_size_, 10);
 
-  _parser = VelodyneParserFactory::create_parser(_config);
-  if (_parser == nullptr) {
+  parser_ = VelodyneParserFactory::create_parser(config_);
+  if (parser_ == nullptr) {
     ROS_BREAK();
   }
-  _parser->setup();
+  parser_->setup();
   // Emphasis no header available in published msg, which enables us to
   // customize header.seq.
   // Learn from
   // http://answers.ros.org/question/55126/why-does-ros-overwrite-my-sequence-number/
   // ros::AdvertiseOptions opt =
   //     ros::AdvertiseOptions::create<sensor_msgs::PointCloud2>(
-  //         _topic_pointcloud, _queue_size, &connected, &disconnected,
+  //         topic_pointcloud_, queue_size_, &connected, &disconnected,
   //         ros::VoidPtr(), NULL);
   // opt.has_header = false;
-  // _velodyne_points_output = node.advertise(opt);
-  _pointcloud_pub =
-      node.advertise<sensor_msgs::PointCloud2>(_topic_pointcloud, _queue_size);
+  // velodyne_points_output_ = node.advertise(opt);
+  pointcloud_pub_ =
+      node.advertise<sensor_msgs::PointCloud2>(topic_pointcloud_, queue_size_);
 
   // subscribe to VelodyneScan packets
-  _velodyne_scan = node.subscribe(
-      _topic_packets, _queue_size, &Convert::convert_packets_to_pointcloud,
+  velodyne_scan_ = node.subscribe(
+      topic_packets_, queue_size_, &Convert::convert_packets_to_pointcloud,
       (Convert*)this, ros::TransportHints().tcpNoDelay(true));
 }
 
 Convert::~Convert() {
-  if (_parser != nullptr) {
-    delete _parser;
+  if (parser_ != nullptr) {
+    delete parser_;
   }
 }
 
@@ -81,19 +80,19 @@ void Convert::convert_packets_to_pointcloud(
   ROS_DEBUG_STREAM(scan_msg->header.seq);
 
   VPointCloud::Ptr pointcloud(new VPointCloud());
-  _parser->generate_pointcloud(scan_msg, pointcloud);
+  parser_->generate_pointcloud(scan_msg, pointcloud);
 
   if (pointcloud->empty()) {
     return;
   }
 
-  if (_config.organized) {
+  if (config_.organized) {
     ROS_DEBUG_STREAM("reorder point cloud");
-    _parser->order(pointcloud);
+    parser_->order(pointcloud);
   }
 
   // publish the accumulated cloud message
-  _pointcloud_pub.publish(pointcloud);
+  pointcloud_pub_.publish(pointcloud);
 }
 
 }  // namespace velodyne

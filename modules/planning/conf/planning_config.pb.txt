@@ -68,19 +68,20 @@ em_planner_config {
         }
     }
     qp_spline_path_config {
-        spline_order: 6
+        spline_order: 5
         max_spline_length: 20.0
         time_resolution: 0.1
-        regularization_weight: 0.1
-        first_spline_weight_factor: 10.0
-        derivative_weight: 100.0
-        second_derivative_weight: 10.0
+        regularization_weight: 1.0
+        first_spline_weight_factor: 0.2
+        derivative_weight: 500.0
+        second_derivative_weight: 1000.0
         third_derivative_weight: 10.0
         reference_line_weight: 0.0
         num_output: 100
         cross_lane_lateral_extension: 1.2
         cross_lane_longitudinal_extension: 100.0
-        history_path_weight: 0.0;
+        history_path_weight: 0.0
+        lane_change_mid_l: 0.8
     }
     qp_st_speed_config {
         total_path_length: 250.0
@@ -116,7 +117,7 @@ em_planner_config {
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 1.2
-            low_speed_centric_acceleration_limit: 1.6
+            low_speed_centric_acceleration_limit: 1.4
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
@@ -127,7 +128,7 @@ em_planner_config {
     }
 }
 
-reference_line_smoother_config {
+qp_spline_reference_line_smoother_config {
     spline_order: 6
     constraint_to_knots_ratio: 5
     max_spline_length: 25.0

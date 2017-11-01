@@ -67,6 +67,7 @@ DECLARE_double(lateral_jerk_bound);
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
 
+DECLARE_double(dl_bound);
 DECLARE_double(kappa_bound);
 DECLARE_double(dkappa_bound);
 
@@ -81,6 +82,7 @@ DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(stop_distance_obstacle);
 DECLARE_double(stop_distance_destination);
+DECLARE_double(destination_check_distance);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
 DECLARE_double(follow_time_buffer);

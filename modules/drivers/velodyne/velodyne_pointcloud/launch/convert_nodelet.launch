@@ -9,7 +9,6 @@
   <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
   <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   <arg name="node_name" default="convert_nodelet"/>
-  <arg name="time_zone" default="8"/>
 
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
         args="load velodyne_pointcloud/ConvertNodelet velodyne_nodelet_manager" output="screen">
@@ -21,6 +20,5 @@
     <param name="organized" value="$(arg organized)"/>
     <param name="topic_pointcloud" value="$(arg topic_pointcloud)"/>
     <param name="topic_packets" value="$(arg topic_packets)"/>
-    <param name="time_zone" value="$(arg time_zone)"/>
   </node>
 </launch>

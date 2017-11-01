@@ -26,14 +26,21 @@ from mobileye_data import MobileyeData
 from localization_data import LocalizationData
 from planning_data import PlanningData
 from view_subplot import ViewSubplot
+from subplot_s_speed import SubplotSSpeed
+from subplot_s_theta import SubplotSTheta
+from subplot_s_time import SubplotSTime
 from modules.localization.proto import localization_pb2
 
+PLANNING_TOPIC = '/apollo/planning'
 mobileye = MobileyeData()
 localization = LocalizationData()
 planning = PlanningData()
 
 def update(frame_number):
     view_subplot.show(mobileye, localization, planning)
+    s_speed_subplot.show(planning)
+    s_theta_subplot.show(planning)
+    s_time_subplot.show(planning)
 
 def localization_callback(localization_pb):
     localization.update(localization_pb)
@@ -44,6 +51,7 @@ def mobileye_callback(mobileye_pb):
     #mobileye.compute_next_lanes()
     mobileye.compute_obstacles()
     planning.compute_path()
+    planning.compute_path_param()
 
 def planning_callback(planning_pb):
     planning.update(planning_pb)
@@ -53,7 +61,7 @@ def add_listener():
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
-    rospy.Subscriber('/apollo/planning_lite',
+    rospy.Subscriber(PLANNING_TOPIC,
                      planning_pb2.ADCTrajectory,
                      planning_callback)
     rospy.Subscriber('/apollo/localization/pose',
@@ -66,13 +74,23 @@ if __name__ == '__main__':
     add_listener()
     fig = plt.figure()
 
-    ax = plt.subplot2grid((1, 2), (0, 0), rowspan=1, colspan=1)
-
+    ax = plt.subplot2grid((3, 2), (0, 0), rowspan=3, colspan=1)
     view_subplot = ViewSubplot(ax)
+
+    ax1 = plt.subplot2grid((3, 2), (0, 1), rowspan=1, colspan=1)
+    s_speed_subplot = SubplotSSpeed(ax1)
+
+    ax2 = plt.subplot2grid((3, 2), (1, 1), rowspan=1, colspan=1)
+    s_theta_subplot = SubplotSTheta(ax2)
+
+    ax3 = plt.subplot2grid((3, 2), (2, 1), rowspan=1, colspan=1)
+    s_time_subplot = SubplotSTime(ax3)
 
     ani = animation.FuncAnimation(fig, update, interval=100)
 
     #ax.axis('equal')
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
+    ax2.axvline(x=0.0, alpha=0.3)
+    ax2.axhline(y=0.0, alpha=0.3)
     plt.show()
