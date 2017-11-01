@@ -36,12 +36,12 @@
 namespace apollo {
 namespace control {
 
-using common::TrajectoryPoint;
 using common::Point3D;
+using common::TrajectoryPoint;
 using common::VehicleState;
 using Matrix = Eigen::MatrixXd;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 namespace {
 
@@ -398,8 +398,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
       VehicleState::instance()->heading() - traj_point.path_point().theta()));
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
@@ -433,15 +432,21 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
-  const auto &com = VehicleState::instance()->ComputeCOMPosition(lr_);
-  ComputeLateralErrors(com.x(), com.y(), VehicleState::instance()->heading(),
-                       VehicleState::instance()->linear_velocity(),
-                       VehicleState::instance()->angular_velocity(),
-                       trajectory_analyzer_, debug);
+  if (FLAGS_use_relative_position) {
+    ComputeLateralErrors(0.0, 0.0, VehicleState::instance()->heading(),
+                         VehicleState::instance()->linear_velocity(),
+                         VehicleState::instance()->angular_velocity(),
+                         trajectory_analyzer_, debug);
+  } else {
+    const auto &com = VehicleState::instance()->ComputeCOMPosition(lr_);
+    ComputeLateralErrors(com.x(), com.y(), VehicleState::instance()->heading(),
+                         VehicleState::instance()->linear_velocity(),
+                         VehicleState::instance()->angular_velocity(),
+                         trajectory_analyzer_, debug);
+  }
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
@@ -542,6 +547,10 @@ void LatController::ComputeLateralErrors(
 
   double dx = x - matched_point.path_point().x();
   double dy = y - matched_point.path_point().y();
+
+  ADEBUG << "x point: " << x << " y point: " << y;
+  ADEBUG << "math point x: " << matched_point.path_point().x()
+         << " y point: " << matched_point.path_point().y();
 
   double cos_matched_theta = std::cos(matched_point.path_point().theta());
   double sin_matched_theta = std::sin(matched_point.path_point().theta());
