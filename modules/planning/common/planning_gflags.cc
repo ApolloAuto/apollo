@@ -127,6 +127,9 @@ DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 3.0,
               "stop distance from destination line");
+DEFINE_double(destination_check_distance, 5.0,
+              "if the distance between destination and ADC is less than this,"
+              " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 10,
