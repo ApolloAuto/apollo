@@ -20,6 +20,7 @@
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_generator.h"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -235,7 +236,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
-  uint32_t constraint_num = 3 * number_of_spline + 1;
+  uint32_t constraint_num = 2 * number_of_spline + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return true;
@@ -258,7 +259,13 @@ bool QpSplinePathGenerator::AddConstraint(
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint, equality constraint
-  // spline_constraint->AddPointConstraint(evaluated_s_.back(), 0.0);
+  spline_constraint->AddPointConstraint(
+      qp_spline_path_config_.point_constraint_s_position(),
+      std::copysign(
+          std::fmax(0.0,
+                    std::fabs(init_frenet_point_.l()) -
+                        qp_spline_path_config_.lane_change_lateral_shift()),
+          init_frenet_point_.l()));
   spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
   spline_constraint->AddPointSecondDerivativeConstraint(evaluated_s_.back(),
                                                         0.0);
@@ -280,6 +287,8 @@ bool QpSplinePathGenerator::AddConstraint(
   std::vector<double> kappa_lower_bound(evaluated_s_.size(),
                                         -FLAGS_kappa_bound);
   std::vector<double> kappa_upper_bound(evaluated_s_.size(), FLAGS_kappa_bound);
+  kappa_lower_bound.front() = -FLAGS_kappa_bound / 5.0;
+  kappa_upper_bound.front() = FLAGS_dkappa_bound / 5.0;
   if (!spline_constraint->AddSecondDerivativeBoundary(
           evaluated_s_, kappa_lower_bound, kappa_upper_bound)) {
     AERROR << "Fail to add second derivative boundary.";
