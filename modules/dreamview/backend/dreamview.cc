@@ -97,7 +97,6 @@ Status Dreamview::Start() {
   if (FLAGS_enable_sim_control) {
     sim_control_->Init(true);
   }
-  hmi_->Start();
   return Status::OK();
 }
 
