@@ -38,6 +38,8 @@ DECLARE_string(routing_request_topic);
 DECLARE_string(routing_response_topic);
 DECLARE_string(relative_odometry_topic);
 DECLARE_string(ins_stat_topic);
+DECLARE_string(ins_status_topic);
+DECLARE_string(gnss_status_topic);
 // TODO(xiaoxq): Retire hmi_command topic after integration with dreamview.
 DECLARE_string(hmi_command_topic);
 DECLARE_string(hmi_status_topic);

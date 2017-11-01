@@ -22,6 +22,7 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
 #include "modules/common/monitor/proto/monitor.pb.h"
+#include "modules/common/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
@@ -68,6 +69,8 @@ using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
     Adapter<calibration::republish_msg::RelativeOdometry>;
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
+using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
+using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
 // TODO(xiaoxq): Retire HMICommandAdapter after integration with dreamview.
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using HMIStatusAdapter = Adapter<dreamview::HMIStatus>;
