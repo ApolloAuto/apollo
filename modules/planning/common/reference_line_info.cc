@@ -247,6 +247,14 @@ void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
   Decider decider;
   decider.MakeDecision(*this, decision_result);
   ExportTurnSignal(decision_result->mutable_vehicle_signal());
+  auto* main_decision = decision_result->mutable_main_decision();
+  if (main_decision->has_stop()) {
+    main_decision->mutable_stop()->set_change_lane_type(
+        Lanes().PreviousAction());
+  } else if (main_decision->has_cruise()) {
+    main_decision->mutable_cruise()->set_change_lane_type(
+        Lanes().PreviousAction());
+  }
 }
 
 }  // namespace planning
