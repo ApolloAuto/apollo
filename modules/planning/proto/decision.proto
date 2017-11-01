@@ -151,6 +151,10 @@ message MainChangeLane {
 
 message MainMissionComplete {
   // arrived at routing destination
+  // When stopped, the front center of vehicle should be at this point.
+  optional apollo.common.PointENU stop_point = 1;
+  // When stopped, the heading of the vehicle should be stop_heading.
+  optional double stop_heading = 2;
 }
 
 message MainNotReady {
