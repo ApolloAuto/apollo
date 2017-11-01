@@ -11220,6 +11220,7 @@ trajectory_point {
 decision {
   main_decision {
     cruise {
+      change_lane_type: FORWARD
     }
   }
   object_decision {
