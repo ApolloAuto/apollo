@@ -29,6 +29,8 @@ from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 
 planning_pub = None
+PUB_NODE_NAME = "planning_lite"
+PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
 f = open("benchmark.txt","w")
 SPEED = 0 #m/s
 CRUISE_SPEED = 10 #m/s
@@ -138,7 +140,7 @@ def mobileye_callback(mobileye_pb):
 
 def add_listener():
     global planning_pub
-    rospy.init_node('planning_lite', anonymous=True)
+    rospy.init_node(PUB_NODE_NAME, anonymous=True)
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
@@ -150,7 +152,7 @@ def add_listener():
                      chassis_callback)
 
     planning_pub = rospy.Publisher(
-        '/apollo/planning_lite', planning_pb2.ADCTrajectory, queue_size=1)
+        PUB_TOPIC, planning_pb2.ADCTrajectory, queue_size=1)
 
 
 def update(frame_number):
