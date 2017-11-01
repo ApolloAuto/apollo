@@ -11227,6 +11227,7 @@ decision {
         y: 4141386.0428220723
       }
       stop_heading: -1.8123278493438064
+      change_lane_type: FORWARD
     }
   }
   object_decision {
