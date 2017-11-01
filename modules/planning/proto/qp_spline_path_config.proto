@@ -17,4 +17,6 @@ message QpSplinePathConfig {
   optional double cross_lane_longitudinal_extension = 12 [default = 50.0];
   optional double history_path_weight = 13 [default = 0.0];
   optional double lane_change_mid_l = 14 [default = 0.6];
+  optional double point_constraint_s_position = 15 [default = 110.0];
+  optional double lane_change_lateral_shift = 16 [default = 1.0];
 }
