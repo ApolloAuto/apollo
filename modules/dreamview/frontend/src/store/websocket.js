@@ -27,7 +27,14 @@ class WebSocketEndpoint {
         }
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
+
             switch (message.type) {
+                case "HMIConfig":
+                    STORE.hmi.updateConfig(message.data);
+                    break;
+                case "HMIStatus":
+                    STORE.hmi.updateStatus(message.data);
+                    break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
@@ -135,6 +142,20 @@ class WebSocketEndpoint {
     dumpMessages() {
         this.websocket.send(JSON.stringify({
             type: "Dump",
+        }));
+    }
+
+    changeMap(map) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeMap",
+            new_map: map
+        }));
+    }
+
+    changeVehicle(new_vehicle) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeVehicle",
+            new_vehicle: new_vehicle
         }));
     }
 }

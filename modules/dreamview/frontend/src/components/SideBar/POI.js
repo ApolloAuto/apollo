@@ -16,9 +16,9 @@ class MenuItemRadio extends React.Component {
                     options.showPOI = false;
                 }}>
                     <input type="radio" name={id} id={title}
-                    checked={routeEditingManager.poi_name === title} readOnly/>
+                           checked={routeEditingManager.poi_name === title} readOnly/>
                     <label id="radio-selector-label" htmlFor={title} />
-                    <span>  {title}</span>
+                    <span>{title}</span>
                 </li>
             </ul>
         );
