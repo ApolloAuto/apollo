@@ -74,7 +74,7 @@ bool EnsureDirectory(const std::string &directory_path) {
 bool RemoveAllFiles(const std::string &directory_path) {
   DIR *directory = opendir(directory_path.c_str());
   struct dirent *file;
-  while ((file = readdir(directory)) != NULL) {
+  while ((file = readdir(directory)) != nullptr) {
     // skip directory_path/. and directory_path/..
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -89,6 +89,24 @@ bool RemoveAllFiles(const std::string &directory_path) {
   }
   closedir(directory);
   return true;
+}
+
+std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
+  std::vector<std::string> result;
+  DIR *directory = opendir(directory_path.c_str());
+  struct dirent *entry;
+  while ((entry = readdir(directory)) != nullptr) {
+    // skip directory_path/. and directory_path/..
+    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+      continue;
+    }
+
+    if (entry->d_type == DT_DIR) {
+      result.emplace_back(entry->d_name);
+    }
+  }
+  closedir(directory);
+  return result;
 }
 
 }  // namespace util
