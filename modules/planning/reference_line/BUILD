@@ -70,6 +70,7 @@ cc_library(
     deps = [
         ":reference_line",
         "//modules/common/math",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d:quintic_spiral_path",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
