@@ -123,7 +123,7 @@ bool QpSplinePathGenerator::Generate(
   const Spline1d& spline = spline_generator_->spline();
   std::vector<common::PathPoint> path_points;
 
-  double start_l = 0.0;
+  double start_l = init_frenet_point_.l();
   if (is_solved) {
     start_l = spline(init_frenet_point_.s());
   }
@@ -140,7 +140,7 @@ bool QpSplinePathGenerator::Generate(
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
   constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
   while (s + kEpsilon < end_s) {
-    double l = 0.0;
+    double l = init_frenet_point_.l();
     if (is_solved) {
       l = spline(s);
     }
