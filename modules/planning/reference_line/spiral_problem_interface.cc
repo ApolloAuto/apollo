@@ -179,7 +179,8 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
 
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-    x[variable_offset + i] = point_distances_[i];
+    double delta_theta = relative_theta_[i + 1] - relative_theta_[i];
+    x[variable_offset + i] = point_distances_[i] / std::cos(0.5 * delta_theta);
   }
   return true;
 }
