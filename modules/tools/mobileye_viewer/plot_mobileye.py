@@ -31,6 +31,7 @@ from subplot_s_theta import SubplotSTheta
 from subplot_s_time import SubplotSTime
 from modules.localization.proto import localization_pb2
 
+PLANNING_TOPIC = '/apollo/planning_lite'
 mobileye = MobileyeData()
 localization = LocalizationData()
 planning = PlanningData()
@@ -60,7 +61,7 @@ def add_listener():
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
-    rospy.Subscriber('/apollo/planning_lite',
+    rospy.Subscriber(PLANNING_TOPIC,
                      planning_pb2.ADCTrajectory,
                      planning_callback)
     rospy.Subscriber('/apollo/localization/pose',
