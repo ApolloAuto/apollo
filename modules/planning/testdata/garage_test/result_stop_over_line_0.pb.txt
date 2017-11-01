@@ -4498,10 +4498,10 @@ decision {
       reason_code: STOP_REASON_DESTINATION
       reason: "stop by DEST"
       stop_point {
-        x: 586366.13271099166
-        y: 4140779.4027160881
+        x: 586366.13284661178
+        y: 4140779.4032230014
       }
-      stop_heading: 1.3093799327698736
+      stop_heading: 1.3093800379827796
     }
   }
   object_decision {
@@ -4528,10 +4528,10 @@ decision {
           reason_code: STOP_REASON_DESTINATION
           distance_s: -3
           stop_point {
-            x: 586366.13271099166
-            y: 4140779.4027160881
+            x: 586366.13284661178
+            y: 4140779.4032230014
           }
-          stop_heading: 1.3093799327698736
+          stop_heading: 1.3093800379827796
         }
       }
     }
