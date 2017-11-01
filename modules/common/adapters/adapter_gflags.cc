@@ -48,6 +48,10 @@ DEFINE_string(relative_odometry_topic, "/apollo/calibration/relative_odometry",
               "relative odometry topic name");
 DEFINE_string(ins_stat_topic, "/apollo/sensor/gnss/ins_stat",
               "ins stat topic name");
+DEFINE_string(ins_status_topic, "/apollo/sensor/gnss/ins_status",
+              "ins status topic name");
+DEFINE_string(gnss_status_topic, "/apollo/sensor/gnss/gnss_status",
+              "gnss status topic name");
 DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
               "HMI command topic name");
 DEFINE_string(hmi_status_topic, "/apollo/hmi_status", "HMI status topic name");

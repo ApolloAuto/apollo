@@ -94,7 +94,7 @@ HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
   *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
   *config_.mutable_available_vehicles() =
       ListDirAsDict(FLAGS_vehicle_data_path);
-  AERROR << "Loaded HMI config: " << config_.DebugString();
+  ADEBUG << "Loaded HMI config: " << config_.DebugString();
 
   // Register websocket message handlers.
   if (websocket_) {
