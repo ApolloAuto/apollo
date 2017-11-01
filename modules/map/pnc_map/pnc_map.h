@@ -108,6 +108,9 @@ class RouteSegments : public std::vector<LaneSegment> {
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
 
+  void SetId(const std::string &id);
+  const std::string &Id() const;
+
   /**
    * Get the last waypoint from the lane segments.
    */
@@ -132,6 +135,8 @@ class RouteSegments : public std::vector<LaneSegment> {
   bool is_on_segment_ = false;
 
   routing::ChangeLaneType next_action_ = routing::FORWARD;
+
+  std::string id_;
 };
 
 class PncMap {
