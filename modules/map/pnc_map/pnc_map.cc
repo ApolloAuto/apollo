@@ -37,7 +37,6 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/routing/common/routing_gflags.h"
 
-
 DEFINE_bool(reckless_change_lane, false, "always allow change lane");
 
 namespace apollo {
@@ -154,6 +153,14 @@ bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
     }
   }
   return has_projection;
+}
+
+void RouteSegments::SetPreviousAction(routing::ChangeLaneType action) {
+  previous_action_ = action;
+}
+
+routing::ChangeLaneType RouteSegments::PreviousAction() const {
+  return previous_action_;
 }
 
 void RouteSegments::SetNextAction(routing::ChangeLaneType action) {
@@ -431,9 +438,9 @@ bool PncMap::GetRouteSegments(
   const double dist_on_passage =
       common::util::DistanceXY(current_point_, passage_start_point_);
   const bool allow_change_lane =
-      FLAGS_reckless_change_lane || (
-      (min_l_to_lane_center_ < kMaxDistanceToLaneCenter) &&
-      (dist_on_passage > FLAGS_min_length_for_lane_change));
+      FLAGS_reckless_change_lane ||
+      ((min_l_to_lane_center_ < kMaxDistanceToLaneCenter) &&
+       (dist_on_passage > FLAGS_min_length_for_lane_change));
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
   for (const int index : drive_passages) {
@@ -480,6 +487,11 @@ bool PncMap::GetRouteSegments(
     route_segments->back().SetId(route_segment_id);
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
+      route_segments->back().SetPreviousAction(routing::FORWARD);
+    } else if (l > 0) {
+      route_segments->back().SetPreviousAction(routing::RIGHT);
+    } else {
+      route_segments->back().SetPreviousAction(routing::LEFT);
     }
   }
   return !route_segments->empty();
