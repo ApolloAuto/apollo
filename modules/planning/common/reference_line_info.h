@@ -60,6 +60,8 @@ class ReferenceLineInfo {
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
   const ReferenceLine& reference_line() const;
+  const common::TrajectoryPoint& init_adc_point() const;
+
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
 
