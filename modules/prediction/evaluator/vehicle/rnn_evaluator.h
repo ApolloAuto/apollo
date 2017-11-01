@@ -78,8 +78,8 @@ class RNNEvaluator : public Evaluator {
                        const LaneSequence& lane_sequence,
                        std::vector<float>* const feature_values);
 
-  bool IsCutinInHistory(const std::string& lane_id,
-                        const std::string& lane_id_pre);
+  bool IsCutinInHistory(const std::string& curr_lane_id,
+                        const std::string& prev_lane_id);
 
  private:
   std::unique_ptr<NetParameter> model_ptr_;
