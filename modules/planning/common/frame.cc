@@ -198,11 +198,14 @@ const Obstacle *Frame::CreateDestinationObstacle() {
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         FLAGS_stop_distance_destination);
   auto dest_point = lane->GetSmoothPoint(dest_lane_s);
+  double left_width = 0.0;
+  double right_width = 0.0;
+  lane->GetWidth(dest_lane_s, &left_width, &right_width);
   // check if destination point is in planning range
   common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
                                       lane->Heading(dest_lane_s),
                                       FLAGS_virtual_stop_wall_length,
-                                      FLAGS_virtual_stop_wall_width};
+                                      left_width + right_width};
   return AddStaticVirtualObstacle(FLAGS_destination_obstacle_id,
                                   destination_box);
 }
