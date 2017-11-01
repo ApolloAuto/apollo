@@ -23,6 +23,8 @@
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
 
+DECLARE_bool(reckless_change_lane);
+
 namespace apollo {
 namespace planning {
 
@@ -178,6 +180,21 @@ TEST_F(SunnyvaleLoopTest, mission_complete) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
+
+/*
+ * test change lane with obstacle at target lane
+ */
+TEST_F(SunnyvaleLoopTest, avoid_change_left) {
+  std::string seq_num = "11";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 
 }  // namespace planning
 }  // namespace apollo
