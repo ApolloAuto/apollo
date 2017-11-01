@@ -440,8 +440,8 @@ function version() {
 
 function build_gnss() {
   CURRENT_PATH=$(pwd)
-  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
-    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  if [ -d "/home/tmp/ros" ]; then
+    ROS_PATH="/home/tmp/ros"
   else
     warning "ROS not found. Run apolllo.sh build first."
     exit 1
