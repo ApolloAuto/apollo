@@ -98,6 +98,10 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 }  // namespace
 
+const std::string &RouteSegments::Id() const { return id_; }
+
+void RouteSegments::SetId(const std::string &id) { id_ = id; }
+
 void RouteSegments::SetCanExit(bool can_exit) { can_exit_ = can_exit; }
 
 bool RouteSegments::CanExit() const { return can_exit_; }
@@ -467,6 +471,9 @@ bool PncMap::GetRouteSegments(
     }
     route_segments->back().SetCanExit(passage.can_exit());
     route_segments->back().SetNextAction(passage.change_lane_type());
+    std::string route_segment_id =
+        std::to_string(road_index) + "_" + std::to_string(index);
+    route_segments->back().SetId(route_segment_id);
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
     }

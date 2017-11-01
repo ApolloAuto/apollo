@@ -325,7 +325,8 @@ common::Status Planning::Plan(
   for (auto& reference_line_info : frame_->reference_line_info()) {
     status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
                             &reference_line_info);
-    AERROR_IF(!status.ok()) << "planner failed to make a driving plan.";
+    AERROR_IF(!status.ok()) << "planner failed to make a driving plan for: "
+                            << reference_line_info.Lanes().Id();
   }
 
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
