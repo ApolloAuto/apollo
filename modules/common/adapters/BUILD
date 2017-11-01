@@ -79,6 +79,7 @@ cc_library(
         "//modules/calibration/republish_msg/proto:relative_odometry_proto",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/monitor/proto:monitor_proto",
+        "//modules/common/proto:gnss_status_proto",
         "//modules/control/proto:control_proto",
         "//modules/dreamview/proto:hmi_status_proto",
         "//modules/drivers/gnss/proto:ins_proto",
