@@ -54,11 +54,11 @@ DEFINE_bool(enable_smooth_reference_line, true,
 
 DEFINE_bool(enable_spiral_reference_line, false,
             "enable new spiral based reference line");
-DEFINE_double(spiral_smoother_max_deviation, 1.0,
+DEFINE_double(spiral_smoother_max_deviation, 0.1,
               "The max deviation of spiral reference line smoother.");
-DEFINE_int32(spiral_smoother_num_iteration, 100,
+DEFINE_int32(spiral_smoother_num_iteration, 500,
              "The iteration num of spiral reference line smoother.");
-DEFINE_double(spiral_smoother_piecewise_length, 30.0,
+DEFINE_double(spiral_smoother_piecewise_length, 5.0,
               "The piecewise length of spiral smoother.");
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");

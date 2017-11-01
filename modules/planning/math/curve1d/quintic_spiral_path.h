@@ -37,6 +37,8 @@ namespace planning {
  */
 class QuinticSpiralPath : public QuinticPolynomialCurve1d {
  public:
+    QuinticSpiralPath() = default;
+
     QuinticSpiralPath(const std::array<double, 3>& start,
                               const std::array<double, 3>& end,
                               const double delta_s);
