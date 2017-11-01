@@ -29,7 +29,7 @@ from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 
 planning_pub = None
-PUB_NODE_NAME = "planning_lite"
+PUB_NODE_NAME = "planning"
 PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
 f = open("benchmark.txt","w")
 SPEED = 0 #m/s

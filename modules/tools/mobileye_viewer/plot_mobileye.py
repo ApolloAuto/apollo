@@ -31,7 +31,7 @@ from subplot_s_theta import SubplotSTheta
 from subplot_s_time import SubplotSTime
 from modules.localization.proto import localization_pb2
 
-PLANNING_TOPIC = '/apollo/planning_lite'
+PLANNING_TOPIC = '/apollo/planning'
 mobileye = MobileyeData()
 localization = LocalizationData()
 planning = PlanningData()
