@@ -35,11 +35,11 @@ class HMI {
  public:
   explicit HMI(WebSocketHandler *websocket);
 
-  void Start();
-
  private:
   // Broadcast HMIStatus to all clients.
   void BroadcastHMIStatus() const;
+
+  void RegisterMessageHandlers();
 
   static int ExecuteComponentCommand(
       const google::protobuf::Map<std::string, Component> &components,

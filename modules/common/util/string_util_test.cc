@@ -24,34 +24,34 @@ namespace apollo {
 namespace common {
 namespace util {
 
-TEST(UtilTest, EndWith) {
+TEST(StringUtilTest, EndWith) {
   EXPECT_TRUE(EndWith("abc.def", "def"));
   EXPECT_TRUE(EndWith("abc.def", ".def"));
   EXPECT_FALSE(EndWith("abc.def", "abc"));
   EXPECT_FALSE(EndWith("abc.def", "de"));
 }
 
-TEST(UtilTest, StrCat) {
-  EXPECT_EQ(StrCat("string", "32"), "string32");  // string, string
-  EXPECT_EQ(StrCat("string", 32, 3.2f), "string323.2");  // string, int, float
-  EXPECT_EQ(StrCat(3.2, ' ', true), "3.2 1");  // double, char, bool
+TEST(StringUtilTest, StrCat) {
+  EXPECT_EQ("string32", StrCat("string", "32"));  // string, string
+  EXPECT_EQ("string323.2", StrCat("string", 32, 3.2f));  // string, int, float
+  EXPECT_EQ("3.2 1", StrCat(3.2, ' ', true));  // double, char, bool
 }
 
-TEST(UtilTest, IterPrinter) {
+TEST(StringUtilTest, IterPrinter) {
   // Container.
   std::vector<std::string> vec;
-  EXPECT_EQ(StrCat(PrintIter(vec)), "");  // Empty string
+  EXPECT_EQ("", StrCat(PrintIter(vec)));  // Empty string
   vec.assign({"0", "1", "2"});
-  EXPECT_EQ(StrCat(PrintIter(vec)), "0 1 2");
-  EXPECT_EQ(StrCat(PrintIter(vec, "|")), "0|1|2");
-  EXPECT_EQ(StrCat(PrintIter(vec.begin(), vec.end(), ", ")), "0, 1, 2");
-  EXPECT_EQ(StrCat(PrintIter(vec.begin() + 1, vec.end() - 1, " ")), "1");
+  EXPECT_EQ("0 1 2", StrCat(PrintIter(vec)));
+  EXPECT_EQ("0|1|2", StrCat(PrintIter(vec, "|")));
+  EXPECT_EQ("0, 1, 2", StrCat(PrintIter(vec.begin(), vec.end(), ", ")));
+  EXPECT_EQ("1", StrCat(PrintIter(vec.begin() + 1, vec.end() - 1, " ")));
 
   // Array.
   int data[] = {0, 1, 2};
-  EXPECT_EQ(StrCat(PrintIter(data)), "0 1 2");
-  EXPECT_EQ(StrCat(PrintIter(data, data + 2, ", ")), "0, 1");
-  EXPECT_EQ(StrCat(PrintIter(data + 1, data + 2, ", ")), "1");
+  EXPECT_EQ("0 1 2", StrCat(PrintIter(data)));
+  EXPECT_EQ("0, 1", StrCat(PrintIter(data, data + 2, ", ")));
+  EXPECT_EQ("1", StrCat(PrintIter(data + 1, data + 2, ", ")));
 }
 
 }  // namespace util

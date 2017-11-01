@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
@@ -199,6 +200,13 @@ bool EnsureDirectory(const std::string &directory_path);
  * @return If the action is successful.
  */
 bool RemoveAllFiles(const std::string &directory_path);
+
+/**
+ * @brief List sub-directories.
+ * @param directory_path Directory path.
+ * @return A vector of sub-directories, without the directory_path prefix.
+ */
+std::vector<std::string> ListSubDirectories(const std::string &directory_path);
 
 }  // namespace util
 }  // namespace common
