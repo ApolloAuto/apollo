@@ -188,7 +188,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(2, 3) = 1.0;
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
   matrix_a_(4, 4) = 1.0;
-  matrix_a_(5, 5) = 1.0;  // TODO: change to add delays
+  matrix_a_(5, 5) = 0.0;  // TODO: change to add delays
 
   matrix_a_coeff_ = Matrix::Zero(matrix_size, matrix_size);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
@@ -201,8 +201,8 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_bd_ = Matrix::Zero(basic_state_size_, controls_);
   matrix_b_(1, 0) = cf_ / mass_;
   matrix_b_(3, 0) = lf_ * cf_ / iz_;
-  matrix_b_(4, 1) = 1.0;
-  matrix_b_(5, 1) = 1.0;
+  matrix_b_(4, 1) = 0.0;
+  matrix_b_(5, 1) = -1.0;
   matrix_bd_ = matrix_b_ * ts_;
 
   matrix_state_ = Matrix::Zero(matrix_size, 1);
@@ -294,7 +294,7 @@ Status MPCController::ComputeControlCommand(
 
   if (::apollo::common::math::SolveLinearMPC(
           matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound,
-          upper_bound, initial_state, reference, lqr_eps_, lqr_max_iteration_,
+          upper_bound, matrix_state_, reference, lqr_eps_, lqr_max_iteration_,
           &control) != true) {
     AERROR << "MPC failed";
   }
