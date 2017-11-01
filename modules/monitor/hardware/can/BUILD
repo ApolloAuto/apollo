@@ -20,6 +20,20 @@ cc_library(
         }),
 )
 
+cc_library(
+    name = "can_monitor",
+    srcs = ["can_monitor.cc"],
+    hdrs = ["can_monitor.h"],
+    deps = [
+        ":can_checker_factory",
+        "//external:gflags",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/common:canbus_common",
+        "//modules/common/util:util",
+        "//modules/monitor/common:monitor",
+    ],
+)
+
 cc_binary(
     name = "can_check",
     srcs = [
