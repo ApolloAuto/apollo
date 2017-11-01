@@ -266,6 +266,9 @@ bool QpSplinePathGenerator::AddConstraint(
   // add first derivative bound to improve lane change smoothness
   std::vector<double> dl_lower_bound(evaluated_s_.size(), -FLAGS_dl_bound);
   std::vector<double> dl_upper_bound(evaluated_s_.size(), FLAGS_dl_bound);
+  dl_lower_bound.front() = -FLAGS_dl_bound / 2.0;
+  dl_upper_bound.front() = FLAGS_dl_bound / 2.0;
+
   if (!spline_constraint->AddDerivativeBoundary(evaluated_s_, dl_lower_bound,
                                                 dl_upper_bound)) {
     AERROR << "Fail to add second derivative boundary.";
