@@ -102,6 +102,9 @@ PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
 }
+const common::TrajectoryPoint& ReferenceLineInfo::init_adc_point() const {
+  return init_adc_point_;
+}
 
 const ReferenceLine& ReferenceLineInfo::reference_line() const {
   return reference_line_;
