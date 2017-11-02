@@ -51,9 +51,9 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
 
   bool Sampling(const ReferenceLine& raw_reference_line);
 
-  bool ApplyConstraint(const ReferenceLine& raw_reference_line);
+  bool AddConstraint(const ReferenceLine& raw_reference_line);
 
-  bool ApplyKernel();
+  bool AddKernel();
 
   bool Solve();
 
