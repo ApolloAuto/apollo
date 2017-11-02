@@ -195,6 +195,7 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
   RUN_GOLDEN_TEST;
 }
 
-
 }  // namespace planning
 }  // namespace apollo
+
+TMAIN;
