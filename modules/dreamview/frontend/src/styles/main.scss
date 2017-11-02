@@ -43,6 +43,7 @@ body {
 
 
 
+
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
 
@@ -63,15 +64,10 @@ body {
     position: absolute;
     z-index: 100;
     height: 100%;
-    top: 60px;
     background: #1d2226;
     border-right: 3px solid #000000;
 
     display: flex;
-
-    @include small-screen {
-        top: 55px;
-    }
 
     .button {
         opacity: 0.7;
@@ -364,14 +360,14 @@ body {
 
         flex: 0 0 auto;
         margin-top: 10px;
-        margin-left: 10px;
+        margin-left: 18px;
         margin-right: auto;
 
         @include small-screen {
             top: 15px;
-            left: 23px;
-            height: 24px;
-            width: 73px;
+            left: 25px;
+            height: 25px;
+            width: 80px;
 
             margin-top: 15px;
         }
@@ -436,263 +432,175 @@ body {
     left: 0;
     width: 100%;
     z-index: 10;
-    background: linear-gradient(to bottom,
-    rgba(3, 38, 68, 1) 0%,
-    rgba(3, 38, 68, 1) 25%,
-    rgba(4, 36, 65, 0.8) 50%,
-    rgba(4, 36, 65, 0));
 
-    min-height: 300px;
-
-    @include small-screen {
-        min-height: 200px;
-    }
-
-    .label-text {
-        font-size: 15px;
-        color: #778899;
-
-        @include small-screen {
-            font-size: 14px;
-        }
-    }
-
-    .status-background {
-        width: 100%;
-        height: 300px;
-
-        @include small-screen {
-            height: 200px;
-        }
-    }
-
-    .throttle-panel {
+    .auto-meter {
         position: absolute;
-
-        top: 30px;
-        right: 172px;
-        width: 100px;
-        height: 200px;
-
-        @include small-screen {
-            top: 20px;
-            right: 112px;
-            width: 75px;
-            height: 150px;
-        }
-    }
-
-    .brake-panel {
-        position: absolute;
-
-        top: 30px;
-        right: 72px;
-        width: 100px;
-        height: 200px;
-
-        @include small-screen {
-            top: 20px;
-            right: 37px;
-            width: 75px;
-            height: 150px;
-        }
-    }
-
-    .speed-unit {
-        position: absolute;
-        color: #fff;
-
-        font-size: 10px;
-        top: 122px;
-        right: 118px;
-
-        @include small-screen {
-            font-size: 8px;
-            top: 98px;
-            right: 102px;
-        }
-    }
-
-    .speed-panel {
-        position: absolute;
-        text-align: center;
-        color: #fff;
-        width: 100px;
-        height: 100px;
-
-        top: 85px;
-        right: 122px;
-
-        @include small-screen {
-            top: 56px;
-            right: 62px;
-        }
+        width: 224px;
+        height: 112px;
+        top: 10px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
 
         .speed-read {
+            position: absolute;
+            top: 27px;
+            left: 15px;
+
             font-family: Arial;
             font-weight: lighter;
-
-            font-size: 50px;
-
-            @include small-screen {
-                font-size: 36px;
-            }
+            font-size: 35px;
+            color: #ffffff;
         }
 
-        .driving-mode {
-            font-family: Arial;
-            font-weight: 300;
-            color: #30A5FF;
+        .speed-unit {
+            position: absolute;
+            top: 66px;
+            left: 17px;
+            color: #ffffff;
 
-            margin-top: 5px;
             font-size: 15px;
+        }
 
-            @include small-screen {
-                margin-top: 15px;
-                font-size: 11px;
+        .brake-panel {
+            position: absolute;
+            top: 21px;
+            right: 2px;
+        }
+
+        .throttle-panel {
+            position: absolute;
+            top: 61px;
+            right: 2px;
+        }
+
+        .meter-container {
+            .meter-label {
+                font-size: 13px;
+                color: #ffffff;
             }
-        }
-    }
+            .meter-head {
+                display: inline-block;
+                position: absolute;
+                margin: 5px 0px 0px 5px;
+                border-width: 4px;
+                border-style: solid;
+            }
+            .meter-background {
+                position: relative;
+                display: block;
+                height: 2px;
+                width: 120px;
+                margin: 8px;
 
-    .meter-text-accelerator {
-        position: absolute;
-        color: #ffffff;
-
-        top: 240px;
-        right: 190px;
-
-        @include small-screen {
-            top: 175px;
-            right: 135px;
-        }
-    }
-
-    .meter-text-brake {
-        position: absolute;
-        color: #ffffff;
-
-        top: 240px;
-        right: 80px;
-
-        @include small-screen {
-            top: 175px;
-            right: 35px;
+                span {
+                    position: relative;
+                    overflow: hidden;
+                    display: block;
+                    height: 100%;
+                }
+            }
         }
     }
 
     .wheel {
         position: absolute;
+        width: 187px;
+        height: 92px;
+        top: 128px;
+        right: 20px;
+        padding: 10px 22px 10px 15px;
+        background: rgba(0, 0, 0, 0.8);
 
-        top: 30px;
-        right: 420px;
+        display: flex;
+        flex-direction: row;
+        justify-content: left;
+        align-items: center;
 
-        @include small-screen {
-            top: 20px;
-            right: 300px;
+        .steerangle-read {
+            font-family: Arial;
+            font-weight: lighter;
+            font-size: 35px;
+            color: #ffffff;
         }
 
-        .wheel-background {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            z-index: 5;
-
-            width: 200px;
-            height: 130px;
-
-            @include small-screen {
-                width: 140px;
-                height: 91px;
-            }
-        }
-
-        .wheel-image {
-            position: absolute;
-            z-index: 10;
-
-            top: 28px;
-            right: 62px;
-            width: 76px;
-            height: 76px;
-
-            @include small-screen {
-                top: 19.6px;
-                right: 43.4px;
-                width: 53.2px;
-                height: 53.2px;
-            }
+        .steerangle-unit {
+            padding: 0px 10px 20px 3px;
+            color: #ffffff;
+            font-size: 15px;
         }
 
         .left-arrow {
             position: absolute;
-            z-index: 10;
-
-            top: 55px;
-            right: 170px;
-            width: 19px;
-            height: 22px;
-
-            @include small-screen {
-                top: 38.5px;
-                right: 119px;
-                width: 13.3px;
-                height: 15.4px;
-            }
+            top: 44px;
+            right: 120px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 15px 12px 0px;
+            border-color: transparent;
         }
 
         .right-arrow {
             position: absolute;
-            z-index: 10;
-
-            top: 55px;
-            right: 10px;
-            width: 19px;
-            height: 22px;
-
-            @include small-screen {
-                top: 38.5px;
-                right: 7px;
-                width: 13.3px;
-                height: 15.4px;
-            }
+            top: 44px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 0 12px 15px;
+            border-color: transparent transparent transparent #30435e;
         }
 
-        .left-label-text {
+        .wheel-background {
             position: absolute;
-            color: #ffffff;
+            top: 10px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            margin: 10px;
 
-            top: 58px;
-            right: 210px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
 
-            @include small-screen {
-                top: 40.6px;
-                right: 147px;
-            }
+            background: rgba(0, 0, 0, 1);
+            border-radius: 50%;
+            border: 2px solid #006aff;
         }
 
-        .right-label-text {
+        .wheel-arm {
             position: absolute;
-            color: #ffffff;
-
-            top: 58px;
-            right: -50px;
-
-            @include small-screen {
-                top: 40.6px;
-                right: -35px;
-            }
+            top: 35px;
+            left: 34px;
+            height: 30px;
+            width: 2px;
+            content: "";
+            background: black;
+            border-radius: 0 0 20px 20px;
+            transform-origin: 50% 100%;
+            -webkit-transform-origin: 50% 100%;
+            background: #006aff;
+        }
+        .wheel-arm:before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: -6px;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border: 5px solid #006aff;
         }
     }
 
     .traffic-light-indicator {
         position: absolute;
 
-        top: 180px;
-        right: 590px;
+        top: 30px;
+        right: 400px;
 
         @include small-screen {
-            top: 126px;
-            right: 420px;
+            right: 370px;
         }
 
         .green {
