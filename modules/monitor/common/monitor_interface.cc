@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_HARDWARE_CAN_CAN_MONITOR_H_
-#define MODULES_MONITOR_HARDWARE_CAN_CAN_MONITOR_H_
-
-#include <string>
-#include <vector>
 
 #include "modules/monitor/common/monitor_interface.h"
 
 namespace apollo {
 namespace monitor {
 
-class CanMonitor : public HardwareMonitor {
- public:
-  explicit CanMonitor(SystemStatus *system_status);
-  void RunOnce(const double current_time) override;
-};
+HardwareMonitor::HardwareMonitor(const std::string &name, const double interval,
+                                 SystemStatus *system_status)
+    : RecurrentRunner(name, interval) {
+  system_status->mutable_hardware()->insert({name, {}});
+  status_ = &system_status->mutable_hardware()->at(name);
+}
+
+ModuleMonitor::ModuleMonitor(const std::string &name, const double interval,
+                             SystemStatus *system_status)
+    : RecurrentRunner(name, interval) {
+  system_status->mutable_modules()->insert({name, {}});
+  status_ = &system_status->mutable_modules()->at(name);
+}
 
 }  // namespace monitor
 }  // namespace apollo
-
-#endif  // MODULES_MONITOR_HARDWARE_CAN_CAN_MONITOR_H_

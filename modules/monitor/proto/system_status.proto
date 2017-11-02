@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package apollo.monitor;
 
+import "modules/common/proto/header.proto";
+
 message HardwareStatus {
   enum Status {
     OK = 0;
@@ -32,6 +34,7 @@ message ModuleStatus {
 }
 
 message SystemStatus {
-  map<string, ModuleStatus> modules = 1;
-  map<string, HardwareStatus> hardware = 2;
+  optional apollo.common.Header header = 1;
+  map<string, ModuleStatus> modules = 2;
+  map<string, HardwareStatus> hardware = 3;
 }

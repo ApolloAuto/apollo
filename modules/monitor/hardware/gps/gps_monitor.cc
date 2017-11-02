@@ -19,11 +19,19 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 
+DEFINE_string(gps_monitor_name, "GPS", "Name of the GPS monitor.");
+DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
+
 namespace apollo {
 namespace monitor {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::gnss_status::InsStatus;
+
+GpsMonitor::GpsMonitor(SystemStatus *system_status)
+    : HardwareMonitor(FLAGS_gps_monitor_name, FLAGS_gps_monitor_interval,
+                      system_status) {
+}
 
 void GpsMonitor::RunOnce(const double current_time) {
   // Check Gnss status.

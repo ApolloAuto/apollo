@@ -40,9 +40,9 @@ DECLARE_string(relative_odometry_topic);
 DECLARE_string(ins_stat_topic);
 DECLARE_string(ins_status_topic);
 DECLARE_string(gnss_status_topic);
+DECLARE_string(system_status_topic);
 // TODO(xiaoxq): Retire hmi_command topic after integration with dreamview.
 DECLARE_string(hmi_command_topic);
-DECLARE_string(hmi_status_topic);
 DECLARE_string(mobileye_topic);
 DECLARE_string(delphi_esr_topic);
 DECLARE_string(compressed_image_topic);
