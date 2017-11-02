@@ -67,7 +67,9 @@ void ADCNeighborhood::InitNeighborhood(Frame* frame) {
         double diff_theta =
             obstacle_theta - obstacle_point_on_ref_line.theta();
         obstacle_state[2] = speed * std::cos(diff_theta);
+        obstacle_state[3] = 0.0;  // set s_dotdot as zero
         neighborhood_.push_back(std::move(obstacle_state));
+        break;
       }
       relative_time += trajectory_time_resolution;
     }
