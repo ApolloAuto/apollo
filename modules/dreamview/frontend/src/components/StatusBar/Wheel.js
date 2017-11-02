@@ -31,6 +31,7 @@ export default class Wheel extends React.Component {
                     <div className="wheel-arm"
                          style={{transform: `translate(-50%, -100%) rotate(${steeringAngle}deg`}}/>
                 </div>
+                <div className="driving-mode">{drivingMode}</div>
             </div>
         );
     }
