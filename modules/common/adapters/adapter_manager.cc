@@ -90,6 +90,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableTrafficLightDetection(FLAGS_traffic_light_detection_topic,
                                     config.mode(),
                                     config.message_history_limit());
+        break;
       case AdapterConfig::PAD:
         EnablePad(FLAGS_pad_topic, config.mode(),
                   config.message_history_limit());
