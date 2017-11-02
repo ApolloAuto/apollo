@@ -73,6 +73,11 @@ bool EnsureDirectory(const std::string &directory_path) {
 
 bool RemoveAllFiles(const std::string &directory_path) {
   DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << directory_path;
+    return false;
+  }
+
   struct dirent *file;
   while ((file = readdir(directory)) != nullptr) {
     // skip directory_path/. and directory_path/..
@@ -94,6 +99,11 @@ bool RemoveAllFiles(const std::string &directory_path) {
 std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
   std::vector<std::string> result;
   DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << directory_path;
+    return result;
+  }
+
   struct dirent *entry;
   while ((entry = readdir(directory)) != nullptr) {
     // skip directory_path/. and directory_path/..
