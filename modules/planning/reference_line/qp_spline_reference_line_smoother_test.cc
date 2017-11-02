@@ -73,7 +73,7 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
   EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_FLOAT_EQ(153.64156, smoothed_reference_line.Length());
+  EXPECT_FLOAT_EQ(153.91533, smoothed_reference_line.Length());
 }
 
 }  // namespace planning
