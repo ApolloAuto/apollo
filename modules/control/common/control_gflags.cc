@@ -49,3 +49,5 @@ DEFINE_bool(enable_gain_scheduler, false,
             "Enable gain scheduler for higher vechile speed");
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
 DEFINE_bool(use_relative_position, false, "Use relative position");
+DEFINE_double(query_relative_time, 0.5,
+              "Temp flag to query target by relative time");
