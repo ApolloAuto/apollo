@@ -65,8 +65,7 @@ bool SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
   }
 
   Matrix matrix_k =
-      Matrix::Zero(matrix_b.rows() * horizon,
-                   matrix_b.cols() * horizon);
+      Matrix::Zero(matrix_b.rows() * horizon, matrix_b.cols() * horizon);
   for (unsigned int r = 0; r < horizon; ++r) {
     for (unsigned int c = 0; c <= r; ++c) {
       matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(), matrix_b.rows(),
@@ -103,7 +102,6 @@ bool SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
                     matrix_r.cols()) = matrix_r;
   }
 
-
   // Update matrix_m1, matrix_m2, convert MPC problem to QP problem done
   Matrix matrix_m1 = matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr;
   Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
@@ -131,8 +129,8 @@ bool SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
       matrix_equality_boundary));
   auto result = qp_solver->Solve();
   if (!result) {
-  AERROR << "Linear MPC solver failed";
-  return false;
+    AERROR << "Linear MPC solver failed";
+    return false;
   }
   matrix_v = qp_solver->params();
 
