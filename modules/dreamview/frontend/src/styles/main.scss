@@ -9,7 +9,7 @@
     align-items: center;
     border-top: 1px solid #333333;
     padding: 10px;
-    
+
     .icon {
         height: 20px;
         width: 20px;
@@ -40,8 +40,12 @@ body {
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+
+
+
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
+
 .dreamview-canvas {
     position: absolute;
     top: 0px;
@@ -55,34 +59,35 @@ body {
     display: none;
 }
 
-.sidebar {
+.side-bar {
     position: absolute;
     z-index: 100;
+    height: 100%;
+    top: 60px;
+    background: #1d2226;
+    border-right: 3px solid #000000;
 
-    top: 150px;
-    left: 40px;
+    display: flex;
 
     @include small-screen {
-        top: 100px;
-        left: 10px;
+        top: 55px;
     }
 
     .button {
         opacity: 0.7;
         height: 60px;
-        width: 260px;
+        width: 86px;
         border: none;
-        padding: 20px;
+        padding: 2px;
         display: block;
         font-size: 14px;
-        text-align: left;
+        text-align: center;
+        background: #1d2226;
         color: #FFFFFF;
-        background-color: #000000;
 
         @include small-screen {
-            padding-top: 5px;
-            height: 10px;
-            width: 200px;
+            font-size: 12px;
+            width: 80px;
         }
     }
 
@@ -154,7 +159,7 @@ body {
                 @include small-screen {
                     line-height: 25px;
                 }
-            
+
                 img {
                     position: relative;
                     transform: translate(70%, 30%);
@@ -167,7 +172,7 @@ body {
                         height: 15px;
                     }
                 }
-                    
+
                 span {
                     padding-left: 35px;
 
@@ -176,7 +181,7 @@ body {
                     }
                 }
             }
-            
+
             summary::-webkit-details-marker {
                 float: right;
                 padding-top: 22px;
@@ -191,7 +196,7 @@ body {
         details[open] {
             background-color: #002848;
         }
-        
+
         ul {
             list-style: none;
             padding-left: 0px;
@@ -199,35 +204,35 @@ body {
             cursor: pointer;
             font-size: 12px;
             background-color: #000F23;
-            
+
             li {
                 line-height: 40px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 padding-left: 6px;
                 margin-left: 0;
-                    
+
                 span {
                     padding-left: 20px;
                 }
             }
-                
+
             li:hover {
                 background-color: #000000;
             }
         }
 
-        // Toggle switch
+        /* Toggle switch */
         .switch {
             position: relative;
             transform: translate(35%, 25%);
             width: 40px;
             display: inline-block;
         }
-        
+
         .toggle-switch {
             display: none;
         }
-        
+
         .toggle-switch-label {
             display: block;
             overflow: hidden;
@@ -240,7 +245,7 @@ body {
             background-color: #3F4548;
             transition: background-color 0.2s ease-in;
         }
-        
+
         .toggle-switch-label:before {
             content: "";
             display: block;
@@ -254,26 +259,26 @@ body {
             border-radius: 16px;
             transition: all 0.2s ease-in;
         }
-        
-        .toggle-switch:checked + .toggle-switch-label {
+
+        .toggle-switch:checked+.toggle-switch-label {
             background-color: #0E3D62;
         }
-        
-        .toggle-switch:checked + .toggle-switch-label,
-        .toggle-switch:checked + .toggle-switch-label:before {
+
+        .toggle-switch:checked+.toggle-switch-label,
+        .toggle-switch:checked+.toggle-switch-label:before {
             border-color: #0E3D62;
         }
-        
-        .toggle-switch:checked + .toggle-switch-label:before {
+
+        .toggle-switch:checked+.toggle-switch-label:before {
             right: 0px;
             background-color: #30A5FF;
         }
 
-        // Radio button
+        /*  Radio button */
         input[type="radio"] {
             display: none;
         }
-        
+
         #radio-selector-label {
             position: relative;
             transform: translate(65%, 30%);
@@ -289,31 +294,31 @@ body {
             box-shadow: inset 1px 0 #A0A0A0;
             border: 7px solid #3F4548;
         }
-        
-        input[type="radio"]:checked + #radio-selector-label {
+
+        input[type="radio"]:checked+#radio-selector-label {
             border: 7px solid #0E3D62;
             background-color: #30A5FF;
         }
     }
 
-    // Adjust the scrollbar style.
-    ::-webkit-scrollbar {
+    /* Adjust the scrollbar style. */
+     ::-webkit-scrollbar {
         width: 4px;
         opacity: 0.3;
         background-color: #FFFFFF;
     }
 
-    ::-webkit-scrollbar-track {
+     ::-webkit-scrollbar-track {
         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         background-color: #555555;
     }
 
-    ::-webkit-scrollbar-thumb {
+     ::-webkit-scrollbar-thumb {
         opacity: 0.8;
         background-color: #30A5FF;
     }
 
-    ::-webkit-scrollbar-thumb:active {
+     ::-webkit-scrollbar-thumb:active {
         background-color: #30A5FF;
     }
 }
@@ -338,26 +343,38 @@ body {
     position: relative;
     top: 0;
     left: 0;
+    height: 60px;
     z-index: 50;
 
-    font-size: 14px;
     color: #ffffff;
     text-align: left;
     background: #000000;
 
     display: flex;
+    @include small-screen {
+        height: 55px;
+    }
 
     /* The Apollo logo on the status bar. */
     .apollo-logo {
-        top: 15px;
-        left: 23px;
-        height: 24px;
-        width: 73px;
+        top: 40px;
+        left: 40px;
+        height: 40px;
+        width: 121px;
 
         flex: 0 0 auto;
-        margin-top: 15px;
+        margin-top: 10px;
         margin-left: 10px;
         margin-right: auto;
+
+        @include small-screen {
+            top: 15px;
+            left: 23px;
+            height: 24px;
+            width: 73px;
+
+            margin-top: 15px;
+        }
     }
 
     .selector {
@@ -371,7 +388,7 @@ body {
             display: block;
             padding: 0.5em 3em 0.5em 0.5em;
             border: none;
-
+            font-size: 16px;
             background: #000000;
             color: #ffffff;
 
@@ -382,6 +399,10 @@ body {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+
+            @include small-screen {
+                font-size: 14px;
+            }
         }
 
         .arrow {
@@ -416,17 +437,17 @@ body {
     width: 100%;
     z-index: 10;
     background: linear-gradient(to bottom,
-                                rgba(3, 38, 68, 1) 0%,
-                                rgba(3, 38, 68, 1) 25%,
-                                rgba(4, 36, 65, 0.8) 50%,
-                                rgba(4, 36, 65, 0));
+    rgba(3, 38, 68, 1) 0%,
+    rgba(3, 38, 68, 1) 25%,
+    rgba(4, 36, 65, 0.8) 50%,
+    rgba(4, 36, 65, 0));
 
     min-height: 300px;
-    
+
     @include small-screen {
         min-height: 200px;
     }
-    
+
     .label-text {
         font-size: 15px;
         color: #778899;
@@ -442,23 +463,6 @@ body {
 
         @include small-screen {
             height: 200px;
-        }
-    }
-
-    /* The Apollo logo on the status bar. */
-    .apollo-logo {
-        position: absolute;
-
-        top: 40px;
-        left: 40px;
-        height: 46px;
-        width: 141px;
-
-        @include small-screen {
-            top: 28px;
-            left: 40px;
-            height: 27.6px;
-            width: 84.6px;
         }
     }
 
@@ -480,7 +484,7 @@ body {
 
     .brake-panel {
         position: absolute;
-        
+
         top: 30px;
         right: 72px;
         width: 100px;
@@ -518,7 +522,7 @@ body {
 
         top: 85px;
         right: 122px;
-        
+
         @include small-screen {
             top: 56px;
             right: 62px;
@@ -542,7 +546,7 @@ body {
 
             margin-top: 5px;
             font-size: 15px;
-            
+
             @include small-screen {
                 margin-top: 15px;
                 font-size: 11px;
@@ -595,7 +599,7 @@ body {
 
             width: 200px;
             height: 130px;
-            
+
             @include small-screen {
                 width: 140px;
                 height: 91px;
@@ -690,7 +694,7 @@ body {
             top: 126px;
             right: 420px;
         }
-        
+
         .green {
             position: absolute;
 
@@ -799,7 +803,7 @@ body {
             }
 
             span {
-                font-family:PingFangSC-Light;
+                font-family: PingFangSC-Light;
                 font-size: 14px;
                 color: #d8d8d8;
                 text-align: center;
@@ -810,12 +814,13 @@ body {
             }
         }
 
-        .button:hover{
+        .button:hover {
             background: #09182C;
         }
     }
 
-    .exit-button, .editing-tip {
+    .exit-button,
+    .editing-tip {
         position: absolute;
         top: 0px;
 
@@ -824,12 +829,12 @@ body {
         border: none;
 
         background: #102244;
-        color:#d8d8d8;
+        color: #d8d8d8;
         font-size: 35px;
 
         @include small-screen {
             height: 60px;
-            width:  60px;
+            width: 60px;
 
             font-size: 20px;
         }
@@ -856,7 +861,7 @@ body {
             top: 35%;
             left: 37%;
 
-           @include small-screen {
+            @include small-screen {
                 top: 30%;
                 left: 32%;
             }
@@ -889,7 +894,7 @@ body {
 
             border-style: solid;
             border-width: 0px 20px 20px 20px;
-            border-color: rgba(0,0,0,0) rgba(0,0,0,0) #FFFFFF rgba(0,0,0,0);
+            border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #FFFFFF rgba(0, 0, 0, 0);
 
             @-moz-document url-prefix() {
                 top: -38px;
@@ -901,8 +906,6 @@ body {
         }
     }
 }
-
-
 
 .loader {
     width: 100vw;
@@ -936,8 +939,12 @@ body {
             animation-play-state: running;
 
             @keyframes flash {
-                from {color: #FFFFFF;}
-                to {color: #000C17;}
+                from {
+                    color: #FFFFFF;
+                }
+                to {
+                    color: #000C17;
+                }
             }
         }
     }

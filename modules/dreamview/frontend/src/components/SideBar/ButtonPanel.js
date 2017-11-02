@@ -102,6 +102,7 @@ export default class ButtonPanel extends React.Component {
                 <SideBarButton label="Layer Menu"
                                onClick={onMenu}
                                active={showMenu} />
+                <div className="separator" />
             </div>
         );
     }
