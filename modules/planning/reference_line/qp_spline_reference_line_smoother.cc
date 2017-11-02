@@ -59,12 +59,12 @@ bool QpSplineReferenceLineSmoother::Smooth(
 
   spline_solver_->Reset(t_knots_, smoother_config_.spline_order());
 
-  if (!ApplyConstraint(raw_reference_line)) {
+  if (!AddConstraint(raw_reference_line)) {
     AERROR << "Add constraint for spline smoother failed";
     return false;
   }
 
-  if (!ApplyKernel()) {
+  if (!AddKernel()) {
     AERROR << "Add kernel for spline smoother failed.";
     return false;
   }
@@ -152,7 +152,7 @@ bool QpSplineReferenceLineSmoother::Sampling(
   return true;
 }
 
-bool QpSplineReferenceLineSmoother::ApplyConstraint(
+bool QpSplineReferenceLineSmoother::AddConstraint(
     const ReferenceLine& raw_reference_line) {
   uint32_t constraint_num =
       smoother_config_.constraint_to_knots_ratio() * (t_knots_.size() - 1) + 1;
@@ -211,7 +211,7 @@ bool QpSplineReferenceLineSmoother::ApplyConstraint(
   return true;
 }
 
-bool QpSplineReferenceLineSmoother::ApplyKernel() {
+bool QpSplineReferenceLineSmoother::AddKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
