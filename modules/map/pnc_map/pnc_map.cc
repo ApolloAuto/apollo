@@ -38,6 +38,9 @@
 #include "modules/routing/common/routing_gflags.h"
 
 DEFINE_bool(reckless_change_lane, false, "always allow change lane");
+DEFINE_double(max_distance_to_lane_center, 0.2,
+              "The max distance to lance center that we believe lane change is "
+              "finished.");
 
 namespace apollo {
 namespace hdmap {
@@ -426,7 +429,6 @@ bool PncMap::GetRouteSegments(
     const double backward_length, const double forward_length,
     std::vector<RouteSegments> *const route_segments) const {
   // vehicle has to be this close to lane center before considering change lane
-  constexpr double kMaxDistanceToLaneCenter = 0.5;
   if (!current_waypoint_.lane || route_index_.size() != 3 ||
       route_index_[0] < 0) {
     AERROR << "Invalid position, use UpdatePosition() function first";
@@ -439,7 +441,7 @@ bool PncMap::GetRouteSegments(
       common::util::DistanceXY(current_point_, passage_start_point_);
   const bool allow_change_lane =
       FLAGS_reckless_change_lane ||
-      ((min_l_to_lane_center_ < kMaxDistanceToLaneCenter) &&
+      ((min_l_to_lane_center_ < FLAGS_max_distance_to_lane_center) &&
        (dist_on_passage > FLAGS_min_length_for_lane_change));
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
