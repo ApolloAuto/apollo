@@ -126,6 +126,8 @@ cc_library(
         "planning_util.h",
     ],
     deps = [
+        ":planning_gflags",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/math:hermite_spline",
