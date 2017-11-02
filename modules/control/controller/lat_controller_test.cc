@@ -57,7 +57,7 @@ class LatControllerTest : public ::testing::Test, LatController {
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug) const {
+                            SimpleLateralDebug *debug) {
     LatController::ComputeLateralErrors(x, y, theta, linear_v, angular_v,
                                         trajectory_analyzer, debug);
   }
