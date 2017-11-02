@@ -46,6 +46,7 @@ body {
 }
 
 
+
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
 
@@ -65,10 +66,16 @@ body {
 .side-bar {
     position: absolute;
     z-index: 100;
+    height: 100%;
+    top: 60px;
     background: #1d2226;
     border-right: 3px solid #000000;
 
     display: flex;
+
+    @include small-screen {
+        top: 55px;
+    }
 
     .button {
         opacity: 0.7;
@@ -357,17 +364,14 @@ body {
     height: 60px;
     z-index: 50;
 
-    font-size: 16px;
     color: #ffffff;
     text-align: left;
     background: #000000;
 
     display: flex;
-    align-items: center;
 
     @include small-screen {
         height: 55px;
-        font-size: 14px;
     }
 
     /* The Apollo logo on the status bar. */
@@ -378,15 +382,17 @@ body {
         width: 121px;
 
         flex: 0 0 auto;
-        margin: 10px auto 0px 18px;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: auto;
 
         @include small-screen {
             top: 15px;
-            left: 25px;
-            height: 25px;
-            width: 80px;
+            left: 23px;
+            height: 24px;
+            width: 73px;
 
-            margin-top: 5px;
+            margin-top: 15px;
         }
     }
 
@@ -401,6 +407,7 @@ body {
             display: block;
             padding: 0.5em 3em 0.5em 0.5em;
             border: none;
+            font-size: 16px;
             background: #000000;
             color: #ffffff;
 
@@ -411,6 +418,10 @@ body {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+
+            @include small-screen {
+                font-size: 14px;
+            }
         }
 
         .arrow {
@@ -444,8 +455,38 @@ body {
     left: 0;
     width: 100%;
     z-index: 10;
+    background: linear-gradient(to bottom,
+    rgba(3, 38, 68, 1) 0%,
+    rgba(3, 38, 68, 1) 25%,
+    rgba(4, 36, 65, 0.8) 50%,
+    rgba(4, 36, 65, 0));
 
-    .auto-meter {
+    min-height: 300px;
+
+    @include small-screen {
+        min-height: 200px;
+    }
+
+    .label-text {
+        font-size: 15px;
+        color: #778899;
+
+        @include small-screen {
+            font-size: 14px;
+        }
+    }
+
+    .status-background {
+        width: 100%;
+        height: 300px;
+
+        @include small-screen {
+            height: 200px;
+        }
+    }
+
+    .throttle-panel {
+>>>>>>> 5391e13... updated sidebar style
         position: absolute;
         width: 224px;
         height: 112px;
@@ -464,25 +505,25 @@ body {
             color: #ffffff;
         }
 
-        .speed-unit {
-            position: absolute;
-            top: 66px;
-            left: 17px;
-            color: #ffffff;
-
-            font-size: 15px;
-        }
-
-        .brake-panel {
+    .brake-panel {
             position: absolute;
             top: 21px;
             right: 2px;
         }
 
-        .throttle-panel {
-            position: absolute;
-            top: 61px;
-            right: 2px;
+    .speed-panel {
+        position: absolute;
+        text-align: center;
+        color: #fff;
+        width: 100px;
+        height: 100px;
+
+        top: 85px;
+        right: 122px;
+
+        @include small-screen {
+            top: 56px;
+            right: 62px;
         }
 
         .meter-container {
@@ -490,12 +531,20 @@ body {
                 font-size: 13px;
                 color: #ffffff;
             }
-            .meter-head {
-                display: inline-block;
-                position: absolute;
-                margin: 5px 0px 0px 5px;
-                border-width: 4px;
-                border-style: solid;
+        }
+
+        .driving-mode {
+            font-family: Arial;
+            font-weight: 300;
+            color: #30A5FF;
+
+            margin-top: 5px;
+            font-size: 15px;
+
+            @include small-screen {
+                margin-top: 15px;
+                font-size: 11px;
+
             }
             .meter-background {
                 position: relative;
@@ -543,13 +592,17 @@ body {
 
         .left-arrow {
             position: absolute;
-            top: 40px;
-            right: 120px;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 12px 15px 12px 0px;
-            border-color: transparent;
+            top: 0px;
+            right: 0px;
+            z-index: 5;
+
+            width: 200px;
+            height: 130px;
+
+            @include small-screen {
+                width: 140px;
+                height: 91px;
+            }
         }
 
         .right-arrow {
