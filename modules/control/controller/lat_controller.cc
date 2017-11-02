@@ -543,37 +543,44 @@ void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) const {
-  auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+  // TODO: (QiL) change this to conf.
+  ::apollo::common::TrajectoryPoint target_point;
+  if (FLAGS_use_relative_position) {
+    target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        FLAGS_query_relative_time);
+  } else {
+    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+  }
 
-  double dx = x - matched_point.path_point().x();
-  double dy = y - matched_point.path_point().y();
+  double dx = x - target_point.path_point().x();
+  double dy = y - target_point.path_point().y();
 
   ADEBUG << "x point: " << x << " y point: " << y;
-  ADEBUG << "math point x: " << matched_point.path_point().x()
-         << " y point: " << matched_point.path_point().y();
+  ADEBUG << "math point x: " << target_point.path_point().x()
+         << " y point: " << target_point.path_point().y();
 
-  double cos_matched_theta = std::cos(matched_point.path_point().theta());
-  double sin_matched_theta = std::sin(matched_point.path_point().theta());
+  double cos_matched_theta = std::cos(target_point.path_point().theta());
+  double sin_matched_theta = std::sin(target_point.path_point().theta());
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
   debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
 
   double delta_theta =
-      common::math::NormalizeAngle(theta - matched_point.path_point().theta());
+      common::math::NormalizeAngle(theta - target_point.path_point().theta());
   double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = linear_v * sin_delta_theta;
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
 
   // theta_error = delta_theta;
   debug->set_heading_error(delta_theta);
-  // theta_error_dot = angular_v - matched_point.path_point().kappa() *
-  // matched_point.v();
-  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
-                                                matched_point.v());
+  // theta_error_dot = angular_v - target_point.path_point().kappa() *
+  // target_point.v();
+  debug->set_heading_error_rate(angular_v - target_point.path_point().kappa() *
+                                                target_point.v());
 
-  // matched_theta = matched_point.path_point().theta();
-  debug->set_ref_heading(matched_point.path_point().theta());
-  // matched_kappa = matched_point.path_point().kappa();
-  debug->set_curvature(matched_point.path_point().kappa());
+  // matched_theta = target_point.path_point().theta();
+  debug->set_ref_heading(target_point.path_point().theta());
+  // matched_kappa = target_point.path_point().kappa();
+  debug->set_curvature(target_point.path_point().kappa());
 }
 
 }  // namespace control
