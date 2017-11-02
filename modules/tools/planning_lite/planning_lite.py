@@ -31,6 +31,8 @@ from modules.canbus.proto import chassis_pb2
 planning_pub = None
 PUB_NODE_NAME = "planning"
 PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
+LAST_INIT_LAT = None
+MAX_LAT_CHANGE_PER_CYCLE = 0.1
 f = open("benchmark.txt","w")
 SPEED = 0 #m/s
 CRUISE_SPEED = 10 #m/s
@@ -39,6 +41,17 @@ x= []
 y = []
 nx = []
 ny = []
+
+def get_central_line_offset(current_init_lat):
+    if LAST_INIT_LAT is None:
+        return 0
+    if abs(current_init_lat - LAST_INIT_LAT) < MAX_LAT_CHANGE_PER_CYCLE:
+        return 0
+    else:
+        if current_init_lat > LAST_INIT_LAT:
+            return - (abs(current_init_lat - LAST_INIT_LAT) - MAX_LAT_CHANGE_PER_CYCLE)
+        else:
+            return abs(current_init_lat - LAST_INIT_LAT) - MAX_LAT_CHANGE_PER_CYCLE
 
 def get_central_line(mobileye_pb, path_length):
     ref_lane_x = []
@@ -55,10 +68,12 @@ def get_central_line(mobileye_pb, path_length):
     lc2 = mobileye_pb.lka_766.curvature
     lc3 = mobileye_pb.lka_766.curvature_derivative
     #lrangex = mobileye_pb.lka_767.view_range
+    offset = get_central_line_offset((rc0+lc0)/2.0)
+
     for y in range(int(path_length)):
         rx = rc3 * (y * y * y) + rc2 * (y * y) + rc1 * y + rc0
         lx = lc3 * (y * y * y) + lc2 * (y * y) + lc1 * y + lc0
-        ref_lane_x.append((rx + lx)/2.0)
+        ref_lane_x.append((rx + lx)/2.0 + offset)
         ref_lane_y.append(y)
     return ref_lane_x, ref_lane_y
 
@@ -103,7 +118,7 @@ def get_theta(point, point_base):
     return math.atan2(point[1] - point_base[1], point[0] - point_base[0]) - math.atan2(1, 0)
 
 def mobileye_callback(mobileye_pb):
-    global x, y, nx ,ny
+    global x, y, nx ,ny, LAST_INIT_LAT
     start_timestamp = time.time()
     path_length = MINIMUM_PATH_LENGTH
     if path_length < SPEED * 2:
@@ -136,6 +151,7 @@ def mobileye_callback(mobileye_pb):
         traj_point.relative_time = relative_time
 
     planning_pub.publish(adc_trajectory)
+    LAST_INIT_LAT = nx[0]
     f.write("duration: " + str(time.time() - start_timestamp) + "\n")
 
 def add_listener():
