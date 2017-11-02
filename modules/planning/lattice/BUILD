@@ -180,8 +180,12 @@ cc_library(
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/reference_line:reference_line",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
+        "//modules/planning/lattice:reference_line_matcher",
+        "//modules/planning/lattice:lattice_util",
+        "//modules/planning/lattice:lattice_params",
         "@glog//:glog",
     ],
 )

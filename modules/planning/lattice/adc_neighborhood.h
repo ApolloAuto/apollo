@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_LATTICE_ADC_NEIGHBORHOOD_H_
 
 #include <array>
+#include <vector>
 
 #include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -42,7 +43,12 @@ class ADCNeighborhood {
   bool IsInNeighborhood(const Obstacle& obstacle);
 
  private:
+  void InitNeighborhood(Frame* frame);
+
+ private:
   ReferenceLine reference_line_;
+  // array of [t, s, s_dot, s_dotdot]
+  std::vector<std::array<double, 4>> neighborhood_;
 };
 
 }  // namespace planning
