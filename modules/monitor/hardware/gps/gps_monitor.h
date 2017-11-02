@@ -16,9 +16,10 @@
 #ifndef MODULES_MONITOR_HARDWARE_GPS_GPS_MONITOR_H_
 #define MODULES_MONITOR_HARDWARE_GPS_GPS_MONITOR_H_
 
+#include <string>
 #include <vector>
 
-#include "modules/monitor/common/monitor.h"
+#include "modules/monitor/common/monitor_interface.h"
 
 namespace apollo {
 namespace monitor {
@@ -26,6 +27,7 @@ namespace monitor {
 // AdapterManager is required to listen to ins_status and gnss_status.
 class GpsMonitor : public HardwareMonitor {
  public:
+  explicit GpsMonitor(SystemStatus *system_status);
   void RunOnce(const double current_time) override;
 };
 

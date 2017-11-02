@@ -30,7 +30,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/common:canbus_common",
         "//modules/common/util:util",
-        "//modules/monitor/common:monitor",
+        "//modules/monitor/common:monitor_interface",
     ],
 )
 
