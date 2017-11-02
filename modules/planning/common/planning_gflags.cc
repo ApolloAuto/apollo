@@ -60,6 +60,8 @@ DEFINE_int32(spiral_smoother_num_iteration, 1000,
              "The iteration num of spiral reference line smoother.");
 DEFINE_double(spiral_smoother_piecewise_length, 10.0,
               "The piecewise length of spiral smoother.");
+DEFINE_double(spiral_reference_line_resolution, 0.02,
+    "The output resolution for reference line.");
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
