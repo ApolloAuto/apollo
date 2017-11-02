@@ -41,7 +41,7 @@ export default class AutoMeter extends React.Component {
     }
 
     render() {
-        const { throttlePercent, brakePercent, speed, drivingMode } = this.props;
+        const { throttlePercent, brakePercent, speed } = this.props;
 
         return (
             <div className="auto-meter">

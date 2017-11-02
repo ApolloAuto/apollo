@@ -1,14 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import Image from "components/common/Image";
-import wheelImage from "assets/images/wheel/wheel.png";
-import wheelBackground from "assets/images/wheel/wheel_background.png";
-import leftArrowOff from "assets/images/wheel/left_off";
-import rightArrowOff from "assets/images/wheel/right_off";
-import leftArrowOn from "assets/images/wheel/left_on";
-import rightArrowOn from "assets/images/wheel/right_on";
-
 @observer
 export default class Wheel extends React.Component {
     constructor(props) {
@@ -20,7 +12,7 @@ export default class Wheel extends React.Component {
     }
 
     render() {
-        const { steeringAngle, turnSignal } = this.props;
+        const { steeringAngle, turnSignal, drivingMode } = this.props;
 
         const leftArrowColor = (turnSignal === 'LEFT' || turnSignal === 'EMERGENCY')
                                ? this.signalColor.on : this.signalColor.off;
@@ -39,6 +31,7 @@ export default class Wheel extends React.Component {
                     <div className="wheel-arm"
                          style={{transform: `translate(-50%, -100%) rotate(${steeringAngle}deg`}}/>
                 </div>
+                <div className="driving-mode">{drivingMode}</div>
             </div>
         );
     }

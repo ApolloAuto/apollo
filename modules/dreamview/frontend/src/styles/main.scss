@@ -41,9 +41,6 @@ body {
 }
 
 
-
-
-
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
 
@@ -342,13 +339,17 @@ body {
     height: 60px;
     z-index: 50;
 
+    font-size: 16px;
     color: #ffffff;
     text-align: left;
     background: #000000;
 
     display: flex;
+    align-items: center;
+
     @include small-screen {
         height: 55px;
+        font-size: 14px;
     }
 
     /* The Apollo logo on the status bar. */
@@ -359,9 +360,7 @@ body {
         width: 121px;
 
         flex: 0 0 auto;
-        margin-top: 10px;
-        margin-left: 18px;
-        margin-right: auto;
+        margin: 10px auto 0px 18px;
 
         @include small-screen {
             top: 15px;
@@ -369,7 +368,7 @@ body {
             height: 25px;
             width: 80px;
 
-            margin-top: 15px;
+            margin-top: 5px;
         }
     }
 
@@ -384,7 +383,6 @@ body {
             display: block;
             padding: 0.5em 3em 0.5em 0.5em;
             border: none;
-            font-size: 16px;
             background: #000000;
             color: #ffffff;
 
@@ -395,10 +393,6 @@ body {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-
-            @include small-screen {
-                font-size: 14px;
-            }
         }
 
         .arrow {
@@ -531,7 +525,7 @@ body {
 
         .left-arrow {
             position: absolute;
-            top: 44px;
+            top: 40px;
             right: 120px;
             width: 0;
             height: 0;
@@ -542,7 +536,7 @@ body {
 
         .right-arrow {
             position: absolute;
-            top: 44px;
+            top: 40px;
             right: 20px;
             width: 0;
             height: 0;
@@ -553,7 +547,7 @@ body {
 
         .wheel-background {
             position: absolute;
-            top: 10px;
+            top: 6px;
             right: 30px;
             width: 70px;
             height: 70px;
@@ -590,6 +584,19 @@ body {
             width: 0;
             height: 0;
             border: 5px solid #006aff;
+        }
+
+        .driving-mode {
+            position: absolute;
+            width: 125px;
+            right: 15px;
+            bottom: 4px;
+
+            font-family: Arial;
+            font-weight: 300;
+            color: #ffffff;
+            font-size: 13px;
+            text-align: center;
         }
     }
 

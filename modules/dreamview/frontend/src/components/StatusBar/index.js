@@ -14,10 +14,10 @@ export default class StatusBar extends React.Component {
             <div className="status-bar">
                 <AutoMeter throttlePercent={meters.throttlePercent}
                            brakePercent={meters.brakePercent}
-                           speed={meters.speed}
-                           drivingMode={meters.drivingMode} />
+                           speed={meters.speed} />
                 <Wheel steeringAngle={meters.steeringAngle}
-                       turnSignal={meters.turnSignal} />
+                       turnSignal={meters.turnSignal}
+                       drivingMode={meters.drivingMode} />
                 <TrafficLightIndicator />
             </div>
         );
