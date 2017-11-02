@@ -54,7 +54,6 @@ class BehaviorDecider {
       Frame* frame,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
-      LonSampleConfig* lon_sample_config,
       PlanningTarget* planning_target);
 
   // Given a reference line, compute the nearest forward state and

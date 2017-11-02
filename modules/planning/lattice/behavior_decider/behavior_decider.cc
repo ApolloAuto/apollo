@@ -102,7 +102,7 @@ PlanningTarget BehaviorDecider::Analyze(
   ret.set_decision_type(PlanningTarget::GO);
 
   if (StopDecisionNearDestination(frame, lon_init_state,
-      discretized_reference_line, lon_sample_config, &ret)) {
+      discretized_reference_line, &ret)) {
     AINFO << "STOP decision when near the routing end.";
   }
 
@@ -113,7 +113,6 @@ bool BehaviorDecider::StopDecisionNearDestination(
     Frame* frame,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
-    LonSampleConfig* lon_sample_config,
     PlanningTarget* planning_target) {
 
   PointENU routing_end = frame->GetRoutingDestination();
@@ -127,6 +126,11 @@ bool BehaviorDecider::StopDecisionNearDestination(
   if (dist > dist_thred_omit_routing_end) {
     return false;
   }
+
+  LatticeSamplingConfig* lattice_sampling_config =
+    planning_target->mutable_lattice_sampling_config();
+  LonSampleConfig* lon_sample_config =
+    lattice_sampling_config->mutable_lon_sample_config();
 
   if (routing_end_on_ref_line.s() <
         discretized_reference_line.back().s() - 0.2) {
