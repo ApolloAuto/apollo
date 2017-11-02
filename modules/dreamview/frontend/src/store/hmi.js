@@ -1,7 +1,6 @@
 import { observable, action } from "mobx";
 
 export default class HMI {
-    // @observable config = {};
     @observable maps = [];
     @observable currentMap = 'none';
     @observable vehicles = [];
@@ -24,7 +23,6 @@ export default class HMI {
 
     @action updateConfig(newConfig) {
         console.log("config:", newConfig);
-        // this.config = newConfig;
         this.updateMaps(newConfig.availableMaps);
         this.updateVehicles(newConfig.availableVehicles);
     }
