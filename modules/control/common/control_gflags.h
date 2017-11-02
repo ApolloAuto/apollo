@@ -46,5 +46,5 @@ DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);
 DECLARE_bool(set_steer_limit);
 DECLARE_bool(use_relative_position);
-
+DECLARE_double(query_relative_time);
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
