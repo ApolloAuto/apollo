@@ -35,6 +35,7 @@ DECLARE_bool(enable_spiral_reference_line);
 DECLARE_double(spiral_smoother_max_deviation);
 DECLARE_int32(spiral_smoother_num_iteration);
 DECLARE_double(spiral_smoother_piecewise_length);
+DECLARE_double(spiral_reference_line_resolution);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
