@@ -95,6 +95,30 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "dropbox",
+    hdrs = [
+        "dropbox.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_test(
+    name = "dropbox_test",
+    size = "small",
+    srcs = [
+        "dropbox_test.cc",
+    ],
+    deps = [
+        ":dropbox",
+        "//modules/common",
+        "//modules/common:log",
+        "@gtest//:main",
+    ],
+)
+
 cc_test(
     name = "file_test",
     size = "small",
