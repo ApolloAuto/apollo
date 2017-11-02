@@ -22,10 +22,18 @@
 #include "modules/common/util/file.h"
 #include "modules/monitor/hardware/can/can_checker_factory.h"
 
+DEFINE_string(can_monitor_name, "CAN", "Name of the CAN monitor.");
+DEFINE_double(can_monitor_interval, 3, "CAN status checking interval (s).");
+
 namespace apollo {
 namespace monitor {
 
 using apollo::canbus::CanbusConf;
+
+CanMonitor::CanMonitor(SystemStatus *system_status)
+    : HardwareMonitor(FLAGS_can_monitor_name, FLAGS_can_monitor_interval,
+                      system_status) {
+}
 
 void CanMonitor::RunOnce(const double current_time) {
   CanbusConf canbus_conf;

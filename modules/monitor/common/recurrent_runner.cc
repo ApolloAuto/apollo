@@ -24,7 +24,7 @@
 namespace apollo {
 namespace monitor {
 
-namespace time = apollo::common::time;
+using apollo::common::time::Clock;
 
 RecurrentRunner::RecurrentRunner(const std::string &name,
                                  const double interval)
@@ -50,6 +50,7 @@ void RecurrentRunnerThread::RegisterRunner(
 }
 
 void RecurrentRunnerThread::Start() {
+  CHECK(!thread_) << "Thread has already started.";
   thread_.reset(new std::thread([this]() {
     while (true) {
       {
@@ -61,7 +62,7 @@ void RecurrentRunnerThread::Start() {
       }
 
       // Tick runners.
-      const double current_time = time::ToSecond(time::Clock::Now());
+      const double current_time = Clock::NowInSecond();
       for (auto &runner : runners_) {
         runner->Tick(current_time);
       }
@@ -72,6 +73,7 @@ void RecurrentRunnerThread::Start() {
 }
 
 void RecurrentRunnerThread::Stop() {
+  CHECK(thread_) << "Thread has already stopped.";
   {
     std::lock_guard<std::mutex> guard(stop_mutex_);
     stop_ = true;

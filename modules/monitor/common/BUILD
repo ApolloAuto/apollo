@@ -14,9 +14,9 @@ cc_library(
 )
 
 cc_library(
-    name = "monitor",
-    srcs = ["monitor.cc"],
-    hdrs = ["monitor.h"],
+    name = "monitor_interface",
+    srcs = ["monitor_interface.cc"],
+    hdrs = ["monitor_interface.h"],
     deps = [
         ":recurrent_runner",
         "//modules/monitor/proto:system_status_proto",

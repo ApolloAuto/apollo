@@ -25,7 +25,6 @@
 #include "modules/common/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/dreamview/proto/hmi_status.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
@@ -33,6 +32,7 @@
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -71,9 +71,9 @@ using RelativeOdometryAdapter =
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
 using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
+using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
 // TODO(xiaoxq): Retire HMICommandAdapter after integration with dreamview.
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
-using HMIStatusAdapter = Adapter<dreamview::HMIStatus>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;

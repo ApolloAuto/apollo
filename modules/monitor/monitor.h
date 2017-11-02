@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_COMMON_MONITOR_H_
-#define MODULES_MONITOR_COMMON_MONITOR_H_
+#ifndef MODULES_MONITOR_MONITOR_H_
+#define MODULES_MONITOR_MONITOR_H_
 
+#include <memory>
 #include <string>
 
+#include "modules/common/apollo_app.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -29,25 +31,21 @@
 namespace apollo {
 namespace monitor {
 
-class HardwareMonitor : public RecurrentRunner {
+class Monitor : public apollo::common::ApolloApp {
  public:
-  HardwareMonitor(const std::string &name, const double interval,
-                  SystemStatus *system_status);
+  Monitor();
+  std::string Name() const override { return "SystemMonitor"; }
 
- protected:
-  HardwareStatus *status_;  // No ownership.
-};
+  apollo::common::Status Init() override;
+  apollo::common::Status Start() override;
+  void Stop() override;
 
-class ModuleMonitor : public RecurrentRunner {
- public:
-  ModuleMonitor(const std::string &name, const double interval,
-                SystemStatus *system_status);
-
- protected:
-  ModuleStatus *status_;  // No ownership.
+ private:
+  RecurrentRunnerThread monitor_thread_;
+  SystemStatus system_status_;
 };
 
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_COMMON_MONITOR_H_
+#endif  // MODULES_MONITOR_MONITOR_H_
