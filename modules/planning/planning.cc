@@ -183,7 +183,10 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 
 void Planning::RunOnce() {
   const double start_timestamp = Clock::NowInSecond();
+
+  // snapshot all coming data
   AdapterManager::Observe();
+
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
                         ->mutable_main_decision()
