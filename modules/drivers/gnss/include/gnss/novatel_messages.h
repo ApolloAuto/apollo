@@ -49,6 +49,10 @@ enum MessageId : uint16_t {
   RAWIMUSX = 1462,
   MARK1PVA = 1067,
   GPGGA = 218,
+  BDSEPHEMERIS = 1696,
+  GLOEPHEMERIS = 723,
+  GPSEPHEMERIS = 7,
+  RANGE = 43,
 };
 
 // Every binary message has 32-bit CRC performed on all data including the
@@ -175,6 +179,110 @@ enum class DatumId : uint32_t {
   // We only use WGS-84.
   WGS84 = 61,
 };
+
+struct BDS_Ephemeris {
+  uint32_t satellite_id; //ID/ranging code
+  uint32_t week;  //week number
+  double ura; //user range accurancy(metres). This is the evaluated URAI/URA lookup-table value
+  uint32_t health1; //Autonomous satellite health flag. 0 means broadcasting satellite is good, 1 means not
+  double tdg1; //Equipment group delay differential for the B1 signal(seconds)
+  double tdg2; //Equipment froup delay defferential for the B2 signal(seconds)
+  uint32_t aodc; //Age of data, clock
+  uint32_t toc; //Reference time of clock parameters
+  double a0; //Constant term of clock correction polynomial(seconds)
+  double a1; //Linear term of clock correction polynomial (seconds/seconds)
+  double a2; //Quadratic term of clock correction polynomial (second/seconds^2)
+  uint32_t aode; //Age of data, ephemeris
+  uint32_t toe; //Reference time of ephemeris parameters
+  double rootA; //Square root of semi-major axis (sqrt(metres))
+  double ecc; //Eccentricity (sqrt(metres))
+  double omega; //Argument of perigee
+  double delta_N; //Mean motion difference from computed value (radians/second)
+  double M0; //Mean anomaly at reference time (radians)
+  double omega0; //Longitude of ascending node of orbital of plane computed according to reference time(radians)
+  double rra; //Rate of right ascension(radians/second)
+  double inc_angle; //inclination angle at reference time(radians)
+  double idot; //Rate of inclination angle(radians/second)
+  double cuc; //Amplitude of cosine harmonic correction term to the argument of latitude(radians)
+  double cus; //Amplitude of sine harmonic correction term to the argument of latitude(radians)
+  double crc; //Amplitude of cosine harmonic correction term to the orbit radius(metres)
+  double crs; //Amplitude of sine harmonic correction term to the orbit radius(metres)
+  double cic; //Amplitude of cosine harmonic correction term to the angle of inclination(radians)
+  double cis; //Amplitude of sine harmonic correction term to the angle of inclination(radians)
+};
+static_assert(sizeof(BDS_Ephemeris) == 196, "Incorrect size of BDS_Ephemeris.");
+
+struct GLO_Ephemeris {
+  uint16_t sloto; //Slot information offset-PRNidentification(Slot+37).
+  uint16_t freqo; //frequency channel offset for satellite in the range 0 to 20
+  uint8_t sat_type; //Satellite type where(0=GLO_SAT, 1=GLO_SAT_M, 2=GLO_SAT_K)
+  uint8_t reserved_1; //Reserved
+  uint16_t e_week; //reference week of ephemeris(GPS reference time)
+  uint32_t e_time; //reference time of ephemeris(GPS reference time) in ms
+  uint32_t t_offset; //integer seconds between GPS and GLONASS time. A positive value implies GLONASS is ahead of GPS reference time.
+  uint16_t Nt; //Calendar number of day within 4 year interval starting at Jan 1 of leap year
+  uint8_t reserved_2; //Reserved
+  uint8_t reserved_3; //Reserved
+  uint32_t issue; //15 minute interval number corresponding to ephemeris reference time
+  uint32_t health; //Ephemeris health where 0-3=GOOD, 4-15=BAD
+  double pos_x; //X coordinate for satellite at reference time (PZ-90.02), in meters
+  double pos_y; //Y coordinate for satellite at reference time (PZ-90.02), in meters
+  double pos_z; //Z coordinate for satellite at reference time (PZ-90.02), in meters
+  double vel_x; //X corrdinate for satellite velocity at reference time(PZ-90.02), in meters/s
+  double vel_y; //Y corrdinate for satellite velocity at reference time(PZ-90.02), in meters/s
+  double vel_z; //Z corrdinate for satellite velocity at reference time(PZ-90.02), in meters/s
+  double acc_x; //X coordinate for lunisolar acceleration at reference time(PZ-90.02), in meters/s/s
+  double acc_y; //Y coordinate for lunisolar acceleration at reference time(PZ-90.02), in meters/s/s
+  double acc_z; //Z coordinate for lunisolar acceleration at reference time(PZ-90.02), in meters/s/s
+  double tau_n; //Correction to the nth satellite time t_n relative to GLONASS time_t, in seconds
+  double delta_tau_n; //Time difference between navigation RF signal transmitted in L2 sub-band and
+                      //navigation RF signal transmitted in L1 sub-band by nth satellite , in seconds
+  double gamma; //frequency correction , in seconds/second
+  uint32_t Tk; //Time of frame start(since start of GLONASS day), in seconds
+  uint32_t P; //technological parameter
+  uint32_t Ft; //User range
+  uint32_t age; //age of data, in days
+  uint32_t Flags; //information flags
+};
+static_assert(sizeof(GLO_Ephemeris) == 144, "Incorrect size of GLO_Ephemeris.");
+
+struct GPS_Ephemeris {
+  uint32_t prn; //Satellite prn number
+  double tow; //Time stamp of subframe 0
+  uint32_t health; //Health status -a 6-bit health code as defined in ICD-GPS-200
+  uint32_t iode1; //issue of ephemeris data 1
+  uint32_t iode2; //issue of ephemeris data 2
+  uint32_t week; //GPS reference week number
+  uint32_t z_week; //Z count week number
+  double toe; //reference time for ephemeris, seconds
+  double A; //semi-major axis, metres
+  double delta_A; //Mean motion defference, radians/second
+  double M_0; //Mean anomaly of reference time, radians
+  double ecc; //Eccentricity. dimensionless-quantiry defined for a conic section where e=0 is a circle, e=1 is a parabola
+                //0<e<1 os an ellipse and e>1 is a hyperbola
+  double omega; //Argument of perigee, radians -measurement along the orbital path from the ascending node to the point where
+                  //the SV os closest to the earth, in the direction of the SV's motion
+  double cuc; //Argument of latitude
+  double cus; //Argument of latitude
+  double crc; //Orbit radius
+  double crs; //Orbit radius
+  double cic; //Inclination
+  double cis; //Inclination
+  double I_0; //Inclination angle at reference time, radians
+  double dot_I; //Rate of inclination angle, radians/second
+  double omega_0; //right ascension, radians
+  double dot_omega; //rate of right ascension, radians/second
+  uint32_t iodc; //issue of data clock
+  double toc; //SV clock correction term, seconds
+  double tgd; //Estimated group delay difference seconds
+  double af0; //Clock aging parameter. seconds
+  double af1; //Clock aging paraneter
+  double af2; //Clock aging parameter
+  uint32_t AS; //Anti-spoofing on : 0=false, 1=true
+  double N; //Corrected mean motion, radians/second
+  double ura; //User Range Acceracy variance.
+};
+static_assert(sizeof(GPS_Ephemeris) == 224, "Incorrect size of GPS_Ephemeris.");
 
 struct BestPos {
   SolutionStatus solution_status;
