@@ -86,7 +86,7 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
-DEFINE_double(output_trajectory_time_resolution, 0.01,
+DEFINE_double(output_trajectory_time_resolution, 0.1,
               "Trajectory time resolution when publish for EM planner");
 
 DEFINE_bool(enable_trajectory_check, false,
