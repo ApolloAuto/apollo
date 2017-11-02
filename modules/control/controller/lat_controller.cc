@@ -543,7 +543,7 @@ void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) const {
-  // TODO: (QiL) change this to conf.
+  // TODO(QiL): change this to conf.
   ::apollo::common::TrajectoryPoint target_point;
   if (FLAGS_use_relative_position) {
     target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
