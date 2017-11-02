@@ -124,7 +124,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
         Json poi_list = Json::array();
         if (LoadPOI()) {
-          for (const auto& landmark : poi_.landmark()) {
+          for (const auto &landmark : poi_.landmark()) {
             Json place;
             place["name"] = landmark.name();
             place["x"] = landmark.waypoint().pose().x();
@@ -176,6 +176,11 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     auto *waypoint = routing_request->mutable_waypoint();
     for (size_t i = 0; i < iter->size(); ++i) {
       auto &point = (*iter)[i];
+      if (point.find("x") == point.end() || point.find("y") == point.end()) {
+        AERROR << "Failed to prepare a routing request: waypoint not found";
+        return false;
+      }
+
       if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
                                                waypoint->Add())) {
         waypoint->RemoveLast();
