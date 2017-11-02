@@ -27,6 +27,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
               "Global flagfile shared by all modules.");
@@ -125,21 +126,6 @@ void HMI::RegisterMessageHandlers() {
         ExecuteComponentCommand(config_.modules(), *module, *command);
       });
 
-  // HMI client asks for executing hardware command.
-  websocket_->RegisterMessageHandler(
-      "ExecuteHardwareCommand",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain
-        // {hardware: "hardware_name", command: "command_name"}.
-        const auto hardware = json.find("hardware");
-        const auto command = json.find("command");
-        if (hardware == json.end() || command == json.end()) {
-          AERROR << "Truncated hardware command.";
-          return;
-        }
-        ExecuteComponentCommand(config_.hardware(), *hardware, *command);
-      });
-
   // HMI client asks for changing driving mode.
   websocket_->RegisterMessageHandler(
       "ChangeDrivingMode",
@@ -181,6 +167,13 @@ void HMI::RegisterMessageHandlers() {
           return;
         }
         ChangeVehicleTo(*new_vehicle);
+      });
+
+  // Received new system status, broadcast to clients.
+  AdapterManager::AddSystemStatusCallback(
+      [this](const monitor::SystemStatus &system_status) {
+        *status_.mutable_system_status() = system_status;
+        BroadcastHMIStatus();
       });
 }
 
@@ -252,6 +245,7 @@ void HMI::ChangeMapTo(const std::string &map_name) {
 
   // TODO(xiaoxq): Reset all modules.
   status_.set_current_map(map_name);
+  BroadcastHMIStatus();
 }
 
 void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
@@ -264,6 +258,7 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
   // TODO(xiaoxq): Copy vehicle params to target position, and reset all modules
   // and hardware.
   status_.set_current_vehicle(vehicle_name);
+  BroadcastHMIStatus();
 }
 
 }  // namespace dreamview
