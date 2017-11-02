@@ -5,7 +5,6 @@ import AutoMeter from "components/StatusBar/AutoMeter";
 import Wheel from "components/StatusBar/Wheel";
 import TrafficLightIndicator from "components/StatusBar/TrafficLightIndicator";
 
-
 @observer
 export default class StatusBar extends React.Component {
     render() {
@@ -13,7 +12,6 @@ export default class StatusBar extends React.Component {
 
         return (
             <div className="status-bar">
-                <StatusBackground />
                 <AutoMeter throttlePercent={meters.throttlePercent}
                            brakePercent={meters.brakePercent}
                            speed={meters.speed} />
