@@ -1,8 +1,18 @@
-/***************************************************************************
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- **************************************************************************/
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 /**
  * @file world_manager.h
  **/
@@ -10,11 +20,14 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H
 
 #include "modules/common/macro.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/lattice_sampling_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-//class ScenarioFeature;
+class Scenario;
+
 class ScenarioManager {
 private:
     enum FeatureLevel {
@@ -25,35 +38,36 @@ private:
         NUM_LEVELS,
     };
 public:
-    /*
-    void reset();
-    int construct_world(const DecisionPath* decision_path);
+    void Reset();
+    int ComputeWorldDecision(
+        const std::vector<common::PathPoint>& discretized_reference_line,
+        std::vector<PlanningTarget*>* const decisions);
+
     template<class T>
-    void register_world_feature(FeatureLevel level) {
-        auto feature = std::make_unique<T>();
-        _features[static_cast<int>(level)].push_back(feature.get());
-        _indexed_features[feature->name()] = std::move(feature);
+    void RegisterScenario(FeatureLevel level) {
+        auto scenario = std::make_unique<T>();
+        scenarios_[static_cast<int>(level)].push_back(scenario.get());
+        indexed_scenarios_[scenario->name()] = std::move(scenario);
     }
+
     template<class T>
-    const T* find_world() const {
-        auto world_iter = _indexed_features.find(T::feature_name());
-        if (world_iter == _indexed_features.end()) {
+    const T* FindScenario() const {
+        auto scenario_iter = indexed_features_.find(T::scenario_name());
+        if (scenario_iter == indexed_features_.end()) {
             return nullptr;
         } else {
-            return dynamic_cast<const T*>(world_iter->second.get());
+            return dynamic_cast<const T*>(scenario_iter->second.get());
         }
     }
-    */
 private:
-    /*
-    void register_world_features();
-    std::vector<std::vector<WorldFeature*>> _features;
-    std::unordered_map<std::string, std::unique_ptr<WorldFeature>> _indexed_features;
-    bool _initialized = false;
-    */
+    void RegisterScenarios();
+    std::vector<std::vector<Scenario*>> scenarios_;
+    std::unordered_map<std::string, std::unique_ptr<Scenario>> indexed_scenarios_;
+    bool initialized_ = false;
     DECLARE_SINGLETON(ScenarioManager);
 };
-} // namespace decision
-} // namespace adu
-} // namespace baidu
+
+} // namespace apollo
+} // namespace planning
+
 #endif
