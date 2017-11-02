@@ -49,6 +49,14 @@ DEFINE_double(look_forward_time_sec, 8,
               "look forward time times adc speed to calculate this distance "
               "when creating reference line from routing");
 
+DEFINE_double(prepare_rerouting_time, 2.0,
+              "If there are this amount of seconds left to finish driving on "
+              "current route, and there is no routing, do rerouting");
+
+DEFINE_double(rerouting_cooldown_time, 0.6,
+              "Wait for at least this amount of seconds before send another "
+              "rerouting request");
+
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
@@ -61,7 +69,7 @@ DEFINE_int32(spiral_smoother_num_iteration, 1000,
 DEFINE_double(spiral_smoother_piecewise_length, 10.0,
               "The piecewise length of spiral smoother.");
 DEFINE_double(spiral_reference_line_resolution, 0.02,
-    "The output resolution for reference line.");
+              "The output resolution for reference line.");
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
