@@ -120,6 +120,8 @@ class SimControl {
   // Number of planning received in terms of one RoutingResponse.
   int planning_count_;
 
+  bool re_routing_triggered_;
+
   // Whether the sim control is enabled.
   bool enabled_;
 

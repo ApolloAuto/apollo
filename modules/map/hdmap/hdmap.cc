@@ -21,6 +21,7 @@ namespace apollo {
 namespace hdmap {
 
 int HDMap::LoadMapFromFile(const std::string& map_filename) {
+  AINFO << "Loading HDMap: " << map_filename << "...";
   return impl_.LoadMapFromFile(map_filename);
 }
 
@@ -113,8 +114,8 @@ int HDMap::GetRoads(const apollo::common::PointENU& point, double distance,
 }
 
 int HDMap::GetNearestLane(const common::PointENU& point,
-                          LaneInfoConstPtr* nearest_lane,
-                          double* nearest_s, double* nearest_l) const {
+                          LaneInfoConstPtr* nearest_lane, double* nearest_s,
+                          double* nearest_l) const {
   return impl_.GetNearestLane(point, nearest_lane, nearest_s, nearest_l);
 }
 
@@ -125,9 +126,9 @@ int HDMap::GetNearestLaneWithHeading(const apollo::common::PointENU& point,
                                      LaneInfoConstPtr* nearest_lane,
                                      double* nearest_s,
                                      double* nearest_l) const {
-  return impl_.GetNearestLaneWithHeading(
-      point, distance, central_heading, max_heading_difference, nearest_lane,
-      nearest_s, nearest_l);
+  return impl_.GetNearestLaneWithHeading(point, distance, central_heading,
+                                         max_heading_difference, nearest_lane,
+                                         nearest_s, nearest_l);
 }
 
 int HDMap::GetLanesWithHeading(const apollo::common::PointENU& point,
@@ -135,8 +136,8 @@ int HDMap::GetLanesWithHeading(const apollo::common::PointENU& point,
                                const double central_heading,
                                const double max_heading_difference,
                                std::vector<LaneInfoConstPtr>* lanes) const {
-  return impl_.GetLanesWithHeading(
-      point, distance, central_heading, max_heading_difference, lanes);
+  return impl_.GetLanesWithHeading(point, distance, central_heading,
+                                   max_heading_difference, lanes);
 }
 
 int HDMap::GetRoadBoundaries(
