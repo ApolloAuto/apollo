@@ -115,15 +115,19 @@ void HMI::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "ExecuteModuleCommand",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain
-        // {module: "module_name", command: "command_name"}.
+        // json should contain {module: "module_name", command: "command_name"}.
+        // If module_name is "all", then run the command on all modules.
         const auto module = json.find("module");
         const auto command = json.find("command");
         if (module == json.end() || command == json.end()) {
           AERROR << "Truncated module command.";
           return;
         }
-        ExecuteComponentCommand(config_.modules(), *module, *command);
+        if (*module == "all") {
+          RunCommandOnAllModules(*command);
+        } else {
+          RunModuleCommand(*module, *command);
+        }
       });
 
   // HMI client asks for changing driving mode.
@@ -184,19 +188,17 @@ void HMI::BroadcastHMIStatus() const {
   }
 }
 
-int HMI::ExecuteComponentCommand(const Map<std::string, Component> &components,
-                                 const std::string &component_name,
-                                 const std::string &command_name) {
-  const auto component = components.find(component_name);
-  if (component == components.end()) {
-    AERROR << "Cannot find component with name " << component_name;
+int HMI::RunModuleCommand(const std::string &module_name,
+                          const std::string &command_name) {
+  const auto module = config_.modules().find(module_name);
+  if (module == config_.modules().end()) {
+    AERROR << "Cannot find " << module_name << " module";
     return -1;
   }
-  const auto &supported_commands = component->second.supported_commands();
+  const auto &supported_commands = module->second.supported_commands();
   const auto cmd = supported_commands.find(command_name);
   if (cmd == supported_commands.end()) {
-    AERROR << "Cannot find command with name " << command_name
-           << " for component " << component_name;
+    AERROR << "Cannot find command " << module_name << ":" << command_name;
     return -1;
   }
   AINFO << "Execute system command: " << cmd->second;
@@ -204,6 +206,17 @@ int HMI::ExecuteComponentCommand(const Map<std::string, Component> &components,
 
   AERROR_IF(ret != 0) << "Command returns " << ret << ": " << cmd->second;
   return ret;
+}
+
+int HMI::RunCommandOnAllModules(const std::string &command_name) {
+  int failed = 0;
+  for (const auto &module : config_.modules()) {
+    const int ret = RunModuleCommand(module.first, command_name);
+    if (ret != 0) {
+      ++failed;
+    }
+  }
+  return failed;
 }
 
 void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
@@ -243,7 +256,7 @@ void HMI::ChangeMapTo(const std::string &map_name) {
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
   fout << "\n--map_dir=" << iter->second << std::endl;
 
-  // TODO(xiaoxq): Reset all modules.
+  RunCommandOnAllModules("stop");
   status_.set_current_map(map_name);
   BroadcastHMIStatus();
 }
@@ -255,8 +268,7 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
     return;
   }
 
-  // TODO(xiaoxq): Copy vehicle params to target position, and reset all modules
-  // and hardware.
+  RunCommandOnAllModules("stop");
   status_.set_current_vehicle(vehicle_name);
   BroadcastHMIStatus();
 }
