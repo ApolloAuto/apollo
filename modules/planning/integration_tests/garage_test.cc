@@ -106,3 +106,5 @@ TEST_F(GarageTest, stop_over_line) {
 
 }  // namespace planning
 }  // namespace apollo
+
+TMAIN;
