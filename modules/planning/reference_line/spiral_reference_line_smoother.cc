@@ -28,11 +28,15 @@
 #include "IpSolveStatistics.hpp"
 #include "glog/logging.h"
 
+#include "modules/common/time/time.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/reference_line/spiral_problem_interface.h"
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::time::Clock;
 
 SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
     const double max_point_deviation)
@@ -43,7 +47,8 @@ SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-  const double piecewise_length = 10.0;
+  const double start_timestamp = Clock::NowInSecond();
+  const double piecewise_length = FLAGS_spiral_smoother_piecewise_length;
   const double length = raw_reference_line.Length();
   ADEBUG << "Length = " << length;
   uint32_t num_of_pieces =
@@ -90,6 +95,10 @@ bool SpiralReferenceLineSmoother::Smooth(
     return false;
   }
   *smoothed_reference_line = ReferenceLine(ref_points);
+  const double end_timestamp = Clock::NowInSecond();
+  ADEBUG << "Spiral reference line smoother time: "
+         << (end_timestamp - start_timestamp) * 1000 << " ms.";
+
   return true;
 }
 
@@ -113,7 +122,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   //  app->Options()->SetNumericValue("derivative_test_perturbation", 1.0e-7);
   //  app->Options()->SetStringValue("derivative_test", "second-order");
   app->Options()->SetIntegerValue("print_level", 0);
-  int num_iterations = 10;
+  int num_iterations = FLAGS_spiral_smoother_num_iteration;
   app->Options()->SetIntegerValue("max_iter", num_iterations);
 
   //  app->Options()->SetNumericValue("acceptable_tol", 0.5);
@@ -121,7 +130,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   //  app->Options()->SetNumericValue("constr_viol_tol", 0.01);
   //  app->Options()->SetIntegerValue("acceptable_iter", 10);
   //  app->Options()->SetIntegerValue("print_level", 0);
-  // app->Options()->SetStringValue("fast_step_computation", "yes");
+  //  app->Options()->SetStringValue("fast_step_computation", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {

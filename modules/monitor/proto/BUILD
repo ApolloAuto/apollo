@@ -12,6 +12,9 @@ cc_proto_library(
 proto_library(
     name = "system_status_proto_lib",
     srcs = ["system_status.proto"],
+    deps = [
+        "//modules/common/proto:header_proto_lib",
+    ],
 )
 
 cpplint()

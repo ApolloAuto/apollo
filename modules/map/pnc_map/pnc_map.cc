@@ -37,6 +37,11 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/routing/common/routing_gflags.h"
 
+DEFINE_bool(reckless_change_lane, false, "always allow change lane");
+DEFINE_double(max_distance_to_lane_center, 0.2,
+              "The max distance to lance center that we believe lane change is "
+              "finished.");
+
 namespace apollo {
 namespace hdmap {
 
@@ -98,6 +103,10 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 }  // namespace
 
+const std::string &RouteSegments::Id() const { return id_; }
+
+void RouteSegments::SetId(const std::string &id) { id_ = id; }
+
 void RouteSegments::SetCanExit(bool can_exit) { can_exit_ = can_exit; }
 
 bool RouteSegments::CanExit() const { return can_exit_; }
@@ -147,6 +156,14 @@ bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
     }
   }
   return has_projection;
+}
+
+void RouteSegments::SetPreviousAction(routing::ChangeLaneType action) {
+  previous_action_ = action;
+}
+
+routing::ChangeLaneType RouteSegments::PreviousAction() const {
+  return previous_action_;
 }
 
 void RouteSegments::SetNextAction(routing::ChangeLaneType action) {
@@ -412,7 +429,6 @@ bool PncMap::GetRouteSegments(
     const double backward_length, const double forward_length,
     std::vector<RouteSegments> *const route_segments) const {
   // vehicle has to be this close to lane center before considering change lane
-  constexpr double kMaxDistanceToLaneCenter = 0.5;
   if (!current_waypoint_.lane || route_index_.size() != 3 ||
       route_index_[0] < 0) {
     AERROR << "Invalid position, use UpdatePosition() function first";
@@ -424,8 +440,9 @@ bool PncMap::GetRouteSegments(
   const double dist_on_passage =
       common::util::DistanceXY(current_point_, passage_start_point_);
   const bool allow_change_lane =
-      (min_l_to_lane_center_ < kMaxDistanceToLaneCenter) &&
-      (dist_on_passage > FLAGS_min_length_for_lane_change);
+      FLAGS_reckless_change_lane ||
+      ((min_l_to_lane_center_ < FLAGS_max_distance_to_lane_center) &&
+       (dist_on_passage > FLAGS_min_length_for_lane_change));
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
   for (const int index : drive_passages) {
@@ -467,8 +484,16 @@ bool PncMap::GetRouteSegments(
     }
     route_segments->back().SetCanExit(passage.can_exit());
     route_segments->back().SetNextAction(passage.change_lane_type());
+    std::string route_segment_id =
+        std::to_string(road_index) + "_" + std::to_string(index);
+    route_segments->back().SetId(route_segment_id);
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
+      route_segments->back().SetPreviousAction(routing::FORWARD);
+    } else if (l > 0) {
+      route_segments->back().SetPreviousAction(routing::RIGHT);
+    } else {
+      route_segments->back().SetPreviousAction(routing::LEFT);
     }
   }
   return !route_segments->empty();

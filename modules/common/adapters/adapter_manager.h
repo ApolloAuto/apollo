@@ -243,9 +243,11 @@ class AdapterManager {
   REGISTER_ADAPTER(RoutingResponse);
   REGISTER_ADAPTER(RelativeOdometry);
   REGISTER_ADAPTER(InsStat);
+  REGISTER_ADAPTER(InsStatus);
+  REGISTER_ADAPTER(GnssStatus);
+  REGISTER_ADAPTER(SystemStatus);
   // TODO(xiaoxq): Retire HMICommand adapter after integration with dreamview.
   REGISTER_ADAPTER(HMICommand);
-  REGISTER_ADAPTER(HMIStatus);
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(CompressedImage);

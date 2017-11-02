@@ -147,7 +147,7 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
 
   std::unique_ptr<ReferenceLineSmoother> smoother;
   if (FLAGS_enable_spiral_reference_line) {
-    double max_deviation = 0.1;
+    double max_deviation = FLAGS_spiral_smoother_max_deviation;
     smoother.reset(new SpiralReferenceLineSmoother(max_deviation));
   } else {
     smoother.reset(new QpSplineReferenceLineSmoother(smoother_config_,

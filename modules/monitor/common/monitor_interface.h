@@ -14,24 +14,40 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/monitor/common/monitor.h"
+#ifndef MODULES_MONITOR_COMMON_MONITOR_INTERFACE_H_
+#define MODULES_MONITOR_COMMON_MONITOR_INTERFACE_H_
 
+#include <string>
+
+#include "modules/monitor/common/recurrent_runner.h"
+#include "modules/monitor/proto/system_status.pb.h"
+
+/**
+ * @namespace apollo::monitor
+ * @brief apollo::monitor
+ */
 namespace apollo {
 namespace monitor {
 
-HardwareMonitor::HardwareMonitor(const std::string &name, const double interval,
-                                 SystemStatus *system_status)
-    : RecurrentRunner(name, interval) {
-  system_status->mutable_hardware()->insert({name, {}});
-  status_ = &system_status->mutable_hardware()->at(name);
-}
+class HardwareMonitor : public RecurrentRunner {
+ public:
+  HardwareMonitor(const std::string &name, const double interval,
+                  SystemStatus *system_status);
 
-ModuleMonitor::ModuleMonitor(const std::string &name, const double interval,
-                             SystemStatus *system_status)
-    : RecurrentRunner(name, interval) {
-  system_status->mutable_modules()->insert({name, {}});
-  status_ = &system_status->mutable_modules()->at(name);
-}
+ protected:
+  HardwareStatus *status_;  // No ownership.
+};
+
+class ModuleMonitor : public RecurrentRunner {
+ public:
+  ModuleMonitor(const std::string &name, const double interval,
+                SystemStatus *system_status);
+
+ protected:
+  ModuleStatus *status_;  // No ownership.
+};
 
 }  // namespace monitor
 }  // namespace apollo
+
+#endif  // MODULES_MONITOR_COMMON_MONITOR_INTERFACE_H_

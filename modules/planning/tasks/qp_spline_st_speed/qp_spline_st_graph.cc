@@ -114,8 +114,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   speed_data->Clear();
   const Spline1d& spline = spline_generator_->spline();
 
-  const double t_output_resolution =
-      qp_st_speed_config_.output_time_resolution();
+  const double t_output_resolution = FLAGS_output_trajectory_time_resolution;
   double time = 0.0;
   while (time < qp_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);

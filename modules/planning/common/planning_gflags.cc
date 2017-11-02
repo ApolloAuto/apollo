@@ -54,6 +54,12 @@ DEFINE_bool(enable_smooth_reference_line, true,
 
 DEFINE_bool(enable_spiral_reference_line, false,
             "enable new spiral based reference line");
+DEFINE_double(spiral_smoother_max_deviation, 0.1,
+              "The max deviation of spiral reference line smoother.");
+DEFINE_int32(spiral_smoother_num_iteration, 1000,
+             "The iteration num of spiral reference line smoother.");
+DEFINE_double(spiral_smoother_piecewise_length, 10.0,
+              "The piecewise length of spiral smoother.");
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
@@ -80,7 +86,7 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
-DEFINE_double(output_trajectory_time_resolution, 0.01,
+DEFINE_double(output_trajectory_time_resolution, 0.1,
               "Trajectory time resolution when publish for EM planner");
 
 DEFINE_bool(enable_trajectory_check, false,

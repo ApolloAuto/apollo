@@ -23,9 +23,10 @@
 
 #include <vector>
 
-#include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
+#include "Eigen/Dense"
+#include "modules/planning/math/curve1d/quintic_spiral_path.h"
 
 namespace apollo {
 namespace planning {
@@ -92,6 +93,8 @@ class SpiralProblemInterface : public Ipopt::TNLP {
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
  private:
+  void update_piecewise_spiral_paths(const double* x, const int n);
+
   std::vector<Eigen::Vector2d> points_;
 
   std::vector<double> theta_;
@@ -123,6 +126,8 @@ class SpiralProblemInterface : public Ipopt::TNLP {
   const std::size_t num_of_internal_points_ = 5;
 
   std::vector<double> relative_theta_;
+
+  std::vector<QuinticSpiralPath> piecewise_paths_;
 };
 
 }  // namespace planning

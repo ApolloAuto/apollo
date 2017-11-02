@@ -27,6 +27,11 @@ namespace planning {
 
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
+using apollo::common::Status;
+
+namespace {
+constexpr double kSpeedOptimizationFallbackClost = 2e4;
+}
 
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
 
@@ -43,6 +48,8 @@ apollo::common::Status SpeedOptimizer::Execute(
   if (!ret.ok() && FLAGS_enable_slowdown_profile_generator) {
     *reference_line_info->mutable_speed_data() = GenerateStopProfile(
         frame->PlanningStartPoint().v(), frame->PlanningStartPoint().a());
+    reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
+    ret = Status::OK();
   }
   RecordDebugInfo(reference_line_info->speed_data());
   return ret;
