@@ -228,7 +228,7 @@ bool LidarProcessSubnode::InitFrameDependence() {
            << lidar_processing_data_name;
     return false;
   }
-  AINFO << "Init shared data successfully, data: " << processing_data_->name();
+  AINFO << "Init shared data successfully, data: " << processing_data_->Name();
 
   /// init hdmap
   if (FLAGS_enable_hdmap_input) {

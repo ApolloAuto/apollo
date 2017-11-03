@@ -12,7 +12,7 @@ class data_name : public CommonSharedData<SensorObjects> {  \
 public:  \
     data_name() : CommonSharedData<SensorObjects>() {}  \
     virtual ~data_name() {}  \
-    virtual std::string name() const override {  \
+    virtual std::string Name() const override {  \
         return #data_name;  \
     }  \
 private:  \

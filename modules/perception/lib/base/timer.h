@@ -74,8 +74,8 @@ class TimerWrapper {
 
 #define PERF_BLOCK_START()           \
   apollo::perception::Timer _timer_; \
-  _timer_.start()
+  _timer_.Start()
 
-#define PERF_BLOCK_END(msg) _timer_.end(msg)
+#define PERF_BLOCK_END(msg) _timer_.End(msg)
 
 #endif  // MODULES_PERCEPTION_LIB_BASE_TIMER_H_
