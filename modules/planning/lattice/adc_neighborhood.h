@@ -19,6 +19,8 @@
 
 #include <array>
 #include <vector>
+#include <unordered_set>
+#include <string>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/planning/common/frame.h"
@@ -30,7 +32,8 @@ namespace planning {
 
 class ADCNeighborhood {
  public:
-  ADCNeighborhood(Frame* frame,
+  ADCNeighborhood(
+      const Frame* frame,
       const apollo::common::TrajectoryPoint& planning_init_point,
       const ReferenceLine& reference_line);
 
@@ -42,17 +45,24 @@ class ADCNeighborhood {
       std::array<double, 3>* backward_nearest_obstacle_state,
       double* enter_time);
 
-  bool IsInNeighborhood(const Obstacle& obstacle);
+  bool IsInNeighborhood(const Obstacle* obstacle);
+
+  bool IsForward(const Obstacle* obstacle);
+
+  bool IsBackward(const Obstacle* obstacle);
 
  private:
-  void InitNeighborhood(Frame* frame,
+  void InitNeighborhood(
+      const Frame* frame,
       const apollo::common::TrajectoryPoint& planning_init_point,
       const ReferenceLine& reference_line);
 
-  void SetupObstacles(Frame* frame,
+  void SetupObstacles(
+      const Frame* frame,
       const ReferenceLine& reference_line);
 
-  void SetupADC(Frame* frame,
+  void SetupADC(
+      const Frame* frame,
       const apollo::common::TrajectoryPoint& planning_init_point,
       const ReferenceLine& reference_line);
 
@@ -60,7 +70,12 @@ class ADCNeighborhood {
   std::array<double, 3> init_s_;
   std::array<double, 3> init_d_;
   // array of [t, start_s, end_s, s_dot, s_dotdot]
-  std::vector<std::array<double, 5>> neighborhood_;
+  std::vector<std::array<double, 5>> forward_neighborhood_;
+  // array of [t, start_s, end_s, s_dot, s_dotdot]
+  std::vector<std::array<double, 5>> backward_neighborhood_;
+
+  std::unordered_set<std::string> forward_obstacle_id_set_;
+  std::unordered_set<std::string> backward_obstacle_id_set_;
 };
 
 }  // namespace planning

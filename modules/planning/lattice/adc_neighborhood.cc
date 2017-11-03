@@ -33,20 +33,23 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 
-ADCNeighborhood::ADCNeighborhood(Frame* frame,
+ADCNeighborhood::ADCNeighborhood(
+    const Frame* frame,
     const TrajectoryPoint& planning_init_point,
     const ReferenceLine& reference_line) {
   InitNeighborhood(frame, planning_init_point, reference_line);
 }
 
-void ADCNeighborhood::InitNeighborhood(Frame* frame,
+void ADCNeighborhood::InitNeighborhood(
+    const Frame* frame,
     const TrajectoryPoint& planning_init_point,
     const ReferenceLine& reference_line) {
   SetupObstacles(frame, reference_line);
   SetupADC(frame, planning_init_point, reference_line);
 }
 
-void ADCNeighborhood::SetupADC(Frame* frame,
+void ADCNeighborhood::SetupADC(
+    const Frame* frame,
     const TrajectoryPoint& planning_init_point,
     const ReferenceLine& reference_line) {
   auto discretized_reference_line =
@@ -63,7 +66,8 @@ void ADCNeighborhood::SetupADC(Frame* frame,
   init_d_ = init_d;
 }
 
-void ADCNeighborhood::SetupObstacles(Frame* frame,
+void ADCNeighborhood::SetupObstacles(
+    const Frame* frame,
     const ReferenceLine& reference_line) {
   const std::vector<const Obstacle*>& obstacles = frame->obstacles();
   std::vector<PathPoint> discretized_ref_points =
@@ -95,7 +99,15 @@ void ADCNeighborhood::SetupObstacles(Frame* frame,
             obstacle_theta - obstacle_point_on_ref_line.theta();
         obstacle_state[3] = speed * std::cos(diff_theta);
         obstacle_state[4] = 0.0;  // set s_dotdot as zero
-        neighborhood_.push_back(std::move(obstacle_state));
+        // TODO(all) confirm the logic to determine whether an obstacle
+        // is forward or backward.
+        if (obstacle_state[2] < init_s_[0]) {
+          backward_neighborhood_.push_back(std::move(obstacle_state));
+          backward_obstacle_id_set_.insert(obstacle->Id());
+        } else {
+          forward_neighborhood_.push_back(std::move(obstacle_state));
+          forward_obstacle_id_set_.insert(obstacle->Id());
+        }
         break;
       }
       relative_time += trajectory_time_resolution;
@@ -107,13 +119,10 @@ bool ADCNeighborhood::ForwardNearestObstacle(
     std::array<double, 3>* forward_nearest_obstacle_state,
     double* enter_time) {
   bool found = false;
-  for (const auto& obstacle_state : neighborhood_) {
+  for (const auto& obstacle_state : forward_neighborhood_) {
     double obstacle_s = obstacle_state[1];
     // TODO(all) consider the length of adc,
     // Maybe change init_s_[0] to init_s_[0] - half_adc_length
-    if (obstacle_s < init_s_[0]) {
-      continue;
-    }
     if (!found) {
       found = true;
       *enter_time = obstacle_state[0];
@@ -134,7 +143,7 @@ bool ADCNeighborhood::BackwardNearestObstacle(
     std::array<double, 3>* backward_nearest_obstacle_state,
     double* enter_time) {
   bool found = false;
-  for (const auto& obstacle_state : neighborhood_) {
+  for (const auto& obstacle_state : backward_neighborhood_) {
     double obstacle_s = obstacle_state[2];
     // TODO(all) consider the length of adc,
     // Maybe change init_s_[0] to init_s_[0] + half_adc_length
@@ -155,6 +164,22 @@ bool ADCNeighborhood::BackwardNearestObstacle(
     }
   }
   return found;
+}
+
+bool ADCNeighborhood::IsForward(const Obstacle* obstacle) {
+  std::string obstacle_id = obstacle->Id();
+  return forward_obstacle_id_set_.find(obstacle_id) !=
+         forward_obstacle_id_set_.end();
+}
+
+bool ADCNeighborhood::IsBackward(const Obstacle* obstacle) {
+  std::string obstacle_id = obstacle->Id();
+  return backward_obstacle_id_set_.find(obstacle_id) !=
+         backward_obstacle_id_set_.end();
+}
+
+bool ADCNeighborhood::IsInNeighborhood(const Obstacle* obstacle) {
+  return IsForward(obstacle) || IsBackward(obstacle);
 }
 
 }  // namespace planning
