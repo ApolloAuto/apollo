@@ -1,41 +1,37 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import Image from "components/common/Image";
-import wheelImage from "assets/images/wheel/wheel.png";
-import wheelBackground from "assets/images/wheel/wheel_background.png";
-import leftArrowOff from "assets/images/wheel/left_off";
-import rightArrowOff from "assets/images/wheel/right_off";
-import leftArrowOn from "assets/images/wheel/left_on";
-import rightArrowOn from "assets/images/wheel/right_on";
-
 @observer
 export default class Wheel extends React.Component {
-    render() {
-        const { steeringAngle, turnSignal } = this.props;
+    constructor(props) {
+        super(props);
+        this.signalColor = {
+            off: '#30435e',
+            on: '#006aff',
+        };
+    }
 
-        const leftArrowSrc = (turnSignal === 'LEFT' || turnSignal === 'EMERGENCY')
-                             ? leftArrowOn : leftArrowOff;
-        const rightArrowSrc = (turnSignal === 'RIGHT' || turnSignal === 'EMERGENCY')
-                              ? rightArrowOn : rightArrowOff;
+    render() {
+        const { steeringAngle, turnSignal, drivingMode } = this.props;
+
+        const leftArrowColor = (turnSignal === 'LEFT' || turnSignal === 'EMERGENCY')
+                               ? this.signalColor.on : this.signalColor.off;
+        const rightArrowColor = (turnSignal === 'RIGHT' || turnSignal === 'EMERGENCY')
+                                ? this.signalColor.on : this.signalColor.off;
 
         return (
             <div className="wheel">
-                <Image image={wheelBackground}
-                       className="wheel-background" />
-                <Image image={wheelImage}
-                       style={{transform: `rotate(${steeringAngle}deg)`}}
-                       className="wheel-image" />
-                <Image image={leftArrowSrc}
-                       className="left-arrow"/>
-                <Image image={rightArrowSrc}
-                       className="right-arrow"/>
-                <span className="left-label-text label-text">
-                    Left
-                </span>
-                <span className="right-label-text label-text">
-                    Right
-                </span>
+                <div className="steerangle-read">{steeringAngle}</div>
+                <div className="steerangle-unit">°</div>
+                <div className="left-arrow"
+                     style={{borderRightColor: leftArrowColor}}></div>
+                <div className="right-arrow"
+                     style={{borderLeftColor: rightArrowColor}}></div>
+                <div className="wheel-background">
+                    <div className="wheel-arm"
+                         style={{transform: `translate(-50%, -100%) rotate(${steeringAngle}deg`}}/>
+                </div>
+                <div className="driving-mode">{drivingMode}</div>
             </div>
         );
     }

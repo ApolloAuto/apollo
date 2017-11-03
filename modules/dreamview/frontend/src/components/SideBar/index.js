@@ -14,7 +14,7 @@ export default class SideBar extends React.Component {
         const { monitor, options, routeEditingManager, video } = this.props.store;
 
         return (
-            <div className="sidebar">
+            <div className="side-bar">
                 <ButtonPanel resetBackend={() => {
                                      WS.resetBackend();
                                  }}

@@ -1,6 +1,7 @@
 import { observable, computed, action, runInAction } from "mobx";
 import * as THREE from "three";
 
+import HMI from "store/hmi";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
@@ -23,6 +24,8 @@ class DreamviewStore {
     };
 
     @observable isInitialized = false;
+
+    @observable hmi = new HMI();
 
     @observable planning = new Planning();
 
