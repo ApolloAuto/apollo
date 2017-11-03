@@ -51,9 +51,9 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
 
   bool Sampling(const ReferenceLine& raw_reference_line);
 
-  bool ApplyConstraint(const ReferenceLine& raw_reference_line);
+  bool AddConstraint(const ReferenceLine& raw_reference_line);
 
-  bool ApplyKernel();
+  bool AddKernel();
 
   bool Solve();
 
@@ -70,6 +70,9 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
   std::vector<double> t_knots_;
   std::vector<common::PathPoint> ref_points_;
   Spline2dSolver* spline_solver_ = nullptr;
+
+  double ref_x_ = 0.0;
+  double ref_y_ = 0.0;
 };
 
 }  // namespace planning

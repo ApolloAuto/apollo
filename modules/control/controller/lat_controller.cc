@@ -375,62 +375,6 @@ Status LatController::Reset() {
   return Status::OK();
 }
 
-// state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
-// Rate, Preview Lateral1, Preview Lateral2, ...]
-void LatController::UpdateState(SimpleLateralDebug *debug) {
-  TrajectoryPoint traj_point;
-  const auto &position = VehicleState::instance()->ComputeCOMPosition(lr_);
-  double raw_lateral_error = GetLateralError(position, &traj_point);
-
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
-  debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
-
-  // ref_curvature_ = traj_point.kappa();
-  debug->set_curvature(traj_point.path_point().kappa());
-
-  // ref_heading_ = traj_point.theta;
-  debug->set_ref_heading(traj_point.path_point().theta());
-
-  // heading_error_ =
-  //    common::math::NormalizeAngle(VehicleState::instance()->heading() -
-  //    ref_heading_);
-  debug->set_heading_error(common::math::NormalizeAngle(
-      VehicleState::instance()->heading() - traj_point.path_point().theta()));
-
-  // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
-
-  // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
-  debug->set_heading_error_rate(
-      (debug->heading_error() - previous_heading_error_) / ts_);
-  // lateral_error_rate_ = (lateral_error_ - previous_lateral_error_) / ts_;
-  debug->set_lateral_error_rate(
-      (debug->lateral_error() - previous_lateral_error_) / ts_);
-
-  // Prepare for next iteration.
-  previous_heading_error_ = debug->heading_error();
-  previous_lateral_error_ = debug->lateral_error();
-
-  // State matrix update;
-  // First four elements are fixed;
-  matrix_state_(0, 0) = debug->lateral_error();
-  matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
-  matrix_state_(3, 0) = debug->heading_error_rate();
-
-  // Next elements are depending on preview window size;
-  for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    const auto &future_position_estimate =
-        VehicleState::instance()->EstimateFuturePosition(preview_time);
-    double preview_lateral = GetLateralError(future_position_estimate, nullptr);
-    matrix_state_(basic_state_size_ + i, 0) = preview_lateral;
-  }
-  // preview matrix update;
-}
-
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   if (FLAGS_use_relative_position) {
     ComputeLateralErrors(0.0, 0.0, VehicleState::instance()->heading(),
@@ -542,38 +486,54 @@ double LatController::GetLateralError(const common::math::Vec2d &point,
 void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
-    SimpleLateralDebug *debug) const {
-  auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+    SimpleLateralDebug *debug) {
+  // TODO(QiL): change this to conf.
+  ::apollo::common::TrajectoryPoint target_point;
+  if (FLAGS_use_relative_position) {
+    target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        FLAGS_query_relative_time);
+  } else {
+    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+  }
 
-  double dx = x - matched_point.path_point().x();
-  double dy = y - matched_point.path_point().y();
+  double dx = x - target_point.path_point().x();
+  double dy = y - target_point.path_point().y();
 
   ADEBUG << "x point: " << x << " y point: " << y;
-  ADEBUG << "math point x: " << matched_point.path_point().x()
-         << " y point: " << matched_point.path_point().y();
+  ADEBUG << "math point x: " << target_point.path_point().x()
+         << " y point: " << target_point.path_point().y();
 
-  double cos_matched_theta = std::cos(matched_point.path_point().theta());
-  double sin_matched_theta = std::sin(matched_point.path_point().theta());
+  double cos_matched_theta = std::cos(target_point.path_point().theta());
+  double sin_matched_theta = std::sin(target_point.path_point().theta());
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
-  debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
+  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
 
+  // TODO(QiL): Code reformat when done with test
+  double raw_lateral_error = cos_matched_theta * dy - sin_matched_theta * dx;
+  if (FLAGS_use_relative_position) {
+    double filtered_lateral_error =
+        lateral_error_filter_.Update(raw_lateral_error);
+    debug->set_lateral_error(filtered_lateral_error);
+  } else {
+    debug->set_lateral_error(raw_lateral_error);
+  }
   double delta_theta =
-      common::math::NormalizeAngle(theta - matched_point.path_point().theta());
+      common::math::NormalizeAngle(theta - target_point.path_point().theta());
   double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = linear_v * sin_delta_theta;
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
 
   // theta_error = delta_theta;
   debug->set_heading_error(delta_theta);
-  // theta_error_dot = angular_v - matched_point.path_point().kappa() *
-  // matched_point.v();
-  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
-                                                matched_point.v());
+  // theta_error_dot = angular_v - target_point.path_point().kappa() *
+  // target_point.v();
+  debug->set_heading_error_rate(angular_v - target_point.path_point().kappa() *
+                                                target_point.v());
 
-  // matched_theta = matched_point.path_point().theta();
-  debug->set_ref_heading(matched_point.path_point().theta());
-  // matched_kappa = matched_point.path_point().kappa();
-  debug->set_curvature(matched_point.path_point().kappa());
+  // matched_theta = 3.path_point().theta();
+  debug->set_ref_heading(target_point.path_point().theta());
+  // matched_kappa = target_point.path_point().kappa();
+  debug->set_curvature(target_point.path_point().kappa());
 }
 
 }  // namespace control

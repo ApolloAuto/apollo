@@ -23,9 +23,9 @@ class ViewSubplot:
         #self.ax = ax
         self.right_lane, = ax.plot(
             [-10, 10, -10, 10], [-10, 150, 150, -10],
-            'b-', lw=3, alpha=0.4)
+            'bo', lw=3, alpha=0.4)
         self.left_lane, = ax.plot(
-            [0], [0], 'g-', lw=3, alpha=0.4)
+            [0], [0], 'go', lw=3, alpha=0.4)
         self.obstacles, =  ax.plot(
             [0], [0], 'r.', ms=20, alpha=0.8)
         self.ref_lane, = ax.plot(

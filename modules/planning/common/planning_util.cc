@@ -21,14 +21,17 @@
 #include <memory>
 #include <utility>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/integral.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/hermite_spline.h"
 
 namespace apollo {
 namespace planning {
 namespace util {
 
+using common::adapter::AdapterManager;
 using common::PathPoint;
 using common::SpeedPoint;
 using common::TrajectoryPoint;
@@ -204,6 +207,15 @@ common::SLPoint interpolate(const common::SLPoint &start,
   point.set_s(s);
   point.set_l(l);
   return point;
+}
+
+void DumpPlanningContext() {
+  AdapterManager::GetLocalization()->DumpLatestMessage();
+  AdapterManager::GetChassis()->DumpLatestMessage();
+  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
+  if (FLAGS_enable_prediction) {
+    AdapterManager::GetPrediction()->DumpLatestMessage();
+  }
 }
 
 }  // namespace util

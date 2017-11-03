@@ -23,29 +23,28 @@ namespace dreamview {
 
 using google::protobuf::Map;
 
-TEST(HMITest, ExecuteComponentCommand) {
-  Map<std::string, Component> modules;
+TEST(HMITest, RunModuleCommand) {
+  HMI hmi(nullptr);
   // Fail on not-exist component.
-  EXPECT_NE(0, HMI::ExecuteComponentCommand(modules, "Module", "Any"));
+  EXPECT_NE(0, hmi.RunModuleCommand("Module", "Any"));
 
-  auto *module_commands = modules.insert({"Module", {}}).first
+  auto *modules = hmi.config_.mutable_modules();
+  auto *module_commands = modules->insert({"Module", {}}).first
       ->second.mutable_supported_commands();
   {
     // Succeed on single command.
     module_commands->insert({"SingleCommand", "ls"});
-    EXPECT_EQ(0, HMI::ExecuteComponentCommand(modules, "Module",
-                                              "SingleCommand"));
+    EXPECT_EQ(0, hmi.RunModuleCommand("Module", "SingleCommand"));
   }
   {
     // Succeed on complex command.
     module_commands->insert({"ComplexCommand", "ls /dev/null"});
-    EXPECT_EQ(0, HMI::ExecuteComponentCommand(modules, "Module",
-                                              "ComplexCommand"));
+    EXPECT_EQ(0, hmi.RunModuleCommand("Module", "ComplexCommand"));
   }
   {
     // Fail on bad command.
     module_commands->insert({"BadCommand", "ls /dev/null/not_exist"});
-    EXPECT_NE(0, HMI::ExecuteComponentCommand(modules, "Module", "BadCommand"));
+    EXPECT_NE(0, hmi.RunModuleCommand("Module", "BadCommand"));
   }
 }
 
