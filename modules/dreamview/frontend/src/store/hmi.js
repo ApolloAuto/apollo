@@ -5,7 +5,6 @@ export default class HMI {
     @observable currentMap = 'none';
     @observable vehicles = [];
     @observable currentVehicle = 'none';
-    @observable status = {};
 
     @action updateMaps(availableMaps) {
         this.maps = Object.keys(availableMaps).sort()
@@ -28,10 +27,10 @@ export default class HMI {
     }
 
     @action updateStatus(newStatus) {
-        console.log("status:", newStatus);
-        this.status = newStatus;
-        if (newStatus.currentMap) {
-            this.currentMap = newStatus.currentMap;
+        for (const key in newStatus) {
+            if (key in this) {
+                this[key] = newStatus[key];
+            }
         }
     }
 }
