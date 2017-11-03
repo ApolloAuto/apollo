@@ -78,11 +78,12 @@ void ADCNeighborhood::SetupObstacles(Frame* frame,
       common::math::Box2d box = obstacle->GetBoundingBox(point);
       bool overlap = reference_line.HasOverlap(box);
       if (overlap) {
-        std::array<double, 4> obstacle_state;
+        std::array<double, 5> obstacle_state;
         obstacle_state[0] = relative_time;
         SLBoundary sl_boundary;
         reference_line.GetSLBoundary(box, &sl_boundary);
         obstacle_state[1] = sl_boundary.start_s();
+        obstacle_state[2] = sl_boundary.end_s();
         PathPoint obstacle_point_on_ref_line =
             ReferenceLineMatcher::match_to_reference_line(
                 discretized_ref_points, obstacle_state[1]);
@@ -92,8 +93,8 @@ void ADCNeighborhood::SetupObstacles(Frame* frame,
         double obstacle_theta = std::atan2(velocity.y(), velocity.x());
         double diff_theta =
             obstacle_theta - obstacle_point_on_ref_line.theta();
-        obstacle_state[2] = speed * std::cos(diff_theta);
-        obstacle_state[3] = 0.0;  // set s_dotdot as zero
+        obstacle_state[3] = speed * std::cos(diff_theta);
+        obstacle_state[4] = 0.0;  // set s_dotdot as zero
         neighborhood_.push_back(std::move(obstacle_state));
         break;
       }
@@ -103,10 +104,57 @@ void ADCNeighborhood::SetupObstacles(Frame* frame,
 }
 
 bool ADCNeighborhood::ForwardNearestObstacle(
-    std::array<double, 3>* obstacle_state,
+    std::array<double, 3>* forward_nearest_obstacle_state,
     double* enter_time) {
-  // TODO(kechxu) implement
-  return true;
+  bool found = false;
+  for (const auto& obstacle_state : neighborhood_) {
+    double obstacle_s = obstacle_state[1];
+    // TODO(all) consider the length of adc,
+    // Maybe change init_s_[0] to init_s_[0] - half_adc_length
+    if (obstacle_s < init_s_[0]) {
+      continue;
+    }
+    if (!found) {
+      found = true;
+      *enter_time = obstacle_state[0];
+      (*forward_nearest_obstacle_state)[0] = obstacle_state[1];
+      (*forward_nearest_obstacle_state)[1] = obstacle_state[3];
+      (*forward_nearest_obstacle_state)[2] = obstacle_state[4];
+    } else if (obstacle_s < (*forward_nearest_obstacle_state)[0]) {
+      *enter_time = obstacle_state[0];
+      (*forward_nearest_obstacle_state)[0] = obstacle_state[1];
+      (*forward_nearest_obstacle_state)[1] = obstacle_state[3];
+      (*forward_nearest_obstacle_state)[2] = obstacle_state[4];
+    }
+  }
+  return found;
+}
+
+bool ADCNeighborhood::BackwardNearestObstacle(
+    std::array<double, 3>* backward_nearest_obstacle_state,
+    double* enter_time) {
+  bool found = false;
+  for (const auto& obstacle_state : neighborhood_) {
+    double obstacle_s = obstacle_state[2];
+    // TODO(all) consider the length of adc,
+    // Maybe change init_s_[0] to init_s_[0] + half_adc_length
+    if (obstacle_s > init_s_[0]) {
+      continue;
+    }
+    if (!found) {
+      found = true;
+      *enter_time = obstacle_state[0];
+      (*backward_nearest_obstacle_state)[0] = obstacle_state[2];
+      (*backward_nearest_obstacle_state)[1] = obstacle_state[3];
+      (*backward_nearest_obstacle_state)[2] = obstacle_state[4];
+    } else if (obstacle_s > (*backward_nearest_obstacle_state)[0]) {
+      *enter_time = obstacle_state[0];
+      (*backward_nearest_obstacle_state)[0] = obstacle_state[2];
+      (*backward_nearest_obstacle_state)[1] = obstacle_state[3];
+      (*backward_nearest_obstacle_state)[2] = obstacle_state[4];
+    }
+  }
+  return found;
 }
 
 }  // namespace planning

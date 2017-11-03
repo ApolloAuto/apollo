@@ -35,11 +35,11 @@ class ADCNeighborhood {
       const ReferenceLine& reference_line);
 
   bool ForwardNearestObstacle(
-      std::array<double, 3>* obstacle_state,
+      std::array<double, 3>* forward_nearest_obstacle_state,
       double* enter_time);
 
   bool BackwardNearestObstacle(
-      std::array<double, 3>* obstacle_state,
+      std::array<double, 3>* backward_nearest_obstacle_state,
       double* enter_time);
 
   bool IsInNeighborhood(const Obstacle& obstacle);
@@ -59,8 +59,8 @@ class ADCNeighborhood {
  private:
   std::array<double, 3> init_s_;
   std::array<double, 3> init_d_;
-  // array of [t, s, s_dot, s_dotdot]
-  std::vector<std::array<double, 4>> neighborhood_;
+  // array of [t, start_s, end_s, s_dot, s_dotdot]
+  std::vector<std::array<double, 5>> neighborhood_;
 };
 
 }  // namespace planning
