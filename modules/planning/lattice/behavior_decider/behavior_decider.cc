@@ -78,15 +78,15 @@ PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line) {
-  PlanningTarget ret;
   CHECK(frame != nullptr);
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
-  for (size_t i = 0; i < discretized_reference_line.size(); ++i) {
+  PlanningTarget ret;
+  for (const auto& reference_point : discretized_reference_line) {
     ret.mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
-        ->CopyFrom(discretized_reference_line[i]);
+        ->CopyFrom(reference_point);
   }
 
   LatticeSamplingConfig* lattice_sampling_config =
@@ -109,37 +109,48 @@ PlanningTarget BehaviorDecider::Analyze(
   return ret;
 }
 
-bool BehaviorDecider::StopDecisionNearDestination(
-    Frame* frame,
+bool BehaviorDecider::StopDecisionNearDestination(Frame* frame,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
     PlanningTarget* planning_target) {
 
   PointENU routing_end = frame->GetRoutingDestination();
-  PathPoint routing_end_on_ref_line =
-      ReferenceLineMatcher::match_to_reference_line(
-          discretized_reference_line, routing_end.x(), routing_end.y());
+  PathPoint routing_end_matched_point =
+      ReferenceLineMatcher::match_to_reference_line(discretized_reference_line,
+          routing_end.x(), routing_end.y());
 
-  double dist_x = routing_end.x() - routing_end_on_ref_line.x();
-  double dist_y = routing_end.y() - routing_end_on_ref_line.y();
+  double dist_x = routing_end.x() - routing_end_matched_point.x();
+  double dist_y = routing_end.y() - routing_end_matched_point.y();
   double dist = std::hypot(dist_x, dist_y);
-  if (dist > dist_thred_omit_routing_end) {
+  if (dist > dist_thred_omit_routing_end * dist_thred_omit_routing_end) {
     return false;
   }
 
-  LatticeSamplingConfig* lattice_sampling_config =
-    planning_target->mutable_lattice_sampling_config();
-  LonSampleConfig* lon_sample_config =
-    lattice_sampling_config->mutable_lon_sample_config();
+  double res_s = routing_end_matched_point.s() - lon_init_state[0];
+  if (res_s <= 0.0) {
+    LatticeSamplingConfig* lattice_sampling_config =
+        planning_target->mutable_lattice_sampling_config();
+    LonSampleConfig* lon_sample_config =
+        lattice_sampling_config->mutable_lon_sample_config();
 
-  if (routing_end_on_ref_line.s() <
-        discretized_reference_line.back().s() - 0.2) {
-    double res_s = routing_end_on_ref_line.s() - lon_init_state[0];
+    lon_sample_config->mutable_lon_end_condition()->set_s(
+        routing_end_matched_point.s());
+    lon_sample_config->mutable_lon_end_condition()->set_ds(0.0);
+    lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
+    planning_target->set_decision_type(PlanningTarget::STOP);
+    return true;
+  } else {
     double v = lon_init_state[1];
-    double target_acc = (v * v) / (2.0 * res_s);
-    if (target_acc > stop_acc_thred) {
+    double required_stop_deceleration = (v * v) / (2.0 * res_s);
+
+    if (required_stop_deceleration > stop_acc_thred) {
+      LatticeSamplingConfig* lattice_sampling_config =
+          planning_target->mutable_lattice_sampling_config();
+      LonSampleConfig* lon_sample_config =
+          lattice_sampling_config->mutable_lon_sample_config();
+
       lon_sample_config->mutable_lon_end_condition()->set_s(
-          routing_end_on_ref_line.s());
+          routing_end_matched_point.s());
       lon_sample_config->mutable_lon_end_condition()->set_ds(0.0);
       lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
       planning_target->set_decision_type(PlanningTarget::STOP);

@@ -57,9 +57,9 @@ PathPoint ReferenceLineMatcher::match_to_reference_line(
     }
   }
 
-  std::size_t index_start = index_min == 0 ? index_min : index_min - 1;
+  std::size_t index_start = (index_min == 0) ? index_min : index_min - 1;
   std::size_t index_end =
-      index_min + 1 == reference_line.size() ? index_min : index_min + 1;
+      (index_min + 1 == reference_line.size()) ? index_min : index_min + 1;
 
   if (index_start == index_end) {
     return reference_line[index_start];
