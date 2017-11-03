@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.localization;
 
-import "modules/localization/proto/gnss_raw_observation.proto";
+import "modules/drivers/gnss/proto/gnss_raw_observation.proto";
 
 //Define a rover' direction cosine to an observed satellite under WGS-84
 message SatDirCosine {
@@ -24,7 +24,7 @@ enum PntType {
 //and pnt stands for Positioning, Navigating and Timing
 message GnssPntResult {
   optional uint32 receiver_id = 1;
-  optional GnssTimeType time_type = 2 [default = GPS_TIME];
+  optional apollo.drivers.gnss.GnssTimeType time_type = 2 [default = GPS_TIME];
   optional uint32 gnss_week = 3;
   optional double gnss_second_s = 4;
   //Solution type
