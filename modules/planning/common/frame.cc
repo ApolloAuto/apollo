@@ -259,12 +259,14 @@ bool Frame::CheckCollision() {
       ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
       continue;
     }
+    /**
     if (adc_polygon.DistanceTo(obstacle->PerceptionPolygon()) <
         FLAGS_max_collision_distance) {
       AERROR << "Found collision with obstacle " << obstacle->Id();
       collision_obstacle_id_ = obstacle->Id();
       return true;
     }
+    */
   }
   return false;
 }

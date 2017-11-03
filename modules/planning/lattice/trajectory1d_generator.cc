@@ -31,19 +31,20 @@ namespace apollo {
 namespace planning {
 
 void Trajectory1dGenerator::GenerateTrajectoryBundles(
-    const PlanningTarget& planning_objective,
+    const PlanningTarget& planning_target,
     const std::array<double, 3>& lon_init_state,
     const std::array<double, 3>& lat_init_state,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) {
+
   const LatticeSamplingConfig& lattice_sampling_config =
-      planning_objective.lattice_sampling_config();
+      planning_target.lattice_sampling_config();
   const LonSampleConfig& lon_sample_config =
       lattice_sampling_config.lon_sample_config();
   const LatSampleConfig& lat_sample_config =
       lattice_sampling_config.lat_sample_config();
 
-  if (planning_objective.decision_type() == PlanningTarget::STOP &&
+  if (planning_target.decision_type() == PlanningTarget::STOP &&
       enable_stop_handling == true) {
     double stop_position = lon_sample_config.lon_end_condition().s();
     double distance = stop_position - lon_init_state[0];
@@ -51,6 +52,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
 
     // if the stop point is close enough and vehicle speed is close to zero.
     if (distance < stop_margin && s_dot < stop_speed_threshold) {
+      ADEBUG << "Lattice planner stop handling: use standing still trajectory";
       std::shared_ptr<Curve1d> ptr_lon_trajectory =
           std::shared_ptr<Curve1d>(new StandingStillTrajectory1d(
               lon_init_state[0], planned_trajectory_time));
@@ -66,13 +68,21 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     // if the stop point is close enough and vehicle speed is slow, e.g., < 0.5
     // m/s.
     if (distance < stop_margin && s_dot < low_speed_threshold) {
-      double comfort_deceleration =
-          std::fabs(longitudinal_acceleration_comfort_factor *
-                    FLAGS_longitudinal_acceleration_lower_bound);
+      ADEBUG << "Lattice planner stop handling: "
+          "use constant deceleration trajectory";
+
+      double deceleration = 0.0;
+      if (distance <= 0.0) {
+        deceleration =
+            low_speed_threshold * low_speed_threshold / stop_margin * 0.5;
+      } else {
+        deceleration = std::min(s_dot * s_dot / distance * 0.5,
+            low_speed_threshold * low_speed_threshold / stop_margin * 0.5);
+      }
 
       std::shared_ptr<Curve1d> ptr_lon_trajectory =
           std::shared_ptr<Curve1d>(new ConstantDecelerationTrajectory1d(
-              lon_init_state[0], lon_init_state[1], comfort_deceleration));
+              lon_init_state[0], lon_init_state[1], -deceleration));
       ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
 
       std::shared_ptr<Curve1d> ptr_lat_trajectory =
@@ -81,10 +91,11 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
       ptr_lat_trajectory_bundle->push_back(ptr_lat_trajectory);
       return;
     }
+    ADEBUG << "Lattice planner stop handling: use polynomial trajectory";
   }
 
   // generate the trajectory bundles using polynomial methods.
-  GenerateLongitudinalTrajectoryBundle(planning_objective, lon_init_state,
+  GenerateLongitudinalTrajectoryBundle(planning_target, lon_init_state,
                                        ptr_lon_trajectory_bundle);
   GenerateLateralTrajectoryBundle(lat_init_state, ptr_lat_trajectory_bundle);
   return;

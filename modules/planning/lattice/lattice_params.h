@@ -26,14 +26,13 @@ namespace planning {
 
 // TODO(all) move the fake FLAG variable to planning_gflags
 static double planned_trajectory_time = 8.0;
-static double stop_margin = 1.0;
+static double stop_margin = 2.0;
 static double stop_speed_threshold = 0.1;
-static double low_speed_threshold = 0.5;
+static double low_speed_threshold = 2.0;
 static double enable_stop_handling = true;
-static double longitudinal_acceleration_comfort_factor = 0.7;
 static double trajectory_time_resolution = 0.05;
-static double stop_acc_thred = 0.5;
-static double dist_thred_omit_routing_end = 3.0;
+static double stop_acc_thred = 1.0;
+static double dist_thred_omit_routing_end = 1.0;
 
 }  // namespace planning
 }  // namespace apollo

@@ -61,7 +61,8 @@ void CartesianFrenetConverter::cartesian_to_frenet(
       one_minus_kappa_r_d / cos_delta_theta / cos_delta_theta *
           (kappa * one_minus_kappa_r_d / cos_delta_theta - rkappa);
 
-  ptr_s_condition->at(0) = rs;
+  double delta_s = dx * std::cos(rtheta) + dy * std::sin(rtheta);
+  ptr_s_condition->at(0) = rs + delta_s;
 
   ptr_s_condition->at(1) = v * cos_delta_theta / one_minus_kappa_r_d;
 

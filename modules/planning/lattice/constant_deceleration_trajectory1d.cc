@@ -50,7 +50,7 @@ double ConstantDecelerationTrajectory1d::Evaluate_v(const double t) const {
 
 double ConstantDecelerationTrajectory1d::Evaluate_a(const double t) const {
   if (t < end_t_) {
-    return deceleration_;
+    return -deceleration_;
   } else {
     return 0.0;
   }
