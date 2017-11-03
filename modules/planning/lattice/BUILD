@@ -128,6 +128,7 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice:lattice_params",
+        "//modules/planning/lattice:adc_neighborhood",
         "//modules/prediction/proto:prediction_proto",
         "//modules/common/configs:vehicle_config_helper",
     ],

@@ -166,19 +166,19 @@ bool ADCNeighborhood::BackwardNearestObstacle(
   return found;
 }
 
-bool ADCNeighborhood::IsForward(const Obstacle* obstacle) {
+bool ADCNeighborhood::IsForward(const Obstacle* obstacle) const {
   std::string obstacle_id = obstacle->Id();
   return forward_obstacle_id_set_.find(obstacle_id) !=
          forward_obstacle_id_set_.end();
 }
 
-bool ADCNeighborhood::IsBackward(const Obstacle* obstacle) {
+bool ADCNeighborhood::IsBackward(const Obstacle* obstacle) const {
   std::string obstacle_id = obstacle->Id();
   return backward_obstacle_id_set_.find(obstacle_id) !=
          backward_obstacle_id_set_.end();
 }
 
-bool ADCNeighborhood::IsInNeighborhood(const Obstacle* obstacle) {
+bool ADCNeighborhood::IsInNeighborhood(const Obstacle* obstacle) const {
   return IsForward(obstacle) || IsBackward(obstacle);
 }
 

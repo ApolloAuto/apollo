@@ -24,6 +24,7 @@ cc_library(
         "//modules/planning/lattice:lattice_constraint_checker",
         "//modules/planning/lattice/behavior_decider:behavior_decider",
         "//modules/planning/lattice:lattice_util",
+        "//modules/planning/lattice:adc_neighborhood",
     ],
 )
 

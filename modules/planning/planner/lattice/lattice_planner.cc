@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "modules/planning/lattice/lattice_params.h"
+#include "modules/planning/lattice/adc_neighborhood.h"
 #include "modules/planning/lattice/reference_line_matcher.h"
 #include "modules/planning/lattice/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_evaluator.h"
@@ -111,7 +112,10 @@ Status LatticePlanner::Plan(
   // Get instance of collision checker and constraint checker
   const std::vector<const Obstacle*>& obstacles = frame->obstacles();
 
-  CollisionChecker collision_checker(obstacles);
+  ADCNeighborhood adc_neighborhood(frame,
+      planning_init_point, reference_line_info->reference_line());
+
+  CollisionChecker collision_checker(adc_neighborhood, obstacles);
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.
