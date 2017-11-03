@@ -84,20 +84,20 @@ bool QpSplineReferenceLineSmoother::Smooth(
   for (std::uint32_t i = 0;
        i < smoother_config_.num_of_total_points() && t < end_t;
        ++i, t += resolution) {
-    const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
+    const double heading = std::atan2(spline_solver_->spline().DerivativeY(t),
                                       spline_solver_->spline().DerivativeX(t));
     const double kappa = CurveMath::ComputeCurvature(
         spline_solver_->spline().DerivativeX(t),
         spline_solver_->spline().SecondDerivativeX(t),
-        spline_solver_->spline().derivative_y(t),
-        spline_solver_->spline().second_derivative_y(t));
+        spline_solver_->spline().DerivativeY(t),
+        spline_solver_->spline().SecondDerivativeY(t));
     const double dkappa = CurveMath::ComputeCurvatureDerivative(
         spline_solver_->spline().DerivativeX(t),
         spline_solver_->spline().SecondDerivativeX(t),
         spline_solver_->spline().ThirdDerivativeX(t),
-        spline_solver_->spline().derivative_y(t),
-        spline_solver_->spline().second_derivative_y(t),
-        spline_solver_->spline().third_derivative_y(t));
+        spline_solver_->spline().DerivativeY(t),
+        spline_solver_->spline().SecondDerivativeY(t),
+        spline_solver_->spline().ThirdDerivativeY(t));
 
     std::pair<double, double> xy = spline(t);
     xy.first += ref_x_;

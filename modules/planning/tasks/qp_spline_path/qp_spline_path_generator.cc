@@ -81,6 +81,7 @@ bool QpSplinePathGenerator::Generate(
 
   // set reference l value using init_frenet_point_.l()
   ref_l_ = init_frenet_point_.l();
+  ADEBUG << "ref_l_ = " << ref_l_;
 
   double start_s = init_frenet_point_.s();
   double end_s = reference_line_.Length();
@@ -131,11 +132,6 @@ bool QpSplinePathGenerator::Generate(
   std::vector<common::PathPoint> path_points;
 
   double start_l = ref_l_;
-  /*
-  if (is_solved) {
-    start_l = spline(init_frenet_point_.s());
-  }
-  */
   ReferencePoint ref_point =
       reference_line_.GetReferencePoint(init_frenet_point_.s());
   Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
@@ -267,11 +263,13 @@ bool QpSplinePathGenerator::AddConstraint(
 
   // add end point constraint, equality constraint
   const double lat_shift = std::copysign(
-      std::fmax(0.0, std::fabs(ref_l_) -
-                         qp_spline_path_config_.lane_change_lateral_shift()),
-      init_frenet_point_.l());
+      std::fmin(std::fabs(ref_l_),
+                qp_spline_path_config_.lane_change_lateral_shift()),
+      -ref_l_);
+
+  ADEBUG << "lat_shift = " << lat_shift;
   spline_constraint->AddPointConstraint(
-      qp_spline_path_config_.point_constraint_s_position(), lat_shift - ref_l_);
+      qp_spline_path_config_.point_constraint_s_position(), lat_shift);
 
   // add first derivative bound to improve lane change smoothness
   std::vector<double> dl_lower_bound(evaluated_s_.size(), -FLAGS_dl_bound);
