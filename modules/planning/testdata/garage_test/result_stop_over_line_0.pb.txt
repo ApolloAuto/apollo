@@ -9,7 +9,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -23,7 +23,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -37,7 +37,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -51,7 +51,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -65,7 +65,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -79,7 +79,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -93,7 +93,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -107,7 +107,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -121,7 +121,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -135,7 +135,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -149,7 +149,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -163,7 +163,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -177,7 +177,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -191,7 +191,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -205,7 +205,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -219,7 +219,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -233,7 +233,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -247,7 +247,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -261,7 +261,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -275,7 +275,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -289,7 +289,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -303,7 +303,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -317,7 +317,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -331,7 +331,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -345,7 +345,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -359,7 +359,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -373,7 +373,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -387,7 +387,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -401,7 +401,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -415,7 +415,7 @@ trajectory_point {
     y: 4140735.52422
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699848e-05
+    kappa: 3.7846794424699882e-05
     dkappa: 0
     ddkappa: 0
   }
@@ -429,10 +429,10 @@ decision {
       reason_code: STOP_REASON_DESTINATION
       reason: "stop by DEST"
       stop_point {
-        x: 586366.08905428462
-        y: 4140779.424370816
+        x: 586366.089054192
+        y: 4140779.4243704369
       }
-      stop_heading: 1.304678376386998
+      stop_heading: 1.3046781617363452
       change_lane_type: FORWARD
     }
   }
@@ -445,10 +445,10 @@ decision {
           reason_code: STOP_REASON_OBSTACLE
           distance_s: -10
           stop_point {
-            x: 586352.99882874638
-            y: 4140731.4015232041
+            x: 586352.99882198358
+            y: 4140731.4015249512
           }
-          stop_heading: 1.3046782267160806
+          stop_heading: 1.3046781617288197
         }
       }
     }
@@ -460,10 +460,10 @@ decision {
           reason_code: STOP_REASON_DESTINATION
           distance_s: -3
           stop_point {
-            x: 586366.08905428462
-            y: 4140779.424370816
+            x: 586366.089054192
+            y: 4140779.4243704369
           }
-          stop_heading: 1.304678376386998
+          stop_heading: 1.3046781617363452
         }
       }
     }
