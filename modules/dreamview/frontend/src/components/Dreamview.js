@@ -3,13 +3,14 @@ import { inject, observer } from "mobx-react";
 import SplitPane from 'react-split-pane';
 
 import DashCamPlayer from "components/DashCamPlayer";
+import Geolocation from "components/common/Geolocation";
+import PNCMonitor from "components/PNCMonitor";
+import RouteEditingBar from "components/RouteEditingBar";
+import Loader from "components/common/Loader";
+import MenuBar from "components/MenuBar";
 import SideBar from "components/SideBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
-import RouteEditingBar from "components/RouteEditingBar";
-import Loader from "components/common/Loader";
-import PNCMonitor from "components/PNCMonitor";
-import Geolocation from "components/common/Geolocation";
 import WS from "store/websocket";
 
 @inject("store") @observer
@@ -56,6 +57,7 @@ export default class Dreamview extends React.Component {
                        onChange={this.handleDrag}
                        allowResize={options.showPNCMonitor}>
                 <div>
+                    {showBars ? <MenuBar /> : null}
                     {showBars ? <SideBar /> : null}
                     {showBars ? <StatusBar meters={meters} /> : null}
                     {showRoutingBar ? <RouteEditingBar /> : null}
