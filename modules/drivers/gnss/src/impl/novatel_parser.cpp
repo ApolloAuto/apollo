@@ -31,6 +31,7 @@
 #include "proto/gnss.pb.h"
 #include "proto/imu.pb.h"
 #include "proto/ins.pb.h"
+#include "proto/gnss_raw_observation.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -126,6 +127,12 @@ class NovatelParser : public Parser {
     
   bool handle_raw_imu_x(const novatel::RawImuX* imu);
 
+  bool handle_bds_eph(const novatel::BDS_Ephemeris* bds_emph);
+
+  bool handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph);
+
+  bool handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph);
+
   double _gyro_scale = 0.0;
 
   double _accel_scale = 0.0;
@@ -155,6 +162,8 @@ class NovatelParser : public Parser {
   ::apollo::drivers::gnss::Imu _imu;
   ::apollo::drivers::gnss::Ins _ins;
   ::apollo::drivers::gnss::InsStat _ins_stat;
+  ::apollo::drivers::gnss::GnssEphemeris _gnss_ephemeris;
+  ::apollo::drivers::gnss::EpochObservation _gnss_observation;
 };
 
 Parser* Parser::create_novatel() { return new NovatelParser(); }
@@ -358,16 +367,50 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
       break;
 
     case novatel::INSPVAX:
-        if (message_length != sizeof(novatel::InsPvaX)) {
-          ROS_ERROR("Incorrect message_length");
-          break;
-        }
-
-        if (handle_ins_pvax(reinterpret_cast<novatel::InsPvaX*>(message))) {
-          message_ptr = &_ins_stat;
-          return MessageType::INS_STAT;
-        }
+      if (message_length != sizeof(novatel::InsPvaX)) {
+        ROS_ERROR("Incorrect message_length");
         break;
+      }
+
+      if (handle_ins_pvax(reinterpret_cast<novatel::InsPvaX*>(message))) {
+        message_ptr = &_ins_stat;
+        return MessageType::INS_STAT;
+      }
+      break;
+
+    case novatel::BDSEPHEMERIS:
+      if (message_length != sizeof(novatel::BDS_Ephemeris)) {
+        ROS_ERROR("Incorrect BDSEPHEMERIS message_length");
+        break;
+      }
+      if (handle_bds_eph(reinterpret_cast<novatel::BDS_Ephemeris*>(message))){
+        message_ptr = &_gnss_ephemeris;
+        return MessageType::BDSEPHEMERIDES;
+      }
+      break;
+
+    case novatel::GPSEPHEMERIS:
+      if (message_length != sizeof(novatel::GPS_Ephemeris)) {
+        ROS_ERROR("Incorrect GPSEPHEMERIS message_length");
+        break;
+      }
+      if (handle_gps_eph(reinterpret_cast<novatel::GPS_Ephemeris*>(message))) {
+        message_ptr = &_gnss_ephemeris;
+        return MessageType::GPSEPHEMERIDES;
+      }
+      break;
+
+    case novatel::GLOEPHEMERIS:
+      if (message_length != sizeof(novatel::GLO_Ephemeris)) {
+        ROS_ERROR("Incorrect GLOEPHEMERIS message length");
+        break;
+      }
+      if (handle_glo_eph(reinterpret_cast<novatel::GLO_Ephemeris*>(message))) {
+        message_ptr = &_gnss_ephemeris;
+        return MessageType::GLOEPHEMERIDES;
+      }
+      break;
+
     default:
       break;
   }
@@ -612,6 +655,117 @@ bool NovatelParser::handle_raw_imu_x(const novatel::RawImuX* imu) {
           5, "Unsupported IMU frame mapping: " << _imu_frame_mapping);
   }
   _imu_measurement_time_previous = time;
+  return true;
+}
+
+bool NovatelParser::handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph) {
+  _gnss_ephemeris.set_gnss_type(apollo::drivers::gnss::GnssType::GPS_SYS);
+
+  apollo::drivers::gnss::KepplerOrbit *keppler_orbit = _gnss_ephemeris.mutable_keppler_orbit();
+
+  keppler_orbit->set_gnss_type(apollo::drivers::gnss::GnssType::GPS_SYS);
+  keppler_orbit->set_gnss_time_type(apollo::drivers::gnss::GnssTimeType::GPS_TIME);
+  keppler_orbit->set_sat_prn(gps_emph->prn);
+  keppler_orbit->set_week_num(gps_emph->week);
+  keppler_orbit->set_af0(gps_emph->af0);
+  keppler_orbit->set_af1(gps_emph->af1);
+  keppler_orbit->set_af2(gps_emph->af2);
+  keppler_orbit->set_iode(gps_emph->iode1);
+  keppler_orbit->set_deltan(gps_emph->delta_A);
+  keppler_orbit->set_m0(gps_emph->M_0);
+  keppler_orbit->set_e(gps_emph->ecc);
+  keppler_orbit->set_roota(sqrt(gps_emph->A));
+  keppler_orbit->set_toe(gps_emph->toe);
+  keppler_orbit->set_toc(gps_emph->toc);
+  keppler_orbit->set_cic(gps_emph->cic);
+  keppler_orbit->set_crc(gps_emph->crc);
+  keppler_orbit->set_cis(gps_emph->cis);
+  keppler_orbit->set_crs(gps_emph->crs);
+  keppler_orbit->set_cuc(gps_emph->cuc);
+  keppler_orbit->set_cus(gps_emph->cus);
+  keppler_orbit->set_omega0(gps_emph->omega_0);
+  keppler_orbit->set_omega(gps_emph->omega);
+  keppler_orbit->set_i0(gps_emph->I_0);
+  keppler_orbit->set_omegadot(gps_emph->dot_omega);
+  keppler_orbit->set_idot(gps_emph->dot_I);
+  keppler_orbit->set_accuracy(sqrt(gps_emph->ura));
+  keppler_orbit->set_health(gps_emph->health);
+  keppler_orbit->set_tgd(gps_emph->tgd);
+  keppler_orbit->set_iodc(gps_emph->iodc);
+  return true;
+}
+
+bool NovatelParser::handle_bds_eph(const novatel::BDS_Ephemeris* bds_emph) {
+  _gnss_ephemeris.set_gnss_type(apollo::drivers::gnss::GnssType::BDS_SYS);
+
+  apollo::drivers::gnss::KepplerOrbit *keppler_orbit = _gnss_ephemeris.mutable_keppler_orbit();
+
+  keppler_orbit->set_gnss_type(apollo::drivers::gnss::GnssType::BDS_SYS);
+  keppler_orbit->set_gnss_time_type(apollo::drivers::gnss::GnssTimeType::BDS_TIME);
+  keppler_orbit->set_sat_prn(bds_emph->satellite_id);
+  keppler_orbit->set_week_num(bds_emph->week);
+  keppler_orbit->set_af0(bds_emph->a0);
+  keppler_orbit->set_af1(bds_emph->a1);
+  keppler_orbit->set_af2(bds_emph->a2);
+  keppler_orbit->set_iode(bds_emph->aode);
+  keppler_orbit->set_deltan(bds_emph->delta_N);
+  keppler_orbit->set_m0(bds_emph->M0);
+  keppler_orbit->set_e(bds_emph->ecc);
+  keppler_orbit->set_roota(bds_emph->rootA);
+  keppler_orbit->set_toe(bds_emph->toe);
+  keppler_orbit->set_toc(bds_emph->toc);
+  keppler_orbit->set_cic(bds_emph->cic);
+  keppler_orbit->set_crc(bds_emph->crc);
+  keppler_orbit->set_cis(bds_emph->cis);
+  keppler_orbit->set_crs(bds_emph->crs);
+  keppler_orbit->set_cuc(bds_emph->cuc);
+  keppler_orbit->set_cus(bds_emph->cus);
+  keppler_orbit->set_omega0(bds_emph->omega0);
+  keppler_orbit->set_omega(bds_emph->omega);
+  keppler_orbit->set_i0(bds_emph->inc_angle);
+  keppler_orbit->set_omegadot(bds_emph->rra);
+  keppler_orbit->set_idot(bds_emph->idot);
+  keppler_orbit->set_accuracy(bds_emph->ura);
+  keppler_orbit->set_health(bds_emph->health1);
+  keppler_orbit->set_tgd(bds_emph->tdg1);
+  keppler_orbit->set_iodc(bds_emph->aodc);
+  return true;
+}
+
+bool NovatelParser::handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph) {
+  _gnss_ephemeris.set_gnss_type(apollo::drivers::gnss::GnssType::GLO_SYS);
+
+  apollo::drivers::gnss::GlonassOrbit *glonass_orbit = _gnss_ephemeris.mutable_glonass_orbit();
+  glonass_orbit->set_gnss_type(apollo::drivers::gnss::GnssType::GLO_SYS);
+  glonass_orbit->set_gnss_time_type(apollo::drivers::gnss::GnssTimeType::GLO_TIME);
+  glonass_orbit->set_slot_prn(glo_emph->sloto - 37);
+  glonass_orbit->set_toe(glo_emph->e_time / 1000);
+  glonass_orbit->set_frequency_no(glo_emph->freqo - 7);
+  glonass_orbit->set_week_num(glo_emph->e_week);
+  glonass_orbit->set_week_second_s(glo_emph->e_time / 1000);
+  glonass_orbit->set_tk(glo_emph->Tk);
+  glonass_orbit->set_clock_offset(-glo_emph->tau_n);
+  glonass_orbit->set_clock_drift( glo_emph->gamma);
+
+  if (glo_emph->health <= 3) {
+    glonass_orbit->set_health(0); // 0 means good.
+  } else {
+    glonass_orbit->set_health(1); // 1 means bad.
+  }
+  glonass_orbit->set_position_x(glo_emph->pos_x);
+  glonass_orbit->set_position_y(glo_emph->pos_y);
+  glonass_orbit->set_position_z(glo_emph->pos_z);
+
+  glonass_orbit->set_velocity_x(glo_emph->vel_x);
+  glonass_orbit->set_velocity_y(glo_emph->vel_y);
+  glonass_orbit->set_velocity_z(glo_emph->vel_z);
+
+  glonass_orbit->set_accelerate_x(glo_emph->acc_x);
+  glonass_orbit->set_accelerate_y(glo_emph->acc_y);
+  glonass_orbit->set_accelerate_z(glo_emph->acc_z);
+
+  glonass_orbit->set_infor_age(glo_emph->age);
+
   return true;
 }
 
