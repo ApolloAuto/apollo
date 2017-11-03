@@ -142,10 +142,12 @@ def mobileye_callback(mobileye_pb):
             dist =  euclidean_distance((nx[i], ny[i]), (nx[i-1], ny[i-1]))
             s += dist
             relative_time += dist / CRUISE_SPEED
-
-        traj_point.path_point.theta = get_theta((nx[i], ny[i]), (nx[0], ny[0]))
-        if i == 0:
-            traj_point.path_point.theta = 0
+        if (i+1) >= len(nx):
+            traj_point.path_point.theta = get_theta(
+                (nx[-1], ny[-1]), (nx[0], ny[0]))
+        else:
+            traj_point.path_point.theta = get_theta(
+                (nx[i+1], ny[i+1]), (nx[0], ny[0]))
         traj_point.path_point.s = s
         traj_point.v = CRUISE_SPEED
         traj_point.relative_time = relative_time
