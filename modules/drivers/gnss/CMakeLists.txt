@@ -55,8 +55,9 @@ set(GPGGA_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/gpgga.pb.cc")
 set(GNSS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/gnss.pb.cc")
 set(IMU_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/imu.pb.cc")
 set(INS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/ins.pb.cc")
+SET(GNSS_OBS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/gnss_raw_observation.pb.cc")
 
-add_library(utils src/impl/utils.cpp ${CONFIG_PB_SRCS} ${GPGGA_PB_SRCS} ${GNSS_PB_SRCS} ${IMU_PB_SRCS} ${INS_PB_SRCS} ${GNSS_STATUS_PB_SRCS} ${LOCALIZATION_POSE_PB_SRCS} ${LOCALIZATION_IMU_PB_SRCS} ${LOCALIZATION_GPS_PB_SRCS} ${HEADER_PB_SRCS} ${ERROR_CODE_SRCS} ${GEOMETRY_PB_SRCS})
+add_library(utils src/impl/utils.cpp ${CONFIG_PB_SRCS} ${GPGGA_PB_SRCS} ${GNSS_PB_SRCS} ${IMU_PB_SRCS} ${INS_PB_SRCS} ${GNSS_STATUS_PB_SRCS} ${LOCALIZATION_POSE_PB_SRCS} ${LOCALIZATION_IMU_PB_SRCS} ${LOCALIZATION_GPS_PB_SRCS} ${HEADER_PB_SRCS} ${ERROR_CODE_SRCS} ${GEOMETRY_PB_SRCS} ${GNSS_OBS_PB_SRCS})
 target_link_libraries(utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 add_library(stream_nodelet src/stream_nodelet.cpp src/raw_stream.cpp src/impl/serial_stream.cpp src/impl/tcp_stream.cpp src/impl/udp_stream.cpp src/impl/ntrip_stream.cpp)
