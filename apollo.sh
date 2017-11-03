@@ -205,7 +205,7 @@ function release() {
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
   for m in control canbus localization decision perception \
-       prediction planning routing calibration
+       prediction planning routing calibration third_party_perception
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
@@ -288,6 +288,14 @@ function release() {
   cp -r docs $ROOT_DIR
   cp LICENSE $ROOT_DIR
   cp third_party/ACKNOWLEDGEMENT.txt $ROOT_DIR
+
+  # mobileye drivers
+  mkdir -p $MODULES_DIR/drivers/delphi_esr
+  cp bazel-bin/modules/drivers/delphi_esr/delphi_esr $MODULES_DIR/drivers/delphi_esr
+  cp -r modules/drivers/delphi_esr/conf $MODULES_DIR/drivers/delphi_esr
+  mkdir -p $MODULES_DIR/drivers/mobileye
+  cp bazel-bin/modules/drivers/mobileye/mobileye $MODULES_DIR/drivers/mobileye
+  cp -r modules/drivers/mobileye/conf  $MODULES_DIR/drivers/mobileye
 
   # release info
   META=${ROOT_DIR}/meta.txt
