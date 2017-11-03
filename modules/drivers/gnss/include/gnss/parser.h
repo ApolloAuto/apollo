@@ -82,6 +82,10 @@ class Parser {
     EPHEMERIDES,
     OBSERVATION,
     GPGGA,
+    BDSEPHEMERIDES,
+    RAWIMU,
+    GPSEPHEMERIDES,
+    GLOEPHEMERIDES,
   };
 
   // Gets a parsed protobuf message. The caller must consume the message before
