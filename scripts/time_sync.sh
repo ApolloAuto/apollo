@@ -23,3 +23,5 @@ if [ $? -eq 1 ]; then
 fi
 
 # ntpdate running log at /var/log/syslog
+
+sudo ntpdate -v -u us.pool.ntp.org
