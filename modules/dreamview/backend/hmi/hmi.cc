@@ -91,6 +91,17 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
 HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
+  // If the module path doesn't exist, remove it from list.
+  auto *modules = config_.mutable_modules();
+  for (auto iter = modules->begin(); iter != modules->end();) {
+    const auto &conf = iter->second;
+    if (conf.has_path() && !common::util::PathExists(conf.path())) {
+      iter = modules->erase(iter);
+    } else {
+      ++iter;
+    }
+  }
+
   // Get available maps and vehicles by listing data directory.
   *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
   *config_.mutable_available_vehicles() =

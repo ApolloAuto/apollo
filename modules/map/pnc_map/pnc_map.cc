@@ -364,7 +364,8 @@ bool PncMap::PassageToSegments(routing::Passage passage,
       AERROR << "Failed to find lane : " << lane.id();
       return false;
     }
-    segments->emplace_back(lane_ptr, lane.start_s(), lane.end_s());
+    segments->emplace_back(lane_ptr, std::max(0.0, lane.start_s()),
+                           std::min(lane_ptr->total_length(), lane.end_s()));
   }
   return !segments->empty();
 }
