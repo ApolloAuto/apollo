@@ -44,6 +44,7 @@ modules {
 modules {
   name: "mobileye"
   display_name: "Mobileye"
+  path: "modules/drivers/mobileye"
   supported_commands {
     name: "start"
     command: "scripts/mobileye.sh"

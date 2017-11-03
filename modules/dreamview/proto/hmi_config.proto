@@ -4,7 +4,9 @@ package apollo.dreamview;
 
 message Component {
   optional string display_name = 1;
-  map<string, string> supported_commands = 2;
+  // If the path is given, HMI will check if it's available.
+  optional string path = 2;
+  map<string, string> supported_commands = 3;
 }
 
 message HMIConfig {
