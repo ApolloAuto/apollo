@@ -30,18 +30,44 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 
 ADCNeighborhood::ADCNeighborhood(Frame* frame,
+    const TrajectoryPoint& planning_init_point,
     const ReferenceLine& reference_line) {
-  reference_line_ = reference_line;
-  InitNeighborhood(frame);
+  InitNeighborhood(frame, planning_init_point, reference_line);
 }
 
-void ADCNeighborhood::InitNeighborhood(Frame* frame) {
+void ADCNeighborhood::InitNeighborhood(Frame* frame,
+    const TrajectoryPoint& planning_init_point,
+    const ReferenceLine& reference_line) {
+  SetupObstacles(frame, reference_line);
+  SetupADC(frame, planning_init_point, reference_line);
+}
+
+void ADCNeighborhood::SetupADC(Frame* frame,
+    const TrajectoryPoint& planning_init_point,
+    const ReferenceLine& reference_line) {
+  auto discretized_reference_line =
+      ToDiscretizedReferenceLine(
+          reference_line.reference_points());
+  PathPoint matched_point = ReferenceLineMatcher::match_to_reference_line(
+      discretized_reference_line, planning_init_point.path_point().x(),
+      planning_init_point.path_point().y());
+  std::array<double, 3> init_s;
+  std::array<double, 3> init_d;
+  ComputeInitFrenetState(matched_point, planning_init_point,
+      &init_s, &init_d);
+  init_s_ = init_s;
+  init_d_ = init_d;
+}
+
+void ADCNeighborhood::SetupObstacles(Frame* frame,
+    const ReferenceLine& reference_line) {
   const std::vector<const Obstacle*>& obstacles = frame->obstacles();
   std::vector<PathPoint> discretized_ref_points =
-      ToDiscretizedReferenceLine(reference_line_.reference_points());
+      ToDiscretizedReferenceLine(reference_line.reference_points());
   for (const Obstacle* obstacle : obstacles) {
     double relative_time = 0.0;
     while (relative_time < planned_trajectory_time) {
@@ -50,12 +76,12 @@ void ADCNeighborhood::InitNeighborhood(Frame* frame) {
       }
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
-      bool overlap = reference_line_.HasOverlap(box);
+      bool overlap = reference_line.HasOverlap(box);
       if (overlap) {
         std::array<double, 4> obstacle_state;
         obstacle_state[0] = relative_time;
         SLBoundary sl_boundary;
-        reference_line_.GetSLBoundary(box, &sl_boundary);
+        reference_line.GetSLBoundary(box, &sl_boundary);
         obstacle_state[1] = sl_boundary.start_s();
         PathPoint obstacle_point_on_ref_line =
             ReferenceLineMatcher::match_to_reference_line(
@@ -74,6 +100,13 @@ void ADCNeighborhood::InitNeighborhood(Frame* frame) {
       relative_time += trajectory_time_resolution;
     }
   }
+}
+
+bool ADCNeighborhood::ForwardNearestObstacle(
+    std::array<double, 3>* obstacle_state,
+    double* enter_time) {
+  // TODO(kechxu) implement
+  return true;
 }
 
 }  // namespace planning

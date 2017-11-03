@@ -20,6 +20,7 @@
 #include <array>
 #include <vector>
 
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/common/obstacle.h"
@@ -30,6 +31,7 @@ namespace planning {
 class ADCNeighborhood {
  public:
   ADCNeighborhood(Frame* frame,
+      const apollo::common::TrajectoryPoint& planning_init_point,
       const ReferenceLine& reference_line);
 
   bool ForwardNearestObstacle(
@@ -43,10 +45,20 @@ class ADCNeighborhood {
   bool IsInNeighborhood(const Obstacle& obstacle);
 
  private:
-  void InitNeighborhood(Frame* frame);
+  void InitNeighborhood(Frame* frame,
+      const apollo::common::TrajectoryPoint& planning_init_point,
+      const ReferenceLine& reference_line);
+
+  void SetupObstacles(Frame* frame,
+      const ReferenceLine& reference_line);
+
+  void SetupADC(Frame* frame,
+      const apollo::common::TrajectoryPoint& planning_init_point,
+      const ReferenceLine& reference_line);
 
  private:
-  ReferenceLine reference_line_;
+  std::array<double, 3> init_s_;
+  std::array<double, 3> init_d_;
   // array of [t, s, s_dot, s_dotdot]
   std::vector<std::array<double, 4>> neighborhood_;
 };
