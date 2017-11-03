@@ -28,10 +28,10 @@ bool SharedDataManager::Init(const DAGConfig::SharedDataConfig &data_config) {
     }
 
     auto result = shared_data_map_.emplace(
-        shared_data->Name(), std::unique_ptr<SharedData>(shared_data));
+        shared_data->name(), std::unique_ptr<SharedData>(shared_data));
 
     if (!result.second) {
-      AERROR << "duplicate SharedData: " << shared_data->Name();
+      AERROR << "duplicate SharedData: " << shared_data->name();
       return true;
     }
   }

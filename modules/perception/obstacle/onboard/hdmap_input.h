@@ -40,7 +40,8 @@ class HDMapInput {
 
   // @brief: get roi polygon
   //         all points are in the world frame
-  bool GetROI(const pcl_util::PointD& pointd, HdmapStructPtr* mapptr);
+  bool GetROI(const pcl_util::PointD& pointd, const double& map_radius, 
+    HdmapStructPtr* mapptr);
 
   // @brief: get nearest lane direction
   bool GetNearestLaneDirection(const pcl_util::PointD& pointd,

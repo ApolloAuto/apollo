@@ -22,6 +22,7 @@
 #define MODULES_COMMON_MACRO_H_
 
 #include <iostream>
+#include <iomanip>
 
 #define DISALLOW_COPY_AND_ASSIGN(classname) \
  private:                                   \
@@ -41,4 +42,20 @@
   }                                         \
   DISALLOW_IMPLICIT_CONSTRUCTORS(classname) \
  private:
+
+#ifdef GLOG_TIMESTAMP
+#undef GLOG_TIMESTAMP
+#endif
+#define GLOG_TIMESTAMP(timestamp)  \
+        std::fixed << std::setprecision(9) << timestamp
+#define GLOG_DOUBLE(value)  \
+        std::fixed << std::setprecision(6) << value
+#define GLOG_DOUBLE_WITH_PRECISION(value, precision)  \
+        std::fixed << std::setprecision(precision) << value
+// for unsed variable
+#undef UNUSED
+#define UNUSED(x) (void)(x)
+      
 #endif  // MODULES_COMMON_MACRO_H_
+
+

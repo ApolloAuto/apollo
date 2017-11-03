@@ -54,3 +54,10 @@ DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 /// obstacle/perception.cc
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
+
+/// obstacle/onboard/radar_process.cc
+DEFINE_string(onboard_radar_detector, "DummyRadarDetector", "onboard radar detector");
+DEFINE_string(radar_tf2_frame_id, "world", "the tf2 transform frame id");
+DEFINE_string(radar_tf2_child_frame_id, "radar_front",
+              "the tf2 transform child frame id");
+DEFINE_double(front_radar_forward_distance, 120.0, "get front radar forward distancer");

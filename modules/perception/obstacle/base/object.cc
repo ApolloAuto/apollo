@@ -33,6 +33,12 @@ Object::Object() {
   cloud.reset(new pcl_util::PointCloud);
   type = UNKNOWN;
   type_probs.resize(MAX_OBJECT_TYPE, 0);
+  position_uncertainty << 0.01, 0, 0,
+    0, 0.01, 0,
+    0, 0, 0.01;
+  velocity_uncertainty << 0.01, 0, 0,
+    0, 0.01, 0,
+    0, 0, 0.01;
 }
 
 void Object::clone(const Object& rhs) {
@@ -128,6 +134,18 @@ bool Object::Deserialize(const PerceptionObstacle& pb_obs) {
   type = static_cast<ObjectType>(pb_obs.type());
 
   return true;
+}
+
+std::string SensorObjects::ToString() const {
+  std::ostringstream oss;
+  oss << "sensor_type: " << GetSensorType(sensor_type)
+      << ", timestamp:" << GLOG_TIMESTAMP(timestamp) << ", sensor2world_pose:\n";
+  oss << sensor2world_pose << "\n, objects: " << objects.size() << " < ";
+  for (auto obj : objects) {
+      oss << "\n" << obj->ToString();
+  }
+  oss << " >]";
+  return oss.str();
 }
 
 }  // namespace perception
