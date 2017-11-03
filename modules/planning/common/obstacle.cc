@@ -85,6 +85,8 @@ Obstacle::Obstacle(const std::string& id,
 
 bool Obstacle::IsStatic() const { return is_static_; }
 
+bool Obstacle::IsVirtual() const { return is_virtual_; }
+
 bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return true;
