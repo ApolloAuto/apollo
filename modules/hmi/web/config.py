@@ -68,6 +68,11 @@ class Config(object):
             cls.pb_singleton = text_format.Merge(conf_file.read(),
                                                  config_pb2.Config())
         conf_pb = cls.pb_singleton
+        for i in range(len(conf_pb.modules) - 1, -1, -1):
+            # If the module path doesn't exist, remove it from list.
+            if (conf_pb.modules[i].path and
+                not os.path.exists(conf_pb.modules[i].path)):
+                del conf_pb.modules[i]
 
         # Init logger
         file_handler = logging.handlers.TimedRotatingFileHandler(
