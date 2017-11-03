@@ -695,6 +695,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
       point->set_y(path_point.y());
       point->set_s(path_point.s());
       point->set_kappa(path_point.kappa());
+      point->set_dkappa(path_point.dkappa());
     }
   }
 }
