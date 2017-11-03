@@ -32,6 +32,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
@@ -116,6 +117,7 @@ bool QpSplinePathGenerator::Generate(
   if (!is_solved) {
     AERROR << "Fail to solve qp_spline_path. Use reference line as qp_path "
               "output.";
+    util::DumpPlanningContext();
   }
   ADEBUG << common::util::StrCat("Spline dl:", init_frenet_point_.dl(),
                                  ", ddl:", init_frenet_point_.ddl());
