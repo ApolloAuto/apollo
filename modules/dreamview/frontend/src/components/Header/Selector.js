@@ -7,6 +7,7 @@ export default class Selector extends React.Component {
         super(props);
 
         this.state = {
+            name: props.name,
             value: props.currentOption,
         };
 
@@ -19,7 +20,7 @@ export default class Selector extends React.Component {
         });
         this.entries.unshift(
             <option key="none" value="none" disabled style={{"display":"none"}}>
-                -- select an option --
+                {`-- select a ${this.state.name} --`}
             </option>
         );
     }
@@ -30,7 +31,7 @@ export default class Selector extends React.Component {
     }
 
     render() {
-        const { options, currentOption, onChange } = this.props;
+        const { name, options, currentOption, onChange } = this.props;
 
         return (
             <div className="selector">

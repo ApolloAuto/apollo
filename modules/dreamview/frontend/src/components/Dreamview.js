@@ -6,8 +6,8 @@ import DashCamPlayer from "components/DashCamPlayer";
 import Geolocation from "components/common/Geolocation";
 import PNCMonitor from "components/PNCMonitor";
 import RouteEditingBar from "components/RouteEditingBar";
+import Header from "components/Header";
 import Loader from "components/common/Loader";
-import MenuBar from "components/MenuBar";
 import SideBar from "components/SideBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
@@ -57,7 +57,7 @@ export default class Dreamview extends React.Component {
                        onChange={this.handleDrag}
                        allowResize={options.showPNCMonitor}>
                 <div>
-                    {showBars ? <MenuBar /> : null}
+                    {showBars ? <Header /> : null}
                     {showBars ? <SideBar /> : null}
                     {showBars ? <StatusBar meters={meters} /> : null}
                     {showRoutingBar ? <RouteEditingBar /> : null}

@@ -27,7 +27,7 @@ class Renderer {
             antialias: useAntialias
         });
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x031C31);
+        this.scene.background = new THREE.Color(0x0E1113);
 
         // The ground. (grid for now)
         this.ground = new Ground();
