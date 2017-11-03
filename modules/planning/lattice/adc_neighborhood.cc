@@ -93,13 +93,12 @@ void ADCNeighborhood::SetupObstacles(
             ReferenceLineMatcher::match_to_reference_line(
                 discretized_ref_points, obstacle_state[1]);
         const PerceptionObstacle& perception_obstacle = obstacle->Perception();
+        double ref_theta = obstacle_point_on_ref_line.theta();
         auto velocity = perception_obstacle.velocity();
-        double speed = std::hypot(velocity.x(), velocity.y());
-        double obstacle_theta = std::atan2(velocity.y(), velocity.x());
-        double diff_theta =
-            obstacle_theta - obstacle_point_on_ref_line.theta();
-        obstacle_state[3] = speed * std::cos(diff_theta);
-        obstacle_state[4] = 0.0;  // set s_ddot as zero
+        obstacle_state[3] = std::cos(ref_theta) * velocity.x() +
+            std::sin(ref_theta) * velocity.y();
+
+        obstacle_state[4] = 0.0;  // set s_ddot to zero
         // TODO(all) confirm the logic to determine whether an obstacle
         // is forward or backward.
         if (obstacle_state[2] < init_s_[0]) {
