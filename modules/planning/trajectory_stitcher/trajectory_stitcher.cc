@@ -69,9 +69,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   std::size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
 
   if (prev_trajectory_size == 0) {
-    AWARN << "Projected trajectory at time [" << prev_trajectory->header_time()
-          << "] size is zero! Previous planning not exist or failed. Use "
-             "origin car status instead.";
+    ADEBUG << "Projected trajectory at time [" << prev_trajectory->header_time()
+           << "] size is zero! Previous planning not exist or failed. Use "
+              "origin car status instead.";
     return ComputeReinitStitchingTrajectory();
   }
 

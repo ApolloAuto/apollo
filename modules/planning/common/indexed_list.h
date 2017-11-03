@@ -68,6 +68,21 @@ class IndexedList {
   }
 
   /**
+   * @brief Find object by id in the container
+   * @param id the id of the object
+   * @return the raw pointer to the object if found.
+   * @return nullptr if the object is not found.
+   */
+  const T* Find(const I id) const {
+    auto iter = object_dict_.find(id);
+    if (iter == object_dict_.end()) {
+      return nullptr;
+    } else {
+      return &iter->second;
+    }
+  }
+
+  /**
    * @brief List all the items in the container.
    * @return the list of const raw pointers of the objects in the container.
    */
