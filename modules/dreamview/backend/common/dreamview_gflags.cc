@@ -37,6 +37,12 @@ DEFINE_bool(enable_sim_control, false,
             "Whether to enable SimControl to publish localization and chassis "
             "message.");
 
+DEFINE_double(sim_control_start_velocity, 0.0,
+              "The initial velocity of the main vehicle in sim control.");
+
+DEFINE_double(sim_control_start_acceleration, 0.0,
+              "The initial acceleration of the main vehicle in sim control.");
+
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");
 

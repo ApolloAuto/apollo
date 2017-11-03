@@ -89,8 +89,8 @@ void SimControl::Init(bool set_start_point) {
 }
 
 void SimControl::SetStartPoint(const double x, const double y) {
-  next_point_.set_v(0.0);
-  next_point_.set_a(0.0);
+  next_point_.set_v(FLAGS_sim_control_start_velocity);
+  next_point_.set_a(FLAGS_sim_control_start_acceleration);
 
   auto* next_point = next_point_.mutable_path_point();
   next_point->set_x(x);
