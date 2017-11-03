@@ -17,6 +17,7 @@
 #include "modules/monitor/hardware/can/can_monitor.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
 #include "modules/monitor/monitor.h"
+#include "modules/monitor/software/process_monitor.h"
 
 DEFINE_string(monitor_adapter_config_filename,
               "modules/monitor/conf/adapter.conf",
@@ -43,13 +44,20 @@ class StatusChangeMonitor : public RecurrentRunner {
 
   // Publish the new system status if it changed.
   void RunOnce(const double current_time) override {
+    // Get fingerprint of current status.
+    // Don't use DebugString() which has known bug on Map field. The string
+    // doesn't change though the value has changed.
     static std::hash<std::string> hash_fn;
-    const size_t new_fp = hash_fn(system_status_->ShortDebugString());
+    std::string proto_bytes;
+    system_status_->clear_header();
+    system_status_->SerializeToString(&proto_bytes);
+    const size_t new_fp = hash_fn(proto_bytes);
+
     if (system_status_fp_ != new_fp) {
       AdapterManager::FillSystemStatusHeader(name_, system_status_);
       AdapterManager::PublishSystemStatus(*system_status_);
-      system_status_fp_ = new_fp;
       ADEBUG << "Published system status: " << system_status_->DebugString();
+      system_status_fp_ = new_fp;
     }
   }
 
@@ -77,6 +85,7 @@ Status Monitor::Init() {
 
   monitor_thread_.RegisterRunner(make_unique<CanMonitor>(&system_status_));
   monitor_thread_.RegisterRunner(make_unique<GpsMonitor>(&system_status_));
+  monitor_thread_.RegisterRunner(make_unique<ProcessMonitor>(&system_status_));
 
   // Register the StatusChangeMonitor as last runner, so it will monitor all
   // changes made by the previous runners.
