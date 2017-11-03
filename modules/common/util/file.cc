@@ -19,10 +19,23 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <fstream>
 
 namespace apollo {
 namespace common {
 namespace util {
+
+bool GetContent(const std::string &file_name, std::string *content) {
+  std::ifstream fin(file_name);
+  if (!fin) {
+    return false;
+  }
+
+  std::stringstream str_stream;
+  str_stream << fin.rdbuf();
+  *content = str_stream.str();
+  return true;
+}
 
 bool PathExists(const std::string &path) {
   struct stat info;

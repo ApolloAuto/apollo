@@ -171,6 +171,14 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
 }
 
 /**
+ * @brief Get file content as string.
+ * @param file_name The name of the file to read content.
+ * @param content The file content.
+ * @return If the action is successful.
+ */
+bool GetContent(const std::string &file_name, std::string *content);
+
+/**
  * @brief Check if the path exists.
  * @return If the path exists.
  */

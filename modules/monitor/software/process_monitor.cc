@@ -24,7 +24,7 @@
 
 DEFINE_string(process_monitor_name, "ProcessMonitor",
               "Name of the process monitor.");
-DEFINE_double(process_monitor_interval, 3,
+DEFINE_double(process_monitor_interval, 1.5,
               "Process status checking interval (s).");
 
 DEFINE_string(module_monitor_conf_path,
@@ -33,22 +33,8 @@ DEFINE_string(module_monitor_conf_path,
 
 namespace apollo {
 namespace monitor {
-namespace {
 
 using apollo::common::util::GetProtoFromFile;
-
-std::string TranslateSymbolicLink(const std::string &origin) {
-  constexpr int BUF_SIZE = 512;
-  char buf[BUF_SIZE];
-  int count = readlink(origin.c_str(), buf, BUF_SIZE);
-  if (count < 0) {
-    count = 0;
-  }
-  buf[count] = '\0';
-  return buf;
-}
-
-}  // namespace
 
 ProcessMonitor::ProcessMonitor(SystemStatus *system_status)
     : RecurrentRunner(FLAGS_process_monitor_name,
@@ -59,7 +45,7 @@ ProcessMonitor::ProcessMonitor(SystemStatus *system_status)
 
   // Init module status if it has set binary to check.
   for (const auto &module_conf : config_.modules()) {
-    if (module_conf.has_binary_path()) {
+    if (!module_conf.process_cmd_keywords().empty()) {
       status_->insert({module_conf.name(), {}});
     }
   }
@@ -68,22 +54,30 @@ ProcessMonitor::ProcessMonitor(SystemStatus *system_status)
 void ProcessMonitor::RunOnce(const double current_time) {
   // Set all processes as not-running by default.
   for (const auto &module_conf : config_.modules()) {
-    if (module_conf.has_binary_path()) {
+    if (!module_conf.process_cmd_keywords().empty()) {
       (*status_)[module_conf.name()].set_process_running(false);
     }
   }
 
   const auto procs = common::util::ListSubDirectories("/proc");
   for (const auto &proc : procs) {
-    const auto binary_link = common::util::StrCat("/proc/", proc, "/exe");
-    const auto binary_path = TranslateSymbolicLink(binary_link);
-    if (binary_path.empty()) {
+    // Get process command string.
+    std::string cmd_string;
+    const auto cmd_file = common::util::StrCat("/proc/", proc, "/cmdline");
+    if (!common::util::GetContent(cmd_file, &cmd_string)) {
       continue;
     }
+
     for (const auto &module_conf : config_.modules()) {
-      // Find the bounded module.
-      if (module_conf.has_binary_path() &&
-          common::util::EndWith(binary_path, module_conf.binary_path())) {
+      const auto &keywords = module_conf.process_cmd_keywords();
+      // Check if the command string contains all keywords of this module.
+      const bool keywords_matched = !keywords.empty() && std::find_if(
+          keywords.begin(), keywords.end(),
+          [cmd_string](const std::string &keyword)->bool {
+            return cmd_string.find(keyword) == std::string::npos;
+          }) == keywords.end();
+
+      if (keywords_matched) {
         (*status_)[module_conf.name()].set_process_running(true);
         ADEBUG << "Found " << module_conf.name() << " module "
                   "is running on process " << proc;
