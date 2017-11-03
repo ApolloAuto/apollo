@@ -256,6 +256,10 @@ bool Frame::CheckCollision() {
   common::math::Polygon2d adc_polygon(adc_box);
   const double adc_half_diagnal = adc_box.diagonal() / 2.0;
   for (const auto &obstacle : obstacles_.Items()) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
+
     double center_dist =
         adc_box.center().DistanceTo(obstacle->PerceptionBoundingBox().center());
     if (center_dist > obstacle->PerceptionBoundingBox().diagonal() / 2.0 +
