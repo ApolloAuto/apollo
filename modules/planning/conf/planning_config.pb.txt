@@ -134,11 +134,11 @@ qp_spline_reference_line_smoother_config {
     constraint_to_knots_ratio: 5
     max_spline_length: 25.0
     longitudinal_boundary_bound: 2.0
-    lateral_boundary_bound: 0.10
+    lateral_boundary_bound: 0.25
     second_derivative_weight: 200.0
     third_derivative_weight: 1000.0
     num_of_total_points: 500
-    regularization_weight: 0.2
+    regularization_weight: 1.0e-5
 }
 
 rule_config : {
