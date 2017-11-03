@@ -8,5 +8,3 @@
 --vehicle_config_path=modules/common/data/mkz_config.pb.txt
 
 --map_dir=modules/map/data/sunnyvale_loop
-
---map_dir=modules/map/data/demo
