@@ -411,10 +411,6 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
       }
       break;
 
-    case novatel::RANGE:
-
-      break;
-
     default:
       break;
   }
@@ -674,7 +670,7 @@ bool NovatelParser::handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph) {
   keppler_orbit->set_af0(gps_emph->af0);
   keppler_orbit->set_af1(gps_emph->af1);
   keppler_orbit->set_af2(gps_emph->af2);
-  keppler_orbit->set_iode(gps_emph->iode1); // ???
+  keppler_orbit->set_iode(gps_emph->iode1);
   keppler_orbit->set_deltan(gps_emph->delta_A);
   keppler_orbit->set_m0(gps_emph->M_0);
   keppler_orbit->set_e(gps_emph->ecc);
@@ -694,7 +690,7 @@ bool NovatelParser::handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph) {
   keppler_orbit->set_idot(gps_emph->dot_I);
   keppler_orbit->set_accuracy(sqrt(gps_emph->ura));
   keppler_orbit->set_health(gps_emph->health);
-  keppler_orbit->set_tgd(gps_emph->tgd); //tdg2?
+  keppler_orbit->set_tgd(gps_emph->tgd);
   keppler_orbit->set_iodc(gps_emph->iodc);
   return true;
 }
@@ -731,7 +727,7 @@ bool NovatelParser::handle_bds_eph(const novatel::BDS_Ephemeris* bds_emph) {
   keppler_orbit->set_idot(bds_emph->idot);
   keppler_orbit->set_accuracy(bds_emph->ura);
   keppler_orbit->set_health(bds_emph->health1);
-  keppler_orbit->set_tgd(bds_emph->tdg1); //tdg2?
+  keppler_orbit->set_tgd(bds_emph->tdg1);
   keppler_orbit->set_iodc(bds_emph->aodc);
   return true;
 }
@@ -750,10 +746,11 @@ bool NovatelParser::handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph) {
   glonass_orbit->set_tk(glo_emph->Tk);
   glonass_orbit->set_clock_offset(-glo_emph->tau_n);
   glonass_orbit->set_clock_drift( glo_emph->gamma);
+
   if (glo_emph->health <= 3) {
-    glonass_orbit->set_health(0);
+    glonass_orbit->set_health(0); // 0 means good.
   } else {
-    glonass_orbit->set_health(1);
+    glonass_orbit->set_health(1); // 1 means bad.
   }
   glonass_orbit->set_position_x(glo_emph->pos_x);
   glonass_orbit->set_position_y(glo_emph->pos_y);
