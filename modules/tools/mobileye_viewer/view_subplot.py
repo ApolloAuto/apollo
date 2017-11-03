@@ -25,11 +25,14 @@ class ViewSubplot:
             [-10, 10, -10, 10], [-10, 150, 150, -10],
             'bo', lw=3, alpha=0.4)
         self.left_lane, = ax.plot(
-            [0], [0], 'go', lw=3, alpha=0.4)
+            [0], [0], 'go', lw=3, alpha=0.5)
         self.obstacles, =  ax.plot(
-            [0], [0], 'r.', ms=20, alpha=0.8)
+            [0], [0], 'r.', ms=20, alpha=0.5)
         self.ref_lane, = ax.plot(
-            [0], [0], 'k--', lw=3, alpha=0.4)
+            [0], [0], 'k--', lw=3, alpha=0.8)
+        self.vehicle = ax.plot(
+            [-1.055, 1.055, 1.055, -1.055, -1.055], [0, 0, -4.933, -4.933, 0],
+            'r-', lw=1)
 
         self.speed_line, = ax.plot([0], [0], 'r-', lw=3, alpha=0.4)
         self.acc_line, = ax.plot([0], [0], 'y-', lw=3, alpha=1)
@@ -47,7 +50,7 @@ class ViewSubplot:
         self.right_lane.set_visible(False)
         self.ref_lane.set_visible(False)
 
-    def show(self, mobileye_data, localization_data, planning_data):
+    def show(self, mobileye_data, localization_data, planning_data, chassis_data):
         self.left_lane.set_visible(True)
         self.right_lane.set_visible(True)
         self.ref_lane.set_visible(True)
@@ -63,6 +66,10 @@ class ViewSubplot:
 
         self.ref_lane.set_xdata(planning_data.path_x)
         self.ref_lane.set_ydata(planning_data.path_y)
+        if chassis_data.is_auto():
+            self.ref_lane.set_color('r')
+        else:
+            self.ref_lane.set_color('k')
 
         mobileye_data.obstacle_data_lock.acquire()
         self.obstacles.set_ydata(mobileye_data.obstacle_x)
