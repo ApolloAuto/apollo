@@ -13,6 +13,7 @@ cc_library(
         "//modules/monitor/hardware/can:can_monitor",
         "//modules/monitor/hardware/gps:gps_monitor",
         "//modules/monitor/proto:system_status_proto",
+        "//modules/monitor/software:process_monitor",
     ],
 )
 
