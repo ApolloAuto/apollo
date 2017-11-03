@@ -168,6 +168,8 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
   **/
   lateral_error_filter_ =
       MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
+  heading_error_filter_ =
+      MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
 }
 
 Status LatController::Init(const ControlConf *control_conf) {
@@ -521,10 +523,15 @@ void LatController::ComputeLateralErrors(
       common::math::NormalizeAngle(theta - target_point.path_point().theta());
   double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = linear_v * sin_delta_theta;
+  // theta_error = delta_theta
+  // TODO(QiL): Code reformat after test
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
+  if (FLAGS_use_relative_position) {
+    debug->set_heading_error(heading_error_filter_.Update(delta_theta));
+  } else {
+    debug->set_heading_error(delta_theta);
+  }
 
-  // theta_error = delta_theta;
-  debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - target_point.path_point().kappa() *
   // target_point.v();
   debug->set_heading_error_rate(angular_v - target_point.path_point().kappa() *
