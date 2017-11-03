@@ -8,9 +8,9 @@
 namespace apollo {
 namespace perception {
 
-bool SharedDataManager::init(const DAGConfig::SharedDataConfig& data_config) {
-  if (_inited) {
-    AWARN << "SharedDataManager init twice.";
+bool SharedDataManager::Init(const DAGConfig::SharedDataConfig &data_config) {
+  if (inited_) {
+    AWARN << "SharedDataManager Init twice.";
     return true;
   }
 
@@ -22,45 +22,45 @@ bool SharedDataManager::init(const DAGConfig::SharedDataConfig& data_config) {
       AERROR << "failed to get SharedData instance: " << proto.name();
       return false;
     }
-    if (!shared_data->init()) {
-      AERROR << "failed to init SharedData. name: " << proto.name();
+    if (!shared_data->Init()) {
+      AERROR << "failed to Init SharedData. name: " << proto.name();
       return false;
     }
 
-    auto result = _shared_data_map.emplace(
-        shared_data->name(), std::unique_ptr<SharedData>(shared_data));
+    auto result = shared_data_map_.emplace(
+        shared_data->Name(), std::unique_ptr<SharedData>(shared_data));
 
     if (!result.second) {
-      AERROR << "duplicate SharedData: " << shared_data->name();
+      AERROR << "duplicate SharedData: " << shared_data->Name();
       return true;
     }
   }
 
-  AINFO << "SharedDataManager load " << _shared_data_map.size()
+  AINFO << "SharedDataManager load " << shared_data_map_.size()
         << " SharedData.";
 
-  _inited = true;
+  inited_ = true;
   return true;
 }
 
-SharedData* SharedDataManager::get_shared_data(const std::string& name) const {
-  auto citer = _shared_data_map.find(name);
-  if (citer == _shared_data_map.end()) {
+SharedData *SharedDataManager::GetSharedData(const std::string &name) const {
+  auto citer = shared_data_map_.find(name);
+  if (citer == shared_data_map_.end()) {
     return NULL;
   }
   return citer->second.get();
 }
 
-void SharedDataManager::reset() {
-  for (auto& pair : _shared_data_map) {
-    pair.second->reset();
+void SharedDataManager::Reset() {
+  for (auto &pair : shared_data_map_) {
+    pair.second->Reset();
   }
-  AINFO << "reset all SharedData. nums: " << _shared_data_map.size();
+  AINFO << "reset all SharedData. nums: " << shared_data_map_.size();
 }
 
-void SharedDataManager::remove_stale_data() {
-  for (auto& shared_data : _shared_data_map) {
-    shared_data.second->remove_stale_data();
+void SharedDataManager::RemoveStaleData() {
+  for (auto &shared_data : shared_data_map_) {
+    shared_data.second->RemoveStaleData();
   }
 }
 

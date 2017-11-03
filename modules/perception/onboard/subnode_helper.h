@@ -15,31 +15,31 @@ class SubnodeHelper {
   // subnode has a field named reserve
   // when reserve like "source_name:./data;source_param:.fsi"
   // you can use this func to get the map
-  static bool parse_reserve_field(
-      const std::string& reserve,
-      std::map<std::string, std::string>* result_map);
+  static bool ParseReserveField(
+      const std::string &reserve,
+      std::map<std::string, std::string> *result_map);
 
   // produce key for shared data which is always map
   // key = device_id + stamp * 100
-  static bool produce_shared_data_key(double stamp,
-                                      const std::string& device_id,
-                                      std::string* key);
+  static bool ProduceSharedDataKey(double stamp,
+                                   const std::string &device_id,
+                                   std::string *key);
 
   // produce key for shared data which is always map
   // key = (long)(stamp * 100)*100 + device_id
-  static bool produce_shared_data_key(double stamp,
-                                      const std::string& device_id,
-                                      int64_t* key);
+  static bool ProduceSharedDataKey(double stamp,
+                                   const std::string &device_id,
+                                   int64_t *key);
 
   // conf format: param1_name=param1_value&param2_name=param2_value
-  static bool extract_params(const std::string& conf_str,
-                             const std::vector<std::string>& param_names,
-                             std::vector<std::string>* param_values);
+  static bool ExtractParams(const std::string &conf_str,
+                            const std::vector<std::string> &param_names,
+                            std::vector<std::string> *param_values);
 
   // conf format: param1_name=param1_value&param2_name=param2_value
-  static bool extract_param(const std::string& conf_str,
-                            const std::string& param_name,
-                            std::string* param_value);
+  static bool ExtractParam(const std::string &conf_str,
+                           const std::string &param_name,
+                           std::string *param_value);
 
  private:
   // Not allowed to instanced.
@@ -50,18 +50,19 @@ class SubnodeHelper {
 // @brief FrameSkiper is designed for limiting the frame ratio.
 class FrameSkiper {
  public:
-  FrameSkiper() : _min_interval(0.0), _ts(0.0) {}
+  FrameSkiper() : min_interval_(0.0), ts_(0.0) {
+  }
 
   // @brief max_ratio means max frame/s
-  bool init(const double max_ratio);
+  bool Init(const double max_ratio);
 
   // @brief if the frame should be skip
   // @param true skip the msg.
-  bool skip(const double ts);
+  bool Skip(const double ts);
 
  private:
-  double _min_interval;
-  double _ts;
+  double min_interval_;
+  double ts_;
 };
 
 }  // namespace perception

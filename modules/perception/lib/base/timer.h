@@ -33,13 +33,13 @@ class Timer {
   Timer() = default;
 
   // no-thread safe.
-  void start();
+  void Start();
 
   // return the elapsed time,
   // also output msg and time in glog.
   // automatically start a new timer.
   // no-thread safe.
-  uint64_t end(const std::string& msg);
+  uint64_t End(const std::string &msg);
 
  private:
   // in ms.
@@ -51,9 +51,13 @@ class Timer {
 
 class TimerWrapper {
  public:
-  explicit TimerWrapper(const std::string& msg) : msg_(msg) { timer_.start(); }
+  explicit TimerWrapper(const std::string &msg) : msg_(msg) {
+    timer_.Start();
+  }
 
-  ~TimerWrapper() { timer_.end(msg_); }
+  ~TimerWrapper() {
+    timer_.End(msg_);
+  }
 
  private:
   Timer timer_;

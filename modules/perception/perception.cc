@@ -45,8 +45,8 @@ Status Perception::Init() {
   /// init config manager
   ConfigManager* config_manager = ConfigManager::instance();
   if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager";
-    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init ConfigManager.");
+      AERROR << "failed to Init ConfigManager";
+      return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init ConfigManager.");
   }
   AINFO << "Init config manager successfully, work_root: "
         << config_manager->work_root();
@@ -55,13 +55,13 @@ Status Perception::Init() {
       FileUtil::GetAbsolutePath(FLAGS_work_root, FLAGS_dag_config_path);
 
   DAGStreaming dag_streaming;
-  if (!dag_streaming.init(dag_config_path)) {
+    if (!dag_streaming.Init(dag_config_path)) {
     AERROR << "failed to Init DAGStreaming. dag_config_path:"
            << dag_config_path;
-    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init DAGStreaming.");
+        return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
   }
 
-  dag_streaming.start();
+    dag_streaming.Start();
 
   return Status::OK();
 }

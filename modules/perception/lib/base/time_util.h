@@ -15,7 +15,7 @@ namespace perception {
 class TimeUtil {
  public:
   // @brief: UNIX timestamp to GPS timestamp, in seconds.
-  static double unix2gps(double unix_time) {
+  static double Unix2gps(double unix_time) {
     double gps_time = unix_time - UNIX_GPS_DIFF;
     if (unix_time < LEAP_SECOND_TIMESTAMP) {
       gps_time -= 1.0;
@@ -24,7 +24,7 @@ class TimeUtil {
   }
 
   // @brief: GPS timestamp to UNIX timestamp, in seconds.
-  static double gps2unix(double gps_time) {
+  static double Gps2unix(double gps_time) {
     double unix_time = gps_time + UNIX_GPS_DIFF;
     if (unix_time + 1 < LEAP_SECOND_TIMESTAMP) {
       unix_time += 1.0;
@@ -32,7 +32,7 @@ class TimeUtil {
     return unix_time;
   }
 
-  static double get_current_time() {
+  static double GetCurrentTime() {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
     const double timestamp = tv.tv_sec * 1000000 + tv.tv_usec;

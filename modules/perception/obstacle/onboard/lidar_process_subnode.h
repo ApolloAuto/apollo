@@ -29,12 +29,12 @@ class LidarProcessSubnode : public Subnode {
   LidarProcessSubnode() = default;
   ~LidarProcessSubnode() = default;
 
-  StatusCode proc_events() override {
+  StatusCode ProcEvents() override {
     return SUCC;
   }
 
  private:
-  bool init_internal() override;
+  bool InitInternal() override;
 
   void OnPointCloud(const sensor_msgs::PointCloud2& message);
 

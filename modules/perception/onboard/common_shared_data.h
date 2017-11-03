@@ -30,7 +30,7 @@ struct CommonSharedDataKey {
   CommonSharedDataKey() = default;
   CommonSharedDataKey(const double& ts, const std::string& id)
       : timestamp(ts), device_id(id) {}
-  virtual std::string to_string() const {
+  virtual std::string ToString() const {
     return device_id +
            (boost::format("%ld") %
             static_cast<long>(timestamp * FLAGS_stamp_enlarge_factor))
@@ -41,7 +41,7 @@ struct CommonSharedDataKey {
 };
 
 struct CommonSharedDataStat {
-  std::string to_string() const {
+  std::string ToString() const {
     std::ostringstream oss;
     oss << "add_cnt:" << add_cnt << " remove_cnt:" << remove_cnt
         << " get_cnt:" << get_cnt;
@@ -60,53 +60,57 @@ class CommonSharedData : public SharedData {
   CommonSharedData() {}
   virtual ~CommonSharedData() {}
 
-  virtual bool init() override {
+  virtual bool Init() override {
     return true;
   }
   // @brief: you must impl your own name func
   // @return: name of your own class
-  virtual std::string name() const = 0;
+  virtual std::string Name() const = 0;
 
   // @brief: reset the shared data, clear data
-  virtual void reset() override;
+  virtual void Reset() override;
 
-  virtual void remove_stale_data() override;
+  virtual void RemoveStaleData() override;
 
   // @brief: add new key shared data
   // @param [in]: key
   // @param [in]: value
   // @return : true or false
-  bool add(const std::string& key, const SharedDataPtr<M>& data);
-  bool add(const CommonSharedDataKey& key, const SharedDataPtr<M>& data);
+  bool Add(const std::string &key, const SharedDataPtr<M> &data);
+
+  bool Add(const CommonSharedDataKey &key, const SharedDataPtr<M> &data);
 
   // @brief: get shared data for the given key
   // @param [in]: key
   // @param [out]: value with the key
   // @return : true or false
-  bool get(const std::string& key, SharedDataPtr<M>* data);
-  bool get(const CommonSharedDataKey& key, SharedDataPtr<M>* data);
+  bool Get(const std::string &key, SharedDataPtr<M> *data);
+
+  bool Get(const CommonSharedDataKey &key, SharedDataPtr<M> *data);
 
   // @brief: remove shared data with the given key
   // @param [in]: key
   // @return : true or false
-  bool remove(const std::string& key);
-  bool remove(const CommonSharedDataKey& key);
+  bool Remove(const std::string &key);
+
+  bool Remove(const CommonSharedDataKey &key);
 
   // @brief: get the data then remove it
   // @param [in]: key
   // @param [out]: value with the key
   // @return : true or false
-  bool pop(const std::string& key, SharedDataPtr<M>* data);
-  bool pop(const CommonSharedDataKey& key, SharedDataPtr<M>* data);
+  bool Pop(const std::string &key, SharedDataPtr<M> *data);
+
+  bool Pop(const CommonSharedDataKey &key, SharedDataPtr<M> *data);
 
   // @brief: num of data stored in shared data
   // @return: num of data
-  unsigned size() const {
-    return _data_map.size();
+  unsigned Size() const {
+    return data_map_.size();
   }
 
-  CommonSharedDataStat get_stat() const {
-    return _stat;
+  CommonSharedDataStat GetStat() const {
+    return stat_;
   }
 
  private:
@@ -116,143 +120,143 @@ class CommonSharedData : public SharedData {
       DataAddedTimeMap;  // precision in second
   typedef std::pair<std::string, uint64_t> DataKeyTimestampPair;
 
-  SharedDataMap _data_map;
-  Mutex _mutex;
-  CommonSharedDataStat _stat;
-  DataAddedTimeMap _data_added_time_map;
+  SharedDataMap data_map_;
+  Mutex mutex_;
+  CommonSharedDataStat stat_;
+  DataAddedTimeMap data_added_time_map_;
 
   DISALLOW_COPY_AND_ASSIGN(CommonSharedData);
 };
 
 template <class M>
-void CommonSharedData<M>::reset() {
-  MutexLock lock(&_mutex);
-  AINFO << "Reset " << name() << ", map size: " << _data_map.size();
-  _data_map.clear();
-  _data_added_time_map.clear();
+void CommonSharedData<M>::Reset() {
+  MutexLock lock(&mutex_);
+  AINFO << "Reset " << Name() << ", map size: " << data_map_.size();
+  data_map_.clear();
+  data_added_time_map_.clear();
 }
 
 template <class M>
-void CommonSharedData<M>::remove_stale_data() {
-  MutexLock lock(&_mutex);
+void CommonSharedData<M>::RemoveStaleData() {
+  MutexLock lock(&mutex_);
   const uint64_t now = ::time(NULL);
   bool has_change = false;
-  for (auto iter = _data_added_time_map.begin();
-       iter != _data_added_time_map.end();) {
+  for (auto iter = data_added_time_map_.begin();
+      iter != data_added_time_map_.end();) {
     if (now - iter->second > FLAGS_shared_data_stale_time) {
-      const size_t erase_cnt = _data_map.erase(iter->first);
+      const size_t erase_cnt = data_map_.erase(iter->first);
       if (erase_cnt != 1u) {
         AWARN << "_data_map erase cnt:" << erase_cnt << " key:" << iter->first;
         return;
       }
-      iter = _data_added_time_map.erase(iter);
-      ++_stat.remove_cnt;
+      iter = data_added_time_map_.erase(iter);
+      ++stat_.remove_cnt;
       has_change = true;
     } else {
       ++iter;
     }
   }
   if (has_change) {
-    AINFO << "SharedData remove_stale_data name:" << name() << " stat:["
-          << _stat.to_string() << "]";
+    AINFO << "SharedData remove_stale_data name:" << Name() << " stat:["
+          << stat_.ToString() << "]";
   }
 }
 
 template <class M>
-bool CommonSharedData<M>::add(const std::string& key,
-                              const SharedDataPtr<M>& data) {
-  MutexLock lock(&_mutex);
-  auto ret = _data_map.emplace(SharedDataPair(key, data));
+bool CommonSharedData<M>::Add(const std::string &key,
+                              const SharedDataPtr<M> &data) {
+  MutexLock lock(&mutex_);
+  auto ret = data_map_.emplace(SharedDataPair(key, data));
   if (!ret.second) {
     AWARN << "Duplicate key: " << key;
     return false;
   }
 
   const uint64_t timestamp = ::time(NULL);
-  _data_added_time_map.emplace(DataKeyTimestampPair(key, timestamp));
+  data_added_time_map_.emplace(DataKeyTimestampPair(key, timestamp));
 
-  ++_stat.add_cnt;
+  ++stat_.add_cnt;
   return true;
 }
 
 template <class M>
-bool CommonSharedData<M>::add(const CommonSharedDataKey& key,
-                              const SharedDataPtr<M>& data) {
-  return add(key.to_string(), data);
+bool CommonSharedData<M>::Add(const CommonSharedDataKey &key,
+                              const SharedDataPtr<M> &data) {
+  return Add(key.ToString(), data);
 }
 
 template <class M>
-bool CommonSharedData<M>::get(const std::string& key, SharedDataPtr<M>* data) {
-  MutexLock lock(&_mutex);
-  auto citer = _data_map.find(key);
-  if (citer == _data_map.end()) {
+bool CommonSharedData<M>::Get(const std::string &key, SharedDataPtr<M> *data) {
+  MutexLock lock(&mutex_);
+  auto citer = data_map_.find(key);
+  if (citer == data_map_.end()) {
     AWARN << "Failed to get shared data. key: " << key;
     return false;
   }
   *data = citer->second;
-  ++_stat.get_cnt;
+  ++stat_.get_cnt;
   return true;
 }
 
 template <class M>
-bool CommonSharedData<M>::get(const CommonSharedDataKey& key,
-                              SharedDataPtr<M>* data) {
-  return get(key.to_string(), data);
+bool CommonSharedData<M>::Get(const CommonSharedDataKey &key,
+                              SharedDataPtr<M> *data) {
+  return Get(key.ToString(), data);
 }
 
 template <class M>
-bool CommonSharedData<M>::remove(const std::string& key) {
-  MutexLock lock(&_mutex);
-  const size_t num = _data_map.erase(key);
+bool CommonSharedData<M>::Remove(const std::string &key) {
+  MutexLock lock(&mutex_);
+  const size_t num = data_map_.erase(key);
   if (num != 1u) {
     AWARN << "Only one element should be deleted with key: " << key
           << ", but num: " << num;
     return false;
   }
 
-  const size_t erase_cnt = _data_added_time_map.erase(key);
+  const size_t erase_cnt = data_added_time_map_.erase(key);
   if (erase_cnt != 1u) {
     AWARN << "_data_added_time_map erase cnt:" << erase_cnt << " key:" << key;
     return false;
   }
-  ++_stat.remove_cnt;
+  ++stat_.remove_cnt;
   return true;
 }
 
 template <class M>
-bool CommonSharedData<M>::remove(const CommonSharedDataKey& key) {
-  return remove(key.to_string());
+bool CommonSharedData<M>::Remove(const CommonSharedDataKey &key) {
+  return Remove(key.ToString());
 }
 
 template <class M>
-bool CommonSharedData<M>::pop(const std::string& key, SharedDataPtr<M>* data) {
-  MutexLock lock(&_mutex);
-  auto citer = _data_map.find(key);
-  if (citer == _data_map.end()) {
+bool CommonSharedData<M>::Pop(const std::string &key, SharedDataPtr<M> *data) {
+  MutexLock lock(&mutex_);
+  auto citer = data_map_.find(key);
+  if (citer == data_map_.end()) {
     AWARN << "Failed to get shared data. key: " << key;
     return false;
   }
   *data = citer->second;
-  const size_t num = _data_map.erase(key);
+  const size_t num = data_map_.erase(key);
   if (num != 1u) {
     AWARN << "Only one element should be deleted with key: " << key
           << ", but num: " << num;
     return false;
   }
-  const size_t erase_cnt = _data_added_time_map.erase(key);
+  const size_t erase_cnt = data_added_time_map_.erase(key);
   if (erase_cnt != 1u) {
     AWARN << "_data_added_time_map erase cnt:" << erase_cnt << " key:" << key;
     return false;
   }
-  ++_stat.get_cnt;
-  ++_stat.remove_cnt;
+  ++stat_.get_cnt;
+  ++stat_.remove_cnt;
   return true;
 }
 
 template <class M>
-bool CommonSharedData<M>::pop(const CommonSharedDataKey& key,
-                              SharedDataPtr<M>* data) {
-  return pop(key.to_string(), data);
+bool CommonSharedData<M>::Pop(const CommonSharedDataKey &key,
+                              SharedDataPtr<M> *data) {
+  return Pop(key.ToString(), data);
 }
 
 }  // namespace perception

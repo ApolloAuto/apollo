@@ -15,8 +15,8 @@ using std::map;
 using std::string;
 using std::vector;
 
-bool SubnodeHelper::parse_reserve_field(const string& reserve,
-                                        map<string, string>* result_map) {
+bool SubnodeHelper::ParseReserveField(const string &reserve,
+                                      map<string, string> *result_map) {
   int str_len = static_cast<int>(reserve.size());
   if (str_len == 0) {
     AERROR << "reserve is empty";
@@ -52,9 +52,9 @@ bool SubnodeHelper::parse_reserve_field(const string& reserve,
   return true;
 }
 
-bool SubnodeHelper::produce_shared_data_key(double stamp,
-                                            const string& device_id,
-                                            string* key) {
+bool SubnodeHelper::ProduceSharedDataKey(double stamp,
+                                         const string &device_id,
+                                         string *key) {
   char temp[64];
   memset(temp, '\0', sizeof(temp));
   int ret = snprintf(temp, sizeof(temp), "%ld",
@@ -71,20 +71,20 @@ bool SubnodeHelper::produce_shared_data_key(double stamp,
   return true;
 }
 
-bool SubnodeHelper::produce_shared_data_key(double stamp,
-                                            const string& device_id,
-                                            int64_t* key) {
+bool SubnodeHelper::ProduceSharedDataKey(double stamp,
+                                         const string &device_id,
+                                         int64_t *key) {
   int64_t temp = static_cast<int64_t>(stamp * FLAGS_stamp_enlarge_factor);
   *key = temp * FLAGS_stamp_enlarge_factor + atoi(device_id.c_str());
   return true;
 }
 
-bool SubnodeHelper::extract_params(const string& conf_str,
-                                   const vector<string>& param_names,
-                                   vector<string>* param_values) {
+bool SubnodeHelper::ExtractParams(const string &conf_str,
+                                  const vector<string> &param_names,
+                                  vector<string> *param_values) {
   for (auto key : param_names) {
     string val;
-    if (!extract_param(conf_str, key, &val)) {
+    if (!ExtractParam(conf_str, key, &val)) {
       return false;
     }
     param_values->push_back(val);
@@ -92,9 +92,9 @@ bool SubnodeHelper::extract_params(const string& conf_str,
   return true;
 }
 
-bool SubnodeHelper::extract_param(const string& conf_str,
-                                  const string& param_name,
-                                  string* param_value) {
+bool SubnodeHelper::ExtractParam(const string &conf_str,
+                                 const string &param_name,
+                                 string *param_value) {
   vector<string> fields;
   split(fields, conf_str, is_any_of("&"));
   for (auto field : fields) {
@@ -121,18 +121,18 @@ bool SubnodeHelper::extract_param(const string& conf_str,
   return false;
 }
 
-bool FrameSkiper::init(const double max_ratio) {
-  _min_interval = 1 / max_ratio;
+bool FrameSkiper::Init(const double max_ratio) {
+  min_interval_ = 1 / max_ratio;
   return true;
 }
 
-bool FrameSkiper::skip(const double ts) {
+bool FrameSkiper::Skip(const double ts) {
   if (!FLAGS_enable_frame_ratio_control) {
     return false;
   }
 
-  if (ts - _ts > _min_interval) {
-    _ts = ts;
+  if (ts - ts_ > min_interval_) {
+    ts_ = ts;
     return false;
   } else {
     return true;

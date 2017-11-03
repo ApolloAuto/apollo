@@ -12,44 +12,45 @@ namespace perception {
 class Thread {
  public:
   Thread(bool joinable = false, const std::string& name = "Thread")
-      : _tid(0), _started(false), _joinable(joinable), _thread_name(name) {}
-
-  pthread_t tid() const {
-    return _tid;
+          : tid_(0), started_(false), joinable_(joinable), thread_name_(name) {
   }
 
-  void set_joinable(bool joinable) {
-    if (!_started) {
-      _joinable = joinable;
+  pthread_t Tid() const {
+    return tid_;
+  }
+
+  void SetJoinable(bool joinable) {
+    if (!started_) {
+      joinable_ = joinable;
     }
   }
 
-  void start();
+  void Start();
 
-  void join();
+  void Join();
 
-  bool is_alive();
+  bool IsAlive();
 
-  std::string get_thread_name() const {
-    return _thread_name;
+  std::string thread_name() const {
+    return thread_name_;
   }
   void set_thread_name(const std::string& name) {
-    _thread_name = name;
+    thread_name_ = name;
   }
 
  protected:
-  virtual void run() = 0;
+  virtual void Run() = 0;
 
-  static void* thread_runner(void* arg) {
+  static void *ThreadRunner(void *arg) {
     Thread* t = reinterpret_cast<Thread*>(arg);
-    t->run();
+    t->Run();
     return NULL;
   }
 
-  pthread_t _tid;
-  bool _started;
-  bool _joinable;
-  std::string _thread_name;
+  pthread_t tid_;
+  bool started_;
+  bool joinable_;
+  std::string thread_name_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Thread);

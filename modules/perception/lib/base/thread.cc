@@ -8,38 +8,38 @@
 namespace apollo {
 namespace perception {
 
-void Thread::start() {
+void Thread::Start() {
   pthread_attr_t attr;
   CHECK_EQ(pthread_attr_init(&attr), 0);
   CHECK_EQ(
       pthread_attr_setdetachstate(
-          &attr, _joinable ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED),
+              &attr, joinable_ ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED),
       0);
   CHECK_EQ(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL), 0);
   CHECK_EQ(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL), 0);
 
-  int result = pthread_create(&_tid, &attr, &thread_runner, this);
+  int result = pthread_create(&tid_, &attr, &ThreadRunner, this);
   CHECK_EQ(result, 0) << "Could not create thread (" << result << ")";
 
   CHECK_EQ(pthread_attr_destroy(&attr), 0);
 
-  _started = true;
+  started_ = true;
 }
 
-void Thread::join() {
-  CHECK(_joinable) << "Thread is not joinable";
-  int result = pthread_join(_tid, NULL);
-  CHECK_EQ(result, 0) << "Could not join thread (" << _tid << ", "
-                      << _thread_name << ")";
-  _tid = 0;
+void Thread::Join() {
+  CHECK(joinable_) << "Thread is not joinable";
+  int result = pthread_join(tid_, NULL);
+  CHECK_EQ(result, 0) << "Could not join thread (" << tid_ << ", "
+                      << thread_name_ << ")";
+  tid_ = 0;
 }
 
-bool Thread::is_alive() {
-  if (_tid == 0) {
+bool Thread::IsAlive() {
+  if (tid_ == 0) {
     return false;
   }
   // no signal sent, just check existence for thread
-  int ret = pthread_kill(_tid, 0);
+  int ret = pthread_kill(tid_, 0);
   if (ret == ESRCH) {
     return false;
   }

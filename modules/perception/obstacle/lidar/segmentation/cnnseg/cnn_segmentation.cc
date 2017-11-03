@@ -120,12 +120,12 @@ bool CNNSegmentation::Init() {
 
   cluster2d_.reset(new cnnseg::Cluster2D());
   if (!cluster2d_->Init(height_, width_, range_)) {
-    AERROR << "Fail to init cluster2d for CNNSegmentation";
+    AERROR << "Fail to Init cluster2d for CNNSegmentation";
   }
 
   feature_generator_.reset(new cnnseg::FeatureGenerator<float>());
   if (!feature_generator_->Init(feature_param, feature_blob_.get())) {
-    AERROR << "Fail to init feature generator for CNNSegmentation";
+    AERROR << "Fail to Init feature generator for CNNSegmentation";
     return false;
   }
 

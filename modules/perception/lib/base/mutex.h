@@ -11,43 +11,44 @@ namespace perception {
 class Mutex {
  public:
   Mutex() {
-    pthread_mutex_init(&_mu, NULL);
+    pthread_mutex_init(&mu_, NULL);
   }
 
   ~Mutex() {
-    pthread_mutex_destroy(&_mu);
+    pthread_mutex_destroy(&mu_);
   }
 
-  inline void lock() {
-    pthread_mutex_lock(&_mu);
+  inline void Lock() {
+    pthread_mutex_lock(&mu_);
   }
 
-  inline void unlock() {
-    pthread_mutex_unlock(&_mu);
+  inline void Unlock() {
+    pthread_mutex_unlock(&mu_);
   }
 
-  inline bool try_lock() {
-    return pthread_mutex_trylock(&_mu) == 0;
+  inline bool TryLock() {
+    return pthread_mutex_trylock(&mu_) == 0;
   }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Mutex);
 
   friend class CondVar;
-  pthread_mutex_t _mu;
+
+  pthread_mutex_t mu_;
 };
 
 class MutexLock {
  public:
-  explicit MutexLock(Mutex* mu) : _mu(mu) {
-    _mu->lock();
+  explicit MutexLock(Mutex *mu) : mu_(mu) {
+    mu_->Lock();
   }
   ~MutexLock() {
-    _mu->unlock();
+    mu_->Unlock();
   }
 
  private:
-  Mutex* const _mu;
+  Mutex *const mu_;
   DISALLOW_COPY_AND_ASSIGN(MutexLock);
 };
 
@@ -55,117 +56,118 @@ class MutexLock {
 class CondVar {
  public:
   CondVar() {
-    pthread_cond_init(&_cv, NULL);
+    pthread_cond_init(&cv_, NULL);
   }
 
   ~CondVar() {
-    pthread_cond_destroy(&_cv);
+    pthread_cond_destroy(&cv_);
   }
 
-  void wait(Mutex* mu) {
-    pthread_cond_wait(&_cv, &mu->_mu);
+  void Wait(Mutex *mu) {
+    pthread_cond_wait(&cv_, &mu->mu_);
   }
 
-  void signal() {
-    pthread_cond_signal(&_cv);
+  void Signal() {
+    pthread_cond_signal(&cv_);
   }
 
-  void signalall() {
-    pthread_cond_broadcast(&_cv);
+  void Signalall() {
+    pthread_cond_broadcast(&cv_);
   }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CondVar);
 
-  pthread_cond_t _cv;
+  pthread_cond_t cv_;
 };
 
 class BlockingCounter {
  public:
-  explicit BlockingCounter(size_t cnt) : _counter(cnt) {}
+  explicit BlockingCounter(size_t cnt) : counter_(cnt) {
+  }
 
-  bool decrement() {
-    MutexLock lock(&_mutex);
-    --_counter;
+  bool Decrement() {
+    MutexLock lock(&mutex_);
+    --counter_;
 
-    if (_counter == 0u) {
-      _cond.signalall();
+    if (counter_ == 0u) {
+      cond_.Signalall();
     }
 
-    return _counter == 0u;
+    return counter_ == 0u;
   }
 
-  void reset(size_t cnt) {
-    MutexLock lock(&_mutex);
-    _counter = cnt;
+  void Reset(size_t cnt) {
+    MutexLock lock(&mutex_);
+    counter_ = cnt;
   }
 
-  void wait() {
-    MutexLock lock(&_mutex);
+  void Wait() {
+    MutexLock lock(&mutex_);
 
-    while (_counter != 0u) {
-      _cond.wait(&_mutex);
+    while (counter_ != 0u) {
+      cond_.Wait(&mutex_);
     }
   }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BlockingCounter);
-  Mutex _mutex;
-  CondVar _cond;
-  size_t _counter;
+  Mutex mutex_;
+  CondVar cond_;
+  size_t counter_;
 };
 
 class RwMutex {
  public:
   RwMutex() {
-    pthread_rwlock_init(&_mu, NULL);
+    pthread_rwlock_init(&mu_, NULL);
   }
   ~RwMutex() {
-    pthread_rwlock_destroy(&_mu);
+    pthread_rwlock_destroy(&mu_);
   }
 
-  inline void reader_lock() {
-    pthread_rwlock_rdlock(&_mu);
+  inline void ReaderLock() {
+    pthread_rwlock_rdlock(&mu_);
   }
-  inline void writer_lock() {
-    pthread_rwlock_wrlock(&_mu);
+  inline void WriterLock() {
+    pthread_rwlock_wrlock(&mu_);
   }
 
-  inline void unlock() {
-    pthread_rwlock_unlock(&_mu);
+  inline void Unlock() {
+    pthread_rwlock_unlock(&mu_);
   }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(RwMutex);
-  pthread_rwlock_t _mu;
+  pthread_rwlock_t mu_;
 };
 
 class ReaderMutexLock {
  public:
-  explicit ReaderMutexLock(RwMutex* mu) : _mu(mu) {
-    _mu->reader_lock();
+  explicit ReaderMutexLock(RwMutex *mu) : mu_(mu) {
+    mu_->ReaderLock();
   }
   ~ReaderMutexLock() {
-    _mu->unlock();
+    mu_->Unlock();
   }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ReaderMutexLock);
-  RwMutex* _mu = nullptr;
+  RwMutex *mu_ = nullptr;
 };
 
 class WriterMutexLock {
  public:
-  explicit WriterMutexLock(RwMutex* mu) : _mu(mu) {
-    _mu->writer_lock();
+  explicit WriterMutexLock(RwMutex *mu) : mu_(mu) {
+    mu_->WriterLock();
   }
   ~WriterMutexLock() {
-    _mu->unlock();
+    mu_->Unlock();
   }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(WriterMutexLock);
-  RwMutex* _mu = nullptr;
+  RwMutex *mu_ = nullptr;
 };
 
 }  // namespace perception

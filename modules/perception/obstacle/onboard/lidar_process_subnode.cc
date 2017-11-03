@@ -38,7 +38,7 @@ using Eigen::Affine3d;
 using std::string;
 using std::map;
 
-bool LidarProcessSubnode::init_internal() {
+bool LidarProcessSubnode::InitInternal() {
   if (inited_) {
     return true;
   }
@@ -46,23 +46,23 @@ bool LidarProcessSubnode::init_internal() {
   RegistAllAlgorithm();
 
   if (!InitFrameDependence()) {
-    AERROR << "failed to init frame dependence.";
+    AERROR << "failed to Init frame dependence.";
     return false;
   }
 
   if (!InitAlgorithmPlugin()) {
-    AERROR << "failed to init algorithm plugin.";
+    AERROR << "failed to Init algorithm plugin.";
     return false;
   }
   // parse reserve fileds
   map<string, string> reserve_field_map;
-  if (!SubnodeHelper::parse_reserve_field(_reserve, &reserve_field_map)) {
-    AERROR << "Failed to parse reserve filed: " << _reserve;
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
+    AERROR << "Failed to parse reserve filed: " << reserve_;
     return false;
   }
 
   if (reserve_field_map.find("device_id") == reserve_field_map.end()) {
-    AERROR << "Failed to find field device_id, reserve: " << _reserve;
+    AERROR << "Failed to find field device_id, reserve: " << reserve_;
     return false;
   }
   device_id_ = reserve_field_map["device_id"];
@@ -79,7 +79,7 @@ void LidarProcessSubnode::OnPointCloud(
     const sensor_msgs::PointCloud2& message) {
   PERF_FUNCTION("LidarProcessSubnode");
   if (!inited_) {
-    AERROR << "the LidarProcessSubnode has not been init";
+    AERROR << "the LidarProcessSubnode has not been Init";
     return;
   }
   const double kTimeStamp = message.header.stamp.toSec();
@@ -218,11 +218,11 @@ void LidarProcessSubnode::RegistAllAlgorithm() {
 
 bool LidarProcessSubnode::InitFrameDependence() {
   /// init share data
-  CHECK(_shared_data_manager != nullptr);
+  CHECK(shared_data_manager_ != nullptr);
   // init preprocess_data
   const string lidar_processing_data_name("LidarObjectData");
   processing_data_ = dynamic_cast<LidarObjectData*>(
-      _shared_data_manager->get_shared_data(lidar_processing_data_name));
+          shared_data_manager_->GetSharedData(lidar_processing_data_name));
   if (processing_data_ == nullptr) {
     AERROR << "Failed to get shared data instance "
            << lidar_processing_data_name;
@@ -238,10 +238,10 @@ bool LidarProcessSubnode::InitFrameDependence() {
       return false;
     }
     if (!hdmap_input_->Init()) {
-      AERROR << "failed to init HDMapInput";
+      AERROR << "failed to Init HDMapInput";
       return false;
     }
-    AINFO << "get and init hdmap_input succ.";
+    AINFO << "get and Init hdmap_input succ.";
   }
 
   return true;
@@ -256,7 +256,7 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     return false;
   }
   if (!roi_filter_->Init()) {
-    AERROR << "Failed to init roi filter: " << roi_filter_->name();
+    AERROR << "Failed to Init roi filter: " << roi_filter_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, roi_filter_: "
@@ -270,7 +270,7 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     return false;
   }
   if (!segmentor_->Init()) {
-    AERROR << "Failed to init segmentor: " << segmentor_->name();
+    AERROR << "Failed to Init segmentor: " << segmentor_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, segmentor: "
@@ -284,7 +284,7 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     return false;
   }
   if (!object_builder_->Init()) {
-    AERROR << "Failed to init object builder: " << object_builder_->name();
+    AERROR << "Failed to Init object builder: " << object_builder_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
@@ -298,7 +298,7 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     return false;
   }
   if (!tracker_->Init()) {
-    AERROR << "Failed to init tracker: " << tracker_->name();
+    AERROR << "Failed to Init tracker: " << tracker_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, tracker: " << tracker_->name();
@@ -377,21 +377,21 @@ void LidarProcessSubnode::PublishDataAndEvent(
     double timestamp, const SharedDataPtr<SensorObjects>& data) {
   // set shared data
   std::string key;
-  if (!SubnodeHelper::produce_shared_data_key(timestamp, device_id_, &key)) {
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
     AERROR << "Failed to produce shared key. time: "
            << GLOG_TIMESTAMP(timestamp) << ", device_id: " << device_id_;
     return;
   }
 
-  processing_data_->add(key, data);
+  processing_data_->Add(key, data);
   // pub events
-  for (size_t idx = 0; idx < _pub_meta_events.size(); ++idx) {
-    const EventMeta& event_meta = _pub_meta_events[idx];
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta &event_meta = pub_meta_events_[idx];
     Event event;
     event.event_id = event_meta.event_id;
     event.timestamp = timestamp;
     event.reserve = device_id_;
-    _event_manager->publish(event);
+    event_manager_->Publish(event);
   }
 }
 

@@ -28,65 +28,69 @@ class DAGStreaming : public Thread {
  public:
   DAGStreaming();
   virtual ~DAGStreaming();
-  bool init(const std::string& dag_config_path);
 
-  void stop();
+  bool Init(const std::string &dag_config_path);
 
-  size_t num_subnodes() const {
-    return _subnode_map.size();
+  void Stop();
+
+  size_t NumSubnodes() const {
+    return subnode_map_.size();
   }
 
-  void reset();
+  void Reset();
 
-  void remove_stale_data() {
-    _shared_data_manager.remove_stale_data();
+  void RemoveStaleData() {
+    shared_data_manager_.RemoveStaleData();
   }
 
-  size_t congestion_value() const;
+  size_t CongestionValue() const;
 
  protected:
-  virtual void run() override;
+  virtual void Run() override;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(DAGStreaming);
 
   // start run and wait.
-  void schedule();
-  bool init_subnodes(const DAGConfig& dag_config);
-  bool init_shared_data(const DAGConfig::SharedDataConfig& data_config);
+  void Schedule();
+
+  bool InitSubnodes(const DAGConfig &dag_config);
+
+  bool InitSharedData(const DAGConfig::SharedDataConfig &data_config);
 
   typedef std::map<SubnodeID, std::unique_ptr<Subnode>> SubnodeMap;
 
-  EventManager _event_manager;
-  SharedDataManager _shared_data_manager;
-  bool _inited;
-  std::unique_ptr<DAGStreamingMonitor> _monitor;
+  EventManager event_manager_;
+  SharedDataManager shared_data_manager_;
+  bool inited_;
+  std::unique_ptr<DAGStreamingMonitor> monitor_;
   // NOTE(Yangguang Li): Guarantee Sunode should be firstly called destructor.
   // Subnode depends the EventManager and SharedDataManager.
-  SubnodeMap _subnode_map;
+  SubnodeMap subnode_map_;
 };
 
 class DAGStreamingMonitor : public Thread {
  public:
   explicit DAGStreamingMonitor(DAGStreaming* dag_streaming)
       : Thread(true, "DAGStreamingMonitor"),
-        _dag_streaming(dag_streaming),
-        _stop(false) {}
+        dag_streaming_(dag_streaming),
+        stop_(false) {
+  }
 
   virtual ~DAGStreamingMonitor() {}
 
-  void stop() {
-    _stop = true;
+  void Stop() {
+    stop_ = true;
   }
 
  protected:
-  virtual void run() override;
+  virtual void Run() override;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(DAGStreamingMonitor);
   // Not own DAGStreaming instance.
-  DAGStreaming* _dag_streaming;
-  volatile bool _stop;
+  DAGStreaming *dag_streaming_;
+  volatile bool stop_;
 };
 
 }  // namespace perception

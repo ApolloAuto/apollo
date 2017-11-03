@@ -21,119 +21,119 @@ using std::vector;
 using std::string;
 using std::ostringstream;
 
-bool Subnode::init(const DAGConfig::Subnode& subnode_config,
-                   EventManager* event_manager,
-                   SharedDataManager* shared_data_manager,
-                   const vector<EventID>& sub_events,
-                   const vector<EventID>& pub_events) {
-  _name = subnode_config.name();
-  _id = subnode_config.id();
-  _reserve = subnode_config.reserve();
+bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
+                   EventManager *event_manager,
+                   SharedDataManager *shared_data_manager,
+                   const vector<EventID> &sub_events,
+                   const vector<EventID> &pub_events) {
+  name_ = subnode_config.name();
+  id_ = subnode_config.id();
+  reserve_ = subnode_config.reserve();
   if (subnode_config.has_type()) {
-    _type = subnode_config.type();
+    type_ = subnode_config.type();
   }
 
   CHECK(event_manager != NULL) << "event_manager == NULL";
-  _event_manager = event_manager;
+  event_manager_ = event_manager;
   CHECK(shared_data_manager != NULL) << "shared_data_manager == NULL";
-  _shared_data_manager = shared_data_manager;
+  shared_data_manager_ = shared_data_manager;
 
   // fill sub and pub meta events.
-  if (!_event_manager->get_event_meta(sub_events, &_sub_meta_events)) {
-    AERROR << "failed to get Sub EventMeta. node: <" << _name << ", " << _id
+  if (!event_manager_->GetEventMeta(sub_events, &sub_meta_events_)) {
+    AERROR << "failed to get Sub EventMeta. node: <" << name_ << ", " << id_
            << ">";
     return false;
   }
 
-  if (!_event_manager->get_event_meta(pub_events, &_pub_meta_events)) {
-    AERROR << "failed to get Pub EventMeta. node: <" << _id << ", " << _name
+  if (!event_manager_->GetEventMeta(pub_events, &pub_meta_events_)) {
+    AERROR << "failed to get Pub EventMeta. node: <" << id_ << ", " << name_
            << ">";
     return false;
   }
 
-  if (!init_internal()) {
-    AERROR << "failed to init inner members.";
+  if (!InitInternal()) {
+    AERROR << "failed to Init inner members.";
     return false;
   }
 
-  _inited = true;
+  inited_ = true;
   return true;
 }
 
-void Subnode::run() {
-  if (!_inited) {
-    AERROR << "Subnode not inited, run failed. node: <" << _id << ", " << _name
+void Subnode::Run() {
+  if (!inited_) {
+    AERROR << "Subnode not inited, run failed. node: <" << id_ << ", " << name_
            << ">";
     return;
   }
 
-  if (_type == DAGConfig::SUBNODE_IN) {
-    AINFO << "Subnode == SUBNODE_IN, EXIT THREAD. subnode:" << debug_string();
+  if (type_ == DAGConfig::SUBNODE_IN) {
+    AINFO << "Subnode == SUBNODE_IN, EXIT THREAD. subnode:" << DebugString();
     return;
   }
 
-  while (!_stop) {
-    StatusCode status = proc_events();
-    ++_total_count;
+  while (!stop_) {
+    StatusCode status = ProcEvents();
+    ++total_count_;
     if (status == FAIL) {
-      ++_failed_count;
-      AWARN << "Subnode: " << _name << " proc event failed. "
-            << " total_count: " << _total_count
-            << " failed_count: " << _failed_count;
+      ++failed_count_;
+      AWARN << "Subnode: " << name_ << " proc event failed. "
+            << " total_count: " << total_count_
+            << " failed_count: " << failed_count_;
       continue;
     }
 
     // FATAL error, so exit thread.
     if (status == FATAL) {
-      AERROR << "Subnode: " << _name << " proc event FATAL error, EXIT. "
-             << " total_count: " << _total_count
-             << " failed_count: " << _failed_count;
+      AERROR << "Subnode: " << name_ << " proc event FATAL error, EXIT. "
+             << " total_count: " << total_count_
+             << " failed_count: " << failed_count_;
       break;
     }
   }
 }
 
-string Subnode::debug_string() const {
+string Subnode::DebugString() const {
   ostringstream oss;
-  oss << "{id: " << _id << ", name: " << _name << ", reserve: " << _reserve
-      << ", type:" << DAGConfig::SubnodeType_Name(_type);
+  oss << "{id: " << id_ << ", name: " << name_ << ", reserve: " << reserve_
+      << ", type:" << DAGConfig::SubnodeType_Name(type_);
 
   oss << ", SubEvents: [";
-  for (size_t idx = 0; idx < _sub_meta_events.size(); ++idx) {
-    oss << "<" << _sub_meta_events[idx].to_string() << ">";
+  for (size_t idx = 0; idx < sub_meta_events_.size(); ++idx) {
+    oss << "<" << sub_meta_events_[idx].to_string() << ">";
   }
 
   oss << "], PubEvents: [";
-  for (size_t idx = 0; idx < _pub_meta_events.size(); ++idx) {
-    oss << "<" << _pub_meta_events[idx].to_string() << ">";
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    oss << "<" << pub_meta_events_[idx].to_string() << ">";
   }
   oss << "]}";
 
   return oss.str();
 }
 
-StatusCode CommonSubnode::proc_events() {
-  CHECK(_sub_meta_events.size() == 1u) << "CommonSubnode sub_meta_events == 1";
-  CHECK(_pub_meta_events.size() == 1u) << "CommonSubnode pub_meta_events == 1";
+StatusCode CommonSubnode::ProcEvents() {
+  CHECK(sub_meta_events_.size() == 1u) << "CommonSubnode sub_meta_events == 1";
+  CHECK(pub_meta_events_.size() == 1u) << "CommonSubnode pub_meta_events == 1";
 
   Event sub_event;
-  if (!_event_manager->subscribe(_sub_meta_events[0].event_id, &sub_event)) {
+  if (!event_manager_->Subscribe(sub_meta_events_[0].event_id, &sub_event)) {
     AERROR << "failed to subscribe. meta_event: <"
-           << _sub_meta_events[0].to_string() << ">";
+           << sub_meta_events_[0].to_string() << ">";
     return FAIL;
   }
 
   Event pub_event = sub_event;
-  pub_event.event_id = _pub_meta_events[0].event_id;
+  pub_event.event_id = pub_meta_events_[0].event_id;
 
   // user defined logic api.
-  if (!handle_event(sub_event, &pub_event)) {
+  if (!HandleEvent(sub_event, &pub_event)) {
     AWARN << "failed to call _handle_event. sub_event: <"
           << sub_event.to_string() << "> pub_event: <" << pub_event.to_string();
     return FAIL;
   }
 
-  if (!_event_manager->publish(pub_event)) {
+  if (!event_manager_->Publish(pub_event)) {
     AERROR << "failed to publish pub_event: <" << pub_event.to_string() << ">";
     return FAIL;
   }

@@ -19,32 +19,36 @@ class EventManager {
   ~EventManager() = default;
 
   // not thread-safe.
-  bool init(const DAGConfig::EdgeConfig& edge_config);
+  bool Init(const DAGConfig::EdgeConfig &edge_config);
 
   // thread-safe.
-  bool publish(const Event& event);
+  bool Publish(const Event &event);
 
   // if no event arrive, this api would be block.
   // thread-safe.
-  bool subscribe(EventID event_id, Event* event);
+  bool Subscribe(EventID event_id, Event *event);
 
-  bool subscribe(EventID event_id, Event* event, bool nonblocking);
+  bool Subscribe(EventID event_id, Event *event, bool nonblocking);
 
   // clear all the event queues.
-  void reset();
-  int avg_len_of_event_queues() const;
-  int max_len_of_event_queues() const;
+  void Reset();
 
-  bool get_event_meta(EventID event_id, EventMeta* event_meta) const;
-  bool get_event_meta(const std::vector<EventID>& event_ids,
-                      std::vector<EventMeta>* event_metas) const;
+  int AvgLenOfEventQueues() const;
 
-  bool get_event_meta(EventID event_id, std::string* str) const;
-  bool get_event_meta(const std::vector<EventID>& event_id,
-                      std::vector<std::string>* str_list) const;
+  int MaxLenOfEventQueues() const;
 
-  int num_events() const {
-    return _event_queue_map.size();
+  bool GetEventMeta(EventID event_id, EventMeta *event_meta) const;
+
+  bool GetEventMeta(const std::vector<EventID> &event_ids,
+                    std::vector<EventMeta> *event_metas) const;
+
+  bool GetEventMeta(EventID event_id, std::string *str) const;
+
+  bool GetEventMeta(const std::vector<EventID> &event_id,
+                    std::vector<std::string> *str_list) const;
+
+  int NumEvents() const {
+    return event_queue_map_.size();
   }
 
  private:
@@ -57,12 +61,12 @@ class EventManager {
   using EventMetaMapIterator = EventMetaMap::iterator;
   using EventMetaMapConstIterator = EventMetaMap::const_iterator;
 
-  bool get_event_queue(EventID event_id, EventQueue** queue);
+  bool GetEventQueue(EventID event_id, EventQueue **queue);
 
-  EventQueueMap _event_queue_map;
+  EventQueueMap event_queue_map_;
   // for debug.
-  EventMetaMap _event_meta_map;
-  bool _inited = false;
+  EventMetaMap event_meta_map_;
+  bool inited_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(EventManager);
 };

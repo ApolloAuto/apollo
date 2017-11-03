@@ -11,6 +11,7 @@
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/onboard/subnode.h"
+#include "dag_streaming.h"
 
 namespace apollo {
 namespace perception {
@@ -30,14 +31,15 @@ DEFINE_bool(enable_timing_remove_stale_data, true,
 
 DAGStreaming::DAGStreaming()
     : Thread(true, "DAGStreamingThread"),
-      _inited(false),
-      _monitor(new DAGStreamingMonitor(this)) {}
+      inited_(false),
+      monitor_(new DAGStreamingMonitor(this)) {
+}
 
 DAGStreaming::~DAGStreaming() {}
 
-bool DAGStreaming::init(const string& dag_config_path) {
-  if (_inited) {
-    AWARN << "DAGStreaming init twice.";
+bool DAGStreaming::Init(const string &dag_config_path) {
+  if (inited_) {
+    AWARN << "DAGStreaming Init twice.";
     return true;
   }
 
@@ -53,59 +55,59 @@ bool DAGStreaming::init(const string& dag_config_path) {
     return false;
   }
 
-  if (!_event_manager.init(dag_config.edge_config())) {
-    AERROR << "failed to init EventManager. file: " << dag_config_path;
+  if (!event_manager_.Init(dag_config.edge_config())) {
+    AERROR << "failed to Init EventManager. file: " << dag_config_path;
     return false;
   }
 
-  if (!init_shared_data(dag_config.data_config()) ||
-      !init_subnodes(dag_config)) {
+  if (!InitSharedData(dag_config.data_config()) ||
+      !InitSubnodes(dag_config)) {
     return false;
   }
 
-  _inited = true;
-  AINFO << "DAGStreaming init success.";
+  inited_ = true;
+  AINFO << "DAGStreaming Init success.";
   return true;
 }
 
-void DAGStreaming::schedule() {
-  _monitor->start();
+void DAGStreaming::Schedule() {
+  monitor_->Start();
   // start all subnodes.
-  for (auto& pair : _subnode_map) {
-    pair.second->start();
+  for (auto &pair : subnode_map_) {
+    pair.second->Start();
   }
 
   AINFO << "DAGStreaming start to schedule...";
 
-  for (auto& pair : _subnode_map) {
-    pair.second->join();
+  for (auto &pair : subnode_map_) {
+    pair.second->Join();
   }
 
-  _monitor->join();
+  monitor_->Join();
   AINFO << "DAGStreaming schedule exit.";
 }
 
-void DAGStreaming::stop() {
-  _monitor->stop();
+void DAGStreaming::Stop() {
+  monitor_->Stop();
   // stop all subnodes.
-  for (auto& pair : _subnode_map) {
-    pair.second->stop();
+  for (auto &pair : subnode_map_) {
+    pair.second->Stop();
   }
 
   // sleep 100 ms
   usleep(100000);
   // kill thread which is blocked
-  for (auto& pair : _subnode_map) {
-    if (pair.second->is_alive()) {
-      AINFO << "pthread_cancel to thread " << pair.second->tid();
-      pthread_cancel(pair.second->tid());
+  for (auto &pair : subnode_map_) {
+    if (pair.second->IsAlive()) {
+      AINFO << "pthread_cancel to thread " << pair.second->Tid();
+      pthread_cancel(pair.second->Tid());
     }
   }
 
   AINFO << "DAGStreaming is stoped.";
 }
 
-bool DAGStreaming::init_subnodes(const DAGConfig& dag_config) {
+bool DAGStreaming::InitSubnodes(const DAGConfig &dag_config) {
   const DAGConfig::SubnodeConfig& subnode_config = dag_config.subnode_config();
   const DAGConfig::EdgeConfig& edge_config = dag_config.edge_config();
 
@@ -152,43 +154,43 @@ bool DAGStreaming::init_subnodes(const DAGConfig& dag_config) {
       return false;
     }
 
-    bool result = inst->init(
-        subnode_config, &_event_manager, &_shared_data_manager,
-        subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
+    bool result = inst->Init(
+            subnode_config, &event_manager_, &shared_data_manager_,
+            subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
     if (!result) {
-      AERROR << "failed to init subnode. name: " << inst->name();
+      AERROR << "failed to Init subnode. name: " << inst->name();
       return false;
     }
-    _subnode_map.emplace(subnode_id, std::unique_ptr<Subnode>(inst));
+    subnode_map_.emplace(subnode_id, std::unique_ptr<Subnode>(inst));
 
-    AINFO << "init subnode succ. " << inst->debug_string();
+    AINFO << "Init subnode succ. " << inst->DebugString();
   }
 
-  AINFO << "DAGStreaming load " << _subnode_map.size() << " subnodes, "
-        << _event_manager.num_events() << " events.";
+  AINFO << "DAGStreaming load " << subnode_map_.size() << " subnodes, "
+        << event_manager_.NumEvents() << " events.";
   return true;
 }
 
-bool DAGStreaming::init_shared_data(
-    const DAGConfig::SharedDataConfig& data_config) {
-  return _shared_data_manager.init(data_config);
+bool DAGStreaming::InitSharedData(
+        const DAGConfig::SharedDataConfig &data_config) {
+  return shared_data_manager_.Init(data_config);
 }
 
-void DAGStreaming::run() {
-  schedule();
+void DAGStreaming::Run() {
+  Schedule();
 }
 
-void DAGStreaming::reset() {
-  _event_manager.reset();
-  _shared_data_manager.reset();
+void DAGStreaming::Reset() {
+  event_manager_.Reset();
+  shared_data_manager_.Reset();
   AINFO << "DAGStreaming RESET.";
 }
 
-size_t DAGStreaming::congestion_value() const {
-  return _event_manager.max_len_of_event_queues();
+size_t DAGStreaming::CongestionValue() const {
+  return event_manager_.MaxLenOfEventQueues();
 }
 
-void DAGStreamingMonitor::run() {
+void DAGStreamingMonitor::Run() {
   if (FLAGS_max_allowed_congestion_value == 0 &&
       !FLAGS_enable_timing_remove_stale_data) {
     AINFO << "disable to check DAGStreaming congestion value,"
@@ -196,12 +198,12 @@ void DAGStreamingMonitor::run() {
     return;
   }
 
-  while (!_stop) {
+  while (!stop_) {
     if (FLAGS_max_allowed_congestion_value > 0) {
       // Timing to check DAGStreaming congestion value.
-      int congestion_value = _dag_streaming->congestion_value();
+      int congestion_value = dag_streaming_->CongestionValue();
       if (congestion_value > FLAGS_max_allowed_congestion_value) {
-        _dag_streaming->reset();
+        dag_streaming_->Reset();
         AERROR << "DAGStreaming has CONGESTION, reset it."
                << " congestion_value: " << congestion_value
                << " max_allowed_congestion_value: "
@@ -210,7 +212,7 @@ void DAGStreamingMonitor::run() {
     }
 
     if (FLAGS_enable_timing_remove_stale_data) {
-      _dag_streaming->remove_stale_data();
+      dag_streaming_->RemoveStaleData();
     }
     sleep(1);
   }

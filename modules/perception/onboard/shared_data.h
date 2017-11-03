@@ -13,18 +13,19 @@ class SharedData {
   SharedData() {}
   virtual ~SharedData() {}
 
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
   // this api should clear all the memory used,
   // and would be called by SharedDataManager when reset DAGStreaming.
-  virtual void reset() {
+  virtual void Reset() {
     CHECK(false) << "reset() not implemented.";
   }
 
-  virtual void remove_stale_data() {
+  virtual void RemoveStaleData() {
     CHECK(false) << "remove_stale_data() not implemented.";
   }
-  virtual std::string name() const = 0;
+
+  virtual std::string Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SharedData);

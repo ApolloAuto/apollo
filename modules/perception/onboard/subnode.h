@@ -28,14 +28,15 @@ class Subnode : public Thread {
  public:
   Subnode()
       : Thread(true),
-        _id(0),
-        _type(DAGConfig::SUBNODE_NORMAL),
-        _event_manager(NULL),
-        _shared_data_manager(NULL),
-        _stop(false),
-        _inited(false),
-        _total_count(0),
-        _failed_count(0) {}
+        id_(0),
+        type_(DAGConfig::SUBNODE_NORMAL),
+        event_manager_(NULL),
+        shared_data_manager_(NULL),
+        stop_(false),
+        inited_(false),
+        total_count_(0),
+        failed_count_(0) {
+  }
 
   virtual ~Subnode() {}
 
@@ -43,63 +44,63 @@ class Subnode : public Thread {
   //        It is same for all the subnodes in one stream;
   // @return  bool
   // @retval
-  virtual bool init(const DAGConfig::Subnode& config,
-                    EventManager* event_manager,
-                    SharedDataManager* shared_data_manager,
-                    const std::vector<EventID>& sub_events,
-                    const std::vector<EventID>& pub_events);
+  virtual bool Init(const DAGConfig::Subnode &config,
+                    EventManager *event_manager,
+                    SharedDataManager *shared_data_manager,
+                    const std::vector<EventID> &sub_events,
+                    const std::vector<EventID> &pub_events);
 
-  void stop() {
-    _stop = true;
+  void Stop() {
+    stop_ = true;
   }
 
   // @brief Subnode process interface, should be realized in derived class.
   // @return  bool
   // @retval
-  virtual StatusCode proc_events() = 0;
+  virtual StatusCode ProcEvents() = 0;
 
   SubnodeID id() const {
-    return _id;
+    return id_;
   }
 
   std::string name() const {
-    return _name;
+    return name_;
   }
 
   std::string reserve() const {
-    return _reserve;
+    return reserve_;
   }
 
-  virtual std::string debug_string() const;
+  virtual std::string DebugString() const;
 
  protected:
   //@brief init the inner members ( default do nothing )
   //@return true/false
-  virtual bool init_internal() {
+  virtual bool InitInternal() {
     // do nothing.
     return true;
   }
 
   //@brief inner run
-  virtual void run() override;
+  virtual void Run() override;
 
   // following variable can be accessed by Derived Class.
-  SubnodeID _id;
-  std::string _name;
-  std::string _reserve;
-  DAGConfig::SubnodeType _type;
-  EventManager* _event_manager;
-  SharedDataManager* _shared_data_manager;
+  SubnodeID id_;
+  std::string name_;
+  std::string reserve_;
+  DAGConfig::SubnodeType type_;
+  EventManager *event_manager_;
+  SharedDataManager *shared_data_manager_;
 
-  std::vector<EventMeta> _sub_meta_events;
-  std::vector<EventMeta> _pub_meta_events;
+  std::vector<EventMeta> sub_meta_events_;
+  std::vector<EventMeta> pub_meta_events_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Subnode);
-  volatile bool _stop;
-  bool _inited;
-  int _total_count;
-  int _failed_count;
+  volatile bool stop_;
+  bool inited_;
+  int total_count_;
+  int failed_count_;
 };
 
 REGISTER_REGISTERER(Subnode);
@@ -114,11 +115,11 @@ class CommonSubnode : public Subnode {
   CommonSubnode() : Subnode() {}
   virtual ~CommonSubnode() {}
 
-  virtual StatusCode proc_events();
+  virtual StatusCode ProcEvents();
 
  protected:
   // Derive class implement this api.
-  virtual bool handle_event(const Event& sub_event, Event* pub_event) = 0;
+  virtual bool HandleEvent(const Event &sub_event, Event *pub_event) = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CommonSubnode);

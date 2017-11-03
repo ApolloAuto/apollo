@@ -22,7 +22,7 @@ struct Event {
   double local_timestamp = 0.0;  // local timestamp to compute process delay.
 
   Event() {
-    local_timestamp = TimeUtil::get_current_time();
+      local_timestamp = TimeUtil::GetCurrentTime();
   }
 
   std::string to_string() const {

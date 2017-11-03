@@ -17,21 +17,22 @@ class SharedDataManager {
   SharedDataManager() = default;
   ~SharedDataManager() = default;
 
-  bool init(const DAGConfig::SharedDataConfig& data_config);
+  bool Init(const DAGConfig::SharedDataConfig &data_config);
 
   // thread-safe.
-  SharedData* get_shared_data(const std::string& name) const;
+  SharedData *GetSharedData(const std::string &name) const;
 
-  void reset();
-  void remove_stale_data();
+  void Reset();
+
+  void RemoveStaleData();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SharedDataManager);
 
   using SharedDataMap = std::map<std::string, std::unique_ptr<SharedData>>;
 
-  SharedDataMap _shared_data_map;
-  bool _inited = false;
+  SharedDataMap shared_data_map_;
+  bool inited_ = false;
 };
 
 }  // namespace perception
