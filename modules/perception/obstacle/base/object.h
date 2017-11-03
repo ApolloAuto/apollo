@@ -81,6 +81,10 @@ struct alignas(16) Object {
 
   // stable anchor_point during time, e.g., barycenter
   Eigen::Vector3d anchor_point;
+
+  // noise covariance matrix for uncertainty of position and velocity
+  Eigen::Matrix3d position_uncertainty;
+  Eigen::Matrix3d velocity_uncertainty;
 };
 
 typedef std::shared_ptr<Object> ObjectPtr;
@@ -92,7 +96,7 @@ struct SensorObjects {
     sensor2world_pose = Eigen::Matrix4d::Zero();
   }
 
-  std::string to_string() const;
+  std::string ToString() const;
 
   // Transmit error_code to next subnode.
   common::ErrorCode error_code = common::ErrorCode::OK;

@@ -14,7 +14,8 @@ cc_library(
         "//modules/perception/common:perception_common",
         "//modules/perception/onboard:perception_onboard",
         "//modules/perception/obstacle/onboard:perception_obstacle_onboard",
-
+        "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
+        "//modules/perception/obstacle/onboard:perception_obstacle_radar_process",
     ],
 )
 

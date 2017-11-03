@@ -14,42 +14,36 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_FILTER_BASE_FILTER_H_
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_FILTER_BASE_FILTER_H_
 
-#ifndef MODEULES_PERCEPTION_PERCEPTION_H_
-#define MODEULES_PERCEPTION_PERCEPTION_H_
+#include <Eigen/Core>
 
-#include <memory>
-#include <string>
+#include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/base/object.h"
 
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
-#include "modules/perception/obstacle/onboard/radar_process.h"
-#include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
-
-/**
- * @namespace apollo::perception
- * @brief apollo::perception
- */
 namespace apollo {
 namespace perception {
 
-class Perception : public common::ApolloApp {
- public:
-  std::string Name() const override;
-  common::Status Init() override;
-  common::Status Start() override;
-  void Stop() override;
-
- private:
-  void RegistAllOnboardClass();
+class BaseFilter{
+public:
+    BaseFilter(){
+        name_= "BaseFilter";
+    };
+    virtual ~BaseFilter(){};
+    
+    virtual void Initialize(const Object& state) = 0;
+    virtual Eigen::Vector4d Predict(double time_diff) = 0;
+    std::string name(){
+        return name_;
+    }
+    virtual Eigen::Vector4d UpdateWithObject(Object& new_object) = 0;
+    virtual Eigen::Matrix4d GetCovarianceMatrix() = 0;
+protected:
+    std::string name_;
 };
 
-}  // namespace perception
-}  // namespace apollo
+} // namesapce perception
+} // namesapce apollo
 
-#endif  // MODULES_PERCEPTION_PERCEPTION_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_FILTER_BASE_FILTER_H_

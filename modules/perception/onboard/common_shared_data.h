@@ -65,7 +65,7 @@ class CommonSharedData : public SharedData {
   }
   // @brief: you must impl your own name func
   // @return: name of your own class
-  virtual std::string Name() const = 0;
+  virtual std::string name() const = 0;
 
   // @brief: reset the shared data, clear data
   virtual void Reset() override;
@@ -131,7 +131,7 @@ class CommonSharedData : public SharedData {
 template <class M>
 void CommonSharedData<M>::Reset() {
   MutexLock lock(&mutex_);
-  AINFO << "Reset " << Name() << ", map size: " << data_map_.size();
+  AINFO << "Reset " << name() << ", map size: " << data_map_.size();
   data_map_.clear();
   data_added_time_map_.clear();
 }
@@ -157,7 +157,7 @@ void CommonSharedData<M>::RemoveStaleData() {
     }
   }
   if (has_change) {
-    AINFO << "SharedData remove_stale_data name:" << Name() << " stat:["
+    AINFO << "SharedData remove_stale_data name:" << name() << " stat:["
           << stat_.ToString() << "]";
   }
 }
