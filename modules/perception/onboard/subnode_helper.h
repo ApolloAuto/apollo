@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_SUBNODE_HELPER_H
-#define apollo_PERCEPTION_ONBOARD_SUBNODE_HELPER_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
+#define MODEULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
 
 #include <map>
 #include <string>
@@ -67,4 +67,4 @@ class FrameSkiper {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_SUBNODE_HELPER_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_

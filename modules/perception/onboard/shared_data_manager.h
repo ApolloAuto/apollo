@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H
-#define apollo_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#define MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
 
 #include <map>
 #include <memory>
@@ -37,4 +37,4 @@ class SharedDataManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_

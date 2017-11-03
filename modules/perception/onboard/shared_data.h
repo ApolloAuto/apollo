@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_SHARED_DATA_H
-#define apollo_PERCEPTION_ONBOARD_SHARED_DATA_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
+#define MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -36,4 +36,4 @@ REGISTER_REGISTERER(SharedData);
 
 }  // namespace perception
 }  // namespace apollo
-#endif  // apollo_PERCEPTION_ONBOARD_SHARED_DATA_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_

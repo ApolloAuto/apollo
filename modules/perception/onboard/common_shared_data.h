@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H
-#define apollo_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#define MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 
 #include <map>
 #include <memory>
@@ -258,4 +258,4 @@ bool CommonSharedData<M>::pop(const CommonSharedDataKey& key,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_

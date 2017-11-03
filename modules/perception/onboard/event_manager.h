@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_EVENT_MANAGER_H
-#define apollo_PERCEPTION_ONBOARD_EVENT_MANAGER_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
+#define MODEULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
 
 #include <memory>
 #include <sstream>
@@ -70,4 +70,4 @@ class EventManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_EVENT_MANAGER_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_

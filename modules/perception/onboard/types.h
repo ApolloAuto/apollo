@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_TYPES_H
-#define apollo_PERCEPTION_ONBOARD_TYPES_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_TYPES_H_
+#define MODEULES_PERCEPTION_ONBOARD_TYPES_H_
 
 #include <sstream>
 #include <string>
@@ -65,4 +65,4 @@ enum IoStreamType {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_TYPES_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_TYPES_H_

@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_SUBNODE_H
-#define apollo_PERCEPTION_ONBOARD_SUBNODE_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_SUBNODE_H_
+#define MODEULES_PERCEPTION_ONBOARD_SUBNODE_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -158,4 +158,4 @@ class CommonSubnode : public Subnode {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_SUBNODE_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_SUBNODE_H_

@@ -1,5 +1,5 @@
-#ifndef apollo_PERCEPTION_ONBOARD_DAG_STREAMING_H
-#define apollo_PERCEPTION_ONBOARD_DAG_STREAMING_H
+#ifndef MODEULES_PERCEPTION_ONBOARD_DAG_STREAMING_H_
+#define MODEULES_PERCEPTION_ONBOARD_DAG_STREAMING_H_
 
 #include <map>
 #include <memory>
@@ -92,4 +92,4 @@ class DAGStreamingMonitor : public Thread {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_ONBOARD_DAG_STREAMING_H
+#endif  // MODEULES_PERCEPTION_ONBOARD_DAG_STREAMING_H_
