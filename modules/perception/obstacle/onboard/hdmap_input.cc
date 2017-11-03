@@ -53,7 +53,9 @@ bool HDMapInput::Init() {
   return HDMapUtil::ReloadMaps();
 }
 
-bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
+
+bool HDMapInput::GetROI(const PointD& pointd, const double& map_radius,
+  HdmapStructPtr* mapptr) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
     return false;
@@ -69,7 +71,7 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::vector<RoadROIBoundaryPtr> boundary_vec;
   std::vector<JunctionBoundaryPtr> junctions_vec;
 
-  int status = hdmap->GetRoadBoundaries(point, FLAGS_map_radius, &boundary_vec,
+  int status = hdmap->GetRoadBoundaries(point, map_radius, &boundary_vec,
                                         &junctions_vec);
   if (status != SUCC) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();

@@ -159,6 +159,14 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableCompressedImage(FLAGS_compressed_image_topic, config.mode(),
                               config.message_history_limit());
         break;
+      case AdapterConfig::RADAR:
+        EnablePointCloud(FLAGS_radar_topic, config.mode(),
+                         config.message_history_limit());
+        break;
+      case AdapterConfig::ODOMETRY:
+        EnablePointCloud(FLAGS_odometry_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;

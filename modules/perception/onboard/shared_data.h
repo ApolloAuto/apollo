@@ -25,7 +25,7 @@ class SharedData {
     CHECK(false) << "remove_stale_data() not implemented.";
   }
 
-  virtual std::string Name() const = 0;
+  virtual std::string name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SharedData);

@@ -61,8 +61,7 @@ Status Perception::Init() {
         return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
   }
 
-    dag_streaming.Start();
-
+  dag_streaming.Start();
   return Status::OK();
 }
 
