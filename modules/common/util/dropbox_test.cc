@@ -28,57 +28,57 @@ namespace common {
 namespace util {
 
 TEST(Dropbox, case_int) {
-  EXPECT_EQ(nullptr, Dropbox<int>::open()->get("a"));
-  Dropbox<int>::open()->set("a", 1);
-  const auto* result = Dropbox<int>::open()->get("a");
+  EXPECT_EQ(nullptr, Dropbox<int>::Open()->Get("a"));
+  Dropbox<int>::Open()->Set("a", 1);
+  const auto* result = Dropbox<int>::Open()->Get("a");
   EXPECT_EQ(1, *result);
-  Dropbox<int>::open()->set("a", 2);
-  result = Dropbox<int>::open()->get("a");
+  Dropbox<int>::Open()->Set("a", 2);
+  result = Dropbox<int>::Open()->Get("a");
   EXPECT_EQ(2, *result);
-  Dropbox<int>::open()->remove("a");
-  EXPECT_EQ(nullptr, Dropbox<float>::open()->get("a"));
-  EXPECT_EQ(nullptr, Dropbox<int>::open()->get("b"));
+  Dropbox<int>::Open()->Remove("a");
+  EXPECT_EQ(nullptr, Dropbox<float>::Open()->Get("a"));
+  EXPECT_EQ(nullptr, Dropbox<int>::Open()->Get("b"));
 }
 
 TEST(Dropbox, case_remove) {
-  EXPECT_EQ(nullptr, Dropbox<int>::open()->get("a"));
-  Dropbox<int>::open()->set("a", 1);
-  const auto* result = Dropbox<int>::open()->get("a");
+  EXPECT_EQ(nullptr, Dropbox<int>::Open()->Get("a"));
+  Dropbox<int>::Open()->Set("a", 1);
+  const auto* result = Dropbox<int>::Open()->Get("a");
   EXPECT_EQ(1, *result);
-  Dropbox<int>::open()->remove("a");
-  EXPECT_EQ(nullptr, Dropbox<int>::open()->get("a"));
+  Dropbox<int>::Open()->Remove("a");
+  EXPECT_EQ(nullptr, Dropbox<int>::Open()->Get("a"));
 }
 
 TEST(Dropbox, case_float) {
-  EXPECT_EQ(nullptr, Dropbox<float>::open()->get("a"));
-  Dropbox<float>::open()->set("a", 1.0);
-  float* result = Dropbox<float>::open()->get("a");
+  EXPECT_EQ(nullptr, Dropbox<float>::Open()->Get("a"));
+  Dropbox<float>::Open()->Set("a", 1.0);
+  float* result = Dropbox<float>::Open()->Get("a");
   EXPECT_FLOAT_EQ(1.0, *result);
-  Dropbox<float>::open()->set("a", 2.0);
-  result = Dropbox<float>::open()->get("a");
+  Dropbox<float>::Open()->Set("a", 2.0);
+  result = Dropbox<float>::Open()->Get("a");
   EXPECT_FLOAT_EQ(2.0, *result);
-  result = Dropbox<float>::open()->get("b");
+  result = Dropbox<float>::Open()->Get("b");
   EXPECT_EQ(nullptr, result);
-  Dropbox<float>::open()->remove("a");
+  Dropbox<float>::Open()->Remove("a");
 }
 
 TEST(Dropbox, case_vector_int) {
-  EXPECT_EQ(nullptr, Dropbox<std::vector<int>>::open()->get("a"));
+  EXPECT_EQ(nullptr, Dropbox<std::vector<int>>::Open()->Get("a"));
   std::vector<int> v{1, 2, 3};
-  Dropbox<decltype(v)>::open()->set("a", v);
-  auto* result = Dropbox<std::vector<int>>::open()->get("a");
+  Dropbox<decltype(v)>::Open()->Set("a", v);
+  auto* result = Dropbox<std::vector<int>>::Open()->Get("a");
   EXPECT_EQ(v, *result);
   result->push_back(4);
-  result = Dropbox<std::vector<int>>::open()->get("a");
+  result = Dropbox<std::vector<int>>::Open()->Get("a");
   EXPECT_EQ(4, result->size());
-  Dropbox<std::vector<int>>::open()->set("a", v);
-  result = Dropbox<std::vector<int>>::open()->get("a");
+  Dropbox<std::vector<int>>::Open()->Set("a", v);
+  result = Dropbox<std::vector<int>>::Open()->Get("a");
   EXPECT_EQ(3, result->size());
-  Dropbox<float>::open()->set("a", 2.0);
-  const auto* float_result = Dropbox<float>::open()->get("a");
+  Dropbox<float>::Open()->Set("a", 2.0);
+  const auto* float_result = Dropbox<float>::Open()->Get("a");
   EXPECT_FLOAT_EQ(2.0, *float_result);
-  EXPECT_EQ(nullptr, Dropbox<float>::open()->get("b"));
-  Dropbox<std::vector<int>>::open()->remove("a");
+  EXPECT_EQ(nullptr, Dropbox<float>::Open()->Get("b"));
+  Dropbox<std::vector<int>>::Open()->Remove("a");
 }
 
 }  // namespace util

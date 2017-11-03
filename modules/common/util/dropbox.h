@@ -40,7 +40,7 @@ using KeyType = std::string;
 template <class T>
 class Dropbox {
  public:
-  const T* get(const KeyType& key) const {
+  const T* Get(const KeyType& key) const {
     auto iter = _store.find(key);
     if (iter == _store.end()) {
       return nullptr;
@@ -49,7 +49,7 @@ class Dropbox {
     }
   }
 
-  T* get(const KeyType& key) {
+  T* Get(const KeyType& key) {
     auto iter = _store.find(key);
     if (iter == _store.end()) {
       return nullptr;
@@ -58,11 +58,11 @@ class Dropbox {
     }
   }
 
-  void set(const KeyType& key, const T& t) { _store[key] = t; }
+  void Set(const KeyType& key, const T& t) { _store[key] = t; }
 
-  void remove(const KeyType& key) { _store.erase(key); }
+  void Remove(const KeyType& key) { _store.erase(key); }
 
-  static Dropbox<T>* open() {
+  static Dropbox<T>* Open() {
     static Dropbox<T> _static_store;
     return &_static_store;
   }
