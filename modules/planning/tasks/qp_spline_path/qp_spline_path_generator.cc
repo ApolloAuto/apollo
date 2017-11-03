@@ -268,15 +268,10 @@ bool QpSplinePathGenerator::AddConstraint(
                     std::fabs(init_frenet_point_.l()) -
                         qp_spline_path_config_.lane_change_lateral_shift()),
           init_frenet_point_.l()));
-  spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
-  spline_constraint->AddPointSecondDerivativeConstraint(evaluated_s_.back(),
-                                                        0.0);
 
   // add first derivative bound to improve lane change smoothness
   std::vector<double> dl_lower_bound(evaluated_s_.size(), -FLAGS_dl_bound);
   std::vector<double> dl_upper_bound(evaluated_s_.size(), FLAGS_dl_bound);
-  dl_lower_bound.front() = -FLAGS_dl_bound / 2.0;
-  dl_upper_bound.front() = FLAGS_dl_bound / 2.0;
 
   if (!spline_constraint->AddDerivativeBoundary(evaluated_s_, dl_lower_bound,
                                                 dl_upper_bound)) {
@@ -289,8 +284,6 @@ bool QpSplinePathGenerator::AddConstraint(
   std::vector<double> kappa_lower_bound(evaluated_s_.size(),
                                         -FLAGS_kappa_bound);
   std::vector<double> kappa_upper_bound(evaluated_s_.size(), FLAGS_kappa_bound);
-  kappa_lower_bound.front() = -FLAGS_kappa_bound / 5.0;
-  kappa_upper_bound.front() = FLAGS_dkappa_bound / 5.0;
   if (!spline_constraint->AddSecondDerivativeBoundary(
           evaluated_s_, kappa_lower_bound, kappa_upper_bound)) {
     AERROR << "Fail to add second derivative boundary.";
