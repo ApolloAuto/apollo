@@ -201,6 +201,7 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/reference_line:reference_line",
+        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
     ],
 )
 

@@ -19,6 +19,8 @@
 #include <cmath>
 #include <limits>
 #include <utility>
+#include <algorithm>
+
 #include "modules/planning/lattice/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/lattice_params.h"

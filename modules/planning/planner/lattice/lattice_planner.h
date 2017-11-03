@@ -42,11 +42,6 @@ class LatticePlanner : public Planner {
                       ReferenceLineInfo* reference_line_info) override;
 
  private:
-  void ComputeInitFrenetState(const common::PathPoint& matched_point,
-                              const common::TrajectoryPoint& cartesian_state,
-                              std::array<double, 3>* ptr_s,
-                              std::array<double, 3>* ptr_d) const;
-
   DiscretizedTrajectory CombineTrajectory(
       const std::vector<common::PathPoint>& reference_line,
       const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,

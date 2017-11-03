@@ -209,18 +209,6 @@ Status LatticePlanner::Plan(
   }
 }
 
-void LatticePlanner::ComputeInitFrenetState(
-    const PathPoint& matched_point, const TrajectoryPoint& cartesian_state,
-    std::array<double, 3>* ptr_s, std::array<double, 3>* ptr_d) const {
-  CartesianFrenetConverter::cartesian_to_frenet(
-      matched_point.s(), matched_point.x(), matched_point.y(),
-      matched_point.theta(), matched_point.kappa(), matched_point.dkappa(),
-      cartesian_state.path_point().x(), cartesian_state.path_point().y(),
-      cartesian_state.v(), cartesian_state.a(),
-      cartesian_state.path_point().theta(),
-      cartesian_state.path_point().kappa(), ptr_s, ptr_d);
-}
-
 DiscretizedTrajectory LatticePlanner::CombineTrajectory(
     const std::vector<PathPoint>& reference_line, const Curve1d& lon_trajectory,
     const Curve1d& lat_trajectory, const double init_relative_time) const {

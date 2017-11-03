@@ -21,8 +21,13 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
+
 namespace apollo {
 namespace planning {
+
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 
 std::vector<common::PathPoint> ToDiscretizedReferenceLine(
     const std::vector<ReferencePoint>& ref_points) {
@@ -47,6 +52,20 @@ std::vector<common::PathPoint> ToDiscretizedReferenceLine(
     path_points.push_back(std::move(path_point));
   }
   return path_points;
+}
+
+void ComputeInitFrenetState(
+    const PathPoint& matched_point,
+    const TrajectoryPoint& cartesian_state,
+    std::array<double, 3>* ptr_s,
+    std::array<double, 3>* ptr_d) {
+  CartesianFrenetConverter::cartesian_to_frenet(
+      matched_point.s(), matched_point.x(), matched_point.y(),
+      matched_point.theta(), matched_point.kappa(), matched_point.dkappa(),
+      cartesian_state.path_point().x(), cartesian_state.path_point().y(),
+      cartesian_state.v(), cartesian_state.a(),
+      cartesian_state.path_point().theta(),
+      cartesian_state.path_point().kappa(), ptr_s, ptr_d);
 }
 
 }  // namespace planning
