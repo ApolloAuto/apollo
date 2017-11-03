@@ -50,3 +50,7 @@ DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
 DEFINE_string(obstacle_module_name, "perception_obstacle",
               "perception obstacle module name");
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
+
+/// obstacle/perception.cc
+DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
+              "Onboard DAG Streaming config.");

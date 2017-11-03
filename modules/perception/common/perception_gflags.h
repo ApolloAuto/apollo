@@ -44,4 +44,7 @@ DECLARE_string(lidar_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
 
+///obstacle/perception.cc
+DECLARE_string(dag_config_path);
+
 #endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */

@@ -1,0 +1,143 @@
+#include <boost/algorithm/string.hpp>
+
+#include "modules/common/log.h"
+#include "modules/perception/onboard/subnode_helper.h"
+
+namespace apollo {
+namespace perception {
+
+DEFINE_bool(enable_frame_ratio_control, true, "enable frame ratio control");
+
+using boost::algorithm::is_any_of;
+using boost::algorithm::split;
+using boost::algorithm::trim;
+using std::map;
+using std::string;
+using std::vector;
+
+bool SubnodeHelper::parse_reserve_field(const string& reserve,
+                                        map<string, string>* result_map) {
+  int str_len = static_cast<int>(reserve.size());
+  if (str_len == 0) {
+    AERROR << "reserve is empty";
+    return false;
+  }
+  int start = -1;
+  int pos = 0;
+  string key;
+  do {
+    if (reserve[pos] == ':') {
+      if (pos - start <= 1) {
+        AERROR << "Invalid reserve field: " << reserve;
+        return false;
+      }
+      key = reserve.substr(start + 1, pos - start - 1);
+      trim(key);
+      start = pos;
+    } else if (reserve[pos] == ';' || pos == str_len - 1) {
+      if (key.empty() || pos - start <= 1) {
+        AERROR << "Invalid reserve field: " << reserve;
+        return false;
+      }
+      int len = reserve[pos] == ';' ? pos - start - 1 : pos - start;
+      string value = reserve.substr(start + 1, len);
+      trim(value);
+      (*result_map)[key] = value;
+      start = pos;
+    } else {
+      // just pass
+    }
+    ++pos;
+  } while (pos < str_len);
+  return true;
+}
+
+bool SubnodeHelper::produce_shared_data_key(double stamp,
+                                            const string& device_id,
+                                            string* key) {
+  char temp[64];
+  memset(temp, '\0', sizeof(temp));
+  int ret = snprintf(temp, sizeof(temp), "%ld",
+                     static_cast<long>(stamp * FLAGS_stamp_enlarge_factor));
+  if (ret < 0) {
+    AERROR << "Encounter an output error.";
+    return false;
+  }
+  if (ret >= static_cast<int>(sizeof(temp))) {
+    AERROR << "Output was truncated.";
+    return false;
+  }
+  *key = device_id + string(temp);
+  return true;
+}
+
+bool SubnodeHelper::produce_shared_data_key(double stamp,
+                                            const string& device_id,
+                                            int64_t* key) {
+  int64_t temp = static_cast<int64_t>(stamp * FLAGS_stamp_enlarge_factor);
+  *key = temp * FLAGS_stamp_enlarge_factor + atoi(device_id.c_str());
+  return true;
+}
+
+bool SubnodeHelper::extract_params(const string& conf_str,
+                                   const vector<string>& param_names,
+                                   vector<string>* param_values) {
+  for (auto key : param_names) {
+    string val;
+    if (!extract_param(conf_str, key, &val)) {
+      return false;
+    }
+    param_values->push_back(val);
+  }
+  return true;
+}
+
+bool SubnodeHelper::extract_param(const string& conf_str,
+                                  const string& param_name,
+                                  string* param_value) {
+  vector<string> fields;
+  split(fields, conf_str, is_any_of("&"));
+  for (auto field : fields) {
+    vector<string> param_pair;
+    split(param_pair, field, is_any_of("="));
+    if (param_pair.size() != 2u) {
+      AERROR << "Invalid param(need key=value):" << field;
+      return false;
+    }
+
+    string name = param_pair[0];
+    name.erase(0, name.find_first_not_of(" "));
+    name.erase(name.find_last_not_of(" ") + 1);
+
+    string value = param_pair[1];
+    value.erase(0, value.find_first_not_of(" "));
+    value.erase(value.find_last_not_of(" ") + 1);
+    if (name == param_name) {
+      *param_value = value;
+      return true;
+    }
+  }
+  AERROR << "No Param:" << param_name << " conf:" << conf_str;
+  return false;
+}
+
+bool FrameSkiper::init(const double max_ratio) {
+  _min_interval = 1 / max_ratio;
+  return true;
+}
+
+bool FrameSkiper::skip(const double ts) {
+  if (!FLAGS_enable_frame_ratio_control) {
+    return false;
+  }
+
+  if (ts - _ts > _min_interval) {
+    _ts = ts;
+    return false;
+  } else {
+    return true;
+  }
+}
+
+}  // namespace perception
+}  // namespace apollo

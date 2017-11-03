@@ -16,6 +16,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/util:string_util",
+        "//modules/common/proto:error_code_proto",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/proto:perception_proto",

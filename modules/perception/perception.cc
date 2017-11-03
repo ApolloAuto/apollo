@@ -15,11 +15,15 @@
  *****************************************************************************/
 
 #include "modules/perception/perception.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/base/file_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
+#include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
+#include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/onboard/dag_streaming.h"
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 
@@ -37,29 +41,38 @@ std::string Perception::Name() const {
 Status Perception::Init() {
   AdapterManager::Init(FLAGS_perception_adapter_config_filename);
 
-  lidar_process_.reset(new LidarProcess());
-  if (lidar_process_ != nullptr && !lidar_process_->Init()) {
-    AERROR << "failed to init lidar_process.";
-    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init lidar_process.");
+  RegistAllOnboardClass();
+  /// init config manager
+  ConfigManager* config_manager = ConfigManager::instance();
+  if (!config_manager->Init()) {
+    AERROR << "failed to init ConfigManager";
+    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init ConfigManager.");
+  }
+  AINFO << "Init config manager successfully, work_root: "
+        << config_manager->work_root();
+
+  const std::string dag_config_path =
+      FileUtil::GetAbsolutePath(FLAGS_work_root, FLAGS_dag_config_path);
+
+  DAGStreaming dag_streaming;
+  if (!dag_streaming.init(dag_config_path)) {
+    AERROR << "failed to Init DAGStreaming. dag_config_path:"
+           << dag_config_path;
+    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init DAGStreaming.");
   }
 
-  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&Perception::OnPointCloud, this);
+  dag_streaming.start();
+
   return Status::OK();
 }
 
-void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
-  ADEBUG << "get point cloud callback";
+void Perception::RegistAllOnboardClass() {
+  /// regist subnode
+  RegisterFactoryLidarProcessSubnode();
 
-  if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
-    lidar_process_->Process(message);
-
-    /// public obstacle message
-    PerceptionObstacles obstacles;
-    if (lidar_process_->GeneratePbMsg(&obstacles)) {
-      AdapterManager::PublishPerceptionObstacles(obstacles);
-    }
-  }
+  /// regist sharedata
+  RegisterFactoryLidarObjectData();
+  RegisterFactoryRadarFrontObjectData();
 }
 
 Status Perception::Start() {
