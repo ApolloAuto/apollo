@@ -1,0 +1,28 @@
+modules {
+  name: "canbus"
+  binary_path: "modules/canbus/canbus"
+}
+modules {
+  name: "localization"
+  binary_path: "modules/localization/localization"
+}
+modules {
+  name: "perception"
+  binary_path: "modules/perception/perception"
+}
+modules {
+  name: "prediction"
+  binary_path: "modules/prediction/prediction"
+}
+modules {
+  name: "routing"
+  binary_path: "modules/routing/routing"
+}
+modules {
+  name: "planning"
+  binary_path: "modules/planning/planning"
+}
+modules {
+  name: "control"
+  binary_path: "modules/control/control"
+}

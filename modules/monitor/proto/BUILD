@@ -17,4 +17,19 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "module_monitor_conf_proto",
+    deps = [
+        ":module_monitor_conf_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "module_monitor_conf_proto_lib",
+    srcs = ["module_monitor_conf.proto"],
+    deps = [
+        "//modules/common/adapters/proto:adapter_config_proto_lib",
+    ],
+)
+
 cpplint()
