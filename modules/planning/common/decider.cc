@@ -53,7 +53,7 @@ void Decider::MakeDecision(const ReferenceLineInfo& reference_line_info,
 }
 
 void Decider::MakeMainMissionCompleteDecision(
-  const ReferenceLineInfo& reference_line_info) {
+    const ReferenceLineInfo& reference_line_info) {
   if (!decision_result_->main_decision().has_stop()) {
     return;
   }
@@ -61,7 +61,7 @@ void Decider::MakeMainMissionCompleteDecision(
   if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
     return;
   }
-  const auto& adc_pos = reference_line_info.init_adc_point().path_point();
+  const auto& adc_pos = reference_line_info.AdcPlanningPoint().path_point();
   if (common::util::DistanceXY(adc_pos, main_stop.stop_point()) >
       FLAGS_destination_check_distance) {
     return;

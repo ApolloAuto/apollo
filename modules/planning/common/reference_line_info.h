@@ -45,7 +45,8 @@ class ReferenceLineInfo {
   explicit ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                              const ReferenceLine& reference_line,
                              const hdmap::RouteSegments& segments,
-                             const common::TrajectoryPoint& init_adc_point);
+                             const common::PointENU& adc_position,
+                             const common::TrajectoryPoint& adc_planning_point);
 
   bool Init();
 
@@ -55,8 +56,9 @@ class ReferenceLineInfo {
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
   const ReferenceLine& reference_line() const;
-  const common::TrajectoryPoint& init_adc_point() const;
+  const common::TrajectoryPoint& AdcPlanningPoint() const;
 
+  bool ReachedDestination() const;
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
 
@@ -64,6 +66,7 @@ class ReferenceLineInfo {
 
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
+  void SetCost(double cost) { cost_ = cost; }
 
   /**
    * @brief check if current reference line is started from another reference
@@ -103,7 +106,8 @@ class ReferenceLineInfo {
 
   const hdmap::PncMap* pnc_map_ = nullptr;
   const ReferenceLine reference_line_;
-  const common::TrajectoryPoint init_adc_point_;
+  const common::PointENU adc_position_;
+  const common::TrajectoryPoint adc_planning_point_;
 
   /**
    * @brief this is the number that measures the goodness of this reference
