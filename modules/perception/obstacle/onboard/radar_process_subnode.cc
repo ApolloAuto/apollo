@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/onboard/radar_process.h"
+ #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 
+#include <map>
 #include <string>
 
 #include "Eigen/Core"
@@ -25,11 +26,13 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
+#include "modules/perception/onboard/subnode_helper.h"
 
 namespace apollo {
 namespace perception {
@@ -40,8 +43,9 @@ using pcl_util::PointD;
 using Eigen::Matrix4d;
 using Eigen::Affine3d;
 using std::string;
+using std::map;
 
-bool RadarProcess::Init() {
+bool RadarProcessSubnode::InitInternal() {
   if (inited_) {
     return true;
   }
@@ -49,21 +53,38 @@ bool RadarProcess::Init() {
   RegistAllAlgorithm();
 
   if (!InitFrameDependence()) {
-    AERROR << "failed to init frame dependence.";
+    AERROR << "failed to Init frame dependence.";
     return false;
   }
 
   if (!InitAlgorithmPlugin()) {
-    AERROR << "failed to init algorithm plugin.";
+    AERROR << "failed to Init algorithm plugin.";
+    return false;
+  }
+  // parse reserve fileds
+  map<string, string> reserve_field_map;
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
+    AERROR << "Failed to parse reserve filed: " << reserve_;
     return false;
   }
 
+  if (reserve_field_map.find("device_id") == reserve_field_map.end()) {
+    AERROR << "Failed to find field device_id, reserve: " << reserve_;
+    return false;
+  }
+  device_id_ = reserve_field_map["device_id"];
+
+  CHECK(AdapterManager::GetRadar()) << "Radar is not initialized.";
+  AdapterManager::AddRadarCallback(&RadarProcessSubnode::OnRadar,
+                                        this);
   inited_ = true;
+
   return true;
 }
 
-bool RadarProcess::Process(const RadarObsArray& radar_obs_proto) {
-  PERF_FUNCTION("RadarProcess");
+void RadarProcessSubnode::OnRadar(
+    const RadarObsArray& radar_obs_proto) {
+ PERF_FUNCTION("RadarProcess");
     double timestamp = radar_obs_proto.measurement_time();
     double unix_timestamp = timestamp;
     const double cur_time = common::time::Clock::NowInSecond();
@@ -76,12 +97,12 @@ bool RadarProcess::Process(const RadarObsArray& radar_obs_proto) {
         timestamp -= 0.07;
     } else {
         AERROR << "Unknown sensor type";
-        return false;
+        return;
     }
 
     if (fabs(timestamp - 0.0) < 10e-6) {
         AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);
-        return false;
+        return;
     }
     ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
             << " num_raw_obstacles: " << radar_obs_proto.delphiobs_size() << "]";
@@ -90,7 +111,7 @@ bool RadarProcess::Process(const RadarObsArray& radar_obs_proto) {
   if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
     AERROR << "failed to get trans at timestamp: " << timestamp;
     error_code_ = common::PERCEPTION_ERROR_TF;
-    return false;
+    return;
   }
 
     // Current Localiztion, using 64-velodyne postion.
@@ -119,21 +140,24 @@ bool RadarProcess::Process(const RadarObsArray& radar_obs_proto) {
     PERF_BLOCK_START();
     options.radar2world_pose = &(*radar2world_pose);
     std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
+    radar_objects->timestamp = timestamp;
+    radar_objects->sensor_type = RADAR;
     bool result = radar_detector_->Detect(
             radar_obs_proto,
             map_polygons,
             options,
             &radar_objects->objects);
     if (!result) {
+        radar_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
+        PublishDataAndEvent(timestamp, radar_objects);
         AERROR << "Failed to call RadarDetector. [timestamp: "
                    << GLOG_TIMESTAMP(timestamp)
                    << ", map_polygons_size: " << map_polygons.size()
                    << ", num_raw_conti_obstacles: " << radar_obs_proto.contiobs_size() << "]";
-        return false;
+        return;
     }
-    radar_objects->timestamp = timestamp;
-    radar_objects->sensor_type = RADAR;
     PERF_BLOCK_END("radar_detect");
+    PublishDataAndEvent(timestamp_, radar_objects);
 
     const double end_timestamp = common::time::Clock::NowInSecond();
     const double end_latency = (end_timestamp - unix_timestamp) * 1e3;
@@ -141,23 +165,30 @@ bool RadarProcess::Process(const RadarObsArray& radar_obs_proto) {
            << GLOG_TIMESTAMP(timestamp)
            << "]:cur_time[" << GLOG_TIMESTAMP(end_timestamp)
            << "]:cur_latency[" << end_latency << "]";
-  return true;
+
+    ADEBUG << "radar process succ, there are "
+           << (radar_objects->objects).size() << " objects.";
+  return;
 }
 
-void RadarProcess::RegistAllAlgorithm() {
+void RadarProcessSubnode::RegistAllAlgorithm() {
   RegisterFactoryDummyRadarDetector();
   RegisterFactoryModestRadarDetector();
 }
 
-bool RadarProcess::InitFrameDependence() {
-  /// init config manager
-  ConfigManager* config_manager = ConfigManager::instance();
-  if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager";
+bool RadarProcessSubnode::InitFrameDependence() {
+  /// init share data
+  CHECK(shared_data_manager_ != nullptr);
+  // init preprocess_data
+  const string radar_data_name("RadarFrontObjectData");
+  radar_data_ = dynamic_cast<RadarFrontObjectData*>(
+          shared_data_manager_->GetSharedData(radar_data_name));
+  if (radar_data_ == nullptr) {
+    AERROR << "Failed to get shared data instance "
+           << radar_data_name;
     return false;
   }
-  AINFO << "Init config manager successfully, work_root: "
-        << config_manager->work_root();
+  AINFO << "Init shared data successfully, data: " << radar_data_->name();
 
   /// init hdmap
   if (FLAGS_enable_hdmap_input) {
@@ -167,17 +198,17 @@ bool RadarProcess::InitFrameDependence() {
       return false;
     }
     if (!hdmap_input_->Init()) {
-      AERROR << "failed to init HDMapInput";
+      AERROR << "failed to Init HDMapInput";
       return false;
     }
-    AINFO << "get and init hdmap_input succ.";
+    AINFO << "get and Init hdmap_input succ.";
   }
 
   return true;
 }
 
-bool RadarProcess::InitAlgorithmPlugin() {
-  /// init radar detecor
+bool RadarProcessSubnode::InitAlgorithmPlugin() {
+  /// init tracker
   radar_detector_.reset(
       BaseRadarDetectorRegisterer::GetInstanceByName(FLAGS_onboard_radar_detector));
   if (!radar_detector_) {
@@ -185,15 +216,15 @@ bool RadarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!radar_detector_->Init()) {
-    AERROR << "Failed to init tracker: " << radar_detector_->name();
+    AERROR << "Failed to Init tracker: " << radar_detector_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, radar detecor: " << radar_detector_->name();
-
+  AINFO << "Init algorithm plugin successfully, tracker: " << radar_detector_->name();
   return true;
 }
 
-bool RadarProcess::GetRadarTrans(const double query_time, Matrix4d* trans) {
+bool RadarProcessSubnode::GetRadarTrans(const double query_time,
+                                           Matrix4d* trans) {
   if (!trans) {
     AERROR << "failed to get trans, the trans ptr can not be NULL";
     return false;
@@ -217,7 +248,7 @@ bool RadarProcess::GetRadarTrans(const double query_time, Matrix4d* trans) {
   geometry_msgs::TransformStamped transform_stamped;
   try {
     transform_stamped = tf2_buffer.lookupTransform(
-        FLAGS_lidar_tf2_frame_id, FLAGS_lidar_tf2_child_frame_id, query_stamp);
+        FLAGS_radar_tf2_frame_id, FLAGS_radar_tf2_child_frame_id, query_stamp);
   } catch (tf2::TransformException& ex) {
     AERROR << "Exception: " << ex.what();
     return false;
@@ -226,33 +257,34 @@ bool RadarProcess::GetRadarTrans(const double query_time, Matrix4d* trans) {
   tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
   *trans = affine_3d.matrix();
 
-  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
-         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
+  ADEBUG << "get " << FLAGS_radar_tf2_frame_id << " to "
+         << FLAGS_radar_tf2_child_frame_id << " trans: " << *trans;
   return true;
 }
 
-bool RadarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
-  AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
-                                                obstacles);
-  common::Header* header = obstacles->mutable_header();
-  header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
-  header->set_camera_timestamp(0);
-  header->set_radar_timestamp(0);
-
-  obstacles->set_error_code(error_code_);
-
-  for (const auto& obj : objects_) {
-    PerceptionObstacle* obstacle = obstacles->add_perception_obstacle();
-    if (!obj->Serialize(obstacle)) {
-      AERROR << "Failed gen PerceptionObstacle. Object:" << obj->ToString();
-      return false;
-    }
-    obstacle->set_timestamp(obstacle->timestamp() * 1000);
+void RadarProcessSubnode::PublishDataAndEvent(
+    double timestamp, const SharedDataPtr<SensorObjects>& data) {
+  // set shared data
+  std::string key;
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
+    AERROR << "Failed to produce shared key. time: "
+           << GLOG_TIMESTAMP(timestamp) << ", device_id: " << device_id_;
+    return;
   }
 
-  ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
-  return true;
+  radar_data_->Add(key, data);
+  // pub events
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta &event_meta = pub_meta_events_[idx];
+    Event event;
+    event.event_id = event_meta.event_id;
+    event.timestamp = timestamp;
+    event.reserve = device_id_;
+    event_manager_->Publish(event);
+  }
 }
 
 }  // namespace perception
 }  // namespace apollo
+
+
