@@ -45,11 +45,11 @@ class ADCNeighborhood {
       std::array<double, 3>* backward_nearest_obstacle_state,
       double* enter_time);
 
-  bool IsInNeighborhood(const Obstacle* obstacle);
+  bool IsInNeighborhood(const Obstacle* obstacle) const;
 
-  bool IsForward(const Obstacle* obstacle);
+  bool IsForward(const Obstacle* obstacle) const;
 
-  bool IsBackward(const Obstacle* obstacle);
+  bool IsBackward(const Obstacle* obstacle) const;
 
  private:
   void InitNeighborhood(

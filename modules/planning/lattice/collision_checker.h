@@ -23,6 +23,7 @@
 
 #include <vector>
 
+#include "modules/planning/lattice/adc_neighborhood.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/common/math/box2d.h"
@@ -32,12 +33,16 @@ namespace planning {
 
 class CollisionChecker {
  public:
-  explicit CollisionChecker(const std::vector<const Obstacle*>& obstacles);
+  explicit CollisionChecker(
+      const ADCNeighborhood& adc_neighborhood,
+      const std::vector<const Obstacle*>& obstacles);
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
  private:
-  void BuildPredictedEnv(const std::vector<const Obstacle*>& obstacles);
+  void BuildPredictedEnv(
+       const ADCNeighborhood& adc_neighborhood,
+       const std::vector<const Obstacle*>& obstacles);
 
   std::vector<std::vector<common::math::Box2d>> predicted_envs_;
 };

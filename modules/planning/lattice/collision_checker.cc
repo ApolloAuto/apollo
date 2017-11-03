@@ -30,8 +30,9 @@ namespace apollo {
 namespace planning {
 
 CollisionChecker::CollisionChecker(
+    const ADCNeighborhood& adc_neighborhood,
     const std::vector<const Obstacle*>& obstacles) {
-  BuildPredictedEnv(obstacles);
+  BuildPredictedEnv(adc_neighborhood, obstacles);
 }
 
 bool CollisionChecker::InCollision(
@@ -62,6 +63,7 @@ bool CollisionChecker::InCollision(
 }
 
 void CollisionChecker::BuildPredictedEnv(
+    const ADCNeighborhood& adc_neighborhood,
     const std::vector<const Obstacle*>& obstacles) {
   CHECK(predicted_envs_.empty());
 
@@ -73,6 +75,9 @@ void CollisionChecker::BuildPredictedEnv(
       // temp. fix, figure out why some obstacle's predicted trajectory
       // has zero points.
       if (obstacle->Trajectory().trajectory_point_size() == 0) {
+        continue;
+      }
+      if (!adc_neighborhood.IsInNeighborhood(obstacle)) {
         continue;
       }
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
