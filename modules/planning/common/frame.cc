@@ -146,7 +146,8 @@ bool Frame::InitReferenceLineInfo() {
   auto segments_iter = segments.begin();
   while (ref_line_iter != reference_lines.end()) {
     reference_line_info_.emplace_back(pnc_map_.get(), *ref_line_iter,
-                                      *segments_iter, planning_start_point_);
+                                      *segments_iter, init_pose_.position(),
+                                      planning_start_point_);
     ++ref_line_iter;
     ++segments_iter;
   }

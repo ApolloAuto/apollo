@@ -46,15 +46,17 @@ using apollo::common::VehicleSignal;
 ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                                      const ReferenceLine& reference_line,
                                      const hdmap::RouteSegments& segments,
-                                     const TrajectoryPoint& init_adc_point)
+                                     const common::PointENU& adc_position,
+                                     const TrajectoryPoint& adc_planning_point)
     : pnc_map_(pnc_map),
       reference_line_(reference_line),
-      init_adc_point_(init_adc_point),
+      adc_position_(adc_position),
+      adc_planning_point_(adc_planning_point),
       lanes_(segments) {}
 
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
-  const auto& path_point = init_adc_point_.path_point();
+  const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
   Vec2d vec_to_center(
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
@@ -80,8 +82,8 @@ PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
 }
-const common::TrajectoryPoint& ReferenceLineInfo::init_adc_point() const {
-  return init_adc_point_;
+const common::TrajectoryPoint& ReferenceLineInfo::AdcPlanningPoint() const {
+  return adc_planning_point_;
 }
 
 const ReferenceLine& ReferenceLineInfo::reference_line() const {
@@ -241,6 +243,24 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
       break;
     }
   }
+}
+
+bool ReferenceLineInfo::ReachedDestination() const {
+  constexpr double kDestinationDeltaS = 2.0;
+  const auto* dest_ptr = path_decision_.Find(FLAGS_destination_obstacle_id);
+  if (!dest_ptr) {
+    return false;
+  }
+  if (!dest_ptr->LongitudinalDecision().has_stop()) {
+    return false;
+  }
+  if (!reference_line_.IsOnRoad(
+          dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
+    return false;
+  }
+  const double stop_s = dest_ptr->perception_sl_boundary().start_s() +
+                        dest_ptr->LongitudinalDecision().stop().distance_s();
+  return adc_sl_boundary_.end_s() + kDestinationDeltaS > stop_s;
 }
 
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {

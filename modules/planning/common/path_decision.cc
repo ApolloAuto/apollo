@@ -42,6 +42,10 @@ PathObstacle *PathDecision::Find(const std::string &object_id) {
   return path_obstacles_.Find(object_id);
 }
 
+const PathObstacle *PathDecision::Find(const std::string &object_id) const {
+  return path_obstacles_.Find(object_id);
+}
+
 void PathDecision::SetStBoundary(const std::string &id,
                                  const StBoundary &boundary) {
   auto *obstacle = path_obstacles_.Find(id);

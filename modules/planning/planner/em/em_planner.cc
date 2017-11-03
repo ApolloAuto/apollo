@@ -104,11 +104,6 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
-  if (!frame) {
-    AERROR << "Frame is empty in EMPlanner";
-    return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
-  }
-
   const double kStraightForwardLineCost = 10000.0;
   if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
       reference_line_info->Lanes().IsOnSegment()) {
