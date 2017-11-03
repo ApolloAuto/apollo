@@ -195,6 +195,20 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test qp path failure
+ */
+TEST_F(SunnyvaleLoopTest, qp_path_failure) {
+  std::string seq_num = "12";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_enable_prediction = false;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
 
