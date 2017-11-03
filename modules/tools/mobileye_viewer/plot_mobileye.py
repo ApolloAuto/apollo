@@ -25,19 +25,22 @@ from modules.drivers.proto import mobileye_pb2
 from mobileye_data import MobileyeData
 from localization_data import LocalizationData
 from planning_data import PlanningData
+from chassis_data import ChassisData
 from view_subplot import ViewSubplot
 from subplot_s_speed import SubplotSSpeed
 from subplot_s_theta import SubplotSTheta
 from subplot_s_time import SubplotSTime
 from modules.localization.proto import localization_pb2
+from modules.canbus.proto import chassis_pb2
 
-PLANNING_TOPIC = '/apollo/planning'
+PLANNING_TOPIC = '/apollo/planning_lite'
 mobileye = MobileyeData()
 localization = LocalizationData()
 planning = PlanningData()
+chassis = ChassisData()
 
 def update(frame_number):
-    view_subplot.show(mobileye, localization, planning)
+    view_subplot.show(mobileye, localization, planning, chassis)
     s_speed_subplot.show(planning)
     s_theta_subplot.show(planning)
     s_time_subplot.show(planning)
@@ -56,6 +59,10 @@ def mobileye_callback(mobileye_pb):
 def planning_callback(planning_pb):
     planning.update(planning_pb)
 
+def chassis_callback(chassis_pb):
+    chassis.update(chassis_pb)
+
+
 def add_listener():
     rospy.init_node('mobileye_plot', anonymous=True)
     rospy.Subscriber('/apollo/sensor/mobileye',
@@ -67,7 +74,9 @@ def add_listener():
     rospy.Subscriber('/apollo/localization/pose',
                      localization_pb2.LocalizationEstimate,
                      localization_callback)
-
+    rospy.Subscriber('/apollo/canbus/chassis',
+                     chassis_pb2.Chassis,
+                     chassis_callback)
 
 if __name__ == '__main__':
 
