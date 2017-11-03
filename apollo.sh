@@ -275,11 +275,12 @@ function release() {
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
     # hw check
-    mkdir -p $MODULES_DIR/monitor/hwmonitor/hw_check/
-    cp bazel-bin/modules/monitor/hwmonitor/hw_check/can_check $MODULES_DIR/monitor/hwmonitor/hw_check/
-    cp bazel-bin/modules/monitor/hwmonitor/hw_check/gps_check $MODULES_DIR/monitor/hwmonitor/hw_check/
-    mkdir -p $MODULES_DIR/monitor/hwmonitor/hw/tools/
-    cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
+    mkdir -p $MODULES_DIR/monitor/hardware/can
+    cp bazel-bin/modules/monitor/hardware/can/can_check $MODULES_DIR/monitor/hardware/can
+    mkdir -p $MODULES_DIR/monitor/hardware/gps
+    cp bazel-bin/modules/monitor/hardware/gps/gps_check $MODULES_DIR/monitor/hardware/gps
+    mkdir -p $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
+    cp bazel-bin/modules/monitor/hardware/can/esdcan/esdcan_tools/esdcan_test_app $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
