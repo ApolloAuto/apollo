@@ -113,7 +113,9 @@ namespace adapter {
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
+  name##Adapter *InternalGet##name() {                                         \
+    return name##_.get();                                                      \
+  }                                                                            \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (IsRos()) {                                                             \
@@ -181,7 +183,9 @@ class AdapterManager {
   /**
    * @brief Returns whether AdapterManager is running ROS mode.
    */
-  static bool IsRos() { return instance()->node_handle_ != nullptr; }
+  static bool IsRos() {
+    return instance()->node_handle_ != nullptr;
+  }
 
   /**
    * @brief Returns a reference to static tf2 buffer.
@@ -198,7 +202,7 @@ class AdapterManager {
    * rate. It takes a class member function, and a bare pointer to the
    * object to call the method on.
    */
-  template<class T>
+  template <class T>
   static ros::Timer CreateTimer(ros::Duration period,
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
@@ -251,6 +255,12 @@ class AdapterManager {
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
   REGISTER_ADAPTER(CompressedImage);
+  REGISTER_ADAPTER(GnssRtkObs);
+  REGISTER_ADAPTER(GnssRtkEph);
+  REGISTER_ADAPTER(GnssBestPose);
+  REGISTER_ADAPTER(IntegMeasureGnss);
+  REGISTER_ADAPTER(IntegMeasureLidar);
+  REGISTER_ADAPTER(IntegSinsPva);
   DECLARE_SINGLETON(AdapterManager);
 };
 

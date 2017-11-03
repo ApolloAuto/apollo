@@ -1,0 +1,57 @@
+syntax = "proto2";
+
+package apollo.localization;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+
+message IntegMeasure {
+  optional apollo.common.Header header = 1;
+
+  enum MeasureType{
+    // Only include gnss position.
+    GNSS_POS_ONLY = 0;
+    // Include gnss position and velocity.
+    GNSS_POS_VEL = 1;
+    // Only include gnss velocity.
+    GNSS_VEL_ONLY = 2;  
+    // Only include point cloud position.
+    POINT_CLOUD_POS = 3;
+    // Only include odometer velocity.
+    ODOMETER_VEL_ONLY = 4;
+    // Trigger measure update using vehicle constraint.
+    VEHICLE_CONSTRAINT = 5;
+  }
+  optional MeasureType measure_type = 2;
+
+  enum FrameType{
+    // Position give the longitude and latitude unit:rad.
+    ENU = 0;
+    // Position give x y and z from earth center.
+    ECEF = 1;
+    // Position give x y and z in utm frame.
+    UTM = 2;
+    ODOMETER = 3;
+  }
+  optional FrameType frame_type = 3;
+
+  // Position measurement from GNSS or Lidar.
+  optional apollo.common.Point3D position = 4;
+
+  // Velocity measurement from GNSS or odometer.
+  optional apollo.common.Point3D velocity = 5;
+
+  optional double yaw = 6;
+
+  // Utm zone id.
+  optional int32 zone_id = 7;
+
+  // Whether the measurement contains variance.
+  optional bool is_have_variance = 8;
+
+  // Whether use double antenna gnss to get yaw measurement.
+  optional bool is_gnss_double_antenna = 9;
+
+  // Covariance matrix of measurement.
+  repeated double measure_covar = 10 [packed = true];
+}

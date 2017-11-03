@@ -23,6 +23,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/localization:localization_base",
         "//modules/localization/rtk:rtk_localization",
+        "//modules/localization/msf:msf_localization",
     ],
 )
 

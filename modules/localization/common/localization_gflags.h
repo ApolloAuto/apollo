@@ -30,6 +30,7 @@ DECLARE_double(localization_publish_freq);
 
 DECLARE_string(localization_config_file);
 DECLARE_string(rtk_adapter_config_file);
+DECLARE_string(msf_adapter_config_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
 DECLARE_bool(enable_map_reference_unify);
@@ -47,5 +48,21 @@ DECLARE_int32(report_threshold_err_num);
 DECLARE_double(report_gps_imu_time_diff_threshold);
 
 DECLARE_bool(enable_gps_timestamp);
+
+// lidar localization
+DECLARE_string(map_path);
+DECLARE_string(lidar_extrinsic_file);
+DECLARE_string(lidar_height_file);
+DECLARE_bool(debug_log_flag);
+DECLARE_bool(is_locator_available);
+DECLARE_string(broadcast_tf2_frame_id_lidar);
+DECLARE_string(broadcast_tf_child_frame_id_lidar);
+DECLARE_string(query_tf2_target_frame_id_lidar);
+DECLARE_string(query_tf2_source_frame_id_lidar);
+DECLARE_string(publish_frame_id_lidar);
+DECLARE_int32(localization_mode);
+DECLARE_int32(tf2_buffer_expire_time);
+DECLARE_int32(local_utm_zone_id);
+DECLARE_double(map_coverage_theshold);
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

@@ -35,6 +35,12 @@ message AdapterConfig {
     IMAGE_SHORT = 28;
     IMAGE_LONG = 29;
     DRIVE_EVENT = 30;
+    GNSS_RTK_OBS = 31;
+    GNSS_RTK_EPH = 32;
+    GNSS_BEST_POSE = 33;
+    INTEG_MEASURE_GNSS = 34;
+    INTEG_MEASURE_LIDAR = 35;
+    INTEG_SINS_PVA = 36;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
