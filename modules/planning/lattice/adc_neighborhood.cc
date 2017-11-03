@@ -73,11 +73,12 @@ void ADCNeighborhood::SetupObstacles(
   std::vector<PathPoint> discretized_ref_points =
       ToDiscretizedReferenceLine(reference_line.reference_points());
   for (const Obstacle* obstacle : obstacles) {
+    //TODO(zhangyajia): each obstacle has only one predicted trajectory?
+    if (obstacle->Trajectory().trajectory_point_size() == 0) {
+      continue;
+    }
     double relative_time = 0.0;
     while (relative_time < planned_trajectory_time) {
-      if (obstacle->Trajectory().trajectory_point_size() == 0) {
-        continue;
-      }
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
       bool overlap = reference_line.HasOverlap(box);
@@ -98,7 +99,7 @@ void ADCNeighborhood::SetupObstacles(
         double diff_theta =
             obstacle_theta - obstacle_point_on_ref_line.theta();
         obstacle_state[3] = speed * std::cos(diff_theta);
-        obstacle_state[4] = 0.0;  // set s_dotdot as zero
+        obstacle_state[4] = 0.0;  // set s_ddot as zero
         // TODO(all) confirm the logic to determine whether an obstacle
         // is forward or backward.
         if (obstacle_state[2] < init_s_[0]) {

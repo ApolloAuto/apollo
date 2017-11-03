@@ -122,7 +122,7 @@ bool BehaviorDecider::StopDecisionNearDestination(Frame* frame,
   double dist_x = routing_end.x() - routing_end_matched_point.x();
   double dist_y = routing_end.y() - routing_end_matched_point.y();
   double dist = std::hypot(dist_x, dist_y);
-  if (dist > dist_thred_omit_routing_end * dist_thred_omit_routing_end) {
+  if (dist > dist_thred_omit_routing_end) {
     return false;
   }
 
