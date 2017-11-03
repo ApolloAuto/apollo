@@ -74,7 +74,7 @@ double Spline2dSeg::DerivativeX(const double t) const {
   return derivative_x_(t);
 }
 
-double Spline2dSeg::derivative_y(const double t) const {
+double Spline2dSeg::DerivativeY(const double t) const {
   return derivative_y_(t);
 }
 
@@ -82,7 +82,7 @@ double Spline2dSeg::SecondDerivativeX(const double t) const {
   return second_derivative_x_(t);
 }
 
-double Spline2dSeg::second_derivative_y(const double t) const {
+double Spline2dSeg::SecondDerivativeY(const double t) const {
   return second_derivative_y_(t);
 }
 
@@ -90,7 +90,7 @@ double Spline2dSeg::ThirdDerivativeX(const double t) const {
   return third_derivative_x_(t);
 }
 
-double Spline2dSeg::third_derivative_y(const double t) const {
+double Spline2dSeg::ThirdDerivativeY(const double t) const {
   return third_derivative_y_(t);
 }
 
@@ -104,13 +104,13 @@ const PolynomialXd& Spline2dSeg::spline_func_y() const {
 
 const PolynomialXd& Spline2dSeg::DerivativeX() const { return derivative_x_; }
 
-const PolynomialXd& Spline2dSeg::derivative_y() const { return derivative_y_; }
+const PolynomialXd& Spline2dSeg::DerivativeY() const { return derivative_y_; }
 
 const PolynomialXd& Spline2dSeg::SecondDerivativeX() const {
   return second_derivative_x_;
 }
 
-const PolynomialXd& Spline2dSeg::second_derivative_y() const {
+const PolynomialXd& Spline2dSeg::SecondDerivativeY() const {
   return second_derivative_y_;
 }
 
@@ -118,7 +118,7 @@ const PolynomialXd& Spline2dSeg::ThirdDerivativeX() const {
   return third_derivative_x_;
 }
 
-const PolynomialXd& Spline2dSeg::third_derivative_y() const {
+const PolynomialXd& Spline2dSeg::ThirdDerivativeY() const {
   return third_derivative_y_;
 }
 
