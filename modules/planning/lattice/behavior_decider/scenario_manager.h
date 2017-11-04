@@ -16,8 +16,8 @@
 /**
  * @file world_manager.h
  **/
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 
 #include "modules/common/macro.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -29,45 +29,46 @@ namespace planning {
 class Scenario;
 
 class ScenarioManager {
-private:
-    enum FeatureLevel {
-        LEVEL0 = 0,
-        LEVEL1,
-        LEVEL2,
-        LEVEL3,
-        NUM_LEVELS,
-    };
-public:
-    void Reset();
-    int ComputeWorldDecision(
-        const std::vector<common::PathPoint>& discretized_reference_line,
-        std::vector<PlanningTarget*>* const decisions);
+ private:
+  enum FeatureLevel {
+    LEVEL0 = 0,
+    LEVEL1,
+    LEVEL2,
+    LEVEL3,
+    NUM_LEVELS,
+  };
 
-    template<class T>
-    void RegisterScenario(FeatureLevel level) {
-        auto scenario = std::make_unique<T>();
-        scenarios_[static_cast<int>(level)].push_back(scenario.get());
-        indexed_scenarios_[scenario->name()] = std::move(scenario);
-    }
+ public:
+  void Reset();
+  int ComputeWorldDecision(
+      const std::vector<common::PathPoint>& discretized_reference_line,
+      std::vector<PlanningTarget*>* const decisions);
 
-    template<class T>
-    const T* FindScenario() const {
-        auto scenario_iter = indexed_features_.find(T::scenario_name());
-        if (scenario_iter == indexed_features_.end()) {
-            return nullptr;
-        } else {
-            return dynamic_cast<const T*>(scenario_iter->second.get());
-        }
+  template<class T>
+  void RegisterScenario(FeatureLevel level) {
+    auto scenario = std::make_unique<T>();
+    scenarios_[static_cast<int>(level)].push_back(scenario.get());
+    indexed_scenarios_[scenario->name()] = std::move(scenario);
+  }
+
+  template<class T>
+  const T* FindScenario() const {
+    auto scenario_iter = indexed_features_.find(T::scenario_name());
+    if (scenario_iter == indexed_features_.end()) {
+      return nullptr;
+    } else {
+      return dynamic_cast<const T*>(scenario_iter->second.get());
     }
-private:
-    void RegisterScenarios();
-    std::vector<std::vector<Scenario*>> scenarios_;
-    std::unordered_map<std::string, std::unique_ptr<Scenario>> indexed_scenarios_;
-    bool initialized_ = false;
-    DECLARE_SINGLETON(ScenarioManager);
+  }
+ private:
+  void RegisterScenarios();
+  std::vector<std::vector<Scenario*>> scenarios_;
+  std::unordered_map<std::string, std::unique_ptr<Scenario>> indexed_scenarios_;
+  bool initialized_ = false;
+  DECLARE_SINGLETON(ScenarioManager);
 };
 
-} // namespace apollo
-} // namespace planning
+}  // namespace apollo
+}  // namespace planning
 
-#endif
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_

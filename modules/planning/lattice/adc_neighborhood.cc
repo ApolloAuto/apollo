@@ -73,7 +73,7 @@ void ADCNeighborhood::SetupObstacles(
   std::vector<PathPoint> discretized_ref_points =
       ToDiscretizedReferenceLine(reference_line.reference_points());
   for (const Obstacle* obstacle : obstacles) {
-    //TODO(zhangyajia): each obstacle has only one predicted trajectory?
+    // TODO(zhangyajia): each obstacle has only one predicted trajectory?
     if (obstacle->Trajectory().trajectory_point_size() == 0) {
       continue;
     }
