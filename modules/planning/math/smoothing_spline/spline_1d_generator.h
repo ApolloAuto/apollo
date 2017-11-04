@@ -48,10 +48,10 @@
 #ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_GENERATOR_H_
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_GENERATOR_H_
 
+#include <qpOASES.hpp>
+
 #include <memory>
 #include <vector>
-
-#include "qpOASES/include/qpOASES.hpp"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
