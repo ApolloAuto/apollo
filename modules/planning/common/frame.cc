@@ -284,24 +284,6 @@ bool Frame::CreateReferenceLineFromRouting(
     std::list<hdmap::RouteSegments> *segments) {
   DCHECK_NOTNULL(reference_lines);
   DCHECK_NOTNULL(segments);
-  std::vector<hdmap::RouteSegments> route_segments;
-  const auto &adc_speed = common::VehicleState::instance()->linear_velocity();
-  double look_forward_distance = (adc_speed * FLAGS_look_forward_time_sec >
-                                  FLAGS_look_forward_min_distance)
-                                     ? FLAGS_look_forward_distance
-                                     : FLAGS_look_forward_min_distance;
-
-  if (!pnc_map_->UpdatePosition(position)) {
-    AERROR << "Failed to update position: " << position.ShortDebugString()
-           << " in pnc map.";
-    return false;
-  }
-  if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
-                                  look_forward_distance, &route_segments)) {
-    AERROR << "Failed to extract segments from routing";
-    return false;
-  }
-
   std::unique_ptr<ReferenceLineSmoother> smoother;
   std::vector<double> init_t_knots;
   Spline2dSolver spline_solver(init_t_knots, smoother_config_.spline_order());
@@ -312,24 +294,10 @@ bool Frame::CreateReferenceLineFromRouting(
     smoother.reset(
         new QpSplineReferenceLineSmoother(smoother_config_, &spline_solver));
   }
-
-  for (const auto &each_segments : route_segments) {
-    hdmap::Path hdmap_path;
-    hdmap::PncMap::CreatePathFromLaneSegments(each_segments, &hdmap_path);
-    if (FLAGS_enable_smooth_reference_line) {
-      ReferenceLine reference_line;
-      if (!smoother->Smooth(ReferenceLine(hdmap_path), &reference_line)) {
-        AERROR << "Failed to smooth reference line";
-        continue;
-      }
-      reference_lines->emplace_back(std::move(reference_line));
-      segments->emplace_back(each_segments);
-    } else {
-      reference_lines->emplace_back(hdmap_path);
-      segments->emplace_back(each_segments);
-    }
-  }
-  return !reference_lines->empty();
+  const auto &adc_speed = common::VehicleState::instance()->linear_velocity();
+  return ReferenceLineProvider::CreateReferenceLineFromRouting(
+      position, adc_speed, pnc_map_.get(), smoother.get(), reference_lines,
+      segments);
 }
 
 std::string Frame::DebugString() const {

@@ -58,7 +58,7 @@ class ReferenceLineProvider {
 
   void UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
-  bool UpdateVehicleStatus(const common::PointENU& position, double speed);
+  void UpdateVehicleStatus(const common::PointENU& position, double speed);
 
   bool Start();
 
@@ -69,10 +69,15 @@ class ReferenceLineProvider {
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);
 
+  static bool CreateReferenceLineFromRouting(
+      const common::PointENU& position, double speed, hdmap::PncMap* pnc_map,
+      ReferenceLineSmoother* smoother,
+      std::list<ReferenceLine>* reference_lines,
+      std::list<hdmap::RouteSegments>* segments);
+
  private:
   void Generate();
   void IsValidReferenceLine();
-  bool CreateReferenceLineFromRouting();
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -82,6 +87,7 @@ class ReferenceLineProvider {
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
+  common::PointENU position_;
   double vehicle_speed_ = 0.0;
 
   bool has_routing_ = false;
@@ -91,8 +97,8 @@ class ReferenceLineProvider {
   bool is_stop_ = false;
 
   std::mutex reference_line_groups_mutex_;
-  std::list<std::vector<ReferenceLine>> reference_line_groups_;
-  std::list<std::vector<hdmap::RouteSegments>> route_segment_groups_;
+  std::list<std::list<ReferenceLine>> reference_line_groups_;
+  std::list<std::list<hdmap::RouteSegments>> route_segment_groups_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };
