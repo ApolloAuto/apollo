@@ -17,19 +17,22 @@
 ###############################################################################
 import math
 
-class ViewSubplot:
 
+class ViewSubplot:
     def __init__(self, ax):
-        #self.ax = ax
+        # self.ax = ax
         self.right_lane, = ax.plot(
             [-10, 10, -10, 10], [-10, 150, 150, -10],
             'bo', lw=3, alpha=0.4)
         self.left_lane, = ax.plot(
-            [0], [0], 'go', lw=3, alpha=0.4)
-        self.obstacles, =  ax.plot(
-            [0], [0], 'r.', ms=20, alpha=0.8)
+            [0], [0], 'go', lw=3, alpha=0.5)
+        self.obstacles, = ax.plot(
+            [0], [0], 'r.', ms=20, alpha=0.5)
         self.ref_lane, = ax.plot(
-            [0], [0], 'k--', lw=3, alpha=0.4)
+            [0], [0], 'k--', lw=3, alpha=0.8)
+        self.vehicle = ax.plot(
+            [-1.055, 1.055, 1.055, -1.055, -1.055], [0, 0, -4.933, -4.933, 0],
+            'r-', lw=1)
 
         self.speed_line, = ax.plot([0], [0], 'r-', lw=3, alpha=0.4)
         self.acc_line, = ax.plot([0], [0], 'y-', lw=3, alpha=1)
@@ -47,7 +50,8 @@ class ViewSubplot:
         self.right_lane.set_visible(False)
         self.ref_lane.set_visible(False)
 
-    def show(self, mobileye_data, localization_data, planning_data):
+    def show(self, mobileye_data, localization_data, planning_data,
+             chassis_data):
         self.left_lane.set_visible(True)
         self.right_lane.set_visible(True)
         self.ref_lane.set_visible(True)
@@ -57,12 +61,16 @@ class ViewSubplot:
         self.right_lane.set_ydata(mobileye_data.right_lane_y)
         self.left_lane.set_xdata(mobileye_data.left_lane_x)
         self.left_lane.set_ydata(mobileye_data.left_lane_y)
-        #self.ref_lane.set_xdata(mobileye_data.ref_lane_x)
-        #self.ref_lane.set_ydata(mobileye_data.ref_lane_y)
+        # self.ref_lane.set_xdata(mobileye_data.ref_lane_x)
+        # self.ref_lane.set_ydata(mobileye_data.ref_lane_y)
         mobileye_data.lane_data_lock.release()
 
         self.ref_lane.set_xdata(planning_data.path_x)
         self.ref_lane.set_ydata(planning_data.path_y)
+        if chassis_data.is_auto():
+            self.ref_lane.set_color('r')
+        else:
+            self.ref_lane.set_color('k')
 
         mobileye_data.obstacle_data_lock.acquire()
         self.obstacles.set_ydata(mobileye_data.obstacle_x)
@@ -70,12 +78,12 @@ class ViewSubplot:
         mobileye_data.obstacle_data_lock.release()
 
         mobileye_data.next_lane_data_lock.acquire()
-        #print range(len(mobileye_data.next_lanes_x))
+        # print range(len(mobileye_data.next_lanes_x))
         for i in range(len(mobileye_data.next_lanes_x)):
             if i >= len(self.next_lanes):
                 mobileye_data.next_lane_data_lock.release()
                 break
-            #print mobileye_data.next_lanes_x[i]
+            # print mobileye_data.next_lanes_x[i]
             self.next_lanes[i].set_xdata(mobileye_data.next_lanes_x[i])
             self.next_lanes[i].set_ydata(mobileye_data.next_lanes_y[i])
         mobileye_data.next_lane_data_lock.release()
@@ -87,14 +95,18 @@ class ViewSubplot:
         acc_x = localization_data.localization_pb.pose.linear_acceleration.x
         acc_y = localization_data.localization_pb.pose.linear_acceleration.y
         heading = localization_data.localization_pb.pose.heading
-        #print heading
-        new_speed_x = math.cos(-heading + math.pi/2)*speed_x - math.sin(-heading+ math.pi/2)* speed_y
-        new_speed_y = math.sin(-heading+ math.pi/2)*speed_x + math.cos(-heading+ math.pi/2)* speed_y
+        # print heading
+        new_speed_x = math.cos(-heading + math.pi / 2) * speed_x - math.sin(
+            -heading + math.pi / 2) * speed_y
+        new_speed_y = math.sin(-heading + math.pi / 2) * speed_x + math.cos(
+            -heading + math.pi / 2) * speed_y
 
-        new_acc_x = math.cos(-heading + math.pi/2) * acc_x - math.sin(-heading+ math.pi/2) * acc_y
-        new_acc_y = math.sin(-heading+ math.pi/2) * acc_x + math.cos(-heading+ math.pi/2) * acc_y
+        new_acc_x = math.cos(-heading + math.pi / 2) * acc_x - math.sin(
+            -heading + math.pi / 2) * acc_y
+        new_acc_y = math.sin(-heading + math.pi / 2) * acc_x + math.cos(
+            -heading + math.pi / 2) * acc_y
 
-        #self.speed_line.set_xdata([0, new_speed_x])
-        #self.speed_line.set_ydata([0, new_speed_y])
-        #self.acc_line.set_xdata([0, new_acc_x])
-        #self.acc_line.set_ydata([0, new_acc_y])
+        # self.speed_line.set_xdata([0, new_speed_x])
+        # self.speed_line.set_ydata([0, new_speed_y])
+        # self.acc_line.set_xdata([0, new_acc_x])
+        # self.acc_line.set_ydata([0, new_acc_y])
