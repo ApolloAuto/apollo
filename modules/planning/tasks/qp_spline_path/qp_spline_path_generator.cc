@@ -79,20 +79,15 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  // set reference l value using init_frenet_point_.l()
-  ref_l_ = init_frenet_point_.l();
-  ADEBUG << "ref_l_ = " << ref_l_;
-
   double start_s = init_frenet_point_.s();
+  double start_l = init_frenet_point_.l();
   double end_s = reference_line_.Length();
 
-  const double kMinPathLength = 1.0e-6;
+  constexpr double kMinPathLength = 1.0e-6;
   if (start_s + kMinPathLength > end_s) {
     AERROR << "Path length is too small. Path start_s: " << start_s
            << ", end_s: " << end_s;
     return false;
-  } else {
-    ADEBUG << "path start with " << start_s << ", end with " << end_s;
   }
 
   if (!InitSpline(start_s, end_s)) {
@@ -131,23 +126,19 @@ bool QpSplinePathGenerator::Generate(
   const Spline1d& spline = spline_generator_->spline();
   std::vector<common::PathPoint> path_points;
 
-  double start_l = ref_l_;
-  ReferencePoint ref_point =
-      reference_line_.GetReferencePoint(init_frenet_point_.s());
+  ReferencePoint ref_point = reference_line_.GetReferencePoint(start_s);
   Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
       ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), start_l);
 
-  const double x_diff = xy_point.x() - init_point.path_point().x();
-  const double y_diff = xy_point.y() - init_point.path_point().y();
+  const auto xy_diff = xy_point - Vec2d(init_point.path_point().x(),
+                                        init_point.path_point().y());
 
-  double s = init_frenet_point_.s();
-  double s_resolution =
-      (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
-  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
-  while (s + kEpsilon < end_s) {
-    double l = ref_l_;
+  double s_resolution = (end_s - start_s) / qp_spline_path_config_.num_output();
+  constexpr double kEpsilon = 1e-6;
+  for (double s = start_s; s + kEpsilon < end_s; s += s_resolution) {
+    double l = start_l;
     if (is_solved) {
-      l = spline(s) + ref_l_;
+      l += spline(s);
     }
     if (planning_debug_ &&
         planning_debug_->planning_data().sl_frame().size() >= 1) {
@@ -165,10 +156,10 @@ bool QpSplinePathGenerator::Generate(
       ddl = spline.SecondOrderDerivative(s);
     }
     ReferencePoint ref_point = reference_line_.GetReferencePoint(s);
-    Vec2d curr_xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
-        ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), l);
-    curr_xy_point.set_x(curr_xy_point.x() - x_diff);
-    curr_xy_point.set_y(curr_xy_point.y() - y_diff);
+    Vec2d curr_xy_point =
+        CartesianFrenetConverter::CalculateCartesianPoint(
+            ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), l) -
+        xy_diff;
     double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), l, dl);
     double kappa = CartesianFrenetConverter::CalculateKappa(
@@ -188,8 +179,7 @@ bool QpSplinePathGenerator::Generate(
     if (path_point.s() > end_s) {
       break;
     }
-    path_points.push_back(std::move(path_point));
-    s += s_resolution;
+    path_points.emplace_back(std::move(path_point));
   }
   path_data->SetReferenceLine(&reference_line_);
   path_data->SetDiscretizedPath(DiscretizedPath(path_points));
@@ -263,9 +253,9 @@ bool QpSplinePathGenerator::AddConstraint(
 
   // add end point constraint, equality constraint
   const double lat_shift = std::copysign(
-      std::fmin(std::fabs(ref_l_),
+      std::fmin(std::fabs(init_frenet_point_.l()),
                 qp_spline_path_config_.lane_change_lateral_shift()),
-      -ref_l_);
+      -init_frenet_point_.l());
 
   ADEBUG << "lat_shift = " << lat_shift;
   spline_constraint->AddPointConstraint(
@@ -348,10 +338,11 @@ bool QpSplinePathGenerator::AddConstraint(
     }
   }
 
+  const double start_l = init_frenet_point_.l();
   std::for_each(boundary_low.begin(), boundary_low.end(),
-                [this](double& d) { d -= this->ref_l_; });
+                [start_l](double& d) { d -= start_l; });
   std::for_each(boundary_high.begin(), boundary_high.end(),
-                [this](double& d) { d -= this->ref_l_; });
+                [start_l](double& d) { d -= start_l; });
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
                                       boundary_high)) {
     AERROR << "Add boundary constraint failed";
@@ -383,7 +374,7 @@ void QpSplinePathGenerator::AddHistoryPathKernel() {
        ++i) {
     const auto p = last_path_data.frenet_frame_path().PointAt(i);
     history_s.push_back(p.s());
-    histroy_l.push_back(p.l() - ref_l_);
+    histroy_l.push_back(p.l() - init_frenet_point_.l());
   }
 
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
@@ -395,8 +386,8 @@ void QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_path_config_.reference_line_weight() > 0.0) {
-    std::vector<double> ref_l(evaluated_s_.size(), -ref_l_);
-    const double delta_l = -ref_l_ / (evaluated_s_.size() - 1);
+    std::vector<double> ref_l(evaluated_s_.size(), -init_frenet_point_.l());
+    const double delta_l = -init_frenet_point_.l() / (evaluated_s_.size() - 1);
     for (uint32_t i = 0; i < ref_l.size(); ++i) {
       ref_l[i] += delta_l * (evaluated_s_.size() - 1 - i);
     }
