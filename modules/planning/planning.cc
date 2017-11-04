@@ -298,10 +298,17 @@ common::Status Planning::Plan(
   for (auto& reference_line_info : frame_->reference_line_info()) {
     status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
                             &reference_line_info);
-    AERROR_IF(!status.ok()) << "planner failed to make a driving plan for: "
-                            << reference_line_info.Lanes().Id();
+    if (status == Status::OK()) {
+      if (FLAGS_prioritize_change_lane && reference_line_info.IsDrivable() &&
+          reference_line_info.IsChangeLanePath()) {
+        ADEBUG << "Found change lane line, skip other reference line";
+        break;
+      }
+    } else {
+      AERROR << "planner failed to make a driving plan for: "
+             << reference_line_info.Lanes().Id();
+    }
   }
-
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(

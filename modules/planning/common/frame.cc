@@ -313,12 +313,12 @@ void Frame::AddObstacle(const Obstacle &obstacle) {
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
-  drive_reference_line_info_ = &reference_line_info_.front();
-  double reference_line_cost = drive_reference_line_info_->Cost();
+  double min_cost = std::numeric_limits<double>::infinity();
   for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.Cost() < reference_line_cost) {
+    if (reference_line_info.IsDrivable() &&
+        reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
-      reference_line_cost = reference_line_info.Cost();
+      min_cost = reference_line_info.Cost();
     }
   }
   return drive_reference_line_info_;
