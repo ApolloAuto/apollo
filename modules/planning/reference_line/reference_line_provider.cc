@@ -150,6 +150,17 @@ bool ReferenceLineProvider::GetReferenceLines(
   }
 }
 
+void ReferenceLineProvider::PrioritzeChangeLane(
+    std::vector<hdmap::RouteSegments> *route_segments) {
+  CHECK_NOTNULL(route_segments);
+  for (std::size_t i = 1; i < route_segments->size(); ++i) {
+    if (!route_segments->at(i).IsOnSegment()) {
+      std::swap(route_segments->at(0), route_segments->at(i));
+      break;
+    }
+  }
+}
+
 bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
@@ -166,6 +177,9 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
       AERROR << "Failed to extract segments from routing";
       return false;
     }
+  }
+  if (FLAGS_prioritize_change_lane) {
+    PrioritzeChangeLane(&route_segments);
   }
   for (const auto &lanes : route_segments) {
     hdmap::Path hdmap_path;

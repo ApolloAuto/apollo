@@ -70,6 +70,9 @@ DEFINE_double(spiral_smoother_piecewise_length, 10.0,
               "The piecewise length of spiral smoother.");
 DEFINE_double(spiral_reference_line_resolution, 0.02,
               "The output resolution for reference line.");
+DEFINE_bool(prioritize_change_lane, false,
+            "change lane strategy has higher priority, always use a valid "
+            "change lane path if such path exists");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
