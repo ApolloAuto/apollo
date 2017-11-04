@@ -68,6 +68,11 @@ class HdmapROIFilter : public BaseROIFilter {
               const ROIFilterOptions& roi_filter_options,
               pcl_util::PointIndices* roi_indices) override;
 
+  /**
+   * @brief: Merge junction polygons and road boundaries in a vector.
+   */
+  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
+                                  std::vector<PolygonDType>* polygons);
  protected:
   /**
    * @brief: Draw polygons into grids in bitmap and check each point whether
@@ -101,12 +106,6 @@ class HdmapROIFilter : public BaseROIFilter {
   void MergeRoadBoundariesToPolygons(
       const std::vector<RoadBoundary>& road_boundaries,
       std::vector<PolygonDType>* polygons);
-
-  /**
-   * @brief: Merge junction polygons and road boundaries in a vector.
-   */
-  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
-                                  std::vector<PolygonDType>* polygons);
 
   /**
    * @brief: After drawing polygons into grids in bitmap. We check each point

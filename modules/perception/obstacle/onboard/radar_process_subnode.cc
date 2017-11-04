@@ -77,6 +77,8 @@ bool RadarProcessSubnode::InitInternal() {
   CHECK(AdapterManager::GetRadar()) << "Radar is not initialized.";
   AdapterManager::AddRadarCallback(&RadarProcessSubnode::OnRadar,
                                         this);
+  // TODO: odometry message adapter.
+
   inited_ = true;
 
   return true;
@@ -129,13 +131,18 @@ void RadarProcessSubnode::OnRadar(
                      << ", " << position.z << "]";
         // NOTE: if call hdmap failed, using empty map_polygons.
     }
+    if (roi_filter_ != nullptr) {
+      roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
+    }
     RadarDetectorOptions options;
+
     // // 3. get car car_linear_speed
     // if (!get_car_linear_speed(timestamp, &(options.car_linear_speed))) {
     //     XLOG(ERROR) << "Failed to call get_car_linear_speed. [timestamp: "
     //                << GLOG_TIMESTAMP(timestamp);
     //     return;
     // }
+
     // 4. Call RadarDetector::detect.
     PERF_BLOCK_START();
     options.radar2world_pose = &(*radar2world_pose);
@@ -208,7 +215,16 @@ bool RadarProcessSubnode::InitFrameDependence() {
 }
 
 bool RadarProcessSubnode::InitAlgorithmPlugin() {
-  /// init tracker
+  /// init roi filter
+  roi_filter_.reset(new HdmapROIFilter());
+  if (!roi_filter_->Init()) {
+    AERROR << "Failed to Init roi filter: " << roi_filter_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, roi_filter_: "
+        << roi_filter_->name();
+
+  /// init radar detector
   radar_detector_.reset(
       BaseRadarDetectorRegisterer::GetInstanceByName(FLAGS_onboard_radar_detector));
   if (!radar_detector_) {

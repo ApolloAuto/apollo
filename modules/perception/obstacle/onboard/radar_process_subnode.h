@@ -26,6 +26,8 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/detector/modest/modest_radar_detector.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
@@ -70,6 +72,8 @@ class RadarProcessSubnode : public Subnode {
 
   std::unique_ptr<BaseRadarDetector> radar_detector_;
   HDMapInput* hdmap_input_ = NULL;
+  // here we use HdmapROIFilter
+  std::unique_ptr<HdmapROIFilter> roi_filter_;
 };
 
 REGISTER_SUBNODE(RadarProcessSubnode);

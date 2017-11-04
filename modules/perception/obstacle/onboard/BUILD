@@ -125,6 +125,7 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/onboard:perception_onboard",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
