@@ -31,6 +31,7 @@ cc_library(
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:road_graph",
         "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/evaluator/network:rnn_model",
         "@eigen//:eigen",
     ],
 )
