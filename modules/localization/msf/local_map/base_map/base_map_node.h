@@ -32,6 +32,8 @@ public:
 
     /**@brief Save the map node to the disk. */
     bool save();
+    /**@brief Save intensity image of node. */
+    bool save_intensity_image() const;
     /**@brief Load the map node from the disk. */
     bool load();
     bool load(const char* filename);
@@ -154,6 +156,8 @@ protected:
     virtual unsigned int create_body_binary(std::vector<unsigned char> &buf) const;
     /**@brief Get the size of the body in bytes. */
     virtual unsigned int get_body_binary_size() const;
+    /**@brief Save intensity image of node. */
+    bool save_intensity_image(const std::string& path) const;
 
     /**@brief The map settings. */
     const BaseMapConfig* _map_config;

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <assert.h>
+#include <opencv2/opencv.hpp>
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
 namespace apollo {
@@ -33,6 +34,8 @@ public:
     virtual unsigned int create_binary(unsigned char * buf, unsigned int buf_size) const = 0;
     /**@brief Get the binary size of the object. */
     virtual unsigned int get_binary_size() const = 0;
+    /**@brief get intensity image of node. */
+    virtual void get_intensity_img(cv::Mat &intensity_img) const = 0;
 };
 
 } // namespace msf

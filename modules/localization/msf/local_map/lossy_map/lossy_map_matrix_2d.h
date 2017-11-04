@@ -65,6 +65,8 @@ public:
     virtual unsigned int create_binary(unsigned char * buf, unsigned int buf_size) const;
     /**@brief Get the binary size of the object. */
     virtual unsigned int get_binary_size() const;
+    /**@brief get intensity image of node. */
+    virtual void get_intensity_img(cv::Mat &intensity_img) const;
 
     inline LossyMapCell2D* operator [] (int row) {
         return _map_cells + row * _cols;

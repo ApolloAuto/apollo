@@ -59,6 +59,7 @@ void BaseMapNode::reset_map_node() {
 // }
 
 bool BaseMapNode::save() {
+    save_intensity_image();
     char buf[1024];
     std::string path = _map_config->_map_folder_path;
     if (!create_map_directory(path)) {
@@ -94,6 +95,8 @@ bool BaseMapNode::save() {
     }
     snprintf(buf, 1024, "/%08u", abs(_index._n));
     path = path + buf;
+
+    std::cout << "Save node: " << path << std::endl;
 
     FILE * file = fopen(path.c_str(), "wb");
     if (file) {
@@ -411,6 +414,53 @@ bool BaseMapNode::create_map_directory(const std::string& path) const {
     else {
         return system::create_directory(path);
     }
+}
+
+bool BaseMapNode::save_intensity_image() const {
+    char buf[1024];
+    std::string path = _map_config->_map_folder_path;
+    if (!create_map_directory(path)) {
+        return false;
+    }
+    path = path + "/image";
+    if (!create_map_directory(path)) {
+        return false;
+    }
+    snprintf(buf, 1024, "/%03u", _index._resolution_id);
+    path = path + buf;
+    if (!create_map_directory(path)) {
+        return false;
+    }
+    if (_index._zone_id > 0) {
+        path = path + "/north";
+    }
+    else {
+        path = path + "/south";
+    }
+    if (!create_map_directory(path)) {
+        return false;
+    }
+    snprintf(buf, 1024, "/%02d", abs(_index._zone_id));
+    path = path + buf;
+    if (!create_map_directory(path)) {
+        return false;
+    }
+    snprintf(buf, 1024, "/%08u", abs(_index._m));
+    path = path + buf;
+    if (!create_map_directory(path)) {
+        return false;
+    }
+    snprintf(buf, 1024, "/%08u.png", abs(_index._n));
+    path = path + buf;
+    bool success0 = save_intensity_image(path);
+    return success0;
+}
+
+bool BaseMapNode::save_intensity_image(const std::string& path) const {
+    cv::Mat image;
+    _map_matrix->get_intensity_img(image);
+    bool success = cv::imwrite(path, image);
+    return success;
 }
 
 } // namespace msf

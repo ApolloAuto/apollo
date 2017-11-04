@@ -400,6 +400,17 @@ unsigned int LossyMapMatrix2D::get_binary_size() const {
     return target_size;
 }
 
+void LossyMapMatrix2D::get_intensity_img(cv::Mat &intensity_img) const {
+    intensity_img = cv::Mat(cv::Size(_cols, _rows), CV_8UC1);
+
+    for (int y = 0; y < _rows; ++y) {
+        for (int x = 0; x < _cols; ++x) {
+            unsigned int id = y * _cols + x;
+            intensity_img.at<unsigned char>(y, x) = (unsigned char)(_map_cells[id].intensity);
+        }
+    }
+}
+
 } // namespace msf
 } // namespace localization
 } // namespace apollo

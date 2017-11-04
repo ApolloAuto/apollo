@@ -75,11 +75,12 @@ void BaseMapConfig::load_xml(boost::property_tree::ptree& config) {
     BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
             config.get_child("map.map_config.resolutions")) {
         _map_resolutions.push_back(atof(v.second.data().c_str()));
-        std::cerr << "Resolution: " << v.second.data() << std::endl;
+        std::cout << "Resolution: " << v.second.data() << std::endl;
     }
     BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
             config.get_child("map.map_record.datasets")) {
         _map_datasets.push_back(v.second.data());
+        std::cout << "Dataset: " << v.second.data() << std::endl;
     }
     return;
 }

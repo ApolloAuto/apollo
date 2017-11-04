@@ -8,6 +8,8 @@ cc_library(
         "compression.cc",
         "system_utility.cc",
         "timer.cc",
+        "extract_ground_plane.h", 
+        "voxel_grid_covariance_hdmap.h"
     ],
     hdrs = [
         "compression.h",
