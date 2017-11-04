@@ -26,7 +26,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/frame.h"

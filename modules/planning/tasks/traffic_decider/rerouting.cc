@@ -25,7 +25,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/dropbox.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -77,7 +77,7 @@ bool Rerouting::ChangeLaneFailRerouting(
   // 5. If the end of current passage region is further than kPrepareRoutingTime
   // * speed, no rerouting
   double adc_s = reference_line_info->AdcSlBoundary().end_s();
-  const auto* vehicle_state = common::VehicleState::instance();
+  const auto* vehicle_state = common::VehicleStateProvider::instance();
   double speed = vehicle_state->linear_velocity();
   const double prepare_distance = speed * FLAGS_prepare_rerouting_time;
   if (sl_point.s() > adc_s + prepare_distance) {

@@ -16,7 +16,7 @@
 /**
  * @file vehicle_state.h
  *
- * @brief Declaration of the class VehicleState.
+ * @brief Declaration of the class VehicleStateProvider.
  */
 #ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 #define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
@@ -40,12 +40,12 @@ namespace apollo {
 namespace common {
 
 /**
- * @class VehicleState
+ * @class VehicleStateProvider
  * @brief The class of vehicle state.
  *        It includes basic information and computation
  *        about the state of the vehicle.
  */
-class VehicleState {
+class VehicleStateProvider {
  public:
   /**
    * @brief Constructor by information of localization and chassis.
@@ -56,7 +56,7 @@ class VehicleState {
                 const canbus::Chassis& chassis);
 
   /**
-   * @brief Update VehicleState instance by protobuf files.
+   * @brief Update VehicleStateProvider instance by protobuf files.
    * @param localization_file the localization protobuf file.
    * @param chassis_file The chassis protobuf file
    */
@@ -70,7 +70,7 @@ class VehicleState {
   /**
    * @brief Default destructor.
    */
-  virtual ~VehicleState() = default;
+  virtual ~VehicleStateProvider() = default;
 
   /**
    * @brief Get the x-coordinate of vehicle position.
@@ -224,8 +224,7 @@ class VehicleState {
    *        the vehicle's center of mass.
    * @return The position of the vehicle's center of mass.
    */
-  math::Vec2d ComputeCOMPosition(
-      const double rear_to_com_distance) const;
+  math::Vec2d ComputeCOMPosition(const double rear_to_com_distance) const;
 
   /**
    * @brief Compute the bouding box of the vehicle.
@@ -234,7 +233,7 @@ class VehicleState {
   const math::Box2d& AdcBoundingBox() const;
 
  private:
-  DECLARE_SINGLETON(VehicleState);
+  DECLARE_SINGLETON(VehicleStateProvider);
 
   void InitAdcBoundingBox();
 

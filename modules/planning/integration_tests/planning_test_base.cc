@@ -20,7 +20,7 @@
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "modules/common/log.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
