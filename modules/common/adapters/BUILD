@@ -29,6 +29,7 @@ cc_library(
         "//modules/common",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/monitor/proto:monitor_proto",
+        "//modules/common/transform_listener",
         "//modules/common/util",
         "@glog//:glog",
         "@ros//:ros_common",
