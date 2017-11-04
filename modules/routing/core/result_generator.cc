@@ -379,7 +379,7 @@ bool ResultGenerator::GeneratePassageRegion(
     const std::string& map_version, const RoutingRequest& request,
     const std::vector<NodeWithRange>& nodes,
     const TopoRangeManager& range_manager, RoutingResponse* const result) {
-  AdapterManager::FillRoutingResponseHeader(FLAGS_node_name, result);
+  AdapterManager::FillRoutingResponseHeader(FLAGS_routing_node_name, result);
 
   if (!GeneratePassageRegion(nodes, range_manager, result)) {
     return false;
