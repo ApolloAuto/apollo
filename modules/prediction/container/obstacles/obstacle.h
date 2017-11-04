@@ -150,6 +150,8 @@ class Obstacle {
 
   void InitRNNStates();
 
+  bool rnn_enabled() const;
+
  private:
   common::ErrorCode SetId(
       const perception::PerceptionObstacle& perception_obstacle,

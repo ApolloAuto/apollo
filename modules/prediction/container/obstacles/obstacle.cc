@@ -1063,5 +1063,9 @@ void Obstacle::InitRNNStates() {
   }
 }
 
+bool Obstacle::rnn_enabled() const {
+  return rnn_enabled_;
+}
+
 }  // namespace prediction
 }  // namespace apollo
