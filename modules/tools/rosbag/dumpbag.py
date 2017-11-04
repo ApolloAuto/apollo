@@ -36,14 +36,22 @@ def write_to_file(file_path, topic_pb):
     f.close()
 
 
-def dump_bag(in_bag, out_dir, filter_topic):
+def dump_bag(in_bag, out_dir, start_time, duration, filter_topic):
     """out_bag = in_bag + routing_bag"""
     bag = rosbag.Bag(in_bag, 'r')
     seq = 0
     for topic, msg, t in bag.read_messages():
+        t_sec = t.secs + t.nsecs / 1.0e9;
+        if start_time and t_sec < start_time:
+            print "not yet reached the start time"
+            continue
+        if start_time and t_sec >= start_time + duration:
+            print "done"
+            break
         if topic == "/apollo/sensor/mobileye":
             continue
-        if not filter_topic or (filter_topic and topic == filter_topic):
+        if not filter_topic or topic == filter_topic:
+            print "export at time ", t
             message_file = topic.replace("/", "_")
             file_path = os.path.join(out_dir,
                                      str(seq) + message_file + ".pb.txt")
@@ -57,6 +65,10 @@ if __name__ == "__main__":
         "A tool to dump the protobuf messages in a ros bag into text files")
     parser.add_argument(
         "in_rosbag", action="store", type=str, help="the input ros bag")
+    parser.add_argument(
+        "--start_time", action="store", type=float, help="the input ros bag")
+    parser.add_argument(
+        "--duration", action="store", type=float, default=1.0, help="the input ros bag")
     parser.add_argument(
         "out_dir",
         action="store",
@@ -72,4 +84,4 @@ if __name__ == "__main__":
     if os.path.exists(args.out_dir):
         shutil.rmtree(args.out_dir)
     os.makedirs(args.out_dir)
-    dump_bag(args.in_rosbag, args.out_dir, args.topic)
+    dump_bag(args.in_rosbag, args.out_dir, args.start_time, args.duration, args.topic)
