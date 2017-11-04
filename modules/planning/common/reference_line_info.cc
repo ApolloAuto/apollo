@@ -186,6 +186,14 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   return true;
 }
 
+void ReferenceLineInfo::SetDriable(bool drivable) { is_drivable_ = drivable; }
+
+bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
+
+bool ReferenceLineInfo::IsChangeLanePath() const {
+  return !Lanes().IsOnSegment();
+}
+
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
   return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
                                       "speed_data:", speed_data_.DebugString());
