@@ -57,16 +57,11 @@ void ReferenceLineProvider::UpdateRoutingResponse(
   has_routing_ = true;
 }
 
-bool ReferenceLineProvider::UpdateVehicleStatus(
+void ReferenceLineProvider::UpdateVehicleStatus(
     const common::PointENU &position, double speed) {
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
   vehicle_speed_ = speed;
-  if (!pnc_map_->UpdatePosition(position)) {
-    AERROR << "Failed to update pnc_map position: "
-           << position.ShortDebugString();
-    return false;
-  }
-  return true;
+  position_ = position;
 }
 
 bool ReferenceLineProvider::Start() {
@@ -86,20 +81,43 @@ void ReferenceLineProvider::Stop() {
 }
 
 void ReferenceLineProvider::Generate() {
+  constexpr int32_t kSleepTime = 200;  // milliseconds
   while (!is_stop_) {
+    std::this_thread::sleep_for(
+        std::chrono::duration<double, std::milli>(kSleepTime));
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
-      constexpr int32_t kRoutingNotReadySleepTimeMs = 500;  // milliseconds
-      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
-          kRoutingNotReadySleepTimeMs));
       continue;
     }
-    if (!CreateReferenceLineFromRouting()) {
-      AERROR << "Fail to get reference line";
+    std::list<ReferenceLine> reference_lines;
+    std::list<hdmap::RouteSegments> segments;
+    std::unique_ptr<ReferenceLineSmoother> smoother;
+    if (FLAGS_enable_spiral_reference_line) {
+      double max_deviation = FLAGS_spiral_smoother_max_deviation;
+      smoother.reset(new SpiralReferenceLineSmoother(max_deviation));
+    } else {
+      smoother.reset(new QpSplineReferenceLineSmoother(smoother_config_,
+                                                       spline_solver_.get()));
     }
-    constexpr int32_t kReferenceLineProviderSleepTime = 200;
-    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(
-        kReferenceLineProviderSleepTime));
+    {
+      std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+      if (!CreateReferenceLineFromRouting(position_, vehicle_speed_,
+                                          pnc_map_.get(), smoother.get(),
+                                          &reference_lines, &segments)) {
+        AERROR << "Fail to get reference line";
+        continue;
+      }
+    }
+    if (!reference_lines.empty()) {
+      std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
+      reference_line_groups_.emplace_back(reference_lines);
+      route_segment_groups_.emplace_back(segments);
+      const size_t kMaxStoredReferenceLineGroups = 3;
+      while (reference_line_groups_.size() > kMaxStoredReferenceLineGroups) {
+        reference_line_groups_.pop_front();
+        route_segment_groups_.pop_front();
+      }
+    }
   }
 }
 
@@ -129,33 +147,28 @@ bool ReferenceLineProvider::GetReferenceLines(
   return true;
 }
 
-bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
+bool ReferenceLineProvider::CreateReferenceLineFromRouting(
+    const common::PointENU &position, double speed, hdmap::PncMap *pnc_map,
+    ReferenceLineSmoother *smoother, std::list<ReferenceLine> *reference_lines,
+    std::list<hdmap::RouteSegments> *segments) {
+  if (!pnc_map->UpdatePosition(position)) {
+    AERROR << "Failed to update position: " << position.ShortDebugString()
+           << " in pnc map.";
+    return false;
+  }
   std::vector<hdmap::RouteSegments> route_segments;
-
-  double look_forward_distance = (vehicle_speed_ * FLAGS_look_forward_time_sec >
-                                  FLAGS_look_forward_min_distance)
-                                     ? FLAGS_look_forward_distance
-                                     : FLAGS_look_forward_min_distance;
+  double look_forward_distance =
+      (speed * FLAGS_look_forward_time_sec > FLAGS_look_forward_min_distance)
+          ? FLAGS_look_forward_distance
+          : FLAGS_look_forward_min_distance;
   {
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
-                                    look_forward_distance, &route_segments)) {
+    if (!pnc_map->GetRouteSegments(FLAGS_look_backward_distance,
+                                   look_forward_distance, &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
     }
   }
 
-  std::unique_ptr<ReferenceLineSmoother> smoother;
-  if (FLAGS_enable_spiral_reference_line) {
-    double max_deviation = FLAGS_spiral_smoother_max_deviation;
-    smoother.reset(new SpiralReferenceLineSmoother(max_deviation));
-  } else {
-    smoother.reset(new QpSplineReferenceLineSmoother(smoother_config_,
-                                                     spline_solver_.get()));
-  }
-
-  std::vector<ReferenceLine> reference_lines;
-  std::vector<hdmap::RouteSegments> segments;
   for (const auto &lanes : route_segments) {
     hdmap::Path hdmap_path;
     hdmap::PncMap::CreatePathFromLaneSegments(lanes, &hdmap_path);
@@ -184,29 +197,18 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting() {
         }
       }
       if (is_valid_reference_line) {
-        reference_lines.push_back(std::move(reference_line));
-        segments.emplace_back(lanes);
+        reference_lines->emplace_back(std::move(reference_line));
+        segments->emplace_back(lanes);
       }
     } else {
-      reference_lines.emplace_back(hdmap_path);
-      segments.emplace_back(lanes);
+      reference_lines->emplace_back(hdmap_path);
+      segments->emplace_back(lanes);
     }
   }
 
-  if (reference_lines.empty()) {
+  if (reference_lines->empty()) {
     AERROR << "No smooth reference lines available";
     return false;
-  }
-
-  if (!reference_lines.empty()) {
-    std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
-    reference_line_groups_.emplace_back(reference_lines);
-    route_segment_groups_.emplace_back(route_segments);
-    const size_t kMaxStoredReferenceLineGroups = 3;
-    while (reference_line_groups_.size() > kMaxStoredReferenceLineGroups) {
-      reference_line_groups_.pop_front();
-      route_segment_groups_.pop_front();
-    }
   }
 
   return true;
