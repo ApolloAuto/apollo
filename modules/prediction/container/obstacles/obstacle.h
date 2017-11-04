@@ -148,6 +148,8 @@ class Obstacle {
 
   void SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states);
 
+  void GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states);
+
   void InitRNNStates();
 
   bool rnn_enabled() const;
