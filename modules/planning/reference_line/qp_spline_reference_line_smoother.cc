@@ -180,12 +180,11 @@ bool QpSplineReferenceLineSmoother::AddConstraint(
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
-  static constexpr double kFixedBoundLimit = 0.01;
+  static constexpr double kFixedBoundLimit = 1.0e-6;
   if (longitudinal_bound.size() > 0) {
     longitudinal_bound.front() = kFixedBoundLimit;
     longitudinal_bound.back() = kFixedBoundLimit;
   }
-
   if (lateral_bound.size() > 0) {
     lateral_bound.front() = kFixedBoundLimit;
     lateral_bound.back() = kFixedBoundLimit;

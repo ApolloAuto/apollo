@@ -83,7 +83,7 @@ em_planner_config {
         history_path_weight: 0.0
         lane_change_mid_l: 0.0
         point_constraint_s_position: 110.0
-        lane_change_lateral_shift: 1.3
+        lane_change_lateral_shift: 1.5
     }
     qp_st_speed_config {
         total_path_length: 250.0
