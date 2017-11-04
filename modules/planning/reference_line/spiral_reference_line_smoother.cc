@@ -182,7 +182,6 @@ bool SpiralReferenceLineSmoother::Smooth(
 
     start_s = ptr_smoothed_point2d->back().s();
   }
-
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
 }
