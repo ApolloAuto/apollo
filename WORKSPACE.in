@@ -138,15 +138,6 @@ new_http_archive(
     url = "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip",
 )
 
-# qpOASES
-new_http_archive(
-    name = "qp_oases",
-    build_file = "third_party/qp_oases.BUILD",
-    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
-    strip_prefix = "qp-oases-3.2.1-1",
-    url = "https://github.com/startcode/qp-oases/archive/v3.2.1-1.zip",
-)
-
 #IpOpt
 new_local_repository(
     name = "ipopt",
