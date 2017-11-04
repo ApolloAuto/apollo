@@ -21,6 +21,7 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <mutex>
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -59,7 +60,48 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
-  // TODO(all) continue implement
+  Eigen::MatrixXf obstacle_feature_mat;
+  std::unordered_map<int, Eigen::MatrixXf> lane_feature_mats;
+  std::unique_lock<std::mutex> lock(mutex_, std::defer_lock);
+  if (ExtractFeatureValues(obstacle_ptr,
+          &obstacle_feature_mat, &lane_feature_mats) != 0) {
+    AWARN << "Fail to extract feature from obstacle";
+    return;
+  }
+  if (obstacle_feature_mat.rows() != 1 ||
+      obstacle_feature_mat.size() != dim_obstacle_feature_) {
+    AWARN << "Dim of obstacle feature is wrong!";
+    return;
+  }
+
+  Eigen::MatrixXf prob_mat;
+  std::vector<Eigen::MatrixXf> states;
+  if (!obstacle_ptr->rnn_enabled()) {
+    obstacle_ptr->InitRNNStates();
+  }
+  obstacle_ptr->GetRNNStates(&states);
+  lock.lock();
+
+  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence = lane_graph_ptr->mutable_lane_sequence(i);
+    int seq_id = lane_sequence->lane_sequence_id();
+    const Eigen::MatrixXf& lane_feature_mat = lane_feature_mats[seq_id];
+    if (lane_feature_mat.cols() != dim_lane_point_feature_) {
+      AWARN << "Lane feature dim of seq-" << seq_id << " is wrong!";
+      continue;
+    }
+    // TODO(all) solve the following
+    // model_ptr_->SetState(states);
+    // model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &prob_mat);
+    if (std::isnan(prob_mat(0, 0)) || std::isinf(prob_mat(0, 0))) {
+      AWARN << "Fail to compute probability.";
+      continue;
+    }
+  }
+  // TODO(all) solve the following
+  // model_ptr_->State(&states);
+  lock.unlock();
+  // obstacle_ptr->SetRNNStates(states);
 }
 
 void RNNEvaluator::Clear() {}
@@ -80,7 +122,7 @@ int RNNEvaluator::ExtractFeatureValues(
   std::vector<float> lane_feature;
   if (SetupObstacleFeature(obstacle, &obstacle_features) != 0) {
     AWARN << "[RnnPlugin] Reset rnn";
-    // TODO(all) obstacle->init_rnn_state();
+    obstacle->InitRNNStates();
   }
   if (static_cast<int>(obstacle_features.size()) != dim_obstacle_feature_) {
     AINFO << "Fail to setup obstacle feature!";

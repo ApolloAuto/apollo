@@ -1051,6 +1051,10 @@ void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
   rnn_states_ = rnn_states;
 }
 
+void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
+  rnn_states = &rnn_states_;
+}
+
 void Obstacle::InitRNNStates() {
   if (network::RnnModel::instance()->IsOk()) {
     network::RnnModel::instance()->ResetState();
