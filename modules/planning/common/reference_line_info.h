@@ -94,6 +94,18 @@ class ReferenceLineInfo {
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
+  /**
+   * Check if the current reference line is a change lane reference line, i.e.,
+   * ADC's current position is not on this reference line.
+   */
+  bool IsChangeLanePath() const;
+  /**
+   * Set if the vehicle can drive following this reference line
+   * A planner need to set this value to true if the reference line is OK
+   */
+  void SetDriable(bool drivable);
+  bool IsDrivable() const;
+
   const hdmap::RouteSegments& Lanes() const;
 
   void ExportDecision(DecisionResult* decision_result) const;
@@ -113,6 +125,8 @@ class ReferenceLineInfo {
    * line. The lower the better.
    */
   double cost_ = 0.0;
+
+  bool is_drivable_ = false;
 
   PathDecision path_decision_;
 

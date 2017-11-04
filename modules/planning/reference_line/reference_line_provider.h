@@ -83,6 +83,7 @@ class ReferenceLineProvider {
  private:
   void GenerateThread();
   void IsValidReferenceLine();
+  void PrioritzeChangeLane(std::vector<hdmap::RouteSegments>* route_segments);
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);

@@ -158,6 +158,9 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   reference_line_info->SetTrajectory(trajectory);
+  if (ret == Status::OK()) {  // vehicle can drive on this reference line.
+    reference_line_info->SetDriable(true);
+  }
   return ret;
 }
 
