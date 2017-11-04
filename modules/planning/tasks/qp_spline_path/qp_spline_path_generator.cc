@@ -181,7 +181,7 @@ bool QpSplinePathGenerator::Generate(
           common::util::DistanceXY(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
       if (distance > 1e-4) {
-        path_point.set_dkappa((kappa - path_points.back().dkappa()) / distance);
+        path_point.set_dkappa((kappa - path_points.back().kappa()) / distance);
       }
     }
 
