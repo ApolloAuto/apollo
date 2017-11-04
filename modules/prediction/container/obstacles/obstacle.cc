@@ -29,6 +29,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/evaluator/network/rnn_model.h"
 
 namespace apollo {
 namespace prediction {
@@ -1043,6 +1044,22 @@ void Obstacle::Trim() {
   if (count > 0) {
     ADEBUG << "Obstacle [" << id_ << "] trimmed " << count
            << " historical features";
+  }
+}
+
+void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
+  rnn_states_ = rnn_states;
+}
+
+void Obstacle::InitRNNStates() {
+  if (network::RnnModel::instance()->IsOk()) {
+    network::RnnModel::instance()->ResetState();
+    network::RnnModel::instance()->State(&rnn_states_);
+    rnn_enabled_ = true;
+    ADEBUG << "Success to initialize rnn model.";
+  } else {
+    AWARN << "Fail to initialize rnn model.";
+    rnn_enabled_ = false;
   }
 }
 
