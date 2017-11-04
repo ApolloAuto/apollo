@@ -34,18 +34,18 @@ public:
     ~ContiRadarIDExpansion() {}
 
     void ExpandIds(RadarObsArray& radar_obs) {
-        skip_outdated_objects(radar_obs);
-        for (size_t i = 0; i < radar_obs.contiobs_size(); ++i) {
+        SkipOutdatedObjects(radar_obs);
+        for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
             ContiRadarObs& contiobs = *(radar_obs.mutable_contiobs(i));
             int id = contiobs.obstacle_id();
             int meas_state = contiobs.meas_state();
             if (/*_need_restart || */need_inner_restart_ || meas_state == CONTI_NEW) {
-                int next_id = get_next_id();
+                int next_id = GetNextId();
                 local2global_[id] = next_id;
             } else {
                 auto it = local2global_.find(id);
                 if (it == local2global_.end()) {
-                    int next_id = get_next_id();
+                    int next_id = GetNextId();
                     local2global_[id] = next_id;
                 }
             }
@@ -55,9 +55,8 @@ public:
     void SkipOutdatedObjects(RadarObsArray& radar_obs) {
         RadarObsArray out_obs;
         double timestamp = radar_obs.measurement_time() - 1e-6;
-        int cnt = 0;
         need_inner_restart_ = false;
-        for (size_t i = 0; i < radar_obs.contiobs_size(); ++i) {
+        for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
             ContiRadarObs& contiobs = *(radar_obs.mutable_contiobs(i));
             double object_timestamp = double(contiobs.header().radar_timestamp()) / 1e9;
             if (object_timestamp > timestamp) {
@@ -94,7 +93,7 @@ private:
     bool need_restart_;
     bool need_inner_restart_;
     double timestamp_;
-    std::map<int, int> _local2global;
+    std::map<int, int> local2global_;
 };
 
 } // namespace perception

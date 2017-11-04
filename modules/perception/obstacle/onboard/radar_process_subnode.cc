@@ -85,8 +85,9 @@ bool RadarProcessSubnode::InitInternal() {
 }
 
 void RadarProcessSubnode::OnRadar(
-    const RadarObsArray& radar_obs_proto) {
- PERF_FUNCTION("RadarProcess");
+    const RadarObsArray& radar_obs) {
+    PERF_FUNCTION("RadarProcess");
+    RadarObsArray radar_obs_proto = radar_obs;
     double timestamp = radar_obs_proto.measurement_time();
     double unix_timestamp = timestamp;
     const double cur_time = common::time::Clock::NowInSecond();
@@ -102,6 +103,9 @@ void RadarProcessSubnode::OnRadar(
         return;
     }
 
+    _conti_id_expansion.UpdateTimestamp(timestamp);
+    _conti_id_expansion.ExpandIds(radar_obs_proto);
+
     if (fabs(timestamp - 0.0) < 10e-6) {
         AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);
         return;
@@ -109,6 +113,7 @@ void RadarProcessSubnode::OnRadar(
     ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
             << " num_raw_obstacles: " << radar_obs_proto.delphiobs_size() << "]";
 
+  // 1. get radar pose
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
   if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
     AERROR << "failed to get trans at timestamp: " << timestamp;

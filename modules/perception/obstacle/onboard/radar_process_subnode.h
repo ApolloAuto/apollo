@@ -30,6 +30,7 @@
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/detector/modest/modest_radar_detector.h"
+#include "modules/perception/obstacle/radar/detector/modest/conti_radar_id_expansion.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
@@ -52,7 +53,7 @@ class RadarProcessSubnode : public Subnode {
  private:
   bool InitInternal() override;
 
-  void OnRadar(const RadarObsArray& radar_obs_proto);
+  void OnRadar(const RadarObsArray& radar_obs);
 
   void RegistAllAlgorithm();
   bool InitFrameDependence();
@@ -70,6 +71,7 @@ class RadarProcessSubnode : public Subnode {
   RadarFrontObjectData* radar_data_ = nullptr;
   std::string device_id_;
 
+  ContiRadarIDExpansion _conti_id_expansion;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
   HDMapInput* hdmap_input_ = NULL;
   // here we use HdmapROIFilter
