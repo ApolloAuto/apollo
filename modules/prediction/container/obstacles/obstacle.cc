@@ -52,6 +52,8 @@ double Damp(const double x, const double sigma) {
 
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
+//Obstacle::Obstacle() : rnn_enabled_(false) {}
+
 int Obstacle::id() const {
   std::lock_guard<std::mutex> lock(mutex_);
   return id_;
@@ -1070,6 +1072,7 @@ void Obstacle::InitRNNStates() {
 }
 
 bool Obstacle::rnn_enabled() const {
+  AINFO << "-----prediction rnn enable" << rnn_enabled_;
   return rnn_enabled_;
 }
 

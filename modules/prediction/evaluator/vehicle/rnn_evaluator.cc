@@ -297,7 +297,6 @@ bool RNNEvaluator::IsCutinInHistory(const std::string& curr_lane_id,
     return true;
   }
   return false;
-}
 
 }  // namespace prediction
 }  // namespace apollo
