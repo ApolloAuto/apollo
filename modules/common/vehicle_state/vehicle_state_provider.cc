@@ -20,7 +20,6 @@
 
 #include "Eigen/Core"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
@@ -42,38 +41,19 @@ Status VehicleStateProvider::Update(
     return Status(ErrorCode::LOCALIZATION_ERROR, msg);
   }
   if (chassis.has_header() && chassis.header().has_timestamp_sec()) {
-    timestamp_ = chassis.header().timestamp_sec();
+    vehicle_state_.set_timestamp(chassis.header().timestamp_sec());
   }
   if (chassis.has_speed_mps()) {
-    linear_v_ = chassis.speed_mps();
+    vehicle_state_.set_linear_velocity(chassis.speed_mps());
   }
 
   if (chassis.has_gear_location()) {
-    gear_ = chassis.gear_location();
+    vehicle_state_.set_gear(chassis.gear_location());
   } else {
-    gear_ = canbus::Chassis::GEAR_NONE;
+    vehicle_state_.set_gear(canbus::Chassis::GEAR_NONE);
   }
 
-  InitAdcBoundingBox();
-
   return Status::OK();
-}
-
-void VehicleStateProvider::InitAdcBoundingBox() {
-  const auto &param =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  math::Vec2d position(x_, y_);
-  math::Vec2d vec_to_center(
-      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
-      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
-  math::Vec2d center(position + vec_to_center.rotate(heading_));
-  adc_bounding_box_ = std::unique_ptr<math::Box2d>(
-      new math::Box2d(center, heading_, param.length(), param.width()));
-}
-
-const math::Box2d &VehicleStateProvider::AdcBoundingBox() const {
-  CHECK(adc_bounding_box_) << "ADC bounding box not initialized";
-  return *adc_bounding_box_;
 }
 
 bool VehicleStateProvider::ConstructExceptLinearVelocity(
@@ -82,20 +62,21 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     AERROR << "Invalid localization input.";
     return false;
   }
-  pose_ = localization.pose();
+  vehicle_state_.mutable_pose()->CopyFrom(localization.pose());
   if (localization.pose().has_position()) {
-    x_ = localization.pose().position().x();
-    y_ = localization.pose().position().y();
-    z_ = localization.pose().position().z();
+    vehicle_state_.set_x(localization.pose().position().x());
+    vehicle_state_.set_y(localization.pose().position().y());
+    vehicle_state_.set_z(localization.pose().position().z());
   }
 
   const auto &orientation = localization.pose().orientation();
 
   if (localization.pose().has_heading()) {
-    heading_ = localization.pose().heading();
+    vehicle_state_.set_heading(localization.pose().heading());
   } else {
-    heading_ = math::QuaternionToHeading(orientation.qw(), orientation.qx(),
-                                         orientation.qy(), orientation.qz());
+    vehicle_state_.set_heading(
+        math::QuaternionToHeading(orientation.qw(), orientation.qx(),
+                                  orientation.qy(), orientation.qz()));
   }
 
   if (FLAGS_enable_map_reference_unify) {
@@ -104,137 +85,141 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
                 "when FLAGS_enable_map_reference_unify is true.";
       return false;
     }
-    angular_v_ = localization.pose().angular_velocity_vrf().z();
+    vehicle_state_.set_angular_velocity(
+        localization.pose().angular_velocity_vrf().z());
 
     if (!localization.pose().has_linear_acceleration_vrf()) {
       AERROR << "localization.pose().has_linear_acceleration_vrf() must be "
                 "true when FLAGS_enable_map_reference_unify is true.";
       return false;
     }
-    linear_a_y_ = localization.pose().linear_acceleration_vrf().y();
+    vehicle_state_.set_linear_acceleration(
+        localization.pose().linear_acceleration_vrf().y());
   } else {
     CHECK(localization.pose().has_angular_velocity());
-    angular_v_ = localization.pose().angular_velocity().z();
+    vehicle_state_.set_angular_velocity(
+        localization.pose().angular_velocity().z());
     CHECK(localization.pose().has_linear_acceleration());
-    linear_a_y_ = localization.pose().linear_acceleration().y();
+    vehicle_state_.set_linear_acceleration(
+        localization.pose().linear_acceleration().y());
   }
 
-  if (!(linear_v_ > 0.0)) {
-    kappa_ = 0.0;
+  if (!(vehicle_state_.linear_velocity() > 0.0)) {
+    vehicle_state_.set_kappa(0.0);
   } else {
-    kappa_ = angular_v_ / linear_v_;
+    vehicle_state_.set_kappa(vehicle_state_.angular_velocity() /
+                             vehicle_state_.linear_velocity());
   }
 
   if (localization.pose().has_euler_angles()) {
-    roll_ = localization.pose().euler_angles().x();
-    pitch_ = localization.pose().euler_angles().y();
-    yaw_ = localization.pose().euler_angles().z();
+    vehicle_state_.set_roll(localization.pose().euler_angles().x());
+    vehicle_state_.set_pitch(localization.pose().euler_angles().y());
+    vehicle_state_.set_yaw(localization.pose().euler_angles().z());
   } else {
     math::EulerAnglesZXYd euler_angle(orientation.qw(), orientation.qx(),
                                       orientation.qy(), orientation.qz());
-    roll_ = euler_angle.roll();
-    pitch_ = euler_angle.pitch();
-    yaw_ = euler_angle.yaw();
+    vehicle_state_.set_roll(euler_angle.roll());
+    vehicle_state_.set_pitch(euler_angle.pitch());
+    vehicle_state_.set_yaw(euler_angle.yaw());
   }
 
   return true;
 }
 
-double VehicleStateProvider::x() const { return x_; }
+double VehicleStateProvider::x() const { return vehicle_state_.x(); }
 
-double VehicleStateProvider::y() const { return y_; }
+double VehicleStateProvider::y() const { return vehicle_state_.y(); }
 
-double VehicleStateProvider::z() const { return z_; }
+double VehicleStateProvider::z() const { return vehicle_state_.z(); }
 
-double VehicleStateProvider::roll() const { return roll_; }
+double VehicleStateProvider::roll() const { return vehicle_state_.roll(); }
 
-double VehicleStateProvider::pitch() const { return pitch_; }
+double VehicleStateProvider::pitch() const { return vehicle_state_.pitch(); }
 
-double VehicleStateProvider::yaw() const { return yaw_; }
+double VehicleStateProvider::yaw() const { return vehicle_state_.yaw(); }
 
-double VehicleStateProvider::heading() const { return heading_; }
+double VehicleStateProvider::heading() const {
+  return vehicle_state_.heading();
+}
 
-double VehicleStateProvider::kappa() const { return kappa_; }
+double VehicleStateProvider::kappa() const { return vehicle_state_.kappa(); }
 
-double VehicleStateProvider::linear_velocity() const { return linear_v_; }
+double VehicleStateProvider::linear_velocity() const {
+  return vehicle_state_.linear_velocity();
+}
 
-double VehicleStateProvider::angular_velocity() const { return angular_v_; }
+double VehicleStateProvider::angular_velocity() const {
+  return vehicle_state_.angular_velocity();
+}
 
-double VehicleStateProvider::linear_acceleration() const { return linear_a_y_; }
+double VehicleStateProvider::linear_acceleration() const {
+  return vehicle_state_.linear_acceleration();
+}
 
-double VehicleStateProvider::gear() const { return gear_; }
+double VehicleStateProvider::gear() const { return vehicle_state_.gear(); }
 
-void VehicleStateProvider::set_x(const double x) { x_ = x; }
+double VehicleStateProvider::timestamp() const {
+  return vehicle_state_.timestamp();
+}
 
-void VehicleStateProvider::set_y(const double y) { y_ = y; }
-
-void VehicleStateProvider::set_z(const double z) { z_ = z; }
-
-void VehicleStateProvider::set_roll(const double roll) { roll_ = roll; }
-
-void VehicleStateProvider::set_pitch(const double pitch) { pitch_ = pitch; }
-
-// As of now, use heading instead of yaw angle
-void VehicleStateProvider::set_yaw(const double yaw) { yaw_ = yaw; }
-
-void VehicleStateProvider::set_heading(const double heading) {
-  heading_ = heading;
+const localization::Pose &VehicleStateProvider::pose() const {
+  return vehicle_state_.pose();
 }
 
 void VehicleStateProvider::set_linear_velocity(const double linear_velocity) {
-  linear_v_ = linear_velocity;
+  vehicle_state_.set_linear_velocity(linear_velocity);
 }
 
-void VehicleStateProvider::set_angular_velocity(const double angular_velocity) {
-  angular_v_ = angular_velocity;
-}
-
-void VehicleStateProvider::set_gear(
-    const canbus::Chassis::GearPosition gear_position) {
-  gear_ = gear_position;
+const VehicleState &VehicleStateProvider::vehicle_state() const {
+  return vehicle_state_;
 }
 
 math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
-  double v = linear_v_;
-  if (gear_ == canbus::Chassis::GEAR_REVERSE) {
-    v = -linear_v_;
+  double v = vehicle_state_.linear_velocity();
+  if (vehicle_state_.gear() == canbus::Chassis::GEAR_REVERSE) {
+    v = -vehicle_state_.linear_velocity();
   }
   // Predict distance travel vector
-  if (std::fabs(angular_v_) < 0.0001) {
+  if (std::fabs(vehicle_state_.angular_velocity()) < 0.0001) {
     vec_distance[0] = 0.0;
     vec_distance[1] = v * t;
   } else {
-    vec_distance[0] = -v / angular_v_ * (1.0 - std::cos(angular_v_ * t));
-    vec_distance[1] = std::sin(angular_v_ * t) * v / angular_v_;
+    vec_distance[0] = -v / vehicle_state_.angular_velocity() *
+                      (1.0 - std::cos(vehicle_state_.angular_velocity() * t));
+    vec_distance[1] = std::sin(vehicle_state_.angular_velocity() * t) * v /
+                      vehicle_state_.angular_velocity();
   }
 
   // If we have rotation information, take it into consideration.
-  if (pose_.has_orientation()) {
-    const auto &orientation = pose_.orientation();
+  if (vehicle_state_.pose().has_orientation()) {
+    const auto &orientation = vehicle_state_.pose().orientation();
     Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                          orientation.qy(), orientation.qz());
-    Eigen::Vector3d pos_vec(x_, y_, z_);
+    Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
+                            vehicle_state_.z());
     auto future_pos_3d = quaternion.toRotationMatrix() * vec_distance + pos_vec;
     return math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 
   // If no valid rotation information provided from localization,
   // return the estimated future position without rotation.
-  return math::Vec2d(vec_distance[0] + x_, vec_distance[1] + y_);
+  return math::Vec2d(vec_distance[0] + vehicle_state_.x(),
+                     vec_distance[1] + vehicle_state_.y());
 }
 
 math::Vec2d VehicleStateProvider::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
   Eigen::Vector3d v(0.0, rear_to_com_distance, 0.0);
-  Eigen::Vector3d pos_vec(x_, y_, z_);
+  Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
+                          vehicle_state_.z());
   // Initialize the COM position without rotation
   Eigen::Vector3d com_pos_3d = v + pos_vec;
 
   // If we have rotation information, take it into consideration.
-  if (pose_.has_orientation()) {
-    const auto &orientation = pose_.orientation();
+  if (vehicle_state_.pose().has_orientation()) {
+    const auto &orientation = vehicle_state_.pose().orientation();
     Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                          orientation.qy(), orientation.qz());
     // Update the COM position with rotation
