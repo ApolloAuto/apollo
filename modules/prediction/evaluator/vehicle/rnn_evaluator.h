@@ -28,6 +28,7 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/network_model.pb.h"
+#include "modules/prediction/evaluator/network/rnn_model.h"
 
 namespace apollo {
 namespace prediction {
@@ -83,7 +84,7 @@ class RNNEvaluator : public Evaluator {
                         const std::string& prev_lane_id);
 
  private:
-  std::unique_ptr<NetParameter> model_ptr_;
+  std::unique_ptr<network::RnnModel> model_ptr_;
   int dim_obstacle_feature_ = 10;
   int dim_lane_point_feature_ = 4;
   int length_lane_point_sequence_ = 20;
