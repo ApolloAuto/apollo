@@ -138,9 +138,13 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
   auto point = lane->GetSmoothPoint(0);
+  common::VehicleState state;
+  state.set_x(point.x());
+  state.set_y(point.y());
+  state.set_z(point.y());
   std::vector<RouteSegments> segments;
   EXPECT_FALSE(pnc_map_->GetRouteSegments(10, 30, &segments));
-  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
+  EXPECT_TRUE(pnc_map_->UpdateVehicleState(state));
   bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
   ASSERT_TRUE(result);
   // first time on this passage, should not immediately change lane
@@ -155,12 +159,18 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   ASSERT_TRUE(lane);
   pnc_map_->route_index_.clear();
   auto point = lane->GetSmoothPoint(0);
-  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
+  common::VehicleState state;
+  state.set_x(point.x());
+  state.set_y(point.y());
+  state.set_z(point.y());
+  EXPECT_TRUE(pnc_map_->UpdateVehicleState(state));
   FLAGS_min_length_for_lane_change = 30.0;
   point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
-  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
+  state.set_x(point.x());
+  state.set_y(point.y());
+  state.set_z(point.y());
+  EXPECT_TRUE(pnc_map_->UpdateVehicleState(state));
   std::vector<RouteSegments> segments;
-  EXPECT_TRUE(pnc_map_->UpdatePosition(point));
   bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
@@ -172,11 +182,15 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   EXPECT_FALSE(segments[1].IsOnSegment());
 }
 
-TEST_F(PncMapTest, UpdatePosition) {
+TEST_F(PncMapTest, UpdateVehicleState) {
   auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
   auto first_point = lane1->GetSmoothPoint(5);
   pnc_map_->route_index_.clear();
-  pnc_map_->UpdatePosition(first_point);
+  common::VehicleState state;
+  state.set_x(first_point.x());
+  state.set_y(first_point.y());
+  state.set_z(first_point.z());
+  pnc_map_->UpdateVehicleState(state);
   EXPECT_EQ(3, pnc_map_->route_index_.size());
   EXPECT_EQ(0, pnc_map_->route_index_[0]);
   EXPECT_EQ(2, pnc_map_->route_index_[1]);
@@ -192,7 +206,10 @@ TEST_F(PncMapTest, UpdatePosition) {
   EXPECT_EQ(first_point.z(), pnc_map_->current_point_.z());
 
   auto second_point = lane1->GetSmoothPoint(6);
-  pnc_map_->UpdatePosition(second_point);
+  state.set_x(second_point.x());
+  state.set_y(second_point.y());
+  state.set_z(second_point.z());
+  pnc_map_->UpdateVehicleState(state);
   EXPECT_EQ(3, pnc_map_->route_index_.size());
   EXPECT_EQ(0, pnc_map_->route_index_[0]);
   EXPECT_EQ(2, pnc_map_->route_index_[1]);
