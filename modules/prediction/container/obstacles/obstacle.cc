@@ -1054,7 +1054,8 @@ void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
 }
 
 void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
-  rnn_states = &rnn_states_;
+  rnn_states->clear();
+  rnn_states->insert(rnn_states->begin(), rnn_states_.begin(), rnn_states_.end());
 }
 
 void Obstacle::InitRNNStates() {
@@ -1070,7 +1071,6 @@ void Obstacle::InitRNNStates() {
 }
 
 bool Obstacle::rnn_enabled() const {
-  AINFO << "-----prediction rnn enable" << rnn_enabled_;
   return rnn_enabled_;
 }
 

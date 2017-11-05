@@ -77,24 +77,23 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<Eigen::MatrixXf> states;
   if (!obstacle_ptr->rnn_enabled()) {
     obstacle_ptr->InitRNNStates();
-  AINFO << "------------0 state size: " << states.size();
   }
-  AINFO << "------------1 state size: " << states.size();
   obstacle_ptr->GetRNNStates(&states);
-  AINFO << "------------2 state size: " << states.size();
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     int seq_id = lane_sequence_ptr->lane_sequence_id();
+    if (lane_feature_mats.find(seq_id) != lane_feature_mats.end()) {
+      ADEBUG << "Fail to access seq-" << seq_id << " feature!";
+      continue;
+    }
     const Eigen::MatrixXf& lane_feature_mat = lane_feature_mats[seq_id];
     if (lane_feature_mat.cols() != dim_lane_point_feature_) {
       AWARN << "Lane feature dim of seq-" << seq_id << " is wrong!";
       continue;
     }
     // TODO(all) solve the following
-    AINFO << "------------3 state size: " << states.size();
     model_ptr_->SetState(states);
-    AINFO << "------------4 state size: " << states.size();
     model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &prob_mat);
     if (std::isnan(prob_mat(0, 0)) || std::isinf(prob_mat(0, 0))) {
       AWARN << "Fail to compute probability.";
@@ -124,7 +123,7 @@ int RNNEvaluator::ExtractFeatureValues(
   std::vector<float> obstacle_features;
   std::vector<float> lane_features;
   if (SetupObstacleFeature(obstacle, &obstacle_features) != 0) {
-    AWARN << "[RnnPlugin] Reset rnn";
+    ADEBUG << "Reset rnn state";
     obstacle->InitRNNStates();
   }
   if (static_cast<int>(obstacle_features.size()) != dim_obstacle_feature_) {
@@ -178,8 +177,8 @@ int RNNEvaluator::SetupObstacleFeature(
 
   bool success_setup = false;
   int ret = 0;
-  int num = obstacle->history_size() > 3 ? 3 : obstacle->history_size();
-  for (int i = 0; i < num; ++i) {
+  size_t num = obstacle->history_size() > 3 ? 3 : obstacle->history_size();
+  for (size_t i = 0; i < num; ++i) {
     Feature* fea = obstacle->mutable_feature(i);
     if (fea == nullptr) {
       ADEBUG << "Fail to get " << i << "-th feature from obstacle";
@@ -208,7 +207,7 @@ int RNNEvaluator::SetupObstacleFeature(
 
     Feature* fea_pre = nullptr;
     if (i + 1 < obstacle->history_size()) {
-      Feature* fea_pre = obstacle->mutable_feature(i + 1);
+      fea_pre = obstacle->mutable_feature(i + 1);
     }
     if (fea_pre != nullptr) {
       if (fea_pre->lane().has_lane_feature() &&
