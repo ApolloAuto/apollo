@@ -39,9 +39,8 @@ using apollo::perception::TrafficLightDetection;
 
 Rerouting::Rerouting(const RuleConfig& config) : TrafficRule(config) {}
 
-bool Rerouting::ChangeLaneFailRerouting(
-    const ReferenceLineInfo* reference_line_info) {
-  const auto& segments = reference_line_info->Lanes();
+bool Rerouting::ChangeLaneFailRerouting() {
+  const auto& segments = reference_line_info_->Lanes();
   // 1. If current reference line is drive forward, no rerouting.
   if (segments.NextAction() == routing::FORWARD) {
     // if not current lane, do not check for rerouting
@@ -59,13 +58,12 @@ bool Rerouting::ChangeLaneFailRerouting(
   }
 
   // 4. If the end of current passage region not appeared, no rerouting
-  const auto& route_end_waypoint =
-      reference_line_info->Lanes().RouteEndWaypoint();
+  const auto& route_end_waypoint = segments.RouteEndWaypoint();
   if (!route_end_waypoint.lane) {
     return true;
   }
   auto point = route_end_waypoint.lane->GetSmoothPoint(route_end_waypoint.s);
-  const auto& reference_line = reference_line_info->reference_line();
+  const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint sl_point;
   if (!reference_line.XYToSL({point.x(), point.y()}, &sl_point)) {
     AERROR << "Failed to project point: " << point.ShortDebugString();
@@ -76,7 +74,7 @@ bool Rerouting::ChangeLaneFailRerouting(
   }
   // 5. If the end of current passage region is further than kPrepareRoutingTime
   // * speed, no rerouting
-  double adc_s = reference_line_info->AdcSlBoundary().end_s();
+  double adc_s = reference_line_info_->AdcSlBoundary().end_s();
   const auto* vehicle_state = common::VehicleStateProvider::instance();
   double speed = vehicle_state->linear_velocity();
   const double prepare_distance = speed * FLAGS_prepare_rerouting_time;
@@ -87,7 +85,7 @@ bool Rerouting::ChangeLaneFailRerouting(
   }
   // 6. Check if we have done rerouting before
   const std::string last_rerouting_time_key =
-      "kLastReroutingTime_" + reference_line_info->Lanes().Id();
+      "kLastReroutingTime_" + segments.Id();
   double* last_routing_time =
       common::util::Dropbox<double>::Open()->Get(last_rerouting_time_key);
   double current_time = Clock::NowInSecond();
@@ -96,7 +94,7 @@ bool Rerouting::ChangeLaneFailRerouting(
     ADEBUG << "Skip rerouting and wait for previous rerouting result";
     return true;
   }
-  if (!Frame::Rerouting()) {
+  if (!frame_->Rerouting()) {
     AERROR << "Failed to send rerouting request";
     return false;
   }
@@ -107,9 +105,11 @@ bool Rerouting::ChangeLaneFailRerouting(
   return true;
 }
 
-bool Rerouting::ApplyRule(Frame*,
+bool Rerouting::ApplyRule(Frame* frame,
                           ReferenceLineInfo* const reference_line_info) {
-  if (!ChangeLaneFailRerouting(reference_line_info)) {
+  frame_ = frame;
+  reference_line_info_ = reference_line_info;
+  if (!ChangeLaneFailRerouting()) {
     AERROR << "In un-successful lane change case, rerouting failed";
     return false;
   }
