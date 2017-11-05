@@ -73,9 +73,12 @@ DEFINE_double(prediction_pedestrian_total_time, 10.0,
 DEFINE_int32(num_trajectory_still_pedestrian, 6,
              "number of trajectories for static pedestrian");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
-DEFINE_string(vehicle_model_file,
+DEFINE_string(evaluator_vehicle_mlp_file,
               "modules/prediction/data/mlp_vehicle_model.bin",
-              "Vehicle model file");
+              "mlp model file for vehicle evaluator");
+DEFINE_string(evaluator_vehicle_rnn_file,
+              "modules/prediction/data/rnn_vehicle_model.bin",
+              "rmm model file for vehicle evaluator");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
 

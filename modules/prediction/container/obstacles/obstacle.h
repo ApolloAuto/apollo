@@ -228,7 +228,7 @@ class Obstacle {
       kf_lane_trackers_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
   std::vector<Eigen::MatrixXf> rnn_states_;
-  bool rnn_enabled_;
+  bool rnn_enabled_ = false;
   static std::mutex mutex_;
 };
 
