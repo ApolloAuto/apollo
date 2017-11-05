@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+
 #include <cmath>
 
 #include "Eigen/Core"
@@ -23,15 +25,14 @@
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
 namespace common {
 
-VehicleState::VehicleState() {}
+VehicleStateProvider::VehicleStateProvider() {}
 
-Status VehicleState::Update(
+Status VehicleStateProvider::Update(
     const localization::LocalizationEstimate &localization,
     const canbus::Chassis &chassis) {
   if (!ConstructExceptLinearVelocity(localization)) {
@@ -58,7 +59,7 @@ Status VehicleState::Update(
   return Status::OK();
 }
 
-void VehicleState::InitAdcBoundingBox() {
+void VehicleStateProvider::InitAdcBoundingBox() {
   const auto &param =
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   math::Vec2d position(x_, y_);
@@ -70,12 +71,12 @@ void VehicleState::InitAdcBoundingBox() {
       new math::Box2d(center, heading_, param.length(), param.width()));
 }
 
-const math::Box2d &VehicleState::AdcBoundingBox() const {
+const math::Box2d &VehicleStateProvider::AdcBoundingBox() const {
   CHECK(adc_bounding_box_) << "ADC bounding box not initialized";
   return *adc_bounding_box_;
 }
 
-bool VehicleState::ConstructExceptLinearVelocity(
+bool VehicleStateProvider::ConstructExceptLinearVelocity(
     const localization::LocalizationEstimate &localization) {
   if (!localization.has_pose()) {
     AERROR << "Invalid localization input.";
@@ -139,58 +140,61 @@ bool VehicleState::ConstructExceptLinearVelocity(
   return true;
 }
 
-double VehicleState::x() const { return x_; }
+double VehicleStateProvider::x() const { return x_; }
 
-double VehicleState::y() const { return y_; }
+double VehicleStateProvider::y() const { return y_; }
 
-double VehicleState::z() const { return z_; }
+double VehicleStateProvider::z() const { return z_; }
 
-double VehicleState::roll() const { return roll_; }
+double VehicleStateProvider::roll() const { return roll_; }
 
-double VehicleState::pitch() const { return pitch_; }
+double VehicleStateProvider::pitch() const { return pitch_; }
 
-double VehicleState::yaw() const { return yaw_; }
+double VehicleStateProvider::yaw() const { return yaw_; }
 
-double VehicleState::heading() const { return heading_; }
+double VehicleStateProvider::heading() const { return heading_; }
 
-double VehicleState::kappa() const { return kappa_; }
+double VehicleStateProvider::kappa() const { return kappa_; }
 
-double VehicleState::linear_velocity() const { return linear_v_; }
+double VehicleStateProvider::linear_velocity() const { return linear_v_; }
 
-double VehicleState::angular_velocity() const { return angular_v_; }
+double VehicleStateProvider::angular_velocity() const { return angular_v_; }
 
-double VehicleState::linear_acceleration() const { return linear_a_y_; }
+double VehicleStateProvider::linear_acceleration() const { return linear_a_y_; }
 
-double VehicleState::gear() const { return gear_; }
+double VehicleStateProvider::gear() const { return gear_; }
 
-void VehicleState::set_x(const double x) { x_ = x; }
+void VehicleStateProvider::set_x(const double x) { x_ = x; }
 
-void VehicleState::set_y(const double y) { y_ = y; }
+void VehicleStateProvider::set_y(const double y) { y_ = y; }
 
-void VehicleState::set_z(const double z) { z_ = z; }
+void VehicleStateProvider::set_z(const double z) { z_ = z; }
 
-void VehicleState::set_roll(const double roll) { roll_ = roll; }
+void VehicleStateProvider::set_roll(const double roll) { roll_ = roll; }
 
-void VehicleState::set_pitch(const double pitch) { pitch_ = pitch; }
+void VehicleStateProvider::set_pitch(const double pitch) { pitch_ = pitch; }
 
 // As of now, use heading instead of yaw angle
-void VehicleState::set_yaw(const double yaw) { yaw_ = yaw; }
+void VehicleStateProvider::set_yaw(const double yaw) { yaw_ = yaw; }
 
-void VehicleState::set_heading(const double heading) { heading_ = heading; }
+void VehicleStateProvider::set_heading(const double heading) {
+  heading_ = heading;
+}
 
-void VehicleState::set_linear_velocity(const double linear_velocity) {
+void VehicleStateProvider::set_linear_velocity(const double linear_velocity) {
   linear_v_ = linear_velocity;
 }
 
-void VehicleState::set_angular_velocity(const double angular_velocity) {
+void VehicleStateProvider::set_angular_velocity(const double angular_velocity) {
   angular_v_ = angular_velocity;
 }
 
-void VehicleState::set_gear(const canbus::Chassis::GearPosition gear_position) {
+void VehicleStateProvider::set_gear(
+    const canbus::Chassis::GearPosition gear_position) {
   gear_ = gear_position;
 }
 
-math::Vec2d VehicleState::EstimateFuturePosition(const double t) const {
+math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
   double v = linear_v_;
   if (gear_ == canbus::Chassis::GEAR_REVERSE) {
@@ -220,7 +224,7 @@ math::Vec2d VehicleState::EstimateFuturePosition(const double t) const {
   return math::Vec2d(vec_distance[0] + x_, vec_distance[1] + y_);
 }
 
-math::Vec2d VehicleState::ComputeCOMPosition(
+math::Vec2d VehicleStateProvider::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
   Eigen::Vector3d v(0.0, rear_to_com_distance, 0.0);
