@@ -23,7 +23,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
@@ -37,7 +37,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleState;
+using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
@@ -61,7 +61,7 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double timestamp,
   }
   frame_->UpdateRoutingResponse(
       AdapterManager::GetRoutingResponse()->GetLatestObserved());
-  frame_->SetVehicleInitPose(VehicleState::instance()->pose());
+  frame_->SetVehicleInitPose(VehicleStateProvider::instance()->pose());
 
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     const auto& prediction =
@@ -145,7 +145,8 @@ Status Planning::Init() {
   return planner_->Init(config_);
 }
 
-bool Planning::IsVehicleStateValid(const common::VehicleState& vehicle_state) {
+bool Planning::IsVehicleStateValid(
+    const common::VehicleStateProvider& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
       std::isnan(vehicle_state.kappa()) ||
@@ -217,11 +218,11 @@ void Planning::RunOnce() {
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
   common::Status status =
-      common::VehicleState::instance()->Update(localization, chassis);
-  DCHECK(IsVehicleStateValid(*common::VehicleState::instance()));
+      common::VehicleStateProvider::instance()->Update(localization, chassis);
+  DCHECK(IsVehicleStateValid(*common::VehicleStateProvider::instance()));
   if (!status.ok()) {
-    AERROR << "Update VehicleState failed.";
-    not_ready->set_reason("Update VehicleState failed.");
+    AERROR << "Update VehicleStateProvider failed.";
+    not_ready->set_reason("Update VehicleStateProvider failed.");
     status.Save(not_ready_pb.mutable_header()->mutable_status());
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
@@ -231,8 +232,8 @@ void Planning::RunOnce() {
     ReferenceLineProvider::instance()->UpdateRoutingResponse(
         AdapterManager::GetRoutingResponse()->GetLatestObserved());
     ReferenceLineProvider::instance()->UpdateVehicleStatus(
-        common::VehicleState::instance()->pose().position(),
-        common::VehicleState::instance()->linear_velocity());
+        common::VehicleStateProvider::instance()->pose().position(),
+        common::VehicleStateProvider::instance()->linear_velocity());
     if (!ReferenceLineProvider::instance()->HasReferenceLine()) {
       not_ready->set_reason("reference line not ready");
       AERROR << not_ready->reason() << "; skip the planning cycle.";

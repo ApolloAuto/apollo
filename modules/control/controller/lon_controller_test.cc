@@ -30,7 +30,7 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
-using VehicleState = common::VehicleState;
+using VehicleStateProvider = common::VehicleStateProvider;
 
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";
@@ -117,7 +117,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   double time_now = Clock::NowInSecond();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  auto *vehicle_state = VehicleState::instance();
+  auto *vehicle_state = VehicleStateProvider::instance();
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 

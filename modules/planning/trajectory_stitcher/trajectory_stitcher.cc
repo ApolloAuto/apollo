@@ -29,11 +29,11 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleState;
+using apollo::common::VehicleStateProvider;
 
 std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory() {
-  const auto& vehicle_state = *common::VehicleState::instance();
+  const auto& vehicle_state = *common::VehicleStateProvider::instance();
   TrajectoryPoint init_point;
   init_point.mutable_path_point()->set_x(vehicle_state.x());
   init_point.mutable_path_point()->set_y(vehicle_state.y());
@@ -91,7 +91,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory();
   }
 
-  const auto& vehicle_state = *VehicleState::instance();
+  const auto& vehicle_state = *VehicleStateProvider::instance();
   auto matched_point = prev_trajectory->TrajectoryPointAt(matched_index);
   const double position_diff =
       std::hypot(matched_point.path_point().x() - vehicle_state.x(),

@@ -43,7 +43,7 @@ cc_library(
     deps = [
         ":traffic_rules",
         "//modules/common/status",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/tasks:task",

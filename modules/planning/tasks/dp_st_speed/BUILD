@@ -68,7 +68,7 @@ cc_library(
         ":dp_st_graph",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "//modules/planning/proto:planning_proto",
