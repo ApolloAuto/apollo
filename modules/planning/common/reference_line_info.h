@@ -29,9 +29,10 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/proto/planning.pb.h"
 
-#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -42,11 +43,10 @@ namespace planning {
 
 class ReferenceLineInfo {
  public:
-  explicit ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                             const common::TrajectoryPoint& adc_planning_point,
                              const ReferenceLine& reference_line,
-                             const hdmap::RouteSegments& segments,
-                             const common::PointENU& adc_position,
-                             const common::TrajectoryPoint& adc_planning_point);
+                             const hdmap::RouteSegments& segments);
 
   bool Init();
 
@@ -104,15 +104,13 @@ class ReferenceLineInfo {
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
-  const hdmap::PncMap* pnc_map_ = nullptr;
-  const ReferenceLine reference_line_;
-  const common::PointENU adc_position_;
+  const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
+  const ReferenceLine reference_line_;
 
   /**
    * @brief this is the number that measures the goodness of this reference
    * line. The lower the better.
-   * TODO(all): implement trajectory cost calculation
    */
   double cost_ = 0.0;
 
