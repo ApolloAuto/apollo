@@ -32,7 +32,7 @@ namespace prediction {
 
 using apollo::hdmap::LaneInfo;
 
-RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
+RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_evaluator_vehicle_rnn_file); }
 
 void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
@@ -62,7 +62,6 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   Eigen::MatrixXf obstacle_feature_mat;
   std::unordered_map<int, Eigen::MatrixXf> lane_feature_mats;
-  std::unique_lock<std::mutex> lock(mutex_, std::defer_lock);
   if (ExtractFeatureValues(obstacle_ptr,
           &obstacle_feature_mat, &lane_feature_mats) != 0) {
     AWARN << "Fail to extract feature from obstacle";
@@ -78,29 +77,32 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<Eigen::MatrixXf> states;
   if (!obstacle_ptr->rnn_enabled()) {
     obstacle_ptr->InitRNNStates();
+  AINFO << "------------0 state size: " << states.size();
   }
+  AINFO << "------------1 state size: " << states.size();
   obstacle_ptr->GetRNNStates(&states);
-  lock.lock();
+  AINFO << "------------2 state size: " << states.size();
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
-    LaneSequence* lane_sequence = lane_graph_ptr->mutable_lane_sequence(i);
-    int seq_id = lane_sequence->lane_sequence_id();
+    LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
+    int seq_id = lane_sequence_ptr->lane_sequence_id();
     const Eigen::MatrixXf& lane_feature_mat = lane_feature_mats[seq_id];
     if (lane_feature_mat.cols() != dim_lane_point_feature_) {
       AWARN << "Lane feature dim of seq-" << seq_id << " is wrong!";
       continue;
     }
     // TODO(all) solve the following
+    AINFO << "------------3 state size: " << states.size();
     model_ptr_->SetState(states);
+    AINFO << "------------4 state size: " << states.size();
     model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &prob_mat);
     if (std::isnan(prob_mat(0, 0)) || std::isinf(prob_mat(0, 0))) {
       AWARN << "Fail to compute probability.";
       continue;
     }
+    lane_sequence_ptr->set_probability(prob_mat(0, 0));
   }
-  // TODO(all) solve the following
   model_ptr_->State(&states);
-  lock.unlock();
   obstacle_ptr->SetRNNStates(states);
 }
 
@@ -120,7 +122,7 @@ int RNNEvaluator::ExtractFeatureValues(
     Obstacle* obstacle, Eigen::MatrixXf* const obstacle_feature_mat,
     std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats) {
   std::vector<float> obstacle_features;
-  std::vector<float> lane_feature;
+  std::vector<float> lane_features;
   if (SetupObstacleFeature(obstacle, &obstacle_features) != 0) {
     AWARN << "[RnnPlugin] Reset rnn";
     obstacle->InitRNNStates();
@@ -143,14 +145,14 @@ int RNNEvaluator::ExtractFeatureValues(
   for (int i = 0; i < routes; ++i) {
     LaneSequence lane_seq = feature->lane().lane_graph().lane_sequence(i);
     int seq_id = lane_seq.lane_sequence_id();
-    if (SetupLaneFeature(*feature, lane_seq, &lane_feature) != 0) {
+    if (SetupLaneFeature(*feature, lane_seq, &lane_features) != 0) {
       AWARN << "Fail to setup lane sequence feature!";
       continue;
     }
     int dim = dim_lane_point_feature_;
-    Eigen::MatrixXf mat(lane_feature.size() / dim, dim);
-    for (int j = 0; j < static_cast<int>(lane_feature.size()); ++j) {
-      mat(j / dim, j % dim) = lane_feature[j];
+    Eigen::MatrixXf mat(lane_features.size() / dim, dim);
+    for (int j = 0; j < static_cast<int>(lane_features.size()); ++j) {
+      mat(j / dim, j % dim) = lane_features[j];
     }
     (*lane_feature_mats)[seq_id] = std::move(mat);
   }
@@ -204,7 +206,10 @@ int RNNEvaluator::SetupObstacleFeature(
     success_setup = true;
     ADEBUG << "Success to setup obstacle feature!";
 
-    Feature* fea_pre = obstacle->mutable_feature(i + 1);
+    Feature* fea_pre = nullptr;
+    if (i + 1 < obstacle->history_size()) {
+      Feature* fea_pre = obstacle->mutable_feature(i + 1);
+    }
     if (fea_pre != nullptr) {
       if (fea_pre->lane().has_lane_feature() &&
           fea_pre->lane().lane_feature().has_lane_id()) {

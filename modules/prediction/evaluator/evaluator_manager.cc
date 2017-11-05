@@ -33,6 +33,7 @@ EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 
 void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::RNN_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
