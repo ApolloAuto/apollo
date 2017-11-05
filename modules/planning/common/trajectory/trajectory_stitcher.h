@@ -15,18 +15,17 @@
  *****************************************************************************/
 
 /**
- * @file trajectory_stitcher.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
-#define MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
+#ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
+#define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
 
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/proto/vehicle_state.pb.h"
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
 namespace apollo {
@@ -37,17 +36,16 @@ class TrajectoryStitcher {
   TrajectoryStitcher() = delete;
 
   static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
-      const bool is_on_auto_mode, const double current_timestamp,
+      const common::VehicleState& vehicle_state, const double current_timestamp,
       const double planning_cycle_time,
-      const PublishableTrajectory* prev_trajectory,
-      bool* is_replan);
+      const PublishableTrajectory* prev_trajectory, bool* is_replan);
 
  private:
-  static std::vector<common::TrajectoryPoint>
-  ComputeReinitStitchingTrajectory();
+  static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
+      const common::VehicleState& vehicle_state);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TRAJECTORY_STITCHER_TRAJECTORY_STITCHER_H_
+#endif  // MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_

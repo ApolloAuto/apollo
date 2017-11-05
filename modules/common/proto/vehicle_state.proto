@@ -19,5 +19,6 @@ message VehicleState {
   optional double angular_velocity = 11 [default =0.0];
   optional double linear_acceleration = 12 [default =0.0];
   optional apollo.canbus.Chassis.GearPosition gear = 13;
-  optional apollo.localization.Pose pose = 14;
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 14;
+  optional apollo.localization.Pose pose = 15;
 }

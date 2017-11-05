@@ -26,10 +26,10 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/planning/trajectory_stitcher/trajectory_stitcher.h"
 
 namespace apollo {
 namespace planning {
@@ -215,11 +215,11 @@ void Planning::RunOnce() {
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
-  bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
   bool is_replan = false;
   const auto& stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          is_auto_mode, start_timestamp, planning_cycle_time,
+          common::VehicleStateProvider::instance()->vehicle_state(),
+          start_timestamp, planning_cycle_time,
           last_publishable_trajectory_.get(), &is_replan);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;

@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file trajectory_stitcher.cc
+ * @file
  **/
 
-#include "modules/planning/trajectory_stitcher/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory/trajectory_stitcher.h"
 
 #include <algorithm>
 
@@ -29,11 +29,11 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleStateProvider;
+using apollo::common::VehicleState;
 
 std::vector<TrajectoryPoint>
-TrajectoryStitcher::ComputeReinitStitchingTrajectory() {
-  const auto& vehicle_state = *common::VehicleStateProvider::instance();
+TrajectoryStitcher::ComputeReinitStitchingTrajectory(
+    const common::VehicleState& vehicle_state) {
   TrajectoryPoint init_point;
   init_point.mutable_path_point()->set_x(vehicle_state.x());
   init_point.mutable_path_point()->set_y(vehicle_state.y());
@@ -52,18 +52,18 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory() {
 //    2. we don't have the trajectory from last planning cycle or
 //    3. the position deviation from actual and target is too high
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
-    const bool is_on_auto_mode, const double current_timestamp,
+    const VehicleState& vehicle_state, const double current_timestamp,
     const double planning_cycle_time,
     const PublishableTrajectory* prev_trajectory, bool* is_replan) {
   *is_replan = true;
   if (!FLAGS_enable_trajectory_stitcher) {
-    return ComputeReinitStitchingTrajectory();
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
   if (!prev_trajectory) {
-    return ComputeReinitStitchingTrajectory();
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
-  if (!is_on_auto_mode) {
-    return ComputeReinitStitchingTrajectory();
+  if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
   std::size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
@@ -72,7 +72,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     ADEBUG << "Projected trajectory at time [" << prev_trajectory->header_time()
            << "] size is zero! Previous planning not exist or failed. Use "
               "origin car status instead.";
-    return ComputeReinitStitchingTrajectory();
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
   const double veh_rel_time =
@@ -82,16 +82,15 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   if (matched_index == prev_trajectory_size) {
     AWARN << "The previous trajectory is not long enough, something is wrong";
-    return ComputeReinitStitchingTrajectory();
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
   if (matched_index == 0 &&
       veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
     AWARN << "the previous trajectory doesn't cover current time";
-    return ComputeReinitStitchingTrajectory();
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  const auto& vehicle_state = *VehicleStateProvider::instance();
   auto matched_point = prev_trajectory->TrajectoryPointAt(matched_index);
   const double position_diff =
       std::hypot(matched_point.path_point().x() - vehicle_state.x(),
@@ -100,7 +99,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (position_diff > FLAGS_replan_distance_threshold) {
     AWARN << "the distance between matched point and actual position is too "
              "large";
-    return ComputeReinitStitchingTrajectory();
+    return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
   double forward_rel_time = veh_rel_time + planning_cycle_time;
