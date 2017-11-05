@@ -52,6 +52,7 @@ Status VehicleStateProvider::Update(
   } else {
     vehicle_state_.set_gear(canbus::Chassis::GEAR_NONE);
   }
+  vehicle_state_.set_driving_mode(chassis.driving_mode());
 
   return Status::OK();
 }
