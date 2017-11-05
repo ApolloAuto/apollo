@@ -27,6 +27,7 @@ cc_library(
         "pnc_map.h",
     ],
     deps = [
+        "//modules/common/proto:vehicle_state_proto",
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
         "//modules/routing/common:routing_gflags",

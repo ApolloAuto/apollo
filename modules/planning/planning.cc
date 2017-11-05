@@ -59,9 +59,6 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double timestamp,
     AERROR << "Routing is empty";
     return Status(ErrorCode::PLANNING_ERROR, "routing is empty");
   }
-  frame_->UpdateRoutingResponse(
-      AdapterManager::GetRoutingResponse()->GetLatestObserved());
-  frame_->SetVehicleInitPose(VehicleStateProvider::instance()->pose());
 
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     const auto& prediction =
@@ -90,7 +87,6 @@ bool Planning::HasSignalLight(const PlanningConfig& config) {
 Status Planning::Init() {
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
-  Frame::SetMap(hdmap_);
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
@@ -129,10 +125,8 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->Init(
-        hdmap_, config_.qp_spline_reference_line_smoother_config());
-  }
+  ReferenceLineProvider::instance()->Init(
+      hdmap_, config_.qp_spline_reference_line_smoother_config());
 
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
@@ -158,9 +152,7 @@ bool Planning::IsVehicleStateValid(
 }
 
 Status Planning::Start() {
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->Start();
-  }
+  ReferenceLineProvider::instance()->Start();
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
   return Status::OK();
@@ -174,10 +166,10 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-
-  if (frame_) {
+  if (AdapterManager::GetRoutingResponse() &&
+      !AdapterManager::GetRoutingResponse()->Empty()) {
     trajectory_pb->mutable_routing_header()->CopyFrom(
-        frame_->routing_response().header());
+        AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
   AdapterManager::PublishPlanning(*trajectory_pb);
 }
@@ -226,20 +218,6 @@ void Planning::RunOnce() {
     status.Save(not_ready_pb.mutable_header()->mutable_status());
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
-  }
-  // if reference line is not ready, continue;
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->UpdateRoutingResponse(
-        AdapterManager::GetRoutingResponse()->GetLatestObserved());
-    ReferenceLineProvider::instance()->UpdateVehicleStatus(
-        common::VehicleStateProvider::instance()->pose().position(),
-        common::VehicleStateProvider::instance()->linear_velocity());
-    if (!ReferenceLineProvider::instance()->HasReferenceLine()) {
-      not_ready->set_reason("reference line not ready");
-      AERROR << not_ready->reason() << "; skip the planning cycle.";
-      PublishPlanningPb(&not_ready_pb, start_timestamp);
-      return;
-    }
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
@@ -303,9 +281,7 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->Stop();
-  }
+  ReferenceLineProvider::instance()->Stop();
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);

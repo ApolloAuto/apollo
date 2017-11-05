@@ -38,7 +38,6 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -54,18 +53,11 @@ class Frame {
   // functions called out of optimizers
   void SetPrediction(const prediction::PredictionObstacles &prediction);
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
-  void SetVehicleInitPose(const localization::Pose &pose);
   const common::TrajectoryPoint &PlanningStartPoint() const;
   common::Status Init(const PlanningConfig &config,
                       const double current_time_stamp);
 
-  static void SetMap(const hdmap::HDMap *pnc_map);
-
   uint32_t SequenceNum() const;
-
-  void UpdateRoutingResponse(const routing::RoutingResponse &routing);
-
-  const routing::RoutingResponse &routing_response() const;
 
   std::string DebugString() const;
 
@@ -85,24 +77,9 @@ class Frame {
   const Obstacle *AddStaticVirtualObstacle(const std::string &id,
                                            const common::math::Box2d &box);
 
-  static bool Rerouting();
+  bool Rerouting();
 
  private:
-  /**
-   * @brief This is the function that can create one reference lines
-   * from routing result.
-   * @param position: the position near routing ( distance < 20m in current
-   * config).
-   * @param reference_line return the reference line
-   * @param segments : return the connected lanes corresponding to each
-   * reference line.
-   * @return true if at least one reference line is successfully created.
-   */
-  bool CreateReferenceLineFromRouting(
-      const common::PointENU &position,
-      std::list<ReferenceLine> *reference_lines,
-      std::list<hdmap::RouteSegments> *segments);
-
   /**
    * @brief create obstacles from prediction input.
    * @param prediction the received prediction result.
@@ -139,11 +116,9 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
 
   uint32_t sequence_num_ = 0;
-  localization::Pose init_pose_;
-  static std::unique_ptr<hdmap::PncMap> pnc_map_;
+  const hdmap::HDMap *hdmap_ = nullptr;
+  common::VehicleState vehicle_state_;
   QpSplineReferenceLineSmootherConfig smoother_config_;
-
-  common::VehicleState adc_state_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

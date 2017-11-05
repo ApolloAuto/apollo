@@ -21,11 +21,14 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
+#include <condition_variable>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
+
+#include "modules/common/proto/vehicle_state.pb.h"
 
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -56,27 +59,29 @@ class ReferenceLineProvider {
   void Init(const hdmap::HDMap* hdmap_,
             const QpSplineReferenceLineSmootherConfig& smoother_config);
 
-  void UpdateRoutingResponse(const routing::RoutingResponse& routing);
+  bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
-  void UpdateVehicleStatus(const common::PointENU& position, double speed);
+  bool UpdateVehicleState(const common::VehicleState& vehicle_state);
 
   bool Start();
 
   void Stop();
 
-  bool HasReferenceLine();
-
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);
 
-  static bool CreateReferenceLineFromRouting(
-      const common::PointENU& position, double speed, hdmap::PncMap* pnc_map,
-      ReferenceLineSmoother* smoother,
+  /**
+   * @brief Use PncMap to create refrence line and the corresponding segments
+   * based on routing and current position. This is a thread safe function.
+   * @return true if !reference_lines.empty() && reference_lines.size() ==
+   *                 segments.size();
+   **/
+  bool CreateReferenceLineFromRouting(
       std::list<ReferenceLine>* reference_lines,
       std::list<hdmap::RouteSegments>* segments);
 
  private:
-  void Generate();
+  void GenerateThread();
   void IsValidReferenceLine();
 
  private:
@@ -85,10 +90,11 @@ class ReferenceLineProvider {
   bool is_initialized_ = false;
   std::unique_ptr<std::thread> thread_;
 
+  std::unique_ptr<ReferenceLineSmoother> smoother_;
+
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
-  common::PointENU position_;
-  double vehicle_speed_ = 0.0;
+  common::VehicleState vehicle_state_;
 
   bool has_routing_ = false;
 
@@ -97,6 +103,7 @@ class ReferenceLineProvider {
   bool is_stop_ = false;
 
   std::mutex reference_line_groups_mutex_;
+  std::condition_variable cv_has_reference_line_;
   std::list<std::list<ReferenceLine>> reference_line_groups_;
   std::list<std::list<hdmap::RouteSegments>> route_segment_groups_;
 

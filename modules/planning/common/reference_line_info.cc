@@ -43,15 +43,13 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 
-ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                                     const TrajectoryPoint& adc_planning_point,
                                      const ReferenceLine& reference_line,
-                                     const hdmap::RouteSegments& segments,
-                                     const common::PointENU& adc_position,
-                                     const TrajectoryPoint& adc_planning_point)
-    : pnc_map_(pnc_map),
-      reference_line_(reference_line),
-      adc_position_(adc_position),
+                                     const hdmap::RouteSegments& segments)
+    : vehicle_state_(vehicle_state),
       adc_planning_point_(adc_planning_point),
+      reference_line_(reference_line),
       lanes_(segments) {}
 
 bool ReferenceLineInfo::Init() {

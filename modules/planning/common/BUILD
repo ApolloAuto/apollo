@@ -206,6 +206,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
