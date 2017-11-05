@@ -88,7 +88,6 @@ class RNNEvaluator : public Evaluator {
   int dim_obstacle_feature_ = 10;
   int dim_lane_point_feature_ = 4;
   int length_lane_point_sequence_ = 20;
-  std::mutex mutex_;
 };
 
 }  // namespace prediction

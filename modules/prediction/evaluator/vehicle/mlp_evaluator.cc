@@ -45,7 +45,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 }  // namespace
 
-MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
+MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_evaluator_vehicle_mlp_file); }
 
 void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
 
