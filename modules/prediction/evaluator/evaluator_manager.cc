@@ -20,6 +20,7 @@
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -119,6 +120,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
   switch (type) {
     case ObstacleConf::MLP_EVALUATOR: {
       evaluator_ptr.reset(new MLPEvaluator());
+      break;
+    }
+    case ObstacleConf::RNN_EVALUATOR: {
+      evaluator_ptr.reset(new RNNEvaluator());
       break;
     }
     default: { break; }
