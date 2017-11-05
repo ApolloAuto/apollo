@@ -265,7 +265,8 @@ PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
 const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
-bool PncMap::UpdatePosition(const common::PointENU &point) {
+bool PncMap::UpdateVehicleState(const common::VehicleState &state) {
+  auto point = common::util::MakePointENU(state.x(), state.y(), state.z());
   if (!GetNearestPointFromRouting(point, &current_waypoint_)) {
     AERROR << "Failed to get waypoint from routing";
     return false;
@@ -301,7 +302,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
     ADEBUG << "Same routing, skip update routing";
-    return false;
+    return true;
   }
   if (!ValidateRouting(routing)) {
     AERROR << "Invalid routing";
@@ -432,7 +433,7 @@ bool PncMap::GetRouteSegments(
   // vehicle has to be this close to lane center before considering change lane
   if (!current_waypoint_.lane || route_index_.size() != 3 ||
       route_index_[0] < 0) {
-    AERROR << "Invalid position, use UpdatePosition() function first";
+    AERROR << "Invalid position, use UpdateVehicleState() function first";
     return false;
   }
   const int road_index = route_index_[0];
