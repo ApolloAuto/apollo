@@ -91,28 +91,29 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       continue;
     }
     // TODO(all) solve the following
-    // model_ptr_->SetState(states);
-    // model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &prob_mat);
+    model_ptr_->SetState(states);
+    model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &prob_mat);
     if (std::isnan(prob_mat(0, 0)) || std::isinf(prob_mat(0, 0))) {
       AWARN << "Fail to compute probability.";
       continue;
     }
   }
   // TODO(all) solve the following
-  // model_ptr_->State(&states);
+  model_ptr_->State(&states);
   lock.unlock();
-  // obstacle_ptr->SetRNNStates(states);
+  obstacle_ptr->SetRNNStates(states);
 }
 
 void RNNEvaluator::Clear() {}
 
 void RNNEvaluator::LoadModel(const std::string& model_file) {
-  model_ptr_.reset(new NetParameter());
-  CHECK(model_ptr_ != nullptr);
-  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+  NetParameter net_parameter;
+  CHECK(common::util::GetProtoFromFile(model_file, &net_parameter))
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
+  model_ptr_.reset(network::RnnModel::instance());
+  model_ptr_->LoadModel(net_parameter);
 }
 
 int RNNEvaluator::ExtractFeatureValues(
