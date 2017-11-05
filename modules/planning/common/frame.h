@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -114,9 +115,12 @@ class Frame {
   void AlignPredictionTime(const double trajectory_header_time);
 
   /**
-   * Check if there is collision with obstacles
+   * Find an obstacle that collides with ADC (Autonomous Driving Car) if such
+   * obstacle exists.
+   * @return pointer to the obstacle if such obstacle exists, otherwise
+   * @return false if no colliding obstacle.
    */
-  bool CheckCollision();
+  const Obstacle *FindCollisionObstacle() const;
 
   const Obstacle *CreateDestinationObstacle();
 
@@ -139,7 +143,7 @@ class Frame {
   static std::unique_ptr<hdmap::PncMap> pnc_map_;
   QpSplineReferenceLineSmootherConfig smoother_config_;
 
-  std::string collision_obstacle_id_;
+  common::VehicleState adc_state_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

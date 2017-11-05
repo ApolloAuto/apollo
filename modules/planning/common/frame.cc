@@ -238,10 +238,11 @@ Status Frame::Init(const PlanningConfig &config,
     return Status(ErrorCode::PLANNING_ERROR, "failed to find destination");
   }
 
-  if (CheckCollision()) {
-    AERROR << "Found collision with obstacle: " << collision_obstacle_id_;
+  const auto *collision_obstacle = FindCollisionObstacle();
+  if (collision_obstacle) {
+    AERROR << "Found collision with obstacle: " << collision_obstacle->Id();
     return Status(ErrorCode::PLANNING_ERROR,
-                  "Collision found with " + collision_obstacle_id_);
+                  "Collision found with " + collision_obstacle->Id());
   }
   if (!InitReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";
@@ -251,10 +252,20 @@ Status Frame::Init(const PlanningConfig &config,
   return Status::OK();
 }
 
-bool Frame::CheckCollision() {
-  const auto &adc_box =
-      common::VehicleStateProvider::instance()->AdcBoundingBox();
-  common::math::Polygon2d adc_polygon(adc_box);
+const Obstacle *Frame::FindCollisionObstacle() const {
+  if (obstacles_.Items().empty()) {
+    return nullptr;
+  }
+  const auto &param =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  common::math::Vec2d position(adc_state_.x(), adc_state_.y());
+  common::math::Vec2d vec_to_center(
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
+  common::math::Vec2d center(position +
+                             vec_to_center.rotate(adc_state_.heading()));
+  common::math::Box2d adc_box(center, adc_state_.heading(), param.length(),
+                              param.width());
   const double adc_half_diagnal = adc_box.diagonal() / 2.0;
   for (const auto &obstacle : obstacles_.Items()) {
     if (obstacle->IsVirtual()) {
@@ -268,14 +279,13 @@ bool Frame::CheckCollision() {
       ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
       continue;
     }
-    if (adc_polygon.DistanceTo(obstacle->PerceptionPolygon()) <
+    if (obstacle->PerceptionPolygon().DistanceTo(adc_box) <
         FLAGS_max_collision_distance) {
       AERROR << "Found collision with obstacle " << obstacle->Id();
-      collision_obstacle_id_ = obstacle->Id();
-      return true;
+      return obstacle;
     }
   }
-  return false;
+  return nullptr;
 }
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }

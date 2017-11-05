@@ -78,17 +78,6 @@ TEST_F(VehicleStateProviderTest, EstimateFuturePosition) {
   EXPECT_NEAR(future_position.y(), 90.393, 1e-3);
 }
 
-TEST_F(VehicleStateProviderTest, AdcBoudingBox) {
-  auto* vehicle_state_provider = VehicleStateProvider::instance();
-  vehicle_state_provider->Update(localization_, chassis_);
-  const auto& adc_box = vehicle_state_provider->AdcBoundingBox();
-  EXPECT_FLOAT_EQ(4.933, adc_box.length());
-  EXPECT_FLOAT_EQ(2.11, adc_box.width());
-  EXPECT_FLOAT_EQ(-1.8388083, adc_box.heading());
-  EXPECT_FLOAT_EQ(357.13635, adc_box.center().x());
-  EXPECT_FLOAT_EQ(94.793236, adc_box.center().y());
-}
-
 }  // namespace vehicle_state_provider
 }  // namespace common
 }  // namespace apollo
