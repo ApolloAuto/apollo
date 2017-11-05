@@ -25,6 +25,7 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
 #include "modules/common/macro.h"
@@ -63,9 +64,9 @@ class VehicleStateProvider {
   void Update(const std::string& localization_file,
               const std::string& chassis_file);
 
-  double timestamp() const { return timestamp_; }
+  double timestamp() const;
 
-  const localization::Pose& pose() const { return pose_; }
+  const localization::Pose& pose() const;
 
   /**
    * @brief Default destructor.
@@ -145,68 +146,10 @@ class VehicleStateProvider {
   double gear() const;
 
   /**
-   * @brief Set the x-coordinate of vehicle position.
-   * @param x The x-coordinate of vehicle position.
-   */
-  void set_x(const double x);
-
-  /**
-   * @brief Set the y-coordinate of vehicle position.
-   * @param y The y-coordinate of vehicle position.
-   */
-  void set_y(const double y);
-
-  /**
-   * @brief Set the z coordinate of vehicle position.
-   * @param z The z coordinate of vehicle position.
-   */
-  void set_z(const double z);
-
-  /**
-   * @brief Set the vehicle roll angle.
-   * @param pitch The vehicle roll angle.
-   */
-  void set_roll(const double roll);
-
-  /**
-   * @brief Set the vehicle pitch angle.
-   * @param pitch The vehicle pitch angle.
-   */
-  void set_pitch(const double pitch);
-
-  /**
-   * @brief Set the vehicle yaw angle.
-   * @param pitch The vehicle yaw angle.
-   */
-  void set_yaw(const double yaw);
-
-  /**
-   * @brief Set the heading of vehicle position, which is the angle
-   *        between the vehicle's heading direction and the x-axis.
-   * @param heading The angle between the vehicle's heading direction
-   *         and the x-axis.
-   */
-  void set_heading(const double heading);
-
-  void set_kappa(const double kappa) { kappa_ = kappa; }
-
-  /**
    * @brief Set the vehicle's linear velocity.
    * @param linear_velocity The value to set the vehicle's linear velocity.
    */
   void set_linear_velocity(const double linear_velocity);
-
-  /**
-   * @brief Set the vehicle's angular velocity.
-   * @param angular_velocity The vehicle's angular velocity.
-   */
-  void set_angular_velocity(const double angular_velocity);
-
-  /**
-   * @brief Set the vehicle's gear position.
-   * @param gear_position The vehicle's gear position.
-   */
-  void set_gear(const canbus::Chassis::GearPosition gear_position);
 
   /**
    * @brief Estimate future position from current position and heading,
@@ -226,36 +169,15 @@ class VehicleStateProvider {
    */
   math::Vec2d ComputeCOMPosition(const double rear_to_com_distance) const;
 
-  /**
-   * @brief Compute the bouding box of the vehicle.
-   * @return the bounding box of the vehicle represented by Box2d.
-   */
-  const math::Box2d& AdcBoundingBox() const;
+  const VehicleState& vehicle_state() const;
 
  private:
-  DECLARE_SINGLETON(VehicleStateProvider);
-
-  void InitAdcBoundingBox();
-
   bool ConstructExceptLinearVelocity(
       const localization::LocalizationEstimate& localization);
 
-  double x_ = 0.0;
-  double y_ = 0.0;
-  double z_ = 0.0;
-  double roll_ = 0.0;
-  double pitch_ = 0.0;
-  double yaw_ = 0.0;
-  double heading_ = 0.0;
-  // TODO(all): check the setting of kappa_
-  double kappa_ = 0.0;
-  double linear_v_ = 0.0;
-  double angular_v_ = 0.0;
-  double timestamp_ = 0.0;
-  double linear_a_y_ = 0.0;
-  canbus::Chassis::GearPosition gear_;
-  localization::Pose pose_;
-  std::unique_ptr<math::Box2d> adc_bounding_box_ = nullptr;
+  common::VehicleState vehicle_state_;
+
+  DECLARE_SINGLETON(VehicleStateProvider);
 };
 
 }  // namespace common

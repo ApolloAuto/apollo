@@ -11,12 +11,11 @@ cc_library(
         "vehicle_state_provider.h",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "//modules/common:macro",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:box2d",
         "//modules/common/math:quaternion",
+        "//modules/common/proto:vehicle_state_proto",
         "//modules/common/status",
         "//modules/localization/common:localization_common",
         "@eigen//:eigen",
