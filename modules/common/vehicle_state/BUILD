@@ -3,12 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "vehicle_state",
+    name = "vehicle_state_provider",
     srcs = [
-        "vehicle_state.cc",
+        "vehicle_state_provider.cc",
     ],
     hdrs = [
-        "vehicle_state.h",
+        "vehicle_state_provider.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -24,17 +24,17 @@ cc_library(
 )
 
 cc_test(
-    name = "vehicle_state_test",
+    name = "vehicle_state_provider_test",
     size = "small",
     srcs = [
-        "vehicle_state_test.cc",
+        "vehicle_state_provider_test.cc",
     ],
     data = [
         "//modules/canbus:canbus_testdata",
         "//modules/localization:localization_testdata",
     ],
     deps = [
-        ":vehicle_state",
+        ":vehicle_state_provider",
         "//modules/common/util",
         "@gtest//:main",
     ],

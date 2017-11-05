@@ -19,7 +19,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -54,7 +54,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_x(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
-  common::VehicleState::instance()->Update(localization, chassis);
+  common::VehicleStateProvider::instance()->Update(localization, chassis);
   ReferenceLineInfo info(nullptr, reference_line, segments, point, start_point);
   auto status = planner.Plan(start_point, nullptr, &info);
 
@@ -96,7 +96,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_x(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
-  common::VehicleState::instance()->Update(localization, chassis);
+  common::VehicleStateProvider::instance()->Update(localization, chassis);
   ReferenceLine ref;
   hdmap::RouteSegments segments;
   ReferenceLineInfo info(nullptr, ref, segments, point, start_point);

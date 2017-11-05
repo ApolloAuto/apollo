@@ -17,7 +17,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",

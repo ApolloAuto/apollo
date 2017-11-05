@@ -33,7 +33,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -83,7 +83,7 @@ void Frame::CreatePredictionObstacles(
 
 bool Frame::Rerouting() {
   auto *adapter_manager = AdapterManager::instance();
-  const auto *vehicle_state = common::VehicleState::instance();
+  const auto *vehicle_state = common::VehicleStateProvider::instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {
     AERROR << "No previous routing available";
     return false;
@@ -252,7 +252,8 @@ Status Frame::Init(const PlanningConfig &config,
 }
 
 bool Frame::CheckCollision() {
-  const auto &adc_box = common::VehicleState::instance()->AdcBoundingBox();
+  const auto &adc_box =
+      common::VehicleStateProvider::instance()->AdcBoundingBox();
   common::math::Polygon2d adc_polygon(adc_box);
   const double adc_half_diagnal = adc_box.diagonal() / 2.0;
   for (const auto &obstacle : obstacles_.Items()) {
@@ -294,7 +295,8 @@ bool Frame::CreateReferenceLineFromRouting(
     smoother.reset(
         new QpSplineReferenceLineSmoother(smoother_config_, &spline_solver));
   }
-  const auto &adc_speed = common::VehicleState::instance()->linear_velocity();
+  const auto &adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   return ReferenceLineProvider::CreateReferenceLineFromRouting(
       position, adc_speed, pnc_map_.get(), smoother.get(), reference_lines,
       segments);
