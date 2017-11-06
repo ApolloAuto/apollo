@@ -83,7 +83,9 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  ref_l_ = init_frenet_point_.l();
+  if (is_change_lane_path_) {
+    ref_l_ = init_frenet_point_.l();
+  }
 
   double start_s = init_frenet_point_.s();
   double start_l = ref_l_;
