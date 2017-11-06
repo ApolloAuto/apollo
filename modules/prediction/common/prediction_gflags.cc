@@ -82,6 +82,10 @@ DEFINE_string(evaluator_vehicle_rnn_file,
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
 
+// evaluator
+DEFINE_double(rnn_min_lane_relatice_s, 5.0,
+              "Minimal relative s for RNN model.");
+
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
               "Threshold for trimming lane sequence trajectories");
