@@ -84,6 +84,7 @@ class QpSplinePathGenerator {
   const DiscretizedPath* last_discretized_path_ = nullptr;
   SLBoundary adc_sl_boundary_;
   bool is_change_lane_path_ = false;
+  double ref_l_ = 0.0;
 };
 
 }  // namespace planning
