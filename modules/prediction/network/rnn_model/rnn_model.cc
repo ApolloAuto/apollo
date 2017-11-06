@@ -14,16 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/network/rnn_model.h"
+#include "modules/prediction/network/rnn_model/rnn_model.h"
 
 #include <string>
 #include <vector>
-
 #include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "modules/prediction/evaluator/network/layer/layer.h"
 
 namespace apollo {
 namespace prediction {

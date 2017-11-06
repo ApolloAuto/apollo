@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/network/layer/util.h"
+#include "modules/prediction/network/net_util.h"
 
 #include <string>
 #include <unordered_map>
-
 #include "Eigen/Dense"
+
 #include "modules/common/log.h"
 
 namespace apollo {

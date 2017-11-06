@@ -29,7 +29,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
-#include "modules/prediction/evaluator/network/rnn_model.h"
+#include "modules/prediction/network/rnn_model/rnn_model.h"
 
 namespace apollo {
 namespace prediction {

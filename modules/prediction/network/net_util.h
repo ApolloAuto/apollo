@@ -14,30 +14,41 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file util.h
+ */
+
+#ifndef MODULES_PREDICTION_NETWORK_NET_UTIL_H_
+#define MODULES_PREDICTION_NETWORK_NET_UTIL_H_
+
+#include <functional>
 #include <string>
-#include "gtest/gtest.h"
+#include "Eigen/Dense"
 
-#include "modules/common/util/file.h"
-#include "modules/prediction/evaluator/network/rnn_model.h"
+#include "modules/prediction/proto/network_layers.pb.h"
 
+/**
+ * @namespace apollo::prediction::network
+ * @brief apollo::prediction::network
+ */
 namespace apollo {
 namespace prediction {
 namespace network {
 
-class NetModelTest : public ::testing::Test {
- public:
-  void SetUp() override {}
-};
+float sigmoid(float x);
+float tanh(float x);
+float linear(float x);
+float hard_sigmoid(float x);
+float relu(float x);
 
-TEST(NetModelTest, verification_test) {
-  const std::string rnn_filename =
-      "modules/prediction/data/rnn_vehicle_model.bin";
-  NetParameter net_parameter = NetParameter();
-  EXPECT_TRUE(common::util::GetProtoFromFile(rnn_filename, &net_parameter));
-  EXPECT_TRUE(RnnModel::instance()->LoadModel(net_parameter));
-  EXPECT_TRUE(RnnModel::instance()->VerifyModel());
-}
+std::function<float(float)> serialize_to_function(const std::string& str);
+
+bool LoadTensor(const TensorParameter& tensor_pb, Eigen::MatrixXf* matrix);
+
+bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
 
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo
+
+#endif  // MODULES_PREDICTION_NETWORK_NET_UTIL_H_
