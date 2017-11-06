@@ -15,19 +15,17 @@
  *****************************************************************************/
 
 /**
- * @file
- * @brief
+ * @file layer.cc
  */
 
-#include "modules/prediction/evaluator/network/layer/layer.h"
+#include "modules/prediction/network/net_layer.h"
 
 #include <string>
 #include <vector>
-
 #include "Eigen/Dense"
 
 #include "modules/common/log.h"
-#include "modules/prediction/evaluator/network/layer/util.h"
+#include "modules/prediction/network/net_util.h"
 #include "modules/prediction/proto/network_layers.pb.h"
 
 namespace apollo {

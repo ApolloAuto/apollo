@@ -12,27 +12,10 @@ cc_library(
     ],
     deps = [
         "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/evaluator/network:net_model",
-        "//modules/prediction/evaluator/network/layer:layer",
+        "//modules/prediction/network:net_model",
+        "//modules/prediction/network:net_layer",
         "//modules/common:log",
         "//modules/common:macro",
-        "@eigen//:eigen",
-    ],
-)
-
-cc_library(
-    name = "net_model",
-    srcs = [
-        "net_model.cc",
-    ],
-    hdrs = [
-        "net_model.h",
-    ],
-    deps = [
-        "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/evaluator/network/layer:layer",
-        "//modules/common:log",
-        "//modules/common/util",
         "@eigen//:eigen",
     ],
 )
@@ -47,10 +30,9 @@ cc_test(
         "//modules/prediction:prediction_data",
     ],
     deps = [
-        "//modules/prediction/evaluator/network:rnn_model",
+        "//modules/prediction/network/rnn_model:rnn_model",
         "@gtest//:main",
     ],
 )
-
 
 cpplint()

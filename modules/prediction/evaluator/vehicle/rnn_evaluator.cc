@@ -127,7 +127,7 @@ int RNNEvaluator::ExtractFeatureValues(
     obstacle->InitRNNStates();
   }
   if (static_cast<int>(obstacle_features.size()) != dim_obstacle_feature_) {
-    AINFO << "Fail to setup obstacle feature!";
+    AERROR << "Fail to setup obstacle feature!";
     return -1;
   }
   obstacle_feature_mat->resize(1, obstacle_features.size());
@@ -137,7 +137,7 @@ int RNNEvaluator::ExtractFeatureValues(
 
   Feature* feature = obstacle->mutable_latest_feature();
   if (!feature->has_lane() || !feature->lane().has_lane_graph()) {
-    AINFO << "Fail to access lane graph!";
+    AERROR << "Fail to access lane graph!";
     return -1;
   }
   int routes = feature->lane().lane_graph().lane_sequence_size();

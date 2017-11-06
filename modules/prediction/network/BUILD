@@ -3,45 +3,61 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "layer",
+    name = "net_util",
     srcs = [
-        "layer.cc",
+        "net_util.cc",
     ],
     hdrs = [
-        "layer.h",
+        "net_util.h",
     ],
     deps = [
         "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/evaluator/network/layer:util",
         "//modules/common:log",
         "@eigen//:eigen",
     ],
 )
 
 cc_library(
-    name = "util",
+    name = "net_layer",
     srcs = [
-        "util.cc",
+        "net_layer.cc",
     ],
     hdrs = [
-        "util.h",
+        "net_layer.h",
     ],
     deps = [
         "//modules/prediction/proto:network_model_proto",
+        "//modules/prediction/network:net_util",
         "//modules/common:log",
         "@eigen//:eigen",
     ],
 )
 
+cc_library(
+    name = "net_model",
+    srcs = [
+        "net_model.cc",
+    ],  
+    hdrs = [
+        "net_model.h",
+    ],  
+    deps = [
+        "//modules/prediction/proto:network_model_proto",
+        "//modules/prediction/network:net_layer",
+        "//modules/common:log",
+        "//modules/common/util",
+        "@eigen//:eigen",
+    ],  
+)
+
 cc_test(
-    name = "layer_test",
+    name = "net_util_test",
     size = "small",
     srcs = [
-        "layer_test.cc",
+        "net_util_test.cc",
     ],
     deps = [
-        "//modules/prediction/evaluator/network/layer:util",
-        "//modules/prediction/evaluator/network/layer:layer",
+        "//modules/prediction/network:net_util",
         "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
         "@gtest//:main",
@@ -49,13 +65,14 @@ cc_test(
 )
 
 cc_test(
-    name = "util_test",
+    name = "net_layer_test",
     size = "small",
     srcs = [
-        "util_test.cc",
+        "net_layer_test.cc",
     ],
     deps = [
-        "//modules/prediction/evaluator/network/layer:util",
+        "//modules/prediction/network:net_util",
+        "//modules/prediction/network:net_layer",
         "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
         "@gtest//:main",

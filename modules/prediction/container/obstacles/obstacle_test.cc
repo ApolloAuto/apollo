@@ -41,6 +41,7 @@ class ObstacleTest : public KMLMapBasedTest {
     FLAGS_q_var = 0.1;
     FLAGS_r_var = 0.001;
     FLAGS_enable_kf_tracking = true;
+    FLAGS_min_prediction_length = 50.0;
     int num_frame = 3;
     for (int i = 1; i <= num_frame; ++i) {
       const auto filename = common::util::StrCat(
@@ -129,9 +130,19 @@ TEST_F(ObstacleTest, VehicleLaneGraph) {
   Obstacle* obstacle_ptr = container_.GetObstacle(1);
   const Feature& latest_feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = latest_feature.lane().lane_graph();
-  EXPECT_EQ(lane_graph.lane_sequence_size(), 2);
+  EXPECT_EQ(lane_graph.lane_sequence_size(), 3);
+  EXPECT_EQ(lane_graph.lane_sequence(0).lane_segment_size(), 2);
   EXPECT_EQ(lane_graph.lane_sequence(0).lane_segment(0).lane_id(), "l164");
-  EXPECT_EQ(lane_graph.lane_sequence(1).lane_segment(0).lane_id(), "l163");
+  EXPECT_EQ(lane_graph.lane_sequence(0).lane_segment(1).lane_id(), "l120");
+
+  EXPECT_EQ(lane_graph.lane_sequence(1).lane_segment_size(), 3);
+  EXPECT_EQ(lane_graph.lane_sequence(1).lane_segment(0).lane_id(), "l164");
+  EXPECT_EQ(lane_graph.lane_sequence(1).lane_segment(1).lane_id(), "l35");
+  EXPECT_EQ(lane_graph.lane_sequence(1).lane_segment(2).lane_id(), "l153");
+
+  EXPECT_EQ(lane_graph.lane_sequence(2).lane_segment_size(), 2);
+  EXPECT_EQ(lane_graph.lane_sequence(2).lane_segment(0).lane_id(), "l163");
+  EXPECT_EQ(lane_graph.lane_sequence(2).lane_segment(1).lane_id(), "l114");
 }
 
 TEST_F(ObstacleTest, PedestrianBasic) {
