@@ -255,7 +255,8 @@ int RNNEvaluator::SetupLaneFeature(const Feature& feature,
     LaneSegment lane_seg = lane_sequence.lane_segment(seg_i);
     for (int pt_i = 0; pt_i < lane_seg.lane_point_size(); ++pt_i) {
       p_lane_point = lane_seg.mutable_lane_point(pt_i);
-      if (p_lane_point->has_relative_s() && p_lane_point->relative_s() < 5) {
+      if (p_lane_point->has_relative_s() &&
+          p_lane_point->relative_s() < FLAGS_rnn_min_lane_relatice_s) {
         continue;
       }
       if (!feature.has_position() || !p_lane_point->has_position()) {
