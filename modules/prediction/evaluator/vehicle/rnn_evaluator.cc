@@ -113,7 +113,7 @@ void RNNEvaluator::LoadModel(const std::string& model_file) {
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
-  model_ptr_.reset(network::RnnModel::instance());
+  model_ptr_ = network::RnnModel::instance();
   model_ptr_->LoadModel(net_parameter);
 }
 
