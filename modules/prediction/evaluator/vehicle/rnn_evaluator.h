@@ -28,7 +28,7 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/network_model.pb.h"
-#include "modules/prediction/evaluator/network/rnn_model.h"
+#include "modules/prediction/network/rnn_model/rnn_model.h"
 
 namespace apollo {
 namespace prediction {

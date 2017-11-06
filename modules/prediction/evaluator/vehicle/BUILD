@@ -60,7 +60,7 @@ cc_library(
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:network_model_proto",
         "//modules/prediction/common:prediction_map",
-        "//modules/prediction/evaluator/network:rnn_model",
+        "//modules/prediction/network/rnn_model:rnn_model",
         "@eigen//:eigen",
     ],
 )

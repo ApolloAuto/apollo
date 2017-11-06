@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/network/net_model.h"
+#include "modules/prediction/network/net_model.h"
 
 #include <fstream>
 #include <sstream>
@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/prediction/evaluator/network/layer/layer.h"
 #include "modules/prediction/proto/network_model.pb.h"
 
 namespace apollo {

@@ -78,7 +78,7 @@ DEFINE_string(evaluator_vehicle_mlp_file,
               "mlp model file for vehicle evaluator");
 DEFINE_string(evaluator_vehicle_rnn_file,
               "modules/prediction/data/rnn_vehicle_model.bin",
-              "rmm model file for vehicle evaluator");
+              "rnn model file for vehicle evaluator");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
 

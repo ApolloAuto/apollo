@@ -19,12 +19,12 @@
 
 #include "Eigen/Dense"
 
-#include "modules/prediction/evaluator/network/layer/layer.h"
-#include "modules/prediction/evaluator/network/layer/util.h"
-#include "modules/prediction/proto/network_model.pb.h"
+#include "modules/common/macro.h"
+#include "modules/prediction/network/net_layer.h"
+#include "modules/prediction/network/net_model.h"
 
-#ifndef MODULES_PREDICTION_EVALUATOR_NETWORK_NET_MODEL_H_
-#define MODULES_PREDICTION_EVALUATOR_NETWORK_NET_MODEL_H_
+#ifndef MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
+#define MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
 
 /**
  * @namespace apollo::prediction::network
@@ -34,43 +34,24 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-class NetModel {
+class RnnModel : public NetModel {
  public:
-  NetModel();
-
-  ~NetModel();
-
   virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output) const = 0;
+                   Eigen::MatrixXf* output) const;
 
-  virtual bool VerifyModel() const = 0;
+  virtual bool VerifyModel() const;
 
-  virtual void SetState(const std::vector<Eigen::MatrixXf>& states) {}
+  virtual void SetState(const std::vector<Eigen::MatrixXf>& states);
 
-  virtual void State(std::vector<Eigen::MatrixXf>* states) const {}
+  virtual void State(std::vector<Eigen::MatrixXf>* states) const;
 
-  virtual void ResetState() const {}
+  virtual void ResetState() const;
 
-  bool LoadModel(const NetParameter& net_parameter);
-
-  std::string PerformanceString() const;
-
-  const std::string& Name() const;
-
-  int Id() const;
-
-  bool IsOk() const;
-
- protected:
-  void Clear();
-
-  std::vector<Layer*> layers_;
-  NetParameter net_parameter_;
-  bool ok_;
+  DECLARE_SINGLETON(RnnModel);
 };
 
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_NETWORK_NET_MODEL_H_
+#endif  // MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
