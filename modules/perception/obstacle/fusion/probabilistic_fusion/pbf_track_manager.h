@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_background_track.h"
@@ -28,42 +28,42 @@ public:
     static PbfTrackManager* instance();
     ~PbfTrackManager();
 
-    inline std::vector<PbfTrackPtr>& get_tracks() {
-        return _tracks;
+    inline std::vector<PbfTrackPtr>& GetTracks() {
+        return tracks_;
     }
     
-    inline const std::vector<PbfTrackPtr>& get_tracks() const {
-        return _tracks;
+    inline const std::vector<PbfTrackPtr>& GetTracks() const {
+        return tracks_;
     }
     
-    void add_track(const PbfTrackPtr& track){
-        _tracks.push_back(track);
+    void AddTrack(const PbfTrackPtr &track){
+        tracks_.push_back(track);
     }
 
-    inline std::vector<PbfBackgroundTrackPtr>& get_background_tracks() {
-        return _background_tracks;
+    inline std::vector<PbfBackgroundTrackPtr>& GetBackgroundTracks() {
+        return background_tracks_;
     }
     
-    inline const std::vector<PbfBackgroundTrackPtr>& get_background_tracks() const {
-        return _background_tracks;
+    inline const std::vector<PbfBackgroundTrackPtr>& GetBackgroundTracks() const {
+        return background_tracks_;
     }
     
-    void add_background_track(const PbfBackgroundTrackPtr& track){
-        _background_tracks.push_back(track);
+    void AddBackgroundTrack(const PbfBackgroundTrackPtr &track){
+        background_tracks_.push_back(track);
     }
 
-    int remove_lost_tracks();
+    int TemoveLostTracks();
 
 private:
     DISALLOW_COPY_AND_ASSIGN(PbfTrackManager);
     PbfTrackManager();
 
 protected:
-    std::vector<PbfTrackPtr>  _tracks;
-    std::vector<PbfBackgroundTrackPtr> _background_tracks;
+    std::vector<PbfTrackPtr>  tracks_;
+    std::vector<PbfBackgroundTrackPtr> background_tracks_;
 };
 
 } //namespace perception
 } //namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_

@@ -20,7 +20,7 @@
 namespace apollo {
 namespace perception {
 
-PbfSensorManager* PbfSensorManager::instance() {
+PbfSensorManager* PbfSensorManager::Instance() {
     static PbfSensorManager sensor_manager;
     return &sensor_manager;
 }
@@ -30,75 +30,75 @@ PbfSensorManager::PbfSensorManager() {
 }
 
 PbfSensorManager::~PbfSensorManager() {
-    std::map<std::string, PbfSensor*>::iterator it = _sensors.begin();
-    for (; it != _sensors.end(); ++it) {
+    std::map<std::string, PbfSensor*>::iterator it = sensors_.begin();
+    for (; it != sensors_.end(); ++it) {
         if (it->second != nullptr) {
             delete (it->second);
             it->second = nullptr;
         }
     }
-    _sensors.clear();
+    sensors_.clear();
 }
 
-bool PbfSensorManager::init() {
+bool PbfSensorManager::Init() {
 
-    _sensors.clear();
+    sensors_.clear();
 
     std::string sensor_id = GetSensorType(VELODYNE_64);
     SensorType type = VELODYNE_64;
 
     PbfSensor* velodyne_64 = new PbfSensor(type, sensor_id);
-    _sensors[sensor_id] = velodyne_64;
+    sensors_[sensor_id] = velodyne_64;
 
     sensor_id = GetSensorType(RADAR);
     type = RADAR;
     PbfSensor* radar = new PbfSensor(type, sensor_id);
-    _sensors[sensor_id] = radar;
+    sensors_[sensor_id] = radar;
     //TODO: init from sensor configuration file
     return true;
 }
 
-void PbfSensorManager::add_sensor_measurements(const SensorObjects& objects) {
+void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
     std::string sensor_id = GetSensorType(objects.sensor_type);
     SensorType type = objects.sensor_type;
 
-    std::map<std::string, PbfSensor*>::iterator it = _sensors.find(sensor_id);
+    std::map<std::string, PbfSensor*>::iterator it = sensors_.find(sensor_id);
     PbfSensor* sensor = nullptr;
-    if (it == _sensors.end()) {
+    if (it == sensors_.end()) {
         AWARN << "Cannot find sensor " << sensor_id
             << " and create one in SensorManager";
         sensor = new PbfSensor(type, sensor_id);
-        _sensors[sensor_id] = sensor;
+        sensors_[sensor_id] = sensor;
     } else {
         sensor = it->second;
     }
 
-    sensor->add_frame(objects);
+    sensor->AddFrame(objects);
 }
 
-void PbfSensorManager::get_latest_sensor_frames(double time_stamp,
-    const std::string& sensor_id,
-    std::vector<PbfSensorFramePtr>* frames) {
+void PbfSensorManager::GetLatestSensorFrames(double time_stamp,
+                                             const std::string &sensor_id,
+                                             std::vector<PbfSensorFramePtr> *frames) {
     if (frames == nullptr) {
         return;
     }
-    std::map<std::string, PbfSensor*>::iterator it = _sensors.find(sensor_id);
-    if (it == _sensors.end()) {
+    std::map<std::string, PbfSensor*>::iterator it = sensors_.find(sensor_id);
+    if (it == sensors_.end()) {
         return;
     }
-    return it->second->query_latest_frames(time_stamp, frames);
+    return it->second->QueryLatestFrames(time_stamp, frames);
 }
 
-void PbfSensorManager::get_latest_frames(const double time_stamp,
-    std::vector<PbfSensorFramePtr>* frames) {
+void PbfSensorManager::GetLatestFrames(const double time_stamp,
+                                       std::vector<PbfSensorFramePtr> *frames) {
     if (frames == nullptr) {
         return;
     }
     frames->clear();
-    for (std::map<std::string, PbfSensor*>::iterator it = _sensors.begin();
-        it != _sensors.end(); ++it) {
+    for (std::map<std::string, PbfSensor*>::iterator it = sensors_.begin();
+        it != sensors_.end(); ++it) {
         PbfSensor* sensor = it->second;
-        PbfSensorFramePtr frame = sensor->query_latest_frame(time_stamp);
+        PbfSensorFramePtr frame = sensor->QueryLatestFrame(time_stamp);
         if (frame != nullptr) {
             frames->push_back(frame);
         }
@@ -114,30 +114,30 @@ void PbfSensorManager::get_latest_frames(const double time_stamp,
     }
 }
 
-PbfSensor* PbfSensorManager::get_sensor(const std::string& sensor_id) {
-    std::map<std::string, PbfSensor*>::iterator it = _sensors.find(sensor_id);
+PbfSensor* PbfSensorManager::GetSensor(const std::string &sensor_id) {
+    std::map<std::string, PbfSensor*>::iterator it = sensors_.find(sensor_id);
     PbfSensor* sensor = nullptr;
-    if (it != _sensors.end()) {
+    if (it != sensors_.end()) {
         sensor = it->second;
     }
     return sensor;
 }
 
-bool PbfSensorManager::get_pose(const std::string& sensor_id,
-    double time_stamp, Eigen::Matrix4d* pose) {
+bool PbfSensorManager::GetPose(const std::string &sensor_id,
+                               double time_stamp, Eigen::Matrix4d *pose) {
     if (pose == nullptr) {
         AERROR << "output parameter pose is nullptr";
         return false;
     }
 
-    std::map<std::string, PbfSensor*>::iterator it = _sensors.find(sensor_id);
-    if (it == _sensors.end()) {
+    std::map<std::string, PbfSensor*>::iterator it = sensors_.find(sensor_id);
+    if (it == sensors_.end()) {
         AERROR << "Failed to find sensor for " << sensor_id;
         return false;
     }
 
     PbfSensor* sensor = it->second;
-    return sensor->get_pose(time_stamp, pose);
+    return sensor->GetPose(time_stamp, pose);
 }
 
 } // namespace perception

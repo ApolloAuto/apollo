@@ -28,45 +28,43 @@ namespace apollo {
 namespace perception {
 
 /*class PbfBackgroundTrack*/
-double PbfBackgroundTrack::_s_max_invisible_period = 0.5;
-void PbfBackgroundTrack::set_max_invisible_period(double period) {
-    _s_max_invisible_period = period;
+double PbfBackgroundTrack::s_max_invisible_period_ = 0.5;
+void PbfBackgroundTrack::SetMaxInvisiblePeriod(double period) {
+    s_max_invisible_period_ = period;
 }
 PbfBackgroundTrack::PbfBackgroundTrack(PbfSensorObjectPtr obj) {
-    _idx = PbfTrack::get_next_track_id();
-    SensorType sensor_type = obj->sensor_type;
-    std::string sensor_id = obj->sensor_id;
-    _fused_timestamp = obj->timestamp;
-    _fused_object.reset(new PbfSensorObject());
-    _fused_object->clone(*obj);
-    _age = 0;
-    _invisible_period = 0;
-    _tracking_period = 0.0;
-    _is_dead = false;
+    idx_ = PbfTrack::GetNextTrackId();
+    fused_timestamp_ = obj->timestamp;
+    fused_object_.reset(new PbfSensorObject());
+    fused_object_->clone(*obj);
+    age_ = 0;
+    invisible_period_ = 0;
+    tracking_period_ = 0.0;
+    is_dead_ = false;
 }
 PbfBackgroundTrack::~PbfBackgroundTrack() {
 }
-void PbfBackgroundTrack::update_with_sensor_object(PbfSensorObjectPtr obj) {
-    _fused_object->clone(*obj);
-    _invisible_period = 0;
-    _tracking_period += obj->timestamp - _fused_timestamp;
-    _fused_timestamp = obj->timestamp;
-    _fused_object->timestamp = obj->timestamp;
+void PbfBackgroundTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj) {
+    fused_object_->clone(*obj);
+    invisible_period_ = 0;
+    tracking_period_ += obj->timestamp - fused_timestamp_;
+    fused_timestamp_ = obj->timestamp;
+    fused_object_->timestamp = obj->timestamp;
 }
-void PbfBackgroundTrack::update_without_sensor_object(const SensorType& sensor_type,
-    const std::string& sensor_id, double timestamp) {
+void PbfBackgroundTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
+                                                   const std::string &sensor_id, double timestamp) {
     
-    _invisible_period = timestamp - _fused_timestamp;
-    if (_invisible_period > _s_max_invisible_period) {
-        _is_dead = true;
+    invisible_period_ = timestamp - fused_timestamp_;
+    if (invisible_period_ > s_max_invisible_period_) {
+        is_dead_ = true;
     }
 }
-PbfSensorObjectPtr PbfBackgroundTrack::get_fused_object() {
-    return _fused_object;
+PbfSensorObjectPtr PbfBackgroundTrack::GetFusedObject() {
+    return fused_object_;
 }
-bool PbfBackgroundTrack::able_to_publish() const {
+bool PbfBackgroundTrack::AbleToPublish() const {
     double invisible_period_threshold = 0.01;
-    if (_invisible_period > invisible_period_threshold) {
+    if (invisible_period_ > invisible_period_threshold) {
         return false;
     }
     return true;

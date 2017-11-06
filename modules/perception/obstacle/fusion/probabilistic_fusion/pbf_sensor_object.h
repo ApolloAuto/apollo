@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H
+#ifndef MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_
+#define MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_
 #include "modules/perception/obstacle/base/object.h"
 
 namespace apollo {
@@ -56,4 +56,4 @@ typedef std::shared_ptr<PbfSensorFrame> PbfSensorFramePtr;
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_

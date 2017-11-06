@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #include <deque>
 #include "modules/common/macro.h"
 #include "modules/common/log.h"
@@ -31,19 +31,19 @@ public:
     ~PbfSensor();
 
     /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
-    void query_latest_frames(double time_stamp, std::vector<PbfSensorFramePtr>* frames);
+    void QueryLatestFrames(double time_stamp, std::vector<PbfSensorFramePtr> *frames);
 
     /**@brief query latest frame whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
-    PbfSensorFramePtr query_latest_frame(double time_stamp);
+    PbfSensorFramePtr QueryLatestFrame(double time_stamp);
 
     /**@brief add a frame objects*/
-    void add_frame(const SensorObjects& frame);
+    void AddFrame(const SensorObjects &frame);
 
     /**@brief query pose at time_stamp, return false if not found*/
-    bool get_pose(double time_stamp, Eigen::Matrix4d* pose);
+    bool GetPose(double time_stamp, Eigen::Matrix4d *pose);
 
-    static void set_max_cached_frame_number(int number) {
-        _s_max_cached_frame_number = number;
+    static void SetMaxCachedFrameNumber(int number) {
+        s_max_cached_frame_number_ = number;
     }
 private:
     DISALLOW_COPY_AND_ASSIGN(PbfSensor);
@@ -51,18 +51,18 @@ private:
 
 protected:
     /**@brief cached frames in FIFO*/
-    std::deque<PbfSensorFramePtr>  _frames;
+    std::deque<PbfSensorFramePtr>  frames_;
 
-    std::string                    _sensor_id;
-    SensorType                     _sensor_type;
+    std::string                    sensor_id_;
+    SensorType                     sensor_type_;
 
     /**@brief max size of _frames*/
-    static int                     _s_max_cached_frame_number;
+    static int                     s_max_cached_frame_number_;
 
-    double                         _latest_query_timestamp;
+    double                         latest_query_timestamp_;
 };
 
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_

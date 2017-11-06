@@ -23,12 +23,12 @@
 //     MyObjectFusion() : BaseFusion() {}
 //     virtual ~MyObjectFusion() {}
 //
-//     virtual bool init() override {
+//     virtual bool Init() override {
 //         // Do something.
 //         return true;
 //     }
 //
-//     virtual bool fuse(
+//     virtual bool Fuse(
 //              const std::vector<SensorObjects>& multi_sensor_objects,
 //              std::vector<ObjectPtr>* fused_objects) override {
 //
@@ -64,13 +64,13 @@ class BaseFusion {
 public:
     BaseFusion() {}
     virtual ~BaseFusion() {}
-    virtual bool init() = 0;
+    virtual bool Init() = 0;
     // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
     // @param [in]: multi sensor objects.
     // @param [out]: fused objects.
-    virtual bool fuse(
-            const std::vector<SensorObjects>& multi_sensor_objects,
-            std::vector<ObjectPtr>* fused_objects) = 0;
+    virtual bool Fuse(
+        const std::vector<SensorObjects> &multi_sensor_objects,
+        std::vector<ObjectPtr> *fused_objects) = 0;
     virtual std::string name() const = 0;
 private:
     DISALLOW_COPY_AND_ASSIGN(BaseFusion);

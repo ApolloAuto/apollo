@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
 
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -33,40 +33,40 @@ public:
     PbfTrackObjectDistance();
     virtual ~PbfTrackObjectDistance();
 
-    float compute(const PbfTrackPtr& fused_track,
-        const PbfSensorObjectPtr& sensor_object,
-        const TrackObjectDistanceOptions& options);
+    float Compute(const PbfTrackPtr &fused_track,
+                  const PbfSensorObjectPtr &sensor_object,
+                  const TrackObjectDistanceOptions &options);
 
 protected:
-    float compute_velodyne64_velodyne64(const PbfSensorObjectPtr& fused_object,
-                              const PbfSensorObjectPtr& sensor_object,
-                              const Eigen::Vector3d& ref_pos,
-                              int range = 3);
-    float compute_velodyne64_radar(const PbfSensorObjectPtr& fused_object,
-                              const PbfSensorObjectPtr& sensor_object,
-                              const Eigen::Vector3d& ref_pos,
-                              int range = 3);
-    float compute_radar_radar(const PbfSensorObjectPtr& fused_object,
-                              const PbfSensorObjectPtr& sensor_object,
-                              const Eigen::Vector3d& ref_pos,
-                              int range = 3);
+    float ComputeVelodyne64Velodyne64(const PbfSensorObjectPtr &fused_object,
+                                      const PbfSensorObjectPtr &sensor_object,
+                                      const Eigen::Vector3d &ref_pos,
+                                      int range = 3);
+    float ComputeVelodyne64Radar(const PbfSensorObjectPtr &fused_object,
+                                 const PbfSensorObjectPtr &sensor_object,
+                                 const Eigen::Vector3d &ref_pos,
+                                 int range = 3);
+    float ComputeRadarRadar(const PbfSensorObjectPtr &fused_object,
+                            const PbfSensorObjectPtr &sensor_object,
+                            const Eigen::Vector3d &ref_pos,
+                            int range = 3);
 
-    float compute_distance_3d(const PbfSensorObjectPtr& fused_object,
-                              const PbfSensorObjectPtr& sensor_object,
-                              const Eigen::Vector3d& ref_pos,
-                              int range);
-    float compute_euclidean_distance(const Eigen::Vector3d& des,
-                                     const Eigen::Vector3d& src);
-    bool compute_polygon_center(const PolygonDType& polygon,
-                                Eigen::Vector3d& center);
-    bool compute_polygon_center(const PolygonDType& polygon,
-                                const Eigen::Vector3d& ref_pos,
-                                int range,
-                                Eigen::Vector3d& center);
+    float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
+                            const PbfSensorObjectPtr &sensor_object,
+                            const Eigen::Vector3d &ref_pos,
+                            int range);
+    float ComputeEuclideanDistance(const Eigen::Vector3d &des,
+                                   const Eigen::Vector3d &src);
+    bool ComputePolygonCenter(const PolygonDType &polygon,
+                              Eigen::Vector3d &center);
+    bool ComputePolygonCenter(const PolygonDType &polygon,
+                              const Eigen::Vector3d &ref_pos,
+                              int range,
+                              Eigen::Vector3d &center);
 private:
     DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
 };
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_

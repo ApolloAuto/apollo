@@ -22,85 +22,85 @@ namespace apollo {
 namespace perception {
 
 PbfKalmanMotionFusion::PbfKalmanMotionFusion() {
-    _initialized = false;
-    _name = "PbfKalmanMotionFusion";
+    initialized_ = false;
+    name_ = "PbfKalmanMotionFusion";
 }
 
 PbfKalmanMotionFusion::~PbfKalmanMotionFusion() {
 
 }
 
-void PbfKalmanMotionFusion::initialize(const Eigen::Vector3d& anchor_point,
+void PbfKalmanMotionFusion::Initialize(const Eigen::Vector3d& anchor_point,
     const Eigen::Vector3d& velocity) {
 
-    _belief_anchor_point = anchor_point;
-    _belief_velocity = velocity;
+    belief_anchor_point_ = anchor_point;
+    belief_velocity_ = velocity;
 }
 
-void PbfKalmanMotionFusion::initialize(const PbfSensorObjectPtr new_object) {
+void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
     ACHECK(new_object != nullptr && new_object->object != nullptr)
         << "Initialize PbfKalmanMotionFusion with null sensor object";
 
     if (is_lidar(new_object->sensor_type)) {
-        _belief_anchor_point = new_object->object->anchor_point;
-        _belief_velocity = new_object->object->velocity;
-        _initialized = true;
+        belief_anchor_point_ = new_object->object->anchor_point;
+        belief_velocity_ = new_object->object->velocity;
+        initialized_ = true;
     } else if (is_radar(new_object->sensor_type)) {
-        _belief_anchor_point = new_object->object->anchor_point;
-        _belief_velocity = new_object->object->velocity;
-        _initialized = true;
+        belief_anchor_point_ = new_object->object->anchor_point;
+        belief_velocity_ = new_object->object->velocity;
+        initialized_ = true;
     } 
 
-    _a_matrix.setIdentity();
-    _a_matrix(0, 2) = 0.05;
-    _a_matrix(1, 3) = 0.05;
+    a_matrix_.setIdentity();
+    a_matrix_(0, 2) = 0.05;
+    a_matrix_(1, 3) = 0.05;
     // initialize states to the states of the detected obstacle
-    _posteriori_state(0) = _belief_anchor_point(0);
-    _posteriori_state(1) = _belief_anchor_point(1);
-    _posteriori_state(2) = _belief_velocity(0);
-    _posteriori_state(3) = _belief_velocity(1);
-    _priori_state = _posteriori_state;
+    posteriori_state_(0) = belief_anchor_point_(0);
+    posteriori_state_(1) = belief_anchor_point_(1);
+    posteriori_state_(2) = belief_velocity_(0);
+    posteriori_state_(3) = belief_velocity_(1);
+    priori_state_ = posteriori_state_;
 
-    _q_matrix.setIdentity();
+    q_matrix_.setIdentity();
 
-    _r_matrix.setIdentity();
-    _r_matrix.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
-    _r_matrix.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
+    r_matrix_.setIdentity();
+    r_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
+    r_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
 
-    _p_matrix.setIdentity();
-    _p_matrix.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
-    _p_matrix.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
-    _c_matrix.setIdentity();
+    p_matrix_.setIdentity();
+    p_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
+    p_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
+    c_matrix_.setIdentity();
 }
 
-void PbfKalmanMotionFusion::predict(Eigen::Vector3d& anchor_point,
+void PbfKalmanMotionFusion::Predict(Eigen::Vector3d& anchor_point,
     Eigen::Vector3d& velocity, const double time_diff) {
 
-    anchor_point = _belief_anchor_point + _belief_velocity * time_diff;
-    velocity = _belief_velocity;
+    anchor_point = belief_anchor_point_ + belief_velocity_ * time_diff;
+    velocity = belief_velocity_;
 }
 
-void PbfKalmanMotionFusion::update_with_object(const PbfSensorObjectPtr new_object,
-    const double time_diff) {
+void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
+                                             const double time_diff) {
     ACHECK(new_object != nullptr && new_object->object != nullptr)
         << "update PbfKalmanMotionFusion with null sensor object";
 
     //predict and then correct
-    _a_matrix.setIdentity();
-    _a_matrix(0, 2) = time_diff;
-    _a_matrix(1, 3) = time_diff;
+    a_matrix_.setIdentity();
+    a_matrix_(0, 2) = time_diff;
+    a_matrix_(1, 3) = time_diff;
 
-    _priori_state  = _a_matrix * _posteriori_state;
-    _p_matrix = ((_a_matrix * _p_matrix) * _a_matrix.transpose()) + _q_matrix;
+    priori_state_  = a_matrix_ * posteriori_state_;
+    p_matrix_ = ((a_matrix_ * p_matrix_) * a_matrix_.transpose()) + q_matrix_;
 
     if (new_object->sensor_type == VELODYNE_64) {
-        _belief_anchor_point = new_object->object->center;
-        _belief_velocity = new_object->object->velocity;
+        belief_anchor_point_ = new_object->object->center;
+        belief_velocity_ = new_object->object->velocity;
     } else if (new_object->sensor_type == RADAR) {
-        _belief_anchor_point(0) = new_object->object->center(0);
-        _belief_anchor_point(1) = new_object->object->center(1);
-        _belief_velocity(0) = new_object->object->velocity(0);
-        _belief_velocity(1) = new_object->object->velocity(1);
+        belief_anchor_point_(0) = new_object->object->center(0);
+        belief_anchor_point_(1) = new_object->object->center(1);
+        belief_velocity_(0) = new_object->object->velocity(0);
+        belief_velocity_(1) = new_object->object->velocity(1);
     } else {
         AERROR << "unsupported sensor type for PbfKalmanMotionFusion: "
             << new_object->sensor_type;
@@ -108,42 +108,42 @@ void PbfKalmanMotionFusion::update_with_object(const PbfSensorObjectPtr new_obje
     }
 
     Eigen::Vector4d measurement;
-    measurement(0) = _belief_anchor_point(0);
-    measurement(1) = _belief_anchor_point(1);
-    measurement(2) = _belief_velocity(0);
-    measurement(3) = _belief_velocity(1);
+    measurement(0) = belief_anchor_point_(0);
+    measurement(1) = belief_anchor_point_(1);
+    measurement(2) = belief_velocity_(0);
+    measurement(3) = belief_velocity_(1);
 
-    //_r_matrix = new_object.uncertainty_mat;
-    _r_matrix.setIdentity();
-    _r_matrix.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
-    _r_matrix.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
+    //r_matrix_ = new_object.uncertainty_mat;
+    r_matrix_.setIdentity();
+    r_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
+    r_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
 
-    _k_matrix = _p_matrix * _c_matrix.transpose() *
-        (_c_matrix * _p_matrix * _c_matrix.transpose() + _r_matrix).inverse();
+    k_matrix_ = p_matrix_ * c_matrix_.transpose() *
+        (c_matrix_ * p_matrix_ * c_matrix_.transpose() + r_matrix_).inverse();
 
-    Eigen::Vector4d predict_measurement(_priori_state(0), _priori_state(1),
-                _priori_state(2), _priori_state(3));
+    Eigen::Vector4d predict_measurement(priori_state_(0), priori_state_(1),
+                priori_state_(2), priori_state_(3));
 
-    _posteriori_state = _priori_state + _k_matrix * (measurement - predict_measurement);
-    _p_matrix = (Eigen::Matrix4d::Identity() - _k_matrix * _c_matrix) * _p_matrix
-        * (Eigen::Matrix4d::Identity() - _k_matrix * _c_matrix).transpose()
-        + _k_matrix * _r_matrix * _k_matrix.transpose();
+    posteriori_state_ = priori_state_ + k_matrix_ * (measurement - predict_measurement);
+    p_matrix_ = (Eigen::Matrix4d::Identity() - k_matrix_ * c_matrix_) * p_matrix_
+        * (Eigen::Matrix4d::Identity() - k_matrix_ * c_matrix_).transpose()
+        + k_matrix_ * r_matrix_ * k_matrix_.transpose();
 
-    _belief_anchor_point(0) = _posteriori_state(0);
-    _belief_anchor_point(1) = _posteriori_state(1);
-    _belief_velocity(0) = _posteriori_state(2);
-    _belief_velocity(1) = _posteriori_state(3);
+    belief_anchor_point_(0) = posteriori_state_(0);
+    belief_anchor_point_(1) = posteriori_state_(1);
+    belief_velocity_(0) = posteriori_state_(2);
+    belief_velocity_(1) = posteriori_state_(3);
 }
 
-void PbfKalmanMotionFusion::update_without_object(const double time_diff) {
+void PbfKalmanMotionFusion::UpdateWithoutObject(const double time_diff) {
 
-    _belief_anchor_point = _belief_anchor_point + _belief_velocity * time_diff;
+    belief_anchor_point_ = belief_anchor_point_ + belief_velocity_ * time_diff;
 }
 
-void PbfKalmanMotionFusion::get_state(Eigen::Vector3d& anchor_point, Eigen::Vector3d& velocity) {
+void PbfKalmanMotionFusion::GetState(Eigen::Vector3d& anchor_point, Eigen::Vector3d& velocity) {
 
-    anchor_point = _belief_anchor_point;
-    velocity = _belief_velocity;
+    anchor_point = belief_anchor_point_;
+    velocity = belief_velocity_;
 }
 
 } // namespace perception

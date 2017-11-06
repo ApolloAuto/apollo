@@ -19,21 +19,21 @@
 namespace apollo {
 namespace perception {
 
-double PbfBaseTrackObjectMatcher::_s_max_match_distance = 4.0;
+double PbfBaseTrackObjectMatcher::s_max_match_distance_ = 4.0;
 
-void PbfBaseTrackObjectMatcher::set_max_match_distance(double dist) {
-    _s_max_match_distance = dist;
+void PbfBaseTrackObjectMatcher::SetMaxMatchDistance(double dist) {
+    s_max_match_distance_ = dist;
 }
 
-double PbfBaseTrackObjectMatcher::get_max_match_distance() {
-    return _s_max_match_distance;
+double PbfBaseTrackObjectMatcher::GetMaxMatchDistance() {
+    return s_max_match_distance_;
 }
 
-void PbfBaseTrackObjectMatcher::id_assign(std::vector<PbfTrackPtr>& fusion_tracks,
-    std::vector<PbfSensorObjectPtr>& sensor_objects,
-    std::vector<TrackObjectPair>& assignments,
-    std::vector<int>& unassigned_fusion_tracks,
-    std::vector<int>& unassigned_sensor_objects) {
+void PbfBaseTrackObjectMatcher::IdAssign(std::vector<PbfTrackPtr> &fusion_tracks,
+                                         std::vector<PbfSensorObjectPtr> &sensor_objects,
+                                         std::vector<TrackObjectPair> &assignments,
+                                         std::vector<int> &unassigned_fusion_tracks,
+                                         std::vector<int> &unassigned_sensor_objects) {
 
     size_t num_track = fusion_tracks.size();
     size_t num_obj = sensor_objects.size();
@@ -51,7 +51,7 @@ void PbfBaseTrackObjectMatcher::id_assign(std::vector<PbfTrackPtr>& fusion_track
     
     std::map<int, int> sensor_id_2_track_ind;
     for (size_t i = 0; i < num_track; i++) {
-        PbfSensorObjectPtr obj = fusion_tracks[i]->get_sensor_object(sensor_type, sensor_id);
+        PbfSensorObjectPtr obj = fusion_tracks[i]->GetSensorObject(sensor_type, sensor_id);
         if (obj == nullptr) {
             continue;
         }

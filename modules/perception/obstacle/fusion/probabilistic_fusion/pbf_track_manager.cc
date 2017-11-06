@@ -33,31 +33,31 @@ PbfTrackManager::~PbfTrackManager() {
 
 }
 
-int PbfTrackManager::remove_lost_tracks() {
+int PbfTrackManager::TemoveLostTracks() {
     int track_count = 0;
-    for (int i = 0; i < _tracks.size(); i++) {
-        if (!_tracks[i]->is_dead()) {
+    for (int i = 0; i < tracks_.size(); i++) {
+        if (!tracks_[i]->IsDead()) {
             if (i != track_count) {
-                _tracks[track_count] = _tracks[i];
+                tracks_[track_count] = tracks_[i];
             }
             track_count++;            
         }
     }
 
-    AINFO << "Remove " << (int)_tracks.size() - track_count << " tracks";
-    _tracks.resize(track_count);
+    AINFO << "Remove " << (int)tracks_.size() - track_count << " tracks";
+    tracks_.resize(track_count);
 
     int bk_track_count = 0;
-    for (size_t i = 0; i < _background_tracks.size(); i++) {
-        if (!_background_tracks[i]->is_dead()) {
+    for (size_t i = 0; i < background_tracks_.size(); i++) {
+        if (!background_tracks_[i]->IsDead()) {
             if (i != bk_track_count) {
-                _background_tracks[bk_track_count] = _background_tracks[i];
+                background_tracks_[bk_track_count] = background_tracks_[i];
             }
             bk_track_count++;
         }
     }
-    AINFO << "Remove " << (int)_tracks.size() - track_count << " background tracks";
-    _background_tracks.resize(bk_track_count);
+    AINFO << "Remove " << (int)tracks_.size() - track_count << " background tracks";
+    background_tracks_.resize(bk_track_count);
 
     return track_count + bk_track_count;
 }

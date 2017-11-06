@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H_
 
 #include <utility>
 #include <vector>
@@ -34,7 +34,7 @@ public:
     PbfHmTrackObjectMatcher();
     virtual ~PbfHmTrackObjectMatcher();
     
-    bool match(std::vector<PbfTrackPtr>& fusion_tracks,
+    bool Match(std::vector<PbfTrackPtr>& fusion_tracks,
         std::vector<PbfSensorObjectPtr>& sensor_objects,
         const TrackObjectMatcherOptions& options,
         std::vector<TrackObjectPair>& assignments,
@@ -43,29 +43,29 @@ public:
         std::vector<double>& track2measurements_dist, 
         std::vector<double>& measurement2track_dist)  override;
 
-    bool init() override;
+    bool Init() override;
 
     std::string name() const override;
 
 protected:
-    void compute_association_mat(const std::vector<PbfTrackPtr>& fusion_tracks,
-            const std::vector<PbfSensorObjectPtr>& sensor_objects,
-            const std::vector<int>& unassigned_fusion_tracks,
-            const std::vector<int>& unassigned_sensor_objects,
-            const Eigen::Vector3d& ref_point,
-            std::vector<std::vector<double> >& association_mat);
-    bool hm_assign(const std::vector<std::vector<double> >& association_mat,
-            std::vector<TrackObjectPair>& assignments,
-            std::vector<int>& unassigned_fusion_tracks,
-            std::vector<int>& unassigned_sensor_objects);
-    void minimize_assignment(const std::vector<std::vector<double> > &association_mat,
-        std::vector<int> &ref_idx,
-        std::vector<int> &new_idx);
-    void compute_connected_components(
-        const std::vector<std::vector<double> >& association_mat,
+    void ComputeAssociationMat(const std::vector<PbfTrackPtr> &fusion_tracks,
+                               const std::vector<PbfSensorObjectPtr> &sensor_objects,
+                               const std::vector<int> &unassigned_fusion_tracks,
+                               const std::vector<int> &unassigned_sensor_objects,
+                               const Eigen::Vector3d &ref_point,
+                               std::vector<std::vector<double> > &association_mat);
+    bool HmAssign(const std::vector<std::vector<double> > &association_mat,
+                  std::vector<TrackObjectPair> &assignments,
+                  std::vector<int> &unassigned_fusion_tracks,
+                  std::vector<int> &unassigned_sensor_objects);
+    void MinimizeAssignment(const std::vector<std::vector<double> > &association_mat,
+                            std::vector<int> &ref_idx,
+                            std::vector<int> &new_idx);
+    void ComputeConnectedComponents(
+        const std::vector<std::vector<double> > &association_mat,
         float connected_threshold,
-        std::vector<std::vector<int> >& track_components,
-        std::vector<std::vector<int> >& obj_components);
+        std::vector<std::vector<int> > &track_components,
+        std::vector<std::vector<int> > &obj_components);
 private:
     DISALLOW_COPY_AND_ASSIGN(PbfHmTrackObjectMatcher);
 
@@ -74,4 +74,4 @@ private:
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H_

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_
 #include <utility>
 #include <vector>
 #include "modules/common/macro.h"
@@ -27,7 +27,7 @@ namespace perception {
 
 class PbfBaseMotionFusion {
 public:
-    PbfBaseMotionFusion() : _name("PbfBaseMotionFusion"), _initialized(false) {
+    PbfBaseMotionFusion() : name_("PbfBaseMotionFusion"), initialized_(false) {
     }
     virtual ~PbfBaseMotionFusion() {}
 
@@ -35,56 +35,56 @@ public:
     // @params[IN] anchor_point: initial anchor point for filtering
     // @params[IN] velocity: initial velocity for filtering
     // @return nothing
-    virtual void initialize(const Eigen::Vector3d& anchor_point,
+    virtual void Initialize(const Eigen::Vector3d& anchor_point,
         const Eigen::Vector3d& velocity) = 0;
 
     // @brief initialize state of the filter
     // @params[IN] new_object: initial object for filtering
     // @return nothing
-    virtual void initialize(const PbfSensorObjectPtr new_object) = 0;
+    virtual void Initialize(const PbfSensorObjectPtr new_object) = 0;
 
     // @brief predict the state of filter
     // @params[OUT] anchor_point:  predicted anchor point for filtering
     // @params[OUT] velocity: predicted velocity
     // @params[IN] time_diff: time interval from last update
     // @return nothing
-    virtual void predict(Eigen::Vector3d& anchor_point,
+    virtual void Predict(Eigen::Vector3d& anchor_point,
         Eigen::Vector3d& velocity, const double time_diff) = 0;
 
     // @brief update with measurements
     // @params[IN] new_object: new object for current update
     // @params[IN] time_diff: time interval from last update;
     // @return nothing
-    virtual void update_with_object(const PbfSensorObjectPtr new_object,
-        const double time_diff) = 0;
+    virtual void UpdateWithObject(const PbfSensorObjectPtr new_object,
+                                  const double time_diff) = 0;
 
     // @brief update without measurements
     // @params[IN] time_diff: time interval from last update
     // @return nothing
-    virtual void update_without_object(const double time_diff) = 0;
+    virtual void UpdateWithoutObject(const double time_diff) = 0;
 
     // @brief get current state of the filter
     // @params[OUT] anchor_point: current anchor_point
     // @params[OUT] velocity: current velocity
     // @return nothing
-    virtual void get_state(Eigen::Vector3d& anchor_point, Eigen::Vector3d& velocity) = 0;
+    virtual void GetState(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity) = 0;
 
     std::string name() {
-        return _name;
+        return name_;
     }
 
     // @brief check if filter has been initialized
     // @return initialization status 
-    bool initialized() const {
-        return _initialized;
+    bool Initialized() const {
+        return initialized_;
     }
 
 protected:
-    std::string _name;
-    bool _initialized;    
+    std::string name_;
+    bool initialized_;
 };
 
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H

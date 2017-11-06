@@ -19,49 +19,48 @@
 namespace apollo {
 namespace perception {
 
-int PbfSensor::_s_max_cached_frame_number = 10;
+int PbfSensor::s_max_cached_frame_number_ = 10;
 
 PbfSensor::PbfSensor(const SensorType& type, const std::string& sensor_id): 
-     _sensor_id(sensor_id), _sensor_type(type), _latest_query_timestamp(0.0) {
+     sensor_id_(sensor_id), sensor_type_(type), latest_query_timestamp_(0.0) {
 }
 
 PbfSensor::~PbfSensor() {
 
 }
 
-void PbfSensor::query_latest_frames(double time_stamp, std::vector<PbfSensorFramePtr>* frames) {
+void PbfSensor::QueryLatestFrames(double time_stamp, std::vector<PbfSensorFramePtr> *frames) {
     if (frames == nullptr) {
         return;
     }
-
     frames->clear();
-    for (size_t i = 0; i < _frames.size(); i++) {
-        if (_frames[i]->timestamp > _latest_query_timestamp && 
-            _frames[i]->timestamp <= time_stamp) {
-            (*frames).push_back(_frames[i]);
+    for (size_t i = 0; i < frames_.size(); i++) {
+        if (frames_[i]->timestamp > latest_query_timestamp_ &&
+            frames_[i]->timestamp <= time_stamp) {
+            (*frames).push_back(frames_[i]);
         }
     }
-    _latest_query_timestamp = time_stamp;
+    latest_query_timestamp_ = time_stamp;
 }
 
-PbfSensorFramePtr PbfSensor::query_latest_frame(double time_stamp) {
+PbfSensorFramePtr PbfSensor::QueryLatestFrame(double time_stamp) {
 
     PbfSensorFramePtr latest_frame = nullptr;
-    for (size_t i = 0; i < _frames.size(); i++) {
-        if (_frames[i]->timestamp > _latest_query_timestamp &&
-            _frames[i]->timestamp <= time_stamp) {
-            latest_frame = _frames[i];
-            _latest_query_timestamp = _frames[i]->timestamp;
+    for (size_t i = 0; i < frames_.size(); i++) {
+        if (frames_[i]->timestamp > latest_query_timestamp_ &&
+            frames_[i]->timestamp <= time_stamp) {
+            latest_frame = frames_[i];
+            latest_query_timestamp_ = frames_[i]->timestamp;
         }
     }
-//    if (_sensor_type != CAMERA) {
-//        _latest_query_timestamp = time_stamp;
+//    if (sensor_type_ != CAMERA) {
+//        latest_query_timestamp_ = time_stamp;
 //   }
-//    _latest_query_timestamp = time_stamp;
+//    latest_query_timestamp_ = time_stamp;
     return latest_frame;
 }
 
-void PbfSensor::add_frame(const SensorObjects& frame) {
+void PbfSensor::AddFrame(const SensorObjects &frame) {
     //NOTE: keep empty frame for completeness
     PbfSensorFramePtr pbf_frame(new PbfSensorFrame());
     pbf_frame->timestamp = frame.timestamp;
@@ -79,22 +78,22 @@ void PbfSensor::add_frame(const SensorObjects& frame) {
         obj->sensor_id = GetSensorType(frame.sensor_type);
         pbf_frame->objects[i] = obj;
     }
-    if (_frames.size() > _s_max_cached_frame_number) {
-        _frames.pop_front();
+    if ((int)(frames_.size()) > s_max_cached_frame_number_) {
+        frames_.pop_front();
     }
-    _frames.push_back(pbf_frame);
+    frames_.push_back(pbf_frame);
 }
 
-bool PbfSensor::get_pose(double time_stamp, Eigen::Matrix4d* pose) {
+bool PbfSensor::GetPose(double time_stamp, Eigen::Matrix4d *pose) {
     if (pose == nullptr) {
         AERROR << "parameter pose is nullptr for output";
         return false;
     }
 
-    for (int i = (int)_frames.size() - 1; i >= 0; i--) {
-        double time_diff = time_stamp - _frames[i]->timestamp;
+    for (int i = (int)frames_.size() - 1; i >= 0; i--) {
+        double time_diff = time_stamp - frames_[i]->timestamp;
         if (fabs(time_diff) < 1.0e-3) {
-            *pose = _frames[i]->sensor2world_pose;
+            *pose = frames_[i]->sensor2world_pose;
             return true;
         }
     }

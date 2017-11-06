@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_
 #include <mutex>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
@@ -33,75 +33,68 @@ public:
     ProbabilisticFusion();
     ~ProbabilisticFusion();
 
-    virtual bool init() override;
+    virtual bool Init() override;
 
     /**@brief main entrance of fusion*/
-    virtual bool fuse(const std::vector<SensorObjects>& multi_sensor_objects,
-        std::vector<ObjectPtr>* fused_objects) override;
+    virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
+                      std::vector<ObjectPtr> *fused_objects) override;
 
     virtual std::string name() const override;
 
 protected:
 
-    void fuse_frame(const PbfSensorFramePtr& frame);
+    void FuseFrame(const PbfSensorFramePtr &frame);
 
     /**@brief create new tracks for objects not assigned to current tracks*/
-    void create_new_tracks(const std::vector<PbfSensorObjectPtr>& sensor_objects,
-        const std::vector<int>& unassigned_ids);
+    void CreateNewTracks(const std::vector<PbfSensorObjectPtr> &sensor_objects,
+                         const std::vector<int> &unassigned_ids);
 
     /**@brief update current tracks with matched objects*/
-    void update_assigned_tracks(std::vector<PbfTrackPtr>& tracks,
-        std::vector<PbfSensorObjectPtr>& sensor_objects,
-        std::vector<TrackObjectPair>& assignments, 
-        const std::vector<double>& track_objects_dist);
+    void UpdateAssignedTracks(std::vector<PbfTrackPtr> &tracks,
+                              std::vector<PbfSensorObjectPtr> &sensor_objects,
+                              std::vector<TrackObjectPair> &assignments,
+                              const std::vector<double> &track_objects_dist);
 
     /**@brief update current tracks which cannot find matched objects*/
-    void update_unassigned_tracks(std::vector<PbfTrackPtr>& tracks,
-        const std::vector<int>& unassigned_tracks,
-        const std::vector<double>& track_object_dist, 
-        const SensorType& sensor_type,
-        const std::string& sensor_id,
-        double timestamp);
+    void UpdateUnassignedTracks(std::vector<PbfTrackPtr> &tracks,
+                                const std::vector<int> &unassigned_tracks,
+                                const std::vector<double> &track_object_dist,
+                                const SensorType &sensor_type,
+                                const std::string &sensor_id,
+                                double timestamp);
 
-    void collect_fused_objects(double timestamp, std::vector<ObjectPtr>* fused_objects);
+    void CollectFusedObjects(double timestamp, std::vector<ObjectPtr> *fused_objects);
 
-    void decompose_frame_objects(const std::vector<PbfSensorObjectPtr>& frame_objects, 
-        std::vector<PbfSensorObjectPtr>& foreground_objects, 
-        std::vector<PbfSensorObjectPtr>& background_objects);
+    void DecomposeFrameObjects(const std::vector<PbfSensorObjectPtr> &frame_objects,
+                               std::vector<PbfSensorObjectPtr> &foreground_objects,
+                               std::vector<PbfSensorObjectPtr> &background_objects);
 
-    void fuse_background_objects(std::vector<PbfSensorObjectPtr>& background_objects, 
-        const SensorType& sensor_type, 
-        const std::string& sensor_id,
-        double timestamp);
+    void FuseBackgroundObjects(std::vector<PbfSensorObjectPtr> &background_objects,
+                               const SensorType &sensor_type,
+                               const std::string &sensor_id,
+                               double timestamp);
 
-    void fuse_foreground_objects(std::vector<PbfSensorObjectPtr>& foreground_objects, 
-        Eigen::Vector3d ref_point, 
-        const SensorType& sensor_type, 
-        const std::string& sensor_id,
-        double timestamp);
+    void FuseForegroundObjects(std::vector<PbfSensorObjectPtr> &foreground_objects,
+                               Eigen::Vector3d ref_point,
+                               const SensorType &sensor_type,
+                               const std::string &sensor_id,
+                               double timestamp);
 
 protected:
     /**@brief produce fusion result for PNC only when fusing sensor with _publish_sensor_id*/
-    std::string _publish_sensor_id;
-
-    bool        _started;
-
-    PbfBaseTrackObjectMatcher* _matcher;
-
-    PbfSensorManager* _sensor_manager;
-
-    PbfTrackManager* _track_manager;
-
-    std::mutex _sensor_data_rw_mutex;
-
-    std::mutex _fusion_mutex;
-
-    bool  _use_radar;
-    bool  _use_lidar;
+    std::string publish_sensor_id_;
+    bool started_;
+    PbfBaseTrackObjectMatcher* matcher_;
+    PbfSensorManager* sensor_manager_;
+    PbfTrackManager* track_manager_;
+    std::mutex sensor_data_rw_mutex_;
+    std::mutex fusion_mutex_;
+    bool  use_radar_;
+    bool  use_lidar_;
 private:
     DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };
 
 } // namespace perception
 } // namespace apollo
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_

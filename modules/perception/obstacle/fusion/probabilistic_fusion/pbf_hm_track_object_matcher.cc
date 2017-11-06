@@ -31,7 +31,7 @@ PbfHmTrackObjectMatcher::~PbfHmTrackObjectMatcher() {
 
 }
 
-bool PbfHmTrackObjectMatcher::match(std::vector<PbfTrackPtr>& fusion_tracks,
+bool PbfHmTrackObjectMatcher::Match(std::vector<PbfTrackPtr>& fusion_tracks,
     std::vector<PbfSensorObjectPtr>& sensor_objects,
     const TrackObjectMatcherOptions& options,
     std::vector<TrackObjectPair>& assignments,
@@ -46,14 +46,14 @@ bool PbfHmTrackObjectMatcher::match(std::vector<PbfTrackPtr>& fusion_tracks,
         return false;
     }
 
-    id_assign(fusion_tracks, sensor_objects, assignments,
-        unassigned_fusion_tracks, unassigned_sensor_objects);
+    IdAssign(fusion_tracks, sensor_objects, assignments,
+             unassigned_fusion_tracks, unassigned_sensor_objects);
     AINFO << "local_track_id_assign: " << fusion_tracks.size()
         << "," << sensor_objects.size() << "," << assignments.size();
 
     const Eigen::Vector3d& ref_point = *(options.ref_point);
-    compute_association_mat(fusion_tracks, sensor_objects, unassigned_fusion_tracks,
-        unassigned_sensor_objects, ref_point, association_mat);
+    ComputeAssociationMat(fusion_tracks, sensor_objects, unassigned_fusion_tracks,
+                          unassigned_sensor_objects, ref_point, association_mat);
 
     int num_track = fusion_tracks.size();
     int num_measurement = sensor_objects.size();
@@ -77,8 +77,8 @@ bool PbfHmTrackObjectMatcher::match(std::vector<PbfTrackPtr>& fusion_tracks,
         return true;
     }
 
-    bool state = hm_assign(association_mat, assignments,
-            unassigned_fusion_tracks, unassigned_sensor_objects);
+    bool state = HmAssign(association_mat, assignments,
+                          unassigned_fusion_tracks, unassigned_sensor_objects);
 
     for (size_t i = 0; i < assignments.size(); i++) {
         int track_ind = assignments[i].first;
@@ -131,12 +131,12 @@ std::string PbfHmTrackObjectMatcher::name() const {
     return "PbfHmTrackObjectMatcher";
 }
 
-void PbfHmTrackObjectMatcher::compute_association_mat(const std::vector<PbfTrackPtr>& fusion_tracks,
-        const std::vector<PbfSensorObjectPtr>& sensor_objects,
-        const std::vector<int>& unassigned_fusion_tracks,
-        const std::vector<int>& unassigned_sensor_objects,
-        const Eigen::Vector3d& ref_point,
-        std::vector<std::vector<double> >& association_mat) {
+void PbfHmTrackObjectMatcher::ComputeAssociationMat(const std::vector<PbfTrackPtr> &fusion_tracks,
+                                                    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+                                                    const std::vector<int> &unassigned_fusion_tracks,
+                                                    const std::vector<int> &unassigned_sensor_objects,
+                                                    const Eigen::Vector3d &ref_point,
+                                                    std::vector<std::vector<double> > &association_mat) {
     PbfTrackObjectDistance pbf_distance;
     Eigen::Vector3d local_ref_point = ref_point;
     TrackObjectDistanceOptions options;
@@ -149,7 +149,7 @@ void PbfHmTrackObjectMatcher::compute_association_mat(const std::vector<PbfTrack
         for (size_t j = 0; j < unassigned_sensor_objects.size(); ++j) {
             int sensor_idx = unassigned_sensor_objects[j];
             const PbfSensorObjectPtr& sensor_object = sensor_objects[sensor_idx];
-            double distance = pbf_distance.compute(fusion_track, sensor_object, options);
+            double distance = pbf_distance.Compute(fusion_track, sensor_object, options);
             association_mat[i][j] = distance;
         }
     }
@@ -169,15 +169,15 @@ void PbfHmTrackObjectMatcher::compute_association_mat(const std::vector<PbfTrack
     // }
 }
 
-bool PbfHmTrackObjectMatcher::hm_assign(const std::vector<std::vector<double> >& association_mat,
-        std::vector<TrackObjectPair>& assignments,
-        std::vector<int>& unassigned_fusion_tracks,
-        std::vector<int>& unassigned_sensor_objects) {
+bool PbfHmTrackObjectMatcher::HmAssign(const std::vector<std::vector<double> > &association_mat,
+                                       std::vector<TrackObjectPair> &assignments,
+                                       std::vector<int> &unassigned_fusion_tracks,
+                                       std::vector<int> &unassigned_sensor_objects) {
     // TODO
-    double max_dist = _s_max_match_distance;
+    double max_dist = s_max_match_distance_;
     std::vector<std::vector<int> > fusion_components;
     std::vector<std::vector<int> > sensor_components;
-    compute_connected_components(association_mat, max_dist, fusion_components, sensor_components);
+    ComputeConnectedComponents(association_mat, max_dist, fusion_components, sensor_components);
 
     if (fusion_components.size() != sensor_components.size()) {
         AERROR << "fusion component size it not equal to sensor component size.";
@@ -219,7 +219,7 @@ bool PbfHmTrackObjectMatcher::hm_assign(const std::vector<std::vector<double> >&
         std::vector<int> fusion_idxs;
         std::vector<int> sensor_idxs;
         if (loc_mat.size() != 0 && loc_mat[0].size() != 0) {
-            minimize_assignment(loc_mat, fusion_idxs, sensor_idxs);
+            MinimizeAssignment(loc_mat, fusion_idxs, sensor_idxs);
         }
 
         for (size_t j = 0; j < fusion_idxs.size(); ++j) {
@@ -255,7 +255,7 @@ bool PbfHmTrackObjectMatcher::hm_assign(const std::vector<std::vector<double> >&
     return true;
 }
 
-void PbfHmTrackObjectMatcher::minimize_assignment(
+void PbfHmTrackObjectMatcher::MinimizeAssignment(
     const std::vector<std::vector<double> > &association_mat,
     std::vector<int> &ref_idx,
     std::vector<int> &new_idx) {
@@ -272,15 +272,15 @@ void PbfHmTrackObjectMatcher::minimize_assignment(
     hungarian_optimizer.minimize(&ref_idx, &new_idx);
 }
 
-bool PbfHmTrackObjectMatcher::init() {
+bool PbfHmTrackObjectMatcher::Init() {
     return true;
 }
 
-void PbfHmTrackObjectMatcher::compute_connected_components(
-    const std::vector<std::vector<double> >& association_mat,
+void PbfHmTrackObjectMatcher::ComputeConnectedComponents(
+    const std::vector<std::vector<double> > &association_mat,
     float connected_threshold,
-    std::vector<std::vector<int> >& track_components,
-    std::vector<std::vector<int> >& obj_components) {
+    std::vector<std::vector<int> > &track_components,
+    std::vector<std::vector<int> > &obj_components) {
     int no_track = association_mat.size();
     int no_obj = 0;
     if (no_track != 0) {

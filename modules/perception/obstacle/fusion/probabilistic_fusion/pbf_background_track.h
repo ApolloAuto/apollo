@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BACKGROUND_TRACK_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BACKGROUND_TRACK_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BACKGROUND_TRACK_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BACKGROUND_TRACK_H_
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
@@ -29,49 +29,49 @@ public:
     ~PbfBackgroundTrack();
 
     /**@brief Update track with sensor object */
-    void update_with_sensor_object(PbfSensorObjectPtr obj);
+    void UpdateWithSensorObject(PbfSensorObjectPtr obj);
 
-    void update_without_sensor_object(const SensorType& sensor_type,
-        const std::string& sensor_id,  double timestamp);
+    void UpdateWithoutSensorObject(const SensorType &sensor_type,
+                                   const std::string &sensor_id, double timestamp);
 
-    PbfSensorObjectPtr get_fused_object();
+    PbfSensorObjectPtr GetFusedObject();
 
-    inline double get_fused_timestamp() const {
-        return _fused_timestamp;
+    inline double GetFusedTimestamp() const {
+        return fused_timestamp_;
     }
 
-    inline int get_track_id() const {
-        return _idx;
+    inline int GetTrackId() const {
+        return idx_;
     }
 
-    inline double get_tracking_period() const {
-        return _tracking_period;
+    inline double GetTrackingPeriod() const {
+        return tracking_period_;
     }
 
-    inline bool is_dead() const {
-        return _is_dead;
+    inline bool IsDead() const {
+        return is_dead_;
     }
 
-    bool able_to_publish() const;
+    bool AbleToPublish() const;
 
-    static void set_max_invisible_period(double period);
+    static void SetMaxInvisiblePeriod(double period);
 
 protected:
-    PbfSensorObjectPtr    _fused_object;
+    PbfSensorObjectPtr    fused_object_;
 
     /**@brief time stamp of the track*/
-    double                _fused_timestamp;
+    double                fused_timestamp_;
 
-    int                   _age;
-    double                _tracking_period;
+    int                   age_;
+    double                tracking_period_;
 
     /**@brief global track id*/
-    int                   _idx;
-    double                _invisible_period;
+    int                   idx_;
+    double                invisible_period_;
 
-    bool                  _is_dead;
+    bool                  is_dead_;
 
-    static double         _s_max_invisible_period;
+    static double         s_max_invisible_period_;
 private:
     PbfBackgroundTrack();
 };
@@ -81,4 +81,4 @@ typedef std::shared_ptr<PbfBackgroundTrack> PbfBackgroundTrackPtr;
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BACKGROUND_TRACK_H_

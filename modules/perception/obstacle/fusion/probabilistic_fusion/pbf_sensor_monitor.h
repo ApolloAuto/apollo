@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
  
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
 #include <string>
 #include <map>
 #include "modules/common/macro.h"
@@ -35,12 +35,12 @@ class PbfSensorMonitor{
 public:
     PbfSensorMonitor();
 
-    bool init();
+    bool Init();
 
-    void update(const std::string& sensor_id, double capture_time, double detection_time);
+    void Update(const std::string &sensor_id, double capture_time, double detection_time);
 
 protected:
-    std::map<std::string, SensorStatus> _sensor_states;
+    std::map<std::string, SensorStatus> sensor_states_;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(PbfSensorMonitor);
@@ -49,4 +49,4 @@ private:
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_

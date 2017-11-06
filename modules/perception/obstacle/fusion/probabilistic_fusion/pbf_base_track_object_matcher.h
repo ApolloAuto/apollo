@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H
-#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_
 #include <utility>
 #include <vector>
 #include "modules/common/macro.h"
@@ -46,7 +46,7 @@ public:
     // @params[OUT] track2measurements_dist:minimum match distance to measurements for each track
     // @prams[OUT] measurement2track_dist:minimum match distacne to tracks for each measurement
     // @return nothing
-    virtual bool match(std::vector<PbfTrackPtr>& fusion_tracks,
+    virtual bool Match(std::vector<PbfTrackPtr>& fusion_tracks,
         std::vector<PbfSensorObjectPtr>& sensor_objects,
         const TrackObjectMatcherOptions& options,
         std::vector<TrackObjectPair>& assignments,
@@ -55,22 +55,22 @@ public:
         std::vector<double>& track2measurements_dist, 
         std::vector<double>& measurement2track_dist) = 0;
 
-    virtual bool init() = 0;
+    virtual bool Init() = 0;
 
     virtual std::string name() const = 0;
 
-    void id_assign(std::vector<PbfTrackPtr>& fusion_tracks,
-        std::vector<PbfSensorObjectPtr>& sensor_objects,
-        std::vector<TrackObjectPair>& assignments,
-        std::vector<int>& unassigned_fusion_tracks,
-        std::vector<int>& unassigned_sensor_objects);
+    void IdAssign(std::vector<PbfTrackPtr> &fusion_tracks,
+                  std::vector<PbfSensorObjectPtr> &sensor_objects,
+                  std::vector<TrackObjectPair> &assignments,
+                  std::vector<int> &unassigned_fusion_tracks,
+                  std::vector<int> &unassigned_sensor_objects);
 
-    static void set_max_match_distance(double dist);
+    static void SetMaxMatchDistance(double dist);
 
-    static double get_max_match_distance();
+    static double GetMaxMatchDistance();
 
 protected:
-    static double _s_max_match_distance;
+    static double s_max_match_distance_;
 private:
     DISALLOW_COPY_AND_ASSIGN(PbfBaseTrackObjectMatcher);
 
@@ -79,4 +79,4 @@ private:
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_
