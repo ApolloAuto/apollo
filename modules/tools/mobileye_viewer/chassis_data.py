@@ -27,6 +27,8 @@ class ChassisData:
         self.chassis_pb = chassis_pb
 
     def is_auto(self):
+        if self.chassis_pb is None:
+            return False
         if self.chassis_pb.driving_mode is None:
             return False
         if self.chassis_pb.driving_mode == \

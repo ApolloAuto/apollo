@@ -61,12 +61,13 @@ class ViewSubplot:
         self.right_lane.set_ydata(mobileye_data.right_lane_y)
         self.left_lane.set_xdata(mobileye_data.left_lane_x)
         self.left_lane.set_ydata(mobileye_data.left_lane_y)
-        # self.ref_lane.set_xdata(mobileye_data.ref_lane_x)
-        # self.ref_lane.set_ydata(mobileye_data.ref_lane_y)
         mobileye_data.lane_data_lock.release()
 
+        planning_data.path_lock.acquire()
         self.ref_lane.set_xdata(planning_data.path_x)
         self.ref_lane.set_ydata(planning_data.path_y)
+        planning_data.path_lock.release()
+
         if chassis_data.is_auto():
             self.ref_lane.set_color('r')
         else:
@@ -78,12 +79,10 @@ class ViewSubplot:
         mobileye_data.obstacle_data_lock.release()
 
         mobileye_data.next_lane_data_lock.acquire()
-        # print range(len(mobileye_data.next_lanes_x))
         for i in range(len(mobileye_data.next_lanes_x)):
             if i >= len(self.next_lanes):
                 mobileye_data.next_lane_data_lock.release()
                 break
-            # print mobileye_data.next_lanes_x[i]
             self.next_lanes[i].set_xdata(mobileye_data.next_lanes_x[i])
             self.next_lanes[i].set_ydata(mobileye_data.next_lanes_y[i])
         mobileye_data.next_lane_data_lock.release()
@@ -95,7 +94,7 @@ class ViewSubplot:
         acc_x = localization_data.localization_pb.pose.linear_acceleration.x
         acc_y = localization_data.localization_pb.pose.linear_acceleration.y
         heading = localization_data.localization_pb.pose.heading
-        # print heading
+
         new_speed_x = math.cos(-heading + math.pi / 2) * speed_x - math.sin(
             -heading + math.pi / 2) * speed_y
         new_speed_y = math.sin(-heading + math.pi / 2) * speed_x + math.cos(
