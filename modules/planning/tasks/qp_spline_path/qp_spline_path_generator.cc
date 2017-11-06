@@ -63,6 +63,10 @@ void QpSplinePathGenerator::SetDebugLogger(
   planning_debug_ = debug;
 }
 
+void QpSplinePathGenerator::SetChangeLane(bool is_change_lane_path) {
+  is_change_lane_path_ = is_change_lane_path;
+}
+
 bool QpSplinePathGenerator::Generate(
     const std::vector<const PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
@@ -252,10 +256,13 @@ bool QpSplinePathGenerator::AddConstraint(
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint, equality constraint
-  const double lat_shift = std::copysign(
-      std::fmin(std::fabs(init_frenet_point_.l()),
-                qp_spline_path_config_.lane_change_lateral_shift()),
-      -init_frenet_point_.l());
+  double lat_shift = -init_frenet_point_.l();
+  if (is_change_lane_path_) {
+    lat_shift = std::copysign(
+        std::fmin(std::fabs(init_frenet_point_.l()),
+                  qp_spline_path_config_.lane_change_lateral_shift()),
+        -init_frenet_point_.l());
+  }
 
   ADEBUG << "lat_shift = " << lat_shift;
   spline_constraint->AddPointConstraint(
