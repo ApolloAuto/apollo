@@ -113,6 +113,13 @@ void ObjectBuilder::build(const RadarObsArray& raw_obstacles,
         // four mock point: around obstacle center.
         RadarUtil::MockRadarPolygon(point, object_ptr->length, object_ptr->width,
                 theta, object_ptr->polygon);
+        if (object_ptr->radar_supplement == nullptr) {
+            object_ptr->radar_supplement.reset(new RadarSupplement());
+        }
+        object_ptr->radar_supplement->range =
+            std::sqrt(location_r[0] * location_r[0] + location_r[1] * location_r[1]);
+        // TODO should be set to theta
+        object_ptr->radar_supplement->angle = 0;
         objects->push_back(object_ptr);
     }
      continuous_ids_ = current_con_ids;

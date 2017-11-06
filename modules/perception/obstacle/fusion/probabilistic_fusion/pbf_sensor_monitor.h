@@ -13,35 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#include "modules/perception/obstacle/base/types.h"
+ 
+#ifndef ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H
+#define ADU_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H
+#include <string>
+#include <map>
+#include "modules/common/macro.h"
 
 namespace apollo {
 namespace perception {
 
-std::string GetSensorType(SensorType sensor_type) {
-  switch (sensor_type) {
-    case VELODYNE_64:
-      return "velodyne_64";
-    case VELODYNE_16:
-      return "velodyne_16";
-    case RADAR:
-      return "radar";
-    case CAMERA:
-      return "camera";
-    case UNKNOWN_SENSOR_TYPE:
-      return "unknown_sensor_type";
-  }
-  return "";
-}
+struct SensorStatus {
+    std::string sensor_id;
+    double latest_capture_time = 0.0;
+    double latest_detection_time = 0.0;
+    int latest_obstacle_number = 0;
+    double latest_latency = 0.0;
+}; 
 
-bool is_lidar(SensorType sensor_type) {
-    return (sensor_type == VELODYNE_64);
-}
+class PbfSensorMonitor{
+public:
+    PbfSensorMonitor();
 
-bool is_radar(SensorType sensor_type) {
-    return (sensor_type == RADAR);
-}
+    bool init();
 
-}  // namespace perception
-}  // namespace apollo
+    void update(const std::string& sensor_id, double capture_time, double detection_time);
+
+protected:
+    std::map<std::string, SensorStatus> _sensor_states;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(PbfSensorMonitor);
+};
+
+} // namespace perception
+} // namespace apollo
+
+#endif

@@ -44,6 +44,11 @@ Object::Object() {
 void Object::clone(const Object& rhs) {
   *this = rhs;
   pcl::copyPointCloud<pcl_util::Point, pcl_util::Point>(*(rhs.cloud), *cloud);
+  radar_supplement = nullptr;
+  if (rhs.radar_supplement != nullptr) {
+    radar_supplement.reset(new RadarSupplement());
+    radar_supplement->clone(*(rhs.radar_supplement));
+  }
 }
 
 std::string Object::ToString() const {

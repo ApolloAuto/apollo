@@ -7,11 +7,13 @@ cc_library(
     srcs = [
         "object.cc",
         "types.cc",
+        "object_supplement.cpp"
     ],
     hdrs = [
         "hdmap_struct.h",
         "object.h",
         "types.h",
+        "object_supplement.h",
     ],
     deps = [
         "//modules/common",

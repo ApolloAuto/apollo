@@ -13,35 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
+#define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
-#include "modules/perception/obstacle/base/types.h"
+#include <Eigen/Core>
+#include "modules/perception/obstacle/base/types.h" 
 
 namespace apollo {
 namespace perception {
 
-std::string GetSensorType(SensorType sensor_type) {
-  switch (sensor_type) {
-    case VELODYNE_64:
-      return "velodyne_64";
-    case VELODYNE_16:
-      return "velodyne_16";
-    case RADAR:
-      return "radar";
-    case CAMERA:
-      return "camera";
-    case UNKNOWN_SENSOR_TYPE:
-      return "unknown_sensor_type";
-  }
-  return "";
-}
-
-bool is_lidar(SensorType sensor_type) {
-    return (sensor_type == VELODYNE_64);
-}
-
-bool is_radar(SensorType sensor_type) {
-    return (sensor_type == RADAR);
-}
+struct alignas(16) RadarSupplement {
+    RadarSupplement();
+    ~RadarSupplement();
+    RadarSupplement(const RadarSupplement& rhs);
+    RadarSupplement& operator = (const RadarSupplement& rhs);
+    void clone(const RadarSupplement& rhs);
+    // distance
+    float range = 0.0f;
+    // x -> forward, y -> left
+    float angle = 0.0f;
+    float relative_radial_velocity = 0.0f;
+    float relative_tangential_velocity = 0.0f;
+    float radial_velocity = 0.0f;
+};
+typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
+typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;
 
 }  // namespace perception
 }  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
