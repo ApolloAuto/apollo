@@ -52,8 +52,6 @@ double Damp(const double x, const double sigma) {
 
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
-//Obstacle::Obstacle() : rnn_enabled_(false) {}
-
 int Obstacle::id() const {
   std::lock_guard<std::mutex> lock(mutex_);
   return id_;
@@ -1055,7 +1053,8 @@ void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
 
 void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
   rnn_states->clear();
-  rnn_states->insert(rnn_states->begin(), rnn_states_.begin(), rnn_states_.end());
+  rnn_states->insert(rnn_states->end(),
+                     rnn_states_.begin(), rnn_states_.end());
 }
 
 void Obstacle::InitRNNStates() {
