@@ -19,53 +19,70 @@
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 
+DEFINE_string(task_info_template_file,
+              "modules/data/conf/task_info_template.pb.txt",
+              "Path of the task info template file.");
+
 namespace apollo {
 namespace data {
 
-Task InfoCollector::GetTaskInfo() {
-  Task task;
-  *task.mutable_vehicle() = GetVehicleInfo();
-  *task.mutable_environment() = GetEnvironmentInfo();
-  *task.mutable_hardware() = GetHardwareInfo();
-  *task.mutable_software() = GetSoftwareInfo();
-  *task.mutable_user() = GetUserInfo();
-  return task;
+using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::util::GetProtoFromFile;
+using apollo::common::util::SetProtoToASCIIFile;
+
+InfoCollector::InfoCollector() : task_info_(LoadTaskInfoTemplate()) {
 }
 
-VehicleInfo InfoCollector::GetVehicleInfo() {
-  VehicleInfo vehicle;
+const Task &InfoCollector::GetTaskInfo() {
+  // Use MergeFrom to override the template.
+  GetVehicleInfo();
+  GetEnvironmentInfo();
+  GetHardwareInfo();
+  GetSoftwareInfo();
+  GetUserInfo();
+  return task_info_;
+}
+
+const VehicleInfo &InfoCollector::GetVehicleInfo() {
+  VehicleInfo *vehicle = task_info_.mutable_vehicle();
   static auto *chassis_detail = CHECK_NOTNULL(
       apollo::common::adapter::AdapterManager::GetChassisDetail());
   if (!chassis_detail->Empty()) {
-    *vehicle.mutable_license() = chassis_detail->GetLatestObserved().license();
+    *vehicle->mutable_license() = chassis_detail->GetLatestObserved().license();
   }
 
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_canbus_conf_file, vehicle.mutable_canbus_conf()));
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_vehicle_config_path, vehicle.mutable_vehicle_config()));
-  return vehicle;
+  CHECK(GetProtoFromFile(FLAGS_canbus_conf_file,
+                         vehicle->mutable_canbus_conf()));
+  CHECK(GetProtoFromFile(FLAGS_vehicle_config_path,
+                         vehicle->mutable_vehicle_config()));
+  return *vehicle;
 }
 
 // TODO(xiaoxq): Implement the info getters.
-EnvironmentInfo InfoCollector::GetEnvironmentInfo() {
-  EnvironmentInfo environment;
-  return environment;
+const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
+  return task_info_.environment();
 }
 
-HardwareInfo InfoCollector::GetHardwareInfo() {
-  HardwareInfo hardware;
-  return hardware;
+const HardwareInfo &InfoCollector::GetHardwareInfo() {
+  return task_info_.hardware();
 }
 
-SoftwareInfo InfoCollector::GetSoftwareInfo() {
-  SoftwareInfo software;
-  return software;
+const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
+  return task_info_.software();
 }
 
-UserInfo InfoCollector::GetUserInfo() {
-  UserInfo user;
-  return user;
+const UserInfo &InfoCollector::GetUserInfo() {
+  return task_info_.user();
+}
+
+Task InfoCollector::LoadTaskInfoTemplate() {
+  Task task_info;
+  CHECK(GetProtoFromASCIIFile(FLAGS_task_info_template_file, &task_info));
+  return task_info;
+}
+
+bool InfoCollector::SaveTaskInfoTemplate(const Task &task_info) {
+  return SetProtoToASCIIFile(task_info, FLAGS_task_info_template_file);
 }
 
 }  // namespace data

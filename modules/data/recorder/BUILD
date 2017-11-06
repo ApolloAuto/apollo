@@ -13,4 +13,12 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "update_task_info",
+    srcs = ["update_task_info.cc"],
+    deps = [
+        ":info_collector",
+    ],
+)
+
 cpplint()
