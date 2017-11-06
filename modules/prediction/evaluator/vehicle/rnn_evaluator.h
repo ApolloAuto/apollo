@@ -84,7 +84,7 @@ class RNNEvaluator : public Evaluator {
                         const std::string& prev_lane_id);
 
  private:
-  std::unique_ptr<network::RnnModel> model_ptr_;
+  network::RnnModel* model_ptr_;
   int dim_obstacle_feature_ = 10;
   int dim_lane_point_feature_ = 4;
   int length_lane_point_sequence_ = 20;
