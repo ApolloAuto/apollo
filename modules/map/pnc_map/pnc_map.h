@@ -176,7 +176,7 @@ class PncMap {
                         std::vector<RouteSegments> *const route_segments) const;
 
  private:
-  bool GetNearestPointFromRouting(const common::PointENU &point,
+  bool GetNearestPointFromRouting(const common::VehicleState &point,
                                   LaneWaypoint *waypoint) const;
 
   /**
