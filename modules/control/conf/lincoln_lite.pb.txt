@@ -26,7 +26,7 @@ lat_controller_conf {
   matrix_q: 0.25
   matrix_q: 0.02
   cutoff_freq: 10
-  mean_filter_window_size: 5
+  mean_filter_window_size: 15
   max_iteration: 150
   max_lateral_acceleration: 5.0
   lat_err_gain_scheduler {
