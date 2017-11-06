@@ -23,9 +23,30 @@ cd "${DIR}/.."
 
 set -x
 
-NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_player.py")"
-if [ "${NUM_PROCESSES}" -ne 0 ]; then
-    pkill -f rtk_player.py
-fi
+function start() {
+  TIME=`date +%F_%H_%M`
+  if [ -e data/log/garage.csv ]; then
+    cp data/log/garage.csv data/log/garage-${TIME}.csv
+  fi
 
-python modules/tools/record_play/rtk_player.py
+  NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_recorderpy")"
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    python modules/tools/record_play/rtk_recorder.py
+  fi
+}
+
+function stop() {
+  pkill -f rtk_recorder.py
+}
+
+case $1 in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    start
+    ;;
+esac
