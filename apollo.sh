@@ -126,6 +126,12 @@ function build() {
 
   # Build python proto
   build_py_proto
+
+  # Update task info template on compiling, but don't check in.
+  bazel-bin/modules/data/recorder/update_task_info \
+      --commit_id=$(git rev-parse HEAD)
+  git update-index --assume-unchanged \
+      modules/data/conf/task_info_template.pb.txt
 }
 
 function cibuild() {
@@ -300,8 +306,8 @@ function release() {
 
   # release info
   META=${ROOT_DIR}/meta.txt
-  echo "Git commit: $(git show --oneline  -s | awk '{print $1}')" > $META
-  echo "Build time: $TIME" >>  $META
+  echo "Git commit: $(git rev-parse HEAD)" > $META
+  echo "Build time: $(get_now)" >>  $META
 }
 
 function gen_coverage() {
