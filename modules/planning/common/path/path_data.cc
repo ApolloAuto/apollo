@@ -72,6 +72,16 @@ const DiscretizedPath &PathData::discretized_path() const {
   return discretized_path_;
 }
 
+bool PathData::IsEmpty() const {
+  return discretized_path_.NumOfPoints() == 0 &&
+         frenet_path_.NumOfPoints() == 0;
+}
+
+std::list<std::pair<DiscretizedPath, FrenetFramePath>>
+    &PathData::path_data_history() {
+  return path_data_history_;
+}
+
 const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }

@@ -48,9 +48,8 @@ class PathData {
 
   bool GetPathPointWithPathS(const double s,
                              common::PathPoint *const path_point) const;
-  std::list<std::pair<DiscretizedPath, FrenetFramePath>> &path_data_history() {
-    return path_data_history_;
-  }
+
+  std::list<std::pair<DiscretizedPath, FrenetFramePath>> &path_data_history();
 
   /*
    * brief: this function will find the path_point in discretized_path whose
@@ -60,6 +59,8 @@ class PathData {
                             common::PathPoint *const path_point) const;
 
   void Clear();
+
+  bool IsEmpty() const;
 
   std::string DebugString() const;
 

@@ -44,10 +44,11 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
-                         const ReferenceLine &reference_line,
+                         const ReferenceLineInfo &reference_line_info,
                          const SpeedData &speed_data)
     : config_(config),
-      reference_line_(reference_line),
+      reference_line_info_(reference_line_info),
+      reference_line_(reference_line_info.reference_line()),
       speed_data_(speed_data) {}
 
 bool DPRoadGraph::FindPathTunnel(
@@ -163,30 +164,37 @@ bool DPRoadGraph::GenerateMinCostPath(
 bool DPRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
-  constexpr double kSamplePointLookForwardTime = 1.0;
+  constexpr double kSamplePointLookForwardTimeChangeLane = 3.0;
+  constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
   CHECK(points != nullptr);
 
   const double reference_line_length = reference_line_.Length();
 
-  double level_distance =
-      std::fmax(config_.step_length_min(),
-                std::fmin(init_point.v() * kSamplePointLookForwardTime,
-                          config_.step_length_max()));
+  double level_distance = 0.0;
+  if (reference_line_info_.IsChangeLanePath()) {
+    level_distance =
+        std::max(config_.step_length_min(),
+                 init_point.v() * kSamplePointLookForwardTimeChangeLane);
+  } else {
+    level_distance = common::math::Clamp(
+        init_point.v() * kSamplePointLookForwardTimeNoChangeLane,
+        config_.step_length_min(), config_.step_length_max());
+  }
   double accumulated_s = init_sl_point_.s();
   for (std::size_t i = 0; accumulated_s < reference_line_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
     const double s = std::fmin(accumulated_s, reference_line_length);
 
-    int32_t num =
-        static_cast<int32_t>(config_.sample_points_num_each_level() / 2);
-
-    for (int32_t j = -num; j < num + 1; ++j) {
-      double l = config_.lateral_sample_offset() * j;
-      auto sl = common::util::MakeSLPoint(s, l);
-      if (reference_line_.IsOnRoad(sl)) {
-        level_points.push_back(sl);
-      }
+    double left_width = 0.0;
+    double right_width = 0.0;
+    reference_line_.GetLaneWidth(s, &left_width, &right_width);
+    std::vector<double> sample_l;
+    common::util::uniform_slice(-right_width, left_width,
+                                config_.sample_points_num_each_level() - 1,
+                                &sample_l);
+    for (double l : sample_l) {
+      level_points.emplace_back(common::util::MakeSLPoint(s, l));
     }
     if (!level_points.empty()) {
       points->emplace_back(level_points);
