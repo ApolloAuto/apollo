@@ -23,6 +23,13 @@ cd "${DIR}/.."
 
 set -x
 
+function setup() {
+  bash scripts/canbus.sh start
+  bash scripts/gps.sh start
+  bash scripts/localization.sh start
+  bash scripts/control.sh start
+}
+
 function start() {
   TIME=`date +%F_%H_%M`
   if [ -e data/log/garage.csv ]; then
@@ -40,6 +47,9 @@ function stop() {
 }
 
 case $1 in
+  setup)
+    setup
+    ;;
   start)
     start
     ;;

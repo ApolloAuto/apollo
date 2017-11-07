@@ -41,9 +41,10 @@ class HMI {
 
   void RegisterMessageHandlers();
 
-  // Run a supported command of module, return the ret code.
-  int RunModuleCommand(const std::string &module_name,
-                       const std::string &command_name);
+  // Run a supported command of some component, return the ret code.
+  static int RunComponentCommand(
+      const google::protobuf::Map<std::string, Component> &components,
+      const std::string &component_name, const std::string &command_name);
   // Run a supported command of all modules, return the count of failed ones.
   int RunCommandOnAllModules(const std::string &command_name);
 
@@ -57,7 +58,7 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
 
-  FRIEND_TEST(HMITest, RunModuleCommand);
+  FRIEND_TEST(HMITest, RunComponentCommand);
 };
 
 }  // namespace dreamview
