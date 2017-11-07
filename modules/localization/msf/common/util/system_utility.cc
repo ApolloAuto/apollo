@@ -25,116 +25,115 @@ namespace localization {
 namespace msf {
 
 bool system::is_exists(const std::string &path) {
-    boost::filesystem::path p(path);
-    return boost::filesystem::exists(p);
+  boost::filesystem::path p(path);
+  return boost::filesystem::exists(p);
 }
 
 bool system::is_directory(const std::string &path) {
-    boost::filesystem::path p(path);
-    return boost::filesystem::is_directory(p);
+  boost::filesystem::path p(path);
+  return boost::filesystem::is_directory(p);
 }
 
 bool system::create_directory(const std::string& path) {
-    boost::filesystem::path p(path);
-    return boost::filesystem::create_directory(p);
+  boost::filesystem::path p(path);
+  return boost::filesystem::create_directory(p);
 }
 
 bool system::get_file_size(const std::string& path, unsigned int& size) {
-    boost::filesystem::path p(path);
-    if (boost::filesystem::exists(p)) {
-        if (boost::filesystem::is_regular_file(p)) {
-            size = boost::filesystem::file_size(p);
-            return true;
-        }
-        else {
-            return false;
-        }
+  boost::filesystem::path p(path);
+  if (boost::filesystem::exists(p)) {
+    if (boost::filesystem::is_regular_file(p)) {
+      size = boost::filesystem::file_size(p);
+      return true;
     }
     else {
-        return false;
+      return false;
     }
+  }
+  else {
+    return false;
+  }
 }
 
-bool system::copy_file(const std::string& src, const std::string& dst, bool is_overwrite) {
-    boost::filesystem::path path_src(src);
-    boost::filesystem::path path_dst(dst);
-    boost::system::error_code error;
-    if (is_overwrite) {
-        boost::filesystem::copy_file(path_src, path_dst,
-                                     boost::filesystem::copy_option::fail_if_exists, error);
-    }
-    else {
-        boost::filesystem::copy_file(path_src, path_dst,
-                                     boost::filesystem::copy_option::overwrite_if_exists, error);
-    }
-    if (!error) {
-        return true;
-    }
-    else {
-        return false;
-    }
+bool system::copy_file(const std::string& src,
+    const std::string& dst, bool is_overwrite) {
+  boost::filesystem::path path_src(src);
+  boost::filesystem::path path_dst(dst);
+  boost::system::error_code error;
+  if (is_overwrite) {
+    boost::filesystem::copy_file(path_src, path_dst,
+        boost::filesystem::copy_option::fail_if_exists, error);
+  }
+  else {
+    boost::filesystem::copy_file(path_src, path_dst,
+        boost::filesystem::copy_option::overwrite_if_exists, error);
+  }
+  if (!error) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
-void system::get_files_in_folder_recursive(const std::string& folder, const std::string& ext, std::vector<std::string>& ret)
-{
-    ret.clear();
-    namespace fs = boost::filesystem;
-    if(!fs::exists(folder) || !fs::is_directory(folder)) {
-        return;
-    }
+void system::get_files_in_folder_recursive(const std::string& folder,
+    const std::string& ext, std::vector<std::string>& ret) {
+  ret.clear();
+  namespace fs = boost::filesystem;
+  if(!fs::exists(folder) || !fs::is_directory(folder)) {
+    return;
+  }
 
-    fs::recursive_directory_iterator it(folder);
-    fs::recursive_directory_iterator endit;
+  fs::recursive_directory_iterator it(folder);
+  fs::recursive_directory_iterator endit;
 
-    while(it != endit)
-    {
-        if(fs::is_regular_file(*it) && it->path().extension() == ext) {
-            ret.push_back(it->path().string());
-        }
-        ++it;
+  while(it != endit) {
+    if(fs::is_regular_file(*it) && it->path().extension() == ext) {
+      ret.push_back(it->path().string());
     }
-    std::sort(ret.begin(), ret.end());
+    ++it;
+  }
+  std::sort(ret.begin(), ret.end());
 }
 
-void system::get_files_in_folder(const std::string& folder, const std::string& ext, std::vector<std::string>& ret)
-{
-    ret.clear();
-    namespace fs = boost::filesystem;
-    if(!fs::exists(folder) || !fs::is_directory(folder)) {
-        return;
-    }
+void system::get_files_in_folder(const std::string& folder,
+    const std::string& ext, std::vector<std::string>& ret) {
+  ret.clear();
+  namespace fs = boost::filesystem;
+  if(!fs::exists(folder) || !fs::is_directory(folder)) {
+    return;
+  }
 
-    fs::directory_iterator it(folder);
-    fs::directory_iterator endit;
+  fs::directory_iterator it(folder);
+  fs::directory_iterator endit;
 
-    while(it != endit)
-    {
-        if(fs::is_regular_file(*it) && it->path().extension() == ext) {
-            ret.push_back(it->path().string());
-        }
-        ++it;
+  while(it != endit) {
+    if(fs::is_regular_file(*it) && it->path().extension() == ext) {
+      ret.push_back(it->path().string());
     }
-    std::sort(ret.begin(), ret.end());
+    ++it;
+  }
+  std::sort(ret.begin(), ret.end());
 }
 
-void system::get_folders_in_folder(const std::string& folder, std::vector<std::string>& ret) {
-    ret.clear();
-    namespace fs = boost::filesystem;
-    if(!fs::exists(folder) || !fs::is_directory(folder)) {
-        return;
-    }
+void system::get_folders_in_folder(const std::string& folder,
+    std::vector<std::string>& ret) {
+  ret.clear();
+  namespace fs = boost::filesystem;
+  if(!fs::exists(folder) || !fs::is_directory(folder)) {
+    return;
+  }
 
-    fs::directory_iterator it(folder);
-    fs::directory_iterator endit;
+  fs::directory_iterator it(folder);
+  fs::directory_iterator endit;
 
-    while(it != endit)
-    {
-        if(fs::is_directory(*it)) {
-            ret.push_back(it->path().string());
-        }
-        ++it;
+  while(it != endit) {
+    if(fs::is_directory(*it)) {
+      ret.push_back(it->path().string());
     }
-    std::sort(ret.begin(), ret.end());
+    ++it;
+  }
+  std::sort(ret.begin(), ret.end());
 }
 
 } // namespace msf
