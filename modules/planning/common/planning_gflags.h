@@ -69,8 +69,6 @@ DECLARE_double(speed_upper_bound);
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
 
-DECLARE_double(lateral_acceleration_bound);
-
 DECLARE_double(lateral_jerk_bound);
 
 DECLARE_double(longitudinal_jerk_lower_bound);
@@ -98,7 +96,6 @@ DECLARE_double(follow_time_buffer);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);
-DECLARE_double(virtual_stop_wall_width);
 DECLARE_double(virtual_stop_wall_height);
 
 DECLARE_double(prediction_total_time);
@@ -113,7 +110,6 @@ DECLARE_double(turn_signal_distance);
 
 // QpSt optimizer
 DECLARE_bool(enable_slowdown_profile_generator);
-DECLARE_double(slowdown_speed_threshold);
 DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
 
