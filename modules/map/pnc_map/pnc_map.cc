@@ -37,20 +37,13 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/routing/common/routing_gflags.h"
 
-DEFINE_bool(reckless_change_lane, false, "always allow change lane");
-DEFINE_double(max_distance_to_lane_center, 0.2,
-              "The max distance to lance center that we believe lane change is "
-              "finished.");
-
 namespace apollo {
 namespace hdmap {
 
 using apollo::routing::RoutingResponse;
+using apollo::common::VehicleState;
 
 namespace {
-
-// Minimum error in lane segmentation.
-const double kSegmentationEpsilon = 0.2;
 
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
@@ -92,36 +85,7 @@ PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
 const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
-bool PncMap::UpdateVehicleState(const common::VehicleState &state) {
-  auto point = common::util::MakePointENU(state.x(), state.y(), state.z());
-  if (!GetNearestPointFromRouting(state, &current_waypoint_)) {
-    AERROR << "Failed to get waypoint from routing";
-    return false;
-  }
-  auto current_route_index = GetWaypointIndex(current_waypoint_);
-  if (current_route_index.size() != 3 || current_route_index[0] < 0) {
-    AERROR << "Failed to get routing index from waypoint";
-    return false;
-  }
-
-  // only update passage_start_point_ when route passage changes
-  if (route_index_.size() != 3 || route_index_[0] != current_route_index[0] ||
-      route_index_[1] != current_route_index[1]) {  //  different passage
-    passage_start_point_ = point;
-    min_l_to_lane_center_ = std::numeric_limits<double>::max();
-  }
-  current_point_ = point;
-  route_index_ = current_route_index;
-  double s = 0.0;
-  double l = 0.0;
-  if (!current_waypoint_.lane->GetProjection({point.x(), point.y()}, &s, &l)) {
-    AERROR << "Failed to project poin " << point.ShortDebugString()
-           << " onto lane " << current_waypoint_.lane->id().id();
-    return false;
-  }
-  min_l_to_lane_center_ = std::min(min_l_to_lane_center_, std::fabs(l));
-  return true;
-}
+bool PncMap::IsSameRouting() const { return is_same_routing_; }
 
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   if (routing_.has_header() && routing.has_header() &&
@@ -129,8 +93,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
     ADEBUG << "Same routing, skip update routing";
+    is_same_routing_ = true;
     return true;
   }
+  is_same_routing_ = false;
   if (!ValidateRouting(routing)) {
     AERROR << "Invalid routing";
     return false;
@@ -143,10 +109,6 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       }
     }
   }
-  current_waypoint_.lane = nullptr;
-  route_index_.clear();
-  current_point_.Clear();
-  passage_start_point_.Clear();
   routing_ = routing;
   return true;
 }
@@ -197,12 +159,6 @@ bool PncMap::PassageToSegments(routing::Passage passage,
                            std::min(lane_ptr->total_length(), lane.end_s()));
   }
   return !segments->empty();
-}
-
-bool RouteSegments::IsOnSegment() const { return is_on_segment_; }
-
-void RouteSegments::SetIsOnSegment(bool on_segment) {
-  is_on_segment_ = on_segment;
 }
 
 std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
@@ -256,23 +212,28 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
 }
 
 bool PncMap::GetRouteSegments(
-    const double backward_length, const double forward_length,
-    std::vector<RouteSegments> *const route_segments) const {
-  // vehicle has to be this close to lane center before considering change lane
-  if (!current_waypoint_.lane || route_index_.size() != 3 ||
-      route_index_[0] < 0) {
-    AERROR << "Invalid position, use UpdateVehicleState() function first";
+    const VehicleState &state, const double backward_length,
+    const double forward_length,
+    std::list<RouteSegments> *const route_segments) const {
+  LaneWaypoint waypoint;
+
+  common::PointENU point;
+  point.set_x(state.x());
+  point.set_y(state.y());
+  point.set_z(state.z());
+  if (!GetNearestPointFromRouting(state, &waypoint)) {
+    AERROR << "Failed to get waypoint from routing";
     return false;
   }
-  const int road_index = route_index_[0];
-  const int passage_index = route_index_[1];
+  auto route_index = GetWaypointIndex(waypoint);
+  // vehicle has to be this close to lane center before considering change lane
+  if (!waypoint.lane || route_index.size() != 3 || route_index[0] < 0) {
+    AERROR << "Invalid vehicle state:  ";
+    return false;
+  }
+  const int road_index = route_index[0];
+  const int passage_index = route_index[1];
   const auto &road = routing_.road(road_index);
-  const double dist_on_passage =
-      common::util::DistanceXY(current_point_, passage_start_point_);
-  const bool allow_change_lane =
-      FLAGS_reckless_change_lane ||
-      ((min_l_to_lane_center_ < FLAGS_max_distance_to_lane_center) &&
-       (dist_on_passage > FLAGS_min_length_for_lane_change));
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
   for (const int index : drive_passages) {
@@ -282,10 +243,9 @@ bool PncMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
-    auto nearest_point = current_point_;
+    auto nearest_point = point;
     if (index == passage_index) {
-      nearest_point =
-          current_waypoint_.lane->GetSmoothPoint(current_waypoint_.s);
+      nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
     }
     double s = 0.0;
     double l = 0.0;
@@ -296,19 +256,16 @@ bool PncMap::GetRouteSegments(
       continue;
     }
     if (index != passage_index) {
-      if (!allow_change_lane) {
-        continue;
-      }
-      if (!segments.CanDriveFrom(current_waypoint_)) {
+      if (!segments.CanDriveFrom(waypoint)) {
         ADEBUG << "You cannot drive from current waypoint to passage: "
                << index;
         continue;
       }
     }
     route_segments->emplace_back();
+    const auto last_waypoint = segments.LastWaypoint();
     TruncateLaneSegments(segments, s - backward_length, s + forward_length,
                          &route_segments->back());
-    const auto last_waypoint = segments.LastWaypoint();
     if (route_segments->back().IsWaypointOnSegment(last_waypoint)) {
       route_segments->back().SetRouteEndWaypoint(last_waypoint);
     }

@@ -22,6 +22,7 @@
 #define MODULES_MAP_PNC_MAP_PNC_MAP_H_
 
 #include <limits>
+#include <list>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -48,16 +49,22 @@ class PncMap {
   const hdmap::HDMap *hdmap() const;
 
   bool UpdateRoutingResponse(const routing::RoutingResponse &routing_response);
-  bool UpdateVehicleState(const common::VehicleState &vehicle_state);
 
   const routing::RoutingResponse &routing_response() const;
 
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
-  bool GetRouteSegments(const double backward_length,
+  bool GetRouteSegments(const common::VehicleState &state,
+                        const double backward_length,
                         const double forward_length,
-                        std::vector<RouteSegments> *const route_segments) const;
+                        std::list<RouteSegments> *const route_segments) const;
+
+  /**
+   * Check if the routing is the same as existing one after call
+   * UpdateRoutingResponse"
+   */
+  bool IsSameRouting() const;
 
  private:
   bool GetNearestPointFromRouting(const common::VehicleState &point,
@@ -104,12 +111,8 @@ class PncMap {
  private:
   routing::RoutingResponse routing_;
   std::unordered_set<std::string> routing_lane_ids_;
-  LaneWaypoint current_waypoint_;
-  common::PointENU current_point_;
-  std::vector<int> route_index_;
-  common::PointENU passage_start_point_;
-  double min_l_to_lane_center_ = std::numeric_limits<double>::max();
   const hdmap::HDMap *hdmap_ = nullptr;
+  bool is_same_routing_ = false;
 };
 
 }  // namespace hdmap
