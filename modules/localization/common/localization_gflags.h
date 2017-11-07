@@ -49,20 +49,31 @@ DECLARE_double(report_gps_imu_time_diff_threshold);
 
 DECLARE_bool(enable_gps_timestamp);
 
-// lidar localization
+// lidar module
 DECLARE_string(map_path);
 DECLARE_string(lidar_extrinsic_file);
 DECLARE_string(lidar_height_file);
-DECLARE_bool(debug_log_flag);
-DECLARE_bool(is_locator_available);
-DECLARE_string(broadcast_tf2_frame_id_lidar);
-DECLARE_string(broadcast_tf_child_frame_id_lidar);
-DECLARE_string(query_tf2_target_frame_id_lidar);
-DECLARE_string(query_tf2_source_frame_id_lidar);
-DECLARE_string(publish_frame_id_lidar);
-DECLARE_int32(localization_mode);
-DECLARE_int32(tf2_buffer_expire_time);
+DECLARE_int32(lidar_localization_mode);
+DECLARE_double(lidar_imu_max_delay_time);
+DECLARE_double(lidar_map_coverage_theshold);
+DECLARE_bool(lidar_debug_log_flag);
+
+// integ module
+DECLARE_bool(integ_ins_can_self_align);
+DECLARE_bool(integ_sins_align_with_vel);
+DECLARE_bool(using_raw_gnsspos);
+DECLARE_double(vel_threshold_get_yaw);
+DECLARE_bool(integ_debug_log_flag);
+DECLARE_string(extrinsic_imu_gnss_filename);
+
+// gnss module
+DECLARE_bool(enable_ins_aid_rtk);
+DECLARE_bool(enable_auto_save_eph_file);
+DECLARE_string(eph_buffer_path);
+
+DECLARE_double(imu_rate);
 DECLARE_int32(local_utm_zone_id);
-DECLARE_double(map_coverage_theshold);
+DECLARE_bool(trans_gpstime_to_utctime);
+DECLARE_int32(gnss_mode);
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

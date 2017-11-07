@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
+#ifndef MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H
+#define MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H
 
 #include "Eigen/Core"
 
@@ -25,31 +25,31 @@ namespace msf {
 
 template <typename T>
 class Rect2D {
- public:
-  /**@brieft The constructor. */
-  Rect2D();
-  /**@brief The constructor. */
-  Rect2D(T min_x, T min_y, T max_x, T max_y);
-  /**@brief Copy constructor. */
-  Rect2D(const Rect2D<T>& ref);
-  /**@brief Overloading the operator =. */
-  Rect2D<T>& operator = (const Rect2D<T>& ref);
-  /**@brief Get the min x of the rectangle. */
-  T get_min_x() const;
-  /**@brief Get the min y of the rectangle. */
-  T get_min_y() const;
-  /**@brief Get the max x of the rectangle. */
-  T get_max_x() const;
-  /**@brief Get the max y of the rectangle. */
-  T get_max_y() const;
-  /**@brief Get the left top corner of the rectangle. */
-  Eigen::Matrix<T, 2, 1> get_left_top_corner() const;
-  /**@brief Get the right bottom corner of the rectangle. */
-  Eigen::Matrix<T, 2, 1> get_right_bottom_corner() const;
+public:
+    /**@brieft The constructor. */
+    Rect2D();
+    /**@brief The constructor. */
+    Rect2D(T min_x, T min_y, T max_x, T max_y);
+    /**@brief Copy constructor. */
+    Rect2D(const Rect2D<T>& ref);
+    /**@brief Overloading the operator =. */
+    Rect2D<T>& operator = (const Rect2D<T>& ref);
+    /**@brief Get the min x of the rectangle. */
+    T get_min_x() const;
+    /**@brief Get the min y of the rectangle. */
+    T get_min_y() const;
+    /**@brief Get the max x of the rectangle. */
+    T get_max_x() const;
+    /**@brief Get the max y of the rectangle. */
+    T get_max_y() const;
+    /**@brief Get the left top corner of the rectangle. */
+    Eigen::Matrix<T, 2, 1> get_left_top_corner() const;
+    /**@brief Get the right bottom corner of the rectangle. */
+    Eigen::Matrix<T, 2, 1> get_right_bottom_corner() const;
 
- private:
-  /**@brief min_x, min_y, max_x, max_y. */
-  Eigen::Matrix<T, 4, 1> _data;
+private:
+    /**@brief min_x, min_y, max_x, max_y. */
+    Eigen::Matrix<T, 4, 1> _data;
 };
 
 template <typename T>
@@ -58,59 +58,59 @@ Rect2D<T>::Rect2D() {
 
 template <typename T>
 Rect2D<T>::Rect2D(T min_x, T min_y, T max_x, T max_y): 
-    _data(min_x, min_y, max_x, max_y) {
+        _data(min_x, min_y, max_x, max_y) {
 }
 
 template <typename T>
 Rect2D<T>::Rect2D(const Rect2D<T>& ref) {
-  _data = ref._data;
+    _data = ref._data;
 }
 
 template <typename T>
 Rect2D<T>& Rect2D<T>::operator = (
-    const Rect2D<T>& ref) {
-  _data = ref._data;
-  return *this;
+        const Rect2D<T>& ref) {
+    _data = ref._data;
+    return *this;
 }
 
 template <typename T>
 T Rect2D<T>::get_min_x() const {
-  return _data(0);
+    return _data(0);
 }
 
 template <typename T>
 T Rect2D<T>::get_min_y() const {
-  return _data(1);
+    return _data(1);
 }
 
 template <typename T>
 T Rect2D<T>::get_max_x() const {
-  return _data(2);
+    return _data(2);
 }
 
 template <typename T>
 T Rect2D<T>::get_max_y() const {
-  return _data(3);
+    return _data(3);
 }
 
 template <typename T>
 Eigen::Matrix<T, 2, 1> Rect2D<T>::get_left_top_corner() const {
-  Eigen::Matrix<T, 2, 1> corner;
-  corner(0) = _data(0);
-  corner(1) = _data(1);
-  return corner;
+    Eigen::Matrix<T, 2, 1> corner;
+    corner(0) = _data(0);
+    corner(1) = _data(1);
+    return corner;
 }
 
 template <typename T>
 Eigen::Matrix<T, 2, 1> Rect2D<T>::get_right_bottom_corner() const {
-  Eigen::Matrix<T, 2, 1> corner;
-  corner(0) = _data(2);
-  corner(1) = _data(3);
-  return corner;
+    Eigen::Matrix<T, 2, 1> corner;
+    corner(0) = _data(2);
+    corner(1) = _data(3);
+    return corner;
 }
 
 } // namespace msf
 } // namespace localization
 } // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
+#endif // MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H

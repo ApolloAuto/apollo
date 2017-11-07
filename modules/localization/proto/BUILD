@@ -115,5 +115,19 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "gnss_pnt_result_proto",
+    deps = [
+        ":gnss_pnt_result_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "gnss_pnt_result_proto_lib",
+    srcs = ["gnss_pnt_result.proto"],
+    deps = [
+        "//modules/drivers/gnss/proto:gnss_raw_observation_lib",
+    ],
+)
 
 cpplint()

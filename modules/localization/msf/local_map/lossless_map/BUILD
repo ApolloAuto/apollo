@@ -13,8 +13,8 @@ cc_library(
     ],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/localization/msf/common/threadpool:localization_msf_common_threadpool",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//third_party/threadpool",
         "@eigen//:eigen",
     ],
 )

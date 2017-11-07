@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "msf_localization.h",
     ],
+    linkopts = [
+        "-lboost_system",
+    ],
     deps = [
         "//modules/common",
         "//modules/common/adapters:adapter_manager",
@@ -23,7 +26,10 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:sins_pva_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_proto",
+        "//modules/localization/msf/local_integ:localization_msf_local_integ",
         "@gtest//:gtest",
+        "@glog//:glog",
         "@ros//:ros_common",
     ],
 )

@@ -4,7 +4,7 @@
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 #include <list>
 #include <boost/thread.hpp>
-#include "third_party/threadpool/threadpool.hpp"  
+#include "modules/localization/msf/common/threadpool/threadpool.hpp"  
 
 namespace apollo {
 namespace localization {

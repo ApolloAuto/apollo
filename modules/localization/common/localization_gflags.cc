@@ -59,31 +59,55 @@ DEFINE_double(report_gps_imu_time_diff_threshold, 0.02,
 DEFINE_bool(enable_gps_timestamp, false,
             "True to set gps timestamp as localization header timestamp");
 
-// lidar localization
+// msf parame
+// DEFINE_int32(tf2_buffer_expire_time, 10,
+//     "Query Ros TF timeout in ms. ros::Duration time.");
+// DEFINE_double(map_coverage_theshold, 0.9,
+//     "The valid coverage of pointcloud and map.");
+
 DEFINE_string(map_path, "../mapdata/local_map",
     "The path of localization map.");
-DEFINE_string(lidar_extrinsic_file,
+DEFINE_string(lidar_extrinsic_file, 
     "/home/caros/ros/share/params/velodyne64_novatel_extrinsics_example.yaml",
     "The path of extrinsics parameter of velodyne64 and imu.");
 DEFINE_string(lidar_height_file,
     "/home/caros/ros/share/params/velodyne64_height.yaml",
     "The path of height parameter of lidar.");
-DEFINE_bool(debug_log_flag, false, "Debug switch.");
-DEFINE_bool(is_locator_available, true, "The status of lidar locator.");
-DEFINE_string(broadcast_tf2_frame_id_lidar, "localization_lidar",
-    "The child frame id used to broadcast the lidar localization result.");
-DEFINE_string(broadcast_tf_child_frame_id_lidar, "world",
-    "The child frame id used to broadcast the lidar localization result.");
-DEFINE_string(query_tf2_target_frame_id_lidar, "world",
-    "The target frame id used to query.");
-DEFINE_string(query_tf2_source_frame_id_lidar, "novatel",
-    "The source frame id used to query.");
-DEFINE_string(publish_frame_id_lidar, "localization_lidar",
-    "The frame id used to publish localization result.");
-DEFINE_int32(localization_mode, 2,
+DEFINE_int32(lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
-DEFINE_int32(tf2_buffer_expire_time, 10,
-    "Query Ros TF timeout in ms. ros::Duration time.");
-DEFINE_int32(local_utm_zone_id, 50, "UTM zone id.");
-DEFINE_double(map_coverage_theshold, 0.9,
-    "The valid coverage of pointcloud and map.");
+DEFINE_double(lidar_imu_max_delay_time, 0.4,
+    "Lidar msg and imu msg max delay time");
+DEFINE_double(lidar_map_coverage_theshold, 0.9, 
+    "Threshold to detect wether vehicle is out of map");
+DEFINE_bool(lidar_debug_log_flag, false, 
+    "Lidar Debug switch.");
+
+// integ module
+DEFINE_bool(integ_ins_can_self_align, false,
+    "");
+DEFINE_bool(integ_sins_align_with_vel, true,
+    "");
+DEFINE_double(vel_threshold_get_yaw, 5.0,
+    "");
+DEFINE_bool(integ_debug_log_flag, false,
+    "");
+DEFINE_string(extrinsic_imu_gnss_filename, "", 
+    "");
+
+// gnss module
+DEFINE_bool(enable_ins_aid_rtk, false, 
+    "");
+DEFINE_bool(enable_auto_save_eph_file, true,
+    "");
+DEFINE_string(eph_buffer_path, "",
+    "");
+
+DEFINE_double(imu_rate, 1.0, 
+    "");
+DEFINE_int32(local_utm_zone_id, 50,
+    "UTM zone id");
+DEFINE_bool(trans_gpstime_to_utctime, true,
+    "");
+DEFINE_int32(gnss_mode, 1,
+    "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
+

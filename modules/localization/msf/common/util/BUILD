@@ -8,14 +8,15 @@ cc_library(
         "compression.cc",
         "system_utility.cc",
         "timer.cc",
-        "extract_ground_plane.h", 
-        "voxel_grid_covariance_hdmap.h"
     ],
     hdrs = [
         "compression.h",
         "rect2d.h",
         "system_utility.h",
         "timer.h",
+        "time_conversion.h",
+        "extract_ground_plane.h",
+        "voxel_grid_covariance_hdmap.h"
     ],
     linkopts = [
         "-lboost_filesystem",

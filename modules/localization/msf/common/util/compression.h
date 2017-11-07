@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H_
+#ifndef MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H
+#define MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H
 
 #include <vector>
 
@@ -24,26 +24,28 @@ namespace localization {
 namespace msf {
 
 class CompressionStrategy {
- public:
-  typedef std::vector<unsigned char> BufferStr;
-  virtual ~CompressionStrategy() {}
-  virtual unsigned int encode(BufferStr& buf, BufferStr& buf_compressed) = 0;
-  virtual unsigned int decode(BufferStr& buf, BufferStr& buf_uncompressed) = 0;
- protected:
+public:
+    typedef std::vector<unsigned char> BufferStr;
+    virtual ~CompressionStrategy() {}
+    virtual unsigned int encode(BufferStr& buf, BufferStr& buf_compressed) = 0;
+    virtual unsigned int decode(BufferStr& buf, BufferStr& buf_uncompressed) = 0;
+protected:
 };
 
 class ZlibStrategy: public CompressionStrategy {
- public:
-  virtual unsigned int encode(BufferStr& buf, BufferStr& buf_compressed);
-  virtual unsigned int decode(BufferStr& buf, BufferStr& buf_uncompressed);
- protected:
-  static const unsigned int zlib_chunk;
-  unsigned int zlib_compress(BufferStr& src, BufferStr& dst);
-  unsigned int zlib_uncompress(BufferStr& src, BufferStr& dst);
+public:
+    virtual unsigned int encode(BufferStr& buf, BufferStr& buf_compressed);
+    virtual unsigned int decode(BufferStr& buf, BufferStr& buf_uncompressed);
+protected:
+    static const unsigned int zlib_chunk;
+    unsigned int zlib_compress(BufferStr& src,
+                  BufferStr& dst);
+    unsigned int zlib_uncompress(BufferStr& src,
+                    BufferStr& dst);
 };
 
 } // namespace msf
 } // namespace localization
 } // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H_
+#endif // MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H

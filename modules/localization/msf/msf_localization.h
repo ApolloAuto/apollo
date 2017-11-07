@@ -41,6 +41,11 @@
 #include "modules/common/monitor/monitor.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
+#include "modules/localization/msf/local_integ/localization_integ.h"
+// #include "modules/localization/msf/local_integ/localization_lidar_process.h"
+// #include "modules/localization/msf/local_integ/measure_republish_process.h"
+// #include "modules/localization/msf/local_integ/localization_gnss_process.h"
+// #include "modules/localization/msf/local_integ/localization_integ_process.h"
 
 /**
  * @namespace apollo::localization
@@ -72,12 +77,16 @@ class MSFLocalization : public LocalizationBase {
   apollo::common::Status Stop() override;
 
  private:
+  void Init();
   void OnTimer(const ros::TimerEvent &event);
   void OnPointCloud(const sensor_msgs::PointCloud2& message);
   void OnImu(const localization::Imu &imu_msg);
   void OnGps(const localization::Gps &gps_msg);
   void OnMeasure(const localization::IntegMeasure &measure_msg);
   void OnSinsPva(const localization::IntegSinsPva &sins_pva_msg);
+  void OnGnssRtkObs(const EpochObservation& raw_obs_msg);
+  void OnGnssRtkEph(const GnssEphemeris& gnss_orbit_msg);
+  void OnGnssBestPose(const GnssBestPose& bestgnsspos_msg);
   // void PublishLocalization();
   // void RunWatchDog();
 
@@ -88,6 +97,19 @@ class MSFLocalization : public LocalizationBase {
   double last_received_timestamp_sec_ = 0.0;
   double last_reported_timestamp_sec_ = 0.0;
   bool service_started_ = false;
+
+  LocalizationInteg localization_integ_;
+  LocalizationIntegParam localizaiton_param_;
+
+  // MeasureRepublishParam republish_param_;
+  // LocalizationLidarParam lidar_param_;
+  // LocalizationIntegParam integ_param_;
+  // LocalizationGnssParam gnss_param_;
+
+  // LocalizationLidarProcess lidar_process_;
+  // MeasureRepublishProcess republish_process_;
+  // LocalizationIntegProcess integ_process_;
+  // LocalizationGnssProcess gnss_process_;
 
   // FRIEND_TEST(RTKLocalizationTest, InterpolateIMU);
   // FRIEND_TEST(RTKLocalizationTest, ComposeLocalizationMsg);

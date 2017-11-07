@@ -46,49 +46,45 @@ void load_pcd_poses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
     }
 }
 
-// void save_pcd_poses(std::string file_path,
-//    const std::vector<numerical::Transform<double> >& poses,
-//    const std::vector<double>& timestamps) {
-//   FILE * file = fopen(file_path.c_str(), "w");
-//   if (file) {
-//     for (size_t i = 0; i < poses.size(); ++i) {
-//       const numerical::Transform<double>& pose = poses[i];
-//       double timestamp = timestamps[i];
-//       fprintf(file, "%lu %lf %lf %lf %lf %lf %lf %lf %lf\n", i,
-//           timestamp, pose.get_translation()[0], pose.get_translation()[1],
-//           pose.get_translation()[2], pose.get_quaternion().get_x(),
-//           pose.get_quaternion().get_y(), pose.get_quaternion().get_z(),
-//           pose.get_quaternion().get_r());
+// void save_pcd_poses(std::string file_path, const std::vector<numerical::Transform<double> >& poses,
+//         const std::vector<double>& timestamps) {
+//     FILE * file = fopen(file_path.c_str(), "w");
+//     if (file) {
+//         for (size_t i = 0; i < poses.size(); ++i) {
+//             const numerical::Transform<double>& pose = poses[i];
+//             double timestamp = timestamps[i];
+//             fprintf(file, "%lu %lf %lf %lf %lf %lf %lf %lf %lf\n", i,
+//                     timestamp, pose.get_translation()[0], pose.get_translation()[1],
+//                     pose.get_translation()[2], pose.get_quaternion().get_x(),
+//                     pose.get_quaternion().get_y(), pose.get_quaternion().get_z(),
+//                     pose.get_quaternion().get_r());
+//         }
+//         fclose(file);
 //     }
-//     fclose(file);
-//   }
-//   else {
-//     std::cerr << "Can't open file to read: " << file_path << std::endl;
-//   }
+//     else {
+//         std::cerr << "Can't open file to read: " << file_path << std::endl;
+//     }
 // }
 
 bool load_extrinsic(std::string file_path, Eigen::Affine3d& extrinsic) {
-  YAML::Node config = YAML::LoadFile(file_path);
-  if (config["transform"]) {
-    if (config["transform"]["translation"]) {
-      extrinsic.translation()(0)
-          = config["transform"]["translation"]["x"].as<double>();
-      extrinsic.translation()(1)
-          = config["transform"]["translation"]["y"].as<double>();
-      extrinsic.translation()(2)
-          = config["transform"]["translation"]["z"].as<double>();
-      if (config["transform"]["rotation"]) {
-        double qx = config["transform"]["rotation"]["x"].as<double>();
-        double qy = config["transform"]["rotation"]["y"].as<double>();
-        double qz = config["transform"]["rotation"]["z"].as<double>();
-        double qw = config["transform"]["rotation"]["w"].as<double>();
-        extrinsic.linear()
-            = Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
-        return true;
-      }
+    YAML::Node config = YAML::LoadFile(file_path);
+    if (config["transform"]) {
+        if (config["transform"]["translation"]) {
+            extrinsic.translation()(0) = config["transform"]["translation"]["x"].as<double>();
+            extrinsic.translation()(1) = config["transform"]["translation"]["y"].as<double>();
+            extrinsic.translation()(2) = config["transform"]["translation"]["z"].as<double>();
+            if (config["transform"]["rotation"]) {
+                double qx = config["transform"]["rotation"]["x"].as<double>();
+                double qy = config["transform"]["rotation"]["y"].as<double>();
+                double qz = config["transform"]["rotation"]["z"].as<double>();
+                double qw = config["transform"]["rotation"]["w"].as<double>();
+
+                extrinsic.linear() = Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();//numerical::Quaternion<double>(qx, qy, qz, qw);
+                return true;
+            }
+        }
     }
-  }
-  return false;
+    return false;
 }
 
 void load_pcds(std::string file_path, 
@@ -103,64 +99,62 @@ void load_pcds(std::string file_path,
 }
 
 void load_pcds(std::string file_path, 
-    unsigned int frame_index,
-    const Eigen::Affine3d& pose,
-    std::vector<Eigen::Vector3d>& pt3ds, 
-    std::vector<unsigned char>& intensities,
-    bool is_global) {    
-  Eigen::Affine3d pose_inv = pose.inverse();
-  pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
-  if (pcl::io::loadPCDFile(file_path, *cloud) >= 0) {
-    if (cloud->height == 1 || cloud->width == 1) {
-      std::cerr << "Un-organized-point-cloud" << std::endl;
-      for (unsigned int i = 0; i < cloud->size(); ++i) {
-        Eigen::Vector3d pt3d;
-        pt3d[0] = (*cloud)[i].x;
-        pt3d[1] = (*cloud)[i].y;
-        pt3d[2] = (*cloud)[i].z;
+        unsigned int frame_index,
+        const Eigen::Affine3d& pose,
+        std::vector<Eigen::Vector3d>& pt3ds, 
+        std::vector<unsigned char>& intensities,
+        bool is_global) {
+    
+    Eigen::Affine3d pose_inv = pose.inverse();
+    pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
+    if (pcl::io::loadPCDFile(file_path, *cloud) >= 0) {
+        if (cloud->height == 1 || cloud->width == 1) {
+            std::cerr << "Un-organized-point-cloud" << std::endl;
+            for (unsigned int i = 0; i < cloud->size(); ++i) {
+                Eigen::Vector3d pt3d;
+                pt3d[0] = (*cloud)[i].x;
+                pt3d[1] = (*cloud)[i].y;
+                pt3d[2] = (*cloud)[i].z;
 
-        if (pt3d[0] == pt3d[0] && pt3d[1] == pt3d[1] && pt3d[2] == pt3d[2]) {
-          Eigen::Vector3d pt3d_local;
-          if (is_global) {
-            pt3d_local = pose_inv * pt3d;
-          }
-          else {
-            pt3d_local = pt3d;
-          }
-          unsigned char intensity
-              = static_cast<unsigned char>((*cloud)[i].intensity);
-          pt3ds.push_back(pt3d_local);
-          intensities.push_back(intensity);
-        }
-      }
-    } else {
-      for (unsigned int h = 0; h < cloud->height; ++h) {
-        for (unsigned int w = 0; w < cloud->width; ++w) {
-          double x = cloud->at(w, h).x;
-          double y = cloud->at(w, h).y;
-          double z = cloud->at(w, h).z;
-          Eigen::Vector3d pt3d(x, y, z);
-            if (pt3d[0] == pt3d[0] && pt3d[1] == pt3d[1]
-                && pt3d[2] == pt3d[2]) {
-              Eigen::Vector3d pt3d_local;
-              if (is_global) {
-                pt3d_local = pose_inv * pt3d;
-              }
-              else {
-                pt3d_local = pt3d;
-              }
-              unsigned char intensity
-                  = static_cast<unsigned char>(cloud->at(w, h).intensity);
-              pt3ds.push_back(pt3d_local);
-              intensities.push_back(intensity);
+                if (pt3d[0] == pt3d[0] &&  pt3d[1] == pt3d[1] && pt3d[2] == pt3d[2]) {  // NaN
+                    Eigen::Vector3d pt3d_local;
+                    if (is_global) {
+                        pt3d_local = pose_inv * pt3d;
+                    }
+                    else {
+                        pt3d_local = pt3d;
+                    }
+                    unsigned char intensity = static_cast<unsigned char>((*cloud)[i].intensity);
+                    pt3ds.push_back(pt3d_local);
+                    intensities.push_back(intensity);
+                }
             }
-          }
+        } else {
+            for (unsigned int h = 0; h < cloud->height; ++h) {
+                for (unsigned int w = 0; w < cloud->width; ++w) {
+                    double x = cloud->at(w, h).x;
+                    double y = cloud->at(w, h).y;
+                    double z = cloud->at(w, h).z;
+                    Eigen::Vector3d pt3d(x, y, z);
+                    if (pt3d[0] == pt3d[0] &&  pt3d[1] == pt3d[1] && pt3d[2] == pt3d[2]) {  // NaN
+                        Eigen::Vector3d pt3d_local;
+                        if (is_global) {
+                            pt3d_local = pose_inv * pt3d;
+                        }
+                        else {
+                            pt3d_local = pt3d;
+                        }
+                        unsigned char intensity = static_cast<unsigned char>(cloud->at(w, h).intensity);
+                        pt3ds.push_back(pt3d_local);
+                        intensities.push_back(intensity);
+                    }
+                }
+            }
         }
-      }
-  }
-  else {
-    std::cerr << "Failed to load PCD file: " << file_path << "." << std::endl;
-  }
+    }
+    else {
+        std::cerr << "Failed to load PCD file: " << file_path << "." << std::endl;
+    }
 }
 
 } // namespace velodyne
