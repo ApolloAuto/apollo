@@ -220,6 +220,8 @@ dkappaGraph:
             x:
                 labelString: 's (m)'
             y:
+                min: -0.02
+                max: 0.02
                 labelString: 'dkappa'
     properties:
         lines:
