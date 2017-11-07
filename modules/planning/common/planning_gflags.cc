@@ -113,8 +113,6 @@ DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
 
-DEFINE_double(lateral_acceleration_bound, 4.0, "lateral acceleration bound");
-
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
 
@@ -161,7 +159,6 @@ DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
-DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
@@ -223,9 +220,6 @@ DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
 // QpSt optimizer
 DEFINE_bool(enable_slowdown_profile_generator, true,
             "True to enable slowdown speed profile generator.");
-DEFINE_double(slowdown_speed_threshold, 8.0,
-              "Only generator slowdown profile when adc speed is lower than "
-              "this threshold. unit : m/s.");
 DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
