@@ -71,7 +71,7 @@ void Perception::RegistAllOnboardClass() {
 
   /// regist sharedata
   RegisterFactoryLidarObjectData();
-  RegisterFactoryRadarFrontObjectData();
+  RegisterFactoryRadarObjectData();
 }
 
 Status Perception::Start() {

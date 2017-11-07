@@ -192,8 +192,8 @@ bool RadarProcessSubnode::InitFrameDependence() {
   /// init share data
   CHECK(shared_data_manager_ != nullptr);
   // init preprocess_data
-  const string radar_data_name("RadarFrontObjectData");
-  radar_data_ = dynamic_cast<RadarFrontObjectData*>(
+  const string radar_data_name("RadarObjectData");
+  radar_data_ = dynamic_cast<RadarObjectData*>(
           shared_data_manager_->GetSharedData(radar_data_name));
   if (radar_data_ == nullptr) {
     AERROR << "Failed to get shared data instance "

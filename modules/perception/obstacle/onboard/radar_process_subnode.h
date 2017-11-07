@@ -68,7 +68,7 @@ class RadarProcessSubnode : public Subnode {
   double timestamp_;
   SeqId seq_num_ = 0;
   common::ErrorCode error_code_ = common::OK;
-  RadarFrontObjectData* radar_data_ = nullptr;
+  RadarObjectData* radar_data_ = nullptr;
   std::string device_id_;
 
   ContiRadarIDExpansion _conti_id_expansion;
