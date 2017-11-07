@@ -73,6 +73,9 @@ DEFINE_double(spiral_reference_line_resolution, 0.02,
 DEFINE_bool(prioritize_change_lane, false,
             "change lane strategy has higher priority, always use a valid "
             "change lane path if such path exists");
+DEFINE_bool(reckless_change_lane, false,
+            "Alway allow the vehicle change lane. The vehicle may contineous "
+            "change lane. This is mainly test purpose");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 

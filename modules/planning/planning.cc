@@ -188,7 +188,8 @@ void Planning::RunOnce() {
     not_ready->set_reason("prediction not ready");
   }
   if (not_ready->has_reason()) {
-    AERROR << not_ready->reason() << "; skip the planning cycle.";
+    LOG_EVERY_N(ERROR, 5) << not_ready->reason()
+                          << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
