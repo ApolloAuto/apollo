@@ -30,27 +30,11 @@ TEST(LRUCache, General) {
   int timestamps[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
   std::vector<std::vector<int>> keys = {
-      {0},
-      {1, 0},
-      {2, 1, 0},
-      {3, 2, 1, 0},
-      {2, 3, 1, 0},
-      {1, 2, 3, 0},
-      {4, 1, 2, 3},
-      {3, 4, 1, 2},
-      {5, 3, 4, 1},
-      {6, 5, 3, 4}};
+      {0},          {1, 0},       {2, 1, 0},    {3, 2, 1, 0}, {2, 3, 1, 0},
+      {1, 2, 3, 0}, {4, 1, 2, 3}, {3, 4, 1, 2}, {5, 3, 4, 1}, {6, 5, 3, 4}};
   std::vector<std::vector<int>> values = {
-      {0},
-      {1, 0},
-      {2, 1, 0},
-      {3, 2, 1, 0},
-      {4, 3, 1, 0},
-      {5, 4, 3, 0},
-      {6, 5, 4, 3},
-      {7, 6, 5, 4},
-      {8, 7, 6, 5},
-      {9, 8, 7, 6}};
+      {0},          {1, 0},       {2, 1, 0},    {3, 2, 1, 0}, {4, 3, 1, 0},
+      {5, 4, 3, 0}, {6, 5, 4, 3}, {7, 6, 5, 4}, {8, 7, 6, 5}, {9, 8, 7, 6}};
   int obsoletes[TEST_NUM] = {-1, -1, -1, -1, -1, -1, 0, -1, 2, 1};
   LRUCache<int, int> lru(CAPACITY);
   for (int i = 0; i < TEST_NUM; ++i) {
@@ -66,6 +50,36 @@ TEST(LRUCache, General) {
       cur = cur->next;
     }
   }
+}
+
+TEST(LRUCache, UAF) {
+  LRUCache<int, int> cache;
+  std::vector<int> keys = {1, 3, 5};
+  std::vector<int> vals = {2, 4, 6};
+
+  for (size_t i = 0; i < 2; ++i) {
+    cache.Put(keys[i], vals[i]);
+  }
+  EXPECT_EQ(2, cache.size());
+  Node<int, int>* curr = cache.First();
+  EXPECT_TRUE(curr != nullptr);
+  for (size_t i = 0; i < 2; ++i) {
+    EXPECT_EQ(curr->key, keys[1 - i]);
+    EXPECT_EQ(curr->val, vals[1 - i]);
+    curr = curr->next;
+  }
+  cache.Clear();
+
+  cache.Put(keys[2], vals[2]);
+  EXPECT_EQ(1, cache.size());
+  curr = cache.First();
+  EXPECT_TRUE(curr != nullptr);
+  for (int i = 2; i < 3; ++i) {
+    EXPECT_EQ(curr->key, keys[i]);
+    EXPECT_EQ(curr->val, vals[i]);
+    curr = curr->next;
+  }
+  cache.Clear();
 }
 
 }  // namespace util
