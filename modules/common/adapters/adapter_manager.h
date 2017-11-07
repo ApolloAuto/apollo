@@ -238,7 +238,6 @@ class AdapterManager {
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
   REGISTER_ADAPTER(Radar);
-  // REGISTER_ADAPTER(Odometry);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);

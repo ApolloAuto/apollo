@@ -17,7 +17,6 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
-#include <nav_msgs/Odometry.h>
 #include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -65,7 +64,6 @@ using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using RadarAdapter = Adapter<apollo::drivers::RadarObsArray>;
-using OdometryAdapter = Adapter<::nav_msgs::Odometry>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;

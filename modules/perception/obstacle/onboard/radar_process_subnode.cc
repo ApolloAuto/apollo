@@ -77,8 +77,10 @@ bool RadarProcessSubnode::InitInternal() {
   CHECK(AdapterManager::GetRadar()) << "Radar is not initialized.";
   AdapterManager::AddRadarCallback(&RadarProcessSubnode::OnRadar,
                                         this);
-  // TODO: odometry message adapter.
-
+  CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
+  AdapterManager::AddGpsCallback(&RadarProcessSubnode::OnGps, 
+                                        this);
+  gps_buffer_.set_capacity(FLAGS_gps_buffer_size);
   inited_ = true;
 
   return true;
@@ -141,12 +143,12 @@ void RadarProcessSubnode::OnRadar(
     }
     RadarDetectorOptions options;
 
-    // // 3. get car car_linear_speed
-    // if (!get_car_linear_speed(timestamp, &(options.car_linear_speed))) {
-    //     XLOG(ERROR) << "Failed to call get_car_linear_speed. [timestamp: "
-    //                << GLOG_TIMESTAMP(timestamp);
-    //     return;
-    // }
+    // 3. get car car_linear_speed
+    if (!GetCarLinearSpeed(timestamp, &(options.car_linear_speed))) {
+        AERROR << "Failed to call get_car_linear_speed. [timestamp: "
+                   << GLOG_TIMESTAMP(timestamp);
+        return;
+    }
 
     // 4. Call RadarDetector::detect.
     PERF_BLOCK_START();
@@ -182,6 +184,54 @@ void RadarProcessSubnode::OnRadar(
            << (radar_objects->objects).size() << " objects.";
   return;
 }
+
+void RadarProcessSubnode::OnGps(const apollo::localization::Gps& gps) {
+  MutexLock lock(&mutex_);
+  double timestamp = gps.header().timestamp_sec();
+  ObjectPair obj_pair;
+  obj_pair.first = timestamp;
+  obj_pair.second = gps;
+  gps_buffer_.push_back(obj_pair);
+}
+
+bool RadarProcessSubnode::GetCarLinearSpeed(double timestamp, 
+  Eigen::Vector3f* car_linear_speed) {
+    MutexLock lock(&mutex_);
+    if (car_linear_speed == NULL) {
+        AERROR << "Param car_linear_speed NULL error.";
+        return false;
+    }
+    if (gps_buffer_.empty()) {
+        AWARN << "Rosmsg buffer is empty.";
+        return false;
+    }
+    if (gps_buffer_.front().first - 0.1 > timestamp) {
+        AWARN << "Your timestamp (" << timestamp << ") is earlier than the oldest "
+                     << "timestamp (" << gps_buffer_.front().first << ").";
+        return false;
+    }
+    if (gps_buffer_.back().first + 0.1 < timestamp) {
+        AWARN << "Your timestamp (" << timestamp << ") is newer than the latest "
+                     << "timestamp (" << gps_buffer_.back().first << ").";
+        return false;
+    }
+    // loop to find nearest
+    double distance = 1e9;
+    int idx = gps_buffer_.size() - 1;
+    for (; idx >= 0; --idx) {
+        double temp_distance = fabs(timestamp - gps_buffer_[idx].first);
+        if (temp_distance >= distance) {
+            break;
+        }
+        distance = temp_distance;
+    }
+    const auto& velocity = gps_buffer_[idx + 1].second.localization().linear_velocity();
+    (*car_linear_speed)[0] = velocity.x();
+    (*car_linear_speed)[1] = velocity.y();
+    (*car_linear_speed)[2] = velocity.z();
+    return true;
+}
+
 
 void RadarProcessSubnode::RegistAllAlgorithm() {
   RegisterFactoryDummyRadarDetector();
