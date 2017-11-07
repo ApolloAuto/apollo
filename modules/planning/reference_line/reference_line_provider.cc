@@ -104,7 +104,6 @@ void ReferenceLineProvider::Stop() {
 
 void ReferenceLineProvider::GenerateThread() {
   constexpr int32_t kSleepTime = 200;  // milliseconds
-  constexpr size_t kMaxStoredReferenceLineGroups = 3;
   while (!is_stop_) {
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
@@ -118,13 +117,9 @@ void ReferenceLineProvider::GenerateThread() {
       AERROR << "Fail to get reference line";
       continue;
     }
-    std::unique_lock<std::mutex> lock(reference_line_groups_mutex_);
-    reference_line_groups_.emplace_back(reference_lines);
-    route_segment_groups_.emplace_back(segments);
-    while (reference_line_groups_.size() > kMaxStoredReferenceLineGroups) {
-      reference_line_groups_.pop_front();
-      route_segment_groups_.pop_front();
-    }
+    std::unique_lock<std::mutex> lock(reference_lines_mutex__);
+    reference_lines_ = reference_lines;
+    route_segments_ = segments;
     lock.unlock();
     cv_has_reference_line_.notify_one();
   }
@@ -136,13 +131,11 @@ bool ReferenceLineProvider::GetReferenceLines(
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
   if (FLAGS_enable_reference_line_provider_thread) {
-    std::unique_lock<std::mutex> lock(reference_line_groups_mutex_);
-    cv_has_reference_line_.wait(
-        lock, [this]() { return !reference_line_groups_.empty(); });
-    reference_lines->assign(reference_line_groups_.back().begin(),
-                            reference_line_groups_.back().end());
-    segments->assign(route_segment_groups_.back().begin(),
-                     route_segment_groups_.back().end());
+    std::unique_lock<std::mutex> lock(reference_lines_mutex__);
+    cv_has_reference_line_.wait(lock,
+                                [this]() { return !reference_lines_.empty(); });
+    reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
+    segments->assign(route_segments_.begin(), route_segments_.end());
     lock.unlock();
     return true;
   } else {
