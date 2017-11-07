@@ -88,6 +88,7 @@ class Spline1dGenerator {
 
   int last_num_constraint_ = 0;
   int last_num_param_ = 0;
+  bool last_problem_success_ = false;
 };
 
 }  // namespace planning
