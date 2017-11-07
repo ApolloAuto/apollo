@@ -15,15 +15,18 @@
  *****************************************************************************/
 
 /**
- * @file reference_line_provider.cc
+ * @file
  *
  * @brief Implementation of the class ReferenceLineProvider.
  */
 
+#include <algorithm>
 #include <utility>
 
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
+#include "modules/routing/common/routing_gflags.h"
 
 /**
  * @namespace apollo::planning
@@ -33,6 +36,9 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::VehicleState;
+using apollo::common::math::Vec2d;
+using apollo::hdmap::RouteSegments;
+using apollo::hdmap::LaneWaypoint;
 
 ReferenceLineProvider::ReferenceLineProvider() {}
 
@@ -47,6 +53,7 @@ void ReferenceLineProvider::Init(
     const QpSplineReferenceLineSmootherConfig &smoother_config) {
   pnc_map_.reset(new hdmap::PncMap(hdmap_));
   smoother_config_ = smoother_config;
+  segment_history_.clear();
   std::vector<double> init_t_knots;
   spline_solver_.reset(new Spline2dSolver(init_t_knots, 1));
   if (FLAGS_enable_spiral_reference_line) {
@@ -59,6 +66,57 @@ void ReferenceLineProvider::Init(
   is_initialized_ = true;
 }
 
+bool ReferenceLineProvider::IsAllowChangeLane(
+    const common::math::Vec2d &point,
+    const std::list<RouteSegments> &route_segments) {
+  if (FLAGS_reckless_change_lane) {
+    ADEBUG << "enabled reckless change lane enabled";
+    return true;
+  }
+  if (route_segments.size() <= 1) {
+    return false;
+  }
+  auto forward_segment = route_segments.begin();
+  while (forward_segment != route_segments.end() &&
+         !forward_segment->IsOnSegment()) {
+    ++forward_segment;
+  }
+  if (forward_segment == route_segments.end()) {
+    return true;
+  }
+  double s = 0.0;
+  double l = 0.0;
+  LaneWaypoint waypoint;
+  if (!forward_segment->GetProjection(point, &s, &l, &waypoint)) {
+    AERROR << "Failed to project to forward segment from point: "
+           << point.DebugString();
+    return false;
+  }
+  auto history_iter = segment_history_.find(forward_segment->Id());
+  if (history_iter == segment_history_.end()) {
+    auto &inserter = segment_history_[forward_segment->Id()];
+    inserter.min_l = std::fabs(l);
+    inserter.last_point = point;
+    inserter.accumulate_s = 0.0;
+    return false;
+  } else {
+    history_iter->second.min_l =
+        std::min(history_iter->second.min_l, std::fabs(l));
+    double dist =
+        common::util::DistanceXY(history_iter->second.last_point, point);
+    history_iter->second.last_point = point;
+    history_iter->second.accumulate_s += dist;
+    constexpr double kChangeLaneMinL = 0.25;
+    constexpr double kChangeLaneMinLengthFactor = 0.6;
+    if (history_iter->second.min_l < kChangeLaneMinL &&
+        history_iter->second.accumulate_s >=
+            kChangeLaneMinLengthFactor * FLAGS_min_length_for_lane_change) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing) {
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
@@ -66,20 +124,17 @@ bool ReferenceLineProvider::UpdateRoutingResponse(
     AERROR << "Failed to update routing in pnc map";
     return false;
   }
+  if (!pnc_map_->IsSameRouting()) {
+    segment_history_.clear();
+  }
   has_routing_ = true;
   return true;
 }
 
-bool ReferenceLineProvider::UpdateVehicleState(
+void ReferenceLineProvider::UpdateVehicleState(
     const VehicleState &vehicle_state) {
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
   vehicle_state_ = vehicle_state;
-  if (!pnc_map_->UpdateVehicleState(vehicle_state_)) {
-    AERROR << "PncMap failed to update vehicle state: "
-           << vehicle_state_.ShortDebugString();
-    return false;
-  }
-  return true;
 }
 
 bool ReferenceLineProvider::Start() {
@@ -144,28 +199,34 @@ bool ReferenceLineProvider::GetReferenceLines(
 }
 
 void ReferenceLineProvider::PrioritzeChangeLane(
-    std::vector<hdmap::RouteSegments> *route_segments) {
+    std::list<hdmap::RouteSegments> *route_segments) {
   CHECK_NOTNULL(route_segments);
-  for (std::size_t i = 1; i < route_segments->size(); ++i) {
-    if (!route_segments->at(i).IsOnSegment()) {
-      std::swap(route_segments->at(0), route_segments->at(i));
+  auto iter = route_segments->begin();
+  while (iter != route_segments->end()) {
+    if (!iter->IsOnSegment()) {
+      route_segments->splice(route_segments->begin(), *route_segments, iter);
       break;
     }
+    ++iter;
   }
 }
 
 bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
-  std::vector<hdmap::RouteSegments> route_segments;
+  std::list<hdmap::RouteSegments> route_segments;
   double look_forward_distance =
       (vehicle_state_.linear_velocity() * FLAGS_look_forward_time_sec >
        FLAGS_look_forward_min_distance)
           ? FLAGS_look_forward_distance
           : FLAGS_look_forward_min_distance;
+  common::math::Vec2d point;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(FLAGS_look_backward_distance,
+    point.set_x(vehicle_state_.x());
+    point.set_y(vehicle_state_.y());
+    if (!pnc_map_->GetRouteSegments(vehicle_state_,
+                                    FLAGS_look_backward_distance,
                                     look_forward_distance, &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
@@ -174,7 +235,11 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   if (FLAGS_prioritize_change_lane) {
     PrioritzeChangeLane(&route_segments);
   }
+  bool is_allow_change_lane = IsAllowChangeLane(point, route_segments);
   for (const auto &lanes : route_segments) {
+    if (!is_allow_change_lane && !lanes.IsOnSegment()) {
+      continue;
+    }
     hdmap::Path hdmap_path;
     hdmap::PncMap::CreatePathFromLaneSegments(lanes, &hdmap_path);
     if (FLAGS_enable_smooth_reference_line) {

@@ -59,6 +59,12 @@ const LaneWaypoint &RouteSegments::RouteEndWaypoint() const {
   return route_end_waypoint_;
 }
 
+bool RouteSegments::IsOnSegment() const { return is_on_segment_; }
+
+void RouteSegments::SetIsOnSegment(bool on_segment) {
+  is_on_segment_ = on_segment;
+}
+
 void RouteSegments::SetRouteEndWaypoint(const LaneWaypoint &waypoint) {
   route_end_waypoint_ = waypoint;
 }
@@ -72,7 +78,11 @@ LaneWaypoint RouteSegments::LastWaypoint() const {
 
 bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
                                   double *l, LaneWaypoint *waypoint) const {
-  const auto point = common::math::Vec2d{point_enu.x(), point_enu.y()};
+  return GetProjection({point_enu.x(), point_enu.y()}, s, l, waypoint);
+}
+
+bool RouteSegments::GetProjection(const common::math::Vec2d &point, double *s,
+                                  double *l, LaneWaypoint *waypoint) const {
   *l = std::numeric_limits<double>::infinity();
   double accumulate_s = 0.0;
   bool has_projection = false;

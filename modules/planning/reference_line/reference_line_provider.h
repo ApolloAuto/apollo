@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 /**
  * @file reference_line_provider.h
  *
  * @brief Declaration of the class ReferenceLineProvider.
  */
+
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
@@ -25,7 +27,9 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/common/proto/vehicle_state.pb.h"
@@ -61,7 +65,7 @@ class ReferenceLineProvider {
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
-  bool UpdateVehicleState(const common::VehicleState& vehicle_state);
+  void UpdateVehicleState(const common::VehicleState& vehicle_state);
 
   bool Start();
 
@@ -83,7 +87,9 @@ class ReferenceLineProvider {
  private:
   void GenerateThread();
   void IsValidReferenceLine();
-  void PrioritzeChangeLane(std::vector<hdmap::RouteSegments>* route_segments);
+  void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
+  bool IsAllowChangeLane(const common::math::Vec2d& point,
+                         const std::list<hdmap::RouteSegments>& route_segments);
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -107,6 +113,13 @@ class ReferenceLineProvider {
   std::condition_variable cv_has_reference_line_;
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
+
+  struct SegmentHistory {
+    double min_l = 0.0;
+    double accumulate_s = 0.0;
+    common::math::Vec2d last_point;
+  };
+  std::unordered_map<std::string, SegmentHistory> segment_history_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };
