@@ -12,6 +12,7 @@ message Component {
 message HMIConfig {
   map<string, Component> modules = 1;          // {module_name: module}
   map<string, Component> hardware = 2;         // {hardware_name: hardware}
-  map<string, string> available_maps = 3;      // {map_name: map_dir}
-  map<string, string> available_vehicles = 4;  // {vehicle_name: vehicle_dir}
+  map<string, Component> tools = 3;            // {tool_name: tool}
+  map<string, string> available_maps = 4;      // {map_name: map_dir}
+  map<string, string> available_vehicles = 5;  // {vehicle_name: vehicle_dir}
 }
