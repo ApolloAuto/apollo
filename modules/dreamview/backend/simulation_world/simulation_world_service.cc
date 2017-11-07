@@ -28,6 +28,7 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -477,7 +478,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
   const std::string id = std::to_string(obstacle.id());
   // Create a new world object and put it into object map if the id does not
   // exist in the map yet.
-  if (obj_map_.find(id) == obj_map_.end()) {
+  if (!apollo::common::util::ContainsKey(obj_map_, id)) {
     Object &world_obj = obj_map_[id];
     SetObstacleInfo(obstacle, &world_obj);
     SetObstaclePolygon(obstacle, &world_obj);
