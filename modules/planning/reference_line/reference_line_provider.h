@@ -103,10 +103,10 @@ class ReferenceLineProvider {
 
   bool is_stop_ = false;
 
-  std::mutex reference_line_groups_mutex_;
+  std::mutex reference_lines_mutex__;
   std::condition_variable cv_has_reference_line_;
-  std::list<std::list<ReferenceLine>> reference_line_groups_;
-  std::list<std::list<hdmap::RouteSegments>> route_segment_groups_;
+  std::list<ReferenceLine> reference_lines_;
+  std::list<hdmap::RouteSegments> route_segments_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };
