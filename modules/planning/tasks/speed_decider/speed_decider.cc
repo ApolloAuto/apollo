@@ -120,35 +120,50 @@ Status SpeedDecider::MakeObjectDecision(
     }
 
     auto position = GetStPosition(speed_profile, boundary);
-    if (position == BELOW) {
-      if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
-        ObjectDecisionType stop_decision;
-        CreateStopDecision(*path_obstacle, &stop_decision);
-        path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
-      } else if (CheckIsFollowByT(boundary)) {
-        // FOLLOW decision
-        ObjectDecisionType follow_decision;
-        CreateFollowDecision(*path_obstacle, &follow_decision);
-        path_obstacle->AddLongitudinalDecision("dp_st_graph", follow_decision);
-      } else {
-        // YIELD decision
-        ObjectDecisionType yield_decision;
-        CreateYieldDecision(boundary, &yield_decision);
-        path_obstacle->AddLongitudinalDecision("dp_st_graph", yield_decision);
-      }
-    } else {
-      if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
-        ObjectDecisionType ignore;
-        ignore.mutable_ignore();
-        path_obstacle->AddLongitudinalDecision("dp_st_graph", ignore);
+    switch (position) {
+      case BELOW:
+        if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+          ObjectDecisionType stop_decision;
+          CreateStopDecision(*path_obstacle, &stop_decision);
+          path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+        } else if (CheckIsFollowByT(boundary) &&
+                   (boundary.max_t() - boundary.min_t() >
+                    FLAGS_follow_min_time_sec)) {
+          // FOLLOW decision
+          ObjectDecisionType follow_decision;
+          CreateFollowDecision(*path_obstacle, &follow_decision);
+          path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                 follow_decision);
+        } else {
+          // YIELD decision
+          ObjectDecisionType yield_decision;
+          CreateYieldDecision(boundary, &yield_decision);
+          path_obstacle->AddLongitudinalDecision("dp_st_graph", yield_decision);
+        }
+        break;
+      case ABOVE:
+        if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+          ObjectDecisionType ignore;
+          ignore.mutable_ignore();
+          path_obstacle->AddLongitudinalDecision("dp_st_graph", ignore);
 
-      } else {
-        // OVERTAKE decision
-        ObjectDecisionType overtake_decision;
-        CreateOvertakeDecision(*path_obstacle, &overtake_decision);
-        path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                               overtake_decision);
-      }
+        } else {
+          // OVERTAKE decision
+          ObjectDecisionType overtake_decision;
+          CreateOvertakeDecision(*path_obstacle, &overtake_decision);
+          path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                 overtake_decision);
+        }
+        break;
+      case CROSS:
+        {
+          ObjectDecisionType stop_decision;
+          CreateStopDecision(*path_obstacle, &stop_decision);
+          path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+        }
+       break;
+      default:
+        AERROR << "Unknown position:" << position;
     }
     AppendIgnoreDecision(path_obstacle);
   }
