@@ -18,7 +18,6 @@
 #include "modules/common/log.h"
 #include "modules/data/recorder/info_collector.h"
 
-DEFINE_string(docker_image, "", "Current container's docker image.");
 DEFINE_string(commit_id, "", "Current commit ID.");
 
 namespace apollo {
@@ -29,9 +28,6 @@ void UpdateTaskInfo() {
 
   // Update software information.
   auto *software = task.mutable_software();
-  if (!FLAGS_docker_image.empty()) {
-    software->set_docker_image(FLAGS_docker_image);
-  }
   if (!FLAGS_commit_id.empty()) {
     software->set_commit_id(FLAGS_commit_id);
   }
