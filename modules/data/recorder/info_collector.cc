@@ -68,7 +68,11 @@ const HardwareInfo &InfoCollector::GetHardwareInfo() {
 }
 
 const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
-  return task_info_.software();
+  SoftwareInfo *software = task_info_.mutable_software();
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+    software->set_docker_image(docker_image);
+  }
+  return *software;
 }
 
 const UserInfo &InfoCollector::GetUserInfo() {
