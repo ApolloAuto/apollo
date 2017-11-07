@@ -125,6 +125,7 @@ bool Spline2dSolver::Solve() {
 
   const double l_lower_bound_ = -1e10;
   const double l_upper_bound_ = 1e10;
+
   for (int i = 0; i < num_param; ++i) {
     lower_bound[i] = l_lower_bound_;
     upper_bound[i] = l_upper_bound_;
@@ -134,8 +135,8 @@ bool Spline2dSolver::Solve() {
   double affine_constraint_matrix[num_param * num_constraint];  // NOLINT
   double constraint_lower_bound[num_constraint];                // NOLINT
   double constraint_upper_bound[num_constraint];                // NOLINT
-  index = 0;
 
+  index = 0;
   for (int r = 0; r < equality_constraint_matrix.rows(); ++r) {
     constraint_lower_bound[r] = equality_constraint_boundary(r, 0);
     constraint_upper_bound[r] = equality_constraint_boundary(r, 0);
@@ -194,6 +195,8 @@ bool Spline2dSolver::Solve() {
   }
 
   double result[num_param];  // NOLINT
+  memset(result, 0, sizeof result);
+
   sqp_solver_->getPrimalSolution(result);
 
   MatrixXd solved_params = MatrixXd::Zero(num_param, 1);
