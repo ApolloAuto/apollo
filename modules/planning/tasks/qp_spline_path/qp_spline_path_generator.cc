@@ -88,7 +88,6 @@ bool QpSplinePathGenerator::Generate(
   }
 
   double start_s = init_frenet_point_.s();
-  double start_l = ref_l_;
   double end_s = reference_line_.Length();
 
   constexpr double kMinPathLength = 1.0e-6;
