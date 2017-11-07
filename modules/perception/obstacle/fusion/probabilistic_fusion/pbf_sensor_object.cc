@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
 namespace apollo {
 namespace perception {
 
-PbfSensorObject::PbfSensorObject() : sensor_type(UNKNOWN_SENSOR_TYPE), 
-    timestamp(0.0), invisible_period(0.0) {
-    object.reset(new Object());
+PbfSensorObject::PbfSensorObject() : sensor_type(UNKNOWN_SENSOR_TYPE),
+                                     timestamp(0.0), invisible_period(0.0) {
+  object.reset(new Object());
 }
 
 PbfSensorObject::PbfSensorObject(ObjectPtr obj3d, SensorType type, double time) :
@@ -31,32 +31,32 @@ PbfSensorObject::PbfSensorObject(ObjectPtr obj3d, SensorType type, double time) 
 PbfSensorObject::~PbfSensorObject() {
 }
 
-PbfSensorObject::PbfSensorObject(const PbfSensorObject& rhs) {
-    sensor_type = rhs.sensor_type;
-    sensor_id = rhs.sensor_id;
-    timestamp = rhs.timestamp;
-    object = rhs.object;
-    invisible_period = rhs.invisible_period;
+PbfSensorObject::PbfSensorObject(const PbfSensorObject &rhs) {
+  sensor_type = rhs.sensor_type;
+  sensor_id = rhs.sensor_id;
+  timestamp = rhs.timestamp;
+  object = rhs.object;
+  invisible_period = rhs.invisible_period;
 }
 
-PbfSensorObject& PbfSensorObject::operator = (const PbfSensorObject& rhs) {
-    sensor_type = rhs.sensor_type;
-    sensor_id = rhs.sensor_id;
-    timestamp = rhs.timestamp;
-    object = rhs.object;
-    invisible_period = rhs.invisible_period;    
-    return (*this);
+PbfSensorObject &PbfSensorObject::operator=(const PbfSensorObject &rhs) {
+  sensor_type = rhs.sensor_type;
+  sensor_id = rhs.sensor_id;
+  timestamp = rhs.timestamp;
+  object = rhs.object;
+  invisible_period = rhs.invisible_period;
+  return (*this);
 }
 
-void PbfSensorObject::clone(const PbfSensorObject& rhs) {
-    sensor_type = rhs.sensor_type;
-    sensor_id = rhs.sensor_id;
-    timestamp = rhs.timestamp;
-    invisible_period = rhs.invisible_period;    
-    if (object == nullptr) {
-        object.reset(new Object());
-    }
-    object->clone(*(rhs.object));
+void PbfSensorObject::clone(const PbfSensorObject &rhs) {
+  sensor_type = rhs.sensor_type;
+  sensor_id = rhs.sensor_id;
+  timestamp = rhs.timestamp;
+  invisible_period = rhs.invisible_period;
+  if (object == nullptr) {
+    object.reset(new Object());
+  }
+  object->clone(*(rhs.object));
 }
 
 } // namespace perception

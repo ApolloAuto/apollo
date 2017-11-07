@@ -21,70 +21,70 @@
 
 namespace apollo {
 namespace perception {
-  
+
 class ContiRadarUtil {
-public:
-static bool IsFp(const ContiRadarObs& contiobs,
-        const ContiParams& params,
-        const int delay_frames,
-        int& tracking_times) {
-  int cls = contiobs.obstacle_class();
-  if (tracking_times < delay_frames * 2) {
-    const double& lo_vel_rms = contiobs.longitude_vel_rms();
-    const double& la_vel_rms = contiobs.lateral_vel_rms();
-    const double& lo_dist_rms = contiobs.longitude_dist_rms();
-    const double& la_dist_rms = contiobs.lateral_dist_rms();
-    const double& probexist = contiobs.probexist();
-    if (cls == CONTI_CAR || cls == CONTI_TRUCK) {
+ public:
+  static bool IsFp(const ContiRadarObs &contiobs,
+                   const ContiParams &params,
+                   const int delay_frames,
+                   int &tracking_times) {
+    int cls = contiobs.obstacle_class();
+    if (tracking_times < delay_frames * 2) {
+      const double &lo_vel_rms = contiobs.longitude_vel_rms();
+      const double &la_vel_rms = contiobs.lateral_vel_rms();
+      const double &lo_dist_rms = contiobs.longitude_dist_rms();
+      const double &la_dist_rms = contiobs.lateral_dist_rms();
+      const double &probexist = contiobs.probexist();
+      if (cls == CONTI_CAR || cls == CONTI_TRUCK) {
         if (probexist < params.probexist_vehicle) {
           return true;
         } else if (lo_vel_rms > params.lo_vel_rms_vehicle ||
-                     la_vel_rms > params.la_vel_rms_vehicle ||
-                     lo_dist_rms > params.lo_dist_rms_vehicle ||
-                     la_dist_rms > params.la_dist_rms_vehicle) {
+            la_vel_rms > params.la_vel_rms_vehicle ||
+            lo_dist_rms > params.lo_dist_rms_vehicle ||
+            la_dist_rms > params.la_dist_rms_vehicle) {
           return true;
         } else if (tracking_times <= delay_frames) {
           return true;
         }
-    } else if (cls == CONTI_PEDESTRIAN) {
+      } else if (cls == CONTI_PEDESTRIAN) {
         if (probexist < params.probexist_pedestrian) {
           return true;
         } else if (lo_vel_rms > params.lo_vel_rms_pedestrian ||
-                      la_vel_rms > params.la_vel_rms_pedestrian ||
-                      lo_dist_rms > params.lo_dist_rms_pedestrian ||
-                      la_dist_rms > params.la_dist_rms_pedestrian){
+            la_vel_rms > params.la_vel_rms_pedestrian ||
+            lo_dist_rms > params.lo_dist_rms_pedestrian ||
+            la_dist_rms > params.la_dist_rms_pedestrian) {
           return true;
         }
-    } else if (cls == CONTI_MOTOCYCLE || cls == CONTI_BICYCLE) {
+      } else if (cls == CONTI_MOTOCYCLE || cls == CONTI_BICYCLE) {
         if (probexist < params.probexist_bicycle) {
           return true;
         } else if (lo_vel_rms > params.lo_vel_rms_bicycle ||
-                      la_vel_rms > params.la_vel_rms_bicycle ||
-                      lo_dist_rms > params.lo_dist_rms_bicycle ||
-                      la_dist_rms > params.la_dist_rms_bicycle) {
+            la_vel_rms > params.la_vel_rms_bicycle ||
+            lo_dist_rms > params.lo_dist_rms_bicycle ||
+            la_dist_rms > params.la_dist_rms_bicycle) {
           return true;
         }
-    } else if (cls == CONTI_POINT || cls == CONTI_WIDE || cls == CONTI_UNKNOWN) {
-      if (probexist < params.probexist_unknown) {
-        return true;
-      } else if (lo_vel_rms > params.lo_vel_rms_unknown ||
-                    la_vel_rms > params.la_vel_rms_unknown ||
-                    lo_dist_rms > params.lo_dist_rms_unknown ||
-                    la_dist_rms > params.la_dist_rms_unknown) {
-        return true;
-      } else if (tracking_times <= delay_frames) {
-        return true;
+      } else if (cls == CONTI_POINT || cls == CONTI_WIDE || cls == CONTI_UNKNOWN) {
+        if (probexist < params.probexist_unknown) {
+          return true;
+        } else if (lo_vel_rms > params.lo_vel_rms_unknown ||
+            la_vel_rms > params.la_vel_rms_unknown ||
+            lo_dist_rms > params.lo_dist_rms_unknown ||
+            la_dist_rms > params.la_dist_rms_unknown) {
+          return true;
+        } else if (tracking_times <= delay_frames) {
+          return true;
+        }
       }
     }
+    int meas_state = contiobs.meas_state();
+    if (meas_state == CONTI_DELETED || meas_state == CONTI_PREDICTED ||
+        meas_state == CONTI_DELETED_FOR) {
+      tracking_times = 0;
+      return true;
+    }
+    return false;
   }
-  int meas_state = contiobs.meas_state();
-  if (meas_state == CONTI_DELETED || meas_state == CONTI_PREDICTED || 
-      meas_state == CONTI_DELETED_FOR) {
-    tracking_times = 0;
-    return true;
-  }
-  return false;
-}
 
 };
 

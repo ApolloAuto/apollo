@@ -36,43 +36,43 @@ namespace perception {
 DECLARE_string(onboard_fusion);
 
 class FusionSubnode : public Subnode {
-public:
-    FusionSubnode() = default;
-    virtual ~FusionSubnode() {}
-    virtual StatusCode ProcEvents() override;
-    bool GeneratePbMsg(PerceptionObstacles* obstacles);
-protected:
-    virtual bool InitInternal() override;
-private:
-    bool InitOutputStream();
-    bool SubscribeEvents(
-            const EventMeta& event_meta,
-            std::vector<Event>* events) const;
-    bool BuildSensorObjs(
-            const std::vector<Event>& events,
-            std::vector<SensorObjects>* multi_sensor_objs) const;
-    bool ProducePbMsg(
-            double timestamp,
-            SeqId seq_num,
-            const std::vector<ObjectPtr>& fused_objs,
-            std::string* pb_msg) const;
-    bool GetSharedData(
-            const Event& event,
-            std::shared_ptr<SensorObjects>* sensor_objects) const;
-    StatusCode Process(const EventMeta& event_meta,
-        const std::vector<Event>& events);   
-    
-    double timestamp_;
-    std::vector<ObjectPtr> objects_;
-    common::ErrorCode error_code_ = common::OK;
-    std::unique_ptr<BaseFusion> fusion_;
-    LidarObjectData* lidar_object_data_ = nullptr;
-    RadarObjectData* radar_object_data_ = nullptr;
-    // lidar perception subnode event controls the publishing behavior
-    EventID pub_driven_event_id_;
-    EventID lidar_event_id_;
-    EventID radar_event_id_;
-    DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
+ public:
+  FusionSubnode() = default;
+  virtual ~FusionSubnode() {}
+  virtual StatusCode ProcEvents() override;
+  bool GeneratePbMsg(PerceptionObstacles *obstacles);
+ protected:
+  virtual bool InitInternal() override;
+ private:
+  bool InitOutputStream();
+  bool SubscribeEvents(
+      const EventMeta &event_meta,
+      std::vector<Event> *events) const;
+  bool BuildSensorObjs(
+      const std::vector<Event> &events,
+      std::vector<SensorObjects> *multi_sensor_objs) const;
+  bool ProducePbMsg(
+      double timestamp,
+      SeqId seq_num,
+      const std::vector<ObjectPtr> &fused_objs,
+      std::string *pb_msg) const;
+  bool GetSharedData(
+      const Event &event,
+      std::shared_ptr<SensorObjects> *sensor_objects) const;
+  StatusCode Process(const EventMeta &event_meta,
+                     const std::vector<Event> &events);
+
+  double timestamp_;
+  std::vector<ObjectPtr> objects_;
+  common::ErrorCode error_code_ = common::OK;
+  std::unique_ptr<BaseFusion> fusion_;
+  LidarObjectData *lidar_object_data_ = nullptr;
+  RadarObjectData *radar_object_data_ = nullptr;
+  // lidar perception subnode event controls the publishing behavior
+  EventID pub_driven_event_id_;
+  EventID lidar_event_id_;
+  EventID radar_event_id_;
+ DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };
 
 }  // namespace perception

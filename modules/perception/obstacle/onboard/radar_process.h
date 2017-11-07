@@ -43,9 +43,9 @@ class RadarProcess {
 
   bool Init();
   bool IsInit() { return inited_; }
-  bool Process(const RadarObsArray& radar_obs_proto);
+  bool Process(const RadarObsArray &radar_obs_proto);
 
-  bool GeneratePbMsg(PerceptionObstacles* obstacles);
+  bool GeneratePbMsg(PerceptionObstacles *obstacles);
 
   std::vector<ObjectPtr> GetObjects() { return objects_; }
 
@@ -54,13 +54,13 @@ class RadarProcess {
   bool InitFrameDependence();
   bool InitAlgorithmPlugin();
 
-  bool GetRadarTrans(const double query_time, Eigen::Matrix4d* trans);
+  bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
 
   bool inited_ = false;
   double timestamp_;
   common::ErrorCode error_code_ = common::OK;
   std::vector<ObjectPtr> objects_;
-  HDMapInput* hdmap_input_ = NULL;
+  HDMapInput *hdmap_input_ = NULL;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
 
   std::unique_ptr<OpenglVisualizer> visualizer_ = nullptr;

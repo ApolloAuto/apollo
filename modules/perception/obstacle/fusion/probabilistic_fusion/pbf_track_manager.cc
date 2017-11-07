@@ -20,9 +20,9 @@
 namespace apollo {
 namespace perception {
 
-PbfTrackManager* PbfTrackManager::instance() {
-    static PbfTrackManager track_manager;
-    return &track_manager;
+PbfTrackManager *PbfTrackManager::instance() {
+  static PbfTrackManager track_manager;
+  return &track_manager;
 }
 
 PbfTrackManager::PbfTrackManager() {
@@ -34,32 +34,32 @@ PbfTrackManager::~PbfTrackManager() {
 }
 
 int PbfTrackManager::TemoveLostTracks() {
-    int track_count = 0;
-    for (int i = 0; i < tracks_.size(); i++) {
-        if (!tracks_[i]->IsDead()) {
-            if (i != track_count) {
-                tracks_[track_count] = tracks_[i];
-            }
-            track_count++;            
-        }
+  int track_count = 0;
+  for (int i = 0; i < tracks_.size(); i++) {
+    if (!tracks_[i]->IsDead()) {
+      if (i != track_count) {
+        tracks_[track_count] = tracks_[i];
+      }
+      track_count++;
     }
+  }
 
-    AINFO << "Remove " << (int)tracks_.size() - track_count << " tracks";
-    tracks_.resize(track_count);
+  AINFO << "Remove " << (int) tracks_.size() - track_count << " tracks";
+  tracks_.resize(track_count);
 
-    int bk_track_count = 0;
-    for (size_t i = 0; i < background_tracks_.size(); i++) {
-        if (!background_tracks_[i]->IsDead()) {
-            if (i != bk_track_count) {
-                background_tracks_[bk_track_count] = background_tracks_[i];
-            }
-            bk_track_count++;
-        }
+  int bk_track_count = 0;
+  for (size_t i = 0; i < background_tracks_.size(); i++) {
+    if (!background_tracks_[i]->IsDead()) {
+      if (i != bk_track_count) {
+        background_tracks_[bk_track_count] = background_tracks_[i];
+      }
+      bk_track_count++;
     }
-    AINFO << "Remove " << (int)tracks_.size() - track_count << " background tracks";
-    background_tracks_.resize(bk_track_count);
+  }
+  AINFO << "Remove " << (int) tracks_.size() - track_count << " background tracks";
+  background_tracks_.resize(bk_track_count);
 
-    return track_count + bk_track_count;
+  return track_count + bk_track_count;
 }
 
 } //namespace perception

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_PREPROCESS_ADAPTIVE_KALMAN_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_PREPROCESS_ADAPTIVE_KALMAN_FILTER_H_
 
@@ -26,42 +26,42 @@ namespace apollo {
 namespace perception {
 
 class AdaptiveKalmanFilter : public BaseFilter {
-public:
-    AdaptiveKalmanFilter();
+ public:
+  AdaptiveKalmanFilter();
 
-    ~AdaptiveKalmanFilter();
+  ~AdaptiveKalmanFilter();
 
-    void Initialize(const Object& state);
+  void Initialize(const Object &state);
 
-    Eigen::Vector4d Predict(const double time_diff);
+  Eigen::Vector4d Predict(const double time_diff);
 
-    Eigen::Vector4d UpdateWithObject(Object& new_object);
+  Eigen::Vector4d UpdateWithObject(Object &new_object);
 
-    Eigen::Matrix4d GetCovarianceMatrix() {return p_matrix_;}
-    
-    void get_state(Eigen::Vector3d& anchor_point, Eigen::Vector3d& velocity);
+  Eigen::Matrix4d GetCovarianceMatrix() { return p_matrix_; }
 
-private:
-    Eigen::Vector3d  belief_anchor_point_;
-    Eigen::Vector3d  belief_velocity_;
+  void get_state(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity);
 
-    Eigen::Vector4d  state_;
-    Eigen::Vector4d  priori_state_;
-    Eigen::Vector4d  posteriori_state_;
+ private:
+  Eigen::Vector3d belief_anchor_point_;
+  Eigen::Vector3d belief_velocity_;
 
-    Eigen::Matrix4d  p_matrix_;
-    // the state-transition matrix
-    Eigen::Matrix4d  a_matrix_;
-    // the observation mode
-    Eigen::Matrix4d  c_matrix_;
+  Eigen::Vector4d state_;
+  Eigen::Vector4d priori_state_;
+  Eigen::Vector4d posteriori_state_;
 
-    // the covariance of the process noise
-    Eigen::Matrix4d  q_matrix_;
-    //  the covariance of the observation noise
-    Eigen::Matrix4d  r_matrix_;
+  Eigen::Matrix4d p_matrix_;
+  // the state-transition matrix
+  Eigen::Matrix4d a_matrix_;
+  // the observation mode
+  Eigen::Matrix4d c_matrix_;
 
-    // Optimal Kalman gain
-    Eigen::Matrix4d  k_matrix_;
+  // the covariance of the process noise
+  Eigen::Matrix4d q_matrix_;
+  //  the covariance of the observation noise
+  Eigen::Matrix4d r_matrix_;
+
+  // Optimal Kalman gain
+  Eigen::Matrix4d k_matrix_;
 };
 
 } // namespace perception

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_INTERFACE_BASE_FUSION_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_INTERFACE_BASE_FUSION_H_
 // SAMPLE CODE:
@@ -57,23 +57,23 @@
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/base/object.h"
- 
+
 namespace apollo {
 namespace perception {
 class BaseFusion {
-public:
-    BaseFusion() {}
-    virtual ~BaseFusion() {}
-    virtual bool Init() = 0;
-    // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
-    // @param [in]: multi sensor objects.
-    // @param [out]: fused objects.
-    virtual bool Fuse(
-        const std::vector<SensorObjects> &multi_sensor_objects,
-        std::vector<ObjectPtr> *fused_objects) = 0;
-    virtual std::string name() const = 0;
-private:
-    DISALLOW_COPY_AND_ASSIGN(BaseFusion);
+ public:
+  BaseFusion() {}
+  virtual ~BaseFusion() {}
+  virtual bool Init() = 0;
+  // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
+  // @param [in]: multi sensor objects.
+  // @param [out]: fused objects.
+  virtual bool Fuse(
+      const std::vector<SensorObjects> &multi_sensor_objects,
+      std::vector<ObjectPtr> *fused_objects) = 0;
+  virtual std::string name() const = 0;
+ private:
+ DISALLOW_COPY_AND_ASSIGN(BaseFusion);
 };
 REGISTER_REGISTERER(BaseFusion);
 #define REGISTER_FUSION(name) REGISTER_CLASS(BaseFusion, name)

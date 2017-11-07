@@ -56,9 +56,9 @@ class RadarProcessSubnode : public Subnode {
   typedef std::pair<double, apollo::localization::Gps> ObjectPair;
   bool InitInternal() override;
 
-  void OnRadar(const RadarObsArray& radar_obs);
+  void OnRadar(const RadarObsArray &radar_obs);
 
-  void OnGps(const apollo::localization::Gps& gps);
+  void OnGps(const apollo::localization::Gps &gps);
 
   void RegistAllAlgorithm();
 
@@ -66,24 +66,23 @@ class RadarProcessSubnode : public Subnode {
 
   bool InitAlgorithmPlugin();
 
-  bool GetRadarTrans(const double query_time, Eigen::Matrix4d* trans);
+  bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
 
   void PublishDataAndEvent(double timestamp,
-                           const SharedDataPtr<SensorObjects>& data);
+                           const SharedDataPtr<SensorObjects> &data);
 
-  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f* car_linear_speed);
+  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f *car_linear_speed);
 
   bool inited_ = false;
-  double timestamp_;
   SeqId seq_num_ = 0;
   common::ErrorCode error_code_ = common::OK;
-  RadarObjectData* radar_data_ = nullptr;
+  RadarObjectData *radar_data_ = nullptr;
   std::string device_id_;
 
   boost::circular_buffer<ObjectPair> gps_buffer_;
   ContiRadarIDExpansion _conti_id_expansion;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
-  HDMapInput* hdmap_input_ = NULL;
+  HDMapInput *hdmap_input_ = NULL;
   // here we use HdmapROIFilter
   std::unique_ptr<HdmapROIFilter> roi_filter_;
   Mutex mutex_;

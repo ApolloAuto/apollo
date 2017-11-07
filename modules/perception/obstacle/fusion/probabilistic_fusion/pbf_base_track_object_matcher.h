@@ -28,51 +28,51 @@ namespace perception {
 typedef std::pair<int, int> TrackObjectPair;
 
 struct TrackObjectMatcherOptions {
-    Eigen::Vector3d* ref_point = nullptr;
+  Eigen::Vector3d *ref_point = nullptr;
 };
 
 class PbfBaseTrackObjectMatcher {
-public:
-    PbfBaseTrackObjectMatcher() {}
-    virtual ~PbfBaseTrackObjectMatcher() {}
+ public:
+  PbfBaseTrackObjectMatcher() {}
+  virtual ~PbfBaseTrackObjectMatcher() {}
 
-    // @brief match sensor objects to global tracks build previously
-    // @params[IN] fusion_tracks: global tracks 
-    // @params[IN] sensor_objects: sensor objects
-    // @params[IN] options: matcher options for future use
-    // @params[OUT] assignments: matched pair of tracks and measurements
-    // @params[OUT] unassigned_tracks: unmatched tracks
-    // @params[OUT] unassigned_objects: unmatched objects
-    // @params[OUT] track2measurements_dist:minimum match distance to measurements for each track
-    // @prams[OUT] measurement2track_dist:minimum match distacne to tracks for each measurement
-    // @return nothing
-    virtual bool Match(std::vector<PbfTrackPtr>& fusion_tracks,
-        std::vector<PbfSensorObjectPtr>& sensor_objects,
-        const TrackObjectMatcherOptions& options,
-        std::vector<TrackObjectPair>& assignments,
-        std::vector<int>& unassigned_fusion_tracks,
-        std::vector<int>& unassigned_sensor_tracks, 
-        std::vector<double>& track2measurements_dist, 
-        std::vector<double>& measurement2track_dist) = 0;
+  // @brief match sensor objects to global tracks build previously
+  // @params[IN] fusion_tracks: global tracks
+  // @params[IN] sensor_objects: sensor objects
+  // @params[IN] options: matcher options for future use
+  // @params[OUT] assignments: matched pair of tracks and measurements
+  // @params[OUT] unassigned_tracks: unmatched tracks
+  // @params[OUT] unassigned_objects: unmatched objects
+  // @params[OUT] track2measurements_dist:minimum match distance to measurements for each track
+  // @prams[OUT] measurement2track_dist:minimum match distacne to tracks for each measurement
+  // @return nothing
+  virtual bool Match(std::vector<PbfTrackPtr> &fusion_tracks,
+                     std::vector<PbfSensorObjectPtr> &sensor_objects,
+                     const TrackObjectMatcherOptions &options,
+                     std::vector<TrackObjectPair> &assignments,
+                     std::vector<int> &unassigned_fusion_tracks,
+                     std::vector<int> &unassigned_sensor_tracks,
+                     std::vector<double> &track2measurements_dist,
+                     std::vector<double> &measurement2track_dist) = 0;
 
-    virtual bool Init() = 0;
+  virtual bool Init() = 0;
 
-    virtual std::string name() const = 0;
+  virtual std::string name() const = 0;
 
-    void IdAssign(std::vector<PbfTrackPtr> &fusion_tracks,
-                  std::vector<PbfSensorObjectPtr> &sensor_objects,
-                  std::vector<TrackObjectPair> &assignments,
-                  std::vector<int> &unassigned_fusion_tracks,
-                  std::vector<int> &unassigned_sensor_objects);
+  void IdAssign(std::vector<PbfTrackPtr> &fusion_tracks,
+                std::vector<PbfSensorObjectPtr> &sensor_objects,
+                std::vector<TrackObjectPair> &assignments,
+                std::vector<int> &unassigned_fusion_tracks,
+                std::vector<int> &unassigned_sensor_objects);
 
-    static void SetMaxMatchDistance(double dist);
+  static void SetMaxMatchDistance(double dist);
 
-    static double GetMaxMatchDistance();
+  static double GetMaxMatchDistance();
 
-protected:
-    static double s_max_match_distance_;
-private:
-    DISALLOW_COPY_AND_ASSIGN(PbfBaseTrackObjectMatcher);
+ protected:
+  static double s_max_match_distance_;
+ private:
+ DISALLOW_COPY_AND_ASSIGN(PbfBaseTrackObjectMatcher);
 
 };
 

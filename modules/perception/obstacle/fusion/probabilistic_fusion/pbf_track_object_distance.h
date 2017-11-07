@@ -26,45 +26,45 @@ namespace apollo {
 namespace perception {
 
 struct TrackObjectDistanceOptions {
-    Eigen::Vector3d* ref_point = nullptr;
+  Eigen::Vector3d *ref_point = nullptr;
 };
-class PbfTrackObjectDistance{
-public:
-    PbfTrackObjectDistance();
-    virtual ~PbfTrackObjectDistance();
+class PbfTrackObjectDistance {
+ public:
+  PbfTrackObjectDistance();
+  virtual ~PbfTrackObjectDistance();
 
-    float Compute(const PbfTrackPtr &fused_track,
-                  const PbfSensorObjectPtr &sensor_object,
-                  const TrackObjectDistanceOptions &options);
+  float Compute(const PbfTrackPtr &fused_track,
+                const PbfSensorObjectPtr &sensor_object,
+                const TrackObjectDistanceOptions &options);
 
-protected:
-    float ComputeVelodyne64Velodyne64(const PbfSensorObjectPtr &fused_object,
-                                      const PbfSensorObjectPtr &sensor_object,
-                                      const Eigen::Vector3d &ref_pos,
-                                      int range = 3);
-    float ComputeVelodyne64Radar(const PbfSensorObjectPtr &fused_object,
-                                 const PbfSensorObjectPtr &sensor_object,
-                                 const Eigen::Vector3d &ref_pos,
-                                 int range = 3);
-    float ComputeRadarRadar(const PbfSensorObjectPtr &fused_object,
-                            const PbfSensorObjectPtr &sensor_object,
+ protected:
+  float ComputeVelodyne64Velodyne64(const PbfSensorObjectPtr &fused_object,
+                                    const PbfSensorObjectPtr &sensor_object,
+                                    const Eigen::Vector3d &ref_pos,
+                                    int range = 3);
+  float ComputeVelodyne64Radar(const PbfSensorObjectPtr &fused_object,
+                               const PbfSensorObjectPtr &sensor_object,
+                               const Eigen::Vector3d &ref_pos,
+                               int range = 3);
+  float ComputeRadarRadar(const PbfSensorObjectPtr &fused_object,
+                          const PbfSensorObjectPtr &sensor_object,
+                          const Eigen::Vector3d &ref_pos,
+                          int range = 3);
+
+  float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
+                          const PbfSensorObjectPtr &sensor_object,
+                          const Eigen::Vector3d &ref_pos,
+                          int range);
+  float ComputeEuclideanDistance(const Eigen::Vector3d &des,
+                                 const Eigen::Vector3d &src);
+  bool ComputePolygonCenter(const PolygonDType &polygon,
+                            Eigen::Vector3d &center);
+  bool ComputePolygonCenter(const PolygonDType &polygon,
                             const Eigen::Vector3d &ref_pos,
-                            int range = 3);
-
-    float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
-                            const PbfSensorObjectPtr &sensor_object,
-                            const Eigen::Vector3d &ref_pos,
-                            int range);
-    float ComputeEuclideanDistance(const Eigen::Vector3d &des,
-                                   const Eigen::Vector3d &src);
-    bool ComputePolygonCenter(const PolygonDType &polygon,
-                              Eigen::Vector3d &center);
-    bool ComputePolygonCenter(const PolygonDType &polygon,
-                              const Eigen::Vector3d &ref_pos,
-                              int range,
-                              Eigen::Vector3d &center);
-private:
-    DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
+                            int range,
+                            Eigen::Vector3d &center);
+ private:
+ DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
 };
 } // namespace perception
 } // namespace apollo

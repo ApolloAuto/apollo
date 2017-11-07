@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
 #include <string>
@@ -24,26 +24,26 @@ namespace apollo {
 namespace perception {
 
 struct SensorStatus {
-    std::string sensor_id;
-    double latest_capture_time = 0.0;
-    double latest_detection_time = 0.0;
-    int latest_obstacle_number = 0;
-    double latest_latency = 0.0;
-}; 
+  std::string sensor_id;
+  double latest_capture_time = 0.0;
+  double latest_detection_time = 0.0;
+  int latest_obstacle_number = 0;
+  double latest_latency = 0.0;
+};
 
-class PbfSensorMonitor{
-public:
-    PbfSensorMonitor();
+class PbfSensorMonitor {
+ public:
+  PbfSensorMonitor();
 
-    bool Init();
+  bool Init();
 
-    void Update(const std::string &sensor_id, double capture_time, double detection_time);
+  void Update(const std::string &sensor_id, double capture_time, double detection_time);
 
-protected:
-    std::map<std::string, SensorStatus> sensor_states_;
+ protected:
+  std::map<std::string, SensorStatus> sensor_states_;
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(PbfSensorMonitor);
+ private:
+ DISALLOW_COPY_AND_ASSIGN(PbfSensorMonitor);
 };
 
 } // namespace perception

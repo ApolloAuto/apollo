@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
 #include <queue>
@@ -26,34 +26,34 @@ namespace apollo {
 namespace perception {
 
 class PbfSensorManager {
-public:
-    static PbfSensorManager* Instance();
-    ~PbfSensorManager();
+ public:
+  static PbfSensorManager *Instance();
+  ~PbfSensorManager();
 
-    void AddSensorMeasurements(const SensorObjects &objects);
+  void AddSensorMeasurements(const SensorObjects &objects);
 
-    void GetLatestSensorFrames(double time_stamp, const std::string &sensor_id,
-                               std::vector<PbfSensorFramePtr> *frames);
-    
-    /**@brief query one closest sensor frame for each sensor between last query timestamp and 
-       current timestamp, stored in ascending order of the frame timestamp */
-    void GetLatestFrames(const double time_stamp,
-                         std::vector<PbfSensorFramePtr> *frames);
+  void GetLatestSensorFrames(double time_stamp, const std::string &sensor_id,
+                             std::vector<PbfSensorFramePtr> *frames);
 
-    PbfSensor* GetSensor(const std::string &sensor_id);
+  /**@brief query one closest sensor frame for each sensor between last query timestamp and
+     current timestamp, stored in ascending order of the frame timestamp */
+  void GetLatestFrames(const double time_stamp,
+                       std::vector<PbfSensorFramePtr> *frames);
 
-    bool GetPose(const std::string &sensor_id, double time_stamp, Eigen::Matrix4d *pose);
+  PbfSensor *GetSensor(const std::string &sensor_id);
 
-protected:
-    bool Init();
+  bool GetPose(const std::string &sensor_id, double time_stamp, Eigen::Matrix4d *pose);
 
-private:
-    PbfSensorManager();
+ protected:
+  bool Init();
 
-    /**@brief sensor_id based key*/
-    std::map<std::string, PbfSensor*> sensors_;
-private:
-    DISALLOW_COPY_AND_ASSIGN(PbfSensorManager);
+ private:
+  PbfSensorManager();
+
+  /**@brief sensor_id based key*/
+  std::map<std::string, PbfSensor *> sensors_;
+ private:
+ DISALLOW_COPY_AND_ASSIGN(PbfSensorManager);
 };
 
 } // namespace perception

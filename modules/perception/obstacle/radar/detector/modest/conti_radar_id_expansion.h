@@ -24,76 +24,75 @@ namespace apollo {
 namespace perception {
 
 class ContiRadarIDExpansion {
-public:
-    ContiRadarIDExpansion() {
-        current_idx_ = 0;
-        need_restart_ = true;
+ public:
+  ContiRadarIDExpansion() {
+    current_idx_ = 0;
+    need_restart_ = true;
+    need_inner_restart_ = true;
+    timestamp_ = 0.0;
+  }
+  ~ContiRadarIDExpansion() {}
+
+  void ExpandIds(RadarObsArray &radar_obs) {
+    SkipOutdatedObjects(radar_obs);
+    for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
+      ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
+      int id = contiobs.obstacle_id();
+      int meas_state = contiobs.meas_state();
+      if (/*_need_restart || */need_inner_restart_ || meas_state == CONTI_NEW) {
+        int next_id = GetNextId();
+        local2global_[id] = next_id;
+      } else {
+        auto it = local2global_.find(id);
+        if (it == local2global_.end()) {
+          int next_id = GetNextId();
+          local2global_[id] = next_id;
+        }
+      }
+      contiobs.set_obstacle_id(local2global_[id]);
+    }
+  }
+  void SkipOutdatedObjects(RadarObsArray &radar_obs) {
+    RadarObsArray out_obs;
+    double timestamp = radar_obs.measurement_time() - 1e-6;
+    need_inner_restart_ = false;
+    for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
+      ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
+      double object_timestamp = double(contiobs.header().radar_timestamp()) / 1e9;
+      if (object_timestamp > timestamp) {
+        ContiRadarObs *obs = out_obs.add_contiobs();
+        *obs = contiobs;
+      } else {
         need_inner_restart_ = true;
-        timestamp_ = 0.0;
+      }
     }
-    ~ContiRadarIDExpansion() {}
-
-    void ExpandIds(RadarObsArray& radar_obs) {
-        SkipOutdatedObjects(radar_obs);
-        for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
-            ContiRadarObs& contiobs = *(radar_obs.mutable_contiobs(i));
-            int id = contiobs.obstacle_id();
-            int meas_state = contiobs.meas_state();
-            if (/*_need_restart || */need_inner_restart_ || meas_state == CONTI_NEW) {
-                int next_id = GetNextId();
-                local2global_[id] = next_id;
-            } else {
-                auto it = local2global_.find(id);
-                if (it == local2global_.end()) {
-                    int next_id = GetNextId();
-                    local2global_[id] = next_id;
-                }
-            }
-            contiobs.set_obstacle_id(local2global_[id]);
-        }
+    if (need_inner_restart_) {
+      AINFO << "skip outdated objects: " << radar_obs.contiobs_size() << " -> "
+            << out_obs.contiobs_size();
+      radar_obs = out_obs;
     }
-    void SkipOutdatedObjects(RadarObsArray& radar_obs) {
-        RadarObsArray out_obs;
-        double timestamp = radar_obs.measurement_time() - 1e-6;
-        need_inner_restart_ = false;
-        for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
-            ContiRadarObs& contiobs = *(radar_obs.mutable_contiobs(i));
-            double object_timestamp = double(contiobs.header().radar_timestamp()) / 1e9;
-            if (object_timestamp > timestamp) {
-                ContiRadarObs *obs = out_obs.add_contiobs();
-                *obs = contiobs;
-            } else {
-                need_inner_restart_ = true;
-            }
-        }
-        if (need_inner_restart_) {
-            AINFO << "skip outdated objects: " << radar_obs.contiobs_size() << " -> "
-                       << out_obs.contiobs_size();
-            radar_obs = out_obs;
-        }
+  }
+  void SetNeedRestart(bool need_restart) {
+    need_restart_ = need_restart;
+  }
+  void UpdateTimestamp(double timestamp) {
+    need_restart_ = false;
+    if (timestamp - timestamp_ > 0.1) {
+      need_restart_ = true;
     }
-    void SetNeedRestart(bool need_restart) {
-        need_restart_ = need_restart;
-    }
-    void UpdateTimestamp(double timestamp) {
-        need_restart_ = false;
-        if (timestamp - timestamp_ > 0.1) {
-            need_restart_ = true;
-        }
-        timestamp_ = timestamp_;
-    }
-private:
-    int GetNextId() {
-        ++current_idx_;
-        current_idx_ %= MAX_RADAR_IDX;
-        return current_idx_;
-    }
-
-    int current_idx_;
-    bool need_restart_;
-    bool need_inner_restart_;
-    double timestamp_;
-    std::map<int, int> local2global_;
+    timestamp_ = timestamp_;
+  }
+ private:
+  int GetNextId() {
+    ++current_idx_;
+    current_idx_ %= MAX_RADAR_IDX;
+    return current_idx_;
+  }
+  int current_idx_;
+  bool need_restart_;
+  bool need_inner_restart_;
+  double timestamp_;
+  std::map<int, int> local2global_;
 };
 
 } // namespace perception

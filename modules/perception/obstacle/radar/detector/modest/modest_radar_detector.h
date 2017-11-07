@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DETECTOR_H_
 
@@ -34,12 +34,12 @@ class ModestRadarDetector : public BaseRadarDetector {
 
   bool Init() override;
 
-  bool Detect(const RadarObsArray& raw_obstacles,
-            const std::vector<PolygonDType>& map_polygons,
-            const RadarDetectorOptions& options,
-            std::vector<ObjectPtr>* objects) override;
+  bool Detect(const RadarObsArray &raw_obstacles,
+              const std::vector<PolygonDType> &map_polygons,
+              const RadarDetectorOptions &options,
+              std::vector<ObjectPtr> *objects) override;
 
-  bool collect_radar_result(std::vector<ObjectPtr>* objects);
+  bool collect_radar_result(std::vector<ObjectPtr> *objects);
 
   std::string name() const override {
     return "ModestRadarDetector";
@@ -60,7 +60,7 @@ class ModestRadarDetector : public BaseRadarDetector {
   ObjectBuilder object_builder;
   boost::shared_ptr<RadarTrackManager> radar_tracker_;
 
-  DISALLOW_COPY_AND_ASSIGN(ModestRadarDetector);
+ DISALLOW_COPY_AND_ASSIGN(ModestRadarDetector);
 };
 
 REGISTER_RADARDETECTOR(ModestRadarDetector);

@@ -29,31 +29,30 @@
 
 namespace apollo {
 namespace perception {
-
 class ObjectBuilder {
-public:
-void build(const RadarObsArray& raw_obstacles,
-        const Eigen::Matrix4d& radar_pose,
-        const Eigen::Vector2d& main_velocity,
-        SensorObjects & radar_objects);
+ public:
+  void build(const RadarObsArray &raw_obstacles,
+             const Eigen::Matrix4d &radar_pose,
+             const Eigen::Vector2d &main_velocity,
+             SensorObjects &radar_objects);
 
-static void SetDelayFrame(int delay_frames) {
-  delay_frames_ = delay_frames;
-}
+  static void SetDelayFrame(int delay_frames) {
+    delay_frames_ = delay_frames;
+  }
 
-static void SetUseFpFilter(bool use_fp_filter) {
-  use_fp_filter_ = use_fp_filter;
-}
+  static void SetUseFpFilter(bool use_fp_filter) {
+    use_fp_filter_ = use_fp_filter;
+  }
 
-static void SetContiParams(ContiParams conti_params) {
-  conti_params_ = conti_params;
-}
+  static void SetContiParams(ContiParams conti_params) {
+    conti_params_ = conti_params;
+  }
 
-private:
-std::map<int, int> continuous_ids_;
-static int delay_frames_;
-static bool use_fp_filter_;
-static ContiParams conti_params_;
+ private:
+  std::map<int, int> continuous_ids_;
+  static int delay_frames_;
+  static bool use_fp_filter_;
+  static ContiParams conti_params_;
 };
 
 } // namespace perception

@@ -30,73 +30,56 @@ namespace apollo {
 namespace perception {
 
 class RadarTrack {
-public:
-    RadarTrack();
+ public:
+  RadarTrack();
 
-    RadarTrack(Object &dobs, const double &timestamp);
+  RadarTrack(Object &obs, const double &timestamp);
 
-    RadarTrack(const RadarTrack &track);
+  RadarTrack(const RadarTrack &track);
 
-    RadarTrack& operator = (const RadarTrack &track);
+  RadarTrack &operator=(const RadarTrack &track);
 
-    ~RadarTrack(){}
+  ~RadarTrack() {}
 
-    void Prediction(double object_time);
+  void Prediction(double object_time);
 
-    // update the object after association with a radar obervation
-    void SetObsRadar(ObjectPtr obs_radar, const double timestamp);
+  // update the object after association with a radar obervation
+  void UpdataObsRadar(ObjectPtr obs_radar, const double timestamp);
 
-    // without timestamp, to set the radar observation to NULL
-    // (implemented in radar_local_detector.cpp)
-    void SetObsRadarWithoutTimestamp(ObjectPtr obs_radar);
+  void SetObsRadar(ObjectPtr obs_radar);
 
-    // tracking is considered to be successful if _tracked_times >= 4
-    bool ConfirmTrack();
+  void IncreaseTrackedTimes();
 
-    void IncreaseTrackedTimes();
+  int GetObsId() const;
 
-    int GetTrackedTimes();
+  ObjectPtr GetObsRadar();
 
-    int GetObsId() const;
+  ObjectPtr GetObs();
 
-    ObjectPtr GetObsRadar();
+  double GetTimestamp();
 
-    const ObjectPtr GetObsRadar() const;
+  double GetTrackingTime();
 
-    void SetObsRadar(ObjectPtr obs_radar);
+  static void SetFilterType(std::string filter_type) {
+    s_chosen_filter_ = filter_type;
+  }
 
-    ObjectPtr GetObs();
+  static void SetTrackedTimesThreshold(const int &threshold) {
+    s_tracked_times_threshold_ = threshold;
+  }
 
-    const ObjectPtr GetObs() const;
-
-    double GetTimestamp();
-
-    double GetTrackingTime();
-
-    void TrueIdTracked();
-
-    void FalseIdTracked();
-
-    static void SetFilterType(std::string filter_type) {
-        s_chosen_filter_ = filter_type;
-    }
-    
-    static void SetTrackedTimesThreshold(const int& threshold) {
-        s_tracked_times_threshold_ = threshold;
-    }
-
-private:
-    static std::string s_chosen_filter_;
-    static int s_current_idx_;
-    static int s_tracked_times_threshold_;
-    int obs_id_;
-    double timestamp_;
-    ObjectPtr obs_radar_;  // observation from radar
-    ObjectPtr obs_;        // track state after filtering
-    boost::shared_ptr<BaseFilter> tracker_;    // kalman filter
-    int tracked_times_;
-    double tracking_time_;
-    bool id_tracked_;
+ private:
+  static std::string s_chosen_filter_;
+  static int s_current_idx_;
+  static int s_tracked_times_threshold_;
+  int obs_id_;
+  double timestamp_;
+  ObjectPtr obs_radar_;  // observation from radar
+  ObjectPtr obs_;        // track state after filtering
+  boost::shared_ptr<BaseFilter> tracker_;    // kalman filter
+  int tracked_times_;
+  double tracking_time_;
+  bool id_tracked_;
 };
 
 } // namespace perception

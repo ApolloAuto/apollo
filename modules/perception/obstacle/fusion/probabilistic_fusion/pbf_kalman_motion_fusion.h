@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_
 #include <utility>
@@ -27,68 +27,68 @@ namespace apollo {
 namespace perception {
 
 class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
-public:
-    PbfKalmanMotionFusion();
-    ~PbfKalmanMotionFusion();
+ public:
+  PbfKalmanMotionFusion();
+  ~PbfKalmanMotionFusion();
 
-    // @brief initialize the state of filter
-    // @params[IN] anchor_point: initial anchor point for filtering
-    // @params[IN] velocity: initial velocity for filtering
-    // @return nothing
-    void Initialize(const Eigen::Vector3d& anchor_point,
-        const Eigen::Vector3d& velocity);
+  // @brief initialize the state of filter
+  // @params[IN] anchor_point: initial anchor point for filtering
+  // @params[IN] velocity: initial velocity for filtering
+  // @return nothing
+  void Initialize(const Eigen::Vector3d &anchor_point,
+                  const Eigen::Vector3d &velocity);
 
-    // @brief initialize state of the filter
-    // @params[IN] new_object: initial object for filtering
-    // @return nothing
-    void Initialize(const PbfSensorObjectPtr new_object);
+  // @brief initialize state of the filter
+  // @params[IN] new_object: initial object for filtering
+  // @return nothing
+  void Initialize(const PbfSensorObjectPtr new_object);
 
-    // @brief predict the state of filter
-    // @params[OUT] anchor_point:  predicted anchor point for filtering
-    // @params[OUT] velocity: predicted velocity
-    // @params[IN] time_diff: time interval from last update
-    // @return nothing
-    void Predict(Eigen::Vector3d& anchor_point,
-        Eigen::Vector3d& velocity, const double time_diff);
+  // @brief predict the state of filter
+  // @params[OUT] anchor_point:  predicted anchor point for filtering
+  // @params[OUT] velocity: predicted velocity
+  // @params[IN] time_diff: time interval from last update
+  // @return nothing
+  void Predict(Eigen::Vector3d &anchor_point,
+               Eigen::Vector3d &velocity, const double time_diff);
 
-    // @brief update with measurements
-    // @params[IN] new_object: new object for current update
-    // @params[IN] time_diff: time interval from last update;
-    // @return nothing
-    void UpdateWithObject(const PbfSensorObjectPtr new_object,
-                          const double time_diff);
+  // @brief update with measurements
+  // @params[IN] new_object: new object for current update
+  // @params[IN] time_diff: time interval from last update;
+  // @return nothing
+  void UpdateWithObject(const PbfSensorObjectPtr new_object,
+                        const double time_diff);
 
-    // @brief update without measurements
-    // @params[IN] time_diff: time interval from last update
-    // @return nothing
-    void UpdateWithoutObject(const double time_diff);
+  // @brief update without measurements
+  // @params[IN] time_diff: time interval from last update
+  // @return nothing
+  void UpdateWithoutObject(const double time_diff);
 
-    // @brief get current state of the filter
-    // @params[OUT] anchor_point: current anchor_point
-    // @params[OUT] velocity: current velocity
-    // @return nothing
-    void GetState(Eigen::Vector3d& anchor_point, Eigen::Vector3d& velocity);
+  // @brief get current state of the filter
+  // @params[OUT] anchor_point: current anchor_point
+  // @params[OUT] velocity: current velocity
+  // @return nothing
+  void GetState(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity);
 
-protected:
-    Eigen::Vector3d belief_anchor_point_;
-    Eigen::Vector3d belief_velocity_;
+ protected:
+  Eigen::Vector3d belief_anchor_point_;
+  Eigen::Vector3d belief_velocity_;
 
-    Eigen::Vector4d priori_state_;
-    Eigen::Vector4d posteriori_state_;
+  Eigen::Vector4d priori_state_;
+  Eigen::Vector4d posteriori_state_;
 
-    Eigen::Matrix4d p_matrix_;
-    // the state-transition matrix
-    Eigen::Matrix4d a_matrix_;
-    // the observation mode
-    Eigen::Matrix4d c_matrix_;
+  Eigen::Matrix4d p_matrix_;
+  // the state-transition matrix
+  Eigen::Matrix4d a_matrix_;
+  // the observation mode
+  Eigen::Matrix4d c_matrix_;
 
-    // the covariance of the process noise
-    Eigen::Matrix4d q_matrix_;
-    //  the covariance of the observation noise
-    Eigen::Matrix4d r_matrix_;
+  // the covariance of the process noise
+  Eigen::Matrix4d q_matrix_;
+  //  the covariance of the observation noise
+  Eigen::Matrix4d r_matrix_;
 
-    // Optimal Kalman gain
-    Eigen::Matrix4d k_matrix_;
+  // Optimal Kalman gain
+  Eigen::Matrix4d k_matrix_;
 };
 
 } // namespace perception

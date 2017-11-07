@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
 
@@ -24,139 +24,139 @@ namespace apollo {
 namespace perception {
 
 class PbfTrack {
-public:
-    explicit PbfTrack(PbfSensorObjectPtr obj);
+ public:
+  explicit PbfTrack(PbfSensorObjectPtr obj);
 
-    ~PbfTrack();
+  ~PbfTrack();
 
-    /**@brief Update track with sensor object */
-    void UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist);
+  /**@brief Update track with sensor object */
+  void UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist);
 
-    void UpdateWithoutSensorObject(const SensorType &sensor_type,
-                                   const std::string &sensor_id, double min_match_dist, double timestamp);
+  void UpdateWithoutSensorObject(const SensorType &sensor_type,
+                                 const std::string &sensor_id, double min_match_dist, double timestamp);
 
-    PbfSensorObjectPtr GetFusedObject();
+  PbfSensorObjectPtr GetFusedObject();
 
-    double GetGusedTimestamp() const;
+  double GetGusedTimestamp() const;
 
-    PbfSensorObjectPtr GetLidarObject(const std::string &sensor_id);
+  PbfSensorObjectPtr GetLidarObject(const std::string &sensor_id);
 
-    PbfSensorObjectPtr GetRadarObject(const std::string &sensor_id);
+  PbfSensorObjectPtr GetRadarObject(const std::string &sensor_id);
 
-    PbfSensorObjectPtr GetSensorObject(const SensorType &sensor_type,
-                                       const std::string &sensor_id);
-    
-    /**@brief get latest lidar measurement for multi lidar sensors*/
-    PbfSensorObjectPtr GetLatestLidarObject();
-    /**@brief get latest lidar measurement for multi radar sensors*/    
-    PbfSensorObjectPtr GetLatestRadarObject();
+  PbfSensorObjectPtr GetSensorObject(const SensorType &sensor_type,
+                                     const std::string &sensor_id);
 
-    int GetTrackId() const;
+  /**@brief get latest lidar measurement for multi lidar sensors*/
+  PbfSensorObjectPtr GetLatestLidarObject();
+  /**@brief get latest lidar measurement for multi radar sensors*/
+  PbfSensorObjectPtr GetLatestRadarObject();
 
-    double GetTrackingPeriod() const {
-        return tracking_period_;
-    }
+  int GetTrackId() const;
 
-    inline bool IsDead() const {
-        return is_dead_;
-    }
-    bool AbleToPublish();
+  double GetTrackingPeriod() const {
+    return tracking_period_;
+  }
 
-    static int GetNextTrackId();
+  inline bool IsDead() const {
+    return is_dead_;
+  }
+  bool AbleToPublish();
 
-    static void SetMaxLidarInvisiblePeriod(double period) {
-        s_max_lidar_invisible_period_ = period;
-    }
+  static int GetNextTrackId();
 
-    static double GetMaxLidarInvisiblePeriod() {
-        return s_max_lidar_invisible_period_;
-    }
+  static void SetMaxLidarInvisiblePeriod(double period) {
+    s_max_lidar_invisible_period_ = period;
+  }
 
-    static void SetMaxRadarInvisiblePeriod(double period) {
-        s_max_radar_invisible_period_ = period;
-    }
+  static double GetMaxLidarInvisiblePeriod() {
+    return s_max_lidar_invisible_period_;
+  }
 
-    static double GetMaxRadarInvisiblePeriod() {
-        return s_max_radar_confident_angle_;
-    }
+  static void SetMaxRadarInvisiblePeriod(double period) {
+    s_max_radar_invisible_period_ = period;
+  }
 
-    static void SetMaxRadarConfidentAngle(double angle) {
-        s_max_radar_confident_angle_ = angle;
-    }
+  static double GetMaxRadarInvisiblePeriod() {
+    return s_max_radar_confident_angle_;
+  }
 
-    static double GetMaxRadarConfidentAngle() {
-        return s_max_radar_confident_angle_;
-    }
+  static void SetMaxRadarConfidentAngle(double angle) {
+    s_max_radar_confident_angle_ = angle;
+  }
 
-    static void SetMinRadarConfidentDistance(double dist) {
-        s_min_radar_confident_distance_ = dist;
-    }
+  static double GetMaxRadarConfidentAngle() {
+    return s_max_radar_confident_angle_;
+  }
 
-    static void SetPublishIfHasLidar(bool enabled) {
-        s_publish_if_has_lidar_ = enabled;
-    }
-    static void SetPublishIfHasRadar(bool enabled) {
-        s_publish_if_has_radar_ = enabled;
-    }
+  static void SetMinRadarConfidentDistance(double dist) {
+    s_min_radar_confident_distance_ = dist;
+  }
 
-    static void SetMotionFusionMethod(const std::string motion_fusion_method);
+  static void SetPublishIfHasLidar(bool enabled) {
+    s_publish_if_has_lidar_ = enabled;
+  }
+  static void SetPublishIfHasRadar(bool enabled) {
+    s_publish_if_has_radar_ = enabled;
+  }
 
-protected:
-    /**@brief use obj's velocity to update obj's location to input timestamp*/
-    void PerformMotionCompensation(PbfSensorObjectPtr obj, double timestamp);
+  static void SetMotionFusionMethod(const std::string motion_fusion_method);
 
-    void PerformMotionFusion(PbfSensorObjectPtr obj);
+ protected:
+  /**@brief use obj's velocity to update obj's location to input timestamp*/
+  void PerformMotionCompensation(PbfSensorObjectPtr obj, double timestamp);
 
-    void UpdateMeasurementsLifeWithMeasurement(std::map<std::string, PbfSensorObjectPtr> &objects,
-                                               const std::string &sensor_id,
-                                               double timestamp, double max_invisible_time);
-    
-    void UpdateMeasurementsLifeWithoutMeasurement(std::map<std::string, PbfSensorObjectPtr> &objects,
-                                                  const std::string &sensor_id,
-                                                  double timestamp, double max_invisible_time, bool &invisible_state);
+  void PerformMotionFusion(PbfSensorObjectPtr obj);
 
-protected:
-    PbfSensorObjectPtr    fused_object_;
+  void UpdateMeasurementsLifeWithMeasurement(std::map<std::string, PbfSensorObjectPtr> &objects,
+                                             const std::string &sensor_id,
+                                             double timestamp, double max_invisible_time);
 
-    /**@brief time stamp of the track*/
-    double                fused_timestamp_;
+  void UpdateMeasurementsLifeWithoutMeasurement(std::map<std::string, PbfSensorObjectPtr> &objects,
+                                                const std::string &sensor_id,
+                                                double timestamp, double max_invisible_time, bool &invisible_state);
 
-    int                   age_;
-    double                tracking_period_;
+ protected:
+  PbfSensorObjectPtr fused_object_;
 
-    /**@brief global track id*/
-    int                   idx_;
-    double                invisible_period_;
-    bool                  invisible_in_lidar_;
-    bool                  invisible_in_radar_;
+  /**@brief time stamp of the track*/
+  double fused_timestamp_;
 
-    /**@brief motion fusion*/
-    PbfBaseMotionFusion*  motion_fusion_;
+  int age_;
+  double tracking_period_;
 
-    /**@brief one object instance per sensor, might be more later*/
-    std::map<std::string, PbfSensorObjectPtr>  lidar_objects_;
-    std::map<std::string, PbfSensorObjectPtr>  radar_objects_;
+  /**@brief global track id*/
+  int idx_;
+  double invisible_period_;
+  bool invisible_in_lidar_;
+  bool invisible_in_radar_;
 
-    bool                  is_dead_;
-private:
-    PbfTrack();
+  /**@brief motion fusion*/
+  PbfBaseMotionFusion *motion_fusion_;
 
-private:
-    static int            s_track_idx_;
+  /**@brief one object instance per sensor, might be more later*/
+  std::map<std::string, PbfSensorObjectPtr> lidar_objects_;
+  std::map<std::string, PbfSensorObjectPtr> radar_objects_;
 
-    //invisible period for different sensors
-    static double         s_max_lidar_invisible_period_;
-    static double         s_max_radar_invisible_period_;
+  bool is_dead_;
+ private:
+  PbfTrack();
 
-    //radar confidant regions
-    static double         s_max_radar_confident_angle_;
-    static double         s_min_radar_confident_distance_;
+ private:
+  static int s_track_idx_;
 
-    static std::string    s_motion_fusion_method_;
+  //invisible period for different sensors
+  static double s_max_lidar_invisible_period_;
+  static double s_max_radar_invisible_period_;
 
-    //publish conditions
-    static bool           s_publish_if_has_lidar_;
-    static bool           s_publish_if_has_radar_;
+  //radar confidant regions
+  static double s_max_radar_confident_angle_;
+  static double s_min_radar_confident_distance_;
+
+  static std::string s_motion_fusion_method_;
+
+  //publish conditions
+  static bool s_publish_if_has_lidar_;
+  static bool s_publish_if_has_radar_;
 };
 
 typedef std::shared_ptr<PbfTrack> PbfTrackPtr;

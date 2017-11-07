@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_background_track.h"
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
@@ -30,44 +30,44 @@ namespace perception {
 /*class PbfBackgroundTrack*/
 double PbfBackgroundTrack::s_max_invisible_period_ = 0.5;
 void PbfBackgroundTrack::SetMaxInvisiblePeriod(double period) {
-    s_max_invisible_period_ = period;
+  s_max_invisible_period_ = period;
 }
 PbfBackgroundTrack::PbfBackgroundTrack(PbfSensorObjectPtr obj) {
-    idx_ = PbfTrack::GetNextTrackId();
-    fused_timestamp_ = obj->timestamp;
-    fused_object_.reset(new PbfSensorObject());
-    fused_object_->clone(*obj);
-    age_ = 0;
-    invisible_period_ = 0;
-    tracking_period_ = 0.0;
-    is_dead_ = false;
+  idx_ = PbfTrack::GetNextTrackId();
+  fused_timestamp_ = obj->timestamp;
+  fused_object_.reset(new PbfSensorObject());
+  fused_object_->clone(*obj);
+  age_ = 0;
+  invisible_period_ = 0;
+  tracking_period_ = 0.0;
+  is_dead_ = false;
 }
 PbfBackgroundTrack::~PbfBackgroundTrack() {
 }
 void PbfBackgroundTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj) {
-    fused_object_->clone(*obj);
-    invisible_period_ = 0;
-    tracking_period_ += obj->timestamp - fused_timestamp_;
-    fused_timestamp_ = obj->timestamp;
-    fused_object_->timestamp = obj->timestamp;
+  fused_object_->clone(*obj);
+  invisible_period_ = 0;
+  tracking_period_ += obj->timestamp - fused_timestamp_;
+  fused_timestamp_ = obj->timestamp;
+  fused_object_->timestamp = obj->timestamp;
 }
 void PbfBackgroundTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
                                                    const std::string &sensor_id, double timestamp) {
-    
-    invisible_period_ = timestamp - fused_timestamp_;
-    if (invisible_period_ > s_max_invisible_period_) {
-        is_dead_ = true;
-    }
+
+  invisible_period_ = timestamp - fused_timestamp_;
+  if (invisible_period_ > s_max_invisible_period_) {
+    is_dead_ = true;
+  }
 }
 PbfSensorObjectPtr PbfBackgroundTrack::GetFusedObject() {
-    return fused_object_;
+  return fused_object_;
 }
 bool PbfBackgroundTrack::AbleToPublish() const {
-    double invisible_period_threshold = 0.01;
-    if (invisible_period_ > invisible_period_threshold) {
-        return false;
-    }
-    return true;
+  double invisible_period_threshold = 0.01;
+  if (invisible_period_ > invisible_period_threshold) {
+    return false;
+  }
+  return true;
 }
 
 } // namespace perception

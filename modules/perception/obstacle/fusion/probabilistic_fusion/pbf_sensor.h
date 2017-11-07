@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- 
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #include <deque>
@@ -26,40 +26,40 @@ namespace apollo {
 namespace perception {
 
 class PbfSensor {
-public:
-    explicit PbfSensor(const SensorType& type, const std::string& sensor_id);
-    ~PbfSensor();
+ public:
+  explicit PbfSensor(const SensorType &type, const std::string &sensor_id);
+  ~PbfSensor();
 
-    /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
-    void QueryLatestFrames(double time_stamp, std::vector<PbfSensorFramePtr> *frames);
+  /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
+  void QueryLatestFrames(double time_stamp, std::vector<PbfSensorFramePtr> *frames);
 
-    /**@brief query latest frame whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
-    PbfSensorFramePtr QueryLatestFrame(double time_stamp);
+  /**@brief query latest frame whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
+  PbfSensorFramePtr QueryLatestFrame(double time_stamp);
 
-    /**@brief add a frame objects*/
-    void AddFrame(const SensorObjects &frame);
+  /**@brief add a frame objects*/
+  void AddFrame(const SensorObjects &frame);
 
-    /**@brief query pose at time_stamp, return false if not found*/
-    bool GetPose(double time_stamp, Eigen::Matrix4d *pose);
+  /**@brief query pose at time_stamp, return false if not found*/
+  bool GetPose(double time_stamp, Eigen::Matrix4d *pose);
 
-    static void SetMaxCachedFrameNumber(int number) {
-        s_max_cached_frame_number_ = number;
-    }
-private:
-    DISALLOW_COPY_AND_ASSIGN(PbfSensor);
-    PbfSensor();
+  static void SetMaxCachedFrameNumber(int number) {
+    s_max_cached_frame_number_ = number;
+  }
+ private:
+ DISALLOW_COPY_AND_ASSIGN(PbfSensor);
+  PbfSensor();
 
-protected:
-    /**@brief cached frames in FIFO*/
-    std::deque<PbfSensorFramePtr>  frames_;
+ protected:
+  /**@brief cached frames in FIFO*/
+  std::deque<PbfSensorFramePtr> frames_;
 
-    std::string                    sensor_id_;
-    SensorType                     sensor_type_;
+  std::string sensor_id_;
+  SensorType sensor_type_;
 
-    /**@brief max size of _frames*/
-    static int                     s_max_cached_frame_number_;
+  /**@brief max size of _frames*/
+  static int s_max_cached_frame_number_;
 
-    double                         latest_query_timestamp_;
+  double latest_query_timestamp_;
 };
 
 } // namespace perception
