@@ -59,6 +59,14 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "map_util",
+    hdrs = ["map_util.h"],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ]
+)
+
 cc_test(
     name = "string_tokenizer_test",
     size = "small",

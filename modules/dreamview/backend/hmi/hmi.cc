@@ -22,6 +22,7 @@
 #include "gflags/gflags.h"
 #include "google/protobuf/util/json_util.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
@@ -39,15 +40,15 @@ DEFINE_string(vehicle_data_path, "modules/calibration/data",
 
 namespace apollo {
 namespace dreamview {
+namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
 using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
-
-namespace {
 
 std::string ProtoToTypedJson(const std::string &json_type,
                              const google::protobuf::Message &proto) {
@@ -137,8 +138,22 @@ void HMI::RegisterMessageHandlers() {
         if (*module == "all") {
           RunCommandOnAllModules(*command);
         } else {
-          RunModuleCommand(*module, *command);
+          RunComponentCommand(config_.modules(), *module, *command);
         }
+      });
+
+  // HMI client asks for executing tool command.
+  websocket_->RegisterMessageHandler(
+      "ExecuteToolCommand",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {tool: "tool_name", command: "command_name"}.
+        const auto tool = json.find("tool");
+        const auto command = json.find("command");
+        if (tool == json.end() || command == json.end()) {
+          AERROR << "Truncated tool command.";
+          return;
+        }
+        RunComponentCommand(config_.tools(), *tool, *command);
       });
 
   // HMI client asks for changing driving mode.
@@ -199,30 +214,31 @@ void HMI::BroadcastHMIStatus() const {
   }
 }
 
-int HMI::RunModuleCommand(const std::string &module_name,
-                          const std::string &command_name) {
-  const auto module = config_.modules().find(module_name);
-  if (module == config_.modules().end()) {
-    AERROR << "Cannot find " << module_name << " module";
+int HMI::RunComponentCommand(const Map<std::string, Component> &components,
+                             const std::string &component_name,
+                             const std::string &command_name) {
+  const auto *component = FindOrNull(components, component_name);
+  if (component == nullptr) {
+    AERROR << "Cannot find component " << component_name;
     return -1;
   }
-  const auto &supported_commands = module->second.supported_commands();
-  const auto cmd = supported_commands.find(command_name);
-  if (cmd == supported_commands.end()) {
-    AERROR << "Cannot find command " << module_name << ":" << command_name;
+  const auto *cmd = FindOrNull(component->supported_commands(), command_name);
+  if (cmd == nullptr) {
+    AERROR << "Cannot find command " << component_name << "." << command_name;
     return -1;
   }
-  AINFO << "Execute system command: " << cmd->second;
-  int ret = std::system(cmd->second.c_str());
+  ADEBUG << "Execute system command: " << *cmd;
+  const int ret = std::system(cmd->c_str());
 
-  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << cmd->second;
+  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << *cmd;
   return ret;
 }
 
 int HMI::RunCommandOnAllModules(const std::string &command_name) {
   int failed = 0;
-  for (const auto &module : config_.modules()) {
-    const int ret = RunModuleCommand(module.first, command_name);
+  const auto &modules = config_.modules();
+  for (const auto &module : modules) {
+    const int ret = RunComponentCommand(modules, module.first, command_name);
     if (ret != 0) {
       ++failed;
     }
