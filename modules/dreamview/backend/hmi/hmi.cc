@@ -44,6 +44,7 @@ namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
@@ -273,15 +274,15 @@ void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
 }
 
 void HMI::ChangeMapTo(const std::string &map_name) {
-  const auto iter = config_.available_maps().find(map_name);
-  if (iter == config_.available_maps().end()) {
+  const auto *map_dir = FindOrNull(config_.available_maps(), map_name);
+  if (map_dir == nullptr) {
     AERROR << "Unknown map " << map_name;
     return;
   }
   // Append new map_dir flag to global flagfile.
   std::ofstream fout(FLAGS_global_flagfile, std::ios_base::app);
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
-  fout << "\n--map_dir=" << iter->second << std::endl;
+  fout << "\n--map_dir=" << *map_dir << std::endl;
 
   RunCommandOnAllModules("stop");
   status_.set_current_map(map_name);
@@ -289,8 +290,7 @@ void HMI::ChangeMapTo(const std::string &map_name) {
 }
 
 void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
-  const auto iter = config_.available_vehicles().find(vehicle_name);
-  if (iter == config_.available_vehicles().end()) {
+  if (!ContainsKey(config_.available_vehicles(), vehicle_name)) {
     AERROR << "Unknown vehicle " << vehicle_name;
     return;
   }
