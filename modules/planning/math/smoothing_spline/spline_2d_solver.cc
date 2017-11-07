@@ -86,6 +86,7 @@ bool Spline2dSolver::Solve() {
          << ", last_num_constraint_: " << last_num_constraint_;
 
   bool use_hotstart =
+      last_problem_success_ &&
       (FLAGS_enable_sqp_solver && sqp_solver_ != nullptr &&
        num_param == last_num_param_ && num_constraint == last_num_constraint_);
 
@@ -191,9 +192,11 @@ bool Spline2dSolver::Solve() {
                 "reasons:"
              << ret;
     }
+    last_problem_success_ = false;
     return false;
   }
 
+  last_problem_success_ = true;
   double result[num_param];  // NOLINT
   memset(result, 0, sizeof result);
 
