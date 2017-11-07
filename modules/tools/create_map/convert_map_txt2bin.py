@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 """
-Create base map from localization and mobileye lane detection
+Convert a base map from txt to bin format
 """
 
 import argparse
