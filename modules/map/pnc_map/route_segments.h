@@ -92,7 +92,7 @@ class RouteSegments : public std::vector<LaneSegment> {
 
   /**
    * Project a point to this route segment.
-   * @param point_enu a map point.
+   * @param point_enu a map point, or point, which is a Vec2d point
    * @param s return the longitudinal s relative to the route segment.
    * @param l return the lateral distance relative to the route segment.
    * @param waypoint return the LaneWaypoint, which has lane and lane_s on the
@@ -101,12 +101,15 @@ class RouteSegments : public std::vector<LaneSegment> {
    */
   bool GetProjection(const common::PointENU &point_enu, double *s, double *l,
                      LaneWaypoint *waypoint) const;
-
+  bool GetProjection(const common::math::Vec2d &point, double *s, double *l,
+                     LaneWaypoint *waypoint) const;
   /**
-   * Check whether the map allows a vehicle can reach current RouteSegment from
+   * Check whether the map allows a vehicle can reach current RouteSegment
+   * from
    * a point on a lane (LaneWaypoint).
    * @param waypoint the start waypoint
-   * @return true if the map allows a vehicle to drive from waypoint to current
+   * @return true if the map allows a vehicle to drive from waypoint to
+   * current
    * RouteSegment. Otherwise false.
    */
   bool CanDriveFrom(const LaneWaypoint &waypoint) const;
