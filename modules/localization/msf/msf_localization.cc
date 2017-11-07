@@ -92,6 +92,8 @@ Status MSFLocalization::Start() {
   // Integ Sins Pva
   CHECK(AdapterManager::GetIntegSinsPva()) << "IntegSinsPva is not initialized.";
   AdapterManager::AddIntegSinsPvaCallback(&MSFLocalization::OnSinsPva, this);
+
+  return Status::OK();
 }
 
 Status MSFLocalization::Stop() {

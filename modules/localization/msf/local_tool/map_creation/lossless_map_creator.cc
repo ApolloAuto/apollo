@@ -250,8 +250,8 @@ int main(int argc, char **argv) {
                     pt.intensity = static_cast<float>(velodyne_frame.intensities[i]);
                 }
 
-                plane_extractor.extract_xy_plane(pcl_pc);
-                PclPointCloudPtrT& plane_pc = plane_extractor.get_xy_plane_cloud();
+                plane_extractor.ExtractXYPlane(pcl_pc);
+                PclPointCloudPtrT& plane_pc = plane_extractor.GetXYPlaneCloud();
 
                 for (unsigned int k = 0; k < plane_pc->size(); ++k) {
                     const PclPointT& plane_pt = plane_pc->at(k);
