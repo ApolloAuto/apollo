@@ -25,15 +25,17 @@ namespace msf {
 
 const unsigned int ZlibStrategy::zlib_chunk = 16384;
 
-unsigned int ZlibStrategy::encode(BufferStr& buf, BufferStr& buf_compressed) {
-  return zlib_compress(buf, buf_compressed);
+unsigned int ZlibStrategy::Encode(BufferStr& buf,
+    BufferStr& buf_compressed) {
+  return ZlibCompress(buf, buf_compressed);
 }
 
-unsigned int ZlibStrategy::decode(BufferStr& buf, BufferStr& buf_uncompressed) {
-  return zlib_uncompress(buf, buf_uncompressed);
+unsigned int ZlibStrategy::Decode(BufferStr& buf,
+    BufferStr& buf_uncompressed) {
+  return ZlibUncompress(buf, buf_uncompressed);
 }
 
-unsigned int ZlibStrategy::zlib_compress(std::vector<unsigned char>& src,
+unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
     std::vector<unsigned char>& dst) {
   dst.resize(zlib_chunk*2);
   int ret, flush;
@@ -92,7 +94,7 @@ unsigned int ZlibStrategy::zlib_compress(std::vector<unsigned char>& src,
   return Z_OK;
 }
 
-unsigned int ZlibStrategy::zlib_uncompress(std::vector<unsigned char>& src,
+unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
     std::vector<unsigned char>& dst) {
   dst.resize(zlib_chunk*2);
   int ret;

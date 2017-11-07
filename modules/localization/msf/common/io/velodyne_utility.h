@@ -46,13 +46,13 @@ struct VelodyneFrame {
   Eigen::Affine3d pose;
 };
 
-void load_pcds(std::string file_path, 
+void LoadPcds(std::string file_path, 
         unsigned int frame_index,
         const Eigen::Affine3d& pose,
         VelodyneFrame& velodyne_frame, 
         bool is_global);
 
-void load_pcds(std::string file_path, 
+void LoadPcds(std::string file_path, 
     unsigned int frame_index,
     const Eigen::Affine3d& pose,
     std::vector<Eigen::Vector3d>& pt3ds, 
@@ -60,14 +60,15 @@ void load_pcds(std::string file_path,
     bool is_global);
 
 /**@brief Load the PCD poses with their timestamps. */
-void load_pcd_poses(std::string file_path,
+void LoadPcdPoses(std::string file_path,
     std::vector<Eigen::Affine3d>& poses,
     std::vector<double>& timestamps);
 
 /**@brief Load the PCD poses with their timestamps and indices. */
-void load_pcd_poses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
-                    std::vector<double>& timestamps, 
-                    std::vector<unsigned int>& pcd_indices);
+void LoadPcdPoses(std::string file_path,
+    std::vector<Eigen::Affine3d>& poses,
+    std::vector<double>& timestamps, 
+    std::vector<unsigned int>& pcd_indices);
 
 // /**@brief Save the PCD poses with their timestamps. */
 // void save_pcd_poses(std::string file_path,
@@ -75,7 +76,7 @@ void load_pcd_poses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
 //    const std::vector<double>& timestamps);
 
 /**@brief Load the velodyne extrinsic from a YAML file. */
-bool load_extrinsic(std::string file_path, Eigen::Affine3d& extrinsic);
+bool LoadExtrinsic(std::string file_path, Eigen::Affine3d& extrinsic);
 
 } // namespace velodyne
 } // namespace msf

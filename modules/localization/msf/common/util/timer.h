@@ -30,16 +30,16 @@ class Timer {
   /**@brief The constructor. */
   Timer();
   /**@brief Start the timer. */
-  void start();
+  void Start();
   /**@brief End the timer. 
    * This function will automatically start a new timer
    * at the end of function call.
    * <title> The title in the output message.
    * Use NULL if there is no title. */
-  void end(const char * title);
+  void End(const char * title);
  private:
-  boost::posix_time::ptime _start_time;
-  boost::posix_time::ptime _end_time;
+  boost::posix_time::ptime start_time_;
+  boost::posix_time::ptime end_time_;
 };
 
 class TimeAccumulator {
@@ -47,19 +47,19 @@ class TimeAccumulator {
   /**@brief The constructor. */
   TimeAccumulator();
   /**@brief Start the timer. */
-  void start();
+  void Start();
   /**@brief End the timer and print a message. Use NULL if no message. */
-  void end(const char * title = NULL);
+  void End(const char * title = NULL);
   /**@brief Clear the accumulator. */
-  void clear();
+  void Clear();
   /**@brief Get the totol duration of the timer.
    * <title> The duration will be output to std::cout.
    * The title is message title. Use NULL if no title.
    */
-  void get_duration(const char * title);
+  void GetDuration(const char * title);
  private:
-  boost::posix_time::ptime _start_time;
-  boost::posix_time::time_duration _duration;
+  boost::posix_time::ptime start_time_;
+  boost::posix_time::time_duration duration_;
 };
 
 } // namespace msf

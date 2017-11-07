@@ -114,19 +114,19 @@ bool BaseMapNode::save() {
 bool BaseMapNode::load() {
     char buf[1024];
     std::string path = _map_config->_map_folder_path;
-    if (!(system::is_exists(path)
-            && system::is_directory(path))) {
+    if (!(system::IsExists(path)
+            && system::IsDirectory(path))) {
         return false;
     }
     path = path + "/map";
-    if (!(system::is_exists(path) 
-            && system::is_directory(path))) {
+    if (!(system::IsExists(path) 
+            && system::IsDirectory(path))) {
         return false;
     }
     snprintf(buf, 1024, "/%03u", _index._resolution_id);
     path = path + buf;
-    if (!(system::is_exists(path) 
-            && system::is_directory(path))) {
+    if (!(system::IsExists(path) 
+            && system::IsDirectory(path))) {
         return false;
     }
     if (_index._zone_id > 0) {
@@ -135,20 +135,20 @@ bool BaseMapNode::load() {
     else {
         path = path + "/south";
     }
-    if (!(system::is_exists(path) 
-            && system::is_directory(path))) {
+    if (!(system::IsExists(path) 
+            && system::IsDirectory(path))) {
         return false;
     }
     snprintf(buf, 1024, "/%02d", abs(_index._zone_id));
     path = path + buf;
-    if (!(system::is_exists(path) 
-            && system::is_directory(path))) {
+    if (!(system::IsExists(path) 
+            && system::IsDirectory(path))) {
         return false;
     }
     snprintf(buf, 1024, "/%08u", abs(_index._m));
     path = path + buf;
-    if (!(system::is_exists(path) 
-            && system::is_directory(path))) {
+    if (!(system::IsExists(path) 
+            && system::IsDirectory(path))) {
         return false;
     }
     snprintf(buf, 1024, "/%08u", abs(_index._n));
@@ -288,7 +288,7 @@ unsigned int BaseMapNode::load_body_binary(std::vector<unsigned char> &buf) {
         return _map_matrix->load_binary(&buf[0]);
     }
     std::vector<unsigned char> buf_uncompressed;
-    _compression_strategy->decode(buf, buf_uncompressed);
+    _compression_strategy->Decode(buf, buf_uncompressed);
     std::cerr << "map node compress ratio: " <<
             (float)(buf.size())/buf_uncompressed.size() << std::endl;
     return _map_matrix->load_binary(&buf_uncompressed[0]);
@@ -308,7 +308,7 @@ unsigned int BaseMapNode::create_body_binary(
     unsigned int body_size = get_body_binary_size();
     buf_uncompressed.resize(body_size);
     _map_matrix->create_binary(&buf_uncompressed[0], body_size);
-    _compression_strategy->encode(buf_uncompressed, buf);
+    _compression_strategy->Encode(buf_uncompressed, buf);
     _file_body_binary_size = buf.size();
     return buf.size();
 }
@@ -393,18 +393,18 @@ Eigen::Vector2d BaseMapNode::get_coordinate(unsigned int x, unsigned int y) cons
 Eigen::Vector2d BaseMapNode::get_left_top_corner(
     const BaseMapConfig& config, const MapNodeIndex& index) {
     Eigen::Vector2d coord;
-    coord[0] = config._map_range.get_min_x() +
+    coord[0] = config._map_range.GetMinX() +
             config._map_node_size_x*config._map_resolutions[index._resolution_id]*index._n;
-    coord[1] = config._map_range.get_min_y() +
+    coord[1] = config._map_range.GetMinY() +
             config._map_node_size_y*config._map_resolutions[index._resolution_id]*index._m;
-    assert(coord[0] < config._map_range.get_max_x());
-    assert(coord[1] < config._map_range.get_max_y());
+    assert(coord[0] < config._map_range.GetMaxX());
+    assert(coord[1] < config._map_range.GetMaxY());
     return coord;
 }
 
 bool BaseMapNode::create_map_directory(const std::string& path) const {
-    if (system::is_exists(path)) {
-        if (!system::is_directory(path)) {
+    if (system::IsExists(path)) {
+        if (!system::IsDirectory(path)) {
             return false;
         }
         else {
@@ -412,7 +412,7 @@ bool BaseMapNode::create_map_directory(const std::string& path) const {
         }
     }
     else {
-        return system::create_directory(path);
+        return system::CreateDirectory(path);
     }
 }
 

@@ -107,9 +107,9 @@ MapNodeIndex MapNodeIndex::get_map_node_index(const BaseMapConfig& option,
     MapNodeIndex index;
     index._resolution_id = resolution_id;
     index._zone_id = zone_id;
-    int n = static_cast<int>((coordinate[0] - option._map_range.get_min_x()) / 
+    int n = static_cast<int>((coordinate[0] - option._map_range.GetMinX()) / 
             (option._map_node_size_x * option._map_resolutions[resolution_id]));
-    int m = static_cast<int>((coordinate[1] - option._map_range.get_min_y()) / 
+    int m = static_cast<int>((coordinate[1] - option._map_range.GetMinY()) / 
             (option._map_node_size_y * option._map_resolutions[resolution_id]));
     if (n >= 0 && m >= 0 && n < int(get_map_index_range_east(option, resolution_id)) &&
             m < int(get_map_index_range_north(option, resolution_id))) {
@@ -126,7 +126,7 @@ unsigned int MapNodeIndex::get_map_index_range_east(
     const BaseMapConfig& option, 
     unsigned int resolution_id) {
     return static_cast<unsigned int>(
-        (option._map_range.get_max_x() - option._map_range.get_min_x()) / 
+        (option._map_range.GetMaxX() - option._map_range.GetMinX()) / 
         (option._map_node_size_x * option._map_resolutions[resolution_id]));
 }
 
@@ -134,8 +134,8 @@ unsigned int MapNodeIndex::get_map_index_range_north(
     const BaseMapConfig& option, 
     unsigned int resolution_id) {
     return static_cast<unsigned int>(
-        (option._map_range.get_max_y() - option._map_range.get_min_y()) / 
-        (option._map_node_size_y*option._map_resolutions[resolution_id]));
+        (option._map_range.GetMaxY() - option._map_range.GetMinY()) / 
+        (option._map_node_size_y * option._map_resolutions[resolution_id]));
 }
 
 std::ostream& operator<< (std::ostream& cerr, const MapNodeIndex& index) {

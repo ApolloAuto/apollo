@@ -35,17 +35,17 @@ class Rect2D {
   /**@brief Overloading the operator =. */
   Rect2D<T>& operator = (const Rect2D<T>& ref);
   /**@brief Get the min x of the rectangle. */
-  T get_min_x() const;
+  T GetMinX() const;
   /**@brief Get the min y of the rectangle. */
-  T get_min_y() const;
+  T GetMinY() const;
   /**@brief Get the max x of the rectangle. */
-  T get_max_x() const;
+  T GetMaxX() const;
   /**@brief Get the max y of the rectangle. */
-  T get_max_y() const;
+  T GetMaxY() const;
   /**@brief Get the left top corner of the rectangle. */
-  Eigen::Matrix<T, 2, 1> get_left_top_corner() const;
+  Eigen::Matrix<T, 2, 1> GetLeftTopCorner() const;
   /**@brief Get the right bottom corner of the rectangle. */
-  Eigen::Matrix<T, 2, 1> get_right_bottom_corner() const;
+  Eigen::Matrix<T, 2, 1> GetRightBottomCorner() const;
 
  private:
   /**@brief min_x, min_y, max_x, max_y. */
@@ -74,27 +74,27 @@ Rect2D<T>& Rect2D<T>::operator = (
 }
 
 template <typename T>
-T Rect2D<T>::get_min_x() const {
+T Rect2D<T>::GetMinX() const {
   return _data(0);
 }
 
 template <typename T>
-T Rect2D<T>::get_min_y() const {
+T Rect2D<T>::GetMinY() const {
   return _data(1);
 }
 
 template <typename T>
-T Rect2D<T>::get_max_x() const {
+T Rect2D<T>::GetMaxX() const {
   return _data(2);
 }
 
 template <typename T>
-T Rect2D<T>::get_max_y() const {
+T Rect2D<T>::GetMaxY() const {
   return _data(3);
 }
 
 template <typename T>
-Eigen::Matrix<T, 2, 1> Rect2D<T>::get_left_top_corner() const {
+Eigen::Matrix<T, 2, 1> Rect2D<T>::GetLeftTopCorner() const {
   Eigen::Matrix<T, 2, 1> corner;
   corner(0) = _data(0);
   corner(1) = _data(1);
@@ -102,7 +102,7 @@ Eigen::Matrix<T, 2, 1> Rect2D<T>::get_left_top_corner() const {
 }
 
 template <typename T>
-Eigen::Matrix<T, 2, 1> Rect2D<T>::get_right_bottom_corner() const {
+Eigen::Matrix<T, 2, 1> Rect2D<T>::GetRightBottomCorner() const {
   Eigen::Matrix<T, 2, 1> corner;
   corner(0) = _data(2);
   corner(1) = _data(3);

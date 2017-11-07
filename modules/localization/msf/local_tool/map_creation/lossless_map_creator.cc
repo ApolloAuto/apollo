@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
     std::vector<std::vector<double> > time_stamps(num_trials);
     std::vector<std::vector<unsigned int> > pcd_indices(num_trials);
     for (std::size_t i = 0; i < pose_files.size(); ++i) {
-         velodyne::load_pcd_poses(pose_files[i], ieout_poses[i], 
+         velodyne::LoadPcdPoses(pose_files[i], ieout_poses[i], 
                             time_stamps[i], pcd_indices[i]);
     }
 
@@ -144,8 +144,8 @@ int main(int argc, char **argv) {
     LosslessMapConfig &loss_less_config 
             = static_cast<LosslessMapConfig&>(map.get_config());
     std::string map_folder_path = map_base_folder + "/map";
-    if (!system::is_exists(map_folder_path)) {
-        system::create_directory(map_folder_path);
+    if (!system::IsExists(map_folder_path)) {
+        system::CreateDirectory(map_folder_path);
     }
     map.set_map_folder_path(map_folder_path);
     for (size_t i = 0; i < pcd_folder_pathes.size(); ++i) {
@@ -185,10 +185,11 @@ int main(int argc, char **argv) {
         for (size_t i = 0; i < loss_less_config._map_resolutions.size(); ++i) {
             fprintf(file, "%lf, ", loss_less_config._map_resolutions[i]);
         }
-        fprintf(file, "\nMap size: %lf %lf %lf %lf\n", loss_less_config._map_range.get_min_x(),
-                loss_less_config._map_range.get_min_y(),
-                loss_less_config._map_range.get_max_x(),
-                loss_less_config._map_range.get_max_y());
+        fprintf(file, "\nMap size: %lf %lf %lf %lf\n",
+                loss_less_config._map_range.GetMinX(),
+                loss_less_config._map_range.GetMinY(),
+                loss_less_config._map_range.GetMaxX(),
+                loss_less_config._map_range.GetMaxY());
         fprintf(file, "Map node size: %d x %d\n", 
                       loss_less_config._map_node_size_x, 
                       loss_less_config._map_node_size_y);
@@ -226,7 +227,7 @@ int main(int argc, char **argv) {
             ss << pcd_indices[trial][frame_idx];
             pcd_file_path = pcd_folder_pathes[trial] + "/" + ss.str() + ".pcd";
             const Eigen::Affine3d &pcd_pose = poses[trial_frame_idx];
-            velodyne::load_pcds(pcd_file_path, trial_frame_idx,
+            velodyne::LoadPcds(pcd_file_path, trial_frame_idx,
                                 pcd_pose, velodyne_frame, false);
             std::cout << "Loaded " << velodyne_frame.pt3ds.size() << "3D Points at Trial: "
                       << trial << " Frame: " << trial_frame_idx << "." << std::endl;

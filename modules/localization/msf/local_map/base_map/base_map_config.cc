@@ -44,10 +44,10 @@ void BaseMapConfig::create_xml(boost::property_tree::ptree& config) const {
     config.put("map.map_config.version", _map_version);
     config.put("map.map_config.node_size.x", _map_node_size_x);
     config.put("map.map_config.node_size.y", _map_node_size_y);
-    config.put("map.map_config.range.min_x", _map_range.get_min_x());
-    config.put("map.map_config.range.min_y", _map_range.get_min_y());
-    config.put("map.map_config.range.max_x", _map_range.get_max_x());
-    config.put("map.map_config.range.max_y", _map_range.get_max_y());
+    config.put("map.map_config.range.min_x", _map_range.GetMinX());
+    config.put("map.map_config.range.min_y", _map_range.GetMinY());
+    config.put("map.map_config.range.max_x", _map_range.GetMaxX());
+    config.put("map.map_config.range.max_y", _map_range.GetMaxY());
     config.put("map.map_config.compression", _map_is_compression);
     config.put("map.map_runtime.map_ground_height_offset", _map_ground_height_offset);
     for (size_t i = 0; i < _map_resolutions.size(); ++i) {
@@ -100,7 +100,7 @@ void BaseMapConfig::resize_map_range() {
     
     int n = 0;
     while (true) {
-        if (min_x < _map_range.get_min_x()) {
+        if (min_x < _map_range.GetMinX()) {
             break;
         }
         ++n;
@@ -108,7 +108,7 @@ void BaseMapConfig::resize_map_range() {
     }
     n = 0;
     while (true) {
-        if (min_y < _map_range.get_min_y()) {
+        if (min_y < _map_range.GetMinY()) {
             break;
         }
         ++n;
@@ -116,7 +116,7 @@ void BaseMapConfig::resize_map_range() {
     }
     n = 0;
     while (true) {
-        if (max_x > _map_range.get_max_x()) {
+        if (max_x > _map_range.GetMaxX()) {
             break;
         }
         ++n;
@@ -124,7 +124,7 @@ void BaseMapConfig::resize_map_range() {
     }
     n = 0;
     while (true) {
-        if (max_y > _map_range.get_max_y()) {
+        if (max_y > _map_range.GetMaxY()) {
             break;
         }
         ++n;

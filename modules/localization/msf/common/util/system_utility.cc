@@ -24,22 +24,22 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-bool system::is_exists(const std::string &path) {
+bool system::IsExists(const std::string &path) {
   boost::filesystem::path p(path);
   return boost::filesystem::exists(p);
 }
 
-bool system::is_directory(const std::string &path) {
+bool system::IsDirectory(const std::string &path) {
   boost::filesystem::path p(path);
   return boost::filesystem::is_directory(p);
 }
 
-bool system::create_directory(const std::string& path) {
+bool system::CreateDirectory(const std::string& path) {
   boost::filesystem::path p(path);
   return boost::filesystem::create_directory(p);
 }
 
-bool system::get_file_size(const std::string& path, unsigned int& size) {
+bool system::GetFileSize(const std::string& path, unsigned int& size) {
   boost::filesystem::path p(path);
   if (boost::filesystem::exists(p)) {
     if (boost::filesystem::is_regular_file(p)) {
@@ -55,7 +55,7 @@ bool system::get_file_size(const std::string& path, unsigned int& size) {
   }
 }
 
-bool system::copy_file(const std::string& src,
+bool system::CopyFile(const std::string& src,
     const std::string& dst, bool is_overwrite) {
   boost::filesystem::path path_src(src);
   boost::filesystem::path path_dst(dst);
@@ -76,7 +76,7 @@ bool system::copy_file(const std::string& src,
   }
 }
 
-void system::get_files_in_folder_recursive(const std::string& folder,
+void system::GetFilesInFolderRecursive(const std::string& folder,
     const std::string& ext, std::vector<std::string>& ret) {
   ret.clear();
   namespace fs = boost::filesystem;
@@ -96,7 +96,7 @@ void system::get_files_in_folder_recursive(const std::string& folder,
   std::sort(ret.begin(), ret.end());
 }
 
-void system::get_files_in_folder(const std::string& folder,
+void system::GetFilesInFolder(const std::string& folder,
     const std::string& ext, std::vector<std::string>& ret) {
   ret.clear();
   namespace fs = boost::filesystem;
@@ -116,7 +116,7 @@ void system::get_files_in_folder(const std::string& folder,
   std::sort(ret.begin(), ret.end());
 }
 
-void system::get_folders_in_folder(const std::string& folder,
+void system::GetFoldersInFolder(const std::string& folder,
     std::vector<std::string>& ret) {
   ret.clear();
   namespace fs = boost::filesystem;

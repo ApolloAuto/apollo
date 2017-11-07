@@ -8,42 +8,42 @@ namespace localization {
 namespace msf {
 namespace velodyne {
 
-void load_pcd_poses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
-        std::vector<double>& timestamps) {
-    std::vector<unsigned int> pcd_indices;
-    load_pcd_poses(file_path, poses, timestamps, pcd_indices);
+void LoadPcdPoses(std::string file_path,
+    std::vector<Eigen::Affine3d>& poses,
+    std::vector<double>& timestamps) {
+  std::vector<unsigned int> pcd_indices;
+  LoadPcdPoses(file_path, poses, timestamps, pcd_indices);
 }
 
-void load_pcd_poses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
-                    std::vector<double>& timestamps, 
-                    std::vector<unsigned int>& pcd_indices) {
-    poses.clear();
-    timestamps.clear();
-    pcd_indices.clear();
+void LoadPcdPoses(std::string file_path,
+    std::vector<Eigen::Affine3d>& poses,
+    std::vector<double>& timestamps, 
+    std::vector<unsigned int>& pcd_indices) {
+  poses.clear();
+  timestamps.clear();
+  pcd_indices.clear();
 
-    FILE * file = fopen(file_path.c_str(), "r");
-    if (file) {
-        unsigned int index;
-        double timestamp;
-        double x, y, z;
-        double qx, qy, qz, qr;
-        int size = 9;
-        while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
-                        &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9) {
+  FILE * file = fopen(file_path.c_str(), "r");
+  if (file) {
+    unsigned int index;
+    double timestamp;
+    double x, y, z;
+    double qx, qy, qz, qr;
+    int size = 9;
+    while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n",
+        &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9) {
 
-            Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
-            Eigen::Quaterniond quat(qr, qx, qy, qz);
-            // numerical::Quaternion<double> quat = numerical::Quaternion<double>(qx, qy, qz, qr);
-            // numerical::Transform<double> pose = numerical::Transform<double>(quat, trans);
-            poses.push_back(trans * quat);
-            timestamps.push_back(timestamp);
-            pcd_indices.push_back(index);
-        }
-        fclose(file);
+      Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
+      Eigen::Quaterniond quat(qr, qx, qy, qz);
+      poses.push_back(trans * quat);
+      timestamps.push_back(timestamp);
+      pcd_indices.push_back(index);
     }
-    else {
-        std::cerr << "Can't open file to read: " << file_path << std::endl;
-    }
+    fclose(file);
+  }
+  else {
+    std::cerr << "Can't open file to read: " << file_path << std::endl;
+  }
 }
 
 // void save_pcd_poses(std::string file_path,
@@ -67,7 +67,7 @@ void load_pcd_poses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
 //   }
 // }
 
-bool load_extrinsic(std::string file_path, Eigen::Affine3d& extrinsic) {
+bool LoadExtrinsic(std::string file_path, Eigen::Affine3d& extrinsic) {
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["translation"]) {
@@ -91,18 +91,18 @@ bool load_extrinsic(std::string file_path, Eigen::Affine3d& extrinsic) {
   return false;
 }
 
-void load_pcds(std::string file_path, 
+void LoadPcds(std::string file_path, 
         unsigned int frame_index,
         const Eigen::Affine3d& pose,
         VelodyneFrame& velodyne_frame, 
         bool is_global) {
-    velodyne_frame.frame_index = frame_index;
-    velodyne_frame.pose = pose;
-    load_pcds(file_path, frame_index, pose, velodyne_frame.pt3ds, 
-              velodyne_frame.intensities, is_global);
+  velodyne_frame.frame_index = frame_index;
+  velodyne_frame.pose = pose;
+  LoadPcds(file_path, frame_index, pose, velodyne_frame.pt3ds, 
+      velodyne_frame.intensities, is_global);
 }
 
-void load_pcds(std::string file_path, 
+void LoadPcds(std::string file_path, 
     unsigned int frame_index,
     const Eigen::Affine3d& pose,
     std::vector<Eigen::Vector3d>& pt3ds, 
