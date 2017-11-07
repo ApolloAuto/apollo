@@ -250,8 +250,8 @@ bool QpSplinePathGenerator::AddConstraint(
       spline_generator_->mutable_spline_constraint();
 
   // add init status constraint, equality constraint
-  spline_constraint->AddPointConstraint(init_frenet_point_.s(), 0.0);
-
+  spline_constraint->AddPointConstraint(init_frenet_point_.s(),
+                                        init_frenet_point_.l() - ref_l_);
   spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
                                                   init_frenet_point_.dl());
   spline_constraint->AddPointSecondDerivativeConstraint(
