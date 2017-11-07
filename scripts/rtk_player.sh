@@ -23,6 +23,13 @@ cd "${DIR}/.."
 
 set -x
 
+function setup() {
+  bash scripts/canbus.sh start
+  bash scripts/gps.sh start
+  bash scripts/localization.sh start
+  bash scripts/control.sh start
+}
+
 function start() {
   NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_player.py")"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
@@ -37,6 +44,9 @@ function stop() {
 }
 
 case $1 in
+  setup)
+    setup
+    ;;
   start)
     start
     ;;

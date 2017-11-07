@@ -19,8 +19,8 @@
  * @brief Some string util functions.
  */
 
-#ifndef MODULES_COMMON_STRING_UTIL_H_
-#define MODULES_COMMON_STRING_UTIL_H_
+#ifndef MODULES_COMMON_UTIL_STRING_UTIL_H_
+#define MODULES_COMMON_UTIL_STRING_UTIL_H_
 
 #include <sstream>
 #include <string>
@@ -135,4 +135,4 @@ std::ostream& operator<<(
 
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_STRING_UTIL_H_
+#endif  // MODULES_COMMON_UTIL_STRING_UTIL_H_
