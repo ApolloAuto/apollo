@@ -6,6 +6,8 @@ cc_library(
     name = "behavior_decider",
     hdrs = [
         "behavior_decider.h",
+        "scenario.h",
+        "scenario_manager.h",
     ],
     srcs = [
         "behavior_decider.cc",

@@ -45,7 +45,7 @@ namespace planning {
 
 class Scenario {
  public:
-  explicit Scenario(std::string name) : _name(std::move(name)) {}
+  explicit Scenario(std::string name) : name_(std::move(name)) {}
   virtual ~Scenario() = default;
   /**
    * Individual Decision/SamplingCondition for specific scenario
