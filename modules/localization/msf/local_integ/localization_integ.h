@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
- * @file localization_integ_process.h
- * @brief The class of MeasureRepublishProcess
+ * @file localization_integ.h
+ * @brief The class of LocalizationInteg
  */
 
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_H_
