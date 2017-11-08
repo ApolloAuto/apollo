@@ -36,12 +36,13 @@
 namespace apollo {
 namespace control {
 
-using common::TrajectoryPoint;
-using common::Point3D;
-using common::VehicleState;
-using Matrix = Eigen::MatrixXd;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Point3D;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleStateProvider;
+using apollo::common::util::StrCat;
+using Matrix = Eigen::MatrixXd;
 
 namespace {
 
@@ -84,9 +85,7 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
   AINFO << "Using " << name_;
 }
 
-LatController::~LatController() {
-  CloseLogFile();
-}
+LatController::~LatController() { CloseLogFile(); }
 
 bool LatController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -127,18 +126,21 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
 void LatController::ProcessLogs(const SimpleLateralDebug *debug,
                                 const canbus::Chassis *chassis) {
-  const std::string log_str = apollo::common::util::StrCat(
-      debug->lateral_error(), ",", debug->ref_heading(), ",",
-      VehicleState::instance()->heading(), ",", debug->heading_error(), ",",
-      debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
-      debug->curvature(), ",", debug->steer_angle(), ",",
-      debug->steer_angle_feedforward(), ",",
-      debug->steer_angle_lateral_contribution(), ",",
-      debug->steer_angle_lateral_rate_contribution(), ",",
-      debug->steer_angle_heading_contribution(), ",",
-      debug->steer_angle_heading_rate_contribution(), ",",
-      debug->steer_angle_feedback(), ",", chassis->steering_percentage(), ",",
-      VehicleState::instance()->linear_velocity());
+  // StrCat supports 9 arguments at most.
+  const std::string log_str = StrCat(
+      StrCat(debug->lateral_error(), ",", debug->ref_heading(), ",",
+             VehicleStateProvider::instance()->heading(), ",",
+             debug->heading_error(), ","),
+      StrCat(debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
+             debug->curvature(), ",", debug->steer_angle(), ","),
+      StrCat(debug->steer_angle_feedforward(), ",",
+             debug->steer_angle_lateral_contribution(), ",",
+             debug->steer_angle_lateral_rate_contribution(), ",",
+             debug->steer_angle_heading_contribution(), ","),
+      StrCat(debug->steer_angle_heading_rate_contribution(), ",",
+             debug->steer_angle_feedback(), ",",
+             chassis->steering_percentage(), ",",
+             VehicleStateProvider::instance()->linear_velocity()));
   if (FLAGS_enable_csv_debug) {
     steer_log_file_ << log_str << std::endl;
   }
@@ -167,6 +169,8 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
       control_conf->lat_controller_conf().mean_filter_window_size());
   **/
   lateral_error_filter_ =
+      MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
+  heading_error_filter_ =
       MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
 }
 
@@ -255,20 +259,16 @@ void LatController::LoadLatGainScheduler(
       << "Fail to load heading error gain scheduler";
 }
 
-void LatController::Stop() {
-  CloseLogFile();
-}
+void LatController::Stop() { CloseLogFile(); }
 
-std::string LatController::Name() const {
-  return name_;
-}
+std::string LatController::Name() const { return name_; }
 
 Status LatController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  VehicleState::instance()->set_linear_velocity(chassis->speed_mps());
+  VehicleStateProvider::instance()->set_linear_velocity(chassis->speed_mps());
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -288,11 +288,13 @@ Status LatController::ComputeControlCommand(
   // Add gain sheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
-        matrix_q_(0, 0) * lat_err_interpolation_->Interpolate(
-                              VehicleState::instance()->linear_velocity());
+        matrix_q_(0, 0) *
+        lat_err_interpolation_->Interpolate(
+            VehicleStateProvider::instance()->linear_velocity());
     matrix_q_updated_(2, 2) =
-        matrix_q_(2, 2) * heading_err_interpolation_->Interpolate(
-                              VehicleState::instance()->linear_velocity());
+        matrix_q_(2, 2) *
+        heading_err_interpolation_->Interpolate(
+            VehicleStateProvider::instance()->linear_velocity());
     common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_updated_,
                                   matrix_r_, lqr_eps_, lqr_max_iteration_,
                                   &matrix_k_);
@@ -318,8 +320,8 @@ Status LatController::ComputeControlCommand(
   if (FLAGS_set_steer_limit) {
     double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
-                  (VehicleState::instance()->linear_velocity() *
-                   VehicleState::instance()->linear_velocity())) *
+                  (VehicleStateProvider::instance()->linear_velocity() *
+                   VehicleStateProvider::instance()->linear_velocity())) *
         steer_transmission_ratio_ * 180 / M_PI /
         steer_single_direction_max_degree_ * 100;
 
@@ -352,7 +354,7 @@ Status LatController::ComputeControlCommand(
       -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
 
-  debug->set_heading(VehicleState::instance()->heading());
+  debug->set_heading(VehicleStateProvider::instance()->heading());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforward);
   debug->set_steer_angle_lateral_contribution(steer_angle_lateral_contribution);
@@ -363,7 +365,7 @@ Status LatController::ComputeControlCommand(
       steer_angle_heading_rate_contribution);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
-  debug->set_ref_speed(VehicleState::instance()->linear_velocity());
+  debug->set_ref_speed(VehicleStateProvider::instance()->linear_velocity());
 
   ProcessLogs(debug, chassis);
   return Status::OK();
@@ -375,72 +377,23 @@ Status LatController::Reset() {
   return Status::OK();
 }
 
-// state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
-// Rate, Preview Lateral1, Preview Lateral2, ...]
-void LatController::UpdateState(SimpleLateralDebug *debug) {
-  TrajectoryPoint traj_point;
-  const auto &position = VehicleState::instance()->ComputeCOMPosition(lr_);
-  double raw_lateral_error = GetLateralError(position, &traj_point);
-
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
-  debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
-
-  // ref_curvature_ = traj_point.kappa();
-  debug->set_curvature(traj_point.path_point().kappa());
-
-  // ref_heading_ = traj_point.theta;
-  debug->set_ref_heading(traj_point.path_point().theta());
-
-  // heading_error_ =
-  //    common::math::NormalizeAngle(VehicleState::instance()->heading() -
-  //    ref_heading_);
-  debug->set_heading_error(common::math::NormalizeAngle(
-      VehicleState::instance()->heading() - traj_point.path_point().theta()));
-
-  // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
-
-  // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
-  debug->set_heading_error_rate(
-      (debug->heading_error() - previous_heading_error_) / ts_);
-  // lateral_error_rate_ = (lateral_error_ - previous_lateral_error_) / ts_;
-  debug->set_lateral_error_rate(
-      (debug->lateral_error() - previous_lateral_error_) / ts_);
-
-  // Prepare for next iteration.
-  previous_heading_error_ = debug->heading_error();
-  previous_lateral_error_ = debug->lateral_error();
-
-  // State matrix update;
-  // First four elements are fixed;
-  matrix_state_(0, 0) = debug->lateral_error();
-  matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
-  matrix_state_(3, 0) = debug->heading_error_rate();
-
-  // Next elements are depending on preview window size;
-  for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    const auto &future_position_estimate =
-        VehicleState::instance()->EstimateFuturePosition(preview_time);
-    double preview_lateral = GetLateralError(future_position_estimate, nullptr);
-    matrix_state_(basic_state_size_ + i, 0) = preview_lateral;
-  }
-  // preview matrix update;
-}
-
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
-  const auto &com = VehicleState::instance()->ComputeCOMPosition(lr_);
-  ComputeLateralErrors(com.x(), com.y(), VehicleState::instance()->heading(),
-                       VehicleState::instance()->linear_velocity(),
-                       VehicleState::instance()->angular_velocity(),
-                       trajectory_analyzer_, debug);
+  if (FLAGS_use_relative_position) {
+    ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
+                         VehicleStateProvider::instance()->linear_velocity(),
+                         VehicleStateProvider::instance()->angular_velocity(),
+                         trajectory_analyzer_, debug);
+  } else {
+    const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
+    ComputeLateralErrors(com.x(), com.y(),
+                         VehicleStateProvider::instance()->heading(),
+                         VehicleStateProvider::instance()->linear_velocity(),
+                         VehicleStateProvider::instance()->angular_velocity(),
+                         trajectory_analyzer_, debug);
+  }
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() ==
+  if (VehicleStateProvider::instance()->gear() ==
       canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
@@ -473,7 +426,7 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix() {
-  double v = std::max(VehicleState::instance()->linear_velocity(), 0.2);
+  double v = std::max(VehicleStateProvider::instance()->linear_velocity(), 0.2);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
@@ -501,7 +454,7 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
       lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
 
   // then change it from rad to %
-  double v = VehicleState::instance()->linear_velocity();
+  double v = VehicleStateProvider::instance()->linear_velocity();
   double steer_angle_feedforwardterm =
       (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
        matrix_k_(0, 2) *
@@ -537,34 +490,59 @@ double LatController::GetLateralError(const common::math::Vec2d &point,
 void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
-    SimpleLateralDebug *debug) const {
-  auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+    SimpleLateralDebug *debug) {
+  // TODO(QiL): change this to conf.
+  ::apollo::common::TrajectoryPoint target_point;
+  if (FLAGS_use_relative_position) {
+    target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        FLAGS_query_relative_time);
+  } else {
+    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+  }
 
-  double dx = x - matched_point.path_point().x();
-  double dy = y - matched_point.path_point().y();
+  double dx = x - target_point.path_point().x();
+  double dy = y - target_point.path_point().y();
 
-  double cos_matched_theta = std::cos(matched_point.path_point().theta());
-  double sin_matched_theta = std::sin(matched_point.path_point().theta());
+  ADEBUG << "x point: " << x << " y point: " << y;
+  ADEBUG << "math point x: " << target_point.path_point().x()
+         << " y point: " << target_point.path_point().y();
+
+  double cos_matched_theta = std::cos(target_point.path_point().theta());
+  double sin_matched_theta = std::sin(target_point.path_point().theta());
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
-  debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
+  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
 
+  // TODO(QiL): Code reformat when done with test
+  double raw_lateral_error = cos_matched_theta * dy - sin_matched_theta * dx;
+  if (FLAGS_use_relative_position) {
+    double filtered_lateral_error =
+        lateral_error_filter_.Update(raw_lateral_error);
+    debug->set_lateral_error(filtered_lateral_error);
+  } else {
+    debug->set_lateral_error(raw_lateral_error);
+  }
   double delta_theta =
-      common::math::NormalizeAngle(theta - matched_point.path_point().theta());
+      common::math::NormalizeAngle(theta - target_point.path_point().theta());
   double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = linear_v * sin_delta_theta;
+  // theta_error = delta_theta
+  // TODO(QiL): Code reformat after test
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
+  if (FLAGS_use_relative_position) {
+    debug->set_heading_error(heading_error_filter_.Update(delta_theta));
+  } else {
+    debug->set_heading_error(delta_theta);
+  }
 
-  // theta_error = delta_theta;
-  debug->set_heading_error(delta_theta);
-  // theta_error_dot = angular_v - matched_point.path_point().kappa() *
-  // matched_point.v();
-  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
-                                                matched_point.v());
+  // theta_error_dot = angular_v - target_point.path_point().kappa() *
+  // target_point.v();
+  debug->set_heading_error_rate(
+      angular_v - target_point.path_point().kappa() * target_point.v());
 
-  // matched_theta = matched_point.path_point().theta();
-  debug->set_ref_heading(matched_point.path_point().theta());
-  // matched_kappa = matched_point.path_point().kappa();
-  debug->set_curvature(matched_point.path_point().kappa());
+  // matched_theta = 3.path_point().theta();
+  debug->set_ref_heading(target_point.path_point().theta());
+  // matched_kappa = target_point.path_point().kappa();
+  debug->set_curvature(target_point.path_point().kappa());
 }
 
 }  // namespace control

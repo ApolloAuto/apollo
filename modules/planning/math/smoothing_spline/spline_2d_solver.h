@@ -21,10 +21,10 @@
 #ifndef MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_SOLVER_H_
 #define MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_SOLVER_H_
 
+#include <qpOASES.hpp>
+
 #include <memory>
 #include <vector>
-
-#include "qpOASES/include/qpOASES.hpp"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
@@ -59,6 +59,7 @@ class Spline2dSolver {
 
   int last_num_constraint_ = 0;
   int last_num_param_ = 0;
+  bool last_problem_success_ = false;
 };
 
 }  // namespace planning

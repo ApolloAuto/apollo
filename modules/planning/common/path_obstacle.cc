@@ -25,6 +25,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -33,7 +34,8 @@
 namespace apollo {
 namespace planning {
 
-using common::VehicleConfigHelper;
+using apollo::common::util::FindOrDie;
+using apollo::common::VehicleConfigHelper;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;
@@ -233,19 +235,13 @@ ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  auto lhs_iter =
-      s_longitudinal_decision_safety_sorter_.find(lhs.object_tag_case());
-  DCHECK(lhs_iter != s_longitudinal_decision_safety_sorter_.end())
-      << "decision : " << lhs.ShortDebugString()
-      << " not found in safety sorter";
-  auto rhs_iter =
-      s_longitudinal_decision_safety_sorter_.find(rhs.object_tag_case());
-  DCHECK(rhs_iter != s_longitudinal_decision_safety_sorter_.end())
-      << "decision : " << rhs.ShortDebugString()
-      << " not found in safety sorter";
-  if (lhs_iter->second < rhs_iter->second) {
+  const auto lhs_val = FindOrDie(s_longitudinal_decision_safety_sorter_,
+                                 lhs.object_tag_case());
+  const auto rhs_val = FindOrDie(s_longitudinal_decision_safety_sorter_,
+                                 rhs.object_tag_case());
+  if (lhs_val < rhs_val) {
     return rhs;
-  } else if (lhs_iter->second > rhs_iter->second) {
+  } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
     if (lhs.has_ignore()) {
@@ -294,17 +290,13 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  auto lhs_iter = s_lateral_decision_safety_sorter_.find(lhs.object_tag_case());
-  DCHECK(lhs_iter != s_lateral_decision_safety_sorter_.end())
-      << "decision : " << lhs.ShortDebugString()
-      << " not found in safety sorter";
-  auto rhs_iter = s_lateral_decision_safety_sorter_.find(rhs.object_tag_case());
-  DCHECK(rhs_iter != s_lateral_decision_safety_sorter_.end())
-      << "decision : " << rhs.ShortDebugString()
-      << " not found in safety sorter";
-  if (lhs_iter->second < rhs_iter->second) {
+  const auto lhs_val = FindOrDie(s_lateral_decision_safety_sorter_,
+                                 lhs.object_tag_case());
+  const auto rhs_val = FindOrDie(s_lateral_decision_safety_sorter_,
+                                 rhs.object_tag_case());
+  if (lhs_val < rhs_val) {
     return rhs;
-  } else if (lhs_iter->second > rhs_iter->second) {
+  } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
     if (lhs.has_ignore()) {

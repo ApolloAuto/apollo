@@ -26,6 +26,7 @@
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 #include "Eigen/Dense"
+#include "modules/planning/math/curve1d/quintic_spiral_path.h"
 
 namespace apollo {
 namespace planning {
@@ -72,15 +73,15 @@ class SpiralProblemInterface : public Ipopt::TNLP {
    *   2) The values of the jacobian (if "values" is not NULL)
    */
   bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
-      int* iRow, int* jCol, double* values) override;
+                  int* iRow, int* jCol, double* values) override;
 
   /** Method to return:
    *   1) The structure of the hessian of the lagrangian (if "values" is NULL)
    *   2) The values of the hessian of the lagrangian (if "values" is not NULL)
    */
   bool eval_h(int n, const double* x, bool new_x, double obj_factor, int m,
-      const double* lambda, bool new_lambda, int nele_hess, int* iRow,
-      int* jCol, double* values) override;
+              const double* lambda, bool new_lambda, int nele_hess, int* iRow,
+              int* jCol, double* values) override;
 
   /** @name Solution Methods */
   /** This method is called when the algorithm is complete so the TNLP can
@@ -92,6 +93,8 @@ class SpiralProblemInterface : public Ipopt::TNLP {
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
  private:
+  void update_piecewise_spiral_paths(const double* x, const int n);
+
   std::vector<Eigen::Vector2d> points_;
 
   std::vector<double> theta_;
@@ -123,6 +126,8 @@ class SpiralProblemInterface : public Ipopt::TNLP {
   const std::size_t num_of_internal_points_ = 5;
 
   std::vector<double> relative_theta_;
+
+  std::vector<QuinticSpiralPath> piecewise_paths_;
 };
 
 }  // namespace planning

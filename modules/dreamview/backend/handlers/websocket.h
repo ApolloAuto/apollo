@@ -26,6 +26,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <vector>
 
 #include "CivetServer.h"
 #include "third_party/json/json.hpp"
@@ -51,6 +52,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
   using Json = nlohmann::json;
   using Connection = struct mg_connection;
   using MessageHandler = std::function<void(const Json &, Connection *)>;
+  using ConnectionReadyHandler = std::function<void(Connection *)>;
 
   /**
    * @brief Callback method for when the client intends to establish a websocket
@@ -122,9 +124,19 @@ class WebSocketHandler : public CivetWebSocketHandler {
     message_handlers_[type] = handler;
   }
 
+  /**
+   * @brief Add a new handler for new connections.
+   * @param handler The function to handle the new connection in ReadyState.
+   */
+  void RegisterConnectionReadyHandler(ConnectionReadyHandler handler) {
+    connection_ready_handlers_.emplace_back(handler);
+  }
+
  private:
   // Message handlers keyed by message type.
   std::unordered_map<std::string, MessageHandler> message_handlers_;
+  // New connection ready handlers.
+  std::vector<ConnectionReadyHandler> connection_ready_handlers_;
 
   // The mutex guarding the connection set. We are not using read
   // write lock, as the server is not expected to get many clients

@@ -43,6 +43,7 @@ bash apollo.sh buildvelodyne
 ```xml
 <arg name="calibration_online" default="true" />
 ```
+> 注意: 该参数只对64线雷达生效
 
 当该参数设置为`true`的时候，不需要提供内参文件；设置为`false`时，必须提供内参文件
 **内参文件**
@@ -55,12 +56,6 @@ bash apollo.sh buildvelodyne
 <arg name="extrinsics_velodyne64" default="$(find velodyne_pointcloud)/params/velodyne64_novatel_extrinsics_example.yaml"/>
 ```
 
-**时区** 
-```xml
-<!-- Beijing UTC+8 -->
-<!-- California UTC-8 -->
-<arg name="time_zone" default="-8" />
-```
 ### 启动velodyne驱动
 **请先修改并确认launch文件中的参数与实际车辆相对应**
 ```bash

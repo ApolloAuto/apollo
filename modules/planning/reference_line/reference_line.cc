@@ -65,8 +65,10 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
     return reference_points_.front();
   }
   if (s > accumulated_s.back()) {
-    AWARN << "The requested s " << s << " > reference line length "
-          << accumulated_s.back();
+    if (s > 1e6) {
+      AWARN << "The requested s " << s << " > reference line length "
+            << accumulated_s.back();
+    }
     return reference_points_.back();
   }
 
@@ -225,6 +227,14 @@ const MapPath& ReferenceLine::map_path() const { return map_path_; }
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
   return map_path_.GetWidth(s, left_width, right_width);
+}
+
+bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
+  common::SLPoint sl_point;
+  if (!XYToSL(vec2d_point, &sl_point)) {
+    return false;
+  }
+  return IsOnRoad(sl_point);
 }
 
 bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {

@@ -19,8 +19,6 @@
 #ifndef MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
 #define MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
 
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
 

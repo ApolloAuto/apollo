@@ -31,12 +31,12 @@ class PointCloudDumpNodelet : public nodelet::Nodelet {
 
  private:
   virtual void onInit();
-  boost::shared_ptr<PointCloudDump> _pc_dump;
+  boost::shared_ptr<PointCloudDump> pc_dump_;
 };
 
 /** @brief Nodelet initialization. */
 void PointCloudDumpNodelet::onInit() {
-  _pc_dump.reset(new PointCloudDump(getNodeHandle(), getPrivateNodeHandle()));
+  pc_dump_.reset(new PointCloudDump(getNodeHandle(), getPrivateNodeHandle()));
 }
 
 }  // namespace velodyne

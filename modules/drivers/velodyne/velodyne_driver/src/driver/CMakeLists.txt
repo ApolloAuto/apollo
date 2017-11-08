@@ -1,8 +1,8 @@
 # build the driver node
 add_executable(driver_node 
-  velodyne_node.cpp 
+  driver_node.cpp 
   driver.cpp 
-  # driver16.cpp
+  driver16.cpp
   # driver32.cpp
   driver64.cpp
   )
@@ -15,7 +15,7 @@ target_link_libraries(driver_node
 add_library(driver_nodelet 
   driver_nodelet.cpp
   driver.cpp 
-  # driver16.cpp
+  driver16.cpp
   # driver32.cpp
   driver64.cpp
 )

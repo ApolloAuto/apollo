@@ -189,43 +189,6 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
       PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore)
           .has_ignore());
 
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_overtake,
-                                                       decision_nudge),
-               ".*decision : nudge \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_nudge),
-      ".*decision : nudge \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_nudge),
-      ".*decision : nudge \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_nudge),
-      ".*decision : nudge \\{ \\} not found in safety sorter.*");
-
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_overtake,
-                                                       decision_sidepass),
-               ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_follow,
-                                                       decision_sidepass),
-               ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_yield,
-                                                       decision_sidepass),
-               ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_sidepass),
-      ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_nudge,
-                                                       decision_overtake),
-               ".*decision : nudge \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_sidepass,
-                                                       decision_overtake),
-               ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-
-  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_nudge,
-                                                       decision_sidepass),
-               ".*decision : nudge \\{ \\} not found in safety sorter.*");
-
   ObjectDecisionType decision_overtake1;
   decision_overtake1.mutable_overtake()->set_distance_s(1);
   ObjectDecisionType decision_overtake2;
@@ -293,42 +256,12 @@ TEST(MergeLateralDecision, AllDecisions) {
       PathObstacle::MergeLateralDecision(decision_ignore, decision_nudge)
           .has_nudge());
 
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_overtake),
-      ".*decision : overtake \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_follow),
-      ".*decision : follow \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_yield),
-      ".*decision : yield \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_stop),
-      ".*decision : stop \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_sidepass),
-      ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_overtake, decision_nudge),
-      ".*decision : overtake \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_sidepass, decision_nudge),
-      ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_overtake, decision_sidepass),
-      ".*decision : overtake \\{ \\} not found in safety sorter.*");
-
   ObjectDecisionType decision_nudge2;
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
   EXPECT_TRUE(
       PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2)
           .has_nudge());
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
-  EXPECT_DEATH(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2),
-      ".*could not merge left nudge and right nudge");
 }
 
 TEST(PathObstacleTest, add_decision_test) {
@@ -422,10 +355,6 @@ TEST(PathObstacleTest, add_decision_test) {
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
     EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
-
-    decision.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
-    EXPECT_DEATH(path_obstacle.AddLateralDecision("test_right_nudge", decision),
-                 ".*could not merge left nudge and right nudge");
   }
 
   // overtake and ignore

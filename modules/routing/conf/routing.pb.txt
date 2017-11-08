@@ -1,7 +1,0 @@
-base_speed: 4.167
-left_turn_penalty: 50.0
-right_turn_penalty: 20.0
-uturn_penalty: 100.0
-change_penalty: 50.0
-base_changing_length: 50.0
-min_length_for_lane_change: 10.0

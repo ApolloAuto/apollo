@@ -9,5 +9,4 @@ message RoutingConfig {
   optional double uturn_penalty = 4 ;     // left turn penalty for node creater [m]
   optional double change_penalty = 5;     // change penalty for edge creater [m]
   optional double base_changing_length = 6;  // base change length penalty for edge creater [m]
-  optional double min_length_for_lane_change = 7; // min length for lane change [m]
 }

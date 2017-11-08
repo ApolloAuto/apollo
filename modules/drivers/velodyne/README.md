@@ -39,6 +39,8 @@ First, specify the parameters of the car.
 ```xml
 <arg name="calibration_online" default="true" />
 ```
+> Notice: Only for velodyne64
+
 When calibration_online is true, intrinsic parameter file is not needed, otherwise, please specify the intrinsic parameter file as below:
 
 **intrinsic parameter file**
@@ -51,12 +53,6 @@ When calibration_online is true, intrinsic parameter file is not needed, otherwi
 <arg name="extrinsics_velodyne64" default="$(find velodyne_pointcloud)/params/velodyne64_novatel_extrinsics_example.yaml"/>
 ```
 
-**timezone** 
-```xml
-<!-- Beijing UTC+8 -->
-<!-- California UTC-8 -->
-<arg name="time_zone" default="-8" />
-```
 ### Start Velodyne Driver
 **Plese first change the parameters in the launch file for your car**
 ```bash

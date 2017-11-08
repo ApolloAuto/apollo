@@ -25,7 +25,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -253,7 +253,13 @@ Status Control::CheckInput() {
     }
   }
 
-  common::VehicleState::instance()->Update(localization_, chassis_);
+  // Add tempprary flag for test
+  if (FLAGS_use_relative_position) {
+    localization_.mutable_pose()->mutable_position()->set_x(0.0);
+    localization_.mutable_pose()->mutable_position()->set_y(0.0);
+    localization_.mutable_pose()->set_heading(0.0);
+  }
+  common::VehicleStateProvider::instance()->Update(localization_, chassis_);
 
   return Status::OK();
 }

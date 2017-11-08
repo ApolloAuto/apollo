@@ -28,6 +28,7 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -477,7 +478,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
   const std::string id = std::to_string(obstacle.id());
   // Create a new world object and put it into object map if the id does not
   // exist in the map yet.
-  if (obj_map_.find(id) == obj_map_.end()) {
+  if (!apollo::common::util::ContainsKey(obj_map_, id)) {
     Object &world_obj = obj_map_[id];
     SetObstacleInfo(obstacle, &world_obj);
     SetObstaclePolygon(obstacle, &world_obj);
@@ -503,38 +504,15 @@ void SimulationWorldService::UpdatePlanningTrajectory(
 
   util::TrajectoryPointCollector collector(&world_);
 
-  size_t i = 0;
-  const size_t trajectory_length = trajectory.trajectory_point_size();
   bool collecting_started = false;
-  while (i < trajectory_length) {
-    const TrajectoryPoint &point = trajectory.trajectory_point(i);
+  for (const TrajectoryPoint &point : trajectory.trajectory_point()) {
     // Trajectory points with a timestamp older than the cutoff time
     // (which is effectively the timestamp of the most up-to-date
     // localization/chassis message) will be dropped.
-    //
-    // Note that the last two points are always included.
     if (collecting_started ||
         point.relative_time() + header_time >= cutoff_time) {
       collecting_started = true;
       collector.Collect(point);
-      if (i == trajectory_length - 1) {
-        // Break if the very last point is collected.
-        break;
-      } else if (i == trajectory_length - 2) {
-        // Move on to the last point if the last but one is collected.
-        i = trajectory_length - 1;
-      } else if (i < trajectory_length - 2) {
-        // When collecting the trajectory points, downsample with a ratio of 10.
-        constexpr double downsample_ratio = 10;
-        i += downsample_ratio;
-        if (i > trajectory_length - 2) {
-          i = trajectory_length - 2;
-        }
-      } else {
-        break;
-      }
-    } else {
-      ++i;
     }
   }
 }
@@ -640,14 +618,69 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 }
 
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
+  size_t max_interval = 10;
   auto *planning_data = world_.mutable_planning_data();
 
-  planning_data->mutable_speed_plan()->CopyFrom(data.speed_plan());
-  planning_data->mutable_st_graph()->CopyFrom(data.st_graph());
+  // Update SL Frame
   planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
 
+  // Update ST Graph
+  planning_data->clear_st_graph();
+  for (auto &graph : data.st_graph()) {
+    auto *st_graph = planning_data->add_st_graph();
+    st_graph->set_name(graph.name());
+    st_graph->mutable_boundary()->CopyFrom(graph.boundary());
+    if (graph.has_kernel_cruise_ref()) {
+      st_graph->mutable_kernel_cruise_ref()->CopyFrom(
+          graph.kernel_cruise_ref());
+    }
+    if (graph.has_kernel_follow_ref()) {
+      st_graph->mutable_kernel_follow_ref()->CopyFrom(
+          graph.kernel_follow_ref());
+    }
+    if (graph.has_speed_constraint()) {
+      st_graph->mutable_speed_constraint()->CopyFrom(graph.speed_constraint());
+    }
+
+    // downsample speed_profile and speed_limit
+    // The x-axis range is always [-10, 200], downsample to ~200 points but skip
+    // max 10 points
+    size_t profile_downsample_interval =
+        std::max(1, (graph.speed_profile_size() / 200));
+    profile_downsample_interval =
+        std::min(profile_downsample_interval, max_interval);
+    DownsampleSpeedPointsByInterval(graph.speed_profile(),
+                                    profile_downsample_interval,
+                                    st_graph->mutable_speed_profile());
+
+    size_t limit_downsample_interval =
+        std::max(1, (graph.speed_limit_size() / 200));
+    limit_downsample_interval =
+        std::min(limit_downsample_interval, max_interval);
+    DownsampleSpeedPointsByInterval(graph.speed_limit(),
+                                    limit_downsample_interval,
+                                    st_graph->mutable_speed_limit());
+  }
+
+  // Update Speed Plan
+  planning_data->clear_speed_plan();
+  for (auto &plan : data.speed_plan()) {
+    if (plan.speed_point_size() > 0) {
+      auto *downsampled_plan = planning_data->add_speed_plan();
+      downsampled_plan->set_name(plan.name());
+
+      // Downsample the speed plan for frontend display.
+      // The x-axis range is always [-2, 10], downsample to ~80 points
+      size_t interval = std::max(1, (plan.speed_point_size() / 80));
+      interval = std::min(interval, max_interval);
+      DownsampleSpeedPointsByInterval(plan.speed_point(), interval,
+                                      downsampled_plan->mutable_speed_point());
+    }
+  }
+
+  // Update path
   planning_data->clear_path();
-  for (const ::apollo::common::Path &path : data.path()) {
+  for (auto &path : data.path()) {
     // Downsample the path points for frontend display.
     // Angle threshold is about 5.72 degree.
     constexpr double angle_threshold = 0.1;
@@ -663,8 +696,31 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
       point->set_y(path_point.y());
       point->set_s(path_point.s());
       point->set_kappa(path_point.kappa());
+      point->set_dkappa(path_point.dkappa());
     }
   }
+}
+
+template <typename Points>
+void SimulationWorldService::DownsampleSpeedPointsByInterval(
+    const Points &points, size_t downsampleInterval,
+    Points *downsampled_points) {
+  if (points.size() == 0) {
+    return;
+  }
+
+  for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
+    auto *point = downsampled_points->Add();
+    point->set_s(points[i].s());
+    point->set_t(points[i].t());
+    point->set_v(points[i].v());
+  }
+
+  // add the last point
+  auto *point = downsampled_points->Add();
+  point->set_s(points[points.size() - 1].s());
+  point->set_t(points[points.size() - 1].t());
+  point->set_v(points[points.size() - 1].v());
 }
 
 template <>

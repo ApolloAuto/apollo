@@ -36,8 +36,8 @@ QpSplinePathOptimizer::QpSplinePathOptimizer()
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
   qp_spline_path_config_ = config.em_planner_config().qp_spline_path_config();
   std::vector<double> init_knots;
-  spline_generator_.reset(new Spline1dGenerator(init_knots,
-      qp_spline_path_config_.spline_order()));
+  spline_generator_.reset(
+      new Spline1dGenerator(init_knots, qp_spline_path_config_.spline_order()));
   is_init_ = true;
   return true;
 }
@@ -54,6 +54,7 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
                                        qp_spline_path_config_,
                                        reference_line_info_->AdcSlBoundary());
   path_generator.SetDebugLogger(reference_line_info_->mutable_debug());
+  path_generator.SetChangeLane(reference_line_info_->IsChangeLanePath());
 
   if (!path_generator.Generate(
           reference_line_info_->path_decision()->path_obstacles().Items(),

@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/topo_test_utils.h"
 
 namespace apollo {
@@ -55,6 +56,7 @@ void GetRangeVec(std::vector<NodeSRange>* range_vec) {
 }  // namespace
 
 TEST(TopoNodeTestSuit, static_func_test) {
+  FLAGS_min_length_for_lane_change = 10.0;
   std::vector<NodeSRange> range_vec;
   GetRangeVec(&range_vec);
   {

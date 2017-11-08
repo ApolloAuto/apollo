@@ -3,6 +3,7 @@ import { observable, action } from "mobx";
 import PARAMETERS from "store/config/parameters.yml";
 
 export default class Options {
+    @observable showPOI = PARAMETERS.options.defaults.showPOI;
     @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showConsole = PARAMETERS.options.defaults.showConsole;
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
@@ -34,15 +35,24 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesId;
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
 
+    @action toggleShowPOI() {
+        this.showPOI = !this.showPOI;
+        if (this.showPOI) {
+            this.showMenu = false;
+            this.showConsole = false;
+        }
+    }
     @action toggleShowMenu() {
         this.showMenu = !this.showMenu;
         if (this.showMenu) {
+            this.showPOI = false;
             this.showConsole = false;
         }
     }
     @action toggleShowConsole() {
         this.showConsole = !this.showConsole;
         if (this.showConsole) {
+            this.showPOI = false;
             this.showMenu = false;
         }
     }
