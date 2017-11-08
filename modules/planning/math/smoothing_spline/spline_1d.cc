@@ -89,16 +89,6 @@ bool Spline1d::SetSplineSegs(const Eigen::MatrixXd& params,
   return true;
 }
 
-Spline1dSeg* Spline1d::mutable_smoothing_spline(const uint32_t index) {
-  if (index >= splines_.size()) {
-    return nullptr;
-  } else {
-    // TODO(all): the address of spline_[index] may change, so we need a better
-    // design here to avoid potential crash.
-    return &splines_[index];
-  }
-}
-
 const std::vector<double>& Spline1d::x_knots() const { return x_knots_; }
 
 uint32_t Spline1d::spline_order() const { return spline_order_; }
