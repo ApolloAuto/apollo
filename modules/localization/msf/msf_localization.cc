@@ -20,6 +20,7 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace localization {
@@ -119,11 +120,11 @@ void MSFLocalization::Init() {
   localizaiton_param_.extrinsic_imu_gnss_file = FLAGS_extrinsic_imu_gnss_filename;
 
   // lidar module
-  localizaiton_param_.map_path = FLAGS_local_map_path;
+  localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
   localizaiton_param_.lidar_extrinsic_file
-      = TranslatePath(FLAGS_lidar_extrinsic_file);
+      = common::util::TranslatePath(FLAGS_lidar_extrinsic_file);
   localizaiton_param_.lidar_height_file
-      = TranslatePath(FLAGS_lidar_height_file);
+      = common::util::TranslatePath(FLAGS_lidar_height_file);
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;

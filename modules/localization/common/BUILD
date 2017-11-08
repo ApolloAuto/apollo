@@ -12,8 +12,6 @@ cc_library(
     ]),
     deps = [
         "//modules/localization/proto:localization_proto",
-        "//modules/common/util",
-        "//modules/common/util:string_util",
         "@glog//:glog",
     ],
 )

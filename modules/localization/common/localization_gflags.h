@@ -22,10 +22,7 @@
 #ifndef MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
 #define MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
 
-#include <string>
 #include "gflags/gflags.h"
-#include "modules/common/util/file.h"
-#include "modules/common/util/string_util.h"
 
 DECLARE_string(localization_module_name);
 
@@ -53,7 +50,7 @@ DECLARE_double(report_gps_imu_time_diff_threshold);
 DECLARE_bool(enable_gps_timestamp);
 
 // lidar module
-DECLARE_string(local_map_path);
+DECLARE_string(local_map_name);
 DECLARE_string(lidar_extrinsic_file);
 DECLARE_string(lidar_height_file);
 DECLARE_int32(lidar_localization_mode);
@@ -68,6 +65,8 @@ DECLARE_bool(using_raw_gnsspos);
 DECLARE_double(vel_threshold_get_yaw);
 DECLARE_bool(integ_debug_log_flag);
 DECLARE_string(extrinsic_imu_gnss_filename);
+DECLARE_string(broadcast_tf2_frame_id);
+DECLARE_string(broadcast_tf2_child_frame_id);
 
 // gnss module
 DECLARE_bool(enable_ins_aid_rtk);
@@ -78,14 +77,5 @@ DECLARE_double(imu_rate);
 DECLARE_int32(local_utm_zone_id);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
-
-namespace apollo {
-namespace localization {
-
-std::string RosRoot();
-std::string TranslatePath(const std::string &src_path);
-
-}  // namespace localization
-}  // namespace apollo
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

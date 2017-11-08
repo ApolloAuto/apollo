@@ -65,7 +65,7 @@ DEFINE_bool(enable_gps_timestamp, false,
 // DEFINE_double(map_coverage_theshold, 0.9,
 //     "The valid coverage of pointcloud and map.");
 
-DEFINE_string(local_map_path, "../mapdata/local_map",
+DEFINE_string(local_map_name, "local_map",
     "The path of localization map.");
 DEFINE_string(lidar_extrinsic_file, 
     "<ros>/share/velodyne_pointcloud/params/"
@@ -97,6 +97,10 @@ DEFINE_bool(integ_debug_log_flag, false,
     "");
 DEFINE_string(extrinsic_imu_gnss_filename, "", 
     "");
+DEFINE_string(broadcast_tf2_frame_id, "world",
+    "The frame id used to broadcast the localization result.");
+DEFINE_string(broadcast_tf2_child_frame_id, "localization_100hz",
+    "The child frame id used to broadcast the localization result.");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, 
@@ -114,34 +118,3 @@ DEFINE_bool(trans_gpstime_to_utctime, true,
     "");
 DEFINE_int32(gnss_mode, 1,
     "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
-
-namespace apollo {
-namespace localization {
-
-using apollo::common::util::CopyFile;
-using apollo::common::util::StrCat;
-
-std::string RosRoot() {
-  if (const char* ros_root = std::getenv("ROS_ROOT")) {
-    // ROS_ROOT env points to <ros>/share/ros. We shift it to <ros>.
-    return StrCat(ros_root, "/../..");
-  }
-  // If no ROS_ROOT env is available, we assume there is a "ros" dir in current
-  // working directory, which is true for our release image.
-  return "ros";
-}
-
-std::string TranslatePath(const std::string &src_path) {
-  static const std::string kRosPlaceholder = "<ros>";
-  static const std::string kRosRoot = RosRoot();
-
-  std::string result = src_path;
-  const auto pos = src_path.find(kRosPlaceholder);
-  if (pos != std::string::npos) {
-    result.replace(pos, kRosPlaceholder.length(), kRosRoot);
-  }
-  return result;
-}
-
-}  // namespace localization
-}  // namespace apollo
