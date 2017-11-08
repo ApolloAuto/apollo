@@ -20,9 +20,6 @@
 
 #include "modules/planning/math/polynomial_xd.h"
 
-#include <iomanip>
-#include <sstream>
-
 #include "modules/common/log.h"
 
 namespace apollo {
