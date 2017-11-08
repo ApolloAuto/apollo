@@ -25,16 +25,17 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/map_util.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/node_with_range.h"
 #include "modules/routing/graph/range_utils.h"
 
 namespace apollo {
 namespace routing {
+namespace {
 
 using apollo::common::adapter::AdapterManager;
-
-namespace {
+using apollo::common::util::ContainsKey;
 
 bool IsCloseEnough(double value_1, double value_2) {
   constexpr double kEpsilon = 1e-6;
@@ -208,8 +209,7 @@ void ExtendBackward(bool enable_use_road_id,
       // }
 
       // if pred node has been inserted
-      if (node_set_of_curr_passage.find(pred_node) !=
-          node_set_of_curr_passage.end()) {
+      if (ContainsKey(node_set_of_curr_passage, pred_node)) {
         continue;
       }
       // if pred node is reachable from prev passage
@@ -275,8 +275,7 @@ void ExtendForward(bool enable_use_road_id,
       //   continue;
       // }
       // if succ node has been inserted
-      if (node_set_of_curr_passage.find(succ_node) !=
-          node_set_of_curr_passage.end()) {
+      if (ContainsKey(node_set_of_curr_passage, succ_node)) {
         continue;
       }
       // if next passage is reachable from succ node
