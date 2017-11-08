@@ -26,8 +26,7 @@
 namespace apollo {
 namespace planning {
 
-Spline2d::Spline2d(const std::vector<double>& t_knots,
-                   const uint32_t order)
+Spline2d::Spline2d(const std::vector<double>& t_knots, const uint32_t order)
     : t_knots_(t_knots), spline_order_(order) {
   if (t_knots.size() > 1) {
     for (uint32_t i = 1; i < t_knots_.size(); ++i) {
@@ -130,12 +129,6 @@ bool Spline2d::set_splines(const Eigen::MatrixXd& params,
   }
   spline_order_ = order;
   return true;
-}
-
-// get the mutable single smoothing spline, if index out of range, nullptr will
-// returned;
-Spline2dSeg* Spline2d::mutable_smoothing_spline(const uint32_t index) {
-  return &splines_[index];
 }
 
 const Spline2dSeg& Spline2d::smoothing_spline(const uint32_t index) const {
