@@ -43,8 +43,6 @@ class NetModel {
   virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output) const = 0;
 
-  virtual bool VerifyModel() const = 0;
-
   virtual void SetState(const std::vector<Eigen::MatrixXf>& states) {}
 
   virtual void State(std::vector<Eigen::MatrixXf>* states) const {}

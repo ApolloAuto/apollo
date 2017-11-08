@@ -35,7 +35,23 @@ TEST(NetModelTest, verification_test) {
   NetParameter net_parameter = NetParameter();
   EXPECT_TRUE(common::util::GetProtoFromFile(rnn_filename, &net_parameter));
   EXPECT_TRUE(RnnModel::instance()->LoadModel(net_parameter));
-  EXPECT_TRUE(RnnModel::instance()->VerifyModel());
+
+  Eigen::MatrixXf obstacle_feature;
+  Eigen::MatrixXf lane_feature;
+  Eigen::MatrixXf output;
+  for (int i = 0; i < net_parameter.verification_samples_size(); ++i) {
+    VerificationSample sample = net_parameter.verification_samples(i);
+    EXPECT_EQ(sample.features_size(), 2);
+    EXPECT_TRUE(LoadTensor(sample.features(0), &obstacle_feature));
+    EXPECT_TRUE(LoadTensor(sample.features(1), &lane_feature));
+
+    RnnModel::instance()->Run({obstacle_feature, lane_feature}, &output);
+    EXPECT_EQ(output.size(), 1);
+    EXPECT_TRUE(sample.has_probability());
+    EXPECT_NEAR(output(0, 0), sample.probability(), 0.1);
+
+    RnnModel::instance()->ResetState();
+  }
 }
 
 }  // namespace network

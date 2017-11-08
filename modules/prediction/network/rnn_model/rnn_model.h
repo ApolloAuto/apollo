@@ -39,8 +39,6 @@ class RnnModel : public NetModel {
   virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output) const;
 
-  virtual bool VerifyModel() const;
-
   virtual void SetState(const std::vector<Eigen::MatrixXf>& states);
 
   virtual void State(std::vector<Eigen::MatrixXf>* states) const;
