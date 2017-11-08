@@ -240,40 +240,13 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     if (!is_allow_change_lane && !lanes.IsOnSegment()) {
       continue;
     }
-    hdmap::Path hdmap_path;
-    hdmap::PncMap::CreatePathFromLaneSegments(lanes, &hdmap_path);
-    if (FLAGS_enable_smooth_reference_line) {
-      ReferenceLine raw_reference_line(hdmap_path);
-      ReferenceLine reference_line;
-      if (!smoother_->Smooth(raw_reference_line, &reference_line)) {
-        AERROR << "Failed to smooth reference line";
-        continue;
-      }
-
-      bool is_valid_reference_line = true;
-      const double kReferenceLineDiffCheckResolution = 5.0;
-      for (int s = 0.0; s < raw_reference_line.Length();
-           s += kReferenceLineDiffCheckResolution) {
-        auto xy_old = raw_reference_line.GetReferencePoint(s);
-        auto xy_new = reference_line.GetReferencePoint(s);
-        const double diff = xy_old.DistanceTo(xy_new);
-
-        if (diff > FLAGS_smoothed_reference_line_max_diff) {
-          AERROR << "Fail to provide reference line because too large diff "
-                    "between smoothed and raw reference lines. diff: "
-                 << diff;
-          is_valid_reference_line = false;
-          break;
-        }
-      }
-      if (is_valid_reference_line) {
-        reference_lines->emplace_back(std::move(reference_line));
-        segments->emplace_back(lanes);
-      }
-    } else {
-      reference_lines->emplace_back(hdmap_path);
-      segments->emplace_back(lanes);
+    ReferenceLine reference_line;
+    if (!SmoothReferenceLine(lanes, &reference_line)) {
+      AERROR << "Failed to smooth reference line";
+      continue;
     }
+    reference_lines->emplace_back(reference_line);
+    segments->emplace_back(lanes);
   }
 
   if (reference_lines->empty()) {
@@ -284,5 +257,41 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   return true;
 }
 
+bool ReferenceLineProvider::IsReferenceLineSmoothValid(
+    const ReferenceLine &raw, const ReferenceLine &smoothed) const {
+  const double kReferenceLineDiffCheckResolution = 5.0;
+  for (int s = 0.0; s < raw.Length(); s += kReferenceLineDiffCheckResolution) {
+    auto xy_old = raw.GetReferencePoint(s);
+    auto xy_new = smoothed.GetReferencePoint(s);
+    const double diff = xy_old.DistanceTo(xy_new);
+    if (diff > kReferenceLineDiffCheckResolution) {
+      AERROR << "Fail to provide reference line because too large diff "
+                "between smoothed and raw reference lines. diff: "
+             << diff;
+      return false;
+    }
+  }
+  return true;
+}
+
+bool ReferenceLineProvider::SmoothReferenceLine(
+    const hdmap::RouteSegments &lanes, ReferenceLine *reference_line) {
+  hdmap::Path path;
+  hdmap::PncMap::CreatePathFromLaneSegments(lanes, &path);
+  if (!FLAGS_enable_smooth_reference_line) {
+    *reference_line = ReferenceLine(path);
+    return true;
+  }
+  ReferenceLine raw_reference_line(path);
+  if (!smoother_->Smooth(raw_reference_line, reference_line)) {
+    AERROR << "Failed to smooth reference line";
+    return false;
+  }
+  if (!IsReferenceLineSmoothValid(raw_reference_line, *reference_line)) {
+    AERROR << "The smoothed reference line error is too large";
+    return false;
+  }
+  return true;
+}
 }  // namespace planning
 }  // namespace apollo
