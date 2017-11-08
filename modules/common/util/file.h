@@ -194,6 +194,14 @@ bool PathExists(const std::string &path);
 bool DirectoryExists(const std::string &directory_path);
 
 /**
+ * @brief Copy a file.
+ * @param from The file path to copy from.
+ * @param to The file path to copy to.
+ * @return If the action is successful.
+ */
+bool CopyFile(const std::string &from, const std::string &to);
+
+/**
  * @brief Check if a specified directory specified by directory_path exists.
  *        If not, recursively create the directory (and its parents).
  * @param directory_path Directory path.

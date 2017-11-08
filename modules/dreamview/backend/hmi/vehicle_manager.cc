@@ -72,6 +72,7 @@ namespace apollo {
 namespace dreamview {
 namespace {
 
+using apollo::common::util::CopyFile;
 using apollo::common::util::StrCat;
 
 std::string RosRoot() {
@@ -96,18 +97,6 @@ std::string TranslatePath(const std::string &src_path) {
   return result;
 }
 
-void CopyFileIfExists(const std::string &from, const std::string &to) {
-  std::ifstream src(from, std::ios::binary);
-  if (!src) {
-    // Skip if the source file doesn't exist.
-    return;
-  }
-
-  std::ofstream dst(TranslatePath(to), std::ios::binary);
-  CHECK(dst) << "Cannot write to " << to;
-  dst << src.rdbuf();
-}
-
 }  // namespace
 
 bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
@@ -117,25 +106,23 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
   }
 
   // Copy vehicle_param_pb.
-  CopyFileIfExists(StrCat(vehicle_data_path, "/", FLAGS_vehicle_param_pb_file),
-                   FLAGS_vehicle_param_pb_path);
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_vehicle_param_pb_file),
+           FLAGS_vehicle_param_pb_path);
   // Copy calibration_table.
-  CopyFileIfExists(StrCat(vehicle_data_path, "/", FLAGS_calibration_table_file),
-                   FLAGS_calibration_table_path);
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_calibration_table_file),
+           FLAGS_calibration_table_path);
   // Copy velodyne_params.
-  CopyFileIfExists(StrCat(vehicle_data_path, "/", FLAGS_velodyne_launch_file),
-                   FLAGS_velodyne_launch_path);
-  CopyFileIfExists(
-      StrCat(vehicle_data_path, "/", FLAGS_velodyne_intrinsics_file),
-      FLAGS_velodyne_intrinsics_path);
-  CopyFileIfExists(
-      StrCat(vehicle_data_path, "/", FLAGS_velodyne_extrinsics_file),
-      FLAGS_velodyne_extrinsics_path);
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_launch_file),
+           TranslatePath(FLAGS_velodyne_launch_path));
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_intrinsics_file),
+           TranslatePath(FLAGS_velodyne_intrinsics_path));
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_extrinsics_file),
+           TranslatePath(FLAGS_velodyne_extrinsics_path));
   // Copy gnss_conf.
-  CopyFileIfExists(StrCat(vehicle_data_path, "/", FLAGS_gnss_launch_file),
-                   FLAGS_gnss_launch_path);
-  CopyFileIfExists(StrCat(vehicle_data_path, "/", FLAGS_gnss_conf_file),
-                   FLAGS_gnss_conf_path);
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_gnss_launch_file),
+           TranslatePath(FLAGS_gnss_launch_path));
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_gnss_conf_file),
+           TranslatePath(FLAGS_gnss_conf_path));
 
   return true;
 }

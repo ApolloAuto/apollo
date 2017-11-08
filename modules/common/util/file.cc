@@ -55,6 +55,17 @@ bool DirectoryExists(const std::string &directory_path) {
   return false;
 }
 
+bool CopyFile(const std::string &from, const std::string &to) {
+  std::ifstream src(from, std::ios::binary);
+  std::ofstream dst(to, std::ios::binary);
+  if (src && dst) {
+    dst << src.rdbuf();
+    return true;
+  }
+  AERROR_IF(src && !dst) << "Target path is not writable: " << to;
+  return false;
+}
+
 bool EnsureDirectory(const std::string &directory_path) {
   std::string path = directory_path;
   for (size_t i = 1; i < directory_path.size(); ++i) {
