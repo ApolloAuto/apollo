@@ -21,9 +21,22 @@
 #include <limits.h>
 #include <fstream>
 
+#include "modules/common/util/string_util.h"
+
 namespace apollo {
 namespace common {
 namespace util {
+namespace {
+
+std::string GetRosHome() {
+  // Note that ROS_ROOT env points to <ROS_HOME>/share/ros.
+  const std::string known_tail = "/share/ros";
+  const std::string ros_root = CHECK_NOTNULL(std::getenv("ROS_ROOT"));
+  CHECK(EndWith(ros_root, known_tail));
+  return ros_root.substr(0, ros_root.length() - known_tail.length());
+}
+
+}  // namespace
 
 bool GetContent(const std::string &file_name, std::string *content) {
   std::ifstream fin(file_name);
@@ -35,6 +48,21 @@ bool GetContent(const std::string &file_name, std::string *content) {
   str_stream << fin.rdbuf();
   *content = str_stream.str();
   return true;
+}
+
+std::string TranslatePath(const std::string &src_path) {
+  static const std::string kRosHomePlaceHolder = "<ros>";
+  static const std::string kRosHome = GetRosHome();
+
+  std::string result(src_path);
+
+  // Replace ROS home place holder.
+  const auto pos = src_path.find(kRosHomePlaceHolder);
+  if (pos != std::string::npos) {
+    result.replace(pos, kRosHomePlaceHolder.length(), kRosHome);
+  }
+
+  return result;
 }
 
 bool PathExists(const std::string &path) {
