@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/time",
+        "//modules/common/util:map_util",
         "//modules/common/util:string_util",
         "//third_party/json",
         "@civetweb//:civetweb++",

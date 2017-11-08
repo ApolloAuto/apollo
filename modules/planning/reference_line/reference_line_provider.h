@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 /**
  * @file reference_line_provider.h
  *
  * @brief Declaration of the class ReferenceLineProvider.
  */
+
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
+#include <condition_variable>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
+#include "modules/common/proto/vehicle_state.pb.h"
+
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 /**
@@ -55,23 +61,41 @@ class ReferenceLineProvider {
   ~ReferenceLineProvider();
 
   void Init(const hdmap::HDMap* hdmap_,
-            const ReferenceLineSmootherConfig& smoother_config);
+            const QpSplineReferenceLineSmootherConfig& smoother_config);
 
-  void UpdateRoutingResponse(const routing::RoutingResponse& routing);
+  bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
+
+  void UpdateVehicleState(const common::VehicleState& vehicle_state);
 
   bool Start();
 
   void Stop();
 
-  bool HasReferenceLine();
-
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);
 
+  /**
+   * @brief Use PncMap to create refrence line and the corresponding segments
+   * based on routing and current position. This is a thread safe function.
+   * @return true if !reference_lines.empty() && reference_lines.size() ==
+   *                 segments.size();
+   **/
+  bool CreateReferenceLineFromRouting(
+      std::list<ReferenceLine>* reference_lines,
+      std::list<hdmap::RouteSegments>* segments);
+
  private:
-  void Generate();
+  void GenerateThread();
   void IsValidReferenceLine();
-  bool CreateReferenceLineFromRouting(const common::PointENU& position);
+  void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
+  bool IsAllowChangeLane(const common::math::Vec2d& point,
+                         const std::list<hdmap::RouteSegments>& route_segments);
+
+  bool IsReferenceLineSmoothValid(const ReferenceLine& raw,
+                                  const ReferenceLine& smoothed) const;
+
+  bool SmoothReferenceLine(const hdmap::RouteSegments& lanes,
+                           ReferenceLine* reference_line);
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -79,18 +103,29 @@ class ReferenceLineProvider {
   bool is_initialized_ = false;
   std::unique_ptr<std::thread> thread_;
 
+  std::unique_ptr<ReferenceLineSmoother> smoother_;
+
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
+  common::VehicleState vehicle_state_;
 
   bool has_routing_ = false;
 
-  ReferenceLineSmootherConfig smoother_config_;
+  QpSplineReferenceLineSmootherConfig smoother_config_;
 
   bool is_stop_ = false;
 
-  std::mutex reference_line_groups_mutex_;
-  std::list<std::vector<ReferenceLine>> reference_line_groups_;
-  std::list<std::vector<hdmap::RouteSegments>> route_segment_groups_;
+  std::mutex reference_lines_mutex__;
+  std::condition_variable cv_has_reference_line_;
+  std::list<ReferenceLine> reference_lines_;
+  std::list<hdmap::RouteSegments> route_segments_;
+
+  struct SegmentHistory {
+    double min_l = 0.0;
+    double accumulate_s = 0.0;
+    common::math::Vec2d last_point;
+  };
+  std::unordered_map<std::string, SegmentHistory> segment_history_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };

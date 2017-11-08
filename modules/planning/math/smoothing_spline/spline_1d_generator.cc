@@ -85,15 +85,15 @@ bool Spline1dGenerator::Solve() {
       equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
 
   bool use_hotstart =
+      last_problem_success_ &&
       (FLAGS_enable_sqp_solver && sqp_solver_ != nullptr &&
        num_param == last_num_param_ && num_constraint == last_num_constraint_);
 
   if (!use_hotstart) {
     sqp_solver_.reset(new ::qpOASES::SQProblem(num_param, num_constraint,
-                                               ::qpOASES::HST_POSDEF));
+                                               ::qpOASES::HST_UNKNOWN));
     ::qpOASES::Options my_options;
     my_options.enableCholeskyRefactorisation = 1;
-    my_options.enableRegularisation = ::qpOASES::BT_TRUE;
     my_options.epsNum = FLAGS_default_active_set_eps_num;
     my_options.epsDen = FLAGS_default_active_set_eps_den;
     my_options.epsIterRef = FLAGS_default_active_set_eps_iter_ref;
@@ -134,8 +134,8 @@ bool Spline1dGenerator::Solve() {
   double affine_constraint_matrix[num_param * num_constraint];  // NOLINT
   double constraint_lower_bound[num_constraint];                // NOLINT
   double constraint_upper_bound[num_constraint];                // NOLINT
-  index = 0;
 
+  index = 0;
   for (int r = 0; r < equality_constraint_matrix.rows(); ++r) {
     constraint_lower_bound[r] = equality_constraint_boundary(r, 0);
     constraint_upper_bound[r] = equality_constraint_boundary(r, 0);
@@ -190,10 +190,14 @@ bool Spline1dGenerator::Solve() {
                 "reasons:"
              << ret;
     }
+    last_problem_success_ = false;
     return false;
   }
 
+  last_problem_success_ = true;
   double result[num_param];  // NOLINT
+  memset(result, 0, sizeof result);
+
   sqp_solver_->getPrimalSolution(result);
 
   MatrixXd solved_params = MatrixXd::Zero(num_param, 1);
@@ -201,10 +205,11 @@ bool Spline1dGenerator::Solve() {
     solved_params(i, 0) = result[i];
   }
 
-  const uint32_t spline_order = spline_.spline_order();
-
   last_num_param_ = num_param;
   last_num_constraint_ = num_constraint;
+
+  // TODO(Liangliang): fix this bug
+  const uint32_t spline_order = spline_.spline_order() - 1;
   return spline_.SetSplineSegs(solved_params, spline_order);
 }
 

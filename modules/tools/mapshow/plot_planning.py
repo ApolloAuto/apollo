@@ -53,10 +53,9 @@ def planning_callback(planning_pb):
     planning.compute_st_data()
     planning.compute_sl_data()
     planning.compute_path_data()
-    print  "computing lattice path data " + planning_pb.debug.planning_data.DebugString
-    planning.compute_lattice_path_data()
     planning.compute_speed_data()
     planning.compute_init_point()
+
 
 def add_listener():
     rospy.init_node('st_plot', anonymous=True)
