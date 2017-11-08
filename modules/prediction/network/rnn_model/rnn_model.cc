@@ -60,39 +60,6 @@ void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   layers_[12]->Run({bn1}, output);  // sigmoid activation
 }
 
-bool RnnModel::VerifyModel() const {
-  Eigen::MatrixXf obstacle_feature;
-  Eigen::MatrixXf lane_feature;
-  Eigen::MatrixXf output;
-
-  ADEBUG << "Check Model";
-  for (int i = 0; i < net_parameter_.verification_samples_size(); ++i) {
-    VerificationSample sample = net_parameter_.verification_samples(i);
-    CHECK_EQ(sample.features_size(), 2);
-    if (!LoadTensor(sample.features(0), &obstacle_feature)) {
-      AERROR << "Fail to load verification samples!";
-      return false;
-    }
-    if (!LoadTensor(sample.features(1), &lane_feature)) {
-      AERROR << "Fail to load verification samples!";
-      return false;
-    }
-    this->Run({obstacle_feature, lane_feature}, &output);
-    if (output.size() != 1) {
-      AERROR << "output size != 1!";
-      return false;
-    }
-    if (std::fabs(output(0, 0) - sample.probability()) > 1e-2) {
-      AERROR << "predict: " << output(0, 0)
-             << ",  actual: " << sample.probability();
-      return false;
-    }
-    ResetState();
-  }
-  ADEBUG << "Success to validate the model.";
-  return true;
-}
-
 void RnnModel::SetState(const std::vector<Eigen::MatrixXf>& states) {
   layers_[4]->SetState(states);
   layers_[5]->ResetState();
