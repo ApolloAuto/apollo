@@ -64,11 +64,6 @@ TEST_F(SpeedLimitTest, GetSpeedLimitByS) {
     EXPECT_DOUBLE_EQ(v_limit, it_lower->second);
     s += ds;
   }
-  s = -1.0e-12;
-  EXPECT_DEATH(
-      speed_limit_.GetSpeedLimitByS(s),
-      ".*Check failed: s >= speed_limit_points_.front\\(\\).first \\(-1e-12 "
-      "vs. 0\\).*");
 }
 
 }  // namespace planning

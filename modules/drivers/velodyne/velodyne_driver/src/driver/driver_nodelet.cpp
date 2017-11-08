@@ -28,13 +28,13 @@ namespace velodyne {
 
 class DriverNodelet : public nodelet::Nodelet {
  public:
-  DriverNodelet() : _runing(false) {}
+  DriverNodelet() : runing_(false) {}
 
   ~DriverNodelet() {
-    if (_runing) {
+    if (runing_) {
       ROS_INFO("shutting down driver thread");
-      _runing = false;
-      _device_thread->join();
+      runing_ = false;
+      device_thread_->join();
       ROS_INFO("driver thread stopped");
     }
   }
@@ -43,10 +43,10 @@ class DriverNodelet : public nodelet::Nodelet {
   virtual void onInit(void);
   virtual void device_poll(void);
 
-  volatile bool _runing;  ///< device thread is running
-  boost::shared_ptr<boost::thread> _device_thread;
+  volatile bool runing_;  ///< device thread is running
+  boost::shared_ptr<boost::thread> device_thread_;
 
-  boost::shared_ptr<VelodyneDriver> _dvr;  ///< driver implementation class
+  boost::shared_ptr<VelodyneDriver> dvr_;  ///< driver implementation class
 };
 
 void DriverNodelet::onInit() {
@@ -57,11 +57,11 @@ void DriverNodelet::onInit() {
   if (driver == nullptr) {
     ROS_BREAK();
   }
-  _dvr.reset(driver);
-  _dvr->init(getNodeHandle());
+  dvr_.reset(driver);
+  dvr_->init(getNodeHandle());
   // spawn device poll thread
-  _runing = true;
-  _device_thread = boost::shared_ptr<boost::thread>(
+  runing_ = true;
+  device_thread_ = boost::shared_ptr<boost::thread>(
       new boost::thread(boost::bind(&DriverNodelet::device_poll, this)));
 }
 
@@ -69,15 +69,15 @@ void DriverNodelet::onInit() {
 void DriverNodelet::device_poll() {
   while (ros::ok()) {
     // poll device until end of file
-    _runing = _dvr->poll();
+    runing_ = dvr_->poll();
 
-    if (!_runing) {
+    if (!runing_) {
       ROS_ERROR("Running false, stop poll!");
       break;
     }
   }
 
-  _runing = false;
+  runing_ = false;
 }
 
 }  // namespace velodyne

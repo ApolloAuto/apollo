@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/planner:planner",
         "//modules/planning/proto:planning_proto",

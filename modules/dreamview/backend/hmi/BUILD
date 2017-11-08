@@ -3,12 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "hmi_status_helper",
-    srcs = ["hmi_status_helper.cc"],
-    hdrs = ["hmi_status_helper.h"],
+    name = "vehicle_manager",
+    srcs = ["vehicle_manager.cc"],
+    hdrs = ["vehicle_manager.h"],
     deps = [
-        "//modules/common/adapters:adapter_manager",
-        "//modules/dreamview/proto:hmi_status_proto",
+        "//modules/common/util",
+        "//modules/common/util:string_util",
     ],
 )
 
@@ -17,7 +17,9 @@ cc_library(
     srcs = ["hmi.cc"],
     hdrs = ["hmi.h"],
     deps = [
+        ":vehicle_manager",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/util:map_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket",
         "//modules/dreamview/proto:hmi_config_proto",

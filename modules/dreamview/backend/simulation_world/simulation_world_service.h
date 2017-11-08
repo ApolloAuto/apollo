@@ -165,6 +165,11 @@ class SimulationWorldService {
 
   void UpdateDelays();
 
+  template <typename Points>
+  void DownsampleSpeedPointsByInterval(const Points &points,
+                                       size_t downsampleInterval,
+                                       Points *downsampled_points);
+
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;

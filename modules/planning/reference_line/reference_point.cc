@@ -29,6 +29,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+using apollo::common::util::StrCat;
+
 namespace {
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
@@ -53,12 +55,15 @@ double ReferencePoint::lower_bound() const { return lower_bound_; }
 double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 std::string ReferencePoint::DebugString() const {
-  // clang-format off
-  return apollo::common::util::StrCat("{x: ", std::fixed, x(),
-         ", " "y: ", y(), ", " "theta: ", heading(), ", " "kappa: ",
-         kappa(), ", " "dkappa: ", dkappa(), ", " "upper_bound: ",
-         upper_bound(), ", " "lower_bound: ", lower_bound(), "}");
-  // clang-format on
+  // StrCat supports 9 arguments at most.
+  return StrCat(
+      StrCat("{x: ", x(), ", "
+             "y: ", y(), ", "
+             "theta: ", heading(), ", "
+             "kappa: ", kappa(), ", "),
+      StrCat("dkappa: ", dkappa(), ", "
+             "upper_bound: ", upper_bound(), ", "
+             "lower_bound: ", lower_bound(), "}"));
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {

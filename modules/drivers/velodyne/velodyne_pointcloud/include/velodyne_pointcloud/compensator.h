@@ -74,30 +74,30 @@ class Compensator {
   inline uint get_field_size(const int data_type);
 
   // subsrcibe velodyne pointcloud2 msg.
-  ros::Subscriber _pointcloud_sub;
+  ros::Subscriber pointcloud_sub_;
   // publish point cloud2 after motion compensation
-  ros::Publisher _compensation_pub;
-  //   ros::Publisher _metastatus_publisher;
+  ros::Publisher compensation_pub_;
+  //   ros::Publisher metastatus_publisher_;
   // tf2 buffer
-  tf2_ros::Buffer _tf2_buffer;
+  tf2_ros::Buffer tf2_buffer_;
   // tf2 transform listener to get transform by gps timestamp.
-  tf2_ros::TransformListener _tf2_transform_listener;
+  tf2_ros::TransformListener tf2_transform_listener_;
   // transform child frame id(world -> child frame)
-  std::string _child_frame_id;
-  float _tf_timeout;
+  std::string child_frame_id_;
+  float tf_timeout_;
 
   // varibes for point fields value, we get point x,y,z by these offset
-  int _x_offset;
-  int _y_offset;
-  int _z_offset;
-  int _timestamp_offset;
-  uint _timestamp_data_size;
+  int x_offset_;
+  int y_offset_;
+  int z_offset_;
+  int timestamp_offset_;
+  uint timestamp_data_size_;
 
   // topic names
-  std::string _topic_compensated_pointcloud;
-  std::string _topic_pointcloud;
+  std::string topic_compensated_pointcloud_;
+  std::string topic_pointcloud_;
   // ros queue size for publisher and subscriber
-  int _queue_size;
+  int queue_size_;
 };
 
 }  // namespace velodyne

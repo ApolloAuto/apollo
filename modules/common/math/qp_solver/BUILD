@@ -41,7 +41,9 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math/qp_solver:qp_solver_gflags",
         "@eigen//:eigen",
-        "@qp_oases//:qp_oases",
+    ],
+    linkopts = [
+        "-lqp_oases",
     ],
 )
 

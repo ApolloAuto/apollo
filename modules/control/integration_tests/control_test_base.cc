@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include <unistd.h>
 #include <climits>
@@ -49,7 +49,7 @@ uint32_t ControlTestBase::s_seq_num_ = 0;
 
 bool ControlTestBase::test_control() {
   if (!common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                                &control_.control_conf_)) {
+                                      &control_.control_conf_)) {
     AERROR << "Unable to load control conf file: " << FLAGS_control_conf_file;
     exit(EXIT_FAILURE);
   }
@@ -139,16 +139,14 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
     AINFO << "The golden file is " << tmp_golden_path << " Remember to:\n"
           << "mv " << tmp_golden_path << " " << FLAGS_test_data_dir << "\n"
           << "git add " << FLAGS_test_data_dir << "/" << golden_result_file;
-    common::util::SetProtoToASCIIFile(control_command_,
-                                                golden_result_file);
+    common::util::SetProtoToASCIIFile(control_command_, golden_result_file);
   } else {
     ControlCommand golden_result;
-    bool load_success = common::util::GetProtoFromASCIIFile(
-        full_golden_path, &golden_result);
+    bool load_success =
+        common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
-      common::util::SetProtoToASCIIFile(control_command_,
-                                                  tmp_golden_path);
+      common::util::SetProtoToASCIIFile(control_command_, tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
@@ -156,8 +154,7 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
         common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
       std::string tmp_planning_file = tmp_golden_path + ".tmp";
-      common::util::SetProtoToASCIIFile(control_command_,
-                                                  tmp_planning_file);
+      common::util::SetProtoToASCIIFile(control_command_, tmp_planning_file);
       AERROR << "found diff " << tmp_planning_file << " " << full_golden_path;
     }
   }
@@ -171,7 +168,9 @@ void ControlTestBase::SetUpTestCase() {
   FLAGS_is_control_test_mode = true;
 }
 
-void ControlTestBase::SetUp() { ++s_seq_num_; }
+void ControlTestBase::SetUp() {
+  ++s_seq_num_;
+}
 
 }  // namespace control
 }  // namespace apollo

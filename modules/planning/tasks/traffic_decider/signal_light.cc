@@ -24,10 +24,11 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/util/map_util.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -87,7 +88,7 @@ void SignalLight::MakeDecisions(Frame* frame,
   signal_light_debug->set_adc_front_s(
       reference_line_info->AdcSlBoundary().end_s());
   signal_light_debug->set_adc_speed(
-      common::VehicleState::instance()->linear_velocity());
+      common::VehicleStateProvider::instance()->linear_velocity());
 
   for (const hdmap::PathOverlap* signal_light : signal_lights_) {
     const TrafficLight signal = GetSignal(signal_light->object_id);
@@ -113,9 +114,9 @@ void SignalLight::MakeDecisions(Frame* frame,
   }
 }
 
-const TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
-  auto iter = signals_.find(signal_id);
-  if (iter == signals_.end()) {
+TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
+  const auto* result = apollo::common::util::FindPtrOrNull(signals_, signal_id);
+  if (result == nullptr) {
     TrafficLight traffic_light;
     traffic_light.set_id(signal_id);
     traffic_light.set_color(TrafficLight::UNKNOWN);
@@ -123,13 +124,14 @@ const TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
     traffic_light.set_tracking_time(0.0);
     return traffic_light;
   }
-  return *iter->second;
+  return *result;
 }
 
 double SignalLight::GetStopDeceleration(
     ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
-  double adc_speed = common::VehicleState::instance()->linear_velocity();
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed < FLAGS_stop_min_speed) {
     return 0.0;
   }

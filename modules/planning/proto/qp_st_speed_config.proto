@@ -28,10 +28,10 @@ message QpPiecewiseConfig {
   optional double follow_drag_distance = 8;
 }
 
+// next ID: 11
 message QpStSpeedConfig {
   optional double total_path_length = 1 [ default = 200.0 ];
   optional double total_time = 2 [ default = 6.0 ];
-  optional double output_time_resolution = 3 [ default = 0.05 ];
   optional double preferred_max_acceleration = 4 [ default = 1.2 ];
   optional double preferred_min_deceleration = 5 [ default = -1.8 ];
   optional double max_acceleration = 6 [ default = 2.0 ];

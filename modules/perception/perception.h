@@ -44,10 +44,10 @@ class Perception : public common::ApolloApp {
   common::Status Start() override;
   void Stop() override;
 
- private:
   // Upon receiving point cloud data
   void OnPointCloud(const sensor_msgs::PointCloud2& message);
 
+ private:
   std::unique_ptr<LidarProcess> lidar_process_;
 };
 
