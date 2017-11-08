@@ -25,6 +25,7 @@
 #include <utility>
 
 #include "glog/logging.h"
+#include "modules/common/math/angle.h"
 #include "modules/common/math/integral.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
@@ -37,31 +38,34 @@ namespace planning {
  */
 class QuinticSpiralPath : public QuinticPolynomialCurve1d {
  public:
-    QuinticSpiralPath(const std::array<double, 3>& start,
-                              const std::array<double, 3>& end,
-                              const double delta_s);
+  QuinticSpiralPath() = default;
 
-    QuinticSpiralPath(const double theta0, const double kappa0,
-                              const double dkappa0, const double theta1,
-                              const double kappa1, const double dkappa1,
-                              const double delta_s);
+  QuinticSpiralPath(const std::array<double, 3>& start,
+                            const std::array<double, 3>& end,
+                            const double delta_s);
+
+  QuinticSpiralPath(const double theta0, const double kappa0,
+                            const double dkappa0, const double theta1,
+                            const double kappa1, const double dkappa1,
+                            const double delta_s);
 
   template <std::size_t N>
   double ComputeCartesianDeviationX(const double s) const {
-    auto cos_theta =
-        [this](const double s) { return std::cos(Evaluate(0, s)); };
+    auto cos_theta = [this](const double s) {
+      const auto a = common::math::Angle16::from_rad(Evaluate(0, s));
+      return common::math::cos(a);
+    };
     return common::math::IntegrateByGaussLegendre<N>(cos_theta, 0.0, s);
   }
 
   template <std::size_t N>
   double ComputeCartesianDeviationY(const double s) const {
-    auto sin_theta =
-        [this](const double s) { return std::sin(Evaluate(0, s)); };
+    auto sin_theta = [this](const double s) {
+      const auto a = common::math::Angle16::from_rad(Evaluate(0, s));
+      return common::math::sin(a);
+    };
     return common::math::IntegrateByGaussLegendre<N>(sin_theta, 0.0, s);
   }
-
-  double DeriveKappaDerivative(const std::size_t param_index,
-                               const double ratio) const;
 
   template <std::size_t N>
   std::pair<double, double> DeriveCartesianDeviation(
@@ -73,12 +77,14 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     std::pair<double, double> cartesian_deviation = {0.0, 0.0};
     for (std::size_t i = 0; i < N; ++i) {
       double r = 0.5 * x[i] + 0.5;
-      double curr_theta = Evaluate(0, r * param_);
+      auto curr_theta_angle = common::math::Angle16::from_rad(
+          Evaluate(0, r * param_));
       double derived_theta = DeriveTheta(param_index, r);
 
       cartesian_deviation.first +=
-          w[i] * (-std::sin(curr_theta)) * derived_theta;
-      cartesian_deviation.second += w[i] * std::cos(curr_theta) * derived_theta;
+          w[i] * (-common::math::sin(curr_theta_angle)) * derived_theta;
+      cartesian_deviation.second +=
+          w[i] * common::math::cos(curr_theta_angle) * derived_theta;
     }
 
     cartesian_deviation.first *= param_ * 0.5;
@@ -87,14 +93,20 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     if (param_index == DELTA_S) {
       for (std::size_t i = 0; i < N; ++i) {
         double r = 0.5 * x[i] + 0.5;
-        double theta = Evaluate(0, r * param_);
+        auto theta_angle =
+            common::math::Angle16::from_rad(Evaluate(0, r * param_));
 
-        cartesian_deviation.first += 0.5 * w[i] * std::cos(theta);
-        cartesian_deviation.second += 0.5 * w[i] * std::sin(theta);
+        cartesian_deviation.first +=
+            0.5 * w[i] * common::math::cos(theta_angle);
+        cartesian_deviation.second +=
+            0.5 * w[i] * common::math::sin(theta_angle);
       }
     }
     return cartesian_deviation;
   }
+
+  double DeriveKappaDerivative(const std::size_t param_index,
+                               const double ratio) const;
 
   static const std::size_t THETA0 = 0;
   static const std::size_t KAPPA0 = 1;

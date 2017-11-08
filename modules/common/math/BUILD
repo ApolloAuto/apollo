@@ -22,6 +22,7 @@ cc_library(
         ":search",
         ":sin_table",
         ":vec2d",
+        ":factorial",
     ],
 )
 
@@ -168,6 +169,15 @@ cc_library(
         "//modules/common/math:matrix_operations",
         "//modules/common/util:string_util",
         "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "factorial",
+    hdrs = [
+        "factorial.h",
+    ],
+    deps = [
     ],
 )
 

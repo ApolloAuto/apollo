@@ -77,18 +77,27 @@ class HDMapUtil {
   // Get default base map from the file specified by global flags.
   // Return nullptr if failed to load.
   static const HDMap* BaseMapPtr();
-  // Similar to BaseMap(), but garantee to return a valid HDMap, or else raise
-  // fatal error.
+  // Guarantee to return a valid base_map, or else raise fatal error.
   static const HDMap& BaseMap();
 
-  // Reload the base map from the file specified by global flags.
-  static bool ReloadBaseMap();
+  // Get default sim_map from the file specified by global flags.
+  // Return nullptr if failed to load.
+  static const HDMap* SimMapPtr();
+
+  // Guarantee to return a valid sim_map, or else raise fatal error.
+  static const HDMap& SimMap();
+
+  // Reload maps from the file specified by global flags.
+  static bool ReloadMaps();
 
  private:
   HDMapUtil() = delete;
 
   static std::unique_ptr<HDMap> base_map_;
   static std::mutex base_map_mutex_;
+
+  static std::unique_ptr<HDMap> sim_map_;
+  static std::mutex sim_map_mutex_;
 };
 
 }  // namespace hdmap

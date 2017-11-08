@@ -202,13 +202,14 @@ void ExtendBackward(bool enable_use_road_id,
          nodes_of_curr_passage->front().GetTopoNode()->InFromPreEdge()) {
       const auto& pred_node = edge->FromNode();
       // if pred node is not in the same road
-      if (pred_node->RoadId() != nodes_of_curr_passage->front().RoadId()) {
-        continue;
-      }
+      // if (enable_use_road_id && pred_node->RoadId() !=
+      // nodes_of_curr_passage->front().RoadId()) {
+      //   continue;
+      // }
+
       // if pred node has been inserted
-      if (enable_use_road_id &&
-          node_set_of_curr_passage.find(pred_node) !=
-              node_set_of_curr_passage.end()) {
+      if (node_set_of_curr_passage.find(pred_node) !=
+          node_set_of_curr_passage.end()) {
         continue;
       }
       // if pred node is reachable from prev passage
@@ -269,10 +270,10 @@ void ExtendForward(bool enable_use_road_id,
          nodes_of_curr_passage->back().GetTopoNode()->OutToSucEdge()) {
       const auto& succ_node = edge->ToNode();
       // if succ node is not in the same road
-      if (enable_use_road_id &&
-          succ_node->RoadId() != nodes_of_curr_passage->back().RoadId()) {
-        continue;
-      }
+      // if (enable_use_road_id &&
+      //     succ_node->RoadId() != nodes_of_curr_passage->back().RoadId()) {
+      //   continue;
+      // }
       // if succ node has been inserted
       if (node_set_of_curr_passage.find(succ_node) !=
           node_set_of_curr_passage.end()) {
@@ -378,7 +379,7 @@ bool ResultGenerator::GeneratePassageRegion(
     const std::string& map_version, const RoutingRequest& request,
     const std::vector<NodeWithRange>& nodes,
     const TopoRangeManager& range_manager, RoutingResponse* const result) {
-  AdapterManager::FillRoutingResponseHeader(FLAGS_node_name, result);
+  AdapterManager::FillRoutingResponseHeader(FLAGS_routing_node_name, result);
 
   if (!GeneratePassageRegion(nodes, range_manager, result)) {
     return false;

@@ -18,7 +18,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171025_1428"
+VERSION_X86_64="dev-x86_64-20171103_2113"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -97,6 +97,7 @@ function main(){
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
+        -e DOCKER_IMG=$IMG \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $APOLLO_ROOT_DIR:/apollo \
         -v /media:/media \

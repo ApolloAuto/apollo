@@ -7,6 +7,9 @@ cc_library(
     hdrs = [
         "indexed_list.h",
     ],
+    deps = [
+        "//modules/common/util:map_util",
+    ],
 )
 
 cc_test(
@@ -26,6 +29,9 @@ cc_library(
     name = "indexed_queue",
     hdrs = [
         "indexed_queue.h",
+    ],
+    deps = [
+        "//modules/common/util:map_util",
     ],
 )
 
@@ -99,6 +105,7 @@ cc_library(
         ":indexed_list",
         ":obstacle",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/util:map_util",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
@@ -126,6 +133,8 @@ cc_library(
         "planning_util.h",
     ],
     deps = [
+        ":planning_gflags",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/math:hermite_spline",
@@ -175,7 +184,7 @@ cc_library(
         ":path_decision",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:planning_gflags",
@@ -203,14 +212,13 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:reference_line_smoother_config_proto",
         "//modules/planning/reference_line:reference_line_provider",
-        "//modules/planning/reference_line:reference_line_smoother",
     ],
 )
 

@@ -14,7 +14,7 @@ message Header {
   optional string module_name = 2;
 
   // Sequence number for each message. Each module maintains its own counter for
-  // sequence_num, always starting from 0 on boot.
+  // sequence_num, always starting from 1 on boot.
   optional uint32 sequence_num = 3;
 
   // Lidar Sensor timestamp for nano-second.

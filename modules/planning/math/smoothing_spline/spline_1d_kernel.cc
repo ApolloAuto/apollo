@@ -24,6 +24,7 @@
 
 #include <algorithm>
 
+#include "modules/common/log.h"
 #include "modules/planning/math/smoothing_spline/spline_seg_kernel.h"
 
 namespace apollo {
@@ -84,7 +85,6 @@ const Eigen::MatrixXd& Spline1dKernel::kernel_matrix() const {
 const Eigen::MatrixXd& Spline1dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
-
 void Spline1dKernel::AddNthDerivativekernelMatrix(const uint32_t n,
                                                   const double weight) {
   for (uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
@@ -108,6 +108,38 @@ void Spline1dKernel::AddSecondOrderDerivativeMatrix(const double weight) {
 
 void Spline1dKernel::AddThirdOrderDerivativeMatrix(const double weight) {
   AddNthDerivativekernelMatrix(3, weight);
+}
+
+void Spline1dKernel::AddNthDerivativekernelMatrixForSplineK(
+    const uint32_t n, const uint32_t k, const double weight) {
+  if (k < 0 || k + 1 >= x_knots_.size()) {
+    AERROR << "Cannot add NthDerivativeKernel for spline K because k is out of "
+              "range. k = "
+           << k;
+    return;
+  }
+  Eigen::MatrixXd cur_kernel =
+      2 *
+      SplineSegKernel::instance()->NthDerivativeKernel(
+          n, spline_order_, x_knots_[k + 1] - x_knots_[k]) *
+      weight;
+  kernel_matrix_.block(k * spline_order_, k * spline_order_, spline_order_,
+                       spline_order_) += cur_kernel;
+}
+
+void Spline1dKernel::AddDerivativeKernelMatrixForSplineK(const uint32_t k,
+                                                         const double weight) {
+  AddNthDerivativekernelMatrixForSplineK(1, k, weight);
+}
+
+void Spline1dKernel::AddSecondOrderDerivativeMatrixForSplineK(
+    const uint32_t k, const double weight) {
+  AddNthDerivativekernelMatrixForSplineK(2, k, weight);
+}
+
+void Spline1dKernel::AddThirdOrderDerivativeMatrixForSplineK(
+    const uint32_t k, const double weight) {
+  AddNthDerivativekernelMatrixForSplineK(3, k, weight);
 }
 
 bool Spline1dKernel::AddReferenceLineKernelMatrix(

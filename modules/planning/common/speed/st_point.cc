@@ -27,6 +27,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::util::StringPrintf;
+
 STPoint::STPoint(const double s, const double t) : Vec2d(t, s) {}
 
 STPoint::STPoint(const common::math::Vec2d& vec2d_point) : Vec2d(vec2d_point) {}
@@ -40,10 +42,7 @@ void STPoint::set_s(const double s) { return set_y(s); }
 void STPoint::set_t(const double t) { return set_x(t); }
 
 std::string STPoint::DebugString() const {
-  return apollo::common::util::StrCat("{ \"s\" : ", std::setprecision(6), s(),
-                                      ", "
-                                      "\"t\" : ",
-                                      std::setprecision(6), t(), " }");
+  return StringPrintf("{ \"s\" : %.6f, \"t\" : %.6f }", s(), t());
 }
 
 }  // namespace planning

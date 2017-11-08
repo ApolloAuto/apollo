@@ -4,6 +4,7 @@ package apollo.planning;
 
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/vehicle_signal.proto";
+import "modules/routing/proto/routing.proto";
 
 message TargetLane {
   // lane id
@@ -109,6 +110,7 @@ message MainStop {
   optional apollo.common.PointENU stop_point = 3;
   // When stopped, the heading of the vehicle should be stop_heading.
   optional double stop_heading = 4;
+  optional apollo.routing.ChangeLaneType change_lane_type = 5;
 }
 
 message EmergencyStopHardBrake {
@@ -136,8 +138,10 @@ message MainEmergencyStop {
 
 message MainCruise {
   // cruise current lane
+  optional apollo.routing.ChangeLaneType change_lane_type = 1;
 }
 
+// This message is deprecated
 message MainChangeLane {
   enum Type {
     LEFT = 1;
@@ -151,6 +155,10 @@ message MainChangeLane {
 
 message MainMissionComplete {
   // arrived at routing destination
+  // When stopped, the front center of vehicle should be at this point.
+  optional apollo.common.PointENU stop_point = 1;
+  // When stopped, the heading of the vehicle should be stop_heading.
+  optional double stop_heading = 2;
 }
 
 message MainNotReady {
@@ -167,12 +175,12 @@ message MainDecision {
     MainCruise cruise = 1;
     MainStop stop = 2;
     MainEmergencyStop estop = 3;
-    MainChangeLane change_lane = 4;
+    MainChangeLane change_lane = 4 [deprecated=true];
     MainMissionComplete mission_complete = 6;
     MainNotReady not_ready = 7;
     MainParking parking = 8;
   }
-  repeated TargetLane target_lane = 5;
+  repeated TargetLane target_lane = 5 [deprecated = true];
 }
 
 message DecisionResult {

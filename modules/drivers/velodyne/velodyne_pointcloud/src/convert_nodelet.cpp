@@ -31,14 +31,14 @@ class ConvertNodelet : public nodelet::Nodelet {
 
  private:
   virtual void onInit();
-  boost::shared_ptr<Convert> _conv;
+  boost::shared_ptr<Convert> conv_;
 };
 
 /** @brief Nodelet initialization. */
 void ConvertNodelet::onInit() {
   ROS_INFO("Point cloud nodelet init");
-  _conv.reset(new Convert());
-  _conv->init(getNodeHandle(), getPrivateNodeHandle());
+  conv_.reset(new Convert());
+  conv_->init(getNodeHandle(), getPrivateNodeHandle());
 }
 
 }  // namespace velodyne

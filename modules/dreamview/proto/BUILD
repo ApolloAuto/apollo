@@ -39,6 +39,6 @@ proto_library(
     name = "hmi_status_proto_lib",
     srcs = ["hmi_status.proto"],
     deps = [
-        "//modules/monitor/proto:hardware_status_proto_lib",
-    ]
+        "//modules/monitor/proto:system_status_proto_lib",
+    ],
 )
