@@ -6,7 +6,7 @@
 #define PERCEPTION_COLOR_DECISION_H
 
 #include <traffic_light/interface/green_interface.h>
-#include "module/perception/traffic_light/interface/base_reviser.h"
+#include "modules/perception/traffic_light/interface/base_reviser.h"
 
 namespace adu {
 namespace perception {

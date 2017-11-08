@@ -3,12 +3,12 @@
 // @file: image.cpp
 // @brief: Image Class
 
-#include "module/perception/traffic_light/base/image.h"
+#include "modules/perception/traffic_light/base/image.h"
 
 #include <iomanip>
 
 #include <gflags/gflags.h>
-#include <xlog.h>
+#include "modules/common/log.h"
 #include <cv_bridge/cv_bridge.h>
 
 DEFINE_int32(double_show_precision, 14, "When output a double data, the precision.");
@@ -16,11 +16,6 @@ DEFINE_int32(double_show_precision, 14, "When output a double data, the precisio
 namespace adu {
 namespace perception {
 namespace traffic_light {
-
-DEFINE_int32(night_begin_hour, 10, "when the night comes (start from 8 o`clock)");
-DEFINE_int32(night_begin_minute, 40, "when the night comes");
-DEFINE_int32(night_end_hour, 20, "when the night ends (start from 8 o`clock)");
-DEFINE_int32(night_end_minute, 40, "when the night ends");
 
 bool Image::init(const double ts, const CameraId device_id, const cv::Mat &mat) {
   _contain_mat = true;

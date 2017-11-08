@@ -5,7 +5,7 @@
 // @brief: tl_preprocessor definition
 //
 
-#include "module/perception/traffic_light/preprocessor/tl_preprocessor.h"
+#include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 
 #include <gflags/gflags.h>
 #include "xlog.h"

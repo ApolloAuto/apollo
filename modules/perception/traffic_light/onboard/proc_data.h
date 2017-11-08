@@ -7,7 +7,7 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_DATA_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_DATA_H
 
-#include "module/perception/traffic_light/base/image_lights.h"
+#include "modules/perception/traffic_light/base/image_lights.h"
 #include "onboard/common_shared_data.h"
 
 namespace adu {

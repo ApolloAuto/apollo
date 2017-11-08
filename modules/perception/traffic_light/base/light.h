@@ -11,7 +11,7 @@
 #include <map_signal.pb.h>
 #include <traffic_light_detection.pb.h>
 
-#include "module/perception/traffic_light/base/image.h"
+#include "modules/perception/traffic_light/base/image.h"
 
 namespace adu {
 namespace perception {

@@ -13,7 +13,7 @@
 
 #include "onboard/subnode.h"
 #include "onboard/stream_output.h"
-#include "module/perception/traffic_light/base/image_lights.h"
+#include "modules/perception/traffic_light/base/image_lights.h"
 
 namespace adu {
 namespace perception {

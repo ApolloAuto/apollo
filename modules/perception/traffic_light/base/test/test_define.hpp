@@ -10,7 +10,7 @@
 #include <sstream>
 #include <cmath>
 #include <opencv2/opencv.hpp>
-#include <xlog.h>
+#include "modules/common/log.h"
 #include <gflags/gflags.h>
 
 DECLARE_bool(enable_show_image_on_unittest);

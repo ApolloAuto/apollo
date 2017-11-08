@@ -17,10 +17,6 @@
 namespace adu {
 namespace perception {
 namespace traffic_light {
-DECLARE_int32(night_begin_hour);
-DECLARE_int32(night_begin_minute);
-DECLARE_int32(night_end_hour);
-DECLARE_int32(night_end_minute);
 
 //Camera id
 enum CameraId {

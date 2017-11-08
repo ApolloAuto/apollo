@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include "module/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/base/light.h"
 
 namespace adu {
 namespace perception {

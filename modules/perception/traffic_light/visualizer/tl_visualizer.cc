@@ -17,7 +17,7 @@
 #include "lib/base/perf.h"
 #include "lib/base/time_util.h"
 #include <traffic_light_detection.pb.h>
-#include "module/perception/traffic_light/base/image_lights.h"
+#include "modules/perception/traffic_light/base/image_lights.h"
 
 using adu::perception::traffic_light::Image;
 using adu::perception::traffic_light::CameraId;

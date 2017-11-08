@@ -4,10 +4,10 @@
 // @file base_lights_projection.cpp
 // @brief 
 //
-#include "module/perception/traffic_light/projection/projection.h"
+#include "modules/perception/traffic_light/projection/projection.h"
 
 #include <gflags/gflags.h>
-#include <xlog.h>
+#include "modules/common/log.h"
 
 namespace adu {
 namespace perception {

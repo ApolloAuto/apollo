@@ -13,12 +13,12 @@
 #include <map>
 #include <lib/config_manager/config_manager.h>
 
-#include "module/perception/traffic_light/interface/base_preprocessor.h"
+#include "modules/perception/traffic_light/interface/base_preprocessor.h"
 
 #include "lib/base/perf.h"
-#include "module/perception/traffic_light/base/image.h"
-#include "module/perception/traffic_light/base/image_lights.h"
-#include "module/perception/traffic_light/projection/multi_camera_projection.h"
+#include "modules/perception/traffic_light/base/image.h"
+#include "modules/perception/traffic_light/base/image_lights.h"
+#include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace adu {
 namespace perception {

@@ -6,7 +6,7 @@
 #include <string>
 
 #include <lib/base/macros.h>
-#include "module/perception/traffic_light/rectify/unity/detection.h"
+#include "modules/perception/traffic_light/rectify/unity/detection.h"
 #include <traffic_light/rectify/unity/unity_rectify.h>
 
 DEFINE_string(ext,

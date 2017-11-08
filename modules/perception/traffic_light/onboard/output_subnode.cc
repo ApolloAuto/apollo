@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
 // @author Ruidong Tang (tangruidong@baidu.com)
 // @brief:
-#include "module/perception/traffic_light/onboard/output_subnode.h"
+#include "modules/perception/traffic_light/onboard/output_subnode.h"
 
 #include <gflags/gflags.h>
 #include <traffic_light_detection.pb.h>
@@ -13,8 +13,8 @@
 #include "onboard/event_manager.h"
 #include "onboard/shared_data_manager.h"
 #include "onboard/subnode_helper.h"
-#include "module/perception/traffic_light/onboard/proc_data.h"
-#include "module/perception/traffic_light/onboard/preprocessor_subnode.h"
+#include "modules/perception/traffic_light/onboard/proc_data.h"
+#include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
 DEFINE_bool(enable_fill_lights_outside_image, false,
             "fill the lights(returned by HD-Map, while not in image) with DEFAULT_UNKNOWN_COLOR");

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "module/perception/traffic_light/base/utils.h"
+#include "modules/perception/traffic_light/base/utils.h"
 
 namespace adu {
 namespace perception {

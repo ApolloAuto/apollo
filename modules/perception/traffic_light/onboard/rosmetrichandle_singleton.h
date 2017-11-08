@@ -7,7 +7,7 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_ROSMETRICHANDLE_SINGLETON_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_ROSMETRICHANDLE_SINGLETON_H
 
-#include <xlog.h>
+#include "modules/common/log.h"
 #include "lib/base/singleton.h"
 #include "roslibmetric/metric_handle.h"
 

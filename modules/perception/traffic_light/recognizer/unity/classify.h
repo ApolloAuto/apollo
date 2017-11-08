@@ -7,8 +7,8 @@
 
 #include <string>
 #include <utility>
-#include "module/perception/traffic_light/base/light.h"
-#include "module/perception/traffic_light/interface/green_interface.h"
+#include "modules/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 #include "caffe/caffe.hpp"
 
 namespace adu {

@@ -5,7 +5,7 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
 
-#include "module/perception/traffic_light/interface/green_interface.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 namespace adu {
 namespace perception {

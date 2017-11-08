@@ -24,10 +24,10 @@
 #include "onboard/subnode.h"
 #include "onboard/stream_input.h"
 #include "onboard/subnode_helper.h"
-#include "module/perception/traffic_light/onboard/preprocessor_data.h"
-#include "module/perception/traffic_light/base/image.h"
-#include "module/perception/traffic_light/preprocessor/tl_preprocessor.h"
-#include "module/perception/traffic_light/projection/multi_camera_projection.h"
+#include "modules/perception/traffic_light/onboard/preprocessor_data.h"
+#include "modules/perception/traffic_light/base/image.h"
+#include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
+#include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace adu {
 namespace perception {

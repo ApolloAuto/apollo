@@ -18,10 +18,10 @@
 
 #include "onboard/subnode.h"
 #include "onboard/transform_input_wrapper.h"
-#include "module/perception/traffic_light/interface/base_rectifier.h"
-#include "module/perception/traffic_light/interface/base_recognizer.h"
-#include "module/perception/traffic_light/interface/base_reviser.h"
-#include "module/perception/traffic_light/projection/multi_camera_projection.h"
+#include "modules/perception/traffic_light/interface/base_rectifier.h"
+#include "modules/perception/traffic_light/interface/base_recognizer.h"
+#include "modules/perception/traffic_light/interface/base_reviser.h"
+#include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace adu {
 namespace perception {

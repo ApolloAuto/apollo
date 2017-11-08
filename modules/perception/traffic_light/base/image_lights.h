@@ -9,9 +9,9 @@
 #include <vector>
 #include <memory>
 
-#include "module/perception/traffic_light/base/image.h"
-#include "module/perception/traffic_light/base/light.h"
-#include "module/perception/traffic_light/base/pose.h"
+#include "modules/perception/traffic_light/base/image.h"
+#include "modules/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/base/pose.h"
 
 namespace adu {
 namespace perception {

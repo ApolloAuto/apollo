@@ -2,7 +2,7 @@
 // @author zhengwenchao(zhengwenchao@baidu.com)
 // @date 2016/09/13 09:51:08
 //
-#include "module/perception/traffic_light/onboard/preprocessor_data.h"
+#include "modules/perception/traffic_light/onboard/preprocessor_data.h"
 
 namespace adu {
 namespace perception {

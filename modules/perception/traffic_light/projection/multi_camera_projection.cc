@@ -4,10 +4,10 @@
 // @file multi_camera_projection.cpp
 // @brief 
 //
-#include "module/perception/traffic_light/projection/multi_camera_projection.h"
+#include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 #include <gflags/gflags.h>
-#include <xlog.h>
+#include "modules/common/log.h"
 
 namespace adu {
 namespace perception {

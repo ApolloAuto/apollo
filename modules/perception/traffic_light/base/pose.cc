@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
 // @author erlangz(erlangz@baidu.com)
 // @date 2016/09/18 11:12:51
-#include "module/perception/traffic_light/base/pose.h"
+#include "modules/perception/traffic_light/base/pose.h"
 
 namespace adu {
 namespace perception {

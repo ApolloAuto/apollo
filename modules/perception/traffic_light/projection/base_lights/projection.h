@@ -11,7 +11,7 @@
 #include <cmath>
 #include <eigen3/Eigen/Core>
 
-#include "module/perception/traffic_light/interface/base_projection.h"
+#include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace adu {
 namespace perception {

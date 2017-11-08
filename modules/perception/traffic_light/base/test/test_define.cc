@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
 // @author erlangz(erlangz@baidu.com)
 // @date 2016/06/23 17:54:39
-#include "module/perception/traffic_light/base/test/test_define.hpp"
+#include "modules/perception/traffic_light/base/test/test_define.hpp"
 
 DEFINE_bool(enable_show_image_on_unittest,
 false, "show images when test images equal.");

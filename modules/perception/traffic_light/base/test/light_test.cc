@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-#include "module/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/base/light.h"
 
 namespace adu {
 namespace perception {

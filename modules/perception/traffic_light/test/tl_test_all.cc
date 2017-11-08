@@ -3,8 +3,8 @@
 //
 #include <lib/base/macros.h>
 #include <traffic_light/rectify/unity/unity_rectify.h>
-#include "module/perception/traffic_light/recognizer/unity/unity_recognize.h"
-#include "module/perception/traffic_light/reviser/strategy/color_decision.h"
+#include "modules/perception/traffic_light/recognizer/unity/unity_recognize.h"
+#include "modules/perception/traffic_light/reviser/strategy/color_decision.h"
 DEFINE_string(ext,
 ".jpg", "ext");
 DEFINE_string(hdmap_file,

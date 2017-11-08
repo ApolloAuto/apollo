@@ -14,7 +14,7 @@
 
 #include "lib/base/file_util.h"
 #include "lib/config_manager/config_manager.h"
-#include "module/perception/traffic_light/interface/base_projection.h"
+#include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace adu {
 namespace perception {

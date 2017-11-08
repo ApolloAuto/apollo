@@ -8,7 +8,7 @@
 #include <traffic_light/interface/base_rectifier.h>
 #include <traffic_light/interface/green_interface.h>
 #include <lib/config_manager/config_manager.h>
-#include "module/perception/traffic_light/rectify/unity/detection.h"
+#include "modules/perception/traffic_light/rectify/unity/detection.h"
 
 namespace adu {
 namespace perception {

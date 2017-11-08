@@ -12,8 +12,8 @@
 
 #include "lib/base/noncopyable.h"
 #include "lib/base/registerer.h"
-#include "module/perception/traffic_light/base/image.h"
-#include "module/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/base/image.h"
+#include "modules/perception/traffic_light/base/light.h"
 
 namespace adu {
 namespace perception {

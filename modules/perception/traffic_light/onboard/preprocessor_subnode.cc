@@ -4,7 +4,7 @@
 // @file: preprocessor_subnode.cpp
 // @brief: preprocessor_subnode definition.
 //
-#include "module/perception/traffic_light/onboard/preprocessor_subnode.h"
+#include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
 #include <map>
 #include <functional>
@@ -13,7 +13,7 @@
 #include <traffic_light/base/utils.h>
 #include "ros/meta_stats.h"
 //#include "roslibmetric/metric_handle.h"
-#include "module/perception/traffic_light/onboard/rosmetrichandle_singleton.h"
+#include "modules/perception/traffic_light/onboard/rosmetrichandle_singleton.h"
 
 #include "lib/base/macros.h"
 #include "lib/base/file_util.h"

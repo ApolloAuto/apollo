@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "module/perception/traffic_light/projection/base_lights/projection.h"
-#include "module/perception/traffic_light/projection/projection.h"
-#include "module/perception/traffic_light/projection/multi_camera_projection.h"
-#include "module/perception/traffic_light/preprocessor/tl_preprocessor.h"
+#include "modules/perception/traffic_light/projection/base_lights/projection.h"
+#include "modules/perception/traffic_light/projection/projection.h"
+#include "modules/perception/traffic_light/projection/multi_camera_projection.h"
+#include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 
 namespace adu {
 namespace perception {
