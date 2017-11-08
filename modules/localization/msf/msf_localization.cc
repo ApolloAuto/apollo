@@ -120,8 +120,10 @@ void MSFLocalization::Init() {
 
   // lidar module
   localizaiton_param_.map_path = FLAGS_map_path;
-  localizaiton_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsic_file;
-  localizaiton_param_.lidar_height_file = FLAGS_lidar_height_file;
+  localizaiton_param_.lidar_extrinsic_file
+      = TranslatePath(FLAGS_lidar_extrinsic_file);
+  localizaiton_param_.lidar_height_file
+      = TranslatePath(FLAGS_lidar_height_file);
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;

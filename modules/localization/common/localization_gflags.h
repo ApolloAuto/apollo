@@ -22,7 +22,10 @@
 #ifndef MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
 #define MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
 
+#include <string>
 #include "gflags/gflags.h"
+#include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 
 DECLARE_string(localization_module_name);
 
@@ -75,5 +78,14 @@ DECLARE_double(imu_rate);
 DECLARE_int32(local_utm_zone_id);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
+
+namespace apollo {
+namespace localization {
+
+std::string RosRoot();
+std::string TranslatePath(const std::string &src_path);
+
+}  // namespace localization
+}  // namespace apollo
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

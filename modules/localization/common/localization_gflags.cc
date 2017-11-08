@@ -68,11 +68,15 @@ DEFINE_bool(enable_gps_timestamp, false,
 DEFINE_string(map_path, "../mapdata/local_map",
     "The path of localization map.");
 DEFINE_string(lidar_extrinsic_file, 
-    "/home/caros/ros/share/params/velodyne64_novatel_extrinsics_example.yaml",
-    "The path of extrinsics parameter of velodyne64 and imu.");
+    "<ros>/share/velodyne_pointcloud/params/"
+    "velodyne64_novatel_extrinsics_example.yaml",
+    "Velodyne extrinsic path for the vehicle in use, "
+    "where <ros> is the placeholder of ROS root.");
 DEFINE_string(lidar_height_file,
-    "/home/caros/ros/share/params/velodyne64_height.yaml",
-    "The path of height parameter of lidar.");
+    "<ros>/share/velodyne_pointcloud/params/"
+    "velodyne64_height_example.yaml",
+    "Velodyne extrinsic path for the vehicle in use, "
+    "where <ros> is the placeholder of ROS root.");
 DEFINE_int32(lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
@@ -111,3 +115,33 @@ DEFINE_bool(trans_gpstime_to_utctime, true,
 DEFINE_int32(gnss_mode, 1,
     "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
 
+namespace apollo {
+namespace localization {
+
+using apollo::common::util::CopyFile;
+using apollo::common::util::StrCat;
+
+std::string RosRoot() {
+  if (const char* ros_root = std::getenv("ROS_ROOT")) {
+    // ROS_ROOT env points to <ros>/share/ros. We shift it to <ros>.
+    return StrCat(ros_root, "/../..");
+  }
+  // If no ROS_ROOT env is available, we assume there is a "ros" dir in current
+  // working directory, which is true for our release image.
+  return "ros";
+}
+
+std::string TranslatePath(const std::string &src_path) {
+  static const std::string kRosPlaceholder = "<ros>";
+  static const std::string kRosRoot = RosRoot();
+
+  std::string result = src_path;
+  const auto pos = src_path.find(kRosPlaceholder);
+  if (pos != std::string::npos) {
+    result.replace(pos, kRosPlaceholder.length(), kRosRoot);
+  }
+  return result;
+}
+
+}  // namespace localization
+}  // namespace apollo
