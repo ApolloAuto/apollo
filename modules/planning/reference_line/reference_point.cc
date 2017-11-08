@@ -46,6 +46,19 @@ ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
       lower_bound_(lower_bound),
       upper_bound_(upper_bound) {}
 
+common::PathPoint ReferencePoint::ToPathPoint(double s) const {
+  common::PathPoint path_point;
+  path_point.set_x(x());
+  path_point.set_y(y());
+  path_point.set_z(0.0);
+  path_point.set_theta(heading());
+  path_point.set_s(s);
+  path_point.set_kappa(kappa_);
+  path_point.set_dkappa(dkappa_);
+  path_point.set_ddkappa(0.0);
+  return path_point;
+}
+
 double ReferencePoint::kappa() const { return kappa_; }
 
 double ReferencePoint::dkappa() const { return dkappa_; }

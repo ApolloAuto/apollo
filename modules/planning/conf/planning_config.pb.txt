@@ -132,8 +132,8 @@ em_planner_config {
 
 qp_spline_reference_line_smoother_config {
     spline_order: 5
-    constraint_to_knots_ratio: 5
     max_spline_length: 25.0
+    max_constraint_interval : 12.5
     longitudinal_boundary_bound: 2.0
     lateral_boundary_bound: 0.25
     second_derivative_weight: 200.0

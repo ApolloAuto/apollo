@@ -21,16 +21,27 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_SMOOTHER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_SMOOTHER_H_
 
+#include <vector>
+
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
+
+struct AnchorPoint {
+  common::PathPoint path_point;
+  double lateral_bound = 0.0;
+  double longitudinal_bound = 0.0;
+};
 
 class ReferenceLineSmoother {
  public:
   ReferenceLineSmoother() = default;
 
   virtual ~ReferenceLineSmoother() = default;
+
+  virtual void SetAnchorPoints(
+      const std::vector<AnchorPoint>& achor_points) = 0;
 
   virtual bool Smooth(const ReferenceLine&, ReferenceLine* const) = 0;
 };

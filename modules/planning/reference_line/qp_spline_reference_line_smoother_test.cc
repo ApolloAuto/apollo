@@ -24,6 +24,7 @@
 #include "modules/planning/proto/qp_spline_reference_line_smoother_config.pb.h"
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -72,8 +73,30 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
 TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
+  std::vector<AnchorPoint> anchor_points;
+  const double interval = 10.0;
+  int num_of_anchors =
+      std::max(1, static_cast<int>(reference_line_->Length() / interval + 0.5));
+  std::vector<double> anchor_s;
+  common::util::uniform_slice(0.0, reference_line_->Length(),
+                              num_of_anchors - 1, &anchor_s);
+  for (const double s : anchor_s) {
+    anchor_points.emplace_back();
+    auto& last_anchor = anchor_points.back();
+    auto ref_point = reference_line_->GetReferencePoint(s);
+    last_anchor.path_point = ref_point.ToPathPoint(s);
+    // TODO(zhangliangliang): change the langitudianl and lateral direction in
+    // code
+    last_anchor.longitudinal_bound = 2.0;
+    last_anchor.lateral_bound = 0.2;
+  }
+  anchor_points.front().longitudinal_bound = 1e-6;
+  anchor_points.front().lateral_bound = 1e-6;
+  anchor_points.back().longitudinal_bound = 1e-6;
+  anchor_points.back().lateral_bound = 1e-6;
+  smoother_.SetAnchorPoints(anchor_points);
   EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_FLOAT_EQ(153.93542, smoothed_reference_line.Length());
+  EXPECT_FLOAT_EQ(152.5217, smoothed_reference_line.Length());
 }
 
 }  // namespace planning
