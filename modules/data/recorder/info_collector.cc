@@ -81,7 +81,8 @@ const UserInfo &InfoCollector::GetUserInfo() {
 
 Task InfoCollector::LoadTaskInfoTemplate() {
   Task task_info;
-  CHECK(GetProtoFromASCIIFile(FLAGS_task_info_template_file, &task_info));
+  // The template might not exist, then just ignore.
+  GetProtoFromASCIIFile(FLAGS_task_info_template_file, &task_info);
   return task_info;
 }
 
