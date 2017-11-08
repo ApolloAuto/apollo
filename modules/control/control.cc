@@ -185,8 +185,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
-  if (trajectory_.has_signal()) {
-    control_command->mutable_signal()->CopyFrom(trajectory_.signal());
+  if (trajectory_.decision().has_vehicle_signal()) {
+    control_command->mutable_signal()->CopyFrom(
+        trajectory_.decision().vehicle_signal());
   }
   return status;
 }
