@@ -30,6 +30,7 @@ namespace drivers {
 namespace velodyne {
 
 static int FIRING_DATA_PORT = 2368;
+static int POSITIONING_DATA_PORT = 8308;
 static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 
 /** @brief Live Velodyne input from socket. */
@@ -39,11 +40,11 @@ class SocketInput : public Input {
   virtual ~SocketInput();
   void init(int &port);
   int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt);
-  // int get_positioning_data_packtet(const NMEATimePtr &nmea_time);
+  int get_positioning_data_packtet(const NMEATimePtr &nmea_time);
 
  private:
-  int _sockfd;
-  int _port;
+  int sockfd_;
+  int port_;
   bool input_available(int timeout);
 };
 

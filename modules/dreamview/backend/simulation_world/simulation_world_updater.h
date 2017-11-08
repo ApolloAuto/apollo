@@ -32,6 +32,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
+#include "modules/routing/proto/poi.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -85,12 +86,12 @@ class SimulationWorldUpdater {
       apollo::routing::RoutingRequest *routing_request);
 
   /**
-   * @brief Tries to load the default routing end point from the file if it has
+   * @brief Tries to load the points of interest from the file if it has
    * not been.
-   * @return False if failed to load the default routing end point from file,
+   * @return False if failed to load from file,
    * true otherwise or if it's already loaded.
    */
-  bool LoadDefaultEndPoint();
+  bool LoadPOI();
 
   /**
    * @brief Dumps the latest received message to file.
@@ -122,7 +123,7 @@ class SimulationWorldUpdater {
   SimControl *sim_control_;
 
   // End point for requesting default route
-  apollo::routing::LaneWaypoint default_end_point_;
+  apollo::routing::POI poi_;
 
   // The json string to be pushed to frontend, which is updated by timer.
   std::string simulation_world_json_;

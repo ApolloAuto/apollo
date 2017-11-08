@@ -21,17 +21,17 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/predictor/regional/regional_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
+#include "modules/prediction/predictor/regional/regional_predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::perception::PerceptionObstacles;
-using apollo::perception::PerceptionObstacle;
 using apollo::common::adapter::AdapterConfig;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 PredictorManager::PredictorManager() { RegisterPredictors(); }
 
@@ -93,9 +93,19 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   Predictor* predictor = nullptr;
   for (const auto& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
+    if (!perception_obstacle.has_id()) {
+      AERROR << "A perception obstacle has no id.";
+      continue;
+    }
+
+    int id = perception_obstacle.id();
+    if (id < 0) {
+      AERROR << "A perception obstacle has invalid id [" << id << "].";
+      continue;
+    }
+
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
-    int id = perception_obstacle.id();
     Obstacle* obstacle = container->GetObstacle(id);
     if (obstacle != nullptr) {
       switch (perception_obstacle.type()) {

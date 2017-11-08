@@ -43,8 +43,10 @@ cc_library(
     name = "string_util",
     hdrs = [
         "string_util.h",
-        "string_util_internal.h",
     ],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ]
 )
 
 cc_test(
@@ -57,6 +59,14 @@ cc_test(
         ":string_util",
         "@gtest//:main",
     ],
+)
+
+cc_library(
+    name = "map_util",
+    hdrs = ["map_util.h"],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ]
 )
 
 cc_test(
@@ -89,6 +99,30 @@ cc_test(
     ],
     deps = [
         ":factory",
+        "//modules/common",
+        "//modules/common:log",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "dropbox",
+    hdrs = [
+        "dropbox.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_test(
+    name = "dropbox_test",
+    size = "small",
+    srcs = [
+        "dropbox_test.cc",
+    ],
+    deps = [
+        ":dropbox",
         "//modules/common",
         "//modules/common:log",
         "@gtest//:main",

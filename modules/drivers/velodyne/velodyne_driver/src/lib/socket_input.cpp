@@ -1,18 +1,18 @@
- /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *****************************************************************************/
+/******************************************************************************
+* Copyright 2017 The Apollo Authors. All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*****************************************************************************/
 
 /* -*- mode: C++ -*-
  *
@@ -48,24 +48,24 @@ namespace velodyne {
  *  @param private_nh private node handle for driver
  *  @param udp_port UDP port number to connect
  */
-SocketInput::SocketInput() : _sockfd(-1), _port(0) {}
+SocketInput::SocketInput() : sockfd_(-1), port_(0) {}
 
 /** @brief destructor */
-SocketInput::~SocketInput(void) { 
-  (void)close(_sockfd); 
+SocketInput::~SocketInput(void) {
+  (void)close(sockfd_);
 }
 
 void SocketInput::init(int &port) {
-  if (_sockfd != -1) {
-    (void)close(_sockfd);
+  if (sockfd_ != -1) {
+    (void)close(sockfd_);
   }
 
   // connect to Velodyne UDP port
   ROS_INFO_STREAM("Opening UDP socket: port " << uint16_t(port));
-  _port = port;
-  _sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+  port_ = port;
+  sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 
-  if (_sockfd == -1) {
+  if (sockfd_ == -1) {
     ROS_ERROR_STREAM("Init socket failed, UDP port is " << port);
     ROS_BREAK();
   }
@@ -77,17 +77,17 @@ void SocketInput::init(int &port) {
   my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
   //    my_addr.sin_addr.s_addr = inet_addr("192.168.1.100");
 
-  if (bind(_sockfd, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
-    ROS_ERROR_STREAM("Socket bind failed! Port " << _port);
+  if (bind(sockfd_, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
+    ROS_ERROR_STREAM("Socket bind failed! Port " << port_);
     ROS_BREAK();
   }
 
-  if (fcntl(_sockfd, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
-    ROS_ERROR_STREAM("non-block! Port " << _port);
+  if (fcntl(sockfd_, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
+    ROS_ERROR_STREAM("non-block! Port " << port_);
     ROS_BREAK();
   }
 
-  ROS_DEBUG_STREAM("Velodyne socket fd is " << _sockfd << ", port " << _port);
+  ROS_DEBUG_STREAM("Velodyne socket fd is " << sockfd_ << ", port " << port_);
 }
 
 /** @brief Get one velodyne packet. */
@@ -99,12 +99,12 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
     }
     // Receive packets that should now be available from the
     // socket using a blocking read.
-    ssize_t nbytes = recvfrom(_sockfd, &(pkt->data[0]), FIRING_DATA_PACKET_SIZE,
+    ssize_t nbytes = recvfrom(sockfd_, &(pkt->data[0]), FIRING_DATA_PACKET_SIZE,
                               0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
-        ROS_ERROR_STREAM("recvfail from port " << _port);
+        ROS_ERROR_STREAM("recvfail from port " << port_);
         return RECIEVE_FAIL;
       }
     }
@@ -115,7 +115,7 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
     }
 
     ROS_ERROR_STREAM("Incomplete Velodyne rising data packet read: "
-                     << nbytes << " bytes from port " << _port);
+                     << nbytes << " bytes from port " << port_);
   }
   double time2 = ros::Time::now().toSec();
   pkt->stamp = ros::Time((time2 + time1) / 2.0);
@@ -123,9 +123,44 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
   return 0;
 }
 
+int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
+  while (true) {
+    if (!input_available(POLL_TIMEOUT)) {
+      return 1;
+    }
+    // Receive packets that should now be available from the
+    // socket using a blocking read.
+    // Last 234 bytes not use
+    uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
+    ssize_t nbytes =
+        recvfrom(sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
+
+    if (nbytes < 0) {
+      if (errno != EWOULDBLOCK) {
+        ROS_ERROR_STREAM("recvfail from port " << port_);
+        return 1;
+      }
+    }
+
+    if ((size_t)nbytes == POSITIONING_DATA_PACKET_SIZE) {
+      // read successful, exract nmea time
+      if (exract_nmea_time_from_packet(nmea_time, bytes)) {
+        break;
+      } else {
+        return 1;
+      }
+    }
+
+    ROS_INFO_STREAM("incomplete Velodyne packet read: "
+                    << nbytes << " bytes from port " << port_);
+  }
+
+  return 0;
+}
+
 bool SocketInput::input_available(int timeout) {
   struct pollfd fds[1];
-  fds[0].fd = _sockfd;
+  fds[0].fd = sockfd_;
   fds[0].events = POLLIN;
   // Unfortunately, the Linux kernel recvfrom() implementation
   // uses a non-interruptible sleep() when waiting for data,
@@ -151,19 +186,19 @@ bool SocketInput::input_available(int timeout) {
     if (retval < 0) {  // poll() error?
       if (errno != EINTR) {
         ROS_ERROR_STREAM("Velodyne port "
-                         << _port << "poll() error: " << strerror(errno));
+                         << port_ << "poll() error: " << strerror(errno));
       }
       return false;
     }
 
     if (retval == 0) {  // poll() timeout?
-      ROS_WARN_STREAM("Velodyne port " << _port << " poll() timeout");
+      ROS_WARN_STREAM("Velodyne port " << port_ << " poll() timeout");
       return false;
     }
 
     if ((fds[0].revents & POLLERR) || (fds[0].revents & POLLHUP) ||
         (fds[0].revents & POLLNVAL)) {  // device error?
-      ROS_ERROR_STREAM("Velodyne port " << _port
+      ROS_ERROR_STREAM("Velodyne port " << port_
                                         << "poll() reports Velodyne error");
       return false;
     }

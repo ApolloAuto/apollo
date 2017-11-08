@@ -28,10 +28,8 @@ namespace planning {
 BacksideVehicle::BacksideVehicle(const RuleConfig& config)
     : TrafficRule(config) {}
 
-bool BacksideVehicle::ApplyRule(Frame* frame,
-                                ReferenceLineInfo* const reference_line_info) {
-  auto* path_decision = reference_line_info->path_decision();
-  const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
+void BacksideVehicle::MakeLaneKeepingObstacleDecision(
+    const SLBoundary& adc_sl_boundary, PathDecision* path_decision) {
   ObjectDecisionType ignore;
   ignore.mutable_ignore();
   const std::string rule_id = RuleConfig::RuleId_Name(config_.rule_id());
@@ -53,6 +51,16 @@ bool BacksideVehicle::ApplyRule(Frame* frame,
       path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
       continue;
     }
+  }
+}
+
+bool BacksideVehicle::ApplyRule(Frame*,
+                                ReferenceLineInfo* const reference_line_info) {
+  auto* path_decision = reference_line_info->path_decision();
+  const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
+  if (reference_line_info->Lanes()
+          .IsOnSegment()) {  // The lane keeping reference line.
+    MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision);
   }
   return true;
 }

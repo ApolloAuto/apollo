@@ -105,6 +105,7 @@ function main() {
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
+        -e DOCKER_IMG=$IMG \
         -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \

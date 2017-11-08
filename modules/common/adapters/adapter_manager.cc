@@ -37,6 +37,7 @@ bool AdapterManager::Initialized() {
 
 void AdapterManager::Reset() {
   instance()->initialized_ = false;
+  instance()->observers_.clear();
 }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
@@ -89,6 +90,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableTrafficLightDetection(FLAGS_traffic_light_detection_topic,
                                     config.mode(),
                                     config.message_history_limit());
+        break;
       case AdapterConfig::PAD:
         EnablePad(FLAGS_pad_topic, config.mode(),
                   config.message_history_limit());
@@ -129,6 +131,18 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableInsStat(FLAGS_ins_stat_topic, config.mode(),
                       config.message_history_limit());
         break;
+      case AdapterConfig::INS_STATUS:
+        EnableInsStatus(FLAGS_ins_status_topic, config.mode(),
+                        config.message_history_limit());
+        break;
+      case AdapterConfig::GNSS_STATUS:
+        EnableGnssStatus(FLAGS_gnss_status_topic, config.mode(),
+                         config.message_history_limit());
+        break;
+      case AdapterConfig::SYSTEM_STATUS:
+        EnableSystemStatus(FLAGS_system_status_topic, config.mode(),
+                           config.message_history_limit());
+        break;
       case AdapterConfig::HMI_COMMAND:
         EnableHMICommand(FLAGS_hmi_command_topic, config.mode(),
                          config.message_history_limit());
@@ -144,10 +158,6 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config.mode(),
                               config.message_history_limit());
-        break;
-      case AdapterConfig::HMI_STATUS:
-        EnableHMIStatus(FLAGS_hmi_status_topic, config.mode(),
-                        config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

@@ -77,17 +77,17 @@ Status QpPiecewiseStGraph::Search(
       qp_st_speed_config_.qp_piecewise_config().number_of_evaluated_graph_t(),
       t_evaluated_resolution_));
 
-  if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
+  if (!AddConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                        st_graph_data.st_boundaries(), accel_bound)
            .ok()) {
-    const std::string msg = "Apply constraint failed!";
+    const std::string msg = "Add constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.st_boundaries(), st_graph_data.speed_limit())
+  if (!AddKernel(st_graph_data.st_boundaries(), st_graph_data.speed_limit())
            .ok()) {
-    const std::string msg = "Apply kernel failed!";
+    const std::string msg = "Add kernel failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -125,7 +125,7 @@ Status QpPiecewiseStGraph::Search(
   return Status::OK();
 }
 
-Status QpPiecewiseStGraph::ApplyConstraint(
+Status QpPiecewiseStGraph::AddConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     const std::vector<const StBoundary*>& boundaries,
     const std::pair<double, double>& accel_bound) {
@@ -215,7 +215,7 @@ Status QpPiecewiseStGraph::ApplyConstraint(
   return Status::OK();
 }
 
-Status QpPiecewiseStGraph::ApplyKernel(
+Status QpPiecewiseStGraph::AddKernel(
     const std::vector<const StBoundary*>& boundaries,
     const SpeedLimit& speed_limit) {
   auto* kernel = generator_->mutable_kernel();
@@ -237,14 +237,14 @@ Status QpPiecewiseStGraph::ApplyKernel(
            speed_limit,
            qp_st_speed_config_.qp_piecewise_config().cruise_weight())
            .ok()) {
-    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
   }
 
   if (!AddFollowReferenceLineKernel(
            boundaries,
            qp_st_speed_config_.qp_piecewise_config().follow_weight())
            .ok()) {
-    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
   }
   kernel->AddRegularization(
       qp_st_speed_config_.qp_piecewise_config().regularization_weight());

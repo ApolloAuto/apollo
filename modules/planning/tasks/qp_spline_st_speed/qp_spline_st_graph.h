@@ -56,15 +56,15 @@ class QpSplineStGraph {
  private:
   void Init();
 
-  // apply st graph constraint
-  common::Status ApplyConstraint(
+  // Add st graph constraint
+  common::Status AddConstraint(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
       const std::vector<const StBoundary*>& boundaries,
       const std::pair<double, double>& accel_bound);
 
-  // apply objective function
-  common::Status ApplyKernel(const std::vector<const StBoundary*>& boundaries,
-                             const SpeedLimit& speed_limit);
+  // Add objective function
+  common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,
+                           const SpeedLimit& speed_limit);
 
   // solve
   common::Status Solve();

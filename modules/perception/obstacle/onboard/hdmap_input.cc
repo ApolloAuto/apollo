@@ -49,7 +49,9 @@ using std::vector;
 // HDMapInput
 HDMapInput::HDMapInput() {}
 
-bool HDMapInput::Init() { return HDMapUtil::ReloadBaseMap(); }
+bool HDMapInput::Init() {
+  return HDMapUtil::ReloadMaps();
+}
 
 bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   auto* hdmap = HDMapUtil::BaseMapPtr();

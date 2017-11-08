@@ -42,7 +42,7 @@ if [ "$RELEASE_DOCKER" != "1" ];then
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
 # setup ros package
-# this is a tempary solution to avoid ros package downloading.
+# this is a temporary solution to avoid ros package downloading.
 ROS="/home/tmp/ros"
 if [ -e "$ROS" ]; then
   rm -rf $ROS

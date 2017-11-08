@@ -6,7 +6,7 @@ import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
-import "modules/planning/proto/reference_line_smoother_config.proto";
+import "modules/planning/proto/qp_spline_reference_line_smoother_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
@@ -46,6 +46,6 @@ message PlanningConfig {
   optional PlannerType planner_type = 1 [default = EM];
 
   optional EMPlannerConfig em_planner_config = 2;
-  optional apollo.planning.ReferenceLineSmootherConfig reference_line_smoother_config = 3;
+  optional apollo.planning.QpSplineReferenceLineSmootherConfig qp_spline_reference_line_smoother_config = 3;
   repeated RuleConfig rule_config = 4;
 }

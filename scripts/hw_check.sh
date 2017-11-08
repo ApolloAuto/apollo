@@ -31,10 +31,10 @@ case $1 in
       sudo mknod --mode=a+rw /dev/can0 c 52 0
     fi
 
-    eval "${APOLLO_BIN_PREFIX}/modules/monitor/hwmonitor/hw_check/can_check | tee ${LOG}"
+    eval "${APOLLO_BIN_PREFIX}/modules/monitor/hardware/can/can_check | tee ${LOG}"
     ;;
   "gps")
-    eval "${APOLLO_BIN_PREFIX}/modules/monitor/hwmonitor/hw_check/gps_check | tee ${LOG}"
+    eval "${APOLLO_BIN_PREFIX}/modules/monitor/hardware/gps/gps_check | tee ${LOG}"
     ;;
   *)
     echo "Usage: $0 {can|gps}" | tee "${LOG}"

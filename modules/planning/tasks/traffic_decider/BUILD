@@ -23,7 +23,9 @@ cc_library(
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/util:dropbox",
         "//modules/common/util:factory",
+        "//modules/common/util:map_util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
@@ -42,7 +44,7 @@ cc_library(
     deps = [
         ":traffic_rules",
         "//modules/common/status",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/tasks:task",

@@ -79,12 +79,6 @@ class Planning:
         self.init_point_x = []
         self.init_point_y = []
 
-        # lattice paths
-        self.lattice_lock = threading.Lock()
-        self.lattice_path_data_x = [] # list of list for each lattice path
-        self.lattice_path_data_y = []
-        self.lattice_path_costs =[]
-
     def update_planning_pb(self, planning_pb):
         self.planning_pb = planning_pb
 
@@ -210,11 +204,16 @@ class Planning:
             st_speed_constraint_s[st_graph.name] = []
             st_speed_constraint_lower[st_graph.name] = []
             st_speed_constraint_upper[st_graph.name] = []
-            for speed_constraint in st_graph.speed_constraint:
-                interp_s = np.interp(speed_constraint.t, st_curve_t[st_graph.name], st_curve_s[st_graph.name])
-                st_speed_constraint_s[st_graph.name].append(interp_s)
-                st_speed_constraint_lower[st_graph.name].append(speed_constraint.lower_bound)
-                st_speed_constraint_upper[st_graph.name].append(speed_constraint.upper_bound)
+
+            speed_constraint = st_graph.speed_constraint
+            interp_s_set = []
+            for t in speed_constraint.t:
+                interp_s = np.interp(t, st_curve_t[st_graph.name],
+                                     st_curve_s[st_graph.name])
+                interp_s_set.append(interp_s)
+            st_speed_constraint_s[st_graph.name].extend(interp_s_set)
+            st_speed_constraint_lower[st_graph.name].extend(speed_constraint.lower_bound)
+            st_speed_constraint_upper[st_graph.name].extend(speed_constraint.upper_bound)
 
             kernel_cruise_t[st_graph.name] = []
             kernel_cruise_s[st_graph.name] = []
@@ -443,39 +442,6 @@ class Planning:
             line.set_label(name[0:5])
             cnt += 1
         self.path_data_lock.release()
-
-    def compute_lattice_path_data(self):
-        print "     --- computing lattice path"
-        lattice_path_data_x = []
-        lattice_path_data_y = []
-        print "planning_data.trajectory_path size=[" + str(len(self.planning_pb.debug.planning_data.trajectory_path)) + "]"
-        for traj_path in self.planning_pb.debug.planning_data.trajectory_path:
-            print "      getting trajectory_path ......"
-            each_path_x = []
-            each_path_y = []
-            traj_str = ""
-            for traj_path_point in traj_path.trajectory_point:
-                each_path_x.append(traj_path_point.path_point.x)
-                each_path_y.append(traj_path_point.path_point.y)
-                traj_str += "(" + str(traj_path_point.path_point.x) + "," \
-                        + str(traj_path_point.path_point.y) + ")" + " "
-            lattice_path_data_x.append(each_path_x)
-            lattice_path_data_y.append(each_path_y)
-            print "    traj_str " + traj_str
-        # End of for
-        self.lattice_lock.acquire()
-        self.lattice_path_data_x = lattice_path_data_x
-        self.lattice_path_data_y = lattice_path_data_y
-        #print " lattice_path_data_x list size = " +str(len(self.lattice_path_data_x))
-        if len(self.lattice_path_data_x) > 0:
-            print " lattice_path_data_x[0] size = " +str(len(self.lattice_path_data_x[0]))
-        self.lattice_lock.release()
-    # End of compute_lattice_path_data
-
-    def replot_lattice_path_data(self, path_lines):
-        # Currently do nothing
-        print "Doing nothing right now ------  Replot_Lattice_Path_Data"
-    # End of replot lattice path_data
 
     def compute_speed_data(self):
         speed_data_time = {}

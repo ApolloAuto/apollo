@@ -18,7 +18,9 @@ message Command {
 message Component {
   optional string name = 1;
   optional string display_name = 2;
-  repeated Command supported_commands = 3;
+  // If the path is given, HMI will check if it's available.
+  optional string path = 3;
+  repeated Command supported_commands = 4;
 }
 
 message Config {

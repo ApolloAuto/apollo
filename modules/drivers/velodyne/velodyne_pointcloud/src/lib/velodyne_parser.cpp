@@ -35,7 +35,7 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
     if (std::abs(previous_packet_stamp - current_packet_stamp) > 3599000000) {
       gps_base_usec += 3600 * 1e6;
       ROS_INFO_STREAM("Base time plus 3600s. Model: "
-                      << _config.model << std::fixed
+                      << config_.model << std::fixed
                       << ". current:" << current_packet_stamp
                       << ", last time:" << previous_packet_stamp);
     } else {
@@ -70,7 +70,7 @@ VPoint VelodyneParser::get_nan_point(double timestamp) {
 }
 
 VelodyneParser::VelodyneParser(Config config)
-    : _last_time_stamp(0), _config(config), _mode(STRONGEST) {}
+    : last_time_stamp_(0), config_(config), mode_(STRONGEST) {}
 
 void VelodyneParser::init_angle_params(double view_direction,
                                        double view_width) {
@@ -84,46 +84,46 @@ void VelodyneParser::init_angle_params(double view_direction,
 
   // converting into the hardware velodyne ref (negative yaml and degrees)
   // adding 0.5 perfomrs a centered double to int conversion
-  _config.min_angle = 100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5;
-  _config.max_angle = 100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5;
-  if (_config.min_angle == _config.max_angle) {
+  config_.min_angle = 100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5;
+  config_.max_angle = 100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5;
+  if (config_.min_angle == config_.max_angle) {
     // avoid returning empty cloud if min_angle = max_angle
-    _config.min_angle = 0;
-    _config.max_angle = 36000;
+    config_.min_angle = 0;
+    config_.max_angle = 36000;
   }
 }
 
 /** Set up for on-line operation. */
 void VelodyneParser::setup() {
-  if (!_config.calibration_online) {
-    _calibration.read(_config.calibration_file);
+  if (!config_.calibration_online) {
+    calibration_.read(config_.calibration_file);
 
-    if (!_calibration._initialized) {
+    if (!calibration_.initialized_) {
       ROS_FATAL_STREAM(
-          "Unable to open calibration file: " << _config.calibration_file);
+          "Unable to open calibration file: " << config_.calibration_file);
       ROS_BREAK();
     }
   }
 
   // setup angle parameters.
-  init_angle_params(_config.view_direction, _config.view_width);
-  init_sin_cos_rot_table(_sin_rot_table, _cos_rot_table, ROTATION_MAX_UNITS,
+  init_angle_params(config_.view_direction, config_.view_width);
+  init_sin_cos_rot_table(sin_rot_table_, cos_rot_table_, ROTATION_MAX_UNITS,
                          ROTATION_RESOLUTION);
 }
 
 bool VelodyneParser::is_scan_valid(int rotation, float range) {
   // check range first
-  if (range < _config.min_range || range > _config.max_range) {
+  if (range < config_.min_range || range > config_.max_range) {
     return false;
   }
   // condition added to avoid calculating points which are not
   // in the interesting defined area (min_angle < area < max_angle)
   // not used now
-  // if ((_config.min_angle > _config.max_angle && (rotation <=
-  // _config.max_angle || rotation >= _config.min_angle))
-  //     || (_config.min_angle < _config.max_angle && rotation >=
-  //     _config.min_angle
-  //         && rotation <= _config.max_angle)) {
+  // if ((config_.min_angle > config_.max_angle && (rotation <=
+  // config_.max_angle || rotation >= config_.min_angle))
+  //     || (config_.min_angle < config_.max_angle && rotation >=
+  //     config_.min_angle
+  //         && rotation <= config_.max_angle)) {
   //     return true;
   // }
   return true;
@@ -142,11 +142,11 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
   // cos(a-b) = cos(a)*cos(b) + sin(a)*sin(b)
   // sin(a-b) = sin(a)*cos(b) - cos(a)*sin(b)
   double cos_rot_angle =
-      _cos_rot_table[rotation] * corrections.cos_rot_correction +
-      _sin_rot_table[rotation] * corrections.sin_rot_correction;
+      cos_rot_table_[rotation] * corrections.cos_rot_correction +
+      sin_rot_table_[rotation] * corrections.sin_rot_correction;
   double sin_rot_angle =
-      _sin_rot_table[rotation] * corrections.cos_rot_correction -
-      _cos_rot_table[rotation] * corrections.sin_rot_correction;
+      sin_rot_table_[rotation] * corrections.cos_rot_correction -
+      cos_rot_table_[rotation] * corrections.sin_rot_correction;
 
   double vert_offset = corrections.vert_offset_correction;
 
@@ -166,7 +166,7 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
   double distance_corr_x = 0;
   double distance_corr_y = 0;
 
-  if (_need_two_pt_correction && distance1 <= 2500) {
+  if (need_two_pt_correction_ && distance1 <= 2500) {
     distance_corr_x =
         (corrections.dist_correction - corrections.dist_correction_x) *
             (xx - 2.4) / 22.64 +
@@ -206,9 +206,12 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
 }
 
 VelodyneParser *VelodyneParserFactory::create_parser(Config config) {
-  if (config.model == "64E_S2" || config.model == "64E_S3S" ||
-      config.model == "64E_S3D_STRONGEST" || config.model == "64E_S3D_LAST" ||
-      config.model == "64E_S3D_DUAL") {
+  if (config.model == "VLP16") {
+    config.calibration_online = false;
+    return new Velodyne16Parser(config);
+  } else if (config.model == "64E_S2" || config.model == "64E_S3S" ||
+             config.model == "64E_S3D_STRONGEST" ||
+             config.model == "64E_S3D_LAST" || config.model == "64E_S3D_DUAL") {
     return new Velodyne64Parser(config);
   } else {
     ROS_ERROR_STREAM("invalid model, must be 64E_S2|64E_S3S"

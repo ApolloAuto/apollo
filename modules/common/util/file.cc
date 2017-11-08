@@ -19,10 +19,23 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <fstream>
 
 namespace apollo {
 namespace common {
 namespace util {
+
+bool GetContent(const std::string &file_name, std::string *content) {
+  std::ifstream fin(file_name);
+  if (!fin) {
+    return false;
+  }
+
+  std::stringstream str_stream;
+  str_stream << fin.rdbuf();
+  *content = str_stream.str();
+  return true;
+}
 
 bool PathExists(const std::string &path) {
   struct stat info;
@@ -39,6 +52,17 @@ bool DirectoryExists(const std::string &directory_path) {
     return true;
   }
 
+  return false;
+}
+
+bool CopyFile(const std::string &from, const std::string &to) {
+  std::ifstream src(from, std::ios::binary);
+  std::ofstream dst(to, std::ios::binary);
+  if (src && dst) {
+    dst << src.rdbuf();
+    return true;
+  }
+  AERROR_IF(src && !dst) << "Target path is not writable: " << to;
   return false;
 }
 
@@ -73,8 +97,13 @@ bool EnsureDirectory(const std::string &directory_path) {
 
 bool RemoveAllFiles(const std::string &directory_path) {
   DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << directory_path;
+    return false;
+  }
+
   struct dirent *file;
-  while ((file = readdir(directory)) != NULL) {
+  while ((file = readdir(directory)) != nullptr) {
     // skip directory_path/. and directory_path/..
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -89,6 +118,29 @@ bool RemoveAllFiles(const std::string &directory_path) {
   }
   closedir(directory);
   return true;
+}
+
+std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
+  std::vector<std::string> result;
+  DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << directory_path;
+    return result;
+  }
+
+  struct dirent *entry;
+  while ((entry = readdir(directory)) != nullptr) {
+    // skip directory_path/. and directory_path/..
+    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+      continue;
+    }
+
+    if (entry->d_type == DT_DIR) {
+      result.emplace_back(entry->d_name);
+    }
+  }
+  closedir(directory);
+  return result;
 }
 
 }  // namespace util
