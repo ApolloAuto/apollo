@@ -150,16 +150,21 @@ PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
 SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
 
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
-    const double time_resolution, const double relative_time,
+    const double relative_time,
     DiscretizedTrajectory* ptr_discretized_trajectory) {
-  CHECK(time_resolution > 0.0);
   CHECK(ptr_discretized_trajectory != nullptr);
+  // use varied resolution to reduce data load but also provide enough data
+  // point for control module
+  const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
+  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
+  const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
   if (path_data_.discretized_path().NumOfPoints() == 0) {
     AWARN << "path data is empty";
     return false;
   }
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
-       cur_rel_time += time_resolution) {
+       cur_rel_time += (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion
+                                                     : kSparseTimeResolution)) {
     common::SpeedPoint speed_point;
     if (!speed_data_.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;
