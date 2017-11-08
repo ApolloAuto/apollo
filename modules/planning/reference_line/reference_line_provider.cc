@@ -220,13 +220,13 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
        FLAGS_look_forward_min_distance)
           ? FLAGS_look_forward_distance
           : FLAGS_look_forward_min_distance;
+  double look_backward_distance = FLAGS_look_backward_distance;
   common::math::Vec2d point;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
     point.set_x(vehicle_state_.x());
     point.set_y(vehicle_state_.y());
-    if (!pnc_map_->GetRouteSegments(vehicle_state_,
-                                    FLAGS_look_backward_distance,
+    if (!pnc_map_->GetRouteSegments(vehicle_state_, look_backward_distance,
                                     look_forward_distance, &route_segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
@@ -259,8 +259,10 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
 
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
-  const double kReferenceLineDiffCheckResolution = 5.0;
-  for (int s = 0.0; s < raw.Length(); s += kReferenceLineDiffCheckResolution) {
+  constexpr double kReferenceLineDiffCheckStep = 10.0;
+  constexpr double kReferenceLineDiffCheckResolution = 5.0;
+  for (double s = 0.0; s + kReferenceLineDiffCheckStep / 2.0 < raw.Length();
+       s += kReferenceLineDiffCheckStep) {
     auto xy_old = raw.GetReferencePoint(s);
     auto xy_new = smoothed.GetReferencePoint(s);
     const double diff = xy_old.DistanceTo(xy_new);
@@ -274,6 +276,32 @@ bool ReferenceLineProvider::IsReferenceLineSmoothValid(
   return true;
 }
 
+void ReferenceLineProvider::GetAnchorPoints(
+    const ReferenceLine &reference_line,
+    std::vector<AnchorPoint> *anchor_points) const {
+  CHECK_NOTNULL(anchor_points);
+  const double interval = smoother_config_.max_constraint_interval();
+  int num_of_anchors =
+      std::max(1, static_cast<int>(reference_line.Length() / interval + 0.5));
+  std::vector<double> anchor_s;
+  common::util::uniform_slice(0.0, reference_line.Length(), num_of_anchors - 1,
+                              &anchor_s);
+  for (const double s : anchor_s) {
+    anchor_points->emplace_back();
+    auto &last_anchor = anchor_points->back();
+    auto ref_point = reference_line.GetReferencePoint(s);
+    last_anchor.path_point = ref_point.ToPathPoint(s);
+    // TODO(zhangliangliang): change the langitudianl and lateral direction in
+    // code
+    last_anchor.longitudinal_bound = smoother_config_.lateral_boundary_bound();
+    last_anchor.lateral_bound = smoother_config_.longitudinal_boundary_bound();
+  }
+  anchor_points->front().longitudinal_bound = 1e-6;
+  anchor_points->front().lateral_bound = 1e-6;
+  anchor_points->back().longitudinal_bound = 1e-6;
+  anchor_points->back().lateral_bound = 1e-6;
+}
+
 bool ReferenceLineProvider::SmoothReferenceLine(
     const hdmap::RouteSegments &lanes, ReferenceLine *reference_line) {
   hdmap::Path path;
@@ -283,8 +311,12 @@ bool ReferenceLineProvider::SmoothReferenceLine(
     return true;
   }
   ReferenceLine raw_reference_line(path);
+  // generate anchor points:
+  std::vector<AnchorPoint> anchor_points;
+  GetAnchorPoints(raw_reference_line, &anchor_points);
+  smoother_->SetAnchorPoints(anchor_points);
   if (!smoother_->Smooth(raw_reference_line, reference_line)) {
-    AERROR << "Failed to smooth reference line";
+    AERROR << "Failed to smooth reference line with anchor points";
     return false;
   }
   if (!IsReferenceLineSmoothValid(raw_reference_line, *reference_line)) {
