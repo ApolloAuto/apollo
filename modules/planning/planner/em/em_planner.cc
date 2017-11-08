@@ -146,7 +146,6 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
-          FLAGS_output_trajectory_time_resolution,
           planning_start_point.relative_time(), &trajectory)) {
     std::string msg("Fail to aggregate planning trajectory.");
     AERROR << msg;
@@ -244,8 +243,8 @@ std::vector<SpeedPoint> EMPlanner::GenerateSpeedHotStart(
 
     hot_start_speed_profile.push_back(std::move(speed_point));
 
-    t += FLAGS_trajectory_time_resolution;
-    s += v * FLAGS_trajectory_time_resolution;
+    t += FLAGS_trajectory_time_min_interval;
+    s += v * FLAGS_trajectory_time_min_interval;
   }
   return hot_start_speed_profile;
 }
