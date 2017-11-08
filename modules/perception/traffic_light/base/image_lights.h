@@ -13,7 +13,7 @@
 #include "modules/perception/traffic_light/base/light.h"
 #include "modules/perception/traffic_light/base/pose.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -42,6 +42,6 @@ struct ImageLights {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H

@@ -9,37 +9,34 @@
 #include <gflags/gflags.h>
 #include "modules/common/log.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
 bool MultiCamerasProjection::init() {
-  config_manager::ConfigManager *config_manager
-      = base::Singleton<config_manager::ConfigManager>::get();
+  ConfigManager *config_manager
+      = ConfigManager::instance();
   std::string model_name = FLAGS_traffic_light_projection;
-  const config_manager::ModelConfig *model_config = NULL;
-  if (!config_manager->get_model_config(model_name, &model_config)) {
+  const ModelConfig *model_config = NULL;
+  if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
     return false;
   }
 
-  using config_manager::ConfigRead;
-
   // Read camera names from config file
   std::vector<std::string> camera_names;
   std::string single_projection_name;
-  try {
-    camera_names = ConfigRead<std::vector<std::string> >::read(
-        *model_config,
-        "camera_names");
-    single_projection_name = ConfigRead<std::string>::read(*model_config, "SingleProjection");
-    AINFO << "number of camera_names: " << camera_names.size();
-    AINFO << "SingleProjection name: " << single_projection_name;
-
-  } catch (const config_manager::ConfigManagerError &e) {
-    AERROR << model_name << "Load camera_names error: " << e.what();
+  if (!model_config->GetValue("camera_names", &camera_names)) {
+    AERROR << "camera_names not found." << name();
     return false;
   }
+  if (!model_config->GetValue("SingleProjection", &single_projection_name)) {
+    AERROR << "SingleProjection not found." << name();
+    return false;
+  }
+
+  AINFO << "number of camera_names: " << camera_names.size();
+  AINFO << "SingleProjection name: " << single_projection_name;
 
   // Read each camera's config
   std::string lidar2gps_file;
@@ -48,37 +45,38 @@ bool MultiCamerasProjection::init() {
 
   for (size_t i = 0; i < camera_names.size(); ++i) {
     const auto &camera_model_name = camera_names[i];
-    const config_manager::ModelConfig *camera_model_config = NULL;
-    if (!config_manager->get_model_config(camera_model_name, &camera_model_config)) {
+    const ModelConfig *camera_model_config = NULL;
+    if (!config_manager->GetModelConfig(camera_model_name, &camera_model_config)) {
       AERROR << "not found camera model: " << camera_model_name;
       return false;
     }
 
-    try {
-      lidar2gps_file = ConfigRead<std::string>::read(*camera_model_config,
-                                                     "lidar2gps_file");
-      lidar2gps_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                         lidar2gps_file);
-
-      lidar2camera_file = ConfigRead<std::string>::read(*camera_model_config,
-                                                        "lidar2camera_file");
-      lidar2camera_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                            lidar2camera_file);
-
-      camera_intrinsic_file = ConfigRead<std::string>::read(*camera_model_config,
-                                                            "camera_intrinsic_file");
-      camera_intrinsic_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                                camera_intrinsic_file);
-    } catch (const config_manager::ConfigManagerError &e) {
-      AERROR << model_name << " Load " << camera_model_name
-             << " camera param: " << e.what();
+    if (!model_config->GetValue("lidar2gps_file", &lidar2gps_file)) {
+      AERROR << "lidar2gps_file not found." << name();
       return false;
     }
+    if (!model_config->GetValue("lidar2camera_file", &lidar2camera_file)) {
+      AERROR << "lidar2camera_file not found." << name();
+      return false;
+    }
+    if (!model_config->GetValue("camera_intrinsic_file", &camera_intrinsic_file)) {
+      AERROR << "camera_intrinsic_file not found." << name();
+      return false;
+    }
+    lidar2gps_file = FileUtil::GetAbsolutePath(config_manager->work_root(),
+                                               lidar2gps_file);
+
+    lidar2camera_file = FileUtil::GetAbsolutePath(config_manager->work_root(),
+                                                  lidar2camera_file);
+
+    camera_intrinsic_file = FileUtil::GetAbsolutePath(config_manager->work_root(),
+                                                      camera_intrinsic_file);
+
 
     // we can skip wide/narrow camera if their params. file does not exist
-    bool skip_camera = (!base::FileUtil::exists(lidar2gps_file) ||
-        !base::FileUtil::exists(lidar2camera_file) ||
-        !base::FileUtil::exists(camera_intrinsic_file)) &&
+    bool skip_camera = (!FileUtil::Exists(lidar2gps_file) ||
+        !FileUtil::Exists(lidar2camera_file) ||
+        !FileUtil::Exists(camera_intrinsic_file)) &&
         ((camera_model_name == "camera_2mm_focus") ||
             (camera_model_name == "camera_12mm_focus"));
     if (skip_camera) {
@@ -101,7 +99,7 @@ bool MultiCamerasProjection::init() {
     _camera_names.push_back(camera_names[i]);
   }
 
-  _projection.reset(BaseProjectionRegisterer::get_instance_by_name(
+  _projection.reset(BaseProjectionRegisterer::GetInstanceByName(
       single_projection_name));
   if (_projection == nullptr) {
     AERROR << "MultiCamerasProjection new projection failed. name:"
@@ -146,8 +144,8 @@ bool MultiCamerasProjection::init() {
 bool MultiCamerasProjection::project(const CarPose &pose,
                                      const ProjectOption &option,
                                      Light *light) const {
-  const Eigen::Matrix4d mpose = pose.get_pose();
-  const adu::common::hdmap::Signal &tl_info = light->info;
+  const Eigen::Matrix4d mpose = pose.pose();
+  const apollo::hdmap::Signal &tl_info = light->info;
   bool ret = true;
 
   std::map<int, CameraCoeffient> camera_id_to_coeffient;
@@ -156,15 +154,6 @@ bool MultiCamerasProjection::project(const CarPose &pose,
       _camera_coeffients.at("camera_6mm_focus");
   camera_id_to_coeffient[static_cast<int>(CameraId::LONG_FOCUS)] =
       _camera_coeffients.at("camera_25mm_focus");
-
-  if (_camera_coeffients.find("camera_2mm_focus") != _camera_coeffients.end()) {
-    camera_id_to_coeffient[static_cast<int>(CameraId::WIDE_FOCUS)] =
-        _camera_coeffients.at("camera_2mm_focus");
-  }
-  if (_camera_coeffients.find("camera_12mm_focus") != _camera_coeffients.end()) {
-    camera_id_to_coeffient[static_cast<int>(CameraId::NARROW_FOCUS)] =
-        _camera_coeffients.at("camera_12mm_focus");
-  }
 
   auto camera_id = static_cast<int>(option.camera_id);
   if (camera_id_to_coeffient.find(camera_id) == camera_id_to_coeffient.end()) {
@@ -176,8 +165,8 @@ bool MultiCamerasProjection::project(const CarPose &pose,
   ret = _projection->project(camera_id_to_coeffient[camera_id], mpose, tl_info, light);
 
   if (!ret) {
-    XLOG(WARN) << "Projection failed projection the traffic light. "
-               << "camera_id: " << camera_id;
+    AWARN << "Projection failed projection the traffic light. "
+          << "camera_id: " << camera_id;
     return false;
   }
   return true;
@@ -187,8 +176,6 @@ bool MultiCamerasProjection::has_camera(const CameraId &cam_id) {
   std::map<int, std::string> camera_id_to_camera_name;
   camera_id_to_camera_name[static_cast<int>(CameraId::SHORT_FOCUS)] = "camera_6mm_focus";
   camera_id_to_camera_name[static_cast<int>(CameraId::LONG_FOCUS)] = "camera_25mm_focus";
-  camera_id_to_camera_name[static_cast<int>(CameraId::WIDE_FOCUS)] = "camera_2mm_focus";
-  camera_id_to_camera_name[static_cast<int>(CameraId::NARROW_FOCUS)] = "camera_12mm_focus";
 
   auto itr = std::find(_camera_names.begin(), _camera_names.end(),
                        camera_id_to_camera_name[static_cast<int>(cam_id)]);
@@ -200,4 +187,4 @@ bool MultiCamerasProjection::has_camera(const CameraId &cam_id) {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

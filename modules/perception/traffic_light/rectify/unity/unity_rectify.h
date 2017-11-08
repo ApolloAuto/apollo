@@ -5,12 +5,12 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 
-#include <traffic_light/interface/base_rectifier.h>
-#include <traffic_light/interface/green_interface.h>
-#include <lib/config_manager/config_manager.h>
+#include <modules/perception/traffic_light/interface/base_rectifier.h>
+#include <modules/perception/traffic_light/interface/green_interface.h>
+#include <modules/perception/lib/config_manager/config_manager.h>
 #include "modules/perception/traffic_light/rectify/unity/detection.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -29,8 +29,8 @@ class UnityRectify : public BaseRectifier {
   virtual bool rectify(const Image &image, const RectifyOption &option,
                        std::vector<LightPtr> *lights) override;
 
-  bool init_detection(const config_manager::ConfigManager *config_manager,
-                      const config_manager::ModelConfig *model_config,
+  bool init_detection(const ConfigManager *config_manager,
+                      const ModelConfig *model_config,
                       std::shared_ptr<IRefine> *detection, std::shared_ptr<IGetBox> *crop);
 
   // @brief name

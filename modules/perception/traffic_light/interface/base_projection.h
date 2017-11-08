@@ -6,13 +6,13 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 
-#include "lib/base/noncopyable.h"
-#include "lib/base/registerer.h"
+#include "modules/perception/lib/base/noncopyable.h"
+#include "modules/perception/lib/base/registerer.h"
 
 #include "modules/perception/traffic_light/base/pose.h"
 #include "modules/perception/traffic_light/base/light.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -66,7 +66,7 @@ class BaseProjection {
   //                 out:map info & the region on the image.
   virtual bool project(const CameraCoeffient &camera_coeffient,
                        const Eigen::Matrix4d &pose,
-                       const adu::common::hdmap::Signal &tl_info,
+                       const apollo::hdmap::Signal &tl_info,
                        Light *light) const = 0;
 };
 
@@ -108,7 +108,7 @@ bool load_matrix4d_from_file(const std::string &file_name, const std::string &ke
                              Eigen::Matrix4d *matrix);
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 

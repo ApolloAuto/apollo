@@ -4,7 +4,7 @@
 //
 #include "modules/perception/traffic_light/onboard/preprocessor_data.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -12,4 +12,4 @@ REGISTER_SHAREDDATA(TLPreprocessingData);
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

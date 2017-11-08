@@ -4,10 +4,10 @@
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TEST_SUBNODE_TEST_H
 
 #include <gtest/gtest.h>
-#include "onboard/event_manager.h"
-#include "onboard/shared_data_manager.h"
+#include "modules/perception/onboard/event_manager.h"
+#include "modules/perception/onboard/shared_data_manager.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -18,18 +18,18 @@ class SubnodeTest : public testing::Test {
 
  protected:
   bool init_event_manager(const std::vector<std::string> &event_name,
-                          std::vector<onboard::EventMeta> *event_meta,
-                          onboard::EventManager *event_manager);
+                          std::vector<EventMeta> *event_meta,
+                          EventManager *event_manager);
   bool init_shared_data_manager(const std::vector<std::string> &share_data_names,
-                                onboard::SharedDataManager *data_manager);
+                                SharedDataManager *data_manager);
  protected:
-  onboard::EventManager event_manager;
-  onboard::SharedDataManager shared_data_manager;
+  EventManager event_manager;
+  SharedDataManager shared_data_manager;
 };
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TEST_SUBNODE_TEST_H
 // @date 2016/09/20 14:30:54

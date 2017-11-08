@@ -9,17 +9,17 @@
 #include <gflags/gflags.h>
 #include "modules/common/log.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
 bool TwoCamerasProjection::init() {
 
-  config_manager::ConfigManager *config_manager
-      = base::Singleton<config_manager::ConfigManager>::get();
+  ConfigManager *config_manager
+      = ConfigManager::instance();
   std::string model_name = FLAGS_traffic_light_projection;
-  const config_manager::ModelConfig *model_config = NULL;
-  if (!config_manager->get_model_config(model_name, &model_config)) {
+  const ModelConfig *model_config = NULL;
+  if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
     return false;
   }
@@ -27,25 +27,25 @@ bool TwoCamerasProjection::init() {
   std::string lidar2gps_file;
   std::string lidar2camera_file;
   std::string camera_intrinsic_file;
-  using config_manager::ConfigRead;
+  using ConfigRead;
 
   try {
     lidar2gps_file = ConfigRead<std::string>::read(*model_config,
                                                    "short_lidar2gps_file");
-    lidar2gps_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                       lidar2gps_file);
+    lidar2gps_file = FileUtil::get_absolute_path(config_manager->work_root(),
+                                                 lidar2gps_file);
 
     lidar2camera_file = ConfigRead<std::string>::read(*model_config,
                                                       "short_lidar2camera_file");
-    lidar2camera_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                          lidar2camera_file);
+    lidar2camera_file = FileUtil::get_absolute_path(config_manager->work_root(),
+                                                    lidar2camera_file);
 
     camera_intrinsic_file = ConfigRead<std::string>::read(*model_config,
                                                           "short_camera_intrinsic_file");
-    camera_intrinsic_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                              camera_intrinsic_file);
+    camera_intrinsic_file = FileUtil::get_absolute_path(config_manager->work_root(),
+                                                        camera_intrinsic_file);
 
-  } catch (const config_manager::ConfigManagerError &e) {
+  } catch (const ConfigManagerError &e) {
     AERROR << model_name << "Load short focus camera param: " << e.what();
     return false;
   }
@@ -60,20 +60,20 @@ bool TwoCamerasProjection::init() {
   try {
     lidar2gps_file = ConfigRead<std::string>::read(*model_config,
                                                    "long_lidar2gps_file");
-    lidar2gps_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                       lidar2gps_file);
+    lidar2gps_file = FileUtil::get_absolute_path(config_manager->work_root(),
+                                                 lidar2gps_file);
 
     lidar2camera_file = ConfigRead<std::string>::read(*model_config,
                                                       "long_lidar2camera_file");
-    lidar2camera_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                          lidar2camera_file);
+    lidar2camera_file = FileUtil::get_absolute_path(config_manager->work_root(),
+                                                    lidar2camera_file);
 
     camera_intrinsic_file = ConfigRead<std::string>::read(*model_config,
                                                           "long_camera_intrinsic_file");
-    camera_intrinsic_file = base::FileUtil::get_absolute_path(config_manager->work_root(),
-                                                              camera_intrinsic_file);
+    camera_intrinsic_file = FileUtil::get_absolute_path(config_manager->work_root(),
+                                                        camera_intrinsic_file);
 
-  } catch (const config_manager::ConfigManagerError &e) {
+  } catch (const ConfigManagerError &e) {
     AERROR << model_name << "Load long focus camera param: " << e.what();
     return false;
   }
@@ -85,7 +85,7 @@ bool TwoCamerasProjection::init() {
     return false;
   }
 
-  _projection.reset(BaseProjectionRegisterer::get_instance_by_name(
+  _projection.reset(BaseProjectionRegisterer::GetInstanceByName(
       FLAGS_traffic_light_projection));
   if (_projection == nullptr) {
     AERROR << "TwoCamerasProjection new projection failed. name:"
@@ -123,8 +123,8 @@ bool TwoCamerasProjection::project(const CarPose &pose,
                                    const ProjectOption &option,
                                    Light *light) const {
 
-  const Eigen::Matrix4d mpose = pose.get_pose();
-  const adu::common::hdmap::Signal &tl_info = light->info;
+  const Eigen::Matrix4d mpose = pose.pose();
+  const apollo::hdmap::Signal &tl_info = light->info;
   bool ret = true;
   switch (option.camera_id) {
     case CameraId::LONG_FOCUS:ret = _projection
@@ -137,8 +137,8 @@ bool TwoCamerasProjection::project(const CarPose &pose,
       return false;
   }
   if (!ret) {
-    XLOG(WARN) << "Projection failed projection the traffic light. "
-               << "camera_id:" << option.camera_id;
+    AWARN << "Projection failed projection the traffic light. "
+          << "camera_id:" << option.camera_id;
     return false;
   }
   return true;
@@ -146,4 +146,4 @@ bool TwoCamerasProjection::project(const CarPose &pose,
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

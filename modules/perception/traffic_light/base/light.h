@@ -8,23 +8,23 @@
 
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
-#include <map_signal.pb.h>
-#include <traffic_light_detection.pb.h>
+#include <modules/perception/proto/traffic_light_detection.pb.h>
+#include <modules/map/proto/map_signal.pb.h>
 
 #include "modules/perception/traffic_light/base/image.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-typedef adu::common::traffic_light::TrafficLight::Color TLColor;
-const TLColor UNKNOWN_COLOR = adu::common::traffic_light::TrafficLight::UNKNOWN;
-const TLColor GREEN = adu::common::traffic_light::TrafficLight::GREEN;
-const TLColor RED = adu::common::traffic_light::TrafficLight::RED;
-const TLColor YELLOW = adu::common::traffic_light::TrafficLight::YELLOW;
-const TLColor BLACK = adu::common::traffic_light::TrafficLight::BLACK;
+typedef apollo::perception::TrafficLight::Color TLColor;
+const TLColor UNKNOWN_COLOR = apollo::perception::TrafficLight::UNKNOWN;
+const TLColor GREEN = apollo::perception::TrafficLight::GREEN;
+const TLColor RED = apollo::perception::TrafficLight::RED;
+const TLColor YELLOW = apollo::perception::TrafficLight::YELLOW;
+const TLColor BLACK = apollo::perception::TrafficLight::BLACK;
 //When the light has been covered by some objected, the color returned.
-const TLColor DEFAULT_UNKNOWN_COLOR = adu::common::traffic_light::TrafficLight::UNKNOWN;
+const TLColor DEFAULT_UNKNOWN_COLOR = apollo::perception::TrafficLight::UNKNOWN;
 
 // enum DetectionClassId {
 //     UNKNOWN_CLASS = -1,
@@ -96,10 +96,10 @@ struct LightStatus {
 struct Light {
   Light() = default;
 
-  explicit Light(const adu::common::hdmap::Signal &signal) :
+  explicit Light(const apollo::hdmap::Signal &signal) :
       info(signal) {
   }
-  adu::common::hdmap::Signal info;    // Light info in the map.
+  apollo::hdmap::Signal info;    // Light info in the map.
   LightRegion region;  // Light region on the image.
   LightStatus status;  // Light Status.
 
@@ -119,15 +119,15 @@ typedef std::vector<LightPtr> LightPtrs;
 //@brief compute stopline to car's distance
 double stopline_distance(
     const Eigen::Matrix4d &car_pose,
-    const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Curve> &stoplines);
+    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Curve> &stoplines);
 
 //@brief compute traffic light to car's distance
 double trafficlight_distance(
     const Eigen::Matrix4d &car_pose,
-    const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Subsignal> &subsignal);
+    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Subsignal> &subsignal);
 
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H

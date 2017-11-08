@@ -12,15 +12,15 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/opencv.hpp>
 
-#include "onboard/stream_output.h"
+#include "modules/perception/onboard/stream_output.h"
 
-#include "lib/base/perf.h"
-#include "lib/base/time_util.h"
-#include <traffic_light_detection.pb.h>
+#include "modules/perception/lib/base/perf.h"
+#include "modules/perception/lib/base/time_util.h"
+#include <modules/perception/traffic_light_detection.pb.h>
 #include "modules/perception/traffic_light/base/image_lights.h"
 
-using adu::perception::traffic_light::Image;
-using adu::perception::traffic_light::CameraId;
+using apollo::perception::traffic_light::Image;
+using apollo::perception::traffic_light::CameraId;
 
 static std::map<std::string, cv::Scalar> s_color_table = {
     {std::string("red_light_box"), cv::Scalar(0, 0, 255)},
@@ -44,7 +44,7 @@ static std::vector<std::shared_ptr<Image> > s_cached_images;
 const int MAX_CACHED_IMAGES_NUM = 100;
 
 static cv::Mat s_img(1080, 1920, CV_8UC3, cv::Scalar(128, 128, 128));
-std::unique_ptr<adu::perception::onboard::StreamOutput> g_output_stream;
+std::unique_ptr<apollo::perception::StreamOutput> g_output_stream;
 
 void tl_debug_callback(const std_msgs::String::ConstPtr &msg);
 void tl_image_long_callback(const sensor_msgs::ImageConstPtr &msg);
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "traffic_light_viz_listener");
   ros::NodeHandle n;
 
-  g_output_stream.reset(new adu::perception::onboard::StreamOutput());
+  g_output_stream.reset(new apollo::perception::StreamOutput());
   if (g_output_stream == nullptr ||
       !g_output_stream->register_publisher<sensor_msgs::Image>(
           "sink_type=9&sink_name=/perception/traffic_light_debug")) {
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 }
 
 void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
-  adu::common::traffic_light::TrafficLightDetection tl_result;
+  apollo::perception::TrafficLightDetection tl_result;
   tl_result.ParseFromString(msg->data);
   //ROS_INFO("I heard: [%s]", tl_result.ShortDebugString().c_str());
 
@@ -154,15 +154,15 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
           rectified_box.height());
       cv::Scalar color;
       switch (rectified_box.color()) {
-        case adu::common::traffic_light::TrafficLight::RED:color = s_color_table["red_light_box"];
+        case apollo::perception::TrafficLight::RED:color = s_color_table["red_light_box"];
           break;
-        case adu::common::traffic_light::TrafficLight::GREEN:
+        case apollo::perception::TrafficLight::GREEN:
           color = s_color_table["green_light_box"];
           break;
-        case adu::common::traffic_light::TrafficLight::BLACK:
+        case apollo::perception::TrafficLight::BLACK:
           color = s_color_table["black_light_box"];
           break;
-        case adu::common::traffic_light::TrafficLight::YELLOW:
+        case apollo::perception::TrafficLight::YELLOW:
           color = s_color_table["yellow_light_box"];
           break;
         default:color = s_color_table["unknown_light_box"];

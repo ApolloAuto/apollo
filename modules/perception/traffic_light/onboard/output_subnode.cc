@@ -4,45 +4,45 @@
 #include "modules/perception/traffic_light/onboard/output_subnode.h"
 
 #include <gflags/gflags.h>
-#include <traffic_light_detection.pb.h>
+#include <modules/perception/proto/traffic_light_detection.pb.h>
 #include <cv_bridge/cv_bridge.h>
-#include <traffic_light/base/utils.h>
+#include <modules/perception/traffic_light/base/utils.h>
 #include "ros/meta_stats.h"
-#include "lib/base/perf.h"
-#include "lib/base/time_util.h"
-#include "onboard/event_manager.h"
-#include "onboard/shared_data_manager.h"
-#include "onboard/subnode_helper.h"
+#include "modules/perception/lib/base/timer.h"
+#include "modules/perception/lib/base/time_util.h"
+#include "modules/perception/onboard/event_manager.h"
+#include "modules/perception/onboard/shared_data_manager.h"
+#include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/onboard/proc_data.h"
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
 DEFINE_bool(enable_fill_lights_outside_image, false,
             "fill the lights(returned by HD-Map, while not in image) with DEFAULT_UNKNOWN_COLOR");
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-using onboard::SubnodeHelper;
+using SubnodeHelper;
 
-onboard::Status TLOutputSubnode::proc_events() {
-  onboard::Event event;
-  const onboard::EventMeta &event_meta = _sub_meta_events[0];
-  if (!_event_manager->subscribe(event_meta.event_id, &event)) {
+StatusCode TLOutputSubnode::proc_events() {
+  Event event;
+  const EventMeta &event_meta = sub_meta_events_[0];
+  if (!event_manager_->subscribe(event_meta.event_id, &event)) {
     AERROR << "Failed to subscribe event: " << event_meta.event_id;
-    return onboard::FAIL;
+    return FAIL;
   }
 
   PERF_FUNCTION();
-  base::Timer timer;
-  timer.start();
+  Timer timer;
+  timer.Start();
   if (!proc_upstream_data(event)) {
     AERROR << "TLOutputSubnode failed to proc_upstream_data. "
            << "event:" << event.to_string();
-    return onboard::FAIL;
+    return FAIL;
   }
-  timer.end("TLOutputSubnode::proc_events");
-  return onboard::SUCC;
+  timer.End("TLOutputSubnode::proc_events");
+  return SUCC;
 }
 
 bool TLOutputSubnode::init_internal() {
@@ -59,11 +59,11 @@ bool TLOutputSubnode::init_internal() {
 }
 
 bool TLOutputSubnode::init_shared_data() {
-  CHECK_NOTNULL(_shared_data_manager);
+  CHECK_NOTNULL(shared_data_manager_);
 
   const std::string proc_data_name("TLProcData");
   _proc_data = dynamic_cast<TLProcData *>(
-      _shared_data_manager->get_shared_data(proc_data_name));
+      shared_data_manager_->GetSharedData(proc_data_name));
   if (_proc_data == nullptr) {
     AERROR << "Failed to get shared data instance " << proc_data_name;
     return false;
@@ -76,20 +76,20 @@ bool TLOutputSubnode::init_output_stream() {
   // expect _reserve format:
   //      "traffic_light_output_stream : sink_type=m&sink_name=x;
   std::map<std::string, std::string> reserve_field_map;
-  if (!onboard::SubnodeHelper::parse_reserve_field(_reserve, &reserve_field_map)) {
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "TLOutputSubnode failed to parse reserve string: "
-           << _reserve;
+           << reserve_;
     return false;
   }
 
   auto iter = reserve_field_map.find("traffic_light_output_stream");
   if (iter == reserve_field_map.end()) {
     AERROR << "TLOutputSubnode no output stream conf, need "
-           << "key:traffic_light_output_stream. reserve:" << _reserve;
+           << "key:traffic_light_output_stream. reserve:" << reserve_;
     return false;
   }
 
-  _output_stream.reset(new onboard::StreamOutput());
+  _output_stream.reset(new StreamOutput());
   if (_output_stream == nullptr ||
       !_output_stream->register_publisher<std_msgs::String>(iter->second)) {
     AERROR << "TLOutputSubnode init publisher failed. "
@@ -99,18 +99,18 @@ bool TLOutputSubnode::init_output_stream() {
   return true;
 }
 
-bool TLOutputSubnode::proc_upstream_data(const onboard::Event &event) {
-  base::Timer timer;
-  timer.start();
+bool TLOutputSubnode::proc_upstream_data(const Event &event) {
+  Timer timer;
+  timer.Start();
   std::string key;
-  if (!SubnodeHelper::produce_shared_data_key(event.timestamp, event.reserve, &key)) {
+  if (!SubnodeHelper::ProduceSharedDataKey(event.timestamp, event.reserve, &key)) {
     AERROR << "TLOutputSubnode Failed to produce shared data key. "
            << "event:" << event.to_string();
     return false;
   }
 
   std::shared_ptr<ImageLights> image_lights;
-  if (!_proc_data->get(key, &image_lights)) {
+  if (!_proc_data->Get(key, &image_lights)) {
     AERROR << "TLOutputSubnode get data failed. key:" << key;
     return false;
   }
@@ -128,20 +128,20 @@ bool TLOutputSubnode::proc_upstream_data(const onboard::Event &event) {
     return false;
   }
 
-  timer.end("TLOutputSubnode::proc_upstream_data");
+  timer.End("TLOutputSubnode::proc_upstream_data");
   return true;
 }
 
 bool TLOutputSubnode::transform_message(
-    const onboard::Event &event,
+    const Event &event,
     const std::shared_ptr<ImageLights> &image_lights,
     boost::shared_ptr<std_msgs::String> *msg) const {
-  base::Timer timer;
-  timer.start();
+  Timer timer;
+  timer.Start();
   const auto &lights = image_lights->lights;
 
-  adu::common::traffic_light::TrafficLightDetection result;
-  common::header::Header *header = result.mutable_header();
+  apollo::perception::TrafficLightDetection result;
+  apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   uint64_t timestamp = ts_double_2_int64(image_lights->image->ts());
   switch (image_lights->image->device_id()) {
@@ -163,7 +163,7 @@ bool TLOutputSubnode::transform_message(
   ros::MetaStats::instance()->record_publish(info, "/perception/traffic_light_status");
   // add traffic light result
   for (size_t i = 0; i < lights->size(); i++) {
-    adu::common::traffic_light::TrafficLight *light_result = result.add_traffic_light();
+    apollo::perception::TrafficLight *light_result = result.add_traffic_light();
     light_result->set_id(lights->at(i)->info.id().id());
     light_result->set_confidence(lights->at(i)->status.confidence);
     light_result->set_color(lights->at(i)->status.color);
@@ -173,7 +173,7 @@ bool TLOutputSubnode::transform_message(
   result.set_contain_lights(image_lights->num_signals > 0);
 
   // add traffic light debug info
-  adu::common::traffic_light::TrafficLightDebug *light_debug =
+  apollo::perception::TrafficLightDebug *light_debug =
       result.mutable_traffic_light_debug();
 
   // set signal number
@@ -233,7 +233,7 @@ bool TLOutputSubnode::transform_message(
   light_debug->set_project_error(image_lights->offset);
 
   if (lights->size() > 0) {
-    double distance = stopline_distance(image_lights->pose.get_pose(),
+    double distance = stopline_distance(image_lights->pose.pose(),
                                         lights->at(0)->info.stop_line());
     light_debug->set_distance_to_stop_line(distance);
   }
@@ -252,7 +252,7 @@ bool TLOutputSubnode::transform_message(
       } else {
         color = lights->at(0)->status.color;
         for (size_t i = 0; i < lights_outside_image->size(); i++) {
-          adu::common::traffic_light::TrafficLight *light_result = result
+          apollo::perception::TrafficLight *light_result = result
               .add_traffic_light();
           light_result->set_id(lights_outside_image->at(i)->info.id().id());
           light_result->set_confidence(lights_outside_image->at(i)->status.confidence);
@@ -266,9 +266,9 @@ bool TLOutputSubnode::transform_message(
     AERROR << "Output_result serialize to String failed.";
     return false;
   }
-  //auto process_time = base::TimeUtil::get_current_time() - event.local_timestamp;
+  //auto process_time = TimeUtil::GetCurrentTime() - event.local_timestamp;
   auto process_time =
-      base::TimeUtil::get_current_time() - image_lights->preprocess_receive_timestamp;
+      TimeUtil::GetCurrentTime() - image_lights->preprocess_receive_timestamp;
   AINFO << "TLOutputSubnode transform_message "
         << " ts:" << GLOG_TIMESTAMP(event.timestamp)
         << " device:" << image_lights->image->device_id_str()
@@ -276,7 +276,7 @@ bool TLOutputSubnode::transform_message(
         << " number of lights:" << lights->size()
         << " lights:" << result.ShortDebugString();
 
-  timer.end("TLOutputSubnode::transform_message");
+  timer.End("TLOutputSubnode::transform_message");
   return true;
 }
 
@@ -284,4 +284,4 @@ REGISTER_SUBNODE(TLOutputSubnode);
 
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo

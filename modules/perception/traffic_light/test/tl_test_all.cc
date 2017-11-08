@@ -1,8 +1,8 @@
 //
 // Created by gaohan02 on 17-3-13.
 //
-#include <lib/base/macros.h>
-#include <traffic_light/rectify/unity/unity_rectify.h>
+#include <modules/perception/lib/base/macros.h>
+#include <modules/perception/traffic_light/rectify/unity/unity_rectify.h>
 #include "modules/perception/traffic_light/recognizer/unity/unity_recognize.h"
 #include "modules/perception/traffic_light/reviser/strategy/color_decision.h"
 DEFINE_string(ext,
@@ -14,7 +14,7 @@ DEFINE_string(img_dir,
 "data/dataset/image/",
 "img dir");
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -59,12 +59,12 @@ class DebugLight {
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::shared_ptr<adu::perception::traffic_light::BaseRectifier> _rectifier(
-      new adu::perception::traffic_light::UnityRectify);
-  std::shared_ptr<adu::perception::traffic_light::BaseRecognizer> _recognizer(
-      new adu::perception::traffic_light::UnityRecognize);
-  std::shared_ptr<adu::perception::traffic_light::BaseReviser> _reviser(
-      new adu::perception::traffic_light::ColorReviser);
+  std::shared_ptr<apollo::perception::traffic_light::BaseRectifier> _rectifier(
+      new apollo::perception::traffic_light::UnityRectify);
+  std::shared_ptr<apollo::perception::traffic_light::BaseRecognizer> _recognizer(
+      new apollo::perception::traffic_light::UnityRecognize);
+  std::shared_ptr<apollo::perception::traffic_light::BaseReviser> _reviser(
+      new apollo::perception::traffic_light::ColorReviser);
 
   bool init_ok = _rectifier->init() && _recognizer->init() && _reviser->init();
   if (!init_ok) {
@@ -72,14 +72,14 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  using adu::perception::traffic_light::LightPtrs;
-  using adu::perception::traffic_light::LightPtr;
-  using adu::perception::traffic_light::Light;
-  using adu::perception::traffic_light::Image;
+  using apollo::perception::traffic_light::LightPtrs;
+  using apollo::perception::traffic_light::LightPtr;
+  using apollo::perception::traffic_light::Light;
+  using apollo::perception::traffic_light::Image;
 
   std::ifstream fin_hd(FLAGS_hdmap_file.c_str());
   std::string line;
-  adu::perception::traffic_light::DebugLight debug;
+  apollo::perception::traffic_light::DebugLight debug;
   XLOG_INFO(FLAGS_hdmap_file.c_str());
   std::string last_ts = "";
   int count = 0;
@@ -106,11 +106,11 @@ int main(int argc, char *argv[]) {
     AINFO << "Processing: " << ts << " Image";
     cv::Mat img = cv::imread(FLAGS_img_dir + ts + FLAGS_ext);
     Image image;
-    image.init(1, adu::perception::traffic_light::LONG_FOCUS, img);
-    _rectifier->rectify(image, adu::perception::traffic_light::RectifyOption(), &lights);
-    _recognizer->recognize_status(image, adu::perception::traffic_light::RecognizeOption(),
+    image.init(1, apollo::perception::traffic_light::LONG_FOCUS, img);
+    _rectifier->rectify(image, apollo::perception::traffic_light::RectifyOption(), &lights);
+    _recognizer->recognize_status(image, apollo::perception::traffic_light::RecognizeOption(),
                                   &lights);
-    //_reviser->revise(adu::perception::traffic_light::ReviseOption(image.ts()), &lights);
+    //_reviser->revise(apollo::perception::traffic_light::ReviseOption(image.ts()), &lights);
     if (ts == last_ts) {
       ++count;
     } else {

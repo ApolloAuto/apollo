@@ -8,57 +8,56 @@
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 
 #include <gflags/gflags.h>
-#include "xlog.h"
+#include "modules/perception/lib/base/file_util.h"
+#include "modules/perception/lib/base/time_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include <modules/perception/traffic_light/base/utils.h>
 
-#include "lib/base/macros.h"
-#include "lib/base/file_util.h"
-#include "lib/base/time_util.h"
-#include "lib/config_manager/config_manager.h"
-#include <traffic_light/base/utils.h>
-
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
 bool TLPreprocessor::init() {
-  config_manager::ConfigManager *config_manager
-      = base::Singleton<config_manager::ConfigManager>::get();
-  const config_manager::ModelConfig *model_config = NULL;
-  if (!config_manager->get_model_config(name(), &model_config)) {
+  ConfigManager *config_manager = ConfigManager::instance();
+  const ModelConfig *model_config = NULL;
+  if (!config_manager->GetModelConfig(name(), &model_config)) {
     AERROR << "not found model: " << name();
     return false;
   }
 
-  using config_manager::ConfigRead;
-
   // Read parameters from config file
-  try {
-    _max_cached_image_lights_array_size = ConfigRead<int>::read(*model_config,
-                                                                "max_cached_image_lights_array_size");
-    _projection_image_cols = ConfigRead<int>::read(*model_config,
-                                                   "projection_image_cols");
-    _projection_image_rows = ConfigRead<int>::read(*model_config,
-                                                   "projection_image_rows");
-    _sync_interval_seconds = ConfigRead<double>::read(*model_config,
-                                                      "sync_interval_seconds");
-    _no_signals_interval_seconds = ConfigRead<double>::read(*model_config,
-                                                            "no_signals_interval_seconds");
-  } catch (const config_manager::ConfigManagerError &e) {
-    AERROR << name() << " failed to load configuration: " << e.what();
+  if (!model_config
+      ->GetValue("max_cached_image_lights_array_size", &_max_cached_image_lights_array_size)) {
+    AERROR << "max_cached_image_lights_array_size not found." << name();
     return false;
   }
-
+  if (!model_config->GetValue("projection_image_cols", &_projection_image_cols)) {
+    AERROR << "projection_image_cols not found." << name();
+    return false;
+  }
+  if (!model_config->GetValue("projection_image_rows", &_projection_image_rows)) {
+    AERROR << "projection_image_rows not found." << name();
+    return false;
+  }
+  if (!model_config->GetValue("sync_interval_seconds", &_sync_interval_seconds)) {
+    AERROR << "sync_interval_seconds not found." << name();
+    return false;
+  }
+  if (!model_config->GetValue("no_signals_interval_seconds", &_no_signals_interval_seconds)) {
+    AERROR << "no_signals_interval_seconds not found." << name();
+    return false;
+  }
   return true;
 }
 
 bool TLPreprocessor::add_cached_lights_projections(
     const CarPose &pose,
-    const std::vector<adu::common::hdmap::Signal> &signals,
+    const std::vector<apollo::hdmap::Signal> &signals,
     const MultiCamerasProjection &projection,
     const std::map<int, int> &image_borders_size,
     const double timestamp,
     bool *projections_outside_all_images) {
-  base::MutexLock lock(&_mutex);
+  MutexLock lock(&_mutex);
   PERF_FUNCTION();
 
   AINFO << "TLPreprocessor has " << _cached_lights_projections_array.size()
@@ -178,7 +177,7 @@ bool TLPreprocessor::sync_image(
     const CameraId &camera_id,
     std::shared_ptr<ImageLights> *data,
     bool *should_pub) {
-  base::MutexLock lock(&_mutex);
+  MutexLock lock(&_mutex);
   PERF_FUNCTION();
 
   double sync_time = timestamp;
@@ -259,11 +258,11 @@ bool TLPreprocessor::sync_image(
   return true;
 }
 
-void TLPreprocessor::set_last_signals(const std::vector<adu::common::hdmap::Signal> &signals) {
+void TLPreprocessor::set_last_signals(const std::vector<apollo::hdmap::Signal> &signals) {
   _last_signals = signals;
 }
 
-void TLPreprocessor::get_last_signals(std::vector<adu::common::hdmap::Signal> *signals) const {
+void TLPreprocessor::get_last_signals(std::vector<apollo::hdmap::Signal> *signals) const {
   *signals = _last_signals;
 }
 
@@ -411,7 +410,7 @@ void TLPreprocessor::select_image(const CarPose &pose,
 }
 
 bool TLPreprocessor::project_lights(const MultiCamerasProjection &projection,
-                                    const std::vector<adu::common::hdmap::Signal> &signals,
+                                    const std::vector<apollo::hdmap::Signal> &signals,
                                     const CarPose &pose,
                                     CameraId camera_id,
                                     std::shared_ptr<LightPtrs> &lights_on_image,
@@ -432,8 +431,8 @@ bool TLPreprocessor::project_lights(const MultiCamerasProjection &projection,
   bool camera_is_working = false;
   get_camera_is_working_flag(camera_id, &camera_is_working);
   if (!camera_is_working) {
-    XLOG(WARN) << "TLPreprocessor::project_lights not project lights, "
-               << "camera is not working, CameraId: " << CAMERA_ID_TO_STR.at(camera_id);
+    AWARN << "TLPreprocessor::project_lights not project lights, "
+          << "camera is not working, CameraId: " << CAMERA_ID_TO_STR.at(camera_id);
     return true;
   }
 
@@ -483,20 +482,20 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
            CAMERA_ID_TO_STR.at(proj_cam_id) : std::to_string(proj_cam_id));
       // 找到对应时间的定位，但是相机 ID 不符
       if (camera_id != (*ptr_lights_projection)->camera_id) {
-        XLOG(WARN) << "find appropriate localization, but camera_id not match"
-                   << ", cached projection's camera_id: "
-                   << proj_cam_id_str
-                   << " , image's camera_id: "
-                   << CAMERA_ID_TO_STR.at(image_cam_id);
+        AWARN << "find appropriate localization, but camera_id not match"
+              << ", cached projection's camera_id: "
+              << proj_cam_id_str
+              << " , image's camera_id: "
+              << CAMERA_ID_TO_STR.at(image_cam_id);
         //return false;
         continue;
       }
       if (sync_time < _last_output_ts) {
-        XLOG(WARN) << "TLPreprocessor reject the image pub ts:"
-                   << GLOG_TIMESTAMP(sync_time)
-                   << " which is earlier than last output ts:"
-                   << GLOG_TIMESTAMP(_last_output_ts)
-                   << ", image camera_id: " << CAMERA_ID_TO_STR.at(image_cam_id);
+        AWARN << "TLPreprocessor reject the image pub ts:"
+              << GLOG_TIMESTAMP(sync_time)
+              << " which is earlier than last output ts:"
+              << GLOG_TIMESTAMP(_last_output_ts)
+              << ", image camera_id: " << CAMERA_ID_TO_STR.at(image_cam_id);
         return false;
       }
       *sync_ok = true;
@@ -541,45 +540,45 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
     }
     if (sync_time < cached_array.front()->timestamp) {
       double pose_ts = cached_array.front()->timestamp;
-      double system_ts = base::TimeUtil::get_current_time();
-      XLOG(WARN) << "TLPreprocessor " << cached_array_str << " sync failed, image ts: "
-                 << GLOG_TIMESTAMP(sync_time)
-                 << ", which is earlier than " << cached_array_str << ".front() ts: "
-                 << GLOG_TIMESTAMP(pose_ts)
-                 << ", diff between image and pose ts: "
-                 << GLOG_TIMESTAMP(sync_time - pose_ts)
-                 << "; system ts: " << GLOG_TIMESTAMP(system_ts)
-                 << ", diff between image and system ts: "
-                 << GLOG_TIMESTAMP(sync_time - system_ts)
-                 << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+      double system_ts = TimeUtil::GetCurrentTime();
+      AWARN << "TLPreprocessor " << cached_array_str << " sync failed, image ts: "
+            << GLOG_TIMESTAMP(sync_time)
+            << ", which is earlier than " << cached_array_str << ".front() ts: "
+            << GLOG_TIMESTAMP(pose_ts)
+            << ", diff between image and pose ts: "
+            << GLOG_TIMESTAMP(sync_time - pose_ts)
+            << "; system ts: " << GLOG_TIMESTAMP(system_ts)
+            << ", diff between image and system ts: "
+            << GLOG_TIMESTAMP(sync_time - system_ts)
+            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
       // difference between image and pose timestamps
       *diff_image_pose_ts = sync_time - pose_ts;
       *diff_image_sys_ts = sync_time - system_ts;
     } else if (sync_time > cached_array.back()->timestamp) {
       double pose_ts = cached_array.back()->timestamp;
-      double system_ts = base::TimeUtil::get_current_time();
-      XLOG(WARN) << "TLPreprocessor " << cached_array_str << " sync failed, image ts: "
-                 << GLOG_TIMESTAMP(sync_time)
-                 << ", which is older than " << cached_array_str << ".back() ts: "
-                 << GLOG_TIMESTAMP(pose_ts)
-                 << ", diff between image and pose ts: "
-                 << GLOG_TIMESTAMP(sync_time - pose_ts)
-                 << "; system ts: " << GLOG_TIMESTAMP(system_ts)
-                 << ", diff between image and system ts: "
-                 << GLOG_TIMESTAMP(sync_time - system_ts)
-                 << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+      double system_ts = TimeUtil::GetCurrentTime();
+      AWARN << "TLPreprocessor " << cached_array_str << " sync failed, image ts: "
+            << GLOG_TIMESTAMP(sync_time)
+            << ", which is older than " << cached_array_str << ".back() ts: "
+            << GLOG_TIMESTAMP(pose_ts)
+            << ", diff between image and pose ts: "
+            << GLOG_TIMESTAMP(sync_time - pose_ts)
+            << "; system ts: " << GLOG_TIMESTAMP(system_ts)
+            << ", diff between image and system ts: "
+            << GLOG_TIMESTAMP(sync_time - system_ts)
+            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
       *diff_image_pose_ts = sync_time - pose_ts;
       *diff_image_sys_ts = sync_time - system_ts;
     } else if (!find_loc) {
       // 确实没找到定位才打 log
-      XLOG(WARN) << "TLPreprocessor " << cached_array_str << " sync failed, image ts: "
-                 << GLOG_TIMESTAMP(sync_time)
-                 << ", cannot find close enough timestamp, "
-                 << cached_array_str << ".front() ts: "
-                 << GLOG_TIMESTAMP(cached_array.front()->timestamp) << ", "
-                 << cached_array_str << ".back() ts: "
-                 << GLOG_TIMESTAMP(cached_array.back()->timestamp)
-                 << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+      AWARN << "TLPreprocessor " << cached_array_str << " sync failed, image ts: "
+            << GLOG_TIMESTAMP(sync_time)
+            << ", cannot find close enough timestamp, "
+            << cached_array_str << ".front() ts: "
+            << GLOG_TIMESTAMP(cached_array.front()->timestamp) << ", "
+            << cached_array_str << ".back() ts: "
+            << GLOG_TIMESTAMP(cached_array.back()->timestamp)
+            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
     }
   }
 
@@ -627,7 +626,7 @@ int TLPreprocessor::get_max_focal_len_camera_id() {
 bool TLPreprocessor::select_camera_by_lights_projection(
     const double timestamp,
     const CarPose &pose,
-    const std::vector<adu::common::hdmap::Signal> &signals,
+    const std::vector<apollo::hdmap::Signal> &signals,
     const MultiCamerasProjection &projection,
     const std::map<int, int> &image_borders_size,
     std::shared_ptr<ImageLights> *image_lights,
@@ -694,4 +693,4 @@ REGISTER_PREPROCESSOR(TLPreprocessor);
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

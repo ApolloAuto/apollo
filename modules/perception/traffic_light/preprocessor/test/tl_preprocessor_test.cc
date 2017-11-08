@@ -4,7 +4,7 @@
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace config_manager {
 DECLARE_string(config_manager_path);
@@ -17,12 +17,12 @@ REGISTER_PROJECTION(SingleBoundaryBasedProjection);
 class TLPreprocessorTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    if (base::Singleton<config_manager::ConfigManager>::_instance) {
-      delete base::Singleton<config_manager::ConfigManager>::_instance;
-      base::Singleton<config_manager::ConfigManager>::_instance = NULL;
+    if (Singleton<ConfigManager>::_instance) {
+      delete Singleton<ConfigManager>::_instance;
+      Singleton<ConfigManager>::_instance = NULL;
     }
-    base::Singleton<config_manager::ConfigManager>::_instance =
-        new config_manager::ConfigManager;
+    Singleton<ConfigManager>::_instance =
+        new ConfigManager;
     _preprocessor = new TLPreprocessor;
   }
 
@@ -30,7 +30,7 @@ class TLPreprocessorTest : public ::testing::Test {
     delete _preprocessor;
   }
 
-  void prepare_test_data_long_focus(CarPose *pose, adu::common::hdmap::Signal *signals) {
+  void prepare_test_data_long_focus(CarPose *pose, apollo::hdmap::Signal *signals) {
 
     pose->_pose << 0.928898, -0.370222, -0.00911767, 433843,
         0.37033, 0.928479, 0.0279876, 4.43584e+06,
@@ -76,7 +76,7 @@ class TLPreprocessorTest : public ::testing::Test {
     pt->set_z(z2);
   }
 
-  void prepare_test_data_short_focus(CarPose *pose, adu::common::hdmap::Signal *signals) {
+  void prepare_test_data_short_focus(CarPose *pose, apollo::hdmap::Signal *signals) {
     pose->_pose << -0.869575, 0.493604, -0.0139364, 429986,
         -0.493661, -0.869654, 0.000698665, 4.43728e+06,
         -0.011775, 0.00748738, 0.999903, 34.8932,
@@ -126,24 +126,24 @@ class TLPreprocessorTest : public ::testing::Test {
 };
 
 TEST_F(TLPreprocessorTest, test_init_fail) {
-  config_manager::fLS::FLAGS_config_manager_path = "non-exist";
+  fLS::FLAGS_config_manager_path = "non-exist";
   ASSERT_FALSE(_preprocessor->init());
 }
 
 TEST_F(TLPreprocessorTest, test_init_exception) {
-  config_manager::fLS::FLAGS_config_manager_path = "conf/bad_config_manager.config";
+  fLS::FLAGS_config_manager_path = "conf/bad_config_manager.config";
   ASSERT_FALSE(_preprocessor->init());
 }
 
 TEST_F(TLPreprocessorTest, test_init) {
-  config_manager::fLS::FLAGS_config_manager_path = "conf/config_manager.config";
+  fLS::FLAGS_config_manager_path = "conf/config_manager.config";
   ASSERT_TRUE(_preprocessor->init());
 }
 
 TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   ASSERT_TRUE(_preprocessor->init());
   CarPose pose;
-  std::vector<adu::common::hdmap::Signal> signals;
+  std::vector<apollo::hdmap::Signal> signals;
   MultiCamerasProjection projection;
   std::map<int, int> image_borders = {
       {static_cast<int>(CameraId::LONG_FOCUS), 100},
@@ -162,7 +162,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   }
 
   // add light
-  adu::common::hdmap::Signal tl_signal;
+  apollo::hdmap::Signal tl_signal;
   double x1 = 433815.51701951429;
   double x2 = 433816.01932359143;
   double y1 = 4435923.9110349407;
@@ -552,7 +552,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   // empty signals
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals;
+    std::vector<apollo::hdmap::Signal> signals;
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -571,7 +571,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   // invalid camera id
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -592,7 +592,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   }
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -615,7 +615,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   // long focus project on image
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -640,7 +640,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   // short focus project on image
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -664,7 +664,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   // long focus project outside image
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -689,7 +689,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
   // short focus project outside image
   {
     CarPose pose;
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     MultiCamerasProjection projection;
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
 
@@ -764,7 +764,7 @@ TEST_F(TLPreprocessorTest, test_select_image) {
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
     ASSERT_TRUE(projection.init());
 
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     prepare_test_data_long_focus(&pose, &(signals[0]));
     int cam_id = 0;
     ASSERT_TRUE(_preprocessor->project_lights(
@@ -814,7 +814,7 @@ TEST_F(TLPreprocessorTest, test_select_image) {
     FLAGS_traffic_light_projection = "MultiCamerasProjection";
     ASSERT_TRUE(projection.init());
 
-    std::vector<adu::common::hdmap::Signal> signals(1);
+    std::vector<apollo::hdmap::Signal> signals(1);
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = 0;
@@ -997,7 +997,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
 }
 
 TEST_F(TLPreprocessorTest, test_get_max_min_focal_len_camera_id) {
-  config_manager::fLS::FLAGS_config_manager_path = "conf/config_manager.config";
+  fLS::FLAGS_config_manager_path = "conf/config_manager.config";
   ASSERT_TRUE(_preprocessor->init());
 
   // test get_max_focal_len_camera_id()
@@ -1048,7 +1048,7 @@ TEST_F(TLPreprocessorTest, test_get_max_min_focal_len_camera_id) {
 }
 
 TEST_F(TLPreprocessorTest, test_set_get_max_cached_image_lights_array_size) {
-  config_manager::fLS::FLAGS_config_manager_path = "conf/config_manager.config";
+  fLS::FLAGS_config_manager_path = "conf/config_manager.config";
   ASSERT_TRUE(_preprocessor->init());
 
   size_t max_cached_image_lights_array_size = 0;
@@ -1066,4 +1066,4 @@ TEST_F(TLPreprocessorTest, test_set_get_max_cached_image_lights_array_size) {
 
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo

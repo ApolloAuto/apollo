@@ -7,7 +7,7 @@
 
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 class Select : public ISelectLight {

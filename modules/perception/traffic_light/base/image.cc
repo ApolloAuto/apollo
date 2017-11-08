@@ -13,7 +13,7 @@
 
 DEFINE_int32(double_show_precision, 14, "When output a double data, the precision.");
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -103,4 +103,4 @@ std::ostream &operator<<(std::ostream &os, const Image &image) {
 
 }// namespace traffic_light
 }// namespace perception
-}// namespace adu
+}// namespace apollo

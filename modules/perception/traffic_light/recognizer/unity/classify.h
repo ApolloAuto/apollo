@@ -11,7 +11,7 @@
 #include "modules/perception/traffic_light/interface/green_interface.h"
 #include "caffe/caffe.hpp"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 

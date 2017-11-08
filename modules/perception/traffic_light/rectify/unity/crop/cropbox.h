@@ -5,9 +5,9 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_CROPBOX_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_CROPBOX_H
 
-#include <traffic_light/interface/green_interface.h>
+#include <modules/perception/traffic_light/interface/green_interface.h>
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 class CropBox : public IGetBox {

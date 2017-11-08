@@ -7,14 +7,14 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 
-#include "onboard/common_shared_data.h"
+#include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-class TLPreprocessingData : public onboard::CommonSharedData<ImageLights> {
+class TLPreprocessingData : public CommonSharedData<ImageLights> {
  public:
   TLPreprocessingData() = default;
 
@@ -27,7 +27,7 @@ class TLPreprocessingData : public onboard::CommonSharedData<ImageLights> {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 

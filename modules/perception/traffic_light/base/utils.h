@@ -7,7 +7,7 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 

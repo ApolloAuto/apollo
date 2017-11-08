@@ -11,24 +11,24 @@
 #include <std_msgs/String.h>
 #include <sensor_msgs/Image.h>
 
-#include "onboard/subnode.h"
-#include "onboard/stream_output.h"
+#include "modules/perception/onboard/subnode.h"
+#include "modules/perception/onboard/stream_output.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
 class TLProcData;
 
-class TLOutputSubnode : public onboard::Subnode {
+class TLOutputSubnode : public Subnode {
  public:
   TLOutputSubnode() = default;
   virtual ~TLOutputSubnode() {
     _proc_data = nullptr;
   }
 
-  virtual onboard::Status proc_events() override;
+  virtual StatusCode proc_events() override;
 
  protected:
   virtual bool init_internal() override;
@@ -36,13 +36,13 @@ class TLOutputSubnode : public onboard::Subnode {
   bool init_shared_data();
   bool init_output_stream();
 
-  bool transform_message(const onboard::Event &event,
+  bool transform_message(const Event &event,
                          const std::shared_ptr<ImageLights> &lights,
                          boost::shared_ptr<std_msgs::String> *msg) const;
-  bool proc_upstream_data(const onboard::Event &event);
+  bool proc_upstream_data(const Event &event);
 
  private:
-  std::unique_ptr<onboard::StreamOutput> _output_stream;
+  std::unique_ptr<StreamOutput> _output_stream;
   TLProcData *_proc_data = nullptr;
 
   // save BGR colors
@@ -53,6 +53,6 @@ class TLOutputSubnode : public onboard::Subnode {
 
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H

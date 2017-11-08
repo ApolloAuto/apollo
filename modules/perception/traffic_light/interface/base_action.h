@@ -5,10 +5,10 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_ACTION_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_ACTION_H
 
-#include "onboard/common_shared_data.h"
-#include "onboard/subnode.h"
+#include "modules/perception/onboard/common_shared_data.h"
+#include "modules/perception/onboard/subnode.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 //@brief the Action of Msg synced.

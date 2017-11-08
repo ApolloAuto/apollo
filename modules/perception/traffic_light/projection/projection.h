@@ -10,11 +10,11 @@
 
 #include <memory>
 
-#include "lib/base/file_util.h"
-#include "lib/config_manager/config_manager.h"
+#include "modules/perception/lib/base/file_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -32,6 +32,6 @@ class TwoCamerasProjection {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROJECTION_PROJECTION_H

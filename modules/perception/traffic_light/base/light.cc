@@ -10,7 +10,7 @@
 
 #include "modules/common/log.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -22,27 +22,27 @@ std::ostream &operator<<(std::ostream &os, const Light &light) {
 
 double stopline_distance(
     const Eigen::Matrix4d &car_pose,
-    const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Curve> &stoplines) {
+    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Curve> &stoplines) {
   if (stoplines.size() == 0) {
-    XLOG(WARN) << "compute car to stopline's distance failed(no stopline). "
-               << "car_pose:" << car_pose;
+    AWARN << "compute car to stopline's distance failed(no stopline). "
+          << "car_pose:" << car_pose;
     return -1;
   }
-  const ::adu::common::hdmap::Curve &stopline = stoplines.Get(0);
+  const ::apollo::hdmap::Curve &stopline = stoplines.Get(0);
   if (stopline.segment_size() == 0) {
-    XLOG(WARN) << "compute car to stopline's distance failed(stopline has no segment line). "
-               << "car_pose:" << car_pose << " stopline:" << stopline.ShortDebugString();
+    AWARN << "compute car to stopline's distance failed(stopline has no segment line). "
+          << "car_pose:" << car_pose << " stopline:" << stopline.ShortDebugString();
     return -1;
   }
   if (!stopline.segment(0).has_line_segment()) {
-    XLOG(WARN) << "compute car to stopline's distance failed(stopline has no segment). "
-               << "car_pose:" << car_pose << " stopline:" << stopline.ShortDebugString();
+    AWARN << "compute car to stopline's distance failed(stopline has no segment). "
+          << "car_pose:" << car_pose << " stopline:" << stopline.ShortDebugString();
     return -1;
   }
 
   if (stopline.segment(0).line_segment().point_size() == 0) {
-    XLOG(WARN) << "compute car to stopline's distance failed(stopline has no point). "
-               << "car_pose:" << car_pose << " stopline:" << stopline.ShortDebugString();
+    AWARN << "compute car to stopline's distance failed(stopline has no point). "
+          << "car_pose:" << car_pose << " stopline:" << stopline.ShortDebugString();
     return -1;
   }
 
@@ -57,10 +57,10 @@ double stopline_distance(
 //@brief compute traffic light to car's distance
 double trafficlight_distance(
     const Eigen::Matrix4d &car_pose,
-    const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Subsignal> &subsignal) {
+    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Subsignal> &subsignal) {
   if (subsignal.size() == 0) {
-    XLOG(WARN) << "compute car to traffic_light's distance failed(no traffic_light). "
-               << "car_pose:" << car_pose;
+    AWARN << "compute car to traffic_light's distance failed(no traffic_light). "
+          << "car_pose:" << car_pose;
     return -1;
   }
   double car_x = car_pose(0, 3);
@@ -72,4 +72,4 @@ double trafficlight_distance(
 
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo

@@ -8,13 +8,13 @@
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_DATA_H
 
 #include "modules/perception/traffic_light/base/image_lights.h"
-#include "onboard/common_shared_data.h"
+#include "modules/perception/onboard/common_shared_data.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-class TLProcData : public onboard::CommonSharedData<ImageLights> {
+class TLProcData : public CommonSharedData<ImageLights> {
  public:
   TLProcData() = default;
 
@@ -27,6 +27,6 @@ class TLProcData : public onboard::CommonSharedData<ImageLights> {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_DATA_H

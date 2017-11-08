@@ -3,7 +3,7 @@
 
 #include "modules/perception/traffic_light/base/image.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 

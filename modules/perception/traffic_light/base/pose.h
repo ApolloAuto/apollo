@@ -7,9 +7,8 @@
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
 
 #include <eigen3/Eigen/Core>
-#include "lib/pcl_util/pcl_types.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -22,9 +21,7 @@ class CarPose {
 
   bool init(const Eigen::Matrix4d &pose);
 
-  const Eigen::Matrix4d get_pose() const;
-
-  const pcl_util::PointD get_position() const;
+  const Eigen::Matrix4d pose() const;
 
  private:
   Eigen::Matrix4d _pose;
@@ -36,7 +33,7 @@ std::ostream &operator<<(std::ostream &os, const CarPose &pose);
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
 // @date 2016/09/08 17:48:06

@@ -2,10 +2,10 @@
 // Created by gaohan02 on 16-12-2.
 //
 
-#include <lib/config_manager/config_manager.h>
+#include <modules/perception/lib/config_manager/config_manager.h>
 #include "color_decision.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -21,26 +21,25 @@ std::string ColorReviser::name() const {
   return "ColorReviser";
 }
 bool ColorReviser::init() {
-  config_manager::ConfigManager *config_manager = \
-            base::Singleton<config_manager::ConfigManager>::get();
+  ConfigManager *config_manager = ConfigManager::instance();
   if (config_manager == NULL) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
   }
 
-  const config_manager::ModelConfig *model_config = NULL;
-  if (!config_manager->get_model_config(name(), &model_config)) {
+  const ModelConfig *model_config = NULL;
+  if (!config_manager->GetModelConfig(name(), &model_config)) {
     AERROR << "not found model config: " << name();
     return false;
   }
 
-  if (!model_config->get_value(\
+  if (!model_config->GetValue(\
             "enable", &_enable)) {
     AERROR << "enable not found." << name();
     return false;
   }
 
-  if (!model_config->get_value(\
+  if (!model_config->GetValue(\
             "blink_time", &_blink_time)) {
     AERROR << "blink_time not found." << name();
     return false;
@@ -64,9 +63,9 @@ bool ColorReviser::revise(const ReviseOption &option, std::vector<LightPtr> *lig
       case UNKNOWN_COLOR:
         if (_color_map.find(id) != _color_map.end() &&
             option.ts > 0 && option.ts - _time_map[id] < _blink_time) {
-          lights_ref[i]->status.color = _color_map[id];
           AINFO << "Revise " << _s_color_strs[lights_ref[i]->status.color]
-                << " to color " << _color_map[id];
+                << " to color " << _s_color_strs[_color_map[id]];
+          lights_ref[i]->status.color = _color_map[id];
         } else {
           AINFO << "Unrevised color " << _s_color_strs[lights_ref[i]->status.color];
         }
@@ -77,6 +76,8 @@ bool ColorReviser::revise(const ReviseOption &option, std::vector<LightPtr> *lig
             option.ts > 0 && _color_map.at(id) == RED) {
           lights_ref[i]->status.color = _color_map.at(id);
           AINFO << "Revise Yellow to color Red";
+          _color_map[id] = RED;
+          _time_map[id] = option.ts;
           break;
         }
       case RED:

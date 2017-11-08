@@ -6,11 +6,11 @@
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H
 
 #include <caffe/layers/pyramid_layers.hpp>
-#include <traffic_light/interface/green_interface.h>
-#include <traffic_light/base/light.h>
+#include <modules/perception/traffic_light/interface/green_interface.h>
+#include <modules/perception/traffic_light/base/light.h>
 #include "caffe/caffe.hpp"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 

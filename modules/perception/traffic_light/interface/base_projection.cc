@@ -10,7 +10,7 @@
 
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -127,11 +127,11 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
   try {
     YAML::Node config = YAML::LoadFile(file_name);
     if (!config) {
-      XLOG(WARN) << "Open TransformationMatrix File:" << file_name << " failed.";
+      AWARN << "Open TransformationMatrix File:" << file_name << " failed.";
       return false;
     }
     if (!config["transform"]) {
-      XLOG(WARN) << "Open TransformationMatrix File:" << file_name << " has no transform.";
+      AWARN << "Open TransformationMatrix File:" << file_name << " has no transform.";
       return false;
     }
     //fill translation
@@ -140,7 +140,7 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
       (*transformation_matrix)(1, 3) = config["transform"]["translation"]["y"].as<double>();
       (*transformation_matrix)(2, 3) = config["transform"]["translation"]["z"].as<double>();
     } else {
-      XLOG(WARN) << "TransformationMatrix File:" << file_name << " has no transform:translation.";
+      AWARN << "TransformationMatrix File:" << file_name << " has no transform:translation.";
       return false;
     }
     //fill rotation
@@ -152,7 +152,7 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
       Eigen::Quaternion<double> rotation(qw, qx, qy, qz);
       (*transformation_matrix).block<3, 3>(0, 0) = rotation.toRotationMatrix();
     } else {
-      XLOG(WARN) << "TransformationMatrix File:" << file_name << " has no transform:rotation.";
+      AWARN << "TransformationMatrix File:" << file_name << " has no transform:rotation.";
       return false;
     }
   } catch (const YAML::Exception &e) {
@@ -174,11 +174,11 @@ bool load_matrix4d_from_file(const std::string &file_name, const std::string &ke
   try {
     YAML::Node config = YAML::LoadFile(file_name);
     if (!config) {
-      XLOG(WARN) << "Open Matrix File:" << file_name << " failed.";
+      AWARN << "Open Matrix File:" << file_name << " failed.";
       return false;
     }
     if (!config[key]) {
-      XLOG(WARN) << "Matrix File:" << file_name << " has no key:" << key;
+      AWARN << "Matrix File:" << file_name << " has no key:" << key;
       return false;
     }
 
@@ -209,4 +209,4 @@ bool load_matrix4d_from_file(const std::string &file_name, const std::string &ke
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

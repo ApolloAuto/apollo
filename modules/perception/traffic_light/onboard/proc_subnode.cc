@@ -6,74 +6,68 @@
 // 
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "modules/common/log.h"
-#include <traffic_light/base/utils.h>
-#include <traffic_light/rectify/unity/crop/cropbox.h>
+#include <modules/perception/traffic_light/base/utils.h>
+#include <modules/perception/traffic_light/rectify/unity/crop/cropbox.h>
 #include "ctime"
 
-//#include "roslibmetric/metric_handle.h"
-#include "modules/perception/traffic_light/onboard/rosmetrichandle_singleton.h"
-#include "lib/base/perf.h"
-#include "lib/config_manager/config_manager.h"
-#include "onboard/subnode_helper.h"
-#include "onboard/shared_data_manager.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/traffic_light/onboard/proc_data.h"
 #include "modules/perception/traffic_light/onboard/preprocessor_data.h"
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-using ::adu::perception::base::Singleton;
-
 DEFINE_string(traffic_light_rectifier,
-"",
-"the rectifier enabled for traffic_light");
+              "",
+              "the rectifier enabled for traffic_light");
 DEFINE_string(traffic_light_recognizer,
-"",
-"the recognizer enabled for traffic_light");
+              "",
+              "the recognizer enabled for traffic_light");
 DEFINE_string(traffic_light_reviser,
-"", "the reviser enabled for traffic_light");
+              "", "the reviser enabled for traffic_light");
 
 DEFINE_double(valid_ts_interval,
-100,
-"the difference between event ts and now ts must be less than me.Unit:second ");
+              100,
+              "the difference between event ts and now ts must be less than me.Unit:second ");
 
 TLProcSubnode::~TLProcSubnode() {
-  _preprocessing_data = nullptr;
-  _proc_data = nullptr;
+  preprocessing_data_ = nullptr;
+  proc_data_ = nullptr;
 }
 
-bool TLProcSubnode::init_internal() {
+bool TLProcSubnode::InitInternal() {
 
-  if (!init_shared_data()) {
+  if (!InitSharedData()) {
     AERROR << "TLProcSubnode init shared data failed.";
     return false;
   }
-  if (!init_rectifier()) {
+  if (!InitRectifier()) {
     AERROR << "TLProcSubnode init rectifier failed.";
     return false;
   }
-  if (!init_recognizer()) {
+  if (!InitRecognizer()) {
     AERROR << "TLProcSubnode init recognizer failed.";
     return false;
   }
-  if (!init_reviser()) {
+  if (!InitReviser()) {
     AERROR << "TLProcSubnode init reviser failed.";
     return false;
   }
 
   // init image_border
-  config_manager::ConfigManager *config_manager
-      = base::Singleton<config_manager::ConfigManager>::get();
+  ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name("TLProcSubnode");
-  const config_manager::ModelConfig *model_config(nullptr);
-  if (!config_manager->get_model_config(model_name, &model_config)) {
+  const ModelConfig *model_config(nullptr);
+  if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "TLProcSubnode not found model: " << model_name;
     return false;
   }
-  if (!model_config->get_value("image_border",
-                               &_image_border)) {
+  if (!model_config->GetValue("image_border",
+                              &image_border_)) {
     AERROR << "TLProcSubnode Failed to find Conf: "
            << "image_border.";
     return false;
@@ -84,10 +78,10 @@ bool TLProcSubnode::init_internal() {
     case 0: {
       float crop_scale = 0;
       float crop_min_size = 0;
-      _crop.reset(new CropBox(crop_scale, crop_min_size));
+      crop_.reset(new CropBox(crop_scale, crop_min_size));
     }
       break;
-    case 1:_crop.reset(new CropBoxWholeImage());
+    case 1:crop_.reset(new CropBoxWholeImage());
       break;
   }
 
@@ -95,28 +89,28 @@ bool TLProcSubnode::init_internal() {
   return true;
 }
 
-bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
-                                 onboard::Event *pub_event) {
-  const double proc_subnode_handle_event_start_ts = base::TimeUtil::get_current_time();
+bool TLProcSubnode::HandleEvent(const Event &sub_event,
+                                Event *pub_event) {
+  const double proc_subnode_handle_event_start_ts = TimeUtil::GetCurrentTime();
   PERF_FUNCTION();
   // get up-stream data
   const double timestamp = sub_event.timestamp;
   const std::string device_id = sub_event.reserve;
-  pub_event->local_timestamp = base::TimeUtil::get_current_time();
+  pub_event->local_timestamp = TimeUtil::GetCurrentTime();
 
   AINFO << "Detect Start ts:" << GLOG_TIMESTAMP(timestamp);
   std::string key;
-  if (!onboard::SubnodeHelper::produce_shared_data_key(timestamp, device_id,
-                                                       &key)) {
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id,
+                                           &key)) {
     AERROR << "TLProcSubnode produce_shared_data_key failed."
            << " ts:" << timestamp << " device_id:" << device_id;
     return false;
   }
 
-  onboard::SharedDataPtr<ImageLights> image_lights;
-  if (!_preprocessing_data->get(key, &image_lights)) {
+  SharedDataPtr<ImageLights> image_lights;
+  if (!preprocessing_data_->Get(key, &image_lights)) {
     AERROR << "TLProcSubnode failed to get shared data,"
-           << " name:" << _preprocessing_data->name()
+           << " name:" << preprocessing_data_->name()
            << ", time: " << GLOG_TIMESTAMP(timestamp);
     return false;
   }
@@ -126,17 +120,17 @@ bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
       image_lights->preprocess_send_timestamp);
 
-  if (base::TimeUtil::get_current_time() - sub_event.local_timestamp > FLAGS_valid_ts_interval) {
+  if (TimeUtil::GetCurrentTime() - sub_event.local_timestamp > FLAGS_valid_ts_interval) {
     AERROR << "TLProcSubnode failed to process image"
            << "Because images are too old"
-           << ",current time: " << GLOG_TIMESTAMP(base::TimeUtil::get_current_time())
+           << ",current time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime())
            << ", event time: " << GLOG_TIMESTAMP(sub_event.local_timestamp);
     return false;
   }
 
   // verify image_lights from cameras
   RectifyOption rectify_option;
-  if (!verify_image_lights(*image_lights, &rectify_option.camera_id)) {
+  if (!VerifyImageLights(*image_lights, &rectify_option.camera_id)) {
     AERROR << "TLProcSubnode invalid image_lights ";
     return false;
   }
@@ -148,48 +142,32 @@ bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
     return false;
   }
   // using rectifier to rectify the region.
-  const double before_rectify_ts = base::TimeUtil::get_current_time();
-  if (!_rectifier->rectify(*(image_lights->image), rectify_option,
+  const double before_rectify_ts = TimeUtil::GetCurrentTime();
+  if (!rectifier_->rectify(*(image_lights->image), rectify_option,
                            (image_lights->lights).get())) {
     AERROR << "TLProcSubnode failed to rectify the regions "
            << "ts:" << GLOG_TIMESTAMP(timestamp) << " Image:" << *(image_lights->image);
     return false;
   }
-  const double detection_latency = base::TimeUtil::get_current_time() - before_rectify_ts;
+  const double detection_latency = TimeUtil::GetCurrentTime() - before_rectify_ts;
 
   // update image_border
-  const double before_update_image_border_ts = base::TimeUtil::get_current_time();
-  base::MutexLock lock(&_mutex);
+  const double before_update_image_border_ts = TimeUtil::GetCurrentTime();
+  MutexLock lock(&mutex_);
   int cam_id = static_cast<int>(image_lights->camera_id);
-  compute_image_border(*image_lights,
-                       &TLPreprocessorSubnode::_s_image_borders[cam_id]);
+  ComputeImageBorder(*image_lights,
+                     &TLPreprocessorSubnode::_s_image_borders[cam_id]);
   AINFO << "TLProcSubnode update image_border size: "
         << TLPreprocessorSubnode::_s_image_borders[cam_id]
         << " ts: " << GLOG_TIMESTAMP(timestamp)
         << " CameraId: " << image_lights->camera_id;
   image_lights->offset = TLPreprocessorSubnode::_s_image_borders[cam_id];
   const double update_image_border_latency =
-      base::TimeUtil::get_current_time() - before_update_image_border_ts;
-
-  // 给 CarOS Monitor 发异常
-  // 投影框偏移较大
-  if (image_lights->offset > 150) {
-    RosMetricHandleSingleton *ros_mh = Singleton<RosMetricHandleSingleton>::get();
-    // std::string debug_string = "Offset between projection_box and detection_box(in pixel): " +
-    //         std::to_string(image_lights->offset) + ". Check camera extrinsics.";
-    std::string debug_string = "";
-    debug_string += ("offset:" + std::to_string(image_lights->offset));
-    debug_string += (",camera_id:" + CAMERA_ID_TO_STR.at(image_lights->camera_id));
-    ros_mh->throw_exception(1, 102, debug_string);
-    XLOG(WARN) << "Offset between projection_box and detection_box(in pixel): "
-               << std::to_string(image_lights->offset)
-               << ". Check camera extrinsics"
-               << ". debug_string: " << debug_string;
-  }
+      TimeUtil::GetCurrentTime() - before_update_image_border_ts;
 
   // recognize_status
-  const double before_recognization_ts = base::TimeUtil::get_current_time();
-  if (!_recognizer->recognize_status(*(image_lights->image), RecognizeOption(),
+  const double before_recognization_ts = TimeUtil::GetCurrentTime();
+  if (!recognizer_->recognize_status(*(image_lights->image), RecognizeOption(),
                                      (image_lights->lights).get())) {
     AERROR << "TLProcSubnode failed to recognize lights,"
            << " ts:" << GLOG_TIMESTAMP(timestamp)
@@ -197,16 +175,16 @@ bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
     return false;
   }
   const double recognization_latency =
-      base::TimeUtil::get_current_time() - before_recognization_ts;
+      TimeUtil::GetCurrentTime() - before_recognization_ts;
 
   // revise status
-  const double before_revise_ts = base::TimeUtil::get_current_time();
-  if (!_reviser->revise(ReviseOption(sub_event.timestamp), image_lights->lights.get())) {
+  const double before_revise_ts = TimeUtil::GetCurrentTime();
+  if (!reviser_->revise(ReviseOption(sub_event.timestamp), image_lights->lights.get())) {
     AERROR << "TLReviserSubnode revise data failed. "
            << "sub_event:" << sub_event.to_string();
     return false;
   }
-  const double revise_latency = base::TimeUtil::get_current_time() - before_revise_ts;
+  const double revise_latency = TimeUtil::GetCurrentTime() - before_revise_ts;
 
   AINFO << "TLProcSubnode process traffic_light, "
         << " msg_ts: " << GLOG_TIMESTAMP(timestamp)
@@ -216,7 +194,7 @@ bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
         << " recognization_latency: " << recognization_latency * 1000 << " ms."
         << " revise_latency: " << revise_latency * 1000 << " ms."
         << " TLProcSubnode::handle_event latency: "
-        << (base::TimeUtil::get_current_time() -
+        << (TimeUtil::GetCurrentTime() -
             proc_subnode_handle_event_start_ts) * 1000 << " ms."
         << " enter_proc_latency: " << enter_proc_latency * 1000 << " ms."
         << " preprocess_latency: " << (image_lights->preprocess_send_timestamp -
@@ -225,7 +203,7 @@ bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
   // }
 
   // add to down-stream data
-  if (!_proc_data->add(key, image_lights)) {
+  if (!proc_data_->Add(key, image_lights)) {
     AERROR << "TLProcSubnode failed to add data down-stream, "
            << " key:" << key;
     return false;
@@ -238,43 +216,43 @@ bool TLProcSubnode::handle_event(const onboard::Event &sub_event,
   return true;
 }
 
-bool TLProcSubnode::init_shared_data() {
-  CHECK_NOTNULL(_shared_data_manager);
+bool TLProcSubnode::InitSharedData() {
+  CHECK_NOTNULL(shared_data_manager_);
 
   const std::string preprocessing_data_name("TLPreprocessingData");
-  _preprocessing_data = dynamic_cast<TLPreprocessingData *>(
-      _shared_data_manager->get_shared_data(preprocessing_data_name));
-  if (_preprocessing_data == nullptr) {
+  preprocessing_data_ = dynamic_cast<TLPreprocessingData *>(
+      shared_data_manager_->GetSharedData(preprocessing_data_name));
+  if (preprocessing_data_ == nullptr) {
     AERROR << "TLProcSubnode failed to get shared data instance: "
            << preprocessing_data_name;
     return false;
   }
 
   const std::string proc_data_name("TLProcData");
-  _proc_data = dynamic_cast<TLProcData *>(
-      _shared_data_manager->get_shared_data(proc_data_name));
-  if (_proc_data == nullptr) {
+  proc_data_ = dynamic_cast<TLProcData *>(
+      shared_data_manager_->GetSharedData(proc_data_name));
+  if (proc_data_ == nullptr) {
     AERROR << "Failed to get shared data instance: "
            << proc_data_name;
     return false;
   }
 
   AINFO << "Init shared data successfully, "
-        << "preprocessing_data: " << _preprocessing_data->name()
-        << "proc_data:" << _proc_data->name();
+        << "preprocessing_data: " << preprocessing_data_->name()
+        << "proc_data:" << proc_data_->name();
   return true;
 }
 
-bool TLProcSubnode::init_rectifier() {
+bool TLProcSubnode::InitRectifier() {
 
-  _rectifier.reset(BaseRectifierRegisterer::get_instance_by_name(
+  rectifier_.reset(BaseRectifierRegisterer::GetInstanceByName(
       FLAGS_traffic_light_rectifier));
-  if (!_rectifier) {
+  if (!rectifier_) {
     AERROR << "TLProcSubnode new rectifier failed. rectifier name:"
            << FLAGS_traffic_light_rectifier << " failed.";
     return false;
   }
-  if (!_rectifier->init()) {
+  if (!rectifier_->init()) {
     AERROR << "TLProcSubnode init rectifier failed. rectifier name:"
            << FLAGS_traffic_light_rectifier << " failed.";
     return false;
@@ -282,30 +260,30 @@ bool TLProcSubnode::init_rectifier() {
   return true;
 }
 
-bool TLProcSubnode::init_recognizer() {
-  _recognizer.reset(BaseRecognizerRegisterer::get_instance_by_name(
+bool TLProcSubnode::InitRecognizer() {
+  recognizer_.reset(BaseRecognizerRegisterer::GetInstanceByName(
       FLAGS_traffic_light_recognizer));
-  if (!_recognizer) {
+  if (!recognizer_) {
     AERROR << "TLProcSubnode new recognizer failed. name:"
            << FLAGS_traffic_light_recognizer;
     return false;
   }
-  if (!_recognizer->init()) {
+  if (!recognizer_->init()) {
     AERROR << "TLProcSubnode init recognizer failed.";
     return false;
   }
   return true;
 }
 
-bool TLProcSubnode::init_reviser() {
-  _reviser.reset(BaseReviserRegisterer::get_instance_by_name(
+bool TLProcSubnode::InitReviser() {
+  reviser_.reset(BaseReviserRegisterer::GetInstanceByName(
       FLAGS_traffic_light_reviser));
-  if (_reviser == nullptr) {
+  if (reviser_ == nullptr) {
     AERROR << "TLProcSubnode new reviser failed. name:"
            << FLAGS_traffic_light_reviser;
     return false;
   }
-  if (!_reviser->init()) {
+  if (!reviser_->init()) {
     AERROR << "TLProcSubnode init reviser failed. name:"
            << FLAGS_traffic_light_reviser;
     return false;
@@ -313,12 +291,12 @@ bool TLProcSubnode::init_reviser() {
   return true;
 }
 
-double TLProcSubnode::get_mean_distance(const double ts,
-                                        const Eigen::Matrix4d &car_pose,
-                                        const LightPtrs &lights) const {
+double TLProcSubnode::GetMeanDistance(const double ts,
+                                      const Eigen::Matrix4d &car_pose,
+                                      const LightPtrs &lights) const {
   if (lights.empty()) {
-    XLOG(WARN) << "get_mean_distance failed. lights is empty, "
-               << "while it should not be. ts:" << GLOG_TIMESTAMP(ts);
+    AWARN << "get_mean_distance failed. lights is empty, "
+          << "while it should not be. ts:" << GLOG_TIMESTAMP(ts);
     return DBL_MAX;
   }
 
@@ -326,8 +304,8 @@ double TLProcSubnode::get_mean_distance(const double ts,
   for (const LightPtr &light : lights) {
     auto light_distance = stopline_distance(car_pose, light->info.stop_line());
     if (light_distance < 0) {
-      XLOG(WARN) << "get_mean_distance failed. lights stop line data is illegal, "
-                 << "ts:" << GLOG_TIMESTAMP(ts);
+      AWARN << "get_mean_distance failed. lights stop line data is illegal, "
+            << "ts:" << GLOG_TIMESTAMP(ts);
       return DBL_MAX;
     }
     distance += light_distance;
@@ -335,7 +313,7 @@ double TLProcSubnode::get_mean_distance(const double ts,
   return distance / lights.size();
 }
 
-bool TLProcSubnode::verify_image_lights(
+bool TLProcSubnode::VerifyImageLights(
     const ImageLights &image_lights, CameraId *selection) const {
   if (!image_lights.image || !image_lights.image->contain_image()) {
     AERROR << "TLProcSubnode image_lights has no image, "
@@ -361,8 +339,8 @@ bool TLProcSubnode::verify_image_lights(
   return true;
 }
 
-bool TLProcSubnode::compute_image_border(const ImageLights &image_lights,
-                                         int *image_border) {
+bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
+                                       int *image_border) {
   if (!image_lights.image) {
     AERROR << "TLProcSubnode image_lights has no image, "
            << "compute_image_border failed.";
@@ -399,7 +377,7 @@ bool TLProcSubnode::compute_image_border(const ImageLights &image_lights,
     cv::Rect projection_roi = lights_ref[i]->region.projection_roi;
     // 有多个灯，取最大偏移
     int offset = 0;
-    compute_rects_offset(projection_roi, rectified_roi, &offset);
+    ComputeRectsOffset(projection_roi, rectified_roi, &offset);
     max_offset = std::max(max_offset, offset);
   }
   if (max_offset != -1) {
@@ -409,7 +387,7 @@ bool TLProcSubnode::compute_image_border(const ImageLights &image_lights,
   return true;
 }
 
-void TLProcSubnode::compute_rects_offset(
+void TLProcSubnode::ComputeRectsOffset(
     const cv::Rect &rect1,
     const cv::Rect &rect2,
     int *offset) {
@@ -449,4 +427,4 @@ REGISTER_SUBNODE(TLProcSubnode);
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

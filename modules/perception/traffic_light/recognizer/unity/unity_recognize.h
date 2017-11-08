@@ -5,11 +5,11 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 
-#include <traffic_light/interface/base_recognizer.h>
-#include <traffic_light/interface/green_interface.h>
-#include <lib/config_manager/config_manager.h>
+#include <modules/perception/traffic_light/interface/base_recognizer.h>
+#include <modules/perception/traffic_light/interface/green_interface.h>
+#include <modules/perception/lib/config_manager/config_manager.h>
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 class UnityRecognize : public BaseRecognizer {
@@ -33,8 +33,8 @@ class UnityRecognize : public BaseRecognizer {
   std::shared_ptr<IRefine> _classify_day;
   std::shared_ptr<IRefine> _classify_night;
 
-  bool init_model(const adu::perception::config_manager::ConfigManager *config_manager,
-                  const adu::perception::config_manager::ModelConfig *model_config,
+  bool init_model(const apollo::perception::ConfigManager *config_manager,
+                  const apollo::perception::ModelConfig *model_config,
                   std::shared_ptr<IRefine> *classify);
 };
 }

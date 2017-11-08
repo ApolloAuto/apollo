@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 

@@ -8,7 +8,7 @@ false, "show images when test images equal.");
 DEFINE_bool(enable_show_mat_on_unittest,
 false, "show mat difference when test failed.");
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 namespace test {
@@ -90,5 +90,5 @@ std::string mat_brief(const cv::Mat &mat, const int max_rows, const int max_cols
 } // namespace test
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 

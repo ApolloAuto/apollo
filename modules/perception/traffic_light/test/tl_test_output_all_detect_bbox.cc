@@ -5,9 +5,9 @@
 #include <iostream>
 #include <string>
 
-#include <lib/base/macros.h>
+#include <modules/perception/lib/base/macros.h>
 #include "modules/perception/traffic_light/rectify/unity/detection.h"
-#include <traffic_light/rectify/unity/unity_rectify.h>
+#include <modules/perception/traffic_light/rectify/unity/unity_rectify.h>
 
 DEFINE_string(ext,
 ".jpg", "ext");
@@ -21,7 +21,7 @@ DEFINE_int32(detect_output_type,
 0,
 "detection output type; 0 for day and night, 1 for day, 2 for night");
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -75,15 +75,15 @@ class DebugLight {
   FILE *fout;
 };
 
-}  // namespace adu
+}  // namespace apollo
 }  // namespace perception
 }  // namespace traffic_light
 
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  std::shared_ptr<adu::perception::traffic_light::UnityRectify> _rectifier(
-      new adu::perception::traffic_light::UnityRectify);
+  std::shared_ptr<apollo::perception::traffic_light::UnityRectify> _rectifier(
+      new apollo::perception::traffic_light::UnityRectify);
 
   bool init_ok = _rectifier->init();
   if (!init_ok) {
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  using adu::perception::traffic_light::DetectOutputBoxType;
+  using apollo::perception::traffic_light::DetectOutputBoxType;
   // Set detection output box type
   switch (FLAGS_detect_output_type) {
     default:
@@ -103,10 +103,10 @@ int main(int argc, char **argv) {
       break;
   }
 
-  using adu::perception::traffic_light::LightPtrs;
-  using adu::perception::traffic_light::LightPtr;
-  using adu::perception::traffic_light::Light;
-  using adu::perception::traffic_light::Image;
+  using apollo::perception::traffic_light::LightPtrs;
+  using apollo::perception::traffic_light::LightPtr;
+  using apollo::perception::traffic_light::Light;
+  using apollo::perception::traffic_light::Image;
 
   // Set test data
   // FLAGS_hdmap_file = "/home/guiyilin/Downloads/20161219T105238/rect_info.txt";
@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
 
   std::ifstream fin_hd(FLAGS_hdmap_file.c_str());
   std::string line;
-  adu::perception::traffic_light::DebugLight debug("result_all_bbox.txt");
+  apollo::perception::traffic_light::DebugLight debug("result_all_bbox.txt");
   XLOG_INFO(FLAGS_hdmap_file.c_str());
 
   while (getline(fin_hd, line)) {

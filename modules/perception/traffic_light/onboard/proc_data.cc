@@ -6,7 +6,7 @@
 // 
 #include "modules/perception/traffic_light/onboard/proc_data.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -14,4 +14,4 @@ REGISTER_SHAREDDATA(TLProcData)
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo

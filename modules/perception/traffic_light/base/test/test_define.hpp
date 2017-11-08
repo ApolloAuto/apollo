@@ -15,7 +15,7 @@
 
 DECLARE_bool(enable_show_image_on_unittest);
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 namespace test {
@@ -105,6 +105,6 @@ void show_image(const std::string &name, const cv::Mat &expect, const cv::Mat &o
 } // namespace test
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif //ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_TEST_TEST_DEFINE_HPP

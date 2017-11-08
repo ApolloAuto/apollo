@@ -13,7 +13,7 @@
 
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -22,18 +22,18 @@ class SingleBoundaryBasedProjection : public BaseProjection {
  public:
   virtual bool project(const CameraCoeffient &camera_coeffient,
                        const Eigen::Matrix4d &pose,
-                       const adu::common::hdmap::Signal &tl_info,
+                       const apollo::hdmap::Signal &tl_info,
                        Light *light) const override;
 
  private:
   bool project_point(const CameraCoeffient &coeffient,
                      const Eigen::Matrix4d &pose,
-                     const adu::common::hdmap::Point &point,
+                     const apollo::common::Point3D &point,
                      int *center_x, int *center_y) const;
 
   bool project_point_distort(const CameraCoeffient &coeffient,
                              const Eigen::Matrix4d &pose,
-                             const adu::common::hdmap::Point &point,
+                             const apollo::common::Point3D &point,
                              int *center_x, int *center_y) const;
 
   Eigen::Matrix<double, 2, 1> pixel_denormalize(
@@ -44,6 +44,6 @@ class SingleBoundaryBasedProjection : public BaseProjection {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H

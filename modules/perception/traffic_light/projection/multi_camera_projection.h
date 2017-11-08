@@ -12,11 +12,11 @@
 #include <vector>
 #include <map>
 
-#include "lib/base/file_util.h"
-#include "lib/config_manager/config_manager.h"
+#include "modules/perception/lib/base/file_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -29,7 +29,9 @@ class MultiCamerasProjection {
   virtual ~MultiCamerasProjection() = default;
   virtual bool init();
   virtual bool project(const CarPose &pose, const ProjectOption &option, Light *light) const;
-
+  std::string name() const {
+    return "TLPreprocessor";
+  }
   bool has_camera(const CameraId &cam_id);
 
  private:
@@ -40,6 +42,6 @@ class MultiCamerasProjection {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H

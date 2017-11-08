@@ -9,7 +9,7 @@
 #include <opencv2/opencv.hpp>
 #include "modules/perception/traffic_light/base/light.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 // class-wrapper

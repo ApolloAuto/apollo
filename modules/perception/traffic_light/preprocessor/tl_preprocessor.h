@@ -11,16 +11,17 @@
 #include <memory>
 #include <vector>
 #include <map>
-#include <lib/config_manager/config_manager.h>
+#include <modules/perception/lib/config_manager/config_manager.h>
+#include <modules/perception/lib/base/mutex.h>
 
 #include "modules/perception/traffic_light/interface/base_preprocessor.h"
 
-#include "lib/base/perf.h"
+#include "modules/perception/lib/base/timer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -37,7 +38,7 @@ class TLPreprocessor : public BasePreprocessor {
 
   bool add_cached_lights_projections(
       const CarPose &pose,
-      const std::vector<adu::common::hdmap::Signal> &signals,
+      const std::vector<apollo::hdmap::Signal> &signals,
       const MultiCamerasProjection &projection,
       const std::map<int, int> &image_borders_size,
       const double ts,
@@ -50,8 +51,8 @@ class TLPreprocessor : public BasePreprocessor {
       std::shared_ptr<ImageLights> *pub_data,
       bool *should_pub);
 
-  void set_last_signals(const std::vector<adu::common::hdmap::Signal> &signals);
-  void get_last_signals(std::vector<adu::common::hdmap::Signal> *signals) const;
+  void set_last_signals(const std::vector<apollo::hdmap::Signal> &signals);
+  void get_last_signals(std::vector<apollo::hdmap::Signal> *signals) const;
 
   void set_last_signals_ts(double last_signals_ts);
   void get_last_signals_ts(double *last_signals_ts) const;
@@ -80,7 +81,7 @@ class TLPreprocessor : public BasePreprocessor {
   bool select_camera_by_lights_projection(
       const double timestamp,
       const CarPose &pose,
-      const std::vector<adu::common::hdmap::Signal> &signals,
+      const std::vector<apollo::hdmap::Signal> &signals,
       const MultiCamerasProjection &projection,
       const std::map<int, int> &image_borders_size,
       std::shared_ptr<ImageLights> *image_lights,
@@ -96,7 +97,7 @@ class TLPreprocessor : public BasePreprocessor {
 
   //@brief Project lights from HDMap onto long focus or short focus image plane
   bool project_lights(const MultiCamerasProjection &projection,
-                      const std::vector<adu::common::hdmap::Signal> &signals,
+                      const std::vector<apollo::hdmap::Signal> &signals,
                       const CarPose &pose,
                       CameraId camera_id,
                       std::shared_ptr<LightPtrs> &lights_on_image,
@@ -118,7 +119,7 @@ class TLPreprocessor : public BasePreprocessor {
   int get_max_focal_len_camera_id();
 
  private:
-  std::vector<adu::common::hdmap::Signal> _last_signals;
+  std::vector<apollo::hdmap::Signal> _last_signals;
   double _last_signals_ts = -1;
   double _valid_hdmap_interval = 1.5;
 
@@ -131,16 +132,16 @@ class TLPreprocessor : public BasePreprocessor {
   std::vector<std::shared_ptr<ImageLights> > _cached_lights_projections_array;
 
   std::map<int, int> _camera_is_working_flags;
-  base::Mutex _mutex;
+  Mutex _mutex;
 
   // cache signal numbers
   size_t _max_cached_signal_nums_size = 200;
   std::vector<std::pair<double, size_t> > _cached_signal_nums_array;
 
   // some parameters from config file
-  size_t _max_cached_image_lights_array_size = 100;
-  size_t _projection_image_cols = 1920;
-  size_t _projection_image_rows = 1080;
+  int _max_cached_image_lights_array_size = 100;
+  int _projection_image_cols = 1920;
+  int _projection_image_rows = 1080;
   double _sync_interval_seconds = 0.1;
   double _no_signals_interval_seconds = 0.5;
 
@@ -149,6 +150,6 @@ class TLPreprocessor : public BasePreprocessor {
 
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H

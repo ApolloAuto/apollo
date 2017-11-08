@@ -10,12 +10,12 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "lib/base/noncopyable.h"
-#include "lib/base/registerer.h"
+#include "modules/perception/lib/base/noncopyable.h"
+#include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -51,6 +51,6 @@ REGISTER_REGISTERER(BaseRecognizer);
 
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H

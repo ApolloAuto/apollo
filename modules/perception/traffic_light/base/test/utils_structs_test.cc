@@ -2,7 +2,7 @@
 
 #include "modules/perception/traffic_light/base/utils.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 

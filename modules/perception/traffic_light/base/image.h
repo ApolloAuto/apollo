@@ -14,7 +14,7 @@
 #include <opencv2/opencv.hpp>
 #include <sensor_msgs/Image.h>
 
-namespace adu {
+namespace apollo {
 namespace perception {
 namespace traffic_light {
 
@@ -99,6 +99,6 @@ typedef std::shared_ptr<Image> ImageSharedPtr;
 
 }// namespace traffic_light
 }// namespace perception
-}// namespace adu
+}// namespace apollo
 
 #endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
