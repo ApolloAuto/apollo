@@ -76,6 +76,7 @@ class QpSplinePathGenerator {
   const ReferenceLine& reference_line_;
   const QpSplinePathConfig& qp_spline_path_config_;
 
+  common::TrajectoryPoint init_trajectory_point_;
   common::FrenetFramePoint init_frenet_point_;
 
   std::vector<double> knots_;
