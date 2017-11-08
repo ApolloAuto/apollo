@@ -118,7 +118,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   double time = 0.0;
   while (time < qp_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);
-    double v = spline.Derivative(time);
+    double v = std::max(0.0, spline.Derivative(time));
     double a = spline.SecondOrderDerivative(time);
     double da = spline.ThirdOrderDerivative(time);
     speed_data->AppendSpeedPoint(s, time, v, a, da);
