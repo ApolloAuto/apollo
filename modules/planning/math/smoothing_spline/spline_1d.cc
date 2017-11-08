@@ -28,8 +28,7 @@
 namespace apollo {
 namespace planning {
 
-Spline1d::Spline1d(const std::vector<double>& x_knots,
-                   const uint32_t order)
+Spline1d::Spline1d(const std::vector<double>& x_knots, const uint32_t order)
     : x_knots_(x_knots), spline_order_(order) {
   if (x_knots.size() > 1) {
     for (uint32_t i = 1; i < x_knots_.size(); ++i) {
@@ -73,15 +72,16 @@ double Spline1d::ThirdOrderDerivative(const double x) const {
 
 bool Spline1d::SetSplineSegs(const Eigen::MatrixXd& params,
                              const uint32_t order) {
+  const uint32_t num_params = order + 1;
   // check if the parameter size fit
-  if (x_knots_.size() * order !=
-      order + static_cast<uint32_t>(params.rows())) {
+  if (x_knots_.size() * num_params !=
+      num_params + static_cast<uint32_t>(params.rows())) {
     return false;
   }
   for (uint32_t i = 0; i < splines_.size(); ++i) {
-    std::vector<double> spline_piece(order, 0.0);
-    for (uint32_t j = 0; j < order; ++j) {
-      spline_piece[j] = params(i * order + j, 0);
+    std::vector<double> spline_piece(num_params, 0.0);
+    for (uint32_t j = 0; j < num_params; ++j) {
+      spline_piece[j] = params(i * num_params + j, 0);
     }
     splines_[i].SetParams(spline_piece);
   }
