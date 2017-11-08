@@ -22,14 +22,14 @@
 // data file
 DECLARE_string(control_conf_file);
 
-DECLARE_string(adapter_config_filename);
+DECLARE_string(control_adapter_config_filename);
 
 DECLARE_bool(enable_csv_debug);
 
 // temporary gflag for test purpose
 DECLARE_bool(enable_speed_station_preview);
 
-DECLARE_string(node_name);
+DECLARE_string(control_node_name);
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
 
