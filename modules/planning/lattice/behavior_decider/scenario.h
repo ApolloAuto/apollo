@@ -22,8 +22,9 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_H_
 
-#include <string>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -39,9 +40,6 @@
 
 namespace apollo {
 namespace planning {
-
-//using ObjectId = std::string;
-//using ObjectIds = std::vector<ObjectId>;
 
 class Scenario {
  public:
@@ -69,7 +67,7 @@ class Scenario {
     std::string name_;
 };
 
-}  // namespace apollo
 }  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_H_
