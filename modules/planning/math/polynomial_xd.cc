@@ -47,28 +47,32 @@ void PolynomialXd::SetParams(const std::vector<double>& params) {
 
 const std::vector<double>& PolynomialXd::params() const { return params_; }
 
-void PolynomialXd::DerivedFrom(const PolynomialXd& base) {
+PolynomialXd PolynomialXd::DerivedFrom(const PolynomialXd& base) {
+  std::vector<double> params;
   if (base.order() <= 0) {
-    params_.clear();
+    params.clear();
   } else {
-    params_.resize(base.params().size() - 1);
+    params.resize(base.params().size() - 1);
     for (std::uint32_t i = 1; i < base.order() + 1; ++i) {
-      params_[i - 1] = base[i] * i;
+      params[i - 1] = base[i] * i;
     }
   }
+  return PolynomialXd(params);
 }
 
-void PolynomialXd::IntegratedFrom(const PolynomialXd& base) {
-  IntegratedFrom(base, 0.0);
+PolynomialXd PolynomialXd::IntegratedFrom(const PolynomialXd& base) {
+  return PolynomialXd::IntegratedFrom(base, 0.0);
 }
 
-void PolynomialXd::IntegratedFrom(const PolynomialXd& base,
-                                  const double intercept) {
-  params_.resize(base.params().size() + 1);
-  params_[0] = intercept;
+PolynomialXd PolynomialXd::IntegratedFrom(const PolynomialXd& base,
+                                          const double intercept) {
+  std::vector<double> params;
+  params.resize(base.params().size() + 1);
+  params[0] = intercept;
   for (std::uint32_t i = 0; i < base.params().size(); ++i) {
-    params_[i + 1] = base[i] / (i + 1);
+    params[i + 1] = base[i] / (i + 1);
   }
+  return PolynomialXd(params);
 }
 
 double PolynomialXd::operator()(const double value) const {
