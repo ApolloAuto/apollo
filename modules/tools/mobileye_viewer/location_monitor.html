@@ -1,0 +1,64 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Google Maps - pygmaps </title>
+    <script type="text/javascript"
+            src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript"
+            src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        var symbolCar = {
+            path: 'M -1,0 A 1,1 0 0 0 -3,0 1,1 0 0 0 -1,0M 1,0 A 1,1 0 0 0 3,0 1,1 0 0 0 1,0M -3,3 Q 0,5 3,3',
+            strokeColor: '#00F',
+            rotation: 180,
+            scale: 2
+        };
+        var marker;
+        var map;
+        function Initialize() {
+            LoadGoogleMap();
+            setInterval(function () {
+                GetMapData();
+            }, 100);
+        }
+        function LoadGoogleMap() {
+            var latlng = new google.maps.LatLng(37.415885, -122.014487);
+            var mapOptions = {
+                center: latlng,
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+            marker = new google.maps.Marker({
+                icon: symbolCar,
+                position: latlng
+            });
+            marker.setMap(map);
+        }
+
+        function GetMapData() {
+            var json = '';
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:5001/",
+                data: "{}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (resp) {
+                    var LatLng = new google.maps.LatLng(resp[0].lat, resp[0].lon);
+                    map.setCenter(LatLng);
+                    marker.setPosition(LatLng);
+                },
+                error: function () {
+                    debugger;
+                }
+            });
+        }
+    </script>
+</head>
+<body style="margin:0px; padding:0px;" onload="Initialize()">
+<div id="map_canvas" style="width: 100%; height: 100%;"></div>
+</body>
+</html>
