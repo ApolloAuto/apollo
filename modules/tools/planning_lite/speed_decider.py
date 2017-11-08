@@ -20,3 +20,7 @@ class SpeedDecider:
     def __init__(self):
         self.mobileye_pb = None
         self.chassis_pb = None
+        self.CRUISE_SPEED = 10  # m/s
+
+    def get_target_speed(self):
+        return self.CRUISE_SPEED
