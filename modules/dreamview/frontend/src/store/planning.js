@@ -20,7 +20,8 @@ export default class Planning {
       stGraph: {},
       stSpeedGraph: {},
       speedGraph: {},
-      kappaGraph: {}
+      kappaGraph: {},
+      dkappaGraph: {},
     };
   }
 
@@ -171,12 +172,18 @@ export default class Planning {
     }
   }
 
+  updateDkappaGraph(paths) {
+    for (const path of paths) {
+      this.data.dkappaGraph[path.name] =
+        this.extractDataPoints(path.pathPoint, 's', 'dkappa');
+    }
+  }
+
   updadteLatencyGraph(currentTime, latencyStates) {
     const timeRange = 300000; // 5 min
     for (const moduleName in this.latencyGraph) {
       let graph = this.latencyGraph[moduleName];
-
-      if (graph.length > 1 ) {
+      if (graph.length > 0) {
         const startTime = graph[0].x;
         const endTime = graph[graph.length - 1].x;
         const diff = currentTime - startTime;
@@ -219,6 +226,7 @@ export default class Planning {
 
       if (planningData.path) {
         this.updateKappaGraph(planningData.path);
+        this.updateDkappaGraph(planningData.path);
       }
     }
 

@@ -59,6 +59,7 @@ class ReferenceLine {
   bool GetLaneWidth(const double s, double* const left_width,
                     double* const right_width) const;
   bool IsOnRoad(const common::SLPoint& sl_point) const;
+  bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
 
   /**
    * @brief check if any part of the box has overlap with the road.

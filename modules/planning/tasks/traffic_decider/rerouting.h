@@ -40,7 +40,7 @@ class Rerouting : public TrafficRule {
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool ChangeLaneFailRerouting(const ReferenceLineInfo* reference_line_info);
+  bool ChangeLaneFailRerouting();
 
   ReferenceLineInfo* reference_line_info_;
   Frame* frame_;

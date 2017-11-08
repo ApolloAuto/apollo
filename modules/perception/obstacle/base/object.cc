@@ -25,6 +25,8 @@ namespace apollo {
 namespace perception {
 
 using Eigen::Vector3d;
+using apollo::common::util::Print;
+using apollo::common::util::StrCat;
 
 Object::Object() {
   direction = Vector3d(1, 0, 0);
@@ -41,19 +43,20 @@ void Object::clone(const Object& rhs) {
 }
 
 std::string Object::ToString() const {
-  return common::util::StrCat(
-      "Object[id: ", id, ", "
-      "track_id: ", track_id, ", "
-      "cloud_size: ", cloud->size(), ", "
-      "direction: ", direction.transpose(), ", "
-      "center: ", center.transpose(), ", "
-      "velocity: ", velocity.transpose(), ", "
-      "width: ", width, ", "
-      "length: ", length, ", "
-      "height: ", height, ", "
-      "polygon_size: ", polygon.size(), ", "
-      "type: ", type, ", "
-      "is_background: ", is_background, "]");
+  // StrCat supports 9 arguments at most.
+  return StrCat(
+      StrCat("Object[id: ", id, ", "
+             "track_id: ", track_id, ", "
+             "cloud_size: ", cloud->size(), ", "
+             "direction: ", Print(direction.transpose()), ", "),
+      StrCat("center: ", Print(center.transpose()), ", "
+             "velocity: ", Print(velocity.transpose()), ", "
+             "width: ", width, ", "
+             "length: ", length, ", "),
+      StrCat("height: ", height, ", "
+             "polygon_size: ", polygon.size(), ", "
+             "type: ", type, ", "
+             "is_background: ", is_background, "]"));
 }
 
 bool Object::Serialize(PerceptionObstacle* pb_obj) const {

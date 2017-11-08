@@ -69,13 +69,13 @@ double Spline2d::DerivativeX(const double t) const {
   return splines_[index].DerivativeX(t - t_knots_[index]);
 }
 
-double Spline2d::derivative_y(const double t) const {
+double Spline2d::DerivativeY(const double t) const {
   // zero order spline
   if (splines_.size() == 0) {
     return 0.0;
   }
   uint32_t index = find_index(t);
-  return splines_[index].derivative_y(t - t_knots_[index]);
+  return splines_[index].DerivativeY(t - t_knots_[index]);
 }
 
 double Spline2d::SecondDerivativeX(const double t) const {
@@ -86,12 +86,12 @@ double Spline2d::SecondDerivativeX(const double t) const {
   return splines_[index].SecondDerivativeX(t - t_knots_[index]);
 }
 
-double Spline2d::second_derivative_y(const double t) const {
+double Spline2d::SecondDerivativeY(const double t) const {
   if (splines_.size() == 0) {
     return 0.0;
   }
   uint32_t index = find_index(t);
-  return splines_[index].second_derivative_y(t - t_knots_[index]);
+  return splines_[index].SecondDerivativeY(t - t_knots_[index]);
 }
 
 double Spline2d::ThirdDerivativeX(const double t) const {
@@ -102,12 +102,12 @@ double Spline2d::ThirdDerivativeX(const double t) const {
   return splines_[index].ThirdDerivativeX(t - t_knots_[index]);
 }
 
-double Spline2d::third_derivative_y(const double t) const {
+double Spline2d::ThirdDerivativeY(const double t) const {
   if (splines_.size() == 0) {
     return 0.0;
   }
   uint32_t index = find_index(t);
-  return splines_[index].third_derivative_y(t - t_knots_[index]);
+  return splines_[index].ThirdDerivativeY(t - t_knots_[index]);
 }
 /**
 *   @brief: set splines

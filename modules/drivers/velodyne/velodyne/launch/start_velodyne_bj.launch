@@ -10,9 +10,6 @@
     <arg name="rpm" default="600"/>
     <!-- 64E_S3D_STRONGEST | 64E_S3D_LATEST | 64E_S3D_DUAL -->
     <arg name="model" default="64E_S3D_STRONGEST" />
-    <!-- beijing    UTC+8:00 -->
-    <!-- california UTC-8:00 -->
-    <arg name="time_zone" default="-8" />
     <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
 
@@ -37,7 +34,6 @@
     <arg name="organized" default="$(arg organized)"/>
     <arg name="min_range" default="$(arg min_range)" />
     <arg name="max_range" default="$(arg max_range_64)" />
-    <arg name="time_zone" default="$(arg time_zone)" />
     <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
     <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   </include>

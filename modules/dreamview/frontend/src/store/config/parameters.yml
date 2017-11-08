@@ -36,6 +36,7 @@ planning:
     width: 1.4
 options:
   defaults:
+    showPOI: false
     showMenu: false
     showConsole: false
     showPNCMonitor: false

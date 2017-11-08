@@ -52,16 +52,15 @@ double WrapAngle(const double angle) {
 }
 
 double NormalizeAngle(const double angle) {
-  const double new_angle = std::fmod(angle + M_PI, M_PI * 2.0);
-  return (new_angle < 0 ? new_angle + M_PI * 2.0 : new_angle) - M_PI;
+  double a = std::fmod(angle + M_PI, 2.0 * M_PI);
+  if (a < 0.0) {
+    a += (2.0 * M_PI);
+  }
+  return a - M_PI;
 }
 
 double AngleDiff(const double from, const double to) {
-  double angle = std::fmod((to - from) + M_PI, 2.0 * M_PI);
-  if (angle < 0.0) {
-    angle += (2.0 * M_PI);
-  }
-  return angle - M_PI;
+  return NormalizeAngle(to - from);
 }
 
 int RandomInt(const int s, const int t, unsigned int rand_seed) {

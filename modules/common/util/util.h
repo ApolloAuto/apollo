@@ -69,6 +69,11 @@ struct PairHash {
  */
 SLPoint MakeSLPoint(const double s, const double l);
 
+template <typename T>
+common::math::Vec2d MakeVec2d(const T& t) {
+  return common::math::Vec2d(t.x(), t.y());
+}
+
 PointENU MakePointENU(const double x, const double y, const double z);
 
 PointENU MakePointENU(const math::Vec2d& xy);

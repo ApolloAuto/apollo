@@ -34,6 +34,14 @@ class BacksideVehicle : public TrafficRule {
   virtual ~BacksideVehicle() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+
+ private:
+  /**
+   * @brief When the reference line info indicates that there is no lane change,
+   * use lane keeping strategy for back side vehicles.
+   */
+  void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
+                                       PathDecision* path_decision);
 };
 
 }  // namespace planning

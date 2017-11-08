@@ -1,0 +1,74 @@
+header {
+  timestamp_sec: 1509400518.88418
+  module_name: "routing"
+  sequence_num: 2
+}
+road {
+  id: "42-157-40"
+  passage {
+    segment {
+      id: "40_1_-3"
+      start_s: 7.05926281781638
+      end_s: 593.196
+    }
+    change_lane_type: LEFT
+  }
+  passage {
+    segment {
+      id: "40_1_-2"
+      start_s: 7.0573706560552889
+      end_s: 593.037
+    }
+    change_lane_type: LEFT
+  }
+  passage {
+    segment {
+      id: "40_1_-1"
+      start_s: 7.05640672459209
+      end_s: 592.956
+    }
+    segment {
+      id: "157_1_-1"
+      start_s: 0
+      end_s: 37.8509
+    }
+    segment {
+      id: "42_1_-1"
+      start_s: 0
+      end_s: 18.989288803241255
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 642.97692598542494
+}
+routing_request {
+  header {
+    timestamp_sec: 1509400518.8777616
+    module_name: "dreamview"
+    sequence_num: 1
+  }
+  waypoint {
+    id: "40_1_-3"
+    s: 7.05926281781638
+    pose {
+      x: 587703.81774817116
+      y: 4141469.6915823659
+    }
+  }
+  waypoint {
+    id: "42_1_-1"
+    s: 18.989288803241255
+    pose {
+      x: 587072.18905483524
+      y: 4141576.0899855583
+    }
+  }
+}
+map_version: "1.000000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

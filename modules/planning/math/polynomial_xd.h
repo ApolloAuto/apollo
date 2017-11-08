@@ -35,9 +35,12 @@ class PolynomialXd {
   double operator()(const double value) const;
   double operator[](const std::uint32_t index) const;
   void SetParams(const std::vector<double>& params);
-  void DerivedFrom(const PolynomialXd& base);
-  void IntegratedFrom(const PolynomialXd& base);
-  void IntegratedFrom(const PolynomialXd& base, const double intercept);
+
+  static PolynomialXd DerivedFrom(const PolynomialXd& base);
+  static PolynomialXd IntegratedFrom(const PolynomialXd& base);
+  static PolynomialXd IntegratedFrom(const PolynomialXd& base,
+                                     const double intercept);
+
   std::uint32_t order() const;
   const std::vector<double>& params() const;
 

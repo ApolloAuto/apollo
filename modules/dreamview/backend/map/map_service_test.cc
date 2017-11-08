@@ -19,6 +19,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/common/configs/config_gflags.h"
+
 using apollo::hdmap::Id;
 using apollo::hdmap::Map;
 using apollo::common::PointENU;
@@ -60,17 +62,20 @@ TEST(MapElementIdsTest, Json) {
 
 class MapServiceTest : public ::testing::Test {
  protected:
-  MapServiceTest()
-      : map_service("modules/dreamview/backend/testdata/garage.bin") {}
+  MapServiceTest() {
+    FLAGS_map_dir = "modules/dreamview/backend/testdata";
+    FLAGS_base_map_filename = "garage.bin";
+    map_service.reset(new MapService(false));
+  }
 
-  MapService map_service;
+  std::unique_ptr<MapService> map_service;
 };
 
 TEST_F(MapServiceTest, CollectMapElementIds) {
   PointENU p;
   p.set_x(0.0);
   p.set_y(0.0);
-  MapElementIds map_element_ids = map_service.CollectMapElementIds(p, 20000.0);
+  MapElementIds map_element_ids = map_service->CollectMapElementIds(p, 20000.0);
 
   EXPECT_THAT(map_element_ids.lane, UnorderedElementsAre("l1"));
   EXPECT_THAT(map_element_ids.crosswalk, UnorderedElementsAre());
@@ -84,14 +89,14 @@ TEST_F(MapServiceTest, CollectMapElementIds) {
 TEST_F(MapServiceTest, RetrieveMapElements) {
   MapElementIds map_element_ids;
   map_element_ids.lane.push_back("l1");
-  Map map = map_service.RetrieveMapElements(map_element_ids);
+  Map map = map_service->RetrieveMapElements(map_element_ids);
   EXPECT_EQ(1, map.lane_size());
   EXPECT_EQ("l1", map.lane(0).id().id());
 }
 
 TEST_F(MapServiceTest, GetStartPoint) {
   PointENU start_point;
-  EXPECT_TRUE(map_service.GetStartPoint(&start_point));
+  EXPECT_TRUE(map_service->GetStartPoint(&start_point));
   EXPECT_DOUBLE_EQ(-1826.4050789145094, start_point.x());
   EXPECT_DOUBLE_EQ(-3027.5187874953263, start_point.y());
   EXPECT_DOUBLE_EQ(0.0, start_point.z());

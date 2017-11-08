@@ -86,15 +86,15 @@ bool Spline2dSolver::Solve() {
          << ", last_num_constraint_: " << last_num_constraint_;
 
   bool use_hotstart =
+      last_problem_success_ &&
       (FLAGS_enable_sqp_solver && sqp_solver_ != nullptr &&
        num_param == last_num_param_ && num_constraint == last_num_constraint_);
 
   if (!use_hotstart) {
     sqp_solver_.reset(new ::qpOASES::SQProblem(num_param, num_constraint,
-                                               ::qpOASES::HST_SEMIDEF));
+                                               ::qpOASES::HST_UNKNOWN));
     ::qpOASES::Options my_options;
     my_options.enableCholeskyRefactorisation = 10;
-    my_options.enableRegularisation = ::qpOASES::BT_TRUE;
     my_options.epsNum = FLAGS_default_active_set_eps_num;
     my_options.epsDen = FLAGS_default_active_set_eps_den;
     my_options.epsIterRef = FLAGS_default_active_set_eps_iter_ref;
@@ -126,6 +126,7 @@ bool Spline2dSolver::Solve() {
 
   const double l_lower_bound_ = -1e10;
   const double l_upper_bound_ = 1e10;
+
   for (int i = 0; i < num_param; ++i) {
     lower_bound[i] = l_lower_bound_;
     upper_bound[i] = l_upper_bound_;
@@ -135,8 +136,8 @@ bool Spline2dSolver::Solve() {
   double affine_constraint_matrix[num_param * num_constraint];  // NOLINT
   double constraint_lower_bound[num_constraint];                // NOLINT
   double constraint_upper_bound[num_constraint];                // NOLINT
-  index = 0;
 
+  index = 0;
   for (int r = 0; r < equality_constraint_matrix.rows(); ++r) {
     constraint_lower_bound[r] = equality_constraint_boundary(r, 0);
     constraint_upper_bound[r] = equality_constraint_boundary(r, 0);
@@ -191,10 +192,14 @@ bool Spline2dSolver::Solve() {
                 "reasons:"
              << ret;
     }
+    last_problem_success_ = false;
     return false;
   }
 
+  last_problem_success_ = true;
   double result[num_param];  // NOLINT
+  memset(result, 0, sizeof result);
+
   sqp_solver_->getPrimalSolution(result);
 
   MatrixXd solved_params = MatrixXd::Zero(num_param, 1);
