@@ -73,7 +73,7 @@ std::string TitleCase(const std::string &origin,
     }
   }
 
-  return apollo::common::util::StrCat(apollo::common::util::PrintIter(parts));
+  return apollo::common::util::PrintIter(parts);
 }
 
 // List subdirs and return a dict of {subdir_title: subdir_path}.
