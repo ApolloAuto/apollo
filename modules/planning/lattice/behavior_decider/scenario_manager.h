@@ -14,10 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 /**
- * @file world_manager.h
+ * @file scenario_manager.h
  **/
+
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
+
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "modules/common/macro.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -60,6 +67,7 @@ class ScenarioManager {
       return dynamic_cast<const T*>(scenario_iter->second.get());
     }
   }
+
  private:
   void RegisterScenarios();
   std::vector<std::vector<Scenario*>> scenarios_;
@@ -68,7 +76,7 @@ class ScenarioManager {
   DECLARE_SINGLETON(ScenarioManager);
 };
 
-}  // namespace apollo
 }  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
