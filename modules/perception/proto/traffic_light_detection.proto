@@ -10,6 +10,7 @@ message TrafficLight {
     RED = 1;
     YELLOW = 2;
     GREEN = 3;
+    BLACK = 4;
   };
   optional Color color = 1;
 
@@ -18,9 +19,6 @@ message TrafficLight {
 
   // How confidence about the detected results, between 0 and 1.
   optional double confidence = 3 [default = 1.0];
-
-  // Duration of the traffic light since detected.
-  optional double tracking_time = 4;
 }
 
 message TrafficLightDetection {
