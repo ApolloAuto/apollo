@@ -76,14 +76,15 @@ em_planner_config {
         derivative_weight: 500.0
         second_derivative_weight: 1000.0
         third_derivative_weight: 10.0
-        reference_line_weight: 0.0
+        reference_line_weight: 10.0
         num_output: 100
-        cross_lane_lateral_extension: 1.2
+        cross_lane_lateral_extension: 0.5
         cross_lane_longitudinal_extension: 100.0
         history_path_weight: 0.0
         lane_change_mid_l: 0.0
         point_constraint_s_position: 110.0
         lane_change_lateral_shift: 1.5
+        uturn_speed_limit: 5.0
     }
     qp_st_speed_config {
         total_path_length: 250.0
@@ -134,7 +135,7 @@ qp_spline_reference_line_smoother_config {
     constraint_to_knots_ratio: 5
     max_spline_length: 25.0
     longitudinal_boundary_bound: 2.0
-    lateral_boundary_bound: 0.20
+    lateral_boundary_bound: 0.25
     second_derivative_weight: 200.0
     third_derivative_weight: 1000.0
     num_of_total_points: 500

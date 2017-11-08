@@ -72,6 +72,7 @@ bool QpSplinePathGenerator::Generate(
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
     PathData* const path_data) {
   ADEBUG << "Init point: " << init_point.DebugString();
+  init_trajectory_point_ = init_point;
 
   const auto& path_data_history = path_data->path_data_history();
   if (!path_data_history.empty()) {
@@ -238,7 +239,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
-  uint32_t constraint_num = 2 * number_of_spline + 1;
+  uint32_t constraint_num = 3 * number_of_spline + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return true;
@@ -254,8 +255,10 @@ bool QpSplinePathGenerator::AddConstraint(
                                         init_frenet_point_.l() - ref_l_);
   spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
                                                   init_frenet_point_.dl());
-  spline_constraint->AddPointSecondDerivativeConstraint(
-      init_frenet_point_.s(), init_frenet_point_.ddl());
+  if (init_trajectory_point_.v() > qp_spline_path_config_.uturn_speed_limit()) {
+    spline_constraint->AddPointSecondDerivativeConstraint(
+        init_frenet_point_.s(), init_frenet_point_.ddl());
+  }
 
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
@@ -271,6 +274,9 @@ bool QpSplinePathGenerator::AddConstraint(
   ADEBUG << "lat_shift = " << lat_shift;
   spline_constraint->AddPointConstraint(
       qp_spline_path_config_.point_constraint_s_position(), lat_shift);
+  if (!is_change_lane_path_) {
+    spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
+  }
 
   // add first derivative bound to improve lane change smoothness
   std::vector<double> dl_lower_bound(evaluated_s_.size(), -FLAGS_dl_bound);
@@ -396,12 +402,10 @@ void QpSplinePathGenerator::AddHistoryPathKernel() {
 void QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
-  if (qp_spline_path_config_.reference_line_weight() > 0.0) {
+  if (init_trajectory_point_.v() < qp_spline_path_config_.uturn_speed_limit() &&
+      !is_change_lane_path_ &&
+      qp_spline_path_config_.reference_line_weight() > 0.0) {
     std::vector<double> ref_l(evaluated_s_.size(), -ref_l_);
-    const double delta_l = -init_frenet_point_.l() / (evaluated_s_.size() - 1);
-    for (uint32_t i = 0; i < ref_l.size(); ++i) {
-      ref_l[i] += delta_l * (evaluated_s_.size() - 1 - i);
-    }
     spline_kernel->AddReferenceLineKernelMatrix(
         evaluated_s_, ref_l, qp_spline_path_config_.reference_line_weight());
   }
