@@ -1072,7 +1072,6 @@ void Obstacle::InitRNNStates() {
 }
 
 bool Obstacle::rnn_enabled() const {
-  AINFO << "-----prediction rnn enable" << rnn_enabled_;
   return rnn_enabled_;
 }
 
