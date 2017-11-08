@@ -7,6 +7,7 @@
   In the provided RTK localization method, there are two inputs:
   * GPS The Global Position System.
   * IMU Inertial Measurement Unit.
+  
   In the provided multi-sensor fusion localization method, there are three inputs:
   * GPS The Global Position System.
   * IMU Inertial Measurement Unit.
