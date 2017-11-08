@@ -15,6 +15,7 @@ cc_library(
         "util.h",
     ],
     deps = [
+        ":string_util",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",

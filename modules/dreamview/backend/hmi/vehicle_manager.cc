@@ -70,34 +70,10 @@ DEFINE_string(gnss_conf_path, "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt",
 
 namespace apollo {
 namespace dreamview {
-namespace {
 
 using apollo::common::util::CopyFile;
 using apollo::common::util::StrCat;
-
-std::string RosRoot() {
-  if (const char* ros_root = std::getenv("ROS_ROOT")) {
-    // ROS_ROOT env points to <ros>/share/ros. We shift it to <ros>.
-    return StrCat(ros_root, "/../..");
-  }
-  // If no ROS_ROOT env is available, we assume there is a "ros" dir in current
-  // working directory, which is true for our release image.
-  return "ros";
-}
-
-std::string TranslatePath(const std::string &src_path) {
-  static const std::string kRosPlaceholder = "<ros>";
-  static const std::string kRosRoot = RosRoot();
-
-  std::string result = src_path;
-  const auto pos = src_path.find(kRosPlaceholder);
-  if (pos != std::string::npos) {
-    result.replace(pos, kRosPlaceholder.length(), kRosRoot);
-  }
-  return result;
-}
-
-}  // namespace
+using apollo::common::util::TranslatePath;
 
 bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
   if (!apollo::common::util::DirectoryExists(vehicle_data_path)) {
