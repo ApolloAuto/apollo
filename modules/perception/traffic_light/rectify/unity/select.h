@@ -14,7 +14,7 @@ class Select : public ISelectLight {
  public:
   Select() = default;
 
-  virtual void select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
+  virtual void Select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
                       const std::vector<LightPtr> &refined_bboxes,
                       std::vector<LightPtr> *selected_bboxes);
 };

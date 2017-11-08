@@ -7,7 +7,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool CarPose::init(const Eigen::Matrix4d &pose) {
+bool CarPose::set_pose(const Eigen::Matrix4d &pose) {
   _pose = pose;
   return true;
 }

@@ -16,33 +16,32 @@ namespace traffic_light {
 
 class UnityRectify : public BaseRectifier {
  public:
-  UnityRectify() {
-  }
+  UnityRectify() = default;
 
-  virtual bool init() override;
+  virtual bool Init() override;
 
   // @brief: rectify light region from image or part of it
   // @param [in] const Image&: input image
   // @param [in] const RectifyOptions&: rectify options
   // @param [in/out] Lights
   // @return  bool
-  virtual bool rectify(const Image &image, const RectifyOption &option,
+  virtual bool Rectify(const Image &image, const RectifyOption &option,
                        std::vector<LightPtr> *lights) override;
 
-  bool init_detection(const ConfigManager *config_manager,
-                      const ModelConfig *model_config,
-                      std::shared_ptr<IRefine> *detection, std::shared_ptr<IGetBox> *crop);
+  bool InitDetection(const ConfigManager *config_manager,
+                     const ModelConfig *model_config,
+                     std::shared_ptr<IRefine> *detection, std::shared_ptr<IGetBox> *crop);
 
   // @brief name
   virtual std::string name() const;
 
-  bool set_output_box_type(DetectOutputBoxType type);
+  bool SetOutputBoxType(DetectOutputBoxType type);
 
  private:
-  std::shared_ptr<ISelectLight> _select;
-  std::shared_ptr<IRefine> _detect;
-  std::shared_ptr<IHDMapOperator> _verifymap;
-  std::shared_ptr<IGetBox> _crop;
+  std::shared_ptr<ISelectLight> select_;
+  std::shared_ptr<IRefine> detect_;
+  std::shared_ptr<IHDMapOperator> verifymap_;
+  std::shared_ptr<IGetBox> crop_;
 };
 
 }

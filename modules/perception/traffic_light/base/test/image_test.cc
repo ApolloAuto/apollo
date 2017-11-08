@@ -34,7 +34,7 @@ TEST_F(ImageTest, test_all) {
     EXPECT_EQ("Image not inited.", ss.str());
   }
 
-  ASSERT_TRUE(_image->init(timestamp, cam_id, img));
+  ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
   {
     std::stringstream ss;
     ss << *_image;
@@ -46,7 +46,7 @@ TEST_F(ImageTest, test_all) {
   EXPECT_EQ("long_focus_camera(25mm)", _image->device_id_str());
 
   cam_id = CameraId::UNKNOWN;
-  ASSERT_TRUE(_image->init(timestamp, cam_id, img));
+  ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
   EXPECT_EQ("unkown device(camera)", _image->device_id_str());
 }
 

@@ -30,14 +30,14 @@ class BaseRectifier {
 
   virtual ~BaseRectifier() = default;
 
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
   // @brief: rectify light region from image or part of it
   // @param [in] const Image&: input image
   // @param [in] const RectifyOption&: rectify options
   // @param [in/out] Lights
   // @return  bool
-  virtual bool rectify(const Image &image, const RectifyOption &option,
+  virtual bool Rectify(const Image &image, const RectifyOption &option,
                        std::vector<LightPtr> *lights) = 0;
 
   // @brief name

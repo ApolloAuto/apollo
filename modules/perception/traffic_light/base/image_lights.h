@@ -17,10 +17,6 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-struct ImagesPose {
-  std::vector<ImageSharedPtr> images;
-  CarPose pose;
-};
 struct ImageLights {
   std::shared_ptr<Image> image;
   CarPose pose;
@@ -28,7 +24,6 @@ struct ImageLights {
   std::shared_ptr<LightPtrs> lights_outside_image; //record the lights outside the lights.
   CameraId camera_id = UNKNOWN;
   double timestamp = 0.0;   // image's timestamp
-  double pose_timestamp = 0.0;   // pose's timestamp
 
   double preprocess_receive_timestamp = 0.0;   // timestamp when received a image
   double preprocess_send_timestamp = 0.0;  // timestamp when PreprocessSubnode pub event

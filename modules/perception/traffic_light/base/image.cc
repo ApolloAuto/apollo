@@ -17,58 +17,56 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool Image::init(const double ts, const CameraId device_id, const cv::Mat &mat) {
-  _contain_mat = true;
-  _contain_image = true;
-  _timestamp = ts,
-  _device_id = device_id,
-  _mat = mat.clone();
+bool Image::Init(const double &ts, const CameraId &device_id, const cv::Mat &mat) {
+  contain_mat_ = true;
+  contain_image_ = true;
+  timestamp_ = ts,
+  device_id_ = device_id,
+  mat_ = mat.clone();
   ADEBUG << *this << " init.";
   return true;
 }
-bool Image::init(const double ts, const CameraId device_id,
+bool Image::Init(const double &ts, const CameraId &device_id,
                  const sensor_msgs::ImageConstPtr &image_data) {
-  _contain_mat = false;
-  _contain_image = true;
-  _timestamp = ts,
-  _device_id = device_id,
-  _image_data = image_data;
+  contain_mat_ = false;
+  contain_image_ = true;
+  timestamp_ = ts,
+  device_id_ = device_id,
+  image_data_ = image_data;
   ADEBUG << *this << " init.";
   return true;
 }
 
 double Image::ts() const {
-  return _timestamp;
+  return timestamp_;
 }
 
 CameraId Image::device_id() const {
-  return _device_id;
+  return device_id_;
 }
 
 std::string Image::device_id_str() const {
-  int device_id = static_cast<int>(_device_id);
-  if (CAMERA_ID_TO_STR.find(device_id) == CAMERA_ID_TO_STR.end()) {
+  if (kCameraIdToStr.find(device_id_) == kCameraIdToStr.end()) {
     return "unkown device(camera)";
   }
-
-  return CAMERA_ID_TO_STR.at(device_id);
+  return kCameraIdToStr.at(device_id_);
 }
-bool Image::generate_mat() {
-  if (!_contain_mat) {
+bool Image::GenerateMat() {
+  if (!contain_mat_) {
     cv_bridge::CvImageConstPtr cv_ptr;
     try {
-      if (_image_data->encoding.compare("rgb8") == 0) {
-        cv_ptr = cv_bridge::toCvShare(_image_data, "bgr8");
-      } else if (_image_data->encoding.compare("8UC3") == 0) {
-        cv_ptr = cv_bridge::toCvShare(_image_data, "8UC3");
+      if (image_data_->encoding.compare("rgb8") == 0) {
+        cv_ptr = cv_bridge::toCvShare(image_data_, "bgr8");
+      } else if (image_data_->encoding.compare("8UC3") == 0) {
+        cv_ptr = cv_bridge::toCvShare(image_data_, "8UC3");
       } else {
         AERROR << "TLPreprocessorSubnode get unknown image format. "
-               << "format:" << _image_data->encoding;
+               << "format:" << image_data_->encoding;
         return false;
       }
-      _mat = cv_ptr->image;
-      _contain_mat = true;
-      AINFO << "Generate done " << _mat.size();
+      mat_ = cv_ptr->image;
+      contain_mat_ = true;
+      AINFO << "Generate done " << mat_.size();
     }
     catch (const cv_bridge::Exception &e) {
       AERROR << "TLPreprocessorSubnode trans msg to cv::Mat failed." << e.what();
@@ -78,23 +76,23 @@ bool Image::generate_mat() {
   return true;
 }
 cv::Mat Image::mat() const {
-  return _mat;
+  return mat_;
 }
 cv::Size Image::size() const {
-  if (_contain_mat) {
-    return _mat.size();
+  if (contain_mat_) {
+    return mat_.size();
   } else {
-    return cv::Size(_image_data->width, _image_data->height);
+    return cv::Size(image_data_->width, image_data_->height);
   }
 }
 
 std::ostream &operator<<(std::ostream &os, const Image &image) {
 
-  if (image._contain_mat) {
-    os << "Image device_id:" << static_cast<int>(image._device_id)
+  if (image.contain_mat_) {
+    os << "Image device_id:" << static_cast<int>(image.device_id_)
        << " device_id_str: " << image.device_id_str()
-       << " ts:" << std::setprecision(FLAGS_double_show_precision) << image._timestamp
-       << " size:" << image._mat.size();
+       << " ts:" << std::setprecision(FLAGS_double_show_precision) << image.timestamp_
+       << " size:" << image.mat_.size();
   } else {
     os << "Image not inited.";
   }

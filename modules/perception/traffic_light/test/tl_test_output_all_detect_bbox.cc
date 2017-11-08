@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
   std::shared_ptr<apollo::perception::traffic_light::UnityRectify> _rectifier(
       new apollo::perception::traffic_light::UnityRectify);
 
-  bool init_ok = _rectifier->init();
+  bool init_ok = _rectifier->Init();
   if (!init_ok) {
     XLOG_FATAL("Init Failed");
     return 0;
@@ -95,11 +95,11 @@ int main(int argc, char **argv) {
   // Set detection output box type
   switch (FLAGS_detect_output_type) {
     default:
-    case 0:_rectifier->set_output_box_type(DetectOutputBoxType::BOX_ALL);
+    case 0:_rectifier->SetOutputBoxType(DetectOutputBoxType::BOX_ALL);
       break;
-    case 1:_rectifier->set_output_box_type(DetectOutputBoxType::BOX_VERTICAL);
+    case 1:_rectifier->SetOutputBoxType(DetectOutputBoxType::BOX_VERTICAL);
       break;
-    case 2:_rectifier->set_output_box_type(DetectOutputBoxType::BOX_QUADRATE);
+    case 2:_rectifier->SetOutputBoxType(DetectOutputBoxType::BOX_QUADRATE);
       break;
   }
 
@@ -144,8 +144,8 @@ int main(int argc, char **argv) {
     cv::Rect cbox;
     cbox = cv::Rect(0, 0, img.cols, img.rows);
     std::vector<LightPtr> refined_bboxes;
-    _rectifier->_detect->set_crop_box(cbox);
-    _rectifier->_detect->perform(img, &refined_bboxes);
+    _rectifier->detect_->SetCropBox(cbox);
+    _rectifier->detect_->Perform(img, &refined_bboxes);
     //debug.show_detect_bboxes(image, ts, lights);
     debug.write(img, ts, refined_bboxes);
   }

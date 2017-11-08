@@ -137,13 +137,13 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
 
   //cv::Rect cbox;
   //_crop->get_crop_box(image_lights->image->size(), *(image_lights->lights), &cbox);
-  if (!image_lights->image->generate_mat()) {
+  if (!image_lights->image->GenerateMat()) {
     AERROR << "TLProcSubnode failed to generate mat";
     return false;
   }
   // using rectifier to rectify the region.
   const double before_rectify_ts = TimeUtil::GetCurrentTime();
-  if (!rectifier_->rectify(*(image_lights->image), rectify_option,
+  if (!rectifier_->Rectify(*(image_lights->image), rectify_option,
                            (image_lights->lights).get())) {
     AERROR << "TLProcSubnode failed to rectify the regions "
            << "ts:" << GLOG_TIMESTAMP(timestamp) << " Image:" << *(image_lights->image);
@@ -167,8 +167,8 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
 
   // recognize_status
   const double before_recognization_ts = TimeUtil::GetCurrentTime();
-  if (!recognizer_->recognize_status(*(image_lights->image), RecognizeOption(),
-                                     (image_lights->lights).get())) {
+  if (!recognizer_->RecognizeStatus(*(image_lights->image), RecognizeOption(),
+                                    (image_lights->lights).get())) {
     AERROR << "TLProcSubnode failed to recognize lights,"
            << " ts:" << GLOG_TIMESTAMP(timestamp)
            << " image:" << image_lights->image;
@@ -179,7 +179,7 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
 
   // revise status
   const double before_revise_ts = TimeUtil::GetCurrentTime();
-  if (!reviser_->revise(ReviseOption(sub_event.timestamp), image_lights->lights.get())) {
+  if (!reviser_->Revise(ReviseOption(sub_event.timestamp), image_lights->lights.get())) {
     AERROR << "TLReviserSubnode revise data failed. "
            << "sub_event:" << sub_event.to_string();
     return false;
@@ -252,7 +252,7 @@ bool TLProcSubnode::InitRectifier() {
            << FLAGS_traffic_light_rectifier << " failed.";
     return false;
   }
-  if (!rectifier_->init()) {
+  if (!rectifier_->Init()) {
     AERROR << "TLProcSubnode init rectifier failed. rectifier name:"
            << FLAGS_traffic_light_rectifier << " failed.";
     return false;
@@ -268,7 +268,7 @@ bool TLProcSubnode::InitRecognizer() {
            << FLAGS_traffic_light_recognizer;
     return false;
   }
-  if (!recognizer_->init()) {
+  if (!recognizer_->Init()) {
     AERROR << "TLProcSubnode init recognizer failed.";
     return false;
   }
@@ -283,7 +283,7 @@ bool TLProcSubnode::InitReviser() {
            << FLAGS_traffic_light_reviser;
     return false;
   }
-  if (!reviser_->init()) {
+  if (!reviser_->Init()) {
     AERROR << "TLProcSubnode init reviser failed. name:"
            << FLAGS_traffic_light_reviser;
     return false;
@@ -329,8 +329,8 @@ bool TLProcSubnode::VerifyImageLights(
     return false;
   }
   for (LightPtr light:*(image_lights.lights)) {
-    if (!box_is_valid(light->region.projection_roi, image_lights.image->size())) {
-      clear_box(light->region.projection_roi);
+    if (!BoxIsValid(light->region.projection_roi, image_lights.image->size())) {
+      ClearBox(light->region.projection_roi);
       continue;
     }
   }
@@ -352,7 +352,7 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
   if (camera_id < 0 || camera_id >= num_camera_ids) {
     AERROR << "TLProcSubnode image_lights unknown camera selection, "
            << "compute_image_border failed, "
-           << "camera_id: " << CAMERA_ID_TO_STR.at(image_lights.camera_id);
+           << "camera_id: " << kCameraIdToStr.at(image_lights.camera_id);
     return false;
   }
 
@@ -366,7 +366,7 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
 
   if (camera_id == static_cast<int>(CameraId::UNKNOWN) - 1) {
     AINFO << "TLProcSubnode no need to update image border, "
-          << "camera_id: " << CAMERA_ID_TO_STR.at(image_lights.camera_id);
+          << "camera_id: " << kCameraIdToStr.at(image_lights.camera_id);
     return true;
   }
 

@@ -19,7 +19,7 @@ class CarPose {
 
   virtual ~CarPose() = default;
 
-  bool init(const Eigen::Matrix4d &pose);
+  bool set_pose(const Eigen::Matrix4d &pose);
 
   const Eigen::Matrix4d pose() const;
 

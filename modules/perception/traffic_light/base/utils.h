@@ -11,24 +11,20 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-uint64_t ts_double_2_int64(double ts);
+uint64_t TimestampDouble2Int64(double ts);
 
-void get_hour_minute(double ts, int &hour, int &minute);
+void ClearBox(cv::Rect &rect);
 
-int hour_minute_to_second(int hour, int minute);
+bool BoxIsValid(const cv::Rect &box, const cv::Size &size);
+cv::Rect RefinedBox(cv::Rect box, const cv::Size &size);
 
-void clear_box(cv::Rect &rect);
+cv::Point2f GetCenter(cv::Rect box);
 
-bool box_is_valid(const cv::Rect &box, const cv::Size &size);
-cv::Rect refined_box(cv::Rect box, const cv::Size &size);
+float GetDistance(cv::Point2f, cv::Point2f);
 
-cv::Point2f get_center(cv::Rect box);
+float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1, float sigma2);
 
-float get_distance(cv::Point2f, cv::Point2f);
-
-float get_2d_gaussian_score(cv::Point2f p1, cv::Point2f p2, float sigma1, float sigma2);
-
-float get_1d_gaussian_score(float x1, float x2, float sigma);
+float Get1dGaussianScore(float x1, float x2, float sigma);
 
 }
 }

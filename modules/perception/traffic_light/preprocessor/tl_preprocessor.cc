@@ -133,9 +133,9 @@ bool TLPreprocessor::add_cached_lights_projections(
                         lights_on_image_array[cam_id],
                         lights_outside_image_array[cam_id])) {
       AERROR << "add_cached_lights_projections project lights on "
-             << CAMERA_ID_TO_STR.at(cam_id) << " image failed, "
+             << kCameraIdToStr.at(cam_id) << " image failed, "
              << "ts: " << GLOG_TIMESTAMP(timestamp)
-             << ", camera_id: " << CAMERA_ID_TO_STR.at(cam_id);
+             << ", camera_id: " << kCameraIdToStr.at(cam_id);
       return false;
     }
   }
@@ -166,7 +166,7 @@ bool TLPreprocessor::add_cached_lights_projections(
   image_lights->num_signals = image_lights->lights->size() +
       image_lights->lights_outside_image->size();
   _cached_lights_projections_array.push_back(image_lights);
-  AINFO << "selected_camera_id: " << CAMERA_ID_TO_STR.at(selected_camera_id);
+  AINFO << "selected_camera_id: " << kCameraIdToStr.at(selected_camera_id);
 
   return true;
 }
@@ -189,8 +189,8 @@ bool TLPreprocessor::sync_image(
   if (!sync_image_with_cached_lights_projections(
       image, camera_id, sync_time, *data,
       &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok)) {
-    auto camera_id_str = (CAMERA_ID_TO_STR.find(camera_id) != CAMERA_ID_TO_STR.end() ?
-                          CAMERA_ID_TO_STR.at(camera_id) : std::to_string(camera_id));
+    auto camera_id_str = (kCameraIdToStr.find(camera_id) != kCameraIdToStr.end() ?
+                          kCameraIdToStr.at(camera_id) : std::to_string(camera_id));
     AINFO << "sync_image_with_cached_lights_projections failed, "
           << "not publish image to shared data, ts: " << GLOG_TIMESTAMP(sync_time)
           << ", camera_id: " << camera_id_str;
@@ -204,7 +204,7 @@ bool TLPreprocessor::sync_image(
     CameraId max_focal_len_working_camera =
         static_cast<CameraId>(get_max_focal_len_camera_id());
     AINFO << "working camera with maximum focal length: "
-          << CAMERA_ID_TO_STR.at(max_focal_len_working_camera)
+          << kCameraIdToStr.at(max_focal_len_working_camera)
           << ", _last_pub_camera_id: " << _last_pub_camera_id;
     // 在缓存的 signals_num 中根据时间戳查找当前图像时间的灯数
     size_t current_signal_num = 0;
@@ -237,19 +237,19 @@ bool TLPreprocessor::sync_image(
 
       AINFO << "sync image with cached lights projection failed, "
             << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-            << " camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << " camera_id: " << kCameraIdToStr.at(camera_id);
 
     } else {  // 其他 camera_id，直接返回，不发送图像
       AINFO << "sync image with cached lights projection failed, "
             << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-            << " camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << " camera_id: " << kCameraIdToStr.at(camera_id);
       *should_pub = false;
       return false;
     }
   }
   if (sync_ok) {
     AINFO << "TLPreprocessor sync ok ts: " << GLOG_TIMESTAMP(sync_time)
-          << " camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
     _last_output_ts = sync_time;   // update last output timestamp only when sync. is really ok
   }
   _last_pub_camera_id = camera_id;
@@ -325,7 +325,7 @@ bool TLPreprocessor::set_camera_is_working_flag(const CameraId &camera_id, bool 
     return false;
   }
   _camera_is_working_flags[cam_id] = static_cast<int>(is_working);
-  AINFO << "set_camera_is_working_flag succeeded, camera_id: " << CAMERA_ID_TO_STR.at(camera_id)
+  AINFO << "set_camera_is_working_flag succeeded, camera_id: " << kCameraIdToStr.at(camera_id)
         << ", flag: " << _camera_is_working_flags[cam_id];
 
   return true;
@@ -376,7 +376,7 @@ void TLPreprocessor::select_image(const CarPose &pose,
   // 找当前工作的焦距最小的相机，不进行边界检查
   int min_focal_len_working_camera = get_min_focal_len_camera_id();
   AINFO << "working camera with minimum focal length: "
-        << CAMERA_ID_TO_STR.at(min_focal_len_working_camera);
+        << kCameraIdToStr.at(min_focal_len_working_camera);
 
   for (size_t cam_id = 0; cam_id < lights_on_image_array.size(); ++cam_id) {
     if (!lights_outside_image_array[cam_id]->empty()) {
@@ -395,7 +395,7 @@ void TLPreprocessor::select_image(const CarPose &pose,
                        image_borders_size.at(cam_id))) {
           ok = false;
           AINFO << "light project on image border region, "
-                << "CameraId: " << CAMERA_ID_TO_STR.at(cam_id);
+                << "CameraId: " << kCameraIdToStr.at(cam_id);
           break;
         }
       }
@@ -432,7 +432,7 @@ bool TLPreprocessor::project_lights(const MultiCamerasProjection &projection,
   get_camera_is_working_flag(camera_id, &camera_is_working);
   if (!camera_is_working) {
     AWARN << "TLPreprocessor::project_lights not project lights, "
-          << "camera is not working, CameraId: " << CAMERA_ID_TO_STR.at(camera_id);
+          << "camera is not working, CameraId: " << kCameraIdToStr.at(camera_id);
     return true;
   }
 
@@ -478,15 +478,15 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
       auto proj_cam_id = static_cast<int>((*ptr_lights_projection)->camera_id);
       auto image_cam_id = static_cast<int>(camera_id);
       auto proj_cam_id_str =
-          (CAMERA_ID_TO_STR.find(proj_cam_id) != CAMERA_ID_TO_STR.end() ?
-           CAMERA_ID_TO_STR.at(proj_cam_id) : std::to_string(proj_cam_id));
+          (kCameraIdToStr.find(proj_cam_id) != kCameraIdToStr.end() ?
+           kCameraIdToStr.at(proj_cam_id) : std::to_string(proj_cam_id));
       // 找到对应时间的定位，但是相机 ID 不符
       if (camera_id != (*ptr_lights_projection)->camera_id) {
         AWARN << "find appropriate localization, but camera_id not match"
               << ", cached projection's camera_id: "
               << proj_cam_id_str
               << " , image's camera_id: "
-              << CAMERA_ID_TO_STR.at(image_cam_id);
+              << kCameraIdToStr.at(image_cam_id);
         //return false;
         continue;
       }
@@ -495,7 +495,7 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
               << GLOG_TIMESTAMP(sync_time)
               << " which is earlier than last output ts:"
               << GLOG_TIMESTAMP(_last_output_ts)
-              << ", image camera_id: " << CAMERA_ID_TO_STR.at(image_cam_id);
+              << ", image camera_id: " << kCameraIdToStr.at(image_cam_id);
         return false;
       }
       *sync_ok = true;
@@ -535,7 +535,7 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
             << " (sync_time - last_no_signals_ts): "
             << GLOG_TIMESTAMP(sync_time - _last_no_signals_ts)
             << " query /tf in low frequence. "
-            << " camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << " camera_id: " << kCameraIdToStr.at(camera_id);
       return true;
     }
     if (sync_time < cached_array.front()->timestamp) {
@@ -550,7 +550,7 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
             << "; system ts: " << GLOG_TIMESTAMP(system_ts)
             << ", diff between image and system ts: "
             << GLOG_TIMESTAMP(sync_time - system_ts)
-            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
       // difference between image and pose timestamps
       *diff_image_pose_ts = sync_time - pose_ts;
       *diff_image_sys_ts = sync_time - system_ts;
@@ -566,7 +566,7 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
             << "; system ts: " << GLOG_TIMESTAMP(system_ts)
             << ", diff between image and system ts: "
             << GLOG_TIMESTAMP(sync_time - system_ts)
-            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
       *diff_image_pose_ts = sync_time - pose_ts;
       *diff_image_sys_ts = sync_time - system_ts;
     } else if (!find_loc) {
@@ -578,7 +578,7 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
             << GLOG_TIMESTAMP(cached_array.front()->timestamp) << ", "
             << cached_array_str << ".back() ts: "
             << GLOG_TIMESTAMP(cached_array.back()->timestamp)
-            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
     }
   }
 
@@ -656,9 +656,9 @@ bool TLPreprocessor::select_camera_by_lights_projection(
                         lights_on_image_array[cam_id],
                         lights_outside_image_array[cam_id])) {
       AERROR << "select_camera_by_lights_projection project lights on "
-             << CAMERA_ID_TO_STR.at(cam_id) << " image failed, "
+             << kCameraIdToStr.at(cam_id) << " image failed, "
              << "ts: " << GLOG_TIMESTAMP(timestamp)
-             << ", camera_id: " << CAMERA_ID_TO_STR.at(cam_id);
+             << ", camera_id: " << kCameraIdToStr.at(cam_id);
       return false;
     }
   }

@@ -26,11 +26,6 @@ const TLColor BLACK = apollo::perception::TrafficLight::BLACK;
 //When the light has been covered by some objected, the color returned.
 const TLColor DEFAULT_UNKNOWN_COLOR = apollo::perception::TrafficLight::UNKNOWN;
 
-// enum DetectionClassId {
-//     UNKNOWN_CLASS = -1,
-//     DAY_CLASS = 0,
-//     NIGHT_CLASS = 1
-// };
 enum DetectionClassId {
   UNKNOWN_CLASS = -1,
   VERTICAL_CLASS = 0,
@@ -42,7 +37,6 @@ enum DetectionClassId {
 struct LightRegion {
   //roi is marked by map & projection, it may be too large or not accuracy.
   cv::Rect projection_roi;
-  int projection_radius;
 
   std::vector<cv::Rect> debug_roi;
   std::vector<float> debug_roi_detect_scores;
@@ -76,8 +70,6 @@ struct LightStatus {
   TLColor color = UNKNOWN_COLOR;
   // How confidence about the detected results, between 0 and 1.
   double confidence = 0.0;
-  // Duration of the traffic light since detected.
-  double tracking_time = 0.0;
 
   std::string to_string() const {
     std::string light_color = (color == UNKNOWN_COLOR ? "unknown color" :
@@ -86,8 +78,7 @@ struct LightStatus {
                                  (color == YELLOW ? "yellow" : "black"))));
     //std::string light_color;
     std::ostringstream oss;
-    oss << "Status: [color:" << light_color << " confidence:" << confidence
-        << " tracking_time:" << tracking_time << "]";
+    oss << "Status: [color:" << light_color << " confidence:" << confidence << "]";
     return oss.str();
   }
 };

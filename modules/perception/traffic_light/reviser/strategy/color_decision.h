@@ -18,23 +18,23 @@ class ColorReviser : public BaseReviser {
   }
 
   //@brief init the reviser.
-  virtual bool init();
+  virtual bool Init();
   //@brief reviser revise  the perception result
   //       ASSERT(rectifed_result.size == perception_result.size)
   //@param [in] option
   //@param [in/out] rectifed_result
   //@return true/false
-  virtual bool revise(const ReviseOption &option, std::vector<LightPtr> *lights) override;
+  virtual bool Revise(const ReviseOption &option, std::vector<LightPtr> *lights) override;
 
   //@brief Revise's name
   virtual std::string name() const;
 
  private:
-  float _blink_time;
-  int _enable;
-  std::map<std::string, TLColor> _color_map;
-  std::map<std::string, double> _time_map;
-  static std::map<TLColor, std::string> _s_color_strs;
+  float blink_time_;
+  int enable_;
+  std::map<std::string, TLColor> color_map_;
+  std::map<std::string, double> time_map_;
+  static std::map<TLColor, std::string> s_color_strs_;
 };
 
 }

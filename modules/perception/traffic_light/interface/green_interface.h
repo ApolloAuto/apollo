@@ -15,16 +15,16 @@ namespace traffic_light {
 // class-wrapper
 class ISelectLight {
  public:
-  virtual void select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
+  virtual void Select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
                       const std::vector<LightPtr> &refined_bboxes,
                       std::vector<LightPtr> *selected_bboxes) = 0;
 };
 
 class IRefine {
  public:
-  virtual void perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) = 0;
+  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) = 0;
 
-  virtual void set_crop_box(const cv::Rect &box) = 0;
+  virtual void SetCropBox(const cv::Rect &box) = 0;
 };
 
 class IHDMapOperator {
@@ -35,8 +35,8 @@ class IHDMapOperator {
 class IGetBox {
  public:
   virtual void
-  get_crop_box(const cv::Size &size, const std::vector<LightPtr> &lights,
-               cv::Rect *cropbox) = 0;
+  GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
+             cv::Rect *cropbox) = 0;
 };
 }
 }

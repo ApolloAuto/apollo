@@ -27,29 +27,28 @@ class Detection : public IRefine {
   Detection(int &min_crop_size, const std::string &refine_net,
             const std::string &refine_model);
 
-  void init(int &min_crop_size, const std::string &refine_net, const std::string &refine_model);
+  void Init(const int &resize_len, const std::string &refine_net, const std::string &refine_model);
 
-  virtual void perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
+  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
 
-  virtual void set_crop_box(const cv::Rect &box);
+  virtual void SetCropBox(const cv::Rect &box);
 
   ~Detection();
 
-  bool set_output_box_type(DetectOutputBoxType type);
-
-  bool select_output_bboxes(const cv::Mat &crop_image,
-                            int class_id, float inflate_col, float inflate_row,
-                            std::vector<LightPtr> *lights);
-
  private:
+  bool SetOutputBoxType(DetectOutputBoxType type);
+
+  bool SelectOutputBboxes(const cv::Mat &crop_image,
+                          int class_id, float inflate_col, float inflate_row,
+                          std::vector<LightPtr> *lights);
+
   caffe::Net<float> *_refine_net_ptr;
   caffe::PyramidImageOnlineDataLayer<float> *_refine_input_layer;
   caffe::ROIOutputSSDLayer<float> *_refine_output_layer;
 
-  int _min_crop_size;
-  cv::Rect _crop_box;
-  DetectOutputBoxType _detect_output_type = DetectOutputBoxType::BOX_ALL;
-  float _output_threshold;
+  int resize_len_;
+  cv::Rect crop_box_;
+  DetectOutputBoxType detect_output_type_ = DetectOutputBoxType::BOX_ALL;
 };
 }
 }

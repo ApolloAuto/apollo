@@ -14,28 +14,27 @@ namespace perception {
 namespace traffic_light {
 class UnityRecognize : public BaseRecognizer {
  public:
-  UnityRecognize() {
-  }
+  UnityRecognize() = default;
 
-  virtual bool init();
+  bool Init() override;
 
   // @brief: recognize light status
   // @param [in] const Recognize&: recognize options
   // @param [in] const Image&: input image
   // @param [in/out] std::vector<Light>*: recognized light status
   // @return  bool
-  virtual bool recognize_status(const Image &image, const RecognizeOption &option,
-                                std::vector<LightPtr> *lights) override;
+  bool RecognizeStatus(const Image &image, const RecognizeOption &option,
+                       std::vector<LightPtr> *lights) override;
 
   virtual std::string name() const;
 
  private:
-  std::shared_ptr<IRefine> _classify_day;
-  std::shared_ptr<IRefine> _classify_night;
+  std::shared_ptr<IRefine> classify_day_;
+  std::shared_ptr<IRefine> classify_night_;
 
-  bool init_model(const apollo::perception::ConfigManager *config_manager,
-                  const apollo::perception::ModelConfig *model_config,
-                  std::shared_ptr<IRefine> *classify);
+  bool InitModel(const apollo::perception::ConfigManager *config_manager,
+                 const apollo::perception::ModelConfig *model_config,
+                 std::shared_ptr<IRefine> *classify);
 };
 }
 }

@@ -240,7 +240,7 @@ bool TLPreprocessorSubnode::add_data_and_publish_event(
     const CameraId &camera_id,
     double timestamp) {
   // add data down-stream
-  std::string device_id = CAMERA_ID_TO_STR.at(camera_id);
+  std::string device_id = kCameraIdToStr.at(camera_id);
   std::string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &key)) {
     AERROR << "TLPreprocessorSubnode gen share data key failed. ts:"
@@ -292,12 +292,12 @@ void TLPreprocessorSubnode::sub_camera_image(
     return;
   }
   timestamp = msg->header.stamp.toSec();
-  image->init(timestamp, camera_id, msg);
+  image->Init(timestamp, camera_id, msg);
 
   // update last timestamp when receiving a image
   _last_sub_camera_image_ts[camera_id] = timestamp;
 
-  uint64_t timestamp_int64 = ts_double_2_int64(msg->header.stamp.toSec());
+  uint64_t timestamp_int64 = TimestampDouble2Int64(msg->header.stamp.toSec());
   timestamp_int64 += _s_camera_ts_last_3_digits[camera_id];
   ros::MetaInfo info;
   info.camera_timestamp = timestamp_int64;
@@ -305,14 +305,14 @@ void TLPreprocessorSubnode::sub_camera_image(
   ros::MetaStats::instance()->record_receive(info, _camera_topic_names[camera_id]);
 
   AINFO << "TLPreprocessorSubnode received a image msg"
-        << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id)
+        << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
 
   bool camera_is_working = false;
   if (!_preprocessor->get_camera_is_working_flag(camera_id, &camera_is_working)) {
     AINFO << "get_camera_is_working_flag failed, ts: "
           << GLOG_TIMESTAMP(image->ts())
-          << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+          << ", camera_id: " << kCameraIdToStr.at(camera_id);
     return;
   }
   if (!camera_is_working) {
@@ -321,7 +321,7 @@ void TLPreprocessorSubnode::sub_camera_image(
         !_preprocessor->set_camera_is_working_flag(camera_id, true)) {
       AINFO << "set_camera_is_working_flag failed, ts: "
             << GLOG_TIMESTAMP(image->ts())
-            << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
     }
   }
 
@@ -345,10 +345,10 @@ void TLPreprocessorSubnode::sub_camera_image(
   bool should_pub = false;
   if (!_preprocessor->sync_image(image, image->ts(), camera_id, &data, &should_pub)) {
     AINFO << "sync image failed ts: " << GLOG_TIMESTAMP(image->ts())
-          << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+          << ", camera_id: " << kCameraIdToStr.at(camera_id);
   } else {
     AINFO << "sync image succeed ts: " << GLOG_TIMESTAMP(image->ts())
-          << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+          << ", camera_id: " << kCameraIdToStr.at(camera_id);
   }
   const double sync_image_latency = TimeUtil::GetCurrentTime() - before_sync_image_ts;
 
@@ -360,20 +360,20 @@ void TLPreprocessorSubnode::sub_camera_image(
   if (fabs(data->diff_image_sys_ts) > image_sys_ts_diff_threshold) {
     std::string debug_string = "";
     debug_string += ("diff_image_sys_ts:" + std::to_string(data->diff_image_sys_ts));
-    debug_string += (",camera_id:" + CAMERA_ID_TO_STR.at(camera_id));
+    debug_string += (",camera_id:" + kCameraIdToStr.at(camera_id));
     debug_string += (",camera_ts:" + std::to_string(timestamp));
 
     AWARN << "image_ts - system_ts(in seconds): "
           << std::to_string(data->diff_image_sys_ts)
           << ". Check if image timestamp drifts."
-          << ", camera_id: " + CAMERA_ID_TO_STR.at(camera_id)
+          << ", camera_id: " + kCameraIdToStr.at(camera_id)
           << ", debug_string: " << debug_string;
   }
 
   if (!should_pub) {
     AINFO << "TLPreprocessorSubnode not publish image, ts:"
           << GLOG_TIMESTAMP(image->ts())
-          << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+          << ", camera_id: " << kCameraIdToStr.at(camera_id);
     return;
   }
 
@@ -382,7 +382,7 @@ void TLPreprocessorSubnode::sub_camera_image(
   if (!verify_lights_projection(timestamp, camera_id, &data)) {
     AINFO << "TLPreprocessorSubnode verify_lights_projection on image failed, ts:"
           << GLOG_TIMESTAMP(image->ts())
-          << ", camera_id: " << CAMERA_ID_TO_STR.at(camera_id);
+          << ", camera_id: " << kCameraIdToStr.at(camera_id);
     return;
   }
 
@@ -411,7 +411,7 @@ void TLPreprocessorSubnode::sub_camera_image(
           << " sub_camera_image_latency: " <<
           (TimeUtil::GetCurrentTime() -
               sub_camera_image_start_ts) * 1000 << " ms."
-          << " camera_id: " << CAMERA_ID_TO_STR.at(camera_id)
+          << " camera_id: " << kCameraIdToStr.at(camera_id)
           << " number of lights: " << data->lights->size();
   }
 
@@ -424,7 +424,7 @@ bool TLPreprocessorSubnode::get_car_pose(const double ts, CarPose *pose) {
     AERROR << "TLPreprocessorSubnode failed to query pose ts:" << GLOG_TIMESTAMP(ts);
     return false;
   }
-  if (!pose->init(pose_matrix)) {
+  if (!pose->set_pose(pose_matrix)) {
     AERROR << "TLPreprocessorSubnode failed to init ts:" << GLOG_TIMESTAMP(ts)
            << " pose:" << pose_matrix;
     return false;
@@ -476,8 +476,8 @@ bool TLPreprocessorSubnode::verify_lights_projection(
 
   if (camera_id != selected_camera_id) {
     AINFO << "verify_lights_projection selected_camera_id: "
-          << CAMERA_ID_TO_STR.at(selected_camera_id)
-          << ", cached camera_id: " << CAMERA_ID_TO_STR.at(camera_id)
+          << kCameraIdToStr.at(selected_camera_id)
+          << ", cached camera_id: " << kCameraIdToStr.at(camera_id)
           << ", image_ts: " << GLOG_TIMESTAMP(ts)
           << "; do not use this image.";
     return false;

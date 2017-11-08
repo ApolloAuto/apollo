@@ -62,8 +62,8 @@ bool SingleBoundaryBasedProjection::project(const CameraCoeffient &camera_coeffi
     AWARN << "Projection get ROI outside the image. ";
     return false;
   }
-  light->region.projection_roi = refined_box(roi, cv::Size(camera_coeffient.image_width,
-                                                           camera_coeffient.image_height));
+  light->region.projection_roi = RefinedBox(roi, cv::Size(camera_coeffient.image_width,
+                                                          camera_coeffient.image_height));
   AINFO << "refined ROI:" << light->region.projection_roi;
 
   return true;

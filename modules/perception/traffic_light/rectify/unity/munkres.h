@@ -14,42 +14,41 @@ class Munkres {
  public:
   Munkres();
 
-  ~Munkres() {
-  };
+  ~Munkres() = default;;
 
-  void solve(cv::Mat_<int> &m);
+  void Solve(cv::Mat_<int> &mat);
 
-  void diag(bool);
+  void Diag(bool);
 
  private:
   static const int NORMAL = 0;
   static const int STAR = 1;
   static const int PRIME = 2;
 
-  inline bool find_uncovered_in_matrix(double, unsigned int &, unsigned int &) const;
+  inline bool FindUncoveredInMatrix(double, unsigned int &, unsigned int &) const;
 
-  inline bool pair_in_list(const std::pair<int, int> &,
-                           const std::list<std::pair<int, int> > &);
+  inline bool PairInList(const std::pair<int, int> &,
+                         const std::list<std::pair<int, int> > &);
 
-  int step1(void);
+  int Step1(void);
 
-  int step2(void);
+  int Step2(void);
 
-  int step3(void);
+  int Step3(void);
 
-  int step4(void);
+  int Step4(void);
 
-  int step5(void);
+  int Step5(void);
 
-  int step6(void);
+  int Step6(void);
 
-  cv::Mat_<int> _matrix;
-  cv::Mat_<int> _mask_matrix;
-  bool *_row_mask;
-  bool *_col_mask;
-  unsigned int _saverow;
-  unsigned int _savecol;
-  bool _is_diag;
+  cv::Mat_<int> matrix_;
+  cv::Mat_<int> mask_matrix_;
+  bool *row_mask_;
+  bool *col_mask_;
+  unsigned int saverow_;
+  unsigned int savecol_;
+  bool is_diag_;
 };
 }
 }

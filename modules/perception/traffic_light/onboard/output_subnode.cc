@@ -143,7 +143,7 @@ bool TLOutputSubnode::transform_message(
   apollo::perception::TrafficLightDetection result;
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
-  uint64_t timestamp = ts_double_2_int64(image_lights->image->ts());
+  uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
   switch (image_lights->image->device_id()) {
     default:
     case CameraId::LONG_FOCUS:timestamp += 222;
@@ -178,7 +178,7 @@ bool TLOutputSubnode::transform_message(
 
   // set signal number
   AINFO << "TLOutputSubnode num_signals: " << image_lights->num_signals
-        << ", camera_id: " << CAMERA_ID_TO_STR.at(image_lights->camera_id)
+        << ", camera_id: " << kCameraIdToStr.at(image_lights->camera_id)
         << ", is_pose_valid: " << image_lights->is_pose_valid
         << ", ts: " << GLOG_TIMESTAMP(image_lights->timestamp);
   light_debug->set_signal_num(image_lights->num_signals);

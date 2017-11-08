@@ -271,7 +271,7 @@ void tl_image_long_callback(const sensor_msgs::ImageConstPtr &msg) {
   //cv::imshow("tl_image_long", img);
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->init(msg->header.stamp.toSec(), CameraId::LONG_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::LONG_FOCUS, cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);
@@ -299,7 +299,7 @@ void tl_image_short_callback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->init(msg->header.stamp.toSec(), CameraId::SHORT_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::SHORT_FOCUS, cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);
@@ -327,7 +327,7 @@ void tl_image_narrow_callback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->init(msg->header.stamp.toSec(), CameraId::NARROW_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::NARROW_FOCUS, cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);
@@ -355,7 +355,7 @@ void tl_image_wide_callback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->init(msg->header.stamp.toSec(), CameraId::WIDE_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::WIDE_FOCUS, cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);

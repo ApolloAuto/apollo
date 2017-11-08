@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<apollo::perception::traffic_light::BaseReviser> _reviser(
       new apollo::perception::traffic_light::ColorReviser);
 
-  bool init_ok = _rectifier->init() && _recognizer->init() && _reviser->init();
+  bool init_ok = _rectifier->Init() && _recognizer->Init() && _reviser->Init();
   if (!init_ok) {
     XLOG_FATAL("Init Failed");
     return 0;
@@ -106,10 +106,10 @@ int main(int argc, char *argv[]) {
     AINFO << "Processing: " << ts << " Image";
     cv::Mat img = cv::imread(FLAGS_img_dir + ts + FLAGS_ext);
     Image image;
-    image.init(1, apollo::perception::traffic_light::LONG_FOCUS, img);
-    _rectifier->rectify(image, apollo::perception::traffic_light::RectifyOption(), &lights);
-    _recognizer->recognize_status(image, apollo::perception::traffic_light::RecognizeOption(),
-                                  &lights);
+    image.Init(1, apollo::perception::traffic_light::LONG_FOCUS, img);
+    _rectifier->Rectify(image, apollo::perception::traffic_light::RectifyOption(), &lights);
+    _recognizer->RecognizeStatus(image, apollo::perception::traffic_light::RecognizeOption(),
+                                 &lights);
     //_reviser->revise(apollo::perception::traffic_light::ReviseOption(image.ts()), &lights);
     if (ts == last_ts) {
       ++count;

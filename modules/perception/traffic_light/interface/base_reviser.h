@@ -33,14 +33,14 @@ class BaseReviser {
   virtual ~BaseReviser() = default;
 
   //@brief init the reviser.
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
   //@brief reviser revise  the perception result
   //       ASSERT(rectifed_result.size == perception_result.size)
   //@param [in] option
   //@param [in/out] rectifed_result
   //@return true/false
-  virtual bool revise(const ReviseOption &option, std::vector<LightPtr> *lights) = 0;
+  virtual bool Revise(const ReviseOption &option, std::vector<LightPtr> *lights) = 0;
 
   //@brief Revise's name
   virtual std::string name() const = 0;

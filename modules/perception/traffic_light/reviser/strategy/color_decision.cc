@@ -9,7 +9,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-std::map<TLColor, std::string> ColorReviser::_s_color_strs = {
+std::map<TLColor, std::string> ColorReviser::s_color_strs_ = {
     {UNKNOWN_COLOR, "unknown"},
     {RED, "red"},
     {GREEN, "green"},
@@ -20,7 +20,7 @@ std::map<TLColor, std::string> ColorReviser::_s_color_strs = {
 std::string ColorReviser::name() const {
   return "ColorReviser";
 }
-bool ColorReviser::init() {
+bool ColorReviser::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
   if (config_manager == NULL) {
     AERROR << "failed to get ConfigManager instance.";
@@ -34,22 +34,22 @@ bool ColorReviser::init() {
   }
 
   if (!model_config->GetValue(\
-            "enable", &_enable)) {
+            "enable", &enable_)) {
     AERROR << "enable not found." << name();
     return false;
   }
 
   if (!model_config->GetValue(\
-            "blink_time", &_blink_time)) {
+            "blink_time", &blink_time_)) {
     AERROR << "blink_time not found." << name();
     return false;
   }
 
   return true;
 }
-bool ColorReviser::revise(const ReviseOption &option, std::vector<LightPtr> *lights) {
+bool ColorReviser::Revise(const ReviseOption &option, std::vector<LightPtr> *lights) {
 
-  if (_enable == 0) {
+  if (enable_ == 0) {
     return true;
   }
   std::vector<LightPtr> &lights_ref = *lights;
@@ -61,35 +61,35 @@ bool ColorReviser::revise(const ReviseOption &option, std::vector<LightPtr> *lig
       default:
       case BLACK:
       case UNKNOWN_COLOR:
-        if (_color_map.find(id) != _color_map.end() &&
-            option.ts > 0 && option.ts - _time_map[id] < _blink_time) {
-          AINFO << "Revise " << _s_color_strs[lights_ref[i]->status.color]
-                << " to color " << _s_color_strs[_color_map[id]];
-          lights_ref[i]->status.color = _color_map[id];
+        if (color_map_.find(id) != color_map_.end() &&
+            option.ts > 0 && option.ts - time_map_[id] < blink_time_) {
+          AINFO << "Revise " << s_color_strs_[lights_ref[i]->status.color]
+                << " to color " << s_color_strs_[color_map_[id]];
+          lights_ref[i]->status.color = color_map_[id];
         } else {
-          AINFO << "Unrevised color " << _s_color_strs[lights_ref[i]->status.color];
+          AINFO << "Unrevised color " << s_color_strs_[lights_ref[i]->status.color];
         }
         break;
       case YELLOW:
         // if YELLOW appears after RED, revise it to RED
-        if (_color_map.find(id) != _color_map.end() &&
-            option.ts > 0 && _color_map.at(id) == RED) {
-          lights_ref[i]->status.color = _color_map.at(id);
+        if (color_map_.find(id) != color_map_.end() &&
+            option.ts > 0 && color_map_.at(id) == RED) {
+          lights_ref[i]->status.color = color_map_.at(id);
           AINFO << "Revise Yellow to color Red";
-          _color_map[id] = RED;
-          _time_map[id] = option.ts;
+          color_map_[id] = RED;
+          time_map_[id] = option.ts;
           break;
         }
       case RED:
       case GREEN:
-        if (_time_map.size() > 10) {
-          _color_map.clear();
-          _time_map.clear();
+        if (time_map_.size() > 10) {
+          color_map_.clear();
+          time_map_.clear();
         }
-        _color_map[id] = lights_ref[i]->status.color;
-        _time_map[id] = option.ts;
+        color_map_[id] = lights_ref[i]->status.color;
+        time_map_[id] = option.ts;
         AINFO << "Revise Keep Color Unchanged: "
-              << _s_color_strs[lights_ref[i]->status.color];
+              << s_color_strs_[lights_ref[i]->status.color];
         break;
     }
   }
