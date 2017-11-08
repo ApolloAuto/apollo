@@ -90,7 +90,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
       t_knots_, qp_st_speed_config_.qp_spline_config().spline_order());
 
   if (!AddConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.st_boundaries(), accel_bound)
+                     st_graph_data.st_boundaries(), accel_bound)
            .ok()) {
     const std::string msg = "Add constraint failed!";
     AERROR << msg;
@@ -114,7 +114,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   speed_data->Clear();
   const Spline1d& spline = spline_generator_->spline();
 
-  const double t_output_resolution = FLAGS_output_trajectory_time_resolution;
+  const double t_output_resolution = FLAGS_trajectory_time_min_interval;
   double time = 0.0;
   while (time < qp_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);

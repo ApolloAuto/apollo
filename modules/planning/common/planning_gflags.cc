@@ -100,10 +100,17 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
               "Maximum speed (m/s) in planning.");
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
-DEFINE_double(trajectory_time_resolution, 0.1,
-              "Trajectory time resolution in planning");
-DEFINE_double(output_trajectory_time_resolution, 0.1,
-              "Trajectory time resolution when publish for EM planner");
+
+// planning trajectory output time density control
+DEFINE_double(
+    trajectory_time_min_interval, 0.02,
+    "(seconds) Trajectory time interval when publish. The is the min value.");
+DEFINE_double(
+    trajectory_time_max_interval, 0.1,
+    "(seconds) Trajectory time interval when publish. The is the max value.");
+DEFINE_double(
+    trajectory_time_high_density_period, 1.0,
+    "(seconds) Keep high density in the next this amount of seconds. ");
 
 DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");
