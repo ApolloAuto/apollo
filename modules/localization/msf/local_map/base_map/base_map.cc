@@ -38,8 +38,8 @@ void BaseMap::init_thread_pool(int load_thread_num, int preload_thread_num) {
         delete _p_map_preload_threads;
         _p_map_preload_threads = NULL;
     }
-    _p_map_load_threads = new boost::threadpool::pool(load_thread_num);
-    _p_map_preload_threads = new boost::threadpool::pool(preload_thread_num);
+    _p_map_load_threads = new ThreadPool(load_thread_num);
+    _p_map_preload_threads = new ThreadPool(preload_thread_num);
     return;
 }
 
@@ -157,7 +157,7 @@ void BaseMap::add_dataset(const std::string dataset_path) {
 
 void BaseMap::load_map_nodes(std::set<MapNodeIndex> &map_ids) {
     assert(int(map_ids.size()) <= _map_node_cache_lvl1->capacity());
-    //std::cout << "load_map_nodes size: " << map_ids.size() << std::endl;
+    // std::cout << "load_map_nodes size: " << map_ids.size() << std::endl;
     //check in cacheL1
     typename std::set<MapNodeIndex>::iterator itr = map_ids.begin();
     while (itr != map_ids.end()) {
@@ -198,7 +198,9 @@ void BaseMap::load_map_nodes(std::set<MapNodeIndex> &map_ids) {
         ++itr;
     }
 
+    std::cout << "before wait" << std::endl;
     _p_map_load_threads->wait();
+    std::cout << "after wait" << std::endl;
 
     //check in cacheL2 again
     itr = map_ids.begin();

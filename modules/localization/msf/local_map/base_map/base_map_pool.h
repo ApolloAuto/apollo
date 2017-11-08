@@ -4,7 +4,7 @@
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 #include <list>
 #include <boost/thread.hpp>
-#include "modules/localization/msf/common/threadpool/threadpool.hpp"  
+#include "modules/localization/msf/common/util/threadpool.h"  
 
 namespace apollo {
 namespace localization {
@@ -64,7 +64,7 @@ protected:
     /**@brief The size of memory pool. */
     unsigned int _pool_size;
     /**@brief The thread pool for release node. */
-    boost::threadpool::pool _node_reset_workers;
+    ThreadPool _node_reset_workers;
     /**@brief The mutex for release thread.*/
     boost::mutex _mutex;
     /**@brief The mutex for release thread.*/

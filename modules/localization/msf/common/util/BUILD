@@ -16,13 +16,15 @@ cc_library(
         "timer.h",
         "time_conversion.h",
         "extract_ground_plane.h",
-        "voxel_grid_covariance_hdmap.h"
+        "voxel_grid_covariance_hdmap.h",
+        "threadpool.h"
     ],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
     ],
     deps = [
+        "//modules/common:macro",
         "//modules/common:log",
         "@eigen//:eigen",
     ],

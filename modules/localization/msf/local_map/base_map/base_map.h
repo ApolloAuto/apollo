@@ -101,9 +101,9 @@ protected:
     /**@brief The map node memory pool pointer. */
     BaseMapNodePool* _map_node_pool;
     /**@brief The dynamic map node loading thread pool pointer. */
-    boost::threadpool::pool* _p_map_load_threads;
+    ThreadPool* _p_map_load_threads;
     /**@brief The dynamic map node preloading thread pool pointer. */
-    boost::threadpool::pool* _p_map_preload_threads;
+    ThreadPool* _p_map_preload_threads;
     /**@bried Keep the index of preloading nodes. */
     std::set<MapNodeIndex> _map_preloading_task_index;
     /**@brief The mutex for preload map node. **/
