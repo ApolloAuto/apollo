@@ -24,7 +24,7 @@
 ## Gnerate Localization Map
   Localization map is used for LiDAR-based localization, which is a grid-cell representation of the environment. Each cell stores the statistics of laser reflection intensity and altitude. The map is organized as a group of map nodes. For more information refer to `apollo/modules/localization/msf/local_map`.
 
-  We provide a script (`apollo/scripts/msf_local_map.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file) and corresponding poses file. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw x_std y_std`. 
+  We provide a script (`apollo/scripts/msf_local_map.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file) and corresponding poses file. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`. 
 
 ## Instructions
   "We need to provide a detailed list to help users to set up their msf loclaization."
