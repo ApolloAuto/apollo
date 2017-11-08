@@ -349,5 +349,28 @@ TEST_F(HDMapImplTestSuite, GetRoadBoundaries) {
   EXPECT_EQ(1, junctions.size());
 }
 
+TEST_F(HDMapImplTestSuite, GetForwardNearestSignalsOnLane) {
+  apollo::common::PointENU point;
+  point.set_x(586443.98);
+  point.set_y(4140754.02);
+  point.set_z(0.0);
+  std::vector<SignalInfoConstPtr> signals;
+  EXPECT_EQ(0, hdmap_impl_.GetForwardNearestSignalsOnLane(point,
+                  60.0, &signals));
+  EXPECT_EQ(1, signals.size());
+  EXPECT_EQ("1278", signals[0]->id().id());
+
+  EXPECT_EQ(0, hdmap_impl_.GetForwardNearestSignalsOnLane(point,
+                  10.0, &signals));
+  EXPECT_EQ(0, signals.size());
+
+  point.set_x(586442.88);
+  point.set_y(4140749.66);
+  EXPECT_EQ(0, hdmap_impl_.GetForwardNearestSignalsOnLane(point,
+                  20.0, &signals));
+  EXPECT_EQ(1, signals.size());
+  EXPECT_EQ("1278", signals[0]->id().id());
+}
+
 }  // namespace hdmap
 }  // namespace apollo
