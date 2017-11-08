@@ -112,13 +112,13 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
   int num_lasers = 0;
   node[NUM_LASERS] >> num_lasers;
   const YAML::Node& lasers = node[LASERS];
-  calibration._laser_corrections.clear();
-  calibration._num_lasers = num_lasers;
+  calibration.laser_corrections_.clear();
+  calibration.num_lasers_ = num_lasers;
 
   for (int i = 0; i < num_lasers; i++) {
     std::pair<int, LaserCorrection> correction;
     lasers[i] >> correction;
-    calibration._laser_corrections.insert(correction);
+    calibration.laser_corrections_.insert(correction);
   }
 
   // For each laser ring, find the next-smallest vertical angle.
@@ -133,7 +133,7 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
     int next_index = num_lasers;
 
     for (int j = 0; j < num_lasers; ++j) {
-      double angle = calibration._laser_corrections[j].vert_correction;
+      double angle = calibration.laser_corrections_[j].vert_correction;
 
       if (next_angle < angle && angle < min_seen) {
         min_seen = angle;
@@ -144,7 +144,7 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
     if (next_index < num_lasers) {  // anything found in this ring?
 
       // store this ring number with its corresponding laser number
-      calibration._laser_corrections[next_index].laser_ring = ring;
+      calibration.laser_corrections_[next_index].laser_ring = ring;
       next_angle = min_seen;
       //        ROS_INFO_STREAM("laser_ring[" << next_index << "] = " << ring
       //                         << ", angle = " << next_angle);
@@ -185,12 +185,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out,
 YAML::Emitter& operator<<(YAML::Emitter& out, const Calibration& calibration) {
   out << YAML::BeginMap;
   out << YAML::Key << NUM_LASERS << YAML::Value
-      << calibration._laser_corrections.size();
+      << calibration.laser_corrections_.size();
   out << YAML::Key << LASERS << YAML::Value << YAML::BeginSeq;
 
   for (std::map<int, LaserCorrection>::const_iterator it =
-           calibration._laser_corrections.begin();
-       it != calibration._laser_corrections.end(); it++) {
+           calibration.laser_corrections_.begin();
+       it != calibration.laser_corrections_.end(); it++) {
     out << *it;
   }
 
@@ -203,11 +203,11 @@ void Calibration::read(const std::string& calibration_file) {
   std::ifstream fin(calibration_file.c_str());
 
   if (!fin.is_open()) {
-    _initialized = false;
+    initialized_ = false;
     return;
   }
 
-  _initialized = true;
+  initialized_ = true;
 
   try {
     YAML::Node doc;
@@ -216,7 +216,7 @@ void Calibration::read(const std::string& calibration_file) {
     doc >> *this;
   } catch (YAML::Exception& e) {
     std::cerr << "YAML Exception: " << e.what() << std::endl;
-    _initialized = false;
+    initialized_ = false;
   }
 
   fin.close();

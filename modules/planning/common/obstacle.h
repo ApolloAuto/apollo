@@ -53,6 +53,7 @@ class Obstacle {
   std::int32_t PerceptionId() const;
 
   bool IsStatic() const;
+  bool IsVirtual() const;
 
   common::TrajectoryPoint GetPointAtTime(const double time) const;
 
@@ -92,6 +93,8 @@ class Obstacle {
 
   static bool IsVirtualObstacle(
       const perception::PerceptionObstacle &perception_obstacle);
+
+  static bool IsValidTrajectoryPoint(const common::TrajectoryPoint &point);
 
  private:
   std::string id_;

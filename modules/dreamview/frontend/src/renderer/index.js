@@ -15,6 +15,8 @@ import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 
+const _ = require('lodash');
+
 class Renderer {
     constructor() {
         // Disable antialias for mobile devices.
@@ -56,8 +58,6 @@ class Renderer {
 
         // The route editor
         this.routingEditor = new RoutingEditor();
-
-        this.defaultRoutingEndPoint = {};
 
         // The Performance Monitor
         this.stats = null;
@@ -225,11 +225,6 @@ class Renderer {
         this.camera.updateProjectionMatrix();
     }
 
-    updateDefaultRoutingEndPoint(data) {
-        this.defaultRoutingEndPoint.x = data.end_x;
-        this.defaultRoutingEndPoint.y = data.end_y;
-    }
-
     enableRouteEditing() {
         this.enableOrbitControls();
         this.routingEditor.enableEditingMode(this.camera, this.adc);
@@ -247,15 +242,8 @@ class Renderer {
                                                                    false);
     }
 
-    addDefaultEndPoint() {
-        if (this.defaultRoutingEndPoint.x === undefined ||
-            this.defaultRoutingEndPoint.y === undefined) {
-            alert("Failed to get default routing end point, make sure there's " +
-                  "a default end point file under the map data directory.");
-            return;
-        }
-        this.routingEditor.addRoutingPoint(this.defaultRoutingEndPoint,
-                                           this.coordinates, this.scene);
+    addDefaultEndPoint(point) {
+        this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
     }
 
     removeAllRoutingPoints() {
@@ -266,15 +254,9 @@ class Renderer {
         this.routingEditor.removeLastRoutingPoint(this.scene);
     }
 
-    sendRoutingRequest(sendDefaultRoute = false) {
-        if (sendDefaultRoute) {
-            return this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
-                                                                this.coordinates);
-        } else {
-            return this.routingEditor.sendRoutingRequest(this.scene,
-                                                         this.adc.mesh.position,
-                                                         this.coordinates);
-        }
+    sendRoutingRequest() {
+        return this.routingEditor.sendRoutingRequest(this.adc.mesh.position,
+                                                     this.coordinates);
     }
 
     editRoute(event) {

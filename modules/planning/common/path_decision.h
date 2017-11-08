@@ -49,6 +49,8 @@ class PathDecision {
                                const std::string &object_id,
                                const ObjectDecisionType &decision);
 
+  const PathObstacle *Find(const std::string &object_id) const;
+
   PathObstacle *Find(const std::string &object_id);
 
   void SetStBoundary(const std::string &id, const StBoundary &boundary);

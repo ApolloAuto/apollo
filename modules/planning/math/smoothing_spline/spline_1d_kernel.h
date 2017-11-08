@@ -53,6 +53,12 @@ class Spline1dKernel {
   void AddDerivativeKernelMatrix(const double weight);
   void AddSecondOrderDerivativeMatrix(const double weight);
   void AddThirdOrderDerivativeMatrix(const double weight);
+  void AddDerivativeKernelMatrixForSplineK(const uint32_t k,
+                                           const double weight);
+  void AddSecondOrderDerivativeMatrixForSplineK(const uint32_t k,
+                                                const double weight);
+  void AddThirdOrderDerivativeMatrixForSplineK(const uint32_t k,
+                                               const double weight);
 
   // reference line kernel, x_coord in strictly increasing order (for path
   // optimizer)
@@ -66,6 +72,9 @@ class Spline1dKernel {
 
  private:
   void AddNthDerivativekernelMatrix(const uint32_t n, const double weight);
+  void AddNthDerivativekernelMatrixForSplineK(const uint32_t n,
+                                              const uint32_t k,
+                                              const double weight);
   uint32_t FindIndex(const double x) const;
 
  private:

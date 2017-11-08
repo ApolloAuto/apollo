@@ -25,6 +25,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -33,7 +34,8 @@
 namespace apollo {
 namespace planning {
 
-using common::VehicleConfigHelper;
+using apollo::common::util::FindOrDie;
+using apollo::common::VehicleConfigHelper;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;
@@ -103,6 +105,12 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     StBoundary* const st_boundary) {
   const auto& object_id = obstacle_->Id();
   const auto& perception = obstacle_->Perception();
+  if (!IsValidObstacle(perception)) {
+    AERROR << "Fail to build trajectory st boundary because object is not "
+              "valid. PerceptionObstacle: "
+           << perception.DebugString();
+    return false;
+  }
   const double object_width = perception.width();
   const double object_length = perception.length();
   const auto& trajectory_points = obstacle_->Trajectory().trajectory_point();
@@ -118,6 +126,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d min_box({0, 0}, 1.0, 1.0, 1.0);
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
+
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
@@ -226,19 +235,13 @@ ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  auto lhs_iter =
-      s_longitudinal_decision_safety_sorter_.find(lhs.object_tag_case());
-  DCHECK(lhs_iter != s_longitudinal_decision_safety_sorter_.end())
-      << "decision : " << lhs.ShortDebugString()
-      << " not found in safety sorter";
-  auto rhs_iter =
-      s_longitudinal_decision_safety_sorter_.find(rhs.object_tag_case());
-  DCHECK(rhs_iter != s_longitudinal_decision_safety_sorter_.end())
-      << "decision : " << rhs.ShortDebugString()
-      << " not found in safety sorter";
-  if (lhs_iter->second < rhs_iter->second) {
+  const auto lhs_val = FindOrDie(s_longitudinal_decision_safety_sorter_,
+                                 lhs.object_tag_case());
+  const auto rhs_val = FindOrDie(s_longitudinal_decision_safety_sorter_,
+                                 rhs.object_tag_case());
+  if (lhs_val < rhs_val) {
     return rhs;
-  } else if (lhs_iter->second > rhs_iter->second) {
+  } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
     if (lhs.has_ignore()) {
@@ -287,17 +290,13 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  auto lhs_iter = s_lateral_decision_safety_sorter_.find(lhs.object_tag_case());
-  DCHECK(lhs_iter != s_lateral_decision_safety_sorter_.end())
-      << "decision : " << lhs.ShortDebugString()
-      << " not found in safety sorter";
-  auto rhs_iter = s_lateral_decision_safety_sorter_.find(rhs.object_tag_case());
-  DCHECK(rhs_iter != s_lateral_decision_safety_sorter_.end())
-      << "decision : " << rhs.ShortDebugString()
-      << " not found in safety sorter";
-  if (lhs_iter->second < rhs_iter->second) {
+  const auto lhs_val = FindOrDie(s_lateral_decision_safety_sorter_,
+                                 lhs.object_tag_case());
+  const auto rhs_val = FindOrDie(s_lateral_decision_safety_sorter_,
+                                 rhs.object_tag_case());
+  if (lhs_val < rhs_val) {
     return rhs;
-  } else if (lhs_iter->second > rhs_iter->second) {
+  } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
     if (lhs.has_ignore()) {
@@ -393,6 +392,17 @@ void PathObstacle::SetStBoundary(const StBoundary& boundary) {
 
 void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
   st_boundary_.SetBoundaryType(type);
+}
+
+bool PathObstacle::IsValidObstacle(
+    const perception::PerceptionObstacle& perception_obstacle) {
+  const double object_width = perception_obstacle.width();
+  const double object_length = perception_obstacle.length();
+
+  const double kMinObjectDimension = 1.0e-6;
+  return !std::isnan(object_width) && !std::isnan(object_length) &&
+         object_width > kMinObjectDimension &&
+         object_length > kMinObjectDimension;
 }
 
 }  // namespace planning

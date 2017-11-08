@@ -28,21 +28,20 @@
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/planning/reference_line/reference_line.h"
+#include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
 namespace planning {
 
-class SpiralReferenceLineSmoother {
+class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  SpiralReferenceLineSmoother() = default;
-
+  explicit SpiralReferenceLineSmoother(
+      const double max_point_deviation_distance);
   virtual ~SpiralReferenceLineSmoother() = default;
 
-  void set_max_point_deviation(const double d);
-
   bool Smooth(const ReferenceLine& raw_reference_line,
-              ReferenceLine* const smoothed_reference_line) const;
+              ReferenceLine* const smoothed_reference_line) override;
 
  private:
   bool Smooth(std::vector<Eigen::Vector2d> point2d,

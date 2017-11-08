@@ -23,7 +23,6 @@
 DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
-DECLARE_string(move_sequence_predictor_conf_file);
 
 DECLARE_double(prediction_duration);
 DECLARE_double(prediction_freq);

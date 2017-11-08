@@ -54,12 +54,8 @@ class NtripStream : public TcpStream {
   bool _is_login = false;
   const std::string _mountpoint;
   const std::string _login_data;
-  const std::string _gga_data;
   double _timeout_s = 60.0;
   double _data_active_s = 0.0;
-  ros::Subscriber _gpgga_data_sub;
-  std::string _gpgga_data_topic;
-  void gpgga_data_callback(const std_msgs::String::ConstPtr& msg);
 };
 
 NtripStream::NtripStream(const std::string& address, uint16_t port,
@@ -74,16 +70,7 @@ NtripStream::NtripStream(const std::string& address, uint16_t port,
                   "accept: */* \r\n"
                   "Authorization: Basic " +
                   encode_base64(user + ":" + passwd) + "\r\n\r\n"),
-      _gga_data("GET /" + mountpoint +
-                " HTTP/1.0\r\n"
-                "User-Agent: NTRIP gnss_driver/0.0\r\n"
-                "accept: */* \r\n\r\n"),
       _timeout_s(timeout_s) {
-  ros::NodeHandle nh;
-  nh.param("gpgga_data_topic", _gpgga_data_topic,
-           std::string("/apollo/sensor/gnss/gpgga"));
-  _gpgga_data_sub = nh.subscribe(_gpgga_data_topic, 1000,
-                                 &NtripStream::gpgga_data_callback, this);
 }
 
 NtripStream::~NtripStream() { this->disconnect(); }
@@ -208,22 +195,6 @@ size_t NtripStream::read(uint8_t* buffer, size_t max_length) {
   }
 
   return ret;
-}
-
-void NtripStream::gpgga_data_callback(const std_msgs::String::ConstPtr& msg) {
-  size_t size_gga = 0;
-  apollo::drivers::gnss::gpgga::GPGGA gpgga;
-  gpgga.ParseFromString(msg->data);
-  std::string gga_request = _gga_data + gpgga.gpgga();
-  size_gga = write(reinterpret_cast<const uint8_t*>(gga_request.data()),
-                   gga_request.size());
-  if (size_gga != gga_request.size()) {
-    TcpStream::disconnect();
-    _status = Stream::Status::ERROR;
-    ROS_ERROR("Send ntrip gga request failed.");
-  }
-
-  // TODO:more response check, discard response now
 }
 
 Stream* Stream::create_ntrip(const std::string& address, uint16_t port,

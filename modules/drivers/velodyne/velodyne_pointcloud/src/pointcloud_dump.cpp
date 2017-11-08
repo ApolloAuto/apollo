@@ -29,22 +29,22 @@ namespace velodyne {
 
 PointCloudDump::PointCloudDump(ros::NodeHandle node,
                                ros::NodeHandle private_nh) {
-  private_nh.param("save_folder", _save_folder, std::string(""));
-  private_nh.param("topic_name", _topic_name, std::string(""));
-  private_nh.param("file_prefix", _file_prefix, std::string(""));
+  private_nh.param("save_folder", save_folder_, std::string(""));
+  private_nh.param("topic_name", topic_name_, std::string(""));
+  private_nh.param("file_prefix", file_prefix_, std::string(""));
 
-  if (_save_folder == "" || _topic_name == "" || _file_prefix == "") {
+  if (save_folder_ == "" || topic_name_ == "" || file_prefix_ == "") {
     ROS_ERROR_STREAM("no file or topic name input");
   }
 
-  _pointcloud_sub = node.subscribe(
-      _topic_name, 1000, &PointCloudDump::save_callback, (PointCloudDump *)this,
+  pointcloud_sub_ = node.subscribe(
+      topic_name_, 1000, &PointCloudDump::save_callback, (PointCloudDump *)this,
       ros::TransportHints().tcpNoDelay(true));
 }
 
 void PointCloudDump::save_callback(const VPointCloud::ConstPtr &msg) {
   std::string ordered_file_path =
-      _save_folder + "/" + _file_prefix +
+      save_folder_ + "/" + file_prefix_ +
       boost::lexical_cast<std::string>(msg->header.seq) + ".msg";
   dump_msg<VPointCloud>(*msg, ordered_file_path);
 }

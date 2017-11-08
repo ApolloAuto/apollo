@@ -2,6 +2,8 @@ import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
+const _ = require('lodash');
+
 class WebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
@@ -10,7 +12,6 @@ class WebSocketEndpoint {
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
         this.currMapRadius = null;
-        this.defaultRoutingEndPointRequested = false;
     }
 
     initialize() {
@@ -59,7 +60,7 @@ class WebSocketEndpoint {
                     STORE.setInitializationStatus(true);
                     break;
                 case "DefaultEndPoint":
-                    RENDERER.updateDefaultRoutingEndPoint(message);
+                    STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
                     break;
             }
         };
@@ -73,9 +74,8 @@ class WebSocketEndpoint {
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN) {
                 // Load default routing end point.
-                if (!this.defaultRoutingEndPointRequested) {
+                if (_.isEmpty(STORE.routeEditingManager.defaultRoutingEndPoint)) {
                     this.requestDefaultRoutingEndPoint();
-                    this.defaultRoutingEndPointRequested = true;
                 }
                 this.websocket.send(JSON.stringify({type : "RequestSimulationWorld"}));
             }
@@ -111,13 +111,12 @@ class WebSocketEndpoint {
         }));
     }
 
-    requestRoute(start, waypoint, end, sendDefaultRoute = false) {
+    requestRoute(start, waypoint, end) {
         this.websocket.send(JSON.stringify({
             type: "SendRoutingRequest",
             start: start,
             end: end,
             waypoint: waypoint,
-            sendDefaultRoute: sendDefaultRoute,
         }));
     }
 

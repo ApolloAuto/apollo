@@ -28,7 +28,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-// save msg to file: file name is _file_prefix + msg.seq + .msg
+// save msg to file: file name is file_prefix_ + msg.seq + .msg
 class PointCloudDump {
  public:
   PointCloudDump(ros::NodeHandle node, ros::NodeHandle private_nh);
@@ -38,12 +38,12 @@ class PointCloudDump {
   void save_callback(const VPointCloud::ConstPtr &msg);
 
   // save msg folder
-  std::string _save_folder;
+  std::string save_folder_;
   // sub topic name
-  std::string _topic_name;
+  std::string topic_name_;
   // save file prefix,file will be prefix_msgseq.msg
-  std::string _file_prefix;
-  ros::Subscriber _pointcloud_sub;
+  std::string file_prefix_;
+  ros::Subscriber pointcloud_sub_;
 };
 
 }  // namespace velodyne

@@ -176,15 +176,15 @@ speedGraph:
             DpStSpeedOptimizer:
                 color: 'rgba(27, 249, 105, 0.5)' # green
                 borderWidth: 2
-                pointRadius: 1
+                pointRadius: 0
                 fill: false
-                showLine: false
+                showLine: true
             QpSplineStSpeedOptimizer:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 2
-                pointRadius: 1
+                pointRadius: 0
                 fill: false
-                showLine: false
+                showLine: ture
 kappaGraph:
     title: 'Planning Kappa'
     options:
@@ -208,6 +208,50 @@ kappaGraph:
             QpSplinePathOptimizer:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
+dkappaGraph:
+    title: 'Planning Dkappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                min: -0.02
+                max: 0.02
+                labelString: 'dkappa'
+    properties:
+        lines:
+            ReferenceLine:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            QpSplinePathOptimizer:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
+latencyGraph:
+    title: 'Latency'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 'timestampe (sec)'
+            y:
+                labelString: 'latency (ms)'
+    properties:
+        lines:
+            planning:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
                 pointRadius: 0
                 fill: false
                 showLine: true

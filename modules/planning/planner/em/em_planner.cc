@@ -26,7 +26,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/frame.h"
@@ -104,11 +104,6 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
-  if (!frame) {
-    AERROR << "Frame is empty in EMPlanner";
-    return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
-  }
-
   const double kStraightForwardLineCost = 10000.0;
   if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
       reference_line_info->Lanes().IsOnSegment()) {
@@ -163,6 +158,9 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   reference_line_info->SetTrajectory(trajectory);
+  if (ret == Status::OK()) {  // vehicle can drive on this reference line.
+    reference_line_info->SetDriable(true);
+  }
   return ret;
 }
 

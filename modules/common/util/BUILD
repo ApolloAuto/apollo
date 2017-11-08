@@ -59,6 +59,14 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "map_util",
+    hdrs = ["map_util.h"],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ]
+)
+
 cc_test(
     name = "string_tokenizer_test",
     size = "small",
@@ -89,6 +97,30 @@ cc_test(
     ],
     deps = [
         ":factory",
+        "//modules/common",
+        "//modules/common:log",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "dropbox",
+    hdrs = [
+        "dropbox.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_test(
+    name = "dropbox_test",
+    size = "small",
+    srcs = [
+        "dropbox_test.cc",
+    ],
+    deps = [
+        ":dropbox",
         "//modules/common",
         "//modules/common:log",
         "@gtest//:main",

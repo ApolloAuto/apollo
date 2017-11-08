@@ -61,10 +61,8 @@ struct MapElementIds {
 
 class MapService {
  public:
-  explicit MapService(const std::string map_filename);
+  explicit MapService(bool use_sim_map = true);
 
-  MapService(const std::string &base_map_filename,
-             const std::string &sim_map_filename);
   MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
                                      double raidus) const;
 
@@ -95,7 +93,7 @@ class MapService {
 
  private:
   const hdmap::HDMap &BaseMap() const {
-    return hdmap_;
+    return *hdmap_;
   }
 
   bool GetNearestLane(const double x, const double y,
@@ -108,9 +106,9 @@ class MapService {
   bool AddPathFromPassageRegion(const routing::Passage &passage_region,
                                 std::vector<apollo::hdmap::Path> *paths) const;
 
-  hdmap::HDMap hdmap_;
+  const hdmap::HDMap *hdmap_;
   // A downsampled map for dreamview frontend display.
-  hdmap::HDMap sim_map_;
+  const hdmap::HDMap *sim_map_;
 };
 
 }  // namespace dreamview

@@ -1,0 +1,22 @@
+<launch>
+  <arg name="model" default="VLP16" />
+  <arg name="calibration" default="$(find velodyne_pointcloud)/params/VLP16_calibration.yaml" />
+  <arg name="min_range" default="0.9" />
+  <arg name="max_range" default="70.0" />
+  <arg name="organized" default="false"/>
+  <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
+  <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
+  <arg name="node_name" default="convert_nodelet"/>
+
+  <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
+        args="load velodyne_pointcloud/ConvertNodelet velodyne_nodelet_manager" output="screen">
+    <param name="calibration_online" value="$(arg calibration_online)"/>
+    <param name="calibration" value="$(arg calibration)"/>
+    <param name="min_range" value="$(arg min_range)"/>
+    <param name="max_range" value="$(arg max_range)"/>
+    <param name="model" value="$(arg model)"/>
+    <param name="organized" value="$(arg organized)"/>
+    <param name="topic_pointcloud" value="$(arg topic_pointcloud)"/>
+    <param name="topic_packets" value="$(arg topic_packets)"/>
+  </node>
+</launch>

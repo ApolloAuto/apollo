@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
@@ -170,6 +171,14 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
 }
 
 /**
+ * @brief Get file content as string.
+ * @param file_name The name of the file to read content.
+ * @param content The file content.
+ * @return If the action is successful.
+ */
+bool GetContent(const std::string &file_name, std::string *content);
+
+/**
  * @brief Check if the path exists.
  * @return If the path exists.
  */
@@ -199,6 +208,13 @@ bool EnsureDirectory(const std::string &directory_path);
  * @return If the action is successful.
  */
 bool RemoveAllFiles(const std::string &directory_path);
+
+/**
+ * @brief List sub-directories.
+ * @param directory_path Directory path.
+ * @return A vector of sub-directories, without the directory_path prefix.
+ */
+std::vector<std::string> ListSubDirectories(const std::string &directory_path);
 
 }  // namespace util
 }  // namespace common
