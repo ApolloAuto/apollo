@@ -91,6 +91,12 @@ class ReferenceLineProvider {
   bool IsAllowChangeLane(const common::math::Vec2d& point,
                          const std::list<hdmap::RouteSegments>& route_segments);
 
+  bool IsReferenceLineSmoothValid(const ReferenceLine& raw,
+                                  const ReferenceLine& smoothed) const;
+
+  bool SmoothReferenceLine(const hdmap::RouteSegments& lanes,
+                           ReferenceLine* reference_line);
+
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
 
