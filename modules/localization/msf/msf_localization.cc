@@ -119,7 +119,7 @@ void MSFLocalization::Init() {
   localizaiton_param_.extrinsic_imu_gnss_file = FLAGS_extrinsic_imu_gnss_filename;
 
   // lidar module
-  localizaiton_param_.map_path = FLAGS_map_path;
+  localizaiton_param_.map_path = FLAGS_local_map_path;
   localizaiton_param_.lidar_extrinsic_file
       = TranslatePath(FLAGS_lidar_extrinsic_file);
   localizaiton_param_.lidar_height_file

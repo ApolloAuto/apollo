@@ -53,7 +53,7 @@ DECLARE_double(report_gps_imu_time_diff_threshold);
 DECLARE_bool(enable_gps_timestamp);
 
 // lidar module
-DECLARE_string(map_path);
+DECLARE_string(local_map_path);
 DECLARE_string(lidar_extrinsic_file);
 DECLARE_string(lidar_height_file);
 DECLARE_int32(lidar_localization_mode);

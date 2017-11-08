@@ -65,7 +65,7 @@ DEFINE_bool(enable_gps_timestamp, false,
 // DEFINE_double(map_coverage_theshold, 0.9,
 //     "The valid coverage of pointcloud and map.");
 
-DEFINE_string(map_path, "../mapdata/local_map",
+DEFINE_string(local_map_path, "../mapdata/local_map",
     "The path of localization map.");
 DEFINE_string(lidar_extrinsic_file, 
     "<ros>/share/velodyne_pointcloud/params/"
