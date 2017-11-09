@@ -54,6 +54,7 @@ class QpSplinePathGenerator {
   bool Generate(const std::vector<const PathObstacle*>& path_obstacles,
                 const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
+                const double boundary_extension, bool is_final_attempt,
                 PathData* const path_data);
 
  private:
@@ -62,7 +63,8 @@ class QpSplinePathGenerator {
 
   bool InitSpline(const double start_s, const double end_s);
 
-  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame);
+  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame,
+                     const double boundary_extension);
 
   void AddKernel();
 
