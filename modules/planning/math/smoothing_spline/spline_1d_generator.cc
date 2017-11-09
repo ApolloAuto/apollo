@@ -208,9 +208,7 @@ bool Spline1dGenerator::Solve() {
   last_num_param_ = num_param;
   last_num_constraint_ = num_constraint;
 
-  // TODO(Liangliang): fix this bug
-  const uint32_t spline_order = spline_.spline_order() - 1;
-  return spline_.SetSplineSegs(solved_params, spline_order);
+  return spline_.SetSplineSegs(solved_params, spline_.spline_order());
 }
 
 const Spline1d& Spline1dGenerator::spline() const { return spline_; }

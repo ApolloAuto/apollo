@@ -52,7 +52,7 @@ class Spline1d {
   double ThirdOrderDerivative(const double x) const;
 
   // @brief: set spline segments
-  bool SetSplineSegs(const Eigen::MatrixXd& params, const uint32_t order);
+  bool SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order);
 
   const std::vector<double>& x_knots() const;
   uint32_t spline_order() const;
