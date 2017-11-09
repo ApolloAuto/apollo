@@ -117,7 +117,6 @@ class MessageManager {
   template <class T, bool need_check>
   void AddSendProtocolData();
 
- private:
   std::vector<std::unique_ptr<ProtocolData<SensorType>>> send_protocol_data_;
   std::vector<std::unique_ptr<ProtocolData<SensorType>>> recv_protocol_data_;
 

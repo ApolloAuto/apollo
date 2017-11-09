@@ -1,0 +1,37 @@
+<!-- For Radar over bcan only. -->
+<launch>
+<arg name = "module_name" default="sensor_radar"/>
+<arg name="radar_front_extrinsics" default="radar_front"/>
+<arg name="radar_rear_extrinsics" default="radar_rear"/>
+<arg name = "front_can_port" default="2"/>
+<arg name = "rear_can_port" default="3"/>
+<!-- 0 for track, 1 for cluster -->
+<arg name = "output_type" default="0"/> 
+<group ns = "sensor">
+<group ns = "frontradar">
+    <node name = "radar_driver_node" pkg ="radar_driver" type = "radar_driver_node" output = "screen">
+        <param name = "can_port" value = "$(arg front_can_port)"/>
+        <param name = "module_name" value = "$(arg module_name)"/>
+        <param name = "output_type" value = "$(arg output_type)"/>
+    </node>
+    <node name = "radar_disp_node" pkg ="radar_driver" type = "radar_disp_node" output = "screen">
+        <param name ="radar_extrinsics" value = "$(arg radar_front_extrinsics)"/>
+        <param name = "can_port" value = "$(arg front_can_port)"/>
+    </node>
+</group>
+
+<group ns = "rearradar">
+    <node name = "radar_driver_node" pkg ="radar_driver" type = "radar_driver_node" output = "screen">
+        <param name = "can_port" value = "$(arg rear_can_port)"/>
+        <param name = "module_name" value = "$(arg module_name)"/>
+        <param name = "output_type" value = "$(arg output_type)"/>
+    </node>
+    <node name = "radar_disp_node" pkg ="radar_driver" type = "radar_disp_node" output = "screen">
+        <param name ="radar_extrinsics" value = "$(arg radar_rear_extrinsics)"/>
+        <param name = "can_port" value = "$(arg rear_can_port)"/>
+    </node>
+</group>
+</group>
+</launch>
+
+
