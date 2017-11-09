@@ -5,12 +5,14 @@ package apollo.data;
 import "modules/canbus/proto/canbus_conf.proto";
 import "modules/canbus/proto/chassis_detail.proto";
 import "modules/common/configs/proto/vehicle_config.proto";
+import "modules/control/proto/control_conf.proto";
 
 message VehicleInfo {
   optional string name = 1;
   optional apollo.canbus.License license = 2;
   optional apollo.canbus.CanbusConf canbus_conf = 3;
   optional apollo.common.VehicleConfig vehicle_config = 4;
+  optional apollo.control.ControlConf control_config = 5;
 }
 
 message EnvironmentInfo {
