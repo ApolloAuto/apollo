@@ -33,9 +33,6 @@ cc_test(
     name = "hmi_test",
     size = "small",
     srcs = ["hmi_test.cc"],
-    data = [
-        "//modules/dreamview/conf:hmi_config",
-    ],
     deps = [
         ":hmi",
         "@gtest//:main",
