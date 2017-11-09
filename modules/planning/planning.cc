@@ -28,6 +28,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/em/em_planner.h"
+#include "modules/planning/planner/lattice/lattice_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
@@ -48,6 +49,8 @@ void Planning::RegisterPlanners() {
       PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
   planner_factory_.Register(PlanningConfig::EM,
                             []() -> Planner* { return new EMPlanner(); });
+  planner_factory_.Register(PlanningConfig::LATTICE,
+                            []() -> Planner* { return new LatticePlanner(); });
 }
 
 Status Planning::InitFrame(const uint32_t sequence_num,
