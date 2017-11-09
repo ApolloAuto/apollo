@@ -188,8 +188,11 @@ bool Reconstruct(
     const TopoNode* dest_node, std::vector<NodeWithRange>* result_nodes) {
   std::vector<const TopoNode*> result_node_vec;
   result_node_vec.push_back(dest_node);
-  while (auto* result_node = FindPtrOrNull(came_from, dest_node)) {
-    result_node_vec.push_back(result_node);
+
+  auto iter = came_from.find(dest_node);
+  while (iter != came_from.end()) {
+    result_node_vec.push_back(iter->second);
+    iter = came_from.find(iter->second);
   }
   std::reverse(result_node_vec.begin(), result_node_vec.end());
   if (!AdjustLaneChange(&result_node_vec)) {
