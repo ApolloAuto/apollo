@@ -30,10 +30,7 @@ namespace apollo {
 namespace planning {
 
 Spline1dConstraint::Spline1dConstraint(const Spline1d& pss)
-    : x_knots_(pss.x_knots()), spline_order_(pss.spline_order()) {
-  inequality_constraint_.SetIsEquality(false);
-  equality_constraint_.SetIsEquality(true);
-}
+    : Spline1dConstraint(pss.x_knots(), pss.spline_order()) {}
 
 Spline1dConstraint::Spline1dConstraint(const std::vector<double>& x_knots,
                                        const uint32_t spline_order)
@@ -74,9 +71,10 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
     return false;
   }
   // emplace affine constraints
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(),
-      (x_knots_.size() - 1) * spline_order_);
+      (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd inequality_boundary = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
@@ -85,8 +83,8 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
 
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
-      inequality_constraint(i, j + index * spline_order_) = coef;
+    for (uint32_t j = 0; j < num_params; ++j) {
+      inequality_constraint(i, j + index * num_params) = coef;
       coef *= corrected_x;
     }
     inequality_boundary(i, 0) = filtered_lower_bound[i];
@@ -96,9 +94,9 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
     uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
+    for (uint32_t j = 0; j < num_params; ++j) {
       inequality_constraint(i + filtered_lower_bound.size(),
-                            j + index * spline_order_) = coef;
+                            j + index * num_params) = coef;
       coef *= corrected_x;
     }
     inequality_boundary(i + filtered_lower_bound.size(), 0) =
@@ -128,9 +126,10 @@ bool Spline1dConstraint::AddDerivativeBoundary(
   }
 
   // emplace affine constraints
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(),
-      (x_knots_.size() - 1) * spline_order_);
+      (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd inequality_boundary = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
@@ -138,8 +137,8 @@ bool Spline1dConstraint::AddDerivativeBoundary(
     uint32_t index = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
-    for (uint32_t j = 1; j < spline_order_; ++j) {
-      inequality_constraint(i, j + index * spline_order_) = coef * j;
+    for (uint32_t j = 1; j < num_params; ++j) {
+      inequality_constraint(i, j + index * num_params) = coef * j;
       coef *= corrected_x;
     }
     inequality_boundary(i, 0) = filtered_lower_bound[i];
@@ -149,9 +148,9 @@ bool Spline1dConstraint::AddDerivativeBoundary(
     uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
-    for (uint32_t j = 1; j < spline_order_; ++j) {
+    for (uint32_t j = 1; j < num_params; ++j) {
       inequality_constraint(i + filtered_lower_bound.size(),
-                            j + index * spline_order_) = coef * j;
+                            j + index * num_params) = coef * j;
       coef *= corrected_x;
     }
     inequality_boundary(i + filtered_lower_bound.size(), 0) =
@@ -180,9 +179,10 @@ bool Spline1dConstraint::AddSecondDerivativeBoundary(
   }
 
   // emplace affine constraints
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(),
-      (x_knots_.size() - 1) * spline_order_);
+      (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd inequality_boundary = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
@@ -190,8 +190,8 @@ bool Spline1dConstraint::AddSecondDerivativeBoundary(
     uint32_t index = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
-    for (uint32_t j = 2; j < spline_order_; ++j) {
-      inequality_constraint(i, j + index * spline_order_) = coef * j * (j - 1);
+    for (uint32_t j = 2; j < num_params; ++j) {
+      inequality_constraint(i, j + index * num_params) = coef * j * (j - 1);
       coef *= corrected_x;
     }
     inequality_boundary(i, 0) = filtered_lower_bound[i];
@@ -201,9 +201,9 @@ bool Spline1dConstraint::AddSecondDerivativeBoundary(
     uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
-    for (uint32_t j = 2; j < spline_order_; ++j) {
+    for (uint32_t j = 2; j < num_params; ++j) {
       inequality_constraint(i + filtered_lower_bound.size(),
-                            j + index * spline_order_) = coef * j * (j - 1);
+                            j + index * num_params) = coef * j * (j - 1);
       coef *= corrected_x;
     }
     inequality_boundary(i + filtered_lower_bound.size(), 0) =
@@ -234,9 +234,10 @@ bool Spline1dConstraint::AddThirdDerivativeBoundary(
   }
 
   // emplace affine constraints
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(),
-      (x_knots_.size() - 1) * spline_order_);
+      (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd inequality_boundary = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
@@ -244,8 +245,8 @@ bool Spline1dConstraint::AddThirdDerivativeBoundary(
     uint32_t index = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
-    for (uint32_t j = 3; j < spline_order_; ++j) {
-      inequality_constraint(i, j + index * spline_order_) =
+    for (uint32_t j = 3; j < num_params; ++j) {
+      inequality_constraint(i, j + index * num_params) =
           coef * j * (j - 1) * (j - 2);
       coef *= corrected_x;
     }
@@ -256,9 +257,9 @@ bool Spline1dConstraint::AddThirdDerivativeBoundary(
     uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
-    for (uint32_t j = 3; j < spline_order_; ++j) {
+    for (uint32_t j = 3; j < num_params; ++j) {
       inequality_constraint(i + filtered_lower_bound.size(),
-                            j + index * spline_order_) =
+                            j + index * num_params) =
           coef * j * (j - 1) * (j - 2);
       coef *= corrected_x;
     }
@@ -272,11 +273,12 @@ bool Spline1dConstraint::AddThirdDerivativeBoundary(
 bool Spline1dConstraint::AddPointConstraint(const double x, const double fx) {
   uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
+  const uint32_t num_params = spline_order_ + 1;
+  GeneratePowerX(x - x_knots_[index], num_params, &power_x);
   Eigen::MatrixXd equality_constraint =
-      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
-  uint32_t index_offset = index * spline_order_;
-  for (uint32_t i = 0; i < spline_order_; ++i) {
+      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * num_params);
+  uint32_t index_offset = index * num_params;
+  for (uint32_t i = 0; i < num_params; ++i) {
     equality_constraint(0, index_offset + i) = power_x[i];
   }
   Eigen::MatrixXd equality_boundary(1, 1);
@@ -288,11 +290,12 @@ bool Spline1dConstraint::AddPointDerivativeConstraint(const double x,
                                                       const double dfx) {
   uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
+  const uint32_t num_params = spline_order_ + 1;
+  GeneratePowerX(x - x_knots_[index], num_params, &power_x);
   Eigen::MatrixXd equality_constraint =
-      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
-  uint32_t index_offset = index * spline_order_;
-  for (uint32_t i = 1; i < spline_order_; ++i) {
+      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * num_params);
+  uint32_t index_offset = index * num_params;
+  for (uint32_t i = 1; i < num_params; ++i) {
     equality_constraint(0, index_offset + i) = power_x[i - 1] * i;
   }
   Eigen::MatrixXd equality_boundary(1, 1);
@@ -304,11 +307,12 @@ bool Spline1dConstraint::AddPointSecondDerivativeConstraint(const double x,
                                                             const double ddfx) {
   uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
+  const uint32_t num_params = spline_order_ + 1;
+  GeneratePowerX(x - x_knots_[index], num_params, &power_x);
   Eigen::MatrixXd equality_constraint =
-      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
-  uint32_t index_offset = index * spline_order_;
-  for (uint32_t i = 2; i < spline_order_; ++i) {
+      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * num_params);
+  uint32_t index_offset = index * num_params;
+  for (uint32_t i = 2; i < num_params; ++i) {
     equality_constraint(0, index_offset + i) = power_x[i - 2] * i * (i - 1);
   }
   Eigen::MatrixXd equality_boundary(1, 1);
@@ -320,11 +324,12 @@ bool Spline1dConstraint::AddPointThirdDerivativeConstraint(const double x,
                                                            const double dddfx) {
   uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
+  const uint32_t num_params = spline_order_ + 1;
+  GeneratePowerX(x - x_knots_[index], num_params, &power_x);
   Eigen::MatrixXd equality_constraint =
-      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
-  uint32_t index_offset = index * spline_order_;
-  for (uint32_t i = 3; i < spline_order_; ++i) {
+      Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * num_params);
+  uint32_t index_offset = index * num_params;
+  for (uint32_t i = 3; i < num_params; ++i) {
     equality_constraint(0, index_offset + i) =
         power_x[i - 3] * i * (i - 1) * (i - 2);
   }
@@ -337,8 +342,9 @@ bool Spline1dConstraint::AddSmoothConstraint() {
   if (x_knots_.size() < 3) {
     return false;
   }
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd equality_constraint = Eigen::MatrixXd::Zero(
-      x_knots_.size() - 2, (x_knots_.size() - 1) * spline_order_);
+      x_knots_.size() - 2, (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd equality_boundary =
       Eigen::MatrixXd::Zero(x_knots_.size() - 2, 1);
 
@@ -347,9 +353,9 @@ bool Spline1dConstraint::AddSmoothConstraint() {
     double right_coef = -1.0;
     const double x_left = x_knots_[i + 1] - x_knots_[i];
     const double x_right = 0.0;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
-      equality_constraint(i, spline_order_ * i + j) = left_coef;
-      equality_constraint(i, spline_order_ * (i + 1) + j) = right_coef;
+    for (uint32_t j = 0; j < num_params; ++j) {
+      equality_constraint(i, num_params * i + j) = left_coef;
+      equality_constraint(i, num_params * (i + 1) + j) = right_coef;
       left_coef *= x_left;
       right_coef *= x_right;
     }
@@ -364,8 +370,9 @@ bool Spline1dConstraint::AddDerivativeSmoothConstraint() {
   }
 
   const uint32_t n_constraint = (x_knots_.size() - 2) * 2;
-  Eigen::MatrixXd equality_constraint = Eigen::MatrixXd::Zero(
-      n_constraint, (x_knots_.size() - 1) * spline_order_);
+  const uint32_t num_params = spline_order_ + 1;
+  Eigen::MatrixXd equality_constraint =
+      Eigen::MatrixXd::Zero(n_constraint, (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(n_constraint, 1);
 
   for (uint32_t i = 0; i < n_constraint; i += 2) {
@@ -375,13 +382,12 @@ bool Spline1dConstraint::AddDerivativeSmoothConstraint() {
     double right_dcoef = -1.0;
     const double x_left = x_knots_[i / 2 + 1] - x_knots_[i / 2];
     const double x_right = 0.0;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
-      equality_constraint(i, spline_order_ * (i / 2) + j) = left_coef;
-      equality_constraint(i, spline_order_ * ((i / 2) + 1) + j) = right_coef;
+    for (uint32_t j = 0; j < num_params; ++j) {
+      equality_constraint(i, num_params * (i / 2) + j) = left_coef;
+      equality_constraint(i, num_params * ((i / 2) + 1) + j) = right_coef;
       if (j >= 1) {
-        equality_constraint(i + 1, spline_order_ * (i / 2) + j) =
-            left_dcoef * j;
-        equality_constraint(i + 1, spline_order_ * ((i / 2) + 1) + j) =
+        equality_constraint(i + 1, num_params * (i / 2) + j) = left_dcoef * j;
+        equality_constraint(i + 1, num_params * ((i / 2) + 1) + j) =
             right_dcoef * j;
         left_dcoef = left_coef;
         right_dcoef = right_coef;
@@ -400,8 +406,9 @@ bool Spline1dConstraint::AddSecondDerivativeSmoothConstraint() {
   }
 
   const uint32_t n_constraint = (x_knots_.size() - 2) * 3;
-  Eigen::MatrixXd equality_constraint = Eigen::MatrixXd::Zero(
-      n_constraint, (x_knots_.size() - 1) * spline_order_);
+  const uint32_t num_params = spline_order_ + 1;
+  Eigen::MatrixXd equality_constraint =
+      Eigen::MatrixXd::Zero(n_constraint, (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(n_constraint, 1);
 
   for (uint32_t i = 0; i < n_constraint; i += 3) {
@@ -414,23 +421,22 @@ bool Spline1dConstraint::AddSecondDerivativeSmoothConstraint() {
 
     const double x_left = x_knots_[i / 3 + 1] - x_knots_[i / 3];
     const double x_right = 0.0;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
-      equality_constraint(i, spline_order_ * (i / 3) + j) = left_coef;
-      equality_constraint(i, spline_order_ * (i / 3 + 1) + j) = right_coef;
+    for (uint32_t j = 0; j < num_params; ++j) {
+      equality_constraint(i, num_params * (i / 3) + j) = left_coef;
+      equality_constraint(i, num_params * (i / 3 + 1) + j) = right_coef;
 
       if (j >= 2) {
-        equality_constraint(i + 2, spline_order_ * i / 3 + j) =
+        equality_constraint(i + 2, num_params * i / 3 + j) =
             left_ddcoef * j * (j - 1);
-        equality_constraint(i + 2, spline_order_ * (i / 3 + 1) + j) =
+        equality_constraint(i + 2, num_params * (i / 3 + 1) + j) =
             right_ddcoef * j * (j - 1);
         left_ddcoef = left_dcoef;
         right_ddcoef = right_dcoef;
       }
 
       if (j >= 1) {
-        equality_constraint(i + 1, spline_order_ * (i / 3) + j) =
-            left_dcoef * j;
-        equality_constraint(i + 1, spline_order_ * (i / 3 + 1) + j) =
+        equality_constraint(i + 1, num_params * (i / 3) + j) = left_dcoef * j;
+        equality_constraint(i + 1, num_params * (i / 3 + 1) + j) =
             right_dcoef * j;
         left_dcoef = left_coef;
         right_dcoef = right_coef;
@@ -449,8 +455,9 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
   }
 
   const uint32_t n_constraint = (x_knots_.size() - 2) * 4;
-  Eigen::MatrixXd equality_constraint = Eigen::MatrixXd::Zero(
-      n_constraint, (x_knots_.size() - 1) * spline_order_);
+  const uint32_t num_params = spline_order_ + 1;
+  Eigen::MatrixXd equality_constraint =
+      Eigen::MatrixXd::Zero(n_constraint, (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(n_constraint, 1);
 
   for (uint32_t i = 0; i < n_constraint; i += 4) {
@@ -465,31 +472,31 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
 
     const double x_left = x_knots_[i / 4 + 1] - x_knots_[i / 4];
     const double x_right = 0.0;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
-      equality_constraint(i, spline_order_ * i / 4 + j) = left_coef;
-      equality_constraint(i, spline_order_ * (i / 4 + 1) + j) = right_coef;
+    for (uint32_t j = 0; j < num_params; ++j) {
+      equality_constraint(i, num_params * i / 4 + j) = left_coef;
+      equality_constraint(i, num_params * (i / 4 + 1) + j) = right_coef;
 
       if (j >= 3) {
-        equality_constraint(i + 3, spline_order_ * i / 4 + j) =
+        equality_constraint(i + 3, num_params * i / 4 + j) =
             left_dddcoef * j * (j - 1) * (j - 2);
-        equality_constraint(i + 3, spline_order_ * (i / 4 + 1) + j) =
+        equality_constraint(i + 3, num_params * (i / 4 + 1) + j) =
             right_dddcoef * j * (j - 1) * (j - 2);
         left_dddcoef = left_ddcoef;
         right_dddcoef = right_ddcoef;
       }
 
       if (j >= 2) {
-        equality_constraint(i + 2, spline_order_ * i / 4 + j) =
+        equality_constraint(i + 2, num_params * i / 4 + j) =
             left_ddcoef * j * (j - 1);
-        equality_constraint(i + 2, spline_order_ * (i / 4 + 1) + j) =
+        equality_constraint(i + 2, num_params * (i / 4 + 1) + j) =
             right_ddcoef * j * (j - 1);
         left_ddcoef = left_dcoef;
         right_ddcoef = right_dcoef;
       }
 
       if (j >= 1) {
-        equality_constraint(i + 1, spline_order_ * i / 4 + j) = left_dcoef * j;
-        equality_constraint(i + 1, spline_order_ * (i / 4 + 1) + j) =
+        equality_constraint(i + 1, num_params * i / 4 + j) = left_dcoef * j;
+        equality_constraint(i + 1, num_params * (i / 4 + 1) + j) =
             right_dcoef * j;
         left_dcoef = left_coef;
         right_dcoef = right_coef;
@@ -510,33 +517,34 @@ bool Spline1dConstraint::AddMonotoneInequalityConstraint(
     return false;
   }
 
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
-      x_coord.size() - 1, (x_knots_.size() - 1) * spline_order_);
+      x_coord.size() - 1, (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd inequality_boundary =
       Eigen::MatrixXd::Zero(x_coord.size() - 1, 1);
 
   uint32_t prev_spline_index = FindIndex(x_coord[0]);
   double prev_rel_x = x_coord[0] - x_knots_[prev_spline_index];
   std::vector<double> prev_coef;
-  GeneratePowerX(prev_rel_x, spline_order_, &prev_coef);
+  GeneratePowerX(prev_rel_x, num_params, &prev_coef);
   for (uint32_t i = 1; i < x_coord.size(); ++i) {
     uint32_t cur_spline_index = FindIndex(x_coord[i]);
     double cur_rel_x = x_coord[i] - x_knots_[cur_spline_index];
     std::vector<double> cur_coef;
 
-    GeneratePowerX(cur_rel_x, spline_order_, &cur_coef);
+    GeneratePowerX(cur_rel_x, num_params, &cur_coef);
     // if constraint on the same spline
     if (cur_spline_index == prev_spline_index) {
       for (uint32_t j = 0; j < cur_coef.size(); ++j) {
-        inequality_constraint(i - 1, cur_spline_index * spline_order_ + j) =
+        inequality_constraint(i - 1, cur_spline_index * num_params + j) =
             cur_coef[j] - prev_coef[j];
       }
     } else {
       // if not on the same spline
       for (uint32_t j = 0; j < cur_coef.size(); ++j) {
-        inequality_constraint(i - 1, prev_spline_index * spline_order_ + j) =
+        inequality_constraint(i - 1, prev_spline_index * num_params + j) =
             -prev_coef[j];
-        inequality_constraint(i - 1, cur_spline_index * spline_order_ + j) =
+        inequality_constraint(i - 1, cur_spline_index * num_params + j) =
             cur_coef[j];
       }
     }
