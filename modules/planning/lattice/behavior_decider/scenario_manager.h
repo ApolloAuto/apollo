@@ -20,15 +20,16 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-
+#include "modules/planning/lattice/behavior_decider/scenario.h"
 #include "modules/common/macro.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_sampling_config.pb.h"
+
+#include <unordered_map>
+#include <string>
+#include <utility>
+#include <memory>
+#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -53,15 +54,15 @@ class ScenarioManager {
 
   template<class T>
   void RegisterScenario(FeatureLevel level) {
-    auto scenario = std::make_unique<T>();
+    auto scenario = std::unique_ptr<T>();
     scenarios_[static_cast<int>(level)].push_back(scenario.get());
-    indexed_scenarios_[scenario->name()] = std::move(scenario);
+    indexed_scenarios_[scenario->Name()] = std::move(scenario);
   }
 
   template<class T>
   const T* FindScenario() const {
-    auto scenario_iter = indexed_features_.find(T::scenario_name());
-    if (scenario_iter == indexed_features_.end()) {
+    auto scenario_iter = indexed_scenarios_.find(T::scenario_name());
+    if (scenario_iter == indexed_scenarios_.end()) {
       return nullptr;
     } else {
       return dynamic_cast<const T*>(scenario_iter->second.get());

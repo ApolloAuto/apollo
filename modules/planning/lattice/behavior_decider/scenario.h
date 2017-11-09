@@ -17,8 +17,6 @@
  * @file scenario.h
  **/
 
-
-
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_H_
 
@@ -32,8 +30,8 @@
 
 #define DECLARE_SCENARIO(WORLD) \
  public: \
-  WORLD() : SCENARIO(#WORLD) {}; \
-  static std::string FeatureName() { return #WORLD; } \
+  WORLD() : Scenario(#WORLD) {}; \
+  static std::string ScenarioName() { return #WORLD; } \
  private: \
   WORLD(const WORLD&) = delete; \
   WORLD& operator = (const WORLD&) = delete
@@ -62,6 +60,10 @@ class Scenario {
    * reset is called before construction
    */
   virtual void Reset() = 0;
+  /**
+   * Init
+   */
+  virtual bool Init() = 0;
 
  private:
     std::string name_;
