@@ -82,6 +82,8 @@ class CNNSegmentation : public BaseSegmentation {
   boost::shared_ptr<caffe::Blob<float>> height_pt_blob_;
   // raw features to be input into network
   boost::shared_ptr<caffe::Blob<float>> feature_blob_;
+  // class prediction
+  boost::shared_ptr<caffe::Blob<float>> class_pt_blob_;
 
   // use all points of cloud to compute features
   bool use_full_cloud_ = false;
