@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_DEFINE_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_DEFINE_H_
 
-namespace apollo{
-namespace perception{
+namespace apollo {
+namespace perception {
 
 const double RADAR_CYCLE = 0.074;
 const double RADAR_TRACK_TIME_WIN = 0.06;

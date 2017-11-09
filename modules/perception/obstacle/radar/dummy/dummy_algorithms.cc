@@ -18,10 +18,10 @@
 namespace apollo {
 namespace perception {
 
-bool DummyRadarDetector::Detect(const RadarObsArray& raw_obstacles,
-            const std::vector<PolygonDType>& map_polygons,
-            const RadarDetectorOptions& options,
-            std::vector<ObjectPtr>* objects) {
+bool DummyRadarDetector::Detect(const RadarObsArray &raw_obstacles,
+                                const std::vector<PolygonDType> &map_polygons,
+                                const RadarDetectorOptions &options,
+                                std::vector<ObjectPtr> *objects) {
   return result_detect_;
 }
 

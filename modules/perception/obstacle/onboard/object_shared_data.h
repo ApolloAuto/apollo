@@ -20,11 +20,10 @@ private:  \
 }
 
 OBJECT_SHARED_DATA(LidarObjectData);
-OBJECT_SHARED_DATA(RadarFrontObjectData);
+OBJECT_SHARED_DATA(RadarObjectData);
 
 REGISTER_SHAREDDATA(LidarObjectData);
-REGISTER_SHAREDDATA(RadarFrontObjectData);
-
+REGISTER_SHAREDDATA(RadarObjectData);
 
 }  // namespace perception
 }  // namespace apollo

@@ -20,14 +20,14 @@
 #include <fstream>
 #include "modules/perception/obstacle/base/types.h"
 
-namespace apollo{
-namespace perception{
+namespace apollo {
+namespace perception {
 
-class RadarUtil{
-public:
-template <typename PointT>
-static bool IsXyPointIn2dXyPolygon(
-    const PointT& point, const PolygonDType& polygon) {
+class RadarUtil {
+ public:
+  template<typename PointT>
+  static bool IsXyPointIn2dXyPolygon(
+      const PointT &point, const PolygonDType &polygon) {
     bool in_poly = false;
     double x1, x2, y1, y2;
 
@@ -36,48 +36,49 @@ static bool IsXyPointIn2dXyPolygon(
     double xold = polygon.points[nr_poly_points - 1].x;
     double yold = polygon.points[nr_poly_points - 1].y;
     for (int i = 0; i < nr_poly_points; i++) {
-        double xnew = polygon.points[i].x;
-        double ynew = polygon.points[i].y;
-        if (xnew > xold) {
-            x1 = xold;
-            x2 = xnew;
-            y1 = yold;
-            y2 = ynew;
-        } else {
-            x1 = xnew;
-            x2 = xold;
-            y1 = ynew;
-            y2 = yold;
-        }
+      double xnew = polygon.points[i].x;
+      double ynew = polygon.points[i].y;
+      if (xnew > xold) {
+        x1 = xold;
+        x2 = xnew;
+        y1 = yold;
+        y2 = ynew;
+      } else {
+        x1 = xnew;
+        x2 = xold;
+        y1 = ynew;
+        y2 = yold;
+      }
 
-        if ((x1 < point.x) == (point.x <= x2)
-                && (point.y - y1) * (x2 - x1) < (y2 - y1) * (point.x - x1)) {
-            in_poly = !in_poly;
-        }
-        xold = xnew;
-        yold = ynew;
+      if ((x1 < point.x) == (point.x <= x2)
+          && (point.y - y1) * (x2 - x1) < (y2 - y1) * (point.x - x1)) {
+        in_poly = !in_poly;
+      }
+      xold = xnew;
+      yold = ynew;
     }
 
     return in_poly;
-}
+  }
 
-template <typename PointT>
-static bool IsXyPointInHdmap(const PointT &p,
-        const std::vector<PolygonDType>& polygons) {
+  template<typename PointT>
+  static bool IsXyPointInHdmap(const PointT &p,
+                               const std::vector<PolygonDType> &polygons) {
     bool in_flag = false;
     for (int j = 0; j < polygons.size(); j++) {
-        if (IsXyPointIn2dXyPolygon<PointT>(p, polygons[j])) {
-            in_flag = true;
-            break;
-        }
+      if (IsXyPointIn2dXyPolygon<PointT>(p, polygons[j])) {
+        in_flag = true;
+        break;
+      }
     }
     return in_flag;
-}
-static void MockRadarPolygon(const Eigen::Vector3d& center, const double length,
-        const double width, const double theta, PolygonDType& polygon) {
+  }
+
+  static void MockRadarPolygon(const Eigen::Vector3d &center, const double length,
+                               const double width, const double theta, PolygonDType &polygon) {
     Eigen::Matrix2d rotation;
     rotation << cos(theta), -sin(theta),
-                sin(theta), cos(theta);
+        sin(theta), cos(theta);
     Eigen::Vector2d local_poly(0, 0);
     Eigen::Vector2d world_poly;
     polygon.resize(4);
@@ -105,7 +106,7 @@ static void MockRadarPolygon(const Eigen::Vector3d& center, const double length,
     polygon.points[3].x = center(0) + world_poly(0);
     polygon.points[3].y = center(1) + world_poly(1);
     polygon.points[3].z = center(2);
-}
+  }
 };
 
 }//namespace perception

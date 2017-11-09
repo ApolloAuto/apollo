@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
- #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_
 #include <memory>
 #include <vector>
@@ -25,6 +25,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include <boost/circular_buffer.hpp>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
@@ -36,6 +37,7 @@
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
+#include "modules/localization/proto/gps.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
@@ -51,31 +53,39 @@ class RadarProcessSubnode : public Subnode {
   }
 
  private:
+  typedef std::pair<double, apollo::localization::Gps> ObjectPair;
   bool InitInternal() override;
 
-  void OnRadar(const RadarObsArray& radar_obs);
+  void OnRadar(const RadarObsArray &radar_obs);
+
+  void OnGps(const apollo::localization::Gps &gps);
 
   void RegistAllAlgorithm();
+
   bool InitFrameDependence();
+
   bool InitAlgorithmPlugin();
 
-  bool GetRadarTrans(const double query_time, Eigen::Matrix4d* trans);
+  bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
 
   void PublishDataAndEvent(double timestamp,
-                           const SharedDataPtr<SensorObjects>& data);
+                           const SharedDataPtr<SensorObjects> &data);
+
+  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f *car_linear_speed);
 
   bool inited_ = false;
-  double timestamp_;
   SeqId seq_num_ = 0;
   common::ErrorCode error_code_ = common::OK;
-  RadarFrontObjectData* radar_data_ = nullptr;
+  RadarObjectData *radar_data_ = nullptr;
   std::string device_id_;
 
+  boost::circular_buffer<ObjectPair> gps_buffer_;
   ContiRadarIDExpansion _conti_id_expansion;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
-  HDMapInput* hdmap_input_ = NULL;
+  HDMapInput *hdmap_input_ = NULL;
   // here we use HdmapROIFilter
   std::unique_ptr<HdmapROIFilter> roi_filter_;
+  Mutex mutex_;
 };
 
 REGISTER_SUBNODE(RadarProcessSubnode);

@@ -25,22 +25,22 @@
 namespace apollo {
 namespace perception {
 
-class BaseFilter{
-public:
-    BaseFilter(){
-        name_= "BaseFilter";
-    };
-    virtual ~BaseFilter(){};
-    
-    virtual void Initialize(const Object& state) = 0;
-    virtual Eigen::Vector4d Predict(double time_diff) = 0;
-    std::string name(){
-        return name_;
-    }
-    virtual Eigen::Vector4d UpdateWithObject(Object& new_object) = 0;
-    virtual Eigen::Matrix4d GetCovarianceMatrix() = 0;
-protected:
-    std::string name_;
+class BaseFilter {
+ public:
+  BaseFilter() {
+    name_ = "BaseFilter";
+  };
+  virtual ~BaseFilter() {};
+
+  virtual void Initialize(const Object &state) = 0;
+  virtual Eigen::Vector4d Predict(double time_diff) = 0;
+  std::string name() {
+    return name_;
+  }
+  virtual Eigen::Vector4d UpdateWithObject(Object &new_object) = 0;
+  virtual Eigen::Matrix4d GetCovarianceMatrix() = 0;
+ protected:
+  std::string name_;
 };
 
 } // namesapce perception

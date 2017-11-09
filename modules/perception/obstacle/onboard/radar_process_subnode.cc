@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
- #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
+#include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 
 #include <map>
 #include <string>
@@ -76,42 +76,45 @@ bool RadarProcessSubnode::InitInternal() {
 
   CHECK(AdapterManager::GetRadar()) << "Radar is not initialized.";
   AdapterManager::AddRadarCallback(&RadarProcessSubnode::OnRadar,
-                                        this);
-  // TODO: odometry message adapter.
-
+                                   this);
+  CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
+  AdapterManager::AddGpsCallback(&RadarProcessSubnode::OnGps,
+                                 this);
+  gps_buffer_.set_capacity(FLAGS_gps_buffer_size);
   inited_ = true;
 
   return true;
 }
 
 void RadarProcessSubnode::OnRadar(
-    const RadarObsArray& radar_obs) {
-    PERF_FUNCTION("RadarProcess");
-    RadarObsArray radar_obs_proto = radar_obs;
-    double timestamp = radar_obs_proto.measurement_time();
-    double unix_timestamp = timestamp;
-    const double cur_time = common::time::Clock::NowInSecond();
-    const double start_latency = (cur_time - unix_timestamp) * 1e3;
-    AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << GLOG_TIMESTAMP(timestamp)
-               << "]:cur_time[" << GLOG_TIMESTAMP(cur_time) << "]:cur_latency["
-               << start_latency << "]";
-    // correct radar timestamp
-    if (radar_obs_proto.type() == apollo::drivers::CONTINENTAL_ARS_40821){
-        timestamp -= 0.07;
-    } else {
-        AERROR << "Unknown sensor type";
-        return;
-    }
+    const RadarObsArray &radar_obs) {
+  PERF_FUNCTION("RadarProcess");
+  RadarObsArray radar_obs_proto = radar_obs;
+  double timestamp = radar_obs_proto.measurement_time();
+  double unix_timestamp = timestamp;
+  const double cur_time = common::time::Clock::NowInSecond();
+  const double start_latency = (cur_time - unix_timestamp) * 1e3;
+  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << GLOG_TIMESTAMP(timestamp)
+        << "]:cur_time[" << GLOG_TIMESTAMP(cur_time) << "]:cur_latency["
+        << start_latency << "]";
+  // 0. correct radar timestamp
+  if (radar_obs_proto.type() == apollo::drivers::CONTINENTAL_ARS_40821) {
+    timestamp -= 0.07;
+  } else {
+    AERROR << "Unknown sensor type";
+    return;
+  }
+  radar_obs_proto.set_measurement_time(timestamp);
 
-    _conti_id_expansion.UpdateTimestamp(timestamp);
-    _conti_id_expansion.ExpandIds(radar_obs_proto);
+  _conti_id_expansion.UpdateTimestamp(timestamp);
+  _conti_id_expansion.ExpandIds(radar_obs_proto);
 
-    if (fabs(timestamp - 0.0) < 10e-6) {
-        AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);
-        return;
-    }
-    ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
-            << " num_raw_obstacles: " << radar_obs_proto.delphiobs_size() << "]";
+  if (fabs(timestamp - 0.0) < 10e-6) {
+    AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);
+    return;
+  }
+  ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
+         << " num_raw_obstacles: " << radar_obs_proto.contiobs_size() << "]";
 
   // 1. get radar pose
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
@@ -121,66 +124,112 @@ void RadarProcessSubnode::OnRadar(
     return;
   }
 
-    // Current Localiztion, using 64-velodyne postion.
-    PointD position;
-    position.x = (*radar2world_pose)(0,3);
-    position.y = (*radar2world_pose)(1,3);
-    position.z = (*radar2world_pose)(2,3);
-    // 2. Get map polygons.
-    std::vector<PolygonDType> map_polygons;
-    HdmapStructPtr hdmap(new HdmapStruct);
-    if (FLAGS_enable_hdmap_input && hdmap_input_ &&
-            !hdmap_input_->GetROI(position, FLAGS_front_radar_forward_distance, &hdmap)) {
-        AWARN << "Failed to get roi. timestamp: " << GLOG_TIMESTAMP(timestamp)
-                     << " position: [" << position.x << ", " << position.y
-                     << ", " << position.z << "]";
-        // NOTE: if call hdmap failed, using empty map_polygons.
-    }
-    if (roi_filter_ != nullptr) {
-      roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
-    }
-    RadarDetectorOptions options;
+  // Current Localiztion, radar postion.
+  PointD position;
+  position.x = (*radar2world_pose)(0, 3);
+  position.y = (*radar2world_pose)(1, 3);
+  position.z = (*radar2world_pose)(2, 3);
+  // 2. Get map polygons.
+  std::vector<PolygonDType> map_polygons;
+  HdmapStructPtr hdmap(new HdmapStruct);
+  if (FLAGS_enable_hdmap_input && hdmap_input_ &&
+      !hdmap_input_->GetROI(position, FLAGS_front_radar_forward_distance, &hdmap)) {
+    AWARN << "Failed to get roi. timestamp: " << GLOG_TIMESTAMP(timestamp)
+          << " position: [" << position.x << ", " << position.y
+          << ", " << position.z << "]";
+    // NOTE: if call hdmap failed, using empty map_polygons.
+  }
+  if (roi_filter_ != nullptr) {
+    roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
+  }
+  RadarDetectorOptions options;
 
-    // // 3. get car car_linear_speed
-    // if (!get_car_linear_speed(timestamp, &(options.car_linear_speed))) {
-    //     XLOG(ERROR) << "Failed to call get_car_linear_speed. [timestamp: "
-    //                << GLOG_TIMESTAMP(timestamp);
-    //     return;
-    // }
+  // 3. get car car_linear_speed
+  if (!GetCarLinearSpeed(timestamp, &(options.car_linear_speed))) {
+    AERROR << "Failed to call get_car_linear_speed. [timestamp: "
+           << GLOG_TIMESTAMP(timestamp);
+    return;
+  }
 
-    // 4. Call RadarDetector::detect.
-    PERF_BLOCK_START();
-    options.radar2world_pose = &(*radar2world_pose);
-    std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
-    radar_objects->timestamp = timestamp;
-    radar_objects->sensor_type = RADAR;
-    bool result = radar_detector_->Detect(
-            radar_obs_proto,
-            map_polygons,
-            options,
-            &radar_objects->objects);
-    if (!result) {
-        radar_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-        PublishDataAndEvent(timestamp, radar_objects);
-        AERROR << "Failed to call RadarDetector. [timestamp: "
-                   << GLOG_TIMESTAMP(timestamp)
-                   << ", map_polygons_size: " << map_polygons.size()
-                   << ", num_raw_conti_obstacles: " << radar_obs_proto.contiobs_size() << "]";
-        return;
-    }
-    PERF_BLOCK_END("radar_detect");
-    PublishDataAndEvent(timestamp_, radar_objects);
-
-    const double end_timestamp = common::time::Clock::NowInSecond();
-    const double end_latency = (end_timestamp - unix_timestamp) * 1e3;
-    AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
+  // 4. Call RadarDetector::detect.
+  PERF_BLOCK_START();
+  options.radar2world_pose = &(*radar2world_pose);
+  std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
+  radar_objects->timestamp = timestamp;
+  radar_objects->sensor_type = RADAR;
+  bool result = radar_detector_->Detect(
+      radar_obs_proto,
+      map_polygons,
+      options,
+      &radar_objects->objects);
+  if (!result) {
+    radar_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
+    PublishDataAndEvent(timestamp, radar_objects);
+    AERROR << "Failed to call RadarDetector. [timestamp: "
            << GLOG_TIMESTAMP(timestamp)
-           << "]:cur_time[" << GLOG_TIMESTAMP(end_timestamp)
-           << "]:cur_latency[" << end_latency << "]";
+           << ", map_polygons_size: " << map_polygons.size()
+           << ", num_raw_conti_obstacles: " << radar_obs_proto.contiobs_size() << "]";
+    return;
+  }
+  PERF_BLOCK_END("radar_detect");
+  PublishDataAndEvent(timestamp, radar_objects);
 
-    ADEBUG << "radar process succ, there are "
-           << (radar_objects->objects).size() << " objects.";
+  const double end_timestamp = common::time::Clock::NowInSecond();
+  const double end_latency = (end_timestamp - unix_timestamp) * 1e3;
+  AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
+        << GLOG_TIMESTAMP(timestamp)
+        << "]:cur_time[" << GLOG_TIMESTAMP(end_timestamp)
+        << "]:cur_latency[" << end_latency << "]";
+  ADEBUG << "radar process succ, there are "
+         << (radar_objects->objects).size() << " objects.";
   return;
+}
+
+void RadarProcessSubnode::OnGps(const apollo::localization::Gps &gps) {
+  MutexLock lock(&mutex_);
+  double timestamp = gps.header().timestamp_sec();
+  ObjectPair obj_pair;
+  obj_pair.first = timestamp;
+  obj_pair.second = gps;
+  gps_buffer_.push_back(obj_pair);
+}
+
+bool RadarProcessSubnode::GetCarLinearSpeed(double timestamp,
+                                            Eigen::Vector3f *car_linear_speed) {
+  MutexLock lock(&mutex_);
+  if (car_linear_speed == nullptr) {
+    AERROR << "Param car_linear_speed NULL error.";
+    return false;
+  }
+  if (gps_buffer_.empty()) {
+    AWARN << "Rosmsg buffer is empty.";
+    return false;
+  }
+  if (gps_buffer_.front().first - 0.1 > timestamp) {
+    AWARN << "Your timestamp (" << timestamp << ") is earlier than the oldest "
+          << "timestamp (" << gps_buffer_.front().first << ").";
+    return false;
+  }
+  if (gps_buffer_.back().first + 0.1 < timestamp) {
+    AWARN << "Your timestamp (" << timestamp << ") is newer than the latest "
+          << "timestamp (" << gps_buffer_.back().first << ").";
+    return false;
+  }
+  // loop to find nearest
+  double distance = 1e9;
+  int idx = gps_buffer_.size() - 1;
+  for (; idx >= 0; --idx) {
+    double temp_distance = fabs(timestamp - gps_buffer_[idx].first);
+    if (temp_distance >= distance) {
+      break;
+    }
+    distance = temp_distance;
+  }
+  const auto &velocity = gps_buffer_[idx + 1].second.localization().linear_velocity();
+  (*car_linear_speed)[0] = velocity.x();
+  (*car_linear_speed)[1] = velocity.y();
+  (*car_linear_speed)[2] = velocity.z();
+  return true;
 }
 
 void RadarProcessSubnode::RegistAllAlgorithm() {
@@ -190,11 +239,12 @@ void RadarProcessSubnode::RegistAllAlgorithm() {
 
 bool RadarProcessSubnode::InitFrameDependence() {
   /// init share data
-  CHECK(shared_data_manager_ != nullptr);
+  CHECK(shared_data_manager_ != nullptr)
+  << "shared_data_manager_ is nullptr";
   // init preprocess_data
-  const string radar_data_name("RadarFrontObjectData");
-  radar_data_ = dynamic_cast<RadarFrontObjectData*>(
-          shared_data_manager_->GetSharedData(radar_data_name));
+  const string radar_data_name("RadarObjectData");
+  radar_data_ = dynamic_cast<RadarObjectData *>(
+      shared_data_manager_->GetSharedData(radar_data_name));
   if (radar_data_ == nullptr) {
     AERROR << "Failed to get shared data instance "
            << radar_data_name;
@@ -206,14 +256,14 @@ bool RadarProcessSubnode::InitFrameDependence() {
   if (FLAGS_enable_hdmap_input) {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
-      AERROR << "failed to get HDMapInput instance.";
+      AERROR << "Failed to get HDMapInput instance.";
       return false;
     }
     if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
+      AERROR << "Failed to Init HDMapInput";
       return false;
     }
-    AINFO << "get and Init hdmap_input succ.";
+    AINFO << "Get and Init hdmap_input succ.";
   }
 
   return true;
@@ -237,22 +287,22 @@ bool RadarProcessSubnode::InitAlgorithmPlugin() {
     return false;
   }
   if (!radar_detector_->Init()) {
-    AERROR << "Failed to Init tracker: " << radar_detector_->name();
+    AERROR << "Failed to Init radar detector: " << radar_detector_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, tracker: " << radar_detector_->name();
+  AINFO << "Init algorithm plugin successfully, radar detecor: " << radar_detector_->name();
   return true;
 }
 
 bool RadarProcessSubnode::GetRadarTrans(const double query_time,
-                                           Matrix4d* trans) {
+                                        Matrix4d *trans) {
   if (!trans) {
     AERROR << "failed to get trans, the trans ptr can not be NULL";
     return false;
   }
 
   ros::Time query_stamp(query_time);
-  const auto& tf2_buffer = AdapterManager::Tf2Buffer();
+  const auto &tf2_buffer = AdapterManager::Tf2Buffer();
 
   const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
   string err_msg;
@@ -270,7 +320,7 @@ bool RadarProcessSubnode::GetRadarTrans(const double query_time,
   try {
     transform_stamped = tf2_buffer.lookupTransform(
         FLAGS_radar_tf2_frame_id, FLAGS_radar_tf2_child_frame_id, query_stamp);
-  } catch (tf2::TransformException& ex) {
+  } catch (tf2::TransformException &ex) {
     AERROR << "Exception: " << ex.what();
     return false;
   }
@@ -284,7 +334,7 @@ bool RadarProcessSubnode::GetRadarTrans(const double query_time,
 }
 
 void RadarProcessSubnode::PublishDataAndEvent(
-    double timestamp, const SharedDataPtr<SensorObjects>& data) {
+    double timestamp, const SharedDataPtr<SensorObjects> &data) {
   // set shared data
   std::string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {

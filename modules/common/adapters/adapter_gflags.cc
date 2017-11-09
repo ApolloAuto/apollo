@@ -37,8 +37,6 @@ DEFINE_string(pointcloud_topic, "/apollo/compensator/pointcloud",
               "pointcloud topic name");
 DEFINE_string(radar_topic, "/apollo/radar",
               "radar topic name");
-DEFINE_string(odometry_topic, "/apollo/odometry",
-              "odometry topic name");
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");

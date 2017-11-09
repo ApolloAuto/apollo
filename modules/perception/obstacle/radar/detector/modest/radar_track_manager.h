@@ -33,20 +33,20 @@ public:
     RadarTrackManager() {}
     ~RadarTrackManager() {}
 
-    void Process(const SensorObjects &obs_array);
+  void Process(const SensorObjects &radar_obs);
 
     // update tracking state using kalman filter
-    void Update(SensorObjects &obs_array);
+    void Update(SensorObjects &radar_obs);
 
     // match observations to existed tracking states by ID
     void AssignTrackObsIdMatch(
-        const SensorObjects& obs_array,
+        const SensorObjects &radar_obs,
         std::vector<std::pair<int, int> > &assignment,
         std::vector<int> &unassigned_track,
         std::vector<int> &unassigned_obs);
 
     void UpdateAssignedTrack(
-        const SensorObjects& obs_array,
+        const SensorObjects &radar_obs,
         const std::vector<std::pair<int, int> > &assignment);
 
     // update tracking states which fail to find a observation match (set to NULL)
@@ -57,15 +57,15 @@ public:
     void DeleteLostTrack();
 
     void CreateNewTrack(
-        const SensorObjects& obs_array,
+        const SensorObjects &radar_obs,
         std::vector<int>& unassigned_obs);
 
     double DistanceBetweenObs(
         const Object& obs1, double timestamp1,
         const Object& obs2, double timestamp2);
 
-    SensorObjects& GetRadarFrame() {
-        return radar_obs_array_;
+  SensorObjects &GetRadarObs() {
+    return radar_obs_;
     }
 
     std::vector<RadarTrack>& GetTracks() {
@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    SensorObjects radar_obs_array_;
+  SensorObjects radar_obs_;
     std::vector<RadarTrack> obs_track_;
 };
 

@@ -137,6 +137,36 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "perception_obstacle_fusion_subnode",
+    srcs = [
+        "fusion_subnode.cc",
+    ],
+    hdrs = [
+        "fusion_subnode.h",
+        "object_shared_data.h",
+    ],
+    deps = [
+        ":perception_obstacle_hdmapinput",
+        "//modules/common",
+        "//modules/common:log",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/common:perception_common",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
+        "@eigen//:eigen",
+        "@gtest//:gtest",
+        "@ros//:ros_common",
+    ],
+)
+
 cc_test(
     name = "perception_obstacle_hdmap_input_test",
     size = "small",

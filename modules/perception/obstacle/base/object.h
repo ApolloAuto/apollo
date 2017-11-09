@@ -27,6 +27,7 @@
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/perception/obstacle/base/object_supplement.h"
 
 namespace apollo {
 namespace perception {
@@ -85,6 +86,9 @@ struct alignas(16) Object {
   // noise covariance matrix for uncertainty of position and velocity
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
+
+  //sensor particular suplplements, default nullptr
+  RadarSupplementPtr radar_supplement = nullptr;
 };
 
 typedef std::shared_ptr<Object> ObjectPtr;

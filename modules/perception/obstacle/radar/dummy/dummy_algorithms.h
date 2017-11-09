@@ -33,10 +33,10 @@ class DummyRadarDetector : public BaseRadarDetector {
     return result_init_;
   }
 
-  bool Detect(const RadarObsArray& raw_obstacles,
-            const std::vector<PolygonDType>& map_polygons,
-            const RadarDetectorOptions& options,
-            std::vector<ObjectPtr>* objects) override;
+  bool Detect(const RadarObsArray &raw_obstacles,
+              const std::vector<PolygonDType> &map_polygons,
+              const RadarDetectorOptions &options,
+              std::vector<ObjectPtr> *objects) override;
 
   std::string name() const override {
     return "DummyRadarDetector";
@@ -47,7 +47,7 @@ class DummyRadarDetector : public BaseRadarDetector {
   bool result_init_ = true;
   bool result_detect_ = true;
 
-  DISALLOW_COPY_AND_ASSIGN(DummyRadarDetector);
+ DISALLOW_COPY_AND_ASSIGN(DummyRadarDetector);
 };
 
 REGISTER_RADARDETECTOR(DummyRadarDetector);
