@@ -11,6 +11,7 @@ cc_library(
         "shared_data_manager.cc",
         "subnode.cc",
         "subnode_helper.cc",
+        "transform_input.cc"
     ],
     hdrs = [
         "common_shared_data.h",
@@ -20,6 +21,7 @@ cc_library(
         "shared_data_manager.h",
         "subnode.h",
         "subnode_helper.h",
+        "transform_input.h",
         "types.h",
     ],
     deps = [
@@ -29,6 +31,9 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/onboard/proto:dag_proto",
         "//modules/perception/common:perception_common",
+        "//modules/common/adapters:adapter_manager",
+        "@eigen//:eigen",
+        "@ros//:ros_common",
     ],
 )
 
