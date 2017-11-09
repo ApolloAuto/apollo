@@ -123,6 +123,7 @@ MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
 }
 
 bool MapService::ReloadMap() {
+  boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
   const bool ret = HDMapUtil::ReloadMaps();
   hdmap_ = HDMapUtil::BaseMapPtr();
   sim_map_ = use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
@@ -131,8 +132,9 @@ bool MapService::ReloadMap() {
 
 MapElementIds MapService::CollectMapElementIds(const PointENU &point,
                                                double radius) const {
-  MapElementIds result;
+  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
+  MapElementIds result;
   std::vector<LaneInfoConstPtr> lanes;
   if (sim_map_->GetLanes(point, radius, &lanes) != 0) {
     AERROR << "Fail to get lanes from sim_map.";
@@ -175,6 +177,8 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
 }
 
 Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
+  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+
   Map result;
   Id map_id;
 
@@ -240,10 +244,12 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 bool MapService::GetNearestLane(const double x, const double y,
                                 LaneInfoConstPtr *nearest_lane,
                                 double *nearest_s, double *nearest_l) const {
+  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+
   PointENU point;
   point.set_x(x);
   point.set_y(y);
-  if (BaseMap().GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
+  if (hdmap_->GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
     AERROR << "Failed to get nearest lane!";
     return false;
   }
@@ -315,6 +321,8 @@ bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
 
 bool MapService::AddPathFromPassageRegion(
     const routing::Passage &passage_region, std::vector<Path> *paths) const {
+  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+
   RouteSegments segments;
   for (const auto &segment : passage_region.segment()) {
     auto lane_ptr = hdmap_->GetLaneById(hdmap::MakeMapId(segment.id()));
