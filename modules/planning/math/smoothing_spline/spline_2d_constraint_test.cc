@@ -36,8 +36,8 @@ TEST(Spline2dConstraint, add_boundary_01) {
   std::vector<double> angle = {0.0};
   std::vector<Vec2d> ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> longitidinal_bound = {1.0};
-  std::vector<double> lateral_bound = {2.0};
+  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> longitidinal_bound = {2.0};
 
   constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
                            lateral_bound);
@@ -78,8 +78,8 @@ TEST(Spline2dConstraint, add_boundary_02) {
   std::vector<double> angle = {0.2};
   std::vector<Vec2d> ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> longitidinal_bound = {1.0};
-  std::vector<double> lateral_bound = {2.0};
+  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> longitidinal_bound = {2.0};
 
   constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
                            lateral_bound);
@@ -120,8 +120,8 @@ TEST(Spline2dConstraint, add_boundary_03) {
   std::vector<double> angle = {0.2};
   std::vector<Vec2d> ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> longitidinal_bound = {1.0};
-  std::vector<double> lateral_bound = {2.0};
+  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> longitidinal_bound = {2.0};
 
   constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
                            lateral_bound);

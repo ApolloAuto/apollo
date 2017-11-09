@@ -291,10 +291,9 @@ void ReferenceLineProvider::GetAnchorPoints(
     auto &last_anchor = anchor_points->back();
     auto ref_point = reference_line.GetReferencePoint(s);
     last_anchor.path_point = ref_point.ToPathPoint(s);
-    // TODO(zhangliangliang): change the langitudianl and lateral direction in
-    // code
-    last_anchor.longitudinal_bound = smoother_config_.lateral_boundary_bound();
-    last_anchor.lateral_bound = smoother_config_.longitudinal_boundary_bound();
+    last_anchor.longitudinal_bound =
+        smoother_config_.longitudinal_boundary_bound();
+    last_anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
   }
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
