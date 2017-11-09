@@ -87,8 +87,8 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
     last_anchor.path_point = ref_point.ToPathPoint(s);
     // TODO(zhangliangliang): change the langitudianl and lateral direction in
     // code
-    last_anchor.longitudinal_bound = 2.0;
-    last_anchor.lateral_bound = 0.2;
+    last_anchor.lateral_bound = 2.0;
+    last_anchor.longitudinal_bound = 0.2;
   }
   anchor_points.front().longitudinal_bound = 1e-6;
   anchor_points.front().lateral_bound = 1e-6;
