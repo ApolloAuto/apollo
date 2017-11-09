@@ -23,20 +23,21 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-/**@brief The timer to measure the time has elapsed. 
-  * The accuracy is milisecond. */
+/**@brief The timer to measure the time has elapsed.
+ * The accuracy is milisecond. */
 class Timer {
  public:
   /**@brief The constructor. */
   Timer();
   /**@brief Start the timer. */
   void Start();
-  /**@brief End the timer. 
+  /**@brief End the timer.
    * This function will automatically start a new timer
    * at the end of function call.
    * <title> The title in the output message.
    * Use NULL if there is no title. */
-  void End(const char * title);
+  void End(const char* title);
+
  private:
   boost::posix_time::ptime start_time_;
   boost::posix_time::ptime end_time_;
@@ -49,21 +50,22 @@ class TimeAccumulator {
   /**@brief Start the timer. */
   void Start();
   /**@brief End the timer and print a message. Use NULL if no message. */
-  void End(const char * title = NULL);
+  void End(const char* title = NULL);
   /**@brief Clear the accumulator. */
   void Clear();
   /**@brief Get the totol duration of the timer.
    * <title> The duration will be output to std::cout.
    * The title is message title. Use NULL if no title.
    */
-  void GetDuration(const char * title);
+  void GetDuration(const char* title);
+
  private:
   boost::posix_time::ptime start_time_;
   boost::posix_time::time_duration duration_;
 };
 
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_TIMER_H_
+#endif  // MODULES_LOCALIZATION_MSF_COMMON_TIMER_H_

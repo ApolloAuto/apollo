@@ -1,38 +1,35 @@
+#include "./velodyne_utility.h"
 #include <pcl/io/pcd_io.h>
 #include <yaml-cpp/yaml.h>
 #include "./pcl_point_types.h"
-#include "./velodyne_utility.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 namespace velodyne {
 
-void LoadPcdPoses(std::string file_path,
-    std::vector<Eigen::Affine3d>& poses,
-    std::vector<double>& timestamps) {
+void LoadPcdPoses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
+                  std::vector<double>& timestamps) {
   std::vector<unsigned int> pcd_indices;
   LoadPcdPoses(file_path, poses, timestamps, pcd_indices);
 }
 
-void LoadPcdPoses(std::string file_path,
-    std::vector<Eigen::Affine3d>& poses,
-    std::vector<double>& timestamps, 
-    std::vector<unsigned int>& pcd_indices) {
+void LoadPcdPoses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
+                  std::vector<double>& timestamps,
+                  std::vector<unsigned int>& pcd_indices) {
   poses.clear();
   timestamps.clear();
   pcd_indices.clear();
 
-  FILE * file = fopen(file_path.c_str(), "r");
+  FILE* file = fopen(file_path.c_str(), "r");
   if (file) {
     unsigned int index;
     double timestamp;
     double x, y, z;
     double qx, qy, qz, qr;
     int size = 9;
-    while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n",
-        &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9) {
-
+    while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
+                          &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
       Eigen::Quaterniond quat(qr, qx, qy, qz);
       poses.push_back(trans * quat);
@@ -40,8 +37,7 @@ void LoadPcdPoses(std::string file_path,
       pcd_indices.push_back(index);
     }
     fclose(file);
-  }
-  else {
+  } else {
     std::cerr << "Can't open file to read: " << file_path << std::endl;
   }
 }
@@ -71,19 +67,19 @@ bool LoadExtrinsic(std::string file_path, Eigen::Affine3d& extrinsic) {
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["translation"]) {
-      extrinsic.translation()(0)
-          = config["transform"]["translation"]["x"].as<double>();
-      extrinsic.translation()(1)
-          = config["transform"]["translation"]["y"].as<double>();
-      extrinsic.translation()(2)
-          = config["transform"]["translation"]["z"].as<double>();
+      extrinsic.translation()(0) =
+          config["transform"]["translation"]["x"].as<double>();
+      extrinsic.translation()(1) =
+          config["transform"]["translation"]["y"].as<double>();
+      extrinsic.translation()(2) =
+          config["transform"]["translation"]["z"].as<double>();
       if (config["transform"]["rotation"]) {
         double qx = config["transform"]["rotation"]["x"].as<double>();
         double qy = config["transform"]["rotation"]["y"].as<double>();
         double qz = config["transform"]["rotation"]["z"].as<double>();
         double qw = config["transform"]["rotation"]["w"].as<double>();
-        extrinsic.linear()
-            = Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
+        extrinsic.linear() =
+            Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
         return true;
       }
     }
@@ -91,23 +87,18 @@ bool LoadExtrinsic(std::string file_path, Eigen::Affine3d& extrinsic) {
   return false;
 }
 
-void LoadPcds(std::string file_path, 
-        unsigned int frame_index,
-        const Eigen::Affine3d& pose,
-        VelodyneFrame& velodyne_frame, 
-        bool is_global) {
+void LoadPcds(std::string file_path, unsigned int frame_index,
+              const Eigen::Affine3d& pose, VelodyneFrame& velodyne_frame,
+              bool is_global) {
   velodyne_frame.frame_index = frame_index;
   velodyne_frame.pose = pose;
-  LoadPcds(file_path, frame_index, pose, velodyne_frame.pt3ds, 
-      velodyne_frame.intensities, is_global);
+  LoadPcds(file_path, frame_index, pose, velodyne_frame.pt3ds,
+           velodyne_frame.intensities, is_global);
 }
 
-void LoadPcds(std::string file_path, 
-    unsigned int frame_index,
-    const Eigen::Affine3d& pose,
-    std::vector<Eigen::Vector3d>& pt3ds, 
-    std::vector<unsigned char>& intensities,
-    bool is_global) {    
+void LoadPcds(std::string file_path, unsigned int frame_index,
+              const Eigen::Affine3d& pose, std::vector<Eigen::Vector3d>& pt3ds,
+              std::vector<unsigned char>& intensities, bool is_global) {
   Eigen::Affine3d pose_inv = pose.inverse();
   pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
   if (pcl::io::loadPCDFile(file_path, *cloud) >= 0) {
@@ -123,12 +114,11 @@ void LoadPcds(std::string file_path,
           Eigen::Vector3d pt3d_local;
           if (is_global) {
             pt3d_local = pose_inv * pt3d;
-          }
-          else {
+          } else {
             pt3d_local = pt3d;
           }
-          unsigned char intensity
-              = static_cast<unsigned char>((*cloud)[i].intensity);
+          unsigned char intensity =
+              static_cast<unsigned char>((*cloud)[i].intensity);
           pt3ds.push_back(pt3d_local);
           intensities.push_back(intensity);
         }
@@ -140,30 +130,27 @@ void LoadPcds(std::string file_path,
           double y = cloud->at(w, h).y;
           double z = cloud->at(w, h).z;
           Eigen::Vector3d pt3d(x, y, z);
-            if (pt3d[0] == pt3d[0] && pt3d[1] == pt3d[1]
-                && pt3d[2] == pt3d[2]) {
-              Eigen::Vector3d pt3d_local;
-              if (is_global) {
-                pt3d_local = pose_inv * pt3d;
-              }
-              else {
-                pt3d_local = pt3d;
-              }
-              unsigned char intensity
-                  = static_cast<unsigned char>(cloud->at(w, h).intensity);
-              pt3ds.push_back(pt3d_local);
-              intensities.push_back(intensity);
+          if (pt3d[0] == pt3d[0] && pt3d[1] == pt3d[1] && pt3d[2] == pt3d[2]) {
+            Eigen::Vector3d pt3d_local;
+            if (is_global) {
+              pt3d_local = pose_inv * pt3d;
+            } else {
+              pt3d_local = pt3d;
             }
+            unsigned char intensity =
+                static_cast<unsigned char>(cloud->at(w, h).intensity);
+            pt3ds.push_back(pt3d_local);
+            intensities.push_back(intensity);
           }
         }
       }
-  }
-  else {
+    }
+  } else {
     std::cerr << "Failed to load PCD file: " << file_path << "." << std::endl;
   }
 }
 
-} // namespace velodyne
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace velodyne
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

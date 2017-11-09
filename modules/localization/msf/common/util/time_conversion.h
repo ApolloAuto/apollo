@@ -25,7 +25,9 @@ namespace util {
 
 // array_size(a) returns the number of elements in a.
 template <class T, size_t N>
-constexpr size_t ArraySize(T (&)[N]) { return N; }
+constexpr size_t ArraySize(T (&)[N]) {
+  return N;
+}
 
 // Leap seconds change every a few years. See below for details.
 // http://www.leapsecond.com/java/gpsclock.htm
@@ -44,14 +46,14 @@ constexpr size_t ArraySize(T (&)[N]) { return N; }
 
 // A table of when a leap second is inserted and cumulative leap seconds.
 static constexpr int32_t LEAP_SECONDS[][2] = {
-  // UNIX time, leap seconds
-  // Add future leap seconds here.
-  {1483228800, 18},  // 2017-01-01
-  {1435708800, 17},  // 2015-07-01
-  {1341100800, 16},  // 2012-07-01
-  {1230768000, 15},  // 2009-01-01
-  {1136073600, 14},  // 2006-01-01
-  // We do not have any data before 2016, do we?
+    // UNIX time, leap seconds
+    // Add future leap seconds here.
+    {1483228800, 18},  // 2017-01-01
+    {1435708800, 17},  // 2015-07-01
+    {1341100800, 16},  // 2012-07-01
+    {1230768000, 15},  // 2009-01-01
+    {1136073600, 14},  // 2006-01-01
+                       // We do not have any data before 2016, do we?
 };
 
 // This is number of seconds that UNIX is ahead of GPS, without leap seconds.
@@ -73,12 +75,12 @@ T UnixToGpsSeconds(T unix_seconds) {
 
 inline int64_t UnixToGpsMicroSeconds(int64_t unix_microseconds) {
   return UnixToGpsSeconds(unix_microseconds / ONE_MILLION) * ONE_MILLION +
-      unix_microseconds % ONE_MILLION;
+         unix_microseconds % ONE_MILLION;
 }
 
 inline int64_t UnixToGpsNanoSeconds(int64_t unix_nanoseconds) {
   return UnixToGpsSeconds(unix_nanoseconds / ONE_BILLION) * ONE_BILLION +
-      unix_nanoseconds % ONE_BILLION;
+         unix_nanoseconds % ONE_BILLION;
 }
 
 template <typename T>
@@ -94,16 +96,16 @@ T GpsToUnixSeconds(T gps_seconds) {
 
 inline int64_t GpsToUnixMicroSeconds(int64_t gps_microseconds) {
   return GpsToUnixSeconds(gps_microseconds / ONE_MILLION) * ONE_MILLION +
-      gps_microseconds % ONE_MILLION;
+         gps_microseconds % ONE_MILLION;
 }
 
 inline int64_t GpsToUnixNanoSeconds(int64_t gps_nanoseconds) {
   return GpsToUnixSeconds(gps_nanoseconds / ONE_BILLION) * ONE_BILLION +
-      gps_nanoseconds % ONE_BILLION;
+         gps_nanoseconds % ONE_BILLION;
 }
 
-} // namespace util
-} // namespace localization
-} // namespace apollo
+}  // namespace util
+}  // namespace localization
+}  // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_UTIL_TIME_CONVERSION_H_
+#endif  // MODULES_LOCALIZATION_MSF_COMMON_UTIL_TIME_CONVERSION_H_

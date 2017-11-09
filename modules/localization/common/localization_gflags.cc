@@ -65,56 +65,43 @@ DEFINE_bool(enable_gps_timestamp, false,
 // DEFINE_double(map_coverage_theshold, 0.9,
 //     "The valid coverage of pointcloud and map.");
 
-DEFINE_string(local_map_name, "local_map",
-    "The path of localization map.");
-DEFINE_string(lidar_extrinsic_file, 
-    "<ros>/share/velodyne_pointcloud/params/"
-    "velodyne64_novatel_extrinsics_example.yaml",
-    "Velodyne extrinsic path for the vehicle in use, "
-    "where <ros> is the placeholder of ROS root.");
+DEFINE_string(local_map_name, "local_map", "The path of localization map.");
+DEFINE_string(lidar_extrinsic_file,
+              "<ros>/share/velodyne_pointcloud/params/"
+              "velodyne64_novatel_extrinsics_example.yaml",
+              "Velodyne extrinsic path for the vehicle in use, "
+              "where <ros> is the placeholder of ROS root.");
 DEFINE_string(lidar_height_file,
-    "<ros>/share/velodyne_pointcloud/params/"
-    "velodyne64_height_example.yaml",
-    "Velodyne extrinsic path for the vehicle in use, "
-    "where <ros> is the placeholder of ROS root.");
-DEFINE_int32(lidar_localization_mode, 2,
+              "<ros>/share/velodyne_pointcloud/params/"
+              "velodyne64_height_example.yaml",
+              "Velodyne extrinsic path for the vehicle in use, "
+              "where <ros> is the placeholder of ROS root.");
+DEFINE_int32(
+    lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
-    "Lidar msg and imu msg max delay time");
-DEFINE_double(lidar_map_coverage_theshold, 0.9, 
-    "Threshold to detect wether vehicle is out of map");
-DEFINE_bool(lidar_debug_log_flag, false, 
-    "Lidar Debug switch.");
+              "Lidar msg and imu msg max delay time");
+DEFINE_double(lidar_map_coverage_theshold, 0.9,
+              "Threshold to detect wether vehicle is out of map");
+DEFINE_bool(lidar_debug_log_flag, false, "Lidar Debug switch.");
 
 // integ module
-DEFINE_bool(integ_ins_can_self_align, false,
-    "");
-DEFINE_bool(integ_sins_align_with_vel, true,
-    "");
-DEFINE_double(vel_threshold_get_yaw, 5.0,
-    "");
-DEFINE_bool(integ_debug_log_flag, false,
-    "");
-DEFINE_string(extrinsic_imu_gnss_filename, "", 
-    "");
+DEFINE_bool(integ_ins_can_self_align, false, "");
+DEFINE_bool(integ_sins_align_with_vel, true, "");
+DEFINE_double(vel_threshold_get_yaw, 5.0, "");
+DEFINE_bool(integ_debug_log_flag, false, "");
+DEFINE_string(extrinsic_imu_gnss_filename, "", "");
 DEFINE_string(broadcast_tf2_frame_id, "world",
-    "The frame id used to broadcast the localization result.");
+              "The frame id used to broadcast the localization result.");
 DEFINE_string(broadcast_tf2_child_frame_id, "localization_100hz",
-    "The child frame id used to broadcast the localization result.");
+              "The child frame id used to broadcast the localization result.");
 
 // gnss module
-DEFINE_bool(enable_ins_aid_rtk, false, 
-    "");
-DEFINE_bool(enable_auto_save_eph_file, true,
-    "");
-DEFINE_string(eph_buffer_path, "",
-    "");
+DEFINE_bool(enable_ins_aid_rtk, false, "");
+DEFINE_bool(enable_auto_save_eph_file, true, "");
+DEFINE_string(eph_buffer_path, "", "");
 
-DEFINE_double(imu_rate, 1.0, 
-    "");
-DEFINE_int32(local_utm_zone_id, 50,
-    "UTM zone id");
-DEFINE_bool(trans_gpstime_to_utctime, true,
-    "");
-DEFINE_int32(gnss_mode, 1,
-    "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
+DEFINE_double(imu_rate, 1.0, "");
+DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
+DEFINE_bool(trans_gpstime_to_utctime, true, "");
+DEFINE_int32(gnss_mode, 1, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");

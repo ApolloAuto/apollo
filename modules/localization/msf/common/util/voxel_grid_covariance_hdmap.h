@@ -17,28 +17,23 @@
 #ifndef MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_
 #define MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_
 
-#include <map>
 #include <pcl/common/common.h>
 #include <pcl/filters/boost.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree_flann.h>
-#include <Eigen/Dense>
 #include <Eigen/Cholesky>
+#include <Eigen/Dense>
+#include <map>
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-template<typename PointT>
-class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
-{
+template <typename PointT>
+class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
  public:
-  enum LeafType {
-    FEW,
-    BAD,
-    PLANE,
-    LINE
-  };
+  enum LeafType { FEW, BAD, PLANE, LINE };
+
  protected:
   using pcl::VoxelGrid<PointT>::filter_name_;
   using pcl::VoxelGrid<PointT>::getClassName;
@@ -65,19 +60,18 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   typedef typename PointCloud::ConstPtr PointCloudConstPtr;
 
  public:
-  typedef boost::shared_ptr< pcl::VoxelGrid<PointT> > Ptr;
-  typedef boost::shared_ptr< const pcl::VoxelGrid<PointT> > ConstPtr;
+  typedef boost::shared_ptr<pcl::VoxelGrid<PointT>> Ptr;
+  typedef boost::shared_ptr<const pcl::VoxelGrid<PointT>> ConstPtr;
 
   struct Leaf {
-    Leaf() :
-      nr_points_(0),
-      mean_(Eigen::Vector3d::Zero ()),
-      centroid(),
-      cov_(Eigen::Matrix3d::Identity ()),
-      icov_(Eigen::Matrix3d::Zero ()),
-      evecs_(Eigen::Matrix3d::Identity ()),
-      evals_(Eigen::Vector3d::Zero ()) {
-    }
+    Leaf()
+        : nr_points_(0),
+          mean_(Eigen::Vector3d::Zero()),
+          centroid(),
+          cov_(Eigen::Matrix3d::Identity()),
+          icov_(Eigen::Matrix3d::Zero()),
+          evecs_(Eigen::Matrix3d::Identity()),
+          evals_(Eigen::Vector3d::Zero()) {}
 
     // Get the voxel covariance.
     Eigen::Matrix3d GetCov() const {
@@ -139,14 +133,14 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   typedef const Leaf* LeafConstPtr;
 
  public:
-  VoxelGridCovariance() :
-    searchable_(true),
-    min_points_per_voxel_(6),
-    min_covar_eigvalue_mult_(0.01),
-    leaves_(),
-    voxel_centroids_(),
-    voxel_centroidsleaf_indices_(),
-    kdtree_() {
+  VoxelGridCovariance()
+      : searchable_(true),
+        min_points_per_voxel_(6),
+        min_covar_eigvalue_mult_(0.01),
+        leaves_(),
+        voxel_centroids_(),
+        voxel_centroidsleaf_indices_(),
+        kdtree_() {
     downsample_all_data_ = false;
     save_leaf_layout_ = false;
     leaf_size_.setZero();
@@ -161,7 +155,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
       min_points_per_voxel_ = min_points_per_voxel;
     } else {
       PCL_WARN("%s, Covariance need 3 pts, set min_pt_per_vexel to 3",
-          this->getClassName().c_str());
+               this->getClassName().c_str());
       min_points_per_voxel_ = 3;
     }
   }
@@ -181,7 +175,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   }
 
   // Filter cloud and initializes voxel structure.
-  inline void Filter (PointCloud& output, bool searchable = false) {
+  inline void Filter(PointCloud& output, bool searchable = false) {
     searchable_ = searchable;
     ApplyFilter(output);
     voxel_centroids_ = PointCloudPtr(new PointCloud(output));
@@ -214,12 +208,9 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   // Get the voxel containing point p.
   inline LeafConstPtr GetLeaf(PointT& p) {
     // Generate index associated with p
-    int ijk0 = static_cast<int>
-        (floor(p.x * inverse_leaf_size_[0]) - min_b_[0]);
-    int ijk1 = static_cast<int>
-        (floor(p.y * inverse_leaf_size_[1]) - min_b_[1]);
-    int ijk2 = static_cast<int>
-        (floor(p.z * inverse_leaf_size_[2]) - min_b_[2]);
+    int ijk0 = static_cast<int>(floor(p.x * inverse_leaf_size_[0]) - min_b_[0]);
+    int ijk1 = static_cast<int>(floor(p.y * inverse_leaf_size_[1]) - min_b_[1]);
+    int ijk2 = static_cast<int>(floor(p.z * inverse_leaf_size_[2]) - min_b_[2]);
 
     // Compute the centroid leaf index
     int idx = ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
@@ -236,14 +227,14 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   }
 
   // Get the voxel containing point p.
-  inline LeafConstPtr GetLeaf (Eigen::Vector3f& p) {
+  inline LeafConstPtr GetLeaf(Eigen::Vector3f& p) {
     // Generate index associated with p
-    int ijk0 = static_cast<int>
-        (floor(p[0] * inverse_leaf_size_[0]) - min_b_[0]);
-    int ijk1 = static_cast<int>
-        (floor(p[1] * inverse_leaf_size_[1]) - min_b_[1]);
-    int ijk2 = static_cast<int>
-        (floor(p[2] * inverse_leaf_size_[2]) - min_b_[2]);
+    int ijk0 =
+        static_cast<int>(floor(p[0] * inverse_leaf_size_[0]) - min_b_[0]);
+    int ijk1 =
+        static_cast<int>(floor(p[1] * inverse_leaf_size_[1]) - min_b_[1]);
+    int ijk2 =
+        static_cast<int>(floor(p[2] * inverse_leaf_size_[2]) - min_b_[2]);
 
     // Compute the centroid leaf index
     int idx = ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
@@ -260,7 +251,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   }
   // Get the voxels surrounding point p.
   int GetNeighborhoodAtPoint(const PointT& reference_point,
-      std::vector<LeafConstPtr> &neighbors) {
+                             std::vector<LeafConstPtr>& neighbors) {
     neighbors.clear();
     // Find displacement coordinates
     Eigen::MatrixXi relative_coordinates = pcl::getAllNeighborCellIndices();
@@ -289,7 +280,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
       }
     }
 
-    return (static_cast<int> (neighbors.size()));
+    return (static_cast<int>(neighbors.size()));
   }
 
   // Get the leaf structure map.
@@ -309,7 +300,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
     int pnt_per_cell = 1000;
     boost::mt19937 rng;
     boost::normal_distribution<> nd(0.0, leaf_size_.head(3).norm());
-    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<>>
         var_nor(rng, nd);
 
     Eigen::LLT<Eigen::Matrix3d> llt_of_cov;
@@ -320,7 +311,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
 
     // Generate points for each occupied voxel with sufficient points.
     for (typename std::map<size_t, Leaf>::iterator it = leaves_.begin();
-        it != leaves_.end(); ++it) {
+         it != leaves_.end(); ++it) {
       Leaf& leaf = it->second;
       if (leaf.nr_points_ >= min_points_per_voxel_) {
         cell_mean = leaf.mean_;
@@ -329,19 +320,19 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
         for (int i = 0; i < pnt_per_cell; i++) {
           rand_point = Eigen::Vector3d(var_nor(), var_nor(), var_nor());
           dist_point = cell_mean + cholesky_decomp * rand_point;
-          cell_cloud.push_back(pcl::PointXYZ(
-              static_cast<float>(dist_point(0)),
-              static_cast<float>(dist_point(1)),
-              static_cast<float>(dist_point(2))));
+          cell_cloud.push_back(
+              pcl::PointXYZ(static_cast<float>(dist_point(0)),
+                            static_cast<float>(dist_point(1)),
+                            static_cast<float>(dist_point(2))));
         }
       }
     }
   }
 
   // Search for the k-nearest occupied voxels for the given query point.
-  int NearestKsearch(const PointT &point, int k,
-      std::vector<LeafConstPtr> &k_leaves,
-      std::vector<float> &k_sqr_distances) {
+  int NearestKsearch(const PointT& point, int k,
+                     std::vector<LeafConstPtr>& k_leaves,
+                     std::vector<float>& k_sqr_distances) {
     k_leaves.clear();
 
     // Check if kdtree has been built
@@ -357,26 +348,27 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
     // Find leaves corresponding to neighbors
     k_leaves.reserve(k);
     for (std::vector<int>::iterator iter = k_indices.begin();
-        iter != k_indices.end(); iter++) {
+         iter != k_indices.end(); iter++) {
       k_leaves.push_back(&leaves_[voxel_centroidsleaf_indices_[*iter]]);
     }
     return k;
   }
 
   // Search for the k-nearest occupied voxels for the given query point.
-  inline int NearestKsearch(const PointCloud &cloud, int index, int k,
-      std::vector<LeafConstPtr> &k_leaves,
-      std::vector<float> &k_sqr_distances) {
-    if (index >= static_cast<int> (cloud.points.size()) || index < 0) {
-        return (0);
+  inline int NearestKsearch(const PointCloud& cloud, int index, int k,
+                            std::vector<LeafConstPtr>& k_leaves,
+                            std::vector<float>& k_sqr_distances) {
+    if (index >= static_cast<int>(cloud.points.size()) || index < 0) {
+      return (0);
     }
     return NearestKsearch(cloud.points[index], k, k_leaves, k_sqr_distances);
   }
 
   // Search for all the nearest occupied voxels in a given radius.
-  int RadiusSearch(const PointT &point, double radius,
-      std::vector<LeafConstPtr> &k_leaves,
-      std::vector<float> &k_sqr_distances, unsigned int max_nn = 0) {
+  int RadiusSearch(const PointT& point, double radius,
+                   std::vector<LeafConstPtr>& k_leaves,
+                   std::vector<float>& k_sqr_distances,
+                   unsigned int max_nn = 0) {
     k_leaves.clear();
 
     // Check if kdtree has been built
@@ -387,28 +379,28 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
 
     // Find neighbors within radius in the occupied voxel centroid cloud
     std::vector<int> k_indices;
-    int k = kdtree_.radiusSearch(point, radius, k_indices,
-        k_sqr_distances, max_nn);
+    int k =
+        kdtree_.radiusSearch(point, radius, k_indices, k_sqr_distances, max_nn);
 
     // Find leaves corresponding to neighbors
     k_leaves.reserve(k);
     for (std::vector<int>::iterator iter = k_indices.begin();
-        iter != k_indices.end(); iter++) {
+         iter != k_indices.end(); iter++) {
       k_leaves.push_back(&leaves_[voxel_centroidsleaf_indices_[*iter]]);
     }
     return k;
   }
 
   // Search for all the nearest occupied voxels of in a given radius.
-  inline int RadiusSearch(const PointCloud &cloud, int index, double radius,
-      std::vector<LeafConstPtr> &k_leaves,
-      std::vector<float> &k_sqr_distances,
-      unsigned int max_nn = 0) {
-    if (index >= static_cast<int> (cloud.points.size()) || index < 0) {
-        return (0);
+  inline int RadiusSearch(const PointCloud& cloud, int index, double radius,
+                          std::vector<LeafConstPtr>& k_leaves,
+                          std::vector<float>& k_sqr_distances,
+                          unsigned int max_nn = 0) {
+    if (index >= static_cast<int>(cloud.points.size()) || index < 0) {
+      return (0);
     }
-    return RadiusSearch(cloud.points[index], radius,
-        k_leaves, k_sqr_distances, max_nn);
+    return RadiusSearch(cloud.points[index], radius, k_leaves, k_sqr_distances,
+                        max_nn);
   }
 
  private:
@@ -419,7 +411,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
     // Has the input dataset been set already?
     if (!input_) {
       PCL_WARN("[%s::ApplyFilter] No input dataset given!\n",
-          getClassName().c_str());
+               getClassName().c_str());
       output.width = output.height = 0;
       output.points.clear();
       return;
@@ -432,23 +424,24 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
     Eigen::Vector4f min_p, max_p;
     // Get the minimum and maximum dimensions
     if (!filter_field_name_.empty()) {
-      pcl::getMinMax3D<PointT> (input_, filter_field_name_,
-          static_cast<float> (filter_limit_min_),
-          static_cast<float> (filter_limit_max_),
-          min_p, max_p, filter_limit_negative_);
+      pcl::getMinMax3D<PointT>(input_, filter_field_name_,
+                               static_cast<float>(filter_limit_min_),
+                               static_cast<float>(filter_limit_max_), min_p,
+                               max_p, filter_limit_negative_);
     } else {
-      pcl::getMinMax3D<PointT> (*input_, min_p, max_p);
+      pcl::getMinMax3D<PointT>(*input_, min_p, max_p);
     }
     // Check that the leaf size is not too small.
-    int64_t dx = static_cast<int64_t>
-        ((max_p[0] - min_p[0]) * inverse_leaf_size_[0]) + 1;
-    int64_t dy = static_cast<int64_t>
-        ((max_p[1] - min_p[1]) * inverse_leaf_size_[1]) + 1;
-    int64_t dz = static_cast<int64_t>
-        ((max_p[2] - min_p[2]) * inverse_leaf_size_[2]) + 1;
+    int64_t dx =
+        static_cast<int64_t>((max_p[0] - min_p[0]) * inverse_leaf_size_[0]) + 1;
+    int64_t dy =
+        static_cast<int64_t>((max_p[1] - min_p[1]) * inverse_leaf_size_[1]) + 1;
+    int64_t dz =
+        static_cast<int64_t>((max_p[2] - min_p[2]) * inverse_leaf_size_[2]) + 1;
 
     if ((dx * dy * dz) > std::numeric_limits<int32_t>::max()) {
-      PCL_WARN("[%s::ApplyFilter] leaf size is too small. \
+      PCL_WARN(
+          "[%s::ApplyFilter] leaf size is too small. \
           Integer indices would overflow.",
           getClassName().c_str());
       output.clear();
@@ -489,11 +482,13 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
     if (!filter_field_name_.empty()) {
       // Get the distance field index
       std::vector<pcl::PCLPointField> fields;
-      int distance_idx = pcl::getFieldIndex(*input_,
-          filter_field_name_, fields);
+      int distance_idx =
+          pcl::getFieldIndex(*input_, filter_field_name_, fields);
       if (distance_idx == -1) {
-          PCL_WARN("[pcl::%s::ApplyFilter] Invalid filter field name. \
-              Index is %d.\n", getClassName().c_str(), distance_idx);
+        PCL_WARN(
+            "[pcl::%s::ApplyFilter] Invalid filter field name. \
+              Index is %d.\n",
+            getClassName().c_str(), distance_idx);
       }
       // First pass: go over all points and insert them into the right leaf
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {
@@ -506,11 +501,11 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
           }
         }
         // Get the distance value
-        const uint8_t* pt_data
-            = reinterpret_cast<const uint8_t*> (&input_->points[cp]);
+        const uint8_t* pt_data =
+            reinterpret_cast<const uint8_t*>(&input_->points[cp]);
         float distance_value = 0;
-        memcpy(&distance_value,
-            pt_data + fields[distance_idx].offset, sizeof(float));
+        memcpy(&distance_value, pt_data + fields[distance_idx].offset,
+               sizeof(float));
 
         if (filter_limit_negative_) {
           // Use a threshold for cutting out points which inside the interval
@@ -526,18 +521,18 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
           }
         }
 
-        int ijk0 = static_cast<int>
-            (floor(input_->points[cp].x * inverse_leaf_size_[0]) -
+        int ijk0 = static_cast<int>(
+            floor(input_->points[cp].x * inverse_leaf_size_[0]) -
             static_cast<float>(min_b_[0]));
-        int ijk1 = static_cast<int>
-            (floor(input_->points[cp].y * inverse_leaf_size_[1]) -
+        int ijk1 = static_cast<int>(
+            floor(input_->points[cp].y * inverse_leaf_size_[1]) -
             static_cast<float>(min_b_[1]));
-        int ijk2 = static_cast<int>
-            (floor(input_->points[cp].z * inverse_leaf_size_[2]) -
+        int ijk2 = static_cast<int>(
+            floor(input_->points[cp].z * inverse_leaf_size_[2]) -
             static_cast<float>(min_b_[2]));
         // Compute the centroid leaf index
-        int idx = ijk0 * divb_mul_[0] +
-            ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
+        int idx =
+            ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
 
         Leaf& leaf = leaves_[idx];
         if (leaf.nr_points_ == 0) {
@@ -545,12 +540,11 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
           leaf.centroid.setZero();
         }
 
-        //!added by wangcheng
+        //! added by wangcheng
         leaf.cloud_.points.push_back(input_->points[cp]);
 
-        Eigen::Vector3d pt3d(input_->points[cp].x,
-            input_->points[cp].y,
-            input_->points[cp].z);
+        Eigen::Vector3d pt3d(input_->points[cp].x, input_->points[cp].y,
+                             input_->points[cp].z);
         // Accumulate point sum for centroid calculation
         leaf.mean_ += pt3d;
         // Accumulate x*xT for single pass covariance calculation
@@ -558,20 +552,19 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
 
         // Do we need to process all the fields?
         if (!downsample_all_data_) {
-          Eigen::Vector4f pt(input_->points[cp].x,
-              input_->points[cp].y,
-              input_->points[cp].z, 0);
-          leaf.centroid.template head<4> () += pt;
+          Eigen::Vector4f pt(input_->points[cp].x, input_->points[cp].y,
+                             input_->points[cp].z, 0);
+          leaf.centroid.template head<4>() += pt;
         } else {
           // Copy all the fields
           Eigen::VectorXf centroid = Eigen::VectorXf::Zero(centroid_size);
-          pcl::for_each_type<FieldList> (pcl::NdCopyPointEigenFunctor<PointT>(
+          pcl::for_each_type<FieldList>(pcl::NdCopyPointEigenFunctor<PointT>(
               input_->points[cp], centroid));
           // ---[ RGB special case
           if (rgba_index >= 0) {
             // Fill r/g/b data, assuming that the order is BGRA
-            const pcl::RGB& rgb = *reinterpret_cast<const pcl::RGB*> (
-                reinterpret_cast<const char*> (&input_->points[cp]) +
+            const pcl::RGB& rgb = *reinterpret_cast<const pcl::RGB*>(
+                reinterpret_cast<const char*>(&input_->points[cp]) +
                 rgba_index);
             centroid[centroid_size - 4] = rgb.a;
             centroid[centroid_size - 3] = rgb.r;
@@ -582,7 +575,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
         }
         ++leaf.nr_points_;
       }
-    } else {// No distance filtering, process all data
+    } else {  // No distance filtering, process all data
       // First pass: go over all points and insert them into the right leaf
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {
         if (!input_->is_dense) {
@@ -593,19 +586,19 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
             continue;
           }
         }
-        int ijk0 = static_cast<int>
-            (floor(input_->points[cp].x * inverse_leaf_size_[0]) -
+        int ijk0 = static_cast<int>(
+            floor(input_->points[cp].x * inverse_leaf_size_[0]) -
             static_cast<float>(min_b_[0]));
-        int ijk1 = static_cast<int>
-            (floor(input_->points[cp].y * inverse_leaf_size_[1]) -
+        int ijk1 = static_cast<int>(
+            floor(input_->points[cp].y * inverse_leaf_size_[1]) -
             static_cast<float>(min_b_[1]));
-        int ijk2 = static_cast<int>
-            (floor(input_->points[cp].z * inverse_leaf_size_[2]) -
+        int ijk2 = static_cast<int>(
+            floor(input_->points[cp].z * inverse_leaf_size_[2]) -
             static_cast<float>(min_b_[2]));
 
         // Compute the centroid leaf index
-        int idx = ijk0 * divb_mul_[0] +
-            ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
+        int idx =
+            ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
 
         // int idx = (((input_->points[cp].getArray4fmap () *
         // inverse_leaf_size_).template cast<int> ()).matrix ()
@@ -617,12 +610,11 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
           leaf.centroid.setZero();
         }
 
-        //!added by wangcheng
+        //! added by wangcheng
         leaf.cloud_.points.push_back(input_->points[cp]);
 
-        Eigen::Vector3d pt3d(input_->points[cp].x,
-            input_->points[cp].y,
-            input_->points[cp].z);
+        Eigen::Vector3d pt3d(input_->points[cp].x, input_->points[cp].y,
+                             input_->points[cp].z);
         // Accumulate point sum for centroid calculation
         leaf.mean_ += pt3d;
         // Accumulate x*xT for single pass covariance calculation
@@ -630,20 +622,19 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
 
         // Do we need to process all the fields?
         if (!downsample_all_data_) {
-          Eigen::Vector4f pt(input_->points[cp].x,
-              input_->points[cp].y,
-              input_->points[cp].z, 0);
+          Eigen::Vector4f pt(input_->points[cp].x, input_->points[cp].y,
+                             input_->points[cp].z, 0);
           leaf.centroid.template head<4>() += pt;
         } else {
           // Copy all the fields
           Eigen::VectorXf centroid = Eigen::VectorXf::Zero(centroid_size);
-          pcl::for_each_type<FieldList> (pcl::NdCopyPointEigenFunctor<PointT>
-              (input_->points[cp], centroid));
+          pcl::for_each_type<FieldList>(pcl::NdCopyPointEigenFunctor<PointT>(
+              input_->points[cp], centroid));
           // ---[ RGB special case
           if (rgba_index >= 0) {
             // Fill r/g/b data, assuming that the order is BGRA
-            const pcl::RGB& rgb = *reinterpret_cast<const pcl::RGB*> (
-                reinterpret_cast<const char*> (&input_->points[cp]) +
+            const pcl::RGB& rgb = *reinterpret_cast<const pcl::RGB*>(
+                reinterpret_cast<const char*>(&input_->points[cp]) +
                 rgba_index);
             centroid[centroid_size - 4] = rgb.a;
             centroid[centroid_size - 3] = rgb.r;
@@ -675,12 +666,12 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
     double min_covar_eigvalue;
 
     for (typename std::map<size_t, Leaf>::iterator it = leaves_.begin();
-      it != leaves_.end(); ++it) {
+         it != leaves_.end(); ++it) {
       // Normalize the centroid
       Leaf& leaf = it->second;
 
       // Normalize the centroid
-      leaf.centroid /= static_cast<float> (leaf.nr_points_);
+      leaf.centroid /= static_cast<float>(leaf.nr_points_);
       // Point sum used for single pass covariance calculation
       pt_sum = leaf.mean_;
       // Normalize mean
@@ -697,12 +688,12 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
           output.points.back().y = leaf.centroid[1];
           output.points.back().z = leaf.centroid[2];
         } else {
-          pcl::for_each_type<FieldList> (pcl::NdCopyEigenPointFunctor<PointT>
-              (leaf.centroid, output.back()));
+          pcl::for_each_type<FieldList>(pcl::NdCopyEigenPointFunctor<PointT>(
+              leaf.centroid, output.back()));
           // ---[ RGB special case
           if (rgba_index >= 0) {
-            pcl::RGB& rgb = *reinterpret_cast<pcl::RGB*>
-                (reinterpret_cast<char*>(&output.points.back()) + rgba_index);
+            pcl::RGB& rgb = *reinterpret_cast<pcl::RGB*>(
+                reinterpret_cast<char*>(&output.points.back()) + rgba_index);
             rgb.a = leaf.centroid[centroid_size - 4];
             rgb.r = leaf.centroid[centroid_size - 3];
             rgb.g = leaf.centroid[centroid_size - 2];
@@ -712,15 +703,16 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
 
         // Stores the voxel indice for fast access searching
         if (searchable_) {
-          voxel_centroidsleaf_indices_.push_back(static_cast<int> (it->first));
+          voxel_centroidsleaf_indices_.push_back(static_cast<int>(it->first));
         }
 
         // Single pass covariance calculation
         leaf.cov_ = (leaf.cov_ - 2 * (pt_sum * leaf.mean_.transpose())) /
-            leaf.nr_points_ + leaf.mean_ * leaf.mean_.transpose();
+                        leaf.nr_points_ +
+                    leaf.mean_ * leaf.mean_.transpose();
         leaf.cov_ *= (leaf.nr_points_ - 1.0) / leaf.nr_points_;
 
-        //Normalize Eigen Val such that max no more than 100x min.
+        // Normalize Eigen Val such that max no more than 100x min.
         eigensolver.compute(leaf.cov_);
         eigen_val = eigensolver.eigenvalues().asDiagonal();
         leaf.evecs_ = eigensolver.eigenvectors();
@@ -761,7 +753,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   // Minimum allowable ratio between eigenvalues.
   double min_covar_eigvalue_mult_;
 
-  // Voxel structure containing all leaf nodes.       
+  // Voxel structure containing all leaf nodes.
   std::map<size_t, Leaf> leaves_;
 
   /* Point cloud containing centroids of voxels
@@ -776,7 +768,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT>
   pcl::KdTreeFLANN<PointT> kdtree_;
 };
 
-} // msf
-} // localization
-} // apollo
-#endif //MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
+#endif  // MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_

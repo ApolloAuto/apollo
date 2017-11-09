@@ -24,12 +24,12 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-bool system::IsExists(const std::string &path) {
+bool system::IsExists(const std::string& path) {
   boost::filesystem::path p(path);
   return boost::filesystem::exists(p);
 }
 
-bool system::IsDirectory(const std::string &path) {
+bool system::IsDirectory(const std::string& path) {
   boost::filesystem::path p(path);
   return boost::filesystem::is_directory(p);
 }
@@ -45,50 +45,49 @@ bool system::GetFileSize(const std::string& path, unsigned int& size) {
     if (boost::filesystem::is_regular_file(p)) {
       size = boost::filesystem::file_size(p);
       return true;
-    }
-    else {
+    } else {
       return false;
     }
-  }
-  else {
+  } else {
     return false;
   }
 }
 
-bool system::CopyFile(const std::string& src,
-    const std::string& dst, bool is_overwrite) {
+bool system::CopyFile(const std::string& src, const std::string& dst,
+                      bool is_overwrite) {
   boost::filesystem::path path_src(src);
   boost::filesystem::path path_dst(dst);
   boost::system::error_code error;
   if (is_overwrite) {
     boost::filesystem::copy_file(path_src, path_dst,
-        boost::filesystem::copy_option::fail_if_exists, error);
-  }
-  else {
-    boost::filesystem::copy_file(path_src, path_dst,
-        boost::filesystem::copy_option::overwrite_if_exists, error);
+                                 boost::filesystem::copy_option::fail_if_exists,
+                                 error);
+  } else {
+    boost::filesystem::copy_file(
+        path_src, path_dst, boost::filesystem::copy_option::overwrite_if_exists,
+        error);
   }
   if (!error) {
     return true;
-  }
-  else {
+  } else {
     return false;
   }
 }
 
 void system::GetFilesInFolderRecursive(const std::string& folder,
-    const std::string& ext, std::vector<std::string>& ret) {
+                                       const std::string& ext,
+                                       std::vector<std::string>& ret) {
   ret.clear();
   namespace fs = boost::filesystem;
-  if(!fs::exists(folder) || !fs::is_directory(folder)) {
+  if (!fs::exists(folder) || !fs::is_directory(folder)) {
     return;
   }
 
   fs::recursive_directory_iterator it(folder);
   fs::recursive_directory_iterator endit;
 
-  while(it != endit) {
-    if(fs::is_regular_file(*it) && it->path().extension() == ext) {
+  while (it != endit) {
+    if (fs::is_regular_file(*it) && it->path().extension() == ext) {
       ret.push_back(it->path().string());
     }
     ++it;
@@ -96,19 +95,19 @@ void system::GetFilesInFolderRecursive(const std::string& folder,
   std::sort(ret.begin(), ret.end());
 }
 
-void system::GetFilesInFolder(const std::string& folder,
-    const std::string& ext, std::vector<std::string>& ret) {
+void system::GetFilesInFolder(const std::string& folder, const std::string& ext,
+                              std::vector<std::string>& ret) {
   ret.clear();
   namespace fs = boost::filesystem;
-  if(!fs::exists(folder) || !fs::is_directory(folder)) {
+  if (!fs::exists(folder) || !fs::is_directory(folder)) {
     return;
   }
 
   fs::directory_iterator it(folder);
   fs::directory_iterator endit;
 
-  while(it != endit) {
-    if(fs::is_regular_file(*it) && it->path().extension() == ext) {
+  while (it != endit) {
+    if (fs::is_regular_file(*it) && it->path().extension() == ext) {
       ret.push_back(it->path().string());
     }
     ++it;
@@ -117,18 +116,18 @@ void system::GetFilesInFolder(const std::string& folder,
 }
 
 void system::GetFoldersInFolder(const std::string& folder,
-    std::vector<std::string>& ret) {
+                                std::vector<std::string>& ret) {
   ret.clear();
   namespace fs = boost::filesystem;
-  if(!fs::exists(folder) || !fs::is_directory(folder)) {
+  if (!fs::exists(folder) || !fs::is_directory(folder)) {
     return;
   }
 
   fs::directory_iterator it(folder);
   fs::directory_iterator endit;
 
-  while(it != endit) {
-    if(fs::is_directory(*it)) {
+  while (it != endit) {
+    if (fs::is_directory(*it)) {
       ret.push_back(it->path().string());
     }
     ++it;
@@ -136,6 +135,6 @@ void system::GetFoldersInFolder(const std::string& folder,
   std::sort(ret.begin(), ret.end());
 }
 
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

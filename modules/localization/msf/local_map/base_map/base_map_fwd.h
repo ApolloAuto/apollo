@@ -25,8 +25,8 @@ class MapNodeIndex;
 /**@brief The memory pool for the data structure of BaseMapNode. */
 class BaseMapNodePool;
 
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_FWD_H
+#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_FWD_H

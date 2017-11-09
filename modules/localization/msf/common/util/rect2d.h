@@ -33,7 +33,7 @@ class Rect2D {
   /**@brief Copy constructor. */
   Rect2D(const Rect2D<T>& ref);
   /**@brief Overloading the operator =. */
-  Rect2D<T>& operator = (const Rect2D<T>& ref);
+  Rect2D<T>& operator=(const Rect2D<T>& ref);
   /**@brief Get the min x of the rectangle. */
   T GetMinX() const;
   /**@brief Get the min y of the rectangle. */
@@ -53,13 +53,11 @@ class Rect2D {
 };
 
 template <typename T>
-Rect2D<T>::Rect2D() {
-}
+Rect2D<T>::Rect2D() {}
 
 template <typename T>
-Rect2D<T>::Rect2D(T min_x, T min_y, T max_x, T max_y): 
-    _data(min_x, min_y, max_x, max_y) {
-}
+Rect2D<T>::Rect2D(T min_x, T min_y, T max_x, T max_y)
+    : _data(min_x, min_y, max_x, max_y) {}
 
 template <typename T>
 Rect2D<T>::Rect2D(const Rect2D<T>& ref) {
@@ -67,8 +65,7 @@ Rect2D<T>::Rect2D(const Rect2D<T>& ref) {
 }
 
 template <typename T>
-Rect2D<T>& Rect2D<T>::operator = (
-    const Rect2D<T>& ref) {
+Rect2D<T>& Rect2D<T>::operator=(const Rect2D<T>& ref) {
   _data = ref._data;
   return *this;
 }
@@ -109,8 +106,8 @@ Eigen::Matrix<T, 2, 1> Rect2D<T>::GetRightBottomCorner() const {
   return corner;
 }
 
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
+#endif  // MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_

@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/compression.h"
-#include <cstdio>
 #include <assert.h>
 #include <zlib.h>
+#include <cstdio>
 
 namespace apollo {
 namespace localization {
@@ -25,24 +25,22 @@ namespace msf {
 
 const unsigned int ZlibStrategy::zlib_chunk = 16384;
 
-unsigned int ZlibStrategy::Encode(BufferStr& buf,
-    BufferStr& buf_compressed) {
+unsigned int ZlibStrategy::Encode(BufferStr& buf, BufferStr& buf_compressed) {
   return ZlibCompress(buf, buf_compressed);
 }
 
-unsigned int ZlibStrategy::Decode(BufferStr& buf,
-    BufferStr& buf_uncompressed) {
+unsigned int ZlibStrategy::Decode(BufferStr& buf, BufferStr& buf_uncompressed) {
   return ZlibUncompress(buf, buf_uncompressed);
 }
 
 unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
-    std::vector<unsigned char>& dst) {
-  dst.resize(zlib_chunk*2);
+                                        std::vector<unsigned char>& dst) {
+  dst.resize(zlib_chunk * 2);
   int ret, flush;
   unsigned have;
   z_stream strm;
-  unsigned char *in = &src[0];
-  unsigned char *out = &dst[0];
+  unsigned char* in = &src[0];
+  unsigned char* out = &dst[0];
   unsigned int src_idx = 0;
   unsigned int dst_idx = 0;
 
@@ -51,17 +49,15 @@ unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
   strm.zfree = Z_NULL;
   strm.opaque = Z_NULL;
   ret = deflateInit(&strm, Z_BEST_SPEED);
-  if (ret != Z_OK)
-    return ret;
+  if (ret != Z_OK) return ret;
 
   /* compress until end of file */
   do {
     in = &src[src_idx];
     if (src.size() - src_idx > zlib_chunk) {
-        strm.avail_in = zlib_chunk;
+      strm.avail_in = zlib_chunk;
       flush = Z_NO_FLUSH;
-    }
-    else {
+    } else {
       strm.avail_in = src.size() - src_idx;
       flush = Z_FINISH;
     }
@@ -73,20 +69,20 @@ unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
     do {
       strm.avail_out = zlib_chunk;
       strm.next_out = out;
-      ret = deflate(&strm, flush);    /* no bad return value */
-      assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
+      ret = deflate(&strm, flush);   /* no bad return value */
+      assert(ret != Z_STREAM_ERROR); /* state not clobbered */
       have = zlib_chunk - strm.avail_out;
       dst_idx += have;
-      if (dst_idx + zlib_chunk> dst.size()) {
-        dst.resize(dst_idx + zlib_chunk*2);
+      if (dst_idx + zlib_chunk > dst.size()) {
+        dst.resize(dst_idx + zlib_chunk * 2);
       }
       out = &dst[dst_idx];
     } while (strm.avail_out == 0);
-    assert(strm.avail_in == 0);     /* all input will be used */
+    assert(strm.avail_in == 0); /* all input will be used */
 
     /* done when last data in file processed */
   } while (flush != Z_FINISH);
-  assert(ret == Z_STREAM_END);        /* stream will be complete */
+  assert(ret == Z_STREAM_END); /* stream will be complete */
 
   /* clean up and return */
   (void)deflateEnd(&strm);
@@ -95,13 +91,13 @@ unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
 }
 
 unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
-    std::vector<unsigned char>& dst) {
-  dst.resize(zlib_chunk*2);
+                                          std::vector<unsigned char>& dst) {
+  dst.resize(zlib_chunk * 2);
   int ret;
   unsigned have;
   z_stream strm;
-  unsigned char *in = &src[0];
-  unsigned char *out = &dst[0];
+  unsigned char* in = &src[0];
+  unsigned char* out = &dst[0];
   unsigned int src_idx = 0;
   unsigned int dst_idx = 0;
 
@@ -112,41 +108,38 @@ unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
   strm.avail_in = 0;
   strm.next_in = Z_NULL;
   ret = inflateInit(&strm);
-  if (ret != Z_OK)
-    return ret;
+  if (ret != Z_OK) return ret;
 
   /* decompress until deflate stream ends or end of file */
   do {
     in = &src[src_idx];
     if (src.size() - src_idx > zlib_chunk) {
       strm.avail_in = zlib_chunk;
-    }
-    else {
+    } else {
       strm.avail_in = src.size() - src_idx;
     }
     strm.next_in = in;
     src_idx += strm.avail_in;
-    if (strm.avail_in == 0)
-      break;
+    if (strm.avail_in == 0) break;
 
     /* run inflate() on input until output buffer not full */
     do {
       strm.avail_out = zlib_chunk;
       strm.next_out = out;
       ret = inflate(&strm, Z_NO_FLUSH);
-      assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
+      assert(ret != Z_STREAM_ERROR); /* state not clobbered */
       switch (ret) {
-      case Z_NEED_DICT:
-        ret = Z_DATA_ERROR;     /* and fall through */
-      case Z_DATA_ERROR:
-      case Z_MEM_ERROR:
-        (void)inflateEnd(&strm);
-        return ret;
+        case Z_NEED_DICT:
+          ret = Z_DATA_ERROR; /* and fall through */
+        case Z_DATA_ERROR:
+        case Z_MEM_ERROR:
+          (void)inflateEnd(&strm);
+          return ret;
       }
       have = zlib_chunk - strm.avail_out;
       dst_idx += have;
       if (dst_idx + zlib_chunk > dst.size()) {
-        dst.resize(dst_idx + zlib_chunk*2);
+        dst.resize(dst_idx + zlib_chunk * 2);
       }
       out = &dst[dst_idx];
     } while (strm.avail_out == 0);
@@ -160,6 +153,6 @@ unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
   return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
 }
 
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

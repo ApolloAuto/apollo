@@ -23,13 +23,13 @@
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_H_
 
 #include <sensor_msgs/PointCloud2.h>
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/localization/proto/gnss_pnt_result.pb.h"
 #include "modules/localization/proto/imu.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/gnss_pnt_result.pb.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 
 /**
  * @namespace apollo::localization
@@ -42,11 +42,7 @@ typedef apollo::drivers::gnss::EpochObservation EpochObservation;
 typedef apollo::drivers::gnss::GnssEphemeris GnssEphemeris;
 typedef drivers::gnss::GnssBestPose GnssBestPose;
 
-enum class LocalizaitonMeasureState {
-  NOT_VALID = 0,
-  NOT_STABLE,
-  OK
-};
+enum class LocalizaitonMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
 
 struct LocalizationIntegParam {
   LocalizationIntegParam() {}
@@ -101,38 +97,38 @@ class LocalizationInteg {
   // Lidar pcd process.
   void PcdProcess(const sensor_msgs::PointCloud2& message);
   // Raw Imu process.
-  void RawImuProcess(const Imu &imu_msg);
-  // Gnss Info process.  
-  void RawObservationProcess(const EpochObservation &raw_obs_msg);
-  void RawEphemerisProcess(const GnssEphemeris &gnss_orbit_msg);
+  void RawImuProcess(const Imu& imu_msg);
+  // Gnss Info process.
+  void RawObservationProcess(const EpochObservation& raw_obs_msg);
+  void RawEphemerisProcess(const GnssEphemeris& gnss_orbit_msg);
   // gnss best pose process
   void GnssBestPoseProcess(const GnssBestPose& bestgnsspos_msg);
 
-  void GetLidarMeasure(LocalizaitonMeasureState& state, 
-      IntegMeasure &lidar_measure);
+  void GetLidarMeasure(LocalizaitonMeasureState& state,
+                       IntegMeasure& lidar_measure);
 
-  void GetIntegMeasure(LocalizaitonMeasureState& state, 
-      IntegSinsPva& sins_pva, LocalizationEstimate &integ_localization);
+  void GetIntegMeasure(LocalizaitonMeasureState& state, IntegSinsPva& sins_pva,
+                       LocalizationEstimate& integ_localization);
 
   void GetGnssMeasure(LocalizaitonMeasureState& state,
-      IntegMeasure& gnss_measure);
+                      IntegMeasure& gnss_measure);
 
  private:
-    MeasureRepublishProcess* republish_process_;
-    LocalizationIntegProcess* integ_process_;
-    LocalizationGnssProcess* gnss_process_;
-    LocalizationLidarProcess* lidar_process_;
+  MeasureRepublishProcess* republish_process_;
+  LocalizationIntegProcess* integ_process_;
+  LocalizationGnssProcess* gnss_process_;
+  LocalizationLidarProcess* lidar_process_;
 
-    LocalizaitonMeasureState lidar_measure_state_; 
-    IntegMeasure lidar_measure_;
+  LocalizaitonMeasureState lidar_measure_state_;
+  IntegMeasure lidar_measure_;
 
-    LocalizaitonMeasureState integ_measure_state_; 
-    LocalizationEstimate integ_localization_;
-    IntegSinsPva integ_sins_pva_;
+  LocalizaitonMeasureState integ_measure_state_;
+  LocalizationEstimate integ_localization_;
+  IntegSinsPva integ_sins_pva_;
 
-    LocalizaitonMeasureState gnss_measure_state_;
-    IntegMeasure gnss_measure_;
-    bool is_use_gnss_bestpose_;
+  LocalizaitonMeasureState gnss_measure_state_;
+  IntegMeasure gnss_measure_;
+  bool is_use_gnss_bestpose_;
 };
 
 }  // namespace localization

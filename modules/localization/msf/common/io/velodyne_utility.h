@@ -22,9 +22,9 @@
 #ifndef MODULES_LOCALIZATION_MSF_COMMON_VELODYNE_UTILITY_H_
 #define MODULES_LOCALIZATION_MSF_COMMON_VELODYNE_UTILITY_H_
 
-#include <vector>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <vector>
 
 namespace apollo {
 namespace localization {
@@ -46,29 +46,22 @@ struct VelodyneFrame {
   Eigen::Affine3d pose;
 };
 
-void LoadPcds(std::string file_path, 
-        unsigned int frame_index,
-        const Eigen::Affine3d& pose,
-        VelodyneFrame& velodyne_frame, 
-        bool is_global);
+void LoadPcds(std::string file_path, unsigned int frame_index,
+              const Eigen::Affine3d& pose, VelodyneFrame& velodyne_frame,
+              bool is_global);
 
-void LoadPcds(std::string file_path, 
-    unsigned int frame_index,
-    const Eigen::Affine3d& pose,
-    std::vector<Eigen::Vector3d>& pt3ds, 
-    std::vector<unsigned char>& intensities,
-    bool is_global);
+void LoadPcds(std::string file_path, unsigned int frame_index,
+              const Eigen::Affine3d& pose, std::vector<Eigen::Vector3d>& pt3ds,
+              std::vector<unsigned char>& intensities, bool is_global);
 
 /**@brief Load the PCD poses with their timestamps. */
-void LoadPcdPoses(std::string file_path,
-    std::vector<Eigen::Affine3d>& poses,
-    std::vector<double>& timestamps);
+void LoadPcdPoses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
+                  std::vector<double>& timestamps);
 
 /**@brief Load the PCD poses with their timestamps and indices. */
-void LoadPcdPoses(std::string file_path,
-    std::vector<Eigen::Affine3d>& poses,
-    std::vector<double>& timestamps, 
-    std::vector<unsigned int>& pcd_indices);
+void LoadPcdPoses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
+                  std::vector<double>& timestamps,
+                  std::vector<unsigned int>& pcd_indices);
 
 // /**@brief Save the PCD poses with their timestamps. */
 // void save_pcd_poses(std::string file_path,
@@ -78,10 +71,9 @@ void LoadPcdPoses(std::string file_path,
 /**@brief Load the velodyne extrinsic from a YAML file. */
 bool LoadExtrinsic(std::string file_path, Eigen::Affine3d& extrinsic);
 
-} // namespace velodyne
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace velodyne
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_VELODYNE_UTILITY_H_
-
+#endif  // MODULES_LOCALIZATION_MSF_COMMON_VELODYNE_UTILITY_H_
