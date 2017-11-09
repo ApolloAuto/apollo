@@ -172,6 +172,12 @@ bool Spline1dGenerator::Solve() {
     ret = sqp_solver_->hotstart(
         h_matrix, g_matrix, affine_constraint_matrix, lower_bound, upper_bound,
         constraint_lower_bound, constraint_upper_bound, max_iter);
+    if (ret != qpOASES::SUCCESSFUL_RETURN) {
+      AERROR << "Fail to hotstart spline 1d, will use re-init instead.";
+      ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
+                              lower_bound, upper_bound, constraint_lower_bound,
+                              constraint_upper_bound, max_iter);
+    }
   } else {
     ADEBUG << "no using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
