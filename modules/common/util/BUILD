@@ -15,6 +15,7 @@ cc_library(
         "util.h",
     ],
     deps = [
+        ":string_util",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
@@ -43,8 +44,10 @@ cc_library(
     name = "string_util",
     hdrs = [
         "string_util.h",
-        "string_util_internal.h",
     ],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ]
 )
 
 cc_test(

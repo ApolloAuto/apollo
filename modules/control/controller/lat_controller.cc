@@ -36,12 +36,13 @@
 namespace apollo {
 namespace control {
 
-using common::Point3D;
-using common::TrajectoryPoint;
-using common::VehicleStateProvider;
-using Matrix = Eigen::MatrixXd;
 using apollo::common::ErrorCode;
+using apollo::common::Point3D;
 using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleStateProvider;
+using apollo::common::util::StrCat;
+using Matrix = Eigen::MatrixXd;
 
 namespace {
 
@@ -125,18 +126,21 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
 void LatController::ProcessLogs(const SimpleLateralDebug *debug,
                                 const canbus::Chassis *chassis) {
-  const std::string log_str = apollo::common::util::StrCat(
-      debug->lateral_error(), ",", debug->ref_heading(), ",",
-      VehicleStateProvider::instance()->heading(), ",", debug->heading_error(),
-      ",", debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
-      debug->curvature(), ",", debug->steer_angle(), ",",
-      debug->steer_angle_feedforward(), ",",
-      debug->steer_angle_lateral_contribution(), ",",
-      debug->steer_angle_lateral_rate_contribution(), ",",
-      debug->steer_angle_heading_contribution(), ",",
-      debug->steer_angle_heading_rate_contribution(), ",",
-      debug->steer_angle_feedback(), ",", chassis->steering_percentage(), ",",
-      VehicleStateProvider::instance()->linear_velocity());
+  // StrCat supports 9 arguments at most.
+  const std::string log_str = StrCat(
+      StrCat(debug->lateral_error(), ",", debug->ref_heading(), ",",
+             VehicleStateProvider::instance()->heading(), ",",
+             debug->heading_error(), ","),
+      StrCat(debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
+             debug->curvature(), ",", debug->steer_angle(), ","),
+      StrCat(debug->steer_angle_feedforward(), ",",
+             debug->steer_angle_lateral_contribution(), ",",
+             debug->steer_angle_lateral_rate_contribution(), ",",
+             debug->steer_angle_heading_contribution(), ","),
+      StrCat(debug->steer_angle_heading_rate_contribution(), ",",
+             debug->steer_angle_feedback(), ",",
+             chassis->steering_percentage(), ",",
+             VehicleStateProvider::instance()->linear_velocity()));
   if (FLAGS_enable_csv_debug) {
     steer_log_file_ << log_str << std::endl;
   }

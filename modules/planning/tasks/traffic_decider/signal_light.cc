@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/util/map_util.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -113,9 +114,9 @@ void SignalLight::MakeDecisions(Frame* frame,
   }
 }
 
-const TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
-  auto iter = signals_.find(signal_id);
-  if (iter == signals_.end()) {
+TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
+  const auto* result = apollo::common::util::FindPtrOrNull(signals_, signal_id);
+  if (result == nullptr) {
     TrafficLight traffic_light;
     traffic_light.set_id(signal_id);
     traffic_light.set_color(TrafficLight::UNKNOWN);
@@ -123,7 +124,7 @@ const TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
     traffic_light.set_tracking_time(0.0);
     return traffic_light;
   }
-  return *iter->second;
+  return *result;
 }
 
 double SignalLight::GetStopDeceleration(

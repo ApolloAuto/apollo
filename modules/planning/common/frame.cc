@@ -114,10 +114,7 @@ bool Frame::InitReferenceLineInfo() {
     AERROR << "Failed to update routing in reference line provider";
     return false;
   }
-  if (!ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state_)) {
-    AERROR << "Failed to update vehicle state in reference line provider";
-    return false;
-  }
+  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state_);
   if (!ReferenceLineProvider::instance()->GetReferenceLines(&reference_lines,
                                                             &segments)) {
     AERROR << "Failed to create reference line";

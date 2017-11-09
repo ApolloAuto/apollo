@@ -28,6 +28,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
@@ -44,7 +45,6 @@ namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
@@ -73,7 +73,7 @@ std::string TitleCase(const std::string &origin,
     }
   }
 
-  return apollo::common::util::StrCat(apollo::common::util::PrintIter(parts));
+  return apollo::common::util::PrintIter(parts);
 }
 
 // List subdirs and return a dict of {subdir_title: subdir_path}.
@@ -290,10 +290,12 @@ void HMI::ChangeMapTo(const std::string &map_name) {
 }
 
 void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
-  if (!ContainsKey(config_.available_vehicles(), vehicle_name)) {
+  const auto *vehicle = FindOrNull(config_.available_vehicles(), vehicle_name);
+  if (vehicle == nullptr) {
     AERROR << "Unknown vehicle " << vehicle_name;
     return;
   }
+  CHECK(VehicleManager::UseVehicle(*vehicle));
 
   RunCommandOnAllModules("stop");
   status_.set_current_vehicle(vehicle_name);

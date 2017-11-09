@@ -127,11 +127,9 @@ function build() {
   # Build python proto
   build_py_proto
 
-  # Update task info template on compiling, but don't check in.
+  # Update task info template on compiling.
   bazel-bin/modules/data/recorder/update_task_info \
       --commit_id=$(git rev-parse HEAD)
-  git update-index --assume-unchanged \
-      modules/data/conf/task_info_template.pb.txt
 }
 
 function cibuild() {

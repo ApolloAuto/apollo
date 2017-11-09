@@ -40,6 +40,7 @@ DECLARE_double(spiral_smoother_piecewise_length);
 DECLARE_double(spiral_reference_line_resolution);
 
 DECLARE_bool(prioritize_change_lane);
+DECLARE_bool(reckless_change_lane);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
@@ -58,8 +59,9 @@ DECLARE_double(smoothed_reference_line_max_diff);
 // parameters for trajectory planning
 DECLARE_double(planning_upper_speed_limit);
 DECLARE_double(trajectory_time_length);
-DECLARE_double(trajectory_time_resolution);
-DECLARE_double(output_trajectory_time_resolution);
+DECLARE_double(trajectory_time_min_interval);
+DECLARE_double(trajectory_time_max_interval);
+DECLARE_double(trajectory_time_high_density_period);
 
 // parameters for trajectory sanity check
 DECLARE_bool(enable_trajectory_check);
@@ -93,6 +95,7 @@ DECLARE_double(destination_check_distance);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
 DECLARE_double(follow_time_buffer);
+DECLARE_double(follow_min_time_sec);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);

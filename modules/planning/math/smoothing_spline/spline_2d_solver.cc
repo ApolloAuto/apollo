@@ -86,6 +86,7 @@ bool Spline2dSolver::Solve() {
          << ", last_num_constraint_: " << last_num_constraint_;
 
   bool use_hotstart =
+      last_problem_success_ &&
       (FLAGS_enable_sqp_solver && sqp_solver_ != nullptr &&
        num_param == last_num_param_ && num_constraint == last_num_constraint_);
 
@@ -173,6 +174,12 @@ bool Spline2dSolver::Solve() {
     ret = sqp_solver_->hotstart(
         h_matrix, g_matrix, affine_constraint_matrix, lower_bound, upper_bound,
         constraint_lower_bound, constraint_upper_bound, max_iter);
+    if (ret != qpOASES::SUCCESSFUL_RETURN) {
+      AERROR << "Fail to hotstart spline 2d, will use re-init instead.";
+      ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
+                              lower_bound, upper_bound, constraint_lower_bound,
+                              constraint_upper_bound, max_iter);
+    }
   } else {
     ADEBUG << "Spline2dSolver is NOT using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
@@ -191,9 +198,11 @@ bool Spline2dSolver::Solve() {
                 "reasons:"
              << ret;
     }
+    last_problem_success_ = false;
     return false;
   }
 
+  last_problem_success_ = true;
   double result[num_param];  // NOLINT
   memset(result, 0, sizeof result);
 
@@ -204,11 +213,10 @@ bool Spline2dSolver::Solve() {
     solved_params(i, 0) = result[i];
   }
 
-  const uint32_t spline_order = spline_.spline_order();
-
   last_num_param_ = num_param;
   last_num_constraint_ = num_constraint;
-  return spline_.set_splines(solved_params, spline_order);
+
+  return spline_.set_splines(solved_params, spline_.spline_order());
 }
 
 // extract

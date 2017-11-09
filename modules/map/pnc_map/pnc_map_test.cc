@@ -74,42 +74,12 @@ std::unique_ptr<PncMap> PncMapTest::pnc_map_;
 hdmap::HDMap PncMapTest::hdmap_;
 routing::RoutingResponse PncMapTest::routing_;
 
-TEST_F(PncMapTest, RouteSegments_GetProjection) {
-  auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
-  RouteSegments route_segments;
-  route_segments.emplace_back(lane1, 10, 20);
-  LaneWaypoint waypoint;
-  auto point = lane1->GetSmoothPoint(5);
-  double s = 0.0;
-  double l = 0.0;
-  EXPECT_FALSE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  point = lane1->GetSmoothPoint(10);
-  EXPECT_TRUE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  EXPECT_EQ(lane1, waypoint.lane);
-  EXPECT_NEAR(10.0, waypoint.s, 1e-4);
-  EXPECT_NEAR(0.0, s, 1e-4);
-  EXPECT_NEAR(0.0, l, 1e-4);
-  point = lane1->GetSmoothPoint(15);
-  EXPECT_TRUE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  EXPECT_EQ(lane1, waypoint.lane);
-  EXPECT_NEAR(15.0, waypoint.s, 1e-4);
-  EXPECT_NEAR(5.0, s, 1e-4);
-  EXPECT_NEAR(0.0, l, 1e-4);
-  point = lane1->GetSmoothPoint(25);
-  EXPECT_FALSE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  auto lane2 = hdmap_.GetLaneById(hdmap::MakeMapId("13_1_-1"));
-  route_segments.emplace_back(lane2, 20, 30);
-  EXPECT_FALSE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  point = lane2->GetSmoothPoint(0);
-  EXPECT_FALSE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  point = lane2->GetSmoothPoint(25);
-  EXPECT_TRUE(route_segments.GetProjection(point, &s, &l, &waypoint));
-  EXPECT_EQ(lane2, waypoint.lane);
-  EXPECT_NEAR(25.0, waypoint.s, 1e-4);
-  EXPECT_NEAR(15.0, s, 1e-4);
-  EXPECT_NEAR(0.0, l, 1e-4);
-  point = lane2->GetSmoothPoint(31);
-  EXPECT_FALSE(route_segments.GetProjection(point, &s, &l, &waypoint));
+TEST_F(PncMapTest, UpdateRouting) {
+  pnc_map_->routing_.clear_header();
+  EXPECT_TRUE(pnc_map_->UpdateRoutingResponse(routing_));
+  EXPECT_FALSE(pnc_map_->IsSameRouting());
+  EXPECT_TRUE(pnc_map_->UpdateRoutingResponse(routing_));
+  EXPECT_TRUE(pnc_map_->IsSameRouting());
 }
 
 TEST_F(PncMapTest, GetNearestPointFromRouting) {
@@ -137,7 +107,6 @@ TEST_F(PncMapTest, GetWaypointIndex) {
 }
 
 TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
-  pnc_map_->route_index_.clear();
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
   auto point = lane->GetSmoothPoint(0);
@@ -146,93 +115,44 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   state.set_y(point.y());
   state.set_z(point.y());
   state.set_heading(M_PI);
-  std::vector<RouteSegments> segments;
-  EXPECT_FALSE(pnc_map_->GetRouteSegments(10, 30, &segments));
-  EXPECT_TRUE(pnc_map_->UpdateVehicleState(state));
-  bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
-  ASSERT_TRUE(result);
+  std::list<RouteSegments> segments;
+  ASSERT_TRUE(pnc_map_->GetRouteSegments(state, 10, 30, &segments));
   // first time on this passage, should not immediately change lane
-  ASSERT_EQ(1, segments.size());
-  EXPECT_NEAR(40, RouteLength(segments[0]), 1e-4);
-  EXPECT_EQ(routing::LEFT, segments[0].NextAction());
-  EXPECT_TRUE(segments[0].IsOnSegment());
+  ASSERT_EQ(2, segments.size());
+  EXPECT_NEAR(40, RouteLength(segments.front()), 1e-4);
+  EXPECT_NEAR(40, RouteLength(segments.back()), 1e-4);
+  EXPECT_EQ(routing::LEFT, segments.front().NextAction());
+  EXPECT_TRUE(segments.front().IsOnSegment());
+  EXPECT_EQ(routing::RIGHT, segments.back().NextAction());
+  EXPECT_FALSE(segments.back().IsOnSegment());
 }
 
 TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
-  pnc_map_->route_index_.clear();
   auto point = lane->GetSmoothPoint(0);
   common::VehicleState state;
   state.set_x(point.x());
   state.set_y(point.y());
   state.set_z(point.y());
   state.set_heading(M_PI);
-  EXPECT_TRUE(pnc_map_->UpdateVehicleState(state));
-  FLAGS_min_length_for_lane_change = 30.0;
   point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
   state.set_x(point.x());
   state.set_y(point.y());
   state.set_z(point.y());
   state.set_heading(M_PI);
-  EXPECT_TRUE(pnc_map_->UpdateVehicleState(state));
-  std::vector<RouteSegments> segments;
-  bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
+  std::list<RouteSegments> segments;
+  bool result = pnc_map_->GetRouteSegments(state, 10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
-  EXPECT_NEAR(40, RouteLength(segments[0]), 1e-4);
-  EXPECT_EQ(routing::LEFT, segments[0].NextAction());
-  EXPECT_TRUE(segments[0].IsOnSegment());
-  EXPECT_NEAR(40, RouteLength(segments[1]), 1e-4);
-  EXPECT_EQ(routing::RIGHT, segments[1].NextAction());
-  EXPECT_FALSE(segments[1].IsOnSegment());
-}
-
-TEST_F(PncMapTest, UpdateVehicleState) {
-  auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
-  auto first_point = lane1->GetSmoothPoint(5);
-  pnc_map_->route_index_.clear();
-  common::VehicleState state;
-  state.set_x(first_point.x());
-  state.set_y(first_point.y());
-  state.set_z(first_point.z());
-  state.set_heading(M_PI);
-  pnc_map_->UpdateVehicleState(state);
-  EXPECT_EQ(3, pnc_map_->route_index_.size());
-  EXPECT_EQ(0, pnc_map_->route_index_[0]);
-  EXPECT_EQ(2, pnc_map_->route_index_[1]);
-  EXPECT_EQ(0, pnc_map_->route_index_[2]);
-
-  EXPECT_EQ(lane1, pnc_map_->current_waypoint_.lane);
-  EXPECT_NEAR(5, pnc_map_->current_waypoint_.s, 1e-4);
-  EXPECT_EQ(first_point.x(), pnc_map_->passage_start_point_.x());
-  EXPECT_EQ(first_point.y(), pnc_map_->passage_start_point_.y());
-  EXPECT_EQ(first_point.z(), pnc_map_->passage_start_point_.z());
-  EXPECT_EQ(first_point.x(), pnc_map_->current_point_.x());
-  EXPECT_EQ(first_point.y(), pnc_map_->current_point_.y());
-  EXPECT_EQ(first_point.z(), pnc_map_->current_point_.z());
-
-  auto second_point = lane1->GetSmoothPoint(6);
-  state.set_x(second_point.x());
-  state.set_y(second_point.y());
-  state.set_z(second_point.z());
-  state.set_heading(M_PI);
-  pnc_map_->UpdateVehicleState(state);
-  EXPECT_EQ(3, pnc_map_->route_index_.size());
-  EXPECT_EQ(0, pnc_map_->route_index_[0]);
-  EXPECT_EQ(2, pnc_map_->route_index_[1]);
-  EXPECT_EQ(0, pnc_map_->route_index_[2]);
-
-  EXPECT_EQ(lane1, pnc_map_->current_waypoint_.lane);
-  EXPECT_NEAR(6, pnc_map_->current_waypoint_.s, 1e-4);
-  EXPECT_EQ(first_point.x(), pnc_map_->passage_start_point_.x());
-  EXPECT_EQ(first_point.y(), pnc_map_->passage_start_point_.y());
-  EXPECT_EQ(first_point.z(), pnc_map_->passage_start_point_.z());
-  EXPECT_EQ(second_point.x(), pnc_map_->current_point_.x());
-  EXPECT_EQ(second_point.y(), pnc_map_->current_point_.y());
-  EXPECT_EQ(second_point.z(), pnc_map_->current_point_.z());
-
-  pnc_map_->route_index_.clear();
+  const auto& first = segments.front();
+  const auto& second = segments.back();
+  EXPECT_NEAR(40, RouteLength(first), 1e-4);
+  EXPECT_EQ(routing::LEFT, first.NextAction());
+  EXPECT_TRUE(first.IsOnSegment());
+  EXPECT_NEAR(40, RouteLength(second), 1e-4);
+  EXPECT_EQ(routing::RIGHT, second.NextAction());
+  EXPECT_FALSE(second.IsOnSegment());
 }
 
 TEST_F(PncMapTest, GetNeighborPassages) {

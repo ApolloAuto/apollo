@@ -29,7 +29,7 @@ using apollo::common::math::Vec2d;
 
 TEST(Spline2dConstraint, add_boundary_01) {
   std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 4;
+  int32_t spline_order = 3;
   Spline2dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {0.0};
@@ -71,7 +71,7 @@ TEST(Spline2dConstraint, add_boundary_01) {
 // test add boundary with non-zero angle
 TEST(Spline2dConstraint, add_boundary_02) {
   std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 4;
+  int32_t spline_order = 3;
   Spline2dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {0.0};
@@ -113,7 +113,7 @@ TEST(Spline2dConstraint, add_boundary_02) {
 // test add boundary with multiple splines
 TEST(Spline2dConstraint, add_boundary_03) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0};
-  int32_t spline_order = 4;
+  int32_t spline_order = 3;
   Spline2dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {1.0};

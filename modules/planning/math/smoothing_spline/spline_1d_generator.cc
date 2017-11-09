@@ -172,6 +172,12 @@ bool Spline1dGenerator::Solve() {
     ret = sqp_solver_->hotstart(
         h_matrix, g_matrix, affine_constraint_matrix, lower_bound, upper_bound,
         constraint_lower_bound, constraint_upper_bound, max_iter);
+    if (ret != qpOASES::SUCCESSFUL_RETURN) {
+      AERROR << "Fail to hotstart spline 1d, will use re-init instead.";
+      ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
+                              lower_bound, upper_bound, constraint_lower_bound,
+                              constraint_upper_bound, max_iter);
+    }
   } else {
     ADEBUG << "no using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
@@ -205,11 +211,10 @@ bool Spline1dGenerator::Solve() {
     solved_params(i, 0) = result[i];
   }
 
-  const uint32_t spline_order = spline_.spline_order();
-
   last_num_param_ = num_param;
   last_num_constraint_ = num_constraint;
-  return spline_.SetSplineSegs(solved_params, spline_order);
+
+  return spline_.SetSplineSegs(solved_params, spline_.spline_order());
 }
 
 const Spline1d& Spline1dGenerator::spline() const { return spline_; }

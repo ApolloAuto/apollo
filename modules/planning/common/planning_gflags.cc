@@ -73,6 +73,9 @@ DEFINE_double(spiral_reference_line_resolution, 0.02,
 DEFINE_bool(prioritize_change_lane, false,
             "change lane strategy has higher priority, always use a valid "
             "change lane path if such path exists");
+DEFINE_bool(reckless_change_lane, false,
+            "Alway allow the vehicle change lane. The vehicle may contineous "
+            "change lane. This is mainly test purpose");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
@@ -97,10 +100,17 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
               "Maximum speed (m/s) in planning.");
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
-DEFINE_double(trajectory_time_resolution, 0.1,
-              "Trajectory time resolution in planning");
-DEFINE_double(output_trajectory_time_resolution, 0.1,
-              "Trajectory time resolution when publish for EM planner");
+
+// planning trajectory output time density control
+DEFINE_double(
+    trajectory_time_min_interval, 0.02,
+    "(seconds) Trajectory time interval when publish. The is the min value.");
+DEFINE_double(
+    trajectory_time_max_interval, 0.1,
+    "(seconds) Trajectory time interval when publish. The is the max value.");
+DEFINE_double(
+    trajectory_time_high_density_period, 1.0,
+    "(seconds) Keep high density in the next this amount of seconds. ");
 
 DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");
@@ -154,6 +164,9 @@ DEFINE_double(follow_min_distance, 10,
 DEFINE_double(
     follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
+DEFINE_double(
+    follow_min_time_sec, 3.0,
+    "min following time in st region before considering a valid follow");
 
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");

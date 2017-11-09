@@ -36,8 +36,7 @@ namespace planning {
 class Spline1dConstraint {
  public:
   explicit Spline1dConstraint(const Spline1d& pss);
-  Spline1dConstraint(const std::vector<double>& x_knots,
-                     const uint32_t order);
+  Spline1dConstraint(const std::vector<double>& x_knots, const uint32_t order);
 
   // direct methods
   bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,

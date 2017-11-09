@@ -16,6 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
+# WARN: Please use with cautious.
+# This script is for Apollo 2.0, in which HMI and Dreamview are well integrated.
+# So it's exclusive with hmi.sh.
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -23,6 +26,33 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-# run function from apollo_base.sh
-# run command_name module_name
-run decision "$@"
+function start() {
+    echo "Start roscore..."
+    ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
+    nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
+
+    # Start system monitor
+    bash scripts/monitor.sh
+
+    # Start Dreamview
+    bash scripts/dreamview.sh && \
+    echo "Dreamview is running at http://localhost:8888"
+}
+
+function stop() {
+    bash scripts/dreamview.sh stop
+    bash scripts/monitor.sh stop
+    pkill -f roscore
+}
+
+case $1 in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    start
+    ;;
+esac
