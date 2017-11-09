@@ -21,8 +21,6 @@
 #include <queue>
 
 #include "modules/common/log.h"
-#include "modules/common/util/map_util.h"
-
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
@@ -31,8 +29,6 @@
 namespace apollo {
 namespace routing {
 namespace {
-
-using apollo::common::util::FindPtrOrNull;
 
 constexpr double LANE_CHANGE_SKIP_S = 10.0;
 

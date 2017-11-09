@@ -21,7 +21,6 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/proto:common_proto",
-        "//modules/common/util:map_util",
         "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/graph",
