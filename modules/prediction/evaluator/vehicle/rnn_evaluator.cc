@@ -73,7 +73,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
-  Eigen::MatrixXf prob_mat;
+  Eigen::MatrixXf pred_mat;
   std::vector<Eigen::MatrixXf> states;
   if (!obstacle_ptr->rnn_enabled()) {
     obstacle_ptr->InitRNNStates();
@@ -92,14 +92,20 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       AWARN << "Lane feature dim of seq-" << seq_id << " is wrong!";
       continue;
     }
-    // TODO(all) solve the following
     model_ptr_->SetState(states);
-    model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &prob_mat);
-    if (std::isnan(prob_mat(0, 0)) || std::isinf(prob_mat(0, 0))) {
+    model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &pred_mat);
+    double probability = pred_mat(0, 0);
+    double acceleration = pred_mat(0, 1);
+    if (std::isnan(probability) || std::isinf(probability)) {
       AWARN << "Fail to compute probability.";
       continue;
     }
-    lane_sequence_ptr->set_probability(prob_mat(0, 0));
+    if (std::isnan(acceleration) || std::isinf(acceleration)) {
+      AWARN << "Fail to compute acceleration.";
+      continue;
+    }
+    lane_sequence_ptr->set_probability(probability);
+    lane_sequence_ptr->set_acceleration(acceleration);
   }
   model_ptr_->State(&states);
   obstacle_ptr->SetRNNStates(states);
@@ -127,7 +133,7 @@ int RNNEvaluator::ExtractFeatureValues(
     obstacle->InitRNNStates();
   }
   if (static_cast<int>(obstacle_features.size()) != dim_obstacle_feature_) {
-    AERROR << "Fail to setup obstacle feature!";
+    ADEBUG << "Obstacle feature size: " << obstacle_features.size();
     return -1;
   }
   obstacle_feature_mat->resize(1, obstacle_features.size());
@@ -137,7 +143,7 @@ int RNNEvaluator::ExtractFeatureValues(
 
   Feature* feature = obstacle->mutable_latest_feature();
   if (!feature->has_lane() || !feature->lane().has_lane_graph()) {
-    AERROR << "Fail to access lane graph!";
+    ADEBUG << "Fail to access lane graph!";
     return -1;
   }
   int routes = feature->lane().lane_graph().lane_sequence_size();
@@ -169,7 +175,6 @@ int RNNEvaluator::SetupObstacleFeature(
   float theta = 0.0;
   float dist_lb = 1.0;
   float dist_rb = 1.0;
-  int lane_type = 3;  // NO_TURN TODO(all) double check
   if (obstacle->history_size() < 1) {
     AWARN << "Size of feature less than 1!";
     return -1;
@@ -194,7 +199,6 @@ int RNNEvaluator::SetupObstacleFeature(
     theta = p_lane_fea->angle_diff();
     dist_lb = p_lane_fea->dist_to_left_boundary();
     dist_rb = p_lane_fea->dist_to_right_boundary();
-    lane_type = p_lane_fea->lane_turn_type();
 
     if (!fea->has_speed() || !fea->has_theta()) {
       ADEBUG << "Fail to access speed from " << i << "-the feature";
@@ -233,10 +237,6 @@ int RNNEvaluator::SetupObstacleFeature(
   feature_values->push_back(dist_lb);
   feature_values->push_back(dist_rb);
   feature_values->push_back(theta);
-  feature_values->push_back(lane_type == 0 ? 1.0 : 0.0);
-  feature_values->push_back(lane_type == 1 ? 1.0 : 0.0);
-  feature_values->push_back(lane_type == 2 ? 1.0 : 0.0);
-  feature_values->push_back(lane_type == 3 ? 1.0 : 0.0);
   return ret;
 }
 

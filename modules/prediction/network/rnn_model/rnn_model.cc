@@ -48,16 +48,31 @@ void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
 
   Eigen::MatrixXf merge;
   Eigen::MatrixXf dense1;
+  Eigen::MatrixXf act1;
   layers_[6]->Run({lstm1, lstm2}, &merge);
   layers_[7]->Run({merge}, &dense1);
   layers_[8]->Run({dense1}, &bn1);
+  layers_[9]->Run({bn1}, &act1);
 
-  Eigen::MatrixXf act;
   Eigen::MatrixXf dense2;
-  layers_[9]->Run({bn1}, &act);
-  layers_[10]->Run({act}, &dense2);
-  layers_[11]->Run({dense2}, &bn1);
-  layers_[12]->Run({bn1}, output);  // sigmoid activation
+  Eigen::MatrixXf bn4;
+  Eigen::MatrixXf act2;
+  layers_[10]->Run({act1}, &dense2);
+  layers_[11]->Run({dense2}, &bn4);
+  layers_[12]->Run({bn4}, &act2);
+
+  Eigen::MatrixXf prob;
+  layers_[13]->Run({act2}, &dense2);
+  layers_[15]->Run({dense2}, &bn1);
+  layers_[17]->Run({bn1}, &prob);
+
+  Eigen::MatrixXf acc;
+  layers_[14]->Run({act2}, &dense2);
+  layers_[16]->Run({dense2}, &bn1);
+  layers_[18]->Run({bn1}, &acc);
+
+  output->resize(1, 2);
+  *output << prob, acc;
 }
 
 void RnnModel::SetState(const std::vector<Eigen::MatrixXf>& states) {
