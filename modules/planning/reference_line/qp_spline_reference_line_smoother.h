@@ -46,12 +46,14 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
 
+  void SetAnchorPoints(const std::vector<AnchorPoint>& achor_points) override;
+
  private:
   void Clear();
 
-  bool Sampling(const ReferenceLine& raw_reference_line);
+  bool Sampling();
 
-  bool AddConstraint(const ReferenceLine& raw_reference_line);
+  bool AddConstraint();
 
   bool AddKernel();
 
@@ -68,7 +70,7 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
  private:
   QpSplineReferenceLineSmootherConfig smoother_config_;
   std::vector<double> t_knots_;
-  std::vector<common::PathPoint> ref_points_;
+  std::vector<AnchorPoint> anchor_points_;
   Spline2dSolver* spline_solver_ = nullptr;
 
   double ref_x_ = 0.0;
