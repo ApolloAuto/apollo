@@ -22,6 +22,7 @@ cc_library(
         "//modules/common/util:map_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket",
+        "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/proto:hmi_config_proto",
         "//modules/dreamview/proto:hmi_status_proto",
         "@com_google_protobuf//:protobuf",

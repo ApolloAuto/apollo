@@ -118,9 +118,15 @@ nlohmann::json MapElementIds::Json() const {
   return result;
 }
 
-MapService::MapService(bool use_sim_map) {
+MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
+  ReloadMap();
+}
+
+bool MapService::ReloadMap() {
+  const bool ret = HDMapUtil::ReloadMaps();
   hdmap_ = HDMapUtil::BaseMapPtr();
-  sim_map_ = use_sim_map ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
+  sim_map_ = use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
+  return ret;
 }
 
 MapElementIds MapService::CollectMapElementIds(const PointENU &point,
