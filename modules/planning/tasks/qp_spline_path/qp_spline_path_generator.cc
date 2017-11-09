@@ -251,13 +251,24 @@ bool QpSplinePathGenerator::AddConstraint(
       spline_generator_->mutable_spline_constraint();
 
   // add init status constraint, equality constraint
-  spline_constraint->AddPointConstraint(init_frenet_point_.s(),
-                                        init_frenet_point_.l() - ref_l_);
-  spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
-                                                  init_frenet_point_.dl());
+  const double kBoundaryEpsilon = 1e-4;
+  std::vector<double> s_positions(1, 0.0);
+  std::vector<double> lower_bound(1, 0.0);
+  std::vector<double> upper_bound(1, 0.0);
+  s_positions.front() = init_frenet_point_.s();
+  lower_bound.front() = init_frenet_point_.l() - ref_l_ - kBoundaryEpsilon;
+  upper_bound.front() = init_frenet_point_.l() - ref_l_ + kBoundaryEpsilon;
+  spline_constraint->AddBoundary(s_positions, lower_bound, upper_bound);
+
+  lower_bound.front() = init_frenet_point_.dl() - kBoundaryEpsilon;
+  upper_bound.front() = init_frenet_point_.dl() + kBoundaryEpsilon;
+  spline_constraint->AddDerivativeBoundary(s_positions, lower_bound,
+                                           upper_bound);
   if (init_trajectory_point_.v() > qp_spline_path_config_.uturn_speed_limit()) {
-    spline_constraint->AddPointSecondDerivativeConstraint(
-        init_frenet_point_.s(), init_frenet_point_.ddl());
+    lower_bound.front() = init_frenet_point_.ddl() - kBoundaryEpsilon;
+    upper_bound.front() = init_frenet_point_.ddl() + kBoundaryEpsilon;
+    spline_constraint->AddSecondDerivativeBoundary(s_positions, lower_bound,
+                                                   upper_bound);
   }
 
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
