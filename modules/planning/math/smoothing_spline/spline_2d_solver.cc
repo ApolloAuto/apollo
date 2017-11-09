@@ -207,11 +207,10 @@ bool Spline2dSolver::Solve() {
     solved_params(i, 0) = result[i];
   }
 
-  const uint32_t spline_order = spline_.spline_order();
-
   last_num_param_ = num_param;
   last_num_constraint_ = num_constraint;
-  return spline_.set_splines(solved_params, spline_order);
+
+  return spline_.set_splines(solved_params, spline_.spline_order());
 }
 
 // extract
