@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/msf_localization.h"
-
+#include <sstream>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -125,13 +126,11 @@ void MSFLocalization::Init() {
   localizaiton_param_.enable_auto_save_eph_file =
       FLAGS_enable_auto_save_eph_file;
   localizaiton_param_.eph_buffer_path = FLAGS_eph_buffer_path;
-  localizaiton_param_.extrinsic_imu_gnss_file =
-      FLAGS_extrinsic_imu_gnss_filename;
 
   // lidar module
   localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
   localizaiton_param_.lidar_extrinsic_file =
-      common::util::TranslatePath(FLAGS_lidar_extrinsic_file);
+      common::util::TranslatePath(FLAGS_velodyne_extrinsics_path);
   localizaiton_param_.lidar_height_file =
       common::util::TranslatePath(FLAGS_lidar_height_file);
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
@@ -144,6 +143,39 @@ void MSFLocalization::Init() {
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
 
   localization_integ_.Init(localizaiton_param_);
+
+  // set imu to ant offset
+  apollo::drivers::gnss::config::Config gnss_config;
+  bool success = common::util::GetProtoFromASCIIFile<
+      apollo::drivers::gnss::config::Config>(
+      common::util::TranslatePath(FLAGS_gnss_conf_path), &gnss_config);
+  std::string login_commands = gnss_config.login_commands(1);
+
+  if (1) {
+    localizaiton_param_.imu_to_ant_offset.offset_x = 0.0;
+    localizaiton_param_.imu_to_ant_offset.offset_y = 0.0;
+    localizaiton_param_.imu_to_ant_offset.offset_z = 0.0;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_x = 0.0;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_y = 0.0;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_z = 0.0;
+  } else {
+    std::string name = "";
+    double offset_x = 0.0;
+    double offset_y = 0.0;
+    double offset_z = 0.0;
+    double uncertainty_x = 0.0;
+    double uncertainty_y = 0.0;
+    double uncertainty_z = 0.0;
+    std::stringstream ss_str(login_commands);
+    ss_str >> name >> offset_x >> offset_y >> offset_z >> uncertainty_x >>
+        uncertainty_y >> uncertainty_z;
+    localizaiton_param_.imu_to_ant_offset.offset_x = offset_x;
+    localizaiton_param_.imu_to_ant_offset.offset_y = offset_y;
+    localizaiton_param_.imu_to_ant_offset.offset_z = offset_z;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_x = uncertainty_x;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_y = uncertainty_y;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
+  }
 
   // lidar_param_.Init();
   // lidar_process_.Init(lidar_param_);

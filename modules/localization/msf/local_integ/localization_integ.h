@@ -44,6 +44,15 @@ typedef drivers::gnss::GnssBestPose GnssBestPose;
 
 enum class LocalizaitonMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
 
+struct ImuToAntOffset {
+  double offset_x;
+  double offset_y;
+  double offset_z;
+  double uncertainty_x;
+  double uncertainty_y;
+  double uncertainty_z;
+};
+
 struct LocalizationIntegParam {
   LocalizationIntegParam() {}
 
@@ -60,7 +69,7 @@ struct LocalizationIntegParam {
   bool enable_ins_aid_rtk;
   bool enable_auto_save_eph_file;
   std::string eph_buffer_path;
-  std::string extrinsic_imu_gnss_file;
+  ImuToAntOffset imu_to_ant_offset;
 
   // lidar module
   std::string map_path;

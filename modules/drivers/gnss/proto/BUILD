@@ -52,3 +52,17 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "config_proto",
+    deps = [
+        ":config_lib",
+    ],
+)
+
+proto_library(
+    name = "config_lib",
+    srcs = ["config.proto"],
+    deps = [
+    ],
+)
