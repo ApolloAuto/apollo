@@ -110,6 +110,12 @@ class ApolloApp {
   /** The callback thread number
    */
   uint32_t callback_thread_num_ = 1;
+
+ private:
+  /**
+   * @brief Export flag values to <FLAGS_log_dir>/<name>.flags.
+   */
+  void ExportFlags() const;
 };
 
 void apollo_app_sigint_handler(int signal_num);
