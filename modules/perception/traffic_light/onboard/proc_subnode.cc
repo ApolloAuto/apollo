@@ -6,8 +6,8 @@
 // 
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "modules/common/log.h"
-#include <modules/perception/traffic_light/base/utils.h>
-#include <modules/perception/traffic_light/rectify/unity/crop/cropbox.h>
+#include "modules/perception/traffic_light/base/utils.h"
+#include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "ctime"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -154,14 +154,14 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
   // update image_border
   const double before_update_image_border_ts = TimeUtil::GetCurrentTime();
   MutexLock lock(&mutex_);
-  int cam_id = static_cast<int>(image_lights->camera_id);
+  //int cam_id = static_cast<int>(image_lights->camera_id);
   ComputeImageBorder(*image_lights,
-                     &TLPreprocessorSubnode::_s_image_borders[cam_id]);
+                     &TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id]);
   AINFO << "TLProcSubnode update image_border size: "
-        << TLPreprocessorSubnode::_s_image_borders[cam_id]
+        << TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id]
         << " ts: " << GLOG_TIMESTAMP(timestamp)
         << " CameraId: " << image_lights->camera_id;
-  image_lights->offset = TLPreprocessorSubnode::_s_image_borders[cam_id];
+  image_lights->offset = TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id];
   const double update_image_border_latency =
       TimeUtil::GetCurrentTime() - before_update_image_border_ts;
 
@@ -422,8 +422,6 @@ void TLProcSubnode::ComputeRectsOffset(
 
   *offset = std::max(abs(pt1.x - pt2.x), abs(pt1.y - pt2.y));
 }
-
-REGISTER_SUBNODE(TLProcSubnode);
 
 } // namespace traffic_light
 } // namespace perception

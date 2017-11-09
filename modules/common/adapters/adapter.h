@@ -43,6 +43,7 @@
 
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/Image.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -334,7 +335,10 @@ class Adapter {
                 IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
-
+  bool FeedFile(const std::string &message_file,
+                IdentifierType<::sensor_msgs::Image>) {
+    return false;
+  }
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(

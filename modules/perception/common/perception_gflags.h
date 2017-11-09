@@ -48,7 +48,7 @@ DECLARE_string(radar_tf2_frame_id);
 DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
-
+DECLARE_double(forward_distance);
 ///obstacle/perception.cc
 DECLARE_string(dag_config_path);
 

@@ -11,8 +11,8 @@
 #include <memory>
 #include <vector>
 #include <map>
-#include <modules/perception/lib/config_manager/config_manager.h>
-#include <modules/perception/lib/base/mutex.h>
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/base/mutex.h"
 
 #include "modules/perception/traffic_light/interface/base_preprocessor.h"
 
@@ -62,12 +62,6 @@ class TLPreprocessor : public BasePreprocessor {
 
   void set_last_pub_camera_id(CameraId camera_id);
   void get_last_pub_camera_id(CameraId *camera_id) const;
-
-  void set_last_no_signals_ts(double last_no_signals_ts);
-  void get_last_no_signals_ts(double *last_no_signals_ts) const;
-
-  void set_last_output_ts(double last_output_ts);
-  void get_last_output_ts(double *last_output_ts) const;
 
   void set_no_signals_interval_seconds(double seconds);
   void get_no_signals_interval_seconds(double *seconds) const;

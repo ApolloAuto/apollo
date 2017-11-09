@@ -5,7 +5,7 @@
 #ifndef PERCEPTION_COLOR_DECISION_H
 #define PERCEPTION_COLOR_DECISION_H
 
-#include <modules/perception/traffic_light/interface/green_interface.h>
+#include "modules/perception/traffic_light/interface/green_interface.h"
 #include "modules/perception/traffic_light/interface/base_reviser.h"
 
 namespace apollo {

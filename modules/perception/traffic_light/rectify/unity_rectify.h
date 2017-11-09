@@ -5,10 +5,10 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 
-#include <modules/perception/traffic_light/interface/base_rectifier.h>
-#include <modules/perception/traffic_light/interface/green_interface.h>
-#include <modules/perception/lib/config_manager/config_manager.h>
-#include "modules/perception/traffic_light/rectify/unity/detection.h"
+#include "modules/perception/traffic_light/interface/base_rectifier.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "detection.h"
 
 namespace apollo {
 namespace perception {

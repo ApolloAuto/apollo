@@ -19,6 +19,8 @@ message TrafficLight {
 
   // How confidence about the detected results, between 0 and 1.
   optional double confidence = 3 [default = 1.0];
+
+  optional double tracking_time =4 [default = 0.0];
 }
 
 message TrafficLightDetection {

@@ -13,8 +13,8 @@
 #include <string>
 
 #include <gflags/gflags.h>
-#include <modules/perception/onboard/common_shared_data.h>
-#include <modules/perception/traffic_light/interface/green_interface.h>
+#include "modules/perception/onboard/common_shared_data.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
@@ -77,6 +77,7 @@ class TLProcSubnode : public CommonSubnode {
   DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
 };
 
+REGISTER_SUBNODE(TLProcSubnode);
 } // namespace traffic_light
 } // namespace perception
 } // namespace apollo

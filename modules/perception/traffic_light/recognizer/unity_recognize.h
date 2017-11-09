@@ -5,9 +5,9 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 
-#include <modules/perception/traffic_light/interface/base_recognizer.h>
-#include <modules/perception/traffic_light/interface/green_interface.h>
-#include <modules/perception/lib/config_manager/config_manager.h>
+#include "modules/perception/traffic_light/interface/base_recognizer.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {

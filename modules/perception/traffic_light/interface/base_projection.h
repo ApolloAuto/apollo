@@ -6,12 +6,11 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 
-#include "modules/perception/lib/base/noncopyable.h"
 #include "modules/perception/lib/base/registerer.h"
-
 #include "modules/perception/traffic_light/base/pose.h"
 #include "modules/perception/traffic_light/base/light.h"
 
+#include <eigen3/Eigen/Core>
 namespace apollo {
 namespace perception {
 namespace traffic_light {

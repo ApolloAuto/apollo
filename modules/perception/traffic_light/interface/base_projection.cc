@@ -6,9 +6,10 @@
 // Projection the TrafficLights' Location on XYZ-Coord in real world to UV-Coord on the image.
 // The code in this file defines the coeffients and loads them from ini files.
 
-#include <yaml-cpp/yaml.h>
-
 #include "modules/perception/traffic_light/interface/base_projection.h"
+
+#include <yaml-cpp/yaml.h>
+#include <eigen3/Eigen/Eigen>
 
 namespace apollo {
 namespace perception {

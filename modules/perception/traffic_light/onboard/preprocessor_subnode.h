@@ -18,7 +18,7 @@
 
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
-#include <modules/perception/obstacle/onboard/hdmap_input.h>
+#include "modules/perception/traffic_light/onboard/hdmap_input.h"
 
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode.h"
@@ -51,7 +51,7 @@ class TLPreprocessorSubnode : public Subnode {
   }
 
   // for check lights projection on image border region dynamically
-  static std::map<CameraId, int> _s_image_borders;
+  static std::map<int, int> _s_image_borders;
   static std::string _s_debug_roi_relative_pos;  // for check relative
 
  protected:
@@ -105,8 +105,8 @@ class TLPreprocessorSubnode : public Subnode {
 
   HDMapInput *_hd_map = nullptr;  // HDMap
 
-  std::map<CameraId, double> _last_sub_camera_image_ts;
-  std::map<CameraId, std::string> _camera_topic_names;
+  std::map<int, double> _last_sub_camera_image_ts;
+  std::map<int, std::string> _camera_topic_names;
 
   double _last_query_tf_ts = 0.0;
   double _query_tf_inverval_seconds = 0.0;
@@ -121,6 +121,7 @@ class TLPreprocessorSubnode : public Subnode {
  DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
 };
 
+REGISTER_SUBNODE(TLPreprocessorSubnode);
 } // namespace traffic_light
 } // namespace perception
 } // namespace adu

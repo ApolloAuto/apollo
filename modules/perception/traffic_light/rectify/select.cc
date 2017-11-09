@@ -2,9 +2,9 @@
 // Created by gaohan02 on 17-5-23.
 //
 
-#include "modules/perception/traffic_light/rectify/unity/select.h"
-#include "modules/perception/traffic_light/rectify/unity/munkres.h"
-#include <modules/perception/traffic_light/base/utils.h>
+#include "select.h"
+#include "munkres.h"
+#include "modules/perception/traffic_light/base/utils.h"
 
 namespace apollo {
 namespace perception {

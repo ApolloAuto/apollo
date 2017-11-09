@@ -8,142 +8,149 @@
 
 #include <gflags/gflags.h>
 #include "modules/common/log.h"
+#include "modules/perception/traffic_light/base/utils.h"
 
+DEFINE_double(width_margin_ratio, 0.5,
+              "When the light center is near the width margin ratio * Radius, "
+                  "we will regard the light as outside the image.");
+DEFINE_double(height_margin_ratio, 2.5,
+              "When the light center is near the height margin ratio * Radius, "
+                  "we will regard the light as outside the image.");
+DEFINE_double(light_height_adjust, 0,
+              "When map has something wrong, we could adjust height without chaning code");
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool TwoCamerasProjection::init() {
-
-  ConfigManager *config_manager
-      = ConfigManager::instance();
-  std::string model_name = FLAGS_traffic_light_projection;
-  const ModelConfig *model_config = NULL;
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
-    AERROR << "not found model: " << model_name;
+bool SingleBoundaryBasedProjection::project(const CameraCoeffient &camera_coeffient,
+                                            const Eigen::Matrix4d &pose,
+                                            const apollo::hdmap::Signal &tl_info,
+                                            Light *light) const {
+  int bound_size = tl_info.boundary().point_size();
+  if (bound_size < 4) {
+    AERROR << "Light boundary should be rectangle, which has four points! Got :"
+           << bound_size;
     return false;
   }
 
-  std::string lidar2gps_file;
-  std::string lidar2camera_file;
-  std::string camera_intrinsic_file;
-  using ConfigRead;
+  std::vector<int> x(bound_size);
+  std::vector<int> y(bound_size);
 
-  try {
-    lidar2gps_file = ConfigRead<std::string>::read(*model_config,
-                                                   "short_lidar2gps_file");
-    lidar2gps_file = FileUtil::get_absolute_path(config_manager->work_root(),
-                                                 lidar2gps_file);
-
-    lidar2camera_file = ConfigRead<std::string>::read(*model_config,
-                                                      "short_lidar2camera_file");
-    lidar2camera_file = FileUtil::get_absolute_path(config_manager->work_root(),
-                                                    lidar2camera_file);
-
-    camera_intrinsic_file = ConfigRead<std::string>::read(*model_config,
-                                                          "short_camera_intrinsic_file");
-    camera_intrinsic_file = FileUtil::get_absolute_path(config_manager->work_root(),
-                                                        camera_intrinsic_file);
-
-  } catch (const ConfigManagerError &e) {
-    AERROR << model_name << "Load short focus camera param: " << e.what();
-    return false;
-  }
-  if (!_short_focus_camera_coeffient.init("Short Focus",
-                                          lidar2gps_file,
-                                          lidar2camera_file,
-                                          camera_intrinsic_file)) {
-    AERROR << "Short Focus Camera Projection init failed.";
-    return false;
-  }
-
-  try {
-    lidar2gps_file = ConfigRead<std::string>::read(*model_config,
-                                                   "long_lidar2gps_file");
-    lidar2gps_file = FileUtil::get_absolute_path(config_manager->work_root(),
-                                                 lidar2gps_file);
-
-    lidar2camera_file = ConfigRead<std::string>::read(*model_config,
-                                                      "long_lidar2camera_file");
-    lidar2camera_file = FileUtil::get_absolute_path(config_manager->work_root(),
-                                                    lidar2camera_file);
-
-    camera_intrinsic_file = ConfigRead<std::string>::read(*model_config,
-                                                          "long_camera_intrinsic_file");
-    camera_intrinsic_file = FileUtil::get_absolute_path(config_manager->work_root(),
-                                                        camera_intrinsic_file);
-
-  } catch (const ConfigManagerError &e) {
-    AERROR << model_name << "Load long focus camera param: " << e.what();
-    return false;
-  }
-  if (!_long_focus_camera_coeffient.init("Long Focus",
-                                         lidar2gps_file,
-                                         lidar2camera_file,
-                                         camera_intrinsic_file)) {
-    AERROR << "Long Focus Camera Projection init failed.";
-    return false;
-  }
-
-  _projection.reset(BaseProjectionRegisterer::GetInstanceByName(
-      FLAGS_traffic_light_projection));
-  if (_projection == nullptr) {
-    AERROR << "TwoCamerasProjection new projection failed. name:"
-           << FLAGS_traffic_light_projection;
-    return false;
-  }
-
-  if (FLAGS_traffic_light_projection == "SingleBoundaryBasedProjection") {
-    // in fact , because of the difference of definition parameters between cn and us,
-    // the name is different.
-    // for the short focus camera, they are:
-    // lidar2camera is camera to lidar
-    // lidar2gps is lidar to gps
-    _short_focus_camera_coeffient.gps2camera = _short_focus_camera_coeffient.lidar2gps *
-        _short_focus_camera_coeffient.lidar2camera;
-    _short_focus_camera_coeffient.gps2camera = _short_focus_camera_coeffient.gps2camera
-                                                                            .inverse();
-
-    AINFO << "GPS to short: ";
-    AINFO << _short_focus_camera_coeffient.gps2camera;
-    // for the long focus camera, they are:
-    // lidar2camera is long camera to short camera
-    // lidar2gps is lidar to gps
-    _long_focus_camera_coeffient.gps2camera = _short_focus_camera_coeffient.lidar2gps *
-        _short_focus_camera_coeffient.lidar2camera *
-        _long_focus_camera_coeffient.lidar2camera;
-    _long_focus_camera_coeffient.gps2camera = _long_focus_camera_coeffient.gps2camera.inverse();
-    AINFO << "GPS to long: ";
-    AINFO << _long_focus_camera_coeffient.gps2camera;
-  }
-  return true;
-}
-
-bool TwoCamerasProjection::project(const CarPose &pose,
-                                   const ProjectOption &option,
-                                   Light *light) const {
-
-  const Eigen::Matrix4d mpose = pose.pose();
-  const apollo::hdmap::Signal &tl_info = light->info;
-  bool ret = true;
-  switch (option.camera_id) {
-    case CameraId::LONG_FOCUS:ret = _projection
-          ->project(_long_focus_camera_coeffient, mpose, tl_info, light);
-      break;
-    case CameraId::SHORT_FOCUS:ret = _projection
-          ->project(_short_focus_camera_coeffient, mpose, tl_info, light);
-      break;
-    default:AERROR << "Projection get unkown camera_id:" << option.camera_id;
+  for (int i = 0; i < bound_size; ++i) {
+    // if (!project_point(camera_coeffient, pose, tl_info.boundary().point(i), &x[i], &y[i])) {
+    //     return false;
+    // }
+    if (!project_point_distort(camera_coeffient,
+                               pose, tl_info.boundary().point(i), &x[i], &y[i])) {
       return false;
+    }
   }
-  if (!ret) {
-    AWARN << "Projection failed projection the traffic light. "
-          << "camera_id:" << option.camera_id;
+  int minx = 0;
+  int miny = 0;
+  int maxx = 0;
+  int maxy = 0;
+
+  minx = std::min(x[0], x[2]);
+  miny = std::min(y[0], y[2]);
+  maxx = std::max(x[0], x[2]);
+  maxy = std::max(y[0], y[2]);
+
+  cv::Rect roi(minx, miny, maxx - minx, maxy - miny);
+  AINFO << "projection get ROI:" << roi;
+  if (minx < 0 || miny < 0 || maxx >= camera_coeffient.image_width ||
+      maxy >= camera_coeffient.image_height) {
+    AWARN << "Projection get ROI outside the image. ";
     return false;
   }
+  light->region.projection_roi = RefinedBox(roi, cv::Size(camera_coeffient.image_width,
+                                                          camera_coeffient.image_height));
+  AINFO << "refined ROI:" << light->region.projection_roi;
+
+  return true;
+}
+bool SingleBoundaryBasedProjection::project_point(const CameraCoeffient &coeffient,
+                                                  const Eigen::Matrix4d &pose,
+                                                  const apollo::common::Point3D &point,
+                                                  int *center_x, int *center_y) const {
+  Eigen::Matrix<double, 4, 1> TL_loc_LTM;
+  Eigen::Matrix<double, 3, 1> TL_loc_cam;
+
+  TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust, 1.0;
+  TL_loc_LTM = coeffient.gps2camera * pose.inverse() * TL_loc_LTM;
+
+  //The light may be to the back of Camera, we can't project them on the images.
+  if (TL_loc_LTM(2) < 0) {
+    AWARN << "Compute a light behind the car. light to car Pose:" << TL_loc_LTM;
+    return false;
+  }
+  TL_loc_cam = coeffient.camera_intrinsic * TL_loc_LTM;
+
+  TL_loc_cam /= TL_loc_cam(2, 0);
+  *center_x = (int) TL_loc_cam(0, 0);
+  *center_y = (int) TL_loc_cam(1, 0);
+
   return true;
 }
 
+bool SingleBoundaryBasedProjection::project_point_distort(const CameraCoeffient &coeffient,
+                                                          const Eigen::Matrix4d &pose,
+                                                          const apollo::common::PointENU &point,
+                                                          int *center_x, int *center_y) const {
+  Eigen::Matrix<double, 4, 1> TL_loc_LTM;
+  Eigen::Matrix<double, 3, 1> TL_loc_cam;
+
+  TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust, 1.0;
+  TL_loc_LTM = coeffient.gps2camera * pose.inverse() * TL_loc_LTM;
+
+  //The light may be to the back of Camera, we can't project them on the images.
+  if (TL_loc_LTM(2) < 0) {
+    AWARN << "Compute a light behind the car. light to car Pose:" << TL_loc_LTM;
+    return false;
+  }
+
+  Eigen::Matrix<double, 2, 1> pt2d;
+  pt2d[0] = TL_loc_LTM[0] / TL_loc_LTM[2];
+  pt2d[1] = TL_loc_LTM[1] / TL_loc_LTM[2];
+
+  pt2d = pixel_denormalize(pt2d, coeffient.camera_intrinsic, coeffient.distort_params);
+  *center_x = pt2d[0];
+  *center_y = pt2d[1];
+
+  return true;
+}
+
+Eigen::Matrix<double, 2, 1> SingleBoundaryBasedProjection::pixel_denormalize(
+    const Eigen::Matrix<double, 2, 1> &pt2d,
+    const Eigen::Matrix<double, 3, 4> &camera_intrinsic,
+    const Eigen::Matrix<double, 5, 1> &distort_params) const {
+  // add distortion
+  double r_sq = pt2d[0] * pt2d[0] + pt2d[1] * pt2d[1];
+  Eigen::Matrix<double, 2, 1> pt2d_radial = pt2d * (1 + distort_params[0] * r_sq +
+      distort_params[1] * r_sq * r_sq + distort_params[4] * r_sq * r_sq * r_sq);
+  Eigen::Matrix<double, 2, 1> dpt2d;
+  dpt2d[0] = 2 * distort_params[2] * pt2d[0] * pt2d[1] +
+      distort_params[3] * (r_sq + 2 * pt2d[0] * pt2d[0]);
+  dpt2d[1] = distort_params[2] * (r_sq + 2 * pt2d[1] * pt2d[1]) +
+      2 * distort_params[3] * pt2d[0] * pt2d[1];
+
+  Eigen::Matrix<double, 2, 1> pt2d_distort;
+  pt2d_distort[0] = pt2d_radial[0] + dpt2d[0];
+  pt2d_distort[1] = pt2d_radial[1] + dpt2d[1];
+
+  // add intrinsic K
+  double focal_length_x = camera_intrinsic(0, 0);
+  double focal_length_y = camera_intrinsic(1, 1);
+  double center_x = camera_intrinsic(0, 2);
+  double center_y = camera_intrinsic(1, 2);
+
+  Eigen::Matrix<double, 2, 1> pt;
+  pt[0] = pt2d_distort[0] * focal_length_x + center_x;
+  pt[1] = pt2d_distort[1] * focal_length_y + center_y;
+
+  return pt;
+}
+
+REGISTER_PROJECTION(SingleBoundaryBasedProjection);
 } // namespace traffic_light
 } // namespace perception
 } // namespace apollo

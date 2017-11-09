@@ -2,13 +2,12 @@
 // Created by gaohan02 on 16-9-13.
 //
 
-#include <modules/perception/lib/base/file_util.h>
-#include <modules/perception/traffic_light/base/utils.h>
-#include <modules/perception/traffic_light/rectify/unity/crop/cropbox.h>
-#include <modules/perception/traffic_light/rectify/unity/crop/verify_hdmap.h>
-#include "modules/perception/traffic_light/rectify/unity/detection.h"
-#include "modules/perception/traffic_light/rectify/unity/select.h"
-#include "modules/perception/traffic_light/rectify/unity/unity_rectify.h"
+#include "modules/perception/lib/base/file_util.h"
+#include "modules/perception/traffic_light/base/utils.h"
+#include "cropbox.h"
+#include "detection.h"
+#include "select.h"
+#include "unity_rectify.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -36,7 +35,6 @@ bool UnityRectify::Init() {
     AERROR << "hdmap_box_scale not found." << name();
     return false;
   }
-  verifymap_.reset(new HDmapVerify(hd_scale));
   select_.reset(new Select);
 
   return true;
@@ -143,8 +141,6 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     light->region.debug_roi.push_back(cv::Rect(0, 0, 0, 0));
     light->region.debug_roi_detect_scores.push_back(0.0f);
   }
-
-  verifymap_->verify(ros_image, lights);
 
   cv::Rect cbox;
   crop_->GetCropBox(ros_image.size(), lights_ref, &cbox);

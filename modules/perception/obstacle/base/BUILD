@@ -7,7 +7,7 @@ cc_library(
     srcs = [
         "object.cc",
         "types.cc",
-        "object_supplement.cpp"
+        "object_supplement.cc"
     ],
     hdrs = [
         "hdmap_struct.h",

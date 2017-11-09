@@ -163,6 +163,14 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnablePointCloud(FLAGS_radar_topic, config.mode(),
                          config.message_history_limit());
         break;
+      case AdapterConfig::IMAGE_SHORT:
+        EnableImageShort(FLAGS_image_short_topic, config.mode(),
+                         config.message_history_limit());
+        break;
+      case AdapterConfig::IMAGE_LONG:
+        EnableImageLong(FLAGS_image_long_topic, config.mode(),
+                        config.message_history_limit());
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;

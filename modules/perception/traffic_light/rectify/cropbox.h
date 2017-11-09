@@ -5,7 +5,7 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_CROPBOX_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_CROPBOX_H
 
-#include <modules/perception/traffic_light/interface/green_interface.h>
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 namespace apollo {
 namespace perception {

@@ -34,6 +34,8 @@ message AdapterConfig {
     GNSS_STATUS = 26;
     RADAR = 27;
     ODOMETRY = 28;
+    IMAGE_SHORT = 29;
+    IMAGE_LONG = 30;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

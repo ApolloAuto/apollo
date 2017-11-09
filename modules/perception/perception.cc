@@ -23,6 +23,8 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
+#include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "modules/perception/onboard/dag_streaming.h"
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
@@ -68,7 +70,8 @@ Status Perception::Init() {
 void Perception::RegistAllOnboardClass() {
   /// regist subnode
   RegisterFactoryLidarProcessSubnode();
-
+  traffic_light::RegisterFactoryTLProcSubnode();
+  traffic_light::RegisterFactoryTLProcSubnode();
   /// regist sharedata
   RegisterFactoryLidarObjectData();
   RegisterFactoryRadarObjectData();

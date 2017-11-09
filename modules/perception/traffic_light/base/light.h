@@ -6,10 +6,10 @@
 #ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
 #define ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
 
-#include <Eigen/Eigen>
+#include <eigen3/Eigen/Core>
 #include <opencv2/opencv.hpp>
-#include <modules/perception/proto/traffic_light_detection.pb.h>
-#include <modules/map/proto/map_signal.pb.h>
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/map/proto/map_signal.pb.h"
 
 #include "modules/perception/traffic_light/base/image.h"
 

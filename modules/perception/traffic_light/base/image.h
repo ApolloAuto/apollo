@@ -28,11 +28,11 @@ enum CameraId {
   CAMERA_ID_COUNT = 5
 };
 
-const std::map<CameraId, std::string> kCameraIdToStr = {
-    {LONG_FOCUS, "long_focus_camera(25mm)"},
-    {NARROW_FOCUS, "narrow_focus_camera(12mm)"},
-    {SHORT_FOCUS, "short_focus_camera(6mm)"},
-    {WIDE_FOCUS, "wide_focus_camera(2.1mm)"}
+const std::map<int, std::string> kCameraIdToStr = {
+    {static_cast<int>(LONG_FOCUS), "long_focus_camera(25mm)"},
+    {static_cast<int>(NARROW_FOCUS), "narrow_focus_camera(12mm)"},
+    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"},
+    {static_cast<int>(WIDE_FOCUS), "wide_focus_camera(2.1mm)"}
 };
 
 //@brief Image loaded from camera.

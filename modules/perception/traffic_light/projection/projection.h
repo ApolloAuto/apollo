@@ -3,35 +3,47 @@
 // @date 2016/09/26 17:48:42
 // @file projection.h
 // @brief Project a traffic_light onto image.
-//        We were told traffic_light's location & we have known our location, 
+//        We were told traffic_light's location & we have known our location,
 //        and then we mark the traffic_light region on the image.
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROJECTION_PROJECTION_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROJECTION_PROJECTION_H
+#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
+#define ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 
-#include <memory>
-
-#include "modules/perception/lib/base/file_util.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include <cmath>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-//@brief 2 Camera Projection project the Light into the image. 
-class TwoCamerasProjection {
+//@brief Projection for each Camera.
+class SingleBoundaryBasedProjection : public BaseProjection {
  public:
-  virtual ~TwoCamerasProjection() = default;
-  virtual bool init();
-  virtual bool project(const CarPose &pose, const ProjectOption &option, Light *light) const;
+  virtual bool project(const CameraCoeffient &camera_coeffient,
+                       const Eigen::Matrix4d &pose,
+                       const apollo::hdmap::Signal &tl_info,
+                       Light *light) const override;
+
  private:
-  CameraCoeffient _long_focus_camera_coeffient;
-  CameraCoeffient _short_focus_camera_coeffient;
-  std::unique_ptr<BaseProjection> _projection;
+  bool project_point(const CameraCoeffient &coeffient,
+                     const Eigen::Matrix4d &pose,
+                     const apollo::common::Point3D &point,
+                     int *center_x, int *center_y) const;
+
+  bool project_point_distort(const CameraCoeffient &coeffient,
+                             const Eigen::Matrix4d &pose,
+                             const apollo::common::PointENU &point,
+                             int *center_x, int *center_y) const;
+
+  Eigen::Matrix<double, 2, 1> pixel_denormalize(
+      const Eigen::Matrix<double, 2, 1> &pt2d,
+      const Eigen::Matrix<double, 3, 4> &camera_intrinsic,
+      const Eigen::Matrix<double, 5, 1> &distort_params) const;
 };
 
 } // namespace traffic_light
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROJECTION_PROJECTION_H
+#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H

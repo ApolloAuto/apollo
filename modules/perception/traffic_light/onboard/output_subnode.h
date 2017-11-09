@@ -12,7 +12,6 @@
 #include <sensor_msgs/Image.h>
 
 #include "modules/perception/onboard/subnode.h"
-#include "modules/perception/onboard/stream_output.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 
 namespace apollo {

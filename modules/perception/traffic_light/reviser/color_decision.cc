@@ -2,8 +2,8 @@
 // Created by gaohan02 on 16-12-2.
 //
 
-#include <modules/perception/lib/config_manager/config_manager.h>
 #include "color_decision.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {

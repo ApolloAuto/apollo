@@ -28,27 +28,20 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-std::map<CameraId, int> TLPreprocessorSubnode::_s_camera_ts_last_3_digits = {
-    {CameraId::LONG_FOCUS, 222},
-    {CameraId::SHORT_FOCUS, 111},
-    {CameraId::NARROW_FOCUS, 444},
-    {CameraId::WIDE_FOCUS, 333}
+std::map<int, int> TLPreprocessorSubnode::_s_camera_ts_last_3_digits = {
+    {static_cast<int>(CameraId::LONG_FOCUS), 222},
+    {static_cast<int>(CameraId::SHORT_FOCUS), 111},
 };
 
 std::map<int, std::string> TLPreprocessorSubnode::_s_camera_names = {
-    {CameraId::LONG_FOCUS, "long_focus_camera"},
-    {CameraId::SHORT_FOCUS, "short_focus_camera"},
-    {CameraId::NARROW_FOCUS, "12mm_focus_camera"},
-    {CameraId::WIDE_FOCUS, "2mm_focus_camera"}
+    {static_cast<int>(CameraId::LONG_FOCUS), "long_focus_camera"},
+    {static_cast<int>(CameraId::SHORT_FOCUS), "short_focus_camera"},
 };
 
-std::map<CameraId, int> TLPreprocessorSubnode::_s_image_borders = {
-    {CameraId::LONG_FOCUS, 100},
-    {CameraId::SHORT_FOCUS, 100},
-    {CameraId::NARROW_FOCUS, 100},
-    {CameraId::WIDE_FOCUS, 100}
+std::map<int, int> TLPreprocessorSubnode::_s_image_borders = {
+    {static_cast<int>(CameraId::LONG_FOCUS), 100},
+    {static_cast<int>(CameraId::SHORT_FOCUS), 100},
 };
-std::string TLPreprocessorSubnode::_s_debug_roi_relative_pos = "unknown";
 
 TLPreprocessorSubnode::TLPreprocessorSubnode() {
 }
@@ -60,8 +53,7 @@ bool TLPreprocessorSubnode::InitInternal() {
     return false;
   }
 
-  ConfigManager *config_manager
-      = ConfigManager::instance();
+  ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name("TLPreprocessorSubnode");
   const ModelConfig *model_config(nullptr);
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
@@ -420,10 +412,11 @@ void TLPreprocessorSubnode::sub_camera_image(
 
 bool TLPreprocessorSubnode::get_car_pose(const double ts, CarPose *pose) {
   Eigen::Matrix4d pose_matrix;
-  if (!_velodyne2world_trans.query_pos(ts, &pose_matrix)) {
-    AERROR << "TLPreprocessorSubnode failed to query pose ts:" << GLOG_TIMESTAMP(ts);
-    return false;
-  }
+  // TODO:: query pose
+  //if (!_velodyne2world_trans.query_pos(ts, &pose_matrix)) {
+  //  AERROR << "TLPreprocessorSubnode failed to query pose ts:" << GLOG_TIMESTAMP(ts);
+  //  return false;
+  //}
   if (!pose->set_pose(pose_matrix)) {
     AERROR << "TLPreprocessorSubnode failed to init ts:" << GLOG_TIMESTAMP(ts)
            << " pose:" << pose_matrix;
@@ -450,7 +443,7 @@ bool TLPreprocessorSubnode::verify_lights_projection(
   double valid_hdmap_interval = 0.0;
   _preprocessor->get_last_signals_ts(&last_signals_ts);
   _preprocessor->get_valid_hdmap_interval(&valid_hdmap_interval);
-  if (!_hd_map->get_signals(pose.pose(), &signals)) {
+  if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
       _preprocessor->get_last_signals(&signals);
       AWARN << "verify_lights_projection failed to get signals info. Use last info\n"
@@ -513,7 +506,7 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   double valid_hdmap_interval = 0.0;
   _preprocessor->get_last_signals_ts(&last_signals_ts);
   _preprocessor->get_valid_hdmap_interval(&valid_hdmap_interval);
-  if (!_hd_map->get_signals(pose.pose(), &signals)) {
+  if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
       _preprocessor->get_last_signals(&signals);
       AWARN << "add_cached_camera_selection failed to get signals info. "
@@ -537,7 +530,6 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   }
 }
 
-REGISTER_SUBNODE(TLPreprocessorSubnode);
 } // namespace traffic_light
 } // namespace perception
 } // namespace adu

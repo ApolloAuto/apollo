@@ -4,10 +4,9 @@
 #include "modules/perception/traffic_light/onboard/output_subnode.h"
 
 #include <gflags/gflags.h>
-#include <modules/perception/proto/traffic_light_detection.pb.h>
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include <cv_bridge/cv_bridge.h>
-#include <modules/perception/traffic_light/base/utils.h>
-#include "ros/meta_stats.h"
+#include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/onboard/event_manager.h"

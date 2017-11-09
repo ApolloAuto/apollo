@@ -5,7 +5,8 @@
 // @brief 
 //
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
-
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 #include <gflags/gflags.h>
 #include "modules/common/log.h"
 

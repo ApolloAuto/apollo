@@ -4,7 +4,7 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
-#include "modules/perception/traffic_light/rectify/unity/detection.h"
+#include "detection.h"
 #include "modules/perception/lib/base/timer.h"
 
 namespace apollo {

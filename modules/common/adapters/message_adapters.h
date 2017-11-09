@@ -41,6 +41,7 @@
 #include "modules/drivers/proto/sensor_radar.pb.h"
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/Image.h"
 
 /**
  * @file message_adapters.h
@@ -63,6 +64,8 @@ using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
+using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using RadarAdapter = Adapter<apollo::drivers::RadarObsArray>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;

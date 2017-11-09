@@ -3,7 +3,7 @@
 //
 
 #include "modules/common/log.h"
-#include "modules/perception/traffic_light/rectify/unity/crop/cropbox.h"
+#include "cropbox.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
 namespace apollo {

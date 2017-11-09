@@ -6,12 +6,11 @@
 //
 
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
-
-#include <gflags/gflags.h>
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include <modules/perception/traffic_light/base/utils.h>
+#include "modules/perception/traffic_light/base/utils.h"
+#include <gflags/gflags.h>
 
 namespace apollo {
 namespace perception {
@@ -133,9 +132,9 @@ bool TLPreprocessor::add_cached_lights_projections(
                         lights_on_image_array[cam_id],
                         lights_outside_image_array[cam_id])) {
       AERROR << "add_cached_lights_projections project lights on "
-             << kCameraIdToStr.at(cam_id) << " image failed, "
+             << kCameraIdToStr.at(static_cast<CameraId>(cam_id)) << " image failed, "
              << "ts: " << GLOG_TIMESTAMP(timestamp)
-             << ", camera_id: " << kCameraIdToStr.at(cam_id);
+             << ", camera_id: " << kCameraIdToStr.at(static_cast<CameraId>(cam_id));
       return false;
     }
   }
@@ -288,24 +287,6 @@ void TLPreprocessor::set_last_pub_camera_id(CameraId camera_id) {
 
 void TLPreprocessor::get_last_pub_camera_id(CameraId *camera_id) const {
   *camera_id = _last_pub_camera_id;
-}
-
-void TLPreprocessor::set_last_no_signals_ts(double last_no_signals_ts) {
-  _last_no_signals_ts = last_no_signals_ts;
-}
-
-void TLPreprocessor::get_last_no_signals_ts(double *last_no_signals_ts) const {
-  CHECK_NOTNULL(last_no_signals_ts);
-  *last_no_signals_ts = _last_no_signals_ts;
-}
-
-void TLPreprocessor::set_last_output_ts(double last_output_ts) {
-  _last_output_ts = last_output_ts;
-}
-
-void TLPreprocessor::get_last_output_ts(double *last_output_ts) const {
-  CHECK_NOTNULL(last_output_ts);
-  *last_output_ts = _last_output_ts;
 }
 
 void TLPreprocessor::set_no_signals_interval_seconds(double seconds) {

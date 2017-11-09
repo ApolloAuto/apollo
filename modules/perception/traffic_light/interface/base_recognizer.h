@@ -10,7 +10,6 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "modules/perception/lib/base/noncopyable.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"

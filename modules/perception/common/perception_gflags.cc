@@ -62,3 +62,4 @@ DEFINE_string(radar_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(radar_tf2_child_frame_id, "radar_front",
               "the tf2 transform child frame id");
 DEFINE_double(front_radar_forward_distance, 120.0, "get front radar forward distancer");
+DEFINE_double(forward_distance, 100.0, "max distance to front signals");
