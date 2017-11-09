@@ -23,6 +23,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
+
 namespace apollo {
 namespace planning {
 
@@ -505,7 +508,8 @@ std::vector<double> Spline2dConstraint::AffineThirdDerivativeCoef(
 
 double Spline2dConstraint::SignDistance(const Vec2d& xy_point,
                                         const double angle) const {
-  return -std::sin(angle) * xy_point.x() + std::cos(angle) * xy_point.y();
+  return common::math::InnerProd(xy_point.x(), xy_point.y(), -std::sin(angle),
+                                 std::cos(angle));
 }
 
 std::vector<double> Spline2dConstraint::PolyCoef(const double t) const {

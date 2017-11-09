@@ -152,5 +152,46 @@ TEST(Spline2dConstraint, add_boundary_03) {
   }
 }
 
+TEST(Spline2dConstraint, add_boundary_04) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  std::vector<double> t_coord = {0.0};
+  std::vector<double> angle = {-M_PI / 2.0};
+  std::vector<Vec2d> ref_point;
+  ref_point.emplace_back(Vec2d(0.0, 0.0));
+  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> longitidinal_bound = {2.0};
+
+  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
+                           lateral_bound);
+  const auto mat = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary =
+      constraint.inequality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(4, 8);
+  ref_mat <<
+      1, -0,  -0,  -0,  0,  0,  0,  0,
+     -1,  0,   0,   0, -0, -0, -0, -0,
+      0,  0,   0,   0, -1,  0,  0,  0,
+     -0, -0,  -0,  -0,  1, -0, -0, -0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(4, 1);
+  ref_boundary << -1.0, -1.0, -2.0, -2.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
