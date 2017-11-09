@@ -91,6 +91,9 @@ class MapService {
   bool ConstructLaneWayPoint(const double x, const double y,
                              routing::LaneWaypoint *laneWayPoint) const;
 
+  // Reload map from current FLAGS_map_dir.
+  bool ReloadMap();
+
  private:
   const hdmap::HDMap &BaseMap() const {
     return *hdmap_;
@@ -106,9 +109,10 @@ class MapService {
   bool AddPathFromPassageRegion(const routing::Passage &passage_region,
                                 std::vector<apollo::hdmap::Path> *paths) const;
 
-  const hdmap::HDMap *hdmap_;
+  const bool use_sim_map_;
+  const hdmap::HDMap *hdmap_ = nullptr;
   // A downsampled map for dreamview frontend display.
-  const hdmap::HDMap *sim_map_;
+  const hdmap::HDMap *sim_map_ = nullptr;
 };
 
 }  // namespace dreamview
