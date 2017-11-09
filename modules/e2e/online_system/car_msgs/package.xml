@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
 #
@@ -13,14 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################-->
-
-<?xml version="1.0"?>
 <package>
   <name>car_msgs</name>
   <version>0.0.0</version>
   <description>The car_msgs package</description>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="zhengchao04@baidu.com">zhengchao04</maintainer>
