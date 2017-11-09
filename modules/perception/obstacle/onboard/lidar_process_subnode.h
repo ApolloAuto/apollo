@@ -50,7 +50,6 @@ class LidarProcessSubnode : public Subnode {
 
   void TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
                             pcl_util::PointCloudPtr* out_cloud);
-  bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
 
   void PublishDataAndEvent(double timestamp,
                            const SharedDataPtr<SensorObjects>& data);

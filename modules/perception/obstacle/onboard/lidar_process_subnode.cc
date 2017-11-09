@@ -22,6 +22,7 @@
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/onboard/transform_input.h"
 
 namespace apollo {
 namespace perception {
@@ -332,45 +333,6 @@ void LidarProcessSubnode::TransPointCloudToPCL(
     }
   }
   cloud->points.resize(points_num);
-}
-
-bool LidarProcessSubnode::GetVelodyneTrans(const double query_time,
-                                           Matrix4d* trans) {
-  if (!trans) {
-    AERROR << "failed to get trans, the trans ptr can not be NULL";
-    return false;
-  }
-
-  ros::Time query_stamp(query_time);
-  const auto& tf2_buffer = AdapterManager::Tf2Buffer();
-
-  const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
-  string err_msg;
-  if (!tf2_buffer.canTransform(FLAGS_lidar_tf2_frame_id,
-                               FLAGS_lidar_tf2_child_frame_id, query_stamp,
-                               ros::Duration(kTf2BuffSize), &err_msg)) {
-    AERROR << "Cannot transform frame: " << FLAGS_lidar_tf2_frame_id
-           << " to frame " << FLAGS_lidar_tf2_child_frame_id
-           << " , err: " << err_msg
-           << ". Frames: " << tf2_buffer.allFramesAsString();
-    return false;
-  }
-
-  geometry_msgs::TransformStamped transform_stamped;
-  try {
-    transform_stamped = tf2_buffer.lookupTransform(
-        FLAGS_lidar_tf2_frame_id, FLAGS_lidar_tf2_child_frame_id, query_stamp);
-  } catch (tf2::TransformException& ex) {
-    AERROR << "Exception: " << ex.what();
-    return false;
-  }
-  Affine3d affine_3d;
-  tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
-  *trans = affine_3d.matrix();
-
-  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
-         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
-  return true;
 }
 
 void LidarProcessSubnode::PublishDataAndEvent(
