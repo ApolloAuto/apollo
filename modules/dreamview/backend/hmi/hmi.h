@@ -21,6 +21,7 @@
 
 #include "gtest/gtest_prod.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 
@@ -33,7 +34,7 @@ namespace dreamview {
 
 class HMI {
  public:
-  explicit HMI(WebSocketHandler *websocket);
+  HMI(WebSocketHandler *websocket, MapService *map_service);
 
  private:
   // Broadcast HMIStatus to all clients.
@@ -57,6 +58,7 @@ class HMI {
 
   // No ownership.
   WebSocketHandler *websocket_;
+  MapService *map_service_;
 
   FRIEND_TEST(HMITest, RunComponentCommand);
 };
