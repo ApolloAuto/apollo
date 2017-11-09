@@ -23,6 +23,10 @@
 
 #include <string>
 #include <vector>
+
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
+
 #include "modules/map/pnc_map/pnc_map.h"
 #include "third_party/json/json.hpp"
 
@@ -95,10 +99,6 @@ class MapService {
   bool ReloadMap();
 
  private:
-  const hdmap::HDMap &BaseMap() const {
-    return *hdmap_;
-  }
-
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
                       double *nearest_s, double *nearest_l) const;
@@ -113,6 +113,9 @@ class MapService {
   const hdmap::HDMap *hdmap_ = nullptr;
   // A downsampled map for dreamview frontend display.
   const hdmap::HDMap *sim_map_ = nullptr;
+
+  // RW lock to protect map data
+  mutable boost::shared_mutex mutex_;
 };
 
 }  // namespace dreamview
