@@ -24,7 +24,9 @@
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
 
 #include <algorithm>
+#include <functional>
 #include <vector>
+
 #include "Eigen/Core"
 
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"
@@ -46,10 +48,10 @@ class Spline1dConstraint {
 
   // preset method
   /**
-  *   @brief: inequality boundary constraints
-  *   if no boundary, do specify either by std::infinity or
-  *   let vector.size() = 0
-  **/
+   * @brief: inequality boundary constraints
+   * if no boundary, do specify either by std::infinity or
+   * let vector.size() = 0
+   **/
   bool AddBoundary(const std::vector<double>& x_coord,
                    const std::vector<double>& lower_bound,
                    const std::vector<double>& upper_bound);
@@ -67,10 +69,10 @@ class Spline1dConstraint {
                                   const std::vector<double>& upper_bound);
 
   /**
-  *   @brief: equality constraint to guarantee joint smoothness
-  *   boundary equality constriant constraint on fx, dfx, ddfx ... in vector
-  *   form; upto third order
-  **/
+   * @brief: equality constraint to guarantee joint smoothness
+   * boundary equality constriant constraint on fx, dfx, ddfx ... in vector
+   * form; upto third order
+   **/
   bool AddPointConstraint(const double x, const double fx);
   bool AddPointDerivativeConstraint(const double x, const double dfx);
   bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
@@ -86,7 +88,6 @@ class Spline1dConstraint {
   bool AddPointThirdDerivativeConstraintInRange(const double x,
                                                 const double dddfx,
                                                 const double range);
-
   // guarantee upto values are joint
   bool AddSmoothConstraint();
 
@@ -100,19 +101,17 @@ class Spline1dConstraint {
   bool AddThirdDerivativeSmoothConstraint();
 
   /**
-  *   @brief: Add monotone constraint inequality, guarantee the monotone city at
-  *evaluated point
-  **/
-
-  // customized monotone inequality constraint at x_coord
+   * @brief: Add monotone constraint inequality, guarantee the monotone city at
+   * evaluated point. customized monotone inequality constraint at x_coord
+   **/
   bool AddMonotoneInequalityConstraint(const std::vector<double>& x_coord);
 
   // default inequality constraint at knots
   bool AddMonotoneInequalityConstraintAtKnots();
 
   /**
-  *   @brief: output interface inequality constraint
-  **/
+   * @brief: output interface inequality constraint
+   **/
   const AffineConstraint& inequality_constraint() const;
   const AffineConstraint& equality_constraint() const;
 
@@ -128,6 +127,12 @@ class Spline1dConstraint {
                          std::vector<double>* const filtered_upper_bound);
   void GeneratePowerX(const double x, const uint32_t order,
                       std::vector<double>* const power_x) const;
+
+  using AddConstraintInRangeFunc =
+      std::function<bool(const std::vector<double>&, const std::vector<double>&,
+                         const std::vector<double>&)>;
+  bool AddConstraintInRange(AddConstraintInRangeFunc func, const double x,
+                            const double val, const double range);
 
  private:
   AffineConstraint inequality_constraint_;
