@@ -49,7 +49,7 @@ bool ModestRadarDetector::Init() {
     return false;
   }
   RadarTrack::SetTrackedTimesThreshold(delay_frames_);
-  ObjectBuilder::SetDelayFrame(delay_frames_);
+  object_builder_.SetDelayFrame(delay_frames_);
   if (chosen_filter_ == "Adaptive Kalman Filter") {
     RadarTrack::SetFilterType("Adaptive Kalman Filter");
     AINFO << "Chosen filter: Use Adaptive Kalman Filter";
@@ -61,7 +61,7 @@ bool ModestRadarDetector::Init() {
     AERROR << "use_fp_filter is not found.";
     return false;
   }
-  ObjectBuilder::SetUseFpFilter(use_kf_filter_);
+  object_builder_.SetUseFpFilter(use_kf_filter_);
   if (!model_config->GetValue("use_kf_filter", &use_kf_filter_)) {
     AERROR << "use_kf_filter is not found.";
     return false;
@@ -166,7 +166,7 @@ bool ModestRadarDetector::Init() {
     AERROR << "la_vel_dist_unknown not found.";
     return false;
   }
-  ObjectBuilder::SetContiParams(conti_params_);
+  object_builder_.SetContiParams(conti_params_);
   AINFO << "Initialize the modest radar  detector";
   return true;
 }
@@ -197,7 +197,7 @@ bool ModestRadarDetector::Detect(const RadarObsArray &raw_obstacles,
   }
 
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
-  object_builder.build(raw_obstacles, radar_pose, main_velocity, *radar_objects);
+  object_builder_.build(raw_obstacles, radar_pose, main_velocity, *radar_objects);
   radar_objects->timestamp = (double) raw_obstacles.measurement_time();
   radar_objects->sensor_type = RADAR;
 
@@ -229,7 +229,8 @@ bool ModestRadarDetector::Detect(const RadarObsArray &raw_obstacles,
 
   // treatment
   radar_tracker_->Process(*radar_objects);
-
+  AINFO << "After process: , object size: " <<  radar_objects->objects.size();
+ 
   collect_radar_result(objects);
   return true;
 }

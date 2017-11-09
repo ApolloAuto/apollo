@@ -33,7 +33,6 @@
 
 namespace apollo {
 namespace perception {
-DECLARE_string(onboard_fusion);
 
 class FusionSubnode : public Subnode {
  public:
@@ -74,6 +73,8 @@ class FusionSubnode : public Subnode {
   EventID radar_event_id_;
  DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };
+
+REGISTER_SUBNODE(FusionSubnode);
 
 }  // namespace perception
 }  // namespace apollo

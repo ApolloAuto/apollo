@@ -228,7 +228,7 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   FuseBackgroundObjects(background_objects,
                         frame->sensor_type, frame->sensor_id, frame->timestamp);
 
-  track_manager_->TemoveLostTracks();
+  track_manager_->RemoveLostTracks();
 
 }
 

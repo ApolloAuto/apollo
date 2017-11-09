@@ -37,7 +37,7 @@ class BaseFilter {
   std::string name() {
     return name_;
   }
-  virtual Eigen::Vector4d UpdateWithObject(Object &new_object) = 0;
+  virtual Eigen::Vector4d UpdateWithObject(const Object &new_object, const double time_diff) = 0;
   virtual Eigen::Matrix4d GetCovarianceMatrix() = 0;
  protected:
   std::string name_;

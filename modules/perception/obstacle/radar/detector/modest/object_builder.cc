@@ -21,9 +21,6 @@
 namespace apollo {
 namespace perception {
 
-int ObjectBuilder::delay_frames_ = 4;
-bool ObjectBuilder::use_fp_filter_ = true;
-
 void ObjectBuilder::build(const RadarObsArray &raw_obstacles,
                           const Eigen::Matrix4d &radar_pose,
                           const Eigen::Vector2d &main_velocity,

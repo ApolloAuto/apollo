@@ -60,11 +60,12 @@ Eigen::Vector4d AdaptiveKalmanFilter::Predict(const double time_diff) {
   return state;
 }
 
-Eigen::Vector4d AdaptiveKalmanFilter::UpdateWithObject(Object &new_object) {
+Eigen::Vector4d AdaptiveKalmanFilter::UpdateWithObject(const Object &new_object, 
+  const double time_diff) {
   //predict and then correct
   a_matrix_.setIdentity();
-  a_matrix_(0, 2) = 0.074;
-  a_matrix_(1, 3) = 0.074;
+  a_matrix_(0, 2) = time_diff;
+  a_matrix_(1, 3) = time_diff;
 
   priori_state_ = a_matrix_ * posteriori_state_;
   p_matrix_ = ((a_matrix_ * p_matrix_) * a_matrix_.transpose()) + q_matrix_;

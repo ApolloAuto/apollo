@@ -21,6 +21,7 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/pcl_util",
+        "//modules/perception/lib/base",
         "//modules/perception/proto:perception_proto",
         "@eigen//:eigen",
     ],

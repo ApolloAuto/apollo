@@ -157,6 +157,7 @@ void RadarProcessSubnode::OnRadar(
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
   radar_objects->timestamp = timestamp;
   radar_objects->sensor_type = RADAR;
+  radar_objects->sensor2world_pose = *radar2world_pose;
   bool result = radar_detector_->Detect(
       radar_obs_proto,
       map_polygons,

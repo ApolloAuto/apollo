@@ -19,6 +19,7 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -37,7 +38,7 @@ class PbfTrack {
 
   PbfSensorObjectPtr GetFusedObject();
 
-  double GetGusedTimestamp() const;
+  double GetFusedTimestamp() const;
 
   PbfSensorObjectPtr GetLidarObject(const std::string &sensor_id);
 
@@ -143,20 +144,19 @@ class PbfTrack {
 
  private:
   static int s_track_idx_;
-
   //invisible period for different sensors
   static double s_max_lidar_invisible_period_;
   static double s_max_radar_invisible_period_;
-
   //radar confidant regions
   static double s_max_radar_confident_angle_;
   static double s_min_radar_confident_distance_;
-
   static std::string s_motion_fusion_method_;
-
   //publish conditions
   static bool s_publish_if_has_lidar_;
   static bool s_publish_if_has_radar_;
+  FRIEND_TEST(PbfTrackTest, test_pbf_track_constructor);
+  FRIEND_TEST(PbfTrackTest, test_pbf_get_object);
+  FRIEND_TEST(PbfTrackTest, test_pbf_update_measurements_life);
 };
 
 typedef std::shared_ptr<PbfTrack> PbfTrackPtr;
