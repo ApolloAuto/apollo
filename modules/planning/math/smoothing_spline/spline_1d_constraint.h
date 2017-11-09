@@ -76,6 +76,17 @@ class Spline1dConstraint {
   bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
   bool AddPointThirdDerivativeConstraint(const double x, const double dddfx);
 
+  bool AddPointConstraintInRange(const double x, const double fx,
+                                 const double range);
+  bool AddPointDerivativeConstraintInRange(const double x, const double dfx,
+                                           const double range);
+  bool AddPointSecondDerivativeConstraintInRange(const double x,
+                                                 const double ddfx,
+                                                 const double range);
+  bool AddPointThirdDerivativeConstraintInRange(const double x,
+                                                const double dddfx,
+                                                const double range);
+
   // guarantee upto values are joint
   bool AddSmoothConstraint();
 
