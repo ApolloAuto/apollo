@@ -46,12 +46,14 @@ class HMI {
   static int RunComponentCommand(
       const google::protobuf::Map<std::string, Component> &components,
       const std::string &component_name, const std::string &command_name);
-  // Run a supported command of all modules, return the count of failed ones.
-  int RunCommandOnAllModules(const std::string &command_name);
+
+  // Run a supported command of current mode.
+  void RunModeCommand(const std::string &command_name);
 
   static void ChangeDrivingModeTo(const std::string &new_mode);
-  void ChangeMapTo(const std::string &new_map);
-  void ChangeVehicleTo(const std::string &new_vehicle);
+  void ChangeMapTo(const std::string &map_name);
+  void ChangeVehicleTo(const std::string &vehicle_name);
+  void ChangeModeTo(const std::string &mode_name);
 
   HMIConfig config_;
   HMIStatus status_;
