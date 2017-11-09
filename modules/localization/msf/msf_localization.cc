@@ -85,23 +85,6 @@ Status MSFLocalization::Start() {
                                             this);
   }
 
-  // // Integ Measure Gnss
-  // CHECK(AdapterManager::GetIntegMeasureGnss()) << "IntegMeasureGnss is not
-  // initialized.";
-  // AdapterManager::AddIntegMeasureGnssCallback(&MSFLocalization::OnIntegMeasureGnss,
-  // this);
-
-  // // Integ Measure Lidar
-  // CHECK(AdapterManager::GetIntegMeasureLidar()) << "IntegMeasureLidar is not
-  // initialized.";
-  // AdapterManager::AddIntegMeasureLidarCallback(&MSFLocalization::OnIntegMeasureLidar,
-  // this);
-
-  // Integ Sins Pva
-  CHECK(AdapterManager::GetIntegSinsPva())
-      << "IntegSinsPva is not initialized.";
-  AdapterManager::AddIntegSinsPvaCallback(&MSFLocalization::OnSinsPva, this);
-
   return Status::OK();
 }
 
@@ -138,6 +121,10 @@ void MSFLocalization::Init() {
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;
   localizaiton_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
 
+  std::cerr << "map: " << localizaiton_param_.map_path << std::endl;
+  std::cerr << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file << std::endl;
+  std::cerr << "lidar_height: " << localizaiton_param_.lidar_height_file << std::endl;
+
   // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
@@ -153,11 +140,11 @@ void MSFLocalization::Init() {
 
   if (1) {
     localizaiton_param_.imu_to_ant_offset.offset_x = 0.0;
-    localizaiton_param_.imu_to_ant_offset.offset_y = 0.0;
-    localizaiton_param_.imu_to_ant_offset.offset_z = 0.0;
-    localizaiton_param_.imu_to_ant_offset.uncertainty_x = 0.0;
-    localizaiton_param_.imu_to_ant_offset.uncertainty_y = 0.0;
-    localizaiton_param_.imu_to_ant_offset.uncertainty_z = 0.0;
+    localizaiton_param_.imu_to_ant_offset.offset_y = 1.10866;
+    localizaiton_param_.imu_to_ant_offset.offset_z = 1.14165;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_x = 0.05;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_y = 0.05;
+    localizaiton_param_.imu_to_ant_offset.uncertainty_z = 0.08;
   } else {
     std::string name = "";
     double offset_x = 0.0;
@@ -247,49 +234,11 @@ void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
     AdapterManager::PublishLocalization(integ_localization);
   }
 
-  // imu -> lidar
-  // imu -> integ -> republish -> lidar -> publish
-
-  // lidar_process_.RawImuProcess(imu_msg);
-
-  // integ_process_.RawImuProcess(imu_msg);
-
-  // IntegState state;
-  // IntegSinsPva sins_pva;
-  // LocalizationEstimate localization;
-  // integ_process_.GetResult(state, sins_pva, localization);
-
-  // if (state != IntegState::NOT_INIT) {
-  //   // update republish
-  //   republish_process_.IntegPvaProcess(sins_pva);
-
-  //   // update lidar
-  //   lidar_process_.IntegPvaProcess(sins_pva);
-
-  //   if (FLAGS_gnss_mode == int(GnssMode::SELF)) {
-  //     // update gnss
-  //     gnss_process_.IntegSinsPvaProcess(sins_pva);
-  //   }
-
-  //   // publish sins_pva for debug
-  //   AdapterManager::PublishIntegSinsPva(sins_pva);
-  // }
-
-  // if (state == IntegState::OK) {
-  //   //localization
-  //   AdapterManager::PublishLocalization(localization);
-  // }
   return;
 }
 
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
   localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);
-
-  // // TODO use GnssInfoType to on/of callback
-  // IntegMeasure measure;
-  // republish_process_.NovatelBestgnssposProcess(
-  //     bestgnsspos_msg, measure);
-  // integ_process_.MeasureDataProcess(measure);
 
   return;
 }
@@ -303,18 +252,6 @@ void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
 
   AdapterManager::PublishIntegMeasureGnss(measure);
 
-  // gnss_process_.RawObservationProcess(raw_obs_msg);
-
-  // IntegMeasure gnss_measure;
-  // gnss_process_.GetResult(gnss_measure);
-
-  // IntegMeasure measure;
-  // republish_process_.GnssLocalProcess(gnss_measure, measure);
-  // integ_process_.MeasureDataProcess(measure);
-
-  // // pushlish GNSS IntegMeasure for debug
-  // AdapterManager::PublishIntegMeasureGnss(measure);
-
   return;
 }
 
@@ -326,12 +263,6 @@ void MSFLocalization::OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg) {
 }
 
 void MSFLocalization::OnGps(const localization::Gps &gps_msg) {}
-
-void MSFLocalization::OnMeasure(const localization::IntegMeasure &measure_msg) {
-}
-
-void MSFLocalization::OnSinsPva(
-    const localization::IntegSinsPva &sins_pva_msg) {}
 
 }  // namespace localization
 }  // namespace apollo

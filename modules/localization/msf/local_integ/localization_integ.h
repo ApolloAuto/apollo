@@ -54,7 +54,9 @@ struct ImuToAntOffset {
 };
 
 struct LocalizationIntegParam {
-  LocalizationIntegParam() {}
+  LocalizationIntegParam() {
+    is_using_raw_gnsspos = true;
+  }
 
   // integration module
   bool is_ins_can_self_align;
