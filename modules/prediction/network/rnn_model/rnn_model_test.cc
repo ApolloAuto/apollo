@@ -46,7 +46,7 @@ TEST(NetModelTest, verification_test) {
     EXPECT_TRUE(LoadTensor(sample.features(1), &lane_feature));
 
     RnnModel::instance()->Run({obstacle_feature, lane_feature}, &output);
-    EXPECT_EQ(output.size(), 1);
+    EXPECT_EQ(output.size(), 2);
     EXPECT_TRUE(sample.has_probability());
     EXPECT_NEAR(output(0, 0), sample.probability(), 0.1);
 

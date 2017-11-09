@@ -85,7 +85,7 @@ class RNNEvaluator : public Evaluator {
 
  private:
   network::RnnModel* model_ptr_;
-  int dim_obstacle_feature_ = 10;
+  int dim_obstacle_feature_ = 6;
   int dim_lane_point_feature_ = 4;
   int length_lane_point_sequence_ = 20;
 };
