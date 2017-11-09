@@ -363,9 +363,29 @@ void Obstacle::SetLengthWidthHeight(
 }
 
 void Obstacle::InitKFMotionTracker(Feature* feature) {
+  double cycle_time = 0.1;
+  double t = cycle_time;
   // Set transition matrix F
+  // constant acceleration dynamic model
   Eigen::Matrix<double, 6, 6> F;
-  F.setIdentity();
+  F.setZero();
+  F(0, 0) = 1.0;
+  F(0, 2) = t;
+  F(0, 4) = 0.5 * t * t;
+
+  F(1, 1) = 1.0;
+  F(1, 3) = t;
+  F(1, 5) = 0.5 * t * t;
+
+  F(2, 2) = 1.0;
+  F(2, 4) = t;
+
+  F(3, 2) = 1.0;
+  F(3, 5) = t;
+
+  F(4, 4) = 1.0;
+
+  F(5, 5) = 1.0;
   kf_motion_tracker_.SetTransitionMatrix(F);
 
   // Set observation matrix H
@@ -376,6 +396,8 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   kf_motion_tracker_.SetObservationMatrix(H);
 
   // Set covariance of transition noise matrix Q
+  // make the noise this order:
+  // noise(x/y) < noise(vx/vy) < noise(ax/ay)
   Eigen::Matrix<double, 6, 6> Q;
   Q.setIdentity();
   Q *= FLAGS_q_var;
@@ -388,6 +410,8 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   kf_motion_tracker_.SetObservationNoise(R);
 
   // Set current state covariance matrix P
+  // make the covariance this order:
+  // cov(x/y) < cov(vx/vy) < cov(ax/ay)
   Eigen::Matrix<double, 6, 6> P;
   P.setIdentity();
   P *= FLAGS_p_var;
