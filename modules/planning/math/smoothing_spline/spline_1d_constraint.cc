@@ -286,6 +286,23 @@ bool Spline1dConstraint::AddPointConstraint(const double x, const double fx) {
   return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
+bool Spline1dConstraint::AddPointConstraintInRange(const double x,
+                                                   const double fx,
+                                                   const double range) {
+  if (range < 0.0) {
+    return false;
+  }
+  std::vector<double> x_vec;
+  x_vec.push_back(x);
+
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  lower_bound.push_back(fx - range);
+  upper_bound.push_back(fx + range);
+
+  return AddBoundary(x_vec, lower_bound, upper_bound);
+}
+
 bool Spline1dConstraint::AddPointDerivativeConstraint(const double x,
                                                       const double dfx) {
   uint32_t index = FindIndex(x);
@@ -301,6 +318,22 @@ bool Spline1dConstraint::AddPointDerivativeConstraint(const double x,
   Eigen::MatrixXd equality_boundary(1, 1);
   equality_boundary(0, 0) = dfx;
   return AddEqualityConstraint(equality_constraint, equality_boundary);
+}
+
+bool Spline1dConstraint::AddPointDerivativeConstraintInRange(
+    const double x, const double dfx, const double range) {
+  if (range < 0.0) {
+    return false;
+  }
+  std::vector<double> x_vec;
+  x_vec.push_back(x);
+
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  lower_bound.push_back(dfx - range);
+  upper_bound.push_back(dfx + range);
+
+  return AddDerivativeBoundary(x_vec, lower_bound, upper_bound);
 }
 
 bool Spline1dConstraint::AddPointSecondDerivativeConstraint(const double x,
@@ -320,6 +353,22 @@ bool Spline1dConstraint::AddPointSecondDerivativeConstraint(const double x,
   return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
+bool Spline1dConstraint::AddPointSecondDerivativeConstraintInRange(
+    const double x, const double ddfx, const double range) {
+  if (range < 0.0) {
+    return false;
+  }
+  std::vector<double> x_vec;
+  x_vec.push_back(x);
+
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  lower_bound.push_back(ddfx - range);
+  upper_bound.push_back(ddfx + range);
+
+  return AddSecondDerivativeBoundary(x_vec, lower_bound, upper_bound);
+}
+
 bool Spline1dConstraint::AddPointThirdDerivativeConstraint(const double x,
                                                            const double dddfx) {
   uint32_t index = FindIndex(x);
@@ -336,6 +385,22 @@ bool Spline1dConstraint::AddPointThirdDerivativeConstraint(const double x,
   Eigen::MatrixXd equality_boundary(1, 1);
   equality_boundary(0, 0) = dddfx;
   return AddEqualityConstraint(equality_constraint, equality_boundary);
+}
+
+bool Spline1dConstraint::AddPointThirdDerivativeConstraintInRange(
+    const double x, const double dddfx, const double range) {
+  if (range < 0.0) {
+    return false;
+  }
+  std::vector<double> x_vec;
+  x_vec.push_back(x);
+
+  std::vector<double> lower_bound;
+  std::vector<double> upper_bound;
+  lower_bound.push_back(dddfx - range);
+  upper_bound.push_back(dddfx + range);
+
+  return AddThirdDerivativeBoundary(x_vec, lower_bound, upper_bound);
 }
 
 bool Spline1dConstraint::AddSmoothConstraint() {
