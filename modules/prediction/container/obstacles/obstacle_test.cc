@@ -55,7 +55,6 @@ class ObstacleTest : public KMLMapBasedTest {
   ObstaclesContainer container_;
 };
 
-/**
 TEST_F(ObstacleTest, VehicleBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
@@ -202,7 +201,6 @@ TEST_F(ObstacleTest, PedestrianHeading) {
   EXPECT_DOUBLE_EQ(latest_feature.theta(), 1.220);
   EXPECT_NEAR(latest_feature.t_velocity_heading(), 1.221, 0.01);
 }
-**/
 
 }  // namespace prediction
 }  // namespace apollo

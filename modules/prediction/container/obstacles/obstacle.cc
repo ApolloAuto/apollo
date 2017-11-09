@@ -380,7 +380,7 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   F(2, 2) = 1.0;
   F(2, 4) = t;
 
-  F(3, 2) = 1.0;
+  F(3, 3) = 1.0;
   F(3, 5) = t;
 
   F(4, 4) = 1.0;
