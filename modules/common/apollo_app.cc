@@ -18,13 +18,17 @@
 
 #include <csignal>
 #include <string>
+#include <vector>
 
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/status/status.h"
+#include "modules/common/util/string_util.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 
 #include "ros/include/ros/ros.h"
+
+DECLARE_string(log_dir);
 
 namespace apollo {
 namespace common {
@@ -39,6 +43,21 @@ void ApolloApp::ReportModuleStatus(
   status_.set_name(Name());
   status_.set_status(status);
   hmi::HMIStatusHelper::ReportModuleStatus(status_);
+}
+
+void ApolloApp::ExportFlags() const {
+  const auto export_file = util::StrCat(FLAGS_log_dir, "/", Name(), ".flags");
+  std::ofstream fout(export_file);
+  CHECK(fout) << "Cannot open file " << export_file;
+
+  std::vector<gflags::CommandLineFlagInfo> flags;
+  gflags::GetAllFlags(&flags);
+  for (const auto &flag : flags) {
+    fout << "# " << flag.type << ", default=" << flag.default_value << "\n"
+         << "# " << flag.description << "\n"
+         << "--" << flag.name << "=" << flag.current_value << "\n"
+         << std::endl;
+  }
 }
 
 int ApolloApp::Spin() {
@@ -56,6 +75,7 @@ int ApolloApp::Spin() {
     ReportModuleStatus(apollo::hmi::ModuleStatus::STOPPED);
     return -2;
   }
+  ExportFlags();
   ReportModuleStatus(apollo::hmi::ModuleStatus::STARTED);
   spinner.start();
   ros::waitForShutdown();
