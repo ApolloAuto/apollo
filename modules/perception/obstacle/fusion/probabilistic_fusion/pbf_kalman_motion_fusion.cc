@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
+
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -35,6 +36,8 @@ void PbfKalmanMotionFusion::Initialize(const Eigen::Vector3d &anchor_point,
 
   belief_anchor_point_ = anchor_point;
   belief_velocity_ = velocity;
+  belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
+  last_radar_velocity_ = Eigen::Vector3d(1000, 1000, 0);
 }
 
 void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
@@ -44,10 +47,12 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   if (is_lidar(new_object->sensor_type)) {
     belief_anchor_point_ = new_object->object->anchor_point;
     belief_velocity_ = new_object->object->velocity;
+    belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
     initialized_ = true;
   } else if (is_radar(new_object->sensor_type)) {
     belief_anchor_point_ = new_object->object->anchor_point;
     belief_velocity_ = new_object->object->velocity;
+    belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
     initialized_ = true;
   }
 
@@ -62,6 +67,7 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   priori_state_ = posteriori_state_;
 
   q_matrix_.setIdentity();
+  q_matrix_ *= 0.5;
 
   r_matrix_.setIdentity();
   r_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
@@ -91,16 +97,56 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
   a_matrix_(1, 3) = time_diff;
 
   priori_state_ = a_matrix_ * posteriori_state_;
-  p_matrix_ = ((a_matrix_ * p_matrix_) * a_matrix_.transpose()) + q_matrix_;
+  priori_state_(2) += belief_acceleration_(0) * time_diff;
+  priori_state_(3) += belief_acceleration_(1) * time_diff;
 
+  p_matrix_ = ((a_matrix_ * p_matrix_) * a_matrix_.transpose()) + q_matrix_;
+  p_matrix_.block<2, 2>(2, 0) = Eigen::Matrix2d::Zero();
+  p_matrix_.block<2, 2>(0, 2) = Eigen::Matrix2d::Zero();
+
+  Eigen::Vector3d measured_acceleration = Eigen::Vector3d::Zero();
   if (new_object->sensor_type == VELODYNE_64) {
     belief_anchor_point_ = new_object->object->center;
     belief_velocity_ = new_object->object->velocity;
+    if (GetLidarHistoryLength() >= 3) {
+      int old_velocity_index = GetLidarHistoryIndex(3);
+      Eigen::Vector3d old_velocity = history_velocity_[old_velocity_index];
+      double old_timediff = GetHistoryTimediff(old_velocity_index, new_object->timestamp);
+      measured_acceleration = (belief_velocity_ - old_velocity) / old_timediff;
+    }
+    if ((GetLidarHistoryLength() >= 3 && GetRadarHistoryLength() >= 3) ||
+        history_velocity_.size() > 20) {
+      history_velocity_.pop_front();
+      history_time_diff_.pop_front();
+      history_velocity_is_radar_.pop_front();
+    }
+
+    history_velocity_.push_back(belief_velocity_);
+    history_time_diff_.push_back(new_object->timestamp);
+    history_velocity_is_radar_.push_back(false);
+    last_radar_velocity_ = Eigen::Vector3d(1000, 1000, 0);
   } else if (new_object->sensor_type == RADAR) {
     belief_anchor_point_(0) = new_object->object->center(0);
     belief_anchor_point_(1) = new_object->object->center(1);
     belief_velocity_(0) = new_object->object->velocity(0);
     belief_velocity_(1) = new_object->object->velocity(1);
+    if (GetRadarHistoryLength() >= 3) {
+      int old_velocity_index = GetRadarHistoryIndex(3);
+      Eigen::Vector3d old_velocity = history_velocity_[old_velocity_index];
+      double old_timediff = GetHistoryTimediff(old_velocity_index, new_object->timestamp);
+      measured_acceleration = (belief_velocity_ - old_velocity) / old_timediff;
+    }
+    if ((GetLidarHistoryLength() >= 3 && GetRadarHistoryLength() >= 3) ||
+        history_velocity_.size() > 20) {
+      history_velocity_.pop_front();
+      history_time_diff_.pop_front();
+      history_velocity_is_radar_.pop_front();
+    }
+    history_velocity_.push_back(belief_velocity_);
+    history_time_diff_.push_back(new_object->timestamp);
+    history_velocity_is_radar_.push_back(true);
+    last_radar_velocity_ = belief_velocity_;
+    last_radar_velocity_(2) = 0;
   } else {
     AERROR << "unsupported sensor type for PbfKalmanMotionFusion: "
            << new_object->sensor_type;
@@ -118,6 +164,12 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
   r_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
   r_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
 
+  // Use lidar when there is no radar yet
+  if (GetRadarHistoryLength() == 0 && GetLidarHistoryLength() > 1) {
+    r_matrix_.setIdentity();
+    r_matrix_ *= 0.01;
+  }
+
   k_matrix_ = p_matrix_ * c_matrix_.transpose() *
       (c_matrix_ * p_matrix_ * c_matrix_.transpose() + r_matrix_).inverse();
 
@@ -133,6 +185,10 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
   belief_anchor_point_(1) = posteriori_state_(1);
   belief_velocity_(0) = posteriori_state_(2);
   belief_velocity_(1) = posteriori_state_(3);
+  UpdateAcceleration(measured_acceleration);
+  if (belief_velocity_.head(2).norm() < 0.05) {
+    belief_velocity_ = Eigen::Vector3d(0, 0, 0);
+  }
 }
 
 void PbfKalmanMotionFusion::UpdateWithoutObject(const double time_diff) {
@@ -144,6 +200,76 @@ void PbfKalmanMotionFusion::GetState(Eigen::Vector3d &anchor_point, Eigen::Vecto
 
   anchor_point = belief_anchor_point_;
   velocity = belief_velocity_;
+}
+
+int PbfKalmanMotionFusion::GetRadarHistoryLength() {
+  int history_length = 0;
+  for (size_t i = 0; i < history_velocity_is_radar_.size(); ++i) {
+    if (history_velocity_is_radar_[i]) {
+      history_length++;
+    }
+  }
+  return history_length;
+}
+
+int PbfKalmanMotionFusion::GetLidarHistoryLength() {
+  int history_length = history_velocity_is_radar_.size();
+  history_length -= GetRadarHistoryLength();
+  return history_length;
+}
+
+int PbfKalmanMotionFusion::GetLidarHistoryIndex(const int &history_seq) {
+  int history_index = 0;
+  int history_count = 0;
+  for (size_t i = 1; i <= history_velocity_is_radar_.size(); ++i) {
+    history_index = history_velocity_is_radar_.size() - i;
+    if (!history_velocity_is_radar_[history_index]) {
+      history_count++;
+    }
+    if (history_count == history_seq) {
+      break;
+    }
+  }
+  return history_index;
+}
+
+int PbfKalmanMotionFusion::GetRadarHistoryIndex(const int &history_seq) {
+  int history_index = 0;
+  int history_count = 0;
+  for (size_t i = 1; i <= history_velocity_is_radar_.size(); ++i) {
+    history_index = history_velocity_is_radar_.size() - i;
+    if (history_velocity_is_radar_[history_index]) {
+      history_count++;
+    }
+    if (history_count == history_seq) {
+      break;
+    }
+  }
+  return history_index;
+}
+
+double PbfKalmanMotionFusion::GetHistoryTimediff(const int &history_index,
+                                                 const double &current_timestamp) {
+  double history_timestamp = history_time_diff_[history_index];
+  double history_timediff = current_timestamp - history_timestamp;
+  return history_timediff;
+}
+
+void PbfKalmanMotionFusion::UpdateAcceleration(const Eigen::VectorXd &measured_acceleration) {
+  Eigen::Matrix2d mat_c = Eigen::Matrix2d::Identity();
+  Eigen::Matrix2d mat_q = Eigen::Matrix2d::Identity() * 0.5;
+  Eigen::Matrix2d mat_k = p_matrix_.block<2, 2>(2, 2) * mat_c.transpose() *
+      (mat_c * p_matrix_.block<2, 2>(2, 2) * mat_c.transpose() + mat_q).inverse();
+  Eigen::Vector2d acceleration_gain =
+      mat_k * (measured_acceleration.head(2) - mat_c * belief_acceleration_.head(2));
+  // breakdown
+  float breakdown_threshold = 2;
+  if (acceleration_gain.norm() > breakdown_threshold) {
+    acceleration_gain.normalize();
+    acceleration_gain *= breakdown_threshold;
+  }
+  belief_acceleration_(0) += acceleration_gain(0);
+  belief_acceleration_(1) += acceleration_gain(1);
 }
 
 } // namespace perception
