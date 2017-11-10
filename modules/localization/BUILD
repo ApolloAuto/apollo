@@ -20,6 +20,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common:apollo_app",
+        "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/localization:localization_base",
         "//modules/localization/rtk:rtk_localization",

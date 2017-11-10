@@ -20,6 +20,7 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_tokenizer.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -122,8 +123,10 @@ void MSFLocalization::Init() {
   localizaiton_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
 
   std::cerr << "map: " << localizaiton_param_.map_path << std::endl;
-  std::cerr << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file << std::endl;
-  std::cerr << "lidar_height: " << localizaiton_param_.lidar_height_file << std::endl;
+  std::cerr << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file
+            << std::endl;
+  std::cerr << "lidar_height: " << localizaiton_param_.lidar_height_file
+            << std::endl;
 
   // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
@@ -132,12 +135,6 @@ void MSFLocalization::Init() {
   localization_integ_.Init(localizaiton_param_);
 
   // set imu to ant offset
-  apollo::drivers::gnss::config::Config gnss_config;
-  bool success = common::util::GetProtoFromASCIIFile<
-      apollo::drivers::gnss::config::Config>(
-      common::util::TranslatePath(FLAGS_gnss_conf_path), &gnss_config);
-  std::string login_commands = gnss_config.login_commands(1);
-
   if (1) {
     localizaiton_param_.imu_to_ant_offset.offset_x = 0.0;
     localizaiton_param_.imu_to_ant_offset.offset_y = 1.10866;
@@ -146,6 +143,16 @@ void MSFLocalization::Init() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_y = 0.05;
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = 0.08;
   } else {
+    apollo::drivers::gnss::config::Config gnss_config;
+    CHECK(common::util::GetProtoFromASCIIFile<
+          apollo::drivers::gnss::config::Config>(
+        common::util::TranslatePath(FLAGS_gnss_conf_path), &gnss_config));
+    CHECK(gnss_config.login_commands_size() > 1);
+    std::string login_commands = gnss_config.login_commands(1);
+    std::vector<std::string> segmented_login_commands =
+        common::util::StringTokenizer::Split(login_commands, " ");
+    CHECK(segmented_login_commands.size() == 7);
+
     std::string name = "";
     double offset_x = 0.0;
     double offset_y = 0.0;
@@ -208,8 +215,8 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
   // if (state == 2) {
   //   // TODO republish refactoring
   //   IntegMeasure lidar_measure;
-  //   republish_process_.LidarLocalProcess(lidar_localization, lidar_measure);
-  //   integ_process_.MeasureDataProcess(lidar_measure);
+  //   republish_process_.LidarLocalProcess(lidar_localization,
+  //   lidar_measure); integ_process_.MeasureDataProcess(lidar_measure);
 
   //   // publish lidar message to debug
   //   AdapterManager::PublishIntegMeasureLidar(lidar_measure);
