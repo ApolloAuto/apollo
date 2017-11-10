@@ -46,7 +46,7 @@ class RouteSegmentsTest : public ::testing::Test {
 
 hdmap::HDMap RouteSegmentsTest::hdmap_;
 
-TEST_F(RouteSegmentsTest, RouteSegments_GetProjection) {
+TEST_F(RouteSegmentsTest, GetProjection) {
   auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
   RouteSegments route_segments;
   route_segments.emplace_back(lane1, 10, 20);
@@ -82,6 +82,111 @@ TEST_F(RouteSegmentsTest, RouteSegments_GetProjection) {
   EXPECT_NEAR(0.0, l, 1e-4);
   point = lane2->GetSmoothPoint(31);
   EXPECT_FALSE(route_segments.GetProjection(point, &s, &l, &waypoint));
+}
+
+TEST_F(RouteSegmentsTest, Stitch) {
+  auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
+  auto lane2 = hdmap_.GetLaneById(hdmap::MakeMapId("13_1_-1"));
+  {
+    RouteSegments seg1;
+    RouteSegments seg2;
+    seg1.emplace_back(lane1, 10, 20);
+    seg1.emplace_back(lane2, 10, 15);
+    seg2.emplace_back(lane2, 15, 20);
+    seg2.emplace_back(lane2, 20, 30);
+    EXPECT_TRUE(seg1.Stitch(seg2));
+    EXPECT_EQ(3, seg1.size());
+    EXPECT_EQ(lane1, seg1[0].lane);
+    EXPECT_FLOAT_EQ(10, seg1[0].start_s);
+    EXPECT_FLOAT_EQ(20, seg1[0].end_s);
+    EXPECT_EQ(lane2, seg1[1].lane);
+    EXPECT_FLOAT_EQ(10, seg1[1].start_s);
+    EXPECT_FLOAT_EQ(20, seg1[1].end_s);
+    EXPECT_EQ(lane2, seg1[2].lane);
+    EXPECT_FLOAT_EQ(20, seg1[2].start_s);
+    EXPECT_FLOAT_EQ(30, seg1[2].end_s);
+  }
+  {
+    RouteSegments seg1;
+    RouteSegments seg2;
+    seg1.emplace_back(lane1, 10, 20);
+    seg1.emplace_back(lane2, 10, 15);
+    seg2.emplace_back(lane2, 15, 20);
+    seg2.emplace_back(lane2, 20, 30);
+    EXPECT_TRUE(seg2.Stitch(seg1));
+    EXPECT_EQ(3, seg2.size());
+    EXPECT_EQ(lane1, seg2[0].lane);
+    EXPECT_FLOAT_EQ(10, seg2[0].start_s);
+    EXPECT_FLOAT_EQ(20, seg2[0].end_s);
+    EXPECT_EQ(lane2, seg2[1].lane);
+    EXPECT_FLOAT_EQ(10, seg2[1].start_s);
+    EXPECT_FLOAT_EQ(20, seg2[1].end_s);
+    EXPECT_EQ(lane2, seg2[2].lane);
+    EXPECT_FLOAT_EQ(20, seg2[2].start_s);
+    EXPECT_FLOAT_EQ(30, seg2[2].end_s);
+  }
+}
+
+TEST_F(RouteSegmentsTest, Shrink) {
+  auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
+  auto lane2 = hdmap_.GetLaneById(hdmap::MakeMapId("13_1_-1"));
+  {
+    RouteSegments seg;
+    seg.emplace_back(lane1, 10, 20);
+    seg.emplace_back(lane2, 15, 20);
+    seg.emplace_back(lane2, 20, 30);
+    auto point = lane2->GetSmoothPoint(15.0);
+    seg.Shrink({point.x(), point.y()}, 5, 10);
+    EXPECT_EQ(3, seg.size());
+    EXPECT_EQ(lane1, seg[0].lane);
+    EXPECT_FLOAT_EQ(15, seg[0].start_s);
+    EXPECT_FLOAT_EQ(20, seg[0].end_s);
+    EXPECT_EQ(lane2, seg[1].lane);
+    EXPECT_FLOAT_EQ(15, seg[1].start_s);
+    EXPECT_FLOAT_EQ(20, seg[1].end_s);
+    EXPECT_FLOAT_EQ(20, seg[2].start_s);
+    EXPECT_FLOAT_EQ(25, seg[2].end_s);
+  }
+  {
+    RouteSegments seg;
+    seg.emplace_back(lane1, 10, 20);
+    seg.emplace_back(lane2, 15, 20);
+    seg.emplace_back(lane2, 20, 30);
+    auto point = lane2->GetSmoothPoint(15.0);
+    seg.Shrink({point.x(), point.y()}, 50, 10);
+    EXPECT_EQ(3, seg.size());
+    EXPECT_EQ(lane1, seg[0].lane);
+    EXPECT_FLOAT_EQ(10, seg[0].start_s);
+    EXPECT_FLOAT_EQ(20, seg[0].end_s);
+    EXPECT_EQ(lane2, seg[1].lane);
+    EXPECT_FLOAT_EQ(15, seg[1].start_s);
+    EXPECT_FLOAT_EQ(20, seg[1].end_s);
+    EXPECT_EQ(lane2, seg[2].lane);
+    EXPECT_FLOAT_EQ(20, seg[2].start_s);
+    EXPECT_FLOAT_EQ(25, seg[2].end_s);
+  }
+  {
+    RouteSegments seg;
+    seg.emplace_back(lane1, 10, 20);
+    seg.emplace_back(lane2, 15, 20);
+    seg.emplace_back(lane2, 20, 30);
+    auto point = lane2->GetSmoothPoint(15.0);
+    seg.Shrink({point.x(), point.y()}, -5, 50);
+    EXPECT_EQ(1, seg.size());
+    EXPECT_EQ(lane2, seg[0].lane);
+    EXPECT_FLOAT_EQ(20, seg[0].start_s);
+    EXPECT_FLOAT_EQ(30, seg[0].end_s);
+  }
+  {
+    RouteSegments seg;
+    seg.emplace_back(lane2, 10, 30);
+    auto point = lane2->GetSmoothPoint(20.0);
+    seg.Shrink({point.x(), point.y()}, 5, 5);
+    EXPECT_EQ(1, seg.size());
+    EXPECT_EQ(lane2, seg[0].lane);
+    EXPECT_FLOAT_EQ(15, seg[0].start_s);
+    EXPECT_FLOAT_EQ(25, seg[0].end_s);
+  }
 }
 
 }  // namespace hdmap
