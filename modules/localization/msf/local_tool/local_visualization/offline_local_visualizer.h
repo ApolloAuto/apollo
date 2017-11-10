@@ -8,6 +8,8 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+#define LOC_INFO_NUM 3
+
 class OfflineLocalVisualizer {
  public:
   OfflineLocalVisualizer();

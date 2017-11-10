@@ -7,6 +7,9 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+unsigned char color_table[4][3] = {{0, 0, 255}, {0, 255, 0}, 
+                        {255, 0, 0}, {0, 0, 0}};
+
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
   if (this->level < key.level) {
@@ -89,6 +92,8 @@ VisualizationEngine::VisualizationEngine()
   _image_visual_leaf_path = "";
 
   _window_name = "Local Visualizer";
+  _loc_info_num = 1;
+  _car_loc_id = 0;
 }
 
 VisualizationEngine::~VisualizationEngine() {}
@@ -97,10 +102,12 @@ bool VisualizationEngine::Init(const std::string &map_folder,
                                const BaseMapConfig &map_config,
                                const unsigned int resolution_id,
                                const int zone_id,
-                               const Eigen::Affine3d &extrinsic) {
+                               const Eigen::Affine3d &extrinsic,
+                               const unsigned int loc_info_num) {
   _map_folder = map_folder;
   _map_config = map_config;
   _velodyne_extrinsic = extrinsic;
+  _loc_info_num = loc_info_num;
 
   if (_resolution_id >= _map_config._map_resolutions.size()) {
     std::cerr << "Invalid resolution id." << std::endl;
@@ -130,27 +137,28 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   return true;
 }
 
-void VisualizationEngine::Visualize(const Eigen::Affine3d &cur_pose,
+void VisualizationEngine::Visualize(const std::vector<LocalizatonInfo> &loc_infos,
                                     const std::vector<Eigen::Vector3d> &cloud) {
   if (!_is_init) {
+    std::cerr << "Visualziation should be init first." << std::endl;
     return;
   }
-  _car_pose = cur_pose;
 
-  unsigned int img_width = _map_config._map_node_size_x;
-  unsigned int img_height = _map_config._map_node_size_y;
-  Eigen::Vector3d cen = cur_pose.translation();
-  _cloud_img_lt_coord[0] =
-      cen[0] -
-      _map_config._map_resolutions[_resolution_id] * (img_width / 2.0f);
-  _cloud_img_lt_coord[1] =
-      cen[1] -
-      _map_config._map_resolutions[_resolution_id] * (img_height / 2.0f);
+  if (loc_infos.size() != _loc_info_num) {
+    std::cerr << "Please check the localization info num." << std::endl;
+    return;
+  }
 
-  _cloud_img.setTo(cv::Scalar(0, 0, 0));
-  _cloud_img_mask.setTo(cv::Scalar(0));
+  if (!loc_infos[_car_loc_id].is_valid) {
+    std::cerr << "Localization info is invalid." << std::endl;
+    return;
+  }
+
+  _cur_loc_infos = loc_infos;
+  _car_pose = loc_infos[_car_loc_id].pose;
+
   CloudToMat(_car_pose, _velodyne_extrinsic, cloud, _cloud_img,
-             _cloud_img_mask);
+          _cloud_img_mask);
   Draw();
 }
 
@@ -244,7 +252,8 @@ void VisualizationEngine::Draw() {
   cv::Point node_grid_index = MapGridIndexToNodeGridIndex(map_grid_index);
   cv::Point bias = node_grid_index - map_grid_index;
 
-  DrawCar(bias);
+  DrawLoc(bias);
+  DrawStd(bias);
   DrawCloud(bias);
 
   int width = (int)(1024 * _cur_scale) / _cur_stride;
@@ -255,6 +264,10 @@ void VisualizationEngine::Draw() {
   cv::resize(_big_window(cv::Rect(left_top_x, left_top_y, width, width)),
              _image_window, cv::Size(1024, 1024), 0, 0, CV_INTER_LINEAR);
   cv::flip(_image_window, _image_window, 0);
+
+  DrawLegend();
+  DrawInfo();
+
   cv::namedWindow(_window_name, CV_WINDOW_NORMAL);
   // cv::setMouseCallback(_window_name, processMouse, 0);
   cv::imshow(_window_name, _image_window);
@@ -266,22 +279,55 @@ void VisualizationEngine::Draw() {
   ProcessKey(cv::waitKey(waitTime));
 }
 
-void VisualizationEngine::DrawCar(const cv::Point &bias) {
+void VisualizationEngine::DrawLoc(const cv::Point &bias) {
+  std::cout << "Draw loc." << std::endl;
   if (_cur_level == 0) {
-    cv::Point lt;
-    const Eigen::Vector3d &loc = _car_pose.translation();
-    Eigen::Vector2d loc_2d;
-    loc_2d[0] = loc[0];
-    loc_2d[1] = loc[1];
+    for (unsigned int i = 0; i < _loc_info_num; i++) {
+      LocalizatonInfo &loc_info = _cur_loc_infos[i];
+      cv::Point lt;
+      const Eigen::Vector3d &loc = loc_info.pose.translation();
+      Eigen::Vector2d loc_2d;
+      loc_2d[0] = loc[0];
+      loc_2d[1] = loc[1];
 
-    lt = CoordToMapGridIndex(loc_2d, _resolution_id, _cur_stride);
-    lt = lt + bias + cv::Point(1024, 1024);
+      lt = CoordToMapGridIndex(loc_2d, _resolution_id, _cur_stride);
+      lt = lt + bias + cv::Point(1024, 1024);
+      
+      unsigned char b = color_table[i % _loc_info_num][0];
+      unsigned char g = color_table[i % _loc_info_num][1];
+      unsigned char r = color_table[i % _loc_info_num][2];
+      cv::circle(_big_window, lt, 4, cv::Scalar(b, g, r), 1);
+    }
+  }
+}
 
-    cv::circle(_big_window, lt, 4, cv::Scalar(0, 0, 255), 1);
+void VisualizationEngine::DrawStd(const cv::Point &bias) {
+  std::cout << "Draw std." << std::endl;
+  if (_cur_level == 0) {
+    for (unsigned int i = 0; i < _loc_info_num; i++) {
+      LocalizatonInfo &loc_info = _cur_loc_infos[i];
+      cv::Point lt;
+      const Eigen::Vector3d &loc = loc_info.pose.translation();
+      const Eigen::Vector3d &std = loc_info.std_var;
+      Eigen::Vector2d loc_2d;
+      loc_2d[0] = loc[0];
+      loc_2d[1] = loc[1];
+
+      lt = CoordToMapGridIndex(loc_2d, _resolution_id, _cur_stride);
+      lt = lt + bias + cv::Point(1024, 1024);
+      
+      unsigned char b = color_table[i % _loc_info_num][0];
+      unsigned char g = color_table[i % _loc_info_num][1];
+      unsigned char r = color_table[i % _loc_info_num][2];
+
+      cv::Size size(std[0] * 100 + 1.0, std[1] * 100 + 1.0);
+      cv::ellipse(_big_window, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2, 8);
+    }
   }
 }
 
 void VisualizationEngine::DrawCloud(const cv::Point &bias) {
+  std::cout << "Draw cloud." << std::endl;
   if (_cur_level == 0) {
     cv::Point lt;
     lt = CoordToMapGridIndex(_cloud_img_lt_coord, _resolution_id, _cur_stride);
@@ -294,6 +340,65 @@ void VisualizationEngine::DrawCloud(const cv::Point &bias) {
       // _cloud_img.copyTo(_big_window(cv::Rect(lt.x, lt.y, 1024, 1024)));
     }
   }
+}
+
+void VisualizationEngine::DrawLegend() {
+  std::cout << "Draw legend." << std::endl;
+  int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+  double fontScale = 0.6;
+  int thickness = 2.0;
+  int baseline = 0;
+  cv::Size textSize; 
+
+  for (unsigned int i = 0; i < _loc_info_num; i++) {
+    LocalizatonInfo &loc_info = _cur_loc_infos[i];
+    if (!loc_info.is_valid) {
+      continue;
+    }
+
+    std::string text = loc_info.description;
+    textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+    cv::Point textOrg(790, (15 + textSize.height) * (i + 1));
+    cv::putText(_image_window, text, textOrg, fontFace, fontScale,
+        cv::Scalar(255, 0, 0), thickness, 8);
+
+    unsigned char b = color_table[i % _loc_info_num][0];
+    unsigned char g = color_table[i % _loc_info_num][1];
+    unsigned char r = color_table[i % _loc_info_num][2];
+    cv::circle(_image_window, cv::Point(755, 
+          (15 + textSize.height) * (i + 1)  - textSize.height/2), 
+          8, cv::Scalar(b, g, r), 3 );
+  }
+}
+
+void VisualizationEngine::DrawInfo() {
+  std::cout << "Draw info." << std::endl;
+  LocalizatonInfo &loc_info = _cur_loc_infos[_car_loc_id];
+
+  int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+  double fontScale = 0.8;
+  int thickness = 2.0;
+  int baseline = 0;
+  cv::Size textSize; 
+
+  std::string text;
+  
+  // draw frame id.
+  char info[256];
+  snprintf(info, 256, "Frame: %d.", loc_info.frame_id);
+  text = info;
+  textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+  cv::Point textOrg(10, 10 + textSize.height);
+  cv::putText(_image_window, text, textOrg, fontFace, fontScale,
+      cv::Scalar(255, 0, 0), thickness, 8);
+  
+  // draw timestamp.
+  snprintf(info, 256, "Timestamp: %lf.", loc_info.timestamp);
+  text = info;
+  textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+  textOrg = cv::Point(10, 2 * (10 + textSize.height));
+  cv::putText(_image_window, text, textOrg, fontFace, fontScale,
+      cv::Scalar(255, 0, 0), thickness, 8);
 }
 
 void VisualizationEngine::UpdateLevel() {
@@ -462,6 +567,19 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
                                      const std::vector<Eigen::Vector3d> &cloud,
                                      cv::Mat &cloud_img,
                                      cv::Mat &cloud_img_mask) {
+  unsigned int img_width = _map_config._map_node_size_x;
+  unsigned int img_height = _map_config._map_node_size_y;
+  Eigen::Vector3d cen = _car_pose.translation();
+  _cloud_img_lt_coord[0] =
+      cen[0] -
+      _map_config._map_resolutions[_resolution_id] * (img_width / 2.0f);
+  _cloud_img_lt_coord[1] =
+      cen[1] -
+      _map_config._map_resolutions[_resolution_id] * (img_height / 2.0f);
+
+  _cloud_img.setTo(cv::Scalar(0, 0, 0));
+  _cloud_img_mask.setTo(cv::Scalar(0));
+
   for (unsigned int i = 0; i < cloud.size(); i++) {
     const Eigen::Vector3d &pt = cloud[i];
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
@@ -475,7 +593,10 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
       continue;
     }
 
-    cloud_img.at<cv::Vec3b>(row, col) = cv::Vec3b(0, 255, 255);
+    unsigned char b = color_table[_car_loc_id % _loc_info_num][0];
+    unsigned char g = color_table[_car_loc_id % _loc_info_num][1];
+    unsigned char r = color_table[_car_loc_id % _loc_info_num][2];
+    cloud_img.at<cv::Vec3b>(row, col) = cv::Vec3b(b, g, r);
     cloud_img_mask.at<unsigned char>(row, col) = 1;
   }
 }
@@ -568,6 +689,10 @@ void VisualizationEngine::UpdateScale(const double factor) {
   _cur_scale *= factor;
 }
 
+void VisualizationEngine::GenNextCarLocId() {
+  _car_loc_id = (_car_loc_id + 1) % _loc_info_num;
+}
+
 void VisualizationEngine::ProcessKey(int key) {
   const int move = 20;
   char c_key = static_cast<char>(key);
@@ -583,7 +708,7 @@ void VisualizationEngine::ProcessKey(int key) {
       break;
     }
     case 'w': {
-      UpdateViewCenter(0, -move);
+      UpdateViewCenter(0, move);
       Draw();
       break;
     }
@@ -593,7 +718,7 @@ void VisualizationEngine::ProcessKey(int key) {
       break;
     }
     case 's': {
-      UpdateViewCenter(0, move);
+      UpdateViewCenter(0, -move);
       Draw();
       break;
     }
@@ -625,6 +750,11 @@ void VisualizationEngine::ProcessKey(int key) {
     }
     case 'p': {
       _auto_play = !_auto_play;
+      break;
+    }
+    case 'c': {
+      GenNextCarLocId();
+      break;
     }
     default:
       break;

@@ -12,6 +12,51 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+struct LocalizatonInfo {
+  LocalizatonInfo() {
+    is_valid = false;
+    timestamp = 0.0;
+    frame_id = 0;
+    std_var[0] = 0.1;
+    std_var[1] = 0.1;
+    std_var[1] = 0.1;
+  }
+
+  ~LocalizatonInfo() {
+  }
+
+  void set(const Eigen::Affine3d &pose, 
+          const Eigen::Vector3d &std_var,
+          const std::string &description, 
+          const double &timestamp, 
+          const unsigned int &frame_id) {
+    this->pose = pose;
+    this->std_var = std_var;
+    this->description = description;
+    this->timestamp = timestamp;
+    this->frame_id = frame_id;
+    is_valid = true;
+  }
+
+  void set(const Eigen::Affine3d &pose,
+          const std::string &description,
+          const double &timestamp, 
+          const unsigned int &frame_id) {
+    this->pose = pose;
+    this->description = description;
+    this->timestamp = timestamp;
+    this->frame_id = frame_id;
+    is_valid = true;
+  }
+
+  Eigen::Affine3d pose;
+  Eigen::Vector3d std_var;
+  std::string description;
+  double timestamp;
+  unsigned int frame_id;
+  bool is_valid;
+};
+
 struct MapImageKey {
   MapImageKey() : level(0), zone_id(0), node_north_id(0), node_east_id(0) {}
   bool operator<(const MapImageKey &key) const;
@@ -45,16 +90,19 @@ class VisualizationEngine {
  public:
   bool Init(const std::string &map_folder, const BaseMapConfig &map_config,
             const unsigned int resolution_id, const int zone_id,
-            const Eigen::Affine3d &extrinsic);
-  void Visualize(const Eigen::Affine3d &cur_pose,
+            const Eigen::Affine3d &extrinsic,
+            const unsigned int loc_info_num = 1);
+  void Visualize(const std::vector<LocalizatonInfo> &loc_infos,
                  const std::vector<Eigen::Vector3d> &cloud);
 
  private:
   void Preprocess(const std::string &map_folder);
   void Draw();
-  void DrawCar(const cv::Point &bias);
+  void DrawLoc(const cv::Point &bias);
+  void DrawStd(const cv::Point &bias);
   void DrawCloud(const cv::Point &bias);
-  // void DrawLegend();
+  void DrawLegend();
+  void DrawInfo();
 
   void UpdateLevel();
   void GenerateMutiResolutionImages(const std::vector<std::string> &src_files,
@@ -82,6 +130,7 @@ class VisualizationEngine {
   void UpdateViewCenter(const double move_x, const double move_y);
   void SetScale(const double scale);
   void UpdateScale(const double factor);
+  void GenNextCarLocId();
   void ProcessKey(int key);
 
  private:
@@ -121,6 +170,10 @@ class VisualizationEngine {
   cv::Mat _cloud_img_mask;
   Eigen::Vector2d _cloud_img_lt_coord;
   Eigen::Affine3d _velodyne_extrinsic;
+
+  unsigned int _loc_info_num;
+  unsigned int _car_loc_id;
+  std::vector<LocalizatonInfo> _cur_loc_infos;
 };
 
 }  // namespace msf

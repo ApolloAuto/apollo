@@ -81,7 +81,7 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   std::cout << "Get zone id succeed." << std::endl;
 
   success = _visual_engine.Init(_map_folder, _map_config, _resolution_id,
-                                _zone_id, _velodyne_extrinsic);
+                                _zone_id, _velodyne_extrinsic, LOC_INFO_NUM);
   if (!success) {
     std::cerr << "Visualization engine init failed." << std::endl;
     return false;
@@ -93,12 +93,33 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
 
 void OfflineLocalVisualizer::Visualize() {
   for (unsigned int idx = 0; idx < _pcd_timestamps.size(); idx++) {
-    auto found_iter = _lidar_poses.find(idx);
-    if (found_iter == _lidar_poses.end()) {
-      continue;
-    }
-    const Eigen::Affine3d &lidar_pose = found_iter->second;
+    LocalizatonInfo lidar_loc_info;
+    LocalizatonInfo gnss_loc_info;
+    LocalizatonInfo fusion_loc_info;
 
+    auto found_iter = _lidar_poses.find(idx);
+    if (found_iter != _lidar_poses.end()) {
+      const Eigen::Affine3d &lidar_pose = found_iter->second;
+      lidar_loc_info.set(lidar_pose, "Lidar.", _pcd_timestamps[idx], idx + 1);
+    }
+
+    found_iter = _gnss_poses.find(idx);
+    if (found_iter != _gnss_poses.end()) {
+      const Eigen::Affine3d &gnss_pose = found_iter->second;
+      gnss_loc_info.set(gnss_pose, "GNSS.", _pcd_timestamps[idx], idx + 1);
+    }
+
+    found_iter = _fusion_poses.find(idx);
+    if (found_iter != _fusion_poses.end()) {
+      const Eigen::Affine3d &fusion_pose = found_iter->second;
+      fusion_loc_info.set(fusion_pose, "GNSS.", _pcd_timestamps[idx], idx + 1);
+    }
+
+    std::vector<LocalizatonInfo> loc_infos;
+    loc_infos.push_back(lidar_loc_info);
+    loc_infos.push_back(gnss_loc_info);
+    loc_infos.push_back(fusion_loc_info);
+    
     std::string pcd_file_path;
     std::ostringstream ss;
     ss << idx + 1;
@@ -107,8 +128,10 @@ void OfflineLocalVisualizer::Visualize() {
     std::vector<Eigen::Vector3d> pt3ds;
     std::vector<unsigned char> intensities;
     apollo::localization::msf::velodyne::LoadPcds(
-        pcd_file_path, idx, lidar_pose, pt3ds, intensities, false);
-    _visual_engine.Visualize(lidar_pose, pt3ds);
+        pcd_file_path, idx, lidar_loc_info.pose, 
+        pt3ds, intensities, false);
+
+    _visual_engine.Visualize(loc_infos, pt3ds);
   }
 }
 
@@ -129,7 +152,6 @@ bool OfflineLocalVisualizer::GnssLocFileHandler(
   velodyne::LoadPcdPoses(_gnss_loc_file, poses, timestamps);
 
   PoseInterpolationByTime(poses, timestamps, pcd_timestamps, _gnss_poses);
-
   return true;
 }
 
@@ -140,7 +162,6 @@ bool OfflineLocalVisualizer::FusionLocFileHandler(
   velodyne::LoadPcdPoses(_fusion_loc_file, poses, timestamps);
 
   PoseInterpolationByTime(poses, timestamps, pcd_timestamps, _fusion_poses);
-
   return true;
 }
 
@@ -152,7 +173,7 @@ void OfflineLocalVisualizer::PoseInterpolationByTime(
   unsigned int index = 0;
   for (size_t i = 0; i < ref_timestamps.size(); i++) {
     double ref_timestamp = ref_timestamps[i];
-    unsigned int ref_frame_id = i;
+    // unsigned int ref_frame_id = i;
     // unsigned int matched_index = 0;
     while (in_timestamps[index] < ref_timestamp &&
            index < in_timestamps.size()) {
@@ -177,20 +198,19 @@ void OfflineLocalVisualizer::PoseInterpolationByTime(
         Eigen::Quaterniond cur_quatd(cur_pose.linear());
         Eigen::Translation3d cur_transd(cur_pose.translation());
 
-        Eigen::Quaterniond res_quatd = pre_quatd.slerp(t, cur_quatd);
+        Eigen::Quaterniond res_quatd = pre_quatd.slerp(1 - t, cur_quatd);
+        // Eigen::Quaterniond res_quatd = pre_quatd.slerp(t, cur_quatd);
+
         Eigen::Translation3d re_transd;
-        re_transd.x() = pre_quatd.x() * (1 - t) + cur_transd.x() * t;
-        re_transd.y() = pre_quatd.y() * (1 - t) + cur_transd.y() * t;
-        re_transd.z() = pre_quatd.z() * (1 - t) + cur_transd.z() * t;
+        re_transd.x() = pre_transd.x() * t + cur_transd.x() * (1 - t);
+        re_transd.y() = pre_transd.y() * t + cur_transd.y() * (1 - t);
+        re_transd.z() = pre_transd.z() * t + cur_transd.z() * (1 - t);
+
+        // re_transd.x() = pre_transd.x() * (1 - t) + cur_transd.x() * t;
+        // re_transd.y() = pre_transd.y() * (1 - t) + cur_transd.y() * t;
+        // re_transd.z() = pre_transd.z() * (1 - t) + cur_transd.z() * t;
 
         out_poses[i] = re_transd * res_quatd;
-        // if (fabs(cur_timestamp - ref_timestamp)
-        //         < fabs(pre_timestamp - ref_timestamp)) {
-        //         matched_index = index;
-        // }
-        // else {
-        //         matched_index = index - 1;
-        // }
       }
     } else {
       std::cerr << "[ERROR] No more poses. Exit now." << std::endl;
