@@ -56,10 +56,14 @@ DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
 
-/// obstacle/onboard/radar_process.cc
+/// obstacle/onboard/radar_process_subnode.cc
 DEFINE_string(onboard_radar_detector, "DummyRadarDetector", "onboard radar detector");
 DEFINE_string(radar_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(radar_tf2_child_frame_id, "radar_front",
               "the tf2 transform child frame id");
 DEFINE_double(front_radar_forward_distance, 120.0, "get front radar forward distancer");
+
+/// obstacle/onboard/fusion_subnode.cc
+DEFINE_string(onboard_fusion, "ProbabilisticFusion", "fusion name which enabled onboard");
+
 DEFINE_double(forward_distance, 100.0, "max distance to front signals");

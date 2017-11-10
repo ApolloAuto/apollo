@@ -52,7 +52,7 @@ class PbfTrackManager {
     background_tracks_.push_back(track);
   }
 
-  int TemoveLostTracks();
+  int RemoveLostTracks();
 
  private:
  DISALLOW_COPY_AND_ASSIGN(PbfTrackManager);

@@ -13,37 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_FILTER_BASE_FILTER_H_
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_FILTER_BASE_FILTER_H_
+#include <string>
+#include <vector>
 
-#include <Eigen/Core>
-
-#include "modules/perception/obstacle/base/types.h"
+#include "modules/common/macro.h"
+#include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/obstacle/base/object.h"
 
 namespace apollo {
 namespace perception {
 
-class BaseFilter {
- public:
-  BaseFilter() {
-    name_ = "BaseFilter";
-  };
-  virtual ~BaseFilter() {};
-
-  virtual void Initialize(const Object &state) = 0;
-  virtual Eigen::Vector4d Predict(double time_diff) = 0;
-  std::string name() {
-    return name_;
-  }
-  virtual Eigen::Vector4d UpdateWithObject(const Object &new_object, const double time_diff) = 0;
-  virtual Eigen::Matrix4d GetCovarianceMatrix() = 0;
- protected:
-  std::string name_;
+struct TypeFuserOptions {
+    double timestamp = 0.0;
 };
 
-} // namesapce perception
-} // namesapce apollo
+class BaseTypeFuser {
+ public:
+  BaseTypeFuser() {}
+  virtual ~BaseTypeFuser() {}
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_FILTER_BASE_FILTER_H_
+  virtual bool init() = 0;
+
+  virtual bool fuse_type(
+  	const TypeFuserOptions& options,
+  	std::vector<ObjectPtr>* objects) = 0;
+
+  virtual std::string name() const = 0;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseTypeFuser);
+};
+
+REGISTER_REGISTERER(BaseTypeFuser);
+#define REGISTER_TYPEFUSER(name) REGISTER_CLASS(BaseTypeFuser, name)
+
+} // namespace perception
+} // namespace apollo
+
+#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_

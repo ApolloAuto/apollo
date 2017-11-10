@@ -21,13 +21,10 @@
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/common/perception_gflags.h"
 
-// Defined in onboard/onboard_main.cpp
-DECLARE_string(ros_node_name);
 namespace apollo {
 namespace perception {
-
-DEFINE_string(onboard_fusion, "", "fusion name which enabled onboard");
 
 bool FusionSubnode::InitInternal() {
   CHECK(shared_data_manager_ != nullptr);
@@ -198,8 +195,6 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
   return true;
 }
-
-REGISTER_SUBNODE(FusionSubnode);
 
 }  // namespace perception
 }  // namespace apollo

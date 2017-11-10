@@ -31,4 +31,62 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "conti_radar_id_expansion_test",
+    size = "small",
+    srcs = [
+        "conti_radar_id_expansion_test.cc",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
+        "@gtest//:gtest",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "modest_radar_detector_test",
+    size = "small",
+    srcs = [
+        "modest_radar_detector_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
+        "@gtest//:gtest",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "conti_radar_util_test",
+    size = "small",
+    srcs = [
+        "conti_radar_util_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
+        "@gtest//:gtest",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

@@ -57,10 +57,10 @@ class ModestRadarDetector : public BaseRadarDetector {
   int delay_frames_;
   std::string chosen_filter_;
   ContiParams conti_params_;
-  ObjectBuilder object_builder;
+  ObjectBuilder object_builder_;
   boost::shared_ptr<RadarTrackManager> radar_tracker_;
-
- DISALLOW_COPY_AND_ASSIGN(ModestRadarDetector);
+  FRIEND_TEST(ModestRadarDetectorTest, modest_radar_detector_test);
+  DISALLOW_COPY_AND_ASSIGN(ModestRadarDetector);
 };
 
 REGISTER_RADARDETECTOR(ModestRadarDetector);

@@ -35,7 +35,7 @@ class AdaptiveKalmanFilter : public BaseFilter {
 
   Eigen::Vector4d Predict(const double time_diff);
 
-  Eigen::Vector4d UpdateWithObject(Object &new_object);
+  Eigen::Vector4d UpdateWithObject(const Object &new_object, const double time_diff);
 
   Eigen::Matrix4d GetCovarianceMatrix() { return p_matrix_; }
 

@@ -41,8 +41,6 @@ class RadarTrack {
 
   ~RadarTrack() {}
 
-  void Prediction(double object_time);
-
   // update the object after association with a radar obervation
   void UpdataObsRadar(ObjectPtr obs_radar, const double timestamp);
 

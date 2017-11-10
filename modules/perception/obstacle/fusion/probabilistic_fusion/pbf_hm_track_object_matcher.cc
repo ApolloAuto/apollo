@@ -150,6 +150,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(const std::vector<PbfTrackPt
       int sensor_idx = unassigned_sensor_objects[j];
       const PbfSensorObjectPtr &sensor_object = sensor_objects[sensor_idx];
       double distance = pbf_distance.Compute(fusion_track, sensor_object, options);
+      AINFO << "sensor distance:" << distance;
       association_mat[i][j] = distance;
     }
   }

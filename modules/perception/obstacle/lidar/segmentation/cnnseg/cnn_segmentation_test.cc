@@ -31,6 +31,7 @@
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/obstacle/base/object.h"
 
 #define VISUALIZE
 
@@ -62,6 +63,15 @@ struct CellStat {
 
 int F2I(float val, float ori, float scale) {
   return static_cast<int>(std::floor((ori - val) * scale));
+}
+
+cv::Vec3b GetTypeColor(ObjectType type) {
+  switch (type) {
+  case PEDESTRIAN: return cv::Vec3b(255, 128, 128); // pink
+  case BICYCLE: return cv::Vec3b(0, 0, 255); // blue
+  case VEHICLE: return cv::Vec3b(0, 255, 0); // green 
+  default: return cv::Vec3b(0, 255, 255); // yellow
+  }
 }
 
 class CNNSegmentationTest : public testing::Test {
@@ -160,7 +170,6 @@ void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
 
   // show segment grids with tight bounding box
   const cv::Vec3b segm_color(0, 0, 255);    // red
-  const cv::Vec3b bbox_color(0, 255, 255);  // yellow
 
   for (size_t i = 0; i < objects.size(); ++i) {
     const ObjectPtr &obj = objects[i];
@@ -187,6 +196,7 @@ void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
 
     // fillConvexPoly(img, list.data(), list.size(), cv::Scalar(positive_prob *
     // segm_color));
+    cv::Vec3b bbox_color = GetTypeColor(obj->type);
     rectangle(img, cv::Point(x_min, y_min), cv::Point(x_max, y_max),
               cv::Scalar(bbox_color));
   }

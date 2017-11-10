@@ -80,21 +80,15 @@ RadarTrack &RadarTrack::operator=(const RadarTrack &track) {
   return *this;
 }
 
-void RadarTrack::Prediction(double object_time) {
-  // object_time should be seconds
-  double time_diff = object_time - timestamp_;
-  if (time_diff < 0) {
-    AWARN << "New objects should younger than the track";
-  } else {
-    tracker_->Predict(time_diff);
-  }
-}
-
 void RadarTrack::UpdataObsRadar(ObjectPtr obs_radar, const double timestamp) {
   obs_radar_ = obs_radar;
-  Prediction(timestamp);
   Eigen::Vector4d result;
-  result = tracker_->UpdateWithObject(*obs_radar_);
+  double time_diff = timestamp - timestamp_;
+  if (time_diff < 0) {
+      AWARN << "New objects should younger than the track";
+      return;
+  }
+  result = tracker_->UpdateWithObject(*obs_radar_, time_diff);
   (*obs_).clone(*obs_radar_);
   (*obs_).center[0] = result[0];
   (*obs_).center[1] = result[1];

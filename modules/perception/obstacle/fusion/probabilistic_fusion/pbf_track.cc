@@ -74,8 +74,7 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
 }
 
 void PbfTrack::SetMotionFusionMethod(const std::string motion_fusion_method) {
-  if (motion_fusion_method == "PbfKalmanMotionFusion" ||
-      motion_fusion_method == "PbfDirectMotionFusion") {
+  if (motion_fusion_method == "PbfKalmanMotionFusion") {
     s_motion_fusion_method_ = motion_fusion_method;
   } else {
     AERROR << "unsupported motion fusion method : " << motion_fusion_method
@@ -142,7 +141,7 @@ PbfSensorObjectPtr PbfTrack::GetFusedObject() {
   return fused_object_;
 }
 
-double PbfTrack::GetGusedTimestamp() const {
+double PbfTrack::GetFusedTimestamp() const {
   return fused_timestamp_;
 }
 
@@ -182,7 +181,6 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
       motion_fusion_->GetState(anchor_point, velocity);
       fused_object_->object->velocity = velocity;
     } else {
-      //in case the track is created with a camera measurement
       motion_fusion_->Initialize(obj);
     }
   } else if (is_radar(sensor_type)) {
@@ -263,7 +261,6 @@ int PbfTrack::GetNextTrackId() {
 }
 
 bool PbfTrack::AbleToPublish() {
-
   AINFO << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " " << lidar_objects_.size();
   double invisible_period_threshold = 0.001;
   if (invisible_period_ > invisible_period_threshold &&

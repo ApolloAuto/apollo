@@ -53,10 +53,6 @@ PbfSensorFramePtr PbfSensor::QueryLatestFrame(double time_stamp) {
       latest_query_timestamp_ = frames_[i]->timestamp;
     }
   }
-//    if (sensor_type_ != CAMERA) {
-//        latest_query_timestamp_ = time_stamp;
-//   }
-//    latest_query_timestamp_ = time_stamp;
   return latest_frame;
 }
 

@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/onboard:perception_onboard",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_subnode",
         "//modules/perception/obstacle/onboard:perception_obstacle_radar_subnode",
+        "//modules/perception/obstacle/onboard:perception_obstacle_fusion_subnode",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
         "//modules/perception/obstacle/onboard:perception_obstacle_radar_process",
         "//modules/perception/traffic_light/onboard:perception_traffic_light_onboard",
