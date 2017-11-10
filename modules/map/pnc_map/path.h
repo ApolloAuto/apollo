@@ -57,6 +57,7 @@ struct LaneSegment {
   LaneInfoConstPtr lane = nullptr;
   double start_s = 0.0;
   double end_s = 0.0;
+  double Length() const { return end_s - start_s; }
 
   std::string DebugString() const;
 };
