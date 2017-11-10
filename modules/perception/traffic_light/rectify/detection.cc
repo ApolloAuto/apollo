@@ -42,22 +42,8 @@ void Detection::Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights)
 
   float inflate_col = 1.0f / _crop_col_shrink;
   float inflate_row = 1.0f / _crop_row_shrink;
-
-  switch (detect_output_type_) {
-    case DetectOutputBoxType::BOX_ALL:    // day and night
-      SelectOutputBboxes(crop_image, 0, inflate_col, inflate_row, lights);
-      SelectOutputBboxes(crop_image, 1, inflate_col, inflate_row, lights);
-      break;
-    case DetectOutputBoxType::BOX_VERTICAL:    // day
-      SelectOutputBboxes(crop_image, 0, inflate_col, inflate_row, lights);
-      break;
-    case DetectOutputBoxType::BOX_QUADRATE:    // night
-      SelectOutputBboxes(crop_image, 1, inflate_col, inflate_row, lights);
-      break;
-    default:AINFO << "DenseBoxDetection::perform get unknown detetion output box type: "
-                  << detect_output_type_;
-      return;
-  }
+  SelectOutputBboxes(crop_image, 0, inflate_col, inflate_row, lights);
+  SelectOutputBboxes(crop_image, 1, inflate_col, inflate_row, lights);
 
   AINFO << "Dump output Done! Get box num:" << lights->size();
 
@@ -83,19 +69,6 @@ Detection::Detection(int &min_crop_size, const std::string &refine_net,
 }
 Detection::~Detection() {
   delete _refine_net_ptr;
-}
-
-bool Detection::SetOutputBoxType(DetectOutputBoxType type) {
-  const auto detect_output_type_count =
-      static_cast<int>(DetectOutputBoxType::DETECT_OUTPUT_BOX_TYPE_COUNT);
-  const auto type_int = static_cast<int>(type);
-  if (type_int < 0 || type_int >= detect_output_type_count) {
-    AERROR << "Unknown detetion output box type: " << type;
-    return false;
-  }
-  detect_output_type_ = type;
-
-  return true;
 }
 
 bool Detection::SelectOutputBboxes(const cv::Mat &crop_image,

@@ -35,12 +35,9 @@ class UnityRectify : public BaseRectifier {
   // @brief name
   virtual std::string name() const;
 
-  bool SetOutputBoxType(DetectOutputBoxType type);
-
  private:
   std::shared_ptr<ISelectLight> select_;
   std::shared_ptr<IRefine> detect_;
-  std::shared_ptr<IHDMapOperator> verifymap_;
   std::shared_ptr<IGetBox> crop_;
 };
 

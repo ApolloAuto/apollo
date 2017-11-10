@@ -10,9 +10,9 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-void Select::Select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
-                    const std::vector<LightPtr> &refined_bboxes,
-                    std::vector<LightPtr> *selected_bboxes) {
+void GaussianSelect::Select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
+                            const std::vector<LightPtr> &refined_bboxes,
+                            std::vector<LightPtr> *selected_bboxes) {
 
   // find bbox with max area in refined_bboxes
   auto max_area_refined_bbox = std::max_element(refined_bboxes.begin(), refined_bboxes.end(),

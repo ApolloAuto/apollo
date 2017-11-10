@@ -36,7 +36,6 @@ class Detection : public IRefine {
   ~Detection();
 
  private:
-  bool SetOutputBoxType(DetectOutputBoxType type);
 
   bool SelectOutputBboxes(const cv::Mat &crop_image,
                           int class_id, float inflate_col, float inflate_row,

@@ -10,9 +10,9 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-class Select : public ISelectLight {
+class GaussianSelect : public ISelectLight {
  public:
-  Select() = default;
+  GaussianSelect() = default;
 
   virtual void Select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
                       const std::vector<LightPtr> &refined_bboxes,

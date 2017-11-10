@@ -396,27 +396,22 @@ void TLProcSubnode::ComputeRectsOffset(
 
   cv::Point pt1;
   cv::Point pt2;
-  TLPreprocessorSubnode::_s_debug_roi_relative_pos = "unknown";
   // 分四个象限, 记录横、纵方向最大偏移
   if (center2.y <= center1.y) {
     if (center2.x >= center1.x) {
       pt1 = cv::Point(rect1.x + rect1.width, rect1.y);
       pt2 = cv::Point(rect2.x + rect2.width, rect2.y);
-      TLPreprocessorSubnode::_s_debug_roi_relative_pos = "top right";
     } else {
       pt1 = cv::Point(rect1.x, rect1.y);
       pt2 = cv::Point(rect2.x, rect2.y);
-      TLPreprocessorSubnode::_s_debug_roi_relative_pos = "top left";
     }
   } else {
     if (center2.x >= center1.x) {
       pt1 = cv::Point(rect1.x + rect1.width, rect1.y + rect1.height);
       pt2 = cv::Point(rect2.x + rect2.width, rect2.y + rect2.height);
-      TLPreprocessorSubnode::_s_debug_roi_relative_pos = "bottom right";
     } else {
       pt1 = cv::Point(rect1.x, rect1.y + rect1.height);
       pt2 = cv::Point(rect2.x, rect2.y + rect2.height);
-      TLPreprocessorSubnode::_s_debug_roi_relative_pos = "bottom left";
     }
   }
 

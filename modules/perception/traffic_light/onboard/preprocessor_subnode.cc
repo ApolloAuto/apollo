@@ -10,9 +10,8 @@
 #include <functional>
 #include <string>
 #include <vector>
-#include <modules/perception/traffic_light/base/utils.h>
-#include "ros/meta_stats.h"
-
+#include "modules/perception/onboard/transform_input.h"
+#include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -87,11 +86,6 @@ bool TLPreprocessorSubnode::InitInternal() {
     return false;
   }
 
-  // init TF module
-  if (!init_transform_input(reserve_field)) {
-    AERROR << "TLPreprocessorSubnode Failed to init transform input: " << reserve_;
-    return false;
-  }
   // init hd_map
   if (!init_hdmap()) {
     AERROR << "TLPreprocessorSubnode Failed to init hdmap";
@@ -154,23 +148,6 @@ bool TLPreprocessorSubnode::init_preprocessor() {
   return true;
 }
 
-bool TLPreprocessorSubnode::init_transform_input(
-    const std::map<std::string, std::string> &fields) {
-  // init velodyne to world tf
-  const auto citer = fields.find("velodyne2world_trans");
-  if (citer == fields.end()) {
-    AERROR << "Failed to find velodyne2world_trans conf.";
-    return false;
-  }
-  AINFO << "[velodyne2world] :" << citer->second;
-  const std::string &velodyne2world = citer->second;
-  if (!_velodyne2world_trans.init(velodyne2world)) {
-    AERROR << "TLPreprocessorSubnode failed to init velodyne2world_trans";
-    return false;
-  }
-  return true;
-}
-
 bool TLPreprocessorSubnode::init_hdmap() {
   _hd_map = HDMapInput::instance();
   if (_hd_map == nullptr) {
@@ -216,11 +193,11 @@ bool TLPreprocessorSubnode::init_subscriber(
   _last_sub_camera_image_ts[camera_id] = 0.0;
 
   // register subscriber
-  if (!_stream_input.register_subscriber(source_type, new_source_name, callback, this)) {
-    AERROR << "Failed to register input stream. [type: " << source_type
-           << "] [name: " << new_source_name << "].";
-    return false;
-  }
+  //if (!_stream_input.register_subscriber(source_type, new_source_name, callback, this)) {
+  //  AERROR << "Failed to register input stream. [type: " << source_type
+  //         << "] [name: " << new_source_name << "].";
+  //  return false;
+  //}
 
   AINFO << "Init subscriber successfully, source_type: " << source_type
         << ", source_name: " << new_source_name;
@@ -254,7 +231,7 @@ bool TLPreprocessorSubnode::add_data_and_publish_event(
     event.event_id = event_meta.event_id;
     event.reserve = device_id;
     event.timestamp = timestamp;
-    this->event_manager_->publish(event);
+    this->event_manager_->Publish(event);
   }
 
   return true;
@@ -291,10 +268,6 @@ void TLPreprocessorSubnode::sub_camera_image(
 
   uint64_t timestamp_int64 = TimestampDouble2Int64(msg->header.stamp.toSec());
   timestamp_int64 += _s_camera_ts_last_3_digits[camera_id];
-  ros::MetaInfo info;
-  info.camera_timestamp = timestamp_int64;
-  info.lidar_timestamp = 0;
-  ros::MetaStats::instance()->record_receive(info, _camera_topic_names[camera_id]);
 
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
@@ -417,6 +390,7 @@ bool TLPreprocessorSubnode::get_car_pose(const double ts, CarPose *pose) {
   //  AERROR << "TLPreprocessorSubnode failed to query pose ts:" << GLOG_TIMESTAMP(ts);
   //  return false;
   //}
+  GetVelodyneTrans(ts, &pose_matrix);
   if (!pose->set_pose(pose_matrix)) {
     AERROR << "TLPreprocessorSubnode failed to init ts:" << GLOG_TIMESTAMP(ts)
            << " pose:" << pose_matrix;

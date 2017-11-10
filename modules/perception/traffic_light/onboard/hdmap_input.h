@@ -29,7 +29,7 @@
 
 namespace apollo {
 namespace perception {
-
+namespace traffic_light {
 // Singleton HDMapInput, interfaces are thread-safe.
 class HDMapInput {
  public:
@@ -51,7 +51,7 @@ class HDMapInput {
 };
 
 typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
-
+}
 }  // namespace perception
 }  // namespace apollo
 

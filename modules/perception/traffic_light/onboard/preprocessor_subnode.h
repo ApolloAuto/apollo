@@ -52,7 +52,6 @@ class TLPreprocessorSubnode : public Subnode {
 
   // for check lights projection on image border region dynamically
   static std::map<int, int> _s_image_borders;
-  static std::string _s_debug_roi_relative_pos;  // for check relative
 
  protected:
   //@brief init pre-processor
@@ -64,7 +63,6 @@ class TLPreprocessorSubnode : public Subnode {
   //bool init_synchronizer(const ModelConfig& config);
   bool init_preprocessor();
 
-  bool init_transform_input(const std::map<std::string, std::string> &fields);
   bool init_hdmap();
 
   bool init_subscriber(const std::map<std::string, std::string> &fields,
@@ -115,8 +113,8 @@ class TLPreprocessorSubnode : public Subnode {
   int _max_process_image_fps = 10;  // max frames to be processed per second
   double _proc_interval_seconds = 0.0;  //
 
-  static std::map<CameraId, std::string> _s_camera_names;
-  static std::map<CameraId, int> _s_camera_ts_last_3_digits;
+  static std::map<int, std::string> _s_camera_names;
+  static std::map<int, int> _s_camera_ts_last_3_digits;
 
  DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
 };

@@ -23,6 +23,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",
         "//modules/perception/traffic_light/base:perception_traffic_light_base",
+        "@yaml_cpp//:yaml",
     ],
 )
 

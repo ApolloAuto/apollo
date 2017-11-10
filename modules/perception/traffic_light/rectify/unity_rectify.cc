@@ -35,7 +35,7 @@ bool UnityRectify::Init() {
     AERROR << "hdmap_box_scale not found." << name();
     return false;
   }
-  select_.reset(new Select);
+  select_.reset(new GaussianSelect);
 
   return true;
 }
@@ -71,11 +71,6 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
     return false;
   }
 
-  if (!model_config->GetValue("output_type", &output_type)) {
-    AERROR << "output_type not found." << model_config->name();
-    return false;
-  }
-
   if (!model_config->GetValue(\
             "detection_model", &detection_model)) {
     AERROR << "detection_model not found." << model_config->name();
@@ -108,22 +103,6 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
     default:
     case 0:detection->reset(new Detection(crop_min_size, detection_net, detection_model));
       break;
-  }
-
-  bool set_output_box_type_ok = false;
-  switch (output_type) {
-    default:
-    case 0:set_output_box_type_ok = SetOutputBoxType(DetectOutputBoxType::BOX_ALL);
-      break;
-    case 1:set_output_box_type_ok = SetOutputBoxType(DetectOutputBoxType::BOX_VERTICAL);
-      break;
-    case 2:set_output_box_type_ok = SetOutputBoxType(DetectOutputBoxType::BOX_QUADRATE);
-      break;
-  }
-  if (!set_output_box_type_ok) {
-    AERROR << "UnityRectify::init_detection set_output_box_type failed, type: "
-           << output_type;
-    return false;
   }
 
   return true;
@@ -191,19 +170,6 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
 
 std::string UnityRectify::name() const {
   return "UnityRectify";
-}
-
-bool UnityRectify::SetOutputBoxType(DetectOutputBoxType type) {
-  if (detect_.get() == NULL) {
-    AWARN << "detection not initialized, cannot set detection threshold.";
-    return false;
-  }
-  if (dynamic_cast<Detection *>(detect_.get())->SetOutputBoxType(type)) {
-    AERROR << "UnityRectify::set_output_box_type failed, type: "
-           << type;
-    return false;
-  }
-  return true;
 }
 
 REGISTER_RECTIFIER(UnityRectify);
