@@ -16,4 +16,5 @@
 # limitations under the License.
 ###############################################################################
 
-./bazel-bin/modules/map/tools/map_xysl --flagfile=modules/common/data/global_flagfile.txt $@
+
+python modules/tools/rosbag/transcribe.py $@
