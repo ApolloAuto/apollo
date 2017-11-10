@@ -1,0 +1,33 @@
+---
+organization:              # organization info, including company name, site and descriptions.
+  required:                # 
+    name: Baidu            # company name.
+    wibsite: www.baidu.com # company site.
+  optional:                # 
+    description: UNKONWN   # company descriptions.
+vehicle:                   #
+  required:                #
+    vehicle_id: VIN001     # vehicle_id is the UID of vehicle, VIN(Vehicle Identification Number) is recommended.
+    vehicle_tag: Apollo    # vehicle_tag could tell us that the data come from Apollo partner. DO NOT MODIFY.
+    vehicle_type: auto_car # sensor_car or auto_sensor.
+  optional:                #
+    description: UNKNOWN   # vehicle descriptions.
+data:
+  output_path: /mnt/nvme1/
+  output_link_path: /home/apollo/record_data
+  recorder_cmd_topic: /apollo/data_recorder/cmd
+  recorder_status_topic: /apollo/data_recorder/status
+  backup_path: /home/apollo/backup
+  backup_keep_days: 3          # 
+  backup_max_size: 102400      # unit MB
+  meta_extension: ini          # global meta format: ini or json.
+  disk_min_size: 1024          # min availbale disk size, unit MB
+  data_type:
+  - rosbag
+  - roslog
+  - syslog
+  - carcorefile
+  - carversion
+  - carprm
+  - userdata
+  - meta
