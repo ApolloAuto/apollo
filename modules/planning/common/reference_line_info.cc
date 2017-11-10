@@ -57,8 +57,8 @@ bool ReferenceLineInfo::Init() {
   const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
   Vec2d vec_to_center(
-      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
-      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0);
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
   Vec2d center(position + vec_to_center.rotate(path_point.theta()));
   common::math::Box2d box(center, path_point.theta(), param.length(),
                           param.width());
