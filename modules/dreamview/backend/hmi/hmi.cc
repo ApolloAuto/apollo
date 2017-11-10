@@ -105,6 +105,13 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
     }
   }
 
+  // If the default mode is unavailable, select the first one.
+  const auto &modes = config_.modes();
+  if (!ContainsKey(modes, status_.current_mode())) {
+    CHECK(!modes.empty());
+    status_.set_current_mode(modes.begin()->first);
+  }
+
   // Get available maps and vehicles by listing data directory.
   *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
   *config_.mutable_available_vehicles() =
