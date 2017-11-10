@@ -121,6 +121,14 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
           predictor = GetPredictor(pedestrian_predictor_);
           break;
         }
+        case PerceptionObstacle::BICYCLE: {
+          if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
+            predictor = GetPredictor(cyclist_on_lane_predictor_);
+          } else {
+            predictor = GetPredictor(cyclist_off_lane_predictor_);
+          }
+          break;
+        }
         default: {
           if (obstacle->IsOnLane()) {
             predictor = GetPredictor(vehicle_on_lane_predictor_);

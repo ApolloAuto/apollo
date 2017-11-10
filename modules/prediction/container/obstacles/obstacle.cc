@@ -126,6 +126,20 @@ bool Obstacle::IsOnLane() {
   return false;
 }
 
+bool Obstacle::IsNearJunction() {
+  if (feature_history_.size() <= 0) {
+    return false;
+  }
+  double pos_x = latest_feature().position().x();
+  double pos_y = latest_feature().position().y();
+  if (FLAGS_enable_kf_tracking) {
+    pos_x = latest_feature().t_position().x();
+    pos_y = latest_feature().t_position().y();
+  }
+  return PredictionMap::instance()->NearJunction(
+      {pos_x, pos_y}, FLAGS_search_radius);
+}
+
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
                       const double timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
