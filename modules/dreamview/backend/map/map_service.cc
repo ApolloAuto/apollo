@@ -119,12 +119,15 @@ nlohmann::json MapElementIds::Json() const {
 }
 
 MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
-  ReloadMap();
+  ReloadMap(false);
 }
 
-bool MapService::ReloadMap() {
+bool MapService::ReloadMap(bool force_reload) {
   boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-  const bool ret = HDMapUtil::ReloadMaps();
+  bool ret = true;
+  if (force_reload) {
+    ret = HDMapUtil::ReloadMaps();
+  }
   hdmap_ = HDMapUtil::BaseMapPtr();
   sim_map_ = use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
   return ret;

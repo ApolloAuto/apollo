@@ -91,8 +91,7 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
 }  // namespace
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket)
-    , map_service_(map_service) {
+    : websocket_(websocket), map_service_(map_service) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
   // If the module path doesn't exist, remove it from list.
@@ -313,7 +312,8 @@ void HMI::ChangeMapTo(const std::string &map_name) {
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
   fout << "\n--map_dir=" << *map_dir << std::endl;
   // Also reload simulation map.
-  CHECK(map_service_->ReloadMap()) << "Failed to load map from " << *map_dir;
+  CHECK(map_service_->ReloadMap(true)) << "Failed to load map from "
+                                       << *map_dir;
 
   RunModeCommand("stop");
   status_.set_current_map(map_name);
