@@ -96,7 +96,7 @@ class MapService {
                              routing::LaneWaypoint *laneWayPoint) const;
 
   // Reload map from current FLAGS_map_dir.
-  bool ReloadMap();
+  bool ReloadMap(bool force_reload);
 
  private:
   bool GetNearestLane(const double x, const double y,
