@@ -36,6 +36,10 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+
+constexpr double kMaxBound = 1e3;
+}
 
 using apollo::common::time::Clock;
 using Eigen::MatrixXd;
@@ -123,8 +127,8 @@ bool Spline1dGenerator::Solve() {
   double lower_bound[num_param];  // NOLINT
   double upper_bound[num_param];  // NOLINT
 
-  const double l_lower_bound_ = -1e10;
-  const double l_upper_bound_ = 1e10;
+  const double l_lower_bound_ = -kMaxBound;
+  const double l_upper_bound_ = kMaxBound;
   for (int i = 0; i < num_param; ++i) {
     lower_bound[i] = l_lower_bound_;
     upper_bound[i] = l_upper_bound_;
@@ -147,7 +151,7 @@ bool Spline1dGenerator::Solve() {
 
   DCHECK_EQ(index, equality_constraint_matrix.rows() * num_param);
 
-  const double constraint_upper_bound_ = 1e10;
+  const double constraint_upper_bound_ = kMaxBound;
   for (int r = 0; r < inequality_constraint_matrix.rows(); ++r) {
     constraint_lower_bound[r + equality_constraint_boundary.rows()] =
         inequality_constraint_boundary(r, 0);
