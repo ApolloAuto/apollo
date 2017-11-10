@@ -313,11 +313,12 @@ common::Status Planning::Plan(
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(
-        "planner failed to make a driving plan because NO "
-        "best_reference_line "
-        "can be provided.");
+        "planner failed to make a driving plan because NO valid reference line "
+        "info.");
     AERROR << msg;
-    last_publishable_trajectory_->Clear();
+    if (last_publishable_trajectory_) {
+      last_publishable_trajectory_->Clear();
+    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
