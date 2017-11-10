@@ -18,6 +18,7 @@ limitations under the License.
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
+#include <limits>
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
@@ -37,9 +38,9 @@ Id CreateHDMapId(const std::string& string_id) {
   return id;
 }
 
-//default lanes search radius in GetForwardNearestSignalsOnLane 
-const double LanesSearchRange = 10.0; 
-//backward search distance in GetForwardNearestSignalsOnLane
+// default lanes search radius in GetForwardNearestSignalsOnLane
+const double LanesSearchRange = 10.0;
+// backward search distance in GetForwardNearestSignalsOnLane
 const int BackwardDistance = 4;
 
 }  // namespace
@@ -90,7 +91,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   for (const auto& road : map_.road()) {
     road_table_[road.id().id()].reset(new RoadInfo(road));
   }
- 
+
   for (const auto& road_ptr_pair : road_table_) {
     const auto& road_id = road_ptr_pair.second->id();
     for (const auto& road_section : road_ptr_pair.second->sections()) {
@@ -602,7 +603,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   for (const auto& lane : surrounding_lanes) {
     if (!lane->signals().empty()) {
         lane_ptr = lane;
-        nearest_l = lane_ptr->DistanceTo(car_point, &map_point, 
+        nearest_l = lane_ptr->DistanceTo(car_point, &map_point,
                                           &nearest_s, &s_index);
         break;
     }
@@ -627,7 +628,6 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     back_distance = back_distance - s;
     s = lane_ptr->total_length();
   }
-  
   double s_start = s - back_distance;
   while (lane_ptr != nullptr) {
     double signal_min_dist = std::numeric_limits<double>::infinity();
@@ -638,7 +638,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
       SignalInfoConstPtr signal_ptr = nullptr;
       for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
         if (overlap_ptr->overlap().object(i).id().id() == lane_ptr->id().id()) {
-          lane_overlap_offset_s = 
+          lane_overlap_offset_s =
               overlap_ptr->overlap().object(i).lane_overlap_info().start_s()
               - s_start;
           continue;
@@ -651,7 +651,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
           signal_min_dist = lane_overlap_offset_s;
           min_dist_signal_ptr.clear();
           min_dist_signal_ptr.push_back(signal_ptr);
-        } else if (lane_overlap_offset_s < (signal_min_dist + 0.1) && 
+        } else if (lane_overlap_offset_s < (signal_min_dist + 0.1) &&
                    lane_overlap_offset_s > (signal_min_dist - 0.1)) {
           min_dist_signal_ptr.push_back(signal_ptr);
         }
