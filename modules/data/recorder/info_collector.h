@@ -17,6 +17,7 @@
 #ifndef MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
 #define MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
 
+#include "modules/data/proto/recorder_conf.pb.h"
 #include "modules/data/proto/task.pb.h"
 
 /**
@@ -47,6 +48,7 @@ class InfoCollector {
 
  private:
   Task task_info_;
+  RecorderConf config_;
 };
 
 }  // namespace data

@@ -36,6 +36,10 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+
+constexpr double kMaxBound = 1e3;
+}
 
 using apollo::common::time::Clock;
 using Eigen::MatrixXd;
@@ -123,8 +127,8 @@ bool Spline1dGenerator::Solve() {
   double lower_bound[num_param];  // NOLINT
   double upper_bound[num_param];  // NOLINT
 
-  const double l_lower_bound_ = -1e10;
-  const double l_upper_bound_ = 1e10;
+  const double l_lower_bound_ = -kMaxBound;
+  const double l_upper_bound_ = kMaxBound;
   for (int i = 0; i < num_param; ++i) {
     lower_bound[i] = l_lower_bound_;
     upper_bound[i] = l_upper_bound_;
@@ -147,7 +151,7 @@ bool Spline1dGenerator::Solve() {
 
   DCHECK_EQ(index, equality_constraint_matrix.rows() * num_param);
 
-  const double constraint_upper_bound_ = 1e10;
+  const double constraint_upper_bound_ = kMaxBound;
   for (int r = 0; r < inequality_constraint_matrix.rows(); ++r) {
     constraint_lower_bound[r + equality_constraint_boundary.rows()] =
         inequality_constraint_boundary(r, 0);
@@ -172,6 +176,12 @@ bool Spline1dGenerator::Solve() {
     ret = sqp_solver_->hotstart(
         h_matrix, g_matrix, affine_constraint_matrix, lower_bound, upper_bound,
         constraint_lower_bound, constraint_upper_bound, max_iter);
+    if (ret != qpOASES::SUCCESSFUL_RETURN) {
+      AERROR << "Fail to hotstart spline 1d, will use re-init instead.";
+      ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
+                              lower_bound, upper_bound, constraint_lower_bound,
+                              constraint_upper_bound, max_iter);
+    }
   } else {
     ADEBUG << "no using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
@@ -208,9 +218,7 @@ bool Spline1dGenerator::Solve() {
   last_num_param_ = num_param;
   last_num_constraint_ = num_constraint;
 
-  // TODO(Liangliang): fix this bug
-  const uint32_t spline_order = spline_.spline_order() - 1;
-  return spline_.SetSplineSegs(solved_params, spline_order);
+  return spline_.SetSplineSegs(solved_params, spline_.spline_order());
 }
 
 const Spline1d& Spline1dGenerator::spline() const { return spline_; }

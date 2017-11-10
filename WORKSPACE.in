@@ -145,13 +145,6 @@ new_local_repository(
     path = "/usr/local/ipopt/include/coin",
 )
 
-#IpOpt
-new_local_repository(
-    name = "ipopt",
-    build_file = "third_party/ipopt.BUILD",
-    path = "/usr/local/ipopt/include/coin",
-)
-
 # Proj.4
 new_http_archive(
     name = "proj4",

@@ -21,7 +21,6 @@
 #include <queue>
 
 #include "modules/common/log.h"
-
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
@@ -29,7 +28,6 @@
 
 namespace apollo {
 namespace routing {
-
 namespace {
 
 constexpr double LANE_CHANGE_SKIP_S = 10.0;
@@ -186,6 +184,7 @@ bool Reconstruct(
     const TopoNode* dest_node, std::vector<NodeWithRange>* result_nodes) {
   std::vector<const TopoNode*> result_node_vec;
   result_node_vec.push_back(dest_node);
+
   auto iter = came_from.find(dest_node);
   while (iter != came_from.end()) {
     result_node_vec.push_back(iter->second);

@@ -97,6 +97,9 @@ class ReferenceLineProvider {
   bool SmoothReferenceLine(const hdmap::RouteSegments& lanes,
                            ReferenceLine* reference_line);
 
+  void GetAnchorPoints(const ReferenceLine& reference_line,
+                       std::vector<AnchorPoint>* anchor_points) const;
+
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
 

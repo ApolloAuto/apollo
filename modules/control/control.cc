@@ -41,7 +41,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
 std::string Control::Name() const {
-  return FLAGS_node_name;
+  return FLAGS_control_node_name;
 }
 
 Status Control::Init() {
@@ -51,7 +51,7 @@ Status Control::Init() {
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
-  AdapterManager::Init(FLAGS_adapter_config_filename);
+  AdapterManager::Init(FLAGS_control_adapter_config_filename);
 
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
 
@@ -185,8 +185,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
-  if (trajectory_.has_signal()) {
-    control_command->mutable_signal()->CopyFrom(trajectory_.signal());
+  if (trajectory_.decision().has_vehicle_signal()) {
+    control_command->mutable_signal()->CopyFrom(
+        trajectory_.decision().vehicle_signal());
   }
   return status;
 }

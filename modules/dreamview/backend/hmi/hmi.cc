@@ -90,7 +90,9 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
 
 }  // namespace
 
-HMI::HMI(WebSocketHandler *websocket) : websocket_(websocket) {
+HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
+    : websocket_(websocket)
+    , map_service_(map_service) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
   // If the module path doesn't exist, remove it from list.
@@ -132,14 +134,10 @@ void HMI::RegisterMessageHandlers() {
         // If module_name is "all", then run the command on all modules.
         const auto module = json.find("module");
         const auto command = json.find("command");
-        if (module == json.end() || command == json.end()) {
-          AERROR << "Truncated module command.";
-          return;
-        }
-        if (*module == "all") {
-          RunCommandOnAllModules(*command);
-        } else {
+        if (module != json.end() && command != json.end()) {
           RunComponentCommand(config_.modules(), *module, *command);
+        } else {
+          AERROR << "Truncated module command.";
         }
       });
 
@@ -150,11 +148,25 @@ void HMI::RegisterMessageHandlers() {
         // json should contain {tool: "tool_name", command: "command_name"}.
         const auto tool = json.find("tool");
         const auto command = json.find("command");
-        if (tool == json.end() || command == json.end()) {
+        if (tool != json.end() && command != json.end()) {
+          RunComponentCommand(config_.tools(), *tool, *command);
+        } else {
           AERROR << "Truncated tool command.";
-          return;
         }
-        RunComponentCommand(config_.tools(), *tool, *command);
+      });
+
+  // HMI client asks for executing mode command.
+  websocket_->RegisterMessageHandler(
+      "ExecuteModeCommand",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {command: "command_name"}.
+        // Supported commands are: "start", "stop".
+        const auto command = json.find("command");
+        if (command != json.end()) {
+          RunModeCommand(*command);
+        } else {
+          AERROR << "Truncated mode command.";
+        }
       });
 
   // HMI client asks for changing driving mode.
@@ -165,11 +177,11 @@ void HMI::RegisterMessageHandlers() {
         // DrivingModeName should be one of canbus::Chassis::DrivingMode.
         // For now it is either COMPLETE_MANUAL or COMPLETE_AUTO_DRIVE.
         const auto new_mode = json.find("new_mode");
-        if (new_mode == json.end()) {
+        if (new_mode != json.end()) {
+          ChangeDrivingModeTo(*new_mode);
+        } else {
           AERROR << "Truncated ChangeDrivingMode request.";
-          return;
         }
-        ChangeDrivingModeTo(*new_mode);
       });
 
   // HMI client asks for changing map.
@@ -179,11 +191,11 @@ void HMI::RegisterMessageHandlers() {
         // json should contain {new_map: "MapName"}.
         // MapName should be a key of config_.available_maps.
         const auto new_map = json.find("new_map");
-        if (new_map == json.end()) {
+        if (new_map != json.end()) {
+          ChangeMapTo(*new_map);
+        } else {
           AERROR << "Truncated ChangeMap request.";
-          return;
         }
-        ChangeMapTo(*new_map);
       });
 
   // HMI client asks for changing vehicle.
@@ -193,11 +205,25 @@ void HMI::RegisterMessageHandlers() {
         // json should contain {new_vehicle: "VehicleName"}.
         // VehicleName should be a key of config_.available_vehicles.
         const auto new_vehicle = json.find("new_vehicle");
-        if (new_vehicle == json.end()) {
+        if (new_vehicle != json.end()) {
+          ChangeVehicleTo(*new_vehicle);
+        } else {
           AERROR << "Truncated ChangeVehicle request.";
-          return;
         }
-        ChangeVehicleTo(*new_vehicle);
+      });
+
+  // HMI client asks for changing mode.
+  websocket_->RegisterMessageHandler(
+      "ChangeMode",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {new_mode: "ModeName"}.
+        // ModeName should be a key of config_.modes.
+        const auto new_mode = json.find("new_mode");
+        if (new_mode != json.end()) {
+          ChangeModeTo(*new_mode);
+        } else {
+          AERROR << "Truncated ChangeMode request.";
+        }
       });
 
   // Received new system status, broadcast to clients.
@@ -235,16 +261,14 @@ int HMI::RunComponentCommand(const Map<std::string, Component> &components,
   return ret;
 }
 
-int HMI::RunCommandOnAllModules(const std::string &command_name) {
-  int failed = 0;
-  const auto &modules = config_.modules();
-  for (const auto &module : modules) {
-    const int ret = RunComponentCommand(modules, module.first, command_name);
-    if (ret != 0) {
-      ++failed;
+void HMI::RunModeCommand(const std::string &command_name) {
+  const Mode &current_mode = config_.modes().at(status_.current_mode());
+  if (command_name == "start" || command_name == "stop") {
+    // Run the command on all live modules.
+    for (const auto &module : current_mode.live_modules()) {
+      RunComponentCommand(config_.modules(), module, command_name);
     }
   }
-  return failed;
 }
 
 void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
@@ -274,31 +298,59 @@ void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
 }
 
 void HMI::ChangeMapTo(const std::string &map_name) {
+  if (status_.current_map() == map_name) {
+    return;
+  }
   const auto *map_dir = FindOrNull(config_.available_maps(), map_name);
   if (map_dir == nullptr) {
     AERROR << "Unknown map " << map_name;
     return;
   }
+
+  FLAGS_map_dir = *map_dir;
   // Append new map_dir flag to global flagfile.
   std::ofstream fout(FLAGS_global_flagfile, std::ios_base::app);
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
   fout << "\n--map_dir=" << *map_dir << std::endl;
+  // Also reload simulation map.
+  CHECK(map_service_->ReloadMap()) << "Failed to load map from " << *map_dir;
 
-  RunCommandOnAllModules("stop");
+  RunModeCommand("stop");
   status_.set_current_map(map_name);
   BroadcastHMIStatus();
 }
 
 void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
+  if (status_.current_vehicle() == vehicle_name) {
+    return;
+  }
   const auto *vehicle = FindOrNull(config_.available_vehicles(), vehicle_name);
   if (vehicle == nullptr) {
     AERROR << "Unknown vehicle " << vehicle_name;
     return;
   }
+
   CHECK(VehicleManager::UseVehicle(*vehicle));
 
-  RunCommandOnAllModules("stop");
+  RunModeCommand("stop");
   status_.set_current_vehicle(vehicle_name);
+  BroadcastHMIStatus();
+}
+
+void HMI::ChangeModeTo(const std::string &mode_name) {
+  if (status_.current_mode() == mode_name) {
+    return;
+  }
+  if (!ContainsKey(config_.modes(), mode_name)) {
+    AERROR << "Unknown mode " << mode_name;
+    return;
+  }
+
+  // Stop the running modules for previous mode.
+  if (status_.has_current_mode()) {
+    RunModeCommand("stop");
+  }
+  status_.set_current_mode(mode_name);
   BroadcastHMIStatus();
 }
 

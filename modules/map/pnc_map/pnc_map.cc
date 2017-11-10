@@ -228,7 +228,7 @@ bool PncMap::GetRouteSegments(
   auto route_index = GetWaypointIndex(waypoint);
   // vehicle has to be this close to lane center before considering change lane
   if (!waypoint.lane || route_index.size() != 3 || route_index[0] < 0) {
-    AERROR << "Invalid vehicle state:  ";
+    AERROR << "Invalid vehicle state:  " << state.ShortDebugString();
     return false;
   }
   const int road_index = route_index[0];

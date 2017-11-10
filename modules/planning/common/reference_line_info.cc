@@ -70,8 +70,7 @@ bool ReferenceLineInfo::Init() {
 }
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
-//<<<<<<< HEAD
-//
+
 //bool ReferenceLineInfo::HasReachedDestination() {
 //  auto* dest_obstacle = path_decision_.Find(FLAGS_destination_obstacle_id);
 //  if (!dest_obstacle) {
@@ -93,8 +92,6 @@ const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
 //  }
 //  return false;
 //}
-//=======
-//>>>>>>> upstream/master
 
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;

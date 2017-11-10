@@ -16,13 +16,4 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
-
-# run function from apollo_base.sh
-# run command_name module_name
-run decision "$@"
+./bazel-bin/modules/map/tools/map_xysl --flagfile=modules/common/data/global_flagfile.txt $@

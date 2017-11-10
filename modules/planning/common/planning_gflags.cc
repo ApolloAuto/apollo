@@ -124,7 +124,8 @@ DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
 
-DEFINE_double(lateral_acceleration_bound, 4.0, "lateral acceleration bound");
+DEFINE_double(lateral_acceleration_bound, 4.0,
+              "Bound of lateral accleration; symmetric for left and right");
 
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
