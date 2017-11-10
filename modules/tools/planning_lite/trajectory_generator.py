@@ -18,6 +18,7 @@
 import math
 import time
 import rospy
+from numpy.polynomial.polynomial import polyval
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 
@@ -30,15 +31,15 @@ def euclidean_distance(point1, point2):
 
 def get_theta(point, point_base):
     # print point
-    return math.atan2(point[1] - point_base[1],
-                      point[0] - point_base[0]) - math.atan2(1, 0)
+    return math.atan2(point[0] - point_base[0],
+                      point[1] - point_base[1]) - math.atan2(1, 0)
 
 
 class TrajectoryGenerator:
     def __init__(self):
         self.mobileye_pb = None
 
-    def generate(self, nx, ny, speed, start_timestamp):
+    def generate(self, path_coef, final_path_length, speed, start_timestamp):
         adc_trajectory = planning_pb2.ADCTrajectory()
         adc_trajectory.header.timestamp_sec = rospy.Time.now().to_sec()
         adc_trajectory.header.module_name = "planning"
@@ -48,21 +49,20 @@ class TrajectoryGenerator:
         s = 0
         relative_time = 0
 
-        for i in range(len(nx)):
+        for x in range(int(final_path_length)):
+            y = polyval(x, path_coef)
+
             traj_point = adc_trajectory.trajectory_point.add()
-            traj_point.path_point.x = ny[i]
-            traj_point.path_point.y = -nx[i]
-            if i > 0:
-                dist = euclidean_distance((nx[i], ny[i]),
-                                          (nx[i - 1], ny[i - 1]))
+            traj_point.path_point.x = x
+            traj_point.path_point.y = -y
+            if x > 0:
+                dist = euclidean_distance((x, y),
+                                          (x - 1, polyval(x - 1, path_coef)))
                 s += dist
                 relative_time += dist / speed
-            if (i + 1) >= len(nx):
-                traj_point.path_point.theta = get_theta(
-                    (nx[-1], ny[-1]), (nx[0], ny[0]))
-            else:
-                traj_point.path_point.theta = get_theta(
-                    (nx[i + 1], ny[i + 1]), (nx[0], ny[0]))
+
+            traj_point.path_point.theta = get_theta(
+                (x + 1, polyval(x + 1, path_coef)), (0, polyval(0, path_coef)))
             traj_point.path_point.s = s
             traj_point.v = speed
             traj_point.relative_time = relative_time
