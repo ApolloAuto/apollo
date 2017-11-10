@@ -45,7 +45,9 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
       path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
       continue;
     }
-    if (path_obstacle->st_boundary().min_s() < 0) {
+    auto adc_back_s = adc_sl_boundary.end_s() - adc_sl_boundary.start_s();
+    // Ignore the car comes from back of ADC
+    if (path_obstacle->st_boundary().min_s() < -adc_back_s) {
       path_decision->AddLongitudinalDecision(rule_id, path_obstacle->Id(),
                                              ignore);
       path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
