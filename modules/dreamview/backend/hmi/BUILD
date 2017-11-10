@@ -9,6 +9,8 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/common/util:string_util",
+        "//modules/common/configs:config_gflags",
+        "//modules/control/common:control_gflags",
     ],
 )
 
