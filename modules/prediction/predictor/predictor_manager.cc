@@ -50,7 +50,8 @@ void PredictorManager::Init(const PredictionConf& config) {
       continue;
     }
 
-    if (obstacle_conf.obstacle_type() == PerceptionObstacle::VEHICLE) {
+    if (obstacle_conf.obstacle_type() == PerceptionObstacle::VEHICLE ||
+        obstacle_conf.obstacle_type() == PerceptionObstacle::BICYCLE) {
       if (!obstacle_conf.has_obstacle_status() ||
           !obstacle_conf.has_predictor_type()) {
         ADEBUG << "Vehicle obstacle config ["
@@ -71,6 +72,10 @@ void PredictorManager::Init(const PredictionConf& config) {
   AINFO << "Defined vehicle on lane obstacle predictor ["
         << vehicle_on_lane_predictor_ << "].";
   AINFO << "Defined vehicle off lane obstacle predictor ["
+        << vehicle_off_lane_predictor_ << "].";
+  AINFO << "Defined bicycle on lane obstacle predictor ["
+        << vehicle_on_lane_predictor_ << "].";
+  AINFO << "Defined bicycle off lane obstacle predictor ["
         << vehicle_off_lane_predictor_ << "].";
   AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
         << "].";
