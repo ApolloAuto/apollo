@@ -21,6 +21,7 @@ DEFINE_bool(enable_adapter_dump, false,
             "/tmp/adapters/<topic_name>/<seq_num>.txt for debugging purposes.");
 DEFINE_string(gps_topic, "/apollo/sensor/gnss/odometry", "GPS topic name");
 DEFINE_string(imu_topic, "/apollo/sensor/gnss/corrected_imu", "IMU topic name");
+DEFINE_string(raw_imu_topic, "/apollo/sensor/gnss/imu", "Raw IMU topic name");
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
 DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");

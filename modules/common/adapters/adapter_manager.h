@@ -234,6 +234,7 @@ class AdapterManager {
   REGISTER_ADAPTER(ControlCommand);
   REGISTER_ADAPTER(Gps);
   REGISTER_ADAPTER(Imu);
+  REGISTER_ADAPTER(RawImu);
   REGISTER_ADAPTER(Localization);
   REGISTER_ADAPTER(Monitor);
   REGISTER_ADAPTER(Pad);

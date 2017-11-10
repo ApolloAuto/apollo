@@ -70,6 +70,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::IMU:
         EnableImu(FLAGS_imu_topic, config);
         break;
+      case AdapterConfig::RAW_IMU:
+        EnableRawImu(FLAGS_raw_imu_topic, config.mode(),
+                     config.message_history_limit());
       case AdapterConfig::CHASSIS:
         EnableChassis(FLAGS_chassis_topic, config);
         break;

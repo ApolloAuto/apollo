@@ -66,6 +66,15 @@ Status MSFLocalization::Start() {
   }
   AdapterManager::AddImuCallback(&MSFLocalization::OnImu, this);
 
+  // Raw Imu
+  if (!AdapterManager::GetRawImu()) {
+    buffer.ERROR(
+        "Raw IMU input not initialized. Check your adapter.conf file!");
+    buffer.PrintLog();
+    return Status(common::LOCALIZATION_ERROR, "no Raw IMU adapter");
+  }
+  AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
+
   // Point Cloud
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   AdapterManager::AddPointCloudCallback(&MSFLocalization::OnPointCloud, this);
@@ -243,6 +252,8 @@ void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
 
   return;
 }
+
+void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {}
 
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
   localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);

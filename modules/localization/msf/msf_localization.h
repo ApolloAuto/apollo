@@ -30,6 +30,7 @@
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 
+#include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -81,6 +82,7 @@ class MSFLocalization : public LocalizationBase {
   void OnTimer(const ros::TimerEvent &event);
   void OnPointCloud(const sensor_msgs::PointCloud2 &message);
   void OnImu(const localization::Imu &imu_msg);
+  void OnRawImu(const drivers::gnss::Imu &imu_msg);
   void OnGps(const localization::Gps &gps_msg);
   // void OnMeasure(const localization::IntegMeasure &measure_msg);
   // void OnSinsPva(const localization::IntegSinsPva &sins_pva_msg);
