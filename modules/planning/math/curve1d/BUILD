@@ -46,6 +46,7 @@ cc_library(
         ":polynomial_curve1d",
         "//modules/common:log",
         "//modules/common/util:string_util",
+        "@glog//:glog",
     ],
 )
 
