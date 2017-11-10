@@ -211,7 +211,7 @@ class HDMap {
    * @param signals all signals match conditions
    * @return 0:success, otherwise failed
    */
- int GetForwardNearestSignalsOnLane(
+  int GetForwardNearestSignalsOnLane(
              const apollo::common::PointENU& point,
              const double distance,
              std::vector<SignalInfoConstPtr>* signals) const;
