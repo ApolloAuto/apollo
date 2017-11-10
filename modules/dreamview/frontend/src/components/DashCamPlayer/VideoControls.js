@@ -2,7 +2,7 @@ import React from "react";
 
 import syncupIcon from "assets/images/icons/syncup.png";
 
-export default class Controls extends React.Component {
+export default class VideoControls extends React.Component {
 
     render() {
         const { showSyncup, onSyncup, onClose } = this.props;

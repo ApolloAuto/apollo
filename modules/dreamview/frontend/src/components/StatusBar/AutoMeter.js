@@ -29,13 +29,13 @@ export default class AutoMeter extends React.Component {
         this.setting = {
             brake: {
                 label: 'Brake',
-                meterColor: '#b43131',
+                meterColor: '#B43131',
                 background: '#382626',
             },
             accelerator: {
                 label: 'Accelerator',
-                meterColor: '#006aff',
-                background: '#2d3b50',
+                meterColor: '#006AFF',
+                background: '#2D3B50',
             },
         };
     }

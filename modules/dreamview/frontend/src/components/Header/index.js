@@ -2,18 +2,28 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 
 import Image from "components/common/Image";
-import logoApollo from "assets/images/logo_apollo.png";
 import Selector from "components/Header/Selector";
 import WS from "store/websocket";
+import logoApollo from "assets/images/logo_apollo.png";
+
 
 @inject("store") @observer
 export default class Header extends React.Component {
     render() {
-        const { maps, vehicles, currentMap, currentVehicle } = this.props.store.hmi;
+        const { modes, currentMode,
+                maps, currentMap,
+                vehicles, currentVehicle } = this.props.store.hmi;
+        const { routeEditingManager } = this.props.store;
 
         return (
-            <div className = "menu-bar">
-                <Image image = {logoApollo} className="apollo-logo" />
+            <header className = "header">
+                <Image image={logoApollo} className="apollo-logo" />
+                <Selector name="setup mode"
+                          options={modes}
+                          currentOption={currentMode}
+                          onChange={(event) => {
+                            WS.changeSetupMode(event.target.value);
+                          }}/>
                 <Selector name="vehicle"
                           options={vehicles}
                           currentOption={currentVehicle}
@@ -26,7 +36,13 @@ export default class Header extends React.Component {
                           onChange={(event) => {
                             WS.changeMap(event.target.value);
                           }}/>
-            </div>
+                <Selector name="point of interest"
+                          options={Object.keys(routeEditingManager.defaultRoutingEndPoint)}
+                          currentOption={routeEditingManager.currentPOI}
+                          onChange={(event) => {
+                            routeEditingManager.setDefaultEndPoint(event.target.value);
+                          }}/>
+            </header>
         );
     }
 }

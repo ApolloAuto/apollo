@@ -6,13 +6,13 @@ export default class Wheel extends React.Component {
     constructor(props) {
         super(props);
         this.signalColor = {
-            off: '#30435e',
-            on: '#006aff',
+            off: '#30435E',
+            on: '#006AFF',
         };
     }
 
     render() {
-        const { steeringAngle, turnSignal, drivingMode } = this.props;
+        const { steeringAngle, turnSignal } = this.props;
 
         const leftArrowColor = (turnSignal === 'LEFT' || turnSignal === 'EMERGENCY')
                                ? this.signalColor.on : this.signalColor.off;
@@ -31,7 +31,6 @@ export default class Wheel extends React.Component {
                     <div className="wheel-arm"
                          style={{transform: `translate(-50%, -100%) rotate(${steeringAngle}deg`}}/>
                 </div>
-                <div className="driving-mode">{drivingMode}</div>
             </div>
         );
     }

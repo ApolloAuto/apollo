@@ -30,7 +30,7 @@ class WebSocketEndpoint {
 
             switch (message.type) {
                 case "HMIConfig":
-                    STORE.hmi.updateConfig(message.data);
+                    STORE.hmi.initialize(message.data);
                     break;
                 case "HMIStatus":
                     STORE.hmi.updateStatus(message.data);
@@ -145,17 +145,54 @@ class WebSocketEndpoint {
         }));
     }
 
-    changeMap(map) {
+    changeSetupMode(mode) {
         this.websocket.send(JSON.stringify({
-            type: "ChangeMap",
-            new_map: map
+            type: "ChangeMode",
+            new_mode: mode,
         }));
     }
 
-    changeVehicle(new_vehicle) {
+    changeMap(map) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeMap",
+            new_map: map,
+        }));
+    }
+
+    changeVehicle(vehcile) {
         this.websocket.send(JSON.stringify({
             type: "ChangeVehicle",
-            new_vehicle: new_vehicle
+            new_vehicle: vehcile,
+        }));
+    }
+
+    executeModeCommand(command) {
+        this.websocket.send(JSON.stringify({
+            type: "ExecuteModeCommand",
+            command, command,
+        }));
+    }
+
+    executeModuleCommand(module, command) {
+        this.websocket.send(JSON.stringify({
+            type: "ExecuteModuleCommand",
+            module: module,
+            command, command,
+        }));
+    }
+
+    executeToolCommand(tool, command) {
+         this.websocket.send(JSON.stringify({
+            type: "ExecuteToolCommand",
+            tool: tool,
+            command, command,
+        }));
+    }
+
+    changeDrivingMode(mode) {
+         this.websocket.send(JSON.stringify({
+            type: "ChangeDrivingMode",
+            new_mode: mode,
         }));
     }
 }
