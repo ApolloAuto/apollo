@@ -16,45 +16,20 @@
 # limitations under the License.
 ###############################################################################
 import math
-from numpy.polynomial.polynomial import polyval
 
 
 class PathDecider:
     def __init__(self):
         self.MINIMUM_PATH_LENGTH = 5
         self.MAX_LAT_CHANGE = 0.1
-        self.mobileye_pb = None
-        self.chassis_pb = None
-        self.left_lane_marker_coef = []
-        self.right_lane_marker_coef = []
         self.last_init_lat = None
 
-    def update_mobileye_pb(self, mobileye_pb):
-        self.mobileye_pb = mobileye_pb
-
-        rc0 = mobileye_pb.lka_768.position
-        rc1 = mobileye_pb.lka_769.heading_angle
-        rc2 = mobileye_pb.lka_768.curvature
-        rc3 = mobileye_pb.lka_768.curvature_derivative
-        # rrangex = mobileye_pb.lka_769.view_range
-        self.right_lane_marker_coef = [rc0, rc1, rc2, rc3]
-
-        lc0 = mobileye_pb.lka_766.position
-        lc1 = mobileye_pb.lka_767.heading_angle
-        lc2 = mobileye_pb.lka_766.curvature
-        lc3 = mobileye_pb.lka_766.curvature_derivative
-        # lrangex = mobileye_pb.lka_767.view_range
-        self.left_lane_marker_coef = [lc0, lc1, lc2, lc3]
-
-    def update_chassis_pb(self, chassis_pb):
-        self.chassis_pb = chassis_pb
-
-    def get_path_length(self):
+    def get_path_length(self, chassis_provider):
         path_length = self.MINIMUM_PATH_LENGTH
-        if self.chassis_pb is not None:
-            speed = self.chassis_pb.speed_mps
-            if path_length < speed * 2:
-                path_length = math.ceil(speed * 2)
+        current_speed = chassis_provider.get_speed_mps()
+        if current_speed is not None:
+            if path_length < current_speed * 2:
+                path_length = math.ceil(current_speed * 2)
         return path_length
 
     def get_reference_line_offset(self, current_init_lat):
@@ -64,25 +39,25 @@ class PathDecider:
             return 0
         else:
             if current_init_lat > self.last_init_lat:
-                return - (
-                    abs(
-                        current_init_lat - self.last_init_lat) - self.MAX_LAT_CHANGE)
+                return - (abs(current_init_lat - self.last_init_lat) -
+                          self.MAX_LAT_CHANGE)
             else:
                 return abs(
                     current_init_lat - self.last_init_lat) - self.MAX_LAT_CHANGE
 
-    def get_path(self):
-        path_length = self.get_path_length()
+    def get_path(self, mobileye_provider, chassis_provider):
+        path_length = self.get_path_length(chassis_provider)
         offset = self.get_reference_line_offset(
-            (self.right_lane_marker_coef[0] +
-             self.left_lane_marker_coef[0]) / 2.0)
-        ref_lane_x = []
-        ref_lane_y = []
-        for y in range(int(path_length)):
-            rx = polyval(y, self.right_lane_marker_coef)
-            lx = polyval(y, self.left_lane_marker_coef)
-            ref_lane_x.append((rx + lx) / 2.0 + offset)
-            ref_lane_y.append(y)
+            (mobileye_provider.right_lane_marker_coef[0] +
+             mobileye_provider.left_lane_marker_coef[0]) / 2.0)
+        path_coef = [0, 0, 0, 0]
 
-        self.last_init_lat = ref_lane_x[0]
-        return ref_lane_x, ref_lane_y
+        path_coef[0] = ((mobileye_provider.right_lane_marker_coef[0] +
+                         mobileye_provider.left_lane_marker_coef[
+                             0]) / 2.0) + offset
+        for i in range(1, 4):
+            path_coef[i] = (mobileye_provider.right_lane_marker_coef[i] +
+                            mobileye_provider.left_lane_marker_coef[i]) / 2.0
+
+        self.last_init_lat = path_coef[0]
+        return path_coef, path_length
