@@ -204,6 +204,7 @@ Status LatticePlanner::Plan(
     num_planning_succeeded_cycles += 1;
     AINFO << "[END]-------------------------------------------------";
     AINFO << "";
+    reference_line_info->SetDriable(true);
     return Status::OK();
   } else {
     AINFO << "Planning failed";
