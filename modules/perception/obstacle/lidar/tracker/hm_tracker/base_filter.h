@@ -87,6 +87,15 @@ class BaseFilter {
     Eigen::Vector3f* velocity,
     Eigen::Vector3f* velocity_accelaration) = 0;
 
+  virtual void GetAccelerationGain(
+  Eigen::Vector3f* acceleration_gain) = 0;
+
+  // @brief get online covariance of filter
+  // @params[OUT] online_covariance: online covariance
+  // @return noting
+  virtual void GetOnlineCovariance(
+    Eigen::Matrix3d* online_covariance) = 0;
+
   // @brief get name of filter
   // @return name of filter
   std::string Name() {

@@ -106,7 +106,10 @@ class KalmanFilter : public BaseFilter {
   void GetState(
     Eigen::Vector3f* anchor_point,
     Eigen::Vector3f* velocity,
-    Eigen::Vector3f* velocity_accelaration);
+    Eigen::Vector3f* accelaration);
+
+  void GetAccelerationGain(
+    Eigen::Vector3f* acceleration_gain);
 
  protected:
   // @brief propagate covariance of filter
@@ -173,7 +176,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] measured_velocity: velocity of given measurement
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateModel(
+  void UpdateVelocity(
     const Eigen::VectorXf& measured_anchor_point,
     const Eigen::VectorXf& measured_velocity,
     const double& time_diff);
@@ -204,27 +207,49 @@ class KalmanFilter : public BaseFilter {
   // @return nothing
   void ComputeBreakdownThreshold();
 
+  // @brief get online covariance of filter
+  // @params[OUT] online_covariance: online covariance
+  // @return noting
+  void GetOnlineCovariance(Eigen::Matrix3d* online_covariance);
+
  protected:
+  void EvaluateOnlineCovariance();
+  Eigen::Vector3f ComputeMeasuredAcceleration(
+    const Eigen::Vector3f& measured_velocity,
+    const double& time_diff);
+  void UpdateAcceleration(
+    const Eigen::VectorXf& measured_acceleration);
+
+
   // adaptive
   static bool               s_use_adaptive_;
   static double             s_association_score_maximum_;
 
   // parameters
   static Eigen::Matrix3d    s_propagation_noise_;
-  static double             s_measurement_noise_;
-  static double             s_initial_velocity_noise_;
-  static double             s_breakdown_threshold_maximum_;
+  static double                 s_measurement_noise_;
+  static double                 s_initial_velocity_noise_;
+  static double                 s_breakdown_threshold_maximum_;
+
+  static int                      s_measurement_cached_history_size_minimum_;                     
+  static int                      s_measurement_cached_history_size_maximum_;                                            
+  int                               measurement_cached_history_size_; 
 
   // filter history
   int                       age_;
 
+  std::deque<Eigen::Vector3f> history_measured_velocity_;
+  std::deque<double>              history_time_diff_;
+
   // filter covariances
   Eigen::Matrix3d           velocity_covariance_;
+  Eigen::Matrix3d           online_velocity_covariance_;
 
   // filter states
   Eigen::Vector3d           belief_anchor_point_;
   Eigen::Vector3d           belief_velocity_;
-  Eigen::Vector3d           belief_velocity_accelaration_;
+  Eigen::Vector3d           belief_acceleration_;
+  Eigen::Vector3d           belief_acceleration_gain_;
   double                    update_quality_;
   double                    breakdown_threshold_;
 };  // class KalmanFilter

@@ -30,6 +30,8 @@ Eigen::Matrix3d KalmanFilter::s_propagation_noise_ = 10 *
 double KalmanFilter::s_measurement_noise_ = 0.4;
 double KalmanFilter::s_initial_velocity_noise_ = 5;
 double KalmanFilter::s_breakdown_threshold_maximum_ = 10;
+int KalmanFilter::s_measurement_cached_history_size_minimum_ = 3;
+int KalmanFilter::s_measurement_cached_history_size_maximum_ = 6;
 
 void KalmanFilter::SetUseAdaptive(const bool& use_adaptive) {
   s_use_adaptive_ = use_adaptive;
@@ -102,7 +104,8 @@ KalmanFilter::KalmanFilter() {
   update_quality_ = 1.0;
   breakdown_threshold_ = s_breakdown_threshold_maximum_;
   belief_velocity_ = Eigen::Vector3d::Zero();
-  belief_velocity_accelaration_ = Eigen::Vector3d::Zero();
+  belief_acceleration_gain_ = Eigen::Vector3d::Zero();
+  belief_acceleration_ = Eigen::Vector3d::Zero();
 }
 
 void KalmanFilter::Initialize(const Eigen::Vector3f& anchor_point,
@@ -111,7 +114,8 @@ void KalmanFilter::Initialize(const Eigen::Vector3f& anchor_point,
   breakdown_threshold_ = s_breakdown_threshold_maximum_;
   belief_anchor_point_ = anchor_point.cast<double>();
   belief_velocity_ = velocity.cast<double>();
-  belief_velocity_accelaration_ = Eigen::Vector3d::Zero();
+  belief_acceleration_gain_ = Eigen::Vector3d::Zero();
+  belief_acceleration_ = Eigen::Vector3d::Zero();
 }
 
 Eigen::VectorXf KalmanFilter::Predict(const double& time_diff) {
@@ -151,9 +155,25 @@ void KalmanFilter::UpdateWithObject(const TrackedObjectPtr& new_object,
   Eigen::Vector3f measured_velocity = ComputeMeasuredVelocity(
     new_object, old_object, time_diff);
 
+  // debug: compute measured acceleration
+  Eigen::Vector3f measured_acceleration = 
+    ComputeMeasuredAcceleration(measured_velocity, time_diff);
+
   // C. Update model
-  UpdateModel(measured_anchor_point, measured_velocity, time_diff);
-  age_ += 1;
+  UpdateVelocity(measured_anchor_point, measured_velocity, time_diff);
+  UpdateAcceleration(measured_acceleration);
+
+   // Cache measurement history
+   if (history_measured_velocity_.size() >= measurement_cached_history_size_) {
+      history_measured_velocity_.pop_front();
+      history_time_diff_.pop_front();
+   }
+   history_measured_velocity_.push_back(measured_velocity);
+   history_time_diff_.push_back(time_diff);
+   
+   EvaluateOnlineCovariance();  
+   
+   age_ += 1;
 }
 
 void KalmanFilter::UpdateWithoutObject(const double& time_diff) {
@@ -170,10 +190,15 @@ void KalmanFilter::GetState(Eigen::Vector3f* anchor_point,
 
 void KalmanFilter::GetState(Eigen::Vector3f* anchor_point,
   Eigen::Vector3f* velocity,
-  Eigen::Vector3f* velocity_accelaration) {
+  Eigen::Vector3f* acceleration) {
   (*anchor_point) = belief_anchor_point_.cast<float>();
   (*velocity) = belief_velocity_.cast<float>();
-  (*velocity_accelaration) = belief_velocity_accelaration_.cast<float>();
+  (*acceleration) = belief_acceleration_.cast<float>();
+}
+
+void KalmanFilter::GetAccelerationGain(
+  Eigen::Vector3f* acceleration_gain) {
+  (*acceleration_gain) = belief_acceleration_gain_.cast<float>();
 }
 
 void KalmanFilter::Propagate(const double& time_diff) {
@@ -355,7 +380,7 @@ Eigen::Vector3f KalmanFilter::SelectMeasuredVelocityAccordingMotionConsistency(
   return measured_velocity;
 }
 
-void KalmanFilter::UpdateModel(const Eigen::VectorXf& measured_anchor_point,
+void KalmanFilter::UpdateVelocity(const Eigen::VectorXf& measured_anchor_point,
   const Eigen::VectorXf& measured_velocity,
   const double& time_diff) {
   // Compute kalman gain
@@ -368,8 +393,9 @@ void KalmanFilter::UpdateModel(const Eigen::VectorXf& measured_anchor_point,
   Eigen::Vector3d measured_anchor_point_d =
     measured_anchor_point.cast<double>();
   Eigen::Vector3d measured_velocity_d = measured_velocity.cast<double>();
-  Eigen::Vector3d velocity_gain = mat_k *
-    (measured_velocity_d - mat_c * belief_velocity_);
+  Eigen::Vector3d priori_velocity = belief_velocity_ + belief_acceleration_gain_ * time_diff;
+  Eigen::Vector3d velocity_gain = mat_k * (measured_velocity_d - mat_c * priori_velocity);
+
 
   // Breakdown
   ComputeBreakdownThreshold();
@@ -379,14 +405,14 @@ void KalmanFilter::UpdateModel(const Eigen::VectorXf& measured_anchor_point,
   }
 
   belief_anchor_point_ = measured_anchor_point_d;
-  belief_velocity_ += velocity_gain;
-  belief_velocity_accelaration_ = velocity_gain / time_diff;
+  belief_velocity_ = priori_velocity + velocity_gain;
+  belief_acceleration_gain_ = velocity_gain / time_diff;
 
   // Adaptive
   if (s_use_adaptive_) {
-    belief_velocity_ -= belief_velocity_accelaration_ * time_diff;
-    belief_velocity_accelaration_ *= update_quality_;
-    belief_velocity_ += belief_velocity_accelaration_ * time_diff;
+    belief_velocity_ -= belief_acceleration_gain_ * time_diff;
+    belief_acceleration_gain_ *= update_quality_;
+    belief_velocity_ += belief_acceleration_gain_ * time_diff;
   }
 
   // Compute posterior covariance
@@ -448,6 +474,70 @@ void KalmanFilter::ComputeBreakdownThreshold() {
   if (breakdown_threshold_ > s_breakdown_threshold_maximum_) {
     breakdown_threshold_ = s_breakdown_threshold_maximum_;
   }
+}
+
+Eigen::Vector3f KalmanFilter::ComputeMeasuredAcceleration(
+    const Eigen::Vector3f& measured_velocity,
+    const double& time_diff) {
+    if (history_measured_velocity_.size() < 3) {
+        return Eigen::Vector3f::Zero();
+    }
+    int history_index = history_measured_velocity_.size() - 3;
+    Eigen::Vector3f history_measurement = history_measured_velocity_[history_index];
+    double accumulated_time_diff = time_diff;
+    for (int i = history_index + 1; i < history_measured_velocity_.size(); ++i) {
+        accumulated_time_diff += history_time_diff_[i];
+    }
+    Eigen::Vector3f measured_acceleration = measured_velocity - history_measurement;
+    measured_acceleration /= accumulated_time_diff;
+    return measured_acceleration;
+}
+
+void KalmanFilter::EvaluateOnlineCovariance() {
+    Eigen::Matrix3d online_covariance = Eigen::Matrix3d::Zero();
+    int evaluate_window = 
+        history_measured_velocity_.size() > s_measurement_cached_history_size_maximum_ ?
+        history_measured_velocity_.size() : s_measurement_cached_history_size_maximum_;
+    for (size_t i = 0; i < evaluate_window; ++i) {
+        int history_index = history_measured_velocity_.size() - i - 1;
+        Eigen::Vector3d velocity_resisual = Eigen::Vector3d(5, 5, 0);
+        if (history_index >= 0) {
+            velocity_resisual =
+                history_measured_velocity_[history_index].cast<double>() - belief_velocity_;
+        }
+        online_covariance(0, 0) += velocity_resisual(0) * velocity_resisual(0);
+        online_covariance(0, 1) += velocity_resisual(0) * velocity_resisual(1);
+        online_covariance(1, 0) += velocity_resisual(1) * velocity_resisual(0);
+        online_covariance(1, 1) += velocity_resisual(1) * velocity_resisual(1);
+    }
+    online_velocity_covariance_ = online_covariance / evaluate_window;
+}
+
+void KalmanFilter::GetOnlineCovariance(Eigen::Matrix3d* online_covariance) {
+    *online_covariance = online_velocity_covariance_;
+}
+
+void KalmanFilter::UpdateAcceleration(
+    const Eigen::VectorXf& measured_acceleration) {
+    // Compute kalman gain
+    Eigen::Matrix3d mat_c = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d mat_q = s_measurement_noise_ * Eigen::Matrix3d::Identity() * 3;
+    Eigen::Matrix3d mat_k = velocity_covariance_ * mat_c.transpose() * 
+        (mat_c * velocity_covariance_ * mat_c.transpose() + mat_q).inverse();
+    // Compute posterior belief
+    Eigen::Vector3d measured_acceleration_d = measured_acceleration.cast<double>();
+    Eigen::Vector3d acceleration_gain = 
+        mat_k * (measured_acceleration_d - mat_c * belief_acceleration_);
+    // Adaptive
+    acceleration_gain *= update_quality_;
+    // Breakdonw
+    float breakdown_threshold = 2;
+    if (acceleration_gain.norm() > breakdown_threshold) {
+        acceleration_gain.normalize();
+        acceleration_gain *= breakdown_threshold;
+    }
+    // simple add
+    belief_acceleration_ += acceleration_gain;
 }
 
 }  // namespace perception

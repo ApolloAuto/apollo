@@ -70,8 +70,22 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   void GetState(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity);
 
  protected:
+  int GetRadarHistoryLength();
+
+  int GetLidarHistoryLength();
+
+  int GetLidarHistoryIndex(const int &history_seq);
+
+  int GetRadarHistoryIndex(const int &history_seq);
+
+  double GetHistoryTimediff(const int &history_index,
+                            const double &current_timestamp);
+
+  void UpdateAcceleration(const Eigen::VectorXd &measured_acceleration);
+
   Eigen::Vector3d belief_anchor_point_;
   Eigen::Vector3d belief_velocity_;
+  Eigen::Vector3d belief_acceleration_;
 
   Eigen::Vector4d priori_state_;
   Eigen::Vector4d posteriori_state_;
@@ -89,6 +103,14 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 
   // Optimal Kalman gain
   Eigen::Matrix4d k_matrix_;
+
+  Eigen::Vector3d last_radar_velocity_;
+  std::deque<bool> history_lidar_radar_consistency_;
+  bool love_radar_ = false;
+
+  std::deque<Eigen::Vector3d> history_velocity_;
+  std::deque<double> history_time_diff_;
+  std::deque<bool> history_velocity_is_radar_;
 };
 
 } // namespace perception
