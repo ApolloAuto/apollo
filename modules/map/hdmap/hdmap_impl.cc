@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "modules/map/hdmap/hdmap_impl.h"
 
+#include <iostream>
 #include <algorithm>
 #include <unordered_set>
 
@@ -54,6 +55,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
     return -1;
   }
 
+
   for (const auto& lane : map_.lane()) {
     lane_table_[lane.id().id()].reset(new LaneInfo(lane));
   }
@@ -88,7 +90,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   for (const auto& road : map_.road()) {
     road_table_[road.id().id()].reset(new RoadInfo(road));
   }
-
+ 
   for (const auto& road_ptr_pair : road_table_) {
     const auto& road_id = road_ptr_pair.second->id();
     for (const auto& road_section : road_ptr_pair.second->sections()) {
@@ -569,7 +571,7 @@ int HDMapImpl::GetRoadBoundaries(
 int HDMapImpl::GetForwardNearestSignalsOnLane(
     const apollo::common::PointENU& point,
     const double distance,
-    std::vector<SignalInfoConstPtr>* signals) {
+    std::vector<SignalInfoConstPtr>* signals) const {
   CHECK_NOTNULL(signals);
 
   signals->clear();
@@ -585,7 +587,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   car_point.set_y(point.y());
   apollo::common::math::Vec2d map_point;
   if (GetLanes(point, LanesSearchRange, &temp_surrounding_lanes) == -1) {
-    AInfo << "The car is not on lane!";
+    AINFO << "The car is not on lane!";
     return -1;
   }
   for (const auto& surround_lane : temp_surrounding_lanes) {
@@ -594,14 +596,14 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     }
   }
   if (surrounding_lanes.empty()) {
-    AInfo << "Can not find lanes around car.";
+    AINFO << "Can not find lanes around car.";
     return -1;
   }
   for (const auto& lane : surrounding_lanes) {
     if (!lane->signals().empty()) {
         lane_ptr = lane;
-        nearest_l = lane_ptr->distance_to(car_point, &map_point, 
-                                          &nearest_s, s_index);
+        nearest_l = lane_ptr->DistanceTo(car_point, &map_point, 
+                                          &nearest_s, &s_index);
         break;
     }
   }
@@ -618,7 +620,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   while (s < back_distance) {
     for (const auto& predecessor_lane_id : lane_ptr->lane().predecessor_id()) {
       lane_ptr = GetLaneById(predecessor_lane_id);
-      if (lane_ptr->lane().turn() == apollo::common::hdmap::Lane::NO_TURN) {
+      if (lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
         break;
       }
     }
@@ -631,7 +633,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     double signal_min_dist = std::numeric_limits<double>::infinity();
     std::vector<SignalInfoConstPtr> min_dist_signal_ptr;
     for (const auto& overlap_id : lane_ptr->lane().overlap_id()) {
-      OverlapInfoConstPtr overlap_ptr = get_overlap_by_id(overlap_id);
+      OverlapInfoConstPtr overlap_ptr = GetOverlapById(overlap_id);
       double lane_overlap_offset_s = 0.0;
       SignalInfoConstPtr signal_ptr = nullptr;
       for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
@@ -641,7 +643,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
               - s_start;
           continue;
         }
-        signal_ptr = get_signal_by_id(overlap_ptr->overlap().object(i).id());
+        signal_ptr = GetSignalById(overlap_ptr->overlap().object(i).id());
         if (signal_ptr == nullptr || lane_overlap_offset_s < 0.0) {
           break;
         }
@@ -667,7 +669,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     LaneInfoConstPtr tmp_lane_ptr = nullptr;
     for (const auto& successor_lane_id : lane_ptr->lane().successor_id()) {
       tmp_lane_ptr = GetLaneById(successor_lane_id);
-      if (tmp_lane_ptr->lane().turn() == apollo::common::hdmap::Lane::NO_TURN) {
+      if (tmp_lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
         break;
       }
     }
