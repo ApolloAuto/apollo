@@ -66,6 +66,10 @@ class PncMap {
    */
   bool IsSameRouting() const;
 
+  bool ExtendSegments(const RouteSegments &segments,
+                      const common::PointENU &point, double look_forward,
+                      double look_backward, RouteSegments *extended_segments);
+
  private:
   bool GetNearestPointFromRouting(const common::VehicleState &point,
                                   LaneWaypoint *waypoint) const;
@@ -85,9 +89,9 @@ class PncMap {
                          const RouteSegments &segments,
                          LaneWaypoint *waypoint) const;
 
-  bool TruncateLaneSegments(const RouteSegments &segments, double start_s,
-                            double end_s,
-                            RouteSegments *const truncated_segments) const;
+  bool ExtendSegments(const RouteSegments &segments, double start_s,
+                      double end_s,
+                      RouteSegments *const truncated_segments) const;
 
   static bool ValidateRouting(const routing::RoutingResponse &routing);
 
