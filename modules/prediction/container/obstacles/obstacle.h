@@ -146,6 +146,8 @@ class Obstacle {
    */
   bool IsOnLane();
 
+  bool IsNearJunction();
+
   void SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states);
 
   void GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states);
