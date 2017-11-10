@@ -286,10 +286,13 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   }
 
   ADEBUG << "lat_shift = " << lat_shift;
-  spline_constraint->AddPointConstraint(
-      qp_spline_path_config_.point_constraint_s_position(), lat_shift);
+  const double kEndPointBoundaryEpsilon = 1e-2;
+  spline_constraint->AddPointConstraintInRange(
+      qp_spline_path_config_.point_constraint_s_position(), lat_shift,
+      kEndPointBoundaryEpsilon);
   if (!is_change_lane_path_) {
-    spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
+    spline_constraint->AddPointDerivativeConstraintInRange(
+        evaluated_s_.back(), 0.0, kEndPointBoundaryEpsilon);
   }
 
   // add first derivative bound to improve lane change smoothness
@@ -339,11 +342,10 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
 
     if (evaluated_s_.at(i) - evaluated_s_.at(0) <
         qp_spline_path_config_.cross_lane_longitudinal_extension()) {
-      const double kRoadBoundaryBuff = 0.1;
-      road_boundary.first = std::fmin(road_boundary.first + kRoadBoundaryBuff,
-                                      init_frenet_point_.l() - lateral_buf);
-      road_boundary.second = std::fmax(road_boundary.second - kRoadBoundaryBuff,
-                                       init_frenet_point_.l() + lateral_buf);
+      road_boundary.first =
+          std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+      road_boundary.second =
+          std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
     }
     boundary_low.emplace_back(common::util::MaxElement(
         std::vector<double>{road_boundary.first, static_obs_boundary.first,
