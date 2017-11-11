@@ -60,6 +60,9 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                          const ReferenceLine& reference_line,
                                          PathDecision* const path_decision,
                                          SpeedData* const speed_data) {
+  if (reference_line_info_->ReachedDestination()) {
+    return Status::OK();
+  }
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");

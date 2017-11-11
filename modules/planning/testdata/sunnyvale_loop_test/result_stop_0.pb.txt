@@ -985,7 +985,14 @@ trajectory_point {
 }
 decision {
   main_decision {
-    cruise {
+    stop {
+      reason_code: STOP_REASON_OBSTACLE
+      reason: "stop by 401_0"
+      stop_point {
+        x: 587046.18442476622
+        y: 4141548.7374630719
+      }
+      stop_heading: 1.1924923179463285
       change_lane_type: FORWARD
     }
   }

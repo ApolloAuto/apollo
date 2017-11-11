@@ -33,9 +33,11 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
   ObjectDecisionType ignore;
   ignore.mutable_ignore();
   const std::string rule_id = RuleConfig::RuleId_Name(config_.rule_id());
+  const double adc_length_s =
+      adc_sl_boundary.end_s() - adc_sl_boundary.start_s();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     if (path_obstacle->perception_sl_boundary().end_s() >=
-        adc_sl_boundary.end_s()) {
+        adc_sl_boundary.end_s()) {  // don't ignore such vehicles.
       continue;
     }
 
@@ -45,9 +47,8 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
       path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
       continue;
     }
-    auto adc_back_s = adc_sl_boundary.end_s() - adc_sl_boundary.start_s();
     // Ignore the car comes from back of ADC
-    if (path_obstacle->st_boundary().min_s() < -adc_back_s) {
+    if (path_obstacle->st_boundary().min_s() < -adc_length_s) {
       path_decision->AddLongitudinalDecision(rule_id, path_obstacle->Id(),
                                              ignore);
       path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);
