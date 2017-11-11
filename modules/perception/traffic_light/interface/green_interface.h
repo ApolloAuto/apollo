@@ -38,6 +38,15 @@ class IGetBox {
   GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
              cv::Rect *cropbox) = 0;
 };
+class DummyRefine : public IRefine {
+ public:
+  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) override {
+
+  }
+  virtual void SetCropBox(const cv::Rect &box) override {
+
+  }
+};
 }
 }
 }

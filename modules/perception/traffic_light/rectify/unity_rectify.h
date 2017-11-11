@@ -8,7 +8,6 @@
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "detection.h"
 
 namespace apollo {
 namespace perception {

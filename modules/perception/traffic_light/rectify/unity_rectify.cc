@@ -5,7 +5,7 @@
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "cropbox.h"
-#include "detection.h"
+//#include "detection.h"
 #include "select.h"
 #include "unity_rectify.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -51,7 +51,6 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
   float output_threshold = 0.0f;
   std::string detection_model;
   std::string detection_net;
-  int output_type = static_cast<int>(DetectOutputBoxType::BOX_ALL);
 
   if (!model_config->GetValue(\
             "crop_scale", &crop_scale)) {
@@ -101,7 +100,8 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
   }
   switch (detect_method) {
     default:
-    case 0:detection->reset(new Detection(crop_min_size, detection_net, detection_model));
+      //case 0:detection->reset(new Detection(crop_min_size, detection_net, detection_model));
+      detection->reset(new DummyRefine());
       break;
   }
 
