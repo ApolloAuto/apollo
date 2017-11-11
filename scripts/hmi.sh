@@ -23,10 +23,15 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-function start() {
-    echo "Start roscore..."
-    ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
-    nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
+function start_now() {
+    ROS_PROCESS="$(pgrep -c -f roscore)"
+    if [ "${ROS_PROCESS}" -eq 0 ]; then
+        echo "Start roscore..."
+        ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
+        nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
+    else
+        echo "roscore is already in running..."
+    fi
 
     echo "Start HMI ros bridge..."
     LOG="${APOLLO_ROOT_DIR}/data/log/hmi_ros_bridge.out"
@@ -49,6 +54,19 @@ function start() {
     fi
 }
 
+function start() {
+    echo "****************************************"
+    echo "* We have integrated HMI with Dreamview."
+    echo "* This entrypoint is going to be retired soon."
+    echo "* Please use scripts/bootstrap.sh to start the system."
+    echo "* Or wait for 3s to continue..."
+    echo "****************************************"
+    echo ""
+    sleep 3
+
+    start_now
+}
+
 function stop() {
     pkill -f -9 hmi_main.py
     pkill -f ros_bridge
@@ -56,6 +74,9 @@ function stop() {
 }
 
 case $1 in
+  start_now)
+    start_now
+    ;;
   start)
     start
     ;;
