@@ -37,6 +37,9 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+double GetLaneChangeLateralShift(const double v) { return -0.075 * v + 4.0; }
+}
 
 using Vec2d = apollo::common::math::Vec2d;
 
@@ -279,17 +282,20 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   // add end point constraint, equality constraint
   double lat_shift = -ref_l_;
   if (is_change_lane_path_) {
+    double lane_change_lateral_shift =
+        GetLaneChangeLateralShift(init_trajectory_point_.v());
     lat_shift = std::copysign(
-        std::fmin(std::fabs(ref_l_),
-                  qp_spline_path_config_.lane_change_lateral_shift()),
-        -ref_l_);
+        std::fmin(std::fabs(ref_l_), lane_change_lateral_shift), -ref_l_);
   }
 
   ADEBUG << "lat_shift = " << lat_shift;
   const double kEndPointBoundaryEpsilon = 1e-2;
+  constexpr double kReservedDistance = 10.0;
   spline_constraint->AddPointConstraintInRange(
-      qp_spline_path_config_.point_constraint_s_position(), lat_shift,
-      kEndPointBoundaryEpsilon);
+      std::fmin(qp_spline_path_config_.point_constraint_s_position(),
+                kReservedDistance + init_frenet_point_.s() +
+                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
+      lat_shift, kEndPointBoundaryEpsilon);
   if (!is_change_lane_path_) {
     spline_constraint->AddPointDerivativeConstraintInRange(
         evaluated_s_.back(), 0.0, kEndPointBoundaryEpsilon);
