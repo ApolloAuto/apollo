@@ -427,8 +427,14 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     const double adjusted_end_s =
         std::min(end_s - router_s + lane_segment.start_s, lane_segment.end_s);
     if (adjusted_start_s < adjusted_end_s) {
-      truncated_segments->emplace_back(lane_segment.lane, adjusted_start_s,
-                                       adjusted_end_s);
+      if (!truncated_segments->empty() &&
+          truncated_segments->back().lane->id().id() ==
+              lane_segment.lane->id().id()) {
+        truncated_segments->back().end_s = adjusted_end_s;
+      } else {
+        truncated_segments->emplace_back(lane_segment.lane, adjusted_start_s,
+                                         adjusted_end_s);
+      }
     }
     router_s += (lane_segment.end_s - lane_segment.start_s);
     if (router_s > end_s) {
@@ -436,6 +442,15 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     }
   }
   // Extend the trajectory towards the end of the trajectory.
+  if (router_s < end_s && !truncated_segments->empty()) {
+    auto &back = truncated_segments->back();
+    if (back.lane->total_length() > back.end_s) {
+      double origin_end_s = back.end_s;
+      back.end_s =
+          std::min(back.end_s + end_s - router_s, back.lane->total_length());
+      router_s += back.end_s - origin_end_s;
+    }
+  }
   if (router_s < end_s) {
     const auto &last_segment = segments.back();
     auto last_lane = last_segment.lane;
