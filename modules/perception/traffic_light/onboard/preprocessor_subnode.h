@@ -18,12 +18,13 @@
 
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
+#include <image_transport/subscriber.h>
 #include "modules/perception/traffic_light/onboard/hdmap_input.h"
 
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
-#include "modules/perception/traffic_light/onboard/preprocessor_data.h"
+#include "modules/perception/traffic_light/onboard/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
@@ -42,7 +43,7 @@ class TLPreprocessorSubnode;
 class TLPreprocessorSubnode : public Subnode {
  public:
   TLPreprocessorSubnode();
-  virtual ~TLPreprocessorSubnode();
+  virtual ~TLPreprocessorSubnode() = default;;
 
   // @brief: as a subnode with type SUBNODE_IN
   //         we will use ros callback, so ignore subnode callback
@@ -64,10 +65,6 @@ class TLPreprocessorSubnode : public Subnode {
   bool init_preprocessor();
 
   bool init_hdmap();
-
-  bool init_subscriber(const std::map<std::string, std::string> &fields,
-                       const CameraId &camera_id,
-                       void (TLPreprocessorSubnode::*)(const sensor_msgs::ImageConstPtr &));
 
   bool add_data_and_publish_event(
       const std::shared_ptr<ImageLights> &data,
@@ -99,6 +96,8 @@ class TLPreprocessorSubnode : public Subnode {
   //std::string                                                  _work_root_dir;
   //StreamInput<sensor_msgs::Image,
   //                     TLPreprocessorSubnode>                  _stream_input;
+  image_transport::Subscriber sub_short_;
+  image_transport::Subscriber sub_long_;
   TLPreprocessingData *_preprocessing_data = nullptr;
 
   HDMapInput *_hd_map = nullptr;  // HDMap

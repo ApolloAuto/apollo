@@ -13,8 +13,7 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/shared_data_manager.h"
-#include "modules/perception/traffic_light/onboard/proc_data.h"
-#include "modules/perception/traffic_light/onboard/preprocessor_data.h"
+#include "modules/perception/traffic_light/onboard/tl_shared_data.h"
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
 namespace apollo {

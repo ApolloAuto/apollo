@@ -10,6 +10,8 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <image_transport/image_transport.h>
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/lib/base/file_util.h"
@@ -97,27 +99,24 @@ bool TLPreprocessorSubnode::InitInternal() {
     return false;
   }
 
-  // set long focus camera
-  if (!init_subscriber(reserve_field, LONG_FOCUS,
-                       &TLPreprocessorSubnode::sub_long_focus_camera)) {
-    AERROR << "TLPreprocessorSubnode init failed. init long focus camera."
-           << " reserve:" << reserve_;
-    return false;
-  }
-  // set short focus camera
-  if (!init_subscriber(reserve_field, SHORT_FOCUS,
-                       &TLPreprocessorSubnode::sub_short_focus_camera)) {
-    AERROR << "TLPreprocessorSubnode init failed. init short focus camera."
-           << " reserve:" << reserve_;
-    return false;
-  }
-
+  //ros::NodeHandle nh;
+  //image_transport::ImageTransport it(nh);
+  //sub_short_ = it.subscribe(FLAGS_image_short_topic, 1, TLPreprocessorSubnode::sub_short_focus_camera);
+  //sub_long_ = it.subscribe(FLAGS_image_long_topic, 1, TLPreprocessorSubnode::sub_long_focus_camera);
+  //
+  using common::adapter::AdapterManager;
+  CHECK(AdapterManager::GetImageLong())
+  << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
+  common::adapter::AdapterManager::AddImageLongCallback(&TLPreprocessorSubnode::sub_long_focus_camera,
+                                                        this);
+  CHECK(AdapterManager::GetImageShort())
+  << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
+  common::adapter::AdapterManager::AddImageShortCallback(&TLPreprocessorSubnode::sub_short_focus_camera,
+                                                         this);
   return true;
 }
 
-TLPreprocessorSubnode::~TLPreprocessorSubnode() {
-
-}
+TLPreprocessorSubnode::~TLPreprocessorSubnode() = default;
 
 bool TLPreprocessorSubnode::init_shared_data() {
 
@@ -158,49 +157,6 @@ bool TLPreprocessorSubnode::init_hdmap() {
     AERROR << "TLPreprocessorSubnode init hd-map failed.";
     return false;
   }
-  return true;
-}
-
-bool TLPreprocessorSubnode::init_subscriber(
-    const std::map<std::string, std::string> &fields,
-    const CameraId &camera_id,
-    void(TLPreprocessorSubnode::*callback)(const sensor_msgs::ImageConstPtr &)) {
-  auto camera_name = _s_camera_names[camera_id];
-  auto key = camera_name + "_source_type";
-  auto citer = fields.find(key);
-  if (citer == fields.end()) {
-    AERROR << "Failed to find field:" << key << ", reserve: " << reserve_;
-    return false;
-  }
-  IoStreamType source_type =
-      static_cast<IoStreamType>(atoi((citer->second).c_str()));
-
-  key = camera_name + "_source_name";
-  citer = fields.find(key);
-  if (citer == fields.end()) {
-    AERROR << "Failed to find field:" << key << ", reserve: " << reserve_;
-    return false;
-  }
-  const std::string &source_name = citer->second;
-
-  std::string new_source_name = source_name;
-
-  // set source topic name
-  _camera_topic_names[camera_id] = new_source_name;
-
-
-  // use to check whether camera is working
-  _last_sub_camera_image_ts[camera_id] = 0.0;
-
-  // register subscriber
-  //if (!_stream_input.register_subscriber(source_type, new_source_name, callback, this)) {
-  //  AERROR << "Failed to register input stream. [type: " << source_type
-  //         << "] [name: " << new_source_name << "].";
-  //  return false;
-  //}
-
-  AINFO << "Init subscriber successfully, source_type: " << source_type
-        << ", source_name: " << new_source_name;
   return true;
 }
 

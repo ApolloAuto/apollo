@@ -57,14 +57,11 @@ bool Image::GenerateMat() {
     try {
       if (image_data_->encoding.compare("rgb8") == 0) {
         cv_ptr = cv_bridge::toCvShare(image_data_, "bgr8");
-      } else if (image_data_->encoding.compare("8UC3") == 0) {
-        cv_ptr = cv_bridge::toCvShare(image_data_, "8UC3");
-      } else {
-        AERROR << "TLPreprocessorSubnode get unknown image format. "
-               << "format:" << image_data_->encoding;
-        return false;
+        mat_ = cv_ptr->image;
+      } else if (image_data_->encoding.compare("yuyv") == 0) {
+        //TODO:: yuyv 2 rgb rgb 2 bgr
       }
-      mat_ = cv_ptr->image;
+
       contain_mat_ = true;
       AINFO << "Generate done " << mat_.size();
     }
