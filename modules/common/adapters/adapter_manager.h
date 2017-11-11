@@ -108,10 +108,6 @@ namespace adapter {
           node_handle_->subscribe(topic_name, message_history_limit,           \
                                   &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
-    if (mode != AdapterConfig::RECEIVE_ONLY && IsRos()) {                      \
-      name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
-          topic_name, message_history_limit);                                  \
-    }                                                                          \
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \

@@ -339,6 +339,10 @@ class Adapter {
                 IdentifierType<::sensor_msgs::ImageConstPtr>) {
     return false;
   }
+  bool FeedFile(const std::string &message_file,
+                IdentifierType<::sensor_msgs::Image>) {
+    return false;
+  }
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(

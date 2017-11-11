@@ -116,8 +116,6 @@ bool TLPreprocessorSubnode::InitInternal() {
   return true;
 }
 
-TLPreprocessorSubnode::~TLPreprocessorSubnode() = default;
-
 bool TLPreprocessorSubnode::init_shared_data() {
 
   CHECK_NOTNULL(shared_data_manager_);
