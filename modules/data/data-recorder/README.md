@@ -10,7 +10,7 @@ Data-Recorder is responsiable for helping Apollo partner to record data.
 
 ## v1.0.0.1
 
-## How to `use`
+## How to `Use.`
 
 #### Data-Recorder configuration.
 There are recorder.global.yaml and recorder.debug.yaml in conf directory.
@@ -36,8 +36,7 @@ Modify the config file according to your system environments and data recording 
 
  * Send command data_sync_on to enable data sync.
  * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "data_sync_on".
-
- * Write ROS node to publish ROS message control data-recorder.
+ * Also user can write a rosnode to publish ros message to control data-recorder.
 
 #### Subscribe  data-recorder status topic and get data-recorder running infomations.This feature depends on data-recorder has been started.
  * rostopic list  # List all the ros topics.                              
