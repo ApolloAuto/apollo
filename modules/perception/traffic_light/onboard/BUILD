@@ -12,6 +12,7 @@ cc_library(
     hdrs = [
         "hdmap_input.h",
         "preprocessor_subnode.h",
+        "proc_subnode.h",
         "tl_shared_data.h",
     ],
     deps = [
