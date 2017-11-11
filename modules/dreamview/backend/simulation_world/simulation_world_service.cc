@@ -732,7 +732,10 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdateDecision(trajectory.decision(), header_time);
 
-  UpdatePlanningData(trajectory.debug().planning_data());
+  // TODO(siyang, vlin): Make this dynamically controled by frontend
+  if (!FLAGS_ignore_planning_debug_data) {
+    UpdatePlanningData(trajectory.debug().planning_data());
+  }
 
   world_.mutable_latency()->set_planning(
       trajectory.latency_stats().total_time_ms());
