@@ -986,13 +986,13 @@ trajectory_point {
 decision {
   main_decision {
     stop {
-      reason_code: STOP_REASON_DESTINATION
-      reason: "stop by DEST"
+      reason_code: STOP_REASON_OBSTACLE
+      reason: "stop by 2352_0"
       stop_point {
-        x: 586366.0889758768
-        y: 4140779.4244631547
+        x: 586353.00095959182
+        y: 4140731.4009891716
       }
-      stop_heading: 1.3047244341255926
+      stop_heading: 1.30472443412559
       change_lane_type: FORWARD
     }
   }
