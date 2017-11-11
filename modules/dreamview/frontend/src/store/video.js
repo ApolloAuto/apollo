@@ -27,6 +27,10 @@ export default class Video {
         this.offset = null;
     }
 
+    @computed get showVideo() {
+        return (this.path !== undefined && this.path.length !== 0);
+    }
+
     static VALID_TYPE() {
         return ['video/mp4', 'video/quicktime'];
     }

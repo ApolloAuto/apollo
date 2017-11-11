@@ -1,5 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
+import classNames from "classnames";
 
 import Image from "components/common/Image";
 import yellow from
@@ -12,15 +13,19 @@ import red from
 @observer
 export default class TrafficLightIndicator extends React.Component {
     render() {
+        const { drivingMode, isAutoMode } = this.props;
+
         // TODO actually implement render "traffic light on".
         return (
-            <div className="traffic-light-indicator">
+            <div className={classNames({
+                            "traffic-light-indicator": true,
+                            "auto-mode": isAutoMode,
+                            "manual-mode": !isAutoMode,
+                        })}>
                 <Image image={green} className="green" />
                 <Image image={yellow} className="yellow" />
                 <Image image={red} className="red" />
-                <span className="traffic-light-label-text label-text">
-                    Traffic Signal
-                </span>
+                <div className="driving-mode">{drivingMode}</div>
             </div>
         );
     }
