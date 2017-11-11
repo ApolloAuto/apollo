@@ -66,6 +66,12 @@ bool ReferenceLineInfo::Init() {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
+  if (adc_sl_boundary_.end_s() < 0 ||
+      adc_sl_boundary_.start_s() > reference_line_.Length()) {
+    AWARN << "Vehicle SL " << adc_sl_boundary_.ShortDebugString()
+          << " is not on reference line:[0, " << reference_line_.Length()
+          << "]";
+  }
   return true;
 }
 
