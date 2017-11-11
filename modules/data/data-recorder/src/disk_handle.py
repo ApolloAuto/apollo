@@ -59,11 +59,14 @@ def check_disk(output_path, min_space=1024):
     disk_mp = get_mount_point(output_path)
     free_space = get_disk_free_size(disk_mp)
     if free_space < min_space * 1024 * 1024:
+        print("Less than %s of space free on disk %s." % (min_space, disk_mp))
         logging.error("Less than %s of space free on disk %s.", min_space, disk_mp)
-        return False
+        return -2
     elif free_space < min_space * 1024 * 1024 * 5:
+        print("Less than 5 * %s of space free on disk %s." % (min_space, disk_mp))
         logging.warn("Less than 5 * %s of space free on disk %s.", min_space, disk_mp)
-    return True
+        return -1
+    return 0
 
 
 def get_disk_partitions_info(all=False):

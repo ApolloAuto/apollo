@@ -12,6 +12,10 @@ Data-Recorder is responsiable for helping Apollo partner to record data.
 
 ## How to `use`
 
+#### Data-Recorder configuration.
+There are recorder.global.yaml and recorder.debug.yaml in conf directory.
+Modify the config file according to your system environments and data recording requirements.
+
 #### Start Data-Recorder.
  * bash data_reocrder_control.sh start # Start data-recoder with default task_purpose(debug).
  * python data_recorder_manager.py -c ../conf/recorder.debug.yaml # This is another way to start.
@@ -21,14 +25,42 @@ Data-Recorder is responsiable for helping Apollo partner to record data.
  * CTRL + C if start data-recorder with python data_recorder_manager.py -c ../conf/conf.yaml
 
 #### Send control commands to data-recorder.This feature depends on data-recorder has been started.
- * Send ROS message with rostopic pub. command rosbag_record_off means stop rosbag record.
+ * Send command rosbag_record_off to disable rosbag record.
  * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "rosbag_record_off".
 
- * Send ROS message with rostopic pub. command rosbag_record_on means start rosbag record.
+ * Send command rosbag_record_on to enable rosbag record.
  * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "rosbag_record_on".
+
+ * Send command data_sync_off to disable data sync.
+ * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "data_sync_off".
+
+ * Send command data_sync_on to enable data sync.
+ * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "data_sync_on".
 
  * Write ROS node to publish ROS message control data-recorder.
 
 #### Subscribe  data-recorder status topic and get data-recorder running infomations.This feature depends on data-recorder has been started.
  * rostopic list  # List all the ros topics.                              
  * rostopic echo  /apollo/data_recorder/status # Read data from /apollo/data_recorder/status.
+Try to use the following code to subscribe topic and get deserialized message.
+```
+    #!/usr/bin/env python
+    import rospy
+    import recorder_info_pb2
+    from std_msgs.msg import String
+    
+    def callback(data):
+        a = recorder_info_pb2.RecorderInfo()
+        a.ParseFromString(data.data)
+        print(a)
+    
+    def listener():
+        rospy.init_node('listener', anonymous=True)
+        rospy.Subscriber("/apollo/data_recorder/status", String, callback)
+        rospy.spin()
+    
+    if __name__ == '__main__':
+        listener() 
+```
+
+

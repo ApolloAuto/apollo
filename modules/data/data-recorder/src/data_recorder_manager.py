@@ -70,13 +70,13 @@ class DataRecorderManager(object):
         self.output_directory = None
         self.backup_directory = None
         self.recorder_opts_list = []
-        self.lock = threading.RLock()
+        self.rlock = threading.RLock()
         self.if_taskid_isready = False
         self.conf_reader = cf_reader
         self.init()
 
     def init(self):
-        self.recorder_status = recorder_info_pb2.OK_WAITING_FOR_COMMANDS
+        self.recorder_status = recorder_info_pb2.DATA_RECORDER_INIT
         self.cmd_topic = self.conf_reader.data_args.get("recorder_cmd_topic")
         self.status_topic = self.conf_reader.data_args.get("recorder_status_topic")
         self.pub = rospy.Publisher(self.status_topic, String, queue_size=100)
@@ -106,7 +106,7 @@ class DataRecorderManager(object):
 
     def create_task_id(self):
         """Recorder init, create_task_id."""
-        if not disk_handle.check_disk(self.conf_reader.data_args.get('output_path')):
+        if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == -2:
             return -1
         self.create_backup_id()
         self.output_directory = self.conf_reader.data_args.get('output_path') \
@@ -128,7 +128,7 @@ class DataRecorderManager(object):
                     'basic': {
                         'data_recorder_version': G_VERSION,
                         'organization_name': self.conf_reader.organization.get('name'),
-                        'organization_site': self.conf_reader.organization.get('site'),
+                        'organization_website': self.conf_reader.organization.get('website'),
                         'organization_description': self.conf_reader.organization.get('description'),
                         'vehicle_id': self.conf_reader.vehicle.get('vehicle_id'),
                         'vehicle_type': self.conf_reader.vehicle.get('vehicle_type'),
@@ -167,20 +167,43 @@ class DataRecorderManager(object):
         logging.info("receive message from %s, data=%s", self.cmd_topic, data.data)
         if self.latest_cmdtime is not None: 
             if (datetime.datetime.now() - self.latest_cmdtime) < datetime.timedelta(seconds=60):
-                tell_you = (
+                print_message = (
                     "The interval between two consecutive operation"
                      " must not be less than 60 seconds! Thanks!"
                 )
-                print("\33[1;35;2m%s\033[0m" % (tell_you))
+                print("\33[1;35;2m%s\033[0m" % (print_message))
                 return
         self.latest_cmdtime = datetime.datetime.now() 
-        if data.data == "rosbag_record_on":
+        if data.data == "rosbag_record_on" and self.rlock.acquire():
             self.record_enable = True
-            self.recorder_status = recorder_info_pb2.OK_RECORDING_DATA
-        if data.data == "rosbag_record_off":
+            self.recorder_status |= recorder_info_pb2.DATA_RECORD_ENABLE
+            self.rlock.release()
+            print("\33[1;31;2mRosbag record has been enabled!\033[0m")
+            return
+        elif data.data == "rosbag_record_off" and self.rlock.acquire():
             self.record_enable = False
-            self.recorder_status = recorder_info_pb2.OK_WAITING_FOR_COMMANDS
-
+            self.recorder_status &= (~recorder_info_pb2.DATA_RECORD_ENABLE)
+            self.rlock.release()
+            print("\33[1;31;2mRosbag record has been disabled!\033[0m")
+            return
+        elif data.data == "data_sync_on" and self.rlock.acquire():
+            self.sync_enable = True
+            self.recorder_status |= recorder_info_pb2.DATA_SYNC_ENABLE
+            self.rlock.release()
+            print("\33[1;31;2mData sync has been enabled!\033[0m")
+            return
+        elif data.data == "data_sync_off" and self.rlock.acquire():
+            self.sync_enable = False
+            self.recorder_status &= (~recorder_info_pb2.DATA_SYNC_ENABLE)
+            self.rlock.release()
+            print("\33[1;31;2mData sync has been disabled!\033[0m")
+            return
+        else:
+            print_message = (
+                "Invalid command! please try again after 60 seconds."
+            )
+            print("\33[1;35;2m%s\033[0m" % print_message)
+        
     def sync_static_data(self, data):
         """Sync data."""
         src = self.conf_reader.task_data_args[data]['data_property']['src']
@@ -229,10 +252,22 @@ class DataRecorderManager(object):
                 disk.mount = dp.mountpoint
                 if disk.mount == disk_handle.get_mount_point(self.conf_reader.data_args.get('output_path')):
                     info.writing_disk.CopyFrom(disk)
-                    if not disk_handle.check_disk(self.conf_reader.data_args.get('output_path')):
-                        self.recorder_status = recorder_info_pb2.ALERT_DISK_IS_FATAL
-                        self.record_enable = False
-                        self.sync_enable = False
+                    if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == 0:
+                        self.recorder_status &= (~recorder_info_pb2.DISK_SPACE_WARNNING)
+                        self.recorder_status &= (~recorder_info_pb2.DISK_SPACE_ALERT)
+                    if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == -1:
+                        self.recorder_status |= recorder_info_pb2.DISK_SPACE_WARNNING
+                    if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == -2:
+                        self.recorder_status |= recorder_info_pb2.DISK_SPACE_WARNNING
+                        self.recorder_status |= recorder_info_pb2.DISK_SPACE_ALERT
+                        if self.rlock.acquire():
+                            self.record_enable = False
+                            self.sync_enable = False
+                            self.rlock.release()
+                     
+                    if not self.sync_enable and self.rlock.acquire():
+                        self.recorder_status &= (~recorder_info_pb2.DATA_SYNC_ENABLE)
+                        self.rlock.release()
             data = recorder_info_pb2.Data()
             info.status = self.recorder_status
             info.task.CopyFrom(task)
@@ -281,13 +316,11 @@ class DataRecorderManager(object):
         for group in rosbag_groups:
             group_id = group['group_id']
             group_name = group['group_name']
-            group_path = group['group_path']
-            group_sub_path = group['group_sub_path']
             group_topic_match_regex = group['group_topic_match_re']
             group_topic_exclude_regex = group['group_topic_exclude_re']
             prefix = "rosbag_" + self.conf_reader.vehicle['vehicle_id'] + "_" + group_name
             opts = recorder.RecorderOptions()
-            opts.record_path = rosbag_path
+            opts.record_path = rosbag_path 
             opts.record_prefix = prefix
             opts.record_quiet = True
             opts.record_switch = True
@@ -297,7 +330,7 @@ class DataRecorderManager(object):
             opts.record_split = True
             opts.record_split_duration = rosbag_split_duration
             opts.record_prefix = prefix   
-            opts.record_topic_regex = group_topic_match_regex
+            opts.record_topic_match_regex = group_topic_match_regex
             opts.record_topic_exclude_regex = group_topic_exclude_regex
             record = recorder.Recorder(self, opts)
             record_instance = (group_name, record, opts)
@@ -309,8 +342,9 @@ class DataRecorderManager(object):
         for worker in self.worker_list:
             worker.setDaemon(False)
             worker.start()
-        self.recorder_status = recorder_info_pb2.OK_RECORDING_DATA
+        self.recorder_status |= 7 # running & record & sync
         self.listener()
+        
         timer_publish = rospy.Timer(rospy.Duration(2), self.publish_recorder_info)
         while not rospy.is_shutdown():
             rospy.sleep(1)
@@ -348,6 +382,7 @@ class DataRecorderManager(object):
             if self.can_kill:
                 self.stop_signal = True
                 break
+        self.recorder_status = recorder_info_pb2.DATA_RECORDER_EXIT
         timer_publish.shutdown()
         for worker in self.worker_list:
             worker.join()

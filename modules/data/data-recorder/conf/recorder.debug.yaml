@@ -23,10 +23,12 @@ task:
         rosbag_topic_group:
         - group_id: '1'
           group_name: 'default'
-          group_path: './'
-          group_sub_path: ''
           group_topic_match_re: ''
           group_topic_exclude_re: '(/sensor/velodyne64/PointCloud2)|(/sensor/velodyne/fusion.*)|(.*(rosout|theora|image_long|image_short|image_narrow|image_wide|traffic_light_debug)$)'
+        - group_id: '2'
+          group_name: 'test'
+          group_topic_match_re: ''
+          group_topic_exclude_re: ''
     syslog:
       if_record: true
       record_method: rsync

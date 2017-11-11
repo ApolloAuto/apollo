@@ -91,7 +91,7 @@ class ConfigParser(object):
             return -1
         try:
             self.organization['name'] = org_required['name']
-            self.organization['site'] = org_required['site']
+            self.organization['website'] = org_required['website']
         except KeyError as e:
             logging.error("organization name, site are required, %s", str(e))
             return -1
@@ -101,8 +101,9 @@ class ConfigParser(object):
                 try:
                     self.organization['description'] = org_optional['description']
                 except KeyError as e:
-                    logging.warn("get organization optional field encounters error, %s", str(e))
-        logging.info("get organization from yaml config file successfully, organization=%s", self.organization)
+                    logging.warn("Get organization optional field encounters error, %s", str(e))
+        logging.info("Get organization from yaml config file successfully, organization=%s",
+            self.organization)
         return 0
 
     def get_datatype_from_yaml(self, yaml_config):
