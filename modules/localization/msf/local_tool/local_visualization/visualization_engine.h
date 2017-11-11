@@ -1,3 +1,23 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+/**
+ * @file visualization_engine.h
+ * @brief The engine for localization visualization.
+ */
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
 
@@ -12,6 +32,10 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+/**
+ * @struct LocalizatonInfo
+ * @brief The data structure to store info of a localization
+ */
 struct LocalizatonInfo {
   LocalizatonInfo() {
     is_valid = false;
@@ -22,14 +46,11 @@ struct LocalizatonInfo {
     std_var[1] = 0.1;
   }
 
-  ~LocalizatonInfo() {
-  }
+  ~LocalizatonInfo() {}
 
-  void set(const Eigen::Affine3d &pose, 
-          const Eigen::Vector3d &std_var,
-          const std::string &description, 
-          const double &timestamp, 
-          const unsigned int &frame_id) {
+  void set(const Eigen::Affine3d &pose, const Eigen::Vector3d &std_var,
+           const std::string &description, const double &timestamp,
+           const unsigned int &frame_id) {
     this->pose = pose;
     this->std_var = std_var;
     this->description = description;
@@ -38,10 +59,8 @@ struct LocalizatonInfo {
     is_valid = true;
   }
 
-  void set(const Eigen::Affine3d &pose,
-          const std::string &description,
-          const double &timestamp, 
-          const unsigned int &frame_id) {
+  void set(const Eigen::Affine3d &pose, const std::string &description,
+           const double &timestamp, const unsigned int &frame_id) {
     this->pose = pose;
     this->description = description;
     this->timestamp = timestamp;
@@ -57,6 +76,10 @@ struct LocalizatonInfo {
   bool is_valid;
 };
 
+/**
+ * @struct MapImageKey
+ * @brief The key structure of a map image .
+ */
 struct MapImageKey {
   MapImageKey() : level(0), zone_id(0), node_north_id(0), node_east_id(0) {}
   bool operator<(const MapImageKey &key) const;
@@ -67,6 +90,10 @@ struct MapImageKey {
   unsigned int node_east_id;
 };
 
+/**
+ * @class MapImageCache
+ * @brief The cache to load map images.
+ */
 class MapImageCache {
  public:
   typedef std::list<std::pair<MapImageKey, cv::Mat>>::iterator ListIterator;
@@ -82,6 +109,10 @@ class MapImageCache {
   std::list<std::pair<MapImageKey, cv::Mat>> _list;
 };
 
+/**
+ * @class VisualizationEngine
+ * @brief The engine to draw all elements for visualization.
+ */
 class VisualizationEngine {
  public:
   VisualizationEngine();
@@ -105,6 +136,7 @@ class VisualizationEngine {
   void DrawInfo();
 
   void UpdateLevel();
+  /**@brief Generate multi resolution images from origin map node images.*/
   void GenerateMutiResolutionImages(const std::vector<std::string> &src_files,
                                     const int base_path_length,
                                     const std::string &dst_folder);
@@ -113,15 +145,17 @@ class VisualizationEngine {
                        const std::string &path);
   bool InitOtherParams(const std::string &params_file);
 
+  /**@brief Project point cloud ti mat.*/
   void CloudToMat(const Eigen::Affine3d &cur_pose,
                   const Eigen::Affine3d &velodyne_extrinsic,
                   const std::vector<Eigen::Vector3d> &cloud, cv::Mat &cloud_img,
                   cv::Mat &cloud_img_mask);
   void CoordToImageKey(const Eigen::Vector2d &coord, MapImageKey &key);
-
+  /**@brief Compute grid index in current map given global coordinate.*/
   cv::Point CoordToMapGridIndex(const Eigen::Vector2d &coord,
                                 const unsigned int resolution_id,
                                 const int stride);
+  /**@brief Compute grid index in spcific map node.*/
   cv::Point MapGridIndexToNodeGridIndex(const cv::Point &p);
 
   bool LoadImageToCache(const MapImageKey &key);
@@ -134,46 +168,43 @@ class VisualizationEngine {
   void ProcessKey(int key);
 
  private:
-  std::string _map_folder;
-  BaseMapConfig _map_config;
-  unsigned int _zone_id;
-  unsigned int _resolution_id;
+  std::string map_folder_;
+  BaseMapConfig map_config_;
+  unsigned int zone_id_;
+  unsigned int resolution_id_;
 
-  std::string _image_visual_resolution_path;
-  std::string _image_visual_leaf_path;
+  std::string image_visual_resolution_path_;
+  std::string image_visual_leaf_path_;
 
-  MapImageCache _map_image_cache;
-  cv::Point _lt_node_index;
-  cv::Point _lt_node_grid_index;
+  MapImageCache map_image_cache_;
+  cv::Point lt_node_index_;
+  cv::Point lt_node_grid_index_;
 
-  std::string _window_name;
-  cv::Mat _image_window;
-  cv::Mat _big_window;
-  cv::Mat _subMat[3][3];
+  std::string window_name_;
+  cv::Mat image_window_;
+  cv::Mat big_window_;
+  cv::Mat subMat_[3][3];
 
   Eigen::Vector2d _view_center;
-  double _cur_scale;
-  int _cur_stride;
-  int _cur_level;
-  int _max_level;
-  int _max_stride;
+  double cur_scale_;
+  int cur_stride_;
+  int cur_level_;
+  int max_level_;
+  int max_stride_;
 
-  bool _is_init;
-  bool _follow_car;
-  bool _auto_play;
+  bool is_init_;
+  bool follow_car_;
+  bool auto_play_;
 
-  // Set if show multi localization
-  // bool _if_show_muti_localization;
+  Eigen::Affine3d car_pose_;
+  cv::Mat cloud_img_;
+  cv::Mat cloud_img_mask_;
+  Eigen::Vector2d cloud_img_lt_coord_;
+  Eigen::Affine3d velodyne_extrinsic_;
 
-  Eigen::Affine3d _car_pose;
-  cv::Mat _cloud_img;
-  cv::Mat _cloud_img_mask;
-  Eigen::Vector2d _cloud_img_lt_coord;
-  Eigen::Affine3d _velodyne_extrinsic;
-
-  unsigned int _loc_info_num;
-  unsigned int _car_loc_id;
-  std::vector<LocalizatonInfo> _cur_loc_infos;
+  unsigned int loc_info_num_;
+  unsigned int car_loc_id_;
+  std::vector<LocalizatonInfo> cur_loc_infos_;
 };
 
 }  // namespace msf

@@ -6,13 +6,13 @@ namespace apollo {
 namespace localization {
 namespace msf {
 OfflineLocalVisualizer::OfflineLocalVisualizer()
-    : _map_config(), _resolution_id(0), _zone_id(0), _visual_engine() {
-  _map_folder = "";
-  _pcd_folder = "";
-  _gnss_loc_file = "";
-  _lidar_loc_file = "";
-  _fusion_loc_file = "";
-  _extrinsic_file = "";
+    : map_config_(), resolution_id_(0), zone_id_(0), visual_engine_() {
+  map_folder_ = "";
+  pcd_folder_ = "";
+  gnss_loc_file_ = "";
+  lidar_loc_file_ = "";
+  fusion_loc_file_ = "";
+  extrinsic_file_ = "";
 }
 
 OfflineLocalVisualizer::~OfflineLocalVisualizer() {}
@@ -23,28 +23,28 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
                                   const std::string &lidar_loc_file,
                                   const std::string &fusion_loc_file,
                                   const std::string &extrinsic_file) {
-  _map_folder = map_folder;
-  _pcd_folder = pcd_folder;
-  _gnss_loc_file = gnss_loc_file;
-  _lidar_loc_file = lidar_loc_file;
-  _fusion_loc_file = fusion_loc_file;
-  _extrinsic_file = extrinsic_file;
+  map_folder_ = map_folder;
+  pcd_folder_ = pcd_folder;
+  gnss_loc_file_ = gnss_loc_file;
+  lidar_loc_file_ = lidar_loc_file;
+  fusion_loc_file_ = fusion_loc_file;
+  extrinsic_file_ = extrinsic_file;
 
-  _pcd_timestamps.clear();
-  _gnss_poses.clear();
-  _lidar_poses.clear();
-  _fusion_poses.clear();
+  pcd_timestamps_.clear();
+  gnss_poses_.clear();
+  lidar_poses_.clear();
+  fusion_poses_.clear();
 
-  std::string config_file = _map_folder + "/config.xml";
-  _map_config._map_version = "lossy_full_alt";
-  bool success = _map_config.load(config_file);
+  std::string config_file = map_folder_ + "/config.xml";
+  map_config_._map_version = "lossy_full_alt";
+  bool success = map_config_.load(config_file);
   if (!success) {
     std::cerr << "Load map config failed." << std::endl;
     return false;
   }
   std::cout << "Load map config succeed." << std::endl;
 
-  success = velodyne::LoadExtrinsic(_extrinsic_file, _velodyne_extrinsic);
+  success = velodyne::LoadExtrinsic(extrinsic_file_, velodyne_extrinsic_);
   if (!success) {
     std::cerr << "Load velodyne extrinsic failed." << std::endl;
     return false;
@@ -58,30 +58,30 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   }
   std::cout << "Handle lidar localization file succeed." << std::endl;
 
-  success = GnssLocFileHandler(_pcd_timestamps);
+  success = GnssLocFileHandler(pcd_timestamps_);
   if (!success) {
     std::cerr << "Handle gnss localization file failed." << std::endl;
     return false;
   }
   std::cout << "Handle gnss localization file succeed." << std::endl;
 
-  success = FusionLocFileHandler(_pcd_timestamps);
+  success = FusionLocFileHandler(pcd_timestamps_);
   if (!success) {
     std::cerr << "Handle fusion localization file failed." << std::endl;
     return false;
   }
   std::cout << "Handle fusion localization file succeed." << std::endl;
 
-  _resolution_id = 0;
-  success = GetZoneIdFromMapFolder(_map_folder, _resolution_id, _zone_id);
+  resolution_id_ = 0;
+  success = GetZoneIdFromMapFolder(map_folder_, resolution_id_, zone_id_);
   if (!success) {
     std::cerr << "Get zone id failed." << std::endl;
     return false;
   }
   std::cout << "Get zone id succeed." << std::endl;
 
-  success = _visual_engine.Init(_map_folder, _map_config, _resolution_id,
-                                _zone_id, _velodyne_extrinsic, LOC_INFO_NUM);
+  success = visual_engine_.Init(map_folder_, map_config_, resolution_id_,
+                                zone_id_, velodyne_extrinsic_, LOC_INFO_NUM);
   if (!success) {
     std::cerr << "Visualization engine init failed." << std::endl;
     return false;
@@ -92,54 +92,54 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
 }
 
 void OfflineLocalVisualizer::Visualize() {
-  for (unsigned int idx = 0; idx < _pcd_timestamps.size(); idx++) {
+  for (unsigned int idx = 0; idx < pcd_timestamps_.size(); idx++) {
     LocalizatonInfo lidar_loc_info;
     LocalizatonInfo gnss_loc_info;
     LocalizatonInfo fusion_loc_info;
 
-    auto found_iter = _lidar_poses.find(idx);
-    if (found_iter != _lidar_poses.end()) {
+    auto found_iter = lidar_poses_.find(idx);
+    if (found_iter != lidar_poses_.end()) {
       const Eigen::Affine3d &lidar_pose = found_iter->second;
-      lidar_loc_info.set(lidar_pose, "Lidar.", _pcd_timestamps[idx], idx + 1);
+      lidar_loc_info.set(lidar_pose, "Lidar.", pcd_timestamps_[idx], idx + 1);
     }
 
-    found_iter = _gnss_poses.find(idx);
-    if (found_iter != _gnss_poses.end()) {
+    found_iter = gnss_poses_.find(idx);
+    if (found_iter != gnss_poses_.end()) {
       const Eigen::Affine3d &gnss_pose = found_iter->second;
-      gnss_loc_info.set(gnss_pose, "GNSS.", _pcd_timestamps[idx], idx + 1);
+      gnss_loc_info.set(gnss_pose, "GNSS.", pcd_timestamps_[idx], idx + 1);
     }
 
-    found_iter = _fusion_poses.find(idx);
-    if (found_iter != _fusion_poses.end()) {
+    found_iter = fusion_poses_.find(idx);
+    if (found_iter != fusion_poses_.end()) {
       const Eigen::Affine3d &fusion_pose = found_iter->second;
-      fusion_loc_info.set(fusion_pose, "GNSS.", _pcd_timestamps[idx], idx + 1);
+      fusion_loc_info.set(fusion_pose, "Fusion.", pcd_timestamps_[idx],
+                          idx + 1);
     }
 
     std::vector<LocalizatonInfo> loc_infos;
     loc_infos.push_back(lidar_loc_info);
     loc_infos.push_back(gnss_loc_info);
     loc_infos.push_back(fusion_loc_info);
-    
+
     std::string pcd_file_path;
     std::ostringstream ss;
     ss << idx + 1;
-    pcd_file_path = _pcd_folder + "/" + ss.str() + ".pcd";
+    pcd_file_path = pcd_folder_ + "/" + ss.str() + ".pcd";
     // std::cout << "pcd_file_path: " << pcd_file_path << std::endl;
     std::vector<Eigen::Vector3d> pt3ds;
     std::vector<unsigned char> intensities;
     apollo::localization::msf::velodyne::LoadPcds(
-        pcd_file_path, idx, lidar_loc_info.pose, 
-        pt3ds, intensities, false);
+        pcd_file_path, idx, lidar_loc_info.pose, pt3ds, intensities, false);
 
-    _visual_engine.Visualize(loc_infos, pt3ds);
+    visual_engine_.Visualize(loc_infos, pt3ds);
   }
 }
 
 bool OfflineLocalVisualizer::LidarLocFileHandler() {
   std::vector<Eigen::Affine3d> poses;
-  velodyne::LoadPcdPoses(_lidar_loc_file, poses, _pcd_timestamps);
+  velodyne::LoadPcdPoses(lidar_loc_file_, poses, pcd_timestamps_);
   for (unsigned int idx = 0; idx < poses.size(); idx++) {
-    _lidar_poses[idx] = poses[idx];
+    lidar_poses_[idx] = poses[idx];
   }
 
   return true;
@@ -149,9 +149,9 @@ bool OfflineLocalVisualizer::GnssLocFileHandler(
     const std::vector<double> &pcd_timestamps) {
   std::vector<Eigen::Affine3d> poses;
   std::vector<double> timestamps;
-  velodyne::LoadPcdPoses(_gnss_loc_file, poses, timestamps);
+  velodyne::LoadPcdPoses(gnss_loc_file_, poses, timestamps);
 
-  PoseInterpolationByTime(poses, timestamps, pcd_timestamps, _gnss_poses);
+  PoseInterpolationByTime(poses, timestamps, pcd_timestamps, gnss_poses_);
   return true;
 }
 
@@ -159,9 +159,9 @@ bool OfflineLocalVisualizer::FusionLocFileHandler(
     const std::vector<double> &pcd_timestamps) {
   std::vector<Eigen::Affine3d> poses;
   std::vector<double> timestamps;
-  velodyne::LoadPcdPoses(_fusion_loc_file, poses, timestamps);
+  velodyne::LoadPcdPoses(fusion_loc_file_, poses, timestamps);
 
-  PoseInterpolationByTime(poses, timestamps, pcd_timestamps, _fusion_poses);
+  PoseInterpolationByTime(poses, timestamps, pcd_timestamps, fusion_poses_);
   return true;
 }
 

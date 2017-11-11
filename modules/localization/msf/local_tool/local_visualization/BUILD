@@ -6,7 +6,7 @@ cc_library(
     name = "local_visualizer",
     srcs = [
         "visualization_engine.cc",
-        "offline_local_visualizer.cc",
+        "offline_local_visualizer.cc"
     ],
     hdrs = [
         "visualization_engine.h",
@@ -15,13 +15,13 @@ cc_library(
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
-        "-lboost_program_options",
+        "-lboost_program_options"
     ],
     deps = [
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen//:eigen",
-        "@glog//:glog",
+        "@glog//:glog"
     ],
 )
 
@@ -34,14 +34,14 @@ cc_binary(
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
-        "-lboost_program_options",
+        "-lboost_program_options"
     ],
     deps = [
         ":local_visualizer",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen//:eigen",
-        "@glog//:glog",
+        "@glog//:glog"
     ],
 )
 
