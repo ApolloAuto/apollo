@@ -13,15 +13,20 @@ function toDrivingMode(disengageType) {
         case "DISENGAGE_EMERGENCY":
             return "DISENGAGED";
         case "DISENGAGE_AUTO_STEER_ONLY":
-            return "AUTO STEER ONLY";
+            return "AUTO STEER";
         case "DISENGAGE_AUTO_SPEED_ONLY":
-            return "AUTO SPEED ONLY";
+            return "AUTO SPEED";
         case "DISENGAGE_CHASSIS_ERROR":
             return "CHASSIS ERROR";
         default:
             return "?";
     }
+}
 
+function isAutoMode(disengageType) {
+    return disengageType === "DISENGAGE_NONE" ||
+           disengageType === "DISENGAGE_AUTO_STEER_ONLY" ||
+           disengageType === "DISENGAGE_AUTO_SPEED_ONLY";
 }
 
 function meterPerSecondToKmPerHour(speed) {
@@ -34,6 +39,7 @@ export default class Meters {
     @observable speed = 0;
     @observable steeringAngle = 0;
     @observable drivingMode = "?";
+    @observable isAutoMode = false;
     @observable turnSignal = "";
 
     @action update(world) {
@@ -57,6 +63,7 @@ export default class Meters {
 
             if (world.autoDrivingCar.disengageType !== undefined) {
                 this.drivingMode = toDrivingMode(world.autoDrivingCar.disengageType);
+                this.isAutoMode = isAutoMode(world.autoDrivingCar.disengageType);
             }
 
             if (world.autoDrivingCar.currentSignal !== undefined) {

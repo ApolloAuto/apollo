@@ -54,7 +54,7 @@ class MenuItemCheckbox extends React.Component {
                         id={id} checked={options[MenuIdOptionMapping[id]]} readOnly/>
                         <label className="toggle-switch-label" htmlFor={id} />
                     </div>
-                    <span>  {title}</span>
+                    <span>{title}</span>
                 </li>
             </ul>
         );
@@ -105,12 +105,14 @@ class SubMenu extends React.Component {
                 });
         }
         const result = (
-            <div>
-                <details>
-                    <summary><img src={MenuIconMapping[tabId]} />
-                    <span> {tabTitle}</span></summary>
-                    {entries}
-                </details>
+            <div className="card">
+                <div className="card-header summary">
+                    <span>
+                        <img src={MenuIconMapping[tabId]}/>
+                        {tabTitle}
+                    </span>
+                </div>
+                <div className="card-content-column">{entries}</div>
             </div>
         );
         return result;
