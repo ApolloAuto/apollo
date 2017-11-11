@@ -6,19 +6,10 @@
 //
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
-#include <map>
-#include <functional>
-#include <string>
-#include <vector>
 #include <image_transport/image_transport.h>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/utils.h"
-#include "modules/perception/lib/base/file_util.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/onboard/event_manager.h"
-#include "modules/perception/onboard/shared_data_manager.h"
-#include "modules/perception/onboard/types.h"
 
 DEFINE_double(min_valid_ts_in_seconds, 0.0,
 "min valid timestamp, if ts < min_valid_ts_in_seconds image will be skipped.");
@@ -43,9 +34,6 @@ std::map<int, int> TLPreprocessorSubnode::_s_image_borders = {
     {static_cast<int>(CameraId::LONG_FOCUS), 100},
     {static_cast<int>(CameraId::SHORT_FOCUS), 100},
 };
-
-TLPreprocessorSubnode::TLPreprocessorSubnode() {
-}
 
 bool TLPreprocessorSubnode::InitInternal() {
 
@@ -99,11 +87,6 @@ bool TLPreprocessorSubnode::InitInternal() {
     return false;
   }
 
-  //ros::NodeHandle nh;
-  //image_transport::ImageTransport it(nh);
-  //sub_short_ = it.subscribe(FLAGS_image_short_topic, 1, TLPreprocessorSubnode::sub_short_focus_camera);
-  //sub_long_ = it.subscribe(FLAGS_image_long_topic, 1, TLPreprocessorSubnode::sub_long_focus_camera);
-  //
   using common::adapter::AdapterManager;
   CHECK(AdapterManager::GetImageLong())
   << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
@@ -310,11 +293,6 @@ void TLPreprocessorSubnode::sub_camera_image(
 
   // convert rosmsg to cv::Mat
   const double before_rosmsg_to_cv_mat_ts = TimeUtil::GetCurrentTime();
-  //if (!rosmsg_to_cv_mat(msg, data->image->mutable_mat())) {
-  //    AERROR << "TLPreprocessorSubnode rosmsg_to_cv_mat failed. "
-  //                << "CameraId:" << camera_id << " ts:" << timestamp;
-  //    return;
-  //}
   const double rosmsg_to_cv_mat_latency =
       TimeUtil::GetCurrentTime() - before_rosmsg_to_cv_mat_ts;
 

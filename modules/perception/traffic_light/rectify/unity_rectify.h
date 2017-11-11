@@ -41,6 +41,7 @@ class UnityRectify : public BaseRectifier {
   std::shared_ptr<IGetBox> crop_;
 };
 
+REGISTER_RECTIFIER(UnityRectify);
 }
 }
 }

@@ -36,6 +36,8 @@ class UnityRecognize : public BaseRecognizer {
                  const apollo::perception::ModelConfig *model_config,
                  std::shared_ptr<IRefine> *classify);
 };
+
+REGISTER_RECOGNIZER(UnityRecognize);
 }
 }
 }

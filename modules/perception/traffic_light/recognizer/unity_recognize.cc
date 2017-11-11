@@ -131,7 +131,6 @@ std::string UnityRecognize::name() const {
   return "UnityRecognize";
 }
 
-REGISTER_RECOGNIZER(UnityRecognize);
 }
 }
 }

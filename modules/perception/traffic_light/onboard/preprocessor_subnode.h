@@ -42,7 +42,7 @@ class TLPreprocessorSubnode;
 //@brief pre-processor subnode
 class TLPreprocessorSubnode : public Subnode {
  public:
-  TLPreprocessorSubnode();
+  TLPreprocessorSubnode() = default;
   virtual ~TLPreprocessorSubnode() = default;;
 
   // @brief: as a subnode with type SUBNODE_IN

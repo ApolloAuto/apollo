@@ -172,8 +172,6 @@ std::string UnityRectify::name() const {
   return "UnityRectify";
 }
 
-REGISTER_RECTIFIER(UnityRectify);
-
 }
 }
 }

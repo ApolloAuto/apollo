@@ -4,6 +4,9 @@
 // @file: proc_subnode.cpp
 // @brief: 
 // 
+#include "modules/perception/traffic_light/recognizer/unity_recognize.h"
+#include "modules/perception/traffic_light/rectify/unity_rectify.h"
+#include "modules/perception/traffic_light/reviser/color_decision.h"
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -39,6 +42,9 @@ TLProcSubnode::~TLProcSubnode() {
 }
 
 bool TLProcSubnode::InitInternal() {
+  RegisterFactoryUnityRectify();
+  RegisterFactoryUnityRecognize();
+  RegisterFactoryColorReviser();
 
   if (!InitSharedData()) {
     AERROR << "TLProcSubnode init shared data failed.";
@@ -70,18 +76,6 @@ bool TLProcSubnode::InitInternal() {
     AERROR << "TLProcSubnode Failed to find Conf: "
            << "image_border.";
     return false;
-  }
-  int crop_method = 0;
-  switch (crop_method) {
-    default:
-    case 0: {
-      float crop_scale = 0;
-      float crop_min_size = 0;
-      crop_.reset(new CropBox(crop_scale, crop_min_size));
-    }
-      break;
-    case 1:crop_.reset(new CropBoxWholeImage());
-      break;
   }
 
   AINFO << "TLProcSubnode init successfully. ";
@@ -134,8 +128,6 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
     return false;
   }
 
-  //cv::Rect cbox;
-  //_crop->get_crop_box(image_lights->image->size(), *(image_lights->lights), &cbox);
   if (!image_lights->image->GenerateMat()) {
     AERROR << "TLProcSubnode failed to generate mat";
     return false;

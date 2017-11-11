@@ -97,8 +97,6 @@ bool ColorReviser::Revise(const ReviseOption &option, std::vector<LightPtr> *lig
   return true;
 }
 
-REGISTER_REVISER(ColorReviser);
-
 }
 }
 }
