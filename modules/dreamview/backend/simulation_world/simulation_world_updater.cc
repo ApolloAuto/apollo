@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
 #include "google/protobuf/util/json_util.h"
+#include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
@@ -26,6 +27,7 @@ namespace dreamview {
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::util::ContainsKey;
 using apollo::hdmap::EndWayPointFile;
 using apollo::routing::RoutingRequest;
 using google::protobuf::util::MessageToJsonString;
@@ -124,7 +126,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
         Json poi_list = Json::array();
         if (LoadPOI()) {
-          for (const auto& landmark : poi_.landmark()) {
+          for (const auto &landmark : poi_.landmark()) {
             Json place;
             place["name"] = landmark.name();
             place["x"] = landmark.waypoint().pose().x();
@@ -155,14 +157,14 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 bool SimulationWorldUpdater::ConstructRoutingRequest(
     const Json &json, RoutingRequest *routing_request) {
   // Input validations
-  if (json.find("start") == json.end()) {
+  if (!ContainsKey(json, "start")) {
     AERROR << "Cannot prepare a routing request: input validation failed.";
     return false;
   }
 
   // set start point
   auto start = json["start"];
-  if (start.find("x") == start.end() || start.find("y") == start.end()) {
+  if (!ContainsKey(start, "x") || !ContainsKey(start, "y")) {
     AERROR << "Failed to prepare a routing request: start point not found";
     return false;
   }
@@ -176,6 +178,11 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     auto *waypoint = routing_request->mutable_waypoint();
     for (size_t i = 0; i < iter->size(); ++i) {
       auto &point = (*iter)[i];
+      if (!ContainsKey(point, "x") || !ContainsKey(point, "y")) {
+        AERROR << "Failed to prepare a routing request: waypoint not found";
+        return false;
+      }
+
       if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
                                                waypoint->Add())) {
         waypoint->RemoveLast();
@@ -185,13 +192,13 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
   // set end point
   auto *end_point = routing_request->add_waypoint();
-  if (json.find("end") == json.end()) {
+  if (!ContainsKey(json, "end")) {
     AERROR << "Failed to prepare a routing request: end point not found";
     return false;
   }
 
   auto end = json["end"];
-  if (end.find("x") == end.end() || end.find("y") == end.end()) {
+  if (!ContainsKey(end, "x") || !ContainsKey(end, "y")) {
     AERROR << "Failed to prepare a routing request: end point not found";
     return false;
   }
@@ -216,7 +223,7 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
 
     simulation_world_json_ =
-        sim_world_service_.GetUpdateAsJson(FLAGS_map_radius).dump();
+        sim_world_service_.GetUpdateAsJson(FLAGS_sim_map_radius).dump();
   }
 }
 

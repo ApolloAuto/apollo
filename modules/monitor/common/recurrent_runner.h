@@ -36,8 +36,12 @@ class RecurrentRunner {
  public:
   RecurrentRunner(const std::string &name, const double interval);
   virtual ~RecurrentRunner() = default;
+
+  // Tick once, which may or may not execute the RunOnce() function, based on
+  // the interval setting.
   void Tick(const double current_time);
 
+  // Do the actual work.
   virtual void RunOnce(const double current_time) = 0;
 
  protected:
@@ -53,13 +57,16 @@ class RecurrentRunnerThread {
   explicit RecurrentRunnerThread(const double interval);
 
   void RegisterRunner(std::unique_ptr<RecurrentRunner> runner);
+
+  // Start the thread of ticking all registered runners.
   void Start();
+  // Stop the ticking thread.
   void Stop();
 
  private:
   int64_t interval_ms_;
   std::vector<std::unique_ptr<RecurrentRunner>> runners_;
-  std::unique_ptr<std::thread> thread_;
+  std::unique_ptr<std::thread> thread_ = nullptr;
 
   bool stop_ = false;
   std::mutex stop_mutex_;

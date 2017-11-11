@@ -24,9 +24,8 @@
   
   <!-- start cloud nodelet using test calibration file -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
-    <arg name="node_name" value="sensor_velodyne616_convert"/>
+    <arg name="node_name" value="sensor_velodyne16_convert"/>
     <arg name="model" value="$(arg model)"/>
-    <arg name="calibration_online" value="$(arg velodyne16_calibration_online)" />
     <arg name="calibration" default="$(arg velodyne16_calibration_file)" />
     <arg name="organized" default="$(arg organized)"/>
     <arg name="min_range" default="$(arg min_range)" />

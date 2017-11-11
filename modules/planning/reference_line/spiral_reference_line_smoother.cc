@@ -174,14 +174,14 @@ bool SpiralReferenceLineSmoother::Smooth(
 
     auto path_point_seg =
         to_path_points(start_x, start_y, start_s, theta[i], kappa[i], dkappa[i],
-                       theta[i + 1], kappa[i + 1], dkappa[i + 1], s[i], 0.1);
+                       theta[i + 1], kappa[i + 1], dkappa[i + 1], s[i],
+                       FLAGS_spiral_reference_line_resolution);
 
     ptr_smoothed_point2d->insert(ptr_smoothed_point2d->end(),
                                  path_point_seg.begin(), path_point_seg.end());
 
     start_s = ptr_smoothed_point2d->back().s();
   }
-
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
 }

@@ -126,6 +126,10 @@ function build() {
 
   # Build python proto
   build_py_proto
+
+  # Update task info template on compiling.
+  bazel-bin/modules/data/recorder/update_task_info \
+      --commit_id=$(git rev-parse HEAD)
 }
 
 function cibuild() {
@@ -205,7 +209,7 @@ function release() {
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
   for m in control canbus localization decision perception \
-       prediction planning routing calibration
+       prediction planning routing calibration third_party_perception
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
@@ -275,11 +279,12 @@ function release() {
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
     # hw check
-    mkdir -p $MODULES_DIR/monitor/hwmonitor/hw_check/
-    cp bazel-bin/modules/monitor/hwmonitor/hw_check/can_check $MODULES_DIR/monitor/hwmonitor/hw_check/
-    cp bazel-bin/modules/monitor/hwmonitor/hw_check/gps_check $MODULES_DIR/monitor/hwmonitor/hw_check/
-    mkdir -p $MODULES_DIR/monitor/hwmonitor/hw/tools/
-    cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
+    mkdir -p $MODULES_DIR/monitor/hardware/can
+    cp bazel-bin/modules/monitor/hardware/can/can_check $MODULES_DIR/monitor/hardware/can
+    mkdir -p $MODULES_DIR/monitor/hardware/gps
+    cp bazel-bin/modules/monitor/hardware/gps/gps_check $MODULES_DIR/monitor/hardware/gps
+    mkdir -p $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
+    cp bazel-bin/modules/monitor/hardware/can/esdcan/esdcan_tools/esdcan_test_app $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
@@ -289,10 +294,18 @@ function release() {
   cp LICENSE $ROOT_DIR
   cp third_party/ACKNOWLEDGEMENT.txt $ROOT_DIR
 
+  # mobileye drivers
+  mkdir -p $MODULES_DIR/drivers/delphi_esr
+  cp bazel-bin/modules/drivers/delphi_esr/delphi_esr $MODULES_DIR/drivers/delphi_esr
+  cp -r modules/drivers/delphi_esr/conf $MODULES_DIR/drivers/delphi_esr
+  mkdir -p $MODULES_DIR/drivers/mobileye
+  cp bazel-bin/modules/drivers/mobileye/mobileye $MODULES_DIR/drivers/mobileye
+  cp -r modules/drivers/mobileye/conf  $MODULES_DIR/drivers/mobileye
+
   # release info
   META=${ROOT_DIR}/meta.txt
-  echo "Git commit: $(git show --oneline  -s | awk '{print $1}')" > $META
-  echo "Build time: $TIME" >>  $META
+  echo "Git commit: $(git rev-parse HEAD)" > $META
+  echo "Build time: $(get_now)" >>  $META
 }
 
 function gen_coverage() {

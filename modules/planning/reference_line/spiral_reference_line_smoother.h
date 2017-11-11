@@ -43,6 +43,9 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
 
+  // TODO(all) implement this function.
+  void SetAnchorPoints(const std::vector<AnchorPoint>&) override {}
+
  private:
   bool Smooth(std::vector<Eigen::Vector2d> point2d,
               std::vector<common::PathPoint>* ptr_smoothed_point2d) const;

@@ -18,6 +18,7 @@ cc_library(
         "//modules/common/monitor",
         "//modules/common/proto:common_proto",
         "//modules/common/util",
+        "//modules/common/util:map_util",
         "//modules/common/util:points_downsampler",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
@@ -61,6 +62,7 @@ cc_library(
     ],
     deps = [
         ":simulation_world_service",
+        "//modules/common/util:map_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:image",
         "//modules/dreamview/backend/handlers:websocket",

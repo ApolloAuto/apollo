@@ -83,7 +83,7 @@ class MobileyeData:
         rc1 = self.mobileye_pb.lka_769.heading_angle
         rc2 = self.mobileye_pb.lka_768.curvature
         rc3 = self.mobileye_pb.lka_768.curvature_derivative
-        rrangex = self.mobileye_pb.lka_769.view_range
+        rrangex = self.mobileye_pb.lka_769.view_range + 1
         self.lane_data_lock.acquire()
         for y in range(int(rrangex)):
             self.right_lane_y.append(y)
@@ -95,7 +95,7 @@ class MobileyeData:
         lc1 = self.mobileye_pb.lka_767.heading_angle
         lc2 = self.mobileye_pb.lka_766.curvature
         lc3 = self.mobileye_pb.lka_766.curvature_derivative
-        lrangex = self.mobileye_pb.lka_767.view_range
+        lrangex = self.mobileye_pb.lka_767.view_range + 1
         self.lane_data_lock.acquire()
         for y in range(int(lrangex)):
             self.left_lane_y.append(y)

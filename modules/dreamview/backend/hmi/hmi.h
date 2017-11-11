@@ -21,6 +21,7 @@
 
 #include "gtest/gtest_prod.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 
@@ -33,7 +34,7 @@ namespace dreamview {
 
 class HMI {
  public:
-  explicit HMI(WebSocketHandler *websocket);
+  HMI(WebSocketHandler *websocket, MapService *map_service);
 
  private:
   // Broadcast HMIStatus to all clients.
@@ -41,22 +42,27 @@ class HMI {
 
   void RegisterMessageHandlers();
 
-  static int ExecuteComponentCommand(
+  // Run a supported command of some component, return the ret code.
+  static int RunComponentCommand(
       const google::protobuf::Map<std::string, Component> &components,
-      const std::string &component_name,
-      const std::string &command_name);
+      const std::string &component_name, const std::string &command_name);
+
+  // Run a supported command of current mode.
+  void RunModeCommand(const std::string &command_name);
 
   static void ChangeDrivingModeTo(const std::string &new_mode);
-  void ChangeMapTo(const std::string &new_map);
-  void ChangeVehicleTo(const std::string &new_vehicle);
+  void ChangeMapTo(const std::string &map_name);
+  void ChangeVehicleTo(const std::string &vehicle_name);
+  void ChangeModeTo(const std::string &mode_name);
 
   HMIConfig config_;
   HMIStatus status_;
 
   // No ownership.
   WebSocketHandler *websocket_;
+  MapService *map_service_;
 
-  FRIEND_TEST(HMITest, ExecuteComponentCommand);
+  FRIEND_TEST(HMITest, RunComponentCommand);
 };
 
 }  // namespace dreamview

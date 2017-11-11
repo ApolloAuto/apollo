@@ -78,7 +78,7 @@ class MapUtil {
   }
 
   int point_to_sl(const PointENU &point, std::string *lane_id, double *s,
-                  double *l) {
+                  double *l, double *heading) {
     QUIT_IF(lane_id == nullptr, -1, ERROR, "arg lane id is null");
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
     QUIT_IF(l == nullptr, -3, ERROR, "arg l is null");
@@ -87,6 +87,7 @@ class MapUtil {
     QUIT_IF(ret != 0, -4, ERROR, "get_nearest_lane failed with ret[%d]", ret);
     QUIT_IF(lane == nullptr, -5, ERROR, "lane is null");
     *lane_id = lane->id().id();
+    *heading = lane->Heading(*s);
     return 0;
   }
 
@@ -98,11 +99,18 @@ class MapUtil {
     QUIT_IF(lane == nullptr, -3, ERROR, "get_smooth_point_from_lane[%s] failed",
             lane_id.c_str());
     *point = lane->GetSmoothPoint(s);
+    *heading = lane->Heading(s);
+    auto normal_vec =
+        common::math::Vec2d::CreateUnitVec2d(*heading + M_PI / 2.0) * l;
+    point->set_x(point->x() + normal_vec.x());
+    point->set_y(point->y() + normal_vec.y());
+
     return 0;
   }
 
   int lane_projection(const apollo::common::math::Vec2d &vec2d,
-                      const std::string &lane_id, double *s, double *l) {
+                      const std::string &lane_id, double *s, double *l,
+                      double *heading) {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
@@ -110,6 +118,7 @@ class MapUtil {
     bool ret = lane->GetProjection(vec2d, s, l);
     QUIT_IF(!ret, -3, ERROR, "lane[%s] get projection for point[%f, %f] failed",
             lane_id.c_str(), vec2d.x(), vec2d.y());
+    *heading = lane->Heading(*s);
     return 0;
   }
 };
@@ -145,9 +154,8 @@ int main(int argc, char *argv[]) {
     std::string lane_id;
     double s = 0.0;
     double l = 0.0;
-    map_util.point_to_sl(point, &lane_id, &s, &l);
     double heading = 0.0;
-    map_util.sl_to_point(lane_id, s, l, &point, &heading);
+    map_util.point_to_sl(point, &lane_id, &s, &l, &heading);
     printf("lane_id[%s], s[%f], l[%f], heading[%f]\n", lane_id.c_str(), s, l,
            heading);
   }
@@ -160,32 +168,41 @@ int main(int argc, char *argv[]) {
   if (FLAGS_xy_to_lane) {
     double s = 0.0;
     double l = 0.0;
-    int ret = map_util.lane_projection({FLAGS_x, FLAGS_y}, FLAGS_lane, &s, &l);
+    double heading = 0.0;
+    int ret = map_util.lane_projection({FLAGS_x, FLAGS_y}, FLAGS_lane, &s, &l,
+                                       &heading);
     if (ret != 0) {
       printf("lane_projection for x[%f], y[%f], lane_id[%s] failed\n", FLAGS_x,
              FLAGS_y, FLAGS_lane.c_str());
       return -1;
     }
-    printf("lane[%s] s[%f], l[%f]\n", FLAGS_lane.c_str(), s, l);
+    printf("lane[%s] s[%f], l[%f], heading[%f]\n", FLAGS_lane.c_str(), s, l,
+           heading);
   }
   if (FLAGS_lane_to_lane) {
     PointENU point;
-    double heading = 0.0;
-    map_util.sl_to_point(FLAGS_from_lane, FLAGS_s, 0.0, &point, &heading);
+    double src_heading = 0.0;
+    map_util.sl_to_point(FLAGS_from_lane, FLAGS_s, 0.0, &point, &src_heading);
     double target_s = 0.0;
     double target_l = 0.0;
+    double target_heading = 0.0;
     int ret = map_util.lane_projection({point.x(), point.y()}, FLAGS_to_lane,
-                                       &target_s, &target_l);
+                                       &target_s, &target_l, &target_heading);
     if (ret != 0) {
       printf("lane_projection for lane[%s], s[%f] to lane_id[%s] failed\n",
              FLAGS_from_lane.c_str(), FLAGS_s, FLAGS_to_lane.c_str());
       return -1;
     }
-    printf("lane[%s] s[%f], l[%f]\n", FLAGS_to_lane.c_str(), target_s,
-           target_l);
+    printf("lane[%s] s[%f], l[%f], heading[%f]\n", FLAGS_to_lane.c_str(),
+           target_s, target_l, target_heading);
   }
   if (!FLAGS_lane.empty()) {
     const auto *lane_ptr = map_util.get_lane(FLAGS_lane);
+    if (!lane_ptr) {
+      std::cout << "Could not find lane " << FLAGS_lane << " on map "
+                << map_file;
+      return 0;
+    }
     const auto &lane = lane_ptr->lane();
 
     PointENU start_point;

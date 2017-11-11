@@ -2,7 +2,11 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+import "modules/monitor/proto/system_status.proto";
+
 message HMIStatus {
-  optional string current_map = 1;
-  optional string current_vehicle = 2;
+  optional apollo.monitor.SystemStatus system_status = 1;
+  optional string current_map = 2;
+  optional string current_vehicle = 3;
+  optional string current_mode = 4 [default = "standard"];
 }

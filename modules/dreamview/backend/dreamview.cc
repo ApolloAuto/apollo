@@ -84,7 +84,7 @@ Status Dreamview::Init() {
   sim_world_updater_.reset(
       new SimulationWorldUpdater(websocket_.get(), sim_control_.get(),
                                  map_service_.get(), FLAGS_routing_from_file));
-  hmi_.reset(new HMI(websocket_.get()));
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addHandler("/image", *image_);

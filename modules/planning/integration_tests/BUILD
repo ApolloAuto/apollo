@@ -20,7 +20,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning:planning_lib",
         "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/proto:dp_st_speed_config_proto",
@@ -40,7 +40,6 @@ cc_test(
     ],
     deps = [
         ":planning_test_base",
-        "@gtest//:main",
     ],
 )
 
@@ -57,7 +56,6 @@ cc_test(
     ],
     deps = [
         ":planning_test_base",
-        "@gtest//:main",
     ],
 )
 

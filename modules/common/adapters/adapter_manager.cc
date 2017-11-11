@@ -132,12 +132,16 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
                       config.message_history_limit());
         break;
       case AdapterConfig::INS_STATUS:
-        EnableInsStat(FLAGS_ins_status_topic, config.mode(),
-                      config.message_history_limit());
+        EnableInsStatus(FLAGS_ins_status_topic, config.mode(),
+                        config.message_history_limit());
         break;
       case AdapterConfig::GNSS_STATUS:
-        EnableInsStat(FLAGS_gnss_status_topic, config.mode(),
-                      config.message_history_limit());
+        EnableGnssStatus(FLAGS_gnss_status_topic, config.mode(),
+                         config.message_history_limit());
+        break;
+      case AdapterConfig::SYSTEM_STATUS:
+        EnableSystemStatus(FLAGS_system_status_topic, config.mode(),
+                           config.message_history_limit());
         break;
       case AdapterConfig::HMI_COMMAND:
         EnableHMICommand(FLAGS_hmi_command_topic, config.mode(),
@@ -151,13 +155,13 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableDelphiESR(FLAGS_delphi_esr_topic, config.mode(),
                         config.message_history_limit());
         break;
+      case AdapterConfig::CONTI_RADAR:
+        EnableContiRadar(FLAGS_conti_radar_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config.mode(),
                               config.message_history_limit());
-        break;
-      case AdapterConfig::HMI_STATUS:
-        EnableHMIStatus(FLAGS_hmi_status_topic, config.mode(),
-                        config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";
