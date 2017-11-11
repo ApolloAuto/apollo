@@ -35,7 +35,7 @@ function start() {
     bash scripts/monitor.sh
 
     # Start Dreamview
-    bash scripts/dreamview.sh && \
+    bash scripts/dreamview.sh
     echo "Dreamview is running at http://localhost:8888"
 }
 
