@@ -161,13 +161,12 @@ bool ReferenceLine::SLToXY(const SLPoint& sl_point,
 bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
                            SLPoint* const sl_point) const {
   DCHECK_NOTNULL(sl_point);
-  double s = 0;
-  double l = 0;
+  double s = 0.0;
+  double l = 0.0;
   if (!map_path_.GetProjection(xy_point, &s, &l)) {
     AERROR << "Can't get nearest point from path.";
     return false;
   }
-
   sl_point->set_s(s);
   sl_point->set_l(l);
   return true;
