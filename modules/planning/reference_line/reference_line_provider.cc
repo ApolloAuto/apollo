@@ -402,8 +402,7 @@ void ReferenceLineProvider::GetAnchorPoints(
   }
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
-  anchor_points->back().longitudinal_bound = 1e-6;
-  anchor_points->back().lateral_bound = 1e-6;
+  anchor_points->front().enforced = true;
 }
 
 bool ReferenceLineProvider::SmoothRouteSegment(const RouteSegments &segments,
@@ -442,6 +441,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     point.path_point.set_dkappa(prefix_ref_point.dkappa());
     point.longitudinal_bound = 1e-6;
     point.lateral_bound = 1e-6;
+    point.enforced = true;
     break;
   }
   smoother_->SetAnchorPoints(anchor_points);
