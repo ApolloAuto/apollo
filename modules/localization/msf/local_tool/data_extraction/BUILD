@@ -18,7 +18,7 @@ cc_library(
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
-        "-lboost_program_options",
+        "-lboost_program_options"
     ],
     deps = [
         "//modules/localization/proto:localization_proto",
@@ -26,7 +26,7 @@ cc_library(
         "@eigen//:eigen",
         "@glog//:glog",
         "@ros//:ros_common",
-        "@pcl//:pcl",
+        "@pcl//:pcl"
     ],
 )
 
@@ -39,13 +39,13 @@ cc_binary(
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
-        "-lboost_program_options",
+        "-lboost_program_options"
     ],
     deps = [
         ":data_extraction",
         "@eigen//:eigen",
         "@glog//:glog",
-        "@ros//:ros_common",
+        "@ros//:ros_common"
     ],
 )
 
