@@ -7,7 +7,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "perception_obstacle_fusion_probabilistic_fusion",
     srcs = [
-        "pbf_background_track.cc",
         "pbf_base_track_object_matcher.cc",
         "pbf_hm_track_object_matcher.cc",
         "pbf_kalman_motion_fusion.cc",
@@ -21,7 +20,6 @@ cc_library(
         "probabilistic_fusion.cc",
     ],
     hdrs = [
-        "pbf_background_track.h",
         "pbf_base_motion_fusion.h",
         "pbf_base_track_object_matcher.h",
         "pbf_hm_track_object_matcher.h",

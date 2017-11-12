@@ -43,23 +43,10 @@ int PbfTrackManager::RemoveLostTracks() {
       track_count++;
     }
   }
-
   AINFO << "Remove " << (int) tracks_.size() - track_count << " tracks";
   tracks_.resize(track_count);
 
-  int bk_track_count = 0;
-  for (size_t i = 0; i < background_tracks_.size(); i++) {
-    if (!background_tracks_[i]->IsDead()) {
-      if (i != bk_track_count) {
-        background_tracks_[bk_track_count] = background_tracks_[i];
-      }
-      bk_track_count++;
-    }
-  }
-  AINFO << "Remove " << (int) tracks_.size() - track_count << " background tracks";
-  background_tracks_.resize(bk_track_count);
-
-  return track_count + bk_track_count;
+  return track_count;
 }
 
 } //namespace perception
