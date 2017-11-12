@@ -263,7 +263,7 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
-  constexpr double kDestinationDeltaS = 2.0;
+  constexpr double kDestinationDeltaS = 0.05;
   const auto* dest_ptr = path_decision_.Find(FLAGS_destination_obstacle_id);
   if (!dest_ptr) {
     return false;
