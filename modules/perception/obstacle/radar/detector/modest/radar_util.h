@@ -30,7 +30,6 @@ class RadarUtil {
       const PointT &point, const PolygonDType &polygon) {
     bool in_poly = false;
     double x1, x2, y1, y2;
-
     int nr_poly_points = static_cast<int>(polygon.points.size());
     // start with the last point to make the check last point<->first point the first one
     double xold = polygon.points[nr_poly_points - 1].x;
@@ -49,7 +48,6 @@ class RadarUtil {
         y1 = ynew;
         y2 = yold;
       }
-
       if ((x1 < point.x) == (point.x <= x2)
           && (point.y - y1) * (x2 - x1) < (y2 - y1) * (point.x - x1)) {
         in_poly = !in_poly;
@@ -57,7 +55,6 @@ class RadarUtil {
       xold = xnew;
       yold = ynew;
     }
-
     return in_poly;
   }
 

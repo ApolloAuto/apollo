@@ -359,6 +359,9 @@ PbfSensorObjectPtr PbfTrack::GetSensorObject(const SensorType &sensor_type,
     return GetLidarObject(sensor_id);
   } else if (is_radar(sensor_type)) {
     return GetRadarObject(sensor_id);
+  } else {
+    AERROR << "Unsupported sensor type.";
+    return nullptr;
   }
 }
 

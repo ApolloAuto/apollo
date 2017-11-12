@@ -24,8 +24,6 @@
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/detector/modest/radar_define.h"
-#include "modules/perception/obstacle/radar/interface/base_filter.h"
-#include "modules/perception/obstacle/radar/filter/akf/adaptive_kalman_filter.h"
 
 namespace apollo {
 namespace perception {

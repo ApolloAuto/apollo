@@ -104,10 +104,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // Optimal Kalman gain
   Eigen::Matrix4d k_matrix_;
 
-  Eigen::Vector3d last_radar_velocity_;
   std::deque<bool> history_lidar_radar_consistency_;
-  bool love_radar_ = false;
-
   std::deque<Eigen::Vector3d> history_velocity_;
   std::deque<double> history_time_diff_;
   std::deque<bool> history_velocity_is_radar_;

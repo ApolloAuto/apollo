@@ -40,32 +40,17 @@ bool ModestRadarDetector::Init() {
     AERROR << "max_theta not found.";
     return false;
   }
-  if (!model_config->GetValue("chosen_filter", &chosen_filter_)) {
-    AERROR << "chosen_filter not found.";
-    return false;
-  }
   if (!model_config->GetValue("delay_frames", &delay_frames_)) {
     AERROR << "delay_frame not found.";
     return false;
   }
   RadarTrack::SetTrackedTimesThreshold(delay_frames_);
   object_builder_.SetDelayFrame(delay_frames_);
-  if (chosen_filter_ == "Adaptive Kalman Filter") {
-    RadarTrack::SetFilterType("Adaptive Kalman Filter");
-    AINFO << "Chosen filter: Use Adaptive Kalman Filter";
-  } else {
-    AERROR << "Failted to initialize RadarTrack.";
-  }
-  radar_tracker_.reset(new RadarTrackManager());
   if (!model_config->GetValue("use_fp_filter", &use_fp_filter_)) {
     AERROR << "use_fp_filter is not found.";
     return false;
   }
-  object_builder_.SetUseFpFilter(use_kf_filter_);
-  if (!model_config->GetValue("use_kf_filter", &use_kf_filter_)) {
-    AERROR << "use_kf_filter is not found.";
-    return false;
-  }
+  object_builder_.SetUseFpFilter(use_fp_filter_);
   if (!model_config->GetValue("probexist_vehicle",
                               &(conti_params_.probexist_vehicle))) {
     AERROR << "probexist_vehicle not found.";
@@ -167,6 +152,7 @@ bool ModestRadarDetector::Init() {
     return false;
   }
   object_builder_.SetContiParams(conti_params_);
+  radar_tracker_.reset(new RadarTrackManager());
   AINFO << "Initialize the modest radar  detector";
   return true;
 }
@@ -203,6 +189,37 @@ bool ModestRadarDetector::Detect(const RadarObsArray &raw_obstacles,
 
   // roi filter
   auto &filter_objects = radar_objects->objects;
+  roi_filter(map_polygons, filter_objects);
+  // treatment
+  radar_tracker_->Process(*radar_objects);
+  AINFO << "After process: , object size: " <<  radar_objects->objects.size();
+ 
+  collect_radar_result(objects);
+  return true;
+}
+
+bool ModestRadarDetector::collect_radar_result(std::vector<ObjectPtr> *objects) {
+  std::vector<RadarTrack> &obs_track = radar_tracker_->GetTracks();
+  if (objects == nullptr) {
+    AERROR << "objects is nullptr";
+    return false;
+  }
+  for (size_t i = 0; i < obs_track.size(); ++i) {
+    ObjectPtr object_ptr = ObjectPtr(new Object());
+    const ObjectPtr &object_radar_ptr = obs_track[i].GetObsRadar();
+    if (object_radar_ptr->is_background) {
+      continue;
+    }
+    object_ptr->clone(*object_radar_ptr);
+    object_ptr->tracking_time = obs_track[i].GetTrackingTime();
+    object_ptr->track_id = obs_track[i].GetObsId();
+    objects->push_back(object_ptr);
+  }
+  return true;
+}
+
+void ModestRadarDetector::roi_filter(const std::vector<PolygonDType> &map_polygons,
+  std::vector<ObjectPtr>& filter_objects) {
   AINFO << "Before using hdmap, object size:" << filter_objects.size();
   // use new hdmap
   if (use_had_map_) {
@@ -226,44 +243,6 @@ bool ModestRadarDetector::Detect(const RadarObsArray &raw_obstacles,
     }
   }
   AINFO << "After using hdmap, object size:" << filter_objects.size();
-
-  // treatment
-  radar_tracker_->Process(*radar_objects);
-  AINFO << "After process: , object size: " <<  radar_objects->objects.size();
- 
-  collect_radar_result(objects);
-  return true;
-}
-
-bool ModestRadarDetector::collect_radar_result(std::vector<ObjectPtr> *objects) {
-  std::vector<RadarTrack> &obs_track = radar_tracker_->GetTracks();
-  if (objects == nullptr) {
-    AERROR << "objects is nullptr";
-    return false;
-  }
-  for (size_t i = 0; i < obs_track.size(); ++i) {
-    ObjectPtr object_ptr = ObjectPtr(new Object());
-    if (use_kf_filter_) {
-      const ObjectPtr &object_track_ptr = obs_track[i].GetObs();
-      if (object_track_ptr->is_background) {
-        continue;
-      }
-      object_ptr->clone(*object_track_ptr);
-      object_ptr->tracking_time = obs_track[i].GetTrackingTime();
-      object_ptr->track_id = obs_track[i].GetObsId();
-      objects->push_back(object_ptr);
-    } else {
-      const ObjectPtr &object_radar_ptr = obs_track[i].GetObsRadar();
-      if (object_radar_ptr->is_background) {
-        continue;
-      }
-      object_ptr->clone(*object_radar_ptr);
-      object_ptr->tracking_time = obs_track[i].GetTrackingTime();
-      object_ptr->track_id = obs_track[i].GetObsId();
-      objects->push_back(object_ptr);
-    }
-  }
-  return true;
 }
 
 }  // namespace perception
