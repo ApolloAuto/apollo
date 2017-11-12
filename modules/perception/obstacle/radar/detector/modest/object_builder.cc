@@ -67,26 +67,21 @@ void ObjectBuilder::build(const RadarObsArray &raw_obstacles,
     object_ptr->velocity(0) = velocity_w[0] + main_velocity(0);
     object_ptr->velocity(1) = velocity_w[1] + main_velocity(1);
     object_ptr->velocity(2) = 0;
+
     object_ptr->length = 1.0;
     object_ptr->width = 1.0;
     object_ptr->height = 1.0;
     int cls = raw_obstacles.contiobs(i).obstacle_class();
-    if (cls == CONTI_CAR || cls == CONTI_TRUCK) {
-      object_ptr->type = VEHICLE;
+    if (cls == CONTI_CAR) {
       object_ptr->length = raw_obstacles.contiobs(i).length();
       object_ptr->width = raw_obstacles.contiobs(i).width();
-    } else if (cls == CONTI_PEDESTRIAN) {
-      object_ptr->type = PEDESTRIAN;
-    } else if (cls == CONTI_MOTOCYCLE || cls == CONTI_BICYCLE) {
-      object_ptr->type = BICYCLE;
-    } else {
-      object_ptr->type = UNKNOWN;
     }
+    object_ptr->type = UNKNOWN;
 
     Eigen::Matrix3d dist_rms;
-    dist_rms.setZero();
     Eigen::Matrix3d vel_rms;
     vel_rms.setZero();
+    dist_rms.setZero();
     dist_rms(0, 0) = raw_obstacles.contiobs(i).longitude_dist_rms();
     dist_rms(1, 1) = raw_obstacles.contiobs(i).lateral_dist_rms();
     vel_rms(0, 0) = raw_obstacles.contiobs(i).longitude_vel_rms();

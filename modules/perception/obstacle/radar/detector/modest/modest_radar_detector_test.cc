@@ -78,12 +78,11 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
                          options,
                          &objects);
   EXPECT_TRUE(objects.size() == 1);
-  EXPECT_TRUE (radar_detector->chosen_filter_ == "Adaptive Kalman Filter");
   EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);       //threshold
   EXPECT_TRUE(fabs(objects[0]->center(1) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 2.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.0) < 1e-5);
-  EXPECT_TRUE(objects[0]->type == VEHICLE);
+  EXPECT_TRUE(objects[0]->type == UNKNOWN);
   objects.resize(0);
   raw_obstacles.set_measurement_time(123456789.074);
   Eigen::Vector2d location(3.0 * time_diff, 4.0 * time_diff);
@@ -94,12 +93,11 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
                          options,
                          &objects);
   EXPECT_TRUE(objects.size() == 1);
-  EXPECT_TRUE (radar_detector->chosen_filter_ == "Adaptive Kalman Filter");
   EXPECT_TRUE(fabs(objects[0]->center(0) - location(0)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->center(1) - location(1)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 2.0) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.0) < 1e-2);
-  EXPECT_TRUE(objects[0]->type == VEHICLE);
+  EXPECT_TRUE(objects[0]->type == UNKNOWN);
   delete radar_detector;
 }
 

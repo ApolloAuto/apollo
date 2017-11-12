@@ -21,15 +21,12 @@ namespace perception {
 
 // Static member variable
 int RadarTrack::s_current_idx_ = 0;
-std::string RadarTrack::s_chosen_filter_ = "";
 int RadarTrack::s_tracked_times_threshold_ = 4;
 
 RadarTrack::RadarTrack() {
   s_current_idx_ %= MAX_RADAR_IDX;
   obs_id_ = s_current_idx_++;
-
   obs_radar_ = nullptr;
-  obs_ = nullptr;
   tracked_times_ = 1;
   tracking_time_ = 0.0;
 }
@@ -37,20 +34,8 @@ RadarTrack::RadarTrack() {
 RadarTrack::RadarTrack(Object &obs, const double &timestamp) {
   s_current_idx_ %= MAX_RADAR_IDX;
   obs_id_ = s_current_idx_++;
-
   obs_radar_ = ObjectPtr(new Object);
-  obs_ = ObjectPtr(new Object);
-
   *obs_radar_ = obs;
-  *obs_ = obs;
-  if (s_chosen_filter_ == "Adaptive Kalman Filter") {
-    tracker_ = boost::shared_ptr<BaseFilter>(new AdaptiveKalmanFilter());
-  } else {
-    AERROR << "Failed to initialize RadarTrack.";
-    return;
-  }
-  tracker_->Initialize(obs);
-
   timestamp_ = timestamp;
   tracked_times_ = 1;
   tracking_time_ = 0.0;
@@ -60,10 +45,8 @@ RadarTrack::RadarTrack(Object &obs, const double &timestamp) {
 RadarTrack::RadarTrack(const RadarTrack &track) {
   obs_id_ = track.obs_id_;
   obs_radar_ = track.obs_radar_;
-  obs_ = track.obs_;
   tracked_times_ = track.tracked_times_;
   tracking_time_ = track.tracking_time_;
-  tracker_ = track.tracker_;
   timestamp_ = track.timestamp_;
   id_tracked_ = track.id_tracked_;
 }
@@ -71,8 +54,6 @@ RadarTrack::RadarTrack(const RadarTrack &track) {
 RadarTrack &RadarTrack::operator=(const RadarTrack &track) {
   obs_id_ = track.obs_id_;
   obs_radar_ = track.obs_radar_;
-  obs_ = track.obs_;
-  tracker_ = track.tracker_;
   tracked_times_ = track.tracked_times_;
   tracking_time_ = track.tracking_time_;
   timestamp_ = track.timestamp_;
@@ -82,25 +63,6 @@ RadarTrack &RadarTrack::operator=(const RadarTrack &track) {
 
 void RadarTrack::UpdataObsRadar(ObjectPtr obs_radar, const double timestamp) {
   obs_radar_ = obs_radar;
-  Eigen::Vector4d result;
-  double time_diff = timestamp - timestamp_;
-  if (time_diff < 0) {
-      AWARN << "New objects should younger than the track";
-      return;
-  }
-  result = tracker_->UpdateWithObject(*obs_radar_, time_diff);
-  (*obs_).clone(*obs_radar_);
-  (*obs_).center[0] = result[0];
-  (*obs_).center[1] = result[1];
-  (*obs_).velocity[0] = result[2];
-  (*obs_).velocity[1] = result[3];
-
-  Eigen::Matrix4d covariance_matrix = tracker_->GetCovarianceMatrix();
-  (*obs_).position_uncertainty.topLeftCorner(2, 2) =
-      covariance_matrix.topLeftCorner(2, 2);
-  (*obs_).velocity_uncertainty.topLeftCorner(2, 2) =
-      covariance_matrix.block<2, 2>(2, 2);
-
   tracking_time_ += timestamp - timestamp_;
   timestamp_ = timestamp;
 }
@@ -119,10 +81,6 @@ int RadarTrack::GetObsId() const {
 
 ObjectPtr RadarTrack::GetObsRadar() {
   return obs_radar_;
-}
-
-ObjectPtr RadarTrack::GetObs() {
-  return obs_;
 }
 
 double RadarTrack::GetTimestamp() {

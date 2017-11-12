@@ -23,8 +23,6 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/radar/detector/modest/radar_define.h"
-#include "modules/perception/obstacle/radar/interface/base_filter.h"
-#include "modules/perception/obstacle/radar/filter/akf/adaptive_kalman_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -52,29 +50,20 @@ class RadarTrack {
 
   ObjectPtr GetObsRadar();
 
-  ObjectPtr GetObs();
-
   double GetTimestamp();
 
   double GetTrackingTime();
-
-  static void SetFilterType(std::string filter_type) {
-    s_chosen_filter_ = filter_type;
-  }
 
   static void SetTrackedTimesThreshold(const int &threshold) {
     s_tracked_times_threshold_ = threshold;
   }
 
  private:
-  static std::string s_chosen_filter_;
   static int s_current_idx_;
   static int s_tracked_times_threshold_;
   int obs_id_;
   double timestamp_;
   ObjectPtr obs_radar_;  // observation from radar
-  ObjectPtr obs_;        // track state after filtering
-  boost::shared_ptr<BaseFilter> tracker_;    // kalman filter
   int tracked_times_;
   double tracking_time_;
   bool id_tracked_;

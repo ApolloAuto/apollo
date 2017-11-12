@@ -46,6 +46,9 @@ class ModestRadarDetector : public BaseRadarDetector {
   }
 
  private:
+  void roi_filter(const std::vector<PolygonDType> &map_polygons,
+    std::vector<ObjectPtr>& filter_objects);
+
   // for unit test
   bool result_init_ = true;
   bool result_detect_ = true;
@@ -53,9 +56,7 @@ class ModestRadarDetector : public BaseRadarDetector {
   bool use_had_map_;
   double max_theta_;
   bool use_fp_filter_;
-  bool use_kf_filter_;
   int delay_frames_;
-  std::string chosen_filter_;
   ContiParams conti_params_;
   ObjectBuilder object_builder_;
   boost::shared_ptr<RadarTrackManager> radar_tracker_;

@@ -25,7 +25,6 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/radar/interface:perception_obstacle_radar_interface",
-        "//modules/perception/obstacle/radar/filter/akf:perception_obstacle_radar_filter_adaptive_kalman_filter",
         "@eigen//:eigen",
         "@pcl//:pcl",
     ],

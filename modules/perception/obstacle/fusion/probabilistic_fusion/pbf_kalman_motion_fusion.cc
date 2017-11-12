@@ -37,7 +37,6 @@ void PbfKalmanMotionFusion::Initialize(const Eigen::Vector3d &anchor_point,
   belief_anchor_point_ = anchor_point;
   belief_velocity_ = velocity;
   belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
-  last_radar_velocity_ = Eigen::Vector3d(1000, 1000, 0);
 }
 
 void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
@@ -124,7 +123,6 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
     history_velocity_.push_back(belief_velocity_);
     history_time_diff_.push_back(new_object->timestamp);
     history_velocity_is_radar_.push_back(false);
-    last_radar_velocity_ = Eigen::Vector3d(1000, 1000, 0);
   } else if (new_object->sensor_type == RADAR) {
     belief_anchor_point_(0) = new_object->object->center(0);
     belief_anchor_point_(1) = new_object->object->center(1);
@@ -137,7 +135,7 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
       measured_acceleration = (belief_velocity_ - old_velocity) / old_timediff;
     }
     if ((GetLidarHistoryLength() >= 3 && GetRadarHistoryLength() >= 3) ||
-        history_velocity_.size() > 20) {
+      history_velocity_.size() > 20) {
       history_velocity_.pop_front();
       history_time_diff_.pop_front();
       history_velocity_is_radar_.pop_front();
@@ -145,8 +143,6 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
     history_velocity_.push_back(belief_velocity_);
     history_time_diff_.push_back(new_object->timestamp);
     history_velocity_is_radar_.push_back(true);
-    last_radar_velocity_ = belief_velocity_;
-    last_radar_velocity_(2) = 0;
   } else {
     AERROR << "unsupported sensor type for PbfKalmanMotionFusion: "
            << new_object->sensor_type;
