@@ -320,9 +320,11 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     return SmoothRouteSegment(*segments, reference_line);
   }
   const double remain_s = prev_ref->Length() - sl_point.s();
-  if (remain_s > LookForwardDistance(state)) {  // have enough reference line.
+  if (remain_s > LookForwardDistance(state)) {
     *segments = *prev_segment;
     *reference_line = *prev_ref;
+    ADEBUG << "Reference line remain " << remain_s
+           << ", which is enough and no need to extend";
     return true;
   }
   double future_start_s =
@@ -359,6 +361,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
            << " to stitched reference line";
   }
   if (sl.s() > FLAGS_look_backward_distance * 1.5) {
+    ADEBUG << "reference line back side is " << sl.s()
+           << ", shrink reference line";
     if (!reference_line->Shrink(vec2d, FLAGS_look_backward_distance,
                                 std::numeric_limits<double>::infinity())) {
       AWARN << "Failed to shrink reference line";
@@ -412,6 +416,9 @@ void ReferenceLineProvider::GetAnchorPoints(
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
   anchor_points->front().enforced = true;
+  anchor_points->back().longitudinal_bound = 1e-6;
+  anchor_points->back().lateral_bound = 1e-6;
+  anchor_points->back().enforced = true;
 }
 
 bool ReferenceLineProvider::SmoothRouteSegment(const RouteSegments &segments,
