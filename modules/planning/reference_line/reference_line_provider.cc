@@ -301,6 +301,10 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     ++prev_ref;
   }
   if (prev_segment == route_segments_.end()) {
+    if (!route_segments_.empty() && segments->IsOnSegment()) {
+      AWARN << "Current route segment is not connected with previous route "
+               "segment";
+    }
     return SmoothRouteSegment(*segments, reference_line);
   }
   common::SLPoint sl_point;
@@ -310,27 +314,30 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
           << " not on previous reference line";
     return SmoothRouteSegment(*segments, reference_line);
   }
+  if (sl_point.s() < 0 || sl_point.s() > prev_ref->Length()) {
+    AWARN << "Vehicle current position cannot be project to previous reference "
+             "line";
+    return SmoothRouteSegment(*segments, reference_line);
+  }
   const double remain_s = prev_ref->Length() - sl_point.s();
   if (remain_s > LookForwardDistance(state)) {  // have enough reference line.
     *segments = *prev_segment;
     *reference_line = *prev_ref;
     return true;
   }
-  auto start_point = prev_ref->GetReferencePoint(std::max(
-      sl_point.s(),
-      prev_ref->Length() - FLAGS_reference_line_stitch_overlap_distance));
-  common::PointENU start_point_enu;
-  start_point_enu.set_x(start_point.x());
-  start_point_enu.set_y(start_point.y());
-  start_point_enu.set_z(0.0);
+  double future_start_s =
+      std::max(sl_point.s(), prev_ref->Length() -
+                                 FLAGS_reference_line_stitch_overlap_distance);
+  double future_end_s = prev_ref->Length() + FLAGS_look_forward_extend_distance;
   RouteSegments shifted_segments;
-  if (!pnc_map_->ExtendSegments(*segments, start_point_enu, 0.0,
-                                FLAGS_reference_line_stitch_overlap_distance +
-                                    FLAGS_look_forward_extend_distance,
+  std::unique_lock<std::mutex> lock(pnc_map_mutex_);
+  if (!pnc_map_->ExtendSegments(*prev_segment, future_start_s, future_end_s,
                                 &shifted_segments)) {
     AERROR << "Failed to shift route segments forward";
+    lock.unlock();
     return SmoothRouteSegment(*segments, reference_line);
   }
+  lock.unlock();
   hdmap::Path path;
   hdmap::PncMap::CreatePathFromLaneSegments(shifted_segments, &path);
   ReferenceLine new_ref(path);
@@ -356,8 +363,10 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
                                 std::numeric_limits<double>::infinity())) {
       AWARN << "Failed to shrink reference line";
     }
-    shifted_segments.Shrink(vec2d, FLAGS_look_backward_distance,
-                            std::numeric_limits<double>::infinity());
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    pnc_map_->ExtendSegments(shifted_segments,
+                             sl.s() - FLAGS_look_backward_distance,
+                             std::numeric_limits<double>::infinity(), segments);
   }
   return true;
 }
