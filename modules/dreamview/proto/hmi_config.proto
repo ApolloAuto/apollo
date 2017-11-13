@@ -10,9 +10,8 @@ message Component {
 }
 
 message Mode {
-  optional string display_name = 1;
-  repeated string live_modules = 2;
-  repeated string live_hardware = 3;
+  repeated string live_modules = 1;
+  repeated string live_hardware = 2;
 }
 
 message HMIConfig {

@@ -145,6 +145,59 @@ bool RouteSegments::IsConnectedSegment(const RouteSegments &other) const {
   return false;
 }
 
+bool RouteSegments::Shrink(const common::math::Vec2d &point,
+                           double look_backward, double look_forward) {
+  common::SLPoint sl_point;
+  LaneWaypoint waypoint;
+  if (!GetProjection(point, &sl_point, &waypoint)) {
+    AERROR << "failed to project " << point.DebugString() << " to segment";
+    return false;
+  }
+  const double s = sl_point.s();
+  double acc_s = 0.0;
+  auto iter = begin();
+  while (iter != end() && acc_s + iter->Length() < s - look_backward) {
+    acc_s += iter->Length();
+    ++iter;
+  }
+  if (iter == end()) {
+    return true;
+  }
+  iter->start_s =
+      std::max(iter->start_s, s - look_backward - acc_s + iter->start_s);
+  if (iter->Length() < kSegmentationEpsilon) {
+    ++iter;
+  }
+  erase(begin(), iter);
+
+  iter = begin();
+  acc_s = 0.0;
+  while (iter != end() && !WithinLaneSegment(*iter, waypoint)) {
+    ++iter;
+  }
+  if (iter == end()) {
+    return true;
+  }
+  acc_s = iter->end_s - waypoint.s;
+  if (acc_s >= look_forward) {
+    iter->end_s = waypoint.s + look_forward;
+    ++iter;
+    erase(iter, end());
+    return true;
+  }
+  ++iter;
+  while (iter != end() && acc_s + iter->Length() < look_forward) {
+    acc_s += iter->Length();
+    ++iter;
+  }
+  if (iter == end()) {
+    return true;
+  }
+  iter->end_s = std::min(iter->end_s, look_forward - acc_s + iter->start_s);
+  erase(iter + 1, end());
+  return true;
+}
+
 bool RouteSegments::GetProjection(const common::math::Vec2d &point,
                                   common::SLPoint *sl_point,
                                   LaneWaypoint *waypoint) const {

@@ -450,9 +450,8 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     }
   }
   if (router_s < end_s) {
-    const auto &last_segment = segments.back();
-    auto last_lane = last_segment.lane;
-    double last_s = last_segment.end_s;
+    auto last_lane = GetRouteSuccessor(segments.back().lane);
+    double last_s = 0.0;
     while (router_s < end_s - kRouteEpsilon) {
       if (last_lane == nullptr) {
         break;
