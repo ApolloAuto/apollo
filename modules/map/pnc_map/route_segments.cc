@@ -121,9 +121,10 @@ double RouteSegments::Length(const RouteSegments &segments) {
   return s;
 }
 
-bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,
-                                  double *l, LaneWaypoint *waypoint) const {
-  return GetProjection({point_enu.x(), point_enu.y()}, s, l, waypoint);
+bool RouteSegments::GetProjection(const common::PointENU &point_enu,
+                                  common::SLPoint *sl_point,
+                                  LaneWaypoint *waypoint) const {
+  return GetProjection({point_enu.x(), point_enu.y()}, sl_point, waypoint);
 }
 
 bool RouteSegments::IsConnectedSegment(const RouteSegments &other) const {
@@ -144,9 +145,10 @@ bool RouteSegments::IsConnectedSegment(const RouteSegments &other) const {
   return false;
 }
 
-bool RouteSegments::GetProjection(const common::math::Vec2d &point, double *s,
-                                  double *l, LaneWaypoint *waypoint) const {
-  *l = std::numeric_limits<double>::infinity();
+bool RouteSegments::GetProjection(const common::math::Vec2d &point,
+                                  common::SLPoint *sl_point,
+                                  LaneWaypoint *waypoint) const {
+  double min_l = std::numeric_limits<double>::infinity();
   double accumulate_s = 0.0;
   bool has_projection = false;
   for (auto iter = begin(); iter != end();
@@ -162,12 +164,13 @@ bool RouteSegments::GetProjection(const common::math::Vec2d &point, double *s,
         lane_s > iter->end_s + kSegmentationEpsilon) {
       continue;
     }
-    if (std::fabs(lane_l) < std::fabs(*l)) {
+    if (std::fabs(lane_l) < min_l) {
       has_projection = true;
       lane_s = std::max(iter->start_s, lane_s);
       lane_s = std::min(iter->end_s, lane_s);
-      *l = lane_l;
-      *s = lane_s - iter->start_s + accumulate_s;
+      min_l = std::fabs(lane_l);
+      sl_point->set_l(lane_l);
+      sl_point->set_s(lane_s - iter->start_s + accumulate_s);
       waypoint->lane = iter->lane;
       waypoint->s = lane_s;
     }
@@ -210,10 +213,8 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
 
   // 1. should have valid projection.
   LaneWaypoint segment_waypoint;
-  double route_s = 0.0;
-  double lane_l = 0.0;
-  bool has_projection =
-      GetProjection(point, &route_s, &lane_l, &segment_waypoint);
+  common::SLPoint route_sl;
+  bool has_projection = GetProjection(point, &route_sl, &segment_waypoint);
   if (!has_projection) {
     ADEBUG << "No projection from waypoint: " << waypoint.DebugString();
     return false;
@@ -232,7 +233,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   // assume waypoint is at left side
   const auto *neighbor_ids =
       &(segment_waypoint.lane->lane().left_neighbor_forward_lane_id());
-  if (lane_l < 0) {  // waypoint is at right side
+  if (route_sl.l() < 0) {  // waypoint is at right side
     neighbor_ids =
         &(segment_waypoint.lane->lane().right_neighbor_forward_lane_id());
   }
@@ -261,7 +262,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
       segment_waypoint.lane->GetSmoothPoint(segment_waypoint.s);
   double dist = common::util::DistanceXY(point, segment_projected_point);
   const double kLaneSeparationDistance = 0.2;
-  if (lane_l < 0) {  // waypoint at right side
+  if (route_sl.l() < 0) {  // waypoint at right side
     if (dist >
         waypoint_left_width + segment_right_width + kLaneSeparationDistance) {
       ADEBUG << "waypoint is too far to reach";
