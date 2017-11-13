@@ -47,7 +47,7 @@ void ReportRuntimeStatus(const RuntimeStatus& runtime_status) {
   if (client) {
     client->Post(runtime_status);
   } else {
-    AERROR << "Cannot connect to HMI server.";
+    ADEBUG << "Cannot connect to HMI server.";
   }
 }
 
