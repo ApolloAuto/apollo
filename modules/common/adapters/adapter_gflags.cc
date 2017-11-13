@@ -64,3 +64,7 @@ DEFINE_string(conti_radar_topic, "/apollo/sensor/conti_radar",
 // TODO(Authors): Change the topic name
 DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
+DEFINE_string(image_short_topic, "/apollo/sensor/camera/traffic/image_short",
+              "short camera image topic name");
+DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
+              "long camera image topic name");
