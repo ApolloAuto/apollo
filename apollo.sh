@@ -269,6 +269,10 @@ function release() {
   mkdir -p $MODULES_DIR/drivers/velodyne/velodyne
   cp -r modules/drivers/velodyne/velodyne/launch $MODULES_DIR/drivers/velodyne/velodyne
 
+  # usb_cam launch
+  mkdir -p $MODULES_DIR/drivers/usb_cam
+  cp -r modules/drivers/usb_cam/launch $MODULES_DIR/drivers/usb_cam
+
   # lib
   LIB_DIR=$ROOT_DIR/lib
   mkdir $LIB_DIR
@@ -520,6 +524,29 @@ function build_velodyne() {
   rm -rf modules/devel_isolated/
 }
 
+function build_usbcam() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
+    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/usb_cam \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
 function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
@@ -614,6 +641,9 @@ function main() {
       ;;
     buildvelodyne)
       build_velodyne
+      ;;
+    buildusbcam)
+      build_usbcam
       ;;
     config)
       config
