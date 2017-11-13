@@ -144,6 +144,10 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
                           reference_points_.end());
   reference_points_.erase(reference_points_.begin(),
                           reference_points_.begin() + start_index);
+  if (reference_points_.size() < 2) {
+    AERROR << "Too few reference points after shrinking.";
+    return false;
+  }
   map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
       reference_points_.begin(), reference_points_.end()));
   return true;
