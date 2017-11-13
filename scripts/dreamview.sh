@@ -23,7 +23,7 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-# Dreamview always works with system monitor.
+# Dreamview depends on monitor module to get system runtime status.
 bash scripts/monitor.sh "$@"
 
 # run function from apollo_base.sh
