@@ -47,5 +47,7 @@ DECLARE_string(mobileye_topic);
 DECLARE_string(delphi_esr_topic);
 DECLARE_string(conti_radar_topic);
 DECLARE_string(compressed_image_topic);
+DECLARE_string(short_image_topic);
+DECLARE_string(long_image_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
