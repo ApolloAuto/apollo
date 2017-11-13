@@ -30,67 +30,43 @@ TEST(MPCSolverTest, MPC) {
   const int MAX_ITER = 100;
 
   Eigen::MatrixXd A(STATES, STATES);
-  A << 1, 0, 1, 0,
-       0, 1, 0, 1,
-       0, 0, 1, 0,
-       0, 0, 0, 1;
+  A << 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1;
 
   Eigen::MatrixXd B(STATES, CONTROLS);
-  B << 0, 1,
-       0, 0,
-       1, 0,
-       0, 1;
+  B << 0, 1, 0, 0, 1, 0, 0, 1;
 
   Eigen::MatrixXd C(STATES, 1);
-  C << 0,
-       0,
-       0,
-       0.1;
+  C << 0, 0, 0, 0.1;
 
   Eigen::MatrixXd Q(STATES, STATES);
-  Q << 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 0, 0,
-       0, 0, 0, 0;
+  Q << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
 
   Eigen::MatrixXd R(CONTROLS, CONTROLS);
-  R << 1,
-       0,
-       0,
-       1;
+  R << 1, 0, 0, 1;
 
   Eigen::MatrixXd lower_bound(CONTROLS, 1);
-  lower_bound << -10,
-                 -10;
+  lower_bound << -10, -10;
 
   Eigen::MatrixXd upper_bound(CONTROLS, 1);
-  upper_bound << 10,
-                 10;
+  upper_bound << 10, 10;
 
   Eigen::MatrixXd initial_state(STATES, 1);
-  initial_state << 0,
-                   0,
-                   0,
-                   0;
+  initial_state << 0, 0, 0, 0;
 
   Eigen::MatrixXd reference_state(STATES, 1);
-  reference_state << 200,
-                     200,
-                     0,
-                     0;
+  reference_state << 200, 200, 0, 0;
 
   std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
 
   Eigen::MatrixXd control_matrix(CONTROLS, 1);
-  control_matrix << 0,
-                    0;
+  control_matrix << 0, 0;
   std::vector<Eigen::MatrixXd> control(HORIZON, control_matrix);
 
   for (unsigned int i = 0; i < control.size(); ++i) {
     for (unsigned int i = 1; i < control.size(); ++i) {
       control[i - 1] = control[i];
     }
-    control[HORIZON-1] = control_matrix;
+    control[HORIZON - 1] = control_matrix;
     SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state,
                    reference, EPS, MAX_ITER, &control);
     EXPECT_FLOAT_EQ(upper_bound(0), control[0](0));
@@ -98,10 +74,7 @@ TEST(MPCSolverTest, MPC) {
   CONTROLS = 1;
 
   Eigen::MatrixXd B1(STATES, CONTROLS);
-  B1 << 0,
-        0,
-        1,
-        0;
+  B1 << 0, 0, 1, 0;
 
   Eigen::MatrixXd R1(CONTROLS, CONTROLS);
   R1 << 1;
@@ -113,16 +86,10 @@ TEST(MPCSolverTest, MPC) {
   upper_bound1 << 10;
 
   Eigen::MatrixXd initial_state1(STATES, 1);
-  initial_state1 << 30,
-                    30,
-                    0,
-                    0;
+  initial_state1 << 30, 30, 0, 0;
 
   Eigen::MatrixXd reference_state1(STATES, 1);
-  reference_state1 << 0,
-                      0,
-                      0,
-                      0;
+  reference_state1 << 0, 0, 0, 0;
 
   std::vector<Eigen::MatrixXd> reference1(HORIZON, reference_state1);
 
@@ -139,10 +106,7 @@ TEST(MPCSolverTest, MPC) {
   }
 
   Eigen::MatrixXd B2(STATES, CONTROLS);
-  B2 << 0,
-        0,
-        1,
-        0;
+  B2 << 0, 0, 1, 0;
 
   Eigen::MatrixXd R2(CONTROLS, CONTROLS);
   R2 << 1;
@@ -154,16 +118,10 @@ TEST(MPCSolverTest, MPC) {
   upper_bound2 << 10;
 
   Eigen::MatrixXd initial_state2(STATES, 1);
-  initial_state2 << 30,
-                    30,
-                    0,
-                    0;
+  initial_state2 << 30, 30, 0, 0;
 
   Eigen::MatrixXd reference_state2(STATES, 1);
-  reference_state2 << 30,
-                      30,
-                      0,
-                      0;
+  reference_state2 << 30, 30, 0, 0;
 
   std::vector<Eigen::MatrixXd> reference2(HORIZON, reference_state2);
 
@@ -179,7 +137,6 @@ TEST(MPCSolverTest, MPC) {
                    reference2, EPS, MAX_ITER, &control2);
     EXPECT_NEAR(0.0, control2[0](0), 1e-7);
   }
-
 }
 }  // namespace math
 }  // namespace common

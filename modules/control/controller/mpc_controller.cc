@@ -38,7 +38,7 @@ namespace control {
 
 using common::Point3D;
 using common::TrajectoryPoint;
-using common::VehicleState;
+using common::VehicleStateProvider;
 using Matrix = Eigen::MatrixXd;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -55,24 +55,7 @@ std::string GetLogFileName() {
   return std::string(name_buffer);
 }
 
-void WriteHeaders(std::ofstream &file_stream) {
-  file_stream << "current_lateral_error,"
-              << "current_ref_heading,"
-              << "current_heading,"
-              << "current_heading_error,"
-              << "heading_error_rate,"
-              << "lateral_error_rate,"
-              << "current_curvature,"
-              << "steer_angle,"
-              << "steer_angle_feedforward,"
-              << "steer_angle_lateral_contribution,"
-              << "steer_angle_lateral_rate_contribution,"
-              << "steer_angle_heading_contribution,"
-              << "steer_angle_heading_rate_contribution,"
-              << "steer_angle_feedback,"
-              << "steering_position,"
-              << "v" << std::endl;
-}
+void WriteHeaders(std::ofstream &file_stream) {}
 }  // namespace
 
 MPCController::MPCController() : name_("MPC Controller") {
@@ -119,33 +102,19 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   lr_ = wheelbase_ * (1.0 - mass_rear / mass_);
   iz_ = lf_ * lf_ * mass_front + lr_ * lr_ * mass_rear;
 
-  lqr_eps_ = control_conf->mpc_controller_conf().eps();
-  lqr_max_iteration_ = control_conf->mpc_controller_conf().max_iteration();
+  mpc_eps_ = control_conf->mpc_controller_conf().eps();
+  mpc_max_iteration_ = control_conf->mpc_controller_conf().max_iteration();
   throttle_deadzone_ = control_conf->mpc_controller_conf().throttle_deadzone();
   brake_deadzone_ = control_conf->mpc_controller_conf().brake_deadzone();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
+  AINFO << "MPC conf loaded";
   return true;
 }
 
 void MPCController::ProcessLogs(const SimpleMPCDebug *debug,
                                 const canbus::Chassis *chassis) {
-  const std::string log_str = apollo::common::util::StrCat(
-      debug->lateral_error(), ",", debug->ref_heading(), ",",
-      VehicleState::instance()->heading(), ",", debug->heading_error(), ",",
-      debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
-      debug->curvature(), ",", debug->steer_angle(), ",",
-      debug->steer_angle_feedforward(), ",",
-      debug->steer_angle_lateral_contribution(), ",",
-      debug->steer_angle_lateral_rate_contribution(), ",",
-      debug->steer_angle_heading_contribution(), ",",
-      debug->steer_angle_heading_rate_contribution(), ",",
-      debug->steer_angle_feedback(), ",", chassis->steering_percentage(), ",",
-      VehicleState::instance()->linear_velocity());
-  if (FLAGS_enable_csv_debug) {
-    steer_log_file_ << log_str << std::endl;
-  }
-  ADEBUG << "Steer_Control_Detail: " << log_str;
+  // TODO(QiL): Add debug information
 }
 
 void MPCController::LogInitParameters() {
@@ -180,7 +149,6 @@ Status MPCController::Init(const ControlConf *control_conf) {
                   "failed to load control_conf");
   }
   // Matrix init operations.
-  int matrix_size = basic_state_size_;
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_a_(0, 1) = 1.0;
@@ -188,9 +156,11 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(2, 3) = 1.0;
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
   matrix_a_(4, 4) = 1.0;
-  matrix_a_(5, 5) = 0.0;  // TODO: change to add delays
+  matrix_a_(5, 5) = 0.0;
+  // TODO(QiL): change to add delays
+  // TODO(QiL): expand the model to accomendate more combined states.
 
-  matrix_a_coeff_ = Matrix::Zero(matrix_size, matrix_size);
+  matrix_a_coeff_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
   matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
   matrix_a_coeff_(2, 3) = 1.0;
@@ -205,11 +175,15 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_b_(5, 1) = -1.0;
   matrix_bd_ = matrix_b_ * ts_;
 
-  matrix_state_ = Matrix::Zero(matrix_size, 1);
-  matrix_k_ = Matrix::Zero(1, matrix_size);
-  // TODO: Change it to configs
-  matrix_r_ = Matrix::Identity(2, 2);
-  matrix_q_ = Matrix::Zero(matrix_size, matrix_size);
+  matrix_c_ = Matrix::Zero(basic_state_size_, 1);
+  matrix_c_(5, 1) = 1.0;
+  matrix_cd_ = Matrix::Zero(basic_state_size_, 1);
+
+  matrix_state_ = Matrix::Zero(basic_state_size_, 1);
+  matrix_k_ = Matrix::Zero(1, basic_state_size_);
+  // TODO(QiL): Change it to configs
+  matrix_r_ = Matrix::Identity(controls_, controls_);
+  matrix_q_ = Matrix::Zero(basic_state_size_, basic_state_size_);
 
   int r_param_size = control_conf->mpc_controller_conf().matrix_r_size();
   for (int i = 0; i < r_param_size; ++i) {
@@ -217,10 +191,11 @@ Status MPCController::Init(const ControlConf *control_conf) {
   }
 
   int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
-  if (matrix_size != q_param_size) {
+  if (basic_state_size_ != q_param_size) {
     const auto error_msg = apollo::common::util::StrCat(
         "MPC controller error: matrix_q size: ", q_param_size,
-        " in parameter file not equal to matrix_size: ", matrix_size);
+        " in parameter file not equal to basic_state_size_: ",
+        basic_state_size_);
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -254,8 +229,8 @@ Status MPCController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  VehicleState::instance()->set_linear_velocity(
-      std::max(VehicleState::instance()->linear_velocity(), 1.0));
+  VehicleStateProvider::instance()->set_linear_velocity(
+      std::max(VehicleStateProvider::instance()->linear_velocity(), 1.0));
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -263,8 +238,7 @@ Status MPCController::ComputeControlCommand(
   SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
-  // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
-  // Error Rate.
+  // Update state
   UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
@@ -272,46 +246,39 @@ Status MPCController::ComputeControlCommand(
   Eigen::MatrixXd control_matrix(controls_, 1);
   control_matrix << 0, 0;
 
-  Eigen::MatrixXd C(basic_state_size_, 1);
-  C << 0, 0, 0, 0, 0, 0;
-
   Eigen::MatrixXd reference_state(basic_state_size_, 1);
   reference_state << 0, 0, 0, 0, 0, 0;
 
   std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
 
+  // TODO(QiL) : change it to config
   Eigen::MatrixXd lower_bound(controls_, 1);
   lower_bound << -10, -10;
 
   Eigen::MatrixXd upper_bound(controls_, 1);
   upper_bound << 10, 10;
 
-  Eigen::MatrixXd initial_state(basic_state_size_, 1);
-  initial_state << 0, 0, 0, 0, 0, 0;
-  // TODO: change the init state
-
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
   if (::apollo::common::math::SolveLinearMPC(
-          matrix_ad_, matrix_bd_, C, matrix_q_, matrix_r_, lower_bound,
-          upper_bound, matrix_state_, reference, lqr_eps_, lqr_max_iteration_,
+          matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_, matrix_r_, lower_bound,
+          upper_bound, matrix_state_, reference, mpc_eps_, mpc_max_iteration_,
           &control) != true) {
     AERROR << "MPC failed";
   }
 
-  // TODO: Add spline smoothing after the result
-  double steer_angle_feedback = -control[0](1, 0);
-  double steer_angle_feedforward =
-      ComputeLateralFeedForward(debug->curvature());
-  double steer_angle = steer_angle_feedback + steer_angle_feedforward;
+  // TODO(QiL): evaluate whether need to add spline smoothing after the result
+  double steer_angle = control[0](0, 0) * 180 / M_PI *
+                       steer_transmission_ratio_ /
+                       steer_single_direction_max_degree_ * 100;
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
 
   if (FLAGS_set_steer_limit) {
     double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
-                  (VehicleState::instance()->linear_velocity() *
-                   VehicleState::instance()->linear_velocity())) *
+                  (VehicleStateProvider::instance()->linear_velocity() *
+                   VehicleStateProvider::instance()->linear_velocity())) *
         steer_transmission_ratio_ * 180 / M_PI /
         steer_single_direction_max_degree_ * 100;
 
@@ -326,9 +293,9 @@ Status MPCController::ComputeControlCommand(
     cmd->set_steering_target(steer_angle);
   }
 
-  double acceleration_cmd =
-      -control[0](0, 0) +
-      debug->acceleration_reference();  // TODO: add pitch angle feedforward
+  double acceleration_cmd = control[0](1, 0) + debug->acceleration_reference();
+  // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
+
   debug->set_is_full_stop(false);
   if (std::abs(debug->acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
@@ -344,7 +311,7 @@ Status MPCController::ComputeControlCommand(
         std::make_pair(debug->speed_reference(), acceleration_cmd));
   } else {
     calibration_value = control_interpolation_->Interpolate(std::make_pair(
-        VehicleState::instance()->linear_velocity(), acceleration_cmd));
+        VehicleStateProvider::instance()->linear_velocity(), acceleration_cmd));
   }
 
   double throttle_cmd = 0.0;
@@ -363,33 +330,8 @@ Status MPCController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  // compute extra information for logging and debugging
-  double steer_angle_lateral_contribution =
-      -matrix_k_(0, 0) * matrix_state_(0, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
-
-  double steer_angle_lateral_rate_contribution =
-      -matrix_k_(0, 1) * matrix_state_(1, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
-
-  double steer_angle_heading_contribution =
-      -matrix_k_(0, 2) * matrix_state_(2, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
-
-  double steer_angle_heading_rate_contribution =
-      -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
-
-  debug->set_heading(VehicleState::instance()->heading());
+  debug->set_heading(VehicleStateProvider::instance()->heading());
   debug->set_steer_angle(steer_angle);
-  debug->set_steer_angle_feedforward(steer_angle_feedforward);
-  debug->set_steer_angle_lateral_contribution(steer_angle_lateral_contribution);
-  debug->set_steer_angle_lateral_rate_contribution(
-      steer_angle_lateral_rate_contribution);
-  debug->set_steer_angle_heading_contribution(steer_angle_heading_contribution);
-  debug->set_steer_angle_heading_rate_contribution(
-      steer_angle_heading_rate_contribution);
-  debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
   ProcessLogs(debug, chassis);
@@ -419,63 +361,17 @@ void MPCController::LoadControlCalibrationTable(
       << "Fail to load control calibration table";
 }
 
-// state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
-// Rate, Preview Lateral1, Preview Lateral2, ...]
-void MPCController::UpdateState(SimpleMPCDebug *debug) {
-  TrajectoryPoint traj_point;
-  const auto &position = VehicleState::instance()->ComputeCOMPosition(lr_);
-  double raw_lateral_error = GetLateralError(position, &traj_point);
-
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
-  debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
-
-  // ref_curvature_ = traj_point.kappa();
-  debug->set_curvature(traj_point.path_point().kappa());
-
-  // ref_heading_ = traj_point.theta;
-  debug->set_ref_heading(traj_point.path_point().theta());
-
-  // heading_error_ =
-  //    common::math::NormalizeAngle(VehicleState::instance()->heading() -
-  //    ref_heading_);
-  debug->set_heading_error(common::math::NormalizeAngle(
-      VehicleState::instance()->heading() - traj_point.path_point().theta()));
-
-  // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
-
-  // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
-  debug->set_heading_error_rate(
-      (debug->heading_error() - previous_heading_error_) / ts_);
-  // lateral_error_rate_ = (lateral_error_ - previous_lateral_error_) / ts_;
-  debug->set_lateral_error_rate(
-      (debug->lateral_error() - previous_lateral_error_) / ts_);
-
-  // Prepare for next iteration.
-  previous_heading_error_ = debug->heading_error();
-  previous_lateral_error_ = debug->lateral_error();
-
-  // State matrix update;
-  // First six elements are fixed;
-  matrix_state_(0, 0) = debug->lateral_error();
-  matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
-  matrix_state_(3, 0) = debug->heading_error_rate();
-  matrix_state_(4, 0) = debug->station_error();
-  matrix_state_(5, 0) = debug->speed_error();
-}
-
 void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
-  const auto &com = VehicleState::instance()->ComputeCOMPosition(lr_);
-  ComputeLateralErrors(com.x(), com.y(), VehicleState::instance()->heading(),
-                       VehicleState::instance()->linear_velocity(),
-                       VehicleState::instance()->angular_velocity(),
+  const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
+  ComputeLateralErrors(com.x(), com.y(),
+                       VehicleStateProvider::instance()->heading(),
+                       VehicleStateProvider::instance()->linear_velocity(),
+                       VehicleStateProvider::instance()->angular_velocity(),
                        trajectory_analyzer_, debug);
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() == canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleStateProvider::instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
@@ -488,7 +384,7 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
 }
 
 void MPCController::UpdateMatrix() {
-  double v = VehicleState::instance()->linear_velocity();
+  double v = VehicleStateProvider::instance()->linear_velocity();
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
@@ -497,22 +393,10 @@ void MPCController::UpdateMatrix() {
   Matrix matrix_i = Matrix::Identity(matrix_a_.cols(), matrix_a_.cols());
   matrix_ad_ = (matrix_i + ts_ * 0.5 * matrix_a_) *
                (matrix_i - ts_ * 0.5 * matrix_a_).inverse();
-}
 
-double MPCController::ComputeLateralFeedForward(double ref_curvature) const {
-  double kv =
-      lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
-
-  // then change it from rad to %
-  double v = VehicleState::instance()->linear_velocity();
-  double steer_angle_feedforwardterm =
-      (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
-       matrix_k_(0, 2) *
-           (lr_ * ref_curvature -
-            lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
-      180 / M_PI * steer_transmission_ratio_ /
-      steer_single_direction_max_degree_ * 100;
-  return steer_angle_feedforwardterm;
+  matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
+  matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
+  matrix_cd_ = matrix_c_ * heading_error_rate_ * ts_;
 }
 
 /*
@@ -540,7 +424,7 @@ double MPCController::GetLateralError(const common::math::Vec2d &point,
 void MPCController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
-    SimpleMPCDebug *debug) const {
+    SimpleMPCDebug *debug) {
   auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
   double dx = x - matched_point.path_point().x();
@@ -563,7 +447,7 @@ void MPCController::ComputeLateralErrors(
   // matched_point.v();
   debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
                                                 matched_point.v());
-
+  heading_error_rate_ = debug->heading_error_rate();
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point().theta());
   // matched_kappa = matched_point.path_point().kappa();
@@ -583,13 +467,15 @@ void MPCController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      VehicleState::instance()->x(), VehicleState::instance()->y());
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      VehicleState::instance()->x(), VehicleState::instance()->y(),
-      VehicleState::instance()->heading(),
-      VehicleState::instance()->linear_velocity(), matched_point, &s_matched,
-      &s_dot_matched, &d_matched, &d_dot_matched);
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y(),
+      VehicleStateProvider::instance()->heading(),
+      VehicleStateProvider::instance()->linear_velocity(), matched_point,
+      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
   double current_control_time = Clock::NowInSecond();
 
