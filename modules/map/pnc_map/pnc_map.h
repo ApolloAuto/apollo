@@ -70,6 +70,10 @@ class PncMap {
                       const common::PointENU &point, double look_forward,
                       double look_backward, RouteSegments *extended_segments);
 
+  bool ExtendSegments(const RouteSegments &segments, double start_s,
+                      double end_s,
+                      RouteSegments *const truncated_segments) const;
+
  private:
   bool GetNearestPointFromRouting(const common::VehicleState &point,
                                   LaneWaypoint *waypoint) const;
@@ -88,10 +92,6 @@ class PncMap {
   bool ProjectToSegments(const common::PointENU &point_enu,
                          const RouteSegments &segments,
                          LaneWaypoint *waypoint) const;
-
-  bool ExtendSegments(const RouteSegments &segments, double start_s,
-                      double end_s,
-                      RouteSegments *const truncated_segments) const;
 
   static bool ValidateRouting(const routing::RoutingResponse &routing);
 
