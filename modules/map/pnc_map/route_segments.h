@@ -143,16 +143,6 @@ class RouteSegments : public std::vector<LaneSegment> {
    */
   bool Stitch(const RouteSegments &other);
 
-  /**
-   * @brief Shrink current route segments to at most the given distance in front
-   * and in back of the given point.
-   * @param point: the center point
-   * @param look_backward the distance of looking backward from point
-   * @param look_forward the distance of looking forward from point
-   */
-  void Shrink(const common::math::Vec2d &point, double look_backward,
-              double look_forward);
-
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
 
@@ -192,6 +182,7 @@ class RouteSegments : public std::vector<LaneSegment> {
 
   static bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
+  static double Length(const RouteSegments &segments);
 
  private:
   LaneWaypoint route_end_waypoint_;
