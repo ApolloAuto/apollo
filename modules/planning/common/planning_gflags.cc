@@ -51,7 +51,7 @@ DEFINE_double(look_forward_time_sec, 8,
 DEFINE_bool(enable_reference_line_stitching, true,
             "Enable stitching reference line, which can reducing computing "
             "time and improve stabilty");
-DEFINE_double(look_forward_extend_distance, 80,
+DEFINE_double(look_forward_extend_distance, 50,
               "The step size when extending reference line.");
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
