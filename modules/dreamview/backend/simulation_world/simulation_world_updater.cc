@@ -212,8 +212,9 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
 void SimulationWorldUpdater::Start() {
   // start ROS timer, one-shot = false, auto-start = true
-  timer_ = AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
-                                       &SimulationWorldUpdater::OnTimer, this);
+  timer_ =
+      AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
+                                  &SimulationWorldUpdater::OnTimer, this);
 }
 
 void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
