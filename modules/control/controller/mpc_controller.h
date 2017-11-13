@@ -102,15 +102,9 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleMPCDebug *debug);
-
   void UpdateStateAnalyticalMatching(SimpleMPCDebug *debug);
 
   void UpdateMatrix();
-
-  void UpdateMatrixCompound();
-
-  double ComputeLateralFeedForward(double ref_curvature) const;
 
   double GetLateralError(
       const common::math::Vec2d &point,
@@ -119,7 +113,7 @@ class MPCController : public Controller {
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleMPCDebug *debug) const;
+                            SimpleMPCDebug *debug);
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
                                  SimpleMPCDebug *debug);
@@ -174,7 +168,7 @@ class MPCController : public Controller {
   const int basic_state_size_ = 6;
 
   const int controls_ = 2;
-  
+
   const int horizon_ = 10;
   // vehicle state matrix
   Eigen::MatrixXd matrix_a_;
@@ -185,6 +179,11 @@ class MPCController : public Controller {
   Eigen::MatrixXd matrix_b_;
   // control matrix (discrete-time)
   Eigen::MatrixXd matrix_bd_;
+
+  // offset matrix
+  Eigen::MatrixXd matrix_c_;
+  // offset matrix (discrete-time)
+  Eigen::MatrixXd matrix_cd_;
 
   // gain matrix
   Eigen::MatrixXd matrix_k_;
@@ -219,10 +218,10 @@ class MPCController : public Controller {
   // lateral error change rate over time, i.e. d(lateral_error) / dt
   // double lateral_error_rate_ = 0.0;
 
-  // parameters for lqr solver; number of iterations
-  int lqr_max_iteration_ = 0;
-  // parameters for lqr solver; threshold for computation
-  double lqr_eps_ = 0.0;
+  // parameters for mpc solver; number of iterations
+  int mpc_max_iteration_ = 0;
+  // parameters for mpc solver; threshold for computation
+  double mpc_eps_ = 0.0;
 
   DigitalFilter digital_filter_;
 
@@ -243,6 +242,8 @@ class MPCController : public Controller {
   double throttle_deadzone_ = 0.0;
 
   double brake_deadzone_ = 0.0;
+
+  double heading_error_rate_ = 0.0;
 };
 
 }  // namespace control
