@@ -7,7 +7,8 @@ max_planning_interval_sec: 0.2
 max_planning_delay_threshold: 4.0
 action: STOP
 soft_estop_brake: 50.0
-active_controllers: MPC_CONTROLLER
+active_controllers: LAT_CONTROLLER
+active_controllers: LON_CONTROLLER
 max_steering_percentage_allowed: 100
 minimum_speed_resolution: 0.2
 lat_controller_conf {

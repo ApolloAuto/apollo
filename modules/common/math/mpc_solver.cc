@@ -15,7 +15,6 @@
 #include "modules/common/math/mpc_solver.h"
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 
 #include "modules/common/log.h"
@@ -30,11 +29,13 @@ using Matrix = Eigen::MatrixXd;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
-bool SolveLinearMPC(Matrix &matrix_a, Matrix &matrix_b, Matrix &matrix_c,
-                    Matrix &matrix_q, Matrix &matrix_r, Matrix &matrix_lower,
-                    Matrix &matrix_upper, Matrix &matrix_initial_state,
-                    std::vector<Matrix> &reference, double eps, int max_iter,
-                    std::vector<Matrix> *control) {
+bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
+                    const Matrix &matrix_c, const Matrix &matrix_q,
+                    const Matrix &matrix_r, const Matrix &matrix_lower,
+                    const Matrix &matrix_upper,
+                    const Matrix &matrix_initial_state,
+                    const std::vector<Matrix> &reference, const double eps,
+                    const int max_iter, std::vector<Matrix> *control) {
   if (matrix_a.rows() != matrix_a.cols() ||
       matrix_b.rows() != matrix_a.rows() ||
       matrix_lower.rows() != matrix_upper.rows()) {
