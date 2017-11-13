@@ -24,7 +24,7 @@ cd "${DIR}/.."
 source "${DIR}/apollo_base.sh"
 
 # Dreamview always works with system monitor.
-bash scripts/monitor.sh "$@"
+bash scripts/monitor.sh
 
 # run function from apollo_base.sh
 # run command_name module_name
