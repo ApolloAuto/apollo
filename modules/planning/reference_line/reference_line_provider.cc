@@ -377,13 +377,12 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
   constexpr double kReferenceLineDiffCheckStep = 10.0;
-  constexpr double kReferenceLineDiffCheckResolution = 5.0;
   for (double s = 0.0; s + kReferenceLineDiffCheckStep / 2.0 < raw.Length();
        s += kReferenceLineDiffCheckStep) {
     auto xy_old = raw.GetReferencePoint(s);
     auto xy_new = smoothed.GetReferencePoint(s);
     const double diff = xy_old.DistanceTo(xy_new);
-    if (diff > kReferenceLineDiffCheckResolution) {
+    if (diff > FLAGS_smoothed_reference_line_max_diff) {
       AERROR << "Fail to provide reference line because too large diff "
                 "between smoothed and raw reference lines. diff: "
              << diff;
