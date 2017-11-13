@@ -96,7 +96,7 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   anchor_points.back().lateral_bound = 1e-6;
   smoother_.SetAnchorPoints(anchor_points);
   EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_FLOAT_EQ(152.5217, smoothed_reference_line.Length());
+  EXPECT_FLOAT_EQ(152.54079, smoothed_reference_line.Length());
 }
 
 }  // namespace planning
