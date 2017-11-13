@@ -144,6 +144,9 @@ class RouteSegments : public std::vector<LaneSegment> {
    */
   bool Stitch(const RouteSegments &other);
 
+  bool Shrink(const common::math::Vec2d &point, double look_backward,
+              double look_forward);
+
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
 

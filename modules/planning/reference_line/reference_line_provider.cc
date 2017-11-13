@@ -308,28 +308,28 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   }
   common::SLPoint sl_point;
   Vec2d vec2d(state.x(), state.y());
-  if (!prev_ref->XYToSL(vec2d, &sl_point)) {
+  LaneWaypoint waypoint;
+  if (!prev_segment->GetProjection(vec2d, &sl_point, &waypoint)) {
     AWARN << "Vehicle current point: " << vec2d.DebugString()
           << " not on previous reference line";
     return SmoothRouteSegment(*segments, reference_line);
   }
-  if (sl_point.s() < 0 || sl_point.s() > prev_ref->Length()) {
-    AWARN << "Vehicle current position cannot be project to previous reference "
-             "line";
-    return SmoothRouteSegment(*segments, reference_line);
-  }
-  const double remain_s = prev_ref->Length() - sl_point.s();
-  if (remain_s > LookForwardDistance(state)) {
+  const double prev_segment_length = RouteSegments::Length(*prev_segment);
+  const double remain_s = prev_segment_length - sl_point.s();
+  const double look_forward_required_distance = LookForwardDistance(state);
+  if (remain_s > look_forward_required_distance) {
     *segments = *prev_segment;
     *reference_line = *prev_ref;
     ADEBUG << "Reference line remain " << remain_s
-           << ", which is enough and no need to extend";
+           << ", which is more than required " << look_forward_required_distance
+           << " and no need to extend";
     return true;
   }
   double future_start_s =
-      std::max(sl_point.s(), prev_ref->Length() -
+      std::max(sl_point.s(), prev_segment_length -
                                  FLAGS_reference_line_stitch_overlap_distance);
-  double future_end_s = prev_ref->Length() + FLAGS_look_forward_extend_distance;
+  double future_end_s =
+      prev_segment_length + FLAGS_look_forward_extend_distance;
   RouteSegments shifted_segments;
   std::unique_lock<std::mutex> lock(pnc_map_mutex_);
   if (!pnc_map_->ExtendSegments(*prev_segment, future_start_s, future_end_s,
@@ -354,6 +354,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     AWARN << "Failed to stitch route segments";
     return SmoothRouteSegment(*segments, reference_line);
   }
+  *segments = shifted_segments;
   common::SLPoint sl;
   if (!reference_line->XYToSL(vec2d, &sl)) {
     AERROR << "Failed to project point: " << vec2d.DebugString()
@@ -361,15 +362,16 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   }
   if (sl.s() > FLAGS_look_backward_distance * 1.5) {
     ADEBUG << "reference line back side is " << sl.s()
-           << ", shrink reference line";
+           << ", shrink reference line: origin lenght: "
+           << reference_line->Length();
     if (!reference_line->Shrink(vec2d, FLAGS_look_backward_distance,
                                 std::numeric_limits<double>::infinity())) {
       AWARN << "Failed to shrink reference line";
     }
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    pnc_map_->ExtendSegments(shifted_segments,
-                             sl.s() - FLAGS_look_backward_distance,
-                             std::numeric_limits<double>::infinity(), segments);
+    if (!segments->Shrink(vec2d, FLAGS_look_backward_distance,
+                          std::numeric_limits<double>::infinity())) {
+      AWARN << "Failed to shrink route segment";
+    }
   }
   return true;
 }
@@ -458,6 +460,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     point.enforced = true;
     break;
   }
+
   smoother_->SetAnchorPoints(anchor_points);
   if (!smoother_->Smooth(raw_ref, reference_line)) {
     AERROR << "Failed to smooth reference line with anchor points";
