@@ -55,57 +55,6 @@ bool RouteSegments::WithinLaneSegment(const routing::LaneSegment &lane_segment,
          lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s;
 }
 
-void RouteSegments::Shrink(const common::math::Vec2d &point,
-                           double look_backward, double look_forward) {
-  double s = 0.0;
-  double l = 0.0;
-  LaneWaypoint waypoint;
-  if (!GetProjection(point, &s, &l, &waypoint)) {
-    return;
-  }
-  double acc_s = 0.0;
-  auto iter = begin();
-  while (iter != end() && acc_s + iter->Length() < s - look_backward) {
-    acc_s += iter->Length();
-    ++iter;
-  }
-  if (iter == end()) {
-    return;
-  }
-  iter->start_s =
-      std::max(iter->start_s, s - look_backward - acc_s + iter->start_s);
-  if (iter->Length() < kSegmentationEpsilon) {
-    ++iter;
-  }
-  erase(begin(), iter);
-
-  iter = begin();
-  acc_s = 0.0;
-  while (iter != end() && !WithinLaneSegment(*iter, waypoint)) {
-    ++iter;
-  }
-  if (iter == end()) {
-    return;
-  }
-  acc_s = iter->end_s - waypoint.s;
-  if (acc_s >= look_forward) {
-    iter->end_s = waypoint.s + look_forward;
-    ++iter;
-    erase(iter, end());
-    return;
-  }
-  ++iter;
-  while (iter != end() && acc_s + iter->Length() < look_forward) {
-    acc_s += iter->Length();
-    ++iter;
-  }
-  if (iter == end()) {
-    return;
-  }
-  iter->end_s = std::min(iter->end_s, look_forward - acc_s + iter->start_s);
-  erase(iter + 1, end());
-}
-
 bool RouteSegments::Stitch(const RouteSegments &other) {
   auto first_waypoint = FirstWaypoint();
   bool has_overlap = IsWaypointOnSegment(other.FirstWaypoint());
@@ -162,6 +111,14 @@ void RouteSegments::SetProperties(const RouteSegments &other) {
   next_action_ = other.NextAction();
   previous_action_ = other.PreviousAction();
   id_ = other.Id();
+}
+
+double RouteSegments::Length(const RouteSegments &segments) {
+  double s = 0.0;
+  for (const auto &seg : segments) {
+    s += seg.Length();
+  }
+  return s;
 }
 
 bool RouteSegments::GetProjection(const common::PointENU &point_enu, double *s,

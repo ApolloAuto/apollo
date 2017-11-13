@@ -366,8 +366,8 @@ LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
 }
 
 bool PncMap::ExtendSegments(const RouteSegments &segments,
-                            const common::PointENU &point, double look_forward,
-                            double look_backward,
+                            const common::PointENU &point, double look_backward,
+                            double look_forward,
                             RouteSegments *extended_segments) {
   double s = 0.0;
   double l = 0.0;
@@ -376,7 +376,7 @@ bool PncMap::ExtendSegments(const RouteSegments &segments,
     AERROR << "point: " << point.ShortDebugString() << " is not on segment";
     return false;
   }
-  return ExtendSegments(segments, s - look_forward, s + look_backward,
+  return ExtendSegments(segments, s - look_backward, s + look_forward,
                         extended_segments);
 }
 
