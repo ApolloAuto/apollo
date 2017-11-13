@@ -248,10 +248,9 @@ bool PncMap::GetRouteSegments(
     if (index == passage_index) {
       nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
     }
-    double s = 0.0;
-    double l = 0.0;
+    common::SLPoint sl;
     LaneWaypoint segment_waypoint;
-    if (!segments.GetProjection(nearest_point, &s, &l, &segment_waypoint)) {
+    if (!segments.GetProjection(nearest_point, &sl, &segment_waypoint)) {
       ADEBUG << "Failed to get projection from point: "
              << nearest_point.ShortDebugString();
       continue;
@@ -265,9 +264,9 @@ bool PncMap::GetRouteSegments(
     }
     route_segments->emplace_back();
     const auto last_waypoint = segments.LastWaypoint();
-    if (!ExtendSegments(segments, s - backward_length, s + forward_length,
-                        &route_segments->back())) {
-      AERROR << "Failed to extend segments with s=" << s
+    if (!ExtendSegments(segments, sl.s() - backward_length,
+                        sl.s() + forward_length, &route_segments->back())) {
+      AERROR << "Failed to extend segments with s=" << sl.s()
              << ", backward: " << backward_length
              << ", forward: " << forward_length;
       return false;
@@ -283,7 +282,7 @@ bool PncMap::GetRouteSegments(
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
       route_segments->back().SetPreviousAction(routing::FORWARD);
-    } else if (l > 0) {
+    } else if (sl.l() > 0) {
       route_segments->back().SetPreviousAction(routing::RIGHT);
     } else {
       route_segments->back().SetPreviousAction(routing::LEFT);
@@ -369,14 +368,13 @@ bool PncMap::ExtendSegments(const RouteSegments &segments,
                             const common::PointENU &point, double look_backward,
                             double look_forward,
                             RouteSegments *extended_segments) {
-  double s = 0.0;
-  double l = 0.0;
+  common::SLPoint sl;
   LaneWaypoint waypoint;
-  if (!segments.GetProjection(point, &s, &l, &waypoint)) {
+  if (!segments.GetProjection(point, &sl, &waypoint)) {
     AERROR << "point: " << point.ShortDebugString() << " is not on segment";
     return false;
   }
-  return ExtendSegments(segments, s - look_backward, s + look_forward,
+  return ExtendSegments(segments, sl.s() - look_backward, sl.s() + look_forward,
                         extended_segments);
 }
 

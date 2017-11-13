@@ -110,6 +110,9 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
   if (!ContainsKey(modes, status_.current_mode())) {
     CHECK(!modes.empty());
     status_.set_current_mode(modes.begin()->first);
+  } else {
+    // Explicitly set the field to make it visible in the converted JSON.
+    status_.set_current_mode(status_.current_mode());
   }
 
   // Get available maps and vehicles by listing data directory.
