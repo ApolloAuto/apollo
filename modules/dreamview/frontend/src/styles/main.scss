@@ -50,6 +50,7 @@ body {
 
 
 
+
 /* Adjust the scrollbar style. */
 
  ::-webkit-scrollbar {
@@ -243,6 +244,7 @@ body {
         }
     }
 }
+
 
 
 
@@ -613,7 +615,7 @@ body {
         }
     }
 
-    .wheel {
+    .wheel-panel {
         display: flex;
         flex-direction: row;
         justify-content: left;
@@ -642,7 +644,7 @@ body {
 
         .left-arrow {
             position: absolute;
-            top: 40px;
+            top: 45px;
             right: 120px;
             width: 0px;
             height: 0px;
@@ -653,8 +655,8 @@ body {
 
         .right-arrow {
             position: absolute;
-            top: 40px;
-            right: 20px;
+            top: 45px;
+            right: 15px;
             width: 0px;
             height: 0px;
             border-style: solid;
@@ -662,46 +664,19 @@ body {
             border-color: transparent transparent transparent #30435e;
         }
 
+        .wheel {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+        }
         .wheel-background {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-
-            position: absolute;
-            top: 6px;
-            right: 30px;
-            width: 70px;
-            height: 70px;
-            margin: 10px;
-
-            background: rgba(0, 0, 0, 1);
-            border-radius: 50%;
-            border: 2px solid #006aff;
+            stroke-width: 3px;
+            stroke: #006AFF;
         }
-
         .wheel-arm {
-            position: absolute;
-            top: 35px;
-            left: 34px;
-            height: 30px;
-            width: 2px;
-            border-radius: 0 0 20px 20px;
-
-            content: "";           
-            background: #006AFF;
-    
-            transform-origin: 50% 100%;
-            -webkit-transform-origin: 50% 100%;
-        }
-        .wheel-arm:before {
-            display: block;
-            position: absolute;
-            top: -6px;
-            left: -4px;
-            width: 0;
-            height: 0;
-            border: 5px solid #006aff;
-            content: "";
+            stroke-width: 3px;
+            stroke: #006AFF;
+            fill: #006AFF;
         }
     }
 
