@@ -85,10 +85,9 @@ bool ReferenceLineProvider::IsAllowChangeLane(
   if (forward_segment == route_segments.end()) {
     return true;
   }
-  double s = 0.0;
-  double l = 0.0;
+  common::SLPoint sl;
   LaneWaypoint waypoint;
-  if (!forward_segment->GetProjection(point, &s, &l, &waypoint)) {
+  if (!forward_segment->GetProjection(point, &sl, &waypoint)) {
     AERROR << "Failed to project to forward segment from point: "
            << point.DebugString();
     return false;
@@ -96,13 +95,13 @@ bool ReferenceLineProvider::IsAllowChangeLane(
   auto history_iter = segment_history_.find(forward_segment->Id());
   if (history_iter == segment_history_.end()) {
     auto &inserter = segment_history_[forward_segment->Id()];
-    inserter.min_l = std::fabs(l);
+    inserter.min_l = std::fabs(sl.l());
     inserter.last_point = point;
     inserter.accumulate_s = 0.0;
     return false;
   } else {
     history_iter->second.min_l =
-        std::min(history_iter->second.min_l, std::fabs(l));
+        std::min(history_iter->second.min_l, std::fabs(sl.l()));
     double dist =
         common::util::DistanceXY(history_iter->second.last_point, point);
     history_iter->second.last_point = point;
