@@ -1,8 +1,25 @@
 import React from "react";
 import { observer } from "mobx-react";
 
+
+class Wheel extends React.Component {
+    render() {
+        const { steeringAngle } = this.props;
+
+        return (
+            <svg className="wheel" viewBox="0 0 100 100" height="80" width="80">
+                <circle className="wheel-background" cx="50" cy="50" r="45" />
+                <g className="wheel-arm" transform={`rotate(${steeringAngle} 50 50)`}>
+                    <rect x="45" y="7" height="10" width="10" />
+                    <line x1="50" y1="50" x2="50" y2="5"/>
+                </g>
+            </svg>
+        );
+    }
+}
+
 @observer
-export default class Wheel extends React.Component {
+export default class WheelPanel extends React.Component {
     constructor(props) {
         super(props);
         this.signalColor = {
@@ -20,17 +37,12 @@ export default class Wheel extends React.Component {
                                 ? this.signalColor.on : this.signalColor.off;
 
         return (
-            <div className="wheel">
+            <div className="wheel-panel">
                 <div className="steerangle-read">{steeringAngle}</div>
                 <div className="steerangle-unit">°</div>
-                <div className="left-arrow"
-                     style={{borderRightColor: leftArrowColor}}></div>
-                <div className="right-arrow"
-                     style={{borderLeftColor: rightArrowColor}}></div>
-                <div className="wheel-background">
-                    <div className="wheel-arm"
-                         style={{transform: `translate(-50%, -100%) rotate(${steeringAngle}deg`}}/>
-                </div>
+                <div className="left-arrow" style={{borderRightColor: leftArrowColor}} />
+                <Wheel steeringAngle={steeringAngle} />
+                <div className="right-arrow" style={{borderLeftColor: rightArrowColor}} />
             </div>
         );
     }
