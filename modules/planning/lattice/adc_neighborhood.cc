@@ -44,8 +44,8 @@ void ADCNeighborhood::InitNeighborhood(
     const Frame* frame,
     const TrajectoryPoint& planning_init_point,
     const ReferenceLine& reference_line) {
-  SetupObstacles(frame, reference_line);
   SetupADC(frame, planning_init_point, reference_line);
+  SetupObstacles(frame, reference_line);
 }
 
 void ADCNeighborhood::SetupADC(
@@ -78,41 +78,75 @@ void ADCNeighborhood::SetupObstacles(
       continue;
     }
     double relative_time = 0.0;
+    bool entered = false;
     while (relative_time < planned_trajectory_time) {
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
       bool overlap = reference_line.HasOverlap(box);
       if (overlap) {
-        std::array<double, 5> obstacle_state;
-        obstacle_state[0] = relative_time;
         SLBoundary sl_boundary;
         reference_line.GetSLBoundary(box, &sl_boundary);
-        obstacle_state[1] = sl_boundary.start_s();
-        obstacle_state[2] = sl_boundary.end_s();
-        PathPoint obstacle_point_on_ref_line =
-            ReferenceLineMatcher::match_to_reference_line(
-                discretized_ref_points, obstacle_state[1]);
-        const PerceptionObstacle& perception_obstacle = obstacle->Perception();
-        double ref_theta = obstacle_point_on_ref_line.theta();
-        auto velocity = perception_obstacle.velocity();
-        obstacle_state[3] = std::cos(ref_theta) * velocity.x() +
-            std::sin(ref_theta) * velocity.y();
-
-        obstacle_state[4] = 0.0;  // set s_ddot to zero
+        
         // TODO(all) confirm the logic to determine whether an obstacle
         // is forward or backward.
-        if (obstacle_state[2] < init_s_[0]) {
-          backward_neighborhood_.push_back(std::move(obstacle_state));
+        if (sl_boundary.end_s() < init_s_[0]) {
           backward_obstacle_id_set_.insert(obstacle->Id());
         } else {
-          forward_neighborhood_.push_back(std::move(obstacle_state));
           forward_obstacle_id_set_.insert(obstacle->Id());
         }
-        break;
+
+        // TODO(kechxu) move const 2.0 in some place
+        if (std::abs(sl_boundary.start_l()) > 2.0 &&
+            std::abs(sl_boundary.end_l()) > 2.0) {
+          if (!entered) {
+            continue;
+          } else {
+            break;
+          }
+        }
+        double v = SpeedOnReferenceLine(discretized_ref_points,
+              obstacle, sl_boundary);
+        critical_conditions_[obstacle->Id()].set_obstacle_id(
+              obstacle->Id());
+        if (!entered) {
+          SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
+              critical_conditions_[obstacle->Id()].mutable_bottom_left());
+          SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
+              critical_conditions_[obstacle->Id()].mutable_upper_left());
+          entered = !entered;
+        }
+        SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
+            critical_conditions_[obstacle->Id()].mutable_bottom_right());
+        SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
+            critical_conditions_[obstacle->Id()].mutable_upper_right());
       }
       relative_time += trajectory_time_resolution;
     }
   }
+}
+
+void ADCNeighborhood::SetCriticalPoint(
+    const double t, const double s, const double v,
+    CriticalPoint* critical_point) {
+  critical_point->set_t(t);
+  critical_point->set_s(s);
+  critical_point->set_v(v);
+}
+
+double ADCNeighborhood::SpeedOnReferenceLine(
+    const std::vector<apollo::common::PathPoint>& discretized_ref_points,
+    const Obstacle* obstacle,
+    const SLBoundary& sl_boundary) {
+  PathPoint obstacle_point_on_ref_line =
+      ReferenceLineMatcher::match_to_reference_line(
+          discretized_ref_points, sl_boundary.start_s());
+  const PerceptionObstacle& perception_obstacle =
+      obstacle->Perception();
+  double ref_theta = obstacle_point_on_ref_line.theta();
+  auto velocity = perception_obstacle.velocity();
+  double v = std::cos(ref_theta) * velocity.x() +
+      std::sin(ref_theta) * velocity.y();
+  return v;
 }
 
 bool ADCNeighborhood::ForwardNearestObstacle(

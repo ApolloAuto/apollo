@@ -182,6 +182,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/reference_line:reference_line",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/lattice:reference_line_matcher",
