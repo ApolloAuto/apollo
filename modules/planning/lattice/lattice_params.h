@@ -33,6 +33,7 @@ static double enable_stop_handling = true;
 static double trajectory_time_resolution = 0.05;
 static double stop_acc_thred = 1.0;
 static double dist_thred_omit_routing_end = 1.0;
+static double lateral_enter_lane_thred = 2.0;
 
 }  // namespace planning
 }  // namespace apollo

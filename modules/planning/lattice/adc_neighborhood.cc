@@ -96,8 +96,8 @@ void ADCNeighborhood::SetupObstacles(
         }
 
         // TODO(kechxu) move const 2.0 in some place
-        if (std::abs(sl_boundary.start_l()) > 2.0 &&
-            std::abs(sl_boundary.end_l()) > 2.0) {
+        if (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred &&
+            std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred) {
           if (!entered) {
             continue;
           } else {
@@ -147,6 +147,27 @@ double ADCNeighborhood::SpeedOnReferenceLine(
   double v = std::cos(ref_theta) * velocity.x() +
       std::sin(ref_theta) * velocity.y();
   return v;
+}
+
+void ADCNeighborhood::GetCriticalConditions(
+    std::vector<CriticalCondition>* critical_conditions) {
+  critical_conditions->clear();
+  for (const auto& condition : critical_conditions_) {
+    critical_conditions->push_back(condition.second);
+  }
+}
+
+bool ADCNeighborhood::GetCriticalCondition(
+    const std::string& obstacle_id,
+    CriticalCondition* critical_condition) {
+  if (forward_obstacle_id_set_.find(obstacle_id) ==
+      forward_obstacle_id_set_.end() ||
+      backward_obstacle_id_set_.find(obstacle_id) ==
+      backward_obstacle_id_set_.end()) {
+    return false;
+  }
+  *critical_condition = critical_conditions_[obstacle_id];
+  return true;
 }
 
 bool ADCNeighborhood::ForwardNearestObstacle(

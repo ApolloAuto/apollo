@@ -50,8 +50,9 @@ class ADCNeighborhood {
   void GetCriticalConditions(
       std::vector<CriticalCondition>* critical_conditions);
 
-  const CriticalCondition& GetCriticalCondition(
-      const std::string& obstacle_id);
+  bool GetCriticalCondition(
+      const std::string& obstacle_id,
+      CriticalCondition* critical_condition);
 
   bool IsInNeighborhood(const Obstacle* obstacle) const;
 
