@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <limits>
 #include <utility>
 
 #include "modules/map/pnc_map/path.h"
@@ -168,7 +169,7 @@ void ReferenceLineProvider::GenerateThread() {
     }
     std::list<ReferenceLine> reference_lines;
     std::list<hdmap::RouteSegments> segments;
-    if (!CreateReferenceLineFromRouting(&reference_lines, &segments)) {
+    if (!CreateReferenceLine(&reference_lines, &segments)) {
       AERROR << "Fail to get reference line";
       continue;
     }
@@ -194,7 +195,7 @@ bool ReferenceLineProvider::GetReferenceLines(
     lock.unlock();
     return true;
   } else {
-    return CreateReferenceLineFromRouting(reference_lines, segments);
+    return CreateReferenceLine(reference_lines, segments);
   }
 }
 
@@ -211,49 +212,162 @@ void ReferenceLineProvider::PrioritzeChangeLane(
   }
 }
 
-bool ReferenceLineProvider::CreateReferenceLineFromRouting(
-    std::list<ReferenceLine> *reference_lines,
-    std::list<hdmap::RouteSegments> *segments) {
-  std::list<hdmap::RouteSegments> route_segments;
-  double look_forward_distance =
-      (vehicle_state_.linear_velocity() * FLAGS_look_forward_time_sec >
-       FLAGS_look_forward_min_distance)
-          ? FLAGS_look_forward_distance
-          : FLAGS_look_forward_min_distance;
-  double look_backward_distance = FLAGS_look_backward_distance;
+bool ReferenceLineProvider::CreateRouteSegments(
+    const common::VehicleState &vehicle_state, double look_backward_distance,
+    double look_forward_distance, std::list<hdmap::RouteSegments> *segments) {
   common::math::Vec2d point;
-  {
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    point.set_x(vehicle_state_.x());
-    point.set_y(vehicle_state_.y());
-    if (!pnc_map_->GetRouteSegments(vehicle_state_, look_backward_distance,
-                                    look_forward_distance, &route_segments)) {
-      AERROR << "Failed to extract segments from routing";
-      return false;
+  point.set_x(vehicle_state.x());
+  point.set_y(vehicle_state.y());
+  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
+                                  look_forward_distance, segments)) {
+    AERROR << "Failed to extract segments from routing";
+    return false;
+  }
+  bool is_allow_change_lane = IsAllowChangeLane(point, *segments);
+  for (auto iter = segments->begin(); iter != segments->end();) {
+    if (!is_allow_change_lane && !iter->IsOnSegment()) {
+      iter = segments->erase(iter);
+    } else {
+      ++iter;
     }
   }
   if (FLAGS_prioritize_change_lane) {
-    PrioritzeChangeLane(&route_segments);
+    PrioritzeChangeLane(segments);
   }
-  bool is_allow_change_lane = IsAllowChangeLane(point, route_segments);
-  for (const auto &lanes : route_segments) {
-    if (!is_allow_change_lane && !lanes.IsOnSegment()) {
-      continue;
-    }
-    ReferenceLine reference_line;
-    if (!SmoothReferenceLine(lanes, &reference_line)) {
-      AERROR << "Failed to smooth reference line";
-      continue;
-    }
-    reference_lines->emplace_back(reference_line);
-    segments->emplace_back(lanes);
-  }
+  return !segments->empty();
+}
 
-  if (reference_lines->empty()) {
-    AERROR << "No smooth reference lines available";
+double LookForwardDistance(const VehicleState &state) {
+  return (state.linear_velocity() * FLAGS_look_forward_time_sec >
+          FLAGS_look_forward_min_distance)
+             ? FLAGS_look_forward_distance
+             : FLAGS_look_forward_min_distance;
+}
+
+bool ReferenceLineProvider::CreateReferenceLine(
+    std::list<ReferenceLine> *reference_lines,
+    std::list<hdmap::RouteSegments> *segments) {
+  common::VehicleState vehicle_state;
+  {
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    vehicle_state = vehicle_state_;
+  }
+  double look_forward_distance = LookForwardDistance(vehicle_state);
+  double look_backward_distance = FLAGS_look_backward_distance;
+  if (!CreateRouteSegments(vehicle_state, look_backward_distance,
+                           look_forward_distance, segments)) {
+    AERROR << "Failed to create reference line from routing";
     return false;
   }
+  if (!FLAGS_enable_reference_line_stitching) {
+    for (auto iter = segments->begin(); iter != segments->end();) {
+      reference_lines->emplace_back();
+      if (!SmoothRouteSegment(*iter, &reference_lines->back())) {
+        AERROR << "Failed to create reference line from route segments";
+        reference_lines->pop_back();
+        iter = segments->erase(iter);
+      } else {
+        ++iter;
+      }
+    }
+    return true;
+  } else {  // stitching reference line
+    for (auto iter = segments->begin(); iter != segments->end();) {
+      reference_lines->emplace_back();
+      if (!ExtendReferenceLine(vehicle_state, &(*iter),
+                               &reference_lines->back())) {
+        AERROR << "Failed to extend reference line";
+        reference_lines->pop_back();
+        iter = segments->erase(iter);
+      } else {
+        ++iter;
+      }
+    }
+  }
+  return true;
+}
 
+bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
+                                                RouteSegments *segments,
+                                                ReferenceLine *reference_line) {
+  auto prev_segment = route_segments_.begin();
+  auto prev_ref = reference_lines_.begin();
+  while (prev_segment != route_segments_.end()) {
+    if (prev_segment->IsConnectedSegment(*segments)) {
+      break;
+    }
+    ++prev_segment;
+    ++prev_ref;
+  }
+  if (prev_segment == route_segments_.end()) {
+    if (!route_segments_.empty() && segments->IsOnSegment()) {
+      AWARN << "Current route segment is not connected with previous route "
+               "segment";
+    }
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  common::SLPoint sl_point;
+  Vec2d vec2d(state.x(), state.y());
+  if (!prev_ref->XYToSL(vec2d, &sl_point)) {
+    AWARN << "Vehicle current point: " << vec2d.DebugString()
+          << " not on previous reference line";
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  if (sl_point.s() < 0 || sl_point.s() > prev_ref->Length()) {
+    AWARN << "Vehicle current position cannot be project to previous reference "
+             "line";
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  const double remain_s = prev_ref->Length() - sl_point.s();
+  if (remain_s > LookForwardDistance(state)) {  // have enough reference line.
+    *segments = *prev_segment;
+    *reference_line = *prev_ref;
+    return true;
+  }
+  double future_start_s =
+      std::max(sl_point.s(), prev_ref->Length() -
+                                 FLAGS_reference_line_stitch_overlap_distance);
+  double future_end_s = prev_ref->Length() + FLAGS_look_forward_extend_distance;
+  RouteSegments shifted_segments;
+  std::unique_lock<std::mutex> lock(pnc_map_mutex_);
+  if (!pnc_map_->ExtendSegments(*prev_segment, future_start_s, future_end_s,
+                                &shifted_segments)) {
+    AERROR << "Failed to shift route segments forward";
+    lock.unlock();
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  lock.unlock();
+  hdmap::Path path;
+  hdmap::PncMap::CreatePathFromLaneSegments(shifted_segments, &path);
+  ReferenceLine new_ref(path);
+  if (!SmoothPrefixedReferenceLine(*prev_ref, new_ref, reference_line)) {
+    AERROR << "Failed to smooth forward shifted reference line";
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  if (!reference_line->Stitch(*prev_ref)) {
+    AWARN << "Failed to stitch reference line";
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  if (!shifted_segments.Stitch(*prev_segment)) {
+    AWARN << "Failed to stitch route segments";
+    return SmoothRouteSegment(*segments, reference_line);
+  }
+  common::SLPoint sl;
+  if (!reference_line->XYToSL(vec2d, &sl)) {
+    AERROR << "Failed to project point: " << vec2d.DebugString()
+           << " to stitched reference line";
+  }
+  if (sl.s() > FLAGS_look_backward_distance * 1.5) {
+    if (!reference_line->Shrink(vec2d, FLAGS_look_backward_distance,
+                                std::numeric_limits<double>::infinity())) {
+      AWARN << "Failed to shrink reference line";
+    }
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    pnc_map_->ExtendSegments(shifted_segments,
+                             sl.s() - FLAGS_look_backward_distance,
+                             std::numeric_limits<double>::infinity(), segments);
+  }
   return true;
 }
 
@@ -282,7 +396,7 @@ void ReferenceLineProvider::GetAnchorPoints(
   CHECK_NOTNULL(anchor_points);
   const double interval = smoother_config_.max_constraint_interval();
   int num_of_anchors =
-      std::max(1, static_cast<int>(reference_line.Length() / interval + 0.5));
+      std::max(2, static_cast<int>(reference_line.Length() / interval + 0.5));
   std::vector<double> anchor_s;
   common::util::uniform_slice(0.0, reference_line.Length(), num_of_anchors - 1,
                               &anchor_s);
@@ -291,26 +405,72 @@ void ReferenceLineProvider::GetAnchorPoints(
     auto &last_anchor = anchor_points->back();
     auto ref_point = reference_line.GetReferencePoint(s);
     last_anchor.path_point = ref_point.ToPathPoint(s);
-    // TODO(zhangliangliang): change the langitudianl and lateral direction in
-    // code
-    last_anchor.longitudinal_bound = smoother_config_.lateral_boundary_bound();
-    last_anchor.lateral_bound = smoother_config_.longitudinal_boundary_bound();
+    last_anchor.longitudinal_bound =
+        smoother_config_.longitudinal_boundary_bound();
+    last_anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
   }
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
-  anchor_points->back().longitudinal_bound = 1e-6;
-  anchor_points->back().lateral_bound = 1e-6;
+  anchor_points->front().enforced = true;
+}
+
+bool ReferenceLineProvider::SmoothRouteSegment(const RouteSegments &segments,
+                                               ReferenceLine *reference_line) {
+  hdmap::Path path;
+  hdmap::PncMap::CreatePathFromLaneSegments(segments, &path);
+  return SmoothReferenceLine(ReferenceLine(path), reference_line);
+}
+
+bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
+    const ReferenceLine &prefix_ref, const ReferenceLine &raw_ref,
+    ReferenceLine *reference_line) {
+  if (!FLAGS_enable_smooth_reference_line) {
+    *reference_line = raw_ref;
+    return true;
+  }
+  // generate anchor points:
+  std::vector<AnchorPoint> anchor_points;
+  GetAnchorPoints(raw_ref, &anchor_points);
+  // modify anchor points based on prefix_ref
+  for (auto &point : anchor_points) {
+    common::SLPoint sl_point;
+    Vec2d xy{point.path_point.x(), point.path_point.y()};
+    if (!prefix_ref.XYToSL(xy, &sl_point)) {
+      AERROR << "Failed to get projection for point: " << xy.DebugString();
+      return false;
+    }
+    if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
+      continue;
+    }
+    auto prefix_ref_point = prefix_ref.GetNearestReferencepoint(sl_point.s());
+    point.path_point.set_x(prefix_ref_point.x());
+    point.path_point.set_y(prefix_ref_point.y());
+    point.path_point.set_z(0.0);
+    point.path_point.set_theta(prefix_ref_point.heading());
+    point.path_point.set_dkappa(prefix_ref_point.dkappa());
+    point.longitudinal_bound = 1e-6;
+    point.lateral_bound = 1e-6;
+    point.enforced = true;
+    break;
+  }
+  smoother_->SetAnchorPoints(anchor_points);
+  if (!smoother_->Smooth(raw_ref, reference_line)) {
+    AERROR << "Failed to smooth reference line with anchor points";
+    return false;
+  }
+  if (!IsReferenceLineSmoothValid(raw_ref, *reference_line)) {
+    AERROR << "The smoothed reference line error is too large";
+    return false;
+  }
+  return true;
 }
 
 bool ReferenceLineProvider::SmoothReferenceLine(
-    const hdmap::RouteSegments &lanes, ReferenceLine *reference_line) {
-  hdmap::Path path;
-  hdmap::PncMap::CreatePathFromLaneSegments(lanes, &path);
+    const ReferenceLine &raw_reference_line, ReferenceLine *reference_line) {
   if (!FLAGS_enable_smooth_reference_line) {
-    *reference_line = ReferenceLine(path);
+    *reference_line = raw_reference_line;
     return true;
   }
-  ReferenceLine raw_reference_line(path);
   // generate anchor points:
   std::vector<AnchorPoint> anchor_points;
   GetAnchorPoints(raw_reference_line, &anchor_points);

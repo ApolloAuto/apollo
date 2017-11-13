@@ -76,7 +76,7 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   std::vector<AnchorPoint> anchor_points;
   const double interval = 10.0;
   int num_of_anchors =
-      std::max(1, static_cast<int>(reference_line_->Length() / interval + 0.5));
+      std::max(2, static_cast<int>(reference_line_->Length() / interval + 0.5));
   std::vector<double> anchor_s;
   common::util::uniform_slice(0.0, reference_line_->Length(),
                               num_of_anchors - 1, &anchor_s);
@@ -87,8 +87,8 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
     last_anchor.path_point = ref_point.ToPathPoint(s);
     // TODO(zhangliangliang): change the langitudianl and lateral direction in
     // code
-    last_anchor.longitudinal_bound = 2.0;
-    last_anchor.lateral_bound = 0.2;
+    last_anchor.lateral_bound = 2.0;
+    last_anchor.longitudinal_bound = 0.2;
   }
   anchor_points.front().longitudinal_bound = 1e-6;
   anchor_points.front().lateral_bound = 1e-6;

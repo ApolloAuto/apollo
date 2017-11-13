@@ -1,0 +1,55 @@
+<launch>
+    <arg name="velodyne16_calibration_online" default="true" />
+    <!--If 'velodyne16_calibration_online' is true, 'velodyne16_calibration_file' will not use  -->
+    <arg name="velodyne16_calibration_file" default="$(find velodyne_pointcloud)/params/VLP16_calibration.yaml"/>
+    <arg name="extrinsics_velodyne16" default="$(find velodyne_pointcloud)/params/velodyne16_novatel_extrinsics_example.yaml"/>
+    <arg name="velodyne16_frame_id" default="velodyne16"/>
+    <arg name="organized" default="false"/>
+    <arg name="min_range" default="0.9" />
+    <arg name="max_range_16" default="70.0" />
+    <arg name="rpm" default="600"/>
+    <!-- 16E_S3D_STRONGEST | 16E_S3D_LATEST | 16E_S3D_DUAL -->
+    <arg name="model" default="VLP16" />
+    <!-- 100ms -->
+    <arg name="tf_query_timeout" default="0.1"/>
+    <arg name="pcd_folder" value="/apollo/data/pcd" />
+
+  <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
+  </include>
+    <!--  HDL16E -->
+    <!--  driver nodelets -->
+  <include file="$(find velodyne_driver)/launch/driver_nodelet.launch">
+    <arg name="node_name" value="sensor_velodyne16_driver"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="rpm" value="$(arg rpm)"/>
+    <arg name="frame_id" value="$(arg velodyne16_frame_id)"/>
+    <arg name="topic" value="/apollo/sensor/velodyne16/VelodyneScanUnified"/>    
+  </include>
+  
+  <!-- start convert nodelet -->
+  <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
+    <arg name="node_name" value="sensor_velodyne16_convert"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="calibration_online" value="$(arg velodyne16_calibration_online)" />
+    <arg name="calibration" value="$(arg velodyne16_calibration_file)" />
+    <arg name="organized" value="$(arg organized)"/>
+    <arg name="min_range" value="$(arg min_range)" />
+    <arg name="max_range" value="$(arg max_range_16)" />
+    <arg name="topic_pointcloud" value="/apollo/sensor/velodyne16/PointCloud2"/>
+    <arg name="topic_packets" value="/apollo/sensor/velodyne16/VelodyneScanUnified"/>
+  </include>
+
+  <include file="$(find velodyne_pointcloud)/launch/pcd_exporter_nodelet.launch">
+    <arg name="pcd_folder" value="$(arg pcd_folder)"/>
+    <arg name="skip_static_frames" default="false"/>
+    <arg name="child_frame_id" default="velodyne16"/>
+    <arg name="stamp_file" default="$(arg pcd_folder)/stamp.txt"/>
+    <arg name="pose_file" default="$(arg pcd_folder)/pose.txt"/>
+    <arg name="topic_pointcloud" default="/apollo/sensor/velodyne16/PointCloud2"/>
+    <arg name="queue_size" default="10"/>
+  </include>
+
+  <node pkg="velodyne_pointcloud" type="extrinsics_broadcaster.py"
+    args="$(arg extrinsics_velodyne16)" name="static_transform_velodyne16" />
+
+</launch>

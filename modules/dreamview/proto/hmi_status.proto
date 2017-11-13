@@ -8,4 +8,5 @@ message HMIStatus {
   optional apollo.monitor.SystemStatus system_status = 1;
   optional string current_map = 2;
   optional string current_vehicle = 3;
+  optional string current_mode = 4 [default = "standard"];
 }

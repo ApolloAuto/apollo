@@ -153,6 +153,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_2d",
+        "//modules/common/math:math_utils",
         "//modules/common/math:vec2d",
         "@eigen//:eigen",
     ],

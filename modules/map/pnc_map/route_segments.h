@@ -123,11 +123,36 @@ class RouteSegments : public std::vector<LaneSegment> {
   const LaneWaypoint &RouteEndWaypoint() const;
   void SetRouteEndWaypoint(const LaneWaypoint &waypoint);
 
+  /** Stitch current route segments with the other route segment.
+   * @example
+   * Example 1
+   * this:   |--------A-----x-----B------|
+   * other:                 |-----B------x--------C-------|
+   * Result: |--------A-----x-----B------x--------C-------|
+   * In the above example, A-B is current route segments, and B-C is the other
+   * route segments. We update current route segments to A-B-C.
+   *
+   * Example 2
+   * this:                  |-----A------x--------B-------|
+   * other:  |--------C-----x-----A------|
+   * Result: |--------C-----x-----A------x--------B-------|
+   * In the above example, A-B is current route segments, and C-A is the other
+   * route segments. We update current route segments to C-A-B
+   *
+   * @return false if these two reference line cannot be stitched
+   */
+  bool Stitch(const RouteSegments &other);
+
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
 
   void SetId(const std::string &id);
   const std::string &Id() const;
+
+  /**
+   * Get the first waypoint from the lane segments.
+   */
+  LaneWaypoint FirstWaypoint() const;
 
   /**
    * Get the last waypoint from the lane segments.
@@ -139,11 +164,25 @@ class RouteSegments : public std::vector<LaneSegment> {
    */
   bool IsWaypointOnSegment(const LaneWaypoint &waypoint) const;
 
+  /**
+   * @brief Check if we can reach the other segment from current segment just
+   * by
+   * following lane.
+   * @param other Anothr route segment
+   */
+  bool IsConnectedSegment(const RouteSegments &other) const;
+
+  /**
+   * Copy the properties of other segments to current one
+   */
+  void SetProperties(const RouteSegments &other);
+
   static bool WithinLaneSegment(const LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
 
   static bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
+  static double Length(const RouteSegments &segments);
 
  private:
   LaneWaypoint route_end_waypoint_;

@@ -305,6 +305,23 @@ function start_fe() {
     start_fe_customized_path $MODULE $MODULE "$@"
 }
 
+function start_gdb_customized_path() {
+    MODULE_PATH=$1
+    MODULE=$2
+    shift 2
+
+    eval "gdb --args ${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
+        --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
+        --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
+}
+
+function start_gdb() {
+    MODULE=$1
+    shift
+
+    start_gdb_customized_path $MODULE $MODULE "$@"
+}
+
 function stop_customized_path() {
     MODULE_PATH=$1
     MODULE=$2
@@ -329,6 +346,7 @@ function help() {
   help: this help message
   start: start the module in background
   start_fe: start the module without putting in background
+  start_gdb: start the module with gdb
   stop: stop the module
   "
 }
@@ -344,6 +362,9 @@ function run_customized_path() {
             ;;
         start_fe)
             start_fe_customized_path $module_path $module "$@"
+            ;;
+        start_gdb)
+            start_gdb_customized_path $module_path $module "$@"
             ;;
         start_prof)
             start_prof_customized_path $module_path $module "$@"

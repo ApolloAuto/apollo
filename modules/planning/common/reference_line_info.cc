@@ -57,14 +57,20 @@ bool ReferenceLineInfo::Init() {
   const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
   Vec2d vec_to_center(
-      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
-      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0);
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
   Vec2d center(position + vec_to_center.rotate(path_point.theta()));
   common::math::Box2d box(center, path_point.theta(), param.length(),
                           param.width());
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
+  }
+  if (adc_sl_boundary_.end_s() < 0 ||
+      adc_sl_boundary_.start_s() > reference_line_.Length()) {
+    AWARN << "Vehicle SL " << adc_sl_boundary_.ShortDebugString()
+          << " is not on reference line:[0, " << reference_line_.Length()
+          << "]";
   }
   return true;
 }
@@ -257,7 +263,7 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
-  constexpr double kDestinationDeltaS = 2.0;
+  constexpr double kDestinationDeltaS = 0.05;
   const auto* dest_ptr = path_decision_.Find(FLAGS_destination_obstacle_id);
   if (!dest_ptr) {
     return false;

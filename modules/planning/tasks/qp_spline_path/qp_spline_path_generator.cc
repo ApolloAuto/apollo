@@ -37,6 +37,9 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+double GetLaneChangeLateralShift(const double v) { return -0.075 * v + 4.0; }
+}
 
 using Vec2d = apollo::common::math::Vec2d;
 
@@ -70,6 +73,7 @@ void QpSplinePathGenerator::SetChangeLane(bool is_change_lane_path) {
 bool QpSplinePathGenerator::Generate(
     const std::vector<const PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
+    const double boundary_extension, bool is_final_attempt,
     PathData* const path_data) {
   ADEBUG << "Init point: " << init_point.DebugString();
   init_trajectory_point_ = init_point;
@@ -89,7 +93,13 @@ bool QpSplinePathGenerator::Generate(
   }
 
   double start_s = init_frenet_point_.s();
-  double end_s = reference_line_.Length();
+
+  constexpr double kDefaultPathLength = 50.0;
+  double end_s = std::fmin(
+      init_frenet_point_.s() +
+          std::fmax(kDefaultPathLength,
+                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
+      reference_line_.Length());
 
   constexpr double kMinPathLength = 1.0e-6;
   if (start_s + kMinPathLength > end_s) {
@@ -113,7 +123,7 @@ bool QpSplinePathGenerator::Generate(
   }
   qp_frenet_frame.LogQpBound(planning_debug_);
 
-  if (!AddConstraint(qp_frenet_frame)) {
+  if (!AddConstraint(qp_frenet_frame, boundary_extension)) {
     AERROR << "Fail to setup pss path constraint.";
     return false;
   }
@@ -121,6 +131,10 @@ bool QpSplinePathGenerator::Generate(
   AddKernel();
 
   bool is_solved = Solve();
+
+  if (!is_solved && !is_final_attempt) {
+    return false;
+  }
 
   if (!is_solved) {
     AERROR << "Fail to solve qp_spline_path. Use reference line as qp_path "
@@ -245,19 +259,22 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   return true;
 }
 
-bool QpSplinePathGenerator::AddConstraint(
-    const QpFrenetFrame& qp_frenet_frame) {
+bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
+                                          const double boundary_extension) {
   Spline1dConstraint* spline_constraint =
       spline_generator_->mutable_spline_constraint();
 
   // add init status constraint, equality constraint
-  spline_constraint->AddPointConstraint(init_frenet_point_.s(),
-                                        init_frenet_point_.l() - ref_l_);
-  spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
-                                                  init_frenet_point_.dl());
+  const double kBoundaryEpsilon = 1e-4;
+  spline_constraint->AddPointConstraintInRange(init_frenet_point_.s(),
+                                               init_frenet_point_.l() - ref_l_,
+                                               kBoundaryEpsilon);
+  spline_constraint->AddPointDerivativeConstraintInRange(
+      init_frenet_point_.s(), init_frenet_point_.dl(), kBoundaryEpsilon);
+
   if (init_trajectory_point_.v() > qp_spline_path_config_.uturn_speed_limit()) {
-    spline_constraint->AddPointSecondDerivativeConstraint(
-        init_frenet_point_.s(), init_frenet_point_.ddl());
+    spline_constraint->AddPointSecondDerivativeConstraintInRange(
+        init_frenet_point_.s(), init_frenet_point_.ddl(), kBoundaryEpsilon);
   }
 
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
@@ -265,17 +282,23 @@ bool QpSplinePathGenerator::AddConstraint(
   // add end point constraint, equality constraint
   double lat_shift = -ref_l_;
   if (is_change_lane_path_) {
+    double lane_change_lateral_shift =
+        GetLaneChangeLateralShift(init_trajectory_point_.v());
     lat_shift = std::copysign(
-        std::fmin(std::fabs(ref_l_),
-                  qp_spline_path_config_.lane_change_lateral_shift()),
-        -ref_l_);
+        std::fmin(std::fabs(ref_l_), lane_change_lateral_shift), -ref_l_);
   }
 
   ADEBUG << "lat_shift = " << lat_shift;
-  spline_constraint->AddPointConstraint(
-      qp_spline_path_config_.point_constraint_s_position(), lat_shift);
+  const double kEndPointBoundaryEpsilon = 1e-2;
+  constexpr double kReservedDistance = 10.0;
+  spline_constraint->AddPointConstraintInRange(
+      std::fmin(qp_spline_path_config_.point_constraint_s_position(),
+                kReservedDistance + init_frenet_point_.s() +
+                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
+      lat_shift, kEndPointBoundaryEpsilon);
   if (!is_change_lane_path_) {
-    spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
+    spline_constraint->AddPointDerivativeConstraintInRange(
+        evaluated_s_.back(), 0.0, kEndPointBoundaryEpsilon);
   }
 
   // add first derivative bound to improve lane change smoothness
@@ -311,8 +334,10 @@ bool QpSplinePathGenerator::AddConstraint(
   }
 
   // add map bound constraint
-  const double lateral_buf =
-      qp_spline_path_config_.cross_lane_lateral_extension();
+  double lateral_buf = boundary_extension;
+  if (is_change_lane_path_) {
+    lateral_buf = qp_spline_path_config_.cross_lane_lateral_extension();
+  }
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
 
@@ -328,7 +353,6 @@ bool QpSplinePathGenerator::AddConstraint(
       road_boundary.second =
           std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
     }
-
     boundary_low.emplace_back(common::util::MaxElement(
         std::vector<double>{road_boundary.first, static_obs_boundary.first,
                             dynamic_obs_boundary.first}));
@@ -456,10 +480,10 @@ void QpSplinePathGenerator::AddKernel() {
 bool QpSplinePathGenerator::Solve() {
   if (!spline_generator_->Solve()) {
     for (size_t i = 0; i < knots_.size(); ++i) {
-      AERROR << "knots_[" << i << "]: " << knots_[i];
+      ADEBUG << "knots_[" << i << "]: " << knots_[i];
     }
     for (size_t i = 0; i < evaluated_s_.size(); ++i) {
-      AERROR << "evaluated_s_[" << i << "]: " << evaluated_s_[i];
+      ADEBUG << "evaluated_s_[" << i << "]: " << evaluated_s_[i];
     }
     AERROR << "Could not solve the qp problem in spline path generator.";
     return false;

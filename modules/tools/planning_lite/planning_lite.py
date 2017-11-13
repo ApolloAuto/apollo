@@ -24,7 +24,11 @@ from modules.drivers.proto import mobileye_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from path_decider import PathDecider
+from speed_decider import SpeedDecider
 from trajectory_generator import TrajectoryGenerator
+from provider_mobileye import MobileyeProvider
+from provider_chassis import ChassisProvider
+from provider_localization import LocalizationProvider
 
 planning_pub = None
 PUB_NODE_NAME = "planning"
@@ -33,33 +37,39 @@ f = open("benchmark.txt", "w")
 CRUISE_SPEED = 10  # m/s
 
 path_decider = PathDecider()
+speed_decider = SpeedDecider()
 traj_generator = TrajectoryGenerator()
+mobileye_provider = MobileyeProvider()
+chassis_provider = ChassisProvider()
+localization_provider = LocalizationProvider()
 
 nx = []
 ny = []
 
 
 def localization_callback(localization_pb):
-    speed_x = localization_pb.pose.linear_velocity.x
-    speed_y = localization_pb.pose.linear_velocity.y
-    acc_x = localization_pb.linear_acceleration.x
-    acc_y = localization_pb.linear_acceleration.y
+    localization_provider.update(localization_pb)
 
 
 def chassis_callback(chassis_pb):
-    global SPEED
-    SPEED = chassis_pb.speed_mps
-    path_decider.update_chassis_pb(chassis_pb)
+    chassis_provider.update(chassis_pb)
 
 
 def mobileye_callback(mobileye_pb):
     global nx, ny
     start_timestamp = time.time()
 
-    path_decider.update_mobileye_pb(mobileye_pb)
-    nx, ny = path_decider.get_path()
+    mobileye_provider.update(mobileye_pb)
+    mobileye_provider.process_obstacles()
 
-    adc_trajectory = traj_generator.generate(nx, ny, CRUISE_SPEED,
+    path_coef, path_length = path_decider.get_path(
+        mobileye_provider, chassis_provider)
+
+    speed, final_path_length = speed_decider.get_target_speed_and_path_length(
+        mobileye_provider, chassis_provider, path_length)
+
+    adc_trajectory = traj_generator.generate(path_coef, final_path_length,
+                                             speed,
                                              start_timestamp=start_timestamp)
     planning_pub.publish(adc_trajectory)
     f.write("duration: " + str(time.time() - start_timestamp) + "\n")
