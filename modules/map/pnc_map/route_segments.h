@@ -30,6 +30,7 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -99,10 +100,10 @@ class RouteSegments : public std::vector<LaneSegment> {
    * route segment.
    * @return false if error happended or projected outside of the lane segments.
    */
-  bool GetProjection(const common::PointENU &point_enu, double *s, double *l,
-                     LaneWaypoint *waypoint) const;
-  bool GetProjection(const common::math::Vec2d &point, double *s, double *l,
-                     LaneWaypoint *waypoint) const;
+  bool GetProjection(const common::PointENU &point_enu,
+                     common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
+  bool GetProjection(const common::math::Vec2d &point,
+                     common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
   /**
    * Check whether the map allows a vehicle can reach current RouteSegment
    * from
