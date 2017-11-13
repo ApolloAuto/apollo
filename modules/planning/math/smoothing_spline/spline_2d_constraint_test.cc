@@ -193,5 +193,196 @@ TEST(Spline2dConstraint, add_boundary_04) {
   }
 }
 
+TEST(Spline2dConstraint, add_point_angle_constraint_01) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  double t_coord = 0.0;
+  double angle = 45.0 * M_PI / 180.0;
+
+  constraint.AddPointAngleConstraint(t_coord, angle);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 8);
+  ref_mat <<
+    0, -0.707107, -0, -0, 0, 0.707107, 0, 0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(1, 1);
+  ref_boundary << 0.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
+TEST(Spline2dConstraint, add_point_angle_constraint_02) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  double t_coord = 0.0;
+  double angle = 0.0 * M_PI / 180.0;
+
+  constraint.AddPointAngleConstraint(t_coord, angle);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 8);
+  ref_mat <<
+    0, 0, -0, -0, 0, 1, 0, 0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(1, 1);
+  ref_boundary << 0.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
+TEST(Spline2dConstraint, add_point_angle_constraint_03) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  double t_coord = 0.0;
+  double angle = 60.0 * M_PI / 180.0;
+
+  constraint.AddPointAngleConstraint(t_coord, angle);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 8);
+  ref_mat <<
+    0, -0.866025, -0, -0, 0, 0.5, 0, 0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(1, 1);
+  ref_boundary << 0.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
+TEST(Spline2dConstraint, add_point_angle_constraint_04) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  double t_coord = 0.0;
+  double angle = 90.0 * M_PI / 180.0;
+
+  constraint.AddPointAngleConstraint(t_coord, angle);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 8);
+  ref_mat <<
+    0, -1, -0, -0, 0, 0.0, 0, 0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(1, 1);
+  ref_boundary << 0.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
+TEST(Spline2dConstraint, add_point_angle_constraint_05) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  double t_coord = 0.0;
+  double angle = 135.0 * M_PI / 180.0;
+
+  constraint.AddPointAngleConstraint(t_coord, angle);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 8);
+  ref_mat <<
+    0, -0.707107, -0, -0, 0, -0.707107, 0, 0;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-6);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(1, 1);
+  ref_boundary << 0.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
+TEST(Spline2dConstraint, add_point_angle_constraint_06) {
+  std::vector<double> x_knots = {0.0, 1.0};
+  int32_t spline_order = 3;
+  Spline2dConstraint constraint(x_knots, spline_order);
+
+  double t_coord = 1.0;
+  double angle = 60.0 * M_PI / 180.0;
+
+  constraint.AddPointAngleConstraint(t_coord, angle);
+  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto boundary = constraint.equality_constraint().constraint_boundary();
+
+  // clang-format off
+  Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 8);
+  ref_mat << 0, -0.866025, -1.73205, -2.59808, 0, 0.5, 1, 1.5;
+  // clang-format on
+
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      EXPECT_NEAR(mat(i, j), ref_mat(i, j), 1e-5);
+    }
+  }
+
+  Eigen::MatrixXd ref_boundary = Eigen::MatrixXd::Zero(1, 1);
+  ref_boundary << 0.0;
+
+  for (int i = 0; i < ref_boundary.rows(); ++i) {
+    EXPECT_NEAR(boundary(i, 0), ref_boundary(i, 0), 1e-5);
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
