@@ -162,14 +162,24 @@ bool QpSplineReferenceLineSmoother::AddConstraint() {
   }
 
   auto* spline_constraint = spline_solver_->mutable_constraint();
+
+  // all points (x, y) should not deviate anchor points by a bounding box
   if (!spline_constraint->Add2dBoundary(evaluated_t, headings, xy_points,
                                         longitudinal_bound, lateral_bound)) {
-    AERROR << "Add 2d boundary constraint failed";
+    AERROR << "Add 2d boundary constraint failed.";
     return false;
   }
 
+  // the heading of the first point should be identical to the anchor point.
+  if (!spline_constraint->AddPointAngleConstraint(evaluated_t.front(),
+                                                  headings.front())) {
+    AERROR << "Add 2d point angle constraint failed.";
+    return false;
+  }
+
+  // all spline should be connected smoothly to the second order derivative.
   if (!spline_constraint->AddSecondDerivativeSmoothConstraint()) {
-    AERROR << "Add jointness constraint failed";
+    AERROR << "Add jointness constraint failed.";
     return false;
   }
 
