@@ -20,9 +20,11 @@
 #include <array>
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
 #include <string>
 
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/planning/proto/lattice_sampling_config.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/common/obstacle.h"
@@ -45,6 +47,12 @@ class ADCNeighborhood {
       std::array<double, 3>* backward_nearest_obstacle_state,
       double* enter_time);
 
+  void GetCriticalConditions(
+      std::vector<CriticalCondition>* critical_conditions);
+
+  const CriticalCondition& GetCriticalCondition(
+      const std::string& obstacle_id);
+
   bool IsInNeighborhood(const Obstacle* obstacle) const;
 
   bool IsForward(const Obstacle* obstacle) const;
@@ -66,6 +74,15 @@ class ADCNeighborhood {
       const apollo::common::TrajectoryPoint& planning_init_point,
       const ReferenceLine& reference_line);
 
+  double SpeedOnReferenceLine(
+      const std::vector<apollo::common::PathPoint>& discretized_ref_points,
+      const Obstacle* obstacle,
+      const SLBoundary& sl_boundary);
+
+  void SetCriticalPoint(
+      const double t, const double s, const double v,
+      CriticalPoint* critical_point);
+
  private:
   std::array<double, 3> init_s_;
   std::array<double, 3> init_d_;
@@ -73,6 +90,8 @@ class ADCNeighborhood {
   std::vector<std::array<double, 5>> forward_neighborhood_;
   // array of [t, start_s, end_s, s_dot, s_dotdot]
   std::vector<std::array<double, 5>> backward_neighborhood_;
+  // obstacle_id -> critical conditions
+  std::unordered_map<std::string, CriticalCondition> critical_conditions_;
 
   std::unordered_set<std::string> forward_obstacle_id_set_;
   std::unordered_set<std::string> backward_obstacle_id_set_;
