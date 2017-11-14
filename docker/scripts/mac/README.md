@@ -1,7 +1,7 @@
 # Docker Scripts for MacOS
 
 **Hackers only!** Note that we always recommend to run Apollo on Ubuntu. Other
-platforms may not be full featured and lack of testing.
+platforms may be not full featured and lack of testing.
 
 ## Prerequisites
 
