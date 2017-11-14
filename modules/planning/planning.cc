@@ -145,9 +145,10 @@ bool Planning::IsVehicleStateValid(
 }
 
 Status Planning::Start() {
-  ReferenceLineProvider::instance()->Start();
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
+  ReferenceLineProvider::instance()->Start();
+  AINFO << "Planning started";
   return Status::OK();
 }
 
