@@ -35,14 +35,17 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-TcpStream::TcpStream(const char* address, uint16_t port, uint32_t timeout_usec)
-    : _sockfd(-1), _errno(0) {
+TcpStream::TcpStream(const char* address, uint16_t port, uint32_t timeout_usec,
+                     bool auto_reconnect)
+    : _sockfd(-1), _errno(0), _auto_reconnect(auto_reconnect) {
   _peer_addr = inet_addr(address);
   _peer_port = htons(port);
   _timeout_usec = timeout_usec;
 }
 
-TcpStream::~TcpStream() { this->close(); }
+TcpStream::~TcpStream() {
+  this->close();
+}
 
 void TcpStream::open() {
   int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -134,6 +137,16 @@ void TcpStream::close() {
   }
 }
 
+bool TcpStream::reconnect() {
+  if (_auto_reconnect) {
+    disconnect();
+    if (connect()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool TcpStream::connect() {
   if (_sockfd < 0) {
     this->open();
@@ -166,7 +179,7 @@ bool TcpStream::connect() {
   while ((ret = ::connect(_sockfd, reinterpret_cast<sockaddr*>(&peer_addr),
                           sizeof(peer_addr))) < 0) {
     if (errno == EINTR) {
-      ROS_INFO("Tcp connect return EINTR.");
+      ROS_INFO("Tcp connect return EINTR, continue.");
       continue;
     } else {
       if ((errno != EISCONN) && (errno != EINPROGRESS) && (errno != EALREADY)) {
@@ -242,8 +255,7 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
   ssize_t ret = 0;
 
   if (_status != Stream::Status::CONNECTED) {
-    disconnect();
-    connect();
+    reconnect();
     if (_status != Stream::Status::CONNECTED) {
       return 0;
     }
@@ -272,8 +284,7 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
     _status = Stream::Status::ERROR;
     _errno = errno;
     ROS_ERROR("Remote closed.");
-    disconnect();
-    if (connect()) {
+    if (reconnect()) {
       ROS_INFO("Reconnect tcp success.");
     }
   }
@@ -285,8 +296,7 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
   size_t total_nsent = 0;
 
   if (_status != Stream::Status::CONNECTED) {
-    disconnect();
-    connect();
+    reconnect();
     if (_status != Stream::Status::CONNECTED) {
       return 0;
     }

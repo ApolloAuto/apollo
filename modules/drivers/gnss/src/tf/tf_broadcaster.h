@@ -17,14 +17,13 @@
 #ifndef MODULES_DRIVERS_GNSS_TF_BROADCASTER_H_
 #define MODULES_DRIVERS_GNSS_TF_BROADCASTER_H_
 
+#include <geometry_msgs/TransformStamped.h>
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
 
-#include "data_parser.h"
 #include "gnss/parser.h"
 
 #include "modules/localization/proto/gps.pb.h"
@@ -48,8 +47,8 @@ class TFBroadcaster {
   ros::Subscriber _odometry_sub;
   tf2_ros::TransformBroadcaster _broadcaster;
 
-  void gps_to_transform_stamped(const localization::Gps& gps, 
-                             geometry_msgs::TransformStamped* transform);
+  void gps_to_transform_stamped(const localization::Gps& gps,
+                                geometry_msgs::TransformStamped* transform);
   void odometry_callback(const boost::shared_ptr<const localization::Gps>& gps);
 };
 

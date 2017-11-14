@@ -41,15 +41,20 @@ void ParserNodelet::onInit() {
   ros::NodeHandle& nh = getPrivateNodeHandle();
   std::string gnss_conf;
   std::string raw_data_topic;
+  std::string imu_topic;
   std::string ins_stat_topic;
   std::string corr_imu_topic;
   std::string odometry_topic;
   std::string gnss_status_topic;
   std::string ins_status_topic;
+  std::string bestpos_topic;
+  std::string eph_topic;
+  std::string observation_topic;
 
   nh.param("gnss_conf", gnss_conf, std::string("./conf/gnss_conf.txt"));
   nh.param("raw_data_topic", raw_data_topic,
            std::string("/apollo/sensor/gnss/raw_data"));
+  nh.param("imu_topic", imu_topic, std::string("/apollo/sensor/gnss/imu"));
   nh.param("ins_stat_topic", ins_stat_topic,
            std::string("/apollo/sensor/gnss/ins_stat"));
   nh.param("corr_imu_topic", corr_imu_topic,
@@ -60,10 +65,16 @@ void ParserNodelet::onInit() {
            std::string("/apollo/sensor/gnss/gnss_status"));
   nh.param("ins_status_topic", ins_status_topic,
            std::string("/apollo/sensor/gnss/ins_status"));
+  nh.param("bestpos", bestpos_topic,
+           std::string("/apollo/sensor/gnss/best_pose"));
+  nh.param("eph", eph_topic, std::string("/apollo/sensor/gnss/rtk_eph"));
+  nh.param("observation", observation_topic,
+           std::string("/apollo/sensor/gnss/rtk_obs"));
 
-  _data_parser.reset(new DataParser(nh, raw_data_topic, ins_stat_topic,
-                                    corr_imu_topic, odometry_topic,
-                                    gnss_status_topic, ins_status_topic));
+  _data_parser.reset(new DataParser(
+      nh, raw_data_topic, imu_topic, ins_stat_topic, corr_imu_topic,
+      odometry_topic, gnss_status_topic, ins_status_topic, bestpos_topic,
+      eph_topic, observation_topic));
   if (!_data_parser->init(gnss_conf)) {
     ROS_ERROR("Init parser nodelet failed.");
     ROS_ERROR_STREAM("Init parser nodelet failed.");

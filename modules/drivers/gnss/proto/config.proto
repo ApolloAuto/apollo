@@ -49,6 +49,7 @@ message Stream {
     Udp udp = 4;
     Ntrip ntrip = 5;
   }
+  optional bool push_location = 6;
 }
 
 // Device-specific configuration.
