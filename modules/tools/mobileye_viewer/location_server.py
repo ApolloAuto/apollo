@@ -22,6 +22,7 @@ import math
 import thread
 import requests
 import json
+from std_msgs.msg import String
 from flask import jsonify
 from flask import Flask
 from flask import request
@@ -36,6 +37,7 @@ CORS(app)
 lat = 37.415889
 lon = -122.014505
 API_KEY = ""
+routing_pub = None
 
 
 def localization_callback(localization_pb):
@@ -47,10 +49,13 @@ def localization_callback(localization_pb):
 
 
 def add_listener():
+    global routing_pub
     rospy.init_node("map_server", anonymous=True)
     rospy.Subscriber('/apollo/localization/pose',
                      localization_pb2.LocalizationEstimate,
                      localization_callback)
+    routing_pub = rospy.Publisher('/apollo/navigation/routing',
+                    String, queue_size=1)
 
 
 @app.route('/', methods=["POST", "GET"])
@@ -79,14 +84,18 @@ def routing():
     if len(response['routes']) < 1:
         return jsonify(path)
     steps = response['routes'][0]['legs'][0]['steps']
+
     for step in steps:
         start_loc = step['start_location']
         end_loc = step['end_location']
         path.append({'lat': start_loc['lat'], 'lng': start_loc['lng']})
         points = decode_polyline(step['polyline']['points'])
+        step['polyline']['points'] = points
         for point in points:
             path.append({'lat': point[0], 'lng': point[1]})
         path.append({'lat': end_loc['lat'], 'lng': end_loc['lng']})
+
+    routing_pub.publish(json.dumps(steps))
     return jsonify(path)
 
 
