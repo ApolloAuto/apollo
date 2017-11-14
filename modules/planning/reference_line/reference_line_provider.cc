@@ -385,7 +385,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
   constexpr double kReferenceLineDiffCheckStep = 10.0;
-  for (double s = 0.0; s + kReferenceLineDiffCheckStep / 2.0 < raw.Length();
+  for (double s = 0.0; s < smoothed.Length();
        s += kReferenceLineDiffCheckStep) {
     auto xy_new = smoothed.GetReferencePoint(s);
 
@@ -476,7 +476,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
 
   smoother_->SetAnchorPoints(anchor_points);
   if (!smoother_->Smooth(raw_ref, reference_line)) {
-    AERROR << "Failed to smooth reference line with anchor points";
+    AERROR << "Failed to smooth prefixed reference line with anchor points";
     return false;
   }
   if (!IsReferenceLineSmoothValid(raw_ref, *reference_line)) {
