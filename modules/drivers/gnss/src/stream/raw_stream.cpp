@@ -21,7 +21,7 @@
 #include <std_msgs/String.h>
 
 #include "gnss/stream.h"
-#include "gnss/utils.h"
+#include "util/utils.h"
 #include "proto/config.pb.h"
 #include "raw_stream.h"
 
@@ -126,7 +126,7 @@ RawStream::RawStream(ros::NodeHandle &nh, const std::string &name,
     : _raw_data_topic(raw_data_topic),
       _rtcm_data_topic(rtcm_data_topic),
       _raw_data_publisher(nh.advertise<std_msgs::String>(_raw_data_topic, 256)),
-      _rtcm_data_publisher(
+      _rtk_data_publisher(
           nh.advertise<std_msgs::String>(_rtcm_data_topic, 256)),
       _stream_status_publisher(
           nh.advertise<apollo::common::gnss_status::StreamStatus>(
@@ -205,6 +205,11 @@ bool RawStream::init(const std::string &cfg_file) {
     }
     _in_rtk_stream.reset(s);
 
+    if (_config.rtk_from().has_push_location()) {
+      _push_location = _config.rtk_from().push_location();
+    }
+
+
     status = new Status();
     if (!status) {
       ROS_ERROR("Failed to create rtk_from stream status.");
@@ -259,7 +264,7 @@ bool RawStream::init(const std::string &cfg_file) {
   }
 
   _data_thread_ptr.reset(new std::thread(&RawStream::data_spin, this));
-  _ntrip_thread_ptr.reset(new std::thread(&RawStream::ntrip_spin, this));
+  _rtk_thread_ptr.reset(new std::thread(&RawStream::rtk_spin, this));
 
   return true;
 }
@@ -426,36 +431,65 @@ void RawStream::data_spin() {
       }
       msg_pub->data.assign(reinterpret_cast<const char *>(_buffer), length);
       _raw_data_publisher.publish(msg_pub);
+
+      if (_push_location) {
+        push_gpgga(length);
+      }
     }
     stream_status_check();
   }
 }
 
-void RawStream::ntrip_spin() {
+void RawStream::rtk_spin() {
   if (_in_rtk_stream == nullptr) {
     return;
   }
   while (ros::ok()) {
-    size_t length = _in_rtk_stream->read(_buffer_ntrip, BUFFER_SIZE);
+    size_t length = _in_rtk_stream->read(_buffer_rtk, BUFFER_SIZE);
     if (length > 0) {
       if (_rtk_software_solution) {
-        std_msgs::StringPtr rtkmsg_pub(new std_msgs::String);
-        if (!rtkmsg_pub) {
-          ROS_ERROR("New rtkmsg failed.");
-          continue;
-        }
-        rtkmsg_pub->data.assign(reinterpret_cast<const char *>(_buffer_ntrip),
-                                length);
-        _rtcm_data_publisher.publish(rtkmsg_pub);
+        publish_rtk_data(length);
       } else {
+        publish_rtk_data(length);
         if (_out_rtk_stream == nullptr) {
           continue;
         }
-        size_t ret = _out_rtk_stream->write(_buffer_ntrip, length);
+        size_t ret = _out_rtk_stream->write(_buffer_rtk, length);
         if (ret != length) {
           ROS_ERROR_STREAM("Expect write out rtk stream bytes "
                            << length << " but got " << ret);
         }
+      }
+    }
+  }
+}
+
+void RawStream::publish_rtk_data(size_t length) {
+  std_msgs::StringPtr rtkmsg_pub(new std_msgs::String);
+  if (!rtkmsg_pub) {
+    ROS_ERROR("New rtkmsg failed.");
+    return;
+  }
+
+  rtkmsg_pub->data.assign(reinterpret_cast<const char *>(_buffer_rtk),
+                          length);
+  _rtk_data_publisher.publish(rtkmsg_pub);
+}
+
+void RawStream::push_gpgga(size_t length) {
+  if (!_in_rtk_stream) {
+    return;
+  }
+
+  char *gpgga = strstr(reinterpret_cast<char*>(_buffer), "$GPGGA");
+  if (gpgga) {
+    char *p = strchr(gpgga, '*');
+    if (p) {
+      p += 5;
+      if ((p - reinterpret_cast<char*>(_buffer)) <= length) {
+        ROS_INFO_THROTTLE(5, "Push gpgga.");
+        _in_rtk_stream->write(reinterpret_cast<uint8_t*>(gpgga),
+                              reinterpret_cast<uint8_t*>(p) - _buffer);
       }
     }
   }

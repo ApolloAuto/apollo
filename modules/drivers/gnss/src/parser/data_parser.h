@@ -38,11 +38,14 @@ namespace gnss {
 
 class DataParser {
  public:
-  DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
+  DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic, const std::string &imu_topic,
              const std::string &gpgga_topic, const std::string &corr_imu_topic,
              const std::string &odometry_topic,
              const std::string &gnss_status_topic,
-             const std::string &ins_status_topic);
+             const std::string &ins_status_topic,
+             const std::string &bestpos_topic,
+             const std::string &eph_topic,
+             const std::string &observation_topic);
   ~DataParser() {}
   bool init(const std::string &cfg_file);
 
@@ -50,9 +53,12 @@ class DataParser {
   void raw_data_callback(const std_msgs::String::ConstPtr &msg);
   void dispatch_message(Parser::MessageType type, MessagePtr message);
   void publish_ins_stat(const MessagePtr message);
-  void publish_odometry_pb_message(const MessagePtr message);
-  void publish_corrimu_pb_message(const MessagePtr message);
-  void publish_ins_message(const MessagePtr message);
+  void publish_odometry_message(const MessagePtr message);
+  void publish_corrimu_message(const MessagePtr message);
+  void publish_imu_message(const MessagePtr message);
+  void publish_bestpos_message(const MessagePtr message);
+  void publish_ephemeris(const MessagePtr message);
+  void publish_observation(const MessagePtr message);
   void check_ins_status(drivers::gnss::Ins *ins);
   void check_gnss_status(drivers::gnss::Gnss *gnss);
 
@@ -61,11 +67,14 @@ class DataParser {
 
   const ros::Subscriber _raw_data_sub;
   const ros::Publisher _ins_stat_publisher;
+  const ros::Publisher _raw_imu_publisher;
   const ros::Publisher _imu_publisher;
   const ros::Publisher _nav_odometry_publisher;
   const ros::Publisher _gnss_status_publisher;
   const ros::Publisher _ins_status_publisher;
-  const ros::Publisher _ins_publisher;
+  const ros::Publisher _bestpos_publisher;
+  const ros::Publisher _ephemeris_publisher;
+  const ros::Publisher _observation_publisher;
 
   boost::shared_ptr<apollo::common::gnss_status::GnssStatus> _gnss_status;
   boost::shared_ptr<apollo::common::gnss_status::InsStatus> _ins_status;

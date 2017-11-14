@@ -14,47 +14,45 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_GNSS_TF_BROADCASTER_H_
-#define MODULES_DRIVERS_GNSS_TF_BROADCASTER_H_
+#ifndef MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
+#define MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
 
-#include <nodelet/nodelet.h>
-#include <pluginlib/class_list_macros.h>
+#include <memory>
+
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
 
-#include "data_parser.h"
 #include "gnss/parser.h"
-
-#include "modules/localization/proto/gps.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace gnss {
 
-class TFBroadcaster {
+class RtcmParser {
  public:
-  TFBroadcaster(const ros::NodeHandle& nh) : _nh(nh) {}
-  ~TFBroadcaster() {}
-
-  void init();
+  RtcmParser(ros::NodeHandle &nh,
+             const std::string &rtcm_data_topic,
+             const std::string &eph_topic,
+             const std::string &observation_topic);
+  ~RtcmParser() {}
+  bool init();
 
  private:
-  std::string _odometry_topic;
-  std::string _frame_id;
-  std::string _child_frame_id;
-  ros::NodeHandle _nh;
-  ros::Subscriber _odometry_sub;
-  tf2_ros::TransformBroadcaster _broadcaster;
+  void rtcm_data_callback(const std_msgs::String::ConstPtr &msg);
+  void dispatch_message(Parser::MessageType type, MessagePtr message);
+  void publish_ephemeris(const MessagePtr message);
+  void publish_observation(const MessagePtr message);
 
-  void gps_to_transform_stamped(const localization::Gps& gps, 
-                             geometry_msgs::TransformStamped* transform);
-  void odometry_callback(const boost::shared_ptr<const localization::Gps>& gps);
+  bool _inited_flag = false;
+  std::unique_ptr<Parser> _rtcm_parser;
+
+  const ros::Subscriber _rtcm_data_sub;
+  const ros::Publisher _ephemeris_publisher;
+  const ros::Publisher _observation_publisher;
 };
 
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_TF_BROADCASTER_H_
+#endif  // MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
