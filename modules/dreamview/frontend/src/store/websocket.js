@@ -46,6 +46,7 @@ class WebSocketEndpoint {
                     RENDERER.updateWorld(message.world);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
+                    STORE.trafficSignal.update(message.world);
                     if (STORE.options.showPNCMonitor) {
                         STORE.planning.update(message.world);
                     }

@@ -687,26 +687,10 @@ body {
         width: 224px;
         height: 35px;
 
-        .green {
+        .traffic-light {
             position: absolute;
             top: 4px;
             left: 4px;
-            width: 28px;
-            height: 28px;
-        }
-
-        .yellow {
-            position: absolute;
-            top: 4px;
-            left: 35px;
-            width: 28px;
-            height: 28px;
-        }
-
-        .red {
-            position: absolute;
-            top: 4px;
-            left: 68px;
             width: 28px;
             height: 28px;
         }
@@ -802,7 +786,7 @@ body {
     overflow: hidden;
 
     .controller {
-        min-width: 150px;
+        min-width: 180px;
     }
 
     .modules-container {
