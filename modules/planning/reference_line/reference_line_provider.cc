@@ -217,11 +217,13 @@ bool ReferenceLineProvider::CreateRouteSegments(
   common::math::Vec2d point;
   point.set_x(vehicle_state.x());
   point.set_y(vehicle_state.y());
-  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-  if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
-                                  look_forward_distance, segments)) {
-    AERROR << "Failed to extract segments from routing";
-    return false;
+  {
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
+                                    look_forward_distance, segments)) {
+      AERROR << "Failed to extract segments from routing";
+      return false;
+    }
   }
   bool is_allow_change_lane = IsAllowChangeLane(point, *segments);
   for (auto iter = segments->begin(); iter != segments->end();) {
@@ -337,8 +339,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   std::unique_lock<std::mutex> lock(pnc_map_mutex_);
   if (!pnc_map_->ExtendSegments(*prev_segment, future_start_s, future_end_s,
                                 &shifted_segments)) {
-    AERROR << "Failed to shift route segments forward";
     lock.unlock();
+    AERROR << "Failed to shift route segments forward";
     return SmoothRouteSegment(*segments, reference_line);
   }
   lock.unlock();
@@ -346,7 +348,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   hdmap::PncMap::CreatePathFromLaneSegments(shifted_segments, &path);
   ReferenceLine new_ref(path);
   if (!SmoothPrefixedReferenceLine(*prev_ref, new_ref, reference_line)) {
-    AERROR << "Failed to smooth forward shifted reference line";
+    AWARN << "Failed to smooth forward shifted reference line";
     return SmoothRouteSegment(*segments, reference_line);
   }
   if (!reference_line->Stitch(*prev_ref)) {
@@ -361,8 +363,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   segments->SetProperties(segment_properties);
   common::SLPoint sl;
   if (!reference_line->XYToSL(vec2d, &sl)) {
-    AERROR << "Failed to project point: " << vec2d.DebugString()
-           << " to stitched reference line";
+    AWARN << "Failed to project point: " << vec2d.DebugString()
+          << " to stitched reference line";
   }
   if (sl.s() > FLAGS_look_backward_distance * 1.5) {
     ADEBUG << "reference line back side is " << sl.s()
