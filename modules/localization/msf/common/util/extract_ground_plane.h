@@ -84,6 +84,60 @@ class FeatureXYPlane {
     return non_xy_plane_cloud_;
   }
 
+  void ExtractXYPlane(const PointCloudPtrT& cloud) {
+    xy_plane_cloud_.reset(new PointCloudT);
+    PointCloudPtrT pointcloud_ptr(new PointCloudT);
+    pcl::copyPointCloud<PointT>(*cloud, *pointcloud_ptr);
+    int iter_num = log2(max_grid_size_ / min_grid_size_);
+    if (iter_num == 0) {
+      iter_num = 1;
+    }
+    std::clock_t plane_time;
+    plane_time = std::clock();
+    int total_plane_num = 0;
+    for (int iter = 0; iter <= iter_num; ++iter) {
+      double grid_size = max_grid_size_ / Power2(iter);
+      VoxelGridCovariance<PointT> vgc;
+      vgc.setInputCloud(pointcloud_ptr);
+      vgc.SetMinPointPerVoxel(min_planepoints_number_);
+      vgc.setLeafSize(grid_size, grid_size, grid_size);
+      vgc.Filter(false);
+
+      PointCloudT cloud_tmp;
+      int plane_num = 0;
+      typename std::map<size_t, VoxelGridCovariance<PointT>::Leaf>::iterator it;
+      for (it = vgc.GetLeaves().begin(); it != vgc.GetLeaves().end(); it++) {
+        if (it->second.GetPointCount() < min_planepoints_number_) {
+          cloud_tmp += it->second.cloud_;
+          continue;
+        }
+        PointCloudT cloud_outlier;
+        if (GetPlaneFeaturePoint(it->second.cloud_, cloud_outlier)) {
+          cloud_tmp += cloud_outlier;
+          plane_num++;
+        } else {
+          cloud_tmp += it->second.cloud_;
+        }
+      }
+      std::cerr << "the " << iter << " interation: plane_num = " << plane_num
+                << std::endl;
+      total_plane_num += plane_num;
+      pointcloud_ptr.reset(new PointCloudT);
+      *pointcloud_ptr = cloud_tmp;
+    }
+
+    *non_xy_plane_cloud_ = *pointcloud_ptr;
+    plane_time = std::clock() - plane_time;
+    std::cerr << "plane_patch takes:"
+              << static_cast<double>(plane_time) / CLOCKS_PER_SEC << "sec."
+              << std::endl;
+    std::cerr << "total_plane_num = " << total_plane_num << std::endl;
+    std::cerr << "total_points_num = " << xy_plane_cloud_->points.size()
+              << std::endl;
+    return;
+  }
+
+ private:
   bool GetPlaneFeaturePoint(PointCloudT& cloud, PointCloudT& cloud_outlier) {
     // ransac plane
     std::vector<int> inliers;
@@ -143,59 +197,6 @@ class FeatureXYPlane {
       result *= 2.0;
     }
     return result;
-  }
-
-  void ExtractXYPlane(const PointCloudPtrT& cloud) {
-    xy_plane_cloud_.reset(new PointCloudT);
-    PointCloudPtrT pointcloud_ptr(new PointCloudT);
-    pcl::copyPointCloud<PointT>(*cloud, *pointcloud_ptr);
-    int iter_num = log2(max_grid_size_ / min_grid_size_);
-    if (iter_num == 0) {
-      iter_num = 1;
-    }
-    std::clock_t plane_time;
-    plane_time = std::clock();
-    int total_plane_num = 0;
-    for (int iter = 0; iter <= iter_num; ++iter) {
-      double grid_size = max_grid_size_ / Power2(iter);
-      VoxelGridCovariance<PointT> vgc;
-      vgc.setInputCloud(pointcloud_ptr);
-      vgc.SetMinPointPerVoxel(min_planepoints_number_);
-      vgc.setLeafSize(grid_size, grid_size, grid_size);
-      vgc.Filter(false);
-
-      PointCloudT cloud_tmp;
-      int plane_num = 0;
-      typename std::map<size_t, VoxelGridCovariance<PointT>::Leaf>::iterator it;
-      for (it = vgc.GetLeaves().begin(); it != vgc.GetLeaves().end(); it++) {
-        if (it->second.GetPointCount() < min_planepoints_number_) {
-          cloud_tmp += it->second.cloud_;
-          continue;
-        }
-        PointCloudT cloud_outlier;
-        if (GetPlaneFeaturePoint(it->second.cloud_, cloud_outlier)) {
-          cloud_tmp += cloud_outlier;
-          plane_num++;
-        } else {
-          cloud_tmp += it->second.cloud_;
-        }
-      }
-      std::cerr << "the " << iter << " interation: plane_num = " << plane_num
-                << std::endl;
-      total_plane_num += plane_num;
-      pointcloud_ptr.reset(new PointCloudT);
-      *pointcloud_ptr = cloud_tmp;
-    }
-
-    *non_xy_plane_cloud_ = *pointcloud_ptr;
-    plane_time = std::clock() - plane_time;
-    std::cerr << "plane_patch takes:"
-              << static_cast<double>(plane_time) / CLOCKS_PER_SEC << "sec."
-              << std::endl;
-    std::cerr << "total_plane_num = " << total_plane_num << std::endl;
-    std::cerr << "total_points_num = " << xy_plane_cloud_->points.size()
-              << std::endl;
-    return;
   }
 
  private:
