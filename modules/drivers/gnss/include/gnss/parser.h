@@ -54,8 +54,8 @@ class Parser {
   // Return a pointer to a NovAtel parser. The caller should take ownership.
   static Parser *create_novatel();
 
-  // Return a pointer to a u-blox parser. The caller should take ownership.
-  static Parser *create_ublox();
+  // Return a pointer to rtcm v3 parser. The caller should take ownership.
+  static Parser *create_rtcm_v3(bool is_base_station = false);
 
   virtual ~Parser() {}
 
@@ -86,6 +86,7 @@ class Parser {
     RAWIMU,
     GPSEPHEMERIDES,
     GLOEPHEMERIDES,
+    BEST_GNSS_POS,
   };
 
   // Gets a parsed protobuf message. The caller must consume the message before
