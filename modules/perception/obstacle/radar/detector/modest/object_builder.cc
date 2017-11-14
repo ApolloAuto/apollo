@@ -87,9 +87,9 @@ void ObjectBuilder::build(const RadarObsArray &raw_obstacles,
     vel_rms(0, 0) = raw_obstacles.contiobs(i).longitude_vel_rms();
     vel_rms(1, 1) = raw_obstacles.contiobs(i).lateral_vel_rms();
     object_ptr->position_uncertainty = radar_pose.topLeftCorner(3, 3) *
-        dist_rms * dist_rms * radar_pose.topLeftCorner(3, 3).inverse();
+        dist_rms * dist_rms * radar_pose.topLeftCorner(3, 3).transpose();
     object_ptr->velocity_uncertainty = radar_pose.topLeftCorner(3, 3) *
-        vel_rms * vel_rms * radar_pose.topLeftCorner(3, 3).inverse();
+        vel_rms * vel_rms * radar_pose.topLeftCorner(3, 3).transpose();
 
     double local_theta = raw_obstacles.contiobs(i).oritation_angle() / 180.0 * PI;
     Eigen::Vector3f direction = Eigen::Vector3f(cos(local_theta), sin(local_theta), 0);
