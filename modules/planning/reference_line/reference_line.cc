@@ -355,6 +355,11 @@ bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
   return IsOnRoad(sl_point);
 }
 
+bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
+                                double gap) const {
+  return map_path_.OverlapWith(box2d, gap);
+}
+
 bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
   if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;
