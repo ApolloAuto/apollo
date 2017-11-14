@@ -290,6 +290,8 @@ bool ReferenceLineProvider::CreateReferenceLine(
 bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
                                                 RouteSegments *segments,
                                                 ReferenceLine *reference_line) {
+  RouteSegments segment_properties;
+  segment_properties.SetProperties(*segments);
   auto prev_segment = route_segments_.begin();
   auto prev_ref = reference_lines_.begin();
   while (prev_segment != route_segments_.end()) {
@@ -319,6 +321,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   const double look_forward_required_distance = LookForwardDistance(state);
   if (remain_s > look_forward_required_distance) {
     *segments = *prev_segment;
+    segments->SetProperties(segment_properties);
     *reference_line = *prev_ref;
     ADEBUG << "Reference line remain " << remain_s
            << ", which is more than required " << look_forward_required_distance
@@ -355,6 +358,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     return SmoothRouteSegment(*segments, reference_line);
   }
   *segments = shifted_segments;
+  segments->SetProperties(segment_properties);
   common::SLPoint sl;
   if (!reference_line->XYToSL(vec2d, &sl)) {
     AERROR << "Failed to project point: " << vec2d.DebugString()

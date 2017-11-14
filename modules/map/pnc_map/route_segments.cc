@@ -128,18 +128,19 @@ bool RouteSegments::GetProjection(const common::PointENU &point_enu,
 }
 
 bool RouteSegments::IsConnectedSegment(const RouteSegments &other) const {
-  if (Id() == other.Id()) {
-    return true;
-  }
-  if (other.empty()) {
+  if (empty() || other.empty()) {
     return false;
   }
-  LaneWaypoint start_point(front().lane, front().start_s);
-  if (IsWaypointOnSegment(start_point)) {
+  if (IsWaypointOnSegment(other.FirstWaypoint())) {
     return true;
   }
-  LaneWaypoint end_point(back().lane, back().end_s);
-  if (IsWaypointOnSegment(end_point)) {
+  if (IsWaypointOnSegment(other.LastWaypoint())) {
+    return true;
+  }
+  if (other.IsWaypointOnSegment(FirstWaypoint())) {
+    return true;
+  }
+  if (other.IsWaypointOnSegment(LastWaypoint())) {
     return true;
   }
   return false;

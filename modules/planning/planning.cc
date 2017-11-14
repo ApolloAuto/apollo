@@ -321,7 +321,6 @@ common::Status Planning::Plan(
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
   ptr_debug->MergeFrom(best_reference_line->debug());
   trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());
