@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <geometry_msgs/TransformStamped.h>
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
 
 #include "tf_broadcaster.h"
 
@@ -54,4 +54,5 @@ void TFBroadcasterNodelet::onInit() {
 //
 // parameters: package, class name, class type, base class type
 PLUGINLIB_DECLARE_CLASS(gnss_driver, TFBroadcasterNodelet,
-                        apollo::drivers::gnss::TFBroadcasterNodelet, nodelet::Nodelet);
+                        apollo::drivers::gnss::TFBroadcasterNodelet,
+                        nodelet::Nodelet);

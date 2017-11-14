@@ -67,7 +67,9 @@ UdpStream::UdpStream(const char* address, uint16_t port, uint32_t timeout_usec)
   // call open or call open in connect later
 }
 
-UdpStream::~UdpStream() { this->close(); }
+UdpStream::~UdpStream() {
+  this->close();
+}
 
 void UdpStream::open() {
   int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
