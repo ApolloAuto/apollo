@@ -306,6 +306,11 @@ function release() {
   cp bazel-bin/modules/drivers/mobileye/mobileye $MODULES_DIR/drivers/mobileye
   cp -r modules/drivers/mobileye/conf  $MODULES_DIR/drivers/mobileye
 
+  # conti_radar
+  mkdir -p $MODULES_DIR/drivers/conti_radar
+  cp bazel-bin/modules/drivers/conti_radar/conti_radar $MODULES_DIR/drivers/conti_radar
+  cp -r modules/drivers/conti_radar/conf $MODULES_DIR/drivers/conti_radar
+
   # release info
   META=${ROOT_DIR}/meta.txt
   echo "Git commit: $(git rev-parse HEAD)" > $META
