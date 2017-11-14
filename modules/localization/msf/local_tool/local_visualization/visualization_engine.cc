@@ -125,7 +125,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   velodyne_extrinsic_ = extrinsic;
   loc_info_num_ = loc_info_num;
 
-  if (resolution_id_ >= map_config_._map_resolutions.size()) {
+  if (resolution_id_ >= map_config_.map_resolutions_.size()) {
     std::cerr << "Invalid resolution id." << std::endl;
     return false;
   }
@@ -134,10 +134,10 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   resolution_id_ = resolution_id;
 
   cloud_img_ = cv::Mat(
-      cv::Size(map_config_._map_node_size_x, map_config_._map_node_size_y),
+      cv::Size(map_config_.map_node_size_x_, map_config_.map_node_size_y_),
       CV_8UC3);
   cloud_img_mask_ = cv::Mat(
-      cv::Size(map_config_._map_node_size_x, map_config_._map_node_size_y),
+      cv::Size(map_config_.map_node_size_x_, map_config_.map_node_size_y_),
       CV_8UC1);
 
   Preprocess(map_folder);
@@ -557,17 +557,17 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
                                           const std::string &path) {
   lt_node_index_.x = x_min;
   lt_node_index_.y = y_min;
-  lt_node_grid_index_.x = lt_node_index_.x * map_config_._map_node_size_x;
-  lt_node_grid_index_.y = lt_node_index_.y * map_config_._map_node_size_y;
+  lt_node_grid_index_.x = lt_node_index_.x * map_config_.map_node_size_x_;
+  lt_node_grid_index_.y = lt_node_index_.y * map_config_.map_node_size_y_;
 
   double init_center_x = (double(x_max + x_min) / 2 *
-                          map_config_._map_resolutions[resolution_id_] *
-                          map_config_._map_node_size_x) +
-                         map_config_._map_range.GetMinX();
+                          map_config_.map_resolutions_[resolution_id_] *
+                          map_config_.map_node_size_x_) +
+                         map_config_.map_range_.GetMinX();
   double init_center_y = (double(y_max + y_min) / 2 *
-                          map_config_._map_resolutions[resolution_id_] *
-                          map_config_._map_node_size_y) +
-                         map_config_._map_range.GetMinY();
+                          map_config_.map_resolutions_[resolution_id_] *
+                          map_config_.map_node_size_y_) +
+                         map_config_.map_range_.GetMinY();
   SetViewCenter(init_center_x, init_center_y);
   max_level_ = level;
   max_stride_ = 1;
@@ -585,15 +585,15 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
                                      const std::vector<Eigen::Vector3d> &cloud,
                                      cv::Mat &cloud_img,
                                      cv::Mat &cloud_img_mask) {
-  unsigned int img_width = map_config_._map_node_size_x;
-  unsigned int img_height = map_config_._map_node_size_y;
+  unsigned int img_width = map_config_.map_node_size_x_;
+  unsigned int img_height = map_config_.map_node_size_y_;
   Eigen::Vector3d cen = car_pose_.translation();
   cloud_img_lt_coord_[0] =
       cen[0] -
-      map_config_._map_resolutions[resolution_id_] * (img_width / 2.0f);
+      map_config_.map_resolutions_[resolution_id_] * (img_width / 2.0f);
   cloud_img_lt_coord_[1] =
       cen[1] -
-      map_config_._map_resolutions[resolution_id_] * (img_height / 2.0f);
+      map_config_.map_resolutions_[resolution_id_] * (img_height / 2.0f);
 
   cloud_img_.setTo(cv::Scalar(0, 0, 0));
   cloud_img_mask_.setTo(cv::Scalar(0));
@@ -603,11 +603,11 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
     int col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-              map_config_._map_resolutions[resolution_id_];
+              map_config_.map_resolutions_[resolution_id_];
     int row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-              map_config_._map_resolutions[resolution_id_];
-    if (col < 0 || row < 0 || col >= map_config_._map_node_size_x ||
-        row >= map_config_._map_node_size_y) {
+              map_config_.map_resolutions_[resolution_id_];
+    if (col < 0 || row < 0 || col >= map_config_.map_node_size_x_ ||
+        row >= map_config_.map_node_size_y_) {
       continue;
     }
 
@@ -623,12 +623,12 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
                                           MapImageKey &key) {
   key.level = cur_level_;
   // get MapNodeIndex at image level 0
-  MapNodeIndex index = MapNodeIndex::get_map_node_index(
-      map_config_, coord, resolution_id_, zone_id_);
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coord,
+                                                     resolution_id_, zone_id_);
 
   key.zone_id = zone_id_;
-  key.node_north_id = index._m;
-  key.node_east_id = index._n;
+  key.node_north_id = index.m_;
+  key.node_east_id = index.n_;
 
   int m = (int)key.node_north_id - lt_node_index_.y;
   if (m < 0) m = m - (cur_stride_ - 1);
@@ -643,10 +643,10 @@ cv::Point VisualizationEngine::CoordToMapGridIndex(
     const Eigen::Vector2d &coord, const unsigned int resolution_id,
     const int stride) {
   cv::Point p;
-  p.x = static_cast<int>((coord[0] - map_config_._map_range.GetMinX()) /
-                         map_config_._map_resolutions[resolution_id]);
-  p.y = static_cast<int>((coord[1] - map_config_._map_range.GetMinY()) /
-                         map_config_._map_resolutions[resolution_id]);
+  p.x = static_cast<int>((coord[0] - map_config_.map_range_.GetMinX()) /
+                         map_config_.map_resolutions_[resolution_id]);
+  p.y = static_cast<int>((coord[1] - map_config_.map_range_.GetMinY()) /
+                         map_config_.map_resolutions_[resolution_id]);
 
   cv::Point pr;
   pr.x = p.x - lt_node_grid_index_.x;
@@ -659,10 +659,10 @@ cv::Point VisualizationEngine::CoordToMapGridIndex(
 
 cv::Point VisualizationEngine::MapGridIndexToNodeGridIndex(const cv::Point &p) {
   cv::Point pi;
-  pi.x = p.x % map_config_._map_node_size_x;
-  pi.x = pi.x < 0 ? pi.x + map_config_._map_node_size_x : pi.x;
-  pi.y = p.y % map_config_._map_node_size_y;
-  pi.y = pi.y < 0 ? pi.y + map_config_._map_node_size_y : pi.y;
+  pi.x = p.x % map_config_.map_node_size_x_;
+  pi.x = pi.x < 0 ? pi.x + map_config_.map_node_size_x_ : pi.x;
+  pi.y = p.y % map_config_.map_node_size_y_;
+  pi.y = pi.y < 0 ? pi.y + map_config_.map_node_size_y_ : pi.y;
 
   return pi;
 }

@@ -36,8 +36,8 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   fusion_poses_.clear();
 
   std::string config_file = map_folder_ + "/config.xml";
-  map_config_._map_version = "lossy_full_alt";
-  bool success = map_config_.load(config_file);
+  map_config_.map_version_ = "lossy_full_alt";
+  bool success = map_config_.Load(config_file);
   if (!success) {
     std::cerr << "Load map config failed." << std::endl;
     return false;

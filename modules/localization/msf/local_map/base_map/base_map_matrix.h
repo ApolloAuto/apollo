@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_MATRIX_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_MATRIX_H
 
@@ -20,23 +36,23 @@ class BaseMapMatrix {
   /**@brief The copy constructor. */
   BaseMapMatrix(const BaseMapMatrix& cell);
   /**@brief Initialize the map matrix. */
-  virtual void init(const BaseMapConfig* config) = 0;
+  virtual void Init(const BaseMapConfig* config) = 0;
   /**@brief Reset map cells data. */
-  virtual void reset(const BaseMapConfig* config) = 0;
+  virtual void Reset(const BaseMapConfig* config) = 0;
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
    */
-  virtual unsigned int load_binary(unsigned char* buf) = 0;
+  virtual unsigned int LoadBinary(unsigned char* buf) = 0;
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int create_binary(unsigned char* buf,
-                                     unsigned int buf_size) const = 0;
+  virtual unsigned int CreateBinary(unsigned char* buf,
+                                    unsigned int buf_size) const = 0;
   /**@brief Get the binary size of the object. */
-  virtual unsigned int get_binary_size() const = 0;
+  virtual unsigned int GetBinarySize() const = 0;
   /**@brief get intensity image of node. */
-  virtual void get_intensity_img(cv::Mat& intensity_img) const = 0;
+  virtual void GetIntensityImg(cv::Mat& intensity_img) const = 0;
 };
 
 }  // namespace msf

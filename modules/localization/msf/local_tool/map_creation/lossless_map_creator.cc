@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <vector>
@@ -160,33 +176,33 @@ int main(int argc, char** argv) {
   LosslessMapConfig conf;
   LosslessMap map(conf);
   LosslessMapConfig& loss_less_config =
-      static_cast<LosslessMapConfig&>(map.get_config());
+      static_cast<LosslessMapConfig&>(map.GetConfig());
   std::string map_folder_path = map_base_folder + "/map";
   if (!system::IsExists(map_folder_path)) {
     system::CreateDirectory(map_folder_path);
   }
-  map.set_map_folder_path(map_folder_path);
+  map.SetMapFolderPath(map_folder_path);
   for (size_t i = 0; i < pcd_folder_pathes.size(); ++i) {
-    map.add_dataset(pcd_folder_pathes[i]);
+    map.AddDataset(pcd_folder_pathes[i]);
   }
   if (strcasecmp(map_resolution_type.c_str(), "single") == 0) {
-    loss_less_config.set_single_resolutions(single_resolution_map);
+    loss_less_config.SetSingleResolutions(single_resolution_map);
   } else {
-    loss_less_config.set_multi_resolutions();
+    loss_less_config.SetMultiResolutions();
   }
 
   if (strcasecmp(coordinate_type.c_str(), "UTM") == 0) {
-    loss_less_config._coordinate_type = "UTM";
+    loss_less_config.coordinate_type_ = "UTM";
   } else {
-    loss_less_config._coordinate_type = "LTM";
-    loss_less_config._map_range =
+    loss_less_config.coordinate_type_ = "LTM";
+    loss_less_config.map_range_ =
         Rect2D<double>(-1638400.0, -1638400.0, 1638400.0, 1638400.0);
   }
 
   // Output Config file
   char file_buf[1024];
   snprintf(file_buf, 1024, "%s/map/config.xml", map_base_folder.c_str());
-  loss_less_config.save(file_buf);
+  loss_less_config.Save(file_buf);
 
   snprintf(file_buf, 1024, "%s/map/config.txt", map_base_folder.c_str());
   FILE* file = fopen(file_buf, "a");
@@ -194,35 +210,35 @@ int main(int argc, char** argv) {
   if (file) {
     fprintf(file, "\n\nVeldoyne %dE\n", CAR_SENSOR_LASER_NUMBER);
     fprintf(file, "Map coordinate type: %s\n",
-            loss_less_config._coordinate_type.c_str());
-    // if (loss_less_config._coordinate_type == "LTM") {
+            loss_less_config.coordinate_type_.c_str());
+    // if (loss_less_config.coordinate_type_ == "LTM") {
     //     fprintf(file, "Map origin longitude: %lf\n",
     //     loss_less_config._origin_longitude); fprintf(file, "Map origin
     //     latitude: %lf\n", loss_less_config._origin_latitude);
     // }
     fprintf(file, "Map compression: %d\n",
-            loss_less_config._map_is_compression);
+            loss_less_config.map_is_compression_);
     fprintf(file, "Map resolution: ");
-    for (size_t i = 0; i < loss_less_config._map_resolutions.size(); ++i) {
-      fprintf(file, "%lf, ", loss_less_config._map_resolutions[i]);
+    for (size_t i = 0; i < loss_less_config.map_resolutions_.size(); ++i) {
+      fprintf(file, "%lf, ", loss_less_config.map_resolutions_[i]);
     }
     fprintf(file, "\nMap size: %lf %lf %lf %lf\n",
-            loss_less_config._map_range.GetMinX(),
-            loss_less_config._map_range.GetMinY(),
-            loss_less_config._map_range.GetMaxX(),
-            loss_less_config._map_range.GetMaxY());
-    fprintf(file, "Map node size: %d x %d\n", loss_less_config._map_node_size_x,
-            loss_less_config._map_node_size_y);
+            loss_less_config.map_range_.GetMinX(),
+            loss_less_config.map_range_.GetMinY(),
+            loss_less_config.map_range_.GetMaxX(),
+            loss_less_config.map_range_.GetMaxY());
+    fprintf(file, "Map node size: %d x %d\n", loss_less_config.map_node_size_x_,
+            loss_less_config.map_node_size_y_);
     fprintf(file, "Map row x col: \n");
-    for (size_t i = 0; i < loss_less_config._map_resolutions.size(); ++i) {
+    for (size_t i = 0; i < loss_less_config.map_resolutions_.size(); ++i) {
       fprintf(file, "%u x %u, ",
-              MapNodeIndex::get_map_index_range_north(loss_less_config, i),
-              MapNodeIndex::get_map_index_range_east(loss_less_config, i));
+              MapNodeIndex::GetMapIndexRangeNorth(loss_less_config, i),
+              MapNodeIndex::GetMapIndexRangeEast(loss_less_config, i));
     }
     fprintf(file, "Map image max intensity: %lf\n",
-            loss_less_config._max_intensity_value);
+            loss_less_config.max_intensity_value_);
     fprintf(file, "Map image max var: %lf\n",
-            loss_less_config._max_intensity_var_value);
+            loss_less_config.max_intensity_var_value_);
     fprintf(file, "PCD folders: \n");
     for (unsigned int trial = 0; trial < num_trials; ++trial) {
       fprintf(file, "%s\n", pcd_folder_pathes[trial].c_str());
@@ -234,10 +250,10 @@ int main(int argc, char** argv) {
   }
 
   LosslessMapNodePool lossless_map_node_pool(25, 8);
-  lossless_map_node_pool.initial(&loss_less_config);
-  map.init_thread_pool(1, 6);
-  map.init_map_node_caches(12, 24);
-  map.attach_map_node_pool(&lossless_map_node_pool);
+  lossless_map_node_pool.Initial(&loss_less_config);
+  map.InitThreadPool(1, 6);
+  map.InitMapNodeCaches(12, 24);
+  map.AttachMapNodePool(&lossless_map_node_pool);
 
   for (unsigned int trial = 0; trial < num_trials; ++trial) {
     for (unsigned int frame_idx = 0; frame_idx < ieout_poses[trial].size();
@@ -260,7 +276,7 @@ int main(int argc, char** argv) {
         Eigen::Vector3d& pt3d_local = velodyne_frame.pt3ds[i];
         unsigned char intensity = velodyne_frame.intensities[i];
         Eigen::Vector3d pt3d_global = velodyne_frame.pose * pt3d_local;
-        map.set_value(pt3d_global, zone_id, intensity);
+        map.SetValue(pt3d_global, zone_id, intensity);
       }
 
       if (use_plane_inliers_only) {
@@ -286,7 +302,7 @@ int main(int argc, char** argv) {
           unsigned char intensity =
               static_cast<unsigned char>(plane_pt.intensity);
           Eigen::Vector3d pt3d_global = velodyne_frame.pose * pt3d_local_double;
-          map.set_value_layer(pt3d_global, zone_id, intensity);
+          map.SetValueLayer(pt3d_global, zone_id, intensity);
         }
       }
     }
@@ -305,7 +321,7 @@ int main(int argc, char** argv) {
         // Use the altitudes from layer 0 (layer 1 internally in the Map).
         unsigned int layer_id = 0;
         std::vector<unsigned int> layer_counts;
-        map.get_count_safe(pt3d, zone_id, resolution_id, layer_counts);
+        map.GetCountSafe(pt3d, zone_id, resolution_id, layer_counts);
         if (layer_counts.size() == 0) {
           std::cerr << "[FATAL ERROR] Map node should at least have one layer."
                     << std::endl;
@@ -313,7 +329,7 @@ int main(int argc, char** argv) {
         assert(layer_counts.size() > 0);
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
-          map.get_alt_safe(pt3d, zone_id, resolution_id, layer_alts);
+          map.GetAltSafe(pt3d, zone_id, resolution_id, layer_alts);
           if (layer_alts.size() == 0) {
             std::cerr
                 << "[FATAL ERROR] Map node should at least have one layer."
@@ -327,9 +343,9 @@ int main(int argc, char** argv) {
         }
       } else {
         // Use the altitudes from all layers
-        unsigned int count = map.get_count_safe(pt3d, zone_id, resolution_id);
+        unsigned int count = map.GetCountSafe(pt3d, zone_id, resolution_id);
         if (count > 0) {
-          float alt = map.get_alt_safe(pt3d, zone_id, resolution_id);
+          float alt = map.GetAltSafe(pt3d, zone_id, resolution_id);
           double height_diff = pt3d[2] - alt;
           variance_online(mean_height_diff, var_height_diff, count_height_diff,
                           height_diff);
@@ -338,9 +354,9 @@ int main(int argc, char** argv) {
     }
   }
 
-  map.get_config()._map_ground_height_offset = mean_height_diff;
-  std::string config_path = map.get_config()._map_folder_path + "/config.xml";
-  map.get_config().save(config_path);
+  map.GetConfig().map_ground_height_offset_ = mean_height_diff;
+  std::string config_path = map.GetConfig().map_folder_path_ + "/config.xml";
+  map.GetConfig().Save(config_path);
   std::cout << "Mean: " << mean_height_diff << ", Var: " << var_height_diff
             << "." << std::endl;
 

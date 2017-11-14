@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 #include <string>
 
@@ -7,34 +23,34 @@ namespace msf {
 
 LosslessMapConfig::LosslessMapConfig(std::string map_version)
     : BaseMapConfig(map_version) {
-  _map_layer_alt_thres = 10000.0;  // in meters
-  _map_cache_size = 50;            // 80
-  _coordinate_type = "UTM";
-  _max_intensity_value = 255.0;
-  _max_intensity_var_value = 1000.0;
-  _map_is_compression = true;
-  _map_ground_height_offset = 1.7;  // Set the initial value here.
+  map_layer_alt_thres_ = 10000.0;  // in meters
+  map_cache_size_ = 50;            // 80
+  coordinate_type_ = "UTM";
+  max_intensity_value_ = 255.0;
+  max_intensity_var_value_ = 1000.0;
+  map_is_compression_ = true;
+  map_ground_height_offset_ = 1.7;  // Set the initial value here.
 }
 
-void LosslessMapConfig::create_xml(boost::property_tree::ptree& config) const {
-  BaseMapConfig::create_xml(config);
-  config.put("map.map_config.coordinate_type", _coordinate_type);
-  config.put("map.map_runtime.layer_alt_thres", _map_layer_alt_thres);
-  config.put("map.map_runtime.cache_size", _map_cache_size);
-  config.put("map.map_runtime.max_intensity_value", _max_intensity_value);
+void LosslessMapConfig::CreateXml(boost::property_tree::ptree& config) const {
+  BaseMapConfig::CreateXml(config);
+  config.put("map.map_config.coordinate_type", coordinate_type_);
+  config.put("map.map_runtime.layer_alt_thres", map_layer_alt_thres_);
+  config.put("map.map_runtime.cache_size", map_cache_size_);
+  config.put("map.map_runtime.max_intensity_value", max_intensity_value_);
   config.put("map.map_runtime.max_intensity_var_value",
-             _max_intensity_var_value);
+             max_intensity_var_value_);
   return;
 }
 
-void LosslessMapConfig::load_xml(boost::property_tree::ptree& config) {
-  BaseMapConfig::load_xml(config);
-  _coordinate_type = config.get<std::string>("map.map_config.coordinate_type");
-  _map_layer_alt_thres = config.get<float>("map.map_runtime.layer_alt_thres");
-  _map_cache_size = config.get<unsigned int>("map.map_runtime.cache_size");
-  _max_intensity_value =
+void LosslessMapConfig::LoadXml(boost::property_tree::ptree& config) {
+  BaseMapConfig::LoadXml(config);
+  coordinate_type_ = config.get<std::string>("map.map_config.coordinate_type");
+  map_layer_alt_thres_ = config.get<float>("map.map_runtime.layer_alt_thres");
+  map_cache_size_ = config.get<unsigned int>("map.map_runtime.cache_size");
+  max_intensity_value_ =
       config.get<float>("map.map_runtime.max_intensity_value");
-  _max_intensity_var_value =
+  max_intensity_var_value_ =
       config.get<float>("map.map_runtime.max_intensity_var_value");
   return;
 }

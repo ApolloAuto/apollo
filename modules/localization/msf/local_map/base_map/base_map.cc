@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 #include "modules/localization/msf/common/util/system_utility.h"
 
@@ -6,171 +22,170 @@ namespace localization {
 namespace msf {
 
 BaseMap::BaseMap(BaseMapConfig& config)
-    : _map_config(config),
-      _map_node_cache_lvl1(NULL),
-      _map_node_cache_lvl2(NULL),
-      _map_node_pool(NULL),
-      _p_map_load_threads(NULL),
-      _p_map_preload_threads(NULL) {}
+    : map_config_(config),
+      map_node_cache_lvl1_(NULL),
+      map_node_cache_lvl2_(NULL),
+      map_node_pool_(NULL),
+      p_map_load_threads_(NULL),
+      p_map_preload_threads_(NULL) {}
 
 BaseMap::~BaseMap() {
-  if (_p_map_load_threads) {
-    delete _p_map_load_threads;
+  if (p_map_load_threads_) {
+    delete p_map_load_threads_;
   }
-  if (_p_map_preload_threads) {
-    delete _p_map_preload_threads;
+  if (p_map_preload_threads_) {
+    delete p_map_preload_threads_;
   }
-  if (_map_node_cache_lvl1) {
-    delete _map_node_cache_lvl1;
+  if (map_node_cache_lvl1_) {
+    delete map_node_cache_lvl1_;
   }
-  if (_map_node_cache_lvl2) {
-    delete _map_node_cache_lvl2;
+  if (map_node_cache_lvl2_) {
+    delete map_node_cache_lvl2_;
   }
 }
 
-void BaseMap::init_thread_pool(int load_thread_num, int preload_thread_num) {
-  if (_p_map_load_threads) {
-    delete _p_map_load_threads;
-    _p_map_load_threads = NULL;
+void BaseMap::InitThreadPool(int load_thread_num, int preload_thread_num) {
+  if (p_map_load_threads_) {
+    delete p_map_load_threads_;
+    p_map_load_threads_ = NULL;
   }
-  if (_p_map_preload_threads) {
-    delete _p_map_preload_threads;
-    _p_map_preload_threads = NULL;
+  if (p_map_preload_threads_) {
+    delete p_map_preload_threads_;
+    p_map_preload_threads_ = NULL;
   }
-  _p_map_load_threads = new ThreadPool(load_thread_num);
-  _p_map_preload_threads = new ThreadPool(preload_thread_num);
+  p_map_load_threads_ = new ThreadPool(load_thread_num);
+  p_map_preload_threads_ = new ThreadPool(preload_thread_num);
   return;
 }
 
-void BaseMap::init_map_node_caches(int cacheL1_size, int cahceL2_size) {
-  assert(_map_node_cache_lvl1 == NULL);
-  assert(_map_node_cache_lvl2 == NULL);
-  _map_node_cache_lvl1 =
+void BaseMap::InitMapNodeCaches(int cacheL1_size, int cahceL2_size) {
+  assert(map_node_cache_lvl1_ == NULL);
+  assert(map_node_cache_lvl2_ == NULL);
+  map_node_cache_lvl1_ =
       new MapNodeCacheL1<MapNodeIndex, BaseMapNode>(cacheL1_size);
-  _map_node_cache_lvl2 =
+  map_node_cache_lvl2_ =
       new MapNodeCacheL2<MapNodeIndex, BaseMapNode>(cahceL2_size);
 }
 
-BaseMapNode* BaseMap::get_map_node(const MapNodeIndex& index) {
+BaseMapNode* BaseMap::GetMapNode(const MapNodeIndex& index) {
   BaseMapNode* node = NULL;
-  _map_node_cache_lvl1->get(index, node);
+  map_node_cache_lvl1_->Get(index, node);
   return node;
 }
 
-BaseMapNode* BaseMap::get_map_node_safe(const MapNodeIndex& index) {
+BaseMapNode* BaseMap::GetMapNodeSafe(const MapNodeIndex& index) {
   BaseMapNode* node = NULL;
   // try get from cacheL1
-  if (_map_node_cache_lvl1->get(index, node)) {
+  if (map_node_cache_lvl1_->Get(index, node)) {
     return node;
   }
 
   // try get from cacheL2
-  boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-  if (_map_node_cache_lvl2->get(index, node)) {
-    node->set_is_reserved(true);
-    // if (_map_node_cache_lvl1->size() >= _map_node_cache_lvl1->capacity()) {
-    //     _map_node_cache_lvl1->change_capacity(_map_node_cache_lvl1->size() +
+  boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+  if (map_node_cache_lvl2_->Get(index, node)) {
+    node->SetIsReserved(true);
+    // if (map_node_cache_lvl1_->Size() >= map_node_cache_lvl1_->Capacity()) {
+    //     map_node_cache_lvl1_->ChangeCapacity(map_node_cache_lvl1_->Size() +
     //     1);
     // }
-    _map_node_cache_lvl1->put(index, node);
+    map_node_cache_lvl1_->Put(index, node);
     return node;
   }
   lock.unlock();
 
   // load from disk
-  std::cerr << "get_map_node_safe: This node don't exist in cache! "
-            << std::endl
+  std::cerr << "GetMapNodeSafe: This node don't exist in cache! " << std::endl
             << "load this node from disk now!" << index << std::endl;
-  load_map_node_thread_safety(index, true);
-  boost::unique_lock<boost::recursive_mutex> lock2(_map_load_mutex);
-  _map_node_cache_lvl2->get(index, node);
+  LoadMapNodeThreadSafety(index, true);
+  boost::unique_lock<boost::recursive_mutex> lock2(map_load_mutex_);
+  map_node_cache_lvl2_->Get(index, node);
   lock2.unlock();
-  // if (_map_node_cache_lvl1->size() >= _map_node_cache_lvl1->capacity()) {
-  //         _map_node_cache_lvl1->change_capacity(_map_node_cache_lvl1->size()
+  // if (map_node_cache_lvl1_->Size() >= map_node_cache_lvl1_->Capacity()) {
+  //         map_node_cache_lvl1_->ChangeCapacity(map_node_cache_lvl1_->Size()
   //         + 1);
   // }
-  _map_node_cache_lvl1->put(index, node);
+  map_node_cache_lvl1_->Put(index, node);
   return node;
 }
 
-BaseMapNode* BaseMap::get_map_node_thread_safe(const MapNodeIndex& index) {
+BaseMapNode* BaseMap::GetMapNodeThreadSafe(const MapNodeIndex& index) {
   BaseMapNode* node = NULL;
-  _map_node_cache_lvl1->get_silent(index, node);
+  map_node_cache_lvl1_->GetSilent(index, node);
   return node;
 }
 
 /**@brief Return the map node, if it's not in the cache, safely load it. */
-BaseMapNode* BaseMap::get_map_node_safe_thread_safe(const MapNodeIndex& index) {
+BaseMapNode* BaseMap::GetMapNodeSaveThreadSafe(const MapNodeIndex& index) {
   BaseMapNode* node = NULL;
   // try get from cacheL1
-  if (_map_node_cache_lvl1->get_silent(index, node)) {
-    // std::cout << "get_map_node_safe cacheL1" << std::endl;
+  if (map_node_cache_lvl1_->GetSilent(index, node)) {
+    // std::cout << "GetMapNodeSafe cacheL1" << std::endl;
     return node;
   }
 
   // try get from cacheL2
-  boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-  if (_map_node_cache_lvl2->get(index, node)) {
-    node->set_is_reserved(true);
-    // if (_map_node_cache_lvl1->size() >= _map_node_cache_lvl1->capacity()) {
-    //     _map_node_cache_lvl1->change_capacity(_map_node_cache_lvl1->size() +
+  boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+  if (map_node_cache_lvl2_->Get(index, node)) {
+    node->SetIsReserved(true);
+    // if (map_node_cache_lvl1_->Size() >= map_node_cache_lvl1_->Capacity()) {
+    //     map_node_cache_lvl1_->ChangeCapacity(map_node_cache_lvl1_->Size() +
     //     1);
     // }
-    _map_node_cache_lvl1->put(index, node);
+    map_node_cache_lvl1_->Put(index, node);
     return node;
   }
   lock.unlock();
 
   // load from disk
-  std::cerr << "get_map_node_safe_thread_safe: This node don't exist in cache! "
+  std::cerr << "GetMapNodeSaveThreadSafe: This node don't exist in cache! "
             << std::endl
             << "now load this node from disk!" << index << std::endl;
-  load_map_node_thread_safety(index, true);
-  boost::unique_lock<boost::recursive_mutex> lock2(_map_load_mutex);
-  _map_node_cache_lvl2->get(index, node);
+  LoadMapNodeThreadSafety(index, true);
+  boost::unique_lock<boost::recursive_mutex> lock2(map_load_mutex_);
+  map_node_cache_lvl2_->Get(index, node);
   lock2.unlock();
-  // if (_map_node_cache_lvl1->size() >= _map_node_cache_lvl1->capacity()) {
-  //         _map_node_cache_lvl1->change_capacity(_map_node_cache_lvl1->size()
+  // if (map_node_cache_lvl1_->Size() >= map_node_cache_lvl1_->Capacity()) {
+  //         map_node_cache_lvl1_->ChangeCapacity(map_node_cache_lvl1_->Size()
   //         + 1);
   // }
-  _map_node_cache_lvl1->put(index, node);
+  map_node_cache_lvl1_->Put(index, node);
   return node;
 }
 
 /**@brief Check if the map node in the cache. */
-bool BaseMap::is_map_node_exist(const MapNodeIndex& index) const {
-  return _map_node_cache_lvl1->is_exist(index);
+bool BaseMap::IsMapNodeExist(const MapNodeIndex& index) const {
+  return map_node_cache_lvl1_->IsExist(index);
 }
 
-bool BaseMap::set_map_folder_path(const std::string folder_path) {
-  _map_config._map_folder_path = folder_path;
+bool BaseMap::SetMapFolderPath(const std::string folder_path) {
+  map_config_.map_folder_path_ = folder_path;
 
   // Try to load the config
-  std::string config_path = _map_config._map_folder_path + "/config.xml";
+  std::string config_path = map_config_.map_folder_path_ + "/config.xml";
   if (system::IsExists(config_path)) {
-    _map_config.load(config_path);
+    map_config_.Load(config_path);
     return true;
   } else {
     return false;
   }
 }
 
-void BaseMap::add_dataset(const std::string dataset_path) {
-  _map_config._map_datasets.push_back(dataset_path);
-  std::string config_path = _map_config._map_folder_path + "/config.xml";
-  _map_config.save(config_path);
+void BaseMap::AddDataset(const std::string dataset_path) {
+  map_config_.map_datasets_.push_back(dataset_path);
+  std::string config_path = map_config_.map_folder_path_ + "/config.xml";
+  map_config_.Save(config_path);
 }
 
-void BaseMap::load_map_nodes(std::set<MapNodeIndex>& map_ids) {
-  assert(int(map_ids.size()) <= _map_node_cache_lvl1->capacity());
-  // std::cout << "load_map_nodes size: " << map_ids.size() << std::endl;
+void BaseMap::LoadMapNodes(std::set<MapNodeIndex>& map_ids) {
+  assert(int(map_ids.size()) <= map_node_cache_lvl1_->Capacity());
+  // std::cout << "LoadMapNodes size: " << map_ids.size() << std::endl;
   // check in cacheL1
   typename std::set<MapNodeIndex>::iterator itr = map_ids.begin();
   while (itr != map_ids.end()) {
-    if (_map_node_cache_lvl1->is_exist(*itr)) {
-      // std::cout << "load_map_nodes find in L1 cache" << std::endl;
-      boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-      _map_node_cache_lvl2->is_exist(*itr);  // fresh lru list
+    if (map_node_cache_lvl1_->IsExist(*itr)) {
+      // std::cout << "LoadMapNodes find in L1 cache" << std::endl;
+      boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+      map_node_cache_lvl2_->IsExist(*itr);  // fresh lru list
       lock.unlock();
       itr = map_ids.erase(itr);
     } else {
@@ -181,12 +196,12 @@ void BaseMap::load_map_nodes(std::set<MapNodeIndex>& map_ids) {
   // check in cacheL2
   itr = map_ids.begin();
   BaseMapNode* node = NULL;
-  boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
+  boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
   while (itr != map_ids.end()) {
-    if (_map_node_cache_lvl2->get(*itr, node)) {
-      // std::cout << "load_map_nodes find in L2 cache" << std::endl;
-      node->set_is_reserved(true);
-      _map_node_cache_lvl1->put(*itr, node);
+    if (map_node_cache_lvl2_->Get(*itr, node)) {
+      // std::cout << "LoadMapNodes find in L2 cache" << std::endl;
+      node->SetIsReserved(true);
+      map_node_cache_lvl1_->Put(*itr, node);
       itr = map_ids.erase(itr);
     } else {
       ++itr;
@@ -197,27 +212,27 @@ void BaseMap::load_map_nodes(std::set<MapNodeIndex>& map_ids) {
   // load from disk sync
   itr = map_ids.begin();
   while (itr != map_ids.end()) {
-    _p_map_load_threads->schedule(
-        boost::bind(&BaseMap::load_map_node_thread_safety, this, *itr, true));
+    p_map_load_threads_->schedule(
+        boost::bind(&BaseMap::LoadMapNodeThreadSafety, this, *itr, true));
     ++itr;
   }
 
   std::cout << "before wait" << std::endl;
-  _p_map_load_threads->wait();
+  p_map_load_threads_->wait();
   std::cout << "after wait" << std::endl;
 
   // check in cacheL2 again
   itr = map_ids.begin();
   node = NULL;
-  boost::unique_lock<boost::recursive_mutex> lock2(_map_load_mutex);
+  boost::unique_lock<boost::recursive_mutex> lock2(map_load_mutex_);
   while (itr != map_ids.end()) {
-    if (_map_node_cache_lvl2->get(*itr, node)) {
-      // std::cout << "load_map_nodes load from disk" << std::endl;
+    if (map_node_cache_lvl2_->Get(*itr, node)) {
+      // std::cout << "LoadMapNodes load from disk" << std::endl;
       std::cout
-          << "load_map_nodes: preload missed, load this node in main thread.\n"
+          << "LoadMapNodes: preload missed, load this node in main thread.\n"
           << *itr << std::endl;
-      node->set_is_reserved(true);
-      _map_node_cache_lvl1->put(*itr, node);
+      node->SetIsReserved(true);
+      map_node_cache_lvl1_->Put(*itr, node);
       itr = map_ids.erase(itr);
     } else {
       ++itr;
@@ -229,14 +244,14 @@ void BaseMap::load_map_nodes(std::set<MapNodeIndex>& map_ids) {
   return;
 }
 
-void BaseMap::preload_map_nodes(std::set<MapNodeIndex>& map_ids) {
-  assert(int(map_ids.size()) <= _map_node_cache_lvl2->capacity());
+void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>& map_ids) {
+  assert(int(map_ids.size()) <= map_node_cache_lvl2_->Capacity());
   // check in cacheL2
   typename std::set<MapNodeIndex>::iterator itr = map_ids.begin();
   bool is_exist = false;
   while (itr != map_ids.end()) {
-    boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-    is_exist = _map_node_cache_lvl2->is_exist(*itr);
+    boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+    is_exist = map_node_cache_lvl2_->IsExist(*itr);
     lock.unlock();
     if (is_exist) {
       itr = map_ids.erase(itr);
@@ -247,13 +262,13 @@ void BaseMap::preload_map_nodes(std::set<MapNodeIndex>& map_ids) {
 
   // check whether in already preloading index set
   itr = map_ids.begin();
-  auto preloading_itr = _map_preloading_task_index.end();
+  auto preloading_itr = map_preloading_task_index_.end();
   while (itr != map_ids.end()) {
-    boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-    preloading_itr = _map_preloading_task_index.find(*itr);
+    boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+    preloading_itr = map_preloading_task_index_.find(*itr);
     lock.unlock();
     if (preloading_itr !=
-        _map_preloading_task_index.end()) {  // already preloading
+        map_preloading_task_index_.end()) {  // already preloading
       itr = map_ids.erase(itr);
     } else {
       ++itr;
@@ -264,78 +279,76 @@ void BaseMap::preload_map_nodes(std::set<MapNodeIndex>& map_ids) {
   itr = map_ids.begin();
   while (itr != map_ids.end()) {
     std::cout << "Preload map node: " << *itr << std::endl;
-    boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-    _map_preloading_task_index.insert(*itr);
+    boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+    map_preloading_task_index_.insert(*itr);
     lock.unlock();
-    _p_map_preload_threads->schedule(
-        boost::bind(&BaseMap::load_map_node_thread_safety, this, *itr, false));
+    p_map_preload_threads_->schedule(
+        boost::bind(&BaseMap::LoadMapNodeThreadSafety, this, *itr, false));
     ++itr;
   }
 
   return;
 }
 
-void BaseMap::attach_map_node_pool(BaseMapNodePool* map_node_pool) {
-  _map_node_pool = map_node_pool;
+void BaseMap::AttachMapNodePool(BaseMapNodePool* map_node_pool) {
+  map_node_pool_ = map_node_pool;
 }
 
-void BaseMap::load_map_node_thread_safety(MapNodeIndex index,
-                                          bool is_reserved) {
+void BaseMap::LoadMapNodeThreadSafety(MapNodeIndex index, bool is_reserved) {
   BaseMapNode* map_node = NULL;
   while (map_node == NULL) {
-    map_node = _map_node_pool->alloc_map_node();
+    map_node = map_node_pool_->AllocMapNode();
     if (map_node == NULL) {
-      boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-      BaseMapNode* node_remove = _map_node_cache_lvl2->clear_one();
+      boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+      BaseMapNode* node_remove = map_node_cache_lvl2_->ClearOne();
       if (node_remove) {
-        _map_node_pool->free_map_node(node_remove);
+        map_node_pool_->FreeMapNode(node_remove);
       }
     }
   }
   // std::cout << "[successfull load node...]" << std::endl;
-  map_node->init(&_map_config, index, false);
-  if (!map_node->load()) {
+  map_node->Init(&map_config_, index, false);
+  if (!map_node->Load()) {
     std::cerr << "Created map node: " << index << std::endl;
   } else {
     std::cerr << " Loaded map node: " << index << std::endl;
   }
-  map_node->set_is_reserved(is_reserved);
+  map_node->SetIsReserved(is_reserved);
 
-  boost::unique_lock<boost::recursive_mutex> lock(_map_load_mutex);
-  BaseMapNode* node_remove = _map_node_cache_lvl2->put(index, map_node);
+  boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+  BaseMapNode* node_remove = map_node_cache_lvl2_->Put(index, map_node);
   // if the node already added into cacheL2, erase it from preloading set
-  auto itr = _map_preloading_task_index.find(index);
-  if (itr != _map_preloading_task_index.end()) {
-    _map_preloading_task_index.erase(itr);
+  auto itr = map_preloading_task_index_.find(index);
+  if (itr != map_preloading_task_index_.end()) {
+    map_preloading_task_index_.erase(itr);
   }
   if (node_remove) {
-    _map_node_pool->free_map_node(node_remove);
+    map_node_pool_->FreeMapNode(node_remove);
   }
   return;
 }
 
-void BaseMap::preload_map_area(const Eigen::Vector3d& location,
-                               const Eigen::Vector3d& trans_diff,
-                               unsigned int resolution_id,
-                               unsigned int zone_id) {
-  assert(_p_map_preload_threads != NULL);
-  assert(_map_node_pool != NULL);
+void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
+                             const Eigen::Vector3d& trans_diff,
+                             unsigned int resolution_id, unsigned int zone_id) {
+  assert(p_map_preload_threads_ != NULL);
+  assert(map_node_pool_ != NULL);
 
   int x_direction = trans_diff[0] > 0 ? 1 : -1;
   int y_direction = trans_diff[1] > 0 ? 1 : -1;
 
   std::set<MapNodeIndex> map_ids;
   float map_pixel_resolution =
-      this->_map_config._map_resolutions[resolution_id];
+      this->map_config_.map_resolutions_[resolution_id];
   /// top left
   Eigen::Vector3d pt_top_left;
-  pt_top_left[0] = location[0] - (this->_map_config._map_node_size_x *
+  pt_top_left[0] = location[0] - (this->map_config_.map_node_size_x_ *
                                   map_pixel_resolution / 2.0);
-  pt_top_left[1] = location[1] - (this->_map_config._map_node_size_y *
+  pt_top_left[1] = location[1] - (this->map_config_.map_node_size_y_ *
                                   map_pixel_resolution / 2.0);
   pt_top_left[2] = 0;
-  MapNodeIndex map_id = MapNodeIndex::get_map_node_index(
-      this->_map_config, pt_top_left, resolution_id, zone_id);
+  MapNodeIndex map_id = MapNodeIndex::GetMapNodeIndex(
+      this->map_config_, pt_top_left, resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// top center
@@ -343,18 +356,18 @@ void BaseMap::preload_map_area(const Eigen::Vector3d& location,
   pt_top_center[0] = location[0];
   pt_top_center[1] = pt_top_left[1];
   pt_top_center[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_top_center,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_top_center,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// top right
   Eigen::Vector3d pt_top_right;
-  pt_top_right[0] = location[0] + (this->_map_config._map_node_size_x *
+  pt_top_right[0] = location[0] + (this->map_config_.map_node_size_x_ *
                                    map_pixel_resolution / 2.0);
   pt_top_right[1] = pt_top_left[1];
   pt_top_right[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_top_right,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_top_right,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// middle left
@@ -362,13 +375,13 @@ void BaseMap::preload_map_area(const Eigen::Vector3d& location,
   pt_middle_left[0] = pt_top_left[0];
   pt_middle_left[1] = location[1];
   pt_middle_left[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_middle_left,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_middle_left,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// middle center
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, location,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, location,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// middle right
@@ -376,18 +389,18 @@ void BaseMap::preload_map_area(const Eigen::Vector3d& location,
   pt_middle_right[0] = pt_top_right[0];
   pt_middle_right[1] = pt_middle_left[1];
   pt_middle_right[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_middle_right,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_middle_right,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// bottom left
   Eigen::Vector3d pt_bottom_left;
   pt_bottom_left[0] = pt_top_left[0];
-  pt_bottom_left[1] = location[1] + (this->_map_config._map_node_size_y *
+  pt_bottom_left[1] = location[1] + (this->map_config_.map_node_size_y_ *
                                      map_pixel_resolution / 2.0);
   pt_bottom_left[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_bottom_left,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_bottom_left,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// bottom center
@@ -395,8 +408,8 @@ void BaseMap::preload_map_area(const Eigen::Vector3d& location,
   pt_bottom_center[0] = pt_top_center[0];
   pt_bottom_center[1] = pt_bottom_left[1];
   pt_bottom_center[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_bottom_center,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_bottom_center,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// bottom right
@@ -404,75 +417,75 @@ void BaseMap::preload_map_area(const Eigen::Vector3d& location,
   pt_bottom_right[0] = pt_top_right[0];
   pt_bottom_right[1] = pt_bottom_left[1];
   pt_bottom_right[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_bottom_right,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_bottom_right,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   for (int i = -1; i < 2; ++i) {
     Eigen::Vector3d pt;
     pt[0] = location[0] + x_direction * 1.5 *
-                              this->_map_config._map_node_size_x *
+                              this->map_config_.map_node_size_x_ *
                               map_pixel_resolution;
     pt[1] = location[1] + static_cast<double>(i) *
-                              this->_map_config._map_node_size_y *
+                              this->map_config_.map_node_size_y_ *
                               map_pixel_resolution;
     pt[2] = 0;
-    map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt,
-                                              resolution_id, zone_id);
+    map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt, resolution_id,
+                                           zone_id);
     map_ids.insert(map_id);
   }
   for (int i = -1; i < 2; ++i) {
     Eigen::Vector3d pt;
     pt[0] = location[0] + static_cast<double>(i) *
-                              this->_map_config._map_node_size_x *
+                              this->map_config_.map_node_size_x_ *
                               map_pixel_resolution;
     pt[1] = location[1] + y_direction * 1.5 *
-                              this->_map_config._map_node_size_y *
+                              this->map_config_.map_node_size_y_ *
                               map_pixel_resolution;
     pt[2] = 0;
-    map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt,
-                                              resolution_id, zone_id);
+    map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt, resolution_id,
+                                           zone_id);
     map_ids.insert(map_id);
   }
   {
     Eigen::Vector3d pt;
     pt[0] = location[0] + x_direction * 1.5 *
-                              this->_map_config._map_node_size_x *
+                              this->map_config_.map_node_size_x_ *
                               map_pixel_resolution;
     pt[1] = location[1] + y_direction * 1.5 *
-                              this->_map_config._map_node_size_y *
+                              this->map_config_.map_node_size_y_ *
                               map_pixel_resolution;
     pt[2] = 0;
-    map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt,
-                                              resolution_id, zone_id);
+    map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt, resolution_id,
+                                           zone_id);
     map_ids.insert(map_id);
   }
 
-  this->preload_map_nodes(map_ids);
+  this->PreloadMapNodes(map_ids);
   return;
 }
 
-bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
-                            unsigned int resolution_id, unsigned int zone_id,
-                            int filter_size_x, int filter_size_y) {
-  assert(_p_map_load_threads != NULL);
-  assert(_map_node_pool != NULL);
+bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
+                          unsigned int resolution_id, unsigned int zone_id,
+                          int filter_size_x, int filter_size_y) {
+  assert(p_map_load_threads_ != NULL);
+  assert(map_node_pool_ != NULL);
   std::set<MapNodeIndex> map_ids;
   float map_pixel_resolution =
-      this->_map_config._map_resolutions[resolution_id];
+      this->map_config_.map_resolutions_[resolution_id];
   /// top left
   Eigen::Vector3d pt_top_left;
   pt_top_left[0] =
       seed_pt3d[0] -
-      (this->_map_config._map_node_size_x * map_pixel_resolution / 2.0) -
+      (this->map_config_.map_node_size_x_ * map_pixel_resolution / 2.0) -
       static_cast<int>(filter_size_x / 2) * map_pixel_resolution;
   pt_top_left[1] =
       seed_pt3d[1] -
-      (this->_map_config._map_node_size_y * map_pixel_resolution / 2.0) -
+      (this->map_config_.map_node_size_y_ * map_pixel_resolution / 2.0) -
       static_cast<int>(filter_size_y / 2) * map_pixel_resolution;
   pt_top_left[2] = 0;
-  MapNodeIndex map_id = MapNodeIndex::get_map_node_index(
-      this->_map_config, pt_top_left, resolution_id, zone_id);
+  MapNodeIndex map_id = MapNodeIndex::GetMapNodeIndex(
+      this->map_config_, pt_top_left, resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// top center
@@ -480,20 +493,20 @@ bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
   pt_top_center[0] = seed_pt3d[0];
   pt_top_center[1] = pt_top_left[1];
   pt_top_center[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_top_center,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_top_center,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// top right
   Eigen::Vector3d pt_top_right;
   pt_top_right[0] =
       seed_pt3d[0] +
-      (this->_map_config._map_node_size_x * map_pixel_resolution / 2.0) +
+      (this->map_config_.map_node_size_x_ * map_pixel_resolution / 2.0) +
       static_cast<int>(filter_size_x / 2) * map_pixel_resolution;
   pt_top_right[1] = pt_top_left[1];
   pt_top_left[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_top_right,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_top_right,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// middle left
@@ -501,13 +514,13 @@ bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
   pt_middle_left[0] = pt_top_left[0];
   pt_middle_left[1] = seed_pt3d[1];
   pt_middle_left[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_middle_left,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_middle_left,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// middle center
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, seed_pt3d,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, seed_pt3d,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// middle right
@@ -515,8 +528,8 @@ bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
   pt_middle_right[0] = pt_top_right[0];
   pt_middle_right[1] = seed_pt3d[1];
   pt_middle_right[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_middle_right,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_middle_right,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// bottom left
@@ -524,11 +537,11 @@ bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
   pt_bottom_left[0] = pt_top_left[0];
   pt_bottom_left[1] =
       seed_pt3d[1] +
-      (this->_map_config._map_node_size_y * map_pixel_resolution / 2.0) +
+      (this->map_config_.map_node_size_y_ * map_pixel_resolution / 2.0) +
       static_cast<int>(filter_size_y / 2) * map_pixel_resolution;
   pt_bottom_left[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_bottom_left,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_bottom_left,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// bottom center
@@ -536,8 +549,8 @@ bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
   pt_bottom_center[0] = seed_pt3d[0];
   pt_bottom_center[1] = pt_bottom_left[1];
   pt_bottom_center[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_bottom_center,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_bottom_center,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
   /// bottom right
@@ -545,11 +558,11 @@ bool BaseMap::load_map_area(const Eigen::Vector3d& seed_pt3d,
   pt_bottom_right[0] = pt_top_right[0];
   pt_bottom_right[1] = pt_bottom_left[1];
   pt_bottom_right[2] = 0;
-  map_id = MapNodeIndex::get_map_node_index(this->_map_config, pt_bottom_right,
-                                            resolution_id, zone_id);
+  map_id = MapNodeIndex::GetMapNodeIndex(this->map_config_, pt_bottom_right,
+                                         resolution_id, zone_id);
   map_ids.insert(map_id);
 
-  this->load_map_nodes(map_ids);
+  this->LoadMapNodes(map_ids);
   return true;
 }
 

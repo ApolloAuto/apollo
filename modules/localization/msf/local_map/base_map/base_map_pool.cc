@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/msf/local_map/base_map/base_map_pool.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
@@ -9,96 +25,96 @@ namespace msf {
 
 BaseMapNodePool::BaseMapNodePool(unsigned int pool_size,
                                  unsigned int thread_size)
-    : _pool_size(pool_size), _node_reset_workers(thread_size) {}
+    : pool_size_(pool_size), node_reset_workers_(thread_size) {}
 
 BaseMapNodePool::~BaseMapNodePool() {
-  release();
+  Release();
 }
 
-void BaseMapNodePool::initial(const BaseMapConfig* map_config,
+void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
                               bool is_fixed_size) {
-  _is_fixed_size = is_fixed_size;
-  _map_config = map_config;
-  for (unsigned int i = 0; i < _pool_size; ++i) {
-    BaseMapNode* node = alloc_new_map_node();
-    init_new_map_node(node);
-    _free_list.push_back(node);
+  is_fixed_size_ = is_fixed_size;
+  map_config_ = map_config;
+  for (unsigned int i = 0; i < pool_size_; ++i) {
+    BaseMapNode* node = AllocNewMapNode();
+    InitNewMapNode(node);
+    free_list_.push_back(node);
   }
 }
 
-void BaseMapNodePool::release() {
-  _node_reset_workers.wait();
-  typename std::list<BaseMapNode*>::iterator i = _free_list.begin();
-  while (i != _free_list.end()) {
-    finalize_map_node(*i);
-    delloc_map_node(*i);
+void BaseMapNodePool::Release() {
+  node_reset_workers_.wait();
+  typename std::list<BaseMapNode*>::iterator i = free_list_.begin();
+  while (i != free_list_.end()) {
+    FinalizeMapNode(*i);
+    DellocMapNode(*i);
     i++;
   }
-  _free_list.clear();
-  typename std::set<BaseMapNode*>::iterator j = _busy_nodes.begin();
-  while (j != _busy_nodes.end()) {
-    finalize_map_node(*j);
-    delloc_map_node(*j);
+  free_list_.clear();
+  typename std::set<BaseMapNode*>::iterator j = busy_nodes_.begin();
+  while (j != busy_nodes_.end()) {
+    FinalizeMapNode(*j);
+    DellocMapNode(*j);
     j++;
   }
-  _busy_nodes.clear();
-  _pool_size = 0;
+  busy_nodes_.clear();
+  pool_size_ = 0;
 }
 
-BaseMapNode* BaseMapNodePool::alloc_map_node() {
-  if (_free_list.empty()) {
-    _node_reset_workers.wait();
+BaseMapNode* BaseMapNodePool::AllocMapNode() {
+  if (free_list_.empty()) {
+    node_reset_workers_.wait();
   }
-  boost::unique_lock<boost::mutex> lock(_mutex);
-  if (_free_list.empty()) {
-    if (_is_fixed_size) {
+  boost::unique_lock<boost::mutex> lock(mutex_);
+  if (free_list_.empty()) {
+    if (is_fixed_size_) {
       return NULL;
     }
-    BaseMapNode* node = alloc_new_map_node();
-    init_new_map_node(node);
-    _pool_size++;
-    _busy_nodes.insert(node);
+    BaseMapNode* node = AllocNewMapNode();
+    InitNewMapNode(node);
+    pool_size_++;
+    busy_nodes_.insert(node);
     return node;
   } else {
-    BaseMapNode* node = _free_list.front();
-    _free_list.pop_front();
-    _busy_nodes.insert(node);
+    BaseMapNode* node = free_list_.front();
+    free_list_.pop_front();
+    busy_nodes_.insert(node);
     return node;
   }
 }
 
-void BaseMapNodePool::free_map_node(BaseMapNode* map_node) {
-  _node_reset_workers.schedule(
-      boost::bind(&BaseMapNodePool::free_map_node_task, this, map_node));
+void BaseMapNodePool::FreeMapNode(BaseMapNode* map_node) {
+  node_reset_workers_.schedule(
+      boost::bind(&BaseMapNodePool::FreeMapNodeTask, this, map_node));
 }
 
-void BaseMapNodePool::free_map_node_task(BaseMapNode* map_node) {
-  finalize_map_node(map_node);
-  reset_map_node(map_node);
+void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
+  FinalizeMapNode(map_node);
+  ResetMapNode(map_node);
   {
-    boost::unique_lock<boost::mutex> lock(_mutex);
-    typename std::set<BaseMapNode*>::iterator f = _busy_nodes.find(map_node);
-    assert(f != _busy_nodes.end());
-    _free_list.push_back(*f);
-    _busy_nodes.erase(f);
+    boost::unique_lock<boost::mutex> lock(mutex_);
+    typename std::set<BaseMapNode*>::iterator f = busy_nodes_.find(map_node);
+    assert(f != busy_nodes_.end());
+    free_list_.push_back(*f);
+    busy_nodes_.erase(f);
   }
 }
 
-void BaseMapNodePool::init_new_map_node(BaseMapNode* node) {
-  node->init_map_matrix(_map_config);
+void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
+  node->InitMapMatrix(map_config_);
   return;
 }
 
-void BaseMapNodePool::finalize_map_node(BaseMapNode* node) {
-  node->finalize();
+void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) {
+  node->Finalize();
 }
 
-void BaseMapNodePool::delloc_map_node(BaseMapNode* node) {
+void BaseMapNodePool::DellocMapNode(BaseMapNode* node) {
   delete node;
 }
 
-void BaseMapNodePool::reset_map_node(BaseMapNode* node) {
-  node->reset_map_node();
+void BaseMapNodePool::ResetMapNode(BaseMapNode* node) {
+  node->ResetMapNode();
 }
 
 }  // namespace msf

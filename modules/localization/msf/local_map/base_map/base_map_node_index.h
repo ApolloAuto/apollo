@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_NODE_INDEX_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_NODE_INDEX_H
 
@@ -23,15 +39,15 @@ class MapNodeIndex {
   bool operator==(const MapNodeIndex& index) const;
   /**@brief Overload the unequal operator. */
   bool operator!=(const MapNodeIndex& index) const;
-  std::string to_string() const;
+  std::string ToString() const;
 
   // /**@brief Construct a map node index, given a global coordinate. */
-  // static MapNodeIndex get_map_node_index(const BaseMapConfig& option,
+  // static MapNodeIndex GetMapNodeIndex(const BaseMapConfig& option,
   //                                        const
   //                                        idl::car::core::numerical::Vector3D&
   //                                        coordinate, unsigned int
   //                                        resolution_id, int zone_id);
-  // static MapNodeIndex get_map_node_index(const BaseMapConfig& option,
+  // static MapNodeIndex GetMapNodeIndex(const BaseMapConfig& option,
   //                                        const
   //                                        idl::car::core::numerical::Vector2D&
   //                                        coordinate, unsigned int
@@ -39,37 +55,35 @@ class MapNodeIndex {
 
   /**@brief Construct a map node index, given a global coordinate, eigen
    * version. */
-  static MapNodeIndex get_map_node_index(const BaseMapConfig& option,
-                                         const Eigen::Vector3d& coordinate,
-                                         unsigned int resolution_id,
-                                         int zone_id);
-  static MapNodeIndex get_map_node_index(const BaseMapConfig& option,
-                                         const Eigen::Vector2d& coordinate,
-                                         unsigned int resolution_id,
-                                         int zone_id);
+  static MapNodeIndex GetMapNodeIndex(const BaseMapConfig& option,
+                                      const Eigen::Vector3d& coordinate,
+                                      unsigned int resolution_id, int zone_id);
+  static MapNodeIndex GetMapNodeIndex(const BaseMapConfig& option,
+                                      const Eigen::Vector2d& coordinate,
+                                      unsigned int resolution_id, int zone_id);
 
   /**@brief Get the index range (maximum possible index + 1) in the east
    * direction. */
-  static unsigned int get_map_index_range_east(const BaseMapConfig& option,
-                                               unsigned int resolution_id);
+  static unsigned int GetMapIndexRangeEast(const BaseMapConfig& option,
+                                           unsigned int resolution_id);
   /**@brief Get the index range (maximum possible index + 1) in the north
    * direction. */
-  static unsigned int get_map_index_range_north(const BaseMapConfig& option,
-                                                unsigned int resolution_id);
+  static unsigned int GetMapIndexRangeNorth(const BaseMapConfig& option,
+                                            unsigned int resolution_id);
 
   friend std::ostream& operator<<(std::ostream& cout,
                                   const MapNodeIndex& index);
 
   /**@brief The ID of the resolution.
-   * Should be less than BaseMapConfig::_map_resolutions.size(). */
-  unsigned int _resolution_id;
+   * Should be less than BaseMapConfig::map_resolutions_.size(). */
+  unsigned int resolution_id_;
   /**@brief The zone ID. 1 - 60 and -1 - -60.
    * The positive value is the zone at the north hemisphere. */
-  int _zone_id;
+  int zone_id_;
   /**@brief The map node ID at the northing direction. */
-  unsigned int _m;
+  unsigned int m_;
   /**@brief The map node ID at the easting direction. */
-  unsigned int _n;
+  unsigned int n_;
 };
 
 }  // namespace msf

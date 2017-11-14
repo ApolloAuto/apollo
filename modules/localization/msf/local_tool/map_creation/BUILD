@@ -11,7 +11,7 @@ cc_binary(
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
-        "-lboost_program_options",
+        "-lboost_program_options"
     ],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
@@ -19,7 +19,7 @@ cc_binary(
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "@eigen//:eigen",
-        "@glog//:glog",
+        "@glog//:glog"
     ],
 )
 
@@ -32,7 +32,7 @@ cc_binary(
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
-        "-lboost_program_options",
+        "-lboost_program_options"
     ],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
@@ -41,7 +41,7 @@ cc_binary(
         "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "@eigen//:eigen",
-        "@glog//:glog",
+        "@glog//:glog"
     ],
 )
 

@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
@@ -24,12 +40,12 @@ typedef LossyMapConfig2D LossyMapConfig;
 MapNodeIndex get_map_index_from_map_folder(const std::string& map_folder) {
   MapNodeIndex index;
   char buf[100];
-  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index._resolution_id,
-         buf, &index._zone_id, &index._m, &index._n);
+  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_,
+         buf, &index.zone_id_, &index.m_, &index.n_);
   std::string zone = buf;
   // std::cout << zone << std::endl;
   if (zone == "south") {
-    index._zone_id = -index._zone_id;
+    index.zone_id_ = -index.zone_id_;
   }
   std::cout << index << std::endl;
   return index;
@@ -107,13 +123,13 @@ int main(int argc, char** argv) {
 
   LosslessMapConfig lossless_config("lossless_map");
   LosslessMapNodePool lossless_map_node_pool(25, 8);
-  lossless_map_node_pool.initial(&lossless_config);
+  lossless_map_node_pool.Initial(&lossless_config);
 
   LosslessMap lossless_map(lossless_config);
-  lossless_map.init_thread_pool(1, 6);
-  lossless_map.init_map_node_caches(12, 24);
-  lossless_map.attach_map_node_pool(&lossless_map_node_pool);
-  if (!lossless_map.set_map_folder_path(src_map_folder)) {
+  lossless_map.InitThreadPool(1, 6);
+  lossless_map.InitMapNodeCaches(12, 24);
+  lossless_map.AttachMapNodePool(&lossless_map_node_pool);
+  if (!lossless_map.SetMapFolderPath(src_map_folder)) {
     std::cerr << "Reflectance map folder is invalid!" << std::endl;
     return -1;
   }
@@ -129,20 +145,20 @@ int main(int argc, char** argv) {
   std::cout << "index size: " << buf.size() << std::endl;
 
   LosslessMapConfig config_transform_lossy("lossless_map");
-  config_transform_lossy.load(src_map_folder + "config.xml");
-  config_transform_lossy._map_version = "lossy_full_alt";
-  config_transform_lossy.save(dst_map_folder + "config.xml");
+  config_transform_lossy.Load(src_map_folder + "config.xml");
+  config_transform_lossy.map_version_ = "lossy_full_alt";
+  config_transform_lossy.Save(dst_map_folder + "config.xml");
 
   std::cout << "lossy map directory structure has built." << std::endl;
 
   LossyMapConfig lossy_config("lossy_full_alt");
   LossyMapNodePool lossy_map_node_pool(25, 8);
-  lossy_map_node_pool.initial(&lossy_config);
+  lossy_map_node_pool.Initial(&lossy_config);
   LossyMap lossy_map(lossy_config);
-  lossy_map.init_thread_pool(1, 6);
-  lossy_map.init_map_node_caches(12, 24);
-  lossy_map.attach_map_node_pool(&lossy_map_node_pool);
-  if (!lossy_map.set_map_folder_path(dst_map_folder)) {
+  lossy_map.InitThreadPool(1, 6);
+  lossy_map.InitMapNodeCaches(12, 24);
+  lossy_map.AttachMapNodePool(&lossy_map_node_pool);
+  if (!lossy_map.SetMapFolderPath(dst_map_folder)) {
     std::cout << "lossy_map config xml not exist" << std::endl;
   }
 
@@ -158,26 +174,26 @@ int main(int argc, char** argv) {
     // float alt_min = 100.0;
 
     LosslessMapNode* lossless_node =
-        static_cast<LosslessMapNode*>(lossless_map.get_map_node_safe(*itr));
+        static_cast<LosslessMapNode*>(lossless_map.GetMapNodeSafe(*itr));
     if (lossless_node == NULL) {
       std::cerr << "index: " << index << " is a NULL pointer!" << std::endl;
       continue;
     }
     LosslessMapMatrix& lossless_matrix =
-        static_cast<LosslessMapMatrix&>(lossless_node->get_map_cell_matrix());
+        static_cast<LosslessMapMatrix&>(lossless_node->GetMapCellMatrix());
 
     LossyMapNode* lossy_node =
-        static_cast<LossyMapNode*>(lossy_map.get_map_node_safe(*itr));
+        static_cast<LossyMapNode*>(lossy_map.GetMapNodeSafe(*itr));
     LossyMapMatrix& lossy_matrix =
-        static_cast<LossyMapMatrix&>(lossy_node->get_map_cell_matrix());
+        static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
 
-    int rows = lossless_config._map_node_size_y;
-    int cols = lossless_config._map_node_size_x;
+    int rows = lossless_config.map_node_size_y_;
+    int cols = lossless_config.map_node_size_x_;
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
-        float intensity = lossless_node->get_value(row, col);
-        float intensity_var = lossless_node->get_var(row, col);
-        unsigned int count = lossless_node->get_count(row, col);
+        float intensity = lossless_node->GetValue(row, col);
+        float intensity_var = lossless_node->GetVar(row, col);
+        unsigned int count = lossless_node->GetCount(row, col);
 
         // Read altitude
         float altitude_ground = 0.0;
@@ -185,13 +201,13 @@ int main(int argc, char** argv) {
         bool is_ground_useful = false;
         std::vector<float> layer_alts;
         std::vector<unsigned int> layer_counts;
-        lossless_matrix.get_map_cell(row, col).get_count(layer_counts);
-        lossless_matrix.get_map_cell(row, col).get_alt(layer_alts);
+        lossless_matrix.GetMapCell(row, col).GetCount(layer_counts);
+        lossless_matrix.GetMapCell(row, col).GetAlt(layer_alts);
         if (layer_counts.size() == 0 || layer_alts.size() == 0) {
-          altitude_avg = lossless_node->get_alt(row, col);
+          altitude_avg = lossless_node->GetAlt(row, col);
           is_ground_useful = false;
         } else {
-          altitude_avg = lossless_node->get_alt(row, col);
+          altitude_avg = lossless_node->GetAlt(row, col);
           altitude_ground = layer_alts[0];
           is_ground_useful = true;
         }
@@ -204,7 +220,7 @@ int main(int argc, char** argv) {
         lossy_matrix[row][col].is_ground_useful = is_ground_useful;
       }
     }
-    lossy_node->set_is_changed(true);
+    lossy_node->SetIsChanged(true);
   }
 
   return 0;

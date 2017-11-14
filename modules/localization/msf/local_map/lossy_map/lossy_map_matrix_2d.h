@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #ifndef BAIDU_ADU_LOSSY_MAP_MATRIX_FULL_ALT_2D_H
 #define BAIDU_ADU_LOSSY_MAP_MATRIX_FULL_ALT_2D_H
 
@@ -13,19 +29,19 @@ struct LossyMapCell2D {
   /**@brief The default constructor. */
   LossyMapCell2D();
   /**@brief Reset to default value. */
-  inline void reset();
+  inline void Reset();
   // /**@brief Load the map cell from a binary chunk.
   //  * @param <return> The size read (the real size of object).
   //  */
-  // inline unsigned int load_binary(unsigned char * buf);
+  // inline unsigned int LoadBinary(unsigned char * buf);
   // /**@brief Create the binary. Serialization of the object.
   //  * @param <buf, buf_size> The buffer and its size.
   //  * @param <return> The required or the used size of is returned.
   //  */
-  // inline unsigned int create_binary(unsigned char * buf, unsigned int
+  // inline unsigned int CreateBinary(unsigned char * buf, unsigned int
   // buf_size) const;
   // /**@brief Get the binary size of the object. */
-  // inline unsigned int get_binary_size() const;
+  // inline unsigned int GetBinarySize() const;
   /**@brief Overloading the assign operator. */
   LossyMapCell2D& operator=(const LossyMapCell2D& ref);
   /**@brief The number of samples in the cell. */
@@ -48,68 +64,67 @@ class LossyMapMatrix2D : public BaseMapMatrix {
   ~LossyMapMatrix2D();
   LossyMapMatrix2D(const LossyMapMatrix2D& matrix);
 
-  virtual void init(const BaseMapConfig* config);
+  virtual void Init(const BaseMapConfig* config);
   /**@brief Reset map cells data. */
-  virtual void reset(const BaseMapConfig* config);
+  virtual void Reset(const BaseMapConfig* config);
 
-  void init(unsigned int rows, unsigned int cols);
-  void reset(unsigned int rows, unsigned int cols);
+  void Init(unsigned int rows, unsigned int cols);
+  void Reset(unsigned int rows, unsigned int cols);
 
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
    */
-  virtual unsigned int load_binary(unsigned char* buf);
+  virtual unsigned int LoadBinary(unsigned char* buf);
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int create_binary(unsigned char* buf,
-                                     unsigned int buf_size) const;
+  virtual unsigned int CreateBinary(unsigned char* buf,
+                                    unsigned int buf_size) const;
   /**@brief Get the binary size of the object. */
-  virtual unsigned int get_binary_size() const;
+  virtual unsigned int GetBinarySize() const;
   /**@brief get intensity image of node. */
-  virtual void get_intensity_img(cv::Mat& intensity_img) const;
+  virtual void GetIntensityImg(cv::Mat& intensity_img) const;
 
   inline LossyMapCell2D* operator[](int row) {
-    return _map_cells + row * _cols;
+    return map_cells_ + row * cols_;
   }
   inline const LossyMapCell2D* operator[](int row) const {
-    return _map_cells + row * _cols;
+    return map_cells_ + row * cols_;
   }
 
  protected:
   /**@brief The number of rows. */
-  unsigned int _rows;
+  unsigned int rows_;
   /**@brief The number of columns. */
-  unsigned int _cols;
+  unsigned int cols_;
   /**@brief The matrix data structure. */
-  LossyMapCell2D* _map_cells;
+  LossyMapCell2D* map_cells_;
 
  protected:
-  inline unsigned char encode_intensity(const LossyMapCell2D& cell) const;
-  inline void decode_intensity(unsigned char data, LossyMapCell2D& cell) const;
-  inline unsigned short encode_var(const LossyMapCell2D& cell) const;
-  inline void decode_var(unsigned short data, LossyMapCell2D& cell) const;
-  inline unsigned short encode_altitude_ground(
-      const LossyMapCell2D& cell) const;
-  inline void decode_altitude_ground(unsigned short data,
-                                     LossyMapCell2D& cell) const;
-  inline unsigned short encode_altitude_avg(const LossyMapCell2D& cell) const;
-  inline void decode_altitude_avg(unsigned short data,
-                                  LossyMapCell2D& cell) const;
-  inline unsigned char encode_count(const LossyMapCell2D& cell) const;
-  inline void decode_count(unsigned char data, LossyMapCell2D& cell) const;
-  const int _var_range = 1023;  // 65535;
-  const int _var_ratio = 4;     // 256;
+  inline unsigned char EncodeIntensity(const LossyMapCell2D& cell) const;
+  inline void DecodeIntensity(unsigned char data, LossyMapCell2D& cell) const;
+  inline unsigned short EncodeVar(const LossyMapCell2D& cell) const;
+  inline void DecodeVar(unsigned short data, LossyMapCell2D& cell) const;
+  inline unsigned short EncodeAltitudeGround(const LossyMapCell2D& cell) const;
+  inline void DecodeAltitudeGround(unsigned short data,
+                                   LossyMapCell2D& cell) const;
+  inline unsigned short EncodeAltitudeAvg(const LossyMapCell2D& cell) const;
+  inline void DecodeAltitudeAvg(unsigned short data,
+                                LossyMapCell2D& cell) const;
+  inline unsigned char EncodeCount(const LossyMapCell2D& cell) const;
+  inline void DecodeCount(unsigned char data, LossyMapCell2D& cell) const;
+  const int var_range_ = 1023;  // 65535;
+  const int var_ratio_ = 4;     // 256;
   // const unsigned int _alt_range = 1023;//65535;
-  const float _alt_ground_interval = 0.04;
-  const unsigned short _ground_void_flag = 0xffff;
-  const float _alt_avg_interval = 0.04;
-  const int _count_range = 2;  // 30;
-  mutable float _alt_avg_min;
-  mutable float _alt_avg_max;
-  mutable float _alt_ground_min;
-  mutable float _alt_ground_max;
+  const float alt_ground_interval_ = 0.04;
+  const unsigned short ground_void_flag_ = 0xffff;
+  const float alt_avg_interval_ = 0.04;
+  const int count_range_ = 2;  // 30;
+  mutable float alt_avg_min_;
+  mutable float alt_avg_max_;
+  mutable float alt_ground_min_;
+  mutable float alt_ground_max_;
 };
 
 }  // namespace msf

@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_POOL_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_POOL_H
 
@@ -24,53 +40,53 @@ class BaseMapNodePool {
    * @param <map_config> The map option.
    * @param <is_fixed_size> The flag of pool auto expand.
    * */
-  void initial(const BaseMapConfig* map_config, bool is_fixed_size = true);
+  void Initial(const BaseMapConfig* map_config, bool is_fixed_size = true);
   /**@brief Release the pool. */
-  void release();
+  void Release();
   /**@brief Get a MapNode object from memory pool.
    * @param <return> The MapNode object.
    * */
-  BaseMapNode* alloc_map_node();
+  BaseMapNode* AllocMapNode();
   /**@brief Release MapNode object to memory pool.
    * @param <map_node> The released MapNode object.
    * */
-  void free_map_node(BaseMapNode* map_node);
+  void FreeMapNode(BaseMapNode* map_node);
   /**@brief Get the size of pool. */
-  unsigned int get_pool_size() {
-    return _pool_size;
+  unsigned int GetPoolSize() {
+    return pool_size_;
   }
 
  private:
   /**@brief The task function of the thread pool for release node.
    * @param <map_node> The released MapNode object.
    * */
-  void free_map_node_task(BaseMapNode* map_node);
+  void FreeMapNodeTask(BaseMapNode* map_node);
   /**@brief new a map node. */
-  virtual BaseMapNode* alloc_new_map_node() = 0;
+  virtual BaseMapNode* AllocNewMapNode() = 0;
   /**@brief init a map node. */
-  virtual void init_new_map_node(BaseMapNode* node);
-  /**@brief finalize a map node, before reset or delloc the map node. */
-  virtual void finalize_map_node(BaseMapNode* node);
+  virtual void InitNewMapNode(BaseMapNode* node);
+  /**@brief Finalize a map node, before reset or delloc the map node. */
+  virtual void FinalizeMapNode(BaseMapNode* node);
   /**@brief delloc a map node. */
-  virtual void delloc_map_node(BaseMapNode* node);
+  virtual void DellocMapNode(BaseMapNode* node);
   /**@brief reset a map node. */
-  virtual void reset_map_node(BaseMapNode* node);
+  virtual void ResetMapNode(BaseMapNode* node);
 
  protected:
   /**@brief The flag of pool auto expand. */
-  bool _is_fixed_size;
+  bool is_fixed_size_;
   /**@brief The list for free node. */
-  std::list<BaseMapNode*> _free_list;
+  std::list<BaseMapNode*> free_list_;
   /**@brief The set for used node. */
-  std::set<BaseMapNode*> _busy_nodes;
+  std::set<BaseMapNode*> busy_nodes_;
   /**@brief The size of memory pool. */
-  unsigned int _pool_size;
+  unsigned int pool_size_;
   /**@brief The thread pool for release node. */
-  ThreadPool _node_reset_workers;
+  ThreadPool node_reset_workers_;
   /**@brief The mutex for release thread.*/
-  boost::mutex _mutex;
+  boost::mutex mutex_;
   /**@brief The mutex for release thread.*/
-  const BaseMapConfig* _map_config;
+  const BaseMapConfig* map_config_;
 };
 
 }  // namespace msf

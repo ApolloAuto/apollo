@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
 
 namespace apollo {
@@ -12,7 +28,7 @@ LossyMapCell2D::LossyMapCell2D()
       altitude_ground(0.0),
       is_ground_useful(false) {}
 
-void LossyMapCell2D::reset() {
+void LossyMapCell2D::Reset() {
   intensity = 0.0;
   intensity_var = 0.0;
   altitude = 0.0;
@@ -32,62 +48,62 @@ LossyMapCell2D& LossyMapCell2D::operator=(const LossyMapCell2D& ref) {
 }
 
 LossyMapMatrix2D::LossyMapMatrix2D() {
-  _rows = 0;
-  _cols = 0;
-  _map_cells = NULL;
+  rows_ = 0;
+  cols_ = 0;
+  map_cells_ = NULL;
 }
 
 LossyMapMatrix2D::~LossyMapMatrix2D() {
-  if (_map_cells) {
-    delete[] _map_cells;
+  if (map_cells_) {
+    delete[] map_cells_;
   }
-  _rows = 0;
-  _cols = 0;
+  rows_ = 0;
+  cols_ = 0;
 }
 
 LossyMapMatrix2D::LossyMapMatrix2D(const LossyMapMatrix2D& matrix)
     : BaseMapMatrix(matrix) {
-  init(matrix._rows, matrix._cols);
-  for (unsigned int y = 0; y < _rows; ++y) {
-    for (unsigned int x = 0; x < _cols; ++x) {
-      _map_cells[y * _cols + x] = matrix[y][x];
+  Init(matrix.rows_, matrix.cols_);
+  for (unsigned int y = 0; y < rows_; ++y) {
+    for (unsigned int x = 0; x < cols_; ++x) {
+      map_cells_[y * cols_ + x] = matrix[y][x];
     }
   }
 }
 
-void LossyMapMatrix2D::init(const BaseMapConfig* config) {
-  unsigned int rows = config->_map_node_size_y;
-  unsigned int cols = config->_map_node_size_x;
-  if (_rows == rows && _cols == cols) {
+void LossyMapMatrix2D::Init(const BaseMapConfig* config) {
+  unsigned int rows = config->map_node_size_y_;
+  unsigned int cols = config->map_node_size_x_;
+  if (rows_ == rows && cols_ == cols) {
     return;
   }
-  init(rows, cols);
+  Init(rows, cols);
   return;
 }
 
-void LossyMapMatrix2D::init(unsigned int rows, unsigned int cols) {
-  if (_map_cells) {
-    delete[] _map_cells;
-    _map_cells = NULL;
+void LossyMapMatrix2D::Init(unsigned int rows, unsigned int cols) {
+  if (map_cells_) {
+    delete[] map_cells_;
+    map_cells_ = NULL;
   }
-  _map_cells = new LossyMapCell2D[rows * cols];
-  _rows = rows;
-  _cols = cols;
+  map_cells_ = new LossyMapCell2D[rows * cols];
+  rows_ = rows;
+  cols_ = cols;
 }
 
-void LossyMapMatrix2D::reset(const BaseMapConfig* config) {
-  reset(config->_map_node_size_y, config->_map_node_size_x);
+void LossyMapMatrix2D::Reset(const BaseMapConfig* config) {
+  Reset(config->map_node_size_y_, config->map_node_size_x_);
   return;
 }
 
-void LossyMapMatrix2D::reset(unsigned int rows, unsigned int cols) {
+void LossyMapMatrix2D::Reset(unsigned int rows, unsigned int cols) {
   unsigned int length = rows * cols;
   for (unsigned int i = 0; i < length; ++i) {
-    _map_cells[i].reset();
+    map_cells_[i].Reset();
   }
 }
 
-unsigned char LossyMapMatrix2D::encode_intensity(
+unsigned char LossyMapMatrix2D::EncodeIntensity(
     const LossyMapCell2D& cell) const {
   int intensity = cell.intensity;
   if (intensity > 255) {
@@ -99,17 +115,17 @@ unsigned char LossyMapMatrix2D::encode_intensity(
   return intensity;
 }
 
-void LossyMapMatrix2D::decode_intensity(unsigned char data,
-                                        LossyMapCell2D& cell) const {
+void LossyMapMatrix2D::DecodeIntensity(unsigned char data,
+                                       LossyMapCell2D& cell) const {
   cell.intensity = data;
 }
 
-unsigned short LossyMapMatrix2D::encode_var(const LossyMapCell2D& cell) const {
+unsigned short LossyMapMatrix2D::EncodeVar(const LossyMapCell2D& cell) const {
   float var = cell.intensity_var;
   var = std::sqrt(var);
-  int intensity_var = _var_range / (var * _var_ratio + 1.0);
-  if (intensity_var > _var_range) {
-    intensity_var = _var_range;
+  int intensity_var = var_range_ / (var * var_ratio_ + 1.0);
+  if (intensity_var > var_range_) {
+    intensity_var = var_range_;
   }
   if (intensity_var < 1) {
     intensity_var = 1;
@@ -117,20 +133,20 @@ unsigned short LossyMapMatrix2D::encode_var(const LossyMapCell2D& cell) const {
   return intensity_var;
 }
 
-void LossyMapMatrix2D::decode_var(unsigned short data,
-                                  LossyMapCell2D& cell) const {
+void LossyMapMatrix2D::DecodeVar(unsigned short data,
+                                 LossyMapCell2D& cell) const {
   float var = data;
-  var = (_var_range / var - 1.0) / _var_ratio;
+  var = (var_range_ / var - 1.0) / var_ratio_;
   cell.intensity_var = var * var;
 }
 
-unsigned short LossyMapMatrix2D::encode_altitude_ground(
+unsigned short LossyMapMatrix2D::EncodeAltitudeGround(
     const LossyMapCell2D& cell) const {
-  float delta_alt = cell.altitude_ground - _alt_ground_min;
-  delta_alt /= _alt_ground_interval;
+  float delta_alt = cell.altitude_ground - alt_ground_min_;
+  delta_alt /= alt_ground_interval_;
   int ratio = delta_alt + 0.5;
-  if (ratio >= _ground_void_flag) {
-    ratio = _ground_void_flag - 1;
+  if (ratio >= ground_void_flag_) {
+    ratio = ground_void_flag_ - 1;
   }
   if (ratio < 0) {
     ratio = 0;
@@ -138,17 +154,17 @@ unsigned short LossyMapMatrix2D::encode_altitude_ground(
   return ratio;
 }
 
-void LossyMapMatrix2D::decode_altitude_ground(unsigned short data,
-                                              LossyMapCell2D& cell) const {
+void LossyMapMatrix2D::DecodeAltitudeGround(unsigned short data,
+                                            LossyMapCell2D& cell) const {
   float ratio = data;
-  cell.altitude_ground = _alt_ground_min + ratio * _alt_ground_interval;
+  cell.altitude_ground = alt_ground_min_ + ratio * alt_ground_interval_;
   return;
 }
 
-unsigned short LossyMapMatrix2D::encode_altitude_avg(
+unsigned short LossyMapMatrix2D::EncodeAltitudeAvg(
     const LossyMapCell2D& cell) const {
-  float delta_alt = cell.altitude - _alt_avg_min;
-  delta_alt /= _alt_avg_interval;
+  float delta_alt = cell.altitude - alt_avg_min_;
+  delta_alt /= alt_avg_interval_;
   int ratio = delta_alt + 0.5;
   if (ratio > 0xffff) {
     ratio = 0xffff;
@@ -159,28 +175,28 @@ unsigned short LossyMapMatrix2D::encode_altitude_avg(
   return ratio;
 }
 
-void LossyMapMatrix2D::decode_altitude_avg(unsigned short data,
-                                           LossyMapCell2D& cell) const {
+void LossyMapMatrix2D::DecodeAltitudeAvg(unsigned short data,
+                                         LossyMapCell2D& cell) const {
   float ratio = data;
-  cell.altitude = _alt_avg_min + ratio * _alt_avg_interval;
+  cell.altitude = alt_avg_min_ + ratio * alt_avg_interval_;
   return;
 }
 
-unsigned char LossyMapMatrix2D::encode_count(const LossyMapCell2D& cell) const {
+unsigned char LossyMapMatrix2D::EncodeCount(const LossyMapCell2D& cell) const {
   int count_exp = 0;
   int count_tmp = cell.count;
   while (count_tmp > 0) {
     ++count_exp;
     count_tmp /= 2;
   }
-  if (count_exp > _count_range) {
-    count_exp = _count_range;
+  if (count_exp > count_range_) {
+    count_exp = count_range_;
   }
   return count_exp;
 }
 
-void LossyMapMatrix2D::decode_count(unsigned char data,
-                                    LossyMapCell2D& cell) const {
+void LossyMapMatrix2D::DecodeCount(unsigned char data,
+                                   LossyMapCell2D& cell) const {
   int count_exp = data;
   if (count_exp == 0) {
     cell.count = count_exp;
@@ -189,234 +205,234 @@ void LossyMapMatrix2D::decode_count(unsigned char data,
   }
 }
 
-unsigned int LossyMapMatrix2D::load_binary(unsigned char* buf) {
+unsigned int LossyMapMatrix2D::LoadBinary(unsigned char* buf) {
   unsigned int* p = reinterpret_cast<unsigned int*>(buf);
-  _rows = *p;
+  rows_ = *p;
   ++p;
-  _cols = *p;
+  cols_ = *p;
   ++p;
-  // std::cerr << "rows: " << _rows << ", clos: " << _cols << std::endl;
+  // std::cerr << "rows: " << rows_ << ", clos: " << cols_ << std::endl;
   float* pf = reinterpret_cast<float*>(p);
-  _alt_avg_min = *pf;
+  alt_avg_min_ = *pf;
   ++pf;
-  _alt_avg_max = *pf;
+  alt_avg_max_ = *pf;
   ++pf;
-  // std::cerr << "alt_min: " << _alt_avg_min << ", alt_max: " << _alt_avg_max
+  // std::cerr << "alt_min: " << alt_avg_min_ << ", alt_max: " << alt_avg_max_
   // << std::endl;
-  _alt_ground_min = *pf;
+  alt_ground_min_ = *pf;
   ++pf;
-  _alt_ground_max = *pf;
+  alt_ground_max_ = *pf;
   ++pf;
   // std::cerr << "alt_min: " << _alt_min << ", alt_max: " << _alt_max <<
   // std::endl;
 
-  init(_rows, _cols);
+  Init(rows_, cols_);
 
   unsigned char* pp = reinterpret_cast<unsigned char*>(pf);
   // count
-  for (unsigned int row = 0; row < _rows; ++row) {
-    for (unsigned int col = 0; col < _cols; ++col) {
-      decode_count(pp[row * _cols + col], _map_cells[row * _cols + col]);
+  for (unsigned int row = 0; row < rows_; ++row) {
+    for (unsigned int col = 0; col < cols_; ++col) {
+      DecodeCount(pp[row * cols_ + col], map_cells_[row * cols_ + col]);
     }
   }
-  pp += _rows * _cols;
+  pp += rows_ * cols_;
 
   // intensity
-  for (unsigned int row = 0; row < _rows; ++row) {
-    for (unsigned int col = 0; col < _cols; ++col) {
-      decode_intensity(pp[row * _cols + col], _map_cells[row * _cols + col]);
+  for (unsigned int row = 0; row < rows_; ++row) {
+    for (unsigned int col = 0; col < cols_; ++col) {
+      DecodeIntensity(pp[row * cols_ + col], map_cells_[row * cols_ + col]);
     }
   }
-  pp += _rows * _cols;
+  pp += rows_ * cols_;
 
   // intensity_var
-  unsigned char* pp_low = pp + _rows * _cols;
+  unsigned char* pp_low = pp + rows_ * cols_;
   unsigned char* pp_high = pp;
-  for (unsigned int row = 0; row < _rows; ++row) {
-    for (unsigned int col = 0; col < _cols; ++col) {
-      unsigned short var = pp_high[row * _cols + col];
-      var = var * 256 + pp_low[row * _cols + col];
-      decode_var(var, _map_cells[row * _cols + col]);
+  for (unsigned int row = 0; row < rows_; ++row) {
+    for (unsigned int col = 0; col < cols_; ++col) {
+      unsigned short var = pp_high[row * cols_ + col];
+      var = var * 256 + pp_low[row * cols_ + col];
+      DecodeVar(var, map_cells_[row * cols_ + col]);
     }
   }
-  pp += 2 * _rows * _cols;
+  pp += 2 * rows_ * cols_;
 
   // altitude_avg
-  pp_low = pp + _rows * _cols;
+  pp_low = pp + rows_ * cols_;
   pp_high = pp;
-  for (unsigned int row = 0; row < _rows; ++row) {
-    for (unsigned int col = 0; col < _cols; ++col) {
-      unsigned short alt = pp_high[row * _cols + col];
-      alt = alt * 256 + pp_low[row * _cols + col];
-      LossyMapCell2D& cell = _map_cells[row * _cols + col];
+  for (unsigned int row = 0; row < rows_; ++row) {
+    for (unsigned int col = 0; col < cols_; ++col) {
+      unsigned short alt = pp_high[row * cols_ + col];
+      alt = alt * 256 + pp_low[row * cols_ + col];
+      LossyMapCell2D& cell = map_cells_[row * cols_ + col];
       if (cell.count > 0) {
-        decode_altitude_avg(alt, cell);
+        DecodeAltitudeAvg(alt, cell);
       } else {
         cell.altitude = 0.0;
       }
     }
   }
-  pp += 2 * _rows * _cols;
+  pp += 2 * rows_ * cols_;
 
   // altitude_ground
-  pp_low = pp + _rows * _cols;
+  pp_low = pp + rows_ * cols_;
   pp_high = pp;
-  for (unsigned int row = 0; row < _rows; ++row) {
-    for (unsigned int col = 0; col < _cols; ++col) {
-      unsigned short alt = pp_high[row * _cols + col];
-      alt = alt * 256 + pp_low[row * _cols + col];
-      LossyMapCell2D& cell = _map_cells[row * _cols + col];
-      if (alt == _ground_void_flag) {
+  for (unsigned int row = 0; row < rows_; ++row) {
+    for (unsigned int col = 0; col < cols_; ++col) {
+      unsigned short alt = pp_high[row * cols_ + col];
+      alt = alt * 256 + pp_low[row * cols_ + col];
+      LossyMapCell2D& cell = map_cells_[row * cols_ + col];
+      if (alt == ground_void_flag_) {
         cell.is_ground_useful = false;
         cell.altitude_ground = 0.0;
       } else {
         cell.is_ground_useful = true;
-        decode_altitude_ground(alt, cell);
+        DecodeAltitudeGround(alt, cell);
       }
     }
   }
-  pp += 2 * _rows * _cols;
+  pp += 2 * rows_ * cols_;
 
-  return get_binary_size();
+  return GetBinarySize();
 }
 
-unsigned int LossyMapMatrix2D::create_binary(unsigned char* buf,
-                                             unsigned int buf_size) const {
-  unsigned int target_size = get_binary_size();
+unsigned int LossyMapMatrix2D::CreateBinary(unsigned char* buf,
+                                            unsigned int buf_size) const {
+  unsigned int target_size = GetBinarySize();
   if (buf_size >= target_size) {
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
-    *p = _rows;
+    *p = rows_;
     ++p;
-    *p = _cols;
+    *p = cols_;
     ++p;
     buf_size -= sizeof(unsigned int) * 2;
 
     float* pf = reinterpret_cast<float*>(p);
-    _alt_avg_min = 1e8;
-    _alt_avg_max = -1e8;
-    for (unsigned int y = 0; y < _rows; ++y) {
-      for (unsigned int x = 0; x < _cols; ++x) {
-        const LossyMapCell2D& cell = _map_cells[y * _cols + x];
+    alt_avg_min_ = 1e8;
+    alt_avg_max_ = -1e8;
+    for (unsigned int y = 0; y < rows_; ++y) {
+      for (unsigned int x = 0; x < cols_; ++x) {
+        const LossyMapCell2D& cell = map_cells_[y * cols_ + x];
         if (cell.count == 0) {
           continue;
         }
-        if (cell.altitude > _alt_avg_max) {
-          _alt_avg_max = cell.altitude;
+        if (cell.altitude > alt_avg_max_) {
+          alt_avg_max_ = cell.altitude;
         }
-        if (cell.altitude < _alt_avg_min) {
-          _alt_avg_min = cell.altitude;
+        if (cell.altitude < alt_avg_min_) {
+          alt_avg_min_ = cell.altitude;
         }
       }
     }
-    *pf = _alt_avg_min;
+    *pf = alt_avg_min_;
     ++pf;
-    *pf = _alt_avg_max;
+    *pf = alt_avg_max_;
     ++pf;
     buf_size -= sizeof(float) * 2;
 
-    _alt_ground_min = 1e8;
-    _alt_ground_max = -1e8;
-    for (unsigned int y = 0; y < _rows; ++y) {
-      for (unsigned int x = 0; x < _cols; ++x) {
-        const LossyMapCell2D& cell = _map_cells[y * _cols + x];
+    alt_ground_min_ = 1e8;
+    alt_ground_max_ = -1e8;
+    for (unsigned int y = 0; y < rows_; ++y) {
+      for (unsigned int x = 0; x < cols_; ++x) {
+        const LossyMapCell2D& cell = map_cells_[y * cols_ + x];
         if (cell.is_ground_useful == false) {
           continue;
         }
-        if (cell.altitude_ground > _alt_ground_max) {
-          _alt_ground_max = cell.altitude_ground;
+        if (cell.altitude_ground > alt_ground_max_) {
+          alt_ground_max_ = cell.altitude_ground;
         }
-        if (cell.altitude_ground < _alt_ground_min) {
-          _alt_ground_min = cell.altitude_ground;
+        if (cell.altitude_ground < alt_ground_min_) {
+          alt_ground_min_ = cell.altitude_ground;
         }
       }
     }
-    *pf = _alt_ground_min;
+    *pf = alt_ground_min_;
     ++pf;
-    *pf = _alt_ground_max;
+    *pf = alt_ground_max_;
     ++pf;
     buf_size -= sizeof(float) * 2;
 
     unsigned char* pp = reinterpret_cast<unsigned char*>(pf);
     // count
-    for (unsigned int row = 0; row < _rows; ++row) {
-      for (unsigned int col = 0; col < _cols; ++col) {
-        pp[row * _cols + col] = encode_count(_map_cells[row * _cols + col]);
+    for (unsigned int row = 0; row < rows_; ++row) {
+      for (unsigned int col = 0; col < cols_; ++col) {
+        pp[row * cols_ + col] = EncodeCount(map_cells_[row * cols_ + col]);
       }
     }
-    pp += _rows * _cols;
+    pp += rows_ * cols_;
 
     // intensity
-    for (unsigned int row = 0; row < _rows; ++row) {
-      for (unsigned int col = 0; col < _cols; ++col) {
-        pp[row * _cols + col] = encode_intensity(_map_cells[row * _cols + col]);
+    for (unsigned int row = 0; row < rows_; ++row) {
+      for (unsigned int col = 0; col < cols_; ++col) {
+        pp[row * cols_ + col] = EncodeIntensity(map_cells_[row * cols_ + col]);
       }
     }
-    pp += _rows * _cols;
+    pp += rows_ * cols_;
 
     // intensity_var
-    unsigned char* pp_low = pp + _rows * _cols;
+    unsigned char* pp_low = pp + rows_ * cols_;
     unsigned char* pp_high = pp;
-    for (unsigned int row = 0; row < _rows; ++row) {
-      for (unsigned int col = 0; col < _cols; ++col) {
-        unsigned short var = encode_var(_map_cells[row * _cols + col]);
-        pp_high[row * _cols + col] = var / 256;
-        pp_low[row * _cols + col] = var % 256;
+    for (unsigned int row = 0; row < rows_; ++row) {
+      for (unsigned int col = 0; col < cols_; ++col) {
+        unsigned short var = EncodeVar(map_cells_[row * cols_ + col]);
+        pp_high[row * cols_ + col] = var / 256;
+        pp_low[row * cols_ + col] = var % 256;
       }
     }
-    pp += 2 * _rows * _cols;
+    pp += 2 * rows_ * cols_;
 
     // altitude_avg
-    pp_low = pp + _rows * _cols;
+    pp_low = pp + rows_ * cols_;
     pp_high = pp;
-    for (unsigned int row = 0; row < _rows; ++row) {
-      for (unsigned int col = 0; col < _cols; ++col) {
+    for (unsigned int row = 0; row < rows_; ++row) {
+      for (unsigned int col = 0; col < cols_; ++col) {
         unsigned short altitude = 0.0;
-        if (_map_cells[row * _cols + col].count > 0) {
-          altitude = encode_altitude_avg(_map_cells[row * _cols + col]);
+        if (map_cells_[row * cols_ + col].count > 0) {
+          altitude = EncodeAltitudeAvg(map_cells_[row * cols_ + col]);
         }
-        pp_high[row * _cols + col] = altitude / 256;
-        pp_low[row * _cols + col] = altitude % 256;
+        pp_high[row * cols_ + col] = altitude / 256;
+        pp_low[row * cols_ + col] = altitude % 256;
       }
     }
-    pp += 2 * _rows * _cols;
+    pp += 2 * rows_ * cols_;
 
     // altitude_ground
-    pp_low = pp + _rows * _cols;
+    pp_low = pp + rows_ * cols_;
     pp_high = pp;
-    for (unsigned int row = 0; row < _rows; ++row) {
-      for (unsigned int col = 0; col < _cols; ++col) {
-        unsigned short altitude = _ground_void_flag;
-        if (_map_cells[row * _cols + col].is_ground_useful) {
-          altitude = encode_altitude_ground(_map_cells[row * _cols + col]);
+    for (unsigned int row = 0; row < rows_; ++row) {
+      for (unsigned int col = 0; col < cols_; ++col) {
+        unsigned short altitude = ground_void_flag_;
+        if (map_cells_[row * cols_ + col].is_ground_useful) {
+          altitude = EncodeAltitudeGround(map_cells_[row * cols_ + col]);
         }
-        pp_high[row * _cols + col] = altitude / 256;
-        pp_low[row * _cols + col] = altitude % 256;
+        pp_high[row * cols_ + col] = altitude / 256;
+        pp_low[row * cols_ + col] = altitude % 256;
       }
     }
-    pp += 2 * _rows * _cols;
+    pp += 2 * rows_ * cols_;
   }
   return target_size;
 }
 
-unsigned int LossyMapMatrix2D::get_binary_size() const {
+unsigned int LossyMapMatrix2D::GetBinarySize() const {
   unsigned int target_size =
       sizeof(unsigned int) * 2 + sizeof(float) * 4;  // rows and cols and alts
   // count, intensity, intensity_var, altitude_avg, altitude_ground
   target_size +=
-      _rows * _cols *
+      rows_ * cols_ *
       (sizeof(unsigned char) + sizeof(unsigned char) + sizeof(unsigned short) +
        sizeof(unsigned short) + sizeof(unsigned short));
   return target_size;
 }
 
-void LossyMapMatrix2D::get_intensity_img(cv::Mat& intensity_img) const {
-  intensity_img = cv::Mat(cv::Size(_cols, _rows), CV_8UC1);
+void LossyMapMatrix2D::GetIntensityImg(cv::Mat& intensity_img) const {
+  intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
 
-  for (int y = 0; y < _rows; ++y) {
-    for (int x = 0; x < _cols; ++x) {
-      unsigned int id = y * _cols + x;
+  for (int y = 0; y < rows_; ++y) {
+    for (int x = 0; x < cols_; ++x) {
+      unsigned int id = y * cols_ + x;
       intensity_img.at<unsigned char>(y, x) =
-          (unsigned char)(_map_cells[id].intensity);
+          (unsigned char)(map_cells_[id].intensity);
     }
   }
 }
