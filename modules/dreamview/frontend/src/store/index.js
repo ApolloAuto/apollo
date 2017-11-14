@@ -6,6 +6,7 @@ import Monitor from "store/monitor";
 import Options from "store/options";
 import Planning from "store/planning";
 import RouteEditingManager from "store/route_editing_manager";
+import TrafficSignal from "store/traffic_signal";
 import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
 
@@ -31,6 +32,8 @@ class DreamviewStore {
     @observable hmi = new HMI();
 
     @observable planning = new Planning();
+
+    @observable trafficSignal = new TrafficSignal();
 
     @observable meters = new Meters();
 

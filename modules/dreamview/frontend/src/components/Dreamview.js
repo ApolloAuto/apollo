@@ -19,7 +19,7 @@ import WS from "store/websocket";
 @inject("store") @observer
 class MainView extends React.Component {
     render() {
-        const { sceneDimension, meters, options, monitor, video } = this.props.store;
+        const { sceneDimension, meters, monitor, options, trafficSignal, video } = this.props.store;
 
         return (
             <div className="main-view" style={{height: sceneDimension.height}}>
@@ -30,6 +30,7 @@ class MainView extends React.Component {
                 {options.showRouteEditingBar
                     ? <RouteEditingBar />
                     : <StatusBar meters={meters}
+                                 trafficSignal={trafficSignal}
                                  showNotification={!options.showConsole}
                                  monitor={monitor}/>}
                 {video.showVideo && <DashCamPlayer />}
