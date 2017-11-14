@@ -37,6 +37,9 @@ const double kSegmentationEpsilon = 0.2;
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
 
+// margin for comparation
+const double kEpsilon = 0.1;
+
 void RemoveDuplicates(std::vector<Vec2d> *points) {
   CHECK_NOTNULL(points);
 
@@ -248,7 +251,8 @@ bool LaneInfo::IsOnLane(const Vec2d &point) const {
     return false;
   }
 
-  if (accumulate_s > total_length() || accumulate_s < 0.0) {
+  if (accumulate_s > (total_length() + kEpsilon) ||
+              (accumulate_s + kEpsilon) < 0.0) {
     return false;
   }
 
