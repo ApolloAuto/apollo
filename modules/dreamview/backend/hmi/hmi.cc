@@ -51,10 +51,17 @@ using apollo::control::DrivingAction;
 using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
 
+google::protobuf::util::JsonOptions JsonOption() {
+  google::protobuf::util::JsonOptions json_option;
+  json_option.always_print_primitive_fields = true;
+  return json_option;
+}
+
 std::string ProtoToTypedJson(const std::string &json_type,
                              const google::protobuf::Message &proto) {
+  static const auto kJsonOption = JsonOption();
   std::string json_string;
-  google::protobuf::util::MessageToJsonString(proto, &json_string);
+  google::protobuf::util::MessageToJsonString(proto, &json_string, kJsonOption);
 
   Json json_obj;
   json_obj["type"] = json_type;
@@ -110,9 +117,6 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
   if (!ContainsKey(modes, status_.current_mode())) {
     CHECK(!modes.empty());
     status_.set_current_mode(modes.begin()->first);
-  } else {
-    // Explicitly set the field to make it visible in the converted JSON.
-    status_.set_current_mode(status_.current_mode());
   }
 
   // Get available maps and vehicles by listing data directory.
