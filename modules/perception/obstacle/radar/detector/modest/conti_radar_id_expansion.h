@@ -33,7 +33,7 @@ class ContiRadarIDExpansion {
   }
   ~ContiRadarIDExpansion() {}
 
-  void ExpandIds(RadarObsArray &radar_obs) {
+  void ExpandIds(ContiRadar &radar_obs) {
     SkipOutdatedObjects(radar_obs);
     for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
       ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
@@ -52,13 +52,13 @@ class ContiRadarIDExpansion {
       contiobs.set_obstacle_id(local2global_[id]);
     }
   }
-  void SkipOutdatedObjects(RadarObsArray &radar_obs) {
-    RadarObsArray out_obs;
-    double timestamp = radar_obs.measurement_time() - 1e-6;
+  void SkipOutdatedObjects(ContiRadar &radar_obs) {
+    ContiRadar out_obs;
+    double timestamp = radar_obs.header().timestamp_sec() - 1e-6;
     need_inner_restart_ = false;
     for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
       ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
-      double object_timestamp = double(contiobs.header().radar_timestamp()) / 1e9;
+      double object_timestamp = double(contiobs.header().timestamp_sec());
       if (object_timestamp > timestamp) {
         ContiRadarObs *obs = out_obs.add_contiobs();
         *obs = contiobs;

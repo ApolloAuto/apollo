@@ -21,30 +21,27 @@
 namespace apollo {
 namespace dreamview {
 
-using google::protobuf::Map;
-
-TEST(HMITest, RunModuleCommand) {
-  HMI hmi(nullptr);
+TEST(HMITest, RunComponentCommand) {
+  google::protobuf::Map<std::string, Component> components;
   // Fail on not-exist component.
-  EXPECT_NE(0, hmi.RunModuleCommand("Module", "Any"));
+  EXPECT_NE(0, HMI::RunComponentCommand(components, "Module", "NotExist"));
 
-  auto *modules = hmi.config_.mutable_modules();
-  auto *module_commands = modules->insert({"Module", {}}).first
-      ->second.mutable_supported_commands();
+  auto *commands =
+      components.insert({"A", {}}).first->second.mutable_supported_commands();
   {
     // Succeed on single command.
-    module_commands->insert({"SingleCommand", "ls"});
-    EXPECT_EQ(0, hmi.RunModuleCommand("Module", "SingleCommand"));
+    commands->insert({"SingleCommand", "ls"});
+    EXPECT_EQ(0, HMI::RunComponentCommand(components, "A", "SingleCommand"));
   }
   {
     // Succeed on complex command.
-    module_commands->insert({"ComplexCommand", "ls /dev/null"});
-    EXPECT_EQ(0, hmi.RunModuleCommand("Module", "ComplexCommand"));
+    commands->insert({"ComplexCommand", "ls /dev/null"});
+    EXPECT_EQ(0, HMI::RunComponentCommand(components, "A", "ComplexCommand"));
   }
   {
     // Fail on bad command.
-    module_commands->insert({"BadCommand", "ls /dev/null/not_exist"});
-    EXPECT_NE(0, hmi.RunModuleCommand("Module", "BadCommand"));
+    commands->insert({"BadCommand", "ls /dev/null/not_exist"});
+    EXPECT_NE(0, HMI::RunComponentCommand(components, "A", "BadCommand"));
   }
 }
 

@@ -225,6 +225,19 @@ class HDMapImpl {
   int GetRoadBoundaries(const apollo::common::PointENU& point, double radius,
                         std::vector<RoadROIBoundaryPtr>* road_boundaries,
                         std::vector<JunctionBoundaryPtr>* junctions) const;
+  /**
+   * @brief get forward nearest signals within certain range on the lane
+   *        if there are two signals related to one stop line, 
+   *        return both signals.
+   * @param point the target position
+   * @param distance the forward search distance
+   * @param signals all signals match conditions
+   * @return 0:success, otherwise failed
+   */
+  int GetForwardNearestSignalsOnLane(
+             const apollo::common::PointENU& point,
+             const double distance,
+             std::vector<SignalInfoConstPtr>* signals) const;
 
  private:
   int GetLanes(const apollo::common::math::Vec2d& point, double distance,

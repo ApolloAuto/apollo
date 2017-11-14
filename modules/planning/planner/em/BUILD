@@ -18,7 +18,7 @@ cc_library(
         "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:factory",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_common",
         "//modules/planning/constraint_checker",

@@ -33,7 +33,7 @@ class DummyRadarDetector : public BaseRadarDetector {
     return result_init_;
   }
 
-  bool Detect(const RadarObsArray &raw_obstacles,
+  bool Detect(const ContiRadar &raw_obstacles,
               const std::vector<PolygonDType> &map_polygons,
               const RadarDetectorOptions &options,
               std::vector<ObjectPtr> *objects) override;

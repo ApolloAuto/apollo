@@ -2,12 +2,13 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-@observer
+
 class SideBarButton extends React.Component {
     render() {
-        const { onClick, active, label, extraClasses } = this.props;
+        const { disabled, onClick, active, label, extraClasses } = this.props;
         return (
             <button onClick={onClick}
+                    disabled={disabled}
                     className={classNames({
                             "button": true,
                             "active": active,
@@ -30,7 +31,7 @@ class DashCamButton extends React.Component {
     }
 
     render() {
-        const { onClick, video } = this.props;
+        const { disabled, onClick, video } = this.props;
 
         return (
           <div>
@@ -42,6 +43,7 @@ class DashCamButton extends React.Component {
                     accept="video/*"
                     onChange={onClick}/>
             <button onClick={this.onClickHandler}
+                    disabled={disabled}
                     className="button">
                 DashCam Video
             </button>
@@ -50,18 +52,14 @@ class DashCamButton extends React.Component {
     }
 }
 
-@observer
-export default class ButtonPanel extends React.Component {
-    openHMI() {
-        const server = window.location.origin;
-        const link = document.createElement("a");
-        link.href = server;
-        window.open(
-            `http://${link.hostname}:8887`, "_self");
-    }
 
+export default class ButtonPanel extends React.Component {
     render() {
-        const { onPOI, showPOI, showRouteEditingBar,
+        const { initialized,
+                onQuickStarter, showQuickStarter,
+                onModuleController, showModuleController,
+                onDefaultRouting,
+                onRouteEditingBar, showRouteEditingBar,
                 onVideo,
                 onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
@@ -69,39 +67,44 @@ export default class ButtonPanel extends React.Component {
 
         return (
             <div>
-                <SideBarButton label="HMI Setup" active={false}
-                               onClick={this.openHMI.bind(this)}
-                               extraClasses={["button-corner"]} />
-                <div className="separator" />
-                <SideBarButton label="Reset Backend Data"
-                               onClick={resetBackend}
-                               active={false} />
-                <div className="separator" />
-                <SideBarButton label="Dump Messages"
-                               onClick={dumpMessages}
-                               active={false} />
-                <div className="separator" />
-                <SideBarButton label="Default Routing"
-                               onClick={onPOI}
-                               active={showPOI} />
-                <div className="separator" />
-                <SideBarButton label="Route Editing"
-                               onClick={showRouteEditingBar}
-                               active={false} />
-                <div className="separator" />
-                <DashCamButton onClick={onVideo}/>
-                <div className="separator" />
-                <SideBarButton label="PNC Monitor"
-                               onClick={onPNCMonitor}
-                               active={showPNCMonitor} />
-                <div className="separator" />
-                <SideBarButton label="Notifications"
-                               onClick={onConsole}
-                               active={showConsole} />
-                <div className="separator" />
+                <SideBarButton label="Quick Start"
+                               disabled={false}
+                               onClick={onQuickStarter}
+                               active={showQuickStarter}/>
+                <SideBarButton label="Module Controller"
+                               disabled={false}
+                               onClick={onModuleController}
+                               active={showModuleController}/>
                 <SideBarButton label="Layer Menu"
+                               disabled={!initialized}
                                onClick={onMenu}
                                active={showMenu} />
+                <SideBarButton label="Route Editing"
+                               disabled={!initialized}
+                               onClick={onRouteEditingBar}
+                               active={showRouteEditingBar} />
+                <SideBarButton label="PNC Monitor"
+                               disabled={!initialized}
+                               onClick={onPNCMonitor}
+                               active={showPNCMonitor} />
+                <SideBarButton label="Notifications"
+                               disabled={!initialized}
+                               onClick={onConsole}
+                               active={showConsole} />
+                <SideBarButton label="Reset Backend Data"
+                               disabled={!initialized}
+                               onClick={resetBackend}
+                               active={false} />
+                <SideBarButton label="Dump Messages"
+                               disabled={!initialized}
+                               onClick={dumpMessages}
+                               active={false} />
+                <SideBarButton label="Default Routing"
+                               disabled={!initialized}
+                               onClick={onDefaultRouting}
+                               active={false} />
+                <DashCamButton disabled={!initialized}
+                               onClick={onVideo}/>
             </div>
         );
     }

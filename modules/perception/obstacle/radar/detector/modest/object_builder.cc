@@ -21,7 +21,7 @@
 namespace apollo {
 namespace perception {
 
-void ObjectBuilder::build(const RadarObsArray &raw_obstacles,
+void ObjectBuilder::build(const ContiRadar &raw_obstacles,
                           const Eigen::Matrix4d &radar_pose,
                           const Eigen::Vector2d &main_velocity,
                           SensorObjects &radar_objects) {

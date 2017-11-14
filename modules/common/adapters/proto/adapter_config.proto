@@ -32,7 +32,7 @@ message AdapterConfig {
     SYSTEM_STATUS = 24;
     INS_STATUS = 25;
     GNSS_STATUS = 26;
-    RADAR = 27;
+    CONTI_RADAR = 27;
     ODOMETRY = 28;
   }
   enum Mode {

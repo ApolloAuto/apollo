@@ -56,7 +56,7 @@ class RadarProcessSubnode : public Subnode {
   typedef std::pair<double, apollo::localization::Gps> ObjectPair;
   bool InitInternal() override;
 
-  void OnRadar(const RadarObsArray &radar_obs);
+  void OnRadar(const ContiRadar &radar_obs);
 
   void OnGps(const apollo::localization::Gps &gps);
 

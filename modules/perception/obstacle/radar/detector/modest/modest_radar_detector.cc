@@ -157,7 +157,7 @@ bool ModestRadarDetector::Init() {
   return true;
 }
 
-bool ModestRadarDetector::Detect(const RadarObsArray &raw_obstacles,
+bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
                                  const std::vector<PolygonDType> &map_polygons,
                                  const RadarDetectorOptions &options,
                                  std::vector<ObjectPtr> *objects) {
@@ -177,14 +177,10 @@ bool ModestRadarDetector::Detect(const RadarObsArray &raw_obstacles,
   main_velocity[0] = options.car_linear_speed[0];
   main_velocity[1] = options.car_linear_speed[1];
   // preparation
-  if (raw_obstacles.type() != apollo::drivers::CONTINENTAL_ARS_40821) {
-    AERROR << "Unkown radar sensor type!";
-    return false;
-  }
 
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
   object_builder_.build(raw_obstacles, radar_pose, main_velocity, *radar_objects);
-  radar_objects->timestamp = (double) raw_obstacles.measurement_time();
+  radar_objects->timestamp = (double) raw_obstacles.header().timestamp_sec();
   radar_objects->sensor_type = RADAR;
 
   // roi filter

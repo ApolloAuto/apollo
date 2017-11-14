@@ -19,6 +19,22 @@ cc_library(
 )
 
 cc_library(
+    name = "route_segments",
+    srcs = [
+        "route_segments.cc",
+    ],
+    hdrs = [
+        "route_segments.h",
+    ],
+    deps = [
+        "//modules/common/proto:vehicle_state_proto",
+        "//modules/map/hdmap",
+        "//modules/map/pnc_map:path",
+        "//modules/routing/common:routing_gflags",
+    ],
+)
+
+cc_library(
     name = "pnc_map",
     srcs = [
         "pnc_map.cc",
@@ -27,10 +43,19 @@ cc_library(
         "pnc_map.h",
     ],
     deps = [
+        ":path",
+        ":route_segments",
+        "//modules/common/proto:vehicle_state_proto",
         "//modules/map/hdmap",
-        "//modules/map/pnc_map:path",
         "//modules/routing/common:routing_gflags",
     ],
+)
+
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
 )
 
 cc_test(
@@ -42,17 +67,9 @@ cc_test(
     deps = [
         ":path",
         "//modules/common:log",
-        "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",
     ],
-)
-
-filegroup(
-    name = "testdata",
-    srcs = glob([
-        "testdata/**",
-    ]),
 )
 
 cc_test(
@@ -68,7 +85,24 @@ cc_test(
     deps = [
         ":pnc_map",
         "//modules/common:log",
-        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "route_segments_test",
+    size = "small",
+    srcs = [
+        "route_segments_test.cc",
+    ],
+    data = [
+        ":testdata",
+        "//modules/map:map_data",
+    ],
+    deps = [
+        ":route_segments",
+        "//modules/common:log",
         "//modules/common/util",
         "@gtest//:main",
     ],

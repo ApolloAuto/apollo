@@ -25,7 +25,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
@@ -182,7 +182,8 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
 double Crosswalk::GetStopDeceleration(
     ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* crosswalk_overlap) {
-  double adc_speed = common::VehicleState::instance()->linear_velocity();
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed < FLAGS_stop_min_speed) {
     return 0.0;
   }

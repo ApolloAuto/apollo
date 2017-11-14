@@ -211,6 +211,32 @@ kappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
+dkappaGraph:
+    title: 'Planning Dkappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                min: -0.02
+                max: 0.02
+                labelString: 'dkappa'
+    properties:
+        lines:
+            ReferenceLine:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            QpSplinePathOptimizer:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
 latencyGraph:
     title: 'Latency'
     options:

@@ -24,7 +24,7 @@ namespace perception {
 
 TEST(ContiRadarIDExpansionTest, conti_radar_id_expansion_test) {
   ContiRadarIDExpansion id_expansion;
-  RadarObsArray raw_obstacles;
+  ContiRadar raw_obstacles;
   ContiRadarObs *radar_obs = raw_obstacles.add_contiobs();
   radar_obs->set_obstacle_id(0);
   radar_obs->set_meas_state(CONTI_NEW);
@@ -50,20 +50,25 @@ TEST(ContiRadarIDExpansionTest, conti_radar_id_expansion_test) {
 
 TEST(ContiRadarIDExpansionSkipOutdatedObjectsTest, skip_outdated_objects_test) {
   ContiRadarIDExpansion id_expansion;
-  RadarObsArray raw_obstacles;
-  raw_obstacles.set_measurement_time(0.0);
+  ContiRadar raw_obstacles;
+  auto *sensor_header = raw_obstacles.mutable_header();
+  sensor_header->set_timestamp_sec(0.0);
+  sensor_header->set_radar_timestamp(0.0 * 1e9);
   ContiRadarObs *radar_obs = raw_obstacles.add_contiobs();
   radar_obs->set_meas_state(CONTI_NEW);
   auto *header = radar_obs->mutable_header();
+  header->set_timestamp_sec(0.0);
   header->set_radar_timestamp(0.0 * 1e9);
   id_expansion.SkipOutdatedObjects(raw_obstacles);
   EXPECT_TRUE(raw_obstacles.contiobs_size() == 1);
 
-  raw_obstacles.set_measurement_time(0.7);
+  sensor_header->set_timestamp_sec(0.7);
+  sensor_header->set_radar_timestamp(0.7 * 1e9);
   ContiRadarObs *radar_obs2 = raw_obstacles.add_contiobs();
   radar_obs2->set_obstacle_id(0);
   radar_obs2->set_meas_state(CONTI_NEW);
   auto *header2 = radar_obs->mutable_header();
+  header2->set_timestamp_sec(0.7);
   header2->set_radar_timestamp(0.7 * 1e9);
   id_expansion.SkipOutdatedObjects(raw_obstacles);
   EXPECT_TRUE(raw_obstacles.contiobs_size() == 1);

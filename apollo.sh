@@ -126,6 +126,10 @@ function build() {
 
   # Build python proto
   build_py_proto
+
+  # Update task info template on compiling.
+  bazel-bin/modules/data/recorder/update_task_info \
+      --commit_id=$(git rev-parse HEAD)
 }
 
 function cibuild() {
@@ -205,7 +209,7 @@ function release() {
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
   for m in control canbus localization decision perception \
-       prediction planning routing calibration
+       prediction planning routing calibration third_party_perception
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
@@ -265,6 +269,10 @@ function release() {
   mkdir -p $MODULES_DIR/drivers/velodyne/velodyne
   cp -r modules/drivers/velodyne/velodyne/launch $MODULES_DIR/drivers/velodyne/velodyne
 
+  # usb_cam launch
+  mkdir -p $MODULES_DIR/drivers/usb_cam
+  cp -r modules/drivers/usb_cam/launch $MODULES_DIR/drivers/usb_cam
+
   # lib
   LIB_DIR=$ROOT_DIR/lib
   mkdir $LIB_DIR
@@ -275,11 +283,12 @@ function release() {
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
     # hw check
-    mkdir -p $MODULES_DIR/monitor/hwmonitor/hw_check/
-    cp bazel-bin/modules/monitor/hwmonitor/hw_check/can_check $MODULES_DIR/monitor/hwmonitor/hw_check/
-    cp bazel-bin/modules/monitor/hwmonitor/hw_check/gps_check $MODULES_DIR/monitor/hwmonitor/hw_check/
-    mkdir -p $MODULES_DIR/monitor/hwmonitor/hw/tools/
-    cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
+    mkdir -p $MODULES_DIR/monitor/hardware/can
+    cp bazel-bin/modules/monitor/hardware/can/can_check $MODULES_DIR/monitor/hardware/can
+    mkdir -p $MODULES_DIR/monitor/hardware/gps
+    cp bazel-bin/modules/monitor/hardware/gps/gps_check $MODULES_DIR/monitor/hardware/gps
+    mkdir -p $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
+    cp bazel-bin/modules/monitor/hardware/can/esdcan/esdcan_tools/esdcan_test_app $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
@@ -289,10 +298,23 @@ function release() {
   cp LICENSE $ROOT_DIR
   cp third_party/ACKNOWLEDGEMENT.txt $ROOT_DIR
 
+  # mobileye drivers
+  mkdir -p $MODULES_DIR/drivers/delphi_esr
+  cp bazel-bin/modules/drivers/delphi_esr/delphi_esr $MODULES_DIR/drivers/delphi_esr
+  cp -r modules/drivers/delphi_esr/conf $MODULES_DIR/drivers/delphi_esr
+  mkdir -p $MODULES_DIR/drivers/mobileye
+  cp bazel-bin/modules/drivers/mobileye/mobileye $MODULES_DIR/drivers/mobileye
+  cp -r modules/drivers/mobileye/conf  $MODULES_DIR/drivers/mobileye
+
+  # conti_radar
+  mkdir -p $MODULES_DIR/drivers/conti_radar
+  cp bazel-bin/modules/drivers/conti_radar/conti_radar $MODULES_DIR/drivers/conti_radar
+  cp -r modules/drivers/conti_radar/conf $MODULES_DIR/drivers/conti_radar
+
   # release info
   META=${ROOT_DIR}/meta.txt
-  echo "Git commit: $(git show --oneline  -s | awk '{print $1}')" > $META
-  echo "Build time: $TIME" >>  $META
+  echo "Git commit: $(git rev-parse HEAD)" > $META
+  echo "Build time: $(get_now)" >>  $META
 }
 
 function gen_coverage() {
@@ -463,6 +485,8 @@ function build_gnss() {
   protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
   protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./ --python_out=./
   protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_raw_observation.proto --cpp_out=./ --python_out=./
+  protoc modules/drivers/gnss/proto/gnss_best_pose.proto --cpp_out=./ --python_out=./
 
   cd modules
   catkin_make_isolated --install --source drivers/gnss \
@@ -497,6 +521,29 @@ function build_velodyne() {
 
   cd modules
   catkin_make_isolated --install --source drivers/velodyne \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
+function build_usbcam() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
+    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/usb_cam \
     --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
     --cmake-args --no-warn-unused-cli
   find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
@@ -601,6 +648,9 @@ function main() {
       ;;
     buildvelodyne)
       build_velodyne
+      ;;
+    buildusbcam)
+      build_usbcam
       ;;
     config)
       config

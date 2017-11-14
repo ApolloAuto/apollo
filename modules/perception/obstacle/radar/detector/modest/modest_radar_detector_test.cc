@@ -30,9 +30,9 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   EXPECT_TRUE(radar_detector != nullptr);
   radar_detector->Init();
   radar_detector->object_builder_.SetDelayFrame(0);
-  RadarObsArray raw_obstacles;
-  raw_obstacles.set_type(apollo::drivers::CONTINENTAL_ARS_40821);
-  raw_obstacles.set_measurement_time(123456789.0);
+  ContiRadar raw_obstacles;
+  auto *header = raw_obstacles.mutable_header();
+  header->set_timestamp_sec(123456789.0);
   ContiRadarObs *radar_obs = raw_obstacles.add_contiobs();
   radar_obs->set_longitude_dist(0.0);
   radar_obs->set_lateral_dist(0.0);
@@ -84,7 +84,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.0) < 1e-5);
   EXPECT_TRUE(objects[0]->type == UNKNOWN);
   objects.resize(0);
-  raw_obstacles.set_measurement_time(123456789.074);
+  header->set_timestamp_sec(123456789.074);
   Eigen::Vector2d location(3.0 * time_diff, 4.0 * time_diff);
   radar_obs->set_longitude_dist(location(0));
   radar_obs->set_lateral_dist(location(1));

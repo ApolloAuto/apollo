@@ -74,7 +74,7 @@ public:
 
 private:
   SensorObjects radar_obs_;
-    std::vector<RadarTrack> obs_track_;
+  std::vector<RadarTrack> obs_track_;
 };
 
 } // namespace perception

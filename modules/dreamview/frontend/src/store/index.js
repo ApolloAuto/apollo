@@ -1,11 +1,12 @@
 import { observable, computed, action, runInAction } from "mobx";
-import * as THREE from "three";
 
+import HMI from "store/hmi";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
 import Planning from "store/planning";
 import RouteEditingManager from "store/route_editing_manager";
+import TrafficSignal from "store/traffic_signal";
 import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
 
@@ -15,7 +16,11 @@ class DreamviewStore {
 
     @observable worldTimestamp = 0;
 
-    @observable widthInPercentage = 1.0;
+    @observable sceneDimension = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        widthRatio: 1,
+    }
 
     @observable dimension = {
         width: window.innerWidth,
@@ -24,7 +29,11 @@ class DreamviewStore {
 
     @observable isInitialized = false;
 
+    @observable hmi = new HMI();
+
     @observable planning = new Planning();
+
+    @observable trafficSignal = new TrafficSignal();
 
     @observable meters = new Meters();
 
@@ -46,16 +55,23 @@ class DreamviewStore {
         this.worldTimestamp = newTimestamp;
     }
 
-    @action updateWidthInPercentage(newWidth) {
-        this.widthInPercentage = newWidth;
+    @action updateWidthInPercentage(newRatio) {
+        this.sceneDimension.widthRatio = newRatio;
         this.updateDimension();
     }
 
     @action updateDimension() {
-        this.dimension = {
-            width: window.innerWidth * this.widthInPercentage,
-            height: window.innerHeight,
-        };
+        const smallScreen = window.innerHeight < 800.0;
+        const offsetX = smallScreen ? 80 : 90; // width of side-bar
+        const offsetY = smallScreen ? 55 : 60; // height of header
+        const mainViewHeightRatio = 0.60;
+
+        this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;
+        this.dimension.height = window.innerHeight - offsetY;
+
+        this.sceneDimension.width = this.dimension.width - offsetX;
+        this.sceneDimension.height = this.options.showTools
+                ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 
     @action setInitializationStatus(status){
@@ -70,21 +86,49 @@ class DreamviewStore {
         this.geolocation = newGeolocation;
     }
 
-    @action setPNCMonitor() {
-        this.options.toggle('showPNCMonitor');
-        if(this.options.showPNCMonitor) {
-            this.updateWidthInPercentage(0.7);
-            this.options.selectCamera('Monitor');
-            this.options.showPlanningReference = true;
-            this.options.showPlaningDpOptimizer = true;
-            this.options.showPlanningQpOptimizer = true;
-        } else {
-            this.updateWidthInPercentage(1.0);
-            this.options.selectCamera('Default');
-            this.options.showPlanningReference = false;
-            this.options.showPlaningDpOptimizer = false;
-            this.options.showPlanningQpOptimizer = false;
+    @action enablePNCMonitor() {
+        this.updateWidthInPercentage(0.7);
+        this.options.selectCamera('Monitor');
+        this.options.showPlanningReference = true;
+        this.options.showPlaningDpOptimizer = true;
+        this.options.showPlanningQpOptimizer = true;
+    }
+
+    @action disablePNCMonitor() {
+        this.updateWidthInPercentage(1.0);
+        this.options.selectCamera('Default');
+        this.options.showPlanningReference = false;
+        this.options.showPlaningDpOptimizer = false;
+        this.options.showPlanningQpOptimizer = false;
+    }
+
+    handleSideBarClick(option) {
+        const oldShowPNCMonitor = this.options.showPNCMonitor;
+        const oldShowRouteEditingBar = this.options.showRouteEditingBar;
+
+        this.options.toggleSideBar(option);
+
+        // disable tools turned off after toggling
+        if (oldShowPNCMonitor && !this.options.showPNCMonitor) {
+            this.disablePNCMonitor();
         }
+        if (oldShowRouteEditingBar && !this.options.showRouteEditingBar) {
+            this.routeEditingManager.disableRouteEditing();
+        }
+
+        // enable selected tool
+        if (this.options[option]) {
+            switch(option) {
+                case "showPNCMonitor":
+                    this.enablePNCMonitor();
+                    break;
+                case 'showRouteEditingBar':
+                    this.routeEditingManager.enableRouteEditing();
+                    break;
+            }
+        }
+
+        this.updateDimension();
     }
 }
 

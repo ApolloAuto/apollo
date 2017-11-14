@@ -36,8 +36,8 @@ QpSplinePathOptimizer::QpSplinePathOptimizer()
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
   qp_spline_path_config_ = config.em_planner_config().qp_spline_path_config();
   std::vector<double> init_knots;
-  spline_generator_.reset(new Spline1dGenerator(init_knots,
-      qp_spline_path_config_.spline_order()));
+  spline_generator_.reset(
+      new Spline1dGenerator(init_knots, qp_spline_path_config_.spline_order()));
   is_init_ = true;
   return true;
 }
@@ -54,13 +54,30 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
                                        qp_spline_path_config_,
                                        reference_line_info_->AdcSlBoundary());
   path_generator.SetDebugLogger(reference_line_info_->mutable_debug());
+  path_generator.SetChangeLane(reference_line_info_->IsChangeLanePath());
 
-  if (!path_generator.Generate(
-          reference_line_info_->path_decision()->path_obstacles().Items(),
-          speed_data, init_point, path_data)) {
-    const std::string msg = "failed to generate spline path!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  double boundary_extension = 0.0;
+  bool is_final_attempt = false;
+
+  bool ret = path_generator.Generate(
+      reference_line_info_->path_decision()->path_obstacles().Items(),
+      speed_data, init_point, boundary_extension, is_final_attempt, path_data);
+  if (!ret) {
+    AERROR << "failed to generate spline path with boundary_extension = 0.";
+
+    boundary_extension = qp_spline_path_config_.cross_lane_lateral_extension();
+    is_final_attempt = true;
+
+    ret = path_generator.Generate(
+        reference_line_info_->path_decision()->path_obstacles().Items(),
+        speed_data, init_point, boundary_extension, is_final_attempt,
+        path_data);
+    if (!ret) {
+      const std::string msg =
+          "failed to generate spline path at final attempt.";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   }
 
   return Status::OK();

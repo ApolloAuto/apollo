@@ -9,7 +9,7 @@ message ModuleMonitorConf {
     optional string name = 1;
 
     // For process monitor.
-    optional string binary_path = 2;
+    repeated string process_cmd_keywords = 2;
 
     // TODO(xiaoxq): For message monitor, which hasn't been implemented.
     optional apollo.common.adapter.AdapterConfig.MessageType msg_type = 3;

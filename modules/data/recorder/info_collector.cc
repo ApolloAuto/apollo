@@ -16,56 +16,114 @@
 
 #include "modules/data/recorder/info_collector.h"
 
+#include <string>
+
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/control/common/control_gflags.h"
+
+DEFINE_string(task_info_template_file,
+              "modules/data/conf/task_info_template.pb.txt",
+              "Path of the task info template file.");
+
+DEFINE_string(recorder_conf_file, "modules/data/conf/recorder_conf.pb.txt",
+              "Path of the recorder config file.");
 
 namespace apollo {
 namespace data {
+namespace {
 
-Task InfoCollector::GetTaskInfo() {
-  Task task;
-  *task.mutable_vehicle() = GetVehicleInfo();
-  *task.mutable_environment() = GetEnvironmentInfo();
-  *task.mutable_hardware() = GetHardwareInfo();
-  *task.mutable_software() = GetSoftwareInfo();
-  *task.mutable_user() = GetUserInfo();
-  return task;
+using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::util::SetProtoToASCIIFile;
+using apollo::common::util::TranslatePath;
+using google::protobuf::Map;
+using google::protobuf::RepeatedPtrField;
+
+// Load files list to {file_path: file_content} map.
+Map<std::string, std::string> LoadFiles(
+    const RepeatedPtrField<std::string> &files) {
+  Map<std::string, std::string> result;
+  std::string content;
+  for (const auto &file : files) {
+    if (apollo::common::util::GetContent(TranslatePath(file), &content)) {
+      result.insert({file, content});
+    } else {
+      AERROR << "Cannot load file " << file;
+    }
+  }
+  return result;
 }
 
-VehicleInfo InfoCollector::GetVehicleInfo() {
-  VehicleInfo vehicle;
+}  // namespace
+
+InfoCollector::InfoCollector() : task_info_(LoadTaskInfoTemplate()) {
+  CHECK(GetProtoFromASCIIFile(FLAGS_recorder_conf_file, &config_));
+}
+
+const Task &InfoCollector::GetTaskInfo() {
+  // Use MergeFrom to override the template.
+  GetVehicleInfo();
+  GetEnvironmentInfo();
+  GetHardwareInfo();
+  GetSoftwareInfo();
+  GetUserInfo();
+  return task_info_;
+}
+
+const VehicleInfo &InfoCollector::GetVehicleInfo() {
+  VehicleInfo *vehicle = task_info_.mutable_vehicle();
   static auto *chassis_detail = CHECK_NOTNULL(
       apollo::common::adapter::AdapterManager::GetChassisDetail());
+
+  chassis_detail->Observe();
   if (!chassis_detail->Empty()) {
-    *vehicle.mutable_license() = chassis_detail->GetLatestObserved().license();
+    *vehicle->mutable_license() = chassis_detail->GetLatestObserved().license();
   }
 
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_canbus_conf_file, vehicle.mutable_canbus_conf()));
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_vehicle_config_path, vehicle.mutable_vehicle_config()));
-  return vehicle;
+  CHECK(GetProtoFromASCIIFile(FLAGS_canbus_conf_file,
+                              vehicle->mutable_canbus_conf()));
+  CHECK(GetProtoFromASCIIFile(FLAGS_vehicle_config_path,
+                              vehicle->mutable_vehicle_config()));
+  CHECK(GetProtoFromASCIIFile(FLAGS_control_conf_file,
+                              vehicle->mutable_control_config()));
+  return *vehicle;
 }
 
 // TODO(xiaoxq): Implement the info getters.
-EnvironmentInfo InfoCollector::GetEnvironmentInfo() {
-  EnvironmentInfo environment;
-  return environment;
+const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
+  return task_info_.environment();
 }
 
-HardwareInfo InfoCollector::GetHardwareInfo() {
-  HardwareInfo hardware;
-  return hardware;
+const HardwareInfo &InfoCollector::GetHardwareInfo() {
+  HardwareInfo *hardware = task_info_.mutable_hardware();
+  *hardware->mutable_configs() = LoadFiles(config_.hardware_configs());
+  return *hardware;
 }
 
-SoftwareInfo InfoCollector::GetSoftwareInfo() {
-  SoftwareInfo software;
-  return software;
+const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
+  SoftwareInfo *software = task_info_.mutable_software();
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+    software->set_docker_image(docker_image);
+  }
+  *software->mutable_configs() = LoadFiles(config_.software_configs());
+  return *software;
 }
 
-UserInfo InfoCollector::GetUserInfo() {
-  UserInfo user;
-  return user;
+const UserInfo &InfoCollector::GetUserInfo() {
+  return task_info_.user();
+}
+
+Task InfoCollector::LoadTaskInfoTemplate() {
+  Task task_info;
+  // The template might not exist, then just ignore.
+  if (apollo::common::util::PathExists(FLAGS_task_info_template_file)) {
+    CHECK(GetProtoFromASCIIFile(FLAGS_task_info_template_file, &task_info));
+  }
+  return task_info;
+}
+
+bool InfoCollector::SaveTaskInfoTemplate(const Task &task_info) {
+  return SetProtoToASCIIFile(task_info, FLAGS_task_info_template_file);
 }
 
 }  // namespace data

@@ -44,6 +44,7 @@ modules {
 modules {
   name: "mobileye"
   display_name: "Mobileye"
+  path: "modules/drivers/mobileye"
   supported_commands {
     name: "start"
     command: "scripts/mobileye.sh"
@@ -241,25 +242,29 @@ modules {
 }
 tools {
   name: "start_recording"
-  command: "scripts/run_rtk_recorder.sh"
+  command: "scripts/rtk_recorder.sh"
+  command: "start"
   stdout_file: "data/log/rtk_recorder.stdout"
   stderr_file: "data/log/rtk_recorder.stderr"
 }
 tools {
   name: "stop_recording"
-  command: "scripts/stop_rtk_recorder.sh"
+  command: "scripts/rtk_recorder.sh"
+  command: "stop"
   stdout_file: "data/log/stop_rtk_recorder.stdout"
   stderr_file: "data/log/stop_rtk_recorder.stderr"
 }
 tools {
   name: "start_player"
-  command: "scripts/run_rtk_player.sh"
+  command: "scripts/rtk_player.sh"
+  command: "start"
   stdout_file: "data/log/rtk_player.stdout"
   stderr_file: "data/log/rtk_player.stderr"
 }
 tools {
   name: "stop_player"
-  command: "scripts/stop_rtk_player.sh"
+  command: "scripts/rtk_player.sh"
+  command: "stop"
   stdout_file: "data/log/stop_rtk_player.stdout"
   stderr_file: "data/log/stop_rtk_player.stderr"
 }

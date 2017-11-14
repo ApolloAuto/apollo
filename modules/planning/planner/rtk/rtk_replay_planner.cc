@@ -27,7 +27,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleState;
+using apollo::common::VehicleStateProvider;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
