@@ -34,7 +34,7 @@ if [ -e /dev/ttyUSB0 ]; then
 fi
 
 MACHINE_ARCH=$(uname -m)
-ROS_TAR="ros-indigo-apollo-1.5.1-${MACHINE_ARCH}.tar.gz"
+ROS_TAR="ros-indigo-apollo-1.5.2-${MACHINE_ARCH}.tar.gz"
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
