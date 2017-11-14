@@ -9,19 +9,21 @@ message IntegMeasure {
   optional apollo.common.Header header = 1;
 
   enum MeasureType{
-    // Only include gnss position.
+    //the measure data only include gnss position
     GNSS_POS_ONLY = 0;
-    // Include gnss position and velocity.
+    //the measure data include gnss position and velocity
     GNSS_POS_VEL = 1;
-    // Only include gnss velocity.
-    GNSS_VEL_ONLY = 2;  
-    // Only include point cloud position.
-    POINT_CLOUD_POS = 3;
-    // Only include odometer velocity.
-    ODOMETER_VEL_ONLY = 4;
-    // Trigger measure update using vehicle constraint.
-    VEHICLE_CONSTRAINT = 5;
+    GNSS_POS_XY = 2;
+    //the measure data only include gnss velocity
+    GNSS_VEL_ONLY = 3;  
+    //the measure data only include point cloud position
+    POINT_CLOUD_POS = 4;
+    //the measure data only include odometer velocity
+    ODOMETER_VEL_ONLY = 5;
+    //trigger measure update using vehicle constraint
+    VEHICLE_CONSTRAINT = 6;
   }
+
   optional MeasureType measure_type = 2;
 
   enum FrameType{

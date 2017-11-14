@@ -141,13 +141,10 @@ void MSFLocalization::Init() {
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
 
-  localization_integ_.Init(localizaiton_param_);
-
-  // set imu to ant offset
-  if (1) {
+    if (1) {
     localizaiton_param_.imu_to_ant_offset.offset_x = 0.0;
-    localizaiton_param_.imu_to_ant_offset.offset_y = 1.10866;
-    localizaiton_param_.imu_to_ant_offset.offset_z = 1.14165;
+    localizaiton_param_.imu_to_ant_offset.offset_y = 0.788;
+    localizaiton_param_.imu_to_ant_offset.offset_z = 1.077;
     localizaiton_param_.imu_to_ant_offset.uncertainty_x = 0.05;
     localizaiton_param_.imu_to_ant_offset.uncertainty_y = 0.05;
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = 0.08;
@@ -180,19 +177,7 @@ void MSFLocalization::Init() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
   }
 
-  // lidar_param_.Init();
-  // lidar_process_.Init(lidar_param_);
-
-  // republish_param_.Init();
-  // republish_process_.Init(republish_param_);
-
-  // integ_param_.Init();
-  // integ_process_.Init(integ_param_);
-
-  // if (FLAGS_gnss_mode == int(GnssMode::SELF)) {
-  //   gnss_param_.Init();
-  //   gnss_process_.Init(gnss_param_);
-  // }
+  localization_integ_.Init(localizaiton_param_);
 }
 
 void MSFLocalization::OnTimer(const ros::TimerEvent &event) {}
@@ -209,31 +194,11 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
     AdapterManager::PublishIntegMeasureLidar(lidar_measure);
   }
 
-  // // lidar -> republish -> integ
-  // lidar_process_.PcdProcess(message);
-
-  // // Eigen::Affine3D location;
-  // // Eigen::Matrix3d covariance;
-  // // int state = -1;
-  // // lidar_process_.GetResult(state, location, covariance);
-
-  // int state = 0;
-  // LocalizationEstimate lidar_localization;
-  // state = lidar_process_.GetResult(lidar_localization);
-
-  // if (state == 2) {
-  //   // TODO republish refactoring
-  //   IntegMeasure lidar_measure;
-  //   republish_process_.LidarLocalProcess(lidar_localization,
-  //   lidar_measure); integ_process_.MeasureDataProcess(lidar_measure);
-
-  //   // publish lidar message to debug
-  //   AdapterManager::PublishIntegMeasureLidar(lidar_measure);
-  // }
   return;
 }
 
 void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
+  std::cerr << "get imu msg: " << std::endl;
   localization_integ_.RawImuProcess(imu_msg);
 
   LocalizaitonMeasureState state;
@@ -253,7 +218,20 @@ void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
   return;
 }
 
-void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {}
+void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
+  std::cerr << "get raw imu msg: " << std::endl;
+
+  std::cerr << "raw imu acc: "
+            << imu_msg.linear_acceleration().x() 
+            << imu_msg.linear_acceleration().y()
+            << imu_msg.linear_acceleration().z() << std::endl;
+
+  std::cerr << "raw imu acc: "
+            << imu_msg.angular_velocity().x()
+            << imu_msg.angular_velocity().y()
+            << imu_msg.angular_velocity().z() << std::endl;
+  return;
+}
 
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
   localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);
