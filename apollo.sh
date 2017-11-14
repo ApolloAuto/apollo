@@ -485,6 +485,8 @@ function build_gnss() {
   protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
   protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./ --python_out=./
   protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_raw_observation.proto --cpp_out=./ --python_out=./
+  protoc modules/drivers/gnss/proto/gnss_best_pose.proto --cpp_out=./ --python_out=./
 
   cd modules
   catkin_make_isolated --install --source drivers/gnss \

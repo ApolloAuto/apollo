@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <proj_api.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <Eigen/Geometry>
@@ -22,14 +21,17 @@
 #include <cmath>
 #include <memory>
 
+#include <proj_api.h>
+
 #include "data_parser.h"
 #include "gnss/parser.h"
-#include "gnss/utils.h"
+#include "util/utils.h"
+#include "util/time_conversion.h"
 #include "proto/gnss.pb.h"
-#include "proto/gpgga.pb.h"
 #include "proto/imu.pb.h"
 #include "proto/ins.pb.h"
-#include "util/time_conversion.h"
+#include "proto/gnss_raw_observation.pb.h"
+#include "proto/gnss_best_pose.pb.h"
 
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -75,15 +77,21 @@ Parser *create_parser(config::Stream::Format format,
 }  // namespace
 
 DataParser::DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
+                       const std::string &imu_topic,
                        const std::string &ins_stat_topic,
                        const std::string &corr_imu_topic,
                        const std::string &odometry_topic,
                        const std::string &gnss_status_topic,
-                       const std::string &ins_status_topic)
+                       const std::string &ins_status_topic,
+                       const std::string &bestpos_topic,
+                       const std::string &eph_topic,
+                       const std::string &observation_topic)
     : _raw_data_sub(nh.subscribe(raw_data_topic, 256,
                                  &DataParser::raw_data_callback, this)),
       _ins_stat_publisher(
           nh.advertise<::apollo::drivers::gnss::InsStat>(ins_stat_topic, 64)),
+      _raw_imu_publisher(
+          nh.advertise<apollo::drivers::gnss::Imu>(imu_topic, 64)),
       _imu_publisher(
           nh.advertise<apollo::localization::Imu>(corr_imu_topic, 64)),
       _nav_odometry_publisher(
@@ -92,10 +100,15 @@ DataParser::DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
           nh.advertise<apollo::common::gnss_status::GnssStatus>(
               gnss_status_topic, 64, true)),
       _ins_status_publisher(
-          nh.advertise<apollo::common::gnss_status::InsStatus>(ins_status_topic,
-                                                               64, true)),
-      _ins_publisher(
-          nh.advertise<::apollo::drivers::gnss::Ins>("/apollo/sensor/gnss/ins", 64)) {
+          nh.advertise<apollo::common::gnss_status::InsStatus>(
+               ins_status_topic, 64, true)),
+      _bestpos_publisher(
+          nh.advertise<apollo::drivers::gnss::GnssBestPose>(
+              bestpos_topic, 64, true)),
+      _ephemeris_publisher(
+          nh.advertise<GnssEphemeris>(eph_topic, 64)),
+      _observation_publisher(
+          nh.advertise<EpochObservation>(observation_topic, 64)) {
   std::string utm_target_param;
   nh.param("proj4_text", utm_target_param, UTM_TARGET);
   ROS_INFO_STREAM("proj4_text : " << utm_target_param);
@@ -205,15 +218,32 @@ void DataParser::dispatch_message(Parser::MessageType type,
       check_gnss_status(As<::apollo::drivers::gnss::Gnss>(message));
       break;
 
+    case Parser::MessageType::BEST_GNSS_POS:
+      publish_bestpos_message(message);
+      break;
+
+    case Parser::MessageType::IMU:
+      publish_imu_message(message);
+      break;
+
     case Parser::MessageType::INS:
       check_ins_status(As<::apollo::drivers::gnss::Ins>(message));
-      publish_corrimu_pb_message(message);
-      publish_odometry_pb_message(message);
-      //publish_ins_message(message);
+      publish_corrimu_message(message);
+      publish_odometry_message(message);
       break;
 
     case Parser::MessageType::INS_STAT:
       publish_ins_stat(message);
+      break;
+
+    case Parser::MessageType::BDSEPHEMERIDES:
+    case Parser::MessageType::GPSEPHEMERIDES:
+    case Parser::MessageType::GLOEPHEMERIDES:
+      publish_ephemeris(message);
+      break;
+
+    case Parser::MessageType::OBSERVATION:
+      publish_observation(message);
       break;
 
     default:
@@ -222,18 +252,29 @@ void DataParser::dispatch_message(Parser::MessageType type,
 }
 
 void DataParser::publish_ins_stat(const MessagePtr message) {
-    boost::shared_ptr<::apollo::drivers::gnss::InsStat> ins_stat(
-        new ::apollo::drivers::gnss::InsStat(*As<::apollo::drivers::gnss::InsStat>(message)));
-    _ins_stat_publisher.publish(ins_stat);
+  boost::shared_ptr<::apollo::drivers::gnss::InsStat> ins_stat(
+      new ::apollo::drivers::gnss::InsStat(
+          *As<::apollo::drivers::gnss::InsStat>(message)));
+  _ins_stat_publisher.publish(ins_stat);
 }
 
-void DataParser::publish_ins_message(const MessagePtr message) {
-    boost::shared_ptr<::apollo::drivers::gnss::Ins> ins(
-        new ::apollo::drivers::gnss::Ins(*As<::apollo::drivers::gnss::Ins>(message)));
-    _ins_publisher.publish(ins);
+void DataParser::publish_bestpos_message(const MessagePtr message) {
+  boost::shared_ptr<::apollo::drivers::gnss::GnssBestPose> bestpos(
+       new ::apollo::drivers::gnss::GnssBestPose(
+          *As<::apollo::drivers::gnss::GnssBestPose>(message)));
+  bestpos->mutable_header()->set_timestamp_sec(ros::Time::Time::now().toSec());
+  _bestpos_publisher.publish(bestpos);
 }
 
-void DataParser::publish_odometry_pb_message(const MessagePtr message) {
+void DataParser::publish_imu_message(const MessagePtr message) {
+  boost::shared_ptr<::apollo::drivers::gnss::Imu> raw_imu(
+       new ::apollo::drivers::gnss::Imu(
+          *As<::apollo::drivers::gnss::Imu>(message)));
+  raw_imu->mutable_header()->set_timestamp_sec(ros::Time::Time::now().toSec());
+  _raw_imu_publisher.publish(raw_imu);
+}
+
+void DataParser::publish_odometry_message(const MessagePtr message) {
   ::apollo::drivers::gnss::Ins *ins = As<::apollo::drivers::gnss::Ins>(message);
   boost::shared_ptr<::apollo::localization::Gps> gps(
       new ::apollo::localization::Gps());
@@ -277,7 +318,7 @@ void DataParser::publish_odometry_pb_message(const MessagePtr message) {
   _nav_odometry_publisher.publish(gps);
 }
 
-void DataParser::publish_corrimu_pb_message(const MessagePtr message) {
+void DataParser::publish_corrimu_message(const MessagePtr message) {
   ::apollo::drivers::gnss::Ins *ins = As<::apollo::drivers::gnss::Ins>(message);
   boost::shared_ptr<::apollo::localization::Imu> imu(
       new ::apollo::localization::Imu());
@@ -303,6 +344,22 @@ void DataParser::publish_corrimu_pb_message(const MessagePtr message) {
   imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z());
 
   _imu_publisher.publish(imu);
+}
+
+void DataParser::publish_ephemeris(const MessagePtr message) {
+  boost::shared_ptr<::apollo::drivers::gnss::GnssEphemeris> eph(
+    new apollo::drivers::gnss::GnssEphemeris(
+          *As<::apollo::drivers::gnss::GnssEphemeris>(message)));
+
+  _ephemeris_publisher.publish(eph);
+}
+
+void DataParser::publish_observation(const MessagePtr message) {
+  boost::shared_ptr<::apollo::drivers::gnss::EpochObservation> observation(
+    new ::apollo::drivers::gnss::EpochObservation(
+          *As<::apollo::drivers::gnss::EpochObservation>(message)));
+
+  _observation_publisher.publish(observation);
 }
 
 }  // namespace gnss

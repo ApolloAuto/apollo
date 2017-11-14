@@ -46,16 +46,18 @@ class RawStream {
 
  private:
   void data_spin();
-  void ntrip_spin();
+  void rtk_spin();
   bool connect();
   bool disconnect();
   bool login();
   bool logout();
   void stream_status_check();
+  void publish_rtk_data(size_t length);
+  void push_gpgga(size_t length);
 
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t _buffer[BUFFER_SIZE];
-  uint8_t _buffer_ntrip[BUFFER_SIZE];
+  uint8_t _buffer_rtk[BUFFER_SIZE];
 
   std::shared_ptr<Stream> _data_stream;
   std::shared_ptr<Stream> _command_stream;
@@ -68,18 +70,19 @@ class RawStream {
   std::shared_ptr<Status> _out_rtk_stream_status;
 
   bool _rtk_software_solution = false;
+  bool _push_location = false;
   bool _is_healthy = true;
   config::Config _config;
 
   const std::string _raw_data_topic;
   const std::string _rtcm_data_topic;
   const ros::Publisher _raw_data_publisher;
-  const ros::Publisher _rtcm_data_publisher;
+  const ros::Publisher _rtk_data_publisher;
   const ros::Publisher _stream_status_publisher;
 
   boost::shared_ptr<apollo::common::gnss_status::StreamStatus> _stream_status;
   std::unique_ptr<std::thread> _data_thread_ptr;
-  std::unique_ptr<std::thread> _ntrip_thread_ptr;
+  std::unique_ptr<std::thread> _rtk_thread_ptr;
 };
 
 }  // namespace apollo

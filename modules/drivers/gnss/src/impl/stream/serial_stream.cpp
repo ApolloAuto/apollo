@@ -233,8 +233,8 @@ bool SerialStream::connect() {
     return true;
   }
 
-  login();
   _status = Stream::Status::CONNECTED;
+  login();
   return true;
 }
 
@@ -285,7 +285,7 @@ size_t SerialStream::read(uint8_t* buffer, size_t max_length) {
   ssize_t bytes_read = 0;
   ssize_t bytes_current_read = 0;
 
-  wait_readable(100000);  // wait 10ms
+  wait_readable(10000);  // wait 10ms
 
   while (max_length > 0) {
     bytes_current_read = ::read(_fd, buffer, max_length);
@@ -302,7 +302,7 @@ size_t SerialStream::read(uint8_t* buffer, size_t max_length) {
               "Serial stream read data failed, error: " << strerror(errno));
           disconnect();
           if (connect()) {
-            ROS_INFO_STREAM("Reconnect " << _device_name << "success.");
+            ROS_INFO_STREAM("Reconnect " << _device_name << " success.");
             bytes_current_read = 0;
             break;  // has recoverable
           }

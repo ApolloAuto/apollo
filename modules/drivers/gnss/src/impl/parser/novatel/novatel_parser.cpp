@@ -26,12 +26,15 @@
 
 #include <ros/ros.h>
 
-#include "gnss/novatel_messages.h"
+#include "novatel_messages.h"
+#include "util/time_conversion.h"
 #include "gnss/parser.h"
 #include "proto/gnss.pb.h"
 #include "proto/imu.pb.h"
 #include "proto/ins.pb.h"
 #include "proto/gnss_raw_observation.pb.h"
+#include "proto/gnss_best_pose.pb.h"
+#include "rtcm/rtcm_decode.h"
 
 namespace apollo {
 namespace drivers {
@@ -114,6 +117,9 @@ class NovatelParser : public Parser {
   bool handle_best_pos(const novatel::BestPos* pos, uint16_t gps_week,
                        uint32_t gps_millisecs);
 
+  bool handle_gnss_bestpos(const novatel::BestPos* pos, uint16_t gps_week,
+                           uint32_t gps_millisecs);
+
   bool handle_best_vel(const novatel::BestVel* vel, uint16_t gps_week,
                        uint32_t gps_millisecs);
 
@@ -123,7 +129,9 @@ class NovatelParser : public Parser {
 
   bool handle_ins_pva(const novatel::InsPva* pva);
 
-  bool handle_ins_pvax(const novatel::InsPvaX* pvax);
+  bool handle_ins_pvax(const novatel::InsPvaX* pvax,
+                       uint16_t gps_week,
+                       uint32_t gps_millisecs);
     
   bool handle_raw_imu_x(const novatel::RawImuX* imu);
 
@@ -132,6 +140,12 @@ class NovatelParser : public Parser {
   bool handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph);
 
   bool handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph);
+
+  void set_observation_time();
+
+  bool decode_gnss_observation(const uint8_t* obs_data,
+                               const uint8_t* obs_data_end);
+
 
   double _gyro_scale = 0.0;
 
@@ -158,7 +172,10 @@ class NovatelParser : public Parser {
   novatel::SolutionType _velocity_type = static_cast<novatel::SolutionType>(-1);
   novatel::InsStatus _ins_status = static_cast<novatel::InsStatus>(-1);
 
+  raw_t _raw;  // used for observation data
+
   ::apollo::drivers::gnss::Gnss _gnss;
+  ::apollo::drivers::gnss::GnssBestPose _bestpos;
   ::apollo::drivers::gnss::Imu _imu;
   ::apollo::drivers::gnss::Ins _ins;
   ::apollo::drivers::gnss::InsStat _ins_stat;
@@ -173,6 +190,10 @@ NovatelParser::NovatelParser() {
   _ins.mutable_position_covariance()->Resize(9, FLOAT_NAN);
   _ins.mutable_euler_angles_covariance()->Resize(9, FLOAT_NAN);
   _ins.mutable_linear_velocity_covariance()->Resize(9, FLOAT_NAN);
+
+  if (1 != init_raw(&_raw)) {
+    ROS_FATAL_STREAM("memory allocation error for observation data structure.");
+  }
 }
 
 Parser::MessageType NovatelParser::get_message(MessagePtr& message_ptr) {
@@ -274,6 +295,17 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
   }
   switch (message_id) {
     case novatel::BESTGNSSPOS:
+      if (message_length != sizeof(novatel::BestPos)) {
+        ROS_ERROR("Incorrect message_length");
+        break;
+      }
+      if (handle_gnss_bestpos(reinterpret_cast<novatel::BestPos*>(message),
+                              gps_week, gps_millisecs)) {
+        message_ptr = &_bestpos;
+        return MessageType::BEST_GNSS_POS;
+      }
+      break;
+
     case novatel::BESTPOS:
     case novatel::PSRPOS:
       // ROS_ERROR_COND(message_length != sizeof(novatel::BestPos), "Incorrect
@@ -372,7 +404,8 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
         break;
       }
 
-      if (handle_ins_pvax(reinterpret_cast<novatel::InsPvaX*>(message))) {
+      if (handle_ins_pvax(reinterpret_cast<novatel::InsPvaX*>(message),
+                          gps_week, gps_millisecs)) {
         message_ptr = &_ins_stat;
         return MessageType::INS_STAT;
       }
@@ -411,10 +444,50 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
       }
       break;
 
+    case novatel::RANGE:
+      if (decode_gnss_observation(_buffer.data(),
+                                  _buffer.data() + _buffer.size())) {
+        message_ptr = &_gnss_observation;
+        return MessageType::OBSERVATION;
+      }
+      break;
+
     default:
       break;
   }
   return MessageType::NONE;
+}
+
+bool NovatelParser::handle_gnss_bestpos(const novatel::BestPos* pos,
+                                    uint16_t gps_week, uint32_t gps_millisecs) {
+  _bestpos.set_sol_status(
+    static_cast<apollo::drivers::gnss::SolutionStatus>(pos->solution_status));
+  _bestpos.set_sol_type(
+    static_cast<apollo::drivers::gnss::SolutionType>(pos->position_type));
+  _bestpos.set_latitude(pos->latitude);
+  _bestpos.set_longitude(pos->longitude);
+  _bestpos.set_height_msl(pos->height_msl);
+  _bestpos.set_undulation(pos->undulation);
+  _bestpos.set_datum_id(
+    static_cast<apollo::drivers::gnss::DatumId>(pos->datum_id));
+  _bestpos.set_latitude_std_dev(pos->latitude_std_dev);
+  _bestpos.set_longitude_std_dev(pos->longitude_std_dev);
+  _bestpos.set_height_std_dev(pos->height_std_dev);
+  _bestpos.set_base_station_id(pos->base_station_id);
+  _bestpos.set_differential_age(pos->differential_age);
+  _bestpos.set_solution_age(pos->solution_age);
+  _bestpos.set_num_sats_tracked(pos->num_sats_tracked);
+  _bestpos.set_num_sats_in_solution(pos->num_sats_in_solution);
+  _bestpos.set_num_sats_l1(pos->num_sats_l1);
+  _bestpos.set_num_sats_multi(pos->num_sats_multi);
+  _bestpos.set_extended_solution_status(pos->extended_solution_status);
+  _bestpos.set_galileo_beidou_used_mask(pos->galileo_beidou_used_mask);
+  _bestpos.set_gps_glonass_used_mask(pos->gps_glonass_used_mask);
+
+  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  _bestpos.set_measurement_time(seconds);
+  ROS_INFO_STREAM("Best gnss pose:\r\n" << _bestpos.DebugString());
+  return true;
 }
 
 bool NovatelParser::handle_best_pos(const novatel::BestPos* pos,
@@ -590,7 +663,12 @@ bool NovatelParser::handle_ins_pva(const novatel::InsPva* pva) {
   return true;
 }
 
-bool NovatelParser::handle_ins_pvax(const novatel::InsPvaX* pvax) {
+bool NovatelParser::handle_ins_pvax(const novatel::InsPvaX* pvax,
+                                    uint16_t gps_week,
+                                    uint32_t gps_millisecs) {
+  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double unix_sec = apollo::drivers::util::gps2unix(seconds);
+  _ins_stat.mutable_header()->set_timestamp_sec(unix_sec);
   _ins_stat.set_ins_status(pvax->ins_status); 
   _ins_stat.set_pos_type(pvax->pos_type); 
   return true;
@@ -661,10 +739,12 @@ bool NovatelParser::handle_raw_imu_x(const novatel::RawImuX* imu) {
 bool NovatelParser::handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph) {
   _gnss_ephemeris.set_gnss_type(apollo::drivers::gnss::GnssType::GPS_SYS);
 
-  apollo::drivers::gnss::KepplerOrbit *keppler_orbit = _gnss_ephemeris.mutable_keppler_orbit();
+  apollo::drivers::gnss::KepplerOrbit *keppler_orbit =
+                                  _gnss_ephemeris.mutable_keppler_orbit();
 
   keppler_orbit->set_gnss_type(apollo::drivers::gnss::GnssType::GPS_SYS);
-  keppler_orbit->set_gnss_time_type(apollo::drivers::gnss::GnssTimeType::GPS_TIME);
+  keppler_orbit->set_gnss_time_type(
+                          apollo::drivers::gnss::GnssTimeType::GPS_TIME);
   keppler_orbit->set_sat_prn(gps_emph->prn);
   keppler_orbit->set_week_num(gps_emph->week);
   keppler_orbit->set_af0(gps_emph->af0);
@@ -698,10 +778,12 @@ bool NovatelParser::handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph) {
 bool NovatelParser::handle_bds_eph(const novatel::BDS_Ephemeris* bds_emph) {
   _gnss_ephemeris.set_gnss_type(apollo::drivers::gnss::GnssType::BDS_SYS);
 
-  apollo::drivers::gnss::KepplerOrbit *keppler_orbit = _gnss_ephemeris.mutable_keppler_orbit();
+  apollo::drivers::gnss::KepplerOrbit *keppler_orbit =
+                                  _gnss_ephemeris.mutable_keppler_orbit();
 
   keppler_orbit->set_gnss_type(apollo::drivers::gnss::GnssType::BDS_SYS);
-  keppler_orbit->set_gnss_time_type(apollo::drivers::gnss::GnssTimeType::BDS_TIME);
+  keppler_orbit->set_gnss_time_type(
+                          apollo::drivers::gnss::GnssTimeType::BDS_TIME);
   keppler_orbit->set_sat_prn(bds_emph->satellite_id);
   keppler_orbit->set_week_num(bds_emph->week);
   keppler_orbit->set_af0(bds_emph->a0);
@@ -735,9 +817,11 @@ bool NovatelParser::handle_bds_eph(const novatel::BDS_Ephemeris* bds_emph) {
 bool NovatelParser::handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph) {
   _gnss_ephemeris.set_gnss_type(apollo::drivers::gnss::GnssType::GLO_SYS);
 
-  apollo::drivers::gnss::GlonassOrbit *glonass_orbit = _gnss_ephemeris.mutable_glonass_orbit();
+  apollo::drivers::gnss::GlonassOrbit *glonass_orbit =
+                                 _gnss_ephemeris.mutable_glonass_orbit();
   glonass_orbit->set_gnss_type(apollo::drivers::gnss::GnssType::GLO_SYS);
-  glonass_orbit->set_gnss_time_type(apollo::drivers::gnss::GnssTimeType::GLO_TIME);
+  glonass_orbit->set_gnss_time_type(
+                          apollo::drivers::gnss::GnssTimeType::GLO_TIME);
   glonass_orbit->set_slot_prn(glo_emph->sloto - 37);
   glonass_orbit->set_toe(glo_emph->e_time / 1000);
   glonass_orbit->set_frequency_no(glo_emph->freqo - 7);
@@ -748,9 +832,9 @@ bool NovatelParser::handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph) {
   glonass_orbit->set_clock_drift( glo_emph->gamma);
 
   if (glo_emph->health <= 3) {
-    glonass_orbit->set_health(0); // 0 means good.
+    glonass_orbit->set_health(0);  // 0 means good.
   } else {
-    glonass_orbit->set_health(1); // 1 means bad.
+    glonass_orbit->set_health(1);  // 1 means bad.
   }
   glonass_orbit->set_position_x(glo_emph->pos_x);
   glonass_orbit->set_position_y(glo_emph->pos_y);
@@ -767,6 +851,92 @@ bool NovatelParser::handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph) {
   glonass_orbit->set_infor_age(glo_emph->age);
 
   return true;
+}
+
+void NovatelParser::set_observation_time() {
+  int week = 0;
+  double second = 0.0;
+
+  second = time2gpst(_raw.time, &week);
+  _gnss_observation.set_gnss_time_type(apollo::drivers::gnss::GPS_TIME);
+  _gnss_observation.set_gnss_week(week);
+  _gnss_observation.set_gnss_second_s(second);
+}
+
+bool NovatelParser::decode_gnss_observation(const uint8_t* obs_data,
+                                            const uint8_t* obs_data_end) {
+  int status = 0;
+  while (obs_data < obs_data_end) {
+    status = input_oem4(&_raw, *obs_data++);
+    switch (status) {
+      case 1:  // observation data
+        if (_raw.obs.n == 0) {
+          ROS_WARN("Obs is zero");
+        }
+
+        _gnss_observation.Clear();
+        _gnss_observation.set_receiver_id(0);
+        set_observation_time();
+        _gnss_observation.set_sat_obs_num(_raw.obs.n);
+        for (int i = 0; i < _raw.obs.n; ++i) {
+          int prn = 0;
+          int sys = 0;
+
+          sys = satsys(_raw.obs.data[i].sat, &prn);
+          ROS_INFO("sys %d, prn %d", sys, prn);
+
+          apollo::drivers::gnss::GnssType gnss_type;
+          if (!gnss_sys_type(sys, gnss_type)) {
+            break;
+          }
+
+          auto sat_obs = _gnss_observation.add_sat_obs(); //create obj
+          sat_obs->set_sat_prn(prn);
+          sat_obs->set_sat_sys(gnss_type);
+
+          int j = 0;
+          for (j = 0; j < NFREQ + NEXOBS; ++j) {
+            if (is_zero(_raw.obs.data[i].L[j])) {
+              break;
+            }
+
+            apollo::drivers::gnss::GnssBandID baud_id;
+            if (!gnss_baud_id(gnss_type, j, baud_id)) {
+              break;
+            }
+
+            double freq = 0;
+            gnss_frequence(baud_id, freq);
+            auto band_obs = sat_obs->add_band_obs();
+            if (_raw.obs.data[i].code[i] == CODE_L1C) {
+              band_obs->set_pseudo_type(apollo::drivers::gnss::PseudoType::CORSE_CODE);
+            } else if (_raw.obs.data[i].code[i] == CODE_L1P) {
+              band_obs->set_pseudo_type(apollo::drivers::gnss::PseudoType::PRECISION_CODE);
+            } else {
+              ROS_INFO("Code %d, in seq %d, gnss type %d.",
+                       _raw.obs.data[i].code[i], j, static_cast<int>(gnss_type));
+            }
+
+            band_obs->set_band_id(baud_id);
+            band_obs->set_frequency_value(freq);
+            band_obs->set_pseudo_range(_raw.obs.data[i].P[j]);
+            band_obs->set_carrier_phase(_raw.obs.data[i].L[j]);
+            band_obs->set_loss_lock_index(_raw.obs.data[i].SNR[j]);
+            band_obs->set_doppler(_raw.obs.data[i].D[j]);
+            band_obs->set_snr(_raw.obs.data[i].SNR[j]);
+                    band_obs->set_snr(_raw.obs.data[i].SNR[j]);
+          }
+          ROS_INFO("Baud obs num %d.", j);
+          sat_obs->set_band_obs_num(j);
+        }
+        ROS_INFO_STREAM("Observation debuginfo:\r\n" << _gnss_observation.DebugString());
+        return true;
+
+      default:
+        break;
+    }
+  }
+  return false;
 }
 
 }  // namespace gnss

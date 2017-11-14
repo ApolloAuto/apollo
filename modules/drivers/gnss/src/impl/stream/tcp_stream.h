@@ -26,7 +26,8 @@ class TcpStream : public Stream {
   typedef uint32_t be32_t;
 
  public:
-  TcpStream(const char *address, uint16_t port, uint32_t timeout_usec);
+  TcpStream(const char *address, uint16_t port,
+            uint32_t timeout_usec, bool auto_reconnect = true);
   ~TcpStream();
 
   virtual bool connect();
@@ -35,6 +36,7 @@ class TcpStream : public Stream {
   virtual size_t write(const uint8_t *data, size_t length);
 
  private:
+  bool reconnect();
   bool readable(uint32_t timeout_us);
   TcpStream() {}
   void open();
@@ -45,6 +47,7 @@ class TcpStream : public Stream {
   uint32_t _timeout_usec = 0;
   int _sockfd = -1;
   int _errno = 0;
+  bool _auto_reconnect = false;
 };
 
 }  // namespace gnss
