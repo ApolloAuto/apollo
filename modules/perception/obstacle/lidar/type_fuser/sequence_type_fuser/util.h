@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 
 enum {
-    VALID_OBJECT_TYPE = MAX_OBJECT_TYPE - 2,
+  VALID_OBJECT_TYPE = MAX_OBJECT_TYPE - 2,
 };
 
 typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1> Vectord;
@@ -35,30 +35,26 @@ typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, VALID_OBJECT_TYPE> Matrixd;
 
 namespace sequence_type_fuser {
 
-void from_std_vector(const std::vector<float>& src_prob, Vectord* dst_prob);
+void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob);
 
-void from_eigen_vector(const Vectord& src_prob, std::vector<float>* dst_prob);
+void FromEigenVector(const Vectord& src_prob, std::vector<float>* dst_prob);
 
-void to_log(Vectord* prob);
+void ToLog(Vectord* prob);
 
-// void to_exp(Vectord* prob);
+void ToExp(Vectord* prob);
 
-void to_exp(Vectord* prob);
+void Normalize(Vectord* prob);
 
-void normalize(Vectord* prob);
+void NormalizeRow(Matrixd* prob);
 
-// void normalize_log_space(Vectord* prob);
+void PrintProbability(const std::vector<float>& prob, const std::string& name);
 
-void normalize_row(Matrixd* prob);
+bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix);
 
-void print_probability(const std::vector<float>& prob, const std::string& name);
+bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 
-bool load_single_matrix(std::ifstream& fin, Matrixd* matrix);
-
-bool load_single_matrix_file(const std::string& filename, Matrixd* matrix);
-
-bool load_multiple_matrices_file(const std::string& filename, 
-        std::map<std::string, Matrixd>* matrices);
+bool LoadMultipleMatricesFile(const std::string& filename, 
+                              std::map<std::string, Matrixd>* matrices);
 
 }  // namespace sequence_type_fuser
 }  // namespace perception

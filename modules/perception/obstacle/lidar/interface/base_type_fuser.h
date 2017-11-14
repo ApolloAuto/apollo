@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 
 struct TypeFuserOptions {
-    double timestamp = 0.0;
+  double timestamp = 0.0;
 };
 
 class BaseTypeFuser {
@@ -35,11 +35,10 @@ class BaseTypeFuser {
   BaseTypeFuser() {}
   virtual ~BaseTypeFuser() {}
 
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
-  virtual bool fuse_type(
-  	const TypeFuserOptions& options,
-  	std::vector<ObjectPtr>* objects) = 0;
+  virtual bool FuseType(const TypeFuserOptions& options,
+                        std::vector<ObjectPtr>* objects) = 0;
 
   virtual std::string name() const = 0;
 

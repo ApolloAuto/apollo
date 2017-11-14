@@ -33,14 +33,13 @@ class SequenceTypeFuser : public BaseTypeFuser {
 
   // @brief initialize fuser's configs
   // @return true if initialize successfully, otherwise return false
-  bool init() override;
+  bool Init() override;
 
-  bool fuse_type(
-      const TypeFuserOptions& options,
-      std::vector<ObjectPtr>* objects) override;
+  bool FuseType(const TypeFuserOptions& options,
+                std::vector<ObjectPtr>* objects) override;
 
   std::string name() const override {
-      return "SequenceTypeFuser";
+    return "SequenceTypeFuser";
   }
 
  protected:
@@ -48,11 +47,11 @@ class SequenceTypeFuser : public BaseTypeFuser {
   // Note, log(P({X}|O)) = sigma_i{E_unary(X_i,O)} + sigma_ij{E_pairwise(X_i,X_j)} - logZ;
   // E_unary(X_i,O) = sigma{logP(classifier)}, E_pairwise(X_i,X_j) = logTransition(X_i,X_j)
   // Maximize the sequence probability P(X_t|{X}^opt,O) based on optimal state inference.
-  bool fuse_with_ccrf(TrackedObjects* tracked_objects);
+  bool FuseWithCCRF(TrackedObjects* tracked_objects);
 
-  bool rectify_object_type(const ObjectPtr& object, Vectord* log_prob);
+  bool RectifyObjectType(const ObjectPtr& object, Vectord* log_prob);
 
-  bool recover_from_log_prob(Vectord* prob, std::vector<float>* dst, ObjectType* type);
+  bool RecoverFromLogProb(Vectord* prob, std::vector<float>* dst, ObjectType* type);
 
  protected:
   ObjectSequence _sequence;   
