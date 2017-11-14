@@ -64,7 +64,7 @@ class MPCController : public Controller {
   virtual ~MPCController();
 
   /**
-   * @brief initialize MPCeral Controller
+   * @brief initialize MPC Controller
    * @param control_conf control configurations
    * @return Status initialization status
    */
@@ -85,18 +85,18 @@ class MPCController : public Controller {
       ControlCommand *cmd) override;
 
   /**
-   * @brief reset MPCeral Controller
+   * @brief reset MPC Controller
    * @return Status reset status
    */
   common::Status Reset() override;
 
   /**
-   * @brief stop MPCeral controller
+   * @brief stop MPC controller
    */
   void Stop() override;
 
   /**
-   * @brief MPCeral controller name
+   * @brief MPC controller name
    * @return string controller name in string
    */
   std::string Name() const override;
