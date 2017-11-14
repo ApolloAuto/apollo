@@ -366,7 +366,8 @@ void SimulationWorldService::UpdateDelays() {
       AdapterManager::GetPerceptionObstacles()->GetDelayInMs());
   delays->set_planning(AdapterManager::GetPlanning()->GetDelayInMs());
   delays->set_prediction(AdapterManager::GetPrediction()->GetDelayInMs());
-  delays->set_traffic_light(AdapterManager::GetTrafficLightDetection()->GetDelayInMs());
+  delays->set_traffic_light(
+      AdapterManager::GetTrafficLightDetection()->GetDelayInMs());
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
