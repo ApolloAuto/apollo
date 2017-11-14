@@ -385,9 +385,16 @@ bool ReferenceLineProvider::IsReferenceLineSmoothValid(
   constexpr double kReferenceLineDiffCheckStep = 10.0;
   for (double s = 0.0; s + kReferenceLineDiffCheckStep / 2.0 < raw.Length();
        s += kReferenceLineDiffCheckStep) {
-    auto xy_old = raw.GetReferencePoint(s);
     auto xy_new = smoothed.GetReferencePoint(s);
-    const double diff = xy_old.DistanceTo(xy_new);
+
+    common::SLPoint sl_new;
+    if (!raw.XYToSL(xy_new, &sl_new)) {
+      AERROR << "Fail to change xy point on smoothed reference line to sl "
+                "point respect to raw reference line.";
+      return false;
+    }
+
+    const double diff = std::fabs(sl_new.l());
     if (diff > FLAGS_smoothed_reference_line_max_diff) {
       AERROR << "Fail to provide reference line because too large diff "
                 "between smoothed and raw reference lines. diff: "
