@@ -26,6 +26,7 @@ cc_binary(
 cc_test(
     name = "info_collector_test",
     srcs = ["info_collector_test.cc"],
+    size = "small",
     data = [
         "//modules/data/conf:recorder_conf",
     ],
