@@ -16,15 +16,14 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <mutex>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 
 #include "gnss/stream.h"
-#include "gnss/utils.h"
 #include "tcp_stream.h"
-
-#include "proto/gpgga.pb.h"
+#include "util/utils.h"
 
 namespace {
 
@@ -38,7 +37,7 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-class NtripStream : public TcpStream {
+class NtripStream : public Stream {
  public:
   NtripStream(const std::string& address, uint16_t port,
               const std::string& mountpoint, const std::string& user,
@@ -46,6 +45,7 @@ class NtripStream : public TcpStream {
   ~NtripStream();
 
   virtual size_t read(uint8_t* buffer, size_t max_length);
+  virtual size_t write(const uint8_t* data, size_t length);
   virtual bool connect();
   virtual bool disconnect();
 
@@ -53,33 +53,47 @@ class NtripStream : public TcpStream {
   void reconnect();
   bool _is_login = false;
   const std::string _mountpoint;
+  const std::string _write_data_prefix;
   const std::string _login_data;
   double _timeout_s = 60.0;
   double _data_active_s = 0.0;
+  std::unique_ptr<TcpStream> _tcp_stream;
+  std::mutex _internal_mutex;
 };
 
 NtripStream::NtripStream(const std::string& address, uint16_t port,
                          const std::string& mountpoint, const std::string& user,
                          const std::string& passwd, uint32_t timeout_s)
-    : TcpStream(address.c_str(), port, 0),
-      _mountpoint(mountpoint),
-      // add dasha gpgga at first
+    : _mountpoint(mountpoint),
+      _write_data_prefix("GET /" + mountpoint +
+                         " HTTP/1.0\r\n"
+                         "User-Agent: NTRIP gnss_driver/0.0\r\n"
+                         "accept: */* \r\n\r\n"),
+
       _login_data("GET /" + mountpoint +
                   " HTTP/1.0\r\n"
                   "User-Agent: NTRIP gnss_driver/0.0\r\n"
                   "accept: */* \r\n"
                   "Authorization: Basic " +
                   encode_base64(user + ":" + passwd) + "\r\n\r\n"),
-      _timeout_s(timeout_s) {
-}
+      _timeout_s(timeout_s),
+      _tcp_stream(new TcpStream(address.c_str(), port, 0, false)) {}
 
-NtripStream::~NtripStream() { this->disconnect(); }
+NtripStream::~NtripStream() {
+  this->disconnect();
+}
 
 bool NtripStream::connect() {
   if (_is_login) {
     return true;
   }
-  if (!TcpStream::connect()) {
+  if (!_tcp_stream) {
+    ROS_ERROR("New tcp stream failed.");
+    return true;
+  }
+
+  if (!_tcp_stream->connect()) {
+    _status = Stream::Status::DISCONNECTED;
     ROS_ERROR("Tcp connect failed.");
     return false;
   }
@@ -88,10 +102,10 @@ bool NtripStream::connect() {
   size_t size = 0;
   size_t try_times = 0;
 
-  size = write(reinterpret_cast<const uint8_t*>(_login_data.data()),
-               _login_data.size());
+  size = _tcp_stream->write(
+      reinterpret_cast<const uint8_t*>(_login_data.data()), _login_data.size());
   if (size != _login_data.size()) {
-    TcpStream::disconnect();
+    _tcp_stream->disconnect();
     _status = Stream::Status::ERROR;
     ROS_ERROR("Send ntrip request failed.");
     return false;
@@ -99,23 +113,15 @@ bool NtripStream::connect() {
 
   bzero(buffer, sizeof(buffer));
   ROS_INFO("Read ntrip response.");
-  size = TcpStream::read(buffer, 2048);
-  if (_is_login) {
-    ROS_INFO("Already login.");
-    return true;
-  }
+  size = _tcp_stream->read(buffer, sizeof(buffer) - 1);
   while ((size == 0) && (try_times < 3)) {
     sleep(1);
-    size = TcpStream::read(buffer, 2048);
+    size = _tcp_stream->read(buffer, sizeof(buffer) - 1);
     ++try_times;
-    if (_is_login) {
-      ROS_INFO("Already login.");
-      return true;
-    }
   }
 
   if (!size) {
-    TcpStream::disconnect();
+    _tcp_stream->disconnect();
     _status = Stream::Status::DISCONNECTED;
     ROS_ERROR("No response from ntripcaster.");
     return false;
@@ -124,6 +130,7 @@ bool NtripStream::connect() {
   if (std::strstr(reinterpret_cast<char*>(buffer), "ICY 200 OK\r\n")) {
     _status = Stream::Status::CONNECTED;
     _is_login = true;
+    ROS_INFO("Ntrip login successfully.");
     return true;
   }
 
@@ -139,17 +146,18 @@ bool NtripStream::connect() {
   ROS_INFO_STREAM("Recv data length: " << size);
   // ROS_INFO_STREAM("Data from server: " << reinterpret_cast<char*>(buffer));
 
-  TcpStream::disconnect();
+  _tcp_stream->disconnect();
   _status = Stream::Status::ERROR;
   return false;
 }
 
 bool NtripStream::disconnect() {
   if (_is_login) {
-    bool ret = TcpStream::disconnect();
+    bool ret = _tcp_stream->disconnect();
     if (!ret) {
       return false;
     }
+    _status = Stream::Status::DISCONNECTED;
     _is_login = false;
   }
 
@@ -158,6 +166,7 @@ bool NtripStream::disconnect() {
 
 void NtripStream::reconnect() {
   ROS_INFO("Reconnect ntrip caster.");
+  std::unique_lock<std::mutex> lock(_internal_mutex);
   disconnect();
   connect();
   if (_status != Stream::Status::CONNECTED) {
@@ -170,9 +179,13 @@ void NtripStream::reconnect() {
 }
 
 size_t NtripStream::read(uint8_t* buffer, size_t max_length) {
+  if (!_tcp_stream) {
+    return 0;
+  }
+
   size_t ret = 0;
 
-  if (_status != Stream::Status::CONNECTED) {
+  if (_tcp_stream->get_status() != Stream::Status::CONNECTED) {
     reconnect();
     if (_status != Stream::Status::CONNECTED) {
       return 0;
@@ -183,7 +196,7 @@ size_t NtripStream::read(uint8_t* buffer, size_t max_length) {
     _data_active_s = ros::Time::now().toSec();
   }
 
-  ret = TcpStream::read(buffer, max_length);
+  ret = _tcp_stream->read(buffer, max_length);
   if (ret) {
     _data_active_s = ros::Time::now().toSec();
   }
@@ -195,6 +208,34 @@ size_t NtripStream::read(uint8_t* buffer, size_t max_length) {
   }
 
   return ret;
+}
+
+size_t NtripStream::write(const uint8_t* buffer, size_t length) {
+  if (!_tcp_stream) {
+    return 0;
+  }
+  std::unique_lock<std::mutex> lock(_internal_mutex, std::defer_lock);
+  if (!lock.try_lock()) {
+    ROS_INFO("Try lock failed.");
+    return 0;
+  }
+
+  if (_tcp_stream->get_status() != Stream::Status::CONNECTED) {
+    return 0;
+  }
+
+  std::string data(reinterpret_cast<const char*>(buffer), length);
+  data = _write_data_prefix + data;
+  size_t ret = _tcp_stream->write(reinterpret_cast<const uint8_t*>(data.data()),
+                                  data.size());
+  if (ret != data.size()) {
+    ROS_ERROR_STREAM("Send ntrip data size " << data.size() << ", return "
+                                             << ret);
+    _status = Stream::Status::ERROR;
+    return 0;
+  }
+
+  return length;
 }
 
 Stream* Stream::create_ntrip(const std::string& address, uint16_t port,
