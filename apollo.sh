@@ -462,8 +462,8 @@ function version() {
 
 function build_gnss() {
   CURRENT_PATH=$(pwd)
-  if [ -d "/home/tmp/ros" ]; then
-    ROS_PATH="/home/tmp/ros"
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
   else
     warning "ROS not found. Run apolllo.sh build first."
     exit 1
@@ -510,8 +510,8 @@ function build_gnss() {
 
 function build_velodyne() {
   CURRENT_PATH=$(pwd)
-  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
-    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
   else
     warning "ROS not found. Run apolllo.sh build first."
     exit 1
@@ -533,8 +533,8 @@ function build_velodyne() {
 
 function build_usbcam() {
   CURRENT_PATH=$(pwd)
-  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
-    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
   else
     warning "ROS not found. Run apolllo.sh build first."
     exit 1
@@ -571,6 +571,9 @@ function print_usage() {
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_gnss${NONE}: build gnss driver
+  ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_usbcam${NONE}: build velodyne driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
@@ -640,16 +643,16 @@ function main() {
     buildify)
       buildify
       ;;
-    buildgnss)
+    build_gnss)
       build_gnss
       ;;
     build_py)
       build_py_proto
       ;;
-    buildvelodyne)
+    build_velodyne)
       build_velodyne
       ;;
-    buildusbcam)
+    build_usbcam)
       build_usbcam
       ;;
     config)
