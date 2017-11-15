@@ -145,12 +145,18 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
            motion_trajectory_points.size());
   double t = 0.0;
   for (size_t i = 0; i < maneuver_trajectory_points.size(); ++i) {
-    double motion_weight = MotionWeight(t);
-    const TrajectoryPoint& maneuver_point = maneuver_trajectory_points[i];
-    const TrajectoryPoint& motion_point = motion_trajectory_points[i];
     TrajectoryPoint trajectory_point;
-    WeightedMean(maneuver_point, motion_point,
-        1 - motion_weight, motion_weight, &trajectory_point);
+    if (FLAGS_enable_kf_tracking) {
+      double motion_weight = MotionWeight(t);
+      const TrajectoryPoint& maneuver_point = maneuver_trajectory_points[i];
+      const TrajectoryPoint& motion_point = motion_trajectory_points[i];
+
+      WeightedMean(maneuver_point, motion_point,
+          1 - motion_weight, motion_weight, &trajectory_point);
+    } else {
+      trajectory_point = maneuver_trajectory_points[i];
+    }
+
     points->push_back(trajectory_point);
     t += freq;
   }
