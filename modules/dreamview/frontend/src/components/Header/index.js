@@ -13,7 +13,6 @@ export default class Header extends React.Component {
         const { modes, currentMode,
                 maps, currentMap,
                 vehicles, currentVehicle } = this.props.store.hmi;
-        const { routeEditingManager } = this.props.store;
 
         return (
             <header className = "header">
@@ -35,12 +34,6 @@ export default class Header extends React.Component {
                           currentOption={currentMap}
                           onChange={(event) => {
                             WS.changeMap(event.target.value);
-                          }}/>
-                <Selector name="point of interest"
-                          options={Object.keys(routeEditingManager.defaultRoutingEndPoint)}
-                          currentOption={routeEditingManager.currentPOI}
-                          onChange={(event) => {
-                            routeEditingManager.setDefaultEndPoint(event.target.value);
                           }}/>
             </header>
         );
