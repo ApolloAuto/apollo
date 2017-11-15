@@ -40,9 +40,19 @@ bash docker/scripts/mac/dev_into.sh
 
 ## Known Hacks
 
-You docker machine might go down in some situations such as suspending your
+1. You docker machine might go down in some situations such as suspending your
 MacOS. You should bring it up again:
 
 ```bash
 docker-machine restart apollo
 ```
+
+2. Your docker machine is generally running behind a NAT. You can get the
+address with:
+
+```bash
+docker-machine ip apollo
+```
+
+Remember to use it to access Apollo infras such as Dreamview, while not
+"localhost" or "127.0.0.1".

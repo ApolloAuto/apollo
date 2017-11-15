@@ -10,6 +10,7 @@ export default class Options {
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showQuickStarter = PARAMETERS.options.defaults.showQuickStarter;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
+    @observable showPOI = PARAMETERS.options.defaults.showPOI;
 
     mutuallyExclusiveOptions = ['showQuickStarter', 'showModuleController',
         'showMenu', 'showRouteEditingBar'];
@@ -45,8 +46,11 @@ export default class Options {
 
 
     @computed get showTools() {
-        return this.showQuickStarter || this.showModuleController ||
-               this.showMenu || this.showConsole;
+        return this.showQuickStarter ||
+               this.showModuleController ||
+               this.showMenu ||
+               this.showConsole ||
+               this.showPOI;
     }
 
     @computed get showGeo() {

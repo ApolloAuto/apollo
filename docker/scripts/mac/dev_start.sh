@@ -116,8 +116,9 @@ function main(){
     docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
 
     echo "########## Attention ##########"
-    echo "Your container is running at $(docker-machine ip), while not"
-    echo "localhost or 127.0.0.1. Use the IP to access tools such as Dreamview."
+    echo "Your container is running at $(docker-machine ip ${DOCKER_MACHINE}),"
+    echo "while not localhost or 127.0.0.1. Use the IP to access tools such as"
+    echo "Dreamview."
     echo "###############################"
 }
 
