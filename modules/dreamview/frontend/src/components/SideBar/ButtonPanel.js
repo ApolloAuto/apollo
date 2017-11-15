@@ -58,12 +58,12 @@ export default class ButtonPanel extends React.Component {
         const { initialized,
                 onQuickStarter, showQuickStarter,
                 onModuleController, showModuleController,
-                onDefaultRouting,
+                onMenu, showMenu,
                 onRouteEditingBar, showRouteEditingBar,
-                onVideo,
+                onPOI, showPOI,
                 onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
-                onMenu, showMenu, resetBackend, dumpMessages} = this.props;
+                resetBackend, dumpMessages, onVideo} = this.props;
 
         return (
             <div>
@@ -83,6 +83,10 @@ export default class ButtonPanel extends React.Component {
                                disabled={!initialized}
                                onClick={onRouteEditingBar}
                                active={showRouteEditingBar} />
+                <SideBarButton label="Default Routing"
+                               disabled={!initialized}
+                               onClick={onPOI}
+                               active={showPOI} />
                 <SideBarButton label="PNC Monitor"
                                disabled={!initialized}
                                onClick={onPNCMonitor}
@@ -98,10 +102,6 @@ export default class ButtonPanel extends React.Component {
                 <SideBarButton label="Dump Messages"
                                disabled={!initialized}
                                onClick={dumpMessages}
-                               active={false} />
-                <SideBarButton label="Default Routing"
-                               disabled={!initialized}
-                               onClick={onDefaultRouting}
                                active={false} />
                 <DashCamButton disabled={!initialized}
                                onClick={onVideo}/>

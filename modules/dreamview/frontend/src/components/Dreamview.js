@@ -11,6 +11,7 @@ import Header from "components/Header";
 import Loader from "components/common/Loader";
 import SideBar from "components/SideBar";
 import Console from "components/SideBar/Console";
+import POI from "components/SideBar/POI";
 import Menu from "components/SideBar/Menu";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
@@ -42,13 +43,15 @@ class MainView extends React.Component {
 @inject("store") @observer
 class Tools extends React.Component {
     render() {
-        const { monitor, options } = this.props.store;
+        const { monitor, options, routeEditingManager } = this.props.store;
 
         return (
             <div className="tools">
                 {options.showModuleController && <ModuleController />}
                 {options.showQuickStarter && <QuickStarter />}
                 {options.showMenu && <Menu options={options} /> }
+                {options.showPOI && <POI routeEditingManager={routeEditingManager}
+                                         options={options}/>}
                 {options.showConsole && <Console monitor={monitor} />}
             </div>
         );
