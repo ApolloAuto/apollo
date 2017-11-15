@@ -415,6 +415,10 @@ class ThreadPool {
     }
   }
 
+  ~ThreadPool() {
+    Shutdown();
+  }
+
   size_t Size() const {
     return threadpool_impl_->Size();
   }

@@ -16,7 +16,6 @@
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
 #include <gtest/gtest.h>
-#include <unistd.h>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
@@ -131,8 +130,6 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
     location += trans_diff;
   }
 
-  sleep(2);
-
   LosslessMapNode* node =
       static_cast<LosslessMapNode*>(map.GetMapNodeSafe(index));
   node->SetLeftTopCorner(0.0, 0.0);
@@ -148,6 +145,7 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
     const Eigen::Vector3d& pt3d = pt3ds_global[i];
     const unsigned char& intensity = 10 + i % 128;
     node->SetValueIfInBound(pt3d, intensity);
+    node->SetIsChanged(false); // avoid changing origin data
   }
 }
 

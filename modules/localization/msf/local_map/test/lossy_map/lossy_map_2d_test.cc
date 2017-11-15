@@ -16,7 +16,6 @@
 
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
 #include <gtest/gtest.h>
-#include <unistd.h>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
@@ -209,8 +208,6 @@ TEST_F(LossyMap2DTestSuite, MapScheduleTest) {
       lossy_map.PreloadMapArea(location, trans_diff, resolution_id, zone_id);
       location += trans_diff;
     }
-
-    sleep(2);
   }
 }
 
