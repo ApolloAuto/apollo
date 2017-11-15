@@ -641,15 +641,15 @@ body {
         }
 
         .steerangle-unit {
-            padding: 0px 10px 20px 3px;
+            padding: 20px 10px 0px 3px;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 13px;
         }
 
         .left-arrow {
             position: absolute;
             top: 45px;
-            right: 120px;
+            right: 115px;
             width: 0px;
             height: 0px;
             border-style: solid;
@@ -671,7 +671,7 @@ body {
         .wheel {
             position: absolute;
             top: 15px;
-            right: 35px;
+            right: 33px;
         }
         .wheel-background {
             stroke-width: 3px;

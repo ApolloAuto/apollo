@@ -38,6 +38,7 @@ export default class Meters {
     @observable brakePercent = 0;
     @observable speed = 0;
     @observable steeringAngle = 0;
+    @observable steeringPercentage = 0;
     @observable drivingMode = "?";
     @observable isAutoMode = false;
     @observable turnSignal = "";
@@ -57,6 +58,8 @@ export default class Meters {
             }
 
             if (world.autoDrivingCar.steeringAngle !== undefined) {
+                this.steeringPercentage = world.autoDrivingCar.steeringAngle;
+
                 // TODO(siyangy): Avoid magic number here.
                 this.steeringAngle = -Math.round(world.autoDrivingCar.steeringAngle * 4.7);
             }
