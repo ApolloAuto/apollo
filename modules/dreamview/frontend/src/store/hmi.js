@@ -1,4 +1,4 @@
-import { observable, action } from "mobx";
+import { observable, action, computed } from "mobx";
 
 import WS from "store/websocket";
 
@@ -69,5 +69,9 @@ export default class HMI {
         this.moduleStatus.set(id, !this.moduleStatus.get(id));
         const command = this.moduleStatus.get(id) ? "start" : "stop";
         WS.executeModuleCommand(id, command);
+    }
+
+    @computed get showRTKCommands() {
+        return this.currentMode === "RTK Record / Replay";
     }
 }
