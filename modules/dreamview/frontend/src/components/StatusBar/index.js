@@ -18,7 +18,8 @@ export default class StatusBar extends React.Component {
                 <AutoMeter throttlePercent={meters.throttlePercent}
                            brakePercent={meters.brakePercent}
                            speed={meters.speed} />
-                <Wheel steeringAngle={meters.steeringAngle}
+                <Wheel steeringPercentage={meters.steeringPercentage}
+                       steeringAngle={meters.steeringAngle}
                        turnSignal={meters.turnSignal} />
                 <TrafficLightIndicator
                        trafficLightColor={trafficSignal.color}
