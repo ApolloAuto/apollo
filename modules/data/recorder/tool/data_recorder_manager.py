@@ -163,13 +163,13 @@ class DataRecorderManager(object):
         rospy.Subscriber(self.cmd_topic, String, self.listener_callback)
 
     def listener_callback(self, data):
-        """listener callback."""
-        logging.info("receive message from %s, data=%s", self.cmd_topic, data.data)
+        """Listener callback."""
+        logging.info("Receive message from %s, data=%s", self.cmd_topic, data.data)
         if self.latest_cmdtime is not None: 
-            if (datetime.datetime.now() - self.latest_cmdtime) < datetime.timedelta(seconds=60):
+            if (datetime.datetime.now() - self.latest_cmdtime) < datetime.timedelta(seconds=10):
                 print_message = (
                     "The interval between two consecutive operation"
-                     " must not be less than 60 seconds! Thanks!"
+                     " must not be less than 10 seconds! Thanks!"
                 )
                 print("\33[1;35;2m%s\033[0m" % (print_message))
                 return
@@ -299,7 +299,7 @@ class DataRecorderManager(object):
             return None
 
     def start_recorder(self):
-        """Create a recorder and record data to current_output_path."""
+        """Start record and sync threads."""
         self.create_task_id()
         if not self.if_taskid_isready:
             return -1
@@ -342,7 +342,7 @@ class DataRecorderManager(object):
         for worker in self.worker_list:
             worker.setDaemon(False)
             worker.start()
-        self.recorder_status |= 7 # running & record & sync
+        self.recorder_status |= 7 # running && record && sync
         self.listener()
         
         timer_publish = rospy.Timer(rospy.Duration(2), self.publish_recorder_info)
@@ -462,6 +462,6 @@ def main():
 
 if __name__ == '__main__':
     """
-    Run You.
+    Data-Recorder run from here.
     """
     main()

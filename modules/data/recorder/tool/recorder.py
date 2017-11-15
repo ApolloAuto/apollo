@@ -23,7 +23,6 @@ import os
 import sys
 import time
 import Queue
-import psutil
 import signal
 import fnmatch
 import logging
