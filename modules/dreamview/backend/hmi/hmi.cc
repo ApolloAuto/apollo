@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/hmi/hmi.h"
 
 #include <cstdlib>
+#include <thread>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -93,6 +94,48 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
     result.insert({subdir_title, subdir_path});
   }
   return result;
+}
+
+// Send PadMessage to change driving mode to target mode.
+// Retry for several times to try to guarantee the result.
+bool GuaranteeDrivingMode(const Chassis::DrivingMode target_mode,
+                          const bool reset_first) {
+  if (reset_first) {
+    if (!GuaranteeDrivingMode(Chassis::COMPLETE_MANUAL, false)) {
+      return false;
+    }
+  }
+
+  control::PadMessage pad;
+  switch (target_mode) {
+    case Chassis::COMPLETE_MANUAL:
+      pad.set_action(DrivingAction::RESET);
+      break;
+    case Chassis::COMPLETE_AUTO_DRIVE:
+      pad.set_action(DrivingAction::START);
+      break;
+    default:
+      AFATAL << "Unknown action to change driving mode to " << target_mode;
+  }
+
+  constexpr int kMaxTries = 3;
+  constexpr auto kTryInterval = std::chrono::milliseconds(500);
+  auto* chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
+  for (int i = 0; i < kMaxTries; ++i) {
+    // Send driving action periodically until entering target driving mode.
+    AdapterManager::FillPadHeader("HMI", &pad);
+    AdapterManager::PublishPad(pad);
+
+    std::this_thread::sleep_for(kTryInterval);
+    chassis->Observe();
+    if (chassis->Empty()) {
+      AERROR << "No Chassis message received!";
+    } else if (chassis->GetLatestObserved().driving_mode() == target_mode) {
+      return true;
+    }
+  }
+  AERROR << "Failed to change driving mode to " << target_mode;
+  return false;
 }
 
 }  // namespace
@@ -290,24 +333,8 @@ void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
     AERROR << "Unknown driving mode " << new_mode;
     return;
   }
-
-  auto driving_action = DrivingAction::RESET;
-  switch (mode) {
-    case Chassis::COMPLETE_MANUAL:
-      // Default driving action: RESET.
-      break;
-    case Chassis::COMPLETE_AUTO_DRIVE:
-      driving_action = DrivingAction::START;
-      break;
-    default:
-      AERROR << "Unknown action to change driving mode to " << new_mode;
-      return;
-  }
-
-  control::PadMessage pad;
-  pad.set_action(driving_action);
-  AdapterManager::FillPadHeader("HMI", &pad);
-  AdapterManager::PublishPad(pad);
+  const bool reset_first = (mode != Chassis::COMPLETE_MANUAL);
+  GuaranteeDrivingMode(mode, reset_first);
 }
 
 void HMI::ChangeMapTo(const std::string &map_name) {
@@ -360,10 +387,7 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
     return;
   }
 
-  // Stop the running modules for previous mode.
-  if (status_.has_current_mode()) {
-    RunModeCommand("stop");
-  }
+  RunModeCommand("stop");
   status_.set_current_mode(mode_name);
   BroadcastHMIStatus();
 }
