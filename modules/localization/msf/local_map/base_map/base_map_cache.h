@@ -45,14 +45,6 @@ class LRUCache {
   /**@brief Find element for key if it exists in the cache. If not exist, return
    * false. */
   bool Get(Key &key, Element *&value);
-  /**@brief Find element for key if it exists in the cache. If not exist, return
-   * false. This function is thread safe, but DONT change position of element in
-   * LRU queue. */
-  bool GetSilent(const Key &key, Element *&value);
-  /**@brief Find element for key if it exists in the cache. If not exist, return
-   * false. This function is thread safe, but DONT change position of element in
-   * LRU queue. */
-  bool GetSilent(Key &key, Element *&value);
   /**@brief Caches element for key. If cache is full,
    * return the removed element, otherwise return null. */
   Element *Put(const Key &key, Element *value);
@@ -125,22 +117,6 @@ template <class Key, class Element>
 bool LRUCache<Key, Element>::Get(Key &key, Element *&value) {
   const Key &key_const = key;
   return Get(key_const, value);
-}
-
-template <class Key, class Element>
-bool LRUCache<Key, Element>::GetSilent(const Key &key, Element *&value) {
-  MapIterator found_iter = map_.find(key);
-  if (found_iter == map_.end()) {
-    return false;
-  }
-  value = found_iter->second->second;
-  return true;
-}
-
-template <class Key, class Element>
-bool LRUCache<Key, Element>::GetSilent(Key &key, Element *&value) {
-  const Key &key_const = key;
-  return GetSilent(key_const, value);
 }
 
 template <class Key, class Element>
@@ -227,7 +203,7 @@ Element *LRUCache<Key, Element>::Remove(const Key &key) {
 template <class Key, class Element>
 Element *LRUCache<Key, Element>::Remove(Key &key) {
   const Key &key_const = key;
-  remove(key_const);
+  return Remove(key_const);
 }
 
 template <class Key, class Element>

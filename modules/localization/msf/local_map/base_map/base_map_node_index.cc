@@ -71,41 +71,6 @@ std::string MapNodeIndex::ToString() const {
   return ss.str();
 }
 
-// MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
-//         const idl::car::core::numerical::Vector3D& coordinate,
-//         unsigned int resolution_id, int zone_id) {
-//     idl::car::core::numerical::Vector2D coord2d;
-//     coord2d.init(coordinate.get_data());
-//     return GetMapNodeIndex(option, coord2d, resolution_id, zone_id);
-// }
-
-// MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
-//         const idl::car::core::numerical::Vector2D& coordinate,
-//         unsigned int resolution_id, int zone_id) {
-//     assert(resolution_id < option.map_resolutions_.size());
-//     MapNodeIndex index;
-//     index.resolution_id_ = resolution_id;
-//     index.zone_id_ = zone_id;
-//     int n = static_cast<int>((coordinate[0] - option.map_range_.get_min_x())
-//     /
-//             (option.map_node_size_x_ *
-//             option.map_resolutions_[resolution_id]));
-//     int m = static_cast<int>((coordinate[1] - option.map_range_.get_min_y())
-//     /
-//             (option.map_node_size_y_ *
-//             option.map_resolutions_[resolution_id]));
-//     if (n >= 0 && m >= 0 && n < GetMapIndexRangeEast(option,
-//     resolution_id) &&
-//             m < GetMapIndexRangeNorth(option, resolution_id)) {
-//         index.m_ = m;
-//         index.n_ = n;
-//     }
-//     else {
-//         assert(0 == 1); // should never reach here
-//     }
-//     return index;
-// }
-
 MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
                                            const Eigen::Vector3d& coordinate,
                                            unsigned int resolution_id,

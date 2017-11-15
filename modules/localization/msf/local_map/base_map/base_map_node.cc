@@ -190,7 +190,7 @@ unsigned int BaseMapNode::LoadBinary(FILE* file) {
   assert(read_size == header_size);
   unsigned int processed_size = LoadHeaderBinary(&buf[0]);
   assert(processed_size == header_size);
-
+  
   // Load the body
   buf.resize(file_body_binary_size_);
   read_size = fread(&buf[0], 1, file_body_binary_size_, file);

@@ -47,11 +47,6 @@ class BaseMap {
   BaseMapNode* GetMapNode(const MapNodeIndex& index);
   /**@brief Return the map node, if it's not in the cache, safely load it. */
   BaseMapNode* GetMapNodeSafe(const MapNodeIndex& index);
-  /**@brief Get the map node thread safe, if it's not in the cache, return
-   * false. */
-  BaseMapNode* GetMapNodeThreadSafe(const MapNodeIndex& index);
-  /**@brief Return the map node, if it's not in the cache, safely load it. */
-  BaseMapNode* GetMapNodeSaveThreadSafe(const MapNodeIndex& index);
   /**@brief Check if the map node in the cache. */
   bool IsMapNodeExist(const MapNodeIndex& index) const;
 

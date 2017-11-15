@@ -108,50 +108,6 @@ BaseMapNode* BaseMap::GetMapNodeSafe(const MapNodeIndex& index) {
   return node;
 }
 
-BaseMapNode* BaseMap::GetMapNodeThreadSafe(const MapNodeIndex& index) {
-  BaseMapNode* node = NULL;
-  map_node_cache_lvl1_->GetSilent(index, node);
-  return node;
-}
-
-/**@brief Return the map node, if it's not in the cache, safely load it. */
-BaseMapNode* BaseMap::GetMapNodeSaveThreadSafe(const MapNodeIndex& index) {
-  BaseMapNode* node = NULL;
-  // try get from cacheL1
-  if (map_node_cache_lvl1_->GetSilent(index, node)) {
-    // std::cout << "GetMapNodeSafe cacheL1" << std::endl;
-    return node;
-  }
-
-  // try get from cacheL2
-  boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
-  if (map_node_cache_lvl2_->Get(index, node)) {
-    node->SetIsReserved(true);
-    // if (map_node_cache_lvl1_->Size() >= map_node_cache_lvl1_->Capacity()) {
-    //     map_node_cache_lvl1_->ChangeCapacity(map_node_cache_lvl1_->Size() +
-    //     1);
-    // }
-    map_node_cache_lvl1_->Put(index, node);
-    return node;
-  }
-  lock.unlock();
-
-  // load from disk
-  std::cerr << "GetMapNodeSaveThreadSafe: This node don't exist in cache! "
-            << std::endl
-            << "now load this node from disk!" << index << std::endl;
-  LoadMapNodeThreadSafety(index, true);
-  boost::unique_lock<boost::recursive_mutex> lock2(map_load_mutex_);
-  map_node_cache_lvl2_->Get(index, node);
-  lock2.unlock();
-  // if (map_node_cache_lvl1_->Size() >= map_node_cache_lvl1_->Capacity()) {
-  //         map_node_cache_lvl1_->ChangeCapacity(map_node_cache_lvl1_->Size()
-  //         + 1);
-  // }
-  map_node_cache_lvl1_->Put(index, node);
-  return node;
-}
-
 /**@brief Check if the map node in the cache. */
 bool BaseMap::IsMapNodeExist(const MapNodeIndex& index) const {
   return map_node_cache_lvl1_->IsExist(index);
