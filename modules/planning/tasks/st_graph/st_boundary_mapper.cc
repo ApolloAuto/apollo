@@ -172,7 +172,8 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
                            stop_decision.stop().distance_s() -
                            vehicle_param_.front_edge_to_center();
 
-  const double s_min = std::max(0.0, st_stop_s);
+  constexpr double kStopEpsilon = 1e-2;
+  const double s_min = std::max(0.0, st_stop_s - kStopEpsilon);
   const double s_max =
       std::fmax(s_min, std::fmax(planning_distance_, reference_line_.Length()));
 
