@@ -1,8 +1,8 @@
 ---
 organization:              # organization info, including company name, site and descriptions.
   required:                # 
-    name: Baidu            # company name.
-    website: www.baidu.com # company site.
+    name: Apollo           # company name.
+    website: apollo.auto   # company site.
   optional:                # 
     description: UNKONWN   # company descriptions.
 vehicle:                   #

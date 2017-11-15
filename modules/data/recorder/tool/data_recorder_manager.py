@@ -17,7 +17,7 @@
 ###############################################################################
 
 """
-data_recorder_manager is responsiable for autonomous vehicle data recording.
+data_recorder_manager is responsible for autonomous vehicle data recording.
 """
 
 import os
@@ -48,7 +48,7 @@ import data_sync
 import disk_handle
 import meta_manager
 import config_parser
-from proto import recorder_info_pb2
+import modules.data.proto.recorder_info_pb2 as recorder_info_pb2
 
 G_VERSION = "1.0.0.1"
 
@@ -277,7 +277,7 @@ class DataRecorderManager(object):
             self.pub.publish(serialized_str)
 
     def update_link(self):
-        """Update softlink target file."""
+        """Update soft link target file."""
         output_link_path  = self.conf_reader.data_args.get('output_link_path')
         try:
             os.remove(output_link_path)
@@ -416,7 +416,7 @@ def launch_data_recorder(cp):
 
 def main():
     """main function"""
-    usage = "python data_recorder.py -c ../conf/recorder.conf"
+    usage = "python modules/data/recorder/tool/data_recorder_manager.py -c modules/data/conf/recorder.conf"
     parser = optparse.OptionParser(usage)
     parser.add_option("-c", "--conf",
             dest = "conf_file",
@@ -429,9 +429,9 @@ def main():
     (options, args) = parser.parse_args()
 
     if len(sys.argv) == 1:
-        parser.error("Incorrect numbers of agruments")
+        parser.error("Incorrect numbers of arguments")
     if len(args):
-        parser.error("Incorrect numbers of agruments, please type python data_recorder.py -h")
+        parser.error("Incorrect numbers of arguments, please type python data_recorder.py -h")
 
     if options.my_version:
         return print_version(G_VERSION)
@@ -441,7 +441,7 @@ def main():
             parser.error("The config file you given does not exists, please check!")
         else:
             cp =config_parser.ConfigParser()
-            global_conf = cp.load_config("../conf/recorder.global.yaml")
+            global_conf = cp.load_config("modules/data/conf/recorder.global.yaml")
             task_conf = cp.load_config(options.conf_file)
             if global_conf is None:
                 print("Load recorder.global.yaml error!")
@@ -450,7 +450,7 @@ def main():
                 print("Load recorder.debug.yaml error!")
                 sys.exit(-1)
             if not cp.get_global_config(global_conf) == 0:
-                print("Get global parameters from ../conf/recorder.global.yaml encounters error!")
+                print("Get global parameters from modules/data/conf/recorder.global.yaml encounters error!")
                 sys.exit(-1)
             if not cp.get_task_from_yaml(task_conf) == 0:
                 print("Get task parameters from %s encounters error!" % (options.conf_file))

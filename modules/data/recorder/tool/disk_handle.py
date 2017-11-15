@@ -70,7 +70,7 @@ def check_disk(output_path, min_space=1024):
 
 
 def get_disk_partitions_info(all=False):
-    """Return all mountd partitions as a nameduple."""
+    """Return all mounted partitions as a nameduple."""
     phydevs = []
     f = open("/proc/filesystems", "r")
     for line in f:
