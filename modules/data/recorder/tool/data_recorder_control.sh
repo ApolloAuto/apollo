@@ -16,6 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../.." && pwd )"
+cd ${APOLLO_ROOT_DIR}
 
 SCRIPT_NAME="data-recorder"
 PWD=$(cd "$(dirname "$0")"; pwd)
@@ -44,20 +46,21 @@ color_message() {
 usage_start() {
     color_message "Data Recorder:" "BLUE"
     color_message "Usage: bash ${SCRIPT_NAME} start [debug | ads | collection]" "BLUE"
-    color_message "Version: ${SCRIPT_NAME} ${VERSION} Copyright Baidu Inc." "BLUE"
+    color_message "Version: ${SCRIPT_NAME} ${VERSION}." "BLUE"
 }
 
 usage() {
     color_message "Data Recorder:" "BLUE"
     color_message "Usage: bash ${SCRIPT_NAME} [ start | stop | check-env | config ]" "BLUE"
-    color_message "Version: ${SCRIPT_NAME} ${VERSION} Copyright Baidu Inc." "BLUE"
+    color_message "Version: ${SCRIPT_NAME} ${VERSION}." "BLUE"
 }
 
 start() {
     local task_purpose=$1
     ps -ef|grep 'data_recorder_manager'|grep -v 'data_recorder_control'|grep -v 'grep' &>/dev/null
     [ $? -eq 0 ] && printf "\033[31mThere is another data-recorder process running, if you want to stop that process, you can run following command:\nbash data_recorder_control.sh stop\n\033[0m" && exit 1
-    python data_recorder_manager.py -c ../conf/recorder.${task_purpose}.yaml &
+    python modules/data/recorder/tool/data_recorder_manager.py \
+        -c modules/data/conf/recorder.${task_purpose}.yaml &
     sleep 1
     ps -ef|grep 'data_recorder_manager'|grep -v 'grep' &>/dev/null
     [ $? -eq 0 ] && echo "data-recorder start successfully." || echo "data-recorder start failed."

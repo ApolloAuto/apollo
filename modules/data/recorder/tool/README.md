@@ -18,7 +18,7 @@ Modify the config file according to your system environments and data recording 
 
 #### Start Data-Recorder.
  * bash data_reocrder_control.sh start # Start data-recoder with default task_purpose(debug).
- * python data_recorder_manager.py -c ../conf/recorder.debug.yaml # This is another way to start.
+ * python modules/data/recorder/tool/data_recorder_manager.py -c modules/data/conf/recorder.debug.yaml # This is another way to start.
 
 #### Stop Data-Recorder.
  * bash data-recorder_control.sh stop  # stop data-recorder.

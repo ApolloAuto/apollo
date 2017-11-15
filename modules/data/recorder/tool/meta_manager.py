@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-"""This script is responsable for meta management."""
+"""This script is responsible for meta management."""
 
 import sys
 import json
