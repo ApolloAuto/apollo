@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_UTIL_H_
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_UTIL_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_
 
 #include <fstream>
 #include "modules/perception/obstacle/base/types.h"
@@ -72,41 +72,10 @@ class RadarUtil {
   }
 
   static void MockRadarPolygon(const Eigen::Vector3d &center, const double length,
-                               const double width, const double theta, PolygonDType &polygon) {
-    Eigen::Matrix2d rotation;
-    rotation << cos(theta), -sin(theta),
-        sin(theta), cos(theta);
-    Eigen::Vector2d local_poly(0, 0);
-    Eigen::Vector2d world_poly;
-    polygon.resize(4);
-    local_poly(0) = -0.5 * length;
-    local_poly(1) = -0.5 * width;
-    world_poly = rotation * local_poly;
-    polygon.points[0].x = center(0) + world_poly(0);
-    polygon.points[0].y = center(1) + world_poly(1);
-    polygon.points[0].z = center(2);
-    local_poly(0) = -0.5 * length;
-    local_poly(1) = +0.5 * width;
-    world_poly = rotation * local_poly;
-    polygon.points[1].x = center(0) + world_poly(0);
-    polygon.points[1].y = center(1) + world_poly(1);
-    polygon.points[1].z = center(2);
-    local_poly(0) = +0.5 * length;
-    local_poly(1) = +0.5 * width;
-    world_poly = rotation * local_poly;
-    polygon.points[2].x = center(0) + world_poly(0);
-    polygon.points[2].y = center(1) + world_poly(1);
-    polygon.points[2].z = center(2);
-    local_poly(0) = +0.5 * length;
-    local_poly(1) = -0.5 * width;
-    world_poly = rotation * local_poly;
-    polygon.points[3].x = center(0) + world_poly(0);
-    polygon.points[3].y = center(1) + world_poly(1);
-    polygon.points[3].z = center(2);
-  }
+                               const double width, const double theta, PolygonDType &polygon);
 };
 
 }//namespace perception
 }//namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_UTIL_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_

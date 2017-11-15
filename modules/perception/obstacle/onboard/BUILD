@@ -105,7 +105,7 @@ cc_library(
         "//modules/perception/onboard:perception_onboard",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
-        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
+        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "@eigen//:eigen",
         "@gtest//:gtest",

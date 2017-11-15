@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/obstacle/radar/detector/modest/modest_radar_detector.h"
+#include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/common/log.h"

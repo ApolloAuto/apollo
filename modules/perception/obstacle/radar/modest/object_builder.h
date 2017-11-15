@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_OBJECT_BUILDER_H_
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_OBJECT_BUILDER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
 
 #include <memory>
 #include <Eigen/Core>
@@ -23,7 +23,7 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
-#include "modules/perception/obstacle/radar/detector/modest/radar_define.h"
+#include "modules/perception/obstacle/radar/modest/radar_define.h"
 
 namespace apollo {
 namespace perception {
@@ -58,4 +58,4 @@ class ObjectBuilder {
 
 } // namespace perception
 } // namespace apollo
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_OBJECT_BUILDER_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_

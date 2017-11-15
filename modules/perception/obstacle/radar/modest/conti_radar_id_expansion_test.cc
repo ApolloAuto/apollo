@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/radar/detector/modest/conti_radar_id_expansion.h"
+#include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
 
 #include <gtest/gtest.h>
 #include "modules/common/log.h"

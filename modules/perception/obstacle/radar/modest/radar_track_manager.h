@@ -14,16 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_TRACK_MANAGER_H
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_TRACK_MANAGER_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_MANAGER_H
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_MANAGER_H
 
 #include <vector>
 #include <mutex>
 
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/radar/detector/modest/radar_define.h"
-#include "modules/perception/obstacle/radar/detector/modest/radar_track.h"
+#include "modules/perception/obstacle/radar/modest/radar_define.h"
+#include "modules/perception/obstacle/radar/modest/radar_track.h"
 
 namespace apollo {
 namespace perception {
@@ -80,4 +80,4 @@ private:
 } // namespace perception
 } // namespace apollo
 
-#endif
+#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_MANAGER_H

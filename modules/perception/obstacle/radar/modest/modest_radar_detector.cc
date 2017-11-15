@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/radar/detector/modest/modest_radar_detector.h"
+#include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/obstacle/radar/detector/modest/conti_radar_util.h"
-#include "modules/perception/obstacle/radar/detector/modest/radar_util.h"
-#include "modules/perception/obstacle/radar/detector/modest/object_builder.h"
+#include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
+#include "modules/perception/obstacle/radar/modest/radar_util.h"
+#include "modules/perception/obstacle/radar/modest/object_builder.h"
 
 namespace apollo {
 namespace perception {

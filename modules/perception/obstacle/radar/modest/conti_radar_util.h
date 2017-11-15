@@ -14,18 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_DEFINE_H_
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_DEFINE_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
+
+#include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 
 namespace apollo {
 namespace perception {
 
-const double RADAR_CYCLE = 0.074;
-const double RADAR_TRACK_TIME_WIN = 0.06;
-const double RADAR_TRACK_THRES = 2.5;
-const int MAX_RADAR_IDX = 2147483647;
+class ContiRadarUtil {
+ public:
+  static bool IsFp(const ContiRadarObs &contiobs,
+                   const ContiParams &params,
+                   const int delay_frames,
+                   int &tracking_times);
+
+};
 
 } // namespace perception
 } // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_RADAR_DEFINE_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H

@@ -14,15 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DETECTOR_H_
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DETECTOR_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_
 
 #include <string>
 #include <vector>
 
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
-#include "modules/perception/obstacle/radar/detector/modest/radar_track_manager.h"
-#include "modules/perception/obstacle/radar/detector/modest/object_builder.h"
+#include "modules/perception/obstacle/radar/modest/radar_track_manager.h"
+#include "modules/perception/obstacle/radar/modest/object_builder.h"
 
 namespace apollo {
 namespace perception {
@@ -68,4 +68,4 @@ REGISTER_RADARDETECTOR(ModestRadarDetector);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DETECTOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_

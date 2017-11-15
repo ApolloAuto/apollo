@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/radar/detector/modest/radar_track_manager.h"
+#include "modules/perception/obstacle/radar/modest/radar_track_manager.h"
 
 namespace apollo {
 namespace perception {

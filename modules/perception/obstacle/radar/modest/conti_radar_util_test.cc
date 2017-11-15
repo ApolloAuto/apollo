@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/obstacle/radar/detector/modest/conti_radar_util.h"
+#include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 
 #include "modules/common/log.h"
 #include <gtest/gtest.h>
