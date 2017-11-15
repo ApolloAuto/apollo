@@ -117,12 +117,14 @@ bool SpiralReferenceLineSmoother::Smooth(
       fixed_start_point_ = true;
       fixed_start_x_ = anchor_points_[start_index - 1].path_point.x();
       fixed_start_y_ = anchor_points_[start_index - 1].path_point.y();
-      fixed_start_theta_ = anchor_points_[start_index - 1].path_point.theta();
+      fixed_start_theta_ = common::math::NormalizeAngle(
+          anchor_points_[start_index - 1].path_point.theta());
       fixed_start_kappa_ = anchor_points_[start_index - 1].path_point.kappa();
       fixed_start_dkappa_ = anchor_points_[start_index - 1].path_point.dkappa();
 
       Smooth(raw_point2d, &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x,
              &opt_y);
+
       opt_theta.insert(opt_theta.begin(), overhead_theta.begin(),
                        overhead_theta.end());
       opt_kappa.insert(opt_kappa.begin(), overhead_kappa.begin(),
@@ -284,7 +286,7 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
     const double dy = spiral_curve.ComputeCartesianDeviationY<10>(inter_s);
 
     const double theta =
-        spiral_curve.Evaluate(0, inter_s);  // need to be normalized.
+        common::math::NormalizeAngle(spiral_curve.Evaluate(0, inter_s));
     const double kappa = spiral_curve.Evaluate(1, inter_s);
     const double dkappa = spiral_curve.Evaluate(2, inter_s);
 
