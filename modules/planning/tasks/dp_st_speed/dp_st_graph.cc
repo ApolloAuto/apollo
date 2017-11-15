@@ -74,6 +74,25 @@ DpStGraph::DpStGraph(const ReferenceLine& reference_line,
 
 Status DpStGraph::Search(PathDecision* const path_decision,
                          SpeedData* const speed_data) {
+  constexpr double kBounadryEpsilon = 1e-2;
+  for (auto boundary : st_graph_data_.st_boundaries()) {
+    if (boundary->IsPointInBoundary({0.0, 0.0}) ||
+        (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
+         std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
+      std::vector<SpeedPoint> speed_profile;
+      double t = 0.0;
+      for (int i = 0; i < dp_st_speed_config_.matrix_dimension_t();
+           ++i, t += unit_t_) {
+        SpeedPoint speed_point;
+        speed_point.set_s(0.0);
+        speed_point.set_t(t);
+        speed_profile.emplace_back(speed_point);
+      }
+      speed_data->set_speed_vector(speed_profile);
+      return Status::OK();
+    }
+  }
+
   if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
     AERROR << msg;

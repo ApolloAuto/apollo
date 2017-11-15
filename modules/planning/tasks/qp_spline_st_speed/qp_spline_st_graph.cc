@@ -80,6 +80,22 @@ void QpSplineStGraph::SetDebugLogger(
 Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                SpeedData* const speed_data,
                                const std::pair<double, double>& accel_bound) {
+  speed_data->Clear();
+  constexpr double kBounadryEpsilon = 1e-2;
+  for (auto boundary : st_graph_data.st_boundaries()) {
+    if (boundary->IsPointInBoundary({0.0, 0.0}) ||
+        (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
+         std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
+      const double t_output_resolution = FLAGS_trajectory_time_min_interval;
+      double time = 0.0;
+      while (time < qp_st_speed_config_.total_time() + t_output_resolution) {
+        speed_data->AppendSpeedPoint(0.0, time, 0.0, 0.0, 0.0);
+        time += t_output_resolution;
+      }
+      return Status::OK();
+    }
+  }
+
   cruise_.clear();
 
   init_point_ = st_graph_data.init_point();
