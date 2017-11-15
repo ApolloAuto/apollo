@@ -33,7 +33,7 @@ export default class RouteEditingMenu extends React.Component {
                     <RouteEditingButton label="Add Point of Interest"
                                         icon={addPoiIcon}
                                         onClick={() => {
-                                            routeEditingManager.addDefaultEndPoint();
+                                            this.props.store.handleSideBarClick('showPOI');
                                         }}/>
                     <RouteEditingButton label="Remove Last Point"
                                         icon={removeLastIcon}

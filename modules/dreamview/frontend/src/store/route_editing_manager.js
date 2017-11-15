@@ -6,7 +6,8 @@ export default class RouteEditingManager {
 
     // Map from POI name to its x,y coordinates, e.g. {POI-1: {x: 1.0, y: 1.2}}
     @observable defaultRoutingEndPoint = {};
-    @observable currentPOI = "none"; // The chosen POI as a routing end point.
+    @observable currentPOI = "none";
+
 
     @action updateDefaultRoutingEndPoint(data) {
         if (data.poi === undefined || _.isEmpty(data.poi)) {
@@ -22,27 +23,19 @@ export default class RouteEditingManager {
         }
     }
 
-    @action setDefaultEndPoint(poiName) {
+    @action addDefaultEndPoint(poiName) {
         if (_.isEmpty(this.defaultRoutingEndPoint)) {
             alert("Failed to get default routing end point, make sure there's " +
                   "a default end point file under the map data directory.");
             return;
         }
-        if (poiName === undefined || poiName === "none"
+        if (poiName === undefined || poiName === ""
             || !(poiName in this.defaultRoutingEndPoint)) {
-            alert("Please select a valid point of interest.");
+            alert("Please select a valid POI.");
             return;
         }
         this.currentPOI = poiName;
-    }
-
-    addDefaultEndPoint() {
-        if (this.currentPOI === "none") {
-            alert("Please select a valid point of interest.");
-            return false;
-        }
-        RENDERER.addDefaultEndPoint(this.defaultRoutingEndPoint[this.currentPOI]);
-        return true;
+        RENDERER.addDefaultEndPoint(this.defaultRoutingEndPoint[poiName]);
     }
 
     enableRouteEditing() {
