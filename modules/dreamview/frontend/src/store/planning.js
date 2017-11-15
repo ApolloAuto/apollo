@@ -205,11 +205,10 @@ export default class Planning {
     }
   }
 
-  update(world) {
+  update(world, planningData) {
     this.updateSequenceNum(world.sequenceNum);
     this.data = this.initData();
 
-    const planningData = world.planningData;
     if (planningData) {
       if (planningData.slFrame) {
         this.updateSLFrame(planningData.slFrame);
