@@ -67,6 +67,10 @@ class SimulationWorldUpdater {
    */
   void Start();
 
+  // Time interval, in milliseconds, between pushing SimulationWorld to
+  // frontend.
+  static constexpr double kSimWorldTimeIntervalMs = 100;
+
  private:
   /**
    * @brief The callback function to get updates from SimulationWorldService,
@@ -112,9 +116,6 @@ class SimulationWorldUpdater {
                                " message."));
     }
   }
-
-  // Time interval, in seconds, between pushing SimulationWorld to frontend.
-  static constexpr double kSimWorldTimeInterval = 0.1;
 
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;

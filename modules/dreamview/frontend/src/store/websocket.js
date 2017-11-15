@@ -27,7 +27,14 @@ class WebSocketEndpoint {
         }
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
+
             switch (message.type) {
+                case "HMIConfig":
+                    STORE.hmi.initialize(message.data);
+                    break;
+                case "HMIStatus":
+                    STORE.hmi.updateStatus(message.data);
+                    break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
@@ -39,6 +46,7 @@ class WebSocketEndpoint {
                     RENDERER.updateWorld(message.world);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
+                    STORE.trafficSignal.update(message.world);
                     if (STORE.options.showPNCMonitor) {
                         STORE.planning.update(message.world);
                     }
@@ -135,6 +143,57 @@ class WebSocketEndpoint {
     dumpMessages() {
         this.websocket.send(JSON.stringify({
             type: "Dump",
+        }));
+    }
+
+    changeSetupMode(mode) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeMode",
+            new_mode: mode,
+        }));
+    }
+
+    changeMap(map) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeMap",
+            new_map: map,
+        }));
+    }
+
+    changeVehicle(vehcile) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeVehicle",
+            new_vehicle: vehcile,
+        }));
+    }
+
+    executeModeCommand(command) {
+        this.websocket.send(JSON.stringify({
+            type: "ExecuteModeCommand",
+            command, command,
+        }));
+    }
+
+    executeModuleCommand(module, command) {
+        this.websocket.send(JSON.stringify({
+            type: "ExecuteModuleCommand",
+            module: module,
+            command, command,
+        }));
+    }
+
+    executeToolCommand(tool, command) {
+         this.websocket.send(JSON.stringify({
+            type: "ExecuteToolCommand",
+            tool: tool,
+            command, command,
+        }));
+    }
+
+    changeDrivingMode(mode) {
+         this.websocket.send(JSON.stringify({
+            type: "ChangeDrivingMode",
+            new_mode: mode,
         }));
     }
 }

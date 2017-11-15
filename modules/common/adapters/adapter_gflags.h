@@ -31,9 +31,6 @@ DECLARE_string(monitor_topic);
 DECLARE_string(pad_topic);
 DECLARE_string(control_command_topic);
 DECLARE_string(pointcloud_topic);
-DECLARE_string(radar_topic);
-DECLARE_string(image_short_topic);
-DECLARE_string(image_long_topic);
 DECLARE_string(prediction_topic);
 DECLARE_string(perception_obstacle_topic);
 DECLARE_string(traffic_light_detection_topic);
@@ -48,6 +45,9 @@ DECLARE_string(system_status_topic);
 DECLARE_string(hmi_command_topic);
 DECLARE_string(mobileye_topic);
 DECLARE_string(delphi_esr_topic);
+DECLARE_string(conti_radar_topic);
 DECLARE_string(compressed_image_topic);
+DECLARE_string(short_image_topic);
+DECLARE_string(long_image_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

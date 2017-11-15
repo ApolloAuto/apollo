@@ -7,18 +7,23 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
+
     border-top: 1px solid #333333;
     padding: 10px;
-    
+
     .icon {
         height: 20px;
         width: 20px;
+
+        @include small-screen {
+            height: 15px;
+            width: 15px;
+        }
     }
 
     .text {
         margin-left: 10px;
         line-height: 150%;
-        max-width: 200px;
         font-size: 12px;
         character: 0px;
         line: 20px;
@@ -35,199 +40,333 @@
 
 body {
     margin: 0px;
-    background-color: #031C31 !important;
     overflow: hidden;
+
+    background-color: #14171A !important;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    color: #FFFFFF;
 }
+
+
+
+
+
+/* Adjust the scrollbar style. */
+
+ ::-webkit-scrollbar {
+    width: 4px;
+    height: 8px;
+    opacity: 0.3;
+    background-color: #FFFFFF;
+}
+
+ ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #555555;
+}
+
+ ::-webkit-scrollbar-thumb {
+    opacity: 0.8;
+    background-color: #30A5FF;
+}
+
+ ::-webkit-scrollbar-thumb:active {
+    background-color: #30A5FF;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+
+    z-index: 100;
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 60px;
+
+    background: #000000;
+    color: #ffffff;
+    font-size: 16px;
+    text-align: left;
+
+    @include small-screen {
+        height: 55px;
+        font-size: 14px;
+    }
+
+    /* The Apollo logo on the header. */
+    .apollo-logo {
+        flex: 0 0 auto;
+
+        top: 40px;
+        left: 40px;
+        height: 40px;
+        width: 121px;
+        margin: 10px auto 0px 18px;
+
+        @include small-screen {
+            top: 15px;
+            left: 25px;
+            height: 25px;
+            width: 80px;
+            margin-top: 5px;
+        }
+    }
+
+    .selector {
+        flex: 0 0 auto;
+
+        position: relative;
+        margin: 10px;
+        border: 1px solid #383838;
+
+        select {
+            display: block;
+
+            border: none;
+            padding: 0.5em 3em 0.5em 0.5em;
+
+            background: #000000;
+            color: #ffffff;
+            outline: none;
+            cursor: pointer;
+
+            /* remove default arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 30px;
+            height: 100%;
+            border-left: 1px solid #383838;
+
+            background: #181818;
+            pointer-events: none;
+        }
+        .arrow:before {
+            position: absolute;
+            top: 55%;
+            right: 7px;
+            margin-top: -5px;
+            border-top: 8px solid #666666;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+
+            content: '';
+            pointer-events: none;
+        }
+    }
+}
+
+.pane-container {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 60px);
+
+    @include small-screen {
+        height: calc(100% - 55px);
+    }
+
+    .left-pane {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: stretch;
+
+        position: absolute;
+        bottom: 0px;
+        top: 0px;
+        width: 100%;
+
+        .dreamview-body {
+            display: flex;
+            flex-flow: column nowrap;
+
+            flex: 1 1 auto;
+            overflow: hidden;
+
+            .main-view {
+                flex: 0 0 auto;
+                position: relative;
+            }
+        }
+    }
+
+    .right-pane {
+        position: absolute;
+        right: 0px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .SplitPane {
+        .Resizer {
+            background: #000000;
+            opacity: 0.2;
+            z-index: 1;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            -moz-background-clip: padding;
+            -webkit-background-clip: padding;
+            background-clip: padding-box;
+        }
+
+        .Resizer:hover {
+            -webkit-transition: all 2s ease;
+            transition: all 2s ease;
+        }
+
+        .Resizer.vertical {
+            width: 11px;
+            margin: 0 -5px;
+            border-left: 5px solid rgba(255, 255, 255, 0);
+            border-right: 5px solid rgba(255, 255, 255, 0);
+            cursor: col-resize;
+        }
+
+        .Resizer.vertical:hover {
+            border-left: 5px solid rgba(0, 0, 0, 0.5);
+            border-right: 5px solid rgba(0, 0, 0, 0.5);
+        }
+
+        .Resizer.disabled {
+            cursor: auto;
+        }
+
+        .Resizer.disabled:hover {
+            border-color: transparent;
+        }
+    }
+}
+
+
+
+
 
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
+
 .dreamview-canvas {
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
     z-index: 1;
+    position: absolute;
+
+    .geolocation {
+        z-index: 10;
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+
+        color: white;
+    }
 }
 
 .hidden {
     display: none;
 }
 
-.sidebar {
-    position: absolute;
-    z-index: 100;
+.tools {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
 
-    top: 150px;
-    left: 40px;
+    flex: 1 1 auto;
 
-    @include small-screen {
-        top: 100px;
-        left: 10px;
-    }
+    margin-top: 3px;
+    overflow: hidden;
 
-    .button {
-        opacity: 0.7;
-        height: 60px;
-        width: 260px;
-        border: none;
-        padding: 20px;
-        display: block;
-        font-size: 14px;
-        text-align: left;
-        color: #FFFFFF;
-        background-color: #000000;
+    .card {
+        flex: 1 1 auto;
+
+        border-right: 3px solid #000000;
+        padding: 25px 10px 25px 20px;
+        background: #1D2226;
 
         @include small-screen {
-            padding-top: 5px;
-            height: 10px;
-            width: 200px;
-        }
-    }
-
-    .button:focus {
-        outline: 0;
-    }
-
-    .button:active {
-        color: #30A5FF;
-    }
-
-    .active {
-        color: #30A5FF;
-    }
-
-    .button-corner {
-        clip-path: polygon(0% 0%, 80% 0%, 100% 50%, 100% 100%, 0% 100%);
-    }
-
-    .separator {
-        display: block;
-        height: 1px;
-        border: 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 0;
-    }
-
-    .console {
-        background-color: rgba(74, 5, 24, 0.4);
-        border: none;
-        margin: 0px;
-        padding: 0px;
-        width: 260px;
-        height: 250px;
-        overflow: auto;
-        overflow-x: hidden;
-
-        @include small-screen {
-            height: 130px;
-            width: 200px;
+            padding: 15px 5px 15px 15px;
         }
 
-        .monitor-item {
-            @include monitor-item-common-properties();
-        }
-    }
+        .card-header {
+            width: 100%;
+            padding-bottom: 15px;
+            font-size: 18px;
 
-    .nav-side-menu {
-        overflow: auto;
-        background-color: #000000;
-        opacity: 0.6;
-        width: 260px;
-        height: 250px;
-        font-size: 14px;
-        color: #FFFFFF;
-        text-align: left;
-        z-index: 10 !important;
-
-        @include small-screen {
-            height: 180px;
-            width: 200px;
-        }
-
-        details {
-            summary {
-                line-height: 50px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-                @include small-screen {
-                    line-height: 25px;
-                }
-            
-                img {
-                    position: relative;
-                    transform: translate(70%, 30%);
-                    width: 30px;
-                    height: 30px;
-
-                    @include small-screen {
-                        transform: translate(120%, 20%);
-                        width: 15px;
-                        height: 15px;
-                    }
-                }
-                    
-                span {
-                    padding-left: 35px;
-
-                    @include small-screen {
-                        padding-left: 20px;
-                    }
-                }
+            span {
+                width: 200px;
+                border-bottom: 1px solid #999999;
+                padding: 10px 10px 10px 0px;
             }
-            
-            summary::-webkit-details-marker {
-                float: right;
-                padding-top: 22px;
-                padding-right: 10px;
 
-                @include small-screen {
-                    padding-top: 8px;
-                }
+            @include small-screen {
+                font-size: 16px;
             }
         }
 
-        details[open] {
-            background-color: #002848;
+        .card-content-row {
+            display: flex;
+            flex-flow: row wrap;
+            align-content: flex-start;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 85%;
         }
-        
-        ul {
-            list-style: none;
-            padding-left: 0px;
-            margin: 0;
-            cursor: pointer;
-            font-size: 12px;
-            background-color: #000F23;
-            
-            li {
-                line-height: 40px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding-left: 6px;
-                margin-left: 0;
-                    
-                span {
-                    padding-left: 20px;
-                }
-            }
-                
-            li:hover {
-                background-color: #000000;
+
+        .card-content-column {
+            display: flex;
+            flex-flow: column nowrap;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 85%;
+        }
+    }
+
+    ul {
+        flex: 0 0 auto;
+
+        margin: 0;
+        padding-left: 0px;
+        padding-right: 5px;
+
+        background-color: #1D2226;
+        color: #999999;
+        list-style: none;
+        cursor: pointer;
+        font-size: 12px;
+
+        li {
+            line-height: 40px;
+
+            span {
+                padding-left: 20px;
             }
         }
 
-        // Toggle switch
-        .switch {
-            position: relative;
-            transform: translate(35%, 25%);
-            width: 40px;
-            display: inline-block;
+        li:hover {
+            color: #FFFFFF;
+            background-color: #2A3238;
         }
-        
+    }
+
+
+    /* Toggle switch */
+    .switch {
+        display: inline-block;
+
+        position: relative;
+        width: 40px;
+        transform: translate(35%, 25%);
+
         .toggle-switch {
             display: none;
         }
-        
+
         .toggle-switch-label {
             display: block;
             overflow: hidden;
@@ -236,11 +375,10 @@ body {
             padding: 0;
             line-height: 20px;
             border: 0px;
-            border-radius: 16px;
             background-color: #3F4548;
             transition: background-color 0.2s ease-in;
         }
-        
+
         .toggle-switch-label:before {
             content: "";
             display: block;
@@ -251,35 +389,78 @@ body {
             top: 0;
             bottom: 0;
             right: 20px;
-            border-radius: 16px;
             transition: all 0.2s ease-in;
         }
-        
-        .toggle-switch:checked + .toggle-switch-label {
+
+        .toggle-switch:checked+.toggle-switch-label {
             background-color: #0E3D62;
         }
-        
-        .toggle-switch:checked + .toggle-switch-label,
-        .toggle-switch:checked + .toggle-switch-label:before {
+
+        .toggle-switch:checked+.toggle-switch-label,
+        .toggle-switch:checked+.toggle-switch-label:before {
             border-color: #0E3D62;
         }
-        
-        .toggle-switch:checked + .toggle-switch-label:before {
+
+        .toggle-switch:checked+.toggle-switch-label:before {
             right: 0px;
             background-color: #30A5FF;
         }
+    }
 
-        // Radio button
+    .nav-side-menu {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: stretch;
+
+        flex: 2 1 auto;
+
+        z-index: 10 !important;
+        margin-right: 3px;
+
+        overflow-y: hidden;
+        overflow-x: auto;
+        background: #1D2226;
+        font-size: 14px;
+        color: #FFFFFF;
+        text-align: left;
+        white-space: nowrap;
+
+        .summary {
+            line-height: 50px;
+
+            @include small-screen {
+                line-height: 25px;
+            }
+
+            img {
+                position: relative;
+                width: 30px;
+                height: 30px;
+                transform: translate(-30%, 25%);
+
+                @include small-screen {
+                    width: 15px;
+                    height: 15px;
+                    transform: translate(-50%, 10%);
+                }
+            }
+
+            span {
+                padding-left: 10px;
+            }
+        }
+
+        /*  Radio button */
         input[type="radio"] {
             display: none;
         }
-        
+
         #radio-selector-label {
+            display: inline-block;
             position: relative;
             transform: translate(65%, 30%);
             box-sizing: border-box;
             -webkit-box-sizing: border-box;
-            display: inline-block;
             width: 25px;
             height: 25px;
             margin-right: 6px;
@@ -289,404 +470,371 @@ body {
             box-shadow: inset 1px 0 #A0A0A0;
             border: 7px solid #3F4548;
         }
-        
-        input[type="radio"]:checked + #radio-selector-label {
+
+        input[type="radio"]:checked+#radio-selector-label {
             border: 7px solid #0E3D62;
             background-color: #30A5FF;
         }
     }
 
-    // Adjust the scrollbar style.
-    ::-webkit-scrollbar {
-        width: 4px;
-        opacity: 0.3;
-        background-color: #FFFFFF;
-    }
+    .console {
+        z-index: 10;
+        position: relative;
+        min-width: 200px;
+        margin: 0px;
+        border: none;
+        padding: 0px;
 
-    ::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-        background-color: #555555;
-    }
+        overflow-y: auto;
+        overflow-x: hidden;
 
-    ::-webkit-scrollbar-thumb {
-        opacity: 0.8;
-        background-color: #30A5FF;
-    }
-
-    ::-webkit-scrollbar-thumb:active {
-        background-color: #30A5FF;
+        .monitor-item {
+            @include monitor-item-common-properties();
+        }
     }
 }
 
-.notification-warn {
-    @include monitor-item-common-properties();
+.side-bar {
+    display: flex;
 
-    margin-top: 20px;
-    border: 1px solid #A3842D;
-    background-color: rgba(52, 39, 5, 0.3);
-}
+    flex: 0 0 auto;
 
-.notification-alert {
-    @include monitor-item-common-properties();
+    z-index: 100;
+    background: #1D2226;
+    border-right: 3px solid #000000;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-    margin-top: 20px;
-    border: 1px solid #D7466F;
-    background-color: rgba(74, 5, 24, 0.3);
+    .button {
+        display: block;
+        height: 60px;
+        width: 90px;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2px;
+
+        font-size: 14px;
+        text-align: center;
+        background: #1D2226;
+        color: #999999;
+        cursor: pointer;
+
+        @include small-screen {
+            font-size: 12px;
+            width: 80px;
+        }
+    }
+
+    .button:focus {
+        outline: 0;
+    }
+
+    .button:disabled {
+        color: #414141;
+    }
+
+    .active {
+        color: #FFFFFF;
+        background: #2A3238;
+    }
 }
 
 .status-bar {
-    position: relative;
+    z-index: 10;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 10;
-    background: linear-gradient(to bottom,
-                                rgba(3, 38, 68, 1) 0%,
-                                rgba(3, 38, 68, 1) 25%,
-                                rgba(4, 36, 65, 0.8) 50%,
-                                rgba(4, 36, 65, 0));
 
-    min-height: 300px;
-    
-    @include small-screen {
-        min-height: 200px;
-    }
-    
-    .label-text {
-        font-size: 15px;
-        color: #778899;
-
-        @include small-screen {
-            font-size: 14px;
-        }
-    }
-
-    .status-background {
-        width: 100%;
-        height: 300px;
-
-        @include small-screen {
-            height: 200px;
-        }
-    }
-
-    /* The Apollo logo on the status bar. */
-    .apollo-logo {
+    .auto-meter {
         position: absolute;
-
-        top: 40px;
-        left: 40px;
-        height: 46px;
-        width: 141px;
-
-        @include small-screen {
-            top: 28px;
-            left: 40px;
-            height: 27.6px;
-            width: 84.6px;
-        }
-    }
-
-    .throttle-panel {
-        position: absolute;
-
-        top: 30px;
-        right: 172px;
-        width: 100px;
-        height: 200px;
-
-        @include small-screen {
-            top: 20px;
-            right: 112px;
-            width: 75px;
-            height: 150px;
-        }
-    }
-
-    .brake-panel {
-        position: absolute;
-        
-        top: 30px;
-        right: 72px;
-        width: 100px;
-        height: 200px;
-
-        @include small-screen {
-            top: 20px;
-            right: 37px;
-            width: 75px;
-            height: 150px;
-        }
-    }
-
-    .speed-unit {
-        position: absolute;
-        color: #fff;
-
-        font-size: 10px;
-        top: 122px;
-        right: 118px;
-
-        @include small-screen {
-            font-size: 8px;
-            top: 98px;
-            right: 102px;
-        }
-    }
-
-    .speed-panel {
-        position: absolute;
-        text-align: center;
-        color: #fff;
-        width: 100px;
-        height: 100px;
-
-        top: 85px;
-        right: 122px;
-        
-        @include small-screen {
-            top: 56px;
-            right: 62px;
-        }
+        width: 224px;
+        height: 112px;
+        top: 10px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
 
         .speed-read {
+            position: absolute;
+            top: 27px;
+            left: 15px;
+
             font-family: Arial;
             font-weight: lighter;
-
-            font-size: 50px;
-
-            @include small-screen {
-                font-size: 36px;
-            }
+            font-size: 35px;
+            color: #ffffff;
         }
 
-        .driving-mode {
-            font-family: Arial;
-            font-weight: 300;
-            color: #30A5FF;
+        .speed-unit {
+            position: absolute;
+            top: 66px;
+            left: 17px;
 
-            margin-top: 5px;
+            color: #ffffff;
             font-size: 15px;
-            
-            @include small-screen {
-                margin-top: 15px;
-                font-size: 11px;
-            }
-        }
-    }
-
-    .meter-text-accelerator {
-        position: absolute;
-        color: #ffffff;
-
-        top: 240px;
-        right: 190px;
-
-        @include small-screen {
-            top: 175px;
-            right: 135px;
-        }
-    }
-
-    .meter-text-brake {
-        position: absolute;
-        color: #ffffff;
-
-        top: 240px;
-        right: 80px;
-
-        @include small-screen {
-            top: 175px;
-            right: 35px;
-        }
-    }
-
-    .wheel {
-        position: absolute;
-
-        top: 30px;
-        right: 420px;
-
-        @include small-screen {
-            top: 20px;
-            right: 300px;
         }
 
-        .wheel-background {
+        .brake-panel {
             position: absolute;
-            top: 0px;
-            right: 0px;
-            z-index: 5;
-
-            width: 200px;
-            height: 130px;
-            
-            @include small-screen {
-                width: 140px;
-                height: 91px;
-            }
+            top: 21px;
+            right: 2px;
         }
 
-        .wheel-image {
+        .throttle-panel {
             position: absolute;
-            z-index: 10;
+            top: 61px;
+            right: 2px;
+        }
 
-            top: 28px;
-            right: 62px;
-            width: 76px;
-            height: 76px;
-
-            @include small-screen {
-                top: 19.6px;
-                right: 43.4px;
-                width: 53.2px;
-                height: 53.2px;
+        .meter-container {
+            .meter-label {
+                font-size: 13px;
+                color: #ffffff;
             }
+            .meter-head {
+                display: inline-block;
+                position: absolute;
+                margin: 5px 0px 0px 5px;
+                border-width: 4px;
+                border-style: solid;
+            }
+            .meter-background {
+                position: relative;
+                display: block;
+                height: 2px;
+                width: 120px;
+                margin: 8px;
+
+                span {
+                    position: relative;
+                    overflow: hidden;
+                    display: block;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    .wheel-panel {
+        display: flex;
+        flex-direction: row;
+        justify-content: left;
+        align-items: center;
+
+        position: absolute;
+        top: 128px;
+        right: 20px;
+        width: 187px;
+        height: 92px;
+        padding: 10px 22px 10px 15px;
+        background: rgba(0, 0, 0, 0.8);
+
+        .steerangle-read {
+            font-family: Arial;
+            font-weight: lighter;
+            font-size: 35px;
+            color: #ffffff;
+        }
+
+        .steerangle-unit {
+            padding: 0px 10px 20px 3px;
+            color: #ffffff;
+            font-size: 15px;
         }
 
         .left-arrow {
             position: absolute;
-            z-index: 10;
-
-            top: 55px;
-            right: 170px;
-            width: 19px;
-            height: 22px;
-
-            @include small-screen {
-                top: 38.5px;
-                right: 119px;
-                width: 13.3px;
-                height: 15.4px;
-            }
+            top: 45px;
+            right: 120px;
+            width: 0px;
+            height: 0px;
+            border-style: solid;
+            border-width: 12px 15px 12px 0px;
+            border-color: transparent;
         }
 
         .right-arrow {
             position: absolute;
-            z-index: 10;
-
-            top: 55px;
-            right: 10px;
-            width: 19px;
-            height: 22px;
-
-            @include small-screen {
-                top: 38.5px;
-                right: 7px;
-                width: 13.3px;
-                height: 15.4px;
-            }
+            top: 45px;
+            right: 15px;
+            width: 0px;
+            height: 0px;
+            border-style: solid;
+            border-width: 12px 0 12px 15px;
+            border-color: transparent transparent transparent #30435e;
         }
 
-        .left-label-text {
+        .wheel {
             position: absolute;
-            color: #ffffff;
-
-            top: 58px;
-            right: 210px;
-
-            @include small-screen {
-                top: 40.6px;
-                right: 147px;
-            }
+            top: 15px;
+            right: 35px;
         }
-
-        .right-label-text {
-            position: absolute;
-            color: #ffffff;
-
-            top: 58px;
-            right: -50px;
-
-            @include small-screen {
-                top: 40.6px;
-                right: -35px;
-            }
+        .wheel-background {
+            stroke-width: 3px;
+            stroke: #006AFF;
+        }
+        .wheel-arm {
+            stroke-width: 3px;
+            stroke: #006AFF;
+            fill: #006AFF;
         }
     }
 
     .traffic-light-indicator {
         position: absolute;
+        top: 246px;
+        right: 20px;
+        width: 224px;
+        height: 35px;
 
-        top: 180px;
-        right: 590px;
-
-        @include small-screen {
-            top: 126px;
-            right: 420px;
-        }
-        
-        .green {
+        .traffic-light {
             position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 28px;
+            height: 28px;
+        }
 
-            top: 0px;
-            left: 0px;
+        .driving-mode {
+            position: absolute;
+            right: 0px;
+            padding: 10px;
+        }
+    }
+
+    .auto-mode {
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(7, 33, 72, 0.8));
+        border-right: 1px solid #006AFF;
+        color: #006AFF;
+    }
+
+    .manual-mode {
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(39, 27, 27, 0.8));
+        color: #B43131;
+        border-right: 1px solid #B43131;
+    }
+
+    .notification-warn {
+        position: absolute;
+        top: 10px;
+        right: 260px;
+        width: 260px;
+        @include monitor-item-common-properties();
+
+        border: 1px solid #A3842D;
+        background-color: rgba(52, 39, 5, 0.3);
+    }
+
+    .notification-alert {
+        position: absolute;
+        top: 10px;
+        right: 260px;
+        width: 260px;
+        @include monitor-item-common-properties();
+
+        border: 1px solid #D7466F;
+        background-color: rgba(74, 5, 24, 0.3);
+    }
+}
+
+.quick-starter {
+    z-index: 10;
+
+    .command-group {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+
+        flex: 1 1 auto;
+
+        min-height: 40px;
+
+        .name {
             width: 40px;
-            height: 40px;
-
-            @include small-screen {
-                width: 28px;
-                height: 28px;
-            }
+            padding: 15px;
         }
 
-        .yellow {
-            position: absolute;
+        button {
+            flex: 1 1 auto;
 
-            top: 0px;
-            left: 50px;
-            width: 40px;
-            height: 40px;
+            margin: 5px;
+            border: 0px;
 
-            @include small-screen {
-                left: 35px;
-                width: 28px;
-                height: 28px;
-            }
+            color: #999999;
+            border-bottom: 1px solid #006AFF;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(3, 19, 41, 0.8));
+            outline: none;
+            cursor: pointer;
         }
 
-        .red {
-            position: absolute;
+        button:hover {
+            color: #FFFFFF;
+            background: #2A3238;
+        }
+    }
+}
 
-            top: 0px;
-            left: 100px;
-            width: 40px;
-            height: 40px;
+.module-controller {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
 
-            @include small-screen {
-                left: 70px;
-                width: 28px;
-                height: 28px;
-            }
+    flex: 1 1 auto;
+
+    z-index: 10;
+    margin-right: 3px;
+    overflow: hidden;
+
+    .controller {
+        min-width: 180px;
+    }
+
+    .modules-container {
+        flex-flow: column wrap;
+    }
+
+    .status-display {
+        width: 200px;
+        padding: 10px;
+
+        .name {
+            display: inline-block;
+            padding: 10px;
+            min-width: 20px;
         }
 
-        .traffic-light-label-text {
-            position: absolute;
-            color: #ffffff;
+        .status {
+            display: inline-block;
+            position: relative;
+            width: 130px;
+            padding: 10px;
 
-            top: 60px;
-            left: 25px;
-            width: 200px;
+            background: #000000;
+            white-space: nowrap;
 
-            @include small-screen {
-                top: 48px;
-                left: 4px;
-                width: 140px;
+            .status-icon {
+                position: absolute;
+                right: 10px;
+                width: 15px;
+                height: 15px;
+
+                background-color: #B43131;
             }
         }
     }
 }
 
 .route-editing-bar {
-    position: relative;
+    z-index: 10;
+    position: absolute;
     top: 0px;
     left: 0px;
-    width: 100%;
-    z-index: 10;
-
-    background: #102244;
-
+    right: 0px;
     min-height: 90px;
+
+    border-bottom: 3px solid #000000;
+    padding-left: 10px;
+    background: #1D2226;
 
     @include small-screen {
         min-height: 60px;
@@ -697,15 +845,17 @@ body {
         justify-content: center;
         align-items: center;
 
+        overflow: hidden;
+        white-space: nowrap;
+
         .button {
             height: 90px;
-            width: 15%;
-            min-width: 150px;
-
             border: none;
             padding: 10px;
 
-            background: #102244;
+            background: #1D2226;
+            outline: none;
+            color: #999999;
 
             @include small-screen {
                 height: 60px;
@@ -713,8 +863,8 @@ body {
             }
 
             img {
-                top: 23px;
                 display: block;
+                top: 23px;
                 margin: 15px auto;
 
                 @include small-screen {
@@ -724,7 +874,7 @@ body {
             }
 
             span {
-                font-family:PingFangSC-Light;
+                font-family: PingFangSC-Light;
                 font-size: 14px;
                 color: #d8d8d8;
                 text-align: center;
@@ -735,112 +885,84 @@ body {
             }
         }
 
-        .button:hover{
-            background: #09182C;
-        }
-    }
-
-    .exit-button, .editing-tip {
-        position: absolute;
-        top: 0px;
-
-        height: 90px;
-        width: 90px;
-        border: none;
-
-        background: #102244;
-        color:#d8d8d8;
-        font-size: 35px;
-
-        @include small-screen {
-            height: 60px;
-            width:  60px;
-
-            font-size: 20px;
-        }
-    }
-
-    .exit-button {
-        right: 0px;
-        padding: 25px;
-
-        @include small-screen {
-            padding: 18px;
-        }
-    }
-
-    .exit-button:hover {
-        background: #09182C;
-    }
-
-    .editing-tip {
-        left: 0px;
-
-        img {
-            position: absolute;
-            top: 35%;
-            left: 37%;
-
-           @include small-screen {
-                top: 30%;
-                left: 32%;
-            }
+        .button:hover {
+            background: #2A3238;
         }
 
-        p {
-            position: absolute;
-            width: 400px;
-            top: 120%;
-            left: 15px;
-            padding: 20px;
+        .active {
+            color: #FFFFFF;
+            background: #2A3238;
+        }
 
-            background-color: #FFFFFF;
-            color: #999999;
-            font-size: 14px;
-            text-align: left;
-            white-space: pre-wrap;
-            border-radius: 3px;
+        .editing-tip {
+            height: 90px;
+            width: 90px;
+            margin-left: auto;
+            border: none;
+
+            color: #d8d8d8;
+            font-size: 35px;
 
             @include small-screen {
-                left: 5px;
-            }
-        }
+                height: 60px;
+                width: 60px;
 
-        p:before {
-            position: absolute;
-            top: -20px;
-            left: 13px;
-            content: '';
-
-            border-style: solid;
-            border-width: 0px 20px 20px 20px;
-            border-color: rgba(0,0,0,0) rgba(0,0,0,0) #FFFFFF rgba(0,0,0,0);
-
-            @-moz-document url-prefix() {
-                top: -38px;
+                font-size: 20px;
             }
 
-            @include small-screen {
-                left: 8px;
+
+            p {
+                position: absolute;
+                top: 120%;
+                right: 15px;
+                width: 400px;
+                border-radius: 3px;
+                padding: 20px;
+
+                background-color: #FFFFFF;
+                color: #999999;
+                font-size: 14px;
+                text-align: left;
+                white-space: pre-wrap;
+
+                @include small-screen {
+                    right: 5px;
+                }
+            }
+
+            p:before {
+                position: absolute;
+                top: -20px;
+                right: 13px;
+                content: '';
+
+                border-style: solid;
+                border-width: 0px 20px 20px 20px;
+                border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #FFFFFF rgba(0, 0, 0, 0);
+
+                @-moz-document url-prefix() {
+                    top: -38px;
+                }
+
+                @include small-screen {
+                    right: 8px;
+                }
             }
         }
     }
 }
 
-
-
 .loader {
-    width: 100vw;
-    height: 100vh;
+    flex: 0 0 auto;
 
+    position: relative;
     background-color: #000C17;
 
     .img-container {
-        position: absolute;
-
+        position: relative;
         top: 35%;
-        left: 25%;
-        width: 50%;
+        left: 35%;
+        width: 30%;
         height: 40%;
 
         img {
@@ -849,6 +971,7 @@ body {
         }
 
         .status-message {
+            margin-top: 10px;
             font-size: 18px;
             color: #FFFFFF;
             text-align: center;
@@ -861,19 +984,23 @@ body {
             animation-play-state: running;
 
             @keyframes flash {
-                from {color: #FFFFFF;}
-                to {color: #000C17;}
+                from {
+                    color: #FFFFFF;
+                }
+                to {
+                    color: #000C17;
+                }
             }
         }
     }
 }
 
 .dashcam-player {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    color: white;
     z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: white;
 
     video {
         max-width: 380px;
@@ -886,19 +1013,21 @@ body {
     }
 
     .controls {
-        position: absolute;
-        right: 0px;
-        z-index: 10;
         display: flex;
         justify-content: flex-end;
 
+        z-index: 10;
+        position: absolute;
+        right: 0px;
+
         button {
-            opacity: 0.6;
-            border: none;
-            color: #FFFFFF;
-            background-color: #000000;
             width: 27px;
             height: 27px;
+            border: none;
+
+            background-color: #000000;
+            opacity: 0.6;
+            color: #FFFFFF;
 
             img {
                 width: 15px;
@@ -919,67 +1048,15 @@ body {
     }
 }
 
-.geolocation {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    z-index: 1;
-
-    color: white;
-}
-
 .pnc-monitor {
-    position: absolute;
-    right: 0px;
-    width: 100%;
     height: 100%;
 
-    overflow: auto;
     background-color: white;
+    overflow: auto;
 
     .scatter-graph {
         margin: 5px;
         border: 1px solid #d0d8dd;
         box-shadow: 4px 4px 2px #d0d8dd;
-    }
-}
-
-.SplitPane {
-    .Resizer {
-        background: #000;
-        opacity: 0.2;
-        z-index: 1;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        -moz-background-clip: padding;
-        -webkit-background-clip: padding;
-        background-clip: padding-box;
-    }
-
-    .Resizer:hover {
-        -webkit-transition: all 2s ease;
-        transition: all 2s ease;
-    }
-
-    .Resizer.vertical {
-        width: 11px;
-        margin: 0 -5px;
-        border-left: 5px solid rgba(255, 255, 255, 0);
-        border-right: 5px solid rgba(255, 255, 255, 0);
-        cursor: col-resize;
-    }
-
-    .Resizer.vertical:hover {
-        border-left: 5px solid rgba(0, 0, 0, 0.5);
-        border-right: 5px solid rgba(0, 0, 0, 0.5);
-    }
-
-    .Resizer.disabled {
-        cursor: auto;
-    }
-
-    .Resizer.disabled:hover {
-        border-color: transparent;
     }
 }

@@ -69,11 +69,6 @@ class ProbabilisticFusion : public BaseFusion {
                              std::vector<PbfSensorObjectPtr> &foreground_objects,
                              std::vector<PbfSensorObjectPtr> &background_objects);
 
-  void FuseBackgroundObjects(std::vector<PbfSensorObjectPtr> &background_objects,
-                             const SensorType &sensor_type,
-                             const std::string &sensor_id,
-                             double timestamp);
-
   void FuseForegroundObjects(std::vector<PbfSensorObjectPtr> &foreground_objects,
                              Eigen::Vector3d ref_point,
                              const SensorType &sensor_type,

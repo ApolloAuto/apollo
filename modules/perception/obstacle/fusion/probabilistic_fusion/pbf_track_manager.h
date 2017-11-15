@@ -18,7 +18,6 @@
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_background_track.h"
 
 namespace apollo {
 namespace perception {
@@ -40,18 +39,6 @@ class PbfTrackManager {
     tracks_.push_back(track);
   }
 
-  inline std::vector<PbfBackgroundTrackPtr> &GetBackgroundTracks() {
-    return background_tracks_;
-  }
-
-  inline const std::vector<PbfBackgroundTrackPtr> &GetBackgroundTracks() const {
-    return background_tracks_;
-  }
-
-  void AddBackgroundTrack(const PbfBackgroundTrackPtr &track) {
-    background_tracks_.push_back(track);
-  }
-
   int RemoveLostTracks();
 
  private:
@@ -60,7 +47,6 @@ class PbfTrackManager {
 
  protected:
   std::vector<PbfTrackPtr> tracks_;
-  std::vector<PbfBackgroundTrackPtr> background_tracks_;
 };
 
 } //namespace perception

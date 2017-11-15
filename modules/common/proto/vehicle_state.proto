@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/localization/proto/pose.proto";
+
+message VehicleState {
+  optional double x = 1 [default =0.0];
+  optional double y = 2 [default =0.0];
+  optional double z = 3 [default =0.0];
+  optional double timestamp = 4 [default =0.0];
+  optional double roll = 5 [default =0.0];
+  optional double pitch = 6 [default =0.0];
+  optional double yaw = 7 [default =0.0];
+  optional double heading = 8 [default =0.0];
+  optional double kappa = 9 [default =0.0];
+  optional double linear_velocity = 10 [default =0.0];
+  optional double angular_velocity = 11 [default =0.0];
+  optional double linear_acceleration = 12 [default =0.0];
+  optional apollo.canbus.Chassis.GearPosition gear = 13;
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 14;
+  optional apollo.localization.Pose pose = 15;
+}

@@ -29,7 +29,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
@@ -84,10 +84,10 @@ class Planning : public apollo::common::ApolloApp {
 
   void RunOnce();
 
-  common::Status InitFrame(const uint32_t sequence_num, const double time_stamp,
-                           const common::TrajectoryPoint& init_adc_point);
+  common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& planning_start_point);
 
-  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
+  bool IsVehicleStateValid(const common::VehicleStateProvider& vehicle_state);
 
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 

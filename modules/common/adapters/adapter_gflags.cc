@@ -18,7 +18,7 @@
 
 DEFINE_bool(enable_adapter_dump, false,
             "Whether enable dumping the messages to "
-                "/tmp/adapters/<topic_name>/<seq_num>.txt for debugging purposes.");
+            "/tmp/adapters/<topic_name>/<seq_num>.txt for debugging purposes.");
 DEFINE_string(gps_topic, "/apollo/sensor/gnss/odometry", "GPS topic name");
 DEFINE_string(imu_topic, "/apollo/sensor/gnss/corrected_imu", "IMU topic name");
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
@@ -35,15 +35,6 @@ DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
 DEFINE_string(pointcloud_topic, "/apollo/compensator/pointcloud",
               "pointcloud topic name");
-DEFINE_string(radar_topic, "/apollo/radar",
-              "radar topic name");
-DEFINE_string(image_short_topic,
-              "/apollo/sensor/camera/traffic/image_short",
-              "short camera image topic name");
-DEFINE_string(image_long_topic,
-              "/apollo/sensor/camera/traffic/image_long",
-              "long camera image topic name");
-
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");
@@ -68,6 +59,12 @@ DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
 DEFINE_string(mobileye_topic, "/apollo/sensor/mobileye", "mobileye topic name");
 DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");
+DEFINE_string(conti_radar_topic, "/apollo/sensor/conti_radar",
+              "delphi esr radar topic name");
 // TODO(Authors): Change the topic name
 DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
+DEFINE_string(image_short_topic, "/apollo/sensor/camera/traffic/image_short",
+              "short camera image topic name");
+DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
+              "long camera image topic name");

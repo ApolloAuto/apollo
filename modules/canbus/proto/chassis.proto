@@ -66,6 +66,12 @@ message Chassis {
   // Parking brake status.
   optional bool parking_brake = 13;
 
+  // Light signals.
+  optional bool high_beam_signal = 14 [deprecated = true];
+  optional bool low_beam_signal = 15 [deprecated = true];
+  optional bool left_turn_signal = 16 [deprecated = true];
+  optional bool right_turn_signal = 17 [deprecated = true];
+  optional bool horn = 18 [deprecated = true];
 
   optional bool wiper = 19;
   optional bool disengage_status = 20 [deprecated = true];
@@ -83,10 +89,38 @@ message Chassis {
 
   optional apollo.common.VehicleSignal signal = 27;
 
-  // Light signals.
-  optional bool high_beam_signal = 14 [deprecated = true];
-  optional bool low_beam_signal = 15 [deprecated = true];
-  optional bool left_turn_signal = 16 [deprecated = true];
-  optional bool right_turn_signal = 17 [deprecated = true];
-  optional bool horn = 18 [deprecated = true];
+  // Only available for Lincoln now
+  optional ChassisGPS chassis_gps = 28;
+}
+
+message ChassisGPS {
+  optional double latitude = 1;
+  optional double longitude = 2;
+  optional bool gps_valid = 3;
+
+  optional int32 year = 4;
+  optional int32 month = 5;
+  optional int32 day = 6;
+  optional int32 hours = 7;
+  optional int32 minutes = 8;
+  optional int32 seconds = 9;
+  optional double compass_direction = 10;
+  optional double pdop = 11;
+  optional bool is_gps_fault = 12;
+  optional bool is_inferred = 13;
+
+  optional double altitude = 14;
+  optional double heading = 15;
+  optional double hdop = 16;
+  optional double vdop = 17;
+  optional GpsQuality quality = 18;
+  optional int32 num_satellites = 19;
+  optional double gps_speed = 20;
+}
+
+enum GpsQuality {
+  FIX_NO = 0;
+  FIX_2D = 1;
+  FIX_3D = 2;
+  FIX_INVALID = 3;
 }

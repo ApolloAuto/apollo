@@ -220,6 +220,7 @@ class LatController : public Controller {
 
   // MeanFilter heading_rate_filter_;
   MeanFilter lateral_error_filter_;
+  MeanFilter heading_error_filter_;
 
   // for logging purpose
   std::ofstream steer_log_file_;

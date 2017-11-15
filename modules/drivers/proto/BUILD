@@ -11,10 +11,11 @@ proto_library(
     name = "sensor_proto_lib",
     srcs = [
         "delphi_esr.proto",
-        "sensor_radar.proto",
         "mobileye.proto",
+        "conti_radar.proto",
     ],
     deps = [
         "//modules/common/proto:header_proto_lib",
+        "//modules/drivers/conti_radar/proto:conti_radar_proto_lib",
     ],
 )

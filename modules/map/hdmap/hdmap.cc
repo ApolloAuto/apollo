@@ -147,5 +147,12 @@ int HDMap::GetRoadBoundaries(
   return impl_.GetRoadBoundaries(point, radius, road_boundaries, junctions);
 }
 
+int HDMap::GetForwardNearestSignalsOnLane(
+            const apollo::common::PointENU& point,
+            const double distance,
+            std::vector<SignalInfoConstPtr>* signals) const {
+  return impl_.GetForwardNearestSignalsOnLane(point, distance, signals);
+}
+
 }  // namespace hdmap
 }  // namespace apollo

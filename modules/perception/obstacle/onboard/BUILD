@@ -83,30 +83,6 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_obstacle_radar_process",
-    srcs = ["radar_process.cc"],
-    hdrs = ["radar_process.h"],
-    deps = [
-        ":perception_obstacle_hdmapinput",
-        "//modules/common",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base",
-        "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
-        "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
-        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
-        "@eigen//:eigen",
-        "@gtest//:gtest",
-        "@ros//:ros_common",
-    ],
-)
-
-cc_library(
     name = "perception_obstacle_radar_subnode",
     srcs = [
         "radar_process_subnode.cc",
@@ -129,7 +105,7 @@ cc_library(
         "//modules/perception/onboard:perception_onboard",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
-        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
+        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "@eigen//:eigen",
         "@gtest//:gtest",

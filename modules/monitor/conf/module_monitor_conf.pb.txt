@@ -1,28 +1,40 @@
 modules {
   name: "canbus"
-  binary_path: "modules/canbus/canbus"
+  process_cmd_keywords: "modules/canbus/canbus"
+}
+modules {
+  name: "GPS"
+  process_cmd_keywords: "gnss_nodelet_manager"
+}
+modules {
+  name: "velodyne"
+  process_cmd_keywords: "velodyne_nodelet_manager"
+}
+modules {
+  name: "radar"
+  process_cmd_keywords: "modules/drivers/conti_radar/conti_radar"
 }
 modules {
   name: "localization"
-  binary_path: "modules/localization/localization"
+  process_cmd_keywords: "modules/localization/localization"
 }
 modules {
   name: "perception"
-  binary_path: "modules/perception/perception"
+  process_cmd_keywords: "modules/perception/perception"
 }
 modules {
   name: "prediction"
-  binary_path: "modules/prediction/prediction"
+  process_cmd_keywords: "modules/prediction/prediction"
 }
 modules {
   name: "routing"
-  binary_path: "modules/routing/routing"
+  process_cmd_keywords: "modules/routing/routing"
 }
 modules {
   name: "planning"
-  binary_path: "modules/planning/planning"
+  process_cmd_keywords: "modules/planning/planning"
 }
 modules {
   name: "control"
-  binary_path: "modules/control/control"
+  process_cmd_keywords: "modules/control/control"
 }

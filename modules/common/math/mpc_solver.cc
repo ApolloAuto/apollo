@@ -18,8 +18,8 @@
 #include <memory>
 
 #include "modules/common/log.h"
-#include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
+#include "modules/common/math/qp_solver/qp_solver.h"
 
 namespace apollo {
 namespace common {
@@ -29,7 +29,7 @@ using Matrix = Eigen::MatrixXd;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
-void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
+bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
                     const Matrix &matrix_c, const Matrix &matrix_q,
                     const Matrix &matrix_r, const Matrix &matrix_lower,
                     const Matrix &matrix_upper,
@@ -40,10 +40,10 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
       matrix_b.rows() != matrix_a.rows() ||
       matrix_lower.rows() != matrix_upper.rows()) {
     AERROR << "One or more matrices have incompatible dimensions. Aborting.";
-    return;
+    return false;
   }
 
-  const unsigned int horizon = reference.size();
+  unsigned int horizon = reference.size();
 
   // Update augment reference matrix_t
   Matrix matrix_t = Matrix::Zero(matrix_b.rows() * horizon, 1);
@@ -65,15 +65,14 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
     matrix_a_power[i] = matrix_a * matrix_a_power[i - 1];
   }
 
-  Matrix matrix_k = Matrix::Zero(matrix_b.rows() * horizon,
-                                 matrix_b.cols() * control->size());
+  Matrix matrix_k =
+      Matrix::Zero(matrix_b.rows() * horizon, matrix_b.cols() * horizon);
   for (unsigned int r = 0; r < horizon; ++r) {
     for (unsigned int c = 0; c <= r; ++c) {
       matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(), matrix_b.rows(),
                      matrix_b.cols()) = matrix_a_power[r - c] * matrix_b;
     }
   }
-
   // Initialize matrix_k, matrix_m, matrix_t and matrix_v, matrix_qq, matrix_rr,
   // vector of matrix A power
   Matrix matrix_m = Matrix::Zero(matrix_b.rows() * horizon, 1);
@@ -100,8 +99,8 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
         matrix_upper;
     matrix_qq.block(i * matrix_q.rows(), i * matrix_q.rows(), matrix_q.rows(),
                     matrix_q.rows()) = matrix_q;
-    matrix_rr.block(i * matrix_r.rows(), i * matrix_r.rows(), matrix_r.rows(),
-                    matrix_r.rows()) = matrix_r;
+    matrix_rr.block(i * matrix_r.rows(), i * matrix_r.rows(), matrix_r.cols(),
+                    matrix_r.cols()) = matrix_r;
   }
 
   // Update matrix_m1, matrix_m2, convert MPC problem to QP problem done
@@ -113,26 +112,26 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
       -Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
   Matrix matrix_inequality_constrain_uu =
       Matrix::Identity(matrix_uu.rows(), matrix_uu.rows());
-  Matrix matrix_inequality_constrain = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
+  Matrix matrix_inequality_constrain =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
   matrix_inequality_constrain << -matrix_inequality_constrain_ll,
       -matrix_inequality_constrain_uu;
-  Matrix matrix_inequality_boundary = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
+  Matrix matrix_inequality_boundary =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
   matrix_inequality_boundary << matrix_ll, -matrix_uu;
-  Matrix matrix_equality_constrain = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
-  Matrix matrix_equality_boundary = Matrix::Zero(
-      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
+  Matrix matrix_equality_constrain =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
+  Matrix matrix_equality_boundary =
+      Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
 
   std::unique_ptr<QpSolver> qp_solver(new ActiveSetQpSolver(
       matrix_m1, matrix_m2, matrix_inequality_constrain,
       matrix_inequality_boundary, matrix_equality_constrain,
       matrix_equality_boundary));
-
   auto result = qp_solver->Solve();
   if (!result) {
-    AWARN << "Linear MPC solver failed";
+    AERROR << "Linear MPC solver failed";
+    return false;
   }
   matrix_v = qp_solver->params();
 
@@ -140,6 +139,7 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
     (*control)[i] =
         matrix_v.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1);
   }
+  return true;
 }
 
 }  // namespace math

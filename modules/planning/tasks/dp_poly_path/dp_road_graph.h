@@ -32,11 +32,11 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
-#include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
@@ -45,7 +45,7 @@ namespace planning {
 class DPRoadGraph {
  public:
   explicit DPRoadGraph(const DpPolyPathConfig &config,
-                       const ReferenceLine &reference_line,
+                       const ReferenceLineInfo &reference_line_info,
                        const SpeedData &speed_data);
 
   ~DPRoadGraph() = default;
@@ -95,6 +95,7 @@ class DPRoadGraph {
  private:
   DpPolyPathConfig config_;
   common::TrajectoryPoint init_point_;
+  const ReferenceLineInfo &reference_line_info_;
   const ReferenceLine &reference_line_;
   SpeedData speed_data_;
   common::SLPoint init_sl_point_;

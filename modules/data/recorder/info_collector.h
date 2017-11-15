@@ -17,6 +17,7 @@
 #ifndef MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
 #define MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
 
+#include "modules/data/proto/recorder_conf.pb.h"
 #include "modules/data/proto/task.pb.h"
 
 /**
@@ -28,15 +29,26 @@ namespace data {
 
 class InfoCollector {
  public:
-  // Get task information, which doesn't contain TaskData.
-  static Task GetTaskInfo();
+  InfoCollector();
 
+  // Get task information.
+  const Task &GetTaskInfo();
+
+  // Get specific information.
   // Listening topics: ChassisDetail.
-  static VehicleInfo GetVehicleInfo();
-  static EnvironmentInfo GetEnvironmentInfo();
-  static HardwareInfo GetHardwareInfo();
-  static SoftwareInfo GetSoftwareInfo();
-  static UserInfo GetUserInfo();
+  const VehicleInfo &GetVehicleInfo();
+  const EnvironmentInfo &GetEnvironmentInfo();
+  const HardwareInfo &GetHardwareInfo();
+  const SoftwareInfo &GetSoftwareInfo();
+  const UserInfo &GetUserInfo();
+
+  // Load and save the task information template.
+  static Task LoadTaskInfoTemplate();
+  static bool SaveTaskInfoTemplate(const Task &task_info);
+
+ private:
+  Task task_info_;
+  RecorderConf config_;
 };
 
 }  // namespace data

@@ -59,7 +59,7 @@
 #include <Eigen/Core>
 
 // defined in apollo/common
-#include "modules/drivers/proto/sensor_radar.pb.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -70,9 +70,8 @@ namespace apollo {
 namespace perception {
 
 using ::apollo::common::Header;
-using ::apollo::drivers::RadarType;
 using ::apollo::drivers::ContiRadarObs;
-using ::apollo::drivers::RadarObsArray;
+using ::apollo::drivers::ContiRadar;
 
 struct RadarDetectorOptions {
   Eigen::Matrix4d *radar2world_pose = nullptr;
@@ -130,7 +129,7 @@ class BaseRadarDetector {
   // @param [in]: options.
   // @param [out]: transformed objects.
   virtual bool Detect(
-      const RadarObsArray &raw_obstacles,
+      const ContiRadar &raw_obstacles,
       const std::vector<PolygonDType> &map_polygons,
       const RadarDetectorOptions &options,
       std::vector<ObjectPtr> *objects) = 0;

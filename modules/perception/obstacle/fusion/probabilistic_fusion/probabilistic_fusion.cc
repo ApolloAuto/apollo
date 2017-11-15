@@ -225,9 +225,6 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
   FuseForegroundObjects(foreground_objects,
                         ref_point, frame->sensor_type, frame->sensor_id, frame->timestamp);
-  FuseBackgroundObjects(background_objects,
-                        frame->sensor_type, frame->sensor_id, frame->timestamp);
-
   track_manager_->RemoveLostTracks();
 
 }
@@ -284,32 +281,14 @@ void ProbabilisticFusion::CollectFusedObjects(double timestamp,
       obj->track_id = tracks[i]->GetTrackId();
       obj->latest_tracked_time = timestamp;
       obj->tracking_time = tracks[i]->GetTrackingPeriod();
-      // obj->confidence = tracks[i]->get_toic_probability();
       fused_objects->push_back(obj);
       fg_obj_num++;
     }
   }
 
-  int bg_obj_num = 0;
-  std::vector<PbfBackgroundTrackPtr> &background_tracks =
-      track_manager_->GetBackgroundTracks();
-  for (size_t i = 0; i < background_tracks.size(); i++) {
-    if (background_tracks[i]->AbleToPublish()) {
-      PbfSensorObjectPtr fused_object = background_tracks[i]->GetFusedObject();
-      ObjectPtr obj(new Object());
-      obj->clone(*(fused_object->object));
-      obj->track_id = background_tracks[i]->GetTrackId();
-      obj->latest_tracked_time = timestamp;
-      obj->tracking_time = background_tracks[i]->GetTrackingPeriod();
-      fused_objects->push_back(obj);
-      bg_obj_num++;
-    }
-  }
-
-  AINFO << "fg_track_cnt = " << tracks.size()
-        << ", bg_track_cnt = " << background_tracks.size();
-  AINFO << "collect objects : fg_obj_cnt = " << fg_obj_num
-        << ", bg_obj_cnt = " << bg_obj_num << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
+  AINFO << "fg_track_cnt = " << tracks.size();
+  AINFO << "collect objects : fg_obj_cnt = " << ", timestamp = " 
+            << GLOG_TIMESTAMP(timestamp);
 }
 
 void ProbabilisticFusion::DecomposeFrameObjects(
@@ -324,58 +303,6 @@ void ProbabilisticFusion::DecomposeFrameObjects(
       background_objects.push_back(frame_objects[i]);
     } else {
       foreground_objects.push_back(frame_objects[i]);
-    }
-  }
-}
-
-void ProbabilisticFusion::FuseBackgroundObjects(
-    std::vector<PbfSensorObjectPtr> &background_objects,
-    const SensorType &sensor_type,
-    const std::string &sensor_id,
-    double timestamp) {
-
-  std::vector<PbfBackgroundTrackPtr> bg_tracks = track_manager_->GetBackgroundTracks();
-  std::map<int, int> local_id_2_track_ind_map;
-  std::vector<int> track_tag(bg_tracks.size(), 0);
-  std::vector<int> object_tag(background_objects.size(), 0);
-  std::vector<TrackObjectPair> assignments;
-
-  for (size_t i = 0; i < bg_tracks.size(); i++) {
-    const PbfSensorObjectPtr &obj = bg_tracks[i]->GetFusedObject();
-    int l_id = obj->object->track_id;
-    local_id_2_track_ind_map[l_id] = i;
-  }
-  for (size_t i = 0; i < background_objects.size(); i++) {
-    int l_id = background_objects[i]->object->track_id;
-    auto it = local_id_2_track_ind_map.find(l_id);
-    if (it != local_id_2_track_ind_map.end()) {
-      size_t track_ind = it->second;
-      assignments.push_back(std::make_pair<int, int>(track_ind, i));
-      track_tag[track_ind] = 1;
-      object_tag[i] = 1;
-      continue;
-    }
-  }
-
-  //update assigned
-  for (size_t i = 0; i < assignments.size(); i++) {
-    int track_ind = assignments[i].first;
-    int obj_ind = assignments[i].second;
-    bg_tracks[track_ind]->UpdateWithSensorObject(background_objects[obj_ind]);
-  }
-
-  //update unassigned
-  for (size_t i = 0; i < track_tag.size(); i++) {
-    if (track_tag[i] == 0) {
-      bg_tracks[i]->UpdateWithoutSensorObject(sensor_type, sensor_id, timestamp);
-    }
-  }
-
-  //crete new tracks
-  for (size_t i = 0; i < object_tag.size(); i++) {
-    if (object_tag[i] == 0) {
-      PbfBackgroundTrackPtr bg_track(new PbfBackgroundTrack(background_objects[i]));
-      track_manager_->AddBackgroundTrack(bg_track);
     }
   }
 }

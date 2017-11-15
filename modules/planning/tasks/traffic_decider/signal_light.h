@@ -43,8 +43,7 @@ class SignalLight : public TrafficRule {
  private:
   void ReadSignals();
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
-  const apollo::perception::TrafficLight GetSignal(
-      const std::string& signal_id);
+  apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
   void MakeDecisions(Frame* frame,
                      ReferenceLineInfo* const reference_line_info);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,

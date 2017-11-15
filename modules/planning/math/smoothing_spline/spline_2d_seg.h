@@ -44,20 +44,20 @@ class Spline2dSeg {
   double x(const double t) const;
   double y(const double t) const;
   double DerivativeX(const double t) const;
-  double derivative_y(const double t) const;
+  double DerivativeY(const double t) const;
   double SecondDerivativeX(const double t) const;
-  double second_derivative_y(const double t) const;
+  double SecondDerivativeY(const double t) const;
   double ThirdDerivativeX(const double t) const;
-  double third_derivative_y(const double t) const;
+  double ThirdDerivativeY(const double t) const;
 
   const PolynomialXd& spline_func_x() const;
   const PolynomialXd& spline_func_y() const;
   const PolynomialXd& DerivativeX() const;
-  const PolynomialXd& derivative_y() const;
+  const PolynomialXd& DerivativeY() const;
   const PolynomialXd& SecondDerivativeX() const;
-  const PolynomialXd& second_derivative_y() const;
+  const PolynomialXd& SecondDerivativeY() const;
   const PolynomialXd& ThirdDerivativeX() const;
-  const PolynomialXd& third_derivative_y() const;
+  const PolynomialXd& ThirdDerivativeY() const;
 
  private:
   PolynomialXd spline_func_x_;

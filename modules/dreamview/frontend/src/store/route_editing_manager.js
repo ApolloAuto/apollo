@@ -4,10 +4,9 @@ import RENDERER from "renderer";
 
 export default class RouteEditingManager {
 
-    @observable inEditingView = false;
     // Map from POI name to its x,y coordinates, e.g. {POI-1: {x: 1.0, y: 1.2}}
     @observable defaultRoutingEndPoint = {};
-    @observable poi_name = ""; // The chosen POI as a routing end point.
+    @observable currentPOI = "none"; // The chosen POI as a routing end point.
 
     @action updateDefaultRoutingEndPoint(data) {
         if (data.poi === undefined || _.isEmpty(data.poi)) {
@@ -23,28 +22,34 @@ export default class RouteEditingManager {
         }
     }
 
-    @action addDefaultEndPoint(poi_name) {
-        this.poi_name = poi_name;
+    @action setDefaultEndPoint(poiName) {
         if (_.isEmpty(this.defaultRoutingEndPoint)) {
             alert("Failed to get default routing end point, make sure there's " +
                   "a default end point file under the map data directory.");
             return;
         }
-        if (poi_name === undefined || poi_name === ""
-            || !(poi_name in this.defaultRoutingEndPoint)) {
-            alert("Please select a valid POI.");
+        if (poiName === undefined || poiName === "none"
+            || !(poiName in this.defaultRoutingEndPoint)) {
+            alert("Please select a valid point of interest.");
             return;
         }
-        RENDERER.addDefaultEndPoint(this.defaultRoutingEndPoint[poi_name]);
+        this.currentPOI = poiName;
     }
 
-    @action enableRouteEditing() {
-        this.inEditingView = true;
+    addDefaultEndPoint() {
+        if (this.currentPOI === "none") {
+            alert("Please select a valid point of interest.");
+            return false;
+        }
+        RENDERER.addDefaultEndPoint(this.defaultRoutingEndPoint[this.currentPOI]);
+        return true;
+    }
+
+    enableRouteEditing() {
         RENDERER.enableRouteEditing();
     }
 
-    @action disableRouteEditing() {
-        this.inEditingView = false;
+    disableRouteEditing() {
         RENDERER.disableRouteEditing();
     }
 
@@ -57,8 +62,10 @@ export default class RouteEditingManager {
     }
 
     sendRoutingRequest() {
-        if (RENDERER.sendRoutingRequest()){
+        const success = RENDERER.sendRoutingRequest();
+        if (success) {
             this.disableRouteEditing();
         }
+        return success;
     }
 }

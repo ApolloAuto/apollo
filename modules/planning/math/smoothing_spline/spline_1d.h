@@ -30,6 +30,7 @@
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_H_
 
 #include <vector>
+
 #include "Eigen/Core"
 
 #include "modules/planning/math/polynomial_xd.h"
@@ -51,8 +52,7 @@ class Spline1d {
   double ThirdOrderDerivative(const double x) const;
 
   // @brief: set spline segments
-  bool SetSplineSegs(const Eigen::MatrixXd& params, const uint32_t order);
-  Spline1dSeg* mutable_smoothing_spline(const uint32_t index);
+  bool SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order);
 
   const std::vector<double>& x_knots() const;
   uint32_t spline_order() const;
