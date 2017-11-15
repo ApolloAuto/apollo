@@ -68,15 +68,6 @@ Status Planning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-bool Planning::HasSignalLight(const PlanningConfig& config) {
-  for (const auto& rule_config : config.rule_config()) {
-    if (rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
-      return true;
-    }
-  }
-  return false;
-}
-
 Status Planning::Init() {
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
@@ -112,7 +103,7 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (HasSignalLight(config_) &&
+  if (FLAGS_enable_traffic_light &&
       AdapterManager::GetTrafficLightDetection() == nullptr) {
     std::string error_msg("Traffic Light Detection is not registered");
     AERROR << error_msg;
