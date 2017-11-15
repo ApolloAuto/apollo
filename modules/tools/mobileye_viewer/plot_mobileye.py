@@ -68,8 +68,10 @@ def planning_callback(planning_pb):
 def chassis_callback(chassis_pb):
     chassis.update(chassis_pb)
 
+
 def routing_callback(routing_str):
     pass
+
 
 def add_listener():
     rospy.init_node('mobileye_plot', anonymous=True)
