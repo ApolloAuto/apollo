@@ -225,6 +225,12 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
     x[index + 4] = init_points_[i].y();
   }
 
+  if (has_fixed_start_point_) {
+    x[0] = start_theta_;
+    x[1] = start_kappa_;
+    x[2] = start_dkappa_;
+  }
+
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     double delta_theta = relative_theta_[i + 1] - relative_theta_[i];
@@ -752,7 +758,7 @@ void SpiralProblemInterface::set_start_point(const double x, const double y,
   has_fixed_start_point_ = true;
   start_x_ = x;
   start_y_ = y;
-  start_theta_ = theta;
+  start_theta_ = common::math::NormalizeAngle(theta);
   start_kappa_ = kappa;
   start_dkappa_ = dkappa;
 }
