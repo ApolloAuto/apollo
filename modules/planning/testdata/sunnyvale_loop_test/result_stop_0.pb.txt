@@ -1042,6 +1042,51 @@ decision {
         }
       }
     }
+    decision {
+      id: "SL_1065"
+      perception_id: -855654299
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -10
+          stop_point {
+            x: 587046.82777880481
+            y: 4141550.2974306084
+          }
+          stop_heading: 1.1889194876014608
+        }
+      }
+    }
+    decision {
+      id: "SL_1076"
+      perception_id: -1651052487
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -10
+          stop_point {
+            x: 587046.82777880481
+            y: 4141550.2974306084
+          }
+          stop_heading: 1.1889194876014608
+        }
+      }
+    }
+    decision {
+      id: "SL_1055"
+      perception_id: 502372993
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -10
+          stop_point {
+            x: 587046.82777880481
+            y: 4141550.2974306084
+          }
+          stop_heading: 1.1889194876014608
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_RIGHT
