@@ -81,6 +81,12 @@ class SimulationWorldService {
   nlohmann::json GetUpdateAsJson(double radius) const;
 
   /**
+   * @brief Returns the json representation of the planning debug data.
+   * @return Json object equivalence of the PlanningData object.
+   */
+  nlohmann::json GetPlanningData() const;
+
+  /**
    * @brief Returns the json representation of the map element Ids and hash
    * within the given radius from the car.
    * @param radius the search distance from the current car location
@@ -97,7 +103,7 @@ class SimulationWorldService {
 
   /**
    * @brief Sets the flag to clear the owned simulation world object.
-  */
+   */
   void SetToClear() {
     to_clear_ = true;
   }
@@ -173,6 +179,10 @@ class SimulationWorldService {
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
+
+  // The downsampled planning debugging data, owned by the
+  // SimulationWorldService instance.
+  apollo::planning_internal::PlanningData planning_data_;
 
   // The handle of MapService, not owned by SimulationWorldService.
   const MapService *map_service_;
