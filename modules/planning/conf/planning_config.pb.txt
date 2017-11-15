@@ -146,5 +146,8 @@ rule_config : {
     rule_id: BACKSIDE_VEHICLE
 }
 rule_config : {
+    rule_id: SIGNAL_LIGHT
+}
+rule_config : {
     rule_id: REROUTING
 }
