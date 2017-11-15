@@ -58,6 +58,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                          const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          const ReferenceLine& reference_line,
+                                         const SpeedData& reference_speed_data,
                                          PathDecision* const path_decision,
                                          SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
@@ -120,14 +121,16 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       qp_st_speed_config_.preferred_min_deceleration(),
       qp_st_speed_config_.preferred_max_acceleration()};
   st_graph.SetDebugLogger(st_graph_debug);
-  auto ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
+  auto ret = st_graph.Search(st_graph_data, accel_bound, reference_speed_data,
+                             speed_data);
   if (ret != Status::OK()) {
     AWARN << "Failed to solve with ideal acceleration conditions. Use "
              "secondary choice instead.";
 
     accel_bound.first = qp_st_speed_config_.min_deceleration();
     accel_bound.second = qp_st_speed_config_.max_acceleration();
-    ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
+    ret = st_graph.Search(st_graph_data, accel_bound, reference_speed_data,
+                          speed_data);
 
     // backup plan: use piecewise_st_graph
     if (ret != Status::OK()) {
