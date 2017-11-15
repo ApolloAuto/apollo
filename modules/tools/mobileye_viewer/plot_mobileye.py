@@ -32,6 +32,7 @@ from subplot_s_theta import SubplotSTheta
 from subplot_s_time import SubplotSTime
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
+from std_msgs.msg import String
 
 PLANNING_TOPIC = '/apollo/planning'
 mobileye = MobileyeData()
@@ -67,6 +68,8 @@ def planning_callback(planning_pb):
 def chassis_callback(chassis_pb):
     chassis.update(chassis_pb)
 
+def routing_callback(routing_str):
+    pass
 
 def add_listener():
     rospy.init_node('mobileye_plot', anonymous=True)
@@ -82,6 +85,8 @@ def add_listener():
     rospy.Subscriber('/apollo/canbus/chassis',
                      chassis_pb2.Chassis,
                      chassis_callback)
+    rospy.Subscriber('/apollo/navigation/routing',
+                     String, routing_callback)
 
 
 if __name__ == '__main__':
