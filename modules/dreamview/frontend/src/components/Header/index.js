@@ -18,7 +18,7 @@ export default class Header extends React.Component {
             <header className = "header">
                 <Image image={logoApollo} className="apollo-logo" />
                 <Selector name="setup mode"
-                          options={modes}
+                          options={Object.keys(modes).sort()}
                           currentOption={currentMode}
                           onChange={(event) => {
                             WS.changeSetupMode(event.target.value);
