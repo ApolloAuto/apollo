@@ -61,6 +61,11 @@ struct PairHash {
   }
 };
 
+template <typename T>
+bool WithinBound(T start, T end, T value) {
+  return value >= start && value <= end;
+}
+
 /**
  * @brief create a SL point
  * @param s the s value
