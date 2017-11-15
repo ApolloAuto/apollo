@@ -48,7 +48,7 @@ class WebSocketEndpoint {
                     STORE.monitor.update(message.world);
                     STORE.trafficSignal.update(message.world);
                     if (STORE.options.showPNCMonitor) {
-                        STORE.planning.update(message.world);
+                        STORE.planning.update(message.world, message.planningData);
                     }
                     if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.
@@ -85,7 +85,12 @@ class WebSocketEndpoint {
                 if (_.isEmpty(STORE.routeEditingManager.defaultRoutingEndPoint)) {
                     this.requestDefaultRoutingEndPoint();
                 }
-                this.websocket.send(JSON.stringify({type : "RequestSimulationWorld"}));
+
+                const requestPlanningData = STORE.options.showPNCMonitor;
+                this.websocket.send(JSON.stringify({
+                    type : "RequestSimulationWorld",
+                    planning : requestPlanningData,
+                }));
             }
         }, 100);
     }

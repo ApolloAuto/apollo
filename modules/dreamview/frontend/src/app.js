@@ -7,7 +7,6 @@ import { Provider } from "mobx-react";
 
 import "styles/main.scss";
 import STORE from "store";
-import WS from "store/websocket";
 import Dreamview from "components/Dreamview";
 
 ReactDOM.render(

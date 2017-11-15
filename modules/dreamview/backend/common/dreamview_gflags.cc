@@ -60,6 +60,3 @@ DEFINE_string(ssl_certificate, "",
 DEFINE_double(sim_map_radius, 300.0,
               "The radius within which Dreamview will find all the map "
               "elements around the car.");
-
-DEFINE_bool(ignore_planning_debug_data, true,
-            "Whether to skip processing planning debug data.");

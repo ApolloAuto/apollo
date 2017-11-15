@@ -5,7 +5,6 @@ package apollo.dreamview;
 import "modules/common/monitor/proto/monitor.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
-import "modules/planning/proto/planning_internal.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -193,8 +192,6 @@ message SimulationWorld {
   optional DelaysInMs delay = 12;
 
   optional .apollo.common.monitor.MonitorMessage monitor = 13;
-
-  optional .apollo.planning_internal.PlanningData planning_data = 14;
 
   // Module latency
   optional Latency latency = 15;
