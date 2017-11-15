@@ -39,6 +39,7 @@ options:
     showModuleController: false
     showMenu: false
     showConsole: false
+    showPOI: false
     showPNCMonitor: false
     showQuickStarter: true
     showRouteEditingBar: false

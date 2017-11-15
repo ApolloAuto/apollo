@@ -26,13 +26,10 @@ export default class SideBar extends React.Component {
                              dumpMessages={() => {
                                      WS.dumpMessages();
                                  }}
-                             onDefaultRouting={() => {
-                                 if (routeEditingManager.addDefaultEndPoint()) {
-                                     if (!options.showRouteEditingBar) {
-                                        routeEditingManager.sendRoutingRequest();
-                                    }
-                                 }
+                             onPOI={() => {
+                                 this.props.store.handleSideBarClick('showPOI');
                              }}
+                             showPOI={options.showPOI}
                              onRouteEditingBar={() => {
                                     this.props.store.handleSideBarClick('showRouteEditingBar');
                                  }}

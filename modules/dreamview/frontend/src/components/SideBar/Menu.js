@@ -1,6 +1,9 @@
 import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
+
+import MenuItemRadio from 'components/common/MenuItemRadio';
+
 import menuData from 'store/config/MenuData';
 import perceptionIcon from "assets/images/menu/Perception.png";
 import predictionIcon from "assets/images/menu/Prediction.png";
@@ -62,25 +65,6 @@ class MenuItemCheckbox extends React.Component {
 }
 
 @observer
-class MenuItemRadio extends React.Component {
-    render() {
-        const {id, title, options} = this.props;
-        return (
-            <ul>
-                <li id={title} onClick={() => {
-                    options.selectCamera(title);
-                }}>
-                    <input type="radio" name={id} id={title}
-                    checked={options.cameraAngle === title} readOnly/>
-                    <label id="radio-selector-label" htmlFor={title} />
-                    <span>  {title}</span>
-                </li>
-            </ul>
-        );
-    }
-}
-
-@observer
 class SubMenu extends React.Component {
     render() {
         const {tabId, tabTitle, tabType, data, options} = this.props;
@@ -100,7 +84,11 @@ class SubMenu extends React.Component {
                     const item = data[key];
                     return (
                         <MenuItemRadio key={`${tabId}_${key}`} id={tabId}
-                        title={item} options={options}/>
+                                       onClick={() => {
+                                            options.selectCamera(item);
+                                        }}
+                                       checked={options.cameraAngle === item}
+                                       title={item} options={options}/>
                     );
                 });
         }
