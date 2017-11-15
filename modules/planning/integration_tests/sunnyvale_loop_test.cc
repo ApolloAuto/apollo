@@ -150,6 +150,7 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_enable_traffic_light = false;
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }

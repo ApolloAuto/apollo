@@ -111,6 +111,7 @@ DECLARE_double(decision_valid_stop_range);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
+DECLARE_bool(enable_traffic_light);
 
 DECLARE_double(turn_signal_distance);
 
