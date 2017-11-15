@@ -21,6 +21,7 @@ export default class Header extends React.Component {
                           options={Object.keys(modes).sort()}
                           currentOption={currentMode}
                           onChange={(event) => {
+                            this.props.store.hmi.currentMode = event.target.value;
                             WS.changeSetupMode(event.target.value);
                           }}/>
                 <Selector name="vehicle"
