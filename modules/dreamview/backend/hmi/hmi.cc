@@ -387,10 +387,7 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
     return;
   }
 
-  // Stop the running modules for previous mode.
-  if (status_.has_current_mode()) {
-    RunModeCommand("stop");
-  }
+  RunModeCommand("stop");
   status_.set_current_mode(mode_name);
   BroadcastHMIStatus();
 }
