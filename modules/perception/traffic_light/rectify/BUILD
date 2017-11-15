@@ -9,12 +9,14 @@ cc_library(
         "munkres.cc",
         "select.cc",
         "unity_rectify.cc",
+        "detection.cc",
     ],
     hdrs = [
         "cropbox.h",
         "munkres.h",
         "select.h",
         "unity_rectify.h",
+        "detection.h",
     ],
     deps = [
         "//modules/common:log",
