@@ -39,9 +39,9 @@ Id CreateHDMapId(const std::string& string_id) {
 }
 
 // default lanes search radius in GetForwardNearestSignalsOnLane
-const double LanesSearchRange = 10.0;
+constexpr double kLanesSearchRange = 10.0;
 // backward search distance in GetForwardNearestSignalsOnLane
-const int BackwardDistance = 4;
+constexpr int kBackwardDistance = 4;
 
 }  // namespace
 
@@ -587,8 +587,8 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   car_point.set_x(point.x());
   car_point.set_y(point.y());
   apollo::common::math::Vec2d map_point;
-  if (GetLanes(point, LanesSearchRange, &temp_surrounding_lanes) == -1) {
-    AINFO << "The car is not on lane!";
+  if (GetLanes(point, kLanesSearchRange, &temp_surrounding_lanes) == -1) {
+    AINFO << "Can not find lanes around car.";
     return -1;
   }
   for (const auto& surround_lane : temp_surrounding_lanes) {
@@ -597,7 +597,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     }
   }
   if (surrounding_lanes.empty()) {
-    AINFO << "Can not find lanes around car.";
+    AINFO << "Car is not on lane.";
     return -1;
   }
   for (const auto& lane : surrounding_lanes) {
@@ -615,8 +615,8 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     }
   }
 
-  double unused_distance = distance + BackwardDistance;
-  double back_distance = BackwardDistance;
+  double unused_distance = distance + kBackwardDistance;
+  double back_distance = kBackwardDistance;
   double s = nearest_s;
   while (s < back_distance) {
     for (const auto& predecessor_lane_id : lane_ptr->lane().predecessor_id()) {
