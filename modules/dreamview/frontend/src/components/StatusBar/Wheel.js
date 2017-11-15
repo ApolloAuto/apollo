@@ -29,7 +29,7 @@ export default class WheelPanel extends React.Component {
     }
 
     render() {
-        const { steeringAngle, turnSignal } = this.props;
+        const { steeringPercentage, steeringAngle, turnSignal } = this.props;
 
         const leftArrowColor = (turnSignal === 'LEFT' || turnSignal === 'EMERGENCY')
                                ? this.signalColor.on : this.signalColor.off;
@@ -38,8 +38,8 @@ export default class WheelPanel extends React.Component {
 
         return (
             <div className="wheel-panel">
-                <div className="steerangle-read">{steeringAngle}</div>
-                <div className="steerangle-unit">°</div>
+                <div className="steerangle-read">{steeringPercentage}</div>
+                <div className="steerangle-unit">%</div>
                 <div className="left-arrow" style={{borderRightColor: leftArrowColor}} />
                 <Wheel steeringAngle={steeringAngle} />
                 <div className="right-arrow" style={{borderLeftColor: rightArrowColor}} />
