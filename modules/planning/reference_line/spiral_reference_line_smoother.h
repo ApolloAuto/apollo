@@ -38,19 +38,29 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
  public:
   explicit SpiralReferenceLineSmoother(
       const double max_point_deviation_distance);
+
   virtual ~SpiralReferenceLineSmoother() = default;
 
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
 
-  // TODO(all) implement this function.
-  void SetAnchorPoints(const std::vector<AnchorPoint>&) override {}
+  void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
  private:
   bool Smooth(std::vector<Eigen::Vector2d> point2d,
-              std::vector<common::PathPoint>* ptr_smoothed_point2d) const;
+              std::vector<double>* ptr_theta, std::vector<double>* ptr_kappa,
+              std::vector<double>* ptr_dkappa, std::vector<double>* ptr_s,
+              std::vector<double>* ptr_x, std::vector<double>* ptr_y) const;
 
-  std::vector<common::PathPoint> to_path_points(
+  std::vector<common::PathPoint> Interpolate(const std::vector<double>& theta,
+                                             const std::vector<double>& kappa,
+                                             const std::vector<double>& dkappa,
+                                             const std::vector<double>& s,
+                                             const std::vector<double>& x,
+                                             const std::vector<double>& y,
+                                             const double resulotion) const;
+
+  std::vector<common::PathPoint> Interpolate(
       const double start_x, const double start_y, const double start_s,
       const double theta0, const double kappa0, const double dkappa0,
       const double theta1, const double kappa1, const double dkappa1,
@@ -61,7 +71,21 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
                                   const double kappa,
                                   const double dkappa) const;
 
-  double max_point_deviation_ = 0.0;
+  double default_max_point_deviation_ = 0.0;
+
+  std::vector<AnchorPoint> anchor_points_;
+
+  bool fixed_start_point_ = false;
+
+  double fixed_start_x_ = 0.0;
+
+  double fixed_start_y_ = 0.0;
+
+  double fixed_start_theta_ = 0.0;
+
+  double fixed_start_kappa_ = 0.0;
+
+  double fixed_start_dkappa_ = 0.0;
 };
 
 }  // namespace planning
