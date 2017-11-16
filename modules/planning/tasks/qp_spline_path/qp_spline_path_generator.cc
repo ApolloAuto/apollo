@@ -264,6 +264,21 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   Spline1dConstraint* spline_constraint =
       spline_generator_->mutable_spline_constraint();
 
+  const int dim =
+      (knots_.size() - 1) * (qp_spline_path_config_.spline_order() + 1);
+  constexpr double param_range = 1e-4;
+  for (int i = qp_spline_path_config_.spline_order(); i < dim;
+       i += qp_spline_path_config_.spline_order() + 1) {
+    Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(1, dim);
+    Eigen::MatrixXd bd = Eigen::MatrixXd::Zero(1, 1);
+    mat(0, i) = -1;
+    bd(0, 0) = -param_range;
+    spline_constraint->AddInequalityConstraint(mat, bd);
+    mat(0, i) = 1;
+    bd(0, 0) = -param_range;
+    spline_constraint->AddInequalityConstraint(mat, bd);
+  }
+
   // add init status constraint, equality constraint
   const double kBoundaryEpsilon = 1e-4;
   spline_constraint->AddPointConstraintInRange(init_frenet_point_.s(),
