@@ -53,7 +53,7 @@ class Image {
   //@param [in] camera id
   //@param [in] image's data
   bool
-  Init(const double &ts, const CameraId &device_id, const sensor_msgs::ImageConstPtr &image_data);
+  Init(const double &ts, const CameraId &device_id, const std::shared_ptr<sensor_msgs::Image> image_data);
   //@brief return image's timestamp
   double ts() const;
 
@@ -89,7 +89,7 @@ class Image {
   double timestamp_ = 0.0;   //Image's timestamp
   CameraId device_id_ = CameraId::UNKNOWN;   //camera's id
   cv::Mat mat_;         //Image's data
-  sensor_msgs::ImageConstPtr image_data_;
+  std::shared_ptr<sensor_msgs::Image> image_data_;
   friend std::ostream &operator<<(std::ostream &os, const Image &image);
 };
 

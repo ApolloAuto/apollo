@@ -72,12 +72,12 @@ class TLPreprocessorSubnode : public Subnode {
       double timestamp);
 
   //@brief sub long focus camera
-  void sub_long_focus_camera(const sensor_msgs::ImageConstPtr &msg);
+  void sub_long_focus_camera(const sensor_msgs::Image &msg);
 
   //@brief sub short focus camera
-  void sub_short_focus_camera(const sensor_msgs::ImageConstPtr &msg);
+  void sub_short_focus_camera(const sensor_msgs::Image &msg);
 
-  void sub_camera_image(const sensor_msgs::ImageConstPtr &msg, CameraId camera_id);
+  void sub_camera_image(const std::shared_ptr<sensor_msgs::Image> msg, CameraId camera_id);
 
   bool get_car_pose(const double ts, CarPose *pose);
 

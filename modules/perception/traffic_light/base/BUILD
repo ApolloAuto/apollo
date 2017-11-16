@@ -23,6 +23,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/map/proto:map_proto"
     ],
+    copts=["-mavx2"],
 )
 
 cpplint()

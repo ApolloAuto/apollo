@@ -200,7 +200,21 @@ class Adapter {
         << ":" << topic_name_;
     return *observed_queue_.front();
   }
-
+  /**
+   * @brief returns the most recent message pointer in the observing queue.
+   *
+   * /note
+   * Please call Empty() to make sure that there is data in the
+   * queue before calling GetLatestObservedPtr().
+   */
+  std::shared_ptr<D> GetLatestObservedPtr() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    DCHECK(!observed_queue_.empty())
+        << "The view of data queue is empty. No data is received yet or you "
+            "forgot to call Observe()"
+        << ":" << topic_name_;
+    return observed_queue_.front();
+  }
   /**
    * @brief returns the oldest message in the observing queue.
    *

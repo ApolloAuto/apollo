@@ -9,6 +9,7 @@
 
 #include <gflags/gflags.h>
 #include "modules/common/log.h"
+//#include "modules/drivers/usb_cam/include/usb_cam/utility.h"
 #include <cv_bridge/cv_bridge.h>
 
 DEFINE_int32(double_show_precision, 14, "When output a double data, the precision.");
@@ -27,7 +28,7 @@ bool Image::Init(const double &ts, const CameraId &device_id, const cv::Mat &mat
   return true;
 }
 bool Image::Init(const double &ts, const CameraId &device_id,
-                 const sensor_msgs::ImageConstPtr &image_data) {
+                 const std::shared_ptr<sensor_msgs::Image> image_data) {
   contain_mat_ = false;
   contain_image_ = true;
   timestamp_ = ts,
@@ -53,13 +54,18 @@ std::string Image::device_id_str() const {
 }
 bool Image::GenerateMat() {
   if (!contain_mat_) {
-    cv_bridge::CvImageConstPtr cv_ptr;
+
     try {
-      if (image_data_->encoding.compare("rgb8") == 0) {
-        cv_ptr = cv_bridge::toCvShare(image_data_, "bgr8");
-        mat_ = cv_ptr->image;
-      } else if (image_data_->encoding.compare("yuyv") == 0) {
+//      if (image_data_->encoding.compare("rgb8") == 0) {
+//        cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(image_data_, "bgr8");
+//        mat_ = cv_ptr->image;
+//      } else
+      if (image_data_->encoding.compare("yuyv") == 0) {
         //TODO:: yuyv 2 rgb rgb 2 bgr
+//        unsigned char* yuv = (unsigned char*)&(image_data_->data[0]);
+//        mat_ = cv::Mat(image_data_->height,image_data_->width,CV_8UC3);
+//        usb_cam::yuyv2rgb_avx(yuv,mat_.data,image_data_->height*image_data_->width);
+//        cv::cvtColor(mat_,mat_,CV_RGB2BGR);
       }
 
       contain_mat_ = true;

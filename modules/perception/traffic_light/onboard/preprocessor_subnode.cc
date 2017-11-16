@@ -8,6 +8,7 @@
 
 #include <image_transport/image_transport.h>
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
@@ -174,16 +175,18 @@ bool TLPreprocessorSubnode::add_data_and_publish_event(
   return true;
 }
 
-void TLPreprocessorSubnode::sub_long_focus_camera(const sensor_msgs::ImageConstPtr &msg) {
-  sub_camera_image(msg, LONG_FOCUS);
+void TLPreprocessorSubnode::sub_long_focus_camera(const sensor_msgs::Image &msg) {
+  std::shared_ptr<sensor_msgs::Image> img = common::adapter::AdapterManager::GetImageLong()->GetLatestObservedPtr();
+  sub_camera_image(img, LONG_FOCUS);
 }
 
-void TLPreprocessorSubnode::sub_short_focus_camera(const sensor_msgs::ImageConstPtr &msg) {
-  sub_camera_image(msg, SHORT_FOCUS);
+void TLPreprocessorSubnode::sub_short_focus_camera(const sensor_msgs::Image &msg) {
+  std::shared_ptr<sensor_msgs::Image> img = common::adapter::AdapterManager::GetImageShort()->GetLatestObservedPtr();
+  sub_camera_image(img, SHORT_FOCUS);
 }
 
 void TLPreprocessorSubnode::sub_camera_image(
-    const sensor_msgs::ImageConstPtr &msg, CameraId camera_id) {
+    const std::shared_ptr<sensor_msgs::Image> msg, CameraId camera_id) {
   const double sub_camera_image_start_ts = TimeUtil::GetCurrentTime();
   PERF_FUNCTION();
   std::shared_ptr<Image> image(new Image);
