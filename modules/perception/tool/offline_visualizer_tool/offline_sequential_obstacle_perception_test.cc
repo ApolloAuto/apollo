@@ -66,7 +66,7 @@ struct SensorFilesSource {
     std::string extension;
 };
 
-bool LoadRadarProto(const std::string& filepath, RadarObsArray& radar_obs_proto) {
+bool LoadRadarProto(const std::string& filepath, ContiRadar& radar_obs_proto) {
     std::fstream input(filepath.c_str(), std::ios::in | std::ios::binary);
     if (!radar_obs_proto.ParseFromIstream(&input)) {
         AERROR << "Parsing error: " << filepath;
@@ -225,7 +225,7 @@ public:
         AINFO << "Process " << FLAGS_radar_type;
         int frame_id = 0;
         double timestamp = 0.0;
-        RadarObsArray radar_obs_proto;
+        ContiRadar radar_obs_proto;
         Eigen::Vector3f velocity;
         std::string radar_filename = file_path.substr(0, file_path.find_last_of('.')) + ".radar";
         std::string odometry_filename = file_path.substr(0, file_path.find_last_of('.'))

@@ -3,6 +3,7 @@
 
 #include "Eigen/Core"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 
 namespace apollo {
@@ -35,7 +36,7 @@ public:
     ~RadarRawFrame() {}
 
 public:
-    RadarObsArray raw_obstacles_;
+    ContiRadar raw_obstacles_;
     Eigen::Vector3f car_linear_speed_;
 };
 

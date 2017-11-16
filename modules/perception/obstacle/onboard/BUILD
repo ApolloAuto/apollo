@@ -168,7 +168,7 @@ cc_library(
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
         "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
-        "//modules/perception/obstacle/radar/detector/modest:perception_obstacle_radar_detector_modest_detector",
+        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "@eigen//:eigen",
         "@gtest//:gtest",
         "@ros//:ros_common",
