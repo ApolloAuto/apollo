@@ -78,4 +78,8 @@ DECLARE_int32(local_utm_zone_id);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
 
+DECLARE_bool(use_visualize);
+
+DECLARE_bool(use_rawimu);
+
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

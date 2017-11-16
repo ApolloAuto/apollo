@@ -25,6 +25,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/gnss_pnt_result.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -44,6 +45,41 @@ typedef drivers::gnss::GnssBestPose GnssBestPose;
 
 enum class LocalizaitonMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
 
+enum class LocalizationErrorCode {
+  INTEG_ERROR = 0,
+  LIDAR_ERROR,
+  GNSS_ERROR,
+  OK
+};
+
+class LocalizationState {
+public:
+  LocalizationState() : error_code_(LocalizationErrorCode::OK), error_msg_("") {}
+  
+  LocalizationState(LocalizationErrorCode code, const std::string &msg) 
+      : error_code_(code), error_msg_(msg) {}
+  
+  static LocalizationState OK() {
+    return LocalizationState();
+  }
+
+  LocalizationErrorCode error_code() const {
+    return error_code_;
+  }
+
+  std::string error_msg() const {
+    return error_msg_;
+  }
+
+  bool ok() {
+    return error_code_ == LocalizationErrorCode::OK;
+  }
+  
+private:
+  LocalizationErrorCode error_code_;
+  std::string error_msg_;
+};
+
 struct ImuToAntOffset {
   double offset_x;
   double offset_y;
@@ -56,6 +92,7 @@ struct ImuToAntOffset {
 struct LocalizationIntegParam {
   LocalizationIntegParam() {
     is_using_raw_gnsspos = true;
+    is_use_visualize = false;
   }
 
   // integration module
@@ -85,6 +122,8 @@ struct LocalizationIntegParam {
   // common
   int utm_zone_id;
   double imu_rate;
+
+  bool is_use_visualize;
 };
 
 class MeasureRepublishProcess;
@@ -103,12 +142,13 @@ class LocalizationInteg {
   LocalizationInteg();
   ~LocalizationInteg();
   // Initialization.
-  void Init(const LocalizationIntegParam& params);
+  LocalizationState Init(const LocalizationIntegParam& params);
 
   // Lidar pcd process.
   void PcdProcess(const sensor_msgs::PointCloud2& message);
   // Raw Imu process.
-  void RawImuProcess(const Imu& imu_msg);
+  void CorrectedImuProcess(const Imu& imu_msg);
+  void RawImuProcess(const drivers::gnss::Imu& imu_msg);
   // Gnss Info process.
   void RawObservationProcess(const EpochObservation& raw_obs_msg);
   void RawEphemerisProcess(const GnssEphemeris& gnss_orbit_msg);

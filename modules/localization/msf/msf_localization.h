@@ -29,6 +29,7 @@
 
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
+#include <tf2_ros/transform_broadcaster.h>
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -43,10 +44,6 @@
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
 #include "modules/localization/msf/local_integ/localization_integ.h"
-// #include "modules/localization/msf/local_integ/localization_lidar_process.h"
-// #include "modules/localization/msf/local_integ/measure_republish_process.h"
-// #include "modules/localization/msf/local_integ/localization_gnss_process.h"
-// #include "modules/localization/msf/local_integ/localization_integ_process.h"
 
 /**
  * @namespace apollo::localization
@@ -63,7 +60,7 @@ namespace localization {
 class MSFLocalization : public LocalizationBase {
  public:
   MSFLocalization();
-  virtual ~MSFLocalization() = default;
+  virtual ~MSFLocalization();
 
   /**
    * @brief module start function
@@ -77,8 +74,10 @@ class MSFLocalization : public LocalizationBase {
    */
   apollo::common::Status Stop() override;
 
+  void PublishPoseBroadcastTF(const LocalizationEstimate& localization);
+
  private:
-  void Init();
+  apollo::common::Status Init();
   void OnTimer(const ros::TimerEvent &event);
   void OnPointCloud(const sensor_msgs::PointCloud2 &message);
   void OnImu(const localization::Imu &imu_msg);
@@ -103,6 +102,7 @@ class MSFLocalization : public LocalizationBase {
   LocalizationInteg localization_integ_;
   LocalizationIntegParam localizaiton_param_;
 
+  tf2_ros::TransformBroadcaster* tf2_broadcaster_;
   // MeasureRepublishParam republish_param_;
   // LocalizationLidarParam lidar_param_;
   // LocalizationIntegParam integ_param_;

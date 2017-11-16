@@ -71,6 +71,16 @@ LossyMapMatrix2D::LossyMapMatrix2D(const LossyMapMatrix2D& matrix)
   }
 }
 
+LossyMapMatrix2D& LossyMapMatrix2D::operator= (const LossyMapMatrix2D& matrix) {
+  Init(matrix.rows_, matrix.cols_);
+  for (unsigned int y = 0; y < rows_; ++y) {
+    for (unsigned int x = 0; x < cols_; ++x) {
+      map_cells_[y * cols_ + x] = matrix[y][x];
+    }
+  }
+  return *this;
+}
+
 void LossyMapMatrix2D::Init(const BaseMapConfig* config) {
   unsigned int rows = config->map_node_size_y_;
   unsigned int cols = config->map_node_size_x_;

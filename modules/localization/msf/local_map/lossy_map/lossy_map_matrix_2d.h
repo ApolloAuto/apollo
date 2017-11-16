@@ -93,6 +93,8 @@ class LossyMapMatrix2D : public BaseMapMatrix {
     return map_cells_ + row * cols_;
   }
 
+  LossyMapMatrix2D& operator= (const LossyMapMatrix2D& matrix);
+
  protected:
   /**@brief The number of rows. */
   unsigned int rows_;

@@ -108,3 +108,7 @@ DEFINE_double(imu_rate, 1.0, "");
 DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
 DEFINE_bool(trans_gpstime_to_utctime, true, "");
 DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
+
+DEFINE_bool(use_visualize, false, "");
+
+DEFINE_bool(use_rawimu, true, "");

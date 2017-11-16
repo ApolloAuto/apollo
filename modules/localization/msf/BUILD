@@ -29,6 +29,7 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_proto",
         "//modules/drivers/gnss/proto:config_proto",
+        "//modules/drivers/gnss/proto:imu_proto",
         "//modules/localization/msf/local_integ:localization_msf_local_integ",
         "@gtest//:gtest",
         "@glog//:glog",
