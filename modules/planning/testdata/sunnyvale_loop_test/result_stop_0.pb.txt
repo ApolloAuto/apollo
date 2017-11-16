@@ -1047,7 +1047,7 @@ decision {
       perception_id: -855654299
       object_decision {
         stop {
-          distance_s: 0
+          distance_s: -0.5
           stop_point {
             x: 587051.34171483328
             y: 4141558.6886173584
@@ -1062,7 +1062,7 @@ decision {
       perception_id: -1651052487
       object_decision {
         stop {
-          distance_s: 0
+          distance_s: -0.5
           stop_point {
             x: 587051.34171483328
             y: 4141558.6886173584
@@ -1077,7 +1077,7 @@ decision {
       perception_id: 502372993
       object_decision {
         stop {
-          distance_s: 0
+          distance_s: -0.5
           stop_point {
             x: 587051.34171483328
             y: 4141558.6886173584
