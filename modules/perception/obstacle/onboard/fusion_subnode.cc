@@ -27,6 +27,7 @@ namespace apollo {
 namespace perception {
 
 bool FusionSubnode::InitInternal() {
+  RegistAllAlgorithm();
   CHECK(shared_data_manager_ != nullptr);
   fusion_.reset(BaseFusionRegisterer::GetInstanceByName(FLAGS_onboard_fusion));
   if (fusion_ == nullptr) {
@@ -194,6 +195,10 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
   return true;
+}
+
+void FusionSubnode::RegistAllAlgorithm() {
+  RegisterFactoryProbabilisticFusion();
 }
 
 }  // namespace perception

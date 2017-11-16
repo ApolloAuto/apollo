@@ -16,6 +16,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SUBNODE_H_
 
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
+
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
@@ -60,6 +62,7 @@ class FusionSubnode : public Subnode {
       std::shared_ptr<SensorObjects> *sensor_objects) const;
   StatusCode Process(const EventMeta &event_meta,
                      const std::vector<Event> &events);
+  void RegistAllAlgorithm();
 
   double timestamp_;
   std::vector<ObjectPtr> objects_;
