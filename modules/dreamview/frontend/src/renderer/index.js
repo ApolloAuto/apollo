@@ -325,9 +325,9 @@ class Renderer {
         this.render();
     }
 
-    updateWorld(world) {
+    updateWorld(world, planningData) {
         this.adc.update(world, this.coordinates);
-        this.planningTrajectory.update(world, this.coordinates, this.scene);
+        this.planningTrajectory.update(world, planningData, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
