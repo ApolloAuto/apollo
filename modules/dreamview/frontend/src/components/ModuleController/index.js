@@ -8,21 +8,27 @@ import WS from "store/websocket";
 @inject("store") @observer
 export default class Header extends React.Component {
     render() {
-        const { modules, hardware, displayName } = this.props.store.hmi;
+        const { modes, currentMode,
+                moduleStatus, hardwareStatus, displayName } = this.props.store.hmi;
 
-        const moduleEntries = Array.from(modules.keys()).sort().map((key) => {
+        const liveModules = (currentMode !== 'none')
+                              ? modes[currentMode].liveModules : Array.from(moduleStatus.keys());
+        const liveHardware = (currentMode !== 'none')
+                              ? modes[currentMode].liveHardware : Array.from(hardwareStatus.keys());
+
+        const moduleEntries = liveModules.sort().map((key) => {
                   return <Controller key={key}
                                            id={key}
                                            title={displayName[key]}
-                                           modules={modules}
+                                           modules={moduleStatus}
                                            onClick={() => {
                                                 this.props.store.hmi.toggleModule(key);
                                            }}/>;
                 });
-        const hardwareEntries = Array.from(hardware.keys()).sort().map((key) => {
+        const hardwareEntries = liveHardware.map((key) => {
                   return <StatusDisplay key={key}
                                            title={displayName[key]}
-                                           status={hardware.get(key)}/>;
+                                           status={hardwareStatus.get(key)}/>;
                 });
 
         return (

@@ -87,7 +87,7 @@ class Planning : public apollo::common::ApolloApp {
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point);
 
-  bool IsVehicleStateValid(const common::VehicleStateProvider& vehicle_state);
+  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
 
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 
@@ -98,8 +98,6 @@ class Planning : public apollo::common::ApolloApp {
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 
   void RegisterPlanners();
-
-  bool HasSignalLight(const PlanningConfig& config);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;

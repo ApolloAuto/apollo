@@ -117,7 +117,7 @@ body {
         flex: 0 0 auto;
 
         position: relative;
-        margin: 10px;
+        margin: 5px;
         border: 1px solid #383838;
 
         select {
@@ -455,7 +455,7 @@ body {
             display: none;
         }
 
-        #radio-selector-label {
+        .radio-selector-label {
             display: inline-block;
             position: relative;
             transform: translate(65%, 30%);
@@ -471,7 +471,7 @@ body {
             border: 7px solid #3F4548;
         }
 
-        input[type="radio"]:checked+#radio-selector-label {
+        input[type="radio"]:checked+.radio-selector-label {
             border: 7px solid #0E3D62;
             background-color: #30A5FF;
         }
@@ -491,6 +491,10 @@ body {
         .monitor-item {
             @include monitor-item-common-properties();
         }
+    }
+
+    .poi-button {
+        min-width: 190px;
     }
 }
 
@@ -594,7 +598,7 @@ body {
             .meter-head {
                 display: inline-block;
                 position: absolute;
-                margin: 5px 0px 0px 5px;
+                margin: 5px 0px 0px 0px;
                 border-width: 4px;
                 border-style: solid;
             }
@@ -637,15 +641,15 @@ body {
         }
 
         .steerangle-unit {
-            padding: 0px 10px 20px 3px;
+            padding: 20px 10px 0px 3px;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 13px;
         }
 
         .left-arrow {
             position: absolute;
             top: 45px;
-            right: 120px;
+            right: 115px;
             width: 0px;
             height: 0px;
             border-style: solid;
@@ -667,7 +671,7 @@ body {
         .wheel {
             position: absolute;
             top: 15px;
-            right: 35px;
+            right: 33px;
         }
         .wheel-background {
             stroke-width: 3px;

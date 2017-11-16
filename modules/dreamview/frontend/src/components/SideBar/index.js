@@ -7,11 +7,11 @@ import WS from "store/websocket";
 @inject("store") @observer
 export default class SideBar extends React.Component {
     render() {
-        const { isInitialized, options, routeEditingManager, video } = this.props.store;
+        const { isInitialized, options, routeEditingManager, video, hmi } = this.props.store;
 
         return (
             <div className="side-bar">
-                <ButtonPanel initialized={isInitialized}
+                <ButtonPanel enableHMIButtonsOnly={!isInitialized || hmi.showNavigationMap}
                              onQuickStarter={() => {
                                 this.props.store.handleSideBarClick('showQuickStarter');
                              }}
@@ -26,13 +26,10 @@ export default class SideBar extends React.Component {
                              dumpMessages={() => {
                                      WS.dumpMessages();
                                  }}
-                             onDefaultRouting={() => {
-                                 if (routeEditingManager.addDefaultEndPoint()) {
-                                     if (!options.showRouteEditingBar) {
-                                        routeEditingManager.sendRoutingRequest();
-                                    }
-                                 }
+                             onPOI={() => {
+                                 this.props.store.handleSideBarClick('showPOI');
                              }}
+                             showPOI={options.showPOI}
                              onRouteEditingBar={() => {
                                     this.props.store.handleSideBarClick('showRouteEditingBar');
                                  }}

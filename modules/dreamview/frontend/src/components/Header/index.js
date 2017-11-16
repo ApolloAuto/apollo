@@ -13,15 +13,15 @@ export default class Header extends React.Component {
         const { modes, currentMode,
                 maps, currentMap,
                 vehicles, currentVehicle } = this.props.store.hmi;
-        const { routeEditingManager } = this.props.store;
 
         return (
             <header className = "header">
                 <Image image={logoApollo} className="apollo-logo" />
                 <Selector name="setup mode"
-                          options={modes}
+                          options={Object.keys(modes).sort()}
                           currentOption={currentMode}
                           onChange={(event) => {
+                            this.props.store.hmi.currentMode = event.target.value;
                             WS.changeSetupMode(event.target.value);
                           }}/>
                 <Selector name="vehicle"
@@ -35,12 +35,6 @@ export default class Header extends React.Component {
                           currentOption={currentMap}
                           onChange={(event) => {
                             WS.changeMap(event.target.value);
-                          }}/>
-                <Selector name="point of interest"
-                          options={Object.keys(routeEditingManager.defaultRoutingEndPoint)}
-                          currentOption={routeEditingManager.currentPOI}
-                          onChange={(event) => {
-                            routeEditingManager.setDefaultEndPoint(event.target.value);
                           }}/>
             </header>
         );

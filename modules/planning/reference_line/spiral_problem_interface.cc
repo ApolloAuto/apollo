@@ -33,18 +33,18 @@ constexpr std::size_t N = 10;
 
 SpiralProblemInterface::SpiralProblemInterface(
     std::vector<Eigen::Vector2d> points) {
-  points_ = std::move(points);
-  num_of_points_ = points_.size();
+  init_points_ = std::move(points);
+  num_of_points_ = init_points_.size();
   CHECK_GT(num_of_points_, 1);
 
   point_distances_.reserve(num_of_points_ - 1);
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-    point_distances_.push_back((points_[i + 1] - points_[i]).norm());
+    point_distances_.push_back((init_points_[i + 1] - init_points_[i]).norm());
   }
 
   std::vector<double> normalized_theta;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-    Eigen::Vector2d v = points_[i + 1] - points_[i];
+    Eigen::Vector2d v = init_points_[i + 1] - init_points_[i];
     double theta = std::atan2(v.y(), v.x());
     normalized_theta.push_back(theta);
   }
@@ -64,12 +64,12 @@ void SpiralProblemInterface::get_optimization_results(
     std::vector<double>* ptr_theta, std::vector<double>* ptr_kappa,
     std::vector<double>* ptr_dkappa, std::vector<double>* ptr_s,
     std::vector<double>* ptr_x, std::vector<double>* ptr_y) const {
-  *ptr_theta = theta_;
-  *ptr_kappa = kappa_;
-  *ptr_dkappa = dkappa_;
-  *ptr_s = s_;
-  *ptr_x = x_;
-  *ptr_y = y_;
+  *ptr_theta = opt_theta_;
+  *ptr_kappa = opt_kappa_;
+  *ptr_dkappa = opt_dkappa_;
+  *ptr_s = opt_s_;
+  *ptr_x = opt_x_;
+  *ptr_y = opt_y_;
 }
 
 bool SpiralProblemInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
@@ -109,31 +109,78 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     std::size_t index = i * 5;
 
+    double theta_lower = 0.0;
+    double theta_upper = 0.0;
+    double kappa_lower = 0.0;
+    double kappa_upper = 0.0;
+    double dkappa_lower = 0.0;
+    double dkappa_upper = 0.0;
+    double x_lower = 0.0;
+    double x_upper = 0.0;
+    double y_lower = 0.0;
+    double y_upper = 0.0;
+    if (i == 0 && has_fixed_start_point_) {
+      theta_lower = start_theta_;
+      theta_upper = start_theta_;
+      kappa_lower = start_kappa_;
+      kappa_upper = start_kappa_;
+      dkappa_lower = start_dkappa_;
+      dkappa_upper = start_dkappa_;
+      x_lower = start_x_;
+      x_upper = start_x_;
+      y_lower = start_y_;
+      y_upper = start_y_;
+
+    } else if (i + 1 == num_of_points_ && has_fixed_end_point_) {
+      theta_lower = end_theta_;
+      theta_upper = end_theta_;
+      kappa_lower = end_kappa_;
+      kappa_upper = end_kappa_;
+      dkappa_lower = end_dkappa_;
+      dkappa_upper = end_dkappa_;
+      x_lower = end_x_;
+      x_upper = end_x_;
+      y_lower = end_y_;
+      y_upper = end_y_;
+    } else {
+      theta_lower = relative_theta_[i] - M_PI * 0.5;
+      theta_upper = relative_theta_[i] + M_PI * 0.5;
+      kappa_lower = -0.25;
+      kappa_upper = 0.25;
+      dkappa_lower = -0.25;
+      dkappa_upper = 0.25;
+      x_lower = init_points_[i].x() - default_max_point_deviation_;
+      x_upper = init_points_[i].x() + default_max_point_deviation_;
+      y_lower = init_points_[i].y() - default_max_point_deviation_;
+      y_upper = init_points_[i].y() + default_max_point_deviation_;
+    }
+
     // theta
-    x_l[index] = relative_theta_[i] - M_PI * 0.5;
-    x_u[index] = relative_theta_[i] + M_PI * 0.5;
+    x_l[index] = theta_lower;
+    x_u[index] = theta_upper;
 
     // kappa
-    x_l[index + 1] = -0.25;
-    x_u[index + 1] = 0.25;
+    x_l[index + 1] = kappa_lower;
+    x_u[index + 1] = kappa_upper;
 
     // dkappa
-    x_l[index + 2] = -0.25;
-    x_u[index + 2] = 0.25;
+    x_l[index + 2] = dkappa_lower;
+    x_u[index + 2] = dkappa_upper;
 
     // x
-    x_l[index + 3] = points_[i].x() - max_point_deviation_;
-    x_u[index + 3] = points_[i].x() + max_point_deviation_;
+    x_l[index + 3] = x_lower;
+    x_u[index + 3] = x_upper;
 
     // y
-    x_l[index + 4] = points_[i].y() - max_point_deviation_;
-    x_u[index + 4] = points_[i].y() + max_point_deviation_;
+    x_l[index + 4] = y_lower;
+    x_u[index + 4] = y_upper;
   }
 
   // b. for delta_s
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-    x_l[variable_offset + i] = point_distances_[i] - 2.0 * max_point_deviation_;
+    x_l[variable_offset + i] =
+        point_distances_[i] - 2.0 * default_max_point_deviation_;
     x_u[variable_offset + i] = point_distances_[i] * M_PI * 0.5;
   }
 
@@ -153,7 +200,8 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
   std::size_t constraint_offset = 2 * (num_of_points_ - 1);
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     g_l[constraint_offset + i] = 0.0;
-    g_u[constraint_offset + i] = max_point_deviation_ * max_point_deviation_;
+    g_u[constraint_offset + i] =
+        default_max_point_deviation_ * default_max_point_deviation_;
   }
   return true;
 }
@@ -173,14 +221,26 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
     x[index] = relative_theta_[i];
     x[index + 1] = 0.0;
     x[index + 2] = 0.0;
-    x[index + 3] = points_[i].x();
-    x[index + 4] = points_[i].y();
+    x[index + 3] = init_points_[i].x();
+    x[index + 4] = init_points_[i].y();
   }
 
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     double delta_theta = relative_theta_[i + 1] - relative_theta_[i];
     x[variable_offset + i] = point_distances_[i] / std::cos(0.5 * delta_theta);
+  }
+
+  for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
+    double delta_theta = relative_theta_[i + 1] - relative_theta_[i];
+    x[(i + 1) * 5 + 1] = delta_theta / x[variable_offset + i];
+  }
+  x[1] = x[6];
+
+  if (has_fixed_start_point_) {
+    x[0] = start_theta_;
+    x[1] = start_kappa_;
+    x[2] = start_dkappa_;
   }
   return true;
 }
@@ -289,8 +349,8 @@ bool SpiralProblemInterface::eval_g(int n, const double* x, bool new_x, int m,
     double x_cor = x[variable_index + 3];
     double y_cor = x[variable_index + 4];
 
-    double x_diff = x_cor - points_[i].x();
-    double y_diff = y_cor - points_[i].y();
+    double x_diff = x_cor - init_points_[i].x();
+    double y_diff = y_cor - init_points_[i].y();
 
     g[constraint_offset + i] = x_diff * x_diff + y_diff * y_diff;
   }
@@ -527,10 +587,10 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
     }
 
     for (std::size_t i = 0; i < num_of_points_; ++i) {
-      values[nz_index] = 2.0 * (x[i * 5 + 3] - points_[i].x());
+      values[nz_index] = 2.0 * (x[i * 5 + 3] - init_points_[i].x());
       ++nz_index;
 
-      values[nz_index] = 2.0 * (x[i * 5 + 4] - points_[i].y());
+      values[nz_index] = 2.0 * (x[i * 5 + 4] - init_points_[i].y());
       ++nz_index;
     }
 
@@ -657,34 +717,29 @@ void SpiralProblemInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  theta_.reserve(num_of_points_);
-  kappa_.reserve(num_of_points_);
-  dkappa_.reserve(num_of_points_);
-  x_.reserve(num_of_points_);
-  y_.reserve(num_of_points_);
+  opt_theta_.reserve(num_of_points_);
+  opt_kappa_.reserve(num_of_points_);
+  opt_dkappa_.reserve(num_of_points_);
+  opt_x_.reserve(num_of_points_);
+  opt_y_.reserve(num_of_points_);
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     std::size_t index = i * 5;
-    theta_.push_back(x[index]);
-    kappa_.push_back(x[index + 1]);
-    dkappa_.push_back(x[index + 2]);
-    x_.push_back(x[index + 3]);
-    y_.push_back(x[index + 4]);
+    opt_theta_.push_back(x[index]);
+    opt_kappa_.push_back(x[index + 1]);
+    opt_dkappa_.push_back(x[index + 2]);
+    opt_x_.push_back(x[index + 3]);
+    opt_y_.push_back(x[index + 4]);
   }
 
-  s_.reserve(num_of_points_ - 1);
+  opt_s_.reserve(num_of_points_ - 1);
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-    s_.push_back(x[variable_offset + i]);
+    opt_s_.push_back(x[variable_offset + i]);
   }
 }
 
-void SpiralProblemInterface::set_max_point_deviation(
-    const double max_point_deviation) {
-  max_point_deviation_ = max_point_deviation;
-}
-
-void SpiralProblemInterface::update_piecewise_spiral_paths(
-    const double* x, const int n) {
+void SpiralProblemInterface::update_piecewise_spiral_paths(const double* x,
+                                                           const int n) {
   std::size_t variable_offset = num_of_points_ * 5;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     std::size_t index0 = i * 5;
@@ -695,6 +750,35 @@ void SpiralProblemInterface::update_piecewise_spiral_paths(
     double delta_s = x[variable_offset + i];
     piecewise_paths_[i] = std::move(QuinticSpiralPath(x0, x1, delta_s));
   }
+}
+
+void SpiralProblemInterface::set_default_max_point_deviation(
+    const double max_point_deviation) {
+  default_max_point_deviation_ = max_point_deviation;
+}
+
+void SpiralProblemInterface::set_start_point(const double x, const double y,
+                                             const double theta,
+                                             const double kappa,
+                                             const double dkappa) {
+  has_fixed_start_point_ = true;
+  start_x_ = x;
+  start_y_ = y;
+  start_theta_ = common::math::NormalizeAngle(theta);
+  start_kappa_ = kappa;
+  start_dkappa_ = dkappa;
+}
+
+void SpiralProblemInterface::set_end_point(const double x, const double y,
+                                           const double theta,
+                                           const double kappa,
+                                           const double dkappa) {
+  has_fixed_end_point_ = true;
+  end_x_ = x;
+  end_y_ = y;
+  end_theta_ = theta;
+  end_kappa_ = kappa;
+  end_dkappa_ = dkappa;
 }
 
 }  // namespace planning

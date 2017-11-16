@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <chrono>
 #include <limits>
 #include <utility>
 
@@ -50,9 +51,9 @@ ReferenceLineProvider::~ReferenceLineProvider() {
 }
 
 void ReferenceLineProvider::Init(
-    const hdmap::HDMap *hdmap_,
+    const hdmap::HDMap *base_map,
     const QpSplineReferenceLineSmootherConfig &smoother_config) {
-  pnc_map_.reset(new hdmap::PncMap(hdmap_));
+  pnc_map_.reset(new hdmap::PncMap(base_map));
   smoother_config_ = smoother_config;
   segment_history_.clear();
   std::vector<double> init_t_knots;
@@ -158,8 +159,9 @@ void ReferenceLineProvider::Stop() {
 }
 
 void ReferenceLineProvider::GenerateThread() {
-  constexpr int32_t kSleepTime = 200;  // milliseconds
+  constexpr int32_t kSleepTime = 50;  // milliseconds
   while (!is_stop_) {
+    std::this_thread::yield();
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
     if (!has_routing_) {
@@ -185,10 +187,18 @@ bool ReferenceLineProvider::GetReferenceLines(
     std::list<hdmap::RouteSegments> *segments) {
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
+  constexpr double kTimeout = 100;  // milliseconds
+  auto timeout_duration = std::chrono::duration<double, std::milli>(kTimeout);
   if (FLAGS_enable_reference_line_provider_thread) {
     std::unique_lock<std::mutex> lock(reference_lines_mutex__);
-    cv_has_reference_line_.wait(lock,
-                                [this]() { return !reference_lines_.empty(); });
+    if (!cv_has_reference_line_.wait_for(lock, timeout_duration, [this]() {
+          return !reference_lines_.empty();
+        })) {
+      lock.unlock();
+      AWARN << "Reference line calculation timeout (" << kTimeout
+            << "). Will retry...";
+      return false;
+    }
     reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
     segments->assign(route_segments_.begin(), route_segments_.end());
     lock.unlock();
