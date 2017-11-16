@@ -84,7 +84,7 @@
             var json = '';
             $.ajax({
                 type: "POST",
-                url: "http://localhost:5001/",
+                url: "http://" + window.location.hostname + ":5001/",
                 data: "{}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -213,7 +213,7 @@
                 };
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:5001/routing",
+                    url: "http://" + window.location.hostname + ":5001/routing",
                     data: JSON.stringify(data),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
