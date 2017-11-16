@@ -55,8 +55,9 @@ class RTKReplayPlanner : public Planner {
 
   /**
    * @brief Overrode function Plan in parent class Planner.
-   * @param start_point The trajectory point where planning starts
-   * @param trajectory_pb The computed trajectory
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
   apollo::common::Status Plan(

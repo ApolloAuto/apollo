@@ -60,7 +60,7 @@ class ReferenceLineProvider {
    */
   ~ReferenceLineProvider();
 
-  void Init(const hdmap::HDMap* hdmap_,
+  void Init(const hdmap::HDMap* base_map,
             const QpSplineReferenceLineSmootherConfig& smoother_config);
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
