@@ -19,7 +19,7 @@
 DEFINE_string(map_dir, "modules/map/data/demo",
               "Directory which contains a group of related maps.");
 
-DEFINE_string(base_map_filename, "base_map.xml|base_map.bin|base_map.txt",
+DEFINE_string(base_map_filename, "base_map.bin|base_map.xml|base_map.txt",
               "Base map files in the map_dir, search in order.");
 DEFINE_string(sim_map_filename, "sim_map.bin|sim_map.txt",
               "Simulation map files in the map_dir, search in order.");
