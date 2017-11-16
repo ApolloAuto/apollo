@@ -116,16 +116,12 @@ void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist)
 }
 void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
                                          const std::string &sensor_id, double min_match_dist, double timestamp) {
-  bool is_alive = false;
   UpdateMeasurementsLifeWithoutMeasurement(lidar_objects_,
                                            sensor_id, timestamp, s_max_lidar_invisible_period_, invisible_in_lidar_);
   UpdateMeasurementsLifeWithoutMeasurement(radar_objects_,
                                            sensor_id, timestamp, s_max_radar_invisible_period_, invisible_in_radar_);
-
-  is_alive = (!lidar_objects_.empty() || !radar_objects_.empty());
-  is_dead_ = !is_alive;
-
-  if (is_alive) {
+  is_dead_ = (lidar_objects_.empty() && radar_objects_.empty());
+  if (!is_dead_) {
     double time_diff = timestamp - fused_timestamp_;
     motion_fusion_->UpdateWithoutObject(time_diff);
     PerformMotionCompensation(fused_object_, timestamp);

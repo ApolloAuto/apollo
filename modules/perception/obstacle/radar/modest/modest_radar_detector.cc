@@ -179,22 +179,22 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   // preparation
 
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
-  object_builder_.build(raw_obstacles, radar_pose, main_velocity, *radar_objects);
+  object_builder_.Build(raw_obstacles, radar_pose, main_velocity, *radar_objects);
   radar_objects->timestamp = (double) raw_obstacles.header().timestamp_sec();
   radar_objects->sensor_type = RADAR;
 
   // roi filter
   auto &filter_objects = radar_objects->objects;
-  roi_filter(map_polygons, filter_objects);
+  RoiFilter(map_polygons, filter_objects);
   // treatment
   radar_tracker_->Process(*radar_objects);
   AINFO << "After process: , object size: " <<  radar_objects->objects.size();
- 
-  collect_radar_result(objects);
+
+  CollectRadarResult(objects);
   return true;
 }
 
-bool ModestRadarDetector::collect_radar_result(std::vector<ObjectPtr> *objects) {
+bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
   std::vector<RadarTrack> &obs_track = radar_tracker_->GetTracks();
   if (objects == nullptr) {
     AERROR << "objects is nullptr";
@@ -214,8 +214,8 @@ bool ModestRadarDetector::collect_radar_result(std::vector<ObjectPtr> *objects) 
   return true;
 }
 
-void ModestRadarDetector::roi_filter(const std::vector<PolygonDType> &map_polygons,
-  std::vector<ObjectPtr>& filter_objects) {
+void ModestRadarDetector::RoiFilter(const std::vector<PolygonDType> &map_polygons,
+                                    std::vector<ObjectPtr> &filter_objects) {
   AINFO << "Before using hdmap, object size:" << filter_objects.size();
   // use new hdmap
   if (use_had_map_) {

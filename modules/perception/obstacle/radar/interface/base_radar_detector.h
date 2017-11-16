@@ -24,12 +24,12 @@
 //     DefaultRadarDetector() : BaseRadarDetector() {}
 //     virtual ~DefaultRadarDetector() {}
 //
-//     virtual bool init() override {
+//     virtual bool Init() override {
 //         // Do something.
 //         return true;
 //     }
 //
-//     virtual bool detect(
+//     virtual bool Detect(
 //              const RadarRawObstacles& raw_obstacles,
 //              const std::vector<PolygonType>& map_polygons,
 //              const RadarDetectorOptions& options,
