@@ -277,7 +277,7 @@ def decode_polyline(polyline_str):
 
 
 def run_flask():
-    app.run(debug=False, port=5001, host='localhost')
+    app.run(debug=False, port=5001, host='0.0.0.0')
 
 
 if __name__ == "__main__":
