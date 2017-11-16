@@ -173,9 +173,9 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>& map_ids) {
     ++itr;
   }
 
-  std::cout << "before wait" << std::endl;
+  // std::cout << "before wait" << std::endl;
   p_map_load_threads_->wait();
-  std::cout << "after wait" << std::endl;
+  // std::cout << "after wait" << std::endl;
 
   // check in cacheL2 again
   itr = map_ids.begin();

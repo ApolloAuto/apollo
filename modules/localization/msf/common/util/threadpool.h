@@ -185,7 +185,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
     LockingPtr<PoolType, std::recursive_mutex> locked_this(*this, monitor_);
 
     if (locked_this->m_scheduler.Push(task)) {
-      std::cerr << "push task to scheduler" << std::endl;
+      // std::cerr << "push task to scheduler" << std::endl;
       locked_this->task_or_terminate_workers_event_.notify_one();
       return true;
     } else {
@@ -340,7 +340,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
       // std::recursive_mutex::scoped_lock lock(locked_this->monitor_);
       std::unique_lock<std::recursive_mutex> lock(locked_this->monitor_);
 
-      std::cerr << "execute_task" << std::endl;
+      // std::cerr << "execute_task" << std::endl;
 
       // decrease number of threads if necessary
       if (worker_count_ > target_worker_count_) {
@@ -357,7 +357,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
           locked_this->worker_idle_or_terminated_event_.notify_all();
           locked_this->task_or_terminate_workers_event_.wait(lock);
           active_worker_count_++;
-          std::cerr << "active_worker_count_ ++" << std::endl;
+          // std::cerr << "active_worker_count_ ++" << std::endl;
         }
       }
 
