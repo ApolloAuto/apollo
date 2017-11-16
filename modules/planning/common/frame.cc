@@ -108,13 +108,6 @@ std::list<ReferenceLineInfo> &Frame::reference_line_info() {
 bool Frame::InitReferenceLineInfo() {
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
-  // Update reference line provider
-  if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
-          AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
-    AERROR << "Failed to update routing in reference line provider";
-    return false;
-  }
-  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state_);
   if (!ReferenceLineProvider::instance()->GetReferenceLines(&reference_lines,
                                                             &segments)) {
     AERROR << "Failed to create reference line";
