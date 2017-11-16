@@ -123,8 +123,7 @@ Status Planning::Init() {
   return planner_->Init(config_);
 }
 
-bool Planning::IsVehicleStateValid(
-    const common::VehicleStateProvider& vehicle_state) {
+bool Planning::IsVehicleStateValid(const common::VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
       std::isnan(vehicle_state.kappa()) ||
@@ -175,13 +174,9 @@ void Planning::RunOnce() {
     not_ready->set_reason("chassis not ready");
   } else if (AdapterManager::GetRoutingResponse()->Empty()) {
     not_ready->set_reason("routing not ready");
-  } else if (FLAGS_enable_prediction &&
-             AdapterManager::GetPrediction()->Empty()) {
-    not_ready->set_reason("prediction not ready");
   }
   if (not_ready->has_reason()) {
-    LOG_EVERY_N(ERROR, 5) << not_ready->reason()
-                          << "; skip the planning cycle.";
+    AERROR << not_ready->reason() << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
@@ -197,11 +192,27 @@ void Planning::RunOnce() {
 
   common::Status status =
       common::VehicleStateProvider::instance()->Update(localization, chassis);
-  DCHECK(IsVehicleStateValid(*common::VehicleStateProvider::instance()));
-  if (!status.ok()) {
+  auto vehicle_state =
+      common::VehicleStateProvider::instance()->vehicle_state();
+  if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
     AERROR << "Update VehicleStateProvider failed.";
     not_ready->set_reason("Update VehicleStateProvider failed.");
     status.Save(not_ready_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    return;
+  }
+
+  // Update reference line provider
+  if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
+          AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
+    AERROR << "Failed to update routing in reference line provider";
+    return;
+  }
+  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
+
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+    not_ready->set_reason("prediction not ready");
+    AERROR << not_ready->reason() << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
