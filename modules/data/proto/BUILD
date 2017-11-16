@@ -24,3 +24,8 @@ proto_library(
     name = "recorder_conf_proto_lib",
     srcs = ["recorder_conf.proto"],
 )
+
+proto_library(
+    name = "recorder_info_proto_lib",
+    srcs = ["recorder_info.proto"],
+)
