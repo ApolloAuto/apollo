@@ -28,12 +28,14 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -62,6 +64,7 @@ using apollo::hdmap::Path;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::perception::TrafficLightDetection;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
@@ -339,8 +342,10 @@ void SimulationWorldService::Update() {
   // may not always be perfectly aligned and belong to the same frame.
   obj_map_.clear();
   world_.clear_object();
-  UpdateWithLatestObserved("Perception",
+  UpdateWithLatestObserved("PerceptionObstacles",
                            AdapterManager::GetPerceptionObstacles());
+  UpdateWithLatestObserved("PerceptionTrafficLight",
+                           AdapterManager::GetTrafficLightDetection());
   UpdateWithLatestObserved("PredictionObstacles",
                            AdapterManager::GetPrediction());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
@@ -361,7 +366,8 @@ void SimulationWorldService::UpdateDelays() {
       AdapterManager::GetPerceptionObstacles()->GetDelayInMs());
   delays->set_planning(AdapterManager::GetPlanning()->GetDelayInMs());
   delays->set_prediction(AdapterManager::GetPrediction()->GetDelayInMs());
-  // TODO(siyangy): Add traffic light delay when ready.
+  delays->set_traffic_light(
+      AdapterManager::GetTrafficLightDetection()->GetDelayInMs());
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
@@ -477,7 +483,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
   const std::string id = std::to_string(obstacle.id());
   // Create a new world object and put it into object map if the id does not
   // exist in the map yet.
-  if (obj_map_.find(id) == obj_map_.end()) {
+  if (!apollo::common::util::ContainsKey(obj_map_, id)) {
     Object &world_obj = obj_map_[id];
     SetObstacleInfo(obstacle, &world_obj);
     SetObstaclePolygon(obstacle, &world_obj);
@@ -494,6 +500,19 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
   world_.set_timestamp_sec(
       std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const TrafficLightDetection &traffic_light_detection) {
+  Object *signal = world_.mutable_traffic_signal();
+  if (traffic_light_detection.traffic_light_size() > 0) {
+    const auto &traffic_light = traffic_light_detection.traffic_light(0);
+    signal->set_current_signal(
+        apollo::perception::TrafficLight_Color_Name(traffic_light.color()));
+  } else {
+    signal->set_current_signal("");
+  }
 }
 
 void SimulationWorldService::UpdatePlanningTrajectory(
@@ -695,6 +714,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
       point->set_y(path_point.y());
       point->set_s(path_point.s());
       point->set_kappa(path_point.kappa());
+      point->set_dkappa(path_point.dkappa());
     }
   }
 }
@@ -730,7 +750,10 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdateDecision(trajectory.decision(), header_time);
 
-  UpdatePlanningData(trajectory.debug().planning_data());
+  // TODO(siyang, vlin): Make this dynamically controled by frontend
+  if (!FLAGS_ignore_planning_debug_data) {
+    UpdatePlanningData(trajectory.debug().planning_data());
+  }
 
   world_.mutable_latency()->set_planning(
       trajectory.latency_stats().total_time_ms());

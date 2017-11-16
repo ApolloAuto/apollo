@@ -53,7 +53,9 @@ class SimControl {
    * @brief setup callbacks and timer
    * @param set_start_point initialize localization.
    */
-  void Init(bool set_start_point);
+  void Init(bool set_start_point,
+            double start_velocity = 0.0,
+            double start_acceleration = 0.0);
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -130,6 +132,10 @@ class SimControl {
 
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
+
+  // Initial velocity and acceleration of the main vehicle
+  double start_velocity_ = 0.0;
+  double start_acceleration_ = 0.0;
 
   static constexpr int kPlanningCountToStart = 5;
 

@@ -33,8 +33,7 @@ namespace planning {
 
 class Spline2dConstraint {
  public:
-  Spline2dConstraint(const std::vector<double>& t_knots,
-                     const uint32_t order);
+  Spline2dConstraint(const std::vector<double>& t_knots, const uint32_t order);
 
   // direct method
   bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
@@ -51,28 +50,28 @@ class Spline2dConstraint {
   bool Add2dBoundary(const std::vector<double>& t_coord,
                      const std::vector<double>& angle,
                      const std::vector<apollo::common::math::Vec2d>& ref_point,
-                     const std::vector<double>& longitidinal_bound,
+                     const std::vector<double>& longitudinal_bound,
                      const std::vector<double>& lateral_bound);
 
   // ref point refer to derivative reference point
   bool Add2dDerivativeBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
-      const std::vector<double>& longitidinal_bound,
+      const std::vector<double>& longitudinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to second derivative ref point
   bool Add2dSecondDerivativeBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
-      const std::vector<double>& longitidinal_bound,
+      const std::vector<double>& longitudinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to third derivative ref point
   bool Add2dThirdDerivativeBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
-      const std::vector<double>& longitidinal_bound,
+      const std::vector<double>& longitudinal_bound,
       const std::vector<double>& lateral_bound);
 
   bool AddPointConstraint(const double t, const double x, const double y);

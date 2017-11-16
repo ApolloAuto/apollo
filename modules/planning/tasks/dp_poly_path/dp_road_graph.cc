@@ -44,10 +44,11 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
-                         const ReferenceLine &reference_line,
+                         const ReferenceLineInfo &reference_line_info,
                          const SpeedData &speed_data)
     : config_(config),
-      reference_line_(reference_line),
+      reference_line_info_(reference_line_info),
+      reference_line_(reference_line_info.reference_line()),
       speed_data_(speed_data) {}
 
 bool DPRoadGraph::FindPathTunnel(
@@ -72,8 +73,6 @@ bool DPRoadGraph::FindPathTunnel(
   double accumulated_s = init_sl_point_.s();
   const double path_resolution = config_.path_resolution();
 
-  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
-
   for (std::size_t i = 1; i < min_cost_path.size(); ++i) {
     const auto &prev_node = min_cost_path[i - 1];
     const auto &cur_node = min_cost_path[i];
@@ -81,7 +80,7 @@ bool DPRoadGraph::FindPathTunnel(
     const double path_length = cur_node.sl_point.s() - prev_node.sl_point.s();
     double current_s = 0.0;
     const auto &curve = cur_node.min_cost_curve;
-    while (current_s + kEpsilon < path_length) {
+    while (current_s + path_resolution / 2.0 < path_length) {
       const double l = curve.Evaluate(0, current_s);
       const double dl = curve.Evaluate(1, current_s);
       const double ddl = curve.Evaluate(2, current_s);
@@ -93,7 +92,11 @@ bool DPRoadGraph::FindPathTunnel(
       frenet_path.push_back(std::move(frenet_frame_point));
       current_s += path_resolution;
     }
-    accumulated_s += path_length;
+    if (i == min_cost_path.size() - 1) {
+      accumulated_s += current_s;
+    } else {
+      accumulated_s += path_length;
+    }
   }
   FrenetFramePath tunnel(frenet_path);
   path_data->SetReferenceLine(&reference_line_);
@@ -161,39 +164,37 @@ bool DPRoadGraph::GenerateMinCostPath(
 bool DPRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
+  constexpr double kSamplePointLookForwardTimeChangeLane = 3.0;
+  constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
   CHECK(points != nullptr);
 
-  common::math::Vec2d init_cartesian_point(init_point.path_point().x(),
-                                           init_point.path_point().y());
-  common::SLPoint init_sl_point;
-  if (!reference_line_.XYToSL(init_cartesian_point, &init_sl_point)) {
-    AERROR << "Failed to get sl point from point "
-           << init_cartesian_point.DebugString();
-    return false;
+  const double reference_line_length = reference_line_.Length();
+
+  double level_distance = 0.0;
+  if (reference_line_info_.IsChangeLanePath()) {
+    level_distance =
+        std::max(config_.step_length_min(),
+                 init_point.v() * kSamplePointLookForwardTimeChangeLane);
+  } else {
+    level_distance = common::math::Clamp(
+        init_point.v() * kSamplePointLookForwardTimeNoChangeLane,
+        config_.step_length_min(), config_.step_length_max());
   }
-
-  const double reference_line_length =
-      reference_line_.map_path().accumulated_s().back();
-
-  double level_distance =
-      std::fmax(config_.step_length_min(),
-                std::fmin(init_point.v(), config_.step_length_max()));
-
-  double accumulated_s = init_sl_point.s();
+  double accumulated_s = init_sl_point_.s();
   for (std::size_t i = 0; accumulated_s < reference_line_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
     const double s = std::fmin(accumulated_s, reference_line_length);
 
-    int32_t num =
-        static_cast<int32_t>(config_.sample_points_num_each_level() / 2);
-
-    for (int32_t j = -num; j < num + 1; ++j) {
-      double l = config_.lateral_sample_offset() * j;
-      auto sl = common::util::MakeSLPoint(s, l);
-      if (reference_line_.IsOnRoad(sl)) {
-        level_points.push_back(sl);
-      }
+    double left_width = 0.0;
+    double right_width = 0.0;
+    reference_line_.GetLaneWidth(s, &left_width, &right_width);
+    std::vector<double> sample_l;
+    common::util::uniform_slice(-right_width, left_width,
+                                config_.sample_points_num_each_level() - 1,
+                                &sample_l);
+    for (double l : sample_l) {
+      level_points.emplace_back(common::util::MakeSLPoint(s, l));
     }
     if (!level_points.empty()) {
       points->emplace_back(level_points);

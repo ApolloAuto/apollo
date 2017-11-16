@@ -74,8 +74,8 @@ bool RadarProcessSubnode::InitInternal() {
   }
   device_id_ = reserve_field_map["device_id"];
 
-  CHECK(AdapterManager::GetRadar()) << "Radar is not initialized.";
-  AdapterManager::AddRadarCallback(&RadarProcessSubnode::OnRadar,
+  CHECK(AdapterManager::GetContiRadar()) << "Radar is not initialized.";
+  AdapterManager::AddContiRadarCallback(&RadarProcessSubnode::OnRadar,
                                    this);
   CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
   AdapterManager::AddGpsCallback(&RadarProcessSubnode::OnGps,
@@ -87,10 +87,10 @@ bool RadarProcessSubnode::InitInternal() {
 }
 
 void RadarProcessSubnode::OnRadar(
-    const RadarObsArray &radar_obs) {
+    const ContiRadar &radar_obs) {
   PERF_FUNCTION("RadarProcess");
-  RadarObsArray radar_obs_proto = radar_obs;
-  double timestamp = radar_obs_proto.measurement_time();
+  ContiRadar radar_obs_proto = radar_obs;
+  double timestamp = radar_obs_proto.header().timestamp_sec();
   double unix_timestamp = timestamp;
   const double cur_time = common::time::Clock::NowInSecond();
   const double start_latency = (cur_time - unix_timestamp) * 1e3;
@@ -98,13 +98,10 @@ void RadarProcessSubnode::OnRadar(
         << "]:cur_time[" << GLOG_TIMESTAMP(cur_time) << "]:cur_latency["
         << start_latency << "]";
   // 0. correct radar timestamp
-  if (radar_obs_proto.type() == apollo::drivers::CONTINENTAL_ARS_40821) {
-    timestamp -= 0.07;
-  } else {
-    AERROR << "Unknown sensor type";
-    return;
-  }
-  radar_obs_proto.set_measurement_time(timestamp);
+  timestamp -= 0.07;
+  auto* header =  radar_obs_proto.mutable_header();
+  header->set_timestamp_sec(timestamp);
+  header->set_radar_timestamp(timestamp * 1e9);
 
   _conti_id_expansion.UpdateTimestamp(timestamp);
   _conti_id_expansion.ExpandIds(radar_obs_proto);

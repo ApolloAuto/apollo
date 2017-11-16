@@ -28,7 +28,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_piecewise_st_graph.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_graph.h"
@@ -60,6 +60,9 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                          const ReferenceLine& reference_line,
                                          PathDecision* const path_decision,
                                          SpeedData* const speed_data) {
+  if (reference_line_info_->ReachedDestination()) {
+    return Status::OK();
+  }
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");

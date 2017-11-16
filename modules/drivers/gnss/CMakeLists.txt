@@ -49,34 +49,36 @@ set(LOCALIZATION_POSE_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/../../../modules/loca
 set(LOCALIZATION_GPS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/../../../modules/localization/proto/gps.pb.cc")
 set(LOCALIZATION_IMU_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/../../../modules/localization/proto/imu.pb.cc")
 
-set(GNSS_STATUS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/gnss_status.pb.cc")
-set(CONFIG_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/config.pb.cc")
-set(GPGGA_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/gpgga.pb.cc")
-set(GNSS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/gnss.pb.cc")
-set(IMU_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/imu.pb.cc")
-set(INS_PB_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/ins.pb.cc")
+FILE(GLOB GNSS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 
-add_library(utils src/impl/utils.cpp ${CONFIG_PB_SRCS} ${GPGGA_PB_SRCS} ${GNSS_PB_SRCS} ${IMU_PB_SRCS} ${INS_PB_SRCS} ${GNSS_STATUS_PB_SRCS} ${LOCALIZATION_POSE_PB_SRCS} ${LOCALIZATION_IMU_PB_SRCS} ${LOCALIZATION_GPS_PB_SRCS} ${HEADER_PB_SRCS} ${ERROR_CODE_SRCS} ${GEOMETRY_PB_SRCS})
+add_library(rtcm third_party/rtcm3.c third_party/rtcm.c third_party/rtkcmn.c third_party/novatel.c third_party/rcvraw.c)
+target_link_libraries(rtcm m)
+
+add_library(utils src/util/utils.cpp ${GNSS_PROTO_SRCS} ${LOCALIZATION_POSE_PB_SRCS} ${LOCALIZATION_IMU_PB_SRCS} ${LOCALIZATION_GPS_PB_SRCS} ${HEADER_PB_SRCS} ${ERROR_CODE_SRCS} ${GEOMETRY_PB_SRCS})
 target_link_libraries(utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
-add_library(stream_nodelet src/stream_nodelet.cpp src/raw_stream.cpp src/impl/serial_stream.cpp src/impl/tcp_stream.cpp src/impl/udp_stream.cpp src/impl/ntrip_stream.cpp)
+add_library(stream_nodelet src/stream/stream_nodelet.cpp src/stream/raw_stream.cpp src/impl/stream/serial_stream.cpp src/impl/stream/tcp_stream.cpp src/impl/stream/udp_stream.cpp src/impl/stream/ntrip_stream.cpp)
 target_link_libraries(stream_nodelet utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
-add_library(parser_nodelet src/parser_nodelet.cpp src/data_parser.cpp src/impl/novatel_parser.cpp)
-add_dependencies(parser_nodelet novatel_msgs_generate_messages_cpp)
-target_link_libraries(parser_nodelet utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES} proj)
+add_library(parser_nodelet src/parser/parser_nodelet.cpp src/parser/data_parser.cpp src/impl/parser/novatel/novatel_parser.cpp)
+add_dependencies(parser_nodelet novatel_msgs_generate_messages_cpp rtcm)
+target_link_libraries(parser_nodelet rtcm utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES} proj)
 
-add_library(tf_broadcaster_nodelet src/tf_broadcaster_nodelet.cpp src/tf_broadcaster.cpp)
+add_library(rtcm_parser_nodelet src/parser/rtcm_parser_nodelet.cpp src/parser/rtcm_parser.cpp src/impl/parser/rtcm/rtcm3_parser.cpp)
+add_dependencies(rtcm_parser_nodelet novatel_msgs_generate_messages_cpp rtcm)
+target_link_libraries(rtcm_parser_nodelet rtcm utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
+
+add_library(tf_broadcaster_nodelet src/tf/tf_broadcaster_nodelet.cpp src/tf/tf_broadcaster.cpp)
 target_link_libraries(tf_broadcaster_nodelet utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
-add_executable(parser_cli tests/parser_cli.cpp src/impl/novatel_parser.cpp)
-target_link_libraries(parser_cli utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
+add_executable(parser_cli tests/parser_cli.cpp src/impl/parser/novatel/novatel_parser.cpp)
+target_link_libraries(parser_cli rtcm utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 add_executable(test_monitor tests/test_monitor.cpp)
 target_link_libraries(test_monitor utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 install(
-    TARGETS stream_nodelet parser_nodelet tf_broadcaster_nodelet utils test_monitor
+    TARGETS stream_nodelet parser_nodelet rtcm_parser_nodelet tf_broadcaster_nodelet utils rtcm
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

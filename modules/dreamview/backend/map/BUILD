@@ -16,6 +16,9 @@ cc_library(
         "//third_party/json",
         "@glog//:glog",
     ],
+    linkopts = [
+        "-lboost_thread",
+    ],
 )
 
 cc_test(

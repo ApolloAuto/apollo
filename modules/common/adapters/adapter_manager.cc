@@ -155,13 +155,13 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableDelphiESR(FLAGS_delphi_esr_topic, config.mode(),
                         config.message_history_limit());
         break;
+      case AdapterConfig::CONTI_RADAR:
+        EnableContiRadar(FLAGS_conti_radar_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config.mode(),
                               config.message_history_limit());
-        break;
-      case AdapterConfig::RADAR:
-        EnablePointCloud(FLAGS_radar_topic, config.mode(),
-                         config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

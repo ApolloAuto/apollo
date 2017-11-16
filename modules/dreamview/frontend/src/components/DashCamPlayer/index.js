@@ -1,7 +1,7 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 
-import Controls from "components/DashCamPlayer/Controls";
+import VideoControls from "components/DashCamPlayer/VideoControls";
 
 @inject("store") @observer
 export default class DashCamPlayer extends React.Component {
@@ -93,7 +93,7 @@ export default class DashCamPlayer extends React.Component {
 
         return (
            <div className="dashcam-player">
-                    <Controls
+                    <VideoControls
                         showSyncup={showSyncup}
                         onSyncup={this.setVideoPlayTime}
                         onClose={this.closeVideo} />

@@ -30,9 +30,9 @@
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 using apollo::hdmap::BaseMapFile;
@@ -51,10 +51,13 @@ Status Dreamview::Init() {
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
   CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetPad()) << "PadAdapter is not initialized.";
   CHECK(AdapterManager::GetPrediction())
       << "PredictionAdapter is not initialized.";
   CHECK(AdapterManager::GetPerceptionObstacles())
       << "PerceptionObstaclesAdapter is not initialized.";
+  CHECK(AdapterManager::GetTrafficLightDetection())
+      << "TrafficLightDetectionAdapter is not initialized.";
   CHECK(AdapterManager::GetRoutingRequest())
       << "RoutingRequestAdapter is not initialized.";
   CHECK(AdapterManager::GetRoutingResponse())
@@ -84,7 +87,7 @@ Status Dreamview::Init() {
   sim_world_updater_.reset(
       new SimulationWorldUpdater(websocket_.get(), sim_control_.get(),
                                  map_service_.get(), FLAGS_routing_from_file));
-  hmi_.reset(new HMI(websocket_.get()));
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addHandler("/image", *image_);

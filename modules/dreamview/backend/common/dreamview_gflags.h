@@ -39,6 +39,8 @@ DECLARE_string(websocket_timeout_ms);
 
 DECLARE_string(ssl_certificate);
 
-DECLARE_double(map_radius);
+DECLARE_double(sim_map_radius);
+
+DECLARE_bool(ignore_planning_debug_data);
 
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_

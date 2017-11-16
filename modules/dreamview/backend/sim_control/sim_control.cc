@@ -68,7 +68,8 @@ SimControl::SimControl(const MapService* map_service)
       re_routing_triggered_(false),
       enabled_(FLAGS_enable_sim_control) {}
 
-void SimControl::Init(bool set_start_point) {
+void SimControl::Init(bool set_start_point,
+    double start_velocity, double start_acceleration) {
   // Setup planning and routing result data callback.
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
   AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
@@ -86,11 +87,14 @@ void SimControl::Init(bool set_start_point) {
     }
     SetStartPoint(start_point.x(), start_point.y());
   }
+
+  start_velocity_ = start_velocity;
+  start_acceleration_ = start_acceleration;
 }
 
 void SimControl::SetStartPoint(const double x, const double y) {
-  next_point_.set_v(0.0);
-  next_point_.set_a(0.0);
+  next_point_.set_v(start_velocity_);
+  next_point_.set_a(start_acceleration_);
 
   auto* next_point = next_point_.mutable_path_point();
   next_point->set_x(x);

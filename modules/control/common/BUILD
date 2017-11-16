@@ -112,7 +112,7 @@ cc_library(
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/vehicle_state",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/proto:planning_proto",
     ],
 )

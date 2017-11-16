@@ -29,6 +29,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+using apollo::common::util::StrCat;
+
 namespace {
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
@@ -44,6 +46,19 @@ ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
       lower_bound_(lower_bound),
       upper_bound_(upper_bound) {}
 
+common::PathPoint ReferencePoint::ToPathPoint(double s) const {
+  common::PathPoint path_point;
+  path_point.set_x(x());
+  path_point.set_y(y());
+  path_point.set_z(0.0);
+  path_point.set_theta(heading());
+  path_point.set_s(s);
+  path_point.set_kappa(kappa_);
+  path_point.set_dkappa(dkappa_);
+  path_point.set_ddkappa(0.0);
+  return path_point;
+}
+
 double ReferencePoint::kappa() const { return kappa_; }
 
 double ReferencePoint::dkappa() const { return dkappa_; }
@@ -53,12 +68,15 @@ double ReferencePoint::lower_bound() const { return lower_bound_; }
 double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 std::string ReferencePoint::DebugString() const {
-  // clang-format off
-  return apollo::common::util::StrCat("{x: ", std::fixed, x(),
-         ", " "y: ", y(), ", " "theta: ", heading(), ", " "kappa: ",
-         kappa(), ", " "dkappa: ", dkappa(), ", " "upper_bound: ",
-         upper_bound(), ", " "lower_bound: ", lower_bound(), "}");
-  // clang-format on
+  // StrCat supports 9 arguments at most.
+  return StrCat(
+      StrCat("{x: ", x(), ", "
+             "y: ", y(), ", "
+             "theta: ", heading(), ", "
+             "kappa: ", kappa(), ", "),
+      StrCat("dkappa: ", dkappa(), ", "
+             "upper_bound: ", upper_bound(), ", "
+             "lower_bound: ", lower_bound(), "}"));
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {

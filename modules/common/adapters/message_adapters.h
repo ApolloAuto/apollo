@@ -27,6 +27,7 @@
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -38,7 +39,6 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-#include "modules/drivers/proto/sensor_radar.pb.h"
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
 
@@ -63,7 +63,6 @@ using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using RadarAdapter = Adapter<apollo::drivers::RadarObsArray>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
@@ -79,6 +78,7 @@ using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
+using ContiRadarAdapter = Adapter<drivers::ContiRadar>;
 using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 
 }  // namespace adapter

@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 /**
  * @file reference_line_provider.h
  *
  * @brief Declaration of the class ReferenceLineProvider.
  */
+
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
+#include <condition_variable>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <unordered_map>
 #include <vector>
+
+#include "modules/common/proto/vehicle_state.pb.h"
 
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -56,23 +63,61 @@ class ReferenceLineProvider {
   void Init(const hdmap::HDMap* hdmap_,
             const QpSplineReferenceLineSmootherConfig& smoother_config);
 
-  void UpdateRoutingResponse(const routing::RoutingResponse& routing);
+  bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
-  bool UpdateVehicleStatus(const common::PointENU& position, double speed);
+  void UpdateVehicleState(const common::VehicleState& vehicle_state);
 
   bool Start();
 
   void Stop();
 
-  bool HasReferenceLine();
-
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);
 
  private:
-  void Generate();
+  /**
+   * @brief Use PncMap to create refrence line and the corresponding segments
+   * based on routing and current position. This is a thread safe function.
+   * @return true if !reference_lines.empty() && reference_lines.size() ==
+   *                 segments.size();
+   **/
+  bool CreateReferenceLine(std::list<ReferenceLine>* reference_lines,
+                           std::list<hdmap::RouteSegments>* segments);
+
+  void GenerateThread();
   void IsValidReferenceLine();
-  bool CreateReferenceLineFromRouting();
+  void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
+  bool IsAllowChangeLane(const common::math::Vec2d& point,
+                         const std::list<hdmap::RouteSegments>& route_segments);
+
+  bool CreateRouteSegments(const common::VehicleState& vehicle_state,
+                           double look_forward_distance,
+                           double look_backward_distance,
+                           std::list<hdmap::RouteSegments>* segments);
+
+  bool IsReferenceLineSmoothValid(const ReferenceLine& raw,
+                                  const ReferenceLine& smoothed) const;
+
+  bool SmoothReferenceLine(const ReferenceLine& raw_reference_line,
+                           ReferenceLine* reference_line);
+
+  bool SmoothPrefixedReferenceLine(const ReferenceLine& prefix_ref,
+                                   const ReferenceLine& raw_ref,
+                                   ReferenceLine* reference_line);
+
+  void GetAnchorPoints(const ReferenceLine& reference_line,
+                       std::vector<AnchorPoint>* anchor_points) const;
+
+  bool SmoothRouteSegment(const hdmap::RouteSegments& segments,
+                          ReferenceLine* reference_line);
+
+  /**
+   * @brief This function creates a smoothed forward reference line
+   * based on the given segments.
+   */
+  bool ExtendReferenceLine(const common::VehicleState& state,
+                           hdmap::RouteSegments* segments,
+                           ReferenceLine* reference_line);
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
@@ -80,9 +125,11 @@ class ReferenceLineProvider {
   bool is_initialized_ = false;
   std::unique_ptr<std::thread> thread_;
 
+  std::unique_ptr<ReferenceLineSmoother> smoother_;
+
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
-  double vehicle_speed_ = 0.0;
+  common::VehicleState vehicle_state_;
 
   bool has_routing_ = false;
 
@@ -90,9 +137,17 @@ class ReferenceLineProvider {
 
   bool is_stop_ = false;
 
-  std::mutex reference_line_groups_mutex_;
-  std::list<std::vector<ReferenceLine>> reference_line_groups_;
-  std::list<std::vector<hdmap::RouteSegments>> route_segment_groups_;
+  std::mutex reference_lines_mutex__;
+  std::condition_variable cv_has_reference_line_;
+  std::list<ReferenceLine> reference_lines_;
+  std::list<hdmap::RouteSegments> route_segments_;
+
+  struct SegmentHistory {
+    double min_l = 0.0;
+    double accumulate_s = 0.0;
+    common::math::Vec2d last_point;
+  };
+  std::unordered_map<std::string, SegmentHistory> segment_history_;
 
   std::unique_ptr<Spline2dSolver> spline_solver_;
 };

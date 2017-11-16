@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.data;
+
+message RecorderConf {
+  repeated string hardware_configs = 1;
+  repeated string software_configs = 2;
+}

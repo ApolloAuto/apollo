@@ -37,4 +37,25 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "subnode_test",
+    size = "small",
+    srcs = [
+        "subnode_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/onboard:perception_onboard",
+        "@gtest//:gtest",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

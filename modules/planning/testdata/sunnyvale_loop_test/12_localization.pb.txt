@@ -1,0 +1,44 @@
+header {
+  timestamp_sec: 1509683642.6191196
+  module_name: "SimControl"
+  sequence_num: 32397
+}
+pose {
+  position {
+    x: 586916.59632482356
+    y: 4141003.4874952477
+    z: 0
+  }
+  orientation {
+    qx: 0
+    qy: 0
+    qz: 0.49797750171294242
+    qw: 0.86718994908136271
+  }
+  linear_velocity {
+    x: -4.21674216216771
+    y: 2.4608511886967883
+    z: 0
+  }
+  linear_acceleration {
+    x: 0.51808867595181651
+    y: -0.30235169356690333
+    z: 0
+  }
+  angular_velocity {
+    x: 0
+    y: 0
+    z: -0.252241917640758
+  }
+  heading: 2.6133262586660049
+  linear_acceleration_vrf {
+    x: 0
+    y: -0.599860336038549
+    z: 0
+  }
+  angular_velocity_vrf {
+    x: 0
+    y: 0
+    z: -0.252241917640758
+  }
+}
