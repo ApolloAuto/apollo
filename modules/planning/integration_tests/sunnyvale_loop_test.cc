@@ -150,6 +150,23 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_enable_traffic_light = false;
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test right turn, but stop before trafic light
+ * A right turn test case
+ * A traffic light test case
+ */
+TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
+  std::string seq_num = "8";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }

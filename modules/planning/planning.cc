@@ -68,15 +68,6 @@ Status Planning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-bool Planning::HasSignalLight(const PlanningConfig& config) {
-  for (const auto& rule_config : config.rule_config()) {
-    if (rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
-      return true;
-    }
-  }
-  return false;
-}
-
 Status Planning::Init() {
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
@@ -112,7 +103,7 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (HasSignalLight(config_) &&
+  if (FLAGS_enable_traffic_light &&
       AdapterManager::GetTrafficLightDetection() == nullptr) {
     std::string error_msg("Traffic Light Detection is not registered");
     AERROR << error_msg;
@@ -145,9 +136,10 @@ bool Planning::IsVehicleStateValid(
 }
 
 Status Planning::Start() {
-  ReferenceLineProvider::instance()->Start();
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
+  ReferenceLineProvider::instance()->Start();
+  AINFO << "Planning started";
   return Status::OK();
 }
 
@@ -321,7 +313,6 @@ common::Status Planning::Plan(
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
   ptr_debug->MergeFrom(best_reference_line->debug());
   trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());

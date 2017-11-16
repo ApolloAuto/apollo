@@ -96,6 +96,16 @@ class ReferenceLine {
   bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
 
   /**
+   * @brief Check if a box is blocking the road surface. The crieria is to check
+   * whether the remaining space on the road surface is larger than the provided
+   * gap space.
+   * @param boxed the provided box
+   * @param gap check the gap of the space
+   * @return true if the box blocks the road.
+   */
+  bool IsBlockRoad(const common::math::Box2d& box2d, double gap) const;
+
+  /**
    * @brief check if any part of the box has overlap with the road.
    */
   bool HasOverlap(const common::math::Box2d& box) const;

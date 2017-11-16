@@ -161,6 +161,8 @@ DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 3.0,
               "stop distance from destination line");
+DEFINE_double(stop_distance_traffic_light, 0.5,
+              "stop distance from destination line");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
@@ -236,6 +238,7 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer
 DEFINE_bool(enable_slowdown_profile_generator, true,

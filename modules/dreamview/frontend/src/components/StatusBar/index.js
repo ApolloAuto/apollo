@@ -10,7 +10,7 @@ import Wheel from "components/StatusBar/Wheel";
 @observer
 export default class StatusBar extends React.Component {
     render() {
-        const { meters, showNotification, monitor } = this.props;
+        const { meters, trafficSignal, showNotification, monitor } = this.props;
 
         return (
             <div className="status-bar">
@@ -18,9 +18,11 @@ export default class StatusBar extends React.Component {
                 <AutoMeter throttlePercent={meters.throttlePercent}
                            brakePercent={meters.brakePercent}
                            speed={meters.speed} />
-                <Wheel steeringAngle={meters.steeringAngle}
+                <Wheel steeringPercentage={meters.steeringPercentage}
+                       steeringAngle={meters.steeringAngle}
                        turnSignal={meters.turnSignal} />
                 <TrafficLightIndicator
+                       trafficLightColor={trafficSignal.color}
                        drivingMode={meters.drivingMode}
                        isAutoMode={meters.isAutoMode}/>
             </div>

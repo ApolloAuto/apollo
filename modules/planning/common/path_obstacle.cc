@@ -76,11 +76,18 @@ bool PathObstacle::Init(const ReferenceLine& reference_line,
 
 void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
                                    const double adc_start_s) {
+  const auto& adc_param =
+      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const double adc_width = adc_param.width();
   if (obstacle_->IsStatic() ||
       obstacle_->Trajectory().trajectory_point().empty()) {
     std::vector<std::pair<STPoint, STPoint>> point_pairs;
     if (perception_sl_boundary_.end_s() - perception_sl_boundary_.start_s() <
         kStBoundaryDeltaS) {
+      return;
+    }
+    if (!reference_line.IsBlockRoad(obstacle_->PerceptionBoundingBox(),
+                                    adc_width)) {
       return;
     }
     point_pairs.emplace_back(
@@ -235,10 +242,10 @@ ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  const auto lhs_val = FindOrDie(s_longitudinal_decision_safety_sorter_,
-                                 lhs.object_tag_case());
-  const auto rhs_val = FindOrDie(s_longitudinal_decision_safety_sorter_,
-                                 rhs.object_tag_case());
+  const auto lhs_val =
+      FindOrDie(s_longitudinal_decision_safety_sorter_, lhs.object_tag_case());
+  const auto rhs_val =
+      FindOrDie(s_longitudinal_decision_safety_sorter_, rhs.object_tag_case());
   if (lhs_val < rhs_val) {
     return rhs;
   } else if (lhs_val > rhs_val) {
@@ -290,10 +297,10 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  const auto lhs_val = FindOrDie(s_lateral_decision_safety_sorter_,
-                                 lhs.object_tag_case());
-  const auto rhs_val = FindOrDie(s_lateral_decision_safety_sorter_,
-                                 rhs.object_tag_case());
+  const auto lhs_val =
+      FindOrDie(s_lateral_decision_safety_sorter_, lhs.object_tag_case());
+  const auto rhs_val =
+      FindOrDie(s_lateral_decision_safety_sorter_, rhs.object_tag_case());
   if (lhs_val < rhs_val) {
     return rhs;
   } else if (lhs_val > rhs_val) {

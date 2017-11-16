@@ -42,6 +42,7 @@ apollo::common::Status SpeedOptimizer::Execute(
   auto ret = Process(
       reference_line_info->AdcSlBoundary(), reference_line_info->path_data(),
       frame->PlanningStartPoint(), reference_line_info->reference_line(),
+      *reference_line_info->mutable_speed_data(),
       reference_line_info->path_decision(),
       reference_line_info->mutable_speed_data());
 
