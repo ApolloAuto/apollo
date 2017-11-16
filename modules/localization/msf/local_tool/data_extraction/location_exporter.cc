@@ -23,9 +23,9 @@ namespace localization {
 namespace msf {
 
 LocationExporter::LocationExporter(const std::string &loc_file_folder) {
-  gnss_loc_file_ = loc_file_folder + "gnss_loc.txt";
-  lidar_loc_file_ = loc_file_folder + "lidar_loc.txt";
-  fusion_loc_file_ = loc_file_folder + "fusion_loc.txt";
+  gnss_loc_file_ = loc_file_folder + "/gnss_loc.txt";
+  lidar_loc_file_ = loc_file_folder + "/lidar_loc.txt";
+  fusion_loc_file_ = loc_file_folder + "/fusion_loc.txt";
 
   if ((gnss_loc_file_handle_ = fopen(gnss_loc_file_.c_str(), "a")) == NULL) {
     std::cerr << "Cannot open gnss localization file!" << std::endl;

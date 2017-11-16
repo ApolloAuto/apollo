@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
   LosslessMap map(conf);
   LosslessMapConfig& loss_less_config =
       static_cast<LosslessMapConfig&>(map.GetConfig());
-  std::string map_folder_path = map_base_folder + "/map";
+  std::string map_folder_path = map_base_folder + "/lossless_map";
   if (!system::IsExists(map_folder_path)) {
     system::CreateDirectory(map_folder_path);
   }
@@ -201,10 +201,10 @@ int main(int argc, char** argv) {
 
   // Output Config file
   char file_buf[1024];
-  snprintf(file_buf, 1024, "%s/map/config.xml", map_base_folder.c_str());
+  snprintf(file_buf, 1024, "%s/lossless_map/config.xml", map_base_folder.c_str());
   loss_less_config.Save(file_buf);
 
-  snprintf(file_buf, 1024, "%s/map/config.txt", map_base_folder.c_str());
+  snprintf(file_buf, 1024, "%s/lossless_map/config.txt", map_base_folder.c_str());
   FILE* file = fopen(file_buf, "a");
 
   if (file) {
@@ -246,7 +246,7 @@ int main(int argc, char** argv) {
     fclose(file);
   } else {
     std::cerr << "Can't open file: "
-              << "./map/config.txt" << std::endl;
+              << "./lossless_map/config.txt" << std::endl;
   }
 
   LosslessMapNodePool lossless_map_node_pool(25, 8);

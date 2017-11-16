@@ -26,21 +26,24 @@ int main(int argc, char **argv) {
   boost::program_options::options_description boost_desc("Allowed options");
   boost_desc.add_options()("help", "produce help message")(
       "bag_file", boost::program_options::value<std::string>(),
-      "provide the output folder")("out_folder",
-                                   boost::program_options::value<std::string>(),
-                                   "provide the output folder")(
+      "provide the bag file")("out_folder",
+                              boost::program_options::value<std::string>(),
+                              "provide the output folder")(
       "cloud_topic",
       boost::program_options::value<std::string>()->default_value(
           "/apollo/sensor/velodyne64/compensator/PointCloud2"),
       "provide point cloud2 topic")(
       "gnss_loc_topic",
-      boost::program_options::value<std::string>()->default_value(""),
+      boost::program_options::value<std::string>()->default_value(
+          "/apollo/localization/measure_gnss"),
       "provide gnss localization topic")(
       "lidar_loc_topic",
-      boost::program_options::value<std::string>()->default_value(""),
+      boost::program_options::value<std::string>()->default_value(
+          "/apollo/localization/measure_lidar"),
       "provide lidar localization topic")(
       "fusion_loc_topic",
-      boost::program_options::value<std::string>()->default_value(""),
+      boost::program_options::value<std::string>()->default_value(
+          "/apollo/localization/pose"),
       "provide fusion localization topic");
 
   boost::program_options::variables_map boost_args;
@@ -58,6 +61,9 @@ int main(int argc, char **argv) {
   const std::string bag_file = boost_args["bag_file"].as<std::string>();
   const std::string pcd_folder =
       boost_args["out_folder"].as<std::string>() + "/pcd";
+  if (!boost::filesystem::exists(pcd_folder)) {
+    boost::filesystem::create_directory(pcd_folder);
+  }
 
   const std::string cloud_topic = boost_args["cloud_topic"].as<std::string>();
   const std::string gnss_loc_topic =

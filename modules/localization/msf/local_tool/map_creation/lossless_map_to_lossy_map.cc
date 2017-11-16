@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
   }
 
   // create lossy map
-  std::string dst_map_folder = dst_path + "/lossy_single_map/";
+  std::string dst_map_folder = dst_path + "/lossy_map/";
   if (!boost::filesystem::exists(dst_map_folder)) {
     boost::filesystem::create_directory(dst_map_folder);
   }
