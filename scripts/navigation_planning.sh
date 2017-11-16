@@ -26,13 +26,11 @@ source "${DIR}/apollo_base.sh"
 function start() {
 	echo "start"
 	python modules/tools/planning_lite/planning_lite.py &
-	python modules/tools/mobileye_viewer/plot_mobileye.py
 }
 
 function stop() {
     echo "stop"
-    pkill -f planning_lite.py 
-    pkill -f plot_mobileye.py
+    pkill -f planning_lite.py
 }
 
 case $1 in                                                                                          
