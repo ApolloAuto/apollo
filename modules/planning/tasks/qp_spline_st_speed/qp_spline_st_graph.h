@@ -50,17 +50,18 @@ class QpSplineStGraph {
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 
   common::Status Search(const StGraphData& st_graph_data,
-                        SpeedData* const speed_data,
-                        const std::pair<double, double>& accel_bound);
+                        const std::pair<double, double>& accel_bound,
+                        const SpeedData& reference_speed_data,
+                        SpeedData* const speed_data);
 
  private:
   void Init();
 
   // Add st graph constraint
-  common::Status AddConstraint(
-      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      const std::vector<const StBoundary*>& boundaries,
-      const std::pair<double, double>& accel_bound);
+  common::Status AddConstraint(const common::TrajectoryPoint& init_point,
+                               const SpeedLimit& speed_limit,
+                               const std::vector<const StBoundary*>& boundaries,
+                               const std::pair<double, double>& accel_bound);
 
   // Add objective function
   common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,
@@ -87,6 +88,8 @@ class QpSplineStGraph {
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
       std::vector<double>* speed_upper_bound) const;
 
+  bool AddDpStReferenceKernel(const double weight) const;
+
  private:
   // solver
   Spline1dGenerator* spline_generator_ = nullptr;
@@ -111,6 +114,9 @@ class QpSplineStGraph {
 
   // reference line kernel
   std::vector<double> cruise_;
+
+  // reference st points from dp optimizer
+  std::vector<common::SpeedPoint> reference_dp_speed_points_;
 
   planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
 };
