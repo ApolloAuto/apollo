@@ -4,6 +4,7 @@ import SplitPane from 'react-split-pane';
 
 import DashCamPlayer from "components/DashCamPlayer";
 import ModuleController from "components/ModuleController";
+import Navigation from "components/Navigation";
 import PNCMonitor from "components/PNCMonitor";
 import RouteEditingBar from "components/RouteEditingBar";
 import QuickStarter from "components/QuickStarter";
@@ -85,8 +86,16 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { isInitialized, dimension, sceneDimension, options } = this.props.store;
+        const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
 
+        let mainView = null;
+        if (hmi.showNavigationMap) {
+            mainView = <Navigation height={sceneDimension.height}/>;
+        } else if (!isInitialized) {
+            mainView = <Loader height={sceneDimension.height}/>;
+        } else {
+            mainView = <MainView />;
+        }
         return (
             <div>
                 <Header />
@@ -98,8 +107,7 @@ export default class Dreamview extends React.Component {
                         <div className="left-pane">
                             <SideBar />
                             <div className="dreamview-body">
-                                {isInitialized
-                                    ? <MainView /> : <Loader height={sceneDimension.height}/> }
+                                {mainView}
                                 <Tools />
                             </div>
                         </div>

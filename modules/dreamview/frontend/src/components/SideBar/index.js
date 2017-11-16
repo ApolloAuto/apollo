@@ -7,11 +7,11 @@ import WS from "store/websocket";
 @inject("store") @observer
 export default class SideBar extends React.Component {
     render() {
-        const { isInitialized, options, routeEditingManager, video } = this.props.store;
+        const { isInitialized, options, routeEditingManager, video, hmi } = this.props.store;
 
         return (
             <div className="side-bar">
-                <ButtonPanel initialized={isInitialized}
+                <ButtonPanel enableHMIButtonsOnly={!isInitialized || hmi.showNavigationMap}
                              onQuickStarter={() => {
                                 this.props.store.handleSideBarClick('showQuickStarter');
                              }}
