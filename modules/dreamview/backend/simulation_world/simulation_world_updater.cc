@@ -108,12 +108,18 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           return;
         }
 
+        bool requestPlanning = false;
+        if (json.find("planning") != json.end()) {
+          requestPlanning = json["planning"];
+        }
+
         std::string to_send;
         {
           // Pay the price to copy the data instead of sending data over the
           // wire while holding the lock.
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          to_send = simulation_world_json_;
+          to_send = requestPlanning ? simulation_world_with_planning_json_
+                                    : simulation_world_json_;
         }
         websocket_->SendData(conn, to_send, true);
       });
@@ -212,8 +218,9 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
 void SimulationWorldUpdater::Start() {
   // start ROS timer, one-shot = false, auto-start = true
-  timer_ = AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
-                                       &SimulationWorldUpdater::OnTimer, this);
+  timer_ =
+      AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
+                                  &SimulationWorldUpdater::OnTimer, this);
 }
 
 void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
@@ -221,9 +228,12 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    Json simulation_world =
+        sim_world_service_.GetUpdateAsJson(FLAGS_sim_map_radius);
+    simulation_world_json_ = simulation_world.dump();
 
-    simulation_world_json_ =
-        sim_world_service_.GetUpdateAsJson(FLAGS_sim_map_radius).dump();
+    simulation_world["planningData"] = sim_world_service_.GetPlanningData();
+    simulation_world_with_planning_json_ = simulation_world.dump();
   }
 }
 

@@ -15,11 +15,10 @@ message HardwareStatus {
     // HW error, can't be used.
     ERR = 3;
 
-    // For internal use only.
     UNDEF = -1;
   }
 
-  optional Status status = 1;
+  optional Status status = 1 [default = UNDEF];
 
   // Additional message for current status.
   optional string msg = 2;

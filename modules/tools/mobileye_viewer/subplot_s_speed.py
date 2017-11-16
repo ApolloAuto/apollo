@@ -27,9 +27,9 @@ class SubplotSSpeed:
 
 
     def show(self, planning_data):
-            planning_data.path_param_lock.acquire()
-            self.s_speed_line.set_xdata(planning_data.s)
-            self.s_speed_line.set_ydata(planning_data.speed)
-            planning_data.path_param_lock.release()
+        planning_data.path_param_lock.acquire()
+        self.s_speed_line.set_xdata(planning_data.s)
+        self.s_speed_line.set_ydata(planning_data.speed)
+        planning_data.path_param_lock.release()
 
 

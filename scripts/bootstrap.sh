@@ -31,9 +31,6 @@ function start() {
     ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
     nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
 
-    # Start system monitor
-    bash scripts/monitor.sh
-
     # Start Dreamview
     bash scripts/dreamview.sh
     echo "Dreamview is running at http://localhost:8888"
@@ -41,7 +38,6 @@ function start() {
 
 function stop() {
     bash scripts/dreamview.sh stop
-    bash scripts/monitor.sh stop
     pkill -f roscore
 }
 

@@ -5,6 +5,7 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     context: path.join(__dirname, "src"),
@@ -157,7 +158,14 @@ module.exports = {
             // Include only the app. Do not include the service worker.
             chunks: ["app"]
         }),
-        new FaviconsWebpackPlugin("./favicon.png")
+        new FaviconsWebpackPlugin("./favicon.png"),
+        new CopyWebpackPlugin([
+            {
+                from: 'components/Navigation/navigation_viewer.html',
+                to:  'components/Navigation/navigation_viewer.html',
+                toType: 'file',
+            },
+        ]),
     ],
 
     devServer: {

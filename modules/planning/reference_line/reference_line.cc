@@ -128,12 +128,12 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
   const auto& accumulated_s = map_path_.accumulated_s();
   size_t start_index = 0;
   if (sl.s() > look_backward) {
-    auto it_lower =
-        std::lower_bound(accumulated_s.begin(), accumulated_s.end(), sl.s());
+    auto it_lower = std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
+                                     sl.s() - look_backward);
     start_index = std::distance(accumulated_s.begin(), it_lower);
   }
   size_t end_index = reference_points_.size();
-  if (sl.s() + look_forward > Length()) {
+  if (sl.s() + look_forward < Length()) {
     auto start_it = accumulated_s.begin();
     std::advance(start_it, start_index);
     auto it_higher =
@@ -144,6 +144,10 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
                           reference_points_.end());
   reference_points_.erase(reference_points_.begin(),
                           reference_points_.begin() + start_index);
+  if (reference_points_.size() < 2) {
+    AERROR << "Too few reference points after shrinking.";
+    return false;
+  }
   map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
       reference_points_.begin(), reference_points_.end()));
   return true;
@@ -349,6 +353,11 @@ bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
     return false;
   }
   return IsOnRoad(sl_point);
+}
+
+bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
+                                double gap) const {
+  return map_path_.OverlapWith(box2d, gap);
 }
 
 bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {

@@ -43,6 +43,7 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
                                  const PathData& path_data,
                                  const common::TrajectoryPoint& init_point,
                                  const ReferenceLine& reference_line,
+                                 const SpeedData& reference_speed_data,
                                  PathDecision* const path_decision,
                                  SpeedData* const speed_data) override;
   DpStSpeedConfig dp_st_speed_config_;

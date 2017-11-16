@@ -45,7 +45,10 @@ void CanMonitor::RunOnce(const double current_time) {
   can_chk_factory->RegisterCanCheckers();
   auto can_chk =
       can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());
-  CHECK(can_chk);
+
+  if (can_chk == nullptr) {
+    return;
+  }
 
   std::vector<HwCheckResult> can_rslt;
   can_chk->run_check(&can_rslt);
