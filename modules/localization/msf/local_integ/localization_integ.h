@@ -93,6 +93,8 @@ struct LocalizationIntegParam {
   LocalizationIntegParam() {
     is_using_raw_gnsspos = true;
     is_use_visualize = false;
+    lidar_filter_size = 11;
+    lidar_thread_num = 2;
   }
 
   // integration module
@@ -109,6 +111,7 @@ struct LocalizationIntegParam {
   bool enable_auto_save_eph_file;
   std::string eph_buffer_path;
   ImuToAntOffset imu_to_ant_offset;
+  bool gnss_debug_log_flag;
 
   // lidar module
   std::string map_path;
@@ -116,6 +119,8 @@ struct LocalizationIntegParam {
   std::string lidar_height_file;
   bool lidar_debug_log_flag;
   int localization_mode;
+  int lidar_filter_size;
+  int lidar_thread_num;
   double map_coverage_theshold;
   double imu_lidar_max_delay_time;
 
@@ -185,4 +190,4 @@ class LocalizationInteg {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
+#endif // MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_

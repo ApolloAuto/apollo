@@ -163,6 +163,8 @@ Status MSFLocalization::Init() {
       common::util::TranslatePath(FLAGS_lidar_height_file);
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
+  localizaiton_param_.lidar_filter_size = FLAGS_lidar_filter_size;
+  localizaiton_param_.lidar_thread_num = FLAGS_lidar_thread_num;
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;
   localizaiton_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
 
@@ -259,7 +261,7 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
   IntegMeasure lidar_measure;
   localization_integ_.GetLidarMeasure(state, lidar_measure);
 
-  if (state == LocalizaitonMeasureState::OK) {
+  if (state == LocalizaitonMeasureState::OK && FLAGS_lidar_debug_log_flag) {
     // publish lidar message to debug
     AdapterManager::PublishIntegMeasureLidar(lidar_measure);
   }
@@ -276,16 +278,20 @@ void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
   LocalizationEstimate integ_localization;
   localization_integ_.GetIntegMeasure(state, sins_pva, integ_localization);
 
-  if (state != LocalizaitonMeasureState::NOT_VALID) {
-    // publish sins_pva for debug
-    AdapterManager::PublishIntegSinsPva(sins_pva);
-  }
-
   if (state == LocalizaitonMeasureState::OK) {
-    AdapterManager::PublishLocalization(integ_localization);
     PublishPoseBroadcastTF(integ_localization);
   }
 
+  if (FLAGS_integ_debug_log_flag) {
+    if (state != LocalizaitonMeasureState::NOT_VALID) {
+      // publish sins_pva for debug
+      AdapterManager::PublishIntegSinsPva(sins_pva);
+    }
+    
+    if (state == LocalizaitonMeasureState::OK) {
+      AdapterManager::PublishLocalization(integ_localization);
+    }
+  }
   return;
 }
 
@@ -307,14 +313,19 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
   LocalizationEstimate integ_localization;
   localization_integ_.GetIntegMeasure(state, sins_pva, integ_localization);
 
-  if (state != LocalizaitonMeasureState::NOT_VALID) {
-    // publish sins_pva for debug
-    AdapterManager::PublishIntegSinsPva(sins_pva);
+  if (state == LocalizaitonMeasureState::OK) {
+    PublishPoseBroadcastTF(integ_localization);
   }
 
-  if (state == LocalizaitonMeasureState::OK) {
-    AdapterManager::PublishLocalization(integ_localization);
-    PublishPoseBroadcastTF(integ_localization);
+  if (FLAGS_integ_debug_log_flag) {
+    if (state != LocalizaitonMeasureState::NOT_VALID) {
+      // publish sins_pva for debug
+      AdapterManager::PublishIntegSinsPva(sins_pva);
+    }
+    
+    if (state == LocalizaitonMeasureState::OK) {
+      AdapterManager::PublishLocalization(integ_localization);
+    }
   }
   return;
 }
@@ -322,17 +333,25 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
   localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);
 
+  if (FLAGS_gnss_debug_log_flag) {
+    LocalizaitonMeasureState state;
+    IntegMeasure measure;
+    localization_integ_.GetGnssMeasure(state, measure);
+    AdapterManager::PublishIntegMeasureGnss(measure);
+  }
+
   return;
 }
 
 void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
   localization_integ_.RawObservationProcess(raw_obs_msg);
 
-  LocalizaitonMeasureState state;
-  IntegMeasure measure;
-  localization_integ_.GetGnssMeasure(state, measure);
-
-  AdapterManager::PublishIntegMeasureGnss(measure);
+  if (FLAGS_gnss_debug_log_flag) {
+    LocalizaitonMeasureState state;
+    IntegMeasure measure;
+    localization_integ_.GetGnssMeasure(state, measure);
+    AdapterManager::PublishIntegMeasureGnss(measure);
+  }
 
   return;
 }

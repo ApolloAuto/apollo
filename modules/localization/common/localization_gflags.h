@@ -54,6 +54,8 @@ DECLARE_string(local_map_name);
 DECLARE_string(velodyne_extrinsics_path);
 DECLARE_string(lidar_height_file);
 DECLARE_int32(lidar_localization_mode);
+DECLARE_int32(lidar_filter_size);
+DECLARE_int32(lidar_thread_num);
 DECLARE_double(lidar_imu_max_delay_time);
 DECLARE_double(lidar_map_coverage_theshold);
 DECLARE_bool(lidar_debug_log_flag);
@@ -72,6 +74,7 @@ DECLARE_bool(enable_ins_aid_rtk);
 DECLARE_bool(enable_auto_save_eph_file);
 DECLARE_string(eph_buffer_path);
 DECLARE_string(gnss_conf_path);
+DECLARE_bool(gnss_debug_log_flag);
 
 DECLARE_double(imu_rate);
 DECLARE_int32(local_utm_zone_id);

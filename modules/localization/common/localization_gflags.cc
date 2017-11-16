@@ -83,6 +83,8 @@ DEFINE_string(lidar_height_file,
 DEFINE_int32(
     lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
+DEFINE_int32(lidar_filter_size, 11, "Lidar filter size");
+DEFINE_int32(lidar_thread_num, 2, "Lidar thread number");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
               "Lidar msg and imu msg max delay time");
 DEFINE_double(lidar_map_coverage_theshold, 0.9,
@@ -103,6 +105,7 @@ DEFINE_string(broadcast_tf2_child_frame_id, "localization_100hz",
 DEFINE_bool(enable_ins_aid_rtk, false, "");
 DEFINE_bool(enable_auto_save_eph_file, true, "");
 DEFINE_string(eph_buffer_path, "", "");
+DEFINE_bool(gnss_debug_log_flag, false, "Gnss Debug switch.");
 
 DEFINE_double(imu_rate, 1.0, "");
 DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
