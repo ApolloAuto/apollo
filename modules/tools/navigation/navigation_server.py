@@ -281,11 +281,16 @@ def run_flask():
 
 
 if __name__ == "__main__":
-    f = open(os.path.dirname(os.path.abspath(__file__)) +
-             "/navigation_server_key", 'r')
-    for line in f:
-        API_KEY = line.replace('\n', "")
-    f.close()
+    key_file_name = os.path.dirname(os.path.abspath(__file__)) + \
+                "/map_api_key/api_key"
+    try:
+        f = open(key_file_name, 'r')
+        with f:
+            for line in f:
+                API_KEY = line.replace('\n', "")
+                break
+    except IOError:
+        print "Could not read file:", key_file_name
 
     add_listener()
     thread.start_new_thread(run_flask, ())
