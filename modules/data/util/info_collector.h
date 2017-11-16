@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
-#define MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
+#ifndef MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+#define MODULES_DATA_UTIL_INFO_COLLECTOR_H_
 
 #include "modules/data/proto/recorder_conf.pb.h"
 #include "modules/data/proto/task.pb.h"
@@ -54,4 +54,4 @@ class InfoCollector {
 }  // namespace data
 }  // namespace apollo
 
-#endif  // MODULES_DATA_RECORDER_INFO_COLLECTOR_H_
+#endif  // MODULES_DATA_UTIL_INFO_COLLECTOR_H_
