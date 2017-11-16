@@ -3,8 +3,8 @@
 // @file: image.h
 // @brief: Image Class
 
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
 
 #include <gflags/gflags.h>
 #include <string>
@@ -95,4 +95,4 @@ typedef std::shared_ptr<Image> ImageSharedPtr;
 }// namespace perception
 }// namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H

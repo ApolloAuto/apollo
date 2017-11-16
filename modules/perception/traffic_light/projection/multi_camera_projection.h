@@ -5,8 +5,8 @@
 // @brief Project a traffic_light onto image.
 //        We were told traffic_light's location & we have known our location, 
 //        and then we mark the traffic_light region on the image.
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
 
 #include <memory>
 #include <vector>
@@ -44,4 +44,4 @@ class MultiCamerasProjection {
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H

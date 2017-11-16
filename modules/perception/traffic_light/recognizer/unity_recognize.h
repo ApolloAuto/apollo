@@ -2,8 +2,8 @@
 // Created by gaohan02 on 16-9-20.
 //
 
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"

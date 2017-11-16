@@ -3,8 +3,8 @@
 // @date 2016/09/08 17:32:56
 // @file: base_projection.h
 // @brief: the interface for mark a traffic light region on the image.
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/pose.h"
@@ -109,5 +109,5 @@ bool load_matrix4d_from_file(const std::string &file_name, const std::string &ke
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 

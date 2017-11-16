@@ -3,8 +3,8 @@
 // @date 2016/12/14 13:15:14
 // @file traffic_light/onboard/image_lights.h
 // @brief Struct Compine image & lights.
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
 
 #include <vector>
 #include <memory>
@@ -39,4 +39,4 @@ struct ImageLights {
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H

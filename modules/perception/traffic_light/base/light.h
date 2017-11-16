@@ -3,8 +3,8 @@
 // @file: light.h
 // @brief: traffic light basic data struction definition.
 
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
 
 #include <eigen3/Eigen/Core>
 #include <opencv2/opencv.hpp>
@@ -121,4 +121,4 @@ double trafficlight_distance(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H

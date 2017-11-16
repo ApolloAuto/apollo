@@ -18,6 +18,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/perception/traffic_light/base:perception_traffic_light_base",
         "//modules/perception/traffic_light/util:perception_traffic_light_util",
+        "@gtest//:gtest",
     ],
 )
 

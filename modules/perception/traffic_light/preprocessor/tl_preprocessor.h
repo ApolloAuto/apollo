@@ -5,8 +5,8 @@
 // @brief: tl_preprocessor is to cache lights projections info. with images from different cameras
 // 
 
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
 
 #include <memory>
 #include <vector>
@@ -146,4 +146,4 @@ class TLPreprocessor : public BasePreprocessor {
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H

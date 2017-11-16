@@ -2,8 +2,8 @@
 // Created by gaohan02 on 17-5-23.
 //
 
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
 
 #include "modules/perception/traffic_light/interface/green_interface.h"
 

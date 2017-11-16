@@ -2,8 +2,8 @@
 // Created by gaohan02 on 16-9-13.
 //
 
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"

@@ -1,8 +1,8 @@
 // Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
 // @author Ruidong Tang (tangruidong@baidu.com)
 // @file: output_subnode.h
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
 
 #include <map>
 #include <string>
@@ -54,4 +54,4 @@ class TLOutputSubnode : public Subnode {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H

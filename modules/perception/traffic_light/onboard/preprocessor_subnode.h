@@ -4,8 +4,8 @@
 // @file: preprocessor_subnode.h
 // @brief: preprocessor_subnode is to sync 2-ways image &
 //         push them down-stream.
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
 
 #include <memory>
 #include <vector>
@@ -123,4 +123,4 @@ REGISTER_SUBNODE(TLPreprocessorSubnode);
 } // namespace perception
 } // namespace adu
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H

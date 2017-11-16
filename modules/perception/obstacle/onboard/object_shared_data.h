@@ -1,5 +1,5 @@
-#ifndef ADU_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
-#define ADU_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
 
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/onboard/common_shared_data.h"
@@ -28,4 +28,4 @@ REGISTER_SHAREDDATA(RadarObjectData);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H

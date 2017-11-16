@@ -3,8 +3,8 @@
 // @file:base_reviser.h
 // @brief: the interface for revise the traffic light's perception result.
 //
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
 #include <string>
 #include <vector>
 
@@ -52,6 +52,6 @@ REGISTER_REGISTERER(BaseReviser);
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
 
 // @date 2016/09/07 17:41:16

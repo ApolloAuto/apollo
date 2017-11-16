@@ -3,8 +3,8 @@
 // @file: pose.h
 // @brief: the data-structure for Car's pose(translation & rotation).
 //
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
 
 #include <eigen3/Eigen/Core>
 
@@ -35,5 +35,5 @@ std::ostream &operator<<(std::ostream &os, const CarPose &pose);
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
 // @date 2016/09/08 17:48:06

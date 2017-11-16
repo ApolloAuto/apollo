@@ -4,8 +4,8 @@
 // @file: preprocessor_data is the share data 
 //        from PreprocessorSubnode to DetectorSubnode
 //
-#ifndef ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
-#define ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 
 #include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
@@ -40,5 +40,5 @@ REGISTER_SHAREDDATA(TLPreprocessingData);
 } // namespace perception
 } // namespace apollo
 
-#endif  // ADU_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 
