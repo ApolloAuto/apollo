@@ -43,7 +43,7 @@ class WebSocketEndpoint {
                     RENDERER.maybeInitializeOffest(
                         message.world.autoDrivingCar.positionX,
                         message.world.autoDrivingCar.positionY);
-                    RENDERER.updateWorld(message.world);
+                    RENDERER.updateWorld(message.world, message.planningData);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
                     STORE.trafficSignal.update(message.world);
