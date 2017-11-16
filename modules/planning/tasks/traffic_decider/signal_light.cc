@@ -184,7 +184,7 @@ void SignalLight::CreateStopObstacle(
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   ObjectDecisionType stop;
   stop.mutable_stop();
-  stop.mutable_stop()->set_distance_s(0.0);
+  stop.mutable_stop()->set_distance_s(-FLAGS_stop_distance_traffic_light);
   stop.mutable_stop()->set_stop_heading(heading);
   stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
   stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
