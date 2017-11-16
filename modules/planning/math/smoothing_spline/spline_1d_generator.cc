@@ -213,6 +213,7 @@ bool Spline1dGenerator::Solve() {
   MatrixXd solved_params = MatrixXd::Zero(num_param, 1);
   for (int i = 0; i < num_param; ++i) {
     solved_params(i, 0) = result[i];
+    ADEBUG << "spline 1d solved param[" << i << "]: " << result[i];
   }
 
   last_num_param_ = num_param;
