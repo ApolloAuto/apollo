@@ -45,8 +45,9 @@ class FrameContent {
 
   bool HasCloud();
 
-  void SetTrackedObjects(const std::vector<ObjectPtr> &objects);
-
+  void SetTrackedObjectsLidar(const std::vector<ObjectPtr> &objects);
+  void SetTrackedObjectsRadar(const std::vector<ObjectPtr> &objects);
+  void SetTrackedObjectsFused(const std::vector<ObjectPtr> &objects);
   std::vector<ObjectPtr> GetTrackedObjects();
 
  protected:
@@ -67,6 +68,8 @@ class FrameContent {
   Eigen::Vector3d global_offset_;
   bool global_offset_initialized_;
   std::vector<ObjectPtr> tracked_objects_lidar_;  // after tracking
+  std::vector<ObjectPtr> tracked_objects_radar_;  // after tracking
+  std::vector<ObjectPtr> tracked_objects_fused_;  // after tracking
 };
 
 }  // namespace perception
