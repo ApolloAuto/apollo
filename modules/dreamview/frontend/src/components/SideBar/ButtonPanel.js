@@ -55,7 +55,7 @@ class DashCamButton extends React.Component {
 
 export default class ButtonPanel extends React.Component {
     render() {
-        const { initialized,
+        const { enableHMIButtonsOnly,
                 onQuickStarter, showQuickStarter,
                 onModuleController, showModuleController,
                 onMenu, showMenu,
@@ -76,34 +76,34 @@ export default class ButtonPanel extends React.Component {
                                onClick={onModuleController}
                                active={showModuleController}/>
                 <SideBarButton label="Layer Menu"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={onMenu}
                                active={showMenu} />
                 <SideBarButton label="Route Editing"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={onRouteEditingBar}
                                active={showRouteEditingBar} />
                 <SideBarButton label="Default Routing"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={onPOI}
                                active={showPOI} />
                 <SideBarButton label="PNC Monitor"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={onPNCMonitor}
                                active={showPNCMonitor} />
                 <SideBarButton label="Notifications"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={onConsole}
                                active={showConsole} />
                 <SideBarButton label="Reset Backend Data"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={resetBackend}
                                active={false} />
                 <SideBarButton label="Dump Messages"
-                               disabled={!initialized}
+                               disabled={enableHMIButtonsOnly}
                                onClick={dumpMessages}
                                active={false} />
-                <DashCamButton disabled={!initialized}
+                <DashCamButton disabled={enableHMIButtonsOnly}
                                onClick={onVideo}/>
             </div>
         );
