@@ -87,7 +87,7 @@ class Planning : public apollo::common::ApolloApp {
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point);
 
-  bool IsVehicleStateValid(const common::VehicleStateProvider& vehicle_state);
+  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
 
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 
