@@ -1,0 +1,50 @@
+package apollo.data.data_recorder;
+
+message RecorderInfo {
+  optional uint32 status = 1;
+  optional Task task = 2;
+  optional Disk writing_disk = 3;
+  optional Data data = 4;
+  optional Resources resources = 5;
+}
+
+enum StatusType {
+  DATA_RECORDER_INIT = 0x00;
+  DATA_RECORDER_RUNNING = 0x01;
+  DATA_RECORD_ENABLE = 0x02;
+  DATA_SYNC_ENABLE = 0x04;
+  DISK_SPACE_WARNNING = 0x08;
+  DISK_SPACE_ALERT = 0x10;
+  DELETING_OLD_DATA = 0x20;
+  DATA_RECORDER_EXIT = 0x40;
+  UNDEFINED = 0x80;
+}
+
+message Task {
+  optional string id = 1;
+  optional uint32 sequence = 2;
+  optional double duration = 3;
+}
+
+message Disk {
+  optional string sn = 1;
+  optional string fs = 2;
+  optional double size = 3;
+  optional double used = 4;
+  optional double avail = 5;
+  optional double use_percent = 6;
+  optional string mount = 7;
+  optional string slot = 8;
+}
+
+message Resources {
+  repeated Disk disks = 1;
+}
+
+message Data {
+  repeated Bag bags = 1;
+}
+
+message Bag {
+  optional string writing_filename = 1;
+}
