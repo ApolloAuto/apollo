@@ -63,8 +63,6 @@ if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
 fi
 
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
-
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
