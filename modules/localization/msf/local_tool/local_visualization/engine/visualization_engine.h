@@ -160,6 +160,8 @@ class VisualizationEngine {
 
   bool LoadImageToCache(const MapImageKey &key);
 
+  void RotateImg(cv::Mat &in_img, cv::Mat &out_img, double angle);
+
   void SetViewCenter(const double center_x, const double center_y);
   void UpdateViewCenter(const double move_x, const double move_y);
   void SetScale(const double scale);
@@ -205,6 +207,9 @@ class VisualizationEngine {
   unsigned int loc_info_num_;
   unsigned int car_loc_id_;
   std::vector<LocalizatonInfo> cur_loc_infos_;
+
+  bool is_draw_car_;
+  std::vector<cv::Mat> car_img_mats_;
 };
 
 }  // namespace msf

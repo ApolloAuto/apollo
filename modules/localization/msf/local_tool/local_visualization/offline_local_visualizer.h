@@ -22,7 +22,7 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_OFFLINE_LOCAL_VISUALIZER_H
 
 #include <string>
-#include "modules/localization/msf/local_tool/local_visualization/visualization_engine.h"
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
 namespace localization {

@@ -5,11 +5,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "local_visualizer",
     srcs = [
-        "visualization_engine.cc",
+        "engine/visualization_engine.cc",
         "offline_local_visualizer.cc"
     ],
     hdrs = [
-        "visualization_engine.h",
+        "engine/visualization_engine.h",
         "offline_local_visualizer.h"
     ],
     linkopts = [
