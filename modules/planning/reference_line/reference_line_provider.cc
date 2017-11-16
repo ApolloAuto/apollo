@@ -51,9 +51,9 @@ ReferenceLineProvider::~ReferenceLineProvider() {
 }
 
 void ReferenceLineProvider::Init(
-    const hdmap::HDMap *hdmap_,
+    const hdmap::HDMap *base_map,
     const QpSplineReferenceLineSmootherConfig &smoother_config) {
-  pnc_map_.reset(new hdmap::PncMap(hdmap_));
+  pnc_map_.reset(new hdmap::PncMap(base_map));
   smoother_config_ = smoother_config;
   segment_history_.clear();
   std::vector<double> init_t_knots;
