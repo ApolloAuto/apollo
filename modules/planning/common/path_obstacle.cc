@@ -38,8 +38,8 @@ using apollo::common::util::FindOrDie;
 using apollo::common::VehicleConfigHelper;
 
 namespace {
-const double kStBoundaryDeltaS = 0.2;
-const double kStBoundaryDeltaT = 0.05;
+const double kStBoundaryDeltaS = 0.2;   // meters
+const double kStBoundaryDeltaT = 0.05;  // seconds
 }
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
@@ -82,21 +82,19 @@ void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
   if (obstacle_->IsStatic() ||
       obstacle_->Trajectory().trajectory_point().empty()) {
     std::vector<std::pair<STPoint, STPoint>> point_pairs;
-    if (perception_sl_boundary_.end_s() - perception_sl_boundary_.start_s() <
-        kStBoundaryDeltaS) {
-      return;
+    double start_s = perception_sl_boundary_.start_s();
+    double end_s = perception_sl_boundary_.end_s();
+    if (end_s - start_s < kStBoundaryDeltaS) {
+      end_s = start_s + kStBoundaryDeltaS;
     }
     if (!reference_line.IsBlockRoad(obstacle_->PerceptionBoundingBox(),
                                     adc_width)) {
       return;
     }
-    point_pairs.emplace_back(
-        STPoint(perception_sl_boundary_.start_s() - adc_start_s, 0.0),
-        STPoint(perception_sl_boundary_.end_s() - adc_start_s, 0.0));
-    point_pairs.emplace_back(
-        STPoint(perception_sl_boundary_.start_s() - adc_start_s,
-                FLAGS_st_max_t),
-        STPoint(perception_sl_boundary_.end_s() - adc_start_s, FLAGS_st_max_t));
+    point_pairs.emplace_back(STPoint(start_s - adc_start_s, 0.0),
+                             STPoint(end_s - adc_start_s, 0.0));
+    point_pairs.emplace_back(STPoint(start_s - adc_start_s, FLAGS_st_max_t),
+                             STPoint(end_s - adc_start_s, FLAGS_st_max_t));
     st_boundary_ = StBoundary(point_pairs);
   } else {
     if (BuildTrajectoryStBoundary(reference_line, adc_start_s, &st_boundary_)) {
