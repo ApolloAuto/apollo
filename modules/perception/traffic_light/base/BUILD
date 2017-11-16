@@ -21,9 +21,9 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",
-        "//modules/map/proto:map_proto"
+        "//modules/map/proto:map_proto",
+        "//modules/perception/traffic_light/util:perception_traffic_light_util"
     ],
-    copts=["-mavx2"],
 )
 
 cpplint()

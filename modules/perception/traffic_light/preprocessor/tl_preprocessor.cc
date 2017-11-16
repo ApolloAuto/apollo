@@ -101,8 +101,6 @@ bool TLPreprocessor::add_cached_lights_projections(
   const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   const int long_focus_idx = static_cast<int>(CameraId::LONG_FOCUS);
   const int short_focus_idx = static_cast<int>(CameraId::SHORT_FOCUS);
-  const int wide_focus_idx = static_cast<int>(CameraId::WIDE_FOCUS);
-  const int narrow_focus_idx = static_cast<int>(CameraId::NARROW_FOCUS);
 
   std::vector<std::shared_ptr<LightPtrs> > lights_on_image_array(
       num_camera_ids);
@@ -579,7 +577,7 @@ bool TLPreprocessor::is_in_bord(const cv::Size size,
 }
 
 int TLPreprocessor::get_min_focal_len_camera_id() {
-  int min_focal_len_working_camera = static_cast<int>(CameraId::WIDE_FOCUS);
+  int min_focal_len_working_camera = static_cast<int>(CameraId::SHORT_FOCUS);
   const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   for (int cam_id = num_camera_ids - 1; cam_id >= 0; --cam_id) {
     if (_camera_is_working_flags.find(cam_id) != _camera_is_working_flags.end() &&

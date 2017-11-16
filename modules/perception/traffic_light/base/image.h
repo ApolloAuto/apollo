@@ -21,18 +21,14 @@ namespace traffic_light {
 //Camera id
 enum CameraId {
   LONG_FOCUS = 0,         // 25mm
-  NARROW_FOCUS = 1,  // 12mm
-  SHORT_FOCUS = 2,        // 6mm
-  WIDE_FOCUS = 3,   // 2mm
-  UNKNOWN = 4,
-  CAMERA_ID_COUNT = 5
+  SHORT_FOCUS = 1,        // 6mm
+  UNKNOWN = 2,
+  CAMERA_ID_COUNT = 3
 };
 
 const std::map<int, std::string> kCameraIdToStr = {
     {static_cast<int>(LONG_FOCUS), "long_focus_camera(25mm)"},
-    {static_cast<int>(NARROW_FOCUS), "narrow_focus_camera(12mm)"},
-    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"},
-    {static_cast<int>(WIDE_FOCUS), "wide_focus_camera(2.1mm)"}
+    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"}
 };
 
 //@brief Image loaded from camera.
@@ -53,7 +49,7 @@ class Image {
   //@param [in] camera id
   //@param [in] image's data
   bool
-  Init(const double &ts, const CameraId &device_id, const std::shared_ptr<sensor_msgs::Image> image_data);
+  Init(const double &ts, const CameraId &device_id, std::shared_ptr<sensor_msgs::Image> image_data);
   //@brief return image's timestamp
   double ts() const;
 

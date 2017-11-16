@@ -9,8 +9,8 @@
 
 #include <gflags/gflags.h>
 #include "modules/common/log.h"
-//#include "modules/drivers/usb_cam/include/usb_cam/utility.h"
 #include <cv_bridge/cv_bridge.h>
+#include "modules/perception/traffic_light/util/color_space.h"
 
 DEFINE_int32(double_show_precision, 14, "When output a double data, the precision.");
 
@@ -62,10 +62,10 @@ bool Image::GenerateMat() {
 //      } else
       if (image_data_->encoding.compare("yuyv") == 0) {
         //TODO:: yuyv 2 rgb rgb 2 bgr
-//        unsigned char* yuv = (unsigned char*)&(image_data_->data[0]);
-//        mat_ = cv::Mat(image_data_->height,image_data_->width,CV_8UC3);
-//        usb_cam::yuyv2rgb_avx(yuv,mat_.data,image_data_->height*image_data_->width);
-//        cv::cvtColor(mat_,mat_,CV_RGB2BGR);
+        unsigned char *yuv = (unsigned char *) &(image_data_->data[0]);
+        mat_ = cv::Mat(image_data_->height, image_data_->width, CV_8UC3);
+        Yuyv2rgbAvx(yuv, mat_.data, image_data_->height * image_data_->width);
+        cv::cvtColor(mat_, mat_, CV_RGB2BGR);
       }
 
       contain_mat_ = true;
