@@ -32,7 +32,7 @@ class ObjectBuilder {
   ObjectBuilder(): delay_frames_(4), use_fp_filter_(true) {
   }
   ~ObjectBuilder(){}
-  void build(const ContiRadar &raw_obstacles,
+  void Build(const ContiRadar &raw_obstacles,
              const Eigen::Matrix4d &radar_pose,
              const Eigen::Vector2d &main_velocity,
              SensorObjects &radar_objects);

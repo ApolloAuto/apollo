@@ -116,13 +116,13 @@ bool PbfHmTrackObjectMatcher::Match(std::vector<PbfTrackPtr> &fusion_tracks,
     }
   }
 
-  // XLOG(INFO) << "track2measurements:";
+  // AINFO << "track2measurements:";
   // for (size_t i = 0; i < track2measurements_dist.size(); i++) {
-  //     XLOG(INFO) << track2measurements_dist[i];
+  //     AINFO << track2measurements_dist[i];
   // }
-  // XLOG(INFO) << "measurement2track_dist";
+  // AINFO << "measurement2track_dist";
   // for (size_t i = 0; i < measurement2track_dist.size(); i++) {
-  //     XLOG(INFO) << measurement2track_dist[i];
+  //     AINFO << measurement2track_dist[i];
   // }
   return state;
 }
@@ -155,7 +155,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(const std::vector<PbfTrackPt
     }
   }
 
-  // XLOG(INFO) << "association matrix :";
+  // AINFO << "association matrix :";
   // for (size_t i = 0; i < association_mat.size(); i++) {
   //     if (association_mat[i].empty()) {
   //         continue;
@@ -166,7 +166,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(const std::vector<PbfTrackPt
   //     for (size_t j = 0; j < association_mat[i].size(); j++) {
   //         oss_str << association_mat[i][j] << "  ";
   //     }
-  //     XLOG(INFO) << oss_str.str();
+  //     AINFO << oss_str.str();
   // }
 }
 
