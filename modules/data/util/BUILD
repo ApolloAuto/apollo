@@ -25,14 +25,14 @@ cc_binary(
 
 cc_test(
     name = "info_collector_test",
-    srcs = ["info_collector_test.cc"],
     size = "small",
+    srcs = ["info_collector_test.cc"],
     data = [
         "//modules/data/conf:recorder_conf",
     ],
     deps = [
-        "@gtest//:main",
         ":info_collector",
+        "@gtest//:main",
     ],
 )
 
