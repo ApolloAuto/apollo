@@ -17,7 +17,10 @@
 #ifndef MODULES_PERCEPTION_PERCEPTION_INTERFACE_H_
 #define MODULES_PERCEPTION_PERCEPTION_INTERFACE_H_
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/apollo_app.h"
+#include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -39,6 +42,16 @@ class PerceptionInterface : public apollo::common::ApolloApp {
    * frame of PointCloud.
    */
   virtual void RunOnce(const sensor_msgs::PointCloud2& message) = 0;
+
+  /**
+   * @brief Fill the header and publish the perception message.
+   */
+  void Publish(perception::PerceptionObstacles* perception_obstacles) {
+    using apollo::common::adapter::AdapterManager;
+    AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
+                                                  perception_obstacles);
+    AdapterManager::PublishPerceptionObstacles(*perception_obstacles);
+  }
 };
 
 }  // namespace perception

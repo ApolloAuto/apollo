@@ -17,8 +17,10 @@
 #ifndef MODULES_PREDICTION_PREDICTION_INTERFACE_H_
 #define MODULES_PREDICTION_PREDICTION_INTERFACE_H_
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/apollo_app.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -40,6 +42,15 @@ class PredictionInterface : public apollo::common::ApolloApp {
    */
   virtual void RunOnce(
       const perception::PerceptionObstacles &perception_obstacles) = 0;
+
+  /**
+   * @brief Fill the header and publish the prediction message.
+   */
+  void Publish(prediction::PredictionObstacles *prediction_obstacles) {
+    using apollo::common::adapter::AdapterManager;
+    AdapterManager::FillPredictionHeader(Name(), prediction_obstacles);
+    AdapterManager::PublishPrediction(*prediction_obstacles);
+  }
 };
 
 }  // namespace prediction
