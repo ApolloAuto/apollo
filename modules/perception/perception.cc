@@ -53,11 +53,10 @@ void Perception::RunOnce(const sensor_msgs::PointCloud2& message) {
   if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
     lidar_process_->Process(message);
 
-    /// public obstacle message
+    /// publish obstacle message
     PerceptionObstacles obstacles;
-    if (lidar_process_->GeneratePbMsg(&obstacles)) {
-      AdapterManager::PublishPerceptionObstacles(obstacles);
-    }
+    lidar_process_->GeneratePbMsg(&obstacles);
+    Publish(&obstacles);
   }
 }
 
