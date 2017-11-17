@@ -42,7 +42,9 @@ using ::apollo::localization::LocalizationEstimate;
 using ::apollo::perception::PerceptionObstacle;
 using ::apollo::perception::PerceptionObstacles;
 
-std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+std::string Prediction::Name() const {
+  return FLAGS_prediction_module_name;
+}
 
 Status Prediction::Init() {
   // Load prediction conf
@@ -76,15 +78,16 @@ Status Prediction::Init() {
   CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
 
   // Set perception obstacle callback function
-  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::OnPerception,
-                                                 this);
+  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
 
   return Status::OK();
 }
 
-Status Prediction::Start() { return Status::OK(); }
+Status Prediction::Start() {
+  return Status::OK();
+}
 
 void Prediction::Stop() {}
 
@@ -111,7 +114,10 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
          << localization.ShortDebugString() << "].";
 }
 
-void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
+void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
+
   double start_timestamp = Clock::NowInSecond();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
@@ -123,13 +129,10 @@ void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
 
   auto prediction_obstacles =
       PredictorManager::instance()->prediction_obstacles();
-  AdapterManager::FillPredictionHeader(Name(), &prediction_obstacles);
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSecond());
-  AdapterManager::PublishPrediction(prediction_obstacles);
 
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
+  Publish(&prediction_obstacles);
 }
 
 Status Prediction::OnError(const std::string& error_msg) {

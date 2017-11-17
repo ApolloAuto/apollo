@@ -50,7 +50,7 @@ class LidarProcess {
   bool Process(const double timestamp, pcl_util::PointCloudPtr cloud,
                std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
 
-  bool GeneratePbMsg(PerceptionObstacles* obstacles);
+  void GeneratePbMsg(PerceptionObstacles* obstacles);
 
   std::vector<ObjectPtr> GetObjects() { return objects_; }
 
