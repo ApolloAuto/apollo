@@ -119,7 +119,8 @@ class Recorder(threading.Thread):
                 split_arg = "--split --size " \
                           + str(self.recorder_opts.record_split_size)
             else:
-                logging.error("Invalid compression parameter, only support duration or size")
+                logging.error("Invalid compression parameter, "
+                              "only support duration or size")
                 return (-1, 'arguments error')
 
         recordpath = roslib.packages.find_node('rosbag', 'record')
@@ -141,12 +142,14 @@ class Recorder(threading.Thread):
             cmd = cmd \
                 + "--all" \
                 + " " \
-                + "--exclude " + "\'" + self.recorder_opts.record_topic_exclude_regex + "\'" \
+                + "--exclude " + "\'" \
+                + self.recorder_opts.record_topic_exclude_regex + "\'" \
                 + " " \
                 + if_quiet_arg 
         else:
             cmd = cmd \
-                + "--regex " + "\'" + self.recorder_opts.record_topic_match_regex + "\'" \
+                + "--regex " + "\'" \
+                + self.recorder_opts.record_topic_match_regex + "\'" \
                 + " " \
                 + if_quiet_arg 
         return (0, cmd)
@@ -182,12 +185,14 @@ class Recorder(threading.Thread):
                 break
             if not self.recorder_manager.record_enable:
                 os.killpg(self.record_process.pid, signal.SIGINT)
-                self.exitcode = -1024 # Stop record because of record has been disabled.
+                # Stop record because of record has been disabled.
+                self.exitcode = -1024
                 break
             output = self.ssr.readline(0.1)
             if output is not None:
                 logging.info("Record subprocess stream: %s", output)
-                if output in ['Aborted\n', 'Terminated\n'] and self.exitcode != -1024:
+                if (output in ['Aborted\n', 'Terminated\n'] and
+                    self.exitcode != -1024):
                     os.killpg(self.record_process.pid, signal.SIGINT)
                     self.exitcode = -2
                     break
@@ -198,7 +203,8 @@ class Recorder(threading.Thread):
                 self.exitcode = 0
                 break
         logging.info("Record exit: stdout=%s, stderr=%s, errorcode=%s",
-            self.record_process.stdout, self.record_process.stderr, self.record_process.returncode)
+            self.record_process.stdout, self.record_process.stderr,
+            self.record_process.returncode)
 
     def run(self):
         """Thread run."""
@@ -208,4 +214,5 @@ class Recorder(threading.Thread):
             logging.error("Record process exit with exception.")
             self.exitcode = -1
             self.exception = e
-            self.exc_traceback = ''.join(traceback.format_exception(*sys.exc_info()))
+            self.exc_traceback = ''.join(
+                traceback.format_exception(*sys.exc_info()))

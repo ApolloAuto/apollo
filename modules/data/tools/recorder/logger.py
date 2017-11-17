@@ -25,9 +25,11 @@ import os
 
 
 class Logger(object):
-    """The logger factory class. It is a template to help quickly create a log utility.
+    """The logger factory class. It is a template to help quickly create a log
+    utility.
     Attributes:
-    set_conf(log_file, use_stdout, log_level): this is a static method that returns a configured logger.
+    set_conf(log_file, use_stdout, log_level): this is a static method that
+    returns a configured logger.
     get_logger(tag): this is a static method that returns a configured logger.
     """
     __loggers = {}
