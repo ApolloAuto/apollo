@@ -650,9 +650,9 @@ def main():
             if lane_count != len(lane_sets) - 1:
                 lane_sets[lane_count][lane_offset].successor_id.add().id = lane_sets[lane_count + 1][lane_offset].id.id
             if lane_offset != 0:
-                lane_sets[lane_count][lane_offset].left_neighbor_forward_lane_id.add().id = lane_set[lane_offset - 1].id.id
-            if lane_offset != len(lane_set) - 1:
-                lane_sets[lane_count][lane_offset].right_neighbor_forward_lane_id.add().id = lane_set[lane_offset + 1].id.id
+                lane_sets[lane_count][lane_offset].left_neighbor_forward_lane_id.add().id = lane_sets[lane_count][lane_offset - 1].id.id
+            if lane_offset != len(lane_sets[lane_count]) - 1:
+                lane_sets[lane_count][lane_offset].right_neighbor_forward_lane_id.add().id = lane_sets[lane_count][lane_offset + 1].id.id
 
     # Add road/lanes to map and let road contain lanes
     mp.road.extend([road])

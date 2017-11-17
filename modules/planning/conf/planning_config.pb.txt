@@ -105,6 +105,7 @@ em_planner_config {
             cruise_weight: 0.5
             regularization_weight: 0.1
             follow_drag_distance: 17.0
+            dp_st_reference_weight: 0.0
         }
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
@@ -144,6 +145,9 @@ qp_spline_reference_line_smoother_config {
 
 rule_config : {
     rule_id: BACKSIDE_VEHICLE
+}
+rule_config : {
+    rule_id: SIGNAL_LIGHT
 }
 rule_config : {
     rule_id: REROUTING

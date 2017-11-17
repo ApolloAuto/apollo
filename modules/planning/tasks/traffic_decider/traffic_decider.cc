@@ -68,6 +68,11 @@ Status TrafficDecider::Execute(Frame *frame,
   Task::Execute(frame, reference_line_info);
 
   for (const auto &rule_config : rule_configs_) {
+    if (!FLAGS_enable_traffic_light &&
+        rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
+      AWARN << "Traffic light is disabled, enable by --enable_traffic_light";
+      continue;
+    }
     auto rule = rule_factory_.CreateObject(rule_config.rule_id(), rule_config);
     if (!rule) {
       AERROR << "Could not find rule " << rule_config.DebugString();

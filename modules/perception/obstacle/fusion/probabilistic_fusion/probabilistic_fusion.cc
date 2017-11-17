@@ -341,8 +341,5 @@ void ProbabilisticFusion::FuseForegroundObjects(
   CreateNewTracks(foreground_objects, unassigned_objects);
 }
 
-// Register plugin.
-REGISTER_FUSION(ProbabilisticFusion);
-
 } // namespace perception
 } // namespace apollo

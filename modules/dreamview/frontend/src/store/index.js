@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction } from "mobx";
+import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
 import Meters from "store/meters";
@@ -57,21 +57,6 @@ class DreamviewStore {
 
     @action updateWidthInPercentage(newRatio) {
         this.sceneDimension.widthRatio = newRatio;
-        this.updateDimension();
-    }
-
-    @action updateDimension() {
-        const smallScreen = window.innerHeight < 800.0;
-        const offsetX = smallScreen ? 80 : 90; // width of side-bar
-        const offsetY = smallScreen ? 55 : 60; // height of header
-        const mainViewHeightRatio = 0.60;
-
-        this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;
-        this.dimension.height = window.innerHeight - offsetY;
-
-        this.sceneDimension.width = this.dimension.width - offsetX;
-        this.sceneDimension.height = this.options.showTools
-                ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 
     @action setInitializationStatus(status){
@@ -123,16 +108,34 @@ class DreamviewStore {
                     this.enablePNCMonitor();
                     break;
                 case 'showRouteEditingBar':
+                    this.options.showPOI = false;
                     this.routeEditingManager.enableRouteEditing();
                     break;
             }
         }
+    }
 
-        this.updateDimension();
+    // This function is triggerred automatically whenever a observable changes
+    updateDimension() {
+        const smallScreen = window.innerHeight < 800.0;
+        const offsetX = smallScreen ? 80 : 90; // width of side-bar
+        const offsetY = smallScreen ? 55 : 60; // height of header
+        const mainViewHeightRatio = 0.60;
+
+        this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;
+        this.dimension.height = window.innerHeight - offsetY;
+
+        this.sceneDimension.width = this.dimension.width - offsetX;
+        this.sceneDimension.height = this.options.showTools
+                ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 }
 
 const STORE = new DreamviewStore();
+
+autorun(() => {
+    STORE.updateDimension();
+});
 
 // For debugging purpose only. When turned on, it will insert a random
 // monitor message into monitor every 10 seconds.

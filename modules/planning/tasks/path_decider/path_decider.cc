@@ -95,6 +95,10 @@ bool PathDecider::MakeStaticObstacleDecision(
         path_obstacle->LateralDecision().has_ignore()) {
       continue;
     }
+    if (path_obstacle->HasLongitudinalDecision() &&
+        path_obstacle->LongitudinalDecision().has_stop()) {
+      continue;
+    }
 
     if (path_obstacle->st_boundary().boundary_type() ==
         StBoundary::BoundaryType::KEEP_CLEAR) {

@@ -90,6 +90,9 @@ class ProbabilisticFusion : public BaseFusion {
  DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };
 
+// Register plugin.
+REGISTER_FUSION(ProbabilisticFusion);
+
 } // namespace perception
 } // namespace apollo
 #endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_

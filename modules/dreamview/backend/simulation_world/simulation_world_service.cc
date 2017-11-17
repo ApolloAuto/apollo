@@ -382,6 +382,14 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   return update;
 }
 
+Json SimulationWorldService::GetPlanningData() const {
+  std::string planning_data_json;
+  ::google::protobuf::util::MessageToJsonString(planning_data_,
+                                                &planning_data_json);
+
+  return Json::parse(planning_data_json);
+}
+
 Json SimulationWorldService::GetMapElements(double radius) const {
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
@@ -637,15 +645,14 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   size_t max_interval = 10;
-  auto *planning_data = world_.mutable_planning_data();
 
   // Update SL Frame
-  planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
+  planning_data_.mutable_sl_frame()->CopyFrom(data.sl_frame());
 
   // Update ST Graph
-  planning_data->clear_st_graph();
+  planning_data_.clear_st_graph();
   for (auto &graph : data.st_graph()) {
-    auto *st_graph = planning_data->add_st_graph();
+    auto *st_graph = planning_data_.add_st_graph();
     st_graph->set_name(graph.name());
     st_graph->mutable_boundary()->CopyFrom(graph.boundary());
     if (graph.has_kernel_cruise_ref()) {
@@ -681,10 +688,10 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update Speed Plan
-  planning_data->clear_speed_plan();
+  planning_data_.clear_speed_plan();
   for (auto &plan : data.speed_plan()) {
     if (plan.speed_point_size() > 0) {
-      auto *downsampled_plan = planning_data->add_speed_plan();
+      auto *downsampled_plan = planning_data_.add_speed_plan();
       downsampled_plan->set_name(plan.name());
 
       // Downsample the speed plan for frontend display.
@@ -697,7 +704,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update path
-  planning_data->clear_path();
+  planning_data_.clear_path();
   for (auto &path : data.path()) {
     // Downsample the path points for frontend display.
     // Angle threshold is about 5.72 degree.
@@ -705,7 +712,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
     std::vector<int> sampled_indices =
         DownsampleByAngle(path.path_point(), angle_threshold);
 
-    auto *downsampled_path = planning_data->add_path();
+    auto *downsampled_path = planning_data_.add_path();
     downsampled_path->set_name(path.name());
     for (int index : sampled_indices) {
       const auto &path_point = path.path_point()[index];
@@ -750,10 +757,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdateDecision(trajectory.decision(), header_time);
 
-  // TODO(siyang, vlin): Make this dynamically controled by frontend
-  if (!FLAGS_ignore_planning_debug_data) {
-    UpdatePlanningData(trajectory.debug().planning_data());
-  }
+  UpdatePlanningData(trajectory.debug().planning_data());
 
   world_.mutable_latency()->set_planning(
       trajectory.latency_stats().total_time_ms());

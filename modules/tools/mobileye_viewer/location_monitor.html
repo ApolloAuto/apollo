@@ -19,6 +19,8 @@
         var map;
         var interval;
         var routingPath = false;
+        var rightLaneMarker = false;
+        var leftLaneMarker = false;
         var centerVehicle = true;
         var destinationMarker = false;
         style.webkitTransform = 'translateZ(0px)';
@@ -51,7 +53,7 @@
                         draggable: true //make it draggable
                     });
                     //Listen for drag events!
-                    google.maps.event.addListener(marker, 'dragend', function (event) {
+                    google.maps.event.addListener(vehicleMarker, 'dragend', function (event) {
                         markerLocation();
                     });
                 } else {
@@ -92,6 +94,32 @@
                         map.setCenter(LatLng);
                     }
                     vehicleMarker.setPosition(LatLng);
+
+                    if (rightLaneMarker !== false) {
+                        rightLaneMarker.setMap(null);
+                    }
+                    rightLaneMarker = new google.maps.Polyline({
+                        path: resp[1],
+                        geodesic: true,
+                        strokeColor: '#0000FF',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+
+                    rightLaneMarker.setMap(map);
+
+                    if (leftLaneMarker !== false) {
+                        leftLaneMarker.setMap(null);
+                    }
+                    leftLaneMarker = new google.maps.Polyline({
+                        path: resp[2],
+                        geodesic: true,
+                        strokeColor: '#0000FF',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+                    leftLaneMarker.setMap(map);
+
                 },
                 error: function () {
                     debugger;
