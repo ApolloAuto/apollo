@@ -140,7 +140,7 @@ TEST(ObjectTest, test_Serialize) {
   obj.polygon = polygon;
 
   PerceptionObstacle pb_obj;
-  EXPECT_TRUE(obj.Serialize(&pb_obj));
+  obj.Serialize(&pb_obj);
   EXPECT_EQ(pb_obj.id(), 2);
   EXPECT_EQ(pb_obj.position().x(), 4.0);
   AINFO << "org obj:" << obj.ToString();
@@ -172,7 +172,7 @@ TEST(ObjectTest, test_Deserialize) {
     polygon.push_back(p);
   }
 
-  EXPECT_TRUE(obj.Deserialize(pb_obj));
+  obj.Deserialize(pb_obj);
   EXPECT_EQ(obj.track_id, 1);
   EXPECT_EQ(obj.theta, 0.1);
   EXPECT_EQ(obj.center(0), 10.1);

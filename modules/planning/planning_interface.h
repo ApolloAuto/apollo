@@ -17,7 +17,9 @@
 #ifndef MODULES_PLANNING_PLANNING_INTERFACE_H_
 #define MODULES_PLANNING_PLANNING_INTERFACE_H_
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/apollo_app.h"
+#include "modules/planning/proto/planning.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -38,6 +40,15 @@ class PlanningInterface : public apollo::common::ApolloApp {
    * timer.
    */
   virtual void RunOnce() = 0;
+
+  /**
+   * @brief Fill the header and publish the planning message.
+   */
+  void Publish(planning::ADCTrajectory* trajectory) {
+    using apollo::common::adapter::AdapterManager;
+    AdapterManager::FillPlanningHeader(Name(), trajectory);
+    AdapterManager::PublishPlanning(*trajectory);
+  }
 };
 
 }  // namespace planning
