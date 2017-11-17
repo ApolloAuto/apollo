@@ -79,6 +79,8 @@ bool SpiralReferenceLineSmoother::Smooth(
     for (const auto& anchor_point : anchor_points_) {
       if (anchor_point.enforced) {
         start_index++;
+      } else {
+        break;
       }
     }
 
