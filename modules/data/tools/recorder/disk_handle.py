@@ -59,12 +59,16 @@ def check_disk(output_path, min_space=1024):
     disk_mp = get_mount_point(output_path)
     free_space = get_disk_free_size(disk_mp)
     if free_space < min_space * 1024 * 1024:
-        print("Less than %s of space free on disk %s." % (min_space, disk_mp))
-        logging.error("Less than %s of space free on disk %s.", min_space, disk_mp)
+        print("Less than %s of space free on disk %s." %
+              (min_space, disk_mp))
+        logging.error("Less than %s of space free on disk %s.",
+                      min_space, disk_mp)
         return -2
     elif free_space < min_space * 1024 * 1024 * 5:
-        print("Less than 5 * %s of space free on disk %s." % (min_space, disk_mp))
-        logging.warn("Less than 5 * %s of space free on disk %s.", min_space, disk_mp)
+        print("Less than 5 * %s of space free on disk %s." %
+              (min_space, disk_mp))
+        logging.warn("Less than 5 * %s of space free on disk %s.",
+                     min_space, disk_mp)
         return -1
     return 0
 
@@ -99,7 +103,8 @@ def get_disk_usage_info(path):
     vfs = os.statvfs(path)
     free = (vfs[statvfs.F_BAVAIL] * vfs[statvfs.F_BSIZE])
     total = (vfs[statvfs.F_BLOCKS] * vfs[statvfs.F_BSIZE])
-    used =  (vfs[statvfs.F_BLOCKS] - vfs[statvfs.F_BFREE]) * vfs[statvfs.F_FRSIZE]
+    used =  (vfs[statvfs.F_BLOCKS] - vfs[statvfs.F_BFREE]) * \
+        vfs[statvfs.F_FRSIZE]
     try:
         percent = (float(used) / total) * 100
     except ZeroDivisionError:

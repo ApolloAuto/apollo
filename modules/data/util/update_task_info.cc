@@ -16,7 +16,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
-#include "modules/data/recorder/info_collector.h"
+#include "modules/data/util/info_collector.h"
 
 DEFINE_string(commit_id, "", "Current commit ID.");
 
