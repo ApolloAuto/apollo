@@ -134,6 +134,14 @@ bool SpiralReferenceLineSmoother::Smooth(
       opt_s.insert(opt_s.begin(), overhead_s.begin(), overhead_s.end());
       opt_x.insert(opt_x.begin(), overhead_x.begin(), overhead_x.end());
       opt_y.insert(opt_y.begin(), overhead_y.begin(), overhead_y.end());
+
+      std::for_each(opt_x.begin(), opt_x.end(), [this](double& x){
+        x += zero_x_;
+      });
+
+      std::for_each(opt_y.begin(), opt_y.end(), [this](double& y){
+        y += zero_y_;
+      });
     }
   }
 
@@ -172,7 +180,6 @@ bool SpiralReferenceLineSmoother::Smooth(
   const double end_timestamp = Clock::NowInSecond();
   ADEBUG << "Spiral reference line smoother time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
-
   return true;
 }
 
@@ -313,6 +320,17 @@ common::PathPoint SpiralReferenceLineSmoother::to_path_point(
 void SpiralReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
   anchor_points_ = std::move(anchor_points);
+
+  CHECK_GT(anchor_points_.size(), 1);
+  zero_x_ = anchor_points_.front().path_point.x();
+  zero_y_ = anchor_points_.front().path_point.y();
+
+  std::for_each(anchor_points_.begin(), anchor_points_.end(),
+      [this](AnchorPoint& p) {
+        auto curr_x = p.path_point.x();
+        auto curr_y = p.path_point.y();
+        p.path_point.set_x(curr_x - zero_x_);
+        p.path_point.set_y(curr_y - zero_y_);});
 }
 
 }  // namespace planning

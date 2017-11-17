@@ -186,15 +186,14 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // constraints
   // a. positional equality constraints
-  double pos_diff_tolerance = FLAGS_spiral_smoother_piecewise_length / 1000.0;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     // for x
     g_l[i * 2] = 0.0;
-    g_u[i * 2] = pos_diff_tolerance * pos_diff_tolerance;
+    g_u[i * 2] = 0.0;
 
     // for y
     g_l[i * 2 + 1] = 0.0;
-    g_u[i * 2 + 1] = pos_diff_tolerance * pos_diff_tolerance;
+    g_u[i * 2 + 1] = 0.0;
   }
   // b. positional deviation constraints
   std::size_t constraint_offset = 2 * (num_of_points_ - 1);
@@ -764,7 +763,7 @@ void SpiralProblemInterface::set_start_point(const double x, const double y,
   has_fixed_start_point_ = true;
   start_x_ = x;
   start_y_ = y;
-  start_theta_ = common::math::NormalizeAngle(theta);
+  start_theta_ = theta;
   start_kappa_ = kappa;
   start_dkappa_ = dkappa;
 }
