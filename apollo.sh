@@ -128,8 +128,7 @@ function build() {
   build_py_proto
 
   # Update task info template on compiling.
-  bazel-bin/modules/data/recorder/update_task_info \
-      --commit_id=$(git rev-parse HEAD)
+  bazel-bin/modules/data/util/update_task_info --commit_id=$(git rev-parse HEAD)
 }
 
 function cibuild() {

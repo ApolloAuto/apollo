@@ -78,7 +78,8 @@ class DataRecorderManager(object):
     def init(self):
         self.recorder_status = recorder_info_pb2.DATA_RECORDER_INIT
         self.cmd_topic = self.conf_reader.data_args.get("recorder_cmd_topic")
-        self.status_topic = self.conf_reader.data_args.get("recorder_status_topic")
+        self.status_topic = self.conf_reader.data_args.get(
+            "recorder_status_topic")
         self.pub = rospy.Publisher(self.status_topic, String, queue_size=100)
         signal.signal(signal.SIGINT, self.shutdown_hook)
         signal.signal(signal.SIGTERM, self.shutdown_hook)
@@ -106,7 +107,8 @@ class DataRecorderManager(object):
 
     def create_task_id(self):
         """Recorder init, create_task_id."""
-        if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == -2:
+        if disk_handle.check_disk(
+            self.conf_reader.data_args.get('output_path')) == -2:
             return -1
         self.create_backup_id()
         self.output_directory = self.conf_reader.data_args.get('output_path') \
@@ -127,13 +129,20 @@ class DataRecorderManager(object):
                 {
                     'basic': {
                         'data_recorder_version': G_VERSION,
-                        'organization_name': self.conf_reader.organization.get('name'),
-                        'organization_website': self.conf_reader.organization.get('website'),
-                        'organization_description': self.conf_reader.organization.get('description'),
-                        'vehicle_id': self.conf_reader.vehicle.get('vehicle_id'),
-                        'vehicle_type': self.conf_reader.vehicle.get('vehicle_type'),
-                        'vehicle_tag': self.conf_reader.vehicle.get('vehicle_tag'),
-                        'vehicle_description': self.conf_reader.vehicle.get('description'),
+                        'organization_name': \
+                            self.conf_reader.organization.get('name'),
+                        'organization_website': \
+                            self.conf_reader.organization.get('website'),
+                        'organization_description': \
+                            self.conf_reader.organization.get('description'),
+                        'vehicle_id': \
+                            self.conf_reader.vehicle.get('vehicle_id'),
+                        'vehicle_type': \
+                            self.conf_reader.vehicle.get('vehicle_type'),
+                        'vehicle_tag': \
+                            self.conf_reader.vehicle.get('vehicle_tag'),
+                        'vehicle_description': \
+                            self.conf_reader.vehicle.get('description'),
                         'task_purpose': self.conf_reader.task_purpose,
                         'system_uptime': self.get_system_uptime()
                     }
@@ -143,9 +152,10 @@ class DataRecorderManager(object):
         meta_ext = self.conf_reader.data_args.get('meta_extension')
         meta_extension = (meta_ext
             if meta_ext == 'ini' or meta_ext == 'json' else "ini")
-        ret = meta_manager.create_meta(self.output_directory + '/meta/recorder.' + meta_extension,
-                meta_extension,
-                recorder_meta)
+        ret = meta_manager.create_meta(
+            self.output_directory + '/meta/recorder.' + meta_extension,
+            meta_extension,
+            recorder_meta)
         if ret != 0:
             return -1
         self.update_link()
@@ -164,9 +174,11 @@ class DataRecorderManager(object):
 
     def listener_callback(self, data):
         """Listener callback."""
-        logging.info("Receive message from %s, data=%s", self.cmd_topic, data.data)
+        logging.info("Receive message from %s, data=%s",
+                     self.cmd_topic, data.data)
         if self.latest_cmdtime is not None: 
-            if (datetime.datetime.now() - self.latest_cmdtime) < datetime.timedelta(seconds=10):
+            if (datetime.datetime.now() - self.latest_cmdtime) < \
+                datetime.timedelta(seconds=10):
                 print_message = (
                     "The interval between two consecutive operation"
                      " must not be less than 10 seconds! Thanks!"
@@ -208,7 +220,8 @@ class DataRecorderManager(object):
         """Sync data."""
         src = self.conf_reader.task_data_args[data]['data_property']['src']
         dst = self.conf_reader.task_data_args[data]['data_property']['dst']
-        limit = self.conf_reader.task_data_args[data]['action_args']['sync_bwlimit']
+        limit = \
+            self.conf_reader.task_data_args[data]['action_args']['sync_bwlimit']
         src = src if src.endswith('/') else src + "/"
         dst = self.output_directory + "/" + dst + "/"
         cmd = "mkdir -p " + dst \
@@ -223,10 +236,12 @@ class DataRecorderManager(object):
         out, err = process.communicate()
         errcode = process.returncode
         if errcode == 0:
-            logging.info("Sync %s to %s successfully after creating task_id", src, dst)
+            logging.info("Sync %s to %s successfully after creating task_id",
+                         src, dst)
         else:
             logging.error("Sync data failed after creating task_id, \
-                cmd=%s, stdout=%s, stderr=%s, errcode=%s", cmd, out, err, errcode)
+                cmd=%s, stdout=%s, stderr=%s, errcode=%s",
+                cmd, out, err, errcode)
 
     def publish_recorder_info(self, event):
         """Publish data recorder status."""
@@ -235,8 +250,10 @@ class DataRecorderManager(object):
             task = recorder_info_pb2.Task()
             task_id = os.path.split(os.path.abspath(self.output_directory))[1]
             task.id = task_id
-            datetime_task_start = datetime.datetime.strptime(task_id.split('_')[1], '%Y%m%d%H%M%S')
-            task.duration = (datetime.datetime.now() - datetime_task_start).seconds
+            datetime_task_start = datetime.datetime.strptime(
+                task_id.split('_')[1], '%Y%m%d%H%M%S')
+            task.duration = (datetime.datetime.now() - datetime_task_start
+                             ).seconds
             resources = recorder_info_pb2.Resources()
             disk_partitions = disk_handle.get_disk_partitions_info()
             for dp in disk_partitions:
@@ -250,23 +267,33 @@ class DataRecorderManager(object):
                 disk.avail = float(db_usage.free)
                 disk.use_percent = float(db_usage.percent)
                 disk.mount = dp.mountpoint
-                if disk.mount == disk_handle.get_mount_point(self.conf_reader.data_args.get('output_path')):
+                if disk.mount == disk_handle.get_mount_point(
+                    self.conf_reader.data_args.get('output_path')):
                     info.writing_disk.CopyFrom(disk)
-                    if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == 0:
-                        self.recorder_status &= (~recorder_info_pb2.DISK_SPACE_WARNNING)
-                        self.recorder_status &= (~recorder_info_pb2.DISK_SPACE_ALERT)
-                    if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == -1:
-                        self.recorder_status |= recorder_info_pb2.DISK_SPACE_WARNNING
-                    if disk_handle.check_disk(self.conf_reader.data_args.get('output_path')) == -2:
-                        self.recorder_status |= recorder_info_pb2.DISK_SPACE_WARNNING
-                        self.recorder_status |= recorder_info_pb2.DISK_SPACE_ALERT
+                    if disk_handle.check_disk(
+                        self.conf_reader.data_args.get('output_path')) == 0:
+                        self.recorder_status &= (
+                            ~recorder_info_pb2.DISK_SPACE_WARNNING)
+                        self.recorder_status &= (
+                            ~recorder_info_pb2.DISK_SPACE_ALERT)
+                    if disk_handle.check_disk(
+                        self.conf_reader.data_args.get('output_path')) == -1:
+                        self.recorder_status |= \
+                            recorder_info_pb2.DISK_SPACE_WARNNING
+                    if disk_handle.check_disk(
+                        self.conf_reader.data_args.get('output_path')) == -2:
+                        self.recorder_status |= \
+                            recorder_info_pb2.DISK_SPACE_WARNNING
+                        self.recorder_status |= \
+                            recorder_info_pb2.DISK_SPACE_ALERT
                         if self.rlock.acquire():
                             self.record_enable = False
                             self.sync_enable = False
                             self.rlock.release()
                      
                     if not self.sync_enable and self.rlock.acquire():
-                        self.recorder_status &= (~recorder_info_pb2.DATA_SYNC_ENABLE)
+                        self.recorder_status &= (
+                            ~recorder_info_pb2.DATA_SYNC_ENABLE)
                         self.rlock.release()
             data = recorder_info_pb2.Data()
             info.status = self.recorder_status
@@ -308,8 +335,10 @@ class DataRecorderManager(object):
         rosbag_buffer_size = rosbag_args['action_args']['rosbag_buffer_size']
         rosbag_chunk_size = rosbag_args['action_args']['rosbag_chunk_size']
         rosbag_split = rosbag_args['action_args']['rosbag_split']
-        rosbag_split_duration = rosbag_args['action_args']['rosbag_split_duration']
-        rosbag_compress_type = rosbag_args['action_args']['rosbag_compress_type']
+        rosbag_split_duration = \
+            rosbag_args['action_args']['rosbag_split_duration']
+        rosbag_compress_type = \
+            rosbag_args['action_args']['rosbag_compress_type']
         rosbag_groups = rosbag_args['action_args']['rosbag_topic_group']
         rosbag_path = self.output_directory + "/" + rosbag_dst
         record_instance = ()
@@ -318,7 +347,8 @@ class DataRecorderManager(object):
             group_name = group['group_name']
             group_topic_match_regex = group['group_topic_match_re']
             group_topic_exclude_regex = group['group_topic_exclude_re']
-            prefix = "rosbag_" + self.conf_reader.vehicle['vehicle_id'] + "_" + group_name
+            prefix = "rosbag_" + \
+                self.conf_reader.vehicle['vehicle_id'] + "_" + group_name
             opts = recorder.RecorderOptions()
             opts.record_path = rosbag_path 
             opts.record_prefix = prefix
@@ -345,7 +375,8 @@ class DataRecorderManager(object):
         self.recorder_status |= 7 # running && record && sync
         self.listener()
         
-        timer_publish = rospy.Timer(rospy.Duration(2), self.publish_recorder_info)
+        timer_publish = rospy.Timer(rospy.Duration(2),
+                                    self.publish_recorder_info)
         while not rospy.is_shutdown():
             rospy.sleep(1)
             is_alive = False
@@ -360,21 +391,28 @@ class DataRecorderManager(object):
                 if record_pid.exitcode == -1024:
                     del self.recorder_list[index]
                     break
-                if record_pid.exitcode is not None and not record_pid.is_alive():
-                    logging.warn("Record group %s is not alive, try to restart.", record_name)
+                if (record_pid.exitcode is not None and
+                    not record_pid.is_alive()):
+                    logging.warn(
+                        "Record group %s is not alive, try to restart.",
+                        record_name)
                     try:
                         record_pid.start()
                     except Exception as e:
-                        logging.warn("Record group %s is not alive, restart, %s", record_name, str(e))
+                        logging.warn(
+                            "Record group %s is not alive, restart, %s",
+                            record_name, str(e))
                 if record_pid.exitcode is not None and record_pid.exitcode != 0:
                     logging.info("Record exit, name=%s, exitcode=%s", 
                         record_name, 
                         str(record_pid.exitcode))
-                    logging.warn("Record group %s is terminated with exception, try to restart.", record_name)
+                    logging.warn("Record group %s is terminated with "
+                                 "exception, try to restart.", record_name)
                     record = recorder.Recorder(self, record_opts)
                     record.start()
                     del self.recorder_list[index]
-                    self.recorder_list.append((record_name, record, record_opts))
+                    self.recorder_list.append(
+                        (record_name, record, record_opts))
             for worker in self.worker_list:
                 is_alive = is_alive or worker.isAlive()
             if not is_alive:
@@ -416,7 +454,8 @@ def launch_data_recorder(cp):
 
 def main():
     """main function"""
-    usage = "python modules/data/recorder/tool/data_recorder_manager.py -c modules/data/conf/recorder.conf"
+    usage = ("python modules/data/tools/recorder/data_recorder_manager.py -c "
+             "modules/data/conf/recorder.conf")
     parser = optparse.OptionParser(usage)
     parser.add_option("-c", "--conf",
             dest = "conf_file",
@@ -431,17 +470,20 @@ def main():
     if len(sys.argv) == 1:
         parser.error("Incorrect numbers of arguments")
     if len(args):
-        parser.error("Incorrect numbers of arguments, please type python data_recorder.py -h")
+        parser.error("Incorrect numbers of arguments, "
+                     "please type python data_recorder.py -h")
 
     if options.my_version:
         return print_version(G_VERSION)
 
     if options.conf_file is not None:
         if not os.path.exists(options.conf_file):
-            parser.error("The config file you given does not exists, please check!")
+            parser.error(
+                "The config file you given does not exists, please check!")
         else:
             cp =config_parser.ConfigParser()
-            global_conf = cp.load_config("modules/data/conf/recorder.global.yaml")
+            global_conf = cp.load_config(
+                "modules/data/conf/recorder.global.yaml")
             task_conf = cp.load_config(options.conf_file)
             if global_conf is None:
                 print("Load recorder.global.yaml error!")
@@ -450,10 +492,13 @@ def main():
                 print("Load recorder.debug.yaml error!")
                 sys.exit(-1)
             if not cp.get_global_config(global_conf) == 0:
-                print("Get global parameters from modules/data/conf/recorder.global.yaml encounters error!")
+                print("Get global parameters from "
+                      "modules/data/conf/recorder.global.yaml "
+                      "encounters error!")
                 sys.exit(-1)
             if not cp.get_task_from_yaml(task_conf) == 0:
-                print("Get task parameters from %s encounters error!" % (options.conf_file))
+                print("Get task parameters from %s encounters error!" % (
+                    options.conf_file))
             rospy.init_node('data_recorder', anonymous=False)
             launch_data_recorder(cp)
 
