@@ -146,12 +146,12 @@ int main(int argc, char** argv) {
 
   LosslessMapConfig config_transform_lossy("lossless_map");
   config_transform_lossy.Load(src_map_folder + "config.xml");
-  config_transform_lossy.map_version_ = "lossy_full_alt";
+  config_transform_lossy.map_version_ = "lossy_map";
   config_transform_lossy.Save(dst_map_folder + "config.xml");
 
   std::cout << "lossy map directory structure has built." << std::endl;
 
-  LossyMapConfig lossy_config("lossy_full_alt");
+  LossyMapConfig lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
   LossyMap lossy_map(lossy_config);

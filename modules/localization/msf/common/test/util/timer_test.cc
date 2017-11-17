@@ -28,8 +28,8 @@ class TimerTestSuite : public ::testing::Test {
   virtual void SetUp() {}
   virtual void TearDown() {}
 };
-/**@brief Test. */
-TEST_F(TimerTestSuite, test_timer) {
+/**@brief TimerTest. */
+TEST_F(TimerTestSuite, TimerTest) {
   Timer timer;
   timer.Start();
   boost::posix_time::ptime start_time = timer.start_time_;
@@ -40,7 +40,9 @@ TEST_F(TimerTestSuite, test_timer) {
   ASSERT_GE(end_time, start_time);
   ASSERT_GE(start_time_new, start_time);
 }
-TEST_F(TimerTestSuite, test_time_accumulator) {
+
+/**@brief TimeAccumulatorTest. */
+TEST_F(TimerTestSuite, TimeAccumulatorTest) {
   TimeAccumulator timer_accumulator;
   timer_accumulator.Start();
   boost::posix_time::ptime start_time = timer_accumulator.start_time_;

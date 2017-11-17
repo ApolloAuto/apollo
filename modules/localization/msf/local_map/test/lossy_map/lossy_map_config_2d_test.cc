@@ -31,8 +31,8 @@ class LossyMapConfig2DTestSuite : public ::testing::Test {
 
 /**@brief Test load and set methods in LossyMapConfig2D. */
 TEST_F(LossyMapConfig2DTestSuite, LoadSetTest) {
-  BaseMapConfig config("lossy_full_alt");
-  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/testdata/"
+  BaseMapConfig config("lossy_map");
+  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/test_data/"
                         "lossy_single_map/config.xml"),
             true);
   config.SetMultiResolutions();
@@ -50,18 +50,18 @@ TEST_F(LossyMapConfig2DTestSuite, LoadSetTest) {
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.125);
 
   BaseMapConfig config2;
-  EXPECT_EQ(config2.Load("modules/localization/msf/local_map/test/testdata/"
+  EXPECT_EQ(config2.Load("modules/localization/msf/local_map/test/test_data/"
                          "lossy_single_map/config.xml"),
             false);
 }
 
 /**@brief Test save method. */
 TEST_F(LossyMapConfig2DTestSuite, SaveTest) {
-  BaseMapConfig config("lossy_full_alt");
-  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/testdata/"
+  BaseMapConfig config("lossy_map");
+  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/test_data/"
                         "lossy_single_map/config.xml"),
             true);
-  EXPECT_EQ(config.Save("modules/localization/msf/local_map/test/testdata/"
+  EXPECT_EQ(config.Save("modules/localization/msf/local_map/test/test_data/"
                         "temp_output_file.xml"),
             true);
 }

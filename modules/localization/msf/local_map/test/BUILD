@@ -3,9 +3,9 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "localization_msf_local_map_testdata",
+    name = "localization_msf_local_map_test_data",
     srcs = glob([
-        "testdata/*",
+        "test_data/*",
     ]),
 )
 
@@ -17,7 +17,7 @@ cc_test(
                 "lossless_map/*.cc",
                 "lossy_map/*.cc"]),
     data = [
-        ":localization_msf_local_map_testdata",
+        ":localization_msf_local_map_test_data",
     ],
     linkopts = [
         "-lboost_filesystem",

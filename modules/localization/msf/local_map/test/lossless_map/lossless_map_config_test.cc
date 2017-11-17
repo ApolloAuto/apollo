@@ -32,7 +32,7 @@ class LosslessMapConfigTestSuite : public ::testing::Test {
 /**@brief Test load and set methods in LosslessMapConfig. */
 TEST_F(LosslessMapConfigTestSuite, LoadSetTest) {
   BaseMapConfig config("lossless_map");
-  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/testdata/"
+  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/test_data/"
                         "lossless_single_map/config.xml"),
             true);
   config.SetMultiResolutions();
@@ -50,7 +50,7 @@ TEST_F(LosslessMapConfigTestSuite, LoadSetTest) {
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.125);
 
   BaseMapConfig config2;
-  EXPECT_EQ(config2.Load("modules/localization/msf/local_map/test/testdata/"
+  EXPECT_EQ(config2.Load("modules/localization/msf/local_map/test/test_data/"
                          "lossless_single_map/config.xml"),
             false);
 }
@@ -58,10 +58,10 @@ TEST_F(LosslessMapConfigTestSuite, LoadSetTest) {
 /**@brief Test save method. */
 TEST_F(LosslessMapConfigTestSuite, SaveTest) {
   BaseMapConfig config("lossless_map");
-  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/testdata/"
+  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/test_data/"
                         "lossless_single_map/config.xml"),
             true);
-  EXPECT_EQ(config.Save("modules/localization/msf/local_map/test/testdata/"
+  EXPECT_EQ(config.Save("modules/localization/msf/local_map/test/test_data/"
                         "temp_output_file.xml"),
             true);
 }

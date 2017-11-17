@@ -39,12 +39,12 @@ class LosslessMapTestSuite : public ::testing::Test {
 TEST_F(LosslessMapTestSuite, MapNodeTest) {
   // Delete map folder
   boost::filesystem::remove_all(
-      "modules/localization/msf/local_map/test/testdata/temp_map");
+      "modules/localization/msf/local_map/test/test_data/temp_map");
 
   // Map save
   {
     std::string map_base_folder =
-        "modules/localization/msf/local_map/test/testdata";
+        "modules/localization/msf/local_map/test/test_data";
     LosslessMapConfig config;
     LosslessMap map(config);
     LosslessMapNodePool lossless_map_node_pool(25, 8);
@@ -68,7 +68,7 @@ TEST_F(LosslessMapTestSuite, MapNodeTest) {
   // Map load
   {
     std::string map_base_folder =
-        "modules/localization/msf/local_map/test/testdata";
+        "modules/localization/msf/local_map/test/test_data";
 
     LosslessMapConfig config;
     LosslessMap map(config);
@@ -94,7 +94,7 @@ TEST_F(LosslessMapTestSuite, MapNodeTest) {
 
 TEST_F(LosslessMapTestSuite, MapScheduleTest) {
   std::string map_folder =
-      "modules/localization/msf/local_map/test/testdata/lossless_single_map";
+      "modules/localization/msf/local_map/test/test_data/lossless_single_map";
   LosslessMapConfig map_config("lossless_map");
 
   LosslessMapNodePool input_node_pool(25, 8);
@@ -145,7 +145,7 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
     const Eigen::Vector3d& pt3d = pt3ds_global[i];
     const unsigned char& intensity = 10 + i % 128;
     node->SetValueIfInBound(pt3d, intensity);
-    node->SetIsChanged(false); // avoid changing origin data
+    node->SetIsChanged(false);  // avoid changing origin data
   }
 }
 

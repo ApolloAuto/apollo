@@ -93,14 +93,14 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
   typedef LossyMapConfig2D LossyMapConfig;
 
   std::string src_map_folder =
-      "modules/localization/msf/local_map/test/testdata/lossy_single_map";
+      "modules/localization/msf/local_map/test/test_data/lossy_single_map";
   std::string dst_map_folder =
-      "modules/localization/msf/local_map/test/testdata/temp_output_lossy_map";
+      "modules/localization/msf/local_map/test/test_data/temp_output_lossy_map";
   if (!boost::filesystem::exists(dst_map_folder)) {
     boost::filesystem::create_directory(dst_map_folder);
   }
 
-  LossyMapConfig input_config("lossy_full_alt");
+  LossyMapConfig input_config("lossy_map");
 
   LossyMapNodePool input_node_pool(25, 8);
   input_node_pool.Initial(&input_config);
@@ -119,7 +119,7 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
 
   input_config.Save(dst_map_folder + "/config.xml");
 
-  LossyMapConfig lossy_config("lossy_full_alt");
+  LossyMapConfig lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
 
@@ -173,8 +173,8 @@ TEST_F(LossyMap2DTestSuite, MapScheduleTest) {
   typedef LossyMapConfig2D LossyMapConfig;
 
   std::string map_folder =
-      "modules/localization/msf/local_map/test/testdata/lossy_single_map";
-  LossyMapConfig map_config("lossy_full_alt");
+      "modules/localization/msf/local_map/test/test_data/lossy_single_map";
+  LossyMapConfig map_config("lossy_map");
 
   LossyMapNodePool input_node_pool(25, 8);
   input_node_pool.Initial(&map_config);
