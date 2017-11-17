@@ -7,6 +7,9 @@ cc_library(
     hdrs = [
         "indexed_list.h",
     ],
+    linkopts = [
+        "-lboost_thread",
+    ],
     deps = [
         "//modules/common/util:map_util",
     ],
