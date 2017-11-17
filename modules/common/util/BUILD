@@ -47,7 +47,7 @@ cc_library(
     ],
     deps = [
         "@com_google_protobuf//:protobuf",
-    ]
+    ],
 )
 
 cc_test(
@@ -67,7 +67,7 @@ cc_library(
     hdrs = ["map_util.h"],
     deps = [
         "@com_google_protobuf//:protobuf",
-    ]
+    ],
 )
 
 cc_test(

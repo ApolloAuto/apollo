@@ -14,43 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
+#ifndef MODULES_PLANNING_PLANNING_INTERFACE_H_
+#define MODULES_PLANNING_PLANNING_INTERFACE_H_
 
-#ifndef MODEULES_PERCEPTION_PERCEPTION_H_
-#define MODEULES_PERCEPTION_PERCEPTION_H_
-
-#include <memory>
-#include <string>
-
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
-#include "modules/perception/perception_interface.h"
-#include "ros/include/ros/ros.h"
+#include "modules/common/apollo_app.h"
 
 /**
- * @namespace apollo::perception
- * @brief apollo::perception
+ * @namespace apollo::planning
+ * @brief apollo::planning
  */
 namespace apollo {
-namespace perception {
+namespace planning {
 
-class Perception : public PerceptionInterface {
+/**
+ * @class PlanningInterface
+ *
+ * @brief Interface of the planning module
+ */
+class PlanningInterface : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
-  common::Status Init() override;
-  common::Status Start() override;
-  void Stop() override;
-
-  // Upon receiving point cloud data
-  void RunOnce(const sensor_msgs::PointCloud2& message) override;
-
- private:
-  std::unique_ptr<LidarProcess> lidar_process_;
+  /**
+   * @brief main logic of the planning module, runs periodically triggered by
+   * timer.
+   */
+  virtual void RunOnce() = 0;
 };
 
-}  // namespace perception
+}  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_PERCEPTION_H_
+#endif /* MODULES_PLANNING_PLANNING_INTERFACE_H_ */

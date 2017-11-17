@@ -13,9 +13,9 @@ cc_library(
     deps = [
         "//modules/common/adapters:adapter_manager",
         "//modules/drivers/canbus:sensor_gflags",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/conti_radar/protocol:drivers_conti_radar_protocol",
     ],
 )
@@ -42,15 +42,15 @@ cc_library(
     ],
     deps = [
         ":conti_radar_message_manager",
-        "//modules/drivers/conti_radar/protocol:drivers_conti_radar_protocol",
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor",
+        "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus:sensor_gflags",
+        "//modules/drivers/conti_radar/protocol:drivers_conti_radar_protocol",
         "//modules/hmi/utils:hmi_status_helper",
     ],
 )

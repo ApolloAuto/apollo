@@ -12,7 +12,7 @@ proto_library(
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/configs/proto:vehicle_config_proto_lib",
         "//modules/control/proto:control_proto_lib",
-    ]
+    ],
 )
 
 cc_proto_library(

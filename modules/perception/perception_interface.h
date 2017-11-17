@@ -14,20 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
+#ifndef MODULES_PERCEPTION_PERCEPTION_INTERFACE_H_
+#define MODULES_PERCEPTION_PERCEPTION_INTERFACE_H_
 
-#ifndef MODEULES_PERCEPTION_PERCEPTION_H_
-#define MODEULES_PERCEPTION_PERCEPTION_H_
-
-#include <memory>
-#include <string>
-
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
-#include "modules/perception/perception_interface.h"
-#include "ros/include/ros/ros.h"
+#include "modules/common/apollo_app.h"
+#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @namespace apollo::perception
@@ -36,21 +27,21 @@
 namespace apollo {
 namespace perception {
 
-class Perception : public PerceptionInterface {
+/**
+ * @class PerceptionInterface
+ *
+ * @brief Interface of the perception module
+ */
+class PerceptionInterface : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
-  common::Status Init() override;
-  common::Status Start() override;
-  void Stop() override;
-
-  // Upon receiving point cloud data
-  void RunOnce(const sensor_msgs::PointCloud2& message) override;
-
- private:
-  std::unique_ptr<LidarProcess> lidar_process_;
+  /**
+   * @brief main logic of the perception module, triggered upon receiving a new
+   * frame of PointCloud.
+   */
+  virtual void RunOnce(const sensor_msgs::PointCloud2& message) = 0;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_PERCEPTION_H_
+#endif /* MODULES_PERCEPTION_PERCEPTION_INTERFACE_H_ */
