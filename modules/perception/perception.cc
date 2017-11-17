@@ -21,7 +21,6 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/lidar_process.h"
 #include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 
 namespace apollo {
 namespace perception {
@@ -44,11 +43,11 @@ Status Perception::Init() {
   }
 
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&Perception::OnPointCloud, this);
+  AdapterManager::AddPointCloudCallback(&Perception::RunOnce, this);
   return Status::OK();
 }
 
-void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
+void Perception::RunOnce(const sensor_msgs::PointCloud2& message) {
   ADEBUG << "get point cloud callback";
 
   if (lidar_process_ != nullptr && lidar_process_->IsInit()) {

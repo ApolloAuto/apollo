@@ -5,7 +5,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "prediction_lib",
     srcs = ["prediction.cc"],
-    hdrs = ["prediction.h"],
+    hdrs = [
+        "prediction.h",
+        "prediction_interface.h",
+    ],
     deps = [
         "//modules/common",
         "//modules/common:apollo_app",
@@ -13,9 +16,9 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/util",
-        "//modules/common/time",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/time",
+        "//modules/common/util",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",

@@ -12,12 +12,12 @@ cc_library(
         "//modules/drivers/canbus/proto:canbus_proto",
         "//modules/monitor/hardware:hardware_checker",
         "//modules/monitor/hardware/can/socketcan:socketcan_checker_lib",
-      ] + select({
-            "//tools/platforms:use_esd_can": [
-                "//modules/monitor/hardware/can/esdcan:esdcan_checker_lib",
-            ],
-            "//conditions:default": [],
-        }),
+    ] + select({
+        "//tools/platforms:use_esd_can": [
+            "//modules/monitor/hardware/can/esdcan:esdcan_checker_lib",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
@@ -27,9 +27,9 @@ cc_library(
     deps = [
         ":can_checker_factory",
         "//external:gflags",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/common:canbus_common",
-        "//modules/common/util:util",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/util",
         "//modules/monitor/common:monitor_interface",
     ],
 )
@@ -42,9 +42,9 @@ cc_binary(
     deps = [
         ":can_checker_factory",
         "//external:gflags",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/common:canbus_common",
-        "//modules/common/util:util",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/util",
         "//modules/hmi/utils:hmi_status_helper",
         "//modules/monitor/hardware:hardware_check_utils",
     ],
@@ -59,9 +59,9 @@ cc_binary(
     deps = [
         ":can_checker_factory",
         "//external:gflags",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/common:canbus_common",
-        "//modules/common/util:util",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/util",
         "//modules/hmi/utils:hmi_status_helper",
         "//modules/monitor/hardware:hardware_check_utils",
     ],
