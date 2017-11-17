@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.data;
+package apollo.data.recorder;
 
 message RecorderInfo {
   optional uint32 status = 1;
