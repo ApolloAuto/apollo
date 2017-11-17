@@ -33,6 +33,8 @@ class ViewSubplot:
         self.vehicle = ax.plot(
             [-1.055, 1.055, 1.055, -1.055, -1.055], [0, 0, -4.933, -4.933, 0],
             'r-', lw=1)
+        self.routing, = ax.plot(
+            [0], [0], 'r--', lw=3, alpha=0.8)
 
         self.speed_line, = ax.plot([0], [0], 'r-', lw=3, alpha=0.4)
         self.acc_line, = ax.plot([0], [0], 'y-', lw=3, alpha=1)
@@ -51,7 +53,7 @@ class ViewSubplot:
         self.ref_lane.set_visible(False)
 
     def show(self, mobileye_data, localization_data, planning_data,
-             chassis_data):
+             chassis_data, routing_data):
         self.left_lane.set_visible(True)
         self.right_lane.set_visible(True)
         self.ref_lane.set_visible(True)
@@ -89,6 +91,34 @@ class ViewSubplot:
 
         if localization_data.localization_pb is None:
             return
+
+        vx = localization_data.localization_pb.pose.position.x
+        vy = localization_data.localization_pb.pose.position.y
+
+        routing_data.routing_data_lock.acquire()
+        path_x = [x - vx for x in routing_data.routing_x]
+        path_y = [y - vy for y in routing_data.routing_y]
+        routing_data.routing_data_lock.release()
+
+        heading = localization_data.localization_pb.pose.heading
+        npath_x = []
+        npath_y = []
+
+        for i in range(len(path_x)):
+            x = path_x[i]
+            y = path_y[i]
+            # newx = x * math.cos(heading) - y * math.sin(heading)
+            # newy = y * math.cos(heading) + x * math.sin(heading)
+            newx = x * math.cos(- heading + 1.570796) - y * math.sin(
+                -heading + 1.570796)
+            newy = y * math.cos(- heading + 1.570796) + x * math.sin(
+                -heading + 1.570796)
+            npath_x.append(newx)
+            npath_y.append(newy)
+
+        self.routing.set_xdata(npath_x)
+        self.routing.set_ydata(npath_y)
+
         speed_x = localization_data.localization_pb.pose.linear_velocity.x
         speed_y = localization_data.localization_pb.pose.linear_velocity.y
         acc_x = localization_data.localization_pb.pose.linear_acceleration.x
