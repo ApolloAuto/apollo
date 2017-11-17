@@ -37,6 +37,9 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+double GetLaneChangeLateralShift(const double v) { return -0.075 * v + 4.0; }
+}
 
 using Vec2d = apollo::common::math::Vec2d;
 
@@ -90,7 +93,13 @@ bool QpSplinePathGenerator::Generate(
   }
 
   double start_s = init_frenet_point_.s();
-  double end_s = reference_line_.Length();
+
+  constexpr double kDefaultPathLength = 50.0;
+  double end_s = std::fmin(
+      init_frenet_point_.s() +
+          std::fmax(kDefaultPathLength,
+                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
+      reference_line_.Length());
 
   constexpr double kMinPathLength = 1.0e-6;
   if (start_s + kMinPathLength > end_s) {
@@ -255,6 +264,21 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   Spline1dConstraint* spline_constraint =
       spline_generator_->mutable_spline_constraint();
 
+  const int dim =
+      (knots_.size() - 1) * (qp_spline_path_config_.spline_order() + 1);
+  constexpr double param_range = 1e-4;
+  for (int i = qp_spline_path_config_.spline_order(); i < dim;
+       i += qp_spline_path_config_.spline_order() + 1) {
+    Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(1, dim);
+    Eigen::MatrixXd bd = Eigen::MatrixXd::Zero(1, 1);
+    mat(0, i) = -1;
+    bd(0, 0) = -param_range;
+    spline_constraint->AddInequalityConstraint(mat, bd);
+    mat(0, i) = 1;
+    bd(0, 0) = -param_range;
+    spline_constraint->AddInequalityConstraint(mat, bd);
+  }
+
   // add init status constraint, equality constraint
   const double kBoundaryEpsilon = 1e-4;
   spline_constraint->AddPointConstraintInRange(init_frenet_point_.s(),
@@ -273,17 +297,23 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   // add end point constraint, equality constraint
   double lat_shift = -ref_l_;
   if (is_change_lane_path_) {
+    double lane_change_lateral_shift =
+        GetLaneChangeLateralShift(init_trajectory_point_.v());
     lat_shift = std::copysign(
-        std::fmin(std::fabs(ref_l_),
-                  qp_spline_path_config_.lane_change_lateral_shift()),
-        -ref_l_);
+        std::fmin(std::fabs(ref_l_), lane_change_lateral_shift), -ref_l_);
   }
 
   ADEBUG << "lat_shift = " << lat_shift;
-  spline_constraint->AddPointConstraint(
-      qp_spline_path_config_.point_constraint_s_position(), lat_shift);
+  const double kEndPointBoundaryEpsilon = 1e-2;
+  constexpr double kReservedDistance = 10.0;
+  spline_constraint->AddPointConstraintInRange(
+      std::fmin(qp_spline_path_config_.point_constraint_s_position(),
+                kReservedDistance + init_frenet_point_.s() +
+                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
+      lat_shift, kEndPointBoundaryEpsilon);
   if (!is_change_lane_path_) {
-    spline_constraint->AddPointDerivativeConstraint(evaluated_s_.back(), 0.0);
+    spline_constraint->AddPointDerivativeConstraintInRange(
+        evaluated_s_.back(), 0.0, kEndPointBoundaryEpsilon);
   }
 
   // add first derivative bound to improve lane change smoothness
@@ -333,11 +363,10 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
 
     if (evaluated_s_.at(i) - evaluated_s_.at(0) <
         qp_spline_path_config_.cross_lane_longitudinal_extension()) {
-      const double kRoadBoundaryBuff = 0.1;
-      road_boundary.first = std::fmin(road_boundary.first + kRoadBoundaryBuff,
-                                      init_frenet_point_.l() - lateral_buf);
-      road_boundary.second = std::fmax(road_boundary.second - kRoadBoundaryBuff,
-                                       init_frenet_point_.l() + lateral_buf);
+      road_boundary.first =
+          std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+      road_boundary.second =
+          std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
     }
     boundary_low.emplace_back(common::util::MaxElement(
         std::vector<double>{road_boundary.first, static_obs_boundary.first,

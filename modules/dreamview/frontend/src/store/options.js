@@ -1,12 +1,21 @@
-import { observable, action } from "mobx";
+import { observable, action, computed } from "mobx";
 
 import PARAMETERS from "store/config/parameters.yml";
 
 export default class Options {
-    @observable showPOI = PARAMETERS.options.defaults.showPOI;
-    @observable showMenu = PARAMETERS.options.defaults.showMenu;
+    // Side Bar options
     @observable showConsole = PARAMETERS.options.defaults.showConsole;
+    @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
+    @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
+    @observable showQuickStarter = PARAMETERS.options.defaults.showQuickStarter;
+    @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
+    @observable showPOI = PARAMETERS.options.defaults.showPOI;
+
+    mutuallyExclusiveOptions = ['showQuickStarter', 'showModuleController',
+        'showMenu', 'showRouteEditingBar'];
+
+    // Layer Menu options
     @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
     @observable showDecisionObstacle = PARAMETERS.options.defaults.showDecisionObstacle;
     @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
@@ -35,30 +44,39 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesId;
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
 
-    @action toggleShowPOI() {
-        this.showPOI = !this.showPOI;
-        if (this.showPOI) {
-            this.showMenu = false;
-            this.showConsole = false;
+
+    @computed get showTools() {
+        return this.showQuickStarter ||
+               this.showModuleController ||
+               this.showMenu ||
+               this.showConsole ||
+               this.showPOI;
+    }
+
+    @computed get showGeo() {
+        return this.showRouteEditingBar ||
+               this.cameraAngle === 'Map' ||
+               this.cameraAngle === 'Overhead' ||
+               this.cameraAngle === 'Monitor';
+    }
+
+    @action toggleSideBar(option) {
+        this[option] = !this[option];
+
+        // Disable other mutually exclusive options
+        if (this[option] && this.mutuallyExclusiveOptions.includes(option)) {
+            for (const other of this.mutuallyExclusiveOptions) {
+                if (other !== option) {
+                    this[other] = false;
+                }
+            }
         }
     }
-    @action toggleShowMenu() {
-        this.showMenu = !this.showMenu;
-        if (this.showMenu) {
-            this.showPOI = false;
-            this.showConsole = false;
-        }
-    }
-    @action toggleShowConsole() {
-        this.showConsole = !this.showConsole;
-        if (this.showConsole) {
-            this.showPOI = false;
-            this.showMenu = false;
-        }
-    }
+
     @action toggle(option) {
         this[option] = !this[option];
     }
+
     @action selectCamera(option) {
         this.cameraAngle = option;
     }

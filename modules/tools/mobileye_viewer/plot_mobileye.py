@@ -17,6 +17,7 @@
 ###############################################################################
 
 import rospy
+import json
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -25,6 +26,7 @@ from modules.drivers.proto import mobileye_pb2
 from mobileye_data import MobileyeData
 from localization_data import LocalizationData
 from planning_data import PlanningData
+from routing_data import RoutingData
 from chassis_data import ChassisData
 from view_subplot import ViewSubplot
 from subplot_s_speed import SubplotSSpeed
@@ -32,16 +34,18 @@ from subplot_s_theta import SubplotSTheta
 from subplot_s_time import SubplotSTime
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
+from std_msgs.msg import String
 
 PLANNING_TOPIC = '/apollo/planning'
 mobileye = MobileyeData()
 localization = LocalizationData()
 planning = PlanningData()
 chassis = ChassisData()
+routing_data = RoutingData()
 
 
 def update(frame_number):
-    view_subplot.show(mobileye, localization, planning, chassis)
+    view_subplot.show(mobileye, localization, planning, chassis, routing_data)
     s_speed_subplot.show(planning)
     s_theta_subplot.show(planning)
     s_time_subplot.show(planning)
@@ -68,6 +72,10 @@ def chassis_callback(chassis_pb):
     chassis.update(chassis_pb)
 
 
+def routing_callback(routing_str):
+    routing_data.update(routing_str)
+
+
 def add_listener():
     rospy.init_node('mobileye_plot', anonymous=True)
     rospy.Subscriber('/apollo/sensor/mobileye',
@@ -82,6 +90,8 @@ def add_listener():
     rospy.Subscriber('/apollo/canbus/chassis',
                      chassis_pb2.Chassis,
                      chassis_callback)
+    rospy.Subscriber('/apollo/navigation/routing',
+                     String, routing_callback)
 
 
 if __name__ == '__main__':

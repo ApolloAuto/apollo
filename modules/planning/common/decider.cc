@@ -66,6 +66,9 @@ void Decider::MakeMainMissionCompleteDecision(
       FLAGS_destination_check_distance) {
     return;
   }
+  if (!reference_line_info.ReachedDestination()) {
+    return;
+  }
   auto mission_complete =
       decision_result_->mutable_main_decision()->mutable_mission_complete();
   mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
@@ -104,14 +107,6 @@ int Decider::MakeMainStopDecision(
     auto& adc_position =
         common::VehicleStateProvider::instance()->pose().position();
     reference_line.XYToSL({adc_position.x(), adc_position.y()}, &adc_sl);
-    const auto& vehicle_param =
-        common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-    if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {
-      AERROR << "object:" << obstacle->Id() << " stop fence route_s["
-             << stop_line_s << "] behind adc route_s[" << adc_sl.s() << "]";
-      continue;
-    }
-
     if (stop_line_s < min_stop_line_s) {
       min_stop_line_s = stop_line_s;
       stop_obstacle = obstacle;

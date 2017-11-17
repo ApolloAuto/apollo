@@ -76,7 +76,7 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   std::vector<AnchorPoint> anchor_points;
   const double interval = 10.0;
   int num_of_anchors =
-      std::max(1, static_cast<int>(reference_line_->Length() / interval + 0.5));
+      std::max(2, static_cast<int>(reference_line_->Length() / interval + 0.5));
   std::vector<double> anchor_s;
   common::util::uniform_slice(0.0, reference_line_->Length(),
                               num_of_anchors - 1, &anchor_s);
@@ -96,7 +96,7 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   anchor_points.back().lateral_bound = 1e-6;
   smoother_.SetAnchorPoints(anchor_points);
   EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_FLOAT_EQ(152.5217, smoothed_reference_line.Length());
+  EXPECT_FLOAT_EQ(152.54079, smoothed_reference_line.Length());
 }
 
 }  // namespace planning

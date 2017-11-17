@@ -20,23 +20,31 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/control/common/control_gflags.h"
 #include "modules/control/controller/lat_controller.h"
 #include "modules/control/controller/lon_controller.h"
+#include "modules/control/controller/mpc_controller.h"
 
 namespace apollo {
 namespace control {
 
-using apollo::common::time::Clock;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::time::Clock;
 
 void ControllerAgent::RegisterControllers() {
-  controller_factory_.Register(
-      ControlConf::LAT_CONTROLLER,
-      []() -> Controller * { return new LatController(); });
-  controller_factory_.Register(
-      ControlConf::LON_CONTROLLER,
-      []() -> Controller * { return new LonController(); });
+  if (!FLAGS_use_mpc) {
+    controller_factory_.Register(
+        ControlConf::LAT_CONTROLLER,
+        []() -> Controller * { return new LatController(); });
+    controller_factory_.Register(
+        ControlConf::LON_CONTROLLER,
+        []() -> Controller * { return new LonController(); });
+  } else {
+    controller_factory_.Register(
+        ControlConf::MPC_CONTROLLER,
+        []() -> Controller * { return new MPCController(); });
+  }
 }
 
 Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
@@ -80,8 +88,7 @@ Status ControllerAgent::Init(const ControlConf *control_conf) {
 
 Status ControllerAgent::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
-    const canbus::Chassis *chassis,
-    const planning::ADCTrajectory *trajectory,
+    const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
     control::ControlCommand *cmd) {
   for (auto &controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
@@ -91,7 +98,7 @@ Status ControllerAgent::ComputeControlCommand(
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "controller: " << controller->Name()
-          << " calculation time is: " << time_diff_ms << " ms.";
+           << " calculation time is: " << time_diff_ms << " ms.";
     cmd->mutable_latency_stats()->add_controller_time_ms(time_diff_ms);
   }
   return Status::OK();

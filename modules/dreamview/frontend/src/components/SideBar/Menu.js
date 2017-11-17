@@ -1,6 +1,9 @@
 import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
+
+import MenuItemRadio from 'components/common/MenuItemRadio';
+
 import menuData from 'store/config/MenuData';
 import perceptionIcon from "assets/images/menu/Perception.png";
 import predictionIcon from "assets/images/menu/Prediction.png";
@@ -54,26 +57,7 @@ class MenuItemCheckbox extends React.Component {
                         id={id} checked={options[MenuIdOptionMapping[id]]} readOnly/>
                         <label className="toggle-switch-label" htmlFor={id} />
                     </div>
-                    <span>  {title}</span>
-                </li>
-            </ul>
-        );
-    }
-}
-
-@observer
-class MenuItemRadio extends React.Component {
-    render() {
-        const {id, title, options} = this.props;
-        return (
-            <ul>
-                <li id={title} onClick={() => {
-                    options.selectCamera(title);
-                }}>
-                    <input type="radio" name={id} id={title}
-                    checked={options.cameraAngle === title} readOnly/>
-                    <label id="radio-selector-label" htmlFor={title} />
-                    <span>  {title}</span>
+                    <span>{title}</span>
                 </li>
             </ul>
         );
@@ -100,17 +84,23 @@ class SubMenu extends React.Component {
                     const item = data[key];
                     return (
                         <MenuItemRadio key={`${tabId}_${key}`} id={tabId}
-                        title={item} options={options}/>
+                                       onClick={() => {
+                                            options.selectCamera(item);
+                                        }}
+                                       checked={options.cameraAngle === item}
+                                       title={item} options={options}/>
                     );
                 });
         }
         const result = (
-            <div>
-                <details>
-                    <summary><img src={MenuIconMapping[tabId]} />
-                    <span> {tabTitle}</span></summary>
-                    {entries}
-                </details>
+            <div className="card">
+                <div className="card-header summary">
+                    <span>
+                        <img src={MenuIconMapping[tabId]}/>
+                        {tabTitle}
+                    </span>
+                </div>
+                <div className="card-content-column">{entries}</div>
             </div>
         );
         return result;

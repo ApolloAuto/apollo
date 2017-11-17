@@ -5,7 +5,6 @@ package apollo.dreamview;
 import "modules/common/monitor/proto/monitor.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
-import "modules/planning/proto/planning_internal.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -93,8 +92,8 @@ message Object {
   optional double speed_heading = 30;
 
   // Signal Info
-  // For objects with signals set and current signal such as Traffic Light and
-  // Stop Sign.
+  // For objects with signals set and current signal such as Traffic Light,
+  // Stop Sign, and Vehicle Signal.
   repeated string signal_set = 17;
   optional string current_signal = 18;
 
@@ -193,8 +192,6 @@ message SimulationWorld {
   optional DelaysInMs delay = 12;
 
   optional .apollo.common.monitor.MonitorMessage monitor = 13;
-
-  optional .apollo.planning_internal.PlanningData planning_data = 14;
 
   // Module latency
   optional Latency latency = 15;

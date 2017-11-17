@@ -38,6 +38,7 @@ namespace planning {
 using apollo::common::adapter::AdapterManager;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
+using apollo::common::util::WithinBound;
 
 SignalLight::SignalLight(const RuleConfig& config) : TrafficRule(config) {}
 
@@ -153,22 +154,25 @@ double SignalLight::GetStopDeceleration(
 void SignalLight::CreateStopObstacle(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
-  common::SLPoint sl_point;
-  sl_point.set_s(signal_light->start_s);
-  sl_point.set_l(0);
-  common::math::Vec2d vec2d;
   const auto& reference_line = reference_line_info->reference_line();
-  reference_line.SLToXY(sl_point, &vec2d);
-
-  double heading =
-      reference_line.GetReferencePoint(signal_light->start_s).heading();
+  const double stop_s =
+      signal_light->start_s - FLAGS_stop_distance_traffic_light;
+  const double box_center_s =
+      signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
+  if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
+      !WithinBound(0.0, reference_line.Length(), box_center_s)) {
+    ADEBUG << "signal " << signal_light->object_id
+           << " is not on reference line";
+    return;
+  }
+  double heading = reference_line.GetReferencePoint(stop_s).heading();
   double left_lane_width = 0.0;
   double right_lane_width = 0.0;
   reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
                               &right_lane_width);
 
-  common::math::Box2d stop_box{{vec2d.x(), vec2d.y()},
-                               heading,
+  auto box_center = reference_line.GetReferencePoint(box_center_s);
+  common::math::Box2d stop_box{box_center, heading,
                                FLAGS_virtual_stop_wall_length,
                                left_lane_width + right_lane_width};
 
@@ -177,8 +181,14 @@ void SignalLight::CreateStopObstacle(
           FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
           stop_box));
   auto* path_decision = reference_line_info->path_decision();
+  auto stop_point = reference_line.GetReferencePoint(stop_s);
   ObjectDecisionType stop;
   stop.mutable_stop();
+  stop.mutable_stop()->set_distance_s(-FLAGS_stop_distance_traffic_light);
+  stop.mutable_stop()->set_stop_heading(heading);
+  stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
+  stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
+  stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 }

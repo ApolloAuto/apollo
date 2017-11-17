@@ -3,14 +3,61 @@ import { inject, observer } from "mobx-react";
 import SplitPane from 'react-split-pane';
 
 import DashCamPlayer from "components/DashCamPlayer";
+import ModuleController from "components/ModuleController";
+import Navigation from "components/Navigation";
+import PNCMonitor from "components/PNCMonitor";
+import RouteEditingBar from "components/RouteEditingBar";
+import QuickStarter from "components/QuickStarter";
+import Header from "components/Header";
+import Loader from "components/common/Loader";
 import SideBar from "components/SideBar";
+import Console from "components/SideBar/Console";
+import POI from "components/SideBar/POI";
+import Menu from "components/SideBar/Menu";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
-import RouteEditingBar from "components/RouteEditingBar";
-import Loader from "components/common/Loader";
-import PNCMonitor from "components/PNCMonitor";
-import Geolocation from "components/common/Geolocation";
 import WS from "store/websocket";
+
+@inject("store") @observer
+class MainView extends React.Component {
+    render() {
+        const { sceneDimension, meters, monitor, options, trafficSignal, video } = this.props.store;
+
+        return (
+            <div className="main-view" style={{height: sceneDimension.height}}>
+                <Scene  width={sceneDimension.width}
+                        height={sceneDimension.height}
+                        options={options}
+                        invisible={false}/>
+                {options.showRouteEditingBar
+                    ? <RouteEditingBar />
+                    : <StatusBar meters={meters}
+                                 trafficSignal={trafficSignal}
+                                 showNotification={!options.showConsole}
+                                 monitor={monitor}/>}
+                {video.showVideo && <DashCamPlayer />}
+            </div>
+        );
+    }
+}
+
+@inject("store") @observer
+class Tools extends React.Component {
+    render() {
+        const { monitor, options, routeEditingManager } = this.props.store;
+
+        return (
+            <div className="tools">
+                {options.showModuleController && <ModuleController />}
+                {options.showQuickStarter && <QuickStarter />}
+                {options.showMenu && <Menu options={options} /> }
+                {options.showPOI && <POI routeEditingManager={routeEditingManager}
+                                         options={options}/>}
+                {options.showConsole && <Console monitor={monitor} />}
+            </div>
+        );
+    }
+}
 
 @inject("store") @observer
 export default class Dreamview extends React.Component {
@@ -27,6 +74,10 @@ export default class Dreamview extends React.Component {
         }
     }
 
+    componentWillMount() {
+        this.props.store.updateDimension();
+    }
+
     componentDidMount() {
         WS.initialize();
         window.addEventListener("resize", () => {
@@ -35,40 +86,37 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { isInitialized, dimension, meters, options,
-                video, routeEditingManager } = this.props.store;
+        const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
 
-        if (!isInitialized) {
-            return (<Loader />);
+        let mainView = null;
+        if (hmi.showNavigationMap) {
+            mainView = <Navigation height={sceneDimension.height}/>;
+        } else if (!isInitialized) {
+            mainView = <Loader height={sceneDimension.height}/>;
+        } else {
+            mainView = <MainView />;
         }
-
-        const showBars = !routeEditingManager.inEditingView;
-        const showRoutingBar = routeEditingManager.inEditingView;
-        const showVideo = (video.path !== undefined && video.path.length !== 0);
-        const showGeo = (showRoutingBar ||
-                options.cameraAngle === 'Map' ||
-                options.cameraAngle === 'Overhead' ||
-                options.cameraAngle === 'Monitor');
-
         return (
-            <SplitPane split="vertical"
-                       size={dimension.width}
-                       onChange={this.handleDrag}
-                       allowResize={options.showPNCMonitor}>
-                <div>
-                    {showBars ? <SideBar /> : null}
-                    {showBars ? <StatusBar meters={meters} /> : null}
-                    {showRoutingBar ? <RouteEditingBar /> : null}
-                    <Scene
-                        width={dimension.width}
-                        height={dimension.height}
-                        options={options}
-                        invisible={false}/>
-                    {showGeo ? <Geolocation /> : null}
-                    {showVideo  ? <DashCamPlayer /> : null}
+            <div>
+                <Header />
+                <div className="pane-container">
+                    <SplitPane split="vertical"
+                           size={dimension.width}
+                           onChange={this.handleDrag}
+                           allowResize={options.showPNCMonitor}>
+                        <div className="left-pane">
+                            <SideBar />
+                            <div className="dreamview-body">
+                                {mainView}
+                                <Tools />
+                            </div>
+                        </div>
+                        <div className="right-pane">
+                            {options.showPNCMonitor && <PNCMonitor />}
+                        </div>
+                    </SplitPane>
                 </div>
-                {options.showPNCMonitor ? <PNCMonitor /> : <div></div>}
-            </SplitPane>
+            </div>
         );
     }
 }

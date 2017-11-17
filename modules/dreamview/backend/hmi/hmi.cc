@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/hmi/hmi.h"
 
 #include <cstdlib>
+#include <thread>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -51,10 +52,17 @@ using apollo::control::DrivingAction;
 using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
 
+google::protobuf::util::JsonOptions JsonOption() {
+  google::protobuf::util::JsonOptions json_option;
+  json_option.always_print_primitive_fields = true;
+  return json_option;
+}
+
 std::string ProtoToTypedJson(const std::string &json_type,
                              const google::protobuf::Message &proto) {
+  static const auto kJsonOption = JsonOption();
   std::string json_string;
-  google::protobuf::util::MessageToJsonString(proto, &json_string);
+  google::protobuf::util::MessageToJsonString(proto, &json_string, kJsonOption);
 
   Json json_obj;
   json_obj["type"] = json_type;
@@ -88,11 +96,52 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
   return result;
 }
 
+// Send PadMessage to change driving mode to target mode.
+// Retry for several times to try to guarantee the result.
+bool GuaranteeDrivingMode(const Chassis::DrivingMode target_mode,
+                          const bool reset_first) {
+  if (reset_first) {
+    if (!GuaranteeDrivingMode(Chassis::COMPLETE_MANUAL, false)) {
+      return false;
+    }
+  }
+
+  control::PadMessage pad;
+  switch (target_mode) {
+    case Chassis::COMPLETE_MANUAL:
+      pad.set_action(DrivingAction::RESET);
+      break;
+    case Chassis::COMPLETE_AUTO_DRIVE:
+      pad.set_action(DrivingAction::START);
+      break;
+    default:
+      AFATAL << "Unknown action to change driving mode to " << target_mode;
+  }
+
+  constexpr int kMaxTries = 3;
+  constexpr auto kTryInterval = std::chrono::milliseconds(500);
+  auto* chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
+  for (int i = 0; i < kMaxTries; ++i) {
+    // Send driving action periodically until entering target driving mode.
+    AdapterManager::FillPadHeader("HMI", &pad);
+    AdapterManager::PublishPad(pad);
+
+    std::this_thread::sleep_for(kTryInterval);
+    chassis->Observe();
+    if (chassis->Empty()) {
+      AERROR << "No Chassis message received!";
+    } else if (chassis->GetLatestObserved().driving_mode() == target_mode) {
+      return true;
+    }
+  }
+  AERROR << "Failed to change driving mode to " << target_mode;
+  return false;
+}
+
 }  // namespace
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket)
-    , map_service_(map_service) {
+    : websocket_(websocket), map_service_(map_service) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
   // If the module path doesn't exist, remove it from list.
@@ -104,6 +153,13 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
     } else {
       ++iter;
     }
+  }
+
+  // If the default mode is unavailable, select the first one.
+  const auto &modes = config_.modes();
+  if (!ContainsKey(modes, status_.current_mode())) {
+    CHECK(!modes.empty());
+    status_.set_current_mode(modes.begin()->first);
   }
 
   // Get available maps and vehicles by listing data directory.
@@ -277,24 +333,8 @@ void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
     AERROR << "Unknown driving mode " << new_mode;
     return;
   }
-
-  auto driving_action = DrivingAction::RESET;
-  switch (mode) {
-    case Chassis::COMPLETE_MANUAL:
-      // Default driving action: RESET.
-      break;
-    case Chassis::COMPLETE_AUTO_DRIVE:
-      driving_action = DrivingAction::START;
-      break;
-    default:
-      AERROR << "Unknown action to change driving mode to " << new_mode;
-      return;
-  }
-
-  control::PadMessage pad;
-  pad.set_action(driving_action);
-  AdapterManager::FillPadHeader("HMI", &pad);
-  AdapterManager::PublishPad(pad);
+  const bool reset_first = (mode != Chassis::COMPLETE_MANUAL);
+  GuaranteeDrivingMode(mode, reset_first);
 }
 
 void HMI::ChangeMapTo(const std::string &map_name) {
@@ -313,7 +353,8 @@ void HMI::ChangeMapTo(const std::string &map_name) {
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
   fout << "\n--map_dir=" << *map_dir << std::endl;
   // Also reload simulation map.
-  CHECK(map_service_->ReloadMap()) << "Failed to load map from " << *map_dir;
+  CHECK(map_service_->ReloadMap(true)) << "Failed to load map from "
+                                       << *map_dir;
 
   RunModeCommand("stop");
   status_.set_current_map(map_name);
@@ -346,10 +387,7 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
     return;
   }
 
-  // Stop the running modules for previous mode.
-  if (status_.has_current_mode()) {
-    RunModeCommand("stop");
-  }
+  RunModeCommand("stop");
   status_.set_current_mode(mode_name);
   BroadcastHMIStatus();
 }

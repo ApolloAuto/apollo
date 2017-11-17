@@ -17,18 +17,18 @@
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 #include "gflags/gflags.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
+#include "modules/control/common/control_gflags.h"
 
 DEFINE_string(vehicle_param_pb_file, "vehicle_param.pb.txt",
-              "Param proto path relative to the vehicle data path.");
-DEFINE_string(vehicle_param_pb_path, "modules/common/data/mkz_config.pb.txt",
-              "Param proto path for the vehicle in use.");
+              "Param proto path relative to the vehicle data path, which will "
+              "be placed to FLAGS_vehicle_config_path.");
 
 DEFINE_string(calibration_table_file, "calibration_table.pb.txt",
-              "Calibration table path relative to the vehicle data path.");
-DEFINE_string(calibration_table_path, "modules/control/conf/lincoln.pb.txt",
-              "Calibration table path for the vehicle in use.");
+              "Calibration table path relative to the vehicle data path, which "
+              "will be placed to FLAGS_control_conf_file.");
 
 DEFINE_string(velodyne_launch_file, "start_velodyne.launch",
               "Velodyne launch file path relative to the vehicle data path.");
@@ -83,10 +83,10 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
 
   // Copy vehicle_param_pb.
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_vehicle_param_pb_file),
-           FLAGS_vehicle_param_pb_path);
+           FLAGS_vehicle_config_path);
   // Copy calibration_table.
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_calibration_table_file),
-           FLAGS_calibration_table_path);
+           FLAGS_control_conf_file);
   // Copy velodyne_params.
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_launch_file),
            TranslatePath(FLAGS_velodyne_launch_path));

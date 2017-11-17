@@ -71,15 +71,6 @@ Status Planning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-bool Planning::HasSignalLight(const PlanningConfig& config) {
-  for (const auto& rule_config : config.rule_config()) {
-    if (rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
-      return true;
-    }
-  }
-  return false;
-}
-
 Status Planning::Init() {
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
@@ -115,7 +106,7 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (HasSignalLight(config_) &&
+  if (FLAGS_enable_traffic_light &&
       AdapterManager::GetTrafficLightDetection() == nullptr) {
     std::string error_msg("Traffic Light Detection is not registered");
     AERROR << error_msg;
@@ -135,8 +126,7 @@ Status Planning::Init() {
   return planner_->Init(config_);
 }
 
-bool Planning::IsVehicleStateValid(
-    const common::VehicleStateProvider& vehicle_state) {
+bool Planning::IsVehicleStateValid(const common::VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
       std::isnan(vehicle_state.kappa()) ||
@@ -148,9 +138,10 @@ bool Planning::IsVehicleStateValid(
 }
 
 Status Planning::Start() {
-  ReferenceLineProvider::instance()->Start();
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
+  ReferenceLineProvider::instance()->Start();
+  AINFO << "Planning started";
   return Status::OK();
 }
 
@@ -186,13 +177,9 @@ void Planning::RunOnce() {
     not_ready->set_reason("chassis not ready");
   } else if (AdapterManager::GetRoutingResponse()->Empty()) {
     not_ready->set_reason("routing not ready");
-  } else if (FLAGS_enable_prediction &&
-             AdapterManager::GetPrediction()->Empty()) {
-    not_ready->set_reason("prediction not ready");
   }
   if (not_ready->has_reason()) {
-    LOG_EVERY_N(ERROR, 5) << not_ready->reason()
-                          << "; skip the planning cycle.";
+    AERROR << not_ready->reason() << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
@@ -208,11 +195,27 @@ void Planning::RunOnce() {
 
   common::Status status =
       common::VehicleStateProvider::instance()->Update(localization, chassis);
-  DCHECK(IsVehicleStateValid(*common::VehicleStateProvider::instance()));
-  if (!status.ok()) {
+  auto vehicle_state =
+      common::VehicleStateProvider::instance()->vehicle_state();
+  if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
     AERROR << "Update VehicleStateProvider failed.";
     not_ready->set_reason("Update VehicleStateProvider failed.");
     status.Save(not_ready_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    return;
+  }
+
+  // Update reference line provider
+  if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
+          AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
+    AERROR << "Failed to update routing in reference line provider";
+    return;
+  }
+  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
+
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+    not_ready->set_reason("prediction not ready");
+    AERROR << not_ready->reason() << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
@@ -316,14 +319,14 @@ common::Status Planning::Plan(
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(
-        "planner failed to make a driving plan because NO "
-        "best_reference_line "
-        "can be provided.");
+        "planner failed to make a driving plan because NO valid reference line "
+        "info.");
     AERROR << msg;
-    last_publishable_trajectory_->Clear();
+    if (last_publishable_trajectory_) {
+      last_publishable_trajectory_->Clear();
+    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
   ptr_debug->MergeFrom(best_reference_line->debug());
   trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());

@@ -48,7 +48,14 @@ DEFINE_double(look_forward_min_distance, 100,
 DEFINE_double(look_forward_time_sec, 8,
               "look forward time times adc speed to calculate this distance "
               "when creating reference line from routing");
-
+DEFINE_bool(enable_reference_line_stitching, true,
+            "Enable stitching reference line, which can reducing computing "
+            "time and improve stabilty");
+DEFINE_double(look_forward_extend_distance, 50,
+              "The step size when extending reference line.");
+DEFINE_double(reference_line_stitch_overlap_distance, 20,
+              "The overlap distance with the existing reference line when "
+              "stitching the existing reference line");
 DEFINE_double(prepare_rerouting_time, 2.0,
               "If there are this amount of seconds left to finish driving on "
               "current route, and there is no routing, do rerouting");
@@ -158,6 +165,8 @@ DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 3.0,
               "stop distance from destination line");
+DEFINE_double(stop_distance_traffic_light, 0.5,
+              "stop distance from destination line");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
@@ -233,6 +242,7 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer
 DEFINE_bool(enable_slowdown_profile_generator, true,

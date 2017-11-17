@@ -222,13 +222,14 @@ bool PncMap::GetRouteSegments(
   point.set_y(state.y());
   point.set_z(state.z());
   if (!GetNearestPointFromRouting(state, &waypoint)) {
-    AERROR << "Failed to get waypoint from routing";
+    AERROR << "Failed to get waypoint from routing with point: "
+           << point.ShortDebugString();
     return false;
   }
   auto route_index = GetWaypointIndex(waypoint);
   // vehicle has to be this close to lane center before considering change lane
   if (!waypoint.lane || route_index.size() != 3 || route_index[0] < 0) {
-    AERROR << "Invalid vehicle state:  " << state.ShortDebugString();
+    AERROR << "Invalid vehicle position:  " << state.x() << ", " << state.y();
     return false;
   }
   const int road_index = route_index[0];
@@ -247,10 +248,9 @@ bool PncMap::GetRouteSegments(
     if (index == passage_index) {
       nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
     }
-    double s = 0.0;
-    double l = 0.0;
+    common::SLPoint sl;
     LaneWaypoint segment_waypoint;
-    if (!segments.GetProjection(nearest_point, &s, &l, &segment_waypoint)) {
+    if (!segments.GetProjection(nearest_point, &sl, &segment_waypoint)) {
       ADEBUG << "Failed to get projection from point: "
              << nearest_point.ShortDebugString();
       continue;
@@ -264,8 +264,13 @@ bool PncMap::GetRouteSegments(
     }
     route_segments->emplace_back();
     const auto last_waypoint = segments.LastWaypoint();
-    TruncateLaneSegments(segments, s - backward_length, s + forward_length,
-                         &route_segments->back());
+    if (!ExtendSegments(segments, sl.s() - backward_length,
+                        sl.s() + forward_length, &route_segments->back())) {
+      AERROR << "Failed to extend segments with s=" << sl.s()
+             << ", backward: " << backward_length
+             << ", forward: " << forward_length;
+      return false;
+    }
     if (route_segments->back().IsWaypointOnSegment(last_waypoint)) {
       route_segments->back().SetRouteEndWaypoint(last_waypoint);
     }
@@ -277,7 +282,7 @@ bool PncMap::GetRouteSegments(
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
       route_segments->back().SetPreviousAction(routing::FORWARD);
-    } else if (l > 0) {
+    } else if (sl.l() > 0) {
       route_segments->back().SetPreviousAction(routing::RIGHT);
     } else {
       route_segments->back().SetPreviousAction(routing::LEFT);
@@ -326,7 +331,7 @@ bool PncMap::GetNearestPointFromRouting(const common::VehicleState &state,
     }
   }
   if (waypoint->lane == nullptr) {
-    AERROR << "failed to find nearest point";
+    AERROR << "failed to find nearest point" << point.ShortDebugString();
   }
   return waypoint->lane != nullptr;
 }
@@ -359,14 +364,30 @@ LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
   return hdmap_->GetLaneById(preferred_id);
 }
 
-bool PncMap::TruncateLaneSegments(
-    const RouteSegments &segments, double start_s, double end_s,
-    RouteSegments *const truncated_segments) const {
+bool PncMap::ExtendSegments(const RouteSegments &segments,
+                            const common::PointENU &point, double look_backward,
+                            double look_forward,
+                            RouteSegments *extended_segments) {
+  common::SLPoint sl;
+  LaneWaypoint waypoint;
+  if (!segments.GetProjection(point, &sl, &waypoint)) {
+    AERROR << "point: " << point.ShortDebugString() << " is not on segment";
+    return false;
+  }
+  return ExtendSegments(segments, sl.s() - look_backward, sl.s() + look_forward,
+                        extended_segments);
+}
+
+bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
+                            double end_s,
+                            RouteSegments *const truncated_segments) const {
   if (segments.empty()) {
     AERROR << "The input segments is empty";
     return false;
   }
   CHECK_NOTNULL(truncated_segments);
+  truncated_segments->SetProperties(segments);
+
   if (start_s >= end_s) {
     AERROR << "start_s(" << start_s << " >= end_s(" << end_s << ")";
     return false;
@@ -404,8 +425,14 @@ bool PncMap::TruncateLaneSegments(
     const double adjusted_end_s =
         std::min(end_s - router_s + lane_segment.start_s, lane_segment.end_s);
     if (adjusted_start_s < adjusted_end_s) {
-      truncated_segments->emplace_back(lane_segment.lane, adjusted_start_s,
-                                       adjusted_end_s);
+      if (!truncated_segments->empty() &&
+          truncated_segments->back().lane->id().id() ==
+              lane_segment.lane->id().id()) {
+        truncated_segments->back().end_s = adjusted_end_s;
+      } else {
+        truncated_segments->emplace_back(lane_segment.lane, adjusted_start_s,
+                                         adjusted_end_s);
+      }
     }
     router_s += (lane_segment.end_s - lane_segment.start_s);
     if (router_s > end_s) {
@@ -413,10 +440,18 @@ bool PncMap::TruncateLaneSegments(
     }
   }
   // Extend the trajectory towards the end of the trajectory.
+  if (router_s < end_s && !truncated_segments->empty()) {
+    auto &back = truncated_segments->back();
+    if (back.lane->total_length() > back.end_s) {
+      double origin_end_s = back.end_s;
+      back.end_s =
+          std::min(back.end_s + end_s - router_s, back.lane->total_length());
+      router_s += back.end_s - origin_end_s;
+    }
+  }
   if (router_s < end_s) {
-    const auto &last_segment = segments.back();
-    auto last_lane = last_segment.lane;
-    double last_s = last_segment.end_s;
+    auto last_lane = GetRouteSuccessor(segments.back().lane);
+    double last_s = 0.0;
     while (router_s < end_s - kRouteEpsilon) {
       if (last_lane == nullptr) {
         break;

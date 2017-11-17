@@ -60,7 +60,7 @@ class ReferenceLineProvider {
    */
   ~ReferenceLineProvider();
 
-  void Init(const hdmap::HDMap* hdmap_,
+  void Init(const hdmap::HDMap* base_map,
             const QpSplineReferenceLineSmootherConfig& smoother_config);
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
@@ -74,31 +74,50 @@ class ReferenceLineProvider {
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);
 
+ private:
   /**
    * @brief Use PncMap to create refrence line and the corresponding segments
    * based on routing and current position. This is a thread safe function.
    * @return true if !reference_lines.empty() && reference_lines.size() ==
    *                 segments.size();
    **/
-  bool CreateReferenceLineFromRouting(
-      std::list<ReferenceLine>* reference_lines,
-      std::list<hdmap::RouteSegments>* segments);
+  bool CreateReferenceLine(std::list<ReferenceLine>* reference_lines,
+                           std::list<hdmap::RouteSegments>* segments);
 
- private:
   void GenerateThread();
   void IsValidReferenceLine();
   void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
   bool IsAllowChangeLane(const common::math::Vec2d& point,
                          const std::list<hdmap::RouteSegments>& route_segments);
 
+  bool CreateRouteSegments(const common::VehicleState& vehicle_state,
+                           double look_forward_distance,
+                           double look_backward_distance,
+                           std::list<hdmap::RouteSegments>* segments);
+
   bool IsReferenceLineSmoothValid(const ReferenceLine& raw,
                                   const ReferenceLine& smoothed) const;
 
-  bool SmoothReferenceLine(const hdmap::RouteSegments& lanes,
+  bool SmoothReferenceLine(const ReferenceLine& raw_reference_line,
                            ReferenceLine* reference_line);
+
+  bool SmoothPrefixedReferenceLine(const ReferenceLine& prefix_ref,
+                                   const ReferenceLine& raw_ref,
+                                   ReferenceLine* reference_line);
 
   void GetAnchorPoints(const ReferenceLine& reference_line,
                        std::vector<AnchorPoint>* anchor_points) const;
+
+  bool SmoothRouteSegment(const hdmap::RouteSegments& segments,
+                          ReferenceLine* reference_line);
+
+  /**
+   * @brief This function creates a smoothed forward reference line
+   * based on the given segments.
+   */
+  bool ExtendReferenceLine(const common::VehicleState& state,
+                           hdmap::RouteSegments* segments,
+                           ReferenceLine* reference_line);
 
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
