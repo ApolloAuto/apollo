@@ -14,7 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 
-#include "modules/data/recorder/info_collector.h"
+#include "modules/data/util/info_collector.h"
 
 #include "gtest/gtest.h"
 

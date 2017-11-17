@@ -42,7 +42,8 @@ class ConfigParser(object):
             stream = file(config_file, 'r')    
             yaml_cf = yaml.safe_load(stream) 
         except Exception as e:
-            logging.error("Load config file %s encounters error, %s", config_file, str(e))
+            logging.error("Load config file %s encounters error, %s",
+                          config_file, str(e))
         else:
             logging.info("Load config file %s successfully", config_file)
         return yaml_cf
@@ -62,21 +63,30 @@ class ConfigParser(object):
             self.vehicle['vehicle_tag'] = vehicle_required['vehicle_tag']
             self.vehicle['vehicle_type'] = vehicle_required['vehicle_type']
         except KeyError as e:
-            logging.error("vehicle_id, vehicle_type and vehicle_tag are required, %s", str(e))
+            logging.error(
+                "vehicle_id, vehicle_type and vehicle_tag are required, %s",
+                str(e))
             return -1
         try:
             self.vehicle['vehicle_id'] = os.environ['CARID']
-            logging.info("Get CARID from env variable successfully, CARID=%s", self.vehicle['vehicle_id'])
+            logging.info("Get CARID from env variable successfully, CARID=%s",
+                         self.vehicle['vehicle_id'])
         except KeyError as e:
-            logging.warn("Get CARID from env variable failed, read carid from conf.")
+            logging.warn(
+                "Get CARID from env variable failed, read carid from conf.")
         if "optional" in vehicle:
             vehicle_optional = vehicle.get('optional')
             if vehicle_optional is not None:
                 try:
-                    self.vehicle['description'] = vehicle_optional['description']
+                    self.vehicle['description'] = \
+                    vehicle_optional['description']
                 except KeyError as e:
-                    logging.warn("get vehicle optional field encounters error, %s", str(e))
-        logging.info("get vehicle from yaml config file successfully, vehicle=%s", self.vehicle)
+                    logging.warn(
+                        "get vehicle optional field encounters error, %s",
+                        str(e))
+        logging.info(
+            "get vehicle from yaml config file successfully, vehicle=%s",
+            self.vehicle)
         return 0
 
     def get_organization_from_yaml(self, yaml_config):
@@ -87,7 +97,8 @@ class ConfigParser(object):
             return -1
         org_required = org.get('required')
         if org_required is None:
-            logging.error("Config file must contain organization required field.")
+            logging.error(
+                "Config file must contain organization required field.")
             return -1
         try:
             self.organization['name'] = org_required['name']
@@ -99,11 +110,14 @@ class ConfigParser(object):
             org_optional = org.get('optional')
             if org_optional is not None:
                 try:
-                    self.organization['description'] = org_optional['description']
+                    self.organization['description'] = \
+                    org_optional['description']
                 except KeyError as e:
-                    logging.warn("Get organization optional field encounters error, %s", str(e))
-        logging.info("Get organization from yaml config file successfully, organization=%s",
-            self.organization)
+                    logging.warn(
+                        "Get organization optional field encounters error, %s",
+                        str(e))
+        logging.info("Get organization from yaml config file successfully, "
+                     "organization=%s", self.organization)
         return 0
 
     def get_datatype_from_yaml(self, yaml_config):
@@ -119,7 +133,9 @@ class ConfigParser(object):
         data_type = data.get('data_type')
         if data_type is not None:
             self.data_type = data_type
-        logging.info("Get data_type from yaml config file successfully, data_type=%s", self.data_type)
+        logging.info(
+            "Get data_type from yaml config file successfully, data_type=%s",
+            self.data_type)
         return 0
         
     def get_global_config(self, yaml_config):
