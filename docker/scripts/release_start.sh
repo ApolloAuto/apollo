@@ -71,6 +71,9 @@ function main() {
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
+    devices="${devices} $(find_device camera*)"
+    devices="${devices} $(find_device video*)"
+
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
