@@ -76,6 +76,8 @@ function main(){
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
+    devices="${devices} $(find_device video*)"
+    devices="${devices} $(find_device camera*)"
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
