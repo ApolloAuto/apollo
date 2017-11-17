@@ -86,6 +86,10 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
   double fixed_start_kappa_ = 0.0;
 
   double fixed_start_dkappa_ = 0.0;
+
+  double zero_x_ = 0.0;
+
+  double zero_y_ = 0.0;
 };
 
 }  // namespace planning
