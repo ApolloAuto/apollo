@@ -28,9 +28,7 @@ using apollo::common::TrajectoryPoint;
 namespace apollo {
 namespace planning {
 
-class RTKReplayPlannerTest : public ::testing::Test {};
-
-TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
+TEST(RTKReplayPlannerTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
   FLAGS_enable_map_reference_unify = false;
   RTKReplayPlanner planner;
@@ -77,7 +75,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   EXPECT_DOUBLE_EQ(last_point->path_point().y(), 4140681.98605);
 }
 
-TEST_F(RTKReplayPlannerTest, ErrorTest) {
+TEST(RTKReplayPlannerTest, ErrorTest) {
   FLAGS_rtk_trajectory_filename =
       "modules/planning/testdata/garage_no_file.csv";
   FLAGS_enable_map_reference_unify = false;
