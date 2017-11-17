@@ -21,10 +21,6 @@
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
