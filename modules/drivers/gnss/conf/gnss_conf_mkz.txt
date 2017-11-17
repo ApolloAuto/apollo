@@ -42,7 +42,7 @@ login_commands: "log bestposb ontime 1\r\n"
 login_commands: "log INSPVAXB ontime 0.5\r\n"
 login_commands: "log INSPVASB ontime 0.01\r\n"
 login_commands: "log CORRIMUDATASB ontime 0.01\r\n"
-login_commands: "log RAWIMUB onnew 0 0\r\n"
+login_commands: "log RAWIMUSXB onnew 0 0\r\n"
 login_commands: "log INSCOVSB ontime 1\r\n"
 login_commands: "log mark1pvab onnew\r\n"
 
