@@ -28,19 +28,27 @@ docker-machine create --driver virtualbox \
     apollo
 ```
 
-3. Bring up the container and start to work!
+## Bring up and Play
+
+Bring up the container and start to work!
 
 ```bash
 bash docker/scripts/mac/dev_start.sh
 bash docker/scripts/mac/dev_into.sh
+```
 
+The followed procedure inside the docker container is independent with your
+MacOS. Try
+[build and release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#build_release).
+
+```bash
 [Inside container] bash apollo.sh build
 [Inside container] ...
 ```
 
 ## Known Hacks
 
-1. You docker machine might go down in some situations such as suspending your
+1. Your docker machine might go down in some situations such as suspending your
 MacOS. You should bring it up again:
 
 ```bash
