@@ -41,7 +41,9 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const { return "planning"; }
+std::string Planning::Name() const {
+  return "planning";
+}
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -142,11 +144,12 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
+void Planning::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+}
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
-  AdapterManager::FillPlanningHeader(Name(), trajectory_pb);
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
@@ -155,7 +158,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
     trajectory_pb->mutable_routing_header()->CopyFrom(
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
-  AdapterManager::PublishPlanning(*trajectory_pb);
+  Publish(trajectory_pb);
 }
 
 void Planning::RunOnce() {

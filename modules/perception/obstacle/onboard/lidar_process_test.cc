@@ -129,7 +129,7 @@ TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   lidar_process_.objects_ = objs;
 
   PerceptionObstacles obstacles;
-  EXPECT_TRUE(lidar_process_.GeneratePbMsg(&obstacles));
+  lidar_process_.GeneratePbMsg(&obstacles);
   EXPECT_EQ(obstacles.perception_obstacle_size(), 2);
   EXPECT_EQ(obstacles.perception_obstacle(0).type(),
             PerceptionObstacle::VEHICLE);
