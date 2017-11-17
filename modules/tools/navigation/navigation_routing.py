@@ -55,42 +55,65 @@ def add_listener():
                                   String, queue_size=1)
 
 
-@app.route('/routing', methods=["POST", "GET"])
-def routing():
-    content = request.json
-    start_latlon = str(content["start_lat"]) + "," + str(content["start_lon"])
-    end_latlon = str(content["end_lat"]) + "," + str(content["end_lon"])
+def request_routing(request_json):
+    if "start_lat" not in request_json:
+        return None
+    if "start_lon" not in request_json:
+        return None
+    if "end_lat" not in request_json:
+        return None
+    if "end_lon" not in request_json:
+        return None
+
+    start_latlon = str(request_json["start_lat"]) + "," + \
+                   str(request_json["start_lon"])
+    end_latlon = str(request_json["end_lat"]) + "," + \
+                 str(request_json["end_lon"])
 
     url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + \
-          start_latlon + "&destination=" + end_latlon + \
-          "&key=" + API_KEY
+          start_latlon + "&destination=" + end_latlon + "&key=" + API_KEY
+
     res = requests.get(url)
-    path = []
     if res.status_code != 200:
-        return jsonify(path)
+        return None
     response = json.loads(res.content)
-
     if len(response['routes']) < 1:
-        return jsonify(path)
+        return None
     steps = response['routes'][0]['legs'][0]['steps']
+    return steps
 
+
+@app.route('/routing', methods=["POST", "GET"])
+def routing():
+    request_json = request.json
+    steps = request_routing(request_json)
+    if steps is None:
+        routing_pub.publish(json.dumps([]))
+        return jsonify([])
+
+    latlon_path, utm_steps = get_latlon_and_utm_path(steps)
+
+    routing_pub.publish(json.dumps(utm_steps))
+    return jsonify(latlon_path)
+
+
+def get_latlon_and_utm_path(steps):
+    latlon_path = []
     for step in steps:
         start_loc = step['start_location']
         end_loc = step['end_location']
-        path.append({'lat': start_loc['lat'], 'lng': start_loc['lng']})
+        latlon_path.append({'lat': start_loc['lat'], 'lng': start_loc['lng']})
         points = decode_polyline(step['polyline']['points'])
         utm_points = []
 
         for point in points:
-            path.append({'lat': point[0], 'lng': point[1]})
+            latlon_path.append({'lat': point[0], 'lng': point[1]})
             x, y = projector(point[1], point[0])
             utm_points.append([x, y])
 
         step['polyline']['points'] = utm_points
-        path.append({'lat': end_loc['lat'], 'lng': end_loc['lng']})
-
-    routing_pub.publish(json.dumps(steps))
-    return jsonify(path)
+        latlon_path.append({'lat': end_loc['lat'], 'lng': end_loc['lng']})
+    return latlon_path, steps
 
 
 def decode_polyline(polyline_str):
