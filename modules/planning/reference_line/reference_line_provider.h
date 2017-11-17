@@ -76,7 +76,7 @@ class ReferenceLineProvider {
 
  private:
   /**
-   * @brief Use PncMap to create refrence line and the corresponding segments
+   * @brief Use PncMap to create reference line and the corresponding segments
    * based on routing and current position. This is a thread safe function.
    * @return true if !reference_lines.empty() && reference_lines.size() ==
    *                 segments.size();
