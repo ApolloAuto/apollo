@@ -4,15 +4,16 @@
 // @file: proc_subnode.cpp
 // @brief: 
 // 
+#include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
-#include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "ctime"
-
+#include <std_msgs/String.h>
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/shared_data_manager.h"
@@ -82,14 +83,12 @@ bool TLProcSubnode::InitInternal() {
   return true;
 }
 
-bool TLProcSubnode::HandleEvent(const Event &sub_event,
-                                Event *pub_event) {
+bool TLProcSubnode::ProcEvent(const Event &event) {
   const double proc_subnode_handle_event_start_ts = TimeUtil::GetCurrentTime();
   PERF_FUNCTION();
   // get up-stream data
-  const double timestamp = sub_event.timestamp;
-  const std::string device_id = sub_event.reserve;
-  pub_event->local_timestamp = TimeUtil::GetCurrentTime();
+  const double timestamp = event.timestamp;
+  const std::string device_id = event.reserve;
 
   AINFO << "Detect Start ts:" << GLOG_TIMESTAMP(timestamp);
   std::string key;
@@ -113,11 +112,11 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
       image_lights->preprocess_send_timestamp);
 
-  if (TimeUtil::GetCurrentTime() - sub_event.local_timestamp > FLAGS_valid_ts_interval) {
+  if (TimeUtil::GetCurrentTime() - event.local_timestamp > FLAGS_valid_ts_interval) {
     AERROR << "TLProcSubnode failed to process image"
            << "Because images are too old"
            << ",current time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime())
-           << ", event time: " << GLOG_TIMESTAMP(sub_event.local_timestamp);
+           << ", event time: " << GLOG_TIMESTAMP(event.local_timestamp);
     return false;
   }
 
@@ -153,8 +152,6 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
         << " ts: " << GLOG_TIMESTAMP(timestamp)
         << " CameraId: " << image_lights->camera_id;
   image_lights->offset = TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id];
-  const double update_image_border_latency =
-      TimeUtil::GetCurrentTime() - before_update_image_border_ts;
 
   // recognize_status
   const double before_recognization_ts = TimeUtil::GetCurrentTime();
@@ -170,11 +167,12 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
 
   // revise status
   const double before_revise_ts = TimeUtil::GetCurrentTime();
-  if (!reviser_->Revise(ReviseOption(sub_event.timestamp), image_lights->lights.get())) {
+  if (!reviser_->Revise(ReviseOption(event.timestamp), image_lights->lights.get())) {
     AERROR << "TLReviserSubnode revise data failed. "
-           << "sub_event:" << sub_event.to_string();
+           << "sub_event:" << event.to_string();
     return false;
   }
+  PublishMessage(image_lights);
   const double revise_latency = TimeUtil::GetCurrentTime() - before_revise_ts;
 
   AINFO << "TLProcSubnode process traffic_light, "
@@ -192,18 +190,6 @@ bool TLProcSubnode::HandleEvent(const Event &sub_event,
       image_lights->preprocess_receive_timestamp) * 1000
         << " ms.";
   // }
-
-  // add to down-stream data
-  if (!proc_data_->Add(key, image_lights)) {
-    AERROR << "TLProcSubnode failed to add data down-stream, "
-           << " key:" << key;
-    return false;
-  }
-
-  // set pub_event
-  pub_event->timestamp = timestamp;
-  pub_event->reserve = device_id;
-
   return true;
 }
 
@@ -409,6 +395,123 @@ void TLProcSubnode::ComputeRectsOffset(
   *offset = std::max(abs(pt1.x - pt2.x), abs(pt1.y - pt2.y));
 }
 
+bool TLProcSubnode::PublishMessage(
+    const std::shared_ptr<ImageLights> &image_lights) const {
+  Timer timer;
+  timer.Start();
+  const auto &lights = image_lights->lights;
+
+  apollo::perception::TrafficLightDetection result;
+  apollo::common::Header *header = result.mutable_header();
+  header->set_timestamp_sec(ros::Time::now().toSec());
+  uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
+  timestamp += TLPreprocessorSubnode::_s_camera_ts_last_3_digits[static_cast<int>(image_lights->image->device_id())];
+
+  header->set_camera_timestamp(timestamp);
+  // add traffic light result
+  for (size_t i = 0; i < lights->size(); i++) {
+    apollo::perception::TrafficLight *light_result = result.add_traffic_light();
+    light_result->set_id(lights->at(i)->info.id().id());
+    light_result->set_confidence(lights->at(i)->status.confidence);
+    light_result->set_color(lights->at(i)->status.color);
+  }
+
+  // set contain_lights
+  result.set_contain_lights(image_lights->num_signals > 0);
+
+  // add traffic light debug info
+  apollo::perception::TrafficLightDebug *light_debug =
+      result.mutable_traffic_light_debug();
+
+  // set signal number
+  AINFO << "TLOutputSubnode num_signals: " << image_lights->num_signals
+        << ", camera_id: " << kCameraIdToStr.at(image_lights->camera_id)
+        << ", is_pose_valid: " << image_lights->is_pose_valid
+        << ", ts: " << GLOG_TIMESTAMP(image_lights->timestamp);
+  light_debug->set_signal_num(image_lights->num_signals);
+
+  // Crop ROI
+  if (lights->size() > 0 && lights->at(0)->region.debug_roi.size() > 0) {
+    auto &crop_roi = lights->at(0)->region.debug_roi[0];
+    auto tl_cropbox = light_debug->mutable_cropbox();
+    tl_cropbox->set_x(crop_roi.x);
+    tl_cropbox->set_y(crop_roi.y);
+    tl_cropbox->set_width(crop_roi.width);
+    tl_cropbox->set_height(crop_roi.height);
+  }
+
+  // Rectified ROI
+  for (size_t i = 0; i < lights->size(); ++i) {
+    auto &rectified_roi = lights->at(i)->region.rectified_roi;
+    auto tl_rectified_box = light_debug->add_box();
+    tl_rectified_box->set_x(rectified_roi.x);
+    tl_rectified_box->set_y(rectified_roi.y);
+    tl_rectified_box->set_width(rectified_roi.width);
+    tl_rectified_box->set_height(rectified_roi.height);
+    tl_rectified_box->set_color(lights->at(i)->status.color);
+    tl_rectified_box->set_selected(true);
+  }
+
+  // Projection ROI
+  for (size_t i = 0; i < lights->size(); ++i) {
+    auto &projection_roi = lights->at(i)->region.projection_roi;
+    auto tl_projection_box = light_debug->add_box();
+    tl_projection_box->set_x(projection_roi.x);
+    tl_projection_box->set_y(projection_roi.y);
+    tl_projection_box->set_width(projection_roi.width);
+    tl_projection_box->set_height(projection_roi.height);
+  }
+
+  // debug ROI (candidate detection boxes)
+  if (lights->size() > 0 && lights->at(0)->region.debug_roi.size() > 0) {
+    for (size_t i = 1; i < lights->at(0)->region.debug_roi.size(); ++i) {
+      auto &debug_roi = lights->at(0)->region.debug_roi[i];
+      auto tl_debug_box = light_debug->add_box();
+      tl_debug_box->set_x(debug_roi.x);
+      tl_debug_box->set_y(debug_roi.y);
+      tl_debug_box->set_width(debug_roi.width);
+      tl_debug_box->set_height(debug_roi.height);
+    }
+  }
+
+  light_debug->set_ts_diff_pos(image_lights->diff_image_pose_ts);
+  light_debug->set_ts_diff_sys(image_lights->diff_image_sys_ts);
+  light_debug->set_valid_pos(image_lights->is_pose_valid);
+  light_debug->set_project_error(image_lights->offset);
+
+  if (lights->size() > 0) {
+    double distance = stopline_distance(image_lights->pose.pose(),
+                                        lights->at(0)->info.stop_line());
+    light_debug->set_distance_to_stop_line(distance);
+  }
+
+  common::adapter::AdapterManager::PublishTrafficLightDetection(result);
+  auto process_time =
+      TimeUtil::GetCurrentTime() - image_lights->preprocess_receive_timestamp;
+  AINFO << "Publish message "
+        << " ts:" << GLOG_TIMESTAMP(image_lights->timestamp)
+        << " device:" << image_lights->image->device_id_str()
+        << " consuming " << process_time * 1000 << " ms."
+        << " number of lights:" << lights->size()
+        << " lights:" << result.ShortDebugString();
+
+  timer.End("TLProcSubnode::Publish message");
+  return true;
+}
+StatusCode TLProcSubnode::ProcEvents() {
+  Event event;
+  const EventMeta &event_meta = sub_meta_events_[0];
+  if (!event_manager_->Subscribe(event_meta.event_id, &event)) {
+    AERROR << "Failed to subscribe event: " << event_meta.event_id;
+    return FAIL;
+  }
+  if (!ProcEvent(event)) {
+    AERROR << "TLProcSubnode failed to handle event. "
+           << "event:" << event.to_string();
+    return FAIL;
+  }
+  return SUCC;
+}
 } // namespace traffic_light
 } // namespace perception
 } // namespace apollo

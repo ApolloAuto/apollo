@@ -4,27 +4,43 @@ package apollo.perception;
 
 import "modules/common/proto/header.proto";
 
-message TrafficLight {
-  enum Color {
-    UNKNOWN = 0;
-    RED = 1;
-    YELLOW = 2;
-    GREEN = 3;
-    BLACK = 4;
-  };
-  optional Color color = 1;
-
-  // Traffic light string-ID in the map data.
-  optional string id = 2;
-
-  // How confidence about the detected results, between 0 and 1.
-  optional double confidence = 3 [default = 1.0];
-
-  optional double tracking_time =4 [default = 0.0];
+message TrafficLightBox{
+    optional int32 x = 1;
+    optional int32 y = 2;
+    optional int32 width = 3;
+    optional int32 height = 4;
+    optional TrafficLight.Color color = 5;
+    optional bool selected = 6;
 }
-
+message TrafficLightDebug{
+    optional TrafficLightBox cropbox = 1;
+    repeated TrafficLightBox box = 2;
+    optional int32 signal_num = 3;
+    optional int32 valid_pos = 4;
+    optional double ts_diff_pos = 5;
+    optional double ts_diff_sys = 6;
+    optional int32 project_error = 7;
+    optional double distance_to_stop_line = 8;
+}
+message TrafficLight {
+    enum Color {
+        UNKNOWN = 0;
+        RED = 1;
+        YELLOW = 2;
+        GREEN = 3;
+        BLACK = 4;
+    };
+    optional Color color = 1;
+    // Traffic light string-ID in the map data.
+    optional string id = 2;
+    // How confidence about the detected results, between 0 and 1.
+    optional double confidence = 3 [default = 1.0];
+    // Duration of the traffic light since detected.
+    optional double tracking_time = 4;
+}
 message TrafficLightDetection {
-  optional apollo.common.Header header = 2;
-
-  repeated TrafficLight traffic_light = 1;
+    optional apollo.common.Header header = 2;
+    repeated TrafficLight traffic_light = 1;
+    optional TrafficLightDebug traffic_light_debug = 3;
+    optional bool contain_lights = 4;
 }

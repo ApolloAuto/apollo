@@ -7,6 +7,10 @@
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
 #include <image_transport/image_transport.h>
+#include "modules/perception/traffic_light/recognizer/unity_recognize.h"
+#include "modules/perception/traffic_light/rectify/unity_rectify.h"
+#include "modules/perception/traffic_light/reviser/color_decision.h"
+#include "modules/perception/traffic_light/projection/projection.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -37,7 +41,7 @@ std::map<int, int> TLPreprocessorSubnode::_s_image_borders = {
 };
 
 bool TLPreprocessorSubnode::InitInternal() {
-
+  RegisterFactorySingleBoundaryBasedProjection();
   if (!init_shared_data()) {
     AERROR << "TLPreprocessorSubnode init failed. Shared Data init failed.";
     return false;
@@ -66,14 +70,6 @@ bool TLPreprocessorSubnode::InitInternal() {
   // init preprocessor
   if (!init_preprocessor()) {
     AERROR << "TLPreprocessorSubnode init failed.";
-    return false;
-  }
-
-  // parse reserve fileds
-  std::map<std::string, std::string> reserve_field;
-  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field)) {
-    AERROR << "TLPreprocessorSubnode Failed to parse reserve filed."
-           << " reserve:" << reserve_;
     return false;
   }
 
@@ -316,7 +312,6 @@ void TLPreprocessorSubnode::sub_camera_image(
   }
 
 }
-
 
 bool TLPreprocessorSubnode::get_car_pose(const double ts, CarPose *pose) {
   Eigen::Matrix4d pose_matrix;

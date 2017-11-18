@@ -17,7 +17,7 @@ namespace traffic_light {
 bool MultiCamerasProjection::init() {
   ConfigManager *config_manager
       = ConfigManager::instance();
-  std::string model_name = FLAGS_traffic_light_projection;
+  std::string model_name = "MultiCamerasProjection";
   const ModelConfig *model_config = NULL;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
@@ -52,38 +52,17 @@ bool MultiCamerasProjection::init() {
       return false;
     }
 
-    if (!model_config->GetValue("lidar2gps_file", &lidar2gps_file)) {
+    if (!camera_model_config->GetValue("lidar2gps_file", &lidar2gps_file)) {
       AERROR << "lidar2gps_file not found." << name();
       return false;
     }
-    if (!model_config->GetValue("lidar2camera_file", &lidar2camera_file)) {
+    if (!camera_model_config->GetValue("lidar2camera_file", &lidar2camera_file)) {
       AERROR << "lidar2camera_file not found." << name();
       return false;
     }
-    if (!model_config->GetValue("camera_intrinsic_file", &camera_intrinsic_file)) {
+    if (!camera_model_config->GetValue("camera_intrinsic_file", &camera_intrinsic_file)) {
       AERROR << "camera_intrinsic_file not found." << name();
       return false;
-    }
-    lidar2gps_file = FileUtil::GetAbsolutePath(config_manager->work_root(),
-                                               lidar2gps_file);
-
-    lidar2camera_file = FileUtil::GetAbsolutePath(config_manager->work_root(),
-                                                  lidar2camera_file);
-
-    camera_intrinsic_file = FileUtil::GetAbsolutePath(config_manager->work_root(),
-                                                      camera_intrinsic_file);
-
-
-    // we can skip wide/narrow camera if their params. file does not exist
-    bool skip_camera = (!FileUtil::Exists(lidar2gps_file) ||
-        !FileUtil::Exists(lidar2camera_file) ||
-        !FileUtil::Exists(camera_intrinsic_file)) &&
-        ((camera_model_name == "camera_2mm_focus") ||
-            (camera_model_name == "camera_12mm_focus"));
-    if (skip_camera) {
-      AINFO << "Init " << camera_model_name
-            << " failed, continue load other camera coeffient.";
-      continue;
     }
 
     CameraCoeffient camera_coeffient;
@@ -121,7 +100,7 @@ bool MultiCamerasProjection::init() {
 
     auto &camera_coeffient = _camera_coeffients[_camera_names[i]];
     camera_coeffient.gps2camera = camera_coeffient.lidar2gps * camera_coeffient.lidar2camera;
-    camera_coeffient.gps2camera = camera_coeffient.gps2camera.inverse();
+    camera_coeffient.gps2camera = camera_coeffient.gps2camera.inverse().eval();
 
     AINFO << "GPS to " << _camera_names[i] << ": ";
     AINFO << camera_coeffient.gps2camera;
@@ -135,7 +114,7 @@ bool MultiCamerasProjection::init() {
   long_focus_camera_coeffient.gps2camera = short_focus_camera_coeffient.lidar2gps *
       short_focus_camera_coeffient.lidar2camera *
       long_focus_camera_coeffient.lidar2camera;
-  long_focus_camera_coeffient.gps2camera = long_focus_camera_coeffient.gps2camera.inverse();
+  long_focus_camera_coeffient.gps2camera = long_focus_camera_coeffient.gps2camera.inverse().eval();
   AINFO << "GPS to long(25mm): ";
   AINFO << long_focus_camera_coeffient.gps2camera;
 

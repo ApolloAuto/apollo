@@ -150,7 +150,6 @@ Eigen::Matrix<double, 2, 1> SingleBoundaryBasedProjection::pixel_denormalize(
   return pt;
 }
 
-REGISTER_PROJECTION(SingleBoundaryBasedProjection);
 } // namespace traffic_light
 } // namespace perception
 } // namespace apollo

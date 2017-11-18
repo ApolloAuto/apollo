@@ -47,13 +47,14 @@ class TLPreprocessorSubnode : public Subnode {
 
   // @brief: as a subnode with type SUBNODE_IN
   //         we will use ros callback, so ignore subnode callback
-  virtual StatusCode ProcEvents() override {
+  StatusCode ProcEvents() override {
     return SUCC;
   }
 
   // for check lights projection on image border region dynamically
   static std::map<int, int> _s_image_borders;
 
+  static std::map<int, int> _s_camera_ts_last_3_digits;
  protected:
   //@brief init pre-processor
   virtual bool InitInternal() override;
@@ -113,7 +114,6 @@ class TLPreprocessorSubnode : public Subnode {
   double _proc_interval_seconds = 0.0;  //
 
   static std::map<int, std::string> _s_camera_names;
-  static std::map<int, int> _s_camera_ts_last_3_digits;
 
  DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
 };

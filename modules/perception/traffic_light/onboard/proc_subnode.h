@@ -34,15 +34,14 @@ class ImageLights;
 class TLPreprocessingData;
 class TLProcData;
 
-class TLProcSubnode : public CommonSubnode {
+class TLProcSubnode : public Subnode {
  public:
   TLProcSubnode() = default;
-  virtual ~TLProcSubnode();
-
+  ~TLProcSubnode();
+  StatusCode ProcEvents() override;
  protected:
-  virtual bool InitInternal() override;
-  virtual bool HandleEvent(const Event &sub_event,
-                           Event *pub_event) override;
+  bool InitInternal() override;
+  bool ProcEvent(const Event &event);
 
  private:
   bool InitSharedData();
@@ -64,7 +63,7 @@ class TLProcSubnode : public CommonSubnode {
   void ComputeRectsOffset(const cv::Rect &rect1, const cv::Rect &rect2, int *offset);
 
  private:
-  int image_border_;
+  int image_border_ = 100;
 
   TLPreprocessingData *preprocessing_data_ = nullptr;  // up-stream data
   TLProcData *proc_data_ = nullptr;       // down-stream data
@@ -75,6 +74,7 @@ class TLProcSubnode : public CommonSubnode {
   std::shared_ptr<IGetBox> crop_;
   Mutex mutex_;
   DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
+  bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights) const;
 };
 
 REGISTER_SUBNODE(TLProcSubnode);

@@ -42,6 +42,7 @@ class SingleBoundaryBasedProjection : public BaseProjection {
       const Eigen::Matrix<double, 5, 1> &distort_params) const;
 };
 
+REGISTER_PROJECTION(SingleBoundaryBasedProjection);
 } // namespace traffic_light
 } // namespace perception
 } // namespace apollo

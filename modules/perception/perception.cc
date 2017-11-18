@@ -74,7 +74,7 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryLidarProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
   RegisterFactoryFusionSubnode();
-  traffic_light::RegisterFactoryTLProcSubnode();
+  traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();
 
   /// regist sharedata
