@@ -62,7 +62,7 @@ LossyMapMatrix2D::~LossyMapMatrix2D() {
 }
 
 LossyMapMatrix2D::LossyMapMatrix2D(const LossyMapMatrix2D& matrix)
-    : BaseMapMatrix(matrix) {
+    : BaseMapMatrix(matrix), map_cells_(NULL) {
   Init(matrix.rows_, matrix.cols_);
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
