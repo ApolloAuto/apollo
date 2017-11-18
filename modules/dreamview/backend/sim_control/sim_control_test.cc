@@ -18,13 +18,14 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/math/quaternion.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/time/time.h"
+
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/quaternion.h"
 
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
