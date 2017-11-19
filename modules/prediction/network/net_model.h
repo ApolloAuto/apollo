@@ -34,32 +34,85 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
+/**
+ * @class NetModel
+ * @brief NetModel is a base class for specific network model
+ *        It contains a pure virtual function Run which must be implemeted
+ *        in derived class
+ */
 class NetModel {
  public:
+  /**
+   * @brief Constructor
+   */
   NetModel();
 
+  /**
+   * @brief Destructor
+   */
   ~NetModel();
 
+  /**
+   * @brief Compute the model output from inputs
+   * @param Inputs to a network
+   * @param Output of a network will be returned
+   */
   virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
                    Eigen::MatrixXf* output) const = 0;
 
+  /**
+   * @brief Set the internal state of a network model
+   * @param A specified internal state in a vector of Eigen::MatrixXf
+   */
   virtual void SetState(const std::vector<Eigen::MatrixXf>& states) {}
 
+  /**
+   * @brief Access to the internal state of a network model
+   * @return Internal state in a vector of Eigen::MatrixXf of the model
+   */
   virtual void State(std::vector<Eigen::MatrixXf>* states) const {}
 
+  /**
+   * @brief Set the internal state of a model
+   * @param A specified internal state in a vector of Eigen::MatrixXf
+   */
   virtual void ResetState() const {}
 
+  /**
+   * @brief Load network parameters from a protobuf message
+   * @param NetParameter is a protobuf message
+   * @return True if successly loaded, otherwise False
+   */
   bool LoadModel(const NetParameter& net_parameter);
 
+  /**
+   * @brief Shows the performance information of a network
+   * @reture Performance of a network model
+   */
   std::string PerformanceString() const;
 
+  /**
+   * @brief Name of a network model
+   * @reture Name of a network model
+   */
   const std::string& Name() const;
 
+  /**
+   * @brief Id of a network model
+   * @reture Id of a network model
+   */
   int Id() const;
 
+  /**
+   * @brief Indicate the state of a network model
+   * @reture True of a network model is load successively, otherwise False.
+   */
   bool IsOk() const;
 
  protected:
+  /**
+   * @brief Delete layers in a network model and release memory
+   */
   void Clear();
 
   std::vector<Layer*> layers_;
