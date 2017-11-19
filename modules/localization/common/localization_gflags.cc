@@ -90,6 +90,7 @@ DEFINE_double(lidar_imu_max_delay_time, 0.4,
 DEFINE_double(lidar_map_coverage_theshold, 0.9,
               "Threshold to detect wether vehicle is out of map");
 DEFINE_bool(lidar_debug_log_flag, false, "Lidar Debug switch.");
+DEFINE_int32(point_cloud_step, 1, "Point cloud step");
 
 // integ module
 DEFINE_bool(integ_ins_can_self_align, false, "");
@@ -114,4 +115,4 @@ DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
 
 DEFINE_bool(use_visualize, false, "");
 
-DEFINE_bool(use_rawimu, true, "");
+// DEFINE_bool(use_rawimu, true, "");

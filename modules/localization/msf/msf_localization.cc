@@ -37,7 +37,7 @@ using apollo::common::time::Clock;
 MSFLocalization::MSFLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION),
       map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z},
-      tf2_broadcaster_(NULL) {}
+      tf2_broadcaster_(NULL), pcd_msg_index_(-1) {}
 
 MSFLocalization::~MSFLocalization() {
   if (tf2_broadcaster_) {
@@ -69,24 +69,33 @@ Status MSFLocalization::Start() {
   }
   AdapterManager::AddGpsCallback(&MSFLocalization::OnGps, this);
 
-  if (FLAGS_use_rawimu) {
-    // Raw Imu
-    if (!AdapterManager::GetRawImu()) {
-      buffer.ERROR(
-          "Raw IMU input not initialized. Check your adapter.conf file!");
-      buffer.PrintLog();
-      return Status(common::LOCALIZATION_ERROR_MSG, "no Raw IMU adapter");
-    }
-    AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
-  } else {
-    // Imu
-    if (!AdapterManager::GetImu()) {
-      buffer.ERROR("IMU input not initialized. Check your adapter.conf file!");
-      buffer.PrintLog();
-      return Status(common::LOCALIZATION_ERROR_MSG, "no IMU adapter");
-    }
-    AdapterManager::AddImuCallback(&MSFLocalization::OnImu, this);
+  // Raw Imu
+  if (!AdapterManager::GetRawImu()) {
+    buffer.ERROR(
+        "Raw IMU input not initialized. Check your adapter.conf file!");
+    buffer.PrintLog();
+    return Status(common::LOCALIZATION_ERROR_MSG, "no Raw IMU adapter");
   }
+  AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
+
+  // if (FLAGS_use_rawimu) {
+  //   // Raw Imu
+  //   if (!AdapterManager::GetRawImu()) {
+  //     buffer.ERROR(
+  //         "Raw IMU input not initialized. Check your adapter.conf file!");
+  //     buffer.PrintLog();
+  //     return Status(common::LOCALIZATION_ERROR_MSG, "no Raw IMU adapter");
+  //   }
+  //   AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
+  // } else {
+  //   // Imu
+  //   if (!AdapterManager::GetImu()) {
+  //     buffer.ERROR("IMU input not initialized. Check your adapter.conf file!");
+  //     buffer.PrintLog();
+  //     return Status(common::LOCALIZATION_ERROR_MSG, "no IMU adapter");
+  //   }
+  //   AdapterManager::AddImuCallback(&MSFLocalization::OnImu, this);
+  // }
 
   // Point Cloud
   // CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
@@ -255,6 +264,11 @@ void MSFLocalization::PublishPoseBroadcastTF(
 void MSFLocalization::OnTimer(const ros::TimerEvent &event) {}
 
 void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
+  ++pcd_msg_index_;
+  if (pcd_msg_index_ % FLAGS_point_cloud_step != 0) {
+    return;
+  }
+
   localization_integ_.PcdProcess(message);
 
   LocalizaitonMeasureState state;
@@ -269,42 +283,33 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
   return;
 }
 
-void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
-  // std::cerr << "get imu msg: " << std::endl;
-  localization_integ_.CorrectedImuProcess(imu_msg);
+// void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
+//   // std::cerr << "get imu msg: " << std::endl;
+//   localization_integ_.CorrectedImuProcess(imu_msg);
 
-  LocalizaitonMeasureState state;
-  IntegSinsPva sins_pva;
-  LocalizationEstimate integ_localization;
-  localization_integ_.GetIntegMeasure(state, sins_pva, integ_localization);
+//   LocalizaitonMeasureState state;
+//   IntegSinsPva sins_pva;
+//   LocalizationEstimate integ_localization;
+//   localization_integ_.GetIntegMeasure(state, sins_pva, integ_localization);
 
-  if (state == LocalizaitonMeasureState::OK) {
-    PublishPoseBroadcastTF(integ_localization);
-  }
+//   if (state == LocalizaitonMeasureState::OK) {
+//     PublishPoseBroadcastTF(integ_localization);
+//   }
 
-  if (FLAGS_integ_debug_log_flag) {
-    if (state != LocalizaitonMeasureState::NOT_VALID) {
-      // publish sins_pva for debug
-      AdapterManager::PublishIntegSinsPva(sins_pva);
-    }
+//   if (FLAGS_integ_debug_log_flag) {
+//     if (state != LocalizaitonMeasureState::NOT_VALID) {
+//       // publish sins_pva for debug
+//       AdapterManager::PublishIntegSinsPva(sins_pva);
+//     }
     
-    if (state == LocalizaitonMeasureState::OK) {
-      AdapterManager::PublishLocalization(integ_localization);
-    }
-  }
-  return;
-}
+//     if (state == LocalizaitonMeasureState::OK) {
+//       AdapterManager::PublishLocalization(integ_localization);
+//     }
+//   }
+//   return;
+// }
 
 void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
-  // std::cerr << "raw imu acc: "
-  //           << imu_msg.linear_acceleration().x() 
-  //           << imu_msg.linear_acceleration().y()
-  //           << imu_msg.linear_acceleration().z() << std::endl;
-
-  // std::cerr << "raw imu acc: "
-  //           << imu_msg.angular_velocity().x()
-  //           << imu_msg.angular_velocity().y()
-  //           << imu_msg.angular_velocity().z() << std::endl;
 
   localization_integ_.RawImuProcess(imu_msg);
 

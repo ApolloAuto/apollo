@@ -131,10 +131,12 @@ struct LocalizationIntegParam {
   bool is_use_visualize;
 };
 
-class MeasureRepublishProcess;
-class LocalizationIntegProcess;
-class LocalizationGnssProcess;
-class LocalizationLidarProcess;
+// class MeasureRepublishProcess;
+// class LocalizationIntegProcess;
+// class LocalizationGnssProcess;
+// class LocalizationLidarProcess;
+
+class LocalizationIntegImpl;
 
 /**
  * @class LocalizationInteg
@@ -152,7 +154,7 @@ class LocalizationInteg {
   // Lidar pcd process.
   void PcdProcess(const sensor_msgs::PointCloud2& message);
   // Raw Imu process.
-  void CorrectedImuProcess(const Imu& imu_msg);
+  // void CorrectedImuProcess(const Imu& imu_msg);
   void RawImuProcess(const drivers::gnss::Imu& imu_msg);
   // Gnss Info process.
   void RawObservationProcess(const EpochObservation& raw_obs_msg);
@@ -170,21 +172,8 @@ class LocalizationInteg {
                       IntegMeasure& gnss_measure);
 
  private:
-  MeasureRepublishProcess* republish_process_;
-  LocalizationIntegProcess* integ_process_;
-  LocalizationGnssProcess* gnss_process_;
-  LocalizationLidarProcess* lidar_process_;
+  LocalizationIntegImpl* localization_integ_impl_;
 
-  LocalizaitonMeasureState lidar_measure_state_;
-  IntegMeasure lidar_measure_;
-
-  LocalizaitonMeasureState integ_measure_state_;
-  LocalizationEstimate integ_localization_;
-  IntegSinsPva integ_sins_pva_;
-
-  LocalizaitonMeasureState gnss_measure_state_;
-  IntegMeasure gnss_measure_;
-  bool is_use_gnss_bestpose_;
 };
 
 }  // namespace localization

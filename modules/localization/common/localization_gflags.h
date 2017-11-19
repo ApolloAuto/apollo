@@ -59,6 +59,7 @@ DECLARE_int32(lidar_thread_num);
 DECLARE_double(lidar_imu_max_delay_time);
 DECLARE_double(lidar_map_coverage_theshold);
 DECLARE_bool(lidar_debug_log_flag);
+DECLARE_int32(point_cloud_step);
 
 // integ module
 DECLARE_bool(integ_ins_can_self_align);
@@ -83,6 +84,6 @@ DECLARE_int32(gnss_mode);
 
 DECLARE_bool(use_visualize);
 
-DECLARE_bool(use_rawimu);
+// DECLARE_bool(use_rawimu);
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

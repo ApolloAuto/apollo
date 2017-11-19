@@ -80,7 +80,7 @@ class MSFLocalization : public LocalizationBase {
   apollo::common::Status Init();
   void OnTimer(const ros::TimerEvent &event);
   void OnPointCloud(const sensor_msgs::PointCloud2 &message);
-  void OnImu(const localization::Imu &imu_msg);
+  // void OnImu(const localization::Imu &imu_msg);
   void OnRawImu(const drivers::gnss::Imu &imu_msg);
   void OnGps(const localization::Gps &gps_msg);
   // void OnMeasure(const localization::IntegMeasure &measure_msg);
@@ -103,18 +103,8 @@ class MSFLocalization : public LocalizationBase {
   LocalizationIntegParam localizaiton_param_;
 
   tf2_ros::TransformBroadcaster* tf2_broadcaster_;
-  // MeasureRepublishParam republish_param_;
-  // LocalizationLidarParam lidar_param_;
-  // LocalizationIntegParam integ_param_;
-  // LocalizationGnssParam gnss_param_;
 
-  // LocalizationLidarProcess lidar_process_;
-  // MeasureRepublishProcess republish_process_;
-  // LocalizationIntegProcess integ_process_;
-  // LocalizationGnssProcess gnss_process_;
-
-  // FRIEND_TEST(RTKLocalizationTest, InterpolateIMU);
-  // FRIEND_TEST(RTKLocalizationTest, ComposeLocalizationMsg);
+  long long pcd_msg_index_;
 };
 
 }  // namespace localization
