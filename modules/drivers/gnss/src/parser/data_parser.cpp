@@ -265,6 +265,17 @@ void DataParser::publish_imu_message(const MessagePtr message) {
   boost::shared_ptr<::apollo::drivers::gnss::Imu> raw_imu(
       new ::apollo::drivers::gnss::Imu(
           *As<::apollo::drivers::gnss::Imu>(message)));
+
+  ::apollo::drivers::gnss::Imu *imu = As<::apollo::drivers::gnss::Imu>(message);
+
+  raw_imu->mutable_linear_acceleration()->set_x(-imu->linear_acceleration().y());
+  raw_imu->mutable_linear_acceleration()->set_y(-imu->linear_acceleration().x());
+  raw_imu->mutable_linear_acceleration()->set_z(imu->linear_acceleration().z());
+
+  raw_imu->mutable_angular_velocity()->set_x(-imu->angular_velocity().y());
+  raw_imu->mutable_angular_velocity()->set_y(-imu->angular_velocity().x());
+  raw_imu->mutable_angular_velocity()->set_z(imu->angular_velocity().z());
+
   raw_imu->mutable_header()->set_timestamp_sec(ros::Time::Time::now().toSec());
   _raw_imu_publisher.publish(raw_imu);
 }
