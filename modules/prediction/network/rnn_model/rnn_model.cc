@@ -55,21 +55,15 @@ void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   layers_[9]->Run({bn1}, &act1);
 
   Eigen::MatrixXf dense2;
-  Eigen::MatrixXf bn4;
-  Eigen::MatrixXf act2;
-  layers_[10]->Run({act1}, &dense2);
-  layers_[11]->Run({dense2}, &bn4);
-  layers_[12]->Run({bn4}, &act2);
-
   Eigen::MatrixXf prob;
-  layers_[13]->Run({act2}, &dense2);
-  layers_[15]->Run({dense2}, &bn1);
-  layers_[17]->Run({bn1}, &prob);
+  layers_[10]->Run({act1}, &dense2);
+  layers_[12]->Run({dense2}, &bn1);
+  layers_[14]->Run({bn1}, &prob);
 
   Eigen::MatrixXf acc;
-  layers_[14]->Run({act2}, &dense2);
-  layers_[16]->Run({dense2}, &bn1);
-  layers_[18]->Run({bn1}, &acc);
+  layers_[11]->Run({act1}, &dense2);
+  layers_[13]->Run({dense2}, &bn1);
+  layers_[15]->Run({bn1}, &acc);
 
   output->resize(1, 2);
   *output << prob, acc;
