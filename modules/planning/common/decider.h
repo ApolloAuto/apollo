@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/proto/decision.pb.h"
 
 /**
@@ -29,9 +31,6 @@
  */
 namespace apollo {
 namespace planning {
-
-class ReferenceLineInfo;
-class PathDecision;
 
 class Decider {
  public:
