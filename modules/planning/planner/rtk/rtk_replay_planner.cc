@@ -21,6 +21,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

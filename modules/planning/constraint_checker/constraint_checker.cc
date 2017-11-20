@@ -82,7 +82,7 @@ bool ConstraintChecker::ValidTrajectory(
     double dt = p1.relative_time() - p0.relative_time();
     double d_lon_a = p1.a() - p0.a();
     double lon_jerk = d_lon_a / dt;
-    if (!WithinRange(d_lon_a / dt, FLAGS_longitudinal_jerk_lower_bound,
+    if (!WithinRange(lon_jerk, FLAGS_longitudinal_jerk_lower_bound,
                      FLAGS_longitudinal_jerk_upper_bound)) {
       AERROR << "Longitudinal jerk at relative time " << t
              << " exceeds bound, value: " << lon_jerk << ", bound ["

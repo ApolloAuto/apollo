@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-/** * @file path_data.h
+/**
+ * @file path_data.h
  **/
 
 #ifndef MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
