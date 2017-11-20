@@ -12,6 +12,7 @@ class WebSocketEndpoint {
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
         this.currMapRadius = null;
+        this.updatePOI = true;
     }
 
     initialize() {
@@ -82,8 +83,9 @@ class WebSocketEndpoint {
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN) {
                 // Load default routing end point.
-                if (_.isEmpty(STORE.routeEditingManager.defaultRoutingEndPoint)) {
+                if (this.updatePOI) {
                     this.requestDefaultRoutingEndPoint();
+                    this.updatePOI = false;
                 }
 
                 const requestPlanningData = STORE.options.showPNCMonitor;
@@ -163,6 +165,7 @@ class WebSocketEndpoint {
             type: "ChangeMap",
             new_map: map,
         }));
+        this.updatePOI = true;
     }
 
     changeVehicle(vehcile) {

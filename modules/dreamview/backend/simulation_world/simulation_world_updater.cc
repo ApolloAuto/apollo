@@ -41,8 +41,6 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       map_service_(map_service),
       websocket_(websocket),
       sim_control_(sim_control) {
-  // Initialize points of interest
-  LoadPOI();
 
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
@@ -139,6 +137,10 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
             place["y"] = landmark.waypoint().pose().y();
             poi_list.push_back(place);
           }
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR, "Failed to load default POI. "
+              "Please make sure the file exists at " + EndWayPointFile());
         }
         response["poi"] = poi_list;
         websocket_->SendData(conn, response.dump());
@@ -238,8 +240,7 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
 }
 
 bool SimulationWorldUpdater::LoadPOI() {
-  if (poi_.landmark_size() > 0 ||
-      GetProtoFromASCIIFile(EndWayPointFile(), &poi_)) {
+  if (GetProtoFromASCIIFile(EndWayPointFile(), &poi_)) {
     return true;
   }
 
