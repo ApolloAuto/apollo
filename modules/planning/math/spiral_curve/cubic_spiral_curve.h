@@ -17,16 +17,14 @@
 /**
  * @file  : cubic_spiral_curve.h
  * @brief : path class includes the basic parameters for defining a path from
- *initial
- *            point to end point
+ * initial point to end point
  * @model description :
  *            x_p (s) = int_0^s cos( theta_p (s)) ds
  *            y_p (s) = int_0^s sin( theta_p (s)) ds
  *            theta_p (s) = a s + b s^2 / 2 + c s^3 / 3 + d s^4 / 4
  *            kappa_p (s) = a + b s + c s^2 + d s^3
  * @solver: Solve boundary shooting problem with newton raphson method
- *            (default) initialized step for newton: 8, tol = 10^-2, max_iter =
- *10
+ *          (default) initialized step for newton: 8, tol = 10^-2, max_iter = 10
  **/
 
 #ifndef MODULES_PLANNING_MATH_SPIRAL_CURVE_CUBIC_SPIRAL_CURVE_H_
