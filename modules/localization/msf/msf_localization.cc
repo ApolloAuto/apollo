@@ -36,8 +36,9 @@ using apollo::common::time::Clock;
 
 MSFLocalization::MSFLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION),
-      map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z},
-      tf2_broadcaster_(NULL), pcd_msg_index_(-1) {}
+      tf2_broadcaster_(NULL),
+      localization_state_(LocalizaitonMeasureState::OK),
+      pcd_msg_index_(-1) {}
 
 MSFLocalization::~MSFLocalization() {
   if (tf2_broadcaster_) {
@@ -49,7 +50,7 @@ MSFLocalization::~MSFLocalization() {
 Status MSFLocalization::Start() {
   AdapterManager::Init(FLAGS_msf_adapter_config_file);
 
-  Status&& status = Init();
+  Status &&status = Init();
   if (!status.ok()) {
     return status;
   }
@@ -78,6 +79,7 @@ Status MSFLocalization::Start() {
   }
   AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
 
+<<<<<<< HEAD
   // if (FLAGS_use_rawimu) {
   //   // Raw Imu
   //   if (!AdapterManager::GetRawImu()) {
@@ -90,17 +92,20 @@ Status MSFLocalization::Start() {
   // } else {
   //   // Imu
   //   if (!AdapterManager::GetImu()) {
-  //     buffer.ERROR("IMU input not initialized. Check your adapter.conf file!");
-  //     buffer.PrintLog();
-  //     return Status(common::LOCALIZATION_ERROR_MSG, "no IMU adapter");
+  //     buffer.ERROR("IMU input not initialized. Check your adapter.conf
+  //     file!"); buffer.PrintLog(); return
+  //     Status(common::LOCALIZATION_ERROR_MSG, "no IMU adapter");
   //   }
   //   AdapterManager::AddImuCallback(&MSFLocalization::OnImu, this);
   // }
 
+=======
+>>>>>>> several modify in detail
   // Point Cloud
   // CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   if (!AdapterManager::GetPointCloud()) {
-    buffer.ERROR("PointCloud input not initialized. Check your adapter.conf file!");
+    buffer.ERROR(
+        "PointCloud input not initialized. Check your adapter.conf file!");
     buffer.PrintLog();
     return Status(common::LOCALIZATION_ERROR_MSG, "no PointCloud adapter");
   }
@@ -108,18 +113,22 @@ Status MSFLocalization::Start() {
 
   if (FLAGS_gnss_mode == 1) {
     // Gnss Rtk Obs
-    // CHECK(AdapterManager::GetGnssRtkObs()) << "GnssRtkObs is not initialized.";
+    // CHECK(AdapterManager::GetGnssRtkObs()) << "GnssRtkObs is not
+    // initialized.";
     if (!AdapterManager::GetGnssRtkObs()) {
-      buffer.ERROR("GnssRtkObs input not initialized. Check your adapter.conf file!");
+      buffer.ERROR(
+          "GnssRtkObs input not initialized. Check your adapter.conf file!");
       buffer.PrintLog();
       return Status(common::LOCALIZATION_ERROR_MSG, "no GnssRtkObs adapter");
     }
     AdapterManager::AddGnssRtkObsCallback(&MSFLocalization::OnGnssRtkObs, this);
 
     // Gnss Rtk Eph
-    // CHECK(AdapterManager::GetGnssRtkEph()) << "GnssRtkEph is not initialized.";
+    // CHECK(AdapterManager::GetGnssRtkEph()) << "GnssRtkEph is not
+    // initialized.";
     if (!AdapterManager::GetGnssRtkEph()) {
-      buffer.ERROR("GnssRtkEph input not initialized. Check your adapter.conf file!");
+      buffer.ERROR(
+          "GnssRtkEph input not initialized. Check your adapter.conf file!");
       buffer.PrintLog();
       return Status(common::LOCALIZATION_ERROR_MSG, "no GnssRtkEph adapter");
     }
@@ -129,7 +138,8 @@ Status MSFLocalization::Start() {
     // CHECK(AdapterManager::GetGnssBestPose())
     //     << "GnssBestPose is not initialized.";
     if (!AdapterManager::GetGnssBestPose()) {
-      buffer.ERROR("GnssBestPose input not initialized. Check your adapter.conf file!");
+      buffer.ERROR(
+          "GnssBestPose input not initialized. Check your adapter.conf file!");
       buffer.PrintLog();
       return Status(common::LOCALIZATION_ERROR_MSG, "no GnssBestPose adapter");
     }
@@ -225,24 +235,24 @@ Status MSFLocalization::Init() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
   }
 
-  LocalizationState&& state = localization_integ_.Init(localizaiton_param_);
+  LocalizationState &&state = localization_integ_.Init(localizaiton_param_);
   switch (state.error_code()) {
-    case LocalizationErrorCode::INTEG_ERROR :
+    case LocalizationErrorCode::INTEG_ERROR:
       return Status(common::LOCALIZATION_ERROR_INTEG, state.error_msg());
       break;
-    case LocalizationErrorCode::LIDAR_ERROR :
+    case LocalizationErrorCode::LIDAR_ERROR:
       return Status(common::LOCALIZATION_ERROR_LIDAR, state.error_msg());
       break;
-    case LocalizationErrorCode::GNSS_ERROR :
+    case LocalizationErrorCode::GNSS_ERROR:
       return Status(common::LOCALIZATION_ERROR_GNSS, state.error_msg());
   }
 
-  return Status::OK(); 
+  return Status::OK();
 }
 
 void MSFLocalization::PublishPoseBroadcastTF(
-    const LocalizationEstimate& localization) {
-  //broadcast tf message
+    const LocalizationEstimate &localization) {
+  // broadcast tf message
   geometry_msgs::TransformStamped tf2_msg;
   tf2_msg.header.stamp = ros::Time(localization.measurement_time());
   tf2_msg.header.frame_id = FLAGS_broadcast_tf2_frame_id;
@@ -283,6 +293,7 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
   return;
 }
 
+<<<<<<< HEAD
 // void MSFLocalization::OnImu(const localization::Imu &imu_msg) {
 //   // std::cerr << "get imu msg: " << std::endl;
 //   localization_integ_.CorrectedImuProcess(imu_msg);
@@ -301,7 +312,7 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
 //       // publish sins_pva for debug
 //       AdapterManager::PublishIntegSinsPva(sins_pva);
 //     }
-    
+
 //     if (state == LocalizaitonMeasureState::OK) {
 //       AdapterManager::PublishLocalization(integ_localization);
 //     }
@@ -310,9 +321,17 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
 // }
 
 void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
-
   localization_integ_.RawImuProcess(imu_msg);
 
+=======
+void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
+  if (FLAGS_imu_coord_rfu) {
+    localization_integ_.RawImuProcessRfu(imu_msg);
+  } else {
+    localization_integ_.RawImuProcessFlu(imu_msg);
+  }
+
+>>>>>>> several modify in detail
   LocalizaitonMeasureState state;
   IntegSinsPva sins_pva;
   LocalizationEstimate integ_localization;
@@ -327,15 +346,23 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
       // publish sins_pva for debug
       AdapterManager::PublishIntegSinsPva(sins_pva);
     }
-    
+
     if (state == LocalizaitonMeasureState::OK) {
       AdapterManager::PublishLocalization(integ_localization);
     }
   }
+
+  localization_state_ = state;
+
   return;
 }
 
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
+  if (localization_state_ == LocalizaitonMeasureState::OK &&
+      FLAGS_gnss_only_init) {
+    return;
+  }
+
   localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);
 
   if (FLAGS_gnss_debug_log_flag) {

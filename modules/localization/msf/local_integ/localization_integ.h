@@ -155,7 +155,8 @@ class LocalizationInteg {
   void PcdProcess(const sensor_msgs::PointCloud2& message);
   // Raw Imu process.
   // void CorrectedImuProcess(const Imu& imu_msg);
-  void RawImuProcess(const drivers::gnss::Imu& imu_msg);
+  void RawImuProcessFlu(const drivers::gnss::Imu& imu_msg);
+  void RawImuProcessRfu(const drivers::gnss::Imu& imu_msg);
   // Gnss Info process.
   void RawObservationProcess(const EpochObservation& raw_obs_msg);
   void RawEphemerisProcess(const GnssEphemeris& gnss_orbit_msg);

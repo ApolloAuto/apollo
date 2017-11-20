@@ -84,6 +84,12 @@ DECLARE_int32(gnss_mode);
 
 DECLARE_bool(use_visualize);
 
+DECLARE_bool(imu_coord_rfu);
+
+DECLARE_bool(imu_coord_rfu);
+
+DECLARE_bool(gnss_only_init);
+
 // DECLARE_bool(use_rawimu);
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

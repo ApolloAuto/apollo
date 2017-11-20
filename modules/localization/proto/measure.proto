@@ -13,6 +13,7 @@ message IntegMeasure {
     GNSS_POS_ONLY = 0;
     //the measure data include gnss position and velocity
     GNSS_POS_VEL = 1;
+    //the measure data include gnss position
     GNSS_POS_XY = 2;
     //the measure data only include gnss velocity
     GNSS_VEL_ONLY = 3;  
