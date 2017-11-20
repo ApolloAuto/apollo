@@ -70,6 +70,7 @@ DECLARE_double(rnn_min_lane_relatice_s);
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
+DECLARE_bool(enable_lane_sequence_acc);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);

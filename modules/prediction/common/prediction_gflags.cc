@@ -90,6 +90,8 @@ DEFINE_double(rnn_min_lane_relatice_s, 5.0,
 DEFINE_double(lane_sequence_threshold, 0.5,
               "Threshold for trimming lane sequence trajectories");
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
+DEFINE_bool(enable_lane_sequence_acc, false,
+            "If use acceleration in lane sequence.");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 6.0,
