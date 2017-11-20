@@ -13,6 +13,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:rnn_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
         "@glog//:glog",
     ],
