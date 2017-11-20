@@ -196,10 +196,12 @@ void Planning::RunOnce() {
       VehicleStateProvider::instance()->vehicle_state();
 
   // estimate (x, y) at current timestamp
-  auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
-      start_timestamp - vehicle_state.timestamp());
-  vehicle_state.set_x(future_xy.x());
-  vehicle_state.set_y(future_xy.y());
+  if (FLAGS_estimate_current_vehicle_state) {
+    auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
+        start_timestamp - vehicle_state.timestamp());
+    vehicle_state.set_x(future_xy.x());
+    vehicle_state.set_y(future_xy.y());
+  }
 
   if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
     AERROR << "Update VehicleStateProvider failed.";
@@ -228,7 +230,7 @@ void Planning::RunOnce() {
 
   bool is_replan = false;
 
-  const auto& stitching_trajectory =
+  const auto stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
           vehicle_state, start_timestamp, planning_cycle_time,
           last_publishable_trajectory_.get(), &is_replan);
