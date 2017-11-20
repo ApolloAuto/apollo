@@ -104,6 +104,16 @@ class PredictionMap {
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
 
   /**
+   * @brief Check if there are any junctions within the range centered at
+   *        a certain point with a radius.
+   * @param point The position.
+   * @param radius The radius to search junctions.
+   * @return If any junctions exist.
+   */
+  static bool NearJunction(
+      const Eigen::Vector2d& point, const double radius);
+
+  /**
    * @brief Get the lane heading on a point.
    * @param lane_info The target lane.
    * @param point The point to get the heading.
