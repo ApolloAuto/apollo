@@ -29,6 +29,7 @@ ground:
   xorigin: 4096
   yorigin: 4096
   xyoffset: 0
+  type: default # default or tile
 planning:
   # The minimum interval between two consecutive
   minInterval: 0.1

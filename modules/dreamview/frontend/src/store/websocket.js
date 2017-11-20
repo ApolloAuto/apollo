@@ -13,10 +13,19 @@ class WebSocketEndpoint {
         this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
+        this.params = null;
     }
 
-    initialize() {
+    initialize(params) {
         this.counter = 0;
+        if (params) {
+            // TODO (vlin): validate all required parameters.
+            this.params = params;
+            if (params.url) {
+                this.params.serverUrl = `${location.protocol}//${params.url}`;
+            }
+        }
+
         try {
             this.websocket = new WebSocket(this.serverAddr);
         } catch (error) {
@@ -26,6 +35,16 @@ class WebSocketEndpoint {
             }, 1000);
             return;
         }
+        this.websocket.onopen = event => {
+            if (this.params && this.params.mapId && this.params.id) {
+                this.websocket.send(JSON.stringify({
+                    type: 'RetrieveGroundMeta',
+                    data: {
+                        mapId: this.params.mapId,
+                    }
+                }));
+            }
+        };
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
 
@@ -67,6 +86,13 @@ class WebSocketEndpoint {
                 case "MapData":
                     RENDERER.updateMap(message.data);
                     STORE.setInitializationStatus(true);
+                    break;
+                case "GroundMetadata":
+                    RENDERER.updateGroundMetadata(this.params.serverUrl, message.data);
+                    STORE.setInitializationStatus(true);
+
+                    //TODO(vlin): request frame data frame by frame
+                    this.requstFrameData(this.params.id);
                     break;
                 case "DefaultEndPoint":
                     STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
@@ -126,6 +152,14 @@ class WebSocketEndpoint {
         }));
     }
 
+    requstFrameData(id) {
+        this.websocket.send(JSON.stringify({
+            type: 'FrameData',
+            data: {
+                id: id,
+            }
+        }));
+    }
     requestRoute(start, waypoint, end) {
         this.websocket.send(JSON.stringify({
             type: "SendRoutingRequest",
