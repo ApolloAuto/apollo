@@ -71,6 +71,10 @@ void Frame::CreatePredictionObstacles(
   }
 }
 
+const common::VehicleState &Frame::vehicle_state() const {
+  return vehicle_state_;
+}
+
 bool Frame::Rerouting() {
   auto *adapter_manager = AdapterManager::instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {

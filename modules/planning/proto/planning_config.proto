@@ -25,6 +25,7 @@ message RuleConfig {
         CROSSWALK = 3;
         CLEAR_ZONE = 4;
         REROUTING = 5;
+        REFERENCE_LINE_END = 6;
     }
     optional RuleId rule_id = 1;
 }
