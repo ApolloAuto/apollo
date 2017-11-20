@@ -244,6 +244,7 @@ Status MSFLocalization::Init() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_x = uncertainty_x;
     localizaiton_param_.imu_to_ant_offset.uncertainty_y = uncertainty_y;
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
+
     LOG(INFO) << "Loaded IMUTOANTOFFSET: "
               << localizaiton_param_.imu_to_ant_offset.offset_x << " "
               << localizaiton_param_.imu_to_ant_offset.offset_y << " "
