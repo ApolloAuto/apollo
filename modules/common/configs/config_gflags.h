@@ -23,6 +23,7 @@
 // sim_map, routing_topo_grapth, etc.
 DECLARE_string(map_dir);
 
+DECLARE_string(test_base_map_filename);
 DECLARE_string(base_map_filename);
 DECLARE_string(sim_map_filename);
 DECLARE_string(routing_map_filename);
