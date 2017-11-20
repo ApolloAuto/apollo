@@ -25,12 +25,12 @@ source "${DIR}/apollo_base.sh"
 # run command_name module_name
 function start() {
 	echo "start"
-	python modules/tools/navigation/navigation_server.py &
+	python modules/tools/navigation/simulator/navigation_view_backend.py &
 }
 
 function stop() {
     echo "stop"
-    pkill -f navigation_server.py
+    pkill -f navigation_view_backend.py
 }
 
 case $1 in
