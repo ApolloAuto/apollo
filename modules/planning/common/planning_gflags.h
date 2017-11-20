@@ -104,6 +104,7 @@ DECLARE_double(follow_min_time_sec);
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
+DECLARE_string(reference_line_end_obstacle_id);
 
 DECLARE_double(prediction_total_time);
 DECLARE_bool(align_prediction_time);
