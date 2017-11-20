@@ -17,9 +17,8 @@
 /*
  * @file: spiral_formula
  * @brief: class for polynomial spiral functions, partial derivative (analytic
- * form)
- *           with respect to parameters.
- *           every function is optimized with minimum operations plus excat
+ * form) with respect to parameters.
+ *           Every function is optimized with minimum operations plus exact
  * analytic form
  * @warning: all partial derivatives shall guarantee sg > 0
  */

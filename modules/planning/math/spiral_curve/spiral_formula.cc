@@ -22,7 +22,7 @@
 namespace apollo {
 namespace planning {
 
-// coef transformation k3 indicates cubic spiral, k5 indecate quintic spiral
+// coef transformation k3 indicates cubic spiral, k5 indicates quintic spiral
 std::array<double, 4> SpiralFormula::p_to_a_k3(const double sg,
                                                const std::array<double, 4>& p) {
   std::array<double, 4> result = {

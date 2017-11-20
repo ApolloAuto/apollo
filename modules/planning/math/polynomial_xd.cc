@@ -57,10 +57,6 @@ PolynomialXd PolynomialXd::DerivedFrom(const PolynomialXd& base) {
   return PolynomialXd(params);
 }
 
-PolynomialXd PolynomialXd::IntegratedFrom(const PolynomialXd& base) {
-  return PolynomialXd::IntegratedFrom(base, 0.0);
-}
-
 PolynomialXd PolynomialXd::IntegratedFrom(const PolynomialXd& base,
                                           const double intercept) {
   std::vector<double> params;

@@ -31,7 +31,7 @@ namespace planning {
 
 // Hermite spline implementation that works for 1d and 2d space interpolation.
 // Valid input type T: double, Eigen::Vector2d
-template <typename T, std::uint32_t N>
+template <typename T, std::size_t N>
 class HermiteSpline {
  public:
   HermiteSpline(std::array<T, (N + 1) / 2> x0, std::array<T, (N + 1) / 2> x1,
@@ -51,7 +51,7 @@ class HermiteSpline {
   double delta_z_ = 0.0;
 };
 
-template <typename T, std::uint32_t N>
+template <typename T, std::size_t N>
 inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
                                           std::array<T, (N + 1) / 2> x1,
                                           const double z0, const double z1)
@@ -60,13 +60,13 @@ inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
       << "Error: currently we only support cubic and quintic hermite splines!";
 }
 
-template <typename T, std::uint32_t N>
+template <typename T, std::size_t N>
 inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
                                        const double z) const {
   CHECK_LE(z0_, z);
   CHECK_LE(z, z0_ + delta_z_);
 
-  // if N == 3, cubic hermite spline, N == 5, qunitic hermite spline
+  // if N == 3, cubic hermite spline, N == 5, quintic hermite spline
   if (N == 3) {
     const T& p0 = x0_[0];
     const T& v0 = x0_[1];
