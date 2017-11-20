@@ -134,6 +134,8 @@ class NovatelParser : public Parser {
 
   bool handle_raw_imu_x(const novatel::RawImuX* imu);
 
+  bool handle_raw_imu(const novatel::RawImu* imu);
+
   bool handle_bds_eph(const novatel::BDS_Ephemeris* bds_emph);
 
   bool handle_gps_eph(const novatel::GPS_Ephemeris* gps_emph);
@@ -393,6 +395,19 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
       }
 
       if (handle_raw_imu_x(reinterpret_cast<novatel::RawImuX*>(message))) {
+        message_ptr = &_imu;
+        return MessageType::IMU;
+      }
+      break;
+
+    case novatel::RAWIMU:
+    case novatel::RAWIMUS:
+      if (message_length != sizeof(novatel::RawImu)) {
+        ROS_ERROR("Incorrect message_length");
+        break;
+      }
+
+      if (handle_raw_imu(reinterpret_cast<novatel::RawImu*>(message))) {
         message_ptr = &_imu;
         return MessageType::IMU;
       }
@@ -726,6 +741,74 @@ bool NovatelParser::handle_raw_imu_x(const novatel::RawImuX* imu) {
       rfu_to_flu(-imu->y_angle_change_neg * _gyro_scale,
                  imu->x_angle_change * _gyro_scale,
                  -imu->z_angle_change * _gyro_scale,
+                 _imu.mutable_angular_velocity());
+      break;
+    default:
+      ROS_ERROR_STREAM_THROTTLE(
+          5, "Unsupported IMU frame mapping: " << _imu_frame_mapping);
+  }
+  _imu_measurement_time_previous = time;
+  return true;
+}
+
+bool NovatelParser::handle_raw_imu(const novatel::RawImu* imu) {
+  double gyro_scale = 0.0;
+  double accel_scale = 0.0;
+  float imu_measurement_span = 1.0 / 200.0;
+
+  if (is_zero(_gyro_scale)) {
+    novatel::ImuParameter param = novatel::get_imu_parameter(
+                                    novatel::ImuType::ADIS16488);
+    //ROS_INFO_STREAM("IMU type: " << static_cast<unsigned>(imu->imu_type) << "; "
+    //                             << "Gyro scale: " << param.gyro_scale << "; "
+    //                             << "Accel scale: " << param.accel_scale << "; "
+    //                             << "Sampling rate: " << param.sampling_rate_hz
+    //                             << ".");
+
+    if (is_zero(param.sampling_rate_hz)) {
+      ROS_ERROR_STREAM_THROTTLE(
+          5, "Unsupported IMU type ADUS16488.");
+      return false;
+    }
+    gyro_scale = param.gyro_scale * param.sampling_rate_hz;
+    accel_scale = param.accel_scale * param.sampling_rate_hz;
+    imu_measurement_span = 1.0 / param.sampling_rate_hz;
+    _imu.set_measurement_span(imu_measurement_span);
+  } else {
+    gyro_scale = _gyro_scale;
+    accel_scale = _accel_scale;
+    imu_measurement_span = _imu_measurement_span;
+    _imu.set_measurement_span(imu_measurement_span);
+  }
+
+  double time = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  if (_imu_measurement_time_previous > 0.0 &&
+      fabs(time - _imu_measurement_time_previous - imu_measurement_span) >
+          1e-4) {
+    ROS_WARN_STREAM("Unexpected delay between two IMU measurements at: "
+                    << time - _imu_measurement_time_previous);
+  }
+
+  _imu.set_measurement_time(time);
+  switch (_imu_frame_mapping) {
+    case 5:  // Default mapping.
+      rfu_to_flu(imu->x_velocity_change * accel_scale,
+                 -imu->y_velocity_change_neg * accel_scale,
+                 imu->z_velocity_change * accel_scale,
+                 _imu.mutable_linear_acceleration());
+      rfu_to_flu(imu->x_angle_change * gyro_scale,
+                 -imu->y_angle_change_neg * gyro_scale,
+                 imu->z_angle_change * gyro_scale,
+                 _imu.mutable_angular_velocity());
+      break;
+    case 6:
+      rfu_to_flu(-imu->y_velocity_change_neg * accel_scale,
+                 imu->x_velocity_change * accel_scale,
+                 -imu->z_velocity_change * accel_scale,
+                 _imu.mutable_linear_acceleration());
+      rfu_to_flu(-imu->y_angle_change_neg * gyro_scale,
+                 imu->x_angle_change * gyro_scale,
+                 -imu->z_angle_change * gyro_scale,
                  _imu.mutable_angular_velocity());
       break;
     default:
