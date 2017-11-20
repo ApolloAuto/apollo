@@ -18,8 +18,9 @@
  * @file quintic_spiral_path.cpp
  **/
 
-#include "glog/logging.h"
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
+
+#include "glog/logging.h"
 
 namespace apollo {
 namespace planning {

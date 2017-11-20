@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::math::Vec2d;
 
 void CartesianFrenetConverter::cartesian_to_frenet(
     const double rs, const double rx, const double ry, const double rtheta,
