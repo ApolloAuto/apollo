@@ -95,7 +95,8 @@ class Planning : public PlanningInterface {
       ADCTrajectory* trajectory);
 
   common::Status InitFrame(const uint32_t sequence_num,
-                           const common::TrajectoryPoint& planning_start_point);
+                           const common::TrajectoryPoint& planning_start_point,
+                           const common::VehicleState& vehicle_state);
 
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
 
