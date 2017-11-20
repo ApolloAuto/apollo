@@ -18,18 +18,17 @@
  * @file
  **/
 
+#include "modules/planning/common/path_obstacle.h"
+
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include "gtest/gtest.h"
-
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {
