@@ -45,6 +45,7 @@ enum MessageId : uint16_t {
   PSRPOS = 47,
   PSRVEL = 100,
   RAWIMU = 268,
+  RAWIMUS = 325,
   RAWIMUX = 1461,
   RAWIMUSX = 1462,
   MARK1PVA = 1067,
@@ -473,7 +474,7 @@ static_assert(sizeof(RawImuX) == 40, "Incorrect size of RawImuX");
 struct RawImu {
   uint32_t gps_week;
   double gps_seconds;  // Seconds of week.
-  char imuStatus[4];   // Status of the IMU. The content varies with IMU type.
+  uint32_t imuStatus;   // Status of the IMU. The content varies with IMU type.
   int32_t z_velocity_change;      // change in velocity along z axis.
   int32_t y_velocity_change_neg;  // -change in velocity along y axis.
   int32_t x_velocity_change;      // change in velocity along x axis.
