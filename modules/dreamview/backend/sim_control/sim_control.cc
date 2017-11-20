@@ -186,7 +186,7 @@ void SimControl::TimerCallback(const ros::TimerEvent& event) { RunOnce(); }
 
 void SimControl::RunOnce() {
   // Result of the interpolation.
-  double lambda = 0;
+  double lambda = 0.0;
   auto current_time = Clock::NowInSecond();
 
   if (!received_planning_) {

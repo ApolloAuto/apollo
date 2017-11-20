@@ -38,12 +38,11 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
+using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -53,8 +52,8 @@ void Planning::RegisterPlanners() {
 }
 
 Status Planning::InitFrame(const uint32_t sequence_num,
-                           const TrajectoryPoint& planning_start_point) {
-  const auto& vehicle_state = VehicleStateProvider::instance()->vehicle_state();
+                           const TrajectoryPoint& planning_start_point,
+                           const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, planning_start_point, vehicle_state));
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     const auto& prediction =
@@ -125,7 +124,7 @@ Status Planning::Init() {
   return planner_->Init(config_);
 }
 
-bool Planning::IsVehicleStateValid(const common::VehicleState& vehicle_state) {
+bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
       std::isnan(vehicle_state.kappa()) ||
@@ -144,9 +143,7 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-}
+void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
@@ -193,10 +190,19 @@ void Planning::RunOnce() {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  common::Status status =
-      common::VehicleStateProvider::instance()->Update(localization, chassis);
-  auto vehicle_state =
-      common::VehicleStateProvider::instance()->vehicle_state();
+  Status status =
+      VehicleStateProvider::instance()->Update(localization, chassis);
+  VehicleState vehicle_state =
+      VehicleStateProvider::instance()->vehicle_state();
+
+  // estimate (x, y) at current timestamp
+  if (FLAGS_estimate_current_vehicle_state) {
+    auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
+        start_timestamp - vehicle_state.timestamp());
+    vehicle_state.set_x(future_xy.x());
+    vehicle_state.set_y(future_xy.y());
+  }
+
   if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
     AERROR << "Update VehicleStateProvider failed.";
     not_ready->set_reason("Update VehicleStateProvider failed.");
@@ -223,14 +229,14 @@ void Planning::RunOnce() {
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   bool is_replan = false;
-  const auto& stitching_trajectory =
+
+  const auto stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          common::VehicleStateProvider::instance()->vehicle_state(),
-          start_timestamp, planning_cycle_time,
+          vehicle_state, start_timestamp, planning_cycle_time,
           last_publishable_trajectory_.get(), &is_replan);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  status = InitFrame(frame_num, stitching_trajectory.back());
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
   ADCTrajectory trajectory_pb;
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb.mutable_debug());
@@ -292,10 +298,9 @@ void Planning::SetLastPublishableTrajectory(
   last_publishable_trajectory_.reset(new PublishableTrajectory(adc_trajectory));
 }
 
-common::Status Planning::Plan(
-    const double current_time_stamp,
-    const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-    ADCTrajectory* trajectory_pb) {
+Status Planning::Plan(const double current_time_stamp,
+                      const std::vector<TrajectoryPoint>& stitching_trajectory,
+                      ADCTrajectory* trajectory_pb) {
   auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
