@@ -25,7 +25,7 @@ source "${DIR}/apollo_base.sh"
 # run command_name module_name
 function start() {
 	echo "start"
-	python modules/tools/navigation/navigation_routing.py &
+	python modules/tools/navigation/routing/navigation_routing.py &
 }
 
 function stop() {
