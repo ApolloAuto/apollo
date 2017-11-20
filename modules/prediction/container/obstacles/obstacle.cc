@@ -30,6 +30,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/network/rnn_model/rnn_model.h"
 
 namespace apollo {
 namespace prediction {
@@ -125,6 +126,20 @@ bool Obstacle::IsOnLane() {
   }
   ADEBUG << "Obstacle [" << id_ << "] is not on lane.";
   return false;
+}
+
+bool Obstacle::IsNearJunction() {
+  if (feature_history_.size() <= 0) {
+    return false;
+  }
+  double pos_x = latest_feature().position().x();
+  double pos_y = latest_feature().position().y();
+  if (FLAGS_enable_kf_tracking) {
+    pos_x = latest_feature().t_position().x();
+    pos_y = latest_feature().t_position().y();
+  }
+  return PredictionMap::instance()->NearJunction(
+      {pos_x, pos_y}, FLAGS_search_radius);
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
@@ -1058,6 +1073,32 @@ void Obstacle::Trim() {
     ADEBUG << "Obstacle [" << id_ << "] trimmed " << count
            << " historical features";
   }
+}
+
+void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
+  rnn_states_ = rnn_states;
+}
+
+void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
+  rnn_states->clear();
+  rnn_states->insert(rnn_states->end(),
+                     rnn_states_.begin(), rnn_states_.end());
+}
+
+void Obstacle::InitRNNStates() {
+  if (network::RnnModel::instance()->IsOk()) {
+    network::RnnModel::instance()->ResetState();
+    network::RnnModel::instance()->State(&rnn_states_);
+    rnn_enabled_ = true;
+    ADEBUG << "Success to initialize rnn model.";
+  } else {
+    AWARN << "Fail to initialize rnn model.";
+    rnn_enabled_ = false;
+  }
+}
+
+bool Obstacle::rnn_enabled() const {
+  return rnn_enabled_;
 }
 
 }  // namespace prediction
