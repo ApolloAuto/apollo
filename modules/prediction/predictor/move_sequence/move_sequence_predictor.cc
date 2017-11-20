@@ -291,6 +291,9 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
     v = feature.t_speed();
     a = feature.t_acc();
   }
+  if (FLAGS_enable_lane_sequence_acc) {
+    a = lane_sequence.acceleration();
+  }
   double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
 
   double s0 = 0.0;
