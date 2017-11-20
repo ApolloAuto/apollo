@@ -77,6 +77,8 @@ class Frame {
 
   bool Rerouting();
 
+  const common::VehicleState &vehicle_state() const;
+
  private:
   /**
    * @brief create obstacles from prediction input.
