@@ -31,7 +31,7 @@ DEFINE_string(prediction_adapter_config_filename,
 DEFINE_double(prediction_duration, 3.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
-DEFINE_double(min_prediction_length, 5.0,
+DEFINE_double(min_prediction_length, 50.0,
               "Minimal length of prediction trajectory");
 
 // Bag replay timestamp gap
@@ -73,16 +73,25 @@ DEFINE_double(prediction_pedestrian_total_time, 10.0,
 DEFINE_int32(num_trajectory_still_pedestrian, 6,
              "number of trajectories for static pedestrian");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
-DEFINE_string(vehicle_model_file,
+DEFINE_string(evaluator_vehicle_mlp_file,
               "modules/prediction/data/mlp_vehicle_model.bin",
-              "Vehicle model file");
+              "mlp model file for vehicle evaluator");
+DEFINE_string(evaluator_vehicle_rnn_file,
+              "modules/prediction/data/rnn_vehicle_model.bin",
+              "rnn model file for vehicle evaluator");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
+
+// evaluator
+DEFINE_double(rnn_min_lane_relatice_s, 5.0,
+              "Minimal relative s for RNN model.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
               "Threshold for trimming lane sequence trajectories");
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
+DEFINE_bool(enable_lane_sequence_acc, false,
+            "If use acceleration in lane sequence.");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 6.0,
