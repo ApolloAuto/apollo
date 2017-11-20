@@ -183,6 +183,8 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
+DEFINE_string(reference_line_end_obstacle_id, "REF_END",
+              "Obstacle id for the end of reference line obstacle");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
