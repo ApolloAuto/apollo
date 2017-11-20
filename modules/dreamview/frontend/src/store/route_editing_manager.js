@@ -10,7 +10,7 @@ export default class RouteEditingManager {
 
 
     @action updateDefaultRoutingEndPoint(data) {
-        if (data.poi === undefined || _.isEmpty(data.poi)) {
+        if (data.poi === undefined) {
             return;
         }
         this.defaultRoutingEndPoint = {};
