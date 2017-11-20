@@ -71,6 +71,9 @@ function main() {
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
+    devices="${devices} $(find_device camera*)"
+    devices="${devices} $(find_device video*)"
+
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
@@ -105,6 +108,7 @@ function main() {
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
+        -e DOCKER_IMG=$IMG \
         -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \

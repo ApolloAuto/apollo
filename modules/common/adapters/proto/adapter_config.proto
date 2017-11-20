@@ -29,7 +29,10 @@ message AdapterConfig {
     MOBILEYE = 21;
     DELPHIESR = 22;
     COMPRESSED_IMAGE = 23;
-    HMI_STATUS = 24;
+    SYSTEM_STATUS = 24;
+    INS_STATUS = 25;
+    GNSS_STATUS = 26;
+    CONTI_RADAR = 27;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

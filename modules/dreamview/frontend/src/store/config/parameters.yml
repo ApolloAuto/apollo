@@ -36,9 +36,13 @@ planning:
     width: 1.4
 options:
   defaults:
+    showModuleController: false
     showMenu: false
     showConsole: false
+    showPOI: false
     showPNCMonitor: false
+    showQuickStarter: true
+    showRouteEditingBar: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
     showPlanningQpOptimizer: false

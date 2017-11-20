@@ -23,8 +23,6 @@
 
 #include <vector>
 
-#include "glog/logging.h"
-
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/math/vec2d.h"

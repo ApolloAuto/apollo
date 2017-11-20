@@ -19,12 +19,12 @@
 DEFINE_string(control_conf_file, "modules/control/conf/lincoln.pb.txt",
               "default control conf data file");
 
-DEFINE_string(adapter_config_filename, "modules/control/conf/adapter.conf",
-              "The adapter config file");
+DEFINE_string(control_adapter_config_filename,
+              "modules/control/conf/adapter.conf", "The adapter config file");
 
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
-DEFINE_string(node_name, "control", "The control node name in proto");
+DEFINE_string(control_node_name, "control", "The control node name in proto");
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
             "True to use preview speed for table lookup");
@@ -48,3 +48,7 @@ DEFINE_double(steer_angle_rate, 100.0,
 DEFINE_bool(enable_gain_scheduler, false,
             "Enable gain scheduler for higher vechile speed");
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
+DEFINE_bool(use_relative_position, false, "Use relative position");
+DEFINE_double(query_relative_time, 1.5,
+              "Temp flag to query target by relative time");
+DEFINE_bool(use_mpc, false, "Use MPC controller for both lat/lon control");

@@ -23,9 +23,10 @@
 
 #include <vector>
 
-#include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
+#include "Eigen/Dense"
+#include "modules/planning/math/curve1d/quintic_spiral_path.h"
 
 namespace apollo {
 namespace planning {
@@ -36,7 +37,13 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   virtual ~SpiralProblemInterface() = default;
 
-  void set_max_point_deviation(const double point_max_deviation);
+  void set_default_max_point_deviation(const double point_max_deviation);
+
+  void set_start_point(const double x, const double y, const double theta,
+                       const double kappa, const double dkappa);
+
+  void set_end_point(const double x, const double y, const double theta,
+                     const double kappa, const double dkappa);
 
   void get_optimization_results(std::vector<double>* ptr_theta,
                                 std::vector<double>* ptr_kappa,
@@ -92,19 +99,21 @@ class SpiralProblemInterface : public Ipopt::TNLP {
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
  private:
-  std::vector<Eigen::Vector2d> points_;
+  void update_piecewise_spiral_paths(const double* x, const int n);
 
-  std::vector<double> theta_;
+  std::vector<Eigen::Vector2d> init_points_;
 
-  std::vector<double> kappa_;
+  std::vector<double> opt_theta_;
 
-  std::vector<double> dkappa_;
+  std::vector<double> opt_kappa_;
 
-  std::vector<double> s_;
+  std::vector<double> opt_dkappa_;
 
-  std::vector<double> x_;
+  std::vector<double> opt_s_;
 
-  std::vector<double> y_;
+  std::vector<double> opt_x_;
+
+  std::vector<double> opt_y_;
 
   std::vector<double> point_distances_;
 
@@ -118,11 +127,37 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   std::size_t num_of_points_ = 0;
 
-  double max_point_deviation_ = 0.0;
+  double default_max_point_deviation_ = 0.0;
 
   const std::size_t num_of_internal_points_ = 5;
 
   std::vector<double> relative_theta_;
+
+  std::vector<QuinticSpiralPath> piecewise_paths_;
+
+  bool has_fixed_start_point_ = false;
+
+  double start_x_ = 0.0;
+
+  double start_y_ = 0.0;
+
+  double start_theta_ = 0.0;
+
+  double start_kappa_ = 0.0;
+
+  double start_dkappa_ = 0.0;
+
+  bool has_fixed_end_point_ = false;
+
+  double end_x_ = 0.0;
+
+  double end_y_ = 0.0;
+
+  double end_theta_ = 0.0;
+
+  double end_kappa_ = 0.0;
+
+  double end_dkappa_ = 0.0;
 };
 
 }  // namespace planning

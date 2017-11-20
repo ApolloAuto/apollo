@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
@@ -170,6 +171,23 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
 }
 
 /**
+ * @brief Get file content as string.
+ * @param file_name The name of the file to read content.
+ * @param content The file content.
+ * @return If the action is successful.
+ */
+bool GetContent(const std::string &file_name, std::string *content);
+
+/**
+ * @brief Translate the source path to a complete path.
+ *        Supported place holders are:
+ *            <ros>, which will be replaced as ROS home.
+ * @param src_path The source path which may contain place holders.
+ * @return The complete path.
+ */
+std::string TranslatePath(const std::string &src_path);
+
+/**
  * @brief Check if the path exists.
  * @return If the path exists.
  */
@@ -183,6 +201,14 @@ bool PathExists(const std::string &path);
  *         and is indeed a directory.
  */
 bool DirectoryExists(const std::string &directory_path);
+
+/**
+ * @brief Copy a file.
+ * @param from The file path to copy from.
+ * @param to The file path to copy to.
+ * @return If the action is successful.
+ */
+bool CopyFile(const std::string &from, const std::string &to);
 
 /**
  * @brief Check if a specified directory specified by directory_path exists.
@@ -199,6 +225,13 @@ bool EnsureDirectory(const std::string &directory_path);
  * @return If the action is successful.
  */
 bool RemoveAllFiles(const std::string &directory_path);
+
+/**
+ * @brief List sub-directories.
+ * @param directory_path Directory path.
+ * @return A vector of sub-directories, without the directory_path prefix.
+ */
+std::vector<std::string> ListSubDirectories(const std::string &directory_path);
 
 }  // namespace util
 }  // namespace common

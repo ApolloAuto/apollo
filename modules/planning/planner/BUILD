@@ -10,7 +10,6 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
-        "//modules/common/vehicle_state",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_proto",

@@ -18,13 +18,15 @@
  * @file
  **/
 
-#include <limits>
-
 #include "modules/planning/common/decider.h"
+
+#include <limits>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
@@ -45,9 +47,32 @@ void Decider::MakeDecision(const ReferenceLineInfo& reference_line_info,
   if (error_code < 0) {
     MakeEStopDecision(path_decision);
   }
-  // TODO(all): check other main decisions
+  MakeMainMissionCompleteDecision(reference_line_info);
 
   SetObjectDecisions(path_decision);
+}
+
+void Decider::MakeMainMissionCompleteDecision(
+    const ReferenceLineInfo& reference_line_info) {
+  if (!decision_result_->main_decision().has_stop()) {
+    return;
+  }
+  auto main_stop = decision_result_->main_decision().stop();
+  if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
+    return;
+  }
+  const auto& adc_pos = reference_line_info.AdcPlanningPoint().path_point();
+  if (common::util::DistanceXY(adc_pos, main_stop.stop_point()) >
+      FLAGS_destination_check_distance) {
+    return;
+  }
+  if (!reference_line_info.ReachedDestination()) {
+    return;
+  }
+  auto mission_complete =
+      decision_result_->mutable_main_decision()->mutable_mission_complete();
+  mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
+  mission_complete->set_stop_heading(main_stop.stop_heading());
 }
 
 int Decider::MakeMainStopDecision(
@@ -79,16 +104,9 @@ int Decider::MakeMainStopDecision(
 
     // check stop_line_s vs adc_s
     common::SLPoint adc_sl;
-    auto& adc_position = common::VehicleState::instance()->pose().position();
+    auto& adc_position =
+        common::VehicleStateProvider::instance()->pose().position();
     reference_line.XYToSL({adc_position.x(), adc_position.y()}, &adc_sl);
-    const auto& vehicle_param =
-        common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-    if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {
-      AERROR << "object:" << obstacle->Id() << " stop fence route_s["
-             << stop_line_s << "] behind adc route_s[" << adc_sl.s() << "]";
-      continue;
-    }
-
     if (stop_line_s < min_stop_line_s) {
       min_stop_line_s = stop_line_s;
       stop_obstacle = obstacle;

@@ -2,7 +2,6 @@ import * as THREE from "three";
 import OrbitControls from "three/examples/js/controls/OrbitControls.js";
 import Stats from "stats.js";
 
-import STORE from "store";
 import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
@@ -15,6 +14,8 @@ import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 
+const _ = require('lodash');
+
 class Renderer {
     constructor() {
         // Disable antialias for mobile devices.
@@ -25,7 +26,13 @@ class Renderer {
             antialias: useAntialias
         });
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x031C31);
+        this.scene.background = new THREE.Color(0x14171A);
+
+        // The dimension of the scene
+        this.dimension = {
+            width: 0,
+            height: 0,
+        };
 
         // The ground. (grid for now)
         this.ground = new Ground();
@@ -56,8 +63,6 @@ class Renderer {
 
         // The route editor
         this.routingEditor = new RoutingEditor();
-
-        this.defaultRoutingEndPoint = {};
 
         // The Performance Monitor
         this.stats = null;
@@ -128,6 +133,9 @@ class Renderer {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+
+        this.dimension.width = width;
+        this.dimension.height = height;
     }
 
     enableOrbitControls() {
@@ -225,11 +233,6 @@ class Renderer {
         this.camera.updateProjectionMatrix();
     }
 
-    updateDefaultRoutingEndPoint(data) {
-        this.defaultRoutingEndPoint.x = data.end_x;
-        this.defaultRoutingEndPoint.y = data.end_y;
-    }
-
     enableRouteEditing() {
         this.enableOrbitControls();
         this.routingEditor.enableEditingMode(this.camera, this.adc);
@@ -247,15 +250,8 @@ class Renderer {
                                                                    false);
     }
 
-    addDefaultEndPoint() {
-        if (this.defaultRoutingEndPoint.x === undefined ||
-            this.defaultRoutingEndPoint.y === undefined) {
-            alert("Failed to get default routing end point, make sure there's " +
-                  "a default end point file under the map data directory.");
-            return;
-        }
-        this.routingEditor.addRoutingPoint(this.defaultRoutingEndPoint,
-                                           this.coordinates, this.scene);
+    addDefaultEndPoint(point) {
+        this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
     }
 
     removeAllRoutingPoints() {
@@ -266,15 +262,9 @@ class Renderer {
         this.routingEditor.removeLastRoutingPoint(this.scene);
     }
 
-    sendRoutingRequest(sendDefaultRoute = false) {
-        if (sendDefaultRoute) {
-            return this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
-                                                                this.coordinates);
-        } else {
-            return this.routingEditor.sendRoutingRequest(this.scene,
-                                                         this.adc.mesh.position,
-                                                         this.coordinates);
-        }
+    sendRoutingRequest() {
+        return this.routingEditor.sendRoutingRequest(this.adc.mesh.position,
+                                                     this.coordinates);
     }
 
     editRoute(event) {
@@ -335,9 +325,9 @@ class Renderer {
         this.render();
     }
 
-    updateWorld(world) {
+    updateWorld(world, planningData) {
         this.adc.update(world, this.coordinates);
-        this.planningTrajectory.update(world, this.coordinates, this.scene);
+        this.planningTrajectory.update(world, planningData, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
@@ -363,16 +353,14 @@ class Renderer {
             || navigator.userAgent.match(/iPod/i);
     }
 
-    updateGeolocation(event) {
-        const geo = this.getGeolocation(event);
-        STORE.setGeolocation(geo);
-    }
-
     getGeolocation(event) {
+        const canvasPosition = event.currentTarget.getBoundingClientRect();
+
         const vector = new THREE.Vector3(
-            (event.clientX / STORE.dimension.width) * 2 - 1,
-            -(event.clientY / STORE.dimension.height) * 2 + 1,
+            ((event.clientX - canvasPosition.left) / this.dimension.width) * 2 - 1,
+            -((event.clientY - canvasPosition.top) / this.dimension.height) * 2 + 1,
             0);
+
         vector.unproject(this.camera);
 
         const direction = vector.sub(this.camera.position).normalize();

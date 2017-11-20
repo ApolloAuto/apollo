@@ -26,6 +26,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/util/map_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
@@ -38,6 +39,8 @@ using apollo::perception::PerceptionObstacle;
 using apollo::common::math::KalmanFilter;
 using apollo::common::ErrorCode;
 using apollo::common::Point3D;
+using apollo::common::util::FindOrDie;
+using apollo::common::util::FindOrNull;
 using apollo::hdmap::LaneInfo;
 
 std::mutex Obstacle::mutex_;
@@ -99,8 +102,7 @@ size_t Obstacle::history_size() const {
 const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
     const std::string& lane_id) {
   std::lock_guard<std::mutex> lock(mutex_);
-  CHECK(kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end());
-  return kf_lane_trackers_[lane_id];
+  return FindOrDie(kf_lane_trackers_, lane_id);
 }
 
 const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() const {
@@ -378,9 +380,29 @@ void Obstacle::SetLengthWidthHeight(
 }
 
 void Obstacle::InitKFMotionTracker(Feature* feature) {
+  double cycle_time = 0.1;
+  double t = cycle_time;
   // Set transition matrix F
+  // constant acceleration dynamic model
   Eigen::Matrix<double, 6, 6> F;
-  F.setIdentity();
+  F.setZero();
+  F(0, 0) = 1.0;
+  F(0, 2) = t;
+  F(0, 4) = 0.5 * t * t;
+
+  F(1, 1) = 1.0;
+  F(1, 3) = t;
+  F(1, 5) = 0.5 * t * t;
+
+  F(2, 2) = 1.0;
+  F(2, 4) = t;
+
+  F(3, 3) = 1.0;
+  F(3, 5) = t;
+
+  F(4, 4) = 1.0;
+
+  F(5, 5) = 1.0;
   kf_motion_tracker_.SetTransitionMatrix(F);
 
   // Set observation matrix H
@@ -391,6 +413,8 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   kf_motion_tracker_.SetObservationMatrix(H);
 
   // Set covariance of transition noise matrix Q
+  // make the noise this order:
+  // noise(x/y) < noise(vx/vy) < noise(ax/ay)
   Eigen::Matrix<double, 6, 6> Q;
   Q.setIdentity();
   Q *= FLAGS_q_var;
@@ -403,6 +427,8 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   kf_motion_tracker_.SetObservationNoise(R);
 
   // Set current state covariance matrix P
+  // make the covariance this order:
+  // cov(x/y) < cov(vx/vy) < cov(ax/ay)
   Eigen::Matrix<double, 6, 6> P;
   P.setIdentity();
   P *= FLAGS_p_var;
@@ -578,45 +604,36 @@ void Obstacle::UpdateKFLaneTracker(const std::string& lane_id,
                                    const double lane_speed,
                                    const double lane_acc,
                                    const double timestamp, const double beta) {
-  KalmanFilter<double, 4, 2, 0>* kf_ptr = nullptr;
-  if (kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end()) {
-    kf_ptr = &kf_lane_trackers_[lane_id];
-    if (kf_ptr != nullptr) {
-      double delta_ts = 0.0;
-      if (feature_history_.size() > 0) {
-        delta_ts = timestamp - feature_history_.front().timestamp();
-      }
-      if (delta_ts > FLAGS_double_precision) {
-        auto F = kf_ptr->GetTransitionMatrix();
-        F(0, 2) = delta_ts;
-        F(0, 3) = 0.5 * delta_ts * delta_ts;
-        F(2, 3) = delta_ts;
-        kf_ptr->SetTransitionMatrix(F);
-        kf_ptr->Predict();
-
-        Eigen::Matrix<double, 2, 1> z;
-        z(0, 0) = lane_s;
-        z(1, 0) = lane_l;
-        kf_ptr->Correct(z);
-      }
-    } else {
-      kf_lane_trackers_.erase(lane_id);
+  auto* kf_ptr = FindOrNull(kf_lane_trackers_, lane_id);
+  if (kf_ptr != nullptr) {
+    double delta_ts = 0.0;
+    if (feature_history_.size() > 0) {
+      delta_ts = timestamp - feature_history_.front().timestamp();
     }
-  }
+    if (delta_ts > FLAGS_double_precision) {
+      auto F = kf_ptr->GetTransitionMatrix();
+      F(0, 2) = delta_ts;
+      F(0, 3) = 0.5 * delta_ts * delta_ts;
+      F(2, 3) = delta_ts;
+      kf_ptr->SetTransitionMatrix(F);
+      kf_ptr->Predict();
 
-  if (kf_lane_trackers_.find(lane_id) == kf_lane_trackers_.end()) {
+      Eigen::Matrix<double, 2, 1> z;
+      z(0, 0) = lane_s;
+      z(1, 0) = lane_l;
+      kf_ptr->Correct(z);
+    }
+  } else {
     InitKFLaneTracker(lane_id, beta);
-    kf_ptr = &kf_lane_trackers_[lane_id];
-    if (kf_ptr != nullptr) {
-      Eigen::Matrix<double, 4, 1> state;
-      state(0, 0) = lane_s;
-      state(1, 0) = lane_l;
-      state(2, 0) = lane_speed;
-      state(3, 0) = lane_acc;
+    auto& kf = FindOrDie(kf_lane_trackers_, lane_id);
+    Eigen::Matrix<double, 4, 1> state;
+    state(0, 0) = lane_s;
+    state(1, 0) = lane_l;
+    state(2, 0) = lane_speed;
+    state(3, 0) = lane_acc;
 
-      auto P = kf_ptr->GetStateCovariance();
-      kf_ptr->SetStateEstimate(state, P);
-    }
+    auto P = kf.GetStateCovariance();
+    kf.SetStateEstimate(state, P);
   }
 }
 
@@ -629,10 +646,7 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
     return;
   }
 
-  KalmanFilter<double, 4, 2, 0>* kf_ptr = nullptr;
-  if (kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end()) {
-    kf_ptr = &kf_lane_trackers_[lane_id];
-  }
+  auto* kf_ptr = FindOrNull(kf_lane_trackers_, lane_id);
   if (kf_ptr == nullptr) {
     return;
   }

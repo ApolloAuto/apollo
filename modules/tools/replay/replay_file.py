@@ -22,6 +22,7 @@ import os.path
 import sys
 import argparse
 import rospy
+import glob
 from std_msgs.msg import String
 from google.protobuf import text_format
 
@@ -34,11 +35,20 @@ from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
 
 topic_msg_dict = {
-    "/apollo/planning": planning_pb2.ADCTrajectory,
-    "/apollo/prediction": prediction_obstacle_pb2.PredictionObstacles,
-    "/apollo/perception": perception_obstacle_pb2.PerceptionObstacles,
-    "/apollo/routing_response": routing_pb2.RoutingResponse,
-    "/apollo/routing_request": routing_pb2.RoutingRequest,
+    "/apollo/planning":
+    planning_pb2.ADCTrajectory,
+    "/apollo/prediction":
+    prediction_obstacle_pb2.PredictionObstacles,
+    "/apollo/perception":
+    perception_obstacle_pb2.PerceptionObstacles,
+    "/apollo/routing_response":
+    routing_pb2.RoutingResponse,
+    "/apollo/routing_request":
+    routing_pb2.RoutingRequest,
+    "/apollo/localization/pose":
+    localization_pb2.LocalizationEstimate,
+    "/apollo/perception/traffic_light":
+    traffic_light_detection_pb2.TrafficLightDetection,
 }
 
 
@@ -106,13 +116,31 @@ if __name__ == '__main__':
         "--period",
         action="store",
         type=float,
-        default=0,
+        default=0.1,
         help="set the topic publish time duration")
     args = parser.parse_args()
-    period = 0  # use step by step mode
+    period = 0.0  # use step by step mode
     if args.period:  # play with a given period, (1.0 / frequency)
         period = args.period
+    to_replay = args.filename
+    files = []
+    if os.path.isdir(args.filename):
+        files = glob.glob(args.filename + "/*")
+        i = 0
+        for f in files:
+            print "%d  %s" % (i, f)
+            i += 1
+        str_input = raw_input("Select message by number: ")
+        try:
+            selected_file = int(str_input)
+            if selected_file < 0 or selected_file > len(files):
+                print "%d is an invalid number" % selected_file
+        except:
+            print "%s is not a number" % str_input
+        print "Will publish file[%d]: %s" % (selected_file,
+                                             files[selected_file])
+        to_replay = files[selected_file]
     try:
-        topic_publisher(args.topic, args.filename, period)
+        topic_publisher(args.topic, to_replay, period)
     except rospy.ROSInterruptException:
         print "failed to replay message"

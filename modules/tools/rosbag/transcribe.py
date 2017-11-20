@@ -29,10 +29,14 @@ import sys
 
 from std_msgs.msg import String
 
+from modules.localization.proto import localization_pb2
+from modules.perception.proto import perception_obstacle_pb2
+from modules.perception.proto import traffic_light_detection_pb2
+from modules.planning.proto import planning_internal_pb2
 from modules.planning.proto import planning_pb2
 from modules.prediction.proto import prediction_obstacle_pb2
+from modules.localization.proto import localization_pb2 
 from modules.routing.proto import routing_pb2
-from modules.perception.proto import perception_obstacle_pb2
 
 g_args = None
 
@@ -42,6 +46,8 @@ topic_msg_dict = {
     "/apollo/perception": perception_obstacle_pb2.PerceptionObstacles,
     "/apollo/routing_response": routing_pb2.RoutingResponse,
     "/apollo/routing_request": routing_pb2.RoutingRequest,
+    "/apollo/localization/pose": localization_pb2.LocalizationEstimate,
+    "/apollo/perception/traffic_light": traffic_light_detection_pb2.TrafficLightDetection,
 }
 
 

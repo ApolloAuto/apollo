@@ -36,8 +36,8 @@ struct alignas(16) Object {
   void clone(const Object& rhs);
   std::string ToString() const;
 
-  bool Serialize(PerceptionObstacle* pb_obj) const;
-  bool Deserialize(const PerceptionObstacle& pb_obs);
+  void Serialize(PerceptionObstacle* pb_obj) const;
+  void Deserialize(const PerceptionObstacle& pb_obs);
 
   // object id per frame
   int id = 0;

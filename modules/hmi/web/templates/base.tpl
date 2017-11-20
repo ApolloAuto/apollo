@@ -45,6 +45,11 @@
       <img src="{{ url_for('static', filename='images/logo.png') }}"
           class="hmi_navbar_logo" width="141" height="46"/>
     </div>
+    <div class="alert alert-danger">
+      <strong>Duang!</strong>
+      HMI has been integrated with <a onclick="goto_dreamview();">Dreamview</a>.
+      Please have a try and help us improve :)
+    </div>
 
     {% block body %} {% endblock %}
   </div>

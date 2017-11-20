@@ -2,32 +2,46 @@ syntax = "proto2";
 
 package apollo.data;
 
+import "modules/canbus/proto/canbus_conf.proto";
 import "modules/canbus/proto/chassis_detail.proto";
-import "modules/canbus/proto/vehicle_parameter.proto";
+import "modules/common/configs/proto/vehicle_config.proto";
+import "modules/control/proto/control_conf.proto";
 
 message VehicleInfo {
-  optional apollo.canbus.License license = 1;
-  optional apollo.canbus.VehicleParameter parameter = 2;
+  optional string name = 1;
+  optional apollo.canbus.License license = 2;
+  optional apollo.canbus.CanbusConf canbus_conf = 3;
+  optional apollo.common.VehicleConfig vehicle_config = 4;
+  optional apollo.control.ControlConf control_config = 5;
 }
 
 message EnvironmentInfo {
-  // TODO(xiaoxq): weather, temperature, etc.
+  optional float temperature = 1;  // Temperature in degrees Celsius.
+  // TODO(xiaoxq): weather, rare condition, etc.
 }
 
 message HardwareInfo {
-  // TODO(xiaoxq): GPS, Radar, Lidar, Camera, IMU, etc.
+  // Entries of hardware config file path and its content.
+  map<string, string> configs = 1;
 }
 
 message SoftwareInfo {
   optional string docker_image = 1;
   optional string commit_id = 2;
-  // TODO(xiaoxq): modules' configuration.
+  // Entries of software config file path and its content.
+  map<string, string> configs = 3;
 }
 
 message UserInfo {
   optional string entity = 1;  // Company, university, organization, etc.
   optional string driver = 2;
   optional string co_driver = 3;
+}
+
+message TaskData {
+  optional string task_id = 1;
+  // Raw files uri, such as file://, http://, ftp://, hdfs://, etc.
+  repeated string rosbags = 2;
 }
 
 // A task is typically a piece of data which is recorded continuously.
@@ -37,10 +51,5 @@ message Task {
   optional HardwareInfo hardware = 3;
   optional SoftwareInfo software = 4;
   optional UserInfo user = 5;
-
-  optional string task_id = 6;
-  optional double start_time = 7;
-  optional double duration = 8;
-  // Raw bag files uri, such as file://, http://, ftp://, hdfs://, etc.
-  repeated string rosbags = 9;
+  optional TaskData data = 6;
 }

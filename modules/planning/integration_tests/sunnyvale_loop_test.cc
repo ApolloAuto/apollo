@@ -23,6 +23,8 @@
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
 
+DECLARE_bool(reckless_change_lane);
+
 namespace apollo {
 namespace planning {
 
@@ -35,6 +37,7 @@ class SunnyvaleLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
+    FLAGS_test_base_map_filename = "base_map_test.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
   }
@@ -148,6 +151,23 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_enable_traffic_light = false;
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test right turn, but stop before trafic light
+ * A right turn test case
+ * A traffic light test case
+ */
+TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
+  std::string seq_num = "8";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
@@ -166,5 +186,48 @@ TEST_F(SunnyvaleLoopTest, change_lane) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test mission complete
+ */
+TEST_F(SunnyvaleLoopTest, mission_complete) {
+  std::string seq_num = "10";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_enable_prediction = false;
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test change lane with obstacle at target lane
+ */
+TEST_F(SunnyvaleLoopTest, avoid_change_left) {
+  std::string seq_num = "11";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test qp path failure
+ */
+TEST_F(SunnyvaleLoopTest, qp_path_failure) {
+  std::string seq_num = "12";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_enable_prediction = false;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
+
+TMAIN;

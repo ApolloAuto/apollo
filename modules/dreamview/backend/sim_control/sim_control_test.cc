@@ -18,13 +18,14 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/math/quaternion.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/time/time.h"
+
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/quaternion.h"
 
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
@@ -39,10 +40,13 @@ namespace dreamview {
 
 class SimControlTest : public ::testing::Test {
  public:
-  SimControlTest()
-      : map_service_("modules/dreamview/backend/testdata/garage.bin"),
-        sim_control_(&map_service_) {
+  SimControlTest() {
     FLAGS_enable_sim_control = false;
+    FLAGS_map_dir = "modules/dreamview/backend/testdata";
+    FLAGS_base_map_filename = "garage.bin";
+
+    map_service_.reset(new MapService(false));
+    sim_control_.reset(new SimControl(map_service_.get()));
 
     AdapterManagerConfig config;
     config.set_is_ros(false);
@@ -81,8 +85,8 @@ class SimControlTest : public ::testing::Test {
   }
 
  protected:
-  MapService map_service_;
-  SimControl sim_control_;
+  std::unique_ptr<MapService> map_service_;
+  std::unique_ptr<SimControl> sim_control_;
 };
 
 void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
@@ -116,16 +120,17 @@ TEST_F(SimControlTest, Test) {
   const double timestamp = 100.0;
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp);
 
-  sim_control_.SetStartPoint(1.0, 1.0);
+  sim_control_->SetStartPoint(1.0, 1.0);
 
-  AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, &sim_control_);
+  AdapterManager::AddPlanningCallback(&SimControl::OnPlanning,
+                                      sim_control_.get());
   AdapterManager::GetPlanning()->OnReceive(adc_trajectory);
 
   {
     Clock::SetMode(Clock::MOCK);
     const auto timestamp = apollo::common::time::From(100.01);
     Clock::SetNow(timestamp.time_since_epoch());
-    sim_control_.TimerCallback(ros::TimerEvent());
+    sim_control_->TimerCallback(ros::TimerEvent());
 
     const Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
     const LocalizationEstimate *localization =

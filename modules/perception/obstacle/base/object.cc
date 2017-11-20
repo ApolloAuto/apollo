@@ -25,6 +25,8 @@ namespace apollo {
 namespace perception {
 
 using Eigen::Vector3d;
+using apollo::common::util::Print;
+using apollo::common::util::StrCat;
 
 Object::Object() {
   direction = Vector3d(1, 0, 0);
@@ -41,22 +43,23 @@ void Object::clone(const Object& rhs) {
 }
 
 std::string Object::ToString() const {
-  return common::util::StrCat(
-      "Object[id: ", id, ", "
-      "track_id: ", track_id, ", "
-      "cloud_size: ", cloud->size(), ", "
-      "direction: ", direction.transpose(), ", "
-      "center: ", center.transpose(), ", "
-      "velocity: ", velocity.transpose(), ", "
-      "width: ", width, ", "
-      "length: ", length, ", "
-      "height: ", height, ", "
-      "polygon_size: ", polygon.size(), ", "
-      "type: ", type, ", "
-      "is_background: ", is_background, "]");
+  // StrCat supports 9 arguments at most.
+  return StrCat(
+      StrCat("Object[id: ", id, ", "
+             "track_id: ", track_id, ", "
+             "cloud_size: ", cloud->size(), ", "
+             "direction: ", Print(direction.transpose()), ", "),
+      StrCat("center: ", Print(center.transpose()), ", "
+             "velocity: ", Print(velocity.transpose()), ", "
+             "width: ", width, ", "
+             "length: ", length, ", "),
+      StrCat("height: ", height, ", "
+             "polygon_size: ", polygon.size(), ", "
+             "type: ", type, ", "
+             "is_background: ", is_background, "]"));
 }
 
-bool Object::Serialize(PerceptionObstacle* pb_obj) const {
+void Object::Serialize(PerceptionObstacle* pb_obj) const {
   CHECK(pb_obj != NULL);
   pb_obj->set_id(track_id);
   pb_obj->set_theta(theta);
@@ -93,11 +96,9 @@ bool Object::Serialize(PerceptionObstacle* pb_obj) const {
   pb_obj->set_tracking_time(tracking_time);
   pb_obj->set_type(static_cast<PerceptionObstacle::Type>(type));
   pb_obj->set_timestamp(latest_tracked_time);  // in seconds.
-
-  return true;
 }
 
-bool Object::Deserialize(const PerceptionObstacle& pb_obs) {
+void Object::Deserialize(const PerceptionObstacle& pb_obs) {
   track_id = pb_obs.id();
   theta = pb_obs.theta();
 
@@ -126,8 +127,6 @@ bool Object::Deserialize(const PerceptionObstacle& pb_obs) {
   tracking_time = pb_obs.tracking_time();
   latest_tracked_time = pb_obs.timestamp();
   type = static_cast<ObjectType>(pb_obs.type());
-
-  return true;
 }
 
 }  // namespace perception

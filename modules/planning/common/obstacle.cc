@@ -85,6 +85,8 @@ Obstacle::Obstacle(const std::string& id,
 
 bool Obstacle::IsStatic() const { return is_static_; }
 
+bool Obstacle::IsVirtual() const { return is_virtual_; }
+
 bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return true;
@@ -171,6 +173,20 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
 
     int trajectory_index = 0;
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
+      bool is_valid_trajectory = true;
+      for (const auto& point : trajectory.trajectory_point()) {
+        if (!IsValidTrajectoryPoint(point)) {
+          AERROR << "obj:" << perception_id
+                 << " TrajectoryPoint: " << trajectory.ShortDebugString()
+                 << " is NOT valid.";
+          is_valid_trajectory = false;
+          break;
+        }
+      }
+      if (!is_valid_trajectory) {
+        continue;
+      }
+
       const std::string obstacle_id =
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
       obstacles.emplace_back(new Obstacle(
@@ -179,6 +195,17 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     }
   }
   return obstacles;
+}
+
+bool Obstacle::IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
+  return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
+           std::isnan(point.path_point().y()) ||
+           std::isnan(point.path_point().z()) ||
+           std::isnan(point.path_point().kappa()) ||
+           std::isnan(point.path_point().s()) ||
+           std::isnan(point.path_point().dkappa()) ||
+           std::isnan(point.path_point().ddkappa()) || std::isnan(point.v()) ||
+           std::isnan(point.a()) || std::isnan(point.relative_time()));
 }
 
 std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(

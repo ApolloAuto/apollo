@@ -25,7 +25,7 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/common/localization_gflags.h"
@@ -38,7 +38,7 @@ using apollo::common::time::Clock;
 using PlanningTrajectoryPb = planning::ADCTrajectory;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
-using apollo::common::VehicleState;
+using apollo::common::VehicleStateProvider;
 
 class LatControllerTest : public ::testing::Test, LatController {
  public:
@@ -57,7 +57,7 @@ class LatControllerTest : public ::testing::Test, LatController {
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug) const {
+                            SimpleLateralDebug *debug) {
     LatController::ComputeLateralErrors(x, y, theta, linear_v, angular_v,
                                         trajectory_analyzer, debug);
   }
@@ -100,7 +100,7 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
   auto chassis_pb = LoadChassisPb(
       "modules/control/testdata/longitudinal_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  auto *vehicle_state = VehicleState::instance();
+  auto *vehicle_state = VehicleStateProvider::instance();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(

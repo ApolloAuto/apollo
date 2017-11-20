@@ -35,7 +35,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -109,7 +109,10 @@ Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
     if (decision.has_stop()) {
       const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
                             decision.stop().distance_s();
-      if (stop_s < adc_sl_boundary_.end_s()) {
+      // this is a rough estimation based on reference line s, so that a large
+      // buffer is used.
+      constexpr double stop_buff = 1.0;
+      if (stop_s + stop_buff < adc_sl_boundary_.end_s()) {
         AERROR << "Invalid stop decision. not stop at behind of current "
                   "position. stop_s : "
                << stop_s << ", and current adc_s is; "
@@ -154,13 +157,17 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
   const auto& stop_decision = stop_obstacle->LongitudinalDecision();
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  PathPoint obstacle_point;
   if (stop_obstacle->perception_sl_boundary().start_s() >
       path_data_.frenet_frame_path().points().back().s()) {
     return true;
   }
+
+  PathPoint stop_point;
   if (!path_data_.GetPathPointWithRefS(
-          stop_obstacle->perception_sl_boundary().start_s(), &obstacle_point)) {
+          stop_obstacle->perception_sl_boundary().start_s() +
+              stop_decision.stop().distance_s() -
+              vehicle_param_.front_edge_to_center(),
+          &stop_point)) {
     AERROR << "Fail to get path point from reference s. The sl boundary of "
               "stop obstacle "
            << stop_obstacle->Id()
@@ -168,16 +175,10 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
     return false;
   }
 
-  const double st_stop_s =
-      obstacle_point.s() + stop_decision.stop().distance_s() -
-      vehicle_param_.front_edge_to_center() - FLAGS_decision_valid_stop_range;
-  if (st_stop_s < 0.0) {
-    AERROR << "obstacle " << stop_obstacle->Id() << " st stop_s " << st_stop_s
-           << " is less than 0.";
-    return false;
-  }
+  const double st_stop_s = stop_point.s();
 
-  const double s_min = st_stop_s;
+  constexpr double kStopEpsilon = 1e-2;
+  const double s_min = std::max(0.0, st_stop_s - kStopEpsilon);
   const double s_max =
       std::fmax(s_min, std::fmax(planning_distance_, reference_line_.Length()));
 
@@ -415,14 +416,17 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
-  const double mid_to_rear_center =
-      vehicle_param_.length() / 2.0 - vehicle_param_.front_edge_to_center();
-  const double x =
-      path_point.x() - mid_to_rear_center * std::cos(path_point.theta());
-  const double y =
-      path_point.y() - mid_to_rear_center * std::sin(path_point.theta());
+  Vec2d vec_to_center = Vec2d((vehicle_param_.front_edge_to_center() -
+                               vehicle_param_.back_edge_to_center()) /
+                                  2.0,
+                              (vehicle_param_.left_edge_to_center() -
+                               vehicle_param_.right_edge_to_center()) /
+                                  2.0)
+                            .rotate(path_point.theta());
+  Vec2d center = Vec2d(path_point.x(), path_point.y()) + vec_to_center;
+
   const Box2d adc_box =
-      Box2d({x, y}, path_point.theta(), vehicle_param_.length() + 2 * buffer,
+      Box2d(center, path_point.theta(), vehicle_param_.length() + 2 * buffer,
             vehicle_param_.width() + 2 * buffer);
   return obs_box.HasOverlap(adc_box);
 }

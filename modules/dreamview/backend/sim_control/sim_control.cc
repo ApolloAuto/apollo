@@ -31,6 +31,7 @@ using apollo::common::Point3D;
 using apollo::common::Quaternion;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::Header;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
@@ -51,6 +52,11 @@ void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation,
   point_vrf->set_z(v_vrf.z());
 }
 
+bool CompareHeader(const Header& lhs, const Header& rhs) {
+  return lhs.sequence_num() == rhs.sequence_num() &&
+         lhs.timestamp_sec() == rhs.timestamp_sec();
+}
+
 }  // namespace
 
 SimControl::SimControl(const MapService* map_service)
@@ -58,9 +64,12 @@ SimControl::SimControl(const MapService* map_service)
       prev_point_index_(0),
       next_point_index_(0),
       received_planning_(false),
+      planning_count_(-1),
+      re_routing_triggered_(false),
       enabled_(FLAGS_enable_sim_control) {}
 
-void SimControl::Init(bool set_start_point) {
+void SimControl::Init(bool set_start_point, double start_velocity,
+                      double start_acceleration) {
   // Setup planning and routing result data callback.
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
   AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
@@ -78,11 +87,14 @@ void SimControl::Init(bool set_start_point) {
     }
     SetStartPoint(start_point.x(), start_point.y());
   }
+
+  start_velocity_ = start_velocity;
+  start_acceleration_ = start_acceleration;
 }
 
 void SimControl::SetStartPoint(const double x, const double y) {
-  next_point_.set_v(0.0);
-  next_point_.set_a(0.0);
+  next_point_.set_v(start_velocity_);
+  next_point_.set_a(start_acceleration_);
 
   auto* next_point = next_point_.mutable_path_point();
   next_point->set_x(x);
@@ -105,12 +117,23 @@ void SimControl::SetStartPoint(const double x, const double y) {
   Start();
 }
 
+void SimControl::ClearPlanning() {
+  current_trajectory_.Clear();
+  received_planning_ = false;
+  planning_count_ = 0;
+}
+
 void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
   CHECK_LE(2, routing.routing_request().waypoint_size());
   const auto& start_pose = routing.routing_request().waypoint(0).pose();
 
+  current_routing_header_ = routing.header();
+
   // If this is from a planning re-routing request, don't reset car's location.
-  if (routing.routing_request().header().module_name() != "planning") {
+  re_routing_triggered_ =
+      routing.routing_request().header().module_name() == "planning";
+  if (!re_routing_triggered_) {
+    ClearPlanning();
     SetStartPoint(start_pose.x(), start_pose.y());
   }
 }
@@ -121,16 +144,26 @@ void SimControl::Start() {
   }
 }
 
-void SimControl::Stop() {
-  sim_control_timer_.stop();
-}
+void SimControl::Stop() { sim_control_timer_.stop(); }
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
   // Reset current trajectory and the indices upon receiving a new trajectory.
-  current_trajectory_ = trajectory;
-  prev_point_index_ = 0;
-  next_point_index_ = 0;
-  received_planning_ = true;
+  // The routing SimControl owns must match with the one Planning has.
+  if (re_routing_triggered_ ||
+      CompareHeader(trajectory.routing_header(), current_routing_header_)) {
+    // Hold a few cycles until the position information is fully refreshed on
+    // planning side. Don't wait for the very first planning received.
+    ++planning_count_;
+    if (planning_count_ == 0 || planning_count_ >= kPlanningCountToStart) {
+      planning_count_ = kPlanningCountToStart;
+      current_trajectory_ = trajectory;
+      prev_point_index_ = 0;
+      next_point_index_ = 0;
+      received_planning_ = true;
+    }
+  } else {
+    ClearPlanning();
+  }
 }
 
 void SimControl::Freeze() {
@@ -149,13 +182,11 @@ bool SimControl::NextPointWithinRange() {
   return next_point_index_ < current_trajectory_.trajectory_point_size() - 1;
 }
 
-void SimControl::TimerCallback(const ros::TimerEvent& event) {
-  RunOnce();
-}
+void SimControl::TimerCallback(const ros::TimerEvent& event) { RunOnce(); }
 
 void SimControl::RunOnce() {
   // Result of the interpolation.
-  double lambda = 0;
+  double lambda = 0.0;
   auto current_time = Clock::NowInSecond();
 
   if (!received_planning_) {
@@ -188,7 +219,7 @@ void SimControl::RunOnce() {
       next_point_ = current_trajectory_.trajectory_point(next_point_index_);
       prev_point_ = current_trajectory_.trajectory_point(prev_point_index_);
 
-      // Calculate the ratio based on the the position of current time in
+      // Calculate the ratio based on the position of current time in
       // between the previous point and the next point, where lambda =
       // (current_point - prev_point) / (next_point - prev_point).
       if (next_point_index_ != prev_point_index_) {

@@ -2,6 +2,8 @@ import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
+const _ = require('lodash');
+
 class WebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
@@ -10,7 +12,6 @@ class WebSocketEndpoint {
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
         this.currMapRadius = null;
-        this.defaultRoutingEndPointRequested = false;
     }
 
     initialize() {
@@ -26,7 +27,14 @@ class WebSocketEndpoint {
         }
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
+
             switch (message.type) {
+                case "HMIConfig":
+                    STORE.hmi.initialize(message.data);
+                    break;
+                case "HMIStatus":
+                    STORE.hmi.updateStatus(message.data);
+                    break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
@@ -35,11 +43,12 @@ class WebSocketEndpoint {
                     RENDERER.maybeInitializeOffest(
                         message.world.autoDrivingCar.positionX,
                         message.world.autoDrivingCar.positionY);
-                    RENDERER.updateWorld(message.world);
+                    RENDERER.updateWorld(message.world, message.planningData);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
+                    STORE.trafficSignal.update(message.world);
                     if (STORE.options.showPNCMonitor) {
-                        STORE.planning.update(message.world);
+                        STORE.planning.update(message.world, message.planningData);
                     }
                     if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.
@@ -59,7 +68,7 @@ class WebSocketEndpoint {
                     STORE.setInitializationStatus(true);
                     break;
                 case "DefaultEndPoint":
-                    RENDERER.updateDefaultRoutingEndPoint(message);
+                    STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
                     break;
             }
         };
@@ -73,11 +82,15 @@ class WebSocketEndpoint {
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN) {
                 // Load default routing end point.
-                if (!this.defaultRoutingEndPointRequested) {
+                if (_.isEmpty(STORE.routeEditingManager.defaultRoutingEndPoint)) {
                     this.requestDefaultRoutingEndPoint();
-                    this.defaultRoutingEndPointRequested = true;
                 }
-                this.websocket.send(JSON.stringify({type : "RequestSimulationWorld"}));
+
+                const requestPlanningData = STORE.options.showPNCMonitor;
+                this.websocket.send(JSON.stringify({
+                    type : "RequestSimulationWorld",
+                    planning : requestPlanningData,
+                }));
             }
         }, 100);
     }
@@ -111,13 +124,12 @@ class WebSocketEndpoint {
         }));
     }
 
-    requestRoute(start, waypoint, end, sendDefaultRoute = false) {
+    requestRoute(start, waypoint, end) {
         this.websocket.send(JSON.stringify({
             type: "SendRoutingRequest",
             start: start,
             end: end,
             waypoint: waypoint,
-            sendDefaultRoute: sendDefaultRoute,
         }));
     }
 
@@ -136,6 +148,57 @@ class WebSocketEndpoint {
     dumpMessages() {
         this.websocket.send(JSON.stringify({
             type: "Dump",
+        }));
+    }
+
+    changeSetupMode(mode) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeMode",
+            new_mode: mode,
+        }));
+    }
+
+    changeMap(map) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeMap",
+            new_map: map,
+        }));
+    }
+
+    changeVehicle(vehcile) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeVehicle",
+            new_vehicle: vehcile,
+        }));
+    }
+
+    executeModeCommand(command) {
+        this.websocket.send(JSON.stringify({
+            type: "ExecuteModeCommand",
+            command, command,
+        }));
+    }
+
+    executeModuleCommand(module, command) {
+        this.websocket.send(JSON.stringify({
+            type: "ExecuteModuleCommand",
+            module: module,
+            command, command,
+        }));
+    }
+
+    executeToolCommand(tool, command) {
+         this.websocket.send(JSON.stringify({
+            type: "ExecuteToolCommand",
+            tool: tool,
+            command, command,
+        }));
+    }
+
+    changeDrivingMode(mode) {
+         this.websocket.send(JSON.stringify({
+            type: "ChangeDrivingMode",
+            new_mode: mode,
         }));
     }
 }

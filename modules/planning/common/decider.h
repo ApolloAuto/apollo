@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/proto/decision.pb.h"
 
 /**
@@ -30,9 +32,6 @@
 namespace apollo {
 namespace planning {
 
-class ReferenceLineInfo;
-class PathDecision;
-
 class Decider {
  public:
   void MakeDecision(const ReferenceLineInfo &reference_line_info,
@@ -40,6 +39,8 @@ class Decider {
 
  private:
   int MakeMainStopDecision(const ReferenceLineInfo &reference_line_info);
+  void MakeMainMissionCompleteDecision(
+      const ReferenceLineInfo &reference_line_info);
   void MakeEStopDecision(const PathDecision &path_decision);
   void SetObjectDecisions(const PathDecision &path_decision);
 

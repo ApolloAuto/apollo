@@ -23,6 +23,10 @@
 
 #include <string>
 #include <vector>
+
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
+
 #include "modules/map/pnc_map/pnc_map.h"
 #include "third_party/json/json.hpp"
 
@@ -61,10 +65,8 @@ struct MapElementIds {
 
 class MapService {
  public:
-  explicit MapService(const std::string map_filename);
+  explicit MapService(bool use_sim_map = true);
 
-  MapService(const std::string &base_map_filename,
-             const std::string &sim_map_filename);
   MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
                                      double raidus) const;
 
@@ -93,11 +95,10 @@ class MapService {
   bool ConstructLaneWayPoint(const double x, const double y,
                              routing::LaneWaypoint *laneWayPoint) const;
 
- private:
-  const hdmap::HDMap &BaseMap() const {
-    return hdmap_;
-  }
+  // Reload map from current FLAGS_map_dir.
+  bool ReloadMap(bool force_reload);
 
+ private:
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
                       double *nearest_s, double *nearest_l) const;
@@ -108,9 +109,13 @@ class MapService {
   bool AddPathFromPassageRegion(const routing::Passage &passage_region,
                                 std::vector<apollo::hdmap::Path> *paths) const;
 
-  hdmap::HDMap hdmap_;
+  const bool use_sim_map_;
+  const hdmap::HDMap *hdmap_ = nullptr;
   // A downsampled map for dreamview frontend display.
-  hdmap::HDMap sim_map_;
+  const hdmap::HDMap *sim_map_ = nullptr;
+
+  // RW lock to protect map data
+  mutable boost::shared_mutex mutex_;
 };
 
 }  // namespace dreamview

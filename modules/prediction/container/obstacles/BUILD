@@ -25,6 +25,7 @@ cc_library(
         "//modules/common/math:kalman_filter",
         "//modules/common/math:math_utils",
         "//modules/common/proto:error_code_proto",
+        "//modules/common/util:map_util",
         "//modules/map/hdmap",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",

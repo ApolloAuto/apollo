@@ -44,18 +44,18 @@ class Convert {
       const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg);
 
   // RawData class for converting data to point cloud
-  VelodyneParser* _parser;
+  VelodyneParser* parser_;
 
-  ros::Subscriber _velodyne_scan;
-  ros::Publisher _pointcloud_pub;
+  ros::Subscriber velodyne_scan_;
+  ros::Publisher pointcloud_pub_;
 
-  std::string _topic_packets;
-  std::string _topic_pointcloud;
+  std::string topic_packets_;
+  std::string topic_pointcloud_;
 
   /// configuration parameters, get config struct from velodyne_parser.h
-  apollo::drivers::velodyne::Config _config;
+  apollo::drivers::velodyne::Config config_;
   // queue size for ros node pub
-  int _queue_size;
+  int queue_size_;
 };
 
 }  // namespace velodyne

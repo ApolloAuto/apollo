@@ -16,6 +16,7 @@ rtk_from {
         #password:
         timeout_s: 5
     }
+    push_location: true
 }
 
 rtk_to {
@@ -33,16 +34,25 @@ login_commands: "UNLOGALL THISPORT\r\n"
 login_commands: "LOG COM2 GPRMC ONTIME 1.0 0.25\r\n"
 login_commands: "EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10\r\n"
 login_commands: "EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000\r\n"
-login_commands: "LOG NCOM1 GPGGA ONTIME 1.0\r\n"
+login_commands: "LOG GPGGA ONTIME 1.0\r\n"
 
-login_commands: "log bestgnssposb ontime 0.5\r\n"
-login_commands: "log bestgnssvelb ontime 0.5\r\n"
-login_commands: "log bestposb ontime 0.5\r\n"
+login_commands: "log bestgnssposb ontime 1\r\n"
+login_commands: "log bestgnssvelb ontime 1\r\n"
+login_commands: "log bestposb ontime 1\r\n"
 login_commands: "log INSPVAXB ontime 0.5\r\n"
 login_commands: "log INSPVASB ontime 0.01\r\n"
 login_commands: "log CORRIMUDATASB ontime 0.01\r\n"
+login_commands: "log RAWIMUSXB onnew 0 0\r\n"
 login_commands: "log INSCOVSB ontime 1\r\n"
 login_commands: "log mark1pvab onnew\r\n"
+
+login_commands: "log rangeb ontime 0.2\r\n"
+login_commands: "log bdsephemerisb\r\n"
+login_commands: "log gpsephemb\r\n"
+login_commands: "log gloephemerisb\r\n"
+login_commands: "log bdsephemerisb ontime 15\r\n"
+login_commands: "log gpsephemb ontime 15\r\n"
+login_commands: "log gloephemerisb ontime 15\r\n"
 
 login_commands: "log imutoantoffsetsb once\r\n"
 login_commands: "log vehiclebodyrotationb onchanged\r\n"

@@ -20,18 +20,25 @@ limitations under the License.
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::util::StrCat;
+using apollo::common::util::ContainsKey;
 
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     connections_.emplace(conn, std::make_shared<std::mutex>());
     AINFO << "Accepted connection. Total connections: " << connections_.size();
+  }
+
+  // Trigger registered new connection handlers.
+  for (const auto handler : connection_ready_handlers_) {
+    handler(conn);
   }
 }
 
@@ -80,7 +87,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   std::shared_ptr<std::mutex> connection_lock;
   {
     std::unique_lock<std::mutex> lock(mutex_);
-    if (connections_.find(conn) == connections_.end()) {
+    if (!ContainsKey(connections_, conn)) {
       AERROR << "Trying to send to an uncached connection, skipping.";
       return false;
     }
@@ -99,7 +106,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
       return false;
     } else {
       connection_lock->lock();  // Block to acquire the lock.
-      if (connections_.find(conn) == connections_.end()) {
+      if (!ContainsKey(connections_, conn)) {
         return false;
       }
     }
@@ -147,13 +154,13 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return false;
   }
 
-  if (json.find("type") == json.end()) {
+  if (!ContainsKey(json, "type")) {
     AERROR << "Received JSON data without type field: " << json;
     return true;
   }
 
   auto type = json["type"];
-  if (message_handlers_.find(type) == message_handlers_.end()) {
+  if (!ContainsKey(message_handlers_, type)) {
     AERROR << "No message handler found for message type " << type
            << ". The message will be discarded!";
     return true;

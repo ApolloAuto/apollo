@@ -31,14 +31,14 @@ class PCDExporterNodelet : public nodelet::Nodelet {
 
  private:
   virtual void onInit();
-  boost::shared_ptr<PCDExporter> _instance;
+  boost::shared_ptr<PCDExporter> instance_;
 };
 
 /** @brief Nodelet initialization. */
 void PCDExporterNodelet::onInit() {
   ROS_INFO("Pcd exporter nodelet init");
-  _instance.reset(new PCDExporter(getNodeHandle(), getPrivateNodeHandle()));
-  _instance->init();
+  instance_.reset(new PCDExporter(getNodeHandle(), getPrivateNodeHandle()));
+  instance_->init();
 }
 
 }  // namespace velodyne

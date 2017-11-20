@@ -15,7 +15,7 @@ em_planner_config {
 
     dp_poly_path_config {
         sample_points_num_each_level: 9
-        step_length_max: 15.0
+        step_length_max: 40.0
         step_length_min: 8.0
         lateral_sample_offset: 0.5
         lateral_adjust_coeff: 0.5
@@ -58,7 +58,7 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.0
+            high_speed_centric_acceleration_limit: 1.8
             low_speed_centric_acceleration_limit: 1.35
             high_speed_threshold: 20
             low_speed_threshold: 7
@@ -68,23 +68,27 @@ em_planner_config {
         }
     }
     qp_spline_path_config {
-        spline_order: 6
+        spline_order: 4
         max_spline_length: 20.0
         time_resolution: 0.1
-        regularization_weight: 0.1
-        derivative_weight: 0.0
+        regularization_weight: 1.0
+        first_spline_weight_factor: 0.0
+        derivative_weight: 500.0
         second_derivative_weight: 1000.0
         third_derivative_weight: 10.0
-        reference_line_weight: 0
+        reference_line_weight: 100.0
         num_output: 100
-        cross_lane_lateral_extension: 1.2
-        cross_lane_longitudinal_extension: 50.0
-        history_path_weight: 0.0;
+        cross_lane_lateral_extension: 0.5
+        cross_lane_longitudinal_extension: 100.0
+        history_path_weight: 0.0
+        lane_change_mid_l: 0.0
+        point_constraint_s_position: 110.0
+        lane_change_lateral_shift: 1.5
+        uturn_speed_limit: 7.0
     }
     qp_st_speed_config {
         total_path_length: 250.0
         total_time: 8.0
-        output_time_resolution: 0.01
         preferred_max_acceleration: 1.2
         preferred_min_deceleration: -2.0
         max_acceleration: 2.0
@@ -92,7 +96,7 @@ em_planner_config {
 
         qp_spline_config {
             number_of_discrete_graph_t: 4
-            spline_order: 6
+            spline_order: 5
             speed_kernel_weight: 0.0
             accel_kernel_weight: 1000.0
             jerk_kernel_weight: 1000.0
@@ -101,6 +105,7 @@ em_planner_config {
             cruise_weight: 0.5
             regularization_weight: 0.1
             follow_drag_distance: 17.0
+            dp_st_reference_weight: 0.0
         }
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
@@ -114,8 +119,8 @@ em_planner_config {
         }
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.0
-            low_speed_centric_acceleration_limit: 1.8
+            high_speed_centric_acceleration_limit: 1.2
+            low_speed_centric_acceleration_limit: 1.4
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
@@ -126,21 +131,27 @@ em_planner_config {
     }
 }
 
-reference_line_smoother_config {
-    spline_order: 6
-    constraint_to_knots_ratio: 5
+qp_spline_reference_line_smoother_config {
+    spline_order: 5
     max_spline_length: 25.0
+    max_constraint_interval : 5.0
     longitudinal_boundary_bound: 2.0
-    lateral_boundary_bound: 0.10
+    lateral_boundary_bound: 0.25
     second_derivative_weight: 200.0
     third_derivative_weight: 1000.0
     num_of_total_points: 500
-    regularization_weight: 0.2
+    regularization_weight: 1.0e-5
 }
 
 rule_config : {
     rule_id: BACKSIDE_VEHICLE
 }
 rule_config : {
+    rule_id: SIGNAL_LIGHT
+}
+rule_config : {
     rule_id: REROUTING
+}
+rule_config : {
+    rule_id: REFERENCE_LINE_END
 }

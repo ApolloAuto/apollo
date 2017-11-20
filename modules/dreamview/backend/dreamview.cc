@@ -30,12 +30,11 @@
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
-using apollo::hdmap::SimMapFile;
 using apollo::hdmap::BaseMapFile;
 
 std::string Dreamview::Name() const {
@@ -52,10 +51,13 @@ Status Dreamview::Init() {
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
   CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetPad()) << "PadAdapter is not initialized.";
   CHECK(AdapterManager::GetPrediction())
       << "PredictionAdapter is not initialized.";
   CHECK(AdapterManager::GetPerceptionObstacles())
       << "PerceptionObstaclesAdapter is not initialized.";
+  CHECK(AdapterManager::GetTrafficLightDetection())
+      << "TrafficLightDetectionAdapter is not initialized.";
   CHECK(AdapterManager::GetRoutingRequest())
       << "RoutingRequestAdapter is not initialized.";
   CHECK(AdapterManager::GetRoutingResponse())
@@ -79,13 +81,13 @@ Status Dreamview::Init() {
 
   image_.reset(new ImageHandler());
   websocket_.reset(new WebSocketHandler());
-  map_service_.reset(new MapService(BaseMapFile(), SimMapFile()));
+  map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 
   sim_world_updater_.reset(
       new SimulationWorldUpdater(websocket_.get(), sim_control_.get(),
                                  map_service_.get(), FLAGS_routing_from_file));
-  hmi_.reset(new HMI(websocket_.get()));
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addHandler("/image", *image_);
@@ -98,7 +100,6 @@ Status Dreamview::Start() {
   if (FLAGS_enable_sim_control) {
     sim_control_->Init(true);
   }
-  hmi_->Start();
   return Status::OK();
 }
 

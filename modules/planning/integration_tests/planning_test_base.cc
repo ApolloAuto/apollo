@@ -20,7 +20,7 @@
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "modules/common/log.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -38,6 +38,7 @@ DEFINE_string(test_localization_file, "garage_localization.pb.txt",
 DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
+DEFINE_string(test_traffic_light_file, "", "The traffic light test file");
 
 DEFINE_string(test_previous_planning_file, "",
               "The previous planning test file");
@@ -51,6 +52,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_chassis_file = "garage_chassis.pb.txt";
   FLAGS_test_prediction_file = "garage_prediction.pb.txt";
   FLAGS_align_prediction_time = false;
+  FLAGS_estimate_current_vehicle_state = false;
   FLAGS_enable_reference_line_provider_thread = false;
   FLAGS_enable_trajectory_check = true;
 }
@@ -85,17 +87,27 @@ bool PlanningTestBase::SetUpAdapters() {
     return false;
   }
   AINFO << "Using Chassis file: " << chassis_file;
-  if (FLAGS_enable_prediction) {
+  if (FLAGS_enable_prediction && !FLAGS_test_prediction_file.empty()) {
     auto prediction_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
-    if (!FLAGS_test_prediction_file.empty() &&
-        !AdapterManager::FeedPredictionFile(prediction_file)) {
+    if (!AdapterManager::FeedPredictionFile(prediction_file)) {
       AERROR << "Failed to load prediction file: " << prediction_file;
       return false;
     }
     AINFO << "Using Prediction file: " << prediction_file;
   } else {
     AINFO << "Prediction is disabled";
+  }
+  if (FLAGS_enable_traffic_light && !FLAGS_test_traffic_light_file.empty()) {
+    auto traffic_light_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file;
+    if (!AdapterManager::FeedTrafficLightDetectionFile(traffic_light_file)) {
+      AERROR << "Failed to load traffic light file: " << traffic_light_file;
+      return false;
+    }
+    AINFO << "Using Traffic Light file: " << traffic_light_file;
+  } else {
+    AINFO << "Traffic Light is disabled";
   }
   return true;
 }

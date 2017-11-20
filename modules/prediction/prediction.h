@@ -26,11 +26,11 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/prediction_interface.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
-
-#include "modules/common/apollo_app.h"
 
 /**
  * @namespace apollo::prediction
@@ -39,7 +39,7 @@
 namespace apollo {
 namespace prediction {
 
-class Prediction : public apollo::common::ApolloApp {
+class Prediction : public PredictionInterface {
  public:
   /**
    * @brief Destructor
@@ -73,13 +73,16 @@ class Prediction : public apollo::common::ApolloApp {
    * @brief Data callback upon receiving a perception obstacle message.
    * @param perception_obstacles received message.
    */
-  void OnPerception(
-      const perception::PerceptionObstacles &perception_obstacles);
+  void RunOnce(
+      const perception::PerceptionObstacles &perception_obstacles) override;
 
  private:
   common::Status OnError(const std::string &error_msg);
 
   void OnLocalization(const localization::LocalizationEstimate &localization);
+
+  bool IsValidTrajectoryPoint(
+      const ::apollo::common::TrajectoryPoint &trajectory_point);
 
  private:
   PredictionConf prediction_conf_;

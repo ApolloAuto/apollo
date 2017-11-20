@@ -32,7 +32,7 @@ export default class Console extends React.Component {
         const { monitor } = this.props;
 
         return (
-            <ul className="console">
+            <ul className="console card">
                 {monitor.items.map((item, index) => (
                      <MonitorItem key={index} text={item.msg}
                                   level={item.logLevel} />

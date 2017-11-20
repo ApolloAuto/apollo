@@ -32,6 +32,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
+#include "modules/routing/proto/poi.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -66,6 +67,10 @@ class SimulationWorldUpdater {
    */
   void Start();
 
+  // Time interval, in milliseconds, between pushing SimulationWorld to
+  // frontend.
+  static constexpr double kSimWorldTimeIntervalMs = 100;
+
  private:
   /**
    * @brief The callback function to get updates from SimulationWorldService,
@@ -85,12 +90,12 @@ class SimulationWorldUpdater {
       apollo::routing::RoutingRequest *routing_request);
 
   /**
-   * @brief Tries to load the default routing end point from the file if it has
+   * @brief Tries to load the points of interest from the file if it has
    * not been.
-   * @return False if failed to load the default routing end point from file,
+   * @return False if failed to load from file,
    * true otherwise or if it's already loaded.
    */
-  bool LoadDefaultEndPoint();
+  bool LoadPOI();
 
   /**
    * @brief Dumps the latest received message to file.
@@ -112,9 +117,6 @@ class SimulationWorldUpdater {
     }
   }
 
-  // Time interval, in seconds, between pushing SimulationWorld to frontend.
-  static constexpr double kSimWorldTimeInterval = 0.1;
-
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
   const MapService *map_service_;
@@ -122,10 +124,11 @@ class SimulationWorldUpdater {
   SimControl *sim_control_;
 
   // End point for requesting default route
-  apollo::routing::LaneWaypoint default_end_point_;
+  apollo::routing::POI poi_;
 
   // The json string to be pushed to frontend, which is updated by timer.
   std::string simulation_world_json_;
+  std::string simulation_world_with_planning_json_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.

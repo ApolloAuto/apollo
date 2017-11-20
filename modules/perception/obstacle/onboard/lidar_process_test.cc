@@ -32,11 +32,11 @@
 namespace apollo {
 namespace perception {
 
-using std::vector;
+using Eigen::Matrix4d;
 using pcl_util::Point;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
-using Eigen::Matrix4d;
+using std::vector;
 
 class LidarProcessTest : public testing::Test {
  protected:
@@ -102,7 +102,7 @@ TEST_F(LidarProcessTest, test_Process) {
   pcl::io::loadPCDFile(pcd_file, *org_cloud);
   point_cloud->points.reserve(org_cloud->points.size());
   for (size_t i = 0; i < org_cloud->points.size(); ++i) {
-    Point pt;
+    pcl_util::Point pt;
     pt.x = org_cloud->points[i].x;
     pt.y = org_cloud->points[i].y;
     pt.z = org_cloud->points[i].z;
@@ -129,7 +129,7 @@ TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   lidar_process_.objects_ = objs;
 
   PerceptionObstacles obstacles;
-  EXPECT_TRUE(lidar_process_.GeneratePbMsg(&obstacles));
+  lidar_process_.GeneratePbMsg(&obstacles);
   EXPECT_EQ(obstacles.perception_obstacle_size(), 2);
   EXPECT_EQ(obstacles.perception_obstacle(0).type(),
             PerceptionObstacle::VEHICLE);

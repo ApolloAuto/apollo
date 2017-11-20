@@ -31,7 +31,8 @@ from modules.map.proto.map_pb2 import Map
 from modules.map.proto.map_lane_pb2 import LaneBoundaryType, Lane
 from modules.map.proto.map_road_pb2 import BoundaryEdge, Road
 
-from modules.routing.proto.routing_pb2 import RoutingRequest
+from modules.routing.proto.routing_pb2 import LaneWaypoint
+from modules.routing.proto.poi_pb2 import POI, Landmark
 
 class DataPoint:
     """
@@ -253,7 +254,7 @@ def smooth_dimension(data, dim):
     if dim == 'width':
         laplacian_smooth(extracted_data, 1.0, 1000)
     else:
-        laplacian_smooth(extracted_data, 0.5, 10)
+        laplacian_smooth(extracted_data, 1.0, 1000)
     update_data(data, dim, extracted_data)
 
 def smooth_center_width(data):
@@ -649,9 +650,9 @@ def main():
             if lane_count != len(lane_sets) - 1:
                 lane_sets[lane_count][lane_offset].successor_id.add().id = lane_sets[lane_count + 1][lane_offset].id.id
             if lane_offset != 0:
-                lane_sets[lane_count][lane_offset].left_neighbor_forward_lane_id.add().id = lane_set[lane_offset - 1].id.id
-            if lane_offset != len(lane_set) - 1:
-                lane_sets[lane_count][lane_offset].right_neighbor_forward_lane_id.add().id = lane_set[lane_offset + 1].id.id
+                lane_sets[lane_count][lane_offset].left_neighbor_forward_lane_id.add().id = lane_sets[lane_count][lane_offset - 1].id.id
+            if lane_offset != len(lane_sets[lane_count]) - 1:
+                lane_sets[lane_count][lane_offset].right_neighbor_forward_lane_id.add().id = lane_sets[lane_count][lane_offset + 1].id.id
 
     # Add road/lanes to map and let road contain lanes
     mp.road.extend([road])
@@ -667,15 +668,17 @@ def main():
     # Create default end_way_point using the farthest point of last central lane 
     last_central_lane = lane_sets[-1][left_lanes]
 
-    waypoint = RoutingRequest.LaneWaypoint()
-    waypoint.id = last_central_lane.id.id
-    waypoint.s = last_central_lane.length
-    waypoint.pose.x = last_central_lane.central_curve.segment[0].line_segment.point[-1].x
-    waypoint.pose.y = last_central_lane.central_curve.segment[0].line_segment.point[-1].y
+    poi = POI()
+    landmark = poi.landmark.add()
+    landmark.name = "default"
+    landmark.waypoint.id = last_central_lane.id.id
+    landmark.waypoint.s = last_central_lane.length
+    landmark.waypoint.pose.x = last_central_lane.central_curve.segment[0].line_segment.point[-1].x
+    landmark.waypoint.pose.y = last_central_lane.central_curve.segment[0].line_segment.point[-1].y
 
     # Output default end_way_point
     with open(waypoint_file_name, "w") as f:
-        f.write(waypoint.__str__())
+        f.write(poi.__str__())
 
 if __name__ == '__main__':
     main()

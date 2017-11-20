@@ -33,7 +33,8 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
       return file_path;
     }
   }
-  AERROR << "No existing file found in " << dir << "/" << files << ". "
+  AERROR << "No existing file found in " << dir << "/" << files
+         << ". "
             "Fallback to first candidate as default result.";
   CHECK(!candidates.empty()) << "Please specify at least one map.";
   return apollo::common::util::StrCat(FLAGS_map_dir, "/", candidates[0]);
@@ -42,7 +43,9 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
 }  // namespace
 
 std::string BaseMapFile() {
-  return FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename);
+  return FLAGS_test_base_map_filename.empty()
+             ? FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename)
+             : FindFirstExist(FLAGS_map_dir, FLAGS_test_base_map_filename);
 }
 
 std::string SimMapFile() {
@@ -67,6 +70,9 @@ std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
 std::unique_ptr<HDMap> HDMapUtil::base_map_ = nullptr;
 std::mutex HDMapUtil::base_map_mutex_;
 
+std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
+std::mutex HDMapUtil::sim_map_mutex_;
+
 const HDMap* HDMapUtil::BaseMapPtr() {
   if (base_map_ == nullptr) {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
@@ -81,10 +87,30 @@ const HDMap& HDMapUtil::BaseMap() {
   return *CHECK_NOTNULL(BaseMapPtr());
 }
 
-bool HDMapUtil::ReloadBaseMap() {
-  std::lock_guard<std::mutex> lock(base_map_mutex_);
-  base_map_ = CreateMap(BaseMapFile());
-  return base_map_ != nullptr;
+const HDMap* HDMapUtil::SimMapPtr() {
+  if (sim_map_ == nullptr) {
+    std::lock_guard<std::mutex> lock(sim_map_mutex_);
+    if (sim_map_ == nullptr) {  // Double check.
+      sim_map_ = CreateMap(SimMapFile());
+    }
+  }
+  return sim_map_.get();
+}
+
+const HDMap& HDMapUtil::SimMap() {
+  return *CHECK_NOTNULL(SimMapPtr());
+}
+
+bool HDMapUtil::ReloadMaps() {
+  {
+    std::lock_guard<std::mutex> lock(base_map_mutex_);
+    base_map_ = CreateMap(BaseMapFile());
+  }
+  {
+    std::lock_guard<std::mutex> lock(sim_map_mutex_);
+    sim_map_ = CreateMap(SimMapFile());
+  }
+  return base_map_ != nullptr && sim_map_ != nullptr;
 }
 
 }  // namespace hdmap

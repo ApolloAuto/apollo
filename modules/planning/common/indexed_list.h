@@ -22,10 +22,13 @@
 #define MODULES_PLANNING_COMMON_INDEXED_LIST_H_
 
 #include <memory>
-#include <mutex>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
+#include "modules/common/util/map_util.h"
 
 namespace apollo {
 namespace planning {
@@ -41,15 +44,12 @@ class IndexedList {
    * @return The pointer to the object in the container.
    */
   T* Add(const I id, const T& object) {
-    auto* ptr = Find(id);
-    if (ptr) {
+    if (!apollo::common::util::InsertIfNotPresent(&object_dict_, id, object)) {
       return nullptr;
-    } else {
-      const auto iter = object_dict_.insert(
-          typename std::unordered_map<I, T>::value_type(id, object));
-      object_list_.push_back(&(iter.first->second));
-      return &(iter.first->second);
     }
+    T* ret = &object_dict_.at(id);
+    object_list_.push_back(ret);
+    return ret;
   }
 
   /**
@@ -59,12 +59,17 @@ class IndexedList {
    * @return nullptr if the object is not found.
    */
   T* Find(const I id) {
-    auto iter = object_dict_.find(id);
-    if (iter == object_dict_.end()) {
-      return nullptr;
-    } else {
-      return &iter->second;
-    }
+    return apollo::common::util::FindOrNull(object_dict_, id);
+  }
+
+  /**
+   * @brief Find object by id in the container
+   * @param id the id of the object
+   * @return the raw pointer to the object if found.
+   * @return nullptr if the object is not found.
+   */
+  const T* Find(const I id) const {
+    return apollo::common::util::FindOrNull(object_dict_, id);
   }
 
   /**
@@ -82,24 +87,22 @@ template <typename I, typename T>
 class ThreadSafeIndexedList : public IndexedList<I, T> {
  public:
   T* Add(const I id, const T& object) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     return IndexedList<I, T>::Add(id, object);
   }
 
   T* Find(const I id) {
-    // TODO(all) change to shared mutex to all multiple reader
-    std::lock_guard<std::mutex> lock(mutex_);
+    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
     return IndexedList<I, T>::Find(id);
   }
 
   std::vector<const T*> Items() const {
-    // TODO(all) change to shared mutex to all multiple reader
-    std::lock_guard<std::mutex> lock(mutex_);
+    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
     return IndexedList<I, T>::Items();
   }
 
  private:
-  mutable std::mutex mutex_;
+  mutable boost::shared_mutex mutex_;
 };
 
 }  // namespace planning

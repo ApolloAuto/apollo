@@ -31,13 +31,13 @@ class CompensatorNodelet : public nodelet::Nodelet {
 
  private:
   virtual void onInit();
-  boost::shared_ptr<Compensator> _compensator;
+  boost::shared_ptr<Compensator> compensator_;
 };
 
 /** @brief Nodelet initialization. */
 void CompensatorNodelet::onInit() {
   ROS_INFO("Compensator nodelet init");
-  _compensator.reset(new Compensator(getNodeHandle(), getPrivateNodeHandle()));
+  compensator_.reset(new Compensator(getNodeHandle(), getPrivateNodeHandle()));
 }
 
 }  // namespace velodyne

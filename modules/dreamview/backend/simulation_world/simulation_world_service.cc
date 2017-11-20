@@ -28,12 +28,14 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -62,6 +64,7 @@ using apollo::hdmap::Path;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::perception::TrafficLightDetection;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
@@ -339,8 +342,10 @@ void SimulationWorldService::Update() {
   // may not always be perfectly aligned and belong to the same frame.
   obj_map_.clear();
   world_.clear_object();
-  UpdateWithLatestObserved("Perception",
+  UpdateWithLatestObserved("PerceptionObstacles",
                            AdapterManager::GetPerceptionObstacles());
+  UpdateWithLatestObserved("PerceptionTrafficLight",
+                           AdapterManager::GetTrafficLightDetection());
   UpdateWithLatestObserved("PredictionObstacles",
                            AdapterManager::GetPrediction());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
@@ -361,7 +366,8 @@ void SimulationWorldService::UpdateDelays() {
       AdapterManager::GetPerceptionObstacles()->GetDelayInMs());
   delays->set_planning(AdapterManager::GetPlanning()->GetDelayInMs());
   delays->set_prediction(AdapterManager::GetPrediction()->GetDelayInMs());
-  // TODO(siyangy): Add traffic light delay when ready.
+  delays->set_traffic_light(
+      AdapterManager::GetTrafficLightDetection()->GetDelayInMs());
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
@@ -374,6 +380,14 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   update["world"] = Json::parse(sim_world_json);
 
   return update;
+}
+
+Json SimulationWorldService::GetPlanningData() const {
+  std::string planning_data_json;
+  ::google::protobuf::util::MessageToJsonString(planning_data_,
+                                                &planning_data_json);
+
+  return Json::parse(planning_data_json);
 }
 
 Json SimulationWorldService::GetMapElements(double radius) const {
@@ -477,7 +491,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
   const std::string id = std::to_string(obstacle.id());
   // Create a new world object and put it into object map if the id does not
   // exist in the map yet.
-  if (obj_map_.find(id) == obj_map_.end()) {
+  if (!apollo::common::util::ContainsKey(obj_map_, id)) {
     Object &world_obj = obj_map_[id];
     SetObstacleInfo(obstacle, &world_obj);
     SetObstaclePolygon(obstacle, &world_obj);
@@ -496,6 +510,19 @@ void SimulationWorldService::UpdateSimulationWorld(
       std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const TrafficLightDetection &traffic_light_detection) {
+  Object *signal = world_.mutable_traffic_signal();
+  if (traffic_light_detection.traffic_light_size() > 0) {
+    const auto &traffic_light = traffic_light_detection.traffic_light(0);
+    signal->set_current_signal(
+        apollo::perception::TrafficLight_Color_Name(traffic_light.color()));
+  } else {
+    signal->set_current_signal("");
+  }
+}
+
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
@@ -503,38 +530,15 @@ void SimulationWorldService::UpdatePlanningTrajectory(
 
   util::TrajectoryPointCollector collector(&world_);
 
-  size_t i = 0;
-  const size_t trajectory_length = trajectory.trajectory_point_size();
   bool collecting_started = false;
-  while (i < trajectory_length) {
-    const TrajectoryPoint &point = trajectory.trajectory_point(i);
+  for (const TrajectoryPoint &point : trajectory.trajectory_point()) {
     // Trajectory points with a timestamp older than the cutoff time
     // (which is effectively the timestamp of the most up-to-date
     // localization/chassis message) will be dropped.
-    //
-    // Note that the last two points are always included.
     if (collecting_started ||
         point.relative_time() + header_time >= cutoff_time) {
       collecting_started = true;
       collector.Collect(point);
-      if (i == trajectory_length - 1) {
-        // Break if the very last point is collected.
-        break;
-      } else if (i == trajectory_length - 2) {
-        // Move on to the last point if the last but one is collected.
-        i = trajectory_length - 1;
-      } else if (i < trajectory_length - 2) {
-        // When collecting the trajectory points, downsample with a ratio of 10.
-        constexpr double downsample_ratio = 10;
-        i += downsample_ratio;
-        if (i > trajectory_length - 2) {
-          i = trajectory_length - 2;
-        }
-      } else {
-        break;
-      }
-    } else {
-      ++i;
     }
   }
 }
@@ -640,21 +644,75 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 }
 
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
-  auto *planning_data = world_.mutable_planning_data();
+  size_t max_interval = 10;
 
-  planning_data->mutable_speed_plan()->CopyFrom(data.speed_plan());
-  planning_data->mutable_st_graph()->CopyFrom(data.st_graph());
-  planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
+  // Update SL Frame
+  planning_data_.mutable_sl_frame()->CopyFrom(data.sl_frame());
 
-  planning_data->clear_path();
-  for (const ::apollo::common::Path &path : data.path()) {
+  // Update ST Graph
+  planning_data_.clear_st_graph();
+  for (auto &graph : data.st_graph()) {
+    auto *st_graph = planning_data_.add_st_graph();
+    st_graph->set_name(graph.name());
+    st_graph->mutable_boundary()->CopyFrom(graph.boundary());
+    if (graph.has_kernel_cruise_ref()) {
+      st_graph->mutable_kernel_cruise_ref()->CopyFrom(
+          graph.kernel_cruise_ref());
+    }
+    if (graph.has_kernel_follow_ref()) {
+      st_graph->mutable_kernel_follow_ref()->CopyFrom(
+          graph.kernel_follow_ref());
+    }
+    if (graph.has_speed_constraint()) {
+      st_graph->mutable_speed_constraint()->CopyFrom(graph.speed_constraint());
+    }
+
+    // downsample speed_profile and speed_limit
+    // The x-axis range is always [-10, 200], downsample to ~200 points but skip
+    // max 10 points
+    size_t profile_downsample_interval =
+        std::max(1, (graph.speed_profile_size() / 200));
+    profile_downsample_interval =
+        std::min(profile_downsample_interval, max_interval);
+    DownsampleSpeedPointsByInterval(graph.speed_profile(),
+                                    profile_downsample_interval,
+                                    st_graph->mutable_speed_profile());
+
+    size_t limit_downsample_interval =
+        std::max(1, (graph.speed_limit_size() / 200));
+    limit_downsample_interval =
+        std::min(limit_downsample_interval, max_interval);
+    DownsampleSpeedPointsByInterval(graph.speed_limit(),
+                                    limit_downsample_interval,
+                                    st_graph->mutable_speed_limit());
+  }
+
+  // Update Speed Plan
+  planning_data_.clear_speed_plan();
+  for (auto &plan : data.speed_plan()) {
+    if (plan.speed_point_size() > 0) {
+      auto *downsampled_plan = planning_data_.add_speed_plan();
+      downsampled_plan->set_name(plan.name());
+
+      // Downsample the speed plan for frontend display.
+      // The x-axis range is always [-2, 10], downsample to ~80 points
+      size_t interval = std::max(1, (plan.speed_point_size() / 80));
+      interval = std::min(interval, max_interval);
+      DownsampleSpeedPointsByInterval(plan.speed_point(), interval,
+                                      downsampled_plan->mutable_speed_point());
+    }
+  }
+
+  // Update path
+  planning_data_.clear_path();
+  for (auto &path : data.path()) {
     // Downsample the path points for frontend display.
     // Angle threshold is about 5.72 degree.
     constexpr double angle_threshold = 0.1;
     std::vector<int> sampled_indices =
         DownsampleByAngle(path.path_point(), angle_threshold);
 
-    auto *downsampled_path = planning_data->add_path();
+    auto *downsampled_path = planning_data_.add_path();
     downsampled_path->set_name(path.name());
     for (int index : sampled_indices) {
       const auto &path_point = path.path_point()[index];
@@ -663,8 +721,31 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
       point->set_y(path_point.y());
       point->set_s(path_point.s());
       point->set_kappa(path_point.kappa());
+      point->set_dkappa(path_point.dkappa());
     }
   }
+}
+
+template <typename Points>
+void SimulationWorldService::DownsampleSpeedPointsByInterval(
+    const Points &points, size_t downsampleInterval,
+    Points *downsampled_points) {
+  if (points.size() == 0) {
+    return;
+  }
+
+  for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
+    auto *point = downsampled_points->Add();
+    point->set_s(points[i].s());
+    point->set_t(points[i].t());
+    point->set_v(points[i].v());
+  }
+
+  // add the last point
+  auto *point = downsampled_points->Add();
+  point->set_s(points[points.size() - 1].s());
+  point->set_t(points[points.size() - 1].t());
+  point->set_v(points[points.size() - 1].v());
 }
 
 template <>
@@ -678,6 +759,8 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdatePlanningData(trajectory.debug().planning_data());
 
+  world_.mutable_latency()->set_planning(
+      trajectory.latency_stats().total_time_ms());
   world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
 

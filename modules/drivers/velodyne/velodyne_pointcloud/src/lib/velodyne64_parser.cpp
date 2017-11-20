@@ -24,29 +24,29 @@ namespace velodyne {
 
 Velodyne64Parser::Velodyne64Parser(Config config) : VelodyneParser(config) {
   for (int i = 0; i < 4; i++) {
-    _gps_base_usec[i] = 0;
-    _previous_packet_stamp[i] = 0;
+    gps_base_usec_[i] = 0;
+    previous_packet_stamp_[i] = 0;
   }
-  _need_two_pt_correction = true;
+  need_two_pt_correction_ = true;
   // init unpack function and order function by model.
-  if (_config.model == "64E_S2") {
-    _inner_time = &velodyne::INNER_TIME_64;
-    _is_s2 = true;
+  if (config_.model == "64E_S2") {
+    inner_time_ = &velodyne::INNER_TIME_64;
+    is_s2_ = true;
   } else {  // 64E_S3
-    _inner_time = &velodyne::INNER_TIME_64E_S3;
-    _is_s2 = false;
+    inner_time_ = &velodyne::INNER_TIME_64E_S3;
+    is_s2_ = false;
   }
 
-  if (_config.model == "64E_S3D_LAST") {
-    _mode = LAST;
-  } else if (_config.model == "64E_S3D_DUAL") {
-    _mode = DUAL;
+  if (config_.model == "64E_S3D_LAST") {
+    mode_ = LAST;
+  } else if (config_.model == "64E_S3D_DUAL") {
+    mode_ = DUAL;
   }
 }
 
 void Velodyne64Parser::setup() {
   VelodyneParser::setup();
-  if (!_config.calibration_online && _config.organized) {
+  if (!config_.calibration_online && config_.organized) {
     init_offsets();
   }
 }
@@ -111,7 +111,7 @@ void Velodyne64Parser::set_base_time_from_packets(
              time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
     uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
     for (int i = 0; i < 4; ++i) {
-      _gps_base_usec[i] = unix_base * 1000000;
+      gps_base_usec_[i] = unix_base * 1000000;
     }
   }
 }
@@ -139,21 +139,21 @@ void Velodyne64Parser::init_offsets() {
     int col = velodyne::ORDER_64[i];
     // compute offset, NOTICE: std::map doesn't have const [] since [] may
     // insert new values into map
-    const LaserCorrection& corrections = _calibration._laser_corrections[col];
+    const LaserCorrection& corrections = calibration_.laser_corrections_[col];
     int offset = int(corrections.rot_correction / ANGULAR_RESOLUTION + 0.5);
-    _offsets[i] = offset;
+    offsets_[i] = offset;
   }
 }
 
 void Velodyne64Parser::generate_pointcloud(
     const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg,
     VPointCloud::Ptr& pointcloud) {
-  if (_config.calibration_online && !_calibration._initialized) {
-    if (_online_calibration.decode(scan_msg) == -1) {
+  if (config_.calibration_online && !calibration_.initialized_) {
+    if (online_calibration_.decode(scan_msg) == -1) {
       return;
     }
-    _calibration = _online_calibration.calibration();
-    if (_config.organized) {
+    calibration_ = online_calibration_.calibration();
+    if (config_.organized) {
       init_offsets();
     }
   }
@@ -167,7 +167,7 @@ void Velodyne64Parser::generate_pointcloud(
 
   bool skip = false;
   for (size_t i = 0; i < scan_msg->packets.size(); ++i) {
-    if (_gps_base_usec[0] == 0) {
+    if (gps_base_usec_[0] == 0) {
       // only set one time type when call this function, so cannot break
       set_base_time_from_packets(scan_msg->packets[i]);
       // If base time not ready then set empty_unpack true
@@ -175,7 +175,7 @@ void Velodyne64Parser::generate_pointcloud(
     } else {
       check_gps_status(scan_msg->packets[i]);
       unpack(scan_msg->packets[i], *pointcloud);
-      _last_time_stamp = pointcloud->header.stamp;
+      last_time_stamp_ = pointcloud->header.stamp;
       ROS_DEBUG_STREAM("stamp: " << std::fixed << pointcloud->header.stamp);
     }
   }
@@ -186,7 +186,7 @@ void Velodyne64Parser::generate_pointcloud(
     if (pointcloud->empty()) {
       // we discard this pointcloud if empty
       ROS_ERROR_STREAM(
-          "All points is NAN! Please check velodyne:" << _config.model);
+          "All points is NAN! Please check velodyne:" << config_.model);
     }
     pointcloud->width = pointcloud->size();
   }
@@ -198,15 +198,15 @@ double Velodyne64Parser::get_timestamp(double base_time, float time_offset,
   double timestamp = 0;
   int index = 0;
 
-  if (_is_s2) {
+  if (is_s2_) {
     index = block_id & 1;  // % 2
-    double& previous_packet_stamp = _previous_packet_stamp[index];
-    uint64_t& gps_base_usec = _gps_base_usec[index];
+    double& previous_packet_stamp = previous_packet_stamp_[index];
+    uint64_t& gps_base_usec = gps_base_usec_[index];
     timestamp = get_gps_stamp(t, previous_packet_stamp, gps_base_usec);
   } else {                 // 64E_S3
     index = block_id & 3;  // % 4
-    double& previous_packet_stamp = _previous_packet_stamp[index];
-    uint64_t& gps_base_usec = _gps_base_usec[index];
+    double& previous_packet_stamp = previous_packet_stamp_[index];
+    uint64_t& gps_base_usec = gps_base_usec_[index];
     timestamp = get_gps_stamp(t, previous_packet_stamp, gps_base_usec);
   }
   return timestamp;
@@ -237,7 +237,7 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
   double basetime = raw->gps_timestamp;  // usec
 
   for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {  // 12
-    if (_mode != DUAL && !_is_s2 && ((i & 3) >> 1) > 0) {
+    if (mode_ != DUAL && !is_s2_ && ((i & 3) >> 1) > 0) {
       // i%4/2  even-numbered block contain duplicate data
       continue;
     }
@@ -251,14 +251,14 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
       // One point
       uint8_t laser_number = j + bank_origin;  // hardware larse number
       LaserCorrection& corrections =
-          _calibration._laser_corrections[laser_number];
+          calibration_.laser_corrections_[laser_number];
 
       union RawDistance raw_distance;
       raw_distance.bytes[0] = raw->blocks[i].data[k];
       raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
 
       // compute time
-      double timestamp = get_timestamp(basetime, (*_inner_time)[i][j], i);
+      double timestamp = get_timestamp(basetime, (*inner_time_)[i][j], i);
 
       if (j == SCANS_PER_BLOCK - 1) {
         // set header stamp before organize the point cloud
@@ -271,7 +271,7 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
       if (raw_distance.raw_distance == 0 ||
           !is_scan_valid(raw->blocks[i].rotation, distance)) {
         // if orgnized append a nan point to the cloud
-        if (_config.organized) {
+        if (config_.organized) {
           pc.points.emplace_back(get_nan_point(timestamp));
         }
         continue;
@@ -306,7 +306,7 @@ void Velodyne64Parser::order(VPointCloud::Ptr& cloud) {
 
     for (int j = 0; j < height; ++j) {
       // make sure offset is initialized, should be init at setup() just once
-      int row = (j + _offsets[i] + height) % height;
+      int row = (j + offsets_[i] + height) % height;
       target.at(i, j) = cloud->at(col, row);
     }
   }

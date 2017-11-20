@@ -61,6 +61,11 @@ struct PairHash {
   }
 };
 
+template <typename T>
+bool WithinBound(T start, T end, T value) {
+  return value >= start && value <= end;
+}
+
 /**
  * @brief create a SL point
  * @param s the s value
@@ -68,6 +73,11 @@ struct PairHash {
  * @return a SLPoint instance
  */
 SLPoint MakeSLPoint(const double s, const double l);
+
+template <typename T>
+common::math::Vec2d MakeVec2d(const T& t) {
+  return common::math::Vec2d(t.x(), t.y());
+}
 
 PointENU MakePointENU(const double x, const double y, const double z);
 

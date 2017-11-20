@@ -28,7 +28,9 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::ErrorCode;
 
-std::string Routing::Name() const { return FLAGS_node_name; }
+std::string Routing::Name() const {
+  return FLAGS_routing_node_name;
+}
 
 Routing::Routing()
     : monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}

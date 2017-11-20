@@ -24,11 +24,10 @@
 #include <memory>
 #include <string>
 
-#include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/onboard/lidar_process.h"
+#include "modules/perception/perception_interface.h"
 #include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @namespace apollo::perception
@@ -37,17 +36,17 @@
 namespace apollo {
 namespace perception {
 
-class Perception : public common::ApolloApp {
+class Perception : public PerceptionInterface {
  public:
   std::string Name() const override;
   common::Status Init() override;
   common::Status Start() override;
   void Stop() override;
 
- private:
   // Upon receiving point cloud data
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+  void RunOnce(const sensor_msgs::PointCloud2& message) override;
 
+ private:
   std::unique_ptr<LidarProcess> lidar_process_;
 };
 

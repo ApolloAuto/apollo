@@ -1,0 +1,246 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Google Maps - pygmaps </title>
+    <script type="text/javascript"
+            src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript"
+            src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        var symbolCar = {
+            path: 'M -1,0 A 1,1 0 0 0 -3,0 1,1 0 0 0 -1,0M 1,0 A 1,1 0 0 0 3,0 1,1 0 0 0 1,0M -3,3 Q 0,5 3,3',
+            strokeColor: '#00F',
+            rotation: 180,
+            scale: 2
+        };
+        var vehicleMarker;
+        var map;
+        var interval;
+        var routingPath = false;
+        var rightLaneMarker = false;
+        var leftLaneMarker = false;
+        var centerVehicle = true;
+        var destinationMarker = false;
+        style.webkitTransform = 'translateZ(0px)';
+
+        function Initialize() {
+            LoadGoogleMap();
+            interval = setInterval(function () {
+                GetMapData();
+            }, 100);
+
+            var centerControlDiv = document.createElement('div');
+            var centerControl = new CenterControl(centerControlDiv, map);
+            centerControlDiv.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
+
+            var centerControlDiv2 = document.createElement('div');
+            var routingControl = new RoutingControl(centerControlDiv2, map);
+            centerControlDiv2.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv2);
+
+
+            google.maps.event.addListener(map, 'click', function (event) {
+                var clickedLocation = event.latLng;
+                if (destinationMarker === false) {
+                    destinationMarker = new google.maps.Marker({
+                        position: clickedLocation,
+                        map: map,
+                        label: 'D',
+                        draggable: true //make it draggable
+                    });
+                    //Listen for drag events!
+                    google.maps.event.addListener(vehicleMarker, 'dragend', function (event) {
+                        markerLocation();
+                    });
+                } else {
+                    //Marker has already been added, so just change its location.
+                    destinationMarker.setPosition(clickedLocation);
+                }
+                //Get the marker's location.
+                //markerLocation();
+            });
+
+        }
+        function LoadGoogleMap() {
+            var latlng = new google.maps.LatLng(37.415885, -122.014487);
+            var mapOptions = {
+                center: latlng,
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+            vehicleMarker = new google.maps.Marker({
+                position: latlng
+            });
+            vehicleMarker.setMap(map);
+        }
+
+        function GetMapData() {
+            var json = '';
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:5001/",
+                data: "{}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (resp) {
+                    var LatLng = new google.maps.LatLng(resp[0].lat, resp[0].lon);
+                    if (centerVehicle) {
+                        map.setCenter(LatLng);
+                    }
+                    vehicleMarker.setPosition(LatLng);
+
+                    if (rightLaneMarker !== false) {
+                        rightLaneMarker.setMap(null);
+                    }
+                    rightLaneMarker = new google.maps.Polyline({
+                        path: resp[1],
+                        geodesic: true,
+                        strokeColor: '#0000FF',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+
+                    rightLaneMarker.setMap(map);
+
+                    if (leftLaneMarker !== false) {
+                        leftLaneMarker.setMap(null);
+                    }
+                    leftLaneMarker = new google.maps.Polyline({
+                        path: resp[2],
+                        geodesic: true,
+                        strokeColor: '#0000FF',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+                    leftLaneMarker.setMap(map);
+
+                },
+                error: function () {
+                    debugger;
+                }
+            });
+        }
+
+        function CenterControl(controlDiv, map) {
+
+            // Set CSS for the control border.
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = '#fff';
+            controlUI.style.border = '2px solid #fff';
+            controlUI.style.borderRadius = '3px';
+            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.marginBottom = '22px';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to recenter the vehicle';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior.
+            var controlText = document.createElement('div');
+            controlText.style.color = 'rgb(25,25,25)';
+            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            controlText.style.fontSize = '16px';
+            controlText.style.lineHeight = '38px';
+            controlText.style.paddingLeft = '5px';
+            controlText.style.paddingRight = '5px';
+            controlText.innerHTML = 'Center Vehicle is ON';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to Chicago.
+            controlUI.addEventListener('click', function () {
+                if (centerVehicle) {
+                    centerVehicle = false;
+                    controlText.innerHTML = 'Center Vehicle is OFF';
+                }
+                else {
+                    centerVehicle = true;
+                    controlText.innerHTML = 'Center Vehicle is ON';
+                }
+            });
+
+        }
+
+        function RoutingControl(controlDiv, map) {
+
+            // Set CSS for the control border.
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = '#f00';
+            controlUI.style.border = '2px solid #fff';
+            controlUI.style.borderRadius = '3px';
+            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.marginBottom = '22px';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to send routing request';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior.
+            var controlText = document.createElement('div');
+            controlText.style.color = 'rgb(25,25,25)';
+            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            controlText.style.fontSize = '16px';
+            controlText.style.lineHeight = '38px';
+            controlText.style.paddingLeft = '5px';
+            controlText.style.paddingRight = '5px';
+            controlText.innerHTML = 'routing request';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to Chicago.
+            controlUI.addEventListener('click', function () {
+                var data = {
+                    "start_lat": vehicleMarker.getPosition().lat(),
+                    "start_lon": vehicleMarker.getPosition().lng(),
+                    "end_lat": destinationMarker.getPosition().lat(),
+                    "end_lon": destinationMarker.getPosition().lng()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:5001/routing",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false,
+                    success: function (resp) {
+                        if (routingPath !== false) {
+                            routingPath.setMap(null);
+                        }
+                        routingPath = new google.maps.Polyline({
+                            path: resp,
+                            geodesic: true,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 2
+                        });
+
+                        routingPath.setMap(map);
+                    },
+                    error: function () {
+                        debugger;
+                    }
+                });
+
+            });
+
+        }
+
+
+        function markerLocation() {
+            //Get location.
+            var currentLocation = destinationMarker.getPosition();
+            //Add lat and lng values to a field that we can save.
+            document.getElementById('lat').value = currentLocation.lat(); //latitude
+            document.getElementById('lng').value = currentLocation.lng(); //longitude
+        }
+
+    </script>
+</head>
+<body style="margin:0px; padding:0px;" onload="Initialize()">
+<div id="map_canvas" style="width: 100%; height: 100%;"></div>
+</body>
+</html>

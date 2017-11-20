@@ -16,9 +16,10 @@
 
 #include "modules/prediction/prediction.h"
 
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include <cmath>
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
@@ -26,17 +27,20 @@
 #include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::perception::PerceptionObstacles;
-using apollo::perception::PerceptionObstacle;
-using apollo::localization::LocalizationEstimate;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
+using ::apollo::common::ErrorCode;
+using ::apollo::common::Status;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::adapter::AdapterConfig;
+using ::apollo::common::adapter::AdapterManager;
+using ::apollo::common::time::Clock;
+using ::apollo::localization::LocalizationEstimate;
+using ::apollo::perception::PerceptionObstacle;
+using ::apollo::perception::PerceptionObstacles;
 
 std::string Prediction::Name() const {
   return FLAGS_prediction_module_name;
@@ -74,8 +78,7 @@ Status Prediction::Init() {
   CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
 
   // Set perception obstacle callback function
-  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::OnPerception,
-                                                 this);
+  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
 
@@ -111,7 +114,11 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
          << localization.ShortDebugString() << "].";
 }
 
-void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
+void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
+
+  double start_timestamp = Clock::NowInSecond();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
@@ -122,14 +129,37 @@ void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
 
   auto prediction_obstacles =
       PredictorManager::instance()->prediction_obstacles();
-  AdapterManager::FillPredictionHeader(Name(), &prediction_obstacles);
-  AdapterManager::PublishPrediction(prediction_obstacles);
+  prediction_obstacles.set_start_timestamp(start_timestamp);
+  prediction_obstacles.set_end_timestamp(Clock::NowInSecond());
+  Publish(&prediction_obstacles);
+  for (auto const& prediction_obstacle :
+       prediction_obstacles.prediction_obstacle()) {
+    for (auto const& trajectory : prediction_obstacle.trajectory()) {
+      for (auto const& trajectory_point : trajectory.trajectory_point()) {
+        CHECK(IsValidTrajectoryPoint(trajectory_point));
+      }
+    }
+  }
+
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
   ADEBUG << "Published a prediction message ["
          << prediction_obstacles.ShortDebugString() << "].";
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
   return Status(ErrorCode::PREDICTION_ERROR, error_msg);
+}
+
+bool Prediction::IsValidTrajectoryPoint(
+    const TrajectoryPoint& trajectory_point) {
+  return trajectory_point.has_path_point() &&
+         (!std::isnan(trajectory_point.path_point().x())) &&
+         (!std::isnan(trajectory_point.path_point().y())) &&
+         (!std::isnan(trajectory_point.path_point().theta())) &&
+         (!std::isnan(trajectory_point.v())) &&
+         (!std::isnan(trajectory_point.a())) &&
+         (!std::isnan(trajectory_point.relative_time()));
 }
 
 }  // namespace prediction

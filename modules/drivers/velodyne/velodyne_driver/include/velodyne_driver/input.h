@@ -28,9 +28,20 @@ namespace drivers {
 namespace velodyne {
 
 static const size_t FIRING_DATA_PACKET_SIZE = 1206;
+static const size_t POSITIONING_DATA_PACKET_SIZE = 512;
 static const size_t ETHERNET_HEADER_SIZE = 42;
 static const int SOCKET_TIMEOUT = -2;
 static const int RECIEVE_FAIL = -3;
+
+struct NMEATime {
+  uint16_t year;
+  uint16_t mon;
+  uint16_t day;
+  uint16_t hour;
+  uint16_t min;
+  uint16_t sec;
+};
+typedef boost::shared_ptr<NMEATime> NMEATimePtr;
 
 /** @brief Pure virtual Velodyne input base class */
 class Input {
@@ -47,9 +58,13 @@ class Input {
    *          > 0 if incomplete packet (is this possible?)
    */
   virtual int get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) = 0;
-  // virtual int get_positioning_data_packtet(const NMEATimePtr& nmea_time) = 0;
+  virtual int get_positioning_data_packtet(const NMEATimePtr& nmea_time) = 0;
   virtual void init() {}
   virtual void init(int& port) {}
+
+ protected:
+  bool exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
+                                    const uint8_t* bytes);
 };
 
 }  // namespace velodyne

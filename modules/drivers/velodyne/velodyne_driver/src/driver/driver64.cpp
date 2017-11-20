@@ -26,29 +26,29 @@ namespace drivers {
 namespace velodyne {
 
 Velodyne64Driver::Velodyne64Driver(Config config) {
-  _config = config;
+  config_ = config;
 }
 
 void Velodyne64Driver::init(ros::NodeHandle &node) {
   double packet_rate = 0;  // packet frequency (Hz)
-  if (_config.model == "64E_S2" || _config.model == "64E_S3S") {
+  if (config_.model == "64E_S2" || config_.model == "64E_S3S") {
     packet_rate = 3472.17;  // 1333312 / 384
   } else {                  // 64E_S3D etc.
     packet_rate = 5789;
   }
-  double frequency = _config.rpm / 60.0;  // expected Hz rate
+  double frequency = config_.rpm / 60.0;  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  _config.npackets = static_cast<int>(ceil(packet_rate / frequency));
-  ROS_INFO_STREAM("publishing " << _config.npackets << " packets per scan");
+  config_.npackets = static_cast<int>(ceil(packet_rate / frequency));
+  ROS_INFO_STREAM("publishing " << config_.npackets << " packets per scan");
 
-  _input.reset(new SocketInput());
-  _input->init(_config.firing_data_port);
+  input_.reset(new SocketInput());
+  input_->init(config_.firing_data_port);
 
   // raw data output topic
-  _output =
-      node.advertise<velodyne_msgs::VelodyneScanUnified>(_config.topic, 10);
+  output_ =
+      node.advertise<velodyne_msgs::VelodyneScanUnified>(config_.topic, 10);
 }
 
 /** poll the device
@@ -67,16 +67,16 @@ bool Velodyne64Driver::poll(void) {
   }
 
   if (scan->packets.empty()) {
-    ROS_INFO_STREAM("Get a empty scan from port: " << _config.firing_data_port);
+    ROS_INFO_STREAM("Get a empty scan from port: " << config_.firing_data_port);
     return true;
   }
 
   // publish message using time of last packet read
   ROS_DEBUG("Publishing a full Velodyne scan.");
   scan->header.stamp = ros::Time().now();
-  scan->header.frame_id = _config.frame_id;
-  scan->basetime = _basetime;
-  _output.publish(scan);
+  scan->header.frame_id = config_.frame_id;
+  scan->basetime = basetime_;
+  output_.publish(scan);
 
   return true;
 }
