@@ -43,7 +43,7 @@ typedef apollo::drivers::gnss::EpochObservation EpochObservation;
 typedef apollo::drivers::gnss::GnssEphemeris GnssEphemeris;
 typedef drivers::gnss::GnssBestPose GnssBestPose;
 
-enum class LocalizaitonMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
+enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
 
 enum class LocalizationErrorCode {
   INTEG_ERROR = 0,
@@ -163,14 +163,14 @@ class LocalizationInteg {
   // gnss best pose process
   void GnssBestPoseProcess(const GnssBestPose& bestgnsspos_msg);
 
-  void GetLidarMeasure(LocalizaitonMeasureState& state,
-                       IntegMeasure& lidar_measure);
+  void GetLidarLocalization(LocalizationMeasureState& state,
+                       LocalizationEstimate& lidar_localization);
 
-  void GetIntegMeasure(LocalizaitonMeasureState& state, IntegSinsPva& sins_pva,
+  void GetIntegLocalization(LocalizationMeasureState& state, IntegSinsPva& sins_pva,
                        LocalizationEstimate& integ_localization);
 
-  void GetGnssMeasure(LocalizaitonMeasureState& state,
-                      IntegMeasure& gnss_measure);
+  void GetGnssLocalization(LocalizationMeasureState& state,
+                      LocalizationEstimate& gnss_localization);
 
  private:
   LocalizationIntegImpl* localization_integ_impl_;

@@ -158,16 +158,16 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableGnssBestPose(FLAGS_gnss_best_pose_topic, config.mode(),
                            config.message_history_limit());
         break;
-      case AdapterConfig::INTEG_MEASURE_GNSS:
-        EnableIntegMeasureGnss(FLAGS_localization_measure_gnss_topic,
+      case AdapterConfig::LOCALIZATION_MSF_GNSS:
+        EnableLocalizationMsfGnss(FLAGS_localization_gnss_topic,
                                config.mode(), config.message_history_limit());
         break;
-      case AdapterConfig::INTEG_MEASURE_LIDAR:
-        EnableIntegMeasureLidar(FLAGS_localization_measure_lidar_topic,
+      case AdapterConfig::LOCALIZATION_MSF_LIDAR:
+        EnableLocalizationMsfLidar(FLAGS_localization_lidar_topic,
                                 config.mode(), config.message_history_limit());
         break;
-      case AdapterConfig::INTEG_SINS_PVA:
-        EnableIntegSinsPva(FLAGS_localization_sins_pva_topic, config.mode(),
+      case AdapterConfig::LOCALIZATION_MSF_SINS_PVA:
+        EnableLocalizationMsfSinsPva(FLAGS_localization_sins_pva_topic, config.mode(),
                            config.message_history_limit());
         break;
       default:

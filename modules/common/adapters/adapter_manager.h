@@ -259,9 +259,10 @@ class AdapterManager {
   REGISTER_ADAPTER(GnssRtkObs);
   REGISTER_ADAPTER(GnssRtkEph);
   REGISTER_ADAPTER(GnssBestPose);
-  REGISTER_ADAPTER(IntegMeasureGnss);
-  REGISTER_ADAPTER(IntegMeasureLidar);
-  REGISTER_ADAPTER(IntegSinsPva);
+  REGISTER_ADAPTER(LocalizationMsfGnss);
+  REGISTER_ADAPTER(LocalizationMsfLidar);
+  REGISTER_ADAPTER(LocalizationMsfSinsPva);
+
   DECLARE_SINGLETON(AdapterManager);
 };
 

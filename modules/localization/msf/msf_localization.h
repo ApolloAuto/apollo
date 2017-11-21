@@ -104,7 +104,7 @@ class MSFLocalization : public LocalizationBase {
 
   tf2_ros::TransformBroadcaster* tf2_broadcaster_;
 
-  LocalizaitonMeasureState localization_state_;
+  LocalizationMeasureState localization_state_;
   long long pcd_msg_index_;
 };
 
