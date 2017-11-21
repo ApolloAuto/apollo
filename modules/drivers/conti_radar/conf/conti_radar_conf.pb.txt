@@ -3,10 +3,10 @@ can_conf {
   can_card_parameter {
     brand:ESD_CAN
     type: PCI_CARD
-    channel_id: CHANNEL_ID_ZERO
+    channel_id: CHANNEL_ID_ONE
   }
 
-  enable_debug_mode: true
+  enable_debug_mode: false
   enable_receiver_log: false
 }
 
