@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
+from lanemarker_corrector import LaneMarkerCorrector
 
 class Obstacle:
     def __init__(self, x, y):
@@ -71,3 +71,15 @@ class MobileyeProvider:
                     i].obstacle_length
                 obstacle.width = self.mobileye_pb.details_73a[i].obstacle_width
             self.obstacles.append(obstacle)
+
+    def routing_correct(self, routing_provider, localization_provider):
+        routing_segment = routing_provider.get_segment()
+
+        vx = localization_provider.localization_pb.pose.position.x
+        vy = localization_provider.localization_pb.pose.position.y
+        heading = localization_provider.localization_pb.pose.heading
+        position = (vx, vy)
+        corrector = LaneMarkerCorrector(self.left_lane_marker_coef,
+                                        self.right_lane_marker_coef)
+        self.left_lane_marker_coef, self.right_lane_marker_coef = \
+            corrector.correct(position, heading, routing_segment)
