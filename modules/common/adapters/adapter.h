@@ -124,9 +124,7 @@ class Adapter {
   /**
    * @brief returns the topic name that this adapter listens to.
    */
-  const std::string& topic_name() const {
-    return topic_name_;
-  }
+  const std::string& topic_name() const { return topic_name_; }
 
   /**
    * @brief reads the proto message from the file, and push it into
@@ -144,9 +142,7 @@ class Adapter {
    * the adapter.
    * @param data the input data.
    */
-  void FeedData(const D& data) {
-    EnqueueData(data);
-  }
+  void FeedData(const D& data) { EnqueueData(data); }
 
   /**
    * @brief the callback that will be invoked whenever a new
@@ -220,18 +216,14 @@ class Adapter {
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator begin() const {
-    return observed_queue_.begin();
-  }
+  Iterator begin() const { return observed_queue_.begin(); }
 
   /**
    * @brief returns an iterator representing the tail of the observing
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator end() const {
-    return observed_queue_.end();
-  }
+  Iterator end() const { return observed_queue_.end(); }
 
   /**
    * @brief registers the provided callback function to the adapter,
@@ -256,7 +248,7 @@ class Adapter {
   }
 
   /**
-   * @brief fills the fields module_name, timestamp_sec and
+   * @brief fills the fields module_name, current timestamp and
    * sequence_num in the header.
    */
   void FillHeader(const std::string& module_name, D* data) {
@@ -269,24 +261,32 @@ class Adapter {
     header->set_sequence_num(++seq_num_);
   }
 
-  uint32_t GetSeqNum() const {
-    return seq_num_;
+  /**
+   * @brief fills the fields module_name, user provided timestamp and
+   * sequence_num in the header.
+   */
+  void FillHeader(const std::string& module_name, const double timestamp,
+                  D* data) {
+    static_assert(std::is_base_of<google::protobuf::Message, D>::value,
+                  "Can only fill header to proto messages!");
+    auto* header = data->mutable_header();
+    header->set_module_name(module_name);
+    header->set_timestamp_sec(timestamp);
+    header->set_sequence_num(++seq_num_);
   }
+
+  uint32_t GetSeqNum() const { return seq_num_; }
 
   void SetLatestPublished(const D& data) {
     latest_published_data_.reset(new D(data));
   }
 
-  const D* GetLatestPublished() {
-    return latest_published_data_.get();
-  }
+  const D* GetLatestPublished() { return latest_published_data_.get(); }
 
   /**
    * @brief Gets message delay in milliseconds.
    */
-  double GetDelayInMs() {
-    return delay_ms_;
-  }
+  double GetDelayInMs() { return delay_ms_; }
 
   /**
    * @brief Clear the data received so far.
@@ -456,9 +456,7 @@ class Adapter {
   /// message types.
   template <class T, class Enable = void>
   struct MessageDelay {
-    static double Get(const T& new_msg, const T& last_msg) {
-      return 0.0;
-    }
+    static double Get(const T& new_msg, const T& last_msg) { return 0.0; }
   };
 
   template <class T>
