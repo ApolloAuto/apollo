@@ -123,25 +123,17 @@ class ReferenceLineProvider {
   DECLARE_SINGLETON(ReferenceLineProvider);
 
   bool is_initialized_ = false;
+  bool is_stop_ = false;
   std::unique_ptr<std::thread> thread_;
-
   std::unique_ptr<ReferenceLineSmoother> smoother_;
-
-  std::mutex pnc_map_mutex_;
-  std::unique_ptr<hdmap::PncMap> pnc_map_;
-  common::VehicleState vehicle_state_;
-
-  bool has_routing_ = false;
-
+  std::unique_ptr<Spline2dSolver> spline_solver_;
   QpSplineReferenceLineSmootherConfig smoother_config_;
 
-  bool is_stop_ = false;
-
-  std::mutex reference_lines_mutex__;
-  std::condition_variable cv_has_reference_line_;
-  std::list<ReferenceLine> reference_lines_;
-  std::list<hdmap::RouteSegments> route_segments_;
-
+  std::mutex pnc_map_mutex_;
+  // the following data are managed by pnc_map_mutex_
+  std::unique_ptr<hdmap::PncMap> pnc_map_;
+  common::VehicleState vehicle_state_;
+  bool has_routing_ = false;
   struct SegmentHistory {
     double min_l = 0.0;
     double accumulate_s = 0.0;
@@ -149,7 +141,11 @@ class ReferenceLineProvider {
   };
   std::unordered_map<std::string, SegmentHistory> segment_history_;
 
-  std::unique_ptr<Spline2dSolver> spline_solver_;
+  std::mutex reference_lines_mutex_;
+  // the following data are managed by reference_lines_mutex_
+  std::condition_variable cv_has_reference_line_;
+  std::list<ReferenceLine> reference_lines_;
+  std::list<hdmap::RouteSegments> route_segments_;
 };
 
 }  // namespace planning
