@@ -52,3 +52,4 @@ DEFINE_bool(use_relative_position, false, "Use relative position");
 DEFINE_double(query_relative_time, 1.5,
               "Temp flag to query target by relative time");
 DEFINE_bool(use_mpc, false, "Use MPC controller for both lat/lon control");
+DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");

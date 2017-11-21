@@ -82,6 +82,7 @@ message SimpleLongitudinalDebug {
   optional double throttle_cmd = 16;
   optional double brake_cmd = 17;
   optional bool is_full_stop = 18;
+  optional double slope_offset_compensation = 19;
 }
 
 message SimpleLateralDebug {
