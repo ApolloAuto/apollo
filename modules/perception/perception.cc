@@ -70,6 +70,10 @@ Status Perception::Init() {
 }
 
 void Perception::RegistAllOnboardClass() {
+  /// regist sharedata
+  RegisterFactoryLidarObjectData();
+  RegisterFactoryRadarObjectData();
+  traffic_light::RegisterFactoryTLPreprocessingData();
   /// regist subnode
   RegisterFactoryLidarProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
@@ -77,11 +81,6 @@ void Perception::RegistAllOnboardClass() {
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();
 
-  /// regist sharedata
-  RegisterFactoryLidarObjectData();
-  RegisterFactoryRadarObjectData();
-  traffic_light::RegisterFactoryTLPreprocessingData();
-  traffic_light::RegisterFactoryTLProcData();
 }
 
 Status Perception::Start() {

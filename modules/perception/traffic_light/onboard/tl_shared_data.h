@@ -24,17 +24,6 @@ class TLPreprocessingData : public CommonSharedData<ImageLights> {
     return "TLPreprocessingData";
   }
 };
-class TLProcData : public CommonSharedData<ImageLights> {
- public:
-  TLProcData() = default;
-
-  virtual ~TLProcData() = default;
-
-  virtual std::string name() const override {
-    return "TLProcData";
-  }
-};
-REGISTER_SHAREDDATA(TLProcData)
 REGISTER_SHAREDDATA(TLPreprocessingData);
 } // namespace traffic_light
 } // namespace perception
