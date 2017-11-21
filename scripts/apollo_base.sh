@@ -208,17 +208,6 @@ function setup_device() {
   if [ ! -e /dev/nvidia-uvm-tools ];then
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
   fi
-
-  # setup camera devices
-  if [ ! -e /dev/camera ]; then
-      sudo mkdir /dev/camera
-  fi
-  if [ ! -e /dev/camera/obstacle ]; then
-      sudo ln -s /dev/video0  /dev/camera/obstacle
-  fi
-  if [ ! -e /dev/camera/trafficlights ]; then
-      sudo ln -s /dev/video1  /dev/camera/trafficlights
-  fi
 }
 
 function is_stopped_customized_path() {
