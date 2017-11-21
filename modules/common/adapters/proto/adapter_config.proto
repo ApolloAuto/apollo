@@ -44,6 +44,7 @@ message AdapterConfig {
   // The max number of received messages to keep in the adapter, this field
   // is not useful for PUBLISH_ONLY mode messages.
   optional int32 message_history_limit = 3 [default = 10];
+  optional bool latch = 4 [default=false];
 }
 
 // A config to specify which messages a certain module would consume and
