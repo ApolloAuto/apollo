@@ -85,21 +85,30 @@ PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
 const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
-bool PncMap::IsSameRouting() const { return is_same_routing_; }
-
-bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
+bool PncMap::IsNewRouting(const routing::RoutingResponse &routing) const {
+  if (!ValidateRouting(routing)) {
+    ADEBUG << "The provided routing is invalid";
+    return false;
+  }
+  if (!routing_.has_header()) {
+    ADEBUG << "Current routing is empty, use new routing";
+    return true;
+  }
   if (routing_.has_header() && routing.has_header() &&
       routing_.header().sequence_num() == routing.header().sequence_num() &&
       (std::fabs(routing_.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
     ADEBUG << "Same routing, skip update routing";
-    is_same_routing_ = true;
+    return false;
+  } else {
     return true;
   }
-  is_same_routing_ = false;
-  if (!ValidateRouting(routing)) {
-    AERROR << "Invalid routing";
-    return false;
+}
+
+bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
+  if (!IsNewRouting(routing)) {
+    ADEBUG << "Not a valid new routing, no update";
+    return true;
   }
   routing_lane_ids_.clear();
   for (const auto &road : routing.road()) {
