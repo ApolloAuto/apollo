@@ -55,6 +55,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_estimate_current_vehicle_state = false;
   FLAGS_enable_reference_line_provider_thread = false;
   FLAGS_enable_trajectory_check = true;
+  FLAGS_planning_test_mode = true;
 }
 
 bool PlanningTestBase::SetUpAdapters() {

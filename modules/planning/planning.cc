@@ -157,10 +157,18 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
   }
 
   // NOTICE:
-  // Planning module uses the time at each cycle beginning as header's timestamp
-  // The relative time of each trajectory point should be modified if you want
-  // to change the timestamp in header.
-  Publish(timestamp, trajectory_pb);
+  // Since we are using the time at each cycle beginning as timestamp, the
+  // relative time of each trajectory point should be modified so that we can
+  // use the current timestamp in header.
+
+  // auto* trajectory_points = trajectory_pb.mutable_trajectory_point();
+  if (!FLAGS_planning_test_mode) {
+    const double dt = timestamp - Clock::NowInSecond();
+    for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
+      p.set_relative_time(p.relative_time() + dt);
+    }
+  }
+  Publish(trajectory_pb);
 }
 
 void Planning::RunOnce() {
@@ -363,17 +371,17 @@ Status Planning::Plan(const double current_time_stamp,
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  const auto& trajectory = best_reference_line->trajectory();
-  for (size_t i = 0; i < trajectory.NumOfPoints(); ++i) {
-    if (trajectory.TrajectoryPointAt(i).relative_time() >
+  last_publishable_trajectory_->PrependTrajectoryPoints(
+      stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+
+  for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
+    if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
         FLAGS_trajectory_time_high_density_period) {
       break;
     }
-    ADEBUG << trajectory.TrajectoryPointAt(i).ShortDebugString();
+    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
+                  .ShortDebugString();
   }
-
-  last_publishable_trajectory_->PrependTrajectoryPoints(
-      stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 

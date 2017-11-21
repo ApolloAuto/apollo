@@ -44,9 +44,9 @@ class PlanningInterface : public apollo::common::ApolloApp {
   /**
    * @brief Fill the header and publish the planning message.
    */
-  void Publish(const double timestamp, planning::ADCTrajectory* trajectory) {
+  void Publish(planning::ADCTrajectory* trajectory) {
     using apollo::common::adapter::AdapterManager;
-    AdapterManager::FillPlanningHeader(Name(), timestamp, trajectory);
+    AdapterManager::FillPlanningHeader(Name(), trajectory);
     AdapterManager::PublishPlanning(*trajectory);
   }
 };
