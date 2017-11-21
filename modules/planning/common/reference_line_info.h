@@ -88,7 +88,7 @@ class ReferenceLineInfo {
   SpeedData* mutable_speed_data();
   // aggregate final result together by some configuration
   bool CombinePathAndSpeedProfile(
-      const double relative_time,
+      const double relative_time, const double start_s,
       DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;
