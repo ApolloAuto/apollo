@@ -124,6 +124,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
       AINFO << "configure radar again";
       SenderMessage<ContiRadar> sender_message(RadarConfig200::ID,
                                                &radar_config_);
+      sender_message.Update();
       can_client_->SendSingleFrame({sender_message.CanFrame()});
     }
   }
