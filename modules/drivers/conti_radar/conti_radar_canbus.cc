@@ -79,7 +79,9 @@ apollo::common::Status ContiRadarCanbus::Init() {
 
 apollo::common::ErrorCode ContiRadarCanbus::ConfigureRadar() {
   RadarConfig200 radar_config;
+  radar_config.set_radar_conf(conti_radar_conf_.radar_conf());
   SenderMessage<ContiRadar> sender_message(RadarConfig200::ID, &radar_config);
+  sender_message.Update();
   return can_client_->SendSingleFrame({sender_message.CanFrame()});
 }
 
