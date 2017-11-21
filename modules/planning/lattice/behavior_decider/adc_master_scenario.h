@@ -11,6 +11,7 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_ADC_MASTER_SCENARIO_H_
 
 #include "modules/planning/lattice/behavior_decider/scenario.h"
+#include "modules/planning/common/frame.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_sampling_config.pb.h"
 
@@ -24,8 +25,10 @@ public: //implement virtual functions from Scenario
      * 0 for existing head vehicle and -1 for NOT any head vehicle
      */
     virtual int ComputeScenarioDecision(
+      Frame* frame, const common::TrajectoryPoint& init_planning_point,
+      const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<PlanningTarget*>* const decisions) override;
+      std::vector<PlanningTarget>* const decisions) override;
 
     virtual void Reset() override;
 

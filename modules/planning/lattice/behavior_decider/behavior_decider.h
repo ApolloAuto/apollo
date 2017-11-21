@@ -21,14 +21,14 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHVAIOR_DECIDER_H
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
 
-#include <vector>
-
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_sampling_config.pb.h"
+
+#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -68,6 +68,7 @@ class BehaviorDecider {
 
  private:
   PlanningTarget previous_planning_target;
+
 };
 
 }  // namespace planning

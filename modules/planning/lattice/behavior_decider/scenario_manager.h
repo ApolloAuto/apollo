@@ -23,6 +23,7 @@
 #include "modules/planning/lattice/behavior_decider/scenario.h"
 #include "modules/common/macro.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/proto/lattice_sampling_config.pb.h"
 
 #include <unordered_map>
@@ -49,8 +50,10 @@ class ScenarioManager {
  public:
   void Reset();
   int ComputeWorldDecision(
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<PlanningTarget*>* const decisions);
+    Frame* frame, const common::TrajectoryPoint& init_planning_point,
+    const std::array<double, 3>& lon_init_state,
+    const std::vector<common::PathPoint>& discretized_reference_line,
+    std::vector<PlanningTarget>* const decisions);
 
   template<class T>
   void RegisterScenario(FeatureLevel level) {
