@@ -77,6 +77,13 @@ namespace adapter {
                   "Data type must be the same with adapter's type!");          \
     instance()->name##_->FillHeader(module_name, data);                        \
   }                                                                            \
+  template <typename T>                                                        \
+  static void Fill##name##Header(const std::string &module_name,               \
+                                 const double timestamp, T *data) {            \
+    static_assert(std::is_same<name##Adapter::DataType, T>::value,             \
+                  "Data type must be the same with adapter's type!");          \
+    instance()->name##_->FillHeader(module_name, timestamp, data);             \
+  }                                                                            \
   static void Add##name##Callback(name##Adapter::Callback callback) {          \
     CHECK(instance()->name##_)                                                 \
         << "Initialize adapter before setting callback";                       \
