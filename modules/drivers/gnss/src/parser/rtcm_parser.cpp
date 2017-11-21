@@ -36,7 +36,7 @@ RtcmParser::RtcmParser(ros::NodeHandle &nh, const std::string &rtcm_data_topic,
           nh.advertise<EpochObservation>(observation_topic, 16)) {}
 
 bool RtcmParser::init() {
-  _rtcm_parser.reset(Parser::create_rtcm_v3());
+  _rtcm_parser.reset(Parser::create_rtcm_v3(true));
   if (!_rtcm_parser) {
     ROS_ERROR("Failed to create rtcm parser.");
     return false;
