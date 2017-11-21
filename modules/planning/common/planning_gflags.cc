@@ -16,6 +16,8 @@
 
 #include "modules/planning/common/planning_gflags.h"
 
+DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
+
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_string(planning_adapter_config_filename,
