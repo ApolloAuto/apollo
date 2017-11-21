@@ -31,9 +31,10 @@ void ScenarioManager::Reset() {
 }
 
 int ScenarioManager::ComputeWorldDecision(
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<PlanningTarget*>* const decisions) {
-
+    Frame* frame, const common::TrajectoryPoint& init_planning_point,
+    const std::array<double, 3>& lon_init_state,
+    const std::vector<common::PathPoint>& discretized_reference_line,
+    std::vector<PlanningTarget>* const decisions) {
     RegisterScenarios();
     AINFO << "Register Scenarios Success";
 
@@ -56,6 +57,7 @@ int ScenarioManager::ComputeWorldDecision(
             }
             // compute decision
             if (0 != scenario->ComputeScenarioDecision(
+		  frame, init_planning_point, lon_init_state,
                   discretized_reference_line, decisions) ) {
                 AINFO << "scenario[" << scenario->Name() <<"] failed in computing decision";
             } else {

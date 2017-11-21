@@ -7,7 +7,6 @@ cc_library(
     hdrs = [
         "behavior_decider.h",
         "scenario.h",
-        "scenario_manager.h",
     ],
     srcs = [
         "behavior_decider.cc",
@@ -19,6 +18,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/lattice:lattice_params",
+        "//modules/planning/lattice/behavior_decider:scenario_manager",
         "//modules/planning/reference_line",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/proto:common_proto",
