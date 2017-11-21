@@ -10,6 +10,7 @@ trajectory_point {
     z: 0
     theta: -1.827545023130303
     kappa: 0.014029947685582236
+    s: 0
     dkappa: 0
     ddkappa: 0
   }

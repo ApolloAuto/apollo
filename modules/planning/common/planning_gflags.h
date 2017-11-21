@@ -19,6 +19,8 @@
 
 #include "gflags/gflags.h"
 
+DECLARE_bool(planning_test_mode);
+
 DECLARE_string(planning_config_file);
 DECLARE_string(planning_adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
