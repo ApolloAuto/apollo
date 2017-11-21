@@ -155,7 +155,12 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
     trajectory_pb->mutable_routing_header()->CopyFrom(
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
-  Publish(trajectory_pb);
+
+  // NOTICE:
+  // Planning module uses the time at each cycle beginning as header's timestamp
+  // The relative time of each trajectory point should be modified if you want
+  // to change the timestamp in header.
+  Publish(timestamp, trajectory_pb);
 }
 
 void Planning::RunOnce() {
