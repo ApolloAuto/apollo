@@ -77,10 +77,9 @@ routing::RoutingResponse PncMapTest::routing_;
 
 TEST_F(PncMapTest, UpdateRouting) {
   pnc_map_->routing_.clear_header();
+  EXPECT_TRUE(pnc_map_->IsNewRouting(routing_));
   EXPECT_TRUE(pnc_map_->UpdateRoutingResponse(routing_));
-  EXPECT_FALSE(pnc_map_->IsSameRouting());
-  EXPECT_TRUE(pnc_map_->UpdateRoutingResponse(routing_));
-  EXPECT_TRUE(pnc_map_->IsSameRouting());
+  EXPECT_FALSE(pnc_map_->IsNewRouting(routing_));
 }
 
 TEST_F(PncMapTest, GetNearestPointFromRouting) {
