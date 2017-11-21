@@ -99,7 +99,8 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
                       &enable_lane_sequence);
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
-    if (sequence.lane_segment_size() <= 0) {
+    if (sequence.lane_segment_size() <= 0 ||
+        sequence.lane_segment(0).lane_point_size() <= 0) {
       AERROR << "Empty lane segments.";
       continue;
     }
