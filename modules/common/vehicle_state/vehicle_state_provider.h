@@ -18,8 +18,8 @@
  *
  * @brief Declaration of the class VehicleStateProvider.
  */
-#ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
-#define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
+#ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_PROVIDER_H_
+#define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_PROVIDER_H_
 
 #include <memory>
 #include <string>
@@ -183,4 +183,4 @@ class VehicleStateProvider {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
+#endif  // MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_PROVIDER_H_
