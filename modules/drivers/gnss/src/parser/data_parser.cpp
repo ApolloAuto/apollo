@@ -269,11 +269,11 @@ void DataParser::publish_imu_message(const MessagePtr message) {
   ::apollo::drivers::gnss::Imu *imu = As<::apollo::drivers::gnss::Imu>(message);
 
   raw_imu->mutable_linear_acceleration()->set_x(-imu->linear_acceleration().y());
-  raw_imu->mutable_linear_acceleration()->set_y(-imu->linear_acceleration().x());
+  raw_imu->mutable_linear_acceleration()->set_y(imu->linear_acceleration().x());
   raw_imu->mutable_linear_acceleration()->set_z(imu->linear_acceleration().z());
 
   raw_imu->mutable_angular_velocity()->set_x(-imu->angular_velocity().y());
-  raw_imu->mutable_angular_velocity()->set_y(-imu->angular_velocity().x());
+  raw_imu->mutable_angular_velocity()->set_y(imu->angular_velocity().x());
   raw_imu->mutable_angular_velocity()->set_z(imu->angular_velocity().z());
 
   raw_imu->mutable_header()->set_timestamp_sec(ros::Time::Time::now().toSec());
