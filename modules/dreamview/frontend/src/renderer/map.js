@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import WS from "store/websocket.js";
+import WS from "store/websocket";
 
 import { drawSegmentsFromPoints,
          drawDashedLineFromPoints,
