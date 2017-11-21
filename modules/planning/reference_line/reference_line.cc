@@ -454,7 +454,6 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
       AWARN << "lane_waypoint.lane is nullptr";
       continue;
     }
-    ADEBUG << "map speed limit: " << lane_waypoint.lane->lane().speed_limit();
     speed_limit =
         std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
   }

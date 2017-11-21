@@ -201,6 +201,7 @@ void Planning::RunOnce() {
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());
     vehicle_state.set_y(future_xy.y());
+    vehicle_state.set_timestamp(start_timestamp);
   }
 
   if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
@@ -227,9 +228,7 @@ void Planning::RunOnce() {
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
-
   bool is_replan = false;
-
   const auto stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
           vehicle_state, start_timestamp, planning_cycle_time,
@@ -356,6 +355,17 @@ Status Planning::Plan(const double current_time_stamp,
 
   last_publishable_trajectory_.reset(new PublishableTrajectory(
       current_time_stamp, best_reference_line->trajectory()));
+
+  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+
+  const auto& trajectory = best_reference_line->trajectory();
+  for (size_t i = 0; i < trajectory.NumOfPoints(); ++i) {
+    if (trajectory.TrajectoryPointAt(i).relative_time() >
+        FLAGS_trajectory_time_high_density_period) {
+      break;
+    }
+    ADEBUG << trajectory.TrajectoryPointAt(i).ShortDebugString();
+  }
 
   last_publishable_trajectory_->PrependTrajectoryPoints(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);

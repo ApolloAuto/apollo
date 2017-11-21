@@ -197,6 +197,9 @@ Status Frame::Init() {
   }
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
+
+  // TODO(Liangliang): fix the bug here -- we should align prediction time based
+  // on the current time, NOT the vehicle state timestamp.
   if (FLAGS_align_prediction_time) {
     AlignPredictionTime(vehicle_state_.timestamp());
   }
