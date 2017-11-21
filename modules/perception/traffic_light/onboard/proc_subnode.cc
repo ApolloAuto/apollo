@@ -33,10 +33,10 @@ DEFINE_string(traffic_light_recognizer,
 DEFINE_string(traffic_light_reviser,
               "", "the reviser enabled for traffic_light");
 
-DEFINE_double(valid_ts_interval,
-              100,
-              "the difference between event ts and now ts must be less than me.Unit:second ");
-
+std::map<int, int> TLProcSubnode::_s_camera_ts_last_3_digits = {
+    {static_cast<int>(CameraId::LONG_FOCUS), 222},
+    {static_cast<int>(CameraId::SHORT_FOCUS), 111},
+};
 TLProcSubnode::~TLProcSubnode() {
   preprocessing_data_ = nullptr;
   proc_data_ = nullptr;
@@ -78,7 +78,12 @@ bool TLProcSubnode::InitInternal() {
            << "image_border.";
     return false;
   }
-
+  if (!model_config->GetValue("valid_ts_interval",
+                              &valid_ts_interval_)) {
+    AERROR << "TLProcSubnode Failed to find Conf: "
+           << "valid_ts_interval.";
+    return false;
+  }
   AINFO << "TLProcSubnode init successfully. ";
   return true;
 }
@@ -112,7 +117,7 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
       image_lights->preprocess_send_timestamp);
 
-  if (TimeUtil::GetCurrentTime() - event.local_timestamp > FLAGS_valid_ts_interval) {
+  if (TimeUtil::GetCurrentTime() - event.local_timestamp > valid_ts_interval_) {
     AERROR << "TLProcSubnode failed to process image"
            << "Because images are too old"
            << ",current time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime())
@@ -204,19 +209,8 @@ bool TLProcSubnode::InitSharedData() {
            << preprocessing_data_name;
     return false;
   }
-
-  const std::string proc_data_name("TLProcData");
-  proc_data_ = dynamic_cast<TLProcData *>(
-      shared_data_manager_->GetSharedData(proc_data_name));
-  if (proc_data_ == nullptr) {
-    AERROR << "Failed to get shared data instance: "
-           << proc_data_name;
-    return false;
-  }
-
   AINFO << "Init shared data successfully, "
-        << "preprocessing_data: " << preprocessing_data_->name()
-        << "proc_data:" << proc_data_->name();
+        << "preprocessing_data: " << preprocessing_data_->name();
   return true;
 }
 
@@ -405,7 +399,7 @@ bool TLProcSubnode::PublishMessage(
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
-  timestamp += TLPreprocessorSubnode::_s_camera_ts_last_3_digits[static_cast<int>(image_lights->image->device_id())];
+  timestamp += TLProcSubnode::_s_camera_ts_last_3_digits[static_cast<int>(image_lights->image->device_id())];
 
   header->set_camera_timestamp(timestamp);
   // add traffic light result

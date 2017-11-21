@@ -43,7 +43,6 @@ DECLARE_string(lidar_tf2_frame_id);
 DECLARE_string(lidar_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
-DECLARE_double(forward_distance);
 
 /// obstacle/onboard/radar_process_subnode.cc
 DECLARE_double(front_radar_forward_distance);
@@ -55,7 +54,10 @@ DECLARE_string(radar_tf2_child_frame_id);
 /// obstacle/onboard/fusion_subnode.cc
 DECLARE_string(onboard_fusion);
 
-///obstacle/perception.cc
+/// traffic_light/onboard/preprocessor.cc
+DECLARE_double(forward_signal_distance);
+
+///perception.cc
 DECLARE_string(dag_config_path);
 
 #endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */

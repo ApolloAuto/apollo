@@ -64,4 +64,4 @@ DEFINE_double(front_radar_forward_distance, 120.0, "get front radar forward dist
 /// obstacle/onboard/fusion_subnode.cc
 DEFINE_string(onboard_fusion, "ProbabilisticFusion", "fusion name which enabled onboard");
 
-DEFINE_double(forward_distance, 100.0, "max distance to front signals");
+DEFINE_double(forward_signal_distance, 100.0, "max distance to front signals");

@@ -61,7 +61,7 @@ class TLProcSubnode : public Subnode {
 
   //@brief compute offset between two rectangles based on their relative positions
   void ComputeRectsOffset(const cv::Rect &rect1, const cv::Rect &rect2, int *offset);
-
+  static std::map<int, int> _s_camera_ts_last_3_digits;
  private:
   int image_border_ = 100;
 
@@ -75,6 +75,7 @@ class TLProcSubnode : public Subnode {
   Mutex mutex_;
   DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
   bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights) const;
+  float valid_ts_interval_;
 };
 
 REGISTER_SUBNODE(TLProcSubnode);

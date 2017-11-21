@@ -27,11 +27,6 @@ class IRefine {
   virtual void SetCropBox(const cv::Rect &box) = 0;
 };
 
-class IHDMapOperator {
- public:
-  virtual void verify(cv::Mat &ros_image, std::vector<LightPtr> *lights) = 0;
-};
-
 class IGetBox {
  public:
   virtual void
@@ -40,10 +35,10 @@ class IGetBox {
 };
 class DummyRefine : public IRefine {
  public:
-  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) override {
+  void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) override {
 
   }
-  virtual void SetCropBox(const cv::Rect &box) override {
+  void SetCropBox(const cv::Rect &box) override {
 
   }
 };

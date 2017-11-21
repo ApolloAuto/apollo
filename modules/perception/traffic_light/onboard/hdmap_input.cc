@@ -43,7 +43,28 @@ bool HDMapInput::Init() {
 }
 bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
                             std::vector<apollo::hdmap::Signal> *signals) {
+  auto hdmap = HDMapUtil::BaseMapPtr();
 
+  vector<hdmap::SignalInfoConstPtr> forward_signals;
+  apollo::common::PointENU point;
+  point.set_x(pointd(0, 3));
+  point.set_y(pointd(1, 3));
+  point.set_z(pointd(2, 3));
+  int result = hdmap->GetForwardNearestSignalsOnLane(point, FLAGS_forward_signal_distance, &forward_signals);
+
+  if (result != 0) {
+    AERROR << "Failed to call HDMap::get_signal. point: "
+           << point.ShortDebugString();
+    return false;
+  }
+
+  signals->reserve(forward_signals.size());
+  for (auto signal_info : forward_signals) {
+    signals->push_back(signal_info->signal());
+    ADEBUG << "Signal: " << signals->back().DebugString();
+  }
+  ADEBUG << "get_signal success. num_signals: " << signals->size()
+         << " point: " << point.ShortDebugString();
 }
 }
 }  // namespace perception

@@ -54,7 +54,6 @@ class TLPreprocessorSubnode : public Subnode {
   // for check lights projection on image border region dynamically
   static std::map<int, int> _s_image_borders;
 
-  static std::map<int, int> _s_camera_ts_last_3_digits;
  protected:
   //@brief init pre-processor
   virtual bool InitInternal() override;

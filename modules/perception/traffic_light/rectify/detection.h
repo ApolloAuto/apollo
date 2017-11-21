@@ -31,7 +31,7 @@ class Detection : public IRefine {
 
   virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
 
-  virtual void SetCropBox(const cv::Rect &box);
+  void SetCropBox(const cv::Rect &box) override;
 
   ~Detection();
 

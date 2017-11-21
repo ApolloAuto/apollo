@@ -16,19 +16,9 @@
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
-DEFINE_double(min_valid_ts_in_seconds, 0.0,
-"min valid timestamp, if ts < min_valid_ts_in_seconds image will be skipped.");
-DEFINE_double(max_valid_ts_in_seconds, FLT_MAX,
-              "max valid timestamp, if ts > max_valid_ts_in_seconds image will be skipped.");
-
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-
-std::map<int, int> TLPreprocessorSubnode::_s_camera_ts_last_3_digits = {
-    {static_cast<int>(CameraId::LONG_FOCUS), 222},
-    {static_cast<int>(CameraId::SHORT_FOCUS), 111},
-};
 
 std::map<int, std::string> TLPreprocessorSubnode::_s_camera_names = {
     {static_cast<int>(CameraId::LONG_FOCUS), "long_focus_camera"},
@@ -60,6 +50,7 @@ bool TLPreprocessorSubnode::InitInternal() {
            << "max_process_image_fps.";
     return false;
   }
+  _proc_interval_seconds = 1.0 / _max_process_image_fps;
   if (!model_config->GetValue("query_tf_inverval_seconds",
                               &_query_tf_inverval_seconds)) {
     AERROR << "TLPreprocessorSubnode Failed to find Conf: "
@@ -188,22 +179,12 @@ void TLPreprocessorSubnode::sub_camera_image(
   std::shared_ptr<Image> image(new Image);
   cv::Mat cv_mat;
   double timestamp = 0.0;
-  if (msg->header.stamp.toSec() < FLAGS_min_valid_ts_in_seconds ||
-      msg->header.stamp.toSec() > FLAGS_max_valid_ts_in_seconds) {
-    LOG(WARNING) << "TLPreprocessorSubnode rev bad image. "
-                 << "ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec())
-                 << ", which should be in [" << FLAGS_min_valid_ts_in_seconds << ","
-                 << FLAGS_max_valid_ts_in_seconds << "]" << " camera_id:" << camera_id;
-    return;
-  }
+
   timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
 
   // update last timestamp when receiving a image
   _last_sub_camera_image_ts[camera_id] = timestamp;
-
-  uint64_t timestamp_int64 = TimestampDouble2Int64(msg->header.stamp.toSec());
-  timestamp_int64 += _s_camera_ts_last_3_digits[camera_id];
 
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
@@ -230,7 +211,7 @@ void TLPreprocessorSubnode::sub_camera_image(
   add_cached_camera_selection(timestamp);
 
   // 根据最大处理帧率和上一帧处理时间，来判断是否跳过当前帧
-  _proc_interval_seconds = 1.0 / _max_process_image_fps;
+
   if (_last_proc_image_ts > 0.0 &&
       sub_camera_image_start_ts - _last_proc_image_ts < _proc_interval_seconds) {
     AINFO << "skip current image, img_ts: " << GLOG_TIMESTAMP(timestamp)
@@ -320,12 +301,11 @@ bool TLPreprocessorSubnode::get_car_pose(const double ts, CarPose *pose) {
   //  AERROR << "TLPreprocessorSubnode failed to query pose ts:" << GLOG_TIMESTAMP(ts);
   //  return false;
   //}
-  GetVelodyneTrans(ts, &pose_matrix);
-  if (!pose->set_pose(pose_matrix)) {
-    AERROR << "TLPreprocessorSubnode failed to init ts:" << GLOG_TIMESTAMP(ts)
-           << " pose:" << pose_matrix;
+  if (!GetVelodyneTrans(ts, &pose_matrix)) {
+    AERROR << "TLPreprocessorSubnode failed to query pose ts:" << GLOG_TIMESTAMP(ts);
     return false;
   }
+  pose->set_pose(pose_matrix);
   return true;
 }
 
