@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
-import WS from "store/websocket.js";
+import PARAMETERS from "store/config/parameters.yml";
+import WS from "store/websocket";
 import { loadTexture } from "utils/models";
 
 function diffTiles(newTiles, currentTiles) {
@@ -23,7 +24,7 @@ export default class TileGround {
         this.currentTiles = {};
         this.initialized = false;
 
-        this.range = 1;
+        this.range = PARAMETERS.ground.tileRange;
         this.metadata = null;
         this.mapId = null;
         this.mapUrlPrefix = null;

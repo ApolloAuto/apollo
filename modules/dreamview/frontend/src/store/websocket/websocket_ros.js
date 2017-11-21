@@ -1,10 +1,7 @@
-import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
-const _ = require('lodash');
-
-class WebSocketEndpoint {
+export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
         this.websocket = null;
@@ -13,19 +10,10 @@ class WebSocketEndpoint {
         this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
-        this.params = null;
     }
 
-    initialize(params) {
+    initialize() {
         this.counter = 0;
-        if (params) {
-            // TODO (vlin): validate all required parameters.
-            this.params = params;
-            if (params.url) {
-                this.params.serverUrl = `${location.protocol}//${params.url}`;
-            }
-        }
-
         try {
             this.websocket = new WebSocket(this.serverAddr);
         } catch (error) {
@@ -35,16 +23,6 @@ class WebSocketEndpoint {
             }, 1000);
             return;
         }
-        this.websocket.onopen = event => {
-            if (this.params && this.params.mapId && this.params.id) {
-                this.websocket.send(JSON.stringify({
-                    type: 'RetrieveGroundMeta',
-                    data: {
-                        mapId: this.params.mapId,
-                    }
-                }));
-            }
-        };
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
 
@@ -86,13 +64,6 @@ class WebSocketEndpoint {
                 case "MapData":
                     RENDERER.updateMap(message.data);
                     STORE.setInitializationStatus(true);
-                    break;
-                case "GroundMetadata":
-                    RENDERER.updateGroundMetadata(this.params.serverUrl, message.data);
-                    STORE.setInitializationStatus(true);
-
-                    //TODO(vlin): request frame data frame by frame
-                    this.requstFrameData(this.params.id);
                     break;
                 case "DefaultEndPoint":
                     STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
@@ -152,14 +123,6 @@ class WebSocketEndpoint {
         }));
     }
 
-    requstFrameData(id) {
-        this.websocket.send(JSON.stringify({
-            type: 'FrameData',
-            data: {
-                id: id,
-            }
-        }));
-    }
     requestRoute(start, waypoint, end) {
         this.websocket.send(JSON.stringify({
             type: "SendRoutingRequest",
@@ -239,24 +202,3 @@ class WebSocketEndpoint {
         }));
     }
 }
-
-// Returns the websocket server address based on the web server address.
-// Follows the convention that the websocket is served on the same host
-// as the web server, the port number of websocket is the port number of
-// the webserver plus one.
-function deduceWebsocketServerAddr() {
-    const server = window.location.origin;
-    const link = document.createElement("a");
-    link.href = server;
-    const protocol = location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://${link.hostname}:${window.location.port}/websocket`;
-}
-
-// NOTE: process.env.NODE_ENV will be set to "production" by webpack when
-// invoked in production mode ("-p"). We rely on this to determine which
-// websocket server to use.
-const serverAddr = process.env.NODE_ENV === "production" ?
-                   deduceWebsocketServerAddr() : `ws://${devConfig.websocketServer}`;
-const WS = new WebSocketEndpoint(serverAddr);
-
-export default WS;
