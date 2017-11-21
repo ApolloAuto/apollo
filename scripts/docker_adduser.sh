@@ -30,7 +30,15 @@ chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
 
 # grant caros user to access GPS device
 if [ -e /dev/ttyUSB0 ]; then
-    sudo chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
+    chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
+fi
+
+# setup camera device
+if [ -e /dev/video0 ]; then
+    mkdir /dev/camera
+    ln -s /dev/video0  /dev/camera/obstacle
+    ln -s /dev/video1  /dev/camera/trafficlights
+    chmod a+rw /dev/video0 /dev/video1 /dev/camera/obstacle /dev/camera/trafficlights
 fi
 
 MACHINE_ARCH=$(uname -m)
