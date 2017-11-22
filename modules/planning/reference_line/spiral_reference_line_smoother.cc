@@ -47,6 +47,8 @@ SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
+
+  std::cout << "using spiral reference line smoother" << std::endl;
   const double start_timestamp = Clock::NowInSecond();
   std::vector<double> opt_x;
   std::vector<double> opt_y;

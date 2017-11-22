@@ -41,7 +41,7 @@ class ReferenceLineMatcher {
       const std::vector<common::PathPoint>& reference_line, const double s);
 
  private:
-  static common::PathPoint FindMinDistancePoint(const common::PathPoint& p0,
+  static common::PathPoint FindProjectionPoint(const common::PathPoint& p0,
                                                 const common::PathPoint& p1,
                                                 const double x, const double y);
 };
