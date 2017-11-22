@@ -49,20 +49,66 @@ bool FusionSubnode::InitInternal() {
     AWARN << "Failed to get LidarObjectData.";
   }
 
-  AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name();
+  if (!InitOutputStream()) {
+    AERROR << "Failed to init output stream.";
+    return false;
+  }
+
+  AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name(); 
   return true;
 }
+
+bool FusionSubnode::InitOutputStream() {
+  // expect _reserve format:
+  //       pub_driven_event_id:n
+  //       lidar_output_stream : event_id=n&sink_type=m&sink_name=x
+  //       radar_output_stream : event_id=n&sink_type=m&sink_name=x
+  std::map<std::string, std::string> reserve_field_map;
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
+    AERROR << "Failed to parse reserve string: " << reserve_;
+    return false;
+  }
+  auto iter = reserve_field_map.find("pub_driven_event_id");
+  if (iter == reserve_field_map.end()) {
+    AERROR << "Failed to find pub_driven_event_id:"
+                  << reserve_;
+      return false;
+  }
+  pub_driven_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
+
+  auto lidar_iter = reserve_field_map.find("lidar_event_id");
+  if (lidar_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find lidar_event_id:"
+                  << reserve_;
+    AINFO << "lidar_event_id will be set -1";
+    lidar_event_id_ = -1;
+  } else {
+    lidar_event_id_ = static_cast<EventID>(atoi((lidar_iter->second).c_str()));
+  }
+
+  auto radar_iter = reserve_field_map.find("radar_event_id");
+  if (radar_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find radar_event_id:"
+                  << reserve_;
+    AINFO << "radar_event_id will be set -1";
+    radar_event_id_ = -1;
+  } else {
+    radar_event_id_ = static_cast<EventID>(atoi((radar_iter->second).c_str()));
+  }
+  return true;
+}
+
 StatusCode FusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
-      AERROR << "Failed to subscribe events";
+      AERROR << "event meta id:" << event_meta.event_id << " " 
+             << event_meta.from_node << " " << event_meta.to_node;
       return StatusCode::FAIL;
     }
     if (events.empty()) {
       continue;
     }
-
     Process(event_meta, events);
 
     if (event_meta.event_id != pub_driven_event_id_) {
@@ -71,7 +117,7 @@ StatusCode FusionSubnode::ProcEvents() {
              << objects_.size();
       continue;
     }
-    /// public obstacle message
+    // public obstacle message
     PerceptionObstacles obstacles;
     if (GeneratePbMsg(&obstacles)) {
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
@@ -113,9 +159,18 @@ StatusCode FusionSubnode::Process(const EventMeta &event_meta,
 
 bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta, std::vector<Event> *events) const {
   Event event;
-  // no blocking
-  while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
-    events->push_back(event);
+  if (event_meta.event_id == pub_driven_event_id_) {
+    if (event_manager_->Subscribe(event_meta.event_id, &event, false)) {
+      events->push_back(event);
+    } else {
+      AINFO << "Why???";
+      return false;
+    }    
+  } else {
+    // no blocking
+    while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
+      events->push_back(event);
+    }
   }
   return true;
 }
