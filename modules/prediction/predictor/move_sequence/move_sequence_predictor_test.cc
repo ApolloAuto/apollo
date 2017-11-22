@@ -59,7 +59,7 @@ TEST_F(MoveSequencePredictorTest, OnLaneCase) {
   mlp_evaluator.Evaluate(obstacle_ptr);
   MoveSequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 2);
+  EXPECT_EQ(predictor.NumOfTrajectories(), 1);
 }
 
 }  // namespace prediction
