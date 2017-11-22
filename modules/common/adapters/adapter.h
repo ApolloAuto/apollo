@@ -57,6 +57,50 @@ template <bool B, class T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
 /**
+ * @class AdapterBase
+ * @brief Base interface of all concrete adapters.
+ */
+class AdapterBase {
+ public:
+  virtual ~AdapterBase() = default;
+
+  /**
+   * @brief returns the topic name that this adapter listens to.
+   */
+  virtual const std::string& topic_name() const = 0;
+
+  /**
+   * @brief Create a view of data up to the call time for the user.
+   */
+  virtual void Observe() = 0;
+
+  /**
+   * @brief returns TRUE if the observing queue is empty.
+   */
+  virtual bool Empty() const = 0;
+
+  /**
+   * @brief returns TRUE if the adapter has received any message.
+   */
+  virtual bool HasReceived() const = 0;
+
+  /**
+   * @brief Gets message delay in milliseconds.
+   */
+  virtual double GetDelayInMs() const = 0;
+
+  /**
+   * @brief Clear the data received so far.
+   */
+  virtual void ClearData() = 0;
+
+  /**
+   * @brief Dumps the latest received data to file.
+   */
+  virtual bool DumpLatestMessage() = 0;
+};
+
+/**
  * @class Adapter
  * @brief this class serves as the interface and a layer of
  * abstraction for Apollo modules to interact with various I/O (e.g.
@@ -79,7 +123,7 @@ using enable_if_t = typename std::enable_if<B, T>::type;
  * thread-safe w.r.t. data access and update.
  */
 template <typename D>
-class Adapter {
+class Adapter : public AdapterBase {
  public:
   /// The user can use Adapter::DataType to get the type of the
   /// underlying data.
@@ -124,7 +168,7 @@ class Adapter {
   /**
    * @brief returns the topic name that this adapter listens to.
    */
-  const std::string& topic_name() const { return topic_name_; }
+  const std::string& topic_name() const override { return topic_name_; }
 
   /**
    * @brief reads the proto message from the file, and push it into
@@ -159,7 +203,7 @@ class Adapter {
    * @brief copy the data_queue_ into the observing queue to create a
    * view of data up to the call time for the user.
    */
-  void Observe() {
+  void Observe() override {
     std::lock_guard<std::mutex> lock(mutex_);
     observed_queue_ = data_queue_;
   }
@@ -167,7 +211,7 @@ class Adapter {
   /**
    * @brief returns TRUE if the observing queue is empty.
    */
-  bool Empty() const {
+  bool Empty() const override {
     std::lock_guard<std::mutex> lock(mutex_);
     return observed_queue_.empty();
   }
@@ -175,7 +219,7 @@ class Adapter {
   /**
    * @brief returns TRUE if the adapter has received any message.
    */
-  bool HasReceived() const {
+  bool HasReceived() const override {
     std::lock_guard<std::mutex> lock(mutex_);
     return !data_queue_.empty();
   }
@@ -261,20 +305,6 @@ class Adapter {
     header->set_sequence_num(++seq_num_);
   }
 
-  /**
-   * @brief fills the fields module_name, user provided timestamp and
-   * sequence_num in the header.
-   */
-  void FillHeader(const std::string& module_name, const double timestamp,
-                  D* data) {
-    static_assert(std::is_base_of<google::protobuf::Message, D>::value,
-                  "Can only fill header to proto messages!");
-    auto* header = data->mutable_header();
-    header->set_module_name(module_name);
-    header->set_timestamp_sec(timestamp);
-    header->set_sequence_num(++seq_num_);
-  }
-
   uint32_t GetSeqNum() const { return seq_num_; }
 
   void SetLatestPublished(const D& data) {
@@ -286,12 +316,12 @@ class Adapter {
   /**
    * @brief Gets message delay in milliseconds.
    */
-  double GetDelayInMs() { return delay_ms_; }
+  double GetDelayInMs() const override { return delay_ms_; }
 
   /**
    * @brief Clear the data received so far.
    */
-  void ClearData() {
+  void ClearData() override {
     // Lock the queue.
     std::lock_guard<std::mutex> lock(mutex_);
     data_queue_.clear();
@@ -301,7 +331,7 @@ class Adapter {
   /**
    * @brief Dumps the latest received data to file.
    */
-  bool DumpLatestMessage() {
+  bool DumpLatestMessage() override {
     if (!Empty()) {
       D msg = GetLatestObserved();
       return DumpMessage<D>(msg);
