@@ -6,10 +6,12 @@ cc_library(
     name = "local_visualizer",
     srcs = [
         "engine/visualization_engine.cc",
+        "engine/visualization_manager.cc",
         "offline_local_visualizer.cc"
     ],
     hdrs = [
         "engine/visualization_engine.h",
+        "engine/visualization_manager.h",
         "offline_local_visualizer.h"
     ],
     linkopts = [
