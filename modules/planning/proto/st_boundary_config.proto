@@ -11,5 +11,5 @@ message StBoundaryConfig {
   optional double minimal_kappa = 6 [ default = 0.00001 ];
   optional double point_extension = 7 [ default = 1.0 ];
   optional double lowest_speed = 8 [ default = 2.5 ];
-  optional uint32 num_points_to_avg_kappa = 9 [ default = 20 ];
+  optional uint32 num_points_to_avg_kappa = 9 [ default = 4 ];
 }
