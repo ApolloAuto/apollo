@@ -23,6 +23,7 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/lattice_params.h"
 #include "modules/planning/lattice/reference_line_matcher.h"
@@ -39,6 +40,7 @@ using apollo::common::PathPoint;
 
 BehaviorDecider::BehaviorDecider() {}
 
+// For multiple reference_line use
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
@@ -82,6 +84,42 @@ PlanningTarget BehaviorDecider::Analyze(
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
+  std::vector<PlanningTarget> scenario_decisions;
+  //std::vector<PlanningTarget*>* const decisions
+  if (0 != ScenarioManager::instance()->ComputeWorldDecision(
+      frame, init_planning_point, lon_init_state,
+      discretized_reference_line, &scenario_decisions)) {
+    AERROR << "ComputeWorldDecision error!";
+  }
+
+  PlanningTarget ret;
+
+  if (StopDecisionNearDestination(frame, lon_init_state,
+      discretized_reference_line, &ret)) {
+    AINFO << "STOP decision when near the routing end.";
+  }
+
+  ret.CopyFrom(scenario_decisions[0]);
+  for (const auto& reference_point : discretized_reference_line) {
+    ret.mutable_discretized_reference_line()
+        ->add_discretized_reference_line_point()
+        ->CopyFrom(reference_point);
+  }
+
+  return ret;
+}
+///////////////////////////
+
+/*
+// Currently used
+PlanningTarget BehaviorDecider::Analyze(
+    Frame* frame, const common::TrajectoryPoint& init_planning_point,
+    const std::array<double, 3>& lon_init_state,
+    const std::vector<common::PathPoint>& discretized_reference_line) {
+  CHECK(frame != nullptr);
+  // Only handles one reference line
+  CHECK_GT(discretized_reference_line.size(), 0);
+
   PlanningTarget ret;
   for (const auto& reference_point : discretized_reference_line) {
     ret.mutable_discretized_reference_line()
@@ -108,6 +146,7 @@ PlanningTarget BehaviorDecider::Analyze(
 
   return ret;
 }
+*/
 
 bool BehaviorDecider::StopDecisionNearDestination(Frame* frame,
     const std::array<double, 3>& lon_init_state,
