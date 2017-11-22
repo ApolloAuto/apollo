@@ -104,12 +104,7 @@ bool TLPreprocessorSubnode::init_shared_data() {
 }
 
 bool TLPreprocessorSubnode::init_preprocessor() {
-  _preprocessor.reset(new TLPreprocessor);
-  if (!_preprocessor) {
-    AERROR << "TLPreprocessorSubnode new preprocessor failed";
-    return false;
-  }
-  if (!_preprocessor->init()) {
+  if (!_preprocessor.init()) {
     AERROR << "TLPreprocessorSubnode init preprocessor failed";
     return false;
   }
@@ -163,11 +158,13 @@ bool TLPreprocessorSubnode::add_data_and_publish_event(
 }
 
 void TLPreprocessorSubnode::sub_long_focus_camera(const sensor_msgs::Image &msg) {
+  common::adapter::AdapterManager::Observe();
   std::shared_ptr<sensor_msgs::Image> img = common::adapter::AdapterManager::GetImageLong()->GetLatestObservedPtr();
   sub_camera_image(img, LONG_FOCUS);
 }
 
 void TLPreprocessorSubnode::sub_short_focus_camera(const sensor_msgs::Image &msg) {
+  common::adapter::AdapterManager::Observe();
   std::shared_ptr<sensor_msgs::Image> img = common::adapter::AdapterManager::GetImageShort()->GetLatestObservedPtr();
   sub_camera_image(img, SHORT_FOCUS);
 }
@@ -183,15 +180,12 @@ void TLPreprocessorSubnode::sub_camera_image(
   timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
 
-  // update last timestamp when receiving a image
-  _last_sub_camera_image_ts[camera_id] = timestamp;
-
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
 
   bool camera_is_working = false;
-  if (!_preprocessor->get_camera_is_working_flag(camera_id, &camera_is_working)) {
+  if (!_preprocessor.get_camera_is_working_flag(camera_id, &camera_is_working)) {
     AINFO << "get_camera_is_working_flag failed, ts: "
           << GLOG_TIMESTAMP(image->ts())
           << ", camera_id: " << kCameraIdToStr.at(camera_id);
@@ -200,7 +194,7 @@ void TLPreprocessorSubnode::sub_camera_image(
   if (!camera_is_working) {
     // 检查相机投影配置，如果投影配置有误（如标定文件问题等），不标记当前相机为使用状态
     if (_projection.has_camera(camera_id) &&
-        !_preprocessor->set_camera_is_working_flag(camera_id, true)) {
+        !_preprocessor.set_camera_is_working_flag(camera_id, true)) {
       AINFO << "set_camera_is_working_flag failed, ts: "
             << GLOG_TIMESTAMP(image->ts())
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
@@ -225,7 +219,7 @@ void TLPreprocessorSubnode::sub_camera_image(
   const double before_sync_image_ts = TimeUtil::GetCurrentTime();
   std::shared_ptr<ImageLights> data(new ImageLights);
   bool should_pub = false;
-  if (!_preprocessor->sync_image(image, image->ts(), camera_id, &data, &should_pub)) {
+  if (!_preprocessor.sync_image(image, image->ts(), camera_id, &data, &should_pub)) {
     AINFO << "sync image failed ts: " << GLOG_TIMESTAMP(image->ts())
           << ", camera_id: " << kCameraIdToStr.at(camera_id);
   } else {
@@ -236,7 +230,7 @@ void TLPreprocessorSubnode::sub_camera_image(
 
   // CarOS Monitor 异常，图像时间与系统时间相差较大
   size_t max_cached_image_lights_array_size = 0;
-  _preprocessor->get_max_cached_image_lights_array_size(&max_cached_image_lights_array_size);
+  _preprocessor.get_max_cached_image_lights_array_size(&max_cached_image_lights_array_size);
   // tf 频率实际为 200Hz, 0.005 秒一帧，一共缓存了 max_cached_image_lights_array_size * 0.005 时间的 tf 信息
   double image_sys_ts_diff_threshold = max_cached_image_lights_array_size * 0.005;
   if (fabs(data->diff_image_sys_ts) > image_sys_ts_diff_threshold) {
@@ -279,8 +273,8 @@ void TLPreprocessorSubnode::sub_camera_image(
   data->preprocess_receive_timestamp = sub_camera_image_start_ts;
   data->preprocess_send_timestamp = TimeUtil::GetCurrentTime();
   if (add_data_and_publish_event(data, camera_id, image->ts())) {
-    //_preprocessor->set_last_output_ts(image->ts());
-    _preprocessor->set_last_pub_camera_id(camera_id);
+    //_preprocessor.set_last_output_ts(image->ts());
+    _preprocessor.set_last_pub_camera_id(camera_id);
     AINFO << "TLPreprocessorSubnode::sub_camera_image msg_time: "
           << GLOG_TIMESTAMP(image->ts())
           << " sync_image_latency: " << sync_image_latency * 1000 << " ms."
@@ -325,11 +319,11 @@ bool TLPreprocessorSubnode::verify_lights_projection(
   std::vector<apollo::hdmap::Signal> signals;
   double last_signals_ts = 0.0;
   double valid_hdmap_interval = 0.0;
-  _preprocessor->get_last_signals_ts(&last_signals_ts);
-  _preprocessor->get_valid_hdmap_interval(&valid_hdmap_interval);
+  _preprocessor.get_last_signals_ts(&last_signals_ts);
+  _preprocessor.get_valid_hdmap_interval(&valid_hdmap_interval);
   if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
-      _preprocessor->get_last_signals(&signals);
+      _preprocessor.get_last_signals(&signals);
       AWARN << "verify_lights_projection failed to get signals info. Use last info\n"
             << "ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     } else {
@@ -338,16 +332,16 @@ bool TLPreprocessorSubnode::verify_lights_projection(
       return false;
     }
   } else {
-    _preprocessor->set_last_signals(signals);
-    _preprocessor->set_last_signals_ts(ts);
+    _preprocessor.set_last_signals(signals);
+    _preprocessor.set_last_signals_ts(ts);
   }
 
   bool projections_outside_all_images = false;
   CameraId selected_camera_id = CameraId::UNKNOWN;
-  if (!_preprocessor->select_camera_by_lights_projection(
+  if (!_preprocessor.select_camera_by_lights_projection(
       ts, pose, signals, _projection, _s_image_borders, image_lights,
       &projections_outside_all_images, &selected_camera_id)) {
-    AINFO << "_preprocessor->select_camera_by_lights_projection failed";
+    AINFO << "_preprocessor.select_camera_by_lights_projection failed";
     return false;
   }
 
@@ -388,11 +382,11 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   std::vector<apollo::hdmap::Signal> signals;
   double last_signals_ts = 0.0;
   double valid_hdmap_interval = 0.0;
-  _preprocessor->get_last_signals_ts(&last_signals_ts);
-  _preprocessor->get_valid_hdmap_interval(&valid_hdmap_interval);
+  _preprocessor.get_last_signals_ts(&last_signals_ts);
+  _preprocessor.get_valid_hdmap_interval(&valid_hdmap_interval);
   if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
-      _preprocessor->get_last_signals(&signals);
+      _preprocessor.get_last_signals(&signals);
       AWARN << "add_cached_camera_selection failed to get signals info. "
             << "Now use last info. ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     } else {
@@ -400,12 +394,12 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
              << "ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     }
   } else {
-    _preprocessor->set_last_signals(signals);
-    _preprocessor->set_last_signals_ts(ts);
+    _preprocessor.set_last_signals(signals);
+    _preprocessor.set_last_signals_ts(ts);
   }
 
   bool projections_outside_all_images = false;
-  if (!_preprocessor->add_cached_lights_projections(
+  if (!_preprocessor.add_cached_lights_projections(
       pose, signals, _projection, TLPreprocessorSubnode::_s_image_borders, ts,
       &projections_outside_all_images)) {
     AERROR << "add_cached_lights_projections failed, ts: " << GLOG_TIMESTAMP(ts);

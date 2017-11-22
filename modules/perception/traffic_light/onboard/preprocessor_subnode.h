@@ -90,20 +90,12 @@ class TLPreprocessorSubnode : public Subnode {
   void add_cached_camera_selection(double timestamp);
 
  private:
-  std::unique_ptr<TLPreprocessor> _preprocessor;
+  TLPreprocessor _preprocessor;
   MultiCamerasProjection _projection;
 
-  //std::string                                                  _work_root_dir;
-  //StreamInput<sensor_msgs::Image,
-  //                     TLPreprocessorSubnode>                  _stream_input;
-  image_transport::Subscriber sub_short_;
-  image_transport::Subscriber sub_long_;
   TLPreprocessingData *_preprocessing_data = nullptr;
 
   HDMapInput *_hd_map = nullptr;  // HDMap
-
-  std::map<int, double> _last_sub_camera_image_ts;
-  std::map<int, std::string> _camera_topic_names;
 
   double _last_query_tf_ts = 0.0;
   double _query_tf_inverval_seconds = 0.0;

@@ -20,10 +20,10 @@ namespace traffic_light {
 
 //Camera id
 enum CameraId {
+  UNKNOWN = -1,
   LONG_FOCUS = 0,         // 25mm
   SHORT_FOCUS = 1,        // 6mm
-  UNKNOWN = 2,
-  CAMERA_ID_COUNT = 3
+  CAMERA_ID_COUNT = 2
 };
 
 const std::map<int, std::string> kCameraIdToStr = {

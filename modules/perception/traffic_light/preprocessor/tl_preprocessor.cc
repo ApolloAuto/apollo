@@ -46,6 +46,8 @@ bool TLPreprocessor::init() {
     AERROR << "no_signals_interval_seconds not found." << name();
     return false;
   }
+  _camera_is_working_flags.resize((unsigned long) num_camera_ids);
+  AINFO << num_camera_ids;
   return true;
 }
 
@@ -98,9 +100,6 @@ bool TLPreprocessor::add_cached_lights_projections(
   }
 
   // lights projections info.
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
-  const int long_focus_idx = static_cast<int>(CameraId::LONG_FOCUS);
-  const int short_focus_idx = static_cast<int>(CameraId::SHORT_FOCUS);
 
   std::vector<std::shared_ptr<LightPtrs> > lights_on_image_array(
       num_camera_ids);
@@ -296,7 +295,6 @@ void TLPreprocessor::get_no_signals_interval_seconds(double *seconds) const {
 }
 
 bool TLPreprocessor::set_camera_is_working_flag(const CameraId &camera_id, bool is_working) {
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   const int cam_id = static_cast<int>(camera_id);
   if (cam_id < 0 || cam_id >= num_camera_ids) {
     AERROR << "set_camera_is_working_flag failed, "
@@ -311,20 +309,16 @@ bool TLPreprocessor::set_camera_is_working_flag(const CameraId &camera_id, bool 
 }
 
 bool TLPreprocessor::get_camera_is_working_flag(const CameraId &camera_id, bool *is_working) const {
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   const int cam_id = static_cast<int>(camera_id);
+  AINFO << cam_id << " " << num_camera_ids;
+  google::FlushLogFiles(0);
   if (cam_id < 0 || cam_id >= num_camera_ids) {
     AERROR << "get_camera_is_working_flag failed, "
            << "get unknown CameraId: " << camera_id;
     return false;
   }
-  if (_camera_is_working_flags.find(cam_id) == _camera_is_working_flags.end() ||
-      _camera_is_working_flags.at(cam_id) == 0) {
-    *is_working = false;
-    return true;
-  }
 
-  *is_working = true;
+  *is_working = (_camera_is_working_flags[cam_id] != 0);
   return true;
 }
 
@@ -361,8 +355,7 @@ void TLPreprocessor::select_image(const CarPose &pose,
     if (!lights_outside_image_array[cam_id]->empty()) {
       continue;
     }
-    if (_camera_is_working_flags.find(cam_id) == _camera_is_working_flags.end() ||
-        _camera_is_working_flags[cam_id] == 0) {
+    if (_camera_is_working_flags[cam_id] == 0) {
       continue;
     }
     bool ok = true;
@@ -399,7 +392,6 @@ bool TLPreprocessor::project_lights(const MultiCamerasProjection &projection,
     return true;
   }
 
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   const int cam_id = static_cast<int>(camera_id);
   if (cam_id < 0 || cam_id >= num_camera_ids) {
     AERROR << "project_lights get invalid CameraId: " << camera_id;
@@ -437,7 +429,6 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
     double *diff_image_sys_ts,
     bool *sync_ok) {
   PERF_FUNCTION();
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   const int cam_id = static_cast<int>(camera_id);
   if (cam_id < 0 || cam_id >= num_camera_ids) {
     AERROR << "sync_image_with_cached_lights_projections failed, "
@@ -577,11 +568,9 @@ bool TLPreprocessor::is_in_bord(const cv::Size size,
 }
 
 int TLPreprocessor::get_min_focal_len_camera_id() {
-  int min_focal_len_working_camera = static_cast<int>(CameraId::SHORT_FOCUS);
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
+  int min_focal_len_working_camera = short_focus_idx;
   for (int cam_id = num_camera_ids - 1; cam_id >= 0; --cam_id) {
-    if (_camera_is_working_flags.find(cam_id) != _camera_is_working_flags.end() &&
-        _camera_is_working_flags[cam_id] == 1) {
+    if (_camera_is_working_flags[cam_id] == 1) {
       min_focal_len_working_camera = cam_id;
       break;
     }
@@ -590,11 +579,9 @@ int TLPreprocessor::get_min_focal_len_camera_id() {
 }
 
 int TLPreprocessor::get_max_focal_len_camera_id() {
-  int max_focal_len_working_camera = static_cast<int>(CameraId::LONG_FOCUS);
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
+  int max_focal_len_working_camera = long_focus_idx;
   for (int cam_id = 0; cam_id < num_camera_ids; ++cam_id) {
-    if (_camera_is_working_flags.find(cam_id) != _camera_is_working_flags.end() &&
-        _camera_is_working_flags[cam_id] == 1) {
+    if (_camera_is_working_flags[cam_id] == 1) {
       max_focal_len_working_camera = cam_id;
       break;
     }
@@ -616,7 +603,6 @@ bool TLPreprocessor::select_camera_by_lights_projection(
   bool has_signals = (signals.size() > 0);
 
   // lights projections info.
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   std::vector<std::shared_ptr<LightPtrs> > lights_on_image_array(
       num_camera_ids);
   std::vector<std::shared_ptr<LightPtrs> > lights_outside_image_array(

@@ -27,7 +27,9 @@ namespace traffic_light {
 
 class TLPreprocessor : public BasePreprocessor {
  public:
-  TLPreprocessor() = default;
+  TLPreprocessor() : num_camera_ids(static_cast<int>(CAMERA_ID_COUNT)),
+                     long_focus_idx(static_cast<int>(LONG_FOCUS)),
+                     short_focus_idx(static_cast<int>(SHORT_FOCUS)) {}
   ~TLPreprocessor() = default;
 
   virtual bool init();
@@ -125,7 +127,7 @@ class TLPreprocessor : public BasePreprocessor {
 
   std::vector<std::shared_ptr<ImageLights> > _cached_lights_projections_array;
 
-  std::map<int, int> _camera_is_working_flags;
+  std::vector<int> _camera_is_working_flags;
   Mutex _mutex;
 
   // cache signal numbers
@@ -138,8 +140,11 @@ class TLPreprocessor : public BasePreprocessor {
   int _projection_image_rows = 1080;
   double _sync_interval_seconds = 0.1;
   double _no_signals_interval_seconds = 0.5;
+  const int num_camera_ids;
+  const int long_focus_idx;
+  const int short_focus_idx;
 
-  DISALLOW_COPY_AND_ASSIGN(TLPreprocessor);
+ DISALLOW_COPY_AND_ASSIGN(TLPreprocessor);
 };
 
 } // namespace traffic_light
