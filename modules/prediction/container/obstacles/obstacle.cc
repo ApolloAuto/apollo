@@ -994,7 +994,7 @@ void Obstacle::SetMotionStatus() {
   int history_size = static_cast<int>(feature_history_.size());
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
-           << "is considered stationary [default = true].";
+           << "is considered stationary.";
     if (history_size > 0) {
       feature_history_.front().set_is_still(true);
     }
@@ -1039,17 +1039,21 @@ void Obstacle::SetMotionStatus() {
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_
            << "] has a small speed and is considered stationary.";
+    feature_history_.front().set_is_still(true);
   } else if (speed_sensibility < speed_threshold) {
     ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
            << history_size
            << "] considered moving [sensibility = " << speed_sensibility << "]";
+    feature_history_.front().set_is_still(false);
   } else {
     double distance = std::hypot(avg_drift_x, avg_drift_y);
     double distance_std = std::sqrt(2.0 / len) * std;
     if (distance > 2.0 * distance_std) {
       ADEBUG << "Obstacle [" << id_ << "] is moving.";
+      feature_history_.front().set_is_still(false);
     } else {
       ADEBUG << "Obstacle [" << id_ << "] is stationary.";
+      feature_history_.front().set_is_still(true);
     }
   }
 }
