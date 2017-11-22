@@ -67,8 +67,12 @@ def print_stat(msg, fhandle):
         g_first_time = False
         fhandle.write("\t".join(keywords) + "\n")
     for key in keywords:
-        fhandle.write(str(msg[key]) + "\t")
+        if key == "obstacles":
+            fhandle.write("%d\t" % msg[key])
+        else:
+            fhandle.write("%.3f\t" % msg[key])
     fhandle.write("\n")
+    fhandle.flush()
 
 
 def on_receive_planning(planning_msg):
