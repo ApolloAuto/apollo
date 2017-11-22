@@ -28,13 +28,13 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-#define LOC_INFO_NUM 3
-
 /**
  * @class OfflineLocalVisualizer
  * @brief Offline localization visualization tool.
  */
 class OfflineLocalVisualizer {
+#define LOC_INFO_NUM 3
+
  public:
   OfflineLocalVisualizer();
   ~OfflineLocalVisualizer();
@@ -52,11 +52,19 @@ class OfflineLocalVisualizer {
   bool GnssLocFileHandler(const std::vector<double> &pcd_timestamps);
   bool FusionLocFileHandler(const std::vector<double> &pcd_timestamps);
 
-  void PoseInterpolationByTime(
+  //   void PoseInterpolationByTime(
+  //       const std::vector<Eigen::Affine3d> &in_poses,
+  //       const std::vector<double> &in_timestamps,
+  //       const std::vector<double> &ref_timestamps,
+  //       std::map<unsigned int, Eigen::Affine3d> &out_poses);
+  void PoseAndStdInterpolationByTime(
       const std::vector<Eigen::Affine3d> &in_poses,
+      const std::vector<Eigen::Vector3d> &in_stds,
       const std::vector<double> &in_timestamps,
       const std::vector<double> &ref_timestamps,
-      std::map<unsigned int, Eigen::Affine3d> &out_poses);
+      std::map<unsigned int, Eigen::Affine3d> &out_poses,
+      std::map<unsigned int, Eigen::Vector3d> &out_stds);
+
   bool GetZoneIdFromMapFolder(const std::string &map_folder,
                               const unsigned int &resolution_id, int &zone_id);
 
@@ -70,8 +78,11 @@ class OfflineLocalVisualizer {
 
   std::vector<double> pcd_timestamps_;
   std::map<unsigned int, Eigen::Affine3d> gnss_poses_;
+  std::map<unsigned int, Eigen::Vector3d> gnss_stds_;
   std::map<unsigned int, Eigen::Affine3d> lidar_poses_;
+  std::map<unsigned int, Eigen::Vector3d> lidar_stds_;
   std::map<unsigned int, Eigen::Affine3d> fusion_poses_;
+  std::map<unsigned int, Eigen::Vector3d> fusion_stds_;
 
   BaseMapConfig map_config_;
   unsigned int resolution_id_;

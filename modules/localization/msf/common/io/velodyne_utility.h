@@ -63,6 +63,12 @@ void LoadPcdPoses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
                   std::vector<double>& timestamps,
                   std::vector<unsigned int>& pcd_indices);
 
+/**@brief Load poses and stds their timestamps. */
+void LoadPosesAndStds(const std::string& file_path,
+                      std::vector<Eigen::Affine3d>& poses,
+                      std::vector<Eigen::Vector3d>& stds,
+                      std::vector<double>& timestamps);
+
 // /**@brief Save the PCD poses with their timestamps. */
 // void save_pcd_poses(std::string file_path,
 //    const std::vector<Eigen::Affine3d>& poses,

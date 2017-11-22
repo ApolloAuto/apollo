@@ -58,65 +58,115 @@ LocationExporter::~LocationExporter() {
 void LocationExporter::GnssLocCallback(
     const rosbag::MessageInstance &msg_instance) {
   std::cout << "GNSS location callback." << std::endl;
-  boost::shared_ptr<IntegMeasure> msg =
-      msg_instance.instantiate<IntegMeasure>();
+  boost::shared_ptr<LocalizationEstimate> msg =
+      msg_instance.instantiate<LocalizationEstimate>();
   static unsigned int index = 1;
 
-  double timestamp = msg->header().timestamp_sec();
-  double x = msg->position().x();
-  double y = msg->position().y();
-  double z = msg->position().z();
+  double timestamp = msg->measurement_time();
+  double x = msg->pose().position().x();
+  double y = msg->pose().position().y();
+  double z = msg->pose().position().z();
 
-  // double qx = msg->pose().orientation().qx();
-  // double qy = msg->pose().orientation().qy();
-  // double qz = msg->pose().orientation().qz();
-  // double qw = msg->pose().orientation().qw();
-  double qx = 0.0;
-  double qy = 0.0;
-  double qz = 0.0;
-  double qw = 1.0;
+  double qx = msg->pose().orientation().qx();
+  double qy = msg->pose().orientation().qy();
+  double qz = msg->pose().orientation().qz();
+  double qw = msg->pose().orientation().qw();
 
-  double std_x = std::sqrt(msg->measure_covar(0));
-  double std_y = std::sqrt(msg->measure_covar(10));
-  double std_z = std::sqrt(msg->measure_covar(20));
+  double std_x = msg->uncertainty().position_std_dev().x();
+  double std_y = msg->uncertainty().position_std_dev().y();
+  double std_z = msg->uncertainty().position_std_dev().z();
 
   fprintf(gnss_loc_file_handle_,
           "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
+
+  // std::cout << "GNSS location callback." << std::endl;
+  // boost::shared_ptr<IntegMeasure> msg =lidar_loc_file_handle_
+  //     msg_instance.instantiate<IntegMeasure>();
+  // static unsigned int index = 1;
+
+  // double timestamp = msg->header().timestamp_sec();
+  // double x = msg->position().x();
+  // double y = msg->position().y();
+  // double z = msg->position().z();
+
+  // // double qx = msg->pose().orientation().qx();
+  // // double qy = msg->pose().orientation().qy();
+  // // double qz = msg->pose().orientation().qz();
+  // // double qw = msg->pose().orientation().qw();
+  // double qx = 0.0;
+  // double qy = 0.0;
+  // double qz = 0.0;
+  // double qw = 1.0;
+
+  // double std_x = std::sqrt(msg->measure_covar(0));
+  // double std_y = std::sqrt(msg->measure_covar(10));
+  // double std_z = std::sqrt(msg->measure_covar(20));
+
+  // fprintf(gnss_loc_file_handle_,
+  //         "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+  //         timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
+
+  // ++index;
 }
 
 void LocationExporter::LidarLocCallback(
     const rosbag::MessageInstance &msg_instance) {
   std::cout << "Lidar location callback." << std::endl;
-  boost::shared_ptr<IntegMeasure> msg =
-      msg_instance.instantiate<IntegMeasure>();
+  boost::shared_ptr<LocalizationEstimate> msg =
+      msg_instance.instantiate<LocalizationEstimate>();
   static unsigned int index = 1;
 
-  double timestamp = msg->header().timestamp_sec();
-  double x = msg->position().x();
-  double y = msg->position().y();
-  double z = msg->position().z();
+  double timestamp = msg->measurement_time();
+  double x = msg->pose().position().x();
+  double y = msg->pose().position().y();
+  double z = msg->pose().position().z();
 
-  // double qx = msg->pose().orientation().qx();
-  // double qy = msg->pose().orientation().qy();
-  // double qz = msg->pose().orientation().qz();
-  // double qw = msg->pose().orientation().qw();
-  double qx = 0.0;
-  double qy = 0.0;
-  double qz = 0.0;
-  double qw = 1.0;
+  double qx = msg->pose().orientation().qx();
+  double qy = msg->pose().orientation().qy();
+  double qz = msg->pose().orientation().qz();
+  double qw = msg->pose().orientation().qw();
 
-  double std_x = std::sqrt(msg->measure_covar(0));
-  double std_y = std::sqrt(msg->measure_covar(10));
-  double std_z = std::sqrt(msg->measure_covar(20));
+  double std_x = msg->uncertainty().position_std_dev().x();
+  double std_y = msg->uncertainty().position_std_dev().y();
+  double std_z = msg->uncertainty().position_std_dev().z();
 
   fprintf(lidar_loc_file_handle_,
           "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
+
+  // std::cout << "Lidar location callback." << std::endl;
+  // boost::shared_ptr<IntegMeasure> msg =
+  //     msg_instance.instantiate<IntegMeasure>();
+  // static unsigned int index = 1;
+
+  // double timestamp = msg->header().timestamp_sec();
+  // double x = msg->position().x();
+  // double y = msg->position().y();
+  // double z = msg->position().z();
+
+  // // double qx = msg->pose().orientation().qx();
+  // // double qy = msg->pose().orientation().qy();
+  // // double qz = msg->pose().orientation().qz();
+  // // double qw = msg->pose().orientation().qw();
+  // double qx = 0.0;
+  // double qy = 0.0;
+  // double qz = 0.0;
+  // double qw = 1.0;
+
+  // double std_x = std::sqrt(msg->measure_covar(0));
+  // double std_y = std::sqrt(msg->measure_covar(10));
+  // double std_z = std::sqrt(msg->measure_covar(20));
+
+  // fprintf(lidar_loc_file_handle_,
+  //         "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+  //         timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
+
+  // ++index;
 }
 
 void LocationExporter::FusionLocCallback(

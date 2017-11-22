@@ -185,16 +185,15 @@ void VisualizationEngine::Visualize(
     return;
   }
 
-  if (!loc_infos[car_loc_id_].is_valid) {
-    std::cerr << "Localization info is invalid." << std::endl;
+  cur_loc_infos_ = loc_infos;
+
+  if (cur_loc_infos_[car_loc_id_].is_valid) {
+    car_pose_ = cur_loc_infos_[car_loc_id_].pose;
+  } else if (!UpdateCarLocId()) {
     return;
   }
 
-  cur_loc_infos_ = loc_infos;
-  car_pose_ = loc_infos[car_loc_id_].pose;
-
-  CloudToMat(car_pose_, velodyne_extrinsic_, cloud, cloud_img_,
-             cloud_img_mask_);
+  cloud_ = cloud;
   Draw();
 }
 
@@ -393,6 +392,8 @@ void VisualizationEngine::DrawStd(const cv::Point &bias) {
 void VisualizationEngine::DrawCloud(const cv::Point &bias) {
   std::cout << "Draw cloud." << std::endl;
   if (cur_level_ == 0) {
+    CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, cloud_img_,
+               cloud_img_mask_);
     cv::Point lt;
     lt = CoordToMapGridIndex(cloud_img_lt_coord_, resolution_id_, cur_stride_);
     lt = lt + bias + cv::Point(1024, 1024);
@@ -768,8 +769,16 @@ void VisualizationEngine::UpdateScale(const double factor) {
   cur_scale_ *= factor;
 }
 
-void VisualizationEngine::GenNextCarLocId() {
-  car_loc_id_ = (car_loc_id_ + 1) % loc_info_num_;
+bool VisualizationEngine::UpdateCarLocId() {
+  for (unsigned int i = 0; i < loc_info_num_ - 1; i++) {
+    unsigned int tem_car_loc_id = (car_loc_id_ + 1) % loc_info_num_;
+    if (cur_loc_infos_[car_loc_id_].is_valid) {
+      car_loc_id_ = tem_car_loc_id;
+      car_pose_ = cur_loc_infos_[car_loc_id_].pose;
+      return true;
+    }
+  }
+  return false;
 }
 
 void VisualizationEngine::ProcessKey(int key) {
@@ -832,7 +841,8 @@ void VisualizationEngine::ProcessKey(int key) {
       break;
     }
     case 'c': {
-      GenNextCarLocId();
+      UpdateCarLocId();
+      Draw();
       break;
     }
     default:

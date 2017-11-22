@@ -166,7 +166,7 @@ class VisualizationEngine {
   void UpdateViewCenter(const double move_x, const double move_y);
   void SetScale(const double scale);
   void UpdateScale(const double factor);
-  void GenNextCarLocId();
+  bool UpdateCarLocId();
   void ProcessKey(int key);
 
  private:
@@ -199,6 +199,7 @@ class VisualizationEngine {
   bool auto_play_;
 
   Eigen::Affine3d car_pose_;
+  std::vector<Eigen::Vector3d> cloud_;
   cv::Mat cloud_img_;
   cv::Mat cloud_img_mask_;
   Eigen::Vector2d cloud_img_lt_coord_;
