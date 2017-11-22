@@ -16,21 +16,38 @@
 
 #include "modules/monitor/common/monitor_interface.h"
 
+#include "gflags/gflags.h"
+#include "modules/common/util/file.h"
+#include "modules/common/util/map_util.h"
+
+DEFINE_string(monitor_conf_path, "modules/monitor/conf/monitor_conf.pb.txt",
+              "Path of the monitor config file.");
+
 namespace apollo {
 namespace monitor {
 
-HardwareMonitor::HardwareMonitor(const std::string &name, const double interval,
-                                 SystemStatus *system_status)
-    : RecurrentRunner(name, interval) {
-  system_status->mutable_hardware()->insert({name, {}});
-  status_ = &system_status->mutable_hardware()->at(name);
+using apollo::common::util::LookupOrInsert;
+
+MonitorManager::MonitorManager() {
+  CHECK(apollo::common::util::GetProtoFromASCIIFile(FLAGS_monitor_conf_path,
+                                                    &config_));
 }
 
-ModuleMonitor::ModuleMonitor(const std::string &name, const double interval,
-                             SystemStatus *system_status)
-    : RecurrentRunner(name, interval) {
-  system_status->mutable_modules()->insert({name, {}});
-  status_ = &system_status->mutable_modules()->at(name);
+const MonitorConf &MonitorManager::GetConfig() {
+  return instance()->config_;
+}
+
+SystemStatus *MonitorManager::GetStatus() {
+  return &instance()->status_;
+}
+
+HardwareStatus *MonitorManager::GetHardwareStatus(
+    const std::string &hardware_name) {
+  return &LookupOrInsert(GetStatus()->mutable_hardware(), hardware_name, {});
+}
+
+ModuleStatus *MonitorManager::GetModuleStatus(const std::string &module_name) {
+  return &LookupOrInsert(GetStatus()->mutable_modules(), module_name, {});
 }
 
 }  // namespace monitor
