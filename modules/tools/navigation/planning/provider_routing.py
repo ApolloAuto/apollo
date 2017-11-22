@@ -17,11 +17,49 @@
 ###############################################################################
 
 import json
+import threading
+import math
+from shapely.geometry import LineString, Point
+from numpy.polynomial import polynomial as P
+
+# sudo apt-get install libgeos-dev
+# sudo pip install shapely
+
+import numpy as np
+from scipy.interpolate import UnivariateSpline, splev, splrep
+from scipy.optimize import minimize
+
+
+def error_function(c, x, y, t, k, w=None):
+    """The error function to minimize"""
+    diff = y - splev(x, (t, c, k))
+    if w is None:
+        diff = np.einsum('...i,...i', diff, diff)
+    else:
+        diff = np.dot(diff * diff, w)
+    return np.abs(diff)
+
+
+def optimized_spline(x, y, k=3, s=0, w=None):
+    t, c0, k = splrep(x, y, w, k=k, s=s)
+    x0 = x[0]
+    constraint = {}
+    constraint['type'] = 'eq'
+    constraint['fun'] = lambda c: splev(x0, (t, c, k), der=1)
+    constraints = [constraint]
+    res = minimize(error_function, c0, (x, y, t, k, w), constraints=constraints)
+    return UnivariateSpline._from_tck((t, res.x, k))
+
+
+def euclidean(p1, p2):
+    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+
 
 class RoutingProvider:
     def __init__(self):
         self.routing_str = None
         self.routing_points = []
+        self.routing_lock = threading.Lock()
 
     def update(self, routing_str):
         self.routing_str = routing_str
@@ -31,7 +69,80 @@ class RoutingProvider:
             points = step['polyline']['points']
             for point in points:
                 routing_points.append(point)
-        self.routing_points = routing_points
 
-    def get_segment(self):
-        return None
+        self.routing_lock.acquire()
+        self.routing_points = routing_points
+        self.routing_lock.release()
+
+    def get_segment(self, utm_x, utm_y):
+        if self.routing_str is None:
+            return None
+        point = Point(utm_x, utm_y)
+        routing = LineString(self.routing_points)
+        if routing.distance(point) > 10:
+            return []
+        distance = routing.project(point)
+        points = []
+        for i in range(80):
+            p = routing.interpolate(distance + i)
+            points.append(p.coords[0])
+        return points
+
+    def get_local_segment(self, utm_x, utm_y, heading):
+        points = self.get_segment(utm_x, utm_y)
+        if points is None or len(points) < 10:
+            return [], []
+        points_x = []
+        points_y = []
+        for point in points:
+            points_x.append(point[0])
+            points_y.append(point[1])
+
+        path_x = [x - utm_x for x in points_x]
+        path_y = [y - utm_y for y in points_y]
+
+        npath_x = []
+        npath_y = []
+
+        for i in range(len(path_x)):
+            x = path_x[i]
+            y = path_y[i]
+            newx = x * math.cos(-heading) - y * math.sin(-heading)
+            newy = y * math.cos(-heading) + x * math.sin(-heading)
+            # newx = x * math.cos(- heading + 1.570796) - y * math.sin(
+            #    -heading + 1.570796)
+            # newy = y * math.cos(- heading + 1.570796) + x * math.sin(
+            #    -heading + 1.570796)
+            npath_x.append(newx)
+            npath_y.append(-1 * newy)
+        return npath_x, npath_y
+
+    def get_local_segment_spline(self, utm_x, utm_y, heading):
+        local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        cut_idx = len(local_seg_x)
+        for i in range(len(local_seg_x) - 1):
+            if local_seg_x[i + 1] < local_seg_x[i]:
+                cut_idx = i + 1
+                break
+        local_seg_x = local_seg_x[0:cut_idx]
+        local_seg_y = local_seg_y[0:cut_idx]
+
+        if len(local_seg_x) <= 0:
+            return [], []
+        k = 3
+        n = len(local_seg_x)
+        std = 0.5
+        sp = optimized_spline(local_seg_x, local_seg_y, k, s=n * std)
+        X = np.linspace(0, len(local_seg_x), len(local_seg_x))
+        return X, sp(X)
+
+    def get_smooth_local_segment(self, utm_x, utm_y, heading):
+        local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        if len(local_seg_x) <= 0:
+            return None
+        w = []
+        point_num = len(local_seg_x)
+        for i in range(point_num):
+            w.append((point_num - i) ** 3)
+        c, stats = P.polyfit(local_seg_x, local_seg_y, 3, full=True)
+        return c
