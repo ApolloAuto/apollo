@@ -1,9 +1,18 @@
-// Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
-// @author erlangz(zhengwenchao@baidu.com)
-// @date 2016/09/12 16:55:49
-// @file: preprocessor_subnode.cpp
-// @brief: preprocessor_subnode definition.
-//
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
 #include <image_transport/image_transport.h>
@@ -104,7 +113,7 @@ bool TLPreprocessorSubnode::init_shared_data() {
 }
 
 bool TLPreprocessorSubnode::init_preprocessor() {
-  if (!_preprocessor.init()) {
+  if (!_preprocessor.Init()) {
     AERROR << "TLPreprocessorSubnode init preprocessor failed";
     return false;
   }
@@ -219,7 +228,7 @@ void TLPreprocessorSubnode::sub_camera_image(
   const double before_sync_image_ts = TimeUtil::GetCurrentTime();
   std::shared_ptr<ImageLights> data(new ImageLights);
   bool should_pub = false;
-  if (!_preprocessor.sync_image(image, image->ts(), camera_id, &data, &should_pub)) {
+  if (!_preprocessor.SyncImage(image, image->ts(), camera_id, &data, &should_pub)) {
     AINFO << "sync image failed ts: " << GLOG_TIMESTAMP(image->ts())
           << ", camera_id: " << kCameraIdToStr.at(camera_id);
   } else {
@@ -323,7 +332,7 @@ bool TLPreprocessorSubnode::verify_lights_projection(
   _preprocessor.get_valid_hdmap_interval(&valid_hdmap_interval);
   if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
-      _preprocessor.get_last_signals(&signals);
+      _preprocessor.GetLastSignals(&signals);
       AWARN << "verify_lights_projection failed to get signals info. Use last info\n"
             << "ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     } else {
@@ -332,7 +341,7 @@ bool TLPreprocessorSubnode::verify_lights_projection(
       return false;
     }
   } else {
-    _preprocessor.set_last_signals(signals);
+    _preprocessor.SetLastSignals(signals);
     _preprocessor.set_last_signals_ts(ts);
   }
 
@@ -386,7 +395,7 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   _preprocessor.get_valid_hdmap_interval(&valid_hdmap_interval);
   if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
-      _preprocessor.get_last_signals(&signals);
+      _preprocessor.GetLastSignals(&signals);
       AWARN << "add_cached_camera_selection failed to get signals info. "
             << "Now use last info. ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     } else {
@@ -394,12 +403,12 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
              << "ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     }
   } else {
-    _preprocessor.set_last_signals(signals);
+    _preprocessor.SetLastSignals(signals);
     _preprocessor.set_last_signals_ts(ts);
   }
 
   bool projections_outside_all_images = false;
-  if (!_preprocessor.add_cached_lights_projections(
+  if (!_preprocessor.AddCachedLightsProjections(
       pose, signals, _projection, TLPreprocessorSubnode::_s_image_borders, ts,
       &projections_outside_all_images)) {
     AERROR << "add_cached_lights_projections failed, ts: " << GLOG_TIMESTAMP(ts);

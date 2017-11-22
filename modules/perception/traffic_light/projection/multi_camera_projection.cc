@@ -1,9 +1,18 @@
-// Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
-// @author guiyilin(guiyilin@baidu.com)
-// @date 2017/07/31 
-// @file multi_camera_projection.cpp
-// @brief 
-//
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>

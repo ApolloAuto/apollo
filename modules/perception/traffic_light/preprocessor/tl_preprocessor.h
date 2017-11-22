@@ -1,9 +1,18 @@
-// Copyright (c) 2017 Baidu.com, Inc. All Rights Reserved
-// @author guiyilin(guiyilin@baidu.com)
-// @date 2017/08/07
-// @file: tl_preprocessor.h
-// @brief: tl_preprocessor is to cache lights projections info. with images from different cameras
-// 
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
@@ -27,18 +36,18 @@ namespace traffic_light {
 
 class TLPreprocessor : public BasePreprocessor {
  public:
-  TLPreprocessor() : num_camera_ids(static_cast<int>(CAMERA_ID_COUNT)),
-                     long_focus_idx(static_cast<int>(LONG_FOCUS)),
-                     short_focus_idx(static_cast<int>(SHORT_FOCUS)) {}
+  TLPreprocessor() : kCountCameraId(static_cast<int>(CAMERA_ID_COUNT)),
+                     kLongFocusIdx(static_cast<int>(LONG_FOCUS)),
+                     kShortFocusIdx(static_cast<int>(SHORT_FOCUS)) {}
   ~TLPreprocessor() = default;
 
-  virtual bool init();
+  virtual bool Init();
 
-  virtual std::string name() const {
+  virtual std::string Name() const {
     return "TLPreprocessor";
   }
 
-  bool add_cached_lights_projections(
+  bool AddCachedLightsProjections(
       const CarPose &pose,
       const std::vector<apollo::hdmap::Signal> &signals,
       const MultiCamerasProjection &projection,
@@ -46,15 +55,15 @@ class TLPreprocessor : public BasePreprocessor {
       const double ts,
       bool *projections_outside_all_images);
 
-  bool sync_image(
+  bool SyncImage(
       const ImageSharedPtr &image,
       const double timestamp,
       const CameraId &camera_id,
       std::shared_ptr<ImageLights> *pub_data,
       bool *should_pub);
 
-  void set_last_signals(const std::vector<apollo::hdmap::Signal> &signals);
-  void get_last_signals(std::vector<apollo::hdmap::Signal> *signals) const;
+  void SetLastSignals(const std::vector<apollo::hdmap::Signal> &signals);
+  void GetLastSignals(std::vector<apollo::hdmap::Signal> *signals) const;
 
   void set_last_signals_ts(double last_signals_ts);
   void get_last_signals_ts(double *last_signals_ts) const;
@@ -140,9 +149,9 @@ class TLPreprocessor : public BasePreprocessor {
   int _projection_image_rows = 1080;
   double _sync_interval_seconds = 0.1;
   double _no_signals_interval_seconds = 0.5;
-  const int num_camera_ids;
-  const int long_focus_idx;
-  const int short_focus_idx;
+  const int kCountCameraId;
+  const int kLongFocusIdx;
+  const int kShortFocusIdx;
 
  DISALLOW_COPY_AND_ASSIGN(TLPreprocessor);
 };

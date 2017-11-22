@@ -1,3 +1,18 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "gtest/gtest.h"
 #include "modules/perception/traffic_light/projection/projection.h"
 #include "modules/perception/traffic_light/projection/projection.h"
@@ -127,21 +142,21 @@ class TLPreprocessorTest : public ::testing::Test {
 
 TEST_F(TLPreprocessorTest, test_init_fail) {
   fLS::FLAGS_config_manager_path = "non-exist";
-  ASSERT_FALSE(_preprocessor->init());
+  ASSERT_FALSE(_preprocessor->Init());
 }
 
 TEST_F(TLPreprocessorTest, test_init_exception) {
   fLS::FLAGS_config_manager_path = "conf/bad_config_manager.config";
-  ASSERT_FALSE(_preprocessor->init());
+  ASSERT_FALSE(_preprocessor->Init());
 }
 
 TEST_F(TLPreprocessorTest, test_init) {
   fLS::FLAGS_config_manager_path = "conf/config_manager.config";
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
 }
 
 TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
   CarPose pose;
   std::vector<apollo::hdmap::Signal> signals;
   MultiCamerasProjection projection;
@@ -156,7 +171,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   FLAGS_traffic_light_projection = "MultiCamerasProjection";
   ASSERT_TRUE(projection.init());
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->add_cached_lights_projections(
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(
         pose, signals, projection, image_borders, timestamp,
         &lights_projections_all_outside_image));
   }
@@ -193,7 +208,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
 
   signals.push_back(tl_signal);
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->add_cached_lights_projections(
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(
         pose, signals, projection, image_borders, timestamp,
         &lights_projections_all_outside_image));
   }
@@ -206,14 +221,14 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   _preprocessor->set_camera_is_working_flag(CameraId::LONG_FOCUS, true);
   _preprocessor->set_camera_is_working_flag(CameraId::SHORT_FOCUS, true);
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->add_cached_lights_projections(
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(
         pose, signals, projection, image_borders, timestamp,
         &lights_projections_all_outside_image));
   }
 }
 
 TEST_F(TLPreprocessorTest, test_is_in_bord) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
   cv::Size image_size(400, 300);
   int border_size = 50;
 
@@ -237,7 +252,7 @@ TEST_F(TLPreprocessorTest, test_is_in_bord) {
 }
 
 TEST_F(TLPreprocessorTest, test_set_and_get_camera_is_working_flag) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
   int cam_id = -1;
   bool in_use = false;
   ASSERT_FALSE(_preprocessor->set_camera_is_working_flag(static_cast<CameraId>(cam_id), true));
@@ -267,7 +282,7 @@ TEST_F(TLPreprocessorTest, test_set_and_get_camera_is_working_flag) {
 }
 
 TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
   std::shared_ptr<Image> image(new Image);
   int cam_id = -1;
   double sync_time = 0.0;
@@ -526,7 +541,7 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
 }
 
 TEST_F(TLPreprocessorTest, test_setters_and_getters) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
 
   double no_signals_interval_seconds = 0.0;
   _preprocessor->set_no_signals_interval_seconds(5.0);
@@ -547,7 +562,7 @@ TEST_F(TLPreprocessorTest, test_setters_and_getters) {
 }
 
 TEST_F(TLPreprocessorTest, test_project_lights) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
 
   // empty signals
   {
@@ -713,7 +728,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
 }
 
 TEST_F(TLPreprocessorTest, test_select_image) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
   std::map<int, int> image_borders_size = {
       {static_cast<int>(CameraId::LONG_FOCUS), 100},
       {static_cast<int>(CameraId::SHORT_FOCUS), 100},
@@ -852,14 +867,14 @@ TEST_F(TLPreprocessorTest, test_select_image) {
 }
 
 TEST_F(TLPreprocessorTest, test_sync_image) {
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
   std::shared_ptr<Image> image(new Image);
   int cam_id = -1;
   double sync_time = 0.0;
   std::shared_ptr<ImageLights> data(new ImageLights);
   bool should_pub = false;
 
-  ASSERT_FALSE(_preprocessor->sync_image(
+  ASSERT_FALSE(_preprocessor->SyncImage(
       image,
       sync_time,
       static_cast<CameraId>(cam_id),
@@ -868,7 +883,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
   ASSERT_FALSE(should_pub);
 
   cam_id = 1000;
-  ASSERT_FALSE(_preprocessor->sync_image(
+  ASSERT_FALSE(_preprocessor->SyncImage(
       image,
       sync_time,
       static_cast<CameraId>(cam_id),
@@ -877,7 +892,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
   ASSERT_FALSE(should_pub);
 
   cam_id = 0;
-  ASSERT_TRUE(_preprocessor->sync_image(
+  ASSERT_TRUE(_preprocessor->SyncImage(
       image,
       sync_time,
       static_cast<CameraId>(cam_id),
@@ -893,7 +908,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->timestamp = 0.2;
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->_cached_lights_projections_array.push_back(image_lights);
-    ASSERT_FALSE(_preprocessor->sync_image(
+    ASSERT_FALSE(_preprocessor->SyncImage(
         image,
         sync_time,
         static_cast<CameraId>(cam_id),
@@ -911,7 +926,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->timestamp = 0.01;
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->_cached_lights_projections_array.push_back(image_lights);
-    ASSERT_TRUE(_preprocessor->sync_image(
+    ASSERT_TRUE(_preprocessor->SyncImage(
         image,
         sync_time,
         static_cast<CameraId>(cam_id),
@@ -930,7 +945,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->camera_id = CameraId::SHORT_FOCUS;
     _preprocessor->_cached_lights_projections_array.push_back(image_lights);
     _preprocessor->_cached_signal_nums_array.push_back(std::make_pair(0.00, 1));
-    ASSERT_TRUE(_preprocessor->sync_image(
+    ASSERT_TRUE(_preprocessor->SyncImage(
         image,
         sync_time,
         static_cast<CameraId>(cam_id),
@@ -951,7 +966,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->camera_id = CameraId::SHORT_FOCUS;
     _preprocessor->_cached_lights_projections_array.push_back(image_lights);
     _preprocessor->_cached_signal_nums_array.push_back(std::make_pair(0.01, 1));
-    ASSERT_TRUE(_preprocessor->sync_image(
+    ASSERT_TRUE(_preprocessor->SyncImage(
         image,
         sync_time,
         static_cast<CameraId>(cam_id),
@@ -960,7 +975,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     ASSERT_TRUE(should_pub);
     EXPECT_EQ(data->num_signals, 1);
 
-    ASSERT_TRUE(_preprocessor->sync_image(
+    ASSERT_TRUE(_preprocessor->SyncImage(
         image,
         sync_time,
         static_cast<CameraId>(cam_id),
@@ -982,7 +997,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->camera_id = CameraId::SHORT_FOCUS;
     _preprocessor->_cached_lights_projections_array.push_back(image_lights);
     _preprocessor->_cached_signal_nums_array.push_back(std::make_pair(-0.5, 1));
-    ASSERT_TRUE(_preprocessor->sync_image(
+    ASSERT_TRUE(_preprocessor->SyncImage(
         image,
         sync_time,
         static_cast<CameraId>(cam_id),
@@ -998,7 +1013,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
 
 TEST_F(TLPreprocessorTest, test_get_max_min_focal_len_camera_id) {
   fLS::FLAGS_config_manager_path = "conf/config_manager.config";
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
 
   // test get_max_focal_len_camera_id()
   EXPECT_EQ(static_cast<int>(CameraId::LONG_FOCUS),
@@ -1049,7 +1064,7 @@ TEST_F(TLPreprocessorTest, test_get_max_min_focal_len_camera_id) {
 
 TEST_F(TLPreprocessorTest, test_set_get_max_cached_image_lights_array_size) {
   fLS::FLAGS_config_manager_path = "conf/config_manager.config";
-  ASSERT_TRUE(_preprocessor->init());
+  ASSERT_TRUE(_preprocessor->Init());
 
   size_t max_cached_image_lights_array_size = 0;
   ASSERT_TRUE(_preprocessor

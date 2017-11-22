@@ -1,9 +1,18 @@
-// Copyright (c) 2017 Baidu.com, Inc. All Rights Reserved
-// @author guiyilin(guiyilin@baidu.com)
-// @date 2017/08/07
-// @file: tl_preprocessor.cpp
-// @brief: tl_preprocessor definition
-//
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/lib/base/file_util.h"
@@ -16,42 +25,42 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool TLPreprocessor::init() {
+bool TLPreprocessor::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
   const ModelConfig *model_config = NULL;
-  if (!config_manager->GetModelConfig(name(), &model_config)) {
-    AERROR << "not found model: " << name();
+  if (!config_manager->GetModelConfig(Name(), &model_config)) {
+    AERROR << "not found model: " << Name();
     return false;
   }
 
   // Read parameters from config file
   if (!model_config
       ->GetValue("max_cached_image_lights_array_size", &_max_cached_image_lights_array_size)) {
-    AERROR << "max_cached_image_lights_array_size not found." << name();
+    AERROR << "max_cached_image_lights_array_size not found." << Name();
     return false;
   }
   if (!model_config->GetValue("projection_image_cols", &_projection_image_cols)) {
-    AERROR << "projection_image_cols not found." << name();
+    AERROR << "projection_image_cols not found." << Name();
     return false;
   }
   if (!model_config->GetValue("projection_image_rows", &_projection_image_rows)) {
-    AERROR << "projection_image_rows not found." << name();
+    AERROR << "projection_image_rows not found." << Name();
     return false;
   }
   if (!model_config->GetValue("sync_interval_seconds", &_sync_interval_seconds)) {
-    AERROR << "sync_interval_seconds not found." << name();
+    AERROR << "sync_interval_seconds not found." << Name();
     return false;
   }
   if (!model_config->GetValue("no_signals_interval_seconds", &_no_signals_interval_seconds)) {
-    AERROR << "no_signals_interval_seconds not found." << name();
+    AERROR << "no_signals_interval_seconds not found." << Name();
     return false;
   }
-  _camera_is_working_flags.resize((unsigned long) num_camera_ids);
-  AINFO << num_camera_ids;
+  _camera_is_working_flags.resize((unsigned long) kCountCameraId);
+  AINFO << kCountCameraId;
   return true;
 }
 
-bool TLPreprocessor::add_cached_lights_projections(
+bool TLPreprocessor::AddCachedLightsProjections(
     const CarPose &pose,
     const std::vector<apollo::hdmap::Signal> &signals,
     const MultiCamerasProjection &projection,
@@ -102,9 +111,9 @@ bool TLPreprocessor::add_cached_lights_projections(
   // lights projections info.
 
   std::vector<std::shared_ptr<LightPtrs> > lights_on_image_array(
-      num_camera_ids);
+      kCountCameraId);
   std::vector<std::shared_ptr<LightPtrs> > lights_outside_image_array(
-      num_camera_ids);
+      kCountCameraId);
   for (auto &light_ptrs : lights_on_image_array) {
     light_ptrs.reset(new LightPtrs);
   }
@@ -114,8 +123,8 @@ bool TLPreprocessor::add_cached_lights_projections(
 
   // 当前查不到灯，标记一下没有灯，添加到缓存队列
   if (!has_signals) {
-    image_lights->lights = lights_on_image_array[long_focus_idx];
-    image_lights->lights_outside_image = lights_outside_image_array[long_focus_idx];
+    image_lights->lights = lights_on_image_array[kLongFocusIdx];
+    image_lights->lights_outside_image = lights_outside_image_array[kLongFocusIdx];
     image_lights->has_signals = false;
     _cached_lights_projections_array.push_back(image_lights);
     AINFO << "no signals, add lights projections to cached array.";
@@ -123,7 +132,7 @@ bool TLPreprocessor::add_cached_lights_projections(
   }
 
   // project light region on each camera's image plane
-  for (int cam_id = 0; cam_id < num_camera_ids; ++cam_id) {
+  for (int cam_id = 0; cam_id < kCountCameraId; ++cam_id) {
     if (!project_lights(projection, signals, pose,
                         static_cast<CameraId>(cam_id),
                         lights_on_image_array[cam_id],
@@ -138,7 +147,7 @@ bool TLPreprocessor::add_cached_lights_projections(
 
   *projections_outside_all_images = has_signals;
   // 有灯 && (lights_on_image_array 里一个灯都没有), 说明所有相机的图像里都没有灯投影
-  for (int cam_id = 0; cam_id < num_camera_ids; ++cam_id) {
+  for (int cam_id = 0; cam_id < kCountCameraId; ++cam_id) {
     *projections_outside_all_images = *projections_outside_all_images &&
         (lights_on_image_array[cam_id]->size() == 0);
   }
@@ -151,11 +160,11 @@ bool TLPreprocessor::add_cached_lights_projections(
                &(image_lights->camera_id));
 
   auto selected_camera_id = static_cast<int>(image_lights->camera_id);
-  // if (selected_camera_id < 0 || selected_camera_id >= num_camera_ids) {
+  // if (selected_camera_id < 0 || selected_camera_id >= kCountCameraId) {
   //     AINFO << "Unknown selected_camera_id: " << selected_camera_id;
   //     return false;
   // }
-  assert(selected_camera_id >= 0 && selected_camera_id < num_camera_ids);
+  assert(selected_camera_id >= 0 && selected_camera_id < kCountCameraId);
 
   image_lights->lights = lights_on_image_array[selected_camera_id];
   image_lights->lights_outside_image = lights_outside_image_array[selected_camera_id];
@@ -167,7 +176,7 @@ bool TLPreprocessor::add_cached_lights_projections(
   return true;
 }
 
-bool TLPreprocessor::sync_image(
+bool TLPreprocessor::SyncImage(
     const ImageSharedPtr &image,
     const double timestamp,
     const CameraId &camera_id,
@@ -254,11 +263,11 @@ bool TLPreprocessor::sync_image(
   return true;
 }
 
-void TLPreprocessor::set_last_signals(const std::vector<apollo::hdmap::Signal> &signals) {
+void TLPreprocessor::SetLastSignals(const std::vector<apollo::hdmap::Signal> &signals) {
   _last_signals = signals;
 }
 
-void TLPreprocessor::get_last_signals(std::vector<apollo::hdmap::Signal> *signals) const {
+void TLPreprocessor::GetLastSignals(std::vector<apollo::hdmap::Signal> *signals) const {
   *signals = _last_signals;
 }
 
@@ -296,7 +305,7 @@ void TLPreprocessor::get_no_signals_interval_seconds(double *seconds) const {
 
 bool TLPreprocessor::set_camera_is_working_flag(const CameraId &camera_id, bool is_working) {
   const int cam_id = static_cast<int>(camera_id);
-  if (cam_id < 0 || cam_id >= num_camera_ids) {
+  if (cam_id < 0 || cam_id >= kCountCameraId) {
     AERROR << "set_camera_is_working_flag failed, "
            << "get unknown CameraId: " << camera_id;
     return false;
@@ -310,9 +319,9 @@ bool TLPreprocessor::set_camera_is_working_flag(const CameraId &camera_id, bool 
 
 bool TLPreprocessor::get_camera_is_working_flag(const CameraId &camera_id, bool *is_working) const {
   const int cam_id = static_cast<int>(camera_id);
-  AINFO << cam_id << " " << num_camera_ids;
+  AINFO << cam_id << " " << kCountCameraId;
   google::FlushLogFiles(0);
-  if (cam_id < 0 || cam_id >= num_camera_ids) {
+  if (cam_id < 0 || cam_id >= kCountCameraId) {
     AERROR << "get_camera_is_working_flag failed, "
            << "get unknown CameraId: " << camera_id;
     return false;
@@ -393,7 +402,7 @@ bool TLPreprocessor::project_lights(const MultiCamerasProjection &projection,
   }
 
   const int cam_id = static_cast<int>(camera_id);
-  if (cam_id < 0 || cam_id >= num_camera_ids) {
+  if (cam_id < 0 || cam_id >= kCountCameraId) {
     AERROR << "project_lights get invalid CameraId: " << camera_id;
     return false;
   }
@@ -430,7 +439,7 @@ bool TLPreprocessor::sync_image_with_cached_lights_projections(
     bool *sync_ok) {
   PERF_FUNCTION();
   const int cam_id = static_cast<int>(camera_id);
-  if (cam_id < 0 || cam_id >= num_camera_ids) {
+  if (cam_id < 0 || cam_id >= kCountCameraId) {
     AERROR << "sync_image_with_cached_lights_projections failed, "
            << "get unknown CameraId: " << camera_id;
     return false;
@@ -568,8 +577,8 @@ bool TLPreprocessor::is_in_bord(const cv::Size size,
 }
 
 int TLPreprocessor::get_min_focal_len_camera_id() {
-  int min_focal_len_working_camera = short_focus_idx;
-  for (int cam_id = num_camera_ids - 1; cam_id >= 0; --cam_id) {
+  int min_focal_len_working_camera = kShortFocusIdx;
+  for (int cam_id = kCountCameraId - 1; cam_id >= 0; --cam_id) {
     if (_camera_is_working_flags[cam_id] == 1) {
       min_focal_len_working_camera = cam_id;
       break;
@@ -579,8 +588,8 @@ int TLPreprocessor::get_min_focal_len_camera_id() {
 }
 
 int TLPreprocessor::get_max_focal_len_camera_id() {
-  int max_focal_len_working_camera = long_focus_idx;
-  for (int cam_id = 0; cam_id < num_camera_ids; ++cam_id) {
+  int max_focal_len_working_camera = kLongFocusIdx;
+  for (int cam_id = 0; cam_id < kCountCameraId; ++cam_id) {
     if (_camera_is_working_flags[cam_id] == 1) {
       max_focal_len_working_camera = cam_id;
       break;
@@ -604,9 +613,9 @@ bool TLPreprocessor::select_camera_by_lights_projection(
 
   // lights projections info.
   std::vector<std::shared_ptr<LightPtrs> > lights_on_image_array(
-      num_camera_ids);
+      kCountCameraId);
   std::vector<std::shared_ptr<LightPtrs> > lights_outside_image_array(
-      num_camera_ids);
+      kCountCameraId);
   for (auto &light_ptrs : lights_on_image_array) {
     light_ptrs.reset(new LightPtrs);
   }
@@ -615,7 +624,7 @@ bool TLPreprocessor::select_camera_by_lights_projection(
   }
 
   // project light region on each camera's image plane
-  for (int cam_id = 0; cam_id < num_camera_ids; ++cam_id) {
+  for (int cam_id = 0; cam_id < kCountCameraId; ++cam_id) {
     if (!project_lights(projection, signals, pose,
                         static_cast<CameraId>(cam_id),
                         lights_on_image_array[cam_id],
@@ -630,7 +639,7 @@ bool TLPreprocessor::select_camera_by_lights_projection(
 
   // 有灯 && (lights_on_image_array 里一个灯都没有), 说明所有相机的图像里都没有灯投影
   *projections_outside_all_images = has_signals;
-  for (int cam_id = 0; cam_id < num_camera_ids; ++cam_id) {
+  for (int cam_id = 0; cam_id < kCountCameraId; ++cam_id) {
     *projections_outside_all_images = *projections_outside_all_images &&
         (lights_on_image_array[cam_id]->size() == 0);
   }
@@ -641,7 +650,7 @@ bool TLPreprocessor::select_camera_by_lights_projection(
                lights_outside_image_array,
                image_borders_size,
                selected_camera_id);
-  assert(*selected_camera_id >= 0 && *selected_camera_id < num_camera_ids);
+  assert(*selected_camera_id >= 0 && *selected_camera_id < kCountCameraId);
 
   // set selected lights
   if (*selected_camera_id == (*image_lights)->camera_id) {

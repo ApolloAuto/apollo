@@ -17,10 +17,11 @@
 ###############################################################################
 
 
+rm data/log/*
+rm data/core/*
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${DIR}/apollo_base.sh"
-
 # run function from apollo_base.sh
 # run command_name module_name
 run perception "$@"
