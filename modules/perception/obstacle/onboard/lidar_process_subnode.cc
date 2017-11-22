@@ -94,6 +94,7 @@ bool LidarProcessSubnode::InitInternal() {
 
 void LidarProcessSubnode::OnPointCloud(
     const sensor_msgs::PointCloud2& message) {
+  AINFO << "process OnPointCloud.";
   PERF_FUNCTION("LidarProcessSubnode");
   if (!inited_) {
     AERROR << "the LidarProcessSubnode has not been Init";
