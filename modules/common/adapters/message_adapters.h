@@ -36,7 +36,6 @@
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
