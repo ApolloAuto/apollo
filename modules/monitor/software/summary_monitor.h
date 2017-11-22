@@ -13,25 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_HARDWARE_GPS_GPS_MONITOR_H_
-#define MODULES_MONITOR_HARDWARE_GPS_GPS_MONITOR_H_
+#ifndef MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
+#define MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
 
 #include <string>
-#include <vector>
 
+#include "modules/common/adapters/adapter.h"
 #include "modules/monitor/common/monitor_interface.h"
+#include "modules/monitor/proto/monitor_conf.pb.h"
 
 namespace apollo {
 namespace monitor {
 
-// AdapterManager is required to listen to ins_status and gnss_status.
-class GpsMonitor : public RecurrentRunner {
+// A monitor which summarize other monitors' result and publish the whole status
+// if it has changed.
+class SummaryMonitor : public RecurrentRunner {
  public:
-  GpsMonitor();
+  SummaryMonitor();
   void RunOnce(const double current_time) override;
+
+ private:
+  static void SummarizeModules();
+  static void SummarizeHardware();
+
+  size_t system_status_fp_ = 0;
 };
 
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_GPS_GPS_MONITOR_H_
+#endif  // MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_

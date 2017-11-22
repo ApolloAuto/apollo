@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/time",
-        "//modules/monitor/proto:system_status_proto",
     ],
 )
 
@@ -19,6 +18,9 @@ cc_library(
     hdrs = ["monitor_interface.h"],
     deps = [
         ":recurrent_runner",
+        "//modules/common/util",
+        "//modules/common/util:map_util",
+        "//modules/monitor/proto:monitor_conf_proto",
         "//modules/monitor/proto:system_status_proto",
     ],
 )

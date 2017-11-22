@@ -1,0 +1,93 @@
+modules {
+  name: "canbus"
+  process_conf {
+    process_cmd_keywords: "modules/canbus/canbus"
+  }
+}
+modules {
+  name: "GPS"
+  process_conf {
+    process_cmd_keywords: "gnss_nodelet_manager"
+  }
+}
+modules {
+  name: "velodyne"
+  process_conf {
+    process_cmd_keywords: "velodyne_nodelet_manager"
+  }
+}
+modules {
+  name: "radar"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/conti_radar/conti_radar"
+  }
+}
+modules {
+  name: "camera"
+  process_conf {
+    process_cmd_keywords: "camera_nodelet_manager"
+  }
+}
+modules {
+  name: "localization"
+  process_conf {
+    process_cmd_keywords: "modules/localization/localization"
+  }
+  topic_conf {
+    type: LOCALIZATION
+  }
+}
+modules {
+  name: "perception"
+  process_conf {
+    process_cmd_keywords: "modules/perception/perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
+  name: "prediction"
+  process_conf {
+    process_cmd_keywords: "modules/prediction/prediction"
+  }
+  topic_conf {
+    type: PREDICTION
+  }
+}
+modules {
+  name: "routing"
+  process_conf {
+    process_cmd_keywords: "modules/routing/routing"
+  }
+}
+modules {
+  name: "planning"
+  process_conf {
+    process_cmd_keywords: "modules/planning/planning"
+  }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
+}
+modules {
+  name: "control"
+  process_conf {
+    process_cmd_keywords: "modules/control/control"
+  }
+  topic_conf {
+    type: CONTROL_COMMAND
+  }
+}
+hardware {
+  name: "velodyne"
+  topic_conf {
+    type: POINT_CLOUD
+  }
+}
+hardware {
+  name: "camera"
+  topic_conf {
+    type: COMPRESSED_IMAGE
+  }
+}
