@@ -35,13 +35,13 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::perception::PerceptionObstacle;
-using apollo::common::math::KalmanFilter;
 using apollo::common::ErrorCode;
 using apollo::common::Point3D;
+using apollo::common::math::KalmanFilter;
 using apollo::common::util::FindOrDie;
 using apollo::common::util::FindOrNull;
 using apollo::hdmap::LaneInfo;
+using apollo::perception::PerceptionObstacle;
 
 std::mutex Obstacle::mutex_;
 
@@ -138,8 +138,8 @@ bool Obstacle::IsNearJunction() {
     pos_x = latest_feature().t_position().x();
     pos_y = latest_feature().t_position().y();
   }
-  return PredictionMap::instance()->NearJunction(
-      {pos_x, pos_y}, FLAGS_search_radius);
+  return PredictionMap::instance()->NearJunction({pos_x, pos_y},
+                                                 FLAGS_search_radius);
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
@@ -1083,8 +1083,7 @@ void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
 
 void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
   rnn_states->clear();
-  rnn_states->insert(rnn_states->end(),
-                     rnn_states_.begin(), rnn_states_.end());
+  rnn_states->insert(rnn_states->end(), rnn_states_.begin(), rnn_states_.end());
 }
 
 void Obstacle::InitRNNStates() {
@@ -1099,9 +1098,7 @@ void Obstacle::InitRNNStates() {
   }
 }
 
-bool Obstacle::rnn_enabled() const {
-  return rnn_enabled_;
-}
+bool Obstacle::RNNEnabled() const { return rnn_enabled_; }
 
 }  // namespace prediction
 }  // namespace apollo

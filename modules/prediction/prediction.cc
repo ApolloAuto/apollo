@@ -132,9 +132,9 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
        prediction_obstacles.prediction_obstacle()) {
     for (auto const& trajectory : prediction_obstacle.trajectory()) {
       for (auto const& trajectory_point : trajectory.trajectory_point()) {
-        if (IsValidTrajectoryPoint(trajectory_point)) {
+        if (!IsValidTrajectoryPoint(trajectory_point)) {
           AERROR << "Invalid trajectory point ["
-                 << trajectory_point.ShortDebugString();
+                 << trajectory_point.ShortDebugString() << "]";
           return;
         }
       }
