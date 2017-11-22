@@ -61,5 +61,5 @@ message Feature {
     optional apollo.common.Point3D t_acceleration = 20;
     optional double t_acc = 21;
 
-    optional bool is_still = 22 [default = true];
+    optional bool is_still = 22 [default = false];
 }
