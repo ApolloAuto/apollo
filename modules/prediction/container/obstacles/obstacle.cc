@@ -627,6 +627,7 @@ void Obstacle::UpdateKFLaneTracker(const std::string& lane_id,
     InitKFLaneTracker(lane_id, beta);
     auto& kf = FindOrDie(kf_lane_trackers_, lane_id);
     Eigen::Matrix<double, 4, 1> state;
+    state.setZero();
     state(0, 0) = lane_s;
     state(1, 0) = lane_l;
     state(2, 0) = lane_speed;
@@ -698,6 +699,7 @@ void Obstacle::InitKFPedestrianTracker(Feature* feature) {
 
   // Set initial state
   Eigen::Matrix<double, 2, 1> x;
+  x.setZero();
   x(0, 0) = feature->position().x();
   x(1, 0) = feature->position().y();
 
