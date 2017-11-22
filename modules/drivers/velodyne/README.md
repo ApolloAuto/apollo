@@ -22,9 +22,9 @@ Compensation relies on `tf` to query the coordination transform, so gnss_driver 
 ```bash 
 # in dev docker
 cd /apollo
-bash apollo.sh buildvelodyne
+bash apollo.sh build_velodyne
 ```
-The output will overwrite the velodyne driver in `/apollo/bazel-apollo/external/ros/`.
+The output will overwrite the velodyne driver in `/home/tmp/ros/`.
  
 ### Configure Velodyne Driver
 First, specify the parameters of the car.

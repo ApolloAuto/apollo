@@ -202,7 +202,7 @@ RadarConfig200* RadarConfig200::set_rcs_threshold(RcsThreshold rcs_theshold) {
 void RadarConfig200::set_max_distance_valid_p(uint8_t* data, bool valid) {
   Byte frame(data);
   if (valid) {
-    frame.set_bit_0(1);
+    frame.set_bit_1(0);
   } else {
     frame.set_bit_0(0);
   }
@@ -213,7 +213,7 @@ void RadarConfig200::set_sensor_id_valid_p(uint8_t* data, bool valid) {
   if (valid) {
     frame.set_bit_1(1);
   } else {
-    frame.set_bit_1(0);
+    frame.set_bit_0(1);
   }
 }
 
@@ -274,7 +274,7 @@ void RadarConfig200::set_store_in_nvm_valid_p(uint8_t* data, bool valid) {
 void RadarConfig200::set_ctrl_relay_valid_p(uint8_t* data, bool valid) {
   Byte frame(data + 5);
   if (valid) {
-    frame.set_bit_0(1);
+    frame.set_bit_1(0);
   } else {
     frame.set_bit_0(0);
   }
@@ -283,19 +283,20 @@ void RadarConfig200::set_ctrl_relay_valid_p(uint8_t* data, bool valid) {
 void RadarConfig200::set_rcs_threshold_valid_p(uint8_t* data, bool valid) {
   Byte frame(data + 6);
   if (valid) {
-    frame.set_bit_0(1);
+    frame.set_bit_1(0);
   } else {
     frame.set_bit_0(0);
   }
 }
 
 void RadarConfig200::set_max_distance_p(uint8_t* data, uint16_t value) {
+  value /= 2;
   uint8_t low = value >> 2;
   Byte frame_low(data + 1);
   frame_low.set_value(low, 0, 8);
 
   uint8_t high = value << 6;
-  high &= 0xc;
+  high &= 0xc0;
   Byte frame_high(data + 2);
   frame_high.set_value(high, 0, 8);
 }
@@ -318,7 +319,7 @@ void RadarConfig200::set_radar_power_p(uint8_t* data, uint8_t value) {
 
 void RadarConfig200::set_ctrl_relay_p(uint8_t* data, uint8_t value) {
   Byte frame(data + 5);
-  frame.set_bit_1(value);
+  frame.set_value(value, 1, 1);
 }
 
 void RadarConfig200::set_send_ext_info_p(uint8_t* data, uint8_t value) {

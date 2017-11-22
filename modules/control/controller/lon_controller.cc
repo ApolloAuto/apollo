@@ -28,11 +28,11 @@
 namespace apollo {
 namespace control {
 
-using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
-using apollo::common::VehicleStateProvider;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleStateProvider;
+using apollo::common::time::Clock;
 
 const double GRA_ACC = 9.8;
 
@@ -85,9 +85,13 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() { CloseLogFile(); }
+void LonController::Stop() {
+  CloseLogFile();
+}
 
-LonController::~LonController() { CloseLogFile(); }
+LonController::~LonController() {
+  CloseLogFile();
+}
 
 Status LonController::Init(const ControlConf *control_conf) {
   control_conf_ = control_conf;
@@ -213,10 +217,14 @@ Status LonController::ComputeControlCommand(
         speed_pid_controller_.Control(speed_controller_input_limited, ts);
   }
 
+  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
+      GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
+
+  debug->set_slope_offset_compensation(slope_offset_compenstaion);
+
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
-      digital_filter_pitch_angle_.Filter(
-          GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
+      FLAGS_enable_slope_offset * debug->slope_offset_compensation();
   debug->set_is_full_stop(false);
   if (std::abs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
@@ -294,7 +302,9 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const { return name_; }
+std::string LonController::Name() const {
+  return name_;
+}
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,

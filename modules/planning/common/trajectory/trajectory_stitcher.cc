@@ -91,31 +91,40 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  auto matched_point = prev_trajectory->TrajectoryPointAt(matched_index);
+  auto matched_point =
+      prev_trajectory->EvaluateUsingLinearApproximation(veh_rel_time);
+
   const double position_diff =
       std::hypot(matched_point.path_point().x() - vehicle_state.x(),
                  matched_point.path_point().y() - vehicle_state.y());
 
+  ADEBUG << "Control diff: " << position_diff;
+
   if (position_diff > FLAGS_replan_distance_threshold) {
     AWARN << "the distance between matched point and actual position is too "
-             "large";
+             "large, position difference = "
+          << position_diff;
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  double forward_rel_time = veh_rel_time + planning_cycle_time;
+  double forward_rel_time =
+      prev_trajectory->TrajectoryPointAt(matched_index).relative_time() +
+      planning_cycle_time;
+
   std::size_t forward_index =
       prev_trajectory->QueryNearestPoint(forward_rel_time);
 
+  ADEBUG << "matched_index: " << matched_index;
   std::vector<TrajectoryPoint> stitching_trajectory(
-      prev_trajectory->trajectory_points().begin() + matched_index,
+      prev_trajectory->trajectory_points().begin() +
+          std::max(0, static_cast<int>(matched_index - 1)),
       prev_trajectory->trajectory_points().begin() + forward_index + 1);
 
-  const double zero_time = veh_rel_time;
-  const double zero_s =
-      prev_trajectory->TrajectoryPointAt(forward_index).path_point().s();
+  const double zero_s = matched_point.path_point().s();
 
   for (auto& tp : stitching_trajectory) {
-    tp.set_relative_time(tp.relative_time() - zero_time);
+    tp.set_relative_time(tp.relative_time() + prev_trajectory->header_time() -
+                         current_timestamp);
     tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
   }
   *is_replan = false;

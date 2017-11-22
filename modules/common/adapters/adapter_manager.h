@@ -53,11 +53,10 @@ namespace adapter {
 #define REGISTER_ADAPTER(name)                                                 \
  public:                                                                       \
   static void Enable##name(const std::string &topic_name,                      \
-                           AdapterConfig::Mode mode,                           \
-                           int message_history_limit) {                        \
-    CHECK(message_history_limit > 0)                                           \
+                           const AdapterConfig &config) {                      \
+    CHECK(config.message_history_limit() > 0)                                  \
         << "Message history limit must be greater than 0";                     \
-    instance()->InternalEnable##name(topic_name, mode, message_history_limit); \
+    instance()->InternalEnable##name(topic_name, config);                      \
   }                                                                            \
   static name##Adapter *Get##name() {                                          \
     return instance()->InternalGet##name();                                    \
@@ -77,6 +76,13 @@ namespace adapter {
     static_assert(std::is_same<name##Adapter::DataType, T>::value,             \
                   "Data type must be the same with adapter's type!");          \
     instance()->name##_->FillHeader(module_name, data);                        \
+  }                                                                            \
+  template <typename T>                                                        \
+  static void Fill##name##Header(const std::string &module_name,               \
+                                 const double timestamp, T *data) {            \
+    static_assert(std::is_same<name##Adapter::DataType, T>::value,             \
+                  "Data type must be the same with adapter's type!");          \
+    instance()->name##_->FillHeader(module_name, timestamp, data);             \
   }                                                                            \
   static void Add##name##Callback(name##Adapter::Callback callback) {          \
     CHECK(instance()->name##_)                                                 \
@@ -99,25 +105,22 @@ namespace adapter {
   ros::Subscriber name##subscriber_;                                           \
                                                                                \
   void InternalEnable##name(const std::string &topic_name,                     \
-                            AdapterConfig::Mode mode,                          \
-                            int message_history_limit) {                       \
+                            const AdapterConfig &config) {                     \
     name##_.reset(                                                             \
-        new name##Adapter(#name, topic_name, message_history_limit));          \
-    if (mode != AdapterConfig::PUBLISH_ONLY && IsRos()) {                      \
+        new name##Adapter(#name, topic_name, config.message_history_limit())); \
+    if (config.mode() != AdapterConfig::PUBLISH_ONLY && IsRos()) {             \
       name##subscriber_ =                                                      \
-          node_handle_->subscribe(topic_name, message_history_limit,           \
+          node_handle_->subscribe(topic_name, config.message_history_limit(),  \
                                   &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
-    if (mode != AdapterConfig::RECEIVE_ONLY && IsRos()) {                      \
+    if (config.mode() != AdapterConfig::RECEIVE_ONLY && IsRos()) {             \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
-          topic_name, message_history_limit);                                  \
+          topic_name, config.message_history_limit(), config.latch());         \
     }                                                                          \
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() {                                         \
-    return name##_.get();                                                      \
-  }                                                                            \
+  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (IsRos()) {                                                             \
@@ -185,9 +188,7 @@ class AdapterManager {
   /**
    * @brief Returns whether AdapterManager is running ROS mode.
    */
-  static bool IsRos() {
-    return instance()->node_handle_ != nullptr;
-  }
+  static bool IsRos() { return instance()->node_handle_ != nullptr; }
 
   /**
    * @brief Returns a reference to static tf2 buffer.

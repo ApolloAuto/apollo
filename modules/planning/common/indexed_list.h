@@ -22,11 +22,12 @@
 #define MODULES_PLANNING_COMMON_INDEXED_LIST_H_
 
 #include <memory>
-#include <mutex>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
 #include "modules/common/util/map_util.h"
 
 namespace apollo {
@@ -86,24 +87,22 @@ template <typename I, typename T>
 class ThreadSafeIndexedList : public IndexedList<I, T> {
  public:
   T* Add(const I id, const T& object) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     return IndexedList<I, T>::Add(id, object);
   }
 
   T* Find(const I id) {
-    // TODO(all) change to shared mutex to all multiple reader
-    std::lock_guard<std::mutex> lock(mutex_);
+    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
     return IndexedList<I, T>::Find(id);
   }
 
   std::vector<const T*> Items() const {
-    // TODO(all) change to shared mutex to all multiple reader
-    std::lock_guard<std::mutex> lock(mutex_);
+    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
     return IndexedList<I, T>::Items();
   }
 
  private:
-  mutable std::mutex mutex_;
+  mutable boost::shared_mutex mutex_;
 };
 
 }  // namespace planning

@@ -79,6 +79,8 @@ class Frame {
 
   apollo::common::PointENU GetRoutingDestination();
 
+  const common::VehicleState &vehicle_state() const;
+
  private:
   /**
    * @brief create obstacles from prediction input.

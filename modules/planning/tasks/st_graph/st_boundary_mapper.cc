@@ -416,14 +416,17 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
-  const double mid_to_rear_center =
-      vehicle_param_.length() / 2.0 - vehicle_param_.front_edge_to_center();
-  const double x =
-      path_point.x() - mid_to_rear_center * std::cos(path_point.theta());
-  const double y =
-      path_point.y() - mid_to_rear_center * std::sin(path_point.theta());
+  Vec2d vec_to_center = Vec2d((vehicle_param_.front_edge_to_center() -
+                               vehicle_param_.back_edge_to_center()) /
+                                  2.0,
+                              (vehicle_param_.left_edge_to_center() -
+                               vehicle_param_.right_edge_to_center()) /
+                                  2.0)
+                            .rotate(path_point.theta());
+  Vec2d center = Vec2d(path_point.x(), path_point.y()) + vec_to_center;
+
   const Box2d adc_box =
-      Box2d({x, y}, path_point.theta(), vehicle_param_.length() + 2 * buffer,
+      Box2d(center, path_point.theta(), vehicle_param_.length() + 2 * buffer,
             vehicle_param_.width() + 2 * buffer);
   return obs_box.HasOverlap(adc_box);
 }

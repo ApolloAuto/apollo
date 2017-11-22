@@ -16,6 +16,7 @@ cc_library(
         "gps_6e.cc",
         "gps_6f.cc",
         "gyro_6c.cc",
+        "license_7e.cc",
         "misc_69.cc",
         "steering_64.cc",
         "steering_65.cc",
@@ -26,7 +27,6 @@ cc_library(
         "turnsignal_68.cc",
         "version_7f.cc",
         "wheelspeed_6a.cc",
-        "license_7e.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -40,6 +40,7 @@ cc_library(
         "gps_6e.h",
         "gps_6f.h",
         "gyro_6c.h",
+        "license_7e.h",
         "misc_69.h",
         "steering_64.h",
         "steering_65.h",
@@ -50,7 +51,6 @@ cc_library(
         "turnsignal_68.h",
         "version_7f.h",
         "wheelspeed_6a.h",
-        "license_7e.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",

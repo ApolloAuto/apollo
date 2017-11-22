@@ -24,6 +24,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
+#include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 
@@ -39,7 +40,6 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new BacksideVehicle(config);
                          });
-
   rule_factory_.Register(RuleConfig::SIGNAL_LIGHT,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new SignalLight(config);
@@ -49,10 +49,13 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Crosswalk(config);
                          });
-
   rule_factory_.Register(RuleConfig::REROUTING,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Rerouting(config);
+                         });
+  rule_factory_.Register(RuleConfig::REFERENCE_LINE_END,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new ReferenceLineEnd(config);
                          });
 }
 

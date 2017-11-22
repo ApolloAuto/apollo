@@ -1,10 +1,7 @@
-import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
-const _ = require('lodash');
-
-class WebSocketEndpoint {
+export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
         this.websocket = null;
@@ -12,6 +9,7 @@ class WebSocketEndpoint {
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
         this.currMapRadius = null;
+        this.updatePOI = true;
     }
 
     initialize() {
@@ -82,8 +80,9 @@ class WebSocketEndpoint {
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN) {
                 // Load default routing end point.
-                if (_.isEmpty(STORE.routeEditingManager.defaultRoutingEndPoint)) {
+                if (this.updatePOI) {
                     this.requestDefaultRoutingEndPoint();
+                    this.updatePOI = false;
                 }
 
                 const requestPlanningData = STORE.options.showPNCMonitor;
@@ -163,6 +162,7 @@ class WebSocketEndpoint {
             type: "ChangeMap",
             new_map: map,
         }));
+        this.updatePOI = true;
     }
 
     changeVehicle(vehcile) {
@@ -202,24 +202,3 @@ class WebSocketEndpoint {
         }));
     }
 }
-
-// Returns the websocket server address based on the web server address.
-// Follows the convention that the websocket is served on the same host
-// as the web server, the port number of websocket is the port number of
-// the webserver plus one.
-function deduceWebsocketServerAddr() {
-    const server = window.location.origin;
-    const link = document.createElement("a");
-    link.href = server;
-    const protocol = location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://${link.hostname}:${window.location.port}/websocket`;
-}
-
-// NOTE: process.env.NODE_ENV will be set to "production" by webpack when
-// invoked in production mode ("-p"). We rely on this to determine which
-// websocket server to use.
-const serverAddr = process.env.NODE_ENV === "production" ?
-                   deduceWebsocketServerAddr() : `ws://${devConfig.websocketServer}`;
-const WS = new WebSocketEndpoint(serverAddr);
-
-export default WS;

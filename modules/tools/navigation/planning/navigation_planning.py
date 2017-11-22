@@ -20,31 +20,42 @@ import rospy
 import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from std_msgs.msg import String
+
 from modules.drivers.proto import mobileye_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
 from path_decider import PathDecider
 from speed_decider import SpeedDecider
 from trajectory_generator import TrajectoryGenerator
 from provider_mobileye import MobileyeProvider
 from provider_chassis import ChassisProvider
 from provider_localization import LocalizationProvider
+from provider_routing import RoutingProvider
 
 planning_pub = None
 PUB_NODE_NAME = "planning"
 PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
-f = open("benchmark.txt", "w")
 CRUISE_SPEED = 10  # m/s
+ENABLE_FOLLOW = False
+ENABLE_ROUTING_AID = False
 
+f = open("benchmark.txt", "w")
 path_decider = PathDecider()
 speed_decider = SpeedDecider()
 traj_generator = TrajectoryGenerator()
 mobileye_provider = MobileyeProvider()
 chassis_provider = ChassisProvider()
 localization_provider = LocalizationProvider()
+routing_provider = RoutingProvider()
 
 nx = []
 ny = []
+
+
+def routing_callback(routing_str):
+    routing_provider.update(routing_str)
 
 
 def localization_callback(localization_pb):
@@ -62,11 +73,21 @@ def mobileye_callback(mobileye_pb):
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
 
-    path_coef, path_length = path_decider.get_path(
-        mobileye_provider, chassis_provider)
+    if ENABLE_ROUTING_AID:
+        mobileye_provider.routing_correct(routing_provider,
+                                          localization_provider)
 
-    speed, final_path_length = speed_decider.get_target_speed_and_path_length(
-        mobileye_provider, chassis_provider, path_length)
+    path_coef, path_length = path_decider.get_path(
+        mobileye_provider.left_lane_marker_coef,
+        mobileye_provider.right_lane_marker_coef,
+        chassis_provider.get_speed_mps())
+
+    final_path_length = path_length
+    speed = CRUISE_SPEED
+
+    if ENABLE_FOLLOW:
+        speed, final_path_length = speed_decider.get_target_speed_and_path_length(
+            mobileye_provider, chassis_provider, path_length)
 
     adc_trajectory = traj_generator.generate(path_coef, final_path_length,
                                              speed,
@@ -81,12 +102,14 @@ def add_listener():
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
-    # rospy.Subscriber('/apollo/localization/pose',
-    #                 localization_pb2.LocalizationEstimate,
-    #                 localization_callback)
+    rospy.Subscriber('/apollo/localization/pose',
+                     localization_pb2.LocalizationEstimate,
+                     localization_callback)
     rospy.Subscriber('/apollo/canbus/chassis',
                      chassis_pb2.Chassis,
                      chassis_callback)
+    rospy.Subscriber('/apollo/navigation/routing',
+                     String, routing_callback)
 
     planning_pub = rospy.Publisher(
         PUB_TOPIC, planning_pb2.ADCTrajectory, queue_size=1)

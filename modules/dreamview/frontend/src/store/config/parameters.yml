@@ -29,6 +29,8 @@ ground:
   xorigin: 4096
   yorigin: 4096
   xyoffset: 0
+  type: default # default or tile
+  tileRange: 4
 planning:
   # The minimum interval between two consecutive
   minInterval: 0.1
@@ -63,6 +65,8 @@ options:
     showObstaclesHeading: true
     showObstaclesId: true
     cameraAngle: Default
+websocket:
+  type: ros # json or ros
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

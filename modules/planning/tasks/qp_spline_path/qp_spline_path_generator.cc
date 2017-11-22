@@ -38,7 +38,14 @@
 namespace apollo {
 namespace planning {
 namespace {
-double GetLaneChangeLateralShift(const double v) { return -0.075 * v + 4.0; }
+double GetLaneChangeLateralShift(const double v) {
+  const double l0 = 2.0;       // shift at v = 0 m/s
+  const double v_ref = 20.11;  // reference speed: 45mph = 20.11 m/s
+  const double l_ref = 1.4;
+  const double b = l0;
+  const double a = (l_ref - b) / v_ref;
+  return a * v + b;
+}
 }
 
 using Vec2d = apollo::common::math::Vec2d;

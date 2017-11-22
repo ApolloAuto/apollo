@@ -20,10 +20,9 @@
 #include <limits>
 #include <numeric>
 
-#include "modules/map/proto/map_lane.pb.h"
-
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
@@ -46,7 +45,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 }  // namespace
 
-MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
+MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_evaluator_vehicle_mlp_file); }
 
 void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
 

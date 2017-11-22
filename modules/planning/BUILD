@@ -9,6 +9,7 @@ cc_library(
     ],
     hdrs = [
         "planning.h",
+        "planning_interface.h",
     ],
     deps = [
         "//modules/common",

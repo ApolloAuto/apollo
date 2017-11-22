@@ -120,15 +120,22 @@ bool ReferenceLineProvider::IsAllowChangeLane(
 
 bool ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing) {
-  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-  if (!pnc_map_->UpdateRoutingResponse(routing)) {
-    AERROR << "Failed to update routing in pnc map";
-    return false;
+  if (pnc_map_->IsNewRouting(routing)) {
+    {
+      std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+      if (!pnc_map_->UpdateRoutingResponse(routing)) {
+        AERROR << "Failed to update routing in pnc map";
+        return false;
+      }
+      route_segments_.clear();
+      has_routing_ = true;
+    }
+    {
+      std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+      segment_history_.clear();
+      reference_lines_.clear();
+    }
   }
-  if (!pnc_map_->IsSameRouting()) {
-    segment_history_.clear();
-  }
-  has_routing_ = true;
   return true;
 }
 
@@ -174,7 +181,7 @@ void ReferenceLineProvider::GenerateThread() {
       AERROR << "Fail to get reference line";
       continue;
     }
-    std::unique_lock<std::mutex> lock(reference_lines_mutex__);
+    std::unique_lock<std::mutex> lock(reference_lines_mutex_);
     reference_lines_ = reference_lines;
     route_segments_ = segments;
     lock.unlock();
@@ -187,16 +194,16 @@ bool ReferenceLineProvider::GetReferenceLines(
     std::list<hdmap::RouteSegments> *segments) {
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
-  constexpr double kTimeout = 100;  // milliseconds
-  auto timeout_duration = std::chrono::duration<double, std::milli>(kTimeout);
+  constexpr float kTimeout = 1000.0;  // seconds
+  auto timeout_duration = std::chrono::duration<float, std::milli>(kTimeout);
   if (FLAGS_enable_reference_line_provider_thread) {
-    std::unique_lock<std::mutex> lock(reference_lines_mutex__);
+    std::unique_lock<std::mutex> lock(reference_lines_mutex_);
     if (!cv_has_reference_line_.wait_for(lock, timeout_duration, [this]() {
           return !reference_lines_.empty();
         })) {
       lock.unlock();
       AWARN << "Reference line calculation timeout (" << kTimeout
-            << "). Will retry...";
+            << "ms). Will retry...";
       return false;
     }
     reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
@@ -354,6 +361,13 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     return SmoothRouteSegment(*segments, reference_line);
   }
   lock.unlock();
+  if (prev_segment->IsWaypointOnSegment(shifted_segments.LastWaypoint())) {
+    *segments = *prev_segment;
+    segments->SetProperties(segment_properties);
+    *reference_line = *prev_ref;
+    ADEBUG << "Could not further extend reference line";
+    return true;
+  }
   hdmap::Path path;
   hdmap::PncMap::CreatePathFromLaneSegments(shifted_segments, &path);
   ReferenceLine new_ref(path);

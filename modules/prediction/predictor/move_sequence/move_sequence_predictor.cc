@@ -99,7 +99,8 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
                       &enable_lane_sequence);
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
-    if (sequence.lane_segment_size() <= 0) {
+    if (sequence.lane_segment_size() <= 0 ||
+        sequence.lane_segment(0).lane_point_size() <= 0) {
       AERROR << "Empty lane segments.";
       continue;
     }
@@ -145,12 +146,18 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
            motion_trajectory_points.size());
   double t = 0.0;
   for (size_t i = 0; i < maneuver_trajectory_points.size(); ++i) {
-    double motion_weight = MotionWeight(t);
-    const TrajectoryPoint& maneuver_point = maneuver_trajectory_points[i];
-    const TrajectoryPoint& motion_point = motion_trajectory_points[i];
     TrajectoryPoint trajectory_point;
-    WeightedMean(maneuver_point, motion_point,
-        1 - motion_weight, motion_weight, &trajectory_point);
+    if (FLAGS_enable_kf_tracking) {
+      double motion_weight = MotionWeight(t);
+      const TrajectoryPoint& maneuver_point = maneuver_trajectory_points[i];
+      const TrajectoryPoint& motion_point = motion_trajectory_points[i];
+
+      WeightedMean(maneuver_point, motion_point,
+          1 - motion_weight, motion_weight, &trajectory_point);
+    } else {
+      trajectory_point = maneuver_trajectory_points[i];
+    }
+
     points->push_back(trajectory_point);
     t += freq;
   }
@@ -284,6 +291,9 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   if (FLAGS_enable_kf_tracking) {
     v = feature.t_speed();
     a = feature.t_acc();
+  }
+  if (FLAGS_enable_lane_sequence_acc) {
+    a = lane_sequence.acceleration();
   }
   double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
 

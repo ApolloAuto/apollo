@@ -5,7 +5,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "perception_lib",
     srcs = ["perception.cc"],
-    hdrs = ["perception.h"],
+    hdrs = [
+        "perception.h",
+        "perception_interface.h",
+    ],
     deps = [
         "//modules/common:apollo_app",
         "//modules/common:log",

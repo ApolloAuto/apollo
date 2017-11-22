@@ -21,6 +21,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -52,15 +53,14 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
       QueryPositionMatchedPoint(planning_init_point, complete_rtk_trajectory_);
 
   std::uint32_t forward_buffer = FLAGS_rtk_trajectory_forward;
-  std::uint32_t end_index =
-      matched_index + forward_buffer >= complete_rtk_trajectory_.size()
-          ? complete_rtk_trajectory_.size() - 1
-          : matched_index + forward_buffer - 1;
+  // end_index is excluded.
+  std::uint32_t end_index = std::min<std::uint32_t>(
+      complete_rtk_trajectory_.size(), matched_index + forward_buffer);
 
   //  auto* trajectory_points = trajectory_pb->mutable_trajectory_point();
   std::vector<TrajectoryPoint> trajectory_points(
       complete_rtk_trajectory_.begin() + matched_index,
-      complete_rtk_trajectory_.begin() + end_index + 1);
+      complete_rtk_trajectory_.begin() + end_index);
 
   // reset relative time
   double zero_time = complete_rtk_trajectory_[matched_index].relative_time();

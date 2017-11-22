@@ -146,7 +146,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
-          planning_start_point.relative_time(), &trajectory)) {
+          planning_start_point.relative_time(),
+          planning_start_point.path_point().s(), &trajectory)) {
     std::string msg("Fail to aggregate planning trajectory.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

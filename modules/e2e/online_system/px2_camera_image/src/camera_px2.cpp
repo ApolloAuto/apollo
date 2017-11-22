@@ -23,10 +23,8 @@
 #include <stdlib.h>
 #include <memory>
 
-#ifdef LINUX
 #include <execinfo.h>
 #include <unistd.h>
-#endif
 
 #include <cstring>
 #include <functional>
@@ -38,14 +36,13 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
-#include <lodepng.h>
 
 // SAMPLE COMMON
-#include <common/GLCheck.hpp>
-#include <common/WindowGLFW.hpp>
-#include <common/WindowEGL.hpp>
-#include <common/ProgramArguments.hpp>
-#include <common/ConsoleColor.hpp>
+#include "Checks.hpp"
+#include "WindowGLFW.hpp"
+#include "WindowEGL.hpp"
+#include "ProgramArguments.hpp"
+#include "ConsoleColor.hpp"
 
 // CORE
 #include <dw/core/Context.h>
@@ -94,20 +91,6 @@ dwImageStreamerHandle_t nvm2gl = DW_NULL_HANDLE;
 dwImageStreamerHandle_t nvm2cpu = DW_NULL_HANDLE;
 
 dwImageCPU *frameCPU = nullptr;
-
-// Program arguments
-ProgramArguments g_arguments(
-{
-    ProgramArguments::Option_t("camera-type", "ar0231"),
-    ProgramArguments::Option_t("csi-port", "ab"),
-    ProgramArguments::Option_t("offscreen", "0"),
-    ProgramArguments::Option_t("write-file", ""),
-    ProgramArguments::Option_t("serialize-type", "h264"),
-    ProgramArguments::Option_t("serialize-bitrate", "8000000"),
-    ProgramArguments::Option_t("serialize-framerate", "30"),
-    ProgramArguments::Option_t("slave", "0"),
-
-});
 
 //------------------------------------------------------------------------------
 void initGL(WindowBase **window)
@@ -160,7 +143,7 @@ void initRenderer(dwRendererHandle_t *renderer,
 //------------------------------------------------------------------------------
 void initSensors(dwSALHandle_t *sal, dwSensorHandle_t *camera,
                  uint32_t *imageWidth, uint32_t *imageHeight, dwImageType *cameraImageType,
-                 dwContextHandle_t context)
+                 dwContextHandle_t context, ProgramArguments arg)
 {
     dwStatus result;
 
@@ -173,7 +156,7 @@ void initSensors(dwSALHandle_t *sal, dwSensorHandle_t *camera,
 
     // create GMSL Camera interface
     dwSensorParams params;
-    std::string parameterString = g_arguments.parameterString();
+    std::string parameterString = arg.parameterString();
     parameterString             += ",output-format=yuv+data";
     params.parameters           = parameterString.c_str();
     params.protocol             = "camera.gmsl";
@@ -200,12 +183,12 @@ void initSensors(dwSALHandle_t *sal, dwSensorHandle_t *camera,
               << " at " << cameraProperties.framerate << " FPS" << std::endl;
 }
 
-void init(int& image_width, int& image_height) {
+void init(int& image_width, int& image_height, ProgramArguments arg) {
     initGL(&window);
     initSdk(&sdk, window);
     initRenderer(&renderer, sdk, window);
-    initSensors(&sal, &cameraSensor, &image_width_, &image_height_, &cameraImageType, sdk);
-    if (cameraImageType != DW_IMAGE_NVMEDIA)
+    initSensors(&sal, &cameraSensor, &image_width_, &image_height_, &cameraImageType, sdk, arg);
+    if(cameraImageType != DW_IMAGE_NVMEDIA)
     {
         std::cerr << "Error: Expected nvmedia image type, received "
                   << cameraImageType << " instead." << std::endl;
@@ -281,22 +264,22 @@ bool read_frame(unsigned char** image_data) {
         return false;
     }
 
-    if (cameraProperties.outputTypes & DW_CAMERA_PROCESSED_IMAGE) {
+    if( cameraProperties.outputTypes & DW_CAMERA_PROCESSED_IMAGE) {
         status = dwSensorCamera_getImageNvMedia(&frame, DW_CAMERA_PROCESSED_IMAGE, frameHandle);
-        if (status != DW_SUCCESS) {
+        if( status != DW_SUCCESS ) {
             std::cout << "\n ERROR getImageNvMedia " << dwGetStatusName(status) << std::endl;
             return false;
         }
     }
 
     // get embedded lines
-    if (cameraProperties.outputTypes & DW_CAMERA_DATALINES) {
+    if( cameraProperties.outputTypes & DW_CAMERA_DATALINES) {
         const dwCameraDataLines* dataLines = nullptr;
         status = dwSensorCamera_getDataLines(&dataLines, frameHandle);
         // parse the data
-        if (status == DW_SUCCESS) {
+        if( status == DW_SUCCESS ) {
             status = dwSensorCamera_parseDataNvMedia(&sensorData, dataLines, cameraSensor);
-            if (status == DW_SUCCESS) {
+            if( status == DW_SUCCESS ) {
                 std::cout << "Exposure Time (s): " << sensorData.exposureMidpointTime << "\r";// std::endl;
             } else {
                 std::cout << "Could not parse embedded data: " << dwGetStatusName(status) << "\r"; //std::endl;
@@ -307,11 +290,6 @@ bool read_frame(unsigned char** image_data) {
             return false;
         }
     }
-
-    // log message
-    std::cout << frame->timestamp_us;
-    std::cout << " IMAGE SIZE " << frame->img->width << "x" << frame->img->height;
-    std::cout << std::endl;
 
     // Convert from YUV to RGBA
     if (frame && rgbaImagePool.size() > 0) {
@@ -324,52 +302,24 @@ bool read_frame(unsigned char** image_data) {
         if (status != DW_SUCCESS) {
             std::cout << "\n ERROR copyConvert: " << dwGetStatusName(status) << std::endl;
             rgbaImagePool.push_back(rgbaImage);
-
         } else {
-            // take screenshot if requested
-            //if (gTakeScreenshot)
-            //{
-            //    clock_t begin = clock();
-            //    std::cout << "width: " << rgbaImage->prop.width << std::endl;
-            //    std::cout << "height: " << rgbaImage->prop.height << std::endl;
-            //    NvMediaImageSurfaceMap surfaceMap;
-            //    if (NvMediaImageLock(rgbaImage->img, NVMEDIA_IMAGE_ACCESS_READ, &surfaceMap) == NVMEDIA_STATUS_OK) {
-            //    clock_t cpy_begin = clock();
-            //    memcpy(image_data, (unsigned char*)surfaceMap.surface[0].mapping, image_width_ * image_height_ * 4);
-            //    clock_t cpy_end = clock();
-            //    double cpy_time = double(cpy_end - cpy_begin)/ CLOCKS_PER_SEC;
-            //    std::cout << "copy use time: " << cpy_time << std::endl;
-            //        NvMediaImageUnlock(rgbaImage->img);
-            //    } else {
-            //        std::cout << "CANNOT LOCK NVMEDIA IMAGE - NO SCREENSHOT\n";
-            //    }
-            //    clock_t end = clock();
-            //    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-            //    std::cout << "use time: " << elapsed_secs << std::endl;
-            //}
-
-            // Send via ImageStreamer to get CPU image back
             status = dwImageStreamer_postNvMedia(rgbaImage, nvm2cpu);
             if (status != DW_SUCCESS) {
                 std::cout << "\n ERROR postNvMedia: " << dwGetStatusName(status) << std::endl;
                 return false;
-            } else {
-                status = dwImageStreamer_receiveCPU(&frameCPU, 60000, nvm2cpu);
-                if (status == DW_SUCCESS && frameCPU) {
-                    *image_data = frameCPU->data[0];
-                    //memcpy(image_data, frameCPU->data[0], image_width_ * image_height_ * 4);
-                    //dwImageStreamer_returnReceivedCPU(frameCPU, nvm2cpu);
-                } else {
-                    memset(image_data, 0, image_width_ * image_height_ * 4);
-                }
             }
-
-            // any image returned back, we put back into the pool
+            status = dwImageStreamer_receiveCPU(&frameCPU, 60000, nvm2cpu);
+            if (status == DW_SUCCESS && frameCPU) {
+                *image_data = frameCPU->data[0];
+            } else {
+                memset(image_data, 0, image_width_ * image_height_ * 4);
+            }
             dwImageNvMedia *retimg = nullptr;
             dwImageStreamer_waitPostedNvMedia(&retimg, 33000, nvm2cpu);
-
             if (retimg)
                 rgbaImagePool.push_back(retimg);
+            else
+                rgbaImagePool.push_back(rgbaImage);
         }
     }
 

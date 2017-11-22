@@ -82,23 +82,26 @@ function stop() {
 
 function help() {
   echo "Usage:"
-  echo "$0 [start]             Record bag to data/bag."
-  echo "$0 --portable-disk     Record bag to the largest portable disk."
-  echo "$0 stop                Stop recording."
-  echo "$0 help                Show this help message."
+  echo "$0 [start]                     Record bag to data/bag."
+  echo "$0 [start] --portable-disk     Record bag to the largest portable disk."
+  echo "$0 stop                        Stop recording."
+  echo "$0 help                        Show this help message."
 }
 
 case $1 in
   start)
-    start
+    shift
+    start $@
     ;;
   stop)
-    stop
+    shift
+    stop $@
     ;;
   help)
-    help
+    shift
+    help $@
     ;;
   *)
-    start
+    start $@
     ;;
 esac

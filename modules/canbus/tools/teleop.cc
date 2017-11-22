@@ -152,6 +152,8 @@ class Teleop {
           } else {
             throttle = GetCommand(throttle, FLAGS_throttle_inc_delta);
             control_command_.set_throttle(throttle);
+            brake = GetCommand(brake, -FLAGS_brake_inc_delta);
+            control_command_.set_brake(0.00);
           }
           printf("Throttle = %.2f, Brake = %.2f\n", control_command_.throttle(),
                  control_command_.brake());
@@ -166,6 +168,8 @@ class Teleop {
           } else {
             brake = GetCommand(brake, FLAGS_brake_inc_delta);
             control_command_.set_brake(brake);
+            throttle = GetCommand(throttle, -FLAGS_throttle_inc_delta);
+            control_command_.set_throttle(0.00);
           }
           printf("Throttle = %.2f, Brake = %.2f\n", control_command_.throttle(),
                  control_command_.brake());

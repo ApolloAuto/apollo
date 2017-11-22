@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "modules/planning/common/planning_gflags.h"
+
+DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
+
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_string(planning_adapter_config_filename,
@@ -93,6 +96,8 @@ DEFINE_double(max_collision_distance, 0.1,
 
 DEFINE_double(replan_distance_threshold, 5.0,
               "The distance threshold of replan");
+DEFINE_bool(estimate_current_vehicle_state, true,
+            "Estimate current vehicle state.");
 
 DEFINE_bool(enable_reference_line_provider_thread, true,
             "Enable reference line provider thread.");
@@ -187,6 +192,8 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
+DEFINE_string(reference_line_end_obstacle_id, "REF_END",
+              "Obstacle id for the end of reference line obstacle");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");

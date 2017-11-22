@@ -40,9 +40,14 @@ Status VehicleStateProvider::Update(
         "localization:\n", localization.DebugString());
     return Status(ErrorCode::LOCALIZATION_ERROR, msg);
   }
-  if (chassis.has_header() && chassis.header().has_timestamp_sec()) {
+  if (localization.has_header() && localization.header().has_timestamp_sec()) {
+    vehicle_state_.set_timestamp(localization.header().timestamp_sec());
+  } else if (chassis.has_header() && chassis.header().has_timestamp_sec()) {
+    AERROR << "Unable to use location timestamp for vehicle state. Use chassis "
+              "time instead.";
     vehicle_state_.set_timestamp(chassis.header().timestamp_sec());
   }
+
   if (chassis.has_speed_mps()) {
     vehicle_state_.set_linear_velocity(chassis.speed_mps());
   }
