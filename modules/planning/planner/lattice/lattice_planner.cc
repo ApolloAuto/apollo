@@ -40,9 +40,6 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
-std::size_t num_planning_cycles = 0;
-std::size_t num_planning_succeeded_cycles = 0;
-
 LatticePlanner::LatticePlanner() {}
 
 Status LatticePlanner::Init(const PlanningConfig& config) {
@@ -54,6 +51,9 @@ Status LatticePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point,
     Frame* frame,
     ReferenceLineInfo* reference_line_info) {
+
+  static std::size_t num_planning_cycles = 0;
+  static std::size_t num_planning_succeeded_cycles = 0;
 
   AINFO << "";
   AINFO << "[BEGIN]-------------------------------------------------";
@@ -68,7 +68,7 @@ Status LatticePlanner::Plan(
 
   // 2. compute the matched point of the init planning point on the reference
   // line.
-  PathPoint matched_point = ReferenceLineMatcher::match_to_reference_line(
+  PathPoint matched_point = ReferenceLineMatcher::MatchToReferenceLine(
       discretized_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
 
@@ -261,7 +261,7 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
     }
 
     PathPoint matched_ref_point =
-        ReferenceLineMatcher::match_to_reference_line(reference_line, s);
+        ReferenceLineMatcher::MatchToReferenceLine(reference_line, s);
 
     double x = 0.0;
     double y = 0.0;

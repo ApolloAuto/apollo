@@ -33,11 +33,11 @@ class ReferenceLineMatcher {
  public:
   ReferenceLineMatcher() = delete;
 
-  static common::PathPoint match_to_reference_line(
+  static common::PathPoint MatchToReferenceLine(
       const std::vector<common::PathPoint>& reference_line, const double x,
       const double y);
 
-  static common::PathPoint match_to_reference_line(
+  static common::PathPoint MatchToReferenceLine(
       const std::vector<common::PathPoint>& reference_line, const double s);
 
  private:

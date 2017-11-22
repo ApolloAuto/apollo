@@ -155,7 +155,7 @@ bool BehaviorDecider::StopDecisionNearDestination(Frame* frame,
 
   PointENU routing_end = frame->GetRoutingDestination();
   PathPoint routing_end_matched_point =
-      ReferenceLineMatcher::match_to_reference_line(discretized_reference_line,
+      ReferenceLineMatcher::MatchToReferenceLine(discretized_reference_line,
           routing_end.x(), routing_end.y());
 
   double dist_x = routing_end.x() - routing_end_matched_point.x();

@@ -55,7 +55,7 @@ void ADCNeighborhood::SetupADC(
   auto discretized_reference_line =
       ToDiscretizedReferenceLine(
           reference_line.reference_points());
-  PathPoint matched_point = ReferenceLineMatcher::match_to_reference_line(
+  PathPoint matched_point = ReferenceLineMatcher::MatchToReferenceLine(
       discretized_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
   std::array<double, 3> init_s;
@@ -138,7 +138,7 @@ double ADCNeighborhood::SpeedOnReferenceLine(
     const Obstacle* obstacle,
     const SLBoundary& sl_boundary) {
   PathPoint obstacle_point_on_ref_line =
-      ReferenceLineMatcher::match_to_reference_line(
+      ReferenceLineMatcher::MatchToReferenceLine(
           discretized_ref_points, sl_boundary.start_s());
   const PerceptionObstacle& perception_obstacle =
       obstacle->Perception();

@@ -35,7 +35,7 @@ using apollo::planning::util::InterpolateUsingLinearApproximation;
 using apollo::planning::util::interpolate;
 using apollo::common::math::GoldenSectionSearch;
 
-PathPoint ReferenceLineMatcher::match_to_reference_line(
+PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double x,
     const double y) {
   CHECK_GT(reference_line.size(), 0);
@@ -70,7 +70,7 @@ PathPoint ReferenceLineMatcher::match_to_reference_line(
                              reference_line[index_end], x, y);
 }
 
-PathPoint ReferenceLineMatcher::match_to_reference_line(
+PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double s) {
   auto comp =
       [](const PathPoint& point, const double s) { return point.s() < s; };
