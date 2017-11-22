@@ -16,8 +16,8 @@
 
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"

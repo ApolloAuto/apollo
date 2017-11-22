@@ -36,8 +36,8 @@ namespace prediction {
 
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::Id;
-using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
 
 PredictionMap::PredictionMap() {}
@@ -130,8 +130,8 @@ void PredictionMap::OnLane(
   }
 }
 
-bool PredictionMap::NearJunction(
-    const Eigen::Vector2d& point, const double radius) {
+bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
+                                 const double radius) {
   common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
