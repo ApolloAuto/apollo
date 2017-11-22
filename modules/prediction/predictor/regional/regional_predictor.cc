@@ -27,8 +27,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 
 namespace {

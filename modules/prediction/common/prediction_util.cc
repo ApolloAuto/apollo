@@ -20,9 +20,9 @@
 #include <limits>
 #include <string>
 
+#include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
@@ -78,11 +78,9 @@ void TranslatePoint(const double translate_x, const double translate_y,
 }
 
 void GenerateFreeMoveTrajectoryPoints(
-    Eigen::Matrix<double, 6, 1> *state,
-    const Eigen::Matrix<double, 6, 6>& transition,
-    const size_t num,
-    const double freq,
-    std::vector<TrajectoryPoint> *points) {
+    Eigen::Matrix<double, 6, 1>* state,
+    const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
+    const double freq, std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
@@ -151,12 +149,9 @@ void GenerateFreeMoveTrajectoryPoints(
 }
 
 void GenerateLaneSequenceTrajectoryPoints(
-    Eigen::Matrix<double, 4, 1> *state,
-    Eigen::Matrix<double, 4, 4> *transition,
-    const LaneSequence& sequence,
-    const size_t num,
-    const double freq,
-    std::vector<TrajectoryPoint> *points) {
+    Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
+    const LaneSequence& sequence, const size_t num, const double freq,
+    std::vector<TrajectoryPoint>* points) {
   PredictionMap* map = PredictionMap::instance();
   double lane_s = (*state)(0, 0);
   double lane_l = (*state)(1, 0);
