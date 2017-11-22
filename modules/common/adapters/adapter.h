@@ -261,20 +261,6 @@ class Adapter {
     header->set_sequence_num(++seq_num_);
   }
 
-  /**
-   * @brief fills the fields module_name, user provided timestamp and
-   * sequence_num in the header.
-   */
-  void FillHeader(const std::string& module_name, const double timestamp,
-                  D* data) {
-    static_assert(std::is_base_of<google::protobuf::Message, D>::value,
-                  "Can only fill header to proto messages!");
-    auto* header = data->mutable_header();
-    header->set_module_name(module_name);
-    header->set_timestamp_sec(timestamp);
-    header->set_sequence_num(++seq_num_);
-  }
-
   uint32_t GetSeqNum() const { return seq_num_; }
 
   void SetLatestPublished(const D& data) {
