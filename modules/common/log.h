@@ -25,10 +25,10 @@
 #include "glog/raw_logging.h"
 
 #define ADEBUG VLOG(4) << "[DEBUG] "
-#define AINFO {google::FlushLogFiles(0);}LOG(INFO)
-#define AWARN {google::FlushLogFiles(0);}LOG(WARNING)
-#define AERROR {google::FlushLogFiles(0);}LOG(ERROR)
-#define AFATAL {google::FlushLogFiles(0);}LOG(FATAL)
+#define AINFO LOG(INFO)
+#define AWARN LOG(WARNING)
+#define AERROR LOG(ERROR)
+#define AFATAL LOG(FATAL)
 
 // LOG_IF
 #define AINFO_IF(cond) LOG_IF(INFO, cond)
