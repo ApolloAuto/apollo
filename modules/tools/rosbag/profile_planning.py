@@ -40,9 +40,12 @@ def stat_planning(planning_msg):
         return stats
     stats["total_time"] = planning_msg.latency_stats.total_time_ms
     stats["init_time"] = planning_msg.latency_stats.init_frame_time_ms
+    used_time = stats["init_time"]
     stats["obstacles"] = len(planning_msg.decision.object_decision.decision)
     for task in planning_msg.latency_stats.task_stats:
         stats[task.name] = task.time_ms
+        used_time += task.time_ms
+    stats["other"] = stats["total_time"] - used_time
     return stats
 
 
@@ -56,7 +59,8 @@ def print_stat(msg, fhandle):
     keywords = [
         'obstacles', 'total_time', 'init_time', u'TrafficDecider',
         u'DpPolyPathOptimizer', u'PathDecider', u'DpStSpeedOptimizer',
-        u'SpeedDecider', u'QpSplinePathOptimizer', u'QpSplineStSpeedOptimizer'
+        u'SpeedDecider', u'QpSplinePathOptimizer', u'QpSplineStSpeedOptimizer',
+        u'other'
     ]
 
     if g_first_time:
