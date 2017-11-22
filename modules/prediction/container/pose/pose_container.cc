@@ -42,6 +42,7 @@ void PoseContainer::Update(
   } else if (!localization.has_pose()) {
     AERROR << "Localization message has no pose ["
            << localization.ShortDebugString() << "].";
+    return;
   } else if (!localization.pose().has_position() ||
              !localization.pose().has_linear_velocity()) {
     AERROR << "Localization message has no position or linear velocity ["
