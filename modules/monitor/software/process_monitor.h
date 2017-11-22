@@ -18,22 +18,21 @@
 
 #include <map>
 #include <string>
-#include <vector>
 
 #include "modules/monitor/common/monitor_interface.h"
-#include "modules/monitor/proto/module_monitor_conf.pb.h"
 
 namespace apollo {
 namespace monitor {
 
 class ProcessMonitor : public RecurrentRunner {
  public:
-  explicit ProcessMonitor(SystemStatus *system_status);
+  ProcessMonitor();
   void RunOnce(const double current_time) override;
 
  private:
-  ModuleMonitorConf config_;
-  google::protobuf::Map<std::string, ModuleStatus> *status_;  // No ownership.
+  static void UpdateModule(
+      const std::string &module_name, const ProcessConf &process_conf,
+      const std::map<std::string, std::string> &running_processes);
 };
 
 }  // namespace monitor
