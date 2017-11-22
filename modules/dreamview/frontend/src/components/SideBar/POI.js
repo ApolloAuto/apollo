@@ -21,7 +21,7 @@ export default class POI extends React.Component {
                                         }
                                         options.showPOI = false;
                                    }}
-                                   checked={routeEditingManager.currentPOI === key}/>
+                                   checked={false}/>
                 );
             });
 
