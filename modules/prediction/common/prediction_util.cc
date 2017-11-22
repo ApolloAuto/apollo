@@ -233,6 +233,27 @@ void GenerateLaneSequenceTrajectoryPoints(
   }
 }
 
+void GenerateStillSequenceTrajectoryPoints(
+    const double position_x, const double position_y, const double theta,
+    const double total_time, const double freq,
+    std::vector<TrajectoryPoint>* points) {
+  size_t total_num = static_cast<size_t>(total_time / freq);
+  for (size_t i = 0; i < total_num; ++i) {
+    double relative_time = static_cast<double>(i) * freq;
+    TrajectoryPoint trajectory_point;
+    PathPoint path_point;
+    path_point.set_x(position_x);
+    path_point.set_y(position_y);
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(0.0);
+    trajectory_point.set_a(0.0);
+    trajectory_point.set_relative_time(relative_time);
+    points->emplace_back(std::move(trajectory_point));
+  }
+}
+
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo

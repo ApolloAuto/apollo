@@ -23,6 +23,8 @@ from modules.planning.proto import planning_internal_pb2
 from modules.planning.proto import planning_pb2
 from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
+from modules.control.proto import control_cmd_pb2
+from modules.canbus.proto import chassis_pb2
 
 import proto_utils
 
@@ -56,6 +58,8 @@ class MessageType:
 
 topic_pb_list = [
     MessageType("planning", "/apollo/planning", planning_pb2.ADCTrajectory),
+    MessageType("control", "/apollo/control", control_cmd_pb2.ControlCommand),
+    MessageType("chassis", "/apollo/canbus/chassis", chassis_pb2.Chassis),
     MessageType("prediction", "/apollo/prediction",
                 prediction_obstacle_pb2.PredictionObstacles),
     MessageType("perception", "/apollo/perception",
