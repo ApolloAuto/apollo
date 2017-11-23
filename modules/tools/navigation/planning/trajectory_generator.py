@@ -39,7 +39,7 @@ class TrajectoryGenerator:
     def __init__(self):
         self.mobileye_pb = None
 
-    def generate(self, path_coef, final_path_length, speed, start_timestamp):
+    def generate(self, path_x, path_y, final_path_length, speed, start_timestamp):
         adc_trajectory = planning_pb2.ADCTrajectory()
         adc_trajectory.header.timestamp_sec = rospy.Time.now().to_sec()
         adc_trajectory.header.module_name = "planning"
@@ -49,20 +49,19 @@ class TrajectoryGenerator:
         s = 0
         relative_time = 0
 
-        for x in range(int(final_path_length)):
-            y = polyval(x, path_coef)
+        for x in range(int(final_path_length-1)):
+            y = path_y[x]
 
             traj_point = adc_trajectory.trajectory_point.add()
             traj_point.path_point.x = x
-            traj_point.path_point.y = -y
+            traj_point.path_point.y = y
             if x > 0:
-                dist = euclidean_distance((x, y),
-                                          (x - 1, polyval(x - 1, path_coef)))
+                dist = euclidean_distance((x, y), (x - 1, path_y[x-1]))
                 s += dist
                 relative_time += dist / speed
 
             traj_point.path_point.theta = get_theta(
-                (x + 1, polyval(x + 1, path_coef)), (0, polyval(0, path_coef)))
+                (x + 1, path_y[x+1]), (0, path_y[0]))
             traj_point.path_point.s = s
             traj_point.v = speed
             traj_point.relative_time = relative_time
