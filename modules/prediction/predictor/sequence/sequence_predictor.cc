@@ -32,10 +32,10 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
-using apollo::common::TrajectoryPoint;
-using apollo::common::PathPoint;
 
 void SequencePredictor::Predict(Obstacle* obstacle) {
   Clear();

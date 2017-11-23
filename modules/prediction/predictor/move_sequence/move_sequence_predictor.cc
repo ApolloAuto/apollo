@@ -96,13 +96,14 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
       position_y = feature.t_position().y();
     }
     double theta = feature.theta();
-    predictor_util::GenerateStillSequenceTrajectoryPoints(
-        position_x, position_y, theta,
-        FLAGS_prediction_duration,
+    ::apollo::prediction::predictor_util::GenerateStillSequenceTrajectoryPoints(
+        position_x, position_y, theta, FLAGS_prediction_duration,
         FLAGS_prediction_freq, &points);
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(1.0);
     trajectories_.push_back(std::move(trajectory));
+
+    ADEBUG << "Obstacle [" << obstacle->id() << "] has a still trajectory.";
     return;
   }
 

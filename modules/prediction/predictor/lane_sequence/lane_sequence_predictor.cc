@@ -42,6 +42,26 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
+  if (feature.is_still()) {
+    std::vector<TrajectoryPoint> points;
+    double position_x = feature.position().x();
+    double position_y = feature.position().y();
+    if (FLAGS_enable_kf_tracking) {
+      position_x = feature.t_position().x();
+      position_y = feature.t_position().y();
+    }
+    double theta = feature.theta();
+    ::apollo::prediction::predictor_util::GenerateStillSequenceTrajectoryPoints(
+        position_x, position_y, theta, FLAGS_prediction_duration,
+        FLAGS_prediction_freq, &points);
+    Trajectory trajectory = GenerateTrajectory(points);
+    trajectory.set_probability(1.0);
+    trajectories_.push_back(std::move(trajectory));
+
+    ADEBUG << "Obstacle [" << obstacle->id() << "] has a still trajectory.";
+    return;
+  }
+
   std::string lane_id = feature.lane().lane_feature().lane_id();
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
