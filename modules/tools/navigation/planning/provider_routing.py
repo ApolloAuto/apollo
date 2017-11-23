@@ -83,14 +83,17 @@ class RoutingProvider:
             return []
         distance = routing.project(point)
         points = []
-        for i in range(80):
+        total_length = routing.length
+        for i in range(120):
+            if (distance + i) >= total_length:
+                break
             p = routing.interpolate(distance + i)
             points.append(p.coords[0])
         return points
 
     def get_local_segment(self, utm_x, utm_y, heading):
         points = self.get_segment(utm_x, utm_y)
-        if points is None or len(points) < 10:
+        if points is None or len(points) < 30:
             return [], []
         points_x = []
         points_y = []
@@ -114,7 +117,7 @@ class RoutingProvider:
             # newy = y * math.cos(- heading + 1.570796) + x * math.sin(
             #    -heading + 1.570796)
             npath_x.append(newx)
-            npath_y.append(-1 * newy)
+            npath_y.append(newy)
         return npath_x, npath_y
 
     def get_local_segment_spline(self, utm_x, utm_y, heading):
@@ -127,7 +130,7 @@ class RoutingProvider:
         local_seg_x = local_seg_x[0:cut_idx]
         local_seg_y = local_seg_y[0:cut_idx]
 
-        if len(local_seg_x) <= 0:
+        if len(local_seg_x) <= 10:
             return [], []
         k = 3
         n = len(local_seg_x)
