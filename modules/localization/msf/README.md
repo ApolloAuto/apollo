@@ -16,20 +16,20 @@
 
 ## Modes
 
-### GNSS Localization Mode
-  This module works in two modes. One is directly to use gnss best pose (`/apollo/sensor/gnss/best_pose`) from INS system, such as Novatel system. In the second mode, the initial gnss observations and ephemeris information (`/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`) are used to calculate gnss localization result.
-
-  You can set `gnss_mode` in `apollo/localization/conf/localization.conf` to decide which mode you want to use. The default mode is gnss best pose.
-
-### LiDAR Localization Mode
-  We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost.
-
-### MSF Localization Mode
+### MSF Localization Modes
   We provide 4 modes for msf localization module. 3-Systems uses gnss localization result all the time, while 2-Systems only apply gnss localization result to initilize SINS alignment.
   1. 3-Systems(BestGnss + LiDAR + SINS): gnss_mode(0), gnss_only_init(false).
   2. 3-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(false).
   3. 2-Systems(BestGnss + LiDAR + SINS):gnss_mode(0), gnss_only_init(true).
   4. 2-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(true).
+
+### GNSS Localization Setting
+  This module works in two modes. One is directly to use gnss best pose (`/apollo/sensor/gnss/best_pose`) from INS system, such as Novatel system. In the second mode, the initial gnss observations and ephemeris information (`/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`) are used to calculate gnss localization result.
+
+  You can set `gnss_mode` in `apollo/localization/conf/localization.conf` to decide which mode you want to use. The default mode is gnss best pose.
+
+### LiDAR Localization Setting
+  We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost.
 
 ## Gnerate Localization Map
   Localization map is used for LiDAR-based localization, which is a grid-cell representation of the environment. Each cell stores the statistics of laser reflection intensity and altitude. The map is organized as a group of map nodes. For more information refer to `apollo/modules/localization/msf/local_map`.
