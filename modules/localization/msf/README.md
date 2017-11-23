@@ -26,10 +26,10 @@
 
 ### MSF Localization Mode
   We provide 4 modes for msf localization module. 3-Systems uses gnss localization result all the time, while 2-Systems only apply gnss localization result to initilize SINS alignment.
-  1.3-Systems(BestGnss + LiDAR + SINS): gnss_mode(0), gnss_only_init(false).
-  2.3-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(false).
-  3.2-Systems(BestGnss + LiDAR + SINS):gnss_mode(0), gnss_only_init(true).
-  4.2-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(true).
+  1. 3-Systems(BestGnss + LiDAR + SINS): gnss_mode(0), gnss_only_init(false).
+  2. 3-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(false).
+  3. 2-Systems(BestGnss + LiDAR + SINS):gnss_mode(0), gnss_only_init(true).
+  4. 2-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(true).
 
 ## Gnerate Localization Map
   Localization map is used for LiDAR-based localization, which is a grid-cell representation of the environment. Each cell stores the statistics of laser reflection intensity and altitude. The map is organized as a group of map nodes. For more information refer to `apollo/modules/localization/msf/local_map`.
