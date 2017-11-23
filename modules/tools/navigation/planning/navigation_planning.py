@@ -33,6 +33,7 @@ from provider_mobileye import MobileyeProvider
 from provider_chassis import ChassisProvider
 from provider_localization import LocalizationProvider
 from provider_routing import RoutingProvider
+from lanemarker_corrector import LaneMarkerCorrector
 
 planning_pub = None
 PUB_NODE_NAME = "planning"
@@ -69,18 +70,38 @@ def chassis_callback(chassis_pb):
 def mobileye_callback(mobileye_pb):
     global nx, ny
     start_timestamp = time.time()
+    if localization_provider.localization_pb is None:
+        return
+    if chassis_provider.chassis_pb is None:
+        return
 
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
 
     if ENABLE_ROUTING_AID:
-        mobileye_provider.routing_correct(routing_provider,
-                                          localization_provider)
+        vx = localization_provider.localization_pb.pose.position.x
+        vy = localization_provider.localization_pb.pose.position.y
+        heading = localization_provider.localization_pb.pose.heading
+        local_smooth_seg_x, local_smooth_seg_y = \
+            routing_provider.get_local_segment_spline(vx, vy, heading)
 
-    path_coef, path_length = path_decider.get_path(
-        mobileye_provider.left_lane_marker_coef,
-        mobileye_provider.right_lane_marker_coef,
-        chassis_provider.get_speed_mps())
+        if len(local_smooth_seg_x) <= 0:
+            path_x, path_y, path_length = path_decider.get_path(
+                mobileye_provider.left_lane_marker_coef,
+                mobileye_provider.right_lane_marker_coef,
+                chassis_provider.get_speed_mps())
+        else:
+            #print local_smooth_seg_y[0]
+            path_x, path_y, path_length = path_decider.get_routing_aid_path(
+                mobileye_provider.left_lane_marker_coef,
+                mobileye_provider.right_lane_marker_coef,
+                chassis_provider.get_speed_mps(),
+                mobileye_pb, local_smooth_seg_x, local_smooth_seg_y)
+    else:
+        path_x, path_y, path_length = path_decider.get_path(
+            mobileye_provider.left_lane_marker_coef,
+            mobileye_provider.right_lane_marker_coef,
+            chassis_provider.get_speed_mps())
 
     final_path_length = path_length
     speed = CRUISE_SPEED
@@ -89,7 +110,7 @@ def mobileye_callback(mobileye_pb):
         speed, final_path_length = speed_decider.get_target_speed_and_path_length(
             mobileye_provider, chassis_provider, path_length)
 
-    adc_trajectory = traj_generator.generate(path_coef, final_path_length,
+    adc_trajectory = traj_generator.generate(path_x, path_y, final_path_length,
                                              speed,
                                              start_timestamp=start_timestamp)
     planning_pub.publish(adc_trajectory)
