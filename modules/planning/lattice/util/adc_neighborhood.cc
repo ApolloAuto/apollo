@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/adc_neighborhood.h"
+#include "modules/planning/lattice/util/adc_neighborhood.h"
 
 #include <utility>
 #include <vector>
@@ -22,9 +22,9 @@
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/lattice/lattice_params.h"
-#include "modules/planning/lattice/reference_line_matcher.h"
-#include "modules/planning/lattice/lattice_util.h"
+#include "modules/planning/lattice/util/lattice_params.h"
+#include "modules/planning/lattice/util/reference_line_matcher.h"
+#include "modules/planning/lattice/util/lattice_util.h"
 
 namespace apollo {
 namespace planning {

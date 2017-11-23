@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/standing_still_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 
 #include "glog/logging.h"
 

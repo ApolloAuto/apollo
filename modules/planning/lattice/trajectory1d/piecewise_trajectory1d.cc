@@ -18,7 +18,7 @@
  * piecewise_polynomial_trajectory1d.cc
  */
 
-#include "modules/planning/lattice/piecewise_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/piecewise_trajectory1d.h"
 
 #include <cmath>
 

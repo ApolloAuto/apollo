@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/reference_line_matcher.h"
+#include "modules/planning/lattice/util/reference_line_matcher.h"
 
 #include <algorithm>
 #include <vector>

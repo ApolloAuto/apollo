@@ -23,7 +23,7 @@
 
 #include <vector>
 
-#include "modules/planning/lattice/adc_neighborhood.h"
+#include "modules/planning/lattice/util/adc_neighborhood.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/common/math/box2d.h"

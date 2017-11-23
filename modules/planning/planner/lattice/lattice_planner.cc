@@ -19,15 +19,15 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/lattice/lattice_params.h"
-#include "modules/planning/lattice/adc_neighborhood.h"
-#include "modules/planning/lattice/reference_line_matcher.h"
+#include "modules/planning/lattice/util/lattice_params.h"
+#include "modules/planning/lattice/util/adc_neighborhood.h"
+#include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_evaluator.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
-#include "modules/planning/lattice/collision_checker.h"
-#include "modules/planning/lattice/lattice_constraint_checker.h"
-#include "modules/planning/lattice/lattice_util.h"
+#include "modules/planning/lattice/util/collision_checker.h"
+#include "modules/planning/lattice/util/lattice_constraint_checker.h"
+#include "modules/planning/lattice/util/lattice_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
