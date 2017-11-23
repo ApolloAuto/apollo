@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/piecewise_acceleration_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
 
 #include <algorithm>
 

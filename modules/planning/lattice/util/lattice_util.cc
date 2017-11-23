@@ -16,7 +16,7 @@
 
 // NOTE: This file is created temporarily until lattice merge to master branch
 
-#include "modules/planning/lattice/lattice_util.h"
+#include "modules/planning/lattice/util/lattice_util.h"
 
 #include <utility>
 #include <vector>

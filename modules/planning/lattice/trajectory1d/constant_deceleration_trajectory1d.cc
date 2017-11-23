@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/constant_deceleration_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include <cmath>
 #include "modules/common/log.h"
 

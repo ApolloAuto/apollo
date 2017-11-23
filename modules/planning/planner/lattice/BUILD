@@ -16,15 +16,10 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/planner:planner",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/lattice:lattice_params",
-        "//modules/planning/lattice:reference_line_matcher",
+        "//modules/planning/lattice/util:lattice_util",
         "//modules/planning/lattice:trajectory1d_generator",
         "//modules/planning/lattice:trajectory_evaluator",
-        "//modules/planning/lattice:collision_checker",
-        "//modules/planning/lattice:lattice_constraint_checker",
         "//modules/planning/lattice/behavior_decider:behavior_decider",
-        "//modules/planning/lattice:lattice_util",
-        "//modules/planning/lattice:adc_neighborhood",
     ],
 )
 

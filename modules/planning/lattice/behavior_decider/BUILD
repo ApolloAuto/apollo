@@ -6,7 +6,6 @@ cc_library(
     name = "behavior_decider",
     hdrs = [
         "behavior_decider.h",
-        "scenario.h",
     ],
     srcs = [
         "behavior_decider.cc",
@@ -17,13 +16,11 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/lattice:lattice_params",
+        "//modules/planning/lattice/util:lattice_util",
         "//modules/planning/lattice/behavior_decider:scenario_manager",
         "//modules/planning/reference_line",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/proto:common_proto",
-        "//modules/planning/lattice:lattice_util",
-        "//modules/planning/lattice:reference_line_matcher",
         "//external:gflags",
     ],
 )
@@ -31,14 +28,13 @@ cc_library(
 cc_library(
     name = "scenario_manager",
     hdrs = [
-        "scenario.h",
-        "adc_master_scenario.h",
         "scenario_manager.h",
     ],
     srcs = [
         "scenario_manager.cc",
     ],
     deps = [
+    	":adc_master_scenario",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common/proto:pnc_point_proto",

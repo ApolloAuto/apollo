@@ -19,30 +19,32 @@ namespace apollo {
 namespace planning {
 
 class AdcMasterScenario : public Scenario {
-public: //implement virtual functions from Scenario
-    /**
-     * return code:
-     * 0 for existing head vehicle and -1 for NOT any head vehicle
-     */
-    virtual int ComputeScenarioDecision(
+ public:
+  virtual void
+  Reset () override;
+
+  virtual bool
+  Init () override;
+
+  virtual bool
+  ScenarioExist () const override {
+    return exist_;
+  }
+
+  virtual int
+  ComputeScenarioDecision (
       Frame* frame, const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<PlanningTarget>* const decisions) override;
+      std::vector<PlanningTarget>* const decisions);
 
-    virtual void Reset() override;
+ private:
+  bool exist_ = false;
 
-    virtual bool Init() override;
-
-    virtual bool ScenarioExist() const override { return exist_; }
-
-private:
-
-private:
-    bool exist_ = false;
-    DECLARE_SCENARIO(AdcMasterScenario);
+DECLARE_SCENARIO(AdcMasterScenario);
 };
 
 } // namespace planning
 } // namespace apollo
+
 #endif

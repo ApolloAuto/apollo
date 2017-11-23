@@ -21,10 +21,8 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 
 #include "modules/planning/lattice/behavior_decider/scenario.h"
-#include "modules/common/macro.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/lattice_sampling_config.pb.h"
 
 #include <unordered_map>
 #include <string>
@@ -34,8 +32,6 @@
 
 namespace apollo {
 namespace planning {
-
-class Scenario;
 
 class ScenarioManager {
  private:
@@ -57,7 +53,7 @@ class ScenarioManager {
 
   template<class T>
   void RegisterScenario(FeatureLevel level) {
-    auto scenario = std::unique_ptr<T>();
+    auto scenario = std::unique_ptr<T>(new T());
     scenarios_[static_cast<int>(level)].push_back(scenario.get());
     indexed_scenarios_[scenario->Name()] = std::move(scenario);
   }

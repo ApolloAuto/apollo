@@ -25,10 +25,10 @@
 
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/lattice_params.h"
-#include "modules/planning/lattice/reference_line_matcher.h"
+#include "modules/planning/lattice/util/lattice_params.h"
+#include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
-#include "modules/planning/lattice/lattice_util.h"
+#include "modules/planning/lattice/util/lattice_util.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/geometry.pb.h"
 

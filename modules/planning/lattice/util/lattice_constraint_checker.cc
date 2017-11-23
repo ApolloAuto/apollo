@@ -18,7 +18,7 @@
  * @file lattice_constraint_checker.h
  **/
 
-#include "modules/planning/lattice/lattice_constraint_checker.h"
+#include "modules/planning/lattice/util/lattice_constraint_checker.h"
 
 #include <iostream>
 
