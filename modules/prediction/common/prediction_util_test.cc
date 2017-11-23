@@ -66,9 +66,11 @@ TEST(PredictionUtilTest, translate_point) {
   double x = 1.0;
   double y = 2.0;
   TrajectoryPoint trajectory_point;
+  trajectory_point.mutable_path_point()->set_x(1.0);
+  trajectory_point.mutable_path_point()->set_y(1.0);
   TranslatePoint(x, y, &trajectory_point);
-  EXPECT_DOUBLE_EQ(trajectory_point.path_point().x(), 1.0);
-  EXPECT_DOUBLE_EQ(trajectory_point.path_point().y(), 2.0);
+  EXPECT_DOUBLE_EQ(trajectory_point.path_point().x(), 2.0);
+  EXPECT_DOUBLE_EQ(trajectory_point.path_point().y(), 3.0);
 }
 
 }  // namespace predictor_util

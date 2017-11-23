@@ -70,6 +70,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
                     TrajectoryPoint* point) {
   if (point == nullptr || !point->has_path_point()) {
     AERROR << "Point is nullptr or has NO path_point.";
+    return;
   }
   const double original_x = point->path_point().x();
   const double original_y = point->path_point().y();
