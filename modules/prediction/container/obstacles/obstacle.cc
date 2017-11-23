@@ -994,9 +994,9 @@ void Obstacle::SetMotionStatus() {
   int history_size = static_cast<int>(feature_history_.size());
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
-           << "is considered stationary.";
+           << "is considered moving.";
     if (history_size > 0) {
-      feature_history_.front().set_is_still(true);
+      feature_history_.front().set_is_still(false);
     }
     return;
   }
