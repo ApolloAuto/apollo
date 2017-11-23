@@ -114,13 +114,13 @@ void LidarProcessSubnode::OnPointCloud(
   /// get velodyne2world transfrom
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
-    AERROR << "failed to get trans at timestamp: " << kTimeStamp;
+    AERROR << "failed to get trans at timestamp: " << GLOG_TIMESTAMP(kTimeStamp);
     out_sensor_objects->error_code = common::PERCEPTION_ERROR_TF;
     PublishDataAndEvent(timestamp_, out_sensor_objects);
     return;
   }
   out_sensor_objects->sensor2world_pose = *velodyne_trans;
-  ADEBUG << "get trans pose succ.";
+  AINFO << "get trans pose succ." << *velodyne_trans;
   PERF_BLOCK_END("lidar_get_velodyne2world_transfrom");
 
   PointCloudPtr point_cloud(new PointCloud);

@@ -138,8 +138,8 @@ StatusCode FusionSubnode::Process(const EventMeta &event_meta,
     return StatusCode::FAIL;
   }
   PERF_BLOCK_START();
-  std::vector<ObjectPtr> fused_objects;
-  if (!fusion_->Fuse(sensor_objs, &fused_objects)) {
+  objects_.clear();
+  if (!fusion_->Fuse(sensor_objs, &objects_)) {
     AWARN << "Failed to call fusion plugin."
           << " event_meta: [" << event_meta.to_string()
           << "] event_cnt:" << events.size() << " event_0: ["
