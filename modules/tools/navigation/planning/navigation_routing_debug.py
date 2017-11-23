@@ -101,7 +101,7 @@ def mobileye_callback(mobileye_pb):
     for x in range(int(mobileye_provider.left_lane_marker_range)):
         y = polyval(x, left_marker_coef)
         left_marker_x.append(x)
-        left_marker_y.append(y)
+        left_marker_y.append(-y)
 
     right_marker_coef = mobileye_provider.right_lane_marker_coef
     right_marker_x = []
@@ -109,7 +109,7 @@ def mobileye_callback(mobileye_pb):
     for x in range(int(mobileye_provider.right_lane_marker_range)):
         y = polyval(x, right_marker_coef)
         right_marker_x.append(x)
-        right_marker_y.append(y)
+        right_marker_y.append(-y)
 
 
 def add_listener():
