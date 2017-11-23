@@ -27,9 +27,9 @@
 #include <utility>
 #include <vector>
 
+#include <tf2_ros/transform_broadcaster.h>
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
-#include <tf2_ros/transform_broadcaster.h>
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -74,38 +74,26 @@ class MSFLocalization : public LocalizationBase {
    */
   apollo::common::Status Stop() override;
 
-  void PublishPoseBroadcastTF(const LocalizationEstimate& localization);
-
  private:
   apollo::common::Status Init();
-  void OnTimer(const ros::TimerEvent &event);
+  void InitParams();
   void OnPointCloud(const sensor_msgs::PointCloud2 &message);
-  // void OnImu(const localization::Imu &imu_msg);
   void OnRawImu(const drivers::gnss::Imu &imu_msg);
-  void OnGps(const localization::Gps &gps_msg);
-  // void OnMeasure(const localization::IntegMeasure &measure_msg);
-  // void OnSinsPva(const localization::IntegSinsPva &sins_pva_msg);
   void OnGnssRtkObs(const EpochObservation &raw_obs_msg);
   void OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg);
   void OnGnssBestPose(const GnssBestPose &bestgnsspos_msg);
-  // void PublishLocalization();
-  // void RunWatchDog();
+
+  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
 
  private:
-  ros::Timer timer_;
   apollo::common::monitor::Monitor monitor_;
-  const std::vector<double> map_offset_;
-  double last_received_timestamp_sec_ = 0.0;
-  double last_reported_timestamp_sec_ = 0.0;
-  bool service_started_ = false;
-
   LocalizationInteg localization_integ_;
   LocalizationIntegParam localizaiton_param_;
-
-  tf2_ros::TransformBroadcaster* tf2_broadcaster_;
-
+  tf2_ros::TransformBroadcaster *tf2_broadcaster_;
   LocalizationMeasureState localization_state_;
   long long pcd_msg_index_;
+
+  // FRIEND_TEST(MSFLocalizationTest, InitParams);
 };
 
 }  // namespace localization

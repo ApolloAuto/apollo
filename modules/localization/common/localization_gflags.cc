@@ -60,26 +60,12 @@ DEFINE_bool(enable_gps_timestamp, false,
             "True to set gps timestamp as localization header timestamp");
 
 // msf parame
-// DEFINE_int32(tf2_buffer_expire_time, 10,
-//     "Query Ros TF timeout in ms. ros::Duration time.");
-// DEFINE_double(map_coverage_theshold, 0.9,
-//     "The valid coverage of pointcloud and map.");
-
 DEFINE_string(local_map_name, "local_map", "The path of localization map.");
-// DEFINE_string(lidar_extrinsic_file,
-//               "<ros>/share/velodyne_pointcloud/params/"
-//               "velodyne64_novatel_extrinsics_example.yaml",
-//               "Velodyne extrinsic path for the vehicle in use, "
-//               "where <ros> is the placeholder of ROS root.");
 DEFINE_string(lidar_height_file,
               "<ros>/share/velodyne_pointcloud/params/"
               "velodyne64_height_example.yaml",
               "Velodyne extrinsic path for the vehicle in use, "
               "where <ros> is the placeholder of ROS root.");
-// DEFINE_string(gnss_conf_path,
-// "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt",
-//               "GNSS config file path for the vehicle in use, "
-//               "where <ros> is the placeholder of ROS root.");
 DEFINE_int32(
     lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
@@ -107,14 +93,23 @@ DEFINE_bool(enable_ins_aid_rtk, false, "");
 DEFINE_bool(enable_auto_save_eph_file, true, "");
 DEFINE_string(eph_buffer_path, "", "");
 DEFINE_bool(gnss_debug_log_flag, false, "Gnss Debug switch.");
+DEFINE_bool(imuant_from_gnss_conf_file, true,
+            "Use imu ant from gnss configure file.");
+DEFINE_double(imu_to_ant_offset_x, 0.0, "Imu ant offset x");
+DEFINE_double(imu_to_ant_offset_y, 0.0, "Imu ant offset y");
+DEFINE_double(imu_to_ant_offset_z, 0.0, "Imu ant offset z");
+DEFINE_double(imu_to_ant_offset_ux, 0.0, "Imu ant offset x uncertainty");
+DEFINE_double(imu_to_ant_offset_uy, 0.0, "Imu ant offset y uncertainty");
+DEFINE_double(imu_to_ant_offset_uz, 0.0, "Imu ant offset z uncertainty");
 
+// common
 DEFINE_double(imu_rate, 1.0, "");
 DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
 DEFINE_bool(trans_gpstime_to_utctime, true, "");
 DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
-
-DEFINE_bool(use_visualize, false, "");
 DEFINE_bool(imu_coord_rfu, true, "Right/forward/up");
-DEFINE_bool(gnss_only_init, false, "Whether use bestgnsspose as measure after initializaiton.");
+DEFINE_bool(gnss_only_init, false,
+            "Whether use bestgnsspose as measure after initializaiton.");
 
-// DEFINE_bool(use_rawimu, true, "");
+// debug
+DEFINE_bool(use_visualize, false, "");

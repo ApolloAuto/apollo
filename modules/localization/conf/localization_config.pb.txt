@@ -1,1 +1,1 @@
-localization_type: MSF
+localization_type: RTK

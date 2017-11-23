@@ -37,4 +37,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "msf_localization_test",
+    size = "small",
+    srcs = [
+        "msf_localization_test.cc",
+    ],
+    data = ["//modules/localization:localization_testdata"],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/localization/msf:msf_localization",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

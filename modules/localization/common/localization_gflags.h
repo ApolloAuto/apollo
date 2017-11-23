@@ -76,20 +76,23 @@ DECLARE_bool(enable_auto_save_eph_file);
 DECLARE_string(eph_buffer_path);
 DECLARE_string(gnss_conf_path);
 DECLARE_bool(gnss_debug_log_flag);
+DECLARE_bool(imuant_from_gnss_conf_file);
+DECLARE_double(imu_to_ant_offset_x);
+DECLARE_double(imu_to_ant_offset_y);
+DECLARE_double(imu_to_ant_offset_z);
+DECLARE_double(imu_to_ant_offset_ux);
+DECLARE_double(imu_to_ant_offset_uy);
+DECLARE_double(imu_to_ant_offset_uz);
 
+// common
 DECLARE_double(imu_rate);
 DECLARE_int32(local_utm_zone_id);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
-
-DECLARE_bool(use_visualize);
-
 DECLARE_bool(imu_coord_rfu);
-
-DECLARE_bool(imu_coord_rfu);
-
 DECLARE_bool(gnss_only_init);
 
-// DECLARE_bool(use_rawimu);
+// Debug
+DECLARE_bool(use_visualize);
 
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
