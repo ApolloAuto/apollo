@@ -191,16 +191,17 @@ void MSFLocalization::InitParams() {
         common::util::TranslatePath(FLAGS_gnss_conf_path), &gnss_config));
     CHECK(gnss_config.login_commands_size() > 1);
     std::string login_commands = gnss_config.login_commands(1);
+    bool found_imu_ant_parameter = false;
     for (unsigned int i = 0; i < gnss_config.login_commands_size(); ++i) {
-      std::string command("SETIMUTOANTOFFSET");
-      std::string login_commands_i = gnss_config.login_commands(i);
-      // std::cerr << login_commands_i << std::endl;
-      std::size_t found = login_commands_i.find(command);
+      login_commands = gnss_config.login_commands(i);
+      std::size_t found = login_commands.find(std::string("SETIMUTOANTOFFSET"));
       if (found != std::string::npos) {
-        login_commands = login_commands_i;
+        found_imu_ant_parameter = true;
+        break;
       }
     }
-    // std::cerr << login_commands << std::endl;
+    CHECK(found_imu_ant_parameter);
+
     std::vector<std::string> segmented_login_commands =
         common::util::StringTokenizer::Split(login_commands, " ");
     // std::cerr << segmented_login_commands.size() << std::endl;
@@ -223,13 +224,13 @@ void MSFLocalization::InitParams() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_y = uncertainty_y;
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
 
-    LOG(INFO) << "Loaded IMUTOANTOFFSET: "
-              << localizaiton_param_.imu_to_ant_offset.offset_x << " "
+    std::cout << localizaiton_param_.imu_to_ant_offset.offset_x << " "
               << localizaiton_param_.imu_to_ant_offset.offset_y << " "
               << localizaiton_param_.imu_to_ant_offset.offset_z << " "
               << localizaiton_param_.imu_to_ant_offset.uncertainty_x << " "
               << localizaiton_param_.imu_to_ant_offset.uncertainty_y << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_z;
+              << localizaiton_param_.imu_to_ant_offset.uncertainty_z
+              << std::endl;
   }
 }
 
