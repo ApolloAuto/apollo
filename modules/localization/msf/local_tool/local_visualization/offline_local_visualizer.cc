@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/msf/local_tool/local_visualization/offline_local_visualizer.h"
 #include <boost/filesystem.hpp>
 #include "modules/localization/msf/common/io/velodyne_utility.h"
@@ -19,12 +35,14 @@ OfflineLocalVisualizer::~OfflineLocalVisualizer() {}
 
 bool OfflineLocalVisualizer::Init(const std::string &map_folder,
                                   const std::string &pcd_folder,
+                                  const std::string &pcd_timestamp_file,
                                   const std::string &gnss_loc_file,
                                   const std::string &lidar_loc_file,
                                   const std::string &fusion_loc_file,
                                   const std::string &extrinsic_file) {
   map_folder_ = map_folder;
   pcd_folder_ = pcd_folder;
+  pcd_timestamp_file_ = pcd_timestamp_file;
   gnss_loc_file_ = gnss_loc_file;
   lidar_loc_file_ = lidar_loc_file;
   fusion_loc_file_ = fusion_loc_file;
@@ -54,7 +72,14 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   }
   std::cout << "Load velodyne extrinsic succeed." << std::endl;
 
-  success = LidarLocFileHandler();
+  success = PCDTimestampFileHandler();
+  if (!success) {
+    std::cerr << "Handle pcd timestamp file failed." << std::endl;
+    return false;
+  }
+  std::cout << "Handle pcd timestamp file succeed." << std::endl;
+
+  success = LidarLocFileHandler(pcd_timestamps_);
   if (!success) {
     std::cerr << "Handle lidar localization file failed." << std::endl;
     return false;
@@ -110,8 +135,9 @@ void OfflineLocalVisualizer::Visualize() {
       const Eigen::Vector3d &lidar_std = std_found_iter->second;
       // lidar_loc_info.set(lidar_pose, "Lidar.", pcd_timestamps_[idx], idx +
       // 1);
-      lidar_loc_info.set(lidar_pose, lidar_std, "Lidar.", pcd_timestamps_[idx],
-                         idx + 1);
+      lidar_loc_info.set(Eigen::Translation3d(lidar_pose.translation()),
+                         Eigen::Quaterniond(lidar_pose.linear()), lidar_std,
+                         "Lidar.", pcd_timestamps_[idx], idx + 1);
     }
 
     pose_found_iter = gnss_poses_.find(idx);
@@ -122,8 +148,8 @@ void OfflineLocalVisualizer::Visualize() {
       const Eigen::Affine3d &gnss_pose = pose_found_iter->second;
       const Eigen::Vector3d &gnss_std = std_found_iter->second;
       // gnss_loc_info.set(gnss_pose, "GNSS.", pcd_timestamps_[idx], idx + 1);
-      gnss_loc_info.set(gnss_pose, gnss_std, "GNSS.", pcd_timestamps_[idx],
-                        idx + 1);
+      gnss_loc_info.set(Eigen::Translation3d(gnss_pose.translation()), gnss_std,
+                        "GNSS.", pcd_timestamps_[idx], idx + 1);
     }
 
     pose_found_iter = fusion_poses_.find(idx);
@@ -135,8 +161,9 @@ void OfflineLocalVisualizer::Visualize() {
       const Eigen::Vector3d &fusion_std = std_found_iter->second;
       // fusion_loc_info.set(fusion_pose, "Fusion.", pcd_timestamps_[idx],
       //                    idx + 1);
-      fusion_loc_info.set(fusion_pose, fusion_std, "Fusion.",
-                          pcd_timestamps_[idx], idx + 1);
+      fusion_loc_info.set(Eigen::Translation3d(fusion_pose.translation()),
+                          Eigen::Quaterniond(fusion_pose.linear()), fusion_std,
+                          "Fusion.", pcd_timestamps_[idx], idx + 1);
     }
 
     std::vector<LocalizatonInfo> loc_infos;
@@ -158,16 +185,37 @@ void OfflineLocalVisualizer::Visualize() {
   }
 }
 
-bool OfflineLocalVisualizer::LidarLocFileHandler() {
+bool OfflineLocalVisualizer::PCDTimestampFileHandler() {
+  pcd_timestamps_.clear();
+
+  FILE *file = fopen(pcd_timestamp_file_.c_str(), "r");
+  if (file) {
+    unsigned int index;
+    double timestamp;
+    int size = 2;
+    while ((size = fscanf(file, "%u %lf\n", &index, &timestamp)) == 2) {
+      pcd_timestamps_.push_back(timestamp);
+    }
+    fclose(file);
+  } else {
+    std::cerr << "Can't open file to read: " << pcd_timestamp_file_
+              << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+bool OfflineLocalVisualizer::LidarLocFileHandler(
+    const std::vector<double> &pcd_timestamps) {
   std::vector<Eigen::Affine3d> poses;
   std::vector<Eigen::Vector3d> stds;
+  std::vector<double> timestamps;
   // velodyne::LoadPcdPoses(lidar_loc_file_, poses, pcd_timestamps_);
-  velodyne::LoadPosesAndStds(lidar_loc_file_, poses, stds, pcd_timestamps_);
+  velodyne::LoadPosesAndStds(lidar_loc_file_, poses, stds, timestamps);
 
-  for (unsigned int idx = 0; idx < poses.size(); idx++) {
-    lidar_poses_[idx] = poses[idx];
-    lidar_stds_[idx] = stds[idx];
-  }
+  PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
+                                lidar_poses_, lidar_stds_);
 
   return true;
 }
@@ -183,6 +231,7 @@ bool OfflineLocalVisualizer::GnssLocFileHandler(
   // PoseInterpolationByTime(poses, timestamps, pcd_timestamps, gnss_poses_);
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
                                 gnss_poses_, gnss_stds_);
+
   return true;
 }
 
@@ -266,16 +315,6 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
     while (in_timestamps[index] < ref_timestamp &&
            index < in_timestamps.size()) {
       ++index;
-    }
-
-    if (i == 0) {
-      std::cout << "in_timestamps[0]: " << in_timestamps[0] << std::endl;
-      std::cout << "in_timestamps[1]: " << in_timestamps[1] << std::endl;
-      std::cout << "in_timestamps[2]: " << in_timestamps[2] << std::endl;
-      std::cout << "ref_timestamps[0]: " << ref_timestamps[0] << std::endl;
-      std::cout << "ref_timestamps[1]: " << ref_timestamps[1] << std::endl;
-      std::cout << "ref_timestamps[2]: " << ref_timestamps[2] << std::endl;
-      std::cout << "index: " << index << std::endl;
     }
 
     if (index < in_timestamps.size()) {

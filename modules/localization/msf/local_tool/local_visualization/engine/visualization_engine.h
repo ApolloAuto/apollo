@@ -39,41 +39,64 @@ namespace msf {
 struct LocalizatonInfo {
   LocalizatonInfo() {
     is_valid = false;
+    is_has_attitude = false;
+    is_has_std = false;
     timestamp = 0.0;
     frame_id = 0;
-    std_var[0] = 0.1;
-    std_var[1] = 0.1;
-    std_var[1] = 0.1;
+    std_var[0] = 0.01;
+    std_var[1] = 0.01;
+    std_var[1] = 0.01;
   }
 
   ~LocalizatonInfo() {}
 
-  void set(const Eigen::Affine3d &pose, const Eigen::Vector3d &std_var,
+  void set(const Eigen::Translation3d &location,
+           const Eigen::Quaterniond &attitude, const Eigen::Vector3d &std_var,
            const std::string &description, const double &timestamp,
            const unsigned int &frame_id) {
-    this->pose = pose;
+    set(location, attitude, description, timestamp, frame_id);
     this->std_var = std_var;
-    this->description = description;
-    this->timestamp = timestamp;
-    this->frame_id = frame_id;
-    is_valid = true;
+    is_has_std = true;
   }
 
-  void set(const Eigen::Affine3d &pose, const std::string &description,
+  void set(const Eigen::Translation3d &location,
+           const Eigen::Quaterniond &attitude, const std::string &description,
            const double &timestamp, const unsigned int &frame_id) {
-    this->pose = pose;
+    set(location, description, timestamp, frame_id);
+    this->attitude = attitude;
+    this->pose = location * attitude;
+    is_has_attitude = true;
+  }
+
+  void set(const Eigen::Translation3d &location, const Eigen::Vector3d &std_var,
+           const std::string &description, const double &timestamp,
+           const unsigned int &frame_id) {
+    set(location, description, timestamp, frame_id);
+    this->std_var = std_var;
+    is_has_std = true;
+  }
+
+  void set(const Eigen::Translation3d &location, const std::string &description,
+           const double &timestamp, const unsigned int &frame_id) {
+    this->attitude = Eigen::Quaterniond::Identity();
+    this->location = location;
+    this->pose = location * attitude;
     this->description = description;
     this->timestamp = timestamp;
     this->frame_id = frame_id;
     is_valid = true;
   }
 
+  Eigen::Translation3d location;
+  Eigen::Quaterniond attitude;
   Eigen::Affine3d pose;
   Eigen::Vector3d std_var;
   std::string description;
   double timestamp;
   unsigned int frame_id;
   bool is_valid;
+  bool is_has_attitude;
+  bool is_has_std;
 };
 
 /**
@@ -132,6 +155,7 @@ class VisualizationEngine {
   void DrawLoc(const cv::Point &bias);
   void DrawStd(const cv::Point &bias);
   void DrawCloud(const cv::Point &bias);
+  void DrawTrajectory(const cv::Point &bias);
   void DrawLegend();
   void DrawInfo();
 
@@ -167,7 +191,31 @@ class VisualizationEngine {
   void SetScale(const double scale);
   void UpdateScale(const double factor);
   bool UpdateCarLocId();
+  bool UpdateTrajectoryGroups();
   void ProcessKey(int key);
+
+  inline void QuaternionToEuler(const double quaternion[4], double att[3]) {
+    double roll_main = 0.0;
+    double yaw_main = 0.0;
+    double dcm21 =
+        2 * (quaternion[2] * quaternion[3] + quaternion[0] * quaternion[1]);
+    double dcm20 =
+        2 * (quaternion[1] * quaternion[3] - quaternion[0] * quaternion[2]);
+    double dcm22 =
+        quaternion[0] * quaternion[0] - quaternion[1] * quaternion[1] -
+        quaternion[2] * quaternion[2] + quaternion[3] * quaternion[3];
+    double dcm01 =
+        2 * (quaternion[1] * quaternion[2] - quaternion[0] * quaternion[3]);
+    double dcm11 =
+        quaternion[0] * quaternion[0] - quaternion[1] * quaternion[1] +
+        quaternion[2] * quaternion[2] - quaternion[3] * quaternion[3];
+
+    att[0] = asin(dcm21);           // the angle rotate respect to X
+    att[1] = atan2(-dcm20, dcm22);  // the angle rotate respect to Y
+    att[2] = atan2(dcm01, dcm11);   // the angle rotate respect to Z
+
+    return;
+  }
 
  private:
   std::string map_folder_;
@@ -208,6 +256,7 @@ class VisualizationEngine {
   unsigned int loc_info_num_;
   unsigned int car_loc_id_;
   std::vector<LocalizatonInfo> cur_loc_infos_;
+  std::vector<std::map<double, Eigen::Vector2d>> trajectory_groups_;
 
   bool is_draw_car_;
   std::vector<cv::Mat> car_img_mats_;

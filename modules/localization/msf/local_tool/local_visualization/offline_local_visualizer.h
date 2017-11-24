@@ -41,6 +41,7 @@ class OfflineLocalVisualizer {
 
  public:
   bool Init(const std::string &map_folder, const std::string &pcd_folder,
+            const std::string &pcd_timestamp_file,
             const std::string &gnss_loc_file, const std::string &lidar_loc_file,
             const std::string &fusion_loc_file,
             const std::string &extrinsic_file);
@@ -48,7 +49,8 @@ class OfflineLocalVisualizer {
   void Visualize();
 
  private:
-  bool LidarLocFileHandler();
+  bool PCDTimestampFileHandler();
+  bool LidarLocFileHandler(const std::vector<double> &pcd_timestamps);
   bool GnssLocFileHandler(const std::vector<double> &pcd_timestamps);
   bool FusionLocFileHandler(const std::vector<double> &pcd_timestamps);
 
@@ -71,6 +73,7 @@ class OfflineLocalVisualizer {
  private:
   std::string map_folder_;
   std::string pcd_folder_;
+  std::string pcd_timestamp_file_;
   std::string gnss_loc_file_;
   std::string lidar_loc_file_;
   std::string fusion_loc_file_;

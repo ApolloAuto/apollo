@@ -42,41 +42,6 @@ void LoadPcdPoses(std::string file_path, std::vector<Eigen::Affine3d>& poses,
   }
 }
 
-// void LoadPosesAndStds(const std::string &file_path,
-//                     std::vector<Eigen::Affine3d>& poses,
-//                     std::vector<Eigen::Vector3d>& stds,
-//                     std::vector<double>& timestamps) {
-//   poses.clear();
-//   stds.clear();
-//   timestamps.clear();
-
-//   FILE* file = fopen(file_path.c_str(), "r");
-//   if (file) {
-//     unsigned int index;
-//     double timestamp;
-//     double x, y, z;
-//     double qx, qy, qz, qr;
-//     double std_x, std_y, std_z;
-//     int size = 12;
-//     while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf
-//     %lf\n", &index,
-//                           &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr, &std_x,
-//                           &std_y, &std_z)) == 12) {
-//       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
-//       Eigen::Quaterniond quat(qr, qx, qy, qz);
-//       poses.push_back(trans * quat);
-//       timestamps.push_back(timestamp);
-
-//       Eigen::Vector3d std;
-//       std << std_x, std_y, std_z;
-//       stds.push_back(std);
-//     }
-//     fclose(file);
-//   } else {
-//     std::cerr << "Can't open file to read: " << file_path << std::endl;
-//   }
-// }
-
 void LoadPosesAndStds(const std::string& file_path,
                       std::vector<Eigen::Affine3d>& poses,
                       std::vector<Eigen::Vector3d>& stds,
@@ -91,16 +56,19 @@ void LoadPosesAndStds(const std::string& file_path,
     double timestamp;
     double x, y, z;
     double qx, qy, qz, qr;
-    int size = 9;
-    while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
-                          &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9) {
+    double std_x, std_y, std_z;
+    int size = 12;
+    while (
+        (size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                       &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr,
+                       &std_x, &std_y, &std_z)) == 12) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
       Eigen::Quaterniond quat(qr, qx, qy, qz);
       poses.push_back(trans * quat);
       timestamps.push_back(timestamp);
 
       Eigen::Vector3d std;
-      std << 0, 0, 0;
+      std << std_x, std_y, std_z;
       stds.push_back(std);
     }
     fclose(file);
@@ -108,6 +76,40 @@ void LoadPosesAndStds(const std::string& file_path,
     std::cerr << "Can't open file to read: " << file_path << std::endl;
   }
 }
+
+// void LoadPosesAndStds(const std::string& file_path,
+//                       std::vector<Eigen::Affine3d>& poses,
+//                       std::vector<Eigen::Vector3d>& stds,
+//                       std::vector<double>& timestamps) {
+//   poses.clear();
+//   stds.clear();
+//   timestamps.clear();
+
+//   FILE* file = fopen(file_path.c_str(), "r");
+//   if (file) {
+//     unsigned int index;
+//     double timestamp;
+//     double x, y, z;
+//     double qx, qy, qz, qr;
+//     int size = 9;
+//     while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n",
+//     &index,
+//                           &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9)
+//                           {
+//       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
+//       Eigen::Quaterniond quat(qr, qx, qy, qz);
+//       poses.push_back(trans * quat);
+//       timestamps.push_back(timestamp);
+
+//       Eigen::Vector3d std;
+//       std << 0, 0, 0;
+//       stds.push_back(std);
+//     }
+//     fclose(file);
+//   } else {
+//     std::cerr << "Can't open file to read: " << file_path << std::endl;
+//   }
+// }
 
 // void save_pcd_poses(std::string file_path,
 //    const std::vector<numerical::Transform<double> >& poses,

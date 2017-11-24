@@ -9,10 +9,10 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-GNSS_LOC_TOPIC="/apollo/localization/measure_gnss"
-LIDAR_LOC_TOPIC="/apollo/localization/measure_lidar" 
+GNSS_LOC_TOPIC="/apollo/localization/msf_gnss"
+LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar" 
 FUSION_LOC_TOPIC="/apollo/localization/pose" 
-CLOUD_TOPIC="/apollo/sensor/velodyne64/compensator/PointCloud2"
+CLOUD_TOPIC="/apollo/sensor/velodyne64/compensator/PointCloud2"  
 
 $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/monitor_data_exporter \
     --bag_file $1 \

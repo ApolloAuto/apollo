@@ -132,6 +132,8 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   velodyne_extrinsic_ = extrinsic;
   loc_info_num_ = loc_info_num;
 
+  trajectory_groups_.resize(loc_info_num_);
+
   for (unsigned int i = 0; i < loc_info_num_; i++) {
     cv::Mat tem_mat = cv::imread(car_img_path[i % 3]);
     if (tem_mat.empty()) {
@@ -193,6 +195,7 @@ void VisualizationEngine::Visualize(
     return;
   }
 
+  UpdateTrajectoryGroups();
   cloud_ = cloud;
   Draw();
 }
@@ -287,6 +290,7 @@ void VisualizationEngine::Draw() {
   cv::Point node_grid_index = MapGridIndexToNodeGridIndex(map_grid_index);
   cv::Point bias = node_grid_index - map_grid_index;
 
+  DrawTrajectory(bias);
   DrawCloud(bias);
   DrawLoc(bias);
   DrawStd(bias);
@@ -314,6 +318,52 @@ void VisualizationEngine::Draw() {
   ProcessKey(cv::waitKey(waitTime));
 }
 
+void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
+  std::cout << "Draw trajectory." << std::endl;
+  if (cur_level_ == 0) {
+    unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
+    for (unsigned int k = 0; k < loc_info_num_; k++) {
+      std::map<double, Eigen::Vector2d> &trj = trajectory_groups_[i];
+      if (trj.empty()) {
+        continue;
+      }
+
+      cv::Point lt;
+      cv::Point pre_lt;
+      std::map<double, Eigen::Vector2d>::iterator iter = trj.end();
+      --iter;
+      const Eigen::Vector2d &loc_2d = iter->second;
+      lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
+      lt = lt + bias + cv::Point(1024, 1024);
+
+      unsigned char b = color_table[i % 3][0];
+      unsigned char g = color_table[i % 3][1];
+      unsigned char r = color_table[i % 3][2];
+      cv::circle(big_window_, lt, 4, cv::Scalar(b, g, r), 1);
+      pre_lt = lt;
+
+      int count = 0;
+      while (iter != trj.begin() && count < 500) {
+        --iter;
+        const Eigen::Vector2d &loc_2d = iter->second;
+        lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
+        lt = lt + bias + cv::Point(1024, 1024);
+
+        unsigned char b = color_table[i % 3][0];
+        unsigned char g = color_table[i % 3][1];
+        unsigned char r = color_table[i % 3][2];
+
+        cv::circle(big_window_, lt, 3, cv::Scalar(b, g, r), 1);
+        cv::line(big_window_, pre_lt, lt, cv::Scalar(b, g, r), 1);
+        pre_lt = lt;
+
+        ++count;
+      }
+      i = (i + 1) % loc_info_num_;
+    }
+  }
+}
+
 void VisualizationEngine::DrawLoc(const cv::Point &bias) {
   std::cout << "Draw loc." << std::endl;
   if (cur_level_ == 0) {
@@ -321,27 +371,37 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
     for (unsigned int k = 0; k < loc_info_num_; k++) {
       LocalizatonInfo &loc_info = cur_loc_infos_[i];
       cv::Point lt;
-      const Eigen::Vector3d &loc = loc_info.pose.translation();
-      const Eigen::Quaterniond quatd(loc_info.pose.linear());
-      Eigen::Matrix3d matrix = quatd.toRotationMatrix();
-      Eigen::Vector3d euler_angle = matrix.eulerAngles(1, 0, 2);
-      euler_angle = euler_angle * 180 / PI;
+      const Eigen::Translation3d &loc = loc_info.location;
 
-      double yaw = euler_angle[2];
       Eigen::Vector2d loc_2d;
-      loc_2d[0] = loc[0];
-      loc_2d[1] = loc[1];
+      loc_2d[0] = loc.x();
+      loc_2d[1] = loc.y();
 
       lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
       lt = lt + bias + cv::Point(1024, 1024);
 
-      if (is_draw_car_) {
+      if (is_draw_car_ && loc_info.is_has_attitude) {
+        const Eigen::Quaterniond &quatd = loc_info.attitude;
+        double quaternion[] = {quatd.w(), quatd.x(), quatd.y(), quatd.z()};
+        double euler_angle[3] = {0};
+        QuaternionToEuler(quaternion, euler_angle);
+        euler_angle[0] = euler_angle[0] * 180 / PI;
+        euler_angle[1] = euler_angle[1] * 180 / PI;
+        euler_angle[2] = euler_angle[2] * 180 / PI;
+        // Eigen::Matrix3d matrix = quatd.toRotationMatrix();
+        // Eigen::Vector3d euler_angle = matrix.eulerAngles(1, 0, 2);
+        // euler_angle = euler_angle * 180 / PI;
+        double yaw = euler_angle[2];
+
         cv::Mat mat_tem;
         cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
                    CV_INTER_LINEAR);
         cv::Mat rotated_mat;
         // std::cout << "yaw: " << yaw << std::endl;
-        RotateImg(mat_tem, rotated_mat, 90 - yaw);
+        // RotateImg(mat_tem, rotated_mat, 90 - yaw);
+        // RotateImg(mat_tem, rotated_mat, - yaw - 90);
+        // RotateImg(mat_tem, rotated_mat, yaw + 90);
+        RotateImg(mat_tem, rotated_mat, yaw - 90);
         cv::Point car_lt =
             lt - cv::Point(rotated_mat.cols / 2, rotated_mat.rows / 2);
         cv::Mat mat_mask;
@@ -368,28 +428,36 @@ void VisualizationEngine::DrawStd(const cv::Point &bias) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
       LocalizatonInfo &loc_info = cur_loc_infos_[i];
-      cv::Point lt;
-      const Eigen::Vector3d &loc = loc_info.pose.translation();
-      const Eigen::Vector3d &std = loc_info.std_var;
-      Eigen::Vector2d loc_2d;
-      loc_2d[0] = loc[0];
-      loc_2d[1] = loc[1];
+      if (loc_info.is_has_std) {
+        cv::Point lt;
+        const Eigen::Translation3d &loc = loc_info.location;
+        const Eigen::Vector3d &std = loc_info.std_var;
+        Eigen::Vector2d loc_2d;
+        loc_2d[0] = loc.x();
+        loc_2d[1] = loc.y();
 
-      lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
-      lt = lt + bias + cv::Point(1024, 1024);
+        lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
+        lt = lt + bias + cv::Point(1024, 1024);
 
-      unsigned char b = color_table[i % 3][0];
-      unsigned char g = color_table[i % 3][1];
-      unsigned char r = color_table[i % 3][2];
+        unsigned char b = color_table[i % 3][0];
+        unsigned char g = color_table[i % 3][1];
+        unsigned char r = color_table[i % 3][2];
 
-      cv::Size size(std[0] * 100 + 1.0, std[1] * 100 + 1.0);
-      cv::ellipse(big_window_, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2, 8);
-      i = (i + 1) % loc_info_num_;
+        cv::Size size(std::sqrt(std[0]) * 200 + 1.0,
+                      std::sqrt(std[1]) * 200 + 1.0);
+        cv::ellipse(big_window_, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2,
+                    8);
+        i = (i + 1) % loc_info_num_;
+      }
     }
   }
 }
 
 void VisualizationEngine::DrawCloud(const cv::Point &bias) {
+  if (!cur_loc_infos_[car_loc_id_].is_has_attitude) {
+    return;
+  }
+
   std::cout << "Draw cloud." << std::endl;
   if (cur_level_ == 0) {
     CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, cloud_img_,
@@ -779,6 +847,19 @@ bool VisualizationEngine::UpdateCarLocId() {
     }
   }
   return false;
+}
+
+bool VisualizationEngine::UpdateTrajectoryGroups() {
+  for (unsigned int i = 0; i < loc_info_num_; i++) {
+    if (cur_loc_infos_[i].is_valid) {
+      Eigen::Vector2d loc;
+      LocalizatonInfo &loc_info = cur_loc_infos_[i];
+      loc[0] = loc_info.location.x();
+      loc[1] = loc_info.location.y();
+      std::map<double, Eigen::Vector2d> &trajectory = trajectory_groups_[i];
+      trajectory[loc_info.timestamp] = loc;
+    }
+  }
 }
 
 void VisualizationEngine::ProcessKey(int key) {
