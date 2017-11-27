@@ -16,20 +16,14 @@
 
 #include "modules/prediction/network/net_model.h"
 
-#include <fstream>
 #include <sstream>
-#include <string>
-#include <vector>
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/prediction/proto/network_model.pb.h"
 
 namespace apollo {
 namespace prediction {
 namespace network {
-
-NetModel::NetModel() : ok_(false) {}
 
 bool NetModel::LoadModel(const NetParameter& net_parameter) {
   net_parameter_.CopyFrom(net_parameter);

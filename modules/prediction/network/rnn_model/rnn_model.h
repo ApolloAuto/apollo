@@ -14,13 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
 #include <vector>
 
 #include "Eigen/Dense"
 
 #include "modules/common/macro.h"
-#include "modules/prediction/network/net_layer.h"
 #include "modules/prediction/network/net_model.h"
 
 #ifndef MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
@@ -36,35 +34,37 @@ namespace network {
 
 /**
  * @class RnnModel
- * @brief RnnModel is a derived class from NetModel, it has a specific layers structure.
+ * @brief RnnModel is a derived class from NetModel, it has a specific layers
+ * structure.
  */
 class RnnModel : public NetModel {
  public:
   /**
-   * @brief Compute the model output from inputs according to a defined layers' flow
+   * @brief Compute the model output from inputs according to a defined layers'
+   * flow
    * @param Inputs to the network
    * @param Output of the network will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output) const;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) const override;
 
   /**
    * @brief Set the internal state of a network model
    * @param A specified internal state in a vector of Eigen::MatrixXf
    */
-  virtual void SetState(const std::vector<Eigen::MatrixXf>& states);
+  void SetState(const std::vector<Eigen::MatrixXf>& states) override;
 
   /**
    * @brief Access to the internal state of a network model
    * @return Internal state in a vector of Eigen::MatrixXf of the model
    */
-  virtual void State(std::vector<Eigen::MatrixXf>* states) const;
+  void State(std::vector<Eigen::MatrixXf>* states) const override;
 
   /**
    * @brief Set the internal state of a model
    * @param A specified internal state in a vector of Eigen::MatrixXf
    */
-  virtual void ResetState() const;
+  void ResetState() const override;
 
   DECLARE_SINGLETON(RnnModel);
 };
