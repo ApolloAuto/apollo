@@ -44,7 +44,7 @@ class Perception : public common::ApolloApp {
   void Stop() override;
 
  private:
-  DAGStreaming dag_streaming;
+  DAGStreaming dag_streaming_;
   void RegistAllOnboardClass();
 };
 

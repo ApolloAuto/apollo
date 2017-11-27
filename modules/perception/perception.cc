@@ -27,7 +27,6 @@
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
-
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 
@@ -58,12 +57,13 @@ Status Perception::Init() {
   const std::string dag_config_path =
       FileUtil::GetAbsolutePath(FLAGS_work_root, FLAGS_dag_config_path);
 
-    if (!dag_streaming.Init(dag_config_path)) {
+  if (!dag_streaming_.Init(dag_config_path)) {
     AERROR << "failed to Init DAGStreaming. dag_config_path:"
            << dag_config_path;
         return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
   }
   callback_thread_num_ = 5;
+
   return Status::OK();
 }
 
@@ -82,12 +82,14 @@ void Perception::RegistAllOnboardClass() {
 }
 
 Status Perception::Start() {
-  dag_streaming.Start();
+  dag_streaming_.Start();
   return Status::OK();
 }
 
 void Perception::Stop() {
-  dag_streaming.Stop();
+  dag_streaming_.Stop();
+  dag_streaming_.Join();
 }
+
 }  // namespace perception
 }  // namespace apollo

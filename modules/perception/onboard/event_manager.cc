@@ -79,10 +79,7 @@ bool EventManager::Publish(const Event &event) {
     // try second time.
     queue->try_push(event);
   }
-
-  // TODO(Yangguang Li): add debug log.
-  // XLOG(DEBUG) << ""
-
+  
   return true;
 }
 

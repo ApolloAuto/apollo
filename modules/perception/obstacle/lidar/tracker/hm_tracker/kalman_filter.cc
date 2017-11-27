@@ -98,6 +98,7 @@ bool KalmanFilter::InitParams(
 KalmanFilter::KalmanFilter() {
   name_ = "KalmanFilter";
   age_ = 0;
+  measurement_cached_history_size_ = s_measurement_cached_history_size_minimum_;
   velocity_covariance_ = s_initial_velocity_noise_ *
                          Eigen::Matrix3d::Identity();
   // states
