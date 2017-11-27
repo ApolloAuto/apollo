@@ -49,6 +49,11 @@ class TrajectoryCost {
   double RegularDistanceCost(const double distance) const;
 
  private:
+  double CalculatePathCost(const QuinticPolynomialCurve1d &curve,
+                           const double start_s, const double end_s) const;
+  double CalculateObstacleCost(const QuinticPolynomialCurve1d &curve,
+                               const double start_s, const double end_s) const;
+
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
   const common::VehicleParam vehicle_param_;
