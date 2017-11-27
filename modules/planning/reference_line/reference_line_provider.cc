@@ -311,17 +311,22 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
                                                 ReferenceLine *reference_line) {
   RouteSegments segment_properties;
   segment_properties.SetProperties(*segments);
-  auto prev_segment = route_segments_.begin();
+  std::list<hdmap::RouteSegments> prev_route_segments;
+  {
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    prev_route_segments = route_segments_;
+  }
+  auto prev_segment = prev_route_segments.begin();
   auto prev_ref = reference_lines_.begin();
-  while (prev_segment != route_segments_.end()) {
+  while (prev_segment != prev_route_segments.end()) {
     if (prev_segment->IsConnectedSegment(*segments)) {
       break;
     }
     ++prev_segment;
     ++prev_ref;
   }
-  if (prev_segment == route_segments_.end()) {
-    if (!route_segments_.empty() && segments->IsOnSegment()) {
+  if (prev_segment == prev_route_segments.end()) {
+    if (!prev_route_segments.empty() && segments->IsOnSegment()) {
       AWARN << "Current route segment is not connected with previous route "
                "segment";
     }
