@@ -181,17 +181,16 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
       return ErrorCode::CAN_CLIENT_ERROR_BASE;
     }
     if (recv_frames_[i].can_dlc != CANBUS_MESSAGE_LENGTH) {
-      cf.id = recv_frames_[i].can_id;
-      cf.len = recv_frames_[i].can_dlc;
-      std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
-      frames->push_back(cf);
-    } else {
       AERROR << "recv_frames_[" << i
              << "].can_dlc = " << recv_frames_[i].can_dlc
              << ", which is not equal to can message data length ("
              << CANBUS_MESSAGE_LENGTH << ").";
       return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
     }
+    cf.id = recv_frames_[i].can_id;
+    cf.len = recv_frames_[i].can_dlc;
+    std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
+    frames->push_back(cf);
   }
   return ErrorCode::OK;
 }
