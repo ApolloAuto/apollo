@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package apollo.monitor;
+
+import "modules/common/adapters/proto/adapter_config.proto";
+
+// For process monitor.
+message ProcessConf {
+  repeated string process_cmd_keywords = 1;
+}
+message ProcessStatus {
+  optional bool running = 1;
+}
+
+// For topic monitor.
+message TopicConf {
+  optional apollo.common.adapter.AdapterConfig.MessageType type = 1;
+  optional double acceptable_delay = 2 [default = 1];  // In seconds.
+}
+message TopicStatus {
+  optional double message_delay = 1;
+}
+
+message MonitorConf {
+  message ModuleConf {
+    optional string name = 1;
+    optional ProcessConf process_conf = 2;
+    optional TopicConf topic_conf = 3;
+  }
+  repeated ModuleConf modules = 1;
+
+  message HardwareConf {
+    optional string name = 1;
+    optional TopicConf topic_conf = 2;
+  }
+  repeated HardwareConf hardware = 2;
+}

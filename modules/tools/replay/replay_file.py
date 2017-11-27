@@ -26,82 +26,48 @@ import glob
 from std_msgs.msg import String
 from google.protobuf import text_format
 
-from modules.localization.proto import localization_pb2
-from modules.perception.proto import perception_obstacle_pb2
-from modules.perception.proto import traffic_light_detection_pb2
-from modules.planning.proto import planning_internal_pb2
-from modules.planning.proto import planning_pb2
-from modules.prediction.proto import prediction_obstacle_pb2
-from modules.routing.proto import routing_pb2
+import common.proto_utils as proto_utils
+from common.message_manager import PbMessageManager
 
-topic_msg_dict = {
-    "/apollo/planning":
-    planning_pb2.ADCTrajectory,
-    "/apollo/prediction":
-    prediction_obstacle_pb2.PredictionObstacles,
-    "/apollo/perception":
-    perception_obstacle_pb2.PerceptionObstacles,
-    "/apollo/routing_response":
-    routing_pb2.RoutingResponse,
-    "/apollo/routing_request":
-    routing_pb2.RoutingRequest,
-    "/apollo/localization/pose":
-    localization_pb2.LocalizationEstimate,
-    "/apollo/perception/traffic_light":
-    traffic_light_detection_pb2.TrafficLightDetection,
-}
-
-
-def generate_message(msg_type, filename):
-    """generate message from file"""
-    message = msg_type()
-    if not os.path.exists(filename):
-        return None
-    f_handle = file(filename, 'r')
-    text_format.Merge(f_handle.read(), message)
-    f_handle.close()
-    return message
-
-
-def identify_topic(filename):
-    f_handle = file(filename, 'r')
-    file_content = f_handle.read()
-    for topic, msg_type in topic_msg_dict.items():
-        message = msg_type()
-        try:
-            if text_format.Merge(file_content, message):
-                print "identified topic %s" % topic
-                f_handle.close()
-                return topic
-        except text_format.ParseError as e:
-            print "Tried %s, failed" % (topic)
-            continue
-    f_handle.close()
-    return None
+g_message_manager = PbMessageManager()
 
 
 def topic_publisher(topic, filename, period):
     """publisher"""
     rospy.init_node('replay_node', anonymous=True)
+    meta_msg = None
+    msg = None
     if not topic:
         print "Topic not specified, start to guess"
-        topic = identify_topic(filename)
-    if topic not in topic_msg_dict:
-        print "Unknown topic:", topic
-        sys.exit(0)
-    msg_type = topic_msg_dict[topic]
-    pub = rospy.Publisher(topic, msg_type, queue_size=1)
-    message = generate_message(msg_type, filename)
+        meta_msg, msg = g_message_manager.parse_file(filename)
+        topic = meta_msg.topic()
+    else:
+        meta_msg = g_message_manager.get_msg_meta_by_topic(topic)
+        if not meta_msg:
+            print("Failed to find meta info for topic: %s" % (topic))
+            return False
+        msg = meta_msg.parse_file(filename)
+        if not msg:
+            print("Failed to parse file[%s] with topic[%s]" % (filename,
+                                                               topic))
+            return False
+
+    if not msg or not meta_msg:
+        print("Unknown topic: %s" % topic)
+        return False
+
+    pub = rospy.Publisher(topic, meta_msg.msg_type(), queue_size=1)
     if period == 0:
         while not rospy.is_shutdown():
             raw_input("Press any key to publish one message...")
-            pub.publish(message)
-            print("message published")
+            pub.publish(msg)
+            print("Topic[%s] message published" % topic)
     else:
         rate = rospy.Rate(int(1.0 / period))
-        print("started to publish message with rate period %s" % period)
+        print("started to publish topic[%s] message with rate period %s" %
+              (topic, period))
         while not rospy.is_shutdown():
-            pub.publish(message)
+            pub.publish(msg)
             rate.sleep()
 
 

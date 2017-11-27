@@ -612,7 +612,7 @@ function main() {
       apollo_build_dbg $@
       ;;
     build_prof)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY  --copt='-pg' --cxxopt='-pg' --linkopt='-pg'"
+      DEFINES="${DEFINES} --config=cpu_prof --cxxopt=-DCPU_ONLY"
       apollo_build_dbg $@
       ;;
     build_no_perception)
