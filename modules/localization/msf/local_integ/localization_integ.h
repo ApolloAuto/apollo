@@ -45,6 +45,22 @@ typedef drivers::gnss::GnssBestPose GnssBestPose;
 
 enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
 
+class LocalizationResult {
+public:
+  LocalizationResult() : state_(LocalizationMeasureState::NOT_VALID) {}
+  LocalizationResult(const LocalizationMeasureState& state, 
+      const LocalizationEstimate& localiztion) : state_(state), localization_(localiztion) {}
+  LocalizationMeasureState state() const {
+    return state_;
+  }
+  LocalizationEstimate localization() const {
+    return localization_;
+  }
+private:
+  LocalizationMeasureState state_;
+  LocalizationEstimate localization_;
+};
+
 enum class LocalizationErrorCode {
   INTEG_ERROR = 0,
   LIDAR_ERROR,
@@ -163,14 +179,20 @@ class LocalizationInteg {
   // gnss best pose process
   void GnssBestPoseProcess(const GnssBestPose& bestgnsspos_msg);
 
-  void GetLidarLocalization(LocalizationMeasureState& state,
+  void GetLastestLidarLocalization(LocalizationMeasureState& state,
                        LocalizationEstimate& lidar_localization);
 
-  void GetIntegLocalization(LocalizationMeasureState& state, IntegSinsPva& sins_pva,
+  void GetLastestIntegLocalization(LocalizationMeasureState& state,
                        LocalizationEstimate& integ_localization);
 
-  void GetGnssLocalization(LocalizationMeasureState& state,
+  void GetLastestGnssLocalization(LocalizationMeasureState& state,
                       LocalizationEstimate& gnss_localization);
+
+  void GetLidarLocalizationList(std::list<LocalizationResult>& results);
+
+  void GetIntegLocalizationList(std::list<LocalizationResult>& results);
+
+  void GetGnssLocalizationList(std::list<LocalizationResult>& results);
 
  private:
   LocalizationIntegImpl* localization_integ_impl_;

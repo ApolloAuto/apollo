@@ -263,13 +263,18 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
 
   localization_integ_.PcdProcess(message);
 
-  LocalizationMeasureState state;
-  LocalizationEstimate lidar_localization;
-  localization_integ_.GetLidarLocalization(state, lidar_localization);
+  if (FLAGS_lidar_debug_log_flag) {
+    std::list<LocalizationResult> lidar_localization_list;
+    localization_integ_.GetLidarLocalizationList(lidar_localization_list);
 
-  if (state == LocalizationMeasureState::OK && FLAGS_lidar_debug_log_flag) {
-    // publish lidar message to debug
-    AdapterManager::PublishLocalizationMsfLidar(lidar_localization);
+    auto itr = lidar_localization_list.begin();
+    auto itr_end = lidar_localization_list.end();
+    for (; itr != itr_end; ++itr) {
+      if (itr->state() == LocalizationMeasureState::OK) {
+        // publish lidar message to debug
+        AdapterManager::PublishLocalizationMsfLidar(itr->localization());
+      }
+    }
   }
 
   return;
@@ -281,27 +286,23 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
   } else {
     localization_integ_.RawImuProcessFlu(imu_msg);
   }
-  LocalizaitonMeasureState state;
-  IntegSinsPva sins_pva;
-  LocalizationEstimate integ_localization;
-  localization_integ_.GetIntegLocalization(state, sins_pva, integ_localization);
 
-  if (state == LocalizationMeasureState::OK) {
-    PublishPoseBroadcastTF(integ_localization);
-  }
+  std::list<LocalizationResult> integ_localization_list;
+  localization_integ_.GetIntegLocalizationList(integ_localization_list);
 
-  if (FLAGS_integ_debug_log_flag) {
-    if (state != LocalizationMeasureState::NOT_VALID) {
-      // publish sins_pva for debug
-      AdapterManager::PublishLocalizationMsfSinsPva(sins_pva);
-    }
-
-    if (state == LocalizaitonMeasureState::OK) {
-      AdapterManager::PublishLocalization(integ_localization);
+  auto itr = integ_localization_list.begin();
+  auto itr_end = integ_localization_list.end();
+  for (; itr != itr_end; ++itr) {
+    if (itr->state() == LocalizationMeasureState::OK) {
+      PublishPoseBroadcastTF(itr->localization());
+      AdapterManager::PublishLocalization(itr->localization());
     }
   }
 
-  localization_state_ = state;
+  if (integ_localization_list.size()) {
+    localization_state_ = integ_localization_list.back().state();
+  }
+
   return;
 }  // namespace localization
 
@@ -314,11 +315,18 @@ void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
   localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);
 
   if (FLAGS_gnss_debug_log_flag) {
-    LocalizationMeasureState state;
-    LocalizationEstimate gnss_localization;
-    localization_integ_.GetGnssLocalization(state, gnss_localization);
-    AdapterManager::PublishLocalizationMsfGnss(gnss_localization);
+    std::list<LocalizationResult> gnss_localization_list;
+    localization_integ_.GetGnssLocalizationList(gnss_localization_list);
+
+    auto itr = gnss_localization_list.begin();
+    auto itr_end = gnss_localization_list.end();
+    for (; itr != itr_end; ++itr) {
+      if (itr->state() == LocalizationMeasureState::OK) {
+        AdapterManager::PublishLocalizationMsfGnss(itr->localization());
+      }
+    }
   }
+
   return;
 }
 
@@ -326,11 +334,18 @@ void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
   localization_integ_.RawObservationProcess(raw_obs_msg);
 
   if (FLAGS_gnss_debug_log_flag) {
-    LocalizationMeasureState state;
-    LocalizationEstimate gnss_localization;
-    localization_integ_.GetGnssLocalization(state, gnss_localization);
-    AdapterManager::PublishLocalizationMsfGnss(gnss_localization);
+    std::list<LocalizationResult> gnss_localization_list;
+    localization_integ_.GetGnssLocalizationList(gnss_localization_list);
+
+    auto itr = gnss_localization_list.begin();
+    auto itr_end = gnss_localization_list.end();
+    for (; itr != itr_end; ++itr) {
+      if (itr->state() == LocalizationMeasureState::OK) {
+        AdapterManager::PublishLocalizationMsfGnss(itr->localization());
+      }
+    }
   }
+
   return;
 }
 
