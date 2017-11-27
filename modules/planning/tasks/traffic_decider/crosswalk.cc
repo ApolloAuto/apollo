@@ -209,7 +209,11 @@ void Crosswalk::CreateStopObstacle(
   sl_point.set_s(crosswalk_overlap->start_s);
   sl_point.set_l(0);
   Vec2d vec2d;
-  reference_line_info->reference_line().SLToXY(sl_point, &vec2d);
+  if (reference_line_info->reference_line().SLToXY(sl_point, &vec2d)) {
+    AERROR << "Fail to create stop obstacle because SL to XY failed.";
+    return;
+  }
+
   double heading = reference_line_info->reference_line()
                        .GetReferencePoint(crosswalk_overlap->start_s)
                        .heading();
@@ -217,7 +221,6 @@ void Crosswalk::CreateStopObstacle(
   double right_width = 0.0;
   reference_line_info->reference_line().GetLaneWidth(crosswalk_overlap->start_s,
                                                      &left_width, &right_width);
-
   Box2d stop_wall_box{{vec2d.x(), vec2d.y()},
                       heading,
                       FLAGS_virtual_stop_wall_length,

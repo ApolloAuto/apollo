@@ -113,7 +113,7 @@ void Spline1dKernel::AddThirdOrderDerivativeMatrix(const double weight) {
 
 void Spline1dKernel::AddNthDerivativekernelMatrixForSplineK(
     const uint32_t n, const uint32_t k, const double weight) {
-  if (k < 0 || k + 1 >= x_knots_.size()) {
+  if (k + 1 >= x_knots_.size()) {
     AERROR << "Cannot add NthDerivativeKernel for spline K because k is out of "
               "range. k = "
            << k;
