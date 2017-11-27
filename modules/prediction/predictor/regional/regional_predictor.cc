@@ -27,8 +27,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 
 namespace {
@@ -239,6 +239,7 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
   kf.SetStateEstimate(x, P);
 
   Eigen::Matrix<double, 2, 4> B;
+  B.setZero();
   B(0, 0) = delta_ts;
   B(0, 2) = 0.5 * delta_ts * delta_ts;
   B(1, 1) = delta_ts;

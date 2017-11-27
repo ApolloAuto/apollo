@@ -71,7 +71,7 @@ em_planner_config {
         spline_order: 4
         max_spline_length: 20.0
         time_resolution: 0.1
-        regularization_weight: 1.0
+        regularization_weight: 1.0e-5
         first_spline_weight_factor: 0.0
         derivative_weight: 500.0
         second_derivative_weight: 1000.0
@@ -126,7 +126,7 @@ em_planner_config {
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
-            num_points_to_avg_kappa: 10
+            num_points_to_avg_kappa: 4
         }
     }
 }

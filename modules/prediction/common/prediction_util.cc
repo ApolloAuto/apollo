@@ -20,9 +20,9 @@
 #include <limits>
 #include <string>
 
+#include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
@@ -70,6 +70,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
                     TrajectoryPoint* point) {
   if (point == nullptr || !point->has_path_point()) {
     AERROR << "Point is nullptr or has NO path_point.";
+    return;
   }
   const double original_x = point->path_point().x();
   const double original_y = point->path_point().y();
@@ -78,11 +79,9 @@ void TranslatePoint(const double translate_x, const double translate_y,
 }
 
 void GenerateFreeMoveTrajectoryPoints(
-    Eigen::Matrix<double, 6, 1> *state,
-    const Eigen::Matrix<double, 6, 6>& transition,
-    const size_t num,
-    const double freq,
-    std::vector<TrajectoryPoint> *points) {
+    Eigen::Matrix<double, 6, 1>* state,
+    const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
+    const double freq, std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
@@ -151,12 +150,9 @@ void GenerateFreeMoveTrajectoryPoints(
 }
 
 void GenerateLaneSequenceTrajectoryPoints(
-    Eigen::Matrix<double, 4, 1> *state,
-    Eigen::Matrix<double, 4, 4> *transition,
-    const LaneSequence& sequence,
-    const size_t num,
-    const double freq,
-    std::vector<TrajectoryPoint> *points) {
+    Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
+    const LaneSequence& sequence, const size_t num, const double freq,
+    std::vector<TrajectoryPoint>* points) {
   PredictionMap* map = PredictionMap::instance();
   double lane_s = (*state)(0, 0);
   double lane_l = (*state)(1, 0);
@@ -235,6 +231,27 @@ void GenerateLaneSequenceTrajectoryPoints(
       (*state)(0, 0) = lane_s;
       lane_id = sequence.lane_segment(lane_segment_index).lane_id();
     }
+  }
+}
+
+void GenerateStillSequenceTrajectoryPoints(
+    const double position_x, const double position_y, const double theta,
+    const double total_time, const double freq,
+    std::vector<TrajectoryPoint>* points) {
+  size_t total_num = static_cast<size_t>(total_time / freq);
+  for (size_t i = 0; i < total_num; ++i) {
+    double relative_time = static_cast<double>(i) * freq;
+    TrajectoryPoint trajectory_point;
+    PathPoint path_point;
+    path_point.set_x(position_x);
+    path_point.set_y(position_y);
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(0.0);
+    trajectory_point.set_a(0.0);
+    trajectory_point.set_relative_time(relative_time);
+    points->emplace_back(std::move(trajectory_point));
   }
 }
 

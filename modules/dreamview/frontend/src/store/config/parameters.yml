@@ -13,7 +13,7 @@ camera:
     near: 1
     far: 100
   Map:
-    fov: 100
+    fov: 1000
     near: 1
     far: 3000
   Monitor:
@@ -66,7 +66,7 @@ options:
     showObstaclesId: true
     cameraAngle: Default
 websocket:
-  type: ros # json or ros
+  type: ros # json (offline) or ros (online/realtime)
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

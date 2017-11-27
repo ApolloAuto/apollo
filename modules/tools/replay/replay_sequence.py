@@ -25,13 +25,7 @@ import rospy
 from std_msgs.msg import String
 from google.protobuf import text_format
 
-from modules.localization.proto import localization_pb2
-from modules.perception.proto import perception_obstacle_pb2
-from modules.perception.proto import traffic_light_detection_pb2
-from modules.planning.proto import planning_internal_pb2
-from modules.planning.proto import planning_pb2
-from modules.prediction.proto import prediction_obstacle_pb2
-from modules.routing.proto import routing_pb2
+import common.proto_utils as proto_utils
 
 
 def generate_message(filename, pb_type):
@@ -45,38 +39,23 @@ def generate_message(filename, pb_type):
 def seq_publisher(seq_num, period):
     """publisher"""
     rospy.init_node('replay_node', anonymous=True)
-
-    # topic_name => module_name, pb type, pb, publish_handler
-    topic_name_map = {
-        "/apollo/localization/pose":
-        ["localization", localization_pb2.LocalizationEstimate, None, None],
-        "/apollo/routing_response":
-        ["routing", routing_pb2.RoutingResponse, None, None],
-        "/apollo/perception/obstacles": [
-            "perception", perception_obstacle_pb2.PerceptionObstacles, None,
-            None
-        ],
-        "/apollo/prediction": [
-            "prediction", prediction_obstacle_pb2.PredictionObstacles, None,
-            None
-        ],
-        "/apollo/planning":
-        ["planning", planning_pb2.ADCTrajectory, None, None],
-    }
-    for topic, module_features in topic_name_map.iteritems():
-        filename = str(seq_num) + "_" + module_features[0] + ".pb.txt"
+    messages = {}
+    for topic, msg_type in proto_utils.topic_pb_dict.iteritems():
+        messages[topic] = {}
+        filename = str(seq_num) + "_" + topic + ".pb.txt"
         print "trying to load pb file:", filename
-        module_features[3] = rospy.Publisher(
-            topic, module_features[1], queue_size=1)
-        module_features[2] = generate_message(filename, module_features[1])
-        if module_features[2] is None:
+        messages[topic]["publisher"] = rospy.Publisher(
+            topic, msg_type, queue_size=1)
+        pb_msg = msg_type()
+        if not proto_utils.get_pb_from_file(filename, pb_msg):
             print topic, " pb is none"
+        messages[topic]["value"] = pb_msg
 
     rate = rospy.Rate(int(1.0 / period))  # 10hz
     while not rospy.is_shutdown():
-        for topic, module_features in topic_name_map.iteritems():
-            if not module_features[2] is None:
-                module_features[3].publish(module_features[2])
+        for topic, module_features in messages:
+            if module_features["value"] is not None:
+                module_features["publisher"].publish(module_features["value"])
         rate.sleep()
 
 
