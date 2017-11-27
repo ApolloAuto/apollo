@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file trjactory_cost.h
+ * @file trajectory_cost.h
  **/
 
 #ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
