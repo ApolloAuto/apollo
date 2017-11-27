@@ -53,13 +53,14 @@ bool TLPreprocessorSubnode::InitInternal() {
     AERROR << "TLPreprocessorSubnode not found model: " << model_name;
     return false;
   }
+  float _max_process_image_fps;
   if (!model_config->GetValue("max_process_image_fps",
                               &_max_process_image_fps)) {
     AERROR << "TLPreprocessorSubnode Failed to find Conf: "
            << "max_process_image_fps.";
     return false;
   }
-  _proc_interval_seconds = 1.0 / _max_process_image_fps;
+  _proc_interval_seconds = 1.0f / _max_process_image_fps;
   if (!model_config->GetValue("query_tf_inverval_seconds",
                               &_query_tf_inverval_seconds)) {
     AERROR << "TLPreprocessorSubnode Failed to find Conf: "
@@ -78,11 +79,7 @@ bool TLPreprocessorSubnode::InitInternal() {
     AERROR << "TLPreprocessorSubnode Failed to init hdmap";
     return false;
   }
-  // init projection
-  if (!_projection.init()) {
-    AERROR << "TLPreprocessorSubnode init projection failed.";
-    return false;
-  }
+
 
   using common::adapter::AdapterManager;
   CHECK(AdapterManager::GetImageLong())
@@ -138,9 +135,9 @@ bool TLPreprocessorSubnode::add_data_and_publish_event(
     const CameraId &camera_id,
     double timestamp) {
   // add data down-stream
-  std::string device_id = kCameraIdToStr.at(camera_id);
+  std::string device_str = kCameraIdToStr.at(camera_id);
   std::string key;
-  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &key)) {
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_str, &key)) {
     AERROR << "TLPreprocessorSubnode gen share data key failed. ts:"
            << GLOG_TIMESTAMP(timestamp);
     return false;
@@ -158,7 +155,7 @@ bool TLPreprocessorSubnode::add_data_and_publish_event(
 
     Event event;
     event.event_id = event_meta.event_id;
-    event.reserve = device_id;
+    event.reserve = device_str;
     event.timestamp = timestamp;
     this->event_manager_->Publish(event);
   }
@@ -193,25 +190,15 @@ void TLPreprocessorSubnode::sub_camera_image(
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
 
-  bool camera_is_working = false;
-  if (!_preprocessor.get_camera_is_working_flag(camera_id, &camera_is_working)) {
-    AINFO << "get_camera_is_working_flag failed, ts: "
+  // 检查相机投影配置，如果投影配置有误（如标定文件问题等），不标记当前相机为使用状态
+  if (!_preprocessor.set_camera_is_working_flag(camera_id, true)) {
+    AINFO << "set_camera_is_working_flag failed, ts: "
           << GLOG_TIMESTAMP(image->ts())
           << ", camera_id: " << kCameraIdToStr.at(camera_id);
-    return;
-  }
-  if (!camera_is_working) {
-    // 检查相机投影配置，如果投影配置有误（如标定文件问题等），不标记当前相机为使用状态
-    if (_projection.has_camera(camera_id) &&
-        !_preprocessor.set_camera_is_working_flag(camera_id, true)) {
-      AINFO << "set_camera_is_working_flag failed, ts: "
-            << GLOG_TIMESTAMP(image->ts())
-            << ", camera_id: " << kCameraIdToStr.at(camera_id);
-    }
   }
 
   // 将原 sub_tf 的处理放到图像的 callback 里
-  add_cached_camera_selection(timestamp);
+  camera_selection(timestamp);
 
   // 根据最大处理帧率和上一帧处理时间，来判断是否跳过当前帧
 
@@ -274,11 +261,6 @@ void TLPreprocessorSubnode::sub_camera_image(
   // 记录处理当前帧的时间
   _last_proc_image_ts = TimeUtil::GetCurrentTime();
 
-  // convert rosmsg to cv::Mat
-  const double before_rosmsg_to_cv_mat_ts = TimeUtil::GetCurrentTime();
-  const double rosmsg_to_cv_mat_latency =
-      TimeUtil::GetCurrentTime() - before_rosmsg_to_cv_mat_ts;
-
   data->preprocess_receive_timestamp = sub_camera_image_start_ts;
   data->preprocess_send_timestamp = TimeUtil::GetCurrentTime();
   if (add_data_and_publish_event(data, camera_id, image->ts())) {
@@ -287,7 +269,6 @@ void TLPreprocessorSubnode::sub_camera_image(
     AINFO << "TLPreprocessorSubnode::sub_camera_image msg_time: "
           << GLOG_TIMESTAMP(image->ts())
           << " sync_image_latency: " << sync_image_latency * 1000 << " ms."
-          << " rosmsg_to_cv_mat_latency: " << rosmsg_to_cv_mat_latency * 1000 << " ms."
           << " sub_camera_image_latency: " <<
           (TimeUtil::GetCurrentTime() -
               sub_camera_image_start_ts) * 1000 << " ms."
@@ -347,9 +328,13 @@ bool TLPreprocessorSubnode::verify_lights_projection(
 
   bool projections_outside_all_images = false;
   CameraId selected_camera_id = CameraId::UNKNOWN;
-  if (!_preprocessor.select_camera_by_lights_projection(
-      ts, pose, signals, _projection, _s_image_borders, image_lights,
-      &projections_outside_all_images, &selected_camera_id)) {
+  if (!_preprocessor.select_camera_by_lights_projection(ts,
+                                                        pose,
+                                                        signals,
+                                                        image_lights,
+                                                        &projections_outside_all_images,
+                                                        &selected_camera_id,
+                                                        nullptr)) {
     AINFO << "_preprocessor.select_camera_by_lights_projection failed";
     return false;
   }
@@ -366,7 +351,7 @@ bool TLPreprocessorSubnode::verify_lights_projection(
   return true;
 }
 
-void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
+void TLPreprocessorSubnode::camera_selection(double ts) {
   const double current_ts = TimeUtil::GetCurrentTime();
   if (_last_query_tf_ts > 0.0 && current_ts - _last_query_tf_ts < _query_tf_inverval_seconds) {
     AINFO << "skip current tf msg, img_ts: " << GLOG_TIMESTAMP(ts)
@@ -378,13 +363,13 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   // get pose
   CarPose pose;
   if (!get_car_pose(ts, &pose)) {
-    AERROR << "add_cached_camera_selection failed to get car pose, ts:"
+    AERROR << "camera_selection failed to get car pose, ts:"
            << GLOG_TIMESTAMP(ts);
     return;
   }
   auto pos_x = std::to_string(pose.pose()(0, 3));
   auto pos_y = std::to_string(pose.pose()(1, 3));
-  AINFO << "add_cached_camera_selection get position (x, y): "
+  AINFO << "camera_selection get position (x, y): "
         << " (" << pos_x << ", " << pos_y << ").";
 
   // get signals
@@ -396,10 +381,10 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   if (!_hd_map->GetSignals(pose.pose(), &signals)) {
     if (ts - last_signals_ts < valid_hdmap_interval) {
       _preprocessor.GetLastSignals(&signals);
-      AWARN << "add_cached_camera_selection failed to get signals info. "
+      AWARN << "camera_selection failed to get signals info. "
             << "Now use last info. ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     } else {
-      AERROR << "add_cached_camera_selection failed to get signals info. "
+      AERROR << "camera_selection failed to get signals info. "
              << "ts:" << GLOG_TIMESTAMP(ts) << " pose:" << pose;
     }
   } else {
@@ -408,9 +393,7 @@ void TLPreprocessorSubnode::add_cached_camera_selection(double ts) {
   }
 
   bool projections_outside_all_images = false;
-  if (!_preprocessor.AddCachedLightsProjections(
-      pose, signals, _projection, TLPreprocessorSubnode::_s_image_borders, ts,
-      &projections_outside_all_images)) {
+  if (!_preprocessor.AddCachedLightsProjections(pose, signals, ts, &projections_outside_all_images, nullptr)) {
     AERROR << "add_cached_lights_projections failed, ts: " << GLOG_TIMESTAMP(ts);
   } else {
     AINFO << "add_cached_lights_projections succeed, ts: " << GLOG_TIMESTAMP(ts);

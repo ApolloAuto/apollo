@@ -171,9 +171,11 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   FLAGS_traffic_light_projection = "MultiCamerasProjection";
   ASSERT_TRUE(projection.init());
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(
-        pose, signals, projection, image_borders, timestamp,
-        &lights_projections_all_outside_image));
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose,
+                                                          signals,
+                                                          image_borders,
+                                                          timestamp,
+                                                          &lights_projections_all_outside_image));
   }
 
   // add light
@@ -208,9 +210,11 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
 
   signals.push_back(tl_signal);
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(
-        pose, signals, projection, image_borders, timestamp,
-        &lights_projections_all_outside_image));
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose,
+                                                          signals,
+                                                          image_borders,
+                                                          timestamp,
+                                                          &lights_projections_all_outside_image));
   }
 
   // valid pose
@@ -221,9 +225,11 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   _preprocessor->set_camera_is_working_flag(CameraId::LONG_FOCUS, true);
   _preprocessor->set_camera_is_working_flag(CameraId::SHORT_FOCUS, true);
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(
-        pose, signals, projection, image_borders, timestamp,
-        &lights_projections_all_outside_image));
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose,
+                                                          signals,
+                                                          image_borders,
+                                                          timestamp,
+                                                          &lights_projections_all_outside_image));
   }
 }
 
@@ -233,22 +239,22 @@ TEST_F(TLPreprocessorTest, test_is_in_bord) {
   int border_size = 50;
 
   cv::Rect roi1(0, 0, 20, 20);
-  ASSERT_TRUE(_preprocessor->is_in_bord(image_size, roi1, border_size));
+  ASSERT_TRUE(_preprocessor->is_on_border(image_size, roi1, border_size));
 
   cv::Rect roi2(0, 100, 20, 20);
-  ASSERT_TRUE(_preprocessor->is_in_bord(image_size, roi2, border_size));
+  ASSERT_TRUE(_preprocessor->is_on_border(image_size, roi2, border_size));
 
   cv::Rect roi3(100, 0, 20, 20);
-  ASSERT_TRUE(_preprocessor->is_in_bord(image_size, roi3, border_size));
+  ASSERT_TRUE(_preprocessor->is_on_border(image_size, roi3, border_size));
 
   cv::Rect roi4(300, 200, 100, 100);
-  ASSERT_TRUE(_preprocessor->is_in_bord(image_size, roi4, border_size));
+  ASSERT_TRUE(_preprocessor->is_on_border(image_size, roi4, border_size));
 
   cv::Rect roi5(300, 200, 10, 100);
-  ASSERT_TRUE(_preprocessor->is_in_bord(image_size, roi5, border_size));
+  ASSERT_TRUE(_preprocessor->is_on_border(image_size, roi5, border_size));
 
   cv::Rect roi6(300, 200, 100, 10);
-  ASSERT_TRUE(_preprocessor->is_in_bord(image_size, roi6, border_size));
+  ASSERT_TRUE(_preprocessor->is_on_border(image_size, roi6, border_size));
 }
 
 TEST_F(TLPreprocessorTest, test_set_and_get_camera_is_working_flag) {
@@ -574,13 +580,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     std::shared_ptr<LightPtrs> lights_on_image;
     std::shared_ptr<LightPtrs> lights_outside_image;
     ASSERT_TRUE(projection.init());
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        LONG_FOCUS,
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->project_lights(signals, pose, LONG_FOCUS, lights_on_image, lights_outside_image));
   }
 
   // invalid camera id
@@ -597,13 +597,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = -1;
-    ASSERT_FALSE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_FALSE(_preprocessor->project_lights(signals,
+                                               pose,
+                                               static_cast<CameraId>(cam_id),
+                                               lights_on_image,
+                                               lights_outside_image));
   }
   {
     CarPose pose;
@@ -618,13 +616,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = 1000;
-    ASSERT_FALSE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_FALSE(_preprocessor->project_lights(signals,
+                                               pose,
+                                               static_cast<CameraId>(cam_id),
+                                               lights_on_image,
+                                               lights_outside_image));
   }
 
   // long focus project on image
@@ -641,13 +637,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->project_lights(signals,
+                                              pose,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image,
+                                              lights_outside_image));
     EXPECT_EQ(1, lights_on_image->size());
     EXPECT_EQ(0, lights_outside_image->size());
   }
@@ -665,13 +659,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     _preprocessor->set_camera_is_working_flag(SHORT_FOCUS, true);
     prepare_test_data_short_focus(&pose, &(signals[0]));
 
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        SHORT_FOCUS,
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->project_lights(signals, pose, SHORT_FOCUS, lights_on_image, lights_outside_image));
     EXPECT_EQ(1, lights_on_image->size());
     EXPECT_EQ(0, lights_outside_image->size());
   }
@@ -690,13 +678,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
     pose._pose(0, 3) = pose._pose(0, 3) + 100000;
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->project_lights(signals,
+                                              pose,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image,
+                                              lights_outside_image));
     EXPECT_EQ(0, lights_on_image->size());
     EXPECT_EQ(1, lights_outside_image->size());
   }
@@ -715,13 +701,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_short_focus(&pose, &(signals[0]));
     pose._pose(0, 3) = pose._pose(0, 3) + 100000;
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->project_lights(signals,
+                                              pose,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image,
+                                              lights_outside_image));
     EXPECT_EQ(0, lights_on_image->size());
     EXPECT_EQ(1, lights_outside_image->size());
   }
@@ -782,13 +766,11 @@ TEST_F(TLPreprocessorTest, test_select_image) {
     std::vector<apollo::hdmap::Signal> signals(1);
     prepare_test_data_long_focus(&pose, &(signals[0]));
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image_array[0],
-        lights_outside_image_array[0]));
+    ASSERT_TRUE(_preprocessor->project_lights(signals,
+                                              pose,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image_array[0],
+                                              lights_outside_image_array[0]));
 
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(LONG_FOCUS, true));
     _preprocessor->select_image(
@@ -835,13 +817,11 @@ TEST_F(TLPreprocessorTest, test_select_image) {
     int cam_id = 0;
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(LONG_FOCUS, true));
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(SHORT_FOCUS, true));
-    ASSERT_TRUE(_preprocessor->project_lights(
-        projection,
-        signals,
-        pose,
-        static_cast<CameraId>(cam_id),
-        lights_on_image_array[0],
-        lights_outside_image_array[0]));
+    ASSERT_TRUE(_preprocessor->project_lights(signals,
+                                              pose,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image_array[0],
+                                              lights_outside_image_array[0]));
 
     _preprocessor->select_image(
         pose,

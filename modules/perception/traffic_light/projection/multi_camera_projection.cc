@@ -161,7 +161,7 @@ bool MultiCamerasProjection::project(const CarPose &pose,
   return true;
 }
 
-bool MultiCamerasProjection::has_camera(const CameraId &cam_id) {
+bool MultiCamerasProjection::has_camera(const CameraId &cam_id) const {
   std::map<int, std::string> camera_id_to_camera_name;
   camera_id_to_camera_name[static_cast<int>(CameraId::SHORT_FOCUS)] = "camera_6mm_focus";
   camera_id_to_camera_name[static_cast<int>(CameraId::LONG_FOCUS)] = "camera_25mm_focus";

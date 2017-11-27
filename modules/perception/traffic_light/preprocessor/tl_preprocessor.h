@@ -47,13 +47,11 @@ class TLPreprocessor : public BasePreprocessor {
     return "TLPreprocessor";
   }
 
-  bool AddCachedLightsProjections(
-      const CarPose &pose,
-      const std::vector<apollo::hdmap::Signal> &signals,
-      const MultiCamerasProjection &projection,
-      const std::map<int, int> &image_borders_size,
-      const double ts,
-      bool *projections_outside_all_images);
+  bool AddCachedLightsProjections(const CarPose &pose,
+                                  const std::vector<apollo::hdmap::Signal> &signals,
+                                  const std::map<int, int> &image_borders_size,
+                                  const double ts,
+                                  bool *projections_outside_all_images);
 
   bool SyncImage(
       const ImageSharedPtr &image,
@@ -83,15 +81,13 @@ class TLPreprocessor : public BasePreprocessor {
   bool set_max_cached_image_lights_array_size(size_t max_cached_image_lights_array_size);
   bool get_max_cached_image_lights_array_size(size_t *max_cached_image_lights_array_size) const;
 
-  bool select_camera_by_lights_projection(
-      const double timestamp,
-      const CarPose &pose,
-      const std::vector<apollo::hdmap::Signal> &signals,
-      const MultiCamerasProjection &projection,
-      const std::map<int, int> &image_borders_size,
-      std::shared_ptr<ImageLights> *image_lights,
-      bool *projections_outside_all_images,
-      CameraId *selected_camera_id);
+  bool select_camera_by_lights_projection(const double timestamp,
+                                          const CarPose &pose,
+                                          const std::vector<apollo::hdmap::Signal> &signals,
+                                          const std::map<int, int> &image_borders_size,
+                                          std::shared_ptr<ImageLights> *image_lights,
+                                          bool *projections_outside_all_images,
+                                          CameraId *selected_camera_id);
 
  private:
   void select_image(const CarPose &pose,
@@ -101,8 +97,7 @@ class TLPreprocessor : public BasePreprocessor {
                     CameraId *selection);
 
   //@brief Project lights from HDMap onto long focus or short focus image plane
-  bool project_lights(const MultiCamerasProjection &projection,
-                      const std::vector<apollo::hdmap::Signal> &signals,
+  bool project_lights(const std::vector<apollo::hdmap::Signal> &signals,
                       const CarPose &pose,
                       CameraId camera_id,
                       std::shared_ptr<LightPtrs> &lights_on_image,
@@ -118,12 +113,13 @@ class TLPreprocessor : public BasePreprocessor {
       double *diff_image_sys_ts,
       bool *sync_ok);
 
-  bool is_in_bord(const cv::Size size, const cv::Rect &roi, const int border_size) const;
+  bool is_on_border(const cv::Size size, const cv::Rect &roi, const int border_size) const;
 
   int get_min_focal_len_camera_id();
   int get_max_focal_len_camera_id();
 
  private:
+  MultiCamerasProjection _projection;
   std::vector<apollo::hdmap::Signal> _last_signals;
   double _last_signals_ts = -1;
   double _valid_hdmap_interval = 1.5;

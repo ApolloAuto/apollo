@@ -40,13 +40,7 @@
 
 namespace apollo {
 namespace perception {
-namespace onboard {
-class HDMapInput;
-}  // namepace onboard
-
 namespace traffic_light {
-
-class TLPreprocessorSubnode;
 
 //@brief pre-processor subnode
 class TLPreprocessorSubnode : public Subnode {
@@ -96,22 +90,19 @@ class TLPreprocessorSubnode : public Subnode {
       std::shared_ptr<ImageLights> *image_lights);
 
   // 原 sub_tf 的处理流程
-  void add_cached_camera_selection(double timestamp);
+  void camera_selection(double timestamp);
 
  private:
   TLPreprocessor _preprocessor;
-  MultiCamerasProjection _projection;
-
   TLPreprocessingData *_preprocessing_data = nullptr;
 
   HDMapInput *_hd_map = nullptr;  // HDMap
 
-  double _last_query_tf_ts = 0.0;
-  double _query_tf_inverval_seconds = 0.0;
+  float _last_query_tf_ts = 0.0;
+  float _query_tf_inverval_seconds = 0.0;
 
-  double _last_proc_image_ts = 0.0;
-  int _max_process_image_fps = 10;  // max frames to be processed per second
-  double _proc_interval_seconds = 0.0;  //
+  float _last_proc_image_ts = 0.0;
+  float _proc_interval_seconds = 0.0;  //
 
   static std::map<int, std::string> _s_camera_names;
 
@@ -121,6 +112,6 @@ class TLPreprocessorSubnode : public Subnode {
 REGISTER_SUBNODE(TLPreprocessorSubnode);
 } // namespace traffic_light
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H

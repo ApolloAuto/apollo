@@ -40,7 +40,7 @@ class MultiCamerasProjection {
   std::string name() const {
     return "TLPreprocessor";
   }
-  bool has_camera(const CameraId &cam_id);
+  bool has_camera(const CameraId &cam_id) const;
 
  private:
   std::map<std::string, CameraCoeffient> _camera_coeffients;

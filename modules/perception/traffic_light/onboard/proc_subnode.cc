@@ -98,7 +98,6 @@ bool TLProcSubnode::InitInternal() {
 }
 
 bool TLProcSubnode::ProcEvent(const Event &event) {
-  AINFO << "traffic light proc subnode";
   const double proc_subnode_handle_event_start_ts = TimeUtil::GetCurrentTime();
   PERF_FUNCTION();
   // get up-stream data

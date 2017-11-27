@@ -16,10 +16,6 @@
 
 #include "utils.h"
 
-#define _USE_MATH_DEFINES
-
-#include <cmath>
-
 namespace apollo {
 namespace perception {
 namespace traffic_light {
