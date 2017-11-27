@@ -213,8 +213,8 @@ void Crosswalk::CreateStopObstacle(
   double heading = reference_line_info->reference_line()
                        .GetReferencePoint(crosswalk_overlap->start_s)
                        .heading();
-  double left_width;
-  double right_width;
+  double left_width = 0.0;
+  double right_width = 0.0;
   reference_line_info->reference_line().GetLaneWidth(crosswalk_overlap->start_s,
                                                      &left_width, &right_width);
 
