@@ -16,12 +16,12 @@
 
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 
-#include <utility>
-#include <vector>
 #include <cmath>
 #include <memory>
-#include <string>
 #include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -62,8 +62,8 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   Eigen::MatrixXf obstacle_feature_mat;
   std::unordered_map<int, Eigen::MatrixXf> lane_feature_mats;
-  if (ExtractFeatureValues(obstacle_ptr,
-          &obstacle_feature_mat, &lane_feature_mats) != 0) {
+  if (ExtractFeatureValues(obstacle_ptr, &obstacle_feature_mat,
+                           &lane_feature_mats) != 0) {
     AWARN << "Fail to extract feature from obstacle";
     return;
   }
@@ -75,7 +75,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   Eigen::MatrixXf pred_mat;
   std::vector<Eigen::MatrixXf> states;
-  if (!obstacle_ptr->rnn_enabled()) {
+  if (!obstacle_ptr->RNNEnabled()) {
     obstacle_ptr->InitRNNStates();
   }
   obstacle_ptr->GetRNNStates(&states);
@@ -244,8 +244,8 @@ int RNNEvaluator::SetupLaneFeature(const Feature& feature,
                                    const LaneSequence& lane_sequence,
                                    std::vector<float>* const feature_values) {
   feature_values->clear();
-  feature_values->reserve(
-      dim_lane_point_feature_ * length_lane_point_sequence_);
+  feature_values->reserve(dim_lane_point_feature_ *
+                          length_lane_point_sequence_);
   LanePoint* p_lane_point = nullptr;
   int counter = 0;
   for (int seg_i = 0; seg_i < lane_sequence.lane_segment_size(); ++seg_i) {
@@ -268,8 +268,8 @@ int RNNEvaluator::SetupLaneFeature(const Feature& feature,
       float angle = std::atan2(diff_y, diff_x);
       feature_values->push_back(p_lane_point->heading());
       feature_values->push_back(p_lane_point->angle_diff());
-      feature_values->push_back(
-          p_lane_point->relative_l() - feature.lane().lane_feature().lane_l());
+      feature_values->push_back(p_lane_point->relative_l() -
+                                feature.lane().lane_feature().lane_l());
       feature_values->push_back(angle);
       ++counter;
       if (counter > length_lane_point_sequence_) {

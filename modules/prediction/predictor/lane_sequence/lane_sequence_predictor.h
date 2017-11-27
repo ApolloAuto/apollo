@@ -28,8 +28,8 @@
 
 #include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

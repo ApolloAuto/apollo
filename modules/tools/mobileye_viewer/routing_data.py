@@ -23,9 +23,12 @@ import json
 class RoutingData:
     def __init__(self, routing_str=None):
         self.routing_str = routing_str
+        self.routing_debug_str = None
         self.routing_data_lock = threading.Lock()
         self.routing_x = []
         self.routing_y = []
+        self.segment_x = []
+        self.segment_y = []
 
     def update(self, routing_str):
         self.routing_str = routing_str
@@ -41,4 +44,20 @@ class RoutingData:
         self.routing_data_lock.acquire()
         self.routing_x = routing_x
         self.routing_y = routing_y
+        self.routing_data_lock.release()
+
+    def update_debug(self, routing_debug_str):
+        self.routing_debug_str = routing_debug_str
+        segment_json = json.loads(routing_debug_str.data)
+        if segment_json is None:
+            return
+        segment_x = []
+        segment_y = []
+        for point in segment_json:
+            segment_x.append(point[0])
+            segment_y.append(point[1])
+
+        self.routing_data_lock.acquire()
+        self.segment_x = segment_x
+        self.segment_y = segment_y
         self.routing_data_lock.release()

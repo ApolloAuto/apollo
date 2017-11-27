@@ -25,9 +25,9 @@ namespace apollo {
 namespace monitor {
 
 // AdapterManager is required to listen to ins_status and gnss_status.
-class GpsMonitor : public HardwareMonitor {
+class GpsMonitor : public RecurrentRunner {
  public:
-  explicit GpsMonitor(SystemStatus *system_status);
+  GpsMonitor();
   void RunOnce(const double current_time) override;
 };
 

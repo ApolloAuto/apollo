@@ -37,9 +37,10 @@ class MoveSequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
     std::string file =
-      "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
   }
+
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
