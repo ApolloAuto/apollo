@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/prediction/proto/network_model.pb.h"
@@ -30,8 +31,6 @@ namespace network {
 
 NetModel::NetModel() : ok_(false) {}
 
-NetModel::~NetModel() { Clear(); }
-
 bool NetModel::LoadModel(const NetParameter& net_parameter) {
   net_parameter_.CopyFrom(net_parameter);
   layers_.clear();
@@ -39,55 +38,43 @@ bool NetModel::LoadModel(const NetParameter& net_parameter) {
   for (int i = 0; i < net_parameter_.layers_size(); ++i) {
     LayerParameter layer_pb = net_parameter_.layers(i);
     ADEBUG << i << "-th layer name: " << layer_pb.name().c_str();
-    Layer* layer = nullptr;
+    std::unique_ptr<Layer> layer(nullptr);
     switch (layer_pb.oneof_layers_case()) {
       case LayerParameter::kInput:
-        layer = new Input();
+        layer = std::unique_ptr<Layer>(new Input());
         break;
       case LayerParameter::kActivation:
-        layer = new Activation();
+        layer = std::unique_ptr<Layer>(new Activation());
         break;
       case LayerParameter::kDense:
-        layer = new Dense();
+        layer = std::unique_ptr<Layer>(new Dense());
         break;
       case LayerParameter::kBatchNormalization:
-        layer = new BatchNormalization();
+        layer = std::unique_ptr<Layer>(new BatchNormalization());
         break;
       case LayerParameter::kLstm:
-        layer = new LSTM();
+        layer = std::unique_ptr<Layer>(new LSTM());
         break;
       case LayerParameter::kFlatten:
-        layer = new Flatten();
+        layer = std::unique_ptr<Layer>(new Flatten());
         break;
       case LayerParameter::kConcatenate:
-        layer = new Concatenate();
+        layer = std::unique_ptr<Layer>(new Concatenate());
         break;
       default:
         AERROR << "Fail to load layer: " << layer_pb.type().c_str();
-        Clear();
         break;
     }
     if (!layer->Load(layer_pb)) {
       AERROR << "Fail to load " << i << "-layer: " << layer_pb.name().c_str();
-      Clear();
       return false;
     }
-    layers_.push_back(layer);
+    layers_.push_back(std::move(layer));
   }
   ok_ = true;
   AINFO << "Success to load model!";
   ADEBUG << "Its Performance:" << PerformanceString().c_str();
   return true;
-}
-
-void NetModel::Clear() {
-  for (size_t i = 0; i < layers_.size(); ++i) {
-    if (layers_[i] != nullptr) {
-      delete layers_[i];
-      layers_[i] = nullptr;
-    }
-  }
-  ok_ = false;
 }
 
 std::string NetModel::PerformanceString() const {
