@@ -19,7 +19,6 @@
  * @brief: polynomial smoothing spline
  **/
 
-#include <sstream>
 #include "modules/planning/math/smoothing_spline/spline_2d_seg.h"
 
 namespace apollo {

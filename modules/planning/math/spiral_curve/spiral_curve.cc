@@ -27,7 +27,7 @@ namespace planning {
 
 using apollo::common::PathPoint;
 
-SpiralCurve::SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
+SpiralCurve::SpiralCurve(const PathPoint& s, const PathPoint& e,
                          const std::uint32_t order)
     : start_point_(&s),
       end_point_(&e),
@@ -40,11 +40,11 @@ void SpiralCurve::SetSpiralConfig(const SpiralCurveConfig& spiral_config) {
 }
 
 // output params
-const common::PathPoint& SpiralCurve::start_point() const {
+const PathPoint& SpiralCurve::start_point() const {
   return *start_point_;
 }
 
-const common::PathPoint& SpiralCurve::end_point() const { return *end_point_; }
+const PathPoint& SpiralCurve::end_point() const { return *end_point_; }
 
 double SpiralCurve::sg() const { return sg_; }
 
