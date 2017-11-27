@@ -136,6 +136,12 @@ ErrorCode SocketCanClientRaw::Send(const std::vector<CanFrame> &frames,
     return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
   for (size_t i = 0; i < frames.size() && i < MAX_CAN_SEND_FRAME_LEN; ++i) {
+    if (frames[i].len != CANBUS_MESSAGE_LENGTH) {
+      AERROR << "frames[" << i << "].len = " << frames[i].len
+             << ", which is not equal to can message data length ("
+             << CANBUS_MESSAGE_LENGTH << ").";
+      return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
+    }
     send_frames_[i].can_id = frames[i].id;
     send_frames_[i].can_dlc = frames[i].len;
     std::memcpy(send_frames_[i].data, frames[i].data, frames[i].len);
@@ -174,18 +180,19 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
       AERROR << "receive message failed, error code: " << ret;
       return ErrorCode::CAN_CLIENT_ERROR_BASE;
     }
-    cf.id = recv_frames_[i].can_id;
-    cf.len = recv_frames_[i].can_dlc;
-    if (recv_frames_[i].can_dlc <= MAX_CAN_RECV_FRAME_LEN) {
+    if (recv_frames_[i].can_dlc != CANBUS_MESSAGE_LENGTH) {
+      cf.id = recv_frames_[i].can_id;
+      cf.len = recv_frames_[i].can_dlc;
       std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
+      frames->push_back(cf);
     } else {
-      AERROR << "recv_frames_[" << i << "].can_dlc = " << cf.len
-             << ", which exceeds max can received frame length ("
-             << MAX_CAN_RECV_FRAME_LEN;
+      AERROR << "recv_frames_[" << i
+             << "].can_dlc = " << recv_frames_[i].can_dlc
+             << ", which is not equal to can message data length ("
+             << CANBUS_MESSAGE_LENGTH << ").";
+      return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
     }
-    frames->push_back(cf);
   }
-
   return ErrorCode::OK;
 }
 
