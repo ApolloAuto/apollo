@@ -84,7 +84,8 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
   }
 
   // interpolate between it_lower - 1 and it_lower
-  return interpolate(*(it_lower - 1), *it_lower, s);
+  //return interpolate(*(it_lower - 1), *it_lower, s);
+  return InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower, s);
 }
 
 PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
