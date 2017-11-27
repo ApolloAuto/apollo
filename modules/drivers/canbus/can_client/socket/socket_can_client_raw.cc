@@ -176,7 +176,13 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
     }
     cf.id = recv_frames_[i].can_id;
     cf.len = recv_frames_[i].can_dlc;
-    std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
+    if (recv_frames_[i].can_dlc <= MAX_CAN_RECV_FRAME_LEN) {
+      std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
+    } else {
+      AERROR << "recv_frames_[" << i << "].can_dlc = " << cf.len
+             << ", which exceeds max can received frame length ("
+             << MAX_CAN_RECV_FRAME_LEN;
+    }
     frames->push_back(cf);
   }
 
