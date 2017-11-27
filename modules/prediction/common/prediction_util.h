@@ -80,11 +80,9 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @param generated trajectory points
  */
 void GenerateFreeMoveTrajectoryPoints(
-    Eigen::Matrix<double, 6, 1> *state,
-    const Eigen::Matrix<double, 6, 6>& transition,
-    const size_t num,
-    const double freq,
-    std::vector<::apollo::common::TrajectoryPoint> *points);
+    Eigen::Matrix<double, 6, 1>* state,
+    const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
+    const double freq, std::vector<::apollo::common::TrajectoryPoint>* points);
 
 /**
  * @brief Generate a set of lane sequence trajectory points
@@ -96,12 +94,22 @@ void GenerateFreeMoveTrajectoryPoints(
  * @param generated trajectory points
  */
 void GenerateLaneSequenceTrajectoryPoints(
-    Eigen::Matrix<double, 4, 1> *state,
-    Eigen::Matrix<double, 4, 4> *transition,
-    const LaneSequence& sequence,
-    const size_t num,
-    const double freq,
-    std::vector<::apollo::common::TrajectoryPoint> *points);
+    Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
+    const LaneSequence& sequence, const size_t num, const double freq,
+    std::vector<::apollo::common::TrajectoryPoint>* points);
+
+/**
+ * @brief Draw trajectory points for still obstacle
+ * @param obstacle obstacle
+ * @param lane_sequence the specified lane sequence
+ * @param total_time total time of prediction
+ * @param freq time step between prediction trajectory points
+ * @param points the output trajectory points
+ */
+void GenerateStillSequenceTrajectoryPoints(
+    const double position_x, const double position_y, const double theta,
+    const double total_time, const double freq,
+    std::vector<apollo::common::TrajectoryPoint>* points);
 
 }  // namespace predictor_util
 }  // namespace prediction

@@ -110,8 +110,7 @@ class PredictionMap {
    * @param radius The radius to search junctions.
    * @return If any junctions exist.
    */
-  static bool NearJunction(
-      const Eigen::Vector2d& point, const double radius);
+  static bool NearJunction(const Eigen::Vector2d& point, const double radius);
 
   /**
    * @brief Get the lane heading on a point.

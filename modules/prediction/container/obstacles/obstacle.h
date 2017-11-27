@@ -154,7 +154,7 @@ class Obstacle {
 
   void InitRNNStates();
 
-  bool rnn_enabled() const;
+  bool RNNEnabled() const;
 
  private:
   common::ErrorCode SetId(

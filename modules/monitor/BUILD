@@ -14,6 +14,8 @@ cc_library(
         "//modules/monitor/hardware/gps:gps_monitor",
         "//modules/monitor/proto:system_status_proto",
         "//modules/monitor/software:process_monitor",
+        "//modules/monitor/software:summary_monitor",
+        "//modules/monitor/software:topic_monitor",
     ],
 )
 

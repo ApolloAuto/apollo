@@ -19,7 +19,9 @@
 
 #include <string>
 
+#include "modules/common/macro.h"
 #include "modules/monitor/common/recurrent_runner.h"
+#include "modules/monitor/proto/monitor_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 /**
@@ -29,22 +31,18 @@
 namespace apollo {
 namespace monitor {
 
-class HardwareMonitor : public RecurrentRunner {
+class MonitorManager {
  public:
-  HardwareMonitor(const std::string &name, const double interval,
-                  SystemStatus *system_status);
+  static const MonitorConf &GetConfig();
+  static SystemStatus *GetStatus();
+  static HardwareStatus *GetHardwareStatus(const std::string &hardware_name);
+  static ModuleStatus *GetModuleStatus(const std::string &module_name);
 
- protected:
-  HardwareStatus *status_;  // No ownership.
-};
+ private:
+  MonitorConf config_;
+  SystemStatus status_;
 
-class ModuleMonitor : public RecurrentRunner {
- public:
-  ModuleMonitor(const std::string &name, const double interval,
-                SystemStatus *system_status);
-
- protected:
-  ModuleStatus *status_;  // No ownership.
+  DECLARE_SINGLETON(MonitorManager);
 };
 
 }  // namespace monitor

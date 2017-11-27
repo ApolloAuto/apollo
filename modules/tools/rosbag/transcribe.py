@@ -29,33 +29,12 @@ import sys
 
 from std_msgs.msg import String
 
-from modules.localization.proto import localization_pb2
-from modules.perception.proto import perception_obstacle_pb2
-from modules.perception.proto import traffic_light_detection_pb2
-from modules.planning.proto import planning_internal_pb2
-from modules.planning.proto import planning_pb2
-from modules.prediction.proto import prediction_obstacle_pb2
-from modules.localization.proto import localization_pb2 
-from modules.routing.proto import routing_pb2
+import common.proto_utils as proto_utils
+from common.message_manager import PbMessageManager
+
+g_message_manager = PbMessageManager()
 
 g_args = None
-
-topic_msg_dict = {
-    "/apollo/planning": planning_pb2.ADCTrajectory,
-    "/apollo/prediction": prediction_obstacle_pb2.PredictionObstacles,
-    "/apollo/perception": perception_obstacle_pb2.PerceptionObstacles,
-    "/apollo/routing_response": routing_pb2.RoutingResponse,
-    "/apollo/routing_request": routing_pb2.RoutingRequest,
-    "/apollo/localization/pose": localization_pb2.LocalizationEstimate,
-    "/apollo/perception/traffic_light": traffic_light_detection_pb2.TrafficLightDetection,
-}
-
-
-def write_to_file(file_path, topic_pb):
-    """write pb message to file"""
-    f = file(file_path, 'w')
-    f.write(str(topic_pb))
-    f.close()
 
 
 def transcribe(proto_msg):
@@ -64,7 +43,7 @@ def transcribe(proto_msg):
     name = header.module_name
     file_path = os.path.join(g_args.out_dir, seq + "_" + name + ".pb.txt")
     print file_path
-    write_to_file(file_path, proto_msg)
+    proto_utils.write_pb_to_text_file(proto_msg, file_path)
 
 
 if __name__ == "__main__":
@@ -85,9 +64,10 @@ if __name__ == "__main__":
     g_args = parser.parse_args()
     if not os.path.exists(g_args.out_dir):
         os.makedirs(g_args.out_dir)
-    if g_args.topic not in topic_msg_dict:
+    meta_msg = g_message_manager.get_msg_meta_by_topic(g_args.topic)
+    if not meta_msg:
         print "Unknown topic name: %s" % (g_args.topic)
         sys.exit(0)
     rospy.init_node('trascribe_node', anonymous=True)
-    rospy.Subscriber(g_args.topic, topic_msg_dict[g_args.topic], transcribe)
+    rospy.Subscriber(g_args.topic, meta_msg.msg_type(), transcribe)
     rospy.spin()

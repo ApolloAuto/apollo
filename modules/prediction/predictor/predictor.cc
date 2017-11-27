@@ -44,9 +44,7 @@ void Predictor::SetEqualProbability(double probability, int start_index) {
   }
 }
 
-void Predictor::Clear() {
-  trajectories_.clear();
-}
+void Predictor::Clear() { trajectories_.clear(); }
 
 }  // namespace prediction
 }  // namespace apollo

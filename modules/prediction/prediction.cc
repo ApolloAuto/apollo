@@ -42,9 +42,7 @@ using ::apollo::localization::LocalizationEstimate;
 using ::apollo::perception::PerceptionObstacle;
 using ::apollo::perception::PerceptionObstacles;
 
-std::string Prediction::Name() const {
-  return FLAGS_prediction_module_name;
-}
+std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
   // Load prediction conf
@@ -85,9 +83,7 @@ Status Prediction::Init() {
   return Status::OK();
 }
 
-Status Prediction::Start() {
-  return Status::OK();
-}
+Status Prediction::Start() { return Status::OK(); }
 
 void Prediction::Stop() {}
 
@@ -131,15 +127,21 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
       PredictorManager::instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSecond());
-  Publish(&prediction_obstacles);
+
   for (auto const& prediction_obstacle :
        prediction_obstacles.prediction_obstacle()) {
     for (auto const& trajectory : prediction_obstacle.trajectory()) {
       for (auto const& trajectory_point : trajectory.trajectory_point()) {
-        CHECK(IsValidTrajectoryPoint(trajectory_point));
+        if (!IsValidTrajectoryPoint(trajectory_point)) {
+          AERROR << "Invalid trajectory point ["
+                 << trajectory_point.ShortDebugString() << "]";
+          return;
+        }
       }
     }
   }
+
+  Publish(&prediction_obstacles);
 
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
