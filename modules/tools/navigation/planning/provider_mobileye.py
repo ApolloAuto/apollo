@@ -30,11 +30,14 @@ class Obstacle:
 class MobileyeProvider:
     def __init__(self):
         self.mobileye_pb = None
-        self.right_lane_marker_coef = [1, 0, 0, 0]
-        self.left_lane_marker_coef = [1, 0, 0, 0]
+        self.right_lm_coef = [1, 0, 0, 0]
+        self.left_lm_coef = [1, 0, 0, 0]
         self.right_lane_marker_range = 0
         self.left_lane_marker_range = 0
         self.obstacles = []
+        self.right_lm_quality = 0.0
+        self.left_lm_quality = 0.0
+        
 
     def update(self, mobileye_pb):
         self.mobileye_pb = mobileye_pb
@@ -46,14 +49,17 @@ class MobileyeProvider:
         rc2 = self.mobileye_pb.lka_768.curvature
         rc3 = self.mobileye_pb.lka_768.curvature_derivative
         self.right_lane_marker_range = self.mobileye_pb.lka_769.view_range
-        self.right_lane_marker_coef = [rc0, rc1, rc2, rc3]
+        self.right_lm_coef = [rc0, rc1, rc2, rc3]
 
         lc0 = self.mobileye_pb.lka_766.position
         lc1 = self.mobileye_pb.lka_767.heading_angle
         lc2 = self.mobileye_pb.lka_766.curvature
         lc3 = self.mobileye_pb.lka_766.curvature_derivative
         self.left_lane_marker_range = self.mobileye_pb.lka_767.view_range
-        self.left_lane_marker_coef = [lc0, lc1, lc2, lc3]
+        self.left_lm_coef = [lc0, lc1, lc2, lc3]
+
+        self.left_lm_quality = self.mobileye_pb.lka_766.quality / 3.0
+        self.right_lm_quality = self.mobileye_pb.lka_768.quality / 3.0
 
     def process_obstacles(self):
         if self.mobileye_pb is None:
@@ -79,7 +85,7 @@ class MobileyeProvider:
         vy = localization_provider.localization_pb.pose.position.y
         heading = localization_provider.localization_pb.pose.heading
         position = (vx, vy)
-        corrector = LaneMarkerCorrector(self.left_lane_marker_coef,
-                                        self.right_lane_marker_coef)
-        self.left_lane_marker_coef, self.right_lane_marker_coef = \
+        corrector = LaneMarkerCorrector(self.left_lm_coef,
+                                        self.right_lm_coef)
+        self.left_lm_coef, self.right_lm_coef = \
             corrector.correct(position, heading, routing_segment)
