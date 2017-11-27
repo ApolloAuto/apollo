@@ -219,6 +219,8 @@ void RegionalPredictor::DrawMovingTrajectory(
   for (size_t i = 0; i < left_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(left_points->operator[](i)));
+  }
+  for (size_t i = 0; i < right_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(right_points->operator[](i)));
   }
