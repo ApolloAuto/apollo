@@ -23,8 +23,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -88,18 +89,21 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
   // Obstacle cost
   uint32_t start_index = 0;
   bool is_found_start_index = false;
+  bool is_found_end_index = false;
   uint32_t end_index = 0;
   uint32_t index = 0;
   double time_stamp = 0.0;
-  while (end_index != 0) {
+  while (index <= num_of_time_stamps_ &&
+         !(is_found_start_index && is_found_end_index)) {
     common::SpeedPoint speed_point;
     heuristic_speed_data_.EvaluateByTime(time_stamp, &speed_point);
     if (speed_point.s() >= start_s && !is_found_start_index) {
       start_index = index;
       is_found_start_index = true;
     }
-    if (speed_point.s() > end_s) {
+    if (speed_point.s() > end_s && !is_found_end_index) {
       end_index = index;
+      is_found_end_index = true;
     }
     time_stamp += config_.eval_time_interval();
     ++index;
@@ -127,7 +131,7 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
     Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
                      vehicle_param_.width()};
     for (const auto &obstacle_trajectory : obstacle_boxes_) {
-      auto &obstacle_box = obstacle_trajectory[start_index];
+      auto &obstacle_box = obstacle_trajectory.at(start_index);
       // Simple version: calculate obstacle cost by distance
       double distance = obstacle_box.DistanceTo(ego_box);
       if (distance > config_.obstacle_ignore_distance()) {
