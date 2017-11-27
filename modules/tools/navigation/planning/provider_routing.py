@@ -37,7 +37,11 @@ def error_function(c, x, y, t, k, w=None):
         diff = np.einsum('...i,...i', diff, diff)
     else:
         diff = np.dot(diff * diff, w)
-    return np.abs(diff)
+    ddf = splev(x, (t, c, k), der=2)
+    smoothness = 0
+    for i in ddf:
+        smoothness += i * i
+    return np.abs(diff) + 1000 * smoothness
 
 
 def optimized_spline(x, y, k=3, s=0, w=None):
@@ -80,6 +84,8 @@ class RoutingProvider:
         point = Point(utm_x, utm_y)
         routing = LineString(self.routing_points)
         if routing.distance(point) > 10:
+            return []
+        if routing.length < 10:
             return []
         distance = routing.project(point)
         points = []
