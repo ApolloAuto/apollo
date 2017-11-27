@@ -235,7 +235,6 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_proto",
     ],
 )
