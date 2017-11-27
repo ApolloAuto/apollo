@@ -16,6 +16,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "Eigen/Dense"
 
@@ -50,7 +51,7 @@ class NetModel {
   /**
    * @brief Destructor
    */
-  ~NetModel();
+  ~NetModel() = default;
 
   /**
    * @brief Compute the model output from inputs
@@ -110,12 +111,7 @@ class NetModel {
   bool IsOk() const;
 
  protected:
-  /**
-   * @brief Delete layers in a network model and release memory
-   */
-  void Clear();
-
-  std::vector<Layer*> layers_;
+  std::vector<std::unique_ptr<Layer>> layers_;
   NetParameter net_parameter_;
   bool ok_;
 };
