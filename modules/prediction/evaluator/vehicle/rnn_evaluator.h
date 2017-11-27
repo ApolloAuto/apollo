@@ -84,10 +84,10 @@ class RNNEvaluator : public Evaluator {
                         const std::string& prev_lane_id);
 
  private:
+  static const int DIM_OBSTACLE_FEATURE = 6;
+  static const int DIM_LANE_POINT_FEATURE = 4;
+  static const int LENGTH_LANE_POINT_SEQUENCE = 20;
   network::RnnModel* model_ptr_;
-  int dim_obstacle_feature_ = 6;
-  int dim_lane_point_feature_ = 4;
-  int length_lane_point_sequence_ = 20;
 };
 
 }  // namespace prediction
