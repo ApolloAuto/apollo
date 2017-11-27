@@ -98,7 +98,6 @@ bool QpSplinePathGenerator::Generate(
   if (is_change_lane_path_) {
     ref_l_ = init_frenet_point_.l();
   }
-
   double start_s = init_frenet_point_.s();
 
   constexpr double kDefaultPathLength = 50.0;
@@ -312,12 +311,13 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
 
   ADEBUG << "lat_shift = " << lat_shift;
   const double kEndPointBoundaryEpsilon = 1e-2;
-  constexpr double kReservedDistance = 10.0;
-  spline_constraint->AddPointConstraintInRange(
+  constexpr double kReservedDistance = 20.0;
+  const double target_s =
       std::fmin(qp_spline_path_config_.point_constraint_s_position(),
                 kReservedDistance + init_frenet_point_.s() +
-                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
-      lat_shift, kEndPointBoundaryEpsilon);
+                    init_trajectory_point_.v() * FLAGS_look_forward_time_sec);
+  spline_constraint->AddPointConstraintInRange(target_s, lat_shift,
+                                               kEndPointBoundaryEpsilon);
   if (!is_change_lane_path_) {
     spline_constraint->AddPointDerivativeConstraintInRange(
         evaluated_s_.back(), 0.0, kEndPointBoundaryEpsilon);

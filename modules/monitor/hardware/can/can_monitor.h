@@ -24,9 +24,9 @@
 namespace apollo {
 namespace monitor {
 
-class CanMonitor : public HardwareMonitor {
+class CanMonitor : public RecurrentRunner {
  public:
-  explicit CanMonitor(SystemStatus *system_status);
+  CanMonitor();
   void RunOnce(const double current_time) override;
 };
 
