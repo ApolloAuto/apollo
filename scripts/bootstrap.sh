@@ -16,10 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-# WARN: Please use with cautious.
-# This script is for Apollo 2.0, in which HMI and Dreamview are well integrated.
-# So it's exclusive with hmi.sh.
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${DIR}/.."

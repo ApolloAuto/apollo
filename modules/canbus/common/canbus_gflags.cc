@@ -18,7 +18,7 @@
 
 // System gflags
 DEFINE_string(canbus_node_name, "chassis", "The chassis module name in proto");
-DEFINE_string(hmi_name, "canbus", "Module name in HMI");
+DEFINE_string(canbus_module_name, "canbus", "Module name");
 
 DEFINE_string(adapter_config_filename, "modules/canbus/conf/adapter.conf",
               "The adapter config file");

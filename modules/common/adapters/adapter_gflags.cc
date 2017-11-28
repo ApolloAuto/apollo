@@ -54,8 +54,6 @@ DEFINE_string(gnss_status_topic, "/apollo/sensor/gnss/gnss_status",
               "gnss status topic name");
 DEFINE_string(system_status_topic, "/apollo/monitor/system_status",
               "System status topic name");
-DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
-              "HMI command topic name");
 DEFINE_string(mobileye_topic, "/apollo/sensor/mobileye", "mobileye topic name");
 DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");

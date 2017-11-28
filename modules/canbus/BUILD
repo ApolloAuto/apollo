@@ -16,7 +16,6 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/hmi/utils:hmi_status_helper",
     ],
 )
 
@@ -25,7 +24,7 @@ cc_test(
     size = "small",
     srcs = ["canbus_test.cc"],
     deps = [
-        "//modules/canbus:canbus_lib",
+        ":canbus_lib",
         "@gtest//:main",
     ],
 )

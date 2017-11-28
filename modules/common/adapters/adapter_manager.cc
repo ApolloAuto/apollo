@@ -120,9 +120,6 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::SYSTEM_STATUS:
         EnableSystemStatus(FLAGS_system_status_topic, config);
         break;
-      case AdapterConfig::HMI_COMMAND:
-        EnableHMICommand(FLAGS_hmi_command_topic, config);
-        break;
       case AdapterConfig::MOBILEYE:
         EnableMobileye(FLAGS_mobileye_topic, config);
         break;

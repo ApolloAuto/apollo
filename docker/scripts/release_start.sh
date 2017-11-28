@@ -125,7 +125,7 @@ function main() {
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/control/conf"
     fi
-    docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 
 main
