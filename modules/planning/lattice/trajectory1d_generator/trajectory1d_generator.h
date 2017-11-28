@@ -26,7 +26,7 @@
 
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/math/curve1d/curve1d.h"
-#include "modules/planning/lattice/behavior_decider/end_condition_sampler.h"
+#include "modules/planning/lattice/trajectory1d_generator/end_condition_sampler.h"
 
 namespace apollo {
 namespace planning {

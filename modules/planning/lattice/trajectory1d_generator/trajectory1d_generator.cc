@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory1d_generator/trajectory1d_generator.h"
 
 #include <cmath>
 #include <limits>

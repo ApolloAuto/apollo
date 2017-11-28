@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/trajectory_evaluator.h"
+#include "modules/planning/lattice/trajectory1d_generator/trajectory_evaluator.h"
 
 #include <cmath>
 #include <limits>
