@@ -18,6 +18,7 @@
 
 #include "glog/logging.h"
 
+#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -41,6 +42,10 @@ void ClusterGeneralInfo701::Parse(const std::uint8_t* bytes, int32_t length,
   obs->set_lateral_vel(lateral_vel(bytes, length));
   obs->set_rcs(rcs(bytes, length));
   obs->set_dynprop(dynprop(bytes, length));
+  double timestamp = apollo::common::time::Clock::NowInSecond();
+  auto header = obs->mutable_header();
+  header->CopyFrom(conti_radar->header());
+  header->set_timestamp_sec(timestamp);
 }
 
 int ClusterGeneralInfo701::obstacle_id(const std::uint8_t* bytes,
