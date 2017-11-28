@@ -16,9 +16,7 @@
 
 #include "modules/prediction/network/net_util.h"
 
-#include <string>
 #include <unordered_map>
-#include "Eigen/Dense"
 
 #include "modules/common/log.h"
 
@@ -26,18 +24,18 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-float sigmoid(float x) { return 1 / (1 + exp(-1 * x)); }
+float sigmoid(const float x) { return 1 / (1 + exp(-x)); }
 
-float tanh(float x) { return std::tanh(x); }
+float tanh(const float x) { return std::tanh(x); }
 
-float linear(float x) { return x; }
+float linear(const float x) { return x; }
 
-float hard_sigmoid(float x) {
-  float z = 0.2 * x + 0.5;
+float hard_sigmoid(const float x) {
+  const float z = 0.2 * x + 0.5;
   return z <= 0.0 ? 0.0 : (z <= 1.0 ? z : 1.0);
 }
 
-float relu(float x) { return (x > 0.0) ? x : 0.0; }
+float relu(const float x) { return (x > 0.0) ? x : 0.0; }
 
 std::function<float(float)> serialize_to_function(const std::string& str) {
   static const std::unordered_map<std::string, std::function<float(float)> >

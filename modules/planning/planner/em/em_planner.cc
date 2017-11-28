@@ -174,7 +174,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     return speed_profile;
   }
   const ReferenceLineInfo* last_reference_line_info =
-      last_frame->DriveReferenceLinfInfo();
+      last_frame->DriveReferenceLineInfo();
   if (!last_reference_line_info) {
     ADEBUG << "last reference line info is empty";
     return speed_profile;

@@ -29,8 +29,8 @@
 namespace apollo {
 namespace planning {
 
-// 1D quintic polynomial curve: (x0, dx0, ddx0) -- [0, param] --> (x1, dx1,
-// ddx1)
+// 1D quintic polynomial curve:
+// (x0, dx0, ddx0) -- [0, param] --> (x1, dx1, ddx1)
 class QuinticPolynomialCurve1d : public PolynomialCurve1d {
  public:
   QuinticPolynomialCurve1d() = default;

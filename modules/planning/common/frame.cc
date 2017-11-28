@@ -322,7 +322,7 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   return drive_reference_line_info_;
 }
 
-const ReferenceLineInfo *Frame::DriveReferenceLinfInfo() const {
+const ReferenceLineInfo *Frame::DriveReferenceLineInfo() const {
   return drive_reference_line_info_;
 }
 
