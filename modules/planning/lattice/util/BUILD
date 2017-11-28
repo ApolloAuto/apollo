@@ -3,29 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "adc_neighborhood",
-    hdrs = [
-        "adc_neighborhood.h",
-    ],
-    srcs = [
-        "adc_neighborhood.cc",
-    ],
-    deps = [
-        "//modules/common:common",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/reference_line:reference_line",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/common:frame",
-        "//modules/planning/common:obstacle",
-        ":util",
-        ":lattice_params",
-        ":reference_line_matcher",
-        "@glog//:glog",
-    ],
-)
-
-cc_library(
     name = "collision_checker",
     srcs = [
         "collision_checker.cc",
@@ -40,9 +17,9 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
         ":lattice_params",
-        ":adc_neighborhood",
         "//modules/prediction/proto:prediction_proto",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/proto:lattice_structure_proto"
     ],
 )
 

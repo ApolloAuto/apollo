@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/util/adc_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/adc_neighborhood.h"
 
 #include <utility>
 #include <vector>

@@ -26,7 +26,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/lattice_sampling_config.pb.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
 
 #include <vector>
 

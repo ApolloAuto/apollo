@@ -15,36 +15,34 @@
  *****************************************************************************/
 
 /**
- * @file collision_checker.h
+ * @file trajectory1d_info.cpp
  **/
-
-#ifndef MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H
-#define MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H
-
-#include <vector>
-
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/common/obstacle.h"
-#include "modules/common/math/box2d.h"
+#include "modules/planning/lattice/trajectory1d/trajectory1d_info.h"
 
 namespace apollo {
 namespace planning {
 
-class CollisionChecker {
- public:
-  explicit CollisionChecker(
-      const std::vector<const Obstacle*>& obstacles);
+Trajectory1dInfo::Trajectory1dInfo() {
+  type_ = Type::QUINTIC_POLYNOMIAL;
+}
 
-  bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
+void Trajectory1dInfo::set_type(const Type& type) {
+  type_ = type;
+}
 
- private:
-  void BuildPredictedEnv(
-       const std::vector<const Obstacle*>& obstacles);
+std::shared_ptr<Trajectory1d> Trajectory1dInfo::create() const {
+  std::shared_ptr<Trajectory1d> ptr_traj;
 
-  std::vector<std::vector<common::math::Box2d>> predicted_envs_;
-};
+  switch(type_) {
+  case Type::QUINTIC_POLYNOMIAL:
+    break;
+  case Type::QUARTIC_POLYNOMIAL:
+    break;
+  default:
+    break;
+  }
+  return ptr_traj;
+}
 
-}  // namespace planning
-}  // namespace apollo
-
-#endif /* MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H */
+} // namespace planning
+} // namespace apollo

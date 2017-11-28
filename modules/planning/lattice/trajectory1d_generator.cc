@@ -122,7 +122,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     // To Be Uniformly Replaced By LatticeSampleConfig
     GenerateSpeedProfilesForCruising(init_state, lon_sample_config,
                                      ptr_lon_trajectory_bundle);
-  } else if (planning_objective.decision_type() == PlanningTarget::GO) {
+  } else if (planning_objective.decision_type() == PlanningTarget::CRUISE) {
     GenerateSpeedProfilesForFollowing(init_state, lon_sample_config,
                                       ptr_lon_trajectory_bundle);
   } else {

@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "modules/planning/lattice/util/lattice_params.h"
-#include "modules/planning/lattice/util/adc_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/adc_neighborhood.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_evaluator.h"
@@ -43,7 +43,6 @@ using apollo::common::TrajectoryPoint;
 LatticePlanner::LatticePlanner() {}
 
 Status LatticePlanner::Init(const PlanningConfig& config) {
-  // TODO(all) implement
   return Status::OK();
 }
 
@@ -62,9 +61,8 @@ Status LatticePlanner::Plan(
   ++num_planning_cycles;
 
   // 1. obtain a reference line and transform it to the PathPoint format.
-  auto discretized_reference_line =
-      apollo::planning::ToDiscretizedReferenceLine(
-          reference_line_info->reference_line().reference_points());
+  auto discretized_reference_line = ToDiscretizedReferenceLine(
+      reference_line_info->reference_line().reference_points());
 
   // 2. compute the matched point of the init planning point on the reference
   // line.
@@ -112,10 +110,7 @@ Status LatticePlanner::Plan(
   // Get instance of collision checker and constraint checker
   const std::vector<const Obstacle*>& obstacles = frame->obstacles();
 
-  ADCNeighborhood adc_neighborhood(frame,
-      planning_init_point, reference_line_info->reference_line());
-
-  CollisionChecker collision_checker(adc_neighborhood, obstacles);
+  CollisionChecker collision_checker(obstacles);
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.

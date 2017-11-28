@@ -41,7 +41,6 @@ class StandingStillTrajectory1d : public Curve1d {
   double Evaluate(const std::uint32_t order, const double param) const override;
 
  private:
-  // TODO(all) make the following four functions private
   double Evaluate_s(const double t) const;
 
   double Evaluate_v(const double t) const;

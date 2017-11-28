@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "modules/planning/math/curve1d/curve1d.h"
-#include "modules/planning/proto/lattice_sampling_config.pb.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {

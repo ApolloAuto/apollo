@@ -27,7 +27,7 @@
 
 #include "modules/planning/common/frame.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/lattice_sampling_config.pb.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
 
 #define DECLARE_SCENARIO(WORLD) \
  public: \
