@@ -18,8 +18,8 @@
  * @file reference_line_matcher.h
  **/
 
-#ifndef MODULES_PLANNING_LATTIC_REFERENCE_LINE_MATCHER_H_
-#define MODULES_PLANNING_LATTIC_REFERENCE_LINE_MATCHER_H_
+#ifndef MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_
+#define MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_
 
 #include <vector>
 
@@ -49,4 +49,4 @@ class ReferenceLineMatcher {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTIC_REFERENCE_LINE_MATCHER_H_
+#endif  // MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_

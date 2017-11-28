@@ -35,7 +35,8 @@ static const double stop_acc_thred = 1.0;
 static const double dist_thred_omit_routing_end = 1.0;
 static const double lateral_enter_lane_thred = 2.0;
 static const double max_acceleration = 4.0;
-static const double max_deceleration = -4.0;
+static const double min_acceleration = -4.0;
+static const double max_deceleration = -min_acceleration;
 
 }  // namespace planning
 }  // namespace apollo
