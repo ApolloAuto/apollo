@@ -98,35 +98,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "end_condition_sampler",
-    hdrs = [
-        "end_condition_sampler.h",
-    ],
-    srcs = [
-        "end_condition_sampler.cc",
-    ],
-    deps = [
-        "//modules/common:common",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/util:lattice_util",
-    ],
-)
-
-cc_library(
-    name = "trajectory1d_info_generator",
-    hdrs = [
-        "trajectory1d_info_generator.h",
-    ],
-    srcs = [
-        "trajectory1d_info_generator.cc",
-    ],
-    deps = [
-        ":end_condition_sampler",
-        "//modules/planning/lattice/util:lattice_util",
-        "//modules/planning/proto:lattice_structure_proto",
-        "//modules/planning/lattice/trajectory1d:trajectory1d_info"
-    ],
-)
-
 cpplint()

@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/planning/lattice/behavior_decider/end_condition_sampler.h"
+#include "modules/planning/lattice/trajectory1d_generator/end_condition_sampler.h"
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
