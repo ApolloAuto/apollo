@@ -54,7 +54,7 @@ int ScenarioManager::ComputeWorldDecision(
         AINFO << "scenario[" << scenario->Name() << "] does exists";
       }
       // compute decision
-      if (0 !=
+      if (0 ==
           scenario->ComputeScenarioDecision(
               frame, init_planning_point, lon_init_state,
               discretized_reference_line, decisions)) {
