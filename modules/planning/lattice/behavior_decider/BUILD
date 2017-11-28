@@ -61,5 +61,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "feasible_region",
+    hdrs = [
+        "feasible_region.h",
+    ],
+    srcs = [
+        "feasible_region.cc",
+    ],
+    deps = [
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice/util:lattice_params",
+    ],
+)
 
 cpplint()
