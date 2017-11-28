@@ -57,11 +57,11 @@ int ScenarioManager::ComputeWorldDecision(
             }
             // compute decision
             if (0 != scenario->ComputeScenarioDecision(
-		  frame, init_planning_point, lon_init_state,
+		          frame, init_planning_point, lon_init_state,
                   discretized_reference_line, decisions) ) {
-                AINFO << "scenario[" << scenario->Name() <<"] failed in computing decision";
+                AINFO << "scenario[" << scenario->Name() <<"] Success in computing decision";
             } else {
-                AERROR << "scenario[" << scenario->Name() <<"] failed in computing decision";
+                AERROR << "scenario[" << scenario->Name() <<"] Failed in computing decision";
             }
         }
     }
