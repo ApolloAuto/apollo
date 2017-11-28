@@ -21,7 +21,7 @@
 
 // System gflags
 DECLARE_string(canbus_node_name);
-DECLARE_string(hmi_name);
+DECLARE_string(canbus_module_name);
 
 DECLARE_string(adapter_config_filename);
 

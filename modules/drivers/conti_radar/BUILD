@@ -51,7 +51,6 @@ cc_library(
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/conti_radar/protocol:drivers_conti_radar_protocol",
-        "//modules/hmi/utils:hmi_status_helper",
     ],
 )
 
