@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file:
+ * @file
  **/
 
 #ifndef MODULES_MAP_PNC_MAP_ROUTE_SEGMENTS_H_
@@ -44,7 +44,8 @@ namespace hdmap {
  * @brief class RouteSegments
  *
  * This class is a representation of the Passage type in routing.proto.
- * It is exended from a passage region, but keeps some properties of the passage
+ * It is extended from a passage region, but keeps some properties of the
+ *passage
  * such as the last end LaneWaypoint of the original passage region
  * (route_end_waypoint), whether the passage can lead to another passage in
  * routing (can_exit_). This class contains the original data that can be used
@@ -85,7 +86,7 @@ class RouteSegments : public std::vector<LaneSegment> {
   void SetPreviousAction(routing::ChangeLaneType action);
 
   /**
-   * Wether the passage region that generate this route segment can lead to
+   * Whether the passage region that generate this route segment can lead to
    * another passage region in route.
    */
   bool CanExit() const;
@@ -98,7 +99,7 @@ class RouteSegments : public std::vector<LaneSegment> {
    * @param l return the lateral distance relative to the route segment.
    * @param waypoint return the LaneWaypoint, which has lane and lane_s on the
    * route segment.
-   * @return false if error happended or projected outside of the lane segments.
+   * @return false if error happened or projected outside of the lane segments.
    */
   bool GetProjection(const common::PointENU &point_enu,
                      common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
@@ -144,8 +145,8 @@ class RouteSegments : public std::vector<LaneSegment> {
    */
   bool Stitch(const RouteSegments &other);
 
-  bool Shrink(const common::math::Vec2d &point, double look_backward,
-              double look_forward);
+  bool Shrink(const common::math::Vec2d &point, const double look_backward,
+              const double look_forward);
 
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
@@ -170,9 +171,8 @@ class RouteSegments : public std::vector<LaneSegment> {
 
   /**
    * @brief Check if we can reach the other segment from current segment just
-   * by
-   * following lane.
-   * @param other Anothr route segment
+   * by following lane.
+   * @param other Another route segment
    */
   bool IsConnectedSegment(const RouteSegments &other) const;
 
@@ -192,7 +192,7 @@ class RouteSegments : public std::vector<LaneSegment> {
   LaneWaypoint route_end_waypoint_;
 
   /**
-   * wheter this segment can lead to another passage region in routing
+   * whether this segment can lead to another passage region in routing
    */
   bool can_exit_ = false;
 
