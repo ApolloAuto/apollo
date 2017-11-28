@@ -9,6 +9,7 @@
 
 #include "modules/planning/lattice/behavior_decider/adc_master_scenario.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/common/log.h"
 
 #include "gflags/gflags.h"
 
@@ -30,6 +31,7 @@ int AdcMasterScenario::ComputeScenarioDecision(
   std::vector<PlanningTarget>* const decisions) {
 
   CHECK(frame != nullptr);
+
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
