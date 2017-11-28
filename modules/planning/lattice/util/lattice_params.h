@@ -25,17 +25,17 @@ namespace apollo {
 namespace planning {
 
 // TODO(all) move the fake FLAG variable to planning_gflags
-static double planned_trajectory_time = 8.0;
-static double stop_margin = 2.0;
-static double stop_speed_threshold = 0.1;
-static double low_speed_threshold = 2.0;
-static double enable_stop_handling = true;
-static double trajectory_time_resolution = 0.05;
-static double stop_acc_thred = 1.0;
-static double dist_thred_omit_routing_end = 1.0;
-static double lateral_enter_lane_thred = 2.0;
-static double max_acceleration = 4.0;
-static double max_deceleration = -4.0;
+static const double planned_trajectory_time = 8.0;
+static const double stop_margin = 2.0;
+static const double stop_speed_threshold = 0.1;
+static const double low_speed_threshold = 2.0;
+static const double enable_stop_handling = true;
+static const double trajectory_time_resolution = 0.05;
+static const double stop_acc_thred = 1.0;
+static const double dist_thred_omit_routing_end = 1.0;
+static const double lateral_enter_lane_thred = 2.0;
+static const double max_acceleration = 4.0;
+static const double max_deceleration = -4.0;
 
 }  // namespace planning
 }  // namespace apollo
