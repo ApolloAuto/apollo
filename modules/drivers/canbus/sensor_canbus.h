@@ -125,6 +125,11 @@ class SensorCanbus : public apollo::common::ApolloApp {
 // method implementations
 
 template <typename SensorType>
+std::string SensorCanbus<SensorType>::Name() const {
+  return FLAGS_canbus_driver_name;
+}
+
+template <typename SensorType>
 Status SensorCanbus<SensorType>::Init() {
   // load conf
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
