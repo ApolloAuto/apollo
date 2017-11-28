@@ -44,9 +44,9 @@ namespace math {
  * This class is referential-agnostic, although our convention on the use of
  * the word "heading" in this project (permanently set to be 0 at East)
  * forces us to assume that the X/Y frame here is East/North.
- * For disambiguation, we call the axis of the rectangle parellel to the
+ * For disambiguation, we call the axis of the rectangle parallel to the
  * heading direction the "heading-axis". The size of the heading-axis is
- * called "length", and the size of the axis perpenticular to it "width".
+ * called "length", and the size of the axis perpendicular to it "width".
  */
 class Box2d {
  public:
@@ -133,8 +133,8 @@ class Box2d {
   double heading() const { return heading_; }
 
   /**
-   * @brief Getter of the co-sine of the heading
-   * @return The co-sine of the heading
+   * @brief Getter of the cosine of the heading
+   * @return The cosine of the heading
    */
   double cos_heading() const { return cos_heading_; }
 
@@ -172,7 +172,7 @@ class Box2d {
   /**
    * @brief Tests points for membership in the boundary of the box
    * @param point A point that we wish to test for membership in the boundary
-   * @return Truee iff the point is a boundary point of the box
+   * @return True iff the point is a boundary point of the box
    */
   bool IsPointOnBoundary(const Vec2d &point) const;
 
@@ -218,9 +218,8 @@ class Box2d {
   AABox2d GetAABox() const;
 
   /**
-   * @brief ...
-   * @param ...
-   * @return ...
+   * @brief Rotate from center.
+   * @param rotate_angle Angle to rotate.
    */
   void RotateFromCenter(const double rotate_angle);
 
