@@ -91,8 +91,8 @@ class ReferenceLineProvider {
                          const std::list<hdmap::RouteSegments>& route_segments);
 
   bool CreateRouteSegments(const common::VehicleState& vehicle_state,
-                           double look_forward_distance,
-                           double look_backward_distance,
+                           const double look_forward_distance,
+                           const double look_backward_distance,
                            std::list<hdmap::RouteSegments>* segments);
 
   bool IsReferenceLineSmoothValid(const ReferenceLine& raw,

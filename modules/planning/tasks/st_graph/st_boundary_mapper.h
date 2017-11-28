@@ -27,7 +27,6 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/st_boundary.h"
