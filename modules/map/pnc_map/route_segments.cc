@@ -147,7 +147,8 @@ bool RouteSegments::IsConnectedSegment(const RouteSegments &other) const {
 }
 
 bool RouteSegments::Shrink(const common::math::Vec2d &point,
-                           double look_backward, double look_forward) {
+                           const double look_backward,
+                           const double look_forward) {
   common::SLPoint sl_point;
   LaneWaypoint waypoint;
   if (!GetProjection(point, &sl_point, &waypoint)) {
