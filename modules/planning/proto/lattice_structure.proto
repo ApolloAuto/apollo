@@ -23,6 +23,14 @@ message CriticalCondition {
   optional CriticalPoint bottom_right = 5;
 }
 
+message CriticalBound {
+  optional double t = 1;
+  optional double s_upper = 2;
+  optional double s_lower = 3;
+  optional double v_upper = 4;
+  optional double v_lower = 5;
+}
+
 message PlanningTarget {
   enum DecisionType {
     STOP = 0;

@@ -98,4 +98,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "condition_filter",
+    hdrs = [
+        "condition_filter.h",
+    ],
+    srcs = [
+        "condition_filter.cc",
+    ],
+    deps = [
+        "//modules/planning/lattice/behavior_decider:adc_neighborhood",
+        "//modules/planning/lattice/behavior_decider:feasible_region",
+        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/common/math:linear_interpolation",
+    ],
+)
+
 cpplint()
