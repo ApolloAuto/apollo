@@ -133,8 +133,14 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           for (const auto &landmark : poi_.landmark()) {
             Json place;
             place["name"] = landmark.name();
-            place["x"] = landmark.waypoint().pose().x();
-            place["y"] = landmark.waypoint().pose().y();
+            Json waypoint_list;
+            for (const auto &waypoint : landmark.waypoint()) {
+              Json point;
+              point["x"] = waypoint.pose().x();
+              point["y"] = waypoint.pose().y();
+              waypoint_list.push_back(point);
+            }
+            place["waypoint"] = waypoint_list;
             poi_list.push_back(place);
           }
         } else {
