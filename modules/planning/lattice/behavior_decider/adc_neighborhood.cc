@@ -145,7 +145,7 @@ double ADCNeighborhood::SpeedOnReferenceLine(
 }
 
 void ADCNeighborhood::GetCriticalConditions(
-    std::vector<CriticalCondition>* critical_conditions) {
+    std::vector<CriticalCondition>* critical_conditions) const {
   critical_conditions->clear();
   for (const auto& condition : critical_conditions_) {
     critical_conditions->push_back(condition.second);

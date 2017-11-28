@@ -47,7 +47,7 @@ class ADCNeighborhood {
       double* enter_time);
 
   void GetCriticalConditions(
-      std::vector<CriticalCondition>* critical_conditions);
+      std::vector<CriticalCondition>* critical_conditions) const;
 
   bool GetCriticalCondition(const std::string& obstacle_id,
                             CriticalCondition* critical_condition);

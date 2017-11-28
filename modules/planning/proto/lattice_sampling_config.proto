@@ -2,8 +2,6 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/pnc_point.proto";
-
 message LonCondition {
   optional double s = 1 [default = 0.0];
   optional double ds = 2 [default = 0.0];
