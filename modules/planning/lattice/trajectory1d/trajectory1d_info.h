@@ -15,36 +15,44 @@
  *****************************************************************************/
 
 /**
- * @file collision_checker.h
+ * @file trajectory1d_info.h
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H
-#define MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_INFO_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY1D_INFO_H_
 
-#include <vector>
+#include <memory>
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/common/obstacle.h"
-#include "modules/common/math/box2d.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {
 
-class CollisionChecker {
- public:
-  explicit CollisionChecker(
-      const std::vector<const Obstacle*>& obstacles);
+using Trajectory1d = Curve1d;
 
-  bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
+class Trajectory1dInfo {
+ public:
+  enum class Type {
+    QUINTIC_POLYNOMIAL,
+    QUARTIC_POLYNOMIAL,
+    CONSTANT_DECELERATION,
+    PIECEWISE_ACCELERATION,
+    STANDING_STILL
+  };
+
+  Trajectory1dInfo();
+
+  virtual ~Trajectory1dInfo() = default;
+
+  void set_type(const Type&);
+
+  std::shared_ptr<Trajectory1d> create() const;
 
  private:
-  void BuildPredictedEnv(
-       const std::vector<const Obstacle*>& obstacles);
-
-  std::vector<std::vector<common::math::Box2d>> predicted_envs_;
+  Type type_;
 };
 
-}  // namespace planning
-}  // namespace apollo
+} // namespace planning
+} // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H */
+#endif /* MODULES_PLANNING_LATTICE_TRAJECTORY1D_INFO_H_ */

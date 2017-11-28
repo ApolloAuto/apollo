@@ -3,6 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "trajectory1d_info",
+    hdrs = [
+        "trajectory1d_info.h",
+    ],
+    srcs = [
+        "trajectory1d_info.cc",
+    ],
+    deps = [
+        "//modules/planning/math/curve1d:curve1d",
+    ],
+)
+
+cc_library(
     name = "standing_still_trajectory1d",
     hdrs = [
         "standing_still_trajectory1d.h",

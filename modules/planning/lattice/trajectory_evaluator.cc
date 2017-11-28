@@ -185,7 +185,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   double ds = lon_sample_config.lon_end_condition().ds();
   double dds = lon_sample_config.lon_end_condition().dds();
 
-  if (objective.decision_type() == PlanningTarget::GO) {
+  if (objective.decision_type() == PlanningTarget::CRUISE) {
     // zero s target means cruise
     if (s <= std::numeric_limits<double>::epsilon()) {
       double target_speed = ds;

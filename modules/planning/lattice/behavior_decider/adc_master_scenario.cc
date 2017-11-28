@@ -50,7 +50,7 @@ int AdcMasterScenario::ComputeScenarioDecision(
   lon_sample_config->mutable_lon_end_condition()->set_ds(
       FLAGS_default_cruise_speed);
   lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
-  ret.set_decision_type(PlanningTarget::GO);
+  ret.set_decision_type(PlanningTarget::CRUISE);
 
   decisions->emplace_back(std::move(ret));
 

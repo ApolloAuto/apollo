@@ -53,7 +53,7 @@ cc_library(
         "adc_master_scenario.cc",
     ],
     deps = [
-        "//modules/planning/proto:lattice_sampling_config_proto",
+        "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/proto:common_proto",
@@ -72,6 +72,60 @@ cc_library(
     deps = [
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/util:lattice_params",
+    ],
+)
+
+cc_library(
+    name = "adc_neighborhood",
+    hdrs = [
+        "adc_neighborhood.h",
+    ],
+    srcs = [
+        "adc_neighborhood.cc",
+    ],
+    deps = [
+        "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/reference_line:reference_line",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:obstacle",
+        "//modules/planning/lattice/util:util",
+        "//modules/planning/lattice/util:lattice_params",
+        "//modules/planning/lattice/util:reference_line_matcher",
+        "@glog//:glog",
+    ],
+)
+
+cc_library(
+    name = "end_condition_sampler",
+    hdrs = [
+        "end_condition_sampler.h",
+    ],
+    srcs = [
+        "end_condition_sampler.cc",
+    ],
+    deps = [
+        "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice/util:lattice_util",
+    ],
+)
+
+cc_library(
+    name = "trajectory1d_info_generator",
+    hdrs = [
+        "trajectory1d_info_generator.h",
+    ],
+    srcs = [
+        "trajectory1d_info_generator.cc",
+    ],
+    deps = [
+        ":end_condition_sampler",
+        "//modules/planning/lattice/util:lattice_util",
+        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/lattice/trajectory1d:trajectory1d_info"
     ],
 )
 
