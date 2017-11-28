@@ -20,19 +20,13 @@ namespace planning {
 
 class AdcMasterScenario : public Scenario {
  public:
-  virtual void
-  Reset () override;
+  virtual void Reset() override;
 
-  virtual bool
-  Init () override;
+  virtual bool Init() override;
 
-  virtual bool
-  ScenarioExist () const override {
-    return exist_;
-  }
+  virtual bool ScenarioExist() const override { return exist_; }
 
-  virtual int
-  ComputeScenarioDecision (
+  virtual int ComputeScenarioDecision(
       Frame* frame, const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
@@ -41,10 +35,10 @@ class AdcMasterScenario : public Scenario {
  private:
   bool exist_ = false;
 
-DECLARE_SCENARIO(AdcMasterScenario);
+  DECLARE_SCENARIO(AdcMasterScenario);
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif

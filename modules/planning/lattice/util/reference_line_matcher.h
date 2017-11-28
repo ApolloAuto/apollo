@@ -42,8 +42,8 @@ class ReferenceLineMatcher {
 
  private:
   static common::PathPoint FindProjectionPoint(const common::PathPoint& p0,
-                                                const common::PathPoint& p1,
-                                                const double x, const double y);
+                                               const common::PathPoint& p1,
+                                               const double x, const double y);
 };
 
 }  // namespace planning

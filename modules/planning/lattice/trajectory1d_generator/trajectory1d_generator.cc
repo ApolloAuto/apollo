@@ -38,7 +38,6 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     const std::array<double, 3>& lat_init_state,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) {
-
   const LatticeSamplingConfig& lattice_sampling_config =
       planning_target.lattice_sampling_config();
   const LonSampleConfig& lon_sample_config =
@@ -71,14 +70,15 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     // m/s.
     if (distance < stop_margin && s_dot < low_speed_threshold) {
       ADEBUG << "Lattice planner stop handling: "
-          "use constant deceleration trajectory";
+                "use constant deceleration trajectory";
 
       double deceleration = 0.0;
       if (distance <= 0.0) {
         deceleration =
             low_speed_threshold * low_speed_threshold / stop_margin * 0.5;
       } else {
-        deceleration = std::min(s_dot * s_dot / distance * 0.5,
+        deceleration = std::min(
+            s_dot * s_dot / distance * 0.5,
             low_speed_threshold * low_speed_threshold / stop_margin * 0.5);
       }
 
@@ -128,8 +128,8 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   } else {
     AINFO << "generate speed profile for STOP";
     CHECK(planning_objective.decision_type() == PlanningTarget::STOP);
-    AINFO << "target [s, ds, dds] = [" << s_target << ", "
-          << ds_target << ", " << dds_target << "]";
+    AINFO << "target [s, ds, dds] = [" << s_target << ", " << ds_target << ", "
+          << dds_target << "]";
     GenerateSpeedProfilesForStopping(init_state, lon_sample_config,
                                      ptr_lon_trajectory_bundle);
     // GenerateSpeedProfilesForCruising(init_state, lon_sample_config,

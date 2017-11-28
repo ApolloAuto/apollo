@@ -27,9 +27,7 @@ StandingStillTrajectory1d::StandingStillTrajectory1d(const double p,
 
 double StandingStillTrajectory1d::param_length() const { return duration_; }
 
-std::string StandingStillTrajectory1d::to_string() const {
-  return "";
-}
+std::string StandingStillTrajectory1d::to_string() const { return ""; }
 
 double StandingStillTrajectory1d::Evaluate(const std::uint32_t order,
                                            const double param) const {

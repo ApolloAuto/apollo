@@ -35,7 +35,7 @@ CollisionChecker::CollisionChecker(
 }
 
 bool CollisionChecker::InCollision(
-    const DiscretizedTrajectory &discretized_trajectory) {
+    const DiscretizedTrajectory& discretized_trajectory) {
   AINFO << "      --- into collision_checker";
   CHECK_LE(discretized_trajectory.NumOfPoints(), predicted_envs_.size());
   const auto& vehicle_config =

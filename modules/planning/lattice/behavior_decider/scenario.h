@@ -29,13 +29,14 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
-#define DECLARE_SCENARIO(WORLD) \
- public: \
-  WORLD() : Scenario(#WORLD) {}; \
+#define DECLARE_SCENARIO(WORLD)                        \
+ public:                                               \
+  WORLD() : Scenario(#WORLD){};                        \
   static std::string ScenarioName() { return #WORLD; } \
- private: \
-  WORLD(const WORLD&) = delete; \
-  WORLD& operator = (const WORLD&) = delete
+                                                       \
+ private:                                              \
+  WORLD(const WORLD&) = delete;                        \
+  WORLD& operator=(const WORLD&) = delete
 
 namespace apollo {
 namespace planning {
@@ -49,10 +50,10 @@ class Scenario {
    * @return 0 if success
    */
   virtual int ComputeScenarioDecision(
-    Frame* frame, const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line,
-    std::vector<PlanningTarget>* const decisions) = 0;
+      Frame* frame, const common::TrajectoryPoint& init_planning_point,
+      const std::array<double, 3>& lon_init_state,
+      const std::vector<common::PathPoint>& discretized_reference_line,
+      std::vector<PlanningTarget>* const decisions) = 0;
 
   virtual const std::string& Name() const { return name_; }
   /**
@@ -69,7 +70,7 @@ class Scenario {
   virtual bool Init() = 0;
 
  private:
-    std::string name_;
+  std::string name_;
 };
 
 }  // namespace planning

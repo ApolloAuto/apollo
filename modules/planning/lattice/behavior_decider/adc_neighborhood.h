@@ -34,10 +34,9 @@ namespace planning {
 
 class ADCNeighborhood {
  public:
-  ADCNeighborhood(
-      const Frame* frame,
-      const apollo::common::TrajectoryPoint& planning_init_point,
-      const ReferenceLine& reference_line);
+  ADCNeighborhood(const Frame* frame,
+                  const apollo::common::TrajectoryPoint& planning_init_point,
+                  const ReferenceLine& reference_line);
 
   bool ForwardNearestObstacle(
       std::array<double, 3>* forward_nearest_obstacle_state,
@@ -50,9 +49,8 @@ class ADCNeighborhood {
   void GetCriticalConditions(
       std::vector<CriticalCondition>* critical_conditions);
 
-  bool GetCriticalCondition(
-      const std::string& obstacle_id,
-      CriticalCondition* critical_condition);
+  bool GetCriticalCondition(const std::string& obstacle_id,
+                            CriticalCondition* critical_condition);
 
   bool IsInNeighborhood(const Obstacle* obstacle) const;
 
@@ -66,23 +64,18 @@ class ADCNeighborhood {
       const apollo::common::TrajectoryPoint& planning_init_point,
       const ReferenceLine& reference_line);
 
-  void SetupObstacles(
-      const Frame* frame,
-      const ReferenceLine& reference_line);
+  void SetupObstacles(const Frame* frame, const ReferenceLine& reference_line);
 
-  void SetupADC(
-      const Frame* frame,
-      const apollo::common::TrajectoryPoint& planning_init_point,
-      const ReferenceLine& reference_line);
+  void SetupADC(const Frame* frame,
+                const apollo::common::TrajectoryPoint& planning_init_point,
+                const ReferenceLine& reference_line);
 
   double SpeedOnReferenceLine(
       const std::vector<apollo::common::PathPoint>& discretized_ref_points,
-      const Obstacle* obstacle,
-      const SLBoundary& sl_boundary);
+      const Obstacle* obstacle, const SLBoundary& sl_boundary);
 
-  void SetCriticalPoint(
-      const double t, const double s, const double v,
-      CriticalPoint* critical_point);
+  void SetCriticalPoint(const double t, const double s, const double v,
+                        CriticalPoint* critical_point);
 
  private:
   std::array<double, 3> init_s_;
