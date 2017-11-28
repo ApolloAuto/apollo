@@ -67,13 +67,15 @@ Status MSFLocalization::Start() {
   AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
 
   // Point Cloud
-  if (!AdapterManager::GetPointCloud()) {
-    buffer.ERROR(
-        "PointCloud input not initialized. Check your adapter.conf file!");
-    buffer.PrintLog();
-    return Status(common::LOCALIZATION_ERROR_MSG, "no PointCloud adapter");
+  if (FLAGS_enable_lidar_localization) {
+    if (!AdapterManager::GetPointCloud()) {
+      buffer.ERROR(
+          "PointCloud input not initialized. Check your adapter.conf file!");
+      buffer.PrintLog();
+      return Status(common::LOCALIZATION_ERROR_MSG, "no PointCloud adapter");
+    }
+    AdapterManager::AddPointCloudCallback(&MSFLocalization::OnPointCloud, this);
   }
-  AdapterManager::AddPointCloudCallback(&MSFLocalization::OnPointCloud, this);
 
   if (FLAGS_gnss_mode == 1) {
     // Gnss Rtk Obs
@@ -171,6 +173,8 @@ void MSFLocalization::InitParams() {
   // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
+  localizaiton_param_.enable_lidar_localization =
+      FLAGS_enable_lidar_localization;
 
   localizaiton_param_.is_use_visualize = FLAGS_use_visualize;
 
@@ -192,7 +196,7 @@ void MSFLocalization::InitParams() {
     CHECK(gnss_config.login_commands_size() > 1);
     std::string login_commands = gnss_config.login_commands(1);
     bool found_imu_ant_parameter = false;
-    for (unsigned int i = 0; i < gnss_config.login_commands_size(); ++i) {
+    for (int i = 0; i < gnss_config.login_commands_size(); ++i) {
       login_commands = gnss_config.login_commands(i);
       std::size_t found = login_commands.find(std::string("SETIMUTOANTOFFSET"));
       if (found != std::string::npos) {
@@ -331,6 +335,11 @@ void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
 }
 
 void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
+  if (localization_state_ == LocalizationMeasureState::OK &&
+      FLAGS_gnss_only_init) {
+    return;
+  }
+
   localization_integ_.RawObservationProcess(raw_obs_msg);
 
   if (FLAGS_gnss_debug_log_flag) {
@@ -350,6 +359,11 @@ void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
 }
 
 void MSFLocalization::OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg) {
+  if (localization_state_ == LocalizationMeasureState::OK &&
+      FLAGS_gnss_only_init) {
+    return;
+  }
+
   localization_integ_.RawEphemerisProcess(gnss_orbit_msg);
   return;
 }

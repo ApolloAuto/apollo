@@ -92,6 +92,7 @@ DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
 DECLARE_bool(imu_coord_rfu);
 DECLARE_bool(gnss_only_init);
+DECLARE_bool(enable_lidar_localization);
 
 // Debug
 DECLARE_bool(use_visualize);

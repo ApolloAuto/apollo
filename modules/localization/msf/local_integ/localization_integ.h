@@ -46,17 +46,19 @@ typedef drivers::gnss::GnssBestPose GnssBestPose;
 enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK };
 
 class LocalizationResult {
-public:
+ public:
   LocalizationResult() : state_(LocalizationMeasureState::NOT_VALID) {}
-  LocalizationResult(const LocalizationMeasureState& state, 
-      const LocalizationEstimate& localiztion) : state_(state), localization_(localiztion) {}
+  LocalizationResult(const LocalizationMeasureState& state,
+                     const LocalizationEstimate& localiztion)
+      : state_(state), localization_(localiztion) {}
   LocalizationMeasureState state() const {
     return state_;
   }
   LocalizationEstimate localization() const {
     return localization_;
   }
-private:
+
+ private:
   LocalizationMeasureState state_;
   LocalizationEstimate localization_;
 };
@@ -69,12 +71,13 @@ enum class LocalizationErrorCode {
 };
 
 class LocalizationState {
-public:
-  LocalizationState() : error_code_(LocalizationErrorCode::OK), error_msg_("") {}
-  
-  LocalizationState(LocalizationErrorCode code, const std::string &msg) 
+ public:
+  LocalizationState()
+      : error_code_(LocalizationErrorCode::OK), error_msg_("") {}
+
+  LocalizationState(LocalizationErrorCode code, const std::string& msg)
       : error_code_(code), error_msg_(msg) {}
-  
+
   static LocalizationState OK() {
     return LocalizationState();
   }
@@ -90,8 +93,8 @@ public:
   bool ok() {
     return error_code_ == LocalizationErrorCode::OK;
   }
-  
-private:
+
+ private:
   LocalizationErrorCode error_code_;
   std::string error_msg_;
 };
@@ -143,6 +146,7 @@ struct LocalizationIntegParam {
   // common
   int utm_zone_id;
   double imu_rate;
+  bool enable_lidar_localization;
 
   bool is_use_visualize;
 };
@@ -180,13 +184,13 @@ class LocalizationInteg {
   void GnssBestPoseProcess(const GnssBestPose& bestgnsspos_msg);
 
   void GetLastestLidarLocalization(LocalizationMeasureState& state,
-                       LocalizationEstimate& lidar_localization);
+                                   LocalizationEstimate& lidar_localization);
 
   void GetLastestIntegLocalization(LocalizationMeasureState& state,
-                       LocalizationEstimate& integ_localization);
+                                   LocalizationEstimate& integ_localization);
 
   void GetLastestGnssLocalization(LocalizationMeasureState& state,
-                      LocalizationEstimate& gnss_localization);
+                                  LocalizationEstimate& gnss_localization);
 
   void GetLidarLocalizationList(std::list<LocalizationResult>& results);
 
@@ -196,10 +200,9 @@ class LocalizationInteg {
 
  private:
   LocalizationIntegImpl* localization_integ_impl_;
-
 };
 
 }  // namespace localization
 }  // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
+#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_

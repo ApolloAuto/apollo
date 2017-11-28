@@ -114,6 +114,8 @@ DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
 DEFINE_bool(imu_coord_rfu, true, "Right/forward/up");
 DEFINE_bool(gnss_only_init, false,
             "Whether use bestgnsspose as measure after initializaiton.");
+DEFINE_bool(enable_lidar_localization, true,
+            "Enable lidar-based localization.");
 
 // debug
 DEFINE_bool(use_visualize, false, "");
