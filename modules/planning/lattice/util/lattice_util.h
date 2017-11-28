@@ -16,8 +16,8 @@
 
 // NOTE: This file is created temporarily until lattice merge to master branch
 
-#ifndef MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
-#define MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
+#ifndef MODULES_PLANNING_LATTICE_UTIL_LATTICE_UTIL_H_
+#define MODULES_PLANNING_LATTICE_UTIL_LATTICE_UTIL_H_
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -36,4 +36,4 @@ void ComputeInitFrenetState(const common::PathPoint& matched_point,
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_LATTICE_UTIL_H_
+#endif  // MODULES_PLANNING_LATTICE_UTIL_LATTICE_UTIL_H_

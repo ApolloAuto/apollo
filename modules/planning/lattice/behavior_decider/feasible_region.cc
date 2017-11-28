@@ -18,6 +18,7 @@
 
 #include <cmath>
 
+#include "glog/logging.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
 
@@ -33,10 +34,13 @@ void FeasibleRegion::Setup(const std::array<double, 3>& init_s,
                            const double speed_limit) {
   init_s_ = init_s;
   speed_limit_ = speed_limit;
-  // TODO(all) Check v should be positive
+
   double v = init_s[1];
+  CHECK(v >= 0.0);
+
   time_to_zero_speed_ = v / max_deceleration;
   s_to_zero_speed_ = init_s[0] + v * v / (2.0 * max_deceleration);
+
   double delta_v = std::abs(v - speed_limit);
   if (v < speed_limit) {
     time_to_speed_limit_ = delta_v / max_acceleration;
