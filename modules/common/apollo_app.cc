@@ -24,7 +24,6 @@
 #include "modules/common/log.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/string_util.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
 
 #include "ros/include/ros/ros.h"
 
@@ -36,13 +35,6 @@ namespace common {
 void ApolloApp::SetCallbackThreadNumber(uint32_t callback_thread_num) {
   CHECK_GE(callback_thread_num, 1);
   callback_thread_num_ = callback_thread_num;
-}
-
-void ApolloApp::ReportModuleStatus(
-    const apollo::hmi::ModuleStatus::Status status) {
-  status_.set_name(Name());
-  status_.set_status(status);
-  hmi::HMIStatusHelper::ReportModuleStatus(status_);
 }
 
 void ApolloApp::ExportFlags() const {
@@ -65,22 +57,17 @@ int ApolloApp::Spin() {
   auto status = Init();
   if (!status.ok()) {
     AERROR << Name() << " Init failed: " << status;
-    ReportModuleStatus(apollo::hmi::ModuleStatus::UNINITIALIZED);
     return -1;
   }
-  ReportModuleStatus(apollo::hmi::ModuleStatus::INITIALIZED);
   status = Start();
   if (!status.ok()) {
     AERROR << Name() << " Start failed: " << status;
-    ReportModuleStatus(apollo::hmi::ModuleStatus::STOPPED);
     return -2;
   }
   ExportFlags();
-  ReportModuleStatus(apollo::hmi::ModuleStatus::STARTED);
   spinner.start();
   ros::waitForShutdown();
   Stop();
-  ReportModuleStatus(apollo::hmi::ModuleStatus::STOPPED);
   AINFO << Name() << " exited.";
   return 0;
 }

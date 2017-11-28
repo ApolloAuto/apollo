@@ -13,14 +13,4 @@ cc_inc_library(
     ],
 )
 
-cc_inc_library(
-    name = "hardware_check_utils",
-    hdrs = [
-        "hardware_check_utils.h",
-    ],
-    deps = [
-        ":hardware_checker",
-    ],
-)
-
 cpplint()
