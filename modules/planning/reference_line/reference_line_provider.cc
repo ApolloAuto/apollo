@@ -72,11 +72,8 @@ bool ReferenceLineProvider::IsAllowChangeLane(
     const common::math::Vec2d &point,
     const std::list<RouteSegments> &route_segments) {
   if (FLAGS_reckless_change_lane) {
-    ADEBUG << "enabled reckless change lane enabled";
+    AERROR << "reckless change lane is enabled";
     return true;
-  }
-  if (route_segments.size() <= 1) {
-    return false;
   }
   auto forward_segment = route_segments.begin();
   while (forward_segment != route_segments.end() &&
@@ -93,6 +90,7 @@ bool ReferenceLineProvider::IsAllowChangeLane(
            << point.DebugString();
     return false;
   }
+
   auto history_iter = segment_history_.find(forward_segment->Id());
   if (history_iter == segment_history_.end()) {
     auto &inserter = segment_history_[forward_segment->Id()];
@@ -109,8 +107,9 @@ bool ReferenceLineProvider::IsAllowChangeLane(
     history_iter->second.accumulate_s += dist;
     constexpr double kChangeLaneMinL = 0.25;
     constexpr double kChangeLaneMinLengthFactor = 0.6;
+
     if (history_iter->second.min_l < kChangeLaneMinL &&
-        history_iter->second.accumulate_s >=
+        std::fmax(waypoint.s, history_iter->second.accumulate_s) >=
             kChangeLaneMinLengthFactor * FLAGS_min_length_for_lane_change) {
       return true;
     }
