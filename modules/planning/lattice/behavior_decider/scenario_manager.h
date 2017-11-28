@@ -46,19 +46,19 @@ class ScenarioManager {
  public:
   void Reset();
   int ComputeWorldDecision(
-    Frame* frame, const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line,
-    std::vector<PlanningTarget>* const decisions);
+      Frame* frame, const common::TrajectoryPoint& init_planning_point,
+      const std::array<double, 3>& lon_init_state,
+      const std::vector<common::PathPoint>& discretized_reference_line,
+      std::vector<PlanningTarget>* const decisions);
 
-  template<class T>
+  template <class T>
   void RegisterScenario(FeatureLevel level) {
     auto scenario = std::unique_ptr<T>(new T());
     scenarios_[static_cast<int>(level)].push_back(scenario.get());
     indexed_scenarios_[scenario->Name()] = std::move(scenario);
   }
 
-  template<class T>
+  template <class T>
   const T* FindScenario() const {
     auto scenario_iter = indexed_scenarios_.find(T::scenario_name());
     if (scenario_iter == indexed_scenarios_.end()) {

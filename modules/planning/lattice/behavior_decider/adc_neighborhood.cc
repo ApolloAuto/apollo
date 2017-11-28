@@ -33,42 +33,36 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 
-ADCNeighborhood::ADCNeighborhood(
-    const Frame* frame,
-    const TrajectoryPoint& planning_init_point,
-    const ReferenceLine& reference_line) {
+ADCNeighborhood::ADCNeighborhood(const Frame* frame,
+                                 const TrajectoryPoint& planning_init_point,
+                                 const ReferenceLine& reference_line) {
   InitNeighborhood(frame, planning_init_point, reference_line);
 }
 
 void ADCNeighborhood::InitNeighborhood(
-    const Frame* frame,
-    const TrajectoryPoint& planning_init_point,
+    const Frame* frame, const TrajectoryPoint& planning_init_point,
     const ReferenceLine& reference_line) {
   SetupADC(frame, planning_init_point, reference_line);
   SetupObstacles(frame, reference_line);
 }
 
-void ADCNeighborhood::SetupADC(
-    const Frame* frame,
-    const TrajectoryPoint& planning_init_point,
-    const ReferenceLine& reference_line) {
+void ADCNeighborhood::SetupADC(const Frame* frame,
+                               const TrajectoryPoint& planning_init_point,
+                               const ReferenceLine& reference_line) {
   auto discretized_reference_line =
-      ToDiscretizedReferenceLine(
-          reference_line.reference_points());
+      ToDiscretizedReferenceLine(reference_line.reference_points());
   PathPoint matched_point = ReferenceLineMatcher::MatchToReferenceLine(
       discretized_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
   std::array<double, 3> init_s;
   std::array<double, 3> init_d;
-  ComputeInitFrenetState(matched_point, planning_init_point,
-      &init_s, &init_d);
+  ComputeInitFrenetState(matched_point, planning_init_point, &init_s, &init_d);
   init_s_ = init_s;
   init_d_ = init_d;
 }
 
-void ADCNeighborhood::SetupObstacles(
-    const Frame* frame,
-    const ReferenceLine& reference_line) {
+void ADCNeighborhood::SetupObstacles(const Frame* frame,
+                                     const ReferenceLine& reference_line) {
   const std::vector<const Obstacle*>& obstacles = frame->obstacles();
   std::vector<PathPoint> discretized_ref_points =
       ToDiscretizedReferenceLine(reference_line.reference_points());
@@ -86,7 +80,7 @@ void ADCNeighborhood::SetupObstacles(
       if (overlap) {
         SLBoundary sl_boundary;
         reference_line.GetSLBoundary(box, &sl_boundary);
-        
+
         // TODO(all) confirm the logic to determine whether an obstacle
         // is forward or backward.
         if (sl_boundary.end_s() < init_s_[0]) {
@@ -104,20 +98,23 @@ void ADCNeighborhood::SetupObstacles(
             break;
           }
         }
-        double v = SpeedOnReferenceLine(discretized_ref_points,
-              obstacle, sl_boundary);
-        critical_conditions_[obstacle->Id()].set_obstacle_id(
-              obstacle->Id());
+        double v =
+            SpeedOnReferenceLine(discretized_ref_points, obstacle, sl_boundary);
+        critical_conditions_[obstacle->Id()].set_obstacle_id(obstacle->Id());
         if (!entered) {
-          SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
+          SetCriticalPoint(
+              relative_time, sl_boundary.start_s(), v,
               critical_conditions_[obstacle->Id()].mutable_bottom_left());
-          SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
+          SetCriticalPoint(
+              relative_time, sl_boundary.end_s(), v,
               critical_conditions_[obstacle->Id()].mutable_upper_left());
           entered = !entered;
         }
-        SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
+        SetCriticalPoint(
+            relative_time, sl_boundary.start_s(), v,
             critical_conditions_[obstacle->Id()].mutable_bottom_right());
-        SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
+        SetCriticalPoint(
+            relative_time, sl_boundary.end_s(), v,
             critical_conditions_[obstacle->Id()].mutable_upper_right());
       }
       relative_time += trajectory_time_resolution;
@@ -125,9 +122,9 @@ void ADCNeighborhood::SetupObstacles(
   }
 }
 
-void ADCNeighborhood::SetCriticalPoint(
-    const double t, const double s, const double v,
-    CriticalPoint* critical_point) {
+void ADCNeighborhood::SetCriticalPoint(const double t, const double s,
+                                       const double v,
+                                       CriticalPoint* critical_point) {
   critical_point->set_t(t);
   critical_point->set_s(s);
   critical_point->set_v(v);
@@ -135,17 +132,15 @@ void ADCNeighborhood::SetCriticalPoint(
 
 double ADCNeighborhood::SpeedOnReferenceLine(
     const std::vector<apollo::common::PathPoint>& discretized_ref_points,
-    const Obstacle* obstacle,
-    const SLBoundary& sl_boundary) {
+    const Obstacle* obstacle, const SLBoundary& sl_boundary) {
   PathPoint obstacle_point_on_ref_line =
-      ReferenceLineMatcher::MatchToReferenceLine(
-          discretized_ref_points, sl_boundary.start_s());
-  const PerceptionObstacle& perception_obstacle =
-      obstacle->Perception();
+      ReferenceLineMatcher::MatchToReferenceLine(discretized_ref_points,
+                                                 sl_boundary.start_s());
+  const PerceptionObstacle& perception_obstacle = obstacle->Perception();
   double ref_theta = obstacle_point_on_ref_line.theta();
   auto velocity = perception_obstacle.velocity();
-  double v = std::cos(ref_theta) * velocity.x() +
-      std::sin(ref_theta) * velocity.y();
+  double v =
+      std::cos(ref_theta) * velocity.x() + std::sin(ref_theta) * velocity.y();
   return v;
 }
 
@@ -158,12 +153,11 @@ void ADCNeighborhood::GetCriticalConditions(
 }
 
 bool ADCNeighborhood::GetCriticalCondition(
-    const std::string& obstacle_id,
-    CriticalCondition* critical_condition) {
+    const std::string& obstacle_id, CriticalCondition* critical_condition) {
   if (forward_obstacle_id_set_.find(obstacle_id) ==
-      forward_obstacle_id_set_.end() ||
+          forward_obstacle_id_set_.end() ||
       backward_obstacle_id_set_.find(obstacle_id) ==
-      backward_obstacle_id_set_.end()) {
+          backward_obstacle_id_set_.end()) {
     return false;
   }
   *critical_condition = critical_conditions_[obstacle_id];
@@ -171,8 +165,7 @@ bool ADCNeighborhood::GetCriticalCondition(
 }
 
 bool ADCNeighborhood::ForwardNearestObstacle(
-    std::array<double, 3>* forward_nearest_obstacle_state,
-    double* enter_time) {
+    std::array<double, 3>* forward_nearest_obstacle_state, double* enter_time) {
   bool found = false;
   for (const auto& obstacle_state : forward_neighborhood_) {
     double obstacle_s = obstacle_state[1];

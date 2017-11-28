@@ -28,11 +28,10 @@ namespace planning {
 std::vector<common::PathPoint> ToDiscretizedReferenceLine(
     const std::vector<ReferencePoint>& ref_points);
 
-void ComputeInitFrenetState(
-    const common::PathPoint& matched_point,
-    const common::TrajectoryPoint& cartesian_state,
-    std::array<double, 3>* ptr_s,
-    std::array<double, 3>* ptr_d);
+void ComputeInitFrenetState(const common::PathPoint& matched_point,
+                            const common::TrajectoryPoint& cartesian_state,
+                            std::array<double, 3>* ptr_s,
+                            std::array<double, 3>* ptr_d);
 
 }  // namespace planning
 }  // namespace apollo

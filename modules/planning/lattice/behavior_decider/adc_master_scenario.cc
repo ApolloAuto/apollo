@@ -16,8 +16,7 @@
 namespace apollo {
 namespace planning {
 
-void AdcMasterScenario::Reset() {
-}
+void AdcMasterScenario::Reset() {}
 
 bool AdcMasterScenario::Init() {
   exist_ = true;
@@ -25,11 +24,10 @@ bool AdcMasterScenario::Init() {
 }
 
 int AdcMasterScenario::ComputeScenarioDecision(
-  Frame* frame, const common::TrajectoryPoint& init_planning_point,
-  const std::array<double, 3>& lon_init_state,
-  const std::vector<common::PathPoint>& discretized_reference_line, 
-  std::vector<PlanningTarget>* const decisions) {
-
+    Frame* frame, const common::TrajectoryPoint& init_planning_point,
+    const std::array<double, 3>& lon_init_state,
+    const std::vector<common::PathPoint>& discretized_reference_line,
+    std::vector<PlanningTarget>* const decisions) {
   CHECK(frame != nullptr);
 
   // Only handles one reference line
@@ -58,6 +56,5 @@ int AdcMasterScenario::ComputeScenarioDecision(
 
   return 0;
 }
-
 }
 }

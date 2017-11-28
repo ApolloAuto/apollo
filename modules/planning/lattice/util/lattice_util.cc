@@ -54,11 +54,10 @@ std::vector<common::PathPoint> ToDiscretizedReferenceLine(
   return path_points;
 }
 
-void ComputeInitFrenetState(
-    const PathPoint& matched_point,
-    const TrajectoryPoint& cartesian_state,
-    std::array<double, 3>* ptr_s,
-    std::array<double, 3>* ptr_d) {
+void ComputeInitFrenetState(const PathPoint& matched_point,
+                            const TrajectoryPoint& cartesian_state,
+                            std::array<double, 3>* ptr_s,
+                            std::array<double, 3>* ptr_d) {
   CartesianFrenetConverter::cartesian_to_frenet(
       matched_point.s(), matched_point.x(), matched_point.y(),
       matched_point.theta(), matched_point.kappa(), matched_point.dkappa(),

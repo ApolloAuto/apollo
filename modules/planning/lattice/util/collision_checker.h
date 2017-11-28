@@ -32,14 +32,12 @@ namespace planning {
 
 class CollisionChecker {
  public:
-  explicit CollisionChecker(
-      const std::vector<const Obstacle*>& obstacles);
+  explicit CollisionChecker(const std::vector<const Obstacle*>& obstacles);
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
  private:
-  void BuildPredictedEnv(
-       const std::vector<const Obstacle*>& obstacles);
+  void BuildPredictedEnv(const std::vector<const Obstacle*>& obstacles);
 
   std::vector<std::vector<common::math::Box2d>> predicted_envs_;
 };

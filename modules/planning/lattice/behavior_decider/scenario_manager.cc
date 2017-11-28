@@ -15,19 +15,18 @@
 namespace apollo {
 namespace planning {
 
-ScenarioManager::ScenarioManager() {
-}
+ScenarioManager::ScenarioManager() {}
 
 void ScenarioManager::RegisterScenarios() {
-    scenarios_.clear();
-    scenarios_.resize(NUM_LEVELS);
-    //level 0 features
-    RegisterScenario<AdcMasterScenario>(LEVEL0);
+  scenarios_.clear();
+  scenarios_.resize(NUM_LEVELS);
+  // level 0 features
+  RegisterScenario<AdcMasterScenario>(LEVEL0);
 }
 
 void ScenarioManager::Reset() {
-    scenarios_.clear();
-    indexed_scenarios_.clear();
+  scenarios_.clear();
+  indexed_scenarios_.clear();
 }
 
 int ScenarioManager::ComputeWorldDecision(
@@ -35,37 +34,39 @@ int ScenarioManager::ComputeWorldDecision(
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
     std::vector<PlanningTarget>* const decisions) {
-    RegisterScenarios();
-    AINFO << "Register Scenarios Success";
+  RegisterScenarios();
+  AINFO << "Register Scenarios Success";
 
-    for (auto& level_scenario : scenarios_) {
-        for (auto scenario : level_scenario) {
+  for (auto& level_scenario : scenarios_) {
+    for (auto scenario : level_scenario) {
+      scenario->Reset();
 
-            scenario->Reset();
+      if (not scenario->Init()) {
+        AINFO << "scenario[" << scenario->Name() << "] init failed";
+      } else {
+        AINFO << "scenario[" << scenario->Name() << "] init success";
+      }
 
-            if (not scenario->Init()) {
-                AINFO << "scenario[" << scenario->Name() <<"] init failed";
-            } else {
-                AINFO << "scenario[" << scenario->Name() <<"] init success";
-            }
-
-            // check if exists
-            if (not scenario->ScenarioExist()) {
-                AINFO << "scenario[" << scenario->Name() <<"] not exists";
-            } else {
-                AINFO << "scenario[" << scenario->Name() <<"] does exists";
-            }
-            // compute decision
-            if (0 != scenario->ComputeScenarioDecision(
-		          frame, init_planning_point, lon_init_state,
-                  discretized_reference_line, decisions) ) {
-                AINFO << "scenario[" << scenario->Name() <<"] Success in computing decision";
-            } else {
-                AERROR << "scenario[" << scenario->Name() <<"] Failed in computing decision";
-            }
-        }
+      // check if exists
+      if (not scenario->ScenarioExist()) {
+        AINFO << "scenario[" << scenario->Name() << "] not exists";
+      } else {
+        AINFO << "scenario[" << scenario->Name() << "] does exists";
+      }
+      // compute decision
+      if (0 !=
+          scenario->ComputeScenarioDecision(
+              frame, init_planning_point, lon_init_state,
+              discretized_reference_line, decisions)) {
+        AINFO << "scenario[" << scenario->Name()
+              << "] Success in computing decision";
+      } else {
+        AERROR << "scenario[" << scenario->Name()
+               << "] Failed in computing decision";
+      }
     }
-    return 0;
+  }
+  return 0;
 }
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo

@@ -84,20 +84,19 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
   }
 
   // interpolate between it_lower - 1 and it_lower
-  //return interpolate(*(it_lower - 1), *it_lower, s);
+  // return interpolate(*(it_lower - 1), *it_lower, s);
   return InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower, s);
 }
 
 PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
-                                                     const PathPoint& p1,
-                                                     const double x,
-                                                     const double y) {
+                                                    const PathPoint& p1,
+                                                    const double x,
+                                                    const double y) {
   double heading_geodesic =
       common::math::NormalizeAngle(p1.theta() - p0.theta());
   HermiteSpline<double, 5> spline_geodesic(
       {0.0, p0.kappa(), p0.dkappa()},
-      {heading_geodesic, p1.kappa(), p1.dkappa()},
-      p0.s(), p1.s());
+      {heading_geodesic, p1.kappa(), p1.dkappa()}, p0.s(), p1.s());
 
   auto func_dist_square = [&spline_geodesic, &p0, &x, &y](const double s) {
     auto func_cos_theta = [&spline_geodesic, &p0](const double s) {
