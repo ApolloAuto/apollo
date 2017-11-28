@@ -148,6 +148,9 @@ class VisualizationEngine {
             const unsigned int loc_info_num = 1);
   void Visualize(const std::vector<LocalizatonInfo> &loc_infos,
                  const std::vector<Eigen::Vector3d> &cloud);
+  // void SetAutoPlay() {
+  //   auto_play_
+  // }
 
  private:
   void Preprocess(const std::string &map_folder);
@@ -158,6 +161,7 @@ class VisualizationEngine {
   void DrawTrajectory(const cv::Point &bias);
   void DrawLegend();
   void DrawInfo();
+  void DrawTips();
 
   void UpdateLevel();
   /**@brief Generate multi resolution images from origin map node images.*/
@@ -195,8 +199,6 @@ class VisualizationEngine {
   void ProcessKey(int key);
 
   inline void QuaternionToEuler(const double quaternion[4], double att[3]) {
-    double roll_main = 0.0;
-    double yaw_main = 0.0;
     double dcm21 =
         2 * (quaternion[2] * quaternion[3] + quaternion[0] * quaternion[1]);
     double dcm20 =
@@ -234,6 +236,7 @@ class VisualizationEngine {
   cv::Mat image_window_;
   cv::Mat big_window_;
   cv::Mat subMat_[3][3];
+  cv::Mat tips_window_;
 
   Eigen::Vector2d _view_center;
   double cur_scale_;
@@ -259,6 +262,8 @@ class VisualizationEngine {
   std::vector<std::map<double, Eigen::Vector2d>> trajectory_groups_;
 
   bool is_draw_car_;
+  bool is_draw_trajectory_;
+  bool is_draw_std_;
   std::vector<cv::Mat> car_img_mats_;
 };
 

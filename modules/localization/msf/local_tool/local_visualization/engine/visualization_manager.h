@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file visual_msg_scheduler.h
+ * @file visualization_manager.h
  * @brief
  */
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
@@ -32,7 +32,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-struct LidarFrame {
+struct LidarVisFrame {
   /**@brief The frame index. */
   unsigned int frame_id;
   /**@brief The time stamp. */
@@ -91,6 +91,7 @@ class MessageBuffer {
 
   bool PushNewMessage(const double timestamp, const MessageType &msg);
   bool PopOldestMessage(MessageType &msg);
+  bool GetMessageBefore(const double timestamp, MessageType &msg);
   bool GetMessage(const double timestamp, MessageType &msg);
 
   void Clear();
@@ -99,6 +100,7 @@ class MessageBuffer {
   void GetAllMessages(std::list<std::pair<double, MessageType>> &msg_list);
 
   bool IsEmpty();
+  unsigned int BufferSize();
 
  protected:
   std::map<double, ListIterator> msg_map_;
@@ -120,7 +122,7 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
   ~IntepolationMessageBuffer();
 
   bool QueryMessage(const double timestamp, MessageType &msg,
-                    double timeout_s = 0.1);
+                    double timeout_s = 0.05);
 
  private:
   bool WaitMessageBufferOk(const double timestamp,
@@ -129,19 +131,36 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
                            double timeout_ms);
 };
 
+struct VisualizationManagerParams {
+  std::string map_folder;
+  std::string lidar_extrinsic_file;
+  unsigned int lidar_frame_buffer_capacity;
+  unsigned int gnss_loc_info_buffer_capacity;
+  unsigned int lidar_loc_info_buffer_capacity;
+  unsigned int fusion_loc_info_buffer_capacity;
+};
+
 class VisualizationManager {
-#define LOC_INFO_NUM 2
+#define LOC_INFO_NUM 3
  public:
   VisualizationManager();
   ~VisualizationManager();
 
+  static VisualizationManager &GetInstance() {
+    static VisualizationManager visual_manage;
+    return visual_manage;
+  }
+
   bool Init(const std::string &map_folder,
-            const Eigen::Affine3d &velodyne_extrinsic);
-  void AddLidarFrame(const LidarFrame &lidar_frame);
+            const std::string lidar_extrinsic_file);
+  bool Init(const VisualizationManagerParams &params);
+
+  void AddLidarFrame(const LidarVisFrame &lidar_frame);
   void AddGNSSLocMessage(const LocalizationMsg &gnss_loc_msg);
   void AddLidarLocMessage(const LocalizationMsg &lidar_loc_msg);
   void AddFusionLocMessage(const LocalizationMsg &fusion_loc_msg);
   void StartVisualization();
+  void StopVisualization();
 
  private:
   void DoVisualize();
@@ -154,7 +173,7 @@ class VisualizationManager {
   std::thread visual_thread_;
   bool stop_visualization_;
 
-  MessageBuffer<LidarFrame> lidar_frame_buffer_;
+  MessageBuffer<LidarVisFrame> lidar_frame_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> gnss_loc_info_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> lidar_loc_info_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> fusion_loc_info_buffer_;

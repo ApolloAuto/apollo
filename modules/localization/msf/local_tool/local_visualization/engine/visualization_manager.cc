@@ -42,11 +42,14 @@ bool MessageBuffer<MessageType>::PushNewMessage(const double timestamp,
     return false;
   }
 
+  pthread_mutex_lock(&buffer_mutex_);
   auto found_iter = msg_map_.find(timestamp);
   if (found_iter != msg_map_.end()) {
     std::cerr << "The msg has existed in buffer." << std::endl;
+    pthread_mutex_unlock(&buffer_mutex_);
     return false;
   }
+  pthread_mutex_unlock(&buffer_mutex_);
 
   std::pair<double, MessageType> msg_pair = std::make_pair(timestamp, msg);
   pthread_mutex_lock(&buffer_mutex_);
@@ -81,12 +84,37 @@ bool MessageBuffer<MessageType>::PopOldestMessage(MessageType &msg) {
 }
 
 template <class MessageType>
+bool MessageBuffer<MessageType>::GetMessageBefore(const double timestamp,
+                                                  MessageType &msg) {
+  if (IsEmpty()) {
+    std::cerr << "The buffer is empty." << std::endl;
+    return false;
+  }
+
+  std::list<std::pair<double, MessageType>> msg_list;
+  pthread_mutex_lock(&buffer_mutex_);
+  std::copy(this->msg_list_.begin(), this->msg_list_.end(),
+            std::back_inserter(msg_list));
+  pthread_mutex_unlock(&buffer_mutex_);
+
+  for (ListIterator iter = msg_list.end(); iter != msg_list.begin();) {
+    --iter;
+    if (iter->first <= timestamp) {
+      msg = iter->second;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+template <class MessageType>
 bool MessageBuffer<MessageType>::GetMessage(const double timestamp,
                                             MessageType &msg) {
   pthread_mutex_lock(&buffer_mutex_);
   auto found_iter = msg_map_.find(timestamp);
   if (found_iter != msg_map_.end()) {
-    msg = found_iter->second;
+    msg = found_iter->second->second;
     pthread_mutex_unlock(&buffer_mutex_);
     return true;
   }
@@ -125,6 +153,16 @@ bool MessageBuffer<MessageType>::IsEmpty() {
   return flag;
 }
 
+template <class MessageType>
+unsigned int MessageBuffer<MessageType>::BufferSize() {
+  unsigned int size = 0;
+  pthread_mutex_lock(&buffer_mutex_);
+  size = msg_list_.size();
+  pthread_mutex_unlock(&buffer_mutex_);
+
+  return size;
+}
+
 //==============IntepolationMessageBuffer==================
 template <class MessageType>
 IntepolationMessageBuffer<MessageType>::IntepolationMessageBuffer(int capacity)
@@ -157,13 +195,13 @@ bool IntepolationMessageBuffer<MessageType>::QueryMessage(
 
   ListIterator after_iter;
   ListIterator before_iter;
-  for (ListIterator iter = msg_list_tem.end(); iter != msg_list_tem.begin();
-       --iter) {
+  for (ListIterator iter = msg_list_tem.end(); iter != msg_list_tem.begin();) {
     --iter;
     if (iter->first > timestamp) {
       after_iter = iter;
     } else {
       before_iter = iter;
+
       double delta_time = after_iter->first - before_iter->first;
       // if (delete_time > 0.1) {
       //     return false;
@@ -178,7 +216,6 @@ bool IntepolationMessageBuffer<MessageType>::QueryMessage(
       break;
     }
   }
-
   return true;
 }
 
@@ -190,9 +227,9 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
       boost::posix_time::microsec_clock::local_time();
   pthread_mutex_lock(&(this->buffer_mutex_));
   msg_list.clear();
-  msg_map.clear();
   std::copy(this->msg_list_.begin(), this->msg_list_.end(),
             std::back_inserter(msg_list));
+  msg_map = this->msg_map_;
   pthread_mutex_unlock(&(this->buffer_mutex_));
 
   if (msg_list.empty()) {
@@ -207,9 +244,9 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
     usleep(5000);
     pthread_mutex_lock(&(this->buffer_mutex_));
     msg_list.clear();
-    msg_map.clear();
     std::copy(this->msg_list_.begin(), this->msg_list_.end(),
               std::back_inserter(msg_list));
+    msg_map = this->msg_map_;
     pthread_mutex_unlock(&(this->buffer_mutex_));
     last_iter = msg_list.end();
     --last_iter;
@@ -231,8 +268,8 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
 VisualizationManager::VisualizationManager()
     : visual_engine_(),
       stop_visualization_(false),
-      lidar_frame_buffer_(2),
-      gnss_loc_info_buffer_(2),
+      lidar_frame_buffer_(10),
+      gnss_loc_info_buffer_(10),
       lidar_loc_info_buffer_(20),
       fusion_loc_info_buffer_(200) {}
 
@@ -242,7 +279,7 @@ VisualizationManager::~VisualizationManager() {
 }
 
 bool VisualizationManager::Init(const std::string &map_folder,
-                                const Eigen::Affine3d &velodyne_extrinsic) {
+                                const std::string lidar_extrinsic_file) {
   BaseMapConfig map_config;
   unsigned int resolution_id = 0;
   int zone_id = 0;
@@ -256,13 +293,22 @@ bool VisualizationManager::Init(const std::string &map_folder,
   }
   std::cout << "Load map config succeed." << std::endl;
 
-  resolution_id = 0;
   success = GetZoneIdFromMapFolder(map_folder, resolution_id, zone_id);
   if (!success) {
     std::cerr << "Get zone id failed." << std::endl;
     return false;
   }
   std::cout << "Get zone id succeed." << std::endl;
+
+  std::cout << "Load lidar_extrinsic_file: " << lidar_extrinsic_file
+            << std::endl;
+  Eigen::Affine3d velodyne_extrinsic;
+  success = velodyne::LoadExtrinsic(lidar_extrinsic_file, velodyne_extrinsic);
+  if (!success) {
+    std::cerr << "Load velodyne extrinsic failed." << std::endl;
+    return false;
+  }
+  std::cout << "Load velodyne extrinsic succeed." << std::endl;
 
   success = visual_engine_.Init(map_folder, map_config, resolution_id, zone_id,
                                 velodyne_extrinsic, LOC_INFO_NUM);
@@ -275,22 +321,39 @@ bool VisualizationManager::Init(const std::string &map_folder,
   return true;
 }
 
-void VisualizationManager::AddLidarFrame(const LidarFrame &lidar_frame) {
+bool VisualizationManager::Init(const VisualizationManagerParams &params) {
+  lidar_frame_buffer_.SetCapacity(params.lidar_frame_buffer_capacity);
+  gnss_loc_info_buffer_.SetCapacity(params.gnss_loc_info_buffer_capacity);
+  lidar_loc_info_buffer_.SetCapacity(params.lidar_loc_info_buffer_capacity);
+  fusion_loc_info_buffer_.SetCapacity(params.fusion_loc_info_buffer_capacity);
+
+  return Init(params.map_folder, params.lidar_extrinsic_file);
+}
+
+void VisualizationManager::AddLidarFrame(const LidarVisFrame &lidar_frame) {
+  std::cout << "AddLidarFrame." << std::endl;
+  static int id = 0;
+  std::cout << "id." << id << std::endl;
   lidar_frame_buffer_.PushNewMessage(lidar_frame.timestamp, lidar_frame);
+  std::cout << "id." << id << std::endl;
+  id++;
 }
 
 void VisualizationManager::AddGNSSLocMessage(
     const LocalizationMsg &gnss_loc_msg) {
+  std::cout << "AddGNSSLocMessage." << std::endl;
   gnss_loc_info_buffer_.PushNewMessage(gnss_loc_msg.timestamp, gnss_loc_msg);
 }
 
 void VisualizationManager::AddLidarLocMessage(
     const LocalizationMsg &lidar_loc_msg) {
+  std::cout << "AddLidarLocMessage." << std::endl;
   lidar_loc_info_buffer_.PushNewMessage(lidar_loc_msg.timestamp, lidar_loc_msg);
 }
 
 void VisualizationManager::AddFusionLocMessage(
     const LocalizationMsg &fusion_loc_msg) {
+  std::cout << "AddFusionLocMessage." << std::endl;
   fusion_loc_info_buffer_.PushNewMessage(fusion_loc_msg.timestamp,
                                          fusion_loc_msg);
 }
@@ -299,11 +362,37 @@ void VisualizationManager::StartVisualization() {
   visual_thread_ = std::thread(&VisualizationManager::DoVisualize, this);
 }
 
+void VisualizationManager::StopVisualization() {
+  stop_visualization_ = true;
+  visual_thread_.join();
+}
+
 void VisualizationManager::DoVisualize() {
   while (!stop_visualization_) {
-    usleep(50000);
-    if (!lidar_frame_buffer_.IsEmpty()) {
-      LidarFrame lidar_frame;
+    usleep(10000);
+    // if (!lidar_frame_buffer_.IsEmpty()) {
+    if (lidar_frame_buffer_.BufferSize() > 5) {
+      // std::list<std::pair<double, LidarVisFrame>> msg_list1;
+      // lidar_frame_buffer_.GetAllMessages(msg_list1);
+
+      // std::list<std::pair<double, LocalizationMsg>> msg_list2;
+      // lidar_loc_info_buffer_.GetAllMessages(msg_list2);
+
+      // for (std::list<std::pair<double, LidarVisFrame>>::iterator iter =
+      // msg_list1.begin();
+      //        iter != msg_list1.end(); ++iter) {
+      //   std::cout << iter->first;
+      // }
+      // std::cout << "\n";
+
+      // for (std::list<std::pair<double, LocalizationMsg>>::iterator iter =
+      // msg_list2.begin();
+      //        iter != msg_list2.end(); ++iter) {
+      //   std::cout << iter->first;
+      // }
+      // std::cout << "\n";
+
+      LidarVisFrame lidar_frame;
       bool pop_success = lidar_frame_buffer_.PopOldestMessage(lidar_frame);
       if (!pop_success) {
         continue;
@@ -311,10 +400,13 @@ void VisualizationManager::DoVisualize() {
 
       LocalizationMsg lidar_loc;
       LocalizationMsg fusion_loc;
-      bool lidar_query_success = fusion_loc_info_buffer_.QueryMessage(
-          lidar_frame.timestamp, lidar_loc, 0.1);
+      bool lidar_query_success = lidar_loc_info_buffer_.QueryMessage(
+          lidar_frame.timestamp, lidar_loc, 0.02);
+      // bool lidar_query_success = lidar_loc_info_buffer_.GetMessage(
+      //     lidar_frame.timestamp, lidar_loc);
+
       bool fusion_query_success = fusion_loc_info_buffer_.QueryMessage(
-          lidar_frame.timestamp, fusion_loc, 0.1);
+          lidar_frame.timestamp, fusion_loc, 0.02);
 
       if (!lidar_query_success && !fusion_query_success) {
         continue;
@@ -322,6 +414,7 @@ void VisualizationManager::DoVisualize() {
 
       LocalizatonInfo lidar_loc_info;
       LocalizatonInfo fusion_loc_info;
+      LocalizatonInfo gnss_loc_info;
 
       if (lidar_query_success) {
         Eigen::Translation3d trans(
@@ -329,11 +422,10 @@ void VisualizationManager::DoVisualize() {
         Eigen::Quaterniond quat(lidar_loc.qw, lidar_loc.qx, lidar_loc.qy,
                                 lidar_loc.qz);
 
-        const Eigen::Affine3d lidar_pose = trans * quat;
         const Eigen::Vector3d lidar_std(lidar_loc.std_x, lidar_loc.std_y,
                                         lidar_loc.std_z);
 
-        lidar_loc_info.set(lidar_pose, lidar_std, "Lidar.",
+        lidar_loc_info.set(trans, quat, lidar_std, "Lidar.",
                            lidar_frame.timestamp, lidar_frame.frame_id);
       }
 
@@ -343,17 +435,31 @@ void VisualizationManager::DoVisualize() {
         Eigen::Quaterniond quat(fusion_loc.qw, fusion_loc.qx, fusion_loc.qy,
                                 fusion_loc.qz);
 
-        const Eigen::Affine3d fusion_pose = trans * quat;
         const Eigen::Vector3d fusion_std(fusion_loc.std_x, fusion_loc.std_y,
                                          fusion_loc.std_z);
 
-        fusion_loc_info.set(fusion_pose, fusion_std, "Fusion.",
+        fusion_loc_info.set(trans, quat, fusion_std, "Fusion.",
                             lidar_frame.timestamp, lidar_frame.frame_id);
+      }
+
+      LocalizationMsg gnss_loc;
+      bool success = gnss_loc_info_buffer_.GetMessageBefore(
+          lidar_frame.timestamp, gnss_loc);
+      if (success) {
+        Eigen::Translation3d trans(
+            Eigen::Vector3d(gnss_loc.x, gnss_loc.y, gnss_loc.z));
+
+        const Eigen::Vector3d gnss_std(gnss_loc.std_x, gnss_loc.std_y,
+                                       gnss_loc.std_z);
+
+        gnss_loc_info.set(trans, gnss_std, "GNSS.", lidar_frame.timestamp,
+                          lidar_frame.frame_id);
       }
 
       std::vector<LocalizatonInfo> loc_infos;
       loc_infos.push_back(lidar_loc_info);
       loc_infos.push_back(fusion_loc_info);
+      loc_infos.push_back(gnss_loc_info);
       visual_engine_.Visualize(loc_infos, lidar_frame.pt3ds);
     }
   }
