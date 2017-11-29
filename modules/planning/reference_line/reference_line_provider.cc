@@ -91,6 +91,7 @@ bool ReferenceLineProvider::IsAllowChangeLane(
     return false;
   }
 
+  std::lock_guard<std::mutex> lock(segment_history_mutex_);
   auto history_iter = segment_history_.find(forward_segment->Id());
   if (history_iter == segment_history_.end()) {
     auto &inserter = segment_history_[forward_segment->Id()];
@@ -128,15 +129,12 @@ bool ReferenceLineProvider::UpdateRoutingResponse(
         AERROR << "Failed to update routing in pnc map";
         return false;
       }
-      route_segments_.clear();
       has_routing_ = true;
     }
   }
-
   if (is_new_routing) {
-    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    std::lock_guard<std::mutex> lock(segment_history_mutex_);
     segment_history_.clear();
-    reference_lines_.clear();
   }
   return true;
 }
@@ -183,11 +181,9 @@ void ReferenceLineProvider::GenerateThread() {
       AERROR << "Fail to get reference line";
       continue;
     }
-    std::unique_lock<std::mutex> lock(reference_lines_mutex_);
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     reference_lines_ = reference_lines;
     route_segments_ = segments;
-    lock.unlock();
-    cv_has_reference_line_.notify_one();
   }
 }
 
@@ -196,22 +192,17 @@ bool ReferenceLineProvider::GetReferenceLines(
     std::list<hdmap::RouteSegments> *segments) {
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
-  constexpr float kTimeout = 1000.0;  // seconds
-  auto timeout_duration = std::chrono::duration<float, std::milli>(kTimeout);
+
   if (FLAGS_enable_reference_line_provider_thread) {
-    std::unique_lock<std::mutex> lock(reference_lines_mutex_);
-    if (!cv_has_reference_line_.wait_for(lock, timeout_duration, [this]() {
-          return !reference_lines_.empty();
-        })) {
-      lock.unlock();
-      AWARN << "Reference line calculation timeout (" << kTimeout
-            << "ms). Will retry...";
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    if (!reference_lines_.empty()) {
+      reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
+      segments->assign(route_segments_.begin(), route_segments_.end());
+      return true;
+    } else {
+      AWARN << "Reference line is NOT ready.";
       return false;
     }
-    reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
-    segments->assign(route_segments_.begin(), route_segments_.end());
-    lock.unlock();
-    return true;
   } else {
     return CreateReferenceLine(reference_lines, segments);
   }
@@ -318,7 +309,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   std::list<ReferenceLine> prev_reference_lines;
 
   {
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     prev_route_segments = route_segments_;
   }
   {

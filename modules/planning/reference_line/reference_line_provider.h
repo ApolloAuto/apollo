@@ -130,20 +130,24 @@ class ReferenceLineProvider {
   QpSplineReferenceLineSmootherConfig smoother_config_;
 
   std::mutex pnc_map_mutex_;
-  // the following data are managed by pnc_map_mutex_
+  // the following data (pnc_map_, vehicle_state_) are managed
+  // by pnc_map_mutex_
   std::unique_ptr<hdmap::PncMap> pnc_map_;
   common::VehicleState vehicle_state_;
+
   bool has_routing_ = false;
   struct SegmentHistory {
     double min_l = 0.0;
     double accumulate_s = 0.0;
     common::math::Vec2d last_point;
   };
+
+  std::mutex segment_history_mutex_;
   std::unordered_map<std::string, SegmentHistory> segment_history_;
 
   std::mutex reference_lines_mutex_;
-  // the following data are managed by reference_lines_mutex_
-  std::condition_variable cv_has_reference_line_;
+  // the following data (reference_lines_, route_segments_) are managed by
+  // reference_lines_mutex_
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
 };
