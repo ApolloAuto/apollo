@@ -48,6 +48,9 @@ class ConditionFilter {
       const CriticalCondition& critical_condition,
       std::pair<CriticalPoint, CriticalPoint>* block_interval);
 
+  bool TimeWithin(const double t,
+      const CriticalCondition& critical_condition);
+
  private:
   FeasibleRegion feasible_region_;
   std::vector<CriticalCondition> critical_conditions_;

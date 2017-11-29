@@ -20,6 +20,8 @@
 namespace apollo {
 namespace planning {
 
+using CriticalPointPair = std::pair<CriticalPoint, CriticalPoint>;
+
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
     const ADCNeighborhood& adc_neighborhood) :
@@ -34,7 +36,7 @@ void ConditionFilter::QueryFeasibleInterval(const double t,
 
 bool ConditionFilter::QueryBlockInterval(const double t,
     const CriticalCondition& critical_condition,
-    std::pair<CriticalPoint, CriticalPoint>* block_interval) {
+    CriticalPointPair* block_interval) {
   double s_upper = apollo::common::math::lerp(
       critical_condition.upper_left().s(),
       critical_condition.upper_left().t(),
@@ -61,21 +63,35 @@ bool ConditionFilter::QueryBlockInterval(const double t,
   block_interval->second.set_t(t);
   block_interval->second.set_s(s_upper);
   block_interval->second.set_v(v_upper);
-  double t_start = critical_condition.bottom_left().t();
-  double t_end = critical_condition.upper_right().t();
-  if (t < t_start || t > t_end) {
-  	return false;
-  }
-  return true;
+  
+  return TimeWithin(t, critical_condition);
 }
 
 void ConditionFilter::QueryBlockIntervals(const double t,
-    std::vector<std::pair<CriticalPoint, CriticalPoint>>* block_intervals) {
-  // TODO(kechxu) Implement
+    std::vector<CriticalPointPair>* block_intervals) {
+  block_intervals->clear();
+  for (const auto& critical_condition : critical_conditions_) {
+    CriticalPointPair block_interval;
+    if (!QueryBlockInterval(t, critical_condition, &block_interval)) {
+      continue;
+    }
+    block_intervals->push_back(std::move(block_interval));
+  }
+  std::sort(block_intervals->begin(), block_intervals->end(),
+      [](const CriticalPointPair& pair_1, const CriticalPointPair& pair_2) {
+        return pair_1.first.s() < pair_2.first.s();
+      });
 }
 
 void ConditionFilter::Init(const ADCNeighborhood& adc_neighborhood) {
   adc_neighborhood.GetCriticalConditions(&critical_conditions_);
+}
+
+bool ConditionFilter::TimeWithin(const double t,
+    const CriticalCondition& critical_condition) {
+  double t_start = critical_condition.bottom_left().t();
+  double t_end = critical_condition.upper_right().t();
+  return t_start <= t && t <= t_end;
 }
 
 }  // namespace planning
