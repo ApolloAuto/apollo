@@ -367,6 +367,10 @@ class Renderer {
     }
 
     getGeolocation(event) {
+        if (!this.coordinates.isInitialized()) {
+            return;
+        }
+
         const canvasPosition = event.currentTarget.getBoundingClientRect();
 
         const vector = new THREE.Vector3(
