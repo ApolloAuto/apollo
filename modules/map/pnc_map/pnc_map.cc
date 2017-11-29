@@ -323,6 +323,31 @@ bool PncMap::GetNearestPointFromRouting(const common::VehicleState &state,
     if (routing_lane_ids_.count(lane->id().id()) == 0) {
       continue;
     }
+
+    /* If vehicle state is beyond the lane, skip
+     * As shown in the following example, only lane 3 should be considered,
+     * although lane 1 might be closer.
+     *
+     *  =====> driving direction
+     *  --------------
+     *       lane 1
+     *                (*) vehicle position
+     *  -------------- -------------
+     *
+     *       lane 2        lane 3
+     *  -------------- -------------
+     */
+    {
+      double s = 0.0;
+      double l = 0.0;
+      if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+        return false;
+      }
+      constexpr double kEpsilon = 1e-6;
+      if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
+        continue;
+      }
+    }
     double distance = 0.0;
     common::PointENU map_point =
         lane->GetNearestPoint({point.x(), point.y()}, &distance);
