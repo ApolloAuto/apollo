@@ -23,7 +23,7 @@ message CriticalCondition {
   optional CriticalPoint bottom_right = 5;
 }
 
-message CriticalBound {
+message SampleBound {
   optional double t = 1;
   optional double s_upper = 2;
   optional double s_lower = 3;
