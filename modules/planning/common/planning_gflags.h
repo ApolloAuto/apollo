@@ -163,6 +163,7 @@ DECLARE_string(signal_light_virtual_object_prefix);
 // lattice planner
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
+DECLARE_double(spiral_downsample_curvature_thred);
 
 DECLARE_double(trajectory_time_resolution);
 
