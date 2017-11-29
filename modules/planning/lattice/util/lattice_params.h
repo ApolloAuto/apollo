@@ -26,6 +26,7 @@ namespace planning {
 
 // TODO(all) move the fake FLAG variable to planning_gflags
 static const double planned_trajectory_time = 8.0;
+static const double planned_trajectory_horizon = 200.0;
 static const double stop_margin = 2.0;
 static const double stop_speed_threshold = 0.1;
 static const double low_speed_threshold = 2.0;
