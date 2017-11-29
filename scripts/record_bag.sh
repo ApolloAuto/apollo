@@ -29,7 +29,7 @@ function start() {
     LARGEST_DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
         awk '{print substr($0, index($0, $6))}')"
     if [ ! -z "${LARGEST_DISK}" ]; then
-      REAL_BAG_DIR="/media/${DOCKER_USER}/${LARGEST_DISK}/data/bag"
+      REAL_BAG_DIR="${LARGEST_DISK}/data/bag"
       if [ ! -d "${REAL_BAG_DIR}" ]; then
         mkdir -p "${REAL_BAG_DIR}"
       fi
@@ -39,7 +39,6 @@ function start() {
     else
       echo "Cannot find portable disk."
       echo "Please make sure your container was started AFTER inserting the disk."
-      exit 1
     fi
   fi
 
