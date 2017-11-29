@@ -17,7 +17,7 @@
 ###############################################################################
 
 
-addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
+addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP" 2>/dev/null
 adduser --disabled-password --gecos '' "$DOCKER_USER" \
     --uid "$DOCKER_USER_ID" --gid "$DOCKER_GRP_ID" 2>/dev/null
 usermod -aG sudo "$DOCKER_USER"
