@@ -590,7 +590,11 @@ function main() {
   check_machine_arch
   check_esd_files
 
-  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} --copt=-mavx2"
+  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+
+  if [ ${MACHINE_ARCH} == "x86_64" ]; then
+    DEFINES="${DEFINES} --copt=-mavx2"
+  fi
 
   local cmd=$1
   shift
