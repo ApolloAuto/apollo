@@ -21,6 +21,9 @@ modules {
   process_conf {
     process_cmd_keywords: "modules/drivers/conti_radar/conti_radar"
   }
+  topic_conf {
+    type: CONTI_RADAR
+  }
 }
 modules {
   name: "camera"
@@ -77,6 +80,12 @@ modules {
   }
   topic_conf {
     type: CONTROL_COMMAND
+  }
+}
+modules {
+  name: "record_bag"
+  process_conf {
+    process_cmd_keywords: "rosbag/record"
   }
 }
 hardware {
