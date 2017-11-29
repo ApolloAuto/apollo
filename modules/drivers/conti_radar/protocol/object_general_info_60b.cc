@@ -35,7 +35,6 @@ const int32_t ObjectGeneralInfo60B::ID = 0x60B;
 void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
                                  ContiRadar* conti_radar) const {
   int obj_id = object_id(bytes, length);
-  AINFO << "OBJECT ID: " << obj_id;
   auto conti_obs = conti_radar->add_contiobs();
   conti_obs->set_clusterortrack(false);
   conti_obs->set_obstacle_id(obj_id);
