@@ -98,6 +98,13 @@ bool ReferenceLineProvider::IsAllowChangeLane(
     inserter.min_l = std::fabs(sl.l());
     inserter.last_point = point;
     inserter.accumulate_s = 0.0;
+    segment_history_id_.push_back(forward_segment->Id());
+    constexpr int kMaxSegmentHistoryIdNum = 20;
+    if (segment_history_id_.size() > kMaxSegmentHistoryIdNum) {
+      auto front_iter = segment_history_.find(segment_history_id_.front());
+      segment_history_.erase(front_iter);
+      segment_history_id_.pop_front();
+    }
     return false;
   } else {
     history_iter->second.min_l =
@@ -135,6 +142,7 @@ bool ReferenceLineProvider::UpdateRoutingResponse(
   if (is_new_routing) {
     std::lock_guard<std::mutex> lock(segment_history_mutex_);
     segment_history_.clear();
+    segment_history_id_.clear();
   }
   return true;
 }

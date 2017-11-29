@@ -144,6 +144,7 @@ class ReferenceLineProvider {
 
   std::mutex segment_history_mutex_;
   std::unordered_map<std::string, SegmentHistory> segment_history_;
+  std::list<std::string> segment_history_id_;
 
   std::mutex reference_lines_mutex_;
   // the following data (reference_lines_, route_segments_) are managed by
