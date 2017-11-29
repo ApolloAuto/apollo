@@ -36,6 +36,7 @@ static const int HW_CLASS_UNDEF = 0;
 
 class HwCheckResultDetails {
  public:
+  virtual ~HwCheckResultDetails() = default;
   virtual void print_summary(std::ostream &os) = 0;
   virtual void print_test_result(std::ostream &os) = 0;
 };
@@ -49,7 +50,7 @@ struct HwCheckResult {
   std::string mssg;
 
   // TODO(xiaoxq): it is confusing and doesn't support copy operation here;
-  // consider to use a common base class with a deeep copy function.
+  // consider to use a common base class with a deep copy function.
   /// HW-specific details, may or may not be present.
   std::shared_ptr<HwCheckResultDetails> details;
 
@@ -67,6 +68,8 @@ struct HwCheckResult {
 
 class HwCheckerInterface {
  public:
+  virtual ~HwCheckerInterface() = default;
+
   /// Returns HW class (one of pre-defined: CAN, Camera, ...).
   virtual const int get_class() const { return HW_CLASS_UNDEF; }
 
