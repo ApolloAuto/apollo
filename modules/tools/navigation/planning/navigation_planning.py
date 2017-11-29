@@ -40,7 +40,7 @@ PUB_NODE_NAME = "planning"
 PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
 CRUISE_SPEED = 10  # m/s
 ENABLE_FOLLOW = False
-ENABLE_ROUTING_AID = False
+ENABLE_ROUTING_AID = True
 
 f = open("benchmark.txt", "w")
 path_decider = PathDecider()
