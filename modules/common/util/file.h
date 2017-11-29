@@ -93,7 +93,7 @@ bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
   using google::protobuf::TextFormat;
   int file_descriptor = open(file_name.c_str(), O_RDONLY);
   if (file_descriptor < 0) {
-    AERROR << "Failed to open file " << file_name;
+    AERROR << "Failed to open file " << file_name << " in text mode.";
     // Failed to open;
     return false;
   }
@@ -101,7 +101,7 @@ bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
   ZeroCopyInputStream *input = new FileInputStream(file_descriptor);
   bool success = TextFormat::Parse(input, message);
   if (!success) {
-    AERROR << "Failed to parse file " << file_name;
+    AERROR << "Failed to parse file " << file_name << " as text proto.";
   }
   delete input;
   close(file_descriptor);
@@ -136,11 +136,11 @@ bool GetProtoFromBinaryFile(const std::string &file_name,
                             MessageType *message) {
   std::fstream input(file_name, std::ios::in | std::ios::binary);
   if (!input.good()) {
-    AERROR << "Failed to open file " << file_name;
+    AERROR << "Failed to open file " << file_name << " in binary mode.";
     return false;
   }
   if (!message->ParseFromIstream(&input)) {
-    AERROR << "Failed to parse file " << file_name;
+    AERROR << "Failed to parse file " << file_name << " as binary proto.";
     return false;
   }
   return true;
@@ -156,18 +156,14 @@ bool GetProtoFromBinaryFile(const std::string &file_name,
  */
 template <typename MessageType>
 bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
+  // Try the binary parser first if it's much likely a binary proto.
   if (EndWith(file_name, ".bin")) {
-    if (!GetProtoFromBinaryFile(file_name, message) &&
-        !GetProtoFromASCIIFile(file_name, message)) {
-      return false;
-    }
-  } else {
-    if (!GetProtoFromASCIIFile(file_name, message) &&
-        !GetProtoFromBinaryFile(file_name, message)) {
-      return false;
-    }
+    return GetProtoFromBinaryFile(file_name, message) ||
+        GetProtoFromASCIIFile(file_name, message);
   }
-  return true;
+
+  return GetProtoFromASCIIFile(file_name, message) ||
+      GetProtoFromBinaryFile(file_name, message);
 }
 
 /**
