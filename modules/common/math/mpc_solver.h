@@ -41,8 +41,7 @@ namespace math {
  * @param matrix_q The cost matrix for control state
  * @param matrix_lower The lower bound control constrain matrix
  * @param matrix_upper The upper bound control constrain matrix
- * @param matrix_upper The upper bound control constrain matrix
- * @param matrix_initial_state The intial state matrix
+ * @param matrix_initial_state The initial state matrix
  * @param reference The control reference vector with respect to time
  * @param eps The control convergence tolerance
  * @param max_iter The maximum iterations for solving ARE
