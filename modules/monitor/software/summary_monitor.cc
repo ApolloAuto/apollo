@@ -23,6 +23,9 @@
 DEFINE_string(summary_monitor_name, "SummaryMonitor",
               "Name of the summary monitor.");
 
+DEFINE_double(broadcast_max_interval, 8,
+              "Max interval of broadcasting runtime status.");
+
 namespace apollo {
 namespace monitor {
 namespace {
@@ -55,11 +58,13 @@ void SummaryMonitor::RunOnce(const double current_time) {
   system_status->SerializeToString(&proto_bytes);
   const size_t new_fp = hash_fn(proto_bytes);
 
-  if (system_status_fp_ != new_fp) {
+  if (system_status_fp_ != new_fp ||
+      current_time - last_broadcast_ > FLAGS_broadcast_max_interval) {
     AdapterManager::FillSystemStatusHeader("SystemMonitor", system_status);
     AdapterManager::PublishSystemStatus(*system_status);
     ADEBUG << "Published system status: " << system_status->DebugString();
     system_status_fp_ = new_fp;
+    last_broadcast_ = current_time;
   }
 }
 
