@@ -90,7 +90,13 @@ class RoutingProvider:
         distance = routing.project(point)
         points = []
         total_length = routing.length
-        for i in range(120):
+        for i in range(150):
+            if (distance - 150 + i) < 0:
+                continue
+            p = routing.interpolate(distance - 150 + i)
+            points.append(p.coords[0])
+
+        for i in range(150):
             if (distance + i) >= total_length:
                 break
             p = routing.interpolate(distance + i)
@@ -138,7 +144,7 @@ class RoutingProvider:
 
         if len(local_seg_x) <= 10:
             return [], []
-        k = 3
+        k = 5
         n = len(local_seg_x)
         std = 0.5
         sp = optimized_spline(local_seg_x, local_seg_y, k, s=n * std)
