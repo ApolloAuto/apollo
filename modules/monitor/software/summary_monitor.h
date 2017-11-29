@@ -37,6 +37,7 @@ class SummaryMonitor : public RecurrentRunner {
   static void SummarizeHardware();
 
   size_t system_status_fp_ = 0;
+  double last_broadcast_ = 0;
 };
 
 }  // namespace monitor

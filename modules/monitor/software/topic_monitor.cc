@@ -50,6 +50,8 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
       return CHECK_NOTNULL(AdapterManager::GetPlanning());
     case AdapterConfig::CONTROL_COMMAND:
       return CHECK_NOTNULL(AdapterManager::GetControlCommand());
+    case AdapterConfig::CONTI_RADAR:
+      return CHECK_NOTNULL(AdapterManager::GetContiRadar());
     default:
       break;
   }
