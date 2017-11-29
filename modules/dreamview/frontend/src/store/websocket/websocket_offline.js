@@ -2,26 +2,22 @@ import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
-export default class PlaybackWebSocketEndpoint {
+export default class OfflinePlaybackWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
         this.websocket = null;
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
-
-        // For JSON playback mode
-        this.params = null;
-        this.numFrames = null;
-        this.currentFrameId = null;
     }
 
     initialize(params) {
-        if (params) {
-            // TODO (vlin): validate all required parameters.
-            this.params = params;
-            if (params.url) {
-                this.params.serverUrl = `${location.protocol}//${params.url}`;
-            }
+        if (params && params.url && params.id && params.mapId) {
+            this.serverUrl = `${location.protocol}//${params.url}`;
+            STORE.playback.setJobId(params.id);
+            STORE.playback.setMapId(params.mapId);
+        } else {
+            console.error("ERROR: missing required parameter(s)");
+            return;
         }
 
         try {
@@ -29,32 +25,25 @@ export default class PlaybackWebSocketEndpoint {
         } catch (error) {
             console.error("Failed to establish a connection: " + error);
             setTimeout(() => {
-                this.initialize();
+                this.initialize(params);
             }, 1000);
             return;
         }
         this.websocket.onopen = event => {
-            if (this.params && this.params.mapId && this.params.id) {
-                this.websocket.send(JSON.stringify({
-                    type: 'RetrieveGroundMeta',
-                    data: {
-                        mapId: this.params.mapId,
-                    }
-                }));
-            }
+            this.requestGroundMeta(STORE.playback.mapId);
         };
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
 
             switch (message.type) {
                 case "GroundMetadata":
-                    RENDERER.updateGroundMetadata(this.params.serverUrl, message.data);
-                    this.requstFrameCount(this.params.id);
+                    RENDERER.updateGroundMetadata(this.serverUrl, message.data);
+                    this.requstFrameCount(STORE.playback.jobId);
                     break;
                 case "FrameCount":
-                    this.numFrames = message.data;
-                    this.currentFrameId = 1;
+                    STORE.playback.setNumFrames(message.data);
                     STORE.setInitializationStatus(true);
+                    this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
@@ -73,25 +62,8 @@ export default class PlaybackWebSocketEndpoint {
         };
         this.websocket.onclose = event => {
             console.log("WebSocket connection closed, close_code: " + event.code);
-            this.initialize();
+            this.initialize(params);
         };
-
-        // Request simulation world every 100ms.
-        clearInterval(this.timer);
-        this.timer = setInterval(() => {
-            if (this.websocket.readyState === this.websocket.OPEN && this.numFrames) {
-                this.websocket.send(JSON.stringify({
-                    type : "RequestSimulationWorld",
-                    jobId: this.params.id,
-                    frameId: this.currentFrameId,
-                }));
-
-                this.currentFrameId ++;
-                if (this.currentFrameId > this.numFrames) {
-                    clearInterval(this.timer);
-                }
-            }
-        }, 100);
     }
 
     checkMessage(message) {
@@ -109,6 +81,32 @@ export default class PlaybackWebSocketEndpoint {
         this.lastSeqNum = message.world.sequenceNum;
     }
 
+    startPlayback(msPerFrame) {
+        clearInterval(this.timer);
+        this.timer = setInterval(() => {
+            if (this.websocket.readyState === this.websocket.OPEN && STORE.playback.initialized()) {
+                this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+
+                if (!STORE.playback.hasNext()) {
+                    clearInterval(this.timer);
+                }
+            }
+        }, msPerFrame);
+    }
+
+    pausePlayback() {
+        clearInterval(this.timer);
+    }
+
+    requestGroundMeta(mapId) {
+        this.websocket.send(JSON.stringify({
+            type: 'RetrieveGroundMeta',
+            data: {
+                mapId: mapId,
+            }
+        }));
+    }
+
     requstFrameCount(id) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveFrameCount',
@@ -116,12 +114,11 @@ export default class PlaybackWebSocketEndpoint {
         }));
     }
 
-    requstFrameData(id) {
+    requestSimulationWorld(jobId, frameId) {
         this.websocket.send(JSON.stringify({
-            type: 'RetrieveFrameData',
-            data: {
-                id: id,
-            }
+            type : "RequestSimulationWorld",
+            jobId: jobId,
+            frameId: frameId,
         }));
     }
 }

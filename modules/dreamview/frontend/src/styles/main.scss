@@ -1,4 +1,5 @@
 @import "media-queries";
+@import 'playback-controls';
 
 @mixin monitor-item-common-properties() {
     display: flex;
@@ -48,9 +49,6 @@ body {
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
     color: #FFFFFF;
 }
-
-
-
 
 
 /* Adjust the scrollbar style. */
