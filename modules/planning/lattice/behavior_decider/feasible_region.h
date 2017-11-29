@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_FEASIBLE_REGION_H_
 
 #include <array>
+#include <algorithm>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
