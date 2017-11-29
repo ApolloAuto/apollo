@@ -480,7 +480,7 @@ body {
     .console {
         z-index: 10;
         position: relative;
-        min-width: 200px;
+        min-width: 230px;
         margin: 0px;
         border: none;
         padding: 0px;
@@ -798,13 +798,13 @@ body {
     }
 
     .status-display {
-        width: 200px;
-        padding: 10px;
+        min-width: 250px;
+        padding: 5px;
 
         .name {
             display: inline-block;
             padding: 10px;
-            min-width: 20px;
+            min-width: 80px;
         }
 
         .status {
