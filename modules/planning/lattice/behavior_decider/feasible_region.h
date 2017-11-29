@@ -19,34 +19,33 @@
 
 #include <array>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 namespace apollo {
 namespace planning {
 
 class FeasibleRegion {
  public:
-  FeasibleRegion(const std::array<double, 3>& init_s, const double speed_limit);
+  FeasibleRegion(const std::array<double, 3>& init_s,
+      const double speed_limit);
 
-  double SUpper(const double t);
+  double SUpper(const double t) const;
 
-  double SLower(const double t);
+  double SLower(const double t) const;
 
-  double VUpperAbsolute(const double t);
+  double VUpper(const double t) const;
 
-  double VLowerAbsolute(const double t);
-
-  double VUpperRelative(const double t);
-
-  double VLowerRelative(const double t);
+  double VLower(const double t) const;
 
  private:
   void Setup(const std::array<double, 3>& init_s, const double speed_limit);
 
   std::array<double, 3> init_s_;
   double speed_limit_;
-  double time_to_zero_speed_;
-  double s_to_zero_speed_;
-  double time_to_speed_limit_;
-  double s_to_speed_limit_;
+  double t_at_zero_speed_;
+  double s_at_zero_speed_;
+  double t_at_speed_limit_;
+  double s_at_speed_limit_;
 };
 
 }  // namespace planning
