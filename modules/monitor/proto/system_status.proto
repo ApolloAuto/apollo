@@ -45,8 +45,6 @@ message ModuleStatus {
 
   // Detailed status.
   optional ProcessStatus process_status = 3;
-  optional bool process_running = 5 [deprecated = true];
-
   optional TopicStatus topic_status = 4;
 }
 
