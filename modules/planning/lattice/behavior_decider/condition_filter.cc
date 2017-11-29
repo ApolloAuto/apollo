@@ -148,7 +148,7 @@ void ConditionFilter::QueryBlockIntervals(const double t,
 }
 
 void ConditionFilter::Init(const ADCNeighborhood& adc_neighborhood) {
-  adc_neighborhood.GetCriticalConditions(&critical_conditions_);
+  critical_conditions_ = adc_neighborhood.GetCriticalConditions();
 }
 
 bool ConditionFilter::TimeWithin(const double t,

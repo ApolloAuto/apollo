@@ -35,9 +35,15 @@ namespace planning {
 class ADCNeighborhood {
  public:
   ADCNeighborhood(const Frame* frame,
-                  const apollo::common::TrajectoryPoint& planning_init_point,
-                  const ReferenceLine& reference_line);
+      const std::array<double, 3>& init_s,
+      const ReferenceLine& reference_line);
 
+  std::vector<CriticalCondition> GetCriticalConditions() const;
+
+  bool GetCriticalCondition(const std::string& obstacle_id,
+                            CriticalCondition* critical_condition);
+
+  /**
   bool ForwardNearestObstacle(
       std::array<double, 3>* forward_nearest_obstacle_state,
       double* enter_time);
@@ -46,29 +52,15 @@ class ADCNeighborhood {
       std::array<double, 3>* backward_nearest_obstacle_state,
       double* enter_time);
 
-  void GetCriticalConditions(
-      std::vector<CriticalCondition>* critical_conditions) const;
-
-  bool GetCriticalCondition(const std::string& obstacle_id,
-                            CriticalCondition* critical_condition);
-
   bool IsInNeighborhood(const Obstacle* obstacle) const;
 
   bool IsForward(const Obstacle* obstacle) const;
 
   bool IsBackward(const Obstacle* obstacle) const;
+  **/
 
  private:
-  void InitNeighborhood(
-      const Frame* frame,
-      const apollo::common::TrajectoryPoint& planning_init_point,
-      const ReferenceLine& reference_line);
-
   void SetupObstacles(const Frame* frame, const ReferenceLine& reference_line);
-
-  void SetupADC(const Frame* frame,
-                const apollo::common::TrajectoryPoint& planning_init_point,
-                const ReferenceLine& reference_line);
 
   double SpeedOnReferenceLine(
       const std::vector<apollo::common::PathPoint>& discretized_ref_points,
@@ -79,16 +71,19 @@ class ADCNeighborhood {
 
  private:
   std::array<double, 3> init_s_;
-  std::array<double, 3> init_d_;
+
+  // obstacle_id -> critical conditions
+  std::unordered_map<std::string, CriticalCondition> critical_conditions_;
+
+  /**
   // array of [t, start_s, end_s, s_dot, s_dotdot]
   std::vector<std::array<double, 5>> forward_neighborhood_;
   // array of [t, start_s, end_s, s_dot, s_dotdot]
   std::vector<std::array<double, 5>> backward_neighborhood_;
-  // obstacle_id -> critical conditions
-  std::unordered_map<std::string, CriticalCondition> critical_conditions_;
 
   std::unordered_set<std::string> forward_obstacle_id_set_;
   std::unordered_set<std::string> backward_obstacle_id_set_;
+  **/
 };
 
 }  // namespace planning
