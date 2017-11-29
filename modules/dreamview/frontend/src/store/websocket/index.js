@@ -1,8 +1,8 @@
 import devConfig from "store/config/dev.yml";
 import PARAMETERS from "store/config/parameters.yml";
 
-import JsonWebSocketEndpoint from "store/websocket/websocket_json";
-import RosWebSocketEndpoint from "store/websocket/websocket_ros";
+import OfflinePlaybackWebSocketEndpoint from "store/websocket/websocket_offline";
+import RealtimeWebSocketEndpoint from "store/websocket/websocket_ros";
 
 
 // Returns the websocket server address based on the web server address.
@@ -23,17 +23,9 @@ function deduceWebsocketServerAddr() {
 const serverAddr = process.env.NODE_ENV === "production" ?
                    deduceWebsocketServerAddr() : `ws://${devConfig.websocketServer}`;
 
-let WS = null;
-switch (PARAMETERS.websocket.type) {
-    case 'json':
-        WS = new JsonWebSocketEndpoint(serverAddr);
-        break;
-    case 'ros':
-    default:
-        console.log('WS:ros');
-        WS = new RosWebSocketEndpoint(serverAddr);
-        break;
-}
+const WS = PARAMETERS.offlinePlayback
+            ? new OfflinePlaybackWebSocketEndpoint(serverAddr)
+            : new RealtimeWebSocketEndpoint(serverAddr);
 
 export default WS;
 
