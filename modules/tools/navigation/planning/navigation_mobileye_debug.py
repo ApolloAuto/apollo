@@ -24,7 +24,6 @@ import matplotlib.animation as animation
 from std_msgs.msg import String
 from numpy.polynomial.polynomial import polyval
 from modules.drivers.proto import mobileye_pb2
-from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 from path_decider import PathDecider
@@ -35,16 +34,6 @@ from provider_chassis import ChassisProvider
 from provider_localization import LocalizationProvider
 from provider_routing import RoutingProvider
 
-planning_pub = None
-routing_debug_pub = None
-
-PUB_NODE_NAME = "planning"
-PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
-CRUISE_SPEED = 10  # m/s
-ENABLE_FOLLOW = False
-ENABLE_ROUTING_AID = False
-
-f = open("benchmark.txt", "w")
 path_decider = PathDecider()
 speed_decider = SpeedDecider()
 traj_generator = TrajectoryGenerator()
@@ -67,6 +56,9 @@ left_marker_y = []
 right_marker_x = []
 right_marker_y = []
 
+history_x = []
+history_y = []
+
 
 def routing_callback(routing_str):
     routing_provider.update(routing_str)
@@ -76,18 +68,42 @@ def localization_callback(localization_pb):
     localization_provider.update(localization_pb)
 
 
+def chassis_callback(chassis_pb):
+    chassis_provider.update(chassis_pb)
+
+
 def mobileye_callback(mobileye_pb):
     global nx, ny, local_seg_x, local_seg_y
     global left_marker_x, left_marker_y
     global right_marker_x, right_marker_y
     global local_smooth_seg_x, local_smooth_seg_y
-
+    global history_x, history_y
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
+
+    if localization_provider.localization_pb is None:
+        return
 
     vx = localization_provider.localization_pb.pose.position.x
     vy = localization_provider.localization_pb.pose.position.y
     heading = localization_provider.localization_pb.pose.heading
+    speed = chassis_provider.get_speed_mps()
+    mobileye_provider.process_history(heading, speed)
+
+    hist_x = []
+    hist_y = []
+    for line in mobileye_provider.history_left_lines:
+        if line is None:
+            continue
+        x = []
+        y = []
+        for p in line.coords:
+            x.append(p[0])
+            y.append(-p[1])
+        hist_x.append(x)
+        hist_y.append(y)
+    history_x = hist_x
+    history_y = hist_y
 
     local_seg_x, local_seg_y = routing_provider.get_local_segment(vx, vy,
                                                                   heading)
@@ -113,8 +129,7 @@ def mobileye_callback(mobileye_pb):
 
 
 def add_listener():
-    global planning_pub, routing_debug_pub
-    rospy.init_node(PUB_NODE_NAME, anonymous=True)
+    rospy.init_node("mobileye_debug", anonymous=True)
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
@@ -123,11 +138,9 @@ def add_listener():
                      localization_callback)
     rospy.Subscriber('/apollo/navigation/routing',
                      String, routing_callback)
-
-    planning_pub = rospy.Publisher(
-        PUB_TOPIC, planning_pb2.ADCTrajectory, queue_size=1)
-    routing_debug_pub = rospy.Publisher(
-        '/apollo/navigation/routing/debug', String, queue_size=1)
+    rospy.Subscriber('/apollo/canbus/chassis',
+                     chassis_pb2.Chassis,
+                     chassis_callback)
 
 
 def update(frame_number):
@@ -139,6 +152,14 @@ def update(frame_number):
     line4.set_ydata(right_marker_y)
     line3.set_xdata(local_smooth_seg_x)
     line3.set_ydata(local_smooth_seg_y)
+    for l in lines:
+        l.set_xdata([0])
+        l.set_ydata([0])
+    for i in range(len(history_x)):
+        x = history_x[i]
+        y = history_y[i]
+        lines[i].set_xdata(x)
+        lines[i].set_ydata(y)
 
 
 if __name__ == '__main__':
@@ -153,6 +174,11 @@ if __name__ == '__main__':
     line4, = ax.plot([0], [0], 'k-')
     line2, = ax.plot([0], [0], 'b-')
     line3, = ax.plot([0], [0], 'g--', lw=3)
+    lines = []
+    for i in range(50):
+        line, = ax.plot([0], [0], '.')
+        lines.append(line)
+
     ani = animation.FuncAnimation(fig, update, interval=100)
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
