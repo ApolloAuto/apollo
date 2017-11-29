@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "modules/planning/lattice/behavior_decider/condition_filter.h"
+
+#include <cmath>
+
 #include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
@@ -29,9 +32,56 @@ ConditionFilter::ConditionFilter(
   Init(adc_neighborhood);
 }
 
-void ConditionFilter::QueryFeasibleInterval(const double t,
-      std::vector<CriticalBound>* critical_bounds) {
-  // TODO(kechxu) Implement
+void ConditionFilter::QuerySampleBounds(const double t,
+      std::vector<SampleBound>* sample_bounds) {
+  sample_bounds->clear();
+  double feasible_s_lower = feasible_region_.SLower(t);
+  double feasible_s_upper = feasible_region_.SUpper(t);
+  double feasible_v_lower = feasible_region_.VLower(t);
+  double feasible_v_upper = feasible_region_.VUpper(t);
+  if (feasible_s_lower > feasible_s_upper) {
+    ADEBUG << "Invalid feasible region with s lower bound ["
+           << feasible_s_lower << "] and s upper bound ["
+           << feasible_s_upper << "].";
+    return;
+  }
+  std::vector<CriticalPointPair> block_intervals;
+  QueryBlockIntervals(t, &block_intervals);
+  double s_prev = feasible_s_lower;
+  double v_prev = feasible_v_lower;
+  for (size_t i = 0; i < block_intervals.size(); ++i) {
+    const CriticalPointPair& block_interval = block_intervals[i];
+    if (block_interval.second.s() < feasible_s_lower) {
+      continue;
+    }
+    if (s_prev > feasible_s_upper) {
+      break;
+    }
+    if (s_prev < block_interval.first.s()) {
+      if (block_interval.first.s() <= feasible_s_upper) {
+        SampleBound sample_bound;
+        sample_bound.set_t(t);
+        sample_bound.set_s_upper(block_interval.first.s());
+        sample_bound.set_s_lower(s_prev);
+        sample_bound.set_v_upper(block_interval.first.v());
+        sample_bound.set_v_lower(std::min(v_prev, block_interval.first.v()));
+        sample_bounds->push_back(std::move(sample_bound));
+      } else {
+        SampleBound sample_bound;
+        sample_bound.set_t(t);
+        sample_bound.set_s_upper(feasible_s_upper);
+        sample_bound.set_s_lower(s_prev);
+        sample_bound.set_v_upper(feasible_v_upper);
+        sample_bound.set_v_lower(std::min(v_prev, feasible_v_upper));
+        sample_bounds->push_back(std::move(sample_bound));
+        break;
+      }
+    }
+    if (s_prev < block_interval.second.s()) {
+      s_prev = block_interval.second.s();
+      v_prev = block_interval.second.v();
+    }
+  }
 }
 
 bool ConditionFilter::QueryBlockInterval(const double t,

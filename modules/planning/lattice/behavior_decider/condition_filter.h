@@ -33,8 +33,8 @@ class ConditionFilter {
       const std::array<double, 3>& init_s, const double speed_limit,
       const ADCNeighborhood& adc_neighborhood);
 
-  void QueryFeasibleInterval(const double t,
-      std::vector<CriticalBound>* critical_bounds);
+  void QuerySampleBounds(const double t,
+      std::vector<SampleBound>* sample_bounds);
 
   void QueryBlockIntervals(const double t,
       std::vector<std::pair<CriticalPoint, CriticalPoint>>* block_intervals);
