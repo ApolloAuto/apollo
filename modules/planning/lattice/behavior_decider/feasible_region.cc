@@ -83,5 +83,21 @@ double FeasibleRegion::VLower(const double t) const {
   return t < t_at_zero_speed_ ? init_s_[1] - max_deceleration * t : 0.0;
 }
 
+double FeasibleRegion::TLower(const double s) const {
+  CHECK(s >= init_s_[0]);
+
+  if (init_s_[1] < speed_limit_) {
+    if (s < s_at_speed_limit_) {
+      double delta = init_s_[1] * init_s_[1]
+          - 2.0 * max_acceleration * (init_s_[0] - s);
+      return (std::sqrt(delta) - init_s_[1]) / max_acceleration;
+    } else {
+      return t_at_speed_limit_ + (s - s_at_speed_limit_) / speed_limit_;
+    }
+  } else {
+    return (s - init_s_[0]) / init_s_[1];
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo

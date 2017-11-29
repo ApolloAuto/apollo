@@ -37,6 +37,8 @@ class FeasibleRegion {
 
   double VLower(const double t) const;
 
+  double TLower(const double s) const;
+
  private:
   void Setup(const std::array<double, 3>& init_s, const double speed_limit);
 
