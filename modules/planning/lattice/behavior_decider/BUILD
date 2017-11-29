@@ -72,6 +72,7 @@ cc_library(
     deps = [
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/util:lattice_params",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 
