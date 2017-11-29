@@ -336,5 +336,52 @@ void SpiralReferenceLineSmoother::SetAnchorPoints(
         p.path_point.set_y(curr_y - zero_y_);});
 }
 
+int SpiralReferenceLineSmoother::DownSampleRawReferenceLine(
+  const std::vector<Eigen::Vector2d>& raw_point2d,
+  std::vector<Eigen::Vector2d>* down_sampled_raw_point2d) {
+  CHECK(down_sampled_raw_point2d != nullptr);
+  if (raw_point2d.size()==0 ||
+      raw_point2d.size() <= 2) {
+    AERROR << "DownSampleRawReferenceLine error";
+    return 1;
+  }
+  std::vector<double> thetas;
+  std::vector<double> kappas;
+  for (uint i=0; i<raw_point2d.size()-1; ++i) {
+    thetas.push_back(
+    common::math::NormalizeAngle(std::atan2(
+      raw_point2d[i+1].y()-raw_point2d[i].y(),
+      raw_point2d[i+1].x()-raw_point2d[i].x()
+      )));
+  }
+  for (uint i=0; i<thetas.size()-1; ++i) {
+    double diff_y = raw_point2d[i+1].y()-raw_point2d[i].y();
+    double diff_x = raw_point2d[i+1].x()-raw_point2d[i].x();
+    double ds = std::sqrt( diff_y * diff_y + diff_x * diff_x);
+    double dtheta = common::math::NormalizeAngle(thetas[i+1]-thetas[i]);
+    if (ds <= std::numeric_limits<double>::epsilon()) {
+      AWARN << "Distance too close for raw point [" << i << "] (" <<
+        raw_point2d[i].x() << "," << raw_point2d[i].y() << ") [" << i+1 <<
+        "] (" << raw_point2d[i+1].x() << "," << raw_point2d[i+1].y() << ")";
+      kappas.push_back(std::numeric_limits<double>::max());
+    } else {
+      kappas.push_back(dtheta/ds);
+    }
+  }
+  down_sampled_raw_point2d->push_back(
+    Eigen::Vector2d(raw_point2d[0].x(), raw_point2d[0].y()));
+  for (uint i=0; i<kappas.size(); ++i) {
+    if (kappas[i] > FLAGS_spiral_downsample_curvature_thred) {
+      down_sampled_raw_point2d->push_back(
+        Eigen::Vector2d(raw_point2d[i+1].x(), raw_point2d[i+1].y()));
+    }
+  }
+  down_sampled_raw_point2d->push_back(
+    Eigen::Vector2d(raw_point2d[raw_point2d.size()-1].x(),
+      raw_point2d[raw_point2d.size()-1].y()));
+  return 0;
+}
+
+
 }  // namespace planning
 }  // namespace apollo
