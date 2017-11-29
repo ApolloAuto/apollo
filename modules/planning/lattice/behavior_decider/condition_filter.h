@@ -19,6 +19,8 @@
 
 #include <vector>
 #include <array>
+#include <set>
+#include <utility>
 
 #include "modules/planning/lattice/behavior_decider/adc_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
@@ -36,6 +38,8 @@ class ConditionFilter {
   void QuerySampleBounds(const double t,
       std::vector<SampleBound>* sample_bounds);
 
+  void QuerySampleBounds(std::vector<SampleBound>* sample_bounds);
+
   void QueryBlockIntervals(const double t,
       std::vector<std::pair<CriticalPoint, CriticalPoint>>* block_intervals);
 
@@ -50,6 +54,8 @@ class ConditionFilter {
 
   bool TimeWithin(const double t,
       const CriticalCondition& critical_condition);
+
+  void CriticalTimeStamps(std::set<double>* critical_timestamps);
 
  private:
   FeasibleRegion feasible_region_;

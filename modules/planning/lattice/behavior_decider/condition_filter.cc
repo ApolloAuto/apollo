@@ -17,6 +17,7 @@
 #include "modules/planning/lattice/behavior_decider/condition_filter.h"
 
 #include <cmath>
+#include <algorithm>
 
 #include "modules/common/math/linear_interpolation.h"
 
@@ -30,6 +31,19 @@ ConditionFilter::ConditionFilter(
     const ADCNeighborhood& adc_neighborhood) :
     feasible_region_(init_s, speed_limit) {
   Init(adc_neighborhood);
+}
+
+void ConditionFilter::QuerySampleBounds(
+    std::vector<SampleBound>* sample_bounds) {
+  sample_bounds->clear();
+  std::set<double> critical_timestamps;
+  CriticalTimeStamps(&critical_timestamps);
+  for (const double t : critical_timestamps) {
+    std::vector<SampleBound> sample_bounds_at_t;
+    QuerySampleBounds(t, &sample_bounds_at_t);
+    sample_bounds->insert(sample_bounds->end(), sample_bounds_at_t.begin(),
+        sample_bounds_at_t.end());
+  }
 }
 
 void ConditionFilter::QuerySampleBounds(const double t,
@@ -113,7 +127,7 @@ bool ConditionFilter::QueryBlockInterval(const double t,
   block_interval->second.set_t(t);
   block_interval->second.set_s(s_upper);
   block_interval->second.set_v(v_upper);
-  
+
   return TimeWithin(t, critical_condition);
 }
 
@@ -142,6 +156,17 @@ bool ConditionFilter::TimeWithin(const double t,
   double t_start = critical_condition.bottom_left().t();
   double t_end = critical_condition.upper_right().t();
   return t_start <= t && t <= t_end;
+}
+
+void ConditionFilter::CriticalTimeStamps(
+    std::set<double>* critical_timestamps) {
+  critical_timestamps->clear();
+  for (const auto& critical_condition : critical_conditions_) {
+    double t_start = critical_condition.bottom_left().t();
+    double t_end = critical_condition.upper_right().t();
+    critical_timestamps->insert(t_start);
+    critical_timestamps->insert(t_end);
+  }
 }
 
 }  // namespace planning
