@@ -206,6 +206,12 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
   }
 }
 
+void Trajectory1dGenerator::GenerateSpeedProfiles(
+    const std::vector<SampleBound>& sample_bounds,
+    std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
+  // TODO(all) Implement
+}
+
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     const std::array<double, 3>& init_state,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const {
