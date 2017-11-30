@@ -27,6 +27,7 @@
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/trajectory1d_generator/end_condition_sampler.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -63,6 +64,10 @@ class Trajectory1dGenerator {
   void GenerateSpeedProfilesForStopping(
       const std::array<double, 3>& lon_init_state,
       const LonSampleConfig& lon_sample_config,
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
+
+  void GenerateSpeedProfiles(
+      const std::vector<SampleBound>& sample_bounds,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateLateralTrajectoryBundle(
