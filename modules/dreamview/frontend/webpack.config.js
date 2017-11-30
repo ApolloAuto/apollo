@@ -164,7 +164,10 @@ module.exports = {
                 from: 'components/Navigation/navigation_viewer.html',
                 to:  'components/Navigation/navigation_viewer.html',
                 toType: 'file',
-            },
+            }, {
+                from: '../node_modules/three/examples/fonts',
+                to: 'fonts',
+            }
         ]),
     ],
 
