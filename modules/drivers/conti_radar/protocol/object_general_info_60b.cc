@@ -77,7 +77,7 @@ double ObjectGeneralInfo60B::longitude_dist(const std::uint8_t* bytes,
 double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
                                           int32_t length) const {
   Byte t0(bytes + 2);
-  int32_t x = t0.get_byte(1, 3);
+  int32_t x = t0.get_byte(0, 3);
 
   Byte t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
@@ -91,9 +91,9 @@ double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
 
 double ObjectGeneralInfo60B::longitude_vel(const std::uint8_t* bytes,
                                            int32_t length) const {
-  Byte t0(bytes + 3);
+  Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
-  Byte t1(bytes + 3);
+  Byte t1(bytes + 5);
   int32_t t = t1.get_byte(6, 2);
 
   x <<= 2;
@@ -128,8 +128,8 @@ double ObjectGeneralInfo60B::rcs(const std::uint8_t* bytes,
 
 int ObjectGeneralInfo60B::dynprop(const std::uint8_t* bytes,
                                   int32_t length) const {
-  Byte t0(bytes + 7);
-  int32_t x = t0.get_byte(0, 8);
+  Byte t0(bytes + 6);
+  int32_t x = t0.get_byte(0, 3);
 
   int ret = x;
   return ret;
