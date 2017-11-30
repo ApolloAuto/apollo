@@ -40,12 +40,12 @@ bash apollo.sh build
 Follow the steps below to launch Apollo:
 ### Start Apollo
 ```
-# start Human Machine Interface(HMI)
-bash scripts/hmi.sh
+# start module monitor
+bash scripts/bootstrap.sh
 ```
-### Access HMI
-Access HMI by opening your favorite browser, e.g. Chrome, go to http://localhost:8887, click Dreamview to start.
-![HMI Enable Dreamview](docs/demo_guide/images/dreamview_enable.png)
+### Access Dreamview
+Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://localhost:8888
+![Access Dreamview](docs/demo_guide/images/apollo_bootstrap_screen.png)
 
 
 ### Replay demo rosbag
@@ -56,14 +56,7 @@ bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
 rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
 ```
 
-Click upper-right Dreamview button
-![HMI Launch Dreamview](docs/demo_guide/images/dreamview_launch.png)
-
-to load Dreamview UI.
-
-![Open Dreamview](docs/quickstart/images/hmi_open_dreamview.png)
-
-Dreamview should show a running vehicle with trajectory now.
+Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_1.5.png)
 
 Advanced users who wish to build outside this Docker container can refer
