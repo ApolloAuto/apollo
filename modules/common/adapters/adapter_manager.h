@@ -247,12 +247,10 @@ class AdapterManager {
  REGISTER_ADAPTER(InsStatus);
  REGISTER_ADAPTER(GnssStatus);
  REGISTER_ADAPTER(SystemStatus);
-
  REGISTER_ADAPTER(Mobileye);
  REGISTER_ADAPTER(DelphiESR);
  REGISTER_ADAPTER(ContiRadar);
  REGISTER_ADAPTER(CompressedImage);
-
  DECLARE_SINGLETON(AdapterManager);
 };
 
