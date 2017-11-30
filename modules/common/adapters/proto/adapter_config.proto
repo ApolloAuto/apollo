@@ -32,6 +32,8 @@ message AdapterConfig {
     INS_STATUS = 25;
     GNSS_STATUS = 26;
     CONTI_RADAR = 27;
+    IMAGE_SHORT = 28;
+    IMAGE_LONG = 29;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
