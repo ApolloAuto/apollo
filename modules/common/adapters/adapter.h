@@ -380,10 +380,6 @@ class Adapter : public AdapterBase {
     return false;
   }
   bool FeedFile(const std::string &message_file,
-                IdentifierType<::sensor_msgs::ImageConstPtr>) {
-    return false;
-  }
-  bool FeedFile(const std::string &message_file,
                 IdentifierType<::sensor_msgs::Image>) {
     return false;
   }
