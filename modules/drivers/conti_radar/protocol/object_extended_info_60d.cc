@@ -116,7 +116,7 @@ double ObjectExtendedInfo60D::object_length(const std::uint8_t* bytes,
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  double ret = x;
+  double ret = x * 0.2;
   return ret;
 }
 
@@ -125,7 +125,7 @@ double ObjectExtendedInfo60D::object_width(const std::uint8_t* bytes,
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  double ret = x;
+  double ret = x * 0.2;
   return ret;
 }
 
