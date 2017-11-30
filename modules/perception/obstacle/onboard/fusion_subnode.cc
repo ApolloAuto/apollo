@@ -240,10 +240,7 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
-    if (!obj->Serialize(obstacle)) {
-      AERROR << "Failed gen PerceptionObstacle. Object:" << obj->ToString();
-      return false;
-    }
+    obj->Serialize(obstacle);
     obstacle->set_timestamp(obstacle->timestamp() * 1000);
   }
 

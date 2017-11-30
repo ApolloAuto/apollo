@@ -198,7 +198,7 @@ class AdapterManager {
    * rate. It takes a class member function, and a bare pointer to the
    * object to call the method on.
    */
-  template <class T>
+  template<class T>
   static ros::Timer CreateTimer(ros::Duration period,
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
@@ -208,7 +208,7 @@ class AdapterManager {
                                                    oneshot, autostart);
     } else {
       AWARN << "ROS timer is only available in ROS mode, check your adapter "
-               "config file! Return a dummy timer that won't function.";
+          "config file! Return a dummy timer that won't function.";
       return ros::Timer();
     }
   }
@@ -247,36 +247,11 @@ class AdapterManager {
  REGISTER_ADAPTER(InsStatus);
  REGISTER_ADAPTER(GnssStatus);
  REGISTER_ADAPTER(SystemStatus);
-  // TODO(xiaoxq): Retire HMICommand adapter after integration with dreamview.
- REGISTER_ADAPTER(HMICommand);
+
  REGISTER_ADAPTER(Mobileye);
  REGISTER_ADAPTER(DelphiESR);
  REGISTER_ADAPTER(ContiRadar);
  REGISTER_ADAPTER(CompressedImage);
-  REGISTER_ADAPTER(Chassis);
-  REGISTER_ADAPTER(ChassisDetail);
-  REGISTER_ADAPTER(ControlCommand);
-  REGISTER_ADAPTER(Gps);
-  REGISTER_ADAPTER(Imu);
-  REGISTER_ADAPTER(Localization);
-  REGISTER_ADAPTER(Monitor);
-  REGISTER_ADAPTER(Pad);
-  REGISTER_ADAPTER(PerceptionObstacles);
-  REGISTER_ADAPTER(Planning);
-  REGISTER_ADAPTER(PointCloud);
-  REGISTER_ADAPTER(Prediction);
-  REGISTER_ADAPTER(TrafficLightDetection);
-  REGISTER_ADAPTER(RoutingRequest);
-  REGISTER_ADAPTER(RoutingResponse);
-  REGISTER_ADAPTER(RelativeOdometry);
-  REGISTER_ADAPTER(InsStat);
-  REGISTER_ADAPTER(InsStatus);
-  REGISTER_ADAPTER(GnssStatus);
-  REGISTER_ADAPTER(SystemStatus);
-  REGISTER_ADAPTER(Mobileye);
-  REGISTER_ADAPTER(DelphiESR);
-  REGISTER_ADAPTER(ContiRadar);
-  REGISTER_ADAPTER(CompressedImage);
 
  DECLARE_SINGLETON(AdapterManager);
 };
