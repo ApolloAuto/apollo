@@ -247,7 +247,7 @@ class Adapter : public AdapterBase {
    * Please call Empty() to make sure that there is data in the
    * queue before calling GetLatestObservedPtr().
    */
-  std::shared_ptr<D> GetLatestObservedPtr() const {
+  std::shared_ptr<const D> GetLatestObservedPtr() const {
     std::lock_guard<std::mutex> lock(mutex_);
     DCHECK(!observed_queue_.empty())
     << "The view of data queue is empty. No data is received yet or you "

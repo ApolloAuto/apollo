@@ -208,7 +208,7 @@ class AdapterManager {
                                                    oneshot, autostart);
     } else {
       AWARN << "ROS timer is only available in ROS mode, check your adapter "
-          "config file! Return a dummy timer that won't function.";
+               "config file! Return a dummy timer that won't function.";
       return ros::Timer();
     }
   }
