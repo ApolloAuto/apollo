@@ -115,7 +115,7 @@ int ObjectQualityInfo60C::lateral_vel_rms(const std::uint8_t* bytes,
 int ObjectQualityInfo60C::longitude_accel_rms(const std::uint8_t* bytes,
                                               int32_t length) const {
   Byte t0(bytes + 3);
-  int32_t x = t0.get_byte(4, 4);
+  int32_t x = t0.get_byte(0, 4);
 
   Byte t1(bytes + 4);
   int32_t t = t1.get_byte(7, 1);
@@ -130,13 +130,7 @@ int ObjectQualityInfo60C::longitude_accel_rms(const std::uint8_t* bytes,
 int ObjectQualityInfo60C::lateral_accel_rms(const std::uint8_t* bytes,
                                             int32_t length) const {
   Byte t0(bytes + 4);
-  int32_t x = t0.get_byte(4, 4);
-
-  Byte t1(bytes + 4);
-  int32_t t = t1.get_byte(7, 1);
-
-  x <<= 1;
-  x |= t;
+  int32_t x = t0.get_byte(2, 5);
 
   int ret = x;
   return ret;
