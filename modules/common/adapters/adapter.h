@@ -250,9 +250,9 @@ class Adapter : public AdapterBase {
   std::shared_ptr<D> GetLatestObservedPtr() const {
     std::lock_guard<std::mutex> lock(mutex_);
     DCHECK(!observed_queue_.empty())
-        << "The view of data queue is empty. No data is received yet or you "
-            "forgot to call Observe()"
-        << ":" << topic_name_;
+    << "The view of data queue is empty. No data is received yet or you "
+        "forgot to call Observe()"
+    << ":" << topic_name_;
     return observed_queue_.front();
   }
   /**
