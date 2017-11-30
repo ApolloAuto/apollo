@@ -154,18 +154,20 @@ bool TLPreprocessorSubnode::AddDataAndPublishEvent(
 
 void TLPreprocessorSubnode::SubLongFocusCamera(const sensor_msgs::Image &msg) {
   common::adapter::AdapterManager::Observe();
-  std::shared_ptr<sensor_msgs::Image> img = common::adapter::AdapterManager::GetImageLong()->GetLatestObservedPtr();
+  std::shared_ptr<const sensor_msgs::Image> img =
+      common::adapter::AdapterManager::GetImageLong()->GetLatestObservedPtr();
   SubCameraImage(img, LONG_FOCUS);
 }
 
 void TLPreprocessorSubnode::SubShortFocusCamera(const sensor_msgs::Image &msg) {
   common::adapter::AdapterManager::Observe();
-  std::shared_ptr<sensor_msgs::Image> img = common::adapter::AdapterManager::GetImageShort()->GetLatestObservedPtr();
+  std::shared_ptr<const sensor_msgs::Image> img =
+      common::adapter::AdapterManager::GetImageShort()->GetLatestObservedPtr();
   SubCameraImage(img, SHORT_FOCUS);
 }
 
 void TLPreprocessorSubnode::SubCameraImage(
-    const std::shared_ptr<sensor_msgs::Image> msg, CameraId camera_id) {
+     std::shared_ptr<const sensor_msgs::Image> msg, CameraId camera_id) {
   const double sub_camera_image_start_ts = TimeUtil::GetCurrentTime();
   PERF_FUNCTION();
   std::shared_ptr<Image> image(new Image);

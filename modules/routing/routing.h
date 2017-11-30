@@ -26,6 +26,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/monitor/monitor.h"
 #include "modules/common/status/status.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/core/navigator.h"
 
 namespace apollo {
@@ -66,11 +67,14 @@ class Routing : public apollo::common::ApolloApp {
  private:
   void OnRoutingRequest(const RoutingRequest &routing_request);
 
+  RoutingRequest FillLaneInfoIfMissing(const RoutingRequest &routing_request);
+
  private:
   std::unique_ptr<Navigator> navigator_ptr_;
   apollo::common::monitor::Monitor monitor_;
 
   RoutingConfig routing_conf_;
+  const hdmap::HDMap* hdmap_ = nullptr;
 };
 
 }  // namespace routing

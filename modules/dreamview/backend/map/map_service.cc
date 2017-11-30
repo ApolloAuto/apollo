@@ -72,10 +72,15 @@ void ExtractStringVectorFromJson(const nlohmann::json &json_object,
                                  const std::string &key,
                                  std::vector<std::string> *result) {
   auto iter = json_object.find(key);
-  if (iter != json_object.end()) {
+  if (iter != json_object.end() && iter->is_array()) {
     result->reserve(iter->size());
     for (size_t i = 0; i < iter->size(); ++i) {
-      result->push_back((*iter)[i]);
+      auto value = (*iter)[i];
+      if (value.is_string()) {
+        result->push_back(value);
+      } else {
+        AWARN << "Expected 'string' type, but was " << value.type_name();
+      }
     }
   }
 }

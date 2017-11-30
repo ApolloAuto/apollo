@@ -39,7 +39,7 @@ bool Image::Init(const double &ts, const CameraId &device_id, const cv::Mat &mat
   return true;
 }
 bool Image::Init(const double &ts, const CameraId &device_id,
-                 const std::shared_ptr<sensor_msgs::Image> image_data) {
+                 std::shared_ptr<const sensor_msgs::Image> image_data) {
   contain_mat_ = false;
   contain_image_ = true;
   timestamp_ = ts,
