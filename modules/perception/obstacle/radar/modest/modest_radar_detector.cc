@@ -188,9 +188,9 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   RoiFilter(map_polygons, filter_objects);
   // treatment
   radar_tracker_->Process(*radar_objects);
-  AINFO << "After process: , object size: " <<  radar_objects->objects.size();
-
+  AINFO << "After process, object size: " << radar_objects->objects.size();
   CollectRadarResult(objects);
+  AINFO << "radar object size: " << objects->size();
   return true;
 }
 

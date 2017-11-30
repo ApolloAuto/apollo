@@ -120,7 +120,7 @@ void LidarProcessSubnode::OnPointCloud(
     return;
   }
   out_sensor_objects->sensor2world_pose = *velodyne_trans;
-  AINFO << "get trans pose succ." << *velodyne_trans;
+  AINFO << "get lidar trans pose succ. pose: \n" << *velodyne_trans;
   PERF_BLOCK_END("lidar_get_velodyne2world_transfrom");
 
   PointCloudPtr point_cloud(new PointCloud);

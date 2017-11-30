@@ -42,7 +42,7 @@ DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
 DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
 
 DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
-DEFINE_int32(gps_buffer_size, 20, "gps buffer size");
+DEFINE_int32(gps_buffer_size, 40, "gps buffer size");
 DEFINE_string(lidar_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");

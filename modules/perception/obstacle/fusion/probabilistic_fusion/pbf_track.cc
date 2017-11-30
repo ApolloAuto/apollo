@@ -275,7 +275,8 @@ bool PbfTrack::AbleToPublish() {
       if (radar_object->object->radar_supplement->range > s_min_radar_confident_distance_ &&
           radar_object->object->radar_supplement->angle < s_max_radar_confident_angle_) {
         if (fused_object_->object->velocity.dot(fused_object_->object->direction) < 0.3) {
-          fused_object_->object->velocity.setZero();
+          // fused_object_->object->velocity.setZero();
+          return false;
         }
         return true;
       }
