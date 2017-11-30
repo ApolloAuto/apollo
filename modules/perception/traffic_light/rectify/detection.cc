@@ -71,7 +71,8 @@ void Detection::Init(const int &resize_len, const std::string &refine_net,
   (_refine_net_ptr->layers()[0].get());
   _refine_output_layer = static_cast <caffe::ROIOutputSSDLayer<float> *>
   (_refine_net_ptr->layers()[_refine_net_ptr->layers().size() - 1].get());
-  AINFO << _refine_input_layer->resize_scale;
+  AINFO << _refine_input_layer->resize_scale << " " << _refine_input_layer->type();
+
   resize_len_ = resize_len;
 }
 Detection::Detection(int &min_crop_size, const std::string &refine_net,

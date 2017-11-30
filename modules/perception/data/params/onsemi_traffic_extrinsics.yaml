@@ -3,15 +3,15 @@ header:
   stamp:
     secs: 0
     nsecs: 0
-  frame_id: onsemi_obstacle
-child_frame_id: onsemi_traffic
+  frame_id: short_camera
+child_frame_id: long_camera
 transform:
   rotation:
-    x: 0.03187363426717969
-    y: -0.007265623047937405
-    z: -0.001260956095499777
-    w: 0.999464702803482
+    x: -0.065036109359418188
+    y: 0.02112271317777528
+    z: -0.0006417478985479384
+    w: 0.9913155773545259
   translation:
-    x: 0.08644527525504145
-    y: -0.01455833687137122
-    z: 0.1946190035152044
+    x: 0.35
+    y: -0.0006574037270484494
+    z: -0.07860141667671063

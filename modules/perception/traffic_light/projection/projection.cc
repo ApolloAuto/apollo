@@ -46,18 +46,15 @@ bool SingleBoundaryBasedProjection::project(const CameraCoeffient &camera_coeffi
   std::vector<int> y(bound_size);
 
   for (int i = 0; i < bound_size; ++i) {
-    // if (!project_point(camera_coeffient, pose, tl_info.boundary().point(i), &x[i], &y[i])) {
-    //     return false;
-    // }
     if (!project_point_distort(camera_coeffient,
                                pose, tl_info.boundary().point(i), &x[i], &y[i])) {
       return false;
     }
   }
-  int minx = 0;
-  int miny = 0;
-  int maxx = 0;
-  int maxy = 0;
+  int minx = 1000;
+  int miny = 500;
+  int maxx = 1200;
+  int maxy = 600;
 
   minx = std::min(x[0], x[2]);
   miny = std::min(y[0], y[2]);
@@ -85,11 +82,11 @@ bool SingleBoundaryBasedProjection::project_point(const CameraCoeffient &coeffie
   Eigen::Matrix<double, 3, 1> TL_loc_cam;
 
   TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust, 1.0;
-  TL_loc_LTM = coeffient.gps2camera * pose.inverse() * TL_loc_LTM;
+  TL_loc_LTM = coeffient.camera_extrinsic * pose.inverse() * TL_loc_LTM;
 
   //The light may be to the back of Camera, we can't project them on the images.
   if (TL_loc_LTM(2) < 0) {
-    AWARN << "Compute a light behind the car. light to car Pose:" << TL_loc_LTM;
+    AWARN << "Compute a light behind the car. light to car Pose:\n" << TL_loc_LTM;
     return false;
   }
   TL_loc_cam = coeffient.camera_intrinsic * TL_loc_LTM;
@@ -109,11 +106,10 @@ bool SingleBoundaryBasedProjection::project_point_distort(const CameraCoeffient 
   Eigen::Matrix<double, 3, 1> TL_loc_cam;
 
   TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust, 1.0;
-  TL_loc_LTM = coeffient.gps2camera * pose.inverse() * TL_loc_LTM;
-
+  TL_loc_LTM = coeffient.camera_extrinsic * pose.inverse() * TL_loc_LTM;
   //The light may be to the back of Camera, we can't project them on the images.
   if (TL_loc_LTM(2) < 0) {
-    AWARN << "Compute a light behind the car. light to car Pose:" << TL_loc_LTM;
+    AWARN << "Compute a light behind the car. light to car Pose:\n" << TL_loc_LTM;
     return false;
   }
 
@@ -124,7 +120,6 @@ bool SingleBoundaryBasedProjection::project_point_distort(const CameraCoeffient 
   pt2d = pixel_denormalize(pt2d, coeffient.camera_intrinsic, coeffient.distort_params);
   *center_x = pt2d[0];
   *center_y = pt2d[1];
-
   return true;
 }
 

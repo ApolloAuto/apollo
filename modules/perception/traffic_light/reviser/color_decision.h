@@ -45,7 +45,6 @@ class ColorReviser : public BaseReviser {
   int enable_;
   std::map<std::string, TLColor> color_map_;
   std::map<std::string, double> time_map_;
-  static std::map<TLColor, std::string> s_color_strs_;
 };
 REGISTER_REVISER(ColorReviser);
 

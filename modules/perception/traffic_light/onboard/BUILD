@@ -13,7 +13,6 @@ cc_library(
         "hdmap_input.h",
         "preprocessor_subnode.h",
         "proc_subnode.h",
-        "tl_shared_data.h",
     ],
     deps = [
         "//modules/common",
@@ -22,6 +21,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/map/hdmap",
         "//modules/map/hdmap:hdmap_util",
+        "//modules/map/proto:map_proto",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/onboard:perception_onboard",

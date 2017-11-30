@@ -28,12 +28,12 @@
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/subscriber.h>
-#include "modules/perception/traffic_light/onboard/hdmap_input.h"
+#include "hdmap_input.h"
 
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
-#include "modules/perception/traffic_light/onboard/tl_shared_data.h"
+#include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
@@ -62,51 +62,54 @@ class TLPreprocessorSubnode : public Subnode {
   virtual bool InitInternal() override;
 
  private:
-  bool init_shared_data();
+  bool InitSharedData();
 
   //bool init_synchronizer(const ModelConfig& config);
-  bool init_preprocessor();
+  bool InitPreprocessor();
 
-  bool init_hdmap();
+  bool InitHdmap();
 
-  bool add_data_and_publish_event(
+  bool AddDataAndPublishEvent(
       const std::shared_ptr<ImageLights> &data,
       const CameraId &camera_id,
       double timestamp);
 
   //@brief sub long focus camera
-  void sub_long_focus_camera(const sensor_msgs::Image &msg);
+  void SubLongFocusCamera(const sensor_msgs::Image &msg);
 
   //@brief sub short focus camera
-  void sub_short_focus_camera(const sensor_msgs::Image &msg);
+  void SubShortFocusCamera(const sensor_msgs::Image &msg);
 
-  void sub_camera_image(const std::shared_ptr<sensor_msgs::Image> msg, CameraId camera_id);
+  void SubCameraImage(const std::shared_ptr<sensor_msgs::Image> msg, CameraId camera_id);
 
-  bool get_car_pose(const double ts, CarPose *pose);
-
-  bool verify_lights_projection(
+  void CameraSelection(double ts);
+  bool VerifyLightsProjection(
       const double &ts,
       const CameraId &camera_id,
       std::shared_ptr<ImageLights> *image_lights);
-
-  // 原 sub_tf 的处理流程
-  void camera_selection(double timestamp);
-
+  bool GetSignals(double ts, CarPose *pose, std::vector<apollo::hdmap::Signal> *signals);
+  bool GetCarPose(const double ts, CarPose *pose);
  private:
-  TLPreprocessor _preprocessor;
-  TLPreprocessingData *_preprocessing_data = nullptr;
+  TLPreprocessor preprocessor_;
+  TLPreprocessingData *preprocessing_data_ = nullptr;
 
-  HDMapInput *_hd_map = nullptr;  // HDMap
+  HDMapInput *hd_map_ = nullptr;  // HDMap
 
-  float _last_query_tf_ts = 0.0;
-  float _query_tf_inverval_seconds = 0.0;
+  // signals
+  float _last_signals_ts = -1;
+  std::vector<apollo::hdmap::Signal> _last_signals;
+  float valid_hdmap_interval_ = 1.5;
 
-  float _last_proc_image_ts = 0.0;
-  float _proc_interval_seconds = 0.0;  //
+  //tf
+  double _last_query_tf_ts = 0;
+  float _query_tf_inverval_seconds = 0;
 
-  static std::map<int, std::string> _s_camera_names;
+  // process
+  double last_proc_image_ts_ = 0.0;
+  float proc_interval_seconds_ = 0.0;  //
 
  DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
+
 };
 
 REGISTER_SUBNODE(TLPreprocessorSubnode);

@@ -22,12 +22,12 @@
 #include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "ctime"
 #include <std_msgs/String.h>
+#include "modules/perception/lib/base/timer.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/shared_data_manager.h"
-#include "modules/perception/traffic_light/onboard/tl_shared_data.h"
-#include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
+#include "modules/perception/traffic_light/base/tl_shared_data.h"
 
 namespace apollo {
 namespace perception {
@@ -156,16 +156,15 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
   const double detection_latency = TimeUtil::GetCurrentTime() - before_rectify_ts;
 
   // update image_border
-  const double before_update_image_border_ts = TimeUtil::GetCurrentTime();
   MutexLock lock(&mutex_);
   //int cam_id = static_cast<int>(image_lights->camera_id);
   ComputeImageBorder(*image_lights,
-                     &TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id]);
+                     &image_border_size[image_lights->camera_id]);
   AINFO << "TLProcSubnode update image_border size: "
-        << TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id]
+        << image_border_size[image_lights->camera_id]
         << " ts: " << GLOG_TIMESTAMP(timestamp)
         << " CameraId: " << image_lights->camera_id;
-  image_lights->offset = TLPreprocessorSubnode::_s_image_borders[image_lights->camera_id];
+  image_lights->offset = image_border_size[image_lights->camera_id];
 
   // recognize_status
   const double before_recognization_ts = TimeUtil::GetCurrentTime();
@@ -186,9 +185,8 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
            << "sub_event:" << event.to_string();
     return false;
   }
-  PublishMessage(image_lights);
   const double revise_latency = TimeUtil::GetCurrentTime() - before_revise_ts;
-
+  PublishMessage(image_lights);
   AINFO << "TLProcSubnode process traffic_light, "
         << " msg_ts: " << GLOG_TIMESTAMP(timestamp)
         << " from device_id: " << device_id
@@ -301,11 +299,10 @@ bool TLProcSubnode::VerifyImageLights(
     return false;
   }
 
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
   const int cam_id = static_cast<int>(image_lights.camera_id);
-  if (cam_id < 0 || cam_id >= num_camera_ids) {
-    AERROR << "TLProcSubnode image_lights unknown camera id, "
-           << "verify_image_lights failed.";
+  if (cam_id < 0 || cam_id >= kCountCameraId) {
+    AERROR << "TLProcSubnode image_lights unknown camera id: " << cam_id
+           << " verify_image_lights failed.";
     return false;
   }
   for (LightPtr light:*(image_lights.lights)) {
@@ -328,8 +325,7 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
   }
 
   auto camera_id = static_cast<int>(image_lights.camera_id);
-  const int num_camera_ids = static_cast<int>(CameraId::CAMERA_ID_COUNT) - 1;
-  if (camera_id < 0 || camera_id >= num_camera_ids) {
+  if (camera_id < 0 || camera_id >= kCountCameraId) {
     AERROR << "TLProcSubnode image_lights unknown camera selection, "
            << "compute_image_border failed, "
            << "camera_id: " << kCameraIdToStr.at(image_lights.camera_id);
@@ -341,12 +337,6 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
     AINFO << "TLProcSubnode image_lights no lights info, "
           << "no need to update image border, reset image border size to 100";
     *image_border = 100;
-    return true;
-  }
-
-  if (camera_id == static_cast<int>(CameraId::UNKNOWN) - 1) {
-    AINFO << "TLProcSubnode no need to update image border, "
-          << "camera_id: " << kCameraIdToStr.at(image_lights.camera_id);
     return true;
   }
 
@@ -403,7 +393,7 @@ bool TLProcSubnode::PublishMessage(
   Timer timer;
   timer.Start();
   const auto &lights = image_lights->lights;
-
+  cv::Mat img = image_lights->image->mat();
   apollo::perception::TrafficLightDetection result;
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
@@ -417,6 +407,21 @@ bool TLProcSubnode::PublishMessage(
     light_result->set_id(lights->at(i)->info.id().id());
     light_result->set_confidence(lights->at(i)->status.confidence);
     light_result->set_color(lights->at(i)->status.color);
+    cv::Rect rect = lights->at(i)->region.rectified_roi;
+    cv::Scalar color;
+    switch (lights->at(i)->status.color) {
+      case BLACK:color = cv::Scalar(0, 0, 0);
+        break;
+      case GREEN:color = cv::Scalar(0, 255, 0);
+        break;
+      case RED:color = cv::Scalar(0, 0, 255);
+        break;
+      case YELLOW:color = cv::Scalar(0, 255, 255);
+        break;
+      default:color = cv::Scalar(0, 76, 153);
+
+    }
+    cv::rectangle(img, rect, color, 2);
   }
 
   // set contain_lights
@@ -441,6 +446,7 @@ bool TLProcSubnode::PublishMessage(
     tl_cropbox->set_y(crop_roi.y);
     tl_cropbox->set_width(crop_roi.width);
     tl_cropbox->set_height(crop_roi.height);
+    cv::rectangle(img, crop_roi, cv::Scalar(0, 255, 255), 2);
   }
 
   // Rectified ROI
@@ -487,7 +493,9 @@ bool TLProcSubnode::PublishMessage(
                                         lights->at(0)->info.stop_line());
     light_debug->set_distance_to_stop_line(distance);
   }
-
+  char filename[100];
+  snprintf(filename, 200, "img/%s_%lf.jpg", image_lights->image->device_id_str().c_str(), image_lights->image->ts());
+  cv::imwrite(filename, img);
   common::adapter::AdapterManager::PublishTrafficLightDetection(result);
   auto process_time =
       TimeUtil::GetCurrentTime() - image_lights->preprocess_receive_timestamp;

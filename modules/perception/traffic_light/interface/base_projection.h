@@ -39,20 +39,16 @@ struct ProjectOption {
 struct CameraCoeffient {
  public:
   bool init(const std::string &camera_type,
-            const std::string &lidar2gps_matrix_file_name,
-            const std::string &lidar2camera_matrix_file_name,
+            const std::string &camera_extrinsic_file_name,
             const std::string &camera_intrinsic_matrix_file);
  private:
-  bool init_lidar_to_gps_matrix(const std::string &matrix_file);
-  bool init_lidar_to_camera_matrix(const std::string &matrix_file);
+  bool init_camera_extrinsic_matrix(const std::string &matrix_file);
   bool init_camera_intrinsic_matrix_and_distort_params(
       const std::string &camera_intrinsic_file);
 
  public:
   std::string camera_type_str;
-  Eigen::Matrix4d lidar2gps;    //Lidar->GPS Matrix
-  Eigen::Matrix4d lidar2camera; //Lidar->Camera Matrix
-  Eigen::Matrix4d gps2camera; //Lidar->Camera Matrix
+  Eigen::Matrix4d camera_extrinsic; //Lidar->Camera Matrix
   Eigen::Matrix<double, 3, 4> camera_intrinsic; // Camera Intrinsic
   Eigen::Matrix<double, 5, 1> distort_params;  // distortion parameters
   size_t image_height;

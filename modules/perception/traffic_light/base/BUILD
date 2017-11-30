@@ -8,21 +8,24 @@ cc_library(
         "image.cc",
         "light.cc",
         "pose.cc",
+        "tl_shared_data.cc",
         "utils.cc",
     ],
     hdrs = [
+        "image.h",
         "image_lights.h",
         "light.h",
-        "image.h",
         "pose.h",
+        "tl_shared_data.h",
         "utils.h",
     ],
     deps = [
         "//modules/common:log",
-        "//modules/perception/lib/config_manager",
-        "//modules/perception/proto:perception_proto",
         "//modules/map/proto:map_proto",
-        "//modules/perception/traffic_light/util:perception_traffic_light_util"
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/proto:perception_proto",
+        "//modules/perception/traffic_light/util:perception_traffic_light_util",
     ],
 )
 

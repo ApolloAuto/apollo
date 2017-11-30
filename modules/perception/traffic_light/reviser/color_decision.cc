@@ -14,20 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "color_decision.h"
+#include "modules/perception/traffic_light/reviser/color_decision.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/traffic_light/base/tl_shared_data.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-
-std::map<TLColor, std::string> ColorReviser::s_color_strs_ = {
-    {UNKNOWN_COLOR, "unknown"},
-    {RED, "red"},
-    {GREEN, "green"},
-    {YELLOW, "yellow"},
-    {BLACK, "black"}
-};
 
 std::string ColorReviser::name() const {
   return "ColorReviser";
@@ -75,11 +68,11 @@ bool ColorReviser::Revise(const ReviseOption &option, std::vector<LightPtr> *lig
       case UNKNOWN_COLOR:
         if (color_map_.find(id) != color_map_.end() &&
             option.ts > 0 && option.ts - time_map_[id] < blink_time_) {
-          AINFO << "Revise " << s_color_strs_[lights_ref[i]->status.color]
-                << " to color " << s_color_strs_[color_map_[id]];
+          AINFO << "Revise " << kColorStr[lights_ref[i]->status.color]
+                << " to color " << kColorStr[color_map_[id]];
           lights_ref[i]->status.color = color_map_[id];
         } else {
-          AINFO << "Unrevised color " << s_color_strs_[lights_ref[i]->status.color];
+          AINFO << "Unrevised color " << kColorStr[lights_ref[i]->status.color];
         }
         break;
       case YELLOW:
@@ -101,7 +94,7 @@ bool ColorReviser::Revise(const ReviseOption &option, std::vector<LightPtr> *lig
         color_map_[id] = lights_ref[i]->status.color;
         time_map_[id] = option.ts;
         AINFO << "Revise Keep Color Unchanged: "
-              << s_color_strs_[lights_ref[i]->status.color];
+              << kColorStr[lights_ref[i]->status.color];
         break;
     }
   }

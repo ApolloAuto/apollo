@@ -43,7 +43,8 @@ class MultiCamerasProjection {
   bool has_camera(const CameraId &cam_id) const;
 
  private:
-  std::map<std::string, CameraCoeffient> _camera_coeffients;
+
+  std::vector<CameraCoeffient> _camera_coeffient;
   std::vector<std::string> _camera_names;
   std::unique_ptr<BaseProjection> _projection;
 };

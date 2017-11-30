@@ -27,22 +27,15 @@ DEFINE_string(traffic_light_projection,
 "the projection enabled for traffic_light");
 
 bool CameraCoeffient::init(const std::string &camera_type,
-                           const std::string &lidar2gps_matrix_file_name,
-                           const std::string &lidar2camera_matrix_file_name,
+                           const std::string &camera_extrinsic_file_name,
                            const std::string &camera_intrinsic_file_name) {
 
   camera_type_str = camera_type;
 
   try {
-    if (!init_lidar_to_gps_matrix(lidar2gps_matrix_file_name)) {
-      AERROR << camera_type_str << " init failed. lidar to gps matrix file:"
-             << lidar2gps_matrix_file_name;
-      return false;
-    }
-
-    if (!init_lidar_to_camera_matrix(lidar2camera_matrix_file_name)) {
+    if (!init_camera_extrinsic_matrix(camera_extrinsic_file_name)) {
       AERROR << camera_type_str << " init failed. lidar to camera matrix file:"
-             << lidar2camera_matrix_file_name;
+             << camera_extrinsic_file_name;
       return false;
     }
 
@@ -59,24 +52,14 @@ bool CameraCoeffient::init(const std::string &camera_type,
   return true;
 }
 
-bool CameraCoeffient::init_lidar_to_gps_matrix(const std::string &file_name) {
+bool CameraCoeffient::init_camera_extrinsic_matrix(const std::string &file_name) {
 
-  if (!load_transformation_matrix_from_file(file_name, &lidar2gps)) {
-    AERROR << "Load lidar2gps matrix file failed. file:" << file_name;
+  if (!load_transformation_matrix_from_file(file_name, &camera_extrinsic) &&
+      !load_matrix4d_from_file(file_name, "T", &camera_extrinsic)) {
+    AERROR << "Load camera_extrinsic matrix file failed. file:" << file_name;
     return false;
   }
-  AINFO << camera_type_str << " lidar2gps matrix is:" << lidar2gps;
-  return true;
-}
-
-bool CameraCoeffient::init_lidar_to_camera_matrix(const std::string &file_name) {
-
-  if (!load_transformation_matrix_from_file(file_name, &lidar2camera) &&
-      !load_matrix4d_from_file(file_name, "T", &lidar2camera)) {
-    AERROR << "Load lidar2camera matrix file failed. file:" << file_name;
-    return false;
-  }
-  AINFO << camera_type_str << " lidar2camera matrix is:" << lidar2camera;
+  AINFO << camera_type_str << " camera_extrinsic matrix is:" << camera_extrinsic;
   return true;
 }
 

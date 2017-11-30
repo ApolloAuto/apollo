@@ -39,7 +39,6 @@ struct ImageLights {
   double preprocess_receive_timestamp = 0.0;   // timestamp when received a image
   double preprocess_send_timestamp = 0.0;  // timestamp when PreprocessSubnode pub event
   bool is_pose_valid = false;
-  bool has_signals = false;
   double diff_image_pose_ts = 0.0;  // image' timestamp minus the most recently pose's timestamp
   double diff_image_sys_ts = 0.0;  // image' timestamp system's timestamp
   size_t offset = 0;  // offset size between hdmap bbox and detection bbox

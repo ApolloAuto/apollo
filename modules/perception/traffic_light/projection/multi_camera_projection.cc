@@ -17,6 +17,7 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 #include <gflags/gflags.h>
+#include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -49,10 +50,9 @@ bool MultiCamerasProjection::init() {
   AINFO << "SingleProjection name: " << single_projection_name;
 
   // Read each camera's config
-  std::string lidar2gps_file;
-  std::string lidar2camera_file;
+  std::string camera_extrinsic_file;
   std::string camera_intrinsic_file;
-
+  std::map<std::string, CameraCoeffient> camera_coeffients;
   for (size_t i = 0; i < camera_names.size(); ++i) {
     const auto &camera_model_name = camera_names[i];
     const ModelConfig *camera_model_config = NULL;
@@ -61,12 +61,8 @@ bool MultiCamerasProjection::init() {
       return false;
     }
 
-    if (!camera_model_config->GetValue("lidar2gps_file", &lidar2gps_file)) {
-      AERROR << "lidar2gps_file not found." << name();
-      return false;
-    }
-    if (!camera_model_config->GetValue("lidar2camera_file", &lidar2camera_file)) {
-      AERROR << "lidar2camera_file not found." << name();
+    if (!camera_model_config->GetValue("camera_extrinsic_file", &camera_extrinsic_file)) {
+      AERROR << "camera_extrinsic_file not found." << name();
       return false;
     }
     if (!camera_model_config->GetValue("camera_intrinsic_file", &camera_intrinsic_file)) {
@@ -75,16 +71,12 @@ bool MultiCamerasProjection::init() {
     }
 
     CameraCoeffient camera_coeffient;
-    if (!camera_coeffient.init(
-        camera_model_name,
-        lidar2gps_file,
-        lidar2camera_file,
-        camera_intrinsic_file)) {
+    if (!camera_coeffient.init(camera_model_name, camera_extrinsic_file, camera_intrinsic_file)) {
       AERROR << camera_model_name << " Projection init failed.";
       return false;
     }
     AINFO << "init " << camera_names[i] << " coeffient succeeded.";
-    _camera_coeffients[camera_names[i]] = camera_coeffient;
+    camera_coeffients[camera_names[i]] = camera_coeffient;
     _camera_names.push_back(camera_names[i]);
   }
 
@@ -103,29 +95,26 @@ bool MultiCamerasProjection::init() {
   // lidar2gps is lidar to gps
   // if (FLAGS_traffic_light_projection == "SingleBoundaryBasedProjection")
   for (size_t i = 0; i < _camera_names.size(); ++i) {
-    if (_camera_names[i] == "camera_25mm_focus") {
-      continue;
-    }
 
-    auto &camera_coeffient = _camera_coeffients[_camera_names[i]];
-    camera_coeffient.gps2camera = camera_coeffient.lidar2gps * camera_coeffient.lidar2camera;
-    camera_coeffient.gps2camera = camera_coeffient.gps2camera.inverse().eval();
+    auto &camera_coeffient = camera_coeffients[_camera_names[i]];
+    camera_coeffient.camera_extrinsic = camera_coeffient.camera_extrinsic.inverse().eval();
 
-    AINFO << "GPS to " << _camera_names[i] << ": ";
-    AINFO << camera_coeffient.gps2camera;
+    AINFO << "Lidar to " << _camera_names[i] << " transform: ";
+    AINFO << camera_coeffient.camera_extrinsic;
   }
 
   // for the long focus camera, they are:
   // lidar2camera is long camera to short(6mm) camera
   // lidar2gps is lidar to gps
-  auto &short_focus_camera_coeffient = _camera_coeffients["camera_6mm_focus"];
-  auto &long_focus_camera_coeffient = _camera_coeffients["camera_25mm_focus"];
-  long_focus_camera_coeffient.gps2camera = short_focus_camera_coeffient.lidar2gps *
-      short_focus_camera_coeffient.lidar2camera *
-      long_focus_camera_coeffient.lidar2camera;
-  long_focus_camera_coeffient.gps2camera = long_focus_camera_coeffient.gps2camera.inverse().eval();
-  AINFO << "GPS to long(25mm): ";
-  AINFO << long_focus_camera_coeffient.gps2camera;
+  _camera_coeffient.resize(_camera_names.size());
+  _camera_coeffient[kLongFocusIdx] = camera_coeffients["camera_25mm_focus"];
+  _camera_coeffient[kShortFocusIdx] = camera_coeffients["camera_6mm_focus"];
+  auto &short_focus_camera_coeffient = camera_coeffients["camera_6mm_focus"];
+  auto &long_focus_camera_coeffient = camera_coeffients["camera_25mm_focus"];
+  _camera_coeffient[kLongFocusIdx].camera_extrinsic =
+      _camera_coeffient[kLongFocusIdx].camera_extrinsic * _camera_coeffient[kShortFocusIdx].camera_extrinsic;
+  AINFO << "Lidar to long(25mm): ";
+  AINFO << _camera_coeffient[kLongFocusIdx].camera_extrinsic;
 
   return true;
 }
@@ -139,19 +128,14 @@ bool MultiCamerasProjection::project(const CarPose &pose,
 
   std::map<int, CameraCoeffient> camera_id_to_coeffient;
 
-  camera_id_to_coeffient[static_cast<int>(CameraId::SHORT_FOCUS)] =
-      _camera_coeffients.at("camera_6mm_focus");
-  camera_id_to_coeffient[static_cast<int>(CameraId::LONG_FOCUS)] =
-      _camera_coeffients.at("camera_25mm_focus");
-
   auto camera_id = static_cast<int>(option.camera_id);
-  if (camera_id_to_coeffient.find(camera_id) == camera_id_to_coeffient.end()) {
+  if (camera_id < 0 || camera_id >= kCountCameraId) {
     AERROR << "Projection get invalid camera_id: " << camera_id
            << ", check camera parameters file.";
     return false;
   }
-
-  ret = _projection->project(camera_id_to_coeffient[camera_id], mpose, tl_info, light);
+  AINFO << "Begin project camera: " << option.camera_id;
+  ret = _projection->project(_camera_coeffient[camera_id], mpose, tl_info, light);
 
   if (!ret) {
     AWARN << "Projection failed projection the traffic light. "

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/traffic_light/onboard/hdmap_input.h"
+#include "hdmap_input.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -65,6 +65,7 @@ bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
   }
   ADEBUG << "get_signal success. num_signals: " << signals->size()
          << " point: " << point.ShortDebugString();
+  return true;
 }
 }
 }  // namespace perception

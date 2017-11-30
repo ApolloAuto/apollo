@@ -171,11 +171,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   FLAGS_traffic_light_projection = "MultiCamerasProjection";
   ASSERT_TRUE(projection.init());
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose,
-                                                          signals,
-                                                          image_borders,
-                                                          timestamp,
-                                                          &lights_projections_all_outside_image));
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose, signals, timestamp));
   }
 
   // add light
@@ -210,11 +206,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
 
   signals.push_back(tl_signal);
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose,
-                                                          signals,
-                                                          image_borders,
-                                                          timestamp,
-                                                          &lights_projections_all_outside_image));
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose, signals, timestamp));
   }
 
   // valid pose
@@ -225,11 +217,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   _preprocessor->set_camera_is_working_flag(CameraId::LONG_FOCUS, true);
   _preprocessor->set_camera_is_working_flag(CameraId::SHORT_FOCUS, true);
   for (size_t i = 0; i < 300; ++i) {
-    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose,
-                                                          signals,
-                                                          image_borders,
-                                                          timestamp,
-                                                          &lights_projections_all_outside_image));
+    ASSERT_TRUE(_preprocessor->AddCachedLightsProjections(pose, signals, timestamp));
   }
 }
 
@@ -735,12 +723,7 @@ TEST_F(TLPreprocessorTest, test_select_image) {
       light_ptrs.reset(new LightPtrs);
     }
 
-    _preprocessor->select_image(
-        pose,
-        lights_on_image_array,
-        lights_outside_image_array,
-        image_borders_size,
-        &selection);
+    _preprocessor->select_image(pose, lights_on_image_array, lights_outside_image_array, &selection);
     EXPECT_EQ(CameraId::LONG_FOCUS, selection);
   }
 
@@ -773,21 +756,11 @@ TEST_F(TLPreprocessorTest, test_select_image) {
                                               lights_outside_image_array[0]));
 
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(LONG_FOCUS, true));
-    _preprocessor->select_image(
-        pose,
-        lights_on_image_array,
-        lights_outside_image_array,
-        image_borders_size,
-        &selection);
+    _preprocessor->select_image(pose, lights_on_image_array, lights_outside_image_array, &selection);
     EXPECT_EQ(CameraId::LONG_FOCUS, selection);
 
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(LONG_FOCUS, false));
-    _preprocessor->select_image(
-        pose,
-        lights_on_image_array,
-        lights_outside_image_array,
-        image_borders_size,
-        &selection);
+    _preprocessor->select_image(pose, lights_on_image_array, lights_outside_image_array, &selection);
     EXPECT_EQ(CameraId::LONG_FOCUS, selection);
   }
 
@@ -823,23 +796,13 @@ TEST_F(TLPreprocessorTest, test_select_image) {
                                               lights_on_image_array[0],
                                               lights_outside_image_array[0]));
 
-    _preprocessor->select_image(
-        pose,
-        lights_on_image_array,
-        lights_outside_image_array,
-        image_borders_size,
-        &selection);
+    _preprocessor->select_image(pose, lights_on_image_array, lights_outside_image_array, &selection);
     EXPECT_EQ(CameraId::LONG_FOCUS, selection);
 
     image_borders_size[static_cast<int>(CameraId::LONG_FOCUS)] = 500;
     image_borders_size[static_cast<int>(CameraId::SHORT_FOCUS)] = 500;
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(WIDE_FOCUS, true));
-    _preprocessor->select_image(
-        pose,
-        lights_on_image_array,
-        lights_outside_image_array,
-        image_borders_size,
-        &selection);
+    _preprocessor->select_image(pose, lights_on_image_array, lights_outside_image_array, &selection);
     EXPECT_EQ(CameraId::SHORT_FOCUS, selection);
     image_borders_size[static_cast<int>(CameraId::LONG_FOCUS)] = 100;
     image_borders_size[static_cast<int>(CameraId::SHORT_FOCUS)] = 100;

@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+#include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/traffic_light/base/utils.h"
-#include "cropbox.h"
-//#include "detection.h"
-#include "select.h"
-#include "unity_rectify.h"
+#include "modules/perception/traffic_light/rectify/cropbox.h"
+#include "modules/perception/traffic_light/rectify/select.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/traffic_light/rectify/detection.h"
 
 namespace apollo {
 namespace perception {
@@ -41,12 +40,6 @@ bool UnityRectify::Init() {
 
   InitDetection(config_manager, model_config, &detect_, &crop_);
 
-  float hd_scale = 0;
-  if (!model_config->GetValue(\
-            "hdmap_box_scale", &hd_scale)) {
-    AERROR << "hdmap_box_scale not found." << name();
-    return false;
-  }
   select_.reset(new GaussianSelect);
 
   return true;
@@ -112,8 +105,9 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
   }
   switch (detect_method) {
     default:
-      //case 0:detection->reset(new Detection(crop_min_size, detection_net, detection_model));
-      detection->reset(new DummyRefine());
+    case 0:detection->reset(new Detection(crop_min_size, detection_net, detection_model));
+      break;
+    case 1:detection->reset(new DummyRefine());
       break;
   }
 
