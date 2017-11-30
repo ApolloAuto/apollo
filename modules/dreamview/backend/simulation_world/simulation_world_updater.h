@@ -89,6 +89,8 @@ class SimulationWorldUpdater {
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
 
+  bool ValidateCoordinate(const nlohmann::json &json);
+
   /**
    * @brief Tries to load the points of interest from the file if it has
    * not been.
