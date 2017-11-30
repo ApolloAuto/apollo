@@ -47,15 +47,12 @@ void ContiRadarIDExpansion::ExpandIds(ContiRadar &radar_obs) {
 }
 
 void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar &radar_obs) {
-  AINFO << "#############################################";
   ContiRadar out_obs;
-  double timestamp = radar_obs.header().timestamp_sec() - 0.1;
-  AINFO << "timestamp: " << GLOG_TIMESTAMP(timestamp);
+  double timestamp = radar_obs.header().timestamp_sec() - 1e-6;
   need_inner_restart_ = false;
   for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
     ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
     double object_timestamp = double(contiobs.header().timestamp_sec());
-    AINFO << "object_timestamp: " << GLOG_TIMESTAMP(object_timestamp);
     if (object_timestamp > timestamp) {
       ContiRadarObs *obs = out_obs.add_contiobs();
       *obs = contiobs;

@@ -25,7 +25,7 @@
 #include "glog/raw_logging.h"
 
 #define ADEBUG VLOG(4) << "[DEBUG] "
-#define AINFO LOG(INFO)
+#define AINFO {google::FlushLogFiles(0);}LOG(INFO)
 #define AWARN LOG(WARNING)
 #define AERROR LOG(ERROR)
 #define AFATAL LOG(FATAL)
