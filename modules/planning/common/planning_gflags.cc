@@ -266,6 +266,8 @@ DEFINE_double(default_cruise_speed, 5.0,
              "default cruise speed");
 DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for downsampling reference line points");
+DEFINE_bool(enable_sample_bound_planning, false,
+              "enable SampleBound based motion planning");
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");

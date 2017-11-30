@@ -96,10 +96,24 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     ADEBUG << "Lattice planner stop handling: use polynomial trajectory";
   }
 
-  // generate the trajectory bundles using polynomial methods.
-  GenerateLongitudinalTrajectoryBundle(planning_target, lon_init_state,
-                                       ptr_lon_trajectory_bundle);
-  GenerateLateralTrajectoryBundle(lat_init_state, ptr_lat_trajectory_bundle);
+  if (not FLAGS_enable_sample_bound_planning) {
+    // generate the trajectory bundles using polynomial methods.
+    GenerateLongitudinalTrajectoryBundle(planning_target, lon_init_state,
+                                         ptr_lon_trajectory_bundle);
+    GenerateLateralTrajectoryBundle(lat_init_state, ptr_lat_trajectory_bundle);
+  } else {
+    std::vector<SampleBound> sample_bounds;
+    for (const SampleBound& sample_bound : planning_target.sample_bound()) {
+      sample_bounds.push_back(sample_bound);
+    }
+    GenerateSpeedProfiles(
+      lon_init_state,
+      sample_bounds,
+      ptr_lon_trajectory_bundle);
+    GenerateLateralTrajectoryBundle(
+      lat_init_state,
+      ptr_lat_trajectory_bundle);
+  }
   return;
 }
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
@@ -207,6 +221,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
 }
 
 void Trajectory1dGenerator::GenerateSpeedProfiles(
+    const std::array<double, 3>& lon_init_state,
     const std::vector<SampleBound>& sample_bounds,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   // TODO(all) Implement
