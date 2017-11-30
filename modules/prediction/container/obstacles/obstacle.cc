@@ -30,17 +30,18 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/network/rnn_model/rnn_model.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::perception::PerceptionObstacle;
-using apollo::common::math::KalmanFilter;
 using apollo::common::ErrorCode;
 using apollo::common::Point3D;
+using apollo::common::math::KalmanFilter;
 using apollo::common::util::FindOrDie;
 using apollo::common::util::FindOrNull;
 using apollo::hdmap::LaneInfo;
+using apollo::perception::PerceptionObstacle;
 
 std::mutex Obstacle::mutex_;
 
@@ -125,6 +126,20 @@ bool Obstacle::IsOnLane() {
   }
   ADEBUG << "Obstacle [" << id_ << "] is not on lane.";
   return false;
+}
+
+bool Obstacle::IsNearJunction() {
+  if (feature_history_.size() <= 0) {
+    return false;
+  }
+  double pos_x = latest_feature().position().x();
+  double pos_y = latest_feature().position().y();
+  if (FLAGS_enable_kf_tracking) {
+    pos_x = latest_feature().t_position().x();
+    pos_y = latest_feature().t_position().y();
+  }
+  return PredictionMap::instance()->NearJunction({pos_x, pos_y},
+                                                 FLAGS_search_radius);
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
@@ -612,6 +627,7 @@ void Obstacle::UpdateKFLaneTracker(const std::string& lane_id,
     InitKFLaneTracker(lane_id, beta);
     auto& kf = FindOrDie(kf_lane_trackers_, lane_id);
     Eigen::Matrix<double, 4, 1> state;
+    state.setZero();
     state(0, 0) = lane_s;
     state(1, 0) = lane_l;
     state(2, 0) = lane_speed;
@@ -683,6 +699,7 @@ void Obstacle::InitKFPedestrianTracker(Feature* feature) {
 
   // Set initial state
   Eigen::Matrix<double, 2, 1> x;
+  x.setZero();
   x(0, 0) = feature->position().x();
   x(1, 0) = feature->position().y();
 
@@ -977,9 +994,9 @@ void Obstacle::SetMotionStatus() {
   int history_size = static_cast<int>(feature_history_.size());
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
-           << "is considered stationary [default = true].";
+           << "is considered moving.";
     if (history_size > 0) {
-      feature_history_.front().set_is_still(true);
+      feature_history_.front().set_is_still(false);
     }
     return;
   }
@@ -1022,17 +1039,21 @@ void Obstacle::SetMotionStatus() {
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_
            << "] has a small speed and is considered stationary.";
+    feature_history_.front().set_is_still(true);
   } else if (speed_sensibility < speed_threshold) {
     ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
            << history_size
            << "] considered moving [sensibility = " << speed_sensibility << "]";
+    feature_history_.front().set_is_still(false);
   } else {
     double distance = std::hypot(avg_drift_x, avg_drift_y);
     double distance_std = std::sqrt(2.0 / len) * std;
     if (distance > 2.0 * distance_std) {
       ADEBUG << "Obstacle [" << id_ << "] is moving.";
+      feature_history_.front().set_is_still(false);
     } else {
       ADEBUG << "Obstacle [" << id_ << "] is stationary.";
+      feature_history_.front().set_is_still(true);
     }
   }
 }
@@ -1059,6 +1080,29 @@ void Obstacle::Trim() {
            << " historical features";
   }
 }
+
+void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
+  rnn_states_ = rnn_states;
+}
+
+void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
+  rnn_states->clear();
+  rnn_states->insert(rnn_states->end(), rnn_states_.begin(), rnn_states_.end());
+}
+
+void Obstacle::InitRNNStates() {
+  if (network::RnnModel::instance()->IsOk()) {
+    network::RnnModel::instance()->ResetState();
+    network::RnnModel::instance()->State(&rnn_states_);
+    rnn_enabled_ = true;
+    ADEBUG << "Success to initialize rnn model.";
+  } else {
+    AWARN << "Fail to initialize rnn model.";
+    rnn_enabled_ = false;
+  }
+}
+
+bool Obstacle::RNNEnabled() const { return rnn_enabled_; }
 
 }  // namespace prediction
 }  // namespace apollo

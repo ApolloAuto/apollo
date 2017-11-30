@@ -18,7 +18,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171115_2103"
+VERSION_X86_64="dev-x86_64-20171129_1427"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -76,6 +76,8 @@ function main(){
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
+    devices="${devices} $(find_device video*)"
+
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)

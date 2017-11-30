@@ -174,14 +174,14 @@ class Polygon2d {
    *        contains it.
    * @return Whether the polygon contains the line segment or not.
    */
-  bool IsContain(const LineSegment2d &line_segment) const;
+  bool Contains(const LineSegment2d &line_segment) const;
 
   /**
    * @brief Check if the polygon contains another polygon.
    * @param polygon The target polygon. To check if this polygon contains it.
    * @return Whether this polygon contains another polygon or not.
    */
-  bool IsContain(const Polygon2d &polygon) const;
+  bool Contains(const Polygon2d &polygon) const;
 
   /**
    * @brief Compute the convex hull of a group of points.
@@ -283,9 +283,9 @@ class Polygon2d {
   Polygon2d ExpandByDistance(const double distance) const;
 
   /**
-   * @brief Get a string containing essential informaiton about the polygon
+   * @brief Get a string containing essential information about the polygon
    *        for debugging purpose.
-   * @return Essential informaiton about the polygon for debugging purpose.
+   * @return Essential information about the polygon for debugging purpose.
    */
   std::string DebugString() const;
 

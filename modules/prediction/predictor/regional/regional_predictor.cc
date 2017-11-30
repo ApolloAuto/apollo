@@ -27,8 +27,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 
 namespace {
@@ -219,6 +219,8 @@ void RegionalPredictor::DrawMovingTrajectory(
   for (size_t i = 0; i < left_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(left_points->operator[](i)));
+  }
+  for (size_t i = 0; i < right_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(right_points->operator[](i)));
   }
@@ -239,6 +241,7 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
   kf.SetStateEstimate(x, P);
 
   Eigen::Matrix<double, 2, 4> B;
+  B.setZero();
   B(0, 0) = delta_ts;
   B(0, 2) = 0.5 * delta_ts * delta_ts;
   B(1, 1) = delta_ts;

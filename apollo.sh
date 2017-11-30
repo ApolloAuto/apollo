@@ -128,8 +128,7 @@ function build() {
   build_py_proto
 
   # Update task info template on compiling.
-  bazel-bin/modules/data/recorder/update_task_info \
-      --commit_id=$(git rev-parse HEAD)
+  bazel-bin/modules/data/util/update_task_info --commit_id=$(git rev-parse HEAD)
 }
 
 function cibuild() {
@@ -250,13 +249,6 @@ function release() {
   # common data
   mkdir $MODULES_DIR/common
   cp -r modules/common/data $MODULES_DIR/common
-
-  # hmi
-  mkdir -p $MODULES_DIR/hmi/ros_bridge $MODULES_DIR/hmi/utils
-  cp bazel-bin/modules/hmi/ros_bridge/ros_bridge $MODULES_DIR/hmi/ros_bridge/
-  cp -r modules/hmi/conf $MODULES_DIR/hmi
-  cp -r modules/hmi/web $MODULES_DIR/hmi
-  cp -r modules/hmi/utils/*.py $MODULES_DIR/hmi/utils
 
   # perception
   cp -r modules/perception/model/ $MODULES_DIR/perception
@@ -598,7 +590,11 @@ function main() {
   check_machine_arch
   check_esd_files
 
-  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} --copt=-mavx2"
+  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+
+  if [ ${MACHINE_ARCH} == "x86_64" ]; then
+    DEFINES="${DEFINES} --copt=-mavx2"
+  fi
 
   local cmd=$1
   shift
@@ -613,7 +609,7 @@ function main() {
       apollo_build_dbg $@
       ;;
     build_prof)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY  --copt='-pg' --cxxopt='-pg' --linkopt='-pg'"
+      DEFINES="${DEFINES} --config=cpu_prof --cxxopt=-DCPU_ONLY"
       apollo_build_dbg $@
       ;;
     build_no_perception)

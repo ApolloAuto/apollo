@@ -52,8 +52,8 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
   template <std::size_t N>
   double ComputeCartesianDeviationX(const double s) const {
     auto cos_theta = [this](const double s) {
-      const auto a = common::math::Angle16::from_rad(Evaluate(0, s));
-      return common::math::cos(a);
+      const auto a = Evaluate(0, s);
+      return std::cos(a);
     };
     return common::math::IntegrateByGaussLegendre<N>(cos_theta, 0.0, s);
   }
@@ -61,8 +61,8 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
   template <std::size_t N>
   double ComputeCartesianDeviationY(const double s) const {
     auto sin_theta = [this](const double s) {
-      const auto a = common::math::Angle16::from_rad(Evaluate(0, s));
-      return common::math::sin(a);
+      const auto a = Evaluate(0, s);
+      return std::sin(a);
     };
     return common::math::IntegrateByGaussLegendre<N>(sin_theta, 0.0, s);
   }
@@ -77,14 +77,13 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     std::pair<double, double> cartesian_deviation = {0.0, 0.0};
     for (std::size_t i = 0; i < N; ++i) {
       double r = 0.5 * x[i] + 0.5;
-      auto curr_theta_angle = common::math::Angle16::from_rad(
-          Evaluate(0, r * param_));
+      auto curr_theta = Evaluate(0, r * param_);
       double derived_theta = DeriveTheta(param_index, r);
 
       cartesian_deviation.first +=
-          w[i] * (-common::math::sin(curr_theta_angle)) * derived_theta;
+          w[i] * (-std::sin(curr_theta)) * derived_theta;
       cartesian_deviation.second +=
-          w[i] * common::math::cos(curr_theta_angle) * derived_theta;
+          w[i] * std::cos(curr_theta) * derived_theta;
     }
 
     cartesian_deviation.first *= param_ * 0.5;
@@ -93,13 +92,12 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     if (param_index == DELTA_S) {
       for (std::size_t i = 0; i < N; ++i) {
         double r = 0.5 * x[i] + 0.5;
-        auto theta_angle =
-            common::math::Angle16::from_rad(Evaluate(0, r * param_));
+        auto theta_angle = Evaluate(0, r * param_);
 
         cartesian_deviation.first +=
-            0.5 * w[i] * common::math::cos(theta_angle);
+            0.5 * w[i] * std::cos(theta_angle);
         cartesian_deviation.second +=
-            0.5 * w[i] * common::math::sin(theta_angle);
+            0.5 * w[i] * std::sin(theta_angle);
       }
     }
     return cartesian_deviation;

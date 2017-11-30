@@ -29,7 +29,7 @@ function start() {
     LARGEST_DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
         awk '{print substr($0, index($0, $6))}')"
     if [ ! -z "${LARGEST_DISK}" ]; then
-      REAL_BAG_DIR="/media/${DOCKER_USER}/${LARGEST_DISK}/data/bag"
+      REAL_BAG_DIR="${LARGEST_DISK}/data/bag"
       if [ ! -d "${REAL_BAG_DIR}" ]; then
         mkdir -p "${REAL_BAG_DIR}"
       fi
@@ -39,7 +39,6 @@ function start() {
     else
       echo "Cannot find portable disk."
       echo "Please make sure your container was started AFTER inserting the disk."
-      exit 1
     fi
   fi
 
@@ -82,23 +81,26 @@ function stop() {
 
 function help() {
   echo "Usage:"
-  echo "$0 [start]             Record bag to data/bag."
-  echo "$0 --portable-disk     Record bag to the largest portable disk."
-  echo "$0 stop                Stop recording."
-  echo "$0 help                Show this help message."
+  echo "$0 [start]                     Record bag to data/bag."
+  echo "$0 [start] --portable-disk     Record bag to the largest portable disk."
+  echo "$0 stop                        Stop recording."
+  echo "$0 help                        Show this help message."
 }
 
 case $1 in
   start)
-    start
+    shift
+    start $@
     ;;
   stop)
-    stop
+    shift
+    stop $@
     ;;
   help)
-    help
+    shift
+    help $@
     ;;
   *)
-    start
+    start $@
     ;;
 esac

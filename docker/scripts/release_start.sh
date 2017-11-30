@@ -71,6 +71,9 @@ function main() {
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
+    devices="${devices} $(find_device camera*)"
+    devices="${devices} $(find_device video*)"
+
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
@@ -122,7 +125,7 @@ function main() {
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/control/conf"
     fi
-    docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 
 main

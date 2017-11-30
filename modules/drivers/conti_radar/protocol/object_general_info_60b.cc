@@ -18,6 +18,8 @@
 
 #include "glog/logging.h"
 
+
+#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -33,7 +35,6 @@ const int32_t ObjectGeneralInfo60B::ID = 0x60B;
 void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
                                  ContiRadar* conti_radar) const {
   int obj_id = object_id(bytes, length);
-  AINFO << "OBJECT ID: " << obj_id;
   auto conti_obs = conti_radar->add_contiobs();
   conti_obs->set_clusterortrack(false);
   conti_obs->set_obstacle_id(obj_id);
@@ -43,6 +44,10 @@ void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
   conti_obs->set_lateral_vel(lateral_vel(bytes, length));
   conti_obs->set_rcs(rcs(bytes, length));
   conti_obs->set_dynprop(dynprop(bytes, length));
+  double timestamp = apollo::common::time::Clock::NowInSecond();
+  auto header = conti_obs->mutable_header();
+  header->CopyFrom(conti_radar->header());
+  header->set_timestamp_sec(timestamp);
 }
 
 int ObjectGeneralInfo60B::object_id(const std::uint8_t* bytes,

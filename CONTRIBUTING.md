@@ -46,7 +46,7 @@ You can use command `bash apollo.sh test` to run all unit tests.
 
 If your code is not straightforward for other contributors to understand, it is recommended to implement the code in a clear and efficient way, and provide sufficient documentation.
 Apollo uses doxygen to help generate formatted API Document with command `bash apollo.sh doc`.
-Document your code following this guide [How to document code](how_to_document_code.md).
+Document your code following this guide [How to document code](docs/howto/how_to_document_code.md).
 
 #### Commit Message
 The first line of commit message should be a one-line summary of the change.

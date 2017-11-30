@@ -13,9 +13,9 @@ camera:
     near: 1
     far: 100
   Map:
-    fov: 100
+    fov: 70
     near: 1
-    far: 3000
+    far: 4000
   Monitor:
     fov: 70
     near: 1
@@ -29,6 +29,8 @@ ground:
   xorigin: 4096
   yorigin: 4096
   xyoffset: 0
+  type: default # default or tile
+  tileRange: 4
 planning:
   # The minimum interval between two consecutive
   minInterval: 0.1
@@ -63,6 +65,7 @@ options:
     showObstaclesHeading: true
     showObstaclesId: true
     cameraAngle: Default
+offlinePlayback: false
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

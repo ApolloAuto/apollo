@@ -59,12 +59,17 @@ DECLARE_double(pedestrian_max_acc);
 DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_int32(num_trajectory_still_pedestrian);
 DECLARE_double(still_speed);
-DECLARE_string(vehicle_model_file);
+DECLARE_string(evaluator_vehicle_mlp_file);
+DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_int32(max_num_obstacles);
+
+// evaluator
+DECLARE_double(rnn_min_lane_relatice_s);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
+DECLARE_bool(enable_lane_sequence_acc);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);

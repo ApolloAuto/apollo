@@ -37,9 +37,8 @@ class PolynomialXd {
   void SetParams(const std::vector<double>& params);
 
   static PolynomialXd DerivedFrom(const PolynomialXd& base);
-  static PolynomialXd IntegratedFrom(const PolynomialXd& base);
   static PolynomialXd IntegratedFrom(const PolynomialXd& base,
-                                     const double intercept);
+                                     const double intercept = 0.0);
 
   std::uint32_t order() const;
   const std::vector<double>& params() const;

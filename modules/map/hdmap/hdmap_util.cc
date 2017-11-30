@@ -43,7 +43,9 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
 }  // namespace
 
 std::string BaseMapFile() {
-  return FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename);
+  return FLAGS_test_base_map_filename.empty()
+             ? FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename)
+             : FindFirstExist(FLAGS_map_dir, FLAGS_test_base_map_filename);
 }
 
 std::string SimMapFile() {

@@ -25,12 +25,12 @@ source "${DIR}/apollo_base.sh"
 # run command_name module_name
 function start() {
 	echo "start"
-	python modules/tools/planning_lite/planning_lite.py &
+	python modules/tools/navigation/planning/navigation_planning.py &
 }
 
 function stop() {
     echo "stop"
-    pkill -f planning_lite.py
+    pkill -f navigation_planning.py
 }
 
 case $1 in                                                                                          

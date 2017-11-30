@@ -47,7 +47,6 @@
 #include "modules/drivers/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/conti_radar/protocol/radar_config_200.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
 
 /**
  * @namespace apollo::drivers

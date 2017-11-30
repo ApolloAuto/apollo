@@ -76,7 +76,7 @@ class ReferenceLineProvider {
 
  private:
   /**
-   * @brief Use PncMap to create refrence line and the corresponding segments
+   * @brief Use PncMap to create reference line and the corresponding segments
    * based on routing and current position. This is a thread safe function.
    * @return true if !reference_lines.empty() && reference_lines.size() ==
    *                 segments.size();
@@ -91,8 +91,8 @@ class ReferenceLineProvider {
                          const std::list<hdmap::RouteSegments>& route_segments);
 
   bool CreateRouteSegments(const common::VehicleState& vehicle_state,
-                           double look_forward_distance,
-                           double look_backward_distance,
+                           const double look_forward_distance,
+                           const double look_backward_distance,
                            std::list<hdmap::RouteSegments>* segments);
 
   bool IsReferenceLineSmoothValid(const ReferenceLine& raw,
@@ -123,33 +123,34 @@ class ReferenceLineProvider {
   DECLARE_SINGLETON(ReferenceLineProvider);
 
   bool is_initialized_ = false;
+  bool is_stop_ = false;
   std::unique_ptr<std::thread> thread_;
-
   std::unique_ptr<ReferenceLineSmoother> smoother_;
+  std::unique_ptr<Spline2dSolver> spline_solver_;
+  QpSplineReferenceLineSmootherConfig smoother_config_;
 
   std::mutex pnc_map_mutex_;
+  // the following data (pnc_map_, vehicle_state_) are managed
+  // by pnc_map_mutex_
   std::unique_ptr<hdmap::PncMap> pnc_map_;
   common::VehicleState vehicle_state_;
 
   bool has_routing_ = false;
-
-  QpSplineReferenceLineSmootherConfig smoother_config_;
-
-  bool is_stop_ = false;
-
-  std::mutex reference_lines_mutex__;
-  std::condition_variable cv_has_reference_line_;
-  std::list<ReferenceLine> reference_lines_;
-  std::list<hdmap::RouteSegments> route_segments_;
-
   struct SegmentHistory {
     double min_l = 0.0;
     double accumulate_s = 0.0;
     common::math::Vec2d last_point;
   };
-  std::unordered_map<std::string, SegmentHistory> segment_history_;
 
-  std::unique_ptr<Spline2dSolver> spline_solver_;
+  std::mutex segment_history_mutex_;
+  std::unordered_map<std::string, SegmentHistory> segment_history_;
+  std::list<std::string> segment_history_id_;
+
+  std::mutex reference_lines_mutex_;
+  // the following data (reference_lines_, route_segments_) are managed by
+  // reference_lines_mutex_
+  std::list<ReferenceLine> reference_lines_;
+  std::list<hdmap::RouteSegments> route_segments_;
 };
 
 }  // namespace planning

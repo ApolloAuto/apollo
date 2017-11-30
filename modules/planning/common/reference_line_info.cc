@@ -156,7 +156,7 @@ PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
 SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
 
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
-    const double relative_time,
+    const double relative_time, const double start_s,
     DiscretizedTrajectory* ptr_discretized_trajectory) {
   CHECK(ptr_discretized_trajectory != nullptr);
   // use varied resolution to reduce data load but also provide enough data
@@ -186,6 +186,7 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
              << "path total length " << path_data_.discretized_path().Length();
       return false;
     }
+    path_point.set_s(path_point.s() + start_s);
 
     common::TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->CopyFrom(path_point);

@@ -29,7 +29,6 @@
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
-#include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -76,9 +75,6 @@ using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
 using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
 using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
-
-// TODO(xiaoxq): Retire HMICommandAdapter after integration with dreamview.
-using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using ContiRadarAdapter = Adapter<drivers::ContiRadar>;

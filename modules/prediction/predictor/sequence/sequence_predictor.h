@@ -131,8 +131,7 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneChangeWithMaxProb(const LaneChangeType& type,
-                             const double& probability,
-                             const double& max_prob);
+                             const double& probability, const double& max_prob);
 
  protected:
   std::string adc_lane_id_ = "";

@@ -36,6 +36,7 @@ namespace prediction {
 
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::Id;
+using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
 
@@ -127,6 +128,16 @@ void PredictionMap::OnLane(
       lanes->push_back(candidate_lane);
     }
   }
+}
+
+bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
+                                 const double radius) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  std::vector<std::shared_ptr<const JunctionInfo>> junctions;
+  HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
+  return junctions.size() > 0;
 }
 
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,

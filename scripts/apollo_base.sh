@@ -204,6 +204,10 @@ function setup_device() {
   if [ ! -e /dev/nvidia-uvm-tools ];then
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
   fi
+
+  if [ ! -e /dev/nvidia-uvm-tools ];then
+    sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
+  fi
 }
 
 function is_stopped_customized_path() {

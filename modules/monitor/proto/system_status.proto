@@ -3,8 +3,23 @@ syntax = "proto2";
 package apollo.monitor;
 
 import "modules/common/proto/header.proto";
+import "modules/monitor/proto/monitor_conf.proto";
+
+enum Summary {
+  UNKNOWN = 0;
+  OK = 1;
+  WARN = 2;
+  ERROR = 3;
+  FATAL = 4;
+}
 
 message HardwareStatus {
+  // Overall status summary.
+  optional Summary summary = 1 [default = UNKNOWN];
+  // Additional message for current status.
+  optional string msg = 2;
+
+  // Detailed status.
   enum Status {
     OK = 0;
     // HW device is present and in working order, but not ready for service
@@ -17,19 +32,20 @@ message HardwareStatus {
 
     UNDEF = -1;
   }
+  optional Status status = 3 [default = UNDEF];
 
-  optional Status status = 1 [default = UNDEF];
-
-  // Additional message for current status.
-  optional string msg = 2;
+  optional TopicStatus topic_status = 4;
 }
 
 message ModuleStatus {
-  optional bool process_running = 1;
-  optional float message_efficiency = 2;  // frequency / expected_frequency
-
+  // Overall status summary.
+  optional Summary summary = 1 [default = UNKNOWN];
   // Additional message for current status.
-  optional string msg = 3;
+  optional string msg = 2;
+
+  // Detailed status.
+  optional ProcessStatus process_status = 3;
+  optional TopicStatus topic_status = 4;
 }
 
 message SystemStatus {

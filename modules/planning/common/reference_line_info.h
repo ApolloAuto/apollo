@@ -30,9 +30,9 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/proto/vehicle_state.pb.h"
-#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -88,7 +88,7 @@ class ReferenceLineInfo {
   SpeedData* mutable_speed_data();
   // aggregate final result together by some configuration
   bool CombinePathAndSpeedProfile(
-      const double relative_time,
+      const double relative_time, const double start_s,
       DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;

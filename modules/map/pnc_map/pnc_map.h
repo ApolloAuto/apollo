@@ -61,10 +61,9 @@ class PncMap {
                         std::list<RouteSegments> *const route_segments) const;
 
   /**
-   * Check if the routing is the same as existing one after call
-   * UpdateRoutingResponse"
+   * Check if the routing is the same as existing one in PncMap
    */
-  bool IsSameRouting() const;
+  bool IsNewRouting(const routing::RoutingResponse &routing_response) const;
 
   bool ExtendSegments(const RouteSegments &segments,
                       const common::PointENU &point, double look_forward,

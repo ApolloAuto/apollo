@@ -4,22 +4,20 @@ import RENDERER from "renderer";
 
 export default class RouteEditingManager {
 
-    // Map from POI name to its x,y coordinates, e.g. {POI-1: {x: 1.0, y: 1.2}}
+    // Map from POI name to its x,y coordinates,
+    // e.g. {POI-1: [{x: 1.0, y: 1.2}, {x: 101.0, y: 10.2}]}
     @observable defaultRoutingEndPoint = {};
     @observable currentPOI = "none";
 
 
     @action updateDefaultRoutingEndPoint(data) {
-        if (data.poi === undefined || _.isEmpty(data.poi)) {
+        if (data.poi === undefined) {
             return;
         }
         this.defaultRoutingEndPoint = {};
         for (let i = 0; i < data.poi.length; ++i) {
             const place = data.poi[i];
-            this.defaultRoutingEndPoint[place.name] = {
-                    x: place.x,
-                    y: place.y
-                };
+            this.defaultRoutingEndPoint[place.name] = place.waypoint;
         }
     }
 

@@ -53,11 +53,10 @@ namespace adapter {
 #define REGISTER_ADAPTER(name)                                                 \
  public:                                                                       \
   static void Enable##name(const std::string &topic_name,                      \
-                           AdapterConfig::Mode mode,                           \
-                           int message_history_limit) {                        \
-    CHECK(message_history_limit > 0)                                           \
+                           const AdapterConfig &config) {                      \
+    CHECK(config.message_history_limit() > 0)                                  \
         << "Message history limit must be greater than 0";                     \
-    instance()->InternalEnable##name(topic_name, mode, message_history_limit); \
+    instance()->InternalEnable##name(topic_name, config);                      \
   }                                                                            \
   static name##Adapter *Get##name() {                                          \
     return instance()->InternalGet##name();                                    \
@@ -99,25 +98,22 @@ namespace adapter {
   ros::Subscriber name##subscriber_;                                           \
                                                                                \
   void InternalEnable##name(const std::string &topic_name,                     \
-                            AdapterConfig::Mode mode,                          \
-                            int message_history_limit) {                       \
+                            const AdapterConfig &config) {                     \
     name##_.reset(                                                             \
-        new name##Adapter(#name, topic_name, message_history_limit));          \
-    if (mode != AdapterConfig::PUBLISH_ONLY && IsRos()) {                      \
+        new name##Adapter(#name, topic_name, config.message_history_limit())); \
+    if (config.mode() != AdapterConfig::PUBLISH_ONLY && IsRos()) {             \
       name##subscriber_ =                                                      \
-          node_handle_->subscribe(topic_name, message_history_limit,           \
+          node_handle_->subscribe(topic_name, config.message_history_limit(),  \
                                   &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
-    if (mode != AdapterConfig::RECEIVE_ONLY && IsRos()) {                      \
+    if (config.mode() != AdapterConfig::RECEIVE_ONLY && IsRos()) {             \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
-          topic_name, message_history_limit);                                  \
+          topic_name, config.message_history_limit(), config.latch());         \
     }                                                                          \
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() {                                         \
-    return name##_.get();                                                      \
-  }                                                                            \
+  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (IsRos()) {                                                             \
@@ -185,9 +181,7 @@ class AdapterManager {
   /**
    * @brief Returns whether AdapterManager is running ROS mode.
    */
-  static bool IsRos() {
-    return instance()->node_handle_ != nullptr;
-  }
+  static bool IsRos() { return instance()->node_handle_ != nullptr; }
 
   /**
    * @brief Returns a reference to static tf2 buffer.
@@ -204,7 +198,7 @@ class AdapterManager {
    * rate. It takes a class member function, and a bare pointer to the
    * object to call the method on.
    */
-  template<class T>
+  template <class T>
   static ros::Timer CreateTimer(ros::Duration period,
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
@@ -214,7 +208,7 @@ class AdapterManager {
                                                    oneshot, autostart);
     } else {
       AWARN << "ROS timer is only available in ROS mode, check your adapter "
-          "config file! Return a dummy timer that won't function.";
+               "config file! Return a dummy timer that won't function.";
       return ros::Timer();
     }
   }
@@ -259,6 +253,30 @@ class AdapterManager {
  REGISTER_ADAPTER(DelphiESR);
  REGISTER_ADAPTER(ContiRadar);
  REGISTER_ADAPTER(CompressedImage);
+  REGISTER_ADAPTER(Chassis);
+  REGISTER_ADAPTER(ChassisDetail);
+  REGISTER_ADAPTER(ControlCommand);
+  REGISTER_ADAPTER(Gps);
+  REGISTER_ADAPTER(Imu);
+  REGISTER_ADAPTER(Localization);
+  REGISTER_ADAPTER(Monitor);
+  REGISTER_ADAPTER(Pad);
+  REGISTER_ADAPTER(PerceptionObstacles);
+  REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(Prediction);
+  REGISTER_ADAPTER(TrafficLightDetection);
+  REGISTER_ADAPTER(RoutingRequest);
+  REGISTER_ADAPTER(RoutingResponse);
+  REGISTER_ADAPTER(RelativeOdometry);
+  REGISTER_ADAPTER(InsStat);
+  REGISTER_ADAPTER(InsStatus);
+  REGISTER_ADAPTER(GnssStatus);
+  REGISTER_ADAPTER(SystemStatus);
+  REGISTER_ADAPTER(Mobileye);
+  REGISTER_ADAPTER(DelphiESR);
+  REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(CompressedImage);
 
  DECLARE_SINGLETON(AdapterManager);
 };

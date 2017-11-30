@@ -70,7 +70,7 @@ std::string Object::ToString() const {
              "is_background: ", is_background, "]"));
 }
 
-bool Object::Serialize(PerceptionObstacle* pb_obj) const {
+void Object::Serialize(PerceptionObstacle* pb_obj) const {
   CHECK(pb_obj != NULL);
   pb_obj->set_id(track_id);
   pb_obj->set_theta(theta);
@@ -107,11 +107,9 @@ bool Object::Serialize(PerceptionObstacle* pb_obj) const {
   pb_obj->set_tracking_time(tracking_time);
   pb_obj->set_type(static_cast<PerceptionObstacle::Type>(type));
   pb_obj->set_timestamp(latest_tracked_time);  // in seconds.
-
-  return true;
 }
 
-bool Object::Deserialize(const PerceptionObstacle& pb_obs) {
+void Object::Deserialize(const PerceptionObstacle& pb_obs) {
   track_id = pb_obs.id();
   theta = pb_obs.theta();
 
@@ -140,8 +138,6 @@ bool Object::Deserialize(const PerceptionObstacle& pb_obs) {
   tracking_time = pb_obs.tracking_time();
   latest_tracked_time = pb_obs.timestamp();
   type = static_cast<ObjectType>(pb_obs.type());
-
-  return true;
 }
 
 std::string SensorObjects::ToString() const {

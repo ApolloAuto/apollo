@@ -11,6 +11,7 @@ em_planner_config {
     task : SPEED_DECIDER
 
     task : QP_SPLINE_PATH_OPTIMIZER
+
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
@@ -25,6 +26,8 @@ em_planner_config {
         obstacle_collision_distance: 0.2
         obstacle_risk_distance: 2.0
         obstacle_collision_cost: 1e3
+        path_l_cost: 1.0
+        path_dl_cost: 1.0
     }
     dp_st_speed_config {
         total_path_length: 80
@@ -71,7 +74,7 @@ em_planner_config {
         spline_order: 4
         max_spline_length: 20.0
         time_resolution: 0.1
-        regularization_weight: 1.0
+        regularization_weight: 1.0e-5
         first_spline_weight_factor: 0.0
         derivative_weight: 500.0
         second_derivative_weight: 1000.0
@@ -126,7 +129,7 @@ em_planner_config {
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
-            num_points_to_avg_kappa: 10
+            num_points_to_avg_kappa: 4
         }
     }
 }
@@ -151,4 +154,7 @@ rule_config : {
 }
 rule_config : {
     rule_id: REROUTING
+}
+rule_config : {
+    rule_id: REFERENCE_LINE_END
 }

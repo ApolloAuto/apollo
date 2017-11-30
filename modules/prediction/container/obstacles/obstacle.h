@@ -29,6 +29,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Eigen/Dense"
+
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
@@ -144,6 +146,16 @@ class Obstacle {
    */
   bool IsOnLane();
 
+  bool IsNearJunction();
+
+  void SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states);
+
+  void GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states);
+
+  void InitRNNStates();
+
+  bool RNNEnabled() const;
+
  private:
   common::ErrorCode SetId(
       const perception::PerceptionObstacle& perception_obstacle,
@@ -217,6 +229,8 @@ class Obstacle {
   std::unordered_map<std::string, common::math::KalmanFilter<double, 4, 2, 0>>
       kf_lane_trackers_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
+  std::vector<Eigen::MatrixXf> rnn_states_;
+  bool rnn_enabled_ = false;
   static std::mutex mutex_;
 };
 

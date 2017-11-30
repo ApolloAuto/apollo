@@ -35,7 +35,7 @@ const int32_t CAN_FRAME_SIZE = 8;
 const int32_t MAX_CAN_SEND_FRAME_LEN = 1;
 const int32_t MAX_CAN_RECV_FRAME_LEN = 10;
 
-const int32_t CANBUS_MESSAGE_LENGTH = 8;
+const int32_t CANBUS_MESSAGE_LENGTH = 8;  // same as CAN_MAX_DLEN in linux/can.h
 const int32_t MAX_CAN_PORT = 3;
 
 }  // namespace canbus

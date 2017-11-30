@@ -59,11 +59,6 @@ void ContiRadarMessageManager::set_can_client(
 ProtocolData<ContiRadar> *ContiRadarMessageManager::GetMutableProtocolDataById(
     const uint32_t message_id) {
   uint32_t converted_message_id = message_id;
-  if (message_id >= 0x500 && message_id <= 0x539) {
-    // repeated obstacle info
-    converted_message_id = 0x500;
-  }
-
   if (protocol_data_map_.find(converted_message_id) ==
       protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
@@ -91,16 +86,14 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
   if (message_id == 0x600 || message_id == 0x60A) {
     ADEBUG << sensor_data_.ShortDebugString();
 
-    if (sensor_data_.contiobs_size() >
+    if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
       // maybe lost a object_list_status msg
-      return;
+      AdapterManager::PublishContiRadar(sensor_data_);
     }
-
-    AdapterManager::FillContiRadarHeader(FLAGS_sensor_node_name, &sensor_data_);
-    AdapterManager::PublishContiRadar(sensor_data_);
-
     sensor_data_.Clear();
+    // fill header when recieve the general info message
+    AdapterManager::FillContiRadarHeader(FLAGS_sensor_node_name, &sensor_data_);
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);
@@ -124,6 +117,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
       AINFO << "configure radar again";
       SenderMessage<ContiRadar> sender_message(RadarConfig200::ID,
                                                &radar_config_);
+      sender_message.Update();
       can_client_->SendSingleFrame({sender_message.CanFrame()});
     }
   }

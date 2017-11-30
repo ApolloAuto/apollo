@@ -48,7 +48,7 @@ class AABox2d {
    */
   AABox2d() = default;
   /**
-   * @brief Parametrized constructor.
+   * @brief Parameterized constructor.
    * Creates an axes-aligned box with given center, length, and width.
    * @param center The center of the box
    * @param length The size of the box along the x-axis
@@ -56,14 +56,14 @@ class AABox2d {
    */
   AABox2d(const Vec2d &center, const double length, const double width);
   /**
-   * @brief Parametrized constructor.
+   * @brief Parameterized constructor.
    * Creates an axes-aligned box from two opposite corners.
    * @param one_corner One corner of the box
    * @param opposite_corner The opposite corner to the first one
    */
   AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner);
   /**
-   * @brief Parametrized constructor.
+   * @brief Parameterized constructor.
    * Creates an axes-aligned box containing all points in a given vector.
    * @param points Vector of points to be included inside the box.
    */

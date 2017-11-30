@@ -16,75 +16,70 @@
 
 #include "modules/monitor/software/process_monitor.h"
 
-#include <unordered_set>
-
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 
 DEFINE_string(process_monitor_name, "ProcessMonitor",
               "Name of the process monitor.");
+
 DEFINE_double(process_monitor_interval, 1.5,
               "Process status checking interval (s).");
 
-DEFINE_string(module_monitor_conf_path,
-              "modules/monitor/conf/module_monitor_conf.pb.txt",
-              "Path of the module monitor config file.");
-
 namespace apollo {
 namespace monitor {
+namespace {
 
-using apollo::common::util::GetProtoFromFile;
-
-ProcessMonitor::ProcessMonitor(SystemStatus *system_status)
-    : RecurrentRunner(FLAGS_process_monitor_name,
-                      FLAGS_process_monitor_interval)
-    , status_(system_status->mutable_modules()) {
-  CHECK(GetProtoFromFile(FLAGS_module_monitor_conf_path, &config_))
-        << "Unable to parse config file " << FLAGS_module_monitor_conf_path;
-
-  // Init module status if it has set binary to check.
-  for (const auto &module_conf : config_.modules()) {
-    if (!module_conf.process_cmd_keywords().empty()) {
-      status_->insert({module_conf.name(), {}});
+template <class Iterable>
+bool ContainsAll(const std::string &full, const Iterable &parts) {
+  for (const auto &part : parts) {
+    if (full.find(part) == std::string::npos) {
+      return false;
     }
   }
+  return true;
+}
+
+}  // namespace
+
+ProcessMonitor::ProcessMonitor()
+    : RecurrentRunner(FLAGS_process_monitor_name,
+                      FLAGS_process_monitor_interval) {
 }
 
 void ProcessMonitor::RunOnce(const double current_time) {
-  // Set all processes as not-running by default.
-  for (const auto &module_conf : config_.modules()) {
-    if (!module_conf.process_cmd_keywords().empty()) {
-      (*status_)[module_conf.name()].set_process_running(false);
-    }
-  }
-
+  // Get running processes.
+  std::map<std::string, std::string> running_processes;
   const auto procs = common::util::ListSubDirectories("/proc");
   for (const auto &proc : procs) {
     // Get process command string.
     std::string cmd_string;
     const auto cmd_file = common::util::StrCat("/proc/", proc, "/cmdline");
-    if (!common::util::GetContent(cmd_file, &cmd_string)) {
-      continue;
-    }
-
-    for (const auto &module_conf : config_.modules()) {
-      const auto &keywords = module_conf.process_cmd_keywords();
-      // Check if the command string contains all keywords of this module.
-      const bool keywords_matched = !keywords.empty() && std::find_if(
-          keywords.begin(), keywords.end(),
-          [cmd_string](const std::string &keyword)->bool {
-            return cmd_string.find(keyword) == std::string::npos;
-          }) == keywords.end();
-
-      if (keywords_matched) {
-        (*status_)[module_conf.name()].set_process_running(true);
-        ADEBUG << "Found " << module_conf.name() << " module "
-                  "is running on process " << proc;
-        break;
-      }
+    if (common::util::GetContent(cmd_file, &cmd_string)) {
+      running_processes.emplace(proc, cmd_string);
     }
   }
+
+  for (const auto &module : MonitorManager::GetConfig().modules()) {
+    if (module.has_process_conf()) {
+      UpdateModule(module.name(), module.process_conf(), running_processes);
+    }
+  }
+}
+
+void ProcessMonitor::UpdateModule(
+    const std::string &module_name, const ProcessConf &config,
+    const std::map<std::string, std::string> &running_processes) {
+  auto *status = MonitorManager::GetModuleStatus(module_name);
+  for (const auto &proc : running_processes) {
+    if (ContainsAll(proc.second, config.process_cmd_keywords())) {
+      status->mutable_process_status()->set_running(true);
+      ADEBUG << "Module " << module_name
+             << " is running on process " << proc.first;
+      return;
+    }
+  }
+  status->mutable_process_status()->set_running(false);
 }
 
 }  // namespace monitor

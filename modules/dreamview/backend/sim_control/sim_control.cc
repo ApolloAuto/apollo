@@ -68,8 +68,8 @@ SimControl::SimControl(const MapService* map_service)
       re_routing_triggered_(false),
       enabled_(FLAGS_enable_sim_control) {}
 
-void SimControl::Init(bool set_start_point,
-    double start_velocity, double start_acceleration) {
+void SimControl::Init(bool set_start_point, double start_velocity,
+                      double start_acceleration) {
   // Setup planning and routing result data callback.
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
   AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
@@ -144,9 +144,7 @@ void SimControl::Start() {
   }
 }
 
-void SimControl::Stop() {
-  sim_control_timer_.stop();
-}
+void SimControl::Stop() { sim_control_timer_.stop(); }
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
   // Reset current trajectory and the indices upon receiving a new trajectory.
@@ -184,13 +182,11 @@ bool SimControl::NextPointWithinRange() {
   return next_point_index_ < current_trajectory_.trajectory_point_size() - 1;
 }
 
-void SimControl::TimerCallback(const ros::TimerEvent& event) {
-  RunOnce();
-}
+void SimControl::TimerCallback(const ros::TimerEvent& event) { RunOnce(); }
 
 void SimControl::RunOnce() {
   // Result of the interpolation.
-  double lambda = 0;
+  double lambda = 0.0;
   auto current_time = Clock::NowInSecond();
 
   if (!received_planning_) {
@@ -223,7 +219,7 @@ void SimControl::RunOnce() {
       next_point_ = current_trajectory_.trajectory_point(next_point_index_);
       prev_point_ = current_trajectory_.trajectory_point(prev_point_index_);
 
-      // Calculate the ratio based on the the position of current time in
+      // Calculate the ratio based on the position of current time in
       // between the previous point and the next point, where lambda =
       // (current_point - prev_point) / (next_point - prev_point).
       if (next_point_index_ != prev_point_index_) {

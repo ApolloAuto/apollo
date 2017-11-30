@@ -68,7 +68,7 @@ class Frame {
   void AddObstacle(const Obstacle &obstacle);
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
-  const ReferenceLineInfo *DriveReferenceLinfInfo() const;
+  const ReferenceLineInfo *DriveReferenceLineInfo() const;
 
   const std::vector<const Obstacle *> obstacles() const;
 
@@ -76,6 +76,8 @@ class Frame {
                                            const common::math::Box2d &box);
 
   bool Rerouting();
+
+  const common::VehicleState &vehicle_state() const;
 
  private:
   /**

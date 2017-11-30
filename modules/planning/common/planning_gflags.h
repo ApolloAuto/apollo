@@ -19,6 +19,8 @@
 
 #include "gflags/gflags.h"
 
+DECLARE_bool(planning_test_mode);
+
 DECLARE_string(planning_config_file);
 DECLARE_string(planning_adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
@@ -53,6 +55,7 @@ DECLARE_int32(max_history_frame_num);
 
 // parameters for trajectory stitching and reinit planning starting point.
 DECLARE_double(replan_distance_threshold);
+DECLARE_bool(estimate_current_vehicle_state);
 
 // parameter for reference line
 DECLARE_bool(enable_reference_line_provider_thread);
@@ -104,6 +107,7 @@ DECLARE_double(follow_min_time_sec);
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
+DECLARE_string(reference_line_end_obstacle_id);
 
 DECLARE_double(prediction_total_time);
 DECLARE_bool(align_prediction_time);
