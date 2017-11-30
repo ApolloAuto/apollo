@@ -43,6 +43,7 @@
 
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/Image.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -239,7 +240,21 @@ class Adapter : public AdapterBase {
         << ":" << topic_name_;
     return *observed_queue_.front();
   }
-
+  /**
+   * @brief returns the most recent message pointer in the observing queue.
+   *
+   * /note
+   * Please call Empty() to make sure that there is data in the
+   * queue before calling GetLatestObservedPtr().
+   */
+  std::shared_ptr<D> GetLatestObservedPtr() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    DCHECK(!observed_queue_.empty())
+    << "The view of data queue is empty. No data is received yet or you "
+        "forgot to call Observe()"
+    << ":" << topic_name_;
+    return observed_queue_.front();
+  }
   /**
    * @brief returns the oldest message in the observing queue.
    *
@@ -364,7 +379,14 @@ class Adapter : public AdapterBase {
                 IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
-
+  bool FeedFile(const std::string &message_file,
+                IdentifierType<::sensor_msgs::ImageConstPtr>) {
+    return false;
+  }
+  bool FeedFile(const std::string &message_file,
+                IdentifierType<::sensor_msgs::Image>) {
+    return false;
+  }
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
