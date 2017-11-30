@@ -227,6 +227,24 @@ TEST_F(SunnyvaleLoopTest, qp_path_failure) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test change lane faillback
+ * ADC position passed the change lane zone, failed to change to the new lane
+ * and reroute is triggered but new rerouting result is not received yet.
+ * Expect to keep going on the current lane.
+ */
+TEST_F(SunnyvaleLoopTest, change_lane_failback) {
+  std::string seq_num = "13";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_enable_prediction = true;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
 
