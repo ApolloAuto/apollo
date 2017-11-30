@@ -17,7 +17,7 @@
         };
         var vehicleMarker;
         var map;
-        var interval;
+        var interval = false;
         var routingPath = false;
         var rightLaneMarker = false;
         var leftLaneMarker = false;
@@ -28,9 +28,7 @@
 
         function Initialize() {
             LoadGoogleMap();
-            interval = setInterval(function () {
-                GetMapData();
-            }, 100);
+
 
             var centerControlDiv = document.createElement('div');
             var centerControl = new CenterControl(centerControlDiv, map);
@@ -43,6 +41,15 @@
             centerControlDiv2.index = 1;
             map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv2);
 
+            var centerControlDiv3 = document.createElement('div');
+            var canadaRoutingWestControl = new CanadaRoutingWestControl(centerControlDiv3, map);
+            centerControlDiv3.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv3);
+
+            var centerControlDiv4 = document.createElement('div');
+            var canadaRoutingEastControl = new CanadaRoutingEastControl(centerControlDiv4, map);
+            centerControlDiv4.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv4);
 
             google.maps.event.addListener(map, 'click', function (event) {
                 var clickedLocation = event.latLng;
@@ -65,12 +72,18 @@
                 //markerLocation();
             });
 
+            if (interval === false) {
+                interval = setInterval(function () {
+                    GetMapData();
+                }, 100);
+            }
+
         }
         function LoadGoogleMap() {
             var latlng = new google.maps.LatLng(37.415885, -122.014487);
             var mapOptions = {
                 center: latlng,
-                zoom: 15,
+                zoom: 20,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
@@ -89,6 +102,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 async: false,
+                timeout: 200,
                 success: function (resp) {
                     var LatLng = new google.maps.LatLng(resp[0].lat, resp[0].lon);
                     if (centerVehicle) {
@@ -166,23 +180,25 @@
 
             // Setup the click event listeners: simply set the map to Chicago.
             controlUI.addEventListener('click', function () {
+
                 if (centerVehicle) {
                     centerVehicle = false;
                     controlText.innerHTML = 'Center Vehicle is OFF';
+                    map.setZoom(15);
                 }
                 else {
                     centerVehicle = true;
                     controlText.innerHTML = 'Center Vehicle is ON';
+                    map.setZoom(20);
                 }
             });
-
         }
 
         function RoutingControl(controlDiv, map) {
 
             // Set CSS for the control border.
             var controlUI = document.createElement('div');
-            controlUI.style.backgroundColor = '#f00';
+            controlUI.style.backgroundColor = '#cd5c5c';
             controlUI.style.border = '2px solid #fff';
             controlUI.style.borderRadius = '3px';
             controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
@@ -218,6 +234,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     async: false,
+                    timeout: 2000,
                     success: function (resp) {
                         if (routingPath !== false) {
                             routingPath.setMap(null);
@@ -225,8 +242,8 @@
                         routingPath = new google.maps.Polyline({
                             path: resp,
                             geodesic: true,
-                            strokeColor: '#FF0000',
-                            strokeOpacity: 1.0,
+                            strokeColor: '#cd5c5c',
+                            strokeOpacity: 0.3,
                             strokeWeight: 2
                         });
 
@@ -241,6 +258,129 @@
 
         }
 
+        function CanadaRoutingWestControl(controlDiv, map) {
+
+            // Set CSS for the control border.
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = '#ff8c00';
+            controlUI.style.border = '2px solid #fff';
+            controlUI.style.borderRadius = '3px';
+            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.marginBottom = '22px';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to send routing request';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior.
+            var controlText = document.createElement('div');
+            controlText.style.color = 'rgb(25,25,25)';
+            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            controlText.style.fontSize = '16px';
+            controlText.style.lineHeight = '38px';
+            controlText.style.paddingLeft = '5px';
+            controlText.style.paddingRight = '5px';
+            controlText.innerHTML = 'TO Cananda West';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to Chicago.
+            controlUI.addEventListener('click', function () {
+                var data = {
+                    "start_lat": vehicleMarker.getPosition().lat(),
+                    "start_lon": vehicleMarker.getPosition().lng(),
+                    "end_lat": 37.506039,
+                    "end_lon": -122.340299
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "http://" + window.location.hostname + ":5002/routing",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false,
+                    timeout: 2000,
+                    success: function (resp) {
+                        if (routingPath !== false) {
+                            routingPath.setMap(null);
+                        }
+                        routingPath = new google.maps.Polyline({
+                            path: resp,
+                            geodesic: true,
+                            strokeColor: '#ff8c00',
+                            strokeOpacity: 0.3,
+                            strokeWeight: 5
+                        });
+
+                        routingPath.setMap(map);
+                    },
+                    error: function () {
+                        console.error("Failed to retrieve routing data");
+                    }
+                });
+            });
+        }
+
+        function CanadaRoutingEastControl(controlDiv, map) {
+
+            // Set CSS for the control border.
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = '#00bfff';
+            controlUI.style.border = '2px solid #fff';
+            controlUI.style.borderRadius = '3px';
+            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.marginBottom = '22px';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to send routing request';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior.
+            var controlText = document.createElement('div');
+            controlText.style.color = 'rgb(25,25,25)';
+            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            controlText.style.fontSize = '16px';
+            controlText.style.lineHeight = '38px';
+            controlText.style.paddingLeft = '5px';
+            controlText.style.paddingRight = '5px';
+            controlText.innerHTML = 'TO Cananda East';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to Chicago.
+            controlUI.addEventListener('click', function () {
+                var data = {
+                    "start_lat": vehicleMarker.getPosition().lat(),
+                    "start_lon": vehicleMarker.getPosition().lng(),
+                    "end_lat": 37.464198,
+                    "end_lon": -122.298453
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "http://" + window.location.hostname + ":5002/routing",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false,
+                    timeout: 2000,
+                    success: function (resp) {
+                        if (routingPath !== false) {
+                            routingPath.setMap(null);
+                        }
+                        routingPath = new google.maps.Polyline({
+                            path: resp,
+                            geodesic: true,
+                            strokeColor: '#00bfff',
+                            strokeOpacity: 0.3,
+                            strokeWeight: 5
+                        });
+
+                        routingPath.setMap(map);
+                    },
+                    error: function () {
+                        console.error("Failed to retrieve routing data");
+                    }
+                });
+            });
+        }
 
         function markerLocation() {
             //Get location.
