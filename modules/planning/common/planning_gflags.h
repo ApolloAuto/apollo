@@ -164,6 +164,7 @@ DECLARE_string(signal_light_virtual_object_prefix);
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 DECLARE_double(spiral_downsample_curvature_thred);
+DECLARE_bool(enable_sample_bound_planning);
 
 DECLARE_double(trajectory_time_resolution);
 

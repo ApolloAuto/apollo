@@ -39,4 +39,5 @@ message PlanningTarget {
   optional DecisionType decision_type = 1 [default = CRUISE];
   optional DiscretizedReferenceLine discretized_reference_line = 2;
   optional LatticeSamplingConfig lattice_sampling_config = 3;
+  repeated SampleBound sample_bound = 4;
 }
