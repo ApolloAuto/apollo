@@ -86,9 +86,9 @@ class AdapterBase {
   virtual bool HasReceived() const = 0;
 
   /**
-   * @brief Gets message delay in milliseconds.
+   * @brief Gets message delay.
    */
-  virtual double GetDelayInMs() const = 0;
+  virtual double GetDelaySec() const = 0;
 
   /**
    * @brief Clear the data received so far.
@@ -195,7 +195,7 @@ class Adapter : public AdapterBase {
    * @param message the newly received message.
    */
   void OnReceive(const D& message) {
-    UpdateDelay(message);
+    last_receive_time_ = apollo::common::time::Clock::NowInSecond();
     EnqueueData(message);
     FireCallbacks(message);
   }
@@ -329,9 +329,11 @@ class Adapter : public AdapterBase {
   const D* GetLatestPublished() { return latest_published_data_.get(); }
 
   /**
-   * @brief Gets message delay in milliseconds.
+   * @brief Gets message delay.
    */
-  double GetDelayInMs() const override { return delay_ms_; }
+  double GetDelaySec() const override {
+    return apollo::common::time::Clock::NowInSecond() - last_receive_time_;
+  }
 
   /**
    * @brief Clear the data received so far.
@@ -483,75 +485,6 @@ class Adapter : public AdapterBase {
     data_queue_.push_front(std::make_shared<D>(data));
   }
 
-  /**
-   * @brief Calculates message delay based on message type.
-   */
-  double CalculateDelayInMs(const D& new_msg, const D& last_msg) {
-    return MessageDelay<D>::Get(new_msg, last_msg);
-  }
-
-  /**
-   * @brief Updates the message delay upon receiving a new message.
-   */
-  void UpdateDelay(const D& new_msg) {
-    if (!data_queue_.empty()) {
-      std::lock_guard<std::mutex> lock(mutex_);
-      delay_ms_ = CalculateDelayInMs(new_msg, *data_queue_.front());
-    }
-  }
-
-  /// A few partial template specialzations to get message delays for different
-  /// message types.
-  template <class T, class Enable = void>
-  struct MessageDelay {
-    static double Get(const T& new_msg, const T& last_msg) { return 0.0; }
-  };
-
-  template <class T>
-  struct MessageDelay<
-      T, enable_if_t<std::is_base_of<google::protobuf::Message, T>::value>> {
-    static double Get(const T& new_msg, const T& last_msg) {
-      using google::protobuf::Message;
-
-      return (ExtractTimeStampFromMsg(static_cast<const Message&>(new_msg)) -
-              ExtractTimeStampFromMsg(static_cast<const Message&>(last_msg))) *
-             1000.0;
-    }
-
-    static double ExtractTimeStampFromMsg(
-        const google::protobuf::Message& message) {
-      using gpf = google::protobuf::FieldDescriptor;
-
-      auto descriptor = message.GetDescriptor();
-      auto header_descriptor = descriptor->FindFieldByName("header");
-
-      if (header_descriptor == nullptr ||
-          header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
-        return 0.0;
-      }
-
-      auto timestamp_sec_descriptor =
-          header_descriptor->message_type()->FindFieldByName("timestamp_sec");
-      if (timestamp_sec_descriptor == nullptr ||
-          timestamp_sec_descriptor->cpp_type() != gpf::CPPTYPE_DOUBLE) {
-        return 0.0;
-      }
-
-      const auto& header =
-          message.GetReflection()->GetMessage(message, header_descriptor);
-      return header.GetReflection()->GetDouble(header,
-                                               timestamp_sec_descriptor);
-    }
-  };
-
-  template <class Enable>
-  struct MessageDelay<sensor_msgs::PointCloud2, Enable> {
-    static double Get(const sensor_msgs::PointCloud2& new_msg,
-                      const sensor_msgs::PointCloud2& last_msg) {
-      return (new_msg.header.stamp - last_msg.header.stamp).sec * 1000.0;
-    }
-  };
-
   /// The topic name that the adapter listens to.
   std::string topic_name_;
 
@@ -581,11 +514,10 @@ class Adapter : public AdapterBase {
   /// be published.
   uint32_t seq_num_ = 0;
 
-  /// The most recenct published data.
+  /// The most recent published data.
   std::unique_ptr<D> latest_published_data_;
 
-  /// The interval between receiving two consecutive messages.
-  double delay_ms_ = std::numeric_limits<double>::quiet_NaN();
+  double last_receive_time_ = 0;
 };
 
 }  // namespace adapter
