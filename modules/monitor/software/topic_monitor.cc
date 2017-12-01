@@ -74,7 +74,7 @@ void TopicMonitor::RunOnce(const double current_time) {
     status_->set_message_delay(-1);
     return;
   }
-  const double delay = adapter->GetDelay();
+  const double delay = adapter->GetDelaySec();
   if (delay > config_.acceptable_delay()) {
     status_->set_message_delay(delay);
   } else {
