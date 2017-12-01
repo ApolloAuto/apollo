@@ -189,8 +189,14 @@ bool DPRoadGraph::SamplePathWaypoints(
     double left_width = 0.0;
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
+    const auto &vehicle_config =
+        common::VehicleConfigHelper::instance()->GetConfig();
+    const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
+    const double eff_right_width = right_width - half_adc_width;
+    const double eff_left_width = left_width - half_adc_width;
+
     std::vector<double> sample_l;
-    common::util::uniform_slice(-right_width, left_width,
+    common::util::uniform_slice(-eff_right_width, eff_left_width,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
     for (double l : sample_l) {
