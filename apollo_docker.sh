@@ -57,6 +57,7 @@ function gen_docker() {
   RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
   DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
   docker pull $IMG
+  echo "time : ${TIME}" >> ${RELEASE_DIR}/meta.ini
 
   docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
   if [ $? == 0 ];then
