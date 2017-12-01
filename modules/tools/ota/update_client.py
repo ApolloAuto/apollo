@@ -25,12 +25,13 @@ import common.proto_utils as proto_utils
 
 
 def update():
-    if not os.path.exists('update.ini'):
+    UPDATE_FILE = os.path.join(os.path.dirname(__file__), 'update.ini')
+    if not os.path.exists(UPDATE_FILE):
         print "No update found!"
         exit()
         
     config = ConfigParser()
-    config.read('update.ini')
+    config.read(UPDATE_FILE)
     update_tag = config.get('Update', 'tag')
     usr_name = os.environ['DOCKER_USER']
     cmd = 'ssh ' + usr_name + '@localhost' + ' docker pull ' + update_tag
@@ -46,8 +47,9 @@ def update():
     
     # setup car info
     vehicle_info = VehicleInfo()
+    VEHICLE_INFO_FILE = os.path.join(os.path.dirname(__file__), 'vehicle_info.pb.txt')
     try:
-        proto_utils.get_pb_from_text_file("vehicle_info.pb.txt", vehicle_info)
+        proto_utils.get_pb_from_text_file(VEHICLE_INFO_FILE, vehicle_info)
     except IOError:
         print "vehicle_info.pb.txt cannot be open file."
         exit()
@@ -63,7 +65,8 @@ def update():
 
     r = requests.post(url, data=car_info)
     if r.status_code == 200:
-        os.system("rm update.ini")
+        cmd = 'rm ' + UPDATE_FILE
+        os.system(cmd)
         print "Update successfully."
     elif r.status_code == 400:
         print "Invalid Request."

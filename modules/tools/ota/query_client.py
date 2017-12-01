@@ -25,15 +25,17 @@ import common.proto_utils as proto_utils
 
 def query():
     vehicle_info = VehicleInfo()
+    VEHICLE_INFO_FILE = os.path.join(os.path.dirname(__file__), 'vehicle_info.pb.txt')
     try:
-        proto_utils.get_pb_from_text_file("vehicle_info.pb.txt", vehicle_info)
+        proto_utils.get_pb_from_text_file(VEHICLE_INFO_FILE, vehicle_info)
     except IOError:
         print "vehicle_info.pb.txt cannot be open file."
         exit()
     
     # setup server url
     config = ConfigParser()
-    config.read("config.ini")
+    CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.ini')
+    config.read(CONFIG_FILE)
     ip = config.get('Host', 'ip')
     port = config.get('Host', 'port')
     url = 'http://' + ip + ':' + port + '/query'
@@ -53,7 +55,8 @@ def query():
         tag = r.json().get("tag")
         config.add_section('Update')
         config.set('Update', 'tag', tag)
-        with open('update.ini', 'wb') as update_file:
+        UPDATE_FILE = os.path.join(os.path.dirname(__file__), 'update.ini')
+        with open(UPDATE_FILE, 'wb') as update_file:
             config.write(update_file)
     elif r.status_code == 204:
         print "Release is up to date."
