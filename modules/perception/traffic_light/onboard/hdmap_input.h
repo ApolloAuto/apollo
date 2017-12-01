@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
-#define MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_
 
 #include <memory>
 #include <mutex>
@@ -43,11 +43,7 @@ class HDMapInput {
  private:
 
   std::mutex mutex_;  // multi-thread init safe.
-
-  FRIEND_TEST(HDMapInputTest, test_Init);
-  FRIEND_TEST(HDMapInputTest, test_GetROI);
-
- DECLARE_SINGLETON(HDMapInput);
+  DECLARE_SINGLETON(HDMapInput);
 };
 
 typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
@@ -55,4 +51,4 @@ typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_

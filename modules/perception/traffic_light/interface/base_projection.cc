@@ -198,6 +198,6 @@ bool load_matrix4d_from_file(const std::string &file_name, const std::string &ke
   return true;
 }
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

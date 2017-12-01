@@ -41,7 +41,7 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-
+using apollo::hdmap::Signal;
 //@brief pre-processor subnode
 class TLPreprocessorSubnode : public Subnode {
  public:
@@ -88,7 +88,7 @@ class TLPreprocessorSubnode : public Subnode {
       const double &ts,
       const CameraId &camera_id,
       std::shared_ptr<ImageLights> *image_lights);
-  bool GetSignals(double ts, CarPose *pose, std::vector<apollo::hdmap::Signal> *signals);
+  bool GetSignals(double ts, CarPose *pose, std::vector<Signal> *signals);
   bool GetCarPose(const double ts, CarPose *pose);
  private:
   TLPreprocessor preprocessor_;
@@ -98,7 +98,7 @@ class TLPreprocessorSubnode : public Subnode {
 
   // signals
   float _last_signals_ts = -1;
-  std::vector<apollo::hdmap::Signal> _last_signals;
+  std::vector<Signal> _last_signals;
   float valid_hdmap_interval_ = 1.5;
 
   //tf
@@ -114,8 +114,8 @@ class TLPreprocessorSubnode : public Subnode {
 };
 
 REGISTER_SUBNODE(TLPreprocessorSubnode);
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H

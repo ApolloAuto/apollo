@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "utils.h"
+#include "modules/perception/traffic_light/base/utils.h"
 
 namespace apollo {
 namespace perception {
@@ -25,11 +25,11 @@ uint64_t TimestampDouble2Int64(double ts) {
   return result * 1000;
 }
 
-void ClearBox(cv::Rect &rect) {
-  rect.x = 0;
-  rect.y = 0;
-  rect.width = 0;
-  rect.height = 0;
+void ClearBox(cv::Rect *rect) {
+  rect->x = 0;
+  rect->y = 0;
+  rect->width = 0;
+  rect->height = 0;
 }
 bool BoxIsValid(const cv::Rect &box, const cv::Size &size) {
   if (box.width <= 0 || box.height <= 0
@@ -39,7 +39,8 @@ bool BoxIsValid(const cv::Rect &box, const cv::Size &size) {
   }
   return true;
 }
-cv::Rect RefinedBox(cv::Rect box, const cv::Size &size) {
+cv::Rect RefinedBox(const cv::Rect inbox, const cv::Size &size) {
+  cv::Rect box(inbox);
   int cols = size.width;
   int rows = size.height;
   if (box.x < 0) {
@@ -68,22 +69,28 @@ cv::Rect RefinedBox(cv::Rect box, const cv::Size &size) {
   return box;
 }
 
-cv::Point2f GetCenter(cv::Rect box) {
+cv::Point2f GetCenter(const cv::Rect &box) {
   return cv::Point2f(box.x + box.width / 2, box.y + box.height / 2);
 }
-float GetDistance(cv::Point2f p1, cv::Point2f p2) {
-  return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+float GetDistance(const cv::Point2f &p1, const cv::Point2f &p2) {
+  return std::sqrt(
+      (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
-float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1, float sigma2) {
-  return static_cast<float>(std::exp(-0.5 * (((p1.x - p2.x) * (p1.x - p2.x)) / (sigma1 * sigma1) +
-      ((p1.y - p2.y) * (p1.y - p2.y)) / (sigma2 * sigma2))));
+float Get2dGaussianScore(const cv::Point2f &p1,
+                         const cv::Point2f &p2,
+                         float sigma1,
+                         float sigma2) {
+  return static_cast<float>(std::exp(
+      -0.5 * (((p1.x - p2.x) * (p1.x - p2.x)) / (sigma1 * sigma1) +
+          ((p1.y - p2.y) * (p1.y - p2.y)) / (sigma2 * sigma2))));
 }
 
 float Get1dGaussianScore(float x1, float x2, float sigma) {
-  return static_cast<float>(std::exp(-0.5 * (x1 - x2) * (x1 - x2) / (sigma * sigma)));
+  return static_cast<float>(std::exp(
+      -0.5 * (x1 - x2) * (x1 - x2) / (sigma * sigma)));
 }
 
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

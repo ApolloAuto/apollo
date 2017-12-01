@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "modules/common/log.h"
-#include "cropbox.h"
 #include "modules/perception/traffic_light/base/utils.h"
+#include <algorithm>
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
 void
-CropBox::GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
+CropBox::GetCropBox(const cv::Size &size,
+                    const std::vector<LightPtr> &lights,
                     cv::Rect *cropbox) {
   int lights_num = lights.size();
   if (lights_num == 0) {
@@ -51,10 +53,12 @@ CropBox::GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
     if (yt > light.region.projection_roi.y) {
       yt = light.region.projection_roi.y;
     }
-    if (xr < light.region.projection_roi.x + light.region.projection_roi.width) {
+    if (xr
+        < light.region.projection_roi.x + light.region.projection_roi.width) {
       xr = light.region.projection_roi.x + light.region.projection_roi.width;
     }
-    if (yb < light.region.projection_roi.y + light.region.projection_roi.height) {
+    if (yb
+        < light.region.projection_roi.y + light.region.projection_roi.height) {
       yb = light.region.projection_roi.y + light.region.projection_roi.height;
     }
   }
@@ -68,7 +72,8 @@ CropBox::GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
   float resize_width = (xr - xl) * crop_scale_;
   float resize_height = (yb - yt) * crop_scale_;
   float resize = std::max(resize_width, resize_height);
-  resize_width = resize_height = (resize < min_crop_size_) ? min_crop_size_ : resize;
+  resize_width = resize_height =
+      (resize < min_crop_size_) ? min_crop_size_ : resize;
 
   float pad_t = (resize_height - (yb - yt)) / 2;
   float pad_l = (resize_width - (xr - xl)) / 2;
@@ -84,10 +89,10 @@ CropBox::GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
   yb = center_y + resize_width / 2;
   yb = (yb >= rows) ? rows - 1 : yb;
 
-  cropbox->x = (int) xl;
-  cropbox->y = (int) yt;
-  cropbox->width = (int) (xr - xl);
-  cropbox->height = (int) (yb - yt);
+  cropbox->x = static_cast<int>(xl);
+  cropbox->y = static_cast<int>(yt);
+  cropbox->width = static_cast<int>(xr - xl);
+  cropbox->height = static_cast<int>(yb - yt);
 }
 void CropBox::Init(float crop_scale, float min_crop_size) {
   crop_scale_ = crop_scale;
@@ -96,7 +101,8 @@ void CropBox::Init(float crop_scale, float min_crop_size) {
 CropBox::CropBox(float crop_scale, float min_crop_size) {
   Init(crop_scale, min_crop_size);
 }
-void CropBoxWholeImage::GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
+void CropBoxWholeImage::GetCropBox(const cv::Size &size,
+                                   const std::vector<LightPtr> &lights,
                                    cv::Rect *cropbox) {
   for (int i = 0; i < lights.size(); ++i) {
     if (BoxIsValid(lights[i]->region.projection_roi, size)) {
@@ -108,6 +114,6 @@ void CropBoxWholeImage::GetCropBox(const cv::Size &size, const std::vector<Light
   }
   ClearBox(*cropbox);
 }
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

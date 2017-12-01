@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <sstream>
 
 #include "modules/perception/traffic_light/base/image.h"
 
@@ -27,11 +26,11 @@ class ImageTest : public ::testing::Test {
   ImageTest() {}
   virtual ~ImageTest() {}
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     _image = new Image();
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete _image;
   }
 
@@ -53,7 +52,7 @@ TEST_F(ImageTest, test_all) {
   {
     std::stringstream ss;
     ss << *_image;
-    ASSERT_FALSE("Image not inited." == ss.str());
+    ASSERT_NE("Image not inited.", ss.str());
   }
 
   EXPECT_EQ(CameraId::LONG_FOCUS, _image->device_id());
@@ -64,7 +63,7 @@ TEST_F(ImageTest, test_all) {
   ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
   EXPECT_EQ("unkown device(camera)", _image->device_id_str());
 }
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
-}
-}
-}

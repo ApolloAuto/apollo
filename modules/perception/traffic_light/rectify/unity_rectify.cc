@@ -49,7 +49,6 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
                                  const ModelConfig *model_config,
                                  std::shared_ptr<IRefine> *detection,
                                  std::shared_ptr<IGetBox> *crop) {
-
   float crop_scale = 0;
   int crop_min_size = 0;
   int crop_method = 0;
@@ -105,7 +104,10 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
   }
   switch (detect_method) {
     default:
-    case 0:detection->reset(new Detection(crop_min_size, detection_net, detection_model));
+    case 0:
+      detection->reset(new Detection(crop_min_size,
+                                     detection_net,
+                                     detection_model));
       break;
     case 1:detection->reset(new DummyRefine());
       break;
@@ -138,7 +140,6 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     detect_->Perform(ros_image, &detected_bboxes);
 
     AINFO << "detect " << detected_bboxes.size() << " lights";
-    //for (size_t i = 0; i < lights_ref.size(); ++i) {
     for (int j = 0; j < detected_bboxes.size(); j++) {
       AINFO << detected_bboxes[j]->region.rectified_roi;
       cv::Rect &region = detected_bboxes[j]->region.rectified_roi;
@@ -148,7 +149,6 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
       lights_ref[0]->region.debug_roi.push_back(region);
       lights_ref[0]->region.debug_roi_detect_scores.push_back(score);
     }
-    //}
 
     select_->Select(ros_image, lights_ref, detected_bboxes, &selected_bboxes);
   } else {
@@ -160,13 +160,16 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
   }
 
   for (int i = 0; i < lights_ref.size(); ++i) {
-    if (!selected_bboxes[i]->region.is_detected || !selected_bboxes[i]->region.is_selected) {
+    if (!selected_bboxes[i]->region.is_detected
+        || !selected_bboxes[i]->region.is_selected) {
       AWARN << "No detection box ,using project box";
     }
     cv::Rect region = selected_bboxes[i]->region.rectified_roi;
     lights_ref[i]->region.rectified_roi = region;
-    lights_ref[i]->region.detect_class_id = selected_bboxes[i]->region.detect_class_id;
-    lights_ref[i]->region.detect_score = selected_bboxes[i]->region.detect_score;
+    lights_ref[i]->region.detect_class_id =
+        selected_bboxes[i]->region.detect_class_id;
+    lights_ref[i]->region.detect_score =
+        selected_bboxes[i]->region.detect_score;
     lights_ref[i]->region.is_detected = selected_bboxes[i]->region.is_detected;
     lights_ref[i]->region.is_selected = selected_bboxes[i]->region.is_selected;
     AINFO << region;
@@ -177,7 +180,6 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
 std::string UnityRectify::name() const {
   return "UnityRectify";
 }
-
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

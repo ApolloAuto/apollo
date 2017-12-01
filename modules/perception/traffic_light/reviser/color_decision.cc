@@ -52,8 +52,8 @@ bool ColorReviser::Init() {
 
   return true;
 }
-bool ColorReviser::Revise(const ReviseOption &option, std::vector<LightPtr> *lights) {
-
+bool ColorReviser::Revise(const ReviseOption &option,
+                          std::vector<LightPtr> *lights) {
   if (enable_ == 0) {
     return true;
   }
@@ -101,7 +101,6 @@ bool ColorReviser::Revise(const ReviseOption &option, std::vector<LightPtr> *lig
 
   return true;
 }
-
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

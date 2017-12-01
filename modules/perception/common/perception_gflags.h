@@ -55,7 +55,7 @@ DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(onboard_fusion);
 
 /// traffic_light/onboard/preprocessor.cc
-DECLARE_double(forward_signal_distance);
+DECLARE_double(query_signal_range);
 
 ///perception.cc
 DECLARE_string(dag_config_path);

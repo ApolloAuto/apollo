@@ -42,13 +42,8 @@ DEFINE_string(traffic_light_recognizer,
 DEFINE_string(traffic_light_reviser,
               "", "the reviser enabled for traffic_light");
 
-std::map<int, int> TLProcSubnode::_s_camera_ts_last_3_digits = {
-    {static_cast<int>(CameraId::LONG_FOCUS), 222},
-    {static_cast<int>(CameraId::SHORT_FOCUS), 111},
-};
 TLProcSubnode::~TLProcSubnode() {
   preprocessing_data_ = nullptr;
-  proc_data_ = nullptr;
 }
 
 bool TLProcSubnode::InitInternal() {
@@ -150,10 +145,12 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
   if (!rectifier_->Rectify(*(image_lights->image), rectify_option,
                            (image_lights->lights).get())) {
     AERROR << "TLProcSubnode failed to rectify the regions "
-           << "ts:" << GLOG_TIMESTAMP(timestamp) << " Image:" << *(image_lights->image);
+           << "ts:" << GLOG_TIMESTAMP(timestamp) << " Image:"
+           << *(image_lights->image);
     return false;
   }
-  const double detection_latency = TimeUtil::GetCurrentTime() - before_rectify_ts;
+  const double
+      detection_latency = TimeUtil::GetCurrentTime() - before_rectify_ts;
 
   // update image_border
   MutexLock lock(&mutex_);
@@ -180,7 +177,8 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
 
   // revise status
   const double before_revise_ts = TimeUtil::GetCurrentTime();
-  if (!reviser_->Revise(ReviseOption(event.timestamp), image_lights->lights.get())) {
+  if (!reviser_->Revise(ReviseOption(event.timestamp),
+                        image_lights->lights.get())) {
     AERROR << "TLReviserSubnode revise data failed. "
            << "sub_event:" << event.to_string();
     return false;
@@ -398,7 +396,7 @@ bool TLProcSubnode::PublishMessage(
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
-  timestamp += TLProcSubnode::_s_camera_ts_last_3_digits[static_cast<int>(image_lights->image->device_id())];
+  timestamp += kCameraIndicator[image_lights->image->device_id()];
 
   header->set_camera_timestamp(timestamp);
   // add traffic light result
@@ -422,6 +420,10 @@ bool TLProcSubnode::PublishMessage(
 
     }
     cv::rectangle(img, rect, color, 2);
+    cv::rectangle(img,
+                  lights->at(i)->region.projection_roi,
+                  cv::Scalar(255, 255, 0),
+                  2);
   }
 
   // set contain_lights
@@ -469,6 +471,7 @@ bool TLProcSubnode::PublishMessage(
     tl_projection_box->set_y(projection_roi.y);
     tl_projection_box->set_width(projection_roi.width);
     tl_projection_box->set_height(projection_roi.height);
+
   }
 
   // debug ROI (candidate detection boxes)
@@ -494,7 +497,11 @@ bool TLProcSubnode::PublishMessage(
     light_debug->set_distance_to_stop_line(distance);
   }
   char filename[100];
-  snprintf(filename, 200, "img/%s_%lf.jpg", image_lights->image->device_id_str().c_str(), image_lights->image->ts());
+  snprintf(filename,
+           200,
+           "img/%s_%lf.jpg",
+           image_lights->image->device_id_str().c_str(),
+           image_lights->image->ts());
   cv::imwrite(filename, img);
   common::adapter::AdapterManager::PublishTrafficLightDetection(result);
   auto process_time =
@@ -523,6 +530,6 @@ StatusCode TLProcSubnode::ProcEvents() {
   }
   return SUCC;
 }
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

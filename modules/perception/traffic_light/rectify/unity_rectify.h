@@ -19,6 +19,9 @@
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -28,22 +31,23 @@ class UnityRectify : public BaseRectifier {
  public:
   UnityRectify() = default;
 
-  virtual bool Init() override;
+  bool Init() override;
 
   // @brief: rectify light region from image or part of it
   // @param [in] const Image&: input image
   // @param [in] const RectifyOptions&: rectify options
   // @param [in/out] Lights
   // @return  bool
-  virtual bool Rectify(const Image &image, const RectifyOption &option,
+  bool Rectify(const Image &image, const RectifyOption &option,
                        std::vector<LightPtr> *lights) override;
 
   bool InitDetection(const ConfigManager *config_manager,
                      const ModelConfig *model_config,
-                     std::shared_ptr<IRefine> *detection, std::shared_ptr<IGetBox> *crop);
+                     std::shared_ptr<IRefine> *detection,
+                     std::shared_ptr<IGetBox> *crop);
 
   // @brief name
-  virtual std::string name() const;
+  std::string name() const override;
 
  private:
   std::shared_ptr<ISelectLight> select_;
@@ -52,8 +56,7 @@ class UnityRectify : public BaseRectifier {
 };
 
 REGISTER_RECTIFIER(UnityRectify);
-}
-}
-}
-
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 #endif //PERCEPTION_DENSEBOXRECTIFY_H

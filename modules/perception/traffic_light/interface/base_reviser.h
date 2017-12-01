@@ -58,9 +58,9 @@ class BaseReviser {
 REGISTER_REGISTERER(BaseReviser);
 #define REGISTER_REVISER(name) REGISTER_CLASS(BaseReviser, name)
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
 

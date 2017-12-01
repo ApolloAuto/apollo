@@ -64,6 +64,6 @@ TEST(LightTest, test_light) {
   }
 }
 
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

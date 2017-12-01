@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "munkres.h"
+#include "modules/perception/traffic_light/rectify/munkres.h"
 
 namespace apollo {
 namespace perception {
@@ -28,8 +28,8 @@ void Munkres::Diag(bool status) {
   is_diag_ = status;
 }
 
-int MaxValue(cv::Mat_<int> &m) {
-  int max = 0;//std::numeric_limits<int>::min();
+int MaxValue(const cv::Mat_<int> &m) {
+  int max = 0;
   for (int i = 0; i < m.rows; i++) {
     for (int j = 0; j < m.cols; j++) {
       max = std::max<int>(max, m(i, j));
@@ -38,7 +38,10 @@ int MaxValue(cv::Mat_<int> &m) {
   return max;
 }
 
-void ExtendMat(cv::Mat_<int> &mat, unsigned int rows, unsigned int cols, int value = 0) {
+void ExtendMat(cv::Mat_<int> &mat,
+               unsigned int rows,
+               unsigned int cols,
+               int value = 0) {
   cv::Size2i inter_size;
   inter_size.height = std::min<int>(rows, mat.rows);
   inter_size.width = std::min<int>(cols, mat.cols);
@@ -98,9 +101,10 @@ void ReplaceInfinites(cv::Mat_<int> &mat) {
 
 void MinimizeAlongDirection(cv::Mat_<int> &matrix, bool over_columns) {
   const unsigned int outer_size = over_columns ? matrix.cols
-                                               : matrix.rows, inner_size = over_columns
-                                                                           ? matrix.rows
-                                                                           : matrix.cols;
+                                               : matrix.rows,
+      inner_size = over_columns
+                   ? matrix.rows
+                   : matrix.cols;
 
   // Look for a minimum value to subtract from all values along
   // the "outer" direction.
@@ -135,7 +139,8 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
   // Copy input _matrix
   this->matrix_ = mat;
 
-  // If the input _matrix isn't square, make it square and fill the empty values with the largest value present in the _matrix.
+  // If the input _matrix isn't square, make it square
+  // and fill the empty values with the largest value present in the _matrix.
   if (rows != cols) {
     ExtendMat(matrix_, size, size, MaxValue(matrix_));
   }
@@ -153,7 +158,9 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
     col_mask_[i] = false;
   }
 
-  // Prepare the _matrix values...  If there were any infinities, replace them with a value greater than the maximum value in the _matrix.
+  // Prepare the _matrix values...
+  // If there were any infinities, r
+  // eplace them with a value greater than the maximum value in the _matrix.
   ReplaceInfinites(matrix_);
 
   MinimizeAlongDirection(matrix_, false);
@@ -205,7 +212,9 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
 
 }
 
-bool Munkres::FindUncoveredInMatrix(double item, unsigned int &row, unsigned int &col) const {
+bool Munkres::FindUncoveredInMatrix(double item,
+                                    unsigned int &row,
+                                    unsigned int &col) const {
   unsigned int rows = matrix_.rows;
   unsigned int columns = matrix_.cols;
 
@@ -226,7 +235,7 @@ bool Munkres::FindUncoveredInMatrix(double item, unsigned int &row, unsigned int
 bool Munkres::PairInList(const std::pair<int, int> &needle,
                          const std::list<std::pair<int, int> > &haystack) {
   for (std::list<std::pair<int, int> >::const_iterator i = haystack.begin();
-      i != haystack.end(); i++) {
+       i != haystack.end(); i++) {
     if (needle == *i) {
       return true;
     }
@@ -375,7 +384,8 @@ int Munkres::Step4(void) {
     }
   } while (madepair);
 
-  for (std::list<std::pair<int, int> >::iterator i = seq.begin(); i != seq.end(); i++) {
+  for (std::list<std::pair<int, int> >::iterator i = seq.begin();
+       i != seq.end(); i++) {
     // 2. Unstar each starred zero of the sequence.
     if (mask_matrix_(i->first, i->second) == STAR) {
       mask_matrix_(i->first, i->second) = NORMAL;

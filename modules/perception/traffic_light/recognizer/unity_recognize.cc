@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "unity_recognize.h"
-#include "classify.h"
+#include "modules/perception/traffic_light/recognizer/unity_recognize.h"
+#include "modules/perception/traffic_light/recognizer/classify.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
@@ -24,7 +24,6 @@ namespace perception {
 namespace traffic_light {
 
 bool UnityRecognize::Init() {
-
   ConfigManager *config_manager = \
             ConfigManager::instance();
   if (config_manager == NULL) {
@@ -85,11 +84,13 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
     return false;
   }
 
-  if (!model_config->GetValue("classify_resize_width", &classify_resize_width)) {
+  if (!model_config->GetValue("classify_resize_width",
+                              &classify_resize_width)) {
     AERROR << "classify_resize_width not found." << name();
     return false;
   }
-  if (!model_config->GetValue("classify_resize_height", &classify_resize_height)) {
+  if (!model_config->GetValue("classify_resize_height",
+                              &classify_resize_height)) {
     AERROR << "classify_resize_height not found." << name();
     return false;
   }
@@ -106,7 +107,8 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
   return true;
 }
 
-bool UnityRecognize::RecognizeStatus(const Image &image, const RecognizeOption &option,
+bool UnityRecognize::RecognizeStatus(const Image &image,
+                                     const RecognizeOption &option,
                                      std::vector<LightPtr> *lights) {
   cv::Mat ros_image = image.mat();
   std::vector<LightPtr> &lights_ref = *lights;
@@ -115,17 +117,18 @@ bool UnityRecognize::RecognizeStatus(const Image &image, const RecognizeOption &
   classify_night_->SetCropBox(cbox);
   classify_day_->SetCropBox(cbox);
   std::vector<LightPtr> candidate(1);
-  for (LightPtr light:*lights) {
+  for (LightPtr light : *lights) {
     if (light->region.is_detected) {
       candidate[0] = light;
-      if (light->region.detect_class_id == QUADRATE_CLASS) {    // QUADRATE_CLASS (Night)
+      if (light->region.detect_class_id
+          == QUADRATE_CLASS) {    // QUADRATE_CLASS (Night)
         AINFO << "Recognize Use Night Model!";
         classify_night_->Perform(ros_image, &candidate);
-      } else if (light->region.detect_class_id == VERTICAL_CLASS) {    // VERTICAL_CLASS (Day)
+      } else if (light->region.detect_class_id
+          == VERTICAL_CLASS) {    // VERTICAL_CLASS (Day)
         AINFO << "Recognize Use Day Model!";
         classify_day_->Perform(ros_image, &candidate);
       } else {
-
       }
     } else {
       light->status.color = UNKNOWN_COLOR;
@@ -135,14 +138,12 @@ bool UnityRecognize::RecognizeStatus(const Image &image, const RecognizeOption &
             << ". Not perform recognition.";
     }
   }
-
   return true;
 }
 
 std::string UnityRecognize::name() const {
   return "UnityRecognize";
 }
-
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

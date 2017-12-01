@@ -14,17 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "hdmap_input.h"
-
-#include <stdlib.h>
-#include <algorithm>
-#include <vector>
-
+#include "modules/perception/traffic_light/onboard/hdmap_input.h"
 #include "Eigen/Core"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/common/define.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
@@ -50,7 +42,9 @@ bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
   point.set_x(pointd(0, 3));
   point.set_y(pointd(1, 3));
   point.set_z(pointd(2, 3));
-  int result = hdmap->GetForwardNearestSignalsOnLane(point, FLAGS_forward_signal_distance, &forward_signals);
+  int result = hdmap->GetForwardNearestSignalsOnLane(point,
+                                                     FLAGS_query_signal_range,
+                                                     &forward_signals);
 
   if (result != 0) {
     AERROR << "Failed to call HDMap::get_signal. point: "

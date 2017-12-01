@@ -69,7 +69,7 @@ class BaseProjection {
   //@params [in] option for project
   //@params [in/out] in:traffic light 's x,y,z
   //                 out:map info & the region on the image.
-  virtual bool project(const CameraCoeffient &camera_coeffient,
+  virtual bool Project(const CameraCoeffient &camera_coeffient,
                        const Eigen::Matrix4d &pose,
                        const apollo::hdmap::Signal &tl_info,
                        Light *light) const = 0;
@@ -111,9 +111,9 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
 */
 bool load_matrix4d_from_file(const std::string &file_name, const std::string &key,
                              Eigen::Matrix4d *matrix);
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 

@@ -36,7 +36,9 @@ class Munkres {
   static const int STAR = 1;
   static const int PRIME = 2;
 
-  inline bool FindUncoveredInMatrix(double, unsigned int &, unsigned int &) const;
+  inline bool FindUncoveredInMatrix(double,
+                                    unsigned int &,
+                                    unsigned int &) const;
 
   inline bool PairInList(const std::pair<int, int> &,
                          const std::list<std::pair<int, int> > &);

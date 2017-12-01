@@ -45,9 +45,9 @@ class BasePreprocessor {
 REGISTER_REGISTERER(BasePreprocessor);
 #define REGISTER_PREPROCESSOR(name) REGISTER_CLASS(BasePreprocessor, name)
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PREPROCESSOR_H
 

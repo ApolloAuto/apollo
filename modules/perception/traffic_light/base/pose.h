@@ -22,7 +22,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-//@brief Car's Pose
+// @brief Car's Pose
 class CarPose {
  public:
   CarPose() = default;
@@ -41,9 +41,9 @@ class CarPose {
 
 std::ostream &operator<<(std::ostream &os, const CarPose &pose);
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
 // @date 2016/09/08 17:48:06
