@@ -17,11 +17,11 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_
 
+#include <eigen3/Eigen/Core>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
-#include <eigen3/Eigen/Core>
 #include "gtest/gtest_prod.h"
 
 #include "modules/common/macro.h"
@@ -41,7 +41,6 @@ class HDMapInput {
                   std::vector<apollo::hdmap::Signal> *signals);
 
  private:
-
   std::mutex mutex_;  // multi-thread init safe.
   DECLARE_SINGLETON(HDMapInput);
 };

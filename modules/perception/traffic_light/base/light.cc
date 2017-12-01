@@ -24,15 +24,14 @@ namespace perception {
 namespace traffic_light {
 
 std::ostream &operator<<(std::ostream &os, const Light &light) {
-  os << "Light id:" << light.info.id().id()
-     << " status:" << light.status.color;
+  os << "Light id:" << light.info.id().id() << " status:" << light.status.color;
   return os;
 }
 
 double stopline_distance(
     const Eigen::Matrix4d &car_pose,
     const google::protobuf::RepeatedPtrField<::apollo::hdmap::Curve>
-          &stoplines) {
+        &stoplines) {
   if (stoplines.size() == 0) {
     AWARN << "compute car to stopline's distance failed(no stopline). "
           << "car_pose:" << car_pose;
@@ -42,23 +41,21 @@ double stopline_distance(
   if (stopline.segment_size() == 0) {
     AWARN
         << "compute distance to stopline failed(stopline has no segment line)."
-        << "car_pose:" << car_pose << " stopline:"
-        << stopline.ShortDebugString();
+        << "car_pose:" << car_pose
+        << " stopline:" << stopline.ShortDebugString();
     return -1;
   }
   if (!stopline.segment(0).has_line_segment()) {
-    AWARN
-        << "compute distance to stopline failed(stopline has no segment)."
-        << "car_pose:" << car_pose << " stopline:"
-        << stopline.ShortDebugString();
+    AWARN << "compute distance to stopline failed(stopline has no segment)."
+          << "car_pose:" << car_pose
+          << " stopline:" << stopline.ShortDebugString();
     return -1;
   }
 
   if (stopline.segment(0).line_segment().point_size() == 0) {
-    AWARN
-        << "compute distance to stopline failed(stopline has no point). "
-        << "car_pose:" << car_pose << " stopline:"
-        << stopline.ShortDebugString();
+    AWARN << "compute distance to stopline failed(stopline has no point). "
+          << "car_pose:" << car_pose
+          << " stopline:" << stopline.ShortDebugString();
     return -1;
   }
 
@@ -67,8 +64,8 @@ double stopline_distance(
   double stopline_x = stopline.segment(0).line_segment().point(0).x();
   double stopline_y = stopline.segment(0).line_segment().point(0).y();
 
-  return sqrt(
-      std::pow(car_x - stopline_x, 2) + std::pow(car_y - stopline_y, 2));
+  return sqrt(std::pow(car_x - stopline_x, 2) +
+              std::pow(car_y - stopline_y, 2));
 }
 
 }  // namespace traffic_light

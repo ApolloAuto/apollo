@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_SELECT_H
 
-#include "modules/perception/traffic_light/interface/green_interface.h"
 #include <vector>
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 namespace apollo {
 namespace perception {
@@ -35,4 +35,4 @@ class GaussianSelect : public ISelectLight {
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif //PERCEPTION_MATCH_H
+#endif  // PERCEPTION_MATCH_H

@@ -55,7 +55,7 @@ class BaseRectifier {
   virtual std::string name() const = 0;
 
  private:
- DISALLOW_COPY_AND_ASSIGN(BaseRectifier);
+  DISALLOW_COPY_AND_ASSIGN(BaseRectifier);
 };
 
 REGISTER_REGISTERER(BaseRectifier);

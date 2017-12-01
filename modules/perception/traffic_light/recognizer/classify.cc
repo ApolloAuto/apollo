@@ -25,8 +25,7 @@ namespace traffic_light {
 
 ClassifyBySimple::ClassifyBySimple(const std::string &_class_net,
                                    const std::string &_class_model,
-                                   float threshold,
-                                   unsigned int resize_width,
+                                   float threshold, unsigned int resize_width,
                                    unsigned int resize_height) {
   Init(_class_net, _class_model, threshold, resize_width, resize_height);
 }
@@ -35,8 +34,8 @@ void ClassifyBySimple::SetCropBox(const cv::Rect &box) {
   crop_box_ = box;
 }
 void ClassifyBySimple::Init(const std::string &_class_net,
-                            const std::string &_class_model,
-                            float threshold, unsigned int resize_width,
+                            const std::string &_class_model, float threshold,
+                            unsigned int resize_width,
                             unsigned int resize_height) {
   AINFO << "Creating testing net...";
   classify_net_ptr_ = new caffe::Net<float>(_class_net, caffe::TEST);
@@ -54,8 +53,9 @@ void ClassifyBySimple::Init(const std::string &_class_net,
 void ClassifyBySimple::Perform(const cv::Mat &ros_image,
                                std::vector<LightPtr> *lights) {
   caffe::Blob<float> *input_blob_recog = classify_net_ptr_->input_blobs()[0];
-  caffe::Blob<float> *output_blob_recog = classify_net_ptr_->top_vecs()[
-      classify_net_ptr_->top_vecs().size() - 1][0];
+  caffe::Blob<float> *output_blob_recog =
+      classify_net_ptr_
+          ->top_vecs()[classify_net_ptr_->top_vecs().size() - 1][0];
   cv::Mat img = ros_image(crop_box_);
   for (LightPtr light : *lights) {
     if (!light->region.is_detected ||
@@ -90,18 +90,16 @@ ClassifyBySimple::~ClassifyBySimple() {
   delete classify_net_ptr_;
 }
 
-void ClassifyBySimple::ProbToColor(const float *out_put_data,
-                                   float threshold,
+void ClassifyBySimple::ProbToColor(const float *out_put_data, float threshold,
                                    LightPtr light) {
   int max_color_id = 0;
   std::vector<TLColor> status_map = {BLACK, RED, YELLOW, GREEN};
   std::vector<std::string> name_map = {"Black", "Red", "Yellow", "Green"};
   std::vector<float> prob(out_put_data, out_put_data + status_map.size());
   auto max_prob = std::max_element(prob.begin(), prob.end());
-  max_color_id =
-      (*max_prob > threshold) ? static_cast<int>(std::distance(prob.begin(),
-                                                               max_prob))
-                              : 0;
+  max_color_id = (*max_prob > threshold)
+                     ? static_cast<int>(std::distance(prob.begin(), max_prob))
+                     : 0;
 
   light->status.color = status_map[max_color_id];
   light->status.confidence = out_put_data[max_color_id];

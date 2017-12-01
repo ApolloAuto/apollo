@@ -25,6 +25,7 @@ class ImageTest : public ::testing::Test {
  public:
   ImageTest() {}
   virtual ~ImageTest() {}
+
  protected:
   void SetUp() override {
     _image = new Image();
@@ -66,4 +67,3 @@ TEST_F(ImageTest, test_all) {
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-

@@ -17,10 +17,10 @@
 #define MODULES_PERCEPTION_TRFFIC_LIGHT_REVISER_COLOR_DECISION_H
 
 #include <map>
-#include <vector>
 #include <string>
-#include "modules/perception/traffic_light/interface/green_interface.h"
+#include <vector>
 #include "modules/perception/traffic_light/interface/base_reviser.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 namespace apollo {
 namespace perception {
@@ -28,8 +28,7 @@ namespace traffic_light {
 
 class ColorReviser : public BaseReviser {
  public:
-  ColorReviser() {
-  }
+  ColorReviser() {}
 
   // @brief init the reviser.
   virtual bool Init();

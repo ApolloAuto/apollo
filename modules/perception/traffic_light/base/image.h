@@ -17,12 +17,12 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
 
-#include <opencv2/opencv.hpp>
-#include <sensor_msgs/Image.h>
 #include <gflags/gflags.h>
-#include <string>
+#include <sensor_msgs/Image.h>
 #include <map>
 #include <memory>
+#include <opencv2/opencv.hpp>
+#include <string>
 
 namespace apollo {
 namespace perception {
@@ -31,15 +31,14 @@ namespace traffic_light {
 // Camera id
 enum CameraId {
   UNKNOWN = -1,
-  LONG_FOCUS = 0,         // 25mm
-  SHORT_FOCUS = 1,        // 6mm
+  LONG_FOCUS = 0,   // 25mm
+  SHORT_FOCUS = 1,  // 6mm
   CAMERA_ID_COUNT = 2
 };
 
 const std::map<int, std::string> kCameraIdToStr = {
     {static_cast<int>(LONG_FOCUS), "long_focus_camera(25mm)"},
-    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"}
-};
+    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"}};
 
 // @brief Image loaded from camera.
 //       Warning: Image is not Thread Safe.
@@ -58,9 +57,8 @@ class Image {
   // @param [in] ts image's timestamp
   // @param [in] camera id
   // @param [in] image's data
-  bool
-  Init(const double &ts, const CameraId &device_id,
-       std::shared_ptr<const sensor_msgs::Image> image_data);
+  bool Init(const double &ts, const CameraId &device_id,
+            std::shared_ptr<const sensor_msgs::Image> image_data);
   // @brief return image's timestamp
   double ts() const;
 
@@ -93,9 +91,9 @@ class Image {
  private:
   bool contain_image_ = false;
   bool contain_mat_ = false;
-  double timestamp_ = 0.0;   // Image's timestamp
-  CameraId device_id_ = CameraId::UNKNOWN;   // camera's id
-  cv::Mat mat_;         // Image's data
+  double timestamp_ = 0.0;                  // Image's timestamp
+  CameraId device_id_ = CameraId::UNKNOWN;  // camera's id
+  cv::Mat mat_;                             // Image's data
   std::shared_ptr<const sensor_msgs::Image> image_data_;
   friend std::ostream &operator<<(std::ostream &os, const Image &image);
 };

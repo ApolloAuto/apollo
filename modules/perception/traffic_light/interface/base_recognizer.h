@@ -52,7 +52,7 @@ class BaseRecognizer {
   virtual std::string name() const = 0;
 
  private:
- DISALLOW_COPY_AND_ASSIGN(BaseRecognizer);
+  DISALLOW_COPY_AND_ASSIGN(BaseRecognizer);
 };
 
 REGISTER_REGISTERER(BaseRecognizer);

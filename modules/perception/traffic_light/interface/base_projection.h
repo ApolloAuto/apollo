@@ -17,8 +17,8 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/traffic_light/base/pose.h"
 #include "modules/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/base/pose.h"
 
 #include <eigen3/Eigen/Core>
 namespace apollo {
@@ -28,9 +28,7 @@ namespace traffic_light {
 DECLARE_string(traffic_light_projection);
 
 struct ProjectOption {
-  explicit ProjectOption(const CameraId &id) : camera_id(id) {
-
-  }
+  explicit ProjectOption(const CameraId &id) : camera_id(id) {}
 
   CameraId camera_id;
 };
@@ -41,6 +39,7 @@ struct CameraCoeffient {
   bool init(const std::string &camera_type,
             const std::string &camera_extrinsic_file_name,
             const std::string &camera_intrinsic_matrix_file);
+
  private:
   bool init_camera_extrinsic_matrix(const std::string &matrix_file);
   bool init_camera_intrinsic_matrix_and_distort_params(
@@ -78,7 +77,7 @@ class BaseProjection {
 REGISTER_REGISTERER(BaseProjection);
 #define REGISTER_PROJECTION(name) REGISTER_CLASS(BaseProjection, name)
 
-template<typename T>
+template <typename T>
 T arithmetic_mean(const std::vector<T> &data) {
   assert(data.size() > 0);
 
@@ -86,12 +85,12 @@ T arithmetic_mean(const std::vector<T> &data) {
   return sum / data.size();
 }
 
-template<typename T>
+template <typename T>
 T square(const T &d) {
   return d * d;
 }
 
-template<typename T>
+template <typename T>
 T degree_to_radians(const T &angle) {
   return angle * M_PI / 180;
 }
@@ -103,11 +102,9 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
 // @brief load Matrix4d from file
 
 bool load_matrix4d_from_file(const std::string &file_name,
-                             const std::string &key,
-                             Eigen::Matrix4d *matrix);
+                             const std::string &key, Eigen::Matrix4d *matrix);
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
-

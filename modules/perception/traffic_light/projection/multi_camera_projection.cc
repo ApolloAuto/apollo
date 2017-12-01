@@ -23,8 +23,7 @@ namespace perception {
 namespace traffic_light {
 
 bool MultiCamerasProjection::Init() {
-  ConfigManager *config_manager
-      = ConfigManager::instance();
+  ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name = "MultiCamerasProjection";
   const ModelConfig *model_config = NULL;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
@@ -72,8 +71,7 @@ bool MultiCamerasProjection::Init() {
     }
 
     CameraCoeffient camera_coeffient;
-    if (!camera_coeffient.init(camera_model_name,
-                               camera_extrinsic_file,
+    if (!camera_coeffient.init(camera_model_name, camera_extrinsic_file,
                                camera_intrinsic_file)) {
       AERROR << camera_model_name << " Projection init failed.";
       return false;
@@ -83,8 +81,8 @@ bool MultiCamerasProjection::Init() {
     camera_names_.push_back(camera_names[i]);
   }
 
-  projection_.reset(BaseProjectionRegisterer::GetInstanceByName(
-      single_projection_name));
+  projection_.reset(
+      BaseProjectionRegisterer::GetInstanceByName(single_projection_name));
   if (projection_ == nullptr) {
     AERROR << "MultiCamerasProjection new projection failed. name:"
            << single_projection_name;
@@ -104,8 +102,8 @@ bool MultiCamerasProjection::Init() {
   auto &short_focus_camera_coeffient = camera_coeffients["camera_6mm_focus"];
   auto &long_focus_camera_coeffient = camera_coeffients["camera_25mm_focus"];
   camera_coeffient_[kLongFocusIdx].camera_extrinsic =
-      camera_coeffient_[kLongFocusIdx].camera_extrinsic
-          * camera_coeffient_[kShortFocusIdx].camera_extrinsic;
+      camera_coeffient_[kLongFocusIdx].camera_extrinsic *
+      camera_coeffient_[kShortFocusIdx].camera_extrinsic;
   AINFO << "Lidar to long(25mm): ";
   AINFO << camera_coeffient_[kLongFocusIdx].camera_extrinsic;
   return true;

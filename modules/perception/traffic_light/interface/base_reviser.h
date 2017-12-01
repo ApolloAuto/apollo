@@ -27,10 +27,8 @@ namespace perception {
 namespace traffic_light {
 
 struct ReviseOption {
-  explicit ReviseOption(const double timestamp) :
-      ts(timestamp) {
-  }
-  double ts;         // timestamp for lights
+  explicit ReviseOption(const double timestamp) : ts(timestamp) {}
+  double ts;  // timestamp for lights
 };
 
 // @brief Reviser is the class is to revise the perception result.

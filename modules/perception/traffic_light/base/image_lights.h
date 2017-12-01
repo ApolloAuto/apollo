@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
@@ -35,7 +35,7 @@ struct ImageLights {
   // record the lights outside the lights.
   std::shared_ptr<LightPtrs> lights_outside_image;
   CameraId camera_id = UNKNOWN;
-  double timestamp = 0.0;   // image's timestamp
+  double timestamp = 0.0;  // image's timestamp
   // timestamp when received a image
   double preprocess_receive_timestamp = 0.0;
   // timestamp when PreprocessSubnode pub event

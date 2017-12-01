@@ -16,8 +16,8 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
 
-#include <map>
 #include <cmath>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -26,8 +26,8 @@
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
 #include "modules/perception/onboard/subnode.h"
-#include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
+#include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/base_reviser.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
@@ -48,6 +48,7 @@ class TLProcSubnode : public Subnode {
   TLProcSubnode() = default;
   ~TLProcSubnode();
   StatusCode ProcEvents() override;
+
  protected:
   bool InitInternal() override;
   bool ProcEvent(const Event &event);
@@ -58,9 +59,8 @@ class TLProcSubnode : public Subnode {
   bool InitRecognizer();
   bool InitReviser();
 
-  //get mean distance from car to stopline.
-  double GetMeanDistance(const double ts,
-                         const Eigen::Matrix4d &car_location,
+  // get mean distance from car to stopline.
+  double GetMeanDistance(const double ts, const Eigen::Matrix4d &car_location,
                          const LightPtrs &lights) const;
 
   bool VerifyImageLights(const ImageLights &image_lights,
@@ -70,9 +70,9 @@ class TLProcSubnode : public Subnode {
   bool ComputeImageBorder(const ImageLights &image_lights, int *image_border);
 
   //@brief compute offset between two rectangles
-  void ComputeRectsOffset(const cv::Rect &rect1,
-                          const cv::Rect &rect2,
+  void ComputeRectsOffset(const cv::Rect &rect1, const cv::Rect &rect2,
                           int *offset);
+
  private:
   int image_border_ = 100;
 
@@ -82,7 +82,7 @@ class TLProcSubnode : public Subnode {
   std::unique_ptr<BaseRecognizer> recognizer_ = nullptr;
   std::unique_ptr<BaseReviser> reviser_ = nullptr;
   Mutex mutex_;
- DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
+  DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
   bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights) const;
   float valid_ts_interval_;
 };

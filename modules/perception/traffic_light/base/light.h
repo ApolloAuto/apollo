@@ -18,12 +18,12 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
 
 #include <eigen3/Eigen/Core>
-#include <opencv2/opencv.hpp>
-#include <vector>
 #include <memory>
+#include <opencv2/opencv.hpp>
 #include <string>
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include <vector>
 #include "modules/map/proto/map_signal.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/perception/traffic_light/base/image.h"
 
 namespace apollo {
@@ -83,10 +83,13 @@ struct LightStatus {
   double confidence = 0.0;
 
   std::string to_string() const {
-    std::string light_color = (color == UNKNOWN_COLOR ? "unknown color" :
-                               (color == RED ? "red" :
-                                (color == GREEN ? "green" :
-                                 (color == YELLOW ? "yellow" : "black"))));
+    std::string light_color =
+        (color == UNKNOWN_COLOR
+             ? "unknown color"
+             : (color == RED ? "red"
+                             : (color == GREEN
+                                    ? "green"
+                                    : (color == YELLOW ? "yellow" : "black"))));
     // std::string light_color;
     std::ostringstream oss;
     oss << "Status: [color:" << light_color << " confidence:" << confidence
@@ -99,12 +102,10 @@ struct LightStatus {
 struct Light {
   Light() = default;
 
-  explicit Light(const apollo::hdmap::Signal &signal) :
-      info(signal) {
-  }
-  apollo::hdmap::Signal info;    //  Light info in the map.
-  LightRegion region;  //  Light region on the image.
-  LightStatus status;  //  Light Status.
+  explicit Light(const apollo::hdmap::Signal &signal) : info(signal) {}
+  apollo::hdmap::Signal info;  //  Light info in the map.
+  LightRegion region;          //  Light region on the image.
+  LightStatus status;          //  Light Status.
 
   std::string to_string() const {
     std::ostringstream oss;
@@ -123,7 +124,6 @@ typedef std::vector<LightPtr> LightPtrs;
 double stopline_distance(
     const Eigen::Matrix4d &car_pose,
     const google::protobuf::RepeatedPtrField<apollo::hdmap::Curve> &stoplines);
-
 
 }  //  namespace traffic_light
 }  //  namespace perception

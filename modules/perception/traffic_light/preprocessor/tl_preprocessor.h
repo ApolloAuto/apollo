@@ -17,16 +17,16 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
 
-#include <memory>
-#include <vector>
 #include <map>
+#include <memory>
 #include <string>
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include <vector>
 #include "modules/perception/lib/base/mutex.h"
-#include "modules/perception/traffic_light/interface/base_preprocessor.h"
 #include "modules/perception/lib/base/timer.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
+#include "modules/perception/traffic_light/interface/base_preprocessor.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace apollo {
@@ -49,20 +49,16 @@ class TLPreprocessor : public BasePreprocessor {
                               const std::vector<Signal> &signals,
                               const double ts);
 
-  bool SyncImage(
-      const ImageSharedPtr &image,
-      const double sync_time,
-      const CameraId &camera_id,
-      std::shared_ptr<ImageLights> *image_lights,
-      bool *should_pub);
+  bool SyncImage(const ImageSharedPtr &image, const double sync_time,
+                 const CameraId &camera_id,
+                 std::shared_ptr<ImageLights> *image_lights, bool *should_pub);
 
   void set_last_pub_camera_id(CameraId camera_id);
   CameraId last_pub_camera_id() const;
 
   int max_cached_lights_size() const;
 
-  bool SelectCameraByProjection(const double timestamp,
-                                const CarPose &pose,
+  bool SelectCameraByProjection(const double timestamp, const CarPose &pose,
                                 const std::vector<Signal> &signals,
                                 std::shared_ptr<ImageLights> *image_lights,
                                 CameraId *selected_camera_id);
@@ -74,24 +70,17 @@ class TLPreprocessor : public BasePreprocessor {
                    CameraId *selection);
 
   // @brief Project lights from HDMap onto long focus or short focus image plane
-  bool project_lights(const std::vector<Signal> &signals,
-                      const CarPose &pose,
-                      const CameraId &camera_id,
-                      LightPtrs* lights_on_image,
-                      LightPtrs* lights_outside_image);
+  bool project_lights(const std::vector<Signal> &signals, const CarPose &pose,
+                      const CameraId &camera_id, LightPtrs *lights_on_image,
+                      LightPtrs *lights_outside_image);
 
   // @brief Sync. image with cached lights projections
   bool sync_image_with_cached_lights_projections(
-      const ImageSharedPtr &image,
-      CameraId camera_id,
-      double timestamp,
-      std::shared_ptr<ImageLights> *image_lights,
-      double *diff_image_pose_ts,
-      double *diff_image_sys_ts,
-      bool *sync_ok);
+      const ImageSharedPtr &image, CameraId camera_id, double timestamp,
+      std::shared_ptr<ImageLights> *image_lights, double *diff_image_pose_ts,
+      double *diff_image_sys_ts, bool *sync_ok);
 
-  bool IsOnBorder(const cv::Size size,
-                  const cv::Rect &roi,
+  bool IsOnBorder(const cv::Size size, const cv::Rect &roi,
                   const int border_size) const;
 
   int GetMinFocalLenCameraId();
@@ -106,7 +95,7 @@ class TLPreprocessor : public BasePreprocessor {
 
   double last_output_ts_ = 0.0;
 
-  std::vector<std::shared_ptr<ImageLights> > cached_lights_;
+  std::vector<std::shared_ptr<ImageLights>> cached_lights_;
 
   Mutex mutex_;
 

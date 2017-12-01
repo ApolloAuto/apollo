@@ -16,9 +16,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 
+#include <cmath>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
-#include <cmath>
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace apollo {
@@ -29,20 +29,20 @@ namespace traffic_light {
 class BoundaryProjection : public BaseProjection {
  public:
   bool Project(const CameraCoeffient &camera_coeffient,
-                       const Eigen::Matrix4d &pose,
-                       const apollo::hdmap::Signal &tl_info,
-                       Light *light) const override;
+               const Eigen::Matrix4d &pose,
+               const apollo::hdmap::Signal &tl_info,
+               Light *light) const override;
 
  private:
   bool ProjectPoint(const CameraCoeffient &coeffient,
                     const Eigen::Matrix4d &pose,
-                    const apollo::common::Point3D &point,
-                    int *center_x, int *center_y) const;
+                    const apollo::common::Point3D &point, int *center_x,
+                    int *center_y) const;
 
   bool ProjectPointDistort(const CameraCoeffient &coeffient,
                            const Eigen::Matrix4d &pose,
-                           const apollo::common::PointENU &point,
-                           int *center_x, int *center_y) const;
+                           const apollo::common::PointENU &point, int *center_x,
+                           int *center_y) const;
 
   Eigen::Matrix<double, 2, 1> PixelDenormalize(
       const Eigen::Matrix<double, 2, 1> &pt2d,

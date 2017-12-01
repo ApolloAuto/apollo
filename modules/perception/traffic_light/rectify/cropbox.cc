@@ -15,18 +15,17 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/rectify/cropbox.h"
+#include <algorithm>
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
-#include <algorithm>
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-void
-CropBox::GetCropBox(const cv::Size &size,
-                    const std::vector<LightPtr> &lights,
-                    cv::Rect *cropbox) {
+void CropBox::GetCropBox(const cv::Size &size,
+                         const std::vector<LightPtr> &lights,
+                         cv::Rect *cropbox) {
   int lights_num = lights.size();
   if (lights_num == 0) {
     AINFO << "No valid HD-map corrdinates info";
@@ -53,12 +52,12 @@ CropBox::GetCropBox(const cv::Size &size,
     if (yt > light.region.projection_roi.y) {
       yt = light.region.projection_roi.y;
     }
-    if (xr
-        < light.region.projection_roi.x + light.region.projection_roi.width) {
+    if (xr <
+        light.region.projection_roi.x + light.region.projection_roi.width) {
       xr = light.region.projection_roi.x + light.region.projection_roi.width;
     }
-    if (yb
-        < light.region.projection_roi.y + light.region.projection_roi.height) {
+    if (yb <
+        light.region.projection_roi.y + light.region.projection_roi.height) {
       yb = light.region.projection_roi.y + light.region.projection_roi.height;
     }
   }

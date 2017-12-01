@@ -19,9 +19,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {

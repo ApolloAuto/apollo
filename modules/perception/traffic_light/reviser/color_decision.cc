@@ -38,14 +38,12 @@ bool ColorReviser::Init() {
     return false;
   }
 
-  if (!model_config->GetValue(\
-            "enable", &enable_)) {
+  if (!model_config->GetValue("enable", &enable_)) {
     AERROR << "enable not found." << name();
     return false;
   }
 
-  if (!model_config->GetValue(\
-            "blink_time", &blink_time_)) {
+  if (!model_config->GetValue("blink_time", &blink_time_)) {
     AERROR << "blink_time not found." << name();
     return false;
   }
@@ -66,8 +64,8 @@ bool ColorReviser::Revise(const ReviseOption &option,
       default:
       case BLACK:
       case UNKNOWN_COLOR:
-        if (color_map_.find(id) != color_map_.end() &&
-            option.ts > 0 && option.ts - time_map_[id] < blink_time_) {
+        if (color_map_.find(id) != color_map_.end() && option.ts > 0 &&
+            option.ts - time_map_[id] < blink_time_) {
           AINFO << "Revise " << kColorStr[lights_ref[i]->status.color]
                 << " to color " << kColorStr[color_map_[id]];
           lights_ref[i]->status.color = color_map_[id];
@@ -77,8 +75,8 @@ bool ColorReviser::Revise(const ReviseOption &option,
         break;
       case YELLOW:
         // if YELLOW appears after RED, revise it to RED
-        if (color_map_.find(id) != color_map_.end() &&
-            option.ts > 0 && color_map_.at(id) == RED) {
+        if (color_map_.find(id) != color_map_.end() && option.ts > 0 &&
+            color_map_.at(id) == RED) {
           lights_ref[i]->status.color = color_map_.at(id);
           AINFO << "Revise Yellow to color Red";
           color_map_[id] = RED;

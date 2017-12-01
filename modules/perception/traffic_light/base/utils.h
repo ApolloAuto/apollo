@@ -33,10 +33,8 @@ cv::Point2f GetCenter(const cv::Rect &box);
 
 float GetDistance(const cv::Point2f &, const cv::Point2f &);
 
-float Get2dGaussianScore(const cv::Point2f &p1,
-                         const cv::Point2f &p2,
-                         float sigma1,
-                         float sigma2);
+float Get2dGaussianScore(const cv::Point2f &p1, const cv::Point2f &p2,
+                         float sigma1, float sigma2);
 
 float Get1dGaussianScore(float x1, float x2, float sigma);
 

@@ -24,17 +24,14 @@ const int kShortFocusIdx(static_cast<int>(SHORT_FOCUS));
 std::vector<int> image_border_size(kCountCameraId, 100);
 
 std::map<CameraId, int> kCameraIndicator = {
-    {CameraId::LONG_FOCUS, 222},
-    {CameraId::SHORT_FOCUS, 111},
+    {CameraId::LONG_FOCUS, 222}, {CameraId::SHORT_FOCUS, 111},
 };
 
-std::map<TLColor, std::string> kColorStr = {
-    {UNKNOWN_COLOR, "unknown"},
-    {RED, "red"},
-    {GREEN, "green"},
-    {YELLOW, "yellow"},
-    {BLACK, "black"}
-};
+std::map<TLColor, std::string> kColorStr = {{UNKNOWN_COLOR, "unknown"},
+                                            {RED, "red"},
+                                            {GREEN, "green"},
+                                            {YELLOW, "yellow"},
+                                            {BLACK, "black"}};
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
