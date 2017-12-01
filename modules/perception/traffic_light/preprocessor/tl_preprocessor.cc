@@ -124,8 +124,8 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
     if (!project_lights(signals,
                         pose,
                         static_cast<CameraId>(cam_id),
-                        lights_on_image_array[cam_id],
-                        lights_outside_image_array[cam_id])) {
+                        lights_on_image_array[cam_id].get(),
+                        lights_outside_image_array[cam_id].get())) {
       AERROR << "add_cached_lights_projections project lights on "
              << kCameraIdToStr.at(static_cast<CameraId>(cam_id))
              << " image failed, "

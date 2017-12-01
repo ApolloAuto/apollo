@@ -305,7 +305,7 @@ bool TLProcSubnode::VerifyImageLights(
   }
   for (LightPtr light:*(image_lights.lights)) {
     if (!BoxIsValid(light->region.projection_roi, image_lights.image->size())) {
-      ClearBox(light->region.projection_roi);
+      ClearBox(&(light->region.projection_roi));
       continue;
     }
   }

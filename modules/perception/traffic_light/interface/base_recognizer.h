@@ -47,13 +47,14 @@ class BaseRecognizer {
   // @param [in] const Image&: input image
   // @param [in/out] std::vector<Light>*: recognized light status
   // @return  bool
-  virtual bool RecognizeStatus(const Image &image, const RecognizeOption &option,
+  virtual bool RecognizeStatus(const Image &image,
+                               const RecognizeOption &option,
                                std::vector<LightPtr> *lights) = 0;
 
   virtual std::string name() const = 0;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(BaseRecognizer);
+ DISALLOW_COPY_AND_ASSIGN(BaseRecognizer);
 };
 
 REGISTER_REGISTERER(BaseRecognizer);

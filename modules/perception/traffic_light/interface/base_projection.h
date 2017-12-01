@@ -35,7 +35,7 @@ struct ProjectOption {
   CameraId camera_id;
 };
 
-//@brief The Basic Camera Coeffient
+// @brief The Basic Camera Coeffient
 struct CameraCoeffient {
  public:
   bool init(const std::string &camera_type,
@@ -48,14 +48,14 @@ struct CameraCoeffient {
 
  public:
   std::string camera_type_str;
-  Eigen::Matrix4d camera_extrinsic; //Lidar->Camera Matrix
-  Eigen::Matrix<double, 3, 4> camera_intrinsic; // Camera Intrinsic
-  Eigen::Matrix<double, 5, 1> distort_params;  // distortion parameters
+  Eigen::Matrix4d camera_extrinsic;
+  Eigen::Matrix<double, 3, 4> camera_intrinsic;
+  Eigen::Matrix<double, 5, 1> distort_params;
   size_t image_height;
   size_t image_width;
 };
 
-//@brief Projection project traffic light(3D) to a region on the image(2D).
+// @brief Projection project traffic light(3D) to a region on the image(2D).
 //       The data(map & params) for projection should be load in init function.
 class BaseProjection {
  public:
@@ -63,11 +63,11 @@ class BaseProjection {
 
   virtual ~BaseProjection() = default;
 
-  //@brief project the traffic_light to a region on the image.
-  //@params [in] camera's coeffients
-  //@params [in] car's pose
-  //@params [in] option for project
-  //@params [in/out] in:traffic light 's x,y,z
+  // @brief project the traffic_light to a region on the image.
+  // @params [in] camera's coeffients
+  // @params [in] car's pose
+  // @params [in] option for project
+  // @params [in/out] in:traffic light 's x,y,z
   //                 out:map info & the region on the image.
   virtual bool Project(const CameraCoeffient &camera_coeffient,
                        const Eigen::Matrix4d &pose,
@@ -96,20 +96,14 @@ T degree_to_radians(const T &angle) {
   return angle * M_PI / 180;
 }
 
-//@brief load transformation_matrix from file
+// @brief load transformation_matrix from file
 bool load_transformation_matrix_from_file(const std::string &file_name,
-                                          Eigen::Matrix4d *transformation_matrix);
+                                          Eigen::Matrix4d *matrix4d);
 
-/*@brief load Matrix4d from file
-  in File
-  key:
-    0:
-      0: XX
-      1: YY
-      ...
-    ...
-*/
-bool load_matrix4d_from_file(const std::string &file_name, const std::string &key,
+// @brief load Matrix4d from file
+
+bool load_matrix4d_from_file(const std::string &file_name,
+                             const std::string &key,
                              Eigen::Matrix4d *matrix);
 }  // namespace traffic_light
 }  // namespace perception

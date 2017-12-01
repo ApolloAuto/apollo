@@ -30,7 +30,7 @@ CropBox::GetCropBox(const cv::Size &size,
   int lights_num = lights.size();
   if (lights_num == 0) {
     AINFO << "No valid HD-map corrdinates info";
-    ClearBox(*cropbox);
+    ClearBox(cropbox);
     return;
   }
   int rows = size.height;
@@ -63,7 +63,7 @@ CropBox::GetCropBox(const cv::Size &size,
     }
   }
   if (!initialized) {
-    ClearBox(*cropbox);
+    ClearBox(cropbox);
     return;
   }
   // scale
@@ -112,7 +112,7 @@ void CropBoxWholeImage::GetCropBox(const cv::Size &size,
       return;
     }
   }
-  ClearBox(*cropbox);
+  ClearBox(cropbox);
 }
 }  // namespace traffic_light
 }  // namespace perception
