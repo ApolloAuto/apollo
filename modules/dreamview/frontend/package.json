@@ -6,7 +6,7 @@
     "author": "adusim",
     "license": "MIT",
     "scripts": {
-        "build": "node_modules/.bin/webpack -p",
+        "build": "node_modules/.bin/webpack -p --progress",
         "start": "node_modules/.bin/webpack-dev-server --watch-poll"
     },
     "dependencies": {

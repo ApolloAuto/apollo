@@ -6,11 +6,14 @@ export default class Options {
     // Side Bar options
     @observable showConsole = PARAMETERS.options.defaults.showConsole;
     @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
-    @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
-    @observable showQuickStarter = PARAMETERS.options.defaults.showQuickStarter;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
+
+    @observable showMenu =
+        OFFLINE_PLAYBACK ? true : PARAMETERS.options.defaults.showMenu;
+    @observable showQuickStarter =
+        OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showQuickStarter;
 
     mutuallyExclusiveOptions = ['showQuickStarter', 'showModuleController',
         'showMenu', 'showRouteEditingBar'];
