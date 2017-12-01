@@ -77,6 +77,8 @@ function main(){
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
     devices="${devices} $(find_device video*)"
+    devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
+    devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
 
     USER_ID=$(id -u)
     GRP=$(id -g -n)
@@ -89,6 +91,7 @@ function main(){
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
+    set -x
     docker run -it \
         -d \
         --privileged \
@@ -114,7 +117,7 @@ function main(){
         --shm-size 512M \
         $IMG \
         /bin/bash
-
+    set+x
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
