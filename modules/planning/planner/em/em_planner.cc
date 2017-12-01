@@ -154,15 +154,16 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  double s = 0.0;
-  if (!trajectory.trajectory_points().empty() &&
-      trajectory.trajectory_points().back().has_path_point()) {
-    s = trajectory.trajectory_points().back().path_point().s();
+  for (const auto* path_obstacle :
+       reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (!path_obstacle->obstacle()->IsStatic()) {
+      continue;
+    }
+    if (path_obstacle->LongitudinalDecision().has_stop()) {
+      constexpr double kRefrenceLineStaticObsCost = 1e3;
+      reference_line_info->AddCost(kRefrenceLineStaticObsCost);
+    }
   }
-  const double kRefrenceLineLengthTh = 10.0;
-  const double kRefrenceLineLengthCost = 100.0;
-  reference_line_info->AddCost(
-      s > kRefrenceLineLengthTh ? 0.0 : kRefrenceLineLengthCost);
 
   if (FLAGS_enable_trajectory_check) {
     ConstraintChecker::ValidTrajectory(trajectory);
