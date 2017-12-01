@@ -25,7 +25,7 @@ const double RADAR_TRACK_TIME_WIN = 0.06;
 const double RADAR_TRACK_THRES = 2.5;
 const int MAX_RADAR_IDX = 2147483647;
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DEFINE_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_DEFINE_H_

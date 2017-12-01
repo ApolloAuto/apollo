@@ -33,12 +33,12 @@ cv::Point2f GetCenter(cv::Rect box);
 
 float GetDistance(cv::Point2f, cv::Point2f);
 
-float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1, float sigma2);
+float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1,
+                         float sigma2);
 
 float Get1dGaussianScore(float x1, float x2, float sigma);
-
 }
 }
 }
 
-#endif //GREEN_UTILS_H
+#endif  // GREEN_UTILS_H

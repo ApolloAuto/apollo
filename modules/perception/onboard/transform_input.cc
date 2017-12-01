@@ -19,8 +19,8 @@
 #include "eigen_conversions/eigen_msg.h"
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/log.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
@@ -64,5 +64,5 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
   return true;
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

@@ -44,7 +44,6 @@ TEST(UtilsTest, test_refined_box) {
   EXPECT_EQ(189, box3.width);
   EXPECT_EQ(189, box3.height);
 }
-
 }
 }
 }

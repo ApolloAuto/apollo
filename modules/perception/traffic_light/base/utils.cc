@@ -21,7 +21,7 @@ namespace perception {
 namespace traffic_light {
 
 uint64_t TimestampDouble2Int64(double ts) {
-  uint64_t result = (uint64_t) (ts * 1e6);
+  uint64_t result = (uint64_t)(ts * 1e6);
   return result * 1000;
 }
 
@@ -32,9 +32,9 @@ void ClearBox(cv::Rect &rect) {
   rect.height = 0;
 }
 bool BoxIsValid(const cv::Rect &box, const cv::Size &size) {
-  if (box.width <= 0 || box.height <= 0
-      || box.x >= size.width || box.y >= size.height
-      || box.x + box.width - 1 < 0 || box.y + box.height - 1 < 0) {
+  if (box.width <= 0 || box.height <= 0 || box.x >= size.width ||
+      box.y >= size.height || box.x + box.width - 1 < 0 ||
+      box.y + box.height - 1 < 0) {
     return false;
   }
   return true;
@@ -72,18 +72,21 @@ cv::Point2f GetCenter(cv::Rect box) {
   return cv::Point2f(box.x + box.width / 2, box.y + box.height / 2);
 }
 float GetDistance(cv::Point2f p1, cv::Point2f p2) {
-  return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+  return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) +
+                   (p1.y - p2.y) * (p1.y - p2.y));
 }
 
-float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1, float sigma2) {
-  return static_cast<float>(std::exp(-0.5 * (((p1.x - p2.x) * (p1.x - p2.x)) / (sigma1 * sigma1) +
-      ((p1.y - p2.y) * (p1.y - p2.y)) / (sigma2 * sigma2))));
+float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1,
+                         float sigma2) {
+  return static_cast<float>(
+      std::exp(-0.5 * (((p1.x - p2.x) * (p1.x - p2.x)) / (sigma1 * sigma1) +
+                       ((p1.y - p2.y) * (p1.y - p2.y)) / (sigma2 * sigma2))));
 }
 
 float Get1dGaussianScore(float x1, float x2, float sigma) {
-  return static_cast<float>(std::exp(-0.5 * (x1 - x2) * (x1 - x2) / (sigma * sigma)));
+  return static_cast<float>(
+      std::exp(-0.5 * (x1 - x2) * (x1 - x2) / (sigma * sigma)));
 }
-
 }
 }
 }

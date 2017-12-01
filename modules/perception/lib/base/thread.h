@@ -28,8 +28,7 @@ namespace perception {
 class Thread {
  public:
   Thread(bool joinable = false, const std::string& name = "Thread")
-          : tid_(0), started_(false), joinable_(joinable), thread_name_(name) {
-  }
+      : tid_(0), started_(false), joinable_(joinable), thread_name_(name) {}
 
   pthread_t Tid() const {
     return tid_;
@@ -57,7 +56,7 @@ class Thread {
  protected:
   virtual void Run() = 0;
 
-  static void *ThreadRunner(void *arg) {
+  static void* ThreadRunner(void* arg) {
     Thread* t = reinterpret_cast<Thread*>(arg);
     t->Run();
     return NULL;

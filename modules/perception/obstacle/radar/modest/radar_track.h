@@ -17,11 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_H_
 
-#include <memory>
 #include <Eigen/Core>
-#include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/obstacle/base/object.h"
+#include <memory>
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/radar/modest/radar_define.h"
 
 namespace apollo {
@@ -69,7 +69,7 @@ class RadarTrack {
   bool id_tracked_;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_H_

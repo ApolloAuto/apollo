@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
-#include "modules/perception/obstacle/radar/modest/radar_track_manager.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
+#include "modules/perception/obstacle/radar/modest/radar_track_manager.h"
 
 namespace apollo {
 namespace perception {

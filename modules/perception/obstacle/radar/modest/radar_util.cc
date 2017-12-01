@@ -19,11 +19,11 @@
 namespace apollo {
 namespace perception {
 
-void RadarUtil::MockRadarPolygon(const Eigen::Vector3d &center, const double length,
-                             const double width, const double theta, PolygonDType &polygon) {
+void RadarUtil::MockRadarPolygon(const Eigen::Vector3d &center,
+                                 const double length, const double width,
+                                 const double theta, PolygonDType &polygon) {
   Eigen::Matrix2d rotation;
-  rotation << cos(theta), -sin(theta),
-      sin(theta), cos(theta);
+  rotation << cos(theta), -sin(theta), sin(theta), cos(theta);
   Eigen::Vector2d local_poly(0, 0);
   Eigen::Vector2d world_poly;
   polygon.resize(4);
@@ -53,5 +53,5 @@ void RadarUtil::MockRadarPolygon(const Eigen::Vector3d &center, const double len
   polygon.points[3].z = center(2);
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

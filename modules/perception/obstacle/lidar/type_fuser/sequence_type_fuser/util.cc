@@ -20,20 +20,18 @@ namespace apollo {
 namespace perception {
 namespace sequence_type_fuser {
 
-void FromStdVector(const std::vector<float>& src_prob, 
-        Vectord* dst_prob) {
+void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
   (*dst_prob)(0) = src_prob[0];
   for (std::size_t i = 3; i < MAX_OBJECT_TYPE; ++i) {
-    (*dst_prob)(i-2) = static_cast<double>(src_prob[i]);
+    (*dst_prob)(i - 2) = static_cast<double>(src_prob[i]);
   }
 }
 
-void FromEigenVector(const Vectord& src_prob, 
-        std::vector<float>* dst_prob) {
+void FromEigenVector(const Vectord& src_prob, std::vector<float>* dst_prob) {
   dst_prob->assign(MAX_OBJECT_TYPE, 0);
   dst_prob->at(0) = src_prob(0);
   for (std::size_t i = 3; i < MAX_OBJECT_TYPE; ++i) {
-    dst_prob->at(i) = static_cast<float>(src_prob(i-2));
+    dst_prob->at(i) = static_cast<float>(src_prob(i - 2));
   }
 }
 
@@ -44,9 +42,9 @@ void ToLog(Vectord* prob) {
 }
 
 void ToExp(Vectord* prob) {
-    double min_value = prob->minCoeff();
+  double min_value = prob->minCoeff();
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
-    (*prob)(i) = exp((*prob)(i) - min_value);
+    (*prob)(i) = exp((*prob)(i)-min_value);
   }
 }
 
@@ -107,8 +105,8 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
   return true;
 }
 
-bool LoadMultipleMatricesFile(const std::string& filename, 
-        std::map<std::string, Matrixd>* matrices) {
+bool LoadMultipleMatricesFile(const std::string& filename,
+                              std::map<std::string, Matrixd>* matrices) {
   if (matrices == nullptr) {
     return false;
   }
@@ -134,4 +132,3 @@ bool LoadMultipleMatricesFile(const std::string& filename,
 }  // namsepace sequence_type_fuser
 }  // namespace perception
 }  // namespace apollo
-

@@ -14,16 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
+#include <glog/logging.h>
+#include <algorithm>
+#include <functional>
 #include <map>
 #include <string>
-#include <functional>
-#include <algorithm>
-#include <glog/logging.h>
-#include "gtest/gtest.h"
+#include <vector>
 #include "boost/format.hpp"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
+#include "gtest/gtest.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #define protected public
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 namespace apollo {
@@ -98,10 +98,11 @@ TEST(PbfTrackTest, test_pbf_update_measurements_life) {
   object2->timestamp = 0.1;
   object2->object->track_id = 1;
   track.lidar_objects_[object2->sensor_id] = object2;
-  track.UpdateMeasurementsLifeWithMeasurement(track.lidar_objects_, "velodyne_64", 0.45, 0.2);
+  track.UpdateMeasurementsLifeWithMeasurement(track.lidar_objects_,
+                                              "velodyne_64", 0.45, 0.2);
   CHECK_EQ(track.lidar_objects_.size(), 1);
-  track.UpdateMeasurementsLifeWithMeasurement(
-      track.lidar_objects_, "velodyne_64_1", 0.25, 0.2);
+  track.UpdateMeasurementsLifeWithMeasurement(track.lidar_objects_,
+                                              "velodyne_64_1", 0.25, 0.2);
   CHECK_EQ(track.lidar_objects_.size(), 1);
   PbfSensorObjectPtr object3(new PbfSensorObject());
   object3->sensor_type = VELODYNE_64;
@@ -116,5 +117,5 @@ TEST(PbfTrackTest, test_pbf_update_measurements_life) {
   CHECK_EQ(invisible_state, false);
 }
 
-} //namespace perception
-} //namespace apollo
+}  // namespace perception
+}  // namespace apollo

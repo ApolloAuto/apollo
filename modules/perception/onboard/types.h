@@ -20,9 +20,9 @@
 #include <sstream>
 #include <string>
 
+#include "modules/perception/common/define.h"
 #include "modules/perception/lib/base/concurrent_queue.h"
 #include "modules/perception/lib/base/time_util.h"
-#include "modules/perception/common/define.h"
 
 namespace apollo {
 namespace perception {
@@ -38,7 +38,7 @@ struct Event {
   double local_timestamp = 0.0;  // local timestamp to compute process delay.
 
   Event() {
-      local_timestamp = TimeUtil::GetCurrentTime();
+    local_timestamp = TimeUtil::GetCurrentTime();
   }
 
   std::string to_string() const {

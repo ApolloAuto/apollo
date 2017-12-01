@@ -59,29 +59,30 @@ bool ReadPoseFile(const std::string &filename, Eigen::Matrix4d *pose,
   return true;
 }
 
-bool LoadExtrinsic(const std::string& file_path, Eigen::Affine3d* extrinsic) {
-    try {
-        YAML::Node config = YAML::LoadFile(file_path);
-        if (!config["transform"]) {
-            return false;
-        }
-        if (config["transform"]["translation"] && config["transform"]["rotation"]) {
-            double tx = config["transform"]["translation"]["x"].as<double>();
-            double ty = config["transform"]["translation"]["y"].as<double>();
-            double tz = config["transform"]["translation"]["z"].as<double>();
-
-            double qx = config["transform"]["rotation"]["x"].as<double>();
-            double qy = config["transform"]["rotation"]["y"].as<double>();
-            double qz = config["transform"]["rotation"]["z"].as<double>();
-            double qw = config["transform"]["rotation"]["w"].as<double>();
-            *extrinsic = Eigen::Translation3d(tx, ty, tz) * Eigen::Quaterniond(qw, qx, qy, qz);
-        }
-    } catch (const YAML::Exception& e) {
-        AERROR << "load extrinsics: " << file_path << " failed! error: "
-            << e.what();
-        return false;
+bool LoadExtrinsic(const std::string &file_path, Eigen::Affine3d *extrinsic) {
+  try {
+    YAML::Node config = YAML::LoadFile(file_path);
+    if (!config["transform"]) {
+      return false;
     }
-    return true;
+    if (config["transform"]["translation"] && config["transform"]["rotation"]) {
+      double tx = config["transform"]["translation"]["x"].as<double>();
+      double ty = config["transform"]["translation"]["y"].as<double>();
+      double tz = config["transform"]["translation"]["z"].as<double>();
+
+      double qx = config["transform"]["rotation"]["x"].as<double>();
+      double qy = config["transform"]["rotation"]["y"].as<double>();
+      double qz = config["transform"]["rotation"]["z"].as<double>();
+      double qw = config["transform"]["rotation"]["w"].as<double>();
+      *extrinsic =
+          Eigen::Translation3d(tx, ty, tz) * Eigen::Quaterniond(qw, qx, qy, qz);
+    }
+  } catch (const YAML::Exception &e) {
+    AERROR << "load extrinsics: " << file_path
+           << " failed! error: " << e.what();
+    return false;
+  }
+  return true;
 }
 
 }  // namespace perception

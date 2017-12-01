@@ -21,8 +21,10 @@ namespace apollo {
 namespace perception {
 
 FrameContent::FrameContent()
-    : pose_v2w_(Eigen::Matrix4d::Identity()), cloud_(new pcl_util::PointCloud),
-      roi_cloud_(new pcl_util::PointCloud), global_offset_initialized_(false) {}
+    : pose_v2w_(Eigen::Matrix4d::Identity()),
+      cloud_(new pcl_util::PointCloud),
+      roi_cloud_(new pcl_util::PointCloud),
+      global_offset_initialized_(false) {}
 
 FrameContent::~FrameContent() {}
 
@@ -42,7 +44,9 @@ void FrameContent::SetLidarPose(const Eigen::Matrix4d &pose) {
   pose_v2w_(2, 3) += global_offset_[2];
 }
 
-Eigen::Matrix4d FrameContent::GetPoseV2w() { return pose_v2w_; }
+Eigen::Matrix4d FrameContent::GetPoseV2w() {
+  return pose_v2w_;
+}
 
 void FrameContent::SetLidarCloud(pcl_util::PointCloudPtr cloud) {
   pcl::transformPointCloud(*cloud, *(cloud_), pose_v2w_);
@@ -52,9 +56,13 @@ void FrameContent::SetLidarRoiCloud(pcl_util::PointCloudPtr cloud) {
   pcl::transformPointCloud(*cloud, *(roi_cloud_), pose_v2w_);
 }
 
-pcl_util::PointCloudPtr FrameContent::GetCloud() { return cloud_; }
+pcl_util::PointCloudPtr FrameContent::GetCloud() {
+  return cloud_;
+}
 
-pcl_util::PointCloudPtr FrameContent::GetRoiCloud() { return roi_cloud_; }
+pcl_util::PointCloudPtr FrameContent::GetRoiCloud() {
+  return roi_cloud_;
+}
 
 bool FrameContent::HasCloud() {
   if ((cloud_ == nullptr || cloud_->size() == 0)) {
@@ -63,7 +71,7 @@ bool FrameContent::HasCloud() {
   return true;
 }
 
-void FrameContent::OffsetPointcloud(pcl_util::PointCloud* cloud,
+void FrameContent::OffsetPointcloud(pcl_util::PointCloud *cloud,
                                     const Eigen::Vector3d &offset) {
   for (size_t i = 0; i < cloud->size(); ++i) {
     cloud->points[i].x += offset[0];
@@ -72,7 +80,7 @@ void FrameContent::OffsetPointcloud(pcl_util::PointCloud* cloud,
   }
 }
 
-void FrameContent::OffsetPointcloud(pcl_util::PointDCloud* cloud,
+void FrameContent::OffsetPointcloud(pcl_util::PointDCloud *cloud,
                                     const Eigen::Vector3d &offset) {
   for (size_t i = 0; i < cloud->size(); ++i) {
     cloud->points[i].x += offset[0];
@@ -91,7 +99,8 @@ void FrameContent::OffsetObject(ObjectPtr object,
   object->center[2] += offset[2];
 }
 
-void FrameContent::SetTrackedObjectsLidar(const std::vector<ObjectPtr> &objects) {
+void FrameContent::SetTrackedObjectsLidar(
+    const std::vector<ObjectPtr> &objects) {
   tracked_objects_lidar_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     tracked_objects_lidar_[i].reset(new Object);
@@ -100,7 +109,8 @@ void FrameContent::SetTrackedObjectsLidar(const std::vector<ObjectPtr> &objects)
   }
 }
 
-void FrameContent::SetTrackedObjectsRadar(const std::vector<ObjectPtr> &objects) {
+void FrameContent::SetTrackedObjectsRadar(
+    const std::vector<ObjectPtr> &objects) {
   tracked_objects_radar_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     tracked_objects_radar_[i].reset(new Object);
@@ -109,7 +119,8 @@ void FrameContent::SetTrackedObjectsRadar(const std::vector<ObjectPtr> &objects)
   }
 }
 
-void FrameContent::SetTrackedObjectsFused(const std::vector<ObjectPtr> &objects) {
+void FrameContent::SetTrackedObjectsFused(
+    const std::vector<ObjectPtr> &objects) {
   tracked_objects_fused_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     tracked_objects_fused_[i].reset(new Object);

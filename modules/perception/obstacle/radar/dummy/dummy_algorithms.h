@@ -47,7 +47,7 @@ class DummyRadarDetector : public BaseRadarDetector {
   bool result_init_ = true;
   bool result_detect_ = true;
 
- DISALLOW_COPY_AND_ASSIGN(DummyRadarDetector);
+  DISALLOW_COPY_AND_ASSIGN(DummyRadarDetector);
 };
 
 REGISTER_RADARDETECTOR(DummyRadarDetector);

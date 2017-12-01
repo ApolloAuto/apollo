@@ -18,9 +18,9 @@
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
 
 #include "modules/common/macro.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
-#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
@@ -44,29 +44,26 @@ class PbfTrackObjectDistance {
                                     int range = 3);
   float ComputeVelodyne64Radar(const PbfSensorObjectPtr &fused_object,
                                const PbfSensorObjectPtr &sensor_object,
-                               const Eigen::Vector3d &ref_pos,
-                               int range = 3);
+                               const Eigen::Vector3d &ref_pos, int range = 3);
   float ComputeRadarRadar(const PbfSensorObjectPtr &fused_object,
                           const PbfSensorObjectPtr &sensor_object,
-                          const Eigen::Vector3d &ref_pos,
-                          int range = 3);
+                          const Eigen::Vector3d &ref_pos, int range = 3);
 
   float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
                           const PbfSensorObjectPtr &sensor_object,
-                          const Eigen::Vector3d &ref_pos,
-                          int range);
+                          const Eigen::Vector3d &ref_pos, int range);
   float ComputeEuclideanDistance(const Eigen::Vector3d &des,
                                  const Eigen::Vector3d &src);
   bool ComputePolygonCenter(const PolygonDType &polygon,
                             Eigen::Vector3d &center);
   bool ComputePolygonCenter(const PolygonDType &polygon,
-                            const Eigen::Vector3d &ref_pos,
-                            int range,
+                            const Eigen::Vector3d &ref_pos, int range,
                             Eigen::Vector3d &center);
- private:
- DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
-};
-} // namespace perception
-} // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
+ private:
+  DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
+};
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_

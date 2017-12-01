@@ -49,7 +49,7 @@ class BaseTypeFuser {
 REGISTER_REGISTERER(BaseTypeFuser);
 #define REGISTER_TYPEFUSER(name) REGISTER_CLASS(BaseTypeFuser, name)
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_

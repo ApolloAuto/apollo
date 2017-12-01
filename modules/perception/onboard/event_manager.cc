@@ -37,7 +37,7 @@ bool EventManager::Init(const DAGConfig::EdgeConfig &edge_config) {
     return true;
   }
 
-  for (const DAGConfig::Edge& edge : edge_config.edges()) {
+  for (const DAGConfig::Edge &edge : edge_config.edges()) {
     for (const DAGConfig::Event event_pb : edge.events()) {
       if (event_queue_map_.find(event_pb.id()) != event_queue_map_.end()) {
         AERROR << "duplicate event id in config. id: " << event_pb.id();
@@ -63,7 +63,7 @@ bool EventManager::Init(const DAGConfig::EdgeConfig &edge_config) {
 }
 
 bool EventManager::Publish(const Event &event) {
-  EventQueue* queue = NULL;
+  EventQueue *queue = NULL;
   if (!GetEventQueue(event.event_id, &queue)) {
     return false;
   }
@@ -79,12 +79,12 @@ bool EventManager::Publish(const Event &event) {
     // try second time.
     queue->try_push(event);
   }
-  
+
   return true;
 }
 
 bool EventManager::Subscribe(EventID event_id, Event *event, bool nonblocking) {
-  EventQueue* queue = NULL;
+  EventQueue *queue = NULL;
   if (!GetEventQueue(event_id, &queue)) {
     return false;
   }
@@ -114,8 +114,7 @@ bool EventManager::GetEventQueue(EventID event_id, EventQueue **queue) {
   return true;
 }
 
-bool EventManager::GetEventMeta(EventID event_id,
-                                EventMeta *event_meta) const {
+bool EventManager::GetEventMeta(EventID event_id, EventMeta *event_meta) const {
   EventMetaMapConstIterator citer = event_meta_map_.find(event_id);
   if (citer == event_meta_map_.end()) {
     AWARN << "event not found in EventManager. id: " << event_id;

@@ -18,9 +18,9 @@
 
 #include <string>
 #include <utility>
+#include "caffe/caffe.hpp"
 #include "modules/perception/traffic_light/base/light.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
-#include "caffe/caffe.hpp"
 
 namespace apollo {
 namespace perception {
@@ -28,12 +28,13 @@ namespace traffic_light {
 
 class ClassifyBySimple : public IRefine {
  public:
-  ClassifyBySimple(const std::string &_class_net, const std::string &_class_model,
-                   float threshold, unsigned int resize_width,
-                   unsigned int resize_height);
+  ClassifyBySimple(const std::string &_class_net,
+                   const std::string &_class_model, float threshold,
+                   unsigned int resize_width, unsigned int resize_height);
 
-  void init(const std::string &_class_net, const std::string &_class_model, float threshold,
-            unsigned int resize_width, unsigned int resize_height);
+  void init(const std::string &_class_net, const std::string &_class_model,
+            float threshold, unsigned int resize_width,
+            unsigned int resize_height);
 
   virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
 
@@ -42,7 +43,8 @@ class ClassifyBySimple : public IRefine {
   ~ClassifyBySimple();
 
  private:
-  void prob_to_color(const float *out_put_data, float threshold, LightPtr light);
+  void prob_to_color(const float *out_put_data, float threshold,
+                     LightPtr light);
   caffe::Net<float> *_classify_net_ptr;
   cv::Rect _crop_box;
   int _resize_width;
@@ -52,4 +54,4 @@ class ClassifyBySimple : public IRefine {
 }
 }
 }
-#endif //GREEN_CLASSIFY_H
+#endif  // GREEN_CLASSIFY_H

@@ -20,15 +20,14 @@
 #include <vector>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+// #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
 namespace apollo {
 namespace perception {
 
 class PbfBaseMotionFusion {
  public:
-  PbfBaseMotionFusion() : name_("PbfBaseMotionFusion"), initialized_(false) {
-  }
+  PbfBaseMotionFusion() : name_("PbfBaseMotionFusion"), initialized_(false) {}
   virtual ~PbfBaseMotionFusion() {}
 
   // @brief initialize the state of filter
@@ -48,8 +47,8 @@ class PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  virtual void Predict(Eigen::Vector3d &anchor_point,
-                       Eigen::Vector3d &velocity, const double time_diff) = 0;
+  virtual void Predict(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity,
+                       const double time_diff) = 0;
 
   // @brief update with measurements
   // @params[IN] new_object: new object for current update
@@ -67,7 +66,8 @@ class PbfBaseMotionFusion {
   // @params[OUT] anchor_point: current anchor_point
   // @params[OUT] velocity: current velocity
   // @return nothing
-  virtual void GetState(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity) = 0;
+  virtual void GetState(Eigen::Vector3d &anchor_point,
+                        Eigen::Vector3d &velocity) = 0;
 
   std::string name() {
     return name_;
@@ -84,7 +84,7 @@ class PbfBaseMotionFusion {
   bool initialized_;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H

@@ -39,9 +39,8 @@ class TLPreprocessingData : public CommonSharedData<ImageLights> {
   }
 };
 REGISTER_SHAREDDATA(TLPreprocessingData);
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
-

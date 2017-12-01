@@ -118,7 +118,7 @@ bool CNNSegmentation::Init() {
   CHECK(feature_blob_ != nullptr) << "`" << feature_blob_name
                                   << "` not exists!";
   // class prediction
-  string class_pt_blob_name = network_param.has_class_pt_blob() 
+  string class_pt_blob_name = network_param.has_class_pt_blob()
                                   ? network_param.class_pt_blob()
                                   : "class_score";
   class_pt_blob_ = caffe_net_->blob_by_name(class_pt_blob_name);

@@ -37,19 +37,19 @@ bool SequenceTypeFuser::Init() {
 
   // get the transition matrix
   std::string transition_property_file_path;
-  if (!model_config->GetValue("transition_property_file_path", 
-            &transition_property_file_path)) {
+  if (!model_config->GetValue("transition_property_file_path",
+                              &transition_property_file_path)) {
     AERROR << "Failed to find transition_property_file_path in config. ";
     return false;
   }
-  const std::string &work_root = ConfigManager::instance()->work_root();
-  transition_property_file_path = FileUtil::GetAbsolutePath(work_root, 
-          transition_property_file_path);
+  const std::string& work_root = ConfigManager::instance()->work_root();
+  transition_property_file_path =
+      FileUtil::GetAbsolutePath(work_root, transition_property_file_path);
 
-  if (!LoadSingleMatrixFile(transition_property_file_path, 
-            &_transition_matrix)) {
+  if (!LoadSingleMatrixFile(transition_property_file_path,
+                            &_transition_matrix)) {
     return false;
-  } 
+  }
   _transition_matrix += Matrixd::Ones() * 1e-6;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     NormalizeRow(&_transition_matrix);
@@ -65,15 +65,16 @@ bool SequenceTypeFuser::Init() {
 
   // get classifier property
   std::string classifiers_property_file_path;
-  if (!model_config->GetValue("classifiers_property_file_path", 
-            &classifiers_property_file_path)) {
+  if (!model_config->GetValue("classifiers_property_file_path",
+                              &classifiers_property_file_path)) {
     AERROR << "Failed to find classifiers_property_file_path in config. ";
     return false;
   }
-  classifiers_property_file_path = FileUtil::GetAbsolutePath(work_root, 
-          classifiers_property_file_path);
+  classifiers_property_file_path =
+      FileUtil::GetAbsolutePath(work_root, classifiers_property_file_path);
 
-  if (!LoadMultipleMatricesFile(classifiers_property_file_path, &_smooth_matrices)) {
+  if (!LoadMultipleMatricesFile(classifiers_property_file_path,
+                                &_smooth_matrices)) {
     return false;
   }
   for (auto& pair : _smooth_matrices) {
@@ -86,7 +87,7 @@ bool SequenceTypeFuser::Init() {
   _confidence_smooth_matrix = Matrixd::Identity();
   auto iter = _smooth_matrices.find("Confidence");
   if (iter != _smooth_matrices.end()) {
-    _confidence_smooth_matrix = iter->second; 
+    _confidence_smooth_matrix = iter->second;
     _smooth_matrices.erase(iter);
   }
   AINFO << "Confidence: ";
@@ -96,9 +97,8 @@ bool SequenceTypeFuser::Init() {
   return true;
 }
 
-bool SequenceTypeFuser::FuseType(
-            const TypeFuserOptions& options,
-            std::vector<ObjectPtr>* objects) {
+bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
+                                 std::vector<ObjectPtr>* objects) {
   if (objects == nullptr) {
     return false;
   }
@@ -114,10 +114,11 @@ bool SequenceTypeFuser::FuseType(
         continue;
       }
       const int& track_id = object->track_id;
-      _sequence.GetTrackInTemporalWindow(
-              track_id, &tracked_objects, _temporal_window);
-      //CHECK(tracked_objects.size() > 0) << "Empty track found";
-      //CHECK(object == tracked_objects.rbegin()->second) << "Inconsist objects found";
+      _sequence.GetTrackInTemporalWindow(track_id, &tracked_objects,
+                                         _temporal_window);
+      // CHECK(tracked_objects.size() > 0) << "Empty track found";
+      // CHECK(object == tracked_objects.rbegin()->second) << "Inconsist objects
+      // found";
       if (tracked_objects.size() == 0) {
         AERROR << "Find zero-length track, so skip.";
         continue;
@@ -135,16 +136,14 @@ bool SequenceTypeFuser::FuseType(
   return true;
 }
 
-bool SequenceTypeFuser::FuseWithCCRF(
-        TrackedObjects* tracked_objects) {
-
+bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
   if (tracked_objects == nullptr || tracked_objects->size() == 0) {
     return false;
   }
 
   // _current_timestamp = option.timestamp;
 
-  //LOG_INFO << "Enter fuse with conditional probability inference";
+  // LOG_INFO << "Enter fuse with conditional probability inference";
   _fused_oneshot_probs.resize(tracked_objects->size());
 
   std::size_t i = 0;
@@ -171,9 +170,9 @@ bool SequenceTypeFuser::FuseWithCCRF(
       double max_prob = -DBL_MAX;
       std::size_t id = 0;
       for (std::size_t left = 0; left < VALID_OBJECT_TYPE; ++left) {
-        prob = _fused_sequence_probs[i-1](left) 
-            + _transition_matrix(left, right) * _s_alpha
-            + _fused_oneshot_probs[i](right);
+        prob = _fused_sequence_probs[i - 1](left) +
+               _transition_matrix(left, right) * _s_alpha +
+               _fused_oneshot_probs[i](right);
         if (prob > max_prob) {
           max_prob = prob;
           id = left;
@@ -184,14 +183,15 @@ bool SequenceTypeFuser::FuseWithCCRF(
     }
   }
   ObjectPtr object = tracked_objects->rbegin()->second;
-  RecoverFromLogProb(&_fused_sequence_probs.back(), 
-          &object->type_probs, &object->type);
+  RecoverFromLogProb(&_fused_sequence_probs.back(), &object->type_probs,
+                     &object->type);
 
   if (_ccrf_debug) {
     ObjectPtr object = tracked_objects->rbegin()->second;
-    std::cout << "Track id: " << object->track_id 
-        << " length: " << tracked_objects->size() << std::endl;
-    // for (std::size_t i = 0; i < object->lidar_supplement->raw_probs.size(); ++i) {
+    std::cout << "Track id: " << object->track_id
+              << " length: " << tracked_objects->size() << std::endl;
+    // for (std::size_t i = 0; i < object->lidar_supplement->raw_probs.size();
+    // ++i) {
     //     sequence_type_fuser::PrintProbability(object->lidar_supplement->raw_probs[i],
     //             object->lidar_supplement->raw_classification_methods[i]);
     // }
@@ -207,8 +207,8 @@ bool SequenceTypeFuser::FuseWithCCRF(
   return true;
 }
 
-bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object, 
-        Vectord* log_prob) {
+bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
+                                          Vectord* log_prob) {
   using namespace sequence_type_fuser;
 
   if (object == nullptr || log_prob == nullptr) {
@@ -229,23 +229,23 @@ bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
   Normalize(&single_prob);
 
   double conf = object->score;
-  single_prob = conf * single_prob 
-          + (1.0 - conf) * _confidence_smooth_matrix * single_prob;
+  single_prob = conf * single_prob +
+                (1.0 - conf) * _confidence_smooth_matrix * single_prob;
   ToLog(&single_prob);
   *log_prob += single_prob;
   return true;
 }
 
-bool SequenceTypeFuser::RecoverFromLogProb(Vectord* prob, 
-        std::vector<float>* dst, ObjectType* type) {
+bool SequenceTypeFuser::RecoverFromLogProb(Vectord* prob,
+                                           std::vector<float>* dst,
+                                           ObjectType* type) {
   using namespace sequence_type_fuser;
 
   ToExp(prob);
   Normalize(prob);
   FromEigenVector(*prob, dst);
   *type = static_cast<ObjectType>(
-          std::distance(dst->begin(),
-              std::max_element(dst->begin(), dst->end())));
+      std::distance(dst->begin(), std::max_element(dst->begin(), dst->end())));
   return true;
 }
 
@@ -254,5 +254,3 @@ bool SequenceTypeFuser::RecoverFromLogProb(Vectord* prob,
 
 }  // namespace perception
 }  // namespace apollo
-    
-    

@@ -32,7 +32,7 @@ void ContiRadarIDExpansion::ExpandIds(ContiRadar &radar_obs) {
     ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
     int id = contiobs.obstacle_id();
     int meas_state = contiobs.meas_state();
-    if (/*_need_restart || */need_inner_restart_ || meas_state == CONTI_NEW) {
+    if (/*_need_restart || */ need_inner_restart_ || meas_state == CONTI_NEW) {
       int next_id = GetNextId();
       local2global_[id] = next_id;
     } else {
@@ -71,7 +71,7 @@ void ContiRadarIDExpansion::SetNeedRestart(const bool need_restart) {
   need_restart_ = need_restart;
 }
 
-void ContiRadarIDExpansion::UpdateTimestamp(const double& timestamp) {
+void ContiRadarIDExpansion::UpdateTimestamp(const double &timestamp) {
   need_restart_ = false;
   if (timestamp - timestamp_ > 0.1) {
     need_restart_ = true;
@@ -85,5 +85,5 @@ int ContiRadarIDExpansion::GetNextId() {
   return current_idx_;
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

@@ -33,6 +33,6 @@ std::ostream &operator<<(std::ostream &os, const CarPose &pose) {
   return os;
 }
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

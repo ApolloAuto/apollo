@@ -26,7 +26,7 @@ namespace perception {
 class ContiRadarIDExpansion {
  public:
   ContiRadarIDExpansion();
-  
+
   ~ContiRadarIDExpansion();
 
   void ExpandIds(ContiRadar &radar_obs);
@@ -35,11 +35,11 @@ class ContiRadarIDExpansion {
 
   void SetNeedRestart(const bool need_restart);
 
-  void UpdateTimestamp(const double& timestamp);
+  void UpdateTimestamp(const double &timestamp);
 
  private:
   int GetNextId();
- 
+
   int current_idx_;
   bool need_restart_;
   bool need_inner_restart_;
@@ -47,7 +47,7 @@ class ContiRadarIDExpansion {
   std::map<int, int> local2global_;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_MODEST_RADAR_CONTI_RADAR_ID_EXPANSION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_MODEST_RADAR_CONTI_RADAR_ID_EXPANSION_H_

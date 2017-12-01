@@ -18,10 +18,10 @@
 
 #include <std_msgs/String.h>
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -54,7 +54,7 @@ bool FusionSubnode::InitInternal() {
     return false;
   }
 
-  AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name(); 
+  AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name();
   return true;
 }
 
@@ -70,16 +70,14 @@ bool FusionSubnode::InitOutputStream() {
   }
   auto iter = reserve_field_map.find("pub_driven_event_id");
   if (iter == reserve_field_map.end()) {
-    AERROR << "Failed to find pub_driven_event_id:"
-                  << reserve_;
-      return false;
+    AERROR << "Failed to find pub_driven_event_id:" << reserve_;
+    return false;
   }
   pub_driven_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
 
   auto lidar_iter = reserve_field_map.find("lidar_event_id");
   if (lidar_iter == reserve_field_map.end()) {
-    AWARN << "Failed to find lidar_event_id:"
-                  << reserve_;
+    AWARN << "Failed to find lidar_event_id:" << reserve_;
     AINFO << "lidar_event_id will be set -1";
     lidar_event_id_ = -1;
   } else {
@@ -88,8 +86,7 @@ bool FusionSubnode::InitOutputStream() {
 
   auto radar_iter = reserve_field_map.find("radar_event_id");
   if (radar_iter == reserve_field_map.end()) {
-    AWARN << "Failed to find radar_event_id:"
-                  << reserve_;
+    AWARN << "Failed to find radar_event_id:" << reserve_;
     AINFO << "radar_event_id will be set -1";
     radar_event_id_ = -1;
   } else {
@@ -102,7 +99,7 @@ StatusCode FusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
-      AERROR << "event meta id:" << event_meta.event_id << " " 
+      AERROR << "event meta id:" << event_meta.event_id << " "
              << event_meta.from_node << " " << event_meta.to_node;
       return StatusCode::FAIL;
     }
@@ -113,8 +110,8 @@ StatusCode FusionSubnode::ProcEvents() {
 
     if (event_meta.event_id != pub_driven_event_id_) {
       ADEBUG << "Not pub_driven_event_id, skip to publish."
-             << " event_id:" << event_meta.event_id << " fused_obj_cnt:"
-             << objects_.size();
+             << " event_id:" << event_meta.event_id
+             << " fused_obj_cnt:" << objects_.size();
       continue;
     }
     // public obstacle message
@@ -123,8 +120,7 @@ StatusCode FusionSubnode::ProcEvents() {
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
     AINFO << "Publish 3d perception fused msg. timestamp:"
-          << GLOG_TIMESTAMP(timestamp_)
-          << " obj_cnt:" << objects_.size();
+          << GLOG_TIMESTAMP(timestamp_) << " obj_cnt:" << objects_.size();
   }
   return StatusCode::SUCC;
 }
@@ -157,14 +153,15 @@ StatusCode FusionSubnode::Process(const EventMeta &event_meta,
   return StatusCode::SUCC;
 }
 
-bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta, std::vector<Event> *events) const {
+bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
+                                    std::vector<Event> *events) const {
   Event event;
   if (event_meta.event_id == pub_driven_event_id_) {
     if (event_manager_->Subscribe(event_meta.event_id, &event, false)) {
       events->push_back(event);
     } else {
       return false;
-    }    
+    }
   } else {
     // no blocking
     while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
@@ -199,22 +196,21 @@ bool FusionSubnode::BuildSensorObjs(
   return true;
 }
 
-bool FusionSubnode::GetSharedData(
-    const Event &event,
-    std::shared_ptr<SensorObjects> *objs) const {
+bool FusionSubnode::GetSharedData(const Event &event,
+                                  std::shared_ptr<SensorObjects> *objs) const {
   double timestamp = event.timestamp;
   const std::string &device_id = event.reserve;
   std::string data_key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &data_key)) {
     AERROR << "Failed to produce shared data key. EventID:" << event.event_id
-           << " timestamp:" << timestamp
-           << " device_id:" << device_id;
+           << " timestamp:" << timestamp << " device_id:" << device_id;
     return false;
   }
   bool get_data_succ = false;
   if (event.event_id == lidar_event_id_ && lidar_object_data_ != nullptr) {
     get_data_succ = lidar_object_data_->Get(data_key, objs);
-  } else if (event.event_id == radar_event_id_ && radar_object_data_ != nullptr) {
+  } else if (event.event_id == radar_event_id_ &&
+             radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
   } else {
     AERROR << "Event id is not supported. event:" << event.to_string();
@@ -229,8 +225,7 @@ bool FusionSubnode::GetSharedData(
 
 bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-      FLAGS_obstacle_module_name,
-      obstacles);
+      FLAGS_obstacle_module_name, obstacles);
   common::Header *header = obstacles->mutable_header();
   header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
   header->set_camera_timestamp(0);

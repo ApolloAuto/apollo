@@ -29,11 +29,9 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-struct RecognizeOption {
+struct RecognizeOption {};
 
-};
-
-//@brief Recognizer classify the light color. 
+//@brief Recognizer classify the light color.
 class BaseRecognizer {
  public:
   BaseRecognizer() = default;
@@ -47,7 +45,8 @@ class BaseRecognizer {
   // @param [in] const Image&: input image
   // @param [in/out] std::vector<Light>*: recognized light status
   // @return  bool
-  virtual bool RecognizeStatus(const Image &image, const RecognizeOption &option,
+  virtual bool RecognizeStatus(const Image &image,
+                               const RecognizeOption &option,
                                std::vector<LightPtr> *lights) = 0;
 
   virtual std::string name() const = 0;

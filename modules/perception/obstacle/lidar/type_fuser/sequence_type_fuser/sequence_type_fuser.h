@@ -16,8 +16,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
 
-#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/common/object_sequence.h"
+#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/util.h"
 
 namespace apollo {
@@ -43,25 +43,30 @@ class SequenceTypeFuser : public BaseTypeFuser {
   }
 
  protected:
-  // The fusion problem is modeled as inferring the discrete state in a chain CRFs. 
-  // Note, log(P({X}|O)) = sigma_i{E_unary(X_i,O)} + sigma_ij{E_pairwise(X_i,X_j)} - logZ;
-  // E_unary(X_i,O) = sigma{logP(classifier)}, E_pairwise(X_i,X_j) = logTransition(X_i,X_j)
-  // Maximize the sequence probability P(X_t|{X}^opt,O) based on optimal state inference.
+  // The fusion problem is modeled as inferring the discrete state in a chain
+  // CRFs.
+  // Note, log(P({X}|O)) = sigma_i{E_unary(X_i,O)} +
+  // sigma_ij{E_pairwise(X_i,X_j)} - logZ;
+  // E_unary(X_i,O) = sigma{logP(classifier)}, E_pairwise(X_i,X_j) =
+  // logTransition(X_i,X_j)
+  // Maximize the sequence probability P(X_t|{X}^opt,O) based on optimal state
+  // inference.
   bool FuseWithCCRF(TrackedObjects* tracked_objects);
 
   bool RectifyObjectType(const ObjectPtr& object, Vectord* log_prob);
 
-  bool RecoverFromLogProb(Vectord* prob, std::vector<float>* dst, ObjectType* type);
+  bool RecoverFromLogProb(Vectord* prob, std::vector<float>* dst,
+                          ObjectType* type);
 
  protected:
-  ObjectSequence _sequence;   
+  ObjectSequence _sequence;
 
   double _temporal_window;
 
   // Note all probabilities are in the log space
   Matrixd _transition_matrix;
-  std::vector<Vectord> _fused_oneshot_probs; 
-  std::vector<Vectord> _fused_sequence_probs; 
+  std::vector<Vectord> _fused_oneshot_probs;
+  std::vector<Vectord> _fused_sequence_probs;
   std::vector<Vectori> _state_back_trace;
 
   std::map<std::string, Matrixd> _smooth_matrices;

@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <map>
-#include <vector>
-#include <string>
-#include <array>
 #include <gflags/gflags.h>
+#include <array>
+#include <map>
+#include <string>
+#include <vector>
 
-#include "ros/ros.h"
-#include "ros/meta_stats.h"
-#include <std_msgs/String.h>
-#include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include <sensor_msgs/Image.h>
+#include <std_msgs/String.h>
 #include <opencv2/opencv.hpp>
+#include "ros/meta_stats.h"
+#include "ros/ros.h"
 
 #include "modules/perception/onboard/stream_output.h"
 
+#include <modules/perception/traffic_light_detection.pb.h>
 #include "modules/perception/lib/base/perf.h"
 #include "modules/perception/lib/base/time_util.h"
-#include <modules/perception/traffic_light_detection.pb.h>
 #include "modules/perception/traffic_light/base/image_lights.h"
 
 using apollo::perception::traffic_light::Image;
@@ -45,17 +45,15 @@ static std::map<std::string, cv::Scalar> s_color_table = {
     {std::string("unknown_light_box"), cv::Scalar(0, 76, 153)},
     {std::string("projection_roi"), cv::Scalar(255, 255, 0)},
     {std::string("crop_roi"), cv::Scalar(0, 255, 255)},
-    {std::string("debug_roi"), cv::Scalar(255, 169, 255)}
-};
+    {std::string("debug_roi"), cv::Scalar(255, 169, 255)}};
 
 static std::map<std::string, CameraId> s_camera_id_map = {
     {std::string("222"), CameraId::LONG_FOCUS},
     {std::string("111"), CameraId::SHORT_FOCUS},
     {std::string("444"), CameraId::NARROW_FOCUS},
-    {std::string("333"), CameraId::WIDE_FOCUS}
-};
+    {std::string("333"), CameraId::WIDE_FOCUS}};
 
-static std::vector<std::shared_ptr<Image> > s_cached_images;
+static std::vector<std::shared_ptr<Image>> s_cached_images;
 const int MAX_CACHED_IMAGES_NUM = 100;
 
 static cv::Mat s_img(1080, 1920, CV_8UC3, cv::Scalar(128, 128, 128));
@@ -75,7 +73,6 @@ int main(int argc, char **argv) {
   if (g_output_stream == nullptr ||
       !g_output_stream->register_publisher<sensor_msgs::Image>(
           "sink_type=9&sink_name=/perception/traffic_light_debug")) {
-
     return -1;
   }
 
@@ -85,14 +82,14 @@ int main(int argc, char **argv) {
 
   ros::Subscriber sub_tl_debug =
       n.subscribe("/perception/traffic_light_status", 1000, tl_debug_callback);
-  ros::Subscriber sub_tl_image_long =
-      n.subscribe("/sensor/camera/traffic/image_long", 1000, tl_image_long_callback);
-  ros::Subscriber sub_tl_image_short =
-      n.subscribe("/sensor/camera/traffic/image_short", 1000, tl_image_short_callback);
-  ros::Subscriber sub_tl_image_narrow =
-      n.subscribe("/sensor/camera/obstacle/image_narrow", 1000, tl_image_narrow_callback);
-  ros::Subscriber sub_tl_image_wide =
-      n.subscribe("/sensor/camera/obstacle/image_wide", 1000, tl_image_wide_callback);
+  ros::Subscriber sub_tl_image_long = n.subscribe(
+      "/sensor/camera/traffic/image_long", 1000, tl_image_long_callback);
+  ros::Subscriber sub_tl_image_short = n.subscribe(
+      "/sensor/camera/traffic/image_short", 1000, tl_image_short_callback);
+  ros::Subscriber sub_tl_image_narrow = n.subscribe(
+      "/sensor/camera/obstacle/image_narrow", 1000, tl_image_narrow_callback);
+  ros::Subscriber sub_tl_image_wide = n.subscribe(
+      "/sensor/camera/obstacle/image_wide", 1000, tl_image_wide_callback);
 
   ros::spin();
   cv::destroyAllWindows();
@@ -103,7 +100,7 @@ int main(int argc, char **argv) {
 void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   apollo::perception::TrafficLightDetection tl_result;
   tl_result.ParseFromString(msg->data);
-  //ROS_INFO("I heard: [%s]", tl_result.ShortDebugString().c_str());
+  // ROS_INFO("I heard: [%s]", tl_result.ShortDebugString().c_str());
 
   auto img_ts = tl_result.header().camera_timestamp() / 1000000000.0;
   auto ts_str = std::to_string(tl_result.header().camera_timestamp());
@@ -130,46 +127,37 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   if (signals_num > 0 && tl_debug_msg.has_cropbox()) {
     // crop roi
     auto crop_box = tl_debug_msg.cropbox();
-    cv::Rect cv_crop_rect(
-        crop_box.x(),
-        crop_box.y(),
-        crop_box.width(),
-        crop_box.height());
+    cv::Rect cv_crop_rect(crop_box.x(), crop_box.y(), crop_box.width(),
+                          crop_box.height());
     cv::rectangle(s_img, cv_crop_rect, s_color_table["crop_roi"], 2);
 
     // debug roi
     for (int box_idx = signals_num * 2; box_idx < box_size; ++box_idx) {
       auto debug_roi_box = tl_debug_msg.box(box_idx);
-      cv::Rect cv_debug_roi_box(
-          debug_roi_box.x(),
-          debug_roi_box.y(),
-          debug_roi_box.width(),
-          debug_roi_box.height());
+      cv::Rect cv_debug_roi_box(debug_roi_box.x(), debug_roi_box.y(),
+                                debug_roi_box.width(), debug_roi_box.height());
       cv::rectangle(s_img, cv_debug_roi_box, s_color_table["debug_roi"], 2);
     }
 
     // projection roi
     for (int box_idx = signals_num; box_idx < signals_num * 2; ++box_idx) {
       auto projection_box = tl_debug_msg.box(box_idx);
-      cv::Rect cv_projection_box(
-          projection_box.x(),
-          projection_box.y(),
-          projection_box.width(),
-          projection_box.height());
-      cv::rectangle(s_img, cv_projection_box, s_color_table["projection_roi"], 2);
+      cv::Rect cv_projection_box(projection_box.x(), projection_box.y(),
+                                 projection_box.width(),
+                                 projection_box.height());
+      cv::rectangle(s_img, cv_projection_box, s_color_table["projection_roi"],
+                    2);
     }
 
     // rectified roi
     for (int box_idx = 0; box_idx < signals_num; ++box_idx) {
       auto rectified_box = tl_debug_msg.box(box_idx);
-      cv::Rect cv_rectified_box(
-          rectified_box.x(),
-          rectified_box.y(),
-          rectified_box.width(),
-          rectified_box.height());
+      cv::Rect cv_rectified_box(rectified_box.x(), rectified_box.y(),
+                                rectified_box.width(), rectified_box.height());
       cv::Scalar color;
       switch (rectified_box.color()) {
-        case apollo::perception::TrafficLight::RED:color = s_color_table["red_light_box"];
+        case apollo::perception::TrafficLight::RED:
+          color = s_color_table["red_light_box"];
           break;
         case apollo::perception::TrafficLight::GREEN:
           color = s_color_table["green_light_box"];
@@ -180,7 +168,8 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
         case apollo::perception::TrafficLight::YELLOW:
           color = s_color_table["yellow_light_box"];
           break;
-        default:color = s_color_table["unknown_light_box"];
+        default:
+          color = s_color_table["unknown_light_box"];
           break;
       }
 
@@ -191,25 +180,22 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   // draw camera timestamp
   int pos_y = 40;
   std::string ts_text = cv::format("img ts=%lf", img_ts);
-  cv::putText(s_img, ts_text, cv::Point(30, pos_y),
-              cv::FONT_HERSHEY_PLAIN,
-              3.0, CV_RGB(128, 255, 0), 2);
+  cv::putText(s_img, ts_text, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN, 3.0,
+              CV_RGB(128, 255, 0), 2);
   // draw distance to stopline
   pos_y += 50;
   double distance = tl_debug_msg.distance_to_stop_line();
   if (signals_num > 0) {
     std::string dis2sl_text = cv::format("dis2sl=%lf", distance);
     cv::putText(s_img, dis2sl_text, cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN,
-                3.0, CV_RGB(128, 255, 0), 2);
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(128, 255, 0), 2);
   }
 
   // draw "Signals Num"
   pos_y += 50;
   if (tl_debug_msg.valid_pos()) {
     std::string signal_txt = "Signals Num: " + std::to_string(signals_num);
-    cv::putText(s_img, signal_txt, cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN,
+    cv::putText(s_img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
                 3.0, CV_RGB(255, 0, 0), 2);
   }
 
@@ -217,26 +203,21 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   pos_y += 50;
   if (!tl_debug_msg.valid_pos()) {
     cv::putText(s_img, "No Valid Pose.", cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN,
-                3.0, CV_RGB(255, 0, 0), 2);
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
 
     // if image's timestamp is too early or too old
     // draw timestamp difference between image and pose
     pos_y += 50;
     std::string diff_img_pose_ts_str =
         "ts diff: " + std::to_string(tl_debug_msg.ts_diff_pos());
-    cv::putText(s_img, diff_img_pose_ts_str,
-                cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN,
-                3.0, CV_RGB(255, 0, 0), 2);
+    cv::putText(s_img, diff_img_pose_ts_str, cv::Point(30, pos_y),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
 
     pos_y += 50;
     std::string diff_img_sys_ts_str =
         "ts diff sys: " + std::to_string(tl_debug_msg.ts_diff_sys());
-    cv::putText(s_img, diff_img_sys_ts_str,
-                cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN,
-                3.0, CV_RGB(255, 0, 0), 2);
+    cv::putText(s_img, diff_img_sys_ts_str, cv::Point(30, pos_y),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
   }
 
   // draw image border size (offset between hdmap-box and detection-box)
@@ -245,10 +226,8 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
     if (tl_debug_msg.project_error() > 100) {
       std::string img_border_txt =
           "Offset size: " + std::to_string(tl_debug_msg.project_error());
-      cv::putText(s_img, img_border_txt,
-                  cv::Point(30, pos_y_offset),
-                  cv::FONT_HERSHEY_PLAIN,
-                  3.0, CV_RGB(255, 0, 0), 2);
+      cv::putText(s_img, img_border_txt, cv::Point(30, pos_y_offset),
+                  cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
     }
   }
 
@@ -257,8 +236,8 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   cv::waitKey(1);
 
   // publish image
-  auto img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", s_img)
-      .toImageMsg();
+  auto img_msg =
+      cv_bridge::CvImage(std_msgs::Header(), "bgr8", s_img).toImageMsg();
   if (!g_output_stream->publish<sensor_msgs::Image>(img_msg)) {
     std::cerr << "TLOutputSubnode publish debug image message failed. ";
     return;
@@ -282,11 +261,12 @@ void tl_image_long_callback(const sensor_msgs::ImageConstPtr &msg) {
     return;
   }
 
-  //cv::Mat img = cv_ptr->image;
-  //cv::imshow("tl_image_long", img);
+  // cv::Mat img = cv_ptr->image;
+  // cv::imshow("tl_image_long", img);
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->Init(msg->header.stamp.toSec(), CameraId::LONG_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::LONG_FOCUS,
+                   cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);
@@ -314,7 +294,8 @@ void tl_image_short_callback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->Init(msg->header.stamp.toSec(), CameraId::SHORT_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::SHORT_FOCUS,
+                   cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);
@@ -342,7 +323,8 @@ void tl_image_narrow_callback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->Init(msg->header.stamp.toSec(), CameraId::NARROW_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::NARROW_FOCUS,
+                   cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);
@@ -370,7 +352,8 @@ void tl_image_wide_callback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   std::shared_ptr<Image> image(new Image);
-  if (!image->Init(msg->header.stamp.toSec(), CameraId::WIDE_FOCUS, cv_ptr->image)) {
+  if (!image->Init(msg->header.stamp.toSec(), CameraId::WIDE_FOCUS,
+                   cv_ptr->image)) {
     std::cerr << "tl_visualizer load image failed.";
   }
   s_cached_images.push_back(image);

@@ -57,7 +57,7 @@ DECLARE_string(onboard_fusion);
 /// traffic_light/onboard/preprocessor.cc
 DECLARE_double(forward_signal_distance);
 
-///perception.cc
+/// perception.cc
 DECLARE_string(dag_config_path);
 
 #endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */

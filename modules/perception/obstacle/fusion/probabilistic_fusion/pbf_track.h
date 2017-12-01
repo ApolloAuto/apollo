@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
 
+#include "gtest/gtest.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +34,8 @@ class PbfTrack {
   void UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist);
 
   void UpdateWithoutSensorObject(const SensorType &sensor_type,
-                                 const std::string &sensor_id, double min_match_dist, double timestamp);
+                                 const std::string &sensor_id,
+                                 double min_match_dist, double timestamp);
 
   PbfSensorObjectPtr GetFusedObject();
 
@@ -108,13 +109,15 @@ class PbfTrack {
 
   void PerformMotionFusion(PbfSensorObjectPtr obj);
 
-  void UpdateMeasurementsLifeWithMeasurement(std::map<std::string, PbfSensorObjectPtr> &objects,
-                                             const std::string &sensor_id,
-                                             double timestamp, double max_invisible_time);
+  void UpdateMeasurementsLifeWithMeasurement(
+      std::map<std::string, PbfSensorObjectPtr> &objects,
+      const std::string &sensor_id, double timestamp,
+      double max_invisible_time);
 
-  void UpdateMeasurementsLifeWithoutMeasurement(std::map<std::string, PbfSensorObjectPtr> &objects,
-                                                const std::string &sensor_id,
-                                                double timestamp, double max_invisible_time, bool &invisible_state);
+  void UpdateMeasurementsLifeWithoutMeasurement(
+      std::map<std::string, PbfSensorObjectPtr> &objects,
+      const std::string &sensor_id, double timestamp, double max_invisible_time,
+      bool &invisible_state);
 
  protected:
   PbfSensorObjectPtr fused_object_;
@@ -139,19 +142,20 @@ class PbfTrack {
   std::map<std::string, PbfSensorObjectPtr> radar_objects_;
 
   bool is_dead_;
+
  private:
   PbfTrack();
 
  private:
   static int s_track_idx_;
-  //invisible period for different sensors
+  // invisible period for different sensors
   static double s_max_lidar_invisible_period_;
   static double s_max_radar_invisible_period_;
-  //radar confidant regions
+  // radar confidant regions
   static double s_max_radar_confident_angle_;
   static double s_min_radar_confident_distance_;
   static std::string s_motion_fusion_method_;
-  //publish conditions
+  // publish conditions
   static bool s_publish_if_has_lidar_;
   static bool s_publish_if_has_radar_;
   FRIEND_TEST(PbfTrackTest, test_pbf_track_constructor);
@@ -161,7 +165,7 @@ class PbfTrack {
 
 typedef std::shared_ptr<PbfTrack> PbfTrackPtr;
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_

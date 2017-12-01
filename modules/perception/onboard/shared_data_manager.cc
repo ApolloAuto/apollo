@@ -30,8 +30,8 @@ bool SharedDataManager::Init(const DAGConfig::SharedDataConfig &data_config) {
     return true;
   }
 
-  for (auto& proto : data_config.datas()) {
-    SharedData* shared_data =
+  for (auto &proto : data_config.datas()) {
+    SharedData *shared_data =
         SharedDataRegisterer::GetInstanceByName(proto.name());
 
     if (shared_data == NULL) {

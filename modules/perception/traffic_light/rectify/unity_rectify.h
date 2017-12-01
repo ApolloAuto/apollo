@@ -16,9 +16,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
 
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -40,7 +40,8 @@ class UnityRectify : public BaseRectifier {
 
   bool InitDetection(const ConfigManager *config_manager,
                      const ModelConfig *model_config,
-                     std::shared_ptr<IRefine> *detection, std::shared_ptr<IGetBox> *crop);
+                     std::shared_ptr<IRefine> *detection,
+                     std::shared_ptr<IGetBox> *crop);
 
   // @brief name
   virtual std::string name() const;
@@ -56,4 +57,4 @@ REGISTER_RECTIFIER(UnityRectify);
 }
 }
 
-#endif //PERCEPTION_DENSEBOXRECTIFY_H
+#endif  // PERCEPTION_DENSEBOXRECTIFY_H

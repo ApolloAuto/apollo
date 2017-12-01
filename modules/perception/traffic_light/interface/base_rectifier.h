@@ -31,9 +31,10 @@ struct RectifyOption {
   CameraId camera_id = UNKNOWN;
 };
 
-//@brief Rectifier receives the Region of lights from HD-Map, 
+//@brief Rectifier receives the Region of lights from HD-Map,
 //       While the region may be too large or not accuray.
-//       Rectifier should rectify the region, send the accuray regions to classifier.
+//       Rectifier should rectify the region, send the accuray regions to
+//       classifier.
 class BaseRectifier {
  public:
   BaseRectifier() = default;

@@ -20,9 +20,8 @@ namespace apollo {
 namespace perception {
 
 bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
-                 const ContiParams &params,
-                 const int delay_frames,
-                 int &tracking_times) {
+                          const ContiParams &params, const int delay_frames,
+                          int &tracking_times) {
   int cls = contiobs.obstacle_class();
   if (tracking_times < delay_frames * 2) {
     const double &lo_vel_rms = contiobs.longitude_vel_rms();
@@ -34,9 +33,9 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
       if (probexist < params.probexist_vehicle) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_vehicle ||
-          la_vel_rms > params.la_vel_rms_vehicle ||
-          lo_dist_rms > params.lo_dist_rms_vehicle ||
-          la_dist_rms > params.la_dist_rms_vehicle) {
+                 la_vel_rms > params.la_vel_rms_vehicle ||
+                 lo_dist_rms > params.lo_dist_rms_vehicle ||
+                 la_dist_rms > params.la_dist_rms_vehicle) {
         return true;
       } else if (tracking_times <= delay_frames) {
         return true;
@@ -45,27 +44,28 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
       if (probexist < params.probexist_pedestrian) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_pedestrian ||
-          la_vel_rms > params.la_vel_rms_pedestrian ||
-          lo_dist_rms > params.lo_dist_rms_pedestrian ||
-          la_dist_rms > params.la_dist_rms_pedestrian) {
+                 la_vel_rms > params.la_vel_rms_pedestrian ||
+                 lo_dist_rms > params.lo_dist_rms_pedestrian ||
+                 la_dist_rms > params.la_dist_rms_pedestrian) {
         return true;
       }
     } else if (cls == CONTI_MOTOCYCLE || cls == CONTI_BICYCLE) {
       if (probexist < params.probexist_bicycle) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_bicycle ||
-          la_vel_rms > params.la_vel_rms_bicycle ||
-          lo_dist_rms > params.lo_dist_rms_bicycle ||
-          la_dist_rms > params.la_dist_rms_bicycle) {
+                 la_vel_rms > params.la_vel_rms_bicycle ||
+                 lo_dist_rms > params.lo_dist_rms_bicycle ||
+                 la_dist_rms > params.la_dist_rms_bicycle) {
         return true;
       }
-    } else if (cls == CONTI_POINT || cls == CONTI_WIDE || cls == CONTI_UNKNOWN) {
+    } else if (cls == CONTI_POINT || cls == CONTI_WIDE ||
+               cls == CONTI_UNKNOWN) {
       if (probexist < params.probexist_unknown) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_unknown ||
-          la_vel_rms > params.la_vel_rms_unknown ||
-          lo_dist_rms > params.lo_dist_rms_unknown ||
-          la_dist_rms > params.la_dist_rms_unknown) {
+                 la_vel_rms > params.la_vel_rms_unknown ||
+                 lo_dist_rms > params.lo_dist_rms_unknown ||
+                 la_dist_rms > params.la_dist_rms_unknown) {
         return true;
       } else if (tracking_times <= delay_frames) {
         return true;
@@ -80,6 +80,5 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
   }
   return false;
 }
-
 }
 }

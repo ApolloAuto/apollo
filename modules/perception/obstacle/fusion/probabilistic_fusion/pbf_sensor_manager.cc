@@ -25,9 +25,7 @@ PbfSensorManager *PbfSensorManager::Instance() {
   return &sensor_manager;
 }
 
-PbfSensorManager::PbfSensorManager() {
-
-}
+PbfSensorManager::PbfSensorManager() {}
 
 PbfSensorManager::~PbfSensorManager() {
   std::map<std::string, PbfSensor *>::iterator it = sensors_.begin();
@@ -41,7 +39,6 @@ PbfSensorManager::~PbfSensorManager() {
 }
 
 bool PbfSensorManager::Init() {
-
   sensors_.clear();
 
   std::string sensor_id = GetSensorType(VELODYNE_64);
@@ -54,7 +51,7 @@ bool PbfSensorManager::Init() {
   type = RADAR;
   PbfSensor *radar = new PbfSensor(type, sensor_id);
   sensors_[sensor_id] = radar;
-  //TODO: init from sensor configuration file
+  // TODO: init from sensor configuration file
   return true;
 }
 
@@ -76,9 +73,9 @@ void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
   sensor->AddFrame(objects);
 }
 
-void PbfSensorManager::GetLatestSensorFrames(double time_stamp,
-                                             const std::string &sensor_id,
-                                             std::vector<PbfSensorFramePtr> *frames) {
+void PbfSensorManager::GetLatestSensorFrames(
+    double time_stamp, const std::string &sensor_id,
+    std::vector<PbfSensorFramePtr> *frames) {
   if (frames == nullptr) {
     return;
   }
@@ -103,8 +100,8 @@ void PbfSensorManager::GetLatestFrames(const double time_stamp,
       frames->push_back(frame);
     }
   }
-  for (int i = 0; i < (int) frames->size() - 1; i++) {
-    for (int j = i + 1; j < (int) frames->size(); j++) {
+  for (int i = 0; i < (int)frames->size() - 1; i++) {
+    for (int j = i + 1; j < (int)frames->size(); j++) {
       if ((*frames)[j]->timestamp < (*frames)[i]->timestamp) {
         PbfSensorFramePtr tf = (*frames)[i];
         (*frames)[i] = (*frames)[j];
@@ -123,8 +120,8 @@ PbfSensor *PbfSensorManager::GetSensor(const std::string &sensor_id) {
   return sensor;
 }
 
-bool PbfSensorManager::GetPose(const std::string &sensor_id,
-                               double time_stamp, Eigen::Matrix4d *pose) {
+bool PbfSensorManager::GetPose(const std::string &sensor_id, double time_stamp,
+                               Eigen::Matrix4d *pose) {
   if (pose == nullptr) {
     AERROR << "output parameter pose is nullptr";
     return false;
@@ -140,5 +137,5 @@ bool PbfSensorManager::GetPose(const std::string &sensor_id,
   return sensor->GetPose(time_stamp, pose);
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

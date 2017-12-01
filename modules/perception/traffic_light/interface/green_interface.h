@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H
 
-#include <vector>
 #include <opencv2/opencv.hpp>
+#include <vector>
 #include "modules/perception/traffic_light/base/light.h"
 
 namespace apollo {
@@ -27,34 +27,33 @@ namespace traffic_light {
 // class-wrapper
 class ISelectLight {
  public:
-  virtual void Select(const cv::Mat &ros_image, const std::vector<LightPtr> &hdmap_bboxes,
+  virtual void Select(const cv::Mat &ros_image,
+                      const std::vector<LightPtr> &hdmap_bboxes,
                       const std::vector<LightPtr> &refined_bboxes,
                       std::vector<LightPtr> *selected_bboxes) = 0;
 };
 
 class IRefine {
  public:
-  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) = 0;
+  virtual void Perform(const cv::Mat &ros_image,
+                       std::vector<LightPtr> *lights) = 0;
 
   virtual void SetCropBox(const cv::Rect &box) = 0;
 };
 
 class IGetBox {
  public:
-  virtual void
-  GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
-             cv::Rect *cropbox) = 0;
+  virtual void GetCropBox(const cv::Size &size,
+                          const std::vector<LightPtr> &lights,
+                          cv::Rect *cropbox) = 0;
 };
 class DummyRefine : public IRefine {
  public:
-  void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights) override {
-
-  }
-  void SetCropBox(const cv::Rect &box) override {
-
-  }
+  void Perform(const cv::Mat &ros_image,
+               std::vector<LightPtr> *lights) override {}
+  void SetCropBox(const cv::Rect &box) override {}
 };
 }
 }
 }
-#endif //GREEN_INTERFACE_H
+#endif  // GREEN_INTERFACE_H

@@ -25,11 +25,11 @@ void RadarTrackManager::Process(const SensorObjects &radar_obs) {
 }
 
 void RadarTrackManager::Update(SensorObjects &radar_obs) {
-  std::vector<std::pair<int, int> > assignment;
+  std::vector<std::pair<int, int>> assignment;
   std::vector<int> unassigned_track;
   std::vector<int> unassigned_obs;
-  AssignTrackObsIdMatch(radar_obs, assignment,
-                        unassigned_track, unassigned_obs);
+  AssignTrackObsIdMatch(radar_obs, assignment, unassigned_track,
+                        unassigned_obs);
   UpdateAssignedTrack(radar_obs, assignment);
   UpdateUnassignedTrack(radar_obs.timestamp, unassigned_track);
   DeleteLostTrack();
@@ -38,9 +38,8 @@ void RadarTrackManager::Update(SensorObjects &radar_obs) {
 
 void RadarTrackManager::AssignTrackObsIdMatch(
     const SensorObjects &radar_obs,
-    std::vector<std::pair<int, int> > &assignment,
-    std::vector<int> &unassigned_track,
-    std::vector<int> &unassigned_obs) {
+    std::vector<std::pair<int, int>> &assignment,
+    std::vector<int> &unassigned_track, std::vector<int> &unassigned_obs) {
   assignment.resize(obs_track_.size() * 2);
   int assignment_num = 0;
   std::vector<bool> track_used(obs_track_.size(), false);
@@ -54,8 +53,8 @@ void RadarTrackManager::AssignTrackObsIdMatch(
     double timestamp_track = obs_track_[i].GetTimestamp();
     double timestamp_obs = radar_obs.timestamp;
     for (size_t j = 0; j < radar_obs.objects.size(); j++) {
-      double distance = DistanceBetweenObs(*obs, timestamp_track,
-                                           *(radar_obs.objects[j]), timestamp_obs);
+      double distance = DistanceBetweenObs(
+          *obs, timestamp_track, *(radar_obs.objects[j]), timestamp_obs);
       if (obs->track_id == radar_obs.objects[j]->track_id &&
           distance < RADAR_TRACK_THRES) {
         assignment[assignment_num++] = std::make_pair(i, j);
@@ -88,7 +87,7 @@ void RadarTrackManager::AssignTrackObsIdMatch(
 
 void RadarTrackManager::UpdateAssignedTrack(
     const SensorObjects &radar_obs,
-    const std::vector<std::pair<int, int> > &assignment) {
+    const std::vector<std::pair<int, int>> &assignment) {
   for (size_t i = 0; i < assignment.size(); i++) {
     obs_track_[assignment[i].first].UpdataObsRadar(
         radar_obs.objects[assignment[i].second], radar_obs.timestamp);
@@ -96,8 +95,7 @@ void RadarTrackManager::UpdateAssignedTrack(
 }
 
 void RadarTrackManager::UpdateUnassignedTrack(
-    const double &timestamp,
-    std::vector<int> &unassigned_track) {
+    const double &timestamp, std::vector<int> &unassigned_track) {
   double time_stamp = timestamp;
   for (size_t i = 0; i < unassigned_track.size(); i++) {
     if (obs_track_[unassigned_track[i]].GetObsRadar() != nullptr) {
@@ -120,21 +118,21 @@ void RadarTrackManager::DeleteLostTrack() {
   obs_track_.resize(track_num);
 }
 
-void RadarTrackManager::CreateNewTrack(
-    const SensorObjects &radar_obs,
-    std::vector<int> &unassigned_obs) {
+void RadarTrackManager::CreateNewTrack(const SensorObjects &radar_obs,
+                                       std::vector<int> &unassigned_obs) {
   for (size_t i = 0; i < unassigned_obs.size(); i++) {
-    obs_track_.push_back(
-        RadarTrack(*(radar_obs.objects[unassigned_obs[i]]), radar_obs.timestamp));
+    obs_track_.push_back(RadarTrack(*(radar_obs.objects[unassigned_obs[i]]),
+                                    radar_obs.timestamp));
   }
 }
 
-double RadarTrackManager::DistanceBetweenObs(
-    const Object &obs1, double timestamp1,
-    const Object &obs2, double timestamp2) {
+double RadarTrackManager::DistanceBetweenObs(const Object &obs1,
+                                             double timestamp1,
+                                             const Object &obs2,
+                                             double timestamp2) {
   double time_diff = timestamp2 - timestamp1;
   return (obs2.center - obs1.center - obs1.velocity * time_diff).head(2).norm();
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

@@ -36,11 +36,11 @@ std::string GetSensorType(SensorType sensor_type) {
 }
 
 bool is_lidar(SensorType sensor_type) {
-    return (sensor_type == VELODYNE_64);
+  return (sensor_type == VELODYNE_64);
 }
 
 bool is_radar(SensorType sensor_type) {
-    return (sensor_type == RADAR);
+  return (sensor_type == RADAR);
 }
 
 }  // namespace perception

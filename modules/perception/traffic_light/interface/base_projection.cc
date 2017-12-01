@@ -22,14 +22,12 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-DEFINE_string(traffic_light_projection,
-"",
-"the projection enabled for traffic_light");
+DEFINE_string(traffic_light_projection, "",
+              "the projection enabled for traffic_light");
 
 bool CameraCoeffient::init(const std::string &camera_type,
                            const std::string &camera_extrinsic_file_name,
                            const std::string &camera_intrinsic_file_name) {
-
   camera_type_str = camera_type;
 
   try {
@@ -39,7 +37,8 @@ bool CameraCoeffient::init(const std::string &camera_type,
       return false;
     }
 
-    if (!init_camera_intrinsic_matrix_and_distort_params(camera_intrinsic_file_name)) {
+    if (!init_camera_intrinsic_matrix_and_distort_params(
+            camera_intrinsic_file_name)) {
       AERROR << camera_type_str << " init failed. camera intrinsic matrix file:"
              << camera_intrinsic_file_name;
       return false;
@@ -52,14 +51,15 @@ bool CameraCoeffient::init(const std::string &camera_type,
   return true;
 }
 
-bool CameraCoeffient::init_camera_extrinsic_matrix(const std::string &file_name) {
-
+bool CameraCoeffient::init_camera_extrinsic_matrix(
+    const std::string &file_name) {
   if (!load_transformation_matrix_from_file(file_name, &camera_extrinsic) &&
       !load_matrix4d_from_file(file_name, "T", &camera_extrinsic)) {
     AERROR << "Load camera_extrinsic matrix file failed. file:" << file_name;
     return false;
   }
-  AINFO << camera_type_str << " camera_extrinsic matrix is:" << camera_extrinsic;
+  AINFO << camera_type_str
+        << " camera_extrinsic matrix is:" << camera_extrinsic;
   return true;
 }
 
@@ -89,32 +89,35 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
       distort_params[i] = config["D"][i].as<double>();
     }
   } else {
-    AERROR << "load camera distortion coeffients failed. file_name:" << file_name;
+    AERROR << "load camera distortion coeffients failed. file_name:"
+           << file_name;
     return false;
   }
 
   if (config["height"]) {
     image_height = config["height"].as<size_t>();
   } else {
-    AERROR << "load image height from camera intrinsic failed. file:" << file_name;
+    AERROR << "load image height from camera intrinsic failed. file:"
+           << file_name;
     return false;
   }
   if (config["width"]) {
     image_width = config["width"].as<size_t>();
   } else {
-    AERROR << "Load image width from camera intrinsic failed. file:" << file_name;
+    AERROR << "Load image width from camera intrinsic failed. file:"
+           << file_name;
     return false;
   }
 
   AINFO << camera_type_str << " camera intrinsic is:" << camera_intrinsic
-        << " distort_params is:" << distort_params
-        << " height:" << image_height << " width:" << image_width;
+        << " distort_params is:" << distort_params << " height:" << image_height
+        << " width:" << image_width;
   return true;
 }
 
 //@brief load transformation_matrix from file
-bool load_transformation_matrix_from_file(const std::string &file_name,
-                                          Eigen::Matrix4d *transformation_matrix) {
+bool load_transformation_matrix_from_file(
+    const std::string &file_name, Eigen::Matrix4d *transformation_matrix) {
   try {
     YAML::Node config = YAML::LoadFile(file_name);
     if (!config) {
@@ -122,19 +125,24 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
       return false;
     }
     if (!config["transform"]) {
-      AWARN << "Open TransformationMatrix File:" << file_name << " has no transform.";
+      AWARN << "Open TransformationMatrix File:" << file_name
+            << " has no transform.";
       return false;
     }
-    //fill translation
+    // fill translation
     if (config["transform"]["translation"]) {
-      (*transformation_matrix)(0, 3) = config["transform"]["translation"]["x"].as<double>();
-      (*transformation_matrix)(1, 3) = config["transform"]["translation"]["y"].as<double>();
-      (*transformation_matrix)(2, 3) = config["transform"]["translation"]["z"].as<double>();
+      (*transformation_matrix)(0, 3) =
+          config["transform"]["translation"]["x"].as<double>();
+      (*transformation_matrix)(1, 3) =
+          config["transform"]["translation"]["y"].as<double>();
+      (*transformation_matrix)(2, 3) =
+          config["transform"]["translation"]["z"].as<double>();
     } else {
-      AWARN << "TransformationMatrix File:" << file_name << " has no transform:translation.";
+      AWARN << "TransformationMatrix File:" << file_name
+            << " has no transform:translation.";
       return false;
     }
-    //fill rotation
+    // fill rotation
     if (config["transform"]["rotation"]) {
       double qx = config["transform"]["rotation"]["x"].as<double>();
       double qy = config["transform"]["rotation"]["y"].as<double>();
@@ -143,7 +151,8 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
       Eigen::Quaternion<double> rotation(qw, qx, qy, qz);
       (*transformation_matrix).block<3, 3>(0, 0) = rotation.toRotationMatrix();
     } else {
-      AWARN << "TransformationMatrix File:" << file_name << " has no transform:rotation.";
+      AWARN << "TransformationMatrix File:" << file_name
+            << " has no transform:rotation.";
       return false;
     }
   } catch (const YAML::Exception &e) {
@@ -152,7 +161,7 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
     return false;
   }
 
-  //fill trivial elements
+  // fill trivial elements
   for (int i = 0; i < 3; i++) {
     (*transformation_matrix)(3, i) = 0.0;
   }
@@ -160,8 +169,8 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
   return true;
 }
 
-bool load_matrix4d_from_file(const std::string &file_name, const std::string &key,
-                             Eigen::Matrix4d *matrix) {
+bool load_matrix4d_from_file(const std::string &file_name,
+                             const std::string &key, Eigen::Matrix4d *matrix) {
   try {
     YAML::Node config = YAML::LoadFile(file_name);
     if (!config) {
@@ -198,6 +207,6 @@ bool load_matrix4d_from_file(const std::string &file_name, const std::string &ke
   return true;
 }
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

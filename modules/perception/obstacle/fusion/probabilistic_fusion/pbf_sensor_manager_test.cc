@@ -40,12 +40,13 @@ TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
   sensor_manager->AddSensorMeasurements(lidar_frame);
   EXPECT_TRUE(sensor_manager->GetSensor(lidar_name) != nullptr);
   Eigen::Matrix4d pose;
-  EXPECT_TRUE(sensor_manager->GetPose(lidar_name, lidar_frame.timestamp, &pose));
+  EXPECT_TRUE(
+      sensor_manager->GetPose(lidar_name, lidar_frame.timestamp, &pose));
   sensor_manager->AddSensorMeasurements(radar_frame);
   std::vector<PbfSensorFramePtr> frames;
   sensor_manager->GetLatestFrames(radar_frame.timestamp, &frames);
   EXPECT_TRUE(frames.size() == 2);
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

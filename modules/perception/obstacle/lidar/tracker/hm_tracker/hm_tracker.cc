@@ -29,14 +29,14 @@
 namespace apollo {
 namespace perception {
 
-HmObjectTracker::HmObjectTracker(): matcher_method_(HUNGARIAN_MATCHER),
-  filter_method_(KALMAN_FILTER),
-  use_histogram_for_match_(false),
-  histogram_bin_size_(10),
-  matcher_(nullptr),
-  time_stamp_(0.0),
-  valid_(false) {
-}
+HmObjectTracker::HmObjectTracker()
+    : matcher_method_(HUNGARIAN_MATCHER),
+      filter_method_(KALMAN_FILTER),
+      use_histogram_for_match_(false),
+      histogram_bin_size_(10),
+      matcher_(nullptr),
+      time_stamp_(0.0),
+      valid_(false) {}
 
 HmObjectTracker::~HmObjectTracker() {
   if (matcher_) {
@@ -67,8 +67,7 @@ bool HmObjectTracker::Init() {
   float acceleration_noise_maximum = 5;
   float speed_noise_maximum = 0.4;
   // load match method
-  if (!model_config->GetValue("matcher_method_name",
-    &matcher_method_name)) {
+  if (!model_config->GetValue("matcher_method_name", &matcher_method_name)) {
     AERROR << "Failed to get matcher method name! " << name();
     return false;
   }
@@ -96,34 +95,34 @@ bool HmObjectTracker::Init() {
   }
   // load track cached history size maximum
   if (!model_config->GetValue("track_cached_history_size_maximum",
-    &track_cached_history_size_maximum)) {
+                              &track_cached_history_size_maximum)) {
     AERROR << "Failed to get track cached history size maximum! " << name();
     return false;
   }
   if (!ObjectTrack::SetTrackCachedHistorySizeMaximum(
-    track_cached_history_size_maximum)) {
+          track_cached_history_size_maximum)) {
     AERROR << "Failed to set track cached history size maximum! " << name();
     return false;
   }
   // load track consevutive invisible maximum
   if (!model_config->GetValue("track_consecutive_invisible_maximum",
-    &track_consecutive_invisible_maximum)) {
+                              &track_consecutive_invisible_maximum)) {
     AERROR << "Failed to get track consecutive invisible maximum! " << name();
     return false;
   }
   if (!ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
-    track_consecutive_invisible_maximum)) {
+          track_consecutive_invisible_maximum)) {
     AERROR << "Failed to set track consecutive invisible maximum! " << name();
     return false;
   }
   // load track visible ratio minimum
   if (!model_config->GetValue("track_visible_ratio_minimum",
-    &track_visible_ratio_minimum)) {
+                              &track_visible_ratio_minimum)) {
     AERROR << "Failed to get track visible ratio minimum! " << name();
     return false;
   }
   if (!ObjectTrackSet::SetTrackVisibleRatioMinimum(
-    track_visible_ratio_minimum)) {
+          track_visible_ratio_minimum)) {
     AERROR << "Failed to set track visible ratio minimum! " << name();
     return false;
   }
@@ -138,20 +137,18 @@ bool HmObjectTracker::Init() {
   }
   // load collect consecutive invisible maximum
   if (!model_config->GetValue("collect_consecutive_invisible_maximum",
-    &collect_consecutive_invisible_maximum)) {
-    AERROR << "Failed to get collect consecutive invisible maximum! "
-           << name();
+                              &collect_consecutive_invisible_maximum)) {
+    AERROR << "Failed to get collect consecutive invisible maximum! " << name();
     return false;
   }
   if (!SetCollectConsecutiveInvisibleMaximum(
-    collect_consecutive_invisible_maximum)) {
-    AERROR << "Failed to set collect consecutive invisible maximum! "
-           << name();
+          collect_consecutive_invisible_maximum)) {
+    AERROR << "Failed to set collect consecutive invisible maximum! " << name();
     return false;
   }
   // load acceleration maximum
   if (!model_config->GetValue("acceleration_noise_maximum",
-    &acceleration_noise_maximum)) {
+                              &acceleration_noise_maximum)) {
     AERROR << "Failed to get acceleration noise maximum! " << name();
     return false;
   }
@@ -179,7 +176,7 @@ bool HmObjectTracker::Init() {
   int histogram_bin_size = 10;
   // load match distance maximum
   if (!model_config->GetValue("match_distance_maximum",
-    &match_distance_maximum)) {
+                              &match_distance_maximum)) {
     AERROR << "Failed to get match distance maximum! " << name();
     return false;
   }
@@ -191,61 +188,61 @@ bool HmObjectTracker::Init() {
   }
   // load location distance weight
   if (!model_config->GetValue("location_distance_weight",
-    &location_distance_weight)) {
+                              &location_distance_weight)) {
     AERROR << "Failed to get location distance weight! " << name();
     return false;
   }
   if (!TrackObjectDistance::SetLocationDistanceWeight(
-    location_distance_weight)) {
+          location_distance_weight)) {
     AERROR << "Failed to set location distance weight! " << name();
     return false;
   }
   // load direction distance weight
   if (!model_config->GetValue("direction_distance_weight",
-    &direction_distance_weight)) {
+                              &direction_distance_weight)) {
     AERROR << "Failed to get direction distance weight! " << name();
     return false;
   }
   if (!TrackObjectDistance::SetDirectionDistanceWeight(
-    direction_distance_weight)) {
+          direction_distance_weight)) {
     AERROR << "Failed to set direction distance weight! " << name();
     return false;
   }
   // load bbox size distance weight
   if (!model_config->GetValue("bbox_size_distance_weight",
-    &bbox_size_distance_weight)) {
+                              &bbox_size_distance_weight)) {
     AERROR << "Failed to get bbox size distance weight! " << name();
     return false;
   }
   if (!TrackObjectDistance::SetBboxSizeDistanceWeight(
-    bbox_size_distance_weight)) {
+          bbox_size_distance_weight)) {
     AERROR << "Failed to set bbox size distance weight! " << name();
     return false;
   }
   // load point num distance weight
   if (!model_config->GetValue("point_num_distance_weight",
-    &point_num_distance_weight)) {
+                              &point_num_distance_weight)) {
     AERROR << "Failed to get point num distance weight! " << name();
     return false;
   }
   if (!TrackObjectDistance::SetPointNumDistanceWeight(
-    point_num_distance_weight)) {
+          point_num_distance_weight)) {
     AERROR << "Failed to set point num distance weight! " << name();
     return false;
   }
   // load histogram distance weight
   if (!model_config->GetValue("histogram_distance_weight",
-    &histogram_distance_weight)) {
+                              &histogram_distance_weight)) {
     AERROR << "Failed to get histogram distance weight! " << name();
     return false;
   }
   if (!TrackObjectDistance::SetHistogramDistanceWeight(
-    histogram_distance_weight)) {
+          histogram_distance_weight)) {
     AERROR << "Failed to set histogram distance weight! " << name();
     return false;
   }
   use_histogram_for_match_ =
-    histogram_distance_weight > FLT_EPSILON ? true : false;
+      histogram_distance_weight > FLT_EPSILON ? true : false;
   if (!model_config->GetValue("histogram_bin_size", &histogram_bin_size)) {
     AERROR << "Failed to get histogram bin size! " << name();
     return false;
@@ -270,8 +267,7 @@ bool HmObjectTracker::Init() {
     float z_propagation_noise = 10.0f;
     float breakdown_threshold_maximum = 10.0;
     KalmanFilter::SetUseAdaptive(use_adaptive);
-    if (!KalmanFilter::SetAssociationScoreMaximum(
-      association_score_maximum)) {
+    if (!KalmanFilter::SetAssociationScoreMaximum(association_score_maximum)) {
       AERROR << "Failed to set association score maximum! " << name();
       return false;
     }
@@ -280,33 +276,31 @@ bool HmObjectTracker::Init() {
       return false;
     }
     if (!model_config->GetValue("initial_velocity_noise",
-      &initial_velocity_noise)) {
+                                &initial_velocity_noise)) {
       AERROR << "Failed to get initial velocity noise! " << name();
       return false;
     }
     if (!model_config->GetValue("xy_propagation_noise",
-      &xy_propagation_noise)) {
+                                &xy_propagation_noise)) {
       AERROR << "Failed to get xy propagation noise! " << name();
       return false;
     }
-    if (!model_config->GetValue("z_propagation_noise",
-      &z_propagation_noise)) {
+    if (!model_config->GetValue("z_propagation_noise", &z_propagation_noise)) {
       AERROR << "Failed to get z propagation noise! " << name();
       return false;
     }
     if (!KalmanFilter::InitParams(measurement_noise, initial_velocity_noise,
-                                  xy_propagation_noise,
-                                  z_propagation_noise)) {
+                                  xy_propagation_noise, z_propagation_noise)) {
       AERROR << "Failed to set params for kalman filter! " << name();
       return false;
     }
     if (!model_config->GetValue("breakdown_threshold_maximum",
-      &breakdown_threshold_maximum)) {
+                                &breakdown_threshold_maximum)) {
       AERROR << "Failed to get breakdown threshold maximum! " << name();
       return false;
     }
     if (!KalmanFilter::SetBreakdownThresholdMaximum(
-      breakdown_threshold_maximum)) {
+            breakdown_threshold_maximum)) {
       AERROR << "Failed to set breakdown threshold maximum! " << name();
       return false;
     }
@@ -314,8 +308,7 @@ bool HmObjectTracker::Init() {
   return true;
 }
 
-bool HmObjectTracker::SetMatcherMethod(
-  const std::string& matcher_method_name) {
+bool HmObjectTracker::SetMatcherMethod(const std::string& matcher_method_name) {
   if (matcher_method_name == "hungarian_matcher") {
     matcher_method_ = HUNGARIAN_MATCHER;
     AINFO << "matcher method of " << name() << " is " << matcher_method_name;
@@ -326,20 +319,19 @@ bool HmObjectTracker::SetMatcherMethod(
 }
 
 bool HmObjectTracker::SetCollectConsecutiveInvisibleMaximum(
-  const int& collect_consecutive_invisible_maximum) {
+    const int& collect_consecutive_invisible_maximum) {
   if (collect_consecutive_invisible_maximum >= 0) {
     collect_consecutive_invisible_maximum_ =
-      collect_consecutive_invisible_maximum;
+        collect_consecutive_invisible_maximum;
     AINFO << "collect consecutive invisible maximum of " << name() << " is "
-           << collect_consecutive_invisible_maximum_;
+          << collect_consecutive_invisible_maximum_;
     return true;
   }
   AERROR << "invalid collect consecutive invisible maximum of " << name();
   return false;
 }
 
-bool HmObjectTracker::SetCollectAgeMinimum(
-  const int& collect_age_minimum) {
+bool HmObjectTracker::SetCollectAgeMinimum(const int& collect_age_minimum) {
   if (collect_age_minimum >= 0) {
     collect_age_minimum_ = collect_age_minimum;
     AINFO << "collect age minimum of " << name() << " is "
@@ -350,8 +342,7 @@ bool HmObjectTracker::SetCollectAgeMinimum(
   return false;
 }
 
-bool HmObjectTracker::SetHistogramBinSize(
-  const int& histogram_bin_size) {
+bool HmObjectTracker::SetHistogramBinSize(const int& histogram_bin_size) {
   if (histogram_bin_size > 0) {
     histogram_bin_size_ = histogram_bin_size;
     AINFO << "histogram bin size of " << name() << " is "
@@ -367,12 +358,10 @@ const std::vector<ObjectTrackPtr>& HmObjectTracker::GetObjectTracks() const {
 }
 
 bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
-  double timestamp,
-  const TrackerOptions& options,
-  std::vector<ObjectPtr>* tracked_objects) {
+                            double timestamp, const TrackerOptions& options,
+                            std::vector<ObjectPtr>* tracked_objects) {
   // A. track setup
-  if (tracked_objects == nullptr)
-    return false;
+  if (tracked_objects == nullptr) return false;
   if (!valid_) {
     valid_ = true;
     return Initialize(objects, timestamp, options, tracked_objects);
@@ -405,11 +394,11 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   std::vector<int> unassigned_objects;
   std::vector<int> unassigned_tracks;
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
-  matcher_->Match(&transformed_objects, tracks, tracks_predict,
-                  &assignments, &unassigned_tracks, &unassigned_objects);
+  matcher_->Match(&transformed_objects, tracks, tracks_predict, &assignments,
+                  &unassigned_tracks, &unassigned_objects);
   ADEBUG << "multi-object-tracking: " << tracks.size() << "  "
-        << assignments.size() << "  " << transformed_objects.size() << "  "
-        << unassigned_objects.size() << "  " << time_diff;
+         << assignments.size() << "  " << transformed_objects.size() << "  "
+         << unassigned_objects.size() << "  " << time_diff;
 
   // E. update tracks
   // E.1 update tracks with associated objects
@@ -427,9 +416,9 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
 }
 
 bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
-  const double& timestamp,
-  const TrackerOptions& options,
-  std::vector<ObjectPtr>* tracked_objects) {
+                                 const double& timestamp,
+                                 const TrackerOptions& options,
+                                 std::vector<ObjectPtr>* tracked_objects) {
   // A. track setup
   Eigen::Matrix4d velo2world_pose = Eigen::Matrix4d::Identity();
   if (options.velodyne_trans != nullptr) {
@@ -438,9 +427,8 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
     AERROR << "Input velodyne_trans is null";
     return false;
   }
-  global_to_local_offset_ = Eigen::Vector3d(-velo2world_pose(0, 3),
-                                            -velo2world_pose(1, 3),
-                                            -velo2world_pose(2, 3));
+  global_to_local_offset_ = Eigen::Vector3d(
+      -velo2world_pose(0, 3), -velo2world_pose(1, 3), -velo2world_pose(2, 3));
 
   // B. preprocessing
   // B.1 coordinate transformation
@@ -470,10 +458,9 @@ void HmObjectTracker::TransformPoseGlobal2Local(Eigen::Matrix4d* pose) {
 }
 
 void HmObjectTracker::ConstructTrackedObjects(
-  const std::vector<ObjectPtr>& objects,
-  std::vector<TrackedObjectPtr>* tracked_objects,
-  const Eigen::Matrix4d& pose,
-  const TrackerOptions& options) {
+    const std::vector<ObjectPtr>& objects,
+    std::vector<TrackedObjectPtr>* tracked_objects, const Eigen::Matrix4d& pose,
+    const TrackerOptions& options) {
   int num_objects = objects.size();
   tracked_objects->clear();
   tracked_objects->resize(num_objects);
@@ -513,40 +500,41 @@ void HmObjectTracker::ComputeShapeFeatures(TrackedObjectPtr* obj) {
 }
 
 void HmObjectTracker::TransformTrackedObject(TrackedObjectPtr* obj,
-  const Eigen::Matrix4d& pose) {
+                                             const Eigen::Matrix4d& pose) {
   // Transform tracked object with given pose
   TransformObject(&((*obj)->object_ptr), pose);
   // transform direction
   Eigen::Vector3f& dir = (*obj)->direction;
-  dir = (pose * Eigen::Vector4d(
-    dir(0), dir(1), dir(2), 0)).head(3).cast<float>();
+  dir =
+      (pose * Eigen::Vector4d(dir(0), dir(1), dir(2), 0)).head(3).cast<float>();
   // transform center
   Eigen::Vector3f& center = (*obj)->center;
-  center = (pose * Eigen::Vector4d(
-    center(0), center(1), center(2), 1)).head(3).cast<float>();
+  center = (pose * Eigen::Vector4d(center(0), center(1), center(2), 1))
+               .head(3)
+               .cast<float>();
   // transform barycenter
   Eigen::Vector3f& barycenter = (*obj)->barycenter;
-  barycenter = (pose * Eigen::Vector4d(
-    barycenter(0), barycenter(1), barycenter(2), 1)).head(3).cast<float>();
+  barycenter =
+      (pose * Eigen::Vector4d(barycenter(0), barycenter(1), barycenter(2), 1))
+          .head(3)
+          .cast<float>();
 }
 
 void HmObjectTracker::TransformObject(ObjectPtr* obj,
-  const Eigen::Matrix4d& pose) {
+                                      const Eigen::Matrix4d& pose) {
   // Transform object with given pose
   Eigen::Vector3d& dir = (*obj)->direction;
   dir = (pose * Eigen::Vector4d(dir[0], dir[1], dir[2], 0)).head(3);
   // transform center
   Eigen::Vector3d& center = (*obj)->center;
-  center = (pose * Eigen::Vector4d(
-    center[0], center[1], center[2], 1)).head(3);
+  center = (pose * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
   // transform cloud & polygon
   TransformPointCloud<pcl_util::Point>(pose, (*obj)->cloud);
   TransformPointCloud<pcl_util::PointD>(pose, &((*obj)->polygon));
 }
 
 void HmObjectTracker::ComputeTracksPredict(
-  std::vector<Eigen::VectorXf>* tracks_predict,
-  const double& time_diff) {
+    std::vector<Eigen::VectorXf>* tracks_predict, const double& time_diff) {
   // Compute tracks' predicted states
   int no_track = object_tracks_.Size();
   tracks_predict->resize(no_track);
@@ -557,10 +545,9 @@ void HmObjectTracker::ComputeTracksPredict(
 }
 
 void HmObjectTracker::UpdateAssignedTracks(
-  std::vector<Eigen::VectorXf>* tracks_predict,
-  std::vector<TrackedObjectPtr>* new_objects,
-  const std::vector<TrackObjectPair>& assignments,
-  const double& time_diff) {
+    std::vector<Eigen::VectorXf>* tracks_predict,
+    std::vector<TrackedObjectPtr>* new_objects,
+    const std::vector<TrackObjectPair>& assignments, const double& time_diff) {
   // Update assigned tracks
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   for (size_t i = 0; i < assignments.size(); i++) {
@@ -571,21 +558,19 @@ void HmObjectTracker::UpdateAssignedTracks(
 }
 
 void HmObjectTracker::UpdateUnassignedTracks(
-  const std::vector<Eigen::VectorXf>& tracks_predict,
-  const std::vector<int>& unassigned_tracks,
-  const double& time_diff) {
+    const std::vector<Eigen::VectorXf>& tracks_predict,
+    const std::vector<int>& unassigned_tracks, const double& time_diff) {
   // Update tracks without matched objects
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   for (size_t i = 0; i < unassigned_tracks.size(); i++) {
     int track_id = unassigned_tracks[i];
-    tracks[track_id]->UpdateWithoutObject(
-      tracks_predict[track_id], time_diff);
+    tracks[track_id]->UpdateWithoutObject(tracks_predict[track_id], time_diff);
   }
 }
 
 void HmObjectTracker::CreateNewTracks(
-  const std::vector<TrackedObjectPtr>& new_objects,
-  const std::vector<int>& unassigned_objects) {
+    const std::vector<TrackedObjectPtr>& new_objects,
+    const std::vector<int>& unassigned_objects) {
   // Create new tracks for objects without matched tracks
   for (size_t i = 0; i < unassigned_objects.size(); i++) {
     int obj_id = unassigned_objects[i];
@@ -600,7 +585,7 @@ void HmObjectTracker::DeleteLostTracks() {
 }
 
 void HmObjectTracker::CollectTrackedResults(
-  std::vector<ObjectPtr>* tracked_objects) {
+    std::vector<ObjectPtr>* tracked_objects) {
   // Collect tracked results for reporting include objects may be occluded
   // temporaryly
   const std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
@@ -609,7 +594,8 @@ void HmObjectTracker::CollectTrackedResults(
   int track_number = 0;
   for (size_t i = 0; i < tracks.size(); i++) {
     if (tracks[i]->consecutive_invisible_count_ >
-      collect_consecutive_invisible_maximum_) continue;
+        collect_consecutive_invisible_maximum_)
+      continue;
     if (tracks[i]->age_ < collect_age_minimum_) continue;
     ObjectPtr obj(new Object);
     TrackedObjectPtr result_obj = tracks[i]->current_object_;
@@ -630,8 +616,8 @@ void HmObjectTracker::CollectTrackedResults(
     obj->tracking_time = tracks[i]->period_;
     obj->type = result_obj->type;
     obj->center = result_obj->center.cast<double>() - global_to_local_offset_;
-    obj->anchor_point = result_obj->anchor_point.cast<double>() -
-                        global_to_local_offset_;
+    obj->anchor_point =
+        result_obj->anchor_point.cast<double>() - global_to_local_offset_;
     // restore original world coordinates
     for (size_t j = 0; j < obj->cloud->size(); j++) {
       obj->cloud->points[j].x -= global_to_local_offset_[0];

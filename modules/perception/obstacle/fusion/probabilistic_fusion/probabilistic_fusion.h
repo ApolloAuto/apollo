@@ -19,10 +19,10 @@
 #include <mutex>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track_manager.h"
 
 namespace apollo {
@@ -42,7 +42,6 @@ class ProbabilisticFusion : public BaseFusion {
   virtual std::string name() const override;
 
  protected:
-
   void FuseFrame(const PbfSensorFramePtr &frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
@@ -60,23 +59,24 @@ class ProbabilisticFusion : public BaseFusion {
                               const std::vector<int> &unassigned_tracks,
                               const std::vector<double> &track_object_dist,
                               const SensorType &sensor_type,
-                              const std::string &sensor_id,
-                              double timestamp);
+                              const std::string &sensor_id, double timestamp);
 
-  void CollectFusedObjects(double timestamp, std::vector<ObjectPtr> *fused_objects);
+  void CollectFusedObjects(double timestamp,
+                           std::vector<ObjectPtr> *fused_objects);
 
-  void DecomposeFrameObjects(const std::vector<PbfSensorObjectPtr> &frame_objects,
-                             std::vector<PbfSensorObjectPtr> &foreground_objects,
-                             std::vector<PbfSensorObjectPtr> &background_objects);
+  void DecomposeFrameObjects(
+      const std::vector<PbfSensorObjectPtr> &frame_objects,
+      std::vector<PbfSensorObjectPtr> &foreground_objects,
+      std::vector<PbfSensorObjectPtr> &background_objects);
 
-  void FuseForegroundObjects(std::vector<PbfSensorObjectPtr> &foreground_objects,
-                             Eigen::Vector3d ref_point,
-                             const SensorType &sensor_type,
-                             const std::string &sensor_id,
-                             double timestamp);
+  void FuseForegroundObjects(
+      std::vector<PbfSensorObjectPtr> &foreground_objects,
+      Eigen::Vector3d ref_point, const SensorType &sensor_type,
+      const std::string &sensor_id, double timestamp);
 
  protected:
-  /**@brief produce fusion result for PNC only when fusing sensor with _publish_sensor_id*/
+  /**@brief produce fusion result for PNC only when fusing sensor with
+   * _publish_sensor_id*/
   std::string publish_sensor_id_;
   bool started_;
   PbfBaseTrackObjectMatcher *matcher_;
@@ -86,13 +86,14 @@ class ProbabilisticFusion : public BaseFusion {
   std::mutex fusion_mutex_;
   bool use_radar_;
   bool use_lidar_;
+
  private:
- DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
+  DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };
 
 // Register plugin.
 REGISTER_FUSION(ProbabilisticFusion);
 
-} // namespace perception
-} // namespace apollo
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_
+}  // namespace perception
+}  // namespace apollo
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_

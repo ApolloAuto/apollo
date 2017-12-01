@@ -17,24 +17,24 @@
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
 #include <Eigen/Core>
-#include "modules/perception/obstacle/base/types.h" 
+#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
 
 struct alignas(16) RadarSupplement {
-    RadarSupplement();
-    ~RadarSupplement();
-    RadarSupplement(const RadarSupplement& rhs);
-    RadarSupplement& operator = (const RadarSupplement& rhs);
-    void clone(const RadarSupplement& rhs);
-    // distance
-    float range = 0.0f;
-    // x -> forward, y -> left
-    float angle = 0.0f;
-    float relative_radial_velocity = 0.0f;
-    float relative_tangential_velocity = 0.0f;
-    float radial_velocity = 0.0f;
+  RadarSupplement();
+  ~RadarSupplement();
+  RadarSupplement(const RadarSupplement& rhs);
+  RadarSupplement& operator=(const RadarSupplement& rhs);
+  void clone(const RadarSupplement& rhs);
+  // distance
+  float range = 0.0f;
+  // x -> forward, y -> left
+  float angle = 0.0f;
+  float relative_radial_velocity = 0.0f;
+  float relative_tangential_velocity = 0.0f;
+  float radial_velocity = 0.0f;
 };
 typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
 typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;

@@ -99,8 +99,7 @@ class CondVar {
 
 class BlockingCounter {
  public:
-  explicit BlockingCounter(size_t cnt) : counter_(cnt) {
-  }
+  explicit BlockingCounter(size_t cnt) : counter_(cnt) {}
 
   bool Decrement() {
     MutexLock lock(&mutex_);

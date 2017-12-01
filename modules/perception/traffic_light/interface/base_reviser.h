@@ -27,10 +27,8 @@ namespace perception {
 namespace traffic_light {
 
 struct ReviseOption {
-  explicit ReviseOption(const double timestamp) :
-      ts(timestamp) {
-  }
-  double ts;         // timestamp for lights
+  explicit ReviseOption(const double timestamp) : ts(timestamp) {}
+  double ts;  // timestamp for lights
 };
 
 //@brief Reviser is the class is to revise the perception result.
@@ -49,7 +47,8 @@ class BaseReviser {
   //@param [in] option
   //@param [in/out] rectifed_result
   //@return true/false
-  virtual bool Revise(const ReviseOption &option, std::vector<LightPtr> *lights) = 0;
+  virtual bool Revise(const ReviseOption &option,
+                      std::vector<LightPtr> *lights) = 0;
 
   //@brief Revise's name
   virtual std::string name() const = 0;
@@ -58,9 +57,9 @@ class BaseReviser {
 REGISTER_REGISTERER(BaseReviser);
 #define REGISTER_REVISER(name) REGISTER_CLASS(BaseReviser, name)
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
 

@@ -18,9 +18,9 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H
 
 #include <caffe/layers/pyramid_layers.hpp>
-#include "modules/perception/traffic_light/interface/green_interface.h"
-#include "modules/perception/traffic_light/base/light.h"
 #include "caffe/caffe.hpp"
+#include "modules/perception/traffic_light/base/light.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 namespace apollo {
 namespace perception {
@@ -39,7 +39,8 @@ class Detection : public IRefine {
   Detection(int &min_crop_size, const std::string &refine_net,
             const std::string &refine_model);
 
-  void Init(const int &resize_len, const std::string &refine_net, const std::string &refine_model);
+  void Init(const int &resize_len, const std::string &refine_net,
+            const std::string &refine_model);
 
   virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
 
@@ -48,9 +49,8 @@ class Detection : public IRefine {
   ~Detection();
 
  private:
-
-  bool SelectOutputBboxes(const cv::Mat &crop_image,
-                          int class_id, float inflate_col, float inflate_row,
+  bool SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
+                          float inflate_col, float inflate_row,
                           std::vector<LightPtr> *lights);
 
   caffe::Net<float> *_refine_net_ptr;
@@ -64,4 +64,4 @@ class Detection : public IRefine {
 }
 }
 }
-#endif //GREEN_DenseBoxDetection_H
+#endif  // GREEN_DenseBoxDetection_H

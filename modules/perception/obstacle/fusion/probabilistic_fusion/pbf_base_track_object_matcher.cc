@@ -29,20 +29,22 @@ double PbfBaseTrackObjectMatcher::GetMaxMatchDistance() {
   return s_max_match_distance_;
 }
 
-void PbfBaseTrackObjectMatcher::IdAssign(std::vector<PbfTrackPtr> &fusion_tracks,
-                                         std::vector<PbfSensorObjectPtr> &sensor_objects,
-                                         std::vector<TrackObjectPair> &assignments,
-                                         std::vector<int> &unassigned_fusion_tracks,
-                                         std::vector<int> &unassigned_sensor_objects) {
-
+void PbfBaseTrackObjectMatcher::IdAssign(
+    std::vector<PbfTrackPtr> &fusion_tracks,
+    std::vector<PbfSensorObjectPtr> &sensor_objects,
+    std::vector<TrackObjectPair> &assignments,
+    std::vector<int> &unassigned_fusion_tracks,
+    std::vector<int> &unassigned_sensor_objects) {
   size_t num_track = fusion_tracks.size();
   size_t num_obj = sensor_objects.size();
 
   if (num_track == 0 || num_obj == 0) {
     unassigned_fusion_tracks.resize(num_track);
     unassigned_sensor_objects.resize(num_obj);
-    std::iota(unassigned_fusion_tracks.begin(), unassigned_fusion_tracks.end(), 0);
-    std::iota(unassigned_sensor_objects.begin(), unassigned_sensor_objects.end(), 0);
+    std::iota(unassigned_fusion_tracks.begin(), unassigned_fusion_tracks.end(),
+              0);
+    std::iota(unassigned_sensor_objects.begin(),
+              unassigned_sensor_objects.end(), 0);
     return;
   }
 
@@ -51,7 +53,8 @@ void PbfBaseTrackObjectMatcher::IdAssign(std::vector<PbfTrackPtr> &fusion_tracks
 
   std::map<int, int> sensor_id_2_track_ind;
   for (size_t i = 0; i < num_track; i++) {
-    PbfSensorObjectPtr obj = fusion_tracks[i]->GetSensorObject(sensor_type, sensor_id);
+    PbfSensorObjectPtr obj =
+        fusion_tracks[i]->GetSensorObject(sensor_type, sensor_id);
     if (obj == nullptr) {
       continue;
     }
@@ -81,8 +84,7 @@ void PbfBaseTrackObjectMatcher::IdAssign(std::vector<PbfTrackPtr> &fusion_tracks
       unassigned_sensor_objects.push_back(i);
     }
   }
-
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

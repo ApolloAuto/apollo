@@ -44,7 +44,7 @@ DECLARE_int32(stamp_enlarge_factor);
 
 struct CommonSharedDataKey {
   CommonSharedDataKey() = default;
-  CommonSharedDataKey(const double& ts, const std::string& id)
+  CommonSharedDataKey(const double &ts, const std::string &id)
       : timestamp(ts), device_id(id) {}
   virtual std::string ToString() const {
     return device_id +
@@ -158,7 +158,7 @@ void CommonSharedData<M>::RemoveStaleData() {
   const uint64_t now = ::time(NULL);
   bool has_change = false;
   for (auto iter = data_added_time_map_.begin();
-      iter != data_added_time_map_.end();) {
+       iter != data_added_time_map_.end();) {
     if (now - iter->second > FLAGS_shared_data_stale_time) {
       const size_t erase_cnt = data_map_.erase(iter->first);
       if (erase_cnt != 1u) {

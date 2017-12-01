@@ -23,7 +23,7 @@ namespace perception {
 
 bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_

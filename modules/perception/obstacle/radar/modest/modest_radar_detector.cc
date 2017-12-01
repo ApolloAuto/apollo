@@ -18,8 +18,8 @@
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
-#include "modules/perception/obstacle/radar/modest/radar_util.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
+#include "modules/perception/obstacle/radar/modest/radar_util.h"
 
 namespace apollo {
 namespace perception {
@@ -179,8 +179,9 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   // preparation
 
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
-  object_builder_.Build(raw_obstacles, radar_pose, main_velocity, *radar_objects);
-  radar_objects->timestamp = (double) raw_obstacles.header().timestamp_sec();
+  object_builder_.Build(raw_obstacles, radar_pose, main_velocity,
+                        *radar_objects);
+  radar_objects->timestamp = (double)raw_obstacles.header().timestamp_sec();
   radar_objects->sensor_type = RADAR;
 
   // roi filter
@@ -214,8 +215,9 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
   return true;
 }
 
-void ModestRadarDetector::RoiFilter(const std::vector<PolygonDType> &map_polygons,
-                                    std::vector<ObjectPtr> &filter_objects) {
+void ModestRadarDetector::RoiFilter(
+    const std::vector<PolygonDType> &map_polygons,
+    std::vector<ObjectPtr> &filter_objects) {
   AINFO << "Before using hdmap, object size:" << filter_objects.size();
   // use new hdmap
   if (use_had_map_) {
@@ -226,8 +228,8 @@ void ModestRadarDetector::RoiFilter(const std::vector<PolygonDType> &map_polygon
         obs_position.x = filter_objects[i]->center(0);
         obs_position.y = filter_objects[i]->center(1);
         obs_position.z = filter_objects[i]->center(2);
-        if (RadarUtil::IsXyPointInHdmap<pcl_util::PointD>(
-            obs_position, map_polygons)) {
+        if (RadarUtil::IsXyPointInHdmap<pcl_util::PointD>(obs_position,
+                                                          map_polygons)) {
           filter_objects[obs_number] = filter_objects[i];
           obs_number++;
         }

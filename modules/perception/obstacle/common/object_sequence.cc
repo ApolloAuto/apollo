@@ -1,12 +1,11 @@
-#include "modules/common/log.h"
 #include "modules/perception/obstacle/common/object_sequence.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
 
 bool ObjectSequence::AddTrackedFrameObjects(
-        const std::vector<ObjectPtr>& objects,
-        double timestamp) {
+    const std::vector<ObjectPtr>& objects, double timestamp) {
   std::lock_guard<std::mutex> lock(_mutex);
   for (const auto& obj : objects) {
     int& track_id = obj->track_id;
@@ -30,13 +29,12 @@ bool ObjectSequence::AddTrackedFrameObjects(
   return true;
 }
 
-bool ObjectSequence::GetTrackInTemporalWindow(
-        int track_id, 
-        TrackedObjects* track, 
-        double window_time) {
+bool ObjectSequence::GetTrackInTemporalWindow(int track_id,
+                                              TrackedObjects* track,
+                                              double window_time) {
   if (track == nullptr) {
     return false;
-  } 
+  }
   track->clear();
   std::lock_guard<std::mutex> lock(_mutex);
   double start_time = _current - window_time;
@@ -65,7 +63,8 @@ bool ObjectSequence::GetTrackInTemporalWindow(
 //         auto iter = track.second.rbegin();
 //         auto obj_ptr = iter->second;
 //         auto timestamp = iter->first;
-//         if ((obj_ptr->center.head<2>() - center.head<2>()).norm() <= radius) {
+//         if ((obj_ptr->center.head<2>() - center.head<2>()).norm() <= radius)
+//         {
 //             objects->insert(std::make_pair(timestamp, obj_ptr));
 //         }
 //     }
@@ -88,7 +87,7 @@ void ObjectSequence::RemoveStaleTracks(double current_stamp) {
         break;
       }
     }
-    if (track.size() == 0) { // all element removed
+    if (track.size() == 0) {  // all element removed
       _sequence.erase(outer_iter++);
     } else {
       ++outer_iter;
@@ -96,6 +95,5 @@ void ObjectSequence::RemoveStaleTracks(double current_stamp) {
   }
 }
 
-} // namespace perception
-} // namespace apollo
-
+}  // namespace perception
+}  // namespace apollo

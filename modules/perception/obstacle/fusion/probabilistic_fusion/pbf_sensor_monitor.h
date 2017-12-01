@@ -16,8 +16,8 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
-#include <string>
 #include <map>
+#include <string>
 #include "modules/common/macro.h"
 
 namespace apollo {
@@ -37,16 +37,17 @@ class PbfSensorMonitor {
 
   bool Init();
 
-  void Update(const std::string &sensor_id, double capture_time, double detection_time);
+  void Update(const std::string &sensor_id, double capture_time,
+              double detection_time);
 
  protected:
   std::map<std::string, SensorStatus> sensor_states_;
 
  private:
- DISALLOW_COPY_AND_ASSIGN(PbfSensorMonitor);
+  DISALLOW_COPY_AND_ASSIGN(PbfSensorMonitor);
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MONITOR_H_

@@ -16,9 +16,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
 
+#include <map>
 #include <memory>
 #include <vector>
-#include <map>
 
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -28,29 +28,28 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-//@brief 2 Camera Projection project the Light into the image. 
+//@brief 2 Camera Projection project the Light into the image.
 class MultiCamerasProjection {
  public:
-  MultiCamerasProjection() {
-  }
+  MultiCamerasProjection() {}
 
   virtual ~MultiCamerasProjection() = default;
   virtual bool init();
-  virtual bool project(const CarPose &pose, const ProjectOption &option, Light *light) const;
+  virtual bool project(const CarPose &pose, const ProjectOption &option,
+                       Light *light) const;
   std::string name() const {
     return "TLPreprocessor";
   }
   bool has_camera(const CameraId &cam_id) const;
 
  private:
-
   std::vector<CameraCoeffient> _camera_coeffient;
   std::vector<std::string> _camera_names;
   std::unique_ptr<BaseProjection> _projection;
 };
 
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H

@@ -48,11 +48,19 @@ class CNNSegmentation : public BaseSegmentation {
                const SegmentationOptions& options,
                std::vector<ObjectPtr>* objects) override;
 
-  std::string name() const override { return "CNNSegmentation"; }
+  std::string name() const override {
+    return "CNNSegmentation";
+  }
 
-  float range() const { return range_; }
-  int width() const { return width_; }
-  int height() const { return height_; }
+  float range() const {
+    return range_;
+  }
+  int width() const {
+    return width_;
+  }
+  int height() const {
+    return height_;
+  }
 
  private:
   bool GetConfigs(std::string* config_file, std::string* proto_file,
@@ -102,4 +110,5 @@ REGISTER_SEGMENTATION(CNNSegmentation);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_  // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
+        // // NOLINT

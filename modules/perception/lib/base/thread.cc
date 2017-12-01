@@ -29,7 +29,7 @@ void Thread::Start() {
   CHECK_EQ(pthread_attr_init(&attr), 0);
   CHECK_EQ(
       pthread_attr_setdetachstate(
-              &attr, joinable_ ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED),
+          &attr, joinable_ ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED),
       0);
   CHECK_EQ(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL), 0);
   CHECK_EQ(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL), 0);

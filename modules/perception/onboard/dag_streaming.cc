@@ -24,10 +24,10 @@
 #include "gflags/gflags.h"
 #include "google/protobuf/text_format.h"
 
+#include "dag_streaming.h"
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/onboard/subnode.h"
-#include "dag_streaming.h"
 
 namespace apollo {
 namespace perception {
@@ -48,12 +48,11 @@ DEFINE_bool(enable_timing_remove_stale_data, true,
 DAGStreaming::DAGStreaming()
     : Thread(true, "DAGStreamingThread"),
       inited_(false),
-      monitor_(new DAGStreamingMonitor(this)) {
-}
+      monitor_(new DAGStreamingMonitor(this)) {}
 
 DAGStreaming::~DAGStreaming() {}
 
-bool DAGStreaming::Init(const string &dag_config_path) {
+bool DAGStreaming::Init(const string& dag_config_path) {
   if (inited_) {
     AWARN << "DAGStreaming Init twice.";
     return true;
@@ -76,8 +75,7 @@ bool DAGStreaming::Init(const string &dag_config_path) {
     return false;
   }
 
-  if (!InitSharedData(dag_config.data_config()) ||
-      !InitSubnodes(dag_config)) {
+  if (!InitSharedData(dag_config.data_config()) || !InitSubnodes(dag_config)) {
     return false;
   }
 
@@ -89,13 +87,13 @@ bool DAGStreaming::Init(const string &dag_config_path) {
 void DAGStreaming::Schedule() {
   monitor_->Start();
   // start all subnodes.
-  for (auto &pair : subnode_map_) {
+  for (auto& pair : subnode_map_) {
     pair.second->Start();
   }
 
   AINFO << "DAGStreaming start to schedule...";
 
-  for (auto &pair : subnode_map_) {
+  for (auto& pair : subnode_map_) {
     pair.second->Join();
   }
 
@@ -106,14 +104,14 @@ void DAGStreaming::Schedule() {
 void DAGStreaming::Stop() {
   monitor_->Stop();
   // stop all subnodes.
-  for (auto &pair : subnode_map_) {
+  for (auto& pair : subnode_map_) {
     pair.second->Stop();
   }
 
   // sleep 100 ms
   usleep(100000);
   // kill thread which is blocked
-  for (auto &pair : subnode_map_) {
+  for (auto& pair : subnode_map_) {
     if (pair.second->IsAlive()) {
       AINFO << "pthread_cancel to thread " << pair.second->Tid();
       pthread_cancel(pair.second->Tid());
@@ -123,7 +121,7 @@ void DAGStreaming::Stop() {
   AINFO << "DAGStreaming is stoped.";
 }
 
-bool DAGStreaming::InitSubnodes(const DAGConfig &dag_config) {
+bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   const DAGConfig::SubnodeConfig& subnode_config = dag_config.subnode_config();
   const DAGConfig::EdgeConfig& edge_config = dag_config.edge_config();
 
@@ -171,8 +169,8 @@ bool DAGStreaming::InitSubnodes(const DAGConfig &dag_config) {
     }
 
     bool result = inst->Init(
-            subnode_config, &event_manager_, &shared_data_manager_,
-            subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
+        subnode_config, &event_manager_, &shared_data_manager_,
+        subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
     if (!result) {
       AERROR << "failed to Init subnode. name: " << inst->name();
       return false;
@@ -188,7 +186,7 @@ bool DAGStreaming::InitSubnodes(const DAGConfig &dag_config) {
 }
 
 bool DAGStreaming::InitSharedData(
-        const DAGConfig::SharedDataConfig &data_config) {
+    const DAGConfig::SharedDataConfig& data_config) {
   return shared_data_manager_.Init(data_config);
 }
 

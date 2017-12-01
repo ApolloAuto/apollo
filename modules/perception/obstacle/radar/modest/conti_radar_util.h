@@ -24,14 +24,11 @@ namespace perception {
 
 class ContiRadarUtil {
  public:
-  static bool IsFp(const ContiRadarObs &contiobs,
-                   const ContiParams &params,
-                   const int delay_frames,
-                   int &tracking_times);
-
+  static bool IsFp(const ContiRadarObs &contiobs, const ContiParams &params,
+                   const int delay_frames, int &tracking_times);
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H

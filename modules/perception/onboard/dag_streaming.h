@@ -87,11 +87,10 @@ class DAGStreaming : public Thread {
 
 class DAGStreamingMonitor : public Thread {
  public:
-  explicit DAGStreamingMonitor(DAGStreaming* dag_streaming)
+  explicit DAGStreamingMonitor(DAGStreaming *dag_streaming)
       : Thread(true, "DAGStreamingMonitor"),
         dag_streaming_(dag_streaming),
-        stop_(false) {
-  }
+        stop_(false) {}
 
   virtual ~DAGStreamingMonitor() {}
 

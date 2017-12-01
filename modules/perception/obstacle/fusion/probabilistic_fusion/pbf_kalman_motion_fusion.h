@@ -19,9 +19,9 @@
 #include <utility>
 #include <vector>
 #include "modules/common/macro.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -48,8 +48,8 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  void Predict(Eigen::Vector3d &anchor_point,
-               Eigen::Vector3d &velocity, const double time_diff);
+  void Predict(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity,
+               const double time_diff);
 
   // @brief update with measurements
   // @params[IN] new_object: new object for current update
@@ -110,7 +110,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   std::deque<bool> history_velocity_is_radar_;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_

@@ -25,13 +25,14 @@ namespace perception {
 
 class RadarUtil {
  public:
-  template<typename PointT>
-  static bool IsXyPointIn2dXyPolygon(
-      const PointT &point, const PolygonDType &polygon) {
+  template <typename PointT>
+  static bool IsXyPointIn2dXyPolygon(const PointT &point,
+                                     const PolygonDType &polygon) {
     bool in_poly = false;
     double x1, x2, y1, y2;
     int nr_poly_points = static_cast<int>(polygon.points.size());
-    // start with the last point to make the check last point<->first point the first one
+    // start with the last point to make the check last point<->first point the
+    // first one
     double xold = polygon.points[nr_poly_points - 1].x;
     double yold = polygon.points[nr_poly_points - 1].y;
     for (int i = 0; i < nr_poly_points; i++) {
@@ -48,8 +49,8 @@ class RadarUtil {
         y1 = ynew;
         y2 = yold;
       }
-      if ((x1 < point.x) == (point.x <= x2)
-          && (point.y - y1) * (x2 - x1) < (y2 - y1) * (point.x - x1)) {
+      if ((x1 < point.x) == (point.x <= x2) &&
+          (point.y - y1) * (x2 - x1) < (y2 - y1) * (point.x - x1)) {
         in_poly = !in_poly;
       }
       xold = xnew;
@@ -58,7 +59,7 @@ class RadarUtil {
     return in_poly;
   }
 
-  template<typename PointT>
+  template <typename PointT>
   static bool IsXyPointInHdmap(const PointT &p,
                                const std::vector<PolygonDType> &polygons) {
     bool in_flag = false;
@@ -71,11 +72,12 @@ class RadarUtil {
     return in_flag;
   }
 
-  static void MockRadarPolygon(const Eigen::Vector3d &center, const double length,
-                               const double width, const double theta, PolygonDType &polygon);
+  static void MockRadarPolygon(const Eigen::Vector3d &center,
+                               const double length, const double width,
+                               const double theta, PolygonDType &polygon);
 };
 
-}//namespace perception
-}//namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_

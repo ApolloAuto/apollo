@@ -40,7 +40,9 @@ class FeatureGenerator {
 
   void Generate(const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
 
-  inline std::string name() const { return "FeatureGenerator"; }
+  inline std::string name() const {
+    return "FeatureGenerator";
+  }
 
  private:
   Dtype LogCount(int count) {
@@ -83,4 +85,5 @@ typedef FeatureGenerator<double> FP64FeatureGenerator;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_  // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
+        // // NOLINT

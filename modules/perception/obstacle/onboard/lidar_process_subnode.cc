@@ -114,7 +114,8 @@ void LidarProcessSubnode::OnPointCloud(
   /// get velodyne2world transfrom
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
-    AERROR << "failed to get trans at timestamp: " << GLOG_TIMESTAMP(kTimeStamp);
+    AERROR << "failed to get trans at timestamp: "
+           << GLOG_TIMESTAMP(kTimeStamp);
     out_sensor_objects->error_code = common::PERCEPTION_ERROR_TF;
     PublishDataAndEvent(timestamp_, out_sensor_objects);
     return;
@@ -240,7 +241,7 @@ bool LidarProcessSubnode::InitFrameDependence() {
   // init preprocess_data
   const string lidar_processing_data_name("LidarObjectData");
   processing_data_ = dynamic_cast<LidarObjectData*>(
-          shared_data_manager_->GetSharedData(lidar_processing_data_name));
+      shared_data_manager_->GetSharedData(lidar_processing_data_name));
   if (processing_data_ == nullptr) {
     AERROR << "Failed to get shared data instance "
            << lidar_processing_data_name;
@@ -365,7 +366,7 @@ void LidarProcessSubnode::PublishDataAndEvent(
   processing_data_->Add(key, data);
   // pub events
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
-    const EventMeta &event_meta = pub_meta_events_[idx];
+    const EventMeta& event_meta = pub_meta_events_[idx];
     Event event;
     event.event_id = event_meta.event_id;
     event.timestamp = timestamp;

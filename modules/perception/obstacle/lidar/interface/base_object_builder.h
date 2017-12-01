@@ -77,8 +77,8 @@ class BaseObjectBuilder {
   // @brief: calc object feature, and fill fields.
   // @param [in]: options.
   // @param [in/out]: object list.
-  virtual bool Build(const ObjectBuilderOptions &options,
-                     std::vector<ObjectPtr> *objects) = 0;
+  virtual bool Build(const ObjectBuilderOptions& options,
+                     std::vector<ObjectPtr>* objects) = 0;
 
   virtual std::string name() const = 0;
 

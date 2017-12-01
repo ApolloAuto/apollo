@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
 #include <queue>
-#include "modules/common/macro.h"
 #include "modules/common/log.h"
+#include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor.h"
 
@@ -35,14 +35,16 @@ class PbfSensorManager {
   void GetLatestSensorFrames(double time_stamp, const std::string &sensor_id,
                              std::vector<PbfSensorFramePtr> *frames);
 
-  /**@brief query one closest sensor frame for each sensor between last query timestamp and
+  /**@brief query one closest sensor frame for each sensor between last query
+     timestamp and
      current timestamp, stored in ascending order of the frame timestamp */
   void GetLatestFrames(const double time_stamp,
                        std::vector<PbfSensorFramePtr> *frames);
 
   PbfSensor *GetSensor(const std::string &sensor_id);
 
-  bool GetPose(const std::string &sensor_id, double time_stamp, Eigen::Matrix4d *pose);
+  bool GetPose(const std::string &sensor_id, double time_stamp,
+               Eigen::Matrix4d *pose);
 
  protected:
   bool Init();
@@ -52,11 +54,12 @@ class PbfSensorManager {
 
   /**@brief sensor_id based key*/
   std::map<std::string, PbfSensor *> sensors_;
+
  private:
- DISALLOW_COPY_AND_ASSIGN(PbfSensorManager);
+  DISALLOW_COPY_AND_ASSIGN(PbfSensorManager);
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_

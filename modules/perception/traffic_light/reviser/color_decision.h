@@ -16,8 +16,8 @@
 #ifndef PERCEPTION_COLOR_DECISION_H
 #define PERCEPTION_COLOR_DECISION_H
 
-#include "modules/perception/traffic_light/interface/green_interface.h"
 #include "modules/perception/traffic_light/interface/base_reviser.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 
 namespace apollo {
 namespace perception {
@@ -25,8 +25,7 @@ namespace traffic_light {
 
 class ColorReviser : public BaseReviser {
  public:
-  ColorReviser() {
-  }
+  ColorReviser() {}
 
   //@brief init the reviser.
   virtual bool Init();
@@ -35,7 +34,8 @@ class ColorReviser : public BaseReviser {
   //@param [in] option
   //@param [in/out] rectifed_result
   //@return true/false
-  virtual bool Revise(const ReviseOption &option, std::vector<LightPtr> *lights) override;
+  virtual bool Revise(const ReviseOption &option,
+                      std::vector<LightPtr> *lights) override;
 
   //@brief Revise's name
   virtual std::string name() const;
@@ -47,9 +47,8 @@ class ColorReviser : public BaseReviser {
   std::map<std::string, double> time_map_;
 };
 REGISTER_REVISER(ColorReviser);
-
 }
 }
 }
 
-#endif //PERCEPTION_COLOR_DECISION_H
+#endif  // PERCEPTION_COLOR_DECISION_H

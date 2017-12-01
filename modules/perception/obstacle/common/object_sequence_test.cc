@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
 #include "modules/perception/obstacle/common/object_sequence.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -23,13 +23,13 @@ class ObjectSequenceTest : public testing::Test {
  protected:
   ObjectSequenceTest() {}
   virtual ~ObjectSequenceTest() {}
-  void SetUp() {
-  }
+  void SetUp() {}
   void TearDown() {}
   void BuildObjects();
+
  protected:
   ObjectSequence sequence_;
-  std::vector<std::vector<ObjectPtr> > objects_;
+  std::vector<std::vector<ObjectPtr>> objects_;
   std::vector<double> timestamps_;
 };
 
@@ -72,8 +72,10 @@ TEST_F(ObjectSequenceTest, TestAddAndGet) {
   EXPECT_EQ(tracked_objects.size(), 1);
   sequence_.GetTrackInTemporalWindow(9, &tracked_objects, window_time);
   EXPECT_EQ(tracked_objects.size(), 1);
-  EXPECT_FALSE(sequence_.GetTrackInTemporalWindow(8, &tracked_objects, window_time));
-  EXPECT_FALSE(sequence_.GetTrackInTemporalWindow(1, &tracked_objects, window_time));
+  EXPECT_FALSE(
+      sequence_.GetTrackInTemporalWindow(8, &tracked_objects, window_time));
+  EXPECT_FALSE(
+      sequence_.GetTrackInTemporalWindow(1, &tracked_objects, window_time));
 }
 
 }  // namespace perception

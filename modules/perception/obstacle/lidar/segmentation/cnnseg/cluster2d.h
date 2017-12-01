@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CLUSTER2D_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CLUSTER2D_H_
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 #include "caffe/caffe.hpp"
 #include "modules/common/log.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -82,8 +82,7 @@ class Cluster2D {
                const caffe::Blob<float>& instance_pt_blob,
                const apollo::perception::pcl_util::PointCloudPtr& pc_ptr,
                const apollo::perception::pcl_util::PointIndices& valid_indices,
-               float objectness_thresh,
-               bool use_all_grids_for_clustering) {
+               float objectness_thresh, bool use_all_grids_for_clustering) {
     const float* category_pt_data = category_pt_blob.cpu_data();
     const float* instance_pt_x_data = instance_pt_blob.cpu_data();
     const float* instance_pt_y_data =
@@ -228,10 +227,8 @@ class Cluster2D {
     }
   }
 
-  void GetObjects(const float confidence_thresh,
-                  const float height_thresh,
-                  const int min_pts_num,
-                  std::vector<ObjectPtr>* objects) {
+  void GetObjects(const float confidence_thresh, const float height_thresh,
+                  const int min_pts_num, std::vector<ObjectPtr>* objects) {
     CHECK(valid_indices_in_pc_ != nullptr);
 
     for (size_t i = 0; i < point2grid_.size(); ++i) {
@@ -335,23 +332,29 @@ class Cluster2D {
 
   ObjectType GetObjectType(const MetaType meta_type_id) {
     switch (meta_type_id) {
-    case META_UNKNOWN: return UNKNOWN;
-    case META_SMALLMOT: return VEHICLE;
-    case META_BIGMOT: return VEHICLE;
-    case META_NONMOT: return BICYCLE;
-    case META_PEDESTRIAN: return PEDESTRIAN;
-    default: {
-      AERROR << "Undefined ObjectType output by CNNSeg model.";
-      return UNKNOWN;
-    }
+      case META_UNKNOWN:
+        return UNKNOWN;
+      case META_SMALLMOT:
+        return VEHICLE;
+      case META_BIGMOT:
+        return VEHICLE;
+      case META_NONMOT:
+        return BICYCLE;
+      case META_PEDESTRIAN:
+        return PEDESTRIAN;
+      default: {
+        AERROR << "Undefined ObjectType output by CNNSeg model.";
+        return UNKNOWN;
+      }
     }
   }
 
-  std::vector<float> GetObjectTypeProbs(const std::vector<float>& meta_type_probs) {
+  std::vector<float> GetObjectTypeProbs(
+      const std::vector<float>& meta_type_probs) {
     std::vector<float> object_type_probs(MAX_OBJECT_TYPE, 0.0);
     object_type_probs[UNKNOWN] = meta_type_probs[META_UNKNOWN];
-    object_type_probs[VEHICLE] = meta_type_probs[META_SMALLMOT] 
-                                 + meta_type_probs[META_BIGMOT];
+    object_type_probs[VEHICLE] =
+        meta_type_probs[META_SMALLMOT] + meta_type_probs[META_BIGMOT];
     object_type_probs[BICYCLE] = meta_type_probs[META_NONMOT];
     object_type_probs[PEDESTRIAN] = meta_type_probs[META_PEDESTRIAN];
     return object_type_probs;

@@ -42,14 +42,14 @@ class PbfTrackManager {
   int RemoveLostTracks();
 
  private:
- DISALLOW_COPY_AND_ASSIGN(PbfTrackManager);
+  DISALLOW_COPY_AND_ASSIGN(PbfTrackManager);
   PbfTrackManager();
 
  protected:
   std::vector<PbfTrackPtr> tracks_;
 };
 
-} //namespace perception
-} //namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_

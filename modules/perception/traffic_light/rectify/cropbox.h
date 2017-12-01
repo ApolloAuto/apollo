@@ -28,9 +28,9 @@ class CropBox : public IGetBox {
 
   void Init(float crop_scale, float min_crop_size);
 
-  virtual void
-  GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights, cv::Rect
-  *cropbox);
+  virtual void GetCropBox(const cv::Size &size,
+                          const std::vector<LightPtr> &lights,
+                          cv::Rect *cropbox);
 
  private:
   float crop_scale_;
@@ -39,12 +39,11 @@ class CropBox : public IGetBox {
 
 class CropBoxWholeImage : public IGetBox {
  public:
-  virtual void
-  GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights, cv::Rect
-  *cropbox);
+  virtual void GetCropBox(const cv::Size &size,
+                          const std::vector<LightPtr> &lights,
+                          cv::Rect *cropbox);
 };
-
 }
 }
 }
-#endif //GREEN_CROPBOX_H
+#endif  // GREEN_CROPBOX_H

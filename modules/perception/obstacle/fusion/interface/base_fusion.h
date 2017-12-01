@@ -55,8 +55,8 @@
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
@@ -68,12 +68,12 @@ class BaseFusion {
   // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
   // @param [in]: multi sensor objects.
   // @param [out]: fused objects.
-  virtual bool Fuse(
-      const std::vector<SensorObjects> &multi_sensor_objects,
-      std::vector<ObjectPtr> *fused_objects) = 0;
+  virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
+                    std::vector<ObjectPtr> *fused_objects) = 0;
   virtual std::string name() const = 0;
+
  private:
- DISALLOW_COPY_AND_ASSIGN(BaseFusion);
+  DISALLOW_COPY_AND_ASSIGN(BaseFusion);
 };
 REGISTER_REGISTERER(BaseFusion);
 #define REGISTER_FUSION(name) REGISTER_CLASS(BaseFusion, name)

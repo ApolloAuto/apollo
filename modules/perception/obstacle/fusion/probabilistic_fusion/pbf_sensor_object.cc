@@ -19,17 +19,18 @@
 namespace apollo {
 namespace perception {
 
-PbfSensorObject::PbfSensorObject() : sensor_type(UNKNOWN_SENSOR_TYPE),
-                                     timestamp(0.0), invisible_period(0.0) {
+PbfSensorObject::PbfSensorObject()
+    : sensor_type(UNKNOWN_SENSOR_TYPE), timestamp(0.0), invisible_period(0.0) {
   object.reset(new Object());
 }
 
-PbfSensorObject::PbfSensorObject(ObjectPtr obj3d, SensorType type, double time) :
-    sensor_type(type), timestamp(time), object(obj3d), invisible_period(0.0) {
-}
+PbfSensorObject::PbfSensorObject(ObjectPtr obj3d, SensorType type, double time)
+    : sensor_type(type),
+      timestamp(time),
+      object(obj3d),
+      invisible_period(0.0) {}
 
-PbfSensorObject::~PbfSensorObject() {
-}
+PbfSensorObject::~PbfSensorObject() {}
 
 PbfSensorObject::PbfSensorObject(const PbfSensorObject &rhs) {
   sensor_type = rhs.sensor_type;
@@ -59,5 +60,5 @@ void PbfSensorObject::clone(const PbfSensorObject &rhs) {
   object->clone(*(rhs.object));
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

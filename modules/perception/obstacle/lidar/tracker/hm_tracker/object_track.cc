@@ -368,9 +368,13 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 }
 
 /*class ObjectTrackSet*/
-ObjectTrackSet::ObjectTrackSet() { tracks_.reserve(1000); }
+ObjectTrackSet::ObjectTrackSet() {
+  tracks_.reserve(1000);
+}
 
-ObjectTrackSet::~ObjectTrackSet() { Clear(); }
+ObjectTrackSet::~ObjectTrackSet() {
+  Clear();
+}
 
 bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
     const int& track_consecutive_invisible_maximum) {

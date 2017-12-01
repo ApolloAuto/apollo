@@ -24,9 +24,7 @@ namespace perception {
 namespace traffic_light {
 
 bool UnityRecognize::Init() {
-
-  ConfigManager *config_manager = \
-            ConfigManager::instance();
+  ConfigManager *config_manager = ConfigManager::instance();
   if (config_manager == NULL) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
@@ -61,19 +59,18 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
   std::string classify_model;
   std::string classify_net;
 
-  if (!model_config->GetValue(\
-            "classify_model", &classify_model)) {
+  if (!model_config->GetValue("classify_model", &classify_model)) {
     AERROR << "classify_model not found." << name();
     return false;
   }
-  classify_model = FileUtil::GetAbsolutePath(config_manager->work_root(),
-                                             classify_model);
+  classify_model =
+      FileUtil::GetAbsolutePath(config_manager->work_root(), classify_model);
   if (!model_config->GetValue("classify_net", &classify_net)) {
     AERROR << "classify_net not found." << name();
     return false;
   }
-  classify_net = FileUtil::GetAbsolutePath(config_manager->work_root(),
-                                           classify_net);
+  classify_net =
+      FileUtil::GetAbsolutePath(config_manager->work_root(), classify_net);
 
   float classify_threshold = 0;
   int classify_resize_width = 0;
@@ -85,28 +82,29 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
     return false;
   }
 
-  if (!model_config->GetValue("classify_resize_width", &classify_resize_width)) {
+  if (!model_config->GetValue("classify_resize_width",
+                              &classify_resize_width)) {
     AERROR << "classify_resize_width not found." << name();
     return false;
   }
-  if (!model_config->GetValue("classify_resize_height", &classify_resize_height)) {
+  if (!model_config->GetValue("classify_resize_height",
+                              &classify_resize_height)) {
     AERROR << "classify_resize_height not found." << name();
     return false;
   }
-  if (!model_config->GetValue(\
-            "classify_threshold", &classify_threshold)) {
+  if (!model_config->GetValue("classify_threshold", &classify_threshold)) {
     AERROR << "classify_threshold not found." << name();
     return false;
   }
-  classify->reset(new ClassifyBySimple(classify_net,
-                                       classify_model,
+  classify->reset(new ClassifyBySimple(classify_net, classify_model,
                                        classify_threshold,
-                                       (unsigned int) classify_resize_width,
-                                       (unsigned int) classify_resize_height));
+                                       (unsigned int)classify_resize_width,
+                                       (unsigned int)classify_resize_height));
   return true;
 }
 
-bool UnityRecognize::RecognizeStatus(const Image &image, const RecognizeOption &option,
+bool UnityRecognize::RecognizeStatus(const Image &image,
+                                     const RecognizeOption &option,
                                      std::vector<LightPtr> *lights) {
   cv::Mat ros_image = image.mat();
   std::vector<LightPtr> &lights_ref = *lights;
@@ -115,17 +113,18 @@ bool UnityRecognize::RecognizeStatus(const Image &image, const RecognizeOption &
   classify_night_->SetCropBox(cbox);
   classify_day_->SetCropBox(cbox);
   std::vector<LightPtr> candidate(1);
-  for (LightPtr light:*lights) {
+  for (LightPtr light : *lights) {
     if (light->region.is_detected) {
       candidate[0] = light;
-      if (light->region.detect_class_id == QUADRATE_CLASS) {    // QUADRATE_CLASS (Night)
+      if (light->region.detect_class_id ==
+          QUADRATE_CLASS) {  // QUADRATE_CLASS (Night)
         AINFO << "Recognize Use Night Model!";
         classify_night_->Perform(ros_image, &candidate);
-      } else if (light->region.detect_class_id == VERTICAL_CLASS) {    // VERTICAL_CLASS (Day)
+      } else if (light->region.detect_class_id ==
+                 VERTICAL_CLASS) {  // VERTICAL_CLASS (Day)
         AINFO << "Recognize Use Day Model!";
         classify_day_->Perform(ros_image, &candidate);
       } else {
-
       }
     } else {
       light->status.color = UNKNOWN_COLOR;
@@ -142,7 +141,6 @@ bool UnityRecognize::RecognizeStatus(const Image &image, const RecognizeOption &
 std::string UnityRecognize::name() const {
   return "UnityRecognize";
 }
-
 }
 }
 }

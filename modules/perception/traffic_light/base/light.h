@@ -19,8 +19,8 @@
 
 #include <eigen3/Eigen/Core>
 #include <opencv2/opencv.hpp>
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/perception/traffic_light/base/image.h"
 
@@ -34,7 +34,7 @@ const TLColor GREEN = apollo::perception::TrafficLight::GREEN;
 const TLColor RED = apollo::perception::TrafficLight::RED;
 const TLColor YELLOW = apollo::perception::TrafficLight::YELLOW;
 const TLColor BLACK = apollo::perception::TrafficLight::BLACK;
-//When the light has been covered by some objected, the color returned.
+// When the light has been covered by some objected, the color returned.
 const TLColor DEFAULT_UNKNOWN_COLOR = apollo::perception::TrafficLight::UNKNOWN;
 
 enum DetectionClassId {
@@ -46,15 +46,17 @@ enum DetectionClassId {
 
 //@brief Light Region in the Image
 struct LightRegion {
-  //roi is marked by map & projection, it may be too large or not accuracy.
+  // roi is marked by map & projection, it may be too large or not accuracy.
   cv::Rect projection_roi;
 
   std::vector<cv::Rect> debug_roi;
   std::vector<float> debug_roi_detect_scores;
 
-  //rectified_roi is the region marked by Rectifier, it should be accuracy and small.
-  //A Light can have more than one roi, Rectifier may found more than one region seems like TL.
-  //Each roi can has many candidates, Recognizer can votes for them.
+  // rectified_roi is the region marked by Rectifier, it should be accuracy and
+  // small.
+  // A Light can have more than one roi, Rectifier may found more than one
+  // region seems like TL.
+  // Each roi can has many candidates, Recognizer can votes for them.
   cv::Rect rectified_roi;
   bool is_detected = false;
   bool is_selected = false;
@@ -83,13 +85,17 @@ struct LightStatus {
   double confidence = 0.0;
 
   std::string to_string() const {
-    std::string light_color = (color == UNKNOWN_COLOR ? "unknown color" :
-                               (color == RED ? "red" :
-                                (color == GREEN ? "green" :
-                                 (color == YELLOW ? "yellow" : "black"))));
-    //std::string light_color;
+    std::string light_color =
+        (color == UNKNOWN_COLOR
+             ? "unknown color"
+             : (color == RED ? "red"
+                             : (color == GREEN
+                                    ? "green"
+                                    : (color == YELLOW ? "yellow" : "black"))));
+    // std::string light_color;
     std::ostringstream oss;
-    oss << "Status: [color:" << light_color << " confidence:" << confidence << "]";
+    oss << "Status: [color:" << light_color << " confidence:" << confidence
+        << "]";
     return oss.str();
   }
 };
@@ -98,12 +104,10 @@ struct LightStatus {
 struct Light {
   Light() = default;
 
-  explicit Light(const apollo::hdmap::Signal &signal) :
-      info(signal) {
-  }
-  apollo::hdmap::Signal info;    // Light info in the map.
-  LightRegion region;  // Light region on the image.
-  LightStatus status;  // Light Status.
+  explicit Light(const apollo::hdmap::Signal &signal) : info(signal) {}
+  apollo::hdmap::Signal info;  // Light info in the map.
+  LightRegion region;          // Light region on the image.
+  LightStatus status;          // Light Status.
 
   std::string to_string() const {
     std::ostringstream oss;
@@ -121,12 +125,14 @@ typedef std::vector<LightPtr> LightPtrs;
 //@brief compute stopline to car's distance
 double stopline_distance(
     const Eigen::Matrix4d &car_pose,
-    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Curve> &stoplines);
+    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Curve>
+        &stoplines);
 
 //@brief compute traffic light to car's distance
 double trafficlight_distance(
     const Eigen::Matrix4d &car_pose,
-    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Subsignal> &subsignal);
+    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Subsignal>
+        &subsignal);
 
 }  // namespace traffic_light
 }  // namespace perception

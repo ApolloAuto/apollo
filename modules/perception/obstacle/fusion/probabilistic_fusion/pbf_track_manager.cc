@@ -25,13 +25,9 @@ PbfTrackManager *PbfTrackManager::instance() {
   return &track_manager;
 }
 
-PbfTrackManager::PbfTrackManager() {
+PbfTrackManager::PbfTrackManager() {}
 
-}
-
-PbfTrackManager::~PbfTrackManager() {
-
-}
+PbfTrackManager::~PbfTrackManager() {}
 
 int PbfTrackManager::RemoveLostTracks() {
   int track_count = 0;
@@ -43,11 +39,11 @@ int PbfTrackManager::RemoveLostTracks() {
       track_count++;
     }
   }
-  AINFO << "Remove " << (int) tracks_.size() - track_count << " tracks";
+  AINFO << "Remove " << (int)tracks_.size() - track_count << " tracks";
   tracks_.resize(track_count);
 
   return track_count;
 }
 
-} //namespace perception
-} //namespace apollo
+}  // namespace perception
+}  // namespace apollo

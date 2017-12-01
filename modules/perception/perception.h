@@ -26,9 +26,9 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/perception/onboard/dag_streaming.h"
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
-#include "modules/perception/onboard/dag_streaming.h"
 /**
  * @namespace apollo::perception
  * @brief apollo::perception

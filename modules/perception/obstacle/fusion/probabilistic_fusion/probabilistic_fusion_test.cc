@@ -16,11 +16,11 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
+#include <gtest/gtest.h>
+#include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
-#include "modules/perception/common/perception_gflags.h"
-#include "modules/common/log.h"
-#include <gtest/gtest.h>
 
 namespace apollo {
 namespace perception {
@@ -104,5 +104,5 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
   AINFO << "end probabilistic_fusion_test\n";
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

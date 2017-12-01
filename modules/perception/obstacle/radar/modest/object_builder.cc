@@ -30,7 +30,8 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
   for (int i = 0; i < raw_obstacles.contiobs_size(); i++) {
     ObjectPtr object_ptr = ObjectPtr(new Object());
     int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
-    std::map<int, int>::iterator continuous_id_it = continuous_ids_.find(obstacle_id);
+    std::map<int, int>::iterator continuous_id_it =
+        continuous_ids_.find(obstacle_id);
     if (continuous_id_it != continuous_ids_.end()) {
       current_con_ids[obstacle_id] = continuous_id_it->second + 1;
     } else {
@@ -40,17 +41,16 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
       object_ptr->is_background = true;
     }
     int tracking_times = current_con_ids[obstacle_id];
-    if (use_fp_filter_ && ContiRadarUtil::IsFp(raw_obstacles.contiobs(i), conti_params_,
-                                               delay_frames_, tracking_times)) {
+    if (use_fp_filter_ &&
+        ContiRadarUtil::IsFp(raw_obstacles.contiobs(i), conti_params_,
+                             delay_frames_, tracking_times)) {
       object_ptr->is_background = true;
     }
     object_ptr->track_id = obstacle_id;
     Eigen::Matrix<double, 4, 1> location_r;
     Eigen::Matrix<double, 4, 1> location_w;
     location_r << raw_obstacles.contiobs(i).longitude_dist(),
-        raw_obstacles.contiobs(i).lateral_dist(),
-        0.0,
-        1.0;
+        raw_obstacles.contiobs(i).lateral_dist(), 0.0, 1.0;
     location_w = radar_pose * location_r;
     Eigen::Vector3d point;
     point = location_w.topLeftCorner(3, 1);
@@ -59,8 +59,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     Eigen::Matrix<double, 3, 1> velocity_r;
     Eigen::Matrix<double, 3, 1> velocity_w;
     velocity_r << raw_obstacles.contiobs(i).longitude_vel(),
-        raw_obstacles.contiobs(i).lateral_vel(),
-        0.0;
+        raw_obstacles.contiobs(i).lateral_vel(), 0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
     // calculate the absolute velodity
@@ -86,13 +85,17 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     dist_rms(1, 1) = raw_obstacles.contiobs(i).lateral_dist_rms();
     vel_rms(0, 0) = raw_obstacles.contiobs(i).longitude_vel_rms();
     vel_rms(1, 1) = raw_obstacles.contiobs(i).lateral_vel_rms();
-    object_ptr->position_uncertainty = radar_pose.topLeftCorner(3, 3) *
-        dist_rms * dist_rms.transpose() * radar_pose.topLeftCorner(3, 3).transpose();
-    object_ptr->velocity_uncertainty = radar_pose.topLeftCorner(3, 3) *
-        vel_rms * vel_rms.transpose() * radar_pose.topLeftCorner(3, 3).transpose();
+    object_ptr->position_uncertainty =
+        radar_pose.topLeftCorner(3, 3) * dist_rms * dist_rms.transpose() *
+        radar_pose.topLeftCorner(3, 3).transpose();
+    object_ptr->velocity_uncertainty =
+        radar_pose.topLeftCorner(3, 3) * vel_rms * vel_rms.transpose() *
+        radar_pose.topLeftCorner(3, 3).transpose();
 
-    double local_theta = raw_obstacles.contiobs(i).oritation_angle() / 180.0 * PI;
-    Eigen::Vector3f direction = Eigen::Vector3f(cos(local_theta), sin(local_theta), 0);
+    double local_theta =
+        raw_obstacles.contiobs(i).oritation_angle() / 180.0 * PI;
+    Eigen::Vector3f direction =
+        Eigen::Vector3f(cos(local_theta), sin(local_theta), 0);
     direction = radar_pose.topLeftCorner(3, 3).cast<float>() * direction;
     object_ptr->direction = direction.cast<double>();
     // the avg time diff is from manual
@@ -106,8 +109,8 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     if (object_ptr->radar_supplement == nullptr) {
       object_ptr->radar_supplement.reset(new RadarSupplement());
     }
-    object_ptr->radar_supplement->range =
-        std::sqrt(location_r[0] * location_r[0] + location_r[1] * location_r[1]);
+    object_ptr->radar_supplement->range = std::sqrt(
+        location_r[0] * location_r[0] + location_r[1] * location_r[1]);
     // TODO should be set to theta
     object_ptr->radar_supplement->angle = 0;
     objects->push_back(object_ptr);
@@ -115,5 +118,5 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
   continuous_ids_ = current_con_ids;
 }
 
-} // namesapce perception
-} // namesapce apollo
+}  // namesapce perception
+}  // namesapce apollo

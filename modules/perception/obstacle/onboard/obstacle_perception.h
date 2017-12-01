@@ -17,41 +17,41 @@
 #ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
 #define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
 
-#include "modules/perception/obstacle/onboard/lidar_process.h"
-#include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
+#include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
-#include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/onboard/lidar_process.h"
 #include "modules/perception/obstacle/onboard/sensor_raw_frame.h"
+#include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 
 namespace apollo {
 namespace perception {
 
 class ObstaclePerception {
-public:
-    ObstaclePerception();
-    ~ObstaclePerception();
+ public:
+  ObstaclePerception();
+  ~ObstaclePerception();
 
-    bool Init();
+  bool Init();
 
-    bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>& out_objects);
+  bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>& out_objects);
 
-    void SetGlobalOffset(const Eigen::Vector3d& global_offset);
+  void SetGlobalOffset(const Eigen::Vector3d& global_offset);
 
-private:
-    std::unique_ptr<LidarProcess>      lidar_perception_;
-    std::unique_ptr<BaseRadarDetector> radar_detector_;
-    std::unique_ptr<BaseFusion>        fusion_;
-    std::unique_ptr<OpenglVisualizer>  frame_visualizer_ = nullptr;
-    FrameContent                       frame_content_;
-    bool                               initialized_;
-    Eigen::Vector3d                    global_offset_;
-    DISALLOW_COPY_AND_ASSIGN(ObstaclePerception);
-}; // class ObstaclePerception
+ private:
+  std::unique_ptr<LidarProcess> lidar_perception_;
+  std::unique_ptr<BaseRadarDetector> radar_detector_;
+  std::unique_ptr<BaseFusion> fusion_;
+  std::unique_ptr<OpenglVisualizer> frame_visualizer_ = nullptr;
+  FrameContent frame_content_;
+  bool initialized_;
+  Eigen::Vector3d global_offset_;
+  DISALLOW_COPY_AND_ASSIGN(ObstaclePerception);
+};  // class ObstaclePerception
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
+#endif  // MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_

@@ -15,10 +15,10 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
-#include <map>
-#include <vector>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <vector>
 #include "Eigen/Dense"
 #include "modules/perception/obstacle/base/types.h"
 
@@ -53,7 +53,7 @@ bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix);
 
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 
-bool LoadMultipleMatricesFile(const std::string& filename, 
+bool LoadMultipleMatricesFile(const std::string& filename,
                               std::map<std::string, Matrixd>* matrices);
 
 }  // namespace sequence_type_fuser

@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
-#include "modules/perception/common/perception_gflags.h"
-#include "modules/common/log.h"
 #include <gtest/gtest.h>
+#include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -51,10 +51,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   radar_obs->set_meas_state(CONTI_NEW);
   RadarDetectorOptions options;
   Eigen::Matrix4d radar2world_pose;
-  radar2world_pose << 1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1;
+  radar2world_pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Vector3f main_car_velocity;
   main_car_velocity[0] = -1.0;
   main_car_velocity[1] = 0.0;
@@ -73,12 +70,9 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   map_polygons[0].points[3].x = 20;
   map_polygons[0].points[3].y = -20;
   std::vector<ObjectPtr> objects;
-  radar_detector->Detect(raw_obstacles,
-                         map_polygons,
-                         options,
-                         &objects);
+  radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_TRUE(objects.size() == 1);
-  EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);       //threshold
+  EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);  // threshold
   EXPECT_TRUE(fabs(objects[0]->center(1) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 2.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.0) < 1e-5);
@@ -88,10 +82,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   Eigen::Vector2d location(3.0 * time_diff, 4.0 * time_diff);
   radar_obs->set_longitude_dist(location(0));
   radar_obs->set_lateral_dist(location(1));
-  radar_detector->Detect(raw_obstacles,
-                         map_polygons,
-                         options,
-                         &objects);
+  radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_TRUE(objects.size() == 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - location(0)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->center(1) - location(1)) < 1e-2);

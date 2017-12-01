@@ -68,8 +68,7 @@ bool SubnodeHelper::ParseReserveField(const string &reserve,
   return true;
 }
 
-bool SubnodeHelper::ProduceSharedDataKey(double stamp,
-                                         const string &device_id,
+bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string &device_id,
                                          string *key) {
   char temp[64];
   memset(temp, '\0', sizeof(temp));
@@ -87,8 +86,7 @@ bool SubnodeHelper::ProduceSharedDataKey(double stamp,
   return true;
 }
 
-bool SubnodeHelper::ProduceSharedDataKey(double stamp,
-                                         const string &device_id,
+bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string &device_id,
                                          int64_t *key) {
   int64_t temp = static_cast<int64_t>(stamp * FLAGS_stamp_enlarge_factor);
   *key = temp * FLAGS_stamp_enlarge_factor + atoi(device_id.c_str());

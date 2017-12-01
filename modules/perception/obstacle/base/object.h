@@ -23,12 +23,12 @@
 
 #include "Eigen/Core"
 
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/perception/obstacle/base/object_supplement.h"
-#include "modules/perception/lib/base/time_util.h"
 
 namespace apollo {
 namespace perception {
@@ -88,7 +88,7 @@ struct alignas(16) Object {
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
 
-  //sensor particular suplplements, default nullptr
+  // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
 };
 

@@ -19,18 +19,17 @@
 namespace apollo {
 namespace perception {
 
-PbfSensorMonitor::PbfSensorMonitor() {
-}
+PbfSensorMonitor::PbfSensorMonitor() {}
 
 bool PbfSensorMonitor::Init() {
   return true;
 }
 
-void PbfSensorMonitor::Update(const std::string &sensor_id,
-                              double capture_time, double detection_time) {
-
-  //TODO
-  std::map<std::string, SensorStatus>::iterator it = sensor_states_.find(sensor_id);
+void PbfSensorMonitor::Update(const std::string &sensor_id, double capture_time,
+                              double detection_time) {
+  // TODO
+  std::map<std::string, SensorStatus>::iterator it =
+      sensor_states_.find(sensor_id);
   if (it == sensor_states_.end()) {
     SensorStatus status;
     status.sensor_id = sensor_id;
@@ -45,5 +44,5 @@ void PbfSensorMonitor::Update(const std::string &sensor_id,
   }
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

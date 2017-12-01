@@ -16,7 +16,10 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_
+#include <boost/circular_buffer.hpp>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Core"
@@ -24,20 +27,19 @@
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/localization/proto/gps.pb.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include <boost/circular_buffer.hpp>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
-#include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
-#include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
-#include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
+#include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
+#include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 #include "modules/perception/onboard/subnode.h"
-#include "modules/localization/proto/gps.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
@@ -93,6 +95,4 @@ REGISTER_SUBNODE(RadarProcessSubnode);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  //MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_
-
-
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_SUBNODE_H_

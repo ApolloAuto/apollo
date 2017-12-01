@@ -36,8 +36,8 @@ class SingleBoundaryBasedProjection : public BaseProjection {
  private:
   bool project_point(const CameraCoeffient &coeffient,
                      const Eigen::Matrix4d &pose,
-                     const apollo::common::Point3D &point,
-                     int *center_x, int *center_y) const;
+                     const apollo::common::Point3D &point, int *center_x,
+                     int *center_y) const;
 
   bool project_point_distort(const CameraCoeffient &coeffient,
                              const Eigen::Matrix4d &pose,
@@ -51,8 +51,8 @@ class SingleBoundaryBasedProjection : public BaseProjection {
 };
 
 REGISTER_PROJECTION(SingleBoundaryBasedProjection);
-} // namespace traffic_light
-} // namespace perception
-} // namespace apollo
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H

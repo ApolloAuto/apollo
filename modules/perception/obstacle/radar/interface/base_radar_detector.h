@@ -54,17 +54,17 @@
 // using radar_detector to do somethings.
 // ////////////////////////////////////////////////////
 
+#include <Eigen/Core>
 #include <string>
 #include <vector>
-#include <Eigen/Core>
 
 // defined in apollo/common
-#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/common/macro.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
@@ -128,14 +128,14 @@ class BaseRadarDetector {
   // @param [in]: roi map polygons, using world frame.
   // @param [in]: options.
   // @param [out]: transformed objects.
-  virtual bool Detect(
-      const ContiRadar &raw_obstacles,
-      const std::vector<PolygonDType> &map_polygons,
-      const RadarDetectorOptions &options,
-      std::vector<ObjectPtr> *objects) = 0;
+  virtual bool Detect(const ContiRadar &raw_obstacles,
+                      const std::vector<PolygonDType> &map_polygons,
+                      const RadarDetectorOptions &options,
+                      std::vector<ObjectPtr> *objects) = 0;
   virtual std::string name() const = 0;
+
  private:
- DISALLOW_COPY_AND_ASSIGN(BaseRadarDetector);
+  DISALLOW_COPY_AND_ASSIGN(BaseRadarDetector);
 };
 
 REGISTER_REGISTERER(BaseRadarDetector);

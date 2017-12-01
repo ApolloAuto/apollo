@@ -16,12 +16,12 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_OUTPUT_SUBNODE_H
 
+#include <array>
 #include <map>
 #include <string>
-#include <array>
 
-#include <std_msgs/String.h>
 #include <sensor_msgs/Image.h>
+#include <std_msgs/String.h>
 
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
@@ -43,6 +43,7 @@ class TLOutputSubnode : public Subnode {
 
  protected:
   virtual bool init_internal() override;
+
  private:
   bool init_shared_data();
   bool init_output_stream();
@@ -57,7 +58,7 @@ class TLOutputSubnode : public Subnode {
   TLProcData *_proc_data = nullptr;
 
   // save BGR colors
-  //static std::map<std::string, std::array<int, 3> > _s_color_table;
+  // static std::map<std::string, std::array<int, 3> > _s_color_table;
 
   DISALLOW_COPY_AND_ASSIGN(TLOutputSubnode);
 };

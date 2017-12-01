@@ -18,12 +18,12 @@
 
 #include "boost/format.hpp"
 
-#include "modules/perception/obstacle/base/types.h"
 #include "modules/common/macro.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 
 namespace apollo {
 namespace perception {
@@ -60,8 +60,8 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
     motion_fusion_->Initialize(obj);
     invisible_in_radar_ = false;
   } else {
-    AERROR << "Unsupported sensor type : "
-           << sensor_type << ", sensor id : " << sensor_id;
+    AERROR << "Unsupported sensor type : " << sensor_type
+           << ", sensor id : " << sensor_id;
   }
 
   fused_timestamp_ = obj->timestamp;
@@ -89,8 +89,8 @@ PbfTrack::~PbfTrack() {
   }
 }
 
-void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist) {
-
+void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj,
+                                      double match_dist) {
   const SensorType &sensor_type = obj->sensor_type;
   const std::string sensor_id = obj->sensor_id;
   PerformMotionFusion(obj);
@@ -104,10 +104,10 @@ void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist)
   }
 
   double timestamp = obj->timestamp;
-  UpdateMeasurementsLifeWithMeasurement(lidar_objects_, sensor_id,
-                                        timestamp, s_max_lidar_invisible_period_);
-  UpdateMeasurementsLifeWithMeasurement(radar_objects_, sensor_id,
-                                        timestamp, s_max_radar_invisible_period_);
+  UpdateMeasurementsLifeWithMeasurement(lidar_objects_, sensor_id, timestamp,
+                                        s_max_lidar_invisible_period_);
+  UpdateMeasurementsLifeWithMeasurement(radar_objects_, sensor_id, timestamp,
+                                        s_max_radar_invisible_period_);
 
   invisible_period_ = 0;
   tracking_period_ += obj->timestamp - fused_timestamp_;
@@ -115,11 +115,15 @@ void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist)
   fused_object_->timestamp = obj->timestamp;
 }
 void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
-                                         const std::string &sensor_id, double min_match_dist, double timestamp) {
-  UpdateMeasurementsLifeWithoutMeasurement(lidar_objects_,
-                                           sensor_id, timestamp, s_max_lidar_invisible_period_, invisible_in_lidar_);
-  UpdateMeasurementsLifeWithoutMeasurement(radar_objects_,
-                                           sensor_id, timestamp, s_max_radar_invisible_period_, invisible_in_radar_);
+                                         const std::string &sensor_id,
+                                         double min_match_dist,
+                                         double timestamp) {
+  UpdateMeasurementsLifeWithoutMeasurement(lidar_objects_, sensor_id, timestamp,
+                                           s_max_lidar_invisible_period_,
+                                           invisible_in_lidar_);
+  UpdateMeasurementsLifeWithoutMeasurement(radar_objects_, sensor_id, timestamp,
+                                           s_max_radar_invisible_period_,
+                                           invisible_in_radar_);
   is_dead_ = (lidar_objects_.empty() && radar_objects_.empty());
   if (!is_dead_) {
     double time_diff = timestamp - fused_timestamp_;
@@ -160,7 +164,6 @@ PbfSensorObjectPtr PbfTrack::GetRadarObject(const std::string &sensor_id) {
 }
 
 void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
-
   const SensorType &sensor_type = obj->sensor_type;
   double time_diff = obj->timestamp - fused_object_->timestamp;
 
@@ -195,7 +198,7 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
         fused_object_->clone(*obj);
         fused_object_->object->velocity = velocity;
       } else {
-        //if has lidar, use lidar shape
+        // if has lidar, use lidar shape
         Eigen::Vector3d translation = anchor_point - pre_anchor_point;
         fused_object_->object->anchor_point = anchor_point;
         fused_object_->object->center += translation;
@@ -213,10 +216,10 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
     AERROR << "Unsupport sensor type " << sensor_type;
     return;
   }
-
 }
 
-void PbfTrack::PerformMotionCompensation(PbfSensorObjectPtr obj, double timestamp) {
+void PbfTrack::PerformMotionCompensation(PbfSensorObjectPtr obj,
+                                         double timestamp) {
   double time_diff = timestamp - obj->timestamp;
   if (time_diff < 0) {
     AERROR << "target timestamp is smaller than previous timestamp";
@@ -228,14 +231,14 @@ void PbfTrack::PerformMotionCompensation(PbfSensorObjectPtr obj, double timestam
   obj->object->anchor_point += offset;
 
   PolygonDType &polygon = obj->object->polygon;
-  for (int i = 0; i < (int) polygon.size(); i++) {
+  for (int i = 0; i < (int)polygon.size(); i++) {
     polygon.points[i].x += offset[0];
     polygon.points[i].y += offset[1];
     polygon.points[i].z += offset[2];
   }
 
   pcl_util::PointCloudPtr cloud = obj->object->cloud;
-  for (int i = 0; i < (int) cloud->size(); i++) {
+  for (int i = 0; i < (int)cloud->size(); i++) {
     cloud->points[i].x += offset[0];
     cloud->points[i].y += offset[1];
     cloud->points[i].z += offset[2];
@@ -257,24 +260,30 @@ int PbfTrack::GetNextTrackId() {
 }
 
 bool PbfTrack::AbleToPublish() {
-  AINFO << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " " << lidar_objects_.size();
+  AINFO << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " "
+        << lidar_objects_.size();
   double invisible_period_threshold = 0.001;
-  if (invisible_period_ > invisible_period_threshold &&
-      invisible_in_lidar_ && invisible_in_radar_) {
+  if (invisible_period_ > invisible_period_threshold && invisible_in_lidar_ &&
+      invisible_in_radar_) {
     ADEBUG << "unable_to_publish: invisible " << invisible_period_;
     return false;
   }
 
-  if (s_publish_if_has_lidar_ && !invisible_in_lidar_ && !lidar_objects_.empty()) {
+  if (s_publish_if_has_lidar_ && !invisible_in_lidar_ &&
+      !lidar_objects_.empty()) {
     return true;
   }
 
   PbfSensorObjectPtr radar_object = GetLatestRadarObject();
-  if (s_publish_if_has_radar_ && !invisible_in_radar_ && radar_object != nullptr) {
+  if (s_publish_if_has_radar_ && !invisible_in_radar_ &&
+      radar_object != nullptr) {
     if (radar_object->sensor_type == RADAR) {
-      if (radar_object->object->radar_supplement->range > s_min_radar_confident_distance_ &&
-          radar_object->object->radar_supplement->angle < s_max_radar_confident_angle_) {
-        if (fused_object_->object->velocity.dot(fused_object_->object->direction) < 0.3) {
+      if (radar_object->object->radar_supplement->range >
+              s_min_radar_confident_distance_ &&
+          radar_object->object->radar_supplement->angle <
+              s_max_radar_confident_angle_) {
+        if (fused_object_->object->velocity.dot(
+                fused_object_->object->direction) < 0.3) {
           // fused_object_->object->velocity.setZero();
           return false;
         }
@@ -307,11 +316,10 @@ void PbfTrack::UpdateMeasurementsLifeWithoutMeasurement(
     std::map<std::string, PbfSensorObjectPtr> &objects,
     const std::string &sensor_id, double timestamp, double max_invisible_time,
     bool &invisible_state) {
-
   invisible_state = true;
   for (auto it = objects.begin(); it != objects.end();) {
     if (sensor_id == it->first) {
-      it->second = nullptr; //TODO: consider in-view state
+      it->second = nullptr;  // TODO: consider in-view state
       it = objects.erase(it);
     } else {
       double period = timestamp - it->second->timestamp;
@@ -362,5 +370,5 @@ PbfSensorObjectPtr PbfTrack::GetSensorObject(const SensorType &sensor_type,
   }
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

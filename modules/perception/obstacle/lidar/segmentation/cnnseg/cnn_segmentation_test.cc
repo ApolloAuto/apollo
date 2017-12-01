@@ -67,10 +67,14 @@ int F2I(float val, float ori, float scale) {
 
 cv::Vec3b GetTypeColor(ObjectType type) {
   switch (type) {
-  case PEDESTRIAN: return cv::Vec3b(255, 128, 128); // pink
-  case BICYCLE: return cv::Vec3b(0, 0, 255); // blue
-  case VEHICLE: return cv::Vec3b(0, 255, 0); // green 
-  default: return cv::Vec3b(0, 255, 255); // yellow
+    case PEDESTRIAN:
+      return cv::Vec3b(255, 128, 128);  // pink
+    case BICYCLE:
+      return cv::Vec3b(0, 0, 255);  // blue
+    case VEHICLE:
+      return cv::Vec3b(0, 255, 0);  // green
+    default:
+      return cv::Vec3b(0, 255, 255);  // yellow
   }
 }
 
@@ -92,7 +96,9 @@ bool IsValidRowCol(int row, int rows, int col, int cols) {
   return row >= 0 && row < rows && col >= 0 && col < cols;
 }
 
-int RowCol2Grid(int row, int col, int cols) { return row * cols + col; }
+int RowCol2Grid(int row, int col, int cols) {
+  return row * cols + col;
+}
 
 bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
   pcl::PointCloud<PointXYZIT> ori_cloud;
@@ -169,7 +175,7 @@ void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
   }
 
   // show segment grids with tight bounding box
-  const cv::Vec3b segm_color(0, 0, 255);    // red
+  const cv::Vec3b segm_color(0, 0, 255);  // red
 
   for (size_t i = 0; i < objects.size(); ++i) {
     const ObjectPtr &obj = objects[i];

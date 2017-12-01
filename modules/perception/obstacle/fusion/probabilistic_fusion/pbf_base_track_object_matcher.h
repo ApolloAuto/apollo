@@ -43,8 +43,10 @@ class PbfBaseTrackObjectMatcher {
   // @params[OUT] assignments: matched pair of tracks and measurements
   // @params[OUT] unassigned_tracks: unmatched tracks
   // @params[OUT] unassigned_objects: unmatched objects
-  // @params[OUT] track2measurements_dist:minimum match distance to measurements for each track
-  // @prams[OUT] measurement2track_dist:minimum match distacne to tracks for each measurement
+  // @params[OUT] track2measurements_dist:minimum match distance to measurements
+  // for each track
+  // @prams[OUT] measurement2track_dist:minimum match distacne to tracks for
+  // each measurement
   // @return nothing
   virtual bool Match(std::vector<PbfTrackPtr> &fusion_tracks,
                      std::vector<PbfSensorObjectPtr> &sensor_objects,
@@ -71,12 +73,12 @@ class PbfBaseTrackObjectMatcher {
 
  protected:
   static double s_max_match_distance_;
- private:
- DISALLOW_COPY_AND_ASSIGN(PbfBaseTrackObjectMatcher);
 
+ private:
+  DISALLOW_COPY_AND_ASSIGN(PbfBaseTrackObjectMatcher);
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_

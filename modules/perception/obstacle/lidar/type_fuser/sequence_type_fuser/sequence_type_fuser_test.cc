@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "gtest/gtest.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -41,9 +41,10 @@ class SequenceTypeFuserTest : public testing::Test {
   void BuildObjects();
   std::size_t IdMap(size_t i);
   void GenerateSmoothProb(std::vector<float>* prob, std::size_t id, float seed);
+
  protected:
   std::shared_ptr<SequenceTypeFuser> fuser_;
-  std::vector<std::vector<ObjectPtr> > objects_;
+  std::vector<std::vector<ObjectPtr>> objects_;
   std::vector<double> timestamps_;
   static const std::size_t s_sequence_length_;
   static const std::size_t s_object_num_;
@@ -60,8 +61,8 @@ std::size_t SequenceTypeFuserTest::IdMap(std::size_t i) {
   }
 }
 
-void SequenceTypeFuserTest::GenerateSmoothProb(std::vector<float>* prob, 
-        std::size_t id, float seed) {
+void SequenceTypeFuserTest::GenerateSmoothProb(std::vector<float>* prob,
+                                               std::size_t id, float seed) {
   float p = (1.f - seed) / (VALID_OBJECT_TYPE - 1);
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     prob->at(IdMap(i)) = p;

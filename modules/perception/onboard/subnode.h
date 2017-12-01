@@ -26,10 +26,10 @@
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/lib/base/thread.h"
-#include "modules/perception/onboard/proto/dag_config.pb.h"
-#include "modules/perception/onboard/types.h"
-#include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/event_manager.h"
+#include "modules/perception/onboard/proto/dag_config.pb.h"
+#include "modules/perception/onboard/shared_data_manager.h"
+#include "modules/perception/onboard/types.h"
 
 namespace apollo {
 namespace perception {
@@ -51,8 +51,7 @@ class Subnode : public Thread {
         stop_(false),
         inited_(false),
         total_count_(0),
-        failed_count_(0) {
-  }
+        failed_count_(0) {}
 
   virtual ~Subnode() {}
 

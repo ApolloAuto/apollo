@@ -17,6 +17,7 @@
 #ifndef LIDAR_PROCESS_SUBNODE_H
 #define LIDAR_PROCESS_SUBNODE_H
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "Eigen/Core"

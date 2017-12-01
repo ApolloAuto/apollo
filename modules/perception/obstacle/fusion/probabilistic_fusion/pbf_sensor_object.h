@@ -53,7 +53,7 @@ struct PbfSensorFrame {
 
 typedef std::shared_ptr<PbfSensorFrame> PbfSensorFramePtr;
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_
+#endif  // MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_

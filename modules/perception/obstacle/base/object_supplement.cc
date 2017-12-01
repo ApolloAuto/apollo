@@ -19,31 +19,29 @@ namespace apollo {
 namespace perception {
 
 /**RadarSupplement implementation*/
-RadarSupplement::RadarSupplement() {
-}
-RadarSupplement::~RadarSupplement() {
-}
+RadarSupplement::RadarSupplement() {}
+RadarSupplement::~RadarSupplement() {}
 RadarSupplement::RadarSupplement(const RadarSupplement& rhs) {
-    range = rhs.range;
-    angle = rhs.angle;
-    relative_radial_velocity = rhs.relative_radial_velocity;
-    relative_tangential_velocity = rhs.relative_tangential_velocity;
-    radial_velocity = rhs.radial_velocity;
+  range = rhs.range;
+  angle = rhs.angle;
+  relative_radial_velocity = rhs.relative_radial_velocity;
+  relative_tangential_velocity = rhs.relative_tangential_velocity;
+  radial_velocity = rhs.radial_velocity;
 }
-RadarSupplement& RadarSupplement::operator = (const RadarSupplement& rhs) {
-    range = rhs.range;
-    angle = rhs.angle;
-    relative_radial_velocity = rhs.relative_radial_velocity;
-    relative_tangential_velocity = rhs.relative_tangential_velocity;
-    radial_velocity = rhs.radial_velocity;
-    return (*this);
+RadarSupplement& RadarSupplement::operator=(const RadarSupplement& rhs) {
+  range = rhs.range;
+  angle = rhs.angle;
+  relative_radial_velocity = rhs.relative_radial_velocity;
+  relative_tangential_velocity = rhs.relative_tangential_velocity;
+  radial_velocity = rhs.radial_velocity;
+  return (*this);
 }
 void RadarSupplement::clone(const RadarSupplement& rhs) {
-    range = rhs.range;
-    angle = rhs.angle;
-    relative_radial_velocity = rhs.relative_radial_velocity;
-    relative_tangential_velocity = rhs.relative_tangential_velocity;
-    radial_velocity = rhs.radial_velocity;
+  range = rhs.range;
+  angle = rhs.angle;
+  relative_radial_velocity = rhs.relative_radial_velocity;
+  relative_tangential_velocity = rhs.relative_tangential_velocity;
+  radial_velocity = rhs.radial_velocity;
 }
 
 }  // namespace perception

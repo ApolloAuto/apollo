@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #include <deque>
-#include "modules/common/macro.h"
 #include "modules/common/log.h"
+#include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
@@ -30,10 +30,13 @@ class PbfSensor {
   explicit PbfSensor(const SensorType &type, const std::string &sensor_id);
   ~PbfSensor();
 
-  /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
-  void QueryLatestFrames(double time_stamp, std::vector<PbfSensorFramePtr> *frames);
+  /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp,
+   * time_stamp]*/
+  void QueryLatestFrames(double time_stamp,
+                         std::vector<PbfSensorFramePtr> *frames);
 
-  /**@brief query latest frame whose time stamp is in range (_latest_fused_time_stamp, time_stamp]*/
+  /**@brief query latest frame whose time stamp is in range
+   * (_latest_fused_time_stamp, time_stamp]*/
   PbfSensorFramePtr QueryLatestFrame(double time_stamp);
 
   /**@brief add a frame objects*/
@@ -45,8 +48,9 @@ class PbfSensor {
   static void SetMaxCachedFrameNumber(int number) {
     s_max_cached_frame_number_ = number;
   }
+
  private:
- DISALLOW_COPY_AND_ASSIGN(PbfSensor);
+  DISALLOW_COPY_AND_ASSIGN(PbfSensor);
   PbfSensor();
 
  protected:
@@ -62,7 +66,7 @@ class PbfSensor {
   double latest_query_timestamp_;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_

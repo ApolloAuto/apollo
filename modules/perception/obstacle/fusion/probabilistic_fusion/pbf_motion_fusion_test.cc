@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 
-#include <vector>
+#include <algorithm>
+#include <functional>
 #include <map>
 #include <string>
-#include <functional>
-#include <algorithm>
+#include <vector>
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 
@@ -28,10 +28,8 @@ namespace perception {
 
 class PbfMotionFusionTest : public testing::Test {
  protected:
-  PbfMotionFusionTest() {
-  }
-  ~PbfMotionFusionTest() {
-  }
+  PbfMotionFusionTest() {}
+  ~PbfMotionFusionTest() {}
   void SetUp() override {
     PbfBaseMotionFusion *kalman_motion_fusion = new PbfKalmanMotionFusion();
     _motion_fusion_algs.push_back(kalman_motion_fusion);
@@ -42,6 +40,7 @@ class PbfMotionFusionTest : public testing::Test {
     }
     std::vector<PbfBaseMotionFusion *>().swap(_motion_fusion_algs);
   }
+
  protected:
   std::vector<PbfBaseMotionFusion *> _motion_fusion_algs;
 };
@@ -55,7 +54,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   lidar_object->velocity = lidar_velocity;
   PbfSensorObjectPtr pbf_lidar_object(
       new PbfSensorObject(lidar_object, VELODYNE_64, lidar_timestamp));
-  for (auto motion_fusion_alg: _motion_fusion_algs) {
+  for (auto motion_fusion_alg : _motion_fusion_algs) {
     motion_fusion_alg->Initialize(pbf_lidar_object);
     CHECK_EQ(motion_fusion_alg->Initialized(), true);
     Eigen::Vector3d location;
@@ -107,7 +106,8 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement) {
       new PbfSensorObject(lidar_object, VELODYNE_64, lidar_timestamp));
   for (auto motion_fusion_alg : _motion_fusion_algs) {
     motion_fusion_alg->Initialize(pbf_radar_object);
-    motion_fusion_alg->UpdateWithObject(pbf_lidar_object, lidar_timestamp - radar_timestamp);
+    motion_fusion_alg->UpdateWithObject(pbf_lidar_object,
+                                        lidar_timestamp - radar_timestamp);
     Eigen::Vector3d location;
     Eigen::Vector3d velocity;
     motion_fusion_alg->GetState(location, velocity);
@@ -129,7 +129,8 @@ TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
       new PbfSensorObject(lidar_object, VELODYNE_64, lidar_timestamp));
 
   double time_diff = 0.1;
-  Eigen::Vector3d expected_position = lidar_position + lidar_velocity * time_diff;
+  Eigen::Vector3d expected_position =
+      lidar_position + lidar_velocity * time_diff;
   for (auto motion_fusion_alg : _motion_fusion_algs) {
     motion_fusion_alg->Initialize(pbf_lidar_object);
     motion_fusion_alg->UpdateWithoutObject(time_diff);
@@ -141,5 +142,5 @@ TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
   }
 }
 
-} //namespace perception
-} //namespace apollo
+}  // namespace perception
+}  // namespace apollo

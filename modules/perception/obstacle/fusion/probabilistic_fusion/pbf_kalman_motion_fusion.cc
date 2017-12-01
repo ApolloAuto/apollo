@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 
+#include "modules/common/log.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -27,13 +27,10 @@ PbfKalmanMotionFusion::PbfKalmanMotionFusion() {
   name_ = "PbfKalmanMotionFusion";
 }
 
-PbfKalmanMotionFusion::~PbfKalmanMotionFusion() {
-
-}
+PbfKalmanMotionFusion::~PbfKalmanMotionFusion() {}
 
 void PbfKalmanMotionFusion::Initialize(const Eigen::Vector3d &anchor_point,
                                        const Eigen::Vector3d &velocity) {
-
   belief_anchor_point_ = anchor_point;
   belief_velocity_ = velocity;
   belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
@@ -41,7 +38,7 @@ void PbfKalmanMotionFusion::Initialize(const Eigen::Vector3d &anchor_point,
 
 void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   ACHECK(new_object != nullptr && new_object->object != nullptr)
-  << "Initialize PbfKalmanMotionFusion with null sensor object";
+      << "Initialize PbfKalmanMotionFusion with null sensor object";
 
   if (is_lidar(new_object->sensor_type)) {
     belief_anchor_point_ = new_object->object->anchor_point;
@@ -69,28 +66,32 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   q_matrix_ *= 0.5;
 
   r_matrix_.setIdentity();
-  r_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
-  r_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
+  r_matrix_.topLeftCorner(2, 2) =
+      new_object->object->position_uncertainty.topLeftCorner(2, 2);
+  r_matrix_.block<2, 2>(2, 2) =
+      new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
 
   p_matrix_.setIdentity();
-  p_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
-  p_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
+  p_matrix_.topLeftCorner(2, 2) =
+      new_object->object->position_uncertainty.topLeftCorner(2, 2);
+  p_matrix_.block<2, 2>(2, 2) =
+      new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
   c_matrix_.setIdentity();
 }
 
 void PbfKalmanMotionFusion::Predict(Eigen::Vector3d &anchor_point,
-                                    Eigen::Vector3d &velocity, const double time_diff) {
-
+                                    Eigen::Vector3d &velocity,
+                                    const double time_diff) {
   anchor_point = belief_anchor_point_ + belief_velocity_ * time_diff;
   velocity = belief_velocity_;
 }
 
-void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
-                                             const double time_diff) {
+void PbfKalmanMotionFusion::UpdateWithObject(
+    const PbfSensorObjectPtr new_object, const double time_diff) {
   ACHECK(new_object != nullptr && new_object->object != nullptr)
-  << "update PbfKalmanMotionFusion with null sensor object";
+      << "update PbfKalmanMotionFusion with null sensor object";
 
-  //predict and then correct
+  // predict and then correct
   a_matrix_.setIdentity();
   a_matrix_(0, 2) = time_diff;
   a_matrix_(1, 3) = time_diff;
@@ -110,7 +111,8 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
     if (GetLidarHistoryLength() >= 3) {
       int old_velocity_index = GetLidarHistoryIndex(3);
       Eigen::Vector3d old_velocity = history_velocity_[old_velocity_index];
-      double old_timediff = GetHistoryTimediff(old_velocity_index, new_object->timestamp);
+      double old_timediff =
+          GetHistoryTimediff(old_velocity_index, new_object->timestamp);
       measured_acceleration = (belief_velocity_ - old_velocity) / old_timediff;
     }
     if ((GetLidarHistoryLength() >= 3 && GetRadarHistoryLength() >= 3) ||
@@ -131,11 +133,12 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
     if (GetRadarHistoryLength() >= 3) {
       int old_velocity_index = GetRadarHistoryIndex(3);
       Eigen::Vector3d old_velocity = history_velocity_[old_velocity_index];
-      double old_timediff = GetHistoryTimediff(old_velocity_index, new_object->timestamp);
+      double old_timediff =
+          GetHistoryTimediff(old_velocity_index, new_object->timestamp);
       measured_acceleration = (belief_velocity_ - old_velocity) / old_timediff;
     }
     if ((GetLidarHistoryLength() >= 3 && GetRadarHistoryLength() >= 3) ||
-      history_velocity_.size() > 20) {
+        history_velocity_.size() > 20) {
       history_velocity_.pop_front();
       history_time_diff_.pop_front();
       history_velocity_is_radar_.pop_front();
@@ -155,10 +158,12 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
   measurement(2) = belief_velocity_(0);
   measurement(3) = belief_velocity_(1);
 
-  //r_matrix_ = new_object.uncertainty_mat;
+  // r_matrix_ = new_object.uncertainty_mat;
   r_matrix_.setIdentity();
-  r_matrix_.topLeftCorner(2, 2) = new_object->object->position_uncertainty.topLeftCorner(2, 2);
-  r_matrix_.block<2, 2>(2, 2) = new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
+  r_matrix_.topLeftCorner(2, 2) =
+      new_object->object->position_uncertainty.topLeftCorner(2, 2);
+  r_matrix_.block<2, 2>(2, 2) =
+      new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
 
   // Use lidar when there is no radar yet
   if (GetRadarHistoryLength() == 0 && GetLidarHistoryLength() > 1) {
@@ -166,16 +171,19 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
     r_matrix_ *= 0.01;
   }
 
-  k_matrix_ = p_matrix_ * c_matrix_.transpose() *
+  k_matrix_ =
+      p_matrix_ * c_matrix_.transpose() *
       (c_matrix_ * p_matrix_ * c_matrix_.transpose() + r_matrix_).inverse();
 
   Eigen::Vector4d predict_measurement(priori_state_(0), priori_state_(1),
                                       priori_state_(2), priori_state_(3));
 
-  posteriori_state_ = priori_state_ + k_matrix_ * (measurement - predict_measurement);
-  p_matrix_ = (Eigen::Matrix4d::Identity() - k_matrix_ * c_matrix_) * p_matrix_
-      * (Eigen::Matrix4d::Identity() - k_matrix_ * c_matrix_).transpose()
-      + k_matrix_ * r_matrix_ * k_matrix_.transpose();
+  posteriori_state_ =
+      priori_state_ + k_matrix_ * (measurement - predict_measurement);
+  p_matrix_ =
+      (Eigen::Matrix4d::Identity() - k_matrix_ * c_matrix_) * p_matrix_ *
+          (Eigen::Matrix4d::Identity() - k_matrix_ * c_matrix_).transpose() +
+      k_matrix_ * r_matrix_ * k_matrix_.transpose();
 
   belief_anchor_point_(0) = posteriori_state_(0);
   belief_anchor_point_(1) = posteriori_state_(1);
@@ -188,12 +196,11 @@ void PbfKalmanMotionFusion::UpdateWithObject(const PbfSensorObjectPtr new_object
 }
 
 void PbfKalmanMotionFusion::UpdateWithoutObject(const double time_diff) {
-
   belief_anchor_point_ = belief_anchor_point_ + belief_velocity_ * time_diff;
 }
 
-void PbfKalmanMotionFusion::GetState(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity) {
-
+void PbfKalmanMotionFusion::GetState(Eigen::Vector3d &anchor_point,
+                                     Eigen::Vector3d &velocity) {
   anchor_point = belief_anchor_point_;
   velocity = belief_velocity_;
 }
@@ -244,20 +251,24 @@ int PbfKalmanMotionFusion::GetRadarHistoryIndex(const int &history_seq) {
   return history_index;
 }
 
-double PbfKalmanMotionFusion::GetHistoryTimediff(const int &history_index,
-                                                 const double &current_timestamp) {
+double PbfKalmanMotionFusion::GetHistoryTimediff(
+    const int &history_index, const double &current_timestamp) {
   double history_timestamp = history_time_diff_[history_index];
   double history_timediff = current_timestamp - history_timestamp;
   return history_timediff;
 }
 
-void PbfKalmanMotionFusion::UpdateAcceleration(const Eigen::VectorXd &measured_acceleration) {
+void PbfKalmanMotionFusion::UpdateAcceleration(
+    const Eigen::VectorXd &measured_acceleration) {
   Eigen::Matrix2d mat_c = Eigen::Matrix2d::Identity();
   Eigen::Matrix2d mat_q = Eigen::Matrix2d::Identity() * 0.5;
-  Eigen::Matrix2d mat_k = p_matrix_.block<2, 2>(2, 2) * mat_c.transpose() *
-      (mat_c * p_matrix_.block<2, 2>(2, 2) * mat_c.transpose() + mat_q).inverse();
+  Eigen::Matrix2d mat_k =
+      p_matrix_.block<2, 2>(2, 2) * mat_c.transpose() *
+      (mat_c * p_matrix_.block<2, 2>(2, 2) * mat_c.transpose() + mat_q)
+          .inverse();
   Eigen::Vector2d acceleration_gain =
-      mat_k * (measured_acceleration.head(2) - mat_c * belief_acceleration_.head(2));
+      mat_k *
+      (measured_acceleration.head(2) - mat_c * belief_acceleration_.head(2));
   // breakdown
   float breakdown_threshold = 2;
   if (acceleration_gain.norm() > breakdown_threshold) {
@@ -268,5 +279,5 @@ void PbfKalmanMotionFusion::UpdateAcceleration(const Eigen::VectorXd &measured_a
   belief_acceleration_(1) += acceleration_gain(1);
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

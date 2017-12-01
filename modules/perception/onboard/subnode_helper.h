@@ -15,20 +15,17 @@ class SubnodeHelper {
   // subnode has a field named reserve
   // when reserve like "source_name:./data;source_param:.fsi"
   // you can use this func to get the map
-  static bool ParseReserveField(
-      const std::string &reserve,
-      std::map<std::string, std::string> *result_map);
+  static bool ParseReserveField(const std::string &reserve,
+                                std::map<std::string, std::string> *result_map);
 
   // produce key for shared data which is always map
   // key = device_id + stamp * 100
-  static bool ProduceSharedDataKey(double stamp,
-                                   const std::string &device_id,
+  static bool ProduceSharedDataKey(double stamp, const std::string &device_id,
                                    std::string *key);
 
   // produce key for shared data which is always map
   // key = (long)(stamp * 100)*100 + device_id
-  static bool ProduceSharedDataKey(double stamp,
-                                   const std::string &device_id,
+  static bool ProduceSharedDataKey(double stamp, const std::string &device_id,
                                    int64_t *key);
 
   // conf format: param1_name=param1_value&param2_name=param2_value
@@ -50,8 +47,7 @@ class SubnodeHelper {
 // @brief FrameSkiper is designed for limiting the frame ratio.
 class FrameSkiper {
  public:
-  FrameSkiper() : min_interval_(0.0), ts_(0.0) {
-  }
+  FrameSkiper() : min_interval_(0.0), ts_(0.0) {}
 
   // @brief max_ratio means max frame/s
   bool Init(const double max_ratio);

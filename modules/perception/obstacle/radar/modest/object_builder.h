@@ -17,11 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
 
-#include <memory>
 #include <Eigen/Core>
-#include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/obstacle/base/object.h"
+#include <memory>
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/modest/radar_define.h"
 
@@ -29,11 +29,9 @@ namespace apollo {
 namespace perception {
 class ObjectBuilder {
  public:
-  ObjectBuilder(): delay_frames_(4), use_fp_filter_(true) {
-  }
-  ~ObjectBuilder(){}
-  void Build(const ContiRadar &raw_obstacles,
-             const Eigen::Matrix4d &radar_pose,
+  ObjectBuilder() : delay_frames_(4), use_fp_filter_(true) {}
+  ~ObjectBuilder() {}
+  void Build(const ContiRadar &raw_obstacles, const Eigen::Matrix4d &radar_pose,
              const Eigen::Vector2d &main_velocity,
              SensorObjects &radar_objects);
 
@@ -45,7 +43,7 @@ class ObjectBuilder {
     use_fp_filter_ = use_fp_filter;
   }
 
-  void SetContiParams(const ContiParams& conti_params) {
+  void SetContiParams(const ContiParams &conti_params) {
     conti_params_ = conti_params;
   }
 
@@ -56,6 +54,6 @@ class ObjectBuilder {
   ContiParams conti_params_;
 };
 
-} // namespace perception
-} // namespace apollo
-#endif // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
+}  // namespace perception
+}  // namespace apollo
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_

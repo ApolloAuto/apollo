@@ -91,5 +91,5 @@ double RadarTrack::GetTrackingTime() {
   return tracking_time_;
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

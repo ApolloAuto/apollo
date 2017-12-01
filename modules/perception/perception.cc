@@ -15,16 +15,16 @@
  *****************************************************************************/
 
 #include "modules/perception/perception.h"
-#include "modules/common/log.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
-#include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include "ros/include/ros/ros.h"
@@ -48,8 +48,8 @@ Status Perception::Init() {
   /// init config manager
   ConfigManager* config_manager = ConfigManager::instance();
   if (!config_manager->Init()) {
-      AERROR << "failed to Init ConfigManager";
-      return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init ConfigManager.");
+    AERROR << "failed to Init ConfigManager";
+    return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init ConfigManager.");
   }
   AINFO << "Init config manager successfully, work_root: "
         << config_manager->work_root();
@@ -60,7 +60,7 @@ Status Perception::Init() {
   if (!dag_streaming_.Init(dag_config_path)) {
     AERROR << "failed to Init DAGStreaming. dag_config_path:"
            << dag_config_path;
-        return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
+    return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
   }
   callback_thread_num_ = 5;
 
@@ -78,7 +78,6 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryFusionSubnode();
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();
-
 }
 
 Status Perception::Start() {

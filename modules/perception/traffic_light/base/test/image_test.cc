@@ -26,6 +26,7 @@ class ImageTest : public ::testing::Test {
  public:
   ImageTest() {}
   virtual ~ImageTest() {}
+
  protected:
   virtual void SetUp() override {
     _image = new Image();
@@ -64,7 +65,6 @@ TEST_F(ImageTest, test_all) {
   ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
   EXPECT_EQ("unkown device(camera)", _image->device_id_str());
 }
-
 }
 }
 }
