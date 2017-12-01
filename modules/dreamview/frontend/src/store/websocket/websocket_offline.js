@@ -42,11 +42,11 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     break;
                 case "FrameCount":
                     STORE.playback.setNumFrames(message.data);
-                    STORE.setInitializationStatus(true);
                     this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
+                    STORE.setInitializationStatus(true);
 
                     STORE.updateTimestamp(message.timestamp);
                     STORE.updateWorldTimestamp(message.world.timestampSec);

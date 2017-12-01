@@ -23,7 +23,7 @@ function deduceWebsocketServerAddr() {
 const serverAddr = process.env.NODE_ENV === "production" ?
                    deduceWebsocketServerAddr() : `ws://${devConfig.websocketServer}`;
 
-const WS = PARAMETERS.offlinePlayback
+const WS = OFFLINE_PLAYBACK
             ? new OfflinePlaybackWebSocketEndpoint(serverAddr)
             : new RealtimeWebSocketEndpoint(serverAddr);
 

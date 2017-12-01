@@ -11,11 +11,11 @@ module.exports = {
     context: path.join(__dirname, "src"),
 
     entry: {
-        app: "./app.js",
+        offline: "./offline.js",
     },
 
     output: {
-        path: path.join(__dirname, "dist"),
+        path: path.join(__dirname, "dist_offline"),
         filename: "[name].bundle.js",
         publicPath: "/",
     },
@@ -156,15 +156,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: "./index.hbs",
             // Include only the app. Do not include the service worker.
-            chunks: ["app"]
+            chunks: ["offline"]
         }),
         new FaviconsWebpackPlugin("./favicon.png"),
         new CopyWebpackPlugin([
             {
-                from: 'components/Navigation/navigation_viewer.html',
-                to:  'components/Navigation/navigation_viewer.html',
-                toType: 'file',
-            }, {
                 from: '../node_modules/three/examples/fonts',
                 to: 'fonts',
             }
@@ -173,9 +169,18 @@ module.exports = {
         // use the IgnorePlugin to stop any locale being bundled with moment:
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
+        // Configure global constant at "compile" time 
+        // to allow different behavior between offline or realtime
         new webpack.DefinePlugin({
-            OFFLINE_PLAYBACK: JSON.stringify(false),
+            OFFLINE_PLAYBACK: JSON.stringify(true),
         }),
+
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {warnings: false},
+            output: {comments: false},
+            sourceMap: true,
+        }),
+
     ],
 
     devServer: {
