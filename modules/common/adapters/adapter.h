@@ -88,7 +88,7 @@ class AdapterBase {
   /**
    * @brief Gets message delay.
    */
-  virtual double GetDelay() const = 0;
+  virtual double GetDelaySec() const = 0;
 
   /**
    * @brief Clear the data received so far.
@@ -331,7 +331,7 @@ class Adapter : public AdapterBase {
   /**
    * @brief Gets message delay.
    */
-  double GetDelay() const override {
+  double GetDelaySec() const override {
     return apollo::common::time::Clock::NowInSecond() - last_receive_time_;
   }
 
