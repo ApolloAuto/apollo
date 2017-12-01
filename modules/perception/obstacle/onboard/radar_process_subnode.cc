@@ -116,10 +116,11 @@ void RadarProcessSubnode::OnRadar(
   // 1. get radar pose
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
   if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
-    AERROR << "failed to get trans at timestamp: " << timestamp;
+    AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
     error_code_ = common::PERCEPTION_ERROR_TF;
     return;
   }
+  AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
   // Current Localiztion, radar postion.
   PointD position;
@@ -184,8 +185,8 @@ void RadarProcessSubnode::OnRadar(
 }
 
 void RadarProcessSubnode::OnGps(const apollo::localization::Gps &gps) {
-  MutexLock lock(&mutex_);
   double timestamp = gps.header().timestamp_sec();
+  AINFO << "gps timestamp:" << GLOG_TIMESTAMP(timestamp);
   ObjectPair obj_pair;
   obj_pair.first = timestamp;
   obj_pair.second = gps;
@@ -204,12 +205,12 @@ bool RadarProcessSubnode::GetCarLinearSpeed(double timestamp,
     return false;
   }
   if (gps_buffer_.front().first - 0.1 > timestamp) {
-    AWARN << "Your timestamp (" << timestamp << ") is earlier than the oldest "
+    AWARN << "Timestamp (" << GLOG_TIMESTAMP(timestamp) << ") is earlier than the oldest "
           << "timestamp (" << gps_buffer_.front().first << ").";
     return false;
   }
   if (gps_buffer_.back().first + 0.1 < timestamp) {
-    AWARN << "Your timestamp (" << timestamp << ") is newer than the latest "
+    AWARN << "Timestamp (" << GLOG_TIMESTAMP(timestamp) << ") is newer than the latest "
           << "timestamp (" << gps_buffer_.back().first << ").";
     return false;
   }
