@@ -104,7 +104,7 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
-  const double kStraightForwardLineCost = 10000.0;
+  const double kStraightForwardLineCost = 10.0;
   if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
       reference_line_info->Lanes().IsOnSegment()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
@@ -144,6 +144,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
       RecordDebugInfo(optimizer->Name(), time_diff_ms, ptr_latency_stats);
     }
   }
+
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
@@ -152,6 +153,16 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  double s = 0.0;
+  if (!trajectory.trajectory_points().empty() &&
+      trajectory.trajectory_points().back().has_path_point()) {
+    s = trajectory.trajectory_points().back().path_point().s();
+  }
+  const double kRefrenceLineLengthTh = 10.0;
+  const double kRefrenceLineLengthCost = 100.0;
+  reference_line_info->AddCost(
+      s > kRefrenceLineLengthTh ? 0.0 : kRefrenceLineLengthCost);
 
   if (FLAGS_enable_trajectory_check) {
     ConstraintChecker::ValidTrajectory(trajectory);
