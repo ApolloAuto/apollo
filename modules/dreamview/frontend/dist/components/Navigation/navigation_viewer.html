@@ -234,7 +234,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     async: false,
-                    timeout: 2000,
+                    timeout: 5000,
                     success: function (resp) {
                         if (routingPath !== false) {
                             routingPath.setMap(null);
@@ -243,8 +243,8 @@
                             path: resp,
                             geodesic: true,
                             strokeColor: '#cd5c5c',
-                            strokeOpacity: 0.3,
-                            strokeWeight: 2
+                            strokeOpacity: 0.8,
+                            strokeWeight: 5
                         });
 
                         routingPath.setMap(map);
@@ -298,7 +298,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     async: false,
-                    timeout: 2000,
+                    timeout: 5000,
                     success: function (resp) {
                         if (routingPath !== false) {
                             routingPath.setMap(null);
@@ -307,7 +307,7 @@
                             path: resp,
                             geodesic: true,
                             strokeColor: '#ff8c00',
-                            strokeOpacity: 0.3,
+                            strokeOpacity: 0.8,
                             strokeWeight: 5
                         });
 
@@ -360,7 +360,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     async: false,
-                    timeout: 2000,
+                    timeout: 5000,
                     success: function (resp) {
                         if (routingPath !== false) {
                             routingPath.setMap(null);
@@ -369,7 +369,7 @@
                             path: resp,
                             geodesic: true,
                             strokeColor: '#00bfff',
-                            strokeOpacity: 0.3,
+                            strokeOpacity: 0.8,
                             strokeWeight: 5
                         });
 
