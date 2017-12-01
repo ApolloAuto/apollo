@@ -32,7 +32,7 @@ DEFINE_string(calibration_table_file, "calibration_table.pb.txt",
 
 DEFINE_string(velodyne_launch_file, "start_velodyne.launch",
               "Velodyne launch file path relative to the vehicle data path.");
-DEFINE_string(velodyne_launch_path,
+DEFINE_string(velodyne_launch_file_target_path,
               "<ros>/share/velodyne/launch/start_velodyne.launch",
               "Velodyne launch file path for the vehicle in use, "
               "where <ros> is the placeholder of ROS root.");
@@ -40,7 +40,7 @@ DEFINE_string(velodyne_launch_path,
 DEFINE_string(velodyne_intrinsics_file,
               "velodyne_params/64E_S3_calibration_example.yaml",
               "Velodyne intrinsics path relative to the vehicle data path.");
-DEFINE_string(velodyne_intrinsics_path,
+DEFINE_string(velodyne_intrinsics_file_target_path,
               "<ros>/share/velodyne_pointcloud/params/"
               "64E_S3_calibration_example.yaml",
               "Velodyne intrinsic path for the vehicle in use, "
@@ -49,7 +49,7 @@ DEFINE_string(velodyne_intrinsics_path,
 DEFINE_string(velodyne_extrinsics_file,
               "velodyne_params/velodyne64_novatel_extrinsics_example.yaml",
               "Velodyne extrinsics path relative to the vehicle data path.");
-DEFINE_string(velodyne_extrinsics_path,
+DEFINE_string(velodyne_extrinsics_file_target_path,
               "<ros>/share/velodyne_pointcloud/params/"
               "velodyne64_novatel_extrinsics_example.yaml",
               "Velodyne extrinsic path for the vehicle in use, "
@@ -57,16 +57,23 @@ DEFINE_string(velodyne_extrinsics_path,
 
 DEFINE_string(gnss_launch_file, "gnss_params/gnss_driver.launch",
               "GNSS launch file path relative to the vehicle data path.");
-DEFINE_string(gnss_launch_path,
+DEFINE_string(gnss_launch_file_target_path,
               "<ros>/share/gnss_driver/launch/gnss_driver.launch",
               "GNSS launch file path for the vehicle in use, "
               "where <ros> is the placeholder of ROS root.");
 
 DEFINE_string(gnss_conf_file, "gnss_params/gnss_conf_mkz.txt",
               "GNSS config file path relative to the vehicle data path.");
-DEFINE_string(gnss_conf_path, "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt",
+DEFINE_string(gnss_conf_file_target_path,
+              "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt",
               "GNSS config file path for the vehicle in use, "
               "where <ros> is the placeholder of ROS root.");
+
+DEFINE_string(static_vehicle_info_file, "vehicle_info.pb.txt",
+              "Static vehicle info file.");
+DEFINE_string(static_vehicle_info_file_for_ota,
+              "modules/tools/ota/vehicle_info.pb.txt",
+              "Target path of static vehicle_info file for ota usage.");
 
 namespace apollo {
 namespace dreamview {
@@ -89,16 +96,19 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
            FLAGS_control_conf_file);
   // Copy velodyne_params.
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_launch_file),
-           TranslatePath(FLAGS_velodyne_launch_path));
+           TranslatePath(FLAGS_velodyne_launch_file_target_path));
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_intrinsics_file),
-           TranslatePath(FLAGS_velodyne_intrinsics_path));
+           TranslatePath(FLAGS_velodyne_intrinsics_file_target_path));
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_velodyne_extrinsics_file),
-           TranslatePath(FLAGS_velodyne_extrinsics_path));
+           TranslatePath(FLAGS_velodyne_extrinsics_file_target_path));
   // Copy gnss_conf.
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_gnss_launch_file),
-           TranslatePath(FLAGS_gnss_launch_path));
+           TranslatePath(FLAGS_gnss_launch_file_target_path));
   CopyFile(StrCat(vehicle_data_path, "/", FLAGS_gnss_conf_file),
-           TranslatePath(FLAGS_gnss_conf_path));
+           TranslatePath(FLAGS_gnss_conf_file_target_path));
+  // Copy vehicle_info.
+  CopyFile(StrCat(vehicle_data_path, "/", FLAGS_static_vehicle_info_file),
+           FLAGS_static_vehicle_info_file_for_ota);
 
   return true;
 }
