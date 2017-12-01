@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_END_CONDITION_SAMPLER_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_END_CONDITION_SAMPLER_H_
 
+#include "modules/planning/proto/lattice_structure.pb.h"
+
 #include <array>
 #include <utility>
 #include <vector>
@@ -51,6 +53,12 @@ class EndConditionSampler {
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForStopping(const std::array<double, 3>& init_s,
                                     const double ref_stop_position) const;
+
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLonEndConditionsGenerally(
+    const std::vector<SampleBound>& sample_bounds,
+    const LatticeSamplingConfig& lattice_sampling_config) const;
+
 };
 
 }  // namespace planning

@@ -136,5 +136,24 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
   return end_s_conditions;
 }
 
+std::vector<std::pair<std::array<double, 3>, double>>
+EndConditionSampler::SampleLonEndConditionsGenerally(
+  const std::vector<SampleBound>& sample_bounds,
+  const LatticeSamplingConfig& lattice_sampling_config) const {
+
+  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
+  std::array<double, 9> t_offsets = {-0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4};
+
+  for (const SampleBound& sample_bound : sample_bounds) {
+    double s = (sample_bound.s_upper() + sample_bound.s_lower())/2;
+    double ss = sample_bound.v_upper();
+    std::array<double, 3> s_condition = {s, ss, 0.0};
+    for (double t_offset : t_offsets) {
+      end_s_conditions.push_back({s_condition, t_offset + sample_bound.t()});
+    }
+  }
+  return end_s_conditions;
+}
+
 }  // namespace planning
 }  // namespace apollo
