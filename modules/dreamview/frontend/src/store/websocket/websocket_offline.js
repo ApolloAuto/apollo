@@ -101,16 +101,14 @@ export default class OfflinePlaybackWebSocketEndpoint {
     requestGroundMeta(mapId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveGroundMeta',
-            data: {
-                mapId: mapId,
-            }
+            mapId: mapId,
         }));
     }
 
-    requstFrameCount(id) {
+    requstFrameCount(jobId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveFrameCount',
-            id: id,
+            jobId: jobId,
         }));
     }
 

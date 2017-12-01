@@ -14,7 +14,8 @@ function deduceWebsocketServerAddr() {
     const link = document.createElement("a");
     link.href = server;
     const protocol = location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://${link.hostname}:${window.location.port}/websocket`;
+	const path = OFFLINE_PLAYBACK ? 'RosPlayBack' : 'websocket';
+    return `${protocol}://${link.hostname}:${window.location.port}/${path}`;
 }
 
 // NOTE: process.env.NODE_ENV will be set to "production" by webpack when

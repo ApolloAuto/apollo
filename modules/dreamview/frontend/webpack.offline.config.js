@@ -175,11 +175,11 @@ module.exports = {
             OFFLINE_PLAYBACK: JSON.stringify(true),
         }),
 
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {warnings: false},
-            output: {comments: false},
-            sourceMap: true,
-        }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {warnings: false},
+        //     output: {comments: false},
+        //     sourceMap: true,
+        // }),
 
     ],
 

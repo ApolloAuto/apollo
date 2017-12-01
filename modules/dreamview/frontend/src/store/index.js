@@ -34,7 +34,7 @@ class DreamviewStore {
 
     @observable planning = new Planning();
 
-    @observable playback = new Playback();
+    @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 
     @observable trafficSignal = new TrafficSignal();
 
