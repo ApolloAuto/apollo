@@ -27,11 +27,13 @@ namespace perception {
 namespace traffic_light {
 
 struct ReviseOption {
-  explicit ReviseOption(const double timestamp) : ts(timestamp) {}
-  double ts;  // timestamp for lights
+  explicit ReviseOption(const double timestamp) :
+      ts(timestamp) {
+  }
+  double ts;         // timestamp for lights
 };
 
-//@brief Reviser is the class is to revise the perception result.
+// @brief Reviser is the class is to revise the perception result.
 //       It may use history info(Tracker) or some else info.
 class BaseReviser {
  public:
@@ -39,14 +41,14 @@ class BaseReviser {
 
   virtual ~BaseReviser() = default;
 
-  //@brief init the reviser.
+  // @brief init the reviser.
   virtual bool Init() = 0;
 
-  //@brief reviser revise  the perception result
+  // @brief reviser revise  the perception result
   //       ASSERT(rectifed_result.size == perception_result.size)
-  //@param [in] option
-  //@param [in/out] rectifed_result
-  //@return true/false
+  // @param [in] option
+  // @param [in/out] rectifed_result
+  // @return true/false
   virtual bool Revise(const ReviseOption &option,
                       std::vector<LightPtr> *lights) = 0;
 
@@ -62,5 +64,3 @@ REGISTER_REGISTERER(BaseReviser);
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
-
-// @date 2016/09/07 17:41:16

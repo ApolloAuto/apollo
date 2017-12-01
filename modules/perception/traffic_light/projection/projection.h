@@ -16,41 +16,41 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 
-#include <cmath>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
+#include <cmath>
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-//@brief Projection for each Camera.
-class SingleBoundaryBasedProjection : public BaseProjection {
+// @brief Projection for each Camera.
+class BoundaryProjection : public BaseProjection {
  public:
-  virtual bool project(const CameraCoeffient &camera_coeffient,
+  bool Project(const CameraCoeffient &camera_coeffient,
                        const Eigen::Matrix4d &pose,
                        const apollo::hdmap::Signal &tl_info,
                        Light *light) const override;
 
  private:
-  bool project_point(const CameraCoeffient &coeffient,
-                     const Eigen::Matrix4d &pose,
-                     const apollo::common::Point3D &point, int *center_x,
-                     int *center_y) const;
+  bool ProjectPoint(const CameraCoeffient &coeffient,
+                    const Eigen::Matrix4d &pose,
+                    const apollo::common::Point3D &point,
+                    int *center_x, int *center_y) const;
 
-  bool project_point_distort(const CameraCoeffient &coeffient,
-                             const Eigen::Matrix4d &pose,
-                             const apollo::common::PointENU &point,
-                             int *center_x, int *center_y) const;
+  bool ProjectPointDistort(const CameraCoeffient &coeffient,
+                           const Eigen::Matrix4d &pose,
+                           const apollo::common::PointENU &point,
+                           int *center_x, int *center_y) const;
 
-  Eigen::Matrix<double, 2, 1> pixel_denormalize(
+  Eigen::Matrix<double, 2, 1> PixelDenormalize(
       const Eigen::Matrix<double, 2, 1> &pt2d,
       const Eigen::Matrix<double, 3, 4> &camera_intrinsic,
       const Eigen::Matrix<double, 5, 1> &distort_params) const;
 };
 
-REGISTER_PROJECTION(SingleBoundaryBasedProjection);
+REGISTER_PROJECTION(BoundaryProjection);
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

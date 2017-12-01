@@ -16,9 +16,12 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include <memory>
+#include <string>
+#include <vector>
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -49,7 +52,7 @@ class UnityRecognize : public BaseRecognizer {
 };
 
 REGISTER_RECOGNIZER(UnityRecognize);
-}
-}
-}
-#endif  // PERCEPTION_COLOR_RECOGNIZE_H
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
+#endif

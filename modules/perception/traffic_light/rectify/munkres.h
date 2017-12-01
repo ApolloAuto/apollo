@@ -25,8 +25,7 @@ class Munkres {
  public:
   Munkres();
 
-  ~Munkres() = default;
-  ;
+  ~Munkres() = default;;
 
   void Solve(cv::Mat_<int> &mat);
 
@@ -37,11 +36,12 @@ class Munkres {
   static const int STAR = 1;
   static const int PRIME = 2;
 
-  inline bool FindUncoveredInMatrix(double, unsigned int &,
+  inline bool FindUncoveredInMatrix(double,
+                                    unsigned int &,
                                     unsigned int &) const;
 
   inline bool PairInList(const std::pair<int, int> &,
-                         const std::list<std::pair<int, int>> &);
+                         const std::list<std::pair<int, int> > &);
 
   int Step1(void);
 
@@ -67,4 +67,4 @@ class Munkres {
 }
 }
 
-#endif  // PERCEPTION_MUNKRES_H
+#endif //PERCEPTION_MUNKRES_H

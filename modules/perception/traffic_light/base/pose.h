@@ -22,7 +22,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-//@brief Car's Pose
+// @brief Car's Pose
 class CarPose {
  public:
   CarPose() = default;

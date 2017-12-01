@@ -14,21 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cropbox.h"
+#include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
+#include <algorithm>
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-void CropBox::GetCropBox(const cv::Size &size,
-                         const std::vector<LightPtr> &lights,
-                         cv::Rect *cropbox) {
+void
+CropBox::GetCropBox(const cv::Size &size,
+                    const std::vector<LightPtr> &lights,
+                    cv::Rect *cropbox) {
   int lights_num = lights.size();
   if (lights_num == 0) {
     AINFO << "No valid HD-map corrdinates info";
-    ClearBox(*cropbox);
+    ClearBox(cropbox);
     return;
   }
   int rows = size.height;
@@ -51,17 +53,17 @@ void CropBox::GetCropBox(const cv::Size &size,
     if (yt > light.region.projection_roi.y) {
       yt = light.region.projection_roi.y;
     }
-    if (xr <
-        light.region.projection_roi.x + light.region.projection_roi.width) {
+    if (xr
+        < light.region.projection_roi.x + light.region.projection_roi.width) {
       xr = light.region.projection_roi.x + light.region.projection_roi.width;
     }
-    if (yb <
-        light.region.projection_roi.y + light.region.projection_roi.height) {
+    if (yb
+        < light.region.projection_roi.y + light.region.projection_roi.height) {
       yb = light.region.projection_roi.y + light.region.projection_roi.height;
     }
   }
   if (!initialized) {
-    ClearBox(*cropbox);
+    ClearBox(cropbox);
     return;
   }
   // scale
@@ -87,10 +89,10 @@ void CropBox::GetCropBox(const cv::Size &size,
   yb = center_y + resize_width / 2;
   yb = (yb >= rows) ? rows - 1 : yb;
 
-  cropbox->x = (int)xl;
-  cropbox->y = (int)yt;
-  cropbox->width = (int)(xr - xl);
-  cropbox->height = (int)(yb - yt);
+  cropbox->x = static_cast<int>(xl);
+  cropbox->y = static_cast<int>(yt);
+  cropbox->width = static_cast<int>(xr - xl);
+  cropbox->height = static_cast<int>(yb - yt);
 }
 void CropBox::Init(float crop_scale, float min_crop_size) {
   crop_scale_ = crop_scale;
@@ -110,8 +112,8 @@ void CropBoxWholeImage::GetCropBox(const cv::Size &size,
       return;
     }
   }
-  ClearBox(*cropbox);
+  ClearBox(cropbox);
 }
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

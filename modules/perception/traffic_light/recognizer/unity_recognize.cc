@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "unity_recognize.h"
-#include "classify.h"
+#include "modules/perception/traffic_light/recognizer/unity_recognize.h"
+#include "modules/perception/traffic_light/recognizer/classify.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
@@ -24,7 +24,8 @@ namespace perception {
 namespace traffic_light {
 
 bool UnityRecognize::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
+  ConfigManager *config_manager = \
+            ConfigManager::instance();
   if (config_manager == NULL) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
@@ -59,18 +60,19 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
   std::string classify_model;
   std::string classify_net;
 
-  if (!model_config->GetValue("classify_model", &classify_model)) {
+  if (!model_config->GetValue(\
+            "classify_model", &classify_model)) {
     AERROR << "classify_model not found." << name();
     return false;
   }
-  classify_model =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), classify_model);
+  classify_model = FileUtil::GetAbsolutePath(config_manager->work_root(),
+                                             classify_model);
   if (!model_config->GetValue("classify_net", &classify_net)) {
     AERROR << "classify_net not found." << name();
     return false;
   }
-  classify_net =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), classify_net);
+  classify_net = FileUtil::GetAbsolutePath(config_manager->work_root(),
+                                           classify_net);
 
   float classify_threshold = 0;
   int classify_resize_width = 0;
@@ -92,14 +94,16 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
     AERROR << "classify_resize_height not found." << name();
     return false;
   }
-  if (!model_config->GetValue("classify_threshold", &classify_threshold)) {
+  if (!model_config->GetValue(\
+            "classify_threshold", &classify_threshold)) {
     AERROR << "classify_threshold not found." << name();
     return false;
   }
-  classify->reset(new ClassifyBySimple(classify_net, classify_model,
+  classify->reset(new ClassifyBySimple(classify_net,
+                                       classify_model,
                                        classify_threshold,
-                                       (unsigned int)classify_resize_width,
-                                       (unsigned int)classify_resize_height));
+                                       (unsigned int) classify_resize_width,
+                                       (unsigned int) classify_resize_height));
   return true;
 }
 
@@ -116,12 +120,12 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
   for (LightPtr light : *lights) {
     if (light->region.is_detected) {
       candidate[0] = light;
-      if (light->region.detect_class_id ==
-          QUADRATE_CLASS) {  // QUADRATE_CLASS (Night)
+      if (light->region.detect_class_id
+          == QUADRATE_CLASS) {    // QUADRATE_CLASS (Night)
         AINFO << "Recognize Use Night Model!";
         classify_night_->Perform(ros_image, &candidate);
-      } else if (light->region.detect_class_id ==
-                 VERTICAL_CLASS) {  // VERTICAL_CLASS (Day)
+      } else if (light->region.detect_class_id
+          == VERTICAL_CLASS) {    // VERTICAL_CLASS (Day)
         AINFO << "Recognize Use Day Model!";
         classify_day_->Perform(ros_image, &candidate);
       } else {
@@ -134,13 +138,12 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
             << ". Not perform recognition.";
     }
   }
-
   return true;
 }
 
 std::string UnityRecognize::name() const {
   return "UnityRecognize";
 }
-}
-}
-}
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo

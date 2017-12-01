@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "munkres.h"
+#include "modules/perception/traffic_light/rectify/munkres.h"
 
 namespace apollo {
 namespace perception {
@@ -28,8 +28,8 @@ void Munkres::Diag(bool status) {
   is_diag_ = status;
 }
 
-int MaxValue(cv::Mat_<int> &m) {
-  int max = 0;  // std::numeric_limits<int>::min();
+int MaxValue(const cv::Mat_<int> &m) {
+  int max = 0;
   for (int i = 0; i < m.rows; i++) {
     for (int j = 0; j < m.cols; j++) {
       max = std::max<int>(max, m(i, j));
@@ -38,7 +38,9 @@ int MaxValue(cv::Mat_<int> &m) {
   return max;
 }
 
-void ExtendMat(cv::Mat_<int> &mat, unsigned int rows, unsigned int cols,
+void ExtendMat(cv::Mat_<int> &mat,
+               unsigned int rows,
+               unsigned int cols,
                int value = 0) {
   cv::Size2i inter_size;
   inter_size.height = std::min<int>(rows, mat.rows);
@@ -48,8 +50,8 @@ void ExtendMat(cv::Mat_<int> &mat, unsigned int rows, unsigned int cols,
   tm.setTo(cv::Scalar(value));
 
   if (inter_size.width != 0 && inter_size.height != 0) {
-    mat(cv::Rect(cv::Point(0, 0), inter_size))
-        .copyTo(tm(cv::Rect(cv::Point(0, 0), inter_size)));
+    mat(cv::Rect(cv::Point(0, 0), inter_size)).copyTo(
+        tm(cv::Rect(cv::Point(0, 0), inter_size)));
   }
   mat = tm;
 }
@@ -94,11 +96,15 @@ void ReplaceInfinites(cv::Mat_<int> &mat) {
       }
     }
   }
+
 }
 
 void MinimizeAlongDirection(cv::Mat_<int> &matrix, bool over_columns) {
-  const unsigned int outer_size = over_columns ? matrix.cols : matrix.rows,
-                     inner_size = over_columns ? matrix.rows : matrix.cols;
+  const unsigned int outer_size = over_columns ? matrix.cols
+                                               : matrix.rows,
+      inner_size = over_columns
+                   ? matrix.rows
+                   : matrix.cols;
 
   // Look for a minimum value to subtract from all values along
   // the "outer" direction.
@@ -133,8 +139,8 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
   // Copy input _matrix
   this->matrix_ = mat;
 
-  // If the input _matrix isn't square, make it square and fill the empty values
-  // with the largest value present in the _matrix.
+  // If the input _matrix isn't square, make it square
+  // and fill the empty values with the largest value present in the _matrix.
   if (rows != cols) {
     ExtendMat(matrix_, size, size, MaxValue(matrix_));
   }
@@ -144,7 +150,7 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
   ExtendMat(mask_matrix_, size, size);
 
   row_mask_ = new bool[size];
-  col_mask_ = new bool[size];  //?columns
+  col_mask_ = new bool[size];//?columns
   for (unsigned int i = 0; i < size; i++) {
     row_mask_[i] = false;
   }
@@ -152,8 +158,9 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
     col_mask_[i] = false;
   }
 
-  // Prepare the _matrix values...  If there were any infinities, replace them
-  // with a value greater than the maximum value in the _matrix.
+  // Prepare the _matrix values...
+  // If there were any infinities, r
+  // eplace them with a value greater than the maximum value in the _matrix.
   ReplaceInfinites(matrix_);
 
   MinimizeAlongDirection(matrix_, false);
@@ -162,28 +169,22 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
   // Follow the steps
   while (notdone) {
     switch (step) {
-      case 0:
-        notdone = false;
+      case 0:notdone = false;
         // end the step flow
         break;
-      case 1:
-        step = Step1();
+      case 1:step = Step1();
         // step is always 2
         break;
-      case 2:
-        step = Step2();
+      case 2:step = Step2();
         // step is always either 0 or 3
         break;
-      case 3:
-        step = Step3();
+      case 3:step = Step3();
         // step in [3, 4, 5]
         break;
-      case 4:
-        step = Step4();
+      case 4:step = Step4();
         // step is always 2
         break;
-      case 5:
-        step = Step5();
+      case 5:step = Step5();
         // step is always 3
         break;
     }
@@ -208,9 +209,11 @@ void Munkres::Solve(cv::Mat_<int> &mat) {
 
   delete[] row_mask_;
   delete[] col_mask_;
+
 }
 
-bool Munkres::FindUncoveredInMatrix(double item, unsigned int &row,
+bool Munkres::FindUncoveredInMatrix(double item,
+                                    unsigned int &row,
                                     unsigned int &col) const {
   unsigned int rows = matrix_.rows;
   unsigned int columns = matrix_.cols;
@@ -230,8 +233,8 @@ bool Munkres::FindUncoveredInMatrix(double item, unsigned int &row,
 }
 
 bool Munkres::PairInList(const std::pair<int, int> &needle,
-                         const std::list<std::pair<int, int>> &haystack) {
-  for (std::list<std::pair<int, int>>::const_iterator i = haystack.begin();
+                         const std::list<std::pair<int, int> > &haystack) {
+  for (std::list<std::pair<int, int> >::const_iterator i = haystack.begin();
        i != haystack.end(); i++) {
     if (needle == *i) {
       return true;
@@ -299,8 +302,9 @@ int Munkres::Step2(void) {
 }
 
 int Munkres::Step3(void) {
+
   if (FindUncoveredInMatrix(0, saverow_, savecol_)) {
-    mask_matrix_(saverow_, savecol_) = PRIME;  // prime it.
+    mask_matrix_(saverow_, savecol_) = PRIME; // prime it.
   } else {
     return 5;
   }
@@ -321,7 +325,7 @@ int Munkres::Step4(void) {
 
   // seq contains pairs of row/column values where we have found
   // either a star or a prime that is part of the ``alternating sequence``.
-  std::list<std::pair<int, int>> seq;
+  std::list<std::pair<int, int> > seq;
   // use _saverow, _savecol from step 3.
   std::pair<int, int> z0(saverow_, savecol_);
   seq.insert(seq.end(), z0);
@@ -380,8 +384,8 @@ int Munkres::Step4(void) {
     }
   } while (madepair);
 
-  for (std::list<std::pair<int, int>>::iterator i = seq.begin(); i != seq.end();
-       i++) {
+  for (std::list<std::pair<int, int> >::iterator i = seq.begin();
+       i != seq.end(); i++) {
     // 2. Unstar each starred zero of the sequence.
     if (mask_matrix_(i->first, i->second) == STAR) {
       mask_matrix_(i->first, i->second) = NORMAL;
@@ -454,6 +458,7 @@ int Munkres::Step5(void) {
   }
   return 3;
 }
+
 }
 }
 }

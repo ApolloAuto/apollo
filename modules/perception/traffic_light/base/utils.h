@@ -24,21 +24,23 @@ namespace traffic_light {
 
 uint64_t TimestampDouble2Int64(double ts);
 
-void ClearBox(cv::Rect &rect);
+void ClearBox(cv::Rect *rect);
 
 bool BoxIsValid(const cv::Rect &box, const cv::Size &size);
-cv::Rect RefinedBox(cv::Rect box, const cv::Size &size);
+cv::Rect RefinedBox(const cv::Rect inbox, const cv::Size &size);
 
-cv::Point2f GetCenter(cv::Rect box);
+cv::Point2f GetCenter(const cv::Rect &box);
 
-float GetDistance(cv::Point2f, cv::Point2f);
+float GetDistance(const cv::Point2f &, const cv::Point2f &);
 
-float Get2dGaussianScore(cv::Point2f p1, cv::Point2f p2, float sigma1,
+float Get2dGaussianScore(const cv::Point2f &p1,
+                         const cv::Point2f &p2,
+                         float sigma1,
                          float sigma2);
 
 float Get1dGaussianScore(float x1, float x2, float sigma);
-}
-}
-}
 
-#endif  // GREEN_UTILS_H
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
+#endif

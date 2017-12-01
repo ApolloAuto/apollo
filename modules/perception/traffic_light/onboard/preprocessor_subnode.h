@@ -16,38 +16,37 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
 
-#include <deque>
-#include <map>
 #include <memory>
 #include <vector>
+#include <deque>
+#include <map>
 
 #include <ros/ros.h>
-#include <tf/transform_listener.h>
 #include <tf2_ros/transform_listener.h>
+#include <tf/transform_listener.h>
 
+#include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/subscriber.h>
-#include <sensor_msgs/Image.h>
 #include "hdmap_input.h"
 
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
-#include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
+#include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-
+using apollo::hdmap::Signal;
 //@brief pre-processor subnode
 class TLPreprocessorSubnode : public Subnode {
  public:
   TLPreprocessorSubnode() = default;
-  virtual ~TLPreprocessorSubnode() = default;
-  ;
+  virtual ~TLPreprocessorSubnode() = default;;
 
   // @brief: as a subnode with type SUBNODE_IN
   //         we will use ros callback, so ignore subnode callback
@@ -65,13 +64,15 @@ class TLPreprocessorSubnode : public Subnode {
  private:
   bool InitSharedData();
 
-  // bool init_synchronizer(const ModelConfig& config);
+  //bool init_synchronizer(const ModelConfig& config);
   bool InitPreprocessor();
 
   bool InitHdmap();
 
-  bool AddDataAndPublishEvent(const std::shared_ptr<ImageLights> &data,
-                              const CameraId &camera_id, double timestamp);
+  bool AddDataAndPublishEvent(
+      const std::shared_ptr<ImageLights> &data,
+      const CameraId &camera_id,
+      double timestamp);
 
   //@brief sub long focus camera
   void SubLongFocusCamera(const sensor_msgs::Image &msg);
@@ -83,12 +84,12 @@ class TLPreprocessorSubnode : public Subnode {
                       CameraId camera_id);
 
   void CameraSelection(double ts);
-  bool VerifyLightsProjection(const double &ts, const CameraId &camera_id,
-                              std::shared_ptr<ImageLights> *image_lights);
-  bool GetSignals(double ts, CarPose *pose,
-                  std::vector<apollo::hdmap::Signal> *signals);
+  bool VerifyLightsProjection(
+      const double &ts,
+      const CameraId &camera_id,
+      std::shared_ptr<ImageLights> *image_lights);
+  bool GetSignals(double ts, CarPose *pose, std::vector<Signal> *signals);
   bool GetCarPose(const double ts, CarPose *pose);
-
  private:
   TLPreprocessor preprocessor_;
   TLPreprocessingData *preprocessing_data_ = nullptr;
@@ -97,10 +98,10 @@ class TLPreprocessorSubnode : public Subnode {
 
   // signals
   float _last_signals_ts = -1;
-  std::vector<apollo::hdmap::Signal> _last_signals;
+  std::vector<Signal> _last_signals;
   float valid_hdmap_interval_ = 1.5;
 
-  // tf
+  //tf
   double _last_query_tf_ts = 0;
   float _query_tf_inverval_seconds = 0;
 
@@ -108,7 +109,8 @@ class TLPreprocessorSubnode : public Subnode {
   double last_proc_image_ts_ = 0.0;
   float proc_interval_seconds_ = 0.0;  //
 
-  DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
+ DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
+
 };
 
 REGISTER_SUBNODE(TLPreprocessorSubnode);

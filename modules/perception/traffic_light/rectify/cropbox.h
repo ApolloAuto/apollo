@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_CROPBOX_H
 
 #include "modules/perception/traffic_light/interface/green_interface.h"
+#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -28,9 +29,10 @@ class CropBox : public IGetBox {
 
   void Init(float crop_scale, float min_crop_size);
 
-  virtual void GetCropBox(const cv::Size &size,
-                          const std::vector<LightPtr> &lights,
-                          cv::Rect *cropbox);
+  virtual void
+  GetCropBox(const cv::Size &size,
+             const std::vector<LightPtr> &lights,
+             cv::Rect *cropbox);
 
  private:
   float crop_scale_;
@@ -39,11 +41,12 @@ class CropBox : public IGetBox {
 
 class CropBoxWholeImage : public IGetBox {
  public:
-  virtual void GetCropBox(const cv::Size &size,
-                          const std::vector<LightPtr> &lights,
-                          cv::Rect *cropbox);
+  virtual void
+  GetCropBox(const cv::Size &size,
+             const std::vector<LightPtr> &lights,
+             cv::Rect *cropbox);
 };
-}
-}
-}
-#endif  // GREEN_CROPBOX_H
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
+#endif

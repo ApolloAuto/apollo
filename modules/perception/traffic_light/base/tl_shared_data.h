@@ -16,6 +16,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_DATA_H
 
+#include <map>
+#include <string>
+#include <vector>
 #include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 
@@ -28,13 +31,14 @@ extern std::map<TLColor, std::string> kColorStr;
 extern const int kCountCameraId;
 extern const int kLongFocusIdx;
 extern const int kShortFocusIdx;
+extern std::map<CameraId, int> kCameraIndicator;
 class TLPreprocessingData : public CommonSharedData<ImageLights> {
  public:
   TLPreprocessingData() = default;
 
   virtual ~TLPreprocessingData() = default;
 
-  virtual std::string name() const override {
+  std::string name() const override {
     return "TLPreprocessingData";
   }
 };

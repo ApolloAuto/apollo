@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COLOR_DECISION_H
-#define PERCEPTION_COLOR_DECISION_H
+#ifndef MODULES_PERCEPTION_TRFFIC_LIGHT_REVISER_COLOR_DECISION_H
+#define MODULES_PERCEPTION_TRFFIC_LIGHT_REVISER_COLOR_DECISION_H
 
-#include "modules/perception/traffic_light/interface/base_reviser.h"
+#include <map>
+#include <vector>
+#include <string>
 #include "modules/perception/traffic_light/interface/green_interface.h"
+#include "modules/perception/traffic_light/interface/base_reviser.h"
 
 namespace apollo {
 namespace perception {
@@ -25,20 +28,22 @@ namespace traffic_light {
 
 class ColorReviser : public BaseReviser {
  public:
-  ColorReviser() {}
+  ColorReviser() {
+  }
 
-  //@brief init the reviser.
+  // @brief init the reviser.
   virtual bool Init();
-  //@brief reviser revise  the perception result
-  //       ASSERT(rectifed_result.size == perception_result.size)
-  //@param [in] option
-  //@param [in/out] rectifed_result
-  //@return true/false
-  virtual bool Revise(const ReviseOption &option,
-                      std::vector<LightPtr> *lights) override;
 
-  //@brief Revise's name
-  virtual std::string name() const;
+  // @brief reviser revise  the perception result
+  //       ASSERT(rectifed_result.size == perception_result.size)
+  // @param [in] option
+  // @param [in/out] rectifed_result
+  // @return true/false
+  bool Revise(const ReviseOption &option,
+              std::vector<LightPtr> *lights) override;
+
+  // @brief Revise's name
+  std::string name() const override;
 
  private:
   float blink_time_;
@@ -47,8 +52,9 @@ class ColorReviser : public BaseReviser {
   std::map<std::string, double> time_map_;
 };
 REGISTER_REVISER(ColorReviser);
-}
-}
-}
 
-#endif  // PERCEPTION_COLOR_DECISION_H
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_TRFFIC_LIGHT_REVISER_COLOR_DECISION_H
