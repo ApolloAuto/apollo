@@ -38,8 +38,10 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
   switch (type) {
     case AdapterConfig::POINT_CLOUD:
       return CHECK_NOTNULL(AdapterManager::GetPointCloud());
-    case AdapterConfig::COMPRESSED_IMAGE:
-      return CHECK_NOTNULL(AdapterManager::GetCompressedImage());
+    case AdapterConfig::IMAGE_LONG:
+      return CHECK_NOTNULL(AdapterManager::GetImageLong());
+    case AdapterConfig::IMAGE_SHORT:
+      return CHECK_NOTNULL(AdapterManager::GetImageShort());
     case AdapterConfig::LOCALIZATION:
       return CHECK_NOTNULL(AdapterManager::GetLocalization());
     case AdapterConfig::PERCEPTION_OBSTACLES:
@@ -72,7 +74,7 @@ void TopicMonitor::RunOnce(const double current_time) {
     status_->set_message_delay(-1);
     return;
   }
-  const double delay_seconds = adapter->GetDelayInMs() / 1000.0;
+  const double delay_seconds = adapter->GetLagSinceLastMessage();
   if (delay_seconds > config_.acceptable_delay()) {
     status_->set_message_delay(delay_seconds);
   } else {
