@@ -109,6 +109,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     GenerateSpeedProfiles(
       lon_init_state,
       sample_bounds,
+      lattice_sampling_config,
       ptr_lon_trajectory_bundle);
     GenerateLateralTrajectoryBundle(
       lat_init_state,
@@ -223,8 +224,18 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
 void Trajectory1dGenerator::GenerateSpeedProfiles(
     const std::array<double, 3>& lon_init_state,
     const std::vector<SampleBound>& sample_bounds,
+    const LatticeSamplingConfig& lattice_sampling_config,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  // TODO(all) Implement
+  // Maybe pass some sample configs here?
+  std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
+      end_condition_sampler_.SampleLonEndConditionsGenerally(
+        sample_bounds, lattice_sampling_config);
+  for (const auto& end_condition : end_conditions) {
+    std::shared_ptr<Curve1d> ptr_lon_trajectory =
+        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+        lon_init_state, end_condition.first, end_condition.second));
+    ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
+  }
 }
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(

@@ -14,6 +14,7 @@ cc_library(
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/util:lattice_util",
+        "//modules/planning/proto:lattice_structure_proto",
     ],
 )
 

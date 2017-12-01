@@ -69,6 +69,7 @@ class Trajectory1dGenerator {
   void GenerateSpeedProfiles(
       const std::array<double, 3>& lon_init_state,
       const std::vector<SampleBound>& sample_bounds,
+      const LatticeSamplingConfig& lattice_sampling_config,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateLateralTrajectoryBundle(
