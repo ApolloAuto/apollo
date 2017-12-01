@@ -17,12 +17,12 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_CONDITION_FILTER_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_CONDITION_FILTER_H_
 
-#include <vector>
 #include <array>
 #include <set>
 #include <utility>
+#include <vector>
 
-#include "modules/planning/lattice/behavior_decider/adc_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
@@ -33,33 +33,28 @@ class ConditionFilter {
  public:
   ConditionFilter(
       const std::array<double, 3>& init_s, const double speed_limit,
-      const ADCNeighborhood& adc_neighborhood);
+      const PathTimeNeighborhood& path_time_neighborhood);
 
-  void QuerySampleBounds(const double t,
-      std::vector<SampleBound>* sample_bounds);
+  std::vector<SampleBound> QuerySampleBounds(const double t) const;
 
-  void QuerySampleBounds(std::vector<SampleBound>* sample_bounds);
+  std::vector<SampleBound> QuerySampleBounds() const;
 
-  void QueryBlockIntervals(const double t,
-      std::vector<std::pair<CriticalPoint, CriticalPoint>>* block_intervals);
+  std::vector<std::pair<CriticalPoint, CriticalPoint>>
+  QueryPathTimeObstacleIntervals(const double t) const;
 
  private:
-  void Init(const ADCNeighborhood& adc_neighborhood);
+  void Init(const PathTimeNeighborhood& path_time_neighborhood);
 
   // Return true only if t is within the range of time slot,
   // but will output block interval anyway(maybe be extension)
-  bool QueryBlockInterval(const double t,
-      const CriticalCondition& critical_condition,
-      std::pair<CriticalPoint, CriticalPoint>* block_interval);
+  std::pair<CriticalPoint, CriticalPoint> QueryPathTimeObstacleIntervals(const double t,
+      const PathTimeObstacle& critical_condition) const;
 
-  bool TimeWithin(const double t,
-      const CriticalCondition& critical_condition);
-
-  void CriticalTimeStamps(std::set<double>* critical_timestamps);
+  std::set<double> CriticalTimeStamps() const;
 
  private:
   FeasibleRegion feasible_region_;
-  std::vector<CriticalCondition> critical_conditions_;
+  std::vector<PathTimeObstacle> path_time_obstacles_;
 };
 
 }  // namespace planning

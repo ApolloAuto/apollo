@@ -77,12 +77,12 @@ cc_library(
 )
 
 cc_library(
-    name = "adc_neighborhood",
+    name = "path_time_neighborhood",
     hdrs = [
-        "adc_neighborhood.h",
+        "path_time_neighborhood.h",
     ],
     srcs = [
-        "adc_neighborhood.cc",
+        "path_time_neighborhood.cc",
     ],
     deps = [
         "//modules/common:common",
@@ -108,7 +108,7 @@ cc_library(
         "condition_filter.cc",
     ],
     deps = [
-        "//modules/planning/lattice/behavior_decider:adc_neighborhood",
+        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
         "//modules/planning/lattice/behavior_decider:feasible_region",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/common/math:linear_interpolation",

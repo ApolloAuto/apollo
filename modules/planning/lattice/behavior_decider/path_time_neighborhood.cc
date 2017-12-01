@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/behavior_decider/adc_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 
 #include <utility>
 #include <vector>
@@ -33,14 +33,14 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 
-ADCNeighborhood::ADCNeighborhood(const Frame* frame,
+PathTimeNeighborhood::PathTimeNeighborhood(const Frame* frame,
     const std::array<double, 3>& init_s, const ReferenceLine& reference_line) {
 
   init_s_ = init_s;
   SetupObstacles(frame, reference_line);
 }
 
-void ADCNeighborhood::SetupObstacles(const Frame* frame,
+void PathTimeNeighborhood::SetupObstacles(const Frame* frame,
     const ReferenceLine& reference_line) {
   const auto& obstacles = frame->obstacles();
   auto discretized_ref_points = ToDiscretizedReferenceLine(
@@ -74,8 +74,8 @@ void ADCNeighborhood::SetupObstacles(const Frame* frame,
           || sl_boundary.start_s() > init_s_[0] + planned_trajectory_horizon
           || (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred
               && std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred)) {
-        if (critical_conditions_.find(obstacle->Id())
-            != critical_conditions_.end()) {
+        if (path_time_obstacle_map_.find(obstacle->Id())
+            != path_time_obstacle_map_.end()) {
           break;
         } else {
           relative_time += trajectory_time_resolution;
@@ -86,33 +86,55 @@ void ADCNeighborhood::SetupObstacles(const Frame* frame,
       double v = SpeedOnReferenceLine(discretized_ref_points, obstacle,
           sl_boundary);
 
-      if (critical_conditions_.find(obstacle->Id())
-          == critical_conditions_.end()) {
-        critical_conditions_[obstacle->Id()].set_obstacle_id(obstacle->Id());
+      if (path_time_obstacle_map_.find(obstacle->Id())
+          == path_time_obstacle_map_.end()) {
+        path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
         SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
-            critical_conditions_[obstacle->Id()].mutable_bottom_left());
+            path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left());
         SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
-            critical_conditions_[obstacle->Id()].mutable_upper_left());
+            path_time_obstacle_map_[obstacle->Id()].mutable_upper_left());
       }
 
       SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
-          critical_conditions_[obstacle->Id()].mutable_bottom_right());
+          path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right());
       SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
-          critical_conditions_[obstacle->Id()].mutable_upper_right());
+          path_time_obstacle_map_[obstacle->Id()].mutable_upper_right());
     }
     relative_time += trajectory_time_resolution;
   }
+
+  for (auto& critical_condition : path_time_obstacle_map_) {
+    double s_upper = std::max(critical_condition.second.bottom_right().s(),
+        critical_condition.second.upper_right().s());
+
+    double s_lower = std::min(critical_condition.second.bottom_left().s(),
+        critical_condition.second.upper_left().s());
+
+    critical_condition.second.set_path_lower(s_lower);
+
+    critical_condition.second.set_path_upper(s_upper);
+
+    double t_upper = std::max(critical_condition.second.bottom_right().t(),
+        critical_condition.second.upper_right().t());
+
+    double t_lower = std::min(critical_condition.second.bottom_left().t(),
+        critical_condition.second.upper_left().t());
+
+    critical_condition.second.set_time_lower(t_lower);
+
+    critical_condition.second.set_time_upper(t_upper);
+  }
 }
 
-void ADCNeighborhood::SetCriticalPoint(const double t, const double s,
+void PathTimeNeighborhood::SetCriticalPoint(const double t, const double s,
     const double v, CriticalPoint* critical_point) {
   critical_point->set_t(t);
   critical_point->set_s(s);
   critical_point->set_v(v);
 }
 
-double ADCNeighborhood::SpeedOnReferenceLine(
-    const std::vector<apollo::common::PathPoint>& discretized_ref_points,
+double PathTimeNeighborhood::SpeedOnReferenceLine(
+    const std::vector<PathPoint>& discretized_ref_points,
     const Obstacle* obstacle, const SLBoundary& sl_boundary) {
   PathPoint obstacle_point_on_ref_line =
       ReferenceLineMatcher::MatchToReferenceLine(discretized_ref_points,
@@ -125,16 +147,16 @@ double ADCNeighborhood::SpeedOnReferenceLine(
   return v;
 }
 
-std::vector<CriticalCondition> ADCNeighborhood::GetCriticalConditions() const {
-  std::vector<CriticalCondition> critical_conditions;
-  for (const auto& condition : critical_conditions_) {
-    critical_conditions.push_back(condition.second);
+std::vector<PathTimeObstacle> PathTimeNeighborhood::GetPathTimeObstacles() const {
+  std::vector<PathTimeObstacle> path_time_obstacles;
+  for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
+    path_time_obstacles.push_back(path_time_obstacle_element.second);
   }
-  return critical_conditions;
+  return path_time_obstacles;
 }
 
-bool ADCNeighborhood::GetCriticalCondition(const std::string& obstacle_id,
-    CriticalCondition* critical_condition) {
+bool PathTimeNeighborhood::GetPathTimeObstacle(const std::string& obstacle_id,
+    PathTimeObstacle* path_time_obstacle) {
   /**
    if (forward_obstacle_id_set_.find(obstacle_id) ==
    forward_obstacle_id_set_.end() ||
@@ -143,10 +165,10 @@ bool ADCNeighborhood::GetCriticalCondition(const std::string& obstacle_id,
    return false;
    }
    **/
-  if (critical_conditions_.find(obstacle_id) == critical_conditions_.end()) {
+  if (path_time_obstacle_map_.find(obstacle_id) == path_time_obstacle_map_.end()) {
     return false;
   }
-  *critical_condition = critical_conditions_[obstacle_id];
+  *path_time_obstacle = path_time_obstacle_map_[obstacle_id];
   return true;
 }
 

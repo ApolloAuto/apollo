@@ -20,7 +20,7 @@ cc_library(
         "//modules/planning/lattice/trajectory1d_generator:trajectory1d_generator",
         "//modules/planning/lattice/trajectory1d_generator:trajectory_evaluator",
         "//modules/planning/lattice/behavior_decider:behavior_decider",
-        "//modules/planning/lattice/behavior_decider:adc_neighborhood",
+        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
     ],
 )
 
