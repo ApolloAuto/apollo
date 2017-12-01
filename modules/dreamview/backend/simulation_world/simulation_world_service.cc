@@ -360,14 +360,16 @@ void SimulationWorldService::Update() {
 
 void SimulationWorldService::UpdateDelays() {
   auto *delays = world_.mutable_delay();
-  delays->set_chassis(AdapterManager::GetChassis()->GetDelayInMs());
-  delays->set_localization(AdapterManager::GetLocalization()->GetDelayInMs());
+  // TODO(xiaoxq): Refactor delays to use seconds instead of milliseconds.
+  delays->set_chassis(AdapterManager::GetChassis()->GetDelay() * 1000);
+  delays->set_localization(
+      AdapterManager::GetLocalization()->GetDelay() * 1000);
   delays->set_perception_obstacle(
-      AdapterManager::GetPerceptionObstacles()->GetDelayInMs());
-  delays->set_planning(AdapterManager::GetPlanning()->GetDelayInMs());
-  delays->set_prediction(AdapterManager::GetPrediction()->GetDelayInMs());
+      AdapterManager::GetPerceptionObstacles()->GetDelay() * 1000);
+  delays->set_planning(AdapterManager::GetPlanning()->GetDelay() * 1000);
+  delays->set_prediction(AdapterManager::GetPrediction()->GetDelay() * 1000);
   delays->set_traffic_light(
-      AdapterManager::GetTrafficLightDetection()->GetDelayInMs());
+      AdapterManager::GetTrafficLightDetection()->GetDelay() * 1000);
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
