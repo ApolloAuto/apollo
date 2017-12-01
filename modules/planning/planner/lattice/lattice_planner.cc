@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "modules/planning/lattice/util/lattice_params.h"
-#include "modules/planning/lattice/behavior_decider/adc_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/trajectory1d_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory1d_generator/trajectory_evaluator.h"

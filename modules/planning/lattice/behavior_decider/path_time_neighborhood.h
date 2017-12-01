@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_LATTICE_ADC_NEIGHBORHOOD_H_
-#define MODULES_PLANNING_LATTICE_ADC_NEIGHBORHOOD_H_
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_
 
 #include <array>
 #include <vector>
@@ -32,16 +32,16 @@
 namespace apollo {
 namespace planning {
 
-class ADCNeighborhood {
+class PathTimeNeighborhood {
  public:
-  ADCNeighborhood(const Frame* frame,
+    PathTimeNeighborhood(const Frame* frame,
       const std::array<double, 3>& init_s,
       const ReferenceLine& reference_line);
 
-  std::vector<CriticalCondition> GetCriticalConditions() const;
+  std::vector<PathTimeObstacle> GetPathTimeObstacles() const;
 
-  bool GetCriticalCondition(const std::string& obstacle_id,
-                            CriticalCondition* critical_condition);
+  bool GetPathTimeObstacle(const std::string& obstacle_id,
+      PathTimeObstacle* critical_condition);
 
   /**
   bool ForwardNearestObstacle(
@@ -73,7 +73,7 @@ class ADCNeighborhood {
   std::array<double, 3> init_s_;
 
   // obstacle_id -> critical conditions
-  std::unordered_map<std::string, CriticalCondition> critical_conditions_;
+  std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
 
   /**
   // array of [t, start_s, end_s, s_dot, s_dotdot]
@@ -89,4 +89,4 @@ class ADCNeighborhood {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_ADC_NEIGHBORHOOD_H_
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_

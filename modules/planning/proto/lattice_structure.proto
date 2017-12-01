@@ -15,12 +15,16 @@ message CriticalPoint {
   optional double v = 3;
 }
 
-message CriticalCondition {
+message PathTimeObstacle {
   optional string obstacle_id = 1;
   optional CriticalPoint bottom_left = 2;
   optional CriticalPoint upper_left = 3;
   optional CriticalPoint upper_right = 4;
   optional CriticalPoint bottom_right = 5;
+  optional double time_lower = 6;
+  optional double time_upper = 7;
+  optional double path_lower = 8;
+  optional double path_upper = 9;
 }
 
 message SampleBound {
