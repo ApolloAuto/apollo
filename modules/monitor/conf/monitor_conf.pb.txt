@@ -95,8 +95,14 @@ hardware {
   }
 }
 hardware {
-  name: "camera"
+  name: "camera_long"
   topic_conf {
-    type: COMPRESSED_IMAGE
+    type: IMAGE_LONG
+  }
+}
+hardware {
+  name: "camera_short"
+  topic_conf {
+    type: IMAGE_SHORT
   }
 }

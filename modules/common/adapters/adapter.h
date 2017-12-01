@@ -91,6 +91,11 @@ class AdapterBase {
   virtual double GetDelayInMs() const = 0;
 
   /**
+   * @brief Gets message lag since last received message.
+   */
+  virtual double GetLagSinceLastMessage() const = 0;
+
+  /**
    * @brief Clear the data received so far.
    */
   virtual void ClearData() = 0;
@@ -195,9 +200,14 @@ class Adapter : public AdapterBase {
    * @param message the newly received message.
    */
   void OnReceive(const D& message) {
+    last_receive_time_ = apollo::common::time::Clock::NowInSecond();
     UpdateDelay(message);
     EnqueueData(message);
     FireCallbacks(message);
+  }
+
+  double GetLagSinceLastMessage() const override {
+    return apollo::common::time::Clock::NowInSecond() - last_receive_time_;
   }
 
   /**
@@ -500,7 +510,7 @@ class Adapter : public AdapterBase {
     }
   }
 
-  /// A few partial template specialzations to get message delays for different
+  /// A few partial template specializations to get message delays for different
   /// message types.
   template <class T, class Enable = void>
   struct MessageDelay {
@@ -581,11 +591,13 @@ class Adapter : public AdapterBase {
   /// be published.
   uint32_t seq_num_ = 0;
 
-  /// The most recenct published data.
+  /// The most recent published data.
   std::unique_ptr<D> latest_published_data_;
 
   /// The interval between receiving two consecutive messages.
   double delay_ms_ = std::numeric_limits<double>::quiet_NaN();
+
+  double last_receive_time_ = 0;
 };
 
 }  // namespace adapter
