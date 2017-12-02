@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H_
 
 #include <map>
 #include <memory>
@@ -41,16 +41,13 @@ class TLPreprocessor : public BasePreprocessor {
 
   virtual bool Init();
 
-  virtual std::string name() const {
-    return "TLPreprocessor";
-  }
+  virtual std::string name() const { return "TLPreprocessor"; }
 
   bool CacheLightsProjections(const CarPose &pose,
                               const std::vector<Signal> &signals,
                               const double ts);
 
-  bool SyncImage(const ImageSharedPtr &image,
-                 ImageLightsPtr *image_lights,
+  bool SyncImage(const ImageSharedPtr &image, ImageLightsPtr *image_lights,
                  bool *should_pub);
 
   void set_last_pub_camera_id(CameraId camera_id);
@@ -64,10 +61,8 @@ class TLPreprocessor : public BasePreprocessor {
                                 CameraId *selected_camera_id);
 
   // @brief Project lights from HDMap onto long focus or short focus image plane
-  bool ProjectLights(const CarPose &pose,
-                     const std::vector<Signal> &signals,
-                     const CameraId &camera_id,
-                     LightPtrs *lights_on_image,
+  bool ProjectLights(const CarPose &pose, const std::vector<Signal> &signals,
+                     const CameraId &camera_id, LightPtrs *lights_on_image,
                      LightPtrs *lights_outside_image);
 
  private:
@@ -80,8 +75,7 @@ class TLPreprocessor : public BasePreprocessor {
   bool SyncImageWithCachedLights(const ImageSharedPtr &image,
                                  ImageLightsPtr *image_lights,
                                  double *diff_image_pose_ts,
-                                 double *diff_image_sys_ts,
-                                 bool *sync_ok);
+                                 double *diff_image_sys_ts, bool *sync_ok);
 
   bool IsOnBorder(const cv::Size size, const cv::Rect &roi,
                   const int border_size) const;
@@ -108,10 +102,11 @@ class TLPreprocessor : public BasePreprocessor {
   int projection_image_rows_ = 1080;
   float sync_interval_seconds_ = 0.1;
   float no_signals_interval_seconds_ = 0.5;
+
   DISALLOW_COPY_AND_ASSIGN(TLPreprocessor);
 };
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_TL_PREPROCESSOR_H_
