@@ -169,6 +169,7 @@ class Clock {
       default:
         AFATAL << "Unsupported clock mode: " << mode();
     }
+    return From(ros::Time::now().toSec());
   }
 
   /**
