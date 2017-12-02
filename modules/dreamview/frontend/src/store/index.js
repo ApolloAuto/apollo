@@ -34,7 +34,7 @@ class DreamviewStore {
 
     @observable planning = new Planning();
 
-    @observable playback = new Playback();
+    @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 
     @observable trafficSignal = new TrafficSignal();
 
@@ -121,9 +121,12 @@ class DreamviewStore {
     // This function is triggerred automatically whenever a observable changes
     updateDimension() {
         const smallScreen = window.innerHeight < 800.0;
-        const offsetX = smallScreen ? 80 : 90; // width of side-bar
         const offsetY = smallScreen ? 55 : 60; // height of header
         const mainViewHeightRatio = 0.60;
+        let offsetX = 0;
+        if (!OFFLINE_PLAYBACK) {
+            offsetX = smallScreen ? 80 : 90; // width of side-bar
+        }
 
         this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;
         this.dimension.height = window.innerHeight - offsetY;

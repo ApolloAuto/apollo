@@ -43,8 +43,7 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   double s1 = p1.s();
   CHECK(s0 <= s && s <= s1);
 
-  double theta_diff = common::math::NormalizeAngle(
-      p1.theta() - p0.theta());
+  double theta_diff = common::math::NormalizeAngle(p1.theta() - p0.theta());
 
   std::array<double, 3> gx0{{0.0, p0.kappa(), p0.dkappa()}};
   std::array<double, 3> gx1{{theta_diff, p1.kappa(), p1.dkappa()}};
@@ -63,8 +62,8 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
       p0.x() + common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
   double y =
       p0.y() + common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
-  double theta = common::math::NormalizeAngle(
-      geometry_spline.Evaluate(0, s) + p0.theta());
+  double theta =
+      common::math::NormalizeAngle(geometry_spline.Evaluate(0, s) + p0.theta());
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
   double d2kappa = geometry_spline.Evaluate(3, s);
@@ -151,9 +150,9 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   };
 
   double x = pp0.x() +
-      common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
+             common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
   double y = pp0.y() +
-      common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
+             common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
   double theta = geometry_spline.Evaluate(0, s);
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
@@ -179,8 +178,13 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
 TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
                                                     const TrajectoryPoint &tp1,
                                                     const double t) {
-  const PathPoint &pp0 = tp0.path_point();
-  const PathPoint &pp1 = tp1.path_point();
+  if (!tp0.has_path_point() || !tp1.has_path_point()) {
+    TrajectoryPoint p;
+    p.mutable_path_point()->CopyFrom(PathPoint());
+    return p;
+  }
+  const PathPoint pp0 = tp0.path_point();
+  const PathPoint pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
   double t1 = tp1.relative_time();
 

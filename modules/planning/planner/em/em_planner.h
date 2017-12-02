@@ -83,8 +83,10 @@ class EMPlanner : public Planner {
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point);
 
-  void RecordDebugInfo(const std::string& name, const double time_diff_ms,
-                       planning::LatencyStats* ptr_latency_stats);
+  void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
+
+  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                       const std::string& name, const double time_diff_ms);
 
   apollo::common::util::Factory<TaskType, Task> task_factory_;
   std::vector<std::unique_ptr<Task>> tasks_;

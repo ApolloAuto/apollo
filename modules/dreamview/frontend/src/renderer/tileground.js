@@ -30,8 +30,7 @@ export default class TileGround {
         this.mapUrlPrefix = null;
     }
 
-    initialize(serverUrl, mapInfo) {
-        const metadata = mapInfo.metadata;
+    initialize(serverUrl, metadata) {
         this.metadata = {
             tileLength: metadata.tile * metadata.mpp,
             left: metadata.left,
@@ -40,8 +39,8 @@ export default class TileGround {
             numRows: metadata.hnum,
         };
 
-        this.mapId = mapInfo.mapId;
-        this.mapUrlPrefix = `${serverUrl}/map`;
+        this.mapId = metadata.mapid;
+        this.mapUrlPrefix = `${serverUrl}/map/getMapPic`;
         this.initialized = true;
     }
 
@@ -65,7 +64,7 @@ export default class TileGround {
             return;
         }
 
-        const mapUrl = `${this.mapUrlPrefix}?mapId=${this.mapId}&row=${row}&col=${col}`;
+        const mapUrl = `${this.mapUrlPrefix}?mapId=${this.mapId}&i=${row}&j=${col}`;
         const position = coordinates.applyOffset({
             x: this.metadata.left + (row + 0.5) * this.metadata.tileLength,
             y: this.metadata.top - (col + 0.5) * this.metadata.tileLength,

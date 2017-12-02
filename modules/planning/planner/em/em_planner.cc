@@ -90,13 +90,37 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-void EMPlanner::RecordDebugInfo(const std::string& name,
-                                const double time_diff_ms,
-                                planning::LatencyStats* ptr_latency_stats) {
+void EMPlanner::RecordObstacleDebugInfo(
+    ReferenceLineInfo* reference_line_info) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
+  auto ptr_debug = reference_line_info->mutable_debug();
+
+  const auto path_decision = reference_line_info->path_decision();
+  for (const auto path_obstacle : path_decision->path_obstacles().Items()) {
+    auto obstacle_debug = ptr_debug->mutable_planning_data()->add_obstacle();
+    obstacle_debug->set_id(path_obstacle->Id());
+    obstacle_debug->mutable_sl_boundary()->CopyFrom(
+        path_obstacle->perception_sl_boundary());
+  }
+}
+
+void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                                const std::string& name,
+                                const double time_diff_ms) {
+  if (!FLAGS_enable_record_debug) {
+    ADEBUG << "Skip record debug info";
+    return;
+  }
+  if (reference_line_info == nullptr) {
+    AERROR << "Reference line info is null.";
+    return;
+  }
+
+  auto ptr_latency_stats = reference_line_info->mutable_latency_stats();
+
   auto ptr_stats = ptr_latency_stats->add_task_stats();
   ptr_stats->set_name(name);
   ptr_stats->set_time_ms(time_diff_ms);
@@ -104,7 +128,7 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
-  const double kStraightForwardLineCost = 10000.0;
+  const double kStraightForwardLineCost = 10.0;
   if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
       reference_line_info->Lanes().IsOnSegment()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
@@ -120,9 +144,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
   heuristic_speed_data->set_speed_vector(speed_profile);
 
-  auto ptr_debug = reference_line_info->mutable_debug();
-  auto ptr_latency_stats = reference_line_info->mutable_latency_stats();
   auto ret = Status::OK();
+
   for (auto& optimizer : tasks_) {
     const double start_timestamp = Clock::NowInSecond();
     ret = optimizer->Execute(frame, reference_line_info);
@@ -139,11 +162,11 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
            << reference_line_info->PathSpeedDebugString() << std::endl;
     ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
 
-    if (FLAGS_enable_record_debug && ptr_debug != nullptr &&
-        ptr_latency_stats != nullptr) {
-      RecordDebugInfo(optimizer->Name(), time_diff_ms, ptr_latency_stats);
-    }
+    RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);
   }
+
+  RecordObstacleDebugInfo(reference_line_info);
+
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
@@ -151,6 +174,17 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     std::string msg("Fail to aggregate planning trajectory.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  for (const auto* path_obstacle :
+       reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (!path_obstacle->obstacle()->IsStatic()) {
+      continue;
+    }
+    if (path_obstacle->LongitudinalDecision().has_stop()) {
+      constexpr double kRefrenceLineStaticObsCost = 1e3;
+      reference_line_info->AddCost(kRefrenceLineStaticObsCost);
+    }
   }
 
   if (FLAGS_enable_trajectory_check) {

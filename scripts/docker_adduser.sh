@@ -35,11 +35,18 @@ fi
 
 # setup camera device
 if [ -e /dev/video0 ]; then
-  mkdir /dev/camera
-  ln -s /dev/video0  /dev/camera/obstacle
-  ln -s /dev/video1  /dev/camera/trafficlights
-  chmod a+rw /dev/video0 /dev/video1 /dev/camera/obstacle /dev/camera/trafficlights
+  chmod a+rw /dev/video0
 fi
+if [ -e /dev/video1 ]; then
+  chmod a+rw /dev/video1
+fi
+if [ -e /dev/camera/obstacle ]; then
+  chmod a+rw /dev/camera/obstacle
+fi
+if [ -e /dev/camera/trafficlights ]; then
+  chmod a+rw /dev/camera/trafficlights
+fi
+
 
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
@@ -50,5 +57,8 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   # setup ros package
   # this is a temporary solution to avoid ros package downloading.
   ROS="/home/tmp/ros"
-  chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
+  chmod a+w "${ROS}/share/velodyne/launch/start_velodyne.launch"
+  chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
+  chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
+  chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 fi

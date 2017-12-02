@@ -36,7 +36,8 @@ class Renderer {
         };
 
         // The ground.
-        this.ground = PARAMETERS.ground.type === 'tile' ? new TileGround() : new Ground();
+        this.ground = (PARAMETERS.ground.type === 'tile' || OFFLINE_PLAYBACK)
+                      ? new TileGround() : new Ground();
 
         // The map.
         this.map = new Map();
