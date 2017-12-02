@@ -61,7 +61,7 @@ void RadarTrackManager::AssignTrackObsIdMatch(
           *obs, timestamp_track, *(radar_obs.objects[j]), timestamp_obs);
       if (obs->track_id == radar_obs.objects[j]->track_id &&
           distance < RADAR_TRACK_THRES) {
-        (*assignment)[assignment_num++] = std::make_pair(i, j);
+        assignment->at(assignment_num++) = std::make_pair(i, j);
         track_used[i] = true;
         obs_used[j] = true;
         obs_track_[i].IncreaseTrackedTimes();

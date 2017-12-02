@@ -227,12 +227,12 @@ void ModestRadarDetector::RoiFilter(
       int obs_number = 0;
       for (size_t i = 0; i < filter_objects->size(); i++) {
         pcl_util::PointD obs_position;
-        obs_position.x = (*filter_objects)[i]->center(0);
-        obs_position.y = (*filter_objects)[i]->center(1);
-        obs_position.z = (*filter_objects)[i]->center(2);
+        obs_position.x = filter_objects->at(i)->center(0);
+        obs_position.y = filter_objects->at(i)->center(1);
+        obs_position.z = filter_objects->at(i)->center(2);
         if (RadarUtil::IsXyPointInHdmap<pcl_util::PointD>(obs_position,
                                                           map_polygons)) {
-          (*filter_objects)[obs_number] = (*filter_objects)[i];
+          filter_objects->at(obs_number) = filter_objects->at(i);
           obs_number++;
         }
       }
