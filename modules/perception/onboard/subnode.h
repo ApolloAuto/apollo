@@ -89,15 +89,15 @@ class Subnode : public Thread {
   virtual std::string DebugString() const;
 
  protected:
-  //@brief init the inner members ( default do nothing )
-  //@return true/false
+  // @brief init the inner members ( default do nothing )
+  // @return true/false
   virtual bool InitInternal() {
     // do nothing.
     return true;
   }
 
-  //@brief inner run
-  virtual void Run() override;
+  // @brief inner run
+  void Run() override;
 
   // following variable can be accessed by Derived Class.
   SubnodeID id_;
@@ -111,11 +111,11 @@ class Subnode : public Thread {
   std::vector<EventMeta> pub_meta_events_;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Subnode);
   volatile bool stop_;
   bool inited_;
   int total_count_;
   int failed_count_;
+  DISALLOW_COPY_AND_ASSIGN(Subnode);
 };
 
 REGISTER_REGISTERER(Subnode);

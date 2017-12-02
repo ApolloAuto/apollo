@@ -47,11 +47,11 @@ class Mutex {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Mutex);
-
   friend class CondVar;
 
   pthread_mutex_t mu_;
+
+  DISALLOW_COPY_AND_ASSIGN(Mutex);
 };
 
 class MutexLock {
@@ -92,9 +92,8 @@ class CondVar {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(CondVar);
-
   pthread_cond_t cv_;
+  DISALLOW_COPY_AND_ASSIGN(CondVar);
 };
 
 class BlockingCounter {
@@ -126,10 +125,10 @@ class BlockingCounter {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(BlockingCounter);
   Mutex mutex_;
   CondVar cond_;
   size_t counter_;
+  DISALLOW_COPY_AND_ASSIGN(BlockingCounter);
 };
 
 class RwMutex {
@@ -153,8 +152,8 @@ class RwMutex {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(RwMutex);
   pthread_rwlock_t mu_;
+  DISALLOW_COPY_AND_ASSIGN(RwMutex);
 };
 
 class ReaderMutexLock {
@@ -167,8 +166,8 @@ class ReaderMutexLock {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(ReaderMutexLock);
   RwMutex *mu_ = nullptr;
+  DISALLOW_COPY_AND_ASSIGN(ReaderMutexLock);
 };
 
 class WriterMutexLock {
@@ -181,8 +180,8 @@ class WriterMutexLock {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(WriterMutexLock);
   RwMutex *mu_ = nullptr;
+  DISALLOW_COPY_AND_ASSIGN(WriterMutexLock);
 };
 
 }  // namespace perception

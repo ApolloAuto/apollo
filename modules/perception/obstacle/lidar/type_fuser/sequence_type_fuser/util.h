@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <string>
 #include <vector>
 #include "Eigen/Dense"
 #include "modules/perception/obstacle/base/types.h"

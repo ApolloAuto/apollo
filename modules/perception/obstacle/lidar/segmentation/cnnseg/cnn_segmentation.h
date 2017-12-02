@@ -110,5 +110,4 @@ REGISTER_SEGMENTATION(CNNSegmentation);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
-        // // NOLINT
+#endif

@@ -17,13 +17,14 @@
 #ifndef MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 #define MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 
+#include <boost/format.hpp>
 #include <map>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include <boost/format.hpp>
 #include "gflags/gflags.h"
 
 #include "modules/perception/lib/base/mutex.h"
@@ -48,8 +49,8 @@ struct CommonSharedDataKey {
       : timestamp(ts), device_id(id) {}
   virtual std::string ToString() const {
     return device_id +
-           (boost::format("%ld") %
-            static_cast<long>(timestamp * FLAGS_stamp_enlarge_factor))
+           (boost::format("%d") %
+            static_cast<int>(timestamp * FLAGS_stamp_enlarge_factor))
                .str();
   }
   double timestamp = 0.0;
@@ -76,7 +77,7 @@ class CommonSharedData : public SharedData {
   CommonSharedData() {}
   virtual ~CommonSharedData() {}
 
-  virtual bool Init() override {
+  bool Init() override {
     return true;
   }
   // @brief: you must impl your own name func
@@ -84,9 +85,9 @@ class CommonSharedData : public SharedData {
   virtual std::string name() const = 0;
 
   // @brief: reset the shared data, clear data
-  virtual void Reset() override;
+  void Reset() override;
 
-  virtual void RemoveStaleData() override;
+  void RemoveStaleData() override;
 
   // @brief: add new key shared data
   // @param [in]: key

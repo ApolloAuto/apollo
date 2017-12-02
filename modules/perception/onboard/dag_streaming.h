@@ -62,11 +62,9 @@ class DAGStreaming : public Thread {
   size_t CongestionValue() const;
 
  protected:
-  virtual void Run() override;
+  void Run() override;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(DAGStreaming);
-
   // start run and wait.
   void Schedule();
 
@@ -83,6 +81,8 @@ class DAGStreaming : public Thread {
   // NOTE(Yangguang Li): Guarantee Sunode should be firstly called destructor.
   // Subnode depends the EventManager and SharedDataManager.
   SubnodeMap subnode_map_;
+
+  DISALLOW_COPY_AND_ASSIGN(DAGStreaming);
 };
 
 class DAGStreamingMonitor : public Thread {
@@ -99,13 +99,13 @@ class DAGStreamingMonitor : public Thread {
   }
 
  protected:
-  virtual void Run() override;
+  void Run() override;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(DAGStreamingMonitor);
   // Not own DAGStreaming instance.
   DAGStreaming *dag_streaming_;
   volatile bool stop_;
+  DISALLOW_COPY_AND_ASSIGN(DAGStreamingMonitor);
 };
 
 }  // namespace perception

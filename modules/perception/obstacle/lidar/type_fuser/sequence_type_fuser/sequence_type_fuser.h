@@ -16,6 +16,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "modules/perception/obstacle/common/object_sequence.h"
 #include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/util.h"

@@ -65,7 +65,6 @@ class DisjointSetTest : public testing::Test {
 
 TEST_F(DisjointSetTest, DisjointSetMakeSet) {
   Node* node = new Node();
-  ;
   DisjointSetMakeSet<Node>(node);
   EXPECT_EQ(node, node->parent);
   EXPECT_EQ(0, node->node_rank);
