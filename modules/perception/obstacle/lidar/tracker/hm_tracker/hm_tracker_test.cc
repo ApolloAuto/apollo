@@ -43,7 +43,7 @@ class HmObjectTrackerTest : public testing::Test {
     FLAGS_work_root = "modules/perception";
     FLAGS_config_manager_path = "conf/config_manager.config";
     if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to init ConfigManager";
+      AERROR << "failed to Init ConfigManager";
       return;
     }
     hm_tracker_ = new HmObjectTracker();

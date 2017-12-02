@@ -13,8 +13,13 @@ cc_library(
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/perception/lib/base:base",
         "//modules/perception/common:perception_common",
-        "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/obstacle/onboard:perception_obstacle_lidar_subnode",
+        "//modules/perception/obstacle/onboard:perception_obstacle_radar_subnode",
+        "//modules/perception/obstacle/onboard:perception_obstacle_fusion_subnode",
+        "//modules/perception/traffic_light/onboard:perception_traffic_light_onboard",
     ],
 )
 
