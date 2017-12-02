@@ -27,7 +27,7 @@ namespace perception {
 
 class Thread {
  public:
-  Thread(bool joinable = false, const std::string& name = "Thread")
+  explicit Thread(bool joinable = false, const std::string& name = "Thread")
       : tid_(0), started_(false), joinable_(joinable), thread_name_(name) {}
 
   pthread_t Tid() const {

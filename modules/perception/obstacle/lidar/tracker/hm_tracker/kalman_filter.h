@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 
+#include <deque>
 #include <vector>
 
 #include "modules/perception/obstacle/base/object.h"

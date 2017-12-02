@@ -16,9 +16,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SUBNODE_H_
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -40,11 +43,11 @@ class FusionSubnode : public Subnode {
  public:
   FusionSubnode() = default;
   virtual ~FusionSubnode() {}
-  virtual StatusCode ProcEvents() override;
+  StatusCode ProcEvents() override;
   bool GeneratePbMsg(PerceptionObstacles *obstacles);
 
  protected:
-  virtual bool InitInternal() override;
+  bool InitInternal() override;
 
  private:
   bool InitOutputStream();

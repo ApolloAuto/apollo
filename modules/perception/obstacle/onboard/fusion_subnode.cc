@@ -17,6 +17,7 @@
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 
 #include <std_msgs/String.h>
+#include <map>
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"

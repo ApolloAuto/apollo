@@ -22,8 +22,6 @@ namespace apollo {
 namespace perception {
 
 bool SequenceTypeFuser::Init() {
-  using namespace sequence_type_fuser;
-
   const ModelConfig* model_config = NULL;
   if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
     AERROR << "Failed to found model config: " << name();
@@ -46,13 +44,13 @@ bool SequenceTypeFuser::Init() {
   transition_property_file_path =
       FileUtil::GetAbsolutePath(work_root, transition_property_file_path);
 
-  if (!LoadSingleMatrixFile(transition_property_file_path,
-                            &_transition_matrix)) {
+  if (!sequence_type_fuser::LoadSingleMatrixFile(transition_property_file_path,
+                                                 &_transition_matrix)) {
     return false;
   }
   _transition_matrix += Matrixd::Ones() * 1e-6;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
-    NormalizeRow(&_transition_matrix);
+    sequence_type_fuser::NormalizeRow(&_transition_matrix);
   }
   AINFO << "transition matrix";
   AINFO << std::endl << _transition_matrix;
@@ -73,12 +71,12 @@ bool SequenceTypeFuser::Init() {
   classifiers_property_file_path =
       FileUtil::GetAbsolutePath(work_root, classifiers_property_file_path);
 
-  if (!LoadMultipleMatricesFile(classifiers_property_file_path,
-                                &_smooth_matrices)) {
+  if (!sequence_type_fuser::LoadMultipleMatricesFile(
+        classifiers_property_file_path, &_smooth_matrices)) {
     return false;
   }
   for (auto& pair : _smooth_matrices) {
-    NormalizeRow(&pair.second);
+    sequence_type_fuser::NormalizeRow(&pair.second);
     pair.second.transposeInPlace();
     AINFO << "Source: " << pair.first;
     AINFO << std::endl << pair.second;
@@ -209,8 +207,6 @@ bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
 
 bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
                                           Vectord* log_prob) {
-  using namespace sequence_type_fuser;
-
   if (object == nullptr || log_prob == nullptr) {
     return false;
   }
@@ -218,7 +214,7 @@ bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
   log_prob->setZero();
 
   Vectord single_prob;
-  FromStdVector(object->type_probs, &single_prob);
+  sequence_type_fuser::FromStdVector(object->type_probs, &single_prob);
   auto iter = _smooth_matrices.find("CNNSegClassifier");
   if (iter == _smooth_matrices.end()) {
     AERROR << "Failed to find CNNSegmentation classifier property.";
@@ -226,12 +222,12 @@ bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
   }
   static const Vectord epsilon = Vectord::Ones() * 1e-6;
   single_prob = iter->second * single_prob + epsilon;
-  Normalize(&single_prob);
+  sequence_type_fuser::Normalize(&single_prob);
 
   double conf = object->score;
   single_prob = conf * single_prob +
                 (1.0 - conf) * _confidence_smooth_matrix * single_prob;
-  ToLog(&single_prob);
+  sequence_type_fuser::ToLog(&single_prob);
   *log_prob += single_prob;
   return true;
 }
@@ -239,11 +235,9 @@ bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
 bool SequenceTypeFuser::RecoverFromLogProb(Vectord* prob,
                                            std::vector<float>* dst,
                                            ObjectType* type) {
-  using namespace sequence_type_fuser;
-
-  ToExp(prob);
-  Normalize(prob);
-  FromEigenVector(*prob, dst);
+  sequence_type_fuser::ToExp(prob);
+  sequence_type_fuser::Normalize(prob);
+  sequence_type_fuser::FromEigenVector(*prob, dst);
   *type = static_cast<ObjectType>(
       std::distance(dst->begin(), std::max_element(dst->begin(), dst->end())));
   return true;

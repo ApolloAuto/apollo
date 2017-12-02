@@ -19,12 +19,12 @@
 #include <unistd.h>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gflags/gflags.h"
 #include "google/protobuf/text_format.h"
 
-#include "dag_streaming.h"
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/onboard/subnode.h"

@@ -43,12 +43,11 @@ class SharedDataManager {
   void RemoveStaleData();
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(SharedDataManager);
-
   using SharedDataMap = std::map<std::string, std::unique_ptr<SharedData>>;
 
   SharedDataMap shared_data_map_;
   bool inited_ = false;
+  DISALLOW_COPY_AND_ASSIGN(SharedDataManager);
 };
 
 }  // namespace perception

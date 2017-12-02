@@ -17,6 +17,8 @@
 #ifndef MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
 #define MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
 
+#include <string>
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"

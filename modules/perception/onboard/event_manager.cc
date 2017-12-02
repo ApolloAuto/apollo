@@ -16,11 +16,11 @@
 
 #include "modules/perception/onboard/event_manager.h"
 
+#include <gflags/gflags.h>
 #include <algorithm>
 #include <string>
 #include <vector>
 
-#include <gflags/gflags.h>
 #include "modules/common/log.h"
 
 namespace apollo {

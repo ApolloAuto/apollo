@@ -129,6 +129,6 @@ bool LoadMultipleMatricesFile(const std::string& filename,
   return true;
 }
 
-}  // namsepace sequence_type_fuser
+}  // namespace sequence_type_fuser
 }  // namespace perception
 }  // namespace apollo

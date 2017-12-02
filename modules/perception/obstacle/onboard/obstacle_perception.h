@@ -17,6 +17,9 @@
 #ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
 #define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
 
+#include <memory>
+#include <vector>
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
@@ -36,7 +39,7 @@ class ObstaclePerception {
 
   bool Init();
 
-  bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>& out_objects);
+  bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>* out_objects);
 
   void SetGlobalOffset(const Eigen::Vector3d& global_offset);
 

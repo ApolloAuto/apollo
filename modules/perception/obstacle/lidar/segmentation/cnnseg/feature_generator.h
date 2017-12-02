@@ -85,5 +85,4 @@ typedef FeatureGenerator<double> FP64FeatureGenerator;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
-        // // NOLINT
+#endif

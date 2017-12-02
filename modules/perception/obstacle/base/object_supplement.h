@@ -17,6 +17,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
 #include <Eigen/Core>
+#include <memory>
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {

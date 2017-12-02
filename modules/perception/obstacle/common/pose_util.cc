@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include <yaml-cpp/yaml.h>
 
 #include "modules/perception/obstacle/common/pose_util.h"
 
 #include "modules/common/log.h"
-
-#include <yaml-cpp/yaml.h>
 
 namespace apollo {
 namespace perception {
