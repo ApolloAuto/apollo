@@ -54,11 +54,39 @@ bool JsonUtil::GetStringFromJson(const Json &json, const std::string &key,
     return false;
   }
   if (!iter->is_string()) {
-    AERROR << "The value of json." << key << " is not a string";
+    AERROR << "The value of json[" << key << "] is not a string";
     return false;
   }
   *value = *iter;
   return true;
+}
+
+bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
+                                       std::vector<std::string> *value) {
+  const auto iter = json.find(key);
+  if (iter == json.end()) {
+    AERROR << "The json has no such key: " << key;
+    return false;
+  }
+  if (!iter->is_array()) {
+    AERROR << "The value of json[" << key << "] is not an array";
+    return false;
+  }
+
+  bool ret = true;
+  value->clear();
+  value->reserve(iter->size());
+  for (const auto &elem : *iter) {
+    // Note that we still try to get all string values though there are invalid
+    // elements.
+    if (!elem.is_string()) {
+      AWARN << "The value of json[" << key << "] contains non-string element";
+      ret = false;
+    } else {
+      value->push_back(elem);
+    }
+  }
+  return ret;
 }
 
 }  // namespace util
