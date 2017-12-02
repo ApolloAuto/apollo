@@ -31,7 +31,7 @@ RadarTrack::RadarTrack() {
   tracking_time_ = 0.0;
 }
 
-RadarTrack::RadarTrack(Object &obs, const double &timestamp) {
+RadarTrack::RadarTrack(const Object &obs, const double &timestamp) {
   s_current_idx_ %= MAX_RADAR_IDX;
   obs_id_ = s_current_idx_++;
   obs_radar_ = ObjectPtr(new Object);

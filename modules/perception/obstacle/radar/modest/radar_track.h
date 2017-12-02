@@ -31,7 +31,7 @@ class RadarTrack {
  public:
   RadarTrack();
 
-  RadarTrack(Object &obs, const double &timestamp);
+  RadarTrack(const Object &obs, const double &timestamp);
 
   RadarTrack(const RadarTrack &track);
 

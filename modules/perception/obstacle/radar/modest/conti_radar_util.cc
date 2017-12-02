@@ -80,5 +80,6 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
   }
   return false;
 }
-}
-}
+
+} // namespace perception
+} // namespace apollo
