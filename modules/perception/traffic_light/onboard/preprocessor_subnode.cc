@@ -315,7 +315,6 @@ bool TLPreprocessorSubnode::VerifyLightsProjection(
     return false;
   }
 
-  bool projections_outside_all_images = false;
   // TODO(ghdawn): no need to init lights before this line
   image_lights->num_signals = signals.size();
   image_lights->lights->clear();
@@ -347,7 +346,6 @@ void TLPreprocessorSubnode::CameraSelection(double ts) {
   if (!GetSignals(ts, &pose, &signals)) {
     return;
   }
-  bool projections_outside_all_images = false;
   if (!preprocessor_.CacheLightsProjections(pose, signals, ts)) {
     AERROR << "add_cached_lights_projections failed, ts: "
            << GLOG_TIMESTAMP(ts);
