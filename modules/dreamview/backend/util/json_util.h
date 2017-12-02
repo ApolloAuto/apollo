@@ -18,6 +18,7 @@
 #define MODULES_DREAMVIEW_BACKEND_UTIL_JSON_UTIL_H_
 
 #include <string>
+#include <vector>
 
 #include "google/protobuf/message.h"
 #include "third_party/json/json.hpp"
@@ -41,6 +42,14 @@ class JsonUtil {
    */
   static bool GetStringFromJson(const nlohmann::json &json,
                                 const std::string &key, std::string *value);
+
+  /**
+   * @brief Get a string vector from the given json[key].
+   * @return Whether the field exists and is a valid string vector.
+   */
+  static bool GetStringVectorFromJson(const nlohmann::json &json,
+                                      const std::string &key,
+                                      std::vector<std::string> *value);
 };
 
 }  // namespace util

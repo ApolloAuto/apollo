@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/util/json_util.h"
 
 #include "google/protobuf/util/json_util.h"
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 
@@ -53,6 +54,44 @@ TEST(JsonUtilTest, GetStringFromJson) {
   // Non empty string.
   EXPECT_TRUE(JsonUtil::GetStringFromJson(json_obj, "key3", &value));
   EXPECT_EQ("value2", value);
+}
+
+TEST(JsonUtilTest, GetStringVectorFromJson) {
+  Json json_obj;
+  json_obj["key1"] = 0;
+  json_obj["key2"] = Json::array();
+
+  auto int_array = Json::array();
+  int_array.push_back(0);
+  json_obj["key3"] = int_array;
+
+  auto mixed_array = Json::array();
+  mixed_array.push_back(0);
+  mixed_array.push_back("str1");
+  json_obj["key4"] = mixed_array;
+
+  auto str_array = Json::array();
+  str_array.push_back("str1");
+  str_array.push_back("str2");
+  json_obj["key5"] = str_array;
+
+  std::vector<std::string> value;
+  // No such key.
+  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key0", &value));
+  // Value is not array.
+  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key1", &value));
+  // Empty array.
+  EXPECT_TRUE(JsonUtil::GetStringVectorFromJson(json_obj, "key2", &value));
+  EXPECT_TRUE(value.empty());
+  // Non-string array.
+  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key3", &value));
+  EXPECT_TRUE(value.empty());
+  // Array contains non-string element.
+  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key4", &value));
+  EXPECT_THAT(value, testing::ElementsAre("str1"));
+  // String array.
+  EXPECT_TRUE(JsonUtil::GetStringVectorFromJson(json_obj, "key5", &value));
+  EXPECT_THAT(value, testing::ElementsAre("str1", "str2"));
 }
 
 }  // namespace util
