@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "gflags/gflags.h"
-#include "google/protobuf/util/json_util.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -30,6 +29,7 @@
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
+#include "modules/dreamview/backend/util/json_util.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
@@ -49,26 +49,9 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
+using apollo::dreamview::util::JsonUtil;
 using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
-
-google::protobuf::util::JsonOptions JsonOption() {
-  google::protobuf::util::JsonOptions json_option;
-  json_option.always_print_primitive_fields = true;
-  return json_option;
-}
-
-std::string ProtoToTypedJson(const std::string &json_type,
-                             const google::protobuf::Message &proto) {
-  static const auto kJsonOption = JsonOption();
-  std::string json_string;
-  google::protobuf::util::MessageToJsonString(proto, &json_string, kJsonOption);
-
-  Json json_obj;
-  json_obj["type"] = json_type;
-  json_obj["data"] = Json::parse(json_string);
-  return json_obj.dump();
-}
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
 std::string TitleCase(const std::string &origin,
@@ -178,8 +161,10 @@ void HMI::RegisterMessageHandlers() {
   // Send current config and status to new HMI client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
-        websocket_->SendData(conn, ProtoToTypedJson("HMIConfig", config_));
-        websocket_->SendData(conn, ProtoToTypedJson("HMIStatus", status_));
+        websocket_->SendData(conn,
+                             JsonUtil::ProtoToTypedJson("HMIConfig", config_));
+        websocket_->SendData(conn,
+                             JsonUtil::ProtoToTypedJson("HMIStatus", status_));
       });
 
   // HMI client asks for executing module command.
@@ -188,10 +173,11 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {module: "module_name", command: "command_name"}.
         // If module_name is "all", then run the command on all modules.
-        const auto module = json.find("module");
-        const auto command = json.find("command");
-        if (module != json.end() && command != json.end()) {
-          RunComponentCommand(config_.modules(), *module, *command);
+        std::string module;
+        std::string command;
+        if (JsonUtil::GetStringFromJson(json, "module", &module) &&
+            JsonUtil::GetStringFromJson(json, "command", &command)) {
+          RunComponentCommand(config_.modules(), module, command);
         } else {
           AERROR << "Truncated module command.";
         }
@@ -202,10 +188,11 @@ void HMI::RegisterMessageHandlers() {
       "ExecuteToolCommand",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {tool: "tool_name", command: "command_name"}.
-        const auto tool = json.find("tool");
-        const auto command = json.find("command");
-        if (tool != json.end() && command != json.end()) {
-          RunComponentCommand(config_.tools(), *tool, *command);
+        std::string tool;
+        std::string command;
+        if (JsonUtil::GetStringFromJson(json, "tool", &tool) &&
+            JsonUtil::GetStringFromJson(json, "command", &command)) {
+          RunComponentCommand(config_.tools(), tool, command);
         } else {
           AERROR << "Truncated tool command.";
         }
@@ -217,9 +204,9 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {command: "command_name"}.
         // Supported commands are: "start", "stop".
-        const auto command = json.find("command");
-        if (command != json.end()) {
-          RunModeCommand(*command);
+        std::string command;
+        if (JsonUtil::GetStringFromJson(json, "command", &command)) {
+          RunModeCommand(command);
         } else {
           AERROR << "Truncated mode command.";
         }
@@ -232,9 +219,9 @@ void HMI::RegisterMessageHandlers() {
         // json should contain {new_mode: "DrivingModeName"}.
         // DrivingModeName should be one of canbus::Chassis::DrivingMode.
         // For now it is either COMPLETE_MANUAL or COMPLETE_AUTO_DRIVE.
-        const auto new_mode = json.find("new_mode");
-        if (new_mode != json.end()) {
-          ChangeDrivingModeTo(*new_mode);
+        std::string new_mode;
+        if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
+          ChangeDrivingModeTo(new_mode);
         } else {
           AERROR << "Truncated ChangeDrivingMode request.";
         }
@@ -246,9 +233,9 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {new_map: "MapName"}.
         // MapName should be a key of config_.available_maps.
-        const auto new_map = json.find("new_map");
-        if (new_map != json.end()) {
-          ChangeMapTo(*new_map);
+        std::string new_map;
+        if (JsonUtil::GetStringFromJson(json, "new_map", &new_map)) {
+          ChangeMapTo(new_map);
         } else {
           AERROR << "Truncated ChangeMap request.";
         }
@@ -260,9 +247,9 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {new_vehicle: "VehicleName"}.
         // VehicleName should be a key of config_.available_vehicles.
-        const auto new_vehicle = json.find("new_vehicle");
-        if (new_vehicle != json.end()) {
-          ChangeVehicleTo(*new_vehicle);
+        std::string new_vehicle;
+        if (JsonUtil::GetStringFromJson(json, "new_vehicle", &new_vehicle)) {
+          ChangeVehicleTo(new_vehicle);
         } else {
           AERROR << "Truncated ChangeVehicle request.";
         }
@@ -274,9 +261,9 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {new_mode: "ModeName"}.
         // ModeName should be a key of config_.modes.
-        const auto new_mode = json.find("new_mode");
-        if (new_mode != json.end()) {
-          ChangeModeTo(*new_mode);
+        std::string new_mode;
+        if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
+          ChangeModeTo(new_mode);
         } else {
           AERROR << "Truncated ChangeMode request.";
         }
@@ -293,7 +280,7 @@ void HMI::RegisterMessageHandlers() {
 void HMI::BroadcastHMIStatus() const {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
   if (websocket_) {
-    websocket_->BroadcastData(ProtoToTypedJson("HMIStatus", status_));
+    websocket_->BroadcastData(JsonUtil::ProtoToTypedJson("HMIStatus", status_));
   }
 }
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 
-import PARAMETERS from "store/config/parameters.yml";
 import Navigation from "components/Navigation";
 import DashCamPlayer from "components/DashCamPlayer";
 import RouteEditingBar from "components/RouteEditingBar";
@@ -28,7 +27,7 @@ class SceneView extends React.Component {
                                  showNotification={!options.showConsole}
                                  monitor={monitor}/>}
                 {video.showVideo && <DashCamPlayer />}
-                {PARAMETERS.offlinePlayback && <PlaybackControls />}
+                {OFFLINE_PLAYBACK && <PlaybackControls />}
             </div>
         );
     }

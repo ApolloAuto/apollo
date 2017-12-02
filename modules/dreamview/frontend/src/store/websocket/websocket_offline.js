@@ -42,11 +42,11 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     break;
                 case "FrameCount":
                     STORE.playback.setNumFrames(message.data);
-                    STORE.setInitializationStatus(true);
                     this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
+                    STORE.setInitializationStatus(true);
 
                     STORE.updateTimestamp(message.timestamp);
                     STORE.updateWorldTimestamp(message.world.timestampSec);
@@ -101,16 +101,14 @@ export default class OfflinePlaybackWebSocketEndpoint {
     requestGroundMeta(mapId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveGroundMeta',
-            data: {
-                mapId: mapId,
-            }
+            mapId: mapId,
         }));
     }
 
-    requstFrameCount(id) {
+    requstFrameCount(jobId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveFrameCount',
-            id: id,
+            jobId: jobId,
         }));
     }
 
