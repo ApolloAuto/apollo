@@ -29,7 +29,7 @@ namespace traffic_light {
 
 class Detection : public IRefine {
  public:
-  Detection(int &min_crop_size, const std::string &refine_net,
+  Detection(int min_crop_size, const std::string &refine_net,
             const std::string &refine_model);
 
   void Init(const int &resize_len, const std::string &refine_net,

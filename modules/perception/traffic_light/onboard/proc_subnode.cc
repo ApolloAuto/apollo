@@ -15,7 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include <std_msgs/String.h>
-#include "ctime"
+#include <ctime>
+#include <algorithm>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/timer.h"
@@ -391,7 +392,7 @@ bool TLProcSubnode::PublishMessage(
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
-  timestamp += kCameraIndicator[image_lights->image->device_id()];
+  timestamp += kCameraIndicator[image_lights->image->camera_id()];
 
   header->set_camera_timestamp(timestamp);
   // add traffic light result
@@ -492,9 +493,9 @@ bool TLProcSubnode::PublishMessage(
                                         lights->at(0)->info.stop_line());
     light_debug->set_distance_to_stop_line(distance);
   }
-  char filename[100];
-  snprintf(filename, 200, "img/%s_%lf.jpg",
-           image_lights->image->device_id_str().c_str(),
+  char filename[200];
+  snprintf(filename, sizeof(filename), "img/%s_%lf.jpg",
+           image_lights->image->camera_id_str().c_str(),
            image_lights->image->ts());
   cv::imwrite(filename, img);
   common::adapter::AdapterManager::PublishTrafficLightDetection(result);
@@ -502,7 +503,7 @@ bool TLProcSubnode::PublishMessage(
       TimeUtil::GetCurrentTime() - image_lights->preprocess_receive_timestamp;
   AINFO << "Publish message "
         << " ts:" << GLOG_TIMESTAMP(image_lights->timestamp)
-        << " device:" << image_lights->image->device_id_str() << " consuming "
+        << " device:" << image_lights->image->camera_id_str() << " consuming "
         << process_time * 1000 << " ms."
         << " number of lights:" << lights->size()
         << " lights:" << result.ShortDebugString();

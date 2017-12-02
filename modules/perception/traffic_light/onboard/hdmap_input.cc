@@ -60,6 +60,6 @@ bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
          << " point: " << point.ShortDebugString();
   return true;
 }
-}
+}  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

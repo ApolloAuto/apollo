@@ -155,7 +155,7 @@ bool TLOutputSubnode::transform_message(
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
-  switch (image_lights->image->device_id()) {
+  switch (image_lights->image->camera_id()) {
     default:
     case CameraId::LONG_FOCUS:
       timestamp += 222;
@@ -290,7 +290,7 @@ bool TLOutputSubnode::transform_message(
       TimeUtil::GetCurrentTime() - image_lights->preprocess_receive_timestamp;
   AINFO << "TLOutputSubnode transform_message "
         << " ts:" << GLOG_TIMESTAMP(event.timestamp)
-        << " device:" << image_lights->image->device_id_str() << " consuming "
+        << " device:" << image_lights->image->camera_id_str() << " consuming "
         << process_time * 1000 << " ms."
         << " number of lights:" << lights->size()
         << " lights:" << result.ShortDebugString();

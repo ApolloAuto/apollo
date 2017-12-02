@@ -79,7 +79,7 @@ void Detection::Init(const int &resize_len, const std::string &refine_net,
 
   resize_len_ = resize_len;
 }
-Detection::Detection(int &min_crop_size, const std::string &refine_net,
+Detection::Detection(int min_crop_size, const std::string &refine_net,
                      const std::string &refine_model) {
   Init(min_crop_size, refine_net, refine_model);
 }

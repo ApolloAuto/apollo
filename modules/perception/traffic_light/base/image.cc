@@ -30,7 +30,7 @@ bool Image::Init(const double &ts, const CameraId &device_id,
                  const cv::Mat &mat) {
   contain_mat_ = true;
   contain_image_ = true;
-  timestamp_ = ts, device_id_ = device_id, mat_ = mat.clone();
+  timestamp_ = ts, camera_id_ = device_id, mat_ = mat.clone();
   ADEBUG << *this << " init.";
   return true;
 }
@@ -38,7 +38,7 @@ bool Image::Init(const double &ts, const CameraId &device_id,
                  std::shared_ptr<const sensor_msgs::Image> image_data) {
   contain_mat_ = false;
   contain_image_ = true;
-  timestamp_ = ts, device_id_ = device_id, image_data_ = image_data;
+  timestamp_ = ts, camera_id_ = device_id, image_data_ = image_data;
   ADEBUG << *this << " init.";
   return true;
 }
@@ -47,15 +47,15 @@ double Image::ts() const {
   return timestamp_;
 }
 
-CameraId Image::device_id() const {
-  return device_id_;
+CameraId Image::camera_id() const {
+  return camera_id_;
 }
 
-std::string Image::device_id_str() const {
-  if (kCameraIdToStr.find(device_id_) == kCameraIdToStr.end()) {
-    return "unkown device(camera)";
+std::string Image::camera_id_str() const {
+  if (kCameraIdToStr.find(camera_id_) == kCameraIdToStr.end()) {
+    return "unkown camera";
   }
-  return kCameraIdToStr.at(device_id_);
+  return kCameraIdToStr.at(camera_id_);
 }
 bool Image::GenerateMat() {
   if (!contain_mat_) {
@@ -90,8 +90,8 @@ cv::Size Image::size() const {
 
 std::ostream &operator<<(std::ostream &os, const Image &image) {
   if (image.contain_mat_) {
-    os << "Image device_id:" << static_cast<int>(image.device_id_)
-       << " device_id_str: " << image.device_id_str()
+    os << "Image device_id:" << static_cast<int>(image.camera_id_)
+       << " device_id_str: " << image.camera_id_str()
        << " ts:" << std::setprecision(FLAGS_double_show_precision)
        << image.timestamp_ << " size:" << image.mat_.size();
   } else {

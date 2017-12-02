@@ -16,11 +16,13 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
 
+#include <eigen3/Eigen/Core>
+#include <string>
+#include <vector>
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/light.h"
 #include "modules/perception/traffic_light/base/pose.h"
 
-#include <eigen3/Eigen/Core>
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -28,7 +30,8 @@ namespace traffic_light {
 DECLARE_string(traffic_light_projection);
 
 struct ProjectOption {
-  explicit ProjectOption(const CameraId &id) : camera_id(id) {}
+  explicit ProjectOption(const CameraId &id) : camera_id(id) {
+  }
 
   CameraId camera_id;
 };
@@ -102,9 +105,11 @@ bool load_transformation_matrix_from_file(const std::string &file_name,
 // @brief load Matrix4d from file
 
 bool load_matrix4d_from_file(const std::string &file_name,
-                             const std::string &key, Eigen::Matrix4d *matrix);
+                             const std::string &key,
+                             Eigen::Matrix4d *matrix);
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PROJECTION_H
+

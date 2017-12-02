@@ -71,11 +71,11 @@ bool TLPreprocessorSubnode::InitInternal() {
 
   using common::adapter::AdapterManager;
   CHECK(AdapterManager::GetImageLong())
-      << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
+  << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
   AdapterManager::AddImageLongCallback(
       &TLPreprocessorSubnode::SubLongFocusCamera, this);
   CHECK(AdapterManager::GetImageShort())
-      << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
+  << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
   AdapterManager::AddImageShortCallback(
       &TLPreprocessorSubnode::SubShortFocusCamera, this);
   return true;
@@ -119,7 +119,8 @@ bool TLPreprocessorSubnode::InitHdmap() {
 }
 
 bool TLPreprocessorSubnode::AddDataAndPublishEvent(
-    const std::shared_ptr<ImageLights> &data, const CameraId &camera_id,
+    const std::shared_ptr<ImageLights> &data,
+    const CameraId &camera_id,
     double timestamp) {
   // add data down-stream
   std::string device_str = kCameraIdToStr.at(camera_id);
@@ -139,14 +140,12 @@ bool TLPreprocessorSubnode::AddDataAndPublishEvent(
   // pub events
   for (size_t i = 0; i < this->pub_meta_events_.size(); ++i) {
     const EventMeta &event_meta = this->pub_meta_events_[i];
-
     Event event;
     event.event_id = event_meta.event_id;
     event.reserve = device_str;
     event.timestamp = timestamp;
     this->event_manager_->Publish(event);
   }
-
   return true;
 }
 
@@ -170,21 +169,18 @@ void TLPreprocessorSubnode::SubCameraImage(
   PERF_FUNCTION();
   std::shared_ptr<Image> image(new Image);
   cv::Mat cv_mat;
-  double timestamp = 0.0;
-
-  timestamp = msg->header.stamp.toSec();
+  double timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
-  // TODO: for debug , delete later
+  // TODO(ghdawn): for debug , delete later
   image->GenerateMat();
-  cv::imwrite(image->device_id_str() + ".jpg", image->mat());
+  cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
 
-  // 将原 sub_tf 的处理放到图像的 callback 里
+  // which camera should be used?  called in low frequence
   CameraSelection(timestamp);
 
-  // 根据最大处理帧率和上一帧处理时间，来判断是否跳过当前帧
   AINFO << "sub_camera_image_start_ts: "
         << GLOG_TIMESTAMP(sub_camera_image_start_ts)
         << " , _last_proc_image_ts: " << GLOG_TIMESTAMP(last_proc_image_ts_)
@@ -201,10 +197,9 @@ void TLPreprocessorSubnode::SubCameraImage(
 
   // sync image and publish data
   const double before_sync_image_ts = TimeUtil::GetCurrentTime();
-  std::shared_ptr<ImageLights> data(new ImageLights);
+  std::shared_ptr<ImageLights> image_lights(new ImageLights);
   bool should_pub = false;
-  if (!preprocessor_.SyncImage(image, image->ts(), camera_id, &data,
-                               &should_pub)) {
+  if (!preprocessor_.SyncImage(image, &image_lights, &should_pub)) {
     AINFO << "sync image failed ts: " << GLOG_TIMESTAMP(image->ts())
           << ", camera_id: " << kCameraIdToStr.at(camera_id);
   } else {
@@ -215,22 +210,22 @@ void TLPreprocessorSubnode::SubCameraImage(
       TimeUtil::GetCurrentTime() - before_sync_image_ts;
 
   // CarOS Monitor 异常，图像时间与系统时间相差较大
-  size_t max_cached_image_lights_array_size =
-      preprocessor_.max_cached_lights_size();
+  int max_cached_lights_size = preprocessor_.max_cached_lights_size();
   // tf 频率实际为 100Hz, 0.01 秒一帧，
   // 一共缓存了 max_cached_image_lights_array_size * 0.005 时间的 tf 信息
   const float tf_interval = 0.01;
   double image_sys_ts_diff_threshold =
-      max_cached_image_lights_array_size * tf_interval;
-  if (fabs(data->diff_image_sys_ts) > image_sys_ts_diff_threshold) {
+      max_cached_lights_size * tf_interval;
+  if (fabs(image_lights->diff_image_sys_ts) > image_sys_ts_diff_threshold) {
     std::string debug_string = "";
     debug_string +=
-        ("diff_image_sys_ts:" + std::to_string(data->diff_image_sys_ts));
+        ("diff_image_sys_ts:"
+            + std::to_string(image_lights->diff_image_sys_ts));
     debug_string += (",camera_id:" + kCameraIdToStr.at(camera_id));
     debug_string += (",camera_ts:" + std::to_string(timestamp));
 
     AWARN << "image_ts - system_ts(in seconds): "
-          << std::to_string(data->diff_image_sys_ts)
+          << std::to_string(image_lights->diff_image_sys_ts)
           << ". Check if image timestamp drifts."
           << ", camera_id: " + kCameraIdToStr.at(camera_id)
           << ", debug_string: " << debug_string;
@@ -245,20 +240,20 @@ void TLPreprocessorSubnode::SubCameraImage(
 
   // verify lights projection
   // 根据图像时间戳再次查定位和灯，更新 data
-  if (!VerifyLightsProjection(timestamp, camera_id, &data)) {
+  if (!VerifyLightsProjection(image_lights)) {
     AINFO
-        << "TLPreprocessorSubnode verify_lights_projection on image failed, ts:"
-        << GLOG_TIMESTAMP(image->ts())
-        << ", camera_id: " << kCameraIdToStr.at(camera_id);
+    << "TLPreprocessorSubnode verify_lights_projection on image failed, ts:"
+    << GLOG_TIMESTAMP(image->ts())
+    << ", camera_id: " << kCameraIdToStr.at(camera_id);
     return;
   }
 
   // 记录处理当前帧的时间
   last_proc_image_ts_ = sub_camera_image_start_ts;
 
-  data->preprocess_receive_timestamp = sub_camera_image_start_ts;
-  data->preprocess_send_timestamp = TimeUtil::GetCurrentTime();
-  if (AddDataAndPublishEvent(data, camera_id, image->ts())) {
+  image_lights->preprocess_receive_timestamp = sub_camera_image_start_ts;
+  image_lights->preprocess_send_timestamp = TimeUtil::GetCurrentTime();
+  if (AddDataAndPublishEvent(image_lights, camera_id, image->ts())) {
     preprocessor_.set_last_pub_camera_id(camera_id);
     AINFO << "TLPreprocessorSubnode::sub_camera_image msg_time: "
           << GLOG_TIMESTAMP(image->ts())
@@ -266,13 +261,15 @@ void TLPreprocessorSubnode::SubCameraImage(
           << " sub_camera_image_latency: "
           << (TimeUtil::GetCurrentTime() - sub_camera_image_start_ts) * 1000
           << " ms."
-          << " camera_id: " << kCameraIdToStr.at(camera_id)
-          << " number of lights: " << data->lights->size();
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
+    AINFO << " number of lights: " << image_lights->lights->size();
   }
 }
-bool TLPreprocessorSubnode::GetSignals(double ts, CarPose *pose,
+
+bool TLPreprocessorSubnode::GetSignals(double ts,
+                                       CarPose *pose,
                                        std::vector<Signal> *signals) {
-  // get pose
+// get pose
   if (!GetCarPose(ts, pose)) {
     AERROR << "camera_selection failed to get car pose, ts:"
            << GLOG_TIMESTAMP(ts);
@@ -311,27 +308,20 @@ bool TLPreprocessorSubnode::GetCarPose(const double ts, CarPose *pose) {
   return true;
 }
 bool TLPreprocessorSubnode::VerifyLightsProjection(
-    const double &ts, const CameraId &camera_id,
-    std::shared_ptr<ImageLights> *image_lights) {
+    ImageLightsPtr image_lights) {
   std::vector<Signal> signals;
   CarPose pose;
-  if (!GetSignals(ts, &pose, &signals)) {
+  if (!GetSignals(image_lights->timestamp, &pose, &signals)) {
     return false;
   }
 
   bool projections_outside_all_images = false;
-  CameraId selected_camera_id = CameraId::UNKNOWN;
-  if (!preprocessor_.SelectCameraByProjection(ts, pose, signals, image_lights,
-                                              &selected_camera_id)) {
+  if (!preprocessor_.ProjectLights(pose,
+                                   signals,
+                                   image_lights->camera_id,
+                                   image_lights->lights.get(),
+                                   image_lights->lights_outside_image.get())) {
     AINFO << "_preprocessor.select_camera_by_lights_projection failed";
-    return false;
-  }
-
-  if (camera_id != selected_camera_id) {
-    AINFO << "verify_lights_projection selected_camera_id: "
-          << kCameraIdToStr.at(selected_camera_id)
-          << ", cached camera_id: " << kCameraIdToStr.at(camera_id)
-          << ", image_ts: " << GLOG_TIMESTAMP(ts) << "; do not use this image.";
     return false;
   }
 
@@ -365,4 +355,4 @@ void TLPreprocessorSubnode::CameraSelection(double ts) {
 }
 }  // namespace traffic_light
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo

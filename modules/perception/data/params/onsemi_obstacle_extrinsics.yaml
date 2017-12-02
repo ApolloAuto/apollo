@@ -7,7 +7,7 @@ header:
 child_frame_id: onsemi_obstacle
 transform:
   rotation:
-    x: -0.4581
+    x: -0.4881
     y: 0.4581
     z: -0.50026812327159765
     w: 0.543530224003503285

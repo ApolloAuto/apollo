@@ -16,7 +16,6 @@
 
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 #include "modules/perception/lib/base/file_util.h"
-#include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/traffic_light/recognizer/classify.h"
 
 namespace apollo {

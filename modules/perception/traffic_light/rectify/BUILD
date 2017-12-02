@@ -6,14 +6,12 @@ cc_library(
     name = "perception_traffic_light_rectify",
     srcs = [
         "cropbox.cc",
-        "munkres.cc",
         "select.cc",
         "unity_rectify.cc",
         "detection.cc",
     ],
     hdrs = [
         "cropbox.h",
-        "munkres.h",
         "select.h",
         "unity_rectify.h",
         "detection.h",
@@ -25,6 +23,7 @@ cc_library(
         "//modules/map/proto:map_proto",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",
+        "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/traffic_light/base:perception_traffic_light_base",
         "//modules/perception/traffic_light/interface:perception_traffic_light_interface",
     ],

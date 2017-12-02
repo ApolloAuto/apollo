@@ -295,19 +295,25 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
   double diff_image_sys_ts = 0.0;
   bool sync_ok = false;
 
-  ASSERT_FALSE(_preprocessor->sync_image_with_cached_lights_projections(
-      image, static_cast<CameraId>(cam_id), sync_time, data,
-      &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+  ASSERT_FALSE(_preprocessor->SyncImageWithCachedLights(image,
+                                                        data,
+                                                        &diff_image_pose_ts,
+                                                        &diff_image_sys_ts,
+                                                        &sync_ok));
 
   cam_id = 1000;
-  ASSERT_FALSE(_preprocessor->sync_image_with_cached_lights_projections(
-      image, static_cast<CameraId>(cam_id), sync_time, data,
-      &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+  ASSERT_FALSE(_preprocessor->SyncImageWithCachedLights(image,
+                                                        data,
+                                                        &diff_image_pose_ts,
+                                                        &diff_image_sys_ts,
+                                                        &sync_ok));
 
   cam_id = 0;
-  ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-      image, static_cast<CameraId>(cam_id), sync_time, data,
-      &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+  ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                       data,
+                                                       &diff_image_pose_ts,
+                                                       &diff_image_sys_ts,
+                                                       &sync_ok));
 
   cam_id = 0;
   diff_image_pose_ts = 0.0;
@@ -317,9 +323,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights->timestamp = 0.2;
     image_lights->camera_id = CameraId::UNKNOWN;
     _preprocessor->cached_lights_.push_back(image_lights);
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_FALSE(sync_ok);
     _preprocessor->cached_lights_.clear();
   }
@@ -332,9 +340,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights->timestamp = 0.01;
     image_lights->camera_id = CameraId::UNKNOWN;
     _preprocessor->cached_lights_.push_back(image_lights);
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_FALSE(sync_ok);
     _preprocessor->cached_lights_.clear();
   }
@@ -347,9 +357,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights->timestamp = 0.01;
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_TRUE(sync_ok);
     _preprocessor->cached_lights_.clear();
   }
@@ -363,9 +375,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
     _preprocessor->last_output_ts_ = 1000.0;
-    ASSERT_FALSE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_FALSE(_preprocessor->SyncImageWithCachedLights(image,
+                                                          data,
+                                                          &diff_image_pose_ts,
+                                                          &diff_image_sys_ts,
+                                                          &sync_ok));
     ASSERT_FALSE(sync_ok);
     _preprocessor->cached_lights_.clear();
     _preprocessor->last_output_ts_ = 0.0;
@@ -380,9 +394,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
     std::shared_ptr<ImageLights> data_null;
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data_null,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data_null,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_TRUE(sync_ok);
     _preprocessor->cached_lights_.clear();
   }
@@ -401,9 +417,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights2->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights2);
 
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_FALSE(sync_ok);
     EXPECT_DOUBLE_EQ(0.0, diff_image_pose_ts);
     _preprocessor->cached_lights_.clear();
@@ -424,9 +442,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights2->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights2);
 
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_FALSE(sync_ok);
     EXPECT_DOUBLE_EQ(-0.2, diff_image_pose_ts);
     _preprocessor->cached_lights_.clear();
@@ -447,9 +467,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     image_lights2->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights2);
 
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_FALSE(sync_ok);
     EXPECT_DOUBLE_EQ(0.3, diff_image_pose_ts);
     _preprocessor->cached_lights_.clear();
@@ -473,9 +495,11 @@ TEST_F(TLPreprocessorTest, test_sync_image_with_cached_lights_projections) {
     // set _last_no_signals_ts, test query /tf in low frequence case
     _preprocessor->last_no_signals_ts_ = -0.2;
 
-    ASSERT_TRUE(_preprocessor->sync_image_with_cached_lights_projections(
-        image, static_cast<CameraId>(cam_id), sync_time, data,
-        &diff_image_pose_ts, &diff_image_sys_ts, &sync_ok));
+    ASSERT_TRUE(_preprocessor->SyncImageWithCachedLights(image,
+                                                         data,
+                                                         &diff_image_pose_ts,
+                                                         &diff_image_sys_ts,
+                                                         &sync_ok));
     ASSERT_FALSE(sync_ok);
     EXPECT_DOUBLE_EQ(0.0, diff_image_pose_ts);
     _preprocessor->cached_lights_.clear();
@@ -517,8 +541,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     std::shared_ptr<LightPtrs> lights_on_image;
     std::shared_ptr<LightPtrs> lights_outside_image;
     ASSERT_TRUE(projection.Init());
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, LONG_FOCUS, lights_on_image, lights_outside_image));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             LONG_FOCUS,
+                                             lights_on_image,
+                                             lights_outside_image));
   }
 
   // invalid camera id
@@ -535,9 +562,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = -1;
-    ASSERT_FALSE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image,
-        lights_outside_image));
+    ASSERT_FALSE(_preprocessor->ProjectLights(pose,
+                                              signals,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image,
+                                              lights_outside_image));
   }
   {
     CarPose pose;
@@ -552,9 +581,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = 1000;
-    ASSERT_FALSE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image,
-        lights_outside_image));
+    ASSERT_FALSE(_preprocessor->ProjectLights(pose,
+                                              signals,
+                                              static_cast<CameraId>(cam_id),
+                                              lights_on_image,
+                                              lights_outside_image));
   }
 
   // long focus project on image
@@ -571,9 +602,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
 
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             static_cast<CameraId>(cam_id),
+                                             lights_on_image,
+                                             lights_outside_image));
     EXPECT_EQ(1, lights_on_image->size());
     EXPECT_EQ(0, lights_outside_image->size());
   }
@@ -591,8 +624,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     _preprocessor->set_camera_is_working_flag(SHORT_FOCUS, true);
     prepare_test_data_short_focus(&pose, &(signals[0]));
 
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, SHORT_FOCUS, lights_on_image, lights_outside_image));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             SHORT_FOCUS,
+                                             lights_on_image,
+                                             lights_outside_image));
     EXPECT_EQ(1, lights_on_image->size());
     EXPECT_EQ(0, lights_outside_image->size());
   }
@@ -611,9 +647,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_long_focus(&pose, &(signals[0]));
     pose._pose(0, 3) = pose._pose(0, 3) + 100000;
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             static_cast<CameraId>(cam_id),
+                                             lights_on_image,
+                                             lights_outside_image));
     EXPECT_EQ(0, lights_on_image->size());
     EXPECT_EQ(1, lights_outside_image->size());
   }
@@ -632,9 +670,11 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     prepare_test_data_short_focus(&pose, &(signals[0]));
     pose._pose(0, 3) = pose._pose(0, 3) + 100000;
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image,
-        lights_outside_image));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             static_cast<CameraId>(cam_id),
+                                             lights_on_image,
+                                             lights_outside_image));
     EXPECT_EQ(0, lights_on_image->size());
     EXPECT_EQ(1, lights_outside_image->size());
   }
@@ -690,9 +730,11 @@ TEST_F(TLPreprocessorTest, test_select_image) {
     std::vector<apollo::hdmap::Signal> signals(1);
     prepare_test_data_long_focus(&pose, &(signals[0]));
     int cam_id = 0;
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image_array[0],
-        lights_outside_image_array[0]));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             static_cast<CameraId>(cam_id),
+                                             lights_on_image_array[0],
+                                             lights_outside_image_array[0]));
 
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(LONG_FOCUS, true));
     _preprocessor->SelectImage(pose, lights_on_image_array,
@@ -731,9 +773,11 @@ TEST_F(TLPreprocessorTest, test_select_image) {
     int cam_id = 0;
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(LONG_FOCUS, true));
     ASSERT_TRUE(_preprocessor->set_camera_is_working_flag(SHORT_FOCUS, true));
-    ASSERT_TRUE(_preprocessor->project_lights(
-        signals, pose, static_cast<CameraId>(cam_id), lights_on_image_array[0],
-        lights_outside_image_array[0]));
+    ASSERT_TRUE(_preprocessor->ProjectLights(pose,
+                                             signals,
+                                             static_cast<CameraId>(cam_id),
+                                             lights_on_image_array[0],
+                                             lights_outside_image_array[0]));
 
     _preprocessor->SelectImage(pose, lights_on_image_array,
                                lights_outside_image_array, &selection);
@@ -758,18 +802,15 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
   std::shared_ptr<ImageLights> data(new ImageLights);
   bool should_pub = false;
 
-  ASSERT_FALSE(_preprocessor->SyncImage(
-      image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+  ASSERT_FALSE(_preprocessor->SyncImage(image, &data, &should_pub));
   ASSERT_FALSE(should_pub);
 
   cam_id = 1000;
-  ASSERT_FALSE(_preprocessor->SyncImage(
-      image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+  ASSERT_FALSE(_preprocessor->SyncImage(image, &data, &should_pub));
   ASSERT_FALSE(should_pub);
 
   cam_id = 0;
-  ASSERT_TRUE(_preprocessor->SyncImage(
-      image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+  ASSERT_TRUE(_preprocessor->SyncImage(image, &data, &should_pub));
   ASSERT_TRUE(should_pub);
 
   cam_id = 1;
@@ -780,8 +821,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->timestamp = 0.2;
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
-    ASSERT_FALSE(_preprocessor->SyncImage(
-        image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+    ASSERT_FALSE(_preprocessor->SyncImage(image, &data, &should_pub));
     ASSERT_FALSE(should_pub);
     _preprocessor->cached_lights_.clear();
   }
@@ -794,8 +834,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->timestamp = 0.01;
     image_lights->camera_id = CameraId::LONG_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
-    ASSERT_TRUE(_preprocessor->SyncImage(
-        image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+    ASSERT_TRUE(_preprocessor->SyncImage(image, &data, &should_pub));
     ASSERT_TRUE(should_pub);
     _preprocessor->cached_lights_.clear();
   }
@@ -809,8 +848,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->camera_id = CameraId::SHORT_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
     _preprocessor->_cached_signal_nums_array.push_back(std::make_pair(0.00, 1));
-    ASSERT_TRUE(_preprocessor->SyncImage(
-        image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+    ASSERT_TRUE(_preprocessor->SyncImage(image, &data, &should_pub));
     ASSERT_TRUE(should_pub);
     EXPECT_EQ(data->num_signals, 0);
     _preprocessor->cached_lights_.clear();
@@ -826,13 +864,11 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->camera_id = CameraId::SHORT_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
     _preprocessor->_cached_signal_nums_array.push_back(std::make_pair(0.01, 1));
-    ASSERT_TRUE(_preprocessor->SyncImage(
-        image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+    ASSERT_TRUE(_preprocessor->SyncImage(image, &data, &should_pub));
     ASSERT_TRUE(should_pub);
     EXPECT_EQ(data->num_signals, 1);
 
-    ASSERT_TRUE(_preprocessor->SyncImage(
-        image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+    ASSERT_TRUE(_preprocessor->SyncImage(image, &data, &should_pub));
     ASSERT_TRUE(should_pub);
     EXPECT_EQ(data->num_signals, 1);
 
@@ -849,8 +885,7 @@ TEST_F(TLPreprocessorTest, test_sync_image) {
     image_lights->camera_id = CameraId::SHORT_FOCUS;
     _preprocessor->cached_lights_.push_back(image_lights);
     _preprocessor->_cached_signal_nums_array.push_back(std::make_pair(-0.5, 1));
-    ASSERT_TRUE(_preprocessor->SyncImage(
-        image, sync_time, static_cast<CameraId>(cam_id), &data, &should_pub));
+    ASSERT_TRUE(_preprocessor->SyncImage(image, &data, &should_pub));
     ASSERT_TRUE(should_pub);
     EXPECT_EQ(data->num_signals, 0);
 

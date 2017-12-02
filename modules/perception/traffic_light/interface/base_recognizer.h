@@ -17,10 +17,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H
 
-#include <string>
-
 #include <opencv2/opencv.hpp>
-
+#include <string>
+#include <vector>
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
@@ -31,7 +30,7 @@ namespace traffic_light {
 
 struct RecognizeOption {};
 
-//@brief Recognizer classify the light color.
+// @brief Recognizer classify the light color.
 class BaseRecognizer {
  public:
   BaseRecognizer() = default;

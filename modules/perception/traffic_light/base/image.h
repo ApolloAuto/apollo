@@ -19,9 +19,9 @@
 
 #include <gflags/gflags.h>
 #include <sensor_msgs/Image.h>
+#include <opencv2/opencv.hpp>
 #include <map>
 #include <memory>
-#include <opencv2/opencv.hpp>
 #include <string>
 
 namespace apollo {
@@ -63,9 +63,9 @@ class Image {
   double ts() const;
 
   // @brief return image's device_id
-  CameraId device_id() const;
+  CameraId camera_id() const;
   // @brief return image's device_id_str
-  std::string device_id_str() const;
+  std::string camera_id_str() const;
 
   // @brief return image's data
   cv::Mat mat() const;
@@ -83,7 +83,7 @@ class Image {
   }
 
   void set_device_id(CameraId camera_id) {
-    device_id_ = camera_id;
+    camera_id_ = camera_id;
   }
 
   bool GenerateMat();
@@ -92,7 +92,7 @@ class Image {
   bool contain_image_ = false;
   bool contain_mat_ = false;
   double timestamp_ = 0.0;                  // Image's timestamp
-  CameraId device_id_ = CameraId::UNKNOWN;  // camera's id
+  CameraId camera_id_ = CameraId::UNKNOWN;  // camera's id
   cv::Mat mat_;                             // Image's data
   std::shared_ptr<const sensor_msgs::Image> image_data_;
   friend std::ostream &operator<<(std::ostream &os, const Image &image);

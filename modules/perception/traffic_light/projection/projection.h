@@ -16,9 +16,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
 
-#include <cmath>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
+#include <cmath>
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace apollo {

@@ -18,7 +18,6 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_PREPROCESSOR_H
 #include <string>
 #include <vector>
-
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
@@ -27,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-//@brief Reviser is the class is to revise the perception result.
+// @brief Reviser is the class is to revise the perception result.
 //       It may use history info(Tracker) or some else info.
 class BasePreprocessor {
  public:
@@ -35,11 +34,11 @@ class BasePreprocessor {
 
   virtual ~BasePreprocessor() = default;
 
-  //@brief init the reviser.
+  // @brief init the Preprocessor.
   virtual bool Init() = 0;
 
-  //@brief Revise's name
-  virtual std::string Name() const = 0;
+  // @brief Preprocessor's name
+  virtual std::string name() const = 0;
 };
 
 REGISTER_REGISTERER(BasePreprocessor);

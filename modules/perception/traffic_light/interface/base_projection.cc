@@ -115,7 +115,7 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
   return true;
 }
 
-//@brief load transformation_matrix from file
+// @brief load transformation_matrix from file
 bool load_transformation_matrix_from_file(
     const std::string &file_name, Eigen::Matrix4d *transformation_matrix) {
   try {

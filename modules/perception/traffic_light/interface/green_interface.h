@@ -37,23 +37,24 @@ class IRefine {
  public:
   virtual void Perform(const cv::Mat &ros_image,
                        std::vector<LightPtr> *lights) = 0;
-
   virtual void SetCropBox(const cv::Rect &box) = 0;
 };
 
 class IGetBox {
  public:
-  virtual void GetCropBox(const cv::Size &size,
-                          const std::vector<LightPtr> &lights,
-                          cv::Rect *cropbox) = 0;
+  virtual void
+  GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
+             cv::Rect *cropbox) = 0;
 };
 class DummyRefine : public IRefine {
  public:
   void Perform(const cv::Mat &ros_image,
-               std::vector<LightPtr> *lights) override {}
-  void SetCropBox(const cv::Rect &box) override {}
+               std::vector<LightPtr> *lights) override {
+  }
+  void SetCropBox(const cv::Rect &box) override {
+  }
 };
-}
-}
-}
-#endif  // GREEN_INTERFACE_H
+}  // namespace traffic_light
+}  // namespace perception
+}  // namespace apollo
+#endif

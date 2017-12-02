@@ -46,8 +46,7 @@ class HDMapInput {
 };
 
 typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
-}
+}  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_

@@ -41,7 +41,7 @@ class TLPreprocessor : public BasePreprocessor {
 
   virtual bool Init();
 
-  virtual std::string Name() const {
+  virtual std::string name() const {
     return "TLPreprocessor";
   }
 
@@ -49,9 +49,9 @@ class TLPreprocessor : public BasePreprocessor {
                               const std::vector<Signal> &signals,
                               const double ts);
 
-  bool SyncImage(const ImageSharedPtr &image, const double sync_time,
-                 const CameraId &camera_id,
-                 std::shared_ptr<ImageLights> *image_lights, bool *should_pub);
+  bool SyncImage(const ImageSharedPtr &image,
+                 ImageLightsPtr *image_lights,
+                 bool *should_pub);
 
   void set_last_pub_camera_id(CameraId camera_id);
   CameraId last_pub_camera_id() const;
@@ -60,8 +60,15 @@ class TLPreprocessor : public BasePreprocessor {
 
   bool SelectCameraByProjection(const double timestamp, const CarPose &pose,
                                 const std::vector<Signal> &signals,
-                                std::shared_ptr<ImageLights> *image_lights,
+                                std::shared_ptr<ImageLights> image_lights,
                                 CameraId *selected_camera_id);
+
+  // @brief Project lights from HDMap onto long focus or short focus image plane
+  bool ProjectLights(const CarPose &pose,
+                     const std::vector<Signal> &signals,
+                     const CameraId &camera_id,
+                     LightPtrs *lights_on_image,
+                     LightPtrs *lights_outside_image);
 
  private:
   void SelectImage(const CarPose &pose,
@@ -69,16 +76,12 @@ class TLPreprocessor : public BasePreprocessor {
                    const LightsArray &lights_outside_image_array,
                    CameraId *selection);
 
-  // @brief Project lights from HDMap onto long focus or short focus image plane
-  bool project_lights(const std::vector<Signal> &signals, const CarPose &pose,
-                      const CameraId &camera_id, LightPtrs *lights_on_image,
-                      LightPtrs *lights_outside_image);
-
   // @brief Sync. image with cached lights projections
-  bool sync_image_with_cached_lights_projections(
-      const ImageSharedPtr &image, CameraId camera_id, double timestamp,
-      std::shared_ptr<ImageLights> *image_lights, double *diff_image_pose_ts,
-      double *diff_image_sys_ts, bool *sync_ok);
+  bool SyncImageWithCachedLights(const ImageSharedPtr &image,
+                                 ImageLightsPtr *image_lights,
+                                 double *diff_image_pose_ts,
+                                 double *diff_image_sys_ts,
+                                 bool *sync_ok);
 
   bool IsOnBorder(const cv::Size size, const cv::Rect &roi,
                   const int border_size) const;

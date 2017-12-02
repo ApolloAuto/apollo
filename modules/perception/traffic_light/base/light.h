@@ -18,8 +18,8 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
 
 #include <eigen3/Eigen/Core>
-#include <memory>
 #include <opencv2/opencv.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 #include "modules/map/proto/map_signal.pb.h"

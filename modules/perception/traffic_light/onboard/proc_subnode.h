@@ -16,12 +16,12 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
 
+#include <gflags/gflags.h>
 #include <cmath>
 #include <map>
 #include <memory>
 #include <string>
 
-#include <gflags/gflags.h>
 #include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
@@ -66,25 +66,23 @@ class TLProcSubnode : public Subnode {
   bool VerifyImageLights(const ImageLights &image_lights,
                          CameraId *selection) const;
 
-  //@brief compute image border size based on projection box and detection box
+  // @brief compute image border size based on projection box and detection box
   bool ComputeImageBorder(const ImageLights &image_lights, int *image_border);
 
-  //@brief compute offset between two rectangles
+  // @brief compute offset between two rectangles
   void ComputeRectsOffset(const cv::Rect &rect1, const cv::Rect &rect2,
                           int *offset);
+  bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights) const;
 
  private:
   int image_border_ = 100;
-
+  float valid_ts_interval_;
   TLPreprocessingData *preprocessing_data_ = nullptr;  // up-stream data
-
   std::unique_ptr<BaseRectifier> rectifier_ = nullptr;
   std::unique_ptr<BaseRecognizer> recognizer_ = nullptr;
   std::unique_ptr<BaseReviser> reviser_ = nullptr;
   Mutex mutex_;
   DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
-  bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights) const;
-  float valid_ts_interval_;
 };
 
 REGISTER_SUBNODE(TLProcSubnode);

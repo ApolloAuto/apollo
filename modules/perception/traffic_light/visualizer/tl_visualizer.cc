@@ -110,7 +110,7 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   bool found_image = false;
   for (int i = s_cached_images.size() - 1; i >= 0; --i) {
     if (fabs(s_cached_images[i]->ts() - img_ts) < 0.005 &&
-        camera_id == s_cached_images[i]->device_id()) {
+        camera_id == s_cached_images[i]->camera_id()) {
       s_img = s_cached_images[i]->mat().clone();
       found_image = true;
       break;

@@ -49,7 +49,7 @@ struct ImageLights {
   int offset = 0;
   size_t num_signals = 0;
 };
-
+typedef std::shared_ptr<ImageLights> ImageLightsPtr;
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

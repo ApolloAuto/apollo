@@ -17,7 +17,6 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_REVISER_H
 #include <string>
 #include <vector>
-
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
@@ -50,7 +49,7 @@ class BaseReviser {
   virtual bool Revise(const ReviseOption &option,
                       std::vector<LightPtr> *lights) = 0;
 
-  //@brief Revise's name
+  // @brief Revise's name
   virtual std::string name() const = 0;
 };
 

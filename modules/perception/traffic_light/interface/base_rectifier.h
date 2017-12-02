@@ -18,7 +18,7 @@
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H
 
 #include <string>
-
+#include <vector>
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
