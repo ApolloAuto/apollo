@@ -94,7 +94,7 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
     sensor_objects[0].objects.resize(1);
     sensor_objects[0].objects[0] = obj;
     EXPECT_TRUE(probabilistic_fusion->Fuse(sensor_objects, &fused_objects));
-    EXPECT_TRUE(fused_objects.size() == 1);
+    EXPECT_EQ(fused_objects.size(), 1);
     EXPECT_DOUBLE_EQ(fused_objects[0]->length, obj->length);
     EXPECT_DOUBLE_EQ(fused_objects[0]->width, obj->width);
     EXPECT_DOUBLE_EQ(fused_objects[0]->height, obj->height);
