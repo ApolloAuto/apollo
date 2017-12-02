@@ -57,12 +57,12 @@ bool LidarProcess::Init() {
   RegistAllAlgorithm();
 
   if (!InitFrameDependence()) {
-    AERROR << "failed to init frame dependence.";
+    AERROR << "failed to Init frame dependence.";
     return false;
   }
 
   if (!InitAlgorithmPlugin()) {
-    AERROR << "failed to init algorithm plugin.";
+    AERROR << "failed to Init algorithm plugin.";
     return false;
   }
 
@@ -111,7 +111,7 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
     Affine3d temp_trans(*velodyne_trans);
     PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
     hdmap.reset(new HdmapStruct);
-    hdmap_input_->GetROI(velodyne_pose_world, &hdmap);
+    hdmap_input_->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap);
     PERF_BLOCK_END("lidar_get_roi_from_hdmap");
   }
 
@@ -204,7 +204,7 @@ bool LidarProcess::InitFrameDependence() {
   /// init config manager
   ConfigManager* config_manager = ConfigManager::instance();
   if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager";
+    AERROR << "failed to Init ConfigManager";
     return false;
   }
   AINFO << "Init config manager successfully, work_root: "
@@ -218,10 +218,10 @@ bool LidarProcess::InitFrameDependence() {
       return false;
     }
     if (!hdmap_input_->Init()) {
-      AERROR << "failed to init HDMapInput";
+      AERROR << "failed to Init HDMapInput";
       return false;
     }
-    AINFO << "get and init hdmap_input succ.";
+    AINFO << "get and Init hdmap_input succ.";
   }
 
   return true;
@@ -236,7 +236,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!roi_filter_->Init()) {
-    AERROR << "Failed to init roi filter: " << roi_filter_->name();
+    AERROR << "Failed to Init roi filter: " << roi_filter_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, roi_filter_: "
@@ -250,7 +250,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!segmentor_->Init()) {
-    AERROR << "Failed to init segmentor: " << segmentor_->name();
+    AERROR << "Failed to Init segmentor: " << segmentor_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, segmentor: "
@@ -264,7 +264,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!object_builder_->Init()) {
-    AERROR << "Failed to init object builder: " << object_builder_->name();
+    AERROR << "Failed to Init object builder: " << object_builder_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
@@ -278,7 +278,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!tracker_->Init()) {
-    AERROR << "Failed to init tracker: " << tracker_->name();
+    AERROR << "Failed to Init tracker: " << tracker_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, tracker: " << tracker_->name();

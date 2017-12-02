@@ -32,7 +32,7 @@ DECLARE_bool(is_serialize_point_cloud);
 DECLARE_double(map_radius);
 DECLARE_int32(map_sample_step);
 
-/// obstacle/onboard/lidar_process.cc
+/// obstacle/onboard/lidar_process_subnode.cc
 DECLARE_bool(enable_hdmap_input);
 DECLARE_string(onboard_roi_filter);
 DECLARE_string(onboard_segmentor);
@@ -43,5 +43,21 @@ DECLARE_string(lidar_tf2_frame_id);
 DECLARE_string(lidar_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
+
+/// obstacle/onboard/radar_process_subnode.cc
+DECLARE_double(front_radar_forward_distance);
+DECLARE_string(onboard_radar_detector);
+DECLARE_int32(gps_buffer_size);
+DECLARE_string(radar_tf2_frame_id);
+DECLARE_string(radar_tf2_child_frame_id);
+
+/// obstacle/onboard/fusion_subnode.cc
+DECLARE_string(onboard_fusion);
+
+/// traffic_light/onboard/preprocessor.cc
+DECLARE_double(query_signal_range);
+
+/// perception.cc
+DECLARE_string(dag_config_path);
 
 #endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */

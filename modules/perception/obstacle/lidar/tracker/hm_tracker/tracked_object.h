@@ -52,6 +52,7 @@ struct TrackedObject {
   // states
   Eigen::Vector3f anchor_point;
   Eigen::Vector3f velocity;
+  Eigen::Matrix3d velocity_uncertainty;
   Eigen::Vector3f acceleration;
 
   // class type
@@ -68,4 +69,4 @@ typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_  // NOLINT
+#endif

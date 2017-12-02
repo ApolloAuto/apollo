@@ -49,20 +49,20 @@ class OfflineLidarPerceptionTool {
  public:
   bool Init(bool use_visualization = false) {
     if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to init ConfigManager";
+      AERROR << "failed to Init ConfigManager";
       return false;
     }
 
     lidar_process_.reset(new LidarProcess());
     if (!lidar_process_->Init()) {
-      AERROR << "failed to init lidar_process.";
+      AERROR << "failed to Init lidar_process.";
       return false;
     }
 
     if (use_visualization) {
       visualizer_.reset(new OpenglVisualizer());
       if (!visualizer_->Init()) {
-        AERROR << "init visialuzer failed" << std::endl;
+        AERROR << "Init visialuzer failed" << std::endl;
       }
     }
     return true;
@@ -124,7 +124,7 @@ class OfflineLidarPerceptionTool {
         content.SetLidarPose(pose);
         content.SetLidarCloud(cloud);
         content.SetLidarRoiCloud(roi_cloud);
-        content.SetTrackedObjects(result_objects);
+        content.SetTrackedObjectsLidar(result_objects);
         visualizer_->UpdateCameraSystem(&content);
         visualizer_->Render(content);
       }
