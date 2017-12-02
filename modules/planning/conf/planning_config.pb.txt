@@ -23,7 +23,7 @@ em_planner_config {
         eval_time_interval: 0.1
         path_resolution: 0.1
         obstacle_ignore_distance: 20.0
-        obstacle_collision_distance: 0.2
+        obstacle_collision_distance: 0.5
         obstacle_risk_distance: 2.0
         obstacle_collision_cost: 1e5
         path_l_cost: 1.0
@@ -73,6 +73,7 @@ em_planner_config {
     qp_spline_path_config {
         spline_order: 4
         max_spline_length: 20.0
+        max_constraint_interval: 2.0
         time_resolution: 0.1
         regularization_weight: 1.0e-5
         first_spline_weight_factor: 0.0
