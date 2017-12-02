@@ -57,6 +57,12 @@ void SignalLight::ReadSignals() {
   if (AdapterManager::GetTrafficLightDetection()->Empty()) {
     return;
   }
+  if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
+      FLAGS_signal_expire_time_sec) {
+    ADEBUG << "traffic signals msg is expired: "
+           << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
+    return;
+  }
   const TrafficLightDetection& detection =
       AdapterManager::GetTrafficLightDetection()->GetLatestObserved();
   for (int j = 0; j < detection.traffic_light_size(); j++) {

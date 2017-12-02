@@ -130,6 +130,8 @@ DECLARE_bool(enable_follow_accel_constraint);
 DECLARE_double(stop_max_distance_buffer);
 DECLARE_double(stop_min_speed);
 DECLARE_double(stop_max_deceleration);
+DECLARE_double(signal_expire_time_sec);
+
 /// Clear Zone
 DECLARE_string(clear_zone_virtual_object_id_prefix);
 /// triffic light
