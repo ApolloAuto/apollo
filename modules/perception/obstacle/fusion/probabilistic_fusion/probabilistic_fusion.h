@@ -52,9 +52,9 @@ class ProbabilisticFusion : public BaseFusion {
 
   /**@brief update current tracks with matched objects*/
   void UpdateAssignedTracks(std::vector<PbfTrackPtr> *tracks,
-                            const std::vector<PbfSensorObjectPtr> &sensor_objects,
-                            const std::vector<TrackObjectPair> &assignments,
-                            const std::vector<double> &track_objects_dist);
+    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<TrackObjectPair> &assignments,
+    const std::vector<double> &track_objects_dist);
 
   /**@brief update current tracks which cannot find matched objects*/
   void UpdateUnassignedTracks(std::vector<PbfTrackPtr> *tracks,
@@ -68,11 +68,11 @@ class ProbabilisticFusion : public BaseFusion {
 
   void DecomposeFrameObjects(
       const std::vector<PbfSensorObjectPtr> &frame_objects,
-      std::vector<PbfSensorObjectPtr> &foreground_objects,
-      std::vector<PbfSensorObjectPtr> &background_objects);
+      std::vector<PbfSensorObjectPtr> *foreground_objects,
+      std::vector<PbfSensorObjectPtr> *background_objects);
 
   void FuseForegroundObjects(
-      std::vector<PbfSensorObjectPtr> &foreground_objects,
+      std::vector<PbfSensorObjectPtr> *foreground_objects,
       Eigen::Vector3d ref_point, const SensorType &sensor_type,
       const std::string &sensor_id, double timestamp);
 

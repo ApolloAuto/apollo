@@ -232,10 +232,10 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   std::vector<PbfSensorObjectPtr> &objects = frame->objects;
   std::vector<PbfSensorObjectPtr> background_objects;
   std::vector<PbfSensorObjectPtr> foreground_objects;
-  DecomposeFrameObjects(objects, foreground_objects, background_objects);
+  DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
-  FuseForegroundObjects(foreground_objects, ref_point, frame->sensor_type,
+  FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type,
                         frame->sensor_id, frame->timestamp);
   track_manager_->RemoveLostTracks();
 }
@@ -304,21 +304,21 @@ void ProbabilisticFusion::CollectFusedObjects(
 
 void ProbabilisticFusion::DecomposeFrameObjects(
     const std::vector<PbfSensorObjectPtr> &frame_objects,
-    std::vector<PbfSensorObjectPtr> &foreground_objects,
-    std::vector<PbfSensorObjectPtr> &background_objects) {
-  foreground_objects.clear();
-  background_objects.clear();
+    std::vector<PbfSensorObjectPtr> *foreground_objects,
+    std::vector<PbfSensorObjectPtr> *background_objects) {
+  foreground_objects->clear();
+  background_objects->clear();
   for (size_t i = 0; i < frame_objects.size(); i++) {
     if (frame_objects[i]->object->is_background) {
-      background_objects.push_back(frame_objects[i]);
+      background_objects->push_back(frame_objects[i]);
     } else {
-      foreground_objects.push_back(frame_objects[i]);
+      foreground_objects->push_back(frame_objects[i]);
     }
   }
 }
 
 void ProbabilisticFusion::FuseForegroundObjects(
-    std::vector<PbfSensorObjectPtr> &foreground_objects,
+    std::vector<PbfSensorObjectPtr> *foreground_objects,
     Eigen::Vector3d ref_point, const SensorType &sensor_type,
     const std::string &sensor_id, double timestamp) {
   std::vector<int> unassigned_tracks;
@@ -332,23 +332,23 @@ void ProbabilisticFusion::FuseForegroundObjects(
 
   std::vector<double> track2measurements_dist;
   std::vector<double> measurement2tracks_dist;
-  matcher_->Match(tracks, foreground_objects, options, &assignments,
+  matcher_->Match(tracks, *foreground_objects, options, &assignments,
                   &unassigned_tracks, &unassigned_objects,
                   &track2measurements_dist, &measurement2tracks_dist);
 
   AINFO << "fg_track_cnt = " << tracks.size()
-        << ", fg_obj_cnt = " << foreground_objects.size()
+        << ", fg_obj_cnt = " << foreground_objects->size()
         << ", assignement = " << assignments.size()
         << ", unassigned_track_cnt = " << unassigned_tracks.size()
         << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
-  UpdateAssignedTracks(&tracks, foreground_objects, assignments,
+  UpdateAssignedTracks(&tracks, *foreground_objects, assignments,
                        track2measurements_dist);
 
   UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
                          sensor_type, sensor_id, timestamp);
 
-  CreateNewTracks(foreground_objects, unassigned_objects);
+  CreateNewTracks(*foreground_objects, unassigned_objects);
 }
 
 }  // namespace perception
