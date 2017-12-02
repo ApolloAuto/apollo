@@ -16,9 +16,9 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
-#include "google/protobuf/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/util/json_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -30,7 +30,6 @@ using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::ContainsKey;
 using apollo::hdmap::EndWayPointFile;
 using apollo::routing::RoutingRequest;
-using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
@@ -49,15 +48,8 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         if (iter != json.end()) {
           MapElementIds map_element_ids(*iter);
           auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
-
-          std::string retrieved_json_string;
-          MessageToJsonString(retrieved, &retrieved_json_string);
-
-          Json response;
-          response["type"] = "MapData";
-          response["data"] = Json::parse(retrieved_json_string);
-
-          websocket_->SendData(conn, response.dump());
+          websocket_->SendData(
+              conn, util::JsonUtil::ProtoToTypedJson("MapData", retrieved));
         }
       });
 
