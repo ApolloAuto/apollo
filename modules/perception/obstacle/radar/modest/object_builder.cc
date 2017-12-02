@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
+
+#include <map>
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -24,9 +26,13 @@ namespace perception {
 void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
                           const Eigen::Matrix4d &radar_pose,
                           const Eigen::Vector2d &main_velocity,
-                          SensorObjects &radar_objects) {
+                          SensorObjects *radar_objects) {
+  if (radar_objects == nullptr) {
+    AERROR << "radar objects is nullptr.";
+    return;
+  }
   std::map<int, int> current_con_ids;
-  auto objects = &(radar_objects.objects);
+  auto objects = &(radar_objects->objects);
   for (int i = 0; i < raw_obstacles.contiobs_size(); i++) {
     ObjectPtr object_ptr = ObjectPtr(new Object());
     int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
@@ -62,7 +68,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
         raw_obstacles.contiobs(i).lateral_vel(), 0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
-    // calculate the absolute velodity
+    //  calculate the absolute velodity
     object_ptr->velocity(0) = velocity_w[0] + main_velocity(0);
     object_ptr->velocity(1) = velocity_w[1] + main_velocity(1);
     object_ptr->velocity(2) = 0;
@@ -70,11 +76,11 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     object_ptr->length = 1.0;
     object_ptr->width = 1.0;
     object_ptr->height = 1.0;
-    int cls = raw_obstacles.contiobs(i).obstacle_class();
-    if (cls == CONTI_CAR) {
-      object_ptr->length = raw_obstacles.contiobs(i).length();
-      object_ptr->width = raw_obstacles.contiobs(i).width();
-    }
+    //  int cls = raw_obstacles.contiobs(i).obstacle_class();
+    //  if (cls == CONTI_CAR) {
+    //    object_ptr->length = raw_obstacles.contiobs(i).length();
+    //    object_ptr->width = raw_obstacles.contiobs(i).width();
+    //  }
     object_ptr->type = UNKNOWN;
 
     Eigen::Matrix3d dist_rms;
@@ -98,14 +104,14 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
         Eigen::Vector3f(cos(local_theta), sin(local_theta), 0);
     direction = radar_pose.topLeftCorner(3, 3).cast<float>() * direction;
     object_ptr->direction = direction.cast<double>();
-    // the avg time diff is from manual
+    //  the avg time diff is from manual
     object_ptr->tracking_time = current_con_ids[obstacle_id] * 0.074;
     double theta = std::atan2(direction(1), direction(0));
     object_ptr->theta = theta;
-    // For radar obstacle , the polygon is supposed to have
-    // four mock point: around obstacle center.
+    //  For radar obstacle , the polygon is supposed to have
+    //  four mock point: around obstacle center.
     RadarUtil::MockRadarPolygon(point, object_ptr->length, object_ptr->width,
-                                theta, object_ptr->polygon);
+                                theta, &(object_ptr->polygon));
     if (object_ptr->radar_supplement == nullptr) {
       object_ptr->radar_supplement.reset(new RadarSupplement());
     }

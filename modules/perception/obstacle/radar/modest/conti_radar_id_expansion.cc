@@ -52,7 +52,7 @@ void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar &radar_obs) {
   need_inner_restart_ = false;
   for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
     ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
-    double object_timestamp = double(contiobs.header().timestamp_sec());
+    double object_timestamp = static_cast<double>(contiobs.header().timestamp_sec());
     if (object_timestamp > timestamp) {
       ContiRadarObs *obs = out_obs.add_contiobs();
       *obs = contiobs;

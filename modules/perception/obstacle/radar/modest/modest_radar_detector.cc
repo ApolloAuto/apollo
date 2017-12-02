@@ -16,6 +16,7 @@
 
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
+#include <memory>
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
@@ -178,18 +179,19 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   main_velocity[1] = options.car_linear_speed[1];
   // preparation
 
-  std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
-  object_builder_.Build(raw_obstacles, radar_pose, main_velocity,
-                        *radar_objects);
-  radar_objects->timestamp = (double)raw_obstacles.header().timestamp_sec();
-  radar_objects->sensor_type = RADAR;
+  SensorObjects radar_objects;
+  object_builder_.Build(
+    raw_obstacles, radar_pose, main_velocity, &radar_objects);
+  radar_objects.timestamp = static_cast<double>(
+    raw_obstacles.header().timestamp_sec());
+  radar_objects.sensor_type = RADAR;
 
   // roi filter
-  auto &filter_objects = radar_objects->objects;
+  auto &filter_objects = radar_objects.objects;
   RoiFilter(map_polygons, filter_objects);
   // treatment
-  radar_tracker_->Process(*radar_objects);
-  AINFO << "After process, object size: " << radar_objects->objects.size();
+  radar_tracker_->Process(radar_objects);
+  AINFO << "After process, object size: " << radar_objects.objects.size();
   CollectRadarResult(objects);
   AINFO << "radar object size: " << objects->size();
   return true;

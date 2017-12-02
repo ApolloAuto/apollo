@@ -16,6 +16,9 @@
 
 #include "modules/perception/obstacle/radar/modest/radar_track_manager.h"
 
+#include <memory>
+#include <utility>
+
 namespace apollo {
 namespace perception {
 
@@ -131,7 +134,8 @@ double RadarTrackManager::DistanceBetweenObs(const Object &obs1,
                                              const Object &obs2,
                                              double timestamp2) {
   double time_diff = timestamp2 - timestamp1;
-  return (obs2.center - obs1.center - obs1.velocity * time_diff).head(2).norm();
+  return (obs2.center - obs1.center - obs1.velocity 
+    * time_diff).head(2).norm();
 }
 
 }  // namespace perception
