@@ -188,7 +188,7 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
 
   // roi filter
   auto &filter_objects = radar_objects.objects;
-  RoiFilter(map_polygons, filter_objects);
+  RoiFilter(map_polygons, &filter_objects);
   // treatment
   radar_tracker_->Process(radar_objects);
   AINFO << "After process, object size: " << radar_objects.objects.size();
@@ -219,30 +219,30 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
 
 void ModestRadarDetector::RoiFilter(
     const std::vector<PolygonDType> &map_polygons,
-    std::vector<ObjectPtr> &filter_objects) {
-  AINFO << "Before using hdmap, object size:" << filter_objects.size();
+    std::vector<ObjectPtr>* filter_objects) {
+  AINFO << "Before using hdmap, object size:" << filter_objects->size();
   // use new hdmap
   if (use_had_map_) {
     if (!map_polygons.empty()) {
       int obs_number = 0;
-      for (size_t i = 0; i < filter_objects.size(); i++) {
+      for (size_t i = 0; i < filter_objects->size(); i++) {
         pcl_util::PointD obs_position;
-        obs_position.x = filter_objects[i]->center(0);
-        obs_position.y = filter_objects[i]->center(1);
-        obs_position.z = filter_objects[i]->center(2);
+        obs_position.x = (*filter_objects)[i]->center(0);
+        obs_position.y = (*filter_objects)[i]->center(1);
+        obs_position.z = (*filter_objects)[i]->center(2);
         if (RadarUtil::IsXyPointInHdmap<pcl_util::PointD>(obs_position,
                                                           map_polygons)) {
-          filter_objects[obs_number] = filter_objects[i];
+          (*filter_objects)[obs_number] = (*filter_objects)[i];
           obs_number++;
         }
       }
-      filter_objects.resize(obs_number);
+      filter_objects->resize(obs_number);
       AINFO << "query hdmap sucessfully!";
     } else {
       AINFO << "query hdmap unsuccessfully!";
     }
   }
-  AINFO << "After using hdmap, object size:" << filter_objects.size();
+  AINFO << "After using hdmap, object size:" << filter_objects->size();
 }
 
 }  // namespace perception

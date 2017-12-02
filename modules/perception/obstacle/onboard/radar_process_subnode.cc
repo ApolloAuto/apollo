@@ -101,7 +101,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   header->set_radar_timestamp(timestamp * 1e9);
 
   _conti_id_expansion.UpdateTimestamp(timestamp);
-  _conti_id_expansion.ExpandIds(radar_obs_proto);
+  _conti_id_expansion.ExpandIds(&radar_obs_proto);
 
   if (fabs(timestamp - 0.0) < 10e-6) {
     AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);

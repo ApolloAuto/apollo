@@ -47,7 +47,7 @@ class ModestRadarDetector : public BaseRadarDetector {
 
  private:
   void RoiFilter(const std::vector<PolygonDType> &map_polygons,
-                 std::vector<ObjectPtr> &filter_objects);
+                 std::vector<ObjectPtr>* filter_objects);
 
   // for unit test
   bool result_init_ = true;

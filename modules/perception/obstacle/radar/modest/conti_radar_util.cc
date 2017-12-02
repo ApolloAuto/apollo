@@ -21,7 +21,7 @@ namespace perception {
 
 bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
                           const ContiParams &params, const int delay_frames,
-                          int &tracking_times) {
+                          const int tracking_times) {
   int cls = contiobs.obstacle_class();
   if (tracking_times < delay_frames * 2) {
     const double &lo_vel_rms = contiobs.longitude_vel_rms();
@@ -75,11 +75,10 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
   int meas_state = contiobs.meas_state();
   if (meas_state == CONTI_DELETED || meas_state == CONTI_PREDICTED ||
       meas_state == CONTI_DELETED_FOR) {
-    tracking_times = 0;
     return true;
   }
   return false;
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
