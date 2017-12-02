@@ -39,11 +39,12 @@ TrajectoryCost::TrajectoryCost(
     const DpPolyPathConfig &config, const ReferenceLine &reference_line,
     const std::vector<const PathObstacle *> &obstacles,
     const common::VehicleParam &vehicle_param,
-    const SpeedData &heuristic_speed_data)
+    const SpeedData &heuristic_speed_data, const common::SLPoint &init_sl_point)
     : config_(config),
       reference_line_(&reference_line),
       vehicle_param_(vehicle_param),
-      heuristic_speed_data_(heuristic_speed_data) {
+      heuristic_speed_data_(heuristic_speed_data),
+      init_sl_point_(init_sl_point) {
   const double total_time =
       std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
 
@@ -92,30 +93,31 @@ double TrajectoryCost::CalculateObstacleCost(
     const double end_s) const {
   double obstacle_cost = 0.0;
   double time_stamp = 0.0;
+
   for (size_t index = 0; index < num_of_time_stamps_;
        ++index, time_stamp += config_.eval_time_interval()) {
     common::SpeedPoint speed_point;
     heuristic_speed_data_.EvaluateByTime(time_stamp, &speed_point);
-    if (speed_point.s() < start_s) {
+    if (speed_point.s() < start_s - init_sl_point_.s()) {
       continue;
     }
-    if (speed_point.s() > end_s) {
+    if (speed_point.s() > end_s - init_sl_point_.s()) {
       break;
     }
 
-    const double s = speed_point.s() - start_s;
+    const double s = init_sl_point_.s() + speed_point.s() - start_s;
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
     common::SLPoint sl;
-    sl.set_s(speed_point.s());
+    sl.set_s(init_sl_point_.s() + speed_point.s());
     sl.set_l(l);
 
     Vec2d ego_xy_point;
     reference_line_->SLToXY(sl, &ego_xy_point);
 
-    ReferencePoint reference_point =
-        reference_line_->GetReferencePoint(speed_point.s());
+    ReferencePoint reference_point = reference_line_->GetReferencePoint(
+        init_sl_point_.s() + speed_point.s());
 
     const double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
     const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);

@@ -42,7 +42,8 @@ class TrajectoryCost {
                           const ReferenceLine &reference_line,
                           const std::vector<const PathObstacle *> &obstacles,
                           const common::VehicleParam &vehicle_param,
-                          const SpeedData &heuristic_speed_data);
+                          const SpeedData &heuristic_speed_data,
+                          const common::SLPoint &init_sl_point);
   double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
                    const double end_s) const;
   double RiskDistanceCost(const double distance) const;
@@ -58,6 +59,7 @@ class TrajectoryCost {
   const ReferenceLine *reference_line_ = nullptr;
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
+  const common::SLPoint init_sl_point_;
   uint32_t num_of_time_stamps_ = 0;
   std::vector<std::vector<common::math::Box2d>> obstacle_boxes_;
   std::vector<double> obstacle_probabilities_;

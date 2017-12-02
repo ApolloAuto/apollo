@@ -15,7 +15,7 @@ em_planner_config {
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
-        sample_points_num_each_level: 9
+        sample_points_num_each_level: 5
         step_length_max: 40.0
         step_length_min: 8.0
         lateral_sample_offset: 0.5
@@ -25,7 +25,7 @@ em_planner_config {
         obstacle_ignore_distance: 20.0
         obstacle_collision_distance: 0.2
         obstacle_risk_distance: 2.0
-        obstacle_collision_cost: 1e3
+        obstacle_collision_cost: 1e5
         path_l_cost: 1.0
         path_dl_cost: 1.0
     }
