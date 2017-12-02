@@ -279,12 +279,9 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
 void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
                                       const double& time_diff) {
   // A. keep motion if accelaration of filter is greater than a threshold
-  Eigen::Vector3f filter_anchor_point = Eigen::Vector3f::Zero();
-  Eigen::Vector3f filter_velocity = Eigen::Vector3f::Zero();
-  Eigen::Vector3f filter_velocity_accelaration = Eigen::Vector3f::Zero();
-  filter_->GetState(&filter_anchor_point, &filter_velocity,
-                    &filter_velocity_accelaration);
-  double filter_accelaration = filter_velocity_accelaration.norm();
+  Eigen::Vector3f filter_acceleration_gain = Eigen::Vector3f::Zero();
+  filter_->GetAccelerationGain(&filter_acceleration_gain);
+  double filter_accelaration = filter_acceleration_gain.norm();
   bool need_keep_motion = filter_accelaration > s_acceleration_noise_maximum_;
   if (need_keep_motion) {
     Eigen::Vector3f last_velocity = Eigen::Vector3f::Zero();
@@ -371,9 +368,13 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 }
 
 /*class ObjectTrackSet*/
-ObjectTrackSet::ObjectTrackSet() { tracks_.reserve(1000); }
+ObjectTrackSet::ObjectTrackSet() {
+  tracks_.reserve(1000);
+}
 
-ObjectTrackSet::~ObjectTrackSet() { Clear(); }
+ObjectTrackSet::~ObjectTrackSet() {
+  Clear();
+}
 
 bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
     const int& track_consecutive_invisible_maximum) {

@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: onsemi_obstacle
+child_frame_id: onsemi_traffic
+transform:
+  rotation:
+    x: 0.04540935592195333
+    y: 0.01624370177071676
+    z: -0.006708898980092756
+    w: 0.9988138581447558
+  translation:
+    x: 0.3798963422816649
+    y: -0.01295453444494727
+    z: 0.08657414676656128

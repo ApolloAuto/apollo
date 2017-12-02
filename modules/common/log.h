@@ -33,6 +33,7 @@
 // LOG_IF
 #define AINFO_IF(cond) LOG_IF(INFO, cond)
 #define AERROR_IF(cond) LOG_IF(ERROR, cond)
+#define ACHECK(cond) CHECK(cond)
 
 // LOG_EVERY_N
 #define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)

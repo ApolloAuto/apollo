@@ -35,28 +35,52 @@ Object::Object() {
   cloud.reset(new pcl_util::PointCloud);
   type = UNKNOWN;
   type_probs.resize(MAX_OBJECT_TYPE, 0);
+  position_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
+  velocity_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
 }
 
 void Object::clone(const Object& rhs) {
   *this = rhs;
   pcl::copyPointCloud<pcl_util::Point, pcl_util::Point>(*(rhs.cloud), *cloud);
+  radar_supplement = nullptr;
+  if (rhs.radar_supplement != nullptr) {
+    radar_supplement.reset(new RadarSupplement());
+    radar_supplement->clone(*(rhs.radar_supplement));
+  }
 }
 
 std::string Object::ToString() const {
   // StrCat supports 9 arguments at most.
-  return StrCat(
-      StrCat("Object[id: ", id, ", "
-             "track_id: ", track_id, ", "
-             "cloud_size: ", cloud->size(), ", "
-             "direction: ", Print(direction.transpose()), ", "),
-      StrCat("center: ", Print(center.transpose()), ", "
-             "velocity: ", Print(velocity.transpose()), ", "
-             "width: ", width, ", "
-             "length: ", length, ", "),
-      StrCat("height: ", height, ", "
-             "polygon_size: ", polygon.size(), ", "
-             "type: ", type, ", "
-             "is_background: ", is_background, "]"));
+  return StrCat(StrCat("Object[id: ", id,
+                       ", "
+                       "track_id: ",
+                       track_id,
+                       ", "
+                       "cloud_size: ",
+                       cloud->size(),
+                       ", "
+                       "direction: ",
+                       Print(direction.transpose()), ", "),
+                StrCat("center: ", Print(center.transpose()),
+                       ", "
+                       "velocity: ",
+                       Print(velocity.transpose()),
+                       ", "
+                       "width: ",
+                       width,
+                       ", "
+                       "length: ",
+                       length, ", "),
+                StrCat("height: ", height,
+                       ", "
+                       "polygon_size: ",
+                       polygon.size(),
+                       ", "
+                       "type: ",
+                       type,
+                       ", "
+                       "is_background: ",
+                       is_background, "]"));
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
@@ -127,6 +151,19 @@ void Object::Deserialize(const PerceptionObstacle& pb_obs) {
   tracking_time = pb_obs.tracking_time();
   latest_tracked_time = pb_obs.timestamp();
   type = static_cast<ObjectType>(pb_obs.type());
+}
+
+std::string SensorObjects::ToString() const {
+  std::ostringstream oss;
+  oss << "sensor_type: " << GetSensorType(sensor_type)
+      << ", timestamp:" << GLOG_TIMESTAMP(timestamp)
+      << ", sensor2world_pose:\n";
+  oss << sensor2world_pose << "\n, objects: " << objects.size() << " < ";
+  for (auto obj : objects) {
+    oss << "\n" << obj->ToString();
+  }
+  oss << " >]";
+  return oss.str();
 }
 
 }  // namespace perception
