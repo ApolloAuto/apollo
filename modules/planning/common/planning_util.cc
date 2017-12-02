@@ -179,10 +179,12 @@ TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
                                                     const TrajectoryPoint &tp1,
                                                     const double t) {
   if (!tp0.has_path_point() || !tp1.has_path_point()) {
-    return TrajectoryPoint();
+    TrajectoryPoint p;
+    p.mutable_path_point()->CopyFrom(PathPoint());
+    return p;
   }
-  const PathPoint &pp0 = tp0.path_point();
-  const PathPoint &pp1 = tp1.path_point();
+  const PathPoint pp0 = tp0.path_point();
+  const PathPoint pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
   double t1 = tp1.relative_time();
 

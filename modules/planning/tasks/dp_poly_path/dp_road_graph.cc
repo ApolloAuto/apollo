@@ -121,7 +121,8 @@ bool DPRoadGraph::GenerateMinCostPath(
       common::VehicleConfigHelper::instance()->GetConfig();
 
   TrajectoryCost trajectory_cost(config_, reference_line_, obstacles,
-                                 vehicle_config.vehicle_param(), speed_data_);
+                                 vehicle_config.vehicle_param(), speed_data_,
+                                 init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
   graph_nodes[0].emplace_back(init_sl_point_, nullptr, 0.0);
