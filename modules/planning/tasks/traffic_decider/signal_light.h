@@ -51,9 +51,9 @@ class SignalLight : public TrafficRule {
   void CreateStopObstacle(Frame* frame,
                           ReferenceLineInfo* const reference_line_info,
                           const hdmap::PathOverlap* signal_light);
-  std::vector<const hdmap::PathOverlap*> signal_lights_;
+  std::vector<const hdmap::PathOverlap*> signal_lights_from_path_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
-      signals_;
+      detected_signals_;
 };
 
 }  // namespace planning
