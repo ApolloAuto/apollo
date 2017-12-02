@@ -133,9 +133,6 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
     last_no_signals_ts_ = timestamp;
   }
   image_lights->num_signals = signals.size();
-  image_lights->lights = lights_on_image[image_lights->camera_id];
-  image_lights->lights_outside_image =
-      lights_outside_image[image_lights->camera_id];
   AINFO << "cached info with "<<image_lights->num_signals<<" signals";
   cached_lights_.push_back(image_lights);
 
@@ -169,7 +166,10 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
     return false;
   }
 
-  // 同步不成功，根据 camera_id 判断是否发送图像
+  // sync fail may because:
+  // 1. image is not selected
+  // 2. timestamp drift
+  // 3. [there is no tf]
   if (!sync_ok) {
     AINFO << "working camera with maximum focal length: "
           << kCameraIdToStr.at(kLongFocusIdx)
@@ -193,8 +193,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
       (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
       (*image_lights)->timestamp = timestamp;
       (*image_lights)->camera_id = camera_id;
-      (*image_lights)->lights.reset(new LightPtrs);
-      (*image_lights)->lights_outside_image.reset(new LightPtrs);
       // 使用查找到的灯数
       (*image_lights)->num_signals = current_signal_num;
 
