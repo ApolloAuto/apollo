@@ -94,6 +94,10 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   auto matched_point =
       prev_trajectory->EvaluateUsingLinearApproximation(veh_rel_time);
 
+  if (!matched_point.has_path_point()) {
+    return ComputeReinitStitchingTrajectory(vehicle_state);
+  }
+
   const double position_diff =
       std::hypot(matched_point.path_point().x() - vehicle_state.x(),
                  matched_point.path_point().y() - vehicle_state.y());
@@ -123,6 +127,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   const double zero_s = matched_point.path_point().s();
 
   for (auto& tp : stitching_trajectory) {
+    if (!tp.has_path_point()) {
+      return ComputeReinitStitchingTrajectory(vehicle_state);
+    }
     tp.set_relative_time(tp.relative_time() + prev_trajectory->header_time() -
                          current_timestamp);
     tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
