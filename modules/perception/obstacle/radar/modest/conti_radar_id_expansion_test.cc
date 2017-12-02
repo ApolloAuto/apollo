@@ -30,20 +30,20 @@ TEST(ContiRadarIDExpansionTest, conti_radar_id_expansion_test) {
   radar_obs->set_meas_state(CONTI_NEW);
   id_expansion.SetNeedRestart(true);
   id_expansion.UpdateTimestamp(0.0);
-  id_expansion.ExpandIds(raw_obstacles);
-  EXPECT_EQ (radar_obs->obstacle_id(), 1);
+  id_expansion.ExpandIds(&raw_obstacles);
+  EXPECT_EQ(radar_obs->obstacle_id(), 1);
   AINFO << radar_obs->obstacle_id();
 
   radar_obs->set_obstacle_id(0);
   id_expansion.UpdateTimestamp(0.07);
   radar_obs->set_meas_state(CONTI_MEASURED);
-  id_expansion.ExpandIds(raw_obstacles);
+  id_expansion.ExpandIds(&raw_obstacles);
   EXPECT_EQ(radar_obs->obstacle_id(), 1);
   AINFO << radar_obs->obstacle_id();
 
   radar_obs->set_obstacle_id(1);
   id_expansion.UpdateTimestamp(0.14);
-  id_expansion.ExpandIds(raw_obstacles);
+  id_expansion.ExpandIds(&raw_obstacles);
   EXPECT_EQ(radar_obs->obstacle_id(), 2);
   AINFO << radar_obs->obstacle_id();
 }
@@ -59,7 +59,7 @@ TEST(ContiRadarIDExpansionSkipOutdatedObjectsTest, skip_outdated_objects_test) {
   auto *header = radar_obs->mutable_header();
   header->set_timestamp_sec(0.0);
   header->set_radar_timestamp(0.0 * 1e9);
-  id_expansion.SkipOutdatedObjects(raw_obstacles);
+  id_expansion.SkipOutdatedObjects(&raw_obstacles);
   EXPECT_EQ(raw_obstacles.contiobs_size(), 1);
 
   sensor_header->set_timestamp_sec(0.7);
@@ -70,7 +70,7 @@ TEST(ContiRadarIDExpansionSkipOutdatedObjectsTest, skip_outdated_objects_test) {
   auto *header2 = radar_obs->mutable_header();
   header2->set_timestamp_sec(0.7);
   header2->set_radar_timestamp(0.7 * 1e9);
-  id_expansion.SkipOutdatedObjects(raw_obstacles);
+  id_expansion.SkipOutdatedObjects(&raw_obstacles);
   EXPECT_EQ(raw_obstacles.contiobs_size(), 1);
 }
 

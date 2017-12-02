@@ -75,12 +75,12 @@ class RadarUtil {
 
   static void MockRadarPolygon(
     const Eigen::Vector3d &center, const double length,
-    const double width, 
-    const double theta, 
+    const double width,
+    const double theta,
     PolygonDType *polygon);
 };
 
-}  //  namespace perception
-}  //  namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif  //  MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_

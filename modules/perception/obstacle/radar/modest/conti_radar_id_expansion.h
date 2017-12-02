@@ -17,6 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_ID_EXPANSION_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_ID_EXPANSION_H_
 
+#include <map>
+
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/modest/radar_define.h"
 
@@ -29,9 +31,9 @@ class ContiRadarIDExpansion {
 
   ~ContiRadarIDExpansion();
 
-  void ExpandIds(ContiRadar &radar_obs);
+  void ExpandIds(ContiRadar* radar_obs);
 
-  void SkipOutdatedObjects(ContiRadar &radar_obs);
+  void SkipOutdatedObjects(ContiRadar* radar_obs);
 
   void SetNeedRestart(const bool need_restart);
 

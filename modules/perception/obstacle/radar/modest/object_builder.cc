@@ -117,12 +117,12 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     }
     object_ptr->radar_supplement->range = std::sqrt(
         location_r[0] * location_r[0] + location_r[1] * location_r[1]);
-    // TODO should be set to theta
+
     object_ptr->radar_supplement->angle = 0;
     objects->push_back(object_ptr);
   }
   continuous_ids_ = current_con_ids;
 }
 
-}  // namesapce perception
-}  // namesapce apollo
+}  // namespace perception
+}  // namespace apollo

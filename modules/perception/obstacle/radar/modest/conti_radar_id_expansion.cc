@@ -26,10 +26,13 @@ ContiRadarIDExpansion::ContiRadarIDExpansion() {
 
 ContiRadarIDExpansion::~ContiRadarIDExpansion() {}
 
-void ContiRadarIDExpansion::ExpandIds(ContiRadar &radar_obs) {
+void ContiRadarIDExpansion::ExpandIds(ContiRadar* radar_obs) {
+  if (radar_obs == nullptr) {
+    return;
+  }
   // SkipOutdatedObjects(radar_obs);
-  for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
-    ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
+  for (int i = 0; i < radar_obs->contiobs_size(); ++i) {
+    ContiRadarObs &contiobs = *(radar_obs->mutable_contiobs(i));
     int id = contiobs.obstacle_id();
     int meas_state = contiobs.meas_state();
     if (/*_need_restart || */ need_inner_restart_ || meas_state == CONTI_NEW) {
@@ -46,13 +49,14 @@ void ContiRadarIDExpansion::ExpandIds(ContiRadar &radar_obs) {
   }
 }
 
-void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar &radar_obs) {
+void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar* radar_obs) {
   ContiRadar out_obs;
-  double timestamp = radar_obs.header().timestamp_sec() - 1e-6;
+  double timestamp = radar_obs->header().timestamp_sec() - 1e-6;
   need_inner_restart_ = false;
-  for (int i = 0; i < radar_obs.contiobs_size(); ++i) {
-    ContiRadarObs &contiobs = *(radar_obs.mutable_contiobs(i));
-    double object_timestamp = static_cast<double>(contiobs.header().timestamp_sec());
+  for (int i = 0; i < radar_obs->contiobs_size(); ++i) {
+    ContiRadarObs &contiobs = *(radar_obs->mutable_contiobs(i));
+    double object_timestamp = static_cast<double>(
+                              contiobs.header().timestamp_sec());
     if (object_timestamp > timestamp) {
       ContiRadarObs *obs = out_obs.add_contiobs();
       *obs = contiobs;
@@ -61,9 +65,9 @@ void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar &radar_obs) {
     }
   }
   if (need_inner_restart_) {
-    AINFO << "skip outdated objects: " << radar_obs.contiobs_size() << " -> "
+    AINFO << "skip outdated objects: " << radar_obs->contiobs_size() << " -> "
           << out_obs.contiobs_size();
-    radar_obs = out_obs;
+    *radar_obs = out_obs;
   }
 }
 

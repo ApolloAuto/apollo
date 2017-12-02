@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
 
 #include <Eigen/Core>
+#include <map>
 #include <memory>
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/base/object.h"

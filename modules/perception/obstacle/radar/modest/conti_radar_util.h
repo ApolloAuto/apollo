@@ -25,7 +25,7 @@ namespace perception {
 class ContiRadarUtil {
  public:
   static bool IsFp(const ContiRadarObs &contiobs, const ContiParams &params,
-                   const int delay_frames, int &tracking_times);
+                   const int delay_frames, const int tracking_times);
 };
 
 }  // namespace perception
