@@ -190,6 +190,9 @@ DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 DEFINE_string(reference_line_end_obstacle_id, "REF_END",
               "Obstacle id for the end of reference line obstacle");
+DEFINE_double(signal_expire_time_sec, 5.0,
+              "consider the signal msg is expired if its timestamp over "
+              "this threshold (second)");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
