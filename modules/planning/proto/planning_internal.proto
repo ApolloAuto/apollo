@@ -8,6 +8,7 @@ import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
+import "modules/planning/proto/sl_boundary.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -84,6 +85,11 @@ message SignalLightDebug {
   repeated SignalDebug signal = 3;
 }
 
+message ObstacleDebug {
+  optional string id = 1;
+  optional apollo.planning.SLBoundary sl_boundary = 2;
+}
+
 // next id: 17
 message PlanningData {
   // input
@@ -99,4 +105,6 @@ message PlanningData {
 
   optional apollo.common.Header prediction_header = 16;
   optional SignalLightDebug signal_light = 17;
+
+  repeated ObstacleDebug obstacle = 18;
 }
