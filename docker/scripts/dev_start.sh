@@ -117,7 +117,7 @@ function main(){
         --shm-size 512M \
         $IMG \
         /bin/bash
-    set+x
+    set +x
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
