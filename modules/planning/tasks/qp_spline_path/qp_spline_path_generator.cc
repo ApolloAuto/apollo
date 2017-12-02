@@ -259,7 +259,8 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
-  uint32_t constraint_num = 3 * number_of_spline + 1;
+  uint32_t constraint_num =
+      (end_s - start_s) / qp_spline_path_config_.max_constraint_interval() + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return true;
@@ -381,14 +382,15 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
     boundary_high.emplace_back(common::util::MinElement(
         std::vector<double>{road_boundary.second, static_obs_boundary.second,
                             dynamic_obs_boundary.second}));
-    ADEBUG << "s:" << evaluated_s_[i] << " boundary_low:" << boundary_low.back()
-           << " boundary_high:" << boundary_high.back()
-           << " road_boundary_low: " << road_boundary.first
-           << " road_boundary_high: " << road_boundary.second
-           << " static_obs_boundary_low: " << static_obs_boundary.first
-           << " static_obs_boundary_high: " << static_obs_boundary.second
-           << " dynamic_obs_boundary_low: " << dynamic_obs_boundary.first
-           << " dynamic_obs_boundary_high: " << dynamic_obs_boundary.second;
+    ADEBUG << "s[" << evaluated_s_[i] << "] boundary_low["
+           << boundary_low.back() << "] boundary_high[" << boundary_high.back()
+           << "] road_boundary_low[" << road_boundary.first
+           << "] road_boundary_high[" << road_boundary.second
+           << "] static_obs_boundary_low[" << static_obs_boundary.first
+           << "] static_obs_boundary_high[" << static_obs_boundary.second
+           << "] dynamic_obs_boundary_low[" << dynamic_obs_boundary.first
+           << "] dynamic_obs_boundary_high[" << dynamic_obs_boundary.second
+           << "].";
   }
 
   if (planning_debug_) {
