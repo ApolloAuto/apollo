@@ -243,7 +243,7 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
 void ProbabilisticFusion::CreateNewTracks(
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<int> &unassigned_ids) {
-  for (int i = 0; i < unassigned_ids.size(); i++) {
+  for (size_t i = 0; i < unassigned_ids.size(); i++) {
     int id = unassigned_ids[i];
     PbfTrackPtr track(new PbfTrack(sensor_objects[id]));
     track_manager_->AddTrack(track);
@@ -255,7 +255,7 @@ void ProbabilisticFusion::UpdateAssignedTracks(
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<TrackObjectPair> &assignments,
     const std::vector<double> &track_object_dist) {
-  for (int i = 0; i < assignments.size(); i++) {
+  for (size_t i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
     (*tracks)[local_track_index]->UpdateWithSensorObject(
@@ -267,7 +267,7 @@ void ProbabilisticFusion::UpdateUnassignedTracks(
     std::vector<PbfTrackPtr> *tracks, const std::vector<int> &unassigned_tracks,
     const std::vector<double> &track_object_dist, const SensorType &sensor_type,
     const std::string &sensor_id, double timestamp) {
-  for (int i = 0; i < unassigned_tracks.size(); i++) {
+  for (size_t i = 0; i < unassigned_tracks.size(); i++) {
     int local_track_index = unassigned_tracks[i];
     (*tracks)[local_track_index]->UpdateWithoutSensorObject(
         sensor_type, sensor_id, track_object_dist[local_track_index],
