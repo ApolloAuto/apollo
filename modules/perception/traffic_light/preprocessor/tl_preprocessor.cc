@@ -136,6 +136,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
   image_lights->lights = lights_on_image[image_lights->camera_id];
   image_lights->lights_outside_image =
       lights_outside_image[image_lights->camera_id];
+  AINFO << "cached info with "<<image_lights->num_signals<<" signals";
   cached_lights_.push_back(image_lights);
 
   return true;

@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <modules/common/log.h>
 #include "modules/perception/traffic_light/rectify/select.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
@@ -74,7 +73,6 @@ void GaussianSelect::Select(const cv::Mat &ros_image,
   std::vector<int> hd_index;
   std::vector<int> refined_index;
   munkres.maximize(&hd_index, &refined_index);
-  AINFO << hd_index.size()<<" "<< refined_index.size();
   for (int i = 0; i < hdmap_bboxes.size(); ++i) {
     hdmap_bboxes[i]->region.is_selected = false;
   }

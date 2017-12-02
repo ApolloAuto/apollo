@@ -316,6 +316,10 @@ bool TLPreprocessorSubnode::VerifyLightsProjection(
   }
 
   bool projections_outside_all_images = false;
+  // TODO(ghdawn): no need to init lights before this line
+  image_lights->num_signals = signals.size();
+  image_lights->lights->clear();
+  image_lights->lights_outside_image->clear();
   if (!preprocessor_.ProjectLights(pose,
                                    signals,
                                    image_lights->camera_id,
