@@ -15,6 +15,10 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
+
+#include <map>
+#include <string>
+#include <vector>
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -51,7 +55,6 @@ bool PbfSensorManager::Init() {
   type = RADAR;
   PbfSensor *radar = new PbfSensor(type, sensor_id);
   sensors_[sensor_id] = radar;
-  // TODO: init from sensor configuration file
   return true;
 }
 
@@ -100,8 +103,8 @@ void PbfSensorManager::GetLatestFrames(const double time_stamp,
       frames->push_back(frame);
     }
   }
-  for (int i = 0; i < (int)frames->size() - 1; i++) {
-    for (int j = i + 1; j < (int)frames->size(); j++) {
+  for (int i = 0; i < frames->size() - 1; i++) {
+    for (int j = i + 1; j < frames->size(); j++) {
       if ((*frames)[j]->timestamp < (*frames)[i]->timestamp) {
         PbfSensorFramePtr tf = (*frames)[i];
         (*frames)[i] = (*frames)[j];

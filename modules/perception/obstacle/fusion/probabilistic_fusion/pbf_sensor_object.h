@@ -14,8 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_
-#define MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_
+#ifndef MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_  // NOLINT 
+#define MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_  // NOLINT 
+
+#include <memory>
+#include <vector>
+#include <string>
 #include "modules/perception/obstacle/base/object.h"
 
 namespace apollo {
@@ -56,4 +60,4 @@ typedef std::shared_ptr<PbfSensorFrame> PbfSensorFramePtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_
+#endif  // MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_  // NOLINT 

@@ -18,6 +18,9 @@
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
 
 #include "gtest/gtest.h"
+#include <map>
+#include <string>
+#include <memory>
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
@@ -110,14 +113,14 @@ class PbfTrack {
   void PerformMotionFusion(PbfSensorObjectPtr obj);
 
   void UpdateMeasurementsLifeWithMeasurement(
-      std::map<std::string, PbfSensorObjectPtr> &objects,
+      std::map<std::string, PbfSensorObjectPtr> *objects,
       const std::string &sensor_id, double timestamp,
       double max_invisible_time);
 
   void UpdateMeasurementsLifeWithoutMeasurement(
-      std::map<std::string, PbfSensorObjectPtr> &objects,
+      std::map<std::string, PbfSensorObjectPtr> *objects,
       const std::string &sensor_id, double timestamp, double max_invisible_time,
-      bool &invisible_state);
+      bool *invisible_state);
 
  protected:
   PbfSensorObjectPtr fused_object_;

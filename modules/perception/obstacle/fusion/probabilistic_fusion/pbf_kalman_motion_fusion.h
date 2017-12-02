@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
 #include <utility>
 #include <vector>
+#include <deque>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -48,7 +49,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  void Predict(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity,
+  void Predict(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity,
                const double time_diff);
 
   // @brief update with measurements
@@ -67,7 +68,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[OUT] anchor_point: current anchor_point
   // @params[OUT] velocity: current velocity
   // @return nothing
-  void GetState(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity);
+  void GetState(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity);
 
  protected:
   int GetRadarHistoryLength();
@@ -113,4 +114,4 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT

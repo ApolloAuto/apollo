@@ -16,6 +16,9 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 
+#include <map>
+#include <string>
+
 namespace apollo {
 namespace perception {
 
@@ -30,21 +33,22 @@ double PbfBaseTrackObjectMatcher::GetMaxMatchDistance() {
 }
 
 void PbfBaseTrackObjectMatcher::IdAssign(
-    std::vector<PbfTrackPtr> &fusion_tracks,
-    std::vector<PbfSensorObjectPtr> &sensor_objects,
-    std::vector<TrackObjectPair> &assignments,
-    std::vector<int> &unassigned_fusion_tracks,
-    std::vector<int> &unassigned_sensor_objects) {
+    const std::vector<PbfTrackPtr> &fusion_tracks,
+    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    std::vector<TrackObjectPair> *assignments,
+    std::vector<int> *unassigned_fusion_tracks,
+    std::vector<int> *unassigned_sensor_objects) {
   size_t num_track = fusion_tracks.size();
   size_t num_obj = sensor_objects.size();
 
   if (num_track == 0 || num_obj == 0) {
-    unassigned_fusion_tracks.resize(num_track);
-    unassigned_sensor_objects.resize(num_obj);
-    std::iota(unassigned_fusion_tracks.begin(), unassigned_fusion_tracks.end(),
-              0);
-    std::iota(unassigned_sensor_objects.begin(),
-              unassigned_sensor_objects.end(), 0);
+    unassigned_fusion_tracks->resize(num_track);
+    unassigned_sensor_objects->resize(num_obj);
+    std::iota(unassigned_fusion_tracks->begin(),
+      unassigned_fusion_tracks->end(),
+      0);
+    std::iota(unassigned_sensor_objects->begin(),
+              unassigned_sensor_objects->end(), 0);
     return;
   }
 
@@ -69,19 +73,19 @@ void PbfBaseTrackObjectMatcher::IdAssign(
     if (it != sensor_id_2_track_ind.end()) {
       sensor_used[i] = true;
       fusion_used[it->second] = true;
-      assignments.push_back(std::make_pair(it->second, i));
+      assignments->push_back(std::make_pair(it->second, i));
     }
   }
 
   for (size_t i = 0; i < fusion_used.size(); ++i) {
     if (!fusion_used[i]) {
-      unassigned_fusion_tracks.push_back(i);
+      unassigned_fusion_tracks->push_back(i);
     }
   }
 
   for (size_t i = 0; i < sensor_used.size(); ++i) {
     if (!sensor_used[i]) {
-      unassigned_sensor_objects.push_back(i);
+      unassigned_sensor_objects->push_back(i);
     }
   }
 }

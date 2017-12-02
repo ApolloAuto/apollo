@@ -39,7 +39,7 @@ int PbfTrackManager::RemoveLostTracks() {
       track_count++;
     }
   }
-  AINFO << "Remove " << (int)tracks_.size() - track_count << " tracks";
+  AINFO << "Remove " << tracks_.size() - track_count << " tracks";
   tracks_.resize(track_count);
 
   return track_count;

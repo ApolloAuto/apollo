@@ -14,14 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_ // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_ // NOLINT
 #include <utility>
 #include <vector>
+#include <string>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
-// #include
-// "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
 namespace apollo {
 namespace perception {
@@ -48,7 +47,7 @@ class PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  virtual void Predict(Eigen::Vector3d &anchor_point, Eigen::Vector3d &velocity,
+  virtual void Predict(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity,
                        const double time_diff) = 0;
 
   // @brief update with measurements
@@ -67,8 +66,8 @@ class PbfBaseMotionFusion {
   // @params[OUT] anchor_point: current anchor_point
   // @params[OUT] velocity: current velocity
   // @return nothing
-  virtual void GetState(Eigen::Vector3d &anchor_point,
-                        Eigen::Vector3d &velocity) = 0;
+  virtual void GetState(Eigen::Vector3d* anchor_point,
+                        Eigen::Vector3d* velocity) = 0;
 
   std::string name() {
     return name_;
@@ -88,4 +87,4 @@ class PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H // NOLINT

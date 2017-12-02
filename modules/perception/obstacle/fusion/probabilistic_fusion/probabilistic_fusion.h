@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_ // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_ // NOLINT
 #include <mutex>
+#include <string>
+#include <vector>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
@@ -33,13 +35,13 @@ class ProbabilisticFusion : public BaseFusion {
   ProbabilisticFusion();
   ~ProbabilisticFusion();
 
-  virtual bool Init() override;
+  virtual bool Init();
 
   /**@brief main entrance of fusion*/
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<ObjectPtr> *fused_objects) override;
+                    std::vector<ObjectPtr> *fused_objects);
 
-  virtual std::string name() const override;
+  virtual std::string name() const;
 
  protected:
   void FuseFrame(const PbfSensorFramePtr &frame);
@@ -49,13 +51,13 @@ class ProbabilisticFusion : public BaseFusion {
                        const std::vector<int> &unassigned_ids);
 
   /**@brief update current tracks with matched objects*/
-  void UpdateAssignedTracks(std::vector<PbfTrackPtr> &tracks,
-                            std::vector<PbfSensorObjectPtr> &sensor_objects,
-                            std::vector<TrackObjectPair> &assignments,
+  void UpdateAssignedTracks(std::vector<PbfTrackPtr> *tracks,
+                            const std::vector<PbfSensorObjectPtr> &sensor_objects,
+                            const std::vector<TrackObjectPair> &assignments,
                             const std::vector<double> &track_objects_dist);
 
   /**@brief update current tracks which cannot find matched objects*/
-  void UpdateUnassignedTracks(std::vector<PbfTrackPtr> &tracks,
+  void UpdateUnassignedTracks(std::vector<PbfTrackPtr> *tracks,
                               const std::vector<int> &unassigned_tracks,
                               const std::vector<double> &track_object_dist,
                               const SensorType &sensor_type,
@@ -96,4 +98,4 @@ REGISTER_FUSION(ProbabilisticFusion);
 
 }  // namespace perception
 }  // namespace apollo
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT

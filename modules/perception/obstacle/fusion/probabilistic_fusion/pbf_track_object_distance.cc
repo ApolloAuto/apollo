@@ -17,6 +17,9 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track_object_distance.h"
 
 #include <limits>
+#include <utility>
+#include <map>
+#include <algorithm>
 #include "Eigen/StdVector"
 #include "boost/format.hpp"
 #include "modules/common/log.h"
@@ -121,7 +124,7 @@ float PbfTrackObjectDistance::ComputeDistance3D(
   const PolygonDType &fused_poly = obj->polygon;
   Eigen::Vector3d fused_poly_center(0, 0, 0);
   bool fused_state =
-      ComputePolygonCenter(fused_poly, ref_pos, range, fused_poly_center);
+      ComputePolygonCenter(fused_poly, ref_pos, range, &fused_poly_center);
   if (!fused_state) {
     AERROR << "fail to compute polygon center! fused polygon size:"
            << fused_poly.size();
@@ -136,7 +139,7 @@ float PbfTrackObjectDistance::ComputeDistance3D(
   const PolygonDType &sensor_poly = obj2->polygon;
   Eigen::Vector3d sensor_poly_center(0, 0, 0);
   bool sensor_state =
-      ComputePolygonCenter(sensor_poly, ref_pos, range, sensor_poly_center);
+      ComputePolygonCenter(sensor_poly, ref_pos, range, &sensor_poly_center);
 
   if (!sensor_state) {
     AERROR << "fail to compute sensor polygon center: polygon size:"
@@ -163,24 +166,24 @@ float PbfTrackObjectDistance::ComputeEuclideanDistance(
 }
 
 bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType &polygon,
-                                                  Eigen::Vector3d &center) {
+                                                  Eigen::Vector3d *center) {
   int size = polygon.size();
   if (size == 0) {
     return false;
   }
-  center = Eigen::Vector3d(0, 0, 0);
+  *center = Eigen::Vector3d(0, 0, 0);
   for (int i = 0; i < size; ++i) {
     const auto &point = polygon.points[i];
-    center[0] += point.x;
-    center[1] += point.y;
+    (*center)[0] += point.x;
+    (*center)[1] += point.y;
   }
-  center /= size;
+  *center /= size;
   return true;
 }
 
 bool PbfTrackObjectDistance::ComputePolygonCenter(
     const PolygonDType &polygon, const Eigen::Vector3d &ref_pos, int range,
-    Eigen::Vector3d &center) {
+    Eigen::Vector3d *center) {
   PolygonDType polygon_part;
   std::map<double, int> distance2idx;
   for (size_t idx = 0; idx < polygon.size(); ++idx) {
@@ -191,7 +194,6 @@ bool PbfTrackObjectDistance::ComputePolygonCenter(
   }
 
   int size = distance2idx.size();
-  // TODO
   int nu = std::max(range, size / range + 1);
   nu = std::min(nu, size);
   int count = 0;

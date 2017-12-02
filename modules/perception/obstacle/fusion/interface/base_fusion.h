@@ -51,6 +51,7 @@
 // using fusion to do somethings.
 // ////////////////////////////////////////////////////
 #include <vector>
+#include <string>
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"

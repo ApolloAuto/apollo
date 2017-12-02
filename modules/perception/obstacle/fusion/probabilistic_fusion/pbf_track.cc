@@ -16,8 +16,9 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
+#include <map>
+#include <string>
 #include "boost/format.hpp"
-
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
@@ -33,7 +34,7 @@ double PbfTrack::s_max_lidar_invisible_period_ = 0.25;
 double PbfTrack::s_max_radar_invisible_period_ = 0.15;
 double PbfTrack::s_max_radar_confident_angle_ = 20;
 double PbfTrack::s_min_radar_confident_distance_ = 40;
-std::string PbfTrack::s_motion_fusion_method_ = "PbfKalmanMotionFusion";
+std::string PbfTrack::s_motion_fusion_method_ = "PbfKalmanMotionFusion"; // NOLINT
 
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
@@ -104,9 +105,9 @@ void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj,
   }
 
   double timestamp = obj->timestamp;
-  UpdateMeasurementsLifeWithMeasurement(lidar_objects_, sensor_id, timestamp,
+  UpdateMeasurementsLifeWithMeasurement(&lidar_objects_, sensor_id, timestamp,
                                         s_max_lidar_invisible_period_);
-  UpdateMeasurementsLifeWithMeasurement(radar_objects_, sensor_id, timestamp,
+  UpdateMeasurementsLifeWithMeasurement(&radar_objects_, sensor_id, timestamp,
                                         s_max_radar_invisible_period_);
 
   invisible_period_ = 0;
@@ -118,12 +119,14 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
                                          const std::string &sensor_id,
                                          double min_match_dist,
                                          double timestamp) {
-  UpdateMeasurementsLifeWithoutMeasurement(lidar_objects_, sensor_id, timestamp,
-                                           s_max_lidar_invisible_period_,
-                                           invisible_in_lidar_);
-  UpdateMeasurementsLifeWithoutMeasurement(radar_objects_, sensor_id, timestamp,
-                                           s_max_radar_invisible_period_,
-                                           invisible_in_radar_);
+  UpdateMeasurementsLifeWithoutMeasurement(
+    &lidar_objects_, sensor_id, timestamp,
+    s_max_lidar_invisible_period_,
+    &invisible_in_lidar_);
+  UpdateMeasurementsLifeWithoutMeasurement(
+    &radar_objects_, sensor_id, timestamp,
+    s_max_radar_invisible_period_,
+    &invisible_in_radar_);
   is_dead_ = (lidar_objects_.empty() && radar_objects_.empty());
   if (!is_dead_) {
     double time_diff = timestamp - fused_timestamp_;
@@ -177,7 +180,7 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
       motion_fusion_->UpdateWithObject(obj, time_diff);
       Eigen::Vector3d anchor_point;
       Eigen::Vector3d velocity;
-      motion_fusion_->GetState(anchor_point, velocity);
+      motion_fusion_->GetState(&anchor_point, &velocity);
       fused_object_->object->velocity = velocity;
     } else {
       motion_fusion_->Initialize(obj);
@@ -187,11 +190,11 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
         (lidar_object != nullptr || radar_object != nullptr)) {
       Eigen::Vector3d pre_anchor_point;
       Eigen::Vector3d pre_velocity;
-      motion_fusion_->GetState(pre_anchor_point, pre_velocity);
+      motion_fusion_->GetState(&pre_anchor_point, &pre_velocity);
       motion_fusion_->UpdateWithObject(obj, time_diff);
       Eigen::Vector3d anchor_point;
       Eigen::Vector3d velocity;
-      motion_fusion_->GetState(anchor_point, velocity);
+      motion_fusion_->GetState(&anchor_point, &velocity);
       if (lidar_object == nullptr) {
         PbfSensorObject fused_obj_bk;
         fused_obj_bk.clone(*fused_object_);
@@ -231,14 +234,14 @@ void PbfTrack::PerformMotionCompensation(PbfSensorObjectPtr obj,
   obj->object->anchor_point += offset;
 
   PolygonDType &polygon = obj->object->polygon;
-  for (int i = 0; i < (int)polygon.size(); i++) {
+  for (size_t i = 0; i < polygon.size(); i++) {
     polygon.points[i].x += offset[0];
     polygon.points[i].y += offset[1];
     polygon.points[i].z += offset[2];
   }
 
   pcl_util::PointCloudPtr cloud = obj->object->cloud;
-  for (int i = 0; i < (int)cloud->size(); i++) {
+  for (size_t i = 0; i < cloud->size(); i++) {
     cloud->points[i].x += offset[0];
     cloud->points[i].y += offset[1];
     cloud->points[i].z += offset[2];
@@ -295,14 +298,14 @@ bool PbfTrack::AbleToPublish() {
 }
 
 void PbfTrack::UpdateMeasurementsLifeWithMeasurement(
-    std::map<std::string, PbfSensorObjectPtr> &objects,
+    std::map<std::string, PbfSensorObjectPtr> *objects,
     const std::string &sensor_id, double timestamp, double max_invisible_time) {
-  for (auto it = objects.begin(); it != objects.end();) {
+  for (auto it = objects->begin(); it != objects->end();) {
     if (sensor_id != it->first) {
       double period = timestamp - it->second->timestamp;
       if (period > max_invisible_time) {
         it->second = nullptr;
-        it = objects.erase(it);
+        it = objects->erase(it);
       } else {
         ++it;
       }
@@ -313,21 +316,21 @@ void PbfTrack::UpdateMeasurementsLifeWithMeasurement(
 }
 
 void PbfTrack::UpdateMeasurementsLifeWithoutMeasurement(
-    std::map<std::string, PbfSensorObjectPtr> &objects,
+    std::map<std::string, PbfSensorObjectPtr> *objects,
     const std::string &sensor_id, double timestamp, double max_invisible_time,
-    bool &invisible_state) {
-  invisible_state = true;
-  for (auto it = objects.begin(); it != objects.end();) {
+    bool *invisible_state) {
+  *invisible_state = true;
+  for (auto it = objects->begin(); it != objects->end();) {
     if (sensor_id == it->first) {
-      it->second = nullptr;  // TODO: consider in-view state
-      it = objects.erase(it);
+      it->second = nullptr;
+      it = objects->erase(it);
     } else {
       double period = timestamp - it->second->timestamp;
       if (period > max_invisible_time) {
         it->second = nullptr;
-        it = objects.erase(it);
+        it = objects->erase(it);
       } else {
-        invisible_state = false;
+        *invisible_state = false;
         ++it;
       }
     }

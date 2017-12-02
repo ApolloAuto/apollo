@@ -59,7 +59,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
     CHECK_EQ(motion_fusion_alg->Initialized(), true);
     Eigen::Vector3d location;
     Eigen::Vector3d velocity;
-    motion_fusion_alg->GetState(location, velocity);
+    motion_fusion_alg->GetState(&location, &velocity);
     EXPECT_TRUE((location - lidar_position).norm() < 1.0e-6);
     EXPECT_TRUE((velocity - lidar_velocity).norm() < 1.0e-6);
   }
@@ -79,7 +79,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_radar_object) {
     CHECK_EQ(motion_fusion_alg->Initialized(), true);
     Eigen::Vector3d location;
     Eigen::Vector3d velocity;
-    motion_fusion_alg->GetState(location, velocity);
+    motion_fusion_alg->GetState(&location, &velocity);
     EXPECT_TRUE((location - radar_position).norm() < 1.0e-6);
     EXPECT_TRUE((velocity - radar_velocity).norm() < 1.0e-6);
   }
@@ -110,7 +110,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement) {
                                         lidar_timestamp - radar_timestamp);
     Eigen::Vector3d location;
     Eigen::Vector3d velocity;
-    motion_fusion_alg->GetState(location, velocity);
+    motion_fusion_alg->GetState(&location, &velocity);
     AINFO << "algorithm " << motion_fusion_alg->name() << ": " << location
           << lidar_position << (location - lidar_position).norm();
     EXPECT_TRUE((location - lidar_position).norm() < 2.0e-1);
@@ -136,7 +136,7 @@ TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
     motion_fusion_alg->UpdateWithoutObject(time_diff);
     Eigen::Vector3d location;
     Eigen::Vector3d velocity;
-    motion_fusion_alg->GetState(location, velocity);
+    motion_fusion_alg->GetState(&location, &velocity);
     EXPECT_TRUE((location - expected_position).norm() < 1.0e-6);
     EXPECT_TRUE((velocity - lidar_velocity).norm() < 1e-3);
   }

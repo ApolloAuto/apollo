@@ -79,11 +79,11 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   c_matrix_.setIdentity();
 }
 
-void PbfKalmanMotionFusion::Predict(Eigen::Vector3d &anchor_point,
-                                    Eigen::Vector3d &velocity,
+void PbfKalmanMotionFusion::Predict(Eigen::Vector3d *anchor_point,
+                                    Eigen::Vector3d *velocity,
                                     const double time_diff) {
-  anchor_point = belief_anchor_point_ + belief_velocity_ * time_diff;
-  velocity = belief_velocity_;
+  *anchor_point = belief_anchor_point_ + belief_velocity_ * time_diff;
+  *velocity = belief_velocity_;
 }
 
 void PbfKalmanMotionFusion::UpdateWithObject(
@@ -199,10 +199,10 @@ void PbfKalmanMotionFusion::UpdateWithoutObject(const double time_diff) {
   belief_anchor_point_ = belief_anchor_point_ + belief_velocity_ * time_diff;
 }
 
-void PbfKalmanMotionFusion::GetState(Eigen::Vector3d &anchor_point,
-                                     Eigen::Vector3d &velocity) {
-  anchor_point = belief_anchor_point_;
-  velocity = belief_velocity_;
+void PbfKalmanMotionFusion::GetState(Eigen::Vector3d *anchor_point,
+                                     Eigen::Vector3d *velocity) {
+  *anchor_point = belief_anchor_point_;
+  *velocity = belief_velocity_;
 }
 
 int PbfKalmanMotionFusion::GetRadarHistoryLength() {

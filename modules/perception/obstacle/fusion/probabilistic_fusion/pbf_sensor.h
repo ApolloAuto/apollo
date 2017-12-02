@@ -17,6 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #include <deque>
+#include <string>
+#include <vector>
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -49,10 +51,6 @@ class PbfSensor {
     s_max_cached_frame_number_ = number;
   }
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(PbfSensor);
-  PbfSensor();
-
  protected:
   /**@brief cached frames in FIFO*/
   std::deque<PbfSensorFramePtr> frames_;
@@ -64,6 +62,10 @@ class PbfSensor {
   static int s_max_cached_frame_number_;
 
   double latest_query_timestamp_;
+
+ private:
+  PbfSensor();
+  DISALLOW_COPY_AND_ASSIGN(PbfSensor);
 };
 
 }  // namespace perception

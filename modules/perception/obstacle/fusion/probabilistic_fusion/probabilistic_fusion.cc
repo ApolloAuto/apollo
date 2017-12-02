@@ -17,6 +17,8 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
 #include <iomanip>
+#include <string>
+#include <vector>
 #include "modules/common/macro.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
@@ -241,7 +243,7 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
 void ProbabilisticFusion::CreateNewTracks(
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<int> &unassigned_ids) {
-  for (int i = 0; i < (int)unassigned_ids.size(); i++) {
+  for (int i = 0; i < unassigned_ids.size(); i++) {
     int id = unassigned_ids[i];
     PbfTrackPtr track(new PbfTrack(sensor_objects[id]));
     track_manager_->AddTrack(track);
@@ -249,25 +251,25 @@ void ProbabilisticFusion::CreateNewTracks(
 }
 
 void ProbabilisticFusion::UpdateAssignedTracks(
-    std::vector<PbfTrackPtr> &tracks,
-    std::vector<PbfSensorObjectPtr> &sensor_objects,
-    std::vector<TrackObjectPair> &assignments,
+    std::vector<PbfTrackPtr> *tracks,
+    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<TrackObjectPair> &assignments,
     const std::vector<double> &track_object_dist) {
-  for (int i = 0; i < (int)assignments.size(); i++) {
+  for (int i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
-    tracks[local_track_index]->UpdateWithSensorObject(
+    (*tracks)[local_track_index]->UpdateWithSensorObject(
         sensor_objects[local_obj_index], track_object_dist[local_track_index]);
   }
 }
 
 void ProbabilisticFusion::UpdateUnassignedTracks(
-    std::vector<PbfTrackPtr> &tracks, const std::vector<int> &unassigned_tracks,
+    std::vector<PbfTrackPtr> *tracks, const std::vector<int> &unassigned_tracks,
     const std::vector<double> &track_object_dist, const SensorType &sensor_type,
     const std::string &sensor_id, double timestamp) {
-  for (int i = 0; i < (int)unassigned_tracks.size(); i++) {
+  for (int i = 0; i < unassigned_tracks.size(); i++) {
     int local_track_index = unassigned_tracks[i];
-    tracks[local_track_index]->UpdateWithoutSensorObject(
+    (*tracks)[local_track_index]->UpdateWithoutSensorObject(
         sensor_type, sensor_id, track_object_dist[local_track_index],
         timestamp);
   }
@@ -330,9 +332,9 @@ void ProbabilisticFusion::FuseForegroundObjects(
 
   std::vector<double> track2measurements_dist;
   std::vector<double> measurement2tracks_dist;
-  matcher_->Match(tracks, foreground_objects, options, assignments,
-                  unassigned_tracks, unassigned_objects,
-                  track2measurements_dist, measurement2tracks_dist);
+  matcher_->Match(tracks, foreground_objects, options, &assignments,
+                  &unassigned_tracks, &unassigned_objects,
+                  &track2measurements_dist, &measurement2tracks_dist);
 
   AINFO << "fg_track_cnt = " << tracks.size()
         << ", fg_obj_cnt = " << foreground_objects.size()
@@ -340,10 +342,10 @@ void ProbabilisticFusion::FuseForegroundObjects(
         << ", unassigned_track_cnt = " << unassigned_tracks.size()
         << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
-  UpdateAssignedTracks(tracks, foreground_objects, assignments,
+  UpdateAssignedTracks(&tracks, foreground_objects, assignments,
                        track2measurements_dist);
 
-  UpdateUnassignedTracks(tracks, unassigned_tracks, track2measurements_dist,
+  UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
                          sensor_type, sensor_id, timestamp);
 
   CreateNewTracks(foreground_objects, unassigned_objects);

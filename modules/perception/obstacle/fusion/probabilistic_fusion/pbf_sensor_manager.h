@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_  // NOLINT
 #include <queue>
+#include <map>
+#include <string>
+#include <vector>
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -62,4 +65,4 @@ class PbfSensorManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_   // NOLINT

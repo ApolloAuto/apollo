@@ -98,10 +98,10 @@ TEST(PbfTrackTest, test_pbf_update_measurements_life) {
   object2->timestamp = 0.1;
   object2->object->track_id = 1;
   track.lidar_objects_[object2->sensor_id] = object2;
-  track.UpdateMeasurementsLifeWithMeasurement(track.lidar_objects_,
+  track.UpdateMeasurementsLifeWithMeasurement(&(track.lidar_objects_),
                                               "velodyne_64", 0.45, 0.2);
   CHECK_EQ(track.lidar_objects_.size(), 1);
-  track.UpdateMeasurementsLifeWithMeasurement(track.lidar_objects_,
+  track.UpdateMeasurementsLifeWithMeasurement(&(track.lidar_objects_),
                                               "velodyne_64_1", 0.25, 0.2);
   CHECK_EQ(track.lidar_objects_.size(), 1);
   PbfSensorObjectPtr object3(new PbfSensorObject());
@@ -112,7 +112,7 @@ TEST(PbfTrackTest, test_pbf_update_measurements_life) {
   track.lidar_objects_[object3->sensor_id] = object3;
   bool invisible_state = true;
   track.UpdateMeasurementsLifeWithoutMeasurement(
-      track.lidar_objects_, "velodyne_64", 0.35, 0.2, invisible_state);
+      (&track.lidar_objects_), "velodyne_64", 0.35, 0.2, &invisible_state);
   CHECK_EQ(track.lidar_objects_.size(), 1);
   CHECK_EQ(invisible_state, false);
 }

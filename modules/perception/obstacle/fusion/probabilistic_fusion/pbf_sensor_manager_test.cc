@@ -45,7 +45,7 @@ TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
   sensor_manager->AddSensorMeasurements(radar_frame);
   std::vector<PbfSensorFramePtr> frames;
   sensor_manager->GetLatestFrames(radar_frame.timestamp, &frames);
-  EXPECT_TRUE(frames.size() == 2);
+  EXPECT_EQ(frames.size(), 2);
 }
 
 }  // namespace perception

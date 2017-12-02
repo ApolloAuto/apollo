@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
 
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -55,10 +55,10 @@ class PbfTrackObjectDistance {
   float ComputeEuclideanDistance(const Eigen::Vector3d &des,
                                  const Eigen::Vector3d &src);
   bool ComputePolygonCenter(const PolygonDType &polygon,
-                            Eigen::Vector3d &center);
+                            Eigen::Vector3d *center);
   bool ComputePolygonCenter(const PolygonDType &polygon,
                             const Eigen::Vector3d &ref_pos, int range,
-                            Eigen::Vector3d &center);
+                            Eigen::Vector3d *center);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
@@ -66,4 +66,4 @@ class PbfTrackObjectDistance {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
