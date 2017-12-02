@@ -22,7 +22,7 @@ namespace apollo {
 namespace perception {
 
 HungarianOptimizer::HungarianOptimizer(
-    const std::vector<std::vector<double> >& costs)
+    const std::vector<std::vector<double>>& costs)
     : matrix_size_(0),
       costs_(),
       max_cost_(0),

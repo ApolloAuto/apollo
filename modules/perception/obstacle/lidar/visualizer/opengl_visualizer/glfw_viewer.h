@@ -33,7 +33,7 @@ class GLFWViewer {
 
   bool Initialize();
 
-  void SetFrameContent(const FrameContent& frame_content) {
+  void SetFrameContent(const FrameContent &frame_content) {
     frame_content_ = frame_content;
   }
   void Spin();
@@ -46,7 +46,9 @@ class GLFWViewer {
   void SetSize(int w, int h);
   void SetCameraPara(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
                      Eigen::Vector3d i_up_vector);
-  void SetForwardDir(Eigen::Vector3d forward) { forward_dir_ = forward; }
+  void SetForwardDir(Eigen::Vector3d forward) {
+    forward_dir_ = forward;
+  }
 
   // callback assistants
   void ResizeFramebuffer(int width, int height);
@@ -130,7 +132,7 @@ class GLFWViewer {
   static const int kPoint_Num_Per_Cloud_VAO_ = 10000;
   GLuint cloud_VAO_buf_ids_[kCloud_VAO_Num_];
   GLuint cloud_VBO_buf_ids_[kCloud_VAO_Num_][NUM_VBO_TYPE];  // each VAO has
-                                                           // NUM_VBO_TYPE VBOs
+  // NUM_VBO_TYPE VBOs
   GLfloat cloud_verts_[kPoint_Num_Per_Cloud_VAO_][3];
 
   // circle

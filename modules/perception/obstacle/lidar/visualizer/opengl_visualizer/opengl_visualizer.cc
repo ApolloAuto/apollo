@@ -64,13 +64,17 @@ void OpenglVisualizer::Render(const FrameContent &content) {
   AINFO << "OpenglVisualizer spin_once";
 }
 
-void OpenglVisualizer::SetSize(int w, int h) { opengl_vs_->SetSize(w, h); }
+void OpenglVisualizer::SetSize(int w, int h) {
+  opengl_vs_->SetSize(w, h);
+}
 
 void OpenglVisualizer::SetBackgroundColor(float r, float g, float b, float a) {
   opengl_vs_->SetBackgroundColor(Eigen::Vector3d(r, g, b));
 }
 
-void OpenglVisualizer::SetVelodyneHeight(float h) { velodyne_height_ = h; }
+void OpenglVisualizer::SetVelodyneHeight(float h) {
+  velodyne_height_ = h;
+}
 
 void OpenglVisualizer::SetCameraPosition() {
   up_velodyne_.x = 0;
@@ -127,8 +131,8 @@ void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
   TransformPoint<pcl_util::Point>(camera_center_velodyne_,
                                   &camera_center_world_, pose_v2w);
 
-  TransformPoint<pcl_util::Point>(view_point_velodyne_,
-                                  &view_point_world_, pose_v2w);
+  TransformPoint<pcl_util::Point>(view_point_velodyne_, &view_point_world_,
+                                  pose_v2w);
 
   TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_,
                                        &main_car_points_world_, pose_v2w);

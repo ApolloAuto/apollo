@@ -8,11 +8,16 @@ cc_library(
         "file_util.cc",
         "registerer.cc",
         "timer.cc",
+        "thread.cc",
     ],
     hdrs = [
         "file_util.h",
         "registerer.h",
         "timer.h",
+        "time_util.h",
+        "mutex.h",
+        "thread.h",
+        "concurrent_queue.h",
     ],
     linkopts = [
         "-lboost_filesystem",

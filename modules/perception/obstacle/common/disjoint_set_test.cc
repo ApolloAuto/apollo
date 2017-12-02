@@ -44,9 +44,9 @@ class DisjointSetTest : public testing::Test {
     }
   }
   void SetUp() {
-      DisjointSetMakeSet(_node1);
-      _node2->parent = _node1;
-      _node3->parent = _node2;
+    DisjointSetMakeSet(_node1);
+    _node2->parent = _node1;
+    _node3->parent = _node2;
   }
   void TearDown() {}
   struct Node {
@@ -64,7 +64,7 @@ class DisjointSetTest : public testing::Test {
 };
 
 TEST_F(DisjointSetTest, DisjointSetMakeSet) {
-  Node* node = new Node();;
+  Node* node = new Node();
   DisjointSetMakeSet<Node>(node);
   EXPECT_EQ(node, node->parent);
   EXPECT_EQ(0, node->node_rank);
