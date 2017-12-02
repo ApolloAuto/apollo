@@ -169,7 +169,9 @@ bool DPRoadGraph::SamplePathWaypoints(
   constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
   CHECK(points != nullptr);
 
-  const double reference_line_length = reference_line_.Length();
+  const double total_length =
+      std::fmin(init_sl_point_.s() + speed_data_.speed_vector().back().s(),
+                reference_line_.Length());
 
   double level_distance = 0.0;
   if (reference_line_info_.IsChangeLanePath()) {
@@ -182,10 +184,10 @@ bool DPRoadGraph::SamplePathWaypoints(
         config_.step_length_min(), config_.step_length_max());
   }
   double accumulated_s = init_sl_point_.s();
-  for (std::size_t i = 0; accumulated_s < reference_line_length; ++i) {
+  for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
-    const double s = std::fmin(accumulated_s, reference_line_length);
+    const double s = std::fmin(accumulated_s, total_length);
 
     double left_width = 0.0;
     double right_width = 0.0;
