@@ -2,6 +2,7 @@ import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
+
 export default class OfflinePlaybackWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
@@ -48,15 +49,17 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     this.checkMessage(message);
                     STORE.setInitializationStatus(true);
 
-                    STORE.updateTimestamp(message.timestamp);
-                    STORE.updateWorldTimestamp(message.world.timestampSec);
-                    RENDERER.maybeInitializeOffest(
-                        message.world.autoDrivingCar.positionX,
-                        message.world.autoDrivingCar.positionY);
-                    RENDERER.updateWorld(message.world, message.planningData);
-                    STORE.meters.update(message.world);
-                    STORE.monitor.update(message.world);
-                    STORE.trafficSignal.update(message.world);
+                    if (STORE.playback.shouldProcessFrame(message.world)) {
+                        STORE.updateTimestamp(message.timestamp);
+                        STORE.updateWorldTimestamp(message.world.timestampSec);
+                        RENDERER.maybeInitializeOffest(
+                            message.world.autoDrivingCar.positionX,
+                            message.world.autoDrivingCar.positionY);
+                        RENDERER.updateWorld(message.world, message.planningData);
+                        STORE.meters.update(message.world);
+                        STORE.monitor.update(message.world);
+                        STORE.trafficSignal.update(message.world);
+                    }
                     break;
             }
         };

@@ -1,9 +1,10 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import Slider from 'react-rangeslider';
 
 import ControlIcons from "components/PlaybackControls/ControlIcons";
+import TimeControls from "components/PlaybackControls/TimeControls";
 import WS from "store/websocket";
+
 
 @inject("store") @observer
 export default class PlaybackControls extends React.Component {
@@ -13,13 +14,13 @@ export default class PlaybackControls extends React.Component {
         this.state = {
             rate: 1.0,
             isPlaying: false,
-            nextAction: 'play',
         };
+
+        this.nextAction = 'play';
 
         this.handleRateChange = this.handleRateChange.bind(this);
         this.handleIconClick = this.handleIconClick.bind(this);
-        this.handleSliderChange = this.handleSliderChange.bind(this);
-        this.handleSliderChangeComplete = this.handleSliderChangeComplete.bind(this);
+        this.handleFrameSeek = this.handleFrameSeek.bind(this);
     }
 
     handleRateChange(event) {
@@ -34,67 +35,63 @@ export default class PlaybackControls extends React.Component {
         }
     }
 
-    handleIconClick(event) {
+    handleIconClick() {
         const { playback } = this.props.store;
 
         const isPlaying = !this.state.isPlaying;
+        playback.setPlayAction(isPlaying);
         this.setState({isPlaying: isPlaying});
 
-        switch (this.state.nextAction) {
+        switch (this.nextAction) {
             case 'play':
+                playback.resume();
                 WS.startPlayback(playback.msPerFrame);
                 break;
             case 'pause':
+                // set requested frame to where the frame has been retrieved previously,
+                // so resuming playback can request the next frame correctly.
+                playback.syncRequestedToRetrieved();
                 WS.pausePlayback();
                 break;
             case 'replay':
-                playback.resetCurrentFrame();
+                playback.resetFrame();
                 WS.startPlayback(playback.msPerFrame);
                 break;
         }
     }
 
-    handleSliderChange(value) {
+    handleFrameSeek(frame) {
         const { playback } = this.props.store;
-        playback.updateCurrentFrameByPercentage(value);
-    }
 
-    handleSliderChangeComplete() {
+        playback.seekFrame(frame);
         if (!this.state.isPlaying) {
-            const { playback } = this.props.store;
-            WS.requestSimulationWorld(playback.jobId, playback.currentFrame);
+            WS.requestSimulationWorld(playback.jobId, frame);
         }
     }
 
     componentWillUpdate(nextProps, nextState) {
-        const { percentage, replayComplete,
-                currentTimeSec, totalTimeSec } = this.props.store.playback;
+        const { playback } = this.props.store;
 
-        if (nextProps.store.playback.replayComplete && nextState.isPlaying) {
+        if (playback.replayComplete && this.state.isPlaying) {
+            playback.setPlayAction(false);
             this.setState({isPlaying: false});
         }
 
-
-        let newAction = null;
-        if (replayComplete) {
-            newAction = 'replay';
+        if (playback.replayComplete && !playback.isSeeking) {
+            this.nextAction = 'replay';
         } else if (nextState.isPlaying) {
-            newAction = 'pause';
+            this.nextAction = 'pause';
         } else {
-            newAction = 'play';
-        }
-        if (nextState.nextAction !== newAction) {
-            this.setState({nextAction: newAction});
+            this.nextAction = 'play';
         }
     }
 
     render() {
-        const { percentage, replayComplete,
-                currentTimeSec, totalTimeSec } = this.props.store.playback;
+        const {playback} = this.props.store;
 
         return (
             <div className="playback-controls">
-                <ControlIcons type={this.state.nextAction} onClick={this.handleIconClick}/>
+                <ControlIcons onClick={this.handleIconClick} type={this.nextAction} />
                 <div className="rate-selector">
                     <select onChange={this.handleRateChange} value={this.state.rate}>
                         <option value={0.25}>x 0.25</option>
@@ -104,12 +101,11 @@ export default class PlaybackControls extends React.Component {
                     </select>
                     <span className="arrow"></span>
                 </div>
-                <div className="scrubber">
-                    <Slider tooltip={false} value={percentage}
-                            onChange={this.handleSliderChange}
-                            onChangeComplete={this.handleSliderChangeComplete}/>
-                </div>
-                <div className="time-display">{`${currentTimeSec} / ${totalTimeSec} s`}</div>
+                <TimeControls numFrames={playback.numFrames}
+                              currentFrame={playback.currentFrame}
+                              fps={playback.FPS}
+                              isSeeking={playback.isSeeking}
+                              handleFrameSeek={this.handleFrameSeek} />
             </div>
         );
     }
