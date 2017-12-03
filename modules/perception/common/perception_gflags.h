@@ -56,7 +56,8 @@ DECLARE_string(onboard_fusion);
 
 /// traffic_light/onboard/preprocessor.cc
 DECLARE_double(query_signal_range);
-
+DECLARE_bool(output_raw_img);
+DECLARE_bool(output_debug_img);
 /// perception.cc
 DECLARE_string(dag_config_path);
 

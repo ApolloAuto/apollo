@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
-
 #include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
@@ -109,20 +108,25 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
   if (signals.size() > 0) {
     // project light region on each camera's image plane
     for (int cam_id = 0; cam_id < kCountCameraId; ++cam_id) {
-      if (!ProjectLights(pose, signals, static_cast<CameraId>(cam_id),
+      if (!ProjectLights(pose,
+                         signals,
+                         static_cast<CameraId>(cam_id),
                          lights_on_image[cam_id].get(),
                          lights_outside_image[cam_id].get())) {
         AERROR << "add_cached_lights_projections project lights on "
                << kCameraIdToStr.at(static_cast<CameraId>(cam_id))
                << " image failed, "
-               << "ts: " << GLOG_TIMESTAMP(timestamp) << ", camera_id: "
+               << "ts: " << GLOG_TIMESTAMP(timestamp)
+               << ", camera_id: "
                << kCameraIdToStr.at(static_cast<CameraId>(cam_id));
         return false;
       }
     }
 
     // select which image to be used
-    SelectImage(pose, lights_on_image, lights_outside_image,
+    SelectImage(pose,
+                lights_on_image,
+                lights_outside_image,
                 &(image_lights->camera_id));
     AINFO << "select camera: " << kCameraIdToStr.at(image_lights->camera_id);
 
@@ -130,14 +134,15 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
     last_no_signals_ts_ = timestamp;
   }
   image_lights->num_signals = signals.size();
-  AINFO << "cached info with " << image_lights->num_signals << " signals";
+  AINFO << "cached info with "<<image_lights->num_signals<<" signals";
   cached_lights_.push_back(image_lights);
 
   return true;
 }
 
 bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
-                               ImageLightsPtr *image_lights, bool *should_pub) {
+                               ImageLightsPtr *image_lights,
+                               bool *should_pub) {
   MutexLock lock(&mutex_);
   PERF_FUNCTION();
   CameraId camera_id = image->camera_id();
@@ -147,11 +152,14 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
   double diff_image_sys_ts = 0.0;
 
   // sync image with cached lights projections
-  if (!SyncImageWithCachedLights(image, image_lights, &diff_image_pose_ts,
-                                 &diff_image_sys_ts, &sync_ok)) {
-    auto camera_id_str = (kCameraIdToStr.find(camera_id) != kCameraIdToStr.end()
-                              ? kCameraIdToStr.at(camera_id)
-                              : std::to_string(camera_id));
+  if (!SyncImageWithCachedLights(image,
+                                 image_lights,
+                                 &diff_image_pose_ts,
+                                 &diff_image_sys_ts,
+                                 &sync_ok)) {
+    auto camera_id_str =
+        (kCameraIdToStr.find(camera_id) != kCameraIdToStr.end() ?
+         kCameraIdToStr.at(camera_id) : std::to_string(camera_id));
     AINFO << "sync_image_with_cached_lights_projections failed, "
           << "not publish image to shared data, ts: "
           << GLOG_TIMESTAMP(timestamp) << ", camera_id: " << camera_id_str;
@@ -242,7 +250,8 @@ void TLPreprocessor::SelectImage(const CarPose &pose,
     // 找当前工作的焦距最小的相机，不进行边界检查
     if (cam_id != kShortFocusIdx) {
       for (const LightPtr &light : *(lights_on_image_array[cam_id])) {
-        if (IsOnBorder(cv::Size(projection_image_cols_, projection_image_rows_),
+        if (IsOnBorder(cv::Size(projection_image_cols_,
+                                projection_image_rows_),
                        light->region.projection_roi,
                        image_border_size[cam_id])) {
           ok = false;
@@ -322,8 +331,8 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
       auto image_cam_id = static_cast<int>(camera_id);
       auto proj_cam_id_str =
           (kCameraIdToStr.find(proj_cam_id) != kCameraIdToStr.end()
-               ? kCameraIdToStr.at(proj_cam_id)
-               : std::to_string(proj_cam_id));
+           ? kCameraIdToStr.at(proj_cam_id)
+           : std::to_string(proj_cam_id));
       // 找到对应时间的定位，但是相机 ID 不符
       if (proj_cam_id != image_cam_id) {
         AWARN << "find appropriate localization, but camera_id not match"
@@ -410,7 +419,8 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
   return true;
 }
 
-bool TLPreprocessor::IsOnBorder(const cv::Size size, const cv::Rect &roi,
+bool TLPreprocessor::IsOnBorder(const cv::Size size,
+                                const cv::Rect &roi,
                                 const int border_size) const {
   if (roi.x < border_size || roi.y < border_size) {
     return true;
