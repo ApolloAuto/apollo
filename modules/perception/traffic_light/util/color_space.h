@@ -52,11 +52,11 @@ SIMD_INLINE char GetChar(T value, size_t index) {
   return reinterpret_cast<char *>(&value)[index];
 }
 
-#define SIMD_CHAR_AS_LONGLONG(a) (((long long)a) & 0xFF)  // NOLINT
+#define SIMD_CHAR_AS_LONGLONG(a) (((int64_t)a) & 0xFF)
 
-#define SIMD_SHORT_AS_LONGLONG(a) (((long long)a) & 0xFFFF)  // NOLINT
+#define SIMD_SHORT_AS_LONGLONG(a) (((int64_t)a) & 0xFFFF)
 
-#define SIMD_INT_AS_LONGLONG(a) (((long long)a) & 0xFFFFFFFF)  // NOLINT
+#define SIMD_INT_AS_LONGLONG(a) (((int64_t)a) & 0xFFFFFFFF)
 
 #define SIMD_LL_SET1_EPI8(a)                                                \
   SIMD_CHAR_AS_LONGLONG(a) | (SIMD_CHAR_AS_LONGLONG(a) << 8) |              \
