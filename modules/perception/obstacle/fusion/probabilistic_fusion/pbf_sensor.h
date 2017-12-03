@@ -59,7 +59,7 @@ class PbfSensor {
   SensorType sensor_type_;
 
   /**@brief max size of _frames*/
-  static int s_max_cached_frame_number_;
+  static size_t s_max_cached_frame_number_;
 
   double latest_query_timestamp_;
 
