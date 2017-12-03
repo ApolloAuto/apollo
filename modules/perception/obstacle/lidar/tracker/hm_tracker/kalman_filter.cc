@@ -30,8 +30,8 @@ Eigen::Matrix3d KalmanFilter::s_propagation_noise_ =
 double KalmanFilter::s_measurement_noise_ = 0.4;
 double KalmanFilter::s_initial_velocity_noise_ = 5;
 double KalmanFilter::s_breakdown_threshold_maximum_ = 10;
-int KalmanFilter::s_measurement_cached_history_size_minimum_ = 3;
-int KalmanFilter::s_measurement_cached_history_size_maximum_ = 6;
+size_t KalmanFilter::s_measurement_cached_history_size_minimum_ = 3;
+size_t KalmanFilter::s_measurement_cached_history_size_maximum_ = 6;
 
 void KalmanFilter::SetUseAdaptive(const bool& use_adaptive) {
   s_use_adaptive_ = use_adaptive;

@@ -1,3 +1,4 @@
+
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -22,7 +23,7 @@
 namespace apollo {
 namespace perception {
 
-int PbfSensor::s_max_cached_frame_number_ = 10;
+size_t PbfSensor::s_max_cached_frame_number_ = 10;
 
 PbfSensor::PbfSensor(const SensorType &type, const std::string &sensor_id)
     : sensor_id_(sensor_id), sensor_type_(type), latest_query_timestamp_(0.0) {}
