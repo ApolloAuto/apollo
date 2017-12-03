@@ -41,6 +41,7 @@ from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
 from modules.drivers.proto import mobileye_pb2
 from modules.drivers.proto import delphi_esr_pb2
+from modules.drivers.proto import conti_radar_pb2
 
 Refreshrate = 16
 
