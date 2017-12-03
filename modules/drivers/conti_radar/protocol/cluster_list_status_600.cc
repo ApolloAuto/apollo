@@ -40,9 +40,6 @@ void ClusterListStatus600::Parse(const std::uint8_t* bytes, int32_t length,
   status->set_interface_version(interface_version(bytes, length));
   auto counter = status->near() + status->far();
   conti_radar->mutable_contiobs()->Reserve(counter);
-  for (int i = 0; i < counter; ++i) {
-    conti_radar->add_contiobs();
-  }
 }
 
 int ClusterListStatus600::near(const std::uint8_t* bytes,

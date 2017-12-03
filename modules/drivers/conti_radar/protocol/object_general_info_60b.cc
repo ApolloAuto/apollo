@@ -18,10 +18,10 @@
 
 #include "glog/logging.h"
 
-
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
+#include "modules/drivers/conti_radar/protocol/const_vars.h"
 
 namespace apollo {
 namespace drivers {
@@ -70,7 +70,7 @@ double ObjectGeneralInfo60B::longitude_dist(const std::uint8_t* bytes,
   x <<= 5;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.2 - 500.0;
+  double ret = x * OBJECT_DIST_RES + OBJECT_DIST_LONG_MIN;
   return ret;
 }
 
@@ -85,7 +85,7 @@ double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.2 - 204.6;
+  double ret = x * OBJECT_DIST_RES + OBJECT_DIST_LAT_MIN;
   return ret;
 }
 
@@ -98,7 +98,7 @@ double ObjectGeneralInfo60B::longitude_vel(const std::uint8_t* bytes,
 
   x <<= 2;
   x |= t;
-  double ret = x * 0.25 - 128.0;
+  double ret = x * OBJECT_VREL_RES + OBJECT_VREL_LONG_MIN;
   return ret;
 }
 
@@ -113,7 +113,7 @@ double ObjectGeneralInfo60B::lateral_vel(const std::uint8_t* bytes,
   x <<= 3;
   x |= t;
 
-  double ret = x * 0.25 - 64.0;
+  double ret = x * OBJECT_VREL_RES + OBJECT_VREL_LAT_MIN;
   return ret;
 }
 
@@ -122,7 +122,7 @@ double ObjectGeneralInfo60B::rcs(const std::uint8_t* bytes,
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  double ret = x * 0.5 - 64.0;
+  double ret = x * OBJECT_RCS_RES + OBJECT_RCS_MIN;
   return ret;
 }
 
