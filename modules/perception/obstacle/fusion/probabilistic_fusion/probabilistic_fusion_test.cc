@@ -28,10 +28,10 @@ namespace perception {
 TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
   FLAGS_work_root = "modules/perception";
   FLAGS_config_manager_path = "./conf/config_manager.config";
-  AERROR << "start probabilistic_fusion_test\n";
+  AINFO << "start probabilistic_fusion_test\n";
   ProbabilisticFusion *probabilistic_fusion = new ProbabilisticFusion();
   EXPECT_TRUE(probabilistic_fusion->Init());
-  AERROR << "After fusion init";
+  AINFO << "After fusion init";
   std::vector<SensorObjects> sensor_objects;
   std::vector<ObjectPtr> fused_objects;
   sensor_objects.resize(1);
@@ -68,7 +68,6 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
   ObjectPtr radar_obj(new Object());
   obj->clone(*moc_obj);
   for (int i = 0; i < 10; i++) {
-    AERROR << "test " << i;
     position = position + velocity * 0.05;
     timestamp += 0.05;
     radar_obj->center = position;
