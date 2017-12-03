@@ -103,8 +103,8 @@ void PbfSensorManager::GetLatestFrames(const double time_stamp,
       frames->push_back(frame);
     }
   }
-  for (int i = 0; i < frames->size() - 1; i++) {
-    for (int j = i + 1; j < frames->size(); j++) {
+  for (size_t i = 0; i < frames->size() - 1; i++) {
+    for (size_t j = i + 1; j < frames->size(); j++) {
       if ((*frames)[j]->timestamp < (*frames)[i]->timestamp) {
         PbfSensorFramePtr tf = (*frames)[i];
         (*frames)[i] = (*frames)[j];

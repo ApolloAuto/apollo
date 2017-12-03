@@ -92,8 +92,8 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
 
   AINFO << "TLPreprocessor Got signal number:" << signals.size()
         << ", ts: " << GLOG_TIMESTAMP(timestamp);
-  for (int i = 0; i < signals.size(); ++i) {
-    AINFO << "signal info:" << signals[i].ShortDebugString();
+  for (const auto &signal : signals) {
+    AINFO << "signal info:" << signal.ShortDebugString();
   }
   // lights projections info.
 
@@ -175,14 +175,17 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
     AINFO << "working camera with maximum focal length: "
           << kCameraIdToStr.at(kLongFocusIdx)
           << ", _last_pub_camera_id: " << last_pub_camera_id_;
+    // TODO(all): Unify language.
     // 在缓存的 signals_num 中根据时间戳查找当前图像时间的灯数
     size_t current_signal_num = 0;
 
     // 如果灯数为 0 ，那么默认发焦距最大的相机的图像
     // 否则，判断上一次发的是不是也是最大焦距的图像
     if (camera_id == kLongFocusIdx &&
-        (current_signal_num == 0 || camera_id == last_pub_camera_id_ &&
-            last_pub_camera_id_ != CameraId::UNKNOWN)) {
+        // TODO(all): Add parentheses to avoid mix-use of '&&' and '||'.
+        (current_signal_num == 0 ||
+         camera_id == last_pub_camera_id_ &&
+             last_pub_camera_id_ != CameraId::UNKNOWN)) {
       (*image_lights).reset(new ImageLights);
       (*image_lights)->image = image;
       // 距离查不到灯在一定时间范围以内，
