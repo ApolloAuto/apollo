@@ -88,15 +88,18 @@
         }
     }
 
-    .scrubber {
+    .time-controls {
         position: absolute;
         min-width: 300px;
-        left: 120px;
-        right: 135px;
-        top: 7px;
+        height: 100%;
+        left: 125px;
+        right: 0px;
 
         .rangeslider {
-            position: relative;
+            position: absolute;
+            top: 7px;
+            left: 0px;
+            right: 120px;
             margin: 10px 0px;
             height: 7px;
 
@@ -129,12 +132,12 @@
                 box-shadow: none;
             }
         }
-    }
 
-    .time-display {
-        position: absolute;
-        top: 11px;
-        right: 15px;
-        color: #ffffff;
+        .time-display {
+            position: absolute;
+            top: 11px;
+            right: 15px;
+            color: #ffffff;
+        }
     }
 }
