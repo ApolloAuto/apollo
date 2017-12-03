@@ -30,8 +30,8 @@ PbfTrackManager::PbfTrackManager() {}
 PbfTrackManager::~PbfTrackManager() {}
 
 int PbfTrackManager::RemoveLostTracks() {
-  int track_count = 0;
-  for (int i = 0; i < tracks_.size(); i++) {
+  size_t track_count = 0;
+  for (size_t i = 0; i < tracks_.size(); i++) {
     if (!tracks_[i]->IsDead()) {
       if (i != track_count) {
         tracks_[track_count] = tracks_[i];
