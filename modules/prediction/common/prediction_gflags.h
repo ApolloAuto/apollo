@@ -57,7 +57,6 @@ DECLARE_double(pedestrian_min_speed);
 DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_max_acc);
 DECLARE_double(prediction_pedestrian_total_time);
-DECLARE_int32(num_trajectory_still_pedestrian);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
