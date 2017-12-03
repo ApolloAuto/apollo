@@ -29,6 +29,7 @@
 #include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -401,27 +402,6 @@ bool TLProcSubnode::PublishMessage(
     light_result->set_id(lights->at(i)->info.id().id());
     light_result->set_confidence(lights->at(i)->status.confidence);
     light_result->set_color(lights->at(i)->status.color);
-    cv::Rect rect = lights->at(i)->region.rectified_roi;
-    cv::Scalar color;
-    switch (lights->at(i)->status.color) {
-      case BLACK:
-        color = cv::Scalar(0, 0, 0);
-        break;
-      case GREEN:
-        color = cv::Scalar(0, 255, 0);
-        break;
-      case RED:
-        color = cv::Scalar(0, 0, 255);
-        break;
-      case YELLOW:
-        color = cv::Scalar(0, 255, 255);
-        break;
-      default:
-        color = cv::Scalar(0, 76, 153);
-    }
-    cv::rectangle(img, rect, color, 2);
-    cv::rectangle(img, lights->at(i)->region.projection_roi,
-                  cv::Scalar(255, 255, 0), 2);
   }
 
   // set contain_lights
@@ -446,7 +426,6 @@ bool TLProcSubnode::PublishMessage(
     tl_cropbox->set_y(crop_roi.y);
     tl_cropbox->set_width(crop_roi.width);
     tl_cropbox->set_height(crop_roi.height);
-    cv::rectangle(img, crop_roi, cv::Scalar(0, 255, 255), 2);
   }
 
   // Rectified ROI
@@ -493,11 +472,34 @@ bool TLProcSubnode::PublishMessage(
                                         lights->at(0)->info.stop_line());
     light_debug->set_distance_to_stop_line(distance);
   }
-  char filename[200];
-  snprintf(filename, sizeof(filename), "img/%s_%lf.jpg",
-           image_lights->image->camera_id_str().c_str(),
-           image_lights->image->ts());
-  cv::imwrite(filename, img);
+  if(FLAGS_output_debug_img) {
+    char filename[200];
+    snprintf(filename, sizeof(filename), "img/%s_%lf.jpg",
+             image_lights->image->camera_id_str().c_str(),
+             image_lights->image->ts());
+    for (size_t i = 0; i < lights->size(); i++) {
+      cv::Rect rect = lights->at(i)->region.rectified_roi;
+      cv::Scalar color;
+      switch (lights->at(i)->status.color) {
+        case BLACK:color = cv::Scalar(0, 0, 0);
+          break;
+        case GREEN:color = cv::Scalar(0, 255, 0);
+          break;
+        case RED:color = cv::Scalar(0, 0, 255);
+          break;
+        case YELLOW:color = cv::Scalar(0, 255, 255);
+          break;
+        default:color = cv::Scalar(0, 76, 153);
+      }
+
+      cv::rectangle(img, rect, color, 2);
+      cv::rectangle(img, lights->at(i)->region.projection_roi,
+                    cv::Scalar(255, 255, 0), 2);
+      auto &crop_roi = lights->at(0)->region.debug_roi[0];
+      cv::rectangle(img, crop_roi, cv::Scalar(0, 255, 255), 2);
+    }
+    cv::imwrite(filename, img);
+  }
   common::adapter::AdapterManager::PublishTrafficLightDetection(result);
   auto process_time =
       TimeUtil::GetCurrentTime() - image_lights->preprocess_receive_timestamp;
