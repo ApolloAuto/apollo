@@ -15,10 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 
+#include <cmath>
 #include <map>
+#include "modules/common/log.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -99,7 +100,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
         radar_pose.topLeftCorner(3, 3).transpose();
 
     double local_theta =
-        raw_obstacles.contiobs(i).oritation_angle() / 180.0 * PI;
+        raw_obstacles.contiobs(i).oritation_angle() / 180.0 * M_PI;
     Eigen::Vector3f direction =
         Eigen::Vector3f(cos(local_theta), sin(local_theta), 0);
     direction = radar_pose.topLeftCorner(3, 3).cast<float>() * direction;
