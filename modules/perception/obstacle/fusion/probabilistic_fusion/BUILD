@@ -5,7 +5,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_fusion_probabilistic_fusion",
+    name = "probabilistic_fusion",
     srcs = [
         "pbf_base_track_object_matcher.cc",
         "pbf_hm_track_object_matcher.cc",
@@ -46,9 +46,10 @@ cc_library(
     ],
 )
 
-#cc_test(
+# FIXME(all): this test run has some problems.
+# cc_test(
 #    name = "probabilistic_fusion_test",
-#    size = "small",
+#    size = "large",
 #    srcs = [
 #        "probabilistic_fusion_test.cc",
 #    ],
@@ -58,18 +59,18 @@ cc_library(
 #        "//modules/perception/conf:perception_config",
 #    ],
 #    deps = [
+#        ":probabilistic_fusion",
 #        "//external:gflags",
 #        "//modules/common:log",
 #        "//modules/perception/lib/pcl_util",
-#        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
 #        "@gtest//:gtest",
 #        "@gtest//:main",
 #    ],
-#)
+# )
 
 cc_test(
     name = "pbf_motion_fusion_test",
-    size = "small",
+    size = "large",
     srcs = [
         "pbf_motion_fusion_test.cc",
     ],
@@ -79,10 +80,10 @@ cc_test(
         "//modules/perception/conf:perception_config",
     ],
     deps = [
+        ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
         "@gtest//:gtest",
         "@gtest//:main",
     ],
@@ -100,10 +101,10 @@ cc_test(
         "//modules/perception/conf:perception_config",
     ],
     deps = [
+        ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
         "@gtest//:gtest",
         "@gtest//:main",
     ],
@@ -121,10 +122,10 @@ cc_test(
         "//modules/perception/conf:perception_config",
     ],
     deps = [
+        ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
         "@gtest//:gtest",
         "@gtest//:main",
     ],

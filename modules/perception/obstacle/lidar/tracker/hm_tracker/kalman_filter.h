@@ -210,9 +210,9 @@ class KalmanFilter : public BaseFilter {
   static double s_initial_velocity_noise_;
   static double s_breakdown_threshold_maximum_;
 
-  static int s_measurement_cached_history_size_minimum_;
-  static int s_measurement_cached_history_size_maximum_;
-  int measurement_cached_history_size_;
+  static size_t s_measurement_cached_history_size_minimum_;
+  static size_t s_measurement_cached_history_size_maximum_;
+  size_t measurement_cached_history_size_;
 
   // filter history
   int age_;
