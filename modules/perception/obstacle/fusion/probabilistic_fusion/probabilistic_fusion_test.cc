@@ -28,9 +28,10 @@ namespace perception {
 TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
   FLAGS_work_root = "modules/perception";
   FLAGS_config_manager_path = "./conf/config_manager.config";
-  AINFO << "start probabilistic_fusion_test\n";
+  AERROR << "start probabilistic_fusion_test\n";
   ProbabilisticFusion *probabilistic_fusion = new ProbabilisticFusion();
   EXPECT_TRUE(probabilistic_fusion->Init());
+  AERROR << "After fusion init";
   std::vector<SensorObjects> sensor_objects;
   std::vector<ObjectPtr> fused_objects;
   sensor_objects.resize(1);
@@ -39,7 +40,6 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
   sensor_objects[0].timestamp = 0.0;
   sensor_objects[0].sensor2world_pose = Eigen::Matrix4d::Identity();
   EXPECT_TRUE(probabilistic_fusion->Fuse(sensor_objects, &fused_objects));
-  AINFO << 1;
   double timestamp = 0;
   ObjectPtr moc_obj(new Object());
   Eigen::Vector3d position(20, 0, 0);
@@ -68,6 +68,7 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
   ObjectPtr radar_obj(new Object());
   obj->clone(*moc_obj);
   for (int i = 0; i < 10; i++) {
+    AERROR << "test " << i;
     position = position + velocity * 0.05;
     timestamp += 0.05;
     radar_obj->center = position;
