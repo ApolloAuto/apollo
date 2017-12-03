@@ -46,26 +46,26 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "probabilistic_fusion_test",
-    size = "small",
-    srcs = [
-        "probabilistic_fusion_test.cc",
-    ],
-    data = [
-        "//modules/perception:perception_data",
-        "//modules/perception:perception_model",
-        "//modules/perception/conf:perception_config",
-    ],
-    deps = [
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
-        "@gtest//:gtest",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "probabilistic_fusion_test",
+#    size = "small",
+#    srcs = [
+#        "probabilistic_fusion_test.cc",
+#    ],
+#    data = [
+#        "//modules/perception:perception_data",
+#        "//modules/perception:perception_model",
+#        "//modules/perception/conf:perception_config",
+#    ],
+#    deps = [
+#        "//external:gflags",
+#        "//modules/common:log",
+#        "//modules/perception/lib/pcl_util",
+#        "//modules/perception/obstacle/fusion/probabilistic_fusion:perception_obstacle_fusion_probabilistic_fusion",
+#        "@gtest//:gtest",
+#        "@gtest//:main",
+#    ],
+#)
 
 cc_test(
     name = "pbf_motion_fusion_test",
