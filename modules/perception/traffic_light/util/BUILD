@@ -1,4 +1,4 @@
-# load("//tools:cpplint.bzl", "cpplint")
+load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,8 +11,8 @@ cc_library(
         "color_space.h",
     ],
     deps = [
+        "//modules/common:log",
     ],
 )
 
-# TODO(all): Adapt coding style.
-# cpplint()
+cpplint()
