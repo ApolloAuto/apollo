@@ -167,12 +167,11 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
     AINFO << "working camera with maximum focal length: "
           << kCameraIdToStr.at(kLongFocusIdx)
           << ", _last_pub_camera_id: " << last_pub_camera_id_;
-    // TODO(all): Unify language.
-    // 在缓存的 signals_num 中根据时间戳查找当前图像时间的灯数
+    // based on timestamp to search signal number from current image
     size_t current_signal_num = 0;
 
-    // 如果灯数为 0 ，那么默认发焦距最大的相机的图像
-    // 否则，判断上一次发的是不是也是最大焦距的图像
+    // if signal num = 0, use long image
+    // otherwise use previous long image
     if (camera_id == kLongFocusIdx &&
         // TODO(all): Add parentheses to avoid mix-use of '&&' and '||'.
         (current_signal_num == 0 ||
@@ -180,23 +179,21 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
              last_pub_camera_id_ != CameraId::UNKNOWN)) {
       (*image_lights).reset(new ImageLights);
       (*image_lights)->image = image;
-      // 距离查不到灯在一定时间范围以内，
-      // 找不到 pose 是由于查 /tf 降频了，不做标记
-      // 降低 debug 图像上 "No valid pose" 闪烁频率
+      // do not mark "No valid pose" for some period
+      // if it is caused by lower frequency of /tf
       (*image_lights)->is_pose_valid = (fabs(timestamp - last_no_signals_ts_) <
                                         no_signals_interval_seconds_);
       (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
       (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
       (*image_lights)->timestamp = timestamp;
       (*image_lights)->camera_id = camera_id;
-      // 使用查找到的灯数
       (*image_lights)->num_signals = current_signal_num;
 
       AINFO << "sync image with cached lights projection failed, "
             << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
             << " camera_id: " << kCameraIdToStr.at(camera_id);
 
-    } else {  // 其他 camera_id，直接返回，不发送图像
+    } else {  // for other camera_id，return without image
       AINFO << "sync image with cached lights projection failed, "
             << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
             << " camera_id: " << kCameraIdToStr.at(camera_id);
@@ -239,7 +236,7 @@ void TLPreprocessor::SelectImage(const CarPose &pose,
       continue;
     }
     bool ok = true;
-    // 找当前工作的焦距最小的相机，不进行边界检查
+    // find the short focus camera without range check
     if (cam_id != kShortFocusIdx) {
       for (const LightPtr &light : *(lights_on_image_array[cam_id])) {
         if (IsOnBorder(cv::Size(projection_image_cols_, projection_image_rows_),
@@ -312,7 +309,7 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
   // find close enough(by timestamp difference)
   // lights projection from back to front
   *sync_ok = false;
-  bool find_loc = false;  // 是否查到定位
+  bool find_loc = false;  // if pose is found
   auto cached_lights_ptr = cached_lights_.rbegin();
   for (; cached_lights_ptr != cached_lights_.rend(); ++cached_lights_ptr) {
     double light_ts = (*cached_lights_ptr)->timestamp;
@@ -324,7 +321,7 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
           (kCameraIdToStr.find(proj_cam_id) != kCameraIdToStr.end()
                ? kCameraIdToStr.at(proj_cam_id)
                : std::to_string(proj_cam_id));
-      // 找到对应时间的定位，但是相机 ID 不符
+      // found related pose but if camear ID doesn't match
       if (proj_cam_id != image_cam_id) {
         AWARN << "find appropriate localization, but camera_id not match"
               << ", cached projection's camera_id: " << proj_cam_id_str
@@ -395,7 +392,7 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
       *diff_image_pose_ts = image_ts - pose_ts;
       *diff_image_sys_ts = image_ts - system_ts;
     } else if (!find_loc) {
-      // 确实没找到定位才打 log
+      // if no pose found, log warning msg
       AWARN << "TLPreprocessor " << cached_array_str
             << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
             << ", cannot find close enough timestamp, " << cached_array_str
