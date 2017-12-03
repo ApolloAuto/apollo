@@ -33,33 +33,39 @@ const int32_t ClusterQualityInfo702::ID = 0x702;
 
 void ClusterQualityInfo702::Parse(const std::uint8_t* bytes, int32_t length,
                                   ContiRadar* conti_radar) const {
-  int size = conti_radar->contiobs_size();
-  auto conti_obs = conti_radar->mutable_contiobs(size - 1);
-  conti_obs->set_longitude_dist_rms(
-      LINEAR_RMS[longitude_dist_rms(bytes, length)]);
-  conti_obs->set_lateral_dist_rms(LINEAR_RMS[lateral_dist_rms(bytes, length)]);
-  conti_obs->set_longitude_vel_rms(
-      LINEAR_RMS[longitude_vel_rms(bytes, length)]);
-  conti_obs->set_lateral_vel_rms(LINEAR_RMS[lateral_vel_rms(bytes, length)]);
-  conti_obs->set_probexist(PROBOFEXIST[pdh0(bytes, length)]);
-  switch (invalid_state(bytes, length)) {
-    case 0x01:
-    case 0x02:
-    case 0x03:
-    case 0x06:
-    case 0x07:
-    case 0x0E:
-      conti_obs->set_probexist(PROBOFEXIST[0]);
-    default:
-      break;
-  }
-  switch (ambig_state(bytes, length)) {
-    case 0x00:
-    case 0x01:
-    case 0x02:
-      conti_obs->set_probexist(PROBOFEXIST[0]);
-    default:
-      break;
+  int id = target_id(bytes, length);
+  for (int i = 0; i < conti_radar->contiobs_size(); ++i) {
+    if (conti_radar->contiobs(i).obstacle_id() == id) {
+      auto conti_obs = conti_radar->mutable_contiobs(i);
+      conti_obs->set_longitude_dist_rms(
+          LINEAR_RMS[longitude_dist_rms(bytes, length)]);
+      conti_obs->set_lateral_dist_rms(
+          LINEAR_RMS[lateral_dist_rms(bytes, length)]);
+      conti_obs->set_longitude_vel_rms(
+          LINEAR_RMS[longitude_vel_rms(bytes, length)]);
+      conti_obs->set_lateral_vel_rms(
+          LINEAR_RMS[lateral_vel_rms(bytes, length)]);
+      conti_obs->set_probexist(PROBOFEXIST[pdh0(bytes, length)]);
+      switch (invalid_state(bytes, length)) {
+        case 0x01:
+        case 0x02:
+        case 0x03:
+        case 0x06:
+        case 0x07:
+        case 0x0E:
+          conti_obs->set_probexist(PROBOFEXIST[0]);
+        default:
+          break;
+      }
+      switch (ambig_state(bytes, length)) {
+        case 0x00:
+        case 0x01:
+        case 0x02:
+          conti_obs->set_probexist(PROBOFEXIST[0]);
+        default:
+          break;
+      }
+    }
   }
 }
 

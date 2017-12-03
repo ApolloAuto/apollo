@@ -21,6 +21,7 @@
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
+#include "modules/drivers/conti_radar/protocol/const_vars.h"
 
 namespace apollo {
 namespace drivers {
@@ -66,7 +67,7 @@ double ClusterGeneralInfo701::longitude_dist(const std::uint8_t* bytes,
   uint32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
-  double ret = static_cast<double>(x) * 0.2 - 500.0;
+  double ret = x * CLUSTER_DIST_RES + CLUSTER_DIST_LONG_MIN;
   return ret;
 }
 
@@ -79,7 +80,7 @@ double ClusterGeneralInfo701::lateral_dist(const std::uint8_t* bytes,
   uint32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
-  double ret = static_cast<double>(x) * 0.2 - 102.3;
+  double ret = x * CLUSTER_DIST_RES + CLUSTER_DIST_LAT_MIN;
   return ret;
 }
 
@@ -92,7 +93,7 @@ double ClusterGeneralInfo701::longitude_vel(const std::uint8_t* bytes,
   uint32_t t = t1.get_byte(6, 2);
   x <<= 2;
   x |= t;
-  double ret = static_cast<double>(x) * 0.25 - 128.0;
+  double ret = x * CLUSTER_VREL_RES + CLUSTER_VREL_LONG_MIN;
   return ret;
 }
 
@@ -105,7 +106,7 @@ double ClusterGeneralInfo701::lateral_vel(const std::uint8_t* bytes,
   uint32_t t = t1.get_byte(5, 3);
   x <<= 3;
   x |= t;
-  double ret = static_cast<double>(x) * 0.25 - 64.0;
+  double ret = x * CLUSTER_VREL_RES + CLUSTER_VREL_LAT_MIN;
   return ret;
 }
 
@@ -113,7 +114,7 @@ double ClusterGeneralInfo701::rcs(const std::uint8_t* bytes,
                                   int32_t length) const {
   Byte t0(bytes + 7);
   uint32_t x = t0.get_byte(0, 8);
-  double ret = static_cast<double>(x) * 0.5 - 64.0;
+  double ret = x * CLUSTER_RCS_RES + CLUSTER_RCS;
   return ret;
 }
 
