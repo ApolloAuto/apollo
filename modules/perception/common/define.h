@@ -17,11 +17,12 @@
 #ifndef MODULES_PERCEPTION_COMMON_DEFINE_H_
 #define MODULES_PERCEPTION_COMMON_DEFINE_H_
 
+#include <cmath>
+
 namespace apollo {
 namespace perception {
 
-const double PI = 3.1415926535898;
-const double kRadianToDegree = 57.29577951308232;
+constexpr double kRadianToDegree = 180.0 / M_PI;
 
 // Error code definition
 enum StatusCode {
@@ -33,7 +34,6 @@ enum StatusCode {
   // Fatal error, process will be terminated and fatal log will be printed.
   // Generated only when a fatal error occurs, such as config loading error.
   FATAL = 2,
-  TAIL = 3,
 };
 
 }  // namespace perception
