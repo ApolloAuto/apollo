@@ -35,27 +35,30 @@
  *********************************************************************/
 
 #include "modules/perception/traffic_light/util/color_space.h"
+
 #include <cassert>
 #include <cstdint>
+
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
 template <bool align>
-SIMD_INLINE void YuvSeperateAvx2(uint8_t *y, __m256i &y0, __m256i &y1,
-                                 __m256i &u0, __m256i &v0) {
+SIMD_INLINE void YuvSeperateAvx2(uint8_t *y, __m256i &y0,     // NOLINT
+                                 __m256i &y1,                 // NOLINT
+                                 __m256i &u0, __m256i &v0) {  // NOLINT
   __m256i yuv_m256[4];
 
   if (align) {
-    yuv_m256[0] = Load<true>((__m256i *)y);
-    yuv_m256[1] = Load<true>((__m256i *)y + 1);
-    yuv_m256[2] = Load<true>((__m256i *)y + 2);
-    yuv_m256[3] = Load<true>((__m256i *)y + 3);
+    yuv_m256[0] = Load<true>(reinterpret_cast<__m256i *>(y));
+    yuv_m256[1] = Load<true>(reinterpret_cast<__m256i *>(y) + 1);
+    yuv_m256[2] = Load<true>(reinterpret_cast<__m256i *>(y) + 2);
+    yuv_m256[3] = Load<true>(reinterpret_cast<__m256i *>(y) + 3);
   } else {
-    yuv_m256[0] = Load<false>((__m256i *)y);
-    yuv_m256[1] = Load<false>((__m256i *)y + 1);
-    yuv_m256[2] = Load<false>((__m256i *)y + 2);
-    yuv_m256[3] = Load<false>((__m256i *)y + 3);
+    yuv_m256[0] = Load<false>(reinterpret_cast<__m256i *>(y));
+    yuv_m256[1] = Load<false>(reinterpret_cast<__m256i *>(y) + 1);
+    yuv_m256[2] = Load<false>(reinterpret_cast<__m256i *>(y) + 2);
+    yuv_m256[3] = Load<false>(reinterpret_cast<__m256i *>(y) + 3);
   }
 
   y0 = _mm256_or_si256(_mm256_permute4x64_epi64(
@@ -89,9 +92,9 @@ void Yuv2rgbAvx2(__m256i y0, __m256i u0, __m256i v0, uint8_t *rgb) {
   __m256i g0 = YuvToGreen(y0, u0, v0);
   __m256i b0 = YuvToBlue(y0, u0);
 
-  Store<align>((__m256i *)rgb + 0, InterleaveBgr<0>(r0, g0, b0));
-  Store<align>((__m256i *)rgb + 1, InterleaveBgr<1>(r0, g0, b0));
-  Store<align>((__m256i *)rgb + 2, InterleaveBgr<2>(r0, g0, b0));
+  Store<align>((__m256i *)rgb + 0, InterleaveBgr<0>(r0, g0, b0));  // NOLINT
+  Store<align>((__m256i *)rgb + 1, InterleaveBgr<1>(r0, g0, b0));  // NOLINT
+  Store<align>((__m256i *)rgb + 2, InterleaveBgr<2>(r0, g0, b0));  // NOLINT
 }
 
 template <bool align>
