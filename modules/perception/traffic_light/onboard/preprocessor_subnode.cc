@@ -71,11 +71,11 @@ bool TLPreprocessorSubnode::InitInternal() {
 
   using common::adapter::AdapterManager;
   CHECK(AdapterManager::GetImageLong())
-  << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
+      << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
   AdapterManager::AddImageLongCallback(
       &TLPreprocessorSubnode::SubLongFocusCamera, this);
   CHECK(AdapterManager::GetImageShort())
-  << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
+      << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
   AdapterManager::AddImageShortCallback(
       &TLPreprocessorSubnode::SubShortFocusCamera, this);
   return true;
@@ -209,10 +209,10 @@ void TLPreprocessorSubnode::SubCameraImage(
   const double sync_image_latency =
       TimeUtil::GetCurrentTime() - before_sync_image_ts;
 
-  // CarOS Monitor 异常，图像时间与系统时间相差较大
+  // Monitor image time and system time difference
   int max_cached_lights_size = preprocessor_.max_cached_lights_size();
-  // tf 频率实际为 100Hz, 0.01 秒一帧，
-  // 一共缓存了 max_cached_image_lights_array_size * 0.005 时间的 tf 信息
+  // tf frequency is 100Hz, 0.01 sec per frame，
+  // cache frame num: max_cached_image_lights_array_size * 0.005 tf info
   const float tf_interval = 0.01;
   double image_sys_ts_diff_threshold =
       max_cached_lights_size * tf_interval;
@@ -238,17 +238,15 @@ void TLPreprocessorSubnode::SubCameraImage(
     return;
   }
 
-  // verify lights projection
-  // 根据图像时间戳再次查定位和灯，更新 data
+  // verify lights projection based on image time
   if (!VerifyLightsProjection(image_lights)) {
-    AINFO
-    << "TLPreprocessorSubnode verify_lights_projection on image failed, ts:"
-    << GLOG_TIMESTAMP(image->ts())
-    << ", camera_id: " << kCameraIdToStr.at(camera_id);
+    AINFO << "verify_lights_projection on image failed, ts:"
+          << GLOG_TIMESTAMP(image->ts())
+          << ", camera_id: " << kCameraIdToStr.at(camera_id);
     return;
   }
 
-  // 记录处理当前帧的时间
+  // record current frame timestamp
   last_proc_image_ts_ = sub_camera_image_start_ts;
 
   image_lights->preprocess_receive_timestamp = sub_camera_image_start_ts;
