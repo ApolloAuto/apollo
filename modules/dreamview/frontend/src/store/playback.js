@@ -1,14 +1,21 @@
-import {action, computed, observable} from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 export default class Playback {
 
-    DEFAULT_MS_PER_FRAME = 100;
-    msPerFrame = this.DEFAULT_MS_PER_FRAME;
+    FPS = 10; // frames per sec
+
+    msPerFrame = 100;
     jobId = null;
     mapId = null;
 
-    @observable numFrames = null;
-    @observable currentFrame = null;
+    // real frame number starts from 1
+    @observable numFrames = 0;
+    @observable requestedFrame = 0;
+    @observable retrievedFrame = 0;
+
+    @observable isPlaying = false;
+    @observable isSeeking = true;
+    @observable seekingFrame = 1;
 
     setMapId(mapId) {
         this.mapId = mapId;
@@ -18,56 +25,75 @@ export default class Playback {
         this.jobId = jobId;
     }
 
-    setPlayRate(rate) {
-       this.msPerFrame = this.DEFAULT_MS_PER_FRAME / rate;
+    setNumFrames(numFrames) {
+        this.numFrames = parseInt(numFrames);
     }
 
-    @action setNumFrames(numFrames) {
-        if (numFrames > 0) {
-            this.numFrames = numFrames;
-            this.currentFrame = 0;
+    setPlayRate(rate) {
+        if (typeof rate === 'number' && rate > 0) {
+            const defaultSpeed = (1 / this.FPS * 1000);
+            this.msPerFrame = defaultSpeed / rate;
         }
     }
 
-    @action resetCurrentFrame() {
-        this.currentFrame = 0;
-    }
-
-    @action updateCurrentFrameByPercentage(percentage) {
-        this.currentFrame = Math.floor(this.numFrames * percentage / 100.0);
-    }
-
-    @computed get percentage() {
-        return this.currentFrame/this.numFrames * 100;
-    }
-
-    @computed get totalTimeSec() {
-        const numTimeIntervals = this.numFrames - 1;
-        const totalTime = numTimeIntervals * this.DEFAULT_MS_PER_FRAME / 1000;
-        return totalTime.toFixed(2);
-    }
-
-    @computed get currentTimeSec() {
-        const numTimeIntervals = Math.max(0, this.currentFrame - 1);
-        const currentTime = numTimeIntervals * this.DEFAULT_MS_PER_FRAME / 1000;
-        return currentTime.toFixed(2);
-    }
-
-    @computed get replayComplete() {
-        return this.currentFrame >= this.numFrames;
-    }
-
     initialized() {
-        return this.numFrames !== null && this.numFrames !== 0 &&
-               this.jobId !== null && this.mapId !== null;
+        return this.numFrames && this.jobId !== null && this.mapId !== null;
     }
 
     hasNext() {
-        return this.initialized() && this.currentFrame < this.numFrames;
+        return this.initialized() && this.requestedFrame < this.numFrames;
     }
 
     @action next() {
-        this.currentFrame++;
-        return this.currentFrame;
+        this.requestedFrame++;
+        return this.requestedFrame;
+    }
+
+    @computed get currentFrame() {
+        return this.retrievedFrame;
+    }
+
+    @computed get replayComplete() {
+        return this.retrievedFrame >= this.numFrames;
+    }
+
+    // TODO: update fctn name
+    @action setPlayAction(status) {
+        this.isPlaying = status;
+    }
+
+    @action seekFrame(frame) {
+        if (frame > 0 && frame <= this.numFrames) {
+            this.seekingFrame = frame;
+            this.requestedFrame = frame - 1;
+            this.isSeeking = true;
+        }
+    }
+
+    @action resume() {
+        this.seekingFrame = this.requestedFrame + 1;
+        this.isSeeking = true;
+    }
+
+    @action syncRequestedToRetrieved() {
+        this.requestedFrame = this.retrievedFrame;
+    }
+
+    @action resetFrame() {
+        this.requestedFrame = 0;
+        this.retrievedFrame = 0;
+    }
+
+    @action shouldProcessFrame(world) {
+        if (world && world.sequenceNum) {
+            if ((this.isSeeking && this.seekingFrame === world.sequenceNum) ||
+                (!this.isSeeking && this.isPlaying)) {
+                this.retrievedFrame = world.sequenceNum;
+                this.isSeeking = false;
+                return true;
+            }
+        }
+
+        return false;
     }
 }
