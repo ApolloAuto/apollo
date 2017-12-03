@@ -93,13 +93,11 @@ bool PbfHmTrackObjectMatcher::Match(
     int track_ind = (*unassigned_fusion_tracks)[i];
     int track_ind_loc = track_ind_g2l[track_ind];
     (*track2measurements_dist)[track_ind] = association_mat[track_ind_loc][0];
-    int min_m_loc = 0;
     for (size_t j = 1; j < association_mat[track_ind_loc].size(); j++) {
       if ((*track2measurements_dist)[track_ind] >
           association_mat[track_ind_loc][j]) {
         (*track2measurements_dist)[track_ind] =
           association_mat[track_ind_loc][j];
-        min_m_loc = j;
       }
     }
   }

@@ -480,7 +480,8 @@ Eigen::Vector3f KalmanFilter::ComputeMeasuredAcceleration(
   Eigen::Vector3f history_measurement =
       history_measured_velocity_[history_index];
   double accumulated_time_diff = time_diff;
-  for (int i = history_index + 1; i < history_measured_velocity_.size(); ++i) {
+  for (size_t i = history_index + 1; i < history_measured_velocity_.size();
+       ++i) {
     accumulated_time_diff += history_time_diff_[i];
   }
   Eigen::Vector3f measured_acceleration =
@@ -495,7 +496,7 @@ void KalmanFilter::EvaluateOnlineCovariance() {
                                 s_measurement_cached_history_size_maximum_
                             ? history_measured_velocity_.size()
                             : s_measurement_cached_history_size_maximum_;
-  for (size_t i = 0; i < evaluate_window; ++i) {
+  for (int i = 0; i < evaluate_window; ++i) {
     int history_index = history_measured_velocity_.size() - i - 1;
     Eigen::Vector3d velocity_resisual = Eigen::Vector3d(5, 5, 0);
     if (history_index >= 0) {
