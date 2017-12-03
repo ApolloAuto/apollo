@@ -19,6 +19,7 @@
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/utils.h"
+
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -188,7 +189,7 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
       // 找不到 pose 是由于查 /tf 降频了，不做标记
       // 降低 debug 图像上 "No valid pose" 闪烁频率
       (*image_lights)->is_pose_valid = (fabs(timestamp - last_no_signals_ts_) <
-          no_signals_interval_seconds_);
+                                        no_signals_interval_seconds_);
       (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
       (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
       (*image_lights)->timestamp = timestamp;
@@ -319,8 +320,7 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
   *sync_ok = false;
   bool find_loc = false;  // 是否查到定位
   auto cached_lights_ptr = cached_lights_.rbegin();
-  for (; cached_lights_ptr != cached_lights_.rend();
-         ++cached_lights_ptr) {
+  for (; cached_lights_ptr != cached_lights_.rend(); ++cached_lights_ptr) {
     double light_ts = (*cached_lights_ptr)->timestamp;
     if (fabs(light_ts - image_ts) < sync_interval_seconds_) {
       find_loc = true;
@@ -361,8 +361,7 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
   if (!(*sync_ok) && cached_lights_.size() > 1) {
     if (fabs(image_ts - last_no_signals_ts_) < no_signals_interval_seconds_) {
       AINFO << "TLPreprocessor " << cached_array_str
-            << " sync failed, image ts: "
-            << GLOG_TIMESTAMP(image_ts)
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
             << " last_no_signals_ts: " << GLOG_TIMESTAMP(last_no_signals_ts_)
             << " (sync_time - last_no_signals_ts): "
             << GLOG_TIMESTAMP(image_ts - last_no_signals_ts_)
@@ -374,10 +373,9 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
       double pose_ts = cached_lights_.front()->timestamp;
       double system_ts = TimeUtil::GetCurrentTime();
       AWARN << "TLPreprocessor " << cached_array_str
-            << " sync failed, image ts: "
-            << GLOG_TIMESTAMP(image_ts)
-            << ", which is earlier than " << cached_array_str << ".front() ts: "
-            << GLOG_TIMESTAMP(pose_ts)
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << ", which is earlier than " << cached_array_str
+            << ".front() ts: " << GLOG_TIMESTAMP(pose_ts)
             << ", diff between image and pose ts: "
             << GLOG_TIMESTAMP(image_ts - pose_ts)
             << "; system ts: " << GLOG_TIMESTAMP(system_ts)
@@ -391,10 +389,9 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
       double pose_ts = cached_lights_.back()->timestamp;
       double system_ts = TimeUtil::GetCurrentTime();
       AWARN << "TLPreprocessor " << cached_array_str
-            << " sync failed, image ts: "
-            << GLOG_TIMESTAMP(image_ts)
-            << ", which is older than " << cached_array_str << ".back() ts: "
-            << GLOG_TIMESTAMP(pose_ts)
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << ", which is older than " << cached_array_str
+            << ".back() ts: " << GLOG_TIMESTAMP(pose_ts)
             << ", diff between image and pose ts: "
             << GLOG_TIMESTAMP(image_ts - pose_ts)
             << "; system ts: " << GLOG_TIMESTAMP(system_ts)
@@ -406,10 +403,9 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
     } else if (!find_loc) {
       // 确实没找到定位才打 log
       AWARN << "TLPreprocessor " << cached_array_str
-            << " sync failed, image ts: "
-            << GLOG_TIMESTAMP(image_ts)
-            << ", cannot find close enough timestamp, "
-            << cached_array_str << ".front() ts: "
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << ", cannot find close enough timestamp, " << cached_array_str
+            << ".front() ts: "
             << GLOG_TIMESTAMP(cached_lights_.front()->timestamp) << ", "
             << cached_array_str << ".back() ts: "
             << GLOG_TIMESTAMP(cached_lights_.back()->timestamp)
@@ -433,13 +429,9 @@ bool TLPreprocessor::IsOnBorder(const cv::Size size,
   return false;
 }
 
-int TLPreprocessor::GetMinFocalLenCameraId() {
-  return kShortFocusIdx;
-}
+int TLPreprocessor::GetMinFocalLenCameraId() { return kShortFocusIdx; }
 
-int TLPreprocessor::GetMaxFocalLenCameraId() {
-  return kLongFocusIdx;
-}
+int TLPreprocessor::GetMaxFocalLenCameraId() { return kLongFocusIdx; }
 
 REGISTER_PREPROCESSOR(TLPreprocessor);
 

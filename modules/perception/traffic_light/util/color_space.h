@@ -1,5 +1,4 @@
 /*********************************************************************
- *
  * Software License Agreement (BSD License)
  *
  *  Copyright (c) 2014, Robert Bosch LLC.
@@ -39,6 +38,7 @@
 #include <immintrin.h>
 #include <x86intrin.h>
 #include <cstdint>
+
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -49,14 +49,14 @@ void Yuyv2rgbAvx(unsigned char *YUV, unsigned char *RGB, int NumPixels);
 
 template <class T>
 SIMD_INLINE char GetChar(T value, size_t index) {
-  return ((char *)&value)[index];
+  return reinterpret_cast<char *>(&value)[index];
 }
 
-#define SIMD_CHAR_AS_LONGLONG(a) (((long long)a) & 0xFF)
+#define SIMD_CHAR_AS_LONGLONG(a) (((long long)a) & 0xFF)  // NOLINT
 
-#define SIMD_SHORT_AS_LONGLONG(a) (((long long)a) & 0xFFFF)
+#define SIMD_SHORT_AS_LONGLONG(a) (((long long)a) & 0xFFFF)  // NOLINT
 
-#define SIMD_INT_AS_LONGLONG(a) (((long long)a) & 0xFFFFFFFF)
+#define SIMD_INT_AS_LONGLONG(a) (((long long)a) & 0xFFFFFFFF)  // NOLINT
 
 #define SIMD_LL_SET1_EPI8(a)                                                \
   SIMD_CHAR_AS_LONGLONG(a) | (SIMD_CHAR_AS_LONGLONG(a) << 8) |              \
@@ -316,11 +316,16 @@ const int YUV_TO_BGR_ROUND_TERM = 0;  // 1 << (YUV_TO_BGR_AVERAGING_SHIFT);
 // 0.5);
 // const int V_TO_RED_WEIGHT = int(1.4065*(1 << YUV_TO_BGR_AVERAGING_SHIFT) +
 // 0.5);
-const int Y_TO_RGB_WEIGHT = int(((1 << YUV_TO_BGR_AVERAGING_SHIFT)));
-const int U_TO_BLUE_WEIGHT = int(2.041 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
-const int U_TO_GREEN_WEIGHT = -int(0.3455 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
-const int V_TO_GREEN_WEIGHT = -int(0.7169 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
-const int V_TO_RED_WEIGHT = int(1.4065 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
+const int Y_TO_RGB_WEIGHT =
+    static_cast<int>(((1 << YUV_TO_BGR_AVERAGING_SHIFT)));
+const int U_TO_BLUE_WEIGHT =
+    static_cast<int>(2.041 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
+const int U_TO_GREEN_WEIGHT =
+    -static_cast<int>(0.3455 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
+const int V_TO_GREEN_WEIGHT =
+    -static_cast<int>(0.7169 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
+const int V_TO_RED_WEIGHT =
+    static_cast<int>(1.4065 * (1 << YUV_TO_BGR_AVERAGING_SHIFT));
 // const int V_TO_RED_WEIGHT = int(1*(1 << YUV_TO_BGR_AVERAGING_SHIFT));
 
 const __m256i K16_YRGB_RT =
@@ -344,7 +349,7 @@ SIMD_INLINE __m256i Load<true>(const __m256i *p) {
 }
 
 SIMD_INLINE void *AlignLo(const void *ptr, size_t align) {
-  return (void *)(((size_t)ptr) & ~(align - 1));
+  return reinterpret_cast<void *>(((size_t)ptr) & ~(align - 1));
 }
 
 SIMD_INLINE bool Aligned(const void *ptr, size_t align = sizeof(__m256)) {
