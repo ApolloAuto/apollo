@@ -208,7 +208,7 @@ bash docker/scripts/release_commit.sh
 运行以下命令：
 ```
 cd $APOLLO_HOME
-bash docker/scripts/release_start.sh local
+bash docker/scripts/release_start.sh local_release
 ```
 当Docker启动时，它创建一个端口映射，将Docker内部端口8887映射到主机端口8887.然后，您可以在主机浏览器中访问HMI Web服务：
 
