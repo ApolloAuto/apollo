@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
-
 #include <image_transport/image_transport.h>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -23,7 +22,7 @@
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
-
+#include "modules/perception/common/perception_gflags.h"
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -71,11 +70,11 @@ bool TLPreprocessorSubnode::InitInternal() {
 
   using common::adapter::AdapterManager;
   CHECK(AdapterManager::GetImageLong())
-      << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
+  << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
   AdapterManager::AddImageLongCallback(
       &TLPreprocessorSubnode::SubLongFocusCamera, this);
   CHECK(AdapterManager::GetImageShort())
-      << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
+  << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
   AdapterManager::AddImageShortCallback(
       &TLPreprocessorSubnode::SubShortFocusCamera, this);
   return true;
@@ -171,9 +170,11 @@ void TLPreprocessorSubnode::SubCameraImage(
   cv::Mat cv_mat;
   double timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
-  // TODO(ghdawn): for debug , delete later
-  image->GenerateMat();
-  cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+  if (FLAGS_output_raw_img) {
+    image->GenerateMat();
+    cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+  }
+
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
@@ -209,10 +210,10 @@ void TLPreprocessorSubnode::SubCameraImage(
   const double sync_image_latency =
       TimeUtil::GetCurrentTime() - before_sync_image_ts;
 
-  // Monitor image time and system time difference
+  // CarOS Monitor 异常，图像时间与系统时间相差较大
   int max_cached_lights_size = preprocessor_.max_cached_lights_size();
-  // tf frequency is 100Hz, 0.01 sec per frame，
-  // cache frame num: max_cached_image_lights_array_size * 0.005 tf info
+  // tf 频率实际为 100Hz, 0.01 秒一帧，
+  // 一共缓存了 max_cached_image_lights_array_size * 0.005 时间的 tf 信息
   const float tf_interval = 0.01;
   double image_sys_ts_diff_threshold =
       max_cached_lights_size * tf_interval;
@@ -238,15 +239,17 @@ void TLPreprocessorSubnode::SubCameraImage(
     return;
   }
 
-  // verify lights projection based on image time
+  // verify lights projection
+  // 根据图像时间戳再次查定位和灯，更新 data
   if (!VerifyLightsProjection(image_lights)) {
-    AINFO << "verify_lights_projection on image failed, ts:"
-          << GLOG_TIMESTAMP(image->ts())
-          << ", camera_id: " << kCameraIdToStr.at(camera_id);
+    AINFO
+        << "TLPreprocessorSubnode verify_lights_projection on image failed, ts:"
+        << GLOG_TIMESTAMP(image->ts())
+        << ", camera_id: " << kCameraIdToStr.at(camera_id);
     return;
   }
 
-  // record current frame timestamp
+  // 记录处理当前帧的时间
   last_proc_image_ts_ = sub_camera_image_start_ts;
 
   image_lights->preprocess_receive_timestamp = sub_camera_image_start_ts;
