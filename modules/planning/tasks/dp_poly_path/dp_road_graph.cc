@@ -169,8 +169,10 @@ bool DPRoadGraph::SamplePathWaypoints(
   constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
   CHECK(points != nullptr);
 
+  const double kAdditioalPathLength = 20.0;
   const double total_length =
-      std::fmin(init_sl_point_.s() + speed_data_.speed_vector().back().s(),
+      std::fmin(init_sl_point_.s() + speed_data_.speed_vector().back().s() +
+                    kAdditioalPathLength,
                 reference_line_.Length());
 
   double level_distance = 0.0;
