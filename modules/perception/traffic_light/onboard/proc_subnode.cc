@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 #include <std_msgs/String.h>
+#include <algorithm>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode_helper.h"

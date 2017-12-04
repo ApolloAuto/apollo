@@ -134,7 +134,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
     last_no_signals_ts_ = timestamp;
   }
   image_lights->num_signals = signals.size();
-  AINFO << "cached info with "<<image_lights->num_signals<<" signals";
+  AINFO << "cached info with " << image_lights->num_signals << " signals";
   cached_lights_.push_back(image_lights);
 
   return true;
@@ -184,15 +184,15 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
     if (camera_id == kLongFocusIdx &&
         // TODO(all): Add parentheses to avoid mix-use of '&&' and '||'.
         (current_signal_num == 0 ||
-         camera_id == last_pub_camera_id_ &&
-             last_pub_camera_id_ != CameraId::UNKNOWN)) {
+            camera_id == last_pub_camera_id_ &&
+                last_pub_camera_id_ != CameraId::UNKNOWN)) {
       (*image_lights).reset(new ImageLights);
       (*image_lights)->image = image;
       // 距离查不到灯在一定时间范围以内，
       // 找不到 pose 是由于查 /tf 降频了，不做标记
       // 降低 debug 图像上 "No valid pose" 闪烁频率
       (*image_lights)->is_pose_valid = (fabs(timestamp - last_no_signals_ts_) <
-                                        no_signals_interval_seconds_);
+          no_signals_interval_seconds_);
       (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
       (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
       (*image_lights)->timestamp = timestamp;
