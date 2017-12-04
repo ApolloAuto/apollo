@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
 
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
+#include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
@@ -26,6 +27,20 @@ class ContiRadarUtil {
  public:
   static bool IsFp(const ContiRadarObs &contiobs, const ContiParams &params,
                    const int delay_frames, const int tracking_times);
+
+  static bool IsConflict(const Eigen::Vector3f& main_velocity,
+          const Eigen::Vector3f& velocity) {
+    Eigen::Vector3f vector_temp1 = main_velocity;
+    Eigen::Vector3f vector_temp2 = velocity;
+    if (vector_temp1.head(2).norm() > 1e-5 && vector_temp2.head(2).norm() > 1e-5) {
+        double theta = VectorTheta2dXy(vector_temp1, vector_temp2);
+        if ((theta > 1.0 / 4.0 * M_PI && theta < 3.0 / 4.0 * M_PI) ||
+            (theta > -3.0 / 4.0 * M_PI && theta < -1.0 / 4.0 * M_PI)) {
+          return true;
+        }
+    }
+    return false;
+  }
 };
 
 }  // namespace perception
