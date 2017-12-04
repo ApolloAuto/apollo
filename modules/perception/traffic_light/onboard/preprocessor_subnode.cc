@@ -23,6 +23,7 @@
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -171,9 +172,10 @@ void TLPreprocessorSubnode::SubCameraImage(
   cv::Mat cv_mat;
   double timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
-  // TODO(ghdawn): for debug , delete later
-  image->GenerateMat();
-  cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+  if (FLAGS_output_raw_img) {
+    image->GenerateMat();
+    cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+  }
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
