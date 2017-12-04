@@ -263,7 +263,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
       (end_s - start_s) / qp_spline_path_config_.max_constraint_interval() + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1,
                               &evaluated_s_);
-  return true;
+  return (knots_.size() > 1) && !evaluated_s_.empty();
 }
 
 bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
