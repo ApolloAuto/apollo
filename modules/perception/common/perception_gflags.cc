@@ -68,3 +68,5 @@ DEFINE_string(onboard_fusion, "ProbabilisticFusion",
               "fusion name which enabled onboard");
 
 DEFINE_double(query_signal_range, 100.0, "max distance to front signals");
+DEFINE_bool(output_raw_img, false, "write raw image to disk");
+DEFINE_bool(output_debug_img, false, "write debug image to disk");
