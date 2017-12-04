@@ -26,6 +26,8 @@
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/condition_filter.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/util/lattice_util.h"
@@ -78,6 +80,7 @@ PlanningTarget BehaviorDecider::Analyze(
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
+    const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_reference_line) {
   CHECK(frame != nullptr);
   // Only handles one reference line
@@ -106,16 +109,39 @@ PlanningTarget BehaviorDecider::Analyze(
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
-  LatticeSamplingConfig* lattice_sampling_config =
-      ret.mutable_lattice_sampling_config();
-  LonSampleConfig* lon_sample_config =
-      lattice_sampling_config->mutable_lon_sample_config();
-  LatSampleConfig* lat_sample_config =
-      lattice_sampling_config->mutable_lat_sample_config();
-  // lon_sample_config->mutable_lon_end_condition()->set_s(0.0);
-  lon_sample_config->mutable_lon_end_condition()->set_ds(
-      FLAGS_default_cruise_speed);
-  lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
+
+  // TODO(kechxu) move speed_limit somewhere else as a parameter
+  double speed_limit = 45.0;
+
+  PathTimeNeighborhood path_time_neighborhood(
+                           frame, lon_init_state,
+                           reference_line,
+                           discretized_reference_line);
+
+  ConditionFilter condition_filter(lon_init_state, speed_limit,
+                                   path_time_neighborhood);
+
+  std::vector<SampleBound> sample_bounds =
+      condition_filter.QuerySampleBounds();
+
+  if (sample_bounds.empty()) {
+    LatticeSamplingConfig* lattice_sampling_config =
+        ret.mutable_lattice_sampling_config();
+    LonSampleConfig* lon_sample_config =
+        lattice_sampling_config->mutable_lon_sample_config();
+    LatSampleConfig* lat_sample_config =
+        lattice_sampling_config->mutable_lat_sample_config();
+    // lon_sample_config->mutable_lon_end_condition()->set_s(0.0);
+    lon_sample_config->mutable_lon_end_condition()->set_ds(
+        FLAGS_default_cruise_speed);
+    lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
+    ret.set_decision_type(PlanningTarget::CRUISE);
+    return ret;
+  }
+
+  for (const auto& sample_bound : sample_bounds) {
+    ret.add_sample_bound()->CopyFrom(sample_bound);
+  }
   ret.set_decision_type(PlanningTarget::CRUISE);
   return ret;
 }

@@ -21,14 +21,14 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHVAIOR_DECIDER_H
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
 
+#include <vector>
+
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
-
-#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -47,6 +47,7 @@ class BehaviorDecider {
   PlanningTarget Analyze(
       Frame* frame, const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
+      const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
