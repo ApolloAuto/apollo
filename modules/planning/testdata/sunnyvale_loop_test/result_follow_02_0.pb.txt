@@ -1335,11 +1335,48 @@ trajectory_point {
 }
 decision {
   main_decision {
-    cruise {
+    stop {
+      reason_code: STOP_REASON_OBSTACLE
+      reason: "stop by 2339_0"
+      stop_point {
+        x: 587702.9788585935
+        y: 4141386.1233842429
+      }
+      stop_heading: -1.8147916723726503
       change_lane_type: FORWARD
     }
   }
   object_decision {
+    decision {
+      id: "2271_0"
+      perception_id: 2271
+      object_decision {
+        yield {
+          distance_s: -10
+          fence_point {
+            x: 587703.52995660272
+            y: 4141388.3249484692
+            z: 0
+          }
+          fence_heading: -1.8174247977699645
+        }
+      }
+    }
+    decision {
+      id: "2339_0"
+      perception_id: 2339
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -10
+          stop_point {
+            x: 587702.9788585935
+            y: 4141386.1233842429
+          }
+          stop_heading: -1.8147916723726503
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE
