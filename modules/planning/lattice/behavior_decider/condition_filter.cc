@@ -57,7 +57,6 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
   std::vector<CriticalPointPair> path_intervals =
       QueryPathTimeObstacleIntervals(t);
   double s_prev = feasible_s_lower;
-  double v_prev = feasible_v_lower;
 
   std::vector<SampleBound> sample_bounds;
   for (const auto& path_interval : path_intervals) {
@@ -73,8 +72,11 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         sample_bound.set_t(t);
         sample_bound.set_s_upper(path_interval.first.s());
         sample_bound.set_s_lower(s_prev);
-        sample_bound.set_v_upper(path_interval.first.v());
-        sample_bound.set_v_lower(std::min(v_prev, path_interval.first.v()));
+
+        //TODO (zhangyajia): fix this!
+        sample_bound.set_v_upper(feasible_v_upper);
+        sample_bound.set_v_lower(feasible_v_lower);
+
         sample_bounds.push_back(std::move(sample_bound));
       } else {
         SampleBound sample_bound;
@@ -82,14 +84,15 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         sample_bound.set_s_upper(feasible_s_upper);
         sample_bound.set_s_lower(s_prev);
         sample_bound.set_v_upper(feasible_v_upper);
-        sample_bound.set_v_lower(std::min(v_prev, feasible_v_upper));
+
+        //TODO (zhangyajia): fix this!
+        sample_bound.set_v_lower(feasible_v_lower);
         sample_bounds.push_back(std::move(sample_bound));
         break;
       }
     }
     if (s_prev < path_interval.second.s()) {
       s_prev = path_interval.second.s();
-      v_prev = path_interval.second.v();
     }
   }
   return sample_bounds;
@@ -106,24 +109,18 @@ CriticalPointPair ConditionFilter::QueryPathTimeObstacleIntervals(
       path_time_obstacle.upper_right().s(),
       path_time_obstacle.upper_right().t(), t);
 
-  double v_upper = std::max(path_time_obstacle.upper_left().v(),
-      path_time_obstacle.upper_right().v());
-
   double s_lower = apollo::common::math::lerp(
       path_time_obstacle.bottom_left().s(),
       path_time_obstacle.bottom_left().t(),
       path_time_obstacle.bottom_right().s(),
       path_time_obstacle.bottom_right().t(), t);
 
-  double v_lower = std::min(path_time_obstacle.bottom_left().v(),
-      path_time_obstacle.bottom_right().v());
-
   block_interval.first.set_t(t);
   block_interval.first.set_s(s_lower);
-  block_interval.first.set_v(v_lower);
+  block_interval.first.set_obstacle_id(path_time_obstacle.obstacle_id());
   block_interval.second.set_t(t);
   block_interval.second.set_s(s_upper);
-  block_interval.second.set_v(v_upper);
+  block_interval.second.set_obstacle_id(path_time_obstacle.obstacle_id());
 
   return block_interval;
 }
