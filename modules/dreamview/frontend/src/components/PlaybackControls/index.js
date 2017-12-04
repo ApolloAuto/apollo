@@ -44,13 +44,9 @@ export default class PlaybackControls extends React.Component {
 
         switch (this.nextAction) {
             case 'play':
-                playback.resume();
                 WS.startPlayback(playback.msPerFrame);
                 break;
             case 'pause':
-                // set requested frame to where the frame has been retrieved previously,
-                // so resuming playback can request the next frame correctly.
-                playback.syncRequestedToRetrieved();
                 WS.pausePlayback();
                 break;
             case 'replay':
@@ -66,6 +62,8 @@ export default class PlaybackControls extends React.Component {
         playback.seekFrame(frame);
         if (!this.state.isPlaying) {
             WS.requestSimulationWorld(playback.jobId, frame);
+        } else if (!WS.requestTimer) {
+            WS.startPlayback(playback.msPerFrame);
         }
     }
 
