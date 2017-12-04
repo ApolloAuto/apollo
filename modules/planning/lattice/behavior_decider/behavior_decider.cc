@@ -47,34 +47,18 @@ PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<ReferenceLine>& candidate_reference_lines) {
-  PlanningTarget ret;
   CHECK(frame != nullptr);
-  // Only handles one reference line
   CHECK_GT(candidate_reference_lines.size(), 0);
+
+  // Only handles one reference line
   const ReferenceLine& ref_line = candidate_reference_lines[0];
   const std::vector<ReferencePoint>& ref_points = ref_line.reference_points();
 
-  std::vector<common::PathPoint> discretized_ref_points =
-      apollo::planning::ToDiscretizedReferenceLine(ref_points);
+  std::vector<common::PathPoint> discretized_ref_line =
+      ToDiscretizedReferenceLine(ref_points);
 
-  for (size_t i = 0; i < discretized_ref_points.size(); ++i) {
-    ret.mutable_discretized_reference_line()
-        ->add_discretized_reference_line_point()
-        ->CopyFrom(discretized_ref_points[i]);
-  }
-
-  LatticeSamplingConfig* lattice_sampling_config =
-      ret.mutable_lattice_sampling_config();
-  LonSampleConfig* lon_sample_config =
-      lattice_sampling_config->mutable_lon_sample_config();
-  LatSampleConfig* lat_sample_config =
-      lattice_sampling_config->mutable_lat_sample_config();
-  // lon_sample_config->mutable_lon_end_condition()->set_s(0.0);
-  lon_sample_config->mutable_lon_end_condition()->set_ds(
-      FLAGS_default_cruise_speed);
-  lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
-  ret.set_decision_type(PlanningTarget::CRUISE);
-  return ret;
+  return Analyze(frame, init_planning_point, lon_init_state,
+      ref_line, discretized_ref_line);
 }
 
 PlanningTarget BehaviorDecider::Analyze(
