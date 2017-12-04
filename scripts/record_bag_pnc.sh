@@ -53,7 +53,7 @@ function start() {
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup rosbag record -b 2048  \
+    nohup rosbag record --split --duration=10m -b 2048  \
         /apollo/sensor/gnss/gnss_status \
         /apollo/sensor/gnss/odometry \
         /apollo/sensor/gnss/ins_stat \
