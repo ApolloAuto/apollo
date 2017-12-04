@@ -41,14 +41,14 @@ int ScenarioManager::ComputeWorldDecision(
     for (auto scenario : level_scenario) {
       scenario->Reset();
 
-      if (not scenario->Init()) {
+      if (!scenario->Init()) {
         AINFO << "scenario[" << scenario->Name() << "] init failed";
       } else {
         AINFO << "scenario[" << scenario->Name() << "] init success";
       }
 
       // check if exists
-      if (not scenario->ScenarioExist()) {
+      if (!scenario->ScenarioExist()) {
         AINFO << "scenario[" << scenario->Name() << "] not exists";
       } else {
         AINFO << "scenario[" << scenario->Name() << "] does exists";
