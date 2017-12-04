@@ -73,8 +73,8 @@ bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string &device_id,
                                          string *key) {
   char temp[64];
   memset(temp, '\0', sizeof(temp));
-  int ret = snprintf(temp, sizeof(temp), "%d",
-                     static_cast<int>(stamp * FLAGS_stamp_enlarge_factor));
+  int ret = snprintf(temp, sizeof(temp), "%ld",
+                     static_cast<int64_t >(stamp * FLAGS_stamp_enlarge_factor));
   if (ret < 0) {
     AERROR << "Encounter an output error.";
     return false;
