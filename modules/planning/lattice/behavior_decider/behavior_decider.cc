@@ -66,12 +66,11 @@ PlanningTarget BehaviorDecider::Analyze(
     const std::array<double, 3>& lon_init_state,
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_reference_line) {
+
   CHECK(frame != nullptr);
-  // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
   std::vector<PlanningTarget> scenario_decisions;
-  // std::vector<PlanningTarget*>* const decisions
   if (0 !=
       ScenarioManager::instance()->ComputeWorldDecision(
           frame, init_planning_point, lon_init_state,
@@ -80,7 +79,6 @@ PlanningTarget BehaviorDecider::Analyze(
   }
 
   PlanningTarget ret;
-
   if (StopDecisionNearDestination(frame, lon_init_state,
                                   discretized_reference_line, &ret)) {
     AINFO << "STOP decision when near the routing end.";
@@ -94,13 +92,8 @@ PlanningTarget BehaviorDecider::Analyze(
         ->CopyFrom(reference_point);
   }
 
-  // TODO(kechxu) move speed_limit somewhere else as a parameter
-  double speed_limit = 45.0;
-
-  PathTimeNeighborhood path_time_neighborhood(
-                           frame, lon_init_state,
-                           reference_line,
-                           discretized_reference_line);
+  PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
+      reference_line, discretized_reference_line);
 
   ConditionFilter condition_filter(lon_init_state, speed_limit,
                                    path_time_neighborhood);
