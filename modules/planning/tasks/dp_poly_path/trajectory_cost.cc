@@ -75,15 +75,13 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
                                          const double start_s,
                                          const double end_s) const {
   double path_cost = 0.0;
-  double path_s = 0.0;
-  while (path_s < (end_s - start_s)) {
+  for (double path_s = 0.0; path_s < (end_s - start_s);
+       path_s += config_.path_resolution()) {
     const double l = std::fabs(curve.Evaluate(0, path_s));
     path_cost += l * config_.path_l_cost();
 
     const double dl = std::fabs(curve.Evaluate(1, path_s));
     path_cost += dl * config_.path_dl_cost();
-
-    path_s += config_.path_resolution();
   }
   return path_cost;
 }
@@ -92,33 +90,20 @@ double TrajectoryCost::CalculateObstacleCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
     const double end_s) const {
   double obstacle_cost = 0.0;
-  double time_stamp = 0.0;
+  constexpr double kStepS = 2.0;
 
-  for (size_t index = 0; index < num_of_time_stamps_;
-       ++index, time_stamp += config_.eval_time_interval()) {
-    common::SpeedPoint speed_point;
-    heuristic_speed_data_.EvaluateByTime(time_stamp, &speed_point);
-    if (speed_point.s() < start_s - init_sl_point_.s()) {
-      continue;
-    }
-    if (speed_point.s() > end_s - init_sl_point_.s()) {
-      break;
-    }
-
-    const double s = init_sl_point_.s() + speed_point.s() - start_s;
+  for (double curr_s = start_s; curr_s <= end_s; curr_s += kStepS) {
+    const double s = curr_s - start_s;  // spline curve s
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
-    common::SLPoint sl;
-    sl.set_s(init_sl_point_.s() + speed_point.s());
+    common::SLPoint sl;  // ego vehicle sl point
+    sl.set_s(curr_s);
     sl.set_l(l);
-
-    Vec2d ego_xy_point;
+    Vec2d ego_xy_point;  // ego vehicle xy point
     reference_line_->SLToXY(sl, &ego_xy_point);
 
-    ReferencePoint reference_point = reference_line_->GetReferencePoint(
-        init_sl_point_.s() + speed_point.s());
-
+    ReferencePoint reference_point = reference_line_->GetReferencePoint(curr_s);
     const double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
     const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
     const double theta =
@@ -126,7 +111,7 @@ double TrajectoryCost::CalculateObstacleCost(
     const Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
                            vehicle_param_.width()};
     for (const auto &obstacle_trajectory : obstacle_boxes_) {
-      auto &obstacle_box = obstacle_trajectory.at(index);
+      auto &obstacle_box = obstacle_trajectory.back();
       // Simple version: calculate obstacle cost by distance
       const double distance = obstacle_box.DistanceTo(ego_box);
       if (distance > config_.obstacle_ignore_distance()) {
