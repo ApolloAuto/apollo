@@ -54,16 +54,12 @@ function start() {
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record -b 2048  \
-        /apollo/sensor/camera/traffic/image_short \
-        /apollo/sensor/camera/traffic/image_long \
-        /apollo/sensor/conti_radar \
-        /apollo/sensor/delphi_esr \
         /apollo/sensor/gnss/gnss_status \
         /apollo/sensor/gnss/odometry \
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/gnss/corrected_imu \
         /apollo/sensor/mobileye \
-        /apollo/sensor/velodyne64/compensator/PointCloud2 \
+        /apollo/sensor/delphi_esr \
         /apollo/canbus/chassis \
         /apollo/canbus/chassis_detail \
         /apollo/control \
@@ -75,8 +71,6 @@ function start() {
         /apollo/routing_request \
         /apollo/routing_response \
         /apollo/localization/pose \
-        /tf \
-        /tf_static \
         /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
 }
