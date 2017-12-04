@@ -254,7 +254,7 @@ bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
   obj_value = 0.0;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
-    double delta_s = spiral_curve.param_length();
+    double delta_s = spiral_curve.ParamLength();
     double s_segment = delta_s / num_of_internal_points_;
 
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
@@ -280,7 +280,7 @@ bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
     std::size_t index1 = (i + 1) * 5;
 
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
-    double delta_s = spiral_curve.param_length();
+    double delta_s = spiral_curve.ParamLength();
     double s_segment = delta_s / num_of_internal_points_;
 
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
@@ -330,7 +330,7 @@ bool SpiralProblemInterface::eval_g(int n, const double* x, bool new_x, int m,
     std::size_t index1 = (i + 1) * 5;
 
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
-    double delta_s = spiral_curve.param_length();
+    double delta_s = spiral_curve.ParamLength();
 
     double x_diff = x[index1 + 3] - x[index0 + 3] -
                     spiral_curve.ComputeCartesianDeviationX<N>(delta_s);
@@ -486,7 +486,7 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
       std::size_t index1 = (i + 1) * 5;
 
       const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
-      double delta_s = spiral_curve.param_length();
+      double delta_s = spiral_curve.ParamLength();
 
       double x_diff = x[index1 + 3] - x[index0 + 3] -
                       spiral_curve.ComputeCartesianDeviationX<N>(delta_s);

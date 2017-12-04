@@ -37,12 +37,12 @@ class Curve1d {
   virtual double Evaluate(const std::uint32_t order,
                           const double param) const = 0;
 
-  virtual double param_length() const = 0;
+  virtual double ParamLength() const = 0;
 
-  virtual std::string to_string() const = 0;
+  virtual std::string ToString() const = 0;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_MATH_CURVE1D_CURVE1D_H_ */
+#endif  // MODULES_PLANNING_MATH_CURVE1D_CURVE1D_H_
