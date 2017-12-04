@@ -247,6 +247,7 @@ void TLPreprocessorSubnode::SubCameraImage(
     return;
   }
 
+  // record current frame timestamp
   last_proc_image_ts_ = sub_camera_image_start_ts;
 
   image_lights->preprocess_receive_timestamp = sub_camera_image_start_ts;
