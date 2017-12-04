@@ -66,9 +66,14 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     Eigen::Matrix<double, 3, 1> velocity_r;
     Eigen::Matrix<double, 3, 1> velocity_w;
     velocity_r << raw_obstacles.contiobs(i).longitude_vel(),
-        raw_obstacles.contiobs(i).lateral_vel(), 0.0;
+                  raw_obstacles.contiobs(i).lateral_vel(), 
+                  0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
+    Eigen::Vector3f ref_velocity(main_velocity(0), main_velocity(1), 0.0);
+    if (ContiRadarUtil::IsConflict(ref_velocity, velocity_w.cast<float>())) {
+        object_ptr->is_background = true;
+    }
     //  calculate the absolute velodity
     object_ptr->velocity(0) = velocity_w[0] + main_velocity(0);
     object_ptr->velocity(1) = velocity_w[1] + main_velocity(1);
@@ -77,11 +82,6 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     object_ptr->length = 1.0;
     object_ptr->width = 1.0;
     object_ptr->height = 1.0;
-    //  int cls = raw_obstacles.contiobs(i).obstacle_class();
-    //  if (cls == CONTI_CAR) {
-    //    object_ptr->length = raw_obstacles.contiobs(i).length();
-    //    object_ptr->width = raw_obstacles.contiobs(i).width();
-    //  }
     object_ptr->type = UNKNOWN;
 
     Eigen::Matrix3d dist_rms;
