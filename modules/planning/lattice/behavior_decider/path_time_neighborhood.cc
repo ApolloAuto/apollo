@@ -48,8 +48,6 @@ void PathTimeNeighborhood::SetupObstacles(
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
   const auto& obstacles = frame->obstacles();
-  // auto discretized_ref_points = ToDiscretizedReferenceLine(
-  //     reference_line.reference_points());
 
   for (const Obstacle* obstacle : obstacles) {
     if (obstacle->Trajectory().trajectory_point_size() == 0) {
@@ -109,31 +107,31 @@ void PathTimeNeighborhood::SetupObstacles(
     relative_time += trajectory_time_resolution;
   }
 
-  for (auto& critical_condition : path_time_obstacle_map_) {
-    double s_upper = std::max(critical_condition.second.bottom_right().s(),
-        critical_condition.second.upper_right().s());
+  for (auto& path_time_obstacle : path_time_obstacle_map_) {
+    double s_upper = std::max(path_time_obstacle.second.bottom_right().s(),
+        path_time_obstacle.second.upper_right().s());
 
-    double s_lower = std::min(critical_condition.second.bottom_left().s(),
-        critical_condition.second.upper_left().s());
+    double s_lower = std::min(path_time_obstacle.second.bottom_left().s(),
+        path_time_obstacle.second.upper_left().s());
 
-    critical_condition.second.set_path_lower(s_lower);
+    path_time_obstacle.second.set_path_lower(s_lower);
 
-    critical_condition.second.set_path_upper(s_upper);
+    path_time_obstacle.second.set_path_upper(s_upper);
 
-    double t_upper = std::max(critical_condition.second.bottom_right().t(),
-        critical_condition.second.upper_right().t());
+    double t_upper = std::max(path_time_obstacle.second.bottom_right().t(),
+        path_time_obstacle.second.upper_right().t());
 
-    double t_lower = std::min(critical_condition.second.bottom_left().t(),
-        critical_condition.second.upper_left().t());
+    double t_lower = std::min(path_time_obstacle.second.bottom_left().t(),
+        path_time_obstacle.second.upper_left().t());
 
-    critical_condition.second.set_time_lower(t_lower);
+    path_time_obstacle.second.set_time_lower(t_lower);
 
-    critical_condition.second.set_time_upper(t_upper);
+    path_time_obstacle.second.set_time_upper(t_upper);
   }
 }
 
 void PathTimeNeighborhood::SetCriticalPoint(const double t, const double s,
-    const double v, CriticalPoint* critical_point) {
+    const double v, PathTimePoint* critical_point) {
   critical_point->set_t(t);
   critical_point->set_s(s);
   critical_point->set_v(v);

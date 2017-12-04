@@ -24,7 +24,7 @@
 namespace apollo {
 namespace planning {
 
-using CriticalPointPair = std::pair<CriticalPoint, CriticalPoint>;
+using CriticalPointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
@@ -155,9 +155,9 @@ void ConditionFilter::Init(const PathTimeNeighborhood& path_time_neighborhood) {
 
 std::set<double> ConditionFilter::CriticalTimeStamps() const {
   std::set<double> critical_timestamps;
-  for (const auto& critical_condition : path_time_obstacles_) {
-    double t_start = critical_condition.bottom_left().t();
-    double t_end = critical_condition.upper_right().t();
+  for (const auto& path_time_obstacle : path_time_obstacles_) {
+    double t_start = path_time_obstacle.bottom_left().t();
+    double t_end = path_time_obstacle.upper_right().t();
     critical_timestamps.insert(t_start);
     critical_timestamps.insert(t_end);
   }

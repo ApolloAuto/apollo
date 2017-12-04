@@ -42,7 +42,7 @@ class PathTimeNeighborhood {
   std::vector<PathTimeObstacle> GetPathTimeObstacles() const;
 
   bool GetPathTimeObstacle(const std::string& obstacle_id,
-      PathTimeObstacle* critical_condition);
+      PathTimeObstacle* path_time_obstacle);
 
   /**
   bool ForwardNearestObstacle(
@@ -66,11 +66,11 @@ class PathTimeNeighborhood {
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   double SpeedOnReferenceLine(
-      const std::vector<apollo::common::PathPoint>& discretized_ref_points,
+      const std::vector<common::PathPoint>& discretized_ref_points,
       const Obstacle* obstacle, const SLBoundary& sl_boundary);
 
   void SetCriticalPoint(const double t, const double s, const double v,
-                        CriticalPoint* critical_point);
+      PathTimePoint* critical_point);
 
  private:
   std::array<double, 3> init_s_;

@@ -9,7 +9,7 @@ message DiscretizedReferenceLine {
   repeated apollo.common.PathPoint discretized_reference_line_point = 2;
 }
 
-message CriticalPoint {
+message PathTimePoint {
   optional double t = 1;
   optional double s = 2;
   optional double v = 3;
@@ -17,10 +17,10 @@ message CriticalPoint {
 
 message PathTimeObstacle {
   optional string obstacle_id = 1;
-  optional CriticalPoint bottom_left = 2;
-  optional CriticalPoint upper_left = 3;
-  optional CriticalPoint upper_right = 4;
-  optional CriticalPoint bottom_right = 5;
+  optional PathTimePoint bottom_left = 2;
+  optional PathTimePoint upper_left = 3;
+  optional PathTimePoint upper_right = 4;
+  optional PathTimePoint bottom_right = 5;
   optional double time_lower = 6;
   optional double time_upper = 7;
   optional double path_lower = 8;

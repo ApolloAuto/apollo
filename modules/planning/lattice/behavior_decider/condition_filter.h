@@ -39,7 +39,7 @@ class ConditionFilter {
 
   std::vector<SampleBound> QuerySampleBounds() const;
 
-  std::vector<std::pair<CriticalPoint, CriticalPoint>>
+  std::vector<std::pair<PathTimePoint, PathTimePoint>>
   QueryPathTimeObstacleIntervals(const double t) const;
 
  private:
@@ -47,7 +47,7 @@ class ConditionFilter {
 
   // Return true only if t is within the range of time slot,
   // but will output block interval anyway(maybe be extension)
-  std::pair<CriticalPoint, CriticalPoint> QueryPathTimeObstacleIntervals(const double t,
+  std::pair<PathTimePoint, PathTimePoint> QueryPathTimeObstacleIntervals(const double t,
       const PathTimeObstacle& critical_condition) const;
 
   std::set<double> CriticalTimeStamps() const;
