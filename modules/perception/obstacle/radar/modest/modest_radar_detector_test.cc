@@ -53,8 +53,8 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   Eigen::Matrix4d radar2world_pose;
   radar2world_pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Vector3f main_car_velocity;
-  main_car_velocity[0] = -1.0;
-  main_car_velocity[1] = 0.0;
+  main_car_velocity[0] = 0.3;
+  main_car_velocity[1] = 0.4;
   main_car_velocity[2] = 0.0;
   options.radar2world_pose = &radar2world_pose;
   options.car_linear_speed = main_car_velocity;
@@ -77,8 +77,8 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->center(1) - 0.0) < 1e-5);
-  EXPECT_TRUE(fabs(objects[0]->velocity(0) - 2.0) < 1e-5);
-  EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.0) < 1e-5);
+  EXPECT_TRUE(fabs(objects[0]->velocity(0) - 3.3) < 1e-5);
+  EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.4) < 1e-5);
   EXPECT_TRUE(objects[0]->type == UNKNOWN);
   objects.resize(0);
   header->set_timestamp_sec(123456789.074);
@@ -92,8 +92,8 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - location(0)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->center(1) - location(1)) < 1e-2);
-  EXPECT_TRUE(fabs(objects[0]->velocity(0) - 2.0) < 1e-2);
-  EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.0) < 1e-2);
+  EXPECT_TRUE(fabs(objects[0]->velocity(0) - 3.3) < 1e-2);
+  EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.4) < 1e-2);
   EXPECT_TRUE(objects[0]->type == UNKNOWN);
   delete radar_detector;
 }
