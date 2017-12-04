@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
-
 #include <image_transport/image_transport.h>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -23,7 +22,7 @@
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
-
+#include "modules/perception/common/perception_gflags.h"
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -171,9 +170,11 @@ void TLPreprocessorSubnode::SubCameraImage(
   cv::Mat cv_mat;
   double timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
-  // TODO(ghdawn): for debug , delete later
-  image->GenerateMat();
-  cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+  if (FLAGS_output_raw_img) {
+    image->GenerateMat();
+    cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+  }
+
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
         << ", ts:" << GLOG_TIMESTAMP(msg->header.stamp.toSec());
@@ -209,7 +210,6 @@ void TLPreprocessorSubnode::SubCameraImage(
   const double sync_image_latency =
       TimeUtil::GetCurrentTime() - before_sync_image_ts;
 
-  // Monitor image time and system time difference
   int max_cached_lights_size = preprocessor_.max_cached_lights_size();
   // tf frequency is 100Hz, 0.01 sec per frame，
   // cache frame num: max_cached_image_lights_array_size * 0.005 tf info
@@ -238,7 +238,8 @@ void TLPreprocessorSubnode::SubCameraImage(
     return;
   }
 
-  // verify lights projection based on image time
+  // verify lights projection
+  // using image position to project lights again
   if (!VerifyLightsProjection(image_lights)) {
     AINFO << "verify_lights_projection on image failed, ts:"
           << GLOG_TIMESTAMP(image->ts())
