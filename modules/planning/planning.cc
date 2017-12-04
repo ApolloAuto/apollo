@@ -231,12 +231,13 @@ void Planning::RunOnce() {
   }
 
   // Update reference line provider
+  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
+
   if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
           AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
     AERROR << "Failed to update routing in reference line provider";
     return;
   }
-  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
 
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
     not_ready->set_reason("prediction not ready");
