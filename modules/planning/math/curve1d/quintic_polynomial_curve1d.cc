@@ -34,8 +34,7 @@ QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
 
 QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
     const double x0, const double dx0, const double ddx0, const double x1,
-    const double dx1, const double ddx1, const double param)
-    : param_(param) {
+    const double dx1, const double ddx1, const double param) {
   compute_coefficients(x0, dx0, ddx0, x1, dx1, ddx1, param);
   start_condition_[0] = x0;
   start_condition_[1] = dx0;
@@ -43,6 +42,7 @@ QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
   end_condition_[0] = x1;
   end_condition_[1] = dx1;
   end_condition_[2] = ddx1;
+  param_ = param;
 }
 
 QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
@@ -110,9 +110,7 @@ void QuinticPolynomialCurve1d::compute_coefficients(
   return;
 }
 
-double QuinticPolynomialCurve1d::param_length() const { return param_; }
-
-std::string QuinticPolynomialCurve1d::to_string() const {
+std::string QuinticPolynomialCurve1d::ToString() const {
   return apollo::common::util::StrCat(
       apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }

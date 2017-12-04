@@ -274,6 +274,9 @@ double LookForwardDistance(const VehicleState &state) {
 bool ReferenceLineProvider::CreateReferenceLine(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
+  CHECK_NOTNULL(reference_lines);
+  CHECK_NOTNULL(segments);
+
   common::VehicleState vehicle_state;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);

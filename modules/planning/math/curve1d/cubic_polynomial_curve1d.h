@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
- * @file quartic_polynomial_curve1d.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE1D_QUARTIC_POLYNOMIAL_CURVE1D_H_
-#define MODULES_PLANNING_MATH_CURVE1D_QUARTIC_POLYNOMIAL_CURVE1D_H_
+#ifndef MODULES_PLANNING_MATH_CURVE1D_CUBIC_POLYNOMIAL_CURVE1D_H_
+#define MODULES_PLANNING_MATH_CURVE1D_CUBIC_POLYNOMIAL_CURVE1D_H_
 
 #include <array>
 #include <string>
@@ -29,22 +29,18 @@
 namespace apollo {
 namespace planning {
 
-// 1D quartic polynomial curve: (x0, dx0, ddx0) -- [0, param] --> (dx1, ddx1)
-class QuarticPolynomialCurve1d : public PolynomialCurve1d {
+class CubicPolynomialCurve1d : public PolynomialCurve1d {
  public:
-  QuarticPolynomialCurve1d() = default;
+  CubicPolynomialCurve1d() = default;
+  virtual ~CubicPolynomialCurve1d() = default;
 
-  QuarticPolynomialCurve1d(const std::array<double, 3>& start,
-                           const std::array<double, 2>& end,
-                           const double param);
+  CubicPolynomialCurve1d(const std::array<double, 3>& start, const double& end,
+                         const double param);
 
-  QuarticPolynomialCurve1d(const double x0, const double dx0, const double ddx0,
-                           const double dx1, const double ddx1,
-                           const double param);
+  CubicPolynomialCurve1d(const double x0, const double dx0, const double ddx0,
+                         const double x1, const double param);
 
-  QuarticPolynomialCurve1d(const QuarticPolynomialCurve1d& other);
-
-  virtual ~QuarticPolynomialCurve1d() = default;
+  CubicPolynomialCurve1d(const CubicPolynomialCurve1d& other);
 
   double Evaluate(const std::uint32_t order, const double p) const override;
 
@@ -53,15 +49,14 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 
  private:
   void compute_coefficients(const double x0, const double dx0,
-                            const double ddx0, const double dx1,
-                            const double ddx1, const double param);
-
-  std::array<double, 5> coef_ = {{0.0, 0.0, 0.0, 0.0, 0.0}};
+                            const double ddx0, const double x1,
+                            const double param);
+  std::array<double, 4> coef_ = {{0.0, 0.0, 0.0, 0.0}};
   std::array<double, 3> start_condition_ = {{0.0, 0.0, 0.0}};
-  std::array<double, 2> end_condition_ = {{0.0, 0.0}};
+  double end_condition_ = 0.0;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_CURVE1D_QUARTIC_POLYNOMIAL_CURVE1D_H_
+#endif  // MODULES_PLANNING_MATH_CURVE1D_CUBIC_POLYNOMIAL_CURVE1D_H_
