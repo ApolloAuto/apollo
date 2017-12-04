@@ -226,7 +226,16 @@ void Trajectory1dGenerator::GenerateSpeedProfiles(
     const std::vector<SampleBound>& sample_bounds,
     const LatticeSamplingConfig& lattice_sampling_config,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  // Maybe pass some sample configs here?
+
+  // Empty SampleBound is treated as Cruise
+  if (0 == sample_bounds.size()) {
+    GenerateSpeedProfilesForCruising(
+      lon_init_state,
+      lattice_sampling_config.lon_sample_config(),
+      ptr_lon_trajectory_bundle);
+    return;
+  }
+
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_.SampleLonEndConditionsGenerally(
         sample_bounds, lattice_sampling_config);

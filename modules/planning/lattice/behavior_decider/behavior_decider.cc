@@ -97,6 +97,7 @@ PlanningTarget BehaviorDecider::Analyze(
   if (StopDecisionNearDestination(frame, lon_init_state,
                                   discretized_reference_line, &ret)) {
     AINFO << "STOP decision when near the routing end.";
+    return ret;
   }
 
   ret.CopyFrom(scenario_decisions[0]);
@@ -105,7 +106,17 @@ PlanningTarget BehaviorDecider::Analyze(
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
-
+  LatticeSamplingConfig* lattice_sampling_config =
+      ret.mutable_lattice_sampling_config();
+  LonSampleConfig* lon_sample_config =
+      lattice_sampling_config->mutable_lon_sample_config();
+  LatSampleConfig* lat_sample_config =
+      lattice_sampling_config->mutable_lat_sample_config();
+  // lon_sample_config->mutable_lon_end_condition()->set_s(0.0);
+  lon_sample_config->mutable_lon_end_condition()->set_ds(
+      FLAGS_default_cruise_speed);
+  lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
+  ret.set_decision_type(PlanningTarget::CRUISE);
   return ret;
 }
 
