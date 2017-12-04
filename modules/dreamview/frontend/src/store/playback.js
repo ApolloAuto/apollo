@@ -54,10 +54,9 @@ export default class Playback {
     }
 
     @computed get replayComplete() {
-        return this.retrievedFrame >= this.numFrames;
+        return this.seekingFrame > this.numFrames;
     }
 
-    // TODO: update fctn name
     @action setPlayAction(status) {
         this.isPlaying = status;
     }
@@ -70,26 +69,18 @@ export default class Playback {
         }
     }
 
-    @action resume() {
-        this.seekingFrame = this.requestedFrame + 1;
-        this.isSeeking = true;
-    }
-
-    @action syncRequestedToRetrieved() {
-        this.requestedFrame = this.retrievedFrame;
-    }
-
     @action resetFrame() {
         this.requestedFrame = 0;
         this.retrievedFrame = 0;
+        this.seekingFrame = 1;
     }
 
     @action shouldProcessFrame(world) {
         if (world && world.sequenceNum) {
-            if ((this.isSeeking && this.seekingFrame === world.sequenceNum) ||
-                (!this.isSeeking && this.isPlaying)) {
+            if (this.seekingFrame === world.sequenceNum && (this.isPlaying || this.isSeeking)) {
                 this.retrievedFrame = world.sequenceNum;
                 this.isSeeking = false;
+                this.seekingFrame ++;
                 return true;
             }
         }
