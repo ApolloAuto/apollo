@@ -79,7 +79,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
         << " lights projections cached.";
 
   // pop front if cached array'size > FLAGS_max_cached_image_lights_array_size
-  while (cached_lights_.size() > max_cached_lights_size_) {
+  while (cached_lights_.size() > static_cast<size_t>(max_cached_lights_size_)) {
     cached_lights_.erase(cached_lights_.begin());
   }
 
@@ -173,10 +173,11 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
     // if signal num = 0, use long image
     // otherwise use previous long image
     if (camera_id == kLongFocusIdx &&
-        // TODO(all): Add parentheses to avoid mix-use of '&&' and '||'.
+        // TODO(all): check the logic here and avoid the convoluted conditions
+        // within if
         (current_signal_num == 0 ||
-         camera_id == last_pub_camera_id_ &&
-             last_pub_camera_id_ != CameraId::UNKNOWN)) {
+         (camera_id == last_pub_camera_id_ &&
+          last_pub_camera_id_ != CameraId::UNKNOWN))) {
       (*image_lights).reset(new ImageLights);
       (*image_lights)->image = image;
       // do not mark "No valid pose" for some period
