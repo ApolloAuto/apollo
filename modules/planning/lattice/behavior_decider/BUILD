@@ -15,6 +15,8 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
+        "//modules/planning/lattice/behavior_decider:condition_filter",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/lattice/util:lattice_util",
         "//modules/planning/lattice/behavior_decider:scenario_manager",
