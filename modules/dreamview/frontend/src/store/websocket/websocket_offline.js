@@ -9,6 +9,9 @@ export default class OfflinePlaybackWebSocketEndpoint {
         this.websocket = null;
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
+        this.requestTimer = null;
+        this.processTimer = null;
+        this.frameData = {}; // cache frames
     }
 
     initialize(params) {
@@ -49,17 +52,14 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     this.checkMessage(message);
                     STORE.setInitializationStatus(true);
 
-                    if (STORE.playback.shouldProcessFrame(message.world)) {
-                        STORE.updateTimestamp(message.timestamp);
-                        STORE.updateWorldTimestamp(message.world.timestampSec);
-                        RENDERER.maybeInitializeOffest(
-                            message.world.autoDrivingCar.positionX,
-                            message.world.autoDrivingCar.positionY);
-                        RENDERER.updateWorld(message.world, message.planningData);
-                        STORE.meters.update(message.world);
-                        STORE.monitor.update(message.world);
-                        STORE.trafficSignal.update(message.world);
+                    if (STORE.playback.isSeeking) {
+                        this.processSimWorld(message);
                     }
+
+                    if (message.timestamp && !(message.timestamp in this.frameData)) {
+                        this.frameData[message.timestamp] = message;
+                    }
+
                     break;
             }
         };
@@ -85,20 +85,39 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     startPlayback(msPerFrame) {
-        clearInterval(this.timer);
-        this.timer = setInterval(() => {
+        clearInterval(this.requestTimer);
+        this.requestTimer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN && STORE.playback.initialized()) {
                 this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
 
                 if (!STORE.playback.hasNext()) {
-                    clearInterval(this.timer);
+                    clearInterval(this.requestTimer);
+                    this.requestTimer = null;
+                }
+            }
+        }, msPerFrame);
+
+        clearInterval(this.processTimer);
+        this.processTimer = setInterval(() => {
+            if (STORE.playback.initialized()) {
+                const timestamp = STORE.playback.seekingFrame * 100;
+                if (timestamp in this.frameData) {
+                    this.processSimWorld(this.frameData[timestamp]);
+                }
+
+                if (STORE.playback.replayComplete) {
+                    clearInterval(this.processTimer);
+                    this.processTimer = null;
                 }
             }
         }, msPerFrame);
     }
 
     pausePlayback() {
-        clearInterval(this.timer);
+        clearInterval(this.requestTimer);
+        clearInterval(this.processTimer);
+        this.requestTimer = null;
+        this.processTimer = null;
     }
 
     requestGroundMeta(mapId) {
@@ -108,6 +127,19 @@ export default class OfflinePlaybackWebSocketEndpoint {
         }));
     }
 
+    processSimWorld(message) {
+        if (STORE.playback.shouldProcessFrame(message.world)) {
+            STORE.updateTimestamp(message.timestamp);
+            STORE.updateWorldTimestamp(message.world.timestampSec);
+            RENDERER.maybeInitializeOffest(
+                message.world.autoDrivingCar.positionX,
+                message.world.autoDrivingCar.positionY);
+            RENDERER.updateWorld(message.world, message.planningData);
+            STORE.meters.update(message.world);
+            STORE.monitor.update(message.world);
+            STORE.trafficSignal.update(message.world);
+        }
+    }
     requstFrameCount(jobId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveFrameCount',
@@ -116,10 +148,15 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     requestSimulationWorld(jobId, frameId) {
-        this.websocket.send(JSON.stringify({
-            type : "RequestSimulationWorld",
-            jobId: jobId,
-            frameId: frameId,
-        }));
+        const timestamp = frameId * 100;
+        if (!(timestamp in this.frameData)) {
+            this.websocket.send(JSON.stringify({
+                type : "RequestSimulationWorld",
+                jobId: jobId,
+                frameId: frameId,
+            }));
+        } else if (STORE.playback.isSeeking) {
+            this.processSimWorld(this.frameData[timestamp]);
+        }
     }
 }
