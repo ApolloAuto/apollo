@@ -212,7 +212,13 @@ bool ReferenceLineProvider::GetReferenceLines(
       return false;
     }
   } else {
-    return CreateReferenceLine(reference_lines, segments);
+    if (!CreateReferenceLine(reference_lines, segments)) {
+      AERROR << "Failed to create reference line";
+      return false;
+    }
+    reference_lines_ = *reference_lines;
+    route_segments_ = *segments;
+    return true;
   }
 }
 
