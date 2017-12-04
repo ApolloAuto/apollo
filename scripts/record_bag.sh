@@ -53,7 +53,7 @@ function start() {
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup rosbag record -b 2048  \
+    nohup rosbag record --split --duration=1m -b 2048  \
         /apollo/sensor/camera/traffic/image_short \
         /apollo/sensor/camera/traffic/image_long \
         /apollo/sensor/conti_radar \
