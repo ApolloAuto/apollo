@@ -93,16 +93,19 @@ void PathTimeNeighborhood::SetupObstacles(
       if (path_time_obstacle_map_.find(obstacle->Id())
           == path_time_obstacle_map_.end()) {
         path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
-        SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
-            path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left());
-        SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
-            path_time_obstacle_map_[obstacle->Id()].mutable_upper_left());
+
+        *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left() =
+            SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(), relative_time);
+
+        *path_time_obstacle_map_[obstacle->Id()].mutable_upper_left() =
+            SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
       }
 
-      SetCriticalPoint(relative_time, sl_boundary.start_s(), v,
-          path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right());
-      SetCriticalPoint(relative_time, sl_boundary.end_s(), v,
-          path_time_obstacle_map_[obstacle->Id()].mutable_upper_right());
+      *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right() =
+          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(), relative_time);
+
+      *path_time_obstacle_map_[obstacle->Id()].mutable_upper_right() =
+          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
     }
     relative_time += trajectory_time_resolution;
   }
@@ -130,11 +133,13 @@ void PathTimeNeighborhood::SetupObstacles(
   }
 }
 
-void PathTimeNeighborhood::SetCriticalPoint(const double t, const double s,
-    const double v, PathTimePoint* critical_point) {
-  critical_point->set_t(t);
-  critical_point->set_s(s);
-  critical_point->set_v(v);
+PathTimePoint PathTimeNeighborhood::SetPathTimePoint(const std::string& obstacle_id,
+    const double s, const double t) const {
+  PathTimePoint path_time_point;
+  path_time_point.set_s(s);
+  path_time_point.set_t(t);
+  path_time_point.set_obstacle_id(obstacle_id);
+  return path_time_point;
 }
 
 double PathTimeNeighborhood::SpeedOnReferenceLine(
