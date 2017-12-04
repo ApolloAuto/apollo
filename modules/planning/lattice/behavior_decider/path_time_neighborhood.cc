@@ -33,18 +33,23 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 
-PathTimeNeighborhood::PathTimeNeighborhood(const Frame* frame,
-    const std::array<double, 3>& init_s, const ReferenceLine& reference_line) {
+PathTimeNeighborhood::PathTimeNeighborhood(
+    const Frame* frame,
+    const std::array<double, 3>& init_s,
+    const ReferenceLine& reference_line,
+    const std::vector<common::PathPoint>& discretized_ref_points) {
 
   init_s_ = init_s;
-  SetupObstacles(frame, reference_line);
+  SetupObstacles(frame, reference_line, discretized_ref_points);
 }
 
-void PathTimeNeighborhood::SetupObstacles(const Frame* frame,
-    const ReferenceLine& reference_line) {
+void PathTimeNeighborhood::SetupObstacles(
+    const Frame* frame,
+    const ReferenceLine& reference_line,
+    const std::vector<common::PathPoint>& discretized_ref_points) {
   const auto& obstacles = frame->obstacles();
-  auto discretized_ref_points = ToDiscretizedReferenceLine(
-      reference_line.reference_points());
+  // auto discretized_ref_points = ToDiscretizedReferenceLine(
+  //     reference_line.reference_points());
 
   for (const Obstacle* obstacle : obstacles) {
     if (obstacle->Trajectory().trajectory_point_size() == 0) {
@@ -56,6 +61,7 @@ void PathTimeNeighborhood::SetupObstacles(const Frame* frame,
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
 
+      // TODO(all) Remove raw reference line and reimplement GetSlBoundary
       SLBoundary sl_boundary;
       reference_line.GetSLBoundary(box, &sl_boundary);
 

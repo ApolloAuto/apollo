@@ -36,7 +36,8 @@ class PathTimeNeighborhood {
  public:
     PathTimeNeighborhood(const Frame* frame,
       const std::array<double, 3>& init_s,
-      const ReferenceLine& reference_line);
+      const ReferenceLine& reference_line,
+      const std::vector<common::PathPoint>& discretized_ref_points);
 
   std::vector<PathTimeObstacle> GetPathTimeObstacles() const;
 
@@ -60,7 +61,9 @@ class PathTimeNeighborhood {
   **/
 
  private:
-  void SetupObstacles(const Frame* frame, const ReferenceLine& reference_line);
+  void SetupObstacles(const Frame* frame,
+      const ReferenceLine& reference_line,
+      const std::vector<common::PathPoint>& discretized_ref_points);
 
   double SpeedOnReferenceLine(
       const std::vector<apollo::common::PathPoint>& discretized_ref_points,
