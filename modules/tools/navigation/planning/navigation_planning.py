@@ -17,9 +17,12 @@
 ###############################################################################
 
 import rospy
+import datetime
+import os
 import time
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import sys
+import gflags
+from gflags import FLAGS
 from std_msgs.msg import String
 
 from modules.drivers.proto import mobileye_pb2
@@ -33,26 +36,27 @@ from provider_mobileye import MobileyeProvider
 from provider_chassis import ChassisProvider
 from provider_localization import LocalizationProvider
 from provider_routing import RoutingProvider
-from lanemarker_corrector import LaneMarkerCorrector
+
+gflags.DEFINE_integer('max_cruise_speed', 20,
+                      'max speed for cruising in meter per second')
+gflags.DEFINE_boolean('enable_follow', False,
+                      'enable follow function.')
+gflags.DEFINE_boolean('enable_routing_aid', True,
+                      'enable planning leveraging routing information.')
+gflags.DEFINE_string('navigation_planning_node_name', 'navigation_planning',
+                     'node name for navigation planning.')
+gflags.DEFINE_string('navigation_planning_topic', '/apollo/planning',
+                     'navigation planning publish topic.')
 
 planning_pub = None
-PUB_NODE_NAME = "planning"
-PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
-CRUISE_SPEED = 10  # m/s
-ENABLE_FOLLOW = False
-ENABLE_ROUTING_AID = True
-
-f = open("benchmark.txt", "w")
-path_decider = PathDecider()
-speed_decider = SpeedDecider()
-traj_generator = TrajectoryGenerator()
-mobileye_provider = MobileyeProvider()
-chassis_provider = ChassisProvider()
-localization_provider = LocalizationProvider()
-routing_provider = RoutingProvider()
-
-nx = []
-ny = []
+log_file = None
+path_decider = None
+speed_decider = None
+traj_generator = None
+mobileye_provider = None
+chassis_provider = None
+localization_provider = None
+routing_provider = None
 
 
 def routing_callback(routing_str):
@@ -68,7 +72,6 @@ def chassis_callback(chassis_pb):
 
 
 def mobileye_callback(mobileye_pb):
-    global nx, ny
     start_timestamp = time.time()
     if localization_provider.localization_pb is None:
         return
@@ -78,7 +81,7 @@ def mobileye_callback(mobileye_pb):
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
 
-    if ENABLE_ROUTING_AID:
+    if FLAGS.enable_routing_aid:
         path_x, path_y, path_length = path_decider.get_path_by_lmr(
             mobileye_provider, routing_provider,
             localization_provider, chassis_provider)
@@ -87,9 +90,9 @@ def mobileye_callback(mobileye_pb):
             mobileye_provider, chassis_provider)
 
     final_path_length = path_length
-    speed = CRUISE_SPEED
+    speed = FLAGS.max_cruise_speed
 
-    if ENABLE_FOLLOW:
+    if FLAGS.enable_follow:
         speed, final_path_length = speed_decider.get_target_speed_and_path_length(
             mobileye_provider, chassis_provider, path_length)
 
@@ -97,12 +100,31 @@ def mobileye_callback(mobileye_pb):
                                              speed,
                                              start_timestamp=start_timestamp)
     planning_pub.publish(adc_trajectory)
-    f.write("duration: " + str(time.time() - start_timestamp) + "\n")
+    log_file.write("duration: " + str(time.time() - start_timestamp) + "\n")
 
 
-def add_listener():
-    global planning_pub
-    rospy.init_node(PUB_NODE_NAME, anonymous=True)
+def init():
+    global planning_pub, log_file
+    global path_decider, speed_decider, traj_generator
+    global mobileye_provider, chassis_provider
+    global localization_provider, routing_provider
+
+    path_decider = PathDecider()
+    speed_decider = SpeedDecider(FLAGS.max_cruise_speed)
+    traj_generator = TrajectoryGenerator()
+    mobileye_provider = MobileyeProvider()
+    chassis_provider = ChassisProvider()
+    localization_provider = LocalizationProvider()
+    routing_provider = RoutingProvider()
+
+    pgm_path = os.path.dirname(os.path.realpath(__file__))
+    log_path = pgm_path + "/logs/"
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    now = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    log_file = open(log_path + now + ".txt", "w")
+
+    rospy.init_node(FLAGS.navigation_planning_node_name, anonymous=True)
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
@@ -114,33 +136,19 @@ def add_listener():
                      chassis_callback)
     rospy.Subscriber('/apollo/navigation/routing',
                      String, routing_callback)
-
-    planning_pub = rospy.Publisher(
-        PUB_TOPIC, planning_pb2.ADCTrajectory, queue_size=1)
-
-
-def update(frame_number):
-    line2.set_xdata(nx)
-    line2.set_ydata(ny)
+    planning_pub = rospy.Publisher(FLAGS.navigation_planning_topic,
+                                   planning_pb2.ADCTrajectory, queue_size=1)
 
 
 if __name__ == '__main__':
 
-    DEBUG = False
-    line1 = None
-    line2 = None
-    add_listener()
-
-    if DEBUG:
-        fig = plt.figure()
-        ax = plt.subplot2grid((1, 1), (0, 0), rowspan=1, colspan=1)
-        line1, = ax.plot([-10, 10, -10, 10], [-10, 150, 150, -10])
-        line1.set_visible(False)
-        line2, = ax.plot([0], [0])
-        ani = animation.FuncAnimation(fig, update, interval=100)
-        ax.axvline(x=0.0, alpha=0.3)
-        ax.axhline(y=0.0, alpha=0.3)
-
-        plt.show()
-    else:
+    try:
+        argv = FLAGS(sys.argv)  # parse flags
+    except gflags.FlagsError, e:
+        print '%s\\nUsage: %s ARGS\\n%s' % (e, sys.argv[0], FLAGS)
+        sys.exit(1)
+    try:
+        init()
         rospy.spin()
+    finally:
+        log_file.close()
