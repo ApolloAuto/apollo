@@ -103,6 +103,16 @@ PlanningTarget BehaviorDecider::Analyze(
   std::vector<SampleBound> sample_bounds =
       condition_filter.QuerySampleBounds();
 
+  // Debug SampleBound
+  AINFO << "[Printing SampleBound]";
+  if (sample_bounds.empty()) {
+    AINFO << " ------ sample_bounds empty";
+  } else {
+    for (const SampleBound& sample_bound : sample_bounds) {
+      AINFO << " ------ sample_bound: " << sample_bound.ShortDebugString();
+    }
+  }
+
   if (sample_bounds.empty()) {
     LatticeSamplingConfig* lattice_sampling_config =
         ret.mutable_lattice_sampling_config();
