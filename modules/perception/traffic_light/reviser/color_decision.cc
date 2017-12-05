@@ -57,7 +57,7 @@ bool ColorReviser::Revise(const ReviseOption &option,
   }
   std::vector<LightPtr> &lights_ref = *lights;
 
-  for (int i = 0; i < lights_ref.size(); ++i) {
+  for (size_t i = 0; i < lights_ref.size(); ++i) {
     std::string id = lights_ref[i]->info.id().id();
     std::cout << "light " << i << " id: " << id << std::endl;
     switch (lights_ref[i]->status.color) {
