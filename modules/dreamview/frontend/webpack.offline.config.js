@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     context: path.join(__dirname, "src"),
@@ -17,7 +18,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, "dist_offline"),
         filename: "[name].bundle.js",
-        publicPath: "/",
+        publicPath: "/offlineview/",
     },
 
     devtool: "cheap-source-map",
@@ -181,6 +182,7 @@ module.exports = {
         //     sourceMap: true,
         // }),
 
+        // new BundleAnalyzerPlugin(),
     ],
 
     devServer: {
