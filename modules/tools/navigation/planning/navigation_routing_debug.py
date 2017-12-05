@@ -46,7 +46,7 @@ ENABLE_ROUTING_AID = False
 
 f = open("benchmark.txt", "w")
 path_decider = PathDecider()
-speed_decider = SpeedDecider()
+speed_decider = SpeedDecider(CRUISE_SPEED)
 traj_generator = TrajectoryGenerator()
 mobileye_provider = MobileyeProvider()
 chassis_provider = ChassisProvider()
