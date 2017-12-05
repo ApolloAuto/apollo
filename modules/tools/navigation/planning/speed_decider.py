@@ -17,8 +17,8 @@
 ###############################################################################
 
 class SpeedDecider:
-    def __init__(self):
-        self.CRUISE_SPEED = 10  # m/s
+    def __init__(self, max_cruise_speed):
+        self.CRUISE_SPEED = max_cruise_speed  # m/s
 
     def get_target_speed_and_path_length(self, mobileye_provider,
                                          chassis_provider, path_length):
