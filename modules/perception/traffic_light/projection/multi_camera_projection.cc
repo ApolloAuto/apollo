@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
+
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
+
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 
 namespace apollo {
@@ -99,8 +101,8 @@ bool MultiCamerasProjection::Init() {
   camera_coeffient_.resize(camera_names_.size());
   camera_coeffient_[kLongFocusIdx] = camera_coeffients["camera_25mm_focus"];
   camera_coeffient_[kShortFocusIdx] = camera_coeffients["camera_6mm_focus"];
-  auto &short_focus_camera_coeffient = camera_coeffients["camera_6mm_focus"];
-  auto &long_focus_camera_coeffient = camera_coeffients["camera_25mm_focus"];
+  // auto &short_focus_camera_coeffient = camera_coeffients["camera_6mm_focus"];
+  // auto &long_focus_camera_coeffient = camera_coeffients["camera_25mm_focus"];
   camera_coeffient_[kLongFocusIdx].camera_extrinsic =
       camera_coeffient_[kLongFocusIdx].camera_extrinsic *
       camera_coeffient_[kShortFocusIdx].camera_extrinsic;
