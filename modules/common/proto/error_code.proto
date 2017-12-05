@@ -45,6 +45,10 @@ enum ErrorCode {
 
   // Indicates an input has been exhausted.
   END_OF_INPUT = 9000;
+
+  // HTTP request error codes.
+  HTTP_LOGIC_ERROR = 10000;
+  HTTP_RUNTIME_ERROR = 10001;
 }
 
 message StatusPb {

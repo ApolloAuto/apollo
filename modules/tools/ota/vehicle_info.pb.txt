@@ -1,6 +1,0 @@
-name : "MKZ#"
-brand : LINCOLN
-model : MKZ
-license {
-    vin : "xxxxxxxxxxx"
-}
