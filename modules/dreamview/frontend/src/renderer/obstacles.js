@@ -51,6 +51,10 @@ export default class PerceptionObstacles {
             return;
         }
 
+        const adc = coordinates.applyOffset({
+            x: world.autoDrivingCar.positionX,
+            y: world.autoDrivingCar.positionY,
+        });
         let arrowIdx = 0;
         let cubeIdx = 0;
         let extrusionFaceIdx = 0;
@@ -81,8 +85,9 @@ export default class PerceptionObstacles {
                 arrowMesh.visible = true;
             }
             if (STORE.options.showObstaclesId) {
-                this.updateId(obstacle.id,
+                this.updateIdAndDistance(obstacle.id,
                         new THREE.Vector3(position.x, position.y, obstacle.height),
+                        adc.distanceTo(position).toFixed(1),
                         scene);
             }
 
@@ -115,8 +120,8 @@ export default class PerceptionObstacles {
         return arrowMesh;
     }
 
-    updateId(id, position, scene) {
-        const text = this.textRender.composeText(id);
+    updateIdAndDistance(id, position, distance, scene) {
+        const text = this.textRender.composeText(`${id} D:${distance}`);
         if (text === null) {
             return;
         }
