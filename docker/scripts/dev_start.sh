@@ -108,6 +108,8 @@ function main(){
         -v /media:/media \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
+-v /usr/src:/usr/src \
+-v /lib/modules:/lib/modules \
         --net host \
         -w /apollo \
         ${devices} \

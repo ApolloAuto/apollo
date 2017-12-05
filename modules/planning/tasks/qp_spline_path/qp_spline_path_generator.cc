@@ -298,7 +298,7 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
     spline_constraint->AddPointSecondDerivativeConstraintInRange(
         init_frenet_point_.s(), init_frenet_point_.ddl(), kBoundaryEpsilon);
   }
-
+  
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint, equality constraint
