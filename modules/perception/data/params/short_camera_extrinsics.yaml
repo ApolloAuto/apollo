@@ -1,0 +1,17 @@
+transform:
+  rotation:
+    z: -0.522
+    x: -0.478
+    y: 0.478
+    w: 0.522
+  translation:
+    z: -0.05
+    x: 0.0
+    y: 0.12
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: Velodyne64
+child_frame_id: onsemi_obstacle
