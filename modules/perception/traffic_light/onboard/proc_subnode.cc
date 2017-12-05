@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
+
 #include <std_msgs/String.h>
 #include <algorithm>
+
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
@@ -25,7 +28,6 @@
 #include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -38,9 +40,7 @@ DEFINE_string(traffic_light_recognizer, "",
 DEFINE_string(traffic_light_reviser, "",
               "the reviser enabled for traffic_light");
 
-TLProcSubnode::~TLProcSubnode() {
-  preprocessing_data_ = nullptr;
-}
+TLProcSubnode::~TLProcSubnode() { preprocessing_data_ = nullptr; }
 
 bool TLProcSubnode::InitInternal() {
   RegisterFactoryUnityRectify();
@@ -112,7 +112,7 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
 
   // preprocess send a msg -> proc receive a msg
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
-      image_lights->preprocess_send_timestamp);
+                               image_lights->preprocess_send_timestamp);
 
   if (TimeUtil::GetCurrentTime() - event.local_timestamp > valid_ts_interval_) {
     AERROR << "TLProcSubnode failed to process image"
@@ -187,13 +187,13 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
         << " revise_latency: " << revise_latency * 1000 << " ms."
         << " TLProcSubnode::handle_event latency: "
         << (TimeUtil::GetCurrentTime() - proc_subnode_handle_event_start_ts) *
-            1000
+               1000
         << " ms."
         << " enter_proc_latency: " << enter_proc_latency * 1000 << " ms."
         << " preprocess_latency: "
         << (image_lights->preprocess_send_timestamp -
             image_lights->preprocess_receive_timestamp) *
-            1000
+               1000
         << " ms.";
 
   return true;
@@ -544,17 +544,17 @@ bool TLProcSubnode::PublishMessage(
     }
     pos_y += 50;
     {
-      std::string
-          signal_txt = "camera id: " + image_lights->image->camera_id_str();
+      std::string signal_txt =
+          "camera id: " + image_lights->image->camera_id_str();
       cv::putText(img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
                   3.0, CV_RGB(255, 0, 0), 2);
     }
     // draw image border size (offset between hdmap-box and detection-box)
-    int pos_y_offset = 1000;
     if (light_debug->project_error() > 100) {
       std::string img_border_txt =
           "Offset size: " + std::to_string(light_debug->project_error());
-      cv::putText(img, img_border_txt, cv::Point(30, pos_y_offset),
+      constexpr int kPosYOffset = 1000;
+      cv::putText(img, img_border_txt, cv::Point(30, kPosYOffset),
                   cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
     }
 

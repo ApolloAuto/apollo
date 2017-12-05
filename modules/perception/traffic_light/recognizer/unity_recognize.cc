@@ -25,12 +25,12 @@ namespace traffic_light {
 
 bool UnityRecognize::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == NULL) {
+  if (config_manager == nullptr) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
   }
 
-  const ModelConfig *model_config_night = NULL;
+  const ModelConfig *model_config_night = nullptr;
   if (!config_manager->GetModelConfig(name() + "Night", &model_config_night)) {
     AERROR << "not found model config: " << name() + "Night";
     return false;
@@ -40,7 +40,7 @@ bool UnityRecognize::Init() {
     return false;
   }
 
-  const ModelConfig *model_config_day = NULL;
+  const ModelConfig *model_config_day = nullptr;
   if (!config_manager->GetModelConfig(name(), &model_config_day)) {
     AERROR << "not found model config: " << name();
     return false;
@@ -53,6 +53,7 @@ bool UnityRecognize::Init() {
 
   return true;
 }
+
 bool UnityRecognize::InitModel(const ConfigManager *config_manager,
                                const ModelConfig *model_config,
                                std::shared_ptr<IRefine> *classify) {
@@ -72,10 +73,9 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
   classify_net =
       FileUtil::GetAbsolutePath(config_manager->work_root(), classify_net);
 
-  float classify_threshold = 0;
+  float classify_threshold = 0.0;
   int classify_resize_width = 0;
   int classify_resize_height = 0;
-  std::vector<float> classify_rgb_mean;
 
   if (!model_config->GetValue("classify_threshold", &classify_threshold)) {
     AERROR << "classify_threshold not found." << name();
@@ -107,7 +107,9 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
                                      const RecognizeOption &option,
                                      std::vector<LightPtr> *lights) {
   cv::Mat ros_image = image.mat();
+  // TODO(All): remove this comment or implement
   // std::vector<LightPtr> &lights_ref = *lights;
+
   cv::Rect cbox;
   cbox = cv::Rect(0, 0, ros_image.cols, ros_image.rows);
   classify_night_->SetCropBox(cbox);
@@ -137,9 +139,7 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
   return true;
 }
 
-std::string UnityRecognize::name() const {
-  return "UnityRecognize";
-}
+std::string UnityRecognize::name() const { return "UnityRecognize"; }
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

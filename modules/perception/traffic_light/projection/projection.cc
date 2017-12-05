@@ -56,15 +56,10 @@ bool BoundaryProjection::Project(const CameraCoeffient &camera_coeffient,
       return false;
     }
   }
-  int minx = 1000;
-  int miny = 500;
-  int maxx = 1200;
-  int maxy = 600;
-
-  minx = std::min(x[0], x[2]);
-  miny = std::min(y[0], y[2]);
-  maxx = std::max(x[0], x[2]);
-  maxy = std::max(y[0], y[2]);
+  int minx = std::min(x[0], x[2]);
+  int miny = std::min(y[0], y[2]);
+  int maxx = std::max(x[0], x[2]);
+  int maxy = std::max(y[0], y[2]);
 
   cv::Rect roi(minx, miny, maxx - minx, maxy - miny);
   AINFO << "projection get ROI:" << roi;
