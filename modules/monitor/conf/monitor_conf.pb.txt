@@ -21,6 +21,9 @@ modules {
   process_conf {
     process_cmd_keywords: "modules/drivers/conti_radar/conti_radar"
   }
+  topic_conf {
+    type: CONTI_RADAR
+  }
 }
 modules {
   name: "camera"
@@ -79,6 +82,12 @@ modules {
     type: CONTROL_COMMAND
   }
 }
+modules {
+  name: "record_bag"
+  process_conf {
+    process_cmd_keywords: "rosbag/record"
+  }
+}
 hardware {
   name: "velodyne"
   topic_conf {
@@ -86,8 +95,14 @@ hardware {
   }
 }
 hardware {
-  name: "camera"
+  name: "camera_long"
   topic_conf {
-    type: COMPRESSED_IMAGE
+    type: IMAGE_LONG
+  }
+}
+hardware {
+  name: "camera_short"
+  topic_conf {
+    type: IMAGE_SHORT
   }
 }

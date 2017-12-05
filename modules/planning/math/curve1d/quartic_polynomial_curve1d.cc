@@ -76,8 +76,6 @@ double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order,
   }
 }
 
-double QuarticPolynomialCurve1d::param_length() const { return param_; }
-
 void QuarticPolynomialCurve1d::compute_coefficients(
     const double x0, const double dx0, const double ddx0, const double dx1,
     const double ddx1, const double p) {
@@ -102,7 +100,7 @@ void QuarticPolynomialCurve1d::compute_coefficients(
   coef_[1] = b0 / p2 - b1 / 3.0 / p;
 }
 
-std::string QuarticPolynomialCurve1d::to_string() const {
+std::string QuarticPolynomialCurve1d::ToString() const {
   return apollo::common::util::StrCat(
       apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }

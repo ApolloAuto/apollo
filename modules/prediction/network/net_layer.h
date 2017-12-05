@@ -16,10 +16,12 @@
 
 #include <string>
 #include <vector>
+
 #include "Eigen/Dense"
 
-#include "modules/prediction/network/net_util.h"
 #include "modules/prediction/proto/network_layers.pb.h"
+
+#include "modules/prediction/network/net_util.h"
 
 #ifndef MODULES_PREDICTION_NETWORK_NET_LAYER_H_
 #define MODULES_PREDICTION_NETWORK_NET_LAYER_H_
@@ -35,7 +37,7 @@ namespace network {
 /**
  * @class Layer
  * @brief Layer is a base class for specific network layers
- *        It contains a pure virtual function Run which must be implemeted
+ *        It contains a pure virtual function Run which must be implemented
  *        in derived class
  */
 class Layer {
@@ -96,7 +98,7 @@ class Layer {
 
  private:
   std::string name_;
-  int order_number_;
+  int order_number_ = -1;
 };
 
 /**
@@ -115,15 +117,15 @@ class Dense : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 
  private:
   int units_;
@@ -148,15 +150,15 @@ class Activation : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 
  private:
   std::function<float(float)> kactivation_;
@@ -174,26 +176,26 @@ class BatchNormalization : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 
  private:
   Eigen::VectorXf mu_;
   Eigen::VectorXf sigma_;
   Eigen::VectorXf gamma_;
   Eigen::VectorXf beta_;
-  float epsilon_;
-  float momentum_;
-  int axis_;
-  bool center_;
-  bool scale_;
+  float epsilon_ = 0.0;
+  float momentum_ = 0.0;
+  int axis_ = 0;
+  bool center_ = false;
+  bool scale_ = false;
 };
 
 /**
@@ -208,44 +210,44 @@ class LSTM : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 
   /**
-   * @brief Compute the output of lstm step by step
-   * @param Input of current step
-   * @param Ouput of current step
-   * @parem Hidden state of previous step and return current hidden state
-   * @param Cell state of previous step and return current cell state
+   * @brief Reset the internal state and memory cell state as zero-matrix
    */
-  void Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
-            Eigen::MatrixXf* ht_1, Eigen::MatrixXf* ct_1);
-
-  /**
-   * @brief Reset the interal state and memery cell state as zero-matrix
-   */
-  virtual void ResetState();
+  void ResetState() override;
 
   /**
    * @brief Set the internal state and memory cell state
    * @param A vector of Eigen::MatrixXf
    */
-  virtual void SetState(const std::vector<Eigen::MatrixXf>& states);
+  void SetState(const std::vector<Eigen::MatrixXf>& states) override;
 
   /**
    * @brief Access to the internal state and memory cell state
    * @return State in a vector of Eigen::MatrixXf
    */
-  virtual void State(std::vector<Eigen::MatrixXf>* states) const;
+  void State(std::vector<Eigen::MatrixXf>* states) const override;
 
  private:
+  /**
+   * @brief Compute the output of LSTM step by step
+   * @param Input of current step
+   * @param Output of current step
+   * @param Hidden state of previous step and return current hidden state
+   * @param Cell state of previous step and return current cell state
+   */
+  void Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
+            Eigen::MatrixXf* ht_1, Eigen::MatrixXf* ct_1);
+
   Eigen::MatrixXf wi_;
   Eigen::MatrixXf wf_;
   Eigen::MatrixXf wc_;
@@ -264,11 +266,11 @@ class LSTM : public Layer {
   Eigen::MatrixXf ct_1_;
   std::function<float(float)> kactivation_;
   std::function<float(float)> krecurrent_activation_;
-  int units_;
-  bool return_sequences_;
-  bool stateful_;
-  bool use_bias_;
-  bool unit_forget_bias_;
+  int units_ = 0;
+  bool return_sequences_ = false;
+  bool stateful_ = false;
+  bool use_bias_ = false;
+  bool unit_forget_bias_ = false;
 };
 
 /**
@@ -281,15 +283,15 @@ class Flatten : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 };
 
 /**
@@ -303,20 +305,20 @@ class Input : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 
  private:
   std::vector<int> input_shape_;
   std::string dtype_;
-  bool sparse_;
+  bool sparse_ = false;
 };
 
 /**
@@ -330,18 +332,18 @@ class Concatenate : public Layer {
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
-  virtual bool Load(const apollo::prediction::LayerParameter& layer_pb);
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output);
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
 
  private:
-  int axis_;
+  int axis_ = 0;
 };
 
 }  // namespace network

@@ -176,7 +176,9 @@ class ObjectTrackSet {
 
   // @brief get maintained tracks
   // @return maintained tracks
-  inline std::vector<ObjectTrackPtr>& GetTracks() { return tracks_; }
+  inline std::vector<ObjectTrackPtr>& GetTracks() {
+    return tracks_;
+  }
 
   // @brief get maintained tracks
   // @return maintained tracks
@@ -186,12 +188,16 @@ class ObjectTrackSet {
 
   // @brief get size of maintained tracks
   // @return size of maintained tracks
-  inline int Size() const { return tracks_.size(); }
+  inline int Size() const {
+    return tracks_.size();
+  }
 
   // @brief add track to current set of maintained tracks
   // @params[IN] track: adding track
   // @return nothing
-  void AddTrack(const ObjectTrackPtr& track) { tracks_.push_back(track); }
+  void AddTrack(const ObjectTrackPtr& track) {
+    tracks_.push_back(track);
+  }
 
   // @brief remove lost tracks
   // @return number of removed tracks

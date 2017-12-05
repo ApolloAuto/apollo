@@ -293,6 +293,8 @@ void CreatePredictionTrajectory(Object *world_object,
   }
 }
 
+inline double SecToMs(const double sec) { return sec * 1000.0; }
+
 }  // namespace
 
 constexpr int SimulationWorldService::kMaxMonitorItems;
@@ -360,14 +362,16 @@ void SimulationWorldService::Update() {
 
 void SimulationWorldService::UpdateDelays() {
   auto *delays = world_.mutable_delay();
-  delays->set_chassis(AdapterManager::GetChassis()->GetDelayInMs());
-  delays->set_localization(AdapterManager::GetLocalization()->GetDelayInMs());
+  delays->set_chassis(SecToMs(AdapterManager::GetChassis()->GetDelaySec()));
+  delays->set_localization(
+      SecToMs(AdapterManager::GetLocalization()->GetDelaySec()));
   delays->set_perception_obstacle(
-      AdapterManager::GetPerceptionObstacles()->GetDelayInMs());
-  delays->set_planning(AdapterManager::GetPlanning()->GetDelayInMs());
-  delays->set_prediction(AdapterManager::GetPrediction()->GetDelayInMs());
+      SecToMs(AdapterManager::GetPerceptionObstacles()->GetDelaySec()));
+  delays->set_planning(SecToMs(AdapterManager::GetPlanning()->GetDelaySec()));
+  delays->set_prediction(
+      SecToMs(AdapterManager::GetPrediction()->GetDelaySec()));
   delays->set_traffic_light(
-      AdapterManager::GetTrafficLightDetection()->GetDelayInMs());
+      SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {

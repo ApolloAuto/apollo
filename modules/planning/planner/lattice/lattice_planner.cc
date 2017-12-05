@@ -120,6 +120,7 @@ Status LatticePlanner::Plan(
 
   planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
+  /*
   // put obstacles into debug data
   // Note : create prediction_obstacles since there is no longer original
   // data exposed. WTF
@@ -135,7 +136,7 @@ Status LatticePlanner::Plan(
   }
 
   AINFO << "Step Debug Succeeded";
-
+  */
   int num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost = 0.0;
@@ -166,6 +167,7 @@ Status LatticePlanner::Plan(
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
         combined_trajectory.trajectory_points();
 
+    /*
     auto combined_trajectory_path =
         ptr_debug->mutable_planning_data()->add_trajectory_path();
     for (uint i = 0; i < combined_trajectory_points.size(); ++i) {
@@ -173,6 +175,7 @@ Status LatticePlanner::Plan(
           combined_trajectory_points[i]);
     }
     combined_trajectory_path->set_lattice_trajectory_cost(trajectory_pair_cost);
+    */
 
     AINFO << "------(2)set lattice trajectory";
     // AINFO << "trajectory not valid for constraint ["
@@ -217,8 +220,8 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
   double s0 = lon_trajectory.Evaluate(0, 0.0);
   double s_ref_max = reference_line.back().s();
-  double t_param_max = lon_trajectory.param_length();
-  double s_param_max = lat_trajectory.param_length();
+  double t_param_max = lon_trajectory.ParamLength();
+  double s_param_max = lat_trajectory.ParamLength();
 
   double t_param = 0.0;
   while (t_param < planned_trajectory_time) {

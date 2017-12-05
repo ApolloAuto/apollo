@@ -121,7 +121,8 @@ bool DPRoadGraph::GenerateMinCostPath(
       common::VehicleConfigHelper::instance()->GetConfig();
 
   TrajectoryCost trajectory_cost(config_, reference_line_, obstacles,
-                                 vehicle_config.vehicle_param(), speed_data_);
+                                 vehicle_config.vehicle_param(), speed_data_,
+                                 init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
   graph_nodes[0].emplace_back(init_sl_point_, nullptr, 0.0);
@@ -168,7 +169,11 @@ bool DPRoadGraph::SamplePathWaypoints(
   constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
   CHECK(points != nullptr);
 
-  const double reference_line_length = reference_line_.Length();
+  const double kAdditioalPathLength = 20.0;
+  const double total_length =
+      std::fmin(init_sl_point_.s() + speed_data_.speed_vector().back().s() +
+                    kAdditioalPathLength,
+                reference_line_.Length());
 
   double level_distance = 0.0;
   if (reference_line_info_.IsChangeLanePath()) {
@@ -181,16 +186,22 @@ bool DPRoadGraph::SamplePathWaypoints(
         config_.step_length_min(), config_.step_length_max());
   }
   double accumulated_s = init_sl_point_.s();
-  for (std::size_t i = 0; accumulated_s < reference_line_length; ++i) {
+  for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
-    const double s = std::fmin(accumulated_s, reference_line_length);
+    const double s = std::fmin(accumulated_s, total_length);
 
     double left_width = 0.0;
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
+    const auto &vehicle_config =
+        common::VehicleConfigHelper::instance()->GetConfig();
+    const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
+    const double eff_right_width = right_width - half_adc_width;
+    const double eff_left_width = left_width - half_adc_width;
+
     std::vector<double> sample_l;
-    common::util::uniform_slice(-right_width, left_width,
+    common::util::uniform_slice(-eff_right_width, eff_left_width,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
     for (double l : sample_l) {

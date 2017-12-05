@@ -117,15 +117,22 @@ bool CNNSegmentation::Init() {
   feature_blob_ = caffe_net_->blob_by_name(feature_blob_name);
   CHECK(feature_blob_ != nullptr) << "`" << feature_blob_name
                                   << "` not exists!";
+  // class prediction
+  string class_pt_blob_name = network_param.has_class_pt_blob()
+                                  ? network_param.class_pt_blob()
+                                  : "class_score";
+  class_pt_blob_ = caffe_net_->blob_by_name(class_pt_blob_name);
+  CHECK(class_pt_blob_ != nullptr) << "`" << class_pt_blob_name
+                                   << "` not exists!";
 
   cluster2d_.reset(new cnnseg::Cluster2D());
   if (!cluster2d_->Init(height_, width_, range_)) {
-    AERROR << "Fail to init cluster2d for CNNSegmentation";
+    AERROR << "Fail to Init cluster2d for CNNSegmentation";
   }
 
   feature_generator_.reset(new cnnseg::FeatureGenerator<float>());
   if (!feature_generator_->Init(feature_param, feature_blob_.get())) {
-    AERROR << "Fail to init feature generator for CNNSegmentation";
+    AERROR << "Fail to Init feature generator for CNNSegmentation";
     return false;
   }
 
@@ -178,6 +185,8 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   PERF_BLOCK_END("[CNNSeg] clustering");
 
   cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
+
+  cluster2d_->Classify(*class_pt_blob_);
 
   float confidence_thresh = cnnseg_param_.has_confidence_thresh()
                                 ? cnnseg_param_.confidence_thresh()

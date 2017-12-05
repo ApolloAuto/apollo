@@ -24,9 +24,8 @@ const double PolygonScanConverter::kInf =
     std::numeric_limits<double>::infinity();
 
 void PolygonScanConverter::Init(const DirectionMajor major_dir,
-                                const Interval& valid_x_range,
-                                const Polygon& polygon,
-                                const double step) {
+                                const Interval &valid_x_range,
+                                const Polygon &polygon, const double step) {
   major_dir_ = major_dir;
   op_major_dir_ = OppositeDirection(major_dir);
 
@@ -37,7 +36,7 @@ void PolygonScanConverter::Init(const DirectionMajor major_dir,
 }
 
 void PolygonScanConverter::ConvertScans(
-    std::vector<std::vector<Interval>>* scans_intervals) {
+    std::vector<std::vector<Interval>> *scans_intervals) {
   scans_intervals->resize(scans_size_);
 
   DisturbPolygon();
@@ -55,19 +54,17 @@ void PolygonScanConverter::ConvertScans(
   std::sort(active_edge_table_.begin(), active_edge_table_.end());
   for (size_t i = 0; i < active_edge_table_.size(); i += 2) {
     double min_y = active_edge_table_[i].y;
-    double max_y = active_edge_table_[i+1].y;
+    double max_y = active_edge_table_[i + 1].y;
     (*scans_intervals)[0].push_back(Interval(min_y, max_y));
   }
 
-
   for (size_t i = 1; i < scans_size_; ++i) {
-    UpdateActiveEdgeTable(i, &(scans_intervals->at(i)) );
+    UpdateActiveEdgeTable(i, &(scans_intervals->at(i)));
   }
 }
 
 void PolygonScanConverter::UpdateActiveEdgeTable(
-    const size_t x_id,
-    std::vector<Interval>* scan_intervals) {
+    const size_t x_id, std::vector<Interval> *scan_intervals) {
   size_t valid_edges_num = active_edge_table_.size();
   size_t invalid_edges_num = 0;
 
@@ -93,14 +90,14 @@ void PolygonScanConverter::UpdateActiveEdgeTable(
 
   if (invalid_edges_num != 0 || new_edges_num != 0) {
     std::sort(active_edge_table_.begin(), active_edge_table_.end(),
-              [](const Edge &a, const Edge &b) {return a.y < b.y;});
+              [](const Edge &a, const Edge &b) { return a.y < b.y; });
     active_edge_table_.erase(next(active_edge_table_.begin(), valid_edges_num),
                              active_edge_table_.end());
   }
 
   for (size_t i = 0; i + 1 < active_edge_table_.size(); i += 2) {
     double min_y = active_edge_table_[i].y;
-    double max_y = active_edge_table_[i+1].y;
+    double max_y = active_edge_table_[i + 1].y;
 
     scan_intervals->emplace_back(min_y, max_y);
   }
@@ -124,7 +121,7 @@ void PolygonScanConverter::BuildEdgeTable() {
     int x_id = edges[i].first;
     const Edge &edge = edges[i].second;
 
-    if (x_id >=static_cast<int>(scans_size_)) {
+    if (x_id >= static_cast<int>(scans_size_)) {
       continue;
     }
 
@@ -140,7 +137,7 @@ void PolygonScanConverter::BuildEdgeTable() {
 }
 
 bool PolygonScanConverter::ConvertSegmentToEdge(
-    const size_t seg_id, std::pair<int, Edge>* out_edge) {
+    const size_t seg_id, std::pair<int, Edge> *out_edge) {
   const Segment &segment = segments_[seg_id];
 
   double min_x = segment.first[major_dir_] - min_x_;
@@ -187,17 +184,18 @@ void PolygonScanConverter::ConvertPolygonToSegments() {
 
     double x_diff = next_vertex[major_dir_] - cur_vertex[major_dir_];
     double y_diff = next_vertex[op_major_dir_] - cur_vertex[op_major_dir_];
-    std::abs(cur_vertex[major_dir_] - next_vertex[major_dir_]) < kEpsilon ?
-    slope_.push_back(kInf) : slope_.push_back(y_diff / x_diff);
+    std::abs(cur_vertex[major_dir_] - next_vertex[major_dir_]) < kEpsilon
+        ? slope_.push_back(kInf)
+        : slope_.push_back(y_diff / x_diff);
   }
 }
 
 void PolygonScanConverter::DisturbPolygon() {
-  for (auto& pt : polygon_) {
+  for (auto &pt : polygon_) {
     // For current point, find the x coordinate of nearest scan line.
     // If they are too close, disturb the point in case of the point locating on
     // the line.
-    double& x = pt[major_dir_];
+    double &x = pt[major_dir_];
     double d_x = (x - min_x_) / step_;
     int int_d_x = std::round(d_x);
     double delta_x = d_x - int_d_x;

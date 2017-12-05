@@ -23,6 +23,17 @@
 namespace apollo {
 namespace perception {
 
+std::string GetFileName(const std::string& path) {
+  std::string filename;
+  std::string::size_type loc = path.rfind('/');
+  if (loc == std::string::npos) {
+    filename = path;
+  } else {
+    filename = path.substr(loc + 1);
+  }
+  return filename;
+}
+
 void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
                               std::vector<std::string>* ret) {
   std::vector<int> ret_id;

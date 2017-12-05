@@ -20,6 +20,7 @@
 
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/dreamview/backend/util/json_util.h"
 
 namespace apollo {
 namespace dreamview {
@@ -40,6 +41,7 @@ using apollo::hdmap::RouteSegments;
 using apollo::hdmap::SimMapFile;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
+using apollo::dreamview::util::JsonUtil;
 
 namespace {
 
@@ -68,29 +70,17 @@ void ExtractOverlapIds(const std::vector<MapElementInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-void ExtractStringVectorFromJson(const nlohmann::json &json_object,
-                                 const std::string &key,
-                                 std::vector<std::string> *result) {
-  auto iter = json_object.find(key);
-  if (iter != json_object.end()) {
-    result->reserve(iter->size());
-    for (size_t i = 0; i < iter->size(); ++i) {
-      result->push_back((*iter)[i]);
-    }
-  }
-}
-
 }  // namespace
 
 MapElementIds::MapElementIds(const nlohmann::json &json_object)
     : MapElementIds() {
-  ExtractStringVectorFromJson(json_object, "lane", &lane);
-  ExtractStringVectorFromJson(json_object, "crosswalk", &crosswalk);
-  ExtractStringVectorFromJson(json_object, "junction", &junction);
-  ExtractStringVectorFromJson(json_object, "signal", &signal);
-  ExtractStringVectorFromJson(json_object, "stopSign", &stop_sign);
-  ExtractStringVectorFromJson(json_object, "yield", &yield);
-  ExtractStringVectorFromJson(json_object, "overlap", &overlap);
+  JsonUtil::GetStringVectorFromJson(json_object, "lane", &lane);
+  JsonUtil::GetStringVectorFromJson(json_object, "crosswalk", &crosswalk);
+  JsonUtil::GetStringVectorFromJson(json_object, "junction", &junction);
+  JsonUtil::GetStringVectorFromJson(json_object, "signal", &signal);
+  JsonUtil::GetStringVectorFromJson(json_object, "stopSign", &stop_sign);
+  JsonUtil::GetStringVectorFromJson(json_object, "yield", &yield);
+  JsonUtil::GetStringVectorFromJson(json_object, "overlap", &overlap);
 }
 
 size_t MapElementIds::Hash() const {

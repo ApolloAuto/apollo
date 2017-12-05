@@ -17,9 +17,9 @@
 #include "modules/drivers/conti_radar/protocol/object_extended_info_60d.h"
 
 #include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
+#include "modules/drivers/conti_radar/protocol/const_vars.h"
 
 namespace apollo {
 namespace drivers {
@@ -68,7 +68,7 @@ double ObjectExtendedInfo60D::longitude_accel(const std::uint8_t* bytes,
   x <<= 3;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.01 - 10.0;
+  double ret = x * OBJECT_AREL_RES + OBJECT_AREL_LONG_MIN;
   return ret;
 }
 
@@ -83,7 +83,7 @@ double ObjectExtendedInfo60D::lateral_accel(const std::uint8_t* bytes,
   x <<= 4;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.01 - 2.50;
+  double ret = x * OBJECT_AREL_RES + OBJECT_AREL_LAT_MIN;
   return ret;
 }
 
@@ -107,7 +107,7 @@ double ObjectExtendedInfo60D::oritation_angle(const std::uint8_t* bytes,
   x <<= 2;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.4 - 180.0;
+  double ret = x * OBJECT_ORIENTATION_ANGEL_RES + OBJECT_ORIENTATION_ANGEL_MIN;
   return ret;
 }
 
@@ -116,7 +116,7 @@ double ObjectExtendedInfo60D::object_length(const std::uint8_t* bytes,
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  double ret = x;
+  double ret = x * OBJECT_LENGTH_RES;
   return ret;
 }
 
@@ -125,7 +125,7 @@ double ObjectExtendedInfo60D::object_width(const std::uint8_t* bytes,
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  double ret = x;
+  double ret = x * OBJECT_WIDTH_RES;
   return ret;
 }
 

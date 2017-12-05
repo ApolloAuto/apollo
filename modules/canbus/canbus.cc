@@ -37,7 +37,7 @@ using apollo::drivers::canbus::CanClientFactory;
 using apollo::control::ControlCommand;
 using apollo::common::time::Clock;
 
-std::string Canbus::Name() const { return FLAGS_hmi_name; }
+std::string Canbus::Name() const { return FLAGS_canbus_module_name; }
 
 Status Canbus::Init() {
   // load conf

@@ -91,7 +91,7 @@ double TrajectoryEvaluator::evaluate(
   double weight_lat_offset = 10.0;
 
   double t = 0.0;
-  double t_max = lon_trajectory->param_length();
+  double t_max = lon_trajectory->ParamLength();
   double s_max = lon_trajectory->Evaluate(0, t_max);
   double v_end = lon_trajectory->Evaluate(1, t_max);
 
@@ -123,7 +123,7 @@ double TrajectoryEvaluator::evaluate(
 double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
     const std::shared_ptr<Curve1d>& lat_trajectory,
     const std::vector<double>& s_values) const {
-  double lat_s_max = lat_trajectory->param_length();
+  double lat_s_max = lat_trajectory->ParamLength();
   double lat_offset_end = lat_trajectory->Evaluate(0, lat_s_max);
   double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
 
@@ -155,7 +155,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
     const std::shared_ptr<Curve1d>& lon_trajectory) const {
   double cost = 0.0;
   double t = 0.0;
-  double lon_t_max = lon_trajectory->param_length();
+  double lon_t_max = lon_trajectory->ParamLength();
 
   while (t < planned_trajectory_time) {
     double c = 0.0;
@@ -190,9 +190,9 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     if (s <= std::numeric_limits<double>::epsilon()) {
       double target_speed = ds;
       double end_speed =
-          lon_trajectory->Evaluate(1, lon_trajectory->param_length());
+          lon_trajectory->Evaluate(1, lon_trajectory->ParamLength());
 
-      double t_max = lon_trajectory->param_length();
+      double t_max = lon_trajectory->ParamLength();
       double t = 0.0;
       double cost = 0.0;
 
@@ -212,7 +212,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
       // apply the following 3 second rule.
       double target_s = s - 3.0 * ds;
       double end_s =
-          lon_trajectory->Evaluate(0, lon_trajectory->param_length());
+          lon_trajectory->Evaluate(0, lon_trajectory->ParamLength());
 
       double weight = 10.0;
       return (target_s - end_s) * weight;
@@ -220,7 +220,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   } else {
     CHECK(objective.decision_type() == PlanningTarget::STOP);
     double target_s = s;
-    double t_max = lon_trajectory->param_length();
+    double t_max = lon_trajectory->ParamLength();
     double end_s = lon_trajectory->Evaluate(0, t_max);
 
     double weight_overshoot = 100.0;

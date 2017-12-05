@@ -53,14 +53,21 @@ bool SignalLight::ApplyRule(Frame* frame,
 }
 
 void SignalLight::ReadSignals() {
+  detected_signals_.clear();
   if (AdapterManager::GetTrafficLightDetection()->Empty()) {
+    return;
+  }
+  if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
+      FLAGS_signal_expire_time_sec) {
+    ADEBUG << "traffic signals msg is expired: "
+           << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
     return;
   }
   const TrafficLightDetection& detection =
       AdapterManager::GetTrafficLightDetection()->GetLatestObserved();
   for (int j = 0; j < detection.traffic_light_size(); j++) {
     const TrafficLight& signal = detection.traffic_light(j);
-    signals_[signal.id()] = &signal;
+    detected_signals_[signal.id()] = &signal;
   }
 }
 
@@ -69,15 +76,17 @@ bool SignalLight::FindValidSignalLight(
   const std::vector<hdmap::PathOverlap>& signal_lights =
       reference_line_info->reference_line().map_path().signal_overlaps();
   if (signal_lights.size() <= 0) {
+    ADEBUG << "No signal lights from reference line.";
     return false;
   }
+  signal_lights_from_path_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
     if (signal_light.start_s + FLAGS_stop_max_distance_buffer >
         reference_line_info->AdcSlBoundary().end_s()) {
-      signal_lights_.push_back(&signal_light);
+      signal_lights_from_path_.push_back(&signal_light);
     }
   }
-  return signal_lights_.size() > 0;
+  return signal_lights_from_path_.size() > 0;
 }
 
 void SignalLight::MakeDecisions(Frame* frame,
@@ -91,7 +100,7 @@ void SignalLight::MakeDecisions(Frame* frame,
   signal_light_debug->set_adc_speed(
       common::VehicleStateProvider::instance()->linear_velocity());
 
-  for (const hdmap::PathOverlap* signal_light : signal_lights_) {
+  for (const hdmap::PathOverlap* signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light->object_id);
     double stop_deceleration =
         GetStopDeceleration(reference_line_info, signal_light);
@@ -116,7 +125,8 @@ void SignalLight::MakeDecisions(Frame* frame,
 }
 
 TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
-  const auto* result = apollo::common::util::FindPtrOrNull(signals_, signal_id);
+  const auto* result =
+      apollo::common::util::FindPtrOrNull(detected_signals_, signal_id);
   if (result == nullptr) {
     TrafficLight traffic_light;
     traffic_light.set_id(signal_id);

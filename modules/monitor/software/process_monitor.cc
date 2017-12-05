@@ -73,14 +73,12 @@ void ProcessMonitor::UpdateModule(
   auto *status = MonitorManager::GetModuleStatus(module_name);
   for (const auto &proc : running_processes) {
     if (ContainsAll(proc.second, config.process_cmd_keywords())) {
-      status->set_process_running(true);  // TODO(xiaoxq): Deprecate.
       status->mutable_process_status()->set_running(true);
       ADEBUG << "Module " << module_name
              << " is running on process " << proc.first;
       return;
     }
   }
-  status->set_process_running(false);  // TODO(xiaoxq): Deprecate.
   status->mutable_process_status()->set_running(false);
 }
 

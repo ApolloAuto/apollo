@@ -32,9 +32,9 @@
 namespace apollo {
 namespace perception {
 
-class HmObjectTracker : public BaseTracker{
+class HmObjectTracker : public BaseTracker {
  public:
-  typedef std::pair<int, int>           TrackObjectPair;
+  typedef std::pair<int, int> TrackObjectPair;
 
   HmObjectTracker();
   virtual ~HmObjectTracker();
@@ -46,27 +46,24 @@ class HmObjectTracker : public BaseTracker{
   // @brief set matcher method
   // @params[IN] matcher_method_name: name of mathcer method
   // @return true if set successfully, otherwise return fasle
-  bool SetMatcherMethod(
-    const std::string& matcher_method_name);
+  bool SetMatcherMethod(const std::string& matcher_method_name);
 
   // @brief set collect consecutive invisible maximum
   // @params[IN] collect_consecutive_invisible_maximum: collect consecutive
   // invisible maximum
   // @return true if set successfully, otherwise return fasle
   bool SetCollectConsecutiveInvisibleMaximum(
-    const int& collect_consecutive_invisible_maximum);
+      const int& collect_consecutive_invisible_maximum);
 
   // @brief set collect age minimum
   // @params[IN] collect_age_minimum: collect age minimum
   // @return true if set successfully, otherwise return fasle
-  bool SetCollectAgeMinimum(
-    const int& collect_age_minimum);
+  bool SetCollectAgeMinimum(const int& collect_age_minimum);
 
   // @brief set histogram bin size
   // @params[IN] histogram_bin_size: histogram bin size
   // @return true if set successfully, otherwise return fasle
-  bool SetHistogramBinSize(
-    const int& histogram_bin_size);
+  bool SetHistogramBinSize(const int& histogram_bin_size);
 
   // @brief track detected objects over consecutive frames
   // @params[IN] objects: recently detected objects
@@ -74,11 +71,9 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] options: tracker options with necessary information
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if track successfully, otherwise return false
-  bool Track(
-    const std::vector<ObjectPtr>& objects,
-    double timestamp,
-    const TrackerOptions& options,
-    std::vector<ObjectPtr>* tracked_objects);
+  bool Track(const std::vector<ObjectPtr>& objects, double timestamp,
+             const TrackerOptions& options,
+             std::vector<ObjectPtr>* tracked_objects);
 
   // @brief get object tracks of tracker
   // @return object tracks maintained in tracker
@@ -95,18 +90,15 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] options: tracker options with necessary information
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if initialize successfully, otherwise return false
-  bool Initialize(
-    const std::vector<ObjectPtr>& objects,
-    const double& timestamp,
-    const TrackerOptions& options,
-    std::vector<ObjectPtr>* tracked_objects);
+  bool Initialize(const std::vector<ObjectPtr>& objects,
+                  const double& timestamp, const TrackerOptions& options,
+                  std::vector<ObjectPtr>* tracked_objects);
 
   // @brief transform v2world pose to v2local pose intend to avoid huge value
   // float computing
   // @params[OUT] pose: v2world pose
   // @return nothing
-  void TransformPoseGlobal2Local(
-    Eigen::Matrix4d* pose);
+  void TransformPoseGlobal2Local(Eigen::Matrix4d* pose);
 
   // @brief construct tracked objects via necessray transformation & feature
   // computing
@@ -115,41 +107,35 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] pose: pose using for coordinate transformation
   // @params[IN] options: tracker options with necessary information
   // @return nothing
-  void ConstructTrackedObjects(
-    const std::vector<ObjectPtr>& objects,
-    std::vector<TrackedObjectPtr>* tracked_objects,
-    const Eigen::Matrix4d& pose,
-    const TrackerOptions& options);
+  void ConstructTrackedObjects(const std::vector<ObjectPtr>& objects,
+                               std::vector<TrackedObjectPtr>* tracked_objects,
+                               const Eigen::Matrix4d& pose,
+                               const TrackerOptions& options);
 
   // @brief compute objects' shape feature
   // @params[OUT] object: object for computing shape feature
   // @return nothing
-  void ComputeShapeFeatures(
-    TrackedObjectPtr* obj);
+  void ComputeShapeFeatures(TrackedObjectPtr* obj);
 
   // @brief transform tracked object with given pose
   // @params[OUT] obj: tracked object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
-  void TransformTrackedObject(
-    TrackedObjectPtr* obj,
-    const Eigen::Matrix4d& pose);
+  void TransformTrackedObject(TrackedObjectPtr* obj,
+                              const Eigen::Matrix4d& pose);
 
   // @brief transform object with given pose
   // @params[OUT] obj: object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
-  void TransformObject(
-    ObjectPtr* obj,
-    const Eigen::Matrix4d& pose);
+  void TransformObject(ObjectPtr* obj, const Eigen::Matrix4d& pose);
 
   // @brief compute predicted states of maintained tracks
   // @params[OUT] tracks_predict: predicted states of maintained tracks
   // @params[IN] time_diff: time interval for predicting
   // @return nothing
-  void ComputeTracksPredict(
-    std::vector<Eigen::VectorXf>* tracks_predict,
-    const double& time_diff);
+  void ComputeTracksPredict(std::vector<Eigen::VectorXf>* tracks_predict,
+                            const double& time_diff);
 
   // @brief update assigned tracks
   // @params[IN] tracks_predict: predicted states of maintained tracks
@@ -157,11 +143,10 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] assignments: assignment pair of <track, object>
   // @params[IN] time_diff: time interval for updating
   // @return nothing
-  void UpdateAssignedTracks(
-    std::vector<Eigen::VectorXf>* tracks_predict,
-    std::vector<TrackedObjectPtr>* new_objects,
-    const std::vector<TrackObjectPair>& assignments,
-    const double& time_diff);
+  void UpdateAssignedTracks(std::vector<Eigen::VectorXf>* tracks_predict,
+                            std::vector<TrackedObjectPtr>* new_objects,
+                            const std::vector<TrackObjectPair>& assignments,
+                            const double& time_diff);
 
   // @brief update tracks without matched objects
   // @params[IN] tracks_predict: predicted states of maintained tracks
@@ -169,17 +154,15 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] time_diff: time interval for updating
   // @return nothing
   void UpdateUnassignedTracks(
-    const std::vector<Eigen::VectorXf>& tracks_predict,
-    const std::vector<int>& unassigned_tracks,
-    const double& time_diff);
+      const std::vector<Eigen::VectorXf>& tracks_predict,
+      const std::vector<int>& unassigned_tracks, const double& time_diff);
 
   // @brief create new tracks for objects without matched track
   // @params[IN] new_objects: recently detected objects
   // @params[IN] unassigned_objects: index of unassigned objects
   // @return nothing
-  void CreateNewTracks(
-    const std::vector<TrackedObjectPtr>& new_objects,
-    const std::vector<int>& unassigned_objects);
+  void CreateNewTracks(const std::vector<TrackedObjectPtr>& new_objects,
+                       const std::vector<int>& unassigned_objects);
 
   // @brief delete lost tracks
   // @return nothing
@@ -188,28 +171,27 @@ class HmObjectTracker : public BaseTracker{
   // @brief collect tracked results
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return nothing
-  void CollectTrackedResults(
-    std::vector<ObjectPtr>* tracked_objects);
+  void CollectTrackedResults(std::vector<ObjectPtr>* tracked_objects);
 
  private:
   // algorithm setup
-  MatcherType                   matcher_method_;
-  FilterType                    filter_method_;
-  int                           collect_consecutive_invisible_maximum_;
-  int                           collect_age_minimum_;
-  bool                          use_histogram_for_match_;
-  int                           histogram_bin_size_;
+  MatcherType matcher_method_;
+  FilterType filter_method_;
+  int collect_consecutive_invisible_maximum_;
+  int collect_age_minimum_;
+  bool use_histogram_for_match_;
+  int histogram_bin_size_;
 
   // matcher
-  BaseMatcher*                  matcher_;
+  BaseMatcher* matcher_;
 
   // tracks
-  ObjectTrackSet                object_tracks_;
+  ObjectTrackSet object_tracks_;
 
   // set offset to avoid huge value float computing
-  Eigen::Vector3d               global_to_local_offset_;
-  double                        time_stamp_;
-  bool                          valid_;
+  Eigen::Vector3d global_to_local_offset_;
+  double time_stamp_;
+  bool valid_;
 
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker

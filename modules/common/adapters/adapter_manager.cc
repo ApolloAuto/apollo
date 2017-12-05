@@ -120,9 +120,6 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::SYSTEM_STATUS:
         EnableSystemStatus(FLAGS_system_status_topic, config);
         break;
-      case AdapterConfig::HMI_COMMAND:
-        EnableHMICommand(FLAGS_hmi_command_topic, config);
-        break;
       case AdapterConfig::MOBILEYE:
         EnableMobileye(FLAGS_mobileye_topic, config);
         break;
@@ -134,6 +131,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config);
+        break;
+      case AdapterConfig::IMAGE_SHORT:
+        EnableImageShort(FLAGS_image_short_topic, config);
+        break;
+      case AdapterConfig::IMAGE_LONG:
+        EnableImageLong(FLAGS_image_long_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";

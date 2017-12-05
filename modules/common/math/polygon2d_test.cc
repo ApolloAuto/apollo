@@ -264,17 +264,17 @@ TEST(Polygon2dTest, ContainPolygon) {
   const Polygon2d poly2(Box2d::CreateAABox({1, 1}, {2, 2}));
   const Polygon2d poly3(Box2d::CreateAABox({1.5, 1.5}, {4, 4}));
   const Polygon2d poly4(Box2d::CreateAABox({-10, -10}, {10, 10}));
-  EXPECT_TRUE(poly1.IsContain(poly2));
-  EXPECT_FALSE(poly2.IsContain(poly1));
+  EXPECT_TRUE(poly1.Contains(poly2));
+  EXPECT_FALSE(poly2.Contains(poly1));
 
-  EXPECT_FALSE(poly1.IsContain(poly3));
-  EXPECT_FALSE(poly2.IsContain(poly3));
-  EXPECT_FALSE(poly3.IsContain(poly1));
-  EXPECT_FALSE(poly3.IsContain(poly2));
+  EXPECT_FALSE(poly1.Contains(poly3));
+  EXPECT_FALSE(poly2.Contains(poly3));
+  EXPECT_FALSE(poly3.Contains(poly1));
+  EXPECT_FALSE(poly3.Contains(poly2));
 
-  EXPECT_TRUE(poly4.IsContain(poly1));
-  EXPECT_TRUE(poly4.IsContain(poly2));
-  EXPECT_TRUE(poly4.IsContain(poly3));
+  EXPECT_TRUE(poly4.Contains(poly1));
+  EXPECT_TRUE(poly4.Contains(poly2));
+  EXPECT_TRUE(poly4.Contains(poly3));
 
   const Polygon2d poly5(
       {{0, 0}, {4, 0}, {4, 2}, {3, 2}, {2, 1}, {1, 2}, {0, 2}});
@@ -282,10 +282,10 @@ TEST(Polygon2dTest, ContainPolygon) {
   const Polygon2d poly7({{0, 1}, {1, 1}, {1, 2}, {0, 2}});
   const Polygon2d poly8({{3, 1}, {4, 1}, {4, 2}, {3, 2}});
   const Polygon2d poly9({{0, 0}, {4, 0}, {4, 1}, {0, 1}});
-  EXPECT_FALSE(poly5.IsContain(poly6));
-  EXPECT_TRUE(poly5.IsContain(poly7));
-  EXPECT_TRUE(poly5.IsContain(poly8));
-  EXPECT_TRUE(poly5.IsContain(poly9));
+  EXPECT_FALSE(poly5.Contains(poly6));
+  EXPECT_TRUE(poly5.Contains(poly7));
+  EXPECT_TRUE(poly5.Contains(poly8));
+  EXPECT_TRUE(poly5.Contains(poly9));
 }
 
 TEST(Polygon2dTest, ConvexHull) {
@@ -582,7 +582,7 @@ TEST(Polygon2dTest, BoundingBox) {
   EXPECT_NEAR(1.0, box.center().x(), 1e-5);
   EXPECT_NEAR(1.0, box.center().y(), 1e-5);
   EXPECT_NEAR(4.0, box.area(), 1e-5);
-  EXPECT_TRUE(Polygon2d(box).IsContain(poly1));
+  EXPECT_TRUE(Polygon2d(box).Contains(poly1));
   AABox2d aabox = poly1.AABoundingBox();
   EXPECT_NEAR(1.0, aabox.center().x(), 1e-5);
   EXPECT_NEAR(1.0, aabox.center().y(), 1e-5);
@@ -594,20 +594,20 @@ TEST(Polygon2dTest, BoundingBox) {
   EXPECT_NEAR(1.0, box.center().x(), 1e-5);
   EXPECT_NEAR(1.0, box.center().y(), 1e-5);
   EXPECT_NEAR(8.0, box.area(), 1e-5);
-  EXPECT_TRUE(Polygon2d(box).IsContain(poly1));
+  EXPECT_TRUE(Polygon2d(box).Contains(poly1));
 
   box = poly1.MinAreaBoundingBox();
   EXPECT_NEAR(1.0, box.center().x(), 1e-5);
   EXPECT_NEAR(1.0, box.center().y(), 1e-5);
   EXPECT_NEAR(4.0, box.area(), 1e-5);
-  EXPECT_TRUE(Polygon2d(box).IsContain(poly1));
+  EXPECT_TRUE(Polygon2d(box).Contains(poly1));
 
   Polygon2d poly2({{1, 0}, {0, 1}, {-1, 0}, {0, -1}});
   box = poly2.BoundingBoxWithHeading(0.0);
   EXPECT_NEAR(0.0, box.center().x(), 1e-5);
   EXPECT_NEAR(0.0, box.center().y(), 1e-5);
   EXPECT_NEAR(4.0, box.area(), 1e-5);
-  EXPECT_TRUE(Polygon2d(box).IsContain(poly2));
+  EXPECT_TRUE(Polygon2d(box).Contains(poly2));
   aabox = poly2.AABoundingBox();
   EXPECT_NEAR(0.0, aabox.center().x(), 1e-5);
   EXPECT_NEAR(0.0, aabox.center().y(), 1e-5);
@@ -619,13 +619,13 @@ TEST(Polygon2dTest, BoundingBox) {
   EXPECT_NEAR(0.0, box.center().x(), 1e-5);
   EXPECT_NEAR(0.0, box.center().y(), 1e-5);
   EXPECT_NEAR(2.0, box.area(), 1e-5);
-  EXPECT_TRUE(Polygon2d(box).IsContain(poly2));
+  EXPECT_TRUE(Polygon2d(box).Contains(poly2));
 
   box = poly2.MinAreaBoundingBox();
   EXPECT_NEAR(0.0, box.center().x(), 1e-5);
   EXPECT_NEAR(0.0, box.center().y(), 1e-5);
   EXPECT_NEAR(2.0, box.area(), 1e-5);
-  EXPECT_TRUE(Polygon2d(box).IsContain(poly2));
+  EXPECT_TRUE(Polygon2d(box).Contains(poly2));
 
   for (int iter = 0; iter < 1000; ++iter) {
     const int num_sample_points = RandomInt(3, 10);
@@ -643,11 +643,11 @@ TEST(Polygon2dTest, BoundingBox) {
     for (int iter2 = 0; iter2 < 10; ++iter2) {
       const double heading = RandomDouble(0, M_PI * 2.0);
       box = polygon.BoundingBoxWithHeading(heading);
-      EXPECT_TRUE(Polygon2d(box).IsContain(polygon));
+      EXPECT_TRUE(Polygon2d(box).Contains(polygon));
       min_area = std::min(min_area, box.area());
     }
     box = polygon.MinAreaBoundingBox();
-    EXPECT_TRUE(Polygon2d(box).IsContain(polygon));
+    EXPECT_TRUE(Polygon2d(box).Contains(polygon));
     EXPECT_LE(box.area(), min_area + 1e-5);
   }
 }

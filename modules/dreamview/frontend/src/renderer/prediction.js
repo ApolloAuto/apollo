@@ -79,7 +79,11 @@ export default class Prediction {
                             predictionLineColor, minorThickness, 6);
                     this.predLines.push(mesh);
                     scene.add(mesh);
-                    minorThickness -= 0.7;
+
+                    // keep thickness the same trajectories with low probabilities
+                    if (minorThickness > 0.2) {
+                        minorThickness -= 0.7;
+                    }
                 });
             }
         });

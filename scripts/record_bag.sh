@@ -29,7 +29,7 @@ function start() {
     LARGEST_DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
         awk '{print substr($0, index($0, $6))}')"
     if [ ! -z "${LARGEST_DISK}" ]; then
-      REAL_BAG_DIR="/media/${DOCKER_USER}/${LARGEST_DISK}/data/bag"
+      REAL_BAG_DIR="${LARGEST_DISK}/data/bag"
       if [ ! -d "${REAL_BAG_DIR}" ]; then
         mkdir -p "${REAL_BAG_DIR}"
       fi
@@ -39,7 +39,6 @@ function start() {
     else
       echo "Cannot find portable disk."
       echo "Please make sure your container was started AFTER inserting the disk."
-      exit 1
     fi
   fi
 
@@ -54,13 +53,17 @@ function start() {
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup rosbag record -b 2048  \
+    nohup rosbag record --split --duration=1m -b 2048  \
+        /apollo/sensor/camera/traffic/image_short \
+        /apollo/sensor/camera/traffic/image_long \
+        /apollo/sensor/conti_radar \
+        /apollo/sensor/delphi_esr \
         /apollo/sensor/gnss/gnss_status \
         /apollo/sensor/gnss/odometry \
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/gnss/corrected_imu \
         /apollo/sensor/mobileye \
-        /apollo/sensor/delphi_esr \
+        /apollo/sensor/velodyne64/compensator/PointCloud2 \
         /apollo/canbus/chassis \
         /apollo/canbus/chassis_detail \
         /apollo/control \
@@ -72,6 +75,8 @@ function start() {
         /apollo/routing_request \
         /apollo/routing_response \
         /apollo/localization/pose \
+        /tf \
+        /tf_static \
         /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
 }

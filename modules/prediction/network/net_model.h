@@ -14,14 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "Eigen/Dense"
 
+#include "modules/prediction/proto/network_model.pb.h"
+
 #include "modules/prediction/network/net_layer.h"
 #include "modules/prediction/network/net_util.h"
-#include "modules/prediction/proto/network_model.pb.h"
 
 #ifndef MODULES_PREDICTION_NETWORK_NET_MODEL_H_
 #define MODULES_PREDICTION_NETWORK_NET_MODEL_H_
@@ -37,7 +39,7 @@ namespace network {
 /**
  * @class NetModel
  * @brief NetModel is a base class for specific network model
- *        It contains a pure virtual function Run which must be implemeted
+ *        It contains a pure virtual function Run which must be implemented
  *        in derived class
  */
 class NetModel {
@@ -45,12 +47,12 @@ class NetModel {
   /**
    * @brief Constructor
    */
-  NetModel();
+  NetModel() = default;
 
   /**
    * @brief Destructor
    */
-  ~NetModel();
+  virtual ~NetModel() = default;
 
   /**
    * @brief Compute the model output from inputs
@@ -81,43 +83,38 @@ class NetModel {
   /**
    * @brief Load network parameters from a protobuf message
    * @param NetParameter is a protobuf message
-   * @return True if successly loaded, otherwise False
+   * @return True if successfully loaded, otherwise False
    */
   bool LoadModel(const NetParameter& net_parameter);
 
   /**
    * @brief Shows the performance information of a network
-   * @reture Performance of a network model
+   * @return Performance of a network model
    */
   std::string PerformanceString() const;
 
   /**
    * @brief Name of a network model
-   * @reture Name of a network model
+   * @return Name of a network model
    */
   const std::string& Name() const;
 
   /**
    * @brief Id of a network model
-   * @reture Id of a network model
+   * @return Id of a network model
    */
   int Id() const;
 
   /**
    * @brief Indicate the state of a network model
-   * @reture True of a network model is load successively, otherwise False.
+   * @return True of a network model is load successively, otherwise False.
    */
   bool IsOk() const;
 
  protected:
-  /**
-   * @brief Delete layers in a network model and release memory
-   */
-  void Clear();
-
-  std::vector<Layer*> layers_;
+  std::vector<std::unique_ptr<Layer>> layers_;
   NetParameter net_parameter_;
-  bool ok_;
+  bool ok_ = false;
 };
 
 }  // namespace network

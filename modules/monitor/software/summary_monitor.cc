@@ -20,8 +20,14 @@
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 
+DEFINE_string(summary_cleaner_name, "SummaryCleaner",
+              "Name of the summary cleaner.");
+
 DEFINE_string(summary_monitor_name, "SummaryMonitor",
               "Name of the summary monitor.");
+
+DEFINE_double(broadcast_max_interval, 8,
+              "Max interval of broadcasting runtime status.");
 
 namespace apollo {
 namespace monitor {
@@ -33,7 +39,52 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::util::StrCat;
 using apollo::common::util::StringPrintf;
 
+// Status has a *summary* field which is apollo::monitor::Summary.
+template <class Status>
+void UpdateStatusSummary(const Summary new_summary, const std::string &new_msg,
+                         Status *status) {
+  // Overwrite priority: FATAL > ERROR > WARN > OK > UNKNOWN.
+  if (new_summary > status->summary()) {
+    status->set_summary(new_summary);
+    if (!new_msg.empty()) {
+      status->set_msg(new_msg);
+    } else {
+      status->clear_msg();
+    }
+  }
+}
+
+template <class Status>
+void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
+  if (!topic_status.has_message_delay()) {
+    UpdateStatusSummary(Summary::OK, "", status);
+    return;
+  }
+
+  if (topic_status.message_delay() < 0) {
+    UpdateStatusSummary(Summary::ERROR, "No message", status);
+  } else {
+    UpdateStatusSummary(Summary::WARN, "Notable delay", status);
+  }
+}
+
 }  // namespace
+
+// Set interval to 0, so it runs every time when ticking.
+SummaryCleaner::SummaryCleaner()
+    : RecurrentRunner(FLAGS_summary_cleaner_name, 0) {
+}
+
+void SummaryCleaner::RunOnce(const double current_time) {
+  for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
+    module.second.set_summary(Summary::UNKNOWN);
+    module.second.clear_msg();
+  }
+  for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
+    hardware.second.set_summary(Summary::UNKNOWN);
+    hardware.second.clear_msg();
+  }
+}
 
 // Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
@@ -55,81 +106,55 @@ void SummaryMonitor::RunOnce(const double current_time) {
   system_status->SerializeToString(&proto_bytes);
   const size_t new_fp = hash_fn(proto_bytes);
 
-  if (system_status_fp_ != new_fp) {
+  if (system_status_fp_ != new_fp ||
+      current_time - last_broadcast_ > FLAGS_broadcast_max_interval) {
     AdapterManager::FillSystemStatusHeader("SystemMonitor", system_status);
     AdapterManager::PublishSystemStatus(*system_status);
     ADEBUG << "Published system status: " << system_status->DebugString();
     system_status_fp_ = new_fp;
+    last_broadcast_ = current_time;
   }
 }
 
 void SummaryMonitor::SummarizeModules() {
   for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
-    auto &status = module.second;
-    status.set_summary(Summary::UNKNOWN);
-    status.clear_msg();
+    ModuleStatus *status = &(module.second);
 
-    if (status.has_process_status() && !status.process_status().running()) {
-      status.set_summary(Summary::FATAL);
-      status.set_msg("No process");
+    if (status->has_process_status() && !status->process_status().running()) {
+      UpdateStatusSummary(Summary::FATAL, "No process", status);
       continue;
     }
 
-    if (status.has_topic_status()) {
-      if (!status.topic_status().has_message_delay()) {
-        status.set_summary(Summary::OK);
-        continue;
-      }
-
-      const double delay = status.topic_status().message_delay();
-      if (delay < 0) {
-        status.set_summary(Summary::ERROR);
-        status.set_msg("No message");
-      } else {
-        status.set_summary(Summary::WARN);
-        status.set_msg("Notable delay");
-      }
+    if (status->has_topic_status()) {
+      SummarizeOnTopicStatus(status->topic_status(), status);
     }
   }
 }
 
 void SummaryMonitor::SummarizeHardware() {
   for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
-    auto &status = hardware.second;
-    status.set_summary(Summary::UNKNOWN);
-    status.clear_msg();
+    HardwareStatus *status = &(hardware.second);
 
     // If we don't have the status, keeps as UNKNOWN.
-    if (status.has_status()) {
-      switch (status.status()) {
+    if (status->has_status()) {
+      switch (status->status()) {
         case HardwareStatus::NOT_PRESENT:
-          status.set_summary(Summary::FATAL);
+          UpdateStatusSummary(Summary::FATAL, "", status);
           break;
         case HardwareStatus::NOT_READY:
-          status.set_summary(Summary::WARN);
+          UpdateStatusSummary(Summary::WARN, "", status);
           break;
         case HardwareStatus::OK:
-          status.set_summary(Summary::OK);
+          UpdateStatusSummary(Summary::OK, "", status);
           break;
         default:
-          status.set_summary(Summary::ERROR);
+          UpdateStatusSummary(Summary::ERROR, "", status);
           break;
       }
     }
 
-    if (status.summary() == Summary::OK && status.has_topic_status()) {
-      if (!status.topic_status().has_message_delay()) {
-        continue;
-      }
-
-      const double delay = status.topic_status().message_delay();
-      if (delay < 0) {
-        status.set_summary(Summary::ERROR);
-        status.set_msg("No message");
-      } else {
-        status.set_summary(Summary::WARN);
-        status.set_msg("Notable delay");
-      }
+    if (status->has_topic_status()) {
+      SummarizeOnTopicStatus(status->topic_status(), status);
     }
   }
 }

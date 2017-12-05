@@ -70,8 +70,6 @@ DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_max_acc, 2.0, "maximum pedestrian acceleration");
 DEFINE_double(prediction_pedestrian_total_time, 10.0,
               "Total prediction time for pedestrians");
-DEFINE_int32(num_trajectory_still_pedestrian, 6,
-             "number of trajectories for static pedestrian");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(evaluator_vehicle_mlp_file,
               "modules/prediction/data/mlp_vehicle_model.bin",

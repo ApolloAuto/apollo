@@ -31,7 +31,7 @@ namespace drivers {
 namespace conti_radar {
 
 std::string ContiRadarCanbus::Name() const {
-  return FLAGS_hmi_name;
+  return FLAGS_canbus_driver_name;
 }
 
 apollo::common::Status ContiRadarCanbus::Init() {

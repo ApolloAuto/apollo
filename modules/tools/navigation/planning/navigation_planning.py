@@ -40,7 +40,7 @@ PUB_NODE_NAME = "planning"
 PUB_TOPIC = "/apollo/" + PUB_NODE_NAME
 CRUISE_SPEED = 10  # m/s
 ENABLE_FOLLOW = False
-ENABLE_ROUTING_AID = False
+ENABLE_ROUTING_AID = True
 
 f = open("benchmark.txt", "w")
 path_decider = PathDecider()
@@ -79,29 +79,12 @@ def mobileye_callback(mobileye_pb):
     mobileye_provider.process_obstacles()
 
     if ENABLE_ROUTING_AID:
-        vx = localization_provider.localization_pb.pose.position.x
-        vy = localization_provider.localization_pb.pose.position.y
-        heading = localization_provider.localization_pb.pose.heading
-        local_smooth_seg_x, local_smooth_seg_y = \
-            routing_provider.get_local_segment_spline(vx, vy, heading)
-
-        if len(local_smooth_seg_x) <= 0:
-            path_x, path_y, path_length = path_decider.get_path(
-                mobileye_provider.left_lane_marker_coef,
-                mobileye_provider.right_lane_marker_coef,
-                chassis_provider.get_speed_mps())
-        else:
-            #print local_smooth_seg_y[0]
-            path_x, path_y, path_length = path_decider.get_routing_aid_path(
-                mobileye_provider.left_lane_marker_coef,
-                mobileye_provider.right_lane_marker_coef,
-                chassis_provider.get_speed_mps(),
-                mobileye_pb, local_smooth_seg_x, local_smooth_seg_y)
+        path_x, path_y, path_length = path_decider.get_path_by_lmr(
+            mobileye_provider, routing_provider,
+            localization_provider, chassis_provider)
     else:
-        path_x, path_y, path_length = path_decider.get_path(
-            mobileye_provider.left_lane_marker_coef,
-            mobileye_provider.right_lane_marker_coef,
-            chassis_provider.get_speed_mps())
+        path_x, path_y, path_length = path_decider.get_path_by_lm(
+            mobileye_provider, chassis_provider)
 
     final_path_length = path_length
     speed = CRUISE_SPEED

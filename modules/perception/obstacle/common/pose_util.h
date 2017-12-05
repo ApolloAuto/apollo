@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "Eigen/Core"
+#include "Eigen/Dense"
 
 namespace apollo {
 namespace perception {
@@ -53,6 +53,11 @@ void QuaternionToRotationMatrix(const T* quat, T* R) {
 
 bool ReadPoseFile(const std::string& filename, Eigen::Matrix4d* pose,
                   int* frame_id, double* time_stamp);
+
+// @brief: Load the velodyne extrinsic from a YAML file.
+// @param [in]: path to yaml file
+// @param [out]: extrinsic transform
+bool LoadExtrinsic(const std::string& file_path, Eigen::Affine3d* extrinsic);
 
 }  // namespace perception
 }  // namespace apollo

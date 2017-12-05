@@ -46,7 +46,6 @@
 #include "modules/drivers/canbus/sensor_gflags.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
 
 /**
  * @namespace apollo::drivers
@@ -127,7 +126,7 @@ class SensorCanbus : public apollo::common::ApolloApp {
 
 template <typename SensorType>
 std::string SensorCanbus<SensorType>::Name() const {
-  return FLAGS_hmi_name;
+  return FLAGS_canbus_driver_name;
 }
 
 template <typename SensorType>

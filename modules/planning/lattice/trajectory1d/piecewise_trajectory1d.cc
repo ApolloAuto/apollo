@@ -45,14 +45,14 @@ double PiecewiseTrajectory1d::Evaluate(const std::uint32_t order,
   return trajectory_segments_[index]->Evaluate(order, param - param_overhead);
 }
 
-double PiecewiseTrajectory1d::param_length() const {
+double PiecewiseTrajectory1d::ParamLength() const {
   if (accumulated_param_lengths_.empty()) {
     return 0.0;
   }
   return accumulated_param_lengths_.back();
 }
 
-std::string PiecewiseTrajectory1d::to_string() const { return ""; }
+std::string PiecewiseTrajectory1d::ToString() const { return ""; }
 
 void PiecewiseTrajectory1d::AppendSegment(
     const std::shared_ptr<Curve1d> trajectory) {
@@ -65,7 +65,7 @@ void PiecewiseTrajectory1d::AppendSegment(
     double j1 = trajectory->Evaluate(3, 0.0);
 
     auto last_trajectory = trajectory_segments_.back();
-    double last_param_length = last_trajectory->param_length();
+    double last_param_length = last_trajectory->ParamLength();
     double s0 = last_trajectory->Evaluate(0, last_param_length);
     double v0 = last_trajectory->Evaluate(1, last_param_length);
     double a0 = last_trajectory->Evaluate(2, last_param_length);
@@ -89,7 +89,7 @@ void PiecewiseTrajectory1d::AppendSegment(
     trajectory_segments_.push_back(trajectory);
   }
 
-  double accumulated_param_length = trajectory->param_length();
+  double accumulated_param_length = trajectory->ParamLength();
   if (accumulated_param_lengths_.size() > 0) {
     accumulated_param_length += accumulated_param_lengths_.back();
   }

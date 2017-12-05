@@ -18,8 +18,10 @@
 
 #include "glog/logging.h"
 
+#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
+#include "modules/drivers/conti_radar/protocol/const_vars.h"
 
 namespace apollo {
 namespace drivers {
@@ -33,7 +35,6 @@ const int32_t ObjectGeneralInfo60B::ID = 0x60B;
 void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
                                  ContiRadar* conti_radar) const {
   int obj_id = object_id(bytes, length);
-  AINFO << "OBJECT ID: " << obj_id;
   auto conti_obs = conti_radar->add_contiobs();
   conti_obs->set_clusterortrack(false);
   conti_obs->set_obstacle_id(obj_id);
@@ -43,6 +44,10 @@ void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
   conti_obs->set_lateral_vel(lateral_vel(bytes, length));
   conti_obs->set_rcs(rcs(bytes, length));
   conti_obs->set_dynprop(dynprop(bytes, length));
+  double timestamp = apollo::common::time::Clock::NowInSecond();
+  auto header = conti_obs->mutable_header();
+  header->CopyFrom(conti_radar->header());
+  header->set_timestamp_sec(timestamp);
 }
 
 int ObjectGeneralInfo60B::object_id(const std::uint8_t* bytes,
@@ -65,14 +70,14 @@ double ObjectGeneralInfo60B::longitude_dist(const std::uint8_t* bytes,
   x <<= 5;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.2 - 500.0;
+  double ret = x * OBJECT_DIST_RES + OBJECT_DIST_LONG_MIN;
   return ret;
 }
 
 double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
                                           int32_t length) const {
   Byte t0(bytes + 2);
-  int32_t x = t0.get_byte(1, 3);
+  int32_t x = t0.get_byte(0, 3);
 
   Byte t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
@@ -80,20 +85,20 @@ double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  double ret = static_cast<double>(x) * 0.2 - 204.6;
+  double ret = x * OBJECT_DIST_RES + OBJECT_DIST_LAT_MIN;
   return ret;
 }
 
 double ObjectGeneralInfo60B::longitude_vel(const std::uint8_t* bytes,
                                            int32_t length) const {
-  Byte t0(bytes + 3);
+  Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
-  Byte t1(bytes + 3);
+  Byte t1(bytes + 5);
   int32_t t = t1.get_byte(6, 2);
 
   x <<= 2;
   x |= t;
-  double ret = x * 0.25 - 128.0;
+  double ret = x * OBJECT_VREL_RES + OBJECT_VREL_LONG_MIN;
   return ret;
 }
 
@@ -108,7 +113,7 @@ double ObjectGeneralInfo60B::lateral_vel(const std::uint8_t* bytes,
   x <<= 3;
   x |= t;
 
-  double ret = x * 0.25 - 64.0;
+  double ret = x * OBJECT_VREL_RES + OBJECT_VREL_LAT_MIN;
   return ret;
 }
 
@@ -117,14 +122,14 @@ double ObjectGeneralInfo60B::rcs(const std::uint8_t* bytes,
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  double ret = x * 0.5 - 64.0;
+  double ret = x * OBJECT_RCS_RES + OBJECT_RCS_MIN;
   return ret;
 }
 
 int ObjectGeneralInfo60B::dynprop(const std::uint8_t* bytes,
                                   int32_t length) const {
-  Byte t0(bytes + 7);
-  int32_t x = t0.get_byte(0, 8);
+  Byte t0(bytes + 6);
+  int32_t x = t0.get_byte(0, 3);
 
   int ret = x;
   return ret;

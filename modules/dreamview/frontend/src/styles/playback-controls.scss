@@ -1,0 +1,143 @@
+@import "media-queries";
+
+.playback-controls {
+    z-index: 100;
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+
+    background: #1D2226;
+    font-size: 16px;
+    min-width: 550px;
+
+    @include small-screen {
+        font-size: 14px;
+    }
+
+    .icon {
+        display: inline-block;
+        float: left;
+        width: 20px;
+        height: 20px;
+        padding: 10px;
+        cursor: pointer;
+
+        .play {
+            stroke-linejoin: round;
+            stroke-width: 1.5px;
+            stroke: #006AFF;
+            fill: #1D2226;
+        }
+
+        .pause {
+            stroke-linejoin: round;
+            stroke-width: 1.5px;
+            stroke: #006AFF;
+            fill: #006AFF;
+        }
+
+        .replay {
+            top: 2px;
+            stroke-linejoin: round;
+            stroke-width: 1.5px;
+            stroke: #006AFF;
+            fill: #006AFF;
+        }
+    }
+
+    .rate-selector {
+        position: absolute;
+        left: 40px;
+
+        select {
+            display: block;
+            border: none;
+            padding: 11px 23px 0px 5px;
+
+            color: #FFFFFF;
+            background: #1D2226;
+            outline: none;
+            cursor: pointer;
+            font-size: 16px;
+
+            /* remove default arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 5px;
+            right: 0px;
+            width: 10px;
+            height: 100%;
+            pointer-events: none;
+        }
+        .arrow:before {
+            position: absolute;
+            top: 16px;
+            right: 1px;
+            margin-top: -5px;
+            border-top: 8px solid #666666;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+
+            content: '';
+            pointer-events: none;
+        }
+    }
+
+    .time-controls {
+        position: absolute;
+        min-width: 300px;
+        height: 100%;
+        left: 125px;
+        right: 0px;
+
+        .rangeslider {
+            position: absolute;
+            top: 7px;
+            left: 0px;
+            right: 120px;
+            margin: 10px 0px;
+            height: 7px;
+
+            border-radius: 10px;
+            background: #2D3B50;
+            -ms-touch-action: none;
+            touch-action: none;
+
+            .rangeslider__fill {
+                display: block;
+                height: 100%;
+
+                border-radius: 10px;
+                background-color: #006AFF;
+                background: #006AFF;
+            }
+
+            .rangeslider__handle {
+                display: inline-block;
+                position: absolute;
+                height: 16px;
+                width: 16px;
+                top: 50%;
+                transform: translate3d(-50%, -50%, 0);
+
+                border: 1px solid #006AFF;
+                border-radius: 100%;
+                background: #006AFF;
+                cursor: pointer;
+                box-shadow: none;
+            }
+        }
+
+        .time-display {
+            position: absolute;
+            top: 11px;
+            right: 15px;
+            color: #ffffff;
+        }
+    }
+}

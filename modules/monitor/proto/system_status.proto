@@ -5,6 +5,9 @@ package apollo.monitor;
 import "modules/common/proto/header.proto";
 import "modules/monitor/proto/monitor_conf.proto";
 
+// Status summary. The value order is important, because when we summarize,
+// larger value will overwrite smaller value:
+//    FATAL > ERROR > WARN > OK > UNKNOWN
 enum Summary {
   UNKNOWN = 0;
   OK = 1;
@@ -45,8 +48,6 @@ message ModuleStatus {
 
   // Detailed status.
   optional ProcessStatus process_status = 3;
-  optional bool process_running = 5 [deprecated = true];
-
   optional TopicStatus topic_status = 4;
 }
 
