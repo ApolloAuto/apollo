@@ -77,6 +77,7 @@ function main(){
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
     devices="${devices} $(find_device video*)"
+    devices="${devices} $(find_device novatel*)"
     devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
     devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
 
