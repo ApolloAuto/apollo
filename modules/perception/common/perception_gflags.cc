@@ -42,9 +42,31 @@ DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
 DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
 
 DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
+DEFINE_int32(gps_buffer_size, 40, "gps buffer size");
 DEFINE_string(lidar_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");
 DEFINE_string(obstacle_module_name, "perception_obstacle",
               "perception obstacle module name");
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
+
+/// obstacle/perception.cc
+DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
+              "Onboard DAG Streaming config.");
+
+/// obstacle/onboard/radar_process_subnode.cc
+DEFINE_string(onboard_radar_detector, "DummyRadarDetector",
+              "onboard radar detector");
+DEFINE_string(radar_tf2_frame_id, "world", "the tf2 transform frame id");
+DEFINE_string(radar_tf2_child_frame_id, "radar_front",
+              "the tf2 transform child frame id");
+DEFINE_double(front_radar_forward_distance, 120.0,
+              "get front radar forward distancer");
+
+/// obstacle/onboard/fusion_subnode.cc
+DEFINE_string(onboard_fusion, "ProbabilisticFusion",
+              "fusion name which enabled onboard");
+
+DEFINE_double(query_signal_range, 100.0, "max distance to front signals");
+DEFINE_bool(output_raw_img, false, "write raw image to disk");
+DEFINE_bool(output_debug_img, false, "write debug image to disk");

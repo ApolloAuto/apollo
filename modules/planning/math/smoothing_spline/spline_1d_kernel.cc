@@ -31,11 +31,7 @@ namespace apollo {
 namespace planning {
 
 Spline1dKernel::Spline1dKernel(const Spline1d& spline1d)
-    : x_knots_(spline1d.x_knots()), spline_order_(spline1d.spline_order()) {
-  total_params_ =
-      (x_knots_.size() > 1 ? (x_knots_.size() - 1) * (1 + spline_order_) : 0);
-  kernel_matrix_ = Eigen::MatrixXd::Zero(total_params_, total_params_);
-  offset_ = Eigen::MatrixXd::Zero(total_params_, 1);
+    : Spline1dKernel(spline1d.x_knots(), spline1d.spline_order()) {
 }
 
 Spline1dKernel::Spline1dKernel(const std::vector<double>& x_knots,
@@ -113,7 +109,7 @@ void Spline1dKernel::AddThirdOrderDerivativeMatrix(const double weight) {
 
 void Spline1dKernel::AddNthDerivativekernelMatrixForSplineK(
     const uint32_t n, const uint32_t k, const double weight) {
-  if (k < 0 || k + 1 >= x_knots_.size()) {
+  if (k + 1 >= x_knots_.size()) {
     AERROR << "Cannot add NthDerivativeKernel for spline K because k is out of "
               "range. k = "
            << k;

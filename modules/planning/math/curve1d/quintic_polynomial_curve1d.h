@@ -29,8 +29,8 @@
 namespace apollo {
 namespace planning {
 
-// 1D quintic polynomial curve: (x0, dx0, ddx0) -- [0, param] --> (x1, dx1,
-// ddx1)
+// 1D quintic polynomial curve:
+// (x0, dx0, ddx0) -- [0, param] --> (x1, dx1, ddx1)
 class QuinticPolynomialCurve1d : public PolynomialCurve1d {
  public:
   QuinticPolynomialCurve1d() = default;
@@ -49,9 +49,8 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
 
   double Evaluate(const std::uint32_t order, const double p) const override;
 
-  double param_length() const override;
-
-  std::string to_string() const override;
+  double ParamLength() const { return param_; }
+  std::string ToString() const override;
 
  protected:
   void compute_coefficients(const double x0, const double dx0,
@@ -59,12 +58,8 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
                             const double dx1, const double ddx1,
                             const double param);
 
-  double param_ = 0.0;
-
   std::array<double, 6> coef_{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
-
   std::array<double, 3> start_condition_{{0.0, 0.0, 0.0}};
-
   std::array<double, 3> end_condition_{{0.0, 0.0, 0.0}};
 };
 

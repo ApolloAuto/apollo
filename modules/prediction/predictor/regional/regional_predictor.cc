@@ -102,20 +102,14 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double heading = 0.0 - M_PI;
-  const int num_traj = FLAGS_num_trajectory_still_pedestrian;
-  const double delta_heading = 2.0 * M_PI / num_traj;
-  const double speed = FLAGS_pedestrian_min_speed;
+  double heading = feature.theta();
   const double total_time = FLAGS_prediction_pedestrian_total_time;
   const int start_index = NumOfTrajectories();
 
-  for (int i = 0; i < num_traj; ++i) {
-    std::vector<TrajectoryPoint> points;
-    DrawStillTrajectory(position, heading, speed, total_time, &points);
-    Trajectory trajectory = GenerateTrajectory(points);
-    trajectories_.push_back(std::move(trajectory));
-    heading += delta_heading;
-  }
+  std::vector<TrajectoryPoint> points;
+  DrawStillTrajectory(position, heading, 0.0, total_time, &points);
+  Trajectory trajectory = GenerateTrajectory(points);
+  trajectories_.push_back(std::move(trajectory));
   SetEqualProbability(probability, start_index);
 }
 
@@ -219,6 +213,8 @@ void RegionalPredictor::DrawMovingTrajectory(
   for (size_t i = 0; i < left_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(left_points->operator[](i)));
+  }
+  for (size_t i = 0; i < right_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(right_points->operator[](i)));
   }

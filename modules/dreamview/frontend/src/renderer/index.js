@@ -36,7 +36,8 @@ class Renderer {
         };
 
         // The ground.
-        this.ground = PARAMETERS.ground.type === 'tile' ? new TileGround() : new Ground();
+        this.ground = (PARAMETERS.ground.type === 'tile' || OFFLINE_PLAYBACK)
+                      ? new TileGround() : new Ground();
 
         // The map.
         this.map = new Map();
@@ -251,8 +252,15 @@ class Renderer {
                                                                    false);
     }
 
-    addDefaultEndPoint(point) {
-        this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
+    addDefaultEndPoint(points) {
+        if (!this.routingEditor.isInEditingMode()) {
+            this.routingEditor.addRoutingPoint(
+                    this.coordinates.applyOffset(this.adc.mesh.position, true),
+                    this.coordinates, this.scene);
+        }
+        for (let i = 0; i < points.length; i++) {
+            this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene);
+        }
     }
 
     removeAllRoutingPoints() {
@@ -360,6 +368,10 @@ class Renderer {
     }
 
     getGeolocation(event) {
+        if (!this.coordinates.isInitialized()) {
+            return;
+        }
+
         const canvasPosition = event.currentTarget.getBoundingClientRect();
 
         const vector = new THREE.Vector3(

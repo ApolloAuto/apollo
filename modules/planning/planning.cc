@@ -215,7 +215,7 @@ void Planning::RunOnce() {
   // This estimate is only valid if the current time and vehicle state timestamp
   // differs only a small amount (20ms). When the different is too large, the
   // estimation is invalid.
-  DCHECK_GT(start_timestamp, vehicle_state.timestamp());
+  DCHECK_GE(start_timestamp, vehicle_state.timestamp());
   if (FLAGS_estimate_current_vehicle_state &&
       start_timestamp - vehicle_state.timestamp() < 0.020) {
     auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
@@ -234,12 +234,13 @@ void Planning::RunOnce() {
   }
 
   // Update reference line provider
+  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
+
   if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
           AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
     AERROR << "Failed to update routing in reference line provider";
     return;
   }
-  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
 
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
     not_ready->set_reason("prediction not ready");

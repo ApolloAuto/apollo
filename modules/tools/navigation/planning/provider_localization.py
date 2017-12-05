@@ -20,6 +20,12 @@
 class LocalizationProvider:
     def __init__(self):
         self.localization_pb = None
+        self.x = 0
+        self.y = 0
+        self.heading = 0
 
     def update(self, localization_pb):
         self.localization_pb = localization_pb
+        self.x = self.localization_pb.pose.position.x
+        self.y = self.localization_pb.pose.position.y
+        self.heading = self.localization_pb.pose.heading

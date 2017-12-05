@@ -141,8 +141,7 @@ int32_t ProtocolData<SensorType>::GetLength() const {
 
 template <typename SensorType>
 void ProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
-                                     SensorType *sensor_data) const {
-}
+                                     SensorType *sensor_data) const {}
 
 template <typename SensorType>
 void ProtocolData<SensorType>::UpdateData(uint8_t * /*data*/) {}

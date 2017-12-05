@@ -29,7 +29,6 @@
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
-#include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -41,6 +40,7 @@
 #include "modules/routing/proto/routing.pb.h"
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/Image.h"
 
 /**
  * @file message_adapters.h
@@ -63,6 +63,8 @@ using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
+using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
@@ -73,8 +75,6 @@ using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
 using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
 using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
-// TODO(xiaoxq): Retire HMICommandAdapter after integration with dreamview.
-using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using ContiRadarAdapter = Adapter<drivers::ContiRadar>;

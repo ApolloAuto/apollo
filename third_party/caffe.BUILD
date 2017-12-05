@@ -4,10 +4,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "lib",
-    includes = ["."],
+    includes = [
+        ".",
+        "/usr/include"
+    ],
     linkopts = [
-        "-L/usr/lib/x86_64-linux-gnu/hdf5/serial/lib",
-        "-Wl,-rpath,/usr/local/lib:/usr/lib/x86_64-linux-gnu/hdf5/serial/lib",
+        "-Wl,-rpath,/usr/lib/x86_64-linux-gnu/",
         "-lboost_system",
         "-lboost_thread",
         "-lboost_filesystem",

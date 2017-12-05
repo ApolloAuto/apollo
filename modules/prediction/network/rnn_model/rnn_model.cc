@@ -16,12 +16,7 @@
 
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 
-#include <string>
-#include <vector>
-#include "Eigen/Dense"
-
 #include "modules/common/log.h"
-#include "modules/common/macro.h"
 
 namespace apollo {
 namespace prediction {

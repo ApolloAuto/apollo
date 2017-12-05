@@ -38,9 +38,9 @@ class PiecewiseTrajectory1d : public Curve1d {
 
   double Evaluate(const std::uint32_t order, const double param) const;
 
-  double param_length() const;
+  double ParamLength() const;
 
-  std::string to_string() const;
+  std::string ToString() const;
 
   void AppendSegment(const std::shared_ptr<Curve1d> trajectory);
 

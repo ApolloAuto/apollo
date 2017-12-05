@@ -67,7 +67,7 @@ int ObjectListStatus60A::meas_counter(const std::uint8_t* bytes,
 int ObjectListStatus60A::interface_version(const std::uint8_t* bytes,
                                            int32_t length) const {
   Byte t0(bytes + 4);
-  int32_t x = t0.get_byte(4, 8);
+  int32_t x = t0.get_byte(4, 4);
 
   int ret = x;
   return ret;

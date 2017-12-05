@@ -209,7 +209,7 @@ This section provides the instructions to run the Apollo 1.0 Demo on Vehicle.
 Run the following commands:
 ```
 cd $APOLLO_HOME
-bash docker/scripts/release_start.sh local
+bash docker/scripts/release_start.sh local_release
 ```
 When Docker starts, it creates a port mapping, which maps the Docker internal port 8887 to the host port 8887. You can then visit the HMI web service in your host machine browser:
 

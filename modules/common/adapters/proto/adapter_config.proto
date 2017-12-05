@@ -24,8 +24,7 @@ message AdapterConfig {
     ROUTING_RESPONSE = 17;
     RELATIVE_ODOMETRY = 18;
     INS_STAT = 19;
-    // TODO(xiaoxq): Retire HMI_COMMAND after integration with dreamview.
-    HMI_COMMAND = 20;
+    HMI_COMMAND = 20 [deprecated = true];
     MOBILEYE = 21;
     DELPHIESR = 22;
     COMPRESSED_IMAGE = 23;
@@ -33,6 +32,8 @@ message AdapterConfig {
     INS_STATUS = 25;
     GNSS_STATUS = 26;
     CONTI_RADAR = 27;
+    IMAGE_SHORT = 28;
+    IMAGE_LONG = 29;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

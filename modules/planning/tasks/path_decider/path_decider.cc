@@ -72,7 +72,7 @@ bool PathDecider::MakeStaticObstacleDecision(
   const auto &frenet_path = path_data.frenet_frame_path();
   const auto &frenet_points = frenet_path.points();
   if (frenet_points.empty()) {
-    AERROR << "Path is empty";
+    AERROR << "Path is empty.";
     return false;
   }
 
@@ -110,6 +110,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     object_decision.mutable_ignore();
 
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+
     if (sl_boundary.start_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
       path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),

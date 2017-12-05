@@ -147,7 +147,7 @@ bool Polygon2d::HasOverlap(const Polygon2d &polygon) const {
   return DistanceTo(polygon) <= kMathEpsilon;
 }
 
-bool Polygon2d::IsContain(const LineSegment2d &line_segment) const {
+bool Polygon2d::Contains(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return IsPointIn(line_segment.start());
   }
@@ -169,7 +169,7 @@ bool Polygon2d::IsContain(const LineSegment2d &line_segment) const {
   return true;
 }
 
-bool Polygon2d::IsContain(const Polygon2d &polygon) const {
+bool Polygon2d::Contains(const Polygon2d &polygon) const {
   CHECK_GE(points_.size(), 3);
   if (area_ < polygon.area() - kMathEpsilon) {
     return false;
@@ -180,7 +180,7 @@ bool Polygon2d::IsContain(const Polygon2d &polygon) const {
   const auto &line_segments = polygon.line_segments();
   return std::all_of(line_segments.begin(), line_segments.end(),
                      [&](const LineSegment2d &line_segment) {
-                       return IsContain(line_segment);
+                       return Contains(line_segment);
                      });
 }
 

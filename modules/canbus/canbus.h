@@ -39,7 +39,6 @@
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
 
 /**
  * @namespace apollo::canbus

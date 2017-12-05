@@ -73,6 +73,8 @@ function main() {
     devices="${devices} $(find_device nvidia*)"
     devices="${devices} $(find_device camera*)"
     devices="${devices} $(find_device video*)"
+    devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
+    devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -91,6 +93,7 @@ function main() {
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
+    set -x
     docker run -it \
         -d --privileged \
         --name apollo_release \
@@ -116,6 +119,7 @@ function main() {
         --hostname in_release_docker \
         --shm-size 512M \
         $IMG
+    set +x
     if [ "${USER}" != "root" ]; then
         docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
         docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
@@ -125,7 +129,7 @@ function main() {
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/control/conf"
     fi
-    docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 
 main

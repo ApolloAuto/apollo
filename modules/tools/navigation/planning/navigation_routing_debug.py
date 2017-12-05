@@ -95,7 +95,7 @@ def mobileye_callback(mobileye_pb):
     local_smooth_seg_x, local_smooth_seg_y = routing_provider.get_local_segment_spline(
         vx, vy, heading)
 
-    left_marker_coef = mobileye_provider.left_lane_marker_coef
+    left_marker_coef = mobileye_provider.left_lm_coef
     left_marker_x = []
     left_marker_y = []
     for x in range(int(mobileye_provider.left_lane_marker_range)):
@@ -103,7 +103,7 @@ def mobileye_callback(mobileye_pb):
         left_marker_x.append(x)
         left_marker_y.append(-y)
 
-    right_marker_coef = mobileye_provider.right_lane_marker_coef
+    right_marker_coef = mobileye_provider.right_lm_coef
     right_marker_x = []
     right_marker_y = []
     for x in range(int(mobileye_provider.right_lane_marker_range)):
@@ -157,6 +157,6 @@ if __name__ == '__main__':
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
     ax.set_xlim([-2, 100])
-    ax.set_ylim([-50, 50])
+    ax.set_ylim([-10, 10])
 
     plt.show()

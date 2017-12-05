@@ -68,7 +68,7 @@ class Frame {
   void AddObstacle(const Obstacle &obstacle);
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
-  const ReferenceLineInfo *DriveReferenceLinfInfo() const;
+  const ReferenceLineInfo *DriveReferenceLineInfo() const;
 
   const std::vector<const Obstacle *> obstacles() const;
 

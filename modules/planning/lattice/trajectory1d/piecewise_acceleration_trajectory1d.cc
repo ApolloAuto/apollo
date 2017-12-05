@@ -60,12 +60,12 @@ void ConstantAccelerationTrajectory1d::PopSegment() {
   }
 }
 
-double ConstantAccelerationTrajectory1d::param_length() const {
+double ConstantAccelerationTrajectory1d::ParamLength() const {
   CHECK_GT(t_.size(), 1);
   return t_.back() - t_.front();
 }
 
-std::string ConstantAccelerationTrajectory1d::to_string() const {
+std::string ConstantAccelerationTrajectory1d::ToString() const {
   // TODO(all) implement
   return "";
 }

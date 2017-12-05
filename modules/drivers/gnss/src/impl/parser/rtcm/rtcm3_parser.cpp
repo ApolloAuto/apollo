@@ -142,9 +142,6 @@ void Rtcm3Parser::fill_keppler_orbit(
   int prn = 0;
   satsys(eph.sat, &prn);
   keppler_orbit.set_sat_prn(prn);
-
-  ROS_INFO_STREAM("Keppler orbit debuginfo:\r\n"
-                  << keppler_orbit.DebugString());
 }
 
 void Rtcm3Parser::fill_glonass_orbit(
@@ -325,7 +322,6 @@ bool Rtcm3Parser::process_observation() {
     sat_obs->set_band_obs_num(j);
   }
 
-  ROS_INFO_STREAM("Obeservation debuginfo:\r\n" << _observation.DebugString());
   return true;
 }
 
@@ -361,7 +357,6 @@ bool Rtcm3Parser::process_ephemerides() {
     fill_keppler_orbit(_rtcm.nav.eph[_rtcm.ephsat - 1], *obit);
   }
 
-  ROS_INFO_STREAM("Ephemeris debuginfo:\r\n" << _ephemeris.DebugString());
   return true;
 }
 

@@ -105,7 +105,9 @@ void GLFWViewer::SpinOnce() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWViewer::Close() { glfwTerminate(); }
+void GLFWViewer::Close() {
+  glfwTerminate();
+}
 
 void GLFWViewer::SetSize(int w, int h) {
   win_width_ = w;
@@ -657,9 +659,13 @@ void GLFWViewer::MouseMove(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWViewer::MouseWheel(double delta) { mode_mat_(2, 3) -= delta; }
+void GLFWViewer::MouseWheel(double delta) {
+  mode_mat_(2, 3) -= delta;
+}
 
-void GLFWViewer::Reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
+void GLFWViewer::Reset() {
+  mode_mat_ = Eigen::Matrix4d::Identity();
+}
 
 void GLFWViewer::Keyboard(int key) {
   switch (key) {

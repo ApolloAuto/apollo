@@ -173,15 +173,12 @@ function find_device() {
 
 function setup_device() {
   # setup CAN device
-  if [ ! -e /dev/can0 ]; then
-    sudo mknod --mode=a+rw /dev/can0 c 52 0
-  fi
-  if [ ! -e /dev/can1 ]; then
-    sudo mknod --mode=a+rw /dev/can1 c 52 1
-  fi
-  if [ ! -e /dev/can2 ]; then
-    sudo mknod --mode=a+rw /dev/can2 c 52 2
-  fi
+  for INDEX in `seq 0 3`
+  do
+      if [ ! -e /dev/can${INDEX} ]; then
+          sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
+      fi
+  done
 
   MACHINE_ARCH=$(uname -m)
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then

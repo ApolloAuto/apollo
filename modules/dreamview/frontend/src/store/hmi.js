@@ -54,12 +54,13 @@ export default class HMI {
         if (newStatus.systemStatus) {
             if (newStatus.systemStatus.modules) {
                 for (const key in newStatus.systemStatus.modules) {
-                    this.moduleStatus.set(key, newStatus.systemStatus.modules[key].processRunning);
+                    this.moduleStatus.set(key,
+                        newStatus.systemStatus.modules[key].processStatus.running);
                 }
             }
             if (newStatus.systemStatus.hardware) {
                 for (const key in newStatus.systemStatus.hardware) {
-                    this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].status);
+                    this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].summary);
                 }
             }
         }

@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Defines the SocketCanClientRaw class which inherites CanClient.
+ * @brief Defines the SocketCanClientRaw class which inherits CanClient.
  */
 
 #ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_SOCKET_CAN_CLIENT_RAW_H_
@@ -37,11 +37,13 @@
 
 #include <string>
 #include <vector>
-#include "gflags/gflags.h"
+
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+
+#include "gflags/gflags.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
 /**
  * @namespace apollo::canbus::can
@@ -109,7 +111,7 @@ class SocketCanClientRaw : public CanClient {
   std::string GetErrorString(const int32_t status) override;
 
  private:
-  int dev_handler_;
+  int dev_handler_ = 0;
   CANCardParameter::CANChannelId port_;
   can_frame send_frames_[MAX_CAN_SEND_FRAME_LEN];
   can_frame recv_frames_[MAX_CAN_RECV_FRAME_LEN];

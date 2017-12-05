@@ -48,7 +48,7 @@ bool LatticeConstraintChecker::IsValidTrajectoryPair(
 bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
     const Curve1d& lon_trajectory) {
   double t = 0.0;
-  while (t < lon_trajectory.param_length()) {
+  while (t < lon_trajectory.ParamLength()) {
     double v = lon_trajectory.Evaluate(1, t);  // evalute_v
     if (!fuzzy_within(v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
       // AINFO << "not valid longitudinal trajectory: velocity\t" << v;
@@ -76,7 +76,7 @@ bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
 bool LatticeConstraintChecker::IsValidLateralTrajectory(
     const Curve1d& lat_trajectory, const Curve1d& lon_trajectory) {
   double t = 0.0;
-  while (t < lon_trajectory.param_length()) {
+  while (t < lon_trajectory.ParamLength()) {
     double s = lon_trajectory.Evaluate(0, t);
     double dd_ds = lat_trajectory.Evaluate(1, s);
     double ds_dt = lon_trajectory.Evaluate(1, t);
@@ -85,7 +85,7 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(
     double d2s_dt2 = lon_trajectory.Evaluate(2, t);
 
     double a = 0.0;
-    if (s < lat_trajectory.param_length()) {
+    if (s < lat_trajectory.ParamLength()) {
       a = d2d_ds2 * ds_dt * ds_dt + dd_ds * d2s_dt2;
     }
 
@@ -98,7 +98,7 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(
 
     // this is not accurate, just an approximation...
     double j = 0.0;
-    if (s < lat_trajectory.param_length()) {
+    if (s < lat_trajectory.ParamLength()) {
       j = lat_trajectory.Evaluate(3, s) * lon_trajectory.Evaluate(3, t);
     }
 

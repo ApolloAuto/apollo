@@ -17,7 +17,7 @@
 ###############################################################################
 
 
-addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
+addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP" 2>/dev/null
 adduser --disabled-password --gecos '' "$DOCKER_USER" \
     --uid "$DOCKER_USER_ID" --gid "$DOCKER_GRP_ID" 2>/dev/null
 usermod -aG sudo "$DOCKER_USER"
@@ -30,31 +30,35 @@ chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
 
 # grant caros user to access GPS device
 if [ -e /dev/ttyUSB0 ]; then
-    chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
+  chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
 fi
 
 # setup camera device
 if [ -e /dev/video0 ]; then
-    mkdir /dev/camera
-    ln -s /dev/video0  /dev/camera/obstacle
-    ln -s /dev/video1  /dev/camera/trafficlights
-    chmod a+rw /dev/video0 /dev/video1 /dev/camera/obstacle /dev/camera/trafficlights
+  chmod a+rw /dev/video0
+fi
+if [ -e /dev/video1 ]; then
+  chmod a+rw /dev/video1
+fi
+if [ -e /dev/camera/obstacle ]; then
+  chmod a+rw /dev/camera/obstacle
+fi
+if [ -e /dev/camera/trafficlights ]; then
+  chmod a+rw /dev/camera/trafficlights
 fi
 
-MACHINE_ARCH=$(uname -m)
-ROS_TAR="ros-indigo-apollo-1.5.3-${MACHINE_ARCH}.tar.gz"
+
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
-# setup ros package
-# this is a temporary solution to avoid ros package downloading.
-ROS="/home/tmp/ros"
-if [ -e "$ROS" ]; then
-  rm -rf $ROS
-fi
-tar xzf "/home/tmp/${ROS_TAR}" -C "/home/tmp"
-chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
+  # setup ros package
+  # this is a temporary solution to avoid ros package downloading.
+  ROS="/home/tmp/ros"
+  chmod a+w "${ROS}/share/velodyne/launch/start_velodyne.launch"
+  chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
+  chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
+  chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 fi

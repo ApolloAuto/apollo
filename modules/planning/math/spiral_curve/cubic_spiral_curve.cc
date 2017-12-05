@@ -31,10 +31,10 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::PathPoint;
 using apollo::common::Status;
 
-CubicSpiralCurve::CubicSpiralCurve(const common::PathPoint& s,
-                                   const common::PathPoint& e)
+CubicSpiralCurve::CubicSpiralCurve(const PathPoint& s, const PathPoint& e)
     : SpiralCurve(s, e, 3) {
   // generate an order 3 cubic spiral path with four parameters
 }
@@ -81,12 +81,12 @@ bool CubicSpiralCurve::CalculatePath() {
   // simpson integrations func values in Jacobian
   // integration point initialization:
   double ds =
-      sg / (spiral_config().simpson_size() - 1);  // bandwith for integration
+      sg / (spiral_config().simpson_size() - 1);  // bandwidth for integration
   // basic theta value vectors:
   std::vector<double> theta(spiral_config().simpson_size(), 0.0);
   std::vector<double> cos_theta(spiral_config().simpson_size(), 0.0);
   std::vector<double> sin_theta(spiral_config().simpson_size(), 0.0);
-  // partial derivatvies vectors for Jacobian
+  // partial derivatives vectors for Jacobian
   std::vector<double> ptp_p1(spiral_config().simpson_size(), 0.0);
   std::vector<double> ptp_p2(spiral_config().simpson_size(), 0.0);
   std::vector<double> ptp_sg(spiral_config().simpson_size(), 0.0);
@@ -101,7 +101,7 @@ bool CubicSpiralCurve::CalculatePath() {
   Eigen::Matrix<double, 3, 1> delta_q;  // goal difference
   Eigen::Matrix<double, 3, 1> delta_p;  // parameter difference
   Eigen::Matrix<double, 3, 1>
-      q_guess;        // q with current paramter, delta_q = q_g - q_guess
+      q_guess;        // q with current parameter, delta_q = q_g - q_guess
   double diff = 0.0;  // absolute error for q iteration stop
 
   for (int32_t nt = 0; nt < spiral_config().newton_raphson_max_iter(); ++nt) {
@@ -181,7 +181,7 @@ bool CubicSpiralCurve::CalculatePath() {
 }
 
 Status CubicSpiralCurve::GetPathVec(
-    const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
+    const std::uint32_t n, std::vector<PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   // initialization
@@ -191,7 +191,7 @@ Status CubicSpiralCurve::GetPathVec(
 
   path_points->resize(n);
 
-  std::vector<common::PathPoint>& result = *path_points;
+  std::vector<PathPoint>& result = *path_points;
   const double ds = sg() / (n - 1);
 
   std::array<double, 4> p_value;
@@ -240,7 +240,7 @@ Status CubicSpiralCurve::GetPathVec(
 
 Status CubicSpiralCurve::GetPathVecWithS(
     const std::vector<double>& vec_s,
-    std::vector<common::PathPoint>* path_points) const {
+    std::vector<PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (vec_s.empty() || error() > spiral_config().newton_raphson_tol()) {
@@ -249,13 +249,13 @@ Status CubicSpiralCurve::GetPathVecWithS(
   }
 
   const std::uint32_t n = vec_s.size();
-  std::vector<common::PathPoint>& result = *path_points;
+  std::vector<PathPoint>& result = *path_points;
   result.resize(n);
 
   std::array<double, 4> p_value;
   std::copy_n(p_params().begin(), 4, p_value.begin());
 
-  common::PathPoint ref_point(start_point());
+  PathPoint ref_point(start_point());
 
   ref_point.set_s(0.0);
   std::array<double, 4> a_params = SpiralFormula::p_to_a_k3(sg(), p_value);

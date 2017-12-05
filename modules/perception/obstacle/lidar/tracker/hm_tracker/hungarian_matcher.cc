@@ -18,8 +18,8 @@
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/common/graph_util.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/obstacle/common/graph_util.h"
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
@@ -30,7 +30,7 @@ namespace perception {
 float HungarianMatcher::s_match_distance_maximum_ = 4.0f;
 
 bool HungarianMatcher::SetMatchDistanceMaximum(
-  const float& match_distance_maximum) {
+    const float& match_distance_maximum) {
   if (match_distance_maximum >= 0) {
     s_match_distance_maximum_ = match_distance_maximum;
     AINFO << "match distance maximum of HungarianMatcher is "
@@ -42,22 +42,22 @@ bool HungarianMatcher::SetMatchDistanceMaximum(
 }
 
 void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
-  const std::vector<ObjectTrackPtr>& tracks,
-  const std::vector<Eigen::VectorXf>& tracks_predict,
-  std::vector<TrackObjectPair>* assignments,
-  std::vector<int>* unassigned_tracks,
-  std::vector<int>* unassigned_objects) {
+                             const std::vector<ObjectTrackPtr>& tracks,
+                             const std::vector<Eigen::VectorXf>& tracks_predict,
+                             std::vector<TrackObjectPair>* assignments,
+                             std::vector<int>* unassigned_tracks,
+                             std::vector<int>* unassigned_objects) {
   // A. computing association matrix
   Eigen::MatrixXf association_mat(tracks.size(), objects->size());
   ComputeAssociateMatrix(tracks, tracks_predict, (*objects), &association_mat);
 
   // B. computing connected components
-  std::vector<std::vector<int> > object_components;
-  std::vector<std::vector<int> > track_components;
+  std::vector<std::vector<int>> object_components;
+  std::vector<std::vector<int>> track_components;
   ComputeConnectedComponents(association_mat, s_match_distance_maximum_,
                              &track_components, &object_components);
-  ADEBUG << "HungarianMatcher: partition graph into "
-         << track_components.size() << " sub-graphs.";
+  ADEBUG << "HungarianMatcher: partition graph into " << track_components.size()
+         << " sub-graphs.";
 
   // C. matching each sub-graph
   assignments->clear();
@@ -86,12 +86,13 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   }
 }
 
-void HungarianMatcher::MatchInComponents(const Eigen::MatrixXf& association_mat,
-  const std::vector<int>& track_component,
-  const std::vector<int>& object_component,
-  std::vector<TrackObjectPair>* sub_assignments,
-  std::vector<int>* sub_unassigned_tracks,
-  std::vector<int>* sub_unassigned_objects) {
+void HungarianMatcher::MatchInComponents(
+    const Eigen::MatrixXf& association_mat,
+    const std::vector<int>& track_component,
+    const std::vector<int>& object_component,
+    std::vector<TrackObjectPair>* sub_assignments,
+    std::vector<int>* sub_unassigned_tracks,
+    std::vector<int>* sub_unassigned_objects) {
   sub_assignments->clear();
   sub_unassigned_tracks->clear();
   sub_unassigned_objects->clear();
@@ -145,14 +146,14 @@ void HungarianMatcher::MatchInComponents(const Eigen::MatrixXf& association_mat,
   local_assignments.resize(local_association_mat.cols());
   local_unassigned_tracks.assign(local_association_mat.rows(), -1);
   local_unassigned_objects.assign(local_association_mat.cols(), -1);
-  AssignObjectsToTracks(local_association_mat,
-    s_match_distance_maximum_, &local_assignments, &local_unassigned_tracks,
-    &local_unassigned_objects);
+  AssignObjectsToTracks(local_association_mat, s_match_distance_maximum_,
+                        &local_assignments, &local_unassigned_tracks,
+                        &local_unassigned_objects);
   for (size_t i = 0; i < local_assignments.size(); ++i) {
     int global_track_id = track_local2global[local_assignments[i].first];
     int global_object_id = object_local2global[local_assignments[i].second];
-    sub_assignments->push_back(std::make_pair(global_track_id,
-                                              global_object_id));
+    sub_assignments->push_back(
+        std::make_pair(global_track_id, global_object_id));
   }
   for (size_t i = 0; i < local_unassigned_tracks.size(); ++i) {
     int global_track_id = track_local2global[local_unassigned_tracks[i]];
@@ -165,28 +166,27 @@ void HungarianMatcher::MatchInComponents(const Eigen::MatrixXf& association_mat,
 }
 
 void HungarianMatcher::ComputeAssociateMatrix(
-  const std::vector<ObjectTrackPtr>& tracks,
-  const std::vector<Eigen::VectorXf>& tracks_predict,
-  const std::vector<TrackedObjectPtr>& new_objects,
-  Eigen::MatrixXf* association_mat) {
+    const std::vector<ObjectTrackPtr>& tracks,
+    const std::vector<Eigen::VectorXf>& tracks_predict,
+    const std::vector<TrackedObjectPtr>& new_objects,
+    Eigen::MatrixXf* association_mat) {
   // Compute matrix of association distance
   for (size_t i = 0; i < tracks.size(); ++i) {
     for (size_t j = 0; j < new_objects.size(); ++j) {
       (*association_mat)(i, j) = TrackObjectDistance::ComputeDistance(
-        tracks[i], tracks_predict[i], new_objects[j]);
+          tracks[i], tracks_predict[i], new_objects[j]);
     }
   }
 }
 
 void HungarianMatcher::ComputeConnectedComponents(
-  const Eigen::MatrixXf& association_mat,
-  const float& connected_threshold,
-  std::vector<std::vector<int> >* track_components,
-  std::vector<std::vector<int> >* object_components) {
+    const Eigen::MatrixXf& association_mat, const float& connected_threshold,
+    std::vector<std::vector<int>>* track_components,
+    std::vector<std::vector<int>>* object_components) {
   // Compute connected components within given threshold
   int no_track = association_mat.rows();
   int no_object = association_mat.cols();
-  std::vector<std::vector<int> > nb_graph;
+  std::vector<std::vector<int>> nb_graph;
   nb_graph.resize(no_track + no_object);
   for (int i = 0; i < no_track; i++) {
     for (int j = 0; j < no_object; j++) {
@@ -197,7 +197,7 @@ void HungarianMatcher::ComputeConnectedComponents(
     }
   }
 
-  std::vector<std::vector<int> > components;
+  std::vector<std::vector<int>> components;
   ConnectedComponentAnalysis(nb_graph, &components);
   track_components->clear();
   track_components->resize(components.size());
@@ -217,18 +217,17 @@ void HungarianMatcher::ComputeConnectedComponents(
 }
 
 void HungarianMatcher::AssignObjectsToTracks(
-  const Eigen::MatrixXf& association_mat,
-  const double& assign_distance_maximum,
-  std::vector<TrackObjectPair>* assignments,
-  std::vector<int>* unassigned_tracks,
-  std::vector<int>* unassigned_objects) {
+    const Eigen::MatrixXf& association_mat,
+    const double& assign_distance_maximum,
+    std::vector<TrackObjectPair>* assignments,
+    std::vector<int>* unassigned_tracks, std::vector<int>* unassigned_objects) {
   // Assign objects to tracks with null tracks setup
   std::vector<int> tracks_idx;
   std::vector<int> objects_idx;
   int no_track = association_mat.rows();
   int no_object = association_mat.cols();
   // build cost
-  std::vector< std::vector<double> > cost(no_track + no_object);
+  std::vector<std::vector<double>> cost(no_track + no_object);
   for (int i = 0; i < no_track; ++i) {
     cost[i].resize(association_mat.cols());
     for (int j = 0; j < association_mat.cols(); ++j) {
@@ -253,14 +252,14 @@ void HungarianMatcher::AssignObjectsToTracks(
   std::vector<bool> tracks_used(no_track + no_object, false);
   std::vector<bool> objects_used(no_object, false);
   for (size_t i = 0; i < tracks_idx.size(); ++i) {
-    if (tracks_idx[i] < 0 || tracks_idx[i] >= no_track ||
-      objects_idx[i] < 0 || objects_idx[i] >= no_object) {
+    if (tracks_idx[i] < 0 || tracks_idx[i] >= no_track || objects_idx[i] < 0 ||
+        objects_idx[i] >= no_object) {
       continue;
     }
     if (association_mat(tracks_idx[i], objects_idx[i]) <
         assign_distance_maximum) {
       (*assignments)[assignments_num++] =
-        std::make_pair(tracks_idx[i], objects_idx[i]);
+          std::make_pair(tracks_idx[i], objects_idx[i]);
       tracks_used[tracks_idx[i]] = true;
       objects_used[objects_idx[i]] = true;
     }

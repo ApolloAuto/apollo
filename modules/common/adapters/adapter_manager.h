@@ -198,7 +198,7 @@ class AdapterManager {
    * rate. It takes a class member function, and a bare pointer to the
    * object to call the method on.
    */
-  template <class T>
+  template<class T>
   static ros::Timer CreateTimer(ros::Duration period,
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
@@ -236,6 +236,8 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(ImageShort);
+  REGISTER_ADAPTER(ImageLong);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);
@@ -245,13 +247,10 @@ class AdapterManager {
   REGISTER_ADAPTER(InsStatus);
   REGISTER_ADAPTER(GnssStatus);
   REGISTER_ADAPTER(SystemStatus);
-  // TODO(xiaoxq): Retire HMICommand adapter after integration with dreamview.
-  REGISTER_ADAPTER(HMICommand);
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
   REGISTER_ADAPTER(CompressedImage);
-
   DECLARE_SINGLETON(AdapterManager);
 };
 

@@ -48,11 +48,19 @@ class CNNSegmentation : public BaseSegmentation {
                const SegmentationOptions& options,
                std::vector<ObjectPtr>* objects) override;
 
-  std::string name() const override { return "CNNSegmentation"; }
+  std::string name() const override {
+    return "CNNSegmentation";
+  }
 
-  float range() const { return range_; }
-  int width() const { return width_; }
-  int height() const { return height_; }
+  float range() const {
+    return range_;
+  }
+  int width() const {
+    return width_;
+  }
+  int height() const {
+    return height_;
+  }
 
  private:
   bool GetConfigs(std::string* config_file, std::string* proto_file,
@@ -82,6 +90,8 @@ class CNNSegmentation : public BaseSegmentation {
   boost::shared_ptr<caffe::Blob<float>> height_pt_blob_;
   // raw features to be input into network
   boost::shared_ptr<caffe::Blob<float>> feature_blob_;
+  // class prediction
+  boost::shared_ptr<caffe::Blob<float>> class_pt_blob_;
 
   // use all points of cloud to compute features
   bool use_full_cloud_ = false;
@@ -100,4 +110,4 @@ REGISTER_SEGMENTATION(CNNSegmentation);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_  // NOLINT
+#endif

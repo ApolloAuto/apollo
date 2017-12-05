@@ -52,11 +52,12 @@ function start_build_docker() {
 }
 
 function gen_docker() {
-  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20171122_1537"
+  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20171129_1427"
   RELEASE_DIR=${HOME}/.cache/release
   RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
   DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
   docker pull $IMG
+  echo "time : ${TIME}" >> ${RELEASE_DIR}/meta.ini
 
   docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
   if [ $? == 0 ];then

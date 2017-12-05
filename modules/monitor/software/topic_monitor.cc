@@ -38,8 +38,10 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
   switch (type) {
     case AdapterConfig::POINT_CLOUD:
       return CHECK_NOTNULL(AdapterManager::GetPointCloud());
-    case AdapterConfig::COMPRESSED_IMAGE:
-      return CHECK_NOTNULL(AdapterManager::GetCompressedImage());
+    case AdapterConfig::IMAGE_LONG:
+      return CHECK_NOTNULL(AdapterManager::GetImageLong());
+    case AdapterConfig::IMAGE_SHORT:
+      return CHECK_NOTNULL(AdapterManager::GetImageShort());
     case AdapterConfig::LOCALIZATION:
       return CHECK_NOTNULL(AdapterManager::GetLocalization());
     case AdapterConfig::PERCEPTION_OBSTACLES:
@@ -50,6 +52,8 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
       return CHECK_NOTNULL(AdapterManager::GetPlanning());
     case AdapterConfig::CONTROL_COMMAND:
       return CHECK_NOTNULL(AdapterManager::GetControlCommand());
+    case AdapterConfig::CONTI_RADAR:
+      return CHECK_NOTNULL(AdapterManager::GetContiRadar());
     default:
       break;
   }
@@ -70,9 +74,9 @@ void TopicMonitor::RunOnce(const double current_time) {
     status_->set_message_delay(-1);
     return;
   }
-  const double delay_seconds = adapter->GetDelayInMs() / 1000.0;
-  if (delay_seconds > config_.acceptable_delay()) {
-    status_->set_message_delay(delay_seconds);
+  const double delay = adapter->GetDelaySec();
+  if (delay > config_.acceptable_delay()) {
+    status_->set_message_delay(delay);
   } else {
     status_->clear_message_delay();
   }

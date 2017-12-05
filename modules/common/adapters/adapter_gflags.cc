@@ -33,7 +33,8 @@ DEFINE_string(pad_topic, "/apollo/control/pad",
               "control pad message topic name");
 DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
-DEFINE_string(pointcloud_topic, "/apollo/compensator/pointcloud",
+DEFINE_string(pointcloud_topic,
+              "/apollo/sensor/velodyne64/compensator/PointCloud2",
               "pointcloud topic name");
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
@@ -54,8 +55,6 @@ DEFINE_string(gnss_status_topic, "/apollo/sensor/gnss/gnss_status",
               "gnss status topic name");
 DEFINE_string(system_status_topic, "/apollo/monitor/system_status",
               "System status topic name");
-DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
-              "HMI command topic name");
 DEFINE_string(mobileye_topic, "/apollo/sensor/mobileye", "mobileye topic name");
 DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");

@@ -25,23 +25,12 @@ export default class Dreamview extends React.Component {
         }
     }
 
-    parseQueryString(queryString) {
-        const params = {};
-
-        queryString.replace('?','').split("&").forEach((query) => {
-            const segments = query.split('=');
-            params[segments[0]] = segments[1];
-        });
-        return params;
-    }
-
     componentWillMount() {
         this.props.store.updateDimension();
     }
 
     componentDidMount() {
-        const params = this.parseQueryString(window.location.search);
-        WS.initialize(params);
+        WS.initialize();
         window.addEventListener("resize", () => {
             this.props.store.updateDimension();
         });

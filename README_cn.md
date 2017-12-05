@@ -41,24 +41,18 @@ bash apollo.sh build
 ### 启动Apollo
 ```
 # 启动人际交互界面(HMI)
-bash scripts/hmi.sh
+bash scripts/bootstrap.sh
 ```
 ### 访问 HMI
-可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8887。
-然后点击Dreamview启动HMI。
-![HMI Enable Dreamview](docs/demo_guide/images/dreamview_enable.png)
-
-继续点击右上角的Dreamview按钮。
-![HMI Launch Dreamview](docs/demo_guide/images/dreamview_launch.png)
-
-Dreamview 页面载入。
-![Open Dreamview](docs/quickstart/images/hmi_open_dreamview.png)
+可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8888。
+![Enable bootstrap](docs/demo_guide/images/apollo_bootstrap_screen.png)
 
 ### 播放演示rosbag
 ```
 # 启动一个终端窗口，进入apollo目录
 bash docker/scripts/dev_into.sh # 进入docker环境
-rosbag play -l ./docs/demo_guide/demo.bag
+bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
+rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
 ```
 
 这时，Dreamview会播放一辆带着预测轨迹的行驶中的汽车。
