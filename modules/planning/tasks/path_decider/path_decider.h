@@ -48,6 +48,12 @@ class PathDecider : public Task {
 
   ObjectStop GenerateObjectStopDecision(
       const PathObstacle &path_obstacle) const;
+
+  /**
+   * @brief Calculate stop distance with the obstacle using the ADC's minimum
+   * turning radius
+   */
+  double MinimumRadiusStopDistance(const PathObstacle &path_obstacle) const;
 };
 
 }  // namespace planning
