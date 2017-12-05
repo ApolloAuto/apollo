@@ -24,7 +24,7 @@ velodyne驱动是以nodelet的形式实现的，包含了:
 
 ```bash 
 # in dev docker
-cd /apolloe
+cd /apollo
 bash apollo.sh build_velodyne
 ```
 产出会覆盖`/home/tmp/ros/`中原有的velodyne驱动相关文件
