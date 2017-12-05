@@ -55,6 +55,9 @@ class HMI {
   void ChangeVehicleTo(const std::string &vehicle_name);
   void ChangeModeTo(const std::string &mode_name);
 
+  // Check if there is available updates.
+  void CheckOTAUpdates();
+
   HMIConfig config_;
   HMIStatus status_;
 

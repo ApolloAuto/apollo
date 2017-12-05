@@ -25,6 +25,7 @@ namespace util {
 namespace {
 
 using Json = nlohmann::json;
+using google::protobuf::util::MessageToJsonString;
 
 google::protobuf::util::JsonOptions JsonOption() {
   google::protobuf::util::JsonOptions json_option;
@@ -38,7 +39,8 @@ std::string JsonUtil::ProtoToTypedJson(const std::string &json_type,
                                        const google::protobuf::Message &proto) {
   static const auto kJsonOption = JsonOption();
   std::string json_string;
-  google::protobuf::util::MessageToJsonString(proto, &json_string, kJsonOption);
+  const auto status = MessageToJsonString(proto, &json_string, kJsonOption);
+  CHECK(status.ok()) << "Cannot convert proto to json:" << proto.DebugString();
 
   Json json_obj;
   json_obj["type"] = json_type;
