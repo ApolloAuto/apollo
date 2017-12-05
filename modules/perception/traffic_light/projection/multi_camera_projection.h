@@ -37,9 +37,7 @@ class MultiCamerasProjection {
   virtual bool Init();
   virtual bool Project(const CarPose &pose, const ProjectOption &option,
                        Light *light) const;
-  std::string name() const {
-    return "TLPreprocessor";
-  }
+  std::string name() const { return "TLPreprocessor"; }
 
  private:
   std::vector<CameraCoeffient> camera_coeffient_;

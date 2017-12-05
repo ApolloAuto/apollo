@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H_
 
-#include <eigen3/Eigen/Core>
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +34,7 @@ class CarPose {
   const Eigen::Matrix4d pose() const;
 
  private:
-  Eigen::Matrix4d _pose;
+  Eigen::Matrix4d pose_;
 
   friend std::ostream &operator<<(std::ostream &os, const CarPose &);
 };
@@ -45,5 +45,4 @@ std::ostream &operator<<(std::ostream &os, const CarPose &pose);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H
-// @date 2016/09/08 17:48:06
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_POSE_H_
