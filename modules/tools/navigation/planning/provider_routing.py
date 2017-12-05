@@ -64,6 +64,8 @@ class RoutingProvider:
         self.routing_str = None
         self.routing_points = []
         self.routing_lock = threading.Lock()
+        self.SMOOTH_FORWARD_DIST = 150
+        self.SMOOTH_BACKWARD_DIST = 150
 
     def update(self, routing_str):
         self.routing_str = routing_str
@@ -87,19 +89,21 @@ class RoutingProvider:
             return []
         if routing.length < 10:
             return []
-        distance = routing.project(point)
+        vehicle_distance = routing.project(point)
         points = []
         total_length = routing.length
-        for i in range(150):
-            if (distance - 150 + i) < 0:
+        for i in range(self.SMOOTH_BACKWARD_DIST):
+            backward_dist = vehicle_distance - self.SMOOTH_BACKWARD_DIST + i
+            if backward_dist < 0:
                 continue
-            p = routing.interpolate(distance - 150 + i)
+            p = routing.interpolate(backward_dist)
             points.append(p.coords[0])
 
-        for i in range(150):
-            if (distance + i) >= total_length:
+        for i in range(self.SMOOTH_FORWARD_DIST):
+            forward_dist = vehicle_distance + i
+            if forward_dist >= total_length:
                 break
-            p = routing.interpolate(distance + i)
+            p = routing.interpolate(forward_dist)
             points.append(p.coords[0])
         return points
 
@@ -124,40 +128,48 @@ class RoutingProvider:
             y = path_y[i]
             newx = x * math.cos(-heading) - y * math.sin(-heading)
             newy = y * math.cos(-heading) + x * math.sin(-heading)
-            # newx = x * math.cos(- heading + 1.570796) - y * math.sin(
-            #    -heading + 1.570796)
-            # newy = y * math.cos(- heading + 1.570796) + x * math.sin(
-            #    -heading + 1.570796)
             npath_x.append(newx)
             npath_y.append(newy)
         return npath_x, npath_y
 
+    def to_monotonic_segment(self, seg_x, seg_y):
+        left_cut_idx = 0
+        right_cut_idx = len(seg_x)
+        for i in range(len(seg_x) - 1):
+            if seg_x[i + 1] < seg_x[i]:
+                if seg_x[i] >= 0:
+                    right_cut_idx = i + 1
+                    break
+                else:
+                    left_cut_idx = i + 1
+        mono_seg_x = seg_x[left_cut_idx:right_cut_idx]
+        mono_seg_y = seg_y[left_cut_idx:right_cut_idx]
+        return mono_seg_x, mono_seg_y
+
     def get_local_segment_spline(self, utm_x, utm_y, heading):
         local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
-        cut_idx = len(local_seg_x)
-        for i in range(len(local_seg_x) - 1):
-            if local_seg_x[i + 1] < local_seg_x[i]:
-                cut_idx = i + 1
-                break
-        local_seg_x = local_seg_x[0:cut_idx]
-        local_seg_y = local_seg_y[0:cut_idx]
+        mono_seg_x, mono_seg_y = self.to_monotonic_segment(
+            local_seg_x, local_seg_y)
 
-        if len(local_seg_x) <= 10:
+        if len(mono_seg_x) <= 10:
             return [], []
-        k = 5
-        n = len(local_seg_x)
+        k = 3
+        n = len(mono_seg_x)
         std = 0.5
-        sp = optimized_spline(local_seg_x, local_seg_y, k, s=n * std)
-        X = np.linspace(0, len(local_seg_x), len(local_seg_x))
+        sp = optimized_spline(mono_seg_x, mono_seg_y, k, s=n * std)
+        X = np.linspace(0, int(local_seg_x[-1]), int(local_seg_x[-1]))
         return X, sp(X)
 
-    def get_smooth_local_segment(self, utm_x, utm_y, heading):
+    def get_local_segment_spline_debug(self, utm_x, utm_y, heading, k=3,
+                                       std=0.5):
         local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
-        if len(local_seg_x) <= 0:
-            return None
-        w = []
-        point_num = len(local_seg_x)
-        for i in range(point_num):
-            w.append((point_num - i) ** 3)
-        c, stats = P.polyfit(local_seg_x, local_seg_y, 3, full=True)
-        return c
+        mono_seg_x, mono_seg_y = self.to_monotonic_segment(
+            local_seg_x, local_seg_y)
+
+        if len(mono_seg_x) <= 10:
+            return [], []
+        n = len(mono_seg_x)
+        sp = optimized_spline(mono_seg_x, mono_seg_y, k, s=n * std)
+        X = np.linspace(int(mono_seg_x[0]), int(mono_seg_x[-1]),
+                        int(mono_seg_x[-1]))
+        return X, sp(X)
