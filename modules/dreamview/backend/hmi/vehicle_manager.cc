@@ -45,7 +45,7 @@ DEFINE_string(velodyne_params_target_path,
               "where <ros> is the placeholder of ROS root.");
 
 DEFINE_string(camera_params_dir, "camera_params",
-              "Velodyne params directory relative to the vehicle data path.");
+              "Camera params directory relative to the vehicle data path.");
 DEFINE_string(camera_params_target_path, "modules/perception/data/params",
               "Camera params path for the vehicle in use.");
 
