@@ -72,7 +72,7 @@ class TLProcSubnode : public Subnode {
   // @brief compute offset between two rectangles
   void ComputeRectsOffset(const cv::Rect &rect1, const cv::Rect &rect2,
                           int *offset);
-  bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights) const;
+  bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights);
 
  private:
   int image_border_ = 100;
@@ -81,6 +81,7 @@ class TLProcSubnode : public Subnode {
   std::unique_ptr<BaseRectifier> rectifier_ = nullptr;
   std::unique_ptr<BaseRecognizer> recognizer_ = nullptr;
   std::unique_ptr<BaseReviser> reviser_ = nullptr;
+  uint32_t seq_num_ = 0;
   Mutex mutex_;
   DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
 };
