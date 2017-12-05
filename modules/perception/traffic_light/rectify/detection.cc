@@ -104,7 +104,7 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
 
   vector<caffe::BBox<float>> &result_bbox =
       refine_output_layer_->GetFilteredBBox(class_id);
-  for (int candidate_id = 0; candidate_id < result_bbox.size();
+  for (size_t candidate_id = 0; candidate_id < result_bbox.size();
        candidate_id++) {
     LightPtr tmp(new Light);
     tmp->region.rectified_roi.x =
