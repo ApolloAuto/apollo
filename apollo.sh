@@ -208,7 +208,7 @@ function release() {
   MODULES_DIR=$RELEASE_DIR/modules
   mkdir -p $MODULES_DIR
   for m in control canbus localization decision perception \
-       prediction planning routing calibration third_party_perception
+       prediction planning routing calibration third_party_perception monitor
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
@@ -227,7 +227,7 @@ function release() {
   mkdir $MODULES_DIR/control/tools
   cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
 
-  #remove all pyc file in modules/
+  # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
   cp -r modules/tools $MODULES_DIR
 
@@ -274,13 +274,6 @@ function release() {
     do
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
-    # hw check
-    mkdir -p $MODULES_DIR/monitor/hardware/can
-    cp bazel-bin/modules/monitor/hardware/can/can_check $MODULES_DIR/monitor/hardware/can
-    mkdir -p $MODULES_DIR/monitor/hardware/gps
-    cp bazel-bin/modules/monitor/hardware/gps/gps_check $MODULES_DIR/monitor/hardware/gps
-    mkdir -p $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
-    cp bazel-bin/modules/monitor/hardware/can/esdcan/esdcan_tools/esdcan_test_app $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
