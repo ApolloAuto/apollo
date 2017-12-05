@@ -35,16 +35,9 @@ export default class Dreamview extends React.Component {
         const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
 
         return (
-            <div>
-                <Header />
-                <div className="pane-container">
-                    <div className="left-pane">
-                        <div className="dreamview-body">
-                            <MainView />
-                            <ToolView />
-                        </div>
-                    </div>
-                </div>
+            <div className="offlineview">
+                <MainView />
+                <ToolView />
             </div>
         );
     }
