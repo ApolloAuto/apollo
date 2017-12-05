@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
+
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/traffic_light/recognizer/classify.h"
 
@@ -106,7 +107,7 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
                                      const RecognizeOption &option,
                                      std::vector<LightPtr> *lights) {
   cv::Mat ros_image = image.mat();
-  std::vector<LightPtr> &lights_ref = *lights;
+  // std::vector<LightPtr> &lights_ref = *lights;
   cv::Rect cbox;
   cbox = cv::Rect(0, 0, ros_image.cols, ros_image.rows);
   classify_night_->SetCropBox(cbox);
