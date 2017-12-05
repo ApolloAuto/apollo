@@ -199,7 +199,7 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
             image_lights->preprocess_receive_timestamp) *
                1000
         << " ms.";
-  // }
+
   return true;
 }
 
@@ -342,7 +342,7 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
   for (size_t i = 0; i < lights_ref.size(); ++i) {
     cv::Rect rectified_roi = lights_ref[i]->region.rectified_roi;
     cv::Rect projection_roi = lights_ref[i]->region.projection_roi;
-    // 有多个灯，取最大偏移
+    // pick up traffic light with biggest offset
     int offset = 0;
     ComputeRectsOffset(projection_roi, rectified_roi, &offset);
     max_offset = std::max(max_offset, offset);
@@ -361,7 +361,7 @@ void TLProcSubnode::ComputeRectsOffset(const cv::Rect &rect1,
 
   cv::Point pt1;
   cv::Point pt2;
-  // 分四个象限, 记录横、纵方向最大偏移
+  // record the max lateral and longitudinal offset
   if (center2.y <= center1.y) {
     if (center2.x >= center1.x) {
       pt1 = cv::Point(rect1.x + rect1.width, rect1.y);
@@ -384,7 +384,7 @@ void TLProcSubnode::ComputeRectsOffset(const cv::Rect &rect1,
 }
 
 bool TLProcSubnode::PublishMessage(
-    const std::shared_ptr<ImageLights> &image_lights) const {
+    const std::shared_ptr<ImageLights> &image_lights) {
   Timer timer;
   timer.Start();
   const auto &lights = image_lights->lights;
@@ -392,6 +392,7 @@ bool TLProcSubnode::PublishMessage(
   apollo::perception::TrafficLightDetection result;
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
+  header->set_sequence_num(seq_num_++);
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
   timestamp += kCameraIndicator[image_lights->image->camera_id()];
 
@@ -481,15 +482,20 @@ bool TLProcSubnode::PublishMessage(
       cv::Rect rect = lights->at(i)->region.rectified_roi;
       cv::Scalar color;
       switch (lights->at(i)->status.color) {
-        case BLACK:color = cv::Scalar(0, 0, 0);
+        case BLACK:
+          color = cv::Scalar(0, 0, 0);
           break;
-        case GREEN:color = cv::Scalar(0, 255, 0);
+        case GREEN:
+          color = cv::Scalar(0, 255, 0);
           break;
-        case RED:color = cv::Scalar(0, 0, 255);
+        case RED:
+          color = cv::Scalar(0, 0, 255);
           break;
-        case YELLOW:color = cv::Scalar(0, 255, 255);
+        case YELLOW:
+          color = cv::Scalar(0, 255, 255);
           break;
-        default:color = cv::Scalar(0, 76, 153);
+        default:
+          color = cv::Scalar(0, 76, 153);
       }
 
       cv::rectangle(img, rect, color, 2);

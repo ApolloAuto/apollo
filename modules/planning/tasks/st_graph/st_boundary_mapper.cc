@@ -398,6 +398,8 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     b_type = StBoundary::BoundaryType::FOLLOW;
   } else if (obj_decision.has_yield()) {
     characteristic_length = std::fabs(obj_decision.yield().distance_s());
+    boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+                   .ExpandByS(characteristic_length);
     b_type = StBoundary::BoundaryType::YIELD;
   } else if (obj_decision.has_overtake()) {
     characteristic_length = std::fabs(obj_decision.overtake().distance_s());
