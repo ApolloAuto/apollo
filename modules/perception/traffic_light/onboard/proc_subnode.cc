@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/proc_subnode.h"
 
-#include <std_msgs/String.h>
 #include <algorithm>
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -385,8 +384,8 @@ bool TLProcSubnode::PublishMessage(
   timer.Start();
   const auto &lights = image_lights->lights;
   cv::Mat img = image_lights->image->mat();
-  apollo::perception::TrafficLightDetection result;
-  apollo::common::Header *header = result.mutable_header();
+  TrafficLightDetection result;
+  common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   header->set_sequence_num(seq_num_++);
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
@@ -395,7 +394,7 @@ bool TLProcSubnode::PublishMessage(
   header->set_camera_timestamp(timestamp);
   // add traffic light result
   for (size_t i = 0; i < lights->size(); i++) {
-    apollo::perception::TrafficLight *light_result = result.add_traffic_light();
+    TrafficLight *light_result = result.add_traffic_light();
     light_result->set_id(lights->at(i)->info.id().id());
     light_result->set_confidence(lights->at(i)->status.confidence);
     light_result->set_color(lights->at(i)->status.color);
@@ -405,8 +404,7 @@ bool TLProcSubnode::PublishMessage(
   result.set_contain_lights(image_lights->num_signals > 0);
 
   // add traffic light debug info
-  apollo::perception::TrafficLightDebug *light_debug =
-      result.mutable_traffic_light_debug();
+  TrafficLightDebug *light_debug = result.mutable_traffic_light_debug();
 
   // set signal number
   AINFO << "TLOutputSubnode num_signals: " << image_lights->num_signals
