@@ -144,16 +144,21 @@ EndConditionSampler::SampleLonEndConditionsGenerally(
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   std::array<double, 9> t_offsets = {-0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4};
 
+  int num_speed_section = 10;
   for (const SampleBound& sample_bound : sample_bounds) {
-    double s = (sample_bound.s_upper() + sample_bound.s_lower())/2;
-    double ss = sample_bound.v_upper();
-    std::array<double, 3> s_condition = {s, ss, 0.0};
-    for (double t_offset : t_offsets) {
-      double sampled_t = t_offset + sample_bound.t();
-      if (sampled_t <= 0.001) {
-        continue;
+    double s = (sample_bound.s_upper() + sample_bound.s_lower()) / 2;
+    double ss_interval = (sample_bound.v_upper() - sample_bound.v_lower()) / (num_speed_section - 1);
+    double ss = sample_bound.v_lower();
+    for (int i=0; i<num_speed_section; ++i) {
+      ss += i * ss_interval;
+      std::array<double, 3> s_condition = {s, ss, 0.0};
+      for (double t_offset : t_offsets) {
+        double sampled_t = t_offset + sample_bound.t();
+        if (sampled_t <= 0.001) {
+          continue;
+        }
+        end_s_conditions.push_back({s_condition, sampled_t});
       }
-      end_s_conditions.push_back({s_condition, sampled_t});
     }
   }
   return end_s_conditions;
