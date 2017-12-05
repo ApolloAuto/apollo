@@ -199,7 +199,7 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
             image_lights->preprocess_receive_timestamp) *
                1000
         << " ms.";
-  // }
+
   return true;
 }
 
@@ -384,7 +384,7 @@ void TLProcSubnode::ComputeRectsOffset(const cv::Rect &rect1,
 }
 
 bool TLProcSubnode::PublishMessage(
-    const std::shared_ptr<ImageLights> &image_lights) const {
+    const std::shared_ptr<ImageLights> &image_lights) {
   Timer timer;
   timer.Start();
   const auto &lights = image_lights->lights;
@@ -392,6 +392,7 @@ bool TLProcSubnode::PublishMessage(
   apollo::perception::TrafficLightDetection result;
   apollo::common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
+  header->set_sequence_num(seq_num_++);
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
   timestamp += kCameraIndicator[image_lights->image->camera_id()];
 
@@ -481,15 +482,20 @@ bool TLProcSubnode::PublishMessage(
       cv::Rect rect = lights->at(i)->region.rectified_roi;
       cv::Scalar color;
       switch (lights->at(i)->status.color) {
-        case BLACK:color = cv::Scalar(0, 0, 0);
+        case BLACK:
+          color = cv::Scalar(0, 0, 0);
           break;
-        case GREEN:color = cv::Scalar(0, 255, 0);
+        case GREEN:
+          color = cv::Scalar(0, 255, 0);
           break;
-        case RED:color = cv::Scalar(0, 0, 255);
+        case RED:
+          color = cv::Scalar(0, 0, 255);
           break;
-        case YELLOW:color = cv::Scalar(0, 255, 255);
+        case YELLOW:
+          color = cv::Scalar(0, 255, 255);
           break;
-        default:color = cv::Scalar(0, 76, 153);
+        default:
+          color = cv::Scalar(0, 76, 153);
       }
 
       cv::rectangle(img, rect, color, 2);
