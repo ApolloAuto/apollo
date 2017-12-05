@@ -14,19 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/projection/projection.h"
-#include <gflags/gflags.h>
+
 #include <algorithm>
 #include <vector>
+
+#include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
 DEFINE_double(width_margin_ratio, 0.5,
               "When the light center is near the width margin ratio * Radius, "
               "we will regard the light as outside the image.");
+
 DEFINE_double(height_margin_ratio, 2.5,
               "When the light center is near the height margin ratio * Radius, "
               "we will regard the light as outside the image.");
+
 DEFINE_double(light_height_adjust, 0, " adjust height without chaning code");
+
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -63,8 +68,9 @@ bool BoundaryProjection::Project(const CameraCoeffient &camera_coeffient,
 
   cv::Rect roi(minx, miny, maxx - minx, maxy - miny);
   AINFO << "projection get ROI:" << roi;
-  if (minx < 0 || miny < 0 || maxx >= camera_coeffient.image_width ||
-      maxy >= camera_coeffient.image_height) {
+  if (minx < 0 || miny < 0 ||
+      maxx >= static_cast<int>(camera_coeffient.image_width) ||
+      maxy >= static_cast<int>(camera_coeffient.image_height)) {
     AWARN << "Projection get ROI outside the image. ";
     return false;
   }
