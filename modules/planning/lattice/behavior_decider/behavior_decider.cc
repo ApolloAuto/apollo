@@ -83,6 +83,8 @@ PlanningTarget BehaviorDecider::Analyze(
                                   discretized_reference_line, &ret)) {
     AINFO << "STOP decision when near the routing end.";
     return ret;
+  } else {
+    AINFO << "GO decision made";
   }
 
   ret.CopyFrom(scenario_decisions[0]);
@@ -168,6 +170,8 @@ bool BehaviorDecider::StopDecisionNearDestination(
       lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
       planning_target->set_decision_type(PlanningTarget::STOP);
       return true;
+    } else {
+      AINFO << "required_stop_deceleration requirement not satisfied";
     }
   }
   return false;
