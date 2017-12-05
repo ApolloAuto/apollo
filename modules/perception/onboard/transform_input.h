@@ -16,7 +16,7 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
 #define MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
 
-#include "eigen3/Eigen/Core"
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {

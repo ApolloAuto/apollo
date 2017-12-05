@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H_
 
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
@@ -56,7 +57,9 @@ class UnityRectify : public BaseRectifier {
 };
 
 REGISTER_RECTIFIER(UnityRectify);
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_DENSEBOXRECTIFY_H
+
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_RECTIFY_UNITY_RECTIFY_H_
