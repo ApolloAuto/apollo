@@ -31,6 +31,18 @@ cc_test(
 )
 
 cc_library(
+    name = "http_client",
+    srcs = ["http_client.cc"],
+    hdrs = ["http_client.h"],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/status",
+        "//third_party/json",
+        "@curlpp//:curlpp",
+    ],
+)
+
+cc_library(
     name = "trajectory_point_collector",
     srcs = [
         "trajectory_point_collector.cc",
