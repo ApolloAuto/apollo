@@ -7,7 +7,9 @@
     "license": "MIT",
     "scripts": {
         "build": "node_modules/.bin/webpack -p --progress",
-        "start": "node_modules/.bin/webpack-dev-server --watch-poll"
+        "start": "node_modules/.bin/webpack-dev-server --watch-poll",
+        "build_offline": "node_modules/.bin/webpack -p --progress --config webpack.offline.config.js",
+        "start_offline": "node_modules/.bin/webpack-dev-server --watch-poll --config webpack.offline.config.js"
     },
     "dependencies": {
         "chart.js": "^2.7.0",
