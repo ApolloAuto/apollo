@@ -106,8 +106,9 @@ void PathTimeNeighborhood::SetupObstacles(
 
       *path_time_obstacle_map_[obstacle->Id()].mutable_upper_right() =
           SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
+    
+      relative_time += trajectory_time_resolution;
     }
-    relative_time += trajectory_time_resolution;
   }
 
   for (auto& path_time_obstacle : path_time_obstacle_map_) {
