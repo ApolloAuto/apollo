@@ -66,7 +66,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     Eigen::Matrix<double, 3, 1> velocity_r;
     Eigen::Matrix<double, 3, 1> velocity_w;
     velocity_r << raw_obstacles.contiobs(i).longitude_vel(),
-                  raw_obstacles.contiobs(i).lateral_vel(), 
+                  raw_obstacles.contiobs(i).lateral_vel(),
                   0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
