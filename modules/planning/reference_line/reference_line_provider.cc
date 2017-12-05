@@ -212,7 +212,13 @@ bool ReferenceLineProvider::GetReferenceLines(
       return false;
     }
   } else {
-    return CreateReferenceLine(reference_lines, segments);
+    if (!CreateReferenceLine(reference_lines, segments)) {
+      AERROR << "Failed to create reference line";
+      return false;
+    }
+    reference_lines_ = *reference_lines;
+    route_segments_ = *segments;
+    return true;
   }
 }
 
@@ -268,6 +274,9 @@ double LookForwardDistance(const VehicleState &state) {
 bool ReferenceLineProvider::CreateReferenceLine(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
+  CHECK_NOTNULL(reference_lines);
+  CHECK_NOTNULL(segments);
+
   common::VehicleState vehicle_state;
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
