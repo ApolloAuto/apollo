@@ -37,9 +37,12 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   std::set<double> critical_timestamps = CriticalTimeStamps();
   std::vector<SampleBound> sample_bounds;
   for (const double t : critical_timestamps) {
-    std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
-    sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
-        sample_bounds_at_t.end());
+    // TODO(kechxu) change the hard-coded 0.001 to some variable
+    if (t > 0.001) {
+      std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
+      sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
+          sample_bounds_at_t.end());
+    }
   }
   return sample_bounds;
 }
