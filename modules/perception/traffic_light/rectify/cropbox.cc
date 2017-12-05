@@ -101,6 +101,7 @@ void CropBox::Init(float crop_scale, float min_crop_size) {
   crop_scale_ = crop_scale;
   min_crop_size_ = min_crop_size;
 }
+
 CropBox::CropBox(float crop_scale, float min_crop_size) {
   Init(crop_scale, min_crop_size);
 }

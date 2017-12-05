@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  *********************************************************************/
+
 #ifndef USB_CAM_INCLUDE_USB_CAM_UTILITY_H_
 #define USB_CAM_INCLUDE_USB_CAM_UTILITY_H_
 
@@ -537,4 +538,4 @@ SIMD_INLINE __m256i LoadPermuted(const __m256i *p) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif /* USB_CAM_INCLUDE_USB_CAM_UTILITY_H_ */
+#endif  // USB_CAM_INCLUDE_USB_CAM_UTILITY_H_

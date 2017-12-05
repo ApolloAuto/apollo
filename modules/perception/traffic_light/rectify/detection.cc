@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/rectify/detection.h"
+
 #include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -67,7 +69,7 @@ void Detection::Perform(const cv::Mat &ros_image,
 
 void Detection::Init(const int &resize_len, const std::string &refine_net,
                      const std::string &refine_model) {
-  refine_net_ptr_ = new caffe::Net<float>(refine_net, caffe::TEST);
+  refine_net_ptr_.reset(new caffe::Net<float>(refine_net, caffe::TEST));
   refine_net_ptr_->CopyTrainedLayersFrom(refine_model);
   refine_input_layer_ =
       static_cast<caffe::PyramidImageOnlineDataLayer<float> *>(
@@ -79,12 +81,10 @@ void Detection::Init(const int &resize_len, const std::string &refine_net,
 
   resize_len_ = resize_len;
 }
+
 Detection::Detection(int min_crop_size, const std::string &refine_net,
                      const std::string &refine_model) {
   Init(min_crop_size, refine_net, refine_model);
-}
-Detection::~Detection() {
-  delete refine_net_ptr_;
 }
 
 bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
@@ -137,9 +137,9 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
 
   return true;
 }
-void Detection::SetCropBox(const cv::Rect &box) {
-  crop_box_ = box;
-}
+
+void Detection::SetCropBox(const cv::Rect &box) { crop_box_ = box; }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

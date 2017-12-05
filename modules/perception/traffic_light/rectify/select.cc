@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/rectify/select.h"
-#include "modules/perception/traffic_light/base/utils.h"
+
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
+#include "modules/perception/traffic_light/base/utils.h"
 
 namespace apollo {
 namespace perception {
@@ -31,13 +32,12 @@ void GaussianSelect::Select(const cv::Mat &ros_image,
       std::max_element(refined_bboxes.begin(), refined_bboxes.end(),
                        [](const LightPtr lhs, const LightPtr rhs) {
                          return lhs->region.rectified_roi.area() <
-                             rhs->region.rectified_roi.area();
+                                rhs->region.rectified_roi.area();
                        });
 
-//  cv::Mat_<int> cost_matrix(hdmap_bboxes.size(), refined_bboxes.size());
-  std::vector<std::vector<double> >
-      score_matrix
-      (hdmap_bboxes.size(), std::vector<double>(refined_bboxes.size(), 0));
+  //  cv::Mat_<int> cost_matrix(hdmap_bboxes.size(), refined_bboxes.size());
+  std::vector<std::vector<double> > score_matrix(
+      hdmap_bboxes.size(), std::vector<double>(refined_bboxes.size(), 0));
   for (size_t row = 0; row < hdmap_bboxes.size(); ++row) {
     cv::Point2f center_hd = GetCenter(hdmap_bboxes[row]->region.rectified_roi);
     auto width_hd = hdmap_bboxes[row]->region.rectified_roi.width;
@@ -61,8 +61,8 @@ void GaussianSelect::Select(const cv::Mat &ros_image,
       // normalized area score
       // larger area => 1
       double area_score = 1.0 *
-          refined_bboxes[col]->region.rectified_roi.area() /
-          (*max_area_refined_bbox)->region.rectified_roi.area();
+                          refined_bboxes[col]->region.rectified_roi.area() /
+                          (*max_area_refined_bbox)->region.rectified_roi.area();
 
       // when numerator=1， denominator is very small,
       // converting to int might reduce to same value, here uses 1000
@@ -70,7 +70,7 @@ void GaussianSelect::Select(const cv::Mat &ros_image,
       // score * weight h
       score_matrix[row][col] =
           (0.05 + 0.4 * refined_bboxes[col]->region.detect_score +
-              0.2 * distance_score + 0.2 * width_score + 0.2 * area_score);
+           0.2 * distance_score + 0.2 * width_score + 0.2 * area_score);
     }
   }
 
@@ -101,6 +101,7 @@ void GaussianSelect::Select(const cv::Mat &ros_image,
     }
   }
 }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

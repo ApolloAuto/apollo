@@ -19,11 +19,9 @@
 
 #include <memory>
 #include <mutex>
-#include <string>
 #include <vector>
 
 #include "Eigen/Core"
-#include "gtest/gtest_prod.h"
 
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap.h"

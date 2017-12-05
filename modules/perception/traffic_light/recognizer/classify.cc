@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/recognizer/classify.h"
 
-#include <caffe/data_transformer.hpp>
 #include <vector>
 
 #include "modules/common/log.h"
@@ -32,15 +31,13 @@ ClassifyBySimple::ClassifyBySimple(const std::string &_class_net,
   Init(_class_net, _class_model, threshold, resize_width, resize_height);
 }
 
-void ClassifyBySimple::SetCropBox(const cv::Rect &box) {
-  crop_box_ = box;
-}
+void ClassifyBySimple::SetCropBox(const cv::Rect &box) { crop_box_ = box; }
 void ClassifyBySimple::Init(const std::string &_class_net,
                             const std::string &_class_model, float threshold,
                             unsigned int resize_width,
                             unsigned int resize_height) {
   AINFO << "Creating testing net...";
-  classify_net_ptr_ = new caffe::Net<float>(_class_net, caffe::TEST);
+  classify_net_ptr_.reset(new caffe::Net<float>(_class_net, caffe::TEST));
 
   AINFO << "restore parameters...";
   classify_net_ptr_->CopyTrainedLayersFrom(_class_model);
@@ -56,8 +53,8 @@ void ClassifyBySimple::Perform(const cv::Mat &ros_image,
                                std::vector<LightPtr> *lights) {
   caffe::Blob<float> *input_blob_recog = classify_net_ptr_->input_blobs()[0];
   caffe::Blob<float> *output_blob_recog =
-      classify_net_ptr_
-          ->top_vecs()[classify_net_ptr_->top_vecs().size() - 1][0];
+      classify_net_ptr_->top_vecs()[classify_net_ptr_->top_vecs().size() - 1]
+                                   [0];
   cv::Mat img = ros_image(crop_box_);
   for (LightPtr light : *lights) {
     if (!light->region.is_detected ||
@@ -72,9 +69,9 @@ void ClassifyBySimple::Perform(const cv::Mat &ros_image,
     cv::resize(img_light, img_light, cv::Size(resize_width_, resize_height_));
     float *data = input_blob_recog->mutable_cpu_data();
     uchar *pdata = img_light.data;
-    for (int h = 0; h < resize_height_; h++) {
+    for (int h = 0; h < resize_height_; ++h) {
       pdata = img_light.data + h * img_light.step;
-      for (int w = 0; w < resize_width_; w++) {
+      for (int w = 0; w < resize_width_; ++w) {
         for (int channel = 0; channel < 3; channel++) {
           int index = (channel * resize_height_ + h) * resize_width_ + w;
           data[index] = static_cast<float>((*pdata));
@@ -87,9 +84,6 @@ void ClassifyBySimple::Perform(const cv::Mat &ros_image,
     float *out_put_data = output_blob_recog->mutable_cpu_data();
     ProbToColor(out_put_data, unknown_threshold_, light);
   }
-}
-ClassifyBySimple::~ClassifyBySimple() {
-  delete classify_net_ptr_;
 }
 
 void ClassifyBySimple::ProbToColor(const float *out_put_data, float threshold,
@@ -107,7 +101,7 @@ void ClassifyBySimple::ProbToColor(const float *out_put_data, float threshold,
   light->status.confidence = out_put_data[max_color_id];
   AINFO << "Light status recognized as " << name_map[max_color_id];
   AINFO << "Color Prob:";
-  for (size_t j = 0; j < status_map.size(); j++) {
+  for (size_t j = 0; j < status_map.size(); ++j) {
     AINFO << out_put_data[j];
   }
 }

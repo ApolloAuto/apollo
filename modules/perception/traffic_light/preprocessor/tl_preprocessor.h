@@ -33,8 +33,10 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
 using apollo::hdmap::Signal;
 typedef std::vector<std::shared_ptr<LightPtrs>> LightsArray;
+
 class TLPreprocessor : public BasePreprocessor {
  public:
   TLPreprocessor() {}
@@ -87,7 +89,7 @@ class TLPreprocessor : public BasePreprocessor {
  private:
   MultiCamerasProjection projection_;
 
-  double last_no_signals_ts_ = -1;
+  double last_no_signals_ts_ = -1.0;
 
   CameraId last_pub_camera_id_ = CameraId::UNKNOWN;
 

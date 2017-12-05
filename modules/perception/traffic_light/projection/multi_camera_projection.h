@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H_
 
 #include <map>
 #include <memory>
@@ -31,7 +31,7 @@ namespace traffic_light {
 // @brief 2 Camera Projection project the Light into the image.
 class MultiCamerasProjection {
  public:
-  MultiCamerasProjection() {}
+  MultiCamerasProjection() = default;
 
   virtual ~MultiCamerasProjection() = default;
   virtual bool Init();
@@ -49,4 +49,4 @@ class MultiCamerasProjection {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_MULTI_CAMERA_PROJECTION_H
+#endif
