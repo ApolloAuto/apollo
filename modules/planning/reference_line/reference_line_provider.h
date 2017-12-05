@@ -84,6 +84,14 @@ class ReferenceLineProvider {
   bool CreateReferenceLine(std::list<ReferenceLine>* reference_lines,
                            std::list<hdmap::RouteSegments>* segments);
 
+  /**
+   * @brief store the computed reference line. This function can avoid
+   * unnecessary copy if the reference lines are the same.
+   */
+  void UpdateReferenceLine(
+      const std::list<ReferenceLine>& reference_lines,
+      const std::list<hdmap::RouteSegments>& route_segments);
+
   void GenerateThread();
   void IsValidReferenceLine();
   void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
@@ -130,8 +138,6 @@ class ReferenceLineProvider {
   QpSplineReferenceLineSmootherConfig smoother_config_;
 
   std::mutex pnc_map_mutex_;
-  // the following data (pnc_map_, vehicle_state_) are managed
-  // by pnc_map_mutex_
   std::unique_ptr<hdmap::PncMap> pnc_map_;
   common::VehicleState vehicle_state_;
 
@@ -147,8 +153,6 @@ class ReferenceLineProvider {
   std::list<std::string> segment_history_id_;
 
   std::mutex reference_lines_mutex_;
-  // the following data (reference_lines_, route_segments_) are managed by
-  // reference_lines_mutex_
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
 };

@@ -112,15 +112,30 @@ typename Container::value_type MinElement(const Container& elements) {
 }
 
 /**
- * calculate the distance beteween PathPoint a and PathPoint b
- * @param a one path point
- * @param b another path point
- * @return sqrt((a.x-b.x)^2 + (a.y-b.y)^2), i.e., the Euclid distance on XY
- * dimension
+ * calculate the distance beteween Point u and Point v, which are all have
+ * member function x() and y() in XY dimension.
+ * @param u one point that has member function x() and y().
+ * @param b one point that has member function x() and y().
+ * @return sqrt((u.x-v.x)^2 + (u.y-v.y)^2), i.e., the Euclid distance on XY
+ * dimension.
  */
 template <typename U, typename V>
 double DistanceXY(const U& u, const V& v) {
   return std::hypot(u.x() - v.x(), u.y() - v.y());
+}
+
+/**
+ * Check if two points u and v are the same point on XY dimension.
+ * @param u one point that has member function x() and y().
+ * @param v one point that has member function x() and y().
+ * @return sqrt((u.x-v.x)^2 + (u.y-v.y)^2) < epsilon, i.e., the Euclid distance
+ * on XY dimension.
+ */
+template <typename U, typename V>
+bool SamePointXY(const U& u, const V& v) {
+  constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
+  return (u.x() - v.x()) * (u.x() - v.x()) < kMathEpsilonSqr &&
+         (u.y() - v.y()) * (u.y() - v.y()) < kMathEpsilonSqr;
 }
 
 }  // namespace util
