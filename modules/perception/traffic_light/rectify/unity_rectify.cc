@@ -52,7 +52,6 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
   float crop_scale = 0;
   int crop_min_size = 0;
   int crop_method = 0;
-  float output_threshold = 0.0f;
   std::string detection_model;
   std::string detection_net;
 
@@ -136,7 +135,7 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     detect_->Perform(ros_image, &detected_bboxes);
 
     AINFO << "detect " << detected_bboxes.size() << " lights";
-    for (int j = 0; j < detected_bboxes.size(); j++) {
+    for (size_t j = 0; j < detected_bboxes.size(); j++) {
       AINFO << detected_bboxes[j]->region.rectified_roi;
       cv::Rect &region = detected_bboxes[j]->region.rectified_roi;
       float score = detected_bboxes[j]->region.detect_score;
@@ -148,14 +147,14 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
 
     select_->Select(ros_image, lights_ref, detected_bboxes, &selected_bboxes);
   } else {
-    for (int h = 0; h < lights_ref.size(); h++) {
+    for (size_t h = 0; h < lights_ref.size(); h++) {
       LightPtr light = lights_ref[h];
       light->region.is_detected = false;
       selected_bboxes.push_back(light);
     }
   }
 
-  for (int i = 0; i < lights_ref.size(); ++i) {
+  for (size_t i = 0; i < lights_ref.size(); ++i) {
     if (!selected_bboxes[i]->region.is_detected ||
         !selected_bboxes[i]->region.is_selected) {
       AWARN << "No detection box ,using project box";
