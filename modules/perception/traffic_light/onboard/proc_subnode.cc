@@ -342,7 +342,7 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
   for (size_t i = 0; i < lights_ref.size(); ++i) {
     cv::Rect rectified_roi = lights_ref[i]->region.rectified_roi;
     cv::Rect projection_roi = lights_ref[i]->region.projection_roi;
-    // 有多个灯，取最大偏移
+    // pick up traffic light with biggest offset
     int offset = 0;
     ComputeRectsOffset(projection_roi, rectified_roi, &offset);
     max_offset = std::max(max_offset, offset);
@@ -361,7 +361,7 @@ void TLProcSubnode::ComputeRectsOffset(const cv::Rect &rect1,
 
   cv::Point pt1;
   cv::Point pt2;
-  // 分四个象限, 记录横、纵方向最大偏移
+  // record the max lateral and longitudinal offset
   if (center2.y <= center1.y) {
     if (center2.x >= center1.x) {
       pt1 = cv::Point(rect1.x + rect1.width, rect1.y);
