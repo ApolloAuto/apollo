@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/base/image.h"
-#include <cv_bridge/cv_bridge.h>
+
+#include "cv_bridge/cv_bridge.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/util/color_space.h"
 
@@ -43,13 +45,9 @@ bool Image::Init(const double &ts, const CameraId &device_id,
   return true;
 }
 
-double Image::ts() const {
-  return timestamp_;
-}
+double Image::ts() const { return timestamp_; }
 
-CameraId Image::camera_id() const {
-  return camera_id_;
-}
+CameraId Image::camera_id() const { return camera_id_; }
 
 std::string Image::camera_id_str() const {
   if (kCameraIdToStr.find(camera_id_) == kCameraIdToStr.end()) {
@@ -77,9 +75,7 @@ bool Image::GenerateMat() {
   }
   return true;
 }
-cv::Mat Image::mat() const {
-  return mat_;
-}
+cv::Mat Image::mat() const { return mat_; }
 cv::Size Image::size() const {
   if (contain_mat_) {
     return mat_.size();

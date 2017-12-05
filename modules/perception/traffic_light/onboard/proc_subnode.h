@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H_
 
-#include <gflags/gflags.h>
 #include <cmath>
 #include <map>
 #include <memory>
 #include <string>
 
-#include "modules/perception/onboard/common_shared_data.h"
-#include "modules/perception/traffic_light/interface/green_interface.h"
+#include "gflags/gflags.h"
 
+#include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/base_reviser.h"
+#include "modules/perception/traffic_light/interface/green_interface.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace apollo {
@@ -91,4 +91,4 @@ REGISTER_SUBNODE(TLProcSubnode);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PROC_SUBNODE_H_

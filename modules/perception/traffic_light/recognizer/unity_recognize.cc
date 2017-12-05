@@ -140,6 +140,7 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
 }
 
 std::string UnityRecognize::name() const { return "UnityRecognize"; }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

@@ -15,15 +15,16 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
 
-#include <image_transport/image_transport.h>
+#include "image_transport/image_transport.h"
+
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/traffic_light/projection/projection.h"
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -53,7 +54,7 @@ bool TLPreprocessorSubnode::InitInternal() {
   proc_interval_seconds_ = 1.0f / _max_process_image_fps;
 
   if (!model_config->GetValue("query_tf_inverval_seconds",
-                              &_query_tf_inverval_seconds)) {
+                              &query_tf_inverval_seconds_)) {
     AERROR << "TLPreprocessorSubnode Failed to find Conf: "
            << "query_tf_inverval_seconds.";
     return false;
@@ -120,8 +121,7 @@ bool TLPreprocessorSubnode::InitHdmap() {
 }
 
 bool TLPreprocessorSubnode::AddDataAndPublishEvent(
-    const std::shared_ptr<ImageLights> &data,
-    const CameraId &camera_id,
+    const std::shared_ptr<ImageLights> &data, const CameraId &camera_id,
     double timestamp) {
   // add data down-stream
   std::string device_str = kCameraIdToStr.at(camera_id);
@@ -216,13 +216,11 @@ void TLPreprocessorSubnode::SubCameraImage(
   // tf frequency is 100Hz, 0.01 sec per frame，
   // cache frame num: max_cached_image_lights_array_size * 0.005 tf info
   const float tf_interval = 0.01;
-  double image_sys_ts_diff_threshold =
-      max_cached_lights_size * tf_interval;
+  double image_sys_ts_diff_threshold = max_cached_lights_size * tf_interval;
   if (fabs(image_lights->diff_image_sys_ts) > image_sys_ts_diff_threshold) {
     std::string debug_string = "";
-    debug_string +=
-        ("diff_image_sys_ts:"
-            + std::to_string(image_lights->diff_image_sys_ts));
+    debug_string += ("diff_image_sys_ts:" +
+                     std::to_string(image_lights->diff_image_sys_ts));
     debug_string += (",camera_id:" + kCameraIdToStr.at(camera_id));
     debug_string += (",camera_ts:" + std::to_string(timestamp));
 
@@ -266,10 +264,9 @@ void TLPreprocessorSubnode::SubCameraImage(
   }
 }
 
-bool TLPreprocessorSubnode::GetSignals(double ts,
-                                       CarPose *pose,
+bool TLPreprocessorSubnode::GetSignals(double ts, CarPose *pose,
                                        std::vector<Signal> *signals) {
-// get pose
+  // get pose
   if (!GetCarPose(ts, pose)) {
     AERROR << "camera_selection failed to get car pose, ts:"
            << GLOG_TIMESTAMP(ts);
@@ -280,8 +277,8 @@ bool TLPreprocessorSubnode::GetSignals(double ts,
 
   // get signals
   if (!hd_map_->GetSignals(pose->pose(), signals)) {
-    if (ts - _last_signals_ts < valid_hdmap_interval_) {
-      *signals = _last_signals;
+    if (ts - last_signals_ts_ < valid_hdmap_interval_) {
+      *signals = last_signals_;
       AWARN << "camera_selection failed to get signals info. "
             << "Now use last info. ts:" << GLOG_TIMESTAMP(ts)
             << " pose:" << *pose;
@@ -291,8 +288,8 @@ bool TLPreprocessorSubnode::GetSignals(double ts,
       return false;
     }
   } else {
-    _last_signals = *signals;
-    _last_signals_ts = ts;
+    last_signals_ = *signals;
+    last_signals_ts_ = ts;
   }
   return true;
 }
@@ -319,9 +316,7 @@ bool TLPreprocessorSubnode::VerifyLightsProjection(
   image_lights->num_signals = signals.size();
   image_lights->lights.reset(new LightPtrs);
   image_lights->lights_outside_image.reset(new LightPtrs);
-  if (!preprocessor_.ProjectLights(pose,
-                                   signals,
-                                   image_lights->camera_id,
+  if (!preprocessor_.ProjectLights(pose, signals, image_lights->camera_id,
                                    image_lights->lights.get(),
                                    image_lights->lights_outside_image.get())) {
     AINFO << "_preprocessor.select_camera_by_lights_projection failed";
@@ -333,10 +328,10 @@ bool TLPreprocessorSubnode::VerifyLightsProjection(
 void TLPreprocessorSubnode::CameraSelection(double ts) {
   const double current_ts = TimeUtil::GetCurrentTime();
   AINFO << "current_ts: " << GLOG_TIMESTAMP(current_ts)
-        << " , _last_query_tf_ts: " << GLOG_TIMESTAMP(_last_query_tf_ts)
-        << " , diff: " << GLOG_TIMESTAMP(current_ts - _last_query_tf_ts);
-  if (_last_query_tf_ts > 0.0 &&
-      current_ts - _last_query_tf_ts < _query_tf_inverval_seconds) {
+        << " , last_query_tf_ts_: " << GLOG_TIMESTAMP(last_query_tf_ts_)
+        << " , diff: " << GLOG_TIMESTAMP(current_ts - last_query_tf_ts_);
+  if (last_query_tf_ts_ > 0.0 &&
+      current_ts - last_query_tf_ts_ < query_tf_inverval_seconds_) {
     AINFO << "skip current tf msg, img_ts: " << GLOG_TIMESTAMP(ts);
     return;
   }
@@ -353,8 +348,9 @@ void TLPreprocessorSubnode::CameraSelection(double ts) {
     AINFO << "add_cached_lights_projections succeed, ts: "
           << GLOG_TIMESTAMP(ts);
   }
-  _last_query_tf_ts = current_ts;
+  last_query_tf_ts_ = current_ts;
 }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

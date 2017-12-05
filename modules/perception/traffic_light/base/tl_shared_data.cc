@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
+
 namespace apollo {
 namespace perception {
 namespace traffic_light {

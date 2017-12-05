@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H_
 
-#include <opencv2/opencv.hpp>
 #include <vector>
+
+#include "opencv2/opencv.hpp"
+
 #include "modules/perception/traffic_light/base/light.h"
 
 namespace apollo {
@@ -42,19 +44,20 @@ class IRefine {
 
 class IGetBox {
  public:
-  virtual void
-  GetCropBox(const cv::Size &size, const std::vector<LightPtr> &lights,
-             cv::Rect *cropbox) = 0;
+  virtual void GetCropBox(const cv::Size &size,
+                          const std::vector<LightPtr> &lights,
+                          cv::Rect *cropbox) = 0;
 };
+
 class DummyRefine : public IRefine {
  public:
   void Perform(const cv::Mat &ros_image,
-               std::vector<LightPtr> *lights) override {
-  }
-  void SetCropBox(const cv::Rect &box) override {
-  }
+               std::vector<LightPtr> *lights) override {}
+  void SetCropBox(const cv::Rect &box) override {}
 };
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif
+
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_GREEN_INTERFACE_H_

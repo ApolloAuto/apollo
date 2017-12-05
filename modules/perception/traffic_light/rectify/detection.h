@@ -14,15 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H_
 
-#include <caffe/layers/pyramid_layers.hpp>
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "caffe/caffe.hpp"
+#include "caffe/layers/pyramid_layers.hpp"
+
 #include "modules/perception/traffic_light/base/light.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
+
 namespace apollo {
 namespace perception {
 namespace traffic_light {
@@ -39,21 +43,23 @@ class Detection : public IRefine {
 
   void SetCropBox(const cv::Rect &box) override;
 
-  ~Detection();
+  ~Detection() = default;
 
  private:
   bool SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
                           float inflate_col, float inflate_row,
                           std::vector<LightPtr> *lights);
 
-  caffe::Net<float> *refine_net_ptr_;
-  caffe::PyramidImageOnlineDataLayer<float> *refine_input_layer_;
-  caffe::ROIOutputSSDLayer<float> *refine_output_layer_;
+  std::unique_ptr<caffe::Net<float>> refine_net_ptr_;
+  caffe::PyramidImageOnlineDataLayer<float> *refine_input_layer_ = nullptr;
+  caffe::ROIOutputSSDLayer<float> *refine_output_layer_ = nullptr;
 
-  int resize_len_;
+  int resize_len_ = 0;
   cv::Rect crop_box_;
 };
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif  // GREEN_DenseBoxDetection_H
+
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_UNITY_DETECTION_H_
