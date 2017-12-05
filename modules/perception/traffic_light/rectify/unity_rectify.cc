@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
+
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -27,12 +28,12 @@ namespace traffic_light {
 
 bool UnityRectify::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == NULL) {
+  if (config_manager == nullptr) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
   }
 
-  const ModelConfig *model_config = NULL;
+  const ModelConfig *model_config = nullptr;
   if (!config_manager->GetModelConfig(name(), &model_config)) {
     AERROR << "not found model config: " << name();
     return false;
@@ -49,7 +50,7 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
                                  const ModelConfig *model_config,
                                  std::shared_ptr<IRefine> *detection,
                                  std::shared_ptr<IGetBox> *crop) {
-  float crop_scale = 0;
+  float crop_scale = 0.0;
   int crop_min_size = 0;
   int crop_method = 0;
   std::string detection_model;
@@ -118,7 +119,7 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
   std::vector<LightPtr> detected_bboxes;
 
   for (auto &light : lights_ref) {
-    // 默认第一个debug roi 是 crop roi,这里先站位
+    // By default, the first debug ros is crop roi. (Reserve a position here).
     light->region.rectified_roi = light->region.projection_roi;
     light->region.debug_roi.push_back(cv::Rect(0, 0, 0, 0));
     light->region.debug_roi_detect_scores.push_back(0.0f);
@@ -135,7 +136,7 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     detect_->Perform(ros_image, &detected_bboxes);
 
     AINFO << "detect " << detected_bboxes.size() << " lights";
-    for (size_t j = 0; j < detected_bboxes.size(); j++) {
+    for (size_t j = 0; j < detected_bboxes.size(); ++j) {
       AINFO << detected_bboxes[j]->region.rectified_roi;
       cv::Rect &region = detected_bboxes[j]->region.rectified_roi;
       float score = detected_bboxes[j]->region.detect_score;
@@ -172,9 +173,8 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
   return true;
 }
 
-std::string UnityRectify::name() const {
-  return "UnityRectify";
-}
+std::string UnityRectify::name() const { return "UnityRectify"; }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

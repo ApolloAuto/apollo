@@ -221,12 +221,12 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   }
 
   // draw image border size (offset between hdmap-box and detection-box)
-  int pos_y_offset = 1000;
   if (camera_ts_id == "222") {
     if (tl_debug_msg.project_error() > 100) {
       std::string img_border_txt =
           "Offset size: " + std::to_string(tl_debug_msg.project_error());
-      cv::putText(s_img, img_border_txt, cv::Point(30, pos_y_offset),
+      constexpr int kPosYOffset = 1000;
+      cv::putText(s_img, img_border_txt, cv::Point(30, kPosYOffset),
                   cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
     }
   }

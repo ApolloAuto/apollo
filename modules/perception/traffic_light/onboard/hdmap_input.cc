@@ -15,13 +15,14 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/onboard/hdmap_input.h"
-#include "Eigen/Core"
+
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
 using apollo::hdmap::HDMapUtil;
 
 using std::string;
@@ -30,9 +31,7 @@ using std::vector;
 // HDMapInput
 HDMapInput::HDMapInput() {}
 
-bool HDMapInput::Init() {
-  return HDMapUtil::ReloadMaps();
-}
+bool HDMapInput::Init() { return HDMapUtil::ReloadMaps(); }
 bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
                             std::vector<apollo::hdmap::Signal> *signals) {
   auto hdmap = HDMapUtil::BaseMapPtr();
