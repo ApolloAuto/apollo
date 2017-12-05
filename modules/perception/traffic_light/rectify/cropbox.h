@@ -36,8 +36,8 @@ class CropBox : public IGetBox {
                           cv::Rect *cropbox);
 
  private:
-  float crop_scale_;
-  float min_crop_size_;
+  float crop_scale_ = 0.0;
+  float min_crop_size_ = 0.0;
 };
 
 class CropBoxWholeImage : public IGetBox {

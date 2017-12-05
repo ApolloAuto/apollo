@@ -148,7 +148,7 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
 
     select_->Select(ros_image, lights_ref, detected_bboxes, &selected_bboxes);
   } else {
-    for (size_t h = 0; h < lights_ref.size(); h++) {
+    for (size_t h = 0; h < lights_ref.size(); ++h) {
       LightPtr light = lights_ref[h];
       light->region.is_detected = false;
       selected_bboxes.push_back(light);

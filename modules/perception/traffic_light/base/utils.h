@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_UTILS_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_UTILS_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_UTILS_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_UTILS_H_
 
-#include <opencv2/opencv.hpp>
+#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace perception {
@@ -41,4 +41,5 @@ float Get1dGaussianScore(float x1, float x2, float sigma);
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif
+
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_UTILS_H_

@@ -164,18 +164,18 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
   // 2. timestamp drift
   // 3. [there is no tf]
   if (!sync_ok) {
-      AINFO << "sync image with cached lights projection failed, "
-            << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-            << " camera_id: " << kCameraIdToStr.at(camera_id);
-      *should_pub = false;
-      return false;
+    AINFO << "sync image with cached lights projection failed, "
+          << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
+    *should_pub = false;
+    return false;
   }
   if (sync_ok) {
     AINFO << "TLPreprocessor sync ok ts: " << GLOG_TIMESTAMP(timestamp)
           << " camera_id: " << kCameraIdToStr.at(camera_id);
     last_output_ts_ = timestamp;
     last_pub_camera_id_ = camera_id;
-  }  else {
+  } else {
     AINFO << "sync image with cached lights projection failed, "
           << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
           << " camera_id: " << kCameraIdToStr.at(camera_id);

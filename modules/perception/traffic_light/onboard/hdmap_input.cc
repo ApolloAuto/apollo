@@ -25,9 +25,6 @@ namespace traffic_light {
 
 using apollo::hdmap::HDMapUtil;
 
-using std::string;
-using std::vector;
-
 // HDMapInput
 HDMapInput::HDMapInput() {}
 
@@ -36,7 +33,7 @@ bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
                             std::vector<apollo::hdmap::Signal> *signals) {
   auto hdmap = HDMapUtil::BaseMapPtr();
 
-  vector<hdmap::SignalInfoConstPtr> forward_signals;
+  std::vector<hdmap::SignalInfoConstPtr> forward_signals;
   apollo::common::PointENU point;
   point.set_x(pointd(0, 3));
   point.set_y(pointd(1, 3));
