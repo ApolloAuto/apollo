@@ -94,6 +94,32 @@ bool CopyFile(const std::string &from, const std::string &to) {
   return false;
 }
 
+bool CopyDir(const std::string &from, const std::string &to) {
+  DIR *directory = opendir(from.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << from;
+    return false;
+  }
+
+  struct dirent *entry;
+  bool ret = true;
+  while ((entry = readdir(directory)) != nullptr) {
+    // skip directory_path/. and directory_path/..
+    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+      continue;
+    }
+    const std::string sub_path_from = StrCat(from, "/", entry->d_name);
+    const std::string sub_path_to = StrCat(to, "/", entry->d_name);
+    if (entry->d_type == DT_DIR) {
+      ret = CopyDir(sub_path_from, sub_path_to) && ret;
+    } else {
+      ret = CopyFile(sub_path_from, sub_path_to) && ret;
+    }
+  }
+  closedir(directory);
+  return ret;
+}
+
 bool EnsureDirectory(const std::string &directory_path) {
   std::string path = directory_path;
   for (size_t i = 1; i < directory_path.size(); ++i) {
