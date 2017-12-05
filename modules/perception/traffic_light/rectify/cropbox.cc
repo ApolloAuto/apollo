@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/rectify/cropbox.h"
+
 #include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
@@ -74,10 +76,10 @@ void CropBox::GetCropBox(const cv::Size &size,
   resize_width = resize_height =
       (resize < min_crop_size_) ? min_crop_size_ : resize;
 
-  float pad_t = (resize_height - (yb - yt)) / 2;
-  float pad_l = (resize_width - (xr - xl)) / 2;
-  float pad_b = pad_t;
-  float pad_r = pad_l;
+  // float pad_t = (resize_height - (yb - yt)) / 2;
+  // float pad_l = (resize_width - (xr - xl)) / 2;
+  // float pad_b = pad_t;
+  // float pad_r = pad_l;
   // clamp
   xl = center_x - resize_width / 2;
   xl = (xl < 0) ? 0 : xl;
@@ -103,7 +105,7 @@ CropBox::CropBox(float crop_scale, float min_crop_size) {
 void CropBoxWholeImage::GetCropBox(const cv::Size &size,
                                    const std::vector<LightPtr> &lights,
                                    cv::Rect *cropbox) {
-  for (int i = 0; i < lights.size(); ++i) {
+  for (size_t i = 0; i < lights.size(); ++i) {
     if (BoxIsValid(lights[i]->region.projection_roi, size)) {
       cropbox->x = cropbox->y = 0;
       cropbox->width = size.width;
