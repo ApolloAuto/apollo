@@ -174,7 +174,7 @@ void ReferenceLineProvider::Stop() {
 }
 
 void ReferenceLineProvider::GenerateThread() {
-  constexpr int32_t kSleepTime = 50;  // milliseconds
+  constexpr int32_t kSleepTime = 10;  // milliseconds
   while (!is_stop_) {
     std::this_thread::yield();
     std::this_thread::sleep_for(
