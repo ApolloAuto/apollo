@@ -126,7 +126,6 @@ class RouteSegments : public std::vector<LaneSegment> {
   void SetRouteEndWaypoint(const LaneWaypoint &waypoint);
 
   /** Stitch current route segments with the other route segment.
-   * @example
    * Example 1
    * this:   |--------A-----x-----B------|
    * other:                 |-----B------x--------C-------|

@@ -51,7 +51,6 @@ class ReferenceLine {
    * The stitching strategy is to use current reference points as much as
    * possible. The following two examples show two successful stitch cases.
    *
-   * @example
    * Example 1
    * this:   |--------A-----x-----B------|
    * other:                 |-----C------x--------D-------|
