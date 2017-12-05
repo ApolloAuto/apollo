@@ -149,7 +149,11 @@ EndConditionSampler::SampleLonEndConditionsGenerally(
     double ss = sample_bound.v_upper();
     std::array<double, 3> s_condition = {s, ss, 0.0};
     for (double t_offset : t_offsets) {
-      end_s_conditions.push_back({s_condition, t_offset + sample_bound.t()});
+      double sampled_t = t_offset + sample_bound.t();
+      if (sampled_t <= 0.001) {
+        continue;
+      }
+      end_s_conditions.push_back({s_condition, sampled_t});
     }
   }
   return end_s_conditions;
