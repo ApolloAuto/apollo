@@ -47,7 +47,6 @@ bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
 
-  std::cout << "using spiral reference line smoother" << std::endl;
   const double start_timestamp = Clock::NowInSecond();
   std::vector<double> opt_x;
   std::vector<double> opt_y;
@@ -196,6 +195,7 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   CHECK_GT(point2d.size(), 1);
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
+
   ptop->set_default_max_point_deviation(default_max_point_deviation_);
   if (fixed_start_point_) {
     ptop->set_start_point(fixed_start_x_, fixed_start_y_, fixed_start_theta_,
@@ -214,8 +214,7 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   //  app->Options()->SetNumericValue("derivative_test_perturbation", 1.0e-7);
   //  app->Options()->SetStringValue("derivative_test", "second-order");
   app->Options()->SetIntegerValue("print_level", 0);
-  int num_iterations = FLAGS_spiral_smoother_num_iteration;
-  app->Options()->SetIntegerValue("max_iter", num_iterations);
+  app->Options()->SetIntegerValue("max_iter", FLAGS_spiral_smoother_num_iteration);
 
   //  app->Options()->SetNumericValue("acceptable_tol", 0.5);
   //  app->Options()->SetNumericValue("acceptable_obj_change_tol", 0.5);
