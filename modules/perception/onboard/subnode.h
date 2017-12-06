@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common/macro.h"
+#include "modules/common/status/status.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/lib/base/thread.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -70,9 +71,8 @@ class Subnode : public Thread {
   }
 
   // @brief Subnode process interface, should be realized in derived class.
-  // @return  bool
-  // @retval
-  virtual StatusCode ProcEvents() = 0;
+  // @return Status.
+  virtual apollo::common::Status ProcEvents() = 0;
 
   SubnodeID id() const {
     return id_;
@@ -130,7 +130,7 @@ class CommonSubnode : public Subnode {
   CommonSubnode() : Subnode() {}
   virtual ~CommonSubnode() {}
 
-  virtual StatusCode ProcEvents();
+  virtual apollo::common::Status ProcEvents();
 
  protected:
   // Derive class implement this api.
@@ -143,7 +143,7 @@ class CommonSubnode : public Subnode {
 // Just a sample, showing how subnode works.
 // class SubnodeSample : public Subnode {
 // public:
-//     virtual StatusCode proc_events() {
+//     virtual apollo::common::Status proc_events() {
 //         // SubnodeNormal
 //         _event_mgr->sub(EVENT_TYPE_A, event_a);
 //         _data_mgr->get_data(data)
@@ -167,7 +167,7 @@ class CommonSubnode : public Subnode {
 //         printf("Process one event.\n");
 //         sleep(1);
 //
-//         return SUCC;
+//         return apollo::common::Status::OK();
 //     };
 // };
 

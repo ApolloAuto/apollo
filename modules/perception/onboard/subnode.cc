@@ -26,6 +26,8 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using std::vector;
 using std::string;
 using std::ostringstream;
@@ -82,9 +84,9 @@ void Subnode::Run() {
   }
 
   while (!stop_) {
-    StatusCode status = ProcEvents();
+    Status status = ProcEvents();
     ++total_count_;
-    if (status == FAIL) {
+    if (status.code() == ErrorCode::PERCEPTION_ERROR) {
       ++failed_count_;
       AWARN << "Subnode: " << name_ << " proc event failed. "
             << " total_count: " << total_count_
@@ -93,7 +95,7 @@ void Subnode::Run() {
     }
 
     // FATAL error, so exit thread.
-    if (status == FATAL) {
+    if (status.code() == ErrorCode::PERCEPTION_FATAL) {
       AERROR << "Subnode: " << name_ << " proc event FATAL error, EXIT. "
              << " total_count: " << total_count_
              << " failed_count: " << failed_count_;
@@ -121,7 +123,7 @@ string Subnode::DebugString() const {
   return oss.str();
 }
 
-StatusCode CommonSubnode::ProcEvents() {
+Status CommonSubnode::ProcEvents() {
   CHECK(sub_meta_events_.size() == 1u) << "CommonSubnode sub_meta_events == 1";
   CHECK(pub_meta_events_.size() == 1u) << "CommonSubnode pub_meta_events == 1";
 
@@ -129,7 +131,7 @@ StatusCode CommonSubnode::ProcEvents() {
   if (!event_manager_->Subscribe(sub_meta_events_[0].event_id, &sub_event)) {
     AERROR << "failed to subscribe. meta_event: <"
            << sub_meta_events_[0].to_string() << ">";
-    return FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to subscribe event.");
   }
 
   Event pub_event = sub_event;
@@ -139,15 +141,15 @@ StatusCode CommonSubnode::ProcEvents() {
   if (!HandleEvent(sub_event, &pub_event)) {
     AWARN << "failed to call _handle_event. sub_event: <"
           << sub_event.to_string() << "> pub_event: <" << pub_event.to_string();
-    return FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call _handle_event.");
   }
 
   if (!event_manager_->Publish(pub_event)) {
     AERROR << "failed to publish pub_event: <" << pub_event.to_string() << ">";
-    return FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to publish pub_event.");
   }
 
-  return SUCC;
+  return Status::OK();
 }
 
 }  // namespace perception
