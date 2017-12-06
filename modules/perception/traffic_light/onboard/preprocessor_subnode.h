@@ -54,9 +54,6 @@ class TLPreprocessorSubnode : public Subnode {
   //         we will use ros callback, so ignore subnode callback
   StatusCode ProcEvents() override { return SUCC; }
 
-  // for check lights projection on image border region dynamically
-  static std::map<int, int> _s_image_borders;
-
  protected:
   // @brief init pre-processor
   bool InitInternal() override;
@@ -115,3 +112,4 @@ REGISTER_SUBNODE(TLPreprocessorSubnode);
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H_
+

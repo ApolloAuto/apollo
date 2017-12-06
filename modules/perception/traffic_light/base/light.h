@@ -124,7 +124,7 @@ typedef std::shared_ptr<Light> LightPtr;
 typedef std::vector<LightPtr> LightPtrs;
 
 // @brief compute stopline to car's distance
-double stopline_distance(
+double Distance2Stopline(
     const Eigen::Matrix4d &car_pose,
     const google::protobuf::RepeatedPtrField<apollo::hdmap::Curve> &stoplines);
 

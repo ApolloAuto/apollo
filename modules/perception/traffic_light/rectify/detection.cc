@@ -58,8 +58,10 @@ void Detection::Perform(const cv::Mat &ros_image,
 
   float inflate_col = 1.0f / _crop_col_shrink;
   float inflate_row = 1.0f / _crop_row_shrink;
-  SelectOutputBboxes(crop_image, 0, inflate_col, inflate_row, lights);
-  SelectOutputBboxes(crop_image, 1, inflate_col, inflate_row, lights);
+  SelectOutputBboxes(crop_image.size(), VERTICAL_CLASS, inflate_col,
+                                       inflate_row, lights);
+  SelectOutputBboxes(crop_image.size(), QUADRATE_CLASS, inflate_col,
+                                       inflate_row, lights);
 
   AINFO << "Dump output Done! Get box num:" << lights->size();
 
@@ -87,15 +89,9 @@ Detection::Detection(int min_crop_size, const std::string &refine_net,
   Init(min_crop_size, refine_net, refine_model);
 }
 
-bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
+bool Detection::SelectOutputBboxes(const cv::Size &img_size, int class_id,
                                    float inflate_col, float inflate_row,
                                    std::vector<LightPtr> *lights) {
-  if (crop_image.empty()) {
-    AERROR << "DenseBoxDetection crop_image empty, "
-           << "select_output_bboxes failed.";
-    return false;
-  }
-
   if (class_id < 0 || class_id >= 2) {
     AERROR << "DenseBoxDetection invalid class_id, "
            << "select_output_bboxes failed.";
@@ -119,7 +115,7 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
         inflate_row);
     tmp->region.detect_score = result_bbox[candidate_id].score;
 
-    if (!BoxIsValid(tmp->region.rectified_roi, crop_image.size())) {
+    if (!BoxIsValid(tmp->region.rectified_roi, img_size)) {
       AINFO << "Invalid width or height or x or y: "
             << tmp->region.rectified_roi.width << " | "
             << tmp->region.rectified_roi.height << " | "
@@ -129,7 +125,7 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
     }
 
     tmp->region.rectified_roi =
-        RefinedBox(tmp->region.rectified_roi, crop_image.size());
+        RefinedBox(tmp->region.rectified_roi, img_size);
     tmp->region.is_detected = true;
     tmp->region.detect_class_id = DetectionClassId(class_id);
     lights->push_back(tmp);

@@ -46,7 +46,7 @@ class TLPreprocessorTest : public ::testing::Test {
 
   void prepare_test_data_long_focus(CarPose *pose,
                                     apollo::hdmap::Signal *signals) {
-    pose->_pose << 0.928898, -0.370222, -0.00911767, 433843, 0.37033, 0.928479,
+    pose->pose_ << 0.928898, -0.370222, -0.00911767, 433843, 0.37033, 0.928479,
         0.0279876, 4.43584e+06, -0.00189607, -0.0293742, 0.999567, 34.2054, 0,
         0, 0, 1;
 
@@ -91,7 +91,7 @@ class TLPreprocessorTest : public ::testing::Test {
 
   void prepare_test_data_short_focus(CarPose *pose,
                                      apollo::hdmap::Signal *signals) {
-    pose->_pose << -0.869575, 0.493604, -0.0139364, 429986, -0.493661,
+    pose->pose_ << -0.869575, 0.493604, -0.0139364, 429986, -0.493661,
         -0.869654, 0.000698665, 4.43728e+06, -0.011775, 0.00748738, 0.999903,
         34.8932, 0, 0, 0, 1;
 
@@ -209,7 +209,7 @@ TEST_F(TLPreprocessorTest, test_add_cached_lights_projections) {
   }
 
   // valid pose
-  pose._pose << 0.928898, -0.370222, -0.00911767, 433843, 0.37033, 0.928479,
+  pose.pose_ << 0.928898, -0.370222, -0.00911767, 433843, 0.37033, 0.928479,
       0.0279876, 4.43584e+06, -0.00189607, -0.0293742, 0.999567, 34.2054, 0, 0,
       0, 1;
   _preprocessor->set_camera_is_working_flag(CameraId::LONG_FOCUS, true);
@@ -645,7 +645,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     ASSERT_TRUE(projection.Init());
     _preprocessor->set_camera_is_working_flag(LONG_FOCUS, true);
     prepare_test_data_long_focus(&pose, &(signals[0]));
-    pose._pose(0, 3) = pose._pose(0, 3) + 100000;
+    pose.pose_(0, 3) = pose.pose_(0, 3) + 100000;
     int cam_id = 0;
     ASSERT_TRUE(_preprocessor->ProjectLights(pose,
                                              signals,
@@ -668,7 +668,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
     ASSERT_TRUE(projection.Init());
     _preprocessor->set_camera_is_working_flag(SHORT_FOCUS, true);
     prepare_test_data_short_focus(&pose, &(signals[0]));
-    pose._pose(0, 3) = pose._pose(0, 3) + 100000;
+    pose.pose_(0, 3) = pose.pose_(0, 3) + 100000;
     int cam_id = 0;
     ASSERT_TRUE(_preprocessor->ProjectLights(pose,
                                              signals,

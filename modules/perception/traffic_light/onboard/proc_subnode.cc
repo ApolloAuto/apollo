@@ -272,7 +272,7 @@ double TLProcSubnode::GetMeanDistance(const double ts,
 
   double distance = 0.0;
   for (const LightPtr &light : lights) {
-    auto light_distance = stopline_distance(car_pose, light->info.stop_line());
+    auto light_distance = Distance2Stopline(car_pose, light->info.stop_line());
     if (light_distance < 0) {
       AWARN << "get_mean_distance failed. lights stop line data is illegal, "
             << "ts:" << GLOG_TIMESTAMP(ts);
@@ -463,7 +463,7 @@ bool TLProcSubnode::PublishMessage(
   light_debug->set_project_error(image_lights->offset);
 
   if (lights->size() > 0) {
-    double distance = stopline_distance(image_lights->pose.pose(),
+    double distance = Distance2Stopline(image_lights->pose.pose(),
                                         lights->at(0)->info.stop_line());
     light_debug->set_distance_to_stop_line(distance);
   }
