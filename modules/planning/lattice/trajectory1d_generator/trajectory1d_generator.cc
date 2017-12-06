@@ -175,7 +175,9 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   if (planning_target.decision_type() == PlanningTarget::STOP) {
     GenerateSpeedProfilesForStopping(planning_target.stop_point(),
       ptr_lon_trajectory_bundle);
-    return;
+  } else {
+    GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
+      ptr_lon_trajectory_bundle);
   }
 
   std::vector<SampleBound> sample_bounds;
@@ -191,9 +193,6 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
         init_lon_state_, end_condition.first, end_condition.second));
     ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
   }
-
-  GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
-      ptr_lon_trajectory_bundle);
 }
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
