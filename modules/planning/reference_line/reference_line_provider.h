@@ -74,6 +74,8 @@ class ReferenceLineProvider {
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);
 
+  double LastTimeDelay();
+
  private:
   /**
    * @brief Use PncMap to create reference line and the corresponding segments
@@ -155,6 +157,7 @@ class ReferenceLineProvider {
   std::mutex reference_lines_mutex_;
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
+  double last_calculation_time_ = 0.0;
 };
 
 }  // namespace planning

@@ -284,6 +284,11 @@ void Planning::RunOnce() {
   trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
 
+  auto* ref_line_task = trajectory_pb.mutable_latency_stats()->add_task_stats();
+  ref_line_task->set_time_ms(
+      ReferenceLineProvider::instance()->LastTimeDelay() * 1000.0);
+  ref_line_task->set_name("ReferenceLineProvider");
+
   if (!status.ok()) {
     status.Save(trajectory_pb.mutable_header()->mutable_status());
     AERROR << "Planning failed:" << status.ToString();
