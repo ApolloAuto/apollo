@@ -23,13 +23,15 @@
 
 #include "google/protobuf/text_format.h"
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/proto/config_schema.pb.h"
 
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetAbsolutePath;
+using apollo::common::util::GetContent;
 using google::protobuf::TextFormat;
 
 ConfigManager::ConfigManager() {
@@ -51,13 +53,13 @@ bool ConfigManager::InitInternal() {
   }
   model_config_map_.clear();
 
-  std::string path =
-      FileUtil::GetAbsolutePath(work_root_, FLAGS_config_manager_path);
+  const std::string path = GetAbsolutePath(work_root_,
+                                           FLAGS_config_manager_path);
 
   AINFO << "WORK_ROOT: " << work_root_ << " config_manager_path: " << path;
 
   std::string content;
-  if (!FileUtil::GetFileContent(path, &content)) {
+  if (!GetContent(path, &content)) {
     AERROR << "failed to get ConfigManager config path: " << path;
     return false;
   }
@@ -72,11 +74,10 @@ bool ConfigManager::InitInternal() {
 
   for (const std::string& model_config_file :
        file_list_proto.model_config_path()) {
-    std::string abs_path =
-        FileUtil::GetAbsolutePath(work_root_, model_config_file);
+    const std::string abs_path = GetAbsolutePath(work_root_, model_config_file);
 
     std::string config_content;
-    if (!FileUtil::GetFileContent(abs_path, &config_content)) {
+    if (!GetContent(abs_path, &config_content)) {
       AERROR << "failed to get_file_content: " << abs_path;
       return false;
     }

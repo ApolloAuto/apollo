@@ -17,14 +17,14 @@
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-
-using std::string;
-using std::vector;
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::GetAbsolutePath;
+using std::string;
+using std::vector;
 
 bool CNNSegmentation::Init() {
   string config_file;
@@ -218,19 +218,19 @@ bool CNNSegmentation::GetConfigs(string* config_file, string* proto_file,
     AERROR << "Failed to get value of config_file.";
     return false;
   }
-  config_file->assign(FileUtil::GetAbsolutePath(work_root, *config_file));
+  config_file->assign(GetAbsolutePath(work_root, *config_file));
 
   if (!model_config->GetValue("proto_file", proto_file)) {
     AERROR << "Failed to get value of proto_file.";
     return false;
   }
-  proto_file->assign(FileUtil::GetAbsolutePath(work_root, *proto_file));
+  proto_file->assign(GetAbsolutePath(work_root, *proto_file));
 
   if (!model_config->GetValue("weight_file", weight_file)) {
     AERROR << "Failed to get value of weight_file.";
     return false;
   }
-  weight_file->assign(FileUtil::GetAbsolutePath(work_root, *weight_file));
+  weight_file->assign(GetAbsolutePath(work_root, *weight_file));
 
   return true;
 }

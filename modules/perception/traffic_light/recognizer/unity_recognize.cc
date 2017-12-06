@@ -16,12 +16,14 @@
 
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 
-#include "modules/perception/lib/base/file_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/traffic_light/recognizer/classify.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
+using apollo::common::util::GetAbsolutePath;
 
 bool UnityRecognize::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
@@ -64,14 +66,12 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
     AERROR << "classify_model not found." << name();
     return false;
   }
-  classify_model =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), classify_model);
+  classify_model = GetAbsolutePath(config_manager->work_root(), classify_model);
   if (!model_config->GetValue("classify_net", &classify_net)) {
     AERROR << "classify_net not found." << name();
     return false;
   }
-  classify_net =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), classify_net);
+  classify_net = GetAbsolutePath(config_manager->work_root(), classify_net);
 
   float classify_threshold = 0.0;
   int classify_resize_width = 0;
