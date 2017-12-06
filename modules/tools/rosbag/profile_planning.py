@@ -24,6 +24,7 @@ import rospy
 import std_msgs
 import argparse
 import shutil
+import StringIO
 import os
 import sys
 
@@ -60,19 +61,27 @@ def print_stat(msg, fhandle):
         'obstacles', 'total_time', 'init_time', u'TrafficDecider',
         u'DpPolyPathOptimizer', u'PathDecider', u'DpStSpeedOptimizer',
         u'SpeedDecider', u'QpSplinePathOptimizer', u'QpSplineStSpeedOptimizer',
-        u'other'
+        u'ReferenceLineProvider', u'other'
     ]
 
+    output = StringIO.StringIO()
+    valid = True
     if g_first_time:
         g_first_time = False
-        fhandle.write("\t".join(keywords) + "\n")
+        output.write("\t".join(keywords) + "\n")
     for key in keywords:
+        if key not in msg:
+            valid = False
+            break
         if key == "obstacles":
-            fhandle.write("%d\t" % msg[key])
+            output.write("%d\t" % msg[key])
         else:
-            fhandle.write("%.3f\t" % msg[key])
-    fhandle.write("\n")
-    fhandle.flush()
+            output.write("%.3f\t" % msg[key])
+    if valid:
+        output.write("\n")
+        fhandle.write(output.getvalue())
+        fhandle.flush()
+    output.close()
 
 
 def on_receive_planning(planning_msg):
