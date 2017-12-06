@@ -299,14 +299,7 @@ bool ReferenceLineProvider::CreateRouteSegments(
       return false;
     }
   }
-  bool is_allow_change_lane = IsAllowChangeLane(point, *segments);
-  for (auto iter = segments->begin(); iter != segments->end();) {
-    if (!is_allow_change_lane && !iter->IsOnSegment()) {
-      iter = segments->erase(iter);
-    } else {
-      ++iter;
-    }
-  }
+
   if (FLAGS_prioritize_change_lane) {
     PrioritzeChangeLane(segments);
   }

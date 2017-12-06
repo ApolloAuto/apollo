@@ -86,6 +86,9 @@ DEFINE_bool(prioritize_change_lane, false,
 DEFINE_bool(reckless_change_lane, false,
             "Alway allow the vehicle change lane. The vehicle may contineous "
             "change lane. This is mainly test purpose");
+DEFINE_double(freeze_change_lane_time, 1.0,
+              "seconds. Not allowed to change lane this amount of time "
+              "if it just finished change lane or failed to change lane");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
