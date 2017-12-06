@@ -328,7 +328,7 @@ bool TLPreprocessorSubnode::VerifyLightsProjection(
 void TLPreprocessorSubnode::CameraSelection(double ts) {
   const double current_ts = TimeUtil::GetCurrentTime();
   AINFO << "current_ts: " << GLOG_TIMESTAMP(current_ts)
-        << " , last_query_tf_ts_: " << GLOG_TIMESTAMP(last_query_tf_ts_)
+        << " , last_query_tf_ts: " << GLOG_TIMESTAMP(last_query_tf_ts_)
         << " , diff: " << GLOG_TIMESTAMP(current_ts - last_query_tf_ts_);
   if (last_query_tf_ts_ > 0.0 &&
       current_ts - last_query_tf_ts_ < query_tf_inverval_seconds_) {
@@ -354,3 +354,4 @@ void TLPreprocessorSubnode::CameraSelection(double ts) {
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
+
