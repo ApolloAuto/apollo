@@ -65,6 +65,22 @@ std::string TranslatePath(const std::string &src_path) {
   return result;
 }
 
+std::string GetAbsolutePath(const std::string &prefix,
+                            const std::string &relative_path) {
+  if (relative_path.empty()) {
+    return prefix;
+  }
+  // If prefix is empty or relative_path is already absolute.
+  if (prefix.empty() || relative_path[0] == '/') {
+    return relative_path;
+  }
+
+  if (prefix.back() == '/') {
+    return StrCat(prefix, relative_path);
+  }
+  return StrCat(prefix, "/", relative_path);
+}
+
 bool PathExists(const std::string &path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;

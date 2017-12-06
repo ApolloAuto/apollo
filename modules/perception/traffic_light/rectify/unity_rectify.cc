@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 
-#include "modules/perception/lib/base/file_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/traffic_light/rectify/cropbox.h"
@@ -25,6 +25,8 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
+using apollo::common::util::GetAbsolutePath;
 
 bool UnityRectify::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
@@ -75,14 +77,13 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
     AERROR << "detection_model not found." << model_config->name();
     return false;
   }
-  detection_model =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), detection_model);
+  detection_model = GetAbsolutePath(config_manager->work_root(),
+                                    detection_model);
   if (!model_config->GetValue("detection_net", &detection_net)) {
     AERROR << "detection_net not found." << model_config->name();
     return false;
   }
-  detection_net =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), detection_net);
+  detection_net = GetAbsolutePath(config_manager->work_root(), detection_net);
 
   switch (crop_method) {
     default:

@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["config_manager.h"],
     deps = [
         "//modules/common:log",
+        "//modules/common/util",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager/proto:config_proto",
