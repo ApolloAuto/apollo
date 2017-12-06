@@ -15,12 +15,15 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
+
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+
 #include "Eigen/Dense"
+
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {

@@ -34,7 +34,12 @@ double PbfTrack::s_max_lidar_invisible_period_ = 0.25;
 double PbfTrack::s_max_radar_invisible_period_ = 0.15;
 double PbfTrack::s_max_radar_confident_angle_ = 20;
 double PbfTrack::s_min_radar_confident_distance_ = 40;
-std::string PbfTrack::s_motion_fusion_method_ = "PbfKalmanMotionFusion"; // NOLINT
+
+// TODO(Perception):
+// static and global variable are NOT allowed to be of class types. See
+// https://google.github.io/styleguide/cppguide.html#Static_and_Global_Variables
+std::string PbfTrack::s_motion_fusion_method_ =  // NOLINT
+    "PbfKalmanMotionFusion";                     // NOLINT
 
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
@@ -46,11 +51,15 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   invisible_in_lidar_ = true;
   invisible_in_radar_ = true;
 
+  // TODO(Perception): fix the duplicated if - else.
+  /*
   if (s_motion_fusion_method_ == "PbfKalmanMotionFusion") {
     motion_fusion_ = new PbfKalmanMotionFusion();
   } else {
     motion_fusion_ = new PbfKalmanMotionFusion();
   }
+  */
+  motion_fusion_ = new PbfKalmanMotionFusion();
 
   if (is_lidar(sensor_type)) {
     lidar_objects_[sensor_id] = obj;
@@ -120,13 +129,11 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
                                          double min_match_dist,
                                          double timestamp) {
   UpdateMeasurementsLifeWithoutMeasurement(
-    &lidar_objects_, sensor_id, timestamp,
-    s_max_lidar_invisible_period_,
-    &invisible_in_lidar_);
+      &lidar_objects_, sensor_id, timestamp, s_max_lidar_invisible_period_,
+      &invisible_in_lidar_);
   UpdateMeasurementsLifeWithoutMeasurement(
-    &radar_objects_, sensor_id, timestamp,
-    s_max_radar_invisible_period_,
-    &invisible_in_radar_);
+      &radar_objects_, sensor_id, timestamp, s_max_radar_invisible_period_,
+      &invisible_in_radar_);
   is_dead_ = (lidar_objects_.empty() && radar_objects_.empty());
   if (!is_dead_) {
     double time_diff = timestamp - fused_timestamp_;
@@ -136,17 +143,11 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   }
 }
 
-int PbfTrack::GetTrackId() const {
-  return idx_;
-}
+int PbfTrack::GetTrackId() const { return idx_; }
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() {
-  return fused_object_;
-}
+PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
 
-double PbfTrack::GetFusedTimestamp() const {
-  return fused_timestamp_;
-}
+double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
