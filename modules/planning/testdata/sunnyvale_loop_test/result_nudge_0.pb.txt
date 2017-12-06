@@ -1579,6 +1579,16 @@ decision {
     }
   }
   object_decision {
+    decision {
+      id: "1651"
+      perception_id: 1651
+      object_decision {
+        nudge {
+          type: RIGHT_NUDGE
+          distance_l: -0.3
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE
