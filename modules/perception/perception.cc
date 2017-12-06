@@ -18,15 +18,14 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
-#include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
-#include "modules/perception/traffic_light/onboard/proc_subnode.h"
+#include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
+#include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 
@@ -54,8 +53,8 @@ Status Perception::Init() {
   AINFO << "Init config manager successfully, work_root: "
         << config_manager->work_root();
 
-  const std::string dag_config_path =
-      FileUtil::GetAbsolutePath(FLAGS_work_root, FLAGS_dag_config_path);
+  const std::string dag_config_path = apollo::common::util::GetAbsolutePath(
+      FLAGS_work_root, FLAGS_dag_config_path);
 
   if (!dag_streaming_.Init(dag_config_path)) {
     AERROR << "failed to Init DAGStreaming. dag_config_path:"

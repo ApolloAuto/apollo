@@ -65,6 +65,22 @@ std::string TranslatePath(const std::string &src_path) {
   return result;
 }
 
+std::string GetAbsolutePath(const std::string &prefix,
+                            const std::string &relative_path) {
+  if (relative_path.empty()) {
+    return prefix;
+  }
+  // If prefix is empty or relative_path is already absolute.
+  if (prefix.empty() || relative_path[0] == '/') {
+    return relative_path;
+  }
+
+  if (prefix.back() == '/') {
+    return StrCat(prefix, relative_path);
+  }
+  return StrCat(prefix, "/", relative_path);
+}
+
 bool PathExists(const std::string &path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
@@ -92,6 +108,32 @@ bool CopyFile(const std::string &from, const std::string &to) {
   }
   AERROR_IF(src && !dst) << "Target path is not writable: " << to;
   return false;
+}
+
+bool CopyDir(const std::string &from, const std::string &to) {
+  DIR *directory = opendir(from.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << from;
+    return false;
+  }
+
+  struct dirent *entry;
+  bool ret = true;
+  while ((entry = readdir(directory)) != nullptr) {
+    // skip directory_path/. and directory_path/..
+    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+      continue;
+    }
+    const std::string sub_path_from = StrCat(from, "/", entry->d_name);
+    const std::string sub_path_to = StrCat(to, "/", entry->d_name);
+    if (entry->d_type == DT_DIR) {
+      ret = CopyDir(sub_path_from, sub_path_to) && ret;
+    } else {
+      ret = CopyFile(sub_path_from, sub_path_to) && ret;
+    }
+  }
+  closedir(directory);
+  return ret;
 }
 
 bool EnsureDirectory(const std::string &directory_path) {

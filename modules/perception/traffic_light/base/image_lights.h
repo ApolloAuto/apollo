@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H_
 
 #include <memory>
 #include <vector>
@@ -49,9 +49,11 @@ struct ImageLights {
   int offset = 0;
   size_t num_signals = 0;
 };
+
 typedef std::shared_ptr<ImageLights> ImageLightsPtr;
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_IMAGE_LIGHTS_H_

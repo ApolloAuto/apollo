@@ -164,53 +164,25 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
   // 2. timestamp drift
   // 3. [there is no tf]
   if (!sync_ok) {
-    AINFO << "working camera with maximum focal length: "
-          << kCameraIdToStr.at(kLongFocusIdx)
-          << ", _last_pub_camera_id: " << last_pub_camera_id_;
-    // based on timestamp to search signal number from current image
-    size_t current_signal_num = 0;
-
-    // if signal num = 0, use long image
-    // otherwise use previous long image
-    if (camera_id == kLongFocusIdx &&
-        // TODO(all): check the logic here and avoid the convoluted conditions
-        // within if
-        (current_signal_num == 0 ||
-         (camera_id == last_pub_camera_id_ &&
-          last_pub_camera_id_ != CameraId::UNKNOWN))) {
-      (*image_lights).reset(new ImageLights);
-      (*image_lights)->image = image;
-      // do not mark "No valid pose" for some period
-      // if it is caused by lower frequency of /tf
-      (*image_lights)->is_pose_valid = (fabs(timestamp - last_no_signals_ts_) <
-                                        no_signals_interval_seconds_);
-      (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
-      (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
-      (*image_lights)->timestamp = timestamp;
-      (*image_lights)->camera_id = camera_id;
-      (*image_lights)->num_signals = current_signal_num;
-
-      AINFO << "sync image with cached lights projection failed, "
-            << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-            << " camera_id: " << kCameraIdToStr.at(camera_id);
-
-    } else {  // for other camera_id，return without image
-      AINFO << "sync image with cached lights projection failed, "
-            << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-            << " camera_id: " << kCameraIdToStr.at(camera_id);
-      *should_pub = false;
-      return false;
-    }
+    AINFO << "sync image with cached lights projection failed, "
+          << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
+    *should_pub = false;
+    return false;
   }
   if (sync_ok) {
     AINFO << "TLPreprocessor sync ok ts: " << GLOG_TIMESTAMP(timestamp)
           << " camera_id: " << kCameraIdToStr.at(camera_id);
     last_output_ts_ = timestamp;
+    last_pub_camera_id_ = camera_id;
+  } else {
+    AINFO << "sync image with cached lights projection failed, "
+          << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
   }
-  last_pub_camera_id_ = camera_id;
-  *should_pub = true;
+  *should_pub = sync_ok;
 
-  return true;
+  return sync_ok;
 }
 
 void TLPreprocessor::set_last_pub_camera_id(CameraId camera_id) {

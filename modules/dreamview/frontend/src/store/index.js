@@ -120,12 +120,14 @@ class DreamviewStore {
 
     // This function is triggerred automatically whenever a observable changes
     updateDimension() {
-        const smallScreen = window.innerHeight < 800.0;
-        const offsetY = smallScreen ? 55 : 60; // height of header
-        const mainViewHeightRatio = 0.60;
         let offsetX = 0;
+        let offsetY = 0;
+        let mainViewHeightRatio = 0.65;
         if (!OFFLINE_PLAYBACK) {
+            const smallScreen = window.innerHeight < 800.0;
             offsetX = smallScreen ? 80 : 90; // width of side-bar
+            offsetY = smallScreen ? 55 : 60; // height of header
+            mainViewHeightRatio = 0.60;
         }
 
         this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;

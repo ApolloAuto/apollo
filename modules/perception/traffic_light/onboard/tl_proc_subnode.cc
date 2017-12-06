@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/traffic_light/onboard/proc_subnode.h"
-#include <std_msgs/String.h>
-#include <ctime>
+#include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
+
 #include <algorithm>
+
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -29,7 +27,6 @@
 #include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -42,9 +39,7 @@ DEFINE_string(traffic_light_recognizer, "",
 DEFINE_string(traffic_light_reviser, "",
               "the reviser enabled for traffic_light");
 
-TLProcSubnode::~TLProcSubnode() {
-  preprocessing_data_ = nullptr;
-}
+TLProcSubnode::~TLProcSubnode() { preprocessing_data_ = nullptr; }
 
 bool TLProcSubnode::InitInternal() {
   RegisterFactoryUnityRectify();
@@ -277,7 +272,7 @@ double TLProcSubnode::GetMeanDistance(const double ts,
 
   double distance = 0.0;
   for (const LightPtr &light : lights) {
-    auto light_distance = stopline_distance(car_pose, light->info.stop_line());
+    auto light_distance = Distance2Stopline(car_pose, light->info.stop_line());
     if (light_distance < 0) {
       AWARN << "get_mean_distance failed. lights stop line data is illegal, "
             << "ts:" << GLOG_TIMESTAMP(ts);
@@ -389,8 +384,8 @@ bool TLProcSubnode::PublishMessage(
   timer.Start();
   const auto &lights = image_lights->lights;
   cv::Mat img = image_lights->image->mat();
-  apollo::perception::TrafficLightDetection result;
-  apollo::common::Header *header = result.mutable_header();
+  TrafficLightDetection result;
+  common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   header->set_sequence_num(seq_num_++);
   uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
@@ -399,7 +394,7 @@ bool TLProcSubnode::PublishMessage(
   header->set_camera_timestamp(timestamp);
   // add traffic light result
   for (size_t i = 0; i < lights->size(); i++) {
-    apollo::perception::TrafficLight *light_result = result.add_traffic_light();
+    TrafficLight *light_result = result.add_traffic_light();
     light_result->set_id(lights->at(i)->info.id().id());
     light_result->set_confidence(lights->at(i)->status.confidence);
     light_result->set_color(lights->at(i)->status.color);
@@ -409,8 +404,7 @@ bool TLProcSubnode::PublishMessage(
   result.set_contain_lights(image_lights->num_signals > 0);
 
   // add traffic light debug info
-  apollo::perception::TrafficLightDebug *light_debug =
-      result.mutable_traffic_light_debug();
+  TrafficLightDebug *light_debug = result.mutable_traffic_light_debug();
 
   // set signal number
   AINFO << "TLOutputSubnode num_signals: " << image_lights->num_signals
@@ -467,17 +461,18 @@ bool TLProcSubnode::PublishMessage(
   light_debug->set_ts_diff_sys(image_lights->diff_image_sys_ts);
   light_debug->set_valid_pos(image_lights->is_pose_valid);
   light_debug->set_project_error(image_lights->offset);
+  light_debug->set_camera_id(image_lights->camera_id);
 
   if (lights->size() > 0) {
-    double distance = stopline_distance(image_lights->pose.pose(),
+    double distance = Distance2Stopline(image_lights->pose.pose(),
                                         lights->at(0)->info.stop_line());
     light_debug->set_distance_to_stop_line(distance);
   }
   if (FLAGS_output_debug_img) {
     char filename[200];
-    snprintf(filename, sizeof(filename), "img/%s_%lf.jpg",
-             image_lights->image->camera_id_str().c_str(),
-             image_lights->image->ts());
+    snprintf(filename, sizeof(filename), "img/%lf_%s.jpg",
+             image_lights->image->ts(),
+             image_lights->image->camera_id_str().c_str());
     for (size_t i = 0; i < lights->size(); i++) {
       cv::Rect rect = lights->at(i)->region.rectified_roi;
       cv::Scalar color;
@@ -504,7 +499,68 @@ bool TLProcSubnode::PublishMessage(
       auto &crop_roi = lights->at(0)->region.debug_roi[0];
       cv::rectangle(img, crop_roi, cv::Scalar(0, 255, 255), 2);
     }
+    // draw camera timestamp
+    int pos_y = 40;
+    std::string ts_text = cv::format("img ts=%lf", image_lights->timestamp);
+    cv::putText(img, ts_text, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN, 3.0,
+                CV_RGB(128, 255, 0), 2);
+    // draw distance to stopline
+    pos_y += 50;
+    double distance = light_debug->distance_to_stop_line();
+    if (lights->size() > 0) {
+      std::string dis2sl_text = cv::format("dis2sl=%lf", distance);
+      cv::putText(img, dis2sl_text, cv::Point(30, pos_y),
+                  cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(128, 255, 0), 2);
+    }
+
+    // draw "Signals Num"
+    pos_y += 50;
+    if (light_debug->valid_pos()) {
+      std::string signal_txt = "Signals Num: " + std::to_string(lights->size());
+      cv::putText(img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
+                  3.0, CV_RGB(255, 0, 0), 2);
+    }
+
+    // draw "No Pose info."
+    pos_y += 50;
+    if (!light_debug->valid_pos()) {
+      cv::putText(img, "No Valid Pose.", cv::Point(30, pos_y),
+                  cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+    }
+    // if image's timestamp is too early or too old
+    // draw timestamp difference between image and pose
+    pos_y += 50;
+    std::string diff_img_pose_ts_str =
+        "ts diff: " + std::to_string(light_debug->ts_diff_pos());
+    cv::putText(img, diff_img_pose_ts_str, cv::Point(30, pos_y),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+
+    pos_y += 50;
+    std::string diff_img_sys_ts_str =
+        "ts diff sys: " + std::to_string(light_debug->ts_diff_sys());
+    cv::putText(img, diff_img_sys_ts_str, cv::Point(30, pos_y),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+
+    pos_y += 50;
+    {
+      std::string signal_txt =
+          "camera id: " + image_lights->image->camera_id_str();
+      cv::putText(img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
+                  3.0, CV_RGB(255, 0, 0), 2);
+    }
+    // draw image border size (offset between hdmap-box and detection-box)
+//    if (light_debug->project_error() > 100) {
+    std::string img_border_txt =
+        "Offset size: " + std::to_string(light_debug->project_error());
+    constexpr int kPosYOffset = 1000;
+    cv::putText(img, img_border_txt, cv::Point(30, kPosYOffset),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+//    }
+
+    cv::resize(img, img, cv::Size(960, 540));
     cv::imwrite(filename, img);
+    cv::imshow("debug", img);
+    cv::waitKey(10);
   }
 
   common::adapter::AdapterManager::PublishTrafficLightDetection(result);

@@ -13,35 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
-
-#include <ros/ros.h>
-#include <tf/transform_listener.h>
-#include <tf2_ros/transform_listener.h>
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/subscriber.h>
-#include <sensor_msgs/Image.h>
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
 
 #include <deque>
 #include <map>
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "modules/perception/traffic_light/onboard/hdmap_input.h"
+#include "cv_bridge/cv_bridge.h"
+#include "image_transport/subscriber.h"
+#include "ros/ros.h"
+#include "sensor_msgs/Image.h"
+#include "tf/transform_listener.h"
+#include "tf2_ros/transform_listener.h"
+
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
+#include "modules/perception/traffic_light/onboard/hdmap_input.h"
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
 using apollo::hdmap::Signal;
+
 // @brief pre-processor subnode
 class TLPreprocessorSubnode : public Subnode {
  public:
@@ -50,12 +52,7 @@ class TLPreprocessorSubnode : public Subnode {
 
   // @brief: as a subnode with type SUBNODE_IN
   //         we will use ros callback, so ignore subnode callback
-  StatusCode ProcEvents() override {
-    return SUCC;
-  }
-
-  // for check lights projection on image border region dynamically
-  static std::map<int, int> _s_image_borders;
+  StatusCode ProcEvents() override { return SUCC; }
 
  protected:
   // @brief init pre-processor
@@ -93,13 +90,13 @@ class TLPreprocessorSubnode : public Subnode {
   HDMapInput *hd_map_ = nullptr;
 
   // signals
-  float _last_signals_ts = -1;
-  std::vector<Signal> _last_signals;
+  float last_signals_ts_ = -1.0;
+  std::vector<Signal> last_signals_;
   float valid_hdmap_interval_ = 1.5;
 
   // tf
-  double _last_query_tf_ts = 0;
-  float _query_tf_inverval_seconds = 0;
+  double last_query_tf_ts_ = 0.0;
+  float query_tf_inverval_seconds_ = 0.0;
 
   // process
   double last_proc_image_ts_ = 0.0;
@@ -109,8 +106,10 @@ class TLPreprocessorSubnode : public Subnode {
 };
 
 REGISTER_SUBNODE(TLPreprocessorSubnode);
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
+

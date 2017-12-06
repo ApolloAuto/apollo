@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H_
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
 #include <cmath>
+
+#include "Eigen/Core"
+#include "Eigen/Dense"
+
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace apollo {
@@ -51,8 +53,9 @@ class BoundaryProjection : public BaseProjection {
 };
 
 REGISTER_PROJECTION(BoundaryProjection);
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H_
