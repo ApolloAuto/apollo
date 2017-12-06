@@ -41,6 +41,11 @@ cc_library(
 )
 
 cc_library(
+    name = "color",
+    hdrs = ["color.h"],
+)
+
+cc_library(
     name = "string_util",
     hdrs = [
         "string_util.h",
