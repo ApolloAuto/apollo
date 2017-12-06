@@ -35,6 +35,7 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 #include "modules/planning/tasks/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
@@ -64,6 +65,13 @@ bool DPRoadGraph::FindPathTunnel(
            << init_point.DebugString();
     return false;
   }
+
+  if (!CalculateFrenetPoint(init_point_, &init_frenet_frame_point_)) {
+    AERROR << "Fail to create init_frenet_frame_point_ from : "
+           << init_point_.DebugString();
+    return false;
+  }
+
   std::vector<DPRoadGraphNode> min_cost_path;
   if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
@@ -135,7 +143,13 @@ bool DPRoadGraph::GenerateMinCostPath(
       auto &cur_node = graph_nodes[level].back();
       for (const auto &prev_dp_node : prev_dp_nodes) {
         const auto &prev_sl_point = prev_dp_node.sl_point;
-        QuinticPolynomialCurve1d curve(prev_sl_point.l(), 0.0, 0.0,
+        double init_dl = 0.0;
+        double init_ddl = 0.0;
+        if (level == 1) {
+          init_dl = init_frenet_frame_point_.dl();
+          init_ddl = init_frenet_frame_point_.ddl();
+        }
+        QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
         const double cost =
@@ -211,6 +225,39 @@ bool DPRoadGraph::SamplePathWaypoints(
       points->emplace_back(level_points);
     }
   }
+  return true;
+}
+
+bool DPRoadGraph::CalculateFrenetPoint(
+    const common::TrajectoryPoint &traj_point,
+    common::FrenetFramePoint *const frenet_frame_point) {
+  common::SLPoint sl_point;
+  if (!reference_line_.XYToSL(
+          {traj_point.path_point().x(), traj_point.path_point().y()},
+          &sl_point)) {
+    return false;
+  }
+  frenet_frame_point->set_s(sl_point.s());
+  frenet_frame_point->set_l(sl_point.l());
+
+  const double theta = traj_point.path_point().theta();
+  const double kappa = traj_point.path_point().kappa();
+  const double l = frenet_frame_point->l();
+
+  ReferencePoint ref_point;
+  ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
+
+  const double theta_ref = ref_point.heading();
+  const double kappa_ref = ref_point.kappa();
+  const double dkappa_ref = ref_point.dkappa();
+
+  const double dl = CartesianFrenetConverter::CalculateLateralDerivative(
+      theta_ref, theta, l, kappa_ref);
+  const double ddl =
+      CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
+          theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
+  frenet_frame_point->set_dl(dl);
+  frenet_frame_point->set_ddl(ddl);
   return true;
 }
 
