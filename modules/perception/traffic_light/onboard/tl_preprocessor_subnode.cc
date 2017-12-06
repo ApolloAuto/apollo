@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/traffic_light/onboard/preprocessor_subnode.h"
+#include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 
 #include "image_transport/image_transport.h"
 
