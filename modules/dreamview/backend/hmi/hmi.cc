@@ -27,8 +27,10 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
+#include "modules/data/proto/task.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
+#include "modules/dreamview/backend/util/http_client.h"
 #include "modules/dreamview/backend/util/json_util.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -40,6 +42,11 @@ DEFINE_string(map_data_path, "modules/map/data", "Path to map data.");
 DEFINE_string(vehicle_data_path, "modules/calibration/data",
               "Path to vehicle data.");
 
+DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
+              "OTA service url. [Attention! It's still in experiment.]");
+DEFINE_string(ota_vehicle_info_file, "modules/tools/ota/vehicle_info.pb.txt",
+              "Vehicle info to request OTA.");
+
 namespace apollo {
 namespace dreamview {
 namespace {
@@ -47,8 +54,10 @@ namespace {
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::FindOrNull;
+using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
+using apollo::data::VehicleInfo;
 using apollo::dreamview::util::JsonUtil;
 using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
@@ -362,6 +371,8 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
 
   RunModeCommand("stop");
   status_.set_current_vehicle(vehicle_name);
+  // Check available updates for current vehicle.
+  CheckOTAUpdates();
   BroadcastHMIStatus();
 }
 
@@ -377,6 +388,29 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
   RunModeCommand("stop");
   status_.set_current_mode(mode_name);
   BroadcastHMIStatus();
+}
+
+void HMI::CheckOTAUpdates() {
+  VehicleInfo vehicle_info;
+  if (!GetProtoFromASCIIFile(FLAGS_ota_vehicle_info_file, &vehicle_info)) {
+    return;
+  }
+
+  Json ota_request;
+  ota_request["car_type"] = apollo::common::util::StrCat(
+      VehicleInfo::Brand_Name(vehicle_info.brand()),
+      ".", VehicleInfo::Model_Name(vehicle_info.model()));
+  ota_request["vin"] = vehicle_info.license().vin();
+  ota_request["tag"] = std::getenv("DOCKER_IMG");
+
+  Json ota_response;
+  const auto status = util::HttpClient::Post(FLAGS_ota_service_url,
+                                             ota_request, &ota_response);
+  if (status.ok()) {
+    CHECK(JsonUtil::GetStringFromJson(ota_response, "tag",
+                                      status_.mutable_ota_update()));
+    AINFO << "Found available OTA update: " << status_.ota_update();
+  }
 }
 
 }  // namespace dreamview
