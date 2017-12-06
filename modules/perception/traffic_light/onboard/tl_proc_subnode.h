@@ -35,10 +35,6 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-DECLARE_string(traffic_light_rectifier);
-DECLARE_string(traffic_light_recognizer);
-DECLARE_string(traffic_light_reviser);
-
 class ImageLights;
 class TLPreprocessingData;
 class TLProcData;
@@ -47,7 +43,7 @@ class TLProcSubnode : public Subnode {
  public:
   TLProcSubnode() = default;
   ~TLProcSubnode();
-  StatusCode ProcEvents() override;
+  apollo::common::Status ProcEvents() override;
 
  protected:
   bool InitInternal() override;
