@@ -18,13 +18,14 @@
  * @file collision_checker.cpp
  **/
 
+#include "modules/planning/lattice/util/collision_checker.h"
+
 #include <utility>
 
-#include "modules/planning/lattice/util/collision_checker.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/common/log.h"
+#include "modules/planning/lattice/util/lattice_params.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {

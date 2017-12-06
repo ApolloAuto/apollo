@@ -111,5 +111,36 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(
   return true;
 }
 
+bool LatticeConstraintChecker::IsValidTrajectory(
+    const DiscretizedTrajectory& trajectory) {
+  if (trajectory.NumOfPoints() < 2) {
+    return false;
+  }
+
+  const auto& points = trajectory.trajectory_points();
+  for (std::size_t i = 0; i < points.size(); ++i) {
+    double a = points[i].a();
+    if (a < FLAGS_longitudinal_acceleration_lower_bound ||
+        a > FLAGS_longitudinal_acceleration_upper_bound) {
+      return false;
+    }
+
+    if (i > 1) {
+      double dt = points[i].relative_time() - points[i - 1].relative_time();
+      if (dt <= 0.0) {
+        return false;
+      }
+      double last_a = points[i - 1].a();
+      double j = (a - last_a) / dt;
+      if (j < FLAGS_longitudinal_jerk_lower_bound ||
+          j > FLAGS_longitudinal_jerk_upper_bound) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 }  // namespace planning
 }  // namespace apollo
+
