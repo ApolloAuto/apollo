@@ -527,19 +527,19 @@ bool TLProcSubnode::PublishMessage(
       cv::putText(img, "No Valid Pose.", cv::Point(30, pos_y),
                   cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
     }
-      // if image's timestamp is too early or too old
-      // draw timestamp difference between image and pose
-      pos_y += 50;
-      std::string diff_img_pose_ts_str =
-          "ts diff: " + std::to_string(light_debug->ts_diff_pos());
-      cv::putText(img, diff_img_pose_ts_str, cv::Point(30, pos_y),
-                  cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+    // if image's timestamp is too early or too old
+    // draw timestamp difference between image and pose
+    pos_y += 50;
+    std::string diff_img_pose_ts_str =
+        "ts diff: " + std::to_string(light_debug->ts_diff_pos());
+    cv::putText(img, diff_img_pose_ts_str, cv::Point(30, pos_y),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
 
-      pos_y += 50;
-      std::string diff_img_sys_ts_str =
-          "ts diff sys: " + std::to_string(light_debug->ts_diff_sys());
-      cv::putText(img, diff_img_sys_ts_str, cv::Point(30, pos_y),
-                  cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+    pos_y += 50;
+    std::string diff_img_sys_ts_str =
+        "ts diff sys: " + std::to_string(light_debug->ts_diff_sys());
+    cv::putText(img, diff_img_sys_ts_str, cv::Point(30, pos_y),
+                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
 
     pos_y += 50;
     {
