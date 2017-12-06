@@ -115,8 +115,8 @@ bool ReferenceLineProvider::IsAllowChangeLane(
         common::util::DistanceXY(history_iter->second.last_point, point);
     history_iter->second.last_point = point;
     history_iter->second.accumulate_s += dist;
-    constexpr double kChangeLaneMinL = 0.25;
-    constexpr double kChangeLaneMinLengthFactor = 0.6;
+    constexpr double kChangeLaneMinL = 0.30;
+    constexpr double kChangeLaneMinLengthFactor = 0.3;
 
     if (history_iter->second.min_l < kChangeLaneMinL &&
         std::fmax(waypoint.s, history_iter->second.accumulate_s) >=
