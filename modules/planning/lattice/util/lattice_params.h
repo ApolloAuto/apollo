@@ -38,6 +38,7 @@ static const double lateral_enter_lane_thred = 2.0;
 static const double max_acceleration = 4.0;
 static const double min_acceleration = -4.0;
 static const double max_deceleration = -min_acceleration;
+static const double adc_collision_buffer = 0.2;
 
 }  // namespace planning
 }  // namespace apollo
