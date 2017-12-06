@@ -27,6 +27,7 @@ enum ErrorCode {
   PERCEPTION_ERROR = 4000;
   PERCEPTION_ERROR_TF = 4001;
   PERCEPTION_ERROR_PROCESS = 4002;
+  PERCEPTION_FATAL = 4003;
 
   // Prediction module error codes start from here.
   PREDICTION_ERROR = 5000;
