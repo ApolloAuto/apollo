@@ -144,7 +144,7 @@ bool BehaviorDecider::StopDecisionNearDestination(
   }
 
   double res_s = routing_end_matched_point.s() - lon_init_state[0];
-  if (res_s <= 0.0) {
+  if (res_s <= stop_margin) {
     planning_target->set_decision_type(PlanningTarget::STOP);
     planning_target->set_stop_point(routing_end_matched_point.s());
     return true;
