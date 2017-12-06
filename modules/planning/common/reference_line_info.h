@@ -116,6 +116,11 @@ class ReferenceLineInfo {
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
+  void MakeDecision(DecisionResult* decision_result) const;
+  int MakeMainStopDecision(DecisionResult* decision_result) const;
+  void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
+  void MakeEStopDecision(DecisionResult* decision_result) const;
+  void SetObjectDecisions(ObjectDecisions* object_decisions) const;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
   const ReferenceLine reference_line_;
