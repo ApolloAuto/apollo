@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
