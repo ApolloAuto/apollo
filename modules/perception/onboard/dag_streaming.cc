@@ -26,7 +26,7 @@
 #include "google/protobuf/text_format.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/file_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/onboard/subnode.h"
 
 namespace apollo {
@@ -60,7 +60,7 @@ bool DAGStreaming::Init(const string& dag_config_path) {
 
   DAGConfig dag_config;
   string content;
-  if (!FileUtil::GetFileContent(dag_config_path, &content)) {
+  if (!apollo::common::util::GetContent(dag_config_path, &content)) {
     AERROR << "failed to laod DAGConfig file: " << dag_config_path;
     return false;
   }

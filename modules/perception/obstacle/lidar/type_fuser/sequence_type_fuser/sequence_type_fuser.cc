@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/file_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::GetAbsolutePath;
 
 bool SequenceTypeFuser::Init() {
   const ModelConfig* model_config = NULL;
@@ -42,7 +45,7 @@ bool SequenceTypeFuser::Init() {
   }
   const std::string& work_root = ConfigManager::instance()->work_root();
   transition_property_file_path =
-      FileUtil::GetAbsolutePath(work_root, transition_property_file_path);
+      GetAbsolutePath(work_root, transition_property_file_path);
 
   if (!sequence_type_fuser::LoadSingleMatrixFile(transition_property_file_path,
                                                  &_transition_matrix)) {
@@ -69,7 +72,7 @@ bool SequenceTypeFuser::Init() {
     return false;
   }
   classifiers_property_file_path =
-      FileUtil::GetAbsolutePath(work_root, classifiers_property_file_path);
+      GetAbsolutePath(work_root, classifiers_property_file_path);
 
   if (!sequence_type_fuser::LoadMultipleMatricesFile(
         classifiers_property_file_path, &_smooth_matrices)) {
