@@ -173,53 +173,64 @@ double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
 
 double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Curve1d>& lon_trajectory,
-    const PlanningTarget& objective) const {
-  const LatticeSamplingConfig& lattice_sampling_config =
-      objective.lattice_sampling_config();
-  const LonSampleConfig& lon_sample_config =
-      lattice_sampling_config.lon_sample_config();
-  const LatSampleConfig& lat_sample_config =
-      lattice_sampling_config.lat_sample_config();
+    const PlanningTarget& planning_target) const {
 
-  double s = lon_sample_config.lon_end_condition().s();
-  double ds = lon_sample_config.lon_end_condition().ds();
-  double dds = lon_sample_config.lon_end_condition().dds();
-
-  if (objective.decision_type() == PlanningTarget::CRUISE) {
+  if (planning_target.decision_type() == PlanningTarget::CRUISE) {
     // zero s target means cruise
-    if (s <= std::numeric_limits<double>::epsilon()) {
-      double target_speed = ds;
-      double end_speed =
-          lon_trajectory->Evaluate(1, lon_trajectory->ParamLength());
+//    if (s <= std::numeric_limits<double>::epsilon()) {
+//      double target_speed = ds;
+//      double end_speed =
+//          lon_trajectory->Evaluate(1, lon_trajectory->ParamLength());
+//
+//      double t_max = lon_trajectory->ParamLength();
+//      double t = 0.0;
+//      double cost = 0.0;
+//
+//      while (t < planned_trajectory_time) {
+//        double c = 0.0;
+//        if (t < t_max) {
+//          c = target_speed - lon_trajectory->Evaluate(1, t);
+//        } else {
+//          c = target_speed - end_speed;
+//        }
+//        cost += std::fabs(c);
+//        t += trajectory_time_resolution;
+//      }
+//      return cost;
+//    } else {
+//      // Follow
+//      // apply the following 3 second rule.
+//      double target_s = s - 3.0 * ds;
+//      double end_s =
+//          lon_trajectory->Evaluate(0, lon_trajectory->ParamLength());
+//
+//      double weight = 10.0;
+//      return (target_s - end_s) * weight;
+//    }
 
-      double t_max = lon_trajectory->ParamLength();
-      double t = 0.0;
-      double cost = 0.0;
+    double target_speed = planning_target.cruise_speed();
+    double end_speed = lon_trajectory->Evaluate(1,
+        lon_trajectory->ParamLength());
 
-      while (t < planned_trajectory_time) {
-        double c = 0.0;
-        if (t < t_max) {
-          c = target_speed - lon_trajectory->Evaluate(1, t);
-        } else {
-          c = target_speed - end_speed;
-        }
-        cost += std::fabs(c);
-        t += trajectory_time_resolution;
+    double t_max = lon_trajectory->ParamLength();
+    double t = 0.0;
+    double cost = 0.0;
+
+    while (t < planned_trajectory_time) {
+      double c = 0.0;
+      if (t < t_max) {
+        c = target_speed - lon_trajectory->Evaluate(1, t);
+      } else {
+        c = target_speed - end_speed;
       }
-      return cost;
-    } else {
-      // Follow
-      // apply the following 3 second rule.
-      double target_s = s - 3.0 * ds;
-      double end_s =
-          lon_trajectory->Evaluate(0, lon_trajectory->ParamLength());
-
-      double weight = 10.0;
-      return (target_s - end_s) * weight;
+      cost += std::fabs(c);
+      t += trajectory_time_resolution;
     }
+    return cost;
+
   } else {
-    CHECK(objective.decision_type() == PlanningTarget::STOP);
-    double target_s = s;
+    CHECK(planning_target.decision_type() == PlanningTarget::STOP);
+    double target_s = planning_target.stop_point();
     double t_max = lon_trajectory->ParamLength();
     double end_s = lon_trajectory->Evaluate(0, t_max);
 

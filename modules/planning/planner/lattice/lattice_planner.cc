@@ -88,11 +88,11 @@ Status LatticePlanner::Plan(
   AINFO << "    [---planning_target---]: " << planning_target.decision_type();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
-  Trajectory1dGenerator trajectory1d_generator;
+  Trajectory1dGenerator trajectory1d_generator(init_s, init_d);
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
   trajectory1d_generator.GenerateTrajectoryBundles(
-      planning_target, init_s, init_d, &lon_trajectory1d_bundle,
+      planning_target, &lon_trajectory1d_bundle,
       &lat_trajectory1d_bundle);
 
   // 6. first, evaluate the feasibility of the 1d trajectories according to

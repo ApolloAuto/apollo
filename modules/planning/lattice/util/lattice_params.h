@@ -31,7 +31,6 @@ static const double planned_trajectory_horizon = 200.0;
 static const double stop_margin = 2.0;
 static const double stop_speed_threshold = 0.1;
 static const double low_speed_threshold = 2.0;
-static const double enable_stop_handling = true;
 static const double trajectory_time_resolution = 0.05;
 static const double stop_acc_thred = 1.0;
 static const double dist_thred_omit_routing_end = 1.0;

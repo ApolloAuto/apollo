@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/lattice/behavior_decider/feasible_region.h"
+
 namespace apollo {
 namespace planning {
 
@@ -34,30 +36,35 @@ namespace planning {
 // Output: sampled ending 1 dimensional states with corresponding time duration.
 class EndConditionSampler {
  public:
-  EndConditionSampler();
+  EndConditionSampler(const std::array<double, 3>& init_s,
+      const std::array<double, 3>& init_d, const double s_dot_limit);
 
-  virtual ~EndConditionSampler() = default;
+  virtual ~EndConditionSampler();
 
-  std::vector<std::pair<std::array<double, 3>, double>> SampleLatEndConditions(
-      const std::array<double, 3>& init_d) const;
-
-  std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForCruising(const std::array<double, 3>& init_s,
-                                    const double ref_cruise_speed) const;
+  std::vector<std::pair<std::array<double, 3>, double>> SampleLatEndConditions() const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForFollowing(const std::array<double, 3>& init_s,
-                                     const double ref_target_position,
+  SampleLonEndConditionsForCruising(const double ref_cruise_speed) const;
+
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLonEndConditionsForFollowing(const double ref_target_position,
                                      const double ref_target_speed) const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForStopping(const std::array<double, 3>& init_s,
-                                    const double ref_stop_position) const;
+  SampleLonEndConditionsForStopping(const double ref_stop_position) const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsGenerally(
-    const std::vector<SampleBound>& sample_bounds,
-    const LatticeSamplingConfig& lattice_sampling_config) const;
+  SampleLonEndConditionsForPathTimeBounds(
+    const std::vector<SampleBound>& sample_bounds) const;
+
+ private:
+  std::array<double, 3> init_s_;
+
+  std::array<double, 3> init_d_;
+
+  double s_dot_limit_;
+
+  FeasibleRegion* ptr_feasible_region_;
 
 };
 
