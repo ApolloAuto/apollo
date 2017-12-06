@@ -16,42 +16,44 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_INTERFACE_BASE_FUSION_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_INTERFACE_BASE_FUSION_H_
-// SAMPLE CODE:
-//
-// class MyObjectFusion : public BaseFusion {
-// public:
-//     MyObjectFusion() : BaseFusion() {}
-//     virtual ~MyObjectFusion() {}
-//
-//     virtual bool Init() override {
-//         // Do something.
-//         return true;
-//     }
-//
-//     virtual bool Fuse(
-//              const std::vector<SensorObjects>& multi_sensor_objects,
-//              std::vector<ObjectPtr>* fused_objects) override {
-//
-//          // Do something.
-//          return true;
-//      }
-//
-//      virtual std::string name() const override {
-//          return "MyObjectFusion";
-//      } //
-// };
-//
-// // Register plugin.
-// REGISTER_FUSION(MyObjectFusion);
-////////////////////////////////////////////////////////
-// USING CODE:
-//
-// BaseFusion* fusion =
-//  BaseFusionRegisterer::get_instance_by_name("MyObjectFusion");
-// using fusion to do somethings.
-// ////////////////////////////////////////////////////
-#include <vector>
+/** @example
+ * <pre>
+ * class MyObjectFusion : public BaseFusion {
+ * public:
+ *     MyObjectFusion() : BaseFusion() {}
+ *     virtual ~MyObjectFusion() {}
+ *
+ *     virtual bool Init() override {
+ *         // Do something.
+ *         return true;
+ *     }
+ *
+ *     virtual bool Fuse(
+ *              const std::vector<SensorObjects>& multi_sensor_objects,
+ *              std::vector<ObjectPtr>* fused_objects) override {
+ *
+ *          // Do something.
+ *          return true;
+ *      }
+ *
+ *      virtual std::string name() const override {
+ *          return "MyObjectFusion";
+ *      } //
+ * };
+ *
+ * // Register plugin.
+ * REGISTER_FUSION(MyObjectFusion);
+ *
+ *
+ * // USING CODE:
+ *
+ * BaseFusion* fusion =
+ *  BaseFusionRegisterer::get_instance_by_name("MyObjectFusion");
+ * using fusion to do somethings.
+ * </pre>
+ **/
 #include <string>
+#include <vector>
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
@@ -66,9 +68,11 @@ class BaseFusion {
   BaseFusion() {}
   virtual ~BaseFusion() {}
   virtual bool Init() = 0;
-  // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
-  // @param [in]: multi sensor objects.
-  // @param [out]: fused objects.
+  /**
+   * @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
+   * @param [in]: multi sensor objects.
+   * @param [out]: fused objects.
+   **/
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
                     std::vector<ObjectPtr> *fused_objects) = 0;
   virtual std::string name() const = 0;
