@@ -69,7 +69,7 @@ cc_test(
 
 cc_test(
     name = "pbf_motion_fusion_test",
-    size = "large",
+    size = "small",
     srcs = [
         "pbf_motion_fusion_test.cc",
     ],
