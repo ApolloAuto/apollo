@@ -25,6 +25,7 @@
 #include <limits>
 #include <utility>
 
+#include "modules/common/time/time.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -39,6 +40,7 @@ namespace planning {
 
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
 using apollo::hdmap::RouteSegments;
 using apollo::hdmap::LaneWaypoint;
 
@@ -217,6 +219,7 @@ void ReferenceLineProvider::GenerateThread() {
     std::this_thread::yield();
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
+    double start_time = Clock::NowInSecond();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
       continue;
@@ -228,7 +231,15 @@ void ReferenceLineProvider::GenerateThread() {
       continue;
     }
     UpdateReferenceLine(reference_lines, segments);
+    double end_time = Clock::NowInSecond();
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    last_calculation_time_ = end_time - start_time;
   }
+}
+
+double ReferenceLineProvider::LastTimeDelay() {
+  std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+  return last_calculation_time_;
 }
 
 bool ReferenceLineProvider::GetReferenceLines(
@@ -248,11 +259,14 @@ bool ReferenceLineProvider::GetReferenceLines(
       return false;
     }
   } else {
+    double start_time = Clock::NowInSecond();
     if (!CreateReferenceLine(reference_lines, segments)) {
       AERROR << "Failed to create reference line";
       return false;
     }
     UpdateReferenceLine(*reference_lines, *segments);
+    double end_time = Clock::NowInSecond();
+    last_calculation_time_ = end_time - start_time;
     return true;
   }
 }
