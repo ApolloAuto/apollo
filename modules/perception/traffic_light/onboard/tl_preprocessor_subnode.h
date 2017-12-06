@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H_
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H_
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
 
 #include <deque>
 #include <map>
@@ -111,5 +111,5 @@ REGISTER_SUBNODE(TLPreprocessorSubnode);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_PREPROCESSOR_SUBNODE_H_
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
 
