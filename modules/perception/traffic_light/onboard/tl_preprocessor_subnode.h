@@ -42,8 +42,6 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-using apollo::hdmap::Signal;
-
 // @brief pre-processor subnode
 class TLPreprocessorSubnode : public Subnode {
  public:
@@ -52,7 +50,9 @@ class TLPreprocessorSubnode : public Subnode {
 
   // @brief: as a subnode with type SUBNODE_IN
   //         we will use ros callback, so ignore subnode callback
-  StatusCode ProcEvents() override { return SUCC; }
+  apollo::common::Status ProcEvents() override {
+    return apollo::common::Status::OK();
+  }
 
  protected:
   // @brief init pre-processor
@@ -80,7 +80,8 @@ class TLPreprocessorSubnode : public Subnode {
 
   void CameraSelection(double ts);
   bool VerifyLightsProjection(std::shared_ptr<ImageLights> image_lights);
-  bool GetSignals(double ts, CarPose *pose, std::vector<Signal> *signals);
+  bool GetSignals(double ts, CarPose *pose,
+                  std::vector<apollo::hdmap::Signal> *signals);
   bool GetCarPose(const double ts, CarPose *pose);
 
  private:
@@ -91,7 +92,7 @@ class TLPreprocessorSubnode : public Subnode {
 
   // signals
   float last_signals_ts_ = -1.0;
-  std::vector<Signal> last_signals_;
+  std::vector<apollo::hdmap::Signal> last_signals_;
   float valid_hdmap_interval_ = 1.5;
 
   // tf

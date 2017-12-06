@@ -20,7 +20,6 @@
 #include <sstream>
 #include <string>
 
-#include "modules/perception/common/define.h"
 #include "modules/perception/lib/base/concurrent_queue.h"
 #include "modules/perception/lib/base/time_util.h"
 
