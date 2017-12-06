@@ -146,7 +146,6 @@ Status LatticePlanner::Plan(
             *lat_trajectory1d_bundle[trajectory_pair.second],
             *lon_trajectory1d_bundle[trajectory_pair.first])) {
       ++constraint_failure_count;
-      AINFO << "------continued from ConstraintChecker";
       continue;
     }
 
@@ -154,11 +153,9 @@ Status LatticePlanner::Plan(
         *lon_trajectory1d_bundle[trajectory_pair.first],
         *lat_trajectory1d_bundle[trajectory_pair.second],
         planning_init_point.relative_time());
-    AINFO << "------(1)combined trajectory";
 
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
-      AINFO << "------continued from CollisionChecker";
       continue;
     }
 
@@ -177,7 +174,7 @@ Status LatticePlanner::Plan(
     combined_trajectory_path->set_lattice_trajectory_cost(trajectory_pair_cost);
     */
 
-    AINFO << "------(2)set lattice trajectory";
+    // AINFO << "------(2)set lattice trajectory";
     // AINFO << "trajectory not valid for constraint ["
     //          << constraint_failure_count << "] times";
     // AINFO << "trajectory not valid for collision ["
