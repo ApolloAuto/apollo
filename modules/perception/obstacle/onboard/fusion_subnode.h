@@ -43,7 +43,7 @@ class FusionSubnode : public Subnode {
  public:
   FusionSubnode() = default;
   virtual ~FusionSubnode() {}
-  StatusCode ProcEvents() override;
+  apollo::common::Status ProcEvents() override;
   bool GeneratePbMsg(PerceptionObstacles *obstacles);
 
  protected:
@@ -60,8 +60,8 @@ class FusionSubnode : public Subnode {
                     std::string *pb_msg) const;
   bool GetSharedData(const Event &event,
                      std::shared_ptr<SensorObjects> *sensor_objects) const;
-  StatusCode Process(const EventMeta &event_meta,
-                     const std::vector<Event> &events);
+  apollo::common::Status Process(const EventMeta &event_meta,
+                                 const std::vector<Event> &events);
   void RegistAllAlgorithm();
 
   double timestamp_;

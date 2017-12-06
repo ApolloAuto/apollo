@@ -30,6 +30,7 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::Status;
 using google::protobuf::TextFormat;
 
 class MySubnode : public Subnode {
@@ -37,9 +38,9 @@ class MySubnode : public Subnode {
   MySubnode() : Subnode() {}
   virtual ~MySubnode() {}
 
-  StatusCode ProcEvents() override {
+  Status ProcEvents() override {
     AINFO << "MySubnode proc event.";
-    return SUCC;
+    return Status::OK();
   }
 };
 

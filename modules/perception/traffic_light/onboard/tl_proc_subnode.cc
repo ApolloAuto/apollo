@@ -28,16 +28,19 @@
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
 
-namespace apollo {
-namespace perception {
-namespace traffic_light {
-
 DEFINE_string(traffic_light_rectifier, "",
               "the rectifier enabled for traffic_light");
 DEFINE_string(traffic_light_recognizer, "",
               "the recognizer enabled for traffic_light");
 DEFINE_string(traffic_light_reviser, "",
               "the reviser enabled for traffic_light");
+
+namespace apollo {
+namespace perception {
+namespace traffic_light {
+
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 TLProcSubnode::~TLProcSubnode() { preprocessing_data_ = nullptr; }
 
@@ -576,19 +579,20 @@ bool TLProcSubnode::PublishMessage(
   timer.End("TLProcSubnode::Publish message");
   return true;
 }
-StatusCode TLProcSubnode::ProcEvents() {
+Status TLProcSubnode::ProcEvents() {
   Event event;
   const EventMeta &event_meta = sub_meta_events_[0];
   if (!event_manager_->Subscribe(event_meta.event_id, &event)) {
     AERROR << "Failed to subscribe event: " << event_meta.event_id;
-    return FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to subscribe event.");
   }
   if (!ProcEvent(event)) {
     AERROR << "TLProcSubnode failed to handle event. "
            << "event:" << event.to_string();
-    return FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR,
+                  "TLProcSubnode failed to handle event.");
   }
-  return SUCC;
+  return Status::OK();
 }
 }  // namespace traffic_light
 }  // namespace perception
