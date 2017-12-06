@@ -37,12 +37,13 @@ QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
 QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
     const double x0, const double dx0, const double ddx0, const double dx1,
     const double ddx1, const double param) {
-  compute_coefficients(x0, dx0, ddx0, dx1, ddx1, param);
+  param_ = param;
   start_condition_[0] = x0;
   start_condition_[1] = dx0;
   start_condition_[2] = ddx0;
   end_condition_[0] = dx1;
   end_condition_[1] = ddx1;
+  compute_coefficients(x0, dx0, ddx0, dx1, ddx1, param);
 }
 
 QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
@@ -55,21 +56,21 @@ double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order,
                                           const double p) const {
   switch (order) {
     case 0: {
-      return (((coef_[0] * p + coef_[1]) * p + coef_[2]) * p + coef_[3]) * p +
-             coef_[4];
+      return (((coef_[4] * p + coef_[3]) * p + coef_[2]) * p + coef_[1]) * p +
+             coef_[0];
     }
     case 1: {
-      return ((4.0 * coef_[0] * p + 3.0 * coef_[1]) * p + 2.0 * coef_[2]) * p +
-             coef_[3];
+      return ((4.0 * coef_[4] * p + 3.0 * coef_[3]) * p + 2.0 * coef_[2]) * p +
+             coef_[1];
     }
     case 2: {
-      return (12.0 * coef_[0] * p + 6.0 * coef_[1]) * p + 2.0 * coef_[2];
+      return (12.0 * coef_[4] * p + 6.0 * coef_[3]) * p + 2.0 * coef_[2];
     }
     case 3: {
-      return 24.0 * coef_[0] * p + 6.0 * coef_[1];
+      return 24.0 * coef_[4] * p + 6.0 * coef_[3];
     }
     case 4: {
-      return 24.0 * coef_[0];
+      return 24.0 * coef_[4];
     }
     default:
       return 0.0;
@@ -81,12 +82,8 @@ void QuarticPolynomialCurve1d::compute_coefficients(
     const double ddx1, const double p) {
   CHECK_GT(p, 0.0);
 
-  param_ = p;
-
-  coef_[4] = x0;
-
-  coef_[3] = dx0;
-
+  coef_[0] = x0;
+  coef_[1] = dx0;
   coef_[2] = 0.5 * ddx0;
 
   double b0 = dx1 - ddx0 * p - dx0;
@@ -96,7 +93,6 @@ void QuarticPolynomialCurve1d::compute_coefficients(
   double p3 = p2 * p;
 
   coef_[0] = -0.5 / p3 * b0 + 0.25 / p2 * b1;
-
   coef_[1] = b0 / p2 - b1 / 3.0 / p;
 }
 

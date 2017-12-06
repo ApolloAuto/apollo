@@ -58,6 +58,7 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
                             const double dx1, const double ddx1,
                             const double param);
 
+  // f = sum(coef_[i] * x^i), i from 0 to 5
   std::array<double, 6> coef_{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
   std::array<double, 3> start_condition_{{0.0, 0.0, 0.0}};
   std::array<double, 3> end_condition_{{0.0, 0.0, 0.0}};
@@ -66,4 +67,4 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_MATH_CURVE1D_QUINTIC_POLYNOMIAL_CURVE1D_H_ */
+#endif  // MODULES_PLANNING_MATH_CURVE1D_QUINTIC_POLYNOMIAL_CURVE1D_H_
