@@ -31,7 +31,6 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/decider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -282,8 +281,7 @@ bool ReferenceLineInfo::ReachedDestination() const {
 }
 
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
-  Decider decider;
-  decider.MakeDecision(*this, decision_result);
+  MakeDecision(decision_result);
   ExportTurnSignal(decision_result->mutable_vehicle_signal());
   auto* main_decision = decision_result->mutable_main_decision();
   if (main_decision->has_stop()) {
@@ -295,5 +293,142 @@ void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
   }
 }
 
+void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result) const {
+  CHECK_NOTNULL(decision_result);
+  decision_result->Clear();
+
+  // cruise by default
+  decision_result->mutable_main_decision()->mutable_cruise();
+
+  // check stop decision
+  int error_code = MakeMainStopDecision(decision_result);
+  if (error_code < 0) {
+    MakeEStopDecision(decision_result);
+  }
+  MakeMainMissionCompleteDecision(decision_result);
+  SetObjectDecisions(decision_result->mutable_object_decision());
+}
+
+void ReferenceLineInfo::MakeMainMissionCompleteDecision(
+    DecisionResult* decision_result) const {
+  if (!decision_result->main_decision().has_stop()) {
+    return;
+  }
+  auto main_stop = decision_result->main_decision().stop();
+  if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
+    return;
+  }
+  const auto& adc_pos = AdcPlanningPoint().path_point();
+  if (common::util::DistanceXY(adc_pos, main_stop.stop_point()) >
+      FLAGS_destination_check_distance) {
+    return;
+  }
+  if (ReachedDestination()) {
+    return;
+  }
+  auto mission_complete =
+      decision_result->mutable_main_decision()->mutable_mission_complete();
+  mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
+  mission_complete->set_stop_heading(main_stop.stop_heading());
+}
+
+int ReferenceLineInfo::MakeMainStopDecision(
+    DecisionResult* decision_result) const {
+  double min_stop_line_s = std::numeric_limits<double>::infinity();
+  const Obstacle* stop_obstacle = nullptr;
+  const ObjectStop* stop_decision = nullptr;
+
+  for (const auto path_obstacle : path_decision_.path_obstacles().Items()) {
+    const auto& obstacle = path_obstacle->obstacle();
+    const auto& object_decision = path_obstacle->LongitudinalDecision();
+    if (!object_decision.has_stop()) {
+      continue;
+    }
+
+    apollo::common::PointENU stop_point = object_decision.stop().stop_point();
+    common::SLPoint stop_line_sl;
+    reference_line_.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
+
+    double stop_line_s = stop_line_sl.s();
+    if (stop_line_s < 0 || stop_line_s > reference_line_.Length()) {
+      AERROR << "Ignore object:" << obstacle->Id() << " fence route_s["
+             << stop_line_s << "] not in range[0, " << reference_line_.Length()
+             << "]";
+      continue;
+    }
+
+    // check stop_line_s vs adc_s
+    if (stop_line_s < min_stop_line_s) {
+      min_stop_line_s = stop_line_s;
+      stop_obstacle = obstacle;
+      stop_decision = &(object_decision.stop());
+    }
+  }
+
+  if (stop_obstacle != nullptr) {
+    MainStop* main_stop =
+        decision_result->mutable_main_decision()->mutable_stop();
+    main_stop->set_reason_code(stop_decision->reason_code());
+    main_stop->set_reason("stop by " + stop_obstacle->Id());
+    main_stop->mutable_stop_point()->set_x(stop_decision->stop_point().x());
+    main_stop->mutable_stop_point()->set_y(stop_decision->stop_point().y());
+    main_stop->set_stop_heading(stop_decision->stop_heading());
+
+    ADEBUG << " main stop obstacle id:" << stop_obstacle->Id()
+           << " stop_line_s:" << min_stop_line_s << " stop_point: ("
+           << stop_decision->stop_point().x() << stop_decision->stop_point().y()
+           << " ) stop_heading: " << stop_decision->stop_heading();
+
+    return 1;
+  }
+
+  return 0;
+}
+
+void ReferenceLineInfo::SetObjectDecisions(
+    ObjectDecisions* object_decisions) const {
+  for (const auto path_obstacle : path_decision_.path_obstacles().Items()) {
+    if (!path_obstacle->HasNonIgnoreDecision()) {
+      continue;
+    }
+    auto* object_decision = object_decisions->add_decision();
+
+    const auto& obstacle = path_obstacle->obstacle();
+    object_decision->set_id(obstacle->Id());
+    object_decision->set_perception_id(obstacle->PerceptionId());
+    if (path_obstacle->HasLateralDecision() &&
+        !path_obstacle->IsLateralIgnore()) {
+      object_decision->add_object_decision()->CopyFrom(
+          path_obstacle->LateralDecision());
+    }
+    if (path_obstacle->HasLongitudinalDecision() &&
+        !path_obstacle->IsLongitudinalIgnore()) {
+      object_decision->add_object_decision()->CopyFrom(
+          path_obstacle->LongitudinalDecision());
+    }
+  }
+}
+
+void ReferenceLineInfo::MakeEStopDecision(
+    DecisionResult* decision_result) const {
+  decision_result->Clear();
+
+  MainEmergencyStop* main_estop =
+      decision_result->mutable_main_decision()->mutable_estop();
+  main_estop->set_reason_code(MainEmergencyStop::ESTOP_REASON_INTERNAL_ERR);
+  main_estop->set_reason("estop reason to be added");
+  main_estop->mutable_cruise_to_stop();
+
+  // set object decisions
+  ObjectDecisions* object_decisions =
+      decision_result->mutable_object_decision();
+  for (const auto path_obstacle : path_decision_.path_obstacles().Items()) {
+    auto* object_decision = object_decisions->add_decision();
+    const auto& obstacle = path_obstacle->obstacle();
+    object_decision->set_id(obstacle->Id());
+    object_decision->set_perception_id(obstacle->PerceptionId());
+    object_decision->add_object_decision()->mutable_avoid();
+  }
+}
 }  // namespace planning
 }  // namespace apollo

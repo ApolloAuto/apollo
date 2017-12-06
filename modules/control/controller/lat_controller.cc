@@ -106,12 +106,12 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
 
-  double mass_fl = control_conf->lat_controller_conf().mass_fl();
-  double mass_fr = control_conf->lat_controller_conf().mass_fr();
-  double mass_rl = control_conf->lat_controller_conf().mass_rl();
-  double mass_rr = control_conf->lat_controller_conf().mass_rr();
-  double mass_front = mass_fl + mass_fr;
-  double mass_rear = mass_rl + mass_rr;
+  const double mass_fl = control_conf->lat_controller_conf().mass_fl();
+  const double mass_fr = control_conf->lat_controller_conf().mass_fr();
+  const double mass_rl = control_conf->lat_controller_conf().mass_rl();
+  const double mass_rr = control_conf->lat_controller_conf().mass_rr();
+  const double mass_front = mass_fl + mass_fr;
+  const double mass_rear = mass_rl + mass_rr;
   mass_ = mass_front + mass_rear;
 
   lf_ = wheelbase_ * (1.0 - mass_front / mass_);
@@ -138,9 +138,8 @@ void LatController::ProcessLogs(const SimpleLateralDebug *debug,
              debug->steer_angle_lateral_rate_contribution(), ",",
              debug->steer_angle_heading_contribution(), ","),
       StrCat(debug->steer_angle_heading_rate_contribution(), ",",
-             debug->steer_angle_feedback(), ",",
-             chassis->steering_percentage(), ",",
-             VehicleStateProvider::instance()->linear_velocity()));
+             debug->steer_angle_feedback(), ",", chassis->steering_percentage(),
+             ",", VehicleStateProvider::instance()->linear_velocity()));
   if (FLAGS_enable_csv_debug) {
     steer_log_file_ << log_str << std::endl;
   }
@@ -181,7 +180,7 @@ Status LatController::Init(const ControlConf *control_conf) {
                   "failed to load control_conf");
   }
   // Matrix init operations.
-  int matrix_size = basic_state_size_ + preview_window_;
+  const int matrix_size = basic_state_size_ + preview_window_;
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
@@ -211,9 +210,9 @@ Status LatController::Init(const ControlConf *control_conf) {
 
   int q_param_size = control_conf->lat_controller_conf().matrix_q_size();
   if (matrix_size != q_param_size) {
-    const auto error_msg = apollo::common::util::StrCat(
-        "lateral controller error: matrix_q size: ", q_param_size,
-        " in parameter file not equal to matrix_size: ", matrix_size);
+    const auto error_msg =
+        StrCat("lateral controller error: matrix_q size: ", q_param_size,
+               " in parameter file not equal to matrix_size: ", matrix_size);
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -307,18 +306,18 @@ Status LatController::ComputeControlCommand(
   // feedback = - K * state
   // Convert vehicle steer angle from rad to degree and then to steer degree
   // then to 100% ratio
-  double steer_angle_feedback = -(matrix_k_ * matrix_state_)(0, 0) * 180 /
-                                M_PI * steer_transmission_ratio_ /
-                                steer_single_direction_max_degree_ * 100;
+  const double steer_angle_feedback = -(matrix_k_ * matrix_state_)(0, 0) * 180 /
+                                      M_PI * steer_transmission_ratio_ /
+                                      steer_single_direction_max_degree_ * 100;
 
-  double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
-  double steer_angle = steer_angle_feedback + steer_angle_feedforward;
+  const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
 
   // Clamp the steer angle to -100.0 to 100.0
-  steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
+  double steer_angle = common::math::Clamp(
+      steer_angle_feedback + steer_angle_feedforward, -100.0, 100.0);
 
   if (FLAGS_set_steer_limit) {
-    double steer_limit =
+    const double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
                   (VehicleStateProvider::instance()->linear_velocity() *
                    VehicleStateProvider::instance()->linear_velocity())) *
@@ -327,7 +326,7 @@ Status LatController::ComputeControlCommand(
 
     // Clamp the steer angle
     double steer_angle_limited =
-        apollo::common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+        common::math::Clamp(steer_angle, -steer_limit, steer_limit);
     steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
     cmd->set_steering_target(steer_angle_limited);
     debug->set_steer_angle_limited(steer_angle_limited);
@@ -338,19 +337,19 @@ Status LatController::ComputeControlCommand(
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
   // compute extra information for logging and debugging
-  double steer_angle_lateral_contribution =
+  const double steer_angle_lateral_contribution =
       -matrix_k_(0, 0) * matrix_state_(0, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
 
-  double steer_angle_lateral_rate_contribution =
+  const double steer_angle_lateral_rate_contribution =
       -matrix_k_(0, 1) * matrix_state_(1, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
 
-  double steer_angle_heading_contribution =
+  const double steer_angle_heading_contribution =
       -matrix_k_(0, 2) * matrix_state_(2, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
 
-  double steer_angle_heading_rate_contribution =
+  const double steer_angle_heading_rate_contribution =
       -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
 
@@ -407,26 +406,32 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 
   // Next elements are depending on preview window size;
   for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    auto preview_point =
+    const double preview_time = ts_ * (i + 1);
+    const auto preview_point =
         trajectory_analyzer_.QueryNearestPointByRelativeTime(preview_time);
 
-    auto matched_point = trajectory_analyzer_.QueryNearestPointByPosition(
+    const auto matched_point = trajectory_analyzer_.QueryNearestPointByPosition(
         preview_point.path_point().x(), preview_point.path_point().y());
 
-    double dx = preview_point.path_point().x() - matched_point.path_point().x();
-    double dy = preview_point.path_point().y() - matched_point.path_point().y();
+    const double dx =
+        preview_point.path_point().x() - matched_point.path_point().x();
+    const double dy =
+        preview_point.path_point().y() - matched_point.path_point().y();
 
-    double cos_matched_theta = std::cos(matched_point.path_point().theta());
-    double sin_matched_theta = std::sin(matched_point.path_point().theta());
-    double preview_d_error = cos_matched_theta * dy - sin_matched_theta * dx;
+    const double cos_matched_theta =
+        std::cos(matched_point.path_point().theta());
+    const double sin_matched_theta =
+        std::sin(matched_point.path_point().theta());
+    const double preview_d_error =
+        cos_matched_theta * dy - sin_matched_theta * dx;
 
     matrix_state_(basic_state_size_ + i, 0) = preview_d_error;
   }
 }
 
 void LatController::UpdateMatrix() {
-  double v = std::max(VehicleStateProvider::instance()->linear_velocity(), 0.2);
+  const double v =
+      std::max(VehicleStateProvider::instance()->linear_velocity(), 0.2);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
@@ -450,12 +455,12 @@ void LatController::UpdateMatrixCompound() {
 }
 
 double LatController::ComputeFeedForward(double ref_curvature) const {
-  double kv =
+  const double kv =
       lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
 
   // then change it from rad to %
-  double v = VehicleStateProvider::instance()->linear_velocity();
-  double steer_angle_feedforwardterm =
+  const double v = VehicleStateProvider::instance()->linear_velocity();
+  const double steer_angle_feedforwardterm =
       (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
        matrix_k_(0, 2) *
            (lr_ * ref_curvature -
@@ -472,18 +477,18 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
  */
 double LatController::GetLateralError(const common::math::Vec2d &point,
                                       TrajectoryPoint *traj_point) const {
-  auto closest =
+  const auto closest =
       trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
 
-  double point_angle = std::atan2(point.y() - closest.path_point().y(),
-                                  point.x() - closest.path_point().x());
-  double point2path_angle = point_angle - closest.path_point().theta();
+  const double point_angle = std::atan2(point.y() - closest.path_point().y(),
+                                        point.x() - closest.path_point().x());
+  const double point2path_angle = point_angle - closest.path_point().theta();
   if (traj_point != nullptr) {
     *traj_point = closest;
   }
 
-  double dx = closest.path_point().x() - point.x();
-  double dy = closest.path_point().y() - point.y();
+  const double dx = closest.path_point().x() - point.x();
+  const double dy = closest.path_point().y() - point.y();
   return std::sin(point2path_angle) * std::sqrt(dx * dx + dy * dy);
 }
 
@@ -492,7 +497,7 @@ void LatController::ComputeLateralErrors(
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
   // TODO(QiL): change this to conf.
-  ::apollo::common::TrajectoryPoint target_point;
+  TrajectoryPoint target_point;
   if (FLAGS_use_relative_position) {
     target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
         FLAGS_query_relative_time);
@@ -500,20 +505,21 @@ void LatController::ComputeLateralErrors(
     target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
   }
 
-  double dx = x - target_point.path_point().x();
-  double dy = y - target_point.path_point().y();
+  const double dx = x - target_point.path_point().x();
+  const double dy = y - target_point.path_point().y();
 
   ADEBUG << "x point: " << x << " y point: " << y;
   ADEBUG << "math point x: " << target_point.path_point().x()
          << " y point: " << target_point.path_point().y();
 
-  double cos_matched_theta = std::cos(target_point.path_point().theta());
-  double sin_matched_theta = std::sin(target_point.path_point().theta());
+  const double cos_matched_theta = std::cos(target_point.path_point().theta());
+  const double sin_matched_theta = std::sin(target_point.path_point().theta());
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
   // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
 
   // TODO(QiL): Code reformat when done with test
-  double raw_lateral_error = cos_matched_theta * dy - sin_matched_theta * dx;
+  const double raw_lateral_error =
+      cos_matched_theta * dy - sin_matched_theta * dx;
   if (FLAGS_use_relative_position) {
     double filtered_lateral_error =
         lateral_error_filter_.Update(raw_lateral_error);
@@ -521,9 +527,9 @@ void LatController::ComputeLateralErrors(
   } else {
     debug->set_lateral_error(raw_lateral_error);
   }
-  double delta_theta =
+  const double delta_theta =
       common::math::NormalizeAngle(theta - target_point.path_point().theta());
-  double sin_delta_theta = std::sin(delta_theta);
+  const double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = linear_v * sin_delta_theta;
   // theta_error = delta_theta
   // TODO(QiL): Code reformat after test

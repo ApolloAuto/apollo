@@ -34,7 +34,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 
-const double GRA_ACC = 9.8;
+constexpr double GRA_ACC = 9.8;
 
 LonController::LonController()
     : name_(ControlConf_ControllerType_Name(ControlConf::LON_CONTROLLER)) {
@@ -85,13 +85,9 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() {
-  CloseLogFile();
-}
+void LonController::Stop() { CloseLogFile(); }
 
-LonController::~LonController() {
-  CloseLogFile();
-}
+LonController::~LonController() { CloseLogFile(); }
 
 Status LonController::Init(const ControlConf *control_conf) {
   control_conf_ = control_conf;
@@ -172,8 +168,8 @@ Status LonController::ComputeControlCommand(
   double preview_time = lon_controller_conf.preview_window() * ts;
 
   if (preview_time < 0.0) {
-    const auto error_msg = apollo::common::util::StrCat(
-        "Preview time set as: ", preview_time, " less than 0");
+    const auto error_msg = common::util::StrCat("Preview time set as: ",
+                                                preview_time, " less than 0");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -183,10 +179,10 @@ Status LonController::ComputeControlCommand(
   double station_error_limited = 0.0;
   if (FLAGS_enable_speed_station_preview) {
     station_error_limited =
-        apollo::common::math::Clamp(debug->preview_station_error(),
-                                    -station_error_limit, station_error_limit);
+        common::math::Clamp(debug->preview_station_error(),
+                            -station_error_limit, station_error_limit);
   } else {
-    station_error_limited = apollo::common::math::Clamp(
+    station_error_limited = common::math::Clamp(
         debug->station_error(), -station_error_limit, station_error_limit);
   }
   double speed_offset =
@@ -201,9 +197,9 @@ Status LonController::ComputeControlCommand(
   } else {
     speed_controller_input = speed_offset + debug->speed_error();
   }
-  speed_controller_input_limited = apollo::common::math::Clamp(
-      speed_controller_input, -speed_controller_input_limit,
-      speed_controller_input_limit);
+  speed_controller_input_limited =
+      common::math::Clamp(speed_controller_input, -speed_controller_input_limit,
+                          speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
   if (VehicleStateProvider::instance()->linear_velocity() <=
@@ -302,9 +298,7 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const {
-  return name_;
-}
+std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
