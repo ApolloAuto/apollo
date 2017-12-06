@@ -21,6 +21,7 @@ message TrafficLightDebug{
     optional double ts_diff_sys = 6;
     optional int32 project_error = 7;
     optional double distance_to_stop_line = 8;
+    optional int32 camera_id = 9;
 }
 message TrafficLight {
     enum Color {
