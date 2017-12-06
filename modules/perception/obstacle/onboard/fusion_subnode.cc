@@ -237,7 +237,7 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
     obj->Serialize(obstacle);
-    obstacle->set_timestamp(obstacle->timestamp() * 1000);
+    obstacle->set_timestamp(obstacle->timestamp());
   }
 
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
