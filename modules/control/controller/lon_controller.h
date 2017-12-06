@@ -77,8 +77,7 @@ class LonController : public Controller {
    */
   common::Status ComputeControlCommand(
       const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis,
-      const planning::ADCTrajectory *trajectory,
+      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
       control::ControlCommand *cmd) override;
 
   /**
