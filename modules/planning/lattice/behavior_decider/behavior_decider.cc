@@ -21,15 +21,15 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
 
-#include "gflags/gflags.h"
+#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 
+#include "gflags/gflags.h"
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/condition_filter.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
-#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/lattice/util/lattice_util.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/geometry.pb.h"
@@ -79,19 +79,19 @@ PlanningTarget BehaviorDecider::Analyze(
   }
 
   PlanningTarget ret;
+  ret.CopyFrom(scenario_decisions[0]);
+  for (const auto& reference_point : discretized_reference_line) {
+    ret.mutable_discretized_reference_line()
+        ->add_discretized_reference_line_point()
+        ->CopyFrom(reference_point);
+  }
+
   if (StopDecisionNearDestination(frame, lon_init_state,
                                   discretized_reference_line, &ret)) {
     AINFO << "STOP decision when near the routing end.";
     return ret;
   } else {
     AINFO << "GO decision made";
-  }
-
-  ret.CopyFrom(scenario_decisions[0]);
-  for (const auto& reference_point : discretized_reference_line) {
-    ret.mutable_discretized_reference_line()
-        ->add_discretized_reference_line_point()
-        ->CopyFrom(reference_point);
   }
 
   PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
@@ -114,17 +114,8 @@ PlanningTarget BehaviorDecider::Analyze(
   }
 
   if (sample_bounds.empty()) {
-    LatticeSamplingConfig* lattice_sampling_config =
-        ret.mutable_lattice_sampling_config();
-    LonSampleConfig* lon_sample_config =
-        lattice_sampling_config->mutable_lon_sample_config();
-    LatSampleConfig* lat_sample_config =
-        lattice_sampling_config->mutable_lat_sample_config();
-    // lon_sample_config->mutable_lon_end_condition()->set_s(0.0);
-    lon_sample_config->mutable_lon_end_condition()->set_ds(
-        FLAGS_default_cruise_speed);
-    lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
     ret.set_decision_type(PlanningTarget::CRUISE);
+    ret.set_cruise_speed(FLAGS_default_cruise_speed);
     return ret;
   }
 
@@ -132,6 +123,7 @@ PlanningTarget BehaviorDecider::Analyze(
     ret.add_sample_bound()->CopyFrom(sample_bound);
   }
   ret.set_decision_type(PlanningTarget::CRUISE);
+  ret.set_cruise_speed(FLAGS_default_cruise_speed);
   return ret;
 }
 
@@ -153,32 +145,16 @@ bool BehaviorDecider::StopDecisionNearDestination(
 
   double res_s = routing_end_matched_point.s() - lon_init_state[0];
   if (res_s <= 0.0) {
-    LatticeSamplingConfig* lattice_sampling_config =
-        planning_target->mutable_lattice_sampling_config();
-    LonSampleConfig* lon_sample_config =
-        lattice_sampling_config->mutable_lon_sample_config();
-
-    lon_sample_config->mutable_lon_end_condition()->set_s(
-        routing_end_matched_point.s());
-    lon_sample_config->mutable_lon_end_condition()->set_ds(0.0);
-    lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
     planning_target->set_decision_type(PlanningTarget::STOP);
+    planning_target->set_stop_point(routing_end_matched_point.s());
     return true;
   } else {
     double v = lon_init_state[1];
     double required_stop_deceleration = (v * v) / (2.0 * res_s);
 
     if (required_stop_deceleration > stop_acc_thred) {
-      LatticeSamplingConfig* lattice_sampling_config =
-          planning_target->mutable_lattice_sampling_config();
-      LonSampleConfig* lon_sample_config =
-          lattice_sampling_config->mutable_lon_sample_config();
-
-      lon_sample_config->mutable_lon_end_condition()->set_s(
-          routing_end_matched_point.s());
-      lon_sample_config->mutable_lon_end_condition()->set_ds(0.0);
-      lon_sample_config->mutable_lon_end_condition()->set_dds(0.0);
       planning_target->set_decision_type(PlanningTarget::STOP);
+      planning_target->set_stop_point(routing_end_matched_point.s());
       return true;
     } else {
       AINFO << "required_stop_deceleration requirement not satisfied";

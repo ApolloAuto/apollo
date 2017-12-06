@@ -34,49 +34,37 @@ namespace planning {
 
 class Trajectory1dGenerator {
  public:
-  Trajectory1dGenerator() = default;
+  Trajectory1dGenerator(const std::array<double, 3>& lon_init_state,
+      const std::array<double, 3>& lat_init_state);
 
-  virtual ~Trajectory1dGenerator() = default;
+  virtual ~Trajectory1dGenerator();
 
   void GenerateTrajectoryBundles(
-      const PlanningTarget& planning_objective,
-      const std::array<double, 3>& lon_init_state,
-      const std::array<double, 3>& lat_init_state,
+      const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle);
 
  private:
-  void GenerateLongitudinalTrajectoryBundle(
-      const PlanningTarget& planning_objective,
-      const std::array<double, 3>& lon_init_state,
-      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
-
   void GenerateSpeedProfilesForCruising(
-      const std::array<double, 3>& lon_init_state,
-      const LonSampleConfig& lon_sample_config,
-      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
-
-  void GenerateSpeedProfilesForFollowing(
-      const std::array<double, 3>& lon_init_state,
-      const LonSampleConfig& lon_sample_config,
+      const double target_speed,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateSpeedProfilesForStopping(
-      const std::array<double, 3>& lon_init_state,
-      const LonSampleConfig& lon_sample_config,
+      const double stop_position,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
-  void GenerateSpeedProfiles(
-      const std::array<double, 3>& lon_init_state,
-      const std::vector<SampleBound>& sample_bounds,
-      const LatticeSamplingConfig& lattice_sampling_config,
+  void GenerateLongitudinalTrajectoryBundle(
+      const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateLateralTrajectoryBundle(
-      const std::array<double, 3>& lat_init_state,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const;
 
-  EndConditionSampler end_condition_sampler_;
+  EndConditionSampler* end_condition_sampler_;
+
+  std::array<double, 3> init_lon_state_;
+
+  std::array<double, 3> init_lat_state_;
 };
 
 }  // namespace planning
