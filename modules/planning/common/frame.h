@@ -37,6 +37,7 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -116,6 +117,8 @@ class Frame {
   prediction::PredictionObstacles prediction_;
 
   ThreadSafeIndexedObstacles obstacles_;
+
+  ChangeLaneDecider change_lane_decider_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
