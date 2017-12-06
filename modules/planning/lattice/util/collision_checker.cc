@@ -36,7 +36,6 @@ CollisionChecker::CollisionChecker(
 
 bool CollisionChecker::InCollision(
     const DiscretizedTrajectory& discretized_trajectory) {
-  AINFO << "      --- into collision_checker";
   CHECK_LE(discretized_trajectory.NumOfPoints(), predicted_envs_.size());
   const auto& vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
@@ -51,13 +50,11 @@ bool CollisionChecker::InCollision(
         trajectory_point.path_point().theta(), ego_length, ego_width);
     for (const auto& obstacle_box : predicted_envs_[time_index]) {
       if (ego_box.HasOverlap(obstacle_box)) {
-        AINFO << "      --- exit collision_checker";
         return true;
       }
     }
     ++time_index;
   }
-  AINFO << "      --- exit collision_checker";
   return false;
 }
 
