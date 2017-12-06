@@ -46,7 +46,7 @@ class Detection : public IRefine {
   ~Detection() = default;
 
  private:
-  bool SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
+  bool SelectOutputBboxes(const cv::Size &img_size, int class_id,
                           float inflate_col, float inflate_row,
                           std::vector<LightPtr> *lights);
 
