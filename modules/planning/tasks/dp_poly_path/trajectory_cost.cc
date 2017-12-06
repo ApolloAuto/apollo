@@ -78,10 +78,13 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
   for (double path_s = 0.0; path_s < (end_s - start_s);
        path_s += config_.path_resolution()) {
     const double l = std::fabs(curve.Evaluate(0, path_s));
-    path_cost += l * config_.path_l_cost();
+    path_cost += l * l * config_.path_l_cost();
 
     const double dl = std::fabs(curve.Evaluate(1, path_s));
-    path_cost += dl * config_.path_dl_cost();
+    path_cost += dl * dl * config_.path_dl_cost();
+
+    const double ddl = std::fabs(curve.Evaluate(2, path_s));
+    path_cost += ddl * ddl * config_.path_ddl_cost();
   }
   return path_cost;
 }
@@ -90,9 +93,9 @@ double TrajectoryCost::CalculateObstacleCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
     const double end_s) const {
   double obstacle_cost = 0.0;
-  constexpr double kStepS = 2.0;
 
-  for (double curr_s = start_s; curr_s <= end_s; curr_s += kStepS) {
+  for (double curr_s = start_s; curr_s <= end_s;
+       curr_s += config_.path_resolution()) {
     const double s = curr_s - start_s;  // spline curve s
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);

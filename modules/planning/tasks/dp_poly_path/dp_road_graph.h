@@ -92,6 +92,9 @@ class DPRoadGraph {
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
 
+  bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
+                            common::FrenetFramePoint *const frenet_frame_point);
+
  private:
   DpPolyPathConfig config_;
   common::TrajectoryPoint init_point_;
@@ -99,6 +102,7 @@ class DPRoadGraph {
   const ReferenceLine &reference_line_;
   SpeedData speed_data_;
   common::SLPoint init_sl_point_;
+  common::FrenetFramePoint init_frenet_frame_point_;
 };
 
 }  // namespace planning

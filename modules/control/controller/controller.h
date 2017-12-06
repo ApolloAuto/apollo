@@ -25,11 +25,12 @@
 #include <cmath>
 #include <string>
 
-#include "modules/common/status/status.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "modules/common/status/status.h"
 
 /**
  * @namespace apollo::control
@@ -73,8 +74,7 @@ class Controller {
    */
   virtual common::Status ComputeControlCommand(
       const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis,
-      const planning::ADCTrajectory *trajectory,
+      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
       control::ControlCommand *cmd) = 0;
 
   /**

@@ -29,6 +29,7 @@
 #include "Eigen/Core"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/trajectory_analyzer.h"
