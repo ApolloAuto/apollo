@@ -131,7 +131,7 @@ DEFINE_bool(enable_trajectory_check, false,
 DEFINE_double(speed_lower_bound, -0.02, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
-DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
+DEFINE_double(longitudinal_acceleration_lower_bound, -4.0,
               "The lowest longitudinal acceleration allowed.");
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");

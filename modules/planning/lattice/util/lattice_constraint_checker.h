@@ -40,6 +40,8 @@ class LatticeConstraintChecker {
 
   static bool IsValidLateralTrajectory(const Curve1d& lat_trajectory,
                                        const Curve1d& lon_trajectory);
+
+  static bool IsValidTrajectory(const DiscretizedTrajectory& trajectory);
 };
 
 }  // namespace planning
