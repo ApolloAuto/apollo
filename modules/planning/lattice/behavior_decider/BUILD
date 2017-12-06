@@ -37,6 +37,7 @@ cc_library(
     ],
     deps = [
     	":adc_master_scenario",
+        ":signal_light_scenario",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common/proto:pnc_point_proto",
@@ -53,6 +54,24 @@ cc_library(
     ],
     srcs = [
         "adc_master_scenario.cc",
+    ],
+    deps = [
+        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:common_proto",
+        "//modules/planning/common:frame",
+    ],
+)
+
+cc_library(
+    name = "signal_light_scenario",
+    hdrs = [
+        "scenario.h",
+        "signal_light_scenario.h",
+    ],
+    srcs = [
+        "signal_light_scenario.cc",
     ],
     deps = [
         "//modules/planning/proto:lattice_structure_proto",

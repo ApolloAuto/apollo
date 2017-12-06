@@ -9,6 +9,7 @@
 
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/lattice/behavior_decider/adc_master_scenario.h"
+#include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
 
 #include "modules/common/log.h"
 
@@ -22,6 +23,7 @@ void ScenarioManager::RegisterScenarios() {
   scenarios_.resize(NUM_LEVELS);
   // level 0 features
   RegisterScenario<AdcMasterScenario>(LEVEL0);
+  RegisterScenario<SignalLightScenario>(LEVEL0);
 }
 
 void ScenarioManager::Reset() {
