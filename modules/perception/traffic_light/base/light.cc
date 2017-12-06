@@ -28,7 +28,7 @@ std::ostream &operator<<(std::ostream &os, const Light &light) {
   return os;
 }
 
-double stopline_distance(const Eigen::Matrix4d &car_pose,
+double Distance2Stopline(const Eigen::Matrix4d &car_pose,
                          const google::protobuf::RepeatedPtrField<
                              ::apollo::hdmap::Curve> &stoplines) {
   if (stoplines.size() == 0) {
