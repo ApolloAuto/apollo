@@ -212,6 +212,7 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
     object_ptr->clone(*object_radar_ptr);
     object_ptr->tracking_time = obs_track[i].GetTrackingTime();
     object_ptr->track_id = obs_track[i].GetObsId();
+    object_ptr->latest_tracked_time = obs_track[i].GetTimestamp();
     objects->push_back(object_ptr);
   }
   return true;
