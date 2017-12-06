@@ -36,13 +36,13 @@
 namespace apollo {
 namespace control {
 
-using common::Point3D;
-using common::TrajectoryPoint;
-using common::VehicleStateProvider;
-using Matrix = Eigen::MatrixXd;
+using apollo::common::Point3D;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleStateProvider;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::time::Clock;
+using Matrix = Eigen::MatrixXd;
 
 namespace {
 
@@ -68,9 +68,7 @@ MPCController::MPCController() : name_("MPC Controller") {
   AINFO << "Using " << name_;
 }
 
-MPCController::~MPCController() {
-  CloseLogFile();
-}
+MPCController::~MPCController() { CloseLogFile(); }
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -90,12 +88,12 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
 
-  double mass_fl = control_conf->mpc_controller_conf().mass_fl();
-  double mass_fr = control_conf->mpc_controller_conf().mass_fr();
-  double mass_rl = control_conf->mpc_controller_conf().mass_rl();
-  double mass_rr = control_conf->mpc_controller_conf().mass_rr();
-  double mass_front = mass_fl + mass_fr;
-  double mass_rear = mass_rl + mass_rr;
+  const double mass_fl = control_conf->mpc_controller_conf().mass_fl();
+  const double mass_fr = control_conf->mpc_controller_conf().mass_fr();
+  const double mass_rl = control_conf->mpc_controller_conf().mass_rl();
+  const double mass_rr = control_conf->mpc_controller_conf().mass_rr();
+  const double mass_front = mass_fl + mass_fr;
+  const double mass_rear = mass_rl + mass_rr;
   mass_ = mass_front + mass_rear;
 
   lf_ = wheelbase_ * (1.0 - mass_front / mass_);
@@ -192,7 +190,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
 
   int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
   if (basic_state_size_ != q_param_size) {
-    const auto error_msg = apollo::common::util::StrCat(
+    const auto error_msg = common::util::StrCat(
         "MPC controller error: matrix_q size: ", q_param_size,
         " in parameter file not equal to basic_state_size_: ",
         basic_state_size_);
@@ -216,13 +214,9 @@ void MPCController::CloseLogFile() {
   }
 }
 
-void MPCController::Stop() {
-  CloseLogFile();
-}
+void MPCController::Stop() { CloseLogFile(); }
 
-std::string MPCController::Name() const {
-  return name_;
-}
+std::string MPCController::Name() const { return name_; }
 
 Status MPCController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
@@ -260,7 +254,7 @@ Status MPCController::ComputeControlCommand(
 
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
-  if (::apollo::common::math::SolveLinearMPC(
+  if (common::math::SolveLinearMPC(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_, matrix_r_, lower_bound,
           upper_bound, matrix_state_, reference, mpc_eps_, mpc_max_iteration_,
           &control) != true) {
@@ -272,10 +266,10 @@ Status MPCController::ComputeControlCommand(
                        steer_transmission_ratio_ /
                        steer_single_direction_max_degree_ * 100;
   // Clamp the steer angle to -100.0 to 100.0
-  steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
+  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
   if (FLAGS_set_steer_limit) {
-    double steer_limit =
+    const double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
                   (VehicleStateProvider::instance()->linear_velocity() *
                    VehicleStateProvider::instance()->linear_velocity())) *
@@ -284,7 +278,7 @@ Status MPCController::ComputeControlCommand(
 
     // Clamp the steer angle
     double steer_angle_limited =
-        apollo::common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+        common::math::Clamp(steer_angle, -steer_limit, steer_limit);
     steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
     cmd->set_steering_target(steer_angle_limited);
     debug->set_steer_angle_limited(steer_angle_limited);
@@ -384,7 +378,7 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
 }
 
 void MPCController::UpdateMatrix() {
-  double v = VehicleStateProvider::instance()->linear_velocity();
+  const double v = VehicleStateProvider::instance()->linear_velocity();
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
@@ -406,18 +400,18 @@ void MPCController::UpdateMatrix() {
  */
 double MPCController::GetLateralError(const common::math::Vec2d &point,
                                       TrajectoryPoint *traj_point) const {
-  auto closest =
+  const auto closest =
       trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
 
-  double point_angle = std::atan2(point.y() - closest.path_point().y(),
-                                  point.x() - closest.path_point().x());
-  double point2path_angle = point_angle - closest.path_point().theta();
+  const double point_angle = std::atan2(point.y() - closest.path_point().y(),
+                                        point.x() - closest.path_point().x());
+  const double point2path_angle = point_angle - closest.path_point().theta();
   if (traj_point != nullptr) {
     *traj_point = closest;
   }
 
-  double dx = closest.path_point().x() - point.x();
-  double dy = closest.path_point().y() - point.y();
+  const double dx = closest.path_point().x() - point.x();
+  const double dy = closest.path_point().y() - point.y();
   return std::sin(point2path_angle) * std::sqrt(dx * dx + dy * dy);
 }
 
@@ -425,19 +419,20 @@ void MPCController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleMPCDebug *debug) {
-  auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+  const auto matched_point =
+      trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
-  double dx = x - matched_point.path_point().x();
-  double dy = y - matched_point.path_point().y();
+  const double dx = x - matched_point.path_point().x();
+  const double dy = y - matched_point.path_point().y();
 
-  double cos_matched_theta = std::cos(matched_point.path_point().theta());
-  double sin_matched_theta = std::sin(matched_point.path_point().theta());
+  const double cos_matched_theta = std::cos(matched_point.path_point().theta());
+  const double sin_matched_theta = std::sin(matched_point.path_point().theta());
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
   debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
 
-  double delta_theta =
+  const double delta_theta =
       common::math::NormalizeAngle(theta - matched_point.path_point().theta());
-  double sin_delta_theta = std::sin(delta_theta);
+  const double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = chassis_v * sin_delta_theta;
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
 
@@ -445,8 +440,8 @@ void MPCController::ComputeLateralErrors(
   debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - matched_point.path_point().kappa() *
   // matched_point.v();
-  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
-                                                matched_point.v());
+  debug->set_heading_error_rate(
+      angular_v - matched_point.path_point().kappa() * matched_point.v());
   heading_error_rate_ = debug->heading_error_rate();
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point().theta());
@@ -466,7 +461,7 @@ void MPCController::ComputeLongitudinalErrors(
   double d_matched = 0.0;
   double d_dot_matched = 0.0;
 
-  auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
+  const auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
       VehicleStateProvider::instance()->x(),
       VehicleStateProvider::instance()->y());
 
@@ -477,7 +472,7 @@ void MPCController::ComputeLongitudinalErrors(
       VehicleStateProvider::instance()->linear_velocity(), matched_point,
       &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Clock::NowInSecond();
+  const double current_control_time = Clock::NowInSecond();
 
   TrajectoryPoint reference_point =
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(

@@ -72,8 +72,7 @@ class TrajectoryAnalyzer {
    * @param t absolute time for query
    * @return a point of trajectory
    */
-  apollo::common::TrajectoryPoint QueryNearestPointByAbsoluteTime(
-      const double t) const;
+  common::TrajectoryPoint QueryNearestPointByAbsoluteTime(const double t) const;
 
   /**
    * @brief query a point of trajectery that its relative time is closest
@@ -81,8 +80,7 @@ class TrajectoryAnalyzer {
    * @param t relative time for query
    * @return a point of trajectory
    */
-  apollo::common::TrajectoryPoint QueryNearestPointByRelativeTime(
-      const double t) const;
+  common::TrajectoryPoint QueryNearestPointByRelativeTime(const double t) const;
 
   /**
    * @brief query a point of trajectery that its position is closest
@@ -91,8 +89,8 @@ class TrajectoryAnalyzer {
    * @param y value of y-coordination in the given position
    * @return a point of trajectory
    */
-  apollo::common::TrajectoryPoint QueryNearestPointByPosition(
-      const double x, const double y) const;
+  common::TrajectoryPoint QueryNearestPointByPosition(const double x,
+                                                      const double y) const;
 
   /**
    * @brief query a point on trajectery that its position is closest
@@ -102,8 +100,7 @@ class TrajectoryAnalyzer {
    * @return a point on trajectory, the point may be a point of trajectory
    * or interpolated by two adjacent points of trajectory
    */
-  apollo::common::PathPoint QueryMatchedPathPoint(const double x,
-                                                  const double y) const;
+  common::PathPoint QueryMatchedPathPoint(const double x, const double y) const;
 
   /**
    * @brief convert a position with theta and speed to trajectory frame,
@@ -119,8 +116,7 @@ class TrajectoryAnalyzer {
    * @param ptr_d_dot lateral speed
    */
   void ToTrajectoryFrame(const double x, const double y, const double theta,
-                         const double v,
-                         const apollo::common::PathPoint &matched_point,
+                         const double v, const common::PathPoint &matched_point,
                          double *ptr_s, double *ptr_s_dot, double *ptr_d,
                          double *ptr_d_dot) const;
 
@@ -128,15 +124,14 @@ class TrajectoryAnalyzer {
    * @brief get all points of the trajectory
    * @return a vector of trajectory points
    */
-  const std::vector<apollo::common::TrajectoryPoint> &trajectory_points() const;
+  const std::vector<common::TrajectoryPoint> &trajectory_points() const;
 
  private:
-  apollo::common::PathPoint FindMinDistancePoint(
-      const apollo::common::TrajectoryPoint &p0,
-      const apollo::common::TrajectoryPoint &p1, const double x,
-      const double y) const;
+  common::PathPoint FindMinDistancePoint(const common::TrajectoryPoint &p0,
+                                         const common::TrajectoryPoint &p1,
+                                         const double x, const double y) const;
 
-  std::vector<apollo::common::TrajectoryPoint> trajectory_points_;
+  std::vector<common::TrajectoryPoint> trajectory_points_;
 
   double header_time_ = 0.0;
   unsigned int seq_num_ = 0;
