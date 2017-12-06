@@ -21,16 +21,17 @@ function print_help() {
    echo "This script works in one of the three mode:"
    echo "-pc filter for perfect control, produces *.pc.bag"
    echo "-np filter for planning dependencies, produces *.np.bag"
-   echo "-wp filter forplanning and its dependencies, produces *.wp.bag"
+   echo "-wp filter for planning and its dependencies, produces *.wp.bag"
 }
 
 perfect_control_topic="topic == '/apollo/prediction' \
    or topic == '/apollo/routing_response' \
-   or topic == '/apollo/localization/pose' \
    or topic == '/apollo/perception/obstacle' \
    or topic == '/apollo/perception/traffic_light'"
 
-planning_deps="$perfect_control_topic or topic == '/apollo/canbus/chassis'"
+planning_deps="$perfect_control_topic \
+    or topic == '/apollo/canbus/chassis' \
+    or topic == '/apollo/localization/pose'"
 
 planning_all="topic == '/apollo/planning' or $planning_deps"
 
