@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/util.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -55,9 +56,8 @@ void Normalize(Vectord* prob) {
 }
 
 void NormalizeRow(Matrixd* prob) {
-  double sum = 0.0;
   for (std::size_t row = 0; row < VALID_OBJECT_TYPE; ++row) {
-    sum = 0.0;
+    double sum = 0.0;
     for (std::size_t col = 0; col < VALID_OBJECT_TYPE; ++col) {
       sum += (*prob)(row, col);
     }
