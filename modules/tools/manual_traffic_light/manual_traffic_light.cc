@@ -30,6 +30,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/util/color.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap_common.h"
@@ -47,16 +48,15 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 using apollo::common::util::PrintIter;
+using apollo::common::color::ANSI_RED;
+using apollo::common::color::ANSI_GREEN;
+using apollo::common::color::ANSI_RESET;
 
 DEFINE_double(traffic_light_distance, 1000.0,
               "only retrieves traffic lights within this distance");
 
 bool g_is_green = false;
 bool g_updated = true;
-
-constexpr char RED_COLOR[] = "\033[41m";
-constexpr char GREEN_COLOR[] = "\033[42m";
-constexpr char RESET_COLOR[] = "\033[0m";
 
 bool GetTrafficLights(std::vector<SignalInfoConstPtr> *traffic_lights) {
   CHECK_NOTNULL(traffic_lights);
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
     ADEBUG << "Color: " << TrafficLight::Color_Name(color);
     if (g_updated) {
       g_updated = false;
-      const char *print_color = g_is_green ? GREEN_COLOR : RED_COLOR;
+      const char *print_color = g_is_green ? ANSI_GREEN : ANSI_RED;
       std::cout << print_color
                 << "Current Light: " << (g_is_green ? "GREEN" : "RED");
       if (signal_ids.empty()) {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
                   << PrintIter(signal_ids.begin(), signal_ids.end());
       }
       std::cout << std::endl
-                << RESET_COLOR << "Press 'c' to change" << std::endl
+                << ANSI_RESET << "Press 'c' to change" << std::endl
                 << std::endl;
     }
     CreateTrafficLightDetection(signals, color, &traffic_light_detection);
