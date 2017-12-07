@@ -27,11 +27,15 @@ namespace planning {
 using CriticalPointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
-    const std::array<double, 3>& init_s, const double speed_limit,
-    const PathTimeNeighborhood& path_time_neighborhood) :
+    const Frame* frame,
+    const std::array<double, 3>& init_s,
+    const double speed_limit,
+    const ReferenceLine& reference_line,
+    const std::vector<common::PathPoint>& discretized_ref_points) :
     feasible_region_(init_s, speed_limit),
-    path_time_neighborhood_(path_time_neighborhood) {
-  Init(path_time_neighborhood);
+    path_time_neighborhood_(frame, init_s,
+      reference_line, discretized_ref_points) {
+  Init();
 }
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
@@ -168,8 +172,8 @@ std::vector<CriticalPointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
   return path_intervals;
 }
 
-void ConditionFilter::Init(const PathTimeNeighborhood& path_time_neighborhood) {
-  path_time_obstacles_ = path_time_neighborhood.GetPathTimeObstacles();
+void ConditionFilter::Init() {
+  path_time_obstacles_ = path_time_neighborhood_.GetPathTimeObstacles();
 }
 
 std::set<double> ConditionFilter::CriticalTimeStamps() const {

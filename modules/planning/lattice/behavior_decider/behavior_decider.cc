@@ -94,11 +94,11 @@ PlanningTarget BehaviorDecider::Analyze(
     AINFO << "GO decision made";
   }
 
-  PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
-      reference_line, discretized_reference_line);
+  // PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
+  //     reference_line, discretized_reference_line);
 
-  ConditionFilter condition_filter(lon_init_state, speed_limit,
-                                   path_time_neighborhood);
+  ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
+      reference_line, discretized_reference_line);
 
   std::vector<SampleBound> sample_bounds =
       condition_filter.QuerySampleBounds();
