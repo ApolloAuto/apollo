@@ -44,7 +44,7 @@ class PathTimeNeighborhood {
   bool GetPathTimeObstacle(const std::string& obstacle_id,
       PathTimeObstacle* path_time_obstacle);
 
-  double SpeedAtT(const std::string& obstacle_id, const double t);
+  double SpeedAtT(const std::string& obstacle_id, const double t) const;
 
   /**
   bool ForwardNearestObstacle(

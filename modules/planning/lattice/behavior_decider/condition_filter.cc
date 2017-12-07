@@ -29,7 +29,8 @@ using CriticalPointPair = std::pair<PathTimePoint, PathTimePoint>;
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
     const PathTimeNeighborhood& path_time_neighborhood) :
-    feasible_region_(init_s, speed_limit) {
+    feasible_region_(init_s, speed_limit),
+    path_time_neighborhood_(path_time_neighborhood) {
   Init(path_time_neighborhood);
 }
 
@@ -118,11 +119,16 @@ CriticalPointPair ConditionFilter::QueryPathTimeObstacleIntervals(
       path_time_obstacle.bottom_right().s(),
       path_time_obstacle.bottom_right().t(), t);
 
+  const std::string& obstacle_id = path_time_obstacle.obstacle_id();
+  double v = path_time_neighborhood_.SpeedAtT(obstacle_id, t);
+
   block_interval.first.set_t(t);
   block_interval.first.set_s(s_lower);
+  block_interval.first.set_v(v);
   block_interval.first.set_obstacle_id(path_time_obstacle.obstacle_id());
   block_interval.second.set_t(t);
   block_interval.second.set_s(s_upper);
+  block_interval.second.set_v(v);
   block_interval.second.set_obstacle_id(path_time_obstacle.obstacle_id());
 
   return block_interval;
