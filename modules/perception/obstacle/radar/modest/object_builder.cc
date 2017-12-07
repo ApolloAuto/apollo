@@ -70,14 +70,16 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
                   0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
-    Eigen::Vector3f ref_velocity(main_velocity(0), main_velocity(1), 0.0);
-    if (ContiRadarUtil::IsConflict(ref_velocity, velocity_w.cast<float>())) {
-        object_ptr->is_background = true;
-    }
     //  calculate the absolute velodity
     object_ptr->velocity(0) = velocity_w[0] + main_velocity(0);
     object_ptr->velocity(1) = velocity_w[1] + main_velocity(1);
     object_ptr->velocity(2) = 0;
+
+    Eigen::Vector3f ref_velocity(main_velocity(0), main_velocity(1), 0.0);
+    if (ContiRadarUtil::IsConflict(ref_velocity,
+        object_ptr->velocity.cast<float>())) {
+        object_ptr->is_background = true;
+    }
 
     object_ptr->length = 1.0;
     object_ptr->width = 1.0;
