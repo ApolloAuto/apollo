@@ -34,7 +34,9 @@ planning_deps="$perfect_control_topic \
     or topic == '/apollo/canbus/chassis' \
     or topic == '/apollo/localization/pose'"
 
-planning_all="topic == '/apollo/planning' or $planning_deps"
+planning_all="topic == '/apollo/planning' \
+    or topic == '/apollo/drive_event' \
+    or $planning_deps"
 
 
 #Three different filter mode

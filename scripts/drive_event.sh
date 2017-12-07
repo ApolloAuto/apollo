@@ -16,8 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}/.."
 source "${DIR}/apollo_base.sh"
 
-python modules/tools/rosbag/transcribe.py $@
+python modules/tools/rosbag/drive_event.py $@
