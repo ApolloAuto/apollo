@@ -55,6 +55,7 @@ class ConditionFilter {
  private:
   FeasibleRegion feasible_region_;
   std::vector<PathTimeObstacle> path_time_obstacles_;
+  PathTimeNeighborhood path_time_neighborhood_;
 };
 
 }  // namespace planning

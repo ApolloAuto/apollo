@@ -47,8 +47,9 @@ int LastIndexBefore(const prediction::Trajectory& trajectory,
   }
   int start = 0;
   int end = num_traj_point - 1;
-  while (start < end) {
+  while (start + 1 < end) {
     int mid = start + (end - start) / 2;
+    // AERROR << "mid = " << mid;
     if (trajectory.trajectory_point(mid).relative_time() <= t) {
       start = mid;
     } else {
@@ -172,13 +173,13 @@ void PathTimeNeighborhood::SetupObstacles(
 }
 
 double PathTimeNeighborhood::SpeedAtT(
-    const std::string& obstacle_id, const double t) {
+    const std::string& obstacle_id, const double t) const {
   bool found = prediction_traj_map_.find(obstacle_id) !=
                prediction_traj_map_.end();
   CHECK(found);
   CHECK_GE(t, 0.0);
-  const prediction::Trajectory& trajectory =
-      prediction_traj_map_[obstacle_id];
+  prediction::Trajectory trajectory =
+      prediction_traj_map_.at(obstacle_id);
   int num_traj_point = trajectory.trajectory_point_size();
   CHECK_GT(num_traj_point, 0);
 
