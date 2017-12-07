@@ -1,0 +1,32 @@
+data_files {
+  source_path: "vehicle_param.pb.txt"
+  dest_path: "modules/common/data/mkz_config.pb.txt"
+}
+data_files {
+  source_path: "calibration_table.pb.txt"
+  dest_path: "modules/control/conf/lincoln.pb.txt"
+}
+data_files {
+  source_path: "start_velodyne.launch"
+  dest_path: "<ros>/share/velodyne/launch/start_velodyne.launch"
+}
+data_files {
+  source_path: "velodyne_params"
+  dest_path: "<ros>/share/velodyne_pointcloud/params"
+}
+data_files {
+  source_path: "camera_params"
+  dest_path: "modules/perception/data/params"
+}
+data_files {
+  source_path: "gnss_params/gnss_driver.launch"
+  dest_path: "<ros>/share/gnss_driver/launch/gnss_driver.launch"
+}
+data_files {
+  source_path: "gnss_params/gnss_conf_mkz.txt"
+  dest_path: "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt"
+}
+data_files {
+  source_path: "vehicle_info.pb.txt"
+  dest_path: "modules/tools/ota/vehicle_info.pb.txt"
+}
