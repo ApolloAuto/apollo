@@ -31,6 +31,12 @@
 namespace apollo {
 namespace planning {
 
+namespace {
+double QuasiSoftMax(const double x) {
+  return (0.2 + std::exp(-x + 1.75)) / (1.0 + std::exp(-x + 1.75));
+}
+}
+
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::TrajectoryPoint;
@@ -78,7 +84,7 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
   for (double path_s = 0.0; path_s < (end_s - start_s);
        path_s += config_.path_resolution()) {
     const double l = std::fabs(curve.Evaluate(0, path_s));
-    path_cost += l * l * config_.path_l_cost();
+    path_cost += l * l * config_.path_l_cost() * QuasiSoftMax(l);
 
     const double dl = std::fabs(curve.Evaluate(1, path_s));
     path_cost += dl * dl * config_.path_dl_cost();
