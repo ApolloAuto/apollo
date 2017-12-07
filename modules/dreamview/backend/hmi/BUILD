@@ -13,6 +13,14 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "vehicle_manager_main",
+    srcs = ["vehicle_manager_main.cc"],
+    deps = [
+        ":vehicle_manager",
+    ],
+)
+
 cc_library(
     name = "hmi",
     srcs = ["hmi.cc"],
