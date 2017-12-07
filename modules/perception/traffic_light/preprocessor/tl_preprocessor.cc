@@ -141,47 +141,143 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
   MutexLock lock(&mutex_);
   PERF_FUNCTION();
   CameraId camera_id = image->camera_id();
-  double timestamp = image->ts();
+  double image_ts = image->ts();
   bool sync_ok = false;
   double diff_image_pose_ts = 0.0;
   double diff_image_sys_ts = 0.0;
 
-  // sync image with cached lights projections
-  if (!SyncImageWithCachedLights(image, image_lights, &diff_image_pose_ts,
-                                 &diff_image_sys_ts, &sync_ok)) {
-    auto camera_id_str = (kCameraIdToStr.find(camera_id) != kCameraIdToStr.end()
-                              ? kCameraIdToStr.at(camera_id)
-                              : std::to_string(camera_id));
-    AINFO << "sync_image_with_cached_lights_projections failed, "
-          << "not publish image to shared data, ts: "
-          << GLOG_TIMESTAMP(timestamp) << ", camera_id: " << camera_id_str;
-    *should_pub = false;
+  PERF_FUNCTION();
+  if (cached_lights_.size() == 0) {
+    AINFO << "No cached light";
+    return false;
+  }
+  const int cam_id = static_cast<int>(camera_id);
+  if (cam_id < 0 || cam_id >= kCountCameraId) {
+    AERROR << "SyncImageWithCachedLights failed, "
+           << "get unknown CameraId: " << camera_id;
     return false;
   }
 
+  // find close enough(by timestamp difference)
+  // lights projection from back to front
+  bool no_signal = false;
+
+  bool find_loc = false;  // if pose is found
+  auto cached_lights_ptr = cached_lights_.rbegin();
+  for (; cached_lights_ptr != cached_lights_.rend(); ++cached_lights_ptr) {
+    double light_ts = (*cached_lights_ptr)->timestamp;
+    if (fabs(light_ts - image_ts) < sync_interval_seconds_) {
+      find_loc = true;
+      auto proj_cam_id = static_cast<int>((*cached_lights_ptr)->camera_id);
+      auto image_cam_id = static_cast<int>(camera_id);
+      auto proj_cam_id_str =
+          (kCameraIdToStr.find(proj_cam_id) != kCameraIdToStr.end()
+           ? kCameraIdToStr.at(proj_cam_id)
+           : std::to_string(proj_cam_id));
+      // found related pose but if camear ID doesn't match
+      if (proj_cam_id != image_cam_id) {
+        AWARN << "find appropriate localization, but camera_id not match"
+              << ", cached projection's camera_id: " << proj_cam_id_str
+              << " , image's camera_id: " << kCameraIdToStr.at(image_cam_id);
+        continue;
+      }
+      if (image_ts < last_output_ts_) {
+        AWARN << "TLPreprocessor reject the image pub ts:"
+              << GLOG_TIMESTAMP(image_ts)
+              << " which is earlier than last output ts:"
+              << GLOG_TIMESTAMP(last_output_ts_)
+              << ", image camera_id: " << kCameraIdToStr.at(image_cam_id);
+        return false;
+      }
+      sync_ok = true;
+      break;
+    }
+  }
+
+  if (sync_ok) {
+    *image_lights = *cached_lights_ptr;
+    (*image_lights)->image = image;
+    (*image_lights)->timestamp = image_ts;
+    (*image_lights)->diff_image_pose_ts =
+        image_ts - (*cached_lights_ptr)->timestamp;
+    (*image_lights)->diff_image_sys_ts = image_ts - TimeUtil::GetCurrentTime();
+    AINFO << "TLPreprocessor sync ok ts: " << GLOG_TIMESTAMP(image_ts)
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
+    last_output_ts_ = image_ts;
+    last_pub_camera_id_ = camera_id;
+    *should_pub = true;
+  } else {
+    AINFO << "sync image with cached lights projection failed, "
+          << "no valid pose, ts: " << GLOG_TIMESTAMP(image_ts)
+          << " camera_id: " << kCameraIdToStr.at(camera_id);
+    std::string cached_array_str = "cached lights";
+    if (fabs(image_ts - last_no_signals_ts_) < no_signals_interval_seconds_) {
+      AINFO << "TLPreprocessor " << cached_array_str
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << " last_no_signals_ts: " << GLOG_TIMESTAMP(last_no_signals_ts_)
+            << " (sync_time - last_no_signals_ts): "
+            << GLOG_TIMESTAMP(image_ts - last_no_signals_ts_)
+            << " query /tf in low frequence because no signals forward "
+            << " camera_id: " << kCameraIdToStr.at(camera_id);
+      no_signal = true;
+    } else if (image_ts < cached_lights_.front()->timestamp) {
+      double pose_ts = cached_lights_.front()->timestamp;
+      double system_ts = TimeUtil::GetCurrentTime();
+      AWARN << "TLPreprocessor " << cached_array_str
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << ", which is earlier than " << cached_array_str
+            << ".front() ts: " << GLOG_TIMESTAMP(pose_ts)
+            << ", diff between image and pose ts: "
+            << GLOG_TIMESTAMP(image_ts - pose_ts)
+            << "; system ts: " << GLOG_TIMESTAMP(system_ts)
+            << ", diff between image and system ts: "
+            << GLOG_TIMESTAMP(image_ts - system_ts)
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
+      // difference between image and pose timestamps
+      diff_image_pose_ts = image_ts - pose_ts;
+      diff_image_sys_ts = image_ts - system_ts;
+    } else if (image_ts > cached_lights_.back()->timestamp) {
+      double pose_ts = cached_lights_.back()->timestamp;
+      double system_ts = TimeUtil::GetCurrentTime();
+      AWARN << "TLPreprocessor " << cached_array_str
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << ", which is older than " << cached_array_str
+            << ".back() ts: " << GLOG_TIMESTAMP(pose_ts)
+            << ", diff between image and pose ts: "
+            << GLOG_TIMESTAMP(image_ts - pose_ts)
+            << "; system ts: " << GLOG_TIMESTAMP(system_ts)
+            << ", diff between image and system ts: "
+            << GLOG_TIMESTAMP(image_ts - system_ts)
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
+      diff_image_pose_ts = image_ts - pose_ts;
+      diff_image_sys_ts = image_ts - system_ts;
+    } else if (!find_loc) {
+      // if no pose found, log warning msg
+      AWARN << "TLPreprocessor " << cached_array_str
+            << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
+            << ", cannot find close enough timestamp, " << cached_array_str
+            << ".front() ts: "
+            << GLOG_TIMESTAMP(cached_lights_.front()->timestamp) << ", "
+            << cached_array_str << ".back() ts: "
+            << GLOG_TIMESTAMP(cached_lights_.back()->timestamp)
+            << ", camera_id: " << kCameraIdToStr.at(camera_id);
+    }
+    if (image->camera_id() == LONG_FOCUS &&
+        (no_signal || last_pub_camera_id_ == LONG_FOCUS)) {
+      *should_pub = true;
+      (*image_lights).reset(new ImageLights);
+      (*image_lights)->image = image;
+      (*image_lights)->timestamp = image_ts;
+      (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
+      (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
+      (*image_lights)->is_pose_valid = no_signal;
+      (*image_lights)->num_signals = 0;
+    }
+  }
   // sync fail may because:
   // 1. image is not selected
   // 2. timestamp drift
   // 3. [there is no tf]
-  if (!sync_ok) {
-    AINFO << "sync image with cached lights projection failed, "
-          << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-          << " camera_id: " << kCameraIdToStr.at(camera_id);
-    *should_pub = false;
-    return false;
-  }
-  if (sync_ok) {
-    AINFO << "TLPreprocessor sync ok ts: " << GLOG_TIMESTAMP(timestamp)
-          << " camera_id: " << kCameraIdToStr.at(camera_id);
-    last_output_ts_ = timestamp;
-    last_pub_camera_id_ = camera_id;
-  } else {
-    AINFO << "sync image with cached lights projection failed, "
-          << "no valid pose, ts: " << GLOG_TIMESTAMP(timestamp)
-          << " camera_id: " << kCameraIdToStr.at(camera_id);
-  }
-  *should_pub = sync_ok;
-
   return sync_ok;
 }
 
@@ -292,8 +388,8 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
       auto image_cam_id = static_cast<int>(camera_id);
       auto proj_cam_id_str =
           (kCameraIdToStr.find(proj_cam_id) != kCameraIdToStr.end()
-               ? kCameraIdToStr.at(proj_cam_id)
-               : std::to_string(proj_cam_id));
+           ? kCameraIdToStr.at(proj_cam_id)
+           : std::to_string(proj_cam_id));
       // found related pose but if camear ID doesn't match
       if (proj_cam_id != image_cam_id) {
         AWARN << "find appropriate localization, but camera_id not match"
@@ -318,6 +414,9 @@ bool TLPreprocessor::SyncImageWithCachedLights(const ImageSharedPtr &image,
     *image_lights = *cached_lights_ptr;
     (*image_lights)->image = image;
     (*image_lights)->timestamp = image_ts;
+    (*image_lights)->diff_image_pose_ts =
+        image_ts - (*cached_lights_ptr)->timestamp;
+    (*image_lights)->diff_image_sys_ts = image_ts - TimeUtil::GetCurrentTime();
   }
 
   std::string cached_array_str = "cached lights";
