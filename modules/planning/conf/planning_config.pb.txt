@@ -10,8 +10,6 @@ em_planner_config {
 
     task : SPEED_DECIDER
 
-    task : QP_SPLINE_PATH_OPTIMIZER
-
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
