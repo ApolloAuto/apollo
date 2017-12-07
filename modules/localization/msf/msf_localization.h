@@ -40,10 +40,10 @@
 
 #include "glog/logging.h"
 #include "gtest/gtest_prod.h"
+#include "include/localization_integ.h"
 #include "modules/common/monitor/monitor.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
-#include "modules/localization/msf/local_integ/localization_integ.h"
 
 /**
  * @namespace apollo::localization
