@@ -104,19 +104,18 @@ bool ChangeLaneDecider::Apply(
   double now = Clock::NowInSecond();
 
   if (!prev_state) {
-    UpdateState(now, ChangeLaneState::FORWARD,
-                reference_line_info->front().Lanes().Id());
+    UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS,
+                GetCurrentPathId(*reference_line_info));
     return true;
   }
 
   bool has_change_lane = reference_line_info->size() > 1;
   if (!has_change_lane) {
     const auto& path_id = reference_line_info->front().Lanes().Id();
-    if (prev_state->state() == ChangeLaneState::FORWARD) {
+    if (prev_state->state() == ChangeLaneState::CHANGE_LANE_SUCCESS) {
     } else if (prev_state->state() == ChangeLaneState::IN_CHANGE_LANE) {
-      UpdateState(now, ChangeLaneState::FORWARD, path_id);
+      UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS, path_id);
     } else if (prev_state->state() == ChangeLaneState::CHANGE_LANE_FAILED) {
-      UpdateState(now, ChangeLaneState::FORWARD, path_id);
     } else {
       AERROR << "Unknown state: " << prev_state->ShortDebugString();
       return false;
@@ -133,19 +132,23 @@ bool ChangeLaneDecider::Apply(
         PrioritizeChangeLane(reference_line_info);
       } else {
         RemoveChangeLane(reference_line_info);
-        UpdateState(now, ChangeLaneState::FORWARD, current_path_id);
+        UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS, current_path_id);
       }
       return true;
     } else if (prev_state->state() == ChangeLaneState::CHANGE_LANE_FAILED) {
-      RemoveChangeLane(reference_line_info);
-      UpdateState(now, ChangeLaneState::FORWARD, current_path_id);
+      if (now - prev_state->timestamp() < FLAGS_change_lane_fail_freeze_time) {
+        RemoveChangeLane(reference_line_info);
+      } else {
+        UpdateState(now, ChangeLaneState::IN_CHANGE_LANE, current_path_id);
+      }
       return true;
-    } else if (prev_state->state() == ChangeLaneState::FORWARD) {
-      if (now - prev_state->timestamp() > FLAGS_freeze_change_lane_time) {
+    } else if (prev_state->state() == ChangeLaneState::CHANGE_LANE_SUCCESS) {
+      if (now - prev_state->timestamp() <
+          FLAGS_change_lane_success_freeze_time) {
+        RemoveChangeLane(reference_line_info);
+      } else {
         PrioritizeChangeLane(reference_line_info);
         UpdateState(now, ChangeLaneState::IN_CHANGE_LANE, current_path_id);
-      } else {
-        RemoveChangeLane(reference_line_info);
       }
     } else {
       AERROR << "Unknown state: " << prev_state->ShortDebugString();

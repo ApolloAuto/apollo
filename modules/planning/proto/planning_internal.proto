@@ -92,9 +92,9 @@ message ObstacleDebug {
 
 message ChangeLaneState {
    enum State {
-       FORWARD = 1; // drive forward, no change lane
-       IN_CHANGE_LANE = 2; // during change lane state
-       CHANGE_LANE_FAILED = 3; // change lane failed
+       IN_CHANGE_LANE = 1; // during change lane state
+       CHANGE_LANE_FAILED = 2; // change lane failed
+       CHANGE_LANE_SUCCESS = 3; // change lane failed
    }
    optional State state = 1;
    // the id of the route segment that the vehicle is driving on
