@@ -25,6 +25,7 @@ from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.common.proto import drive_event_pb2
 
 import proto_utils
 
@@ -71,7 +72,9 @@ topic_pb_list = [
     MessageType("localization", "/apollo/localization/pose",
                 localization_pb2.LocalizationEstimate),
     MessageType("traffic_light", "/apollo/perception/traffic_light",
-                traffic_light_detection_pb2.TrafficLightDetection)
+                traffic_light_detection_pb2.TrafficLightDetection),
+    MessageType("drive_event", "/apollo/drive_event",
+                drive_event_pb2.DriveEvent),
 ]
 
 
