@@ -80,7 +80,7 @@ class Stream {
       write(_login_data[i]);
       ROS_INFO_STREAM("Login: " << _login_data[i]);
       // sleep a little to avoid overun of the slow serial interface.
-      ros::Duration(0.2).sleep();
+      ros::Duration(0.5).sleep();
     }
   }
 
