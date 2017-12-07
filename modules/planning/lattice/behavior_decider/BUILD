@@ -116,6 +116,7 @@ cc_library(
         "//modules/planning/lattice/util:util",
         "//modules/planning/lattice/util:lattice_params",
         "//modules/planning/lattice/util:reference_line_matcher",
+        "//modules/common/math:linear_interpolation",
         "@glog//:glog",
     ],
 )

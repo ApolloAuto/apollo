@@ -25,6 +25,7 @@
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/util/lattice_util.h"
+#include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
 namespace planning {
@@ -32,6 +33,35 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
+
+namespace {
+
+int LastIndexBefore(const prediction::Trajectory& trajectory,
+                    const double t) {
+  int num_traj_point = trajectory.trajectory_point_size();
+  if (num_traj_point == 0) {
+    return -1;
+  }
+  if (trajectory.trajectory_point(0).relative_time() > t) {
+    return -1;
+  }
+  int start = 0;
+  int end = num_traj_point - 1;
+  while (start < end) {
+    int mid = start + (end - start) / 2;
+    if (trajectory.trajectory_point(mid).relative_time() <= t) {
+      start = mid;
+    } else {
+      end = mid;
+    }
+  }
+  if (trajectory.trajectory_point(end).relative_time() <= t) {
+    return end;
+  }
+  return start;
+}
+
+}  // namespace
 
 PathTimeNeighborhood::PathTimeNeighborhood(
     const Frame* frame,
@@ -52,6 +82,13 @@ void PathTimeNeighborhood::SetupObstacles(
   for (const Obstacle* obstacle : obstacles) {
     if (obstacle->Trajectory().trajectory_point_size() == 0) {
       continue;
+    }
+
+    if (prediction_traj_map_.find(obstacle->Id()) ==
+        prediction_traj_map_.end()) {
+      prediction_traj_map_[obstacle->Id()] = obstacle->Trajectory();
+    } else {
+      AWARN << "Duplicated obstacle found [" << obstacle->Id() << "]";
     }
 
     double relative_time = 0.0;
@@ -132,6 +169,33 @@ void PathTimeNeighborhood::SetupObstacles(
 
     path_time_obstacle.second.set_time_upper(t_upper);
   }
+}
+
+double PathTimeNeighborhood::SpeedAtT(
+    const std::string& obstacle_id, const double t) {
+  bool found = prediction_traj_map_.find(obstacle_id) !=
+               prediction_traj_map_.end();
+  CHECK(found);
+  CHECK_GE(t, 0.0);
+  const prediction::Trajectory& trajectory =
+      prediction_traj_map_[obstacle_id];
+  int num_traj_point = trajectory.trajectory_point_size();
+  CHECK_GT(num_traj_point, 0);
+
+  int index = LastIndexBefore(trajectory, t);
+  if (index == -1) {
+    return trajectory.trajectory_point(0).v();
+  }
+  if (index == num_traj_point - 1) {
+    return trajectory.trajectory_point(index).v();
+  }
+
+  double v_before = trajectory.trajectory_point(index).v();
+  double t_before = trajectory.trajectory_point(index).relative_time();
+  double v_after = trajectory.trajectory_point(index + 1).v();
+  double t_after = trajectory.trajectory_point(index + 1).relative_time();
+  
+  return apollo::common::math::lerp(v_before, t_before, v_after, t_after, t);
 }
 
 PathTimePoint PathTimeNeighborhood::SetPathTimePoint(const std::string& obstacle_id,
