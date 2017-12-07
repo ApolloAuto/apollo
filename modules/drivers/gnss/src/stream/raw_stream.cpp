@@ -368,7 +368,7 @@ bool RawStream::login() {
     login_data.emplace_back(login_command);
     ROS_INFO_STREAM("Login command: " << login_command);
     // sleep a little to avoid overun of the slow serial interface.
-    ros::Duration(0.2).sleep();
+    ros::Duration(0.5).sleep();
   }
   _command_stream->register_login_data(login_data);
   return true;
