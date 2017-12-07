@@ -21,6 +21,7 @@
 #include <queue>
 
 #include "modules/common/log.h"
+#include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
@@ -29,8 +30,6 @@
 namespace apollo {
 namespace routing {
 namespace {
-
-constexpr double LANE_CHANGE_SKIP_S = 10.0;
 
 struct SearchNode {
   const TopoNode* topo_node = nullptr;
@@ -264,9 +263,11 @@ bool AStarStrategy::Search(const TopoGraph* graph,
     }
     closed_set_.emplace(from_node);
 
-    // if residual_s is less than LANE_CHANGE_SKIP_S, only move forward
+    // if residual_s is less than FLAGS_min_length_for_lane_change, only move
+    // forward
     const auto& neighbor_edges =
-        (GetResidualS(from_node) > LANE_CHANGE_SKIP_S && change_lane_enabled_)
+        (GetResidualS(from_node) > FLAGS_min_length_for_lane_change &&
+         change_lane_enabled_)
             ? from_node->OutToAllEdge()
             : from_node->OutToSucEdge();
     double tentative_g_score = 0.0;
@@ -282,7 +283,7 @@ bool AStarStrategy::Search(const TopoGraph* graph,
       if (closed_set_.count(to_node) == 1) {
         continue;
       }
-      if (GetResidualS(edge, to_node) < LANE_CHANGE_SKIP_S) {
+      if (GetResidualS(edge, to_node) < FLAGS_min_length_for_lane_change) {
         continue;
       }
       tentative_g_score =
@@ -299,9 +300,10 @@ bool AStarStrategy::Search(const TopoGraph* graph,
       if (edge->Type() == TopoEdgeType::TET_FORWARD) {
         enter_s_[to_node] = to_node->StartS();
       } else {
-        // else, add enter_s with LANE_CHANGE_SKIP_S
-        double to_node_enter_s = (enter_s_[from_node] + LANE_CHANGE_SKIP_S) /
-                                 from_node->Length() * to_node->Length();
+        // else, add enter_s with FLAGS_min_length_for_lane_change
+        double to_node_enter_s =
+            (enter_s_[from_node] + FLAGS_min_length_for_lane_change) /
+            from_node->Length() * to_node->Length();
         // enter s could be larger than end_s but should be less than length
         to_node_enter_s = std::min(to_node_enter_s, to_node->Length());
         // if enter_s is larger than end_s and to_node is dest_node
