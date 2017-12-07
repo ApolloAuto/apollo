@@ -64,6 +64,8 @@ Status Dreamview::Init() {
       << "RoutingResponseAdapter is not initialized.";
   CHECK(AdapterManager::GetCompressedImage())
       << "CompressedImageAdapter is not initialized.";
+  CHECK(AdapterManager::GetImageShort())
+      << "ImageShortAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.

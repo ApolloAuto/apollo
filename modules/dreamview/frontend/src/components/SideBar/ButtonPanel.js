@@ -2,7 +2,6 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-
 class SideBarButton extends React.Component {
     render() {
         const { disabled, onClick, active, label, extraClasses } = this.props;
@@ -19,40 +18,6 @@ class SideBarButton extends React.Component {
     }
 }
 
-class DashCamButton extends React.Component {
-    constructor(props) {
-      super(props);
-      this.onClickHandler = this.onClickHandler.bind(this);
-    }
-
-    onClickHandler() {
-      this.fileInput.value = null;
-      this.fileInput.click();
-    }
-
-    render() {
-        const { disabled, onClick, video } = this.props;
-
-        return (
-          <div>
-            <input  style={{display: "none"}}
-                    ref={(input) => {
-                        this.fileInput = input;
-                    }}
-                    type="file"
-                    accept="video/*"
-                    onChange={onClick}/>
-            <button onClick={this.onClickHandler}
-                    disabled={disabled}
-                    className="button">
-                DashCam Video
-            </button>
-          </div>
-        );
-    }
-}
-
-
 export default class ButtonPanel extends React.Component {
     render() {
         const { enableHMIButtonsOnly,
@@ -63,7 +28,8 @@ export default class ButtonPanel extends React.Component {
                 onPOI, showPOI,
                 onPNCMonitor, showPNCMonitor,
                 onConsole, showConsole,
-                resetBackend, dumpMessages, onVideo} = this.props;
+                resetBackend, dumpMessages,
+                onVideo, showVideo} = this.props;
 
         return (
             <div>
@@ -103,8 +69,10 @@ export default class ButtonPanel extends React.Component {
                                disabled={enableHMIButtonsOnly}
                                onClick={dumpMessages}
                                active={false} />
-                <DashCamButton disabled={enableHMIButtonsOnly}
-                               onClick={onVideo}/>
+                <SideBarButton label="Sensor Camera"
+                               disabled={enableHMIButtonsOnly}
+                               onClick={onVideo}
+                               active={showVideo} />
             </div>
         );
     }
