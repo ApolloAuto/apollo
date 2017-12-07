@@ -101,19 +101,29 @@ bool DirectoryExists(const std::string &directory_path) {
 
 bool CopyFile(const std::string &from, const std::string &to) {
   std::ifstream src(from, std::ios::binary);
-  std::ofstream dst(to, std::ios::binary);
-  if (src && dst) {
-    dst << src.rdbuf();
-    return true;
+  if (!src) {
+    AERROR << "Source path doesn't exist: " << from;
+    return false;
   }
-  AERROR_IF(src && !dst) << "Target path is not writable: " << to;
-  return false;
+
+  std::ofstream dst(to, std::ios::binary);
+  if (!dst) {
+    AERROR << "Target path is not writable: " << to;
+    return false;
+  }
+
+  dst << src.rdbuf();
+  return true;
 }
 
 bool CopyDir(const std::string &from, const std::string &to) {
   DIR *directory = opendir(from.c_str());
   if (directory == nullptr) {
     AERROR << "Cannot open directory " << from;
+    return false;
+  }
+  if (!EnsureDirectory(to)) {
+    AERROR << "Cannot create target directory " << to;
     return false;
   }
 
@@ -134,6 +144,10 @@ bool CopyDir(const std::string &from, const std::string &to) {
   }
   closedir(directory);
   return ret;
+}
+
+bool Copy(const std::string &from, const std::string &to) {
+  return DirectoryExists(from) ? CopyDir(from, to) : CopyFile(from, to);
 }
 
 bool EnsureDirectory(const std::string &directory_path) {
