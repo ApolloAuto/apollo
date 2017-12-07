@@ -179,8 +179,7 @@ bool DPRoadGraph::GenerateMinCostPath(
 bool DPRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
-  constexpr double kSamplePointLookForwardTimeChangeLane = 3.0;
-  constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
+  constexpr double kSamplePointLookForwardTime = 4.0;
   CHECK(points != nullptr);
 
   const double kAdditioalPathLength = 20.0;
@@ -189,16 +188,9 @@ bool DPRoadGraph::SamplePathWaypoints(
                     kAdditioalPathLength,
                 reference_line_.Length());
 
-  double level_distance = 0.0;
-  if (reference_line_info_.IsChangeLanePath()) {
-    level_distance =
-        std::max(config_.step_length_min(),
-                 init_point.v() * kSamplePointLookForwardTimeChangeLane);
-  } else {
-    level_distance = common::math::Clamp(
-        init_point.v() * kSamplePointLookForwardTimeNoChangeLane,
-        config_.step_length_min(), config_.step_length_max());
-  }
+  const double level_distance =
+      common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
+                          config_.step_length_min(), config_.step_length_max());
   double accumulated_s = init_sl_point_.s();
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     std::vector<common::SLPoint> level_points;
@@ -214,8 +206,13 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width;
     const double eff_left_width = left_width - half_adc_width;
 
+    const double sample_right_boundary =
+        std::fmin(-eff_right_width, init_sl_point_.l());
+    const double sample_left_boundary =
+        std::fmax(eff_left_width, init_sl_point_.l());
+
     std::vector<double> sample_l;
-    common::util::uniform_slice(-eff_right_width, eff_left_width,
+    common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
     for (double l : sample_l) {
