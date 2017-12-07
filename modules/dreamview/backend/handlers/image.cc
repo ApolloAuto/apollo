@@ -30,10 +30,12 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 
+constexpr double ImageHandler::kImageScale;
+
 template <>
 void ImageHandler::OnImage(const sensor_msgs::Image &image) {
   if (image.encoding != "yuyv") {
-    AERROR << "Image format not support: " << image.encoding;
+    AERROR_EVERY(100) << "Image format not support: " << image.encoding;
     return;
   }
 
@@ -43,10 +45,10 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
                                                  image.height * image.width);
   cv::cvtColor(mat, mat, CV_RGB2BGR);
 
-  int scale_down = 5;
   cv::resize(mat, mat,
-             cv::Size(image.width / scale_down, image.height / scale_down), 0,
-             0, CV_INTER_LINEAR);
+             cv::Size(image.width * ImageHandler::kImageScale,
+                      image.height * ImageHandler::kImageScale),
+             0, 0, CV_INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
   cv::imencode(".jpg", mat, send_buffer_, std::vector<int>() /* params */);
