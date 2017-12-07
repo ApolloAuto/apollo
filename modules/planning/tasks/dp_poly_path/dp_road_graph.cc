@@ -118,7 +118,8 @@ bool DPRoadGraph::GenerateMinCostPath(
   CHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
-  if (!SamplePathWaypoints(init_point_, &path_waypoints)) {
+  if (!SamplePathWaypoints(init_point_, &path_waypoints) ||
+      path_waypoints.size() < 2) {
     AERROR << "Fail to sample path waypoints!";
     return false;
   }
@@ -133,6 +134,10 @@ bool DPRoadGraph::GenerateMinCostPath(
                                  init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
+  if (graph_nodes.size() < 2) {
+    AERROR << "Too few graph_nodes.";
+    return false;
+  }
   graph_nodes[0].emplace_back(init_sl_point_, nullptr, 0.0);
 
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
@@ -200,11 +205,13 @@ bool DPRoadGraph::SamplePathWaypoints(
     double left_width = 0.0;
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
+
+    constexpr double kBoundaryBuff = 0.10;
     const auto &vehicle_config =
         common::VehicleConfigHelper::instance()->GetConfig();
     const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
-    const double eff_right_width = right_width - half_adc_width;
-    const double eff_left_width = left_width - half_adc_width;
+    const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
+    const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
     const double sample_right_boundary =
         std::fmin(-eff_right_width, init_sl_point_.l());
@@ -215,8 +222,16 @@ bool DPRoadGraph::SamplePathWaypoints(
     common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
-    for (double l : sample_l) {
-      level_points.emplace_back(common::util::MakeSLPoint(s, l));
+    for (uint8_t j = 0; j < sample_l.size(); ++j) {
+      const double l = sample_l[j];
+
+      if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
+        level_points.emplace_back(common::util::MakeSLPoint(s, l));
+      } else {
+        constexpr double kResonateDistance = 1.0;
+        level_points.emplace_back(common::util::MakeSLPoint(
+            std::fmin(total_length, s + kResonateDistance), l));
+      }
     }
     if (!level_points.empty()) {
       points->emplace_back(level_points);

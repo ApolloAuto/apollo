@@ -114,7 +114,7 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
 
   // preprocess send a msg -> proc receive a msg
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
-                               image_lights->preprocess_send_timestamp);
+      image_lights->preprocess_send_timestamp);
 
   if (TimeUtil::GetCurrentTime() - event.local_timestamp > valid_ts_interval_) {
     AERROR << "TLProcSubnode failed to process image"
@@ -189,13 +189,13 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
         << " revise_latency: " << revise_latency * 1000 << " ms."
         << " TLProcSubnode::handle_event latency: "
         << (TimeUtil::GetCurrentTime() - proc_subnode_handle_event_start_ts) *
-               1000
+            1000
         << " ms."
         << " enter_proc_latency: " << enter_proc_latency * 1000 << " ms."
         << " preprocess_latency: "
         << (image_lights->preprocess_send_timestamp -
             image_lights->preprocess_receive_timestamp) *
-               1000
+            1000
         << " ms.";
 
   return true;
@@ -338,12 +338,14 @@ bool TLProcSubnode::ComputeImageBorder(const ImageLights &image_lights,
   LightPtrs &lights_ref = *(image_lights.lights.get());
   int max_offset = -1;
   for (size_t i = 0; i < lights_ref.size(); ++i) {
-    cv::Rect rectified_roi = lights_ref[i]->region.rectified_roi;
-    cv::Rect projection_roi = lights_ref[i]->region.projection_roi;
-    // pick up traffic light with biggest offset
-    int offset = 0;
-    ComputeRectsOffset(projection_roi, rectified_roi, &offset);
-    max_offset = std::max(max_offset, offset);
+    if (lights_ref[i]->region.is_detected) {
+      cv::Rect rectified_roi = lights_ref[i]->region.rectified_roi;
+      cv::Rect projection_roi = lights_ref[i]->region.projection_roi;
+      // pick up traffic light with biggest offset
+      int offset = 0;
+      ComputeRectsOffset(projection_roi, rectified_roi, &offset);
+      max_offset = std::max(max_offset, offset);
+    }
   }
   if (max_offset != -1) {
     *image_border = max_offset;
