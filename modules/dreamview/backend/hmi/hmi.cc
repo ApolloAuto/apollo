@@ -367,7 +367,7 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
     return;
   }
 
-  CHECK(VehicleManager::UseVehicle(*vehicle));
+  CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
 
   RunModeCommand("stop");
   status_.set_current_vehicle(vehicle_name);

@@ -19,6 +19,9 @@
 
 #include <string>
 
+#include "modules/common/macro.h"
+#include "modules/dreamview/proto/hmi_config.pb.h"
+
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
@@ -28,7 +31,12 @@ namespace dreamview {
 
 class VehicleManager {
  public:
-  static bool UseVehicle(const std::string &vehicle_data_path);
+  bool UseVehicle(const std::string &vehicle_data_path);
+
+ private:
+  VehicleData vehicle_data_;
+
+  DECLARE_SINGLETON(VehicleManager);
 };
 
 }  // namespace dreamview
