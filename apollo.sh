@@ -118,9 +118,7 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
   echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
-  if [ $? -eq 0 ]; then
-    success 'Build passed!'
-  else
+  if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
 
@@ -129,6 +127,16 @@ function build() {
 
   # Update task info template on compiling.
   bazel-bin/modules/data/util/update_task_info --commit_id=$(git rev-parse HEAD)
+
+  if [ -d /apollo-simulator ]; then
+      cd /apollo-simulator && bash build.sh build
+      if [ $? -ne 0 ]; then
+        fail 'Build failed!'
+      fi
+  fi
+  if [ $? -eq 0 ]; then
+    success 'Build passed!'
+  fi
 }
 
 function cibuild() {
@@ -353,12 +361,22 @@ function run_test() {
   else
     echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
+  if [ $? -ne 0 ]; then
+    fail 'Test failed!'
+    return 1
+  fi
+
+  if [ -d /apollo-simulator ]; then
+      cd /apollo-simulator && bash build.sh test
+      if [ $? -ne 0 ]; then
+        fail 'Test failed!'
+        return 1
+      fi
+  fi
+
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
-  else
-    fail 'Test failed!'
-    return 1
   fi
 }
 
