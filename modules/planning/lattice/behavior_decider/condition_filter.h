@@ -32,8 +32,11 @@ namespace planning {
 class ConditionFilter {
  public:
   ConditionFilter(
-      const std::array<double, 3>& init_s, const double speed_limit,
-      const PathTimeNeighborhood& path_time_neighborhood);
+      const Frame* frame,
+      const std::array<double, 3>& init_s,
+      const double speed_limit,
+      const ReferenceLine& reference_line,
+      const std::vector<common::PathPoint>& discretized_ref_points);
 
   std::vector<SampleBound> QuerySampleBounds(const double t) const;
 
@@ -43,7 +46,7 @@ class ConditionFilter {
   QueryPathTimeObstacleIntervals(const double t) const;
 
  private:
-  void Init(const PathTimeNeighborhood& path_time_neighborhood);
+  void Init();
 
   // Return true only if t is within the range of time slot,
   // but will output block interval anyway(maybe be extension)
