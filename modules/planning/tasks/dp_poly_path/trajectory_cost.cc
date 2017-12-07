@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -65,15 +66,20 @@ TrajectoryCost::TrajectoryCost(
     if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle
       continue;
-    }
-    std::vector<Box2d> box_by_time;
-    for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
-      TrajectoryPoint trajectory_point =
-          ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
+    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
+      TrajectoryPoint trajectory_point = ptr_obstacle->GetPointAtTime(0.0);
       Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-      box_by_time.push_back(obstacle_box);
+      static_obstacle_boxes_.push_back(std::move(obstacle_box));
+    } else {
+      std::vector<Box2d> box_by_time;
+      for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
+        TrajectoryPoint trajectory_point =
+            ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
+        Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
+        box_by_time.push_back(obstacle_box);
+      }
+      dynamic_obstacle_boxes_.push_back(std::move(box_by_time));
     }
-    obstacle_boxes_.push_back(box_by_time);
   }
 }
 
@@ -95,7 +101,7 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
   return path_cost;
 }
 
-double TrajectoryCost::CalculateObstacleCost(
+double TrajectoryCost::CalculateStaticObstacleCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
     const double end_s) const {
   double obstacle_cost = 0.0;
@@ -119,20 +125,73 @@ double TrajectoryCost::CalculateObstacleCost(
         common::math::NormalizeAngle(delta_theta + reference_point.heading());
     const Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
                            vehicle_param_.width()};
-    for (const auto &obstacle_trajectory : obstacle_boxes_) {
-      auto &obstacle_box = obstacle_trajectory.back();
-      // Simple version: calculate obstacle cost by distance
-      const double distance = obstacle_box.DistanceTo(ego_box);
-      if (distance > config_.obstacle_ignore_distance()) {
-        continue;
-      } else if (distance <= config_.obstacle_collision_distance()) {
-        obstacle_cost += config_.obstacle_collision_cost();
-      } else if (distance <= config_.obstacle_risk_distance()) {
-        obstacle_cost += RiskDistanceCost(distance);
-      } else {
-        obstacle_cost += RegularDistanceCost(distance);
-      }
+    for (const auto &obstacle_box : static_obstacle_boxes_) {
+      obstacle_cost += GetCostBetweenObsBoxes(ego_box, obstacle_box);
     }
+  }
+  return obstacle_cost;
+}
+
+double TrajectoryCost::CalculateDynamicObstacleCost(
+    const QuinticPolynomialCurve1d &curve, const double start_s,
+    const double end_s) const {
+  double obstacle_cost = 0.0;
+  double time_stamp = 0.0;
+
+  for (size_t index = 0; index < num_of_time_stamps_;
+       ++index, time_stamp += config_.eval_time_interval()) {
+    common::SpeedPoint speed_point;
+    heuristic_speed_data_.EvaluateByTime(time_stamp, &speed_point);
+    if (speed_point.s() < start_s - init_sl_point_.s()) {
+      continue;
+    }
+    if (speed_point.s() > end_s - init_sl_point_.s()) {
+      break;
+    }
+
+    const double s = init_sl_point_.s() + speed_point.s() - start_s;
+    const double l = curve.Evaluate(0, s);
+    const double dl = curve.Evaluate(1, s);
+
+    common::SLPoint sl;
+    sl.set_s(init_sl_point_.s() + speed_point.s());
+    sl.set_l(l);
+
+    Vec2d ego_xy_point;
+    reference_line_->SLToXY(sl, &ego_xy_point);
+
+    ReferencePoint reference_point = reference_line_->GetReferencePoint(
+        init_sl_point_.s() + speed_point.s());
+
+    const double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
+    const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
+    const double theta =
+        common::math::NormalizeAngle(delta_theta + reference_point.heading());
+    const Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
+                           vehicle_param_.width()};
+    for (const auto &obstacle_trajectory : dynamic_obstacle_boxes_) {
+      obstacle_cost +=
+          GetCostBetweenObsBoxes(ego_box, obstacle_trajectory.at(index));
+    }
+  }
+  return obstacle_cost;
+}
+
+double TrajectoryCost::GetCostBetweenObsBoxes(const Box2d &ego_box,
+                                              const Box2d &obstacle_box) const {
+  // Simple version: calculate obstacle cost by distance
+  const double distance = obstacle_box.DistanceTo(ego_box);
+  if (distance > config_.obstacle_ignore_distance()) {
+    return 0.0;
+  }
+
+  double obstacle_cost = 0.0;
+  if (distance <= config_.obstacle_collision_distance()) {
+    obstacle_cost += config_.obstacle_collision_cost();
+  } else if (distance <= config_.obstacle_risk_distance()) {
+    obstacle_cost += RiskDistanceCost(distance);
+  } else {
+    obstacle_cost += RegularDistanceCost(distance);
   }
   return obstacle_cost;
 }
@@ -145,7 +204,8 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
   total_cost += CalculatePathCost(curve, start_s, end_s);
 
   // Obstacle cost
-  total_cost += CalculateObstacleCost(curve, start_s, end_s);
+  total_cost += CalculateStaticObstacleCost(curve, start_s, end_s);
+  total_cost += CalculateDynamicObstacleCost(curve, start_s, end_s);
   return total_cost;
 }
 
