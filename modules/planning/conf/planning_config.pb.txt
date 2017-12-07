@@ -26,9 +26,9 @@ em_planner_config {
         obstacle_collision_distance: 0.5
         obstacle_risk_distance: 2.0
         obstacle_collision_cost: 1e6
-        path_l_cost: 1e2
+        path_l_cost: 1e1
         path_dl_cost: 1e5
-        path_ddl_cost: 1e5
+        path_ddl_cost: 1e4
     }
     dp_st_speed_config {
         total_path_length: 80
