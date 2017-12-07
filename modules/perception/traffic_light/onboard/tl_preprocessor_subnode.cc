@@ -73,11 +73,11 @@ bool TLPreprocessorSubnode::InitInternal() {
 
   using common::adapter::AdapterManager;
   CHECK(AdapterManager::GetImageLong())
-      << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
+  << "TLPreprocessorSubnode init failed.ImageLong is not initialized.";
   AdapterManager::AddImageLongCallback(
       &TLPreprocessorSubnode::SubLongFocusCamera, this);
   CHECK(AdapterManager::GetImageShort())
-      << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
+  << "TLPreprocessorSubnode init failed.ImageShort is not initialized.";
   AdapterManager::AddImageShortCallback(
       &TLPreprocessorSubnode::SubShortFocusCamera, this);
   return true;
@@ -173,8 +173,13 @@ void TLPreprocessorSubnode::SubCameraImage(
   double timestamp = msg->header.stamp.toSec();
   image->Init(timestamp, camera_id, msg);
   if (FLAGS_output_raw_img) {
+    // user should create folders
     image->GenerateMat();
-    cv::imwrite(image->camera_id_str() + ".jpg", image->mat());
+    char filename[100];
+    snprintf(filename, sizeof(filename), "%s/%lf.jpg",
+             image->camera_id_str().c_str(),
+             timestamp);
+    cv::imwrite(filename, image->mat());
   }
   AINFO << "TLPreprocessorSubnode received a image msg"
         << ", camera_id: " << kCameraIdToStr.at(camera_id)
@@ -220,7 +225,7 @@ void TLPreprocessorSubnode::SubCameraImage(
   if (fabs(image_lights->diff_image_sys_ts) > image_sys_ts_diff_threshold) {
     std::string debug_string = "";
     debug_string += ("diff_image_sys_ts:" +
-                     std::to_string(image_lights->diff_image_sys_ts));
+        std::to_string(image_lights->diff_image_sys_ts));
     debug_string += (",camera_id:" + kCameraIdToStr.at(camera_id));
     debug_string += (",camera_ts:" + std::to_string(timestamp));
 
