@@ -42,38 +42,22 @@ using apollo::common::PathPoint;
 
 BehaviorDecider::BehaviorDecider() {}
 
-// For multiple reference_line use
 PlanningTarget BehaviorDecider::Analyze(
-    Frame* frame, const common::TrajectoryPoint& init_planning_point,
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
+    const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
-    const std::vector<ReferenceLine>& candidate_reference_lines) {
-  CHECK(frame != nullptr);
-  CHECK_GT(candidate_reference_lines.size(), 0);
-
-  // Only handles one reference line
-  const ReferenceLine& ref_line = candidate_reference_lines[0];
-  const std::vector<ReferencePoint>& ref_points = ref_line.reference_points();
-
-  std::vector<common::PathPoint> discretized_ref_line =
-      ToDiscretizedReferenceLine(ref_points);
-
-  return Analyze(frame, init_planning_point, lon_init_state,
-      ref_line, discretized_ref_line);
-}
-
-PlanningTarget BehaviorDecider::Analyze(
-    Frame* frame, const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_reference_line) {
 
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
   std::vector<PlanningTarget> scenario_decisions;
+
   if (0 !=
       ScenarioManager::instance()->ComputeWorldDecision(
-          frame, init_planning_point, lon_init_state,
+          frame, reference_line_info,
+          init_planning_point, lon_init_state,
           discretized_reference_line, &scenario_decisions)) {
     AERROR << "ComputeWorldDecision error!";
   }
@@ -94,11 +78,12 @@ PlanningTarget BehaviorDecider::Analyze(
     AINFO << "GO decision made";
   }
 
-  // PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
-  //     reference_line, discretized_reference_line);
+  PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
+      reference_line_info->reference_line(),
+      discretized_reference_line);
 
   ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
-      reference_line, discretized_reference_line);
+      reference_line_info->reference_line(), discretized_reference_line);
 
   std::vector<SampleBound> sample_bounds =
       condition_filter.QuerySampleBounds();
