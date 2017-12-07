@@ -1009,6 +1009,29 @@ body {
     }
 }
 
+.video {
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    img {
+        position: relative;
+        min-width: 100px;
+        min-height: 20px;
+        max-width: 380px;
+        max-height: 300px;
+
+        @include small-screen {
+            max-width: 300px;
+            max-height: 200px;
+        }
+
+        padding: 1px;
+        border: 1px solid #383838;
+    }
+}
+
 .dashcam-player {
     z-index: 1;
     position: absolute;

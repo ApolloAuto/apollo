@@ -45,6 +45,7 @@ options:
     showPNCMonitor: false
     showQuickStarter: true
     showRouteEditingBar: false
+    showVideo: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
     showPlanningQpOptimizer: false
