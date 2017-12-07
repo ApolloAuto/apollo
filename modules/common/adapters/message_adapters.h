@@ -22,12 +22,13 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
 #include "modules/common/monitor/proto/monitor.pb.h"
+#include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -39,8 +40,8 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 #include "sensor_msgs/CompressedImage.h"
-#include "sensor_msgs/PointCloud2.h"
 #include "sensor_msgs/Image.h"
+#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @file message_adapters.h
@@ -66,6 +67,7 @@ using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
 using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
+using DriveEventAdapter = Adapter<DriveEvent>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
