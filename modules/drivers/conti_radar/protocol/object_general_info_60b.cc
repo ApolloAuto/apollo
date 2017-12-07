@@ -44,7 +44,7 @@ void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
   conti_obs->set_lateral_vel(lateral_vel(bytes, length));
   conti_obs->set_rcs(rcs(bytes, length));
   conti_obs->set_dynprop(dynprop(bytes, length));
-  double timestamp = apollo::common::time::Clock::NowInSecond();
+  double timestamp = apollo::common::time::Clock::NowInSeconds();
   auto header = conti_obs->mutable_header();
   header->CopyFrom(conti_radar->header());
   header->set_timestamp_sec(timestamp);

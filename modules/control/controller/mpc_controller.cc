@@ -472,7 +472,7 @@ void MPCController::ComputeLongitudinalErrors(
       VehicleStateProvider::instance()->linear_velocity(), matched_point,
       &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
-  const double current_control_time = Clock::NowInSecond();
+  const double current_control_time = Clock::NowInSeconds();
 
   TrajectoryPoint reference_point =
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(

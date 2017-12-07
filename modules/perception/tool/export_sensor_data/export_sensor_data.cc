@@ -176,7 +176,7 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
   ContiRadar radar_obs_proto = radar_obs;
   double timestamp = radar_obs_proto.header().timestamp_sec();
   double unix_timestamp = timestamp;
-  const double cur_time = common::time::Clock::NowInSecond();
+  const double cur_time = common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - unix_timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << GLOG_TIMESTAMP(timestamp)
         << "]:cur_time[" << GLOG_TIMESTAMP(cur_time) << "]:cur_latency["

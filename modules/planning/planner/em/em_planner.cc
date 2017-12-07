@@ -147,7 +147,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto ret = Status::OK();
 
   for (auto& optimizer : tasks_) {
-    const double start_timestamp = Clock::NowInSecond();
+    const double start_timestamp = Clock::NowInSeconds();
     ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
       reference_line_info->AddCost(std::numeric_limits<double>::infinity());
@@ -155,7 +155,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
              << "], Error message: " << ret.error_message();
       break;
     }
-    const double end_timestamp = Clock::NowInSecond();
+    const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "after optimizer " << optimizer->Name() << ":"
