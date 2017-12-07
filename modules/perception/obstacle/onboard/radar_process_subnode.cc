@@ -90,7 +90,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   ContiRadar radar_obs_proto = radar_obs;
   double timestamp = radar_obs_proto.header().timestamp_sec();
   double unix_timestamp = timestamp;
-  const double cur_time = common::time::Clock::NowInSecond();
+  const double cur_time = common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - unix_timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << GLOG_TIMESTAMP(timestamp)
         << "]:cur_time[" << GLOG_TIMESTAMP(cur_time) << "]:cur_latency["
@@ -170,7 +170,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   PERF_BLOCK_END("radar_detect");
   PublishDataAndEvent(timestamp, radar_objects);
 
-  const double end_timestamp = common::time::Clock::NowInSecond();
+  const double end_timestamp = common::time::Clock::NowInSeconds();
   const double end_latency = (end_timestamp - unix_timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time[" << GLOG_TIMESTAMP(timestamp)
         << "]:cur_time[" << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency["

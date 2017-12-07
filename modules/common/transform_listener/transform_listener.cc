@@ -90,7 +90,7 @@ void TransformListener::TfStaticCallback(
 
 void TransformListener::CallbackImpl(const tf2_msgs::TFMessage::ConstPtr& tf,
                                      bool is_static) {
-  double now = Clock::NowInSecond();
+  double now = Clock::NowInSeconds();
   if (now < last_update_) {
     AWARN << "Detected jump back in time. Clearing TF buffer.";
     buffer_->clear();

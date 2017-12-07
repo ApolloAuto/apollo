@@ -324,7 +324,7 @@ void LonController::ComputeLongitudinalErrors(
       VehicleStateProvider::instance()->linear_velocity(), matched_point,
       &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Clock::NowInSecond();
+  double current_control_time = Clock::NowInSeconds();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =

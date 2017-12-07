@@ -36,7 +36,7 @@ ChangeLaneDecider::ChangeLaneDecider() : state_key_("kChangeLaneStatus") {
 
 void ChangeLaneDecider::UpdateState(ChangeLaneState::State state_code,
                                     const std::string& path_id) {
-  UpdateState(Clock::NowInSecond(), state_code, path_id);
+  UpdateState(Clock::NowInSeconds(), state_code, path_id);
 }
 
 void ChangeLaneDecider::UpdateState(double timestamp,
@@ -101,7 +101,7 @@ bool ChangeLaneDecider::Apply(
   }
 
   auto* prev_state = dropbox_->Get(state_key_);
-  double now = Clock::NowInSecond();
+  double now = Clock::NowInSeconds();
 
   if (!prev_state) {
     UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS,

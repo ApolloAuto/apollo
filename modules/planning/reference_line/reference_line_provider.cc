@@ -219,7 +219,7 @@ void ReferenceLineProvider::GenerateThread() {
     std::this_thread::yield();
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
-    double start_time = Clock::NowInSecond();
+    double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
       continue;
@@ -231,7 +231,7 @@ void ReferenceLineProvider::GenerateThread() {
       continue;
     }
     UpdateReferenceLine(reference_lines, segments);
-    double end_time = Clock::NowInSecond();
+    double end_time = Clock::NowInSeconds();
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     last_calculation_time_ = end_time - start_time;
   }
@@ -259,13 +259,13 @@ bool ReferenceLineProvider::GetReferenceLines(
       return false;
     }
   } else {
-    double start_time = Clock::NowInSecond();
+    double start_time = Clock::NowInSeconds();
     if (!CreateReferenceLine(reference_lines, segments)) {
       AERROR << "Failed to create reference line";
       return false;
     }
     UpdateReferenceLine(*reference_lines, *segments);
-    double end_time = Clock::NowInSecond();
+    double end_time = Clock::NowInSeconds();
     last_calculation_time_ = end_time - start_time;
     return true;
   }
