@@ -27,7 +27,7 @@ function print_help() {
 
 perfect_control_topic="topic == '/apollo/prediction' \
    or topic == '/apollo/routing_response' \
-   or topic == '/apollo/perception/obstacle' \
+   or topic == '/apollo/perception/obstacles' \
    or topic == '/apollo/perception/traffic_light'"
 
 planning_deps="$perfect_control_topic \
