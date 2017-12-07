@@ -115,8 +115,9 @@ Status LatticePlanner::Plan(
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.
-  int constraint_failure_count = 0;
-  int collision_failure_count = 0;
+  std::size_t constraint_failure_count = 0;
+  std::size_t collision_failure_count = 0;
+  std::size_t combined_constraint_failure_count = 0;
 
   planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
@@ -153,6 +154,11 @@ Status LatticePlanner::Plan(
         *lon_trajectory1d_bundle[trajectory_pair.first],
         *lat_trajectory1d_bundle[trajectory_pair.second],
         planning_init_point.relative_time());
+
+    if (!LatticeConstraintChecker::IsValidTrajectory(combined_trajectory)) {
+      ++combined_constraint_failure_count;
+      continue;
+    }
 
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
@@ -191,8 +197,10 @@ Status LatticePlanner::Plan(
 
   AINFO << "Step CombineTrajectory Succeeded";
 
-  AINFO << "trajectory not valid for constraint ["
+  AINFO << "1d trajectory not valid for constraint ["
             << constraint_failure_count << "] times";
+  AINFO << "combined trajectory not valid for ["
+            << combined_constraint_failure_count << "] times";
   AINFO << "trajectory not valid for collision ["
             << collision_failure_count << "] times";
   if (num_lattice_traj > 0) {
