@@ -61,6 +61,9 @@ class TrajectoryCost {
   double GetCostBetweenObsBoxes(const common::math::Box2d &ego_box,
                                 const common::math::Box2d &obstacle_box) const;
 
+  common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
+                                        const double dl) const;
+
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
   const common::VehicleParam vehicle_param_;
