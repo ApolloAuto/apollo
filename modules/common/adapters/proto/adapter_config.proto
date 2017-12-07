@@ -34,6 +34,7 @@ message AdapterConfig {
     CONTI_RADAR = 27;
     IMAGE_SHORT = 28;
     IMAGE_LONG = 29;
+    DRIVE_EVENT = 30;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
