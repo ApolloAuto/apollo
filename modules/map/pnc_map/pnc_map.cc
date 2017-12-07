@@ -42,6 +42,9 @@ namespace hdmap {
 
 using apollo::routing::RoutingResponse;
 using apollo::common::VehicleState;
+using apollo::common::math::Vec2d;
+using apollo::common::PointENU;
+using common::util::MakePointENU;
 
 namespace {
 
@@ -51,7 +54,7 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 // Maximum lateral error used in trajectory approximation.
 const double kTrajectoryApproximationMaxError = 2.0;
 
-void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
+void RemoveDuplicates(std::vector<Vec2d> *points) {
   CHECK_NOTNULL(points);
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
@@ -85,6 +88,52 @@ PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
 const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
+LaneWaypoint PncMap::ToLaneWaypoint(
+    const routing::LaneWaypoint &waypoint) const {
+  auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(waypoint.id()));
+  if (lane) {
+    return LaneWaypoint(lane, waypoint.s());
+  } else {
+    return LaneWaypoint();
+  }
+}
+
+bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
+  if (!ValidateRouting(routing_)) {
+    AERROR << "The routing is invalid when updatting vehicle state";
+    return false;
+  }
+  adc_state_ = vehicle_state;
+  if (!GetNearestPointFromRouting(vehicle_state, &adc_waypoint_)) {
+    AERROR << "Failed to get waypoint from routing with point: "
+           << "(" << vehicle_state.x() << ", " << vehicle_state.y() << ", "
+           << vehicle_state.z() << ")";
+    return false;
+  }
+  route_index_ = GetWaypointIndex(adc_waypoint_);
+  if (route_index_.empty()) {
+    AERROR << "Could not find waypoint " << adc_waypoint_.DebugString();
+    return false;
+  }
+
+  // track how many routing request waypoints the adc have passed.
+  while (next_waypoint_index_ + 1 <
+             static_cast<int>(routing_waypoints_.size()) &&
+         GetWaypointIndex(routing_waypoints_[next_waypoint_index_ + 1]) <
+             route_index_) {
+    ++next_waypoint_index_;
+  }
+  auto last_indices = GetWaypointIndex(routing_waypoints_.back());
+  if (!stop_for_destination_ && last_indices.size() == 3 &&
+      last_indices[0] == routing_.road_size() - 1 &&
+      last_indices[1] == routing_.road().rbegin()->passage_size() - 1 &&
+      last_indices[2] ==
+          routing_.road().rbegin()->passage().rbegin()->segment_size() - 1) {
+    stop_for_destination_ = true;
+  }
+  return true;
+}
+
 bool PncMap::IsNewRouting(const routing::RoutingResponse &routing) const {
   if (!ValidateRouting(routing)) {
     ADEBUG << "The provided routing is invalid";
@@ -107,6 +156,7 @@ bool PncMap::IsNewRouting(const routing::RoutingResponse &routing) const {
 
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   routing_lane_ids_.clear();
+  routing_waypoints_.clear();
   for (const auto &road : routing.road()) {
     for (const auto &passage : road.passage()) {
       for (const auto &lane : passage.segment()) {
@@ -114,7 +164,20 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       }
     }
   }
+  for (auto &waypoint : routing.routing_request().waypoint()) {
+    routing_waypoints_.emplace_back(ToLaneWaypoint(waypoint));
+    if (!routing_waypoints_.back().lane) {
+      AERROR << "Failed to find routing waypoint lane " << waypoint.id()
+             << " on map";
+      routing_waypoints_.clear();
+      return false;
+    }
+  }
   routing_ = routing;
+  route_index_.clear();
+  adc_waypoint_ = LaneWaypoint();
+  next_waypoint_index_ = 0;
+  stop_for_destination_ = false;
   return true;
 }
 
@@ -128,10 +191,42 @@ bool PncMap::ValidateRouting(const RoutingResponse &routing) {
     AERROR << "Route is empty.";
     return false;
   }
+  if (!routing.has_routing_request()) {
+    AERROR << "Rotuing does not have request";
+    return false;
+  }
+  for (const auto &waypoint : routing.routing_request().waypoint()) {
+    if (!waypoint.has_id() || !waypoint.has_s()) {
+      AERROR << "Routing waypoint has no lane_id or s";
+      return false;
+    }
+  }
   return true;
 }
 
 std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
+  if (route_index_.size() == 3) {
+    for (int road_index = route_index_[0]; road_index < routing_.road_size();
+         ++road_index) {
+      const auto &road_segment = routing_.road(road_index);
+      for (int passage_index =
+               (road_index == route_index_[0] ? route_index_[1] : 0);
+           passage_index < road_segment.passage_size(); ++passage_index) {
+        const auto &passage = road_segment.passage(passage_index);
+        for (int lane_index = (road_index == route_index_[0] &&
+                                       passage_index == route_index_[1]
+                                   ? route_index_[2]
+                                   : 0);
+             lane_index < passage.segment_size(); ++lane_index) {
+          if (RouteSegments::WithinLaneSegment(passage.segment(lane_index),
+                                               waypoint)) {
+            return {road_index, passage_index, lane_index};
+          }
+        }
+      }
+    }
+  }
+  // if not found following history route_index_, search backwards
   for (int road_index = routing_.road_size() - 1; road_index >= 0;
        --road_index) {
     const auto &road_segment = routing_.road(road_index);
@@ -147,7 +242,7 @@ std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
       }
     }
   }
-  return {-1, -1, -1};
+  return std::vector<int>();
 }
 
 bool PncMap::PassageToSegments(routing::Passage passage,
@@ -217,28 +312,16 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
 }
 
 bool PncMap::GetRouteSegments(
-    const VehicleState &state, const double backward_length,
-    const double forward_length,
+    const double backward_length, const double forward_length,
     std::list<RouteSegments> *const route_segments) const {
-  LaneWaypoint waypoint;
-
-  common::PointENU point;
-  point.set_x(state.x());
-  point.set_y(state.y());
-  point.set_z(state.z());
-  if (!GetNearestPointFromRouting(state, &waypoint)) {
-    AERROR << "Failed to get waypoint from routing with point: "
-           << point.ShortDebugString();
+  // vehicle has to be this close to lane center before considering change
+  // lane
+  if (!adc_waypoint_.lane || route_index_.size() != 3) {
+    AERROR << "Invalid vehicle state in pnc_map, update vehicle state first";
     return false;
   }
-  auto route_index = GetWaypointIndex(waypoint);
-  // vehicle has to be this close to lane center before considering change lane
-  if (!waypoint.lane || route_index.size() != 3 || route_index[0] < 0) {
-    AERROR << "Invalid vehicle position:  " << state.x() << ", " << state.y();
-    return false;
-  }
-  const int road_index = route_index[0];
-  const int passage_index = route_index[1];
+  const int road_index = route_index_[0];
+  const int passage_index = route_index_[1];
   const auto &road = routing_.road(road_index);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
@@ -249,9 +332,10 @@ bool PncMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
-    auto nearest_point = point;
+    PointENU nearest_point =
+        MakePointENU(adc_state_.x(), adc_state_.y(), adc_state_.z());
     if (index == passage_index) {
-      nearest_point = waypoint.lane->GetSmoothPoint(waypoint.s);
+      nearest_point = adc_waypoint_.lane->GetSmoothPoint(adc_waypoint_.s);
     }
     common::SLPoint sl;
     LaneWaypoint segment_waypoint;
@@ -261,7 +345,7 @@ bool PncMap::GetRouteSegments(
       continue;
     }
     if (index != passage_index) {
-      if (!segments.CanDriveFrom(waypoint)) {
+      if (!segments.CanDriveFrom(adc_waypoint_)) {
         ADEBUG << "You cannot drive from current waypoint to passage: "
                << index;
         continue;
@@ -284,6 +368,7 @@ bool PncMap::GetRouteSegments(
     std::string route_segment_id =
         std::to_string(road_index) + "_" + std::to_string(index);
     route_segments->back().SetId(route_segment_id);
+    route_segments->back().SetStopForDestination(stop_for_destination_);
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
       route_segments->back().SetPreviousAction(routing::FORWARD);
@@ -296,7 +381,7 @@ bool PncMap::GetRouteSegments(
   return !route_segments->empty();
 }
 
-bool PncMap::GetNearestPointFromRouting(const common::VehicleState &state,
+bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
                                         LaneWaypoint *waypoint) const {
   const double kMaxDistance = 10.0;  // meters.
   waypoint->lane = nullptr;
@@ -305,7 +390,7 @@ bool PncMap::GetNearestPointFromRouting(const common::VehicleState &state,
   const int status = hdmap_->GetLanesWithHeading(
       point, kMaxDistance, state.heading(), M_PI / 2.0, &lanes);
   if (status < 0) {
-    AERROR << "failed to get lane from point " << point.DebugString();
+    AERROR << "failed to get lane from point " << point.ShortDebugString();
     return false;
   }
   if (lanes.empty()) {
@@ -319,20 +404,6 @@ bool PncMap::GetNearestPointFromRouting(const common::VehicleState &state,
     if (routing_lane_ids_.count(lane->id().id()) == 0) {
       continue;
     }
-
-    /* If vehicle state is beyond the lane, skip
-     * As shown in the following example, only lane 3 should be considered,
-     * although lane 1 might be closer.
-     *
-     *  =====> driving direction
-     *  --------------
-     *       lane 1
-     *                (*) vehicle position
-     *  -------------- -------------
-     *
-     *       lane 2        lane 3
-     *  -------------- -------------
-     */
     {
       double s = 0.0;
       double l = 0.0;
@@ -361,7 +432,7 @@ bool PncMap::GetNearestPointFromRouting(const common::VehicleState &state,
     }
   }
   if (waypoint->lane == nullptr) {
-    AERROR << "failed to find nearest point" << point.ShortDebugString();
+    AERROR << "failed to find nearest point " << point.ShortDebugString();
   }
   return waypoint->lane != nullptr;
 }
