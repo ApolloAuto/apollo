@@ -45,6 +45,9 @@ namespace dreamview {
  */
 class ImageHandler : public CivetHandler {
  public:
+  // The scale used to resize images sent to frontend
+  static constexpr double kImageScale = 0.2;
+
   ImageHandler();
 
   bool handleGet(CivetServer *server, struct mg_connection *conn);
