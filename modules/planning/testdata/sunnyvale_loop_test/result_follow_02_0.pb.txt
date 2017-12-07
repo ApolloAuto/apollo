@@ -1339,10 +1339,10 @@ decision {
       reason_code: STOP_REASON_OBSTACLE
       reason: "stop by 2339_0"
       stop_point {
-        x: 587701.92731133068
-        y: 4141381.8609983842
+        x: 587701.309228873
+        y: 4141379.3254284714
       }
-      stop_heading: -1.8107932436571927
+      stop_heading: -1.8090718976874254
       change_lane_type: FORWARD
     }
   }
@@ -1368,12 +1368,12 @@ decision {
       object_decision {
         stop {
           reason_code: STOP_REASON_OBSTACLE
-          distance_s: -5.6098165456358791
+          distance_s: -3
           stop_point {
-            x: 587701.92731133068
-            y: 4141381.8609983842
+            x: 587701.309228873
+            y: 4141379.3254284714
           }
-          stop_heading: -1.8107932436571927
+          stop_heading: -1.8090718976874254
         }
       }
     }
