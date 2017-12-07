@@ -175,6 +175,7 @@ double PathDecider::MinimumRadiusStopDistance(
                                    (min_turn_radius - lateral_diff) *
                                        (min_turn_radius - lateral_diff)) +
                          stop_distance_buffer;
+  stop_distance -= vehicle_param.front_edge_to_center();
   stop_distance = std::min(stop_distance, FLAGS_max_stop_distance_obstacle);
   stop_distance = std::max(stop_distance, FLAGS_min_stop_distance_obstacle);
   return stop_distance;
