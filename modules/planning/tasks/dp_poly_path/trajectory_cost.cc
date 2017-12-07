@@ -27,6 +27,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -100,7 +101,7 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
     const double ddl = std::fabs(curve.Evaluate(2, path_s));
     path_cost += ddl * ddl * config_.path_ddl_cost();
   }
-  return path_cost;
+  return path_cost * config_.path_resolution();
 }
 
 double TrajectoryCost::CalculateStaticObstacleCost(
@@ -114,24 +115,14 @@ double TrajectoryCost::CalculateStaticObstacleCost(
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
-    common::SLPoint sl;  // ego vehicle sl point
-    sl.set_s(curr_s);
-    sl.set_l(l);
-    Vec2d ego_xy_point;  // ego vehicle xy point
-    reference_line_->SLToXY(sl, &ego_xy_point);
-
-    ReferencePoint reference_point = reference_line_->GetReferencePoint(curr_s);
-    const double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
-    const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
-    const double theta =
-        common::math::NormalizeAngle(delta_theta + reference_point.heading());
-    const Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
-                           vehicle_param_.width()};
+    const common::SLPoint sl =
+        common::util::MakeSLPoint(curr_s, l);  // ego vehicle sl point
+    const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
     for (const auto &obstacle_box : static_obstacle_boxes_) {
       obstacle_cost += GetCostBetweenObsBoxes(ego_box, obstacle_box);
     }
   }
-  return obstacle_cost;
+  return obstacle_cost * config_.path_resolution();
 }
 
 double TrajectoryCost::CalculateDynamicObstacleCost(
@@ -151,32 +142,20 @@ double TrajectoryCost::CalculateDynamicObstacleCost(
       break;
     }
 
-    const double s = init_sl_point_.s() + speed_point.s() - start_s;
+    const double s =
+        init_sl_point_.s() + speed_point.s() - start_s;  // s on spline curve
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
-    common::SLPoint sl;
-    sl.set_s(init_sl_point_.s() + speed_point.s());
-    sl.set_l(l);
-
-    Vec2d ego_xy_point;
-    reference_line_->SLToXY(sl, &ego_xy_point);
-
-    ReferencePoint reference_point = reference_line_->GetReferencePoint(
-        init_sl_point_.s() + speed_point.s());
-
-    const double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
-    const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
-    const double theta =
-        common::math::NormalizeAngle(delta_theta + reference_point.heading());
-    const Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
-                           vehicle_param_.width()};
+    const common::SLPoint sl =
+        common::util::MakeSLPoint(init_sl_point_.s() + speed_point.s(), l);
+    const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
     for (const auto &obstacle_trajectory : dynamic_obstacle_boxes_) {
       obstacle_cost +=
           GetCostBetweenObsBoxes(ego_box, obstacle_trajectory.at(index));
     }
   }
-  return obstacle_cost;
+  return obstacle_cost * config_.eval_time_interval();
 }
 
 double TrajectoryCost::GetCostBetweenObsBoxes(const Box2d &ego_box,
@@ -196,6 +175,21 @@ double TrajectoryCost::GetCostBetweenObsBoxes(const Box2d &ego_box,
     obstacle_cost += RegularDistanceCost(distance);
   }
   return obstacle_cost;
+}
+
+Box2d TrajectoryCost::GetBoxFromSLPoint(const common::SLPoint &sl,
+                                        const double dl) const {
+  Vec2d xy_point;
+  reference_line_->SLToXY(sl, &xy_point);
+
+  ReferencePoint reference_point = reference_line_->GetReferencePoint(sl.s());
+
+  const double one_minus_kappa_r_d = 1 - reference_point.kappa() * sl.l();
+  const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
+  const double theta =
+      common::math::NormalizeAngle(delta_theta + reference_point.heading());
+  return Box2d(xy_point, theta, vehicle_param_.length(),
+               vehicle_param_.width());
 }
 
 double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
