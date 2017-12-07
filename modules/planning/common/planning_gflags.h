@@ -46,7 +46,8 @@ DECLARE_double(spiral_reference_line_resolution);
 
 DECLARE_bool(prioritize_change_lane);
 DECLARE_bool(reckless_change_lane);
-DECLARE_double(freeze_change_lane_time);
+DECLARE_double(change_lane_fail_freeze_time);
+DECLARE_double(change_lane_success_freeze_time);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
