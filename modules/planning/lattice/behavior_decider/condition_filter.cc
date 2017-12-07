@@ -61,6 +61,7 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
   std::vector<CriticalPointPair> path_intervals =
       QueryPathTimeObstacleIntervals(t);
   double s_prev = feasible_s_lower;
+  const PathTimePoint* point_prev_ptr = nullptr;
 
   std::vector<SampleBound> sample_bounds;
   for (const auto& path_interval : path_intervals) {
@@ -77,9 +78,16 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         sample_bound.set_s_upper(path_interval.first.s());
         sample_bound.set_s_lower(s_prev);
 
-        //TODO (zhangyajia): fix this!
-        sample_bound.set_v_upper(feasible_v_upper);
-        sample_bound.set_v_lower(feasible_v_lower);
+        double v_upper = feasible_v_upper;
+        if (path_interval.first.has_v()) {
+          v_upper = path_interval.first.v();
+        }
+        double v_lower = feasible_v_lower;
+        if (point_prev_ptr) {
+          v_lower = point_prev_ptr->v();
+        }
+        sample_bound.set_v_upper(v_upper);
+        sample_bound.set_v_lower(v_lower);
 
         sample_bounds.push_back(std::move(sample_bound));
       } else {
@@ -90,13 +98,18 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         sample_bound.set_v_upper(feasible_v_upper);
 
         //TODO (zhangyajia): fix this!
-        sample_bound.set_v_lower(feasible_v_lower);
+        double v_lower = feasible_v_upper;
+        if (point_prev_ptr) {
+          v_lower = point_prev_ptr->v();
+        }
+        sample_bound.set_v_lower(v_lower);
         sample_bounds.push_back(std::move(sample_bound));
         break;
       }
     }
     if (s_prev < path_interval.second.s()) {
       s_prev = path_interval.second.s();
+      point_prev_ptr = &(path_interval.second);
     }
   }
   return sample_bounds;
