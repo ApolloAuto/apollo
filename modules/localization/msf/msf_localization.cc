@@ -153,8 +153,12 @@ void MSFLocalization::InitParams() {
 
   // lidar module
   localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
+  // localizaiton_param_.lidar_extrinsic_file =
+  //     common::util::TranslatePath(FLAGS_velodyne_params_target_path) +
+  //     "/velodyne64_novatel_extrinsics_example.yaml";
   localizaiton_param_.lidar_extrinsic_file =
-      common::util::TranslatePath(FLAGS_velodyne_extrinsics_path);
+      "/home/tmp/ros/share/velodyne_pointcloud/params/"
+      "velodyne64_novatel_extrinsics_example.yaml";
   localizaiton_param_.lidar_height_file =
       common::util::TranslatePath(FLAGS_lidar_height_file);
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
@@ -190,9 +194,10 @@ void MSFLocalization::InitParams() {
         FLAGS_imu_to_ant_offset_uz;
   } else {
     apollo::drivers::gnss::config::Config gnss_config;
-    CHECK(common::util::GetProtoFromASCIIFile<
-          apollo::drivers::gnss::config::Config>(
-        common::util::TranslatePath(FLAGS_gnss_conf_path), &gnss_config));
+    // CHECK(common::util::GetProtoFromASCIIFile<
+    //       apollo::drivers::gnss::config::Config>(
+    //     common::util::TranslatePath(FLAGS_gnss_conf_file_target_path),
+    //     &gnss_config));
     CHECK(gnss_config.login_commands_size() > 1);
     std::string login_commands = gnss_config.login_commands(1);
     bool found_imu_ant_parameter = false;
