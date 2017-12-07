@@ -28,18 +28,18 @@ echo "ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
 
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
 
-# grant caros user to access GPS device
-if [ -e /dev/ttyUSB0 ]; then
-  chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
+# setup GPS device
+if [ -e /dev/novatel0 ]; then
+  chmod a+rw /dev/novatel0
+fi
+if [ -e /dev/novatel1 ]; then
+  chmod a+rw /dev/novatel1
+fi
+if [ -e /dev/novatel2 ]; then
+  chmod a+rw /dev/novatel2
 fi
 
 # setup camera device
-if [ -e /dev/video0 ]; then
-  chmod a+rw /dev/video0
-fi
-if [ -e /dev/video1 ]; then
-  chmod a+rw /dev/video1
-fi
 if [ -e /dev/camera/obstacle ]; then
   chmod a+rw /dev/camera/obstacle
 fi
