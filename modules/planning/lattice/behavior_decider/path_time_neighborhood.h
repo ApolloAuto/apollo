@@ -44,6 +44,8 @@ class PathTimeNeighborhood {
   bool GetPathTimeObstacle(const std::string& obstacle_id,
       PathTimeObstacle* path_time_obstacle);
 
+  double SpeedAtT(const std::string& obstacle_id, const double t);
+
   /**
   bool ForwardNearestObstacle(
       std::array<double, 3>* forward_nearest_obstacle_state,
@@ -77,6 +79,8 @@ class PathTimeNeighborhood {
 
   // obstacle_id -> critical conditions
   std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
+
+  std::unordered_map<std::string, prediction::Trajectory> prediction_traj_map_;
 
   /**
   // array of [t, start_s, end_s, s_dot, s_dotdot]

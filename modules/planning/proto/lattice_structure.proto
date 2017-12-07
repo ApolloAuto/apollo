@@ -12,7 +12,8 @@ message DiscretizedReferenceLine {
 message PathTimePoint {
   optional double t = 1;
   optional double s = 2;
-  optional string obstacle_id = 3;
+  optional double v = 3;
+  optional string obstacle_id = 4;
 }
 
 message PathTimeObstacle {
