@@ -195,7 +195,7 @@ class Adapter : public AdapterBase {
    * @param message the newly received message.
    */
   void OnReceive(const D& message) {
-    last_receive_time_ = apollo::common::time::Clock::NowInSecond();
+    last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
     EnqueueData(message);
     FireCallbacks(message);
   }
@@ -314,7 +314,7 @@ class Adapter : public AdapterBase {
     static_assert(std::is_base_of<google::protobuf::Message, D>::value,
                   "Can only fill header to proto messages!");
     auto* header = data->mutable_header();
-    double timestamp = apollo::common::time::Clock::NowInSecond();
+    double timestamp = apollo::common::time::Clock::NowInSeconds();
     header->set_module_name(module_name);
     header->set_timestamp_sec(timestamp);
     header->set_sequence_num(++seq_num_);
@@ -332,7 +332,7 @@ class Adapter : public AdapterBase {
    * @brief Gets message delay.
    */
   double GetDelaySec() const override {
-    return apollo::common::time::Clock::NowInSecond() - last_receive_time_;
+    return apollo::common::time::Clock::NowInSeconds() - last_receive_time_;
   }
 
   /**

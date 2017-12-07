@@ -92,9 +92,9 @@ Status ControllerAgent::ComputeControlCommand(
     control::ControlCommand *cmd) {
   for (auto &controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
-    double start_timestamp = Clock::NowInSecond();
+    double start_timestamp = Clock::NowInSeconds();
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
-    double end_timestamp = Clock::NowInSecond();
+    double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "controller: " << controller->Name()

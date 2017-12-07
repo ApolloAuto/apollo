@@ -59,7 +59,7 @@ class LonControllerTest : public ::testing::Test, LonController {
                                                  &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
-    timestamp_ = Clock::NowInSecond();
+    timestamp_ = Clock::NowInSeconds();
 
     controller_.reset(new LonController());
   }
@@ -114,7 +114,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   auto trajectory_pb =
       LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
-  double time_now = Clock::NowInSecond();
+  double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
   auto *vehicle_state = VehicleStateProvider::instance();
