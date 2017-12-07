@@ -245,6 +245,7 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
   return true;
 }
+
 void FusionSubnode::RegistAllAlgorithm() {
   RegisterFactoryProbabilisticFusion();
 }

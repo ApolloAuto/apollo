@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
-#define MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
 
-#include "Eigen/Core"
+#include "gflags/gflags.h"
+#include "modules/common/log.h"
+#include "ros/include/ros/ros.h"
 
-namespace apollo {
-namespace perception {
+#include "modules/perception/tool/export_sensor_data/export_sensor_data.h"
 
-bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
+DECLARE_string(flagfile);
 
-bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
-
-}  // namespace perception
-}  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
+int main(int argc, char* argv[]) {
+  ros::init(argc, argv, "export_sensor_data");
+  ros::AsyncSpinner spinner(4);
+  AINFO << "Start export_sensor_data.";
+  FLAGS_flagfile =
+      "./modules/perception/tool/offline_visualizer_tool/conf/"
+      "offline_lidar_perception_test.flag";
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  apollo::perception::ExportSensorData export_sensor_data;
+  export_sensor_data.Init();
+  spinner.start();
+  ros::waitForShutdown();
+  return 0;
+}
