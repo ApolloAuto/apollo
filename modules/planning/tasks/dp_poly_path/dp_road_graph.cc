@@ -126,6 +126,14 @@ bool DPRoadGraph::GenerateMinCostPath(
   path_waypoints.insert(path_waypoints.begin(),
                         std::vector<common::SLPoint>{init_sl_point_});
 
+  for (uint32_t i = 0; i < path_waypoints.size(); ++i) {
+    const auto &level_waypoints = path_waypoints.at(i);
+    for (uint32_t j = 0; j < level_waypoints.size(); ++j) {
+      ADEBUG << "level[" << i << "], "
+             << level_waypoints.at(j).ShortDebugString();
+    }
+  }
+
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
@@ -197,10 +205,16 @@ bool DPRoadGraph::SamplePathWaypoints(
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
                           config_.step_length_min(), config_.step_length_max());
   double accumulated_s = init_sl_point_.s();
+  double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
     const double s = std::fmin(accumulated_s, total_length);
+    constexpr double kMinAllowedSampleStep = 1.0;
+    if (std::fabs(s - prev_s) < kMinAllowedSampleStep) {
+      continue;
+    }
+    prev_s = s;
 
     double left_width = 0.0;
     double right_width = 0.0;
@@ -222,16 +236,23 @@ bool DPRoadGraph::SamplePathWaypoints(
     common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
-    for (uint8_t j = 0; j < sample_l.size(); ++j) {
+    const uint8_t sample_size = reference_line_info_.IsChangeLanePath()
+                                    ? sample_l.size() + 1
+                                    : sample_l.size();
+
+    for (uint8_t j = 0; j < sample_size; ++j) {
       const double l = sample_l[j];
+      common::SLPoint sl;
       if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
-        level_points.emplace_back(common::util::MakeSLPoint(s, l));
+        sl = common::util::MakeSLPoint(s, l);
       } else {
-        constexpr double kResonateDistance = 1.0;
-        level_points.emplace_back(common::util::MakeSLPoint(
-            std::fmin(total_length, s + kResonateDistance), l));
+        constexpr double kResonateDistance = 2.0;
+        sl = common::util::MakeSLPoint(
+            std::fmin(total_length, s + kResonateDistance), l);
       }
+      level_points.push_back(std::move(sl));
     }
+
     if (!level_points.empty()) {
       points->emplace_back(level_points);
     }
