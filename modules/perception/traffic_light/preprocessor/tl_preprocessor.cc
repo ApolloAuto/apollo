@@ -196,11 +196,12 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
 
   if (sync_ok) {
     *image_lights = *cached_lights_ptr;
-    (*image_lights)->image = image;
-    (*image_lights)->timestamp = image_ts;
     (*image_lights)->diff_image_pose_ts =
         image_ts - (*cached_lights_ptr)->timestamp;
     (*image_lights)->diff_image_sys_ts = image_ts - TimeUtil::GetCurrentTime();
+
+    (*image_lights)->image = image;
+    (*image_lights)->timestamp = image_ts;
     AINFO << "TLPreprocessor sync ok ts: " << GLOG_TIMESTAMP(image_ts)
           << " camera_id: " << kCameraIdToStr.at(camera_id);
     last_output_ts_ = image_ts;
