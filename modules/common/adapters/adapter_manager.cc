@@ -138,6 +138,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::IMAGE_LONG:
         EnableImageLong(FLAGS_image_long_topic, config);
         break;
+      case AdapterConfig::DRIVE_EVENT:
+        EnableImageLong(FLAGS_drive_event_topic, config);
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;
