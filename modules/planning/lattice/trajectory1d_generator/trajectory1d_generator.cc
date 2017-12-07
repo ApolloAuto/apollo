@@ -50,13 +50,14 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) {
 
   if (planning_target.decision_type() == PlanningTarget::STOP) {
+    /**
     double stop_position = planning_target.stop_point();
     double distance = stop_position - init_lon_state_[0];
     double s_dot = init_lon_state_[1];
 
     // if the stop point is close enough and vehicle speed is close to zero.
     if (distance < stop_margin && s_dot < stop_speed_threshold) {
-      ADEBUG << "Lattice planner stop handling: use standing still trajectory";
+      AINFO << "Lattice planner stop handling: use standing still trajectory";
       std::shared_ptr<Curve1d> ptr_lon_trajectory =
           std::shared_ptr<Curve1d>(new StandingStillTrajectory1d(
               init_lon_state_[0], planned_trajectory_time));
@@ -72,7 +73,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     // if the stop point is close enough and vehicle speed is slow, e.g., < 0.5
     // m/s.
     if ((distance < stop_margin && s_dot < low_speed_threshold) || distance < 0.0) {
-      ADEBUG << "Lattice planner stop handling: "
+      AINFO << "Lattice planner stop handling: "
                 "use constant deceleration trajectory";
 
       double deceleration = 0.0;
@@ -96,7 +97,8 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
       ptr_lat_trajectory_bundle->push_back(ptr_lat_trajectory);
       return;
     }
-    ADEBUG << "Lattice planner stop handling: use polynomial trajectory";
+    **/
+    AINFO << "Lattice planner stop handling: use polynomial trajectory";
   }
 
   GenerateLongitudinalTrajectoryBundle(

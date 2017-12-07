@@ -134,6 +134,8 @@ bool LatticeConstraintChecker::IsValidTrajectory(
       double j = (a - last_a) / dt;
       if (j < FLAGS_longitudinal_jerk_lower_bound ||
           j > FLAGS_longitudinal_jerk_upper_bound) {
+        AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
+        AINFO << "\tjerk exceeds boundary; j = " << j;
         return false;
       }
     }
