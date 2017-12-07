@@ -73,9 +73,11 @@ function main() {
     devices="${devices} $(find_device nvidia*)"
     devices="${devices} $(find_device camera*)"
     devices="${devices} $(find_device video*)"
-    devices="${devices} $(find_device novatel*)"
     devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
     devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
+    devices="${devices} -v /dev/novatel0:/dev/novatel0"
+    devices="${devices} -v /dev/novatel1:/dev/novatel1"
+    devices="${devices} -v /dev/novatel2:/dev/novatel2"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
