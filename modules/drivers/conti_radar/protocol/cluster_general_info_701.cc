@@ -43,7 +43,7 @@ void ClusterGeneralInfo701::Parse(const std::uint8_t* bytes, int32_t length,
   obs->set_lateral_vel(lateral_vel(bytes, length));
   obs->set_rcs(rcs(bytes, length));
   obs->set_dynprop(dynprop(bytes, length));
-  double timestamp = apollo::common::time::Clock::NowInSecond();
+  double timestamp = apollo::common::time::Clock::NowInSeconds();
   auto header = obs->mutable_header();
   header->CopyFrom(conti_radar->header());
   header->set_timestamp_sec(timestamp);

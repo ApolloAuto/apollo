@@ -191,7 +191,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
-  double start_timestamp = Clock::NowInSecond();
+  double start_timestamp = Clock::NowInSeconds();
 
   ControlCommand control_command;
 
@@ -199,7 +199,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
 
-  double end_timestamp = Clock::NowInSecond();
+  double end_timestamp = Clock::NowInSeconds();
 
   if (pad_received_) {
     control_command.mutable_pad_msg()->CopyFrom(pad_msg_);
@@ -268,7 +268,7 @@ Status Control::CheckTimestamp() {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
-  double current_timestamp = Clock::NowInSecond();
+  double current_timestamp = Clock::NowInSeconds();
   double localization_diff =
       current_timestamp - localization_.header().timestamp_sec();
   if (localization_diff >
