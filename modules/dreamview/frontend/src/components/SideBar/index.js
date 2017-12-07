@@ -35,8 +35,9 @@ export default class SideBar extends React.Component {
                                  }}
                              showRouteEditingBar={options.showRouteEditingBar}
                              onVideo={(event) => {
-                                     video.setVideo(event.target.files[0]);
+                                     this.props.store.handleSideBarClick('showVideo');
                                  }}
+                             showVideo={options.showVideo}
                              onPNCMonitor={() => {
                                      this.props.store.handleSideBarClick('showPNCMonitor');
                                  }}
