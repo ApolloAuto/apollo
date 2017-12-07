@@ -38,8 +38,8 @@ enum CameraId {
 };
 
 const std::map<int, std::string> kCameraIdToStr = {
-    {static_cast<int>(LONG_FOCUS), "long_focus_camera(25mm)"},
-    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"}};
+    {static_cast<int>(LONG_FOCUS), "long_focus_camera_25mm"},
+    {static_cast<int>(SHORT_FOCUS), "short_focus_camera_6mm"}};
 
 // @brief Image loaded from camera.
 //       Warning: Image is not Thread Safe.
