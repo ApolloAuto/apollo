@@ -68,8 +68,6 @@ class RadarProcessSubnode : public Subnode {
 
   bool InitAlgorithmPlugin();
 
-  bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
-
   void PublishDataAndEvent(double timestamp,
                            const SharedDataPtr<SensorObjects> &data);
 
