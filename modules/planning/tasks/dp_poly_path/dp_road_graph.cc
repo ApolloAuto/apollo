@@ -224,7 +224,6 @@ bool DPRoadGraph::SamplePathWaypoints(
                                 &sample_l);
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
-
       if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
         level_points.emplace_back(common::util::MakeSLPoint(s, l));
       } else {
