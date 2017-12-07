@@ -27,6 +27,9 @@ em_planner_config {
         path_l_cost: 50.0
         path_dl_cost: 1e5
         path_ddl_cost: 1e3
+        path_l_cost_param_l0: 1.75
+        path_l_cost_param_b: 0.2
+        path_l_cost_param_k: 1.0
     }
     dp_st_speed_config {
         total_path_length: 80
