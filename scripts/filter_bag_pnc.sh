@@ -49,6 +49,7 @@ rosbag filter $INPUT_BAG $OUTPUT_BAG \
   topic == '/apollo/routing_request' or  \
   topic == '/apollo/routing_response' or  \
   topic == '/apollo/localization/pose' or  \
+  topic == '/apollo/drive_event' or  \
   topic == '/apollo/monitor' "
 
 echo "output bag at $OUTPUT_BAG"
