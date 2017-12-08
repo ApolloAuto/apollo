@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/msf_localization.h"
+#include <list>
 #include <sstream>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
@@ -198,7 +199,7 @@ void MSFLocalization::InitParams() {
     //       apollo::drivers::gnss::config::Config>(
     //     common::util::TranslatePath(FLAGS_gnss_conf_file_target_path),
     //     &gnss_config));
-    CHECK(gnss_config.login_commands_size() > 1);
+    CHECK_GT(gnss_config.login_commands_size(), 1);
     std::string login_commands = gnss_config.login_commands(1);
     bool found_imu_ant_parameter = false;
     for (int i = 0; i < gnss_config.login_commands_size(); ++i) {
@@ -213,8 +214,7 @@ void MSFLocalization::InitParams() {
 
     std::vector<std::string> segmented_login_commands =
         common::util::StringTokenizer::Split(login_commands, " ");
-    // std::cerr << segmented_login_commands.size() << std::endl;
-    CHECK(segmented_login_commands.size() == 7);
+    CHECK_EQ(segmented_login_commands.size(), 7);
 
     std::string name = "";
     double offset_x = 0.0;
