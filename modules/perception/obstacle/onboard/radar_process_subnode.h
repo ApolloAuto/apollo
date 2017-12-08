@@ -80,6 +80,7 @@ class RadarProcessSubnode : public Subnode {
   RadarObjectData *radar_data_ = nullptr;
   std::string device_id_;
   Eigen::Matrix4d radar_extrinsic_;
+  Eigen::Matrix4d short_camera_extrinsic_;
 
   boost::circular_buffer<ObjectPair> gps_buffer_;
   ContiRadarIDExpansion _conti_id_expansion;
