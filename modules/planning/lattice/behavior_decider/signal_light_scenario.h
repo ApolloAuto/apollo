@@ -11,6 +11,7 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SIGNAL_LIGHT_SCENARIO_H_
 
 #include "modules/planning/lattice/behavior_decider/scenario.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -33,6 +34,15 @@ class SignalLightScenario : public Scenario {
 
  private:
   bool exist_ = false;
+
+  void ReadSignals();
+  bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
+
+  apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
+
+  std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line_;
+  std::unordered_map<std::string, const apollo::perception::TrafficLight*>
+      detected_signals_;
 
   DECLARE_SCENARIO(SignalLightScenario);
 };

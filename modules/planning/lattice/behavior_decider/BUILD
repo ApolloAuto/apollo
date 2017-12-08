@@ -64,6 +64,11 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/util:map_util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:planning_gflags",
+
     ],
 )
 
