@@ -36,41 +36,25 @@ cc_library(
         "scenario_manager.cc",
     ],
     deps = [
-    	":adc_master_scenario",
-        ":signal_light_scenario",
+        ":scenarios",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/proto:common_proto",
         "//modules/planning/common:frame",
+        "//modules/planning/common:reference_line_info",
     ],
 )
 
 cc_library(
-    name = "adc_master_scenario",
+    name = "scenarios",
     hdrs = [
         "scenario.h",
         "adc_master_scenario.h",
-    ],
-    srcs = [
-        "adc_master_scenario.cc",
-    ],
-    deps = [
-        "//modules/planning/proto:lattice_structure_proto",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/common/proto:common_proto",
-        "//modules/planning/common:frame",
-    ],
-)
-
-cc_library(
-    name = "signal_light_scenario",
-    hdrs = [
-        "scenario.h",
         "signal_light_scenario.h",
     ],
     srcs = [
+        "adc_master_scenario.cc",
         "signal_light_scenario.cc",
     ],
     deps = [
@@ -79,6 +63,12 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/proto:common_proto",
         "//modules/planning/common:frame",
+        "//modules/planning/common:reference_line_info",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/util:map_util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:planning_gflags",
+
     ],
 )
 
