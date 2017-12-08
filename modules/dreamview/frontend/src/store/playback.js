@@ -1,4 +1,5 @@
 import { action, computed, observable } from 'mobx';
+import 'styles/playback-controls';
 
 export default class Playback {
 

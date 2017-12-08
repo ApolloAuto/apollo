@@ -7,7 +7,7 @@ import loaderImg from "assets/images/logo_apollo.png";
 export default class Loader extends React.Component {
     render() {
         const { height } = this.props;
-        const message = "Please send car initial position and map data.";
+        const message = OFFLINE_PLAYBACK ? "" : "Please send car initial position and map data.";
 
         return (
             <div className="loader" style={{height: height}}>
