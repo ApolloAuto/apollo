@@ -56,9 +56,9 @@ if __name__ == "__main__":
     seq_num = 1
 
     while not rospy.is_shutdown():
-        event_str = raw_input("Type in event and press Enter\n>")
-        event_str = event_str.strip()
         current_time = rospy.get_rostime()
+        event_str = raw_input("Type in event and press Enter (current time: " + str(current_time) + ")\n>")
+        event_str = event_str.strip()
         seconds = current_time.secs + current_time.nsecs / 1000.0
         event_msg = meta_msg.msg_type()()
         print event_msg.header
