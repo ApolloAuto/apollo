@@ -126,6 +126,7 @@ layer {
     kernel_size: 3
     stride: 2
     pad: 1 #0
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer {
@@ -2419,6 +2420,7 @@ layer {
     kernel_size: 3
     stride: 2
     pad: 1 #0
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer {
@@ -4546,6 +4548,7 @@ layer {
     kernel_size: 3
     stride: 1
     pad: 1
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer {
@@ -6554,6 +6557,7 @@ layer {
         pool: AVE
         kernel_size: 7
         stride: 7
+        cmp_out_shape_floor_as_conv: true
     }
 }
 
@@ -6580,6 +6584,7 @@ layer {
         pool: AVE
         kernel_size: 7
         stride: 7
+        cmp_out_shape_floor_as_conv: true
     }
 }
 
