@@ -107,9 +107,6 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
                                      const RecognizeOption &option,
                                      std::vector<LightPtr> *lights) {
   cv::Mat ros_image = image.mat();
-  // TODO(All): remove this comment or implement
-  // std::vector<LightPtr> &lights_ref = *lights;
-
   cv::Rect cbox;
   cbox = cv::Rect(0, 0, ros_image.cols, ros_image.rows);
   classify_night_->SetCropBox(cbox);
@@ -118,15 +115,14 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
   for (LightPtr light : *lights) {
     if (light->region.is_detected) {
       candidate[0] = light;
-      if (light->region.detect_class_id ==
-          QUADRATE_CLASS) {  // QUADRATE_CLASS (Night)
+      if (light->region.detect_class_id == QUADRATE_CLASS) {
         AINFO << "Recognize Use Night Model!";
         classify_night_->Perform(ros_image, &candidate);
-      } else if (light->region.detect_class_id ==
-                 VERTICAL_CLASS) {  // VERTICAL_CLASS (Day)
+      } else if (light->region.detect_class_id == VERTICAL_CLASS) {
         AINFO << "Recognize Use Day Model!";
         classify_day_->Perform(ros_image, &candidate);
       } else {
+        AINFO << "Not support yet!";
       }
     } else {
       light->status.color = UNKNOWN_COLOR;

@@ -91,6 +91,7 @@ layer {
     kernel_h: 3
     stride_w: 2
     stride_h: 2
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer{ 
@@ -158,6 +159,7 @@ layer {
     kernel_h: 3
     stride_w: 2
     stride_h: 2
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer{ 
@@ -225,6 +227,7 @@ layer {
     kernel_h: 3
     stride_w: 2
     stride_h: 2
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer{ 
@@ -292,6 +295,7 @@ layer {
     kernel_h: 3
     stride_w: 2
     stride_h: 2
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer{ 
@@ -359,6 +363,7 @@ layer {
     kernel_h: 6
     stride_w: 2
     stride_h: 6
+    cmp_out_shape_floor_as_conv: true
   }
 }
 layer {
