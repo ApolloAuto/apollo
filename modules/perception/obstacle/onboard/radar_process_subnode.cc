@@ -98,7 +98,8 @@ bool RadarProcessSubnode::InitInternal() {
     return false;
   }
   short_camera_extrinsic_ = short_camera_extrinsic.matrix();
-  AINFO << "get short camera  extrinsic succ. pose: \n" << short_camera_extrinsic_;
+  AINFO << "get short camera  extrinsic succ. pose: \n"
+    << short_camera_extrinsic_;
   inited_ = true;
 
   return true;
@@ -138,7 +139,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
     return;
   }
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
-  *radar2world_pose = *velodyne2world_pose * 
+  *radar2world_pose = *velodyne2world_pose *
     short_camera_extrinsic_ *  radar_extrinsic_;
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
