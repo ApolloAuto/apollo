@@ -39,6 +39,9 @@ class SignalLightScenario : public Scenario {
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
 
   apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
+  double GetStopDeceleration(
+    ReferenceLineInfo* const reference_line_info,
+    const hdmap::PathOverlap* signal_light);
 
   std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>

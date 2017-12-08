@@ -52,11 +52,39 @@ int SignalLightScenario::ComputeScenarioDecision(
         ->CopyFrom(reference_point);
   }
 
-  //ret.set_decision_type(PlanningTarget::CRUISE);
-  //ret.set_cruise_speed(FLAGS_default_cruise_speed);
+  if (!FindValidSignalLight(reference_line_info)) {
+    AINFO << "No valid signal light along reference line";
+    return 0;
+  }
+  ReadSignals();
 
-  //decisions->emplace_back(std::move(ret));
 
+  ret.set_decision_type(PlanningTarget::CRUISE);
+  double stop_s = std::numeric_limits<double>::max();
+
+  for (const hdmap::PathOverlap* signal_light : signal_lights_along_reference_line_) {
+    const TrafficLight signal = GetSignal(signal_light->object_id);
+    double stop_deceleration =
+        GetStopDeceleration(reference_line_info, signal_light);
+
+    if ((signal.color() == TrafficLight::RED &&
+         stop_deceleration < FLAGS_stop_max_deceleration) ||
+        (signal.color() == TrafficLight::UNKNOWN &&
+         stop_deceleration < FLAGS_stop_max_deceleration) ||
+        (signal.color() == TrafficLight::YELLOW &&
+         stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
+      if (signal_light->start_s - FLAGS_stop_distance_traffic_light < stop_s) {
+        stop_s = signal_light->start_s - FLAGS_stop_distance_traffic_light;
+        ret.set_decision_type(PlanningTarget::STOP);
+        ret.set_stop_point(stop_s);
+      }
+      //CreateStopObstacle(frame, reference_line_info, signal_light);
+    }
+  }
+
+  if (ret.decision_type() == PlanningTarget::STOP) {
+    decisions->emplace_back(std::move(ret));
+  }
   return 0;
 }
 
@@ -98,6 +126,42 @@ void SignalLightScenario::ReadSignals() {
   }
 }
 
+TrafficLight SignalLightScenario::GetSignal(const std::string& signal_id) {
+  const auto* result =
+      apollo::common::util::FindPtrOrNull(detected_signals_, signal_id);
+  if (result == nullptr) {
+    TrafficLight traffic_light;
+    traffic_light.set_id(signal_id);
+    traffic_light.set_color(TrafficLight::UNKNOWN);
+    traffic_light.set_confidence(0.0);
+    traffic_light.set_tracking_time(0.0);
+    return traffic_light;
+  }
+  return *result;
+}
+
+double SignalLightScenario::GetStopDeceleration(
+    ReferenceLineInfo* const reference_line_info,
+    const hdmap::PathOverlap* signal_light) {
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
+  if (adc_speed < FLAGS_stop_min_speed) {
+    return 0.0;
+  }
+  double stop_distance = 0;
+  double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
+  double stop_line_s = signal_light->start_s;
+
+  if (stop_line_s > adc_front_s) {
+    stop_distance = stop_line_s - adc_front_s;
+  } else {
+    stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
+  }
+  if (stop_distance < 1e-5) {
+    return std::numeric_limits<double>::max();
+  }
+  return (adc_speed * adc_speed) / (2 * stop_distance);
+}
 
 }
 }
