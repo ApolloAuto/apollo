@@ -128,7 +128,7 @@ function build() {
   # Update task info template on compiling.
   bazel-bin/modules/data/util/update_task_info --commit_id=$(git rev-parse HEAD)
 
-  if [ -d /apollo-simulator ]; then
+  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
       cd /apollo-simulator && bash build.sh build
       if [ $? -ne 0 ]; then
         fail 'Build failed!'
@@ -366,7 +366,7 @@ function run_test() {
     return 1
   fi
 
-  if [ -d /apollo-simulator ]; then
+  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
       cd /apollo-simulator && bash build.sh test
       if [ $? -ne 0 ]; then
         fail 'Test failed!'
