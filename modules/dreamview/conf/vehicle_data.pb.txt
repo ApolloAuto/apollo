@@ -19,6 +19,10 @@ data_files {
   dest_path: "modules/perception/data/params"
 }
 data_files {
+  source_path: "radar_params"
+  dest_path: "modules/perception/data/params"
+}
+data_files {
   source_path: "gnss_params/gnss_driver.launch"
   dest_path: "<ros>/share/gnss_driver/launch/gnss_driver.launch"
 }
