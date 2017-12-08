@@ -46,7 +46,9 @@ class ScenarioManager {
  public:
   void Reset();
   int ComputeWorldDecision(
-      Frame* frame, const common::TrajectoryPoint& init_planning_point,
+      Frame* frame,
+      ReferenceLineInfo* const reference_line_info,
+      const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
       std::vector<PlanningTarget>* const decisions);

@@ -80,9 +80,9 @@ Status LatticePlanner::Plan(
 
   // 4. parse the decision and get the planning target.
   PlanningTarget planning_target = decider_.Analyze(frame,
+    reference_line_info,
     planning_init_point,
     init_s,
-    reference_line_info->reference_line(),
     discretized_reference_line);
 
   AINFO << "    [---planning_target---]: " << planning_target.decision_type();
