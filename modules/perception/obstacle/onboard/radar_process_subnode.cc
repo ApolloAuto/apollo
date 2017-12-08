@@ -80,6 +80,15 @@ bool RadarProcessSubnode::InitInternal() {
   CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
   AdapterManager::AddGpsCallback(&RadarProcessSubnode::OnGps, this);
   gps_buffer_.set_capacity(FLAGS_gps_buffer_size);
+  std::string file_path = FLAGS_radar_extrinsic_file;
+  AINFO << "radar extrinsic path: " << file_path;
+  Eigen::Affine3d extrinsic;
+  if (!LoadExtrinsic(file_path, &extrinsic)) {
+    AERROR << "Failed to load extrinsic.";
+    return false;
+  }
+  radar_extrinsic_ = extrinsic.matrix();
+  AINFO << "get radar extrinsic succ. pose: \n" << radar_extrinsic_;
   inited_ = true;
 
   return true;
@@ -112,12 +121,14 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
          << " num_raw_obstacles: " << radar_obs_proto.contiobs_size() << "]";
 
   // 1. get radar pose
-  std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
-  if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
+  std::shared_ptr<Matrix4d> velodyne2world_pose = std::make_shared<Matrix4d>();
+  if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get())) {
     AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
     error_code_ = common::PERCEPTION_ERROR_TF;
     return;
   }
+  std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
+  *radar2world_pose = *velodyne2world_pose * radar_extrinsic_;
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
   // Current Localiztion, radar postion.
