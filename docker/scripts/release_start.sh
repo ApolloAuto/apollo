@@ -95,7 +95,6 @@ function main() {
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
-    set -x
     docker run -it \
         -d --privileged \
         --name apollo_release \
@@ -121,7 +120,6 @@ function main() {
         --hostname in_release_docker \
         --shm-size 512M \
         $IMG
-    set +x
     if [ "${USER}" != "root" ]; then
         docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
         docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
