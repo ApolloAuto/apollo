@@ -26,6 +26,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -62,16 +63,37 @@ TrajectoryCost::TrajectoryCost(
       // Virtual obstacle
       continue;
     } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
+      auto sl_boundary = ptr_path_obstacle->perception_sl_boundary();
+      const double kDefaultLaneWidth = 1.5;
+      const auto &vehicle_config =
+          common::VehicleConfigHelper::instance()->GetConfig();
+      const double width = vehicle_config.vehicle_param().width();
+
+      if (sl_boundary.start_l() + kDefaultLaneWidth < width &&
+          kDefaultLaneWidth - sl_boundary.end_l() < width) {
+        // lane blocking obstacle
+        continue;
+      }
+
       TrajectoryPoint trajectory_point = ptr_obstacle->GetPointAtTime(0.0);
+      constexpr double kBuff = 0.2;
       Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-      static_obstacle_boxes_.push_back(std::move(obstacle_box));
+      Box2d expanded_obstacle_box =
+          Box2d(obstacle_box.center(), obstacle_box.heading(),
+                obstacle_box.length() + kBuff, obstacle_box.width() + kBuff);
+      static_obstacle_boxes_.push_back(std::move(expanded_obstacle_box));
     } else {
       std::vector<Box2d> box_by_time;
       for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
         TrajectoryPoint trajectory_point =
             ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
+
         Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-        box_by_time.push_back(obstacle_box);
+        constexpr double kBuff = 0.5;
+        Box2d expanded_obstacle_box =
+            Box2d(obstacle_box.center(), obstacle_box.heading(),
+                  obstacle_box.length() + kBuff, obstacle_box.width() + kBuff);
+        box_by_time.push_back(expanded_obstacle_box);
       }
       dynamic_obstacle_boxes_.push_back(std::move(box_by_time));
     }
@@ -166,14 +188,15 @@ double TrajectoryCost::GetCostBetweenObsBoxes(const Box2d &ego_box,
     return 0.0;
   }
 
+  std::function<double(const double, const double)> softmax = [](
+      const double x, const double x0) {
+    return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
+  };
+
   double obstacle_cost = 0.0;
-  if (distance <= config_.obstacle_collision_distance()) {
-    obstacle_cost += config_.obstacle_collision_cost();
-  } else if (distance <= config_.obstacle_risk_distance()) {
-    obstacle_cost += RiskDistanceCost(distance);
-  } else {
-    obstacle_cost += RegularDistanceCost(distance);
-  }
+  obstacle_cost += config_.obstacle_collision_cost() *
+                   softmax(distance, config_.obstacle_collision_distance());
+  obstacle_cost += 20.0 * softmax(distance, config_.obstacle_risk_distance());
   return obstacle_cost;
 }
 
