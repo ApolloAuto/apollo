@@ -62,6 +62,9 @@ DEFINE_string(radar_tf2_child_frame_id, "radar_front",
               "the tf2 transform child frame id");
 DEFINE_double(front_radar_forward_distance, 120.0,
               "get front radar forward distancer");
+DEFINE_string(radar_extrinsic_file, 
+  "modules/perception/obstacle/radar/params/radar_front_extrinsics.yaml", 
+  "radar extrinsic file");
 
 /// obstacle/onboard/fusion_subnode.cc
 DEFINE_string(onboard_fusion, "ProbabilisticFusion",
