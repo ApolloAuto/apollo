@@ -1,17 +1,17 @@
+transform:
+  rotation:
+    y: 0.465442900447225
+    x: -0.5001394746772327
+    z: -0.5111293453577122
+    w: 0.5215076266048779
+  translation:
+    x: 0.3476404596108391
+    y: 0.2106821881984495
+    z: 0.06704852122779535
 header:
-  seq: 0
   stamp:
     secs: 0
     nsecs: 0
   frame_id: velodyne64
-child_frame_id: onsemi_obstacle
-transform:
-  rotation:
-    x: -0.4881
-    y: 0.4581
-    z: -0.50026812327159765
-    w: 0.543530224003503285
-  translation:
-    x: 0.0002409737262759
-    y: 0.0107408504183493174
-    z: -0.2004320963978477
+  seq: 0
+child_frame_id: short_camera

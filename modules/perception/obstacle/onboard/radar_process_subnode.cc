@@ -80,15 +80,25 @@ bool RadarProcessSubnode::InitInternal() {
   CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
   AdapterManager::AddGpsCallback(&RadarProcessSubnode::OnGps, this);
   gps_buffer_.set_capacity(FLAGS_gps_buffer_size);
-  std::string file_path = FLAGS_radar_extrinsic_file;
-  AINFO << "radar extrinsic path: " << file_path;
-  Eigen::Affine3d extrinsic;
-  if (!LoadExtrinsic(file_path, &extrinsic)) {
+  std::string radar_extrinstic_path = FLAGS_radar_extrinsic_file;
+  AINFO << "radar extrinsic path: " << radar_extrinstic_path;
+  Eigen::Affine3d radar_extrinsic;
+  if (!LoadExtrinsic(radar_extrinstic_path, &radar_extrinsic)) {
     AERROR << "Failed to load extrinsic.";
     return false;
   }
-  radar_extrinsic_ = extrinsic.matrix();
+  radar_extrinsic_ = radar_extrinsic.matrix();
   AINFO << "get radar extrinsic succ. pose: \n" << radar_extrinsic_;
+
+  std::string short_camera_extrinsic_path = FLAGS_short_camera_extrinsic_file;
+  AINFO << "short camera extrinsic path: " << short_camera_extrinsic_path;
+  Eigen::Affine3d short_camera_extrinsic;
+  if (!LoadExtrinsic(short_camera_extrinsic_path, &short_camera_extrinsic)) {
+    AERROR << "Failed to load extrinsic.";
+    return false;
+  }
+  short_camera_extrinsic_ = short_camera_extrinsic.matrix();
+  AINFO << "get short camera  extrinsic succ. pose: \n" << short_camera_extrinsic_;
   inited_ = true;
 
   return true;
@@ -128,7 +138,8 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
     return;
   }
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
-  *radar2world_pose = *velodyne2world_pose * radar_extrinsic_;
+  *radar2world_pose = *velodyne2world_pose * 
+    short_camera_extrinsic_ *  radar_extrinsic_;
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
   // Current Localiztion, radar postion.
