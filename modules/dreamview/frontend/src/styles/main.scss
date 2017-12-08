@@ -1,5 +1,5 @@
 @import "media-queries";
-@import 'playback-controls';
+
 
 @mixin monitor-item-common-properties() {
     display: flex;
@@ -698,35 +698,65 @@ body {
         position: absolute;
         top: 246px;
         right: 20px;
-        width: 224px;
+        width: 228px;
         height: 35px;
+
+        font-size: 14px;
 
         .traffic-light {
             position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 28px;
-            height: 28px;
+            width: 120px;
+            height: 35px;
+            background: rgba(0, 0, 0, 0.8);
+
+            .symbol {
+                position: relative;
+                top: 4px;
+                left: 4px;
+                width: 28px;
+                height: 28px;
+            }
+
+            .text {
+                position: absolute;
+                top: 10px;
+                right: 8px;
+
+                color: #FFFFFF;
+            }
         }
 
         .driving-mode {
             position: absolute;
+            top: 0px;
             right: 0px;
-            padding: 10px;
+            width: 105px;
+            height: 35px;
+
+            .text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+
+                float: right;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+        }
+
+        .auto-mode {
+            background: linear-gradient(to right, rgba(17, 30, 48, 0.8), rgba(7, 42, 94, 0.8));
+            border-right: 1px solid #006AFF;
+            color: #006AFF;
+        }
+
+        .manual-mode {
+            background: linear-gradient(to right, rgba(30, 17, 17, 0.8), rgba(71, 36, 36, 0.8));
+            color: #B43131;
+            border-right: 1px solid #B43131;
         }
     }
 
-    .auto-mode {
-        background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(7, 33, 72, 0.8));
-        border-right: 1px solid #006AFF;
-        color: #006AFF;
-    }
-
-    .manual-mode {
-        background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(39, 27, 27, 0.8));
-        color: #B43131;
-        border-right: 1px solid #B43131;
-    }
 
     .notification-warn {
         position: absolute;
@@ -975,9 +1005,8 @@ body {
     .img-container {
         position: relative;
         top: 35%;
-        left: 35%;
-        width: 30%;
-        height: 40%;
+        left: 25%;
+        width: 50%;
 
         img {
             width: 100%;
@@ -987,6 +1016,8 @@ body {
         .status-message {
             margin-top: 10px;
             font-size: 18px;
+            /* fallback */
+            font-size: 2vw;
             color: #FFFFFF;
             text-align: center;
 
