@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H_
 
-#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
+
+#include "opencv2/opencv.hpp"
+
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
@@ -61,4 +63,4 @@ REGISTER_REGISTERER(BaseRecognizer);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECOGNIZER_H_

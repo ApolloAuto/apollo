@@ -170,7 +170,7 @@ bool Spline1dGenerator::Solve() {
   int max_iter = std::max(max_iteration_, num_constraint);
 
   ::qpOASES::returnValue ret;
-  const double start_timestamp = Clock::NowInSecond();
+  const double start_timestamp = Clock::NowInSeconds();
   if (use_hotstart) {
     ADEBUG << "using SQP hotstart.";
     ret = sqp_solver_->hotstart(
@@ -188,7 +188,7 @@ bool Spline1dGenerator::Solve() {
                             lower_bound, upper_bound, constraint_lower_bound,
                             constraint_upper_bound, max_iter);
   }
-  const double end_timestamp = Clock::NowInSecond();
+  const double end_timestamp = Clock::NowInSeconds();
   ADEBUG << "Spline1dGenerator QP solve time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
 

@@ -176,7 +176,7 @@ class Clock {
    * @brief gets the current time in second.
    * @return the current time in second.
    */
-  static double NowInSecond() { return ToSecond(Clock::Now()); }
+  static double NowInSeconds() { return ToSecond(Clock::Now()); }
 
   /**
    * @brief Set the behavior of the \class Clock.
@@ -257,10 +257,10 @@ inline Clock::Clock()
 #define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                         \
   using apollo::common::time::Clock;                                          \
   for (double block_start_time = 0;                                           \
-       (block_start_time == 0 ? (block_start_time = Clock::NowInSecond())     \
+       (block_start_time == 0 ? (block_start_time = Clock::NowInSeconds())    \
                               : false);                                       \
        [&]() {                                                                \
-         double now = Clock::NowInSecond();                                   \
+         double now = Clock::NowInSeconds();                                  \
          if (now - block_start_time > (threshold)) {                          \
            AINFO << std::fixed << (message) << ": " << now - block_start_time \
                  << "s.";                                                     \

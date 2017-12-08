@@ -44,6 +44,8 @@ void Monitor::Publish(const std::vector<MessageItem> &messages) const {
 }
 
 void Monitor::DoPublish(MonitorMessage *message) const {
+  DCHECK(AdapterManager::Initialized())
+      << "AdapterManager must be initialized before using monitor.";
   AdapterManager::FillMonitorHeader("monitor", message);
   AdapterManager::PublishMonitor(*message);
 }

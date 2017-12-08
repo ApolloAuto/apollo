@@ -71,6 +71,7 @@ function start() {
         /apollo/routing_request \
         /apollo/routing_response \
         /apollo/localization/pose \
+        /apollo/drive_event \
         /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
 }

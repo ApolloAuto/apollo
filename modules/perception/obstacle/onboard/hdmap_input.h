@@ -25,6 +25,7 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/common/macro.h"
+#include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
@@ -51,7 +52,7 @@ class HDMapInput {
   void DownSampleBoundary(const hdmap::LineSegment& line,
                           PolygonDType* out_boundary_line) const;
 
-  int MergeBoundaryJunction(
+  apollo::common::Status MergeBoundaryJunction(
       const std::vector<hdmap::RoadROIBoundaryPtr>& boundaries,
       const std::vector<hdmap::JunctionBoundaryPtr>& junctions,
       HdmapStructPtr* mapptr);

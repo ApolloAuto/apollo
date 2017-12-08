@@ -890,11 +890,19 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
+    int seq_id = feature->mutable_lane()
+                        ->mutable_lane_graph()
+                        ->lane_sequence_size();
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
       feature->mutable_lane()
-          ->mutable_lane_graph()
-          ->add_lane_sequence()
-          ->CopyFrom(lane_seq);
+             ->mutable_lane_graph()
+             ->add_lane_sequence()
+             ->CopyFrom(lane_seq);
+      feature->mutable_lane()
+             ->mutable_lane_graph()
+             ->mutable_lane_sequence(seq_id)
+             ->set_lane_sequence_id(seq_id);
+      ++seq_id;
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
@@ -904,11 +912,18 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
+    int seq_id = feature->mutable_lane()
+                        ->mutable_lane_graph()
+                        ->lane_sequence_size();
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
       feature->mutable_lane()
-          ->mutable_lane_graph()
-          ->add_lane_sequence()
-          ->CopyFrom(lane_seq);
+             ->mutable_lane_graph()
+             ->add_lane_sequence()
+             ->CopyFrom(lane_seq);
+      feature->mutable_lane()
+             ->mutable_lane_graph()
+             ->mutable_lane_sequence(seq_id)
+             ->set_lane_sequence_id(seq_id);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }

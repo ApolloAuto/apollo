@@ -166,7 +166,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 
   // auto* trajectory_points = trajectory_pb.mutable_trajectory_point();
   if (!FLAGS_planning_test_mode) {
-    const double dt = timestamp - Clock::NowInSecond();
+    const double dt = timestamp - Clock::NowInSeconds();
     for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
       p.set_relative_time(p.relative_time() + dt);
     }
@@ -175,7 +175,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 }
 
 void Planning::RunOnce() {
-  const double start_timestamp = Clock::NowInSecond();
+  const double start_timestamp = Clock::NowInSeconds();
 
   // snapshot all coming data
   AdapterManager::Observe();
@@ -263,7 +263,7 @@ void Planning::RunOnce() {
     frame_->RecordInputDebug(trajectory_pb.mutable_debug());
   }
   trajectory_pb.mutable_latency_stats()->set_init_frame_time_ms(
-      Clock::NowInSecond() - start_timestamp);
+      Clock::NowInSeconds() - start_timestamp);
   if (!status.ok()) {
     AERROR << "Init frame failed";
     if (FLAGS_publish_estop) {
@@ -281,11 +281,16 @@ void Planning::RunOnce() {
 
   status = Plan(start_timestamp, stitching_trajectory, &trajectory_pb);
 
-  const auto time_diff_ms = (Clock::NowInSecond() - start_timestamp) * 1000;
+  const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
   trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
+
+  auto* ref_line_task = trajectory_pb.mutable_latency_stats()->add_task_stats();
+  ref_line_task->set_time_ms(
+      ReferenceLineProvider::instance()->LastTimeDelay() * 1000.0);
+  ref_line_task->set_name("ReferenceLineProvider");
 
   if (!status.ok()) {
     status.Save(trajectory_pb.mutable_header()->mutable_status());

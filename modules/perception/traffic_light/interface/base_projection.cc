@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
-#include <yaml-cpp/yaml.h>
-#include <eigen3/Eigen/Eigen>
+#include "Eigen/Eigen"
+#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace perception {

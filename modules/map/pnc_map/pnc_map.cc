@@ -106,10 +106,6 @@ bool PncMap::IsNewRouting(const routing::RoutingResponse &routing) const {
 }
 
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
-  if (!IsNewRouting(routing)) {
-    ADEBUG << "Not a valid new routing, no update";
-    return true;
-  }
   routing_lane_ids_.clear();
   for (const auto &road : routing.road()) {
     for (const auto &passage : road.passage()) {

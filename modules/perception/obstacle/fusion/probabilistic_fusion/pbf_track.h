@@ -18,8 +18,8 @@
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_H_
 
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 #include "gtest/gtest.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -58,13 +58,9 @@ class PbfTrack {
 
   int GetTrackId() const;
 
-  double GetTrackingPeriod() const {
-    return tracking_period_;
-  }
+  double GetTrackingPeriod() const { return tracking_period_; }
 
-  inline bool IsDead() const {
-    return is_dead_;
-  }
+  inline bool IsDead() const { return is_dead_; }
   bool AbleToPublish();
 
   static int GetNextTrackId();
@@ -138,7 +134,7 @@ class PbfTrack {
   bool invisible_in_radar_;
 
   /**@brief motion fusion*/
-  PbfBaseMotionFusion *motion_fusion_;
+  PbfBaseMotionFusion *motion_fusion_ = nullptr;
 
   /**@brief one object instance per sensor, might be more later*/
   std::map<std::string, PbfSensorObjectPtr> lidar_objects_;

@@ -16,12 +16,14 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
 #define MODULES_PERCEPTION_ONBOARD_TRANSFORM_INPUT_H_
 
-#include "eigen3/Eigen/Core"
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
 
 bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
+
+bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
 
 }  // namespace perception
 }  // namespace apollo

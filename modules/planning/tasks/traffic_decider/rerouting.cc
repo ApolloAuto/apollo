@@ -88,7 +88,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
       "kLastReroutingTime_" + segments.Id();
   double* last_routing_time =
       common::util::Dropbox<double>::Open()->Get(last_rerouting_time_key);
-  double current_time = Clock::NowInSecond();
+  double current_time = Clock::NowInSeconds();
   if (last_routing_time != nullptr &&
       current_time - *last_routing_time < FLAGS_rerouting_cooldown_time) {
     ADEBUG << "Skip rerouting and wait for previous rerouting result";

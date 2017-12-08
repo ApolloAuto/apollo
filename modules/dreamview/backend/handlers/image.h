@@ -29,7 +29,6 @@
 #include "cv_bridge/cv_bridge.h"
 
 #include "CivetServer.h"
-#include "sensor_msgs/CompressedImage.h"
 
 /**
  * @namespace apollo::dreamview
@@ -46,12 +45,16 @@ namespace dreamview {
  */
 class ImageHandler : public CivetHandler {
  public:
+  // The scale used to resize images sent to frontend
+  static constexpr double kImageScale = 0.2;
+
   ImageHandler();
 
   bool handleGet(CivetServer *server, struct mg_connection *conn);
 
  private:
-  void OnImage(const sensor_msgs::CompressedImage &image);
+  template <typename SensorMsgsImage>
+  void OnImage(const SensorMsgsImage &image);
 
   std::vector<uchar> send_buffer_;
 

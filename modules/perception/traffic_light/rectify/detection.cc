@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/rectify/detection.h"
+
 #include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -56,8 +58,10 @@ void Detection::Perform(const cv::Mat &ros_image,
 
   float inflate_col = 1.0f / _crop_col_shrink;
   float inflate_row = 1.0f / _crop_row_shrink;
-  SelectOutputBboxes(crop_image, 0, inflate_col, inflate_row, lights);
-  SelectOutputBboxes(crop_image, 1, inflate_col, inflate_row, lights);
+  SelectOutputBboxes(crop_image.size(), VERTICAL_CLASS, inflate_col,
+                                       inflate_row, lights);
+  SelectOutputBboxes(crop_image.size(), QUADRATE_CLASS, inflate_col,
+                                       inflate_row, lights);
 
   AINFO << "Dump output Done! Get box num:" << lights->size();
 
@@ -67,7 +71,7 @@ void Detection::Perform(const cv::Mat &ros_image,
 
 void Detection::Init(const int &resize_len, const std::string &refine_net,
                      const std::string &refine_model) {
-  refine_net_ptr_ = new caffe::Net<float>(refine_net, caffe::TEST);
+  refine_net_ptr_.reset(new caffe::Net<float>(refine_net, caffe::TEST));
   refine_net_ptr_->CopyTrainedLayersFrom(refine_model);
   refine_input_layer_ =
       static_cast<caffe::PyramidImageOnlineDataLayer<float> *>(
@@ -79,23 +83,15 @@ void Detection::Init(const int &resize_len, const std::string &refine_net,
 
   resize_len_ = resize_len;
 }
+
 Detection::Detection(int min_crop_size, const std::string &refine_net,
                      const std::string &refine_model) {
   Init(min_crop_size, refine_net, refine_model);
 }
-Detection::~Detection() {
-  delete refine_net_ptr_;
-}
 
-bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
+bool Detection::SelectOutputBboxes(const cv::Size &img_size, int class_id,
                                    float inflate_col, float inflate_row,
                                    std::vector<LightPtr> *lights) {
-  if (crop_image.empty()) {
-    AERROR << "DenseBoxDetection crop_image empty, "
-           << "select_output_bboxes failed.";
-    return false;
-  }
-
   if (class_id < 0 || class_id >= 2) {
     AERROR << "DenseBoxDetection invalid class_id, "
            << "select_output_bboxes failed.";
@@ -104,7 +100,7 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
 
   vector<caffe::BBox<float>> &result_bbox =
       refine_output_layer_->GetFilteredBBox(class_id);
-  for (int candidate_id = 0; candidate_id < result_bbox.size();
+  for (size_t candidate_id = 0; candidate_id < result_bbox.size();
        candidate_id++) {
     LightPtr tmp(new Light);
     tmp->region.rectified_roi.x =
@@ -119,7 +115,7 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
         inflate_row);
     tmp->region.detect_score = result_bbox[candidate_id].score;
 
-    if (!BoxIsValid(tmp->region.rectified_roi, crop_image.size())) {
+    if (!BoxIsValid(tmp->region.rectified_roi, img_size)) {
       AINFO << "Invalid width or height or x or y: "
             << tmp->region.rectified_roi.width << " | "
             << tmp->region.rectified_roi.height << " | "
@@ -129,7 +125,7 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
     }
 
     tmp->region.rectified_roi =
-        RefinedBox(tmp->region.rectified_roi, crop_image.size());
+        RefinedBox(tmp->region.rectified_roi, img_size);
     tmp->region.is_detected = true;
     tmp->region.detect_class_id = DetectionClassId(class_id);
     lights->push_back(tmp);
@@ -137,9 +133,9 @@ bool Detection::SelectOutputBboxes(const cv::Mat &crop_image, int class_id,
 
   return true;
 }
-void Detection::SetCropBox(const cv::Rect &box) {
-  crop_box_ = box;
-}
+
+void Detection::SetCropBox(const cv::Rect &box) { crop_box_ = box; }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

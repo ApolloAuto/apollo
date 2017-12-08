@@ -35,6 +35,7 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 #include "modules/planning/tasks/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
@@ -64,6 +65,13 @@ bool DPRoadGraph::FindPathTunnel(
            << init_point.DebugString();
     return false;
   }
+
+  if (!CalculateFrenetPoint(init_point_, &init_frenet_frame_point_)) {
+    AERROR << "Fail to create init_frenet_frame_point_ from : "
+           << init_point_.DebugString();
+    return false;
+  }
+
   std::vector<DPRoadGraphNode> min_cost_path;
   if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
@@ -110,12 +118,21 @@ bool DPRoadGraph::GenerateMinCostPath(
   CHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
-  if (!SamplePathWaypoints(init_point_, &path_waypoints)) {
+  if (!SamplePathWaypoints(init_point_, &path_waypoints) ||
+      path_waypoints.size() < 2) {
     AERROR << "Fail to sample path waypoints!";
     return false;
   }
   path_waypoints.insert(path_waypoints.begin(),
                         std::vector<common::SLPoint>{init_sl_point_});
+
+  for (uint32_t i = 0; i < path_waypoints.size(); ++i) {
+    const auto &level_waypoints = path_waypoints.at(i);
+    for (uint32_t j = 0; j < level_waypoints.size(); ++j) {
+      ADEBUG << "level[" << i << "], "
+             << level_waypoints.at(j).ShortDebugString();
+    }
+  }
 
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
@@ -125,6 +142,10 @@ bool DPRoadGraph::GenerateMinCostPath(
                                  init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
+  if (graph_nodes.size() < 2) {
+    AERROR << "Too few graph_nodes.";
+    return false;
+  }
   graph_nodes[0].emplace_back(init_sl_point_, nullptr, 0.0);
 
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
@@ -135,13 +156,32 @@ bool DPRoadGraph::GenerateMinCostPath(
       auto &cur_node = graph_nodes[level].back();
       for (const auto &prev_dp_node : prev_dp_nodes) {
         const auto &prev_sl_point = prev_dp_node.sl_point;
-        QuinticPolynomialCurve1d curve(prev_sl_point.l(), 0.0, 0.0,
+        double init_dl = 0.0;
+        double init_ddl = 0.0;
+        if (level == 1) {
+          init_dl = init_frenet_frame_point_.dl();
+          init_ddl = init_frenet_frame_point_.ddl();
+        }
+        QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
         const double cost =
             trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s()) +
             prev_dp_node.min_cost;
         cur_node.UpdateCost(&prev_dp_node, curve, cost);
+
+        // try to connect the current point with the first point directly
+        if (level > 1) {
+          init_dl = init_frenet_frame_point_.dl();
+          init_ddl = init_frenet_frame_point_.ddl();
+          QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
+                                         cur_point.l(), 0.0, 0.0,
+                                         cur_point.s() - init_sl_point_.s());
+          const double cost = trajectory_cost.Calculate(
+              curve, init_sl_point_.s(), cur_point.s());
+
+          cur_node.UpdateCost(&(graph_nodes.front().front()), curve, cost);
+        }
       }
     }
   }
@@ -159,14 +199,17 @@ bool DPRoadGraph::GenerateMinCostPath(
     min_cost_path->push_back(*min_cost_node);
   }
   std::reverse(min_cost_path->begin(), min_cost_path->end());
+
+  for (const auto &node : *min_cost_path) {
+    ADEBUG << "min_cost_path: " << node.sl_point.ShortDebugString();
+  }
   return true;
 }
 
 bool DPRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
-  constexpr double kSamplePointLookForwardTimeChangeLane = 3.0;
-  constexpr double kSamplePointLookForwardTimeNoChangeLane = 1.0;
+  constexpr double kSamplePointLookForwardTime = 4.0;
   CHECK(points != nullptr);
 
   const double kAdditioalPathLength = 20.0;
@@ -175,42 +218,95 @@ bool DPRoadGraph::SamplePathWaypoints(
                     kAdditioalPathLength,
                 reference_line_.Length());
 
-  double level_distance = 0.0;
-  if (reference_line_info_.IsChangeLanePath()) {
-    level_distance =
-        std::max(config_.step_length_min(),
-                 init_point.v() * kSamplePointLookForwardTimeChangeLane);
-  } else {
-    level_distance = common::math::Clamp(
-        init_point.v() * kSamplePointLookForwardTimeNoChangeLane,
-        config_.step_length_min(), config_.step_length_max());
-  }
+  const double level_distance =
+      common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
+                          config_.step_length_min(), config_.step_length_max());
   double accumulated_s = init_sl_point_.s();
+  double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
     const double s = std::fmin(accumulated_s, total_length);
+    constexpr double kMinAllowedSampleStep = 1.0;
+    if (std::fabs(s - prev_s) < kMinAllowedSampleStep) {
+      continue;
+    }
+    prev_s = s;
 
     double left_width = 0.0;
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
+
+    constexpr double kBoundaryBuff = 0.10;
     const auto &vehicle_config =
         common::VehicleConfigHelper::instance()->GetConfig();
     const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
-    const double eff_right_width = right_width - half_adc_width;
-    const double eff_left_width = left_width - half_adc_width;
+    const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
+    const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
+
+    const double sample_right_boundary =
+        std::fmin(-eff_right_width, init_sl_point_.l());
+    const double sample_left_boundary =
+        std::fmax(eff_left_width, init_sl_point_.l());
 
     std::vector<double> sample_l;
-    common::util::uniform_slice(-eff_right_width, eff_left_width,
+    common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
-    for (double l : sample_l) {
-      level_points.emplace_back(common::util::MakeSLPoint(s, l));
+    const uint8_t sample_size = reference_line_info_.IsChangeLanePath()
+                                    ? sample_l.size() + 1
+                                    : sample_l.size();
+
+    for (uint8_t j = 0; j < sample_size; ++j) {
+      const double l = sample_l[j];
+      common::SLPoint sl;
+      if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
+        sl = common::util::MakeSLPoint(s, l);
+      } else {
+        constexpr double kResonateDistance = 2.0;
+        sl = common::util::MakeSLPoint(
+            std::fmin(total_length, s + kResonateDistance), l);
+      }
+      level_points.push_back(std::move(sl));
     }
+
     if (!level_points.empty()) {
       points->emplace_back(level_points);
     }
   }
+  return true;
+}
+
+bool DPRoadGraph::CalculateFrenetPoint(
+    const common::TrajectoryPoint &traj_point,
+    common::FrenetFramePoint *const frenet_frame_point) {
+  common::SLPoint sl_point;
+  if (!reference_line_.XYToSL(
+          {traj_point.path_point().x(), traj_point.path_point().y()},
+          &sl_point)) {
+    return false;
+  }
+  frenet_frame_point->set_s(sl_point.s());
+  frenet_frame_point->set_l(sl_point.l());
+
+  const double theta = traj_point.path_point().theta();
+  const double kappa = traj_point.path_point().kappa();
+  const double l = frenet_frame_point->l();
+
+  ReferencePoint ref_point;
+  ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
+
+  const double theta_ref = ref_point.heading();
+  const double kappa_ref = ref_point.kappa();
+  const double dkappa_ref = ref_point.dkappa();
+
+  const double dl = CartesianFrenetConverter::CalculateLateralDerivative(
+      theta_ref, theta, l, kappa_ref);
+  const double ddl =
+      CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
+          theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
+  frenet_frame_point->set_dl(dl);
+  frenet_frame_point->set_ddl(ddl);
   return true;
 }
 

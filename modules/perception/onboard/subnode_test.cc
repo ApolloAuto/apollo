@@ -19,8 +19,8 @@
 #include <google/protobuf/text_format.h>
 
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/proto/dag_config.pb.h"
 #include "modules/perception/onboard/shared_data.h"
@@ -30,6 +30,7 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::Status;
 using google::protobuf::TextFormat;
 
 class MySubnode : public Subnode {
@@ -37,9 +38,9 @@ class MySubnode : public Subnode {
   MySubnode() : Subnode() {}
   virtual ~MySubnode() {}
 
-  StatusCode ProcEvents() override {
+  Status ProcEvents() override {
     AINFO << "MySubnode proc event.";
-    return SUCC;
+    return Status::OK();
   }
 };
 
@@ -50,7 +51,7 @@ TEST(SubnodeTest, test_init) {
       FLAGS_work_root + "/data/onboard_test/dag_streaming.config";
   std::string content;
   DAGConfig dag_config;
-  ASSERT_TRUE(FileUtil::GetFileContent(dag_config_path, &content));
+  ASSERT_TRUE(apollo::common::util::GetContent(dag_config_path, &content));
   ASSERT_TRUE(TextFormat::ParseFromString(content, &dag_config));
   EventManager event_manager;
   ASSERT_TRUE(event_manager.Init(dag_config.edge_config()));

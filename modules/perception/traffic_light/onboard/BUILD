@@ -6,13 +6,13 @@ cc_library(
     name = "perception_traffic_light_onboard",
     srcs = [
         "hdmap_input.cc",
-        "preprocessor_subnode.cc",
-        "proc_subnode.cc",
+        "tl_preprocessor_subnode.cc",
+        "tl_proc_subnode.cc",
     ],
     hdrs = [
         "hdmap_input.h",
-        "preprocessor_subnode.h",
-        "proc_subnode.h",
+        "tl_preprocessor_subnode.h",
+        "tl_proc_subnode.h",
     ],
     deps = [
         "//modules/common",

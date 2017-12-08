@@ -184,6 +184,13 @@ bool GetContent(const std::string &file_name, std::string *content);
 std::string TranslatePath(const std::string &src_path);
 
 /**
+ * @brief Get absolute path by concatenating prefix and relative_path.
+ * @return The absolute path.
+ */
+std::string GetAbsolutePath(const std::string& prefix,
+                            const std::string& relative_path);
+
+/**
  * @brief Check if the path exists.
  * @return If the path exists.
  */
@@ -205,6 +212,22 @@ bool DirectoryExists(const std::string &directory_path);
  * @return If the action is successful.
  */
 bool CopyFile(const std::string &from, const std::string &to);
+
+/**
+ * @brief Copy a directory.
+ * @param from The path to copy from.
+ * @param to The path to copy to.
+ * @return If the action is successful.
+ */
+bool CopyDir(const std::string &from, const std::string &to);
+
+/**
+ * @brief Copy a file or directory.
+ * @param from The path to copy from.
+ * @param to The path to copy to.
+ * @return If the action is successful.
+ */
+bool Copy(const std::string &from, const std::string &to);
 
 /**
  * @brief Check if a specified directory specified by directory_path exists.

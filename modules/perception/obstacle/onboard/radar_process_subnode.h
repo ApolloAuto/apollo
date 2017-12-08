@@ -50,8 +50,8 @@ class RadarProcessSubnode : public Subnode {
   RadarProcessSubnode() = default;
   ~RadarProcessSubnode() = default;
 
-  StatusCode ProcEvents() override {
-    return SUCC;
+  apollo::common::Status ProcEvents() override {
+    return apollo::common::Status::OK();
   }
 
  private:
@@ -67,8 +67,6 @@ class RadarProcessSubnode : public Subnode {
   bool InitFrameDependence();
 
   bool InitAlgorithmPlugin();
-
-  bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans);
 
   void PublishDataAndEvent(double timestamp,
                            const SharedDataPtr<SensorObjects> &data);

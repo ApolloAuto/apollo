@@ -20,16 +20,14 @@ namespace perception {
 namespace traffic_light {
 
 bool CarPose::set_pose(const Eigen::Matrix4d &pose) {
-  _pose = pose;
+  pose_ = pose;
   return true;
 }
 
-const Eigen::Matrix4d CarPose::pose() const {
-  return _pose;
-}
+const Eigen::Matrix4d CarPose::pose() const { return pose_; }
 
 std::ostream &operator<<(std::ostream &os, const CarPose &pose) {
-  os << pose._pose;
+  os << pose.pose_;
   return os;
 }
 

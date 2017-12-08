@@ -18,7 +18,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171129_1427"
+VERSION_X86_64="dev-x86_64-20171206_1627"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -76,9 +76,11 @@ function main(){
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     devices="${devices} $(find_device nvidia*)"
-    devices="${devices} $(find_device video*)"
     devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
     devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
+    devices="${devices} -v /dev/novatel0:/dev/novatel0"
+    devices="${devices} -v /dev/novatel1:/dev/novatel1"
+    devices="${devices} -v /dev/novatel2:/dev/novatel2"
 
     USER_ID=$(id -u)
     GRP=$(id -g -n)
@@ -91,7 +93,6 @@ function main(){
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
-    set -x
     docker run -it \
         -d \
         --privileged \
@@ -108,6 +109,8 @@ function main(){
         -v /media:/media \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
+        -v /usr/src:/usr/src \
+        -v /lib/modules:/lib/modules \
         --net host \
         -w /apollo \
         ${devices} \
@@ -117,7 +120,6 @@ function main(){
         --shm-size 512M \
         $IMG \
         /bin/bash
-    set +x
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi

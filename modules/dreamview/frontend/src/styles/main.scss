@@ -245,9 +245,19 @@ body {
     }
 }
 
+.offlineview {
+    display: flex;
+    flex-flow: column nowrap;
 
+    position: absolute;
+    width: 100%;
+    height: 100%;
 
-
+    .main-view {
+        flex: 0 0 auto;
+        position: relative;
+    }
+}
 
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
@@ -996,6 +1006,29 @@ body {
                 }
             }
         }
+    }
+}
+
+.video {
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    img {
+        position: relative;
+        min-width: 100px;
+        min-height: 20px;
+        max-width: 380px;
+        max-height: 300px;
+
+        @include small-screen {
+            max-width: 300px;
+            max-height: 200px;
+        }
+
+        padding: 1px;
+        border: 1px solid #383838;
     }
 }
 

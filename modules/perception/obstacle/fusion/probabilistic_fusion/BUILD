@@ -46,31 +46,30 @@ cc_library(
     ],
 )
 
-# FIXME(all): this test run has some problems.
-# cc_test(
-#    name = "probabilistic_fusion_test",
-#    size = "large",
-#    srcs = [
-#        "probabilistic_fusion_test.cc",
-#    ],
-#    data = [
-#        "//modules/perception:perception_data",
-#        "//modules/perception:perception_model",
-#        "//modules/perception/conf:perception_config",
-#    ],
-#    deps = [
-#        ":probabilistic_fusion",
-#        "//external:gflags",
-#        "//modules/common:log",
-#        "//modules/perception/lib/pcl_util",
-#        "@gtest//:gtest",
-#        "@gtest//:main",
-#    ],
-# )
+cc_test(
+   name = "probabilistic_fusion_test",
+   size = "small",
+   srcs = [
+       "probabilistic_fusion_test.cc",
+   ],
+   data = [
+       "//modules/perception:perception_data",
+       "//modules/perception:perception_model",
+       "//modules/perception/conf:perception_config",
+   ],
+   deps = [
+       ":probabilistic_fusion",
+       "//external:gflags",
+       "//modules/common:log",
+       "//modules/perception/lib/pcl_util",
+       "@gtest//:gtest",
+       "@gtest//:main",
+   ],
+)
 
 cc_test(
     name = "pbf_motion_fusion_test",
-    size = "large",
+    size = "small",
     srcs = [
         "pbf_motion_fusion_test.cc",
     ],

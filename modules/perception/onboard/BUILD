@@ -28,6 +28,7 @@ cc_library(
         "//modules/common",
         "//modules/common:log",
         "//modules/common/configs:config_gflags",
+        "//modules/common/status",
         "//modules/perception/lib/base",
         "//modules/perception/onboard/proto:dag_proto",
         "//modules/perception/common:perception_common",

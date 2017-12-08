@@ -97,10 +97,14 @@ bool Frame::Rerouting() {
            << point.DebugString() << ", heading:" << vehicle_state_.heading();
     return false;
   }
-  auto *start_point = request.mutable_waypoint(0);
+  routing::LaneWaypoint end_point;
+  end_point.CopyFrom(*request.waypoint().rbegin());
+  request.clear_waypoint();
+  auto *start_point = request.add_waypoint();
   start_point->set_id(lane->id().id());
   start_point->set_s(s);
   start_point->mutable_pose()->CopyFrom(point);
+  request.add_waypoint()->CopyFrom(end_point);
   AdapterManager::PublishRoutingRequest(request);
   return true;
 }
@@ -129,9 +133,16 @@ bool Frame::InitReferenceLineInfo() {
 
   for (auto &info : reference_line_info_) {
     if (!info.Init()) {
-      AERROR << "Failed to init adc sl boundary";
+      AERROR << "Failed to init reference line";
       return false;
     }
+  }
+  if (!change_lane_decider_.Apply(&reference_line_info_)) {
+    AERROR << "Failed to apply change lane decider";
+    return false;
+  }
+
+  for (auto &info : reference_line_info_) {
     if (!info.AddObstacles(obstacles_.Items())) {
       AERROR << "Failed to add obstacles to reference line";
       return false;
@@ -318,6 +329,12 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();
     }
+  }
+  if (reference_line_info_.size() > 1 &&
+      !drive_reference_line_info_->IsChangeLanePath()) {
+    change_lane_decider_.UpdateState(
+        planning_internal::ChangeLaneState::CHANGE_LANE_FAILED,
+        drive_reference_line_info_->Lanes().Id());
   }
   return drive_reference_line_info_;
 }

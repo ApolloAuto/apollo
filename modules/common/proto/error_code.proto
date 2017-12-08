@@ -27,6 +27,7 @@ enum ErrorCode {
   PERCEPTION_ERROR = 4000;
   PERCEPTION_ERROR_TF = 4001;
   PERCEPTION_ERROR_PROCESS = 4002;
+  PERCEPTION_FATAL = 4003;
 
   // Prediction module error codes start from here.
   PREDICTION_ERROR = 5000;
@@ -45,6 +46,10 @@ enum ErrorCode {
 
   // Indicates an input has been exhausted.
   END_OF_INPUT = 9000;
+
+  // HTTP request error codes.
+  HTTP_LOGIC_ERROR = 10000;
+  HTTP_RUNTIME_ERROR = 10001;
 }
 
 message StatusPb {

@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
+
+#include "Eigen/Core"
+#include "Eigen/Dense"
+
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 
 namespace apollo {
@@ -25,7 +27,7 @@ namespace traffic_light {
 bool MultiCamerasProjection::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name = "MultiCamerasProjection";
-  const ModelConfig *model_config = NULL;
+  const ModelConfig *model_config = nullptr;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
     return false;
@@ -99,8 +101,8 @@ bool MultiCamerasProjection::Init() {
   camera_coeffient_.resize(camera_names_.size());
   camera_coeffient_[kLongFocusIdx] = camera_coeffients["camera_25mm_focus"];
   camera_coeffient_[kShortFocusIdx] = camera_coeffients["camera_6mm_focus"];
-  auto &short_focus_camera_coeffient = camera_coeffients["camera_6mm_focus"];
-  auto &long_focus_camera_coeffient = camera_coeffients["camera_25mm_focus"];
+  // auto &short_focus_camera_coeffient = camera_coeffients["camera_6mm_focus"];
+  // auto &long_focus_camera_coeffient = camera_coeffients["camera_25mm_focus"];
   camera_coeffient_[kLongFocusIdx].camera_extrinsic =
       camera_coeffient_[kLongFocusIdx].camera_extrinsic *
       camera_coeffient_[kShortFocusIdx].camera_extrinsic;
@@ -115,8 +117,6 @@ bool MultiCamerasProjection::Project(const CarPose &pose,
   const Eigen::Matrix4d mpose = pose.pose();
   const apollo::hdmap::Signal &tl_info = light->info;
   bool ret = true;
-
-  std::map<int, CameraCoeffient> camera_id_to_coeffient;
 
   auto camera_id = static_cast<int>(option.camera_id);
   if (camera_id < 0 || camera_id >= kCountCameraId) {

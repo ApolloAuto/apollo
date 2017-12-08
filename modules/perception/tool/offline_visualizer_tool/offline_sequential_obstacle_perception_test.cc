@@ -20,8 +20,8 @@
 #include <string>
 
 #include "Eigen/Core"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
@@ -268,7 +268,7 @@ class SequentialPerceptionTest {
     for (const auto& sensor_files_source : sensors_files_sources_) {
       std::string sensor_key = sensor_files_source.first;
       const SensorFilesSource& source = sensor_files_source.second;
-      if (!FileUtil::Exists(source.folder_path)) {
+      if (!apollo::common::util::DirectoryExists(source.folder_path)) {
         AWARN << "No sensor files source: " << sensor_key;
         continue;
       }
