@@ -93,7 +93,6 @@ function main(){
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
-    set -x
     docker run -it \
         -d \
         --privileged \
@@ -110,8 +109,8 @@ function main(){
         -v /media:/media \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
--v /usr/src:/usr/src \
--v /lib/modules:/lib/modules \
+        -v /usr/src:/usr/src \
+        -v /lib/modules:/lib/modules \
         --net host \
         -w /apollo \
         ${devices} \
@@ -121,7 +120,6 @@ function main(){
         --shm-size 512M \
         $IMG \
         /bin/bash
-    set +x
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
