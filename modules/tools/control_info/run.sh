@@ -16,9 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-
-set -x
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/../../../scripts/apollo_base.sh"
 
