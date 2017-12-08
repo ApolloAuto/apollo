@@ -49,5 +49,17 @@ int SignalLightScenario::ComputeScenarioDecision(
 
   return 0;
 }
+
+bool SignalLightScenario::FindValidSignalLight(
+    ReferenceLineInfo* const reference_line_info) {
+  return false;
+}
+
+void SignalLightScenario::ReadSignals() {
+  detected_signals_.clear();
+  return;
+}
+
+
 }
 }
