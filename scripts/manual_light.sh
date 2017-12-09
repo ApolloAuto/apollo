@@ -21,4 +21,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $DIR/..
 
-./bazel-bin/modules/tools/manual_traffic_light/manual_traffic_light --flagfile=modules/common/data/global_flagfile.txt $@
+if [ "$RELEASE_DOCKER" == 1 ]; then
+  /apollo/modules/tools/manual_traffic_light/manual_traffic_light --flagfile=modules/common/data/global_flagfile.txt $@
+else
+  ./bazel-bin/modules/tools/manual_traffic_light/manual_traffic_light --flagfile=modules/common/data/global_flagfile.txt $@
+fi

@@ -238,7 +238,11 @@ function release() {
 
   # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
+
+  # tools
   cp -r modules/tools $MODULES_DIR
+  rm $MODULES_DIR/tools/manual_traffic_light/*
+  cp bazel-bin/modules/tools/manual_traffic_light/manual_traffic_light $MODULES_DIR/tools/manual_traffic_light
 
   # ros
   cp -Lr bazel-apollo/external/ros $RELEASE_DIR/
