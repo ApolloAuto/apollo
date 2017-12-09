@@ -25,6 +25,7 @@
 #include <limits>
 #include <utility>
 
+#include "modules/common/time/time.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -39,6 +40,7 @@ namespace planning {
 
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
 using apollo::hdmap::RouteSegments;
 using apollo::hdmap::LaneWaypoint;
 
@@ -113,8 +115,8 @@ bool ReferenceLineProvider::IsAllowChangeLane(
         common::util::DistanceXY(history_iter->second.last_point, point);
     history_iter->second.last_point = point;
     history_iter->second.accumulate_s += dist;
-    constexpr double kChangeLaneMinL = 0.25;
-    constexpr double kChangeLaneMinLengthFactor = 0.6;
+    constexpr double kChangeLaneMinL = 0.30;
+    constexpr double kChangeLaneMinLengthFactor = 0.3;
 
     if (history_iter->second.min_l < kChangeLaneMinL &&
         std::fmax(waypoint.s, history_iter->second.accumulate_s) >=
@@ -173,12 +175,51 @@ void ReferenceLineProvider::Stop() {
   }
 }
 
+void ReferenceLineProvider::UpdateReferenceLine(
+    const std::list<ReferenceLine> &reference_lines,
+    const std::list<hdmap::RouteSegments> &route_segments) {
+  if (reference_lines.size() != route_segments.size()) {
+    AERROR << "The calculated reference line size(" << reference_lines.size()
+           << ") and route_segments size(" << route_segments.size()
+           << ") are different";
+    return;
+  }
+  std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+  if (reference_lines_.size() != reference_lines.size()) {
+    reference_lines_ = reference_lines;
+    route_segments_ = route_segments;
+    return;
+  }
+  auto segment_iter = route_segments.begin();
+  auto internal_iter = reference_lines_.begin();
+  auto internal_segment_iter = route_segments_.begin();
+  for (auto iter = reference_lines.begin(); iter != reference_lines.end();
+       ++iter, ++segment_iter, ++internal_iter, ++internal_segment_iter) {
+    if (iter->reference_points().empty()) {
+      *internal_iter = *iter;
+      *internal_segment_iter = *segment_iter;
+      continue;
+    }
+    if (common::util::SamePointXY(iter->reference_points().front(),
+                                  internal_iter->reference_points().front()) &&
+        common::util::SamePointXY(iter->reference_points().back(),
+                                  internal_iter->reference_points().back()) &&
+        std::fabs(iter->Length() - internal_iter->Length()) <
+            common::math::kMathEpsilon) {
+      continue;
+    }
+    *internal_iter = *iter;
+    *internal_segment_iter = *segment_iter;
+  }
+}
+
 void ReferenceLineProvider::GenerateThread() {
   constexpr int32_t kSleepTime = 10;  // milliseconds
   while (!is_stop_) {
     std::this_thread::yield();
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
+    double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
       continue;
@@ -189,10 +230,22 @@ void ReferenceLineProvider::GenerateThread() {
       AERROR << "Fail to get reference line";
       continue;
     }
+// <<<<<<< HEAD
+//     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+//     reference_lines_ = reference_lines;
+//     route_segments_ = segments;
+// =======
+    UpdateReferenceLine(reference_lines, segments);
+    double end_time = Clock::NowInSeconds();
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
-    reference_lines_ = reference_lines;
-    route_segments_ = segments;
+    last_calculation_time_ = end_time - start_time;
+// >>>>>>> master
   }
+}
+
+double ReferenceLineProvider::LastTimeDelay() {
+  std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+  return last_calculation_time_;
 }
 
 bool ReferenceLineProvider::GetReferenceLines(
@@ -212,12 +265,19 @@ bool ReferenceLineProvider::GetReferenceLines(
       return false;
     }
   } else {
+    double start_time = Clock::NowInSeconds();
     if (!CreateReferenceLine(reference_lines, segments)) {
       AERROR << "Failed to create reference line";
       return false;
     }
-    reference_lines_ = *reference_lines;
-    route_segments_ = *segments;
+// <<<<<<< HEAD
+//     reference_lines_ = *reference_lines;
+//     route_segments_ = *segments;
+// =======
+    UpdateReferenceLine(*reference_lines, *segments);
+    double end_time = Clock::NowInSeconds();
+    last_calculation_time_ = end_time - start_time;
+// >>>>>>> master
     return true;
   }
 }
@@ -250,14 +310,7 @@ bool ReferenceLineProvider::CreateRouteSegments(
       return false;
     }
   }
-  bool is_allow_change_lane = IsAllowChangeLane(point, *segments);
-  for (auto iter = segments->begin(); iter != segments->end();) {
-    if (!is_allow_change_lane && !iter->IsOnSegment()) {
-      iter = segments->erase(iter);
-    } else {
-      ++iter;
-    }
-  }
+
   if (FLAGS_prioritize_change_lane) {
     PrioritzeChangeLane(segments);
   }

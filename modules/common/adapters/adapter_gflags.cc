@@ -39,6 +39,8 @@ DEFINE_string(pointcloud_topic,
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");
+DEFINE_string(drive_event_topic, "/apollo/drive_event",
+              "drive event topic name");
 DEFINE_string(traffic_light_detection_topic, "/apollo/perception/traffic_light",
               "traffic light detection topic name");
 DEFINE_string(routing_request_topic, "/apollo/routing_request",

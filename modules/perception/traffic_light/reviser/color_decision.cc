@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/reviser/color_decision.h"
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 
@@ -22,9 +23,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-std::string ColorReviser::name() const {
-  return "ColorReviser";
-}
+std::string ColorReviser::name() const { return "ColorReviser"; }
 bool ColorReviser::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
   if (config_manager == NULL) {
@@ -57,7 +56,7 @@ bool ColorReviser::Revise(const ReviseOption &option,
   }
   std::vector<LightPtr> &lights_ref = *lights;
 
-  for (int i = 0; i < lights_ref.size(); ++i) {
+  for (size_t i = 0; i < lights_ref.size(); ++i) {
     std::string id = lights_ref[i]->info.id().id();
     std::cout << "light " << i << " id: " << id << std::endl;
     switch (lights_ref[i]->status.color) {

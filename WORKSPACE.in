@@ -138,11 +138,18 @@ new_http_archive(
     url = "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip",
 )
 
-#IpOpt
+# IpOpt
 new_local_repository(
     name = "ipopt",
     build_file = "third_party/ipopt.BUILD",
     path = "/usr/local/ipopt/include/coin",
+)
+
+# Local-integ
+new_local_repository(
+    name = "local_integ",
+    build_file = "third_party/local_integ.BUILD",
+    path = "/usr/local/local_integ",
 )
 
 # Proj.4

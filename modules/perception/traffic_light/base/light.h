@@ -14,16 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H_
 
-#include <eigen3/Eigen/Core>
-#include <opencv2/opencv.hpp>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
+
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+
 #include "modules/perception/traffic_light/base/image.h"
 
 namespace apollo {
@@ -121,7 +124,7 @@ typedef std::shared_ptr<Light> LightPtr;
 typedef std::vector<LightPtr> LightPtrs;
 
 // @brief compute stopline to car's distance
-double stopline_distance(
+double Distance2Stopline(
     const Eigen::Matrix4d &car_pose,
     const google::protobuf::RepeatedPtrField<apollo::hdmap::Curve> &stoplines);
 
@@ -129,4 +132,4 @@ double stopline_distance(
 }  //  namespace perception
 }  //  namespace apollo
 
-#endif  //  MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H
+#endif  //  MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_LIGHT_H_

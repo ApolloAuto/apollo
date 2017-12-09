@@ -46,8 +46,8 @@ class LidarProcessSubnode : public Subnode {
   LidarProcessSubnode() = default;
   ~LidarProcessSubnode() = default;
 
-  StatusCode ProcEvents() override {
-    return SUCC;
+  apollo::common::Status ProcEvents() override {
+    return apollo::common::Status::OK();
   }
 
  private:
@@ -72,7 +72,7 @@ class LidarProcessSubnode : public Subnode {
                            const SharedDataPtr<SensorObjects>& data);
 
   bool inited_ = false;
-  double timestamp_;
+  double timestamp_ = 0;
   SeqId seq_num_ = 0;
   common::ErrorCode error_code_ = common::OK;
   LidarObjectData* processing_data_ = nullptr;

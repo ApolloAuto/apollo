@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H_
 
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
@@ -26,6 +27,7 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
 class UnityRecognize : public BaseRecognizer {
  public:
   UnityRecognize() = default;
@@ -52,7 +54,9 @@ class UnityRecognize : public BaseRecognizer {
 };
 
 REGISTER_RECOGNIZER(UnityRecognize);
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif
+
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_RECOGNIZE_UNITY_RECOGNIZE_H_

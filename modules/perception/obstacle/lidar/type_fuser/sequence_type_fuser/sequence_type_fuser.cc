@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/file_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::GetAbsolutePath;
 
 bool SequenceTypeFuser::Init() {
   const ModelConfig* model_config = NULL;
@@ -42,7 +45,7 @@ bool SequenceTypeFuser::Init() {
   }
   const std::string& work_root = ConfigManager::instance()->work_root();
   transition_property_file_path =
-      FileUtil::GetAbsolutePath(work_root, transition_property_file_path);
+      GetAbsolutePath(work_root, transition_property_file_path);
 
   if (!sequence_type_fuser::LoadSingleMatrixFile(transition_property_file_path,
                                                  &_transition_matrix)) {
@@ -69,10 +72,10 @@ bool SequenceTypeFuser::Init() {
     return false;
   }
   classifiers_property_file_path =
-      FileUtil::GetAbsolutePath(work_root, classifiers_property_file_path);
+      GetAbsolutePath(work_root, classifiers_property_file_path);
 
   if (!sequence_type_fuser::LoadMultipleMatricesFile(
-        classifiers_property_file_path, &_smooth_matrices)) {
+          classifiers_property_file_path, &_smooth_matrices)) {
     return false;
   }
   for (auto& pair : _smooth_matrices) {
@@ -164,13 +167,12 @@ bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
 
   for (std::size_t i = 1; i < length; ++i) {
     for (std::size_t right = 0; right < VALID_OBJECT_TYPE; ++right) {
-      double prob = 0.0;
       double max_prob = -DBL_MAX;
       std::size_t id = 0;
       for (std::size_t left = 0; left < VALID_OBJECT_TYPE; ++left) {
-        prob = _fused_sequence_probs[i - 1](left) +
-               _transition_matrix(left, right) * _s_alpha +
-               _fused_oneshot_probs[i](right);
+        const double prob = _fused_sequence_probs[i - 1](left) +
+                            _transition_matrix(left, right) * _s_alpha +
+                            _fused_oneshot_probs[i](right);
         if (prob > max_prob) {
           max_prob = prob;
           id = left;

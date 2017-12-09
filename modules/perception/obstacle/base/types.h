@@ -19,7 +19,6 @@
 
 #include <string>
 
-#include "modules/perception/common/define.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {

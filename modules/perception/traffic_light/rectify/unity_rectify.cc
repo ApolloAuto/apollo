@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
-#include "modules/perception/lib/base/file_util.h"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/traffic_light/rectify/cropbox.h"
@@ -25,14 +26,16 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool UnityRectify::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == NULL) {
+  if (config_manager == nullptr) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
   }
 
-  const ModelConfig *model_config = NULL;
+  const ModelConfig *model_config = nullptr;
   if (!config_manager->GetModelConfig(name(), &model_config)) {
     AERROR << "not found model config: " << name();
     return false;
@@ -49,10 +52,9 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
                                  const ModelConfig *model_config,
                                  std::shared_ptr<IRefine> *detection,
                                  std::shared_ptr<IGetBox> *crop) {
-  float crop_scale = 0;
+  float crop_scale = 0.0;
   int crop_min_size = 0;
   int crop_method = 0;
-  float output_threshold = 0.0f;
   std::string detection_model;
   std::string detection_net;
 
@@ -75,14 +77,13 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
     AERROR << "detection_model not found." << model_config->name();
     return false;
   }
-  detection_model =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), detection_model);
+  detection_model = GetAbsolutePath(config_manager->work_root(),
+                                    detection_model);
   if (!model_config->GetValue("detection_net", &detection_net)) {
     AERROR << "detection_net not found." << model_config->name();
     return false;
   }
-  detection_net =
-      FileUtil::GetAbsolutePath(config_manager->work_root(), detection_net);
+  detection_net = GetAbsolutePath(config_manager->work_root(), detection_net);
 
   switch (crop_method) {
     default:
@@ -119,7 +120,7 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
   std::vector<LightPtr> detected_bboxes;
 
   for (auto &light : lights_ref) {
-    // 默认第一个debug roi 是 crop roi,这里先站位
+    // By default, the first debug ros is crop roi. (Reserve a position here).
     light->region.rectified_roi = light->region.projection_roi;
     light->region.debug_roi.push_back(cv::Rect(0, 0, 0, 0));
     light->region.debug_roi_detect_scores.push_back(0.0f);
@@ -136,7 +137,7 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     detect_->Perform(ros_image, &detected_bboxes);
 
     AINFO << "detect " << detected_bboxes.size() << " lights";
-    for (int j = 0; j < detected_bboxes.size(); j++) {
+    for (size_t j = 0; j < detected_bboxes.size(); ++j) {
       AINFO << detected_bboxes[j]->region.rectified_roi;
       cv::Rect &region = detected_bboxes[j]->region.rectified_roi;
       float score = detected_bboxes[j]->region.detect_score;
@@ -148,14 +149,14 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
 
     select_->Select(ros_image, lights_ref, detected_bboxes, &selected_bboxes);
   } else {
-    for (int h = 0; h < lights_ref.size(); h++) {
+    for (size_t h = 0; h < lights_ref.size(); ++h) {
       LightPtr light = lights_ref[h];
       light->region.is_detected = false;
       selected_bboxes.push_back(light);
     }
   }
 
-  for (int i = 0; i < lights_ref.size(); ++i) {
+  for (size_t i = 0; i < lights_ref.size(); ++i) {
     if (!selected_bboxes[i]->region.is_detected ||
         !selected_bboxes[i]->region.is_selected) {
       AWARN << "No detection box ,using project box";
@@ -173,9 +174,8 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
   return true;
 }
 
-std::string UnityRectify::name() const {
-  return "UnityRectify";
-}
+std::string UnityRectify::name() const { return "UnityRectify"; }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

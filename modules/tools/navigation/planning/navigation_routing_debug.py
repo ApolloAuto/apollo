@@ -46,7 +46,7 @@ ENABLE_ROUTING_AID = False
 
 f = open("benchmark.txt", "w")
 path_decider = PathDecider()
-speed_decider = SpeedDecider()
+speed_decider = SpeedDecider(CRUISE_SPEED)
 traj_generator = TrajectoryGenerator()
 mobileye_provider = MobileyeProvider()
 chassis_provider = ChassisProvider()
@@ -81,6 +81,7 @@ def mobileye_callback(mobileye_pb):
     global left_marker_x, left_marker_y
     global right_marker_x, right_marker_y
     global local_smooth_seg_x, local_smooth_seg_y
+    global local_smooth_seg_x2, local_smooth_seg_y2
 
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
@@ -92,8 +93,8 @@ def mobileye_callback(mobileye_pb):
     local_seg_x, local_seg_y = routing_provider.get_local_segment(vx, vy,
                                                                   heading)
 
-    local_smooth_seg_x, local_smooth_seg_y = routing_provider.get_local_segment_spline(
-        vx, vy, heading)
+    local_smooth_seg_x, local_smooth_seg_y = \
+        routing_provider.get_local_segment_spline(vx, vy, heading)
 
     left_marker_coef = mobileye_provider.left_lm_coef
     left_marker_x = []
@@ -156,7 +157,7 @@ if __name__ == '__main__':
     ani = animation.FuncAnimation(fig, update, interval=100)
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
-    ax.set_xlim([-2, 100])
+    ax.set_xlim([-200, 200])
     ax.set_ylim([-10, 10])
 
     plt.show()

@@ -47,6 +47,8 @@ DECLARE_double(spiral_reference_line_resolution);
 
 DECLARE_bool(prioritize_change_lane);
 DECLARE_bool(reckless_change_lane);
+DECLARE_double(change_lane_fail_freeze_time);
+DECLARE_double(change_lane_success_freeze_time);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
@@ -97,7 +99,8 @@ DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
-DECLARE_double(stop_distance_obstacle);
+DECLARE_double(min_stop_distance_obstacle);
+DECLARE_double(max_stop_distance_obstacle);
 DECLARE_double(stop_distance_destination);
 DECLARE_double(stop_distance_traffic_light);
 DECLARE_double(destination_check_distance);

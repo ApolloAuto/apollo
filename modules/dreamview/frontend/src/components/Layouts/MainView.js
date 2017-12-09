@@ -2,12 +2,21 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 
 import Navigation from "components/Navigation";
-import DashCamPlayer from "components/DashCamPlayer";
 import RouteEditingBar from "components/RouteEditingBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
 import Loader from "components/common/Loader";
 import PlaybackControls from "components/PlaybackControls";
+
+class SensorCamera extends React.Component {
+    render() {
+        return (
+           <div className="video">
+                <img src='/image'/>
+            </div>
+        );
+    }
+}
 
 @inject("store") @observer
 class SceneView extends React.Component {
@@ -26,7 +35,7 @@ class SceneView extends React.Component {
                                  trafficSignal={trafficSignal}
                                  showNotification={!options.showConsole}
                                  monitor={monitor}/>}
-                {video.showVideo && <DashCamPlayer />}
+                {options.showVideo && <SensorCamera /> }
                 {OFFLINE_PLAYBACK && <PlaybackControls />}
             </div>
         );

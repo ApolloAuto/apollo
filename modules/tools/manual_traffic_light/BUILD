@@ -12,7 +12,7 @@ cc_binary(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
-        "//modules/common/util:string_util",
+        "//modules/common/util:color",
         "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
     ],

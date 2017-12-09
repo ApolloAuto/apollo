@@ -51,7 +51,7 @@ class LatControllerTest : public ::testing::Test, LatController {
                                                  &control_conf));
     lateral_conf_ = control_conf.lat_controller_conf();
 
-    timestamp_ = Clock::NowInSecond();
+    timestamp_ = Clock::NowInSeconds();
   }
 
   void ComputeLateralErrors(const double x, const double y, const double theta,

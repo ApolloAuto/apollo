@@ -118,9 +118,7 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
   echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
-  if [ $? -eq 0 ]; then
-    success 'Build passed!'
-  else
+  if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
 
@@ -129,6 +127,16 @@ function build() {
 
   # Update task info template on compiling.
   bazel-bin/modules/data/util/update_task_info --commit_id=$(git rev-parse HEAD)
+
+  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
+      cd /apollo-simulator && bash build.sh build
+      if [ $? -ne 0 ]; then
+        fail 'Build failed!'
+      fi
+  fi
+  if [ $? -eq 0 ]; then
+    success 'Build passed!'
+  fi
 }
 
 function cibuild() {
@@ -208,7 +216,7 @@ function release() {
   MODULES_DIR=$RELEASE_DIR/modules
   mkdir -p $MODULES_DIR
   for m in control canbus localization decision perception \
-       prediction planning routing calibration third_party_perception
+       prediction planning routing calibration third_party_perception monitor
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
@@ -227,7 +235,7 @@ function release() {
   mkdir $MODULES_DIR/control/tools
   cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
 
-  #remove all pyc file in modules/
+  # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
   cp -r modules/tools $MODULES_DIR
 
@@ -274,13 +282,6 @@ function release() {
     do
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
-    # hw check
-    mkdir -p $MODULES_DIR/monitor/hardware/can
-    cp bazel-bin/modules/monitor/hardware/can/can_check $MODULES_DIR/monitor/hardware/can
-    mkdir -p $MODULES_DIR/monitor/hardware/gps
-    cp bazel-bin/modules/monitor/hardware/gps/gps_check $MODULES_DIR/monitor/hardware/gps
-    mkdir -p $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
-    cp bazel-bin/modules/monitor/hardware/can/esdcan/esdcan_tools/esdcan_test_app $MODULES_DIR/monitor/hardware/can/esdcan/esdcan_tools
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
@@ -360,12 +361,22 @@ function run_test() {
   else
     echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
+  if [ $? -ne 0 ]; then
+    fail 'Test failed!'
+    return 1
+  fi
+
+  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
+      cd /apollo-simulator && bash build.sh test
+      if [ $? -ne 0 ]; then
+        fail 'Test failed!'
+        return 1
+      fi
+  fi
+
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
-  else
-    fail 'Test failed!'
-    return 1
   fi
 }
 
@@ -570,7 +581,7 @@ function print_usage() {
   ${BLUE}build_usbcam${NONE}: build velodyne driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
-  ${BLUE}build_no_perception${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
+  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
@@ -617,7 +628,13 @@ function main() {
     build_no_perception)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       NOT_BUILD_PERCEPTION=true
-      apollo_build_dbg $@
+      if [ "$1" == "opt" ]; then
+        shift
+        apollo_build_opt $@
+      elif [ "$1" == "dbg" ]; then
+        shift
+        apollo_build_dbg $@
+      fi
       ;;
     cibuild)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"

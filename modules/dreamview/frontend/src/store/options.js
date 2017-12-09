@@ -9,6 +9,7 @@ export default class Options {
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
+    @observable showVideo = PARAMETERS.options.defaults.showVideo;
 
     @observable showMenu =
         OFFLINE_PLAYBACK ? true : PARAMETERS.options.defaults.showMenu;

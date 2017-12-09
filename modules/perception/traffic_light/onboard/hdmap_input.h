@@ -17,12 +17,11 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_
 
-#include <eigen3/Eigen/Core>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <vector>
-#include "gtest/gtest_prod.h"
+
+#include "Eigen/Core"
 
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -46,7 +45,9 @@ class HDMapInput {
 };
 
 typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_HDMAP_INPUT_H_

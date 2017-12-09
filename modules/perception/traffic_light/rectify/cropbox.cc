@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/traffic_light/rectify/cropbox.h"
+
 #include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
@@ -34,13 +36,13 @@ void CropBox::GetCropBox(const cv::Size &size,
   }
   int rows = size.height;
   int cols = size.width;
-  float xr = 0;
-  float yb = 0;
-  float xl = cols - 1;
-  float yt = rows - 1;
+  float xr = 0.0;
+  float yb = 0.0;
+  float xl = cols - 1.0;
+  float yt = rows - 1.0;
   bool initialized = false;
   // min max: for all hdmap boxes
-  for (int i = 0; i < lights_num; i++) {
+  for (int i = 0; i < lights_num; ++i) {
     Light &light = *lights[i];
     if (!BoxIsValid(light.region.projection_roi, size)) {
       continue;
@@ -74,10 +76,11 @@ void CropBox::GetCropBox(const cv::Size &size,
   resize_width = resize_height =
       (resize < min_crop_size_) ? min_crop_size_ : resize;
 
-  float pad_t = (resize_height - (yb - yt)) / 2;
-  float pad_l = (resize_width - (xr - xl)) / 2;
-  float pad_b = pad_t;
-  float pad_r = pad_l;
+  // float pad_t = (resize_height - (yb - yt)) / 2;
+  // float pad_l = (resize_width - (xr - xl)) / 2;
+  // float pad_b = pad_t;
+  // float pad_r = pad_l;
+
   // clamp
   xl = center_x - resize_width / 2;
   xl = (xl < 0) ? 0 : xl;
@@ -93,17 +96,20 @@ void CropBox::GetCropBox(const cv::Size &size,
   cropbox->width = static_cast<int>(xr - xl);
   cropbox->height = static_cast<int>(yb - yt);
 }
+
 void CropBox::Init(float crop_scale, float min_crop_size) {
   crop_scale_ = crop_scale;
   min_crop_size_ = min_crop_size;
 }
+
 CropBox::CropBox(float crop_scale, float min_crop_size) {
   Init(crop_scale, min_crop_size);
 }
+
 void CropBoxWholeImage::GetCropBox(const cv::Size &size,
                                    const std::vector<LightPtr> &lights,
                                    cv::Rect *cropbox) {
-  for (int i = 0; i < lights.size(); ++i) {
+  for (size_t i = 0; i < lights.size(); ++i) {
     if (BoxIsValid(lights[i]->region.projection_roi, size)) {
       cropbox->x = cropbox->y = 0;
       cropbox->width = size.width;

@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H_
 
 #include <string>
 #include <vector>
+
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/light.h"
@@ -65,4 +66,4 @@ REGISTER_REGISTERER(BaseRectifier);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_INTERFACE_BASE_RECTIFIER_H_

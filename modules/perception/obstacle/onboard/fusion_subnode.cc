@@ -16,8 +16,8 @@
 
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 
-#include <std_msgs/String.h>
 #include <map>
+
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -26,6 +26,9 @@
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 bool FusionSubnode::InitInternal() {
   RegistAllAlgorithm();
@@ -96,13 +99,13 @@ bool FusionSubnode::InitOutputStream() {
   return true;
 }
 
-StatusCode FusionSubnode::ProcEvents() {
+Status FusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
       AERROR << "event meta id:" << event_meta.event_id << " "
              << event_meta.from_node << " " << event_meta.to_node;
-      return StatusCode::FAIL;
+      return Status(ErrorCode::PERCEPTION_ERROR, "Subscribe event fail.");
     }
     if (events.empty()) {
       continue;
@@ -123,16 +126,16 @@ StatusCode FusionSubnode::ProcEvents() {
     AINFO << "Publish 3d perception fused msg. timestamp:"
           << GLOG_TIMESTAMP(timestamp_) << " obj_cnt:" << objects_.size();
   }
-  return StatusCode::SUCC;
+  return Status::OK();
 }
 
-StatusCode FusionSubnode::Process(const EventMeta &event_meta,
-                                  const std::vector<Event> &events) {
+Status FusionSubnode::Process(const EventMeta &event_meta,
+                              const std::vector<Event> &events) {
   std::vector<SensorObjects> sensor_objs;
   if (!BuildSensorObjs(events, &sensor_objs)) {
     AERROR << "Failed to build_sensor_objs";
     error_code_ = common::PERCEPTION_ERROR_PROCESS;
-    return StatusCode::FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to build_sensor_objs.");
   }
   PERF_BLOCK_START();
   objects_.clear();
@@ -142,7 +145,7 @@ StatusCode FusionSubnode::Process(const EventMeta &event_meta,
           << "] event_cnt:" << events.size() << " event_0: ["
           << events[0].to_string() << "]";
     error_code_ = common::PERCEPTION_ERROR_PROCESS;
-    return StatusCode::FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call fusion plugin.");
   }
   if (event_meta.event_id == lidar_event_id_) {
     PERF_BLOCK_END("fusion_lidar");
@@ -151,7 +154,7 @@ StatusCode FusionSubnode::Process(const EventMeta &event_meta,
   }
   timestamp_ = sensor_objs[0].timestamp;
   error_code_ = common::OK;
-  return StatusCode::SUCC;
+  return Status::OK();
 }
 
 bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
@@ -237,7 +240,6 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
     obj->Serialize(obstacle);
-    obstacle->set_timestamp(obstacle->timestamp() * 1000);
   }
 
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();

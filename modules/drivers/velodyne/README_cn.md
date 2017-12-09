@@ -24,7 +24,7 @@ velodyne驱动是以nodelet的形式实现的，包含了:
 
 ```bash 
 # in dev docker
-cd /apolloe
+cd /apollo
 bash apollo.sh build_velodyne
 ```
 产出会覆盖`/home/tmp/ros/`中原有的velodyne驱动相关文件
@@ -78,8 +78,8 @@ roslaunch velodyne velodyne_check.launch
 在`/apollo/data/log/`目录生成`velodyne_hz.yyyy-mm-dd-HH-MM-SS.log`和`velodyne_hz.yyyy-mm-dd-HH-MM-SS.log.err`两种方式命名的文件。`.log`文件记录了运动补偿后点云的每一帧之间的时间间隔和频率，`.log.err`记录了频率低于9Hz的点云的时间戳和对应时间间隔
 
 ### 常见问题
-1. velodyne port 2368 poll() timeout
+1. "velodyne port 2368 poll() timeout"
 	主机与velodyne网络不通，可用命令`sudo tcpdump -i eth0 udp port 2368`查看是否能收到velodyne数据包
-2. cannot find transform ...
+2. "cannot find transform ..."
 	`运动补偿`依赖`tf`，请检查`gnss_driver`是否已启动，同时可通过`rostopic echo /tf`查看是否有消息输出
  

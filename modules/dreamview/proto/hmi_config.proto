@@ -22,3 +22,17 @@ message HMIConfig {
   map<string, string> available_vehicles = 5;  // {vehicle_name: vehicle_dir}
   map<string, Mode> modes = 6;                 // {mode_name: mode_config}
 }
+
+message VehicleData {
+  // Upon switching vehicle, we need to copy source data to the dest path to
+  // make it in effect.
+  message DataFile {
+  	// Source path is a path relative to the vehicle data directory.
+  	optional string source_path = 1;
+  	// Dest path is where the data file could become in effect. It is allowed to
+  	// contain patterns such as "<ros>" which are able to finalize by
+  	// apollo::common::util::TranslatePath().
+  	optional string dest_path = 2;
+  }
+  repeated DataFile data_files = 1;
+}

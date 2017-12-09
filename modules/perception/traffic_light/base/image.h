@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_
 
-#include <gflags/gflags.h>
-#include <sensor_msgs/Image.h>
-#include <opencv2/opencv.hpp>
 #include <map>
 #include <memory>
 #include <string>
+
+#include "gflags/gflags.h"
+#include "opencv2/opencv.hpp"
+#include "sensor_msgs/Image.h"
 
 namespace apollo {
 namespace perception {
@@ -37,8 +38,8 @@ enum CameraId {
 };
 
 const std::map<int, std::string> kCameraIdToStr = {
-    {static_cast<int>(LONG_FOCUS), "long_focus_camera(25mm)"},
-    {static_cast<int>(SHORT_FOCUS), "short_focus_camera(6mm)"}};
+    {static_cast<int>(LONG_FOCUS), "long_focus_camera_25mm"},
+    {static_cast<int>(SHORT_FOCUS), "short_focus_camera_6mm"}};
 
 // @brief Image loaded from camera.
 //       Warning: Image is not Thread Safe.
@@ -72,19 +73,11 @@ class Image {
 
   cv::Size size() const;
   // @brief cotain image.
-  bool contain_mat() const {
-    return contain_mat_;
-  }
-  bool contain_image() const {
-    return contain_image_;
-  }
-  void set_ts(double ts) {
-    timestamp_ = ts;
-  }
+  bool contain_mat() const { return contain_mat_; }
+  bool contain_image() const { return contain_image_; }
+  void set_ts(double ts) { timestamp_ = ts; }
 
-  void set_device_id(CameraId camera_id) {
-    camera_id_ = camera_id;
-  }
+  void set_device_id(CameraId camera_id) { camera_id_ = camera_id; }
 
   bool GenerateMat();
 
@@ -104,4 +97,4 @@ typedef std::shared_ptr<Image> ImageSharedPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_

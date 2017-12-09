@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_CLASSIFY_H
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_CLASSIFY_H
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_CLASSIFY_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_CLASSIFY_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "caffe/caffe.hpp"
+
 #include "modules/perception/traffic_light/base/light.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
@@ -41,17 +44,19 @@ class ClassifyBySimple : public IRefine {
 
   void SetCropBox(const cv::Rect &box) override;
 
-  ~ClassifyBySimple();
+  ~ClassifyBySimple() = default;
 
  private:
   void ProbToColor(const float *out_put_data, float threshold, LightPtr light);
-  caffe::Net<float> *classify_net_ptr_;
+  std::unique_ptr<caffe::Net<float>> classify_net_ptr_;
   cv::Rect crop_box_;
-  int resize_width_;
-  int resize_height_;
-  float unknown_threshold_;
+  int resize_width_ = 0;
+  int resize_height_ = 0;
+  float unknown_threshold_ = 0.0;
 };
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
-#endif
+
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_CLASSIFY_H_

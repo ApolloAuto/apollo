@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gflags/gflags.h>
 #include <array>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
-#include <sensor_msgs/Image.h>
-#include <std_msgs/String.h>
-#include <opencv2/opencv.hpp>
+#include "cv_bridge/cv_bridge.h"
+#include "gflags/gflags.h"
+#include "image_transport/image_transport.h"
+#include "opencv2/opencv.hpp"
 #include "ros/meta_stats.h"
 #include "ros/ros.h"
+#include "sensor_msgs/Image.h"
+#include "std_msgs/String.h"
 
-#include "modules/perception/onboard/stream_output.h"
+#include "modules/perception/traffic_light_detection.pb.h"
 
-#include <modules/perception/traffic_light_detection.pb.h>
 #include "modules/perception/lib/base/perf.h"
 #include "modules/perception/lib/base/time_util.h"
+#include "modules/perception/onboard/stream_output.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 
 using apollo::perception::traffic_light::Image;
@@ -221,12 +221,12 @@ void tl_debug_callback(const std_msgs::String::ConstPtr &msg) {
   }
 
   // draw image border size (offset between hdmap-box and detection-box)
-  int pos_y_offset = 1000;
   if (camera_ts_id == "222") {
     if (tl_debug_msg.project_error() > 100) {
       std::string img_border_txt =
           "Offset size: " + std::to_string(tl_debug_msg.project_error());
-      cv::putText(s_img, img_border_txt, cv::Point(30, pos_y_offset),
+      constexpr int kPosYOffset = 1000;
+      cv::putText(s_img, img_border_txt, cv::Point(30, kPosYOffset),
                   cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
     }
   }

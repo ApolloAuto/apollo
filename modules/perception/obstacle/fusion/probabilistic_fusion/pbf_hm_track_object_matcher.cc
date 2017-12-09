@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track_object_distance.h"
 
 namespace apollo {
@@ -50,8 +50,8 @@ bool PbfHmTrackObjectMatcher::Match(
 
   const Eigen::Vector3d &ref_point = *(options.ref_point);
   ComputeAssociationMat(fusion_tracks, sensor_objects,
-    *unassigned_fusion_tracks, *unassigned_sensor_objects,
-    ref_point, &association_mat);
+                        *unassigned_fusion_tracks, *unassigned_sensor_objects,
+                        ref_point, &association_mat);
 
   int num_track = fusion_tracks.size();
   int num_measurement = sensor_objects.size();
@@ -65,7 +65,10 @@ bool PbfHmTrackObjectMatcher::Match(
   }
   std::vector<int> measurement_ind_g2l;
   measurement_ind_g2l.resize(num_measurement, -1);
-  std::vector<int> measurement_ind_l2g = *unassigned_sensor_objects;
+
+  // TODO(Perception): remove this line or use the variable
+  // std::vector<int> measurement_ind_l2g = *unassigned_sensor_objects;
+
   for (size_t i = 0; i < unassigned_sensor_objects->size(); i++) {
     measurement_ind_g2l[(*unassigned_sensor_objects)[i]] = i;
   }
@@ -97,7 +100,7 @@ bool PbfHmTrackObjectMatcher::Match(
       if ((*track2measurements_dist)[track_ind] >
           association_mat[track_ind_loc][j]) {
         (*track2measurements_dist)[track_ind] =
-          association_mat[track_ind_loc][j];
+            association_mat[track_ind_loc][j];
       }
     }
   }
@@ -275,9 +278,7 @@ void PbfHmTrackObjectMatcher::MinimizeAssignment(
   hungarian_optimizer.minimize(ref_idx, new_idx);
 }
 
-bool PbfHmTrackObjectMatcher::Init() {
-  return true;
-}
+bool PbfHmTrackObjectMatcher::Init() { return true; }
 
 void PbfHmTrackObjectMatcher::ComputeConnectedComponents(
     const std::vector<std::vector<double>> &association_mat,

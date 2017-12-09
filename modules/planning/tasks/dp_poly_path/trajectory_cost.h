@@ -52,8 +52,17 @@ class TrajectoryCost {
  private:
   double CalculatePathCost(const QuinticPolynomialCurve1d &curve,
                            const double start_s, const double end_s) const;
-  double CalculateObstacleCost(const QuinticPolynomialCurve1d &curve,
-                               const double start_s, const double end_s) const;
+  double CalculateStaticObstacleCost(const QuinticPolynomialCurve1d &curve,
+                                     const double start_s,
+                                     const double end_s) const;
+  double CalculateDynamicObstacleCost(const QuinticPolynomialCurve1d &curve,
+                                      const double start_s,
+                                      const double end_s) const;
+  double GetCostBetweenObsBoxes(const common::math::Box2d &ego_box,
+                                const common::math::Box2d &obstacle_box) const;
+
+  common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
+                                        const double dl) const;
 
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
@@ -61,8 +70,10 @@ class TrajectoryCost {
   SpeedData heuristic_speed_data_;
   const common::SLPoint init_sl_point_;
   uint32_t num_of_time_stamps_ = 0;
-  std::vector<std::vector<common::math::Box2d>> obstacle_boxes_;
+  std::vector<std::vector<common::math::Box2d>> dynamic_obstacle_boxes_;
   std::vector<double> obstacle_probabilities_;
+
+  std::vector<common::math::Box2d> static_obstacle_boxes_;
 };
 
 }  // namespace planning

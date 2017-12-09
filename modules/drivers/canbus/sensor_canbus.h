@@ -131,6 +131,9 @@ std::string SensorCanbus<SensorType>::Name() const {
 
 template <typename SensorType>
 Status SensorCanbus<SensorType>::Init() {
+  AdapterManager::Init(FLAGS_adapter_config_filename);
+  AINFO << "The adapter manager is successfully initialized.";
+
   // load conf
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
                                                 &canbus_conf_)) {
@@ -162,10 +165,6 @@ Status SensorCanbus<SensorType>::Init() {
     return OnError("Failed to init can receiver.");
   }
   AINFO << "The can receiver is successfully initialized.";
-
-  AdapterManager::Init(FLAGS_adapter_config_filename);
-
-  AINFO << "The adapter manager is successfully initialized.";
 
   return Status::OK();
 }

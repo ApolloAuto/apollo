@@ -14,29 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_DEFINE_H_
-#define MODULES_PERCEPTION_COMMON_DEFINE_H_
+#include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
-#include <cmath>
+#include "gflags/gflags.h"
+#include "modules/common/log.h"
 
-namespace apollo {
-namespace perception {
+DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz8",
+              "Vehicle data path.");
 
-constexpr double kRadianToDegree = 180.0 / M_PI;
+int main(int argc, char **argv) {
+  FLAGS_logtostderr = true;
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
 
-// Error code definition
-enum StatusCode {
-  SUCC = 0,
-  // Common error, process will proceeding and warning log will be printed.
-  // Under most circumstances, function should return this code when a error
-  // occurs.
-  FAIL = 1,
-  // Fatal error, process will be terminated and fatal log will be printed.
-  // Generated only when a fatal error occurs, such as config loading error.
-  FATAL = 2,
-};
+  apollo::dreamview::VehicleManager::instance()->UseVehicle(
+      FLAGS_vehicle_data_path);
+  AINFO << "Switched to vehicle with data from " << FLAGS_vehicle_data_path;
 
-}  // namespace perception
-}  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_COMMON_DEFINE_H_
+  return 0;
+}

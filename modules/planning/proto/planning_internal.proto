@@ -91,6 +91,19 @@ message ObstacleDebug {
   optional apollo.planning.SLBoundary sl_boundary = 2;
 }
 
+message ChangeLaneState {
+   enum State {
+       IN_CHANGE_LANE = 1; // during change lane state
+       CHANGE_LANE_FAILED = 2; // change lane failed
+       CHANGE_LANE_SUCCESS = 3; // change lane failed
+   }
+   optional State state = 1;
+   // the id of the route segment that the vehicle is driving on
+   optional string path_id = 2;
+   // the time stamp when the state started.
+   optional double timestamp = 3;
+}
+
 // next id: 17
 message PlanningData {
   // input
@@ -110,3 +123,4 @@ message PlanningData {
 
   repeated ObstacleDebug obstacle = 18;
 }
+

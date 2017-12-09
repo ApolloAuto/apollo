@@ -114,7 +114,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
-  double start_timestamp = Clock::NowInSecond();
+  double start_timestamp = Clock::NowInSeconds();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
@@ -126,7 +126,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   auto prediction_obstacles =
       PredictorManager::instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
-  prediction_obstacles.set_end_timestamp(Clock::NowInSecond());
+  prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
 
   for (auto const& prediction_obstacle :
        prediction_obstacles.prediction_obstacle()) {
