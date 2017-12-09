@@ -133,7 +133,7 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
 
     constexpr double kBuff = 0.2;
     if (std::fabs(l) > std::fabs(init_sl_point_.l()) &&
-        (l + width + kBuff > left_width || l - width - kBuff < right_width)) {
+        (l + width / 2.0 + kBuff > left_width || l - width / 2.0 - kBuff < right_width)) {
       path_cost += config_.path_out_lane_cost();
     }
 
