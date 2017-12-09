@@ -21,7 +21,9 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_OFFLINE_LOCAL_VISUALIZER_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_OFFLINE_LOCAL_VISUALIZER_H
 
+#include <map>
 #include <string>
+#include <vector>
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
@@ -64,11 +66,11 @@ class OfflineLocalVisualizer {
       const std::vector<Eigen::Vector3d> &in_stds,
       const std::vector<double> &in_timestamps,
       const std::vector<double> &ref_timestamps,
-      std::map<unsigned int, Eigen::Affine3d> &out_poses,
-      std::map<unsigned int, Eigen::Vector3d> &out_stds);
+      std::map<unsigned int, Eigen::Affine3d> *out_poses,
+      std::map<unsigned int, Eigen::Vector3d> *out_stds);
 
   bool GetZoneIdFromMapFolder(const std::string &map_folder,
-                              const unsigned int &resolution_id, int &zone_id);
+                              const unsigned int resolution_id, int *zone_id);
 
  private:
   std::string map_folder_;

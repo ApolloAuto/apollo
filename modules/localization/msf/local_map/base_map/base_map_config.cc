@@ -33,7 +33,7 @@ BaseMapConfig::BaseMapConfig(std::string map_version) {
 
 bool BaseMapConfig::Save(const std::string file_path) {
   boost::property_tree::ptree config;
-  CreateXml(config);
+  CreateXml(&config);
   boost::property_tree::write_xml(file_path, config);
   std::cerr << "Saved the map configuration to: " << file_path << "."
             << std::endl;
@@ -57,28 +57,28 @@ bool BaseMapConfig::Load(const std::string file_path) {
   }
 }
 
-void BaseMapConfig::CreateXml(boost::property_tree::ptree& config) const {
-  config.put("map.map_config.version", map_version_);
-  config.put("map.map_config.node_size.x", map_node_size_x_);
-  config.put("map.map_config.node_size.y", map_node_size_y_);
-  config.put("map.map_config.range.min_x", map_range_.GetMinX());
-  config.put("map.map_config.range.min_y", map_range_.GetMinY());
-  config.put("map.map_config.range.max_x", map_range_.GetMaxX());
-  config.put("map.map_config.range.max_y", map_range_.GetMaxY());
-  config.put("map.map_config.compression", map_is_compression_);
-  config.put("map.map_runtime.map_ground_height_offset",
+void BaseMapConfig::CreateXml(boost::property_tree::ptree* config) const {
+  config->put("map.map_config.version", map_version_);
+  config->put("map.map_config.node_size.x", map_node_size_x_);
+  config->put("map.map_config.node_size.y", map_node_size_y_);
+  config->put("map.map_config.range.min_x", map_range_.GetMinX());
+  config->put("map.map_config.range.min_y", map_range_.GetMinY());
+  config->put("map.map_config.range.max_x", map_range_.GetMaxX());
+  config->put("map.map_config.range.max_y", map_range_.GetMaxY());
+  config->put("map.map_config.compression", map_is_compression_);
+  config->put("map.map_runtime.map_ground_height_offset",
              map_ground_height_offset_);
   for (size_t i = 0; i < map_resolutions_.size(); ++i) {
-    config.add("map.map_config.resolutions.resolution", map_resolutions_[i]);
+    config->add("map.map_config.resolutions.resolution", map_resolutions_[i]);
   }
 
   for (size_t i = 0; i < map_datasets_.size(); ++i) {
-    config.add("map.map_record.datasets.dataset", map_datasets_[i]);
+    config->add("map.map_record.datasets.dataset", map_datasets_[i]);
   }
   return;
 }
 
-void BaseMapConfig::LoadXml(boost::property_tree::ptree& config) {
+void BaseMapConfig::LoadXml(const boost::property_tree::ptree& config) {
   map_resolutions_.clear();
   map_datasets_.clear();
   map_node_size_x_ = config.get<unsigned int>("map.map_config.node_size.x");
@@ -91,12 +91,12 @@ void BaseMapConfig::LoadXml(boost::property_tree::ptree& config) {
   map_is_compression_ = config.get<bool>("map.map_config.compression");
   map_ground_height_offset_ =
       config.get<float>("map.map_runtime.map_ground_height_offset");
-  BOOST_FOREACH (boost::property_tree::ptree::value_type& v,
+  BOOST_FOREACH(const boost::property_tree::ptree::value_type& v,
                  config.get_child("map.map_config.resolutions")) {
     map_resolutions_.push_back(atof(v.second.data().c_str()));
     std::cout << "Resolution: " << v.second.data() << std::endl;
   }
-  BOOST_FOREACH (boost::property_tree::ptree::value_type& v,
+  BOOST_FOREACH(const boost::property_tree::ptree::value_type& v,
                  config.get_child("map.map_record.datasets")) {
     map_datasets_.push_back(v.second.data());
     std::cout << "Dataset: " << v.second.data() << std::endl;

@@ -18,6 +18,8 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_NODE_H
 
 #include <Eigen/Core>
+#include <string>
+#include <vector>
 #include "modules/localization/msf/common/util/compression.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
@@ -131,10 +133,10 @@ class BaseMapNode {
   /**@brief Given the global coordinate, get the local 2D coordinate of the map
    * cell matrix. <return> If global coordinate (x, y) belongs to this map node,
    * eigen version. */
-  bool GetCoordinate(const Eigen::Vector2d& coordinate, unsigned int& x,
-                     unsigned int& y) const;
-  bool GetCoordinate(const Eigen::Vector3d& coordinate, unsigned int& x,
-                     unsigned int& y) const;
+  bool GetCoordinate(const Eigen::Vector2d& coordinate, unsigned int* x,
+                     unsigned int* y) const;
+  bool GetCoordinate(const Eigen::Vector3d& coordinate, unsigned int* x,
+                     unsigned int* y) const;
   /**@brief Given the local 2D coordinate, return the global coordinate, eigen
    * version. */
   Eigen::Vector2d GetCoordinate(unsigned int x, unsigned int y) const;
@@ -174,12 +176,12 @@ class BaseMapNode {
   /**@brief Load the map node body from a binary chunk.
    * @param <return> The size read (the real size of body).
    */
-  virtual unsigned int LoadBodyBinary(std::vector<unsigned char>& buf);
+  virtual unsigned int LoadBodyBinary(std::vector<unsigned char>* buf);
   /**@brief Create the binary body.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateBodyBinary(std::vector<unsigned char>& buf) const;
+  virtual unsigned int CreateBodyBinary(std::vector<unsigned char>* buf) const;
   /**@brief Get the size of the body in bytes. */
   virtual unsigned int GetBodyBinarySize() const;
   /**@brief Save intensity image of node. */

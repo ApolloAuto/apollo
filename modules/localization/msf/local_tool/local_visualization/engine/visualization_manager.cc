@@ -14,8 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "visualization_manager.h"
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
 #include <boost/filesystem.hpp>
+#include <algorithm>
+#include <string>
+#include <vector>
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
@@ -23,7 +26,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-//===================MessageBuffer=======================
+// ===================MessageBuffer=======================
 template <class MessageType>
 MessageBuffer<MessageType>::MessageBuffer(int capacity) : capacity_(capacity) {
   pthread_mutex_init(&buffer_mutex_, NULL);
@@ -68,14 +71,14 @@ bool MessageBuffer<MessageType>::PushNewMessage(const double timestamp,
 }
 
 template <class MessageType>
-bool MessageBuffer<MessageType>::PopOldestMessage(MessageType &msg) {
+bool MessageBuffer<MessageType>::PopOldestMessage(MessageType *msg) {
   if (IsEmpty()) {
     std::cerr << "The buffer is empty." << std::endl;
     return false;
   }
 
   pthread_mutex_lock(&buffer_mutex_);
-  msg = msg_list_.begin()->second;
+  *msg = msg_list_.begin()->second;
   msg_map_.erase(msg_list_.begin()->first);
   msg_list_.pop_front();
   pthread_mutex_unlock(&buffer_mutex_);
@@ -85,7 +88,7 @@ bool MessageBuffer<MessageType>::PopOldestMessage(MessageType &msg) {
 
 template <class MessageType>
 bool MessageBuffer<MessageType>::GetMessageBefore(const double timestamp,
-                                                  MessageType &msg) {
+                                                  MessageType *msg) {
   if (IsEmpty()) {
     std::cerr << "The buffer is empty." << std::endl;
     return false;
@@ -100,7 +103,7 @@ bool MessageBuffer<MessageType>::GetMessageBefore(const double timestamp,
   for (ListIterator iter = msg_list.end(); iter != msg_list.begin();) {
     --iter;
     if (iter->first <= timestamp) {
-      msg = iter->second;
+      *msg = iter->second;
       return true;
     }
   }
@@ -110,11 +113,11 @@ bool MessageBuffer<MessageType>::GetMessageBefore(const double timestamp,
 
 template <class MessageType>
 bool MessageBuffer<MessageType>::GetMessage(const double timestamp,
-                                            MessageType &msg) {
+                                            MessageType *msg) {
   pthread_mutex_lock(&buffer_mutex_);
   auto found_iter = msg_map_.find(timestamp);
   if (found_iter != msg_map_.end()) {
-    msg = found_iter->second->second;
+    *msg = found_iter->second->second;
     pthread_mutex_unlock(&buffer_mutex_);
     return true;
   }
@@ -137,10 +140,10 @@ void MessageBuffer<MessageType>::SetCapacity(const unsigned int capacity) {
 
 template <class MessageType>
 void MessageBuffer<MessageType>::GetAllMessages(
-    std::list<std::pair<double, MessageType>> &msg_list) {
+    std::list<std::pair<double, MessageType>> *msg_list) {
   pthread_mutex_lock(&buffer_mutex_);
-  msg_list.clear();
-  std::copy(msg_list_.begin(), msg_list_.end(), std::back_inserter(msg_list));
+  msg_list->clear();
+  std::copy(msg_list_.begin(), msg_list_.end(), std::back_inserter(*msg_list));
   pthread_mutex_unlock(&buffer_mutex_);
 }
 
@@ -163,7 +166,7 @@ unsigned int MessageBuffer<MessageType>::BufferSize() {
   return size;
 }
 
-//==============IntepolationMessageBuffer==================
+// ==============IntepolationMessageBuffer==================
 template <class MessageType>
 IntepolationMessageBuffer<MessageType>::IntepolationMessageBuffer(int capacity)
     : MessageBuffer<MessageType>(capacity) {}
@@ -173,18 +176,18 @@ IntepolationMessageBuffer<MessageType>::~IntepolationMessageBuffer() {}
 
 template <class MessageType>
 bool IntepolationMessageBuffer<MessageType>::QueryMessage(
-    const double timestamp, MessageType &msg, double timeout_s) {
+    const double timestamp, MessageType *msg, double timeout_s) {
   std::map<double, ListIterator> msg_map_tem;
   std::list<std::pair<double, MessageType>> msg_list_tem;
 
-  if (!WaitMessageBufferOk(timestamp, msg_map_tem, msg_list_tem,
+  if (!WaitMessageBufferOk(timestamp, &msg_map_tem, &msg_list_tem,
                            timeout_s * 100)) {
     return false;
   }
 
   auto found_iter = msg_map_tem.find(timestamp);
   if (found_iter != msg_map_tem.end()) {
-    msg = found_iter->second->second;
+    *msg = found_iter->second->second;
     return true;
   }
 
@@ -211,8 +214,8 @@ bool IntepolationMessageBuffer<MessageType>::QueryMessage(
         return false;
       }
       double scale = (timestamp - before_iter->first) / delta_time;
-      msg = before_iter->second.interpolate(scale, after_iter->second);
-      msg.timestamp = timestamp;
+      *msg = before_iter->second.interpolate(scale, after_iter->second);
+      msg->timestamp = timestamp;
       break;
     }
   }
@@ -221,34 +224,34 @@ bool IntepolationMessageBuffer<MessageType>::QueryMessage(
 
 template <class MessageType>
 bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
-    const double timestamp, std::map<double, ListIterator> &msg_map,
-    std::list<std::pair<double, MessageType>> &msg_list, double timeout_ms) {
+    const double timestamp, std::map<double, ListIterator> *msg_map,
+    std::list<std::pair<double, MessageType>> *msg_list, double timeout_ms) {
   boost::posix_time::ptime start_time =
       boost::posix_time::microsec_clock::local_time();
   pthread_mutex_lock(&(this->buffer_mutex_));
-  msg_list.clear();
+  msg_list->clear();
   std::copy(this->msg_list_.begin(), this->msg_list_.end(),
-            std::back_inserter(msg_list));
-  msg_map = this->msg_map_;
+            std::back_inserter(*msg_list));
+  *msg_map = this->msg_map_;
   pthread_mutex_unlock(&(this->buffer_mutex_));
 
-  if (msg_list.empty()) {
+  if (msg_list->empty()) {
     std::cerr << "The queried buffer is empty." << std::endl;
     return false;
   }
 
-  ListIterator last_iter = msg_list.end();
+  ListIterator last_iter = msg_list->end();
   --last_iter;
   while (last_iter->first < timestamp) {
     std::cout << "Waiting new message!" << std::endl;
     usleep(5000);
     pthread_mutex_lock(&(this->buffer_mutex_));
-    msg_list.clear();
+    msg_list->clear();
     std::copy(this->msg_list_.begin(), this->msg_list_.end(),
-              std::back_inserter(msg_list));
-    msg_map = this->msg_map_;
+              std::back_inserter(*msg_list));
+    *msg_map = this->msg_map_;
     pthread_mutex_unlock(&(this->buffer_mutex_));
-    last_iter = msg_list.end();
+    last_iter = msg_list->end();
     --last_iter;
 
     boost::posix_time::ptime end_time =
@@ -293,7 +296,7 @@ bool VisualizationManager::Init(const std::string &map_folder,
   }
   std::cout << "Load map config succeed." << std::endl;
 
-  success = GetZoneIdFromMapFolder(map_folder, resolution_id, zone_id);
+  success = GetZoneIdFromMapFolder(map_folder, resolution_id, &zone_id);
   if (!success) {
     std::cerr << "Get zone id failed." << std::endl;
     return false;
@@ -303,7 +306,7 @@ bool VisualizationManager::Init(const std::string &map_folder,
   std::cout << "Load lidar_extrinsic_file: " << lidar_extrinsic_file
             << std::endl;
   Eigen::Affine3d velodyne_extrinsic;
-  success = velodyne::LoadExtrinsic(lidar_extrinsic_file, velodyne_extrinsic);
+  success = velodyne::LoadExtrinsic(lidar_extrinsic_file, &velodyne_extrinsic);
   if (!success) {
     std::cerr << "Load velodyne extrinsic failed." << std::endl;
     return false;
@@ -393,7 +396,7 @@ void VisualizationManager::DoVisualize() {
       // std::cout << "\n";
 
       LidarVisFrame lidar_frame;
-      bool pop_success = lidar_frame_buffer_.PopOldestMessage(lidar_frame);
+      bool pop_success = lidar_frame_buffer_.PopOldestMessage(&lidar_frame);
       if (!pop_success) {
         continue;
       }
@@ -401,12 +404,12 @@ void VisualizationManager::DoVisualize() {
       LocalizationMsg lidar_loc;
       LocalizationMsg fusion_loc;
       bool lidar_query_success = lidar_loc_info_buffer_.QueryMessage(
-          lidar_frame.timestamp, lidar_loc, 0.02);
+          lidar_frame.timestamp, &lidar_loc, 0.02);
       // bool lidar_query_success = lidar_loc_info_buffer_.GetMessage(
       //     lidar_frame.timestamp, lidar_loc);
 
       bool fusion_query_success = fusion_loc_info_buffer_.QueryMessage(
-          lidar_frame.timestamp, fusion_loc, 0.02);
+          lidar_frame.timestamp, &fusion_loc, 0.02);
 
       if (!lidar_query_success && !fusion_query_success) {
         continue;
@@ -444,7 +447,7 @@ void VisualizationManager::DoVisualize() {
 
       LocalizationMsg gnss_loc;
       bool success = gnss_loc_info_buffer_.GetMessageBefore(
-          lidar_frame.timestamp, gnss_loc);
+          lidar_frame.timestamp, &gnss_loc);
       if (success) {
         Eigen::Translation3d trans(
             Eigen::Vector3d(gnss_loc.x, gnss_loc.y, gnss_loc.z));
@@ -466,10 +469,10 @@ void VisualizationManager::DoVisualize() {
 }
 
 bool VisualizationManager::GetZoneIdFromMapFolder(
-    const std::string &map_folder, const unsigned int &resolution_id,
-    int &zone_id) {
+    const std::string &map_folder, const unsigned int resolution_id,
+    int *zone_id) {
   char buf[256];
-  snprintf(buf, 256, "/%03u", resolution_id);
+  snprintf(buf, sizeof(buf), "/%03u", resolution_id);
   std::string folder_north = map_folder + "/map" + buf + "/north";
   std::string folder_south = map_folder + "/map" + buf + "/south";
   boost::filesystem::directory_iterator directory_end;
@@ -484,8 +487,8 @@ bool VisualizationManager::GetZoneIdFromMapFolder(
       std::string zone_id_str =
           zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
-      zone_id = -(std::stoi(zone_id_str));
-      std::cout << "Find zone id: " << zone_id << std::endl;
+      *zone_id = -(std::stoi(zone_id_str));
+      std::cout << "Find zone id: " << *zone_id << std::endl;
       return true;
     }
   }
@@ -494,8 +497,8 @@ bool VisualizationManager::GetZoneIdFromMapFolder(
   std::string zone_id_str =
       zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
-  zone_id = (std::stoi(zone_id_str));
-  std::cout << "Find zone id: " << zone_id << std::endl;
+  *zone_id = (std::stoi(zone_id_str));
+  std::cout << "Find zone id: " << *zone_id << std::endl;
   return true;
 }
 

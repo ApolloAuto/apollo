@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
 #include <boost/filesystem.hpp>
+#include <map>
+#include <vector>
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
@@ -65,7 +67,7 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   }
   std::cout << "Load map config succeed." << std::endl;
 
-  success = velodyne::LoadExtrinsic(extrinsic_file_, velodyne_extrinsic_);
+  success = velodyne::LoadExtrinsic(extrinsic_file_, &velodyne_extrinsic_);
   if (!success) {
     std::cerr << "Load velodyne extrinsic failed." << std::endl;
     return false;
@@ -101,7 +103,7 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   std::cout << "Handle fusion localization file succeed." << std::endl;
 
   resolution_id_ = 0;
-  success = GetZoneIdFromMapFolder(map_folder_, resolution_id_, zone_id_);
+  success = GetZoneIdFromMapFolder(map_folder_, resolution_id_, &zone_id_);
   if (!success) {
     std::cerr << "Get zone id failed." << std::endl;
     return false;
@@ -179,7 +181,7 @@ void OfflineLocalVisualizer::Visualize() {
     std::vector<Eigen::Vector3d> pt3ds;
     std::vector<unsigned char> intensities;
     apollo::localization::msf::velodyne::LoadPcds(
-        pcd_file_path, idx, lidar_loc_info.pose, pt3ds, intensities, false);
+        pcd_file_path, idx, lidar_loc_info.pose, &pt3ds, &intensities, false);
 
     visual_engine_.Visualize(loc_infos, pt3ds);
   }
@@ -212,10 +214,10 @@ bool OfflineLocalVisualizer::LidarLocFileHandler(
   std::vector<Eigen::Vector3d> stds;
   std::vector<double> timestamps;
   // velodyne::LoadPcdPoses(lidar_loc_file_, poses, pcd_timestamps_);
-  velodyne::LoadPosesAndStds(lidar_loc_file_, poses, stds, timestamps);
+  velodyne::LoadPosesAndStds(lidar_loc_file_, &poses, &stds, &timestamps);
 
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
-                                lidar_poses_, lidar_stds_);
+                                &lidar_poses_, &lidar_stds_);
 
   return true;
 }
@@ -226,11 +228,11 @@ bool OfflineLocalVisualizer::GnssLocFileHandler(
   std::vector<Eigen::Vector3d> stds;
   std::vector<double> timestamps;
   // velodyne::LoadPcdPoses(gnss_loc_file_, poses, timestamps);
-  velodyne::LoadPosesAndStds(gnss_loc_file_, poses, stds, timestamps);
+  velodyne::LoadPosesAndStds(gnss_loc_file_, &poses, &stds, &timestamps);
 
   // PoseInterpolationByTime(poses, timestamps, pcd_timestamps, gnss_poses_);
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
-                                gnss_poses_, gnss_stds_);
+                                &gnss_poses_, &gnss_stds_);
 
   return true;
 }
@@ -241,11 +243,11 @@ bool OfflineLocalVisualizer::FusionLocFileHandler(
   std::vector<Eigen::Vector3d> stds;
   std::vector<double> timestamps;
   // velodyne::LoadPcdPoses(fusion_loc_file_, poses, timestamps);
-  velodyne::LoadPosesAndStds(fusion_loc_file_, poses, stds, timestamps);
+  velodyne::LoadPosesAndStds(fusion_loc_file_, &poses, &stds, &timestamps);
 
   // PoseInterpolationByTime(poses, timestamps, pcd_timestamps, fusion_poses_);
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
-                                fusion_poses_, fusion_stds_);
+                                &fusion_poses_, &fusion_stds_);
   return true;
 }
 
@@ -305,8 +307,8 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
     const std::vector<Eigen::Vector3d> &in_stds,
     const std::vector<double> &in_timestamps,
     const std::vector<double> &ref_timestamps,
-    std::map<unsigned int, Eigen::Affine3d> &out_poses,
-    std::map<unsigned int, Eigen::Vector3d> &out_stds) {
+    std::map<unsigned int, Eigen::Affine3d> *out_poses,
+    std::map<unsigned int, Eigen::Vector3d> *out_stds) {
   unsigned int index = 0;
   for (size_t i = 0; i < ref_timestamps.size(); i++) {
     double ref_timestamp = ref_timestamps[i];
@@ -341,7 +343,7 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
         re_transd.x() = pre_transd.x() * t + cur_transd.x() * (1 - t);
         re_transd.y() = pre_transd.y() * t + cur_transd.y() * (1 - t);
         re_transd.z() = pre_transd.z() * t + cur_transd.z() * (1 - t);
-        out_poses[i] = re_transd * res_quatd;
+        (*out_poses)[i] = re_transd * res_quatd;
 
         Eigen::Vector3d pre_std = in_stds[index - 1];
         Eigen::Vector3d cur_std = in_stds[index];
@@ -349,7 +351,7 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
         std[0] = pre_std[0] * t + cur_std[0] * (1 - t);
         std[1] = pre_std[1] * t + cur_std[1] * (1 - t);
         std[2] = pre_std[2] * t + cur_std[2] * (1 - t);
-        out_stds[i] = std;
+        (*out_stds)[i] = std;
       }
     } else {
       std::cerr << "[ERROR] No more poses. Exit now." << std::endl;
@@ -360,10 +362,10 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
 }
 
 bool OfflineLocalVisualizer::GetZoneIdFromMapFolder(
-    const std::string &map_folder, const unsigned int &resolution_id,
-    int &zone_id) {
+    const std::string &map_folder, const unsigned int resolution_id,
+    int *zone_id) {
   char buf[256];
-  snprintf(buf, 256, "/%03u", resolution_id);
+  snprintf(buf, sizeof(buf), "/%03u", resolution_id);
   std::string folder_north = map_folder + "/map" + buf + "/north";
   std::string folder_south = map_folder + "/map" + buf + "/south";
   boost::filesystem::directory_iterator directory_end;
@@ -378,8 +380,8 @@ bool OfflineLocalVisualizer::GetZoneIdFromMapFolder(
       std::string zone_id_str =
           zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
-      zone_id = -(std::stoi(zone_id_str));
-      std::cout << "Find zone id: " << zone_id << std::endl;
+      *zone_id = -(std::stoi(zone_id_str));
+      std::cout << "Find zone id: " << *zone_id << std::endl;
       return true;
     }
   }
@@ -388,8 +390,8 @@ bool OfflineLocalVisualizer::GetZoneIdFromMapFolder(
   std::string zone_id_str =
       zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
-  zone_id = (std::stoi(zone_id_str));
-  std::cout << "Find zone id: " << zone_id << std::endl;
+  *zone_id = (std::stoi(zone_id_str));
+  std::cout << "Find zone id: " << *zone_id << std::endl;
   return true;
 }
 

@@ -15,20 +15,21 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
+#include <vector>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_node.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
-LosslessMap::LosslessMap(LosslessMapConfig& config) : BaseMap(config) {}
+LosslessMap::LosslessMap(LosslessMapConfig* config) : BaseMap(config) {}
 
 LosslessMap::~LosslessMap() {}
 
 void LosslessMap::SetValue(const Eigen::Vector3d& coordinate, int zone_id,
                            unsigned char intensity) {
-  for (size_t i = 0; i < map_config_.map_resolutions_.size(); ++i) {
+  for (size_t i = 0; i < map_config_->map_resolutions_.size(); ++i) {
     MapNodeIndex index =
-        MapNodeIndex::GetMapNodeIndex(map_config_, coordinate, i, zone_id);
+        MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate, i, zone_id);
     LosslessMapNode* node =
         static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
     node->SetValue(coordinate, intensity);
@@ -37,9 +38,9 @@ void LosslessMap::SetValue(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::SetValueLayer(const Eigen::Vector3d& coordinate, int zone_id,
                                 unsigned char intensity) {
-  for (size_t i = 0; i < map_config_.map_resolutions_.size(); ++i) {
+  for (size_t i = 0; i < map_config_->map_resolutions_.size(); ++i) {
     MapNodeIndex index =
-        MapNodeIndex::GetMapNodeIndex(map_config_, coordinate, i, zone_id);
+        MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate, i, zone_id);
     LosslessMapNode* node =
         static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
     node->SetValueLayer(coordinate, intensity);
@@ -48,9 +49,9 @@ void LosslessMap::SetValueLayer(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetValue(const Eigen::Vector3d& coordinate, int zone_id,
                            unsigned int resolution_id,
-                           std::vector<unsigned char>& values) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                           std::vector<unsigned char>* values) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   node->GetValue(coordinate, values);
@@ -58,19 +59,18 @@ void LosslessMap::GetValue(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetValueSafe(const Eigen::Vector3d& coordinate, int zone_id,
                                unsigned int resolution_id,
-                               std::vector<unsigned char>& values) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                               std::vector<unsigned char>* values) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
-  ;
   node->GetValue(coordinate, values);
 }
 
 void LosslessMap::GetVar(const Eigen::Vector3d& coordinate, int zone_id,
-                         unsigned int resolution_id, std::vector<float>& vars) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                         unsigned int resolution_id, std::vector<float>* vars) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   node->GetVar(coordinate, vars);
@@ -78,18 +78,18 @@ void LosslessMap::GetVar(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
                              unsigned int resolution_id,
-                             std::vector<float>& vars) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                             std::vector<float>* vars) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   node->GetVar(coordinate, vars);
 }
 
 void LosslessMap::GetAlt(const Eigen::Vector3d& coordinate, int zone_id,
-                         unsigned int resolution_id, std::vector<float>& alts) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                         unsigned int resolution_id, std::vector<float>* alts) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   node->GetAlt(coordinate, alts);
@@ -97,9 +97,9 @@ void LosslessMap::GetAlt(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetAltSafe(const Eigen::Vector3d& coordinate, int zone_id,
                              unsigned int resolution_id,
-                             std::vector<float>& alts) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                             std::vector<float>* alts) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   node->GetAlt(coordinate, alts);
@@ -107,9 +107,9 @@ void LosslessMap::GetAltSafe(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetAltVar(const Eigen::Vector3d& coordinate, int zone_id,
                             unsigned int resolution_id,
-                            std::vector<float>& alt_vars) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                            std::vector<float>* alt_vars) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   node->GetAltVar(coordinate, alt_vars);
@@ -117,9 +117,9 @@ void LosslessMap::GetAltVar(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetAltVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
                                 unsigned int resolution_id,
-                                std::vector<float>& alt_vars) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                                std::vector<float>* alt_vars) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   node->GetAltVar(coordinate, alt_vars);
@@ -127,9 +127,9 @@ void LosslessMap::GetAltVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetCount(const Eigen::Vector3d& coordinate, int zone_id,
                            unsigned int resolution_id,
-                           std::vector<unsigned int>& counts) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                           std::vector<unsigned int>* counts) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   node->GetCount(coordinate, counts);
@@ -137,9 +137,9 @@ void LosslessMap::GetCount(const Eigen::Vector3d& coordinate, int zone_id,
 
 void LosslessMap::GetCountSafe(const Eigen::Vector3d& coordinate, int zone_id,
                                unsigned int resolution_id,
-                               std::vector<unsigned int>& counts) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+                               std::vector<unsigned int>* counts) {
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   node->GetCount(coordinate, counts);
@@ -147,8 +147,8 @@ void LosslessMap::GetCountSafe(const Eigen::Vector3d& coordinate, int zone_id,
 
 unsigned char LosslessMap::GetValue(const Eigen::Vector3d& coordinate,
                                     int zone_id, unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   return node->GetValue(coordinate);
@@ -157,8 +157,8 @@ unsigned char LosslessMap::GetValue(const Eigen::Vector3d& coordinate,
 unsigned char LosslessMap::GetValueSafe(const Eigen::Vector3d& coordinate,
                                         int zone_id,
                                         unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   return node->GetValue(coordinate);
@@ -166,8 +166,8 @@ unsigned char LosslessMap::GetValueSafe(const Eigen::Vector3d& coordinate,
 
 float LosslessMap::GetVar(const Eigen::Vector3d& coordinate, int zone_id,
                           unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   return node->GetVar(coordinate);
@@ -175,8 +175,8 @@ float LosslessMap::GetVar(const Eigen::Vector3d& coordinate, int zone_id,
 
 float LosslessMap::GetVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
                               unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   return node->GetVar(coordinate);
@@ -184,8 +184,8 @@ float LosslessMap::GetVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
 
 float LosslessMap::GetAlt(const Eigen::Vector3d& coordinate, int zone_id,
                           unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   return node->GetAlt(coordinate);
@@ -193,8 +193,8 @@ float LosslessMap::GetAlt(const Eigen::Vector3d& coordinate, int zone_id,
 
 float LosslessMap::GetAltSafe(const Eigen::Vector3d& coordinate, int zone_id,
                               unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   return node->GetAlt(coordinate);
@@ -202,8 +202,8 @@ float LosslessMap::GetAltSafe(const Eigen::Vector3d& coordinate, int zone_id,
 
 float LosslessMap::GetAltVar(const Eigen::Vector3d& coordinate, int zone_id,
                              unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   return node->GetAltVar(coordinate);
@@ -211,8 +211,8 @@ float LosslessMap::GetAltVar(const Eigen::Vector3d& coordinate, int zone_id,
 
 float LosslessMap::GetAltVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
                                  unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   return node->GetAltVar(coordinate);
@@ -220,8 +220,8 @@ float LosslessMap::GetAltVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
 
 unsigned int LosslessMap::GetCount(const Eigen::Vector3d& coordinate,
                                    int zone_id, unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNode(index));
   return node->GetCount(coordinate);
@@ -230,8 +230,8 @@ unsigned int LosslessMap::GetCount(const Eigen::Vector3d& coordinate,
 unsigned int LosslessMap::GetCountSafe(const Eigen::Vector3d& coordinate,
                                        int zone_id,
                                        unsigned int resolution_id) {
-  assert(resolution_id < map_config_.map_resolutions_.size());
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coordinate,
+  assert(resolution_id < map_config_->map_resolutions_.size());
+  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate,
                                                      resolution_id, zone_id);
   LosslessMapNode* node = static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
   return node->GetCount(coordinate);

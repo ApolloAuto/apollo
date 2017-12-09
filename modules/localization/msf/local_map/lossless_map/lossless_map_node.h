@@ -17,6 +17,7 @@
 #ifndef BAIDU_ADU_LOSSLESS_MAP_NODE_H
 #define BAIDU_ADU_LOSSLESS_MAP_NODE_H
 
+#include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
 
@@ -51,23 +52,23 @@ class LosslessMapNode : public BaseMapNode {
   /**@brief Given the 3D global coordinate, get the map cell average intensity
    * of each layer. */
   void GetValue(const Eigen::Vector3d& coordinate,
-                std::vector<unsigned char>& values) const;
+                std::vector<unsigned char>* values) const;
   /**@brief Given the 3D global coordinate, get the map cell variance of the
    * intensity of each layer. */
   void GetVar(const Eigen::Vector3d& coordinate,
-              std::vector<float>& vars) const;
+              std::vector<float>* vars) const;
   /**@brief Given the 3D global coordinate, get the map cell's average altitude
    * of each layer. */
   void GetAlt(const Eigen::Vector3d& coordinate,
-              std::vector<float>& alts) const;
+              std::vector<float>* alts) const;
   /**@brief Given the 3D global coordinate, get the map cell's variance of the
    * altitude of each layer. */
   void GetAltVar(const Eigen::Vector3d& coordinate,
-                 std::vector<float>& alt_vars) const;
+                 std::vector<float>* alt_vars) const;
   /**@brief Given the 3D global coordinate, get the map cell's count of the
    * samples of each layer. */
   void GetCount(const Eigen::Vector3d& coordinate,
-                std::vector<unsigned int>& counts) const;
+                std::vector<unsigned int>* counts) const;
   /**@brief Given the 3D global coordinate, get the map cell average intensity.
    */
   unsigned char GetValue(const Eigen::Vector3d& coordinate) const;

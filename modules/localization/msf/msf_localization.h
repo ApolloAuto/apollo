@@ -89,7 +89,7 @@ class MSFLocalization : public LocalizationBase {
   LocalizationIntegParam localizaiton_param_;
   tf2_ros::TransformBroadcaster *tf2_broadcaster_;
   LocalizationMeasureState localization_state_;
-  long long pcd_msg_index_;
+  uint64_t pcd_msg_index_;
 
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
 };

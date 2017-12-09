@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "localization_msf_local_map_test_data",
     srcs = glob([
-        "test_data/*",
+        "test_data/**"
     ]),
 )
 

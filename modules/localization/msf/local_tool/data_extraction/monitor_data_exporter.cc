@@ -20,7 +20,10 @@
 #include "modules/localization/msf/local_tool/data_extraction/pcd_exporter.h"
 #include "modules/localization/msf/local_tool/data_extraction/rosbag_reader.h"
 
-using namespace apollo::localization::msf;
+using apollo::localization::msf::PCDExporter;
+using apollo::localization::msf::LocationExporter;
+using apollo::localization::msf::RosbagReader;
+using apollo::localization::msf::BaseExporter;
 
 int main(int argc, char **argv) {
   boost::program_options::options_description boost_desc("Allowed options");

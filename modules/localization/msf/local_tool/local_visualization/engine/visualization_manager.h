@@ -24,9 +24,11 @@
 #include <Eigen/Geometry>
 #include <list>
 #include <map>
+#include <string>
 #include <thread>
 #include <utility>
-#include "visualization_engine.h"
+#include <vector>
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
 namespace localization {
@@ -86,18 +88,18 @@ class MessageBuffer {
       typename std::list<std::pair<double, MessageType>>::iterator ListIterator;
 
  public:
-  MessageBuffer(int capacity);
+  explicit MessageBuffer(int capacity);
   ~MessageBuffer();
 
   bool PushNewMessage(const double timestamp, const MessageType &msg);
-  bool PopOldestMessage(MessageType &msg);
-  bool GetMessageBefore(const double timestamp, MessageType &msg);
-  bool GetMessage(const double timestamp, MessageType &msg);
+  bool PopOldestMessage(MessageType *msg);
+  bool GetMessageBefore(const double timestamp, MessageType *msg);
+  bool GetMessage(const double timestamp, MessageType *msg);
 
   void Clear();
 
   void SetCapacity(const unsigned int capacity);
-  void GetAllMessages(std::list<std::pair<double, MessageType>> &msg_list);
+  void GetAllMessages(std::list<std::pair<double, MessageType>> *msg_list);
 
   bool IsEmpty();
   unsigned int BufferSize();
@@ -118,16 +120,16 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
       typename std::list<std::pair<double, MessageType>>::iterator ListIterator;
 
  public:
-  IntepolationMessageBuffer(int capacity);
+  explicit IntepolationMessageBuffer(int capacity);
   ~IntepolationMessageBuffer();
 
-  bool QueryMessage(const double timestamp, MessageType &msg,
+  bool QueryMessage(const double timestamp, MessageType *msg,
                     double timeout_s = 0.05);
 
  private:
   bool WaitMessageBufferOk(const double timestamp,
-                           std::map<double, ListIterator> &msg_map,
-                           std::list<std::pair<double, MessageType>> &msg_list,
+                           std::map<double, ListIterator> *msg_map,
+                           std::list<std::pair<double, MessageType>> *msg_list,
                            double timeout_ms);
 };
 
@@ -142,6 +144,7 @@ struct VisualizationManagerParams {
 
 class VisualizationManager {
 #define LOC_INFO_NUM 3
+
  public:
   VisualizationManager();
   ~VisualizationManager();
@@ -165,7 +168,7 @@ class VisualizationManager {
  private:
   void DoVisualize();
   bool GetZoneIdFromMapFolder(const std::string &map_folder,
-                              const unsigned int &resolution_id, int &zone_id);
+                              const unsigned int resolution_id, int *zone_id);
 
  private:
   VisualizationEngine visual_engine_;

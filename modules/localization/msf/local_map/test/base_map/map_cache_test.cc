@@ -51,14 +51,14 @@ TEST_F(MapCacheTestSuite, LRUCacheTest) {
   lru_cache.Put(id2, ch2);
 
   std::string *str = lru_cache.Put(id3, ch3);
-  ASSERT_TRUE(strcmp(str->c_str(), "aaa") == 0);
+  ASSERT_EQ(strcmp(str->c_str(), "aaa"), 0);
 
-  bool flag = lru_cache.Get(id3, str);
-  ASSERT_TRUE(strcmp(str->c_str(), "ddd") == 0);
+  bool flag = lru_cache.Get(id3, &str);
+  ASSERT_EQ(strcmp(str->c_str(), "ddd"), 0);
   ASSERT_TRUE(flag);
 
   str = lru_cache.Remove(id3);
-  ASSERT_TRUE(strcmp(str->c_str(), "ddd") == 0);
+  ASSERT_EQ(strcmp(str->c_str(), "ddd"), 0);
 
   lru_cache.Put(id4, ch4);
   flag = lru_cache.IsExist(id4);

@@ -90,8 +90,8 @@ class OnlineLocalVisualizer : public apollo::common::ApolloApp {
   void OnFusionLocalization(const LocalizationEstimate &message);
 
   void ParsePointCloudMessage(const sensor_msgs::PointCloud2 &message,
-                              std::vector<Eigen::Vector3d> &pt3ds,
-                              std::vector<unsigned char> &intensities);
+                              std::vector<Eigen::Vector3d> *pt3ds,
+                              std::vector<unsigned char> *intensities);
 
  private:
   apollo::common::monitor::Monitor monitor_;

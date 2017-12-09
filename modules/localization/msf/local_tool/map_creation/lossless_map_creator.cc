@@ -23,17 +23,22 @@
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_pool.h"
 
-namespace apollo {
-namespace localization {
-namespace msf {
-typedef FeatureXYPlane::PointT PclPointT;
-typedef FeatureXYPlane::PointCloudT PclPointCloudT;
-typedef FeatureXYPlane::PointCloudPtrT PclPointCloudPtrT;
-
 const unsigned int CAR_SENSOR_LASER_NUMBER = 64;
 
-bool parse_command_line(int argc, char* argv[],
-                        boost::program_options::variables_map& vm) {
+using apollo::localization::msf::MapNodeIndex;
+using apollo::localization::msf::LosslessMapNodePool;
+using apollo::localization::msf::LosslessMapConfig;
+using apollo::localization::msf::LosslessMap;
+using apollo::localization::msf::LosslessMapNode;
+using apollo::localization::msf::LosslessMapMatrix;
+using apollo::localization::msf::FeatureXYPlane;
+typedef apollo::localization::msf::FeatureXYPlane::PointT PclPointT;
+typedef apollo::localization::msf::FeatureXYPlane::PointCloudT PclPointCloudT;
+typedef apollo::localization::msf::FeatureXYPlane::PointCloudPtrT
+    PclPointCloudPtrT;
+
+bool ParseCommandLine(int argc, char* argv[],
+                        boost::program_options::variables_map* vm) {
   boost::program_options::options_description desc("Allowd options");
   desc.add_options()("help", "product help message")(
       "use_plane_inliers_only",
@@ -70,12 +75,12 @@ bool parse_command_line(int argc, char* argv[],
           "0.125");
   try {
     boost::program_options::store(
-        boost::program_options::parse_command_line(argc, argv, desc), vm);
-    if (vm.count("help")) {
+        boost::program_options::parse_command_line(argc, argv, desc), *vm);
+    if (vm->count("help")) {
       std::cerr << desc << std::endl;
       return false;
     }
-    boost::program_options::notify(vm);
+    boost::program_options::notify(*vm);
   } catch (std::exception& e) {
     std::cerr << "Error" << e.what() << std::endl;
     std::cerr << desc << std::endl;
@@ -87,26 +92,20 @@ bool parse_command_line(int argc, char* argv[],
   return true;
 }
 
-void variance_online(double& mean, double& var, unsigned int& N, double x) {
-  ++N;
-  double value = (x - mean) / N;
-  double v1 = x - mean;
-  mean += value;
-  double v2 = x - mean;
-  var = ((N - 1) * var + v1 * v2) / N;
+void VarianceOnline(double* mean, double* var, unsigned int* N, double x) {
+  ++(*N);
+  double value = (x - (*mean)) / (*N);
+  double v1 = x - (*mean);
+  (*mean) += value;
+  double v2 = x - (*mean);
+  (*var) = (((*N) - 1) * (*var) + v1 * v2) / (*N);
 }
-
-}  // namespace msf
-}  // namespace localization
-}  // namespace apollo
-
-using namespace apollo::localization::msf;
 
 int main(int argc, char** argv) {
   FeatureXYPlane plane_extractor;
 
   boost::program_options::variables_map boost_args;
-  if (!parse_command_line(argc, argv, boost_args)) {
+  if (!ParseCommandLine(argc, argv, &boost_args)) {
     std::cerr << "Parse input command line failed." << std::endl;
     return -1;
   }
@@ -169,17 +168,17 @@ int main(int argc, char** argv) {
   std::vector<std::vector<double>> time_stamps(num_trials);
   std::vector<std::vector<unsigned int>> pcd_indices(num_trials);
   for (std::size_t i = 0; i < pose_files.size(); ++i) {
-    velodyne::LoadPcdPoses(pose_files[i], ieout_poses[i], time_stamps[i],
-                           pcd_indices[i]);
+    apollo::localization::msf::velodyne::LoadPcdPoses(
+        pose_files[i], &ieout_poses[i], &time_stamps[i], &pcd_indices[i]);
   }
 
   LosslessMapConfig conf;
-  LosslessMap map(conf);
+  LosslessMap map(&conf);
   LosslessMapConfig& loss_less_config =
       static_cast<LosslessMapConfig&>(map.GetConfig());
   std::string map_folder_path = map_base_folder + "/lossless_map";
-  if (!system::IsExists(map_folder_path)) {
-    system::CreateDirectory(map_folder_path);
+  if (!apollo::localization::msf::system::IsExists(map_folder_path)) {
+    apollo::localization::msf::system::CreateDirectory(map_folder_path);
   }
   map.SetMapFolderPath(map_folder_path);
   for (size_t i = 0; i < pcd_folder_pathes.size(); ++i) {
@@ -195,16 +194,18 @@ int main(int argc, char** argv) {
     loss_less_config.coordinate_type_ = "UTM";
   } else {
     loss_less_config.coordinate_type_ = "LTM";
-    loss_less_config.map_range_ =
-        Rect2D<double>(-1638400.0, -1638400.0, 1638400.0, 1638400.0);
+    loss_less_config.map_range_ = apollo::localization::msf::Rect2D<double>(
+        -1638400.0, -1638400.0, 1638400.0, 1638400.0);
   }
 
   // Output Config file
   char file_buf[1024];
-  snprintf(file_buf, 1024, "%s/lossless_map/config.xml", map_base_folder.c_str());
+  snprintf(file_buf, sizeof(file_buf), "%s/lossless_map/config.xml",
+           map_base_folder.c_str());
   loss_less_config.Save(file_buf);
 
-  snprintf(file_buf, 1024, "%s/lossless_map/config.txt", map_base_folder.c_str());
+  snprintf(file_buf, sizeof(file_buf), "%s/lossless_map/config.txt",
+           map_base_folder.c_str());
   FILE* file = fopen(file_buf, "a");
 
   if (file) {
@@ -260,14 +261,14 @@ int main(int argc, char** argv) {
          ++frame_idx) {
       unsigned int trial_frame_idx = frame_idx;
       const std::vector<Eigen::Affine3d>& poses = ieout_poses[trial];
-      velodyne::VelodyneFrame velodyne_frame;
+      apollo::localization::msf::velodyne::VelodyneFrame velodyne_frame;
       std::string pcd_file_path;
       std::ostringstream ss;
       ss << pcd_indices[trial][frame_idx];
       pcd_file_path = pcd_folder_pathes[trial] + "/" + ss.str() + ".pcd";
       const Eigen::Affine3d& pcd_pose = poses[trial_frame_idx];
-      velodyne::LoadPcds(pcd_file_path, trial_frame_idx, pcd_pose,
-                         velodyne_frame, false);
+      apollo::localization::msf::velodyne::LoadPcds(
+          pcd_file_path, trial_frame_idx, pcd_pose, &velodyne_frame, false);
       std::cout << "Loaded " << velodyne_frame.pt3ds.size()
                 << "3D Points at Trial: " << trial
                 << " Frame: " << trial_frame_idx << "." << std::endl;
@@ -321,7 +322,7 @@ int main(int argc, char** argv) {
         // Use the altitudes from layer 0 (layer 1 internally in the Map).
         unsigned int layer_id = 0;
         std::vector<unsigned int> layer_counts;
-        map.GetCountSafe(pt3d, zone_id, resolution_id, layer_counts);
+        map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
         if (layer_counts.size() == 0) {
           std::cerr << "[FATAL ERROR] Map node should at least have one layer."
                     << std::endl;
@@ -329,7 +330,7 @@ int main(int argc, char** argv) {
         assert(layer_counts.size() > 0);
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
-          map.GetAltSafe(pt3d, zone_id, resolution_id, layer_alts);
+          map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
           if (layer_alts.size() == 0) {
             std::cerr
                 << "[FATAL ERROR] Map node should at least have one layer."
@@ -338,8 +339,8 @@ int main(int argc, char** argv) {
           assert(layer_alts.size() > 0);
           float alt = layer_alts[layer_id];
           double height_diff = pt3d[2] - alt;
-          variance_online(mean_height_diff, var_height_diff, count_height_diff,
-                          height_diff);
+          VarianceOnline(&mean_height_diff, &var_height_diff,
+                          &count_height_diff, height_diff);
         }
       } else {
         // Use the altitudes from all layers
@@ -347,8 +348,8 @@ int main(int argc, char** argv) {
         if (count > 0) {
           float alt = map.GetAltSafe(pt3d, zone_id, resolution_id);
           double height_diff = pt3d[2] - alt;
-          variance_online(mean_height_diff, var_height_diff, count_height_diff,
-                          height_diff);
+          VarianceOnline(&mean_height_diff, &var_height_diff,
+                          &count_height_diff, height_diff);
         }
       }
     }

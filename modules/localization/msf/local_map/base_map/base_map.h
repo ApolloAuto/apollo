@@ -19,6 +19,8 @@
 
 #include <list>
 #include <map>
+#include <set>
+#include <string>
 #include "modules/localization/msf/local_map/base_map/base_map_cache.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
@@ -34,13 +36,13 @@ namespace msf {
 class BaseMap {
  public:
   /**@brief The constructor. */
-  BaseMap(BaseMapConfig& config);
+  explicit BaseMap(BaseMapConfig* map_config);
   /**@brief The destructor. */
   virtual ~BaseMap();
 
   /**@brief Init load threadpool and preload threadpool. */
   void InitThreadPool(int load_thread_num, int preload_thread_num);
-  //@brief Init level 1 and level 2 map node caches. */
+  /**@brief Init load threadpool and preload threadpool. */
   virtual void InitMapNodeCaches(int cacheL1_size, int cahceL2_size);
 
   /**@brief Get the map node, if it's not in the cache, return false. */
@@ -91,23 +93,23 @@ class BaseMap {
 
   /**@brief Get the map config. */
   inline const BaseMapConfig& GetConfig() const {
-    return map_config_;
+    return *map_config_;
   }
   /**@brief Get the map config. */
   inline BaseMapConfig& GetConfig() {
-    return map_config_;
+    return *map_config_;
   }
 
  protected:
   /**@brief Load map node by index.*/
-  void LoadMapNodes(std::set<MapNodeIndex>& map_ids);
+  void LoadMapNodes(std::set<MapNodeIndex>* map_ids);
   /**@brief Load map node by index.*/
-  void PreloadMapNodes(std::set<MapNodeIndex>& map_ids);
+  void PreloadMapNodes(std::set<MapNodeIndex>* map_ids);
   /**@brief Load map node by index, thread_safety. */
   void LoadMapNodeThreadSafety(MapNodeIndex index, bool is_reserved = false);
 
   /**@brief The map settings. */
-  BaseMapConfig& map_config_;
+  BaseMapConfig* map_config_;
   /**@brief All the map nodes in the Map (in the disk). */
   std::list<MapNodeIndex> map_nodes_disk_;
 

@@ -17,6 +17,8 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_LOCATION_EXPORTER_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_LOCATION_EXPORTER_H
 
+#include <memory>
+#include <string>
 #include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
 
 namespace apollo {
@@ -32,7 +34,7 @@ class LocationExporter : public BaseExporter {
   typedef std::shared_ptr<LocationExporter> Ptr;
   typedef std::shared_ptr<LocationExporter const> ConstPtr;
 
-  LocationExporter(const std::string &loc_file_folder);
+  explicit LocationExporter(const std::string &loc_file_folder);
   ~LocationExporter();
 
   void GnssLocCallback(const rosbag::MessageInstance &msg);

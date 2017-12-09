@@ -21,13 +21,15 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
 
+#include <opencv2/opencv.hpp>
 #include <Eigen/Geometry>
 #include <list>
 #include <map>
-#include <opencv2/opencv.hpp>
 #include <string>
+#include <utility>
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
+
 namespace apollo {
 namespace localization {
 namespace msf {
@@ -52,8 +54,8 @@ struct LocalizatonInfo {
 
   void set(const Eigen::Translation3d &location,
            const Eigen::Quaterniond &attitude, const Eigen::Vector3d &std_var,
-           const std::string &description, const double &timestamp,
-           const unsigned int &frame_id) {
+           const std::string &description, const double timestamp,
+           const unsigned int frame_id) {
     set(location, attitude, description, timestamp, frame_id);
     this->std_var = std_var;
     is_has_std = true;
@@ -61,7 +63,7 @@ struct LocalizatonInfo {
 
   void set(const Eigen::Translation3d &location,
            const Eigen::Quaterniond &attitude, const std::string &description,
-           const double &timestamp, const unsigned int &frame_id) {
+           const double timestamp, const unsigned int frame_id) {
     set(location, description, timestamp, frame_id);
     this->attitude = attitude;
     this->pose = location * attitude;
@@ -69,15 +71,15 @@ struct LocalizatonInfo {
   }
 
   void set(const Eigen::Translation3d &location, const Eigen::Vector3d &std_var,
-           const std::string &description, const double &timestamp,
-           const unsigned int &frame_id) {
+           const std::string &description, const double timestamp,
+           const unsigned int frame_id) {
     set(location, description, timestamp, frame_id);
     this->std_var = std_var;
     is_has_std = true;
   }
 
   void set(const Eigen::Translation3d &location, const std::string &description,
-           const double &timestamp, const unsigned int &frame_id) {
+           const double timestamp, const unsigned int frame_id) {
     this->attitude = Eigen::Quaterniond::Identity();
     this->location = location;
     this->pose = location * attitude;
@@ -123,8 +125,8 @@ class MapImageCache {
 
  public:
   explicit MapImageCache(int capacity) : _capacity(capacity) {}
-  bool Get(const MapImageKey &key, cv::Mat &image);
-  void Set(const MapImageKey &key, cv::Mat &image);
+  bool Get(const MapImageKey &key, cv::Mat *image);
+  void Set(const MapImageKey &key, const cv::Mat &image);
 
  private:
   unsigned int _capacity;
@@ -176,9 +178,9 @@ class VisualizationEngine {
   /**@brief Project point cloud ti mat.*/
   void CloudToMat(const Eigen::Affine3d &cur_pose,
                   const Eigen::Affine3d &velodyne_extrinsic,
-                  const std::vector<Eigen::Vector3d> &cloud, cv::Mat &cloud_img,
-                  cv::Mat &cloud_img_mask);
-  void CoordToImageKey(const Eigen::Vector2d &coord, MapImageKey &key);
+                  const std::vector<Eigen::Vector3d> &cloud, cv::Mat *cloud_img,
+                  cv::Mat *cloud_img_mask);
+  void CoordToImageKey(const Eigen::Vector2d &coord, MapImageKey *key);
   /**@brief Compute grid index in current map given global coordinate.*/
   cv::Point CoordToMapGridIndex(const Eigen::Vector2d &coord,
                                 const unsigned int resolution_id,
@@ -188,7 +190,7 @@ class VisualizationEngine {
 
   bool LoadImageToCache(const MapImageKey &key);
 
-  void RotateImg(cv::Mat &in_img, cv::Mat &out_img, double angle);
+  void RotateImg(const cv::Mat &in_img, cv::Mat *out_img, double angle);
 
   void SetViewCenter(const double center_x, const double center_y);
   void UpdateViewCenter(const double move_x, const double move_y);

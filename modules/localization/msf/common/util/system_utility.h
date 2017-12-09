@@ -33,7 +33,7 @@ class system {
   /**@brief Try to create a directory. */
   static bool CreateDirectory(const std::string& path);
   /**@brief Get the size of a file. */
-  static bool GetFileSize(const std::string& path, unsigned int& size);
+  static bool GetFileSize(const std::string& path, unsigned int* size);
   /**@brief Copy the file. */
   static bool CopyFile(const std::string& src, const std::string& dst,
                        bool is_overwrite = true);
@@ -41,15 +41,15 @@ class system {
    * @param <ext> should be .jpg instead of jpg. **/
   static void GetFilesInFolderRecursive(const std::string& folder,
                                         const std::string& ext,
-                                        std::vector<std::string>& ret);
+                                        std::vector<std::string>* ret);
   /**@brief get list of files end with ext in folder.
    * @param <ext> should be .jpg instead of jpg. **/
   static void GetFilesInFolder(const std::string& folder,
                                const std::string& ext,
-                               std::vector<std::string>& ret);
+                               std::vector<std::string>* ret);
   /**@brief Get list of folders in folder. */
   static void GetFoldersInFolder(const std::string& folder,
-                                 std::vector<std::string>& ret);
+                                 std::vector<std::string>* ret);
 };
 
 }  // namespace msf

@@ -18,6 +18,8 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ROSBAG_READER_H
 #include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 #include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
 
 namespace apollo {

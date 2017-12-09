@@ -16,6 +16,7 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 #include <sstream>
+#include <string>
 
 namespace apollo {
 namespace localization {
@@ -94,8 +95,8 @@ MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
       (coordinate[1] - option.map_range_.GetMinY()) /
       (option.map_node_size_y_ * option.map_resolutions_[resolution_id]));
   if (n >= 0 && m >= 0 &&
-      n < int(GetMapIndexRangeEast(option, resolution_id)) &&
-      m < int(GetMapIndexRangeNorth(option, resolution_id))) {
+      n < static_cast<int>(GetMapIndexRangeEast(option, resolution_id)) &&
+      m < static_cast<int>(GetMapIndexRangeNorth(option, resolution_id))) {
     index.m_ = m;
     index.n_ = n;
   } else {

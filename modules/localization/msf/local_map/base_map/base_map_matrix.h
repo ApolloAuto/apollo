@@ -52,7 +52,7 @@ class BaseMapMatrix {
   /**@brief Get the binary size of the object. */
   virtual unsigned int GetBinarySize() const = 0;
   /**@brief get intensity image of node. */
-  virtual void GetIntensityImg(cv::Mat& intensity_img) const = 0;
+  virtual void GetIntensityImg(cv::Mat* intensity_img) const = 0;
 };
 
 }  // namespace msf

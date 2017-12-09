@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/data_extraction/location_exporter.h"
+#include <string>
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 
@@ -81,35 +82,6 @@ void LocationExporter::GnssLocCallback(
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
-
-  // std::cout << "GNSS location callback." << std::endl;
-  // boost::shared_ptr<IntegMeasure> msg =lidar_loc_file_handle_
-  //     msg_instance.instantiate<IntegMeasure>();
-  // static unsigned int index = 1;
-
-  // double timestamp = msg->header().timestamp_sec();
-  // double x = msg->position().x();
-  // double y = msg->position().y();
-  // double z = msg->position().z();
-
-  // // double qx = msg->pose().orientation().qx();
-  // // double qy = msg->pose().orientation().qy();
-  // // double qz = msg->pose().orientation().qz();
-  // // double qw = msg->pose().orientation().qw();
-  // double qx = 0.0;
-  // double qy = 0.0;
-  // double qz = 0.0;
-  // double qw = 1.0;
-
-  // double std_x = std::sqrt(msg->measure_covar(0));
-  // double std_y = std::sqrt(msg->measure_covar(10));
-  // double std_z = std::sqrt(msg->measure_covar(20));
-
-  // fprintf(gnss_loc_file_handle_,
-  //         "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
-  //         timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
-
-  // ++index;
 }
 
 void LocationExporter::LidarLocCallback(
@@ -138,35 +110,6 @@ void LocationExporter::LidarLocCallback(
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
-
-  // std::cout << "Lidar location callback." << std::endl;
-  // boost::shared_ptr<IntegMeasure> msg =
-  //     msg_instance.instantiate<IntegMeasure>();
-  // static unsigned int index = 1;
-
-  // double timestamp = msg->header().timestamp_sec();
-  // double x = msg->position().x();
-  // double y = msg->position().y();
-  // double z = msg->position().z();
-
-  // // double qx = msg->pose().orientation().qx();
-  // // double qy = msg->pose().orientation().qy();
-  // // double qz = msg->pose().orientation().qz();
-  // // double qw = msg->pose().orientation().qw();
-  // double qx = 0.0;
-  // double qy = 0.0;
-  // double qz = 0.0;
-  // double qw = 1.0;
-
-  // double std_x = std::sqrt(msg->measure_covar(0));
-  // double std_y = std::sqrt(msg->measure_covar(10));
-  // double std_z = std::sqrt(msg->measure_covar(20));
-
-  // fprintf(lidar_loc_file_handle_,
-  //         "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
-  //         timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
-
-  // ++index;
 }
 
 void LocationExporter::FusionLocCallback(

@@ -97,15 +97,15 @@ struct LosslessMapCell {
    * @param <return> The size read (the real size of object).
    */
   /**@brief Get the average intensity of all layers in the map cell. */
-  void GetValue(std::vector<unsigned char>& values) const;
+  void GetValue(std::vector<unsigned char>* values) const;
   /**@brief Get the variance of the intensity of all layers in the map cell. */
-  void GetVar(std::vector<float>& vars) const;
+  void GetVar(std::vector<float>* vars) const;
   /**@brief Get the average altitude of all layers in the map cell. */
-  void GetAlt(std::vector<float>& alts) const;
+  void GetAlt(std::vector<float>* alts) const;
   /**@brief Get the variance of the altitude of all layers in the map cell. */
-  void GetAltVar(std::vector<float>& alt_vars) const;
+  void GetAltVar(std::vector<float>* alt_vars) const;
   /**@brief Get the count of the samples of all layers in the map cell. */
-  void GetCount(std::vector<unsigned int>& counts) const;
+  void GetCount(std::vector<unsigned int>* counts) const;
   /**@brief Get the average intensity of the map cell. */
   inline unsigned char GetValue() const {
     return static_cast<unsigned char>(map_cells[0].intensity);
@@ -173,7 +173,7 @@ class LosslessMapMatrix : public BaseMapMatrix {
   /**@brief Get the binary size of the object. */
   virtual unsigned int GetBinarySize() const;
   /**@brief get intensity image of node. */
-  virtual void GetIntensityImg(cv::Mat& intensity_img) const;
+  virtual void GetIntensityImg(cv::Mat* intensity_img) const;
 
   /**@brief Get a map cell. */
   inline const LosslessMapCell& GetMapCell(unsigned int row,

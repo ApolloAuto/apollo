@@ -84,7 +84,7 @@ class LossyMapMatrix2D : public BaseMapMatrix {
   /**@brief Get the binary size of the object. */
   virtual unsigned int GetBinarySize() const;
   /**@brief get intensity image of node. */
-  virtual void GetIntensityImg(cv::Mat& intensity_img) const;
+  virtual void GetIntensityImg(cv::Mat* intensity_img) const;
 
   inline LossyMapCell2D* operator[](int row) {
     return map_cells_ + row * cols_;
@@ -105,22 +105,22 @@ class LossyMapMatrix2D : public BaseMapMatrix {
 
  protected:
   inline unsigned char EncodeIntensity(const LossyMapCell2D& cell) const;
-  inline void DecodeIntensity(unsigned char data, LossyMapCell2D& cell) const;
-  inline unsigned short EncodeVar(const LossyMapCell2D& cell) const;
-  inline void DecodeVar(unsigned short data, LossyMapCell2D& cell) const;
-  inline unsigned short EncodeAltitudeGround(const LossyMapCell2D& cell) const;
-  inline void DecodeAltitudeGround(unsigned short data,
-                                   LossyMapCell2D& cell) const;
-  inline unsigned short EncodeAltitudeAvg(const LossyMapCell2D& cell) const;
-  inline void DecodeAltitudeAvg(unsigned short data,
-                                LossyMapCell2D& cell) const;
+  inline void DecodeIntensity(unsigned char data, LossyMapCell2D* cell) const;
+  inline uint16_t EncodeVar(const LossyMapCell2D& cell) const;
+  inline void DecodeVar(uint16_t data, LossyMapCell2D* cell) const;
+  inline uint16_t EncodeAltitudeGround(const LossyMapCell2D& cell) const;
+  inline void DecodeAltitudeGround(uint16_t data,
+                                   LossyMapCell2D* cell) const;
+  inline uint16_t EncodeAltitudeAvg(const LossyMapCell2D& cell) const;
+  inline void DecodeAltitudeAvg(uint16_t data,
+                                LossyMapCell2D* cell) const;
   inline unsigned char EncodeCount(const LossyMapCell2D& cell) const;
-  inline void DecodeCount(unsigned char data, LossyMapCell2D& cell) const;
+  inline void DecodeCount(unsigned char data, LossyMapCell2D* cell) const;
   const int var_range_ = 1023;  // 65535;
   const int var_ratio_ = 4;     // 256;
   // const unsigned int _alt_range = 1023;//65535;
   const float alt_ground_interval_ = 0.04;
-  const unsigned short ground_void_flag_ = 0xffff;
+  const uint16_t ground_void_flag_ = 0xffff;
   const float alt_avg_interval_ = 0.04;
   const int count_range_ = 2;  // 30;
   mutable float alt_avg_min_;

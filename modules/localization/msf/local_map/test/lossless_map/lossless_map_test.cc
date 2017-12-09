@@ -46,7 +46,7 @@ TEST_F(LosslessMapTestSuite, MapNodeTest) {
     std::string map_base_folder =
         "modules/localization/msf/local_map/test/test_data";
     LosslessMapConfig config;
-    LosslessMap map(config);
+    LosslessMap map(&config);
     LosslessMapNodePool lossless_map_node_pool(25, 8);
     lossless_map_node_pool.Initial(&config);
     map.InitThreadPool(1, 6);
@@ -71,7 +71,7 @@ TEST_F(LosslessMapTestSuite, MapNodeTest) {
         "modules/localization/msf/local_map/test/test_data";
 
     LosslessMapConfig config;
-    LosslessMap map(config);
+    LosslessMap map(&config);
     LosslessMapNodePool lossless_map_node_pool(25, 8);
     lossless_map_node_pool.Initial(&config);
     map.InitThreadPool(1, 6);
@@ -99,7 +99,7 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
 
   LosslessMapNodePool input_node_pool(25, 8);
   input_node_pool.Initial(&map_config);
-  LosslessMap map(map_config);
+  LosslessMap map(&map_config);
   map.InitThreadPool(1, 6);
   map.InitMapNodeCaches(12, 24);
   map.AttachMapNodePool(&input_node_pool);

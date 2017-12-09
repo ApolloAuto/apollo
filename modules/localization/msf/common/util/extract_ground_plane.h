@@ -19,9 +19,10 @@
 
 #include <pcl/sample_consensus/ransac.h>
 #include <pcl/sample_consensus/sac_model_plane.h>
-#include <cmath>
 #include <pcl/sample_consensus/impl/ransac.hpp>
 #include <pcl/sample_consensus/impl/sac_model_plane.hpp>
+#include <cmath>
+#include <map>
 #include <vector>
 #include "modules/localization/msf/common/util/voxel_grid_covariance_hdmap.h"
 
@@ -112,7 +113,7 @@ class FeatureXYPlane {
           continue;
         }
         PointCloudT cloud_outlier;
-        if (GetPlaneFeaturePoint(it->second.cloud_, cloud_outlier)) {
+        if (GetPlaneFeaturePoint(it->second.cloud_, &cloud_outlier)) {
           cloud_tmp += cloud_outlier;
           plane_num++;
         } else {
@@ -138,7 +139,8 @@ class FeatureXYPlane {
   }
 
  private:
-  bool GetPlaneFeaturePoint(PointCloudT& cloud, PointCloudT& cloud_outlier) {
+  bool GetPlaneFeaturePoint(const PointCloudT& cloud,
+                            PointCloudT* cloud_outlier) {
     // ransac plane
     std::vector<int> inliers;
     PointCloudPtrT cloud_new(new PointCloudT);
@@ -149,7 +151,7 @@ class FeatureXYPlane {
     ransac.setDistanceThreshold(plane_inlier_distance_);
     ransac.computeModel();
     ransac.getInliers(inliers);
-    if ((int)inliers.size() < min_planepoints_number_) {
+    if (static_cast<int>(inliers.size()) < min_planepoints_number_) {
       return false;
     }
     PointCloudPtrT cloud_inlier(new PointCloudT);
@@ -157,13 +159,13 @@ class FeatureXYPlane {
     std::vector<int> outliers;
     unsigned int inlier_idx = 0;
     for (unsigned int i = 0; i < cloud_new->points.size(); ++i) {
-      if ((int)i < inliers[inlier_idx]) {
+      if (static_cast<int>(i) < inliers[inlier_idx]) {
         outliers.push_back(i);
       } else {
         inlier_idx++;
       }
     }
-    pcl::copyPointCloud<PointT>(*cloud_new, outliers, cloud_outlier);
+    pcl::copyPointCloud<PointT>(*cloud_new, outliers, *cloud_outlier);
 
     Eigen::Vector4f centroid;
     pcl::compute3DCentroid(*cloud_inlier, centroid);

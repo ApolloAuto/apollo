@@ -20,7 +20,7 @@
 namespace apollo {
 namespace localization {
 namespace msf {
-//======================LosslessMapSingleCell===========================
+// ======================LosslessMapSingleCell===========================
 LosslessMapSingleCell::LosslessMapSingleCell()
     : intensity(0.0),
       intensity_var(0.0),
@@ -100,7 +100,7 @@ unsigned int LosslessMapSingleCell::GetBinarySize() const {
   return sizeof(float) * 4 + sizeof(unsigned int);
 }
 
-//======================LosslessMapCell===========================
+// ======================LosslessMapCell===========================
 LosslessMapCell::LosslessMapCell() {
   layer_num = 1;
 }
@@ -122,7 +122,8 @@ void LosslessMapCell::SetValueLayer(double altitude, unsigned char intensity,
     if (layer_num < IDL_CAR_NUM_RESERVED_MAP_LAYER) {
       // No layer yet, create a new one
       LosslessMapSingleCell& cell = map_cells[layer_num++];
-      cell.AddSample((float)altitude, static_cast<float>(intensity));
+      cell.AddSample(static_cast<float>(altitude),
+                     static_cast<float>(intensity));
     } else {
       // No enough reserved map layers.
       std::cerr << "[Warning] There are no enough reserved map cell layers. "
@@ -135,12 +136,14 @@ void LosslessMapCell::SetValueLayer(double altitude, unsigned char intensity,
     if (layer_alt_dif < altitude_thres) {
       // Still a good one
       LosslessMapSingleCell& cell = map_cells[best_layer_id];
-      cell.AddSample((float)altitude, static_cast<float>(intensity));
+      cell.AddSample(static_cast<float>(altitude),
+                     static_cast<float>(intensity));
     } else {
       // Should create a new one
       if (layer_num < IDL_CAR_NUM_RESERVED_MAP_LAYER) {
         LosslessMapSingleCell& cell = map_cells[layer_num++];
-        cell.AddSample((float)altitude, static_cast<float>(intensity));
+        cell.AddSample(static_cast<float>(altitude),
+                       static_cast<float>(intensity));
       } else {
         // No enough reserved map layers.
         std::cerr << "[Warning] There are no enough reserved map cell layers. "
@@ -154,7 +157,7 @@ void LosslessMapCell::SetValueLayer(double altitude, unsigned char intensity,
 void LosslessMapCell::SetValue(double altitude, unsigned char intensity) {
   assert(layer_num <= IDL_CAR_NUM_RESERVED_MAP_LAYER);
   LosslessMapSingleCell& cell = map_cells[0];
-  cell.AddSample((float)altitude, static_cast<float>(intensity));
+  cell.AddSample(static_cast<float>(altitude), static_cast<float>(intensity));
 }
 
 unsigned int LosslessMapCell::LoadBinary(unsigned char* buf) {
@@ -215,47 +218,47 @@ unsigned int LosslessMapCell::GetLayerId(double altitude) const {
   return best_layer_id;
 }
 
-void LosslessMapCell::GetValue(std::vector<unsigned char>& values) const {
-  values.clear();
+void LosslessMapCell::GetValue(std::vector<unsigned char>* values) const {
+  values->clear();
   for (unsigned int i = 1; i < layer_num; ++i) {
     const LosslessMapSingleCell& cell = map_cells[i];
-    values.push_back(static_cast<unsigned char>(cell.intensity));
+    values->push_back(static_cast<unsigned char>(cell.intensity));
   }
 }
 
-void LosslessMapCell::GetVar(std::vector<float>& vars) const {
-  vars.clear();
+void LosslessMapCell::GetVar(std::vector<float>* vars) const {
+  vars->clear();
   for (unsigned int i = 1; i < layer_num; ++i) {
     const LosslessMapSingleCell& cell = map_cells[i];
-    vars.push_back(cell.intensity_var);
+    vars->push_back(cell.intensity_var);
   }
 }
 
-void LosslessMapCell::GetAlt(std::vector<float>& alts) const {
-  alts.clear();
+void LosslessMapCell::GetAlt(std::vector<float>* alts) const {
+  alts->clear();
   for (unsigned int i = 1; i < layer_num; ++i) {
     const LosslessMapSingleCell& cell = map_cells[i];
-    alts.push_back(cell.altitude);
+    alts->push_back(cell.altitude);
   }
 }
 
-void LosslessMapCell::GetAltVar(std::vector<float>& alt_vars) const {
-  alt_vars.clear();
+void LosslessMapCell::GetAltVar(std::vector<float>* alt_vars) const {
+  alt_vars->clear();
   for (unsigned int i = 1; i < layer_num; ++i) {
     const LosslessMapSingleCell& cell = map_cells[i];
-    alt_vars.push_back(cell.altitude_var);
+    alt_vars->push_back(cell.altitude_var);
   }
 }
 
-void LosslessMapCell::GetCount(std::vector<unsigned int>& counts) const {
-  counts.clear();
+void LosslessMapCell::GetCount(std::vector<unsigned int>* counts) const {
+  counts->clear();
   for (unsigned int i = 1; i < layer_num; ++i) {
     const LosslessMapSingleCell& cell = map_cells[i];
-    counts.push_back(cell.count);
+    counts->push_back(cell.count);
   }
 }
 
-//======================LosslessMapMatrix===========================
+// ======================LosslessMapMatrix===========================
 LosslessMapMatrix::LosslessMapMatrix() {
   rows_ = 0;
   cols_ = 0;
@@ -367,12 +370,12 @@ unsigned int LosslessMapMatrix::GetBinarySize() const {
   return target_size;
 }
 
-void LosslessMapMatrix::GetIntensityImg(cv::Mat& intensity_img) const {
-  intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
+void LosslessMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
+  *intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
 
   for (int y = 0; y < rows_; ++y) {
     for (int x = 0; x < cols_; ++x) {
-      intensity_img.at<unsigned char>(y, x) = GetMapCell(y, x).GetValue();
+      intensity_img->at<unsigned char>(y, x) = GetMapCell(y, x).GetValue();
     }
   }
 }

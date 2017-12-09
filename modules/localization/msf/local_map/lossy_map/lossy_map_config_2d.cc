@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
+#include <string>
 
 namespace apollo {
 namespace localization {
@@ -30,17 +31,17 @@ LossyMapConfig2D::LossyMapConfig2D(std::string map_version)
   map_ground_height_offset_ = 1.7;  // Set the initial value here.
 }
 
-void LossyMapConfig2D::CreateXml(boost::property_tree::ptree& config) const {
+void LossyMapConfig2D::CreateXml(boost::property_tree::ptree* config) const {
   BaseMapConfig::CreateXml(config);
-  config.put("map.map_runtime.layer_alt_thres", map_layer_alt_thres_);
-  config.put("map.map_runtime.cache_size", map_cache_size_);
-  config.put("map.map_runtime.max_intensity_value", max_intensity_value_);
-  config.put("map.map_runtime.max_intensity_var_value",
+  config->put("map.map_runtime.layer_alt_thres", map_layer_alt_thres_);
+  config->put("map.map_runtime.cache_size", map_cache_size_);
+  config->put("map.map_runtime.max_intensity_value", max_intensity_value_);
+  config->put("map.map_runtime.max_intensity_var_value",
              max_intensity_var_value_);
   return;
 }
 
-void LossyMapConfig2D::LoadXml(boost::property_tree::ptree& config) {
+void LossyMapConfig2D::LoadXml(const boost::property_tree::ptree& config) {
   BaseMapConfig::LoadXml(config);
   map_layer_alt_thres_ = config.get<float>("map.map_runtime.layer_alt_thres");
   map_cache_size_ = config.get<unsigned int>("map.map_runtime.cache_size");

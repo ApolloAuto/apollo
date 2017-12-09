@@ -18,6 +18,7 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_BASE_EXPORTER_H
 
 #include <rosbag/bag.h>
+#include <memory>
 
 namespace apollo {
 namespace localization {

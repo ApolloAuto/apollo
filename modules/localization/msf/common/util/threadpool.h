@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #ifndef THREADPOOL_POOL_CORE_HPP_INCLUDED
 #define THREADPOOL_POOL_CORE_HPP_INCLUDED
 
@@ -17,7 +33,7 @@ namespace localization {
 template <typename T, typename Mutex>
 class LockingPtr {
  public:
-  LockingPtr(volatile T& obj, const volatile Mutex& mtx)
+  LockingPtr(volatile const T& obj, volatile const Mutex& mtx)
       : obj_(const_cast<T*>(&obj)), mutex_(*const_cast<Mutex*>(&mtx)) {
     mutex_.lock();
   }
@@ -42,7 +58,7 @@ class LockingPtr {
 
 class ScopeGuard {
  public:
-  ScopeGuard(std::function<void()> const& call_on_exit)
+  explicit ScopeGuard(std::function<void()> const& call_on_exit)
       : function_(call_on_exit), is_active_(true) {}
 
   ~ScopeGuard() {
@@ -100,7 +116,7 @@ template <typename ThreadPool>
 class WorkerThread
     : public std::enable_shared_from_this<WorkerThread<ThreadPool>> {
  public:
-  WorkerThread(std::shared_ptr<ThreadPool> const& pool) : pool_(pool) {
+  explicit WorkerThread(std::shared_ptr<ThreadPool> const& pool) : pool_(pool) {
     assert(pool);
   }
 
@@ -170,7 +186,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
     return worker_count_;
   }
 
-  // TODO is only called once
+  // is only called once
   void shutdown() {
     this->wait();
     this->terminate_all_workers(true);
@@ -299,7 +315,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
       }
     } else {  // decrease worker count
       locked_this->task_or_terminate_workers_event_
-          .notify_all();  // TODO: Optimize number of notified workers
+          .notify_all();  // TODO(Apollo): Optimize number of notified workers
     }
 
     return true;
@@ -407,7 +423,7 @@ class ThreadPool {
   typedef std::function<void()> TaskType;
 
  public:
-  ThreadPool(size_t initial_threads = 0)
+  explicit ThreadPool(size_t initial_threads = 0)
       : threadpool_impl_(new ThreadPoolImpl()) {
     bool suc = threadpool_impl_->resize(initial_threads);
     if (suc == false) {

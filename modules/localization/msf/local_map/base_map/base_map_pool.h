@@ -19,6 +19,7 @@
 
 #include <boost/thread.hpp>
 #include <list>
+#include <set>
 #include "modules/localization/msf/common/util/threadpool.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 

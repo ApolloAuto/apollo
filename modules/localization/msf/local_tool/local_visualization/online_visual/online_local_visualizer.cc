@@ -145,7 +145,7 @@ void OnlineLocalVisualizer::OnPointCloud(
   // cloud_time = boost::posix_time::microsec_clock::local_time();
 
   std::vector<unsigned char> intensities;
-  ParsePointCloudMessage(message, lidar_vis_frame.pt3ds, intensities);
+  ParsePointCloudMessage(message, &lidar_vis_frame.pt3ds, &intensities);
 
   static unsigned int id = 1;
   lidar_vis_frame.frame_id = id;
@@ -230,8 +230,8 @@ void OnlineLocalVisualizer::OnFusionLocalization(
 
 void OnlineLocalVisualizer::ParsePointCloudMessage(
     const sensor_msgs::PointCloud2 &message,
-    std::vector<Eigen::Vector3d> &pt3ds,
-    std::vector<unsigned char> &intensities) {
+    std::vector<Eigen::Vector3d> *pt3ds,
+    std::vector<unsigned char> *intensities) {
   pcl::PCLPointCloud2 pcl_cloud;
   pcl_conversions::toPCL(message, pcl_cloud);
 
@@ -251,8 +251,8 @@ void OnlineLocalVisualizer::ParsePointCloudMessage(
         Eigen::Vector3d pt3d_local = pt3d;
         unsigned char intensity =
             static_cast<unsigned char>((*cloud)[i].intensity);
-        pt3ds.push_back(pt3d_local);
-        intensities.push_back(intensity);
+        pt3ds->push_back(pt3d_local);
+        intensities->push_back(intensity);
       }
     }
   } else {
@@ -266,8 +266,8 @@ void OnlineLocalVisualizer::ParsePointCloudMessage(
           Eigen::Vector3d pt3d_local = pt3d;
           unsigned char intensity =
               static_cast<unsigned char>(cloud->at(w, h).intensity);
-          pt3ds.push_back(pt3d_local);
-          intensities.push_back(intensity);
+          pt3ds->push_back(pt3d_local);
+          intensities->push_back(intensity);
         }
       }
     }

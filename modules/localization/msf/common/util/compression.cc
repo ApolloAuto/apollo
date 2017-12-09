@@ -25,22 +25,22 @@ namespace msf {
 
 const unsigned int ZlibStrategy::zlib_chunk = 16384;
 
-unsigned int ZlibStrategy::Encode(BufferStr& buf, BufferStr& buf_compressed) {
+unsigned int ZlibStrategy::Encode(BufferStr* buf, BufferStr* buf_compressed) {
   return ZlibCompress(buf, buf_compressed);
 }
 
-unsigned int ZlibStrategy::Decode(BufferStr& buf, BufferStr& buf_uncompressed) {
+unsigned int ZlibStrategy::Decode(BufferStr* buf, BufferStr* buf_uncompressed) {
   return ZlibUncompress(buf, buf_uncompressed);
 }
 
-unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
-                                        std::vector<unsigned char>& dst) {
-  dst.resize(zlib_chunk * 2);
+unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>* src,
+                                        std::vector<unsigned char>* dst) {
+  dst->resize(zlib_chunk * 2);
   int ret, flush;
   unsigned have;
   z_stream strm;
-  unsigned char* in = &src[0];
-  unsigned char* out = &dst[0];
+  unsigned char* in = &((*src)[0]);
+  unsigned char* out = &((*dst)[0]);
   unsigned int src_idx = 0;
   unsigned int dst_idx = 0;
 
@@ -53,12 +53,12 @@ unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
 
   /* compress until end of file */
   do {
-    in = &src[src_idx];
-    if (src.size() - src_idx > zlib_chunk) {
+    in = &((*src)[src_idx]);
+    if (src->size() - src_idx > zlib_chunk) {
       strm.avail_in = zlib_chunk;
       flush = Z_NO_FLUSH;
     } else {
-      strm.avail_in = src.size() - src_idx;
+      strm.avail_in = src->size() - src_idx;
       flush = Z_FINISH;
     }
     strm.next_in = in;
@@ -73,10 +73,10 @@ unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
       assert(ret != Z_STREAM_ERROR); /* state not clobbered */
       have = zlib_chunk - strm.avail_out;
       dst_idx += have;
-      if (dst_idx + zlib_chunk > dst.size()) {
-        dst.resize(dst_idx + zlib_chunk * 2);
+      if (dst_idx + zlib_chunk > dst->size()) {
+        dst->resize(dst_idx + zlib_chunk * 2);
       }
-      out = &dst[dst_idx];
+      out = &((*dst)[dst_idx]);
     } while (strm.avail_out == 0);
     assert(strm.avail_in == 0); /* all input will be used */
 
@@ -86,18 +86,18 @@ unsigned int ZlibStrategy::ZlibCompress(std::vector<unsigned char>& src,
 
   /* clean up and return */
   (void)deflateEnd(&strm);
-  dst.resize(dst_idx);
+  dst->resize(dst_idx);
   return Z_OK;
 }
 
-unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
-                                          std::vector<unsigned char>& dst) {
-  dst.resize(zlib_chunk * 2);
+unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>* src,
+                                          std::vector<unsigned char>* dst) {
+  dst->resize(zlib_chunk * 2);
   int ret;
   unsigned have;
   z_stream strm;
-  unsigned char* in = &src[0];
-  unsigned char* out = &dst[0];
+  unsigned char* in = &((*src)[0]);
+  unsigned char* out = &((*dst)[0]);
   unsigned int src_idx = 0;
   unsigned int dst_idx = 0;
 
@@ -112,11 +112,11 @@ unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
 
   /* decompress until deflate stream ends or end of file */
   do {
-    in = &src[src_idx];
-    if (src.size() - src_idx > zlib_chunk) {
+    in = &((*src)[src_idx]);
+    if (src->size() - src_idx > zlib_chunk) {
       strm.avail_in = zlib_chunk;
     } else {
-      strm.avail_in = src.size() - src_idx;
+      strm.avail_in = src->size() - src_idx;
     }
     strm.next_in = in;
     src_idx += strm.avail_in;
@@ -138,10 +138,10 @@ unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
       }
       have = zlib_chunk - strm.avail_out;
       dst_idx += have;
-      if (dst_idx + zlib_chunk > dst.size()) {
-        dst.resize(dst_idx + zlib_chunk * 2);
+      if (dst_idx + zlib_chunk > dst->size()) {
+        dst->resize(dst_idx + zlib_chunk * 2);
       }
-      out = &dst[dst_idx];
+      out = &((*dst)[dst_idx]);
     } while (strm.avail_out == 0);
 
     /* done when inflate() says it's done */
@@ -149,7 +149,7 @@ unsigned int ZlibStrategy::ZlibUncompress(std::vector<unsigned char>& src,
 
   /* clean up and return */
   (void)inflateEnd(&strm);
-  dst.resize(dst_idx);
+  dst->resize(dst_idx);
   return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
 }
 

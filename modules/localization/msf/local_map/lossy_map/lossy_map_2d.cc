@@ -20,7 +20,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-LossyMap2D::LossyMap2D(LossyMapConfig2D& config) : BaseMap(config) {}
+LossyMap2D::LossyMap2D(LossyMapConfig2D* config) : BaseMap(config) {}
 
 LossyMap2D::~LossyMap2D() {}
 

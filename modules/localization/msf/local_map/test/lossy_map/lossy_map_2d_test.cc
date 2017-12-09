@@ -42,7 +42,7 @@ MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
 
 bool GetAllMapIndex(const std::string& src_map_folder,
                     const std::string& dst_map_folder,
-                    std::list<MapNodeIndex>& buf) {
+                    std::list<MapNodeIndex>* buf) {
   std::string src_map_path = src_map_folder + "/map";
   std::string dst_map_path = dst_map_folder + "/map";
   boost::filesystem::path src_map_path_boost(src_map_path);
@@ -52,16 +52,20 @@ bool GetAllMapIndex(const std::string& src_map_folder,
     boost::filesystem::create_directory(dst_map_path_boost);
   }
 
-  buf.clear();
+  if (!boost::filesystem::exists(src_map_path)) {
+    return false;
+  }
+
+  buf->clear();
 
   boost::filesystem::recursive_directory_iterator end_iter;
-  boost::filesystem::recursive_directory_iterator iter(src_map_path);
+  boost::filesystem::recursive_directory_iterator iter(src_map_path_boost);
   for (; iter != end_iter; ++iter) {
     if (!boost::filesystem::is_directory(*iter)) {
       if (iter->path().extension() == "") {
         std::string tmp = iter->path().string();
         tmp = tmp.substr(src_map_path.length(), tmp.length());
-        buf.push_back(GetMapIndexFromMapFolder(tmp));
+        buf->push_back(GetMapIndexFromMapFolder(tmp));
       }
     } else {
       std::string tmp = iter->path().string();
@@ -101,10 +105,9 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
   }
 
   LossyMapConfig input_config("lossy_map");
-
   LossyMapNodePool input_node_pool(25, 8);
   input_node_pool.Initial(&input_config);
-  LossyMap input_map(input_config);
+  LossyMap input_map(&input_config);
   input_map.InitThreadPool(1, 6);
   input_map.InitMapNodeCaches(12, 24);
   input_map.AttachMapNodePool(&input_node_pool);
@@ -114,16 +117,18 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
   }
 
   std::list<MapNodeIndex> buf;
-  GetAllMapIndex(src_map_folder, dst_map_folder, buf);
+  bool success = GetAllMapIndex(src_map_folder, dst_map_folder, &buf);
+  ASSERT_TRUE(success);
   std::cout << "index size: " << buf.size() << std::endl;
 
-  input_config.Save(dst_map_folder + "/config.xml");
+  LossyMapConfig& input_map_config =
+      static_cast<LossyMapConfig&>(input_map.GetConfig());
+  input_map_config.Save(dst_map_folder + "/config.xml");
 
   LossyMapConfig lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
-
-  LossyMap lossy_map(lossy_config);
+  LossyMap lossy_map(&lossy_config);
   lossy_map.InitThreadPool(1, 6);
   lossy_map.InitMapNodeCaches(12, 24);
   lossy_map.AttachMapNodePool(&lossy_map_node_pool);
@@ -148,8 +153,8 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
     LossyMapMatrix& lossy_matrix =
         static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
 
-    int rows = input_config.map_node_size_y_;
-    int cols = input_config.map_node_size_x_;
+    int rows = input_map_config.map_node_size_y_;
+    int cols = input_map_config.map_node_size_x_;
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
         lossy_matrix[row][col].intensity = input_matrix[row][col].intensity;
@@ -178,7 +183,7 @@ TEST_F(LossyMap2DTestSuite, MapScheduleTest) {
 
   LossyMapNodePool input_node_pool(25, 8);
   input_node_pool.Initial(&map_config);
-  LossyMap lossy_map(map_config);
+  LossyMap lossy_map(&map_config);
   lossy_map.InitThreadPool(1, 6);
   lossy_map.InitMapNodeCaches(12, 24);
   lossy_map.AttachMapNodePool(&input_node_pool);

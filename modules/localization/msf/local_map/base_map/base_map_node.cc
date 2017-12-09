@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include <cstdio>
+#include <string>
+#include <vector>
 #include "modules/localization/msf/common/util/system_utility.h"
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 
@@ -86,7 +88,7 @@ bool BaseMapNode::Save() {
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%03u", index_.resolution_id_);
+  snprintf(buf, sizeof(buf), "/%03u", index_.resolution_id_);
   path = path + buf;
   if (!CreateMapDirectory(path)) {
     return false;
@@ -99,17 +101,17 @@ bool BaseMapNode::Save() {
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%02d", abs(index_.zone_id_));
+  snprintf(buf, sizeof(buf), "/%02d", abs(index_.zone_id_));
   path = path + buf;
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%08u", abs(index_.m_));
+  snprintf(buf, sizeof(buf), "/%08u", abs(index_.m_));
   path = path + buf;
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%08u", abs(index_.n_));
+  snprintf(buf, sizeof(buf), "/%08u", abs(index_.n_));
   path = path + buf;
 
   std::cout << "Save node: " << path << std::endl;
@@ -136,7 +138,7 @@ bool BaseMapNode::Load() {
   if (!(system::IsExists(path) && system::IsDirectory(path))) {
     return false;
   }
-  snprintf(buf, 1024, "/%03u", index_.resolution_id_);
+  snprintf(buf, sizeof(buf), "/%03u", index_.resolution_id_);
   path = path + buf;
   if (!(system::IsExists(path) && system::IsDirectory(path))) {
     return false;
@@ -149,17 +151,17 @@ bool BaseMapNode::Load() {
   if (!(system::IsExists(path) && system::IsDirectory(path))) {
     return false;
   }
-  snprintf(buf, 1024, "/%02d", abs(index_.zone_id_));
+  snprintf(buf, sizeof(buf), "/%02d", abs(index_.zone_id_));
   path = path + buf;
   if (!(system::IsExists(path) && system::IsDirectory(path))) {
     return false;
   }
-  snprintf(buf, 1024, "/%08u", abs(index_.m_));
+  snprintf(buf, sizeof(buf), "/%08u", abs(index_.m_));
   path = path + buf;
   if (!(system::IsExists(path) && system::IsDirectory(path))) {
     return false;
   }
-  snprintf(buf, 1024, "/%08u", abs(index_.n_));
+  snprintf(buf, sizeof(buf), "/%08u", abs(index_.n_));
   path = path + buf;
 
   return Load(path.c_str());
@@ -190,12 +192,12 @@ unsigned int BaseMapNode::LoadBinary(FILE* file) {
   assert(read_size == header_size);
   unsigned int processed_size = LoadHeaderBinary(&buf[0]);
   assert(processed_size == header_size);
-  
+
   // Load the body
   buf.resize(file_body_binary_size_);
   read_size = fread(&buf[0], 1, file_body_binary_size_, file);
   assert(read_size == file_body_binary_size_);
-  processed_size += LoadBodyBinary(buf);
+  processed_size += LoadBodyBinary(&buf);
   return processed_size;
 }
 
@@ -206,7 +208,7 @@ unsigned int BaseMapNode::CreateBinary(FILE* file) const {
 
   unsigned int binary_size = 0;
   std::vector<unsigned char> body_buffer;
-  unsigned int processed_size = CreateBodyBinary(body_buffer);
+  unsigned int processed_size = CreateBodyBinary(&body_buffer);
   // assert(processed_size == buf_size);
 
   // Create header
@@ -290,34 +292,35 @@ unsigned int BaseMapNode::GetHeaderBinarySize() const {
 //     return map_matrix_->GetBinarySize();
 // }
 
-unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>& buf) {
+unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
   if (compression_strategy_ == NULL) {
-    return map_matrix_->LoadBinary(&buf[0]);
+    return map_matrix_->LoadBinary(&((*buf)[0]));
   }
   std::vector<unsigned char> buf_uncompressed;
-  compression_strategy_->Decode(buf, buf_uncompressed);
+  compression_strategy_->Decode(buf, &buf_uncompressed);
   std::cerr << "map node compress ratio: "
-            << (float)(buf.size()) / buf_uncompressed.size() << std::endl;
+            << static_cast<float>(buf->size()) / buf_uncompressed.size()
+            << std::endl;
   return map_matrix_->LoadBinary(&buf_uncompressed[0]);
 }
 
 unsigned int BaseMapNode::CreateBodyBinary(
-    std::vector<unsigned char>& buf) const {
+    std::vector<unsigned char>* buf) const {
   if (compression_strategy_ == NULL) {
     unsigned int body_size = GetBodyBinarySize();
-    buf.resize(body_size);
-    map_matrix_->CreateBinary(&buf[0], body_size);
-    file_body_binary_size_ = buf.size();
-    return buf.size();
+    buf->resize(body_size);
+    map_matrix_->CreateBinary(&((*buf)[0]), body_size);
+    file_body_binary_size_ = buf->size();
+    return buf->size();
   }
   std::vector<unsigned char> buf_uncompressed;
   // Compute the uncompression binary body size
   unsigned int body_size = GetBodyBinarySize();
   buf_uncompressed.resize(body_size);
   map_matrix_->CreateBinary(&buf_uncompressed[0], body_size);
-  compression_strategy_->Encode(buf_uncompressed, buf);
-  file_body_binary_size_ = buf.size();
-  return buf.size();
+  compression_strategy_->Encode(&buf_uncompressed, buf);
+  file_body_binary_size_ = buf->size();
+  return buf->size();
 }
 
 unsigned int BaseMapNode::GetBodyBinarySize() const {
@@ -344,16 +347,18 @@ unsigned int BaseMapNode::GetBodyBinarySize() const {
 // }
 
 bool BaseMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
-                                unsigned int& x, unsigned int& y) const {
+                                unsigned int* x, unsigned int* y) const {
   const Eigen::Vector2d& left_top_corner = GetLeftTopCorner();
   int off_x = static_cast<int>((coordinate[0] - left_top_corner[0]) /
                                GetMapResolution());
   int off_y = static_cast<int>((coordinate[1] - left_top_corner[1]) /
                                GetMapResolution());
-  if (off_x >= 0 && off_x < int(this->map_config_->map_node_size_x_) &&
-      off_y >= 0 && off_y < int(this->map_config_->map_node_size_y_)) {
-    x = static_cast<unsigned int>(off_x);
-    y = static_cast<unsigned int>(off_y);
+  if (off_x >= 0 &&
+      off_x < static_cast<int>(this->map_config_->map_node_size_x_) &&
+      off_y >= 0 &&
+      off_y < static_cast<int>(this->map_config_->map_node_size_y_)) {
+    *x = static_cast<unsigned int>(off_x);
+    *y = static_cast<unsigned int>(off_y);
     return true;
   } else {
     return false;
@@ -369,7 +374,7 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
 // }
 
 bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
-                                unsigned int& x, unsigned int& y) const {
+                                unsigned int* x, unsigned int* y) const {
   Eigen::Vector2d coord2d(coordinate[0], coordinate[1]);
   return GetCoordinate(coord2d, x, y);
 }
@@ -439,7 +444,7 @@ bool BaseMapNode::SaveIntensityImage() const {
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%03u", index_.resolution_id_);
+  snprintf(buf, sizeof(buf), "/%03u", index_.resolution_id_);
   path = path + buf;
   if (!CreateMapDirectory(path)) {
     return false;
@@ -452,17 +457,17 @@ bool BaseMapNode::SaveIntensityImage() const {
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%02d", abs(index_.zone_id_));
+  snprintf(buf, sizeof(buf), "/%02d", abs(index_.zone_id_));
   path = path + buf;
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%08u", abs(index_.m_));
+  snprintf(buf, sizeof(buf), "/%08u", abs(index_.m_));
   path = path + buf;
   if (!CreateMapDirectory(path)) {
     return false;
   }
-  snprintf(buf, 1024, "/%08u.png", abs(index_.n_));
+  snprintf(buf, sizeof(buf), "/%08u.png", abs(index_.n_));
   path = path + buf;
   bool success0 = SaveIntensityImage(path);
   return success0;
@@ -470,7 +475,7 @@ bool BaseMapNode::SaveIntensityImage() const {
 
 bool BaseMapNode::SaveIntensityImage(const std::string& path) const {
   cv::Mat image;
-  map_matrix_->GetIntensityImg(image);
+  map_matrix_->GetIntensityImg(&image);
   bool success = cv::imwrite(path, image);
   return success;
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <algorithm>
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
+#include <algorithm>
 #include "modules/localization/msf/common/util/system_utility.h"
 
 namespace apollo {
@@ -39,11 +39,11 @@ bool system::CreateDirectory(const std::string& path) {
   return boost::filesystem::create_directory(p);
 }
 
-bool system::GetFileSize(const std::string& path, unsigned int& size) {
+bool system::GetFileSize(const std::string& path, unsigned int* size) {
   boost::filesystem::path p(path);
   if (boost::filesystem::exists(p)) {
     if (boost::filesystem::is_regular_file(p)) {
-      size = boost::filesystem::file_size(p);
+      *size = boost::filesystem::file_size(p);
       return true;
     } else {
       return false;
@@ -76,8 +76,8 @@ bool system::CopyFile(const std::string& src, const std::string& dst,
 
 void system::GetFilesInFolderRecursive(const std::string& folder,
                                        const std::string& ext,
-                                       std::vector<std::string>& ret) {
-  ret.clear();
+                                       std::vector<std::string>* ret) {
+  ret->clear();
   namespace fs = boost::filesystem;
   if (!fs::exists(folder) || !fs::is_directory(folder)) {
     return;
@@ -88,16 +88,16 @@ void system::GetFilesInFolderRecursive(const std::string& folder,
 
   while (it != endit) {
     if (fs::is_regular_file(*it) && it->path().extension() == ext) {
-      ret.push_back(it->path().string());
+      ret->push_back(it->path().string());
     }
     ++it;
   }
-  std::sort(ret.begin(), ret.end());
+  std::sort(ret->begin(), ret->end());
 }
 
 void system::GetFilesInFolder(const std::string& folder, const std::string& ext,
-                              std::vector<std::string>& ret) {
-  ret.clear();
+                              std::vector<std::string>* ret) {
+  ret->clear();
   namespace fs = boost::filesystem;
   if (!fs::exists(folder) || !fs::is_directory(folder)) {
     return;
@@ -108,16 +108,16 @@ void system::GetFilesInFolder(const std::string& folder, const std::string& ext,
 
   while (it != endit) {
     if (fs::is_regular_file(*it) && it->path().extension() == ext) {
-      ret.push_back(it->path().string());
+      ret->push_back(it->path().string());
     }
     ++it;
   }
-  std::sort(ret.begin(), ret.end());
+  std::sort(ret->begin(), ret->end());
 }
 
 void system::GetFoldersInFolder(const std::string& folder,
-                                std::vector<std::string>& ret) {
-  ret.clear();
+                                std::vector<std::string>* ret) {
+  ret->clear();
   namespace fs = boost::filesystem;
   if (!fs::exists(folder) || !fs::is_directory(folder)) {
     return;
@@ -128,11 +128,11 @@ void system::GetFoldersInFolder(const std::string& folder,
 
   while (it != endit) {
     if (fs::is_directory(*it)) {
-      ret.push_back(it->path().string());
+      ret->push_back(it->path().string());
     }
     ++it;
   }
-  std::sort(ret.begin(), ret.end());
+  std::sort(ret->begin(), ret->end());
 }
 
 }  // namespace msf

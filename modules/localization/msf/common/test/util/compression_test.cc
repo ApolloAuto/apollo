@@ -39,8 +39,8 @@ TEST_F(CompressionTestSuite, ZlibStrategyTest) {
   }
 
   std::vector<unsigned char> buf_uncompressed2;
-  zlib.Encode(buf_uncompressed, buf_compressed);
-  zlib.Decode(buf_compressed, buf_uncompressed2);
+  zlib.Encode(&buf_uncompressed, &buf_compressed);
+  zlib.Decode(&buf_compressed, &buf_uncompressed2);
 
   for (int i = 0; i < 255; i++) {
     ASSERT_EQ(buf_uncompressed2[i], (unsigned char)i);

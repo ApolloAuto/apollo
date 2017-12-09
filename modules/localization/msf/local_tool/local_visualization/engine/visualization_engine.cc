@@ -27,7 +27,7 @@ namespace msf {
 
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
-std::string car_img_path[3] = {
+const char car_img_path[3][1024] = {
     "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
     "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
     "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
@@ -63,18 +63,18 @@ bool MapImageKey::operator<(const MapImageKey &key) const {
 }
 
 // =================MapImageCache=================
-bool MapImageCache::Get(const MapImageKey &key, cv::Mat &image) {
+bool MapImageCache::Get(const MapImageKey &key, cv::Mat *image) {
   auto found_iter = _map.find(key);
   if (found_iter == _map.end()) {
     return false;
   }
   // move the corresponding key to list front
   _list.splice(_list.begin(), _list, found_iter->second);
-  image = found_iter->second->second;
+  *image = found_iter->second->second;
   return true;
 }
 
-void MapImageCache::Set(const MapImageKey &key, cv::Mat &image) {
+void MapImageCache::Set(const MapImageKey &key, const cv::Mat &image) {
   auto found_iter = _map.find(key);
   if (found_iter != _map.end()) {
     // move the corresponding key to list front
@@ -207,7 +207,7 @@ void VisualizationEngine::Preprocess(const std::string &map_folder) {
   std::string image_path = map_folder_ + "/image";
   std::string image_visual_path = map_folder_ + "/map_visual";
   char buf[256];
-  snprintf(buf, 256, "/%03u", resolution_id_);
+  snprintf(buf, sizeof(buf), "/%03u", resolution_id_);
   image_visual_resolution_path_ = image_visual_path + buf;
   std::cout << "image_visual_resolution_path: " << image_visual_resolution_path_
             << std::endl;
@@ -264,7 +264,7 @@ void VisualizationEngine::Draw() {
   }
 
   MapImageKey iamge_key;
-  CoordToImageKey(_view_center, iamge_key);
+  CoordToImageKey(_view_center, &iamge_key);
 
   // get 3*3 images on that level
   for (int i = -1; i <= 1; ++i) {
@@ -273,7 +273,7 @@ void VisualizationEngine::Draw() {
       key.node_north_id += i * cur_stride_;
       key.node_east_id += j * cur_stride_;
       if (LoadImageToCache(key)) {
-        map_image_cache_.Get(key, subMat_[i + 1][j + 1]);
+        map_image_cache_.Get(key, &subMat_[i + 1][j + 1]);
       } else {
         subMat_[i + 1][j + 1] =
             cv::Mat(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0));
@@ -298,7 +298,7 @@ void VisualizationEngine::Draw() {
   DrawLoc(bias);
   DrawStd(bias);
 
-  int width = (int)(1024 * cur_scale_) / cur_stride_;
+  int width = static_cast<int>(1024 * cur_scale_) / cur_stride_;
   int dis = width / 2;
   int left_top_x = node_grid_index.x + 1024 - dis;
   int left_top_y = node_grid_index.y + 1024 - dis;
@@ -406,7 +406,7 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
         // RotateImg(mat_tem, rotated_mat, 90 - yaw);
         // RotateImg(mat_tem, rotated_mat, - yaw - 90);
         // RotateImg(mat_tem, rotated_mat, yaw + 90);
-        RotateImg(mat_tem, rotated_mat, yaw - 90);
+        RotateImg(mat_tem, &rotated_mat, yaw - 90);
         cv::Point car_lt =
             lt - cv::Point(rotated_mat.cols / 2, rotated_mat.rows / 2);
         cv::Mat mat_mask;
@@ -466,8 +466,8 @@ void VisualizationEngine::DrawCloud(const cv::Point &bias) {
 
   std::cout << "Draw cloud." << std::endl;
   if (cur_level_ == 0) {
-    CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, cloud_img_,
-               cloud_img_mask_);
+    CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, &cloud_img_,
+               &cloud_img_mask_);
     cv::Point lt;
     lt = CoordToMapGridIndex(cloud_img_lt_coord_, resolution_id_, cur_stride_);
     lt = lt + bias + cv::Point(1024, 1024);
@@ -525,7 +525,7 @@ void VisualizationEngine::DrawInfo() {
 
   // draw frame id.
   char info[256];
-  snprintf(info, 256, "Frame: %d.", loc_info.frame_id);
+  snprintf(info, sizeof(info), "Frame: %d.", loc_info.frame_id);
   text = info;
   textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
   cv::Point textOrg(10, 10 + textSize.height);
@@ -533,7 +533,7 @@ void VisualizationEngine::DrawInfo() {
               cv::Scalar(255, 0, 0), thickness, 8);
 
   // draw timestamp.
-  snprintf(info, 256, "Timestamp: %lf.", loc_info.timestamp);
+  snprintf(info, sizeof(info), "Timestamp: %lf.", loc_info.timestamp);
   text = info;
   textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
   textOrg = cv::Point(10, 2 * (10 + textSize.height));
@@ -556,7 +556,7 @@ void VisualizationEngine::DrawTips() {
 
   // draw tips.
   char info[256];
-  snprintf(info, 256,
+  snprintf(info, sizeof(info),
            "e: zoom out; q: zoom in; m: max scale; n: origin scale; w: up; s: "
            "down; a: move left; d: move right; r: move center");
   text = info;
@@ -565,7 +565,7 @@ void VisualizationEngine::DrawTips() {
   cv::putText(tips_window_, text, textOrg, fontFace, fontScale,
               cv::Scalar(255, 255, 255), thickness, 8);
 
-  snprintf(info, 256,
+  snprintf(info, sizeof(info),
            "f: follow car/free view; p: play/pause; c: change current loc; 1: "
            "draw car/not; 2: draw trajectory/not; others: next");
   text = info;
@@ -652,7 +652,7 @@ void VisualizationEngine::GenerateMutiResolutionImages(
 
         for (int i = 0; i < 2; i++) {
           for (int j = 0; j < 2; j++) {
-            snprintf(ss, 200, "%s/%08d/%08d_%d.png",
+            snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
                      image_visual_path_dst.c_str(), pt_y + i * step,
                      pt_x + j * step, lvl - 1);
             // std::cerr << ss << std::endl;
@@ -664,7 +664,7 @@ void VisualizationEngine::GenerateMutiResolutionImages(
           }
         }
         if (flag) {
-          snprintf(ss, 200, "%s/%08d/%08d_%d.png",
+          snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
                    image_visual_path_dst.c_str(), pt_y, pt_x, lvl);
           cv::resize(large, small, cv::Size(1024, 1024), 0, 0, CV_INTER_LINEAR);
           cv::imwrite(ss, small);
@@ -718,11 +718,11 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
   lt_node_grid_index_.x = lt_node_index_.x * map_config_.map_node_size_x_;
   lt_node_grid_index_.y = lt_node_index_.y * map_config_.map_node_size_y_;
 
-  double init_center_x = (double(x_max + x_min) / 2 *
+  double init_center_x = (static_cast<double>(x_max + x_min) / 2 *
                           map_config_.map_resolutions_[resolution_id_] *
                           map_config_.map_node_size_x_) +
                          map_config_.map_range_.GetMinX();
-  double init_center_y = (double(y_max + y_min) / 2 *
+  double init_center_y = (static_cast<double>(y_max + y_min) / 2 *
                           map_config_.map_resolutions_[resolution_id_] *
                           map_config_.map_node_size_y_) +
                          map_config_.map_range_.GetMinY();
@@ -741,8 +741,8 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
 void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
                                      const Eigen::Affine3d &velodyne_extrinsic,
                                      const std::vector<Eigen::Vector3d> &cloud,
-                                     cv::Mat &cloud_img,
-                                     cv::Mat &cloud_img_mask) {
+                                     cv::Mat *cloud_img,
+                                     cv::Mat *cloud_img_mask) {
   unsigned int img_width = map_config_.map_node_size_x_;
   unsigned int img_height = map_config_.map_node_size_y_;
   Eigen::Vector3d cen = car_pose_.translation();
@@ -772,29 +772,29 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     unsigned char b = color_table[car_loc_id_ % 3][0];
     unsigned char g = color_table[car_loc_id_ % 3][1];
     unsigned char r = color_table[car_loc_id_ % 3][2];
-    cloud_img.at<cv::Vec3b>(row, col) = cv::Vec3b(b, g, r);
-    cloud_img_mask.at<unsigned char>(row, col) = 1;
+    cloud_img->at<cv::Vec3b>(row, col) = cv::Vec3b(b, g, r);
+    cloud_img_mask->at<unsigned char>(row, col) = 1;
   }
 }
 
 void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
-                                          MapImageKey &key) {
-  key.level = cur_level_;
+                                          MapImageKey *key) {
+  key->level = cur_level_;
   // get MapNodeIndex at image level 0
   MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coord,
                                                      resolution_id_, zone_id_);
 
-  key.zone_id = zone_id_;
-  key.node_north_id = index.m_;
-  key.node_east_id = index.n_;
+  key->zone_id = zone_id_;
+  key->node_north_id = index.m_;
+  key->node_east_id = index.n_;
 
-  int m = (int)key.node_north_id - lt_node_index_.y;
+  int m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
   if (m < 0) m = m - (cur_stride_ - 1);
-  key.node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
+  key->node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
 
-  int n = (int)key.node_east_id - lt_node_index_.x;
+  int n = static_cast<int>(key->node_east_id) - lt_node_index_.x;
   if (n < 0) n = n - (cur_stride_ - 1);
-  key.node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
+  key->node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
 }
 
 cv::Point VisualizationEngine::CoordToMapGridIndex(
@@ -828,9 +828,9 @@ cv::Point VisualizationEngine::MapGridIndexToNodeGridIndex(const cv::Point &p) {
 bool VisualizationEngine::LoadImageToCache(const MapImageKey &key) {
   cv::Mat img;
 
-  if (!map_image_cache_.Get(key, img)) {
+  if (!map_image_cache_.Get(key, &img)) {
     char path[1024];
-    snprintf(path, 1024, "%s/%02d/%08d/%08d_%d.png",
+    snprintf(path, sizeof(path), "%s/%02d/%08d/%08d_%d.png",
              image_visual_leaf_path_.c_str(), key.zone_id, key.node_north_id,
              key.node_east_id, key.level);
     if (boost::filesystem::exists(boost::filesystem::path(path))) {
@@ -845,7 +845,7 @@ bool VisualizationEngine::LoadImageToCache(const MapImageKey &key) {
   return true;
 }
 
-void VisualizationEngine::RotateImg(cv::Mat &in_img, cv::Mat &out_img,
+void VisualizationEngine::RotateImg(const cv::Mat &in_img, cv::Mat *out_img,
                                     double angle) {
   int width = (in_img.cols > in_img.rows) ? in_img.cols : in_img.rows;
   width += 4;
@@ -856,7 +856,7 @@ void VisualizationEngine::RotateImg(cv::Mat &in_img, cv::Mat &out_img,
                        in_img.cols, in_img.rows)));
   cv::Point2f pt(width / 2.0f, width / 2.0f);
   cv::Mat rotation_mat = cv::getRotationMatrix2D(pt, angle, 1.0);
-  cv::warpAffine(mat_tem, out_img, rotation_mat, cv::Size(width, width));
+  cv::warpAffine(mat_tem, *out_img, rotation_mat, cv::Size(width, width));
 }
 
 void VisualizationEngine::SetViewCenter(const double center_x,

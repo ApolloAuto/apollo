@@ -26,7 +26,7 @@ namespace msf {
 
 class LossyMap2D : public BaseMap {
  public:
-  explicit LossyMap2D(LossyMapConfig2D& config);
+  explicit LossyMap2D(LossyMapConfig2D* config);
   ~LossyMap2D();
 
   /**@brief Preload map nodes for the next frame location calculation.

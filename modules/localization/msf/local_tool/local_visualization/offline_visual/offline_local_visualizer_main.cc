@@ -18,7 +18,6 @@
 #include <boost/program_options.hpp>
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
 
-using namespace apollo::localization::msf;
 int main(int argc, char **argv) {
   boost::program_options::options_description boost_desc("Allowed options");
   boost_desc.add_options()("help", "produce help message")(
@@ -45,7 +44,7 @@ int main(int argc, char **argv) {
   std::string fusion_loc_file = pcd_folder + "/fusion_loc.txt";
   std::string extrinsic_file = basedir + "/velodyne_novatel_extrinsics.yaml";
 
-  OfflineLocalVisualizer local_visualizer;
+  apollo::localization::msf::OfflineLocalVisualizer local_visualizer;
   bool success = local_visualizer.Init(
       map_folder, pcd_folder, pcd_timestamp_file, gnss_loc_file, lidar_loc_file,
       fusion_loc_file, extrinsic_file);

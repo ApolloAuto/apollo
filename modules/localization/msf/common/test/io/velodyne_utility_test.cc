@@ -34,6 +34,6 @@ TEST_F(VelodyneUtilityTestSuite, test) {
   ASSERT_TRUE(true);
 }
 
-}  // namespace numerical
-}  // namespace core
-}  // namespace car
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

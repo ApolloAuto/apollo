@@ -37,7 +37,7 @@ typedef LossyMapNodePool2D LossyMapNodePool;
 typedef LossyMapMatrix2D LossyMapMatrix;
 typedef LossyMapConfig2D LossyMapConfig;
 
-MapNodeIndex get_map_index_from_map_folder(const std::string& map_folder) {
+MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   MapNodeIndex index;
   char buf[100];
   sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_,
@@ -51,9 +51,9 @@ MapNodeIndex get_map_index_from_map_folder(const std::string& map_folder) {
   return index;
 }
 
-bool get_all_map_index(const std::string& src_map_folder,
+bool GetAllMapIndex(const std::string& src_map_folder,
                        const std::string& dst_map_folder,
-                       std::list<MapNodeIndex>& buf) {
+                       std::list<MapNodeIndex>* buf) {
   std::string src_map_path = src_map_folder + "/map";
   std::string dst_map_path = dst_map_folder + "/map";
   boost::filesystem::path src_map_path_boost(src_map_path);
@@ -64,18 +64,18 @@ bool get_all_map_index(const std::string& src_map_folder,
   }
 
   // push path of map's index to list
-  buf.clear();
+  buf->clear();
   // std::deque<std::string> map_bin_path;
   int index = 0;
   boost::filesystem::recursive_directory_iterator end_iter;
-  boost::filesystem::recursive_directory_iterator iter(src_map_path);
+  boost::filesystem::recursive_directory_iterator iter(src_map_path_boost);
   for (; iter != end_iter; ++iter) {
     if (!boost::filesystem::is_directory(*iter)) {
       if (iter->path().extension() == "") {
         // map_bin_path.push_back(iter->path().string());
         std::string tmp = iter->path().string();
         tmp = tmp.substr(src_map_path.length(), tmp.length());
-        buf.push_back(get_map_index_from_map_folder(tmp));
+        buf->push_back(GetMapIndexFromMapFolder(tmp));
       }
     } else {
       std::string tmp = iter->path().string();
@@ -95,7 +95,17 @@ bool get_all_map_index(const std::string& src_map_folder,
 }  // namespace localization
 }  // namespace apollo
 
-using namespace apollo::localization::msf;
+using apollo::localization::msf::MapNodeIndex;
+using apollo::localization::msf::LossyMapMatrix;
+using apollo::localization::msf::LossyMapConfig;
+using apollo::localization::msf::LossyMapNodePool;
+using apollo::localization::msf::LossyMap;
+using apollo::localization::msf::LossyMapNode;
+using apollo::localization::msf::LosslessMapNodePool;
+using apollo::localization::msf::LosslessMapConfig;
+using apollo::localization::msf::LosslessMap;
+using apollo::localization::msf::LosslessMapNode;
+using apollo::localization::msf::LosslessMapMatrix;
 
 int main(int argc, char** argv) {
   boost::program_options::options_description boost_desc("Allowed options");
@@ -125,7 +135,7 @@ int main(int argc, char** argv) {
   LosslessMapNodePool lossless_map_node_pool(25, 8);
   lossless_map_node_pool.Initial(&lossless_config);
 
-  LosslessMap lossless_map(lossless_config);
+  LosslessMap lossless_map(&lossless_config);
   lossless_map.InitThreadPool(1, 6);
   lossless_map.InitMapNodeCaches(12, 24);
   lossless_map.AttachMapNodePool(&lossless_map_node_pool);
@@ -141,7 +151,7 @@ int main(int argc, char** argv) {
   }
 
   std::list<MapNodeIndex> buf;
-  get_all_map_index(src_map_folder, dst_map_folder, buf);
+  GetAllMapIndex(src_map_folder, dst_map_folder, &buf);
   std::cout << "index size: " << buf.size() << std::endl;
 
   LosslessMapConfig config_transform_lossy("lossless_map");
@@ -154,7 +164,7 @@ int main(int argc, char** argv) {
   LossyMapConfig lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
-  LossyMap lossy_map(lossy_config);
+  LossyMap lossy_map(&lossy_config);
   lossy_map.InitThreadPool(1, 6);
   lossy_map.InitMapNodeCaches(12, 24);
   lossy_map.AttachMapNodePool(&lossy_map_node_pool);
@@ -201,8 +211,8 @@ int main(int argc, char** argv) {
         bool is_ground_useful = false;
         std::vector<float> layer_alts;
         std::vector<unsigned int> layer_counts;
-        lossless_matrix.GetMapCell(row, col).GetCount(layer_counts);
-        lossless_matrix.GetMapCell(row, col).GetAlt(layer_alts);
+        lossless_matrix.GetMapCell(row, col).GetCount(&layer_counts);
+        lossless_matrix.GetMapCell(row, col).GetAlt(&layer_alts);
         if (layer_counts.size() == 0 || layer_alts.size() == 0) {
           altitude_avg = lossless_node->GetAlt(row, col);
           is_ground_useful = false;

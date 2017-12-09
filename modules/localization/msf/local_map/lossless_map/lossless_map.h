@@ -17,6 +17,7 @@
 #ifndef BAIDU_ADU_LOCALIZATION_LOSSLESS_MAP_H
 #define BAIDU_ADU_LOCALIZATION_LOSSLESS_MAP_H
 
+#include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 
@@ -26,7 +27,7 @@ namespace msf {
 
 class LosslessMap : public BaseMap {
  public:
-  explicit LosslessMap(LosslessMapConfig& config);
+  explicit LosslessMap(LosslessMapConfig* config);
   ~LosslessMap();
 
  public:
@@ -48,54 +49,54 @@ class LosslessMap : public BaseMap {
    * corresponding map node in the cache and return the value, if necessary.
    * This function returns the value of each layer in the map cell. */
   void GetValue(const Eigen::Vector3d& coordinate, int zone_id,
-                unsigned int resolution_id, std::vector<unsigned char>& values);
+                unsigned int resolution_id, std::vector<unsigned char>* values);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache thread safely and return the value, if
    * necessary. This function returns the value of each layer in the map cell.
    */
   void GetValueSafe(const Eigen::Vector3d& coordinate, int zone_id,
                     unsigned int resolution_id,
-                    std::vector<unsigned char>& values);
+                    std::vector<unsigned char>* values);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache and return the value, if necessary.
    * This function returns the value of each layer in the map cell. */
   void GetVar(const Eigen::Vector3d& coordinate, int zone_id,
-              unsigned int resolution_id, std::vector<float>& vars);
+              unsigned int resolution_id, std::vector<float>* vars);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache thread safely and return the value, if
    * necessary. This function returns the value of each layer in the map cell.
    */
   void GetVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
-                  unsigned int resolution_id, std::vector<float>& vars);
+                  unsigned int resolution_id, std::vector<float>* vars);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache and return the value, if necessary.
    * This function returns the value of each layer in the map cell. */
   void GetAlt(const Eigen::Vector3d& coordinate, int zone_id,
-              unsigned int resolution_id, std::vector<float>& alts);
+              unsigned int resolution_id, std::vector<float>* alts);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache thread safely and return the value, if
    * necessary. This function returns the value of each layer in the map cell.
    */
   void GetAltSafe(const Eigen::Vector3d& coordinate, int zone_id,
-                  unsigned int resolution_id, std::vector<float>& alts);
+                  unsigned int resolution_id, std::vector<float>* alts);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache and return the value, if necessary.
    * This function returns the value of each layer in the map cell. */
   void GetAltVar(const Eigen::Vector3d& coordinate, int zone_id,
-                 unsigned int resolution_id, std::vector<float>& alt_vars);
+                 unsigned int resolution_id, std::vector<float>* alt_vars);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache thread safely and return the value, if
    * necessary. This function returns the value of each layer in the map cell.
    */
   void GetAltVarSafe(const Eigen::Vector3d& coordinate, int zone_id,
-                     unsigned int resolution_id, std::vector<float>& alt_vars);
+                     unsigned int resolution_id, std::vector<float>* alt_vars);
   /**@brief Get the number of samples in the map cell. */
   void GetCount(const Eigen::Vector3d& coordinate, int zone_id,
-                unsigned int resolution_id, std::vector<unsigned int>& counts);
+                unsigned int resolution_id, std::vector<unsigned int>* counts);
   /**@brief Get the number of samples in the map cell thread safely. */
   void GetCountSafe(const Eigen::Vector3d& coordinate, int zone_id,
                     unsigned int resolution_id,
-                    std::vector<unsigned int>& counts);
+                    std::vector<unsigned int>* counts);
   /**@brief Given the 3D global coordinate, this function loads the
    * corresponding map node in the cache and return the value, if necessary. */
   unsigned char GetValue(const Eigen::Vector3d& coordinate, int zone_id,

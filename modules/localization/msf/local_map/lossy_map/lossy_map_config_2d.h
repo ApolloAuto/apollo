@@ -17,6 +17,7 @@
 #ifndef BAIDU_ADU_LOSSY_MAP_CONFIG_2D_H
 #define BAIDU_ADU_LOSSY_MAP_CONFIG_2D_H
 
+#include <string>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
 namespace apollo {
@@ -45,9 +46,9 @@ class LossyMapConfig2D : public BaseMapConfig {
 
  protected:
   /**@brief Create the XML structure. */
-  virtual void CreateXml(boost::property_tree::ptree& config) const;
+  virtual void CreateXml(boost::property_tree::ptree* config) const;
   /**@brief Load the map options from a XML structure. */
-  virtual void LoadXml(boost::property_tree::ptree& config);
+  virtual void LoadXml(const boost::property_tree::ptree& config);
 };
 
 }  // namespace msf

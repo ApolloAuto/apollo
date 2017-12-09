@@ -18,6 +18,7 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_NODE_INDEX_H
 
 #include <iostream>
+#include <string>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
