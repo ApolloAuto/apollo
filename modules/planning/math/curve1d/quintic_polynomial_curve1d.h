@@ -53,10 +53,9 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
   std::string ToString() const override;
 
  protected:
-  void compute_coefficients(const double x0, const double dx0,
-                            const double ddx0, const double x1,
-                            const double dx1, const double ddx1,
-                            const double param);
+  void ComputeCoefficients(const double x0, const double dx0, const double ddx0,
+                           const double x1, const double dx1, const double ddx1,
+                           const double param);
 
   // f = sum(coef_[i] * x^i), i from 0 to 5
   std::array<double, 6> coef_{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
