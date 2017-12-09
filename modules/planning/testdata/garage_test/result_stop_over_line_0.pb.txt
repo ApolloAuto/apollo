@@ -1082,21 +1082,6 @@ decision {
         }
       }
     }
-    decision {
-      id: "DEST"
-      perception_id: -1109540454
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_DESTINATION
-          distance_s: -0.5
-          stop_point {
-            x: 586367.36158261122
-            y: 4140784.2294011195
-          }
-          stop_heading: 1.2878425667819666
-        }
-      }
-    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE
