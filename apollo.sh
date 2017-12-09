@@ -232,6 +232,10 @@ function release() {
     fi
   done
 
+  # calibration tools
+  cp bazel-bin/modules/calibration/lidar_ex_checker/lidar_ex_checker ${MODULES_DIR}/calibration
+  cp bazel-bin/modules/calibration/republish_msg/republish_msg ${MODULES_DIR}/calibration
+
   # control tools
   mkdir $MODULES_DIR/control/tools
   cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
