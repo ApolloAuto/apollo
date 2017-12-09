@@ -70,13 +70,14 @@ ProtocolData<ContiRadar> *ContiRadarMessageManager::GetMutableProtocolDataById(
 
 void ContiRadarMessageManager::Parse(const uint32_t message_id,
                                      const uint8_t *data, int32_t length) {
-  if (length != ::apollo::drivers::canbus::CANBUS_MESSAGE_LENGTH) {
-    AERROR << "Incorrect ContiRadar message length, length:" << length
-           << " required length: "
-           << ::apollo::drivers::canbus::CANBUS_MESSAGE_LENGTH;
-    return;
-  }
-
+  /*
+if (length != ::apollo::drivers::canbus::CANBUS_MESSAGE_LENGTH) {
+AERROR << "Incorrect ContiRadar message length, length:" << length
+<< " required length: "
+<< ::apollo::drivers::canbus::CANBUS_MESSAGE_LENGTH;
+return;
+}
+*/
   ProtocolData<ContiRadar> *sensor_protocol_data =
       GetMutableProtocolDataById(message_id);
   if (sensor_protocol_data == nullptr) {
