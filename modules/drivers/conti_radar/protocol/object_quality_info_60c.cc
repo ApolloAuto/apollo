@@ -29,7 +29,7 @@ namespace conti_radar {
 using apollo::drivers::canbus::Byte;
 
 ObjectQualityInfo60C::ObjectQualityInfo60C() {}
-const int32_t ObjectQualityInfo60C::ID = 0x60C;
+const uint32_t ObjectQualityInfo60C::ID = 0x60C;
 
 void ObjectQualityInfo60C::Parse(const std::uint8_t* bytes, int32_t length,
                                  ContiRadar* conti_radar) const {
