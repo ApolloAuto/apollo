@@ -121,6 +121,17 @@ class PncMap {
    */
   LaneWaypoint ToLaneWaypoint(const routing::LaneWaypoint &waypoint) const;
 
+  /**
+   * @brief Update routing waypoint index to the next waypoint that ADC need to
+   * pass. The logic is by comparing the current waypoint's route index with
+   * route_index and adc_waypoint_:
+   * a. If the waypoint's route_index < route_index_, ADC must have passed
+   * the waypoint.
+   * b. If the waypoint's route_index == route_index_, ADC and the waypoint
+   * is on the same lane, compare the lane_s.
+   */
+  void UpdateNextRoutingWaypointIndex();
+
  private:
   routing::RoutingResponse routing_;
   std::unordered_set<std::string> routing_lane_ids_;
@@ -129,9 +140,9 @@ class PncMap {
    */
   std::vector<LaneWaypoint> routing_waypoints_;
   /**
-   * The next routing request waypoint that the vehicle needs to drive to
+   * The next routing request waypoint that the vehicle have passed.
    */
-  int next_waypoint_index_ = 0;
+  std::size_t next_routing_waypoint_index_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
   bool is_same_routing_ = false;
 

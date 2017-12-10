@@ -169,10 +169,7 @@ TEST_F(PncMapTest, GetNeighborPassages) {
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 2);
-    EXPECT_EQ(3, result.size());
-    EXPECT_EQ(2, result[0]);
-    EXPECT_EQ(1, result[1]);
-    EXPECT_EQ(3, result[2]);
+    EXPECT_EQ(1, result.size());
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 3);
