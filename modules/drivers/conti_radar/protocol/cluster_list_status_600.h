@@ -29,7 +29,7 @@ using apollo::drivers::ContiRadar;
 class ClusterListStatus600
     : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
-  static const int32_t ID;
+  static const uint32_t ID;
   ClusterListStatus600();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ContiRadar* conti_radar) const override;

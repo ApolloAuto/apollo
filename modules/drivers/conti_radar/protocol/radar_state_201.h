@@ -30,7 +30,7 @@ using ::apollo::drivers::conti_radar::RcsThreshold;
 
 class RadarState201 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
-  static const int32_t ID;
+  static const uint32_t ID;
   RadarState201();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ContiRadar* conti_radar) const override;
