@@ -1,6 +1,8 @@
 header {
   module_name: "planning"
 }
+total_path_length: 42.187437522880565
+total_path_time: 7.9999999999999885
 is_replan: true
 gear: GEAR_DRIVE
 trajectory_point {

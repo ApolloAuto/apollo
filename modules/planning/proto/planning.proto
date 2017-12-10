@@ -74,20 +74,31 @@ message LatencyStats {
 // next id: 16
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
+
   optional double total_path_length = 2; // in meters
   optional double total_path_time = 3; // in seconds
+
+  // path data + speed data
   repeated apollo.common.TrajectoryPoint trajectory_point = 12;
+
   optional EStop estop = 6;
+
+  // path point without speed info
   repeated apollo.common.PathPoint path_point = 13;
-  optional apollo.planning_internal.Debug debug = 8;
+
   // is_replan == true mean replan triggered
   optional bool is_replan = 9 [default = false];
+
   // Specify trajectory gear
   optional apollo.canbus.Chassis.GearPosition gear = 10;
+
   optional apollo.planning.DecisionResult decision = 14;
+
   optional LatencyStats latency_stats = 15;
+
   // the routing used for current planning result
   optional apollo.common.Header routing_header = 16;
+  optional apollo.planning_internal.Debug debug = 8;
 
   // replaced by path_point
   repeated ADCPathPoint adc_path_point = 7 [deprecated=true];
