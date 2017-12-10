@@ -47,7 +47,8 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   const double stop_s = velocity * velocity / (2.0 * stop_acc) +
                         FLAGS_virtual_stop_wall_length +
                         FLAGS_stop_distance_destination;
-  if (stop_s < remain_s) {
+  constexpr double kMinReferenceLineRemainLength = 10.0;
+  if (stop_s < remain_s && remain_s > kMinReferenceLineRemainLength) {
     ADEBUG << "have enough reference line to drive on";
     return true;
   }
