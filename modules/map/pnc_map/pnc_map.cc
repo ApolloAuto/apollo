@@ -98,6 +98,22 @@ LaneWaypoint PncMap::ToLaneWaypoint(
   }
 }
 
+void PncMap::UpdateNextRoutingWaypointIndex() {
+  while (next_routing_waypoint_index_ + 1 < routing_waypoints_.size()) {
+    const auto &next_waypoint =
+        routing_waypoints_[next_routing_waypoint_index_];
+    auto waypoint_index = GetWaypointIndex(next_waypoint);
+    if (waypoint_index < route_index_) {
+      ++next_routing_waypoint_index_;
+    } else if (waypoint_index == route_index_ &&
+               adc_waypoint_.s >= next_waypoint.s) {
+      ++next_routing_waypoint_index_;
+    } else {
+      break;
+    }
+  }
+}
+
 bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   if (!ValidateRouting(routing_)) {
     AERROR << "The routing is invalid when updatting vehicle state";
@@ -117,12 +133,8 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   }
 
   // track how many routing request waypoints the adc have passed.
-  while (next_waypoint_index_ + 1 <
-             static_cast<int>(routing_waypoints_.size()) &&
-         GetWaypointIndex(routing_waypoints_[next_waypoint_index_ + 1]) <
-             route_index_) {
-    ++next_waypoint_index_;
-  }
+  UpdateNextRoutingWaypointIndex();
+
   auto last_indices = GetWaypointIndex(routing_waypoints_.back());
   if (!stop_for_destination_ && last_indices.size() == 3 &&
       last_indices[0] == routing_.road_size() - 1 &&
@@ -176,7 +188,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   routing_ = routing;
   route_index_.clear();
   adc_waypoint_ = LaneWaypoint();
-  next_waypoint_index_ = 0;
+  next_routing_waypoint_index_ = 0;
   stop_for_destination_ = false;
   return true;
 }
@@ -226,15 +238,14 @@ std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
       }
     }
   }
-  // if not found following history route_index_, search backwards
-  for (int road_index = routing_.road_size() - 1; road_index >= 0;
-       --road_index) {
+  // if not found following history route_index_, search forward
+  for (int road_index = 0; road_index < routing_.road_size(); ++road_index) {
     const auto &road_segment = routing_.road(road_index);
-    for (int passage_index = road_segment.passage_size() - 1;
-         passage_index >= 0; --passage_index) {
+    for (int passage_index = 0; passage_index < road_segment.passage_size();
+         ++passage_index) {
       const auto &passage = road_segment.passage(passage_index);
-      for (int lane_index = passage.segment_size() - 1; lane_index >= 0;
-           --lane_index) {
+      for (int lane_index = 0; lane_index < passage.segment_size();
+           ++lane_index) {
         if (RouteSegments::WithinLaneSegment(passage.segment(lane_index),
                                              waypoint)) {
           return {road_index, passage_index, lane_index};
@@ -277,6 +288,13 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
   RouteSegments source_segments;
   if (!PassageToSegments(source_passage, &source_segments)) {
     AERROR << "failed to convert passage to segments";
+    return result;
+  }
+  if (next_routing_waypoint_index_ < routing_waypoints_.size() &&
+      source_segments.IsWaypointOnSegment(
+          routing_waypoints_[next_routing_waypoint_index_])) {
+    ADEBUG << "need to pass next waypoint[" << next_routing_waypoint_index_
+           << "] before change lane";
     return result;
   }
   std::unordered_set<std::string> neighbor_lanes;
