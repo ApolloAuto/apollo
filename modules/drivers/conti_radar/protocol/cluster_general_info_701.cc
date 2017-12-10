@@ -30,7 +30,7 @@ namespace conti_radar {
 using apollo::drivers::canbus::Byte;
 
 ClusterGeneralInfo701::ClusterGeneralInfo701() {}
-const int32_t ClusterGeneralInfo701::ID = 0x701;
+const uint32_t ClusterGeneralInfo701::ID = 0x701;
 
 void ClusterGeneralInfo701::Parse(const std::uint8_t* bytes, int32_t length,
                                   ContiRadar* conti_radar) const {
