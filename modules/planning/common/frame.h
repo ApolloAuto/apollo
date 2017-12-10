@@ -100,7 +100,13 @@ class Frame {
    */
   const Obstacle *FindCollisionObstacle() const;
 
-  const Obstacle *CreateDestinationObstacle();
+  /**
+   * @brief create destination obstacle when needed.
+   * @return < 0 if error happend;
+   * @return 0 if destination obstacle is created
+   * @return > 0 if destination obstacle should not be created now.
+   */
+  int CreateDestinationObstacle();
 
  private:
   uint32_t sequence_num_ = 0;

@@ -117,6 +117,7 @@ void RouteSegments::SetProperties(const RouteSegments &other) {
   next_action_ = other.NextAction();
   previous_action_ = other.PreviousAction();
   id_ = other.Id();
+  stop_for_destination_ = other.StopForDestination();
 }
 
 double RouteSegments::Length(const RouteSegments &segments) {
