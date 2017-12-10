@@ -32,7 +32,7 @@ using apollo::drivers::conti_radar::RadarConf;
 class RadarConfig200
     : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
-  static const int32_t ID;
+  static const uint32_t ID;
   RadarConfig200();
   ~RadarConfig200();
   /**
