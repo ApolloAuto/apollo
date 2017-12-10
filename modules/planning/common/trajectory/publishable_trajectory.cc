@@ -42,6 +42,11 @@ void PublishableTrajectory::PopulateTrajectoryProtobuf(
   trajectory_pb->mutable_header()->set_timestamp_sec(header_time_);
   trajectory_pb->mutable_trajectory_point()->CopyFrom(
       {trajectory_points_.begin(), trajectory_points_.end()});
+  if (!trajectory_points_.empty()) {
+    const auto& last_tp = trajectory_points_.back();
+    trajectory_pb->set_total_path_length(last_tp.path_point().s());
+    trajectory_pb->set_total_path_time(last_tp.relative_time());
+  }
 }
 
 }  // namespace planning
