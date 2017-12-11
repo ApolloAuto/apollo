@@ -42,7 +42,9 @@ using ::apollo::localization::LocalizationEstimate;
 using ::apollo::perception::PerceptionObstacle;
 using ::apollo::perception::PerceptionObstacles;
 
-std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+std::string Prediction::Name() const {
+  return FLAGS_prediction_module_name;
+}
 
 Status Prediction::Init() {
   // Load prediction conf
@@ -83,7 +85,9 @@ Status Prediction::Init() {
   return Status::OK();
 }
 
-Status Prediction::Start() { return Status::OK(); }
+Status Prediction::Start() {
+  return Status::OK();
+}
 
 void Prediction::Stop() {}
 

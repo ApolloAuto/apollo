@@ -21,6 +21,7 @@ DEFINE_bool(enable_adapter_dump, false,
             "/tmp/adapters/<topic_name>/<seq_num>.txt for debugging purposes.");
 DEFINE_string(gps_topic, "/apollo/sensor/gnss/odometry", "GPS topic name");
 DEFINE_string(imu_topic, "/apollo/sensor/gnss/corrected_imu", "IMU topic name");
+DEFINE_string(raw_imu_topic, "/apollo/sensor/gnss/imu", "Raw IMU topic name");
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
 DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
@@ -69,3 +70,17 @@ DEFINE_string(image_short_topic, "/apollo/sensor/camera/traffic/image_short",
               "short camera image topic name");
 DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
               "long camera image topic name");
+DEFINE_string(gnss_rtk_obs_topic, "/apollo/sensor/gnss/rtk_obs",
+              "Gnss rtk observation topic name");
+DEFINE_string(gnss_rtk_eph_topic, "/apollo/sensor/gnss/rtk_eph",
+              "Gnss rtk ephemeris topic name");
+DEFINE_string(gnss_best_pose_topic, "/apollo/sensor/gnss/best_pose",
+              "Gnss rtk best gnss pose");
+DEFINE_string(localization_gnss_topic,
+              "/apollo/localization/msf_gnss",
+              "Gnss localization measurement topic name");
+DEFINE_string(localization_lidar_topic,
+              "/apollo/localization/msf_lidar",
+              "Lidar localization measurement topic name");
+DEFINE_string(localization_sins_pva_topic, "/apollo/localization/msf_sins_pva",
+              "Localization sins pva topic name");
