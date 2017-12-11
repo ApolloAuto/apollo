@@ -202,4 +202,4 @@ class LosslessMapMatrix : public BaseMapMatrix {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
+#endif  // LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
