@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/msf_localization.h"
+
 #include <list>
-#include <sstream>
+
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/localization/msf/msf_localization.h"
 
 namespace apollo {
 namespace localization {
@@ -165,11 +167,9 @@ void MSFLocalization::InitParams() {
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;
   localizaiton_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
 
-  std::cerr << "map: " << localizaiton_param_.map_path << std::endl;
-  std::cerr << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file
-            << std::endl;
-  std::cerr << "lidar_height: " << localizaiton_param_.lidar_height_file
-            << std::endl;
+  AERROR << "map: " << localizaiton_param_.map_path;
+  AERROR << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file;
+  AERROR << "lidar_height: " << localizaiton_param_.lidar_height_file;
 
   // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
@@ -229,13 +229,12 @@ void MSFLocalization::InitParams() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_y = uncertainty_y;
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
 
-    std::cout << localizaiton_param_.imu_to_ant_offset.offset_x << " "
-              << localizaiton_param_.imu_to_ant_offset.offset_y << " "
-              << localizaiton_param_.imu_to_ant_offset.offset_z << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_x << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_y << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_z
-              << std::endl;
+    AINFO << localizaiton_param_.imu_to_ant_offset.offset_x << " "
+          << localizaiton_param_.imu_to_ant_offset.offset_y << " "
+          << localizaiton_param_.imu_to_ant_offset.offset_z << " "
+          << localizaiton_param_.imu_to_ant_offset.uncertainty_x << " "
+          << localizaiton_param_.imu_to_ant_offset.uncertainty_y << " "
+          << localizaiton_param_.imu_to_ant_offset.uncertainty_z;
   }
 }
 
