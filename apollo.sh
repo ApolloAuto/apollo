@@ -97,7 +97,7 @@ function generate_build_targets() {
     fail 'Build failed!'
   fi
   if ! $USE_ESD_CAN; then
-     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "modules\/monitor\/hwmonitor\/hw\/esdcan" | grep -v "esd")
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "esd")
   fi
 }
 
@@ -207,72 +207,62 @@ function warn_proprietary_sw() {
 }
 
 function release() {
-  RELEASE_DIR=$HOME/.cache/release
-  if [ -d $RELEASE_DIR ];then
-    rm -rf $RELEASE_DIR
+  RELEASE_DIR="${HOME}/.cache/apollo_release"
+  if [ -d "${RELEASE_DIR}" ]; then
+    rm -fr "${RELEASE_DIR}"
   fi
-  mkdir -p $RELEASE_DIR
+  APOLLO_DIR="${RELEASE_DIR}/apollo"
+  mkdir -p "${APOLLO_DIR}"
 
-  # modules
-  MODULES_DIR=$RELEASE_DIR/modules
-  mkdir -p $MODULES_DIR
-  for m in control canbus localization decision perception \
-       prediction planning routing calibration third_party_perception monitor
-  do
-    TARGET_DIR=$MODULES_DIR/$m
-    mkdir -p $TARGET_DIR
-     if [ -e bazel-bin/modules/$m/$m ]; then
-         cp bazel-bin/modules/$m/$m $TARGET_DIR
-     fi
-    if [ -d modules/$m/conf ];then
-        cp -r modules/$m/conf $TARGET_DIR
-    fi
-    if [ -d modules/$m/data ];then
-        cp -r modules/$m/data $TARGET_DIR
+  # Find binaries and convert from //path:target to path/target
+  BINARIES=$(bazel query "kind(cc_binary, //...)" | sed 's/^\/\///' | sed 's/:/\//')
+  # Copy binaries to release dir.
+  for BIN in ${BINARIES}; do
+    SRC_PATH="bazel-bin/${BIN}"
+    DST_PATH="${APOLLO_DIR}/${BIN}"
+    if [ -e "${SRC_PATH}" ]; then
+      mkdir -p "$(dirname "${DST_PATH}")"
+      cp "${SRC_PATH}" "${DST_PATH}"
     fi
   done
 
-  # calibration tools
-  cp bazel-bin/modules/calibration/lidar_ex_checker/lidar_ex_checker ${MODULES_DIR}/calibration
-  cp bazel-bin/modules/calibration/republish_msg/republish_msg ${MODULES_DIR}/calibration
-
-  # control tools
-  mkdir $MODULES_DIR/control/tools
-  cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
+  # modules data and conf
+  MODULES_DIR="${APOLLO_DIR}/modules"
+  mkdir -p $MODULES_DIR
+  for m in common control canbus localization decision perception dreamview map \
+       prediction planning routing calibration third_party_perception monitor \
+       drivers/delphi_esr \
+       drivers/gnss \
+       drivers/conti_radar
+  do
+    TARGET_DIR=$MODULES_DIR/$m
+    mkdir -p $TARGET_DIR
+    if [ -d modules/$m/conf ]; then
+      cp -r modules/$m/conf $TARGET_DIR
+    fi
+    if [ -d modules/$m/data ]; then
+      cp -r modules/$m/data $TARGET_DIR
+    fi
+  done
 
   # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
 
   # tools
   cp -r modules/tools $MODULES_DIR
-  rm $MODULES_DIR/tools/manual_traffic_light/*
-  cp bazel-bin/modules/tools/manual_traffic_light/manual_traffic_light $MODULES_DIR/tools/manual_traffic_light
 
   # ros
-  cp -Lr bazel-apollo/external/ros $RELEASE_DIR/
-  rm -f ${RELEASE_DIR}/ros/*.tar.gz
+  cp -Lr bazel-apollo/external/ros ${APOLLO_DIR}/
+  rm -f ${APOLLO_DIR}/ros/*.tar.gz
 
   # scripts
-  cp -r scripts $RELEASE_DIR
+  cp -r scripts ${APOLLO_DIR}
 
-  #dreamview
-  cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview $MODULES_DIR
-  cp -r modules/dreamview/conf $MODULES_DIR/dreamview
+  # dreamview runfiles
+  cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview/frontend $MODULES_DIR/dreamview
 
-  # map
-  mkdir $MODULES_DIR/map
-  cp -r modules/map/data $MODULES_DIR/map
-
-  # common data
-  mkdir $MODULES_DIR/common
-  cp -r modules/common/data $MODULES_DIR/common
-
-  # perception
+  # perception model
   cp -r modules/perception/model/ $MODULES_DIR/perception
-
-  # gnss config
-  mkdir -p $MODULES_DIR/drivers/gnss
-  cp -r modules/drivers/gnss/conf/ $MODULES_DIR/drivers/gnss
 
   # velodyne launch
   mkdir -p $MODULES_DIR/drivers/velodyne/velodyne
@@ -283,42 +273,36 @@ function release() {
   cp -r modules/drivers/usb_cam/launch $MODULES_DIR/drivers/usb_cam
 
   # lib
-  LIB_DIR=$RELEASE_DIR/lib
-  mkdir $LIB_DIR
+  LIB_DIR="${APOLLO_DIR}/lib"
+  mkdir "${LIB_DIR}"
   if $USE_ESD_CAN; then
     warn_proprietary_sw
     for m in esd_can
     do
-        cp third_party/can_card_library/$m/lib/* $LIB_DIR
+      cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
 
   # doc
-  cp -r docs $RELEASE_DIR
-  cp LICENSE $RELEASE_DIR
-  cp third_party/ACKNOWLEDGEMENT.txt $RELEASE_DIR
-
-  # mobileye drivers
-  mkdir -p $MODULES_DIR/drivers/delphi_esr
-  cp bazel-bin/modules/drivers/delphi_esr/delphi_esr $MODULES_DIR/drivers/delphi_esr
-  cp -r modules/drivers/delphi_esr/conf $MODULES_DIR/drivers/delphi_esr
-  mkdir -p $MODULES_DIR/drivers/mobileye
-  cp bazel-bin/modules/drivers/mobileye/mobileye $MODULES_DIR/drivers/mobileye
-  cp -r modules/drivers/mobileye/conf  $MODULES_DIR/drivers/mobileye
-
-  # conti_radar
-  mkdir -p $MODULES_DIR/drivers/conti_radar
-  cp bazel-bin/modules/drivers/conti_radar/conti_radar $MODULES_DIR/drivers/conti_radar
-  cp -r modules/drivers/conti_radar/conf $MODULES_DIR/drivers/conti_radar
+  cp -r docs "${APOLLO_DIR}"
+  cp LICENSE "${APOLLO_DIR}"
+  cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_DIR}"
 
   # release info
-  META=${RELEASE_DIR}/meta.ini
+  META="${APOLLO_DIR}/meta.ini"
   echo "[Release]" > $META
   echo "git_commit: $(git rev-parse HEAD)" >> $META
   echo "car_type : LINCOLN.MKZ" >> $META
   echo "arch : ${MACHINE_ARCH}" >> $META
+
+  # system libs
+  for LIB_PATH in /usr/local/local_integ/lib; do
+    DST_PATH="$(dirname "${RELEASE_DIR}${LIB_PATH}")"
+    mkdir -p "${DST_PATH}"
+    cp -r "${LIB_PATH}" "${DST_PATH}"
+  done
 }
 
 function gen_coverage() {
