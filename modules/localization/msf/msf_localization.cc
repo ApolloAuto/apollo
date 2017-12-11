@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/msf_localization.h"
 #include <list>
 #include <sstream>
 #include "modules/common/adapters/adapter_manager.h"
@@ -24,6 +23,7 @@
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/localization/msf/msf_localization.h"
 
 namespace apollo {
 namespace localization {
@@ -113,9 +113,7 @@ Status MSFLocalization::Start() {
   return Status::OK();
 }
 
-Status MSFLocalization::Stop() {
-  return Status::OK();
-}
+Status MSFLocalization::Stop() { return Status::OK(); }
 
 Status MSFLocalization::Init() {
   InitParams();
