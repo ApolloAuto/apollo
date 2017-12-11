@@ -175,6 +175,9 @@ class RouteSegments : public std::vector<LaneSegment> {
    */
   bool IsConnectedSegment(const RouteSegments &other) const;
 
+  bool StopForDestination() const;
+  void SetStopForDestination(bool stop_for_destination);
+
   /**
    * Copy the properties of other segments to current one
    */
@@ -205,6 +208,13 @@ class RouteSegments : public std::vector<LaneSegment> {
   routing::ChangeLaneType previous_action_ = routing::FORWARD;
 
   std::string id_;
+
+  /**
+   * Whether the vehicle should stop for destination. In a routing that has
+   * loops, the adc may pass by destination many times, but it only need to stop
+   * for destination  in the last loop.
+   */
+  bool stop_for_destination_ = false;
 };
 
 }  // namespace hdmap

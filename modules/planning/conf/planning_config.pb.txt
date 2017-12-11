@@ -19,17 +19,18 @@ em_planner_config {
         lateral_sample_offset: 0.5
         lateral_adjust_coeff: 0.5
         eval_time_interval: 0.1
-        path_resolution: 1.0
+        path_resolution: 2.0
         obstacle_ignore_distance: 20.0
         obstacle_collision_distance: 0.5
         obstacle_risk_distance: 2.0
         obstacle_collision_cost: 1e6
-        path_l_cost: 50.0
-        path_dl_cost: 1e5
+        path_l_cost: 100.0
+        path_dl_cost: 1e4
         path_ddl_cost: 1e2
         path_l_cost_param_l0: 1.65
         path_l_cost_param_b: 0.3
         path_l_cost_param_k: 0.55
+        path_out_lane_cost: 1e6
     }
     dp_st_speed_config {
         total_path_length: 80

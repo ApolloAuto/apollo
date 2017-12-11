@@ -125,7 +125,7 @@ export default class PerceptionObstacles {
         if (text === null) {
             return;
         }
-        text.position.set(position.x, position.y, position.z || 3);
+        text.position.set(position.x, position.y + 0.5, position.z || 3);
         const camera = scene.getObjectByName("camera");
         if (camera !== undefined) {
             text.quaternion.copy(camera.quaternion);

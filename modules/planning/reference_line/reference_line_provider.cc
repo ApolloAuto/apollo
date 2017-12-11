@@ -149,10 +149,19 @@ bool ReferenceLineProvider::UpdateRoutingResponse(
   return true;
 }
 
+std::vector<routing::LaneWaypoint>
+ReferenceLineProvider::FutureRouteWaypoints() {
+  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  return pnc_map_->FutureRouteWaypoints();
+}
+
 void ReferenceLineProvider::UpdateVehicleState(
     const VehicleState &vehicle_state) {
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
   vehicle_state_ = vehicle_state;
+  if (!pnc_map_->UpdateVehicleState(vehicle_state)) {
+    AERROR << "Failed to update vehicle state in pnc map";
+  }
 }
 
 bool ReferenceLineProvider::Start() {
@@ -304,7 +313,7 @@ bool ReferenceLineProvider::CreateRouteSegments(
   point.set_y(vehicle_state.y());
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
+    if (!pnc_map_->GetRouteSegments(look_backward_distance,
                                     look_forward_distance, segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;

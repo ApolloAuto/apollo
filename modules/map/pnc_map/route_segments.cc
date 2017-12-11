@@ -40,6 +40,12 @@ void RouteSegments::SetCanExit(bool can_exit) { can_exit_ = can_exit; }
 
 bool RouteSegments::CanExit() const { return can_exit_; }
 
+bool RouteSegments::StopForDestination() const { return stop_for_destination_; }
+
+void RouteSegments::SetStopForDestination(bool stop_for_destination) {
+  stop_for_destination_ = stop_for_destination;
+}
+
 bool RouteSegments::WithinLaneSegment(const LaneSegment &lane_segment,
                                       const LaneWaypoint &waypoint) {
   return waypoint.lane &&
@@ -111,6 +117,7 @@ void RouteSegments::SetProperties(const RouteSegments &other) {
   next_action_ = other.NextAction();
   previous_action_ = other.PreviousAction();
   id_ = other.Id();
+  stop_for_destination_ = other.StopForDestination();
 }
 
 double RouteSegments::Length(const RouteSegments &segments) {

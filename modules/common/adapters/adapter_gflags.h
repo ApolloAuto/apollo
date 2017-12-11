@@ -23,6 +23,7 @@ DECLARE_bool(enable_adapter_dump);
 DECLARE_string(monitor_topic);
 DECLARE_string(gps_topic);
 DECLARE_string(imu_topic);
+DECLARE_string(raw_imu_topic);
 DECLARE_string(chassis_topic);
 DECLARE_string(chassis_detail_topic);
 DECLARE_string(localization_topic);
@@ -48,5 +49,11 @@ DECLARE_string(conti_radar_topic);
 DECLARE_string(compressed_image_topic);
 DECLARE_string(image_short_topic);
 DECLARE_string(image_long_topic);
+DECLARE_string(gnss_rtk_obs_topic);
+DECLARE_string(gnss_rtk_eph_topic);
+DECLARE_string(gnss_best_pose_topic);
+DECLARE_string(localization_gnss_topic);
+DECLARE_string(localization_lidar_topic);
+DECLARE_string(localization_sins_pva_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

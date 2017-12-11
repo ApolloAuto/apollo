@@ -50,13 +50,14 @@ class PncMap {
 
   bool UpdateRoutingResponse(const routing::RoutingResponse &routing_response);
 
+  bool UpdateVehicleState(const common::VehicleState &vehicle_state);
+
   const routing::RoutingResponse &routing_response() const;
 
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
-  bool GetRouteSegments(const common::VehicleState &state,
-                        const double backward_length,
+  bool GetRouteSegments(const double backward_length,
                         const double forward_length,
                         std::list<RouteSegments> *const route_segments) const;
 
@@ -73,17 +74,21 @@ class PncMap {
                       double end_s,
                       RouteSegments *const truncated_segments) const;
 
- private:
-  bool GetNearestPointFromRouting(const common::VehicleState &point,
-                                  LaneWaypoint *waypoint) const;
+  std::vector<routing::LaneWaypoint> FutureRouteWaypoints() const;
 
+ private:
   /**
-   * Find the waypoint index of a routing waypoint.
-   * @return a vector with three values: Road index in RoutingResponse, Passage
-   * index in RoadSegment, and segment index in a Passage. (-1, -1, -1) will be
-   * returned if there is any error.
+   * @brief Find the waypoint index of a routing waypoint. It updates
+   * route_index_ with a vector with three values: Road index in
+   * RoutingResponse, Passage index in RoadSegment, and segment index in a
+   * Passage.
+   * @return empty vector if cannot find waypoint on routing, otherwise
+   *   a vector with three indices: {road_index, passage_index, lane_index}
    */
   std::vector<int> GetWaypointIndex(const LaneWaypoint &waypoint) const;
+
+  bool GetNearestPointFromRouting(const common::VehicleState &point,
+                                  LaneWaypoint *waypoint) const;
 
   bool PassageToSegments(routing::Passage passage,
                          RouteSegments *segments) const;
@@ -111,11 +116,58 @@ class PncMap {
   std::vector<int> GetNeighborPassages(const routing::RoadSegment &road,
                                        int start_passage) const;
 
+  /**
+   * @brief convert a routing waypoint to lane waypoint
+   * @return empty LaneWaypoint if the lane id cannot be found on map, otherwise
+   * return a valid LaneWaypoint with lane ptr and s.
+   */
+  LaneWaypoint ToLaneWaypoint(const routing::LaneWaypoint &waypoint) const;
+
+  /**
+   * @brief Update routing waypoint index to the next waypoint that ADC need to
+   * pass. The logic is by comparing the current waypoint's route index with
+   * route_index and adc_waypoint_:
+   * a. If the waypoint's route_index < route_index_, ADC must have passed
+   * the waypoint.
+   * b. If the waypoint's route_index == route_index_, ADC and the waypoint
+   * is on the same lane, compare the lane_s.
+   */
+  void UpdateNextRoutingWaypointIndex();
+
  private:
   routing::RoutingResponse routing_;
   std::unordered_set<std::string> routing_lane_ids_;
+  /**
+   * The routing request waypoints
+   */
+  std::vector<LaneWaypoint> routing_waypoints_;
+  /**
+   * The next routing request waypoint that the vehicle have passed.
+   */
+  std::size_t next_routing_waypoint_index_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
   bool is_same_routing_ = false;
+
+  /**
+   * The state of the adc
+   */
+  common::VehicleState adc_state_;
+  /**
+   * A three element index: {road_index, passage_index, lane_index}
+   */
+  std::vector<int> route_index_;
+  /**
+   * The waypoint of the autonomous driving car
+   */
+  LaneWaypoint adc_waypoint_;
+
+  /**
+   * @brief Indicates whether the adc should start consider destination.
+   * In a looped routing, the vehicle may need to pass by the destination point
+   * may times on the road, but only need to stop when it encounters destination
+   * for the last time.
+   */
+  bool stop_for_destination_ = false;
 };
 
 }  // namespace hdmap

@@ -35,6 +35,13 @@ message AdapterConfig {
     IMAGE_SHORT = 28;
     IMAGE_LONG = 29;
     DRIVE_EVENT = 30;
+    GNSS_RTK_OBS = 31;
+    GNSS_RTK_EPH = 32;
+    GNSS_BEST_POSE = 33;
+    LOCALIZATION_MSF_GNSS = 34;
+    LOCALIZATION_MSF_LIDAR = 35;
+    LOCALIZATION_MSF_SINS_PVA = 36;
+    RAW_IMU = 37;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

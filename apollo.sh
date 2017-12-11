@@ -184,7 +184,8 @@ function build_py_proto() {
 
 function check() {
   local check_start_time=$(get_now)
-  apollo_build_dbg $@ && run_test && run_lint
+
+  bash $0 build && bash $0 "test" && bash $0 lint
 
   START_TIME=$check_start_time
   if [ $? -eq 0 ]; then
@@ -231,13 +232,21 @@ function release() {
     fi
   done
 
+  # calibration tools
+  cp bazel-bin/modules/calibration/lidar_ex_checker/lidar_ex_checker ${MODULES_DIR}/calibration
+  cp bazel-bin/modules/calibration/republish_msg/republish_msg ${MODULES_DIR}/calibration
+
   # control tools
   mkdir $MODULES_DIR/control/tools
   cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
 
   # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
+
+  # tools
   cp -r modules/tools $MODULES_DIR
+  rm $MODULES_DIR/tools/manual_traffic_light/*
+  cp bazel-bin/modules/tools/manual_traffic_light/manual_traffic_light $MODULES_DIR/tools/manual_traffic_light
 
   # ros
   cp -Lr bazel-apollo/external/ros $RELEASE_DIR/

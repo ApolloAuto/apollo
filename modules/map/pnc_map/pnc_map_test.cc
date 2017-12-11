@@ -95,7 +95,7 @@ TEST_F(PncMapTest, GetNearestPointFromRouting) {
   EXPECT_EQ("9_1_-1", waypoint.lane->id().id());
   EXPECT_FLOAT_EQ(60.757099, waypoint.s);
 }
-TEST_F(PncMapTest, GetWaypointIndex) {
+TEST_F(PncMapTest, UpdateWaypointIndex) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
   ASSERT_TRUE(lane);
   LaneWaypoint waypoint(lane, 60.757099);
@@ -116,7 +116,8 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  ASSERT_TRUE(pnc_map_->GetRouteSegments(state, 10, 30, &segments));
+  ASSERT_TRUE(pnc_map_->UpdateVehicleState(state));
+  ASSERT_TRUE(pnc_map_->GetRouteSegments(10, 30, &segments));
   // first time on this passage, should not immediately change lane
   ASSERT_EQ(2, segments.size());
   EXPECT_NEAR(40, RouteLength(segments.front()), 1e-4);
@@ -130,19 +131,15 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
 TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
-  auto point = lane->GetSmoothPoint(0);
   common::VehicleState state;
-  state.set_x(point.x());
-  state.set_y(point.y());
-  state.set_z(point.y());
-  state.set_heading(M_PI);
-  point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
+  auto point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
   state.set_x(point.x());
   state.set_y(point.y());
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  bool result = pnc_map_->GetRouteSegments(state, 10, 30, &segments);
+  ASSERT_TRUE(pnc_map_->UpdateVehicleState(state));
+  bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
   const auto& first = segments.front();
@@ -172,10 +169,7 @@ TEST_F(PncMapTest, GetNeighborPassages) {
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 2);
-    EXPECT_EQ(3, result.size());
-    EXPECT_EQ(2, result[0]);
-    EXPECT_EQ(1, result[1]);
-    EXPECT_EQ(3, result[2]);
+    EXPECT_EQ(1, result.size());
   }
   {
     auto result = pnc_map_->GetNeighborPassages(road0, 3);

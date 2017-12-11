@@ -31,7 +31,9 @@ void AdapterManager::Observe() {
   }
 }
 
-bool AdapterManager::Initialized() { return instance()->initialized_; }
+bool AdapterManager::Initialized() {
+  return instance()->initialized_;
+}
 
 void AdapterManager::Reset() {
   instance()->initialized_ = false;
@@ -68,6 +70,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::IMU:
         EnableImu(FLAGS_imu_topic, config);
         break;
+      case AdapterConfig::RAW_IMU:
+        EnableRawImu(FLAGS_raw_imu_topic, config);
       case AdapterConfig::CHASSIS:
         EnableChassis(FLAGS_chassis_topic, config);
         break;
@@ -140,6 +144,24 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::DRIVE_EVENT:
         EnableImageLong(FLAGS_drive_event_topic, config);
+        break;
+      case AdapterConfig::GNSS_RTK_OBS:
+        EnableGnssRtkObs(FLAGS_gnss_rtk_obs_topic, config);
+        break;
+      case AdapterConfig::GNSS_RTK_EPH:
+        EnableGnssRtkEph(FLAGS_gnss_rtk_eph_topic, config);
+        break;
+      case AdapterConfig::GNSS_BEST_POSE:
+        EnableGnssBestPose(FLAGS_gnss_best_pose_topic, config);
+        break;
+      case AdapterConfig::LOCALIZATION_MSF_GNSS:
+        EnableLocalizationMsfGnss(FLAGS_localization_gnss_topic, config);
+        break;
+      case AdapterConfig::LOCALIZATION_MSF_LIDAR:
+        EnableLocalizationMsfLidar(FLAGS_localization_lidar_topic, config);
+        break;
+      case AdapterConfig::LOCALIZATION_MSF_SINS_PVA:
+        EnableLocalizationMsfSinsPva(FLAGS_localization_sins_pva_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";

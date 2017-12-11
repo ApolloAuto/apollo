@@ -35,7 +35,7 @@ CubicPolynomialCurve1d::CubicPolynomialCurve1d(const double x0,
                                                const double ddx0,
                                                const double x1,
                                                const double param) {
-  compute_coefficients(x0, dx0, ddx0, x1, param);
+  ComputeCoefficients(x0, dx0, ddx0, x1, param);
   param_ = param;
   start_condition_[0] = x0;
   start_condition_[1] = dx0;
@@ -75,11 +75,11 @@ std::string CubicPolynomialCurve1d::ToString() const {
       apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }
 
-void CubicPolynomialCurve1d::compute_coefficients(const double x0,
-                                                  const double dx0,
-                                                  const double ddx0,
-                                                  const double x1,
-                                                  const double param) {
+void CubicPolynomialCurve1d::ComputeCoefficients(const double x0,
+                                                 const double dx0,
+                                                 const double ddx0,
+                                                 const double x1,
+                                                 const double param) {
   DCHECK(param > 0.0);
   const double p2 = param * param;
   const double p3 = param * p2;

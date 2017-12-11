@@ -389,7 +389,10 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
-check_in_docker
-create_data_dir
-set_lib_path
-determine_bin_prefix
+if [ -z $APOLLO_BASE_SOURCED ]; then
+  check_in_docker
+  create_data_dir
+  set_lib_path
+  determine_bin_prefix
+  export APOLLO_BASE_SOURCED=1
+fi

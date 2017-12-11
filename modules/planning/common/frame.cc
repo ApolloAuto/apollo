@@ -97,14 +97,19 @@ bool Frame::Rerouting() {
            << point.DebugString() << ", heading:" << vehicle_state_.heading();
     return false;
   }
-  routing::LaneWaypoint end_point;
-  end_point.CopyFrom(*request.waypoint().rbegin());
   request.clear_waypoint();
   auto *start_point = request.add_waypoint();
   start_point->set_id(lane->id().id());
   start_point->set_s(s);
   start_point->mutable_pose()->CopyFrom(point);
-  request.add_waypoint()->CopyFrom(end_point);
+  for (const auto &waypoint :
+       ReferenceLineProvider::instance()->FutureRouteWaypoints()) {
+    request.add_waypoint()->CopyFrom(waypoint);
+  }
+  if (request.waypoint_size() <= 1) {
+    AERROR << "Failed to find future waypoints";
+    return false;
+  }
   AdapterManager::PublishRoutingRequest(request);
   return true;
 }
@@ -166,19 +171,29 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
   return ptr;
 }
 
-const Obstacle *Frame::CreateDestinationObstacle() {
+int Frame::CreateDestinationObstacle() {
+  bool near_destination = false;
+  for (const auto &info : reference_line_info_) {
+    if (info.Lanes().StopForDestination()) {
+      near_destination = true;
+      break;
+    }
+  }
+  if (!near_destination) {
+    return 1;
+  }
   const auto &routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
     ADEBUG << "routing_request has no end";
-    return nullptr;
+    return -1;
   }
   const auto &routing_end = *routing.routing_request().waypoint().rbegin();
   const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(routing_end.id()));
   if (!lane) {
     AERROR << "Failed to find lane for destination : "
            << routing_end.ShortDebugString();
-    return nullptr;
+    return -2;
   }
 
   double dest_lane_s =
@@ -193,8 +208,13 @@ const Obstacle *Frame::CreateDestinationObstacle() {
                                       lane->Heading(dest_lane_s),
                                       FLAGS_virtual_stop_wall_length,
                                       left_width + right_width};
-  return AddStaticVirtualObstacle(FLAGS_destination_obstacle_id,
-                                  destination_box);
+  // add destination's projection to each reference line info
+  auto *ptr =
+      AddStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
+  for (auto &info : reference_line_info_) {
+    info.AddObstacle(ptr);
+  }
+  return 0;
 }
 
 Status Frame::Init() {
@@ -217,12 +237,6 @@ Status Frame::Init() {
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }
-
-  if (!CreateDestinationObstacle()) {
-    AERROR << "Failed to create the destination obstacle";
-    return Status(ErrorCode::PLANNING_ERROR, "failed to find destination");
-  }
-
   const auto *collision_obstacle = FindCollisionObstacle();
   if (collision_obstacle) {
     AERROR << "Found collision with obstacle: " << collision_obstacle->Id();
@@ -234,6 +248,12 @@ Status Frame::Init() {
     return Status(ErrorCode::PLANNING_ERROR,
                   "failed to init reference line info");
   }
+
+  if (CreateDestinationObstacle() < 0) {
+    AERROR << "Failed to create the destination obstacle";
+    return Status(ErrorCode::PLANNING_ERROR, "failed to find destination");
+  }
+
   return Status::OK();
 }
 

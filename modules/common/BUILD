@@ -7,7 +7,6 @@ cc_library(
     deps = [
         ":log",
         ":macro",
-        "@glog//:glog",
         "@ros//:ros_common",
     ],
 )

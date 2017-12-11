@@ -48,9 +48,8 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
   std::string ToString() const override;
 
  private:
-  void compute_coefficients(const double x0, const double dx0,
-                            const double ddx0, const double x1,
-                            const double param);
+  void ComputeCoefficients(const double x0, const double dx0, const double ddx0,
+                           const double x1, const double param);
   std::array<double, 4> coef_ = {{0.0, 0.0, 0.0, 0.0}};
   std::array<double, 3> start_condition_ = {{0.0, 0.0, 0.0}};
   double end_condition_ = 0.0;

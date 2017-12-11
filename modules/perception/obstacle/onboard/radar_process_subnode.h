@@ -41,6 +41,7 @@
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 
 namespace apollo {
 namespace perception {
@@ -78,6 +79,8 @@ class RadarProcessSubnode : public Subnode {
   common::ErrorCode error_code_ = common::OK;
   RadarObjectData *radar_data_ = nullptr;
   std::string device_id_;
+  Eigen::Matrix4d radar_extrinsic_;
+  Eigen::Matrix4d short_camera_extrinsic_;
 
   boost::circular_buffer<ObjectPair> gps_buffer_;
   ContiRadarIDExpansion _conti_id_expansion;

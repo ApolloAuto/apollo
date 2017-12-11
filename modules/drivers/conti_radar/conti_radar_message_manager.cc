@@ -77,13 +77,14 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
   }
 
   std::lock_guard<std::mutex> lock(sensor_data_mutex_);
-  if (!is_configured_ && message_id != 0x201) {
+  if (!is_configured_ && message_id != RadarState201::ID) {
     // read radar state message first
     return;
   }
 
   // trigger publishment
-  if (message_id == 0x600 || message_id == 0x60A) {
+  if (message_id == ClusterListStatus600::ID ||
+      message_id == ObjectListStatus60A::ID) {
     ADEBUG << sensor_data_.ShortDebugString();
 
     if (sensor_data_.contiobs_size() <=
@@ -98,7 +99,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);
 
-  if (message_id == 0x201) {
+  if (message_id == RadarState201::ID) {
     ADEBUG << sensor_data_.ShortDebugString();
     if (sensor_data_.radar_state().send_quality() ==
             radar_config_.radar_conf().send_quality() &&
@@ -126,7 +127,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = apollo::common::time::AsInt64<micros>(Clock::Now());
+    const int64_t time = common::time::AsInt64<micros>(Clock::Now());
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;

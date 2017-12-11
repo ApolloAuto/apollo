@@ -169,6 +169,19 @@ bool DPRoadGraph::GenerateMinCostPath(
             trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s()) +
             prev_dp_node.min_cost;
         cur_node.UpdateCost(&prev_dp_node, curve, cost);
+
+        // try to connect the current point with the first point directly
+        if (level == 2) {
+          init_dl = init_frenet_frame_point_.dl();
+          init_ddl = init_frenet_frame_point_.ddl();
+          QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
+                                         cur_point.l(), 0.0, 0.0,
+                                         cur_point.s() - init_sl_point_.s());
+          const double cost = trajectory_cost.Calculate(
+              curve, init_sl_point_.s(), cur_point.s());
+
+          cur_node.UpdateCost(&(graph_nodes.front().front()), curve, cost);
+        }
       }
     }
   }
@@ -186,6 +199,10 @@ bool DPRoadGraph::GenerateMinCostPath(
     min_cost_path->push_back(*min_cost_node);
   }
   std::reverse(min_cost_path->begin(), min_cost_path->end());
+
+  for (const auto &node : *min_cost_path) {
+    ADEBUG << "min_cost_path: " << node.sl_point.ShortDebugString();
+  }
   return true;
 }
 

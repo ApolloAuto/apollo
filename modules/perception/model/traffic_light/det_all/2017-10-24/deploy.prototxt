@@ -6557,6 +6557,7 @@ layer {
         pool: AVE
         kernel_size: 7
         stride: 7
+        cmp_out_shape_floor_as_conv: true
     }
 }
 
@@ -6583,6 +6584,7 @@ layer {
         pool: AVE
         kernel_size: 7
         stride: 7
+        cmp_out_shape_floor_as_conv: true
     }
 }
 

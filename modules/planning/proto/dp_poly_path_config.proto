@@ -21,4 +21,5 @@ message DpPolyPathConfig {
   optional double path_l_cost_param_l0 = 15;
   optional double path_l_cost_param_b = 16;
   optional double path_l_cost_param_k = 17;
+  optional double path_out_lane_cost = 18;
 }
