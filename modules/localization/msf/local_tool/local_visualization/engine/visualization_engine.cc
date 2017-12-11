@@ -15,8 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
+
 #include <stdio.h>
+
 #include <boost/filesystem.hpp>
+
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
 namespace apollo {
@@ -95,11 +98,10 @@ void MapImageCache::Set(const MapImageKey &key, const cv::Mat &image) {
 
 // =================VisualizationEngine=================
 VisualizationEngine::VisualizationEngine()
-    : image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
-      map_image_cache_(20),
+    : map_image_cache_(20),
+      image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
       big_window_(3072, 3072, CV_8UC3),
-      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
-      map_config_() {
+      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {
   is_init_ = false;
   follow_car_ = true;
   auto_play_ = false;
@@ -283,8 +285,8 @@ void VisualizationEngine::Draw() {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i][j].copyTo(
-          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i]
+             [j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
@@ -504,10 +506,9 @@ void VisualizationEngine::DrawLegend() {
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(
-        image_window_,
-        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
-        8, cv::Scalar(b, g, r), 3);
+    cv::circle(image_window_, cv::Point(755, (15 + textSize.height) * (i + 1) -
+                                                 textSize.height / 2),
+               8, cv::Scalar(b, g, r), 3);
   }
 }
 
@@ -760,10 +761,10 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     const Eigen::Vector3d &pt = cloud[i];
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
-    int col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-              map_config_.map_resolutions_[resolution_id_];
-    int row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-              map_config_.map_resolutions_[resolution_id_];
+    uint32_t col = (pt_global[0] - cloud_img_lt_coord_[0]) /
+                   map_config_.map_resolutions_[resolution_id_];
+    uint32_t row = (pt_global[1] - cloud_img_lt_coord_[1]) /
+                   map_config_.map_resolutions_[resolution_id_];
     if (col < 0 || row < 0 || col >= map_config_.map_node_size_x_ ||
         row >= map_config_.map_node_size_y_) {
       continue;
@@ -871,9 +872,7 @@ void VisualizationEngine::UpdateViewCenter(const double move_x,
   _view_center[1] += move_y;
 }
 
-void VisualizationEngine::SetScale(const double scale) {
-  cur_scale_ = scale;
-}
+void VisualizationEngine::SetScale(const double scale) { cur_scale_ = scale; }
 
 void VisualizationEngine::UpdateScale(const double factor) {
   cur_scale_ *= factor;

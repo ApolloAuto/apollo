@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSLESS_MAP_MATRIX_H
-#define BAIDU_ADU_LOSSLESS_MAP_MATRIX_H
+#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
+#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
 
 #include <vector>
+
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 
@@ -111,21 +112,13 @@ struct LosslessMapCell {
     return static_cast<unsigned char>(map_cells[0].intensity);
   }
   /**@brief Get the variance of the intensity of the map cell. */
-  inline float GetVar() const {
-    return map_cells[0].intensity_var;
-  }
+  inline float GetVar() const { return map_cells[0].intensity_var; }
   /**@brief Get the average altitude of the map cell. */
-  inline float GetAlt() const {
-    return map_cells[0].altitude;
-  }
+  inline float GetAlt() const { return map_cells[0].altitude; }
   /**@brief Get the variance of the altitude of the map cell. */
-  inline float GetAltVar() const {
-    return map_cells[0].altitude_var;
-  }
+  inline float GetAltVar() const { return map_cells[0].altitude_var; }
   /**@brief Get the count of the samples in the map cell. */
-  inline unsigned int GetCount() const {
-    return map_cells[0].count;
-  }
+  inline unsigned int GetCount() const { return map_cells[0].count; }
   /**@brief Get a perticular layer in the map cell. The layer 0 is the layer
    * includes all the samples. */
   LosslessMapSingleCell& GetLayer(unsigned int layer_id) {
@@ -209,4 +202,4 @@ class LosslessMapMatrix : public BaseMapMatrix {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSLESS_MAP_MATRIX_H
+#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
