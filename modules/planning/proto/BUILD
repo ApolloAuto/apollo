@@ -18,6 +18,7 @@ proto_library(
         "planning_internal.proto",
         "qp_st_speed_config.proto",
         "sl_boundary.proto",
+        "planning_stats.proto",
     ],
     deps = [
         ":dp_poly_path_config_proto_lib",
