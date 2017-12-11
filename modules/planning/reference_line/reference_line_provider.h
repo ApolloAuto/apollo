@@ -76,6 +76,8 @@ class ReferenceLineProvider {
 
   double LastTimeDelay();
 
+  std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
+
  private:
   /**
    * @brief Use PncMap to create reference line and the corresponding segments
