@@ -15,9 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
+
 #include <cstdio>
 #include <string>
 #include <vector>
+
+#include "modules/common/log.h"
 #include "modules/localization/msf/common/util/system_utility.h"
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 
@@ -60,7 +63,7 @@ void BaseMapNode::InitMapMatrix(const BaseMapConfig* map_config) {
 void BaseMapNode::Finalize() {
   if (is_changed_) {
     Save();
-    std::cerr << "Save Map Node to disk: " << index_ << "." << std::endl;
+    AERROR << "Save Map Node to disk: " << index_ << ".";
   }
 }
 
@@ -114,7 +117,7 @@ bool BaseMapNode::Save() {
   snprintf(buf, sizeof(buf), "/%08u", abs(index_.n_));
   path = path + buf;
 
-  std::cout << "Save node: " << path << std::endl;
+  AINFO << "Save node: " << path;
 
   FILE* file = fopen(path.c_str(), "wb");
   if (file) {
@@ -123,7 +126,7 @@ bool BaseMapNode::Save() {
     is_changed_ = false;
     return true;
   } else {
-    std::cerr << "Can't write to file: " << path << "." << std::endl;
+    AERROR << "Can't write to file: " << path << ".";
     return false;
   }
 }
@@ -179,7 +182,7 @@ bool BaseMapNode::Load(const char* filename) {
     data_is_ready_ = true;
     return true;
   } else {
-    std::cerr << "Can't find the file: " << filename << std::endl;
+    AERROR << "Can't find the file: " << filename;
     return false;
   }
 }
@@ -189,14 +192,14 @@ unsigned int BaseMapNode::LoadBinary(FILE* file) {
   unsigned int header_size = GetHeaderBinarySize();
   std::vector<unsigned char> buf(header_size);
   size_t read_size = fread(&buf[0], 1, header_size, file);
-  assert(read_size == header_size);
+  CHECK_EQ(read_size, header_size);
   unsigned int processed_size = LoadHeaderBinary(&buf[0]);
-  assert(processed_size == header_size);
+  CHECK_EQ(processed_size, header_size);
 
   // Load the body
   buf.resize(file_body_binary_size_);
   read_size = fread(&buf[0], 1, file_body_binary_size_, file);
-  assert(read_size == file_body_binary_size_);
+  CHECK_EQ(read_size, file_body_binary_size_);
   processed_size += LoadBodyBinary(&buf);
   return processed_size;
 }
@@ -208,21 +211,20 @@ unsigned int BaseMapNode::CreateBinary(FILE* file) const {
 
   unsigned int binary_size = 0;
   std::vector<unsigned char> body_buffer;
-  unsigned int processed_size = CreateBodyBinary(&body_buffer);
-  // assert(processed_size == buf_size);
+  CreateBodyBinary(&body_buffer);
+  // CHECK_EQ(processed_size, buf_size);
 
   // Create header
   unsigned int header_size = GetHeaderBinarySize();
-  std::vector<unsigned char> header_buf(header_size);
-  processed_size = CreateHeaderBinary(&buffer[0], buf_size);
-  assert(processed_size == header_size);
+  unsigned int processed_size = CreateHeaderBinary(&buffer[0], buf_size);
+  CHECK_EQ(processed_size, header_size);
 
   unsigned int buffer_bias = processed_size;
   buf_size -= processed_size;
   binary_size += processed_size;
   // Create body
   memcpy(&buffer[buffer_bias], &body_buffer[0], body_buffer.size());
-  assert(buf_size >= body_buffer.size());
+  CHECK_GE(buf_size, body_buffer.size());
   binary_size += body_buffer.size();
   fwrite(&buffer[0], 1, binary_size, file);
   return binary_size;
@@ -298,9 +300,8 @@ unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
   }
   std::vector<unsigned char> buf_uncompressed;
   compression_strategy_->Decode(buf, &buf_uncompressed);
-  std::cerr << "map node compress ratio: "
-            << static_cast<float>(buf->size()) / buf_uncompressed.size()
-            << std::endl;
+  AERROR << "map node compress ratio: "
+         << static_cast<float>(buf->size()) / buf_uncompressed.size();
   return map_matrix_->LoadBinary(&buf_uncompressed[0]);
 }
 

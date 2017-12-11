@@ -23,8 +23,8 @@ cc_library(
     deps = [
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
+        "//modules/common:log",
         "@eigen//:eigen",
-        "@glog//:glog",
         "@ros//:ros_common",
         "@pcl//:pcl"
     ],

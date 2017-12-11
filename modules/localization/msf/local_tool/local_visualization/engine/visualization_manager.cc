@@ -14,13 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
-#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <string>
 #include <vector>
+
 #include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/filesystem.hpp"
+
 #include "modules/localization/msf/common/io/velodyne_utility.h"
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
 
 namespace apollo {
 namespace localization {
@@ -149,9 +151,8 @@ void MessageBuffer<MessageType>::GetAllMessages(
 
 template <class MessageType>
 bool MessageBuffer<MessageType>::IsEmpty() {
-  bool flag = true;
   pthread_mutex_lock(&buffer_mutex_);
-  flag = msg_list_.empty();
+  bool flag = msg_list_.empty();
   pthread_mutex_unlock(&buffer_mutex_);
   return flag;
 }

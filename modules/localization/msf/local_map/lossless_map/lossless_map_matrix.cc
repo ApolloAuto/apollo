@@ -72,6 +72,7 @@ unsigned int LosslessMapSingleCell::LoadBinary(unsigned char* buf) {
   ++p;
   altitude_var = *p;
   ++p;
+  // TODO(Localization): this cast is NOT portable between different platforms
   unsigned int* pp = reinterpret_cast<unsigned int*>(p);
   count = *pp;
   return GetBinarySize();
@@ -90,6 +91,7 @@ unsigned int LosslessMapSingleCell::CreateBinary(unsigned char* buf,
     ++p;
     *p = altitude_var;
     ++p;
+    // TODO(Localization): this cast is NOT portable between different platforms
     unsigned int* pp = reinterpret_cast<unsigned int*>(p);
     *pp = count;
   }
@@ -260,7 +262,7 @@ void LosslessMapCell::GetCount(std::vector<unsigned int>* counts) const {
 LosslessMapMatrix::LosslessMapMatrix() {
   rows_ = 0;
   cols_ = 0;
-  map_cells_ = NULL;
+  map_cells_ = nullptr;
 }
 
 LosslessMapMatrix::~LosslessMapMatrix() {
@@ -299,7 +301,7 @@ void LosslessMapMatrix::Reset(const BaseMapConfig* config) {
 void LosslessMapMatrix::Init(unsigned int rows, unsigned int cols) {
   if (map_cells_) {
     delete[] map_cells_;
-    map_cells_ = NULL;
+    map_cells_ = nullptr;
   }
   map_cells_ = new LosslessMapCell[rows * cols];
   rows_ = rows;

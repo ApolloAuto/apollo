@@ -38,7 +38,7 @@ typedef apollo::localization::msf::FeatureXYPlane::PointCloudPtrT
     PclPointCloudPtrT;
 
 bool ParseCommandLine(int argc, char* argv[],
-                        boost::program_options::variables_map* vm) {
+                      boost::program_options::variables_map* vm) {
   boost::program_options::options_description desc("Allowd options");
   desc.add_options()("help", "product help message")(
       "use_plane_inliers_only",
@@ -47,11 +47,10 @@ bool ParseCommandLine(int argc, char* argv[],
       // ("use_plane_fitting_ransac",
       // boost::program_options::value<bool>()->required(),
       //  "use plane fitting ransac")
-      ("pcd_folders",
-       boost::program_options::value<std::vector<std::string>>()
-           ->multitoken()
-           ->composing()
-           ->required(),
+      ("pcd_folders", boost::program_options::value<std::vector<std::string>>()
+                          ->multitoken()
+                          ->composing()
+                          ->required(),
        "pcd folders(repeated)")(
           "pose_files",
           boost::program_options::value<std::vector<std::string>>()
@@ -209,7 +208,7 @@ int main(int argc, char** argv) {
   FILE* file = fopen(file_buf, "a");
 
   if (file) {
-    fprintf(file, "\n\nVeldoyne %dE\n", CAR_SENSOR_LASER_NUMBER);
+    fprintf(file, "\n\nVeldoyne %uE\n", CAR_SENSOR_LASER_NUMBER);
     fprintf(file, "Map coordinate type: %s\n",
             loss_less_config.coordinate_type_.c_str());
     // if (loss_less_config.coordinate_type_ == "LTM") {
@@ -340,7 +339,7 @@ int main(int argc, char** argv) {
           float alt = layer_alts[layer_id];
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
-                          &count_height_diff, height_diff);
+                         &count_height_diff, height_diff);
         }
       } else {
         // Use the altitudes from all layers
@@ -349,7 +348,7 @@ int main(int argc, char** argv) {
           float alt = map.GetAltSafe(pt3d, zone_id, resolution_id);
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
-                          &count_height_diff, height_diff);
+                         &count_height_diff, height_diff);
         }
       }
     }
