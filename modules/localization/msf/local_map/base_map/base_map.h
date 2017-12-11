@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H
-#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H
+#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H_
+#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H_
 
 #include <list>
 #include <map>
@@ -92,13 +92,9 @@ class BaseMap {
   void LoadBinary(FILE* file, std::string map_folder_path = "");
 
   /**@brief Get the map config. */
-  inline const BaseMapConfig& GetConfig() const {
-    return *map_config_;
-  }
+  inline const BaseMapConfig& GetConfig() const { return *map_config_; }
   /**@brief Get the map config. */
-  inline BaseMapConfig& GetConfig() {
-    return *map_config_;
-  }
+  inline BaseMapConfig& GetConfig() { return *map_config_; }
 
  protected:
   /**@brief Load map node by index.*/
@@ -133,4 +129,4 @@ class BaseMap {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H
+#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H_

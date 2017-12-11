@@ -100,8 +100,8 @@ BaseMapNode* BaseMap::GetMapNodeSafe(const MapNodeIndex& index) {
   lock.unlock();
 
   // load from disk
-  std::cerr << "GetMapNodeSafe: This node don't exist in cache! " << std::endl
-            << "load this node from disk now!" << index << std::endl;
+  AERROR << "GetMapNodeSafe: This node don't exist in cache! ";
+  AERROR << "load this node from disk now! index = " << index;
   LoadMapNodeThreadSafety(index, true);
   boost::unique_lock<boost::recursive_mutex> lock2(map_load_mutex_);
   map_node_cache_lvl2_->Get(index, &node);
@@ -136,7 +136,7 @@ void BaseMap::AddDataset(const std::string dataset_path) {
 }
 
 void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
-  assert(static_cast<int>(map_ids->size()) <= map_node_cache_lvl1_->Capacity());
+  CHECK_LE(static_cast<int>(map_ids->size()), map_node_cache_lvl1_->Capacity());
   // std::cout << "LoadMapNodes size: " << map_ids->size() << std::endl;
   // check in cacheL1
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
@@ -187,9 +187,8 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   while (itr != map_ids->end()) {
     if (map_node_cache_lvl2_->Get(*itr, &node)) {
       // std::cout << "LoadMapNodes load from disk" << std::endl;
-      std::cout
-          << "LoadMapNodes: preload missed, load this node in main thread.\n"
-          << *itr << std::endl;
+      AINFO << "LoadMapNodes: preload missed, load this node in main thread.\n"
+            << *itr;
       node->SetIsReserved(true);
       map_node_cache_lvl1_->Put(*itr, node);
       itr = map_ids->erase(itr);
@@ -199,7 +198,7 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   }
   lock2.unlock();
 
-  assert(map_ids->size() == 0);
+  CHECK(map_ids->empty());
   return;
 }
 
@@ -207,10 +206,9 @@ void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {
   assert(static_cast<int>(map_ids->size()) <= map_node_cache_lvl2_->Capacity());
   // check in cacheL2
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
-  bool is_exist = false;
   while (itr != map_ids->end()) {
     boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
-    is_exist = map_node_cache_lvl2_->IsExist(*itr);
+    bool is_exist = map_node_cache_lvl2_->IsExist(*itr);
     lock.unlock();
     if (is_exist) {
       itr = map_ids->erase(itr);
@@ -237,7 +235,7 @@ void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {
   // load form disk sync
   itr = map_ids->begin();
   while (itr != map_ids->end()) {
-    std::cout << "Preload map node: " << *itr << std::endl;
+    AINFO << "Preload map node: " << *itr;
     boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
     map_preloading_task_index_.insert(*itr);
     lock.unlock();
@@ -267,9 +265,9 @@ void BaseMap::LoadMapNodeThreadSafety(MapNodeIndex index, bool is_reserved) {
   }
   map_node->Init(map_config_, index, false);
   if (!map_node->Load()) {
-    std::cerr << "Created map node: " << index << std::endl;
+    AERROR << "Created map node: " << index;
   } else {
-    std::cerr << " Loaded map node: " << index << std::endl;
+    AERROR << " Loaded map node: " << index;
   }
   map_node->SetIsReserved(is_reserved);
 
@@ -289,8 +287,8 @@ void BaseMap::LoadMapNodeThreadSafety(MapNodeIndex index, bool is_reserved) {
 void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
                              const Eigen::Vector3d& trans_diff,
                              unsigned int resolution_id, unsigned int zone_id) {
-  assert(p_map_preload_threads_ != nullptr);
-  assert(map_node_pool_ != nullptr);
+  CHECK_NOTNULL(p_map_preload_threads_);
+  CHECK_NOTNULL(map_node_pool_);
 
   int x_direction = trans_diff[0] > 0 ? 1 : -1;
   int y_direction = trans_diff[1] > 0 ? 1 : -1;
@@ -426,8 +424,8 @@ void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
 bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
                           unsigned int resolution_id, unsigned int zone_id,
                           int filter_size_x, int filter_size_y) {
-  assert(p_map_load_threads_ != nullptr);
-  assert(map_node_pool_ != nullptr);
+  CHECK_NOTNULL(p_map_load_threads_);
+  CHECK_NOTNULL(map_node_pool_);
   std::set<MapNodeIndex> map_ids;
   float map_pixel_resolution =
       this->map_config_->map_resolutions_[resolution_id];
