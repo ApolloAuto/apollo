@@ -1,7 +1,8 @@
 syntax = "proto2";
 
-import "modules/common/proto/header.proto";
 package apollo.drivers.gnss;
+
+import "modules/common/proto/header.proto";
 
 enum SolutionStatus {
   SOL_COMPUTED = 0;  // solution computed

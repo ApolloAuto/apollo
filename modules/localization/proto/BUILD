@@ -83,4 +83,51 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "measure_proto",
+    deps = [
+        ":measure_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "measure_proto_lib",
+    srcs = ["measure.proto"],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "sins_pva_proto",
+    deps = [
+        ":sins_pva_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "sins_pva_proto_lib",
+    srcs = ["sins_pva.proto"],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "gnss_pnt_result_proto",
+    deps = [
+        ":gnss_pnt_result_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "gnss_pnt_result_proto_lib",
+    srcs = ["gnss_pnt_result.proto"],
+    deps = [
+        "//modules/drivers/gnss/proto:gnss_raw_observation_lib",
+    ],
+)
+
 cpplint()
