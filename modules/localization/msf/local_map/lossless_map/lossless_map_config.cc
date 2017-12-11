@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
+
 #include <string>
 
 namespace apollo {
@@ -39,7 +40,7 @@ void LosslessMapConfig::CreateXml(boost::property_tree::ptree* config) const {
   config->put("map.map_runtime.cache_size", map_cache_size_);
   config->put("map.map_runtime.max_intensity_value", max_intensity_value_);
   config->put("map.map_runtime.max_intensity_var_value",
-             max_intensity_var_value_);
+              max_intensity_var_value_);
   return;
 }
 

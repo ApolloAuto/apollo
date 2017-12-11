@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOCALIZATION_LOSSY_MAP_2D_H
-#define BAIDU_ADU_LOCALIZATION_LOSSY_MAP_2D_H
+#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_2D_H_
+#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_2D_H_
 
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
@@ -52,4 +52,4 @@ class LossyMap2D : public BaseMap {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOCALIZATION_LOSSY_MAP_2D_H
+#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_2D_H_

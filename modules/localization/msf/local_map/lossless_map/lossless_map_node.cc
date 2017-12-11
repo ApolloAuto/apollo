@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_node.h"
+
 #include <vector>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOCALIZATION_LOSSLESS_MAP_H
-#define BAIDU_ADU_LOCALIZATION_LOSSLESS_MAP_H
+#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_H_
+#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_H_
 
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map.h"
@@ -164,4 +164,4 @@ class LosslessMap : public BaseMap {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOCALIZATION_LOSSLESS_MAP_H
+#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_H_
