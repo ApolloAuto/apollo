@@ -149,6 +149,12 @@ bool ReferenceLineProvider::UpdateRoutingResponse(
   return true;
 }
 
+std::vector<routing::LaneWaypoint>
+ReferenceLineProvider::FutureRouteWaypoints() {
+  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  return pnc_map_->FutureRouteWaypoints();
+}
+
 void ReferenceLineProvider::UpdateVehicleState(
     const VehicleState &vehicle_state) {
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);

@@ -97,14 +97,19 @@ bool Frame::Rerouting() {
            << point.DebugString() << ", heading:" << vehicle_state_.heading();
     return false;
   }
-  routing::LaneWaypoint end_point;
-  end_point.CopyFrom(*request.waypoint().rbegin());
   request.clear_waypoint();
   auto *start_point = request.add_waypoint();
   start_point->set_id(lane->id().id());
   start_point->set_s(s);
   start_point->mutable_pose()->CopyFrom(point);
-  request.add_waypoint()->CopyFrom(end_point);
+  for (const auto &waypoint :
+       ReferenceLineProvider::instance()->FutureRouteWaypoints()) {
+    request.add_waypoint()->CopyFrom(waypoint);
+  }
+  if (request.waypoint_size() <= 1) {
+    AERROR << "Failed to find future waypoints";
+    return false;
+  }
   AdapterManager::PublishRoutingRequest(request);
   return true;
 }
