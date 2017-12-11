@@ -12,6 +12,7 @@ cc_library(
     ]),
     deps = [
         "//modules/localization/proto:localization_proto",
+        "//modules/dreamview/backend/hmi:vehicle_manager",
         "@glog//:glog",
     ],
 )

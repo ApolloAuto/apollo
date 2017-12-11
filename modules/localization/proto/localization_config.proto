@@ -5,6 +5,7 @@ package apollo.localization;
 message LocalizationConfig {
   enum LocalizationType {
     RTK = 0;
+    MSF = 1;
   };
   optional LocalizationType localization_type = 1 [default = RTK];
 }
