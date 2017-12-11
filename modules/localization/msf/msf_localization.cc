@@ -29,10 +29,10 @@ namespace apollo {
 namespace localization {
 
 using ::Eigen::Vector3d;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::ImuAdapter;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
 using apollo::common::time::Clock;
 
 MSFLocalization::MSFLocalization()
@@ -124,15 +124,13 @@ Status MSFLocalization::Init() {
   switch (state.error_code()) {
     case LocalizationErrorCode::INTEG_ERROR:
       return Status(common::LOCALIZATION_ERROR_INTEG, state.error_msg());
-      break;
     case LocalizationErrorCode::LIDAR_ERROR:
       return Status(common::LOCALIZATION_ERROR_LIDAR, state.error_msg());
-      break;
     case LocalizationErrorCode::GNSS_ERROR:
       return Status(common::LOCALIZATION_ERROR_GNSS, state.error_msg());
+    default:
+      return Status::OK();
   }
-
-  return Status::OK();
 }
 
 void MSFLocalization::InitParams() {
