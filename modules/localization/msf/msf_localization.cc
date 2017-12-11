@@ -316,7 +316,7 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
 }  // namespace localization
 
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
-  if (localization_state_ == LocalizaitonMeasureState::OK &&
+  if (localization_state_ == LocalizationMeasureState::OK &&
       FLAGS_gnss_only_init) {
     return;
   }

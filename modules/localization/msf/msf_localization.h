@@ -35,6 +35,7 @@
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/localization_base.h"
+// #include "modules/localization/msf/local_integ/localization_integ.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
