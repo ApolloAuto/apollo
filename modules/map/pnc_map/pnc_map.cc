@@ -114,6 +114,12 @@ void PncMap::UpdateNextRoutingWaypointIndex() {
   }
 }
 
+std::vector<routing::LaneWaypoint> PncMap::FutureRouteWaypoints() const {
+  const auto &waypoints = routing_.routing_request().waypoint();
+  return std::vector<routing::LaneWaypoint>(
+      waypoints.begin() + next_routing_waypoint_index_, waypoints.end());
+}
+
 bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   if (!ValidateRouting(routing_)) {
     AERROR << "The routing is invalid when updatting vehicle state";
