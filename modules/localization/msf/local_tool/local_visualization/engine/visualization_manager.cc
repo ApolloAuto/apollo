@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
-#include <boost/filesystem.hpp>
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
 #include "boost/date_time/posix_time/posix_time.hpp"
+#include "modules/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
@@ -41,14 +42,14 @@ template <class MessageType>
 bool MessageBuffer<MessageType>::PushNewMessage(const double timestamp,
                                                 const MessageType &msg) {
   if (capacity_ == 0) {
-    std::cerr << "The buffer capacity is 0." << std::endl;
+    AERROR << "The buffer capacity is 0.";
     return false;
   }
 
   pthread_mutex_lock(&buffer_mutex_);
   auto found_iter = msg_map_.find(timestamp);
   if (found_iter != msg_map_.end()) {
-    std::cerr << "The msg has existed in buffer." << std::endl;
+    AERROR << "The msg has existed in buffer.";
     pthread_mutex_unlock(&buffer_mutex_);
     return false;
   }
@@ -73,7 +74,7 @@ bool MessageBuffer<MessageType>::PushNewMessage(const double timestamp,
 template <class MessageType>
 bool MessageBuffer<MessageType>::PopOldestMessage(MessageType *msg) {
   if (IsEmpty()) {
-    std::cerr << "The buffer is empty." << std::endl;
+    AERROR << "The buffer is empty.";
     return false;
   }
 
@@ -90,7 +91,7 @@ template <class MessageType>
 bool MessageBuffer<MessageType>::GetMessageBefore(const double timestamp,
                                                   MessageType *msg) {
   if (IsEmpty()) {
-    std::cerr << "The buffer is empty." << std::endl;
+    AERROR << "The buffer is empty.";
     return false;
   }
 
@@ -210,7 +211,7 @@ bool IntepolationMessageBuffer<MessageType>::QueryMessage(
       //     return false;
       // }
       if (std::abs(delta_time) < 1e-9) {
-        std::cerr << "Delta_time is too small." << std::endl;
+        AERROR << "Delta_time is too small.";
         return false;
       }
       double scale = (timestamp - before_iter->first) / delta_time;
@@ -236,14 +237,14 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
   pthread_mutex_unlock(&(this->buffer_mutex_));
 
   if (msg_list->empty()) {
-    std::cerr << "The queried buffer is empty." << std::endl;
+    AERROR << "The queried buffer is empty.";
     return false;
   }
 
   ListIterator last_iter = msg_list->end();
   --last_iter;
   while (last_iter->first < timestamp) {
-    std::cout << "Waiting new message!" << std::endl;
+    AINFO << "Waiting new message!";
     usleep(5000);
     pthread_mutex_lock(&(this->buffer_mutex_));
     msg_list->clear();
@@ -259,7 +260,7 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
     boost::posix_time::time_duration during_time = end_time - start_time;
 
     if (during_time.total_milliseconds() >= timeout_ms) {
-      std::cout << "Waiting time is out" << std::endl;
+      AINFO << "Waiting time is out";
       return false;
     }
   }
@@ -291,35 +292,34 @@ bool VisualizationManager::Init(const std::string &map_folder,
   map_config.map_version_ = "lossy_map";
   bool success = map_config.Load(config_file);
   if (!success) {
-    std::cerr << "Load map config failed." << std::endl;
+    AERROR << "Load map config failed.";
     return false;
   }
-  std::cout << "Load map config succeed." << std::endl;
+  AINFO << "Load map config succeed.";
 
   success = GetZoneIdFromMapFolder(map_folder, resolution_id, &zone_id);
   if (!success) {
-    std::cerr << "Get zone id failed." << std::endl;
+    AERROR << "Get zone id failed.";
     return false;
   }
-  std::cout << "Get zone id succeed." << std::endl;
+  AINFO << "Get zone id succeed.";
 
-  std::cout << "Load lidar_extrinsic_file: " << lidar_extrinsic_file
-            << std::endl;
+  AINFO << "Load lidar_extrinsic_file: " << lidar_extrinsic_file;
   Eigen::Affine3d velodyne_extrinsic;
   success = velodyne::LoadExtrinsic(lidar_extrinsic_file, &velodyne_extrinsic);
   if (!success) {
-    std::cerr << "Load velodyne extrinsic failed." << std::endl;
+    AERROR << "Load velodyne extrinsic failed.";
     return false;
   }
-  std::cout << "Load velodyne extrinsic succeed." << std::endl;
+  AINFO << "Load velodyne extrinsic succeed.";
 
   success = visual_engine_.Init(map_folder, map_config, resolution_id, zone_id,
                                 velodyne_extrinsic, LOC_INFO_NUM);
   if (!success) {
-    std::cerr << "Visualization engine init failed." << std::endl;
+    AERROR << "Visualization engine init failed.";
     return false;
   }
-  std::cout << "Visualization engine init succeed." << std::endl;
+  AINFO << "Visualization engine init succeed.";
 
   return true;
 }
@@ -334,29 +334,29 @@ bool VisualizationManager::Init(const VisualizationManagerParams &params) {
 }
 
 void VisualizationManager::AddLidarFrame(const LidarVisFrame &lidar_frame) {
-  std::cout << "AddLidarFrame." << std::endl;
+  AINFO << "AddLidarFrame.";
   static int id = 0;
-  std::cout << "id." << id << std::endl;
+  AINFO << "id." << id;
   lidar_frame_buffer_.PushNewMessage(lidar_frame.timestamp, lidar_frame);
-  std::cout << "id." << id << std::endl;
+  AINFO << "id." << id;
   id++;
 }
 
 void VisualizationManager::AddGNSSLocMessage(
     const LocalizationMsg &gnss_loc_msg) {
-  std::cout << "AddGNSSLocMessage." << std::endl;
+  AINFO << "AddGNSSLocMessage.";
   gnss_loc_info_buffer_.PushNewMessage(gnss_loc_msg.timestamp, gnss_loc_msg);
 }
 
 void VisualizationManager::AddLidarLocMessage(
     const LocalizationMsg &lidar_loc_msg) {
-  std::cout << "AddLidarLocMessage." << std::endl;
+  AINFO << "AddLidarLocMessage.";
   lidar_loc_info_buffer_.PushNewMessage(lidar_loc_msg.timestamp, lidar_loc_msg);
 }
 
 void VisualizationManager::AddFusionLocMessage(
     const LocalizationMsg &fusion_loc_msg) {
-  std::cout << "AddFusionLocMessage." << std::endl;
+  AINFO << "AddFusionLocMessage.";
   fusion_loc_info_buffer_.PushNewMessage(fusion_loc_msg.timestamp,
                                          fusion_loc_msg);
 }
@@ -384,16 +384,16 @@ void VisualizationManager::DoVisualize() {
       // for (std::list<std::pair<double, LidarVisFrame>>::iterator iter =
       // msg_list1.begin();
       //        iter != msg_list1.end(); ++iter) {
-      //   std::cout << iter->first;
+      //   AINFO << iter->first;
       // }
-      // std::cout << "\n";
+      // AINFO << "\n";
 
       // for (std::list<std::pair<double, LocalizationMsg>>::iterator iter =
       // msg_list2.begin();
       //        iter != msg_list2.end(); ++iter) {
-      //   std::cout << iter->first;
+      //   AINFO << iter->first;
       // }
-      // std::cout << "\n";
+      // AINFO << "\n";
 
       LidarVisFrame lidar_frame;
       bool pop_success = lidar_frame_buffer_.PopOldestMessage(&lidar_frame);
@@ -488,7 +488,7 @@ bool VisualizationManager::GetZoneIdFromMapFolder(
           zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
       *zone_id = -(std::stoi(zone_id_str));
-      std::cout << "Find zone id: " << *zone_id << std::endl;
+      AINFO << "Find zone id: " << *zone_id;
       return true;
     }
   }
@@ -498,7 +498,7 @@ bool VisualizationManager::GetZoneIdFromMapFolder(
       zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
   *zone_id = (std::stoi(zone_id_str));
-  std::cout << "Find zone id: " << *zone_id << std::endl;
+  AINFO << "Find zone id: " << *zone_id;
   return true;
 }
 

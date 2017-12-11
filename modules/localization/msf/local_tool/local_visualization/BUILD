@@ -23,7 +23,7 @@ cc_library(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen//:eigen",
-        "@glog//:glog"
+        "//modules/common:log",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_binary(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen//:eigen",
-        "@glog//:glog"
+        "//modules/common:log",
     ],
 )
 
@@ -74,11 +74,11 @@ cc_library(
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",
+        "//modules/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
         "@eigen//:eigen",
-        "@glog//:glog",
         "@ros//:ros_common",
         "@pcl//:pcl"
     ],
