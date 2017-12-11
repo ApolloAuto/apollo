@@ -24,8 +24,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace apollo {
 namespace localization {
@@ -47,21 +47,21 @@ struct VelodyneFrame {
   Eigen::Affine3d pose;
 };
 
-void LoadPcds(const std::string file_path, const unsigned int frame_index,
+void LoadPcds(const std::string& file_path, const unsigned int frame_index,
               const Eigen::Affine3d& pose, VelodyneFrame* velodyne_frame,
               const bool is_global = false);
 
-void LoadPcds(const std::string file_path, const unsigned int frame_index,
+void LoadPcds(const std::string& file_path, const unsigned int frame_index,
               const Eigen::Affine3d& pose, std::vector<Eigen::Vector3d>* pt3ds,
               std::vector<unsigned char>* intensities, bool is_global = false);
 
 /**@brief Load the PCD poses with their timestamps. */
-void LoadPcdPoses(const std::string file_path,
+void LoadPcdPoses(const std::string& file_path,
                   std::vector<Eigen::Affine3d>* poses,
                   std::vector<double>* timestamps);
 
 /**@brief Load the PCD poses with their timestamps and indices. */
-void LoadPcdPoses(const std::string file_path,
+void LoadPcdPoses(const std::string& file_path,
                   std::vector<Eigen::Affine3d>* poses,
                   std::vector<double>* timestamps,
                   std::vector<unsigned int>* pcd_indices);
@@ -78,7 +78,7 @@ void LoadPosesAndStds(const std::string& file_path,
 //    const std::vector<double>& timestamps);
 
 /**@brief Load the velodyne extrinsic from a YAML file. */
-bool LoadExtrinsic(const std::string file_path, Eigen::Affine3d* extrinsic);
+bool LoadExtrinsic(const std::string& file_path, Eigen::Affine3d* extrinsic);
 
 }  // namespace velodyne
 }  // namespace msf

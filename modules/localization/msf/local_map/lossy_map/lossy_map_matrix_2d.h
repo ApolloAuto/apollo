@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSY_MAP_MATRIX_FULL_ALT_2D_H
-#define BAIDU_ADU_LOSSY_MAP_MATRIX_FULL_ALT_2D_H
+#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_MATRIX_2D_H_
+#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_MATRIX_2D_H_
 
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
@@ -93,7 +93,7 @@ class LossyMapMatrix2D : public BaseMapMatrix {
     return map_cells_ + row * cols_;
   }
 
-  LossyMapMatrix2D& operator= (const LossyMapMatrix2D& matrix);
+  LossyMapMatrix2D& operator=(const LossyMapMatrix2D& matrix);
 
  protected:
   /**@brief The number of rows. */
@@ -109,11 +109,9 @@ class LossyMapMatrix2D : public BaseMapMatrix {
   inline uint16_t EncodeVar(const LossyMapCell2D& cell) const;
   inline void DecodeVar(uint16_t data, LossyMapCell2D* cell) const;
   inline uint16_t EncodeAltitudeGround(const LossyMapCell2D& cell) const;
-  inline void DecodeAltitudeGround(uint16_t data,
-                                   LossyMapCell2D* cell) const;
+  inline void DecodeAltitudeGround(uint16_t data, LossyMapCell2D* cell) const;
   inline uint16_t EncodeAltitudeAvg(const LossyMapCell2D& cell) const;
-  inline void DecodeAltitudeAvg(uint16_t data,
-                                LossyMapCell2D* cell) const;
+  inline void DecodeAltitudeAvg(uint16_t data, LossyMapCell2D* cell) const;
   inline unsigned char EncodeCount(const LossyMapCell2D& cell) const;
   inline void DecodeCount(unsigned char data, LossyMapCell2D* cell) const;
   const int var_range_ = 1023;  // 65535;
@@ -133,4 +131,4 @@ class LossyMapMatrix2D : public BaseMapMatrix {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSY_MAP_MATRIX_FULL_ALT_2D_H
+#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_MATRIX_2D_H_

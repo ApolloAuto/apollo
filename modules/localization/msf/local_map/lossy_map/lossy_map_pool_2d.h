@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSY_MAP_POOL_2D_H
-#define BAIDU_ADU_LOSSY_MAP_POOL_2D_H
+#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_POOL_2D_H_
+#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_POOL_2D_H_
 
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
@@ -46,4 +46,4 @@ class LossyMapNodePool2D : public BaseMapNodePool {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSY_MAP_POOL_2D_H
+#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_POOL_2D_H_

@@ -14,17 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/common/io/velodyne_utility.h"
 #include <pcl/io/pcd_io.h>
 #include <yaml-cpp/yaml.h>
 #include "modules/localization/msf/common/io/pcl_point_types.h"
+#include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 namespace velodyne {
 
-void LoadPcds(const std::string file_path, const unsigned int frame_index,
+void LoadPcds(const std::string& file_path, const unsigned int frame_index,
               const Eigen::Affine3d& pose, VelodyneFrame* velodyne_frame,
               bool is_global) {
   velodyne_frame->frame_index = frame_index;
@@ -33,7 +33,7 @@ void LoadPcds(const std::string file_path, const unsigned int frame_index,
            &velodyne_frame->intensities, is_global);
 }
 
-void LoadPcds(const std::string file_path, const unsigned int frame_index,
+void LoadPcds(const std::string& file_path, const unsigned int frame_index,
               const Eigen::Affine3d& pose, std::vector<Eigen::Vector3d>* pt3ds,
               std::vector<unsigned char>* intensities, bool is_global) {
   Eigen::Affine3d pose_inv = pose.inverse();
@@ -87,14 +87,14 @@ void LoadPcds(const std::string file_path, const unsigned int frame_index,
   }
 }
 
-void LoadPcdPoses(const std::string file_path,
+void LoadPcdPoses(const std::string& file_path,
                   std::vector<Eigen::Affine3d>* poses,
                   std::vector<double>* timestamps) {
   std::vector<unsigned int> pcd_indices;
   LoadPcdPoses(file_path, poses, timestamps, &pcd_indices);
 }
 
-void LoadPcdPoses(const std::string file_path,
+void LoadPcdPoses(const std::string& file_path,
                   std::vector<Eigen::Affine3d>* poses,
                   std::vector<double>* timestamps,
                   std::vector<unsigned int>* pcd_indices) {
@@ -108,9 +108,9 @@ void LoadPcdPoses(const std::string file_path,
     double timestamp;
     double x, y, z;
     double qx, qy, qz, qr;
-    int size = 9;
-    while ((size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
-                          &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr)) == 9) {
+    constexpr int kSize = 9;
+    while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
+                  &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
       Eigen::Quaterniond quat(qr, qx, qy, qz);
       poses->push_back(trans * quat);
@@ -138,11 +138,10 @@ void LoadPosesAndStds(const std::string& file_path,
     double x, y, z;
     double qx, qy, qz, qr;
     double std_x, std_y, std_z;
-    int size = 12;
-    while (
-        (size = fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                       &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr,
-                       &std_x, &std_y, &std_z)) == 12) {
+    constexpr int kSize = 12;
+    while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                  &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr, &std_x,
+                  &std_y, &std_z) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
       Eigen::Quaterniond quat(qr, qx, qy, qz);
       poses->push_back(trans * quat);
@@ -158,7 +157,7 @@ void LoadPosesAndStds(const std::string& file_path,
   }
 }
 
-bool LoadExtrinsic(const std::string file_path, Eigen::Affine3d* extrinsic) {
+bool LoadExtrinsic(const std::string& file_path, Eigen::Affine3d* extrinsic) {
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["translation"]) {
