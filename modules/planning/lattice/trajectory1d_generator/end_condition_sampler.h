@@ -55,7 +55,7 @@ class EndConditionSampler {
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForPathTimeBounds(
-    const std::vector<SampleBound>& sample_bounds) const;
+      const PlanningTarget& planning_target) const;
 
  private:
   std::array<double, 3> init_s_;

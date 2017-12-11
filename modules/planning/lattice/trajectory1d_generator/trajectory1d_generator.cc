@@ -182,12 +182,13 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
       ptr_lon_trajectory_bundle);
   }
 
-  std::vector<SampleBound> sample_bounds;
-  for (const SampleBound& sample_bound : planning_target.sample_bound()) {
-    sample_bounds.push_back(sample_bound);
-  }
+  // std::vector<SampleBound> sample_bounds;
+  // for (const SampleBound& sample_bound : planning_target.sample_bound()) {
+  //   sample_bounds.push_back(sample_bound);
+  // }
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(sample_bounds);
+      end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(
+                                  planning_target);
 
   for (const auto& end_condition : end_conditions) {
     std::shared_ptr<Curve1d> ptr_lon_trajectory =

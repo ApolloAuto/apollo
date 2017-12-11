@@ -141,13 +141,13 @@ EndConditionSampler::SampleLonEndConditionsForStopping(const double ref_stop_pos
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
-    const std::vector<SampleBound>& sample_bounds) const {
+    const PlanningTarget& planning_target) const {
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
 
   constexpr std::size_t num_s_section = 5;
   constexpr std::size_t num_s_dot_section = 5;
-  for (const SampleBound& sample_bound : sample_bounds) {
+  for (const SampleBound& sample_bound : planning_target.sample_bound()) {
     double s_interval = (sample_bound.s_upper() - sample_bound.s_lower())
         / (num_s_section - 1);
     std::array<double, num_s_section> s_samples;
