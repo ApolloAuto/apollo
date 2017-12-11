@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSLESS_MAP_POOL_H
-#define BAIDU_ADU_LOSSLESS_MAP_POOL_H
+#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_POOL_H_
+#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_POOL_H_
 
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
@@ -36,7 +36,7 @@ class LosslessMapNodePool : public BaseMapNodePool {
    */
   LosslessMapNodePool(unsigned int pool_size, unsigned int thread_size);
   /**@brief Destructor */
-  virtual ~LosslessMapNodePool() {}
+  virtual ~LosslessMapNodePool() = default;
 
  private:
   virtual BaseMapNode* AllocNewMapNode();
@@ -46,4 +46,4 @@ class LosslessMapNodePool : public BaseMapNodePool {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSLESS_MAP_POOL_H
+#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_POOL_H_
