@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
-#include <iostream>
 
 namespace apollo {
 namespace localization {
 namespace msf {
+
 // ======================LosslessMapSingleCell===========================
 LosslessMapSingleCell::LosslessMapSingleCell()
     : intensity(0.0),
@@ -101,9 +101,7 @@ unsigned int LosslessMapSingleCell::GetBinarySize() const {
 }
 
 // ======================LosslessMapCell===========================
-LosslessMapCell::LosslessMapCell() {
-  layer_num = 1;
-}
+LosslessMapCell::LosslessMapCell() { layer_num = 1; }
 
 void LosslessMapCell::Reset() {
   for (unsigned int i = 0; i < IDL_CAR_NUM_RESERVED_MAP_LAYER; ++i) {
@@ -373,8 +371,8 @@ unsigned int LosslessMapMatrix::GetBinarySize() const {
 void LosslessMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
   *intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
 
-  for (int y = 0; y < rows_; ++y) {
-    for (int x = 0; x < cols_; ++x) {
+  for (uint32_t y = 0; y < rows_; ++y) {
+    for (uint32_t x = 0; x < cols_; ++x) {
       intensity_img->at<unsigned char>(y, x) = GetMapCell(y, x).GetValue();
     }
   }
