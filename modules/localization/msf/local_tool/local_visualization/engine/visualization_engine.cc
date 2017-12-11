@@ -17,13 +17,13 @@
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 #include <stdio.h>
 #include <boost/filesystem.hpp>
+#include <cmath>
+#include "modules/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
-
-#define PI 3.1415926535897932346
 
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
@@ -147,7 +147,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   }
 
   if (resolution_id_ >= map_config_.map_resolutions_.size()) {
-    std::cerr << "Invalid resolution id." << std::endl;
+    AERROR << "Invalid resolution id.";
     return false;
   }
 
@@ -166,7 +166,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   std::string params_file = image_visual_resolution_path_ + "/param.txt";
   bool success = InitOtherParams(params_file);
   if (!success) {
-    std::cerr << "Init other params failed." << std::endl;
+    AERROR << "Init other params failed.";
   }
 
   cv::namedWindow(window_name_, CV_WINDOW_NORMAL);
@@ -181,12 +181,12 @@ void VisualizationEngine::Visualize(
     const std::vector<LocalizatonInfo> &loc_infos,
     const std::vector<Eigen::Vector3d> &cloud) {
   if (!is_init_) {
-    std::cerr << "Visualziation should be init first." << std::endl;
+    AERROR << "Visualziation should be init first.";
     return;
   }
 
   if (loc_infos.size() != loc_info_num_) {
-    std::cerr << "Please check the localization info num." << std::endl;
+    AERROR << "Please check the localization info num.";
     return;
   }
 
@@ -209,10 +209,9 @@ void VisualizationEngine::Preprocess(const std::string &map_folder) {
   char buf[256];
   snprintf(buf, sizeof(buf), "/%03u", resolution_id_);
   image_visual_resolution_path_ = image_visual_path + buf;
-  std::cout << "image_visual_resolution_path: " << image_visual_resolution_path_
-            << std::endl;
+  AINFO << "image_visual_resolution_path: " << image_visual_resolution_path_;
   std::string image_resolution_path = image_path + buf;
-  std::cout << "image_resolution_path: " << image_resolution_path << std::endl;
+  AINFO << "image_resolution_path: " << image_resolution_path;
 
   boost::filesystem::path image_visual_path_boost(image_visual_path);
   if (!boost::filesystem::exists(image_visual_path_boost)) {
@@ -323,7 +322,7 @@ void VisualizationEngine::Draw() {
 }
 
 void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
-  std::cout << "Draw trajectory." << std::endl;
+  AINFO << "Draw trajectory.";
   if (cur_level_ == 0 && is_draw_trajectory_) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
@@ -370,7 +369,7 @@ void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
 }
 
 void VisualizationEngine::DrawLoc(const cv::Point &bias) {
-  std::cout << "Draw loc." << std::endl;
+  AINFO << "Draw loc.";
   if (cur_level_ == 0) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
@@ -390,19 +389,19 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
         double quaternion[] = {quatd.w(), quatd.x(), quatd.y(), quatd.z()};
         double euler_angle[3] = {0};
         QuaternionToEuler(quaternion, euler_angle);
-        euler_angle[0] = euler_angle[0] * 180 / PI;
-        euler_angle[1] = euler_angle[1] * 180 / PI;
-        euler_angle[2] = euler_angle[2] * 180 / PI;
+        euler_angle[0] = euler_angle[0] * 180 / M_PI;
+        euler_angle[1] = euler_angle[1] * 180 / M_PI;
+        euler_angle[2] = euler_angle[2] * 180 / M_PI;
         // Eigen::Matrix3d matrix = quatd.toRotationMatrix();
         // Eigen::Vector3d euler_angle = matrix.eulerAngles(1, 0, 2);
-        // euler_angle = euler_angle * 180 / PI;
+        // euler_angle = euler_angle * 180 / M_PI;
         double yaw = euler_angle[2];
 
         cv::Mat mat_tem;
         cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
                    CV_INTER_LINEAR);
         cv::Mat rotated_mat;
-        // std::cout << "yaw: " << yaw << std::endl;
+        // AINFO << "yaw: " << yaw;
         // RotateImg(mat_tem, rotated_mat, 90 - yaw);
         // RotateImg(mat_tem, rotated_mat, - yaw - 90);
         // RotateImg(mat_tem, rotated_mat, yaw + 90);
@@ -428,7 +427,7 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
 }
 
 void VisualizationEngine::DrawStd(const cv::Point &bias) {
-  std::cout << "Draw std." << std::endl;
+  AINFO << "Draw std.";
   if (cur_level_ == 0 && is_draw_std_) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
@@ -464,7 +463,7 @@ void VisualizationEngine::DrawCloud(const cv::Point &bias) {
     return;
   }
 
-  std::cout << "Draw cloud." << std::endl;
+  AINFO << "Draw cloud.";
   if (cur_level_ == 0) {
     CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, &cloud_img_,
                &cloud_img_mask_);
@@ -482,7 +481,7 @@ void VisualizationEngine::DrawCloud(const cv::Point &bias) {
 }
 
 void VisualizationEngine::DrawLegend() {
-  std::cout << "Draw legend." << std::endl;
+  AINFO << "Draw legend.";
   int fontFace = cv::FONT_HERSHEY_SIMPLEX;
   double fontScale = 0.6;
   int thickness = 2.0;
@@ -512,7 +511,7 @@ void VisualizationEngine::DrawLegend() {
 }
 
 void VisualizationEngine::DrawInfo() {
-  std::cout << "Draw info." << std::endl;
+  AINFO << "Draw info.";
   LocalizatonInfo &loc_info = cur_loc_infos_[car_loc_id_];
 
   int fontFace = cv::FONT_HERSHEY_SIMPLEX;
@@ -542,7 +541,7 @@ void VisualizationEngine::DrawInfo() {
 }
 
 void VisualizationEngine::DrawTips() {
-  std::cout << "Draw tips." << std::endl;
+  AINFO << "Draw tips.";
 
   tips_window_.setTo(cv::Scalar(0, 0, 0));
 
@@ -628,14 +627,14 @@ void VisualizationEngine::GenerateMutiResolutionImages(
     p = dst_folder + p;
     cv::Mat tmp = cv::imread(src_files[i]);
     cv::imwrite(p + "_0.png", tmp);
-    // std::cerr << p << std::endl;
+    // AERROR << p;
   }
 
   // generate higher image level;
   std::string image_visual_path_dst = src_files[0].substr(
       base_path_length, src_files[0].length() - 22 - base_path_length);
   image_visual_path_dst = dst_folder + image_visual_path_dst;
-  // std::cerr << image_visual_path_dst << std::endl;
+  // AERROR << image_visual_path_dst;
 
   int pt_x = x_min;
   int pt_y = y_min;
@@ -655,7 +654,7 @@ void VisualizationEngine::GenerateMutiResolutionImages(
             snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
                      image_visual_path_dst.c_str(), pt_y + i * step,
                      pt_x + j * step, lvl - 1);
-            // std::cerr << ss << std::endl;
+            // AERROR << ss;
             if (boost::filesystem::exists(boost::filesystem::path(ss))) {
               flag = true;
               cv::Mat img = cv::imread(ss);
@@ -676,13 +675,12 @@ void VisualizationEngine::GenerateMutiResolutionImages(
 
   // write param
   std::fstream outf(dst_folder + "/param.txt", std::ios::out);
-  outf << x_min << " " << y_min << std::endl;
-  outf << x_max << " " << y_max << std::endl;
-  outf << level << std::endl;
+  outf << x_min << " " << y_min;
+  outf << x_max << " " << y_max;
+  outf << level;
   outf << image_visual_path_dst.substr(
-              dst_folder.length(),
-              image_visual_path_dst.length() - dst_folder.length() - 3)
-       << std::endl;
+      dst_folder.length(),
+      image_visual_path_dst.length() - dst_folder.length() - 3);
   outf.close();
   return;
 }
@@ -697,7 +695,7 @@ bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
 
   std::ifstream inf(params_file);
   if (!inf.is_open()) {
-    std::cerr << "Open params file failed." << std::endl;
+    AERROR << "Open params file failed.";
     return false;
   }
 
@@ -734,8 +732,7 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
   }
   // SetScale((double)max_stride_);
   image_visual_leaf_path_ = image_visual_resolution_path_ + path;
-  std::cout << "image_visual_leaf_path: " << image_visual_leaf_path_
-            << std::endl;
+  AINFO << "image_visual_leaf_path: " << image_visual_leaf_path_;
 }
 
 void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
@@ -760,10 +757,10 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     const Eigen::Vector3d &pt = cloud[i];
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
-    int col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-              map_config_.map_resolutions_[resolution_id_];
-    int row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-              map_config_.map_resolutions_[resolution_id_];
+    unsigned int col = (pt_global[0] - cloud_img_lt_coord_[0]) /
+                       map_config_.map_resolutions_[resolution_id_];
+    unsigned int row = (pt_global[1] - cloud_img_lt_coord_[1]) /
+                       map_config_.map_resolutions_[resolution_id_];
     if (col < 0 || row < 0 || col >= map_config_.map_node_size_x_ ||
         row >= map_config_.map_node_size_y_) {
       continue;
@@ -835,7 +832,7 @@ bool VisualizationEngine::LoadImageToCache(const MapImageKey &key) {
              key.node_east_id, key.level);
     if (boost::filesystem::exists(boost::filesystem::path(path))) {
       img = cv::imread(path);
-      std::cout << "visualizer load: " << path << std::endl;
+      AINFO << "visualizer load: " << path;
       map_image_cache_.Set(key, img);
       return true;
     } else {
