@@ -11,9 +11,9 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//modules/localization/proto:localization_proto",
+        "//modules/common:log",
         "//modules/dreamview/backend/hmi:vehicle_manager",
-        "@glog//:glog",
+        "//modules/localization/proto:localization_proto",
     ],
 )
 
