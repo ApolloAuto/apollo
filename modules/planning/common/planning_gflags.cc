@@ -92,6 +92,9 @@ DEFINE_double(change_lane_fail_freeze_time, 3.0,
 DEFINE_double(change_lane_success_freeze_time, 3.0,
               "seconds. Not allowed to change lane this amount of time "
               "if it just finished change lane or failed to change lane");
+DEFINE_double(change_lane_min_length, 30.0,
+              "meters. If the change lane target has longer length than this "
+              "threshold, it can shortcut the default lane.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
