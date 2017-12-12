@@ -171,7 +171,8 @@ bool DPRoadGraph::GenerateMinCostPath(
         cur_node.UpdateCost(&prev_dp_node, curve, cost);
 
         // try to connect the current point with the first point directly
-        if (level == 2) {
+        // only do this at lane change
+        if (reference_line_info_.IsChangeLanePath() && level >= 2) {
           init_dl = init_frenet_frame_point_.dl();
           init_ddl = init_frenet_frame_point_.ddl();
           QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
