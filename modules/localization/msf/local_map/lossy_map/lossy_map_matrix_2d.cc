@@ -299,7 +299,8 @@ unsigned int LossyMapMatrix2D::LoadBinary(unsigned char* buf) {
       }
     }
   }
-  pp += 2 * rows_ * cols_;
+  // TODO(Localization): remove this line
+  // pp += 2 * rows_ * cols_;
 
   return GetBinarySize();
 }
@@ -417,7 +418,8 @@ unsigned int LossyMapMatrix2D::CreateBinary(unsigned char* buf,
         pp_low[row * cols_ + col] = altitude % 256;
       }
     }
-    pp += 2 * rows_ * cols_;
+    // TODO(Localization): remove this line
+    // pp += 2 * rows_ * cols_;
   }
   return target_size;
 }
