@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/util/http_client.h"
+#include "modules/common/util/http_client.h"
 
 #include <curlpp/Easy.hpp>
 #include <curlpp/Exception.hpp>
@@ -24,11 +24,9 @@
 #include "modules/common/log.h"
 
 namespace apollo {
-namespace dreamview {
+namespace common {
 namespace util {
 
-using apollo::common::ErrorCode;
-using apollo::common::Status;
 using Json = nlohmann::json;
 
 Status HttpClient::Post(const std::string &url, const Json &json,
@@ -73,5 +71,5 @@ Status HttpClient::Post(const std::string &url, const Json &json,
 }
 
 }  // namespace util
-}  // namespace dreamview
+}  // namespace common
 }  // namespace apollo

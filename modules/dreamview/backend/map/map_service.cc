@@ -18,14 +18,15 @@
 
 #include <algorithm>
 
+#include "modules/common/util/json_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/dreamview/backend/util/json_util.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::PointENU;
+using apollo::common::util::JsonUtil;
 using apollo::hdmap::Map;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfoConstPtr;
@@ -41,7 +42,6 @@ using apollo::hdmap::RouteSegments;
 using apollo::hdmap::SimMapFile;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
-using apollo::dreamview::util::JsonUtil;
 
 namespace {
 
