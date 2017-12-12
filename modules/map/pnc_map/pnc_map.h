@@ -74,6 +74,8 @@ class PncMap {
                       double end_s,
                       RouteSegments *const truncated_segments) const;
 
+  std::vector<routing::LaneWaypoint> FutureRouteWaypoints() const;
+
  private:
   /**
    * @brief Find the waypoint index of a routing waypoint. It updates

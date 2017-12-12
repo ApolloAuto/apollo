@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSLESS_MAP_MATRIX_H
-#define BAIDU_ADU_LOSSLESS_MAP_MATRIX_H
+#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
+#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
 
 #include <vector>
+
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 
@@ -209,4 +210,4 @@ class LosslessMapMatrix : public BaseMapMatrix {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSLESS_MAP_MATRIX_H
+#endif  // LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_

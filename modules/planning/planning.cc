@@ -335,7 +335,9 @@ Status Planning::Plan(const double current_time_stamp,
                             &reference_line_info);
     if (status == Status::OK()) {
       if (FLAGS_prioritize_change_lane && reference_line_info.IsDrivable() &&
-          reference_line_info.IsChangeLanePath()) {
+          reference_line_info.IsChangeLanePath() &&
+          reference_line_info.TrajectoryLength() >
+              FLAGS_change_lane_min_length) {
         ADEBUG << "Found change lane line, skip other reference line";
         break;
       }

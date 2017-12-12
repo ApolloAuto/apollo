@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_UTIL_JSON_UTIL_H_
-#define MODULES_DREAMVIEW_BACKEND_UTIL_JSON_UTIL_H_
+#ifndef MODULES_COMMON_UTIL_JSON_UTIL_H_
+#define MODULES_COMMON_UTIL_JSON_UTIL_H_
 
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@
 #include "third_party/json/json.hpp"
 
 namespace apollo {
-namespace dreamview {
+namespace common {
 namespace util {
 
 class JsonUtil {
@@ -53,7 +53,7 @@ class JsonUtil {
 };
 
 }  // namespace util
-}  // namespace dreamview
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_UTIL_JSON_UTIL_H_
+#endif  // MODULES_COMMON_UTIL_JSON_UTIL_H_

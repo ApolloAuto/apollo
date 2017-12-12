@@ -25,20 +25,20 @@
 
 const unsigned int CAR_SENSOR_LASER_NUMBER = 64;
 
-using apollo::localization::msf::MapNodeIndex;
-using apollo::localization::msf::LosslessMapNodePool;
-using apollo::localization::msf::LosslessMapConfig;
-using apollo::localization::msf::LosslessMap;
-using apollo::localization::msf::LosslessMapNode;
-using apollo::localization::msf::LosslessMapMatrix;
 using apollo::localization::msf::FeatureXYPlane;
+using apollo::localization::msf::LosslessMap;
+using apollo::localization::msf::LosslessMapConfig;
+using apollo::localization::msf::LosslessMapMatrix;
+using apollo::localization::msf::LosslessMapNode;
+using apollo::localization::msf::LosslessMapNodePool;
+using apollo::localization::msf::MapNodeIndex;
 typedef apollo::localization::msf::FeatureXYPlane::PointT PclPointT;
 typedef apollo::localization::msf::FeatureXYPlane::PointCloudT PclPointCloudT;
 typedef apollo::localization::msf::FeatureXYPlane::PointCloudPtrT
     PclPointCloudPtrT;
 
 bool ParseCommandLine(int argc, char* argv[],
-                        boost::program_options::variables_map* vm) {
+                      boost::program_options::variables_map* vm) {
   boost::program_options::options_description desc("Allowd options");
   desc.add_options()("help", "product help message")(
       "use_plane_inliers_only",
@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
   FILE* file = fopen(file_buf, "a");
 
   if (file) {
-    fprintf(file, "\n\nVeldoyne %dE\n", CAR_SENSOR_LASER_NUMBER);
+    fprintf(file, "\n\nVeldoyne %uE\n", CAR_SENSOR_LASER_NUMBER);
     fprintf(file, "Map coordinate type: %s\n",
             loss_less_config.coordinate_type_.c_str());
     // if (loss_less_config.coordinate_type_ == "LTM") {
@@ -340,7 +340,7 @@ int main(int argc, char** argv) {
           float alt = layer_alts[layer_id];
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
-                          &count_height_diff, height_diff);
+                         &count_height_diff, height_diff);
         }
       } else {
         // Use the altitudes from all layers
@@ -349,7 +349,7 @@ int main(int argc, char** argv) {
           float alt = map.GetAltSafe(pt3d, zone_id, resolution_id);
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
-                          &count_height_diff, height_diff);
+                         &count_height_diff, height_diff);
         }
       }
     }

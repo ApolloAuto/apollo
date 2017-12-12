@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSLESS_MAP_CONFIG_H
-#define BAIDU_ADU_LOSSLESS_MAP_CONFIG_H
+#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_CONFIG_H_
+#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_CONFIG_H_
 
 #include <string>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
@@ -57,4 +57,4 @@ class LosslessMapConfig : public BaseMapConfig {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSLESS_MAP_CONFIG_H
+#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_CONFIG_H_

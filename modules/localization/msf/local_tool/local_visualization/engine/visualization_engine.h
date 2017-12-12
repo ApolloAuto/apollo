@@ -18,16 +18,18 @@
  * @file visualization_engine.h
  * @brief The engine for localization visualization.
  */
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
-#define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
+#ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H_
+#define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H_
 
-#include <opencv2/opencv.hpp>
-#include <Eigen/Geometry>
 #include <list>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Geometry"
+#include "opencv2/opencv.hpp"
+
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
 namespace apollo {
@@ -273,4 +275,4 @@ class VisualizationEngine {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H
+#endif  // MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H_

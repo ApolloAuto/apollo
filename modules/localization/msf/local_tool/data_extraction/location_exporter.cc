@@ -15,9 +15,13 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/data_extraction/location_exporter.h"
+
 #include <string>
+
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace localization {
@@ -28,37 +32,38 @@ LocationExporter::LocationExporter(const std::string &loc_file_folder) {
   lidar_loc_file_ = loc_file_folder + "/lidar_loc.txt";
   fusion_loc_file_ = loc_file_folder + "/fusion_loc.txt";
 
-  if ((gnss_loc_file_handle_ = fopen(gnss_loc_file_.c_str(), "a")) == NULL) {
-    std::cerr << "Cannot open gnss localization file!" << std::endl;
+  if ((gnss_loc_file_handle_ = fopen(gnss_loc_file_.c_str(), "a")) == nullptr) {
+    AERROR << "Cannot open gnss localization file!";
   }
 
-  if ((lidar_loc_file_handle_ = fopen(lidar_loc_file_.c_str(), "a")) == NULL) {
-    std::cerr << "Cannot open lidar localization file!" << std::endl;
+  if ((lidar_loc_file_handle_ = fopen(lidar_loc_file_.c_str(), "a")) ==
+      nullptr) {
+    AERROR << "Cannot open lidar localization file!";
   }
 
   if ((fusion_loc_file_handle_ = fopen(fusion_loc_file_.c_str(), "a")) ==
-      NULL) {
-    std::cerr << "Cannot open fusion localization file!" << std::endl;
+      nullptr) {
+    AERROR << "Cannot open fusion localization file!";
   }
 }
 
 LocationExporter::~LocationExporter() {
-  if (gnss_loc_file_handle_ != NULL) {
+  if (gnss_loc_file_handle_ != nullptr) {
     fclose(gnss_loc_file_handle_);
   }
 
-  if (lidar_loc_file_handle_ != NULL) {
+  if (lidar_loc_file_handle_ != nullptr) {
     fclose(lidar_loc_file_handle_);
   }
 
-  if (fusion_loc_file_handle_ != NULL) {
+  if (fusion_loc_file_handle_ != nullptr) {
     fclose(fusion_loc_file_handle_);
   }
 }
 
 void LocationExporter::GnssLocCallback(
     const rosbag::MessageInstance &msg_instance) {
-  std::cout << "GNSS location callback." << std::endl;
+  AINFO << "GNSS location callback.";
   boost::shared_ptr<LocalizationEstimate> msg =
       msg_instance.instantiate<LocalizationEstimate>();
   static unsigned int index = 1;
@@ -78,7 +83,7 @@ void LocationExporter::GnssLocCallback(
   double std_z = msg->uncertainty().position_std_dev().z();
 
   fprintf(gnss_loc_file_handle_,
-          "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
+          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
@@ -86,7 +91,7 @@ void LocationExporter::GnssLocCallback(
 
 void LocationExporter::LidarLocCallback(
     const rosbag::MessageInstance &msg_instance) {
-  std::cout << "Lidar location callback." << std::endl;
+  AINFO << "Lidar location callback.";
   boost::shared_ptr<LocalizationEstimate> msg =
       msg_instance.instantiate<LocalizationEstimate>();
   static unsigned int index = 1;
@@ -106,7 +111,7 @@ void LocationExporter::LidarLocCallback(
   double std_z = msg->uncertainty().position_std_dev().z();
 
   fprintf(lidar_loc_file_handle_,
-          "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
+          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
@@ -114,7 +119,7 @@ void LocationExporter::LidarLocCallback(
 
 void LocationExporter::FusionLocCallback(
     const rosbag::MessageInstance &msg_instance) {
-  std::cout << "Fusion location callback." << std::endl;
+  AINFO << "Fusion location callback.";
   boost::shared_ptr<LocalizationEstimate> msg =
       msg_instance.instantiate<LocalizationEstimate>();
   static unsigned int index = 1;
@@ -134,7 +139,7 @@ void LocationExporter::FusionLocCallback(
   double std_z = msg->uncertainty().position_std_dev().z();
 
   fprintf(fusion_loc_file_handle_,
-          "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
+          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
           x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;

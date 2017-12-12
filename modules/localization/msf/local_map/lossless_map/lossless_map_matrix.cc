@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
-#include <iostream>
 
 namespace apollo {
 namespace localization {
 namespace msf {
+
 // ======================LosslessMapSingleCell===========================
 LosslessMapSingleCell::LosslessMapSingleCell()
     : intensity(0.0),
@@ -72,6 +72,7 @@ unsigned int LosslessMapSingleCell::LoadBinary(unsigned char* buf) {
   ++p;
   altitude_var = *p;
   ++p;
+  // TODO(Localization): this cast is NOT portable between different platforms
   unsigned int* pp = reinterpret_cast<unsigned int*>(p);
   count = *pp;
   return GetBinarySize();
@@ -90,6 +91,7 @@ unsigned int LosslessMapSingleCell::CreateBinary(unsigned char* buf,
     ++p;
     *p = altitude_var;
     ++p;
+    // TODO(Localization): this cast is NOT portable between different platforms
     unsigned int* pp = reinterpret_cast<unsigned int*>(p);
     *pp = count;
   }
@@ -262,7 +264,7 @@ void LosslessMapCell::GetCount(std::vector<unsigned int>* counts) const {
 LosslessMapMatrix::LosslessMapMatrix() {
   rows_ = 0;
   cols_ = 0;
-  map_cells_ = NULL;
+  map_cells_ = nullptr;
 }
 
 LosslessMapMatrix::~LosslessMapMatrix() {
@@ -301,7 +303,7 @@ void LosslessMapMatrix::Reset(const BaseMapConfig* config) {
 void LosslessMapMatrix::Init(unsigned int rows, unsigned int cols) {
   if (map_cells_) {
     delete[] map_cells_;
-    map_cells_ = NULL;
+    map_cells_ = nullptr;
   }
   map_cells_ = new LosslessMapCell[rows * cols];
   rows_ = rows;
@@ -373,8 +375,8 @@ unsigned int LosslessMapMatrix::GetBinarySize() const {
 void LosslessMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
   *intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
 
-  for (int y = 0; y < rows_; ++y) {
-    for (int x = 0; x < cols_; ++x) {
+  for (uint32_t y = 0; y < rows_; ++y) {
+    for (uint32_t x = 0; x < cols_; ++x) {
       intensity_img->at<unsigned char>(y, x) = GetMapCell(y, x).GetValue();
     }
   }

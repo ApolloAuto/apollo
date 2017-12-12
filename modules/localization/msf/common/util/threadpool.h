@@ -169,10 +169,10 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
  public:
   /// Constructor.
   ThreadPoolImpl()
-      : worker_count_(0),
+      : terminate_all_workers_(false),
+        worker_count_(0),
         target_worker_count_(0),
-        active_worker_count_(0),
-        terminate_all_workers_(false) {
+        active_worker_count_(0) {
     m_scheduler.Clear();
   }
 

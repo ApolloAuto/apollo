@@ -71,7 +71,7 @@ LossyMapMatrix2D::LossyMapMatrix2D(const LossyMapMatrix2D& matrix)
   }
 }
 
-LossyMapMatrix2D& LossyMapMatrix2D::operator= (const LossyMapMatrix2D& matrix) {
+LossyMapMatrix2D& LossyMapMatrix2D::operator=(const LossyMapMatrix2D& matrix) {
   Init(matrix.rows_, matrix.cols_);
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
@@ -143,8 +143,7 @@ uint16_t LossyMapMatrix2D::EncodeVar(const LossyMapCell2D& cell) const {
   return intensity_var;
 }
 
-void LossyMapMatrix2D::DecodeVar(uint16_t data,
-                                 LossyMapCell2D* cell) const {
+void LossyMapMatrix2D::DecodeVar(uint16_t data, LossyMapCell2D* cell) const {
   float var = data;
   var = (var_range_ / var - 1.0) / var_ratio_;
   cell->intensity_var = var * var;
@@ -171,8 +170,7 @@ void LossyMapMatrix2D::DecodeAltitudeGround(uint16_t data,
   return;
 }
 
-uint16_t LossyMapMatrix2D::EncodeAltitudeAvg(
-    const LossyMapCell2D& cell) const {
+uint16_t LossyMapMatrix2D::EncodeAltitudeAvg(const LossyMapCell2D& cell) const {
   float delta_alt = cell.altitude - alt_avg_min_;
   delta_alt /= alt_avg_interval_;
   int ratio = delta_alt + 0.5;
@@ -301,7 +299,8 @@ unsigned int LossyMapMatrix2D::LoadBinary(unsigned char* buf) {
       }
     }
   }
-  pp += 2 * rows_ * cols_;
+  // TODO(Localization): remove this line
+  // pp += 2 * rows_ * cols_;
 
   return GetBinarySize();
 }
@@ -419,7 +418,8 @@ unsigned int LossyMapMatrix2D::CreateBinary(unsigned char* buf,
         pp_low[row * cols_ + col] = altitude % 256;
       }
     }
-    pp += 2 * rows_ * cols_;
+    // TODO(Localization): remove this line
+    // pp += 2 * rows_ * cols_;
   }
   return target_size;
 }
@@ -428,18 +428,17 @@ unsigned int LossyMapMatrix2D::GetBinarySize() const {
   unsigned int target_size =
       sizeof(unsigned int) * 2 + sizeof(float) * 4;  // rows and cols and alts
   // count, intensity, intensity_var, altitude_avg, altitude_ground
-  target_size +=
-      rows_ * cols_ *
-      (sizeof(unsigned char) + sizeof(unsigned char) + sizeof(uint16_t) +
-       sizeof(uint16_t) + sizeof(uint16_t));
+  target_size += rows_ * cols_ *
+                 (sizeof(unsigned char) + sizeof(unsigned char) +
+                  sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint16_t));
   return target_size;
 }
 
 void LossyMapMatrix2D::GetIntensityImg(cv::Mat* intensity_img) const {
   *intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
 
-  for (int y = 0; y < rows_; ++y) {
-    for (int x = 0; x < cols_; ++x) {
+  for (unsigned int y = 0; y < rows_; ++y) {
+    for (unsigned int x = 0; x < cols_; ++x) {
       unsigned int id = y * cols_ + x;
       intensity_img->at<unsigned char>(y, x) =
           (unsigned char)(map_cells_[id].intensity);

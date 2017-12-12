@@ -51,7 +51,7 @@ void PCDExporter::CompensatedPcdCallback(
   std::string pcd_filename = ss_pcd.str();
 
   WritePcdFile(pcd_filename, msg);
-  fprintf(stamp_file_handle_, "%d %lf\n", index, msg->header.stamp.toSec());
+  fprintf(stamp_file_handle_, "%u %lf\n", index, msg->header.stamp.toSec());
 
   ++index;
 }

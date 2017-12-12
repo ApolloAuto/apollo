@@ -52,8 +52,8 @@ MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
 }
 
 bool GetAllMapIndex(const std::string& src_map_folder,
-                       const std::string& dst_map_folder,
-                       std::list<MapNodeIndex>* buf) {
+                    const std::string& dst_map_folder,
+                    std::list<MapNodeIndex>* buf) {
   std::string src_map_path = src_map_folder + "/map";
   std::string dst_map_path = dst_map_folder + "/map";
   boost::filesystem::path src_map_path_boost(src_map_path);
@@ -66,7 +66,6 @@ bool GetAllMapIndex(const std::string& src_map_folder,
   // push path of map's index to list
   buf->clear();
   // std::deque<std::string> map_bin_path;
-  int index = 0;
   boost::filesystem::recursive_directory_iterator end_iter;
   boost::filesystem::recursive_directory_iterator iter(src_map_path_boost);
   for (; iter != end_iter; ++iter) {
@@ -95,17 +94,17 @@ bool GetAllMapIndex(const std::string& src_map_folder,
 }  // namespace localization
 }  // namespace apollo
 
-using apollo::localization::msf::MapNodeIndex;
-using apollo::localization::msf::LossyMapMatrix;
-using apollo::localization::msf::LossyMapConfig;
-using apollo::localization::msf::LossyMapNodePool;
-using apollo::localization::msf::LossyMap;
-using apollo::localization::msf::LossyMapNode;
-using apollo::localization::msf::LosslessMapNodePool;
-using apollo::localization::msf::LosslessMapConfig;
 using apollo::localization::msf::LosslessMap;
-using apollo::localization::msf::LosslessMapNode;
+using apollo::localization::msf::LosslessMapConfig;
 using apollo::localization::msf::LosslessMapMatrix;
+using apollo::localization::msf::LosslessMapNode;
+using apollo::localization::msf::LosslessMapNodePool;
+using apollo::localization::msf::LossyMap;
+using apollo::localization::msf::LossyMapConfig;
+using apollo::localization::msf::LossyMapMatrix;
+using apollo::localization::msf::LossyMapNode;
+using apollo::localization::msf::LossyMapNodePool;
+using apollo::localization::msf::MapNodeIndex;
 
 int main(int argc, char** argv) {
   boost::program_options::options_description boost_desc("Allowed options");

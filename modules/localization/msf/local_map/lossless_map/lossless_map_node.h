@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef BAIDU_ADU_LOSSLESS_MAP_NODE_H
-#define BAIDU_ADU_LOSSLESS_MAP_NODE_H
+#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_NODE_H_
+#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_NODE_H_
 
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
@@ -146,4 +146,4 @@ class LosslessMapNode : public BaseMapNode {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // BAIDU_ADU_LOSSLESS_MAP_NODE_H
+#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_NODE_H_

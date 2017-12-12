@@ -15,8 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
+
 #include <stdio.h>
+
 #include <boost/filesystem.hpp>
+
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
 namespace apollo {
@@ -95,11 +98,10 @@ void MapImageCache::Set(const MapImageKey &key, const cv::Mat &image) {
 
 // =================VisualizationEngine=================
 VisualizationEngine::VisualizationEngine()
-    : image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
-      map_image_cache_(20),
+    : map_image_cache_(20),
+      image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
       big_window_(3072, 3072, CV_8UC3),
-      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
-      map_config_() {
+      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {
   is_init_ = false;
   follow_car_ = true;
   auto_play_ = false;
@@ -760,10 +762,10 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     const Eigen::Vector3d &pt = cloud[i];
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
-    int col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-              map_config_.map_resolutions_[resolution_id_];
-    int row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-              map_config_.map_resolutions_[resolution_id_];
+    uint32_t col = (pt_global[0] - cloud_img_lt_coord_[0]) /
+                   map_config_.map_resolutions_[resolution_id_];
+    uint32_t row = (pt_global[1] - cloud_img_lt_coord_[1]) /
+                   map_config_.map_resolutions_[resolution_id_];
     if (col < 0 || row < 0 || col >= map_config_.map_node_size_x_ ||
         row >= map_config_.map_node_size_y_) {
       continue;

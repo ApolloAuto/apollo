@@ -15,9 +15,13 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
-#include <boost/filesystem.hpp>
+
 #include <map>
 #include <vector>
+
+#include "boost/filesystem.hpp"
+
+#include "modules/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
@@ -62,61 +66,61 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   map_config_.map_version_ = "lossy_map";
   bool success = map_config_.Load(config_file);
   if (!success) {
-    std::cerr << "Load map config failed." << std::endl;
+    AERROR << "Load map config failed.";
     return false;
   }
-  std::cout << "Load map config succeed." << std::endl;
+  AINFO << "Load map config succeed.";
 
   success = velodyne::LoadExtrinsic(extrinsic_file_, &velodyne_extrinsic_);
   if (!success) {
-    std::cerr << "Load velodyne extrinsic failed." << std::endl;
+    AERROR << "Load velodyne extrinsic failed.";
     return false;
   }
-  std::cout << "Load velodyne extrinsic succeed." << std::endl;
+  AERROR << "Load velodyne extrinsic succeed.";
 
   success = PCDTimestampFileHandler();
   if (!success) {
-    std::cerr << "Handle pcd timestamp file failed." << std::endl;
+    AERROR << "Handle pcd timestamp file failed.";
     return false;
   }
-  std::cout << "Handle pcd timestamp file succeed." << std::endl;
+  AINFO << "Handle pcd timestamp file succeed.";
 
   success = LidarLocFileHandler(pcd_timestamps_);
   if (!success) {
-    std::cerr << "Handle lidar localization file failed." << std::endl;
+    AERROR << "Handle lidar localization file failed.";
     return false;
   }
-  std::cout << "Handle lidar localization file succeed." << std::endl;
+  AINFO << "Handle lidar localization file succeed.";
 
   success = GnssLocFileHandler(pcd_timestamps_);
   if (!success) {
-    std::cerr << "Handle gnss localization file failed." << std::endl;
+    AERROR << "Handle gnss localization file failed.";
     return false;
   }
-  std::cout << "Handle gnss localization file succeed." << std::endl;
+  AINFO << "Handle gnss localization file succeed.";
 
   success = FusionLocFileHandler(pcd_timestamps_);
   if (!success) {
-    std::cerr << "Handle fusion localization file failed." << std::endl;
+    AERROR << "Handle fusion localization file failed.";
     return false;
   }
-  std::cout << "Handle fusion localization file succeed." << std::endl;
+  AINFO << "Handle fusion localization file succeed.";
 
   resolution_id_ = 0;
   success = GetZoneIdFromMapFolder(map_folder_, resolution_id_, &zone_id_);
   if (!success) {
-    std::cerr << "Get zone id failed." << std::endl;
+    AERROR << "Get zone id failed.";
     return false;
   }
-  std::cout << "Get zone id succeed." << std::endl;
+  AINFO << "Get zone id succeed.";
 
   success = visual_engine_.Init(map_folder_, map_config_, resolution_id_,
                                 zone_id_, velodyne_extrinsic_, LOC_INFO_NUM);
   if (!success) {
-    std::cerr << "Visualization engine init failed." << std::endl;
+    AERROR << "Visualization engine init failed.";
     return false;
   }
-  std::cout << "Visualization engine init succeed." << std::endl;
+  AINFO << "Visualization engine init succeed.";
 
   return true;
 }
@@ -127,12 +131,12 @@ void OfflineLocalVisualizer::Visualize() {
     LocalizatonInfo gnss_loc_info;
     LocalizatonInfo fusion_loc_info;
 
-    std::cout << "Frame id: " << idx + 1 << std::endl;
+    AINFO << "Frame id: " << idx + 1;
     auto pose_found_iter = lidar_poses_.find(idx);
     auto std_found_iter = lidar_stds_.find(idx);
     if (pose_found_iter != lidar_poses_.end() &&
         std_found_iter != lidar_stds_.end()) {
-      std::cout << "Find lidar pose." << std::endl;
+      AINFO << "Find lidar pose.";
       const Eigen::Affine3d &lidar_pose = pose_found_iter->second;
       const Eigen::Vector3d &lidar_std = std_found_iter->second;
       // lidar_loc_info.set(lidar_pose, "Lidar.", pcd_timestamps_[idx], idx +
@@ -146,7 +150,7 @@ void OfflineLocalVisualizer::Visualize() {
     std_found_iter = gnss_stds_.find(idx);
     if (pose_found_iter != gnss_poses_.end() &&
         std_found_iter != gnss_stds_.end()) {
-      std::cout << "Find gnss pose." << std::endl;
+      AINFO << "Find gnss pose.";
       const Eigen::Affine3d &gnss_pose = pose_found_iter->second;
       const Eigen::Vector3d &gnss_std = std_found_iter->second;
       // gnss_loc_info.set(gnss_pose, "GNSS.", pcd_timestamps_[idx], idx + 1);
@@ -158,7 +162,7 @@ void OfflineLocalVisualizer::Visualize() {
     std_found_iter = fusion_stds_.find(idx);
     if (pose_found_iter != fusion_poses_.end() &&
         std_found_iter != fusion_stds_.end()) {
-      std::cout << "Find fusion pose." << std::endl;
+      AINFO << "Find fusion pose.";
       const Eigen::Affine3d &fusion_pose = pose_found_iter->second;
       const Eigen::Vector3d &fusion_std = std_found_iter->second;
       // fusion_loc_info.set(fusion_pose, "Fusion.", pcd_timestamps_[idx],
@@ -194,14 +198,13 @@ bool OfflineLocalVisualizer::PCDTimestampFileHandler() {
   if (file) {
     unsigned int index;
     double timestamp;
-    int size = 2;
-    while ((size = fscanf(file, "%u %lf\n", &index, &timestamp)) == 2) {
+    int kSize = 2;
+    while (fscanf(file, "%u %lf\n", &index, &timestamp) == kSize) {
       pcd_timestamps_.push_back(timestamp);
     }
     fclose(file);
   } else {
-    std::cerr << "Can't open file to read: " << pcd_timestamp_file_
-              << std::endl;
+    AERROR << "Can't open file to read: " << pcd_timestamp_file_;
     return false;
   }
 
@@ -250,6 +253,8 @@ bool OfflineLocalVisualizer::FusionLocFileHandler(
                                 &fusion_poses_, &fusion_stds_);
   return true;
 }
+
+// TODO(Localization): remove the commented code
 
 // void OfflineLocalVisualizer::PoseInterpolationByTime(
 //     const std::vector<Eigen::Affine3d> &in_poses,
@@ -310,11 +315,11 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
     std::map<unsigned int, Eigen::Affine3d> *out_poses,
     std::map<unsigned int, Eigen::Vector3d> *out_stds) {
   unsigned int index = 0;
-  for (size_t i = 0; i < ref_timestamps.size(); i++) {
+  for (size_t i = 0; i < ref_timestamps.size(); ++i) {
     double ref_timestamp = ref_timestamps[i];
     // unsigned int ref_frame_id = i;
     // unsigned int matched_index = 0;
-    while (in_timestamps[index] < ref_timestamp &&
+    while (in_timestamps.at(index) < ref_timestamp &&
            index < in_timestamps.size()) {
       ++index;
     }
@@ -354,10 +359,9 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
         (*out_stds)[i] = std;
       }
     } else {
-      std::cerr << "[ERROR] No more poses. Exit now." << std::endl;
+      AERROR << "[ERROR] No more poses. Exit now.";
       break;
     }
-    // std::cout << "Frame_id: " << i << std::endl;
   }
 }
 
@@ -381,7 +385,7 @@ bool OfflineLocalVisualizer::GetZoneIdFromMapFolder(
           zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
       *zone_id = -(std::stoi(zone_id_str));
-      std::cout << "Find zone id: " << *zone_id << std::endl;
+      AINFO << "Find zone id: " << *zone_id;
       return true;
     }
   }
@@ -391,7 +395,7 @@ bool OfflineLocalVisualizer::GetZoneIdFromMapFolder(
       zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
 
   *zone_id = (std::stoi(zone_id_str));
-  std::cout << "Find zone id: " << *zone_id << std::endl;
+  AINFO << "Find zone id: " << *zone_id;
   return true;
 }
 
