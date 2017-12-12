@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/util/json_util.h"
+#include "modules/common/util/json_util.h"
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/common/log.h"
 
 namespace apollo {
-namespace dreamview {
+namespace common {
 namespace util {
 namespace {
 
@@ -92,5 +92,5 @@ bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
 }
 
 }  // namespace util
-}  // namespace dreamview
+}  // namespace common
 }  // namespace apollo
