@@ -134,6 +134,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
     // backup plan: use piecewise_st_graph
     if (ret != Status::OK()) {
+      AERROR << "Spline QP speed solver Failed. "
+             << "Using finite difference method.";
       QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_);
       ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);
 
