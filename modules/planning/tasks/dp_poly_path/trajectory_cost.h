@@ -45,13 +45,16 @@ class TrajectoryCost {
                           const SpeedData &heuristic_speed_data,
                           const common::SLPoint &init_sl_point);
   double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
-                   const double end_s) const;
+                   const double end_s, const uint32_t curr_level,
+                   const uint32_t total_level) const;
   double RiskDistanceCost(const double distance) const;
   double RegularDistanceCost(const double distance) const;
 
  private:
   double CalculatePathCost(const QuinticPolynomialCurve1d &curve,
-                           const double start_s, const double end_s) const;
+                           const double start_s, const double end_s,
+                           const uint32_t curr_level,
+                           const uint32_t total_level) const;
   double CalculateStaticObstacleCost(const QuinticPolynomialCurve1d &curve,
                                      const double start_s,
                                      const double end_s) const;
