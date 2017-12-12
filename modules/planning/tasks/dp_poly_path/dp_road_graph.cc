@@ -166,7 +166,8 @@ bool DPRoadGraph::GenerateMinCostPath(
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
         const double cost =
-            trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s()) +
+            trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s(),
+                                      level, path_waypoints.size()) +
             prev_dp_node.min_cost;
         cur_node.UpdateCost(&prev_dp_node, curve, cost);
 
@@ -179,7 +180,8 @@ bool DPRoadGraph::GenerateMinCostPath(
                                          cur_point.l(), 0.0, 0.0,
                                          cur_point.s() - init_sl_point_.s());
           const double cost = trajectory_cost.Calculate(
-              curve, init_sl_point_.s(), cur_point.s());
+              curve, init_sl_point_.s(), cur_point.s(), level,
+              path_waypoints.size());
 
           cur_node.UpdateCost(&(graph_nodes.front().front()), curve, cost);
         }

@@ -108,7 +108,9 @@ TrajectoryCost::TrajectoryCost(
 
 double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
                                          const double start_s,
-                                         const double end_s) const {
+                                         const double end_s,
+                                         const uint32_t curr_level,
+                                         const uint32_t total_level) const {
   double path_cost = 0.0;
   for (double path_s = 0.0; path_s < (end_s - start_s);
        path_s += config_.path_resolution()) {
@@ -146,8 +148,11 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
   }
   path_cost *= config_.path_resolution();
 
-  const double end_l = curve.Evaluate(0, end_s - start_s);
-  path_cost += std::fabs(end_l) * config_.path_end_l_cost();
+  if (curr_level == total_level) {
+    const double end_l = curve.Evaluate(0, end_s - start_s);
+    path_cost +=
+        std::fabs(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
+  }
   return path_cost;
 }
 
@@ -243,11 +248,13 @@ Box2d TrajectoryCost::GetBoxFromSLPoint(const common::SLPoint &sl,
 
 // TODO(All): optimize obstacle cost calculation time
 double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
-                                 const double start_s,
-                                 const double end_s) const {
+                                 const double start_s, const double end_s,
+                                 const uint32_t curr_level,
+                                 const uint32_t total_level) const {
   double total_cost = 0.0;
   // path cost
-  total_cost += CalculatePathCost(curve, start_s, end_s);
+  total_cost +=
+      CalculatePathCost(curve, start_s, end_s, curr_level, total_level);
 
   // static obstacle cost
   total_cost += CalculateStaticObstacleCost(curve, start_s, end_s);
