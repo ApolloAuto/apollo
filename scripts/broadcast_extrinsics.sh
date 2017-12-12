@@ -16,21 +16,24 @@
 # limitations under the License.
 ###############################################################################
 
-function print_usage() {
-  echo 'Options:
-    publish: broadcast the extrinsic
-    clean: extrinsics clean
-  '
-}
 
-case $1 in
-  publish)
-    nohup python /apollo/modules/tools/extrinsics_broadcaster/extrinsics_broadcaster.py $2 &
-    ;;
-  clean)
-    ps -ef | grep static_transform_publisher | awk '{print $2}' | xargs kill -2
-    ;;
-  *)
-    print_usage
-    ;;
-esac
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd "${DIR}/.."
+
+source "${DIR}/apollo_base.sh"
+
+EXTRINSICS_FILES=(
+  "modules/perception/data/params/long_camera_extrinsics.yaml"
+  "modules/perception/data/params/short_camera_extrinsics.yaml"
+  "modules/perception/data/params/radar_extrinsics.yaml"
+  "modules/perception/data/params/radar_front_extrinsics.yaml"
+  "${ROS_ROOT}/../velodyne_pointcloud/params/velodyne64_novatel_extrinsics_example.yaml"
+  "${ROS_ROOT}/../velodyne_pointcloud/params/velodyne16_novatel_extrinsics_example.yaml"
+)
+
+bash modules/tools/extrinsics_broadcaster/extrinsics_broadcaster.sh clean
+for i in "${EXTRINSICS_FILES[@]}"
+do
+  bash modules/tools/extrinsics_broadcaster/extrinsics_broadcaster.sh publish "${i}"
+done
