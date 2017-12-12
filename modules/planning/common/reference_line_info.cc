@@ -133,6 +133,14 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
 
+const double ReferenceLineInfo::TrajectoryLength() const {
+  const auto& tps = discretized_trajectory_.trajectory_points();
+  if (tps.empty()) {
+    return 0.0;
+  }
+  return tps.back().path_point().s();
+}
+
 bool ReferenceLineInfo::IsStartFrom(
     const ReferenceLineInfo& previous_reference_line_info) const {
   if (reference_line_.reference_points().empty()) {

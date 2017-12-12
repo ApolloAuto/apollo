@@ -48,6 +48,7 @@ DECLARE_bool(prioritize_change_lane);
 DECLARE_bool(reckless_change_lane);
 DECLARE_double(change_lane_fail_freeze_time);
 DECLARE_double(change_lane_success_freeze_time);
+DECLARE_double(change_lane_min_length);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
