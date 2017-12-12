@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_UTIL_HTTP_CLIENT_H_
-#define MODULES_DREAMVIEW_BACKEND_UTIL_HTTP_CLIENT_H_
+#ifndef MODULES_COMMON_UTIL_HTTP_CLIENT_H_
+#define MODULES_COMMON_UTIL_HTTP_CLIENT_H_
 
 #include <string>
 
@@ -23,7 +23,7 @@
 #include "third_party/json/json.hpp"
 
 namespace apollo {
-namespace dreamview {
+namespace common {
 namespace util {
 
 class HttpClient {
@@ -31,20 +31,18 @@ class HttpClient {
   /**
    * @brief post a json to target url, get response as string.
    */
-  static apollo::common::Status Post(const std::string &url,
-                                     const nlohmann::json &json,
-                                     std::string *result = nullptr);
+  static Status Post(const std::string &url, const nlohmann::json &json,
+                     std::string *result = nullptr);
 
   /**
    * @brief post a json to target url, get response as json.
    */
-  static apollo::common::Status Post(const std::string &url,
-                                     const nlohmann::json &json,
-                                     nlohmann::json *result);
+  static Status Post(const std::string &url, const nlohmann::json &json,
+                     nlohmann::json *result);
 };
 
 }  // namespace util
-}  // namespace dreamview
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_UTIL_HTTP_CLIENT_H_
+#endif  // MODULES_COMMON_UTIL_HTTP_CLIENT_H_

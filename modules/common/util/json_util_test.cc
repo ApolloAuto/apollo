@@ -14,27 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/util/json_util.h"
+#include "modules/common/util/json_util.h"
 
 #include "google/protobuf/util/json_util.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "modules/dreamview/proto/hmi_status.pb.h"
+#include "modules/common/proto/error_code.pb.h"
 
 namespace apollo {
-namespace dreamview {
+namespace common {
 namespace util {
 
 using Json = nlohmann::json;
 
 TEST(JsonUtilTest, ProtoToTypedJson) {
-  HMIStatus status;
-  status.set_current_map("MapA");
+  StatusPb status;
+  status.set_msg("MsgA");
   const std::string json_str = JsonUtil::ProtoToTypedJson("TypeA", status);
 
   Json json_obj = Json::parse(json_str.begin(), json_str.end());
   EXPECT_EQ("TypeA", json_obj["type"]);
-  EXPECT_EQ("MapA", json_obj["data"]["currentMap"]);
+  EXPECT_EQ("MsgA", json_obj["data"]["msg"]);
 }
 
 TEST(JsonUtilTest, GetStringFromJson) {
@@ -95,5 +95,5 @@ TEST(JsonUtilTest, GetStringVectorFromJson) {
 }
 
 }  // namespace util
-}  // namespace dreamview
+}  // namespace common
 }  // namespace apollo
