@@ -60,6 +60,7 @@ int SignalLightScenario::ComputeScenarioDecision(
 
 
   ret.set_decision_type(PlanningTarget::CRUISE);
+  ret.set_cruise_speed(FLAGS_default_cruise_speed);
   double stop_s = std::numeric_limits<double>::max();
 
   for (const hdmap::PathOverlap* signal_light : signal_lights_along_reference_line_) {
@@ -78,7 +79,7 @@ int SignalLightScenario::ComputeScenarioDecision(
         ret.set_decision_type(PlanningTarget::STOP);
         ret.set_stop_point(stop_s);
       }
-      //CreateStopObstacle(frame, reference_line_info, signal_light);
+      CreateStopObstacle(frame, reference_line_info, signal_light);
     }
   }
 
@@ -95,6 +96,8 @@ bool SignalLightScenario::FindValidSignalLight(
   if (signal_lights.size() <= 0) {
     ADEBUG << "No signal lights from reference line.";
     return false;
+  } else {
+    AINFO << "Found signal_lights size=" << signal_lights.size();
   }
   signal_lights_along_reference_line_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
@@ -114,7 +117,7 @@ void SignalLightScenario::ReadSignals() {
   }
   if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
       FLAGS_signal_expire_time_sec) {
-    ADEBUG << "traffic signals msg is expired: "
+    AWARN << "traffic signals msg is expired: "
            << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
     return;
   }
@@ -161,6 +164,37 @@ double SignalLightScenario::GetStopDeceleration(
     return std::numeric_limits<double>::max();
   }
   return (adc_speed * adc_speed) / (2 * stop_distance);
+}
+
+void SignalLightScenario::CreateStopObstacle(
+    Frame* frame, ReferenceLineInfo* const reference_line_info,
+    const hdmap::PathOverlap* signal_light) {
+  const auto& reference_line = reference_line_info->reference_line();
+  const double stop_s =
+      signal_light->start_s - FLAGS_stop_distance_traffic_light;
+  const double box_center_s =
+      signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
+  if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
+      !WithinBound(0.0, reference_line.Length(), box_center_s)) {
+    ADEBUG << "signal " << signal_light->object_id
+           << " is not on reference line";
+    return;
+  }
+  double heading = reference_line.GetReferencePoint(stop_s).heading();
+  double left_lane_width = 0.0;
+  double right_lane_width = 0.0;
+  reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
+                              &right_lane_width);
+
+  auto box_center = reference_line.GetReferencePoint(box_center_s);
+  common::math::Box2d stop_box{box_center, heading,
+                               FLAGS_virtual_stop_wall_length,
+                               left_lane_width + right_lane_width};
+
+  PathObstacle* stop_wall =
+      reference_line_info->AddObstacle(frame->AddStaticVirtualObstacle(
+          FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
+          stop_box));
 }
 
 }

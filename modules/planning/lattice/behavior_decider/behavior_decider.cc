@@ -64,6 +64,11 @@ PlanningTarget BehaviorDecider::Analyze(
 
   PlanningTarget ret;
   ret.CopyFrom(scenario_decisions[0]);
+  if (ret.decision_type() == PlanningTarget::CRUISE) {
+    AINFO << "PlanningTarget set_decision_type: [CRUISE]";
+  } else {
+    AINFO << "PlanningTarget set_decision_type: [STOP]";
+  }
   for (const auto& reference_point : discretized_reference_line) {
     ret.mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
@@ -75,7 +80,7 @@ PlanningTarget BehaviorDecider::Analyze(
     AINFO << "STOP decision when near the routing end.";
     return ret;
   } else {
-    AINFO << "GO decision made";
+    AINFO << "Not approaching destination yet";
   }
 
   PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
@@ -98,17 +103,19 @@ PlanningTarget BehaviorDecider::Analyze(
     }
   }
 
-  if (sample_bounds.empty()) {
+  if (sample_bounds.empty() &&
+    ret.decision_type() != PlanningTarget::STOP) {
     ret.set_decision_type(PlanningTarget::CRUISE);
     ret.set_cruise_speed(FLAGS_default_cruise_speed);
+    AINFO << "Setting PlanningTarget into CRUISE with ZERO sample bound";
     return ret;
   }
 
   for (const auto& sample_bound : sample_bounds) {
     ret.add_sample_bound()->CopyFrom(sample_bound);
   }
-  ret.set_decision_type(PlanningTarget::CRUISE);
-  ret.set_cruise_speed(FLAGS_default_cruise_speed);
+  //ret.set_decision_type(PlanningTarget::CRUISE);
+  //ret.set_cruise_speed(FLAGS_default_cruise_speed);
   return ret;
 }
 
@@ -132,6 +139,7 @@ bool BehaviorDecider::StopDecisionNearDestination(
   if (res_s <= stop_margin) {
     planning_target->set_decision_type(PlanningTarget::STOP);
     planning_target->set_stop_point(routing_end_matched_point.s());
+    AINFO << "Setting PlanningTarget into STOP as res_s <= stop_margin";
     return true;
   } else {
     double v = lon_init_state[1];
@@ -140,6 +148,7 @@ bool BehaviorDecider::StopDecisionNearDestination(
     if (required_stop_deceleration > stop_acc_thred) {
       planning_target->set_decision_type(PlanningTarget::STOP);
       planning_target->set_stop_point(routing_end_matched_point.s());
+      AINFO << "Setting PlanningTarget into STOP as required_stop_deceleration > stop_acc_thred";
       return true;
     } else {
       AINFO << "required_stop_deceleration requirement not satisfied";

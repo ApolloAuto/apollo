@@ -87,7 +87,7 @@ double TrajectoryEvaluator::evaluate(
 
   // these numbers are for temporary use; needs to be tuned later.
   double weight_lon_jerk = 1.0;
-  double weight_lon_objective = 3.0;
+  double weight_lon_objective = 3000.0;
   double weight_lat_offset = 10.0;
 
   double t = 0.0;
