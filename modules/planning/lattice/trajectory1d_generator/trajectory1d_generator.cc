@@ -113,7 +113,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
 void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     const double target_speed,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-
+  AINFO << "cruise speed is  " << target_speed;
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForCruising(target_speed);
 
@@ -157,11 +157,16 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
     const double stop_position,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   AINFO << "stop position s = " << stop_position;
-  AINFO << "init_state s = " << init_lon_state_[0];
+  AINFO << "init_state s = " << init_lon_state_[0]
+    << " init_state ds = " << init_lon_state_[1]
+    << " init_state dds = " << init_lon_state_[2];
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForStopping(stop_position);
   AINFO << "end condition size = " << end_conditions.size();
   for (const auto& end_condition : end_conditions) {
+    AINFO << " --- end_conditiion " << end_condition.first[0]
+      << " " << end_condition.first[1] << " " << end_condition.first[2]
+      << " t="<< end_condition.second;
     std::shared_ptr<Curve1d> ptr_lon_trajectory =
         std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
             init_lon_state_, end_condition.first, end_condition.second));
@@ -177,10 +182,9 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   if (planning_target.decision_type() == PlanningTarget::STOP) {
     GenerateSpeedProfilesForStopping(planning_target.stop_point(),
       ptr_lon_trajectory_bundle);
-  } else {
-    GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
-      ptr_lon_trajectory_bundle);
   }
+  GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
+    ptr_lon_trajectory_bundle);
 
   // std::vector<SampleBound> sample_bounds;
   // for (const SampleBound& sample_bound : planning_target.sample_bound()) {

@@ -42,6 +42,9 @@ class SignalLightScenario : public Scenario {
   double GetStopDeceleration(
     ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light);
+  void CreateStopObstacle(
+    Frame* frame, ReferenceLineInfo* const reference_line_info,
+    const hdmap::PathOverlap* signal_light);
 
   std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
