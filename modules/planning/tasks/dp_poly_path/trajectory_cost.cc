@@ -144,7 +144,11 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
     const double ddl = std::fabs(curve.Evaluate(2, path_s));
     path_cost += ddl * ddl * config_.path_ddl_cost();
   }
-  return path_cost * config_.path_resolution();
+  path_cost *= config_.path_resolution();
+
+  const double end_l = curve.Evaluate(0, end_s - start_s);
+  path_cost += std::fabs(end_l) * config_.path_end_l_cost();
+  return path_cost;
 }
 
 double TrajectoryCost::CalculateStaticObstacleCost(
