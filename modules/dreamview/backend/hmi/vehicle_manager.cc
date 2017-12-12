@@ -55,6 +55,12 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
     AINFO_IF(ret) << "Copied " << source_path << " to " << dest_path;
   }
 
+  static const std::string kBroadcastExtrinsicsCmd =
+      "bash scripts/broadcast_extrinsics.sh";
+  const int ret = std::system(kBroadcastExtrinsicsCmd.c_str());
+  AERROR_IF(ret != 0) << "Command returns " << ret
+      << ": " << kBroadcastExtrinsicsCmd;
+
   return true;
 }
 
