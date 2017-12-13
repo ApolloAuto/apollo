@@ -8,7 +8,6 @@ import Planning from "store/planning";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
 import TrafficSignal from "store/traffic_signal";
-import Video from "store/video";
 import PARAMETERS from "store/config/parameters.yml";
 
 class DreamviewStore {
@@ -44,11 +43,15 @@ class DreamviewStore {
 
     @observable options = new Options();
 
-    @observable video = new Video();
-
     @observable routeEditingManager = new RouteEditingManager();
 
     @observable geolocation = {};
+
+    @observable moduleDelay = observable.map();
+
+    @computed get enableHMIButtonsOnly() {
+        return !this.isInitialized || this.hmi.showNavigationMap;
+    }
 
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;
@@ -88,6 +91,23 @@ class DreamviewStore {
         this.options.showPlanningReference = false;
         this.options.showPlaningDpOptimizer = false;
         this.options.showPlanningQpOptimizer = false;
+    }
+
+    @action updateModuleDelay(world) {
+        if(world && world.delay) {
+            for(module in world.delay) {
+                const hasNotUpdated = (world.delay[module] < 0);
+                const delay = hasNotUpdated ? '-' : world.delay[module].toFixed(2);
+                if (this.moduleDelay.has(module)){
+                    this.moduleDelay.get(module).delay = delay;
+                } else {
+                    this.moduleDelay.set(module, {
+                        delay: delay,
+                        name: module[0].toUpperCase() + module.slice(1),
+                    });
+                }
+            }
+        }
     }
 
     handleSideBarClick(option) {
