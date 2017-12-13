@@ -4,7 +4,6 @@ import PARAMETERS from "store/config/parameters.yml";
 
 export default class Options {
     // Side Bar options
-    @observable showConsole = PARAMETERS.options.defaults.showConsole;
     @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
@@ -13,10 +12,10 @@ export default class Options {
 
     @observable showMenu =
         OFFLINE_PLAYBACK ? true : PARAMETERS.options.defaults.showMenu;
-    @observable showQuickStarter =
-        OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showQuickStarter;
+    @observable showTasks =
+        OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showTasks;
 
-    mutuallyExclusiveOptions = ['showQuickStarter', 'showModuleController',
+    mutuallyExclusiveOptions = ['showTasks', 'showModuleController',
         'showMenu', 'showRouteEditingBar'];
 
     // Layer Menu options
@@ -50,10 +49,9 @@ export default class Options {
 
 
     @computed get showTools() {
-        return this.showQuickStarter ||
+        return this.showTasks ||
                this.showModuleController ||
                this.showMenu ||
-               this.showConsole ||
                this.showPOI;
     }
 
