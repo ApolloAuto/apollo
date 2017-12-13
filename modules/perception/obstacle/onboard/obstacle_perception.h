@@ -44,6 +44,7 @@ class ObstaclePerception {
   void SetGlobalOffset(const Eigen::Vector3d& global_offset);
 
  private:
+  void RegistAllAlgorithm();
   std::unique_ptr<LidarProcess> lidar_perception_;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
   std::unique_ptr<BaseFusion> fusion_;
