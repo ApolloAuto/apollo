@@ -18,6 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
