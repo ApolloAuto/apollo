@@ -81,10 +81,6 @@ void PathTimeNeighborhood::SetupObstacles(
   const auto& obstacles = frame->obstacles();
 
   for (const Obstacle* obstacle : obstacles) {
-    if (obstacle->Trajectory().trajectory_point_size() == 0) {
-      continue;
-    }
-
     if (prediction_traj_map_.find(obstacle->Id()) ==
         prediction_traj_map_.end()) {
       prediction_traj_map_[obstacle->Id()] = obstacle->Trajectory();
@@ -181,7 +177,9 @@ double PathTimeNeighborhood::SpeedAtT(
   prediction::Trajectory trajectory =
       prediction_traj_map_.at(obstacle_id);
   int num_traj_point = trajectory.trajectory_point_size();
-  CHECK_GT(num_traj_point, 0);
+  if (num_traj_point == 0) {
+    return 0.0;
+  }
 
   int index = LastIndexBefore(trajectory, t);
   if (index == -1) {
