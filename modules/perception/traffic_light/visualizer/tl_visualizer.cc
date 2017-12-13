@@ -22,6 +22,7 @@
 
 using apollo::perception::traffic_light::Image;
 using apollo::perception::traffic_light::CameraId;
+using apollo::perception::TrafficLightDetection;
 
 std::map<std::string, cv::Scalar> kColorTable = {
     {std::string("red_light_box"), cv::Scalar(0, 0, 255)},
@@ -36,9 +37,9 @@ std::map<std::string, cv::Scalar> kColorTable = {
 std::vector<std::shared_ptr<Image>> cached_images;
 const int kMaxCachedImageNum = 100;
 
-void SubDebugCallback(const apollo::perception::TrafficLightDetection &tl_result);
-void SubLongFocusCallback(const sensor_msgs::ImagePtr &msg);
-void SubShortFocusCallback(const sensor_msgs::ImagePtr &msg);
+void SubDebugCallback(const TrafficLightDetection &);
+void SubLongFocusCallback(const sensor_msgs::ImagePtr &);
+void SubShortFocusCallback(const sensor_msgs::ImagePtr &);
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "traffic_light_viz_listener");
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-void SubDebugCallback(const apollo::perception::TrafficLightDetection &tl_result) {
+void SubDebugCallback(const TrafficLightDetection &tl_result) {
   auto img_ts = tl_result.header().camera_timestamp() / 1e9;
   auto tl_debug_msg = tl_result.traffic_light_debug();
   auto signals_num = tl_debug_msg.signal_num();
