@@ -41,12 +41,15 @@ namespace planning {
 
 using MapPath = hdmap::Path;
 using apollo::common::SLPoint;
+using apollo::hdmap::InterpolatedIndex;
 
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points),
       map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
-          reference_points.begin(), reference_points.end()))) {}
+          reference_points.begin(), reference_points.end()))) {
+  CHECK_EQ(map_path_.num_points(), reference_points_.size());
+}
 
 ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
     : map_path_(hdmap_path) {
@@ -57,6 +60,7 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
         hdmap::MapPathPoint(point, point.heading(), lane_waypoint), 0.0, 0.0,
         0.0, 0.0);
   }
+  CHECK_EQ(map_path_.num_points(), reference_points_.size());
 }
 
 bool ReferenceLine::Stitch(const ReferenceLine& other) {
@@ -191,20 +195,21 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
     return reference_points_.back();
   }
 
-  auto it_lower =
-      std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
-  if (it_lower == accumulated_s.begin()) {
-    return reference_points_.front();
-  } else {
-    auto index = std::distance(accumulated_s.begin(), it_lower);
-    const auto& p0 = reference_points_[index - 1];
-    const auto& p1 = reference_points_[index];
+  auto interpolate_index = map_path_.GetIndexFromS(s);
+  ADEBUG << interpolate_index.id << ", " << interpolate_index.offset;
 
-    const double s0 = accumulated_s[index - 1];
-    const double s1 = accumulated_s[index];
-
-    return Interpolate(p0, s0, p1, s1, s);
+  uint32_t index = interpolate_index.id;
+  uint32_t next_index = index + 1;
+  if (next_index >= reference_points_.size()) {
+    next_index = reference_points_.size() - 1;
   }
+
+  const auto& p0 = reference_points_[index];
+  const auto& p1 = reference_points_[next_index];
+
+  const double s0 = accumulated_s[index];
+  const double s1 = accumulated_s[next_index];
+  return InterpolateWithMatchedIndex(p0, s0, p1, s1, interpolate_index);
 }
 
 double ReferenceLine::FindMinDistancePoint(const ReferencePoint& p0,
@@ -293,6 +298,30 @@ bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
   return true;
 }
 
+ReferencePoint ReferenceLine::InterpolateWithMatchedIndex(
+    const ReferencePoint& p0, const double s0, const ReferencePoint& p1,
+    const double s1, const InterpolatedIndex& index) const {
+  if (std::fabs(s0 - s1) < common::math::kMathEpsilon) {
+    return p0;
+  }
+  double s = s0 + index.offset;
+  DCHECK_LE(s0 - 1.0e-6, s) << " s: " << s << " is less than s0 :" << s0;
+  DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
+  CHECK(!p0.lane_waypoints().empty());
+  CHECK(!p1.lane_waypoints().empty());
+
+  auto map_path_point = map_path_.GetSmoothPoint(index);
+  double upper_bound = 0.0;
+  double lower_bound = 0.0;
+  map_path_.GetWidth(s, &upper_bound, &lower_bound);
+
+  const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
+  const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
+
+  return ReferencePoint(map_path_point, kappa, dkappa, lower_bound,
+                        upper_bound);
+}
+
 ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
                                           const double s0,
                                           const ReferencePoint& p1,
@@ -301,7 +330,7 @@ ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
     return p0;
   }
   DCHECK_LE(s0 - 1.0e-6, s) << " s: " << s << " is less than s0 :" << s0;
-  DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << "is larger than s1: " << s1;
+  DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
 
   CHECK(!p0.lane_waypoints().empty());
   CHECK(!p1.lane_waypoints().empty());
