@@ -33,8 +33,8 @@ class JsonUtil {
    * @brief Convert proto to a json string.
    * @return A json with two fields: {type:<json_type>, data:<proto_to_json>}.
    */
-  static std::string ProtoToTypedJson(const std::string &json_type,
-                                      const google::protobuf::Message &proto);
+  static nlohmann::json ProtoToTypedJson(
+      const std::string &json_type, const google::protobuf::Message &proto);
 
   /**
    * @brief Get a string value from the given json[key].

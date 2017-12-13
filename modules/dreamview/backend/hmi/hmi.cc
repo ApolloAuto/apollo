@@ -170,10 +170,10 @@ void HMI::RegisterMessageHandlers() {
   // Send current config and status to new HMI client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
-        websocket_->SendData(conn,
-                             JsonUtil::ProtoToTypedJson("HMIConfig", config_));
-        websocket_->SendData(conn,
-                             JsonUtil::ProtoToTypedJson("HMIStatus", status_));
+        websocket_->SendData(
+            conn, JsonUtil::ProtoToTypedJson("HMIConfig", config_).dump());
+        websocket_->SendData(
+            conn, JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
       });
 
   // HMI client asks for executing module command.
@@ -289,7 +289,8 @@ void HMI::RegisterMessageHandlers() {
 void HMI::BroadcastHMIStatus() const {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
   if (websocket_) {
-    websocket_->BroadcastData(JsonUtil::ProtoToTypedJson("HMIStatus", status_));
+    websocket_->BroadcastData(
+        JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
   }
 }
 

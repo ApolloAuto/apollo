@@ -34,4 +34,7 @@ message MonitorConf {
     optional TopicConf topic_conf = 2;
   }
   repeated HardwareConf hardware = 2;
+
+  // End point for vehicle to report status.
+  optional string online_report_endpoint = 3;
 }

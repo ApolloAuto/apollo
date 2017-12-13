@@ -14,13 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_COMMON_MONITOR_INTERFACE_H_
-#define MODULES_MONITOR_COMMON_MONITOR_INTERFACE_H_
+#ifndef MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
+#define MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
 
 #include <string>
 
 #include "modules/common/macro.h"
-#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -48,4 +47,4 @@ class MonitorManager {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_COMMON_MONITOR_INTERFACE_H_
+#endif  // MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_

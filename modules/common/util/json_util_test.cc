@@ -30,9 +30,8 @@ using Json = nlohmann::json;
 TEST(JsonUtilTest, ProtoToTypedJson) {
   StatusPb status;
   status.set_msg("MsgA");
-  const std::string json_str = JsonUtil::ProtoToTypedJson("TypeA", status);
 
-  Json json_obj = Json::parse(json_str.begin(), json_str.end());
+  Json json_obj = JsonUtil::ProtoToTypedJson("TypeA", status);
   EXPECT_EQ("TypeA", json_obj["type"]);
   EXPECT_EQ("MsgA", json_obj["data"]["msg"]);
 }

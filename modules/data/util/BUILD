@@ -23,17 +23,4 @@ cc_binary(
     ],
 )
 
-cc_test(
-    name = "info_collector_test",
-    size = "small",
-    srcs = ["info_collector_test.cc"],
-    data = [
-        "//modules/data/conf:recorder_conf",
-    ],
-    deps = [
-        ":info_collector",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()
