@@ -119,19 +119,26 @@ bool LatticeConstraintChecker::IsValidTrajectory(
 
   const auto& points = trajectory.trajectory_points();
   for (std::size_t i = 0; i < points.size(); ++i) {
-    double a = points[i].a();
-    if (a < FLAGS_longitudinal_acceleration_lower_bound ||
-        a > FLAGS_longitudinal_acceleration_upper_bound) {
+    double lon_a = points[i].a();
+    if (lon_a < FLAGS_longitudinal_acceleration_lower_bound ||
+        lon_a > FLAGS_longitudinal_acceleration_upper_bound) {
       return false;
     }
+
+    double lat_a = std::abs(
+        points[i].v() * points[i].v() * points[i].path_point().kappa());
+    if (lat_a > FLAGS_lateral_acceleration_bound) {
+      return false;
+    }
+
 
     if (i > 1) {
       double dt = points[i].relative_time() - points[i - 1].relative_time();
       if (dt <= 0.0) {
         return false;
       }
-      double last_a = points[i - 1].a();
-      double j = (a - last_a) / dt;
+      double last_lon_a = points[i - 1].a();
+      double j = (lon_a - last_lon_a) / dt;
       if (j < FLAGS_longitudinal_jerk_lower_bound ||
           j > FLAGS_longitudinal_jerk_upper_bound) {
         AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
