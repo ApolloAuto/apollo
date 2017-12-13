@@ -124,7 +124,7 @@ class OfflineLidarPerceptionTool {
         content.SetLidarPose(pose);
         content.SetLidarCloud(cloud);
         content.SetLidarRoiCloud(roi_cloud);
-        content.SetTrackedObjectsLidar(result_objects);
+        content.SetTrackedObjects(result_objects);
         visualizer_->UpdateCameraSystem(&content);
         visualizer_->Render(content);
       }
