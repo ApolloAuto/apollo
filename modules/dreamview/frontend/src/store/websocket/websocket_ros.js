@@ -38,6 +38,7 @@ export default class RosWebSocketEndpoint {
 
                     STORE.updateTimestamp(message.timestamp);
                     STORE.updateWorldTimestamp(message.world.timestampSec);
+                    STORE.updateModuleDelay(message.world);
                     RENDERER.maybeInitializeOffest(
                         message.world.autoDrivingCar.positionX,
                         message.world.autoDrivingCar.positionY);

@@ -1,7 +1,7 @@
 import React from "react";
 
 
-export default class MenuItemRadio extends React.Component {
+export default class RadioItem extends React.Component {
     render() {
         const {id, title, options, onClick, checked, extraClasses} = this.props;
         return (

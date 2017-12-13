@@ -11,9 +11,10 @@ class CommandGroup extends React.Component {
             return <button key={key} onClick={commands[key]}>{key}</button>;
         });
 
+        const text = name ? `${name}:` : '';
         return (
             <div className="command-group">
-                <span className="name">{name}:</span>
+                <span className="name">{text}</span>
                 {entries}
             </div>
         );
@@ -66,18 +67,18 @@ export default class QuickStarter extends React.Component {
     }
 
     render() {
-        const {hmi} = this.props.store;
+        const { hmi } = this.props.store;
 
         return (
-            <div className="quick-starter card">
+            <div className="card">
                 <div className="card-header"><span>Quick Start</span></div>
                 <div className="card-content-column">
+                    <CommandGroup name="Auto" commands={this.auto} />
+                    <CommandGroup name="Reset" commands={this.reset} />
                     {hmi.showRTKCommands &&
                         <CommandGroup name="Record" commands={this.rtKRecord} />}
                     {hmi.showRTKCommands &&
                         <CommandGroup name="Replay" commands={this.rtkReplay} />}
-                    <CommandGroup name="Auto" commands={this.auto} />
-                    <CommandGroup name="Reset" commands={this.reset} />
                 </div>
             </div>
         );

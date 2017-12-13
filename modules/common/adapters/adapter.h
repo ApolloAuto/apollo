@@ -332,7 +332,11 @@ class Adapter : public AdapterBase {
    * @brief Gets message delay.
    */
   double GetDelaySec() const override {
-    return apollo::common::time::Clock::NowInSeconds() - last_receive_time_;
+    if (last_receive_time_ == 0) {
+      return -1;
+    } else {
+      return apollo::common::time::Clock::NowInSeconds() - last_receive_time_;
+    }
   }
 
   /**

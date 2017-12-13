@@ -21,22 +21,18 @@ class SideBarButton extends React.Component {
 export default class ButtonPanel extends React.Component {
     render() {
         const { enableHMIButtonsOnly,
-                onQuickStarter, showQuickStarter,
+                onTasks, showTasks,
                 onModuleController, showModuleController,
                 onMenu, showMenu,
                 onRouteEditingBar, showRouteEditingBar,
-                onPOI, showPOI,
-                onPNCMonitor, showPNCMonitor,
-                onConsole, showConsole,
-                resetBackend, dumpMessages,
-                onVideo, showVideo} = this.props;
+                onPOI, showPOI } = this.props;
 
         return (
             <div>
-                <SideBarButton label="Quick Start"
+                <SideBarButton label="Tasks"
                                disabled={false}
-                               onClick={onQuickStarter}
-                               active={showQuickStarter}/>
+                               onClick={onTasks}
+                               active={showTasks}/>
                 <SideBarButton label="Module Controller"
                                disabled={false}
                                onClick={onModuleController}
@@ -53,26 +49,6 @@ export default class ButtonPanel extends React.Component {
                                disabled={enableHMIButtonsOnly}
                                onClick={onPOI}
                                active={showPOI} />
-                <SideBarButton label="PNC Monitor"
-                               disabled={enableHMIButtonsOnly}
-                               onClick={onPNCMonitor}
-                               active={showPNCMonitor} />
-                <SideBarButton label="Notifications"
-                               disabled={enableHMIButtonsOnly}
-                               onClick={onConsole}
-                               active={showConsole} />
-                <SideBarButton label="Reset Backend Data"
-                               disabled={enableHMIButtonsOnly}
-                               onClick={resetBackend}
-                               active={false} />
-                <SideBarButton label="Dump Messages"
-                               disabled={enableHMIButtonsOnly}
-                               onClick={dumpMessages}
-                               active={false} />
-                <SideBarButton label="Sensor Camera"
-                               disabled={enableHMIButtonsOnly}
-                               onClick={onVideo}
-                               active={showVideo} />
             </div>
         );
     }
