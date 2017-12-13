@@ -144,5 +144,6 @@ proto_library(
     ],
     deps = [
         ":header_proto_lib",
+        "//modules/localization/proto:pose_proto_lib",
     ],
 )
