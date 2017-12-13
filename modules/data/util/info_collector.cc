@@ -67,11 +67,11 @@ const Task &InfoCollector::GetTaskInfo() {
   GetHardwareInfo();
   GetSoftwareInfo();
   GetUserInfo();
-  return task_info_;
+  return instance()->task_info_;
 }
 
 const VehicleInfo &InfoCollector::GetVehicleInfo() {
-  VehicleInfo *vehicle = task_info_.mutable_vehicle();
+  VehicleInfo *vehicle = instance()->task_info_.mutable_vehicle();
   static auto *chassis_detail = CHECK_NOTNULL(
       apollo::common::adapter::AdapterManager::GetChassisDetail());
 
@@ -91,26 +91,28 @@ const VehicleInfo &InfoCollector::GetVehicleInfo() {
 
 // TODO(xiaoxq): Implement the info getters.
 const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
-  return task_info_.environment();
+  return instance()->task_info_.environment();
 }
 
 const HardwareInfo &InfoCollector::GetHardwareInfo() {
-  HardwareInfo *hardware = task_info_.mutable_hardware();
-  *hardware->mutable_configs() = LoadFiles(config_.hardware_configs());
+  HardwareInfo *hardware = instance()->task_info_.mutable_hardware();
+  *hardware->mutable_configs() =
+      LoadFiles(instance()->config_.hardware_configs());
   return *hardware;
 }
 
 const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
-  SoftwareInfo *software = task_info_.mutable_software();
+  SoftwareInfo *software = instance()->task_info_.mutable_software();
   if (const char* docker_image = std::getenv("DOCKER_IMG")) {
     software->set_docker_image(docker_image);
   }
-  *software->mutable_configs() = LoadFiles(config_.software_configs());
+  *software->mutable_configs() =
+      LoadFiles(instance()->config_.software_configs());
   return *software;
 }
 
 const UserInfo &InfoCollector::GetUserInfo() {
-  return task_info_.user();
+  return instance()->task_info_.user();
 }
 
 Task InfoCollector::LoadTaskInfoTemplate() {

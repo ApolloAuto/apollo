@@ -19,6 +19,7 @@
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(process_monitor_name, "ProcessMonitor",
               "Name of the process monitor.");

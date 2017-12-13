@@ -20,6 +20,7 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/can/can_checker_factory.h"
 
 DEFINE_string(can_hardware_name, "CAN", "Name of the CAN hardware.");
