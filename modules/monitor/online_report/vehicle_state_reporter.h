@@ -13,29 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_SOFTWARE_TOPIC_MONITOR_H_
-#define MODULES_MONITOR_SOFTWARE_TOPIC_MONITOR_H_
+#ifndef MODULES_MONITOR_ONLINE_REPORT_VEHICLE_STATE_REPORTER_H_
+#define MODULES_MONITOR_ONLINE_REPORT_VEHICLE_STATE_REPORTER_H_
 
-#include <string>
-
-#include "modules/common/adapters/adapter.h"
 #include "modules/monitor/common/recurrent_runner.h"
-#include "modules/monitor/proto/monitor_conf.pb.h"
 
 namespace apollo {
 namespace monitor {
 
-class TopicMonitor : public RecurrentRunner {
+class VehicleStateReporter : public RecurrentRunner {
  public:
-  TopicMonitor(const TopicConf &config, TopicStatus *status);
+  VehicleStateReporter();
   void RunOnce(const double current_time) override;
-
- private:
-  const TopicConf &config_;
-  TopicStatus *status_;
 };
 
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_SOFTWARE_TOPIC_MONITOR_H_
+#endif  // MODULES_MONITOR_ONLINE_REPORT_VEHICLE_STATE_REPORTER_H_

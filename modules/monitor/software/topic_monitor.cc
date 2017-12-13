@@ -19,6 +19,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(topic_monitor_name, "TopicMonitor", "Name of the topic monitor.");
 
