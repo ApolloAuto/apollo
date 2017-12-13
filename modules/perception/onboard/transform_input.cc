@@ -55,24 +55,49 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
     AERROR << "Exception: " << ex.what();
     return false;
   }
-  Eigen::Affine3d affine_3d;
-  tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
-  *trans = affine_3d.matrix();
-
+  Eigen::Affine3d affine_lidar_3d;
+  tf::transformMsgToEigen(transform_stamped.transform, affine_lidar_3d);
+  Eigen::Matrix4d lidar2novatel_trans = affine_lidar_3d.matrix();
   ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
-         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
+         << FLAGS_lidar_tf2_child_frame_id << " trans: " << lidar2novatel_trans;
+
+
+  if (!tf2_buffer.canTransform(FLAGS_localization_tf2_frame_id,
+                               FLAGS_localization_tf2_child_frame_id,
+                               query_stamp,
+                               ros::Duration(kTf2BuffSize), &err_msg)) {
+    AERROR << "Cannot transform frame: " << FLAGS_localization_tf2_frame_id
+           << " to frame " << FLAGS_localization_tf2_child_frame_id
+           << " , err: " << err_msg
+           << ". Frames: " << tf2_buffer.allFramesAsString();
+    return false;
+  }
+  try {
+    transform_stamped = tf2_buffer.lookupTransform(
+        FLAGS_localization_tf2_frame_id,
+        FLAGS_localization_tf2_child_frame_id, query_stamp);
+  } catch (tf2::TransformException& ex) {
+    AERROR << "Exception: " << ex.what();
+    return false;
+  }
+  Eigen::Affine3d affine_localization_3d;
+  tf::transformMsgToEigen(transform_stamped.transform, affine_localization_3d);
+  Eigen::Matrix4d novatel2world_trans = affine_localization_3d.matrix();
+
+  *trans = novatel2world_trans * lidar2novatel_trans;
+  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
+         << FLAGS_localization_tf2_child_frame_id << " trans: " << *trans;
   return true;
 }
 
-bool GetRadarTrans(const double query_time,
-                                        Eigen::Matrix4d *trans) {
+bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans) {
   if (!trans) {
     AERROR << "failed to get trans, the trans ptr can not be NULL";
     return false;
   }
 
   ros::Time query_stamp(query_time);
-  const auto &tf2_buffer = common::adapter::AdapterManager::Tf2Buffer();
+  const auto& tf2_buffer = common::adapter::AdapterManager::Tf2Buffer();
 
   const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
   std::string err_msg;
@@ -90,16 +115,42 @@ bool GetRadarTrans(const double query_time,
   try {
     transform_stamped = tf2_buffer.lookupTransform(
         FLAGS_radar_tf2_frame_id, FLAGS_radar_tf2_child_frame_id, query_stamp);
-  } catch (tf2::TransformException &ex) {
+  } catch (tf2::TransformException& ex) {
     AERROR << "Exception: " << ex.what();
     return false;
   }
-  Eigen::Affine3d affine_3d;
-  tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
-  *trans = affine_3d.matrix();
-
+  Eigen::Affine3d affine_radar_3d;
+  tf::transformMsgToEigen(transform_stamped.transform, affine_radar_3d);
+  Eigen::Matrix4d radar2novatel_trans = affine_radar_3d.matrix();
   ADEBUG << "get " << FLAGS_radar_tf2_frame_id << " to "
-         << FLAGS_radar_tf2_child_frame_id << " trans: " << *trans;
+         << FLAGS_radar_tf2_child_frame_id << " trans: " << radar2novatel_trans;
+
+
+  if (!tf2_buffer.canTransform(FLAGS_localization_tf2_frame_id,
+                               FLAGS_localization_tf2_child_frame_id,
+                               query_stamp,
+                               ros::Duration(kTf2BuffSize), &err_msg)) {
+    AERROR << "Cannot transform frame: " << FLAGS_localization_tf2_frame_id
+           << " to frame " << FLAGS_localization_tf2_child_frame_id
+           << " , err: " << err_msg
+           << ". Frames: " << tf2_buffer.allFramesAsString();
+    return false;
+  }
+  try {
+    transform_stamped = tf2_buffer.lookupTransform(
+        FLAGS_localization_tf2_frame_id,
+        FLAGS_localization_tf2_child_frame_id, query_stamp);
+  } catch (tf2::TransformException& ex) {
+    AERROR << "Exception: " << ex.what();
+    return false;
+  }
+  Eigen::Affine3d affine_localization_3d;
+  tf::transformMsgToEigen(transform_stamped.transform, affine_localization_3d);
+  Eigen::Matrix4d novatel2world_trans = affine_localization_3d.matrix();
+
+  *trans = novatel2world_trans * radar2novatel_trans;
+  ADEBUG << "get " << FLAGS_radar_tf2_frame_id << " to "
+         << FLAGS_localization_tf2_child_frame_id << " trans: " << *trans;
   return true;
 }
 
