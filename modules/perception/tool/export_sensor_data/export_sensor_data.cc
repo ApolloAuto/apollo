@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "Eigen/Core"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -31,7 +32,7 @@
 #include "modules/perception/onboard/transform_input.h"
 
 DEFINE_string(lidar_path,
-  "modules/perception/tool/export_sensor_data/pcd/", "lidar path");
+  "modules/perception/tool/export_sensor_data/lidar/", "lidar path");
 DEFINE_string(radar_path,
   "modules/perception/tool/export_sensor_data/radar/", "radar path");
 
@@ -78,27 +79,26 @@ void ExportSensorData::WritePose(const std::string &file_pre,
   std::string filename = file_pre + ".pose";
   std::fstream fout(filename.c_str(), std::ios::out | std::ios::binary);
   if (!fout.is_open()) {
-    AINFO << "Failed to write radar pose.";
+    AINFO << "Failed to write pose.";
   }
-  fout << timestamp << " " << seq_num << " "
-       << pose(0, 0) << " " << pose(0, 1) << " "
-       << pose(0, 2) << " " << pose(0, 3) << " "
-       << pose(1, 0) << " " << pose(1, 1) << " "
-       << pose(1, 2) << " " << pose(1, 3) << " "
-       << pose(2, 0) << " " << pose(2, 1) << " "
-       << pose(2, 2) << " " << pose(2, 3);
+  Eigen::Matrix3f mat3f = pose.block<3, 3>(0, 0).cast<float>();
+  Eigen::Quaternionf quaternion(mat3f);
+  fout << std::setprecision(16) << seq_num << " " << timestamp << " "
+       << pose(0, 3) << " " << pose(1, 3) << " " << pose(2, 3) << " "
+       << quaternion.x() << " " << quaternion.y() << " "
+       << quaternion.z() << " " << quaternion.w() << std::endl;
   fout.close();
 }
 
-void ExportSensorData::WriteGpsInfo(const std::string &file_pre,
+void ExportSensorData::WriteVelocityInfo(const std::string &file_pre,
   const double& timestamp, const int seq_num,
   const Eigen::Vector3f& velocity) {
-  std::string filename = file_pre + ".gps";
+  std::string filename = file_pre + ".velocity";
   std::fstream fout(filename.c_str(), std::ios::out | std::ios::binary);
   if (!fout.is_open()) {
-    AINFO << "Failed to write gps.";
+    AINFO << "Failed to write velocity.";
   }
-  fout << timestamp << " " << seq_num << " "
+  fout << std::setprecision(16) << seq_num << " " << timestamp << " "
        << velocity(0) << " " << velocity(1) << " " << velocity(2);
   fout.close();
 }
@@ -156,7 +156,7 @@ void ExportSensorData::OnPointCloud(
   std::shared_ptr<Eigen::Matrix4d> velodyne_trans =
     std::make_shared<Eigen::Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
-    AERROR << "failed to get trans at timestamp: "
+    AERROR << "failed to get velodyne trans at timestamp: "
            << GLOG_TIMESTAMP(kTimeStamp);
     return;
   }
@@ -200,7 +200,8 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
   std::shared_ptr<Eigen::Matrix4d> radar2world_pose =
     std::make_shared<Eigen::Matrix4d>();
   if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
-    AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
+    AERROR << "Failed to get radar trans at timestamp: "
+           << GLOG_TIMESTAMP(timestamp);
     return;
   }
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
@@ -219,7 +220,7 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
   AINFO << "radar file pre: " << file_pre;
   WriteRadar(file_pre, radar_obs_proto);
   WritePose(file_pre, timestamp, seq_num, *radar2world_pose);
-  WriteGpsInfo(file_pre, timestamp, seq_num, car_linear_speed);
+  WriteVelocityInfo(file_pre, timestamp, seq_num, car_linear_speed);
 }
 
 void ExportSensorData::OnGps(const apollo::localization::Gps &gps) {
