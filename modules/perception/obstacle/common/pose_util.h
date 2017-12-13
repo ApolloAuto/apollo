@@ -54,6 +54,9 @@ void QuaternionToRotationMatrix(const T* quat, T* R) {
 bool ReadPoseFile(const std::string& filename, Eigen::Matrix4d* pose,
                   int* frame_id, double* time_stamp);
 
+bool ReadPoseFileMat12(const std::string &filename, Eigen::Matrix4d *pose,
+                  int *frame_id, double *time_stamp);
+
 // @brief: Load the velodyne extrinsic from a YAML file.
 // @param [in]: path to yaml file
 // @param [out]: extrinsic transform

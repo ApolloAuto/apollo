@@ -54,7 +54,7 @@ class ExportSensorData{
   void WritePose(const std::string &file_pre,
     const double timestamp, const int seq_num,
     const Eigen::Matrix4d& pose);
-  void WriteGpsInfo(const std::string &file_pre,
+  void WriteVelocityInfo(const std::string &file_pre,
     const double& timestamp, const int seq_num,
     const Eigen::Vector3f& velocity);
   void WritePCD(const std::string &file_pre,
