@@ -2,7 +2,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import MenuItemRadio from 'components/common/MenuItemRadio';
+import RadioItem from 'components/common/RadioItem';
 
 @observer
 export default class POI extends React.Component {
@@ -12,16 +12,16 @@ export default class POI extends React.Component {
         const entries = Object.keys(routeEditingManager.defaultRoutingEndPoint)
             .map(key => {
                 return (
-                    <MenuItemRadio extraClasses={["poi-button"]}
-                                   key={`poi_${key}`} id='poi' title={key}
-                                   onClick={() => {
-                                        routeEditingManager.addDefaultEndPoint(key);
-                                        if (!options.showRouteEditingBar) {
-                                            routeEditingManager.sendRoutingRequest();
-                                        }
-                                        options.showPOI = false;
-                                   }}
-                                   checked={false}/>
+                    <RadioItem extraClasses={["poi-button"]}
+                               key={`poi_${key}`} id='poi' title={key}
+                               onClick={() => {
+                                    routeEditingManager.addDefaultEndPoint(key);
+                                    if (!options.showRouteEditingBar) {
+                                        routeEditingManager.sendRoutingRequest();
+                                    }
+                                    options.showPOI = false;
+                               }}
+                               checked={false}/>
                 );
             });
 

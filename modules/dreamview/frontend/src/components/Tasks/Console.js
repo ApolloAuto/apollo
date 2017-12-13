@@ -1,8 +1,7 @@
 import React from "react";
-import { observer } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import classNames from "classnames";
 
-import Image from "components/common/Image";
 import warnIcon from "assets/images/icons/warning.png";
 import errorIcon from "assets/images/icons/error.png";
 
@@ -17,7 +16,7 @@ class MonitorItem extends React.Component {
 
         return (
             <li className="monitor-item">
-                <Image image={icon} className="icon" />
+                <img src={icon} className="icon" />
                 <span className={classNames("text", levelClass)}>
                     {text}
                 </span>
@@ -26,18 +25,23 @@ class MonitorItem extends React.Component {
     }
 }
 
-@observer
+@inject("store") @observer
 export default class Console extends React.Component {
     render() {
-        const { monitor } = this.props;
+        const { monitor } = this.props.store;
 
         return (
-            <ul className="console card">
-                {monitor.items.map((item, index) => (
-                     <MonitorItem key={index} text={item.msg}
-                                  level={item.logLevel} />
-                 ))}
-            </ul>
+            <div className="card">
+                <div className="card-header"><span>Console</span></div>
+                <div className="card-content-column">
+                    <ul className="console">
+                        {monitor.items.map((item, index) => (
+                             <MonitorItem key={index} text={item.msg}
+                                          level={item.logLevel} />
+                         ))}
+                    </ul>
+                </div>
+            </div>
         );
     }
 }

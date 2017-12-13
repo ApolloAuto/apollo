@@ -40,11 +40,10 @@ options:
   defaults:
     showModuleController: false
     showMenu: false
-    showConsole: false
     showPOI: false
     showPNCMonitor: false
-    showQuickStarter: true
     showRouteEditingBar: false
+    showTasks: true
     showVideo: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
