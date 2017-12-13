@@ -66,12 +66,16 @@ class RoutingProvider:
         self.routing_lock = threading.Lock()
         self.SMOOTH_FORWARD_DIST = 150
         self.SMOOTH_BACKWARD_DIST = 150
+        self.human = False
 
     def update(self, routing_str):
         self.routing_str = routing_str
         routing_json = json.loads(routing_str.data)
         routing_points = []
+        self.human = False
         for step in routing_json:
+            if step.get('human'):
+                self.human = True
             points = step['polyline']['points']
             for point in points:
                 routing_points.append(point)
@@ -146,8 +150,28 @@ class RoutingProvider:
         mono_seg_y = seg_y[left_cut_idx:right_cut_idx]
         return mono_seg_x, mono_seg_y
 
+    def get_local_ref(self, local_seg_x, local_seg_y):
+        ref_x = []
+        ref_y = []
+        points = []
+        for i in range(len(local_seg_x)):
+            x = local_seg_x[i]
+            y = local_seg_y[i]
+            points.append((x, y))
+        line = LineString(points)
+        dist = line.project(Point((0, 0)))
+        for i in range(int(line.length - dist) + 1):
+            p = line.interpolate(i + dist)
+            ref_x.append(p.x)
+            ref_y.append(p.y)
+        return ref_x, ref_y
+
     def get_local_segment_spline(self, utm_x, utm_y, heading):
         local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        if len(local_seg_x) <= 10:
+            return [], []
+        if self.human:
+            return self.get_local_ref(local_seg_x, local_seg_y)
         mono_seg_x, mono_seg_y = self.to_monotonic_segment(
             local_seg_x, local_seg_y)
 
