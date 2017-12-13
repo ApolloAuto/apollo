@@ -85,6 +85,13 @@ class MSFLocalization : public LocalizationBase {
   void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
 
  private:
+  bool load_gnss_antenna_extrinsic(const std::string &file_path,
+                                   double *offset_x, double *offset_y,
+                                   double *offset_z, double *uncertainty_x,
+                                   double *uncertainty_y,
+                                   double *uncertainty_z);
+
+ private:
   apollo::common::monitor::Monitor monitor_;
   LocalizationInteg localization_integ_;
   LocalizationIntegParam localizaiton_param_;
