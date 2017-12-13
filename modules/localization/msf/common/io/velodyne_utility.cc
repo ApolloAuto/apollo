@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/common/io/velodyne_utility.h"
 #include <pcl/io/pcd_io.h>
 #include <yaml-cpp/yaml.h>
 #include "modules/localization/msf/common/io/pcl_point_types.h"
-#include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
 namespace localization {
