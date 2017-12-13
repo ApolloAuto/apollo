@@ -49,8 +49,8 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) {
 
+  /**
   if (planning_target.decision_type() == PlanningTarget::STOP) {
-    /**
     double stop_position = planning_target.stop_point();
     double distance = stop_position - init_lon_state_[0];
     double s_dot = init_lon_state_[1];
@@ -97,9 +97,9 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
       ptr_lat_trajectory_bundle->push_back(ptr_lat_trajectory);
       return;
     }
-    **/
     AINFO << "Lattice planner stop handling: use polynomial trajectory";
   }
+  **/
 
   GenerateLongitudinalTrajectoryBundle(
     planning_target,
@@ -160,6 +160,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
   AINFO << "init_state s = " << init_lon_state_[0]
     << " init_state ds = " << init_lon_state_[1]
     << " init_state dds = " << init_lon_state_[2];
+
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForStopping(stop_position);
   AINFO << "end condition size = " << end_conditions.size();
@@ -186,10 +187,6 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
     ptr_lon_trajectory_bundle);
 
-  // std::vector<SampleBound> sample_bounds;
-  // for (const SampleBound& sample_bound : planning_target.sample_bound()) {
-  //   sample_bounds.push_back(sample_bound);
-  // }
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(
                                   planning_target);
