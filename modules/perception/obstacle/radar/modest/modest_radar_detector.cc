@@ -208,7 +208,7 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
   for (size_t i = 0; i < obs_track.size(); ++i) {
     ObjectPtr object_ptr = ObjectPtr(new Object());
     const ObjectPtr &object_radar_ptr = obs_track[i].GetObsRadar();
-    if (object_radar_ptr->is_background) {
+    if (use_fp_filter_ && object_radar_ptr->is_background) {
       continue;
     }
     object_ptr->clone(*object_radar_ptr);

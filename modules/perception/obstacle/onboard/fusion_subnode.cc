@@ -108,6 +108,7 @@ Status FusionSubnode::ProcEvents() {
       return Status(ErrorCode::PERCEPTION_ERROR, "Subscribe event fail.");
     }
     if (events.empty()) {
+      usleep(500);
       continue;
     }
     Process(event_meta, events);
@@ -160,17 +161,9 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
 bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
                                     std::vector<Event> *events) const {
   Event event;
-  if (event_meta.event_id == pub_driven_event_id_) {
-    if (event_manager_->Subscribe(event_meta.event_id, &event, false)) {
-      events->push_back(event);
-    } else {
-      return false;
-    }
-  } else {
-    // no blocking
-    while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
-      events->push_back(event);
-    }
+  // no blocking
+  while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
+    events->push_back(event);
   }
   return true;
 }
