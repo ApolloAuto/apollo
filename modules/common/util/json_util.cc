@@ -35,8 +35,8 @@ google::protobuf::util::JsonOptions JsonOption() {
 
 }  // namespace
 
-std::string JsonUtil::ProtoToTypedJson(const std::string &json_type,
-                                       const google::protobuf::Message &proto) {
+nlohmann::json JsonUtil::ProtoToTypedJson(
+    const std::string &json_type, const google::protobuf::Message &proto) {
   static const auto kJsonOption = JsonOption();
   std::string json_string;
   const auto status = MessageToJsonString(proto, &json_string, kJsonOption);
@@ -45,7 +45,7 @@ std::string JsonUtil::ProtoToTypedJson(const std::string &json_type,
   Json json_obj;
   json_obj["type"] = json_type;
   json_obj["data"] = Json::parse(json_string);
-  return json_obj.dump();
+  return json_obj;
 }
 
 bool JsonUtil::GetStringFromJson(const Json &json, const std::string &key,

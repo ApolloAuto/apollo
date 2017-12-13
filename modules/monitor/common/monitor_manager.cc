@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/monitor/common/monitor_interface.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 #include "gflags/gflags.h"
 #include "modules/common/util/file.h"

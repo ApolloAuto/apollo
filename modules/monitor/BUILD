@@ -12,6 +12,7 @@ cc_library(
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/hardware/can:can_monitor",
         "//modules/monitor/hardware/gps:gps_monitor",
+        "//modules/monitor/online_report:vehicle_state_reporter",
         "//modules/monitor/proto:system_status_proto",
         "//modules/monitor/software:process_monitor",
         "//modules/monitor/software:summary_monitor",
