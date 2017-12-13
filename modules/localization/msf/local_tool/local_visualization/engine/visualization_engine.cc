@@ -285,8 +285,8 @@ void VisualizationEngine::Draw() {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i]
-             [j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i][j].copyTo(
+          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
@@ -506,9 +506,10 @@ void VisualizationEngine::DrawLegend() {
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(image_window_, cv::Point(755, (15 + textSize.height) * (i + 1) -
-                                                 textSize.height / 2),
-               8, cv::Scalar(b, g, r), 3);
+    cv::circle(
+        image_window_,
+        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
+        8, cv::Scalar(b, g, r), 3);
   }
 }
 
@@ -872,7 +873,9 @@ void VisualizationEngine::UpdateViewCenter(const double move_x,
   _view_center[1] += move_y;
 }
 
-void VisualizationEngine::SetScale(const double scale) { cur_scale_ = scale; }
+void VisualizationEngine::SetScale(const double scale) {
+  cur_scale_ = scale;
+}
 
 void VisualizationEngine::UpdateScale(const double factor) {
   cur_scale_ *= factor;

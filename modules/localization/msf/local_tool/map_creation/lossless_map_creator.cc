@@ -25,13 +25,13 @@
 
 const unsigned int CAR_SENSOR_LASER_NUMBER = 64;
 
-using apollo::localization::msf::MapNodeIndex;
-using apollo::localization::msf::LosslessMapNodePool;
-using apollo::localization::msf::LosslessMapConfig;
-using apollo::localization::msf::LosslessMap;
-using apollo::localization::msf::LosslessMapNode;
-using apollo::localization::msf::LosslessMapMatrix;
 using apollo::localization::msf::FeatureXYPlane;
+using apollo::localization::msf::LosslessMap;
+using apollo::localization::msf::LosslessMapConfig;
+using apollo::localization::msf::LosslessMapMatrix;
+using apollo::localization::msf::LosslessMapNode;
+using apollo::localization::msf::LosslessMapNodePool;
+using apollo::localization::msf::MapNodeIndex;
 typedef apollo::localization::msf::FeatureXYPlane::PointT PclPointT;
 typedef apollo::localization::msf::FeatureXYPlane::PointCloudT PclPointCloudT;
 typedef apollo::localization::msf::FeatureXYPlane::PointCloudPtrT
@@ -47,10 +47,11 @@ bool ParseCommandLine(int argc, char* argv[],
       // ("use_plane_fitting_ransac",
       // boost::program_options::value<bool>()->required(),
       //  "use plane fitting ransac")
-      ("pcd_folders", boost::program_options::value<std::vector<std::string>>()
-                          ->multitoken()
-                          ->composing()
-                          ->required(),
+      ("pcd_folders",
+       boost::program_options::value<std::vector<std::string>>()
+           ->multitoken()
+           ->composing()
+           ->required(),
        "pcd folders(repeated)")(
           "pose_files",
           boost::program_options::value<std::vector<std::string>>()

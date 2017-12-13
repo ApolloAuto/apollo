@@ -129,9 +129,13 @@ class LosslessMapNode : public BaseMapNode {
   }
 
   /**@brief Get the min altitude of point cloud in the node. */
-  inline float GetMinAltitude() const { return min_altitude_; }
+  inline float GetMinAltitude() const {
+    return min_altitude_;
+  }
   /**@brief Set the min altitude of point cloud in the node. */
-  inline void SetMinAltitude(float altitude) { min_altitude_ = altitude; }
+  inline void SetMinAltitude(float altitude) {
+    min_altitude_ = altitude;
+  }
 
  protected:
   /**@brief The min altitude of point cloud in the node. */
