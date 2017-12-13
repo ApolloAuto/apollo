@@ -32,8 +32,8 @@ class ContiRadarUtil {
           const Eigen::Vector3f& velocity) {
     Eigen::Vector3f vector_temp1 = main_velocity;
     Eigen::Vector3f vector_temp2 = velocity;
-    if (vector_temp1.head(2).norm() > 1e-5
-        && vector_temp2.head(2).norm() > 1e-5) {
+    if (vector_temp1.head(2).norm() > 0.1
+        && vector_temp2.head(2).norm() > 0.1) {
         double theta = VectorTheta2dXy(vector_temp1, vector_temp2);
         if ((theta > 1.0 / 4.0 * M_PI && theta < 3.0 / 4.0 * M_PI) ||
             (theta > -3.0 / 4.0 * M_PI && theta < -1.0 / 4.0 * M_PI)) {

@@ -264,7 +264,7 @@ int PbfTrack::GetNextTrackId() {
 }
 
 bool PbfTrack::AbleToPublish() {
-  AINFO << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " "
+  ADEBUG << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " "
         << lidar_objects_.size();
   double invisible_period_threshold = 0.001;
   if (invisible_period_ > invisible_period_threshold && invisible_in_lidar_ &&
