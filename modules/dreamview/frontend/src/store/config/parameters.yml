@@ -16,10 +16,6 @@ camera:
     fov: 70
     near: 1
     far: 4000
-  Monitor:
-    fov: 70
-    near: 1
-    far: 100
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:

@@ -79,7 +79,6 @@ class DreamviewStore {
 
     @action enablePNCMonitor() {
         this.updateWidthInPercentage(0.7);
-        this.options.selectCamera('Monitor');
         this.options.showPlanningReference = true;
         this.options.showPlaningDpOptimizer = true;
         this.options.showPlanningQpOptimizer = true;
@@ -87,7 +86,6 @@ class DreamviewStore {
 
     @action disablePNCMonitor() {
         this.updateWidthInPercentage(1.0);
-        this.options.selectCamera('Default');
         this.options.showPlanningReference = false;
         this.options.showPlaningDpOptimizer = false;
         this.options.showPlanningQpOptimizer = false;
