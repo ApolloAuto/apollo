@@ -92,9 +92,13 @@ class BaseMap {
   void LoadBinary(FILE* file, std::string map_folder_path = "");
 
   /**@brief Get the map config. */
-  inline const BaseMapConfig& GetConfig() const { return *map_config_; }
+  inline const BaseMapConfig& GetConfig() const {
+    return *map_config_;
+  }
   /**@brief Get the map config. */
-  inline BaseMapConfig& GetConfig() { return *map_config_; }
+  inline BaseMapConfig& GetConfig() {
+    return *map_config_;
+  }
 
  protected:
   /**@brief Load map node by index.*/
