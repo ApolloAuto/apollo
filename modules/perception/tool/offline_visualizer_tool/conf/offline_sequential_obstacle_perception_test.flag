@@ -2,12 +2,15 @@
 --work_root=modules/perception
 --config_manager_path=conf/config_manager.config
 
+--enable_global_offset=false
+
 ####################################################################
 # Flags from obstacle/lidar/test/offline_lidar_perception_test.cpp
 # pcd path
 # type: string
 # default: /apollo/data/pcd/
---pcd_path=/apollo/data/pcd/
+--lidar_path=./modules/perception/tool/export_sensor_data/lidar/
+--radar_path=./modules/perception/tool/export_sensor_data/radar/
 
 # pose path
 # type: string
@@ -24,6 +27,9 @@
 # type: bool
 # default: true
 --enable_visualization=true
+--show_lidar_obstacles=false
+--show_radar_obstacles=false
+--show_fused_obstacles=true
 
 ####################################################################
 # Flags from obstacle/onboard/hdmap_input.cc

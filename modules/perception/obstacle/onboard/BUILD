@@ -42,6 +42,8 @@ cc_library(
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:perception_obstacle_lidar_segmention_cnnseg",
         "//modules/perception/obstacle/lidar/tracker/hm_tracker:perception_obstacle_lidar_tracker_hm_tracker",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
+        "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
+        "//modules/perception/obstacle/fusion/dummy:perception_obstacle_fusion_dummy",
         "@eigen//:eigen",
         "@gtest//:gtest",
         "@ros//:ros_common",
