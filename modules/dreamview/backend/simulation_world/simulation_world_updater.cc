@@ -50,7 +50,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           MapElementIds map_element_ids(*iter);
           auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
           websocket_->SendData(
-              conn, JsonUtil::ProtoToTypedJson("MapData", retrieved));
+              conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
         }
       });
 

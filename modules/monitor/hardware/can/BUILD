@@ -30,7 +30,8 @@ cc_library(
         "//modules/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/util",
-        "//modules/monitor/common:monitor_interface",
+        "//modules/monitor/common:monitor_manager",
+        "//modules/monitor/common:recurrent_runner",
     ],
 )
 
