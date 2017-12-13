@@ -137,6 +137,9 @@ class ReferenceLine {
   static ReferencePoint Interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,
                                     const double s);
+  ReferencePoint InterpolateWithMatchedIndex(
+      const ReferencePoint& p0, const double s0, const ReferencePoint& p1,
+      const double s1, const hdmap::InterpolatedIndex& index) const;
 
   static double FindMinDistancePoint(const ReferencePoint& p0, const double s0,
                                      const ReferencePoint& p1, const double s1,
