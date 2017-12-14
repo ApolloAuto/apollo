@@ -100,7 +100,6 @@ bool PathData::GetPathPointWithPathS(
 bool PathData::GetPathPointWithRefS(const double ref_s,
                                     common::PathPoint *const path_point) const {
   DCHECK_NOTNULL(reference_line_);
-  DCHECK_NOTNULL(path_point);
   DCHECK_EQ(discretized_path_.path_points().size(),
             frenet_path_.points().size());
   if (ref_s < 0) {
@@ -153,14 +152,14 @@ std::string PathData::DebugString() const {
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
   return apollo::common::util::StrCat(
-      "[\n", apollo::common::util::PrintDebugStringIter(
-                 path_points.begin(), path_points.begin() + limit, ",\n"),
+      "[\n",
+      apollo::common::util::PrintDebugStringIter(
+          path_points.begin(), path_points.begin() + limit, ",\n"),
       "]\n");
 }
 
 bool PathData::SLToXY(const FrenetFramePath &frenet_path,
                       DiscretizedPath *const discretized_path) {
-  DCHECK_NOTNULL(discretized_path);
   std::vector<common::PathPoint> path_points;
   for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
     common::SLPoint sl_point;

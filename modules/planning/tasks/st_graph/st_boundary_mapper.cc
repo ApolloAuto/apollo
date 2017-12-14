@@ -54,7 +54,7 @@ using apollo::common::math::Vec2d;
 namespace {
 constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
-}
+}  // namespace
 
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,
@@ -221,8 +221,6 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
     const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
-  DCHECK_NOTNULL(upper_points);
-  DCHECK_NOTNULL(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);
