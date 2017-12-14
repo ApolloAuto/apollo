@@ -63,6 +63,7 @@ class RoutingProvider:
     def __init__(self):
         self.routing_str = None
         self.routing_points = []
+        self.routing = None
         self.routing_lock = threading.Lock()
         self.SMOOTH_FORWARD_DIST = 150
         self.SMOOTH_BACKWARD_DIST = 150
@@ -83,31 +84,31 @@ class RoutingProvider:
         self.routing_lock.acquire()
         self.routing_points = routing_points
         self.routing_lock.release()
+        self.routing = LineString(self.routing_points)
 
     def get_segment(self, utm_x, utm_y):
         if self.routing_str is None:
             return None
         point = Point(utm_x, utm_y)
-        routing = LineString(self.routing_points)
-        if routing.distance(point) > 10:
+        if self.routing.distance(point) > 10:
             return []
-        if routing.length < 10:
+        if self.routing.length < 10:
             return []
-        vehicle_distance = routing.project(point)
+        vehicle_distance = self.routing.project(point)
         points = []
-        total_length = routing.length
+        total_length = self.routing.length
         for i in range(self.SMOOTH_BACKWARD_DIST):
             backward_dist = vehicle_distance - self.SMOOTH_BACKWARD_DIST + i
             if backward_dist < 0:
                 continue
-            p = routing.interpolate(backward_dist)
+            p = self.routing.interpolate(backward_dist)
             points.append(p.coords[0])
 
         for i in range(self.SMOOTH_FORWARD_DIST):
             forward_dist = vehicle_distance + i
             if forward_dist >= total_length:
                 break
-            p = routing.interpolate(forward_dist)
+            p = self.routing.interpolate(forward_dist)
             points.append(p.coords[0])
         return points
 
