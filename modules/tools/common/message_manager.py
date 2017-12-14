@@ -110,7 +110,7 @@ class PbMessageManager:
             print("topic %s is not registered in topic_pb_list" % topic)
             return None
         meta_msg = self.__topic_dict[topic]
-        return meta_msg.parse(filename)
+        return meta_msg.parse_file(filename)
 
     def parse_file(self, filename):
         """parse a file by guessing topic type"""

@@ -44,12 +44,10 @@ def get_pb_from_file(filename, pb_value):
     try:
         return get_pb_from_bin_file(filename, pb_value)
     except:
-        print 'Info: Cannot parse %s as binary proto. will try parse as text' % filename
-
-    try:
-        return get_pb_from_text_file(filename, pb_value)
-    except:
-        print 'Error: Cannot parse %s as text proto' % filename
+        try:
+            return get_pb_from_text_file(filename, pb_value)
+        except:
+            print 'Error: Cannot parse %s as binary or text proto' % filename
 
     return None
 
