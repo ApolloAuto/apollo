@@ -8,7 +8,7 @@ const ColorCodeMapping = {
     'RED': 'rgba(180, 49, 49, 0.8)',
     'BLACK': 'rgba(30, 30, 30, 0.8)',
     'UNKNOWN': 'rgba(30, 30, 30, 0.8)',
-    '': 'rgba(0, 0, 0, 0.6)',
+    '': 'rgba(30, 30, 30, 0.8)',
 };
 
 class TrafficLight extends React.Component {
