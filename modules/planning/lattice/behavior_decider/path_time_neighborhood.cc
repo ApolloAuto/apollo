@@ -49,7 +49,6 @@ int LastIndexBefore(const prediction::Trajectory& trajectory,
   int end = num_traj_point - 1;
   while (start + 1 < end) {
     int mid = start + (end - start) / 2;
-    // AERROR << "mid = " << mid;
     if (trajectory.trajectory_point(mid).relative_time() <= t) {
       start = mid;
     } else {
@@ -93,19 +92,8 @@ void PathTimeNeighborhood::SetupObstacles(
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
 
-      // TODO(all) Remove raw reference line and reimplement GetSlBoundary
       SLBoundary sl_boundary;
       reference_line.GetSLBoundary(box, &sl_boundary);
-
-      /**
-       // TODO(all) confirm the logic to determine whether an obstacle
-       // is forward or backward.
-       if (sl_boundary.end_s() < init_s_[0]) {
-       backward_obstacle_id_set_.insert(obstacle->Id());
-       } else {
-       forward_obstacle_id_set_.insert(obstacle->Id());
-       }
-       **/
 
       //the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < 0.0
@@ -129,17 +117,21 @@ void PathTimeNeighborhood::SetupObstacles(
         path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
 
         *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left() =
-            SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(), relative_time);
+            SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
+                             relative_time);
 
         *path_time_obstacle_map_[obstacle->Id()].mutable_upper_left() =
-            SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
+            SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
+                             relative_time);
       }
 
       *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right() =
-          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(), relative_time);
+          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
+                           relative_time);
 
       *path_time_obstacle_map_[obstacle->Id()].mutable_upper_right() =
-          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
+          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
+                           relative_time);
     
       relative_time += trajectory_time_resolution;
     }
@@ -197,7 +189,8 @@ double PathTimeNeighborhood::SpeedAtT(
   return apollo::common::math::lerp(v_before, t_before, v_after, t_after, t);
 }
 
-PathTimePoint PathTimeNeighborhood::SetPathTimePoint(const std::string& obstacle_id,
+PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
+    const std::string& obstacle_id,
     const double s, const double t) const {
   PathTimePoint path_time_point;
   path_time_point.set_s(s);
@@ -220,7 +213,8 @@ double PathTimeNeighborhood::SpeedOnReferenceLine(
   return v;
 }
 
-std::vector<PathTimeObstacle> PathTimeNeighborhood::GetPathTimeObstacles() const {
+std::vector<PathTimeObstacle>
+PathTimeNeighborhood::GetPathTimeObstacles() const {
   std::vector<PathTimeObstacle> path_time_obstacles;
   for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
     path_time_obstacles.push_back(path_time_obstacle_element.second);
@@ -230,88 +224,13 @@ std::vector<PathTimeObstacle> PathTimeNeighborhood::GetPathTimeObstacles() const
 
 bool PathTimeNeighborhood::GetPathTimeObstacle(const std::string& obstacle_id,
     PathTimeObstacle* path_time_obstacle) {
-  /**
-   if (forward_obstacle_id_set_.find(obstacle_id) ==
-   forward_obstacle_id_set_.end() ||
-   backward_obstacle_id_set_.find(obstacle_id) ==
-   backward_obstacle_id_set_.end()) {
-   return false;
-   }
-   **/
-  if (path_time_obstacle_map_.find(obstacle_id) == path_time_obstacle_map_.end()) {
+  if (path_time_obstacle_map_.find(obstacle_id) ==
+      path_time_obstacle_map_.end()) {
     return false;
   }
   *path_time_obstacle = path_time_obstacle_map_[obstacle_id];
   return true;
 }
-
-/**
- bool ADCNeighborhood::ForwardNearestObstacle(
- std::array<double, 3>* forward_nearest_obstacle_state, double* enter_time) {
- bool found = false;
- for (const auto& obstacle_state : forward_neighborhood_) {
- double obstacle_s = obstacle_state[1];
- // TODO(all) consider the length of adc,
- // Maybe change init_s_[0] to init_s_[0] - half_adc_length
- if (!found) {
- found = true;
- *enter_time = obstacle_state[0];
- (*forward_nearest_obstacle_state)[0] = obstacle_state[1];
- (*forward_nearest_obstacle_state)[1] = obstacle_state[3];
- (*forward_nearest_obstacle_state)[2] = obstacle_state[4];
- } else if (obstacle_s < (*forward_nearest_obstacle_state)[0]) {
- *enter_time = obstacle_state[0];
- (*forward_nearest_obstacle_state)[0] = obstacle_state[1];
- (*forward_nearest_obstacle_state)[1] = obstacle_state[3];
- (*forward_nearest_obstacle_state)[2] = obstacle_state[4];
- }
- }
- return found;
- }
-
- bool ADCNeighborhood::BackwardNearestObstacle(
- std::array<double, 3>* backward_nearest_obstacle_state,
- double* enter_time) {
- bool found = false;
- for (const auto& obstacle_state : backward_neighborhood_) {
- double obstacle_s = obstacle_state[2];
- // TODO(all) consider the length of adc,
- // Maybe change init_s_[0] to init_s_[0] + half_adc_length
- if (obstacle_s > init_s_[0]) {
- continue;
- }
- if (!found) {
- found = true;
- *enter_time = obstacle_state[0];
- (*backward_nearest_obstacle_state)[0] = obstacle_state[2];
- (*backward_nearest_obstacle_state)[1] = obstacle_state[3];
- (*backward_nearest_obstacle_state)[2] = obstacle_state[4];
- } else if (obstacle_s > (*backward_nearest_obstacle_state)[0]) {
- *enter_time = obstacle_state[0];
- (*backward_nearest_obstacle_state)[0] = obstacle_state[2];
- (*backward_nearest_obstacle_state)[1] = obstacle_state[3];
- (*backward_nearest_obstacle_state)[2] = obstacle_state[4];
- }
- }
- return found;
- }
-
- bool ADCNeighborhood::IsForward(const Obstacle* obstacle) const {
- std::string obstacle_id = obstacle->Id();
- return forward_obstacle_id_set_.find(obstacle_id) !=
- forward_obstacle_id_set_.end();
- }
-
- bool ADCNeighborhood::IsBackward(const Obstacle* obstacle) const {
- std::string obstacle_id = obstacle->Id();
- return backward_obstacle_id_set_.find(obstacle_id) !=
- backward_obstacle_id_set_.end();
- }
-
- bool ADCNeighborhood::IsInNeighborhood(const Obstacle* obstacle) const {
- return IsForward(obstacle) || IsBackward(obstacle);
- }
- **/
 
 }  // namespace planning
 }  // namespace apollo
