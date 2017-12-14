@@ -68,7 +68,7 @@ Status Monitor::Init() {
   }
 
   // Register online reporters.
-  if (!MonitorManager::GetConfig().has_online_report_endpoint()) {
+  if (MonitorManager::GetConfig().has_online_report_endpoint()) {
     monitor_thread_.RegisterRunner(make_unique<VehicleStateReporter>());
   }
 
