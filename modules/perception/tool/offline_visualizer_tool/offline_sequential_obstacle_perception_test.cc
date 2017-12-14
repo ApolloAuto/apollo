@@ -100,7 +100,7 @@ bool LoadOdometry(const std::string& filepath, Eigen::Vector3f* velocity) {
 class SequentialPerceptionTest {
  public:
   typedef std::function<bool(const std::string&,
-                             std::shared_ptr<SensorRawFrame>&)>
+                             std::shared_ptr<SensorRawFrame>*)>
       SensorFrameReconstructor;
 
   SequentialPerceptionTest() : init_offset_(false) {}
@@ -132,7 +132,7 @@ class SequentialPerceptionTest {
   }
 
   bool ReconstructSensorRawFrame(const std::string& file_path,
-                                 std::shared_ptr<SensorRawFrame>& frame) {
+                                 std::shared_ptr<SensorRawFrame>* frame) {
     std::string type = file_path.substr(file_path.find_last_of(".") + 1);
     auto find_res = sensor_frame_reconstructor_.find(type);
     if (find_res == sensor_frame_reconstructor_.end()) {
@@ -143,7 +143,7 @@ class SequentialPerceptionTest {
   }
 
   bool ReconstructPointcloudSensorRawFrame(
-      const std::string& file_path, std::shared_ptr<SensorRawFrame>& frame) {
+      const std::string& file_path, std::shared_ptr<SensorRawFrame>* frame) {
     std::string type = file_path.substr(file_path.find_last_of(".") + 1);
     if (type != "pcd") {
       AERROR
@@ -193,19 +193,19 @@ class SequentialPerceptionTest {
     }
 
     // pose = pose * _velodyne2novatel_ex;
-    frame.reset(new VelodyneRawFrame);
+    frame->reset(new VelodyneRawFrame);
     VelodyneRawFrame* velodyne_frame =
-        dynamic_cast<VelodyneRawFrame*>(frame.get());
+        dynamic_cast<VelodyneRawFrame*>(frame->get());
     velodyne_frame->timestamp_ = timestamp;
     velodyne_frame->pose_ = pose;
     velodyne_frame->sensor_type_ = VELODYNE_64;
     velodyne_frame->cloud_ = cloud;
-    AINFO << "velo frame sensor_type_ = " << frame->sensor_type_;
+    AINFO << "velo frame sensor_type_ = " << (*frame)->sensor_type_;
     return true;
   }
 
   bool ReconstructRadarSensorRawFrame(const std::string& file_path,
-                                      std::shared_ptr<SensorRawFrame>& frame) {
+                                      std::shared_ptr<SensorRawFrame>* frame) {
     std::string type = file_path.substr(file_path.find_last_of(".") + 1);
     if (type != "radar") {
       AERROR << "reconstruct_radar_sensor_raw_frame can only handle "
@@ -249,14 +249,14 @@ class SequentialPerceptionTest {
     }
     pose.col(3).head(3) -= global_offset_;
 
-    frame.reset(new RadarRawFrame);
-    RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame.get());
+    frame->reset(new RadarRawFrame);
+    RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame->get());
     radar_frame->timestamp_ = timestamp;
     radar_frame->pose_ = pose;
     radar_frame->sensor_type_ = RADAR;
     radar_frame->raw_obstacles_ = radar_obs_proto;
     radar_frame->car_linear_speed_ = velocity;
-    AINFO << "radar frame sensor_type_ = " << frame->sensor_type_;
+    AINFO << "radar frame sensor_type_ = " << (*frame)->sensor_type_;
     return true;
   }
 
@@ -359,7 +359,7 @@ int main(int argc, char** argv) {
     AINFO << "Process frame " << sensors_files[i];
     std::shared_ptr<apollo::perception::SensorRawFrame> raw_frame(
                                   new apollo::perception::SensorRawFrame);
-    test.ReconstructSensorRawFrame(sensors_files[i].file_path, raw_frame);
+    test.ReconstructSensorRawFrame(sensors_files[i].file_path, &raw_frame);
     test.Run(raw_frame.get());
   }
   return 0;
