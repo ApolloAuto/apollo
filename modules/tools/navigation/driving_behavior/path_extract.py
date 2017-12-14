@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,12 +16,20 @@
 # limitations under the License.
 ###############################################################################
 
+import sys
+import datetime
+import rosbag
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if __name__ == '__main__':
+    fbag = sys.argv[1]
 
-source "${DIR}/apollo_base.sh"
+    now = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    f = open("path_" + fbag.split('/')[-1] + ".txt", 'w')
 
-# generate routing_map.bin in map directory.
-/apollo/bazel-bin/modules/routing/topo_creator/topo_creator \
-    --flagfile=modules/routing/conf/routing.conf \
-    -alsologtostderr $@
+    bag = rosbag.Bag(fbag)
+    for topic, localization_pb, t in bag.read_messages(
+            topics=['/apollo/localization/pose']):
+        x = localization_pb.pose.position.x
+        y = localization_pb.pose.position.y
+        f.write(str(x) + "," + str(y) + "\n")
+    bag.close()

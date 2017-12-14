@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,12 +16,27 @@
 # limitations under the License.
 ###############################################################################
 
+import sys
+import matplotlib.pyplot as plt
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+fig = plt.figure()
+ax = plt.subplot2grid((1, 1), (0, 0))
+styles = ["b-", "r-", "y-"]
+i = 0
+for fn in sys.argv[1:]:
+    f = open(fn, 'r')
+    xs = []
+    ys = []
+    for line in f:
+        line = line.replace("\n", '')
+        data = line.split(',')
+        x = float(data[0])
+        y = float(data[1])
+        xs.append(x)
+        ys.append(y)
+    f.close()
+    ax.plot(xs, ys, styles[i], lw=3, alpha=0.8)
+    i = i % len(styles) + 1
 
-source "${DIR}/apollo_base.sh"
-
-# generate routing_map.bin in map directory.
-/apollo/bazel-bin/modules/routing/topo_creator/topo_creator \
-    --flagfile=modules/routing/conf/routing.conf \
-    -alsologtostderr $@
+ax.axis('equal')
+plt.show()

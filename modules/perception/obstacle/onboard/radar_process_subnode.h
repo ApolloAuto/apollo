@@ -27,7 +27,7 @@
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/localization/proto/gps.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
@@ -56,12 +56,14 @@ class RadarProcessSubnode : public Subnode {
   }
 
  private:
-  typedef std::pair<double, apollo::localization::Gps> ObjectPair;
+  typedef std::pair<double,
+    apollo::localization::LocalizationEstimate> LocalizationPair;
   bool InitInternal() override;
 
   void OnRadar(const ContiRadar &radar_obs);
 
-  void OnGps(const apollo::localization::Gps &gps);
+  void OnLocalization(
+    const apollo::localization::LocalizationEstimate &localization);
 
   void RegistAllAlgorithm();
 
@@ -82,7 +84,7 @@ class RadarProcessSubnode : public Subnode {
   Eigen::Matrix4d radar_extrinsic_;
   Eigen::Matrix4d short_camera_extrinsic_;
 
-  boost::circular_buffer<ObjectPair> gps_buffer_;
+  boost::circular_buffer<LocalizationPair> localization_buffer_;
   ContiRadarIDExpansion _conti_id_expansion;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
   HDMapInput *hdmap_input_ = NULL;
