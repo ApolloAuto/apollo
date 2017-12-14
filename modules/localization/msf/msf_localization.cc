@@ -222,8 +222,8 @@ void MSFLocalization::PublishPoseBroadcastTF(
   // broadcast tf message
   geometry_msgs::TransformStamped tf2_msg;
   tf2_msg.header.stamp = ros::Time(localization.measurement_time());
-  tf2_msg.header.frame_id = FLAGS_broadcast_tf2_frame_id;
-  tf2_msg.child_frame_id = FLAGS_broadcast_tf2_child_frame_id;
+  tf2_msg.header.frame_id = FLAGS_localization_tf2_frame_id;
+  tf2_msg.child_frame_id = FLAGS_localization_tf2_child_frame_id;
 
   tf2_msg.transform.translation.x = localization.pose().position().x();
   tf2_msg.transform.translation.y = localization.pose().position().y();
