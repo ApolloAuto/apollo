@@ -139,7 +139,7 @@ if __name__ == "__main__":
         "signal_filename", action="store", help="""the signal file name""")
     parser.add_argument(
         "--extend_to_neighbor_lane",
-        action="store",
+        action="store_true",
         help="""the signal file name""")
     g_args = parser.parse_args()
     parse_drive_event_file(g_args.drive_event_filename, g_args.signal_filename)
