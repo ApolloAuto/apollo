@@ -56,9 +56,11 @@ Status ExportSensorData::Init() {
                                         this);
   CHECK(AdapterManager::GetContiRadar()) << "Radar is not initialized.";
   AdapterManager::AddContiRadarCallback(&ExportSensorData::OnRadar, this);
-  CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
-  AdapterManager::AddGpsCallback(&ExportSensorData::OnGps, this);
-  gps_buffer_.set_capacity(FLAGS_gps_buffer_size);
+  CHECK(AdapterManager::GetLocalization())
+    << "Localization is not initialized.";
+  AdapterManager::AddLocalizationCallback(
+    &ExportSensorData::OnLocalization, this);
+  localization_buffer_.set_capacity(FLAGS_localization_buffer_size);
   return Status::OK();
 }
 
@@ -223,13 +225,14 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
   WriteVelocityInfo(file_pre, timestamp, seq_num, car_linear_speed);
 }
 
-void ExportSensorData::OnGps(const apollo::localization::Gps &gps) {
-  double timestamp = gps.header().timestamp_sec();
-  AINFO << "gps timestamp:" << GLOG_TIMESTAMP(timestamp);
-  ObjectPair obj_pair;
-  obj_pair.first = timestamp;
-  obj_pair.second = gps;
-  gps_buffer_.push_back(obj_pair);
+void ExportSensorData::OnLocalization(
+  const apollo::localization::LocalizationEstimate &localization) {
+  double timestamp = localization.header().timestamp_sec();
+  AINFO << "localization timestamp:" << GLOG_TIMESTAMP(timestamp);
+  LocalizationPair localization_pair;
+  localization_pair.first = timestamp;
+  localization_pair.second = localization;
+  localization_buffer_.push_back(localization_pair);
 }
 
 bool ExportSensorData::GetCarLinearSpeed(double timestamp,
@@ -239,34 +242,34 @@ bool ExportSensorData::GetCarLinearSpeed(double timestamp,
     AERROR << "Param car_linear_speed NULL error.";
     return false;
   }
-  if (gps_buffer_.empty()) {
+  if (localization_buffer_.empty()) {
     AWARN << "Rosmsg buffer is empty.";
     return false;
   }
-  if (gps_buffer_.front().first - 0.1 > timestamp) {
+  if (localization_buffer_.front().first - 0.1 > timestamp) {
     AWARN << "Timestamp (" << GLOG_TIMESTAMP(timestamp)
           << ") is earlier than the oldest "
-          << "timestamp (" << gps_buffer_.front().first << ").";
+          << "timestamp (" << localization_buffer_.front().first << ").";
     return false;
   }
-  if (gps_buffer_.back().first + 0.1 < timestamp) {
+  if (localization_buffer_.back().first + 0.1 < timestamp) {
     AWARN << "Timestamp (" << GLOG_TIMESTAMP(timestamp)
           << ") is newer than the latest "
-          << "timestamp (" << gps_buffer_.back().first << ").";
+          << "timestamp (" << localization_buffer_.back().first << ").";
     return false;
   }
   // loop to find nearest
   double distance = 1e9;
-  int idx = gps_buffer_.size() - 1;
+  int idx = localization_buffer_.size() - 1;
   for (; idx >= 0; --idx) {
-    double temp_distance = fabs(timestamp - gps_buffer_[idx].first);
+    double temp_distance = fabs(timestamp - localization_buffer_[idx].first);
     if (temp_distance >= distance) {
       break;
     }
     distance = temp_distance;
   }
   const auto &velocity =
-      gps_buffer_[idx + 1].second.localization().linear_velocity();
+      localization_buffer_[idx + 1].second.pose().linear_velocity();
   (*car_linear_speed)[0] = velocity.x();
   (*car_linear_speed)[1] = velocity.y();
   (*car_linear_speed)[2] = velocity.z();
