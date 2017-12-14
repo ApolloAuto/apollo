@@ -542,6 +542,7 @@ body {
         @include small-screen {
             font-size: 12px;
             width: 80px;
+            padding-top: 10px;
         }
 
         .icon {
@@ -552,6 +553,10 @@ body {
 
         .label {
             padding-top: 10px;
+
+            @include small-screen {
+                padding-top: 4px;
+            }
         }
     }
 
@@ -979,7 +984,7 @@ body {
         .button {
             height: 90px;
             border: none;
-            padding: 10px;
+            padding: 10px 15px;
 
             background: #1D2226;
             outline: none;
@@ -987,7 +992,7 @@ body {
 
             @include small-screen {
                 height: 60px;
-                padding: 5px;
+                padding: 5px 10px;
             }
 
             img {
@@ -997,7 +1002,7 @@ body {
 
                 @include small-screen {
                     top: 13px;
-                    margin: 5px auto;
+                    margin: 7px auto;
                 }
             }
 
