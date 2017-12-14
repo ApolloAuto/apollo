@@ -37,6 +37,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::math::Vec2d;
+using apollo::common::math::Box2d;
 using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
@@ -59,8 +60,7 @@ bool ReferenceLineInfo::Init() {
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
   Vec2d center(position + vec_to_center.rotate(path_point.theta()));
-  common::math::Box2d box(center, path_point.theta(), param.length(),
-                          param.width());
+  Box2d box(center, path_point.theta(), param.length(), param.width());
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
@@ -85,7 +85,7 @@ PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
 }
-const common::TrajectoryPoint& ReferenceLineInfo::AdcPlanningPoint() const {
+const TrajectoryPoint& ReferenceLineInfo::AdcPlanningPoint() const {
   return adc_planning_point_;
 }
 
