@@ -286,7 +286,6 @@ bool ReferenceLine::SLToXY(const SLPoint& sl_point,
 
 bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
                            SLPoint* const sl_point) const {
-  DCHECK_NOTNULL(sl_point);
   double s = 0.0;
   double l = 0.0;
   if (!map_path_.GetProjection(xy_point, &s, &l)) {
@@ -369,7 +368,9 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
   return reference_points_;
 }
 
-const MapPath& ReferenceLine::map_path() const { return map_path_; }
+const MapPath& ReferenceLine::map_path() const {
+  return map_path_;
+}
 
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
