@@ -13,11 +13,11 @@ vehicle:                   #
   optional:                #
     description: UNKNOWN   # vehicle descriptions.
 data:
-  output_path: /mnt/nvme1/
-  output_link_path: /home/caros/record_data
+  output_path: /media/apollo/data_storage
+  output_link_path: /apollo/data/record_data
   recorder_cmd_topic: /apollo/data_recorder/cmd
   recorder_status_topic: /apollo/data_recorder/status
-  backup_path: /home/caros/backup
+  backup_path: /apollo/data/backup
   backup_keep_days: 3          # 
   backup_max_size: 102400      # unit MB
   meta_extension: ini          # global meta format: ini or json.
