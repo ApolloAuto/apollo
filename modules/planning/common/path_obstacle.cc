@@ -224,6 +224,14 @@ bool PathObstacle::BuildTrajectoryStBoundary(
 
 const StBoundary& PathObstacle::st_boundary() const { return st_boundary_; }
 
+const std::vector<std::string>& PathObstacle::decider_tags() const {
+  return decider_tags_;
+}
+
+const std::vector<ObjectDecisionType>& PathObstacle::decisions() const {
+  return decisions_;
+}
+
 bool PathObstacle::IsLateralDecision(const ObjectDecisionType& decision) {
   return decision.has_ignore() || decision.has_nudge();
 }
