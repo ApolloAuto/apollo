@@ -327,6 +327,7 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   DCHECK(false) << "Does not have rule to merge decision: "
                 << lhs.ShortDebugString()
                 << " and decision: " << rhs.ShortDebugString();
+  return lhs;
 }
 
 bool PathObstacle::HasLateralDecision() const {
