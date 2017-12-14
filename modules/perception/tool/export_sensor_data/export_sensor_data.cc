@@ -269,7 +269,7 @@ bool ExportSensorData::GetCarLinearSpeed(double timestamp,
     distance = temp_distance;
   }
   const auto &velocity =
-      localization_buffer_[idx + 1].second.pose().linear_velocity();
+      localization_buffer_[idx].second.pose().linear_velocity();
   (*car_linear_speed)[0] = velocity.x();
   (*car_linear_speed)[1] = velocity.y();
   (*car_linear_speed)[2] = velocity.z();
