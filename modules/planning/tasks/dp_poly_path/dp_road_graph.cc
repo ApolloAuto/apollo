@@ -247,20 +247,28 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    const double sample_right_boundary =
+    const double kDeafultUnitL = 0.30;
+    const double sample_l_range =
+        kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
+    double sample_right_boundary =
         std::fmin(-eff_right_width, init_sl_point_.l());
-    const double sample_left_boundary =
-        std::fmax(eff_left_width, init_sl_point_.l());
+    double sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+
+    if (init_sl_point_.l() > eff_left_width) {
+      sample_right_boundary =
+          std::fmax(sample_right_boundary, init_sl_point_.l() - sample_l_range);
+    }
+    if (init_sl_point_.l() < eff_right_width) {
+      sample_left_boundary =
+          std::fmin(sample_left_boundary, init_sl_point_.l() + sample_l_range);
+    }
 
     std::vector<double> sample_l;
     common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
-    const uint8_t sample_size = reference_line_info_.IsChangeLanePath()
-                                    ? sample_l.size() + 1
-                                    : sample_l.size();
 
-    for (uint8_t j = 0; j < sample_size; ++j) {
+    for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
       common::SLPoint sl;
       if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
@@ -271,6 +279,9 @@ bool DPRoadGraph::SamplePathWaypoints(
             std::fmin(total_length, s + kResonateDistance), l);
       }
       level_points.push_back(std::move(sl));
+    }
+    if (!reference_line_info_.IsChangeLanePath()) {
+      level_points.push_back(common::util::MakeSLPoint(s, 0.0));
     }
 
     if (!level_points.empty()) {
