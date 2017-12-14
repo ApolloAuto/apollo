@@ -214,6 +214,17 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
     }
     lane_boundary->set_length(
         UtilXmlParser::CurveLength(*lane_boundary->mutable_curve()));
+
+    bool is_virtual = false;
+    std::string virtual_border = "FALSE";
+    checker = UtilXmlParser::QueryStringAttribute(*sub_node, "virtual",
+            &virtual_border);
+    if (checker == tinyxml2::XML_SUCCESS) {
+      if (virtual_border == "TRUE") {
+        is_virtual = true;
+      }
+    }
+    lane_boundary->set_virtual_(is_virtual);
   }
 
   // road mark
