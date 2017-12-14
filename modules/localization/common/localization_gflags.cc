@@ -71,7 +71,7 @@ DEFINE_string(lidar_extrinsics_file,
               "Lidar extrinsics parameter file.");
 DEFINE_string(lidar_height_file,
               "<ros>/share/velodyne_pointcloud/params/"
-              "velodyne64_height_example.yaml",
+              "velodyne64_height.yaml",
               "Velodyne extrinsic path for the vehicle in use, "
               "where <ros> is the placeholder of ROS root.");
 DEFINE_double(lidar_height_default, 1.80,
