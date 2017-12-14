@@ -89,6 +89,10 @@ class PathObstacle {
 
   const StBoundary& st_boundary() const;
 
+  const std::vector<std::string>& decider_tags() const;
+
+  const std::vector<ObjectDecisionType>& decisions() const;
+
   void AddLongitudinalDecision(const std::string& decider_tag,
                                const ObjectDecisionType& decision);
 

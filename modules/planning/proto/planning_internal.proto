@@ -9,6 +9,7 @@ import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
+import "modules/planning/proto/decision.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -88,6 +89,8 @@ message SignalLightDebug {
 message ObstacleDebug {
   optional string id = 1;
   optional apollo.planning.SLBoundary sl_boundary = 2;
+  repeated string decider_tag = 3;
+  repeated apollo.planning.ObjectDecisionType decision = 4;
 }
 
 message ChangeLaneState {
@@ -121,4 +124,3 @@ message PlanningData {
 
   repeated ObstacleDebug obstacle = 18;
 }
-
