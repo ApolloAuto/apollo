@@ -369,6 +369,9 @@ Status Planning::Plan(const double current_time_stamp,
   ptr_debug->MergeFrom(best_reference_line->debug());
   trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());
+  // set right of way status
+  trajectory_pb->set_right_of_way_status(
+      best_reference_line->GetRightOfWayStatus());
 
   best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
 
