@@ -29,7 +29,7 @@ em_planner_config {
         path_ddl_cost: 5e1
         path_l_cost_param_l0: 1.50
         path_l_cost_param_b: 0.40
-        path_l_cost_param_k: 1.5
+        path_l_cost_param_k: 1.50
         path_out_lane_cost: 1e8
         path_end_l_cost: 1.0e4
     }

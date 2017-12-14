@@ -210,7 +210,10 @@ void ReferenceLineInfo::SetDriable(bool drivable) { is_drivable_ = drivable; }
 bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
 
 bool ReferenceLineInfo::IsChangeLanePath() const {
-  return !Lanes().IsOnSegment();
+  // NOTICE: a reference line info cannot differentiate whether it is a change
+  // lane path or a normal driving path. It can only be set from one that can
+  // see both reference lines.
+  return is_change_lane_path_;
 }
 
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
