@@ -372,6 +372,27 @@ void RTKLocalization::PublishLocalization() {
   ADEBUG << "[OnTimer]: Localization message publish success!";
 }
 
+void RTKLocalization::PublishPoseBroadcastTF(
+    const LocalizationEstimate &localization) {
+  // broadcast tf message
+  geometry_msgs::TransformStamped tf2_msg;
+  tf2_msg.header.stamp = ros::Time(localization.measurement_time());
+  tf2_msg.header.frame_id = FLAGS_broadcast_tf2_frame_id;
+  tf2_msg.child_frame_id = FLAGS_broadcast_tf2_child_frame_id;
+
+  tf2_msg.transform.translation.x = localization.pose().position().x();
+  tf2_msg.transform.translation.y = localization.pose().position().y();
+  tf2_msg.transform.translation.z = localization.pose().position().z();
+
+  tf2_msg.transform.rotation.x = localization.pose().orientation().qx();
+  tf2_msg.transform.rotation.y = localization.pose().orientation().qy();
+  tf2_msg.transform.rotation.z = localization.pose().orientation().qz();
+  tf2_msg.transform.rotation.w = localization.pose().orientation().qw();
+
+  tf2_broadcaster_->sendTransform(tf2_msg);
+  return;
+}
+
 void RTKLocalization::RunWatchDog() {
   if (!FLAGS_enable_watchdog) {
     return;
