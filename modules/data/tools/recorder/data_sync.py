@@ -43,7 +43,7 @@ class DataSync(threading.Thread):
     def check_file(self, filename):
         """Check if a file is used by other process."""
         if os.path.exists(filename):
-            cmd = "echo \"rootpass\n\"|sudo -S lsof -f -- " + filename
+            cmd = "echo \"caros\n\"|sudo -S lsof -f -- " + filename
             process = subprocess.Popen(
                 cmd,
                 shell=True,
@@ -66,15 +66,14 @@ class DataSync(threading.Thread):
             logging.warn("%s do not exits.", src)
             return
         sync_src = src if src.endswith('/') else src + "/"
-        sync_dst = self.recorder_manager.output_directory + "/" + dst + "/"
+        sync_dst = (self.recorder_manager.output_directory + "/" + dst).rstrip('/')
         cmd = "mkdir -p " + sync_dst \
-                + " && echo \"rootpass\n\" |sudo -S /usr/bin/rsync " \
-                + "-auvrtzopgP --bwlimit=" \
-                + str(limit) \
-                + " " \
+                + " && cd " \
                 + sync_src \
-                + " " \
-                + sync_dst
+                + " && echo \"caros\n\" | sudo -S ls" \
+                + " | while read f; do echo \"rootpass\n\" | sudo -S cp -r $f " \
+                + sync_dst \
+                + ";done"
         sync_process = subprocess.Popen(
                 cmd,
                 shell=True,
@@ -197,8 +196,10 @@ class DataSync(threading.Thread):
     def run(self):
         """Thread run from here."""
         now_time = datetime.datetime.now()
-        period = datetime.timedelta(seconds=120)
+        period = datetime.timedelta(seconds=600)
         next_time = now_time + period
+        self.clean_backup()
+        self.sync_data()
         while not self.recorder_manager.stop_signal:
             time.sleep(1)
             if not self.recorder_manager.sync_enable:
