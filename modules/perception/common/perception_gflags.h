@@ -41,8 +41,6 @@ DECLARE_string(onboard_tracker);
 DECLARE_int32(tf2_buff_in_ms);
 DECLARE_string(lidar_tf2_frame_id);
 DECLARE_string(lidar_tf2_child_frame_id);
-DECLARE_string(localization_tf2_frame_id);
-DECLARE_string(localization_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
 
