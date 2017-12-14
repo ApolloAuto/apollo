@@ -46,9 +46,6 @@ DEFINE_int32(localization_buffer_size, 40, "localization buffer size");
 DEFINE_string(lidar_tf2_frame_id, "novatel", "the tf2 transform frame id");
 DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");
-DEFINE_string(localization_tf2_frame_id, "world", "the tf2 transform frame id");
-DEFINE_string(localization_tf2_child_frame_id, "novatel",
-              "the tf2 transform child frame id");
 DEFINE_string(obstacle_module_name, "perception_obstacle",
               "perception obstacle module name");
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
@@ -66,11 +63,11 @@ DEFINE_string(radar_tf2_child_frame_id, "radar",
 DEFINE_double(front_radar_forward_distance, 120.0,
               "get front radar forward distancer");
 DEFINE_string(radar_extrinsic_file,
-  "modules/perception/data/params/radar_extrinsics.yaml",
-  "radar extrinsic file");
+              "modules/perception/data/params/radar_extrinsics.yaml",
+              "radar extrinsic file");
 DEFINE_string(short_camera_extrinsic_file,
-  "modules/perception/data/params/short_camera_extrinsics.yaml",
-  "short_camera extrinsic file");
+              "modules/perception/data/params/short_camera_extrinsics.yaml",
+              "short_camera extrinsic file");
 
 /// obstacle/onboard/fusion_subnode.cc
 DEFINE_string(onboard_fusion, "ProbabilisticFusion",

@@ -93,10 +93,6 @@ DEFINE_bool(integ_ins_can_self_align, false, "");
 DEFINE_bool(integ_sins_align_with_vel, true, "");
 DEFINE_double(vel_threshold_get_yaw, 5.0, "");
 DEFINE_bool(integ_debug_log_flag, false, "");
-DEFINE_string(broadcast_tf2_frame_id, "world",
-              "The frame id used to broadcast the localization result.");
-DEFINE_string(broadcast_tf2_child_frame_id, "localization_100hz",
-              "The child frame id used to broadcast the localization result.");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, "");

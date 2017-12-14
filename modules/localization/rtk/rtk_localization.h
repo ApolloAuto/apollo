@@ -55,7 +55,7 @@ namespace localization {
 class RTKLocalization : public LocalizationBase {
  public:
   RTKLocalization();
-  virtual ~RTKLocalization() = default;
+  virtual ~RTKLocalization();
 
   /**
    * @brief module start function
