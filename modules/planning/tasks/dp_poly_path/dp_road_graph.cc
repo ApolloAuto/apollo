@@ -119,8 +119,9 @@ bool DPRoadGraph::GenerateMinCostPath(
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
   if (!SamplePathWaypoints(init_point_, &path_waypoints) ||
-      path_waypoints.size() < 2) {
-    AERROR << "Fail to sample path waypoints!";
+      path_waypoints.size() < 1) {
+    AERROR << "Fail to sample path waypoints! reference_line_length = "
+           << reference_line_.Length();
     return false;
   }
   path_waypoints.insert(path_waypoints.begin(),
@@ -213,7 +214,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
   constexpr double kSamplePointLookForwardTime = 4.0;
-  CHECK(points != nullptr);
+  CHECK_NOTNULL(points);
 
   const double kAdditioalPathLength = 20.0;
   const double total_length =

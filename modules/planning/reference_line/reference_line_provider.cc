@@ -259,6 +259,7 @@ bool ReferenceLineProvider::GetReferenceLines(
 
   if (FLAGS_enable_reference_line_provider_thread) {
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+
     if (!reference_lines_.empty()) {
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
