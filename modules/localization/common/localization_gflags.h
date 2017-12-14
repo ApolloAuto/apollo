@@ -69,8 +69,6 @@ DECLARE_bool(integ_sins_align_with_vel);
 DECLARE_bool(using_raw_gnsspos);
 DECLARE_double(vel_threshold_get_yaw);
 DECLARE_bool(integ_debug_log_flag);
-DECLARE_string(broadcast_tf2_frame_id);
-DECLARE_string(broadcast_tf2_child_frame_id);
 
 // gnss module
 DECLARE_bool(enable_ins_aid_rtk);
