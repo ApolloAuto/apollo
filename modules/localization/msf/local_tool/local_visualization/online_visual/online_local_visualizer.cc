@@ -118,8 +118,7 @@ Status OnlineLocalVisualizer::Init() {
 void OnlineLocalVisualizer::InitParams() {
   visual_manager_params_.map_folder =
       FLAGS_map_dir + "/" + FLAGS_local_map_name;
-  visual_manager_params_.lidar_extrinsic_file =
-      common::util::TranslatePath(FLAGS_lidar_extrinsics_file);
+  visual_manager_params_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
 }
 
 void OnlineLocalVisualizer::OnPointCloud(
