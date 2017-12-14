@@ -37,15 +37,15 @@ export default class Header extends React.Component {
         return (
             <div className="module-controller">
                 <div className="card">
-                    <div className="card-header"><span>Modules</span></div>
-                    <div className="card-content-row">
-                        {moduleEntries}
-                    </div>
-                </div>
-                <div className="card">
                     <div className="card-header"><span>Hardware</span></div>
                     <div className="card-content-column">
                         {hardwareEntries}
+                    </div>
+                </div>
+                <div className="card">
+                    <div className="card-header"><span>Modules</span></div>
+                    <div className="card-content-row">
+                        {moduleEntries}
                     </div>
                 </div>
             </div>
