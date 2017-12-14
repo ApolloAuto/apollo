@@ -17,7 +17,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.25
-  a: 0.46918395218119385
+  a: 0.46918395218119419
   relative_time: 0
 }
 trajectory_point {
@@ -31,7 +31,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.259477305033938
-  a: 0.4784896338462713
+  a: 0.47848963384627152
   relative_time: 0.02
 }
 trajectory_point {
@@ -45,7 +45,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.269137320910886
-  a: 0.48745564906672412
+  a: 0.48745564906672428
   relative_time: 0.04
 }
 trajectory_point {
@@ -59,7 +59,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.278973291057017
-  a: 0.49608567334883852
+  a: 0.49608567334883857
   relative_time: 0.06
 }
 trajectory_point {
@@ -87,7 +87,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.299146435412135
-  a: 0.51235245112319616
+  a: 0.512352451123196
   relative_time: 0.1
 }
 trajectory_point {
@@ -101,7 +101,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.309470464024091
-  a: 0.51999655562801161
+  a: 0.51999655562801139
   relative_time: 0.12000000000000001
 }
 trajectory_point {
@@ -115,7 +115,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.319944155711168
-  a: 0.5273193712196329
+  a: 0.52731937121963257
   relative_time: 0.14
 }
 trajectory_point {
@@ -129,7 +129,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.330561121450163
-  a: 0.534324573404346
+  a: 0.53432457340434569
   relative_time: 0.16
 }
 trajectory_point {
@@ -143,7 +143,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.341315045728004
-  a: 0.54101583768843731
+  a: 0.54101583768843686
   relative_time: 0.18
 }
 trajectory_point {
@@ -157,7 +157,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.35219968654174
-  a: 0.54739683957819263
+  a: 0.54739683957819218
   relative_time: 0.19999999999999998
 }
 trajectory_point {
@@ -171,7 +171,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.363208875398545
-  a: 0.55347125457989821
+  a: 0.55347125457989765
   relative_time: 0.21999999999999997
 }
 trajectory_point {
@@ -184,8 +184,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.374336517315724
-  a: 0.55924275819984
+  v: 11.374336517315722
+  a: 0.55924275819983937
   relative_time: 0.23999999999999996
 }
 trajectory_point {
@@ -199,7 +199,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.385576590820701
-  a: 0.56471502594430423
+  a: 0.56471502594430356
   relative_time: 0.25999999999999995
 }
 trajectory_point {
@@ -213,7 +213,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.396923147951034
-  a: 0.56989173331957688
+  a: 0.5698917333195761
   relative_time: 0.27999999999999997
 }
 trajectory_point {
@@ -227,7 +227,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.408370314254398
-  a: 0.574776555831944
+  a: 0.57477655583194331
   relative_time: 0.3
 }
 trajectory_point {
@@ -241,7 +241,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.4199122887886
-  a: 0.57937316898769176
+  a: 0.579373168987691
   relative_time: 0.32
 }
 trajectory_point {
@@ -255,7 +255,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.431543344121572
-  a: 0.58368524829310631
+  a: 0.58368524829310542
   relative_time: 0.34
 }
 trajectory_point {
@@ -269,7 +269,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.443257826331365
-  a: 0.58771646925447352
+  a: 0.58771646925447274
   relative_time: 0.36000000000000004
 }
 trajectory_point {
@@ -283,7 +283,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.455050155006164
-  a: 0.59147050737807971
+  a: 0.59147050737807882
   relative_time: 0.38000000000000006
 }
 trajectory_point {
@@ -297,7 +297,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.466914823244279
-  a: 0.59495103817021078
+  a: 0.59495103817020989
   relative_time: 0.40000000000000008
 }
 trajectory_point {
@@ -311,7 +311,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.478846397654138
-  a: 0.59816173713715293
+  a: 0.598161737137152
   relative_time: 0.4200000000000001
 }
 trajectory_point {
@@ -325,7 +325,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.490839518354305
-  a: 0.60110627978519215
+  a: 0.60110627978519127
   relative_time: 0.44000000000000011
 }
 trajectory_point {
@@ -338,8 +338,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.502888898973463
-  a: 0.60378834162061468
+  v: 11.502888898973461
+  a: 0.60378834162061368
   relative_time: 0.46000000000000013
 }
 trajectory_point {
@@ -353,7 +353,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.51498932665042
-  a: 0.60621159814970638
+  a: 0.60621159814970549
   relative_time: 0.48000000000000015
 }
 trajectory_point {
@@ -366,8 +366,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.527135662034118
-  a: 0.60837972487875347
+  v: 11.527135662034116
+  a: 0.60837972487875258
   relative_time: 0.50000000000000011
 }
 trajectory_point {
@@ -381,7 +381,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.539322839283612
-  a: 0.61029639731404206
+  a: 0.61029639731404117
   relative_time: 0.52000000000000013
 }
 trajectory_point {
@@ -394,8 +394,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.551545866068096
-  a: 0.61196529096185825
+  v: 11.551545866068095
+  a: 0.61196529096185737
   relative_time: 0.54000000000000015
 }
 trajectory_point {
@@ -409,7 +409,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.563799823566878
-  a: 0.613390081328488
+  a: 0.61339008132848716
   relative_time: 0.56000000000000016
 }
 trajectory_point {
@@ -423,7 +423,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.576079866469403
-  a: 0.61457444392021765
+  a: 0.61457444392021665
   relative_time: 0.58000000000000018
 }
 trajectory_point {
@@ -436,8 +436,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.588381222975231
-  a: 0.61552205424333284
+  v: 11.588381222975229
+  a: 0.615522054243332
   relative_time: 0.6000000000000002
 }
 trajectory_point {
@@ -451,7 +451,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.600699194794053
-  a: 0.61623658780412
+  a: 0.61623658780411916
   relative_time: 0.62000000000000022
 }
 trajectory_point {
@@ -465,7 +465,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.613029157145688
-  a: 0.61672172010886528
+  a: 0.61672172010886439
   relative_time: 0.64000000000000024
 }
 trajectory_point {
@@ -479,7 +479,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.625366558760076
-  a: 0.61698112666385452
+  a: 0.61698112666385363
   relative_time: 0.66000000000000025
 }
 trajectory_point {
@@ -493,7 +493,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.637706921877285
-  a: 0.61701848297537376
+  a: 0.61701848297537287
   relative_time: 0.68000000000000027
 }
 trajectory_point {
@@ -507,7 +507,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.650045842247509
-  a: 0.61683746454970945
+  a: 0.61683746454970856
   relative_time: 0.70000000000000029
 }
 trajectory_point {
@@ -520,8 +520,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.662378989131069
-  a: 0.61644174689314735
+  v: 11.662378989131067
+  a: 0.61644174689314646
   relative_time: 0.72000000000000031
 }
 trajectory_point {
@@ -535,7 +535,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.674702105298405
-  a: 0.61583500551197368
+  a: 0.61583500551197279
   relative_time: 0.74000000000000032
 }
 trajectory_point {
@@ -549,7 +549,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.687011007030092
-  a: 0.61502091591247443
+  a: 0.61502091591247354
   relative_time: 0.76000000000000034
 }
 trajectory_point {
@@ -563,7 +563,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.699301584116824
-  a: 0.61400315360093571
+  a: 0.61400315360093494
   relative_time: 0.78000000000000036
 }
 trajectory_point {
@@ -577,7 +577,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.711569799859424
-  a: 0.61278539408364374
+  a: 0.612785394083643
   relative_time: 0.80000000000000038
 }
 trajectory_point {
@@ -590,8 +590,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.723811691068841
-  a: 0.6113713128668844
+  v: 11.723811691068839
+  a: 0.61137131286688373
   relative_time: 0.8200000000000004
 }
 trajectory_point {
@@ -604,8 +604,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.736023368066146
-  a: 0.609764585456944
+  v: 11.736023368066144
+  a: 0.60976458545694323
   relative_time: 0.84000000000000041
 }
 trajectory_point {
@@ -619,7 +619,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.748201014682538
-  a: 0.60796888736010835
+  a: 0.60796888736010779
   relative_time: 0.86000000000000043
 }
 trajectory_point {
@@ -632,8 +632,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.760340888259346
-  a: 0.60598789408266385
+  v: 11.760340888259345
+  a: 0.60598789408266318
   relative_time: 0.88000000000000045
 }
 trajectory_point {
@@ -642,12 +642,12 @@ trajectory_point {
     y: 4141502.8121353076
     theta: 2.9070250886237718
     kappa: 0.0013828628302832667
-    s: 10.351386200961619
+    s: 10.351386200961617
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.772439319648017
-  a: 0.6038252811308964
+  v: 11.772439319648015
+  a: 0.60382528113089573
   relative_time: 0.90000000000000047
 }
 trajectory_point {
@@ -661,7 +661,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.784492713210128
-  a: 0.601484724011092
+  a: 0.60148472401109143
   relative_time: 0.92000000000000048
 }
 trajectory_point {
@@ -675,7 +675,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.796497546817381
-  a: 0.598969898229537
+  a: 0.59896989822953639
   relative_time: 0.9400000000000005
 }
 trajectory_point {
@@ -689,7 +689,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 11.808450371851606
-  a: 0.59628447929251716
+  a: 0.59628447929251671
   relative_time: 0.96000000000000052
 }
 trajectory_point {
@@ -702,8 +702,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.820347813204755
-  a: 0.59343214270631883
+  v: 11.820347813204753
+  a: 0.59343214270631828
   relative_time: 0.98000000000000054
 }
 trajectory_point {
@@ -711,13 +711,13 @@ trajectory_point {
     x: 587557.80430384306
     y: 4141503.0854005106
     theta: 2.908710715586015
-    kappa: 0.001460733170099293
-    s: 11.531628675720013
+    kappa: 0.0014607331700992928
+    s: 11.531628675720011
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.832186569278907
-  a: 0.59041656397722786
+  v: 11.832186569278905
+  a: 0.59041656397722753
   relative_time: 1.0000000000000004
 }
 trajectory_point {
@@ -730,8 +730,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 11.89038966024629
-  a: 0.573018680908399
+  v: 11.890389660246289
+  a: 0.5730186809083988
   relative_time: 1.1000000000000005
 }
 trajectory_point {
@@ -754,12 +754,12 @@ trajectory_point {
     y: 4141503.90080835
     theta: 2.9142386504399358
     kappa: 0.0016147461473050152
-    s: 15.107031466866163
+    s: 15.107031466866161
     dkappa: 0
     ddkappa: 0
   }
   v: 12.000705531310203
-  a: 0.52809317016830226
+  a: 0.52809317016830248
   relative_time: 1.3000000000000007
 }
 trajectory_point {
@@ -772,8 +772,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 12.052204253538005
-  a: 0.50148441906855556
+  v: 12.052204253538003
+  a: 0.5014844190685559
   relative_time: 1.4000000000000008
 }
 trajectory_point {
@@ -787,7 +787,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.100930701364844
-  a: 0.4727242551966907
+  a: 0.47272425519669126
   relative_time: 1.5000000000000009
 }
 trajectory_point {
@@ -800,8 +800,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 12.146692705427798
-  a: 0.4422721168384684
+  v: 12.146692705427796
+  a: 0.442272116838469
   relative_time: 1.600000000000001
 }
 trajectory_point {
@@ -814,8 +814,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 12.189344040192518
-  a: 0.41058744227964905
+  v: 12.189344040192516
+  a: 0.41058744227964966
   relative_time: 1.7000000000000011
 }
 trajectory_point {
@@ -829,7 +829,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.228784423953233
-  a: 0.3781296698059935
+  a: 0.37812966980599411
   relative_time: 1.8000000000000012
 }
 trajectory_point {
@@ -843,7 +843,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.264959518832747
-  a: 0.34535823770326218
+  a: 0.34535823770326263
   relative_time: 1.9000000000000012
 }
 trajectory_point {
@@ -857,7 +857,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.297860930782441
-  a: 0.31273258425721512
+  a: 0.31273258425721584
   relative_time: 2.0000000000000013
 }
 trajectory_point {
@@ -871,7 +871,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.32754302233136
-  a: 0.2811970023634493
+  a: 0.28119700236344986
   relative_time: 2.1000000000000014
 }
 trajectory_point {
@@ -885,7 +885,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.354157728543241
-  a: 0.2513833391129488
+  a: 0.25138333911294919
   relative_time: 2.2000000000000015
 }
 trajectory_point {
@@ -899,7 +899,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.377876779761353
-  a: 0.22328236408455757
+  a: 0.22328236408455787
   relative_time: 2.3000000000000016
 }
 trajectory_point {
@@ -912,8 +912,8 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 12.39887098328685
-  a: 0.1968848468571196
+  v: 12.398870983286852
+  a: 0.19688484685711977
   relative_time: 2.4000000000000017
 }
 trajectory_point {
@@ -927,7 +927,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.41731022337877
-  a: 0.17218155700947871
+  a: 0.17218155700947882
   relative_time: 2.5000000000000018
 }
 trajectory_point {
@@ -941,7 +941,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.433363461254034
-  a: 0.14916326412047889
+  a: 0.14916326412047892
   relative_time: 2.6000000000000019
 }
 trajectory_point {
@@ -955,7 +955,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.447198735087449
-  a: 0.12782073776896402
+  a: 0.12782073776896405
   relative_time: 2.700000000000002
 }
 trajectory_point {
@@ -969,7 +969,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.458983160011705
-  a: 0.10814474753377806
+  a: 0.10814474753377804
   relative_time: 2.800000000000002
 }
 trajectory_point {
@@ -977,13 +977,13 @@ trajectory_point {
     x: 587535.09084652236
     y: 4141508.0404207343
     theta: 2.9424057700489752
-    kappa: 0.00093367668849787052
-    s: 34.780483972715309
+    kappa: 0.00093367668849787
+    s: 34.780483972715317
     dkappa: 0
     ddkappa: 0
   }
   v: 12.468882928117377
-  a: 0.090126062993764966
+  a: 0.090126062993764938
   relative_time: 2.9000000000000021
 }
 trajectory_point {
@@ -997,7 +997,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.477063308452925
-  a: 0.0737554537277686
+  a: 0.073755453727768538
   relative_time: 3.0000000000000022
 }
 trajectory_point {
@@ -1011,7 +1011,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.483688647024692
-  a: 0.059023689314632866
+  a: 0.05902368931463281
   relative_time: 3.1000000000000023
 }
 trajectory_point {
@@ -1025,7 +1025,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.488922366796908
-  a: 0.045921539333201755
+  a: 0.0459215393332017
   relative_time: 3.2000000000000024
 }
 trajectory_point {
@@ -1038,7 +1038,7 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 12.492926967691684
+  v: 12.492926967691686
   a: 0.034439773362319182
   relative_time: 3.3000000000000025
 }
@@ -1053,7 +1053,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.495864026589018
-  a: 0.024569160980829008
+  a: 0.024569160980828952
   relative_time: 3.4000000000000026
 }
 trajectory_point {
@@ -1081,7 +1081,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.49917721070077
-  a: 0.0096244753014016471
+  a: 0.0096244753014017026
   relative_time: 3.6000000000000028
 }
 trajectory_point {
@@ -1095,7 +1095,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499871874464603
-  a: 0.004531941161152353
+  a: 0.0045319411611524085
   relative_time: 3.7000000000000028
 }
 trajectory_point {
@@ -1109,7 +1109,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.500136073329825
-  a: 0.0010136389256711897
+  a: 0.0010136389256712453
   relative_time: 3.8000000000000029
 }
 trajectory_point {
@@ -1123,7 +1123,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.500126768965858
-  a: -0.00093966182619792393
+  a: -0.00093966182619786842
   relative_time: 3.900000000000003
 }
 trajectory_point {
@@ -1137,7 +1137,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.5
-  a: -0.0013371915156109651
+  a: -0.0013371915156109588
   relative_time: 4.0000000000000027
 }
 trajectory_point {
@@ -1151,7 +1151,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499884320248489
-  a: -0.000984537101392497
+  a: -0.00098453710139249245
   relative_time: 4.1000000000000023
 }
 trajectory_point {
@@ -1165,7 +1165,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499801510634402
-  a: -0.000679341046768515
+  a: -0.00067934104676851189
   relative_time: 4.200000000000002
 }
 trajectory_point {
@@ -1179,7 +1179,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499746959637891
-  a: -0.00041891702949781688
+  a: -0.00041891702949781482
   relative_time: 4.3000000000000016
 }
 trajectory_point {
@@ -1193,7 +1193,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499716324371331
-  a: -0.0002005787273392001
+  a: -0.00020057872733919923
   relative_time: 4.4000000000000012
 }
 trajectory_point {
@@ -1221,7 +1221,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.4997107726387
-  a: 0.00012058602060659731
+  a: 0.00012058602060659687
   relative_time: 4.6000000000000005
 }
 trajectory_point {
@@ -1235,7 +1235,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499728513558502
-  a: 0.00022878511087618238
+  a: 0.0002287851108761813
   relative_time: 4.7
 }
 trajectory_point {
@@ -1249,7 +1249,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499755484980003
-  a: 0.000305643774998495
+  a: 0.00030564377499849347
   relative_time: 4.8
 }
 trajectory_point {
@@ -1263,7 +1263,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499788687176705
-  a: 0.0003538483352147367
+  a: 0.0003538483352147354
   relative_time: 4.8999999999999995
 }
 trajectory_point {
@@ -1277,7 +1277,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499825389054324
-  a: 0.0003760851137661101
+  a: 0.000376085113766109
   relative_time: 4.9999999999999991
 }
 trajectory_point {
@@ -1291,7 +1291,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.49986312815081
-  a: 0.00037504043289381735
+  a: 0.0003750404328938154
   relative_time: 5.0999999999999988
 }
 trajectory_point {
@@ -1305,7 +1305,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499899710636331
-  a: 0.00035340061483906006
+  a: 0.00035340061483905919
   relative_time: 5.1999999999999984
 }
 trajectory_point {
@@ -1319,7 +1319,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.49993321131328
-  a: 0.0003138519818430419
+  a: 0.00031385198184304082
   relative_time: 5.299999999999998
 }
 trajectory_point {
@@ -1333,7 +1333,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499961973616276
-  a: 0.00025908085614696394
+  a: 0.00025908085614696286
   relative_time: 5.3999999999999977
 }
 trajectory_point {
@@ -1347,7 +1347,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499984609612161
-  a: 0.00019177355999202823
+  a: 0.00019177355999202802
   relative_time: 5.4999999999999973
 }
 trajectory_point {
@@ -1361,7 +1361,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.5
-  a: 0.00011461641561943756
+  a: 0.00011461641561943821
   relative_time: 5.599999999999997
 }
 trajectory_point {
@@ -1375,7 +1375,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.500007294111086
-  a: 3.0295745270393688e-05
+  a: 3.0295745270394121e-05
   relative_time: 5.6999999999999966
 }
 trajectory_point {
@@ -1389,7 +1389,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.50000590990893
-  a: -5.8502128813901409e-05
+  a: -5.8502128813899675e-05
   relative_time: 5.7999999999999963
 }
 trajectory_point {
@@ -1403,7 +1403,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499995533989273
-  a: -0.00014909088439224338
+  a: -0.00014909088439224295
   relative_time: 5.8999999999999959
 }
 trajectory_point {
@@ -1417,7 +1417,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499976121580076
-  a: -0.00023878419922343327
+  a: -0.00023878419922343131
   relative_time: 5.9999999999999956
 }
 trajectory_point {
@@ -1431,7 +1431,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499947896541528
-  a: -0.00032489575106626827
+  a: -0.0003248957510662648
   relative_time: 6.0999999999999952
 }
 trajectory_point {
@@ -1445,7 +1445,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499911351366038
-  a: -0.00040473921767954419
+  a: -0.00040473921767953986
   relative_time: 6.1999999999999948
 }
 trajectory_point {
@@ -1459,7 +1459,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499867247178241
-  a: -0.00047562827682205879
+  a: -0.00047562827682205456
   relative_time: 6.2999999999999945
 }
 trajectory_point {
@@ -1473,7 +1473,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499816613734998
-  a: -0.00053487660625261191
+  a: -0.00053487660625260865
   relative_time: 6.3999999999999941
 }
 trajectory_point {
@@ -1487,7 +1487,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.49976074942539
-  a: -0.00057979788373
+  a: -0.000579797883729997
   relative_time: 6.4999999999999938
 }
 trajectory_point {
@@ -1501,7 +1501,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499701221270724
-  a: -0.0006077057870130236
+  a: -0.00060770578701301839
   relative_time: 6.5999999999999934
 }
 trajectory_point {
@@ -1515,7 +1515,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499639864924534
-  a: -0.00061591399386047574
+  a: -0.00061591399386047064
   relative_time: 6.6999999999999931
 }
 trajectory_point {
@@ -1529,7 +1529,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499578784672575
-  a: -0.00060173618203115768
+  a: -0.00060173618203115378
   relative_time: 6.7999999999999927
 }
 trajectory_point {
@@ -1543,7 +1543,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499520353432825
-  a: -0.00056248602928386728
+  a: -0.00056248602928386218
   relative_time: 6.8999999999999924
 }
 trajectory_point {
@@ -1557,7 +1557,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499467212755491
-  a: -0.0004954772133774
+  a: -0.000495477213377395
   relative_time: 6.999999999999992
 }
 trajectory_point {
@@ -1571,7 +1571,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499422272822997
-  a: -0.0003980234120705545
+  a: -0.00039802341207054962
   relative_time: 7.0999999999999917
 }
 trajectory_point {
@@ -1585,7 +1585,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499388712449997
-  a: -0.0002674383031221289
+  a: -0.00026743830312212695
   relative_time: 7.1999999999999913
 }
 trajectory_point {
@@ -1599,7 +1599,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499369979083369
-  a: -0.00010103556429092383
+  a: -0.00010103556429092036
   relative_time: 7.2999999999999909
 }
 trajectory_point {
@@ -1613,7 +1613,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499369788802209
-  a: 0.00010387112666426722
+  a: 0.00010387112666427069
   relative_time: 7.3999999999999906
 }
 trajectory_point {
@@ -1627,7 +1627,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499392126317847
-  a: 0.00034996809198464661
+  a: 0.00034996809198464834
   relative_time: 7.49999999999999
 }
 trajectory_point {
@@ -1641,7 +1641,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499441244973827
-  a: 0.00063994165391141361
+  a: 0.0006399416539114121
   relative_time: 7.59999999999999
 }
 trajectory_point {
@@ -1655,7 +1655,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499521666745924
-  a: 0.00097647813468576853
+  a: 0.00097647813468576831
   relative_time: 7.6999999999999895
 }
 trajectory_point {
@@ -1669,7 +1669,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499638182242133
-  a: 0.00136226385654892
+  a: 0.001362263856548918
   relative_time: 7.7999999999999892
 }
 trajectory_point {
@@ -1683,7 +1683,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 12.499795850702677
-  a: 0.0017999851417420673
+  a: 0.0017999851417420632
   relative_time: 7.8999999999999888
 }
 decision {
