@@ -350,12 +350,6 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
       min_cost = reference_line_info.Cost();
     }
   }
-  if (reference_line_info_.size() > 1 &&
-      !drive_reference_line_info_->IsChangeLanePath()) {
-    change_lane_decider_.UpdateState(
-        planning_internal::ChangeLaneState::CHANGE_LANE_FAILED,
-        drive_reference_line_info_->Lanes().Id());
-  }
   return drive_reference_line_info_;
 }
 
