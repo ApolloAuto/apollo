@@ -49,7 +49,7 @@ DECLARE_bool(enable_visualization);
 /// obstacle/onboard/radar_process_subnode.cc
 DECLARE_double(front_radar_forward_distance);
 DECLARE_string(onboard_radar_detector);
-DECLARE_int32(gps_buffer_size);
+DECLARE_int32(localization_buffer_size);
 DECLARE_string(radar_tf2_frame_id);
 DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(radar_extrinsic_file);
