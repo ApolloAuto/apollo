@@ -72,9 +72,6 @@ void CollisionChecker::BuildPredictedEnv(
       // TODO(yajia):
       // temp. fix, figure out why some obstacle's predicted trajectory
       // has zero points.
-      if (obstacle->Trajectory().trajectory_point_size() == 0) {
-        continue;
-      }
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
       predicted_env.push_back(std::move(box));
