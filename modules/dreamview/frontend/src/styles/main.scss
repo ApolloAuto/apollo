@@ -560,6 +560,14 @@ body {
         }
     }
 
+    .button:first-child {
+        padding-top: 25px;
+
+        @include small-screen {
+            padding-top: 10px;
+        }
+    }
+
     .button:focus {
         outline: 0;
     }
