@@ -102,7 +102,9 @@ DEFINE_double(max_collision_distance, 0.1,
               "considered as collision if distance (meters) is smaller than or "
               "equal to this (meters)");
 
-DEFINE_double(replan_distance_threshold, 5.0,
+DEFINE_double(replan_lateral_distance_threshold, 0.5,
+              "The distance threshold of replan");
+DEFINE_double(replan_longitudinal_distance_threshold, 4.0,
               "The distance threshold of replan");
 DEFINE_bool(estimate_current_vehicle_state, true,
             "Estimate current vehicle state.");
