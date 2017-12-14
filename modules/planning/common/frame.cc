@@ -136,11 +136,24 @@ bool Frame::InitReferenceLineInfo() {
     ++segments_iter;
   }
 
+  uint32_t info_size = reference_line_info_.size();
+  DCHECK_LE(info_size, 2);
+
   for (auto &info : reference_line_info_) {
     if (!info.Init()) {
       AERROR << "Failed to init reference line";
       return false;
     }
+  }
+
+  // set lane change path flag in reference line info
+  // TODO(All): we have an assumption that the first reference line will be the
+  // change lane line. However, it would be better to set the change lane line
+  // without this assumption. The difficulty is that when both lanes are left
+  // change or right change, we will need current car position and relative l to
+  // decide.
+  if (info_size == 2) {
+    reference_line_info_.front().SetIsChangeLanePath();
   }
   if (!change_lane_decider_.Apply(&reference_line_info_)) {
     AERROR << "Failed to apply change lane decider";

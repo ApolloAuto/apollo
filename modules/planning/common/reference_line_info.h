@@ -96,10 +96,10 @@ class ReferenceLineInfo {
   std::string PathSpeedDebugString() const;
 
   /**
-   * Check if the current reference line is a change lane reference line, i.e.,
-   * ADC's current position is not on this reference line.
+   * Check if the current reference line is a change lane reference line.
    */
   bool IsChangeLanePath() const;
+  void SetIsChangeLanePath() { is_change_lane_path_ = true; }
   /**
    * Set if the vehicle can drive following this reference line
    * A planner need to set this value to true if the reference line is OK
@@ -147,6 +147,8 @@ class ReferenceLineInfo {
   LatencyStats latency_stats_;
 
   hdmap::RouteSegments lanes_;
+
+  bool is_change_lane_path_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
