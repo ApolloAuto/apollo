@@ -57,7 +57,7 @@ void ChangeLaneDecider::PrioritizeChangeLane(
   }
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
-    if (!iter->IsChangeLanePath()) {
+    if (iter->IsChangeLanePath()) {
       reference_line_info->splice(reference_line_info->begin(),
                                   *reference_line_info, iter);
       break;
