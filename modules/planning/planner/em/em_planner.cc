@@ -105,14 +105,15 @@ void EMPlanner::RecordObstacleDebugInfo(
     obstacle_debug->mutable_sl_boundary()->CopyFrom(
         path_obstacle->perception_sl_boundary());
     const auto& decider_tags = path_obstacle->decider_tags();
-    if (!decider_tags.empty()) {
-      obstacle_debug->mutable_decider_tag()->CopyFrom(
-        {decider_tags.begin(), decider_tags.end()});
-    }
     const auto& decisions = path_obstacle->decisions();
-    if (!decisions.empty()) {
-      obstacle_debug->mutable_decision()->CopyFrom(
-          {decisions.begin(), decisions.end()});
+    if (decider_tags.size() != decisions.size()) {
+      AERROR << "decider_tags size: " << decider_tags.size()
+             << " different from decisions size:" << decisions.size();
+    }
+    for (size_t i = 0; i < decider_tags.size(); ++i) {
+      auto decision_tag = obstacle_debug->add_decision_tag();
+      decision_tag->set_decider_tag(decider_tags[i]);
+      decision_tag->mutable_decision()->CopyFrom(decisions[i]);
     }
   }
 }
