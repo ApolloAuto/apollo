@@ -5,5 +5,6 @@ filegroup(
     srcs = [
         "config_manager.config",
         "offline_lidar_perception_test.flag",
+        "offline_sequential_obstacle_perception_test.flag",
     ],
 )
