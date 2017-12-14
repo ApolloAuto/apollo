@@ -86,11 +86,15 @@ message SignalLightDebug {
   repeated SignalDebug signal = 3;
 }
 
+message DecisionTag {
+  optional string decider_tag = 1;
+  optional apollo.planning.ObjectDecisionType decision = 2;
+}
+
 message ObstacleDebug {
   optional string id = 1;
   optional apollo.planning.SLBoundary sl_boundary = 2;
-  repeated string decider_tag = 3;
-  repeated apollo.planning.ObjectDecisionType decision = 4;
+  repeated DecisionTag decision_tag = 3;
 }
 
 message ChangeLaneState {
