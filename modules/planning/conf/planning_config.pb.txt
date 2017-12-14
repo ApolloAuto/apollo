@@ -158,8 +158,5 @@ rule_config : {
     rule_id: SIGNAL_LIGHT
 }
 rule_config : {
-    rule_id: REROUTING
-}
-rule_config : {
     rule_id: REFERENCE_LINE_END
 }
