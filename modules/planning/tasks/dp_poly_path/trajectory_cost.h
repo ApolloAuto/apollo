@@ -64,6 +64,9 @@ class TrajectoryCost {
   double GetCostBetweenObsBoxes(const common::math::Box2d &ego_box,
                                 const common::math::Box2d &obstacle_box) const;
 
+  double GetCostFromObsSL(const double adc_s, const double adc_l,
+                          const SLBoundary &obs_sl_boundary) const;
+
   common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
                                         const double dl) const;
 
@@ -76,7 +79,7 @@ class TrajectoryCost {
   std::vector<std::vector<common::math::Box2d>> dynamic_obstacle_boxes_;
   std::vector<double> obstacle_probabilities_;
 
-  std::vector<common::math::Box2d> static_obstacle_boxes_;
+  std::vector<SLBoundary> static_obstacle_sl_boundaries_;
 };
 
 }  // namespace planning
