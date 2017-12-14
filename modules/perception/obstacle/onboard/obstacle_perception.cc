@@ -19,6 +19,14 @@
 #include "modules/common/time/time.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
+#include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
+#include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
+#include "modules/perception/obstacle/fusion/dummy/dummy_algorithms.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
+
+DEFINE_bool(show_lidar_obstacles, false, "whether show lidar obstacles or not");
+DEFINE_bool(show_radar_obstacles, false, "whether show radar obstacles or not");
+DEFINE_bool(show_fused_obstacles, false, "whether show fused obstacles or not");
 
 namespace apollo {
 namespace perception {
@@ -28,6 +36,7 @@ ObstaclePerception::ObstaclePerception() : initialized_(false) {}
 ObstaclePerception::~ObstaclePerception() {}
 
 bool ObstaclePerception::Init() {
+  RegistAllAlgorithm();
   // initialize lidar detector
   lidar_perception_.reset(new LidarProcess);
   if (lidar_perception_ == nullptr) {
@@ -81,59 +90,70 @@ void ObstaclePerception::SetGlobalOffset(const Eigen::Vector3d& global_offset) {
   global_offset_ = global_offset;
 }
 
+void ObstaclePerception::RegistAllAlgorithm() {
+  RegisterFactoryDummyRadarDetector();
+  RegisterFactoryDummyFusion();
+
+  RegisterFactoryModestRadarDetector();
+  RegisterFactoryProbabilisticFusion();
+}
+
 bool ObstaclePerception::Process(SensorRawFrame* frame,
                                  std::vector<ObjectPtr>* out_objects) {
-  if (frame == nullptr) {
+  if (frame == nullptr || out_objects == nullptr) {
     return false;
   }
   PERF_BLOCK_START();
 
   std::shared_ptr<SensorObjects> sensor_objects(new SensorObjects());
   if (frame->sensor_type_ == VELODYNE_64) {
+    // lidar obstacle detection
     VelodyneRawFrame* velodyne_frame = dynamic_cast<VelodyneRawFrame*>(frame);
-    if (lidar_perception_->Process(
-            velodyne_frame->timestamp_, velodyne_frame->cloud_,
-            std::make_shared<Eigen::Matrix4d>(velodyne_frame->pose_))) {
-      sensor_objects->objects = lidar_perception_->GetObjects();
-      frame_content_.SetLidarPose(velodyne_frame->pose_);
-      frame_content_.SetLidarCloud(velodyne_frame->cloud_);
-      // _frame_content.SetLidarRoiCloud(roi_cloud);
-      frame_content_.SetTrackedObjectsLidar(sensor_objects->objects);
-    } else {
+    std::shared_ptr<Eigen::Matrix4d> velodyne_pose(new Eigen::Matrix4d);
+    *(velodyne_pose.get()) = velodyne_frame->pose_;
+    if (!lidar_perception_->Process(velodyne_frame->timestamp_,
+                                    velodyne_frame->cloud_, velodyne_pose)) {
       AERROR << "Lidar perception error!, " << std::fixed
              << std::setprecision(12) << velodyne_frame->timestamp_;
       return false;
     }
-    // _frame_content.update_timestamp(velodyne_frame->_timestamp);
+    sensor_objects->objects = lidar_perception_->GetObjects();
     PERF_BLOCK_END("lidar_perception");
+    // set frame content
+    if (FLAGS_enable_visualization) {
+      frame_content_.SetLidarPose(velodyne_frame->pose_);
+      frame_content_.SetLidarCloud(velodyne_frame->cloud_);
+      if (FLAGS_show_lidar_obstacles) {
+        frame_content_.SetTrackedObjects(sensor_objects->objects);
+      }
+    }
   } else if (frame->sensor_type_ == RADAR) {
+    // radar obstacle detection
     RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame);
     RadarDetectorOptions options;
     options.radar2world_pose = &(radar_frame->pose_);
     options.car_linear_speed = radar_frame->car_linear_speed_;
     std::vector<ObjectPtr> objects;
     std::vector<PolygonDType> map_polygons;
-    if (radar_detector_->Detect(radar_frame->raw_obstacles_, map_polygons,
+    if (!radar_detector_->Detect(radar_frame->raw_obstacles_, map_polygons,
                                 options, &objects)) {
-      if (!objects.empty()) {
-        sensor_objects->objects = objects;
-        frame_content_.SetTrackedObjectsRadar(objects);
-      } else {
-        AERROR << "Radar detector result is nullptr!";
-        return false;
-      }
-    } else {
       AERROR << "Radar perception error!, " << std::fixed
              << std::setprecision(12) << radar_frame->timestamp_;
       return false;
     }
+    sensor_objects->objects = objects;
+    AINFO << "radar objects size: " << objects.size();
     PERF_BLOCK_END("radar_detection");
+    // set frame content
+    if (FLAGS_enable_visualization && FLAGS_show_radar_obstacles) {
+      frame_content_.SetTrackedObjects(sensor_objects->objects);
+    }
   } else {
     AERROR << "Unknown sensor type : " << frame->sensor_type_;
     return false;
   }
   sensor_objects->sensor_type = frame->sensor_type_;
-  sensor_objects->sensor_id = GetSensorType(RADAR);
+  sensor_objects->sensor_id = GetSensorType(frame->sensor_type_);
   sensor_objects->timestamp = frame->timestamp_;
   sensor_objects->sensor2world_pose = frame->pose_;
 
@@ -147,15 +167,19 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
   }
   PERF_BLOCK_END("sensor_fusion");
 
-  *out_objects = fused_objects;
-  if (frame->sensor_type_ == VELODYNE_64) {
-    frame_content_.SetTrackedObjectsFused(fused_objects);
-  }
-
-  if (FLAGS_enable_visualization && initialized_) {
+  // // set frame content
+  if (FLAGS_enable_visualization) {
+    if (FLAGS_show_fused_obstacles) {
+      frame_content_.SetTrackedObjects(fused_objects);
+      if (frame->sensor_type_ != VELODYNE_64) {
+        return true;
+      }
+    }
+    frame_visualizer_->UpdateCameraSystem(&frame_content_);
     frame_visualizer_->Render(frame_content_);
   }
 
+  *out_objects = fused_objects;
   return true;
 }
 

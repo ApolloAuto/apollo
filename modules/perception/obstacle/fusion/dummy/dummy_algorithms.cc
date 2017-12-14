@@ -13,26 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/obstacle/fusion/dummy/dummy_algorithms.h"
 
-#include "gflags/gflags.h"
-#include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
+namespace apollo {
+namespace perception {
 
-#include "modules/perception/tool/export_sensor_data/export_sensor_data.h"
-
-DECLARE_string(flagfile);
-
-int main(int argc, char* argv[]) {
-  ros::init(argc, argv, "export_sensor_data");
-  ros::AsyncSpinner spinner(4);
-  AINFO << "Start export_sensor_data.";
-  FLAGS_flagfile =
-      "./modules/perception/tool/export_sensor_data/conf/"
-      "export_sensor_data.flag";
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::perception::ExportSensorData export_sensor_data;
-  export_sensor_data.Init();
-  spinner.start();
-  ros::waitForShutdown();
-  return 0;
+bool DummyFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
+                    std::vector<ObjectPtr> *fused_objects) {
+  return result_detect_;
 }
+
+}  // namespace perception
+}  // namespace apollo
