@@ -29,11 +29,9 @@
 #include "pcl/io/pcd_io.h"
 
 DECLARE_string(flagfile);
-DEFINE_string(lidar_path,
-              "./modules/perception/tool/export_sensor_data/lidar/",
+DEFINE_string(lidar_path, "./modules/perception/tool/export_sensor_data/lidar/",
               "lidar path");
-DEFINE_string(radar_path,
-              "./modules/perception/tool/export_sensor_data/radar/",
+DEFINE_string(radar_path, "./modules/perception/tool/export_sensor_data/radar/",
               "radar path");
 DEFINE_bool(enable_global_offset, true,
             "enable global offset for benchmark evaluation");
@@ -53,8 +51,8 @@ struct SensorFile {
   friend std::ostream& operator<<(std::ostream& out,
                                   const SensorFile& sensor_file) {
     out << "sensor_key: " << sensor_file.sensor_key
-        << " file_path: " << sensor_file.file_path
-        << std::setprecision(16) << " timestamp: " << sensor_file.timestamp;
+        << " file_path: " << sensor_file.file_path << std::setprecision(16)
+        << " timestamp: " << sensor_file.timestamp;
     return out;
   }
 };
@@ -86,8 +84,8 @@ bool LoadOdometry(const std::string& filepath, Eigen::Vector3f* velocity) {
   }
   double timestamp = 0.0;
   int frame_id;
-  fin >> frame_id >> timestamp
-      >> (*velocity)(0) >> (*velocity)(1) >> (*velocity)(2);
+  fin >> frame_id >> timestamp >> (*velocity)(0) >> (*velocity)(1) >>
+      (*velocity)(2);
   bool state = true;
   // if (!fin.good()) {
   //   state = false;
@@ -157,7 +155,8 @@ class SequentialPerceptionTest {
     Eigen::Matrix4d pose;
     int frame_id = 0;
     double timestamp = 0.0;
-    std::string pose_filename = FLAGS_lidar_path + "/" +
+    std::string pose_filename =
+        FLAGS_lidar_path + "/" +
         file_path.substr(0, file_path.find_last_of('.')) + ".pose";
     if (!ReadPoseFile(pose_filename, &pose, &frame_id, &timestamp)) {
       AERROR << "Pose file not exits: " << pose_filename;
@@ -176,13 +175,14 @@ class SequentialPerceptionTest {
     // read pcd
     pcl::PointCloud<pcl_util::PointXYZIT>::Ptr cloud_raw(
         new pcl::PointCloud<pcl_util::PointXYZIT>);
-    std::string pcd_filename = FLAGS_lidar_path + "/" +
+    std::string pcd_filename =
+        FLAGS_lidar_path + "/" +
         file_path.substr(0, file_path.find_last_of('.')) + ".pcd";
     AINFO << "pcd file_name: " << pcd_filename;
     pcl::io::loadPCDFile<pcl_util::PointXYZIT>(pcd_filename, *cloud_raw);
     pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
-    double min_timestamp = DBL_MAX;
-    double max_timestamp = 0;
+    // double min_timestamp = DBL_MAX;
+    // double max_timestamp = 0;
     for (size_t i = 0; i < cloud_raw->points.size(); ++i) {
       pcl_util::Point p;
       p.x = cloud_raw->points[i].x;
@@ -218,7 +218,8 @@ class SequentialPerceptionTest {
     Eigen::Matrix4d pose;
     int frame_id = 0;
     double timestamp = 0.0;
-    std::string pose_filename = FLAGS_radar_path + "/" +
+    std::string pose_filename =
+        FLAGS_radar_path + "/" +
         file_path.substr(0, file_path.find_last_of('.')) + ".pose";
     if (!ReadPoseFile(pose_filename, &pose, &frame_id, &timestamp)) {
       AERROR << "Pose file not exits: " << pose_filename;
@@ -226,7 +227,8 @@ class SequentialPerceptionTest {
     }
     // read radar obstacle
     ContiRadar radar_obs_proto;
-    std::string radar_filename = FLAGS_radar_path + "/" +
+    std::string radar_filename =
+        FLAGS_radar_path + "/" +
         file_path.substr(0, file_path.find_last_of('.')) + ".radar";
     if (!LoadRadarProto(radar_filename, &radar_obs_proto)) {
       AERROR << "Failed to load " << radar_filename;
@@ -235,7 +237,8 @@ class SequentialPerceptionTest {
     AINFO << "radar_obs_proto size: " << radar_obs_proto.contiobs().size();
     // read host vehicle velocity
     Eigen::Vector3f velocity;
-    std::string odometry_filename = FLAGS_radar_path + "/" +
+    std::string odometry_filename =
+        FLAGS_radar_path + "/" +
         file_path.substr(0, file_path.find_last_of('.')) + ".velocity";
     if (!LoadOdometry(odometry_filename, &velocity)) {
       AERROR << "Failed to load " << odometry_filename;
@@ -280,8 +283,9 @@ class SequentialPerceptionTest {
           sensors_files_lists[sensor_key];
       sensor_files_list.reserve(files_list.size());
       for (const auto& file_name : files_list) {
-        std::string pose_file = source.folder_path + "/"
-            + file_name.substr(0, file_name.find_last_of('.')) + ".pose";
+        std::string pose_file =
+            source.folder_path + "/" +
+            file_name.substr(0, file_name.find_last_of('.')) + ".pose";
         FILE* fin = fopen(pose_file.c_str(), "rt");
         if (fin == nullptr) {
           AWARN << "pose file: " << pose_file
@@ -308,8 +312,8 @@ class SequentialPerceptionTest {
     sensors_files->reserve(total_sensor_files_num);
     for (const auto& sensor_files_list : sensors_files_lists) {
       sensors_files->insert(sensors_files->end(),
-                           sensor_files_list.second.begin(),
-                           sensor_files_list.second.end());
+                            sensor_files_list.second.begin(),
+                            sensor_files_list.second.end());
     }
     auto compare = [](const SensorFile& lhs, const SensorFile& rhs) {
       return lhs.timestamp < rhs.timestamp;
@@ -323,9 +327,7 @@ class SequentialPerceptionTest {
     obstacle_perception_.Process(frame, &fused_objs);
   }
 
-  const Eigen::Vector3d& GetGlobalOffset() {
-    return global_offset_;
-  }
+  const Eigen::Vector3d& GetGlobalOffset() { return global_offset_; }
 
  private:
   // reconstruct sensor raw frame function
@@ -358,7 +360,7 @@ int main(int argc, char** argv) {
   for (size_t i = 0; i < sensors_files.size(); ++i) {
     AINFO << "Process frame " << sensors_files[i];
     std::shared_ptr<apollo::perception::SensorRawFrame> raw_frame(
-                                  new apollo::perception::SensorRawFrame);
+        new apollo::perception::SensorRawFrame);
     test.ReconstructSensorRawFrame(sensors_files[i].file_path, &raw_frame);
     test.Run(raw_frame.get());
   }

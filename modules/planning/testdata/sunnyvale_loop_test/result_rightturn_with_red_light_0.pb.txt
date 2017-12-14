@@ -1731,3 +1731,4 @@ routing_header {
   timestamp_sec: 1505880682.2605283
   module_name: "routing"
 }
+right_of_way_status: UNPROTECTED
