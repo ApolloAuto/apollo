@@ -114,7 +114,7 @@ class ReferenceLineInfo {
   void SetRightOfWayStatus() { status_ = ADCTrajectory::PROTECTED; }
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const {
     return status_;
-  };
+  }
 
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
