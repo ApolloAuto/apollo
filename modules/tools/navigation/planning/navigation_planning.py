@@ -79,7 +79,6 @@ def mobileye_callback(mobileye_pb):
         return
 
     mobileye_provider.update(mobileye_pb)
-    mobileye_provider.process_obstacles()
 
     if FLAGS.enable_routing_aid:
         path_x, path_y, path_length = path_decider.get_path_by_lmr(
@@ -93,6 +92,7 @@ def mobileye_callback(mobileye_pb):
     speed = FLAGS.max_cruise_speed
 
     if FLAGS.enable_follow:
+        mobileye_provider.process_obstacles()
         speed, final_path_length = speed_decider.get_target_speed_and_path_length(
             mobileye_provider, chassis_provider, path_length)
 

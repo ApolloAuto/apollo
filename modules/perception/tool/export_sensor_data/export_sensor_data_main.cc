@@ -27,8 +27,8 @@ int main(int argc, char* argv[]) {
   ros::AsyncSpinner spinner(4);
   AINFO << "Start export_sensor_data.";
   FLAGS_flagfile =
-      "./modules/perception/tool/offline_visualizer_tool/conf/"
-      "offline_lidar_perception_test.flag";
+      "./modules/perception/tool/export_sensor_data/conf/"
+      "export_sensor_data.flag";
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   apollo::perception::ExportSensorData export_sensor_data;
   export_sensor_data.Init();

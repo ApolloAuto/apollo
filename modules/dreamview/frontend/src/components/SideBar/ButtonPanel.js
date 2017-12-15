@@ -2,6 +2,8 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
+import Icon from "assets/images/sidebar/route_editing.png";
+
 class SideBarButton extends React.Component {
     render() {
         const { disabled, onClick, active, label, extraClasses } = this.props;
@@ -12,7 +14,8 @@ class SideBarButton extends React.Component {
                             "button": true,
                             "active": active,
                         }, extraClasses)}>
-                {label}
+                <img src={Icon} className="icon" />
+                <div className="label">{label}</div>
             </button>
         );
     }

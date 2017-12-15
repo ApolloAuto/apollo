@@ -259,6 +259,7 @@ bool ReferenceLineProvider::GetReferenceLines(
 
   if (FLAGS_enable_reference_line_provider_thread) {
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+
     if (!reference_lines_.empty()) {
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
@@ -315,11 +316,18 @@ bool ReferenceLineProvider::CreateRouteSegments(
   return !segments->empty();
 }
 
-double LookForwardDistance(const VehicleState &state) {
-  return (state.linear_velocity() * FLAGS_look_forward_time_sec >
-          FLAGS_look_forward_min_distance)
-             ? FLAGS_look_forward_distance
-             : FLAGS_look_forward_min_distance;
+double ReferenceLineProvider::LookForwardDistance(const VehicleState &state) {
+  auto forward_distance = state.linear_velocity() * FLAGS_look_forward_time_sec;
+
+  if (forward_distance > FLAGS_look_forward_mid_distance) {
+    return FLAGS_look_forward_long_distance;
+  }
+
+  if (forward_distance > FLAGS_look_forward_short_distance) {
+    return FLAGS_look_forward_mid_distance;
+  }
+
+  return FLAGS_look_forward_short_distance;
 }
 
 bool ReferenceLineProvider::CreateReferenceLine(

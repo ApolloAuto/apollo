@@ -330,22 +330,34 @@ Status Planning::Plan(const double current_time_stamp,
         stitching_trajectory.back());
   }
   auto status = Status::OK();
-  for (auto& reference_line_info : frame_->reference_line_info()) {
-    status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
-                            &reference_line_info);
-    if (status == Status::OK()) {
-      if (FLAGS_prioritize_change_lane && reference_line_info.IsDrivable() &&
-          reference_line_info.IsChangeLanePath() &&
-          reference_line_info.TrajectoryLength() >
-              FLAGS_change_lane_min_length) {
-        ADEBUG << "Found change lane line, skip other reference line";
-        break;
-      }
-    } else {
-      AERROR << "planner failed to make a driving plan for: "
-             << reference_line_info.Lanes().Id();
+  bool has_plan = false;
+  auto it = std::find_if(
+      frame_->reference_line_info().begin(),
+      frame_->reference_line_info().end(),
+      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
+  if (it != frame_->reference_line_info().end()) {
+    status = planner_->Plan(stitching_trajectory.back(), frame_.get(), &(*it));
+    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
+                it->TrajectoryLength() > FLAGS_change_lane_min_length);
+    if (!has_plan) {
+      AERROR << "Fail to plan for lane change.";
     }
   }
+
+  if (!has_plan || !FLAGS_prioritize_change_lane) {
+    for (auto& reference_line_info : frame_->reference_line_info()) {
+      if (reference_line_info.IsChangeLanePath()) {
+        continue;
+      }
+      status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
+                              &reference_line_info);
+      if (status != Status::OK()) {
+        AERROR << "planner failed to make a driving plan for: "
+               << reference_line_info.Lanes().Id();
+      }
+    }
+  }
+
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(
@@ -360,6 +372,9 @@ Status Planning::Plan(const double current_time_stamp,
   ptr_debug->MergeFrom(best_reference_line->debug());
   trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());
+  // set right of way status
+  trajectory_pb->set_right_of_way_status(
+      best_reference_line->GetRightOfWayStatus());
 
   best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
 

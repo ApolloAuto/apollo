@@ -28,8 +28,9 @@ DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(rtk_trajectory_resolution);
 DECLARE_double(look_backward_distance);
-DECLARE_double(look_forward_distance);
-DECLARE_double(look_forward_min_distance);
+DECLARE_double(look_forward_short_distance);
+DECLARE_double(look_forward_mid_distance);
+DECLARE_double(look_forward_long_distance);
 DECLARE_double(look_forward_time_sec);
 DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
@@ -49,6 +50,7 @@ DECLARE_bool(reckless_change_lane);
 DECLARE_double(change_lane_fail_freeze_time);
 DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
+DECLARE_bool(enable_change_lane_decider);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
@@ -57,7 +59,8 @@ DECLARE_bool(enable_trajectory_stitcher);
 DECLARE_int32(max_history_frame_num);
 
 // parameters for trajectory stitching and reinit planning starting point.
-DECLARE_double(replan_distance_threshold);
+DECLARE_double(replan_lateral_distance_threshold);
+DECLARE_double(replan_longitudinal_distance_threshold);
 DECLARE_bool(estimate_current_vehicle_state);
 
 // parameter for reference line

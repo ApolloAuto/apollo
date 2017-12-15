@@ -68,17 +68,10 @@ class TLPreprocessor : public BasePreprocessor {
                      const CameraId &camera_id, LightPtrs *lights_on_image,
                      LightPtrs *lights_outside_image);
 
- private:
   void SelectImage(const CarPose &pose,
                    const LightsArray &lights_on_image_array,
                    const LightsArray &lights_outside_image_array,
                    CameraId *selection);
-
-  // @brief Sync. image with cached lights projections
-  bool SyncImageWithCachedLights(const ImageSharedPtr &image,
-                                 ImageLightsPtr *image_lights,
-                                 double *diff_image_pose_ts,
-                                 double *diff_image_sys_ts, bool *sync_ok);
 
   bool IsOnBorder(const cv::Size size, const cv::Rect &roi,
                   const int border_size) const;

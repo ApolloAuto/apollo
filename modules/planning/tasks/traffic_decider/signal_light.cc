@@ -100,6 +100,7 @@ void SignalLight::MakeDecisions(Frame* frame,
   signal_light_debug->set_adc_speed(
       common::VehicleStateProvider::instance()->linear_velocity());
 
+  bool has_stop = false;
   for (const hdmap::PathOverlap* signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light->object_id);
     double stop_deceleration =
@@ -118,9 +119,14 @@ void SignalLight::MakeDecisions(Frame* frame,
          stop_deceleration < FLAGS_stop_max_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
-      CreateStopObstacle(frame, reference_line_info, signal_light);
+      if (CreateStopObstacle(frame, reference_line_info, signal_light)) {
+        has_stop = true;
+      }
       signal_debug->set_is_stop_wall_created(true);
     }
+  }
+  if (!has_stop) {
+    reference_line_info->SetRightOfWayStatus();
   }
 }
 
@@ -161,7 +167,7 @@ double SignalLight::GetStopDeceleration(
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-void SignalLight::CreateStopObstacle(
+bool SignalLight::CreateStopObstacle(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
   const auto& reference_line = reference_line_info->reference_line();
@@ -173,7 +179,7 @@ void SignalLight::CreateStopObstacle(
       !WithinBound(0.0, reference_line.Length(), box_center_s)) {
     ADEBUG << "signal " << signal_light->object_id
            << " is not on reference line";
-    return;
+    return false;
   }
   double heading = reference_line.GetReferencePoint(stop_s).heading();
   double left_lane_width = 0.0;
@@ -201,6 +207,7 @@ void SignalLight::CreateStopObstacle(
   stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+  return true;
 }
 
 }  // namespace planning

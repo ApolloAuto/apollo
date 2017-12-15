@@ -224,6 +224,9 @@ bool LidarProcess::InitFrameDependence() {
     AINFO << "get and Init hdmap_input succ.";
   }
 
+  /// init roi indices
+  roi_indices_ = pcl_util::PointIndicesPtr(new pcl_util::PointIndices);
+
   return true;
 }
 

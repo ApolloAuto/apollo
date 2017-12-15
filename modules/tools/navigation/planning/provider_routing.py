@@ -63,15 +63,20 @@ class RoutingProvider:
     def __init__(self):
         self.routing_str = None
         self.routing_points = []
+        self.routing = None
         self.routing_lock = threading.Lock()
         self.SMOOTH_FORWARD_DIST = 150
         self.SMOOTH_BACKWARD_DIST = 150
+        self.human = False
 
     def update(self, routing_str):
         self.routing_str = routing_str
         routing_json = json.loads(routing_str.data)
         routing_points = []
+        self.human = False
         for step in routing_json:
+            if step.get('human'):
+                self.human = True
             points = step['polyline']['points']
             for point in points:
                 routing_points.append(point)
@@ -79,31 +84,31 @@ class RoutingProvider:
         self.routing_lock.acquire()
         self.routing_points = routing_points
         self.routing_lock.release()
+        self.routing = LineString(self.routing_points)
 
     def get_segment(self, utm_x, utm_y):
         if self.routing_str is None:
             return None
         point = Point(utm_x, utm_y)
-        routing = LineString(self.routing_points)
-        if routing.distance(point) > 10:
+        if self.routing.distance(point) > 10:
             return []
-        if routing.length < 10:
+        if self.routing.length < 10:
             return []
-        vehicle_distance = routing.project(point)
+        vehicle_distance = self.routing.project(point)
         points = []
-        total_length = routing.length
+        total_length = self.routing.length
         for i in range(self.SMOOTH_BACKWARD_DIST):
             backward_dist = vehicle_distance - self.SMOOTH_BACKWARD_DIST + i
             if backward_dist < 0:
                 continue
-            p = routing.interpolate(backward_dist)
+            p = self.routing.interpolate(backward_dist)
             points.append(p.coords[0])
 
         for i in range(self.SMOOTH_FORWARD_DIST):
             forward_dist = vehicle_distance + i
             if forward_dist >= total_length:
                 break
-            p = routing.interpolate(forward_dist)
+            p = self.routing.interpolate(forward_dist)
             points.append(p.coords[0])
         return points
 
@@ -146,8 +151,28 @@ class RoutingProvider:
         mono_seg_y = seg_y[left_cut_idx:right_cut_idx]
         return mono_seg_x, mono_seg_y
 
+    def get_local_ref(self, local_seg_x, local_seg_y):
+        ref_x = []
+        ref_y = []
+        points = []
+        for i in range(len(local_seg_x)):
+            x = local_seg_x[i]
+            y = local_seg_y[i]
+            points.append((x, y))
+        line = LineString(points)
+        dist = line.project(Point((0, 0)))
+        for i in range(int(line.length - dist) + 1):
+            p = line.interpolate(i + dist)
+            ref_x.append(p.x)
+            ref_y.append(p.y)
+        return ref_x, ref_y
+
     def get_local_segment_spline(self, utm_x, utm_y, heading):
         local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        if len(local_seg_x) <= 10:
+            return [], []
+        if self.human:
+            return self.get_local_ref(local_seg_x, local_seg_y)
         mono_seg_x, mono_seg_y = self.to_monotonic_segment(
             local_seg_x, local_seg_y)
 

@@ -9,7 +9,7 @@ Chart.plugins.register({
             if (dataset.showText) {
                 const meta = chart.getDatasetMeta(index);
                 const element = meta.data[Math.floor(meta.data.length / 2)];
-                const fontSize = 13;
+                const fontSize = 15;
                 const fontStyle = 'normal';
                 const fontFamily = 'Helvetica Neue';
                 chart.ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
@@ -25,6 +25,8 @@ Chart.plugins.register({
         });
     }
 });
+
+Chart.defaults.global.defaultFontColor = '#FFFFFF';
 
 export default class ScatterGraph extends React.Component {
     initializeCanvas(title, options) {
@@ -42,7 +44,7 @@ export default class ScatterGraph extends React.Component {
                 mode: 'xy'
             },
             zoom: {
-                enable: true,
+                enabled: false,
                 mode: 'xy',
             },
             tooltips: {
@@ -62,7 +64,11 @@ export default class ScatterGraph extends React.Component {
                 const axisOptions = {
                     id: `${axis}-axis-0`,
                     scaleLabel: { display: true, labelString: setting.labelString },
-                    ticks: { min: setting.min, max: setting.max }
+                    ticks: { min: setting.min, max: setting.max },
+                    gridLines: {
+                        color: 'rgba(153, 153, 153, 0.5)',
+                        zeroLineColor: 'rgba(153, 153, 153, 0.7)',
+                    }
                 };
                 if (!chartOptions.scales[name]) {
                     chartOptions.scales[name] = [];

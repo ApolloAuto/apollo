@@ -3,10 +3,10 @@ import { inject, observer } from "mobx-react";
 
 import EditingTip from "components/RouteEditingBar/EditingTip";
 
-import removeAllIcon from "assets/images/icons/remove_all.png";
-import removeLastIcon from "assets/images/icons/remove_last.png";
-import sendRouteIcon from "assets/images/icons/send_request.png";
-import addPoiIcon from "assets/images/icons/add_poi.png";
+import removeAllIcon from "assets/images/routing/remove_all.png";
+import removeLastIcon from "assets/images/routing/remove_last.png";
+import sendRouteIcon from "assets/images/routing/send_request.png";
+import addPoiIcon from "assets/images/routing/add_poi.png";
 
 
 class RouteEditingButton extends React.Component {

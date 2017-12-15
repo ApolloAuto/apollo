@@ -58,36 +58,43 @@ TrajectoryCost::TrajectoryCost(
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
     }
+    auto sl_boundary = ptr_path_obstacle->perception_sl_boundary();
+    const auto &vehicle_param =
+        common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+
+    const double adc_left_l =
+        init_sl_point_.l() + vehicle_param.left_edge_to_center();
+    const double adc_right_l =
+        init_sl_point_.l() - vehicle_param.right_edge_to_center();
+
+    constexpr double kLateralIgnoreDistance = 4.0;
+
+    if (adc_left_l + kLateralIgnoreDistance < sl_boundary.start_l() ||
+        adc_right_l - kLateralIgnoreDistance > sl_boundary.end_l()) {
+      continue;
+    }
+
     const auto ptr_obstacle = ptr_path_obstacle->obstacle();
     if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle
       continue;
     } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
-      auto sl_boundary = ptr_path_obstacle->perception_sl_boundary();
       const double kDefaultLaneWidth = 1.5;
-      const auto &vehicle_config =
-          common::VehicleConfigHelper::instance()->GetConfig();
-      const double width = vehicle_config.vehicle_param().width();
+      const double adc_width = vehicle_param.width();
 
-      if (sl_boundary.start_l() + kDefaultLaneWidth < width &&
-          kDefaultLaneWidth - sl_boundary.end_l() < width) {
+      if (sl_boundary.start_l() + kDefaultLaneWidth < adc_width &&
+          kDefaultLaneWidth - sl_boundary.end_l() < adc_width) {
         // lane blocking obstacle
         continue;
       }
 
-      const double length = vehicle_config.vehicle_param().length();
-      if (sl_boundary.start_s() - init_sl_point_.s() < 2.0 * length) {
+      const double adc_length = vehicle_param.length();
+      if (sl_boundary.start_s() - init_sl_point_.s() < 2.0 * adc_length) {
         // if too close, we treat the obstacle as non-nudgable
         continue;
       }
 
-      TrajectoryPoint trajectory_point = ptr_obstacle->GetPointAtTime(0.0);
-      constexpr double kBuff = 0.2;
-      Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-      Box2d expanded_obstacle_box =
-          Box2d(obstacle_box.center(), obstacle_box.heading(),
-                obstacle_box.length() + kBuff, obstacle_box.width() + kBuff);
-      static_obstacle_boxes_.push_back(std::move(expanded_obstacle_box));
+      static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;
       for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
@@ -151,7 +158,7 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
   if (curr_level == total_level) {
     const double end_l = curve.Evaluate(0, end_s - start_s);
     path_cost +=
-        std::fabs(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
+        std::sqrt(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
   }
   return path_cost;
 }
@@ -165,13 +172,8 @@ double TrajectoryCost::CalculateStaticObstacleCost(
        curr_s += config_.path_resolution()) {
     const double s = curr_s - start_s;  // spline curve s
     const double l = curve.Evaluate(0, s);
-    const double dl = curve.Evaluate(1, s);
-
-    const common::SLPoint sl =
-        common::util::MakeSLPoint(curr_s, l);  // ego vehicle sl point
-    const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
-    for (const auto &obstacle_box : static_obstacle_boxes_) {
-      obstacle_cost += GetCostBetweenObsBoxes(ego_box, obstacle_box);
+    for (const auto &obs_sl_boundary : static_obstacle_sl_boundaries_) {
+      obstacle_cost += GetCostFromObsSL(s, l, obs_sl_boundary);
     }
   }
   return obstacle_cost * config_.path_resolution();
@@ -209,6 +211,53 @@ double TrajectoryCost::CalculateDynamicObstacleCost(
   }
   constexpr double kDynamicObsWeight = 1e-3;
   return obstacle_cost * config_.eval_time_interval() * kDynamicObsWeight;
+}
+
+double TrajectoryCost::GetCostFromObsSL(
+    const double adc_s, const double adc_l,
+    const SLBoundary &obs_sl_boundary) const {
+  const auto &vehicle_param =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+
+  const double adc_front_s = adc_s + vehicle_param.front_edge_to_center();
+  const double adc_end_s = adc_s - vehicle_param.back_edge_to_center();
+  const double adc_left_l = adc_l + vehicle_param.left_edge_to_center();
+  const double adc_right_l = adc_l - vehicle_param.right_edge_to_center();
+
+  constexpr double ignore_s_distance = 10.0;
+  constexpr double ignore_l_distance = 3.0;
+  if (adc_front_s + ignore_s_distance < obs_sl_boundary.start_s() ||
+      adc_end_s - ignore_s_distance > obs_sl_boundary.end_s()) {
+    return 0.0;
+  }
+  if (adc_left_l + ignore_l_distance < obs_sl_boundary.start_l() ||
+      adc_right_l - ignore_l_distance > obs_sl_boundary.end_l()) {
+    return 0.0;
+  }
+
+  std::function<double(const double, const double)> softmax = [](
+      const double x, const double x0) {
+    return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
+  };
+
+  double obstacle_cost = 0.0;
+  if (!(adc_front_s < obs_sl_boundary.start_s() ||
+        adc_end_s > obs_sl_boundary.end_s()) &&
+      !(adc_left_l < obs_sl_boundary.end_l() ||
+        adc_right_l > obs_sl_boundary.start_l())) {
+    return config_.obstacle_collision_cost();
+  }
+
+  const double delta_l = std::fabs(
+      adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
+  obstacle_cost += config_.obstacle_collision_cost() *
+                   softmax(delta_l, config_.obstacle_collision_distance());
+
+  const double delta_s = std::fabs(
+      adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);
+  obstacle_cost += config_.obstacle_collision_cost() *
+                   softmax(delta_s, config_.obstacle_collision_distance());
+  return obstacle_cost;
 }
 
 double TrajectoryCost::GetCostBetweenObsBoxes(const Box2d &ego_box,
