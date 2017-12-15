@@ -41,7 +41,6 @@ message ADCPathPoint {
   optional double heading = 5;  // relative to absolute coordinate system
 }
 
-
 message ADCSignals {
   enum SignalType {
     LEFT_TURN = 1;

@@ -339,6 +339,9 @@ Status Planning::Plan(const double current_time_stamp,
     status = planner_->Plan(stitching_trajectory.back(), frame_.get(), &(*it));
     has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
                 it->TrajectoryLength() > FLAGS_change_lane_min_length);
+    if (!has_plan) {
+      AERROR << "Fail to plan for lane change.";
+    }
   }
 
   if (!has_plan || !FLAGS_prioritize_change_lane) {

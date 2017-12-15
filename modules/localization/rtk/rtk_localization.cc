@@ -33,13 +33,12 @@ using apollo::common::time::Clock;
 
 RTKLocalization::RTKLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION),
-      tf2_broadcaster_(NULL),
       map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z} {}
 
 RTKLocalization::~RTKLocalization() {
   if (tf2_broadcaster_) {
     delete tf2_broadcaster_;
-    tf2_broadcaster_ = NULL;
+    tf2_broadcaster_ = nullptr;
   }
 }
 Status RTKLocalization::Start() {
