@@ -72,8 +72,8 @@ def create_lane(map, id):
     lane.length = 100.0
     lane.speed_limit = 20.0
     lane.turn = map_lane_pb2.Lane.NO_TURN
-    lane.predecessor_id.add().id = str(id - 1)
-    lane.successor_id.add().id = str(id + 1)
+    #lane.predecessor_id.add().id = str(id - 1)
+    #lane.successor_id.add().id = str(id + 1)
     left_boundary = lane.left_boundary.curve.segment.add()
     right_boundary = lane.right_boundary.curve.segment.add()
     central = lane.central_curve.segment.add()
@@ -113,12 +113,19 @@ road.id.id = "1"
 section = road.section.add()
 section.id.id = "2"
 lane = None
+lane_n1 = None
 for i in range(length - 1):
     if i % 100 == 0:
         id += 1
+        if lane is not None:
+            lane.successor_id.add().id = str(id)
+        if lane_n1 is not None:
+            lane_n1.successor_id.add().id = str(id + 1000)
+
         lane, central, left_boundary, right_boundary = create_lane(map, id)
         lane_n1, central_n1, left_boundary_n1, right_boundary_n1 = create_lane(
             map, id + 1000)
+
         section.lane_id.add().id = str(id)
         section.lane_id.add().id = str(id + 1000)
 
@@ -134,6 +141,9 @@ for i in range(length - 1):
         lane_n1.left_neighbor_forward_lane_id.add().id = str(id)
 
         if i > 0:
+            lane.predecessor_id.add().id = str(id - 1)
+            lane_n1.predecessor_id.add().id = str(id - 1 + 1000)
+            
             right_edge_point = right_edge_segment.line_segment.point.add()
             left_edge_point = left_edge_segment.line_segment.point.add()
 
