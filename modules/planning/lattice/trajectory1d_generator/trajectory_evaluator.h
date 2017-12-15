@@ -39,7 +39,7 @@ class TrajectoryEvaluator {
 
  public:
   explicit TrajectoryEvaluator(
-      const PlanningTarget& objective,
+      const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories);
 
@@ -56,7 +56,7 @@ class TrajectoryEvaluator {
   double top_trajectory_pair_cost() const;
 
  private:
-  double evaluate(const PlanningTarget& objective,
+  double evaluate(const PlanningTarget& planning_target,
                   const std::shared_ptr<Curve1d>& lon_trajectory,
                   const std::shared_ptr<Curve1d>& lat_trajectory) const;
 

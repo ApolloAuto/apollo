@@ -92,6 +92,7 @@ PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
                                                     const PathPoint& p1,
                                                     const double x,
                                                     const double y) {
+  /**
   double heading_geodesic =
       common::math::NormalizeAngle(p1.theta() - p0.theta());
   HermiteSpline<double, 5> spline_geodesic(
@@ -115,6 +116,19 @@ PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
 
   double s = GoldenSectionSearch(func_dist_square, p0.s(), p1.s());
   return InterpolateUsingLinearApproximation(p0, p1, s);
+  **/
+  double v0x = x - p0.x();
+  double v0y = y - p0.y();
+
+  double v1x = p1.x() - p0.x();
+  double v1y = p1.y() - p0.y();
+
+  double v1_norm = std::sqrt(v1x * v1x + v1y * v1y);
+  double dot = v0x * v1x + v0y * v1y;
+
+  double delta_s = dot / v1_norm;
+  return InterpolateUsingLinearApproximation(p0, p1, p0.s() + delta_s);
+
 }
 
 }  // namespace planning
