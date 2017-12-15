@@ -185,6 +185,24 @@ speedGraph:
                 pointRadius: 0
                 fill: false
                 showLine: ture
+accelerationGraph:
+    title: 'Planning Acceleration'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'acceleration (m/s^2)'
+    properties:
+        lines:
+            acceleration:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
 kappaGraph:
     title: 'Planning Kappa'
     options:
