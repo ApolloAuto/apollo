@@ -29,7 +29,7 @@ class AdcMasterScenario : public Scenario {
       const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<PlanningTarget>* const decisions);
+      PlanningTarget* const decision);
 
  private:
   bool exist_ = false;

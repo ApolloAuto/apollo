@@ -51,7 +51,7 @@ class ScenarioManager {
       const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<PlanningTarget>* const decisions);
+      PlanningTarget* const decision);
 
   template <class T>
   void RegisterScenario(FeatureLevel level) {
