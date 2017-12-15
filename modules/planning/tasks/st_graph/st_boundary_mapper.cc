@@ -156,7 +156,6 @@ Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
 bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
   const auto& stop_decision = stop_obstacle->LongitudinalDecision();
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
-
   if (stop_obstacle->perception_sl_boundary().start_s() >
       path_data_.frenet_frame_path().points().back().s()) {
     return true;
