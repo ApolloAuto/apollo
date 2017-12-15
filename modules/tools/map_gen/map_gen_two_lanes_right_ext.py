@@ -105,7 +105,7 @@ for line in f:
 path = LineString(points)
 length = int(path.length)
 
-fmap = open("map_" + fpath.split("/")[-1] + "_2lanes_right_ext.txt", 'w')
+fmap = open(sys.argv[2], 'w')
 id = 0
 map = map_pb2.Map()
 road = map.road.add()
@@ -143,7 +143,7 @@ for i in range(length - 1):
         if i > 0:
             lane.predecessor_id.add().id = str(id - 1)
             lane_n1.predecessor_id.add().id = str(id - 1 + 1000)
-            
+
             right_edge_point = right_edge_segment.line_segment.point.add()
             left_edge_point = left_edge_segment.line_segment.point.add()
 
