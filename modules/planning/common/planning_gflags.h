@@ -29,7 +29,6 @@ DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(rtk_trajectory_resolution);
 DECLARE_double(look_backward_distance);
 DECLARE_double(look_forward_short_distance);
-DECLARE_double(look_forward_mid_distance);
 DECLARE_double(look_forward_long_distance);
 DECLARE_double(look_forward_time_sec);
 DECLARE_bool(enable_reference_line_stitching);
