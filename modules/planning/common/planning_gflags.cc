@@ -41,13 +41,15 @@ DEFINE_double(
     look_backward_distance, 30,
     "look backward this distance when creating reference line from routing");
 
-DEFINE_double(
-    look_forward_distance, 250,
-    "look forward this distance when creating reference line from routing");
-
-DEFINE_double(look_forward_min_distance, 100,
-              "minimal look forward this distance when creating reference line "
+DEFINE_double(look_forward_short_distance, 60,
+              "short look forward this distance when creating reference line "
+              "from routing when ADC is slow");
+DEFINE_double(look_forward_mid_distance, 150,
+              "medium look forward this distance when creating reference line "
               "from routing");
+DEFINE_double(
+    look_forward_long_distance, 250,
+    "look forward this distance when creating reference line from routing");
 DEFINE_double(look_forward_time_sec, 8,
               "look forward time times adc speed to calculate this distance "
               "when creating reference line from routing");
