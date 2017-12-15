@@ -225,9 +225,9 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   signal->Clear();
   signal->set_turn_signal(VehicleSignal::TURN_NONE);
   if (IsChangeLanePath()) {
-    if (adc_sl_boundary_.start_l() < 0.0) {
+    if (Lanes().PreviousAction() == routing::ChangeLaneType::LEFT) {
       signal->set_turn_signal(VehicleSignal::TURN_LEFT);
-    } else if (adc_sl_boundary_.end_l() > 0.0) {
+    } else if (Lanes().PreviousAction() == routing::ChangeLaneType::RIGHT) {
       signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
     }
     return;
