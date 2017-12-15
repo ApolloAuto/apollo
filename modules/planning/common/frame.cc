@@ -130,18 +130,19 @@ bool Frame::InitReferenceLineInfo() {
   }
   DCHECK_EQ(reference_lines.size(), segments.size());
 
-  // a limit larger than all possible look forward distance
-  constexpr double kForwardUpperLimit = 300.0;
+  auto forword_limit =
+      ReferenceLineProvider::LookForwardDistance(vehicle_state_);
+
   for (auto &ref_line : reference_lines) {
     if (!ref_line.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
-                         FLAGS_look_backward_distance, kForwardUpperLimit)) {
+                         FLAGS_look_backward_distance, forword_limit)) {
       AERROR << "Fail to shrink reference line.";
       return false;
     }
   }
   for (auto &seg : segments) {
     if (!seg.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
-                    FLAGS_look_backward_distance, kForwardUpperLimit)) {
+                    FLAGS_look_backward_distance, forword_limit)) {
       AERROR << "Fail to shrink routing segments.";
       return false;
     }
