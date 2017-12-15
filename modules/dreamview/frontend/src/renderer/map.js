@@ -92,21 +92,25 @@ function addLane(lane, coordinates, scene) {
     });
 
     // TODO: this is a temp. fix for repeated boundary types.
-    const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
-    lane.rightBoundary.curve.segment.forEach((segment, index) => {
-        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-        const boundary = addLaneMesh(rightLaneType, points);
-        scene.add(boundary);
-        drewObjects.push(boundary);
-    });
+    if(!lane.rightBoundary.virtual) {
+        const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
+        lane.rightBoundary.curve.segment.forEach((segment, index) => {
+            const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
+            const boundary = addLaneMesh(rightLaneType, points);
+            scene.add(boundary);
+            drewObjects.push(boundary);
+        });
+    }
 
-    const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
-    lane.leftBoundary.curve.segment.forEach((segment, index) => {
-        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-        const boundary = addLaneMesh(leftLaneType, points);
-        scene.add(boundary);
-        drewObjects.push(boundary);
-    });
+    if(!lane.leftBoundary.virtual) {
+        const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
+        lane.leftBoundary.curve.segment.forEach((segment, index) => {
+            const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
+            const boundary = addLaneMesh(leftLaneType, points);
+            scene.add(boundary);
+            drewObjects.push(boundary);
+        });
+    }
 
     return drewObjects;
 }
@@ -321,7 +325,6 @@ export default class Map {
         if (hash !== this.hash) {
             this.hash = hash;
             const diff = diffMapElements(elementIds, this.data);
-            this.removeExpiredElements(elementIds, scene);
             if (!_.isEmpty(diff) || !this.initialized) {
                 WS.requestMapData(diff);
                 this.initialized = true;
