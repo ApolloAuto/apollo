@@ -26,6 +26,8 @@ set(glfw_INCLUDE_DIR /usr/share/visionworks/VisionWorks-1.6-Samples/3rdparty/glf
 set(glfw_LIBRARY /usr/share/visionworks/VisionWorks-1.6-Samples/3rdparty/glfw3/libs)
 link_directories(${glfw_LIBRARY})
 
+link_directories(lib)
+
 find_package(OpenCV REQUIRED)
 
 catkin_package(LIBRARIES ${PROJECT_NAME})
@@ -40,11 +42,6 @@ include_directories(
 
 add_executable(front_camera 
   src/front_camera.cpp
-  src/camera_px2.cpp
-  src/WindowGLFW.cpp
-  src/WindowEGL.cpp
-  src/ProgramArguments.cpp
-  src/ConsoleColor.cpp
 )
 target_link_libraries(front_camera 
   ${catkin_LIBRARIES}
@@ -52,22 +49,18 @@ target_link_libraries(front_camera
   EGL
   nvmedia
   drm
-  libglfw3.a
+  glfw3
   ${cuda_LIBRARY}
   X11
   Xrandr
   Xi
   GLESv2
   Xxf86vm
+  camera_px2
 )
 
 add_executable(rear_camera 
   src/rear_camera.cpp
-  src/camera_px2.cpp
-  src/WindowGLFW.cpp
-  src/WindowEGL.cpp
-  src/ProgramArguments.cpp
-  src/ConsoleColor.cpp
 )
 target_link_libraries(rear_camera 
   ${catkin_LIBRARIES}
@@ -75,11 +68,12 @@ target_link_libraries(rear_camera
   EGL
   nvmedia
   drm
-  libglfw3.a
+  glfw3
   ${cuda_LIBRARY}
   X11
   Xrandr
   Xi
   GLESv2
   Xxf86vm
+  camera_px2
 )
