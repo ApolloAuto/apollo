@@ -20,6 +20,7 @@ import sys
 
 from modules.map.proto import map_pb2
 from modules.map.proto import map_lane_pb2
+from modules.map.proto import map_road_pb2
 import math
 from shapely.geometry import LineString, Point
 
@@ -118,10 +119,21 @@ for i in range(length - 1):
         lane, central, left_boundary, right_boundary = create_lane(map, id)
         section.lane_id.add().id = str(id)
 
+        left_edge = section.boundary.outer_polygon.edge.add()
+        left_edge.type = map_road_pb2.BoundaryEdge.LEFT_BOUNDARY
+        left_edge_segment = left_edge.curve.segment.add()
+
+        right_edge = section.boundary.outer_polygon.edge.add()
+        right_edge.type = map_road_pb2.BoundaryEdge.RIGHT_BOUNDARY
+        right_edge_segment = right_edge.curve.segment.add()
+
         if i > 0:
             left_bound_point = left_boundary.line_segment.point.add()
             right_bound_point = right_boundary.line_segment.point.add()
             central_point = central.line_segment.point.add()
+
+            right_edge_point = right_edge_segment.line_segment.point.add()
+            left_edge_point = left_edge_segment.line_segment.point.add()
 
             p = path.interpolate(i - 1)
             p2 = path.interpolate(i - 1 + 0.5)
@@ -132,6 +144,12 @@ for i in range(length - 1):
             left_bound_point.x = lp[0]
             right_bound_point.y = rp[1]
             right_bound_point.x = rp[0]
+
+            left_edge_point.y = lp[1]
+            left_edge_point.x = lp[0]
+            right_edge_point.y = rp[1]
+            right_edge_point.x = rp[0]
+
             central_point.x = p.x
             central_point.y = p.y
 
@@ -147,6 +165,9 @@ for i in range(length - 1):
     right_bound_point = right_boundary.line_segment.point.add()
     central_point = central.line_segment.point.add()
 
+    right_edge_point = right_edge_segment.line_segment.point.add()
+    left_edge_point = left_edge_segment.line_segment.point.add()
+
     p = path.interpolate(i)
     p2 = path.interpolate(i + 0.5)
     distance = LANE_WIDTH / 2.0
@@ -158,6 +179,11 @@ for i in range(length - 1):
     left_bound_point.x = lp[0]
     right_bound_point.y = rp[1]
     right_bound_point.x = rp[0]
+
+    left_edge_point.y = lp[1]
+    left_edge_point.x = lp[0]
+    right_edge_point.y = rp[1]
+    right_edge_point.x = rp[0]
 
     left_sample = lane.left_sample.add()
     left_sample.s = i % 100 + 1
