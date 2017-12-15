@@ -104,7 +104,7 @@ for line in f:
 path = LineString(points)
 length = int(path.length)
 
-fmap = open("map_" + fpath.split("/")[-1] + ".txt", 'w')
+fmap = open("map_" + fpath.split("/")[-1] + "_2lanes_right_ext.txt", 'w')
 id = 0
 map = map_pb2.Map()
 road = map.road.add()
@@ -118,16 +118,11 @@ for i in range(length - 1):
         lane, central, left_boundary, right_boundary = create_lane(map, id)
         lane_n1, central_n1, left_boundary_n1, right_boundary_n1 = create_lane(
             map, id + 1000)
-        lane_n2, central_n2, left_boundary_n2, right_boundary_n2 = create_lane(
-            map, id + 2000)
         section.lane_id.add().id = str(id)
         section.lane_id.add().id = str(id + 1000)
-        section.lane_id.add().id = str(id + 2000)
 
-        lane.left_neighbor_forward_lane_id.add().id = str(id + 1000)
-        lane_n1.left_neighbor_forward_lane_id.add().id = str(id + 2000)
-        lane_n2.right_neighbor_forward_lane_id.add().id = str(id + 1000)
-        lane_n1.right_neighbor_forward_lane_id.add().id = str(id)
+        lane.right_neighbor_forward_lane_id.add().id = str(id + 1000)
+        lane_n1.left_neighbor_forward_lane_id.add().id = str(id)
 
         if i > 0:
             left_bound_point = left_boundary.line_segment.point.add()
@@ -162,7 +157,7 @@ for i in range(length - 1):
             p = path.interpolate(i - 1)
             p2 = path.interpolate(i - 1 + 0.5)
             distance = LANE_WIDTH
-            p, p2 = shift(p, p2, distance)
+            p, p2 = shift(p, p2, distance, False)
             distance = LANE_WIDTH / 2.0
             lp, rp = convert(p, p2, distance)
 
@@ -178,33 +173,6 @@ for i in range(length - 1):
             left_sample.width = LANE_WIDTH / 2.0
 
             right_sample = lane_n1.right_sample.add()
-            right_sample.s = 0
-            right_sample.width = LANE_WIDTH / 2.0
-
-            #####
-            left_bound_point = left_boundary_n2.line_segment.point.add()
-            right_bound_point = right_boundary_n2.line_segment.point.add()
-            central_point = central_n2.line_segment.point.add()
-
-            p = path.interpolate(i - 1)
-            p2 = path.interpolate(i - 1 + 0.5)
-            distance = LANE_WIDTH * 2.0
-            p, p2 = shift(p, p2, distance)
-            distance = LANE_WIDTH / 2.0
-            lp, rp = convert(p, p2, distance)
-
-            left_bound_point.y = lp[1]
-            left_bound_point.x = lp[0]
-            right_bound_point.y = rp[1]
-            right_bound_point.x = rp[0]
-            central_point.x = p.x
-            central_point.y = p.y
-
-            left_sample = lane_n2.left_sample.add()
-            left_sample.s = 0
-            left_sample.width = LANE_WIDTH / 2.0
-
-            right_sample = lane_n2.right_sample.add()
             right_sample.s = 0
             right_sample.width = LANE_WIDTH / 2.0
 
@@ -240,7 +208,7 @@ for i in range(length - 1):
     p = path.interpolate(i)
     p2 = path.interpolate(i + 0.5)
     distance = LANE_WIDTH
-    p, p2 = shift(p, p2, distance)
+    p, p2 = shift(p, p2, distance, False)
     distance = LANE_WIDTH / 2.0
     lp, rp = convert(p, p2, distance)
 
@@ -256,33 +224,6 @@ for i in range(length - 1):
     left_sample.width = LANE_WIDTH / 2.0
 
     right_sample = lane_n1.right_sample.add()
-    right_sample.s = i % 100 + 1
-    right_sample.width = LANE_WIDTH / 2.0
-
-    ################
-    left_bound_point = left_boundary_n2.line_segment.point.add()
-    right_bound_point = right_boundary_n2.line_segment.point.add()
-    central_point = central_n2.line_segment.point.add()
-
-    p = path.interpolate(i)
-    p2 = path.interpolate(i + 0.5)
-    distance = 6.6
-    p, p2 = shift(p, p2, distance)
-    distance = LANE_WIDTH / 2.0
-    lp, rp = convert(p, p2, distance)
-
-    central_point.x = p.x
-    central_point.y = p.y
-    left_bound_point.y = lp[1]
-    left_bound_point.x = lp[0]
-    right_bound_point.y = rp[1]
-    right_bound_point.x = rp[0]
-
-    left_sample = lane_n2.left_sample.add()
-    left_sample.s = i % 100 + 1
-    left_sample.width = LANE_WIDTH / 2.0
-
-    right_sample = lane_n2.right_sample.add()
     right_sample.s = i % 100 + 1
     right_sample.width = LANE_WIDTH / 2.0
 
