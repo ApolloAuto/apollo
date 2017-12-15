@@ -22,7 +22,6 @@
 #include "opencv2/opencv.hpp"
 #include "cv_bridge/cv_bridge.h"
 #include "camera_px2.h"
-#include "ProgramArguments.hpp"
 
 bool is_saving = false;
 void callback(const std_msgs::Int16::ConstPtr& msg) {
@@ -40,18 +39,7 @@ int main(int argc, char** argv) {
     
     int ori_width = 1920;
     int ori_height = 1208;
-    ProgramArguments g_arguments(
-    {
-        ProgramArguments::Option_t("camera-type", "ar0231"),
-        ProgramArguments::Option_t("csi-port", "ab"),
-        ProgramArguments::Option_t("offscreen", "0"),
-        ProgramArguments::Option_t("write-file", ""),
-        ProgramArguments::Option_t("serialize-type", "h264"),
-        ProgramArguments::Option_t("serialize-bitrate", "8000000"),
-        ProgramArguments::Option_t("serialize-framerate", "30"),
-        ProgramArguments::Option_t("slave", "0"),
-    });
-    init(ori_width, ori_height, g_arguments);
+    init(ori_width, ori_height, "ab");
     start();
 
     ros::Publisher image_publisher;
