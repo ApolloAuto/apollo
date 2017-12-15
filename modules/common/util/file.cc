@@ -122,25 +122,26 @@ bool CopyDir(const std::string &from, const std::string &to) {
     AERROR << "Cannot open directory " << from;
     return false;
   }
-  if (!EnsureDirectory(to)) {
-    AERROR << "Cannot create target directory " << to;
-    return false;
-  }
 
-  struct dirent *entry;
   bool ret = true;
-  while ((entry = readdir(directory)) != nullptr) {
-    // skip directory_path/. and directory_path/..
-    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
-      continue;
+  if (EnsureDirectory(to)) {
+    struct dirent *entry;
+    while ((entry = readdir(directory)) != nullptr) {
+      // skip directory_path/. and directory_path/..
+      if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+        continue;
+      }
+      const std::string sub_path_from = StrCat(from, "/", entry->d_name);
+      const std::string sub_path_to = StrCat(to, "/", entry->d_name);
+      if (entry->d_type == DT_DIR) {
+        ret &= CopyDir(sub_path_from, sub_path_to);
+      } else {
+        ret &= CopyFile(sub_path_from, sub_path_to);
+      }
     }
-    const std::string sub_path_from = StrCat(from, "/", entry->d_name);
-    const std::string sub_path_to = StrCat(to, "/", entry->d_name);
-    if (entry->d_type == DT_DIR) {
-      ret = CopyDir(sub_path_from, sub_path_to) && ret;
-    } else {
-      ret = CopyFile(sub_path_from, sub_path_to) && ret;
-    }
+  } else {
+    AERROR << "Cannot create target directory " << to;
+    ret = false;
   }
   closedir(directory);
   return ret;
