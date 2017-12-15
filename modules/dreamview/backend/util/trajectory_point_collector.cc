@@ -54,6 +54,7 @@ void TrajectoryPointCollector::Collect(const TrajectoryPoint &point) {
     }
 
     trajectory->set_speed(point.v());
+    trajectory->set_speed_acceleration(point.a());
     trajectory->set_timestamp_sec(point.relative_time());
   }
   previous_ = point;
