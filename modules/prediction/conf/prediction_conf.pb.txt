@@ -11,7 +11,7 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
-  predictor_type: REGIONAL_PREDICTOR
+  predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: BICYCLE 
