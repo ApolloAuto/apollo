@@ -220,14 +220,14 @@ std::string ReferenceLineInfo::PathSpeedDebugString() const {
 
 void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   // set vehicle change lane signal
-  CHECK(signal) << "signal is null";
+  CHECK_NOTNULL(signal);
+
   signal->Clear();
   signal->set_turn_signal(VehicleSignal::TURN_NONE);
-  const auto& next_action = Lanes().NextAction();
-  if (next_action != routing::FORWARD) {  // change lane case
-    if (next_action == routing::LEFT) {
+  if (IsChangeLanePath()) {
+    if (adc_sl_boundary_.start_l() < 0.0) {
       signal->set_turn_signal(VehicleSignal::TURN_LEFT);
-    } else if (next_action == routing::RIGHT) {
+    } else if (adc_sl_boundary_.end_l() > 0.0) {
       signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
     }
     return;
