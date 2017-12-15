@@ -95,6 +95,8 @@ DEFINE_double(change_lane_success_freeze_time, 3.0,
 DEFINE_double(change_lane_min_length, 30.0,
               "meters. If the change lane target has longer length than this "
               "threshold, it can shortcut the default lane.");
+DEFINE_bool(enable_change_lane_decider, false,
+            "True to use change lane state machine decider.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 

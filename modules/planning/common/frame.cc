@@ -163,7 +163,8 @@ bool Frame::InitReferenceLineInfo() {
       return false;
     }
   }
-  if (!change_lane_decider_.Apply(&reference_line_info_)) {
+  if (FLAGS_enable_change_lane_decider &&
+      !change_lane_decider_.Apply(&reference_line_info_)) {
     AERROR << "Failed to apply change lane decider";
     return false;
   }
