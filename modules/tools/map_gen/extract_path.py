@@ -21,16 +21,16 @@ import rosbag
 from modules.localization.proto import localization_pb2
 
 if __name__ == '__main__':
-    fbags = sys.argv[1:]
-
-    filename = "path_"+ fbags[0].split('/')[-1] +".txt"
+    filename = sys.argv[1]
     f = open(filename, 'w')
+    fbags = sys.argv[2:]
 
     for fbag in fbags:
         bag = rosbag.Bag(fbag)
-        for topic, localization_pb, t in bag.read_messages(topics=['/apollo/localization/pose']):
+        for topic, localization_pb, t in bag.read_messages(
+                topics=['/apollo/localization/pose']):
             x = localization_pb.pose.position.x
             y = localization_pb.pose.position.y
-            f.write(str(x) +","+ str(y) + "\n")
+            f.write(str(x) + "," + str(y) + "\n")
         bag.close()
-    print ("File written to: %s" % filename)
+    print("File written to: %s" % filename)
