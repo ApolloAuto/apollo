@@ -77,7 +77,7 @@ class Image {
   bool contain_image() const { return contain_image_; }
   void set_ts(double ts) { timestamp_ = ts; }
 
-  void set_device_id(CameraId camera_id) { camera_id_ = camera_id; }
+  void set_camera_id(CameraId camera_id) { camera_id_ = camera_id; }
 
   bool GenerateMat();
 
