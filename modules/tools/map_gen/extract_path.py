@@ -23,7 +23,8 @@ from modules.localization.proto import localization_pb2
 if __name__ == '__main__':
     fbags = sys.argv[1:]
 
-    f = open("path_"+ fbags[0].split('/')[-1] +".txt", 'w')
+    filename = "path_"+ fbags[0].split('/')[-1] +".txt"
+    f = open(filename, 'w')
 
     for fbag in fbags:
         bag = rosbag.Bag(fbag)
@@ -32,3 +33,4 @@ if __name__ == '__main__':
             y = localization_pb.pose.position.y
             f.write(str(x) +","+ str(y) + "\n")
         bag.close()
+    print ("File written to: %s" % filename)
