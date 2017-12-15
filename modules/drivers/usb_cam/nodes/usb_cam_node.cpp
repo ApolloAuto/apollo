@@ -37,11 +37,12 @@
 #include <ros/ros.h>
 #include "usb_cam_wrapper.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
   ros::init(argc, argv, "usb_cam");
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");
   usb_cam::UsbCamWrapper usbCam(node, priv_nh);
   usbCam.spin();
   return EXIT_SUCCESS;
-};
+}
