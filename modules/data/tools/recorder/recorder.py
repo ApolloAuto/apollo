@@ -78,8 +78,8 @@ class RecorderOptions(object):
         self.record_split_size = 300
         self.record_compress_type = "None"
         self.record_prefix = "rosbag" 
-        self.record_topic_match_regex = "ddd"
-        self.record_topic_exclude_regex = "dfdf"
+        self.record_topic_match_regex = ""
+        self.record_topic_exclude_regex = ""
 
 
 class Recorder(threading.Thread):
