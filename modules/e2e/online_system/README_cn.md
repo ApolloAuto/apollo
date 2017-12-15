@@ -4,7 +4,7 @@
 # 安装环境
 1.	Ubuntu 16.04 LTS
 2.	ROS Kinetic – 建议 ros-kinetic-desktop-full.
-3.	Px2 driveworks 的0.1 版本
+3.	Px2 driveworks 的0.2 版本
 
 # 编译以及安装此模块
 编译和安装此模块都是通过ROS catkin的工具来完成的。
@@ -48,7 +48,7 @@
 然后打开另外一个bash shell，启动camera的node：
 
 ```
-	rosrun px2_camera_image px2_camera_node
+	rosrun px2_camera_image front_camera ./ 
 ```
 
 最后打开另外一个bash shell，打开可视化工具rviz观察是否有image消息发布出来。
