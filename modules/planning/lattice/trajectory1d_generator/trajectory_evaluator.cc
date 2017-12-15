@@ -175,7 +175,6 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Curve1d>& lon_trajectory,
     const PlanningTarget& planning_target) const {
 
-  if (planning_target.decision_type() == PlanningTarget::CRUISE) {
     // zero s target means cruise
 //    if (s <= std::numeric_limits<double>::epsilon()) {
 //      double target_speed = ds;
@@ -207,44 +206,31 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
 //      double weight = 10.0;
 //      return (target_s - end_s) * weight;
 //    }
+  double weight_dist_s = 10.0;
+  double target_speed = planning_target.cruise_speed();
+  double end_speed = lon_trajectory->Evaluate(1,
+      lon_trajectory->ParamLength());
 
-    double target_speed = planning_target.cruise_speed();
-    double end_speed = lon_trajectory->Evaluate(1,
-        lon_trajectory->ParamLength());
+  double t_max = lon_trajectory->ParamLength();
+  double t = 0.0;
+  double s_max = lon_trajectory->Evaluate(0, planned_trajectory_time);
+  double s_min = lon_trajectory->Evaluate(0, 0.0);
+  double dist_s = s_max -s_min;
+  double cost = 0.0;
 
-    double t_max = lon_trajectory->ParamLength();
-    double t = 0.0;
-    double cost = 0.0;
-
-    while (t < planned_trajectory_time) {
-      double c = 0.0;
-      if (t < t_max) {
-        c = target_speed - lon_trajectory->Evaluate(1, t);
-      } else {
-        c = target_speed - end_speed;
-      }
-      cost += std::fabs(c);
-      t += trajectory_time_resolution;
-    }
-    return cost;
-
-  } else {
-    CHECK(planning_target.decision_type() == PlanningTarget::STOP);
-    double target_s = planning_target.stop_point();
-    double t_max = lon_trajectory->ParamLength();
-    double end_s = lon_trajectory->Evaluate(0, t_max);
-
-    double weight_overshoot = 100.0;
-    double weight_undershoot = 1.0;
-
-    double diff_s = target_s - end_s;
-    if (diff_s < 0.0) {
-      return weight_overshoot * (-diff_s);
+  while (t < planned_trajectory_time) {
+    double c = 0.0;
+    if (t < t_max) {
+      c = target_speed - lon_trajectory->Evaluate(1, t);
     } else {
-      return weight_undershoot * diff_s;
+      c = target_speed - end_speed;
     }
+    cost += std::fabs(c);
+    t += trajectory_time_resolution;
   }
-  return 0.0;
+  cost += weight_dist_s * 1.0 / (1.0 + dist_s);
+  return cost;
+
 }
 
 }  // namespace planning

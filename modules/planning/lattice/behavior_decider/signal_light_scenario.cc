@@ -39,15 +39,14 @@ int SignalLightScenario::ComputeScenarioDecision(
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
-    std::vector<PlanningTarget>* const decisions) {
+    PlanningTarget* const decision) {
   CHECK(frame != nullptr);
 
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
-  PlanningTarget ret;
   for (const auto& reference_point : discretized_reference_line) {
-    ret.mutable_discretized_reference_line()
+    decision->mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
@@ -57,10 +56,6 @@ int SignalLightScenario::ComputeScenarioDecision(
     return 0;
   }
   ReadSignals();
-
-
-  ret.set_decision_type(PlanningTarget::CRUISE);
-  ret.set_cruise_speed(FLAGS_default_cruise_speed);
   double stop_s = std::numeric_limits<double>::max();
 
   for (const hdmap::PathOverlap* signal_light : signal_lights_along_reference_line_) {
@@ -74,18 +69,10 @@ int SignalLightScenario::ComputeScenarioDecision(
          stop_deceleration < FLAGS_stop_max_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
-      if (signal_light->start_s - FLAGS_stop_distance_traffic_light < stop_s) {
-        stop_s = signal_light->start_s - FLAGS_stop_distance_traffic_light;
-        ret.set_decision_type(PlanningTarget::STOP);
-        ret.set_stop_point(stop_s);
-      }
       CreateStopObstacle(frame, reference_line_info, signal_light);
     }
   }
 
-  if (ret.decision_type() == PlanningTarget::STOP) {
-    decisions->emplace_back(std::move(ret));
-  }
   return 0;
 }
 

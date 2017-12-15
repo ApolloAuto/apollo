@@ -52,35 +52,20 @@ PlanningTarget BehaviorDecider::Analyze(
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
-  std::vector<PlanningTarget> scenario_decisions;
+  PlanningTarget ret;
 
   if (0 !=
       ScenarioManager::instance()->ComputeWorldDecision(
           frame, reference_line_info,
           init_planning_point, lon_init_state,
-          discretized_reference_line, &scenario_decisions)) {
+          discretized_reference_line, &ret)) {
     AERROR << "ComputeWorldDecision error!";
   }
 
-  PlanningTarget ret;
-  ret.CopyFrom(scenario_decisions[0]);
-  if (ret.decision_type() == PlanningTarget::CRUISE) {
-    AINFO << "PlanningTarget set_decision_type: [CRUISE]";
-  } else {
-    AINFO << "PlanningTarget set_decision_type: [STOP]";
-  }
   for (const auto& reference_point : discretized_reference_line) {
     ret.mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
-  }
-
-  if (StopDecisionNearDestination(frame, lon_init_state,
-                                  discretized_reference_line, &ret)) {
-    AINFO << "STOP decision when near the routing end.";
-    return ret;
-  } else {
-    AINFO << "Not approaching destination yet";
   }
 
   PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
@@ -103,22 +88,13 @@ PlanningTarget BehaviorDecider::Analyze(
     }
   }
 
-  if (sample_bounds.empty() &&
-    ret.decision_type() != PlanningTarget::STOP) {
-    ret.set_decision_type(PlanningTarget::CRUISE);
-    ret.set_cruise_speed(FLAGS_default_cruise_speed);
-    AINFO << "Setting PlanningTarget into CRUISE with ZERO sample bound";
-    return ret;
-  }
-
   for (const auto& sample_bound : sample_bounds) {
     ret.add_sample_bound()->CopyFrom(sample_bound);
   }
-  //ret.set_decision_type(PlanningTarget::CRUISE);
-  //ret.set_cruise_speed(FLAGS_default_cruise_speed);
   return ret;
 }
 
+// To Be Deprecated
 bool BehaviorDecider::StopDecisionNearDestination(
     Frame* frame, const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
@@ -137,8 +113,6 @@ bool BehaviorDecider::StopDecisionNearDestination(
 
   double res_s = routing_end_matched_point.s() - lon_init_state[0];
   if (res_s <= stop_margin) {
-    planning_target->set_decision_type(PlanningTarget::STOP);
-    planning_target->set_stop_point(routing_end_matched_point.s());
     AINFO << "Setting PlanningTarget into STOP as res_s <= stop_margin";
     return true;
   } else {
@@ -146,8 +120,6 @@ bool BehaviorDecider::StopDecisionNearDestination(
     double required_stop_deceleration = (v * v) / (2.0 * res_s);
 
     if (required_stop_deceleration > stop_acc_thred) {
-      planning_target->set_decision_type(PlanningTarget::STOP);
-      planning_target->set_stop_point(routing_end_matched_point.s());
       AINFO << "Setting PlanningTarget into STOP as required_stop_deceleration > stop_acc_thred";
       return true;
     } else {

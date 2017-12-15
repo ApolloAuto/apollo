@@ -37,7 +37,7 @@ int ScenarioManager::ComputeWorldDecision(
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
-    std::vector<PlanningTarget>* const decisions) {
+    PlanningTarget* const decision) {
   RegisterScenarios();
   AINFO << "Register Scenarios Success";
 
@@ -63,7 +63,7 @@ int ScenarioManager::ComputeWorldDecision(
               frame,
               reference_line_info,
               init_planning_point, lon_init_state,
-              discretized_reference_line, decisions)) {
+              discretized_reference_line, decision)) {
         AINFO << "scenario[" << scenario->Name()
               << "] Success in computing decision";
       } else {
@@ -72,25 +72,7 @@ int ScenarioManager::ComputeWorldDecision(
       }
     }
   }
-
-  if (decisions->size() == 1) {
-    return 0;
-  } else {
-    bool found_stop = false;
-    PlanningTarget ret;
-    for (uint i = 0; i < decisions->size(); ++i) {
-      if ((*decisions)[i].decision_type() == PlanningTarget::STOP) {
-        found_stop = true;
-        ret.CopyFrom((*decisions)[i]);
-        break;
-      }
-    }
-    if (found_stop) {
-      decisions->clear();
-      decisions->emplace_back(std::move(ret));
-    }
-    return 0;
-  }
+  return 0;
 }
 }  // namespace planning
 }  // namespace apollo

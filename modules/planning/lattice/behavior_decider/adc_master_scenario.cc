@@ -29,23 +29,18 @@ int AdcMasterScenario::ComputeScenarioDecision(
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
-    std::vector<PlanningTarget>* const decisions) {
+    PlanningTarget* const decision) {
   CHECK(frame != nullptr);
 
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
-  PlanningTarget ret;
   for (const auto& reference_point : discretized_reference_line) {
-    ret.mutable_discretized_reference_line()
+    decision->mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
-
-  ret.set_decision_type(PlanningTarget::CRUISE);
-  ret.set_cruise_speed(FLAGS_default_cruise_speed);
-
-  decisions->emplace_back(std::move(ret));
+  decision->set_cruise_speed(FLAGS_default_cruise_speed);
 
   return 0;
 }
