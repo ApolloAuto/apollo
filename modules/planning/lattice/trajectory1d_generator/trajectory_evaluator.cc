@@ -30,7 +30,7 @@ namespace apollo {
 namespace planning {
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const PlanningTarget& objective,
+    const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories) {
   for (std::size_t i = 0; i < lon_trajectories.size(); ++i) {
@@ -44,7 +44,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
         continue;
       }
       double cost =
-          evaluate(objective, lon_trajectories[i], lat_trajectories[j]);
+          evaluate(planning_target, lon_trajectories[i], lat_trajectories[j]);
       cost_queue_.push(
           PairCost(std::pair<std::size_t, std::size_t>(i, j), cost));
     }
@@ -77,7 +77,7 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
 }
 
 double TrajectoryEvaluator::evaluate(
-    const PlanningTarget& objective,
+    const PlanningTarget& planning_target,
     const std::shared_ptr<Curve1d>& lon_trajectory,
     const std::shared_ptr<Curve1d>& lat_trajectory) const {
   // currently consider three costs:
@@ -109,7 +109,7 @@ double TrajectoryEvaluator::evaluate(
   }
 
   double lon_objective_cost =
-      compute_lon_trajectory_objective_cost(lon_trajectory, objective);
+      compute_lon_trajectory_objective_cost(lon_trajectory, planning_target);
 
   double lon_jerk_cost = compute_lon_trajectory_jerk_cost(lon_trajectory);
 
