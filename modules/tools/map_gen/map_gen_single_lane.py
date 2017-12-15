@@ -105,7 +105,7 @@ for line in f:
 path = LineString(points)
 length = int(path.length)
 
-fmap = open("map_" + fpath.split("/")[-1] + ".1lane.txt", 'w')
+fmap = open(sys.argv[2], 'w')
 id = 0
 map = map_pb2.Map()
 road = map.road.add()
