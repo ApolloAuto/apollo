@@ -58,29 +58,20 @@ extern "C"
 #include <sstream>
 
 #include <sensor_msgs/Image.h>
-#include "utility.h"
 
 namespace usb_cam {
 
 class UsbCam {
-public:
-    typedef enum
-    {
-        IO_METHOD_READ,
-        IO_METHOD_MMAP, 
-        IO_METHOD_USERPTR, 
-        IO_METHOD_UNKNOWN,
-    } io_method;
+ public:
+  typedef enum
+  {
+    IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR, IO_METHOD_UNKNOWN,
+  } io_method;
 
-    typedef enum
-    {
-        PIXEL_FORMAT_YUYV,
-        PIXEL_FORMAT_UYVY,
-        PIXEL_FORMAT_MJPEG, 
-        PIXEL_FORMAT_YUVMONO10,
-        PIXEL_FORMAT_RGB24,
-        PIXEL_FORMAT_UNKNOWN
-    } pixel_format;
+  typedef enum
+  {
+    PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10, PIXEL_FORMAT_RGB24, PIXEL_FORMAT_UNKNOWN
+  } pixel_format;
 
     UsbCam();
     ~UsbCam();
@@ -97,17 +88,16 @@ public:
     // enables/disable auto focus
     void set_auto_focus(int value);
 
-    // Set video device parameters
-    void set_v4l_parameter(const std::string& param, int value);
-    void set_v4l_parameter(const std::string& param, const std::string& value);
-    void set_error_code(const int& value);
+  // Set video device parameters
+  void set_v4l_parameter(const std::string& param, int value);
+  void set_v4l_parameter(const std::string& param, const std::string& value);
 
-    static io_method io_method_from_string(const std::string& str);
-    static pixel_format pixel_format_from_string(const std::string& str);
+  static io_method io_method_from_string(const std::string& str);
+  static pixel_format pixel_format_from_string(const std::string& str);
 
-    void stop_capturing(void);
-    void start_capturing(void);
-    bool is_capturing();
+  void stop_capturing(void);
+  void start_capturing(void);
+  bool is_capturing();
 
 private:
     struct CameraImage
@@ -142,24 +132,23 @@ private:
     //void reset_device(void);
     bool grab_image(int timeout);
 
-    bool _is_capturing;
-    std::string _camera_dev;
-    unsigned int _pixelformat;
-    bool _monochrome;
-    io_method _io_type;
-    int _fd;
-    std::vector<Buffer> _buffers;
-    unsigned int _n_buffers;
-    AVFrame *_avframe_camera;
-    AVFrame *_avframe_rgb;
-    AVCodec *_avcodec;
-    AVDictionary *_avoptions;
-    AVCodecContext *_avcodec_context;
-    int _avframe_camera_size;
-    int _avframe_rgb_size;
-    struct SwsContext *_video_sws;
-    boost::shared_ptr<CameraImage> _image;
-    int _error_code;
+    bool is_capturing_;
+    std::string camera_dev_;
+    unsigned int pixelformat_;
+    bool monochrome_;
+    io_method io_;
+    int fd_;
+    std::vector<Buffer> buffers_;
+    unsigned int n_buffers_;
+    AVFrame *avframe_camera_;
+    AVFrame *avframe_rgb_;
+    AVCodec *avcodec_;
+    AVDictionary *avoptions_;
+    AVCodecContext *avcodec_context_;
+    int avframe_camera_size_;
+    int avframe_rgb_size_;
+    struct SwsContext *video_sws_;
+    boost::shared_ptr<CameraImage> image_;
 };
 
 }
