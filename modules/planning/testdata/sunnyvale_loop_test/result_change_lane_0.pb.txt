@@ -1708,7 +1708,7 @@ decision {
   object_decision {
   }
   vehicle_signal {
-    turn_signal: TURN_LEFT
+    turn_signal: TURN_NONE
   }
 }
 routing_header {

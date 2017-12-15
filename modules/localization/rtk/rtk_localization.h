@@ -87,7 +87,7 @@ class RTKLocalization : public LocalizationBase {
 
  private:
   ros::Timer timer_;
-  tf2_ros::TransformBroadcaster *tf2_broadcaster_;
+  tf2_ros::TransformBroadcaster *tf2_broadcaster_ = nullptr;
   apollo::common::monitor::Monitor monitor_;
   const std::vector<double> map_offset_;
   double last_received_timestamp_sec_ = 0.0;
