@@ -72,8 +72,8 @@ def create_lane(map, id):
     lane.length = 100.0
     lane.speed_limit = 20.0
     lane.turn = map_lane_pb2.Lane.NO_TURN
-    lane.predecessor_id.add().id = str(id - 1)
-    lane.successor_id.add().id = str(id + 1)
+    #lane.predecessor_id.add().id = str(id - 1)
+    #lane.successor_id.add().id = str(id + 1)
     left_boundary = lane.left_boundary.curve.segment.add()
     right_boundary = lane.right_boundary.curve.segment.add()
     central = lane.central_curve.segment.add()
@@ -116,6 +116,8 @@ lane = None
 for i in range(length - 1):
     if i % 100 == 0:
         id += 1
+        if lane is not None:
+            lane.successor_id.add().id = str(id)
         lane, central, left_boundary, right_boundary = create_lane(map, id)
         section.lane_id.add().id = str(id)
 
@@ -128,6 +130,8 @@ for i in range(length - 1):
         right_edge_segment = right_edge.curve.segment.add()
 
         if i > 0:
+            lane.predecessor_id.add().id = str(id - 1)
+
             left_bound_point = left_boundary.line_segment.point.add()
             right_bound_point = right_boundary.line_segment.point.add()
             central_point = central.line_segment.point.add()
