@@ -181,8 +181,6 @@ class SequentialPerceptionTest {
     AINFO << "pcd file_name: " << pcd_filename;
     pcl::io::loadPCDFile<pcl_util::PointXYZIT>(pcd_filename, *cloud_raw);
     pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
-    // double min_timestamp = DBL_MAX;
-    // double max_timestamp = 0;
     for (size_t i = 0; i < cloud_raw->points.size(); ++i) {
       pcl_util::Point p;
       p.x = cloud_raw->points[i].x;
