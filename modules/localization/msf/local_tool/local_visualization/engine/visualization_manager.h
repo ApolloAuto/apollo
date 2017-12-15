@@ -28,6 +28,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include <atomic>
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
@@ -174,7 +175,7 @@ class VisualizationManager {
   VisualizationEngine visual_engine_;
   // Visualization Thread
   std::thread visual_thread_;
-  bool stop_visualization_;
+  std::atomic<bool> stop_visualization_;
 
   MessageBuffer<LidarVisFrame> lidar_frame_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> gnss_loc_info_buffer_;
