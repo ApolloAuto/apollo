@@ -73,7 +73,7 @@ stGraph:
     options:
         legend:
             display: false
-        axes: 
+        axes:
             x:
                 min: -3
                 max: 9
@@ -116,7 +116,7 @@ stSpeedGraph:
     options:
         legend:
             display: true
-        axes: 
+        axes:
             x:
                 min: -10
                 max: 220
@@ -156,7 +156,7 @@ speedGraph:
     options:
         legend:
             display: true
-        axes: 
+        axes:
             x:
                 min: -2
                 max: 10
@@ -194,6 +194,8 @@ accelerationGraph:
             x:
                 labelString: 't (second)'
             y:
+                min: -4.0
+                max: 2.0
                 labelString: 'acceleration (m/s^2)'
     properties:
         lines:
