@@ -3,7 +3,7 @@ slGraph:
     options:
         legend:
             display: false
-        axes: 
+        axes:
             x:
                 min: 0
                 max: 200
@@ -75,8 +75,8 @@ stGraph:
             display: false
         axes:
             x:
-                min: -3
-                max: 9
+                min: -2
+                max: 10
                 labelString: 't (second)'
             y:
                 min: -10
@@ -192,6 +192,8 @@ accelerationGraph:
             display: false
         axes:
             x:
+                min: -2
+                max: 10
                 labelString: 't (second)'
             y:
                 min: -4.0
