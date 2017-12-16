@@ -105,6 +105,8 @@ for line in f:
 path = LineString(points)
 length = int(path.length)
 
+extra_roi_extension = float(sys.argv[3])
+
 fmap = open(sys.argv[2], 'w')
 id = 0
 map = map_pb2.Map()
@@ -142,13 +144,14 @@ for i in range(length - 1):
             p = path.interpolate(i - 1)
             p2 = path.interpolate(i - 1 + 0.5)
             distance = LANE_WIDTH / 2.0
-            lp, rp = convert(p, p2, distance)
 
+            lp, rp = convert(p, p2, distance)
             left_bound_point.y = lp[1]
             left_bound_point.x = lp[0]
             right_bound_point.y = rp[1]
             right_bound_point.x = rp[0]
 
+            lp, rp = convert(p, p2, distance + extra_roi_extension)
             left_edge_point.y = lp[1]
             left_edge_point.x = lp[0]
             right_edge_point.y = rp[1]
