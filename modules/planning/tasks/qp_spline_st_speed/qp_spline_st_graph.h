@@ -84,6 +84,7 @@ class QpSplineStGraph {
   common::Status AddFollowReferenceLineKernel(
       const std::vector<const StBoundary*>& boundaries, const double weight);
 
+  const SpeedData GetHistorySpeed() const;
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
       std::vector<double>* speed_upper_bound) const;
