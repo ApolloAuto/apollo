@@ -2,6 +2,7 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 
 import ButtonPanel from "components/SideBar/ButtonPanel";
+import SubButtonPanel from "components/SideBar/SubButtonPanel";
 import WS from "store/websocket";
 
 @inject("store") @observer
@@ -27,11 +28,14 @@ export default class SideBar extends React.Component {
                              onRouteEditingBar={() => {
                                     this.props.store.handleSideBarClick('showRouteEditingBar');
                                  }}
-                             showRouteEditingBar={options.showRouteEditingBar}
-                             onPOI={() => {
-                                 this.props.store.handleSideBarClick('showPOI');
-                             }}
-                             showPOI={options.showPOI} />
+                             showRouteEditingBar={options.showRouteEditingBar} />
+                <SubButtonPanel enablePOI={
+                                    !enableHMIButtonsOnly && !options.showRouteEditingBar
+                                }
+                                onPOI={() => {
+                                    this.props.store.handleSideBarClick('showPOI');
+                                }}
+                                showPOI={!options.showRouteEditingBar && options.showPOI} />
             </div>
         );
     }

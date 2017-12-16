@@ -40,13 +40,13 @@ class ChangeLaneDecider {
   ChangeLaneDecider();
   bool Apply(std::list<ReferenceLineInfo>* reference_line_info);
 
+ private:
   void UpdateState(planning_internal::ChangeLaneState::State state_code,
                    const std::string& path_id);
   void UpdateState(double timestamp,
                    planning_internal::ChangeLaneState::State state_code,
                    const std::string& path_id);
 
- private:
   void PrioritizeChangeLane(
       std::list<ReferenceLineInfo>* reference_line_info) const;
 

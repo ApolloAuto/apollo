@@ -157,11 +157,8 @@ ReferenceLineProvider::FutureRouteWaypoints() {
 
 void ReferenceLineProvider::UpdateVehicleState(
     const VehicleState &vehicle_state) {
-  std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
   vehicle_state_ = vehicle_state;
-  if (!pnc_map_->UpdateVehicleState(vehicle_state)) {
-    AERROR << "Failed to update vehicle state in pnc map";
-  }
 }
 
 bool ReferenceLineProvider::Start() {
@@ -259,6 +256,7 @@ bool ReferenceLineProvider::GetReferenceLines(
 
   if (FLAGS_enable_reference_line_provider_thread) {
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+
     if (!reference_lines_.empty()) {
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
@@ -297,9 +295,6 @@ bool ReferenceLineProvider::CreateRouteSegments(
     const common::VehicleState &vehicle_state,
     const double look_backward_distance, const double look_forward_distance,
     std::list<hdmap::RouteSegments> *segments) {
-  common::math::Vec2d point;
-  point.set_x(vehicle_state.x());
-  point.set_y(vehicle_state.y());
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
     if (!pnc_map_->GetRouteSegments(look_backward_distance,
@@ -315,11 +310,14 @@ bool ReferenceLineProvider::CreateRouteSegments(
   return !segments->empty();
 }
 
-double LookForwardDistance(const VehicleState &state) {
-  return (state.linear_velocity() * FLAGS_look_forward_time_sec >
-          FLAGS_look_forward_min_distance)
-             ? FLAGS_look_forward_distance
-             : FLAGS_look_forward_min_distance;
+double ReferenceLineProvider::LookForwardDistance(const VehicleState &state) {
+  auto forward_distance = state.linear_velocity() * FLAGS_look_forward_time_sec;
+
+  if (forward_distance > FLAGS_look_forward_short_distance) {
+    return FLAGS_look_forward_long_distance;
+  }
+
+  return FLAGS_look_forward_short_distance;
 }
 
 bool ReferenceLineProvider::CreateReferenceLine(
@@ -330,9 +328,16 @@ bool ReferenceLineProvider::CreateReferenceLine(
 
   common::VehicleState vehicle_state;
   {
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
     vehicle_state = vehicle_state_;
   }
+  {
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    if (!pnc_map_->UpdateVehicleState(vehicle_state)) {
+      AERROR << "Failed to update vehicle state in pnc map";
+    }
+  }
+
   double look_forward_distance = LookForwardDistance(vehicle_state);
   double look_backward_distance = FLAGS_look_backward_distance;
   if (!CreateRouteSegments(vehicle_state, look_backward_distance,

@@ -20,6 +20,7 @@ export default class Planning {
       stGraph: {},
       stSpeedGraph: {},
       speedGraph: {},
+      accelerationGraph: {},
       kappaGraph: {},
       dkappaGraph: {},
     };
@@ -165,6 +166,14 @@ export default class Planning {
     }
   }
 
+  updateAccelerationGraph(trajectory) {
+    const graph = this.data.accelerationGraph;
+    if (trajectory) {
+      graph.acceleration =
+          this.extractDataPoints(trajectory, 'timestampSec', 'speedAcceleration');
+    }
+  }
+
   updateKappaGraph(paths) {
     for (const path of paths) {
       this.data.kappaGraph[path.name] =
@@ -219,8 +228,12 @@ export default class Planning {
         this.updateSTSpeedGraph(planningData.stGraph);
       }
 
-      if (planningData.speedPlan) {
+      if (planningData.speedPlan && world.planningTrajectory) {
         this.updateSpeed(planningData.speedPlan, world.planningTrajectory);
+      }
+
+      if (world.planningTrajectory) {
+        this.updateAccelerationGraph(world.planningTrajectory);
       }
 
       if (planningData.path) {

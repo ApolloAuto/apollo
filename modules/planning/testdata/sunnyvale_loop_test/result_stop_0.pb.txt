@@ -1763,13 +1763,13 @@ decision {
       perception_id: -855654299
       object_decision {
         stop {
-          distance_s: -0.5
+          distance_s: -3
           stop_point {
-            x: 587051.38954856223
-            y: 4141558.6657772213
+            x: 587049.99482299108
+            y: 4141556.5921773664
             z: 0
           }
-          stop_heading: 0.93092955725634452
+          stop_heading: 1.0267808967263341
         }
       }
     }
@@ -1778,13 +1778,13 @@ decision {
       perception_id: -1651052487
       object_decision {
         stop {
-          distance_s: -0.5
+          distance_s: -3
           stop_point {
-            x: 587051.38954856223
-            y: 4141558.6657772213
+            x: 587049.99482299108
+            y: 4141556.5921773664
             z: 0
           }
-          stop_heading: 0.93092955725634452
+          stop_heading: 1.0267808967263341
         }
       }
     }
@@ -1793,13 +1793,13 @@ decision {
       perception_id: 502372993
       object_decision {
         stop {
-          distance_s: -0.5
+          distance_s: -3
           stop_point {
-            x: 587051.38954856223
-            y: 4141558.6657772213
+            x: 587049.99482299108
+            y: 4141556.5921773664
             z: 0
           }
-          stop_heading: 0.93092955725634452
+          stop_heading: 1.0267808967263341
         }
       }
     }
@@ -1812,3 +1812,4 @@ routing_header {
   timestamp_sec: 1504201419.0536358
   module_name: "routing"
 }
+right_of_way_status: UNPROTECTED

@@ -41,7 +41,6 @@ message ADCPathPoint {
   optional double heading = 5;  // relative to absolute coordinate system
 }
 
-
 message ADCSignals {
   enum SignalType {
     LEFT_TURN = 1;
@@ -71,7 +70,7 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
-// next id: 16
+// next id: 18
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -105,4 +104,9 @@ message ADCTrajectory {
   // replaced by trajectory_point
   repeated ADCTrajectoryPoint adc_trajectory_point = 4 [deprecated=true];
   optional apollo.common.VehicleSignal signal = 11 [deprecated=true];
+  enum RightOfWayStatus {
+        UNPROTECTED = 0;
+        PROTECTED = 1;
+  }
+  optional RightOfWayStatus right_of_way_status = 17;
 }

@@ -45,6 +45,8 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::math::Vec2d;
+using apollo::common::math::Box2d;
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
@@ -126,6 +128,26 @@ bool Frame::InitReferenceLineInfo() {
     AERROR << "Failed to create reference line";
     return false;
   }
+  DCHECK_EQ(reference_lines.size(), segments.size());
+
+  auto forword_limit =
+      ReferenceLineProvider::LookForwardDistance(vehicle_state_);
+
+  for (auto &ref_line : reference_lines) {
+    if (!ref_line.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
+                         FLAGS_look_backward_distance, forword_limit)) {
+      AERROR << "Fail to shrink reference line.";
+      return false;
+    }
+  }
+  for (auto &seg : segments) {
+    if (!seg.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
+                    FLAGS_look_backward_distance, forword_limit)) {
+      AERROR << "Fail to shrink routing segments.";
+      return false;
+    }
+  }
+
   reference_line_info_.clear();
   auto ref_line_iter = reference_lines.begin();
   auto segments_iter = segments.begin();
@@ -142,7 +164,8 @@ bool Frame::InitReferenceLineInfo() {
       return false;
     }
   }
-  if (!change_lane_decider_.Apply(&reference_line_info_)) {
+  if (FLAGS_enable_change_lane_decider &&
+      !change_lane_decider_.Apply(&reference_line_info_)) {
     AERROR << "Failed to apply change lane decider";
     return false;
   }
@@ -156,8 +179,8 @@ bool Frame::InitReferenceLineInfo() {
   return true;
 }
 
-const Obstacle *Frame::AddStaticVirtualObstacle(
-    const std::string &id, const common::math::Box2d &box) {
+const Obstacle *Frame::AddStaticVirtualObstacle(const std::string &id,
+                                                const Box2d &box) {
   const auto *object = obstacles_.Find(id);
   if (object) {
     AWARN << "obstacle " << id << " already exist.";
@@ -204,10 +227,10 @@ int Frame::CreateDestinationObstacle() {
   double right_width = 0.0;
   lane->GetWidth(dest_lane_s, &left_width, &right_width);
   // check if destination point is in planning range
-  common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
-                                      lane->Heading(dest_lane_s),
-                                      FLAGS_virtual_stop_wall_length,
-                                      left_width + right_width};
+  Box2d destination_box{{dest_point.x(), dest_point.y()},
+                        lane->Heading(dest_lane_s),
+                        FLAGS_virtual_stop_wall_length,
+                        left_width + right_width};
   // add destination's projection to each reference line info
   auto *ptr =
       AddStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
@@ -263,14 +286,13 @@ const Obstacle *Frame::FindCollisionObstacle() const {
   }
   const auto &param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  common::math::Vec2d position(vehicle_state_.x(), vehicle_state_.y());
-  common::math::Vec2d vec_to_center(
+  Vec2d position(vehicle_state_.x(), vehicle_state_.y());
+  Vec2d vec_to_center(
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
-  common::math::Vec2d center(position +
-                             vec_to_center.rotate(vehicle_state_.heading()));
-  common::math::Box2d adc_box(center, vehicle_state_.heading(), param.length(),
-                              param.width());
+  Vec2d center(position + vec_to_center.rotate(vehicle_state_.heading()));
+  Box2d adc_box(center, vehicle_state_.heading(), param.length(),
+                param.width());
   const double adc_half_diagnal = adc_box.diagonal() / 2.0;
   for (const auto &obstacle : obstacles_.Items()) {
     if (obstacle->IsVirtual()) {

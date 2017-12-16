@@ -78,6 +78,8 @@ class ReferenceLineProvider {
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
 
+  static double LookForwardDistance(const common::VehicleState& state);
+
  private:
   /**
    * @brief Use PncMap to create reference line and the corresponding segments
@@ -143,6 +145,8 @@ class ReferenceLineProvider {
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
+
+  std::mutex vehicle_state_mutex_;
   common::VehicleState vehicle_state_;
 
   bool has_routing_ = false;

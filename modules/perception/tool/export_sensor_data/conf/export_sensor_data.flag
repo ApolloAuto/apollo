@@ -1,29 +1,83 @@
 
-####################################################################
-# Flags from lib/config_manager/config_manager.cc
-# The ModelConfig config paths file.
-# type: string
-# default: ./conf/config_manager.config
---config_manager_path=./conf/config_manager.config
-
-# Project work root directory.
-# type: string
-# default: ""
 --work_root=modules/perception
+--config_manager_path=conf/config_manager.config
 
 ####################################################################
-# Flags from obstacle/base/object.cc
-# Is serialize and output object cloud.
+# Flags from obstacle/lidar/test/offline_lidar_perception_test.cpp
+# pcd path
+# type: string
+# default: /apollo/data/pcd/
+--pcd_path=/apollo/data/pcd/
+
+# pose path
+# type: string
+# default: /apollo/data/pose/
+--pose_path=/apollo/data/pose/
+
+# output path
+# type: string
+# default: /apollo/data/output/
+--save_obstacles=false
+--output_path=/apollo/data/output/
+
+# enable visualization
 # type: bool
-# default: false
---is_serialize_point_cloud=false
+# default: true
+--enable_visualization=true
+
+####################################################################
+# Flags from obstacle/onboard/hdmap_input.cc
+
+# roi distance of car center
+# type: double
+# default: 60.0
+--map_radius=60.0
+
+# step for sample road boundary points
+# type: int32
+# default: 1
+--map_sample_step=1
 
 --flagfile=modules/common/data/global_flagfile.txt
+
+####################################################################
+# Flags from obstacle/onboard/lidar_process.cc
+# enable hdmap input for roi filter
+# type: bool
+# default: false
+--enable_hdmap_input=true
+
+# roi filter before GroundDetector.
+# type: string
+# candidate: DummyROIFilter, HdmapROIFilter
+--onboard_roi_filter=HdmapROIFilter
+
+# the segmentation algorithm for onboard
+# type: string
+# candidate: DummySegmentation, CNNSegmentation
+--onboard_segmentor=CNNSegmentation
+
+# the object build algorithm for onboard
+# type: string
+# candidate: DummyObjectBuilder, MinBoxObjectBuilder
+--onboard_object_builder=MinBoxObjectBuilder
+
+# the tracking algorithm for onboard
+# type: string
+# candidate: DummyTracker, HmObjectTracker
+--onboard_tracker=HmObjectTracker
+
+--onboard_radar_detector=ModestRadarDetector
+
+# the perception module's output topic name.
+# type: string
+# default: perception_obstacle
+--obstacle_module_name=perception_obstacle
 
 # Query Ros TF timeout in ms. ros::Duration time.
 # type: int
 # default: 10
---tf2_buff_in_ms=20
+--tf2_buff_in_ms=10
 
 # ros TF2 quary frame id. tf2_buffer.lookupTransform.
 # type: string
@@ -35,17 +89,4 @@
 # default: velodyne64
 --lidar_tf2_child_frame_id=velodyne64
 
-# gps buffer size
-# type: int
-# default: 40
---gps_buffer_size=40
-
-# radar tf2 frame_id
-# type: string
-# default: radar_front
---radar_tf2_frame_id=world
-
-# radar tf2 child frame id
-# type: string
-# default: world
---radar_tf2_child_frame_id=radar_front
+--v=4

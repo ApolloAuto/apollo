@@ -29,6 +29,7 @@ cc_binary(
     srcs = ["export_sensor_data_main.cc"],
     data = [
         "//modules/perception/conf:perception_adapter_manager_config",
+        "//modules/perception/tool/export_sensor_data/conf:perception_tool_export_sensor_data_config",
     ],
     deps = [
         ":export_sensor_data_lib",

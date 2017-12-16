@@ -23,6 +23,8 @@ from modules.map.proto import map_lane_pb2
 import math
 from shapely.geometry import LineString, Point
 
+LANE_WIDTH = 3.3
+
 
 def convert(p, p2, distance):
     delta_y = p2.y - p.y
@@ -134,7 +136,7 @@ for i in range(length - 1):
 
             p = path.interpolate(i - 1)
             p2 = path.interpolate(i - 1 + 0.5)
-            distance = 1.65
+            distance = LANE_WIDTH / 2.0
             lp, rp = convert(p, p2, distance)
 
             left_bound_point.y = lp[1]
@@ -146,11 +148,11 @@ for i in range(length - 1):
 
             left_sample = lane.left_sample.add()
             left_sample.s = 0
-            left_sample.width = 1.65
+            left_sample.width = LANE_WIDTH / 2.0
 
             right_sample = lane.right_sample.add()
             right_sample.s = 0
-            right_sample.width = 1.65
+            right_sample.width = LANE_WIDTH / 2.0
 
             #####
             left_bound_point = left_boundary_n1.line_segment.point.add()
@@ -159,9 +161,9 @@ for i in range(length - 1):
 
             p = path.interpolate(i - 1)
             p2 = path.interpolate(i - 1 + 0.5)
-            distance = 3.3
+            distance = LANE_WIDTH
             p, p2 = shift(p, p2, distance)
-            distance = 1.65
+            distance = LANE_WIDTH / 2.0
             lp, rp = convert(p, p2, distance)
 
             left_bound_point.y = lp[1]
@@ -173,11 +175,11 @@ for i in range(length - 1):
 
             left_sample = lane_n1.left_sample.add()
             left_sample.s = 0
-            left_sample.width = 1.65
+            left_sample.width = LANE_WIDTH / 2.0
 
             right_sample = lane_n1.right_sample.add()
             right_sample.s = 0
-            right_sample.width = 1.65
+            right_sample.width = LANE_WIDTH / 2.0
 
             #####
             left_bound_point = left_boundary_n2.line_segment.point.add()
@@ -186,9 +188,9 @@ for i in range(length - 1):
 
             p = path.interpolate(i - 1)
             p2 = path.interpolate(i - 1 + 0.5)
-            distance = 6.6
+            distance = LANE_WIDTH * 2.0
             p, p2 = shift(p, p2, distance)
-            distance = 1.65
+            distance = LANE_WIDTH / 2.0
             lp, rp = convert(p, p2, distance)
 
             left_bound_point.y = lp[1]
@@ -200,11 +202,11 @@ for i in range(length - 1):
 
             left_sample = lane_n2.left_sample.add()
             left_sample.s = 0
-            left_sample.width = 1.65
+            left_sample.width = LANE_WIDTH / 2.0
 
             right_sample = lane_n2.right_sample.add()
             right_sample.s = 0
-            right_sample.width = 1.65
+            right_sample.width = LANE_WIDTH / 2.0
 
     left_bound_point = left_boundary.line_segment.point.add()
     right_bound_point = right_boundary.line_segment.point.add()
@@ -212,7 +214,7 @@ for i in range(length - 1):
 
     p = path.interpolate(i)
     p2 = path.interpolate(i + 0.5)
-    distance = 1.65
+    distance = LANE_WIDTH / 2.0
     lp, rp = convert(p, p2, distance)
 
     central_point.x = p.x
@@ -224,11 +226,11 @@ for i in range(length - 1):
 
     left_sample = lane.left_sample.add()
     left_sample.s = i % 100 + 1
-    left_sample.width = 1.65
+    left_sample.width = LANE_WIDTH / 2.0
 
     right_sample = lane.right_sample.add()
     right_sample.s = i % 100 + 1
-    right_sample.width = 1.65
+    right_sample.width = LANE_WIDTH / 2.0
 
     ################
     left_bound_point = left_boundary_n1.line_segment.point.add()
@@ -237,9 +239,9 @@ for i in range(length - 1):
 
     p = path.interpolate(i)
     p2 = path.interpolate(i + 0.5)
-    distance = 3.3
+    distance = LANE_WIDTH
     p, p2 = shift(p, p2, distance)
-    distance = 1.65
+    distance = LANE_WIDTH / 2.0
     lp, rp = convert(p, p2, distance)
 
     central_point.x = p.x
@@ -251,11 +253,11 @@ for i in range(length - 1):
 
     left_sample = lane_n1.left_sample.add()
     left_sample.s = i % 100 + 1
-    left_sample.width = 1.65
+    left_sample.width = LANE_WIDTH / 2.0
 
     right_sample = lane_n1.right_sample.add()
     right_sample.s = i % 100 + 1
-    right_sample.width = 1.65
+    right_sample.width = LANE_WIDTH / 2.0
 
     ################
     left_bound_point = left_boundary_n2.line_segment.point.add()
@@ -266,7 +268,7 @@ for i in range(length - 1):
     p2 = path.interpolate(i + 0.5)
     distance = 6.6
     p, p2 = shift(p, p2, distance)
-    distance = 1.65
+    distance = LANE_WIDTH / 2.0
     lp, rp = convert(p, p2, distance)
 
     central_point.x = p.x
@@ -278,11 +280,11 @@ for i in range(length - 1):
 
     left_sample = lane_n2.left_sample.add()
     left_sample.s = i % 100 + 1
-    left_sample.width = 1.65
+    left_sample.width = LANE_WIDTH / 2.0
 
     right_sample = lane_n2.right_sample.add()
     right_sample.s = i % 100 + 1
-    right_sample.width = 1.65
+    right_sample.width = LANE_WIDTH / 2.0
 
 fmap.write(str(map))
 fmap.close()

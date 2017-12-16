@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,7 +16,32 @@
 # limitations under the License.
 ###############################################################################
 
-echo "****************************************"
-echo "* We have integrated HMI into Dreamview."
-echo "* Please use scripts/bootstrap.sh to start the system."
-echo "****************************************"
+import sys
+import pyproj
+import matplotlib.pyplot as plt
+
+projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
+fig = plt.figure()
+ax = plt.subplot2grid((1, 1), (0, 0))
+styles = ['r-', 'b-']
+
+i = 0
+for fn in sys.argv[1:]:
+    X = []
+    Y = []
+    f = open(fn, 'r')
+    for line in f:
+        line = line.replace('\n', '')
+        vals = line.split(",")
+        if len(vals) < 3:
+            continue
+        print float(vals[-2]), float(vals[-1])
+        x, y = projector(float(vals[-1]), float(vals[-2]))
+        print x, y
+        X.append(x)
+        Y.append(y)
+    f.close()
+    ax.plot(X, Y, styles[i % len(styles)], lw=3, alpha=0.8)
+    i += 1
+ax.axis('equal')
+plt.show()

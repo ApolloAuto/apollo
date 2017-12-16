@@ -1,8 +1,8 @@
 header {
   module_name: "planning"
 }
-total_path_length: 61.2378813275627
-total_path_time: 6.7999999999999927
+total_path_length: 75.629111405898826
+total_path_time: 7.9999999999999885
 is_replan: true
 gear: GEAR_DRIVE
 trajectory_point {
@@ -1532,6 +1532,174 @@ trajectory_point {
   a: 0.61963379256395867
   relative_time: 6.7999999999999927
 }
+trajectory_point {
+  path_point {
+    x: 587464.93259988655
+    y: 4140768.268378864
+    theta: 2.2294338073573194
+    kappa: 5.6918861236441226e-05
+    s: 62.3970573608921
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 11.623407108943827
+  a: 0.63983166974451977
+  relative_time: 6.8999999999999924
+}
+trajectory_point {
+  path_point {
+    x: 587464.21920071053
+    y: 4140769.190132088
+    theta: 2.2294953489873004
+    kappa: 3.1046069309589115e-05
+    s: 63.56263335225961
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 11.688482172198389
+  a: 0.66199915570978951
+  relative_time: 6.999999999999992
+}
+trajectory_point {
+  path_point {
+    x: 587463.50169540755
+    y: 4140770.1170805446
+    theta: 2.2295169464035287
+    kappa: 6.8056401719570141e-06
+    s: 64.73483098944719
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 11.755873110604842
+  a: 0.686151757246855
+  relative_time: 7.0999999999999917
+}
+trajectory_point {
+  path_point {
+    x: 587462.77999087516
+    y: 4140771.0494576087
+    theta: 2.2295096844362843
+    kappa: -1.59745815967597e-05
+    s: 65.913891811392531
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 11.825779211059722
+  a: 0.71230498114280272
+  relative_time: 7.1999999999999913
+}
+trajectory_point {
+  path_point {
+    x: 587462.05392912787
+    y: 4140771.9874717356
+    theta: 2.2294899500662324
+    kappa: -3.8208713761219526e-05
+    s: 67.100077363256943
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 11.898401311138269
+  a: 0.74047433418472008
+  relative_time: 7.2999999999999909
+}
+trajectory_point {
+  path_point {
+    x: 587461.323400473
+    y: 4140772.9313942529
+    theta: 2.2294283874543863
+    kappa: -5.8343139091718747e-05
+    s: 68.293669351493122
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 11.973941799094433
+  a: 0.77067532315969356
+  relative_time: 7.3999999999999906
+}
+trajectory_point {
+  path_point {
+    x: 587460.58820422529
+    y: 4140773.8814517437
+    theta: 2.2293518830505823
+    kappa: -7.77492861875947e-05
+    s: 69.494969798913175
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 12.052604613860877
+  a: 0.80292345485481054
+  relative_time: 7.49999999999999
+}
+trajectory_point {
+  path_point {
+    x: 587459.84817762813
+    y: 4140774.8379260362
+    theta: 2.2292504107640414
+    kappa: -9.584189804504598e-05
+    s: 70.704301199756372
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 12.134595245048969
+  a: 0.83723423605715741
+  relative_time: 7.59999999999999
+}
+trajectory_point {
+  path_point {
+    x: 587459.10316627764
+    y: 4140775.8011314655
+    theta: 2.2291234406381291
+    kappa: -0.00011246051098932926
+    s: 71.922006674757057
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 12.220120732948786
+  a: 0.87362317355382135
+  relative_time: 7.6999999999999895
+}
+trajectory_point {
+  path_point {
+    x: 587458.35288429214
+    y: 4140776.771306952
+    theta: 2.2289833214466546
+    kappa: -0.00012839492562724495
+    s: 73.1484501262125
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 12.309389668529114
+  a: 0.9121057741318892
+  relative_time: 7.7999999999999892
+}
+trajectory_point {
+  path_point {
+    x: 587457.5972485973
+    y: 4140777.7488746969
+    theta: 2.2288144359142397
+    kappa: -0.00014250524534067756
+    s: 74.384016393050828
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 12.402612193437447
+  a: 0.95269754457844769
+  relative_time: 7.8999999999999888
+}
+trajectory_point {
+  path_point {
+    x: 587456.835923811
+    y: 4140778.7340884437
+    theta: 2.22863199851696
+    kappa: -0.0001557352439086294
+    s: 75.629111405898826
+    dkappa: 0
+    ddkappa: 0
+  }
+  v: 12.499999999999989
+  a: 0.9954139916805842
+  relative_time: 7.9999999999999885
+}
 decision {
   main_decision {
     cruise {
@@ -1549,3 +1717,4 @@ routing_header {
   module_name: "routing"
   sequence_num: 1
 }
+right_of_way_status: UNPROTECTED

@@ -157,25 +157,31 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
   const auto& stop_decision = stop_obstacle->LongitudinalDecision();
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  if (stop_obstacle->perception_sl_boundary().start_s() >
-      path_data_.frenet_frame_path().points().back().s()) {
+  if (stop_obstacle->perception_sl_boundary().start_s() > planning_distance_) {
     return true;
   }
 
-  PathPoint stop_point;
-  if (!path_data_.GetPathPointWithRefS(
-          stop_obstacle->perception_sl_boundary().start_s() +
-              stop_decision.stop().distance_s() -
-              vehicle_param_.front_edge_to_center(),
-          &stop_point)) {
-    AERROR << "Fail to get path point from reference s. The sl boundary of "
-              "stop obstacle "
-           << stop_obstacle->Id()
-           << " is: " << stop_obstacle->perception_sl_boundary().DebugString();
-    return false;
-  }
+  double st_stop_s = 0.0;
+  const double stop_ref_s = stop_obstacle->perception_sl_boundary().start_s() +
+                            stop_decision.stop().distance_s() -
+                            vehicle_param_.front_edge_to_center();
 
-  const double st_stop_s = stop_point.s();
+  if (stop_ref_s > path_data_.frenet_frame_path().points().back().s()) {
+    st_stop_s =
+        path_data_.discretized_path().EndPoint().s() +
+        (stop_ref_s - path_data_.frenet_frame_path().points().back().s());
+  } else {
+    PathPoint stop_point;
+    if (!path_data_.GetPathPointWithRefS(stop_ref_s, &stop_point)) {
+      AERROR << "Fail to get path point from reference s. The sl boundary of "
+                "stop obstacle "
+             << stop_obstacle->Id() << " is: "
+             << stop_obstacle->perception_sl_boundary().DebugString();
+      return false;
+    }
+
+    st_stop_s = stop_point.s();
+  }
 
   constexpr double kStopEpsilon = 1e-2;
   const double s_min = std::max(0.0, st_stop_s - kStopEpsilon);
