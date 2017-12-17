@@ -14,13 +14,15 @@ export default class PlaybackControls extends React.Component {
         this.state = {
             rate: 1.0,
             isPlaying: false,
+            nextScreenMode: 'fullscreen',
         };
 
         this.nextAction = 'play';
 
         this.handleRateChange = this.handleRateChange.bind(this);
-        this.handleIconClick = this.handleIconClick.bind(this);
         this.handleFrameSeek = this.handleFrameSeek.bind(this);
+        this.handleActionChange = this.handleActionChange.bind(this);
+        this.handleScreenModeChange = this.handleScreenModeChange.bind(this);
     }
 
     handleRateChange(event) {
@@ -35,7 +37,7 @@ export default class PlaybackControls extends React.Component {
         }
     }
 
-    handleIconClick() {
+    handleActionChange() {
         const { playback } = this.props.store;
 
         const isPlaying = !this.state.isPlaying;
@@ -52,6 +54,21 @@ export default class PlaybackControls extends React.Component {
             case 'replay':
                 playback.resetFrame();
                 WS.startPlayback(playback.msPerFrame);
+                break;
+        }
+    }
+
+    handleScreenModeChange() {
+        const { options } = this.props.store;
+
+        switch (this.state.nextScreenMode) {
+            case 'fullscreen':
+                options.showMenu = false;
+                this.setState({nextScreenMode: 'normalscreen'});
+                break;
+            case 'normalscreen':
+                options.showMenu = true;
+                this.setState({nextScreenMode: 'fullscreen'});
                 break;
         }
     }
@@ -89,7 +106,9 @@ export default class PlaybackControls extends React.Component {
 
         return (
             <div className="playback-controls">
-                <ControlIcons onClick={this.handleIconClick} type={this.nextAction} />
+                <ControlIcons extraClasses="left-controls"
+                              onClick={this.handleActionChange}
+                              type={this.nextAction} />
                 <div className="rate-selector">
                     <select onChange={this.handleRateChange} value={this.state.rate}>
                         <option value={0.25}>x 0.25</option>
@@ -104,6 +123,9 @@ export default class PlaybackControls extends React.Component {
                               fps={playback.FPS}
                               isSeeking={playback.isSeeking}
                               handleFrameSeek={this.handleFrameSeek} />
+                <ControlIcons extraClasses="right-controls"
+                              onClick={this.handleScreenModeChange}
+                              type={this.state.nextScreenMode} />
             </div>
         );
     }
