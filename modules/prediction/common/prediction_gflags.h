@@ -64,6 +64,7 @@ DECLARE_int32(max_num_obstacles);
 
 // evaluator
 DECLARE_double(rnn_min_lane_relatice_s);
+DECLARE_double(perception_confidence_threshold);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);

@@ -108,6 +108,12 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       AERROR << "A perception obstacle has invalid id [" << id << "].";
       continue;
     }
+    if (perception_obstacle.confidence() <
+        FLAGS_perception_confidence_threshold) {
+      AWARN << "Skip low confidence obstacle:"
+            << perception_obstacle.ShortDebugString();
+      continue;
+    }
 
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
