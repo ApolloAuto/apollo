@@ -158,11 +158,23 @@ bool PathObstacle::BuildTrajectoryStBoundary(
       AERROR << "failed to calculate boundary";
       return false;
     }
-    const double object_s_diff =
-        object_boundary.end_s() - object_boundary.start_s();
+    // skip if object is entirely on one side of reference line.
+    constexpr double kSkipLDistanceFactor = 0.4;
+    const double skip_l_distance =
+        (object_boundary.end_s() - object_boundary.start_s()) *
+        kSkipLDistanceFactor;
+    if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
+            skip_l_distance ||
+        std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
+            -skip_l_distance) {
+      continue;
+    }
+
     if (object_boundary.end_s() < 0) {  // skip if behind reference line
       continue;
     }
+    const double object_s_diff =
+        object_boundary.end_s() - object_boundary.start_s();
     if (object_s_diff < kStBoundaryDeltaS) {
       continue;
     }
