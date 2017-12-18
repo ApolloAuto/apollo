@@ -21,6 +21,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
@@ -32,6 +33,7 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::planning::ADCTrajectory;
 
 PredictorManager::PredictorManager() { RegisterPredictors(); }
 
@@ -90,10 +92,16 @@ Predictor* PredictorManager::GetPredictor(
 
 void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
-  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
+  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
-  CHECK_NOTNULL(container);
+  ADCTrajectoryContainer* adc_trajectory_container =
+      dynamic_cast<ADCTrajectoryContainer*>(
+          ContainerManager::instance()->GetContainer(
+              AdapterConfig::PLANNING_TRAJECTORY));
+
+  CHECK_NOTNULL(obstacles_container);
+  CHECK_NOTNULL(adc_trajectory_container);
 
   Predictor* predictor = nullptr;
   for (const auto& perception_obstacle :
@@ -117,7 +125,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
 
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
-    Obstacle* obstacle = container->GetObstacle(id);
+    Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle != nullptr) {
       switch (perception_obstacle.type()) {
         case PerceptionObstacle::VEHICLE: {
@@ -152,6 +160,10 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
 
       if (predictor != nullptr) {
         predictor->Predict(obstacle);
+        if (FLAGS_enable_trim_prediction_trajectory &&
+            adc_trajectory_container->IsProtected()) {
+          predictor->TrimTrajectories(adc_trajectory_container);
+        }
         for (const auto& trajectory : predictor->trajectories()) {
           prediction_obstacle.add_trajectory()->CopyFrom(trajectory);
         }

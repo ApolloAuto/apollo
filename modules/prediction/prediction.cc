@@ -81,6 +81,8 @@ Status Prediction::Init() {
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
+  // Set planning callback function
+  AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
   return Status::OK();
 }
@@ -112,6 +114,15 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
 
   ADEBUG << "Received a localization message ["
          << localization.ShortDebugString() << "].";
+}
+
+void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
+  ADCTrajectoryContainer* adc_trajectory_container =
+      dynamic_cast<ADCTrajectoryContainer*>(
+          ContainerManager::instance()->GetContainer(
+              AdapterConfig::PLANNING_TRAJECTORY));
+  CHECK_NOTNULL(adc_trajectory_container);
+  adc_trajectory_container->Insert(adc_trajectory);
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {

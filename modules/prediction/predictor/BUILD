@@ -12,6 +12,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/predictor/free_move:free_move_predictor",
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
@@ -43,9 +44,11 @@ cc_library(
     srcs = ["predictor.cc"],
     hdrs = ["predictor.h"],
     deps = [
+        "//modules/common/math:line_segment2d",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container"
     ],
 )
 
