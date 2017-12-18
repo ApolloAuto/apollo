@@ -18,8 +18,14 @@
 
 #include <vector>
 
+#include "modules/prediction/common/prediction_gflags.h"
+
 namespace apollo {
 namespace prediction {
+
+using apollo::planning::ADCTrajectory;
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::Vec2d;
 
 const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;
@@ -45,6 +51,56 @@ void Predictor::SetEqualProbability(double probability, int start_index) {
 }
 
 void Predictor::Clear() { trajectories_.clear(); }
+
+void Predictor::TrimTrajectories(
+    const ADCTrajectoryContainer* adc_trajectory_container) {
+  std::vector<LineSegment2d> adc_segments =
+      adc_trajectory_container->ADCTrajectorySegments(FLAGS_adc_time_step);
+  for (size_t i = 0; i < trajectories_.size(); ++i) {
+    TrimTrajectory(adc_segments, &trajectories_[i]);
+  }
+}
+
+bool Predictor::TrimTrajectory(
+    const std::vector<LineSegment2d>& adc_segments,
+    Trajectory* trajectory) {
+  int num_point = trajectory->trajectory_point_size();
+  // Get the index at intersect
+  int index = 0;
+  while (index < num_point) {
+    Vec2d curr_point(
+        trajectory->trajectory_point(index).path_point().x(),
+        trajectory->trajectory_point(index).path_point().y());
+    bool has_intersect = false;
+    for (const LineSegment2d& adc_segment : adc_segments) {
+      double distance = adc_segment.DistanceTo(curr_point);
+      if (distance < FLAGS_distance_to_adc_trajectory_thred) {
+        has_intersect = true;
+        break;
+      }
+    }
+    if (has_intersect) {
+      break;
+    }
+    ++index;
+  }
+
+  // if no intersect
+  if (index == num_point) {
+    return false;
+  }
+
+  double index_time = trajectory->trajectory_point(index).relative_time();
+  // if early intersect occurs
+  if (index_time < FLAGS_time_to_adc_trajectory_thred) {
+    return false;
+  }
+
+  for (int i = index; i < num_point; ++i) {
+    trajectory->mutable_trajectory_point()->RemoveLast();
+  }
+  return true;
+}
 
 }  // namespace prediction
 }  // namespace apollo

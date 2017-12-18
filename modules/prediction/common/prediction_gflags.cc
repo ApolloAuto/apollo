@@ -98,6 +98,15 @@ DEFINE_double(lane_sequence_threshold, 0.5,
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
 DEFINE_bool(enable_lane_sequence_acc, false,
             "If use acceleration in lane sequence.");
+DEFINE_bool(enable_trim_prediction_trajectory, false,
+            "If trim the prediction trajectory to avoid crossing"
+            "protected adc planning trajectory.");
+DEFINE_double(adc_time_step, 0.1, "Time step to search ADC trajectory point");
+DEFINE_double(distance_to_adc_trajectory_thred, 5.0,
+               "Distance threshold to determine if intersect with"
+               "ADC planning trajectory");
+DEFINE_double(time_to_adc_trajectory_thred, 2.0,
+              "Time threshold to trim prediction trajectory");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,
