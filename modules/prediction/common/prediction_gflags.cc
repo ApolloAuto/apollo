@@ -100,7 +100,7 @@ DEFINE_bool(enable_lane_sequence_acc, false,
             "If use acceleration in lane sequence.");
 
 // move sequence prediction
-DEFINE_double(time_upper_bound_to_lane_center, 6.0,
+DEFINE_double(time_upper_bound_to_lane_center, 5.0,
               "Upper bound of time to get to the lane center");
 DEFINE_double(time_lower_bound_to_lane_center, 1.0,
               "Lower bound of time to get to the lane center");
