@@ -16,11 +16,11 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_  // NOLINT
-#include <queue>
+
 #include <map>
 #include <string>
 #include <vector>
-#include "modules/common/log.h"
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor.h"
@@ -65,4 +65,4 @@ class PbfSensorManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_   // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_ // NOLINT

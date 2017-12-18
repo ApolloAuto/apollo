@@ -16,9 +16,8 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
-#include <map>
-#include <string>
 #include "boost/format.hpp"
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
@@ -128,6 +127,10 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
                                          const std::string &sensor_id,
                                          double min_match_dist,
                                          double timestamp) {
+  if (motion_fusion_ == nullptr) {
+    AERROR << "Skip update becuase motion_fusion_ is nullptr.";
+    return;
+  }
   UpdateMeasurementsLifeWithoutMeasurement(
       &lidar_objects_, sensor_id, timestamp, s_max_lidar_invisible_period_,
       &invisible_in_lidar_);
@@ -168,6 +171,10 @@ PbfSensorObjectPtr PbfTrack::GetRadarObject(const std::string &sensor_id) {
 }
 
 void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
+  if (motion_fusion_ == nullptr) {
+    AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
+    return;
+  }
   const SensorType &sensor_type = obj->sensor_type;
   double time_diff = obj->timestamp - fused_object_->timestamp;
 
@@ -265,7 +272,7 @@ int PbfTrack::GetNextTrackId() {
 
 bool PbfTrack::AbleToPublish() {
   ADEBUG << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " "
-        << lidar_objects_.size();
+         << lidar_objects_.size();
   double invisible_period_threshold = 0.001;
   if (invisible_period_ > invisible_period_threshold && invisible_in_lidar_ &&
       invisible_in_radar_) {
