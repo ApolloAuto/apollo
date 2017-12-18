@@ -92,7 +92,7 @@ module.exports = {
                 // first, and then file-loader.
                 //
                 // Now you can import images just like js.
-                test: /\.(png|jpe?g|svg|mp4|mov)$/i,
+                test: /\.(png|jpe?g|svg|mp4|mov|gif)$/i,
                 use: [
                     {
                         loader: "file-loader",
