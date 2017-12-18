@@ -58,6 +58,11 @@ if __name__ == "__main__":
         action="store",
         default="/apollo/localization/pose",
         help="""the drive event topic""")
+    parser.add_argument(
+        "--dir",
+        action="store",
+        default="data",
+        help="""The log export directory.""")
     g_args = parser.parse_args()
 
     drive_event_meta_msg = g_message_manager.get_msg_meta_by_topic(
@@ -91,9 +96,11 @@ if __name__ == "__main__":
             continue
         seq_num += 1
         filename = "%03d_drive_event.pb.txt" % seq_num
+        filename = os.path.join(g_args.dir, filename)
         while os.path.isfile(filename):
             seq_num += 1
-            filename = "%03d_drive_event.pb.txt" % seq_num
+            filename = os.path.join(g_args.dir,
+                                    "%03d_drive_event.pb.txt" % seq_num)
         current_time = rospy.get_rostime()
         seconds = current_time.secs + current_time.nsecs / 1000.0
         event_msg = drive_event_meta_msg.msg_type()()
