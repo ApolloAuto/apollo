@@ -24,7 +24,9 @@
 
 #include <vector>
 
+#include "modules/common/math/line_segment2d.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -70,6 +72,13 @@ class Predictor {
    */
   virtual void Clear();
 
+  /**
+   * @brief Trim prediction trajectories by adc trajectory
+   * @param ADC trajectory container
+   */
+  void TrimTrajectories(
+      const ADCTrajectoryContainer* adc_trajectory_container);
+
  protected:
   /**
    * @brief Generate trajectory from trajectory points
@@ -79,7 +88,22 @@ class Predictor {
   static Trajectory GenerateTrajectory(
       const std::vector<apollo::common::TrajectoryPoint>& points);
 
+  /**
+   * @brief Set equal probability to prediction trajectories
+   * @param probability total probability
+   * @param start_index The start index to set equal probability
+   */
   void SetEqualProbability(double probability, int start_index);
+
+  /**
+   * @brief Trim a single prediction trajectory
+   * @param adc_segments trajectory segments of ADC trajectory
+   * @param trajectory The trimed prediction trajectory
+   * @return If the prediction trajectory is trimed
+   */
+  bool TrimTrajectory(
+      const std::vector<apollo::common::math::LineSegment2d>& adc_segments,
+      Trajectory* trajectory);
 
  protected:
   std::vector<Trajectory> trajectories_;

@@ -20,6 +20,7 @@ cc_library(
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/proto:localization_proto",
+        "//modules/planning/proto:planning_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container:container_manager",
