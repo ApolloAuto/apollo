@@ -205,6 +205,10 @@ void VisualizationEngine::Visualize(
   Draw();
 }
 
+void VisualizationEngine::SetAutoPlay(bool auto_play) {
+    auto_play_ = auto_play;
+}
+
 void VisualizationEngine::Preprocess(const std::string &map_folder) {
   std::string image_path = map_folder_ + "/image";
   std::string image_visual_path = map_folder_ + "/map_visual";

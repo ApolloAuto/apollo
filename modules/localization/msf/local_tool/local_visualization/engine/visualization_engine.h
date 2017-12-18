@@ -152,9 +152,7 @@ class VisualizationEngine {
             const unsigned int loc_info_num = 1);
   void Visualize(const std::vector<LocalizatonInfo> &loc_infos,
                  const std::vector<Eigen::Vector3d> &cloud);
-  // void SetAutoPlay() {
-  //   auto_play_
-  // }
+  void SetAutoPlay(bool auto_play);
 
  private:
   void Preprocess(const std::string &map_folder);
