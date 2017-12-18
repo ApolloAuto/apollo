@@ -60,12 +60,12 @@ function start() {
         /apollo/sensor/delphi_esr \
         /apollo/sensor/gnss/best_pose \
         /apollo/sensor/gnss/corrected_imu \
-        /apollo/sensor/gnss/gnss_status \     
+        /apollo/sensor/gnss/gnss_status \
         /apollo/sensor/gnss/imu \
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/gnss/odometry \
         /apollo/sensor/gnss/rtk_eph \
-        /apollo/sensor/gnss/rtk_obs \        
+        /apollo/sensor/gnss/rtk_obs \
         /apollo/sensor/mobileye \
         /apollo/sensor/velodyne64/compensator/PointCloud2 \
         /apollo/canbus/chassis \
