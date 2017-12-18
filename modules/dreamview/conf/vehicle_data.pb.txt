@@ -11,6 +11,30 @@ data_files {
   dest_path: "<ros>/share/velodyne/launch/start_velodyne.launch"
 }
 data_files {
+  source_path: "velodyne_check.launch"
+  dest_path: "<ros>/share/velodyne/launch/velodyne_check.launch"
+}
+data_files {
+  source_path: "export_pcd_offline.launch"
+  dest_path: "<ros>/share/velodyne/launch/export_pcd_offline.launch"
+}
+data_files {
+  source_path: "replay_velodyne.launch"
+  dest_path: "<ros>/share/velodyne/launch/replay_velodyne.launch"
+}
+data_files {
+  source_path: "start_velodyne_driver.launch"
+  dest_path: "<ros>/share/velodyne_driver/launch/start_velodyne_driver.launch"
+}
+data_files {
+  source_path: "driver_nodelet.launch"
+  dest_path: "<ros>/share/velodyne_driver/launch/driver_nodelet.launch"
+}
+data_files {
+  source_path: "convert_nodelet.launch"
+  dest_path: "<ros>/share/velodyne_pointcloud/launch/convert_nodelet.launch"
+}
+data_files {
   source_path: "velodyne_params"
   dest_path: "<ros>/share/velodyne_pointcloud/params"
 }
