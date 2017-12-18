@@ -87,6 +87,10 @@ DEFINE_double(rnn_min_lane_relatice_s, 5.0,
 DEFINE_double(perception_confidence_threshold, 0.4,
               "Skip the perception obstacle if its confiderence is lower than "
               "this threshold.");
+DEFINE_bool(enable_adjust_velocity_heading, true,
+            "adjust velocity heading to lane heading");
+DEFINE_double(heading_diff_thred, M_PI / 6.0,
+              "Threshold for adjusting on-lane obstacle heading");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
@@ -96,7 +100,7 @@ DEFINE_bool(enable_lane_sequence_acc, false,
             "If use acceleration in lane sequence.");
 
 // move sequence prediction
-DEFINE_double(time_upper_bound_to_lane_center, 6.0,
+DEFINE_double(time_upper_bound_to_lane_center, 5.0,
               "Upper bound of time to get to the lane center");
 DEFINE_double(time_lower_bound_to_lane_center, 1.0,
               "Lower bound of time to get to the lane center");

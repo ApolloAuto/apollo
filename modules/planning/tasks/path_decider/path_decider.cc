@@ -167,13 +167,11 @@ double PathDecider::MinimumRadiusStopDistance(
                std::fabs(path_obstacle.perception_sl_boundary().end_l() -
                          reference_line_info_->AdcSlBoundary().start_l()));
   lateral_diff = std::max(lateral_diff, vehicle_param.width());
-  lateral_diff = std::min(lateral_diff,
-                          vehicle_param.width() +
-                              path_obstacle.perception_sl_boundary().end_l() -
-                              path_obstacle.perception_sl_boundary().start_l());
-  double stop_distance = std::sqrt(min_turn_radius * min_turn_radius -
+  const double kEpison = 1e-5;
+  lateral_diff = std::min(lateral_diff, min_turn_radius - kEpison);
+  double stop_distance = std::sqrt(std::fabs(min_turn_radius * min_turn_radius -
                                    (min_turn_radius - lateral_diff) *
-                                       (min_turn_radius - lateral_diff)) +
+                                       (min_turn_radius - lateral_diff))) +
                          stop_distance_buffer;
   stop_distance -= vehicle_param.front_edge_to_center();
   stop_distance = std::min(stop_distance, FLAGS_max_stop_distance_obstacle);
