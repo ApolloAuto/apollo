@@ -144,15 +144,15 @@ Status LatticePlanner::Plan(
     trajectory_pair_cost = trajectory_evaluator.top_trajectory_pair_cost();
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
     if (!LatticeConstraintChecker::IsValidTrajectoryPair(
-            *lat_trajectory1d_bundle[trajectory_pair.second],
-            *lon_trajectory1d_bundle[trajectory_pair.first])) {
+            *trajectory_pair.second,
+            *trajectory_pair.first)) {
       ++constraint_failure_count;
       continue;
     }
 
     auto combined_trajectory = CombineTrajectory(discretized_reference_line,
-        *lon_trajectory1d_bundle[trajectory_pair.first],
-        *lat_trajectory1d_bundle[trajectory_pair.second],
+        *trajectory_pair.first,
+        *trajectory_pair.second,
         planning_init_point.relative_time());
 
     if (!LatticeConstraintChecker::IsValidTrajectory(combined_trajectory)) {

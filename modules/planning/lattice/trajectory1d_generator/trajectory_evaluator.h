@@ -35,7 +35,7 @@ namespace apollo {
 namespace planning {
 
 class TrajectoryEvaluator {
-  typedef std::pair<std::pair<std::size_t, std::size_t>, double> PairCost;
+  typedef std::pair<std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>, double> PairCost;
 
  public:
   explicit TrajectoryEvaluator(
@@ -49,9 +49,7 @@ class TrajectoryEvaluator {
 
   std::size_t num_of_trajectory_pairs() const;
 
-  std::pair<std::size_t, std::size_t> next_top_trajectory_pair();
-
-  std::pair<std::size_t, std::size_t> top_trajectory_pair_index() const;
+  std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>> next_top_trajectory_pair();
 
   double top_trajectory_pair_cost() const;
 
