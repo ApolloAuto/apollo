@@ -132,7 +132,7 @@ Status Canbus::Start() {
   AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
 
   // last step: publish monitor messages
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("Canbus is started.");
 
   return Status::OK();
@@ -197,7 +197,7 @@ void Canbus::OnControlCommand(const ControlCommand &control_command) {
 
 // Send the error to monitor and return it
 Status Canbus::OnError(const std::string &error_msg) {
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);
 }

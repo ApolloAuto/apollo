@@ -36,7 +36,8 @@
 
 #include "glog/logging.h"
 #include "gtest/gtest_prod.h"
-#include "modules/common/monitor/monitor.h"
+
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
 
@@ -88,7 +89,7 @@ class RTKLocalization : public LocalizationBase {
  private:
   ros::Timer timer_;
   tf2_ros::TransformBroadcaster *tf2_broadcaster_ = nullptr;
-  apollo::common::monitor::Monitor monitor_;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
   const std::vector<double> map_offset_;
   double last_received_timestamp_sec_ = 0.0;
   double last_reported_timestamp_sec_ = 0.0;
