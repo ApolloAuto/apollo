@@ -323,6 +323,8 @@ bool VisualizationManager::Init(const std::string &map_folder,
   }
   std::cout << "Visualization engine init succeed." << std::endl;
 
+  visual_engine_.SetAutoPlay(true);
+
   return true;
 }
 
