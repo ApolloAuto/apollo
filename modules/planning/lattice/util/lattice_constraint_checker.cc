@@ -122,15 +122,18 @@ bool LatticeConstraintChecker::IsValidTrajectory(
     double lon_a = points[i].a();
     if (lon_a < FLAGS_longitudinal_acceleration_lower_bound ||
         lon_a > FLAGS_longitudinal_acceleration_upper_bound) {
+      AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
+      AINFO << "\tlon acc. exceeds boundary; lon_a = " << lon_a;
       return false;
     }
 
     double lat_a = std::abs(
         points[i].v() * points[i].v() * points[i].path_point().kappa());
     if (lat_a > FLAGS_lateral_acceleration_bound) {
+      AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
+      AINFO << "\tlat acc. exceeds boundary; lat_a = " << lat_a;
       return false;
     }
-
 
     if (i > 1) {
       double dt = points[i].relative_time() - points[i - 1].relative_time();

@@ -38,18 +38,16 @@ TrajectoryEvaluator::TrajectoryEvaluator(
 
   for (const auto lon_trajectory : lon_trajectories) {
     if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(
-            *lon_trajectory)) {
+        *lon_trajectory)) {
       continue;
     }
     for (const auto lat_trajectory : lat_trajectories) {
-      if (!LatticeConstraintChecker::IsValidLateralTrajectory(
-              *lat_trajectory, *lon_trajectory)) {
+      if (!LatticeConstraintChecker::IsValidLateralTrajectory(*lat_trajectory,
+          *lon_trajectory)) {
         continue;
       }
-      double cost =
-          evaluate(planning_target, lon_trajectory, lat_trajectory);
-      cost_queue_.push(
-          PairCost({lon_trajectory, lat_trajectory}, cost));
+      double cost = evaluate(planning_target, lon_trajectory, lat_trajectory);
+      cost_queue_.push(PairCost( { lon_trajectory, lat_trajectory }, cost));
     }
   }
 }
@@ -74,6 +72,97 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
   return cost_queue_.top().second;
 }
 
+double TrajectoryEvaluator::evaluate(
+    const PlanningTarget& planning_target,
+    const std::shared_ptr<Trajectory1d>& lon_trajectory,
+    const std::shared_ptr<Trajectory1d>& lat_trajectory) const {
+  // currently consider three costs:
+  // 1. the cost of jerk, currently only consider longitudinal jerk.
+  // 2. the cost of time to achieve the objective
+  // 3. the cost of failure to achieve the planning objective.
+
+  // these numbers are for temporary use; needs to be tuned later.
+  double weight_lon_jerk = 1.0;
+  double weight_lat_offset = 10.0;
+
+  double t = 0.0;
+  double t_max = lon_trajectory->ParamLength();
+  double s_max = lon_trajectory->Evaluate(0, t_max);
+  double v_end = lon_trajectory->Evaluate(1, t_max);
+
+  std::vector<double> s_values;
+  while (t < planned_trajectory_time) {
+    double s = 0.0;
+    if (t < t_max) {
+      s = lon_trajectory->Evaluate(0, t);
+    } else {
+      // extend by constant speed movement
+      s = s_max + v_end * (t - t_max);
+    }
+    s_values.push_back(s);
+    t += trajectory_time_resolution;
+  }
+
+  double lon_jerk_cost = compute_lon_trajectory_comfort_cost(lon_trajectory);
+
+  double lat_offset_cost =
+      compute_lat_trajectory_offset_cost(lat_trajectory, s_values);
+
+  return lon_jerk_cost * weight_lon_jerk + lat_offset_cost * weight_lat_offset;
+}
+
+double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
+    const std::shared_ptr<Trajectory1d>& lat_trajectory,
+    const std::vector<double>& s_values) const {
+  double lat_s_max = lat_trajectory->ParamLength();
+  double lat_offset_end = lat_trajectory->Evaluate(0, lat_s_max);
+  double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
+
+  double weight_same_side_offset = 1.0;
+  double weight_opposite_side_offset = 10.0;
+
+  double cost = 0.0;
+  for (const auto& s : s_values) {
+    double c = 0.0;
+    if (s > lat_s_max) {
+      // extend by same lateral offset
+      c = lat_offset_end;
+    } else {
+      // get lateral offset by s
+      c = lat_trajectory->Evaluate(0, s);
+    }
+    // Question(kechxu) what < 0.0 mean
+    if (c * lat_offset_start < 0.0) {
+      c = c * c * weight_opposite_side_offset;
+    } else {
+      c = c * c * weight_same_side_offset;
+    }
+    cost += c;
+  }
+  return cost;
+}
+
+double TrajectoryEvaluator::compute_lon_trajectory_comfort_cost(
+    const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
+  double cost = 0.0;
+  double t = 0.0;
+  double lon_t_max = lon_trajectory->ParamLength();
+
+  while (t < planned_trajectory_time) {
+    double c = 0.0;
+    if (t < lon_t_max) {
+      c = lon_trajectory->Evaluate(3, t);
+    } else {
+      // when the time beyond the lon_trajectory parameter length,
+      // the jerk is 0.0
+    }
+    cost += c * c;
+    t = t + trajectory_time_resolution;
+  }
+  return cost;
+}
+
+/**
 double TrajectoryEvaluator::evaluate(
     const PlanningTarget& planning_target,
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
@@ -230,6 +319,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   return cost;
 
 }
+**/
 
 }  // namespace planning
 }  // namespace apollo

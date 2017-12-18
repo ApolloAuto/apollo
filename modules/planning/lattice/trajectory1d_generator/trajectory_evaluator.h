@@ -35,11 +35,11 @@ namespace apollo {
 namespace planning {
 
 class TrajectoryEvaluator {
-  typedef std::pair<std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>, double> PairCost;
+  typedef std::pair<
+      std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>, double> PairCost;
 
  public:
-  explicit TrajectoryEvaluator(
-      const PlanningTarget& planning_target,
+  explicit TrajectoryEvaluator(const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories);
 
@@ -49,35 +49,37 @@ class TrajectoryEvaluator {
 
   std::size_t num_of_trajectory_pairs() const;
 
-  std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>> next_top_trajectory_pair();
+  std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>
+  next_top_trajectory_pair();
 
   double top_trajectory_pair_cost() const;
 
  private:
   double evaluate(const PlanningTarget& planning_target,
-                  const std::shared_ptr<Curve1d>& lon_trajectory,
-                  const std::shared_ptr<Curve1d>& lat_trajectory) const;
+      const std::shared_ptr<Curve1d>& lon_trajectory,
+      const std::shared_ptr<Curve1d>& lat_trajectory) const;
 
   double compute_lat_trajectory_offset_cost(
       const std::shared_ptr<Curve1d>& lat_trajectory,
       const std::vector<double>& s_values) const;
 
-  double compute_lon_trajectory_jerk_cost(
+  double compute_lon_trajectory_comfort_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
-  double compute_lon_trajectory_objective_cost(
-      const std::shared_ptr<Curve1d>& lon_trajectory,
-      const PlanningTarget& objective) const;
+  /**
+   double compute_lon_trajectory_objective_cost(
+   const std::shared_ptr<Curve1d>& lon_trajectory,
+   const PlanningTarget& objective) const;
+   **/
 
-  struct CostComparator
-      : public std::binary_function<const PairCost&, const PairCost&, bool> {
-    bool operator()(const PairCost& left, const PairCost& right) const {
-      return left.second > right.second;
-    }
+  struct CostComparator: public std::binary_function<const PairCost&,
+      const PairCost&, bool> {
+      bool operator()(const PairCost& left, const PairCost& right) const {
+        return left.second > right.second;
+      }
   };
 
-  std::priority_queue<PairCost, std::vector<PairCost>, CostComparator>
-      cost_queue_;
+  std::priority_queue<PairCost, std::vector<PairCost>, CostComparator> cost_queue_;
 };
 
 }  // namespace planning
