@@ -65,6 +65,7 @@ data/core
 data/bag
 data/cov
 data/pcd
+data/nfs
 modules/data/conf/task_info_template.pb.txt
 modules/tools/ota/update.ini
 modules/tools/ota/vehicle_info.pb.txt
