@@ -151,7 +151,7 @@ bool PathDecider::MakeStaticObstacleDecision(
                                           object_decision);
       }
     }
-}
+  }
 
   return true;
 }
