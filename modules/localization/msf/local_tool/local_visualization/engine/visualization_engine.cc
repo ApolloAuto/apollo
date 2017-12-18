@@ -31,38 +31,23 @@ namespace msf {
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
 const char car_img_path[3][1024] = {
-    "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
-    "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
-    "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
+  "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
+  "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
+  "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"
+};
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
-  if (this->level < key.level) {
-    return true;
+  if (level != key.level) {
+    return level < key.level;
   }
-  if (this->level > key.level) {
-    return false;
+  if (zone_id != key.zone_id) {
+    return zone_id < key.zone_id;
   }
-
-  if (this->zone_id < key.zone_id) {
-    return true;
+  if (node_north_id != key.node_north_id) {
+    return node_north_id < key.node_north_id;
   }
-  if (this->zone_id > key.zone_id) {
-    return false;
-  }
-
-  if (this->node_north_id < key.node_north_id) {
-    return true;
-  }
-  if (this->node_north_id > key.node_north_id) {
-    return false;
-  }
-
-  if (this->node_east_id < key.node_east_id) {
-    return true;
-  }
-
-  return false;
+  return node_east_id < key.node_east_id;
 }
 
 // =================MapImageCache=================
@@ -206,7 +191,7 @@ void VisualizationEngine::Visualize(
 }
 
 void VisualizationEngine::SetAutoPlay(bool auto_play) {
-    auto_play_ = auto_play;
+  auto_play_ = auto_play;
 }
 
 void VisualizationEngine::Preprocess(const std::string &map_folder) {
