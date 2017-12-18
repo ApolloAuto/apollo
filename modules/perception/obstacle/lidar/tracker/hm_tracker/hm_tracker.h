@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -37,7 +38,7 @@ class HmObjectTracker : public BaseTracker {
   typedef std::pair<int, int> TrackObjectPair;
 
   HmObjectTracker();
-  virtual ~HmObjectTracker();
+  virtual ~HmObjectTracker() = default;
 
   // @brief initialize tracker's configs
   // @return true if initialize successfully, otherwise return false
@@ -79,9 +80,7 @@ class HmObjectTracker : public BaseTracker {
   // @return object tracks maintained in tracker
   const std::vector<ObjectTrackPtr>& GetObjectTracks() const;
 
-  std::string name() const {
-    return "HmObjectTracker";
-  }
+  std::string name() const { return "HmObjectTracker"; }
 
  protected:
   // @brief initialize tracker after obtaining detection of first frame
@@ -177,21 +176,21 @@ class HmObjectTracker : public BaseTracker {
   // algorithm setup
   MatcherType matcher_method_;
   FilterType filter_method_;
-  int collect_consecutive_invisible_maximum_;
-  int collect_age_minimum_;
-  bool use_histogram_for_match_;
-  int histogram_bin_size_;
+  int collect_consecutive_invisible_maximum_ = 0;
+  int collect_age_minimum_ = 0;
+  bool use_histogram_for_match_ = false;
+  int histogram_bin_size_ = 10;
 
   // matcher
-  BaseMatcher* matcher_;
+  std::unique_ptr<BaseMatcher> matcher_;
 
   // tracks
   ObjectTrackSet object_tracks_;
 
   // set offset to avoid huge value float computing
   Eigen::Vector3d global_to_local_offset_;
-  double time_stamp_;
-  bool valid_;
+  double time_stamp_ = 0.0;
+  bool valid_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker

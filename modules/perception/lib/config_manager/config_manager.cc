@@ -34,9 +34,7 @@ using apollo::common::util::GetAbsolutePath;
 using apollo::common::util::GetContent;
 using google::protobuf::TextFormat;
 
-ConfigManager::ConfigManager() {
-  work_root_ = FLAGS_work_root;
-}
+ConfigManager::ConfigManager() { work_root_ = FLAGS_work_root; }
 
 bool ConfigManager::Init() {
   std::unique_lock<std::mutex> lock(mutex_);
@@ -53,8 +51,8 @@ bool ConfigManager::InitInternal() {
   }
   model_config_map_.clear();
 
-  const std::string path = GetAbsolutePath(work_root_,
-                                           FLAGS_config_manager_path);
+  const std::string path =
+      GetAbsolutePath(work_root_, FLAGS_config_manager_path);
 
   AINFO << "WORK_ROOT: " << work_root_ << " config_manager_path: " << path;
 
@@ -94,6 +92,7 @@ bool ConfigManager::InitInternal() {
          multi_model_config_proto.model_configs()) {
       ModelConfig* model_config = new ModelConfig();
       if (!model_config->Reset(model_config_proto)) {
+        delete model_config;
         return false;
       }
 
