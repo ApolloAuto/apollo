@@ -15,6 +15,10 @@ data_files {
   dest_path: "<ros>/share/velodyne_pointcloud/params"
 }
 data_files {
+  source_path: "velodyne_params"
+  dest_path: "modules/localization/msf/params/velodyne_params"
+}
+data_files {
   source_path: "camera_params"
   dest_path: "modules/perception/data/params"
 }
@@ -29,6 +33,10 @@ data_files {
 data_files {
   source_path: "gnss_params/gnss_conf_mkz.txt"
   dest_path: "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt"
+}
+data_files {
+  source_path: "gnss_params/ant_imu_leverarm.yaml"
+  dest_path: "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
 }
 data_files {
   source_path: "vehicle_info.pb.txt"

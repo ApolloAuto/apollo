@@ -19,68 +19,68 @@ enum TriggerFrequence {
 };
 
 class UsbCamWrapper {
-  public:
-    UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh);
-    virtual ~UsbCamWrapper();
-    bool service_start_cap(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
-    bool service_stop_cap(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
-    bool take_and_send_image();
-    bool spin();
+ public:
+  UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh);
+  virtual ~UsbCamWrapper();
+  bool service_start_cap(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+  bool service_stop_cap(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+  bool take_and_send_image();
+  bool spin();
 
-  private:
-    // shared image message
-    sensor_msgs::Image _img;
-    sensor_msgs::CameraInfoPtr _cam_info = nullptr;
-    //image_transport::CameraPublisher image_pub_;
+ private:
+  // shared image message
+  sensor_msgs::Image img_;
+  sensor_msgs::CameraInfoPtr cam_info_ = nullptr;
+  //image_transport::CameraPublisher image_pub_;
 
-    image_transport::PubLoaderPtr _pub_loader;
-    boost::shared_ptr<image_transport::PublisherPlugin> _image_pub_plugin;
+  image_transport::PubLoaderPtr pub_loader_;
+  boost::shared_ptr<image_transport::PublisherPlugin> image_pub_plugin_;
 
-    ros::Publisher _cam_info_pub;
+  ros::Publisher cam_info_pub_;
 
-    // parameters
-    std::string _topic_name;
-    std::string _video_device_name; 
-    std::string _io_method_name; 
-    std::string _pixel_format_name;
-    std::string _camera_name;
-    std::string _camera_info_url;
+  // parameters
+  std::string topic_name_;
+  std::string video_device_name_; 
+  std::string io_method_name_; 
+  std::string pixel_format_name_;
+  std::string camera_name_;
+  std::string camera_info_url_;
 
-    //std::string start_service_name_, start_service_name_;
-    //bool streaming_status_;
-    int _image_width;
-    int _image_height;
-    int _framerate;
-    int _exposure;
-    int _brightness;
-    int _contrast; 
-    int _saturation;
-    int _sharpness;
-    int _focus;
-    int _white_balance;
-    int _gain;
+  //std::string start_service_name_, start_service_name_;
+  //bool streaming_status_;
+  int image_width_;
+  int image_height_;
+  int framerate_;
+  int exposure_;
+  int brightness_;
+  int contrast_; 
+  int saturation_;
+  int sharpness_;
+  int focus_;
+  int white_balance_;
+  int gain_;
 
-    bool _autofocus;
-    bool _autoexposure;
-    bool _auto_white_balance;
+  bool autofocus_;
+  bool autoexposure_;
+  bool auto_white_balance_;
 
-    // usb will be reset when camera timeout
-    int _cam_timeout;
-    UsbCam _cam;
-    boost::shared_ptr<camera_info_manager::CameraInfoManager> _cinfo;
+  // usb will be reset when camera timeout
+  int cam_timeout_;
+  UsbCam cam_;
+  boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;
 
-    ros::ServiceServer _service_start; 
-    ros::ServiceServer _service_stop; 
+  ros::ServiceServer service_start_; 
+  ros::ServiceServer service_stop_; 
 
-    // private ROS node handle
-    ros::NodeHandle _node;
-    ros::NodeHandle _priv_node;
+  // private ROS node handle
+  ros::NodeHandle node_;
+  ros::NodeHandle priv_node_;
 
-    ros::Time _last_stamp;
-    float _frame_warning_interval;
-    float _frame_drop_interval;
-    float _spin_interval;
-    int _error_code;
+  ros::Time last_stamp_;
+  float frame_warning_interval_;
+  float frame_drop_interval_;
+  float spin_interval_;
+  int error_code_;
 };
 }
 

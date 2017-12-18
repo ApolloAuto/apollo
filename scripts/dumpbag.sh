@@ -19,8 +19,6 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "${DIR}/.."
-
 source "${DIR}/apollo_base.sh"
 
-python modules/tools/rosbag/dumpbag.py $@
+python ${DIR}/../modules/tools/rosbag/dumpbag.py $@

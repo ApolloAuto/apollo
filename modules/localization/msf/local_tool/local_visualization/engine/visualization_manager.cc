@@ -14,15 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
+#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <string>
 #include <vector>
-
 #include "boost/date_time/posix_time/posix_time.hpp"
-#include "boost/filesystem.hpp"
-
 #include "modules/localization/msf/common/io/velodyne_utility.h"
-#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
 
 namespace apollo {
 namespace localization {
@@ -151,8 +149,9 @@ void MessageBuffer<MessageType>::GetAllMessages(
 
 template <class MessageType>
 bool MessageBuffer<MessageType>::IsEmpty() {
+  bool flag = true;
   pthread_mutex_lock(&buffer_mutex_);
-  bool flag = msg_list_.empty();
+  flag = msg_list_.empty();
   pthread_mutex_unlock(&buffer_mutex_);
   return flag;
 }
@@ -278,8 +277,10 @@ VisualizationManager::VisualizationManager()
       fusion_loc_info_buffer_(200) {}
 
 VisualizationManager::~VisualizationManager() {
-  stop_visualization_ = true;
-  visual_thread_.join();
+  if (!(stop_visualization_.load())) {
+    stop_visualization_ = true;
+    visual_thread_.join();
+  }
 }
 
 bool VisualizationManager::Init(const std::string &map_folder,
@@ -321,6 +322,8 @@ bool VisualizationManager::Init(const std::string &map_folder,
     return false;
   }
   std::cout << "Visualization engine init succeed." << std::endl;
+
+  visual_engine_.SetAutoPlay(true);
 
   return true;
 }
@@ -372,7 +375,7 @@ void VisualizationManager::StopVisualization() {
 }
 
 void VisualizationManager::DoVisualize() {
-  while (!stop_visualization_) {
+  while (!(stop_visualization_.load())) {
     usleep(10000);
     // if (!lidar_frame_buffer_.IsEmpty()) {
     if (lidar_frame_buffer_.BufferSize() > 5) {

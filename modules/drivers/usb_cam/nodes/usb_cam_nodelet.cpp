@@ -8,30 +8,31 @@
 
 namespace usb_cam {
 
-class UsbCamNodelet: public nodelet::Nodelet {
-
-public:
-    UsbCamNodelet() { };
-    ~UsbCamNodelet() {
-        ROS_INFO("shutting down driver thread");
-        if (_device_thread != nullptr && _device_thread->joinable()) {
-          _device_thread->join();
-        }
-        ROS_INFO("driver thread stopped");
+class UsbCamNodelet: public nodelet::Nodelet 
+{
+ public:
+  UsbCamNodelet() {}
+  ~UsbCamNodelet() {
+  ROS_INFO("shutting down driver thread");
+  if (device_thread_ != nullptr && device_thread_->joinable()) {
+    device_thread_->join();
+  }
+  ROS_INFO("driver thread stopped");
 };
 
-private:
-    virtual void onInit();
-    boost::shared_ptr<UsbCamWrapper> _usb_cam = nullptr;
-    boost::shared_ptr<boost::thread> _device_thread = nullptr;
+ private:
+  virtual void onInit();
+  boost::shared_ptr<UsbCamWrapper> usb_cam_ = nullptr;
+  boost::shared_ptr<boost::thread> device_thread_ = nullptr;
 };
 
-void UsbCamNodelet::onInit() {
-    ROS_INFO("Usb cam nodelet init");
-    _usb_cam.reset(new UsbCamWrapper(getNodeHandle(), getPrivateNodeHandle()));
-    // spawn device poll thread
-    _device_thread = boost::shared_ptr<boost::thread>
-        (new boost::thread(boost::bind(&UsbCamWrapper::spin, _usb_cam)));
+void UsbCamNodelet::onInit()
+{
+  ROS_INFO("Usb cam nodelet init");
+  usb_cam_.reset(new UsbCamWrapper(getNodeHandle(), getPrivateNodeHandle()));
+  // spawn device poll thread
+  device_thread_ = boost::shared_ptr<boost::thread>
+        (new boost::thread(boost::bind(&UsbCamWrapper::spin, usb_cam_)));
 }
 
 }

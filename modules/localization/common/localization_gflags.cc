@@ -65,11 +65,17 @@ DEFINE_bool(enable_gps_timestamp, false,
 
 // msf parame
 DEFINE_string(local_map_name, "local_map", "The path of localization map.");
+DEFINE_string(lidar_extrinsics_file,
+              "modules/localization/msf/params/velodyne_params/"
+              "velodyne64_novatel_extrinsics_example.yaml",
+              "Lidar extrinsics parameter file.");
 DEFINE_string(lidar_height_file,
-              "<ros>/share/velodyne_pointcloud/params/"
-              "velodyne64_height_example.yaml",
+              "modules/localization/msf/params/velodyne_params/"
+              "velodyne64_height.yaml",
               "Velodyne extrinsic path for the vehicle in use, "
               "where <ros> is the placeholder of ROS root.");
+DEFINE_double(lidar_height_default, 1.80,
+              "The height from the center of velodyne to ground.");
 DEFINE_int32(
     lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
@@ -87,18 +93,17 @@ DEFINE_bool(integ_ins_can_self_align, false, "");
 DEFINE_bool(integ_sins_align_with_vel, true, "");
 DEFINE_double(vel_threshold_get_yaw, 5.0, "");
 DEFINE_bool(integ_debug_log_flag, false, "");
-DEFINE_string(broadcast_tf2_frame_id, "world",
-              "The frame id used to broadcast the localization result.");
-DEFINE_string(broadcast_tf2_child_frame_id, "localization_100hz",
-              "The child frame id used to broadcast the localization result.");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, "");
 DEFINE_bool(enable_auto_save_eph_file, true, "");
 DEFINE_string(eph_buffer_path, "", "");
+DEFINE_string(
+    ant_imu_leverarm_file,
+    "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml",
+    "Ant to imu leferarm.");
 DEFINE_bool(gnss_debug_log_flag, false, "Gnss Debug switch.");
-DEFINE_bool(imuant_from_gnss_conf_file, true,
-            "Use imu ant from gnss configure file.");
+DEFINE_bool(if_imuant_from_file, true, "Use imu ant from gnss configure file.");
 DEFINE_double(imu_to_ant_offset_x, 0.0, "Imu ant offset x");
 DEFINE_double(imu_to_ant_offset_y, 0.0, "Imu ant offset y");
 DEFINE_double(imu_to_ant_offset_z, 0.0, "Imu ant offset z");

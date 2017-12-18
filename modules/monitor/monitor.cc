@@ -16,8 +16,10 @@
 #include "modules/monitor/monitor.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/can/can_monitor.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
+#include "modules/monitor/online_report/vehicle_state_reporter.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
 #include "modules/monitor/software/topic_monitor.h"
@@ -63,6 +65,11 @@ Status Monitor::Init() {
       monitor_thread_.RegisterRunner(make_unique<TopicMonitor>(
           hardware.topic_conf(), hw_status->mutable_topic_status()));
     }
+  }
+
+  // Register online reporters.
+  if (MonitorManager::GetConfig().has_online_report_endpoint()) {
+    monitor_thread_.RegisterRunner(make_unique<VehicleStateReporter>());
   }
 
   // Register the SummaryMonitor as last runner, so it will monitor all changes

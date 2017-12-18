@@ -16,9 +16,9 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
+#include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/util/json_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -26,8 +26,9 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::ContainsKey;
+using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::util::JsonUtil;
 using apollo::hdmap::EndWayPointFile;
 using apollo::routing::RoutingRequest;
 using Json = nlohmann::json;
@@ -49,7 +50,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           MapElementIds map_element_ids(*iter);
           auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
           websocket_->SendData(
-              conn, util::JsonUtil::ProtoToTypedJson("MapData", retrieved));
+              conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
         }
       });
 

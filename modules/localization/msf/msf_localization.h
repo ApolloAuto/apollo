@@ -22,27 +22,27 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_H_
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_H_
 
-#include <tf2_ros/transform_broadcaster.h>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "glog/logging.h"
 #include "gtest/gtest_prod.h"
-#include "include/localization_integ.h"
-#include "modules/common/monitor/monitor.h"
-#include "modules/common/status/status.h"
+#include "ros/include/ros/ros.h"
+#include "sensor_msgs/PointCloud2.h"
+#include "tf2_ros/transform_broadcaster.h"
+
 #include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/localization/localization_base.h"
-// #include "modules/localization/msf/local_integ/localization_integ.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
-#include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
+
+#include "include/localization_integ.h"
+#include "modules/common/log.h"
+#include "modules/common/monitor/monitor.h"
+#include "modules/common/status/status.h"
+#include "modules/localization/localization_base.h"
 
 /**
  * @namespace apollo::localization
@@ -83,6 +83,13 @@ class MSFLocalization : public LocalizationBase {
   void OnGnssBestPose(const GnssBestPose &bestgnsspos_msg);
 
   void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
+
+ private:
+  bool load_gnss_antenna_extrinsic(const std::string &file_path,
+                                   double *offset_x, double *offset_y,
+                                   double *offset_z, double *uncertainty_x,
+                                   double *uncertainty_y,
+                                   double *uncertainty_z);
 
  private:
   apollo::common::monitor::Monitor monitor_;

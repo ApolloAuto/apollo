@@ -188,7 +188,7 @@ class BaseMapNode {
   bool SaveIntensityImage(const std::string& path) const;
 
   /**@brief The map settings. */
-  const BaseMapConfig* map_config_;
+  const BaseMapConfig* map_config_ = nullptr;
   /**@brief The index of this node. */
   MapNodeIndex index_;
   /**@brief The left top corner of the map node in the global coordinate system.
@@ -205,7 +205,7 @@ class BaseMapNode {
   bool data_is_ready_;
   /**@brief The body binary size in file. It's useful when reading and writing
    * files. */
-  mutable unsigned int file_body_binary_size_;
+  mutable unsigned int file_body_binary_size_ = 0;
   /**@bried The compression strategy. */
   CompressionStrategy* compression_strategy_;
   /**@brief The min altitude of point cloud in the node. */

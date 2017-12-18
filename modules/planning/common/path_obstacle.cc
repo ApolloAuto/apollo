@@ -70,6 +70,13 @@ bool PathObstacle::Init(const ReferenceLine& reference_line,
     AERROR << "Failed to get sl boundary for obstacle: " << id_;
     return false;
   }
+
+  if (perception_sl_boundary_.start_s() < 0 ||
+      perception_sl_boundary_.end_s() > reference_line.Length()) {
+    return true;
+  }
+
+  // TODO(All): reduce the calculation time of BuildStBoundary
   BuildStBoundary(reference_line, adc_start_s);
   return true;
 }
@@ -151,11 +158,23 @@ bool PathObstacle::BuildTrajectoryStBoundary(
       AERROR << "failed to calculate boundary";
       return false;
     }
-    const double object_s_diff =
-        object_boundary.end_s() - object_boundary.start_s();
+    // skip if object is entirely on one side of reference line.
+    constexpr double kSkipLDistanceFactor = 0.4;
+    const double skip_l_distance =
+        (object_boundary.end_s() - object_boundary.start_s()) *
+        kSkipLDistanceFactor;
+    if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
+            skip_l_distance ||
+        std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
+            -skip_l_distance) {
+      continue;
+    }
+
     if (object_boundary.end_s() < 0) {  // skip if behind reference line
       continue;
     }
+    const double object_s_diff =
+        object_boundary.end_s() - object_boundary.start_s();
     if (object_s_diff < kStBoundaryDeltaS) {
       continue;
     }
@@ -222,6 +241,14 @@ bool PathObstacle::BuildTrajectoryStBoundary(
 }
 
 const StBoundary& PathObstacle::st_boundary() const { return st_boundary_; }
+
+const std::vector<std::string>& PathObstacle::decider_tags() const {
+  return decider_tags_;
+}
+
+const std::vector<ObjectDecisionType>& PathObstacle::decisions() const {
+  return decisions_;
+}
 
 bool PathObstacle::IsLateralDecision(const ObjectDecisionType& decision) {
   return decision.has_ignore() || decision.has_nudge();
@@ -318,6 +345,7 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   DCHECK(false) << "Does not have rule to merge decision: "
                 << lhs.ShortDebugString()
                 << " and decision: " << rhs.ShortDebugString();
+  return lhs;
 }
 
 bool PathObstacle::HasLateralDecision() const {

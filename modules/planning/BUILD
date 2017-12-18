@@ -14,7 +14,6 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/proto:pnc_point_proto",

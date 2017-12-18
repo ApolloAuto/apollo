@@ -112,13 +112,21 @@ struct LosslessMapCell {
     return static_cast<unsigned char>(map_cells[0].intensity);
   }
   /**@brief Get the variance of the intensity of the map cell. */
-  inline float GetVar() const { return map_cells[0].intensity_var; }
+  inline float GetVar() const {
+    return map_cells[0].intensity_var;
+  }
   /**@brief Get the average altitude of the map cell. */
-  inline float GetAlt() const { return map_cells[0].altitude; }
+  inline float GetAlt() const {
+    return map_cells[0].altitude;
+  }
   /**@brief Get the variance of the altitude of the map cell. */
-  inline float GetAltVar() const { return map_cells[0].altitude_var; }
+  inline float GetAltVar() const {
+    return map_cells[0].altitude_var;
+  }
   /**@brief Get the count of the samples in the map cell. */
-  inline unsigned int GetCount() const { return map_cells[0].count; }
+  inline unsigned int GetCount() const {
+    return map_cells[0].count;
+  }
   /**@brief Get a perticular layer in the map cell. The layer 0 is the layer
    * includes all the samples. */
   LosslessMapSingleCell& GetLayer(unsigned int layer_id) {

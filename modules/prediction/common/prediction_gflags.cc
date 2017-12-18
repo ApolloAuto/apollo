@@ -84,6 +84,10 @@ DEFINE_int32(max_num_obstacles, 100,
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
 
+DEFINE_double(perception_confidence_threshold, 0.4,
+              "Skip the perception obstacle if its confiderence is lower than "
+              "this threshold.");
+
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
               "Threshold for trimming lane sequence trajectories");

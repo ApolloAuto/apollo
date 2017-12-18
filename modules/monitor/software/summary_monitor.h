@@ -19,7 +19,7 @@
 #include <string>
 
 #include "modules/common/adapters/adapter.h"
-#include "modules/monitor/common/monitor_interface.h"
+#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 
 namespace apollo {

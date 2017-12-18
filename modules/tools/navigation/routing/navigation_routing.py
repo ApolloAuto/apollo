@@ -28,6 +28,7 @@ from flask import jsonify
 from flask import Flask
 from flask import request
 from flask_cors import CORS
+from shapely.geometry import LineString, Point
 from numpy.polynomial.polynomial import polyval
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
@@ -45,6 +46,9 @@ routing_pub = None
 mobileye_pb = None
 planning_pb = None
 heading = None
+line_ew = None
+line_we = None
+
 projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 
 
@@ -99,6 +103,30 @@ def routing():
 
 def get_latlon_and_utm_path(steps):
     latlon_path = []
+
+    if len(steps) > 0:
+        if steps[0].get('start_location') is not None:
+            loc = steps[0]['start_location']
+            x, y = projector(loc['lng'], loc['lat'])
+            p_start = (x, y)
+            loc = steps[0]['end_location']
+            x, y = projector(loc['lng'], loc['lat'])
+            p_end = (x, y)
+            line = match_drive_data(p_start, p_end)
+            if line is not None:
+                utm_points = []
+                for i in range(int(line.length)):
+                    p = line.interpolate(i)
+                    lons, lats = projector(p.x, p.y, inverse=True)
+                    latlon_path.append({'lat': lats, 'lng': lons})
+                    utm_points.append([p.x, p.y])
+                steps = []
+                steps.append({})
+                steps[0]['human'] = True
+                steps[0]['polyline'] = {}
+                steps[0]['polyline']['points'] = utm_points
+                return latlon_path, steps
+
     for step in steps:
         start_loc = step['start_location']
         end_loc = step['end_location']
@@ -145,6 +173,65 @@ def decode_polyline(polyline_str):
     return coordinates
 
 
+def load_drive_data():
+    global line_ew, line_we
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    hanada_ew_file = dir_path + "/" + "hanada_ew"
+    hanada_we_file = dir_path + "/" + "hanada_we"
+    ew = []
+    try:
+        f = open(hanada_ew_file, 'r')
+        for line in f:
+            line = line.replace('\n', '')
+            vals = line.split(',')
+            if len(vals) != 2:
+                continue
+            x = float(vals[0])
+            y = float(vals[1])
+            ew.append((x, y))
+        line_ew = LineString(ew)
+    except:
+        line_ew = None
+
+    we = []
+    try:
+        f = open(hanada_we_file, 'r')
+        for line in f:
+            line = line.replace('\n', '')
+            vals = line.split(',')
+            if len(vals) != 2:
+                continue
+            x = float(vals[0])
+            y = float(vals[1])
+            we.append((x, y))
+        line_we = LineString(we)
+    except:
+        line_ew = None
+
+
+def match_drive_data(p_start, p_end):
+    ps = Point(p_start)
+    pe = Point(p_end)
+    if line_we is not None:
+        ds = line_we.distance(ps)
+        de = line_we.distance(pe)
+        ss = line_we.project(ps)
+        se = line_we.project(pe)
+        if ds < 4 and de < 50:
+            if ss < se:
+                return line_we
+
+    if line_ew is not None:
+        ds = line_ew.distance(ps)
+        de = line_ew.distance(pe)
+        ss = line_ew.project(ps)
+        se = line_ew.project(pe)
+        if ds < 4 and de < 50:
+            if ss < se:
+                return line_ew
+    return None
+
+
 def run_flask():
     app.run(debug=False, port=5002, host='0.0.0.0')
 
@@ -161,6 +248,7 @@ if __name__ == "__main__":
     except IOError:
         print "Could not read file:", key_file_name
 
+    load_drive_data()
     add_listener()
     thread.start_new_thread(run_flask, ())
     # app.run(debug=False, port=5001, host='localhost')

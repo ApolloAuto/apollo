@@ -14,25 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/msf_localization.h"
+
+#include <yaml-cpp/yaml.h>
 #include <list>
-#include <sstream>
+
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/localization/msf/msf_localization.h"
 
 namespace apollo {
 namespace localization {
 
 using ::Eigen::Vector3d;
-using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::ImuAdapter;
 using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::Status;
 using apollo::common::time::Clock;
 
 MSFLocalization::MSFLocalization()
@@ -113,7 +116,9 @@ Status MSFLocalization::Start() {
   return Status::OK();
 }
 
-Status MSFLocalization::Stop() { return Status::OK(); }
+Status MSFLocalization::Stop() {
+  return Status::OK();
+}
 
 Status MSFLocalization::Init() {
   InitParams();
@@ -150,14 +155,9 @@ void MSFLocalization::InitParams() {
 
   // lidar module
   localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
-  // localizaiton_param_.lidar_extrinsic_file =
-  //     common::util::TranslatePath(FLAGS_velodyne_params_target_path) +
-  //     "/velodyne64_novatel_extrinsics_example.yaml";
-  localizaiton_param_.lidar_extrinsic_file =
-      "/home/tmp/ros/share/velodyne_pointcloud/params/"
-      "velodyne64_novatel_extrinsics_example.yaml";
-  localizaiton_param_.lidar_height_file =
-      common::util::TranslatePath(FLAGS_lidar_height_file);
+  localizaiton_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
+  localizaiton_param_.lidar_height_file = FLAGS_lidar_height_file;
+  localizaiton_param_.lidar_height_default = FLAGS_lidar_height_default;
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
   localizaiton_param_.lidar_filter_size = FLAGS_lidar_filter_size;
@@ -165,11 +165,9 @@ void MSFLocalization::InitParams() {
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;
   localizaiton_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
 
-  std::cerr << "map: " << localizaiton_param_.map_path << std::endl;
-  std::cerr << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file
-            << std::endl;
-  std::cerr << "lidar_height: " << localizaiton_param_.lidar_height_file
-            << std::endl;
+  AERROR << "map: " << localizaiton_param_.map_path;
+  AERROR << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file;
+  AERROR << "lidar_height: " << localizaiton_param_.lidar_height_file;
 
   // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
@@ -179,7 +177,7 @@ void MSFLocalization::InitParams() {
 
   localizaiton_param_.is_use_visualize = FLAGS_use_visualize;
 
-  if (!FLAGS_imuant_from_gnss_conf_file) {
+  if (!FLAGS_if_imuant_from_file) {
     localizaiton_param_.imu_to_ant_offset.offset_x = FLAGS_imu_to_ant_offset_x;
     localizaiton_param_.imu_to_ant_offset.offset_y = FLAGS_imu_to_ant_offset_y;
     localizaiton_param_.imu_to_ant_offset.offset_z = FLAGS_imu_to_ant_offset_z;
@@ -190,38 +188,19 @@ void MSFLocalization::InitParams() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_z =
         FLAGS_imu_to_ant_offset_uz;
   } else {
-    apollo::drivers::gnss::config::Config gnss_config;
-    // CHECK(common::util::GetProtoFromASCIIFile<
-    //       apollo::drivers::gnss::config::Config>(
-    //     common::util::TranslatePath(FLAGS_gnss_conf_file_target_path),
-    //     &gnss_config));
-    CHECK_GT(gnss_config.login_commands_size(), 1);
-    std::string login_commands = gnss_config.login_commands(1);
-    bool found_imu_ant_parameter = false;
-    for (int i = 0; i < gnss_config.login_commands_size(); ++i) {
-      login_commands = gnss_config.login_commands(i);
-      std::size_t found = login_commands.find(std::string("SETIMUTOANTOFFSET"));
-      if (found != std::string::npos) {
-        found_imu_ant_parameter = true;
-        break;
-      }
-    }
-    CHECK(found_imu_ant_parameter);
-
-    std::vector<std::string> segmented_login_commands =
-        common::util::StringTokenizer::Split(login_commands, " ");
-    CHECK_EQ(segmented_login_commands.size(), 7);
-
-    std::string name = "";
     double offset_x = 0.0;
     double offset_y = 0.0;
     double offset_z = 0.0;
     double uncertainty_x = 0.0;
     double uncertainty_y = 0.0;
     double uncertainty_z = 0.0;
-    std::stringstream ss_str(login_commands);
-    ss_str >> name >> offset_x >> offset_y >> offset_z >> uncertainty_x >>
-        uncertainty_y >> uncertainty_z;
+    std::string ant_imu_leverarm_file =
+        common::util::TranslatePath(FLAGS_ant_imu_leverarm_file);
+    AERROR << "Ant imu lever arm file: " << ant_imu_leverarm_file;
+    CHECK(load_gnss_antenna_extrinsic(ant_imu_leverarm_file, &offset_x,
+                                      &offset_y, &offset_z, &uncertainty_x,
+                                      &uncertainty_y, &uncertainty_z));
+
     localizaiton_param_.imu_to_ant_offset.offset_x = offset_x;
     localizaiton_param_.imu_to_ant_offset.offset_y = offset_y;
     localizaiton_param_.imu_to_ant_offset.offset_z = offset_z;
@@ -229,13 +208,12 @@ void MSFLocalization::InitParams() {
     localizaiton_param_.imu_to_ant_offset.uncertainty_y = uncertainty_y;
     localizaiton_param_.imu_to_ant_offset.uncertainty_z = uncertainty_z;
 
-    std::cout << localizaiton_param_.imu_to_ant_offset.offset_x << " "
-              << localizaiton_param_.imu_to_ant_offset.offset_y << " "
-              << localizaiton_param_.imu_to_ant_offset.offset_z << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_x << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_y << " "
-              << localizaiton_param_.imu_to_ant_offset.uncertainty_z
-              << std::endl;
+    AINFO << localizaiton_param_.imu_to_ant_offset.offset_x << " "
+          << localizaiton_param_.imu_to_ant_offset.offset_y << " "
+          << localizaiton_param_.imu_to_ant_offset.offset_z << " "
+          << localizaiton_param_.imu_to_ant_offset.uncertainty_x << " "
+          << localizaiton_param_.imu_to_ant_offset.uncertainty_y << " "
+          << localizaiton_param_.imu_to_ant_offset.uncertainty_z;
   }
 }
 
@@ -244,8 +222,8 @@ void MSFLocalization::PublishPoseBroadcastTF(
   // broadcast tf message
   geometry_msgs::TransformStamped tf2_msg;
   tf2_msg.header.stamp = ros::Time(localization.measurement_time());
-  tf2_msg.header.frame_id = FLAGS_broadcast_tf2_frame_id;
-  tf2_msg.child_frame_id = FLAGS_broadcast_tf2_child_frame_id;
+  tf2_msg.header.frame_id = FLAGS_localization_tf2_frame_id;
+  tf2_msg.child_frame_id = FLAGS_localization_tf2_child_frame_id;
 
   tf2_msg.transform.translation.x = localization.pose().position().x();
   tf2_msg.transform.translation.y = localization.pose().position().y();
@@ -367,6 +345,31 @@ void MSFLocalization::OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg) {
 
   localization_integ_.RawEphemerisProcess(gnss_orbit_msg);
   return;
+}
+
+bool MSFLocalization::load_gnss_antenna_extrinsic(
+    const std::string &file_path, double *offset_x, double *offset_y,
+    double *offset_z, double *uncertainty_x, double *uncertainty_y,
+    double *uncertainty_z) {
+  YAML::Node config = YAML::LoadFile(file_path);
+  if (config["leverarm"]) {
+    if (config["leverarm"]["primary"]["offset"]) {
+      *offset_x = config["leverarm"]["primary"]["offset"]["x"].as<double>();
+      *offset_y = config["leverarm"]["primary"]["offset"]["y"].as<double>();
+      *offset_z = config["leverarm"]["primary"]["offset"]["z"].as<double>();
+
+      if (config["leverarm"]["primary"]["uncertainty"]) {
+        *uncertainty_x =
+            config["leverarm"]["primary"]["uncertainty"]["x"].as<double>();
+        *uncertainty_y =
+            config["leverarm"]["primary"]["uncertainty"]["y"].as<double>();
+        *uncertainty_z =
+            config["leverarm"]["primary"]["uncertainty"]["z"].as<double>();
+      }
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace localization

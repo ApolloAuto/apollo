@@ -63,6 +63,7 @@ class ReferenceLineInfo {
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
 
   const DiscretizedTrajectory& trajectory() const;
+  const double TrajectoryLength() const;
 
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
@@ -110,6 +111,11 @@ class ReferenceLineInfo {
 
   void ExportDecision(DecisionResult* decision_result) const;
 
+  void SetRightOfWayStatus() { status_ = ADCTrajectory::PROTECTED; }
+  ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const {
+    return status_;
+  }
+
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
@@ -146,6 +152,8 @@ class ReferenceLineInfo {
   LatencyStats latency_stats_;
 
   hdmap::RouteSegments lanes_;
+
+  ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

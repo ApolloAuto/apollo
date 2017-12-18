@@ -22,6 +22,8 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/util/http_client.h"
+#include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
@@ -30,8 +32,6 @@
 #include "modules/data/proto/task.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
-#include "modules/dreamview/backend/util/http_client.h"
-#include "modules/dreamview/backend/util/json_util.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
@@ -55,10 +55,10 @@ using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::util::JsonUtil;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
 using apollo::data::VehicleInfo;
-using apollo::dreamview::util::JsonUtil;
 using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
 
@@ -170,10 +170,10 @@ void HMI::RegisterMessageHandlers() {
   // Send current config and status to new HMI client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
-        websocket_->SendData(conn,
-                             JsonUtil::ProtoToTypedJson("HMIConfig", config_));
-        websocket_->SendData(conn,
-                             JsonUtil::ProtoToTypedJson("HMIStatus", status_));
+        websocket_->SendData(
+            conn, JsonUtil::ProtoToTypedJson("HMIConfig", config_).dump());
+        websocket_->SendData(
+            conn, JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
       });
 
   // HMI client asks for executing module command.
@@ -289,7 +289,8 @@ void HMI::RegisterMessageHandlers() {
 void HMI::BroadcastHMIStatus() const {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
   if (websocket_) {
-    websocket_->BroadcastData(JsonUtil::ProtoToTypedJson("HMIStatus", status_));
+    websocket_->BroadcastData(
+        JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
   }
 }
 
@@ -404,8 +405,8 @@ void HMI::CheckOTAUpdates() {
   ota_request["tag"] = std::getenv("DOCKER_IMG");
 
   Json ota_response;
-  const auto status = util::HttpClient::Post(FLAGS_ota_service_url,
-                                             ota_request, &ota_response);
+  const auto status = apollo::common::util::HttpClient::Post(
+      FLAGS_ota_service_url, ota_request, &ota_response);
   if (status.ok()) {
     CHECK(JsonUtil::GetStringFromJson(ota_response, "tag",
                                       status_.mutable_ota_update()));

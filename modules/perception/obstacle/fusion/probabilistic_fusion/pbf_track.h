@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <string>
+
 #include "gtest/gtest.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"

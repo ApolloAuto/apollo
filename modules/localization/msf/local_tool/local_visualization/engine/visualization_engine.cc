@@ -31,38 +31,23 @@ namespace msf {
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
 const char car_img_path[3][1024] = {
-    "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
-    "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
-    "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
+  "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
+  "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
+  "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"
+};
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
-  if (this->level < key.level) {
-    return true;
+  if (level != key.level) {
+    return level < key.level;
   }
-  if (this->level > key.level) {
-    return false;
+  if (zone_id != key.zone_id) {
+    return zone_id < key.zone_id;
   }
-
-  if (this->zone_id < key.zone_id) {
-    return true;
+  if (node_north_id != key.node_north_id) {
+    return node_north_id < key.node_north_id;
   }
-  if (this->zone_id > key.zone_id) {
-    return false;
-  }
-
-  if (this->node_north_id < key.node_north_id) {
-    return true;
-  }
-  if (this->node_north_id > key.node_north_id) {
-    return false;
-  }
-
-  if (this->node_east_id < key.node_east_id) {
-    return true;
-  }
-
-  return false;
+  return node_east_id < key.node_east_id;
 }
 
 // =================MapImageCache=================
@@ -205,6 +190,10 @@ void VisualizationEngine::Visualize(
   Draw();
 }
 
+void VisualizationEngine::SetAutoPlay(bool auto_play) {
+  auto_play_ = auto_play;
+}
+
 void VisualizationEngine::Preprocess(const std::string &map_folder) {
   std::string image_path = map_folder_ + "/image";
   std::string image_visual_path = map_folder_ + "/map_visual";
@@ -285,8 +274,8 @@ void VisualizationEngine::Draw() {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i]
-             [j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i][j].copyTo(
+          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
@@ -506,9 +495,10 @@ void VisualizationEngine::DrawLegend() {
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(image_window_, cv::Point(755, (15 + textSize.height) * (i + 1) -
-                                                 textSize.height / 2),
-               8, cv::Scalar(b, g, r), 3);
+    cv::circle(
+        image_window_,
+        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
+        8, cv::Scalar(b, g, r), 3);
   }
 }
 
@@ -872,7 +862,9 @@ void VisualizationEngine::UpdateViewCenter(const double move_x,
   _view_center[1] += move_y;
 }
 
-void VisualizationEngine::SetScale(const double scale) { cur_scale_ = scale; }
+void VisualizationEngine::SetScale(const double scale) {
+  cur_scale_ = scale;
+}
 
 void VisualizationEngine::UpdateScale(const double factor) {
   cur_scale_ *= factor;

@@ -24,6 +24,7 @@ namespace perception {
 
 bool ReadPoseFile(const std::string &filename, Eigen::Matrix4d *pose,
                   int *frame_id, double *time_stamp) {
+  *pose = Eigen::Matrix4d::Identity();
   std::ifstream ifs(filename.c_str());
   if (!ifs.is_open()) {
     AERROR << "Failed to open file " << filename;
@@ -55,6 +56,23 @@ bool ReadPoseFile(const std::string &filename, Eigen::Matrix4d *pose,
 
   (*frame_id) = id;
   (*time_stamp) = time_samp;
+  return true;
+}
+
+bool ReadPoseFileMat12(const std::string &filename, Eigen::Matrix4d *pose,
+                       int *frame_id, double *time_stamp) {
+  *pose = Eigen::Matrix4d::Identity();
+  std::ifstream ifs(filename.c_str());
+  if (!ifs.is_open()) {
+    AERROR << "Failed to open file " << filename;
+    return false;
+  }
+  ifs >> *frame_id >> *time_stamp;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 4; j++) {
+      ifs >> (*pose)(i, j);
+    }
+  }
   return true;
 }
 

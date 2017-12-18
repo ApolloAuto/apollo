@@ -104,6 +104,17 @@ void EMPlanner::RecordObstacleDebugInfo(
     obstacle_debug->set_id(path_obstacle->Id());
     obstacle_debug->mutable_sl_boundary()->CopyFrom(
         path_obstacle->perception_sl_boundary());
+    const auto& decider_tags = path_obstacle->decider_tags();
+    const auto& decisions = path_obstacle->decisions();
+    if (decider_tags.size() != decisions.size()) {
+      AERROR << "decider_tags size: " << decider_tags.size()
+             << " different from decisions size:" << decisions.size();
+    }
+    for (size_t i = 0; i < decider_tags.size(); ++i) {
+      auto decision_tag = obstacle_debug->add_decision_tag();
+      decision_tag->set_decider_tag(decider_tags[i]);
+      decision_tag->mutable_decision()->CopyFrom(decisions[i]);
+    }
   }
 }
 
@@ -129,8 +140,7 @@ void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
   const double kStraightForwardLineCost = 10.0;
-  if (reference_line_info->Lanes().NextAction() != routing::FORWARD &&
-      reference_line_info->Lanes().IsOnSegment()) {
+  if (!reference_line_info->IsChangeLanePath()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
 

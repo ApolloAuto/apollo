@@ -13,11 +13,10 @@ cc_library(
 )
 
 cc_library(
-    name = "monitor_interface",
-    srcs = ["monitor_interface.cc"],
-    hdrs = ["monitor_interface.h"],
+    name = "monitor_manager",
+    srcs = ["monitor_manager.cc"],
+    hdrs = ["monitor_manager.h"],
     deps = [
-        ":recurrent_runner",
         "//modules/common/util",
         "//modules/common/util:map_util",
         "//modules/monitor/proto:monitor_conf_proto",

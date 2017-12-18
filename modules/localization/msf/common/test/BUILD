@@ -13,16 +13,18 @@ cc_test(
     name = "localization_msf_common_test",
     size = "medium",
     timeout = "short",
-    srcs = glob(["io/*.cc",
-                "util/*.cc"]),
+    srcs = glob([
+        "io/*.cc",
+        "util/*.cc",
+    ]),
     data = [
         ":localization_msf_common_test_data",
     ],
     deps = [
+        "//modules/common:log",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "@glog//:glog",
-        "@gtest//:main"
+        "@gtest//:main",
     ],
 )
 

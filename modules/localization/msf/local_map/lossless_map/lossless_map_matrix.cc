@@ -103,7 +103,9 @@ unsigned int LosslessMapSingleCell::GetBinarySize() const {
 }
 
 // ======================LosslessMapCell===========================
-LosslessMapCell::LosslessMapCell() { layer_num = 1; }
+LosslessMapCell::LosslessMapCell() {
+  layer_num = 1;
+}
 
 void LosslessMapCell::Reset() {
   for (unsigned int i = 0; i < IDL_CAR_NUM_RESERVED_MAP_LAYER; ++i) {
