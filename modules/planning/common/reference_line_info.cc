@@ -133,7 +133,7 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
 
-const double ReferenceLineInfo::TrajectoryLength() const {
+double ReferenceLineInfo::TrajectoryLength() const {
   const auto& tps = discretized_trajectory_.trajectory_points();
   if (tps.empty()) {
     return 0.0;
