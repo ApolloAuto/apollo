@@ -144,7 +144,6 @@ bool Obstacle::IsNearJunction() {
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
                       const double timestamp) {
-  std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0 &&
       timestamp <= feature_history_.front().timestamp()) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
@@ -277,13 +276,37 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
       velocity_z = perception_obstacle.velocity().z();
     }
   }
+  double velocity_heading = std::atan2(velocity_y, velocity_x);
+
+  if (FLAGS_enable_adjust_velocity_heading && IsOnLane()) {
+    double speed = std::hypot(velocity_x, velocity_y);
+    double theta = 0.0;
+    if (perception_obstacle.has_theta()) {
+      theta = perception_obstacle.theta();
+    }
+    double heading_diff = std::abs(velocity_heading - theta);
+    if (heading_diff > FLAGS_heading_diff_thred) {
+      if (history_size() == 0) {
+        velocity_x = speed * std::cos(theta);
+        velocity_y = speed * std::sin(theta);
+      } else {
+        double prev_x = mutable_feature(0)->position().x();
+        double prev_y = mutable_feature(0)->position().y();
+        double diff_x = feature->position().x() - prev_x;
+        double diff_y = feature->position().y() - prev_y;
+        velocity_heading = std::atan2(diff_y, diff_x);
+        velocity_x = speed * std::cos(velocity_heading);
+        velocity_y = speed * std::sin(velocity_heading);
+      }
+    }
+  }
 
   feature->mutable_velocity()->set_x(velocity_x);
   feature->mutable_velocity()->set_y(velocity_y);
   feature->mutable_velocity()->set_z(velocity_z);
 
   double speed = std::hypot(std::hypot(velocity_x, velocity_y), velocity_z);
-  double velocity_heading = std::atan2(velocity_y, velocity_x);
+  velocity_heading = std::atan2(velocity_y, velocity_x);
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
@@ -1074,6 +1097,7 @@ void Obstacle::SetMotionStatus() {
 }
 
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
+  std::lock_guard<std::mutex> lock(mutex_);
   feature_history_.push_front(std::move(*feature));
   ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
 }
