@@ -17,29 +17,13 @@
 ###############################################################################
 
 import requests
-import os.path
 import os
+import sys
 from ConfigParser import ConfigParser
 from modules.data.proto.task_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
 
-
 def update():
-    UPDATE_FILE = os.path.join(os.path.dirname(__file__), 'update.ini')
-    if not os.path.exists(UPDATE_FILE):
-        print "No update found!"
-        exit()
-        
-    config = ConfigParser()
-    config.read(UPDATE_FILE)
-    update_tag = config.get('Update', 'tag')
-    usr_name = os.environ['DOCKER_USER']
-    cmd = 'ssh ' + usr_name + '@localhost' + ' docker pull ' + update_tag
-    code = os.system(cmd)
-    if code != 0:
-        print "Update fail!"
-        exit()
-
     # setup server url
     ip = config.get('Host', 'ip')
     port = config.get('Host', 'port')
@@ -63,7 +47,7 @@ def update():
         "vin" : vin,
     }
 
-    r = requests.post(url, data=car_info)
+    r = requests.post(url, json=car_info)
     if r.status_code == 200:
         cmd = 'rm ' + UPDATE_FILE
         os.system(cmd)
