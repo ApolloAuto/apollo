@@ -30,8 +30,6 @@
 #include "Eigen/Geometry"
 #include "opencv2/opencv.hpp"
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-
 namespace apollo {
 namespace localization {
 namespace msf {
@@ -104,6 +102,49 @@ struct LocalizatonInfo {
 };
 
 /**
+ * @struct VisualMapParam
+ * @brief The data structure to store parameters of a map
+ */
+struct VisualMapParam {
+  VisualMapParam() {
+    map_node_size_x = 0;
+    map_node_size_y = 0;
+    map_min_x = 0.0;
+    map_min_y = 0.0;
+    map_max_x = 0.0;
+    map_max_y = 0.0;
+  }
+
+  ~VisualMapParam() {}
+
+  void set(const std::vector<float> &map_resolutions,
+           const unsigned int map_node_size_x,
+           const unsigned int map_node_size_y, const double map_min_x,
+           const double map_min_y, const double map_max_x,
+           const double map_max_y) {
+    this->map_resolutions = map_resolutions;
+    this->map_node_size_x = map_node_size_x;
+    this->map_node_size_y = map_node_size_y;
+    this->map_min_x = map_min_x;
+    this->map_min_y = map_min_y;
+    this->map_max_x = map_max_x;
+    this->map_max_y = map_max_y;
+  }
+
+  /**@brief The pixel resolutions in the map in meters. */
+  std::vector<float> map_resolutions;
+  /**@brief The map node size in pixels. */
+  unsigned int map_node_size_x;
+  /**@brief The map node size in pixels. */
+  unsigned int map_node_size_y;
+  /**@brief The minimum and maximum UTM range in the map. */
+  double map_min_x;
+  double map_min_y;
+  double map_max_x;
+  double map_max_y;
+};
+
+/**
  * @struct MapImageKey
  * @brief The key structure of a map image .
  */
@@ -146,7 +187,7 @@ class VisualizationEngine {
   ~VisualizationEngine();
 
  public:
-  bool Init(const std::string &map_folder, const BaseMapConfig &map_config,
+  bool Init(const std::string &map_folder, const VisualMapParam &map_param,
             const unsigned int resolution_id, const int zone_id,
             const Eigen::Affine3d &extrinsic,
             const unsigned int loc_info_num = 1);
@@ -223,7 +264,7 @@ class VisualizationEngine {
 
  private:
   std::string map_folder_;
-  BaseMapConfig map_config_;
+  VisualMapParam map_param_;
   unsigned int zone_id_;
   unsigned int resolution_id_;
 

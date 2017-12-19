@@ -24,6 +24,8 @@
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
+#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
 namespace localization {
@@ -105,9 +107,34 @@ void OnlineLocalVisualizer::Stop() {
 
 Status OnlineLocalVisualizer::Init() {
   InitParams();
-  bool success = VisualizationManager::GetInstance().Init(
-      visual_manager_params_.map_folder,
-      visual_manager_params_.lidar_extrinsic_file);
+
+  Eigen::Affine3d velodyne_extrinsic;
+  bool success =
+      velodyne::LoadExtrinsic(lidar_extrinsic_file_, &velodyne_extrinsic);
+  if (!success) {
+    std::cerr << "Load lidar extrinsic failed." << std::endl;
+    return Status(common::LOCALIZATION_ERROR, "load lidar extrinsic failed");
+  }
+  std::cout << "Load lidar extrinsic succeed." << std::endl;
+
+  BaseMapConfig map_config;
+  std::string config_file = map_folder_ + "/config.xml";
+  map_config.map_version_ = "lossy_map";
+  success = map_config.Load(config_file);
+  if (!success) {
+    std::cerr << "Load map config failed." << std::endl;
+    return Status(common::LOCALIZATION_ERROR, "load map config failed");
+  }
+  std::cout << "Load map config succeed." << std::endl;
+
+  VisualMapParam map_param;
+  map_param.set(map_config.map_resolutions_, map_config.map_node_size_x_,
+                map_config.map_node_size_y_, map_config.map_range_.GetMinX(),
+                map_config.map_range_.GetMinY(),
+                map_config.map_range_.GetMaxX(),
+                map_config.map_range_.GetMaxY());
+  success = VisualizationManager::GetInstance().Init(
+      map_folder_, velodyne_extrinsic, map_param);
   if (!success) {
     return Status(common::LOCALIZATION_ERROR, "visualization init failed");
   }
@@ -116,9 +143,9 @@ Status OnlineLocalVisualizer::Init() {
 }
 
 void OnlineLocalVisualizer::InitParams() {
-  visual_manager_params_.map_folder =
+  map_folder_ =
       FLAGS_map_dir + "/" + FLAGS_local_map_name;
-  visual_manager_params_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
+  lidar_extrinsic_file_ = FLAGS_lidar_extrinsics_file;
 }
 
 void OnlineLocalVisualizer::OnPointCloud(
