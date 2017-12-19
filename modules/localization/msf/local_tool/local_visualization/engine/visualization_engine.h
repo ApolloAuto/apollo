@@ -106,17 +106,6 @@ struct LocalizatonInfo {
  * @brief The data structure to store parameters of a map
  */
 struct VisualMapParam {
-  VisualMapParam() {
-    map_node_size_x = 0;
-    map_node_size_y = 0;
-    map_min_x = 0.0;
-    map_min_y = 0.0;
-    map_max_x = 0.0;
-    map_max_y = 0.0;
-  }
-
-  ~VisualMapParam() {}
-
   void set(const std::vector<float> &map_resolutions,
            const unsigned int map_node_size_x,
            const unsigned int map_node_size_y, const double map_min_x,
@@ -134,14 +123,14 @@ struct VisualMapParam {
   /**@brief The pixel resolutions in the map in meters. */
   std::vector<float> map_resolutions;
   /**@brief The map node size in pixels. */
-  unsigned int map_node_size_x;
+  unsigned int map_node_size_x = 0;
   /**@brief The map node size in pixels. */
-  unsigned int map_node_size_y;
+  unsigned int map_node_size_y = 0;
   /**@brief The minimum and maximum UTM range in the map. */
-  double map_min_x;
-  double map_min_y;
-  double map_max_x;
-  double map_max_y;
+  double map_min_x = 0;
+  double map_min_y = 0;
+  double map_max_x = 0;
+  double map_max_y = 0;
 };
 
 /**
