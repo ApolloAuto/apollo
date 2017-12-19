@@ -1,0 +1,3 @@
+# Hardware FAQ
+
+Some content.
