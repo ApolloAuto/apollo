@@ -149,7 +149,10 @@ class ReferenceLineProvider {
   std::mutex vehicle_state_mutex_;
   common::VehicleState vehicle_state_;
 
+  std::mutex routing_mutex_;
+  routing::RoutingResponse routing_;
   bool has_routing_ = false;
+
   struct SegmentHistory {
     double min_l = 0.0;
     double accumulate_s = 0.0;
