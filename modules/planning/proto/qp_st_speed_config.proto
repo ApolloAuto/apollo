@@ -16,6 +16,7 @@ message QpSplineConfig {
   optional double regularization_weight = 9 [ default = 0.1 ];
   optional double follow_drag_distance = 10;
   optional double dp_st_reference_weight = 11;
+  optional double init_jerk_kernel_weight = 12;
 }
 
 message QpPiecewiseConfig {

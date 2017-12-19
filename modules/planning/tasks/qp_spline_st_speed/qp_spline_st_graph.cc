@@ -306,11 +306,13 @@ Status QpSplineStGraph::AddKernel(
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
   }
 
+  // init point jerk continuous kernel
   (*spline_kernel->mutable_kernel_matrix())(2, 2) +=
-      2.0 * 4.0 * qp_st_speed_config_.qp_spline_config().jerk_kernel_weight();
+      2.0 * 4.0 *
+      qp_st_speed_config_.qp_spline_config().init_jerk_kernel_weight();
   (*spline_kernel->mutable_offset())(2, 0) +=
       -4.0 * init_point_.a() *
-      qp_st_speed_config_.qp_spline_config().jerk_kernel_weight();
+      qp_st_speed_config_.qp_spline_config().init_jerk_kernel_weight();
 
   spline_kernel->AddRegularization(
       qp_st_speed_config_.qp_spline_config().regularization_weight());
@@ -549,7 +551,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     }
   }
 
-  const double kTimeBuffer = 2.0;
+  const double kTimeBuffer = 1.0;
   const double kSpeedBuffer = 0.1;
   for (uint32_t k = 0; k < t_evaluated_.size() && t_evaluated_[k] < kTimeBuffer;
        ++k) {
