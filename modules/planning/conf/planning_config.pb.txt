@@ -114,6 +114,7 @@ em_planner_config {
             regularization_weight: 0.1
             follow_drag_distance: 17.0
             dp_st_reference_weight: 0.0
+            init_jerk_kernel_weight: 5e4
         }
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
