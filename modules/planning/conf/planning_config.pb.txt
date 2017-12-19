@@ -134,7 +134,7 @@ em_planner_config {
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
-            num_points_to_avg_kappa: 4
+            num_points_to_avg_kappa: 2
         }
     }
 }
