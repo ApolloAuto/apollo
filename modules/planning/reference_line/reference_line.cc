@@ -406,6 +406,24 @@ bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
   return true;
 }
 
+// return a rough approximated SLBoundary using box length. It is guaranteed to
+// be larger than the accurate SL boundary.
+bool ReferenceLine::GetApproximateSLBoundary(
+    const common::math::Box2d& box, SLBoundary* const sl_boundary) const {
+  SLPoint center_sl_point;
+  if (!XYToSL(box.center(), &center_sl_point)) {
+    AERROR << "failed to get projection for point: "
+           << box.center().DebugString() << " on reference line.";
+    return false;
+  }
+
+  sl_boundary->set_start_s(center_sl_point.s() - box.length() / 2.0);
+  sl_boundary->set_end_s(center_sl_point.s() + box.length() / 2.0);
+  sl_boundary->set_start_l(center_sl_point.l() - box.length() / 2.0);
+  sl_boundary->set_end_l(center_sl_point.l() + box.length() / 2.0);
+  return true;
+}
+
 bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
                                   SLBoundary* const sl_boundary) const {
   double start_s(std::numeric_limits<double>::max());
