@@ -607,7 +607,6 @@ void HmObjectTracker::CollectTrackedResults(
     obj->track_id = tracks[i]->idx_;
     obj->tracking_time = tracks[i]->period_;
     obj->type = result_obj->type;
-    obj->score_type = SCORE_CNN;
     obj->center = result_obj->center.cast<double>() - global_to_local_offset_;
     obj->anchor_point =
         result_obj->anchor_point.cast<double>() - global_to_local_offset_;

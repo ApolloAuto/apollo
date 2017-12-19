@@ -45,8 +45,9 @@ message PerceptionObstacle {
 
   optional double confidence = 13 [default = 1.0];
   enum ConfidenceType {
-      CONFIDENCE_CNN = 0;
-      CONFIDENCE_RADAR = 1;
+      CONFIDENCE_UNKNOWN = 0;
+      CONFIDENCE_CNN = 1;
+      CONFIDENCE_RADAR = 2;
   };
   optional ConfidenceType confidence_type = 14 [default = CONFIDENCE_CNN];
 }
