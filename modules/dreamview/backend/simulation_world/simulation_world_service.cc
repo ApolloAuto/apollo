@@ -302,7 +302,7 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : map_service_(map_service),
-      monitor_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
+      monitor_logger_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
   RegisterMessageCallbacks();
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
@@ -427,7 +427,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   // Copy over the previous messages until there is no more history or
   // the max number of total messages has been hit.
-  auto history = world_.monitor().item();
+  auto history = world_.monitor_msg().item();
   remove_size = history.size() + monitor_msg.item_size() -
                 SimulationWorldService::kMaxMonitorItems;
   if (remove_size < 0) {
@@ -439,8 +439,8 @@ void SimulationWorldService::UpdateSimulationWorld(
   // Refresh the monitor message list in simulation_world.
   ::google::protobuf::RepeatedPtrField<MonitorMessageItem> items(
       updated.begin(), updated.end());
-  world_.mutable_monitor()->mutable_item()->Swap(&items);
-  world_.mutable_monitor()->mutable_header()->set_timestamp_sec(
+  world_.mutable_monitor_msg()->mutable_item()->Swap(&items);
+  world_.mutable_monitor_msg()->mutable_header()->set_timestamp_sec(
       ToSecond(Clock::Now()));
 }
 

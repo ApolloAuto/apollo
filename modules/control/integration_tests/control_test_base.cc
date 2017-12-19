@@ -21,7 +21,6 @@
 
 #include "google/protobuf/text_format.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/monitor/proto/monitor.pb.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/control/integration_tests/control_test_base.h"

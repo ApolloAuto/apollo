@@ -15,21 +15,21 @@
  *****************************************************************************/
 
 /**
- * @file monitor_buffer.h
- * @brief The class of MonitorBuffer
+ * @file monitor_log_buffer.h
+ * @brief The class of MonitorLogBuffer
  */
 
-#ifndef MODULES_MONITOR_MONITOR_BUFFER_H_
-#define MODULES_MONITOR_MONITOR_BUFFER_H_
+#ifndef MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
+#define MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
 
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include "glog/logging.h"
-#include "gtest/gtest_prod.h"
 
-#include "modules/common/monitor/proto/monitor.pb.h"
+#include "gtest/gtest_prod.h"
+#include "modules/common/monitor_log/monitor_logger.h"
+#include "modules/common/monitor_log/proto/monitor_log.pb.h"
 
 /**
  * @namespace apollo::common::monitor
@@ -39,36 +39,32 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
-using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
-
-class Monitor;
-
-#define REG_MSG_TYPE(TYPE)                            \
-  MonitorBuffer &TYPE(const std::string &msg) {       \
-    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg); \
-    return *this;                                     \
-  }                                                   \
-  MonitorBuffer &TYPE() {                             \
-    level_ = MonitorMessageItem::TYPE;                \
-    return *this;                                     \
+#define REG_MSG_TYPE(TYPE)                             \
+    MonitorLogBuffer &TYPE(const std::string &msg) {   \
+    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg);  \
+    return *this;                                      \
+  }                                                    \
+  MonitorLogBuffer &TYPE() {                           \
+    level_ = MonitorMessageItem::TYPE;                 \
+    return *this;                                      \
   }
 
 /**
- * class MonitorBuffer
+ * class MonitorLogBuffer
  *
  * @brief This class help collect MonitorMessage pb to monitor topic.
  * The messages can be published automatically when the MonitorBuffer object's
  * destructor is called, or can be published by calling function Publish().
  */
-class MonitorBuffer {
+class MonitorLogBuffer {
  public:
   /**
    * @brief The constructor of MonitorBuffer.
    * @param a Monitor instance pointer;
    */
-  explicit MonitorBuffer(Monitor *monitor);
+  explicit MonitorLogBuffer(MonitorLogger *monitor);
 
-  virtual ~MonitorBuffer();
+  virtual ~MonitorLogBuffer();
 
   /**
    * @brief print a log trace for the last recorded message.
@@ -107,7 +103,7 @@ class MonitorBuffer {
    * @brief overload operator << to help join messages
    */
   template <typename T>
-  MonitorBuffer &operator<<(const T &msg) {
+  MonitorLogBuffer &operator<<(const T &msg) {
     if (monitor_msg_items_.empty() ||
         monitor_msg_items_.back().first != level_) {
       AddMonitorMsgItem(level_, std::to_string(msg));
@@ -120,12 +116,12 @@ class MonitorBuffer {
   /**
    * @brief overload operator << to help join string messages
    */
-  MonitorBuffer &operator<<(const std::string &msg);
+  MonitorLogBuffer &operator<<(const std::string &msg);
 
   /**
    * @brief overload operator << to help join char messages
    */
-  MonitorBuffer &operator<<(const char *msg);
+  MonitorLogBuffer &operator<<(const char *msg);
 
   /**
    * @brief publish the monitor messages
@@ -133,7 +129,7 @@ class MonitorBuffer {
   void Publish();
 
  private:
-  Monitor *monitor_ = nullptr;
+  MonitorLogger *logger_ = nullptr;
   MonitorMessageItem::LogLevel level_ = MonitorMessageItem::INFO;
   std::vector<MessageItem> monitor_msg_items_;
 
@@ -146,4 +142,4 @@ class MonitorBuffer {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_MONITOR_BUFFER_H_
+#endif  // MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
