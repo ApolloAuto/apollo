@@ -99,6 +99,7 @@ DECLARE_double(st_max_t);
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
+DECLARE_double(longitudinal_ignore_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
