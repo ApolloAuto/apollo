@@ -87,7 +87,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   monitor.add_item()->set_msg("I am the latest message.");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
+  auto* world_monitor = sim_world_service_->world_.mutable_monitor_msg();
   world_monitor->mutable_header()->set_timestamp_sec(1990);
   world_monitor->add_item()->set_msg("I am the previous message.");
 
@@ -104,7 +104,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
   monitor.add_item()->set_msg("I am message -1");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
+  auto* world_monitor = sim_world_service_->world_.mutable_monitor_msg();
   world_monitor->mutable_header()->set_timestamp_sec(1990);
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
     world_monitor->add_item()->set_msg(StrCat("I am message ", i));
@@ -133,7 +133,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   EXPECT_EQ(StrCat("I am message ", large_size - 1),
             monitor.item(large_size - 1).msg());
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
+  auto* world_monitor = sim_world_service_->world_.mutable_monitor_msg();
   world_monitor->mutable_header()->set_timestamp_sec(1990);
 
   sim_world_service_->UpdateSimulationWorld(monitor);

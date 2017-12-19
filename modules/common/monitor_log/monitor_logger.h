@@ -15,21 +15,18 @@
  *****************************************************************************/
 
 /**
- * @file monitor.h
- * @brief The class of Monitor
+ * @file monitor_logger.h
+ * @brief The class of MonitorLogger
  */
 
-#ifndef MODULES_MONITOR_MONITOR_H_
-#define MODULES_MONITOR_MONITOR_H_
+#ifndef MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
+#define MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
 
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include "glog/logging.h"
 
-#include "modules/common/monitor/monitor_buffer.h"
-#include "modules/common/monitor/proto/monitor.pb.h"
+#include "modules/common/monitor_log/proto/monitor_log.pb.h"
 
 /**
  * @namespace apollo::common::monitor
@@ -39,23 +36,26 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
+using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
+
 /**
- * class Monitor
+ * class MonitorLogger
  *
  * @brief This class help collect and publish MonitorMessage pb to monitor
  * topic. A module who wants to publish message can use macro
  * `MONITOR(log_level, log_msg)` to record messages, and call
  * Publish to broadcast the message to other modules.
  */
-class Monitor {
+class MonitorLogger {
  public:
   /**
    * @brief Construct the monitor with the source of the monitor messages. The
    * source is usually the module name who publish the monitor messages.
    * @param source the source of the monitor messages.
    */
-  explicit Monitor(const MonitorMessageItem::MessageSource &source)
+  explicit MonitorLogger(const MonitorMessageItem::MessageSource &source)
       : source_(source) {}
+  virtual ~MonitorLogger() = default;
 
   /**
    * @brief Publish the messages.
@@ -73,4 +73,4 @@ class Monitor {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_MONITOR_H_
+#endif  // MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
