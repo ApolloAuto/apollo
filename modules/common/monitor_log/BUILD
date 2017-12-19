@@ -3,46 +3,45 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "monitor",
+    name = "monitor_log",
     srcs = [
-        "monitor.cc",
-        "monitor_buffer.cc",
+        "monitor_logger.cc",
+        "monitor_log_buffer.cc",
     ],
     hdrs = [
-        "monitor.h",
-        "monitor_buffer.h",
+        "monitor_logger.h",
+        "monitor_log_buffer.h",
     ],
     deps = [
-        "//modules/common",
+        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor/proto:monitor_proto",
+        "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
-        "@glog//:glog",
         "@gtest//:gtest",
     ],
 )
 
 cc_test(
-    name = "monitor_buffer_test",
+    name = "monitor_log_buffer_test",
     size = "small",
     srcs = [
-        "monitor_buffer_test.cc",
+        "monitor_log_buffer_test.cc",
     ],
     deps = [
-        ":monitor",
+        ":monitor_log",
         "@gtest//:main",
     ],
 )
 
 cc_test(
-    name = "monitor_test",
+    name = "monitor_logger_test",
     size = "small",
     srcs = [
-        "monitor_test.cc",
+        "monitor_logger_test.cc",
     ],
     deps = [
-        ":monitor",
+        ":monitor_log",
         "@gtest//:main",
     ],
 )

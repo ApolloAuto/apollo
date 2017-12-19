@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "gtest/gtest_prod.h"
+
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -40,7 +41,7 @@
 
 #include "include/localization_integ.h"
 #include "modules/common/log.h"
-#include "modules/common/monitor/monitor.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
 
@@ -92,7 +93,7 @@ class MSFLocalization : public LocalizationBase {
                                    double *uncertainty_z);
 
  private:
-  apollo::common::monitor::Monitor monitor_;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
   LocalizationInteg localization_integ_;
   LocalizationIntegParam localizaiton_param_;
   tf2_ros::TransformBroadcaster *tf2_broadcaster_;

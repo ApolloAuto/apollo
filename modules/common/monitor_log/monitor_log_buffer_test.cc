@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/monitor/monitor_buffer.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 
-#include <string>
 #include "gtest/gtest.h"
-#include "modules/common/monitor/monitor.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace common {
@@ -26,9 +26,9 @@ namespace monitor {
 
 class MonitorBufferTest : public ::testing::Test {
  protected:
-  void SetUp() override { buffer_ = new MonitorBuffer(nullptr); }
+  void SetUp() override { buffer_ = new MonitorLogBuffer(nullptr); }
   void TearDown() override { delete buffer_; }
-  MonitorBuffer *buffer_ = nullptr;
+  MonitorLogBuffer *buffer_ = nullptr;
 };
 
 TEST_F(MonitorBufferTest, PrintLog) {

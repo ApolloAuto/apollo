@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/common/monitor/monitor.h"
+#include "modules/common/monitor_log/monitor_logger.h"
+
 #include <string>
 #include <vector>
+
 #include "gtest/gtest.h"
-#include "modules/common/adapters/adapter_manager.h"
 
 namespace apollo {
 namespace common {
 namespace monitor {
 
-class MonitorTest : public Monitor {
+class MonitorTest : public MonitorLogger {
  public:
   explicit MonitorTest(const MonitorMessageItem::MessageSource &source)
-      : Monitor(source) {}
+      : MonitorLogger(source) {}
 
  private:
   void DoPublish(MonitorMessage *) const override {}
