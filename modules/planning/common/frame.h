@@ -50,6 +50,7 @@ class Frame {
  public:
   explicit Frame(uint32_t sequence_num,
                  const common::TrajectoryPoint &planning_start_point,
+                 const double start_time,
                  const common::VehicleState &vehicle_state);
 
   void SetPrediction(const prediction::PredictionObstacles &prediction);
@@ -80,6 +81,10 @@ class Frame {
 
   const common::VehicleState &vehicle_state() const;
 
+  static void AlignPredictionTime(
+      const double planning_start_time,
+      prediction::PredictionObstacles *prediction_obstacles);
+
  private:
   /**
    * @brief create obstacles from prediction input.
@@ -90,10 +95,9 @@ class Frame {
 
   bool InitReferenceLineInfo();
 
-  void AlignPredictionTime(const double trajectory_header_time);
-
   /**
-   * Find an obstacle that collides with ADC (Autonomous Driving Car) if such
+   * Find an obstacle that collides with ADC (Autonomous Driving Car) if
+   * such
    * obstacle exists.
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
@@ -112,11 +116,13 @@ class Frame {
   uint32_t sequence_num_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;
+  const double start_time_;
   common::VehicleState vehicle_state_;
   std::list<ReferenceLineInfo> reference_line_info_;
 
   /**
-   * the reference line info that the vehicle finally choose to drive on.
+   * the reference line info that the vehicle finally choose to drive
+   *on.
    **/
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
