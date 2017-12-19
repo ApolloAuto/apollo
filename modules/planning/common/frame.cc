@@ -58,21 +58,16 @@ Frame::Frame(uint32_t sequence_num,
     : sequence_num_(sequence_num),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
-      vehicle_state_(vehicle_state) {}
+      vehicle_state_(vehicle_state) {
+  if (FLAGS_enable_lag_prediction) {
+    lag_predictor_.reset(
+        new LagPrediction(FLAGS_lag_prediction_min_appear_num,
+                          FLAGS_lag_prediction_max_disappear_num));
+  }
+}
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;
-}
-
-void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
-  prediction_ = prediction;
-}
-
-void Frame::CreatePredictionObstacles(
-    const prediction::PredictionObstacles &prediction) {
-  for (auto &ptr : Obstacle::CreateObstacles(prediction)) {
-    AddObstacle(*ptr);
-  }
 }
 
 const common::VehicleState &Frame::vehicle_state() const {
@@ -254,11 +249,21 @@ Status Frame::Init() {
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
 
-  if (FLAGS_align_prediction_time) {
-    AlignPredictionTime(start_time_, &prediction_);
-  }
-  if (FLAGS_enable_prediction) {
-    CreatePredictionObstacles(prediction_);
+  // prediction
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction() &&
+      !AdapterManager::GetPrediction()->Empty()) {
+    if (FLAGS_enable_lag_prediction && lag_predictor_) {
+      lag_predictor_->GetLaggedPrediction(&prediction_);
+    } else {
+      prediction_.CopyFrom(
+          AdapterManager::GetPrediction()->GetLatestObserved());
+    }
+    if (FLAGS_align_prediction_time) {
+      AlignPredictionTime(vehicle_state_.timestamp(), &prediction_);
+    }
+    for (auto &ptr : Obstacle::CreateObstacles(prediction_)) {
+      AddObstacle(*ptr);
+    }
   }
   const auto *collision_obstacle = FindCollisionObstacle();
   if (collision_obstacle) {
