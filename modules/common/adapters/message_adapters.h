@@ -21,7 +21,7 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
-#include "modules/common/monitor/proto/monitor.pb.h"
+#include "modules/common/monitor_log/proto/monitor_log.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"

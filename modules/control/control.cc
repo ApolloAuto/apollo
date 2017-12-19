@@ -51,7 +51,7 @@ Status Control::Init() {
 
   AdapterManager::Init(FLAGS_control_adapter_config_filename);
 
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // set controller
   if (!controller_agent_.Init(&control_conf_).ok()) {
@@ -99,7 +99,7 @@ Status Control::Start() {
 
   AINFO << "Control init done!";
 
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("control started");
 
   return Status::OK();
@@ -275,7 +275,7 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_localization_miss_num * control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
            << localization_diff << "s";
-    common::monitor::MonitorBuffer buffer(&monitor_);
+    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
@@ -285,7 +285,7 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_chassis_miss_num * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
            << "s";
-    common::monitor::MonitorBuffer buffer(&monitor_);
+    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
@@ -296,7 +296,7 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_planning_miss_num * control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
            << trajectory_diff << "s";
-    common::monitor::MonitorBuffer buffer(&monitor_);
+    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }
