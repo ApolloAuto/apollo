@@ -23,7 +23,7 @@
 DECLARE_string(canbus_node_name);
 DECLARE_string(canbus_module_name);
 
-DECLARE_string(adapter_config_filename);
+DECLARE_string(canbus_adapter_config_filename);
 
 // data file
 DECLARE_string(canbus_conf_file);
@@ -34,4 +34,7 @@ DECLARE_int64(min_cmd_interval);
 
 // chassis_detail message publish
 DECLARE_bool(enable_chassis_detail_pub);
+
+// canbus test files
+DECLARE_string(canbus_test_file);
 #endif
