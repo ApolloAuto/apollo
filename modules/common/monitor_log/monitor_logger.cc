@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/common/monitor_log/monitor_logger.h"
 
-#include "modules/common/monitor/monitor.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace common {
 namespace monitor {
 
 using apollo::common::adapter::AdapterManager;
-using apollo::common::time::Clock;
 
-void Monitor::Publish(const std::vector<MessageItem> &messages) const {
+void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
   // compose a monitor message
   if (messages.empty()) {
     return;
@@ -43,7 +41,7 @@ void Monitor::Publish(const std::vector<MessageItem> &messages) const {
   DoPublish(&monitor_msg);
 }
 
-void Monitor::DoPublish(MonitorMessage *message) const {
+void MonitorLogger::DoPublish(MonitorMessage *message) const {
   DCHECK(AdapterManager::Initialized())
       << "AdapterManager must be initialized before using monitor.";
   AdapterManager::FillMonitorHeader("monitor", message);
