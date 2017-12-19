@@ -42,12 +42,10 @@ function update() {
     rm -rf "$HOME/.cache/apollo_release"
   fi
   tar xzf /home/$DOCKER_USER/.cache/apollo_release.tar.gz -C /home/$DOCKER_USER/.cache
-  MACHINE_ARCH=$(uname -m)
-  TIME=$(date  +%Y%m%d_%H%M)
-  NEW_TAG="apolloauto/apollo:release-${MACHINE_ARCH}-${TIME}"
+  NEW_TAG="${UPDATE_TAG}-local"
 
   ssh $DOCKER_USER@localhost  bash /home/$DOCKER_USER/.cache/ota.sh setup $NEW_TAG
-  python ${APOLLO_ROOT}/modules/tools/ota/update_client.py
+  python ${APOLLO_ROOT}/modules/tools/ota/update_client.py ${UPDATE_TAG}
 }
 
 function clean() {
