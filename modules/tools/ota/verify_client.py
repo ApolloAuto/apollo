@@ -1,4 +1,4 @@
-"""OTA verify client"""
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+"""OTA verify client"""
 
 import requests
 import os
