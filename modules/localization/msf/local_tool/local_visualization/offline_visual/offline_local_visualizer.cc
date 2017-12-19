@@ -15,12 +15,9 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
-
 #include <map>
 #include <vector>
-
 #include "boost/filesystem.hpp"
-
 #include "modules/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
@@ -114,7 +111,13 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
   }
   AINFO << "Get zone id succeed.";
 
-  success = visual_engine_.Init(map_folder_, map_config_, resolution_id_,
+  VisualMapParam map_param;
+  map_param.set(map_config_.map_resolutions_, map_config_.map_node_size_x_,
+                map_config_.map_node_size_y_, map_config_.map_range_.GetMinX(),
+                map_config_.map_range_.GetMinY(),
+                map_config_.map_range_.GetMaxX(),
+                map_config_.map_range_.GetMaxY());
+  success = visual_engine_.Init(map_folder_, map_param, resolution_id_,
                                 zone_id_, velodyne_extrinsic_, LOC_INFO_NUM);
   if (!success) {
     AERROR << "Visualization engine init failed.";
@@ -319,8 +322,8 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
     double ref_timestamp = ref_timestamps[i];
     // unsigned int ref_frame_id = i;
     // unsigned int matched_index = 0;
-    while (in_timestamps.at(index) < ref_timestamp &&
-           index < in_timestamps.size()) {
+    while (index < in_timestamps.size() &&
+           in_timestamps.at(index) < ref_timestamp) {
       ++index;
     }
 

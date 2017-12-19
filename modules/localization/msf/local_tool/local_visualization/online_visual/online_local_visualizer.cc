@@ -24,6 +24,8 @@
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
+#include "modules/localization/msf/common/io/velodyne_utility.h"
+#include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
 namespace apollo {
 namespace localization {
@@ -105,9 +107,34 @@ void OnlineLocalVisualizer::Stop() {
 
 Status OnlineLocalVisualizer::Init() {
   InitParams();
-  bool success = VisualizationManager::GetInstance().Init(
-      visual_manager_params_.map_folder,
-      visual_manager_params_.lidar_extrinsic_file);
+
+  Eigen::Affine3d velodyne_extrinsic;
+  bool success =
+      velodyne::LoadExtrinsic(lidar_extrinsic_file_, &velodyne_extrinsic);
+  if (!success) {
+    std::cerr << "Load lidar extrinsic failed." << std::endl;
+    return Status(common::LOCALIZATION_ERROR, "load lidar extrinsic failed");
+  }
+  std::cout << "Load lidar extrinsic succeed." << std::endl;
+
+  BaseMapConfig map_config;
+  std::string config_file = map_folder_ + "/config.xml";
+  map_config.map_version_ = "lossy_map";
+  success = map_config.Load(config_file);
+  if (!success) {
+    std::cerr << "Load map config failed." << std::endl;
+    return Status(common::LOCALIZATION_ERROR, "load map config failed");
+  }
+  std::cout << "Load map config succeed." << std::endl;
+
+  VisualMapParam map_param;
+  map_param.set(map_config.map_resolutions_, map_config.map_node_size_x_,
+                map_config.map_node_size_y_, map_config.map_range_.GetMinX(),
+                map_config.map_range_.GetMinY(),
+                map_config.map_range_.GetMaxX(),
+                map_config.map_range_.GetMaxY());
+  success = VisualizationManager::GetInstance().Init(
+      map_folder_, velodyne_extrinsic, map_param);
   if (!success) {
     return Status(common::LOCALIZATION_ERROR, "visualization init failed");
   }
@@ -116,28 +143,14 @@ Status OnlineLocalVisualizer::Init() {
 }
 
 void OnlineLocalVisualizer::InitParams() {
-  visual_manager_params_.map_folder =
-      FLAGS_map_dir + "/" + FLAGS_local_map_name;
-  visual_manager_params_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
+  map_folder_ = FLAGS_map_dir + "/" + FLAGS_local_map_name;
+  lidar_extrinsic_file_ = FLAGS_lidar_extrinsics_file;
 }
 
 void OnlineLocalVisualizer::OnPointCloud(
     const sensor_msgs::PointCloud2 &message) {
   LidarVisFrame lidar_vis_frame;
   lidar_vis_frame.timestamp = message.header.stamp.toSec();
-
-  // std::cout << "lidar_vis_frame.timestamp: "<< std::setprecision(15) <<
-  // lidar_vis_frame.timestamp << std::endl; static boost::posix_time::ptime
-  // cloud_time =
-  //     boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::ptime cloud_time2 =
-  // boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::time_duration during_time = cloud_time2 - cloud_time;
-  // if (during_time.total_milliseconds() > 500) {
-  //   std::cout << "cloud time: " << during_time.total_milliseconds() <<
-  //   std::endl;
-  // }
-  // cloud_time = boost::posix_time::microsec_clock::local_time();
 
   std::vector<unsigned char> intensities;
   ParsePointCloudMessage(message, &lidar_vis_frame.pt3ds, &intensities);
@@ -163,20 +176,11 @@ void OnlineLocalVisualizer::OnLidarLocalization(
   lidar_loc_msg.qz = message.pose().orientation().qz();
   lidar_loc_msg.qw = message.pose().orientation().qw();
 
-  lidar_loc_msg.std_x = message.uncertainty().position_std_dev().x();
-  lidar_loc_msg.std_y = message.uncertainty().position_std_dev().y();
-  lidar_loc_msg.std_z = message.uncertainty().position_std_dev().z();
-
-  // std::cout << "lidar_loc_msg.timestamp: " << std::setprecision(15) <<
-  // lidar_loc_msg.timestamp << std::endl;
-
-  // static boost::posix_time::ptime cloud_time =
-  //     boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::ptime cloud_time2 =
-  // boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::time_duration during_time = cloud_time2 - cloud_time;
-  // std::cout << "lidar_loc_msg time: " << during_time.total_milliseconds() <<
-  // std::endl; cloud_time = boost::posix_time::microsec_clock::local_time();
+  if (message.has_uncertainty()) {
+    lidar_loc_msg.std_x = message.uncertainty().position_std_dev().x();
+    lidar_loc_msg.std_y = message.uncertainty().position_std_dev().y();
+    lidar_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  }
 
   VisualizationManager::GetInstance().AddLidarLocMessage(lidar_loc_msg);
 }
@@ -195,9 +199,11 @@ void OnlineLocalVisualizer::OnGNSSLocalization(
   gnss_loc_msg.qz = message.pose().orientation().qz();
   gnss_loc_msg.qw = message.pose().orientation().qw();
 
-  gnss_loc_msg.std_x = message.uncertainty().position_std_dev().x();
-  gnss_loc_msg.std_y = message.uncertainty().position_std_dev().y();
-  gnss_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  if (message.has_uncertainty()) {
+    gnss_loc_msg.std_x = message.uncertainty().position_std_dev().x();
+    gnss_loc_msg.std_y = message.uncertainty().position_std_dev().y();
+    gnss_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  }
 
   VisualizationManager::GetInstance().AddGNSSLocMessage(gnss_loc_msg);
 }
@@ -216,9 +222,11 @@ void OnlineLocalVisualizer::OnFusionLocalization(
   fusion_loc_msg.qz = message.pose().orientation().qz();
   fusion_loc_msg.qw = message.pose().orientation().qw();
 
-  fusion_loc_msg.std_x = message.uncertainty().position_std_dev().x();
-  fusion_loc_msg.std_y = message.uncertainty().position_std_dev().y();
-  fusion_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  if (message.has_uncertainty()) {
+    fusion_loc_msg.std_x = message.uncertainty().position_std_dev().x();
+    fusion_loc_msg.std_y = message.uncertainty().position_std_dev().y();
+    fusion_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  }
 
   VisualizationManager::GetInstance().AddFusionLocMessage(fusion_loc_msg);
 }
