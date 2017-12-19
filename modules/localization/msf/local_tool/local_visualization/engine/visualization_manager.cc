@@ -288,7 +288,7 @@ bool VisualizationManager::Init(const std::string &map_folder,
   std::cout << "Get zone id." << std::endl;
   unsigned int resolution_id = 0;
   int zone_id = 0;
-  
+
   bool success = GetZoneIdFromMapFolder(map_folder, resolution_id, &zone_id);
   if (!success) {
     std::cerr << "Get zone id failed." << std::endl;
