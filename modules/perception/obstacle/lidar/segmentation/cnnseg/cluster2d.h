@@ -264,6 +264,7 @@ class Cluster2D {
       apollo::perception::ObjectPtr out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
+      out_obj->score_type = SCORE_CNN;
       out_obj->type = GetObjectType(obs->meta_type);
       out_obj->type_probs = GetObjectTypeProbs(obs->meta_type_probs);
       objects->push_back(out_obj);
