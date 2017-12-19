@@ -171,7 +171,10 @@ DEFINE_double(static_obstacle_speed_threshold, 1.0,
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
-DEFINE_double(lateral_ignore_buffer, 2.0,
+DEFINE_double(longitudinal_ignore_buffer, 10.0,
+              "If an obstacle's longitudinal distance is further away "
+              "than this distance, ignore it");
+DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
 DEFINE_double(max_stop_distance_obstacle, 10.0,
