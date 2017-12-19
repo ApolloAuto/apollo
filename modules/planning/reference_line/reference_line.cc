@@ -409,18 +409,41 @@ bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
 // return a rough approximated SLBoundary using box length. It is guaranteed to
 // be larger than the accurate SL boundary.
 bool ReferenceLine::GetApproximateSLBoundary(
-    const common::math::Box2d& box, SLBoundary* const sl_boundary) const {
-  SLPoint center_sl_point;
-  if (!XYToSL(box.center(), &center_sl_point)) {
-    AERROR << "failed to get projection for point: "
-           << box.center().DebugString() << " on reference line.";
+    const common::math::Box2d& box, const double start_s, const double end_s,
+    SLBoundary* const sl_boundary) const {
+  double s = 0.0;
+  double l = 0.0;
+  double distance = 0.0;
+  if (!map_path_.GetProjectionWithHueristicParams(box.center(), start_s, end_s,
+                                                  &s, &l, &distance)) {
+    AERROR << "Can't get projection point from path.";
     return false;
   }
 
-  sl_boundary->set_start_s(center_sl_point.s() - box.length() / 2.0);
-  sl_boundary->set_end_s(center_sl_point.s() + box.length() / 2.0);
-  sl_boundary->set_start_l(center_sl_point.l() - box.length() / 2.0);
-  sl_boundary->set_end_l(center_sl_point.l() + box.length() / 2.0);
+  auto projected_point = map_path_.GetSmoothPoint(s);
+  auto rotated_box = box;
+  rotated_box.RotateFromCenter(projected_point.heading());
+
+  std::vector<common::math::Vec2d> corners;
+  rotated_box.GetAllCorners(&corners);
+
+  double min_s(std::numeric_limits<double>::max());
+  double max_s(std::numeric_limits<double>::lowest());
+  double min_l(std::numeric_limits<double>::max());
+  double max_l(std::numeric_limits<double>::lowest());
+
+  for (const auto& point : corners) {
+    // x <--> s, y <--> l
+    // because the box is rotated to align the reference line
+    min_s = std::fmin(min_s, point.x());
+    max_s = std::fmax(max_s, point.x());
+    min_l = std::fmin(min_l, point.y());
+    max_l = std::fmax(max_l, point.y());
+  }
+  sl_boundary->set_start_s(min_s);
+  sl_boundary->set_end_s(max_s);
+  sl_boundary->set_start_l(min_l);
+  sl_boundary->set_end_l(max_l);
   return true;
 }
 

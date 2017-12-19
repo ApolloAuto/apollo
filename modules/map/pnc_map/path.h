@@ -201,6 +201,11 @@ class Path {
                        double* lateral) const;
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
                        double* lateral, double* distance) const;
+  bool GetProjectionWithHueristicParams(const common::math::Vec2d& point,
+                                        const double hueristic_start_s,
+                                        const double hueristic_end_s,
+                                        double* accumulate_s, double* lateral,
+                                        double* min_distance) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
