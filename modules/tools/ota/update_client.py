@@ -43,14 +43,12 @@ def update():
     vin = vehicle_info.license.vin
     car_info = {
         "car_type" : brand + "." + model,
-        "tag" : update_tag,
+        "tag" : sys.argv[1],
         "vin" : vin,
     }
 
     r = requests.post(url, json=car_info)
     if r.status_code == 200:
-        cmd = 'rm ' + UPDATE_FILE
-        os.system(cmd)
         print "Update successfully."
     elif r.status_code == 400:
         print "Invalid Request."
