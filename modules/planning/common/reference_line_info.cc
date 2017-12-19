@@ -71,6 +71,12 @@ bool ReferenceLineInfo::Init() {
           << " is not on reference line:[0, " << reference_line_.Length()
           << "]";
   }
+  constexpr double kOutOfReferenceLineL = 10.0;  // in meters
+  if (adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
+      adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
+    AERROR << "Ego vehicle is too far away from reference line.";
+    return false;
+  }
   return true;
 }
 
