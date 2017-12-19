@@ -161,3 +161,6 @@ rule_config : {
 rule_config : {
     rule_id: REFERENCE_LINE_END
 }
+rule_config : {
+    rule_id: DESTINATION
+}
