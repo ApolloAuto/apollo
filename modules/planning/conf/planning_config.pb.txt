@@ -23,7 +23,7 @@ em_planner_config {
         obstacle_ignore_distance: 20.0
         obstacle_collision_distance: 0.5
         obstacle_risk_distance: 2.0
-        obstacle_collision_cost: 1e6
+        obstacle_collision_cost: 1e8
         path_l_cost: 6.5
         path_dl_cost: 8e3
         path_ddl_cost: 5e1
