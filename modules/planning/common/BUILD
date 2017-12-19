@@ -241,6 +241,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "frame_test",
+    size = "small",
+    srcs = [
+        "frame_test.cc",
+    ],
+    data = [
+        "//modules/planning/common:common_testdata",
+    ],
+    deps = [
+        ":frame",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "speed_limit",
     srcs = [
