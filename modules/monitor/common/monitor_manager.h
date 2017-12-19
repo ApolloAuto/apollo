@@ -20,6 +20,7 @@
 #include <string>
 
 #include "modules/common/macro.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -36,10 +37,13 @@ class MonitorManager {
   static SystemStatus *GetStatus();
   static HardwareStatus *GetHardwareStatus(const std::string &hardware_name);
   static ModuleStatus *GetModuleStatus(const std::string &module_name);
+  static apollo::common::monitor::MonitorLogBuffer &LogBuffer();
 
  private:
   MonitorConf config_;
   SystemStatus status_;
+  apollo::common::monitor::MonitorLogger logger_;
+  apollo::common::monitor::MonitorLogBuffer log_buffer_;
 
   DECLARE_SINGLETON(MonitorManager);
 };

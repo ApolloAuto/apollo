@@ -191,7 +191,7 @@ message SimulationWorld {
 
   optional DelaysInMs delay = 12;
 
-  optional apollo.common.monitor.MonitorMessage monitor_msg = 13;
+  optional apollo.common.monitor.MonitorMessage monitor = 13;
 
   // Module latency
   optional Latency latency = 15;
