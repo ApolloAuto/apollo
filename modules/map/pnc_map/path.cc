@@ -412,6 +412,58 @@ bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
   return GetProjection(point, accumulate_s, lateral, &distance);
 }
 
+bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
+                                            const double hueristic_start_s,
+                                            const double hueristic_end_s,
+                                            double* accumulate_s,
+                                            double* lateral,
+                                            double* min_distance) const {
+  if (segments_.empty()) {
+    return false;
+  }
+  if (accumulate_s == nullptr || lateral == nullptr ||
+      min_distance == nullptr) {
+    return false;
+  }
+  CHECK_GE(num_points_, 2);
+  *min_distance = std::numeric_limits<double>::infinity();
+
+  int start_interpolation_index = GetIndexFromS(hueristic_start_s).id;
+  int end_interpolation_index =
+      std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1);
+  for (int i = start_interpolation_index; i < end_interpolation_index; ++i) {
+    const auto& segment = segments_[i];
+    const double distance = segment.DistanceTo(point);
+    if (distance < *min_distance) {
+      const double proj = segment.ProjectOntoUnit(point);
+      if (proj < 0.0 && i > 0) {
+        continue;
+      }
+      if (proj > segment.length() && i + 1 < end_interpolation_index) {
+        const auto& next_segment = segments_[i + 1];
+        if ((point - next_segment.start())
+                .InnerProd(next_segment.unit_direction()) >= 0.0) {
+          continue;
+        }
+      }
+      *min_distance = distance;
+      if (i + 1 >= end_interpolation_index) {
+        *accumulate_s = accumulated_s_[i] + proj;
+      } else {
+        *accumulate_s = accumulated_s_[i] + std::min(proj, segment.length());
+      }
+      const double prod = segment.ProductOntoUnit(point);
+      if ((i == 0 && proj < 0.0) ||
+          (i + 1 == end_interpolation_index && proj > segment.length())) {
+        *lateral = prod;
+      } else {
+        *lateral = (prod > 0.0 ? distance : -distance);
+      }
+    }
+  }
+  return true;
+}
+
 bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
                          double* lateral, double* min_distance) const {
   if (segments_.empty()) {
