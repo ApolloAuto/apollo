@@ -15,12 +15,9 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
-
 #include <stdio.h>
-
 #include <boost/filesystem.hpp>
-
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include <fstream>
 
 namespace apollo {
 namespace localization {
@@ -112,13 +109,13 @@ VisualizationEngine::VisualizationEngine()
 VisualizationEngine::~VisualizationEngine() {}
 
 bool VisualizationEngine::Init(const std::string &map_folder,
-                               const BaseMapConfig &map_config,
+                               const VisualMapParam &map_param,
                                const unsigned int resolution_id,
                                const int zone_id,
                                const Eigen::Affine3d &extrinsic,
                                const unsigned int loc_info_num) {
   map_folder_ = map_folder;
-  map_config_ = map_config;
+  map_param_ = map_param;
   velodyne_extrinsic_ = extrinsic;
   loc_info_num_ = loc_info_num;
 
@@ -133,7 +130,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
     car_img_mats_.push_back(tem_mat);
   }
 
-  if (resolution_id_ >= map_config_.map_resolutions_.size()) {
+  if (resolution_id_ >= map_param_.map_resolutions.size()) {
     std::cerr << "Invalid resolution id." << std::endl;
     return false;
   }
@@ -142,10 +139,10 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   resolution_id_ = resolution_id;
 
   cloud_img_ = cv::Mat(
-      cv::Size(map_config_.map_node_size_x_, map_config_.map_node_size_y_),
+      cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
       CV_8UC3);
   cloud_img_mask_ = cv::Mat(
-      cv::Size(map_config_.map_node_size_x_, map_config_.map_node_size_y_),
+      cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
       CV_8UC1);
 
   Preprocess(map_folder);
@@ -706,17 +703,17 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
                                           const std::string &path) {
   lt_node_index_.x = x_min;
   lt_node_index_.y = y_min;
-  lt_node_grid_index_.x = lt_node_index_.x * map_config_.map_node_size_x_;
-  lt_node_grid_index_.y = lt_node_index_.y * map_config_.map_node_size_y_;
+  lt_node_grid_index_.x = lt_node_index_.x * map_param_.map_node_size_x;
+  lt_node_grid_index_.y = lt_node_index_.y * map_param_.map_node_size_y;
 
   double init_center_x = (static_cast<double>(x_max + x_min) / 2 *
-                          map_config_.map_resolutions_[resolution_id_] *
-                          map_config_.map_node_size_x_) +
-                         map_config_.map_range_.GetMinX();
+                          map_param_.map_resolutions[resolution_id_] *
+                          map_param_.map_node_size_x) +
+                         map_param_.map_min_x;
   double init_center_y = (static_cast<double>(y_max + y_min) / 2 *
-                          map_config_.map_resolutions_[resolution_id_] *
-                          map_config_.map_node_size_y_) +
-                         map_config_.map_range_.GetMinY();
+                          map_param_.map_resolutions[resolution_id_] *
+                          map_param_.map_node_size_y) +
+                         map_param_.map_min_y;
   SetViewCenter(init_center_x, init_center_y);
   max_level_ = level;
   max_stride_ = 1;
@@ -734,15 +731,15 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
                                      const std::vector<Eigen::Vector3d> &cloud,
                                      cv::Mat *cloud_img,
                                      cv::Mat *cloud_img_mask) {
-  unsigned int img_width = map_config_.map_node_size_x_;
-  unsigned int img_height = map_config_.map_node_size_y_;
+  unsigned int img_width = map_param_.map_node_size_x;
+  unsigned int img_height = map_param_.map_node_size_y;
   Eigen::Vector3d cen = car_pose_.translation();
   cloud_img_lt_coord_[0] =
       cen[0] -
-      map_config_.map_resolutions_[resolution_id_] * (img_width / 2.0f);
+      map_param_.map_resolutions[resolution_id_] * (img_width / 2.0f);
   cloud_img_lt_coord_[1] =
       cen[1] -
-      map_config_.map_resolutions_[resolution_id_] * (img_height / 2.0f);
+      map_param_.map_resolutions[resolution_id_] * (img_height / 2.0f);
 
   cloud_img_.setTo(cv::Scalar(0, 0, 0));
   cloud_img_mask_.setTo(cv::Scalar(0));
@@ -752,11 +749,11 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
     uint32_t col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-                   map_config_.map_resolutions_[resolution_id_];
+                   map_param_.map_resolutions[resolution_id_];
     uint32_t row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-                   map_config_.map_resolutions_[resolution_id_];
-    if (col < 0 || row < 0 || col >= map_config_.map_node_size_x_ ||
-        row >= map_config_.map_node_size_y_) {
+                   map_param_.map_resolutions[resolution_id_];
+    if (col < 0 || row < 0 || col >= map_param_.map_node_size_x ||
+        row >= map_param_.map_node_size_y) {
       continue;
     }
 
@@ -771,19 +768,35 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
 void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
                                           MapImageKey *key) {
   key->level = cur_level_;
-  // get MapNodeIndex at image level 0
-  MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(map_config_, coord,
-                                                     resolution_id_, zone_id_);
 
+  assert(resolution_id_ < map_param_.map_resolutions.size());
   key->zone_id = zone_id_;
-  key->node_north_id = index.m_;
-  key->node_east_id = index.n_;
+  int n = static_cast<int>((coord[0] - map_param_.map_min_x) /
+                           (map_param_.map_node_size_x *
+                            map_param_.map_resolutions[resolution_id_]));
+  int m = static_cast<int>((coord[1] - map_param_.map_min_y) /
+                           (map_param_.map_node_size_y *
+                            map_param_.map_resolutions[resolution_id_]));
+  int max_n = static_cast<int>((map_param_.map_max_x - map_param_.map_min_x) /
+                               (map_param_.map_node_size_x *
+                                map_param_.map_resolutions[resolution_id_]));
+  int max_m =
+      static_cast<unsigned int>((map_param_.map_max_y - map_param_.map_min_y) /
+                                (map_param_.map_node_size_y *
+                                 map_param_.map_resolutions[resolution_id_]));
 
-  int m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
+  if (n >= 0 && m >= 0 && n < max_n && m < max_m) {
+    key->node_north_id = m;
+    key->node_east_id = n;
+  } else {
+    assert(0 == 1);  // should never reach here
+  }
+
+  m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
   if (m < 0) m = m - (cur_stride_ - 1);
   key->node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
 
-  int n = static_cast<int>(key->node_east_id) - lt_node_index_.x;
+  n = static_cast<int>(key->node_east_id) - lt_node_index_.x;
   if (n < 0) n = n - (cur_stride_ - 1);
   key->node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
 }
@@ -792,10 +805,10 @@ cv::Point VisualizationEngine::CoordToMapGridIndex(
     const Eigen::Vector2d &coord, const unsigned int resolution_id,
     const int stride) {
   cv::Point p;
-  p.x = static_cast<int>((coord[0] - map_config_.map_range_.GetMinX()) /
-                         map_config_.map_resolutions_[resolution_id]);
-  p.y = static_cast<int>((coord[1] - map_config_.map_range_.GetMinY()) /
-                         map_config_.map_resolutions_[resolution_id]);
+  p.x = static_cast<int>((coord[0] - map_param_.map_min_x) /
+                         map_param_.map_resolutions[resolution_id]);
+  p.y = static_cast<int>((coord[1] - map_param_.map_min_y) /
+                         map_param_.map_resolutions[resolution_id]);
 
   cv::Point pr;
   pr.x = p.x - lt_node_grid_index_.x;
@@ -808,10 +821,10 @@ cv::Point VisualizationEngine::CoordToMapGridIndex(
 
 cv::Point VisualizationEngine::MapGridIndexToNodeGridIndex(const cv::Point &p) {
   cv::Point pi;
-  pi.x = p.x % map_config_.map_node_size_x_;
-  pi.x = pi.x < 0 ? pi.x + map_config_.map_node_size_x_ : pi.x;
-  pi.y = p.y % map_config_.map_node_size_y_;
-  pi.y = pi.y < 0 ? pi.y + map_config_.map_node_size_y_ : pi.y;
+  pi.x = p.x % map_param_.map_node_size_x;
+  pi.x = pi.x < 0 ? pi.x + map_param_.map_node_size_x : pi.x;
+  pi.y = p.y % map_param_.map_node_size_y;
+  pi.y = pi.y < 0 ? pi.y + map_param_.map_node_size_y : pi.y;
 
   return pi;
 }

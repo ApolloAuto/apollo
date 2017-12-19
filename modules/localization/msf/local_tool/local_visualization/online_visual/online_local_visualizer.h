@@ -96,7 +96,8 @@ class OnlineLocalVisualizer : public apollo::common::ApolloApp {
 
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
-  VisualizationManagerParams visual_manager_params_;
+  std::string lidar_extrinsic_file_;
+  std::string map_folder_;
 };
 
 }  // namespace msf

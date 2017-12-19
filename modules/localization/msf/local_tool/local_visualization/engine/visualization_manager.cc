@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 #include "boost/date_time/posix_time/posix_time.hpp"
-#include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
 namespace localization {
@@ -284,38 +283,21 @@ VisualizationManager::~VisualizationManager() {
 }
 
 bool VisualizationManager::Init(const std::string &map_folder,
-                                const std::string lidar_extrinsic_file) {
-  BaseMapConfig map_config;
+                                const Eigen::Affine3d &velodyne_extrinsic,
+                                const VisualMapParam &map_param) {
+  std::cout << "Get zone id." << std::endl;
   unsigned int resolution_id = 0;
   int zone_id = 0;
 
-  std::string config_file = map_folder + "/config.xml";
-  map_config.map_version_ = "lossy_map";
-  bool success = map_config.Load(config_file);
-  if (!success) {
-    std::cerr << "Load map config failed." << std::endl;
-    return false;
-  }
-  std::cout << "Load map config succeed." << std::endl;
-
-  success = GetZoneIdFromMapFolder(map_folder, resolution_id, &zone_id);
+  bool success = GetZoneIdFromMapFolder(map_folder, resolution_id, &zone_id);
   if (!success) {
     std::cerr << "Get zone id failed." << std::endl;
     return false;
   }
   std::cout << "Get zone id succeed." << std::endl;
 
-  std::cout << "Load lidar_extrinsic_file: " << lidar_extrinsic_file
-            << std::endl;
-  Eigen::Affine3d velodyne_extrinsic;
-  success = velodyne::LoadExtrinsic(lidar_extrinsic_file, &velodyne_extrinsic);
-  if (!success) {
-    std::cerr << "Load velodyne extrinsic failed." << std::endl;
-    return false;
-  }
-  std::cout << "Load velodyne extrinsic succeed." << std::endl;
-
-  success = visual_engine_.Init(map_folder, map_config, resolution_id, zone_id,
+  std::cout << "Init visualization engine." << std::endl;
+  success = visual_engine_.Init(map_folder, map_param, resolution_id, zone_id,
                                 velodyne_extrinsic, LOC_INFO_NUM);
   if (!success) {
     std::cerr << "Visualization engine init failed." << std::endl;
@@ -334,7 +316,7 @@ bool VisualizationManager::Init(const VisualizationManagerParams &params) {
   lidar_loc_info_buffer_.SetCapacity(params.lidar_loc_info_buffer_capacity);
   fusion_loc_info_buffer_.SetCapacity(params.fusion_loc_info_buffer_capacity);
 
-  return Init(params.map_folder, params.lidar_extrinsic_file);
+  return Init(params.map_folder, params.velodyne_extrinsic, params.map_param);
 }
 
 void VisualizationManager::AddLidarFrame(const LidarVisFrame &lidar_frame) {
@@ -342,7 +324,6 @@ void VisualizationManager::AddLidarFrame(const LidarVisFrame &lidar_frame) {
   static int id = 0;
   std::cout << "id." << id << std::endl;
   lidar_frame_buffer_.PushNewMessage(lidar_frame.timestamp, lidar_frame);
-  std::cout << "id." << id << std::endl;
   id++;
 }
 
