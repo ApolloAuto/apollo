@@ -61,6 +61,9 @@ namespace adapter {
   static name##Adapter *Get##name() {                                          \
     return instance()->InternalGet##name();                                    \
   }                                                                            \
+  static AdapterConfig &Get##name##Config() {                                  \
+    return instance()->name##config_;                                          \
+  }                                                                            \
   static bool Feed##name##File(const std::string &proto_file) {                \
     if (!instance()->name##_) {                                                \
       AERROR << "Initialize adapter before feeding protobuf";                  \
@@ -101,6 +104,7 @@ namespace adapter {
   std::unique_ptr<name##Adapter> name##_;                                      \
   ros::Publisher name##publisher_;                                             \
   ros::Subscriber name##subscriber_;                                           \
+  AdapterConfig name##config_;                                                 \
                                                                                \
   void InternalEnable##name(const std::string &topic_name,                     \
                             const AdapterConfig &config) {                     \
@@ -117,10 +121,9 @@ namespace adapter {
     }                                                                          \
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
+    name##config_ = config;                                                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() {                                         \
-    return name##_.get();                                                      \
-  }                                                                            \
+  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (IsRos()) {                                                             \
@@ -188,9 +191,7 @@ class AdapterManager {
   /**
    * @brief Returns whether AdapterManager is running ROS mode.
    */
-  static bool IsRos() {
-    return instance()->node_handle_ != nullptr;
-  }
+  static bool IsRos() { return instance()->node_handle_ != nullptr; }
 
   /**
    * @brief Returns a reference to static tf2 buffer.
