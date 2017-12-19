@@ -278,7 +278,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   common::SLPoint route_sl;
   bool has_projection = GetProjection(point, &route_sl, &segment_waypoint);
   if (!has_projection) {
-    ADEBUG << "No projection from waypoint: " << waypoint.DebugString();
+    AERROR << "No projection from waypoint: " << waypoint.DebugString();
     return false;
   }
   // 2. heading should be the same.
@@ -287,31 +287,11 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   double heading_diff =
       common::math::AngleDiff(waypoint_heading, segment_heading);
   if (std::fabs(heading_diff) > M_PI / 2) {
-    ADEBUG << "Angle diff too large";
+    AERROR << "Angle diff too large:" << heading_diff;
     return false;
   }
 
-  // 3. segment waypoint should be waypoint's neighbor
-  // assume waypoint is at left side
-  const auto *neighbor_ids =
-      &(segment_waypoint.lane->lane().left_neighbor_forward_lane_id());
-  if (route_sl.l() < 0) {  // waypoint is at right side
-    neighbor_ids =
-        &(segment_waypoint.lane->lane().right_neighbor_forward_lane_id());
-  }
-  bool is_neighbor = false;
-  for (const auto &id : *neighbor_ids) {
-    if (id.id() == waypoint.lane->id().id()) {
-      is_neighbor = true;
-      break;
-    }
-  }
-  if (!is_neighbor) {
-    ADEBUG << "waypoint is not neighbor of current segment";
-    return false;
-  }
-
-  // 4. the waypoint and the projected lane should not be separated apart.
+  // 3. the waypoint and the projected lane should not be separated apart.
   double waypoint_left_width = 0.0;
   double waypoint_right_width = 0.0;
   waypoint.lane->GetWidth(waypoint.s, &waypoint_left_width,
@@ -323,17 +303,17 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   auto segment_projected_point =
       segment_waypoint.lane->GetSmoothPoint(segment_waypoint.s);
   double dist = common::util::DistanceXY(point, segment_projected_point);
-  const double kLaneSeparationDistance = 0.2;
+  const double kLaneSeparationDistance = 0.3;
   if (route_sl.l() < 0) {  // waypoint at right side
     if (dist >
         waypoint_left_width + segment_right_width + kLaneSeparationDistance) {
-      ADEBUG << "waypoint is too far to reach";
+      AERROR << "waypoint is too far to reach: " << dist;
       return false;
     }
   } else {  // waypoint at left side
     if (dist >
         waypoint_right_width + segment_left_width + kLaneSeparationDistance) {
-      ADEBUG << "waypoint is too far to reach";
+      AERROR << "waypoint is too far to reach: " << dist;
       return false;
     }
   }
