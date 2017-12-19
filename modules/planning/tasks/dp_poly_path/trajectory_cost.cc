@@ -67,10 +67,8 @@ TrajectoryCost::TrajectoryCost(
     const double adc_right_l =
         init_sl_point_.l() - vehicle_param.right_edge_to_center();
 
-    constexpr double kLateralIgnoreDistance = 4.0;
-
-    if (adc_left_l + kLateralIgnoreDistance < sl_boundary.start_l() ||
-        adc_right_l - kLateralIgnoreDistance > sl_boundary.end_l()) {
+    if (adc_left_l + FLAGS_lateral_ignore_buffer < sl_boundary.start_l() ||
+        adc_right_l - FLAGS_lateral_ignore_buffer > sl_boundary.end_l()) {
       continue;
     }
 
@@ -79,11 +77,19 @@ TrajectoryCost::TrajectoryCost(
       // Virtual obstacle
       continue;
     } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
-      const double kDefaultLaneWidth = 1.5;
+      double left_width = 0.0;
+      double right_width = 0.0;
+      reference_line_->GetLaneWidth(sl_boundary.start_s(),
+                                    &left_width, &right_width);
       const double adc_width = vehicle_param.width();
 
-      if (sl_boundary.start_l() + kDefaultLaneWidth < adc_width &&
-          kDefaultLaneWidth - sl_boundary.end_l() < adc_width) {
+      double left_driving_width =  left_width - sl_boundary.end_l()
+          - FLAGS_static_decision_nudge_l_buffer;
+      double right_driving_width =  right_width + sl_boundary.start_l()
+          - FLAGS_static_decision_nudge_l_buffer;
+
+      if (left_driving_width < adc_width &&
+          right_driving_width < adc_width) {
         // lane blocking obstacle
         continue;
       }
@@ -170,10 +176,10 @@ double TrajectoryCost::CalculateStaticObstacleCost(
 
   for (double curr_s = start_s; curr_s <= end_s;
        curr_s += config_.path_resolution()) {
-    const double s = curr_s - start_s;  // spline curve s
-    const double l = curve.Evaluate(0, s);
+    const double curr_l = curve.Evaluate(0, curr_s - start_s);
+
     for (const auto &obs_sl_boundary : static_obstacle_sl_boundaries_) {
-      obstacle_cost += GetCostFromObsSL(s, l, obs_sl_boundary);
+      obstacle_cost += GetCostFromObsSL(curr_s, curr_l, obs_sl_boundary);
     }
   }
   return obstacle_cost * config_.path_resolution();
@@ -224,14 +230,8 @@ double TrajectoryCost::GetCostFromObsSL(
   const double adc_left_l = adc_l + vehicle_param.left_edge_to_center();
   const double adc_right_l = adc_l - vehicle_param.right_edge_to_center();
 
-  constexpr double ignore_s_distance = 10.0;
-  constexpr double ignore_l_distance = 3.0;
-  if (adc_front_s + ignore_s_distance < obs_sl_boundary.start_s() ||
-      adc_end_s - ignore_s_distance > obs_sl_boundary.end_s()) {
-    return 0.0;
-  }
-  if (adc_left_l + ignore_l_distance < obs_sl_boundary.start_l() ||
-      adc_right_l - ignore_l_distance > obs_sl_boundary.end_l()) {
+  if (adc_left_l + FLAGS_lateral_ignore_buffer < obs_sl_boundary.start_l() ||
+      adc_right_l - FLAGS_lateral_ignore_buffer > obs_sl_boundary.end_l()) {
     return 0.0;
   }
 
@@ -241,10 +241,15 @@ double TrajectoryCost::GetCostFromObsSL(
   };
 
   double obstacle_cost = 0.0;
-  if (!(adc_front_s < obs_sl_boundary.start_s() ||
-        adc_end_s > obs_sl_boundary.end_s()) &&
-      !(adc_left_l < obs_sl_boundary.end_l() ||
-        adc_right_l > obs_sl_boundary.start_l())) {
+
+  bool no_overlap = ((adc_front_s < obs_sl_boundary.start_s() ||
+    adc_end_s > obs_sl_boundary.end_s()) ||         // longitudinal
+    (adc_left_l + FLAGS_static_decision_nudge_l_buffer
+        < obs_sl_boundary.start_l() ||
+    adc_right_l - FLAGS_static_decision_nudge_l_buffer
+        > obs_sl_boundary.end_l()));                 // lateral
+
+  if (!no_overlap) {
     return config_.obstacle_collision_cost();
   }
 

@@ -124,6 +124,7 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     const auto frenet_point = frenet_path.EvaluateByS(sl_boundary.start_s());
     const double curr_l = frenet_point.l();
+
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
       // ignore
@@ -135,15 +136,17 @@ bool PathDecider::MakeStaticObstacleDecision(
           GenerateObjectStopDecision(*path_obstacle);
       path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
                                              object_decision);
-    } else if (FLAGS_enable_nudge_decision &&
-               (curr_l - lateral_stop_radius > sl_boundary.end_l())) {
-      ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
-      object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-      object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-      path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
-                                        object_decision);
-    } else {
-      if (FLAGS_enable_nudge_decision) {
+    } else if (FLAGS_enable_nudge_decision) {
+      // nudge
+      if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {
+        // LEFT_NUDGE
+        ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
+        object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
+        object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
+        path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
+                                          object_decision);
+      } else {
+        // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
         object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
