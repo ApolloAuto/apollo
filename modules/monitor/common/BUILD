@@ -17,6 +17,7 @@ cc_library(
     srcs = ["monitor_manager.cc"],
     hdrs = ["monitor_manager.h"],
     deps = [
+        "//modules/common/monitor_log",
         "//modules/common/util",
         "//modules/common/util:map_util",
         "//modules/monitor/proto:monitor_conf_proto",

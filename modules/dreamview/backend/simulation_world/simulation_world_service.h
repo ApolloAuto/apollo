@@ -123,7 +123,8 @@ class SimulationWorldService {
   /**
    * @brief Publish message to the monitor
    * @param msg the string to send to monitor
-   * @param log_level defined in modules/common/monitor/proto/monitor.proto
+   * @param log_level defined in
+   *        modules/common/monitor_log/proto/monitor_log.proto
    */
   void PublishMonitorMessage(
       apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
