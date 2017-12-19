@@ -113,6 +113,7 @@ class MapService {
   const hdmap::HDMap *hdmap_ = nullptr;
   // A downsampled map for dreamview frontend display.
   const hdmap::HDMap *sim_map_ = nullptr;
+  bool pending = true;
 
   // RW lock to protect map data
   mutable boost::shared_mutex mutex_;

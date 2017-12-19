@@ -97,6 +97,15 @@ message ObstacleDebug {
   repeated DecisionTag decision_tag = 3;
 }
 
+message ReferenceLineDebug {
+  optional string id = 1;
+  optional double length = 2;
+  optional double cost = 3;
+  optional bool is_change_lane_path = 4;
+  optional bool is_drivable = 5;
+  optional bool is_protected = 6;
+}
+
 message ChangeLaneState {
    enum State {
        IN_CHANGE_LANE = 1; // during change lane state
@@ -110,7 +119,7 @@ message ChangeLaneState {
    optional double timestamp = 3;
 }
 
-// next id: 17
+// next id: 20
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -127,4 +136,5 @@ message PlanningData {
   optional SignalLightDebug signal_light = 17;
 
   repeated ObstacleDebug obstacle = 18;
+  repeated ReferenceLineDebug reference_line = 19;
 }

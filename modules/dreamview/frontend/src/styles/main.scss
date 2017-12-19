@@ -511,12 +511,13 @@ body {
     }
 
     .poi-button {
-        min-width: 190px;
+        min-width: 250px;
     }
 }
 
 .side-bar {
     display: flex;
+    flex-direction: column;
 
     flex: 0 0 auto;
 
@@ -525,6 +526,14 @@ body {
     border-right: 3px solid #000000;
     overflow-y: auto;
     overflow-x: hidden;
+
+    .main-panel {
+        margin-bottom: auto;
+    }
+
+    button:focus {
+        outline: 0;
+    }
 
     .button {
         display: block;
@@ -568,10 +577,6 @@ body {
         }
     }
 
-    .button:focus {
-        outline: 0;
-    }
-
     .button:disabled {
         color: #414141;
         cursor: not-allowed;
@@ -581,9 +586,39 @@ body {
         }
     }
 
-    .active {
+    .button-active {
         background: #2A3238;
         opacity: 1;
+        color: #FFFFFF;
+    }
+
+    .sub-button {
+        display: block;
+        width: 90px;
+        height: 80px;
+        border: none;
+        padding: 20px;
+
+        font-size: 14px;
+        text-align: center;
+        background: #3E4041;
+        color: #999999;
+        cursor: pointer;
+
+        @include small-screen {
+            font-size: 12px;
+            width: 80px;
+            height: 60px;
+        }
+    }
+
+    .sub-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.3;
+    }
+
+    .sub-button-active {
+        background: #30A5FF;
         color: #FFFFFF;
     }
 }
@@ -936,7 +971,7 @@ body {
 
     .status-display {
         min-width: 250px;
-        padding: 5px;
+        padding: 5px 20px 5px 5px;
 
         .name {
             display: inline-block;

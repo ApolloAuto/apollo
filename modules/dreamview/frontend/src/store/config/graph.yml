@@ -3,7 +3,7 @@ slGraph:
     options:
         legend:
             display: false
-        axes: 
+        axes:
             x:
                 min: 0
                 max: 200
@@ -73,10 +73,10 @@ stGraph:
     options:
         legend:
             display: false
-        axes: 
+        axes:
             x:
-                min: -3
-                max: 9
+                min: -2
+                max: 10
                 labelString: 't (second)'
             y:
                 min: -10
@@ -116,7 +116,7 @@ stSpeedGraph:
     options:
         legend:
             display: true
-        axes: 
+        axes:
             x:
                 min: -10
                 max: 220
@@ -156,7 +156,7 @@ speedGraph:
     options:
         legend:
             display: true
-        axes: 
+        axes:
             x:
                 min: -2
                 max: 10
@@ -181,6 +181,28 @@ speedGraph:
                 showLine: true
             QpSplineStSpeedOptimizer:
                 color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+accelerationGraph:
+    title: 'Planning Acceleration'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                min: -2
+                max: 10
+                labelString: 't (second)'
+            y:
+                min: -4.0
+                max: 2.0
+                labelString: 'acceleration (m/s^2)'
+    properties:
+        lines:
+            acceleration:
+                color: 'rgba(255, 0, 0, 0.8)' # red
                 borderWidth: 2
                 pointRadius: 0
                 fill: false

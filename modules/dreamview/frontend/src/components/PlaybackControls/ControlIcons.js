@@ -1,5 +1,7 @@
 import React from "react";
 
+import classNames from "classnames";
+
 class PlayIcons extends React.Component {
     render() {
         const { onClick } = this.props;
@@ -57,17 +59,67 @@ class PauseIcons extends React.Component {
     }
 }
 
+class FullScreenIcons extends React.Component {
+    render() {
+        const { onClick } = this.props;
+
+        return (
+            <svg className="icon" viewBox="0 0 70 70">
+                <path className="fullscreen"
+                      d="M0 25 V0 H25
+                         M0 45 V70 H25
+                         M45 0 H70 V25
+                         M45 70 H70 V45"/>
+            </svg>
+        );
+    }
+}
+
+class NormalScreenIcons extends React.Component {
+    render() {
+        const { onClick } = this.props;
+
+        return (
+            <svg className="icon" viewBox="0 0 70 70">
+                <path className="exit-fullscreen"
+                      d="M0 25 H25 V0
+                         M0 45 H25 V70
+                         M45 0 V25 H70
+                         M45 70 V45 H70"/>
+            </svg>
+        );
+    }
+}
+
 export default class ControlIcons extends React.Component {
     render() {
-        const { type, onClick } = this.props;
+        const { type, onClick, extraClasses } = this.props;
 
+        let icon = null;
         switch(type) {
             case 'replay':
-                return <ReplayIcons onClick={onClick} />;
+                icon = <ReplayIcons />;
+                break;
             case 'pause':
-                return <PauseIcons onClick={onClick} />;
+                icon = <PauseIcons />;
+                break;
+            case 'play':
+                icon = <PlayIcons />;
+                break;
+            case 'fullscreen':
+                icon = <FullScreenIcons />;
+                break;
+            case 'normalscreen':
+                icon = <NormalScreenIcons />;
+                break;
             default:
-                return <PlayIcons onClick={onClick} />;
+                break;
         }
+
+        return (
+            <div className={classNames(extraClasses)} onClick={onClick}>
+                {icon}
+            </div>
+        );
     }
 }

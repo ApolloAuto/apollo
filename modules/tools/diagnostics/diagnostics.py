@@ -23,6 +23,7 @@ import os
 import random
 import threading
 import traceback
+import signal
 
 import rospy
 from std_msgs.msg import String
@@ -47,6 +48,16 @@ class Diagnostics(object):
         curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
         self.stdscr.nodelay(1)
         curses.curs_set(0)
+
+        """
+        Workaround for issuse #1774, since we know the exactly number of the
+        columns that we used, so if the default terminal width <= 80, we just
+        resize the terminal to ensure it is bigger enough for the addstr() call.
+        Otherwise, addstr() may not happy: "error: addstr() returned ERR".
+        """
+        maxY, maxX = self.stdscr.getmaxyx()
+        if maxY <= 80:
+            curses.resizeterm(maxX, 90) #80+10, 10 for the "Delay" column
 
         self.lock = threading.Lock()
         with open(META_DATA_FILE) as f:
@@ -106,6 +117,7 @@ def main(stdscr):
     """
     Main function
     """
+    signal.signal(signal.SIGWINCH, signal.SIG_DFL)
     rospy.init_node('adu_diagnostics_' + str(random.random()), anonymous=True)
 
     diag = Diagnostics(stdscr)

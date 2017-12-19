@@ -8,7 +8,7 @@ task:
   task_data_args:
     rosbag:
       if_record: true
-      record_method: "rosbag record api"
+      record_method: "rosbag record"
       data_property:
         src: UNKNOWN
         dst: rosbag
@@ -24,10 +24,10 @@ task:
         - group_id: '1'
           group_name: 'default'
           group_topic_match_re: ''
-          group_topic_exclude_re: '(/sensor/velodyne64/PointCloud2)|(/sensor/velodyne/fusion.*)|(.*(rosout|theora|image_long|image_short|image_narrow|image_wide|traffic_light_debug)$)'
+          group_topic_exclude_re: '(.*(rosout|image_long|image_short|image_narrow|image_wide|PointCloud2)$)'
         - group_id: '2'
           group_name: 'test'
-          group_topic_match_re: ''
+          group_topic_match_re: '/apollo/data_recorder/status'
           group_topic_exclude_re: ''
     syslog:
       if_record: true
@@ -53,7 +53,7 @@ task:
       if_record: true
       record_method: rsync
       data_property:
-        src: "/home/apollo/log"
+        src: "/apollo/data/log"
         dst: "otherlog/log/"
       action_args:
         trigger_interval: 900

@@ -38,8 +38,9 @@ using apollo::common::util::FindOrDie;
 using apollo::common::VehicleConfigHelper;
 
 namespace {
-const double kStBoundaryDeltaS = 0.2;   // meters
-const double kStBoundaryDeltaT = 0.05;  // seconds
+const double kStBoundaryDeltaS = 0.2;        // meters
+const double kStBoundarySparseDeltaS = 1.0;  // meters
+const double kStBoundaryDeltaT = 0.05;       // seconds
 }
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
@@ -158,12 +159,30 @@ bool PathObstacle::BuildTrajectoryStBoundary(
       AERROR << "failed to calculate boundary";
       return false;
     }
-    const double object_s_diff =
-        object_boundary.end_s() - object_boundary.start_s();
+    // skip if object is entirely on one side of reference line.
+    constexpr double kSkipLDistanceFactor = 0.4;
+    const double skip_l_distance =
+        (object_boundary.end_s() - object_boundary.start_s()) *
+            kSkipLDistanceFactor +
+        adc_width / 2.0;
+    if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
+            skip_l_distance ||
+        std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
+            -skip_l_distance) {
+      continue;
+    }
+
     if (object_boundary.end_s() < 0) {  // skip if behind reference line
       continue;
     }
-    if (object_s_diff < kStBoundaryDeltaS) {
+    constexpr double kSparseMappingS = 40.0;
+    const double st_boundary_delta_s =
+        (std::fabs(object_boundary.start_s() - adc_start_s) > kSparseMappingS)
+            ? kStBoundarySparseDeltaS
+            : kStBoundaryDeltaS;
+    const double object_s_diff =
+        object_boundary.end_s() - object_boundary.start_s();
+    if (object_s_diff < st_boundary_delta_s) {
       continue;
     }
     const double delta_t =
@@ -173,23 +192,23 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     double high_s =
         std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
     bool has_high = false;
-    while (low_s + kStBoundaryDeltaS < high_s && !(has_low && has_high)) {
+    while (low_s + st_boundary_delta_s < high_s && !(has_low && has_high)) {
       if (!has_low) {
         auto low_ref = reference_line.GetReferencePoint(low_s);
         has_low = object_moving_box.HasOverlap(
             {low_ref, low_ref.heading(), adc_length, adc_width});
-        low_s += kStBoundaryDeltaS;
+        low_s += st_boundary_delta_s;
       }
       if (!has_high) {
         auto high_ref = reference_line.GetReferencePoint(high_s);
         has_high = object_moving_box.HasOverlap(
             {high_ref, high_ref.heading(), adc_length, adc_width});
-        high_s -= kStBoundaryDeltaS;
+        high_s -= st_boundary_delta_s;
       }
     }
     if (has_low && has_high) {
-      low_s -= kStBoundaryDeltaS;
-      high_s += kStBoundaryDeltaS;
+      low_s -= st_boundary_delta_s;
+      high_s += st_boundary_delta_s;
       double low_t =
           (first_traj_point.relative_time() +
            std::fabs((low_s - object_boundary.start_s()) / object_s_diff) *

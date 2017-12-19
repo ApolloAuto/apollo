@@ -8,18 +8,17 @@
 
     <node pkg="nodelet" type="nodelet" name="sensor_camera_traffic_long" output="screen"
           args="load usb_cam/UsbCamNodelet camera_nodelet_manager" respawn="true" >
-      <param name="video_device" value="/dev/video0" />
-    	<param name="image_width" value="1920" />
-    	<param name="image_height" value="1080" />
-    	<param name="pixel_format" value="yuyv" />
-      <param name="frame_rate" value="$(arg frame_rate)" />
-    	<param name="camera_frame_id" value="usb_cam" />
-    	<param name="io_method" value="mmap"/>
-      <param name="camera_timeout" value="2000" />
-      <param name="error_code" value="11" />
-      <param name="camera_info_url" type="string" value="file://$(find usb_cam)/params/onsemi_traffic_intrinsics.yaml" />
-      <remap from="/camera_long/image_raw0" to="$(arg traffic_long_topic_name)" />
-      <remap from="/apollo/sensor/camera/traffic/camera_info" to="$(arg traffic_long_topic_name)/camera_info" />
+	  <param name="video_device" value="/dev/video0" />
+	  <param name="image_width" value="1920" />
+	  <param name="image_height" value="1080" />
+	  <param name="pixel_format" value="yuyv" />
+	  <param name="frame_rate" value="$(arg frame_rate)" />
+	  <param name="camera_frame_id" value="usb_cam" />
+	  <param name="io_method" value="mmap"/>
+	  <param name="camera_timeout" value="2000" />
+	  <param name="camera_info_url" type="string" value="file://$(find usb_cam)/params/onsemi_traffic_intrinsics.yaml" />
+	  <remap from="/camera_long/image_raw0" to="$(arg traffic_long_topic_name)" />
+	  <remap from="/apollo/sensor/camera/traffic/camera_info" to="$(arg traffic_long_topic_name)/camera_info" />
     </node>
   </group>
 </launch>

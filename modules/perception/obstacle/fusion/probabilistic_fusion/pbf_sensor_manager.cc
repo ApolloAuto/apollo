@@ -16,9 +16,6 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
-#include <map>
-#include <string>
-#include <vector>
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -54,7 +51,12 @@ bool PbfSensorManager::Init() {
   sensor_id = GetSensorType(RADAR);
   type = RADAR;
   PbfSensor *radar = new PbfSensor(type, sensor_id);
-  sensors_[sensor_id] = radar;
+  if (sensors_.find(sensor_id) == sensors_.end()) {
+    sensors_[sensor_id] = radar;
+  } else {
+    AERROR << "The velodyne 64 and radar sensor ids are conflict.";
+    return false;
+  }
   return true;
 }
 

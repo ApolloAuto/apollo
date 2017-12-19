@@ -26,6 +26,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -35,6 +36,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
+using apollo::common::SpeedPoint;
 
 QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
                                  const QpStSpeedConfig& qp_st_speed_config,
@@ -452,6 +454,21 @@ Status QpSplineStGraph::GetSConstraintByTime(
   return Status::OK();
 }
 
+const SpeedData QpSplineStGraph::GetHistorySpeed() const {
+  const auto* last_frame = FrameHistory::instance()->Latest();
+  if (!last_frame) {
+    AWARN << "last frame is empty";
+    return SpeedData();
+  }
+  const ReferenceLineInfo* last_reference_line_info =
+      last_frame->DriveReferenceLineInfo();
+  if (!last_reference_line_info) {
+    ADEBUG << "last reference line info is empty";
+    return SpeedData();
+  }
+  return last_reference_line_info->speed_data();
+}
+
 Status QpSplineStGraph::EstimateSpeedUpperBound(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     std::vector<double>* speed_upper_bound) const {
@@ -463,6 +480,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   // processing. We can do the following process multiple times and use
   // previous cycle's results for better estimation.
   const double v = init_point.v();
+  auto last_speed_data = GetHistorySpeed();
 
   if (static_cast<double>(t_evaluated_.size() +
                           speed_limit.speed_limit_points().size()) <
@@ -473,7 +491,12 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     const double kDistanceEpsilon = 1e-6;
     while (i < t_evaluated_.size() &&
            j + 1 < speed_limit.speed_limit_points().size()) {
-      const double distance = v * t_evaluated_[i];
+      double distance = v * t_evaluated_[i];
+      if (!last_speed_data.Empty()) {
+        SpeedPoint p;
+        last_speed_data.EvaluateByTime(t_evaluated_[i], &p);
+        distance = p.s();
+      }
       if (fabs(distance - speed_limit.speed_limit_points()[j].first) <
           kDistanceEpsilon) {
         speed_upper_bound->push_back(
@@ -502,7 +525,12 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
 
     const auto& speed_limit_points = speed_limit.speed_limit_points();
     for (const double t : t_evaluated_) {
-      const double s = v * t;
+      double s = v * t;
+      if (!last_speed_data.Empty()) {
+        SpeedPoint p;
+        last_speed_data.EvaluateByTime(t, &p);
+        s = p.s();
+      }
 
       // NOTICE: we are using binary search here based on two assumptions:
       // (1) The s in speed_limit_points increase monotonically.
