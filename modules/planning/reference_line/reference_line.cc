@@ -196,7 +196,6 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   }
 
   auto interpolate_index = map_path_.GetIndexFromS(s);
-  ADEBUG << interpolate_index.id << ", " << interpolate_index.offset;
 
   uint32_t index = interpolate_index.id;
   uint32_t next_index = index + 1;
