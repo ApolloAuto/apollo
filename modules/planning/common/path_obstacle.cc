@@ -140,6 +140,8 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
 
+  SLBoundary last_sl_boundary;
+  int last_index = 0;
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
@@ -155,11 +157,29 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     // NOTICE: this method will have errors when the reference line is not
     // straight.
     // Need double loop to cover all corner cases.
-    if (!reference_line.GetApproximateSLBoundary(object_moving_box,
-                                                 &object_boundary)) {
+    const double distance_xy =
+        common::util::DistanceXY(trajectory_points[last_index].path_point(),
+                                 trajectory_points[i].path_point());
+    if (last_sl_boundary.start_l() > distance_xy ||
+        last_sl_boundary.end_l() < -distance_xy) {
+      continue;
+    }
+
+    const double mid_s =
+        (last_sl_boundary.start_s() + last_sl_boundary.end_s()) / 2.0;
+    const double start_s = std::fmax(0.0, mid_s - 2.0 * distance_xy);
+    const double end_s = (i == 1) ? reference_line.Length()
+                                  : std::fmin(reference_line.Length(),
+                                              mid_s + 2.0 * distance_xy);
+
+    if (!reference_line.GetApproximateSLBoundary(object_moving_box, start_s,
+                                                 end_s, &object_boundary)) {
       AERROR << "failed to calculate boundary";
       return false;
     }
+    // update history record
+    last_sl_boundary = object_boundary;
+    last_index = i;
 
     // skip if object is entirely on one side of reference line.
     constexpr double kSkipLDistanceFactor = 0.4;
@@ -177,7 +197,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     if (object_boundary.end_s() < 0) {  // skip if behind reference line
       continue;
     }
-    constexpr double kSparseMappingS = 40.0;
+    constexpr double kSparseMappingS = 20.0;
     const double st_boundary_delta_s =
         (std::fabs(object_boundary.start_s() - adc_start_s) > kSparseMappingS)
             ? kStBoundarySparseDeltaS
