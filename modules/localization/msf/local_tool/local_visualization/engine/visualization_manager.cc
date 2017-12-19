@@ -324,7 +324,6 @@ void VisualizationManager::AddLidarFrame(const LidarVisFrame &lidar_frame) {
   static int id = 0;
   std::cout << "id." << id << std::endl;
   lidar_frame_buffer_.PushNewMessage(lidar_frame.timestamp, lidar_frame);
-  std::cout << "id." << id << std::endl;
   id++;
 }
 

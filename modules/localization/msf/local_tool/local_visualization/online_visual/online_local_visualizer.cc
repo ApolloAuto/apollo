@@ -24,8 +24,8 @@
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
+#include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
 namespace apollo {
 namespace localization {
@@ -143,8 +143,7 @@ Status OnlineLocalVisualizer::Init() {
 }
 
 void OnlineLocalVisualizer::InitParams() {
-  map_folder_ =
-      FLAGS_map_dir + "/" + FLAGS_local_map_name;
+  map_folder_ = FLAGS_map_dir + "/" + FLAGS_local_map_name;
   lidar_extrinsic_file_ = FLAGS_lidar_extrinsics_file;
 }
 
@@ -152,19 +151,6 @@ void OnlineLocalVisualizer::OnPointCloud(
     const sensor_msgs::PointCloud2 &message) {
   LidarVisFrame lidar_vis_frame;
   lidar_vis_frame.timestamp = message.header.stamp.toSec();
-
-  // std::cout << "lidar_vis_frame.timestamp: "<< std::setprecision(15) <<
-  // lidar_vis_frame.timestamp << std::endl; static boost::posix_time::ptime
-  // cloud_time =
-  //     boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::ptime cloud_time2 =
-  // boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::time_duration during_time = cloud_time2 - cloud_time;
-  // if (during_time.total_milliseconds() > 500) {
-  //   std::cout << "cloud time: " << during_time.total_milliseconds() <<
-  //   std::endl;
-  // }
-  // cloud_time = boost::posix_time::microsec_clock::local_time();
 
   std::vector<unsigned char> intensities;
   ParsePointCloudMessage(message, &lidar_vis_frame.pt3ds, &intensities);
@@ -190,20 +176,11 @@ void OnlineLocalVisualizer::OnLidarLocalization(
   lidar_loc_msg.qz = message.pose().orientation().qz();
   lidar_loc_msg.qw = message.pose().orientation().qw();
 
-  lidar_loc_msg.std_x = message.uncertainty().position_std_dev().x();
-  lidar_loc_msg.std_y = message.uncertainty().position_std_dev().y();
-  lidar_loc_msg.std_z = message.uncertainty().position_std_dev().z();
-
-  // std::cout << "lidar_loc_msg.timestamp: " << std::setprecision(15) <<
-  // lidar_loc_msg.timestamp << std::endl;
-
-  // static boost::posix_time::ptime cloud_time =
-  //     boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::ptime cloud_time2 =
-  // boost::posix_time::microsec_clock::local_time();
-  // boost::posix_time::time_duration during_time = cloud_time2 - cloud_time;
-  // std::cout << "lidar_loc_msg time: " << during_time.total_milliseconds() <<
-  // std::endl; cloud_time = boost::posix_time::microsec_clock::local_time();
+  if (message.has_uncertainty()) {
+    lidar_loc_msg.std_x = message.uncertainty().position_std_dev().x();
+    lidar_loc_msg.std_y = message.uncertainty().position_std_dev().y();
+    lidar_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  }
 
   VisualizationManager::GetInstance().AddLidarLocMessage(lidar_loc_msg);
 }
@@ -222,9 +199,11 @@ void OnlineLocalVisualizer::OnGNSSLocalization(
   gnss_loc_msg.qz = message.pose().orientation().qz();
   gnss_loc_msg.qw = message.pose().orientation().qw();
 
-  gnss_loc_msg.std_x = message.uncertainty().position_std_dev().x();
-  gnss_loc_msg.std_y = message.uncertainty().position_std_dev().y();
-  gnss_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  if (message.has_uncertainty()) {
+    gnss_loc_msg.std_x = message.uncertainty().position_std_dev().x();
+    gnss_loc_msg.std_y = message.uncertainty().position_std_dev().y();
+    gnss_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  }
 
   VisualizationManager::GetInstance().AddGNSSLocMessage(gnss_loc_msg);
 }
@@ -243,9 +222,11 @@ void OnlineLocalVisualizer::OnFusionLocalization(
   fusion_loc_msg.qz = message.pose().orientation().qz();
   fusion_loc_msg.qw = message.pose().orientation().qw();
 
-  fusion_loc_msg.std_x = message.uncertainty().position_std_dev().x();
-  fusion_loc_msg.std_y = message.uncertainty().position_std_dev().y();
-  fusion_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  if (message.has_uncertainty()) {
+    fusion_loc_msg.std_x = message.uncertainty().position_std_dev().x();
+    fusion_loc_msg.std_y = message.uncertainty().position_std_dev().y();
+    fusion_loc_msg.std_z = message.uncertainty().position_std_dev().z();
+  }
 
   VisualizationManager::GetInstance().AddFusionLocMessage(fusion_loc_msg);
 }
