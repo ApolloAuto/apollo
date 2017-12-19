@@ -24,9 +24,6 @@
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-DEFINE_string(canbus_test_file, "modules/canbus/testdata/canbus_test.pb.txt",
-              "canbus tester input test file, in ControlCommand pb format.");
-
 int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
