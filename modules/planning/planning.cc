@@ -57,12 +57,6 @@ Status Planning::InitFrame(const uint32_t sequence_num,
                            const VehicleState& vehicle_state) {
   frame_.reset(
       new Frame(sequence_num, planning_start_point, start_time, vehicle_state));
-  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
-    const auto& prediction =
-        AdapterManager::GetPrediction()->GetLatestObserved();
-    frame_->SetPrediction(prediction);
-    ADEBUG << "Get prediction: " << prediction.DebugString();
-  }
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame";
