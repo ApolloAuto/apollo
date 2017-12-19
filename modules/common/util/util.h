@@ -26,6 +26,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -109,6 +110,22 @@ typename Container::value_type MaxElement(const Container& elements) {
 template <typename Container>
 typename Container::value_type MinElement(const Container& elements) {
   return *std::min_element(elements.begin(), elements.end());
+}
+
+template <typename T>
+std::unordered_set<T> Intersection(const std::unordered_set<T>& s1,
+                                   const std::unordered_set<T>& s2) {
+  if (s1.size() < s2.size()) {
+    std::unordered_set<T> result;
+    for (const auto& v : s1) {
+      if (s2.count(v) > 0) {
+        result.insert(v);
+      }
+    }
+    return result;
+  } else {
+    return intersection(s2, s1);
+  }
 }
 
 /**

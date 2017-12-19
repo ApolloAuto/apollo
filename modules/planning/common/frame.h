@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file frame.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_COMMON_FRAME_H_
@@ -39,6 +39,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
+#include "modules/planning/common/lag_prediction.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -53,7 +54,6 @@ class Frame {
                  const double start_time,
                  const common::VehicleState &vehicle_state);
 
-  void SetPrediction(const prediction::PredictionObstacles &prediction);
   const common::TrajectoryPoint &PlanningStartPoint() const;
   common::Status Init();
 
@@ -86,13 +86,6 @@ class Frame {
       prediction::PredictionObstacles *prediction_obstacles);
 
  private:
-  /**
-   * @brief create obstacles from prediction input.
-   * @param prediction the received prediction result.
-   */
-  void CreatePredictionObstacles(
-      const prediction::PredictionObstacles &prediction);
-
   bool InitReferenceLineInfo();
 
   /**
@@ -131,6 +124,8 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
 
   ChangeLaneDecider change_lane_decider_;
+
+  std::unique_ptr<LagPrediction> lag_predictor_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

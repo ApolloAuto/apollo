@@ -267,6 +267,15 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+
+DEFINE_bool(enable_lag_prediction, true,
+            "Enable lagged prediction, which is more tolerant to obstacles "
+            "that appear and disappear dequeickly");
+DEFINE_int32(lag_prediction_min_appear_num, 5,
+             "The minimum of appearance of the obstacle for lagged prediction");
+DEFINE_double(lag_prediction_max_disappear_num, 3,
+              "In lagged prediction, ingnore obstacle disappeared for more "
+              "than this value");
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer
