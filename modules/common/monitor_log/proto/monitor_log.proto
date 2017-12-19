@@ -16,6 +16,7 @@ message MonitorMessageItem {
     SIMULATOR = 8;
     HWSYS = 9;
     ROUTING = 10;
+    MONITOR = 11;
   }
 
   optional MessageSource source = 1 [ default = UNKNOWN ];

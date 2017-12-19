@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["process_monitor.h"],
     deps = [
         "//external:gflags",
+        "//modules/common/util:string_util",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
     ],
