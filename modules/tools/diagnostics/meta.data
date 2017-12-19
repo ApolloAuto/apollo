@@ -3,7 +3,7 @@ CHASSIS         chassis_pb2.Chassis()                   /apollo/canbus/chassis  
 CHASSIS_DETAIL  chassis_detail_pb2.ChassisDetail()      /apollo/canbus/chassis_detail       10
 CONTROL         control_cmd_pb2.ControlCommand()        /apollo/control                     10
 LOCALIZATION    localization_pb2.LocalizationEstimate() /apollo/localization/pose           10
-MONITOR         monitor_pb2.MonitorMessage()            /apollo/monitor                     10
+MONITOR         monitor_log_pb2.MonitorMessage()            /apollo/monitor                     10
 PLANNING        planning_pb2.ADCTrajectory()            /apollo/planning                    200
 PERCEPTION      perception_obstacle_pb2.PerceptionObstacles() /apollo/perception/obstacles  200
 PREDICTION      prediction_obstacle_pb2.PredictionObstacles() /apollo/prediction            200
