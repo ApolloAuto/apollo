@@ -44,6 +44,11 @@ message PerceptionObstacle {
   repeated double point_cloud = 12 [packed = true];
 
   optional double confidence = 13 [default = 1.0];
+  enum ConfidenceType {
+      CONFIDENCE_CNN = 0;
+      CONFIDENCE_RADAR = 1;
+  };
+  optional ConfidenceType confidence_type = 14 [default = CONFIDENCE_CNN];
 }
 
 message PerceptionObstacles {
