@@ -81,6 +81,8 @@ class ReferenceLine {
   ReferencePoint GetNearestReferencepoint(const double s) const;
   ReferencePoint GetReferencePoint(const double x, const double y) const;
 
+  bool GetApproximateSLBoundary(const common::math::Box2d& box,
+                                SLBoundary* const sl_boundary) const;
   bool GetSLBoundary(const common::math::Box2d& box,
                      SLBoundary* const sl_boundary) const;
 
