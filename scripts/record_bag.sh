@@ -87,7 +87,7 @@ function start() {
 }
 
 function stop() {
-  pkill -SIGINT -f rosbag
+  pkill -SIGINT -f record
 }
 
 function help() {

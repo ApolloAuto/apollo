@@ -80,6 +80,12 @@ void ProcessMonitor::UpdateModule(
       return;
     }
   }
+
+  if (status->process_status().running()) {
+    // The process stopped. Send monitor log.
+    MonitorManager::LogBuffer().ERROR() << module_name << " process stopped!";
+  }
+
   status->mutable_process_status()->set_running(false);
 }
 

@@ -115,6 +115,10 @@ void SummaryMonitor::RunOnce(const double current_time) {
     system_status_fp_ = new_fp;
     last_broadcast_ = current_time;
   }
+
+  // Print and publish all monitor logs.
+  MonitorManager::LogBuffer().PrintLog();
+  MonitorManager::LogBuffer().Publish();
 }
 
 void SummaryMonitor::SummarizeModules() {
