@@ -45,17 +45,19 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::math::Vec2d;
 using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
+using apollo::prediction::PredictionObstacles;
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
 Frame::Frame(uint32_t sequence_num,
              const common::TrajectoryPoint &planning_start_point,
-             const common::VehicleState &vehicle_state)
+             const double start_time, const common::VehicleState &vehicle_state)
     : sequence_num_(sequence_num),
       planning_start_point_(planning_start_point),
+      start_time_(start_time),
       vehicle_state_(vehicle_state) {}
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
@@ -252,10 +254,8 @@ Status Frame::Init() {
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
 
-  // TODO(Liangliang): fix the bug here -- we should align prediction time based
-  // on the current time, NOT the vehicle state timestamp.
   if (FLAGS_align_prediction_time) {
-    AlignPredictionTime(vehicle_state_.timestamp());
+    AlignPredictionTime(start_time_, &prediction_);
   }
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
@@ -343,16 +343,29 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
 }
 
-void Frame::AlignPredictionTime(const double trajectory_header_time) {
-  ADEBUG << "planning header: " << std::to_string(trajectory_header_time);
-  double prediction_header_time = prediction_.header().timestamp_sec();
-  ADEBUG << "prediction header: " << std::to_string(prediction_header_time);
-
-  for (auto &obstacle : *prediction_.mutable_prediction_obstacle()) {
+void Frame::AlignPredictionTime(const double planning_start_time,
+                                PredictionObstacles *prediction_obstacles) {
+  if (!prediction_obstacles || !prediction_obstacles->has_header() ||
+      !prediction_obstacles->header().has_timestamp_sec()) {
+    return;
+  }
+  double prediction_header_time =
+      prediction_obstacles->header().timestamp_sec();
+  for (auto &obstacle : *prediction_obstacles->mutable_prediction_obstacle()) {
     for (auto &trajectory : *obstacle.mutable_trajectory()) {
       for (auto &point : *trajectory.mutable_trajectory_point()) {
         point.set_relative_time(prediction_header_time + point.relative_time() -
-                                trajectory_header_time);
+                                planning_start_time);
+      }
+      if (!trajectory.trajectory_point().empty() &&
+          trajectory.trajectory_point().begin()->relative_time() < 0) {
+        auto it = trajectory.trajectory_point().begin();
+        while (it != trajectory.trajectory_point().end() &&
+               it->relative_time() < 0) {
+          ++it;
+        }
+        trajectory.mutable_trajectory_point()->erase(
+            trajectory.trajectory_point().begin(), it);
       }
     }
   }
