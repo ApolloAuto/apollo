@@ -56,6 +56,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_reference_line_provider_thread = false;
   FLAGS_enable_trajectory_check = true;
   FLAGS_planning_test_mode = true;
+  FLAGS_enable_lag_prediction = false;
 }
 
 bool PlanningTestBase::SetUpAdapters() {

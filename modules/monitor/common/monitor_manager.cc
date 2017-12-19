@@ -28,9 +28,15 @@ namespace monitor {
 
 using apollo::common::util::LookupOrInsert;
 
-MonitorManager::MonitorManager() {
+MonitorManager::MonitorManager() :
+  logger_(apollo::common::monitor::MonitorMessageItem::MONITOR),
+  log_buffer_(&logger_) {
   CHECK(apollo::common::util::GetProtoFromASCIIFile(FLAGS_monitor_conf_path,
                                                     &config_));
+}
+
+apollo::common::monitor::MonitorLogBuffer &MonitorManager::LogBuffer() {
+  return instance()->log_buffer_;
 }
 
 const MonitorConf &MonitorManager::GetConfig() {

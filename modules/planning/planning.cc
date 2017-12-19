@@ -53,14 +53,10 @@ void Planning::RegisterPlanners() {
 
 Status Planning::InitFrame(const uint32_t sequence_num,
                            const TrajectoryPoint& planning_start_point,
+                           const double start_time,
                            const VehicleState& vehicle_state) {
-  frame_.reset(new Frame(sequence_num, planning_start_point, vehicle_state));
-  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
-    const auto& prediction =
-        AdapterManager::GetPrediction()->GetLatestObserved();
-    frame_->SetPrediction(prediction);
-    ADEBUG << "Get prediction: " << prediction.DebugString();
-  }
+  frame_.reset(
+      new Frame(sequence_num, planning_start_point, start_time, vehicle_state));
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame";
@@ -254,7 +250,8 @@ void Planning::RunOnce() {
           last_publishable_trajectory_.get(), &is_replan);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
+                     vehicle_state);
   ADCTrajectory trajectory_pb;
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb.mutable_debug());
@@ -337,7 +334,6 @@ void Planning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   }
 }
 
-
 Status Planning::Plan(const double current_time_stamp,
                       const std::vector<TrajectoryPoint>& stitching_trajectory,
                       ADCTrajectory* trajectory_pb) {
@@ -388,52 +384,52 @@ Status Planning::Plan(const double current_time_stamp,
       last_publishable_trajectory_->Clear();
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  ptr_debug->MergeFrom(best_reference_line->debug());
+  trajectory_pb->mutable_latency_stats()->MergeFrom(
+      best_reference_line->latency_stats());
+  // set right of way status
+  trajectory_pb->set_right_of_way_status(
+      best_reference_line->GetRightOfWayStatus());
+
+  best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
+
+  // Add debug information.
+  if (FLAGS_enable_record_debug) {
+    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
+    reference_line->set_name("planning_reference_line");
+    const auto& reference_points =
+        best_reference_line->reference_line().reference_points();
+    for (const auto& reference_point : reference_points) {
+      auto* path_point = reference_line->add_path_point();
+      path_point->set_x(reference_point.x());
+      path_point->set_y(reference_point.y());
+      path_point->set_theta(reference_point.heading());
+      path_point->set_kappa(reference_point.kappa());
+      path_point->set_dkappa(reference_point.dkappa());
     }
-    ptr_debug->MergeFrom(best_reference_line->debug());
-    trajectory_pb->mutable_latency_stats()->MergeFrom(
-        best_reference_line->latency_stats());
-    // set right of way status
-    trajectory_pb->set_right_of_way_status(
-        best_reference_line->GetRightOfWayStatus());
+  }
 
-    best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
+  last_publishable_trajectory_.reset(new PublishableTrajectory(
+      current_time_stamp, best_reference_line->trajectory()));
 
-    // Add debug information.
-    if (FLAGS_enable_record_debug) {
-      auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
-      reference_line->set_name("planning_reference_line");
-      const auto& reference_points =
-          best_reference_line->reference_line().reference_points();
-      for (const auto& reference_point : reference_points) {
-        auto* path_point = reference_line->add_path_point();
-        path_point->set_x(reference_point.x());
-        path_point->set_y(reference_point.y());
-        path_point->set_theta(reference_point.heading());
-        path_point->set_kappa(reference_point.kappa());
-        path_point->set_dkappa(reference_point.dkappa());
-      }
+  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+
+  last_publishable_trajectory_->PrependTrajectoryPoints(
+      stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+
+  for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
+    if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
+        FLAGS_trajectory_time_high_density_period) {
+      break;
     }
+    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
+                  .ShortDebugString();
+  }
 
-    last_publishable_trajectory_.reset(new PublishableTrajectory(
-        current_time_stamp, best_reference_line->trajectory()));
+  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 
-    ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
-
-    last_publishable_trajectory_->PrependTrajectoryPoints(
-        stitching_trajectory.begin(), stitching_trajectory.end() - 1);
-
-    for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
-      if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
-          FLAGS_trajectory_time_high_density_period) {
-        break;
-      }
-      ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
-                    .ShortDebugString();
-    }
-
-    last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
-
-    return status;
+  return status;
 }
 
 }  // namespace planning

@@ -23,14 +23,13 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/monitor/proto/monitor.pb.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/apollo_app.h"
-#include "modules/common/monitor/monitor.h"
 #include "modules/common/util/util.h"
 #include "modules/control/controller/controller_agent.h"
 
@@ -51,7 +50,8 @@ class Control : public apollo::common::ApolloApp {
   friend class ControlTestBase;
 
  public:
-  Control() : monitor_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
+  Control() :
+      monitor_logger_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
 
   /**
    * @brief module name
@@ -116,7 +116,7 @@ class Control : public apollo::common::ApolloApp {
 
   ControlConf control_conf_;
 
-  apollo::common::monitor::Monitor monitor_;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
   ros::Timer timer_;
 };
 

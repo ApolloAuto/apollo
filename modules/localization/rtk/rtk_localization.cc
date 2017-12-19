@@ -32,7 +32,7 @@ using apollo::common::Status;
 using apollo::common::time::Clock;
 
 RTKLocalization::RTKLocalization()
-    : monitor_(MonitorMessageItem::LOCALIZATION),
+    : monitor_logger_(MonitorMessageItem::LOCALIZATION),
       map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z} {}
 
 RTKLocalization::~RTKLocalization() {
@@ -48,7 +48,7 @@ Status RTKLocalization::Start() {
   const double duration = 1.0 / FLAGS_localization_publish_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &RTKLocalization::OnTimer, this);
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   if (!AdapterManager::GetGps()) {
     buffer.ERROR() << "GPS input not initialized. Check file "
                    << FLAGS_rtk_adapter_config_file;
@@ -74,7 +74,7 @@ Status RTKLocalization::Stop() {
 void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
   double time_delay =
       common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   if (FLAGS_enable_gps_timestamp &&
       time_delay > FLAGS_gps_time_delay_tolerance) {
     buffer.ERROR() << "GPS message time delay: " << time_delay;
@@ -410,7 +410,7 @@ void RTKLocalization::RunWatchDog() {
     return;
   }
 
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // check GPS time stamp against ROS timer
   double gps_delay_sec =

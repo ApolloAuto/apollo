@@ -302,7 +302,7 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : map_service_(map_service),
-      monitor_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
+      monitor_logger_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
   RegisterMessageCallbacks();
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
@@ -417,31 +417,27 @@ void SimulationWorldService::UpdateSimulationWorld(
   std::vector<MonitorMessageItem> updated;
   updated.reserve(SimulationWorldService::kMaxMonitorItems);
   // Save the latest messages at the top of the history.
-  int remove_size =
-      monitor_msg.item_size() > SimulationWorldService::kMaxMonitorItems
-          ? monitor_msg.item_size() - SimulationWorldService::kMaxMonitorItems
-          : 0;
+  const int updated_size = std::min(monitor_msg.item_size(),
+                                    SimulationWorldService::kMaxMonitorItems);
   std::copy(monitor_msg.item().begin(),
-            std::prev(monitor_msg.item().end(), remove_size),
+            monitor_msg.item().begin() + updated_size,
             std::back_inserter(updated));
 
   // Copy over the previous messages until there is no more history or
   // the max number of total messages has been hit.
   auto history = world_.monitor().item();
-  remove_size = history.size() + monitor_msg.item_size() -
-                SimulationWorldService::kMaxMonitorItems;
-  if (remove_size < 0) {
-    remove_size = 0;
+  const int history_size = std::min(
+      history.size(),
+      SimulationWorldService::kMaxMonitorItems - updated_size);
+  if (history_size > 0) {
+    std::copy(history.begin(), history.begin() + history_size,
+              std::back_inserter(updated));
   }
-  std::copy(history.begin(), std::prev(history.end(), remove_size),
-            std::back_inserter(updated));
 
   // Refresh the monitor message list in simulation_world.
-  ::google::protobuf::RepeatedPtrField<MonitorMessageItem> items(
-      updated.begin(), updated.end());
-  world_.mutable_monitor()->mutable_item()->Swap(&items);
+  *world_.mutable_monitor()->mutable_item() = {updated.begin(), updated.end()};
   world_.mutable_monitor()->mutable_header()->set_timestamp_sec(
-      ToSecond(Clock::Now()));
+      Clock::NowInSeconds());
 }
 
 template <>

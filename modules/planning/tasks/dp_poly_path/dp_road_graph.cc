@@ -213,16 +213,14 @@ bool DPRoadGraph::GenerateMinCostPath(
 bool DPRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
-  constexpr double kSamplePointLookForwardTime = 4.0;
   CHECK_NOTNULL(points);
 
-  const double kMinSampleDistance = 100.0;
-  const double total_length =
-      std::fmin(init_sl_point_.s() +
-                    std::fmax(speed_data_.speed_vector().back().s() + 20.0,
-                              kMinSampleDistance),
-                reference_line_.Length());
+  const double kMinSampleDistance = 40.0;
+  const double total_length = std::fmin(
+      init_sl_point_.s() + std::fmax(init_point.v() * 8.0, kMinSampleDistance),
+      reference_line_.Length());
 
+  constexpr double kSamplePointLookForwardTime = 4.0;
   const double level_distance =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
                           config_.step_length_min(), config_.step_length_max());

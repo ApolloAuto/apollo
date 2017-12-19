@@ -33,7 +33,7 @@ std::string Routing::Name() const {
 }
 
 Routing::Routing()
-    : monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
+    : monitor_logger_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
 
 apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
@@ -60,7 +60,7 @@ apollo::common::Status Routing::Start() {
   }
   AINFO << "Routing service is ready.";
 
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("Routing started");
   return apollo::common::Status::OK();
 }
@@ -99,7 +99,7 @@ void Routing::OnRoutingRequest(
     const RoutingRequest &routing_request) {
   AINFO << "Get new routing request:" << routing_request.DebugString();
   RoutingResponse routing_response;
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   const auto& fixed_request = FillLaneInfoIfMissing(routing_request);
   if (!navigator_ptr_->SearchRoute(fixed_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";

@@ -99,6 +99,7 @@ DECLARE_double(st_max_t);
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
+DECLARE_double(longitudinal_ignore_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
@@ -117,6 +118,9 @@ DECLARE_string(reference_line_end_obstacle_id);
 
 DECLARE_double(prediction_total_time);
 DECLARE_bool(align_prediction_time);
+DECLARE_bool(enable_lag_prediction);
+DECLARE_int32(lag_prediction_min_appear_num);
+DECLARE_double(lag_prediction_max_disappear_num);
 DECLARE_int32(trajectory_point_num_for_debug);
 DECLARE_double(decision_valid_stop_range);
 

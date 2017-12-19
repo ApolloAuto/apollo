@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "gtest/gtest_prod.h"
+
 #include "third_party/json/json.hpp"
 
 #include "modules/dreamview/backend/map/map_service.h"
@@ -34,7 +35,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/common/monitor/monitor.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 
 /**
  * @namespace apollo::dreamview
@@ -122,12 +123,13 @@ class SimulationWorldService {
   /**
    * @brief Publish message to the monitor
    * @param msg the string to send to monitor
-   * @param log_level defined in modules/common/monitor/proto/monitor.proto
+   * @param log_level defined in
+   *        modules/common/monitor_log/proto/monitor_log.proto
    */
   void PublishMonitorMessage(
       apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
       const std::string &msg) {
-    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.AddMonitorMsgItem(log_level, msg);
   }
 
@@ -191,7 +193,7 @@ class SimulationWorldService {
   std::unordered_map<std::string, Object> obj_map_;
 
   // The SIMULATOR monitor for publishing messages.
-  apollo::common::monitor::Monitor monitor_;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
 
   // Whether to clear the SimulationWorld in the next timer cycle, set by
   // frontend request.

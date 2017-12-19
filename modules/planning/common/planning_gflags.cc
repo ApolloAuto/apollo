@@ -41,7 +41,7 @@ DEFINE_double(
     look_backward_distance, 30,
     "look backward this distance when creating reference line from routing");
 
-DEFINE_double(look_forward_short_distance, 100,
+DEFINE_double(look_forward_short_distance, 150,
               "short look forward this distance when creating reference line "
               "from routing when ADC is slow");
 DEFINE_double(
@@ -171,7 +171,10 @@ DEFINE_double(static_obstacle_speed_threshold, 1.0,
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
-DEFINE_double(lateral_ignore_buffer, 2.0,
+DEFINE_double(longitudinal_ignore_buffer, 10.0,
+              "If an obstacle's longitudinal distance is further away "
+              "than this distance, ignore it");
+DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
 DEFINE_double(max_stop_distance_obstacle, 10.0,
@@ -264,6 +267,15 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+
+DEFINE_bool(enable_lag_prediction, true,
+            "Enable lagged prediction, which is more tolerant to obstacles "
+            "that appear and disappear dequeickly");
+DEFINE_int32(lag_prediction_min_appear_num, 5,
+             "The minimum of appearance of the obstacle for lagged prediction");
+DEFINE_double(lag_prediction_max_disappear_num, 3,
+              "In lagged prediction, ingnore obstacle disappeared for more "
+              "than this value");
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer

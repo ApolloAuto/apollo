@@ -155,10 +155,12 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     // NOTICE: this method will have errors when the reference line is not
     // straight.
     // Need double loop to cover all corner cases.
-    if (!reference_line.GetSLBoundary(object_moving_box, &object_boundary)) {
+    if (!reference_line.GetApproximateSLBoundary(object_moving_box,
+                                                 &object_boundary)) {
       AERROR << "failed to calculate boundary";
       return false;
     }
+
     // skip if object is entirely on one side of reference line.
     constexpr double kSkipLDistanceFactor = 0.4;
     const double skip_l_distance =

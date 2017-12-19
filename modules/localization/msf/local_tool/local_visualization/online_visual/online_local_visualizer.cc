@@ -39,7 +39,7 @@ using apollo::common::Status;
 using apollo::common::time::Clock;
 
 OnlineLocalVisualizer::OnlineLocalVisualizer()
-    : monitor_(MonitorMessageItem::LOCALIZATION) {}
+    : monitor_logger_(MonitorMessageItem::LOCALIZATION) {}
 
 OnlineLocalVisualizer::~OnlineLocalVisualizer() {}
 
@@ -50,7 +50,7 @@ std::string OnlineLocalVisualizer::Name() const {
 Status OnlineLocalVisualizer::Start() {
   AdapterManager::Init(FLAGS_msf_visual_adapter_config_file);
 
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // Point Cloud
   if (!AdapterManager::GetPointCloud()) {

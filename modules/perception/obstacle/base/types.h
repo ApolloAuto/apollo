@@ -42,6 +42,12 @@ enum SensorType {
   UNKNOWN_SENSOR_TYPE = 10,
 };
 
+enum ScoreType {
+  UNKNOWN_SCORE_TYPE = 0,
+  SCORE_CNN = 1,
+  SCORE_RADAR = 2,
+};
+
 typedef pcl_util::PointCloud PolygonType;
 typedef pcl_util::PointDCloud PolygonDType;
 

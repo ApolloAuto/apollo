@@ -23,7 +23,7 @@ em_planner_config {
         obstacle_ignore_distance: 20.0
         obstacle_collision_distance: 0.5
         obstacle_risk_distance: 2.0
-        obstacle_collision_cost: 1e6
+        obstacle_collision_cost: 1e8
         path_l_cost: 6.5
         path_dl_cost: 8e3
         path_ddl_cost: 5e1
@@ -114,6 +114,7 @@ em_planner_config {
             regularization_weight: 0.1
             follow_drag_distance: 17.0
             dp_st_reference_weight: 0.0
+            init_jerk_kernel_weight: 5e4
         }
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
@@ -134,7 +135,7 @@ em_planner_config {
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
-            num_points_to_avg_kappa: 4
+            num_points_to_avg_kappa: 2
         }
     }
 }

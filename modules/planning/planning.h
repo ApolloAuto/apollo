@@ -96,6 +96,7 @@ class Planning : public PlanningInterface {
 
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
+                           const double start_time,
                            const common::VehicleState& vehicle_state);
 
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);

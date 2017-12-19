@@ -4,6 +4,7 @@ import { inject, observer } from "mobx-react";
 import Header from "components/Header";
 import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
+import Loader from "components/common/Loader";
 import WS from "store/websocket";
 
 
@@ -33,6 +34,14 @@ export default class Dreamview extends React.Component {
 
     render() {
         const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
+
+        if (!isInitialized) {
+            return (
+                <div className="offlineview">
+                    <Loader extraClasses="offline-loader"/>
+                </div>
+            );
+        }
 
         return (
             <div className="offlineview">
