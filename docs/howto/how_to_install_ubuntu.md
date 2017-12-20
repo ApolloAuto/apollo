@@ -1,6 +1,6 @@
 # How to Install Ubuntu Linux Operating System
 
-## Helpful Hints before you begin:
+## Helpful hints before you begin:
 
 * It is recommended that you use Ubuntu 14.04.3.
 * You can type F2 during the system boot process to enter the BIOS settings. It is recommended that you disable Quick Boot and Quiet Boot in the BIOS to make it easier to catch any issues in the boot process.
