@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/path/path_data.h"
@@ -36,8 +37,8 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
+#include "modules/planning/tasks/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
 namespace planning {
@@ -67,12 +68,14 @@ class DPRoadGraph {
         : sl_point(point_sl), min_cost_prev_node(node_prev) {}
 
     DPRoadGraphNode(const common::SLPoint point_sl,
-                    const DPRoadGraphNode *node_prev, const double cost)
+                    const DPRoadGraphNode *node_prev,
+                    const ComparableCost &cost)
         : sl_point(point_sl), min_cost_prev_node(node_prev), min_cost(cost) {}
 
     void UpdateCost(const DPRoadGraphNode *node_prev,
-                    const QuinticPolynomialCurve1d &curve, const double cost) {
-      if (cost < min_cost) {
+                    const QuinticPolynomialCurve1d &curve,
+                    const ComparableCost &cost) {
+      if (cost <= min_cost) {
         min_cost = cost;
         min_cost_prev_node = node_prev;
         min_cost_curve = curve;
@@ -81,7 +84,9 @@ class DPRoadGraph {
 
     common::SLPoint sl_point;
     const DPRoadGraphNode *min_cost_prev_node = nullptr;
-    double min_cost = std::numeric_limits<double>::infinity();
+    ComparableCost min_cost = {true, true,
+                               std::numeric_limits<double>::infinity(),
+                               std::numeric_limits<double>::infinity()};
     QuinticPolynomialCurve1d min_cost_curve;
   };
 

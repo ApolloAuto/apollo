@@ -68,11 +68,11 @@ class BaseFusion {
   BaseFusion() {}
   virtual ~BaseFusion() {}
   virtual bool Init() = 0;
-  /**
-   * @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
-   * @param [in]: multi sensor objects.
-   * @param [out]: fused objects.
-   **/
+
+  // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
+  // @param [in]: multi sensor objects.
+  // @param [out]: fused objects.
+  // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
                     std::vector<ObjectPtr> *fused_objects) = 0;
   virtual std::string name() const = 0;

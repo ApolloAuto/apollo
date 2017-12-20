@@ -37,7 +37,10 @@ class ProbabilisticFusion : public BaseFusion {
 
   virtual bool Init();
 
-  /**@brief main entrance of fusion*/
+  // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
+  // @param [in]: multi sensor objects.
+  // @param [out]: fused objects.
+  // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
                     std::vector<ObjectPtr> *fused_objects);
 

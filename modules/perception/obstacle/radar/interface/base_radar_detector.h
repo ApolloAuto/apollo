@@ -128,6 +128,7 @@ class BaseRadarDetector {
   // @param [in]: roi map polygons, using world frame.
   // @param [in]: options.
   // @param [out]: transformed objects.
+  // return true if detect successfully, otherwise return false
   virtual bool Detect(const ContiRadar &raw_obstacles,
                       const std::vector<PolygonDType> &map_polygons,
                       const RadarDetectorOptions &options,

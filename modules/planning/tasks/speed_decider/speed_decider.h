@@ -85,6 +85,9 @@ class SpeedDecider : public Task {
 
   void AppendIgnoreDecision(PathObstacle* path_obstacle) const;
 
+  // check if obstacle is low speed and decelerating
+  bool IsLowSpeedDecelerating(const PathObstacle& path_obstacle) const;
+
  private:
   DpStSpeedConfig dp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;

@@ -65,7 +65,7 @@ TEST(Obstacle, IsStaticObstacle) {
 
   perception_obstacle.mutable_velocity()->set_x(0.5);
   perception_obstacle.mutable_velocity()->set_y(0.5);
-  EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
+  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 }
 
 class ObstacleTest : public ::testing::Test {
