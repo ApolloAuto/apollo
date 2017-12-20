@@ -25,6 +25,7 @@
 #include <limits>
 #include <utility>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -38,11 +39,12 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
-using apollo::hdmap::RouteSegments;
 using apollo::hdmap::LaneWaypoint;
+using apollo::hdmap::RouteSegments;
 
 ReferenceLineProvider::ReferenceLineProvider() {}
 
@@ -507,6 +509,8 @@ void ReferenceLineProvider::GetAnchorPoints(
     const ReferenceLine &reference_line,
     std::vector<AnchorPoint> *anchor_points) const {
   CHECK_NOTNULL(anchor_points);
+  const auto half_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   const double interval = smoother_config_.max_constraint_interval();
   int num_of_anchors =
       std::max(2, static_cast<int>(reference_line.Length() / interval + 0.5));
@@ -520,7 +524,12 @@ void ReferenceLineProvider::GetAnchorPoints(
     last_anchor.path_point = ref_point.ToPathPoint(s);
     last_anchor.longitudinal_bound =
         smoother_config_.longitudinal_boundary_bound();
-    last_anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
+    double left_width = 0.0;
+    double right_width = 0.0;
+    reference_line.GetLaneWidth(s, &left_width, &right_width);
+    last_anchor.lateral_bound =
+        std::max(smoother_config_.lateral_boundary_bound(),
+                 std::min(left_width, right_width) - half_width);
   }
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
