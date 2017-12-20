@@ -138,7 +138,7 @@ double SignalLightScenario::GetStopDeceleration(
   if (adc_speed < FLAGS_stop_min_speed) {
     return 0.0;
   }
-  double stop_distance = 0;
+  double stop_distance = 0.0;
   double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
   double stop_line_s = signal_light->start_s;
 
@@ -148,7 +148,8 @@ double SignalLightScenario::GetStopDeceleration(
     stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
   }
   if (stop_distance < 1e-5) {
-    return std::numeric_limits<double>::max();
+    // longitudinal_acceleration_lower_bound is a negative value.
+    return -FLAGS_longitudinal_acceleration_lower_bound;
   }
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
