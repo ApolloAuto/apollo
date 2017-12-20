@@ -10,3 +10,6 @@ Sending a pull request is simple.
 ## Do comments need to be made in Doxygen?
 
 Yes, currently all comments need to be made in Doxygen.
+
+
+**More General FAQs to follow.**
