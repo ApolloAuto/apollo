@@ -22,7 +22,7 @@ namespace planning {
 LatticeQuinticPolynomialCurve1d::LatticeQuinticPolynomialCurve1d(
     const std::array<double, 3>& start, const std::array<double, 3>& end,
     const double param)
-    : QuinticPolynomialCurve1d(start, end, param) {}
+  : QuinticPolynomialCurve1d(start, end, param) {}
 
 LatticeQuinticPolynomialCurve1d::LatticeQuinticPolynomialCurve1d(
     const double x0, const double dx0, const double ddx0,
