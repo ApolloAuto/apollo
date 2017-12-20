@@ -20,8 +20,8 @@
 DEFINE_string(canbus_node_name, "chassis", "The chassis module name in proto");
 DEFINE_string(canbus_module_name, "canbus", "Module name");
 
-DEFINE_string(adapter_config_filename, "modules/canbus/conf/adapter.conf",
-              "The adapter config file");
+DEFINE_string(canbus_adapter_config_filename,
+              "modules/canbus/conf/adapter.conf", "The adapter config file");
 
 // data file
 DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf.pb.txt",
@@ -33,3 +33,7 @@ DEFINE_int64(min_cmd_interval, 5, "Minimum control command interval in us.");
 
 // chassis_detail message publish
 DEFINE_bool(enable_chassis_detail_pub, false, "Chassis Detail message publish");
+
+// canbus test files
+DEFINE_string(canbus_test_file, "modules/canbus/testdata/canbus_test.pb.txt",
+              "canbus tester input test file, in ControlCommand pb format.");

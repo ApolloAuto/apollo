@@ -199,6 +199,21 @@ cc_library(
 )
 
 cc_library(
+    name = "lag_prediction",
+    srcs = [
+        "lag_prediction.cc",
+    ],
+    hdrs = [
+        "lag_prediction.h",
+    ],
+    deps = [
+        ":planning_gflags",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/prediction/proto:prediction_proto",
+    ],
+)
+
+cc_library(
     name = "change_lane_decider",
     srcs = [
         "change_lane_decider.cc",
@@ -226,6 +241,7 @@ cc_library(
     deps = [
         ":change_lane_decider",
         ":indexed_queue",
+        ":lag_prediction",
         ":obstacle",
         ":reference_line_info",
         "//modules/common:log",
@@ -238,6 +254,22 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
+    ],
+)
+
+cc_test(
+    name = "frame_test",
+    size = "small",
+    srcs = [
+        "frame_test.cc",
+    ],
+    data = [
+        "//modules/planning/common:common_testdata",
+    ],
+    deps = [
+        ":frame",
+        "//modules/common/util",
+        "@gtest//:main",
     ],
 )
 

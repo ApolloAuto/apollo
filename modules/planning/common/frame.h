@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file frame.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_COMMON_FRAME_H_
@@ -39,6 +39,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
+#include "modules/planning/common/lag_prediction.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -50,9 +51,9 @@ class Frame {
  public:
   explicit Frame(uint32_t sequence_num,
                  const common::TrajectoryPoint &planning_start_point,
+                 const double start_time,
                  const common::VehicleState &vehicle_state);
 
-  void SetPrediction(const prediction::PredictionObstacles &prediction);
   const common::TrajectoryPoint &PlanningStartPoint() const;
   common::Status Init();
 
@@ -80,20 +81,16 @@ class Frame {
 
   const common::VehicleState &vehicle_state() const;
 
- private:
-  /**
-   * @brief create obstacles from prediction input.
-   * @param prediction the received prediction result.
-   */
-  void CreatePredictionObstacles(
-      const prediction::PredictionObstacles &prediction);
+  static void AlignPredictionTime(
+      const double planning_start_time,
+      prediction::PredictionObstacles *prediction_obstacles);
 
+ private:
   bool InitReferenceLineInfo();
 
-  void AlignPredictionTime(const double trajectory_header_time);
-
   /**
-   * Find an obstacle that collides with ADC (Autonomous Driving Car) if such
+   * Find an obstacle that collides with ADC (Autonomous Driving Car) if
+   * such
    * obstacle exists.
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
@@ -112,11 +109,13 @@ class Frame {
   uint32_t sequence_num_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;
+  const double start_time_;
   common::VehicleState vehicle_state_;
   std::list<ReferenceLineInfo> reference_line_info_;
 
   /**
-   * the reference line info that the vehicle finally choose to drive on.
+   * the reference line info that the vehicle finally choose to drive
+   *on.
    **/
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
@@ -125,6 +124,8 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
 
   ChangeLaneDecider change_lane_decider_;
+
+  std::unique_ptr<LagPrediction> lag_predictor_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

@@ -27,20 +27,22 @@
 namespace apollo {
 namespace canbus {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
 using apollo::drivers::canbus::CanClientFactory;
 
-using apollo::control::ControlCommand;
 using apollo::common::time::Clock;
+using apollo::control::ControlCommand;
 
-std::string Canbus::Name() const { return FLAGS_canbus_module_name; }
+std::string Canbus::Name() const {
+  return FLAGS_canbus_module_name;
+}
 
 Status Canbus::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_filename);
+  AdapterManager::Init(FLAGS_canbus_adapter_config_filename);
   AINFO << "The adapter manager is successfully initialized.";
 
   // load conf
@@ -132,7 +134,7 @@ Status Canbus::Start() {
   AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
 
   // last step: publish monitor messages
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("Canbus is started.");
 
   return Status::OK();
@@ -197,7 +199,7 @@ void Canbus::OnControlCommand(const ControlCommand &control_command) {
 
 // Send the error to monitor and return it
 Status Canbus::OnError(const std::string &error_msg) {
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);
 }
