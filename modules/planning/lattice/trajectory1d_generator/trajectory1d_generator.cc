@@ -24,7 +24,7 @@
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/util/lattice_params.h"
-#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
+#include "modules/planning/lattice/util/lattice_quartic_polynomial_curve1d.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
@@ -124,7 +124,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     end_state[1] = end_condition.first[2];
 
     std::shared_ptr<Curve1d> ptr_lon_trajectory =
-        std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
+        std::shared_ptr<Curve1d>(new LatticeQuarticPolynomialCurve1d(
             init_lon_state_, end_state, end_condition.second));
 
     ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
