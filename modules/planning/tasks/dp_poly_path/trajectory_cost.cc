@@ -123,7 +123,8 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
     const double end_s, const uint32_t curr_level,
     const uint32_t total_level) const {
-  ComparableCost path_cost;
+  ComparableCost cost;
+  double path_cost = 0.0;
   for (double path_s = 0.0; path_s < (end_s - start_s);
        path_s += config_.path_resolution()) {
     const double l = curve.Evaluate(0, path_s);
@@ -135,8 +136,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
       return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
     };
 
-    path_cost.smoothness_cost +=
-        l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
+    path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
 
     double left_width = 0.0;
     double right_width = 0.0;
@@ -149,24 +149,25 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     constexpr double kBuff = 0.2;
     if (std::fabs(l) > std::fabs(init_sl_point_.l()) &&
         (l + width / 2.0 + kBuff > left_width ||
-         l - width / 2.0 - kBuff < right_width)) {
-      path_cost.out_of_boundary = true;
+         l - width / 2.0 - kBuff < -right_width)) {
+      cost.out_of_boundary = true;
     }
 
     const double dl = std::fabs(curve.Evaluate(1, path_s));
-    path_cost.smoothness_cost += dl * dl * config_.path_dl_cost();
+    path_cost += dl * dl * config_.path_dl_cost();
 
     const double ddl = std::fabs(curve.Evaluate(2, path_s));
-    path_cost.smoothness_cost += ddl * ddl * config_.path_ddl_cost();
+    path_cost += ddl * ddl * config_.path_ddl_cost();
   }
-  path_cost.smoothness_cost *= config_.path_resolution();
+  path_cost *= config_.path_resolution();
 
   if (curr_level == total_level) {
     const double end_l = curve.Evaluate(0, end_s - start_s);
-    path_cost.smoothness_cost +=
+    path_cost +=
         std::sqrt(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
   }
-  return path_cost;
+  cost.smoothness_cost = path_cost;
+  return cost;
 }
 
 ComparableCost TrajectoryCost::CalculateStaticObstacleCost(
@@ -251,7 +252,6 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   if (!no_overlap) {
     obstacle_cost.has_collision = true;
-    return obstacle_cost;
   }
 
   const double delta_l = std::fabs(
