@@ -296,13 +296,6 @@ function release() {
   echo "git_commit: $(git rev-parse HEAD)" >> $META
   echo "car_type : LINCOLN.MKZ" >> $META
   echo "arch : ${MACHINE_ARCH}" >> $META
-
-  # system libs
-  for LIB_PATH in /usr/local/local_integ/lib; do
-    DST_PATH="$(dirname "${RELEASE_DIR}${LIB_PATH}")"
-    mkdir -p "${DST_PATH}"
-    cp -r "${LIB_PATH}" "${DST_PATH}"
-  done
 }
 
 function gen_coverage() {
