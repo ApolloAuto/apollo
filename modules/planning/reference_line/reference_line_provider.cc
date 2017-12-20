@@ -529,7 +529,8 @@ void ReferenceLineProvider::GetAnchorPoints(
     reference_line.GetLaneWidth(s, &left_width, &right_width);
     last_anchor.lateral_bound =
         std::max(smoother_config_.lateral_boundary_bound(),
-                 std::min(left_width, right_width) - half_width);
+                 std::min(left_width, right_width) - half_width -
+                     FLAGS_reference_line_lateral_buffer);
   }
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
