@@ -42,4 +42,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "distance_approach_problem_interface",
+    srcs = [
+        "distance_approach_problem_interface.cc",
+    ],
+    hdrs = [
+        "distance_approach_problem_interface.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planning_proto",
+        "@eigen//:eigen",
+        "@ipopt//:ipopt",
+    ],
+)
+
 cpplint()
