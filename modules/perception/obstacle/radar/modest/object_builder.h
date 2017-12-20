@@ -33,6 +33,13 @@ class ObjectBuilder {
   ObjectBuilder(): delay_frames_(4), use_fp_filter_(true) {
   }
   ~ObjectBuilder() {}
+
+  // @brief: build radar objects
+  // @param [in]: raw obstacles from radar driver.
+  // @param [in]: radar pose from localization
+  // @param [in]: host car velocity from localization
+  // @param [out]: built radar objects
+  // @return nothing
   void Build(const ContiRadar &raw_obstacles,
              const Eigen::Matrix4d &radar_pose,
              const Eigen::Vector2d &main_velocity,

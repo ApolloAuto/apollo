@@ -34,43 +34,66 @@ class RadarTrackManager {
   RadarTrackManager() {}
   ~RadarTrackManager() {}
 
+  // @brief: process radar obstacles
+  // @param [in]: built radar obstacles
+  // @return nothing
   void Process(const SensorObjects &radar_obs);
 
-  // update tracking state using kalman filter
+  // @brief: update tracking state
+  // @param [in]: built radar obstacles
+  // @return nothing
   void Update(SensorObjects* radar_obs);
 
-  // match observations to existed tracking states by ID
+  // @brief match observation obstacles to existed tracking states by
+  //            tracking id
+  // @param [out]: assigement index pairs of observations and tracking states
+  // @param [out]: indexs of unassigend tracking state
+  // @param [out]: indexs of unassigned observation obstacles
+  // @return nothing
   void AssignTrackObsIdMatch(const SensorObjects &radar_obs,
                              std::vector<std::pair<int, int>> *assignment,
                              std::vector<int> *unassigned_track,
                              std::vector<int> *unassigned_obs);
 
+  // @brief update tracking state with assigned observation obstacle
+  // @param [IN]: assigement index pairs of observations and tracking states
+  // @return nothing
   void UpdateAssignedTrack(const SensorObjects &radar_obs,
                            const std::vector<std::pair<int, int>> &assignment);
 
-  // update tracking states which fail to find a observation match (set to NULL)
+  // @brief update tracking state of unassigned tracking state
+  // @param [IN]: indexs of unassigend tracking state
+  // @return nothing
   void UpdateUnassignedTrack(const double &timestamp,
-                             std::vector<int> *unassigned_track);
+                             const std::vector<int>& unassigned_track);
 
+  // @brief delete stale tracking states
+  // @return nothing
   void DeleteLostTrack();
 
+  // @brief create a new tracking state with observation obstacles
+  // @param [IN]: indexs of unassigend observation obstacles
+  // @return nothing
   void CreateNewTrack(const SensorObjects &radar_obs,
-                      std::vector<int> *unassigned_obs);
+                      const std::vector<int>& unassigned_obs);
 
-  double DistanceBetweenObs(const Object &obs1, double timestamp1,
-                            const Object &obs2, double timestamp2);
-
+  // @brief get radar obstacles
+  // @return radar obstacles
   SensorObjects &GetRadarObs() {
     return radar_obs_;
   }
 
+  // @brief get tracking state
+  // @return tracking states
   std::vector<RadarTrack> &GetTracks() {
-    return obs_track_;
+    return obs_tracks_;
   }
 
  private:
+  double DistanceBetweenObs(const Object &obs1, double timestamp1,
+                            const Object &obs2, double timestamp2);
   SensorObjects radar_obs_;
-  std::vector<RadarTrack> obs_track_;
+  std::vector<RadarTrack> obs_tracks_;
 };
 
 }  // namespace perception
