@@ -117,7 +117,7 @@ DEFINE_bool(enable_reference_line_provider_thread, true,
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
 
-DEFINE_double(smoothed_reference_line_max_diff, 1.0,
+DEFINE_double(smoothed_reference_line_max_diff, 5.0,
               "Maximum position difference between the smoothed and the raw "
               "reference lines.");
 
