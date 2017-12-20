@@ -42,10 +42,9 @@ namespace perception {
 
 struct SensorFile {
   SensorFile() {}
-  SensorFile(const std::string& key,
-    const std::string& path,
-    double times_tamp = 0.0)
-    : sensor_key(key), file_path(path), timestamp(times_tamp) {}
+  SensorFile(const std::string& key, const std::string& path,
+             double times_tamp = 0.0)
+      : sensor_key(key), file_path(path), timestamp(times_tamp) {}
   std::string sensor_key;
   std::string file_path;
   double timestamp;
@@ -61,7 +60,7 @@ struct SensorFile {
 struct SensorFilesSource {
   SensorFilesSource() {}
   SensorFilesSource(const std::string& folder, const std::string& ext)
-    : folder_path(folder), extension(ext) {}
+      : folder_path(folder), extension(ext) {}
   std::string folder_path;
   std::string extension;
 };

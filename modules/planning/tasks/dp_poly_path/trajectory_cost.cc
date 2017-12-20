@@ -93,13 +93,6 @@ TrajectoryCost::TrajectoryCost(
         // lane blocking obstacle
         continue;
       }
-
-      const double adc_length = vehicle_param.length();
-      if (sl_boundary.start_s() - init_sl_point_.s() < 2.0 * adc_length) {
-        // if too close, we treat the obstacle as non-nudgable
-        continue;
-      }
-
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;
