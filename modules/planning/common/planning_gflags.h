@@ -130,6 +130,10 @@ DECLARE_bool(enable_traffic_light);
 
 DECLARE_double(turn_signal_distance);
 
+// speed decider
+DECLARE_double(low_speed_obstacle_threshold);
+DECLARE_double(decelerating_obstacle_threshold);
+
 // QpSt optimizer
 DECLARE_bool(enable_slowdown_profile_generator);
 DECLARE_double(slowdown_profile_deceleration);
