@@ -428,7 +428,6 @@ Status Planning::Plan(const double current_time_stamp,
   }
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
-
   return status;
 }
 
