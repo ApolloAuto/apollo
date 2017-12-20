@@ -137,9 +137,9 @@ bool DPRoadGraph::GenerateMinCostPath(
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
-  TrajectoryCost trajectory_cost(config_, reference_line_, obstacles,
-                                 vehicle_config.vehicle_param(), speed_data_,
-                                 init_sl_point_);
+  TrajectoryCost trajectory_cost(
+      config_, reference_line_, reference_line_info_.IsChangeLanePath(),
+      obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
   if (graph_nodes.size() < 2) {
