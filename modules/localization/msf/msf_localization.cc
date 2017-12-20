@@ -39,7 +39,7 @@ using apollo::common::Status;
 using apollo::common::time::Clock;
 
 MSFLocalization::MSFLocalization()
-    : monitor_(MonitorMessageItem::LOCALIZATION),
+    : monitor_logger_(MonitorMessageItem::LOCALIZATION),
       tf2_broadcaster_(NULL),
       localization_state_(LocalizationMeasureState::OK),
       pcd_msg_index_(-1) {}
@@ -59,7 +59,7 @@ Status MSFLocalization::Start() {
     return status;
   }
 
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // Raw Imu
   if (!AdapterManager::GetRawImu()) {

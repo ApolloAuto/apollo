@@ -41,7 +41,7 @@ def dump_bag(in_bag, out_dir, start_time, duration, filter_topic):
     bag = rosbag.Bag(in_bag, 'r')
     seq = 0
     for topic, msg, t in bag.read_messages():
-        t_sec = t.secs + t.nsecs / 1.0e9;
+        t_sec = t.secs + t.nsecs / 1.0e9
         if start_time and t_sec < start_time:
             print "not yet reached the start time"
             continue
@@ -68,7 +68,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--start_time", action="store", type=float, help="the input ros bag")
     parser.add_argument(
-        "--duration", action="store", type=float, default=1.0, help="the input ros bag")
+        "--duration",
+        action="store",
+        type=float,
+        default=1.0,
+        help="the input ros bag")
     parser.add_argument(
         "out_dir",
         action="store",
@@ -80,8 +84,9 @@ if __name__ == "__main__":
         the tool will dump all the messages regardless of the message topic."""
     )
     args = parser.parse_args()
+    if not os.path.exists(args.out_dir):
+        print("%s does not exist" % args.out_dir);
+        sys.exit(0)
 
-    if os.path.exists(args.out_dir):
-        shutil.rmtree(args.out_dir)
-    os.makedirs(args.out_dir)
-    dump_bag(args.in_rosbag, args.out_dir, args.start_time, args.duration, args.topic)
+    dump_bag(args.in_rosbag, args.out_dir, args.start_time, args.duration,
+             args.topic)

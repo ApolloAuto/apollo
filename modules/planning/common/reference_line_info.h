@@ -63,7 +63,7 @@ class ReferenceLineInfo {
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
 
   const DiscretizedTrajectory& trajectory() const;
-  const double TrajectoryLength() const;
+  double TrajectoryLength() const;
 
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }

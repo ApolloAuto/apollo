@@ -32,7 +32,7 @@
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/common/monitor/monitor.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -58,7 +58,8 @@ using ::apollo::drivers::canbus::CanReceiver;
 */
 class Canbus : public apollo::common::ApolloApp {
  public:
-  Canbus() : monitor_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+  Canbus() :
+    monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
   * @brief obtain module name
@@ -101,7 +102,7 @@ class Canbus : public apollo::common::ApolloApp {
 
   int64_t last_timestamp_ = 0;
   ros::Timer timer_;
-  apollo::common::monitor::Monitor monitor_;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
 }  // namespace canbus

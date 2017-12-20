@@ -120,14 +120,23 @@ bool MapService::ReloadMap(bool force_reload) {
   }
   hdmap_ = HDMapUtil::BaseMapPtr();
   sim_map_ = use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
+  if (hdmap_ == nullptr || sim_map_ == nullptr) {
+    pending = true;
+    AWARN << "No map data available yet.";
+  } else {
+    pending = false;
+  }
   return ret;
 }
 
 MapElementIds MapService::CollectMapElementIds(const PointENU &point,
                                                double radius) const {
+  MapElementIds result;
+  if (pending) {
+    return result;
+  }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
-  MapElementIds result;
   std::vector<LaneInfoConstPtr> lanes;
   if (sim_map_->GetLanes(point, radius, &lanes) != 0) {
     AERROR << "Fail to get lanes from sim_map.";
@@ -173,6 +182,9 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   Map result;
+  if (pending) {
+    return result;
+  }
   Id map_id;
 
   for (const auto &id : ids.lane) {
@@ -242,7 +254,9 @@ bool MapService::GetNearestLane(const double x, const double y,
   PointENU point;
   point.set_x(x);
   point.set_y(y);
-  if (hdmap_->GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
+  if (pending
+      || hdmap_->GetNearestLane(point, nearest_lane, nearest_s, nearest_l)
+          < 0) {
     AERROR << "Failed to get nearest lane!";
     return false;
   }
@@ -314,6 +328,9 @@ bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
 
 bool MapService::AddPathFromPassageRegion(
     const routing::Passage &passage_region, std::vector<Path> *paths) const {
+  if (pending) {
+    return false;
+  }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   RouteSegments segments;

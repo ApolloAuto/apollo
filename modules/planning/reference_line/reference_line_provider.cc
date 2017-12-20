@@ -129,23 +129,9 @@ bool ReferenceLineProvider::IsAllowChangeLane(
 
 bool ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing) {
-  bool is_new_routing = false;
-  {
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    is_new_routing = pnc_map_->IsNewRouting(routing);
-    if (is_new_routing) {
-      if (!pnc_map_->UpdateRoutingResponse(routing)) {
-        AERROR << "Failed to update routing in pnc map";
-        return false;
-      }
-      has_routing_ = true;
-    }
-  }
-  if (is_new_routing) {
-    std::lock_guard<std::mutex> lock(segment_history_mutex_);
-    segment_history_.clear();
-    segment_history_id_.clear();
-  }
+  std::lock_guard<std::mutex> lock(routing_mutex_);
+  routing_ = routing;
+  has_routing_ = true;
   return true;
 }
 
@@ -342,7 +328,26 @@ bool ReferenceLineProvider::CreateReferenceLine(
     std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
     vehicle_state = vehicle_state_;
   }
+
+  routing::RoutingResponse routing;
   {
+    std::lock_guard<std::mutex> lock(routing_mutex_);
+    routing = routing_;
+  }
+  {
+    // Update routing in pnc_map
+    if (pnc_map_->IsNewRouting(routing)) {
+      if (!pnc_map_->UpdateRoutingResponse(routing)) {
+        AERROR << "Failed to update routing in pnc map";
+        return false;
+      }
+
+      std::lock_guard<std::mutex> lock(segment_history_mutex_);
+      segment_history_.clear();
+      segment_history_id_.clear();
+    }
+
+    // Update vehicle state in pnc_map
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
     if (!pnc_map_->UpdateVehicleState(vehicle_state)) {
       AERROR << "Failed to update vehicle state in pnc map";

@@ -61,6 +61,8 @@ DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_int32(max_num_obstacles);
+DECLARE_bool(enable_adjust_velocity_heading);
+DECLARE_double(heading_diff_thred);
 
 // evaluator
 DECLARE_double(rnn_min_lane_relatice_s);
@@ -70,6 +72,10 @@ DECLARE_double(perception_confidence_threshold);
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
+DECLARE_bool(enable_trim_prediction_trajectory);
+DECLARE_double(adc_time_step);
+DECLARE_double(distance_to_adc_trajectory_thred);
+DECLARE_double(time_to_adc_trajectory_thred);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);

@@ -105,7 +105,7 @@ function check_in_docker() {
 function set_lib_path() {
   if [ "$RELEASE_DOCKER" == 1 ];then
     source /apollo/ros/setup.bash
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/local_integ/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/local_integ/lib:/home/caros/secure_upgrade/depend_lib
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
@@ -117,7 +117,7 @@ function set_lib_path() {
     fi
     PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib:/home/caros/secure_upgrade/depend_lib
   fi
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then

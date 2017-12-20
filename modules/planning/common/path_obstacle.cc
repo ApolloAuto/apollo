@@ -38,8 +38,9 @@ using apollo::common::util::FindOrDie;
 using apollo::common::VehicleConfigHelper;
 
 namespace {
-const double kStBoundaryDeltaS = 0.2;   // meters
-const double kStBoundaryDeltaT = 0.05;  // seconds
+const double kStBoundaryDeltaS = 0.2;        // meters
+const double kStBoundarySparseDeltaS = 1.0;  // meters
+const double kStBoundaryDeltaT = 0.05;       // seconds
 }
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
@@ -139,6 +140,8 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
 
+  SLBoundary last_sl_boundary;
+  int last_index = 0;
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
@@ -154,15 +157,36 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     // NOTICE: this method will have errors when the reference line is not
     // straight.
     // Need double loop to cover all corner cases.
-    if (!reference_line.GetSLBoundary(object_moving_box, &object_boundary)) {
+    const double distance_xy =
+        common::util::DistanceXY(trajectory_points[last_index].path_point(),
+                                 trajectory_points[i].path_point());
+    if (last_sl_boundary.start_l() > distance_xy ||
+        last_sl_boundary.end_l() < -distance_xy) {
+      continue;
+    }
+
+    const double mid_s =
+        (last_sl_boundary.start_s() + last_sl_boundary.end_s()) / 2.0;
+    const double start_s = std::fmax(0.0, mid_s - 2.0 * distance_xy);
+    const double end_s = (i == 1) ? reference_line.Length()
+                                  : std::fmin(reference_line.Length(),
+                                              mid_s + 2.0 * distance_xy);
+
+    if (!reference_line.GetApproximateSLBoundary(object_moving_box, start_s,
+                                                 end_s, &object_boundary)) {
       AERROR << "failed to calculate boundary";
       return false;
     }
+    // update history record
+    last_sl_boundary = object_boundary;
+    last_index = i;
+
     // skip if object is entirely on one side of reference line.
     constexpr double kSkipLDistanceFactor = 0.4;
     const double skip_l_distance =
         (object_boundary.end_s() - object_boundary.start_s()) *
-        kSkipLDistanceFactor;
+            kSkipLDistanceFactor +
+        adc_width / 2.0;
     if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
             skip_l_distance ||
         std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
@@ -173,9 +197,14 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     if (object_boundary.end_s() < 0) {  // skip if behind reference line
       continue;
     }
+    constexpr double kSparseMappingS = 20.0;
+    const double st_boundary_delta_s =
+        (std::fabs(object_boundary.start_s() - adc_start_s) > kSparseMappingS)
+            ? kStBoundarySparseDeltaS
+            : kStBoundaryDeltaS;
     const double object_s_diff =
         object_boundary.end_s() - object_boundary.start_s();
-    if (object_s_diff < kStBoundaryDeltaS) {
+    if (object_s_diff < st_boundary_delta_s) {
       continue;
     }
     const double delta_t =
@@ -185,23 +214,23 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     double high_s =
         std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
     bool has_high = false;
-    while (low_s + kStBoundaryDeltaS < high_s && !(has_low && has_high)) {
+    while (low_s + st_boundary_delta_s < high_s && !(has_low && has_high)) {
       if (!has_low) {
         auto low_ref = reference_line.GetReferencePoint(low_s);
         has_low = object_moving_box.HasOverlap(
             {low_ref, low_ref.heading(), adc_length, adc_width});
-        low_s += kStBoundaryDeltaS;
+        low_s += st_boundary_delta_s;
       }
       if (!has_high) {
         auto high_ref = reference_line.GetReferencePoint(high_s);
         has_high = object_moving_box.HasOverlap(
             {high_ref, high_ref.heading(), adc_length, adc_width});
-        high_s -= kStBoundaryDeltaS;
+        high_s -= st_boundary_delta_s;
       }
     }
     if (has_low && has_high) {
-      low_s -= kStBoundaryDeltaS;
-      high_s += kStBoundaryDeltaS;
+      low_s -= st_boundary_delta_s;
+      high_s += st_boundary_delta_s;
       double low_t =
           (first_traj_point.relative_time() +
            std::fabs((low_s - object_boundary.start_s()) / object_s_diff) *

@@ -57,7 +57,7 @@ class Diagnostics(object):
         """
         maxY, maxX = self.stdscr.getmaxyx()
         if maxY <= 80:
-            curses.resizeterm(maxX, 90) #80+10, 10 for the "Delay" column
+            curses.resizeterm(maxX, 200)
 
         self.lock = threading.Lock()
         with open(META_DATA_FILE) as f:

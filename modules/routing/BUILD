@@ -14,7 +14,7 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor",
+        "//modules/common/monitor_log",
         "//modules/common/status",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",

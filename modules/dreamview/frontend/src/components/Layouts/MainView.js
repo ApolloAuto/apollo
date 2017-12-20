@@ -49,7 +49,7 @@ export default class MainView extends React.Component {
 
         if (hmi.showNavigationMap) {
             return <Navigation height={sceneDimension.height}/>;
-        } else if (!isInitialized) {
+        } else if (!isInitialized && !OFFLINE_PLAYBACK) {
             return <Loader height={sceneDimension.height}/>;
         } else {
             return <SceneView />;

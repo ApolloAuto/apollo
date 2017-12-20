@@ -131,19 +131,22 @@ bool PathDecider::MakeStaticObstacleDecision(
                                         object_decision);
     } else if (curr_l - lateral_stop_radius < sl_boundary.end_l() &&
                curr_l + lateral_stop_radius > sl_boundary.start_l()) {
+      // stop
       *object_decision.mutable_stop() =
           GenerateObjectStopDecision(*path_obstacle);
       path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
                                              object_decision);
-    } else if (FLAGS_enable_nudge_decision &&
-               (curr_l - lateral_stop_radius > sl_boundary.end_l())) {
-      ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
-      object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-      object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-      path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
-                                        object_decision);
-    } else {
-      if (FLAGS_enable_nudge_decision) {
+    } else if (FLAGS_enable_nudge_decision) {
+      // nudge
+      if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {
+        // LEFT_NUDGE
+        ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
+        object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
+        object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
+        path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
+                                          object_decision);
+      } else {
+        // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
         object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
@@ -167,14 +170,13 @@ double PathDecider::MinimumRadiusStopDistance(
                std::fabs(path_obstacle.perception_sl_boundary().end_l() -
                          reference_line_info_->AdcSlBoundary().start_l()));
   lateral_diff = std::max(lateral_diff, vehicle_param.width());
-  lateral_diff = std::min(lateral_diff,
-                          vehicle_param.width() +
-                              path_obstacle.perception_sl_boundary().end_l() -
-                              path_obstacle.perception_sl_boundary().start_l());
-  double stop_distance = std::sqrt(min_turn_radius * min_turn_radius -
-                                   (min_turn_radius - lateral_diff) *
-                                       (min_turn_radius - lateral_diff)) +
-                         stop_distance_buffer;
+  const double kEpison = 1e-5;
+  lateral_diff = std::min(lateral_diff, min_turn_radius - kEpison);
+  double stop_distance =
+      std::sqrt(std::fabs(min_turn_radius * min_turn_radius -
+                          (min_turn_radius - lateral_diff) *
+                              (min_turn_radius - lateral_diff))) +
+      stop_distance_buffer;
   stop_distance -= vehicle_param.front_edge_to_center();
   stop_distance = std::min(stop_distance, FLAGS_max_stop_distance_obstacle);
   stop_distance = std::max(stop_distance, FLAGS_min_stop_distance_obstacle);
@@ -185,16 +187,8 @@ ObjectStop PathDecider::GenerateObjectStopDecision(
     const PathObstacle &path_obstacle) const {
   ObjectStop object_stop;
 
-  double stop_distance = FLAGS_max_stop_distance_obstacle;
-
-  if (path_obstacle.obstacle()->Id() == FLAGS_destination_obstacle_id) {
-    // destination
-    object_stop.set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
-    stop_distance = FLAGS_stop_distance_destination;
-  } else {
-    stop_distance = MinimumRadiusStopDistance(path_obstacle);
-    object_stop.set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
-  }
+  double stop_distance = MinimumRadiusStopDistance(path_obstacle);
+  object_stop.set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
   object_stop.set_distance_s(-stop_distance);
 
   const double stop_ref_s =

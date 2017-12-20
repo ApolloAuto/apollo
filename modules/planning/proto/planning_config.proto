@@ -26,6 +26,7 @@ message RuleConfig {
     CLEAR_ZONE = 4;
     REROUTING = 5;
     REFERENCE_LINE_END = 6;
+    DESTINATION = 7;
   }
   optional RuleId rule_id = 1;
 }

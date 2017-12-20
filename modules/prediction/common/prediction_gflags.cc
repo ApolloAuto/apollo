@@ -87,6 +87,10 @@ DEFINE_double(rnn_min_lane_relatice_s, 5.0,
 DEFINE_double(perception_confidence_threshold, 0.4,
               "Skip the perception obstacle if its confiderence is lower than "
               "this threshold.");
+DEFINE_bool(enable_adjust_velocity_heading, true,
+            "adjust velocity heading to lane heading");
+DEFINE_double(heading_diff_thred, M_PI / 6.0,
+              "Threshold for adjusting on-lane obstacle heading");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
@@ -94,9 +98,18 @@ DEFINE_double(lane_sequence_threshold, 0.5,
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
 DEFINE_bool(enable_lane_sequence_acc, false,
             "If use acceleration in lane sequence.");
+DEFINE_bool(enable_trim_prediction_trajectory, false,
+            "If trim the prediction trajectory to avoid crossing"
+            "protected adc planning trajectory.");
+DEFINE_double(adc_time_step, 0.1, "Time step to search ADC trajectory point");
+DEFINE_double(distance_to_adc_trajectory_thred, 5.0,
+               "Distance threshold to determine if intersect with"
+               "ADC planning trajectory");
+DEFINE_double(time_to_adc_trajectory_thred, 2.0,
+              "Time threshold to trim prediction trajectory");
 
 // move sequence prediction
-DEFINE_double(time_upper_bound_to_lane_center, 6.0,
+DEFINE_double(time_upper_bound_to_lane_center, 5.0,
               "Upper bound of time to get to the lane center");
 DEFINE_double(time_lower_bound_to_lane_center, 1.0,
               "Lower bound of time to get to the lane center");
