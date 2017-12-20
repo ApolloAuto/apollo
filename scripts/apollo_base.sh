@@ -105,7 +105,7 @@ function check_in_docker() {
 function set_lib_path() {
   if [ "$RELEASE_DOCKER" == 1 ];then
     source /apollo/ros/setup.bash
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/local_integ/lib:/home/caros/secure_upgrade/depend_lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/home/caros/secure_upgrade/depend_lib
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
