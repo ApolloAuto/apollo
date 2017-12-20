@@ -11,4 +11,4 @@ https://github.com/ApolloAuto/apollo-kernel/releases
     * ```cd install```
     * ```sudo bash install_kernel.sh```
 3.  Reboot your system by the reboot command
-4.  After reboot, build the ESD CAN driver source code. How to build the ESD CAN driver source code can be found at ESDCAN-README.md
+4.  After rebooting, build the ESD CAN driver source code. How to build the ESD CAN driver source code can be found at [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
