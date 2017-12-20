@@ -30,5 +30,22 @@ LatticeQuinticPolynomialCurve1d::LatticeQuinticPolynomialCurve1d(
     const double param)
   : QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, param) {}
 
+void LatticeQuinticPolynomialCurve1d::SetSampleCondition(
+    const double s, const double ds, const double dds, const double t) {
+  sampled_s_ = s;
+  sampled_ds_ = ds;
+  sampled_dds_ = ds;
+  sampled_t_ = t;
+}
+
+std::array<double, 3>
+LatticeQuinticPolynomialCurve1d::GetSampledSCondition() {
+  return {sampled_s_, sampled_ds_, sampled_dds_};
+}
+
+double LatticeQuinticPolynomialCurve1d::GetSampledTime() {
+  return sampled_t_;
+}
+
 }  // namespace planning
 }  // namespace apollo
