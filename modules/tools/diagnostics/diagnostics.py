@@ -49,16 +49,6 @@ class Diagnostics(object):
         self.stdscr.nodelay(1)
         curses.curs_set(0)
 
-        """
-        Workaround for issuse #1774, since we know the exactly number of the
-        columns that we used, so if the default terminal width <= 80, we just
-        resize the terminal to ensure it is bigger enough for the addstr() call.
-        Otherwise, addstr() may not happy: "error: addstr() returned ERR".
-        """
-        maxY, maxX = self.stdscr.getmaxyx()
-        if maxY <= 80:
-            curses.resizeterm(maxX, 200)
-
         self.lock = threading.Lock()
         with open(META_DATA_FILE) as f:
             for line in f:

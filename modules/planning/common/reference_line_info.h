@@ -111,10 +111,9 @@ class ReferenceLineInfo {
 
   void ExportDecision(DecisionResult* decision_result) const;
 
-  void SetRightOfWayStatus() { status_ = ADCTrajectory::PROTECTED; }
-  ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const {
-    return status_;
-  }
+  void SetJunctionRightOfWay(double junction_s, bool is_protected);
+
+  ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;

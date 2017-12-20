@@ -34,6 +34,7 @@ DECLARE_double(look_forward_time_sec);
 DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
+DECLARE_double(reference_line_lateral_buffer);
 DECLARE_double(prepare_rerouting_time);
 DECLARE_double(rerouting_cooldown_time);
 
@@ -129,6 +130,10 @@ DECLARE_bool(enable_prediction);
 DECLARE_bool(enable_traffic_light);
 
 DECLARE_double(turn_signal_distance);
+
+// speed decider
+DECLARE_double(low_speed_obstacle_threshold);
+DECLARE_double(decelerating_obstacle_threshold);
 
 // QpSt optimizer
 DECLARE_bool(enable_slowdown_profile_generator);

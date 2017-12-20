@@ -36,7 +36,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
-#include "modules/planning/tasks/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
 namespace planning {
@@ -138,16 +137,16 @@ bool DPRoadGraph::GenerateMinCostPath(
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
-  TrajectoryCost trajectory_cost(config_, reference_line_, obstacles,
-                                 vehicle_config.vehicle_param(), speed_data_,
-                                 init_sl_point_);
+  TrajectoryCost trajectory_cost(
+      config_, reference_line_, reference_line_info_.IsChangeLanePath(),
+      obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
   if (graph_nodes.size() < 2) {
     AERROR << "Too few graph_nodes.";
     return false;
   }
-  graph_nodes[0].emplace_back(init_sl_point_, nullptr, 0.0);
+  graph_nodes[0].emplace_back(init_sl_point_, nullptr, ComparableCost());
 
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes[level - 1];
@@ -166,7 +165,7 @@ bool DPRoadGraph::GenerateMinCostPath(
         QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
-        const double cost =
+        const auto cost =
             trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s(),
                                       level, path_waypoints.size()) +
             prev_dp_node.min_cost;
@@ -180,9 +179,9 @@ bool DPRoadGraph::GenerateMinCostPath(
           QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
                                          cur_point.l(), 0.0, 0.0,
                                          cur_point.s() - init_sl_point_.s());
-          const double cost = trajectory_cost.Calculate(
-              curve, init_sl_point_.s(), cur_point.s(), level,
-              path_waypoints.size());
+          const auto cost = trajectory_cost.Calculate(curve, init_sl_point_.s(),
+                                                      cur_point.s(), level,
+                                                      path_waypoints.size());
 
           cur_node.UpdateCost(&(graph_nodes.front().front()), curve, cost);
         }

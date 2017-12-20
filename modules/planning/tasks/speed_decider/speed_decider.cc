@@ -99,6 +99,17 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
   return st_position;
 }
 
+bool SpeedDecider::IsLowSpeedDecelerating(
+    const PathObstacle& path_obstacle) const {
+  const auto& trajectory =
+      path_obstacle.obstacle()->Trajectory().trajectory_point();
+  if (trajectory.empty()) {
+    return false;
+  }
+  return trajectory.begin()->v() < FLAGS_low_speed_obstacle_threshold &&
+         trajectory.begin()->a() < FLAGS_decelerating_obstacle_threshold;
+}
+
 Status SpeedDecider::MakeObjectDecision(
     const SpeedData& speed_profile, PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
@@ -129,11 +140,19 @@ Status SpeedDecider::MakeObjectDecision(
         } else if (CheckIsFollowByT(boundary) &&
                    (boundary.max_t() - boundary.min_t() >
                     FLAGS_follow_min_time_sec)) {
-          // FOLLOW decision
-          ObjectDecisionType follow_decision;
-          CreateFollowDecision(*path_obstacle, &follow_decision);
-          path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                 follow_decision);
+          // stop for low_speed decelerating
+          if (IsLowSpeedDecelerating(*path_obstacle)) {
+            ObjectDecisionType stop_decision;
+            CreateStopDecision(*path_obstacle, &stop_decision);
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   stop_decision);
+          } else {  // high speed or low speed accelerating
+            // FOLLOW decision
+            ObjectDecisionType follow_decision;
+            CreateFollowDecision(*path_obstacle, &follow_decision);
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   follow_decision);
+          }
         } else {
           // YIELD decision
           ObjectDecisionType yield_decision;
@@ -155,13 +174,11 @@ Status SpeedDecider::MakeObjectDecision(
                                                  overtake_decision);
         }
         break;
-      case CROSS:
-        {
-          ObjectDecisionType stop_decision;
-          CreateStopDecision(*path_obstacle, &stop_decision);
-          path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
-        }
-       break;
+      case CROSS: {
+        ObjectDecisionType stop_decision;
+        CreateStopDecision(*path_obstacle, &stop_decision);
+        path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+      } break;
       default:
         AERROR << "Unknown position:" << position;
     }
