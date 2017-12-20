@@ -373,7 +373,7 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
   RunModeCommand("stop");
   status_.set_current_vehicle(vehicle_name);
   // Check available updates for current vehicle.
-  CheckOTAUpdates();
+  // CheckOTAUpdates();
   BroadcastHMIStatus();
 }
 
