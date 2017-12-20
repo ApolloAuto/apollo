@@ -25,6 +25,9 @@ import common.proto_utils as proto_utils
 
 def update():
     # setup server url
+    config = ConfigParser()
+    CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.ini')
+    config.read(CONFIG_FILE)
     ip = config.get('Host', 'ip')
     port = config.get('Host', 'port')
     url = 'http://' + ip + ':' + port + '/update'
