@@ -490,26 +490,25 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
                                 speed_limit.speed_limit_points().size()))) {
     uint32_t i = 0;
     uint32_t j = 0;
-    const double kDistanceEpsilon = 1e-6;
     while (i < t_evaluated_.size() &&
            j + 1 < speed_limit.speed_limit_points().size()) {
       double distance = v * t_evaluated_[i];
-      if (!last_speed_data.Empty()) {
+      if (!last_speed_data.Empty() &&
+          distance < last_speed_data.speed_vector().back().s()) {
         SpeedPoint p;
         last_speed_data.EvaluateByTime(t_evaluated_[i], &p);
         distance = p.s();
       }
+      constexpr double kDistanceEpsilon = 1e-6;
       if (fabs(distance - speed_limit.speed_limit_points()[j].first) <
           kDistanceEpsilon) {
         speed_upper_bound->push_back(
             speed_limit.speed_limit_points()[j].second);
         ++i;
-        ADEBUG << "speed upper bound:" << speed_upper_bound->back();
       } else if (distance < speed_limit.speed_limit_points()[j].first) {
         ++i;
       } else if (distance <= speed_limit.speed_limit_points()[j + 1].first) {
         speed_upper_bound->push_back(speed_limit.GetSpeedLimitByS(distance));
-        ADEBUG << "speed upper bound:" << speed_upper_bound->back();
         ++i;
       } else {
         ++j;
@@ -528,7 +527,8 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     const auto& speed_limit_points = speed_limit.speed_limit_points();
     for (const double t : t_evaluated_) {
       double s = v * t;
-      if (!last_speed_data.Empty()) {
+      if (!last_speed_data.Empty() &&
+          s < last_speed_data.speed_vector().back().s()) {
         SpeedPoint p;
         last_speed_data.EvaluateByTime(t, &p);
         s = p.s();

@@ -26,9 +26,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne16Driver::Velodyne16Driver(Config config) {
-  config_ = config;
-}
+Velodyne16Driver::Velodyne16Driver(Config config) : config_(config) {}
 
 void Velodyne16Driver::init(ros::NodeHandle &node) {
   double packet_rate = 754;                 // packet frequency (Hz)
@@ -63,7 +61,7 @@ bool Velodyne16Driver::poll(void) {
       new velodyne_msgs::VelodyneScanUnified);
 
   if (basetime_ == 0) {
-    usleep(100); // waiting for positioning data
+    usleep(100);  // waiting for positioning data
     return true;
   }
 
