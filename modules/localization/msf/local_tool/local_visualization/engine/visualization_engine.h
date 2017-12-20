@@ -227,6 +227,7 @@ class VisualizationEngine {
   void SetScale(const double scale);
   void UpdateScale(const double factor);
   bool UpdateCarLocId();
+  bool UpdateCarLocId(const unsigned int car_loc_id);
   bool UpdateTrajectoryGroups();
   void ProcessKey(int key);
 
@@ -290,6 +291,7 @@ class VisualizationEngine {
 
   unsigned int loc_info_num_;
   unsigned int car_loc_id_;
+  unsigned int expected_car_loc_id_;
   std::vector<LocalizatonInfo> cur_loc_infos_;
   std::vector<std::map<double, Eigen::Vector2d>> trajectory_groups_;
 
