@@ -58,9 +58,9 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(
-    reference_line_lateral_buffer, 1.0,
-    "When creating reference line, the minimum distance with road curb");
+DEFINE_double(reference_line_lateral_buffer, 1.0,
+              "When creating reference line, the minimum distance with road "
+              "curb for a vehicle driving on this line.");
 DEFINE_double(prepare_rerouting_time, 2.0,
               "If there are this amount of seconds left to finish driving on "
               "current route, and there is no routing, do rerouting");
