@@ -84,7 +84,9 @@ if __name__ == "__main__":
         the tool will dump all the messages regardless of the message topic."""
     )
     args = parser.parse_args()
+    if not os.path.exists(args.out_dir):
+        print("%s does not exist" % args.out_dir);
+        sys.exit(0)
 
-    os.makedirs(args.out_dir)
     dump_bag(args.in_rosbag, args.out_dir, args.start_time, args.duration,
              args.topic)
