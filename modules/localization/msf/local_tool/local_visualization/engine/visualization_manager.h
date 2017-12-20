@@ -55,9 +55,9 @@ struct LocalizationMsg {
   double qz;
   double qw;
 
-  double std_x;
-  double std_y;
-  double std_z;
+  double std_x = 0;
+  double std_y = 0;
+  double std_z = 0;
 
   LocalizationMsg interpolate(const double scale,
                               const LocalizationMsg &loc_msg) {
@@ -125,7 +125,7 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
   ~IntepolationMessageBuffer();
 
   bool QueryMessage(const double timestamp, MessageType *msg,
-                    double timeout_s = 0.05);
+                    double timeout_s = 0.01);
 
  private:
   bool WaitMessageBufferOk(const double timestamp,

@@ -176,7 +176,11 @@ void OnlineLocalVisualizer::OnLidarLocalization(
   lidar_loc_msg.qz = message.pose().orientation().qz();
   lidar_loc_msg.qw = message.pose().orientation().qw();
 
-  if (message.has_uncertainty()) {
+  if (message.has_uncertainty() &&
+      !std::isnan(message.uncertainty().position_std_dev().x()) &&
+      !std::isnan(message.uncertainty().position_std_dev().y()) &&
+      message.uncertainty().position_std_dev().x() > 0 &&
+      message.uncertainty().position_std_dev().y() > 0) {
     lidar_loc_msg.std_x = message.uncertainty().position_std_dev().x();
     lidar_loc_msg.std_y = message.uncertainty().position_std_dev().y();
     lidar_loc_msg.std_z = message.uncertainty().position_std_dev().z();
@@ -199,7 +203,11 @@ void OnlineLocalVisualizer::OnGNSSLocalization(
   gnss_loc_msg.qz = message.pose().orientation().qz();
   gnss_loc_msg.qw = message.pose().orientation().qw();
 
-  if (message.has_uncertainty()) {
+  if (message.has_uncertainty() &&
+      !std::isnan(message.uncertainty().position_std_dev().x()) &&
+      !std::isnan(message.uncertainty().position_std_dev().y()) &&
+      message.uncertainty().position_std_dev().x() > 0 &&
+      message.uncertainty().position_std_dev().y() > 0) {
     gnss_loc_msg.std_x = message.uncertainty().position_std_dev().x();
     gnss_loc_msg.std_y = message.uncertainty().position_std_dev().y();
     gnss_loc_msg.std_z = message.uncertainty().position_std_dev().z();
@@ -222,7 +230,11 @@ void OnlineLocalVisualizer::OnFusionLocalization(
   fusion_loc_msg.qz = message.pose().orientation().qz();
   fusion_loc_msg.qw = message.pose().orientation().qw();
 
-  if (message.has_uncertainty()) {
+  if (message.has_uncertainty() &&
+      !std::isnan(message.uncertainty().position_std_dev().x()) &&
+      !std::isnan(message.uncertainty().position_std_dev().y()) &&
+      message.uncertainty().position_std_dev().x() > 0 &&
+      message.uncertainty().position_std_dev().y() > 0) {
     fusion_loc_msg.std_x = message.uncertainty().position_std_dev().x();
     fusion_loc_msg.std_y = message.uncertainty().position_std_dev().y();
     fusion_loc_msg.std_z = message.uncertainty().position_std_dev().z();
