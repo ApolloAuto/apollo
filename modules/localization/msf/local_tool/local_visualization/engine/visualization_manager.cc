@@ -241,6 +241,11 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
 
   ListIterator last_iter = msg_list->end();
   --last_iter;
+
+  if (last_iter->first < timestamp && timeout_ms < 5000) {
+    return false;
+  }
+
   while (last_iter->first < timestamp) {
     std::cout << "Waiting new message!" << std::endl;
     usleep(5000);
@@ -271,9 +276,9 @@ VisualizationManager::VisualizationManager()
     : visual_engine_(),
       stop_visualization_(false),
       lidar_frame_buffer_(10),
-      gnss_loc_info_buffer_(10),
-      lidar_loc_info_buffer_(20),
-      fusion_loc_info_buffer_(200) {}
+      gnss_loc_info_buffer_(20),
+      lidar_loc_info_buffer_(40),
+      fusion_loc_info_buffer_(400) {}
 
 VisualizationManager::~VisualizationManager() {
   if (!(stop_visualization_.load())) {
@@ -360,26 +365,6 @@ void VisualizationManager::DoVisualize() {
     usleep(10000);
     // if (!lidar_frame_buffer_.IsEmpty()) {
     if (lidar_frame_buffer_.BufferSize() > 5) {
-      // std::list<std::pair<double, LidarVisFrame>> msg_list1;
-      // lidar_frame_buffer_.GetAllMessages(msg_list1);
-
-      // std::list<std::pair<double, LocalizationMsg>> msg_list2;
-      // lidar_loc_info_buffer_.GetAllMessages(msg_list2);
-
-      // for (std::list<std::pair<double, LidarVisFrame>>::iterator iter =
-      // msg_list1.begin();
-      //        iter != msg_list1.end(); ++iter) {
-      //   std::cout << iter->first;
-      // }
-      // std::cout << "\n";
-
-      // for (std::list<std::pair<double, LocalizationMsg>>::iterator iter =
-      // msg_list2.begin();
-      //        iter != msg_list2.end(); ++iter) {
-      //   std::cout << iter->first;
-      // }
-      // std::cout << "\n";
-
       LidarVisFrame lidar_frame;
       bool pop_success = lidar_frame_buffer_.PopOldestMessage(&lidar_frame);
       if (!pop_success) {
@@ -389,12 +374,12 @@ void VisualizationManager::DoVisualize() {
       LocalizationMsg lidar_loc;
       LocalizationMsg fusion_loc;
       bool lidar_query_success = lidar_loc_info_buffer_.QueryMessage(
-          lidar_frame.timestamp, &lidar_loc, 0.02);
+          lidar_frame.timestamp, &lidar_loc, 0);
       // bool lidar_query_success = lidar_loc_info_buffer_.GetMessage(
       //     lidar_frame.timestamp, lidar_loc);
 
       bool fusion_query_success = fusion_loc_info_buffer_.QueryMessage(
-          lidar_frame.timestamp, &fusion_loc, 0.02);
+          lidar_frame.timestamp, &fusion_loc, 0);
 
       if (!lidar_query_success && !fusion_query_success) {
         continue;

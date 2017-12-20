@@ -28,10 +28,9 @@ namespace msf {
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
 const char car_img_path[3][1024] = {
-  "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
-  "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
-  "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"
-};
+    "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
+    "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
+    "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
@@ -104,6 +103,7 @@ VisualizationEngine::VisualizationEngine()
   window_name_ = "Local Visualizer";
   loc_info_num_ = 1;
   car_loc_id_ = 0;
+  expected_car_loc_id_ = 0;
 }
 
 VisualizationEngine::~VisualizationEngine() {}
@@ -118,6 +118,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   map_param_ = map_param;
   velodyne_extrinsic_ = extrinsic;
   loc_info_num_ = loc_info_num;
+  expected_car_loc_id_ = loc_info_num;
 
   trajectory_groups_.resize(loc_info_num_);
 
@@ -138,12 +139,12 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   zone_id_ = zone_id;
   resolution_id_ = resolution_id;
 
-  cloud_img_ = cv::Mat(
-      cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
-      CV_8UC3);
-  cloud_img_mask_ = cv::Mat(
-      cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
-      CV_8UC1);
+  cloud_img_ =
+      cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
+              CV_8UC3);
+  cloud_img_mask_ =
+      cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
+              CV_8UC1);
 
   Preprocess(map_folder);
 
@@ -176,10 +177,16 @@ void VisualizationEngine::Visualize(
 
   cur_loc_infos_ = loc_infos;
 
-  if (cur_loc_infos_[car_loc_id_].is_valid) {
-    car_pose_ = cur_loc_infos_[car_loc_id_].pose;
-  } else if (!UpdateCarLocId()) {
-    return;
+  if (!UpdateCarLocId(expected_car_loc_id_)) {
+    if (!UpdateCarLocId(car_loc_id_)) {
+      if (!UpdateCarLocId()) {
+        return;
+      }
+    } else {
+      if (expected_car_loc_id_ == loc_info_num_) {
+        expected_car_loc_id_ = car_loc_id_;
+      }
+    }
   }
 
   UpdateTrajectoryGroups();
@@ -329,29 +336,34 @@ void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
       lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
       lt = lt + bias + cv::Point(1024, 1024);
 
-      unsigned char b = color_table[i % 3][0];
-      unsigned char g = color_table[i % 3][1];
-      unsigned char r = color_table[i % 3][2];
-      cv::circle(big_window_, lt, 4, cv::Scalar(b, g, r), 1);
-      pre_lt = lt;
-
-      int count = 0;
-      while (iter != trj.begin() && count < 500) {
-        --iter;
-        const Eigen::Vector2d &loc_2d = iter->second;
-        lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
-        lt = lt + bias + cv::Point(1024, 1024);
-
+      if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
         unsigned char b = color_table[i % 3][0];
         unsigned char g = color_table[i % 3][1];
         unsigned char r = color_table[i % 3][2];
-
-        cv::circle(big_window_, lt, 3, cv::Scalar(b, g, r), 1);
-        cv::line(big_window_, pre_lt, lt, cv::Scalar(b, g, r), 1);
+        cv::circle(big_window_, lt, 4, cv::Scalar(b, g, r), 1);
         pre_lt = lt;
 
-        ++count;
+        int count = 0;
+        while (iter != trj.begin() && count < 500) {
+          --iter;
+          const Eigen::Vector2d &loc_2d = iter->second;
+          lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
+          lt = lt + bias + cv::Point(1024, 1024);
+
+          if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
+            unsigned char b = color_table[i % 3][0];
+            unsigned char g = color_table[i % 3][1];
+            unsigned char r = color_table[i % 3][2];
+
+            cv::circle(big_window_, lt, 3, cv::Scalar(b, g, r), 1);
+            cv::line(big_window_, pre_lt, lt, cv::Scalar(b, g, r), 1);
+            pre_lt = lt;
+
+            ++count;
+          }
+        }
       }
+
       i = (i + 1) % loc_info_num_;
     }
   }
@@ -373,41 +385,48 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
       lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
       lt = lt + bias + cv::Point(1024, 1024);
 
-      if (is_draw_car_ && loc_info.is_has_attitude) {
-        const Eigen::Quaterniond &quatd = loc_info.attitude;
-        double quaternion[] = {quatd.w(), quatd.x(), quatd.y(), quatd.z()};
-        double euler_angle[3] = {0};
-        QuaternionToEuler(quaternion, euler_angle);
-        euler_angle[0] = euler_angle[0] * 180 / PI;
-        euler_angle[1] = euler_angle[1] * 180 / PI;
-        euler_angle[2] = euler_angle[2] * 180 / PI;
-        // Eigen::Matrix3d matrix = quatd.toRotationMatrix();
-        // Eigen::Vector3d euler_angle = matrix.eulerAngles(1, 0, 2);
-        // euler_angle = euler_angle * 180 / PI;
-        double yaw = euler_angle[2];
+      if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
+        if (is_draw_car_ && loc_info.is_has_attitude) {
+          const Eigen::Quaterniond &quatd = loc_info.attitude;
+          double quaternion[] = {quatd.w(), quatd.x(), quatd.y(), quatd.z()};
+          double euler_angle[3] = {0};
+          QuaternionToEuler(quaternion, euler_angle);
+          euler_angle[0] = euler_angle[0] * 180 / PI;
+          euler_angle[1] = euler_angle[1] * 180 / PI;
+          euler_angle[2] = euler_angle[2] * 180 / PI;
+          // Eigen::Matrix3d matrix = quatd.toRotationMatrix();
+          // Eigen::Vector3d euler_angle = matrix.eulerAngles(1, 0, 2);
+          // euler_angle = euler_angle * 180 / PI;
+          double yaw = euler_angle[2];
 
-        cv::Mat mat_tem;
-        cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
-                   CV_INTER_LINEAR);
-        cv::Mat rotated_mat;
-        // std::cout << "yaw: " << yaw << std::endl;
-        // RotateImg(mat_tem, rotated_mat, 90 - yaw);
-        // RotateImg(mat_tem, rotated_mat, - yaw - 90);
-        // RotateImg(mat_tem, rotated_mat, yaw + 90);
-        RotateImg(mat_tem, &rotated_mat, yaw - 90);
-        cv::Point car_lt =
-            lt - cv::Point(rotated_mat.cols / 2, rotated_mat.rows / 2);
-        cv::Mat mat_mask;
-        cv::cvtColor(rotated_mat, mat_mask, CV_BGR2GRAY);
-        rotated_mat.copyTo(
-            big_window_(cv::Rect(car_lt.x, car_lt.y, rotated_mat.cols,
-                                 rotated_mat.rows)),
-            mat_mask);
-      } else {
-        unsigned char b = color_table[i % 3][0];
-        unsigned char g = color_table[i % 3][1];
-        unsigned char r = color_table[i % 3][2];
-        cv::circle(big_window_, lt, 4, cv::Scalar(b, g, r), 1);
+          cv::Mat mat_tem;
+          cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
+                     CV_INTER_LINEAR);
+          cv::Mat rotated_mat;
+          // std::cout << "yaw: " << yaw << std::endl;
+          // RotateImg(mat_tem, rotated_mat, 90 - yaw);
+          // RotateImg(mat_tem, rotated_mat, - yaw - 90);
+          // RotateImg(mat_tem, rotated_mat, yaw + 90);
+          RotateImg(mat_tem, &rotated_mat, yaw - 90);
+          cv::Point car_lt =
+              lt - cv::Point(rotated_mat.cols / 2, rotated_mat.rows / 2);
+          cv::Point car_rb =
+              car_lt + cv::Point(rotated_mat.cols, rotated_mat.rows);
+          if (car_lt.x >= 0 && car_lt.y >= 0 && car_rb.x <= 1024 * 3 &&
+              car_rb.y <= 1024 * 3) {
+            cv::Mat mat_mask;
+            cv::cvtColor(rotated_mat, mat_mask, CV_BGR2GRAY);
+            rotated_mat.copyTo(
+                big_window_(cv::Rect(car_lt.x, car_lt.y, rotated_mat.cols,
+                                     rotated_mat.rows)),
+                mat_mask);
+          }
+        } else {
+          unsigned char b = color_table[i % 3][0];
+          unsigned char g = color_table[i % 3][1];
+          unsigned char r = color_table[i % 3][2];
+          cv::circle(big_window_, lt, 4, cv::Scalar(b, g, r), 1);
+        }
       }
 
       i = (i + 1) % loc_info_num_;
@@ -432,14 +451,16 @@ void VisualizationEngine::DrawStd(const cv::Point &bias) {
         lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
         lt = lt + bias + cv::Point(1024, 1024);
 
-        unsigned char b = color_table[i % 3][0];
-        unsigned char g = color_table[i % 3][1];
-        unsigned char r = color_table[i % 3][2];
+        if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
+          unsigned char b = color_table[i % 3][0];
+          unsigned char g = color_table[i % 3][1];
+          unsigned char r = color_table[i % 3][2];
 
-        cv::Size size(std::sqrt(std[0]) * 200 + 1.0,
-                      std::sqrt(std[1]) * 200 + 1.0);
-        cv::ellipse(big_window_, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2,
-                    8);
+          cv::Size size(std::sqrt(std[0]) * 200 + 1.0,
+                        std::sqrt(std[1]) * 200 + 1.0);
+          cv::ellipse(big_window_, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2,
+                      8);
+        }
       }
 
       i = (i + 1) % loc_info_num_;
@@ -735,11 +756,9 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
   unsigned int img_height = map_param_.map_node_size_y;
   Eigen::Vector3d cen = car_pose_.translation();
   cloud_img_lt_coord_[0] =
-      cen[0] -
-      map_param_.map_resolutions[resolution_id_] * (img_width / 2.0f);
+      cen[0] - map_param_.map_resolutions[resolution_id_] * (img_width / 2.0f);
   cloud_img_lt_coord_[1] =
-      cen[1] -
-      map_param_.map_resolutions[resolution_id_] * (img_height / 2.0f);
+      cen[1] - map_param_.map_resolutions[resolution_id_] * (img_height / 2.0f);
 
   cloud_img_.setTo(cv::Scalar(0, 0, 0));
   cloud_img_mask_.setTo(cv::Scalar(0));
@@ -895,6 +914,20 @@ bool VisualizationEngine::UpdateCarLocId() {
   return false;
 }
 
+bool VisualizationEngine::UpdateCarLocId(const unsigned int car_loc_id) {
+  if (car_loc_id >= loc_info_num_) {
+    return false;
+  }
+
+  if (cur_loc_infos_[car_loc_id].is_valid) {
+    car_loc_id_ = car_loc_id;
+    car_pose_ = cur_loc_infos_[car_loc_id_].pose;
+    return true;
+  }
+
+  return false;
+}
+
 bool VisualizationEngine::UpdateTrajectoryGroups() {
   for (unsigned int i = 0; i < loc_info_num_; i++) {
     if (cur_loc_infos_[i].is_valid) {
@@ -971,6 +1004,7 @@ void VisualizationEngine::ProcessKey(int key) {
     }
     case 'c': {
       UpdateCarLocId();
+      expected_car_loc_id_ = car_loc_id_;
       Draw();
       break;
     }
