@@ -28,9 +28,9 @@ namespace msf {
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
 const char car_img_path[3][1024] = {
-    "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
-    "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
-    "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
+  "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
+  "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
+  "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
