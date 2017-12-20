@@ -28,9 +28,11 @@
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/dropbox.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -51,6 +53,12 @@ ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
       adc_planning_point_(adc_planning_point),
       reference_line_(reference_line),
       lanes_(segments) {}
+
+namespace {
+std::string junction_dropbox_id(const std::string& junction_id) {
+  return "junction_protection_" + junction_id;
+}
+}
 
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -78,6 +86,42 @@ bool ReferenceLineInfo::Init() {
     return false;
   }
   return true;
+}
+
+bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
+  constexpr double kEpsilon = 1e-2;
+  return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
+}
+
+void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
+                                              bool is_protected) {
+  auto* junction_store = common::util::Dropbox<bool>::Open();
+  for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
+    if (WithinOverlap(overlap, junction_s)) {
+      junction_store->Set(junction_dropbox_id(overlap.object_id), is_protected);
+    }
+  }
+}
+
+ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
+  auto* junction_store = common::util::Dropbox<bool>::Open();
+  for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
+    if (overlap.end_s < adc_sl_boundary_.start_s()) {
+      junction_store->Remove(junction_dropbox_id(overlap.object_id));
+    } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
+      auto* is_protected =
+          junction_store->Get(junction_dropbox_id(overlap.object_id));
+      if (!is_protected) {
+        continue;
+      }
+      if (*is_protected) {
+        return ADCTrajectory::PROTECTED;
+      } else {
+        return ADCTrajectory::UNPROTECTED;
+      }
+    }
+  }
+  return ADCTrajectory::UNPROTECTED;
 }
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
