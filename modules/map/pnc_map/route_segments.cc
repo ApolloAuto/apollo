@@ -287,7 +287,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   double heading_diff =
       common::math::AngleDiff(waypoint_heading, segment_heading);
   if (std::fabs(heading_diff) > M_PI / 2) {
-    AERROR << "Angle diff too large:" << heading_diff;
+    ADEBUG << "Angle diff too large:" << heading_diff;
     return false;
   }
 
