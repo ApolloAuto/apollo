@@ -25,6 +25,21 @@ cc_library(
     ],
 )
 
-
+cc_library(
+    name = "warm_up_problem_interface",
+    srcs = [
+        "warm_up_problem_interface.cc",
+    ],
+    hdrs = [
+        "warm_up_problem_interface.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planning_proto",
+        "@eigen//:eigen",
+        "@ipopt//:ipopt",
+    ],
+)
 
 cpplint()
