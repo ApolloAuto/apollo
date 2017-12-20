@@ -75,7 +75,9 @@ def query():
             sys.exit(1)
         else:
             token_file_name = os.environ['HOME'] + '/.cache/apollo_update/auth_token'
-            os.makedirs(os.path.dirname(token_file_name))
+            apollo_update = os.path.dirname(token_file_name)
+            if not os.path.exists(apollo_update):
+                os.makedirs(apollo_update)
             with open(token_file_name, 'w') as token_file:
                 token_file.write(auth_token)
         tag = r.json().get("tag")
