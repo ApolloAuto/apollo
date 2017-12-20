@@ -2,7 +2,7 @@
 
 ## Can other operating systems besides Ubuntu be used?
 
-Currently, we have only tested on Ubuntu so it is the only operating system we can officially support. Ubuntu is an ideal operating system as ROS is required to support it. Users are always welcome to try different operating systems and can share their patches with the community if they are successfully able to use them.
+We have only tested on Ubuntu which means it's the only operating system we currently officially support. Ubuntu is an ideal operating system as ROS is required to support it. Users are always welcome to try different operating systems and can share their patches with the community if they are successfully able to use them.
 
 ## I’m having difficulty connecting to localhost:8888 (Dreamview).
 
