@@ -8,9 +8,9 @@ We have only tested on Ubuntu which means it's the only operating system we curr
 
 Before running the Dreamview page, you need to build the system within the docker container using 'bash apollo.sh build'. Once built, if you are not accessing the Dreamview page through the host machine, you should use <apollo_host_ip>:8888 for Dreamview, instead of localhost:8888.
 
-## How can I perform step by step debugging?
+## How can I perform step-by-step debugging?
 
-The majority of bugs can be found through logging (using AERROR, AINFO, ADEBUG). If step by step debugging is needed, we recommend using GDP.
+The majority of bugs can be found through logging (using AERROR, AINFO, ADEBUG). If step-by-step debugging is needed, we recommend using GDP.
 
 ## How do I run the Offline Perception Visualizer?
 
