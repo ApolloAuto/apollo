@@ -75,7 +75,7 @@ class DPRoadGraph {
     void UpdateCost(const DPRoadGraphNode *node_prev,
                     const QuinticPolynomialCurve1d &curve,
                     const ComparableCost &cost) {
-      if (cost < min_cost) {
+      if (cost <= min_cost) {
         min_cost = cost;
         min_cost_prev_node = node_prev;
         min_cost_curve = curve;
