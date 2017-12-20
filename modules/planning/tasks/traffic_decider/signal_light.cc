@@ -124,9 +124,13 @@ void SignalLight::MakeDecisions(Frame* frame,
       }
       signal_debug->set_is_stop_wall_created(true);
     }
-  }
-  if (!has_stop) {
-    reference_line_info->SetRightOfWayStatus();
+    if (has_stop) {
+      reference_line_info->SetJunctionRightOfWay(signal_light->start_s,
+                                                 false);  // not protected
+    } else {
+      reference_line_info->SetJunctionRightOfWay(signal_light->start_s, true);
+      // is protected
+    }
   }
 }
 
