@@ -29,5 +29,22 @@ LatticeQuarticPolynomialCurve1d::LatticeQuarticPolynomialCurve1d(
     const double ddx1, const double param)
   : QuarticPolynomialCurve1d(x0, dx0, ddx0, dx1, ddx1, param) {}
 
+void LatticeQuarticPolynomialCurve1d::SetSampleCondition(
+    const double s, const double ds, const double dds, const double t) {
+  sampled_s_ = s;
+  sampled_ds_ = ds;
+  sampled_dds_ = ds;
+  sampled_t_ = t;
+}
+
+std::array<double, 3>
+LatticeQuarticPolynomialCurve1d::GetSampledSCondition() {
+  return {sampled_s_, sampled_ds_, sampled_dds_};
+}
+
+double LatticeQuarticPolynomialCurve1d::GetSampledTime() {
+  return sampled_t_;
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -17,6 +17,8 @@
 #ifndef MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUARTIC_POLYNOMIAL_CURVE1D_H_
 #define MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUARTIC_POLYNOMIAL_CURVE1D_H_
 
+#include <array>
+
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 namespace apollo {
@@ -39,6 +41,13 @@ class LatticeQuarticPolynomialCurve1d : public QuarticPolynomialCurve1d {
   // LatticeQuarticPolynomialCurve1d(const QuarticPolynomialCurve1d& other);
 
   virtual ~LatticeQuarticPolynomialCurve1d() = default;
+
+  void SetSampleCondition(const double s, const double ds, const double dds,
+                          const double t);
+
+  std::array<double, 3> GetSampledSCondition();
+
+  double GetSampledTime();
 
  private:
   double sampled_s_;
