@@ -23,6 +23,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -277,8 +278,16 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
   auto itr_end = integ_localization_list.end();
   for (; itr != itr_end; ++itr) {
     if (itr->state() == LocalizationMeasureState::OK) {
-      PublishPoseBroadcastTF(itr->localization());
-      AdapterManager::PublishLocalization(itr->localization());
+      // add PI/2 for heading
+      LocalizationEstimate local_result = itr->localization();
+      apollo::localization::Pose *posepb_loc
+          = local_result.mutable_pose();
+      double new_heading = apollo::common::math::
+          NormalizeAngle(posepb_loc->heading() + M_PI_2);
+      posepb_loc->set_heading(new_heading);
+
+      PublishPoseBroadcastTF(local_result);
+      AdapterManager::PublishLocalization(local_result);
     }
   }
 
