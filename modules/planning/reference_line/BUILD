@@ -102,9 +102,10 @@ cc_library(
         "reference_line_provider.h",
     ],
     deps = [
-        "qp_spline_reference_line_smoother",
-        "reference_line",
-        "spiral_reference_line_smoother",
+        ":qp_spline_reference_line_smoother",
+        ":reference_line",
+        ":spiral_reference_line_smoother",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/map/pnc_map",
     ],
 )
