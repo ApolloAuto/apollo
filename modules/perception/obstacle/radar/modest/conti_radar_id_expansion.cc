@@ -80,7 +80,7 @@ void ContiRadarIDExpansion::UpdateTimestamp(const double &timestamp) {
   if (timestamp - timestamp_ > 0.1) {
     need_restart_ = true;
   }
-  timestamp_ = timestamp_;
+  timestamp_ = timestamp;
 }
 
 int ContiRadarIDExpansion::GetNextId() {
