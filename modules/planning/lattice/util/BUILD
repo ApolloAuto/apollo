@@ -72,6 +72,19 @@ cc_library(
 )
 
 cc_library(
+    name = "lattice_quintic_polynomial_curve1d",
+    hdrs = [
+        "lattice_quintic_polynomial_curve1d.h",
+    ],
+    srcs = [
+        "lattice_quintic_polynomial_curve1d.cc",
+    ],
+    deps = [
+        "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+    ],
+)
+
+cc_library(
     name = "util",
     hdrs = [
         "lattice_util.h",

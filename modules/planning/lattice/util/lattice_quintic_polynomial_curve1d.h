@@ -14,31 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUARTIC_POLYNOMIAL_CURVE1D_H_
-#define MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUARTIC_POLYNOMIAL_CURVE1D_H_
+#ifndef MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUINTIC_POLYNOMIAL_CURVE1D_H_
+#define MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUINTIC_POLYNOMIAL_CURVE1D_H_
 
-#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
 namespace apollo {
 namespace planning {
 
-class LatticeQuarticPolynomialCurve1d : public QuarticPolynomialCurve1d {
+class LatticeQuinticPolynomialCurve1d : public QuinticPolynomialCurve1d {
  public:
-  LatticeQuarticPolynomialCurve1d() = default;
+  LatticeQuinticPolynomialCurve1d() = default;
 
-  LatticeQuarticPolynomialCurve1d(
+  LatticeQuinticPolynomialCurve1d(
       const std::array<double, 3>& start,
-      const std::array<double, 2>& end,
+      const std::array<double, 3>& end,
       const double param);
 
-  LatticeQuarticPolynomialCurve1d(
+  LatticeQuinticPolynomialCurve1d(
       const double x0, const double dx0, const double ddx0,
-      const double dx1, const double ddx1,
+      const double x1, const double dx1, const double ddx1,
       const double param);
 
-  // LatticeQuarticPolynomialCurve1d(const QuarticPolynomialCurve1d& other);
+  // LatticeQuinticPolynomialCurve1d(const QuarticPolynomialCurve1d& other);
 
-  virtual ~LatticeQuarticPolynomialCurve1d() = default;
+  virtual ~LatticeQuinticPolynomialCurve1d() = default;
 
  private:
   double sampled_s_;
@@ -50,4 +50,4 @@ class LatticeQuarticPolynomialCurve1d : public QuarticPolynomialCurve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUARTIC_POLYNOMIAL_CURVE1D_H_
+#endif  // MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUINTIC_POLYNOMIAL_CURVE1D_H_
