@@ -50,10 +50,10 @@ class LatticeQuarticPolynomialCurve1d : public QuarticPolynomialCurve1d {
   double GetSampledTime();
 
  private:
-  double sampled_s_;
-  double sampled_ds_;
-  double sampled_dds_;
-  double sampled_t_;
+  double sampled_s_ = -1.0;
+  double sampled_ds_ = 0.0;
+  double sampled_dds_ = 0.0;
+  double sampled_t_ = 0.0;
 };
 
 }  // namespace planning
