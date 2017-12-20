@@ -45,34 +45,51 @@ class ComparableCost {
         out_of_boundary(out_of_boundary_),
         safety_cost(safety_cost_),
         smoothness_cost(smoothness_cost_) {}
+  ComparableCost(const ComparableCost &) = default;
 
   int CompareTo(const ComparableCost &other) const {
+    constexpr double kEpsilon = 1e-12;
     if ((has_collision || out_of_boundary) &&
-        (other.has_collision || other.out_of_boundary)) {
-      return 0;
-    }
-    if (safety_cost > other.safety_cost) {
+        !(other.has_collision || other.out_of_boundary)) {
       return 1;
-    } else if (smoothness_cost > other.smoothness_cost) {
+    } else if (!(has_collision || out_of_boundary) &&
+               (other.has_collision || other.out_of_boundary)) {
+      return -1;
+    } else if (std::fabs(safety_cost + smoothness_cost - other.safety_cost -
+                         other.smoothness_cost) < kEpsilon) {
+      return 0;
+    } else if (safety_cost + smoothness_cost >
+               other.safety_cost + other.smoothness_cost) {
       return 1;
     } else {
       return -1;
     }
   }
-  ComparableCost operator+(const ComparableCost &other) const {
-    return ComparableCost(has_collision || other.has_collision,
-                          out_of_boundary || other.out_of_boundary,
-                          safety_cost + other.safety_cost,
-                          smoothness_cost + other.smoothness_cost);
+  ComparableCost &operator+(const ComparableCost &other) {
+    has_collision = has_collision || other.has_collision;
+    out_of_boundary = out_of_boundary || other.out_of_boundary;
+    safety_cost += other.safety_cost;
+    smoothness_cost += other.smoothness_cost;
+    return *this;
   }
-  ComparableCost operator+=(const ComparableCost &other) const {
-    return *this + other;
+  ComparableCost &operator+=(const ComparableCost &other) {
+    has_collision = has_collision || other.has_collision;
+    out_of_boundary = out_of_boundary || other.out_of_boundary;
+    safety_cost += other.safety_cost;
+    smoothness_cost += other.smoothness_cost;
+    return *this;
   }
   bool operator>(const ComparableCost &other) const {
-    return this->CompareTo(other) == 1;
+    return this->CompareTo(other) > 0;
+  }
+  bool operator>=(const ComparableCost &other) const {
+    return this->CompareTo(other) >= 0;
   }
   bool operator<(const ComparableCost &other) const {
-    return this->CompareTo(other) == -1;
+    return this->CompareTo(other) < 0;
+  }
+  bool operator<=(const ComparableCost &other) const {
+    return this->CompareTo(other) <= 0;
   }
 
   bool has_collision = false;
