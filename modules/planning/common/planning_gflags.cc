@@ -170,7 +170,7 @@ DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_double(static_obstacle_speed_threshold, 1.0,
+DEFINE_double(static_obstacle_speed_threshold, 0.5,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
@@ -215,6 +215,13 @@ DEFINE_string(reference_line_end_obstacle_id, "REF_END",
 DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
+
+// Speed Decider
+DEFINE_double(low_speed_obstacle_threshold, 2.0,
+              "speed lower than this value is considered as low speed");
+DEFINE_double(
+    decelerating_obstacle_threshold, -0.25,
+    "acceleration lower than this value is considered as decelerating");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
