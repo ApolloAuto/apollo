@@ -17,6 +17,8 @@
 #ifndef MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUINTIC_POLYNOMIAL_CURVE1D_H_
 #define MODULES_PLANNING_LATTICE_UTIL_LATTICE_QUINTIC_POLYNOMIAL_CURVE1D_H_
 
+#include <array>
+
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
 namespace apollo {
@@ -40,11 +42,18 @@ class LatticeQuinticPolynomialCurve1d : public QuinticPolynomialCurve1d {
 
   virtual ~LatticeQuinticPolynomialCurve1d() = default;
 
+  void SetSampleCondition(const double s, const double ds, const double dds,
+                          const double t);
+
+  std::array<double, 3> GetSampledSCondition();
+
+  double GetSampledTime();
+
  private:
-  double sampled_s_;
-  double sampled_ds_;
-  double sampled_dds_;
-  double sampled_t_;
+  double sampled_s_ = -1.0;
+  double sampled_ds_ = 0.0;
+  double sampled_dds_ = 0.0;
+  double sampled_t_ = 0.0;
 };
 
 }  // namespace planning
