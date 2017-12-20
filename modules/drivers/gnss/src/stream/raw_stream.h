@@ -56,8 +56,8 @@ class RawStream {
   void push_gpgga(size_t length);
 
   static constexpr size_t BUFFER_SIZE = 2048;
-  uint8_t _buffer[BUFFER_SIZE];
-  uint8_t _buffer_rtk[BUFFER_SIZE];
+  uint8_t _buffer[BUFFER_SIZE] = {0};
+  uint8_t _buffer_rtk[BUFFER_SIZE] = {0};
 
   std::shared_ptr<Stream> _data_stream;
   std::shared_ptr<Stream> _command_stream;
