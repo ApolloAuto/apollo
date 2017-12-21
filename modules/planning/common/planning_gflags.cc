@@ -173,6 +173,9 @@ DEFINE_double(static_obstacle_speed_threshold, 0.5,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
+DEFINE_bool(enable_nudge_slowdown, true,
+            "True to slow down when nudge obstacles.");
+
 DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
 DEFINE_double(longitudinal_ignore_buffer, 10.0,
               "If an obstacle's longitudinal distance is further away "
