@@ -229,8 +229,10 @@ Status MPCController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
+  constexpr double kMinSpeedProtection = 0.1;
   VehicleStateProvider::instance()->set_linear_velocity(
-      std::max(VehicleStateProvider::instance()->linear_velocity(), 0.1));
+      std::max(VehicleStateProvider::instance()->linear_velocity(),
+               kMinSpeedProtection));
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -261,12 +263,18 @@ Status MPCController::ComputeControlCommand(
 
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
+  double mpc_start_timestamp = Clock::NowInSeconds();
   if (common::math::SolveLinearMPC(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_, matrix_r_, lower_bound,
           upper_bound, matrix_state_, reference, mpc_eps_, mpc_max_iteration_,
           &control) != true) {
     AERROR << "MPC failed";
   }
+
+  double mpc_end_timestamp = Clock::NowInSeconds();
+  const double time_diff_ms = (mpc_end_timestamp - mpc_start_timestamp) * 1000;
+
+  ADEBUG << "MPC core: calculation time is: " << time_diff_ms << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
   double steer_angle = control[0](0, 0) * 180 / M_PI *
