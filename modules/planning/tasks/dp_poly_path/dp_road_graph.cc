@@ -137,9 +137,9 @@ bool DPRoadGraph::GenerateMinCostPath(
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
-  TrajectoryCost trajectory_cost(config_, reference_line_, obstacles,
-                                 vehicle_config.vehicle_param(), speed_data_,
-                                 init_sl_point_);
+  TrajectoryCost trajectory_cost(
+      config_, reference_line_, reference_line_info_.IsChangeLanePath(),
+      obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
   if (graph_nodes.size() < 2) {
@@ -253,11 +253,13 @@ bool DPRoadGraph::SamplePathWaypoints(
         std::fmin(-eff_right_width, init_sl_point_.l());
     double sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
 
-    if (init_sl_point_.l() > eff_left_width) {
+    if (reference_line_info_.IsChangeLanePath() &&
+        init_sl_point_.l() > eff_left_width) {
       sample_right_boundary =
           std::fmax(sample_right_boundary, init_sl_point_.l() - sample_l_range);
     }
-    if (init_sl_point_.l() < eff_right_width) {
+    if (reference_line_info_.IsChangeLanePath() &&
+        init_sl_point_.l() < eff_right_width) {
       sample_left_boundary =
           std::fmin(sample_left_boundary, init_sl_point_.l() + sample_l_range);
     }
@@ -266,7 +268,6 @@ bool DPRoadGraph::SamplePathWaypoints(
     common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
-
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
       common::SLPoint sl;

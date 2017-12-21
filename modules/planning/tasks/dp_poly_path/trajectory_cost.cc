@@ -40,11 +40,13 @@ using apollo::common::TrajectoryPoint;
 
 TrajectoryCost::TrajectoryCost(
     const DpPolyPathConfig &config, const ReferenceLine &reference_line,
+    const bool is_change_lane_path,
     const std::vector<const PathObstacle *> &obstacles,
     const common::VehicleParam &vehicle_param,
     const SpeedData &heuristic_speed_data, const common::SLPoint &init_sl_point)
     : config_(config),
       reference_line_(&reference_line),
+      is_change_lane_path_(is_change_lane_path),
       vehicle_param_(vehicle_param),
       heuristic_speed_data_(heuristic_speed_data),
       init_sl_point_(init_sl_point) {
@@ -93,13 +95,6 @@ TrajectoryCost::TrajectoryCost(
         // lane blocking obstacle
         continue;
       }
-
-      const double adc_length = vehicle_param.length();
-      if (sl_boundary.start_s() - init_sl_point_.s() < 2.0 * adc_length) {
-        // if too close, we treat the obstacle as non-nudgable
-        continue;
-      }
-
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;
@@ -147,9 +142,8 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     const double width = vehicle_config.vehicle_param().width();
 
     constexpr double kBuff = 0.2;
-    if (std::fabs(l) > std::fabs(init_sl_point_.l()) &&
-        (l + width / 2.0 + kBuff > left_width ||
-         l - width / 2.0 - kBuff < -right_width)) {
+    if (!is_change_lane_path_ && (l + width / 2.0 + kBuff > left_width ||
+                                  l - width / 2.0 - kBuff < -right_width)) {
       cost.out_of_boundary = true;
     }
 

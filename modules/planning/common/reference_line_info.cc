@@ -28,9 +28,11 @@
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/dropbox.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -51,6 +53,12 @@ ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
       adc_planning_point_(adc_planning_point),
       reference_line_(reference_line),
       lanes_(segments) {}
+
+namespace {
+std::string junction_dropbox_id(const std::string& junction_id) {
+  return "junction_protection_" + junction_id;
+}
+}
 
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -77,7 +85,44 @@ bool ReferenceLineInfo::Init() {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
+  is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
   return true;
+}
+
+bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
+  constexpr double kEpsilon = 1e-2;
+  return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
+}
+
+void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
+                                              bool is_protected) {
+  auto* junction_store = common::util::Dropbox<bool>::Open();
+  for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
+    if (WithinOverlap(overlap, junction_s)) {
+      junction_store->Set(junction_dropbox_id(overlap.object_id), is_protected);
+    }
+  }
+}
+
+ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
+  auto* junction_store = common::util::Dropbox<bool>::Open();
+  for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
+    if (overlap.end_s < adc_sl_boundary_.start_s()) {
+      junction_store->Remove(junction_dropbox_id(overlap.object_id));
+    } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
+      auto* is_protected =
+          junction_store->Get(junction_dropbox_id(overlap.object_id));
+      if (!is_protected) {
+        continue;
+      }
+      if (*is_protected) {
+        return ADCTrajectory::PROTECTED;
+      } else {
+        return ADCTrajectory::UNPROTECTED;
+      }
+    }
+  }
+  return ADCTrajectory::UNPROTECTED;
 }
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
@@ -126,12 +171,29 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
 }
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
-  auto path_obstacle = CreatePathObstacle(obstacle);
-  if (!path_obstacle) {
-    AERROR << "Failed to create path obstacle for " << obstacle->Id();
-    return nullptr;
+  auto path_obstacle_ptr =
+      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
+  auto* path_obstacle = path_decision_.AddPathObstacle(*path_obstacle_ptr);
+
+  SLBoundary perception_sl;
+  if (!reference_line_.GetSLBoundary(obstacle->PerceptionBoundingBox(),
+                                     &perception_sl)) {
+    AERROR << "Failed to get sl boundary for obstacle: " << obstacle->Id();
+    return path_obstacle;
   }
-  return path_decision_.AddPathObstacle(*path_obstacle);
+  path_obstacle->SetPerceptionSlBoundary(perception_sl);
+
+  if (IsUnrelaventObstacle(path_obstacle)) {
+    ObjectDecisionType ignore;
+    ignore.mutable_ignore();
+    path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
+                                      ignore);
+    path_decision_.AddLongitudinalDecision("reference_line_filter",
+                                           obstacle->Id(), ignore);
+  } else {
+    path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
+  }
+  return path_obstacle;
 }
 
 bool ReferenceLineInfo::AddObstacles(
@@ -145,16 +207,19 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-std::unique_ptr<PathObstacle> ReferenceLineInfo::CreatePathObstacle(
-    const Obstacle* obstacle) {
-  auto path_obstacle =
-      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  if (!path_obstacle->Init(reference_line_, adc_sl_boundary_.end_s())) {
-    AERROR << "Failed to create perception sl boundary for obstacle "
-           << obstacle->Id();
-    return nullptr;
+bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
+  // if adc is on the road, and obstacle behind adc, ignore
+  if (path_obstacle->perception_sl_boundary().end_s() >
+      reference_line_.Length()) {
+    return true;
   }
-  return path_obstacle;
+  if (is_on_reference_line_ &&
+      path_obstacle->perception_sl_boundary().end_s() <
+          adc_sl_boundary_.end_s() &&
+      reference_line_.IsOnRoad(path_obstacle->perception_sl_boundary())) {
+    return true;
+  }
+  return false;
 }
 
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {

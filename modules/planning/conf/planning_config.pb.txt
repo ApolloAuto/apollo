@@ -72,6 +72,8 @@ em_planner_config {
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
+            static_obs_nudge_speed_ratio: 0.6
+            dynamic_obs_nudge_speed_ratio: 0.8
         }
     }
     qp_spline_path_config {
@@ -136,6 +138,8 @@ em_planner_config {
             point_extension: 1.0
             lowest_speed: 2.5
             num_points_to_avg_kappa: 2
+            static_obs_nudge_speed_ratio: 0.6
+            dynamic_obs_nudge_speed_ratio: 0.8
         }
     }
 }

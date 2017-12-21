@@ -244,7 +244,7 @@
                             geodesic: true,
                             strokeColor: '#cd5c5c',
                             strokeOpacity: 0.8,
-                            strokeWeight: 5
+                            strokeWeight: (resp[0]["human"] === true) ? 6 : 2
                         });
 
                         routingPath.setMap(map);
@@ -308,7 +308,7 @@
                             geodesic: true,
                             strokeColor: '#ff8c00',
                             strokeOpacity: 0.8,
-                            strokeWeight: 5
+                            strokeWeight: (resp[0]["human"] === true) ? 6 : 2
                         });
 
                         routingPath.setMap(map);
@@ -370,7 +370,7 @@
                             geodesic: true,
                             strokeColor: '#00bfff',
                             strokeOpacity: 0.8,
-                            strokeWeight: 5
+                            strokeWeight: (resp[0]["human"] === true) ? 6 : 2
                         });
 
                         routingPath.setMap(map);

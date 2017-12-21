@@ -58,9 +58,9 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(
-    reference_line_lateral_buffer, 1.0,
-    "When creating reference line, the minimum distance with road curb");
+DEFINE_double(reference_line_lateral_buffer, 1.0,
+              "When creating reference line, the minimum distance with road "
+              "curb for a vehicle driving on this line.");
 DEFINE_double(prepare_rerouting_time, 2.0,
               "If there are this amount of seconds left to finish driving on "
               "current route, and there is no routing, do rerouting");
@@ -177,6 +177,9 @@ DEFINE_double(static_obstacle_speed_threshold, 0.5,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
+DEFINE_bool(enable_nudge_slowdown, true,
+            "True to slow down when nudge obstacles.");
+
 DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
 DEFINE_double(longitudinal_ignore_buffer, 10.0,
               "If an obstacle's longitudinal distance is further away "
@@ -190,15 +193,14 @@ DEFINE_double(min_stop_distance_obstacle, 3.0,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
-
-DEFINE_double(stop_distance_traffic_light, 3.0,
-              "stop distance from destination line");
+DEFINE_double(stop_distance_traffic_light, 0.2,
+              "stop distance from traffic light line");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
-DEFINE_double(follow_min_distance, 5.0,
+DEFINE_double(follow_min_distance, 2.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(
     follow_time_buffer, 2.0,

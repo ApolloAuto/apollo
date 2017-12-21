@@ -105,6 +105,7 @@ class TrajectoryCost {
  public:
   explicit TrajectoryCost(const DpPolyPathConfig &config,
                           const ReferenceLine &reference_line,
+                          const bool is_change_lane_path,
                           const std::vector<const PathObstacle *> &obstacles,
                           const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data,
@@ -139,6 +140,7 @@ class TrajectoryCost {
 
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
+  bool is_change_lane_path_ = false;
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
   const common::SLPoint init_sl_point_;

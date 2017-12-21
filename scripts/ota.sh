@@ -17,7 +17,6 @@
 ###############################################################################
 
 APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-source ${APOLLO_ROOT}/scripts/apollo_base.sh
 
 function update() {
   UPDATE_TAG=$(python ${APOLLO_ROOT}/modules/tools/ota/query_client.py)
