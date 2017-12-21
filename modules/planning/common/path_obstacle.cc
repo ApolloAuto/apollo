@@ -64,22 +64,8 @@ PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
   id_ = obstacle_->Id();
 }
 
-bool PathObstacle::Init(const ReferenceLine& reference_line,
-                        double adc_start_s) {
-  if (!reference_line.GetSLBoundary(obstacle_->PerceptionBoundingBox(),
-                                    &perception_sl_boundary_)) {
-    AERROR << "Failed to get sl boundary for obstacle: " << id_;
-    return false;
-  }
-
-  if (perception_sl_boundary_.start_s() < 0 ||
-      perception_sl_boundary_.end_s() > reference_line.Length()) {
-    return true;
-  }
-
-  // TODO(All): reduce the calculation time of BuildStBoundary
-  BuildStBoundary(reference_line, adc_start_s);
-  return true;
+void PathObstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
+  perception_sl_boundary_ = sl_boundary;
 }
 
 void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,

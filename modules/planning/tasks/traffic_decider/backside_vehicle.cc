@@ -55,8 +55,8 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
       continue;
     }
 
-    if (path_obstacle->perception_sl_boundary().start_s()
-        < adc_sl_boundary.end_s()) {
+    if (path_obstacle->perception_sl_boundary().start_s() <
+        adc_sl_boundary.end_s()) {
       path_decision->AddLongitudinalDecision(rule_id, path_obstacle->Id(),
                                              ignore);
       path_decision->AddLateralDecision(rule_id, path_obstacle->Id(), ignore);

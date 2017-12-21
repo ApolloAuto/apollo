@@ -118,8 +118,7 @@ class ReferenceLineInfo {
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
-  bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
+  bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
   int MakeMainStopDecision(DecisionResult* decision_result) const;
@@ -151,6 +150,8 @@ class ReferenceLineInfo {
   LatencyStats latency_stats_;
 
   hdmap::RouteSegments lanes_;
+
+  bool is_on_reference_line_ = false;
 
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 

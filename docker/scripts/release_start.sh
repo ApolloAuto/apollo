@@ -121,14 +121,26 @@ function main() {
         --shm-size 512M \
         $IMG
     if [ "${USER}" != "root" ]; then
-        docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
-        docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne_pointcloud"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/common/data"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/gnss_driver"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/control/conf"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/perception/data/params/"
+      docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
+      docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
+      docker exec apollo_release bash -c "chmod a+w /apollo"
+
+      DATA_DIRS=("/apollo/modules/common/data"
+                 "/apollo/modules/control/conf"
+                 "/apollo/modules/localization/msf/params/gnss_params"
+                 "/apollo/modules/localization/msf/params/velodyne_params"
+                 "/apollo/modules/perception/data/params"
+                 "/apollo/modules/tools/ota"
+                 "/apollo/ros/share/gnss_driver/conf"
+                 "/apollo/ros/share/gnss_driver/launch"
+                 "/apollo/ros/share/velodyne/launch"
+                 "/apollo/ros/share/velodyne_driver/launch"
+                 "/apollo/ros/share/velodyne_pointcloud/launch"
+                 "/apollo/ros/share/velodyne_pointcloud/params")
+      for DATA_DIR in "${DATA_DIRS[@]}"; do
+        docker exec apollo_release bash -c \
+            "mkdir -p '${DATA_DIR}'; chmod a+rw -R '${DATA_DIR}'"
+      done
     fi
     docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }

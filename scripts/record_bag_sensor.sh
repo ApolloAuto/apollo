@@ -49,21 +49,13 @@ function start() {
   cd "${BAG_DIR}"
   echo "Recording bag to: $(pwd)"
 
-  # record some meta info into bag
-  if [ -e /apollo/meta.ini ]; then
-      META_STR=`cat /apollo/meta.ini | tr '[]:\n' ' '`
-      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
-  else
-      META_STR=`git rev-parse HEAD`
-      META_STR="git commit $META_STR"
-      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
-  fi
-
   # Start recording.
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup rosbag record --split --duration=10m -b 2048  \
+    nohup rosbag record --split --duration=1m -b 2048  \
+        /apollo/sensor/camera/traffic/image_short \
+        /apollo/sensor/camera/traffic/image_long \
         /apollo/sensor/conti_radar \
         /apollo/sensor/delphi_esr \
         /apollo/sensor/gnss/best_pose \
@@ -75,11 +67,11 @@ function start() {
         /apollo/sensor/gnss/rtk_eph \
         /apollo/sensor/gnss/rtk_obs \
         /apollo/sensor/mobileye \
+        /apollo/sensor/velodyne64/compensator/PointCloud2 \
         /apollo/canbus/chassis \
         /apollo/canbus/chassis_detail \
         /apollo/control \
         /apollo/control/pad \
-        /apollo/meta \
         /apollo/perception/obstacles \
         /apollo/perception/traffic_light \
         /apollo/planning \
@@ -87,8 +79,6 @@ function start() {
         /apollo/routing_request \
         /apollo/routing_response \
         /apollo/localization/pose \
-        /apollo/localization/msf_gnss \
-        /apollo/localization/msf_lidar \
         /apollo/drive_event \
         /tf \
         /tf_static \
@@ -98,7 +88,6 @@ function start() {
 
 function stop() {
   pkill -SIGINT -f record
-  pkill -SIGINT -f "rostopic pub"
 }
 
 function help() {

@@ -96,7 +96,7 @@ Status Planning::Init() {
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
-    std::string error_msg("Prediction is not registered");
+    std::string error_msg("Enabled prediction, but no prediction not enabled");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
@@ -232,15 +232,12 @@ void Planning::RunOnce() {
     return;
   }
 
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+    AERROR_EVERY(100) << "prediction is enabled but no prediction provided";
+  }
+
   // Update reference line provider
   ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
-
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
-    not_ready->set_reason("prediction not ready");
-    AERROR << not_ready->reason() << "; skip the planning cycle.";
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
-    return;
-  }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   bool is_replan = false;

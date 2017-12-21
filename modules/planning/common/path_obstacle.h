@@ -65,8 +65,6 @@ class PathObstacle {
   PathObstacle() = default;
   explicit PathObstacle(const Obstacle* obstacle);
 
-  bool Init(const ReferenceLine& reference_line, const double adc_start_s);
-
   const std::string& Id() const;
 
   const Obstacle* obstacle() const;
@@ -120,6 +118,11 @@ class PathObstacle {
   bool IsLongitudinalIgnore() const;
   bool IsLateralIgnore() const;
 
+  void BuildStBoundary(const ReferenceLine& reference_line,
+                       const double adc_start_s);
+
+  void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
+
  private:
   /**
    * @brief check if a ObjectDecisionType is a lateral decision.
@@ -139,9 +142,6 @@ class PathObstacle {
   FRIEND_TEST(MergeLateralDecision, AllDecisions);
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
-
-  void BuildStBoundary(const ReferenceLine& reference_line,
-                       const double adc_start_s);
 
   bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
                                  const double adc_start_s,

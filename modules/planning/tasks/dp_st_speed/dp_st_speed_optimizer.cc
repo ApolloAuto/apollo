@@ -93,7 +93,9 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (!boundary_mapper.GetSpeedLimits(&speed_limit).ok()) {
+  if (!boundary_mapper
+           .GetSpeedLimits(path_decision->path_obstacles(), &speed_limit)
+           .ok()) {
     const std::string msg =
         "Getting speed limits for dp st speed optimizer failed!";
     AERROR << msg;

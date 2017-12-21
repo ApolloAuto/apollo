@@ -99,7 +99,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
 
   SpeedLimit speed_limits;
-  if (boundary_mapper.GetSpeedLimits(&speed_limits) != Status::OK()) {
+  if (boundary_mapper.GetSpeedLimits(path_decision->path_obstacles(),
+                                     &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "GetSpeedLimits for qp st speed optimizer failed!");
   }
