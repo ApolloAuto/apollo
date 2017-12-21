@@ -116,8 +116,7 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  ASSERT_TRUE(pnc_map_->UpdateVehicleState(state));
-  ASSERT_TRUE(pnc_map_->GetRouteSegments(10, 30, &segments));
+  ASSERT_TRUE(pnc_map_->GetRouteSegments(state, 10, 30, &segments));
   // first time on this passage, should not immediately change lane
   ASSERT_EQ(2, segments.size());
   EXPECT_NEAR(40, RouteLength(segments.front()), 1e-4);
@@ -138,8 +137,7 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  ASSERT_TRUE(pnc_map_->UpdateVehicleState(state));
-  bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
+  bool result = pnc_map_->GetRouteSegments(state, 10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
   const auto& first = segments.front();
