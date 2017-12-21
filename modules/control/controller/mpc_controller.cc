@@ -36,11 +36,11 @@
 namespace apollo {
 namespace control {
 
+using apollo::common::ErrorCode;
 using apollo::common::Point3D;
+using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::common::ErrorCode;
-using apollo::common::Status;
 using apollo::common::time::Clock;
 using Matrix = Eigen::MatrixXd;
 
@@ -68,7 +68,9 @@ MPCController::MPCController() : name_("MPC Controller") {
   AINFO << "Using " << name_;
 }
 
-MPCController::~MPCController() { CloseLogFile(); }
+MPCController::~MPCController() {
+  CloseLogFile();
+}
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -174,7 +176,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_bd_ = matrix_b_ * ts_;
 
   matrix_c_ = Matrix::Zero(basic_state_size_, 1);
-  matrix_c_(5, 1) = 1.0;
+  matrix_c_(5, 0) = 1.0;
   matrix_cd_ = Matrix::Zero(basic_state_size_, 1);
 
   matrix_state_ = Matrix::Zero(basic_state_size_, 1);
@@ -214,9 +216,13 @@ void MPCController::CloseLogFile() {
   }
 }
 
-void MPCController::Stop() { CloseLogFile(); }
+void MPCController::Stop() {
+  CloseLogFile();
+}
 
-std::string MPCController::Name() const { return name_; }
+std::string MPCController::Name() const {
+  return name_;
+}
 
 Status MPCController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
@@ -328,6 +334,15 @@ Status MPCController::ComputeControlCommand(
   debug->set_steer_angle(steer_angle);
   debug->set_steering_position(chassis->steering_percentage());
 
+  if (std::abs(VehicleStateProvider::instance()->linear_velocity()) <=
+          FLAGS_max_abs_speed_when_stopped ||
+      chassis->gear_location() == planning_published_trajectory->gear() ||
+      chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
+    cmd->set_gear_location(planning_published_trajectory->gear());
+  } else {
+    cmd->set_gear_location(chassis->gear_location());
+  }
+
   ProcessLogs(debug, chassis);
   return Status::OK();
 }
@@ -362,12 +377,6 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
                        VehicleStateProvider::instance()->linear_velocity(),
                        VehicleStateProvider::instance()->angular_velocity(),
                        trajectory_analyzer_, debug);
-
-  // Reverse heading error if vehicle is going in reverse
-  if (VehicleStateProvider::instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
 
   // State matrix update;
   // First four elements are fixed;
@@ -440,8 +449,8 @@ void MPCController::ComputeLateralErrors(
   debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - matched_point.path_point().kappa() *
   // matched_point.v();
-  debug->set_heading_error_rate(
-      angular_v - matched_point.path_point().kappa() * matched_point.v());
+  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
+                                                matched_point.v());
   heading_error_rate_ = debug->heading_error_rate();
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point().theta());
