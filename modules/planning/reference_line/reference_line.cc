@@ -383,6 +383,18 @@ bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
   return IsOnRoad(sl_point);
 }
 
+bool ReferenceLine::IsOnRoad(const SLBoundary& sl_boundary) const {
+  if (sl_boundary.end_s() < 0 || sl_boundary.start_s() > Length()) {
+    return false;
+  }
+  double middle_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
+  double left_width = 0.0;
+  double right_width = 0.0;
+  map_path_.GetWidth(middle_s, &left_width, &right_width);
+  return sl_boundary.start_l() >= -right_width &&
+         sl_boundary.end_l() <= left_width;
+}
+
 bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
                                 double gap) const {
   return map_path_.OverlapWith(box2d, gap);
