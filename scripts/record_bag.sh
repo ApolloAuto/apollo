@@ -51,12 +51,12 @@ function start() {
 
   # record some meta info into bag
   if [ -e /apollo/meta.ini ]; then
-      META_STR=`cat /apollo/meta.ini | sed 's/\[//g' | sed 's/\]//g' | sed 's/:/ /g' | tr '\n' ' '`
-      rostopic pub -1 -l /apollo/meta std_msgs/String "$META_STR" &
+      META_STR=`cat /apollo/meta.ini | tr '[]:\n' ' '`
+      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
   else
       META_STR=`git rev-parse HEAD`
       META_STR="git commit $META_STR"
-      rostopic pub -1 -l /apollo/meta std_msgs/String "$META_STR" &
+      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
   fi
 
   # Start recording.
@@ -98,6 +98,7 @@ function start() {
 
 function stop() {
   pkill -SIGINT -f record
+  pkill -SIGINT -f "rostopic pub"
 }
 
 function help() {
