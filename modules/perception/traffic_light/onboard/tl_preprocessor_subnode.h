@@ -42,20 +42,26 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-// @brief pre-processor subnode
+/** @class TLPreprocessorSubnode
+ *  @brief pre-processor subnode
+ */
 class TLPreprocessorSubnode : public Subnode {
  public:
   TLPreprocessorSubnode() = default;
   virtual ~TLPreprocessorSubnode() = default;
 
-  // @brief: as a subnode with type SUBNODE_IN
-  //         we will use ros callback, so ignore subnode callback
+  /**
+   * @brief as a subnode with type SUBNODE_IN
+   *         we will use ros callback, so ignore subnode callback
+   */
   apollo::common::Status ProcEvents() override {
     return apollo::common::Status::OK();
   }
 
  protected:
-  // @brief init pre-processor
+  /**
+   * @brief init pre-processor
+   */
   bool InitInternal() override;
 
  private:

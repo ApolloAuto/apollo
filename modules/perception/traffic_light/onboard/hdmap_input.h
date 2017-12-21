@@ -29,13 +29,18 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-// Singleton HDMapInput, interfaces are thread-safe.
+/**
+ * @class HDMapInput
+ * @brief HDMap wrapper
+ */
 class HDMapInput {
  public:
   bool Init();
 
-  // @brief: get roi polygon
-  //         all points are in the world frame
+  /**
+   * @brief: get roi polygon
+   *         all points are in the world frame
+   */
   bool GetSignals(const Eigen::Matrix4d &pointd,
                   std::vector<apollo::hdmap::Signal> *signals);
 

@@ -41,44 +41,88 @@ const std::map<int, std::string> kCameraIdToStr = {
     {static_cast<int>(LONG_FOCUS), "long_focus_camera_25mm"},
     {static_cast<int>(SHORT_FOCUS), "short_focus_camera_6mm"}};
 
-// @brief Image loaded from camera.
-//       Warning: Image is not Thread Safe.
+/*
+** @brief Image loaded from camera.
+*/       Warning: Image
+is not
+Thread Safe
+.
+
+/**
+ * @class Image
+ * @brief Image loaded from camera.
+ */
 class Image {
  public:
-  // @brief constructor
+  /**
+   * @brief constructor
+   */
   Image() = default;
 
-  // @brief init
-  // @param [in] ts image's timestamp
-  // @param [in] camera id
-  // @param [in] image's data
+  /**
+   * @brief init
+   * @param [in] ts image's timestamp
+   * @param [in] camera id
+   * @param [in] mat image
+   */
   bool Init(const double &ts, const CameraId &device_id, const cv::Mat &mat);
 
-  // @brief init
-  // @param [in] ts image's timestamp
-  // @param [in] camera id
-  // @param [in] image's data
+  /**
+   * @brief init
+   * @param [in] ts image's timestamp
+   * @param [in] camera id
+   * @param [in] raw ros image data
+   */
   bool Init(const double &ts, const CameraId &device_id,
             std::shared_ptr<const sensor_msgs::Image> image_data);
-  // @brief return image's timestamp
+
+  /**
+   * @brief return image's timestamp
+   */
   double ts() const;
 
   // @brief return image's device_id
+  /**
+   * @brief return image's timestamp
+   */
   CameraId camera_id() const;
   // @brief return image's device_id_str
+  /**
+   * @brief return image's timestamp
+   */
   std::string camera_id_str() const;
 
-  // @brief return image's data
+  /**
+   * @brief return image as cv::Mat
+   */
   cv::Mat mat() const;
 
+  /**
+   * @brief return image's size
+   */
   cv::Size size() const;
-  // @brief cotain image.
+
+  /**
+   * @brief return whether contains cv::Mat
+   */
   bool contain_mat() const { return contain_mat_; }
+  /**
+   * @brief return whether contains image data
+   */
   bool contain_image() const { return contain_image_; }
+  /**
+   * @brief set image's timestamp
+   */
   void set_ts(double ts) { timestamp_ = ts; }
 
+  /**
+   * @brief set image's camera id
+   */
   void set_camera_id(CameraId camera_id) { camera_id_ = camera_id; }
 
+  /**
+   * @brief generate cv::Mat from image data
+   */
   bool GenerateMat();
 
  private:
