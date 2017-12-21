@@ -89,19 +89,27 @@ if __name__ == "__main__":
         queue_size=10)
     seq_num = 0
     while not rospy.is_shutdown():
-        event_str = raw_input("Type in event and press Enter (current time: " +
-                              str(datetime.datetime.now()) + ")\n>")
-        event_str = event_str.strip()
-        if len(event_str) == 0:
+        event_type = raw_input(
+            "Type in Event Type('d') and press Enter (current time: " +
+            str(datetime.datetime.now()) + ")\n>")
+        event_type = event_type.strip()
+        if len(event_type) != 1:
             continue
+        if event_type[0].lower() != 'd':
+            continue
+        current_time = rospy.get_rostime()
+        event_str = None
+        while not event_str:
+            event_str = raw_input("Type Event:>")
+            event_str = event_str.strip()
         seq_num += 1
-        filename = "%03d_drive_event.pb.txt" % seq_num
+        time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        filename = time + "%03d_drive_event.pb.txt" % seq_num
         filename = os.path.join(g_args.dir, filename)
         while os.path.isfile(filename):
             seq_num += 1
             filename = os.path.join(g_args.dir,
                                     "%03d_drive_event.pb.txt" % seq_num)
-        current_time = rospy.get_rostime()
         seconds = current_time.secs + current_time.nsecs / 1000.0
         event_msg = drive_event_meta_msg.msg_type()()
         event_msg.header.timestamp_sec = seconds
@@ -113,4 +121,4 @@ if __name__ == "__main__":
             event_msg.location.CopyFrom(g_localization.pose)
         pub.publish(event_msg)
         proto_utils.write_pb_to_text_file(event_msg, filename)
-        print("logged to rosbag and file %s" % filename)
+        print("logged to rosbag and written file %s" % filename)
