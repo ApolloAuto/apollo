@@ -1605,3 +1605,6 @@ routing_header {
   sequence_num: 2
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "40_1_-2"
+}

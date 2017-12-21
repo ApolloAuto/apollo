@@ -388,6 +388,9 @@ Status Planning::Plan(const double current_time_stamp,
   // set right of way status
   trajectory_pb->set_right_of_way_status(
       best_reference_line->GetRightOfWayStatus());
+  for (const auto& id : best_reference_line->TargetLaneId()) {
+    trajectory_pb->add_lane_id()->CopyFrom(id);
+  }
 
   best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
 

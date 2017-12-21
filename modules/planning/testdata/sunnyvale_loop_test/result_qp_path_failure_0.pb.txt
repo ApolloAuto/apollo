@@ -1480,3 +1480,18 @@ routing_header {
   sequence_num: 2
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "12_1_-3"
+}
+lane_id {
+  id: "133_1_-3"
+}
+lane_id {
+  id: "88_1_-1"
+}
+lane_id {
+  id: "21_1_-1"
+}
+lane_id {
+  id: "22_1_-1"
+}
