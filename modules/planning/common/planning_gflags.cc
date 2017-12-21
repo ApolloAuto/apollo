@@ -186,14 +186,14 @@ DEFINE_double(min_stop_distance_obstacle, 3.0,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
-DEFINE_double(stop_distance_traffic_light, 3.0,
-              "stop distance from destination line");
+DEFINE_double(stop_distance_traffic_light, 0.2,
+              "stop distance from traffic light line");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
-DEFINE_double(follow_min_distance, 5.0,
+DEFINE_double(follow_min_distance, 2.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(
     follow_time_buffer, 2.0,

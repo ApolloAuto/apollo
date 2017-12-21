@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dir",
         action="store",
-        default="data",
+        default="data/bag",
         help="""The log export directory.""")
     g_args = parser.parse_args()
 
