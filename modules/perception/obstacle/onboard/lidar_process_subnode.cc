@@ -17,21 +17,16 @@
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 
 #include <map>
-#include <string>
 
-#include "Eigen/Core"
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
@@ -377,7 +372,7 @@ void LidarProcessSubnode::TransPointCloudToPCL(
       cloud->points[points_num].y = pt.y;
       cloud->points[points_num].z = pt.z;
       cloud->points[points_num].intensity = pt.intensity;
-      points_num++;
+      ++points_num;
     }
   }
   cloud->points.resize(points_num);
