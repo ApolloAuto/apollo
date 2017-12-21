@@ -32,8 +32,11 @@ extern std::map<TLColor, std::string> kColorStr;
 extern const int kCountCameraId;
 extern const int kLongFocusIdx;
 extern const int kShortFocusIdx;
-extern std::map<CameraId, int> kCameraIndicator;
 
+/**
+ * @class TLPreprocessingData
+ * @brief a image with lights, generated from preprocessing, passed to proc
+ */
 class TLPreprocessingData : public CommonSharedData<ImageLights> {
  public:
   TLPreprocessingData() = default;
