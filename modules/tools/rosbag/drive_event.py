@@ -24,6 +24,7 @@ import std_msgs
 import argparse
 import datetime
 import shutil
+import time
 import os
 import rospy
 import sys
@@ -97,28 +98,23 @@ if __name__ == "__main__":
             continue
         if event_type[0].lower() != 'd':
             continue
-        current_time = rospy.get_rostime()
+        current_time = time.time()
         event_str = None
         while not event_str:
             event_str = raw_input("Type Event:>")
             event_str = event_str.strip()
-        seq_num += 1
-        time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        filename = time + "%03d_drive_event.pb.txt" % seq_num
-        filename = os.path.join(g_args.dir, filename)
-        while os.path.isfile(filename):
-            seq_num += 1
-            filename = os.path.join(g_args.dir,
-                                    "%03d_drive_event.pb.txt" % seq_num)
-        seconds = current_time.secs + current_time.nsecs / 1000.0
         event_msg = drive_event_meta_msg.msg_type()()
-        event_msg.header.timestamp_sec = seconds
+        event_msg.header.timestamp_sec = current_time
         event_msg.header.module_name = "drive_event"
+        seq_num += 1
         event_msg.header.sequence_num = seq_num
         event_msg.header.version = 1
         event_msg.event = event_str
         if g_localization:
             event_msg.location.CopyFrom(g_localization.pose)
         pub.publish(event_msg)
+        time_str = datetime.datetime.fromtimestamp(current_time).strftime(
+            "%Y%m%d%H%M%S")
+        filename = os.path.join(g_args.dir, "%s_drive_event.pb.txt" % time_str)
         proto_utils.write_pb_to_text_file(event_msg, filename)
-        print("logged to rosbag and written file %s" % filename)
+        print("logged to rosbag and written to file %s" % filename)
