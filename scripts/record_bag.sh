@@ -76,6 +76,8 @@ function start() {
         /apollo/routing_request \
         /apollo/routing_response \
         /apollo/localization/pose \
+        /apollo/localization/msf_gnss \
+        /apollo/localization/msf_lidar \
         /apollo/drive_event \
         /tf \
         /tf_static \
