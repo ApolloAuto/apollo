@@ -19,9 +19,9 @@
 #include <memory>
 
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
@@ -47,27 +47,49 @@ void PredictorManager::RegisterPredictors() {
 void PredictorManager::Init(const PredictionConf& config) {
   for (const auto& obstacle_conf : config.obstacle_conf()) {
     if (!obstacle_conf.has_obstacle_type()) {
-      ADEBUG << "Obstacle config [" << obstacle_conf.ShortDebugString()
+      AERROR << "Obstacle config [" << obstacle_conf.ShortDebugString()
              << "] has not defined obstacle type.";
       continue;
     }
 
-    if (obstacle_conf.obstacle_type() == PerceptionObstacle::VEHICLE ||
-        obstacle_conf.obstacle_type() == PerceptionObstacle::BICYCLE) {
-      if (!obstacle_conf.has_obstacle_status() ||
-          !obstacle_conf.has_predictor_type()) {
-        ADEBUG << "Vehicle obstacle config ["
-               << obstacle_conf.ShortDebugString()
-               << "] has not defined obstacle status or predictor type.";
-        continue;
-      } else if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-        vehicle_on_lane_predictor_ = obstacle_conf.predictor_type();
-      } else if (obstacle_conf.obstacle_status() == ObstacleConf::OFF_LANE) {
-        vehicle_off_lane_predictor_ = obstacle_conf.predictor_type();
+    if (!obstacle_conf.has_predictor_type()) {
+      AERROR << "Obstacle config [" << obstacle_conf.ShortDebugString()
+             << "] has not defined predictor type.";
+      continue;
+    }
+
+    switch (obstacle_conf.obstacle_type()) {
+      case PerceptionObstacle::VEHICLE: {
+        if (obstacle_conf.has_obstacle_status()) {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+            vehicle_on_lane_predictor_ = obstacle_conf.predictor_type();
+          } else if (obstacle_conf.obstacle_status() ==
+                     ObstacleConf::OFF_LANE) {
+            vehicle_off_lane_predictor_ = obstacle_conf.predictor_type();
+          }
+        }
+        break;
       }
-    } else if (obstacle_conf.obstacle_type() ==
-               PerceptionObstacle::PEDESTRIAN) {
-      pedestrian_predictor_ = obstacle_conf.predictor_type();
+      case PerceptionObstacle::BICYCLE: {
+        if (obstacle_conf.has_obstacle_status()) {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+            cyclist_on_lane_predictor_ = obstacle_conf.predictor_type();
+          } else if (obstacle_conf.obstacle_status() ==
+                     ObstacleConf::OFF_LANE) {
+            cyclist_off_lane_predictor_ = obstacle_conf.predictor_type();
+          }
+        }
+        break;
+      }
+      case PerceptionObstacle::PEDESTRIAN: {
+        pedestrian_predictor_ = obstacle_conf.predictor_type();
+        break;
+      }
+      case PerceptionObstacle::UNKNOWN: {
+        default_predictor_ = obstacle_conf.predictor_type();
+        break;
+      }
+      default: { break; }
     }
   }
 
@@ -76,9 +98,9 @@ void PredictorManager::Init(const PredictionConf& config) {
   AINFO << "Defined vehicle off lane obstacle predictor ["
         << vehicle_off_lane_predictor_ << "].";
   AINFO << "Defined bicycle on lane obstacle predictor ["
-        << vehicle_on_lane_predictor_ << "].";
+        << cyclist_on_lane_predictor_ << "].";
   AINFO << "Defined bicycle off lane obstacle predictor ["
-        << vehicle_off_lane_predictor_ << "].";
+        << cyclist_off_lane_predictor_ << "].";
   AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
         << "].";
   AINFO << "Defined default obstacle predictor [" << default_predictor_ << "].";
