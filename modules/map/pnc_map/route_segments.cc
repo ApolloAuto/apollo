@@ -103,11 +103,11 @@ void RouteSegments::SetRouteEndWaypoint(const LaneWaypoint &waypoint) {
 }
 
 LaneWaypoint RouteSegments::FirstWaypoint() const {
-  return LaneWaypoint(front().lane, front().start_s);
+  return LaneWaypoint(front().lane, front().start_s, 0.0);
 }
 
 LaneWaypoint RouteSegments::LastWaypoint() const {
-  return LaneWaypoint(back().lane, back().end_s);
+  return LaneWaypoint(back().lane, back().end_s, 0.0);
 }
 
 void RouteSegments::SetProperties(const RouteSegments &other) {
