@@ -73,6 +73,14 @@
 # candidate: DummyTracker, HmObjectTracker
 --onboard_tracker=HmObjectTracker
 
+# the type fusing algorithm for onboard
+# type: string
+# candidate: DummyTypeFuser, SequenceTypeFuser
+--onboard_type_fuser=DummyTypeFuser
+
+# the radar detector for onboard
+# type: string
+# candidate: DummyRadarDetector, ModestRadarDetector
 --onboard_radar_detector=ModestRadarDetector
 
 # the perception module's output topic name.

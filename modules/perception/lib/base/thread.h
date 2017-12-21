@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef apollo_PERCEPTION_LIB_BASE_THREAD_H
-#define apollo_PERCEPTION_LIB_BASE_THREAD_H
+#ifndef MODULES_PERCEPTION_LIB_BASE_THREAD_H
+#define MODULES_PERCEPTION_LIB_BASE_THREAD_H
 
 #include <pthread.h>
 #include <string>
@@ -74,4 +74,4 @@ class Thread {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_LIB_BASE_THREAD_H
+#endif  // MODULES_PERCEPTION_LIB_BASE_THREAD_H
