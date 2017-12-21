@@ -526,11 +526,19 @@ Status StBoundaryMapper::GetSpeedLimits(
       }
     }
 
-    const double curr_speed_limit = std::fmax(
+    double curr_speed_limit = 0.0;
+    if (FLAGS_enable_nudge_slowdown) {
+      curr_speed_limit = std::fmax(
         st_boundary_config_.lowest_speed(),
         common::util::MinElement(std::vector<double>{
             centripetal_acceleration_limit, speed_limit_on_reference_line,
             nudge_obstacle_speed_limit}));
+    } else {
+      curr_speed_limit = std::fmax(
+        st_boundary_config_.lowest_speed(),
+        common::util::MinElement(std::vector<double>{
+            centripetal_acceleration_limit, speed_limit_on_reference_line}));
+    }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
   }
