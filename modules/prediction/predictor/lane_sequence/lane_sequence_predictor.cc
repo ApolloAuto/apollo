@@ -107,6 +107,9 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
   // PredictionMap* map = PredictionMap::instance();
 
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
+  if (FLAGS_enable_rnn_acc && sequence.has_acceleration()) {
+    state(3, 0) = sequence.acceleration();
+  }
   Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
   transition(0, 2) = freq;
   transition(0, 3) = 0.5 * freq * freq;
