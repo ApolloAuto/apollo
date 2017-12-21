@@ -96,6 +96,7 @@ class ReferenceLine {
                     double* const right_width) const;
   bool IsOnRoad(const common::SLPoint& sl_point) const;
   bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
+  bool IsOnRoad(const SLBoundary& sl_boundary) const;
 
   /**
    * @brief Check if a box is blocking the road surface. The crieria is to check
