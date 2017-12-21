@@ -81,9 +81,9 @@ double TrajectoryEvaluator::evaluate(
   // 2. the cost of time to achieve the objective
   // 3. the cost of failure to achieve the planning objective.
 
-  // these numbers are for temporary use; needs to be tuned later.
+  double weight_lon_travel = 10.0;
   double weight_lon_jerk = 1.0;
-  double weight_lat_offset = 10.0;
+  double weight_lat_offset = 1.0;
 
   double t = 0.0;
   double t_max = lon_trajectory->ParamLength();
@@ -103,12 +103,17 @@ double TrajectoryEvaluator::evaluate(
     t += trajectory_time_resolution;
   }
 
+  double lon_travel_cost = compute_lon_trajectory_objective_cost(
+    lon_trajectory, planning_target);
+
   double lon_jerk_cost = compute_lon_trajectory_comfort_cost(lon_trajectory);
 
   double lat_offset_cost =
       compute_lat_trajectory_offset_cost(lat_trajectory, s_values);
 
-  return lon_jerk_cost * weight_lon_jerk + lat_offset_cost * weight_lat_offset;
+  return lon_travel_cost * weight_lon_travel +
+    lon_jerk_cost * weight_lon_jerk +
+    lat_offset_cost * weight_lat_offset;
 }
 
 double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
@@ -163,49 +168,6 @@ double TrajectoryEvaluator::compute_lon_trajectory_comfort_cost(
 }
 
 /**
-double TrajectoryEvaluator::evaluate(
-    const PlanningTarget& planning_target,
-    const std::shared_ptr<Trajectory1d>& lon_trajectory,
-    const std::shared_ptr<Trajectory1d>& lat_trajectory) const {
-  // currently consider three costs:
-  // 1. the cost of jerk, currently only consider longitudinal jerk.
-  // 2. the cost of time to achieve the objective
-  // 3. the cost of failure to achieve the planning objective.
-
-  // these numbers are for temporary use; needs to be tuned later.
-  double weight_lon_jerk = 1.0;
-  double weight_lon_objective = 3000.0;
-  double weight_lat_offset = 10.0;
-
-  double t = 0.0;
-  double t_max = lon_trajectory->ParamLength();
-  double s_max = lon_trajectory->Evaluate(0, t_max);
-  double v_end = lon_trajectory->Evaluate(1, t_max);
-
-  std::vector<double> s_values;
-  while (t < planned_trajectory_time) {
-    double s = 0.0;
-    if (t < t_max) {
-      s = lon_trajectory->Evaluate(0, t);
-    } else {
-      // extend by constant speed movement
-      s = s_max + v_end * (t - t_max);
-    }
-    s_values.push_back(s);
-    t += trajectory_time_resolution;
-  }
-
-  double lon_objective_cost =
-      compute_lon_trajectory_objective_cost(lon_trajectory, planning_target);
-
-  double lon_jerk_cost = compute_lon_trajectory_jerk_cost(lon_trajectory);
-
-  double lat_offset_cost =
-      compute_lat_trajectory_offset_cost(lat_trajectory, s_values);
-
-  return lon_objective_cost * weight_lon_objective +
-         lon_jerk_cost * weight_lon_jerk + lat_offset_cost * weight_lat_offset;
-}
 
 double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
     const std::shared_ptr<Trajectory1d>& lat_trajectory,
@@ -257,6 +219,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
   }
   return cost;
 }
+**/
 
 double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
@@ -293,14 +256,14 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
 //      double weight = 10.0;
 //      return (target_s - end_s) * weight;
 //    }
-  double weight_dist_s = 10.0;
+  double weight_dist_travelled = 10.0;
+  double weight_on_reference_speed = 1.0;
   double target_speed = planning_target.cruise_speed();
-  double end_speed = lon_trajectory->Evaluate(1,
-      lon_trajectory->ParamLength());
-
   double t_max = lon_trajectory->ParamLength();
+
+  double end_speed = lon_trajectory->Evaluate(1, t_max);
   double t = 0.0;
-  double s_max = lon_trajectory->Evaluate(0, planned_trajectory_time);
+  double s_max = lon_trajectory->Evaluate(0, t_max);
   double s_min = lon_trajectory->Evaluate(0, 0.0);
   double dist_s = s_max -s_min;
   double cost = 0.0;
@@ -315,11 +278,12 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     cost += std::fabs(c);
     t += trajectory_time_resolution;
   }
-  cost += weight_dist_s * 1.0 / (1.0 + dist_s);
+  cost *= weight_on_reference_speed;
+  cost += weight_dist_travelled * 1.0 / (1.0 + dist_s);
   return cost;
 
 }
-**/
+
 
 }  // namespace planning
 }  // namespace apollo
