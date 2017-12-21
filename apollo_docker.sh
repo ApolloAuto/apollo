@@ -102,15 +102,15 @@ function gen_docker() {
   fi
 
   CONTAINER_ID=$(docker ps | grep apollo_release | awk '{print $1}')
-  docker commit "$CONTAINER_ID" "$RELEASE_NAME"
   docker commit "$CONTAINER_ID" "$DEFAULT_NAME"
+  docker tag "$DEFAULT_NAME" "$RELEASE_NAME"
   docker stop "$CONTAINER_ID"
 }
 
 function push() {
-  local DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
-  local RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
-  docker tag "$DEFAULT_NAME" "$RELEASE_NAME"
+  DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
+  LATEST_IMAG_ID=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "${DEFAULT_NAME}" | cut -d " " -f 2)
+  RELEASE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep ${LATEST_IMAG_ID}| grep -v "${DEFAULT_NAME}" | cut -d " " -f 1)
   docker push "$DEFAULT_NAME"
   docker push "$RELEASE_NAME"
 }
