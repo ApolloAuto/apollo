@@ -21,20 +21,21 @@ APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 function update() {
   UPDATE_TAG=$(python ${APOLLO_ROOT}/modules/tools/ota/query_client.py)
   if [ "$?" != "0" ]; then
-    exit 0
+    echo $UPDATE_TAG
+    exit 1
   fi
 
   tip="Type 'y' or 'Y' to start upgrade, or type any other key to exit"
   echo $tip
   read -n 1 user_agreed
   if [ "$user_agreed" != "y" ] && [ "$user_agreed" != "Y" ]; then
-    exit 0
+    exit 1
   fi
   cp ${APOLLO_ROOT}/scripts/ota.sh /home/$DOCKER_USER/.cache/
   ssh $DOCKER_USER@localhost  bash /home/$DOCKER_USER/.cache/ota.sh download $UPDATE_TAG
   python ${APOLLO_ROOT}/modules/tools/ota/verify_client.py
   if [ "$?" != "0" ]; then
-    exit 0
+    exit 1
   fi
 
   if [ -e "$HOME/.cache/apollo_release" ]; then
@@ -67,6 +68,7 @@ function download() {
   UPDATE_TAG=$1
   docker pull $UPDATE_TAG
   if [ "$?" != "0" ]; then
+    echo "Downloading fails!"
     exit 1
   else
     echo "New release image has been downloaded!"
