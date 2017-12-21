@@ -139,8 +139,8 @@ void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
-  const double kStraightForwardLineCost = 10.0;
   if (!reference_line_info->IsChangeLanePath()) {
+    const double kStraightForwardLineCost = 10.0;
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
 

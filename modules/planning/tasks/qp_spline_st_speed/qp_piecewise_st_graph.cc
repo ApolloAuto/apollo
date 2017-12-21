@@ -78,7 +78,7 @@ Status QpPiecewiseStGraph::Search(
       t_evaluated_resolution_));
 
   if (!AddConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.st_boundaries(), accel_bound)
+                     st_graph_data.st_boundaries(), accel_bound)
            .ok()) {
     const std::string msg = "Add constraint failed!";
     AERROR << msg;
@@ -103,7 +103,6 @@ Status QpPiecewiseStGraph::Search(
   const auto& res = generator_->params();
   speed_data->AppendSpeedPoint(0.0, 0.0, init_point_.v(), init_point_.a(), 0.0);
 
-  double s = 0.0;
   double v = 0.0;
   double a = 0.0;
 
@@ -111,7 +110,7 @@ Status QpPiecewiseStGraph::Search(
   double dt = t_evaluated_resolution_;
 
   for (int i = 0; i < res.rows(); ++i, time += t_evaluated_resolution_) {
-    s = res(i, 0);
+    double s = res(i, 0);
     if (i == 0) {
       v = s / dt;
       a = (v - init_point_.v()) / dt;
