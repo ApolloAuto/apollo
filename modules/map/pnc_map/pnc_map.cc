@@ -157,6 +157,15 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     AERROR << "The routing is invalid when updatting vehicle state";
     return false;
   }
+  if (!adc_state_.has_x() ||
+      common::util::DistanceXY(adc_state_, vehicle_state) >
+          vehicle_state.linear_velocity() * 5.0) {
+    // speed five times larger than current speed, which is impossible, reset
+    next_routing_waypoint_index_ = 0;
+    route_index_.clear();
+    stop_for_destination_ = false;
+  }
+
   adc_state_ = vehicle_state;
   if (!GetNearestPointFromRouting(vehicle_state, &adc_waypoint_)) {
     AERROR << "Failed to get waypoint from routing with point: "
