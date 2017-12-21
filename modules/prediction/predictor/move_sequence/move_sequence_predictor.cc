@@ -134,7 +134,8 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
            << "] will draw a lane sequence trajectory [" << ToString(sequence)
            << "] with probability [" << sequence.probability() << "].";
 
-    std::string curr_lane_id = sequence.lane_segment(0).lane_id();
+    // TODO(Prediction): remove the following line
+    // std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
     DrawMoveSequenceTrajectoryPoints(*obstacle, sequence,
                                      FLAGS_prediction_duration,

@@ -108,6 +108,7 @@ class ReferenceLineInfo {
   bool IsDrivable() const;
 
   const hdmap::RouteSegments& Lanes() const;
+  const std::list<hdmap::Id> TargetLaneId() const;
 
   void ExportDecision(DecisionResult* decision_result) const;
 
