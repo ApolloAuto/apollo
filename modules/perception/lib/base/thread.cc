@@ -16,7 +16,6 @@
 
 #include "modules/perception/lib/base/thread.h"
 
-#include <assert.h>
 #include <signal.h>
 
 #include "modules/common/log.h"
@@ -31,8 +30,8 @@ void Thread::Start() {
       pthread_attr_setdetachstate(
           &attr, joinable_ ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED),
       0);
-  CHECK_EQ(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL), 0);
-  CHECK_EQ(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL), 0);
+  CHECK_EQ(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr), 0);
+  CHECK_EQ(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, nullptr), 0);
 
   int result = pthread_create(&tid_, &attr, &ThreadRunner, this);
   CHECK_EQ(result, 0) << "Could not create thread (" << result << ")";
@@ -44,7 +43,7 @@ void Thread::Start() {
 
 void Thread::Join() {
   CHECK(joinable_) << "Thread is not joinable";
-  int result = pthread_join(tid_, NULL);
+  int result = pthread_join(tid_, nullptr);
   CHECK_EQ(result, 0) << "Could not join thread (" << tid_ << ", "
                       << thread_name_ << ")";
   tid_ = 0;
