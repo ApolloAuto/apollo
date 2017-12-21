@@ -22,8 +22,10 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/math:math",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
+        "//modules/localization/proto:gps_proto",
         "@eigen//:eigen",
         "@pcl//:pcl",
         "@ros//:ros_common",
@@ -46,6 +48,25 @@ cc_binary(
         "//modules/common:log",
         "@eigen//:eigen",
         "@ros//:ros_common",
+    ],
+)
+
+cc_binary(
+    name = "compare_poses",
+    srcs = [
+        "compare_poses.cc",
+    ],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+        "-lboost_program_options",
+    ],
+    linkstatic = 0,
+    deps = [
+        ":data_extraction",
+        "//modules/localization/msf/local_tool/local_visualization:offline_local_visualizer_lib",
+        "//modules/common:log",
+        "@eigen//:eigen",
     ],
 )
 

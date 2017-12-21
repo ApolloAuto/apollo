@@ -1,7 +1,7 @@
 # Multi-sensor Fusion Localization
 
 ## Introduction
-  The goal of multi-sensor localization is to provide a robust method which can achieve high localization accuracy and resilience in challenging scenes, such as urban downtown, highways, and tunnels. It adaptively uses information from complementary sensors such as GNSS, LiDAR and IMU.
+  The goal of multi-sensor localization is to provide a robust method which can achieve high localization accuracy and resilience in challenging scenes, such as urban downtown, highways, and tunnels. It adaptively uses information from complementary sensors such as GNSS, LiDAR and IMU. If you want to new more details, please refer to our paper [Robust and Precise Vehicle Localization based on Multi-sensor Fusion in Diverse City Scenes] (https://arxiv.org/abs/1711.05805).
 
 ## Input
   * Point cloud data from LiDAR sensor (ROS topic /apollo/sensor/velodyne64/compensator/PointCloud2)
