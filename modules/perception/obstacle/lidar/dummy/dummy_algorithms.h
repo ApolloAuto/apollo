@@ -25,6 +25,7 @@
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
+#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 
 namespace apollo {
 namespace perception {
@@ -177,12 +178,36 @@ class DummyTracker : public BaseTracker {
   DISALLOW_COPY_AND_ASSIGN(DummyTracker);
 };
 
+class DummyTypeFuser : public BaseTypeFuser {
+ public:
+  DummyTypeFuser() : BaseTypeFuser() {}
+  ~DummyTypeFuser() = default;
+
+  bool Init() override {
+    return result_init_;
+  }
+
+  bool FuseType(const TypeFuserOptions& options,
+                std::vector<ObjectPtr>* objects) override;
+
+  std::string name() const override {
+    return "DummyTypeFuser";
+  }
+
+ private:
+  bool result_init_ = true;
+  bool result_type_fuser_ = true;
+
+  DISALLOW_COPY_AND_ASSIGN(DummyTypeFuser);
+};
+
 REGISTER_GROUNDDETECTOR(DummyGroundDetector);
 REGISTER_ROIFILTER(DummyROIFilter);
 REGISTER_SEGMENTATION(DummySegmentation);
 REGISTER_OBJECTBUILDER(DummyObjectBuilder);
 REGISTER_TRACKER(DummyTracker);
 REGISTER_OBJECTFILTER(DummyObjectFilter);
+REGISTER_TYPEFUSER(DummyTypeFuser);
 
 }  // namespace perception
 }  // namespace apollo

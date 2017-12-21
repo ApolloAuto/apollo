@@ -34,6 +34,7 @@
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
+#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 
 namespace apollo {
 namespace perception {
@@ -181,10 +182,23 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-
-  PERF_BLOCK_END("lidar_tracker");
-  ADEBUG << "lidar process succ, there are " << objects_.size()
+  ADEBUG << "call tracker succ, there are " << objects_.size()
          << " tracked objects.";
+  PERF_BLOCK_END("lidar_tracker");
+
+  /// call type fuser
+  if (type_fuser_ != nullptr) {
+    TypeFuserOptions type_fuser_options;
+    type_fuser_options.timestamp = timestamp;
+    if (!type_fuser_->FuseType(type_fuser_options, &objects_)) {
+      AERROR << "failed to call type fuser";
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
+      return false;
+    }
+  }
+  ADEBUG << "lidar process succ.";
+  PERF_BLOCK_END("lidar_type_fuser");
+
   return true;
 }
 
@@ -193,11 +207,13 @@ void LidarProcess::RegistAllAlgorithm() {
   RegisterFactoryDummySegmentation();
   RegisterFactoryDummyObjectBuilder();
   RegisterFactoryDummyTracker();
+  RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
   RegisterFactoryHmObjectTracker();
+  RegisterFactorySequenceTypeFuser();
 }
 
 bool LidarProcess::InitFrameDependence() {
@@ -285,6 +301,20 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   AINFO << "Init algorithm plugin successfully, tracker: " << tracker_->name();
+
+  /// init type fuser
+  type_fuser_.reset(
+      BaseTypeFuserRegisterer::GetInstanceByName(FLAGS_onboard_type_fuser));
+  if (!type_fuser_) {
+    AERROR << "Failed to get instance: " << FLAGS_onboard_type_fuser;
+    return false;
+  }
+  if (!type_fuser_->Init()) {
+    AERROR << "Failed to Init type_fuser: " << type_fuser_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, type_fuser: "
+        << type_fuser_->name();
 
   return true;
 }
