@@ -68,10 +68,6 @@ PlanningTarget BehaviorDecider::Analyze(
         ->CopyFrom(reference_point);
   }
 
-  PathTimeNeighborhood path_time_neighborhood(frame, lon_init_state,
-      reference_line_info->reference_line(),
-      discretized_reference_line);
-
   ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
       reference_line_info->reference_line(), discretized_reference_line);
 

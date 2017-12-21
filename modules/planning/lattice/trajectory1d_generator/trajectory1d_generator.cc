@@ -180,10 +180,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
 
-  //if (planning_target.decision_type() == PlanningTarget::STOP) {
-  //  GenerateSpeedProfilesForStopping(planning_target.stop_point(),
-  //    ptr_lon_trajectory_bundle);
-  //}
+  // cruising trajectories are planned regardlessly.
   GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
     ptr_lon_trajectory_bundle);
 

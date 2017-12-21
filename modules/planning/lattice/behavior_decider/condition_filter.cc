@@ -42,7 +42,8 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   std::set<double> critical_timestamps = CriticalTimeStamps();
   std::vector<SampleBound> sample_bounds;
   for (const double t : critical_timestamps) {
-    // TODO(kechxu) change the hard-coded 0.001 to some variable
+    // TODO (kechxu): change the hard-coded 0.001 to some variable
+    // TODO (zhangyajia): why is this not zero?
     if (t > 0.001) {
       std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
       sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
@@ -64,28 +65,33 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
 
   std::vector<CriticalPointPair> path_intervals =
       QueryPathTimeObstacleIntervals(t);
-  double s_prev = feasible_s_lower;
+  double s_max_reached = feasible_s_lower;
   const PathTimePoint* point_prev_ptr = nullptr;
 
   std::vector<SampleBound> sample_bounds;
   for (const auto& path_interval : path_intervals) {
-    if (path_interval.second.s() < feasible_s_lower) {
+    if (path_interval.second.s() < s_max_reached) {
       continue;
     }
-    if (s_prev > feasible_s_upper) {
+
+    if (s_max_reached > feasible_s_upper) {
       break;
     }
-    if (s_prev < path_interval.first.s()) {
+
+    // a new interval
+    if (s_max_reached < path_interval.first.s()) {
       if (path_interval.first.s() <= feasible_s_upper) {
         SampleBound sample_bound;
         sample_bound.set_t(t);
         sample_bound.set_s_upper(path_interval.first.s());
-        sample_bound.set_s_lower(s_prev);
+        sample_bound.set_s_lower(s_max_reached);
 
         double v_upper = feasible_v_upper;
+
         if (path_interval.first.has_v()) {
           v_upper = path_interval.first.v();
         }
+
         double v_lower = feasible_v_lower;
         if (point_prev_ptr) {
           v_lower = point_prev_ptr->v();
@@ -98,21 +104,22 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         SampleBound sample_bound;
         sample_bound.set_t(t);
         sample_bound.set_s_upper(feasible_s_upper);
-        sample_bound.set_s_lower(s_prev);
+        sample_bound.set_s_lower(s_max_reached);
         sample_bound.set_v_upper(feasible_v_upper);
 
-        //TODO (zhangyajia): fix this!
         double v_lower = feasible_v_upper;
+        /**
         if (point_prev_ptr) {
           v_lower = point_prev_ptr->v();
         }
+        **/
         sample_bound.set_v_lower(v_lower);
         sample_bounds.push_back(std::move(sample_bound));
         break;
       }
     }
-    if (s_prev < path_interval.second.s()) {
-      s_prev = path_interval.second.s();
+    if (s_max_reached < path_interval.second.s()) {
+      s_max_reached = path_interval.second.s();
       point_prev_ptr = &(path_interval.second);
     }
   }
