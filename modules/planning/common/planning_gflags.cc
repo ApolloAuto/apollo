@@ -193,7 +193,7 @@ DEFINE_double(destination_check_distance, 5.0,
               " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
-DEFINE_double(follow_min_distance, 5.0,
+DEFINE_double(follow_min_distance, 2.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(
     follow_time_buffer, 2.0,
