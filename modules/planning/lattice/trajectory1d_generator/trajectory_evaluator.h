@@ -66,6 +66,10 @@ class TrajectoryEvaluator {
   double compute_lon_trajectory_comfort_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
+  double compute_lon_trajectory_objective_cost(
+    const std::shared_ptr<Curve1d>& lon_trajectory,
+    const PlanningTarget& planning_target) const;
+
   struct CostComparator: public std::binary_function<const PairCost&,
       const PairCost&, bool> {
       bool operator()(const PairCost& left, const PairCost& right) const {
