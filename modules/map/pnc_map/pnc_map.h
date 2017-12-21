@@ -50,16 +50,15 @@ class PncMap {
 
   bool UpdateRoutingResponse(const routing::RoutingResponse &routing_response);
 
-  bool UpdateVehicleState(const common::VehicleState &vehicle_state);
-
   const routing::RoutingResponse &routing_response() const;
 
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
-  bool GetRouteSegments(const double backward_length,
+  bool GetRouteSegments(const common::VehicleState &vehicle_state,
+                        const double backward_length,
                         const double forward_length,
-                        std::list<RouteSegments> *const route_segments) const;
+                        std::list<RouteSegments> *const route_segments);
 
   /**
    * Check if the routing is the same as existing one in PncMap
@@ -77,6 +76,7 @@ class PncMap {
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints() const;
 
  private:
+  bool UpdateVehicleState(const common::VehicleState &vehicle_state);
   /**
    * @brief Find the waypoint index of a routing waypoint. It updates
    * route_index_ with a vector with three values: Road index in
