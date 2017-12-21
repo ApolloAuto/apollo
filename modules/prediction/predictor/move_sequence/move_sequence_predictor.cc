@@ -299,6 +299,9 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double theta = feature.velocity_heading();
   double v = feature.speed();
   double a = feature.acc();
+  if (FLAGS_enable_rnn_acc && lane_sequence.has_acceleration()) {
+    a = lane_sequence.acceleration();
+  }
   if (FLAGS_enable_kf_tracking) {
     v = feature.t_speed();
     a = feature.t_acc();

@@ -67,6 +67,7 @@ DECLARE_double(heading_diff_thred);
 // evaluator
 DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_double(perception_confidence_threshold);
+DECLARE_bool(enable_rnn_acc);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
