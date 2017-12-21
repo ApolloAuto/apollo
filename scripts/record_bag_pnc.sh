@@ -54,12 +54,17 @@ function start() {
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record --split --duration=10m -b 2048  \
-        /apollo/sensor/gnss/gnss_status \
-        /apollo/sensor/gnss/odometry \
-        /apollo/sensor/gnss/ins_stat \
-        /apollo/sensor/gnss/corrected_imu \
-        /apollo/sensor/mobileye \
+        /apollo/sensor/conti_radar \
         /apollo/sensor/delphi_esr \
+        /apollo/sensor/gnss/best_pose \
+        /apollo/sensor/gnss/corrected_imu \
+        /apollo/sensor/gnss/gnss_status \
+        /apollo/sensor/gnss/imu \
+        /apollo/sensor/gnss/ins_stat \
+        /apollo/sensor/gnss/odometry \
+        /apollo/sensor/gnss/rtk_eph \
+        /apollo/sensor/gnss/rtk_obs \
+        /apollo/sensor/mobileye \
         /apollo/canbus/chassis \
         /apollo/canbus/chassis_detail \
         /apollo/control \
@@ -72,12 +77,14 @@ function start() {
         /apollo/routing_response \
         /apollo/localization/pose \
         /apollo/drive_event \
+        /tf \
+        /tf_static \
         /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
 }
 
 function stop() {
-  pkill -SIGINT -f rosbag
+  pkill -SIGINT -f record
 }
 
 function help() {
