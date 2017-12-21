@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <string>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -472,6 +471,7 @@ void StBoundaryMapper::GetAvgKappa(
 }
 
 Status StBoundaryMapper::GetSpeedLimits(
+    const IndexedList<std::string, PathObstacle>& path_obstacles,
     SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
 
@@ -490,21 +490,47 @@ Status StBoundaryMapper::GetSpeedLimits(
       break;
     }
 
+    // speed limit from map
     double speed_limit_on_reference_line =
         reference_line_.GetSpeedLimitFromS(frenet_point_s);
 
     // speed limit from path curvature
     const double centripetal_acceleration_limit =
-        st_boundary_config_.high_speed_centric_acceleration_limit();
-
-    double speed_limit_on_path =
-        std::sqrt(centripetal_acceleration_limit /
+        std::sqrt(st_boundary_config_.high_speed_centric_acceleration_limit() /
                   std::fmax(std::fabs(avg_kappa[i]),
                             st_boundary_config_.minimal_kappa()));
 
+    // speed limit from nudge obstacles
+    double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
+    for (const auto* const_path_obstacle : path_obstacles.Items()) {
+      if (!const_path_obstacle->LateralDecision().has_nudge()) {
+        continue;
+      }
+      if (path_s < const_path_obstacle->perception_sl_boundary().start_s() ||
+          path_s > const_path_obstacle->perception_sl_boundary().end_s()) {
+        continue;
+      }
+      constexpr double kRange = 1.0;  // meters
+      const auto& nudge = const_path_obstacle->LateralDecision().nudge();
+      bool is_close_on_left =
+          (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
+          (const_path_obstacle->perception_sl_boundary().end_l() > -kRange);
+      bool is_close_on_right =
+          (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
+          (const_path_obstacle->perception_sl_boundary().start_l() < kRange);
+      if (is_close_on_left || is_close_on_right) {
+        constexpr double kNudgeSpeedRatio = 0.6;
+        nudge_obstacle_speed_limit =
+            kNudgeSpeedRatio * speed_limit_on_reference_line;
+        break;
+      }
+    }
+
     const double curr_speed_limit = std::fmax(
         st_boundary_config_.lowest_speed(),
-        std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
+        common::util::MinElement(std::vector<double>{
+            centripetal_acceleration_limit, speed_limit_on_reference_line,
+            nudge_obstacle_speed_limit}));
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
   }
