@@ -1741,3 +1741,6 @@ routing_header {
   sequence_num: 3
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "57_1_-1"
+}
