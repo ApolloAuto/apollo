@@ -85,6 +85,7 @@ bool ReferenceLineInfo::Init() {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
+  is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
   return true;
 }
 
@@ -148,12 +149,29 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
 }
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
-  auto path_obstacle = CreatePathObstacle(obstacle);
-  if (!path_obstacle) {
-    AERROR << "Failed to create path obstacle for " << obstacle->Id();
-    return nullptr;
+  auto path_obstacle_ptr =
+      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
+  auto* path_obstacle = path_decision_.AddPathObstacle(*path_obstacle_ptr);
+
+  SLBoundary perception_sl;
+  if (!reference_line_.GetSLBoundary(obstacle->PerceptionBoundingBox(),
+                                     &perception_sl)) {
+    AERROR << "Failed to get sl boundary for obstacle: " << obstacle->Id();
+    return path_obstacle;
   }
-  return path_decision_.AddPathObstacle(*path_obstacle);
+  path_obstacle->SetPerceptionSlBoundary(perception_sl);
+
+  if (IsUnrelaventObstacle(path_obstacle)) {
+    ObjectDecisionType ignore;
+    ignore.mutable_ignore();
+    path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
+                                      ignore);
+    path_decision_.AddLongitudinalDecision("reference_line_filter",
+                                           obstacle->Id(), ignore);
+  } else {
+    path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
+  }
+  return path_obstacle;
 }
 
 bool ReferenceLineInfo::AddObstacles(
@@ -167,16 +185,19 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-std::unique_ptr<PathObstacle> ReferenceLineInfo::CreatePathObstacle(
-    const Obstacle* obstacle) {
-  auto path_obstacle =
-      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  if (!path_obstacle->Init(reference_line_, adc_sl_boundary_.end_s())) {
-    AERROR << "Failed to create perception sl boundary for obstacle "
-           << obstacle->Id();
-    return nullptr;
+bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
+  // if adc is on the road, and obstacle behind adc, ignore
+  if (path_obstacle->perception_sl_boundary().end_s() >
+      reference_line_.Length()) {
+    return true;
   }
-  return path_obstacle;
+  if (is_on_reference_line_ &&
+      path_obstacle->perception_sl_boundary().end_s() <
+          adc_sl_boundary_.end_s() &&
+      reference_line_.IsOnRoad(path_obstacle->perception_sl_boundary())) {
+    return true;
+  }
+  return false;
 }
 
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
