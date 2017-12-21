@@ -82,20 +82,15 @@ bool QpSplineReferenceLineSmoother::Smooth(
   for (std::uint32_t i = 0;
        i < smoother_config_.num_of_total_points() && t < end_t;
        ++i, t += resolution) {
-    const double heading = std::atan2(spline.DerivativeY(t),
-                                      spline.DerivativeX(t));
+    const double heading =
+        std::atan2(spline.DerivativeY(t), spline.DerivativeX(t));
     const double kappa = CurveMath::ComputeCurvature(
-        spline.DerivativeX(t),
-        spline.SecondDerivativeX(t),
-        spline.DerivativeY(t),
-        spline.SecondDerivativeY(t));
+        spline.DerivativeX(t), spline.SecondDerivativeX(t),
+        spline.DerivativeY(t), spline.SecondDerivativeY(t));
     const double dkappa = CurveMath::ComputeCurvatureDerivative(
-        spline.DerivativeX(t),
-        spline.SecondDerivativeX(t),
-        spline.ThirdDerivativeX(t),
-        spline.DerivativeY(t),
-        spline.SecondDerivativeY(t),
-        spline.ThirdDerivativeY(t));
+        spline.DerivativeX(t), spline.SecondDerivativeX(t),
+        spline.ThirdDerivativeX(t), spline.DerivativeY(t),
+        spline.SecondDerivativeY(t), spline.ThirdDerivativeY(t));
 
     std::pair<double, double> xy = spline(t);
     xy.first += ref_x_;
@@ -110,9 +105,13 @@ bool QpSplineReferenceLineSmoother::Smooth(
     }
     ref_sl_point.set_s(std::max(ref_sl_point.s(), 0.0));
     ReferencePoint rlp = raw_reference_line.GetReferencePoint(ref_sl_point.s());
+    auto new_lane_waypoints = rlp.lane_waypoints();
+    for (auto& lane_waypoint : new_lane_waypoints) {
+      lane_waypoint.l = ref_sl_point.l();
+    }
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
-                            rlp.lane_waypoints()),
+                            new_lane_waypoints),
         kappa, dkappa, 0.0, 0.0));
   }
 
