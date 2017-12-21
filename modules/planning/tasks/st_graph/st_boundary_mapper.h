@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -49,6 +50,7 @@ class StBoundaryMapper {
   apollo::common::Status GetGraphBoundary(PathDecision* path_decision) const;
 
   virtual apollo::common::Status GetSpeedLimits(
+      const IndexedList<std::string, PathObstacle>& path_obstacles,
       SpeedLimit* const speed_limit_data) const;
 
  private:
