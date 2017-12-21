@@ -192,7 +192,7 @@ class KalmanFilter : public BaseFilter {
   // @brief get online covariance of filter
   // @params[OUT] online_covariance: online covariance
   // @return noting
-  void GetOnlineCovariance(Eigen::Matrix3d* online_covariance);
+  void GetOnlineCovariance(Eigen::Matrix3f* online_covariance);
 
  protected:
   void EvaluateOnlineCovariance();
