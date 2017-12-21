@@ -230,7 +230,7 @@ Status MPCController::ComputeControlCommand(
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
   VehicleStateProvider::instance()->set_linear_velocity(
-      std::max(VehicleStateProvider::instance()->linear_velocity(), 1.0));
+      std::max(VehicleStateProvider::instance()->linear_velocity(), 0.1));
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -251,12 +251,13 @@ Status MPCController::ComputeControlCommand(
 
   std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
 
-  // TODO(QiL) : change it to config
   Eigen::MatrixXd lower_bound(controls_, 1);
-  lower_bound << -10, -10;
+  lower_bound << -steer_single_direction_max_degree_,
+      vehicle_param_.max_deceleration();
 
   Eigen::MatrixXd upper_bound(controls_, 1);
-  upper_bound << 10, 10;
+  upper_bound << steer_single_direction_max_degree_,
+      vehicle_param_.max_acceleration();
 
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
