@@ -117,7 +117,8 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   belief_anchor_point_ = initial_anchor_point;
   belief_velocity_ = initial_velocity;
   const double uncertainty_factor = 5.0;
-  belief_velocity_uncertainty_ = Eigen::Matrix3f::Identity() * uncertainty_factor;
+  belief_velocity_uncertainty_ =
+    Eigen::Matrix3f::Identity() * uncertainty_factor;
   belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
