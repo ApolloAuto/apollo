@@ -18,11 +18,9 @@
 
 #include <string>
 
-#include "Eigen/Core"
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
@@ -48,7 +46,6 @@ using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 using Eigen::Matrix4d;
 using Eigen::Affine3d;
-using std::string;
 
 bool LidarProcess::Init() {
   if (inited_) {
@@ -349,7 +346,7 @@ void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
 
 bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   if (!trans) {
-    AERROR << "failed to get trans, the trans ptr can not be NULL";
+    AERROR << "failed to get trans, the trans ptr can not be nullptr";
     return false;
   }
 
@@ -357,7 +354,7 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   const auto& tf2_buffer = AdapterManager::Tf2Buffer();
 
   const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
-  string err_msg;
+  std::string err_msg;
   if (!tf2_buffer.canTransform(FLAGS_lidar_tf2_frame_id,
                                FLAGS_lidar_tf2_child_frame_id, query_stamp,
                                ros::Duration(kTf2BuffSize), &err_msg)) {
