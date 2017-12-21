@@ -216,8 +216,8 @@ void Path::InitWidth() {
       double left_width = 0.0;
       double right_width = 0.0;
       waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
-      left_width_.push_back(left_width);
-      right_width_.push_back(right_width);
+      left_width_.push_back(left_width - waypoint.l);
+      right_width_.push_back(right_width + waypoint.l);
     }
     s += kSampleDistance;
   }
@@ -330,8 +330,9 @@ MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
     if (index.id < num_segments_) {
       const LaneSegment& lane_segment = lane_segments_to_next_point_[index.id];
       if (lane_segment.lane != nullptr) {
-        point.add_lane_waypoint(LaneWaypoint(
-            lane_segment.lane, lane_segment.start_s + index.offset));
+        point.add_lane_waypoint(
+            LaneWaypoint(lane_segment.lane, lane_segment.start_s + index.offset,
+                         ref_point.lane_waypoints()[0].l));
       }
     }
     if (point.lane_waypoints().empty() && !ref_point.lane_waypoints().empty()) {
