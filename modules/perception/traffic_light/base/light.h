@@ -49,7 +49,10 @@ enum DetectionClassId {
   HORIZONTAL_CLASS = 2
 };
 
-// @brief Light Region in the Image
+/**
+ * @class LightRegion
+ * @brief Light Region in the Image
+ */
 struct LightRegion {
   // roi is marked by map & projection, it may be too large or not accuracy.
   cv::Rect projection_roi;
@@ -78,7 +81,10 @@ struct LightRegion {
   }
 };
 
-// @brief Light Status
+/**
+ * @class LightStatus
+ * @brief Light Status
+ */
 struct LightStatus {
   // Traffic light color status.
   TLColor color = UNKNOWN_COLOR;
@@ -101,7 +107,10 @@ struct LightStatus {
   }
 };
 
-// @brief A Traffic Light.
+/**
+ * @class Light
+ * @brief A Traffic Light
+ */
 struct Light {
   Light() = default;
 
@@ -123,7 +132,12 @@ std::ostream &operator<<(std::ostream &os, const Light &light);
 typedef std::shared_ptr<Light> LightPtr;
 typedef std::vector<LightPtr> LightPtrs;
 
-// @brief compute stopline to car's distance
+/**
+ * @brief compute stopline to car's distance
+ * @param car pose
+ * @param stoplines
+ * @return distance
+ */
 double Distance2Stopline(
     const Eigen::Matrix4d &car_pose,
     const google::protobuf::RepeatedPtrField<apollo::hdmap::Curve> &stoplines);

@@ -28,8 +28,10 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-// @brief Reviser is the class is to revise the perception result.
-//       It may use history info(Tracker) or some else info.
+/**
+ * @class BasePreprocessor
+ * @brief select camera and project lights to image
+ */
 class BasePreprocessor {
  public:
   BasePreprocessor() = default;

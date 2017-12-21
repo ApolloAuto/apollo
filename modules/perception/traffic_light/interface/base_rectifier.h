@@ -32,10 +32,12 @@ struct RectifyOption {
   CameraId camera_id = UNKNOWN;
 };
 
-//  @brief Rectifier receives the Region of lights from HD-Map,
-//         While the region may be too large or not accuray.
-//         Rectifier should rectify the region,
-//         send the accuray regions to classifier.
+/**
+ *  @brief Rectifier receives the Region of lights from HD-Map,
+ *         While the region may be too large or not accuray.
+ *         Rectifier should rectify the region,
+ *         send the accuray regions to classifier.
+ */
 class BaseRectifier {
  public:
   BaseRectifier() = default;
@@ -44,15 +46,19 @@ class BaseRectifier {
 
   virtual bool Init() = 0;
 
-  // @brief: rectify light region from image or part of it
-  // @param [in] const Image&: input image
-  // @param [in] const RectifyOption&: rectify options
-  // @param [in/out] Lights
-  // @return  bool
+  /**
+   * @brief: rectify light region from image or part of it
+   * @param  const Image&: input image
+   * @param  const RectifyOption&: rectify options
+   * @param  Lights
+   * @return  bool
+   */
   virtual bool Rectify(const Image &image, const RectifyOption &option,
                        std::vector<LightPtr> *lights) = 0;
 
-  // @brief name
+  /**
+   * @brief name
+   */
   virtual std::string name() const = 0;
 
  private:
