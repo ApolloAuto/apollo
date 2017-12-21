@@ -144,5 +144,10 @@ bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
   return result_track_;
 }
 
+bool DummyTypeFuser::FuseType(const TypeFuserOptions& options,
+                              std::vector<ObjectPtr>* objects) {
+  return result_type_fuser_;
+}
+
 }  // namespace perception
 }  // namespace apollo

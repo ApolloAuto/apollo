@@ -40,6 +40,7 @@ DEFINE_string(onboard_segmentor, "DummySegmentation", "onboard segmentation");
 DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
               "onboard object builder");
 DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
+DEFINE_string(onboard_type_fuser, "DummyTypeFuser", "onboard type fuser");
 
 DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
 DEFINE_int32(localization_buffer_size, 40, "localization buffer size");

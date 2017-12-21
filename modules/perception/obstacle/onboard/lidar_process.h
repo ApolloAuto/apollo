@@ -30,6 +30,7 @@
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
+#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
@@ -80,6 +81,7 @@ class LidarProcess {
   std::unique_ptr<BaseSegmentation> segmentor_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
+  std::unique_ptr<BaseTypeFuser> type_fuser_;
   pcl_util::PointIndicesPtr roi_indices_;
 
   std::unique_ptr<OpenglVisualizer> visualizer_ = nullptr;

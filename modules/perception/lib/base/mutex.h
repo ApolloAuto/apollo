@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef apollo_PERCEPTION_LIB_BASE_MUTEX_H
-#define apollo_PERCEPTION_LIB_BASE_MUTEX_H
+#ifndef MODULES_PERCEPTION_LIB_BASE_MUTEX_H
+#define MODULES_PERCEPTION_LIB_BASE_MUTEX_H
 
 #include <pthread.h>
 
@@ -187,4 +187,4 @@ class WriterMutexLock {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_LIB_BASE_MUTEX_H
+#endif  // MODULES_PERCEPTION_LIB_BASE_MUTEX_H
