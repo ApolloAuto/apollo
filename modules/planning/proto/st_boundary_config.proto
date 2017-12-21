@@ -12,4 +12,6 @@ message StBoundaryConfig {
   optional double point_extension = 7 [ default = 1.0 ];
   optional double lowest_speed = 8 [ default = 2.5 ];
   optional uint32 num_points_to_avg_kappa = 9 [ default = 4 ];
+  optional double static_obs_nudge_speed_ratio = 10;
+  optional double dynamic_obs_nudge_speed_ratio = 11;
 }
