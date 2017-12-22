@@ -5,12 +5,11 @@ The following sections describe the perception pipeline of obstacles
 that are resolved by Apollo:
 
 -   HDMap Region of Interest (ROI) Filter
-
 -   Convolutional Neural Networks (CNN) Segmentation
-
 -   MinBox Builder
-
 -   HM Object Tracker
+-   Sequential Type Fusion
+-   Sensor Fusion
 
 HDMap Region of Interest (ROI) Filter
 -------------------------------------
@@ -28,11 +27,11 @@ lookup table (LUT) of 2D quantization of the region around the car. The
 input and output of the HDMap ROI filter module are summarized in the
 table below.
 
-  |Input                                                                     |Output                                                                     |
-  |------------------------------------------------------------------------- |---------------------------------------------------------------------------|
-  |The point cloud: A set of 3D points captured from LiDAR Sensor.           |The indices of input points that are inside the ROI defined by HDMap.      |
-  |HDMap: A set of polygons each of which is an ordered set of points.       |										 |
- 
+| Input                                    | Output                                   |
+| ---------------------------------------- | ---------------------------------------- |
+| The point cloud: A set of 3D points captured from LiDAR Sensor. | The indices of input points that are inside the ROI defined by HDMap. |
+| HDMap: A set of polygons each of which is an ordered set of points. |                                          |
+
 
 In general, the Apollo HDMap ROI filter consists of three successive
 steps:
@@ -93,11 +92,11 @@ The user-defined parameters can be set in the configuration file of
 modules/perception/model/hdmap_roi_filter.config. Please refer the
 table below on the usage of parameters for HDMap ROI Filter.
 
-  |Parameter Name      |Usage                                                                          |Default	    |
-  |------------------- |------------------------------------------------------------------------------ |------------|
-  |range           |The range of ROI LUT (the 2D grid) with respect to the origin (LiDAR sensor).  |70.0 meters |
-  |cell_size           |The size of cells for quantizing the 2D grid.                                  |0.25 meter  |
-  |extend_dist         |The distance of extending the ROI from the polygon boundary.                   |0.0 meter   |
+| Parameter Name | Usage                                    | Default     |
+| -------------- | ---------------------------------------- | ----------- |
+| range          | The range of ROI LUT (the 2D grid) with respect to the origin (LiDAR sensor). | 70.0 meters |
+| cell_size      | The size of cells for quantizing the 2D grid. | 0.25 meter  |
+| extend_dist    | The distance of extending the ROI from the polygon boundary. | 0.0 meter   |
 
 Convolutional Neural Networks (CNN) Segmentation
 ------------------------------------------------
@@ -110,11 +109,11 @@ inside ROI is fed into the segmentation module. This process detects and
 segments out foreground obstacles, e.g., cars, trucks, bicycles, and
 pedestrians.
 
-  |Input                                                                        |Output								|
-  |---------------------------------------------------------------------------- |---------------------------------------------------------------|
-  |The point cloud (a set of 3D points)                                     	|A set of objects corresponding to obstacles in the ROI.	|
-  |The point indices indicating points inside the ROI as defined in HDMap   	|								|
-                                                                               
+| Input                                    | Output                                   |
+| ---------------------------------------- | ---------------------------------------- |
+| The point cloud (a set of 3D points)     | A set of objects corresponding to obstacles in the ROI. |
+| The point indices indicating points inside the ROI as defined in HDMap |                                          |
+
 
 Apollo uses a deep CNN for accurate obstacle detection and segmentation.
 The Apollo CNN segmentation consists of four successive steps:
@@ -188,27 +187,23 @@ obstacle attribute prediction. The down-sampling and up-sampling
 operations are implemented in terms of stacked convolution/devolution
 layers with non-linear activation (i.e., ReLu) layers.
 
-<div align=center><img src="images/3d_obstacle_perception/FCNN.png"></div>
+<div align=center><img src="images/3d_obstacle_perception/FCNN-with-class.png"></div>
 
 <div align=center>Figure 2 The FCNN for cell-wise obstacle prediction</div>
 
 ### Obstacle Clustering
 
 After the CNN-based prediction step, Apollo obtains prediction
-information for individual cells. Apollo utilizes four cell object
+information for individual cells. Apollo utilizes five cell object
 attribute images that contain the:
 
 -   Center offset
-
 -   Objectness
-
 -   Positiveness
-
 -   Object height
+-   Class probability
 
-To generate obstacle objects, Apollo constructs a directed graph based
-on the cell center offset prediction and searches the connected
-components as candidate object clusters.
+To generate obstacle objects, Apollo constructs a directed graph based on the cell center offset prediction and searches the connected components as candidate object clusters.
 
 As shown in figure 3, each cell is a node of the graph and the directed
 edge is built based on the center offset prediction of the cell, which
@@ -232,11 +227,12 @@ cluster.
 
 (b) The cells within solid red polygon compose a candidate object
     cluster.
-
 The red filled five-pointed stars indicate the root nodes (cells) of
 sub-graphs that correspond to the connected components. One candidate
 object cluster can be composed of multiple neighboring connected
 components whose root nodes are adjacent to each other.
+
+The class probabilities are summed up over the nodes (cells) within the object cluster for each candidate obstacle type, including vehicle, pedestrian, bicyclist and unknown. The obstacle type corresponding to the maximum averaged probability is the final classification result of the object cluster.
 
 ### Post-processing
 
@@ -255,18 +251,18 @@ The user-defined parameters can be set in the configuration file of
 modules/perception/model/cnn\_segmentation/cnnseg.conf. The table below
 explains the parameter usage and default values for CNN Segmentation.
 
- |Parameter Name		     |Usage											  |Default    |
- |-----------------------------------|--------------------------------------------------------------------------------------------|-----------|
- |objectness_thresh                  |The threshold of objectness for filtering out non-object cells in obstacle clustering step. |0.5	      |
- |use_all_grids_for_clustering       |The option of specifying whether or not to use all cells to construct the graph in the obstacle clustering step.If not, only the occupied cells will be considered.	|true	|
- |confidence_thresh                  |The detection confidence score threshold for filtering out the candidate clusters in the post-processing step.	|0.1	|
- |height_thresh                      |If it is non-negative, the points that are higher than the predicted object height by height_thresh will be filtered out in the post-processing step.	|0.5 meters |
- |min_pts_num                        |In the post-processing step, the candidate clusters with less than min_pts_num points are removed. |3   |
- |use_full_cloud                     |If it is set by true, all the points of the original point cloud will be used for extracting channel features. Otherwise only the points of input point cloud (i.e., the points after HDMap ROI filter) are used.   |true	|
- |gpu_id                             |The ID of the GPU device used in the CNN-based obstacle prediction step.			  |0	      |
- |feature_param {width}              |The number of cells in X (column) axis of the 2D grid.					  |512	      |
- |feature_param {height}             |The number of cells in Y (row) axis of the 2D grid. 					  |512        |
- |feature_param {range}              |The range of the 2D grid with respect to the origin (the LiDAR sensor).			  |60 meters  |
+| Parameter Name               | Usage                                    | Default    |
+| ---------------------------- | ---------------------------------------- | ---------- |
+| objectness_thresh            | The threshold of objectness for filtering out non-object cells in obstacle clustering step. | 0.5        |
+| use_all_grids_for_clustering | The option of specifying whether or not to use all cells to construct the graph in the obstacle clustering step.If not, only the occupied cells will be considered. | true       |
+| confidence_thresh            | The detection confidence score threshold for filtering out the candidate clusters in the post-processing step. | 0.1        |
+| height_thresh                | If it is non-negative, the points that are higher than the predicted object height by height_thresh will be filtered out in the post-processing step. | 0.5 meters |
+| min_pts_num                  | In the post-processing step, the candidate clusters with less than min_pts_num points are removed. | 3          |
+| use_full_cloud               | If it is set by true, all the points of the original point cloud will be used for extracting channel features. Otherwise only the points of input point cloud (i.e., the points after HDMap ROI filter) are used. | true       |
+| gpu_id                       | The ID of the GPU device used in the CNN-based obstacle prediction step. | 0          |
+| feature_param {width}        | The number of cells in X (column) axis of the 2D grid. | 512        |
+| feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 512        |
+| feature_param {range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 60 meters  |
 
 
 
@@ -321,13 +317,13 @@ a series of association features including motion consistency,
 appearance consistency, etc. Some features used in HM tracker’s distance
 computing are shown as below:
 
-  |Association Feature Name |Description                       |
-  |-------------------------|----------------------------------|
-  |location_distance        |Evaluating motion consistency     |
-  |direction_distance       |Evaluating motion consistency     |
-  |bbox_size_distance       |Evaluating appearance consistency |
-  |point_num_distance       |Evaluating appearance consistency |
-  |histogram_distance       |Evaluating appearance consistency |
+| Association Feature Name | Description                       |
+| ------------------------ | --------------------------------- |
+| location_distance        | Evaluating motion consistency     |
+| direction_distance       | Evaluating motion consistency     |
+| bbox_size_distance       | Evaluating appearance consistency |
+| point_num_distance       | Evaluating appearance consistency |
+| histogram_distance       | Evaluating appearance consistency |
 
 Besides, there are some important parameters of distance weights which are
 used for combining the above-mentioned association features into a final
@@ -397,3 +393,40 @@ A high-level workflow of HM object tracker is given in figure 6.
 
 3)  Update the motion state of updated track lists and collect the
     tracking results.
+## Sequential Type Fusion
+
+To smooth the obstacle type and reduce the type switch over the whole trajectory, Apollo utilizes a sequential type fusion algorithm based on a linear-chain Conditional Random Field (CRF), which can be formulated as below:
+
+![CRF_eq1](images/3d_obstacle_perception/CRF_eq1.png)
+
+![CRF_eq2](images/3d_obstacle_perception/CRF_eq2.png)
+
+where the unary term acts on each single node, while the binary one acts on each edge. 
+
+The probability in the unary term is the class probability output by the CNN-based prediction, and the state transition probability in the binary term is modeled by the obstacle type transition from time t-1 to time t, which is statistically learned from large amounts of obstacle trajectories. Specifically, Apollo also uses a learned confusion matrix to indicate the probability of changing from the predicted type to ground truth type to optimize the original class probability. 
+
+The sequential obstacle type is optimized by solving the following problem: 
+
+![CRF_eq3](images/3d_obstacle_perception/CRF_eq3.png)
+
+using Viterbi algorithm.
+
+## Sensor Fusion
+
+The sensor fusion module is designed to fuse LIDAR tracking results and RADAR detection results. In general, fusion items is kept, Apollo first matches the sensor results with the fusion items by tracking id, then computes association matrix for unmatched sensor results and unmatched fusion items to get an optimal matching result. For the matched sensor result, update the corresponding fusion item by Adaptive Kalman Filter. For the unmatched sensor result, create a new fusion item. For the unmatched fusion item, removed from the fusion items if it is too stale. 
+
+### RADAR Detector
+
+Given the radar data from the sensor, some basic process would be done. First of all, the track id needs to be extended, because Apollo needs a global track id for id association. Original radar sensor only provides id with 8 bits, so it is hard to determine if two objects with same id in two adjacent frames are denotes one object in tracking history, especially there exits frame dropping problem. Apollo uses meas state provided by radar sensor to handle this problem. Meanwhile, Apollo assigns new track id to the object which far away from the object with same track id in last frame. Secondly, false positive filter is used to remove noise. Apollo set some threshold via RADAR data to filter results that would be noise. And then, objects is built according the RADAR data as an unified object format. Apollo translates objects into world coordinate via calibration results. Original RADAR sensor provides the relative velocity of the object, so Apollo uses host car velocity from localization. Apollo adds these two velocity to denote the absolute velocity of the detected object. Finally, HDMap roi filter is used to get interested objects. Only objects inside the roi is used by sensor fusion algorithm.
+
+### Fusion Items Management
+
+Given the RADAR results, they would be pushed into a cache; given the LIDAR results, the fusion action would be triggered. Apollo has the concept of publish-sensor. The frequency of sensor fusion output is same as the frequency of publish sensor. Apollo's publish-sensor is LIDAR. The sensor results would feed the fusion pipeline sorted by sensor time stamp. Apollo keeps all sensor results. Survival time is set to different sensor  objects in Apollo. A object is keep alive if at least one sensor result should be surviving. Apollo perception module provides fusion results of LIDAR and RADAR in short range area around the car and radar only results in long distance.  
+
+### Sensor Results to Fusion Lists Association
+
+When associating sensor results to the fusion lists, Apollo first matches the identical track id  of the same sensor, then constructs a bipartite graph and uses Hungarian algorithm to find the best result-to-fusion matching of unmatched sensor results and fusion lists via minimizing the distance cost. The Hungarian algorithm used is the same as HM Object Tracker before. The distance cost is computed by the the euclidean distance of anchor points of the sensor result and fusion item.
+
+### Motion Fusion
+
+Apollo uses Adaptive Kalman filter to estimate the motion of current item with a constant acceleration motion model. The motion states include its belief anchor point, belief velocity and belief acceleration, which correspond to the 3D position, its 3D velocity and acceleration respectively. Actually, Apollo only gets position and velocity from sensor results. In motion fusion, Apollo caches state of all sensor result and computes acceleration via Kalman Filter.  Apollo provides uncertainty of position and velocity in LIDAR tracker and RADAR detector. Apollo feeds all the states and uncertainty to Adaptive Kalman Filter to get the fused results. What needs to be explained is, to overcome the over-estimation of update gain, a breakdown threshold is used in the process of filtering.
