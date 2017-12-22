@@ -102,7 +102,7 @@ class Predictor {
    * @return If the prediction trajectory is trimed
    */
   bool TrimTrajectory(
-      const std::vector<apollo::common::math::LineSegment2d>& adc_segments,
+      const ADCTrajectoryContainer* adc_trajectory_container,
       Trajectory* trajectory);
 
  protected:

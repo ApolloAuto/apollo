@@ -210,6 +210,20 @@ void PredictionMap::NearbyLanesByCurrentLanes(
   }
 }
 
+std::vector<std::string> PredictionMap::NearbyLaneIds(
+    const double x, const double y, const double radius) {
+  std::vector<std::string> lane_ids;
+  std::vector<std::shared_ptr<const LaneInfo>> lanes;
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(x);
+  hdmap_point.set_y(y);
+  HDMapUtil::BaseMap().GetLanes(hdmap_point, radius, &lanes);
+  for (const auto& lane : lanes) {
+    lane_ids.push_back(lane->id().id());
+  }
+  return lane_ids;
+}
+
 bool PredictionMap::IsLeftNeighborLane(
     std::shared_ptr<const LaneInfo> left_lane,
     std::shared_ptr<const LaneInfo> curr_lane) {
