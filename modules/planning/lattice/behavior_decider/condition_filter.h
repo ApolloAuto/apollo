@@ -54,6 +54,7 @@ class ConditionFilter {
       const PathTimeObstacle& critical_condition) const;
 
   std::set<double> CriticalTimeStamps() const;
+  std::vector<double> UniformTimeStamps() const;
 
  private:
   FeasibleRegion feasible_region_;

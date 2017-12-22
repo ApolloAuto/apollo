@@ -124,6 +124,7 @@ cc_library(
         "//modules/planning/lattice/behavior_decider:feasible_region",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/common/math:linear_interpolation",
+        "//modules/planning/lattice/util:lattice_params",
     ],
 )
 
