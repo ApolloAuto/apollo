@@ -1,11 +1,3 @@
-
-```
- __| | __ _| |_ __ _   _ __ ___  ___ ___  _ __ __| | ___ _ __
- / _` |/ _` | __/ _` | | '__/ _ \/ __/ _ \| '__/ _` |/ _ \ '__|
-| (_| | (_| | || (_| | | | |  __/ (_| (_) | | | (_| |  __/ |
- \__,_|\__,_|\__\__,_| |_|  \___|\___\___/|_|  \__,_|\___|_|
-```
-
 Data-Recorder is responsiable for helping Apollo partners to record data.
 
 ## v1.0.0.1
@@ -13,18 +5,17 @@ Data-Recorder is responsiable for helping Apollo partners to record data.
 ## How to `Use.`
 
 #### Data-Recorder configuration.
-Modify modules/data/conf/recorder.global.yaml and modules/data/conf/recorder.debug.yaml according to your system environments and data recording requirements.
-Examples:
+Modify modules/data/conf/recorder.global.yaml and modules/data/conf/recorder.debug.yaml as following examples:
 
 ```modules/data/conf/recorder.global.yaml```</br>
 vehicle_id and output_path are two necessary items that should be modified.
-```c
+```
 # vehicle_id is the UID of vehicle. If VIN is VIN001, export CARID=VIN001 or set vehicle_id in modules/data/conf/recorder.global.yaml as below:
 
 vehicle_id: VIN001
 ```
 
-```c
+```
 # If a portable hard disk is mounted on /media/apollo/data_storage, execute sudo chown -R apollo:apollo /media/apollo/data_storage, and set output_path as below:
 
 output_path: /media/apollo/data_storage
@@ -32,7 +23,7 @@ output_path: /media/apollo/data_storage
 
 ```modules/data/conf/debug.global.yaml```</br>
 If you want to record rosbag group be topics, please refer to the following confituration:
-```c 
+``` 
    rosbag_topic_group:
    - group_id: '1'
      group_name: 'default'
@@ -46,7 +37,7 @@ If you want to record rosbag group be topics, please refer to the following conf
 ```
 
 If you want to copy something from system to record data in portable hard disk, please refer to the following confituration:
-```c
+```
     carversion:                       # date type.
       if_record: true                 # if record.
       record_method: rsync            # record method, defalt value is rsync, do not modify.
@@ -58,15 +49,18 @@ If you want to copy something from system to record data in portable hard disk, 
         sync_bwlimit: 102400          # max speed of copy (KB/s).
         with_remove: false            # remove files after copying.
 ```
+---
 
 #### Start Data-Recorder.
  * bash modules/data/tools/recorder/data_reocrder_control.sh start # Start data-recoder with default task_purpose(debug).
  * python modules/data/tools/recorder/data_recorder_manager.py -c modules/data/conf/recorder.debug.yaml # This is another way to start.
+---
 
 #### Stop Data-Recorder.
  * bash modules/data/tools/recorder/data-recorder_control.sh stop  # stop data-recorder.
  * CTRL + C if start data-recorder with python data_recorder_manager.py -c modules/data/conf/recorder.debug.yaml.
 
+---
 #### Send control commands to data-recorder.This feature depends on data-recorder has been started.
  * Send command rosbag_record_off to disable rosbag record.
  * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "rosbag_record_off".
@@ -85,7 +79,7 @@ If you want to copy something from system to record data in portable hard disk, 
  * rostopic list  # List all the ros topics.
  * rostopic echo  /apollo/data_recorder/status # Read data from /apollo/data_recorder/status.
 Try to use the following code to subscribe topic and get deserialized message.
-```c
+```
     #!/usr/bin/env python
     import rospy
     import recorder_info_pb2
