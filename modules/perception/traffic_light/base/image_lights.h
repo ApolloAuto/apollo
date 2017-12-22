@@ -31,7 +31,6 @@ namespace traffic_light {
 /**
  * @class ImageLights
  * @brief hold all data through traffic light pipeline
- *
  */
 struct ImageLights {
   std::shared_ptr<Image> image;
