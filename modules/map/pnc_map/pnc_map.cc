@@ -101,41 +101,41 @@ LaneWaypoint PncMap::ToLaneWaypoint(
   }
 }
 
-void PncMap::UpdateNextRoutingWaypointIndex(const std::vector<int> &prev_index,
-                                            const std::vector<int> &cur_index) {
+void PncMap::UpdateNextRoutingWaypointIndex(const std::vector<int> &cur_index) {
   if (cur_index.size() != 3) {
     next_routing_waypoint_index_ = 0;
     return;
   }
   // search backwards when the car is driven backward on the route.
-  if (prev_index.size() == 3 && prev_index < cur_index) {
-    while (next_routing_waypoint_index_ != 0 &&
-           routing_waypoint_index_[next_routing_waypoint_index_].index >
-               cur_index) {
-      --next_routing_waypoint_index_;
-    }
-    while (next_routing_waypoint_index_ != 0 &&
-           routing_waypoint_index_[next_routing_waypoint_index_].index ==
-               cur_index &&
-           routing_waypoint_index_[next_routing_waypoint_index_].waypoint.s >
-               adc_waypoint_.s) {
-      --next_routing_waypoint_index_;
-    }
+  while (next_routing_waypoint_index_ != 0 &&
+         next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
+         routing_waypoint_index_[next_routing_waypoint_index_].index >
+             cur_index) {
+    --next_routing_waypoint_index_;
+  }
+  while (next_routing_waypoint_index_ != 0 &&
+         next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
+         routing_waypoint_index_[next_routing_waypoint_index_].index ==
+             cur_index &&
+         adc_waypoint_.s <
+             routing_waypoint_index_[next_routing_waypoint_index_].waypoint.s) {
+    --next_routing_waypoint_index_;
+  }
+  // search forwards
+  while (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
+         routing_waypoint_index_[next_routing_waypoint_index_].index <
+             cur_index) {
     ++next_routing_waypoint_index_;
-  } else {  // search forwards
-    while (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
-           routing_waypoint_index_[next_routing_waypoint_index_].index <
-               cur_index) {
-      ++next_routing_waypoint_index_;
-    }
-    while (
-        next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
-        cur_index ==
-            routing_waypoint_index_[next_routing_waypoint_index_].index &&
-        adc_waypoint_.s >=
-            routing_waypoint_index_[next_routing_waypoint_index_].waypoint.s) {
-      ++next_routing_waypoint_index_;
-    }
+  }
+  while (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
+         cur_index ==
+             routing_waypoint_index_[next_routing_waypoint_index_].index &&
+         adc_waypoint_.s >=
+             routing_waypoint_index_[next_routing_waypoint_index_].waypoint.s) {
+    ++next_routing_waypoint_index_;
+  }
+  if (next_routing_waypoint_index_ >= routing_waypoint_index_.size()) {
+    next_routing_waypoint_index_ = 0;
   }
 }
 
@@ -174,7 +174,7 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   }
 
   // track how many routing request waypoints the adc have passed.
-  UpdateNextRoutingWaypointIndex(route_index_, route_index);
+  UpdateNextRoutingWaypointIndex(route_index);
   route_index_ = route_index;
 
   auto last_indices = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
