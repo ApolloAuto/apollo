@@ -1608,3 +1608,15 @@ right_of_way_status: UNPROTECTED
 lane_id {
   id: "40_1_-2"
 }
+adc_planning_point {
+  path_point {
+    x: 587569.00734608015
+    y: 4141500.3527275259
+    z: -30.969183911569417
+    theta: 2.8987073227943752
+    kappa: 0
+  }
+  v: 11.25
+  a: -0.059883056904789678
+  relative_time: 0
+}
