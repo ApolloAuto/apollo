@@ -13,6 +13,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:prediction_map",
         "//modules/prediction/predictor/sequence:sequence_predictor",
         "//modules/prediction/proto:lane_graph_proto",
         "@eigen//:eigen",

@@ -18,10 +18,12 @@
 
 #include <string>
 #include <utility>
+#include <memory>
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -29,6 +31,7 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
+using apollo::hdmap::LaneInfo;
 
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -88,9 +91,11 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(obstacle->kf_lane_tracker(curr_lane_id),
-                                     sequence, FLAGS_prediction_duration,
-                                     FLAGS_prediction_freq, &points);
+    DrawLaneSequenceTrajectoryPoints(
+      feature, curr_lane_id,
+      obstacle->kf_lane_tracker(curr_lane_id),
+      sequence, FLAGS_prediction_duration,
+      FLAGS_prediction_freq, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
@@ -102,11 +107,25 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
+    const Feature& feature, const std::string& lane_id,
     const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
     double total_time, double freq, std::vector<TrajectoryPoint>* points) {
-  // PredictionMap* map = PredictionMap::instance();
 
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
+  if (!FLAGS_enable_kf_tracking) {
+    Eigen::Vector2d position(feature.position().x(),
+                             feature.position().y());
+    PredictionMap* map = PredictionMap::instance();
+    std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
+    double lane_s = 0.0;
+    double lane_l = 0.0;
+    if (map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
+      state(0, 0) = lane_s;
+      state(1, 0) = lane_l;
+      state(2, 0) = feature.speed();
+      state(3, 0) = feature.acc();
+    }
+  }
   if (FLAGS_enable_rnn_acc && sequence.has_acceleration()) {
     state(3, 0) = sequence.acceleration();
   }
