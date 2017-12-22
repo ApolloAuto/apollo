@@ -373,7 +373,8 @@ Status Planning::Plan(const double current_time_stamp,
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg(
-        "planner failed to make a driving plan because NO valid reference line "
+        "planner failed to make a driving plan because NO valid reference "
+        "line "
         "info.");
     AERROR << msg;
     if (last_publishable_trajectory_) {
@@ -390,8 +391,6 @@ Status Planning::Plan(const double current_time_stamp,
   for (const auto& id : best_reference_line->TargetLaneId()) {
     trajectory_pb->add_lane_id()->CopyFrom(id);
   }
-  trajectory_pb->mutable_adc_planning_point()->CopyFrom(
-      best_reference_line->AdcPlanningPoint());
 
   best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
 
