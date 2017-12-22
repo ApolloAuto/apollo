@@ -50,7 +50,7 @@ std::string GetLogFileName() {
   time_t raw_time;
   char name_buffer[80];
   std::time(&raw_time);
-  strftime(name_buffer, 80, "/tmp/steer_log_simple_optimal_%F_%H%M%S.csv",
+  strftime(name_buffer, 80, "/tmp/mpc_controller_%F_%H%M%S.csv",
            localtime(&raw_time));
   return std::string(name_buffer);
 }
@@ -133,13 +133,6 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
   LpfCoefficients(ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den,
                   &num);
   digital_filter_.set_coefficients(den, num);
-  // Mean filters
-  /**
-  heading_rate_filter_ = MeanFilter(
-      control_conf->mpc_controller_conf().mean_filter_window_size());
-  **/
-  lateral_error_filter_ =
-      MeanFilter(control_conf->mpc_controller_conf().mean_filter_window_size());
 }
 
 Status MPCController::Init(const ControlConf *control_conf) {
@@ -157,7 +150,6 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
   matrix_a_(4, 4) = 1.0;
   matrix_a_(5, 5) = 0.0;
-  // TODO(QiL): change to add delays
   // TODO(QiL): expand the model to accomendate more combined states.
 
   matrix_a_coeff_ = Matrix::Zero(basic_state_size_, basic_state_size_);
