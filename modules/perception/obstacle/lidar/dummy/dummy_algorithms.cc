@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
+
 #include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
@@ -25,7 +26,6 @@ using pcl_util::PointCloudPtr;
 using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-using std::vector;
 
 static void extract_pointcloud_indices(const PointCloudPtr &cloud,
                                        PointIndices *out_indices) {
@@ -53,7 +53,7 @@ bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,
 bool DummySegmentation::Segment(const PointCloudPtr &cloud,
                                 const PointIndices &non_ground_indices,
                                 const SegmentationOptions &options,
-                                vector<ObjectPtr> *objects) {
+                                std::vector<ObjectPtr> *objects) {
   return result_segment_;
 }
 
@@ -86,7 +86,7 @@ void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
 }
 
 bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
-                               vector<ObjectPtr> *objects) {
+                               std::vector<ObjectPtr> *objects) {
   if (objects == NULL) {
     return false;
   }
@@ -106,9 +106,9 @@ bool DummyObjectFilter::Filter(const ObjectFilterOptions &obj_filter_options,
   return result_object_filter_;
 }
 
-bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
-                         const TrackerOptions &options,
-                         vector<ObjectPtr> *tracked_objects) {
+bool DummyTracker::Track(const std::vector<ObjectPtr> &objects,
+                         double timestamp, const TrackerOptions &options,
+                         std::vector<ObjectPtr> *tracked_objects) {
   if (tracked_objects == nullptr || options.velodyne_trans == nullptr) {
     return result_track_;
   }
@@ -142,6 +142,11 @@ bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
   }
 
   return result_track_;
+}
+
+bool DummyTypeFuser::FuseType(const TypeFuserOptions &options,
+                              std::vector<ObjectPtr> *objects) {
+  return result_type_fuser_;
 }
 
 }  // namespace perception

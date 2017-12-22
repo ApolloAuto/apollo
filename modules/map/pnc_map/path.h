@@ -44,8 +44,11 @@ struct LaneWaypoint {
   LaneWaypoint() = default;
   LaneWaypoint(LaneInfoConstPtr lane, const double s)
       : lane(CHECK_NOTNULL(lane)), s(s) {}
+  LaneWaypoint(LaneInfoConstPtr lane, const double s, const double l)
+      : lane(CHECK_NOTNULL(lane)), s(s), l(l) {}
   LaneInfoConstPtr lane = nullptr;
   double s = 0.0;
+  double l = 0.0;
 
   std::string DebugString() const;
 };

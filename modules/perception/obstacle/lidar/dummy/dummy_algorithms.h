@@ -25,6 +25,7 @@
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
+#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 
 namespace apollo {
 namespace perception {
@@ -34,17 +35,13 @@ class DummyROIFilter : public BaseROIFilter {
   DummyROIFilter() : BaseROIFilter() {}
   ~DummyROIFilter() = default;
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Filter(const pcl_util::PointCloudPtr &cloud,
               const ROIFilterOptions &roi_filter_options,
               pcl_util::PointIndices *roi_indices) override;
 
-  std::string name() const override {
-    return "DummyROIFilter";
-  }
+  std::string name() const override { return "DummyROIFilter"; }
 
  private:
   // for ut
@@ -59,17 +56,13 @@ class DummyGroundDetector : public BaseGroundDetector {
   DummyGroundDetector() : BaseGroundDetector() {}
   ~DummyGroundDetector() = default;
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Detect(const GroundDetectorOptions &options,
               pcl_util::PointCloudPtr cloud,
               pcl_util::PointIndicesPtr non_ground_indices) override;
 
-  std::string name() const override {
-    return "DummyGroundDetector";
-  }
+  std::string name() const override { return "DummyGroundDetector"; }
 
  private:
   // for unit test
@@ -84,18 +77,14 @@ class DummySegmentation : public BaseSegmentation {
   DummySegmentation() : BaseSegmentation() {}
   ~DummySegmentation() = default;
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Segment(const pcl_util::PointCloudPtr &cloud,
                const pcl_util::PointIndices &non_ground_indices,
                const SegmentationOptions &options,
                std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override {
-    return "DummySegmentation";
-  }
+  std::string name() const override { return "DummySegmentation"; }
 
  private:
   bool result_init_ = true;
@@ -109,16 +98,12 @@ class DummyObjectBuilder : public BaseObjectBuilder {
   DummyObjectBuilder() : BaseObjectBuilder() {}
   ~DummyObjectBuilder() = default;
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Build(const ObjectBuilderOptions &options,
              std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override {
-    return "DummyObjectBuilder";
-  }
+  std::string name() const override { return "DummyObjectBuilder"; }
 
  protected:
   void BuildObject(const ObjectBuilderOptions &options, ObjectPtr object);
@@ -135,16 +120,12 @@ class DummyObjectFilter : public BaseObjectFilter {
   DummyObjectFilter() : BaseObjectFilter() {}
   ~DummyObjectFilter() {}
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Filter(const ObjectFilterOptions &obj_filter_options,
               std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override {
-    return "DummyObjectFilter";
-  }
+  std::string name() const override { return "DummyObjectFilter"; }
 
  private:
   bool result_init_ = true;
@@ -158,17 +139,13 @@ class DummyTracker : public BaseTracker {
   DummyTracker() : BaseTracker() {}
   ~DummyTracker() = default;
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Track(const std::vector<ObjectPtr> &objects, double timestamp,
              const TrackerOptions &options,
              std::vector<ObjectPtr> *tracked_objects) override;
 
-  std::string name() const override {
-    return "DummyTracker";
-  }
+  std::string name() const override { return "DummyTracker"; }
 
  private:
   bool result_init_ = true;
@@ -177,12 +154,32 @@ class DummyTracker : public BaseTracker {
   DISALLOW_COPY_AND_ASSIGN(DummyTracker);
 };
 
+class DummyTypeFuser : public BaseTypeFuser {
+ public:
+  DummyTypeFuser() : BaseTypeFuser() {}
+  ~DummyTypeFuser() = default;
+
+  bool Init() override { return result_init_; }
+
+  bool FuseType(const TypeFuserOptions &options,
+                std::vector<ObjectPtr> *objects) override;
+
+  std::string name() const override { return "DummyTypeFuser"; }
+
+ private:
+  bool result_init_ = true;
+  bool result_type_fuser_ = true;
+
+  DISALLOW_COPY_AND_ASSIGN(DummyTypeFuser);
+};
+
 REGISTER_GROUNDDETECTOR(DummyGroundDetector);
 REGISTER_ROIFILTER(DummyROIFilter);
 REGISTER_SEGMENTATION(DummySegmentation);
 REGISTER_OBJECTBUILDER(DummyObjectBuilder);
 REGISTER_TRACKER(DummyTracker);
 REGISTER_OBJECTFILTER(DummyObjectFilter);
+REGISTER_TYPEFUSER(DummyTypeFuser);
 
 }  // namespace perception
 }  // namespace apollo

@@ -125,6 +125,8 @@ def get_latlon_and_utm_path(steps):
                 steps[0]['human'] = True
                 steps[0]['polyline'] = {}
                 steps[0]['polyline']['points'] = utm_points
+                if len(latlon_path) > 0:
+                    latlon_path[0]['human'] = True
                 return latlon_path, steps
 
     for step in steps:

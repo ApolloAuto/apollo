@@ -286,17 +286,23 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     }
     double heading_diff = std::abs(velocity_heading - theta);
     if (heading_diff > FLAGS_heading_diff_thred) {
-      if (history_size() == 0) {
-        velocity_x = speed * std::cos(theta);
-        velocity_y = speed * std::sin(theta);
-      } else {
+      if (history_size() > 0) {
         double prev_x = mutable_feature(0)->position().x();
         double prev_y = mutable_feature(0)->position().y();
         double diff_x = feature->position().x() - prev_x;
         double diff_y = feature->position().y() - prev_y;
-        velocity_heading = std::atan2(diff_y, diff_x);
-        velocity_x = speed * std::cos(velocity_heading);
-        velocity_y = speed * std::sin(velocity_heading);
+        if (diff_x > FLAGS_valid_position_diff_thred &&
+            diff_y > FLAGS_valid_position_diff_thred) {
+          velocity_heading = std::atan2(diff_y, diff_x);
+          velocity_x = speed * std::cos(velocity_heading);
+          velocity_y = speed * std::sin(velocity_heading);
+        } else {
+          velocity_x = speed * std::cos(theta);
+          velocity_y = speed * std::sin(theta);
+        }
+      } else {
+        velocity_x = speed * std::cos(theta);
+        velocity_y = speed * std::sin(theta);
       }
     }
   }
