@@ -28,6 +28,7 @@
 
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
@@ -56,6 +57,7 @@ bool DPRoadGraph::FindPathTunnel(
     const std::vector<const PathObstacle *> &obstacles,
     PathData *const path_data) {
   CHECK_NOTNULL(path_data);
+
   init_point_ = init_point;
   if (!reference_line_.XYToSL(
           {init_point_.path_point().x(), init_point_.path_point().y()},
@@ -205,6 +207,10 @@ bool DPRoadGraph::GenerateMinCostPath(
 
   for (const auto &node : *min_cost_path) {
     ADEBUG << "min_cost_path: " << node.sl_point.ShortDebugString();
+    planning_debug_->mutable_planning_data()
+        ->mutable_dp_poly_graph()
+        ->add_min_cost_point()
+        ->CopyFrom(node.sl_point);
   }
   return true;
 }
@@ -226,7 +232,6 @@ bool DPRoadGraph::SamplePathWaypoints(
   double accumulated_s = init_sl_point_.s();
   double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
-    std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
     const double s = std::fmin(accumulated_s, total_length);
     constexpr double kMinAllowedSampleStep = 1.0;
@@ -268,6 +273,8 @@ bool DPRoadGraph::SamplePathWaypoints(
     common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                 config_.sample_points_num_each_level() - 1,
                                 &sample_l);
+    std::vector<common::SLPoint> level_points;
+    planning_internal::SampleLayerDebug sample_layer_debug;
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
       common::SLPoint sl;
@@ -278,13 +285,20 @@ bool DPRoadGraph::SamplePathWaypoints(
         sl = common::util::MakeSLPoint(
             std::fmin(total_length, s + kResonateDistance), l);
       }
+      sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
     if (!reference_line_info_.IsChangeLanePath()) {
-      level_points.push_back(common::util::MakeSLPoint(s, 0.0));
+      auto sl_zero = common::util::MakeSLPoint(s, 0.0);
+      sample_layer_debug.add_sl_point()->CopyFrom(sl_zero);
+      level_points.push_back(sl_zero);
     }
 
     if (!level_points.empty()) {
+      planning_debug_->mutable_planning_data()
+          ->mutable_dp_poly_graph()
+          ->add_sample_layer()
+          ->CopyFrom(sample_layer_debug);
       points->emplace_back(level_points);
     }
   }
