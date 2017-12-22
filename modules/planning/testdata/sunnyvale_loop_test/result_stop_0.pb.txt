@@ -1763,13 +1763,13 @@ decision {
       perception_id: -855654299
       object_decision {
         stop {
-          distance_s: -0.2
+          distance_s: -3
           stop_point {
-            x: 587051.43038807344
-            y: 4141558.8521785531
+            x: 587049.8874920184
+            y: 4141556.5172797395
             z: 0
           }
-          stop_heading: 0.930425709921101
+          stop_heading: 1.0479851156932718
         }
       }
     }
@@ -1778,13 +1778,13 @@ decision {
       perception_id: -1651052487
       object_decision {
         stop {
-          distance_s: -0.2
+          distance_s: -3
           stop_point {
-            x: 587051.43038807344
-            y: 4141558.8521785531
+            x: 587049.8874920184
+            y: 4141556.5172797395
             z: 0
           }
-          stop_heading: 0.930425709921101
+          stop_heading: 1.0479851156932718
         }
       }
     }
@@ -1793,13 +1793,13 @@ decision {
       perception_id: 502372993
       object_decision {
         stop {
-          distance_s: -0.2
+          distance_s: -3
           stop_point {
-            x: 587051.43038807344
-            y: 4141558.8521785531
+            x: 587049.8874920184
+            y: 4141556.5172797395
             z: 0
           }
-          stop_heading: 0.930425709921101
+          stop_heading: 1.0479851156932718
         }
       }
     }
