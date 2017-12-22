@@ -107,6 +107,8 @@ class MPCController : public Controller {
 
   void UpdateMatrix();
 
+  void FeedforwardUpdate(SimpleMPCDebug *debug);
+
   double GetLateralError(
       const common::math::Vec2d &point,
       apollo::common::TrajectoryPoint *trajectory_point) const;
@@ -245,6 +247,8 @@ class MPCController : public Controller {
   double brake_deadzone_ = 0.0;
 
   double heading_error_rate_ = 0.0;
+
+  double steer_angle_feedforwardterm_ = 0.0;
 };
 
 }  // namespace control
