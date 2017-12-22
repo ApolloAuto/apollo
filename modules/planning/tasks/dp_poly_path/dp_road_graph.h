@@ -55,6 +55,10 @@ class DPRoadGraph {
                       const std::vector<const PathObstacle *> &obstacles,
                       PathData *const path_data);
 
+  void SetDebugLogger(apollo::planning_internal::Debug *debug) {
+    planning_debug_ = debug;
+  }
+
  private:
   /**
    * an private inner struct for the dp algorithm
@@ -108,6 +112,7 @@ class DPRoadGraph {
   SpeedData speed_data_;
   common::SLPoint init_sl_point_;
   common::FrenetFramePoint init_frenet_frame_point_;
+  apollo::planning_internal::Debug *planning_debug_ = nullptr;
 };
 
 }  // namespace planning
