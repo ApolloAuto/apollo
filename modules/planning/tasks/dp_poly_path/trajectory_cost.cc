@@ -158,7 +158,7 @@ double TrajectoryCost::CalculatePathCost(const QuinticPolynomialCurve1d &curve,
   if (curr_level == total_level) {
     const double end_l = curve.Evaluate(0, end_s - start_s);
     path_cost +=
-        std::fabs(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
+        std::sqrt(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
   }
   return path_cost;
 }

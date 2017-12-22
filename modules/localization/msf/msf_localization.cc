@@ -155,10 +155,8 @@ void MSFLocalization::InitParams() {
 
   // lidar module
   localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
-  localizaiton_param_.lidar_extrinsic_file =
-      common::util::TranslatePath(FLAGS_lidar_extrinsics_file);
-  localizaiton_param_.lidar_height_file =
-      common::util::TranslatePath(FLAGS_lidar_height_file);
+  localizaiton_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
+  localizaiton_param_.lidar_height_file = FLAGS_lidar_height_file;
   localizaiton_param_.lidar_height_default = FLAGS_lidar_height_default;
   localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
@@ -224,8 +222,8 @@ void MSFLocalization::PublishPoseBroadcastTF(
   // broadcast tf message
   geometry_msgs::TransformStamped tf2_msg;
   tf2_msg.header.stamp = ros::Time(localization.measurement_time());
-  tf2_msg.header.frame_id = FLAGS_broadcast_tf2_frame_id;
-  tf2_msg.child_frame_id = FLAGS_broadcast_tf2_child_frame_id;
+  tf2_msg.header.frame_id = FLAGS_localization_tf2_frame_id;
+  tf2_msg.child_frame_id = FLAGS_localization_tf2_child_frame_id;
 
   tf2_msg.transform.translation.x = localization.pose().position().x();
   tf2_msg.transform.translation.y = localization.pose().position().y();

@@ -30,10 +30,11 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
+using apollo::common::math::Vec2d;
 
 std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory(
-    const common::VehicleState& vehicle_state) {
+    const VehicleState& vehicle_state) {
   TrajectoryPoint init_point;
   init_point.mutable_path_point()->set_x(vehicle_state.x());
   init_point.mutable_path_point()->set_y(vehicle_state.y());
@@ -97,17 +98,25 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (!matched_point.has_path_point()) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
+  auto nearest_point_index = prev_trajectory->QueryNearestPoint(
+      Vec2d(vehicle_state.x(), vehicle_state.y()));
+  auto nearest_point = prev_trajectory->TrajectoryPointAt(nearest_point_index);
 
-  const double position_diff =
-      std::hypot(matched_point.path_point().x() - vehicle_state.x(),
-                 matched_point.path_point().y() - vehicle_state.y());
+  DCHECK(nearest_point.has_path_point());
+  DCHECK(matched_point.has_path_point());
+  const double lat_diff =
+      std::hypot(nearest_point.path_point().x() - vehicle_state.x(),
+                 nearest_point.path_point().y() - vehicle_state.y());
+  const double lon_diff = std::fabs(nearest_point.path_point().s() -
+                                    matched_point.path_point().s());
+  ADEBUG << "Control lateral diff: " << lat_diff
+         << ", longitudinal diff: " << lon_diff;
 
-  ADEBUG << "Control diff: " << position_diff;
-
-  if (position_diff > FLAGS_replan_distance_threshold) {
-    AWARN << "the distance between matched point and actual position is too "
-             "large, position difference = "
-          << position_diff;
+  if (lat_diff > FLAGS_replan_lateral_distance_threshold ||
+      lon_diff > FLAGS_replan_longitudinal_distance_threshold) {
+    AERROR << "the distance between matched point and actual position is too "
+              "large. Replan is triggered. lat_diff = "
+           << lat_diff << ", lon_diff = " << lon_diff;
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 

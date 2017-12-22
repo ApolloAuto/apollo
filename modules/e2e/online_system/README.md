@@ -5,7 +5,7 @@ Use the sensor data module to collect the sensor data and vehicle parameters in 
 # Prerequisites
 1.	Ubuntu 16.04 LTS
 2.	ROS Kinetic – recommend ros-kinetic-desktop-full.
-3.	Px2 driveworks0.1 version
+3.	Px2 driveworks0.2 version
 
 - [ ] First, Ubuntu 16.04 LTS2 *must* be installed.
 
@@ -54,7 +54,7 @@ To test:
 - [ ] Open a second bash shell and initialize the camera node using the following:
 
 	```
-	rosrun px2_camera_image px2_camera_node
+	rosrun px2_camera_image front_image ./ 
     ```
 
 

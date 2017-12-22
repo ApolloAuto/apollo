@@ -29,7 +29,7 @@ namespace localization {
 namespace msf {
 
 BaseMapNode::BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy)
-    : map_config_(NULL), map_matrix_(matrix), compression_strategy_(strategy) {
+    : map_matrix_(matrix), compression_strategy_(strategy) {
   is_changed_ = false;
   data_is_ready_ = false;
   is_reserved_ = false;
@@ -223,8 +223,8 @@ unsigned int BaseMapNode::CreateBinary(FILE* file) const {
   buf_size -= processed_size;
   binary_size += processed_size;
   // Create body
-  memcpy(&buffer[buffer_bias], &body_buffer[0], body_buffer.size());
   CHECK_GE(buf_size, body_buffer.size());
+  memcpy(&buffer[buffer_bias], &body_buffer[0], body_buffer.size());
   binary_size += body_buffer.size();
   fwrite(&buffer[0], 1, binary_size, file);
   return binary_size;

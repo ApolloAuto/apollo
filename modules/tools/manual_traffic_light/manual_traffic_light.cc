@@ -33,6 +33,7 @@
 #include "modules/common/util/color.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
+#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -52,13 +53,40 @@ using apollo::common::color::ANSI_RED;
 using apollo::common::color::ANSI_GREEN;
 using apollo::common::color::ANSI_RESET;
 
+DEFINE_bool(all_lights, false, "set all lights on the map");
+
 DEFINE_double(traffic_light_distance, 1000.0,
               "only retrieves traffic lights within this distance");
 
 bool g_is_green = false;
 bool g_updated = true;
 
-bool GetTrafficLights(std::vector<SignalInfoConstPtr> *traffic_lights) {
+bool GetAllTrafficLights(std::vector<SignalInfoConstPtr> *traffic_lights) {
+  static auto map_filename = apollo::hdmap::BaseMapFile();
+  static apollo::hdmap::Map map_proto;
+  static std::vector<SignalInfoConstPtr> map_traffic_lights;
+  if (map_proto.lane_size() == 0 && map_traffic_lights.empty()) {
+    AERROR << "signal size: " << map_proto.signal_size();
+    if (apollo::common::util::EndWith(map_filename, ".xml")) {
+      if (!apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename,
+                                                              &map_proto)) {
+        return false;
+      }
+    } else if (!apollo::common::util::GetProtoFromFile(map_filename,
+                                                       &map_proto)) {
+      return false;
+    }
+    for (const auto &signal : map_proto.signal()) {
+      const auto *hdmap = HDMapUtil::BaseMapPtr();
+      map_traffic_lights.push_back(hdmap->GetSignalById(signal.id()));
+    }
+  }
+  *traffic_lights = map_traffic_lights;
+  return true;
+}
+
+bool GetTrafficLightsWithinDistance(
+    std::vector<SignalInfoConstPtr> *traffic_lights) {
   CHECK_NOTNULL(traffic_lights);
   AdapterManager::Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
@@ -157,7 +185,13 @@ int main(int argc, char *argv[]) {
     ros::spinOnce();
     loop_rate.sleep();
     std::vector<SignalInfoConstPtr> signals;
-    if (!GetTrafficLights(&signals)) {
+    bool result = false;
+    if (FLAGS_all_lights) {
+      result = GetAllTrafficLights(&signals);
+    } else {
+      result = GetTrafficLightsWithinDistance(&signals);
+    }
+    if (!result) {
       ADEBUG << "Failed to get traffic signals from current location on map";
       continue;
     } else {
@@ -181,11 +215,21 @@ int main(int argc, char *argv[]) {
       std::cout << print_color
                 << "Current Light: " << (g_is_green ? "GREEN" : "RED");
       if (signal_ids.empty()) {
-        std::cout << " No lights in the next " << FLAGS_traffic_light_distance
-                  << " meters";
+        if (FLAGS_all_lights) {
+          std::cout << " No lights in the map";
+        } else {
+          std::cout << " No lights in the next " << FLAGS_traffic_light_distance
+                    << " meters";
+        }
       } else {
-        std::cout << " IDs: "
-                  << PrintIter(signal_ids.begin(), signal_ids.end());
+        if (signal_ids.size() < 5) {
+          std::cout << " IDs: "
+                    << PrintIter(signal_ids.begin(), signal_ids.end());
+        } else {
+          std::cout << " IDs: "
+                    << PrintIter(signal_ids.begin(), signal_ids.begin() + 4)
+                    << " ...";
+        }
       }
       std::cout << std::endl
                 << ANSI_RESET << "Press 'c' to change" << std::endl

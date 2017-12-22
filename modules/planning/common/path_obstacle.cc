@@ -70,6 +70,12 @@ bool PathObstacle::Init(const ReferenceLine& reference_line,
     AERROR << "Failed to get sl boundary for obstacle: " << id_;
     return false;
   }
+
+  if (perception_sl_boundary_.start_s() < 0 ||
+      perception_sl_boundary_.end_s() > reference_line.Length()) {
+    return true;
+  }
+
   // TODO(All): reduce the calculation time of BuildStBoundary
   BuildStBoundary(reference_line, adc_start_s);
   return true;
@@ -327,6 +333,7 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   DCHECK(false) << "Does not have rule to merge decision: "
                 << lhs.ShortDebugString()
                 << " and decision: " << rhs.ShortDebugString();
+  return lhs;
 }
 
 bool PathObstacle::HasLateralDecision() const {
