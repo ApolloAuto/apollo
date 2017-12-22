@@ -150,6 +150,42 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   EXPECT_FALSE(second.IsOnSegment());
 }
 
+TEST_F(PncMapTest, NextWaypointIndex) {
+  EXPECT_TRUE(std::vector<int>({0, 0, 0}) ==
+              pnc_map_->NextWaypointIndex({-1, -1, -1}));
+  EXPECT_TRUE(std::vector<int>({0, 1, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 0, 0}));
+  EXPECT_TRUE(std::vector<int>({0, 1, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 0, 1}));
+  EXPECT_TRUE(std::vector<int>({0, 1, 3}) ==
+              pnc_map_->NextWaypointIndex({0, 1, 2}));
+  EXPECT_TRUE(std::vector<int>({0, 3, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 3, 0}));
+  EXPECT_TRUE(std::vector<int>({0, 3, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 3, 1}));
+}
+
+TEST_F(PncMapTest, SearchForwardIndex_SearchBackwardIndex) {
+  auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
+  LaneWaypoint waypoint(lane, 3.0);
+  auto result = pnc_map_->SearchForwardWaypointIndex({0, 0, 0}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 0, 0}, waypoint);
+  EXPECT_TRUE(result.empty());
+  result = pnc_map_->SearchForwardWaypointIndex({0, 1, 10}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 1, 10}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchForwardWaypointIndex({0, 1, 11}, waypoint);
+  EXPECT_TRUE(result.empty());
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 1, 11}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchForwardWaypointIndex({0, 1, 9}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 1, 9}, waypoint);
+  EXPECT_TRUE(result.empty());
+}
+
 TEST_F(PncMapTest, GetNeighborPassages) {
   const auto& road0 = routing_.road(0);
   {
