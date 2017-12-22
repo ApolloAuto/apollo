@@ -138,6 +138,8 @@ class MPCController : public Controller {
   void LoadControlCalibrationTable(
       const MPCControllerConf &mpc_controller_conf);
 
+  void LoadMPCGainScheduler(const MPCControllerConf &mpc_controller_conf);
+
   std::unique_ptr<Interpolation2D> control_interpolation_;
 
   // the following parameters are vehicle physics related.
@@ -192,6 +194,8 @@ class MPCController : public Controller {
   Eigen::MatrixXd matrix_k_;
   // control authority weighting matrix
   Eigen::MatrixXd matrix_r_;
+  // updated control authority weighting matrix
+  Eigen::MatrixXd matrix_r_updated_;
   // state weighting matrix
   Eigen::MatrixXd matrix_q_;
   // updated state weighting matrix
@@ -231,6 +235,8 @@ class MPCController : public Controller {
   std::unique_ptr<Interpolation1D> lat_err_interpolation_;
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
+
+  std::unique_ptr<Interpolation1D> steer_weight_interpolation_;
 
   // for logging purpose
   std::ofstream steer_log_file_;

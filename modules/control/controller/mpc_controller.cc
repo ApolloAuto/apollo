@@ -175,6 +175,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_k_ = Matrix::Zero(1, basic_state_size_);
   // TODO(QiL): Change it to configs
   matrix_r_ = Matrix::Identity(controls_, controls_);
+
   matrix_q_ = Matrix::Zero(basic_state_size_, basic_state_size_);
 
   int r_param_size = control_conf->mpc_controller_conf().matrix_r_size();
@@ -195,8 +196,12 @@ Status MPCController::Init(const ControlConf *control_conf) {
     matrix_q_(i, i) = control_conf->mpc_controller_conf().matrix_q(i);
   }
 
+  // Update matrix_q_updated_ and matrix_r_updated_
+  matrix_r_updated_ = matrix_r_;
   matrix_q_updated_ = matrix_q_;
+
   InitializeFilters(control_conf);
+  LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   LogInitParameters();
   AINFO << "[MPCController] init done!";
   return Status::OK();
@@ -214,6 +219,39 @@ void MPCController::Stop() {
 
 std::string MPCController::Name() const {
   return name_;
+}
+
+void MPCController::LoadMPCGainScheduler(
+    const MPCControllerConf &mpc_controller_conf) {
+  const auto &lat_err_gain_scheduler =
+      mpc_controller_conf.lat_err_gain_scheduler();
+  const auto &heading_err_gain_scheduler =
+      mpc_controller_conf.heading_err_gain_scheduler();
+  const auto &steer_weight_gain_scheduler =
+      mpc_controller_conf.steer_weight_gain_scheduler();
+  AINFO << "Lateral control gain scheduler loaded";
+  Interpolation1D::DataType xy1, xy2, xy3;
+  for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
+    xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+  for (const auto &scheduler : heading_err_gain_scheduler.scheduler()) {
+    xy2.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+  for (const auto &scheduler : steer_weight_gain_scheduler.scheduler()) {
+    xy2.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+
+  lat_err_interpolation_.reset(new Interpolation1D);
+  CHECK(lat_err_interpolation_->Init(xy1))
+      << "Fail to load lateral error gain scheduler";
+
+  heading_err_interpolation_.reset(new Interpolation1D);
+  CHECK(heading_err_interpolation_->Init(xy2))
+      << "Fail to load heading error gain scheduler";
+
+  steer_weight_interpolation_.reset(new Interpolation1D);
+  CHECK(steer_weight_interpolation_->Init(xy2))
+      << "Fail to load steer weight gain scheduler";
 }
 
 Status MPCController::ComputeControlCommand(
@@ -241,6 +279,26 @@ Status MPCController::ComputeControlCommand(
 
   FeedforwardUpdate(debug);
 
+  // Add gain sheduler for higher speed steering
+  if (FLAGS_enable_gain_scheduler) {
+    matrix_q_updated_(0, 0) =
+        matrix_q_(0, 0) *
+        lat_err_interpolation_->Interpolate(
+            VehicleStateProvider::instance()->linear_velocity());
+    matrix_q_updated_(2, 2) =
+        matrix_q_(2, 2) *
+        heading_err_interpolation_->Interpolate(
+            VehicleStateProvider::instance()->linear_velocity());
+
+    matrix_r_updated_(0, 0) =
+        matrix_r_(2, 2) *
+        steer_weight_interpolation_->Interpolate(
+            VehicleStateProvider::instance()->linear_velocity());
+  } else {
+    matrix_q_updated_ = matrix_q_;
+    matrix_r_updated_ = matrix_r_;
+  }
+
   Eigen::MatrixXd control_matrix(controls_, 1);
   control_matrix << 0, 0;
 
@@ -261,9 +319,9 @@ Status MPCController::ComputeControlCommand(
 
   double mpc_start_timestamp = Clock::NowInSeconds();
   if (common::math::SolveLinearMPC(
-          matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_, matrix_r_, lower_bound,
-          upper_bound, matrix_state_, reference, mpc_eps_, mpc_max_iteration_,
-          &control) != true) {
+          matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
+          matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
+          mpc_eps_, mpc_max_iteration_, &control) != true) {
     AERROR << "MPC failed";
   }
 
