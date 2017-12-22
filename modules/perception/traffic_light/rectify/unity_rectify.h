@@ -28,17 +28,26 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ *  @class UnityRectify
+ *  @brief Rectifier receives the Region of lights from HD-Map,
+ *         While the region may be too large or not accuray.
+ *         Rectifier should rectify the region,
+ *         send the accuray regions to classifier.
+ */
 class UnityRectify : public BaseRectifier {
  public:
   UnityRectify() = default;
 
   bool Init() override;
 
-  // @brief: rectify light region from image or part of it
-  // @param [in] const Image&: input image
-  // @param [in] const RectifyOptions&: rectify options
-  // @param [in/out] Lights
-  // @return  bool
+  /**
+   * @brief: rectify light region from image or part of it
+   * @param  const Image&: input image
+   * @param  const RectifyOption&: rectify options
+   * @param  Lights
+   * @return  bool
+   */
   bool Rectify(const Image &image, const RectifyOption &option,
                std::vector<LightPtr> *lights) override;
 
@@ -47,7 +56,9 @@ class UnityRectify : public BaseRectifier {
                      std::shared_ptr<IRefine> *detection,
                      std::shared_ptr<IGetBox> *crop);
 
-  // @brief name
+  /**
+   * @brief name
+   */
   std::string name() const override;
 
  private:

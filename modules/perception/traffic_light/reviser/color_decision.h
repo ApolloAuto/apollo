@@ -27,22 +27,33 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ * @class BaseReviser
+ * @brief Reviser is the class is to revise the perception result.
+ *        It may use history info or some else info.
+ */
 class ColorReviser : public BaseReviser {
  public:
   ColorReviser() = default;
 
-  // @brief init the reviser.
+  /**
+   * @brief init the reviser.
+   */
   virtual bool Init();
 
-  // @brief reviser revise  the perception result
-  //       ASSERT(rectifed_result.size == perception_result.size)
-  // @param [in] option
-  // @param [in/out] rectifed_result
-  // @return true/false
+  /**
+   * @brief reviser revise  the perception result
+   *       ASSERT(rectifed_result.size == perception_result.size)
+   * @param option
+   * @param rectifed_result
+   * @return true/false
+   */
   bool Revise(const ReviseOption &option,
               std::vector<LightPtr> *lights) override;
 
-  // @brief Revise's name
+  /**
+   * @brief Revise's name
+   */
   std::string name() const override;
 
  private:

@@ -33,6 +33,7 @@ struct RectifyOption {
 };
 
 /**
+ *  @class BaseRectifier
  *  @brief Rectifier receives the Region of lights from HD-Map,
  *         While the region may be too large or not accuray.
  *         Rectifier should rectify the region,
