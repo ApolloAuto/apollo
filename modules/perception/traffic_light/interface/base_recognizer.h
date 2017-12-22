@@ -33,6 +33,7 @@ namespace traffic_light {
 struct RecognizeOption {};
 
 /**
+ * @class BaseRecognizer
  * @brief Recognizer classify the light color.
  */
 class BaseRecognizer {
