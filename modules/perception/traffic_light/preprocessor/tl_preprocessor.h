@@ -37,6 +37,12 @@ namespace traffic_light {
 using apollo::hdmap::Signal;
 typedef std::vector<std::shared_ptr<LightPtrs>> LightsArray;
 
+/**
+ * @class TLPreprocessor
+ * @brief select camera
+ *        project lights
+ *        cache and sync light and image
+ */
 class TLPreprocessor : public BasePreprocessor {
  public:
   TLPreprocessor() {}
@@ -46,10 +52,24 @@ class TLPreprocessor : public BasePreprocessor {
 
   virtual std::string name() const { return "TLPreprocessor"; }
 
+  /**
+   * @brief project and cached lights before images arrive
+   * @param pose used for projection
+   * @param signals obtained from hdmap
+   * @param timestamp
+   * @return success?
+   */
   bool CacheLightsProjections(const CarPose &pose,
                               const std::vector<Signal> &signals,
                               const double ts);
 
+  /**
+   * @brief when image arrives, sync image with cached lights
+   * @param image
+   * @param image_lights hold selected camera ,image and lights
+   * @param should_pub tells whether publish this image to proc
+   * @return success?
+   */
   bool SyncImage(const ImageSharedPtr &image, ImageLightsPtr *image_lights,
                  bool *should_pub);
 
@@ -58,21 +78,38 @@ class TLPreprocessor : public BasePreprocessor {
 
   int max_cached_lights_size() const;
 
-  bool SelectCameraByProjection(const double timestamp, const CarPose &pose,
-                                const std::vector<Signal> &signals,
-                                std::shared_ptr<ImageLights> image_lights,
-                                CameraId *selected_camera_id);
-
-  // @brief Project lights from HDMap onto long focus or short focus image plane
+  /**
+   * @brief Project lights from HDMap onto long focus or short focus image plane
+   * @param pose
+   * @param signals
+   * @param camera_id
+   * @param lights_on_image
+   * @param lights_outside_image
+   * @return
+   */
   bool ProjectLights(const CarPose &pose, const std::vector<Signal> &signals,
                      const CameraId &camera_id, LightPtrs *lights_on_image,
                      LightPtrs *lights_outside_image);
 
+  /**
+   * @brief given projected lights, select which camera to use
+   * @param pose
+   * @param lights_on_image_array
+   * @param lights_outside_image_array
+   * @param selectted camera
+   */
   void SelectImage(const CarPose &pose,
                    const LightsArray &lights_on_image_array,
                    const LightsArray &lights_outside_image_array,
                    CameraId *selection);
 
+  /**
+   * @brief given image border size, judge whether roi is on border
+   * @param size
+   * @param roi
+   * @param border_size
+   * @return
+   */
   bool IsOnBorder(const cv::Size size, const cv::Rect &roi,
                   const int border_size) const;
 
