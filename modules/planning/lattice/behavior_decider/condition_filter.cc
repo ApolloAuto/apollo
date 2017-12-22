@@ -19,7 +19,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -39,11 +41,12 @@ ConditionFilter::ConditionFilter(
 }
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
-  std::set<double> critical_timestamps = CriticalTimeStamps();
+  //std::set<double> critical_timestamps = CriticalTimeStamps();
+  std::vector<double> uniform_timestamps = UniformTimeStamps();
   std::vector<SampleBound> sample_bounds;
-  for (const double t : critical_timestamps) {
-    // TODO (kechxu): change the hard-coded 0.001 to some variable
-    // TODO (zhangyajia): why is this not zero?
+  // TODO (kechxu): change the hard-coded 0.001 to some variable
+  // TODO (zhangyajia): why is this not zero?
+  for (const double t : uniform_timestamps) {
     if (t > 0.001) {
       std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
       sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
@@ -193,6 +196,19 @@ std::set<double> ConditionFilter::CriticalTimeStamps() const {
   }
   return critical_timestamps;
 }
+
+std::vector<double> ConditionFilter::UniformTimeStamps() const {
+  std::vector<double> uniform_timestamps;
+  int num_slices = 10; // per slice length is 0.8 seconds
+  double starting_timestamp = 1.0;
+  common::util::uniform_slice(starting_timestamp,
+                              planned_trajectory_time,
+                              num_slices,
+                              &uniform_timestamps);
+  return uniform_timestamps;
+}
+
+
 
 }  // namespace planning
 }  // namespace apollo
