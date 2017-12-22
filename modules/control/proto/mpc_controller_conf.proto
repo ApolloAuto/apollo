@@ -4,6 +4,8 @@ package apollo.control;
 
 import "modules/control/proto/calibration_table.proto";
 
+import "modules/control/proto/gain_scheduler_conf.proto";
+
 // simple optimal steer control param
 message MPCControllerConf {
   optional double ts = 1;            // sample time (dt) 0.01 now, configurable
@@ -24,5 +26,8 @@ message MPCControllerConf {
   optional double standstill_acceleration = 15;
   optional double throttle_deadzone = 16;
   optional double brake_deadzone = 17;
-  optional calibrationtable.ControlCalibrationTable calibration_table = 18;
+  optional apollo.control.GainScheduler lat_err_gain_scheduler = 18;
+  optional apollo.control.GainScheduler heading_err_gain_scheduler = 19;
+  optional apollo.control.GainScheduler steer_weight_gain_scheduler = 20;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 21;
 }
