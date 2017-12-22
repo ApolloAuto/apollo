@@ -1813,3 +1813,15 @@ routing_header {
   module_name: "routing"
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "28_1_-1"
+}
+lane_id {
+  id: "27_1_-1"
+}
+lane_id {
+  id: "81_1_-1"
+}
+lane_id {
+  id: "160_1_-3"
+}

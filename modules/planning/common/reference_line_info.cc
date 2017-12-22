@@ -127,6 +127,14 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
 
+const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
+  std::list<hdmap::Id> lane_ids;
+  for (const auto& lane_seg : lanes_) {
+    lane_ids.push_back(lane_seg.lane->id());
+  }
+  return lane_ids;
+}
+
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;
 }

@@ -1587,3 +1587,12 @@ routing_header {
   module_name: "routing"
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "138_1_-1"
+}
+lane_id {
+  id: "144_1_-1"
+}
+lane_id {
+  id: "140_1_-1"
+}
