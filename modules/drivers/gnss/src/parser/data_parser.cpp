@@ -346,8 +346,8 @@ void DataParser::publish_corrimu_message(const MessagePtr message) {
   imu_msg->mutable_angular_velocity()->set_z(ins->angular_velocity().z());
 
   imu_msg->mutable_euler_angles()->set_x(ins->euler_angles().x());
-  imu_msg->mutable_euler_angles()->set_y(ins->euler_angles().y());
-  imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z());
+  imu_msg->mutable_euler_angles()->set_y(-ins->euler_angles().y());
+  imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z() - 90 * DEG_TO_RAD_LOCAL);
 
   _imu_publisher.publish(imu);
 }
