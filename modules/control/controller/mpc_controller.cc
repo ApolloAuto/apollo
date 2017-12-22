@@ -240,10 +240,14 @@ Status MPCController::ComputeControlCommand(
   SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
+  ComputeLongitudinalErrors(&trajectory_analyzer_, debug);
+
   // Update state
   UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
+
+  FeedforwardUpdate(debug);
 
   Eigen::MatrixXd control_matrix(controls_, 1);
   control_matrix << 0, 0;
@@ -272,14 +276,15 @@ Status MPCController::ComputeControlCommand(
   }
 
   double mpc_end_timestamp = Clock::NowInSeconds();
-  const double time_diff_ms = (mpc_end_timestamp - mpc_start_timestamp) * 1000;
 
-  ADEBUG << "MPC core: calculation time is: " << time_diff_ms << " ms.";
+  ADEBUG << "MPC core: calculation time is: "
+         << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
   double steer_angle = control[0](0, 0) * 180 / M_PI *
-                       steer_transmission_ratio_ /
-                       steer_single_direction_max_degree_ * 100;
+                           steer_transmission_ratio_ /
+                           steer_single_direction_max_degree_ * 100 +
+                       steer_angle_feedforwardterm_;
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
@@ -388,11 +393,12 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
                        trajectory_analyzer_, debug);
 
   // State matrix update;
-  // First four elements are fixed;
   matrix_state_(0, 0) = debug->lateral_error();
   matrix_state_(1, 0) = debug->lateral_error_rate();
   matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
+  matrix_state_(4, 0) = debug->station_error();
+  matrix_state_(5, 0) = debug->speed_error();
 }
 
 void MPCController::UpdateMatrix() {
@@ -431,6 +437,12 @@ double MPCController::GetLateralError(const common::math::Vec2d &point,
   const double dx = closest.path_point().x() - point.x();
   const double dy = closest.path_point().y() - point.y();
   return std::sin(point2path_angle) * std::sqrt(dx * dx + dy * dy);
+}
+
+void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
+  steer_angle_feedforwardterm_ = (wheelbase_ * debug->curvature()) * 180 /
+                                 M_PI * steer_transmission_ratio_ /
+                                 steer_single_direction_max_degree_ * 100;
 }
 
 void MPCController::ComputeLateralErrors(
