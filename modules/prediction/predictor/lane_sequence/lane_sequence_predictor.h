@@ -22,9 +22,8 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_LANE_SEQUENCE_LANE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_LANE_SEQUENCE_LANE_SEQUENCE_PREDICTOR_H_
 
-// #include <string>
+#include <string>
 #include <vector>
-// #include "Eigen/Dense"
 
 #include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -62,6 +61,7 @@ class LaneSequencePredictor : public SequencePredictor {
    * @param A vector of generated trajectory points
    */
   void DrawLaneSequenceTrajectoryPoints(
+      const Feature& feature, const std::string& lane_id,
       const common::math::KalmanFilter<double, 4, 2, 0>& kf,
       const LaneSequence& sequence, double total_time, double freq,
       std::vector<common::TrajectoryPoint>* points);
