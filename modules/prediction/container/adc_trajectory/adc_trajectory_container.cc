@@ -31,6 +31,10 @@ void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
   std::lock_guard<std::mutex> lock(g_mutex_);
   adc_trajectory_ = dynamic_cast<const ADCTrajectory&>(message);
+  reference_line_lane_ids_.clear();
+  for (const auto& lane_id : adc_trajectory_.lane_id()) {
+    reference_line_lane_ids_.insert(lane_id.id());
+  }
 }
 
 const ADCTrajectory* ADCTrajectoryContainer::GetADCTrajectory() {
@@ -65,6 +69,11 @@ ADCTrajectoryContainer::ADCTrajectorySegments(const double time_step) const {
 bool ADCTrajectoryContainer::IsProtected() const {
   return adc_trajectory_.has_right_of_way_status() &&
          adc_trajectory_.right_of_way_status() == ADCTrajectory::PROTECTED;
+}
+
+bool ADCTrajectoryContainer::ContainsLaneId(const std::string& lane_id) const {
+  return reference_line_lane_ids_.find(lane_id) !=
+         reference_line_lane_ids_.end();
 }
 
 }  // namespace prediction
