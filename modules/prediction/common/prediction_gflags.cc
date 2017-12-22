@@ -79,6 +79,8 @@ DEFINE_string(evaluator_vehicle_rnn_file,
               "rnn model file for vehicle evaluator");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
+DEFINE_double(valid_position_diff_thred, 0.5,
+              "threshold of valid position difference");
 
 // evaluator
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
