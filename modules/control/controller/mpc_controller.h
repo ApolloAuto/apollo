@@ -232,9 +232,6 @@ class MPCController : public Controller {
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
-  // MeanFilter heading_rate_filter_;
-  MeanFilter lateral_error_filter_;
-
   // for logging purpose
   std::ofstream steer_log_file_;
 
