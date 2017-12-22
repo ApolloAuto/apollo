@@ -60,9 +60,15 @@ def query():
     brand = VehicleInfo.Brand.Name(vehicle_info.brand)
     model = VehicleInfo.Model.Name(vehicle_info.model)
     vin = vehicle_info.license.vin
+    META_FILE = "/apollo/meta.ini"
+    if os.path.exists(META_FILE) == False:
+        print "Not a valid release!"
+        sys.exit(1)
+    config.read(META_FILE)
+    cur_tag = config.get('Release','tag')
     car_info = {
         "car_type" : brand + "." + model,
-        "tag" : os.environ['DOCKER_IMG'],
+        "tag" : cur_tag,
         "vin" : vin,
         "token" : dev_token
     }
