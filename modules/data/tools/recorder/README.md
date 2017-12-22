@@ -1,3 +1,4 @@
+
 ```
  __| | __ _| |_ __ _   _ __ ___  ___ ___  _ __ __| | ___ _ __
  / _` |/ _` | __/ _` | | '__/ _ \/ __/ _ \| '__/ _` |/ _ \ '__|
@@ -17,13 +18,13 @@ Examples:
 
 ```modules/data/conf/recorder.global.yaml```</br>
 vehicle_id and output_path are two necessary items that should be modified.
-```
+```c
 # vehicle_id is the UID of vehicle. If VIN is VIN001, export CARID=VIN001 or set vehicle_id in modules/data/conf/recorder.global.yaml as below:
 
 vehicle_id: VIN001
 ```
 
-```
+```c
 # If a portable hard disk is mounted on /media/apollo/data_storage, execute sudo chown -R apollo:apollo /media/apollo/data_storage, and set output_path as below:
 
 output_path: /media/apollo/data_storage
@@ -31,7 +32,7 @@ output_path: /media/apollo/data_storage
 
 ```modules/data/conf/debug.global.yaml```</br>
 If you want to record rosbag group be topics, please refer to the following confituration:
-```
+```c 
    rosbag_topic_group:
    - group_id: '1'
      group_name: 'default'
@@ -45,7 +46,7 @@ If you want to record rosbag group be topics, please refer to the following conf
 ```
 
 If you want to copy something from system to record data in portable hard disk, please refer to the following confituration:
-```
+```c
     carversion:                       # date type.
       if_record: true                 # if record.
       record_method: rsync            # record method, defalt value is rsync, do not modify.
@@ -84,7 +85,7 @@ If you want to copy something from system to record data in portable hard disk, 
  * rostopic list  # List all the ros topics.
  * rostopic echo  /apollo/data_recorder/status # Read data from /apollo/data_recorder/status.
 Try to use the following code to subscribe topic and get deserialized message.
-```
+```c
     #!/usr/bin/env python
     import rospy
     import recorder_info_pb2
