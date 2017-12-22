@@ -127,6 +127,38 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   EXPECT_FALSE(segments.back().IsOnSegment());
 }
 
+TEST_F(PncMapTest, UpdateNextRoutingWaypointIndex) {
+  pnc_map_->next_routing_waypoint_index_ = 0;
+  pnc_map_->adc_waypoint_.s = 0;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 0, 0});
+  EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 50;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 0, 0});
+  EXPECT_EQ(1, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 63.6,
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 3, 0});
+  EXPECT_EQ(3, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 63.8,
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 3, 0});
+  EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
+
+  // overshoot, rollback to 0
+  pnc_map_->adc_waypoint_.s = 50;
+  pnc_map_->UpdateNextRoutingWaypointIndex({4, 0, 0});
+  EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 100;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 2, 0});
+  EXPECT_EQ(3, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 60;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 2, 0});
+  EXPECT_EQ(2, pnc_map_->next_routing_waypoint_index_);
+}
+
 TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);

@@ -132,8 +132,7 @@ class PncMap {
    * b. If the waypoint's route_index == route_index_, ADC and the waypoint
    * is on the same lane, compare the lane_s.
    */
-  void UpdateNextRoutingWaypointIndex(const std::vector<int> &prev_index,
-                                      const std::vector<int> &cur_index);
+  void UpdateNextRoutingWaypointIndex(const std::vector<int> &cur_index);
 
   /**
    * @brief find the index of waypoint by looking forward from index start.
