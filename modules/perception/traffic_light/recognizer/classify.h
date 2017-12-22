@@ -30,6 +30,10 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ * @class ClassifyBySimple
+ * @brief classify light's color using simple cnn
+ */
 class ClassifyBySimple : public IRefine {
  public:
   ClassifyBySimple(const std::string &_class_net,

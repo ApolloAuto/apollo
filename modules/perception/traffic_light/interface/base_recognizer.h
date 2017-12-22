@@ -32,7 +32,10 @@ namespace traffic_light {
 
 struct RecognizeOption {};
 
-// @brief Recognizer classify the light color.
+/**
+ * @class BaseRecognizer
+ * @brief Recognizer classify the light color.
+ */
 class BaseRecognizer {
  public:
   BaseRecognizer() = default;
@@ -41,11 +44,13 @@ class BaseRecognizer {
 
   virtual bool Init() = 0;
 
-  // @brief: recognize light status
-  // @param [in] const Recognize&: recognize options
-  // @param [in] const Image&: input image
-  // @param [in/out] std::vector<Light>*: recognized light status
-  // @return  bool
+  /**
+   * @brief: recognize light status
+   * @param  const Recognize&: recognize options
+   * @param  const Image&: input image
+   * @param  std::vector<Light>*: recognized light status
+   * @return  bool
+   */
   virtual bool RecognizeStatus(const Image &image,
                                const RecognizeOption &option,
                                std::vector<LightPtr> *lights) = 0;
