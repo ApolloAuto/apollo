@@ -71,7 +71,7 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
-// next id: 20
+// next id: 19
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -113,7 +113,4 @@ message ADCTrajectory {
 
   // lane id along reference line
   repeated apollo.hdmap.Id lane_id = 18;
-
-  // virtual ADC point
-  optional apollo.common.TrajectoryPoint adc_planning_point = 19;
 }
