@@ -1283,3 +1283,15 @@ routing_header {
   module_name: "routing"
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "37_1_-4"
+}
+lane_id {
+  id: "38_1_-4"
+}
+lane_id {
+  id: "84_1_-1"
+}
+lane_id {
+  id: "58_1_-2"
+}

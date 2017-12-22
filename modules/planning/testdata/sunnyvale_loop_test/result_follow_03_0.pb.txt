@@ -1754,3 +1754,15 @@ routing_header {
   module_name: "routing"
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "747_1_-1"
+}
+lane_id {
+  id: "141_1_-2"
+}
+lane_id {
+  id: "906_1_-1"
+}
+lane_id {
+  id: "9_1_-2"
+}
