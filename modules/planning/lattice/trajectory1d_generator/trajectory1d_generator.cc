@@ -24,8 +24,9 @@
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/util/lattice_params.h"
-#include "modules/planning/lattice/util/lattice_quartic_polynomial_curve1d.h"
-#include "modules/planning/lattice/util/lattice_quintic_polynomial_curve1d.h"
+#include "modules/planning/lattice/util/lattice_trajectory1d.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
 
@@ -123,9 +124,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     end_state[0] = end_condition.first[1];
     end_state[1] = end_condition.first[2];
 
-    std::shared_ptr<Curve1d> ptr_lon_trajectory =
-        std::shared_ptr<Curve1d>(new LatticeQuarticPolynomialCurve1d(
-            init_lon_state_, end_state, end_condition.second));
+    std::shared_ptr<Curve1d> ptr_lon_trajectory(new LatticeTrajectory1d(
+        std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
+                    init_lon_state_, end_state, end_condition.second))));
 
     ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
   }
@@ -168,9 +169,10 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
     AINFO << " --- end_conditiion " << end_condition.first[0]
       << " " << end_condition.first[1] << " " << end_condition.first[2]
       << " t="<< end_condition.second;
-    std::shared_ptr<Curve1d> ptr_lon_trajectory =
-        std::shared_ptr<Curve1d>(new LatticeQuinticPolynomialCurve1d(
-            init_lon_state_, end_condition.first, end_condition.second));
+
+    std::shared_ptr<Curve1d> ptr_lon_trajectory(new LatticeTrajectory1d(
+           std::shared_ptr<QuinticPolynomialCurve1d>(
+               new QuinticPolynomialCurve1d(init_lon_state_, end_condition.first, end_condition.second))));
 
     ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
   }
@@ -189,9 +191,9 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
                                   planning_target);
 
   for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<Curve1d> ptr_lon_trajectory =
-        std::shared_ptr<Curve1d>(new LatticeQuinticPolynomialCurve1d(
-        init_lon_state_, end_condition.first, end_condition.second));
+    std::shared_ptr<Curve1d> ptr_lon_trajectory(new LatticeTrajectory1d(
+        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(init_lon_state_, end_condition.first, end_condition.second))
+    ));
     ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
   }
 }
@@ -202,9 +204,9 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
       end_condition_sampler_->SampleLatEndConditions();
 
   for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<Curve1d> ptr_lat_trajectory =
-        std::shared_ptr<Curve1d>(new LatticeQuinticPolynomialCurve1d(
-            init_lat_state_, end_condition.first, end_condition.second));
+    std::shared_ptr<Curve1d> ptr_lat_trajectory = std::shared_ptr<Curve1d>(
+        new LatticeTrajectory1d(std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+            init_lat_state_, end_condition.first, end_condition.second))));
 
     ptr_lat_trajectory_bundle->push_back(ptr_lat_trajectory);
   }

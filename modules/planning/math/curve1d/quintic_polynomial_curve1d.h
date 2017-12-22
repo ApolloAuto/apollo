@@ -50,6 +50,7 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
   double Evaluate(const std::uint32_t order, const double p) const override;
 
   double ParamLength() const { return param_; }
+
   std::string ToString() const override;
 
  protected:
