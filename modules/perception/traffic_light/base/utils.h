@@ -19,7 +19,7 @@
 #include "opencv2/opencv.hpp"
 
 namespace apollo {
-namespace perception{
+namespace perception {
 namespace traffic_light {
 
 /**
