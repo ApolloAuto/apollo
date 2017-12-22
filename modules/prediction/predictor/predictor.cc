@@ -17,8 +17,10 @@
 #include "modules/prediction/predictor/predictor.h"
 
 #include <vector>
+#include <string>
 
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -54,27 +56,26 @@ void Predictor::Clear() { trajectories_.clear(); }
 
 void Predictor::TrimTrajectories(
     const ADCTrajectoryContainer* adc_trajectory_container) {
-  std::vector<LineSegment2d> adc_segments =
-      adc_trajectory_container->ADCTrajectorySegments(FLAGS_adc_time_step);
   for (size_t i = 0; i < trajectories_.size(); ++i) {
-    TrimTrajectory(adc_segments, &trajectories_[i]);
+    TrimTrajectory(adc_trajectory_container, &trajectories_[i]);
   }
 }
 
 bool Predictor::TrimTrajectory(
-    const std::vector<LineSegment2d>& adc_segments,
+    const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
   int num_point = trajectory->trajectory_point_size();
   // Get the index at intersect
   int index = 0;
+  bool has_intersect = false;
   while (index < num_point) {
-    Vec2d curr_point(
-        trajectory->trajectory_point(index).path_point().x(),
-        trajectory->trajectory_point(index).path_point().y());
-    bool has_intersect = false;
-    for (const LineSegment2d& adc_segment : adc_segments) {
-      double distance = adc_segment.DistanceTo(curr_point);
-      if (distance < FLAGS_distance_to_adc_trajectory_thred) {
+    double x = trajectory->trajectory_point(index).path_point().x();
+    double y = trajectory->trajectory_point(index).path_point().y();
+    std::vector<std::string> lane_ids =
+        PredictionMap::instance()->NearbyLaneIds(x, y,
+            FLAGS_distance_to_adc_trajectory_thred);
+    for (const std::string& lane_id : lane_ids) {
+      if (adc_trajectory_container->ContainsLaneId(lane_id)) {
         has_intersect = true;
         break;
       }

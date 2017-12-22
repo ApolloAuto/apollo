@@ -147,6 +147,9 @@ class PredictionMap {
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
+  std::vector<std::string> NearbyLaneIds(
+      const double x, const double y, const double radius);
+
   /**
    * @brief Check if a lane is a left neighbor of another lane.
    * @param left_lane The lane to check if it is a left neighbor.
