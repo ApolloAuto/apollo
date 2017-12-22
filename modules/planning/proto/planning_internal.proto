@@ -119,7 +119,16 @@ message ChangeLaneState {
    optional double timestamp = 3;
 }
 
-// next id: 20
+message SampleLayerDebug {
+  repeated apollo.common.SLPoint sl_point = 1;
+}
+
+message DpPolyGraphDebug {
+  repeated SampleLayerDebug sample_layer = 1;
+  repeated apollo.common.SLPoint min_cost_point = 2;
+}
+
+// next id: 21
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -137,4 +146,5 @@ message PlanningData {
 
   repeated ObstacleDebug obstacle = 18;
   repeated ReferenceLineDebug reference_line = 19;
+  optional DpPolyGraphDebug dp_poly_graph = 20;
 }
