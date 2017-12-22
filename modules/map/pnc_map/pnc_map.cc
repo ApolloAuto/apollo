@@ -99,11 +99,43 @@ LaneWaypoint PncMap::ToLaneWaypoint(
 }
 
 void PncMap::UpdateNextRoutingWaypointIndex() {
+  if (route_index_.empty()) {
+    next_routing_waypoint_index_ = 0;
+    return;
+  }
   while (next_routing_waypoint_index_ + 1 < routing_waypoints_.size()) {
     const auto &next_waypoint =
         routing_waypoints_[next_routing_waypoint_index_];
-    auto waypoint_index = GetWaypointIndex(next_waypoint);
-    if (waypoint_index < route_index_) {
+
+    std::vector<int> waypoint_index;
+    // if not found following history route_index_, search forward
+    for (int road_index = 0; road_index < routing_.road_size(); ++road_index) {
+      const auto &road_segment = routing_.road(road_index);
+      for (int passage_index = 0; passage_index < road_segment.passage_size();
+           ++passage_index) {
+        const auto &passage = road_segment.passage(passage_index);
+        for (int lane_index = 0; lane_index < passage.segment_size();
+             ++lane_index) {
+          if (RouteSegments::WithinLaneSegment(passage.segment(lane_index),
+                                               next_waypoint)) {
+            std::vector<int> index{road_index, passage_index, lane_index};
+            if (index < route_index_) {
+              continue;
+            } else {
+              waypoint_index = index;
+              break;
+            }
+          }
+        }
+        if (!waypoint_index.empty()) {
+          break;
+        }
+      }
+      if (!waypoint_index.empty()) {
+        break;
+      }
+    }
+    if (waypoint_index.empty()) {
       ++next_routing_waypoint_index_;
     } else if (waypoint_index == route_index_ &&
                adc_waypoint_.s >= next_waypoint.s) {
@@ -125,6 +157,15 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     AERROR << "The routing is invalid when updatting vehicle state";
     return false;
   }
+  if (!adc_state_.has_x() ||
+      common::util::DistanceXY(adc_state_, vehicle_state) >
+          vehicle_state.linear_velocity() * 5.0) {
+    // speed five times larger than current speed, which is impossible, reset
+    next_routing_waypoint_index_ = 0;
+    route_index_.clear();
+    stop_for_destination_ = false;
+  }
+
   adc_state_ = vehicle_state;
   if (!GetNearestPointFromRouting(vehicle_state, &adc_waypoint_)) {
     AERROR << "Failed to get waypoint from routing with point: "
@@ -335,9 +376,14 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
   return result;
 }
 
-bool PncMap::GetRouteSegments(
-    const double backward_length, const double forward_length,
-    std::list<RouteSegments> *const route_segments) const {
+bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
+                              const double backward_length,
+                              const double forward_length,
+                              std::list<RouteSegments> *const route_segments) {
+  if (!UpdateVehicleState(vehicle_state)) {
+    AERROR << "Failed to update vehicle state in pnc_map";
+    return false;
+  }
   // vehicle has to be this close to lane center before considering change
   // lane
   if (!adc_waypoint_.lane || route_index_.size() != 3) {

@@ -63,10 +63,12 @@ DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_int32(max_num_obstacles);
 DECLARE_bool(enable_adjust_velocity_heading);
 DECLARE_double(heading_diff_thred);
+DECLARE_double(valid_position_diff_thred);
 
 // evaluator
 DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_double(perception_confidence_threshold);
+DECLARE_bool(enable_rnn_acc);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);

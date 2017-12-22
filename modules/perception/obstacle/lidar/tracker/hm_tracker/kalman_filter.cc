@@ -98,6 +98,8 @@ KalmanFilter::KalmanFilter() {
   name_ = "KalmanFilter";
   age_ = 0;
   measurement_cached_history_size_ = s_measurement_cached_history_size_minimum_;
+  s_measurement_cached_history_size_maximum_ =
+    s_measurement_cached_history_size_minimum_;
   velocity_covariance_ =
       s_initial_velocity_noise_ * Eigen::Matrix3d::Identity();
   // states
@@ -512,8 +514,8 @@ void KalmanFilter::EvaluateOnlineCovariance() {
   online_velocity_covariance_ = online_covariance / evaluate_window;
 }
 
-void KalmanFilter::GetOnlineCovariance(Eigen::Matrix3d* online_covariance) {
-  *online_covariance = online_velocity_covariance_;
+void KalmanFilter::GetOnlineCovariance(Eigen::Matrix3f* online_covariance) {
+  *online_covariance = online_velocity_covariance_.cast<float>();
 }
 
 void KalmanFilter::UpdateAcceleration(

@@ -503,6 +503,9 @@ Status StBoundaryMapper::GetSpeedLimits(
     // speed limit from nudge obstacles
     double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
     for (const auto* const_path_obstacle : path_obstacles.Items()) {
+      if (const_path_obstacle->obstacle()->IsVirtual()) {
+        continue;
+      }
       if (!const_path_obstacle->LateralDecision().has_nudge()) {
         continue;
       }
@@ -519,18 +522,33 @@ Status StBoundaryMapper::GetSpeedLimits(
           (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
           (const_path_obstacle->perception_sl_boundary().start_l() < kRange);
       if (is_close_on_left || is_close_on_right) {
-        constexpr double kNudgeSpeedRatio = 0.6;
+        double nudge_speed_ratio = 1.0;
+        if (const_path_obstacle->obstacle()->IsStatic()) {
+          nudge_speed_ratio =
+              st_boundary_config_.static_obs_nudge_speed_ratio();
+        } else {
+          nudge_speed_ratio =
+              st_boundary_config_.dynamic_obs_nudge_speed_ratio();
+        }
         nudge_obstacle_speed_limit =
-            kNudgeSpeedRatio * speed_limit_on_reference_line;
+            nudge_speed_ratio * speed_limit_on_reference_line;
         break;
       }
     }
 
-    const double curr_speed_limit = std::fmax(
+    double curr_speed_limit = 0.0;
+    if (FLAGS_enable_nudge_slowdown) {
+      curr_speed_limit = std::fmax(
         st_boundary_config_.lowest_speed(),
         common::util::MinElement(std::vector<double>{
             centripetal_acceleration_limit, speed_limit_on_reference_line,
             nudge_obstacle_speed_limit}));
+    } else {
+      curr_speed_limit = std::fmax(
+        st_boundary_config_.lowest_speed(),
+        common::util::MinElement(std::vector<double>{
+            centripetal_acceleration_limit, speed_limit_on_reference_line}));
+    }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
   }

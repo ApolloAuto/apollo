@@ -285,7 +285,7 @@ bool ReferenceLineProvider::CreateRouteSegments(
     std::list<hdmap::RouteSegments> *segments) {
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(look_backward_distance,
+    if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
                                     look_forward_distance, segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
@@ -336,12 +336,6 @@ bool ReferenceLineProvider::CreateReferenceLine(
       std::lock_guard<std::mutex> lock(segment_history_mutex_);
       segment_history_.clear();
       segment_history_id_.clear();
-    }
-
-    // Update vehicle state in pnc_map
-    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->UpdateVehicleState(vehicle_state)) {
-      AERROR << "Failed to update vehicle state in pnc map";
     }
   }
 

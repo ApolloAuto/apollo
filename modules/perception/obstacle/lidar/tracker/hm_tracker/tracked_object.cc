@@ -35,7 +35,7 @@ TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
     velocity = Eigen::Vector3f::Zero();
     acceleration = Eigen::Vector3f::Zero();
     type = object_ptr->type;
-    velocity_uncertainty = Eigen::Matrix3d::Identity() * 5;
+    velocity_uncertainty = Eigen::Matrix3f::Identity() * 5;
   }
 }
 
