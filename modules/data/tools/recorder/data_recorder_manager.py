@@ -455,7 +455,7 @@ def launch_data_recorder(cp):
 def main():
     """main function"""
     usage = ("python modules/data/tools/recorder/data_recorder_manager.py -c "
-             "modules/data/conf/recorder.conf")
+             "modules/data/conf/recorder.debug.yaml")
     parser = optparse.OptionParser(usage)
     parser.add_option("-c", "--conf",
             dest = "conf_file",

@@ -6,23 +6,64 @@
  \__,_|\__,_|\__\__,_| |_|  \___|\___\___/|_|  \__,_|\___|_|
 ```
 
-Data-Recorder is responsiable for helping Apollo partner to record data.
+Data-Recorder is responsiable for helping Apollo partners to record data.
 
 ## v1.0.0.1
 
 ## How to `Use.`
 
 #### Data-Recorder configuration.
-There are recorder.global.yaml and recorder.debug.yaml in conf directory.
-Modify the config file according to your system environments and data recording requirements.
+Modify modules/data/conf/recorder.global.yaml and modules/data/conf/recorder.debug.yaml according to your system environments and data recording requirements.
+Examples:
+
+2. modules/data/conf/recorder.global.yaml
+vehicle_id and output_path are two necessary items that should be modified.
+```
+# vehicle_id is the UID of vehicle. If VIN is VIN001, export CARID=VIN001 or set vehicle_id in modules/data/conf/recorder.global.yaml as below:
+vehicle_id: VIN001
+```
+
+```
+# If a portable hard disk is mounted on /media/apollo/data_storage, execute sudo chown -R apollo:apollo /media/apollo/data_storage, and set output_path as below:
+output_path: /media/apollo/data_storage
+```
+
+2. modules/data/conf/debug.global.yaml
+If you want to record rosbag group be topics, please refer to the following confituration:
+```
+   rosbag_topic_group:
+   - group_id: '1'
+     group_name: 'default'
+     group_topic_match_re: ''
+     group_topic_exclude_re: '(.*(rosout|image_long|image_short|image_narrow|image_wide|PointCloud2)$)'
+   - group_id: '2'
+     group_name: 'test'
+     group_topic_match_re: '/apollo/data_recorder/status'
+     group_topic_exclude_re: ''
+
+```
+
+If you want to copy something from system to record data in portable hard disk, please refer to the following confituration:
+```
+    carversion:                       # date type.
+      if_record: true                 # if record.
+      record_method: rsync            # record method, defalt value is rsync, do not modify.
+      data_property:                  # 
+        src: "/home/apollo/version/"  # the source directory of your system.
+        dst: "carversion/"            # the destination directory of record data.
+      action_args:
+        trigger_interval: 900         # copy interval(second).
+        sync_bwlimit: 102400          # max speed of copy (KB/s).
+        with_remove: false            # remove files after copying.
+```  
 
 #### Start Data-Recorder.
- * bash data_reocrder_control.sh start # Start data-recoder with default task_purpose(debug).
+ * bash modules/data/tools/recorder/data_reocrder_control.sh start # Start data-recoder with default task_purpose(debug).
  * python modules/data/tools/recorder/data_recorder_manager.py -c modules/data/conf/recorder.debug.yaml # This is another way to start.
 
 #### Stop Data-Recorder.
- * bash data-recorder_control.sh stop  # stop data-recorder.
- * CTRL + C if start data-recorder with python data_recorder_manager.py -c ../conf/conf.yaml
+ * bash modules/data/tools/recorder/data-recorder_control.sh stop  # stop data-recorder.
+ * CTRL + C if start data-recorder with python data_recorder_manager.py -c modules/data/conf/recorder.debug.yaml. 
 
 #### Send control commands to data-recorder.This feature depends on data-recorder has been started.
  * Send command rosbag_record_off to disable rosbag record.

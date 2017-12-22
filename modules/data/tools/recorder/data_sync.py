@@ -37,13 +37,14 @@ class DataSync(threading.Thread):
     def __init__(self, recorder_manager):
         """Init"""
         threading.Thread.__init__(self)
+        self.sudo_passwd = "apollo"
         self.recorder_manager = recorder_manager
         self.conf_reader = recorder_manager.conf_reader
 
     def check_file(self, filename):
         """Check if a file is used by other process."""
         if os.path.exists(filename):
-            cmd = "echo \"caros\n\"|sudo -S lsof -f -- " + filename
+            cmd = "echo \"" + self.sudo_passwd + "\n\"|sudo -S lsof -f -- " + filename
             process = subprocess.Popen(
                 cmd,
                 shell=True,
@@ -70,8 +71,8 @@ class DataSync(threading.Thread):
         cmd = "mkdir -p " + sync_dst \
                 + " && cd " \
                 + sync_src \
-                + " && echo \"caros\n\" | sudo -S ls" \
-                + " | while read f; do echo \"rootpass\n\" | sudo -S cp -r $f " \
+                + " && echo \"" + self.sudo_passwd + "\n\" | sudo -S ls" \
+                + " | while read f; do echo \"" + self.sudo_passwd + "\n\" | sudo -S cp -r $f " \
                 + sync_dst \
                 + ";done"
         sync_process = subprocess.Popen(
@@ -93,7 +94,7 @@ class DataSync(threading.Thread):
         if not with_remove:
             return
         # backup and remove.
-        cmd = "echo \"rootpass\n\"|sudo -S find " + sync_src + \
+        cmd = "echo \"" + self.sudo_passwd + "\n\"|sudo -S find " + sync_src + \
               " -mmin +1 -type f"
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -132,7 +133,7 @@ class DataSync(threading.Thread):
                            + os.path.split(
                                os.path.abspath(f))[0].replace(sync_src_tmp, '')
                 cmd = "mkdir -p " + backup_dst \
-                        + " && echo \"rootpass\n\" |sudo -S mv " \
+                        + " && echo \"" + self.sudo_passwd + "\n\" |sudo -S mv " \
                         + f \
                         + " " \
                         + backup_dst
