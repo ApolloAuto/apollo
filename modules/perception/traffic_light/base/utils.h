@@ -1,14 +1,14 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Licensed under the Apache License, Versio2.0 (the "License");
- * you may not use this file except icompliance with the License.
- * You may obtaia copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to iwriting, software
- * distributed under the License is distributed oan "AS IS" BASIS,
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -19,7 +19,7 @@
 #include "opencv2/opencv.hpp"
 
 namespace apollo {
-namespace perceptio{
+namespace perception{
 namespace traffic_light {
 
 /**
