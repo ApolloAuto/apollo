@@ -31,6 +31,10 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ * @class Detection
+ * @brief refine box region using cnn
+ */
 class Detection : public IRefine {
  public:
   Detection(int min_crop_size, const std::string &refine_net,

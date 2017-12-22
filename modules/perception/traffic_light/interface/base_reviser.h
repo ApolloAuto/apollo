@@ -32,8 +32,6 @@ struct ReviseOption {
   double ts;  // timestamp for lights
 };
 
-// @brief
-//       It may use history info(Tracker) or some else info.
 /**
  * @class BaseReviser
  * @brief Reviser is the class is to revise the perception result.
