@@ -208,7 +208,7 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
           GetCostBetweenObsBoxes(ego_box, obstacle_trajectory.at(index));
     }
   }
-  constexpr double kDynamicObsWeight = 1e-3;
+  constexpr double kDynamicObsWeight = 1e-6;
   obstacle_cost.safety_cost *=
       (config_.eval_time_interval() * kDynamicObsWeight);
   return obstacle_cost;
