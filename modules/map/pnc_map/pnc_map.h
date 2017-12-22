@@ -132,19 +132,43 @@ class PncMap {
    * b. If the waypoint's route_index == route_index_, ADC and the waypoint
    * is on the same lane, compare the lane_s.
    */
-  void UpdateNextRoutingWaypointIndex();
+  void UpdateNextRoutingWaypointIndex(const std::vector<int> &prev_index,
+                                      const std::vector<int> &cur_index);
+
+  /**
+   * @brief find the index of waypoint by looking forward from index start.
+   * @return empty vector if not found, otherwise return a vector { road_index,
+   * passage_index, lane_index}
+   */
+  std::vector<int> SearchForwardWaypointIndex(
+      const std::vector<int> &start, const LaneWaypoint &waypoint) const;
+
+  std::vector<int> SearchBackwardWaypointIndex(
+      const std::vector<int> &start, const LaneWaypoint &waypoint) const;
 
  private:
   routing::RoutingResponse routing_;
   std::unordered_set<std::string> routing_lane_ids_;
+
   /**
    * The routing request waypoints
    */
-  std::vector<LaneWaypoint> routing_waypoints_;
+  struct WaypointIndex {
+    LaneWaypoint waypoint;
+    std::vector<int> index;
+    WaypointIndex(const LaneWaypoint &waypoint, const std::vector<int> &index)
+        : waypoint(waypoint), index(index) {}
+  };
+
+  // return the segment of an index
+  std::vector<int> NextWaypointIndex(const std::vector<int> &index) const;
+
+  std::vector<WaypointIndex> routing_waypoint_index_;
   /**
-   * The next routing request waypoint that the vehicle have passed.
+   * The next routing request waypoint index in routing_waypoint_index_
    */
   std::size_t next_routing_waypoint_index_ = 0;
+
   const hdmap::HDMap *hdmap_ = nullptr;
   bool is_same_routing_ = false;
 
@@ -163,8 +187,10 @@ class PncMap {
 
   /**
    * @brief Indicates whether the adc should start consider destination.
-   * In a looped routing, the vehicle may need to pass by the destination point
-   * may times on the road, but only need to stop when it encounters destination
+   * In a looped routing, the vehicle may need to pass by the destination
+   * point
+   * may times on the road, but only need to stop when it encounters
+   * destination
    * for the last time.
    */
   bool stop_for_destination_ = false;

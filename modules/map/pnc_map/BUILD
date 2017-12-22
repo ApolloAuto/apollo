@@ -47,6 +47,7 @@ cc_library(
         ":route_segments",
         "//modules/common/proto:vehicle_state_proto",
         "//modules/map/hdmap",
+        "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",
     ],
 )
