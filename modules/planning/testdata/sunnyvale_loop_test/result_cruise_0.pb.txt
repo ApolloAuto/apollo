@@ -1293,3 +1293,15 @@ lane_id {
 lane_id {
   id: "6_1_-2"
 }
+adc_planning_point {
+  path_point {
+    x: 587503.356047
+    y: 4140719.15699
+    z: -29.8598582055
+    theta: 2.35595493774
+    kappa: 0
+  }
+  v: 5.4222221374511719
+  a: 0.496524782766
+  relative_time: 0
+}
