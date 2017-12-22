@@ -25,6 +25,8 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <string>
+#include <unordered_set>
 
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -73,8 +75,11 @@ class ADCTrajectoryContainer : public Container {
    */
   bool IsProtected() const;
 
+  bool ContainsLaneId(const std::string& lane_id) const;
+
  private:
   apollo::planning::ADCTrajectory adc_trajectory_;
+  std::unordered_set<std::string> reference_line_lane_ids_;
   static std::mutex g_mutex_;
 };
 
