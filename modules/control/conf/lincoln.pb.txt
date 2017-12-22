@@ -6619,6 +6619,72 @@ mpc_controller_conf {
   standstill_acceleration: -3.0
   brake_deadzone: 15.5
   throttle_deadzone: 18.0
+  lat_err_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.2
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.1
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.05
+    }
+  }
+  heading_err_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.2
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.1
+    }
+  }
+  steer_weight_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.2
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.1
+    }
+  }
   calibration_table {
     calibration {
       speed: 0.0
