@@ -349,6 +349,26 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
 }
 
+bool ReferenceLineInfo::IsRightTurnPath() const {
+  double route_s = 0.0;
+  const double adc_s = adc_sl_boundary_.end_s();
+  constexpr double kRightTurnStartBuff = 1.0;
+  for (const auto& seg : Lanes()) {
+    if (route_s > adc_s + kRightTurnStartBuff) {
+      break;
+    }
+    route_s += seg.end_s - seg.start_s;
+    if (route_s < adc_s) {
+      continue;
+    }
+    const auto& turn = seg.lane->lane().turn();
+    if (turn == hdmap::Lane::RIGHT_TURN) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool ReferenceLineInfo::ReachedDestination() const {
   constexpr double kDestinationDeltaS = 0.05;
   const auto* dest_ptr = path_decision_.Find(FLAGS_destination_obstacle_id);
