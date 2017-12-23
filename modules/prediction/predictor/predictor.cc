@@ -18,6 +18,8 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 #include "Eigen/Dense"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -56,21 +58,35 @@ void Predictor::SetEqualProbability(double probability, int start_index) {
 void Predictor::Clear() { trajectories_.clear(); }
 
 void Predictor::TrimTrajectories(
+    const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container) {
   for (size_t i = 0; i < trajectories_.size(); ++i) {
-    TrimTrajectory(adc_trajectory_container, &trajectories_[i]);
+    TrimTrajectory(obstacle, adc_trajectory_container, &trajectories_[i]);
   }
 }
 
 bool Predictor::TrimTrajectory(
+    const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
+  if (obstacle == nullptr || obstacle->history_size() == 0) {
+    AERROR << "Invalid obstacle.";
+    return false;
+  }
   int num_point = trajectory->trajectory_point_size();
   if (num_point == 0) {
     return false;
   }
-  double start_x = trajectory->trajectory_point(0).path_point().x();
-  double start_y = trajectory->trajectory_point(0).path_point().y();
+  const Feature& feature = obstacle->latest_feature();
+  double length = feature.length();
+  double heading = feature.theta();
+  double forward_length =
+      std::max(length / 2.0 - FLAGS_ahead_junction_thred, 0.0);
+
+  double start_x = trajectory->trajectory_point(0).path_point().x() +
+                   forward_length * std::cos(heading);
+  double start_y = trajectory->trajectory_point(0).path_point().y() +
+                   forward_length * std::sin(heading);
   if (PredictionMap::instance()->NearJunction(
           {start_x, start_y}, FLAGS_junction_distance_thred)) {
     return false;

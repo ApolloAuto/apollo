@@ -28,7 +28,7 @@ DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
 
-DEFINE_double(prediction_duration, 3.0, "Prediction duration (in seconds)");
+DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 50.0,
@@ -112,6 +112,9 @@ DEFINE_double(time_to_adc_trajectory_thred, 2.0,
               "Time threshold to trim prediction trajectory");
 DEFINE_double(junction_distance_thred, 0.25,
               "Threshold of radius to search junction.");
+DEFINE_double(ahead_junction_thred, 0.5,
+              "If the obstacle is in junction more than this threshold,"
+              "consider it in junction.");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,

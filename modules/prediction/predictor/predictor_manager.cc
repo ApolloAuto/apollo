@@ -184,7 +184,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         predictor->Predict(obstacle);
         if (FLAGS_enable_trim_prediction_trajectory &&
             adc_trajectory_container->IsProtected()) {
-          predictor->TrimTrajectories(adc_trajectory_container);
+          predictor->TrimTrajectories(obstacle, adc_trajectory_container);
         }
         for (const auto& trajectory : predictor->trajectories()) {
           prediction_obstacle.add_trajectory()->CopyFrom(trajectory);
