@@ -251,7 +251,7 @@ DEFINE_string(clear_zone_virtual_object_id_prefix, "CZ_",
 /// traffic light
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
-DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
+DEFINE_double(max_deacceleration_for_yellow_light_stop, 3.0,
               "treat yellow light as red when deceleration (abstract value"
               " in m/s^2) is less than this threshold; otherwise treated"
               " as green light");
