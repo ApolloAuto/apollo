@@ -93,7 +93,7 @@ DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_diff_thred, M_PI / 6.0,
               "Threshold for adjusting on-lane obstacle heading");
-DEFINE_bool(enable_rnn_acc, true, "If use acceleration from RNN model.");
+DEFINE_bool(enable_rnn_acc, false, "If use acceleration from RNN model.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
@@ -110,6 +110,8 @@ DEFINE_double(distance_to_adc_trajectory_thred, 5.0,
                "ADC planning trajectory");
 DEFINE_double(time_to_adc_trajectory_thred, 2.0,
               "Time threshold to trim prediction trajectory");
+DEFINE_double(junction_distance_thred, 0.25,
+              "Threshold of radius to search junction.");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,
