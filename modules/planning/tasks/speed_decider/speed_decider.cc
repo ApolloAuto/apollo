@@ -339,14 +339,12 @@ bool SpeedDecider::CheckIsFollowByT(const StBoundary& boundary) const {
   if (boundary.BottomLeftPoint().s() > boundary.BottomRightPoint().s()) {
     return false;
   }
-  /*
   constexpr double kFollowTimeEpsilon = 1e-3;
   constexpr double kFollowCutOffTime = 0.5;
   if (boundary.min_t() > kFollowCutOffTime ||
       boundary.max_t() < kFollowTimeEpsilon) {
     return false;
   }
-  */
   return true;
 }
 
