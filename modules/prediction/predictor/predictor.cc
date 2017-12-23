@@ -66,23 +66,21 @@ bool Predictor::TrimTrajectory(
     const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
   int num_point = trajectory->trajectory_point_size();
-  // Get the index at intersect
+  if (num_point == 0) {
+    return false;
+  }
+  double start_x = trajectory->trajectory_point(0).path_point().x();
+  double start_y = trajectory->trajectory_point(0).path_point().y();
+  if (PredictionMap::instance()->NearJunction(
+          {start_x, start_y}, FLAGS_junction_distance_thred)) {
+    return false;
+  }
   int index = 0;
-  bool has_intersect = false;
   while (index < num_point) {
     double x = trajectory->trajectory_point(index).path_point().x();
     double y = trajectory->trajectory_point(index).path_point().y();
-    Eigen::Vector2d point(x, y);
-    std::vector<std::string> lane_ids =
-        PredictionMap::instance()->NearbyLaneIds(
-            point, FLAGS_distance_to_adc_trajectory_thred);
-    for (const std::string& lane_id : lane_ids) {
-      if (adc_trajectory_container->ContainsLaneId(lane_id)) {
-        has_intersect = true;
-        break;
-      }
-    }
-    if (has_intersect) {
+    if (PredictionMap::instance()->NearJunction(
+            {x, y}, FLAGS_junction_distance_thred)) {
       break;
     }
     ++index;
@@ -90,12 +88,6 @@ bool Predictor::TrimTrajectory(
 
   // if no intersect
   if (index == num_point) {
-    return false;
-  }
-
-  double index_time = trajectory->trajectory_point(index).relative_time();
-  // if early intersect occurs
-  if (index_time < FLAGS_time_to_adc_trajectory_thred) {
     return false;
   }
 
