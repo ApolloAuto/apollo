@@ -1729,36 +1729,6 @@ decision {
       }
     }
     decision {
-      id: "401_1"
-      perception_id: 401
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_OBSTACLE
-          distance_s: -3
-          stop_point {
-            x: 587049.08822406118
-            y: 4141555.0813091695
-          }
-          stop_heading: 1.0883513444795476
-        }
-      }
-    }
-    decision {
-      id: "401_2"
-      perception_id: 401
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_OBSTACLE
-          distance_s: -3
-          stop_point {
-            x: 587049.08822406118
-            y: 4141555.0813091695
-          }
-          stop_heading: 1.0883513444795476
-        }
-      }
-    }
-    decision {
       id: "SL_1065"
       perception_id: -855654299
       object_decision {
