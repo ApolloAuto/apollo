@@ -132,6 +132,7 @@ DECLARE_bool(enable_prediction);
 DECLARE_bool(enable_traffic_light);
 
 DECLARE_double(turn_signal_distance);
+DECLARE_bool(right_turn_creep_forward);
 
 // speed decider
 DECLARE_double(low_speed_obstacle_threshold);

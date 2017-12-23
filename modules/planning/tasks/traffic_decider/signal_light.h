@@ -51,7 +51,11 @@ class SignalLight : public TrafficRule {
   bool CreateStopObstacle(Frame* frame,
                           ReferenceLineInfo* const reference_line_info,
                           const hdmap::PathOverlap* signal_light);
-  std::vector<const hdmap::PathOverlap*> signal_lights_from_path_;
+  void SetCreepForwardSignalDecision(
+      const ReferenceLineInfo* reference_line_info,
+      hdmap::PathOverlap* const signal_light) const;
+
+  std::vector<hdmap::PathOverlap> signal_lights_from_path_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
       detected_signals_;
 };
