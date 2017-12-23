@@ -281,6 +281,9 @@ DEFINE_double(max_distance_stop_sign_waiting_area, 3,
 DEFINE_double(
     turn_signal_distance, 60.96,
     "In meters. If there is a turn within this distance, use turn signal");
+DEFINE_bool(right_turn_creep_forward, false,
+            "Creep forward at right turn when the signal is red and traffic "
+            "rule is not violated.");
 
 // planning config file
 DEFINE_string(planning_config_file,

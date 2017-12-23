@@ -116,6 +116,8 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
+  bool IsRightTurnPath() const;
+
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
