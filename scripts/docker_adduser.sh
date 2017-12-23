@@ -64,4 +64,4 @@ if [ "$RELEASE_DOCKER" != "1" ];then
 fi
 
 # start supervisord
-supervisord -c /apollo/tools/supervisord.conf
+supervisord -c /apollo/modules/tools/supervisord/conf/supervisord.conf
