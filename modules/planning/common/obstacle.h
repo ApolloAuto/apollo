@@ -71,7 +71,10 @@ class Obstacle {
   const common::math::Polygon2d &PerceptionPolygon() const;
 
   const prediction::Trajectory &Trajectory() const;
+
   bool HasTrajectory() const { return has_trajectory_; }
+
+  double Speed() const;
 
   const perception::PerceptionObstacle &Perception() const;
 
@@ -102,6 +105,7 @@ class Obstacle {
   bool is_static_ = false;
   bool is_virtual_ = false;
   bool has_trajectory_ = false;
+  double speed_ = 0.0;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   common::math::Box2d perception_bounding_box_;

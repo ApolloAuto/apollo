@@ -119,8 +119,6 @@ class ReferenceLineInfo {
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
-
   void MakeDecision(DecisionResult* decision_result) const;
   int MakeMainStopDecision(DecisionResult* decision_result) const;
   void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
@@ -136,7 +134,7 @@ class ReferenceLineInfo {
    */
   double cost_ = 0.0;
 
-  bool is_drivable_ = false;
+  bool is_drivable_ = true;
 
   PathDecision path_decision_;
 

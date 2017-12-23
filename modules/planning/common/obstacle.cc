@@ -61,6 +61,8 @@ Obstacle::Obstacle(const std::string& id,
 
   is_static_ = IsStaticObstacle(perception_obstacle);
   is_virtual_ = IsVirtualObstacle(perception_obstacle);
+  speed_ = std::hypot(perception_obstacle_.velocity().x(),
+                      perception_obstacle_.velocity().y());
 }
 
 Obstacle::Obstacle(const std::string& id,
@@ -81,6 +83,8 @@ Obstacle::Obstacle(const std::string& id,
 
     trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
   }
+  speed_ = std::hypot(perception_obstacle_.velocity().x(),
+                      perception_obstacle_.velocity().y());
 }
 
 bool Obstacle::IsStatic() const { return is_static_; }
@@ -100,6 +104,8 @@ bool Obstacle::IsVirtualObstacle(
     const PerceptionObstacle& perception_obstacle) {
   return perception_obstacle.id() < 0;
 }
+
+double Obstacle::Speed() const { return speed_; }
 
 common::TrajectoryPoint Obstacle::GetPointAtTime(
     const double relative_time) const {

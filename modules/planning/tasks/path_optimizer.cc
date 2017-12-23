@@ -32,7 +32,6 @@ apollo::common::Status PathOptimizer::Execute(
       reference_line_info->speed_data(), reference_line_info->reference_line(),
       frame->PlanningStartPoint(), reference_line_info->mutable_path_data());
   RecordDebugInfo(reference_line_info->path_data());
-
   return ret;
 }
 

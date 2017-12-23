@@ -200,6 +200,10 @@ DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(yield_min_distance, 3.0,
               "min yield distance for vehicles/bicycles/moving objects");
+DEFINE_double(overtake_min_time, 1.0,
+              "min yield distance for vehicles/bicycles/moving objects");
+DEFINE_double(overtake_min_distance, 3.0,
+              "min yield distance for vehicles/bicycles/moving objects");
 DEFINE_double(
     follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");

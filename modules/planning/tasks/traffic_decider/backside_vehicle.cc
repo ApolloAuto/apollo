@@ -65,12 +65,37 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
   }
 }
 
+void BacksideVehicle::MakeChangeLaneObstacleDecision(
+    const SLBoundary& adc_sl_boundary, PathDecision* path_decision) {
+  ObjectDecisionType overtake;
+  const std::string rule_id = RuleConfig::RuleId_Name(config_.rule_id());
+  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+    const auto& sl_boundary = path_obstacle->perception_sl_boundary();
+    if (sl_boundary.start_s() > adc_sl_boundary.end_s()) {
+      // car is in front of us.
+      continue;
+    }
+    double overtake_distance =
+        std::max(FLAGS_overtake_min_distance,
+                 path_obstacle->obstacle()->Speed() * FLAGS_overtake_min_time);
+    if (sl_boundary.end_s() >= adc_sl_boundary.start_s() - overtake_distance) {
+      // overlap with our car on in blind zone, cancel change lane.,
+      reference_line_info_->SetDriable(false);
+      ADEBUG << "Reference line " << reference_line_info_->Lanes().Id()
+             << " is not drivable";
+      return;
+    }
+  }
+}
+
 bool BacksideVehicle::ApplyRule(Frame*,
                                 ReferenceLineInfo* const reference_line_info) {
+  reference_line_info_ = reference_line_info;
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
-  if (reference_line_info->Lanes()
-          .IsOnSegment()) {  // The lane keeping reference line.
+  if (reference_line_info->IsChangeLanePath()) {
+    MakeChangeLaneObstacleDecision(adc_sl_boundary, path_decision);
+  } else {
     MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision);
   }
   return true;
