@@ -73,6 +73,9 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
+                    if (options.hideOptions[key]) {
+                        return null;
+                    }
                     return (
                         <MenuItemCheckbox key={key} id={key} title={item}
                         options={options}/>
@@ -82,6 +85,9 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
+                    if (options.hideOptions[key]) {
+                        return null;
+                    }
                     return (
                         <RadioItem key={`${tabId}_${key}`} id={tabId}
                                    onClick={() => {
@@ -111,6 +117,7 @@ class SubMenu extends React.Component {
 export default class Menu extends React.Component {
     render() {
         const { options } = this.props;
+
         const subMenu = Object.keys(menuData)
             .map(key => {
                 const item = menuData[key];
