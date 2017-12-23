@@ -40,9 +40,11 @@ using apollo::common::SpeedPoint;
 
 QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
                                  const QpStSpeedConfig& qp_st_speed_config,
-                                 const VehicleParam& veh_param)
+                                 const VehicleParam& veh_param,
+                                 const bool is_change_lane)
     : spline_generator_(spline_generator),
       qp_st_speed_config_(qp_st_speed_config),
+      is_change_lane_(is_change_lane),
       t_knots_resolution_(
           qp_st_speed_config_.total_time() /
           qp_st_speed_config_.qp_spline_config().number_of_discrete_graph_t()) {
@@ -548,6 +550,13 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
       } else {
         speed_upper_bound->push_back(speed_limit_points.back().second);
       }
+    }
+  }
+
+  if (is_change_lane_) {
+    constexpr double kLaneChangeSpeedBoost = 1.05;
+    for (uint32_t k = 0; k < t_evaluated_.size(); ++k) {
+      speed_upper_bound->at(k) *= kLaneChangeSpeedBoost;
     }
   }
 
