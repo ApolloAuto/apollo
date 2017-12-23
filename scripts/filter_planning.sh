@@ -95,6 +95,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 function filter() {
     target=""
+    name=$(basename $1)
     if $is_perfect_control; then
         target="$2/${name%.*}.pc.bag"
         rosbag filter $1 "$target" "$perfect_control_topic"
@@ -114,10 +115,9 @@ function filter() {
 }
 
 for bag in $@; do
-   name=$(basename $bag)
    folder=""
    if [ -z $target_dir ] ; then
-     folder="${bag%/*}"
+     folder="$(dirname $bag)"
    else
       folder=$target_dir
    fi
