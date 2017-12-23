@@ -204,7 +204,7 @@ DEFINE_double(
     follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
 DEFINE_double(
-    follow_min_time_sec, 3.0,
+    follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
 
 DEFINE_string(destination_obstacle_id, "DEST",
