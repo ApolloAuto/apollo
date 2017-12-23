@@ -259,6 +259,30 @@ dkappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
+dpPolyGraph:
+    title: 'DP Path'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                labelString: 'l (m)'
+    properties:
+        lines:
+            minCostPoint:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 2
+                fill: false
+                showLine: true
+            sampleLayer:
+                color: 'rgba(225, 225, 225, 0.5)' # white
+                borderWidth: 0
+                pointRadius: 4
+                fill: false
+                showLine: false
 latencyGraph:
     title: 'Latency'
     options:
