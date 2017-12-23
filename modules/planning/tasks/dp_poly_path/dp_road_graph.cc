@@ -175,7 +175,8 @@ bool DPRoadGraph::GenerateMinCostPath(
 
         // try to connect the current point with the first point directly
         // only do this at lane change
-        if (reference_line_info_.IsChangeLanePath() && level >= 2) {
+        if (reference_line_info_.IsChangeLanePath() && IsSafeForLaneChange() &&
+            level >= 2) {
           init_dl = init_frenet_frame_point_.dl();
           init_ddl = init_frenet_frame_point_.ddl();
           QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
@@ -251,7 +252,10 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    const double kDeafultUnitL = 0.30;
+    double kDeafultUnitL = 0.30;
+    if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
+      kDeafultUnitL = 0.7;
+    }
     const double sample_l_range =
         kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
     double sample_right_boundary =
@@ -270,9 +274,13 @@ bool DPRoadGraph::SamplePathWaypoints(
     }
 
     std::vector<double> sample_l;
-    common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
-                                config_.sample_points_num_each_level() - 1,
-                                &sample_l);
+    if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
+      sample_l.push_back(init_sl_point_.l());
+    } else {
+      common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
+                                  config_.sample_points_num_each_level() - 1,
+                                  &sample_l);
+    }
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
@@ -300,6 +308,32 @@ bool DPRoadGraph::SamplePathWaypoints(
           ->add_sample_layer()
           ->CopyFrom(sample_layer_debug);
       points->emplace_back(level_points);
+    }
+  }
+  return true;
+}
+
+bool DPRoadGraph::IsSafeForLaneChange() {
+  if (!reference_line_info_.IsChangeLanePath()) {
+    AERROR << "Not a change lane path.";
+    return false;
+  }
+
+  for (const auto &path_obstacle :
+       reference_line_info_.path_decision().path_obstacles().Items()) {
+    const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+    const auto &adc_sl_boundary = reference_line_info_.AdcSlBoundary();
+
+    constexpr double kLateralShift = 2.5;
+    if (sl_boundary.start_l() < -kLateralShift ||
+        sl_boundary.end_l() > kLateralShift) {
+      continue;
+    }
+
+    constexpr double kSafeDistance = 5.0;
+    if (sl_boundary.end_s() > adc_sl_boundary.start_s() - kSafeDistance &&
+        sl_boundary.start_s() < adc_sl_boundary.end_s() + kSafeDistance) {
+      return false;
     }
   }
   return true;
