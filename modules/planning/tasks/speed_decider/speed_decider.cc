@@ -245,7 +245,7 @@ void SpeedDecider::CreateYieldDecision(
   auto* yield = yield_decision->mutable_yield();
 
   // in meters
-  constexpr double kMinYieldDistance = 10.0;
+  const double kMinYieldDistance = FLAGS_yield_min_distance;
   const double yield_distance_s =
       std::max(-boundary.min_s(), -1.0 * kMinYieldDistance);
   yield->set_distance_s(yield_distance_s);
