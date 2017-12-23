@@ -39,26 +39,46 @@ void EvaluatorManager::RegisterEvaluators() {
 void EvaluatorManager::Init(const PredictionConf& config) {
   for (const auto& obstacle_conf : config.obstacle_conf()) {
     if (!obstacle_conf.has_obstacle_type()) {
-      ADEBUG << "Obstacle config [" << obstacle_conf.ShortDebugString()
-             << "] has not defined obstacle type, status or evaluator type.";
+      AERROR << "Obstacle config [" << obstacle_conf.ShortDebugString()
+             << "] has not defined obstacle type.";
       continue;
     }
 
-    if (obstacle_conf.obstacle_type() == PerceptionObstacle::VEHICLE) {
-      if (!obstacle_conf.has_obstacle_status() ||
-          !obstacle_conf.has_evaluator_type()) {
-        ADEBUG << "Vehicle obstacle config ["
-               << obstacle_conf.ShortDebugString()
-               << "] has not defined obstacle status and evaluator type.";
-        continue;
-      } else if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-        vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+    if (!obstacle_conf.has_evaluator_type()) {
+      ADEBUG << "Obstacle config [" << obstacle_conf.ShortDebugString()
+             << "] has not defined evaluator type.";
+      continue;
+    }
+
+    if (obstacle_conf.has_obstacle_status() &&
+        obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+      switch (obstacle_conf.obstacle_type()) {
+        case PerceptionObstacle::VEHICLE: {
+          vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+          break;
+        }
+        case PerceptionObstacle::BICYCLE: {
+          cyclist_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+          break;
+        }
+        case PerceptionObstacle::PEDESTRIAN: {
+          break;
+        }
+        case PerceptionObstacle::UNKNOWN: {
+          default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+          break;
+        }
+        default: { break; }
       }
     }
   }
 
   AINFO << "Defined vehicle on lane obstacle evaluator ["
         << vehicle_on_lane_evaluator_ << "]";
+  AINFO << "Defined cyclist on lane obstacle evaluator ["
+        << cyclist_on_lane_evaluator_ << "]";
+  AINFO << "Defined default on lane obstacle evaluator ["
+        << default_on_lane_evaluator_ << "]";
 }
 
 Evaluator* EvaluatorManager::GetEvaluator(
@@ -101,9 +121,19 @@ void EvaluatorManager::Run(
         }
         break;
       }
+      case PerceptionObstacle::BICYCLE: {
+        if (obstacle->IsOnLane()) {
+          evaluator = GetEvaluator(cyclist_on_lane_evaluator_);
+          CHECK_NOTNULL(evaluator);
+        }
+        break;
+      }
+      case PerceptionObstacle::PEDESTRIAN: {
+        break;
+      }
       default: {
         if (obstacle->IsOnLane()) {
-          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+          evaluator = GetEvaluator(default_on_lane_evaluator_);
           CHECK_NOTNULL(evaluator);
         }
         break;
