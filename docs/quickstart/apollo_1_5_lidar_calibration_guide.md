@@ -30,6 +30,7 @@ To calibrate the sensors it is important to prepare using the following steps:
 The topics required by the calibration service are shown in the following Table 1:
 
 Table 1. Sensor topics.
+
 | Sensor    | Topic Name                               | Topic Feq. (Hz) |
 | --------- | ---------------------------------------- | --------------- |
 | HDL-64ES3 | /apollo/sensor/velodyne64/VelodyneScanUnified | 10              |
