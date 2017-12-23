@@ -198,11 +198,13 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 2.0,
               "min follow distance for vehicles/bicycles/moving objects");
+DEFINE_double(yield_min_distance, 3.0,
+              "min yield distance for vehicles/bicycles/moving objects");
 DEFINE_double(
     follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
 DEFINE_double(
-    follow_min_time_sec, 3.0,
+    follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
 
 DEFINE_string(destination_obstacle_id, "DEST",
@@ -237,8 +239,12 @@ DEFINE_bool(enable_rule_layer, true,
 /// common
 DEFINE_double(stop_max_distance_buffer, 4.0,
               "distance buffer of passing stop line");
-DEFINE_double(stop_min_speed, 0.1, "min speed for computing stop");
+DEFINE_double(stop_min_speed, 0.2, "min speed(m/s) for computing stop");
 DEFINE_double(stop_max_deceleration, 6.0, "max deceleration");
+DEFINE_double(max_valid_stop_distance, 2.0,
+              "max distance(m) to the stop line to be "
+              "considered as a valid stop");
+
 /// Clear Zone
 DEFINE_string(clear_zone_virtual_object_id_prefix, "CZ_",
               "prefix for converting clear zone id to virtual object id");
@@ -260,6 +266,15 @@ DEFINE_double(crosswalk_strick_l_distance, 4.0,
               "strick stop rule within this l_distance");
 DEFINE_double(crosswalk_loose_l_distance, 5.0,
               "loose stop rule beyond this l_distance");
+/// stop_sign
+DEFINE_bool(enable_stop_sign, false, "enable stop_sign");
+DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
+              "prefix for converting stop_sign id to virtual object id");
+DEFINE_double(stop_duration_for_stop_sign, 3,
+              "min time(second) to stop at stop sign");
+DEFINE_double(max_distance_stop_sign_waiting_area, 3,
+              "max distance(meter) to be considered as "
+              "having arrived stop sign waiting area");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.

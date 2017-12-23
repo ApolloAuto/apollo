@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_PATH_DECISION_H_
 #define MODULES_PLANNING_COMMON_PATH_DECISION_H_
 
+#include <limits>
 #include <list>
 #include <memory>
 #include <string>
@@ -55,9 +56,16 @@ class PathDecision {
 
   void SetStBoundary(const std::string &id, const StBoundary &boundary);
   void EraseStBoundaries();
+  MainStop main_stop() const { return main_stop_; }
+  double stop_reference_line_s() const { return stop_reference_line_s_; }
+  bool MergeWithMainStop(const ObjectStop &obj_stop, const std::string &obj_id,
+                         const ReferenceLine &ref_line,
+                         const SLBoundary &adc_sl_boundary);
 
  private:
   IndexedList<std::string, PathObstacle> path_obstacles_;
+  MainStop main_stop_;
+  double stop_reference_line_s_ = std::numeric_limits<double>::max();
 };
 
 }  // namespace planning
