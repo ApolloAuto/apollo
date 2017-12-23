@@ -33,6 +33,7 @@
 
 #include "modules/prediction/container/container.h"
 #include "modules/common/math/line_segment2d.h"
+#include "modules/common/math/polygon2d.h"
 
 namespace apollo {
 namespace prediction {
@@ -75,10 +76,16 @@ class ADCTrajectoryContainer : public Container {
    */
   bool IsProtected() const;
 
+  bool IsPointInJunction(const apollo::common::math::Vec2d& point) const;
+
   bool ContainsLaneId(const std::string& lane_id) const;
 
  private:
+  apollo::common::math::Polygon2d GetJunctionPolygon();
+
+ private:
   apollo::planning::ADCTrajectory adc_trajectory_;
+  apollo::common::math::Polygon2d junction_polygon_;
   std::unordered_set<std::string> reference_line_lane_ids_;
   static std::mutex g_mutex_;
 };
