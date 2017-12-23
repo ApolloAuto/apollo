@@ -109,7 +109,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   QpSplineStGraph st_graph(spline_generator_.get(), qp_st_speed_config_,
-                           veh_param);
+                           veh_param, reference_line_info_->IsChangeLanePath());
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.discretized_path().Length());
