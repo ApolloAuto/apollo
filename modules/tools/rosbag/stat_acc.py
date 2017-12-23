@@ -16,9 +16,9 @@
 # limitations under the License.
 ###############################################################################
 """
-Stat disengagements and auto/manual driving mileage.
+Stat acc in time sequence.
 Usage:
-    ./stat_mileage.py bag1 bag2 ...
+    ./stat_acc.py bag1 bag2 ...
 """
 
 import sys
@@ -27,7 +27,6 @@ import datetime
 
 from rosbag.bag import Bag
 
-from modules.canbus.proto.chassis_pb2 import Chassis
 
 kChassisTopic = '/apollo/canbus/chassis'
 kLocalizationTopic = '/apollo/localization/pose'
