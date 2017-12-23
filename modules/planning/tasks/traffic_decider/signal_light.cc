@@ -209,6 +209,14 @@ bool SignalLight::CreateStopObstacle(
   stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
   stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
   stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
+
+  if (!path_decision->MergeWithMainStop(stop.stop(), stop_wall->Id(),
+                                        reference_line_info->reference_line(),
+                                        reference_line_info->AdcSlBoundary())) {
+    ADEBUG << "signal " << signal_light->object_id
+           << " is not the cloest stop.";
+    return false;
+  }
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
   return true;
