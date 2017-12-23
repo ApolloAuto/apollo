@@ -137,7 +137,7 @@ class PredictionMap {
   /**
    * @brief Get nearby lanes by a position and current lanes.
    * @param point The position to search its nearby lanes.
-   * @param heading The heading.
+   * @param heading The heading of an obstacle.
    * @param radius The searching radius.
    * @param lanes The current lanes.
    * @param nearby_lanes The searched nearby lanes.
@@ -147,8 +147,14 @@ class PredictionMap {
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
-  std::vector<std::string> NearbyLaneIds(
-      const double x, const double y, const double radius);
+  /**
+   * @brief Get nearby lanes by a position.
+   * @param point The position to search its nearby lanes.
+   * @param radius The searching radius.
+   * @return A vector of nearby lane IDs.
+   */
+  std::vector<std::string> NearbyLaneIds(const Eigen::Vector2d& point,
+                                         const double radius);
 
   /**
    * @brief Check if a lane is a left neighbor of another lane.
