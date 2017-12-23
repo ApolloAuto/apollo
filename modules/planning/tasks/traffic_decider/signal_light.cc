@@ -142,11 +142,10 @@ void SignalLight::SetCreepForwardSignalDecision(
     const ReferenceLineInfo* reference_line_info,
     hdmap::PathOverlap* const signal_light) const {
   CHECK_NOTNULL(signal_light);
-  AERROR << "set creep.";
 
   constexpr double kMaxCreepSpeed = 1.0;
   if (reference_line_info->AdcPlanningPoint().v() > kMaxCreepSpeed) {
-    AERROR << "large speed.";
+    ADEBUG << "Do not creep forward due to large speed.";
     return;
   }
 
@@ -158,13 +157,13 @@ void SignalLight::SetCreepForwardSignalDecision(
         signal_light->start_s - FLAGS_stop_distance_traffic_light;
     if (reference_line_info->AdcSlBoundary().end_s() + st_boundary.min_s() <
         stop_s + kCreepBuff) {
-      AERROR << "close obs.";
+      AERROR << "Do not creep forward because obstacles are close.";
       return;
     }
   }
   signal_light->start_s = reference_line_info->AdcSlBoundary().end_s() +
                           FLAGS_stop_distance_traffic_light + kCreepBuff;
-  AERROR << "Creep s = " << signal_light->start_s;
+  ADEBUG << "Creep forward s = " << signal_light->start_s;
 }
 
 TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
