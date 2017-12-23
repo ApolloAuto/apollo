@@ -4,6 +4,7 @@ This release supports that vehicles autonomously drive on simple urban roads. Ve
 ## Major Features And Improvements
 * Add traffic light detection
 * Add obstacle classification and support obstacle categories: _vehicle_, _pedestrian_, _cyclist_ and _unknown_
+* Upgrade planning capability to change lanes in order to reach the destination
 * Add point cloud based localization algorithm fusion with RTK
 * Add MPC based control algorithm
 * Add RNN model for traffic prediction
