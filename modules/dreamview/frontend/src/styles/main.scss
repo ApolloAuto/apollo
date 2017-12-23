@@ -1175,13 +1175,14 @@ body {
     }
 
     .offline-loader {
-        width: 80%;
+        width: 60%;
 
         .status-message {
             position: relative;
-            top: -80px;
-
-            font-size: 3.5vw;
+            top: -70px;
+            /* fallback */
+            top: -4.5vw;
+            font-size: 3vw;
         }
     }
 }

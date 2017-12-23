@@ -53,10 +53,10 @@ export default [
         title: 'Planning',
         type: 'checkbox',
         data: {
-            planningReference: 'Reference Line',
-            planingDpOptimizer: 'Dp Optimizer Line',
-            planningQpOptimizer: 'Qp Optimizer Line',
             planningLine: 'Planning Line',
+            planningQpOptimizer: 'Qp Optimizer Line',
+            planingDpOptimizer: 'Dp Optimizer Line',
+            planningReference: 'Reference Line',
         }
     },
 ];
