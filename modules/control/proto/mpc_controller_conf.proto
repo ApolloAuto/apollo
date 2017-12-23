@@ -29,5 +29,6 @@ message MPCControllerConf {
   optional apollo.control.GainScheduler lat_err_gain_scheduler = 18;
   optional apollo.control.GainScheduler heading_err_gain_scheduler = 19;
   optional apollo.control.GainScheduler steer_weight_gain_scheduler = 20;
-  optional calibrationtable.ControlCalibrationTable calibration_table = 21;
+  optional apollo.control.GainScheduler feedforwardterm_gain_scheduler = 21;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 22;
 }

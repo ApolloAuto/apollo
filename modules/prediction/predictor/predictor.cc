@@ -16,18 +16,19 @@
 
 #include "modules/prediction/predictor/predictor.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "Eigen/Dense"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::planning::ADCTrajectory;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Vec2d;
+using apollo::planning::ADCTrajectory;
 
 const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;
@@ -71,9 +72,10 @@ bool Predictor::TrimTrajectory(
   while (index < num_point) {
     double x = trajectory->trajectory_point(index).path_point().x();
     double y = trajectory->trajectory_point(index).path_point().y();
+    Eigen::Vector2d point(x, y);
     std::vector<std::string> lane_ids =
-        PredictionMap::instance()->NearbyLaneIds(x, y,
-            FLAGS_distance_to_adc_trajectory_thred);
+        PredictionMap::instance()->NearbyLaneIds(
+            point, FLAGS_distance_to_adc_trajectory_thred);
     for (const std::string& lane_id : lane_ids) {
       if (adc_trajectory_container->ContainsLaneId(lane_id)) {
         has_intersect = true;
