@@ -103,6 +103,7 @@ class DPRoadGraph {
 
   bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
                             common::FrenetFramePoint *const frenet_frame_point);
+  bool IsSafeForLaneChange();
 
  private:
   DpPolyPathConfig config_;
