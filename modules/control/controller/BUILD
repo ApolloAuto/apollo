@@ -169,4 +169,24 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "mpc_controller_test",
+    size = "small",
+    srcs = [
+        "mpc_controller_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":mpc_controller",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+        "//modules/planning/proto:planning_proto",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
