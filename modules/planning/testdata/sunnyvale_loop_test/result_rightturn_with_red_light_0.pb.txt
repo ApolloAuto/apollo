@@ -1712,13 +1712,13 @@ decision {
       perception_id: 1573
       object_decision {
         yield {
-          distance_s: -10
+          distance_s: -3
           fence_point {
-            x: 587713.72818514786
-            y: 4141429.6310461597
+            x: 587712.6888208132
+            y: 4141422.7190683438
             z: 0
           }
-          fence_heading: -1.6004622725040096
+          fence_heading: -1.7940424938554311
         }
       }
     }

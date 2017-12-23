@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_PATH_DECISION_H_
 #define MODULES_PLANNING_COMMON_PATH_DECISION_H_
 
+#include <limits>
 #include <list>
 #include <memory>
 #include <string>
