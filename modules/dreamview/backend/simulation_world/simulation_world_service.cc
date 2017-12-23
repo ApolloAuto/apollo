@@ -649,6 +649,9 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   // Update SL Frame
   planning_data_.mutable_sl_frame()->CopyFrom(data.sl_frame());
 
+  // Update DP path
+  planning_data_.mutable_dp_poly_graph()->CopyFrom(data.dp_poly_graph());
+
   // Update ST Graph
   planning_data_.clear_st_graph();
   for (auto &graph : data.st_graph()) {
