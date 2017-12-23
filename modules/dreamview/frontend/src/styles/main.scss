@@ -1140,7 +1140,7 @@ body {
         position: relative;
         top: 50%;
         left: 50%;
-        width: 50%;
+        width: 40%;
         transform: translate(-50%, -50%);
 
         img {
@@ -1152,7 +1152,7 @@ body {
             margin-top: 10px;
             font-size: 18px;
             /* fallback */
-            font-size: 2vw;
+            font-size: 1.7vw;
             color: #FFFFFF;
             text-align: center;
 
@@ -1175,13 +1175,14 @@ body {
     }
 
     .offline-loader {
-        width: 80%;
+        width: 60%;
 
         .status-message {
             position: relative;
-            top: -80px;
-
-            font-size: 3.5vw;
+            top: -70px;
+            /* fallback */
+            top: -4.5vw;
+            font-size: 3vw;
         }
     }
 }
