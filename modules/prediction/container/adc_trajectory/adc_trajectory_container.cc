@@ -16,14 +16,22 @@
 
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
+#include <vector>
+#include <memory>
+
+#include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/common/prediction_gflags.h"
+
 namespace apollo {
 namespace prediction {
 
 using apollo::planning::ADCTrajectory;
 using apollo::common::math::LineSegment2d;
+using apollo::common::math::Polygon2d;
 using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
 using apollo::common::math::Vec2d;
+using apollo::hdmap::JunctionInfo;
 
 std::mutex ADCTrajectoryContainer::g_mutex_;
 
@@ -35,11 +43,19 @@ void ADCTrajectoryContainer::Insert(
   for (const auto& lane_id : adc_trajectory_.lane_id()) {
     reference_line_lane_ids_.insert(lane_id.id());
   }
+  junction_polygon_ = GetJunctionPolygon();
 }
 
 const ADCTrajectory* ADCTrajectoryContainer::GetADCTrajectory() {
   std::lock_guard<std::mutex> lock(g_mutex_);
   return &adc_trajectory_;
+}
+
+bool ADCTrajectoryContainer::IsPointInJunction(const Vec2d& point) const {
+  if (junction_polygon_.num_points() < 3) {
+    return false;
+  }
+  return junction_polygon_.IsPointIn(point);
 }
 
 std::vector<LineSegment2d>
@@ -74,6 +90,48 @@ bool ADCTrajectoryContainer::IsProtected() const {
 bool ADCTrajectoryContainer::ContainsLaneId(const std::string& lane_id) const {
   return reference_line_lane_ids_.find(lane_id) !=
          reference_line_lane_ids_.end();
+}
+
+Polygon2d ADCTrajectoryContainer::GetJunctionPolygon() {
+  int num_point = adc_trajectory_.trajectory_point_size();
+  if (num_point == 0) {
+    return Polygon2d{};
+  }
+  std::shared_ptr<const JunctionInfo> junction_info(nullptr);
+  double prev_s = 0.0;
+  for (int i = 0; i < num_point; ++i) {
+    double s = adc_trajectory_.trajectory_point(i).path_point().s();
+    if (i > 0 &&
+        std::abs(s - prev_s) < FLAGS_junction_search_radius) {
+      continue;
+    }
+    if (s > FLAGS_adc_trajectory_search_length) {
+      break;
+    }
+    prev_s = s;
+    double x = adc_trajectory_.trajectory_point(i).path_point().x();
+    double y = adc_trajectory_.trajectory_point(i).path_point().y();
+    std::vector<std::shared_ptr<const JunctionInfo>> junctions =
+        PredictionMap::instance()->GetJunctions(
+            {x, y}, FLAGS_junction_search_radius);
+    if (junctions.empty()) {
+      continue;
+    } else {
+      junction_info = junctions.front();
+      break;
+    }
+  }
+  if (junction_info == nullptr) {
+    return Polygon2d{};
+  }
+
+  const apollo::hdmap::Polygon& junction_polygon =
+      junction_info->junction().polygon();
+  std::vector<Vec2d> vertices;
+  for (const auto& point : junction_polygon.point()) {
+    vertices.emplace_back(point.x(), point.y());
+  }
+  return Polygon2d{vertices};
 }
 
 }  // namespace prediction

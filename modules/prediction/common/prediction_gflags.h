@@ -80,6 +80,8 @@ DECLARE_double(distance_to_adc_trajectory_thred);
 DECLARE_double(time_to_adc_trajectory_thred);
 DECLARE_double(junction_distance_thred);
 DECLARE_double(ahead_junction_thred);
+DECLARE_double(adc_trajectory_search_length);
+DECLARE_double(junction_search_radius);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);
