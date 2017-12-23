@@ -110,6 +110,7 @@ DECLARE_double(stop_distance_traffic_light);
 DECLARE_double(destination_check_distance);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
+DECLARE_double(yield_min_distance);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
 

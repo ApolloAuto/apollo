@@ -198,6 +198,8 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 2.0,
               "min follow distance for vehicles/bicycles/moving objects");
+DEFINE_double(yield_min_distance, 3.0,
+              "min yield distance for vehicles/bicycles/moving objects");
 DEFINE_double(
     follow_time_buffer, 2.0,
     "follow time buffer (in second) to calculate the following distance.");
