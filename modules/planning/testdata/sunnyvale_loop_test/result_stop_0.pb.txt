@@ -1743,36 +1743,6 @@ decision {
         }
       }
     }
-    decision {
-      id: "SL_1076"
-      perception_id: -1651052487
-      object_decision {
-        stop {
-          distance_s: -3
-          stop_point {
-            x: 587049.8874920184
-            y: 4141556.5172797395
-            z: 0
-          }
-          stop_heading: 1.0479851156932718
-        }
-      }
-    }
-    decision {
-      id: "SL_1055"
-      perception_id: 502372993
-      object_decision {
-        stop {
-          distance_s: -3
-          stop_point {
-            x: 587049.8874920184
-            y: 4141556.5172797395
-            z: 0
-          }
-          stop_heading: 1.0479851156932718
-        }
-      }
-    }
   }
   vehicle_signal {
     turn_signal: TURN_RIGHT
