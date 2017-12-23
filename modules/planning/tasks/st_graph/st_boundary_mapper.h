@@ -76,6 +76,7 @@ class StBoundaryMapper {
   apollo::common::Status MapWithPredictionTrajectory(
       PathObstacle* path_obstacle) const;
 
+  FRIEND_TEST(StBoundaryMapperTest, get_centric_acc_limit);
   double GetCentricAccLimit(const double kappa) const;
 
   void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
