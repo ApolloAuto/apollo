@@ -87,16 +87,14 @@ bool Predictor::TrimTrajectory(
                    forward_length * std::cos(heading);
   double start_y = trajectory->trajectory_point(0).path_point().y() +
                    forward_length * std::sin(heading);
-  if (PredictionMap::instance()->NearJunction(
-          {start_x, start_y}, FLAGS_junction_distance_thred)) {
+  if (adc_trajectory_container->IsPointInJunction({start_x, start_y})) {
     return false;
   }
   int index = 0;
   while (index < num_point) {
     double x = trajectory->trajectory_point(index).path_point().x();
     double y = trajectory->trajectory_point(index).path_point().y();
-    if (PredictionMap::instance()->NearJunction(
-            {x, y}, FLAGS_junction_distance_thred)) {
+    if (adc_trajectory_container->IsPointInJunction({x, y})) {
       break;
     }
     ++index;
