@@ -50,7 +50,7 @@ work_mode_num=0
 
 #argument parsing code from https://stackoverflow.com/a/14203146
 POSITIONAL=()
-target_dir="."
+target_dir=""
 while [[ $# -gt 0 ]]; do
 key="$1"
 case $key in
@@ -92,26 +92,35 @@ fi
 
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+
 function filter() {
+    target=""
     if $is_perfect_control; then
-        target="${name%.*}.pc.bag"
-        rosbag filter $1 "$target_dir/$target" "$perfect_control_topic"
+        target="$2/${name%.*}.pc.bag"
+        rosbag filter $1 "$target" "$perfect_control_topic"
+
     fi
 
     if $is_no_planning; then
-        target="${name%.*}.np.bag"
-        rosbag filter $1 "$target_dir/$target" "$planning_deps"
+        target="$2/${name%.*}.np.bag"
+        rosbag filter $1 "$target" "$planning_deps"
     fi
 
     if $is_with_planning; then
-        target="${name%.*}.wp.bag"
-        rosbag filter $1 "$target_dir/$target" "$planning_all"
+        target="$2/${name%.*}.wp.bag"
+        rosbag filter $1 "$target" "$planning_all"
     fi
+    echo "filtered ${bag} to $target"
 }
 
 for bag in $@; do
-    name=$(basename $bag)
-    echo "filtering ${bag}"
-    filter $bag
+   name=$(basename $bag)
+   folder=""
+   if [ -z $target_dir ] ; then
+     folder="${bag%/*}"
+   else
+      folder=$target_dir
+   fi
+   filter $bag $folder
 done
 
