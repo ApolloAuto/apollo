@@ -134,8 +134,19 @@ bool PathDecider::MakeStaticObstacleDecision(
       // stop
       *object_decision.mutable_stop() =
           GenerateObjectStopDecision(*path_obstacle);
-      path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
-                                             object_decision);
+
+      if (path_decision->MergeWithMainStop(
+              object_decision.stop(), obstacle.Id(),
+              reference_line_info_->reference_line(),
+              reference_line_info_->AdcSlBoundary())) {
+        path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
+                                               object_decision);
+      } else {
+        ObjectDecisionType object_decision;
+        object_decision.mutable_ignore();
+        path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
+                                               object_decision);
+      }
     } else if (FLAGS_enable_nudge_decision) {
       // nudge
       if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {

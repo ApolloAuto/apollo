@@ -1729,21 +1729,6 @@ decision {
         }
       }
     }
-    decision {
-      id: "867_1"
-      perception_id: 867
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_OBSTACLE
-          distance_s: -3
-          stop_point {
-            x: 587252.94799968787
-            y: 4140931.8336123093
-          }
-          stop_heading: -2.1420620124130152
-        }
-      }
-    }
   }
   vehicle_signal {
     turn_signal: TURN_RIGHT
