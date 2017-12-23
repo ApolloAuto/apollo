@@ -33,6 +33,9 @@ cc_library(
         "pbf_track_object_distance.h",
         "probabilistic_fusion.h",
     ],
+    data = [
+        "//modules/perception/conf:perception_config",
+    ],
     deps = [
         "//modules/common",
         "//modules/common:log",

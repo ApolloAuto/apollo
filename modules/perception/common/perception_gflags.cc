@@ -77,3 +77,14 @@ DEFINE_string(onboard_fusion, "ProbabilisticFusion",
 DEFINE_double(query_signal_range, 100.0, "max distance to front signals");
 DEFINE_bool(output_raw_img, false, "write raw image to disk");
 DEFINE_bool(output_debug_img, false, "write debug image to disk");
+
+/// Temporarily change Kalman motion fusion to config here.
+DEFINE_double(q_matrix_coefficient_amplifier, 0.5,
+              "Kalman fitler matrix Q coeffcients");
+DEFINE_double(r_matrix_amplifier, 1, "Kalman fitler matrix r coeffcients");
+DEFINE_double(p_matrix_amplifier, 1, "Kalman fitler matrix p coeffcients");
+
+DEFINE_double(a_matrix_covariance_coeffcient_1, 0.05,
+              "Kalman fitler matrix a coeffcients, a_matrix_(0, 2)");
+DEFINE_double(a_matrix_covariance_coeffcient_2, 0.05,
+              "Kalman fitler matrix a coeffcients, a_matrix_(1, 3)");
