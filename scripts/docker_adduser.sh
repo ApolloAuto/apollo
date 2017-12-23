@@ -61,7 +61,8 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
   chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
   chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
+  supervisord -c /apollo/modules/tools/supervisord/dev.conf
+else
+  supervisord -c /apollo/modules/tools/supervisord/release.conf
 fi
 
-# start supervisord
-supervisord -c /apollo/modules/tools/supervisord/conf/supervisord.conf
