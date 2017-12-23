@@ -27,6 +27,7 @@ message RuleConfig {
     REROUTING = 5;
     REFERENCE_LINE_END = 6;
     DESTINATION = 7;
+    STOP_SIGN = 8;
   }
   optional RuleId rule_id = 1;
 }
