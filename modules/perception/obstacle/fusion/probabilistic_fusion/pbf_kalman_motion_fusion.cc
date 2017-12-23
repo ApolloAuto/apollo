@@ -16,6 +16,7 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 
@@ -53,8 +54,8 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   }
 
   a_matrix_.setIdentity();
-  a_matrix_(0, 2) = 0.05;
-  a_matrix_(1, 3) = 0.05;
+  a_matrix_(0, 2) = FLAGS_a_matrix_covariance_coeffcient_1;
+  a_matrix_(1, 3) = FLAGS_a_matrix_covariance_coeffcient_1;
   // initialize states to the states of the detected obstacle
   posteriori_state_(0) = belief_anchor_point_(0);
   posteriori_state_(1) = belief_anchor_point_(1);
@@ -63,18 +64,22 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
   priori_state_ = posteriori_state_;
 
   q_matrix_.setIdentity();
-  q_matrix_ *= 0.5;
+  q_matrix_ *= FLAGS_q_matrix_coefficient_amplifier;
 
   r_matrix_.setIdentity();
   r_matrix_.topLeftCorner(2, 2) =
+      FLAGS_r_matrix_amplifier *
       new_object->object->position_uncertainty.topLeftCorner(2, 2);
   r_matrix_.block<2, 2>(2, 2) =
+      FLAGS_r_matrix_amplifier *
       new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
 
   p_matrix_.setIdentity();
   p_matrix_.topLeftCorner(2, 2) =
+      FLAGS_p_matrix_amplifier *
       new_object->object->position_uncertainty.topLeftCorner(2, 2);
   p_matrix_.block<2, 2>(2, 2) =
+      FLAGS_p_matrix_amplifier *
       new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
   c_matrix_.setIdentity();
 }
