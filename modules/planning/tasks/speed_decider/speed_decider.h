@@ -58,25 +58,25 @@ class SpeedDecider : public Task {
    **/
   bool CheckIsFollowByT(const StBoundary& boundary) const;
 
-  void CreateStopDecision(const PathObstacle& path_obstacle,
+  bool CreateStopDecision(const PathObstacle& path_obstacle,
                           ObjectDecisionType* const stop_decision) const;
 
   /**
    * @brief create follow decision based on the boundary
    **/
-  void CreateFollowDecision(const PathObstacle& path_obstacle,
+  bool CreateFollowDecision(const PathObstacle& path_obstacle,
                             ObjectDecisionType* const follow_decision) const;
 
   /**
    * @brief create yield decision based on the boundary
    **/
-  void CreateYieldDecision(const StBoundary& boundary,
+  bool CreateYieldDecision(const StBoundary& boundary,
                            ObjectDecisionType* const yield_decision) const;
 
   /**
    * @brief create overtake decision based on the boundary
    **/
-  void CreateOvertakeDecision(
+  bool CreateOvertakeDecision(
       const PathObstacle& path_obstacle,
       ObjectDecisionType* const overtake_decision) const;
 
