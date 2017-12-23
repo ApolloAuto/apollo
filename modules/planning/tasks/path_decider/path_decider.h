@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_TASKS_PATH_DECIDER_PATH_DECIDER_H_
 #define MODULES_PLANNING_TASKS_PATH_DECIDER_PATH_DECIDER_H_
 
+#include <limits>
 #include <string>
 
 #include "modules/planning/tasks/task.h"
