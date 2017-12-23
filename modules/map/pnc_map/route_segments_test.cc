@@ -24,7 +24,8 @@
 
 namespace apollo {
 namespace hdmap {
-DEFINE_string(test_map_file, "modules/map/data/sunnyvale_loop/base_map.xml",
+DEFINE_string(test_map_file,
+              "modules/map/data/sunnyvale_loop/base_map_test.bin",
               "The test map file");
 DEFINE_string(
     test_routing_file,
