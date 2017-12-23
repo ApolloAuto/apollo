@@ -52,6 +52,13 @@ bool Crosswalk::ApplyRule(Frame* frame,
     return true;
   }
 
+  MakeDecisions(frame, reference_line_info);
+  return true;
+}
+
+void Crosswalk::MakeDecisions(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     const PerceptionObstacle& perception_obstacle =
@@ -165,8 +172,6 @@ bool Crosswalk::ApplyRule(Frame* frame,
       }
     }
   }
-
-  return true;
 }
 
 bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
