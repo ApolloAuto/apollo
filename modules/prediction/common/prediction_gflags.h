@@ -78,6 +78,7 @@ DECLARE_bool(enable_trim_prediction_trajectory);
 DECLARE_double(adc_time_step);
 DECLARE_double(distance_to_adc_trajectory_thred);
 DECLARE_double(time_to_adc_trajectory_thred);
+DECLARE_double(junction_distance_thred);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);
