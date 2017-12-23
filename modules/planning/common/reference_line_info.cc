@@ -168,17 +168,8 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     return path_obstacle;
   }
   path_obstacle->SetPerceptionSlBoundary(perception_sl);
+  path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
 
-  if (IsUnrelaventObstacle(path_obstacle)) {
-    ObjectDecisionType ignore;
-    ignore.mutable_ignore();
-    path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
-                                      ignore);
-    path_decision_.AddLongitudinalDecision("reference_line_filter",
-                                           obstacle->Id(), ignore);
-  } else {
-    path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
-  }
   return path_obstacle;
 }
 
@@ -191,21 +182,6 @@ bool ReferenceLineInfo::AddObstacles(
     }
   }
   return true;
-}
-
-bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
-  // if adc is on the road, and obstacle behind adc, ignore
-  if (path_obstacle->perception_sl_boundary().end_s() >
-      reference_line_.Length()) {
-    return true;
-  }
-  if (is_on_reference_line_ &&
-      path_obstacle->perception_sl_boundary().end_s() <
-          adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->perception_sl_boundary())) {
-    return true;
-  }
-  return false;
 }
 
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {

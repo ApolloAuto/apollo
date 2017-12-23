@@ -42,6 +42,14 @@ class BacksideVehicle : public TrafficRule {
    */
   void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
                                        PathDecision* path_decision);
+  /**
+   * @brief Make decision for backside vehicles where there is change lane.
+   */
+  void MakeChangeLaneObstacleDecision(const SLBoundary& adc_sl_boundary,
+                                      PathDecision* path_decision);
+
+ private:
+  ReferenceLineInfo* reference_line_info_ = nullptr;
 };
 
 }  // namespace planning

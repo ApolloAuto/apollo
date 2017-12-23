@@ -165,6 +165,13 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
              << "], Error message: " << ret.error_message();
       break;
     }
+    if (!reference_line_info->IsDrivable()) {
+      reference_line_info->AddCost(std::numeric_limits<double>::infinity());
+      AERROR << "ReferenceLine " << reference_line_info->Lanes().Id()
+             << " is not drivable";
+      ret = Status(ErrorCode::PLANNING_ERROR, "reference line not driveable");
+      break;
+    }
     const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
@@ -202,9 +209,6 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   reference_line_info->SetTrajectory(trajectory);
-  if (ret == Status::OK()) {  // vehicle can drive on this reference line.
-    reference_line_info->SetDriable(true);
-  }
   return ret;
 }
 
