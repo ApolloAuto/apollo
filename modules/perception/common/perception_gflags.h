@@ -64,4 +64,11 @@ DECLARE_bool(output_debug_img);
 /// perception.cc
 DECLARE_string(dag_config_path);
 
+/// pbf_kalman_motion_fusion.cc
+DECLARE_double(q_matrix_coefficient_amplifier);
+DECLARE_double(r_matrix_amplifier);
+DECLARE_double(p_matrix_amplifier);
+DECLARE_double(a_matrix_covariance_coeffcient_1);
+DECLARE_double(a_matrix_covariance_coeffcient_2);
+
 #endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */
