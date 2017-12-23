@@ -211,12 +211,12 @@ void PredictionMap::NearbyLanesByCurrentLanes(
 }
 
 std::vector<std::string> PredictionMap::NearbyLaneIds(
-    const double x, const double y, const double radius) {
+    const Eigen::Vector2d& point, const double radius) {
   std::vector<std::string> lane_ids;
   std::vector<std::shared_ptr<const LaneInfo>> lanes;
   common::PointENU hdmap_point;
-  hdmap_point.set_x(x);
-  hdmap_point.set_y(y);
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
   HDMapUtil::BaseMap().GetLanes(hdmap_point, radius, &lanes);
   for (const auto& lane : lanes) {
     lane_ids.push_back(lane->id().id());
