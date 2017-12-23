@@ -236,6 +236,8 @@ class MPCController : public Controller {
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
+  std::unique_ptr<Interpolation1D> feedforwardterm_interpolation_;
+
   std::unique_ptr<Interpolation1D> steer_weight_interpolation_;
 
   // for logging purpose
@@ -252,6 +254,8 @@ class MPCController : public Controller {
   double heading_error_rate_ = 0.0;
 
   double steer_angle_feedforwardterm_ = 0.0;
+
+  double steer_angle_feedforwardterm_updated_ = 0.0;
 };
 
 }  // namespace control

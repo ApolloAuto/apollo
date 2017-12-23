@@ -227,18 +227,23 @@ void MPCController::LoadMPCGainScheduler(
       mpc_controller_conf.lat_err_gain_scheduler();
   const auto &heading_err_gain_scheduler =
       mpc_controller_conf.heading_err_gain_scheduler();
+  const auto &feedforwardterm_gain_scheduler =
+      mpc_controller_conf.feedforwardterm_gain_scheduler();
   const auto &steer_weight_gain_scheduler =
       mpc_controller_conf.steer_weight_gain_scheduler();
   AINFO << "Lateral control gain scheduler loaded";
-  Interpolation1D::DataType xy1, xy2, xy3;
+  Interpolation1D::DataType xy1, xy2, xy3, xy4;
   for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
     xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
   }
   for (const auto &scheduler : heading_err_gain_scheduler.scheduler()) {
     xy2.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
   }
+  for (const auto &scheduler : feedforwardterm_gain_scheduler.scheduler()) {
+    xy3.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
   for (const auto &scheduler : steer_weight_gain_scheduler.scheduler()) {
-    xy2.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+    xy4.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
   }
 
   lat_err_interpolation_.reset(new Interpolation1D);
@@ -246,6 +251,10 @@ void MPCController::LoadMPCGainScheduler(
       << "Fail to load lateral error gain scheduler";
 
   heading_err_interpolation_.reset(new Interpolation1D);
+  CHECK(heading_err_interpolation_->Init(xy2))
+      << "Fail to load heading error gain scheduler";
+
+  feedforwardterm_interpolation_.reset(new Interpolation1D);
   CHECK(heading_err_interpolation_->Init(xy2))
       << "Fail to load heading error gain scheduler";
 
@@ -289,7 +298,10 @@ Status MPCController::ComputeControlCommand(
         matrix_q_(2, 2) *
         heading_err_interpolation_->Interpolate(
             VehicleStateProvider::instance()->linear_velocity());
-
+    steer_angle_feedforwardterm_updated_ =
+        steer_angle_feedforwardterm_ *
+        feedforwardterm_interpolation_->Interpolate(
+            VehicleStateProvider::instance()->linear_velocity());
     matrix_r_updated_(0, 0) =
         matrix_r_(2, 2) *
         steer_weight_interpolation_->Interpolate(
@@ -297,6 +309,7 @@ Status MPCController::ComputeControlCommand(
   } else {
     matrix_q_updated_ = matrix_q_;
     matrix_r_updated_ = matrix_r_;
+    steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
   }
 
   Eigen::MatrixXd control_matrix(controls_, 1);
@@ -334,7 +347,7 @@ Status MPCController::ComputeControlCommand(
   double steer_angle = control[0](0, 0) * 180 / M_PI *
                            steer_transmission_ratio_ /
                            steer_single_direction_max_degree_ * 100 +
-                       steer_angle_feedforwardterm_;
+                       steer_angle_feedforwardterm_updated_;
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
