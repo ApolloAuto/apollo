@@ -45,7 +45,8 @@ class QpSplineStGraph {
  public:
   QpSplineStGraph(Spline1dGenerator* spline_generator,
                   const QpStSpeedConfig& qp_st_speed_config,
-                  const apollo::common::VehicleParam& veh_param);
+                  const apollo::common::VehicleParam& veh_param,
+                  const bool is_change_lane);
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 
@@ -100,6 +101,9 @@ class QpSplineStGraph {
 
   // initial status
   common::TrajectoryPoint init_point_;
+
+  // is change lane
+  bool is_change_lane_ = false;
 
   // t knots resolution
   double t_knots_resolution_ = 0.0;
