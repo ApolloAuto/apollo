@@ -138,11 +138,6 @@ Status SpeedDecider::MakeObjectDecision(
           if (CreateStopDecision(*path_obstacle, &stop_decision)) {
             path_obstacle->AddLongitudinalDecision("dp_st_graph",
                                                    stop_decision);
-          } else {
-            ObjectDecisionType ignore_decision;
-            ignore_decision.mutable_ignore();
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                   ignore_decision);
           }
         } else if (CheckIsFollowByT(boundary) &&
                    (boundary.max_t() - boundary.min_t() >
@@ -153,11 +148,6 @@ Status SpeedDecider::MakeObjectDecision(
             if (CreateStopDecision(*path_obstacle, &stop_decision)) {
               path_obstacle->AddLongitudinalDecision("dp_st_graph",
                                                      stop_decision);
-            } else {
-              ObjectDecisionType ignore_decision;
-              ignore_decision.mutable_ignore();
-              path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                     ignore_decision);
             }
           } else {  // high speed or low speed accelerating
             // FOLLOW decision
@@ -165,11 +155,6 @@ Status SpeedDecider::MakeObjectDecision(
             if (CreateFollowDecision(*path_obstacle, &follow_decision)) {
               path_obstacle->AddLongitudinalDecision("dp_st_graph",
                                                      follow_decision);
-            } else {
-              ObjectDecisionType ignore_decision;
-              ignore_decision.mutable_ignore();
-              path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                     ignore_decision);
             }
           }
         } else {
@@ -178,11 +163,6 @@ Status SpeedDecider::MakeObjectDecision(
           if (CreateYieldDecision(boundary, &yield_decision)) {
             path_obstacle->AddLongitudinalDecision("dp_st_graph",
                                                    yield_decision);
-          } else {
-            ObjectDecisionType ignore_decision;
-            ignore_decision.mutable_ignore();
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                   ignore_decision);
           }
         }
         break;
@@ -198,11 +178,6 @@ Status SpeedDecider::MakeObjectDecision(
           if (CreateOvertakeDecision(*path_obstacle, &overtake_decision)) {
             path_obstacle->AddLongitudinalDecision("dp_st_graph",
                                                    overtake_decision);
-          } else {
-            ObjectDecisionType ignore_decision;
-            ignore_decision.mutable_ignore();
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                   ignore_decision);
           }
         }
         break;
@@ -210,11 +185,6 @@ Status SpeedDecider::MakeObjectDecision(
         ObjectDecisionType stop_decision;
         if (CreateStopDecision(*path_obstacle, &stop_decision)) {
           path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
-        } else {
-          ObjectDecisionType ignore_decision;
-          ignore_decision.mutable_ignore();
-          path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                 ignore_decision);
         }
       } break;
       default:
@@ -369,11 +339,14 @@ bool SpeedDecider::CheckIsFollowByT(const StBoundary& boundary) const {
   if (boundary.BottomLeftPoint().s() > boundary.BottomRightPoint().s()) {
     return false;
   }
-  const double kFollowTimeEpsilon = 1e-3;
-  if (boundary.min_t() > kFollowTimeEpsilon ||
+  /*
+  constexpr double kFollowTimeEpsilon = 1e-3;
+  constexpr double kFollowCutOffTime = 0.5;
+  if (boundary.min_t() > kFollowCutOffTime ||
       boundary.max_t() < kFollowTimeEpsilon) {
     return false;
   }
+  */
   return true;
 }
 
