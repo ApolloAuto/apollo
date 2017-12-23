@@ -135,29 +135,55 @@ Status SpeedDecider::MakeObjectDecision(
       case BELOW:
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
-          CreateStopDecision(*path_obstacle, &stop_decision);
-          path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+          if (CreateStopDecision(*path_obstacle, &stop_decision)) {
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   stop_decision);
+          } else {
+            ObjectDecisionType ignore_decision;
+            ignore_decision.mutable_ignore();
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   ignore_decision);
+          }
         } else if (CheckIsFollowByT(boundary) &&
                    (boundary.max_t() - boundary.min_t() >
                     FLAGS_follow_min_time_sec)) {
           // stop for low_speed decelerating
           if (IsLowSpeedDecelerating(*path_obstacle)) {
             ObjectDecisionType stop_decision;
-            CreateStopDecision(*path_obstacle, &stop_decision);
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                   stop_decision);
+            if (CreateStopDecision(*path_obstacle, &stop_decision)) {
+              path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                     stop_decision);
+            } else {
+              ObjectDecisionType ignore_decision;
+              ignore_decision.mutable_ignore();
+              path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                     ignore_decision);
+            }
           } else {  // high speed or low speed accelerating
             // FOLLOW decision
             ObjectDecisionType follow_decision;
-            CreateFollowDecision(*path_obstacle, &follow_decision);
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                   follow_decision);
+            if (CreateFollowDecision(*path_obstacle, &follow_decision)) {
+              path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                     follow_decision);
+            } else {
+              ObjectDecisionType ignore_decision;
+              ignore_decision.mutable_ignore();
+              path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                     ignore_decision);
+            }
           }
         } else {
           // YIELD decision
           ObjectDecisionType yield_decision;
-          CreateYieldDecision(boundary, &yield_decision);
-          path_obstacle->AddLongitudinalDecision("dp_st_graph", yield_decision);
+          if (CreateYieldDecision(boundary, &yield_decision)) {
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   yield_decision);
+          } else {
+            ObjectDecisionType ignore_decision;
+            ignore_decision.mutable_ignore();
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   ignore_decision);
+          }
         }
         break;
       case ABOVE:
@@ -169,15 +195,27 @@ Status SpeedDecider::MakeObjectDecision(
         } else {
           // OVERTAKE decision
           ObjectDecisionType overtake_decision;
-          CreateOvertakeDecision(*path_obstacle, &overtake_decision);
-          path_obstacle->AddLongitudinalDecision("dp_st_graph",
-                                                 overtake_decision);
+          if (CreateOvertakeDecision(*path_obstacle, &overtake_decision)) {
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   overtake_decision);
+          } else {
+            ObjectDecisionType ignore_decision;
+            ignore_decision.mutable_ignore();
+            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                   ignore_decision);
+          }
         }
         break;
       case CROSS: {
         ObjectDecisionType stop_decision;
-        CreateStopDecision(*path_obstacle, &stop_decision);
-        path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+        if (CreateStopDecision(*path_obstacle, &stop_decision)) {
+          path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+        } else {
+          ObjectDecisionType ignore_decision;
+          ignore_decision.mutable_ignore();
+          path_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                 ignore_decision);
+        }
       } break;
       default:
         AERROR << "Unknown position:" << position;
@@ -198,7 +236,7 @@ void SpeedDecider::AppendIgnoreDecision(PathObstacle* path_obstacle) const {
   }
 }
 
-void SpeedDecider::CreateStopDecision(
+bool SpeedDecider::CreateStopDecision(
     const PathObstacle& path_obstacle,
     ObjectDecisionType* const stop_decision) const {
   const auto& boundary = path_obstacle.st_boundary();
@@ -207,15 +245,24 @@ void SpeedDecider::CreateStopDecision(
   stop->set_distance_s(kStopDistance);
   const double fence_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + kStopDistance;
+
+  const double main_stop_s =
+      reference_line_info_->path_decision()->stop_reference_line_s();
+  if (main_stop_s < fence_s) {
+    ADEBUG << "Stop fence is further away, ignore.";
+    return false;
+  }
+
   const auto fence_point = reference_line_->GetReferencePoint(fence_s);
   auto* stop_point = stop->mutable_stop_point();
   stop_point->set_x(fence_point.x());
   stop_point->set_y(fence_point.y());
   stop_point->set_z(0.0);
   stop->set_stop_heading(fence_point.heading());
+  return true;
 }
 
-void SpeedDecider::CreateFollowDecision(
+bool SpeedDecider::CreateFollowDecision(
     const PathObstacle& path_obstacle,
     ObjectDecisionType* const follow_decision) const {
   DCHECK_NOTNULL(follow_decision);
@@ -229,17 +276,26 @@ void SpeedDecider::CreateFollowDecision(
 
   follow->set_distance_s(follow_distance_s);
 
-  const double refence_s =
+  const double reference_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + follow_distance_s;
-  auto ref_point = reference_line_->GetReferencePoint(refence_s);
+
+  const double main_stop_s =
+      reference_line_info_->path_decision()->stop_reference_line_s();
+  if (main_stop_s < reference_s) {
+    ADEBUG << "Follow reference_s is further away, ignore.";
+    return false;
+  }
+
+  auto ref_point = reference_line_->GetReferencePoint(reference_s);
   auto* fence_point = follow->mutable_fence_point();
   fence_point->set_x(ref_point.x());
   fence_point->set_y(ref_point.y());
   fence_point->set_z(0.0);
   follow->set_fence_heading(ref_point.heading());
+  return true;
 }
 
-void SpeedDecider::CreateYieldDecision(
+bool SpeedDecider::CreateYieldDecision(
     const StBoundary& boundary,
     ObjectDecisionType* const yield_decision) const {
   auto* yield = yield_decision->mutable_yield();
@@ -252,15 +308,24 @@ void SpeedDecider::CreateYieldDecision(
 
   const double reference_line_fence_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + yield_distance_s;
+
+  const double main_stop_s =
+      reference_line_info_->path_decision()->stop_reference_line_s();
+  if (main_stop_s < reference_line_fence_s) {
+    ADEBUG << "Yield reference_s is further away, ignore.";
+    return false;
+  }
+
   auto ref_point = reference_line_->GetReferencePoint(reference_line_fence_s);
 
   yield->mutable_fence_point()->set_x(ref_point.x());
   yield->mutable_fence_point()->set_y(ref_point.y());
   yield->mutable_fence_point()->set_z(0.0);
   yield->set_fence_heading(ref_point.heading());
+  return true;
 }
 
-void SpeedDecider::CreateOvertakeDecision(
+bool SpeedDecider::CreateOvertakeDecision(
     const PathObstacle& path_obstacle,
     ObjectDecisionType* const overtake_decision) const {
   DCHECK_NOTNULL(overtake_decision);
@@ -285,11 +350,19 @@ void SpeedDecider::CreateOvertakeDecision(
   const double reference_line_fence_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + overtake_distance_s;
 
+  const double main_stop_s =
+      reference_line_info_->path_decision()->stop_reference_line_s();
+  if (main_stop_s < reference_line_fence_s) {
+    ADEBUG << "Overtake reference_s is further away, ignore.";
+    return false;
+  }
+
   auto ref_point = reference_line_->GetReferencePoint(reference_line_fence_s);
   overtake->mutable_fence_point()->set_x(ref_point.x());
   overtake->mutable_fence_point()->set_y(ref_point.y());
   overtake->mutable_fence_point()->set_z(0.0);
   overtake->set_fence_heading(ref_point.heading());
+  return true;
 }
 
 bool SpeedDecider::CheckIsFollowByT(const StBoundary& boundary) const {
