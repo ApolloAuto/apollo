@@ -13,6 +13,7 @@ cc_library(
         "reference_line_end.cc",
         "rerouting.cc",
         "signal_light.cc",
+        "stop_sign.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
@@ -23,6 +24,7 @@ cc_library(
         "reference_line_end.h",
         "rerouting.h",
         "signal_light.h",
+        "stop_sign.h",
         "traffic_rule.h",
     ],
     deps = [
