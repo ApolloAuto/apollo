@@ -24,16 +24,16 @@
 
 #include <memory>
 #include <mutex>
-#include <vector>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
-#include "modules/prediction/container/container.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/polygon2d.h"
+#include "modules/prediction/container/container.h"
 
 namespace apollo {
 namespace prediction {
@@ -67,8 +67,8 @@ class ADCTrajectoryContainer : public Container {
    * @param Time step to search trajectory points
    * @return The line segments of ADC planning trajectory
    */
-  std::vector<apollo::common::math::LineSegment2d>
-  ADCTrajectorySegments(const double time_step) const;
+  std::vector<apollo::common::math::LineSegment2d> ADCTrajectorySegments(
+      const double time_step) const;
 
   /**
    * @brief Get the right-of-way status of ADC
@@ -76,8 +76,17 @@ class ADCTrajectoryContainer : public Container {
    */
   bool IsProtected() const;
 
+  /**
+   * @brief Check if a point is in the first junction of the adc trajectory
+   * @param Point
+   * @return True if the point is in the first junction of the adc trajectory
+   */
   bool IsPointInJunction(const apollo::common::math::Vec2d& point) const;
 
+  /**
+   * @brief Check if a lane id is contained in the adc trajectory
+   * @return True if the lane id is contained in the adc trajectory
+   */
   bool ContainsLaneId(const std::string& lane_id) const;
 
  private:

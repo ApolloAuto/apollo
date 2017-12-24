@@ -112,8 +112,14 @@ class PredictionMap {
    */
   static bool NearJunction(const Eigen::Vector2d& point, const double radius);
 
-  std::vector<std::shared_ptr<const apollo::hdmap::JunctionInfo>>
-  GetJunctions(const Eigen::Vector2d& point, const double radius);
+  /**
+   * @brief Get a list of junctions given a point and a search radius
+   * @param Point
+   * @param Search radius
+   * @return A list of junctions
+   */
+  std::vector<std::shared_ptr<const apollo::hdmap::JunctionInfo>> GetJunctions(
+      const Eigen::Vector2d& point, const double radius);
 
   /**
    * @brief Get the lane heading on a point.
