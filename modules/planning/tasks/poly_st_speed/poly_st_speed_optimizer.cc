@@ -88,7 +88,7 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.GetGraphBoundary(path_decision).code() ==
+  if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for qp st speed optimizer failed!");

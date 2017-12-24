@@ -110,8 +110,8 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
-                                        STGraphDebug* st_graph_debug) {
-  if (!FLAGS_enable_record_debug) {
+                                        STGraphDebug* st_graph_debug) const {
+  if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
