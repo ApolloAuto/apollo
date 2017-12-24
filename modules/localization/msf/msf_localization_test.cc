@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#define private public
 #include "modules/localization/msf/msf_localization.h"
 
-#include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "ros/include/ros/ros.h"
-
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
-#include "modules/common/util/util.h"
 #include "modules/localization/common/localization_gflags.h"
 
 using apollo::common::adapter::AdapterConfig;
