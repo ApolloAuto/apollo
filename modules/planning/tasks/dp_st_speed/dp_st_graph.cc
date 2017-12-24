@@ -63,19 +63,19 @@ DpStGraph::DpStGraph(const ReferenceLine& reference_line,
     : reference_line_(reference_line),
       dp_st_speed_config_(dp_config),
       st_graph_data_(st_graph_data),
+      vehicle_param_(VehicleConfigHelper::GetConfig().vehicle_param()),
       adc_sl_boundary_(adc_sl_boundary),
       dp_st_cost_(dp_config),
       init_point_(st_graph_data.init_point()) {
   dp_st_speed_config_.set_total_path_length(
       std::fmin(dp_st_speed_config_.total_path_length(),
                 st_graph_data_.path_data_length()));
-  vehicle_param_ = VehicleConfigHelper::GetConfig().vehicle_param();
 }
 
 Status DpStGraph::Search(PathDecision* const path_decision,
                          SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
-  for (auto boundary : st_graph_data_.st_boundaries()) {
+  for (const auto& boundary : st_graph_data_.st_boundaries()) {
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
