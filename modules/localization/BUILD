@@ -24,6 +24,9 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/localization:localization_base",
         "//modules/localization/msf:msf_localization",
+        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "//modules/localization/proto:gnss_pnt_result_proto",
+        "//modules/localization/proto:measure_proto",
         "//modules/localization/rtk:rtk_localization",
     ],
 )
