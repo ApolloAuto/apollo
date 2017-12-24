@@ -81,14 +81,13 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   std::size_t matched_index = prev_trajectory->QueryNearestPoint(veh_rel_time);
 
-  if (matched_index == prev_trajectory_size) {
-    AWARN << "The previous trajectory is not long enough, something is wrong";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
-  }
-
   if (matched_index == 0 &&
       veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
-    AWARN << "the previous trajectory doesn't cover current time";
+    AWARN << "current time smaller than the previous trajectory's first time";
+    return ComputeReinitStitchingTrajectory(vehicle_state);
+  }
+  if (matched_index + 1 >= prev_trajectory_size) {
+    AWARN << "current time beyond the previous trajectory's last time";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
