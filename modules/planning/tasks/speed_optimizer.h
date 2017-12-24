@@ -51,7 +51,7 @@ class SpeedOptimizer : public Task {
                                 const double init_acc) const;
 
   void RecordSTGraphDebug(const StGraphData& st_graph_data,
-                          planning_internal::STGraphDebug* stGraphDebug);
+                          planning_internal::STGraphDebug* stGraphDebug) const;
 
   void RecordDebugInfo(const SpeedData& speed_data);
 };

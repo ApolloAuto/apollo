@@ -47,7 +47,15 @@ class StBoundaryMapper {
 
   virtual ~StBoundaryMapper() = default;
 
-  apollo::common::Status GetGraphBoundary(PathDecision* path_decision) const;
+  apollo::common::Status CreateStBoundary(PathDecision* path_decision) const;
+
+  apollo::common::Status CreateStBoundaryWithHistory(
+      const ObjectDecisions& history_decisions,
+      PathDecision* path_decision) const;
+
+  apollo::common::Status CreateStBoundary(
+      PathObstacle* path_obstacle,
+      const ObjectDecisionType& external_decision) const;
 
   virtual apollo::common::Status GetSpeedLimits(
       const IndexedList<std::string, PathObstacle>& path_obstacles,
@@ -71,10 +79,11 @@ class StBoundaryMapper {
 
   apollo::common::Status MapWithoutDecision(PathObstacle* path_obstacle) const;
 
-  bool MapStopDecision(PathObstacle* stop_obstacle) const;
+  bool MapStopDecision(PathObstacle* stop_obstacle,
+                       const ObjectDecisionType& decision) const;
 
-  apollo::common::Status MapWithPredictionTrajectory(
-      PathObstacle* path_obstacle) const;
+  apollo::common::Status MapWithDecision(
+      PathObstacle* path_obstacle, const ObjectDecisionType& decision) const;
 
   FRIEND_TEST(StBoundaryMapperTest, get_centric_acc_limit);
   double GetCentricAccLimit(const double kappa) const;
