@@ -281,7 +281,7 @@ bool DPRoadGraph::SamplePathWaypoints(
       if (i == 0) {
         sample_l.push_back(init_sl_point_.l());
       } else {
-        sample_l.push_back(0);
+        sample_l.push_back(std::copysign(1.0, init_sl_point_.l()));
       }
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,

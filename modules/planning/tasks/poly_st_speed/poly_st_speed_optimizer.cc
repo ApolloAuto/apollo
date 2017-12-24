@@ -79,7 +79,8 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
                                    reference_line, path_data,
                                    poly_st_speed_config_.total_path_length(),
-                                   poly_st_speed_config_.total_time());
+                                   poly_st_speed_config_.total_time(),
+                                   reference_line_info_->IsChangeLanePath());
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     DCHECK(path_obstacle->HasLongitudinalDecision());
