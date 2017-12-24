@@ -28,6 +28,7 @@ message RuleConfig {
     REFERENCE_LINE_END = 6;
     DESTINATION = 7;
     STOP_SIGN = 8;
+    CHANGE_LANE = 9;
   }
   optional RuleId rule_id = 1;
 }
