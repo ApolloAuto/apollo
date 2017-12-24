@@ -43,7 +43,7 @@ using apollo::common::VehicleStateProvider;
 class MPCControllerTest : public ::testing::Test, MPCController {
  public:
   virtual void SetUp() {
-    FLAGS_v = 3;
+    FLAGS_v = 4;
     std::string control_conf_file =
         "modules/control/testdata/conf/lincoln.pb.txt";
     ControlConf control_conf;
