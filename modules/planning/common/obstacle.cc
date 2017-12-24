@@ -67,18 +67,23 @@ Obstacle::Obstacle(const std::string& id,
                    const PerceptionObstacle& perception_obstacle,
                    const prediction::Trajectory& trajectory)
     : Obstacle(id, perception_obstacle) {
-  has_trajectory_ = true;
   trajectory_ = trajectory;
   auto& trajectory_points = *trajectory_.mutable_trajectory_point();
   double cumulative_s = 0.0;
   if (trajectory_points.size() > 0) {
     trajectory_points[0].mutable_path_point()->set_s(0.0);
+    has_trajectory_ = true;
   }
   for (int i = 1; i < trajectory_points.size(); ++i) {
+    const auto& prev = trajectory_points[i - 1];
+    const auto& cur = trajectory_points[i];
+    if (prev.relative_time() >= cur.relative_time()) {
+      AERROR << "prediction time is not increasing."
+             << "current point: " << cur.ShortDebugString()
+             << "previous point: " << prev.ShortDebugString();
+    }
     cumulative_s +=
-        common::util::DistanceXY(trajectory_points[i - 1].path_point(),
-                                 trajectory_points[i].path_point());
-
+        common::util::DistanceXY(prev.path_point(), cur.path_point());
     trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
   }
 }
