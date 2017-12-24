@@ -114,7 +114,7 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
    * *                             C * x >= d (inequality constraint)
    * **/
 
-  // TODO(QiL) : change qp solver to box constraint or substitue QPOAESE
+  // TODO(QiL) : change qp solver to box constraint or substitute QPOASES
   // Method 1: QPOASES
   Matrix matrix_inequality_constrain_ll =
       Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
