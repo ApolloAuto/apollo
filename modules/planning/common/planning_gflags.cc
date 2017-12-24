@@ -99,6 +99,8 @@ DEFINE_double(change_lane_min_length, 30.0,
               "threshold, it can shortcut the default lane.");
 DEFINE_bool(enable_change_lane_decider, false,
             "True to use change lane state machine decider.");
+DEFINE_double(change_lane_speed_relax_percentage, 0.05,
+              "The percentage of change lane speed relaxation.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
@@ -169,7 +171,7 @@ DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_double(static_obstacle_speed_threshold, 0.5,
+DEFINE_double(static_obstacle_speed_threshold, 1.0,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
@@ -196,7 +198,7 @@ DEFINE_double(destination_check_distance, 5.0,
               " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
-DEFINE_double(follow_min_distance, 2.0,
+DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(yield_min_distance, 3.0,
               "min yield distance for vehicles/bicycles/moving objects");
@@ -251,7 +253,7 @@ DEFINE_string(clear_zone_virtual_object_id_prefix, "CZ_",
 /// traffic light
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
-DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
+DEFINE_double(max_deacceleration_for_yellow_light_stop, 3.0,
               "treat yellow light as red when deceleration (abstract value"
               " in m/s^2) is less than this threshold; otherwise treated"
               " as green light");
@@ -281,6 +283,9 @@ DEFINE_double(max_distance_stop_sign_waiting_area, 3,
 DEFINE_double(
     turn_signal_distance, 60.96,
     "In meters. If there is a turn within this distance, use turn signal");
+DEFINE_bool(right_turn_creep_forward, false,
+            "Creep forward at right turn when the signal is red and traffic "
+            "rule is not violated.");
 
 // planning config file
 DEFINE_string(planning_config_file,

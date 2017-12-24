@@ -495,8 +495,8 @@ Status StBoundaryMapper::GetSpeedLimits(
         reference_line_.GetSpeedLimitFromS(frenet_point_s);
 
     // speed limit from path curvature
-    const double centripetal_acceleration_limit =
-        std::sqrt(st_boundary_config_.high_speed_centric_acceleration_limit() /
+    const double centric_acc_speed_limit =
+        std::sqrt(GetCentricAccLimit(std::fabs(avg_kappa[i])) /
                   std::fmax(std::fabs(avg_kappa[i]),
                             st_boundary_config_.minimal_kappa()));
 
@@ -538,16 +538,16 @@ Status StBoundaryMapper::GetSpeedLimits(
 
     double curr_speed_limit = 0.0;
     if (FLAGS_enable_nudge_slowdown) {
-      curr_speed_limit = std::fmax(
-        st_boundary_config_.lowest_speed(),
-        common::util::MinElement(std::vector<double>{
-            centripetal_acceleration_limit, speed_limit_on_reference_line,
-            nudge_obstacle_speed_limit}));
+      curr_speed_limit =
+          std::fmax(st_boundary_config_.lowest_speed(),
+                    common::util::MinElement(std::vector<double>{
+                        centric_acc_speed_limit, speed_limit_on_reference_line,
+                        nudge_obstacle_speed_limit}));
     } else {
       curr_speed_limit = std::fmax(
-        st_boundary_config_.lowest_speed(),
-        common::util::MinElement(std::vector<double>{
-            centripetal_acceleration_limit, speed_limit_on_reference_line}));
+          st_boundary_config_.lowest_speed(),
+          common::util::MinElement(std::vector<double>{
+              centric_acc_speed_limit, speed_limit_on_reference_line}));
     }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
@@ -586,7 +586,7 @@ double StBoundaryMapper::GetCentricAccLimit(const double kappa) const {
   const double k1 = (h_v_acc - l_v_acc) / (v_high - v_low);
   const double k2 = h_v_acc - v_high * k1;
 
-  const double v = (k1 + std::sqrt(k1 * k1 + 4 * kappa * k2)) / (2 * kappa);
+  const double v = (k1 + std::sqrt(k1 * k1 + 4.0 * kappa * k2)) / (2.0 * kappa);
   ADEBUG << "v = " << v;
 
   if (v > v_high) {

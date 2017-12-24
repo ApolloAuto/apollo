@@ -95,6 +95,12 @@ TrajectoryCost::TrajectoryCost(
         // lane blocking obstacle
         continue;
       }
+
+      if (sl_boundary.start_l() < 0.0 && sl_boundary.end_l() > 0.0) {
+        // if obstacle stays at the center of the lane, do not pass
+        continue;
+      }
+
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;

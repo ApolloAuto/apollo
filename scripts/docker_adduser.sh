@@ -62,3 +62,4 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
   chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 fi
+

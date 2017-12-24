@@ -77,6 +77,7 @@ class Predictor {
    * @param ADC trajectory container
    */
   void TrimTrajectories(
+      const Obstacle* obstacle,
       const ADCTrajectoryContainer* adc_trajectory_container);
 
  protected:
@@ -102,6 +103,7 @@ class Predictor {
    * @return If the prediction trajectory is trimed
    */
   bool TrimTrajectory(
+      const Obstacle* obstacle,
       const ADCTrajectoryContainer* adc_trajectory_container,
       Trajectory* trajectory);
 

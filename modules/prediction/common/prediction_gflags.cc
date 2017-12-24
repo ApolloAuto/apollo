@@ -28,7 +28,7 @@ DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
 
-DEFINE_double(prediction_duration, 3.0, "Prediction duration (in seconds)");
+DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 50.0,
@@ -93,7 +93,7 @@ DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_diff_thred, M_PI / 6.0,
               "Threshold for adjusting on-lane obstacle heading");
-DEFINE_bool(enable_rnn_acc, true, "If use acceleration from RNN model.");
+DEFINE_bool(enable_rnn_acc, false, "If use acceleration from RNN model.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
@@ -105,11 +105,19 @@ DEFINE_bool(enable_trim_prediction_trajectory, false,
             "If trim the prediction trajectory to avoid crossing"
             "protected adc planning trajectory.");
 DEFINE_double(adc_time_step, 0.1, "Time step to search ADC trajectory point");
-DEFINE_double(distance_to_adc_trajectory_thred, 5.0,
+DEFINE_double(distance_to_adc_trajectory_thred, 2.0,
                "Distance threshold to determine if intersect with"
                "ADC planning trajectory");
 DEFINE_double(time_to_adc_trajectory_thred, 2.0,
               "Time threshold to trim prediction trajectory");
+DEFINE_double(junction_distance_thred, 0.25,
+              "Threshold of radius to search junction.");
+DEFINE_double(ahead_junction_thred, 0.5,
+              "If the obstacle is in junction more than this threshold,"
+              "consider it in junction.");
+DEFINE_double(adc_trajectory_search_length, 10.0,
+              "How far to search junction along adc planning trajectory");
+DEFINE_double(junction_search_radius, 1.0, "Radius to search junctions");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,

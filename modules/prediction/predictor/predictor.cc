@@ -18,6 +18,8 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 #include "Eigen/Dense"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -56,33 +58,43 @@ void Predictor::SetEqualProbability(double probability, int start_index) {
 void Predictor::Clear() { trajectories_.clear(); }
 
 void Predictor::TrimTrajectories(
+    const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container) {
   for (size_t i = 0; i < trajectories_.size(); ++i) {
-    TrimTrajectory(adc_trajectory_container, &trajectories_[i]);
+    TrimTrajectory(obstacle, adc_trajectory_container, &trajectories_[i]);
   }
 }
 
 bool Predictor::TrimTrajectory(
+    const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
+  if (obstacle == nullptr || obstacle->history_size() == 0) {
+    AERROR << "Invalid obstacle.";
+    return false;
+  }
   int num_point = trajectory->trajectory_point_size();
-  // Get the index at intersect
+  if (num_point == 0) {
+    return false;
+  }
+  const Feature& feature = obstacle->latest_feature();
+  double length = feature.length();
+  double heading = feature.theta();
+  double forward_length =
+      std::max(length / 2.0 - FLAGS_ahead_junction_thred, 0.0);
+
+  double start_x = trajectory->trajectory_point(0).path_point().x() +
+                   forward_length * std::cos(heading);
+  double start_y = trajectory->trajectory_point(0).path_point().y() +
+                   forward_length * std::sin(heading);
+  if (adc_trajectory_container->IsPointInJunction({start_x, start_y})) {
+    return false;
+  }
   int index = 0;
-  bool has_intersect = false;
   while (index < num_point) {
     double x = trajectory->trajectory_point(index).path_point().x();
     double y = trajectory->trajectory_point(index).path_point().y();
-    Eigen::Vector2d point(x, y);
-    std::vector<std::string> lane_ids =
-        PredictionMap::instance()->NearbyLaneIds(
-            point, FLAGS_distance_to_adc_trajectory_thred);
-    for (const std::string& lane_id : lane_ids) {
-      if (adc_trajectory_container->ContainsLaneId(lane_id)) {
-        has_intersect = true;
-        break;
-      }
-    }
-    if (has_intersect) {
+    if (adc_trajectory_container->IsPointInJunction({x, y})) {
       break;
     }
     ++index;
@@ -90,12 +102,6 @@ bool Predictor::TrimTrajectory(
 
   // if no intersect
   if (index == num_point) {
-    return false;
-  }
-
-  double index_time = trajectory->trajectory_point(index).relative_time();
-  // if early intersect occurs
-  if (index_time < FLAGS_time_to_adc_trajectory_thred) {
     return false;
   }
 

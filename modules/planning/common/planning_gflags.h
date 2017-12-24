@@ -51,6 +51,7 @@ DECLARE_double(change_lane_fail_freeze_time);
 DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
 DECLARE_bool(enable_change_lane_decider);
+DECLARE_double(change_lane_speed_relax_percentage);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
@@ -132,6 +133,7 @@ DECLARE_bool(enable_prediction);
 DECLARE_bool(enable_traffic_light);
 
 DECLARE_double(turn_signal_distance);
+DECLARE_bool(right_turn_creep_forward);
 
 // speed decider
 DECLARE_double(low_speed_obstacle_threshold);
