@@ -21,12 +21,18 @@ function print_help() {
    echo "-d|--dir the target storage directory"
    echo "This script works in three modes:"
    echo "  -pc filter for perfect control, produces *.pc.bag"
+   echo "  -po filter only for perception topic, produces *.po.bag"
    echo "  -np filter for planning dependencies, produces *.np.bag"
    echo "  -wp filter for planning and its dependencies, produces *.wp.bag"
 }
 
-perfect_control_topic="topic == '/apollo/prediction' \
-   or topic == '/apollo/routing_response' \
+routing_topic="topic == '/apollo/routing_response'"
+
+perception_topic="topic == '/apollo/perception/obstacles' \
+   or topic == '/apollo/perception/traffic_light'"
+
+perfect_control_topic="$perception_topic 
+   or $routing_topic \
    or topic == '/apollo/perception/obstacles' \
    or topic == '/apollo/perception/traffic_light'"
 
@@ -46,7 +52,11 @@ is_perfect_control=false
 is_with_planning=false
 #create a rosbag only with planning's dependencies
 is_no_planning=false
+
+#only perception topic
+is_perception=false;
 work_mode_num=0
+
 
 #argument parsing code from https://stackoverflow.com/a/14203146
 POSITIONAL=()
@@ -54,6 +64,11 @@ target_dir=""
 while [[ $# -gt 0 ]]; do
 key="$1"
 case $key in
+    -po|--perception_only)
+    is_perception=true
+    work_mode_num=$((work_mode_num+1))
+    shift # past argument
+    ;;
     -pc|--perfectcontrol)
     is_perfect_control=true
     work_mode_num=$((work_mode_num+1))
@@ -100,6 +115,11 @@ function filter() {
         target="$2/${name%.*}.pc.bag"
         rosbag filter $1 "$target" "$perfect_control_topic"
 
+    fi
+
+    if $is_perception; then
+        target="$2/${name%.*}.po.bag"
+        rosbag filter $1 "$target" "$perception_topic"
     fi
 
     if $is_no_planning; then
