@@ -36,7 +36,7 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
   const double adc_length_s =
       adc_sl_boundary.end_s() - adc_sl_boundary.start_s();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    if (path_obstacle->perception_sl_boundary().end_s() >=
+    if (path_obstacle->PerceptionSLBoundary().end_s() >=
         adc_sl_boundary.end_s()) {  // don't ignore such vehicles.
       continue;
     }
@@ -55,7 +55,7 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
       continue;
     }
 
-    if (path_obstacle->perception_sl_boundary().start_s() <
+    if (path_obstacle->PerceptionSLBoundary().start_s() <
         adc_sl_boundary.end_s()) {
       path_decision->AddLongitudinalDecision(rule_id, path_obstacle->Id(),
                                              ignore);
