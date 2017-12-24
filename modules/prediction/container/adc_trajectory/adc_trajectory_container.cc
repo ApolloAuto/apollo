@@ -16,22 +16,22 @@
 
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::planning::ADCTrajectory;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Polygon2d;
-using apollo::common::TrajectoryPoint;
-using apollo::common::PathPoint;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::JunctionInfo;
+using apollo::planning::ADCTrajectory;
 
 std::mutex ADCTrajectoryContainer::g_mutex_;
 
@@ -58,8 +58,8 @@ bool ADCTrajectoryContainer::IsPointInJunction(const Vec2d& point) const {
   return junction_polygon_.IsPointIn(point);
 }
 
-std::vector<LineSegment2d>
-ADCTrajectoryContainer::ADCTrajectorySegments(const double time_step) const {
+std::vector<LineSegment2d> ADCTrajectoryContainer::ADCTrajectorySegments(
+    const double time_step) const {
   std::vector<LineSegment2d> segments;
   size_t num_point = adc_trajectory_.trajectory_point_size();
   if (num_point == 0) {
@@ -101,8 +101,7 @@ Polygon2d ADCTrajectoryContainer::GetJunctionPolygon() {
   double prev_s = 0.0;
   for (int i = 0; i < num_point; ++i) {
     double s = adc_trajectory_.trajectory_point(i).path_point().s();
-    if (i > 0 &&
-        std::abs(s - prev_s) < FLAGS_junction_search_radius) {
+    if (i > 0 && std::abs(s - prev_s) < FLAGS_junction_search_radius) {
       continue;
     }
     if (s > FLAGS_adc_trajectory_search_length) {
@@ -112,8 +111,8 @@ Polygon2d ADCTrajectoryContainer::GetJunctionPolygon() {
     double x = adc_trajectory_.trajectory_point(i).path_point().x();
     double y = adc_trajectory_.trajectory_point(i).path_point().y();
     std::vector<std::shared_ptr<const JunctionInfo>> junctions =
-        PredictionMap::instance()->GetJunctions(
-            {x, y}, FLAGS_junction_search_radius);
+        PredictionMap::instance()->GetJunctions({x, y},
+                                                FLAGS_junction_search_radius);
     if (junctions.empty()) {
       continue;
     } else {

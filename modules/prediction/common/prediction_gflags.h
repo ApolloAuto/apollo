@@ -33,7 +33,8 @@ DECLARE_double(min_prediction_length);
 DECLARE_double(replay_timestamp_gap);
 
 // Map
-DECLARE_double(search_radius);
+DECLARE_double(lane_search_radius);
+DECLARE_double(junction_search_radius);
 
 // Obstacle features
 DECLARE_bool(enable_kf_tracking);
@@ -75,13 +76,8 @@ DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
-DECLARE_double(adc_time_step);
-DECLARE_double(distance_to_adc_trajectory_thred);
-DECLARE_double(time_to_adc_trajectory_thred);
-DECLARE_double(junction_distance_thred);
-DECLARE_double(ahead_junction_thred);
+DECLARE_double(distance_beyond_junction);
 DECLARE_double(adc_trajectory_search_length);
-DECLARE_double(junction_search_radius);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);

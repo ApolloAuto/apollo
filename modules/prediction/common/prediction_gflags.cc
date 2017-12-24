@@ -39,7 +39,8 @@ DEFINE_double(replay_timestamp_gap, 10.0,
               "Max timestamp gap for rosbag replay");
 
 // Map
-DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
+DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
+DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 
 // Obstacle features
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
@@ -104,20 +105,11 @@ DEFINE_bool(enable_lane_sequence_acc, false,
 DEFINE_bool(enable_trim_prediction_trajectory, false,
             "If trim the prediction trajectory to avoid crossing"
             "protected adc planning trajectory.");
-DEFINE_double(adc_time_step, 0.1, "Time step to search ADC trajectory point");
-DEFINE_double(distance_to_adc_trajectory_thred, 2.0,
-               "Distance threshold to determine if intersect with"
-               "ADC planning trajectory");
-DEFINE_double(time_to_adc_trajectory_thred, 2.0,
-              "Time threshold to trim prediction trajectory");
-DEFINE_double(junction_distance_thred, 0.25,
-              "Threshold of radius to search junction.");
-DEFINE_double(ahead_junction_thred, 0.5,
+DEFINE_double(distance_beyond_junction, 0.5,
               "If the obstacle is in junction more than this threshold,"
               "consider it in junction.");
 DEFINE_double(adc_trajectory_search_length, 10.0,
               "How far to search junction along adc planning trajectory");
-DEFINE_double(junction_search_radius, 1.0, "Radius to search junctions");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,

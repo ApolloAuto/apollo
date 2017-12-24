@@ -16,10 +16,10 @@
 
 #include "modules/prediction/predictor/predictor.h"
 
+#include <algorithm>
+#include <cmath>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <algorithm>
 
 #include "Eigen/Dense"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -81,7 +81,7 @@ bool Predictor::TrimTrajectory(
   double length = feature.length();
   double heading = feature.theta();
   double forward_length =
-      std::max(length / 2.0 - FLAGS_ahead_junction_thred, 0.0);
+      std::max(length / 2.0 - FLAGS_distance_beyond_junction, 0.0);
 
   double start_x = trajectory->trajectory_point(0).path_point().x() +
                    forward_length * std::cos(heading);
