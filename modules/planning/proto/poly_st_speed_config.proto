@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/st_boundary_config.proto";
+
+// next ID: 11
+message PolyStSpeedConfig {
+  optional double total_path_length = 1;
+  optional double total_time = 2;
+  optional apollo.planning.StBoundaryConfig st_boundary_config = 3;
+}
