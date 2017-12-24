@@ -41,16 +41,8 @@ using apollo::common::time::Clock;
 
 MSFLocalization::MSFLocalization()
     : monitor_logger_(MonitorMessageItem::LOCALIZATION),
-      tf2_broadcaster_(NULL),
       localization_state_(LocalizationMeasureState::OK),
       pcd_msg_index_(-1) {}
-
-MSFLocalization::~MSFLocalization() {
-  if (tf2_broadcaster_) {
-    delete tf2_broadcaster_;
-    tf2_broadcaster_ = NULL;
-  }
-}
 
 Status MSFLocalization::Start() {
   AdapterManager::Init(FLAGS_msf_adapter_config_file);
@@ -112,7 +104,7 @@ Status MSFLocalization::Start() {
                                             this);
   }
 
-  tf2_broadcaster_ = new tf2_ros::TransformBroadcaster;
+  tf2_broadcaster_.reset(new tf2_ros::TransformBroadcaster);
 
   return Status::OK();
 }
@@ -198,9 +190,9 @@ void MSFLocalization::InitParams() {
     std::string ant_imu_leverarm_file =
         common::util::TranslatePath(FLAGS_ant_imu_leverarm_file);
     AERROR << "Ant imu lever arm file: " << ant_imu_leverarm_file;
-    CHECK(load_gnss_antenna_extrinsic(ant_imu_leverarm_file, &offset_x,
-                                      &offset_y, &offset_z, &uncertainty_x,
-                                      &uncertainty_y, &uncertainty_z));
+    CHECK(LoadGnssAntennaExtrinsic(ant_imu_leverarm_file, &offset_x,
+                                   &offset_y, &offset_z, &uncertainty_x,
+                                   &uncertainty_y, &uncertainty_z));
 
     localizaiton_param_.imu_to_ant_offset.offset_x = offset_x;
     localizaiton_param_.imu_to_ant_offset.offset_y = offset_y;
@@ -356,7 +348,7 @@ void MSFLocalization::OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg) {
   return;
 }
 
-bool MSFLocalization::load_gnss_antenna_extrinsic(
+bool MSFLocalization::LoadGnssAntennaExtrinsic(
     const std::string &file_path, double *offset_x, double *offset_y,
     double *offset_z, double *uncertainty_x, double *uncertainty_y,
     double *uncertainty_z) {
