@@ -99,6 +99,8 @@ DEFINE_double(change_lane_min_length, 30.0,
               "threshold, it can shortcut the default lane.");
 DEFINE_bool(enable_change_lane_decider, false,
             "True to use change lane state machine decider.");
+DEFINE_double(change_lane_speed_relax_percentage, 0.05,
+              "The percentage of change lane speed relaxation.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
