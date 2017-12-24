@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
         double yaw_diff = fabs(yaw_a - yaw_b);
         yaw_diff = std::min(yaw_diff, 2.0 * M_PI - yaw_diff)  * 180.0 / M_PI;
 
-        file << idx << " " << timestamps_a[idx] << " "
+        file << idx << " " << std::setprecision(13) << timestamps_a[idx] << " "
           << x_diff << " " << y_diff << " " << z_diff << " "
           << roll_diff << " " << pitch_diff << " " << yaw_diff << std::endl;
       }
