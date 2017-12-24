@@ -60,7 +60,7 @@ TrajectoryCost::TrajectoryCost(
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
     }
-    auto sl_boundary = ptr_path_obstacle->perception_sl_boundary();
+    auto sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
     const auto &vehicle_param =
         common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 

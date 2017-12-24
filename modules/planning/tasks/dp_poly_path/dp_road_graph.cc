@@ -321,7 +321,7 @@ bool DPRoadGraph::IsSafeForLaneChange() {
 
   for (const auto &path_obstacle :
        reference_line_info_.path_decision().path_obstacles().Items()) {
-    const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+    const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
     const auto &adc_sl_boundary = reference_line_info_.AdcSlBoundary();
 
     constexpr double kLateralShift = 2.5;
