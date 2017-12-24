@@ -33,14 +33,14 @@ function start() {
         supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
         echo "Started supervisord with dev conf"
     fi
-
-    # Start Dreamview
-    bash scripts/dreamview.sh
+    supervisorctl start monitor &
+    supervisorctl start dreamview &
     echo "Dreamview is running at http://localhost:8888"
 }
 
 function stop() {
-    bash scripts/dreamview.sh stop
+    supervisorctl stop monitor &
+    supervisorctl stop dreamview &
     pkill -f roscore
 }
 
