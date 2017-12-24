@@ -50,6 +50,7 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:path_decision",
         "//modules/planning/common/speed:speed_data",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks/st_graph:st_graph_data",
     ],
