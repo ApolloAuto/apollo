@@ -303,6 +303,12 @@ Status QpSplineStGraph::AddKernel(
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
   }
 
+  if (!AddYieldReferenceLineKernel(
+           boundaries, qp_st_speed_config_.qp_spline_config().yield_weight())
+           .ok()) {
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
+  }
+
   if (!AddDpStReferenceKernel(
           qp_st_speed_config_.qp_spline_config().dp_st_reference_weight())) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
@@ -411,6 +417,52 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
     ADEBUG << "Follow Ref S: " << ref_s[i]
+           << " Relative time: " << filtered_evaluate_t[i] << std::endl;
+  }
+  return Status::OK();
+}
+
+Status QpSplineStGraph::AddYieldReferenceLineKernel(
+    const std::vector<const StBoundary*>& boundaries, const double weight) {
+  auto* spline_kernel = spline_generator_->mutable_spline_kernel();
+  std::vector<double> ref_s;
+  std::vector<double> filtered_evaluate_t;
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    const double curr_t = t_evaluated_[i];
+    double s_min = std::numeric_limits<double>::infinity();
+    bool success = false;
+    for (const auto* boundary : boundaries) {
+      if (boundary->boundary_type() != StBoundary::BoundaryType::YIELD) {
+        continue;
+      }
+      if (curr_t < boundary->min_t() || curr_t > boundary->max_t()) {
+        continue;
+      }
+      double s_upper = 0.0;
+      double s_lower = 0.0;
+      if (boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+        success = true;
+        s_min = std::min(
+            s_min,
+            s_upper - boundary->characteristic_length() -
+                qp_st_speed_config_.qp_spline_config().yield_drag_distance());
+      }
+    }
+    if (success && s_min < cruise_[i]) {
+      filtered_evaluate_t.push_back(curr_t);
+      ref_s.push_back(s_min);
+    }
+  }
+  DCHECK_EQ(filtered_evaluate_t.size(), ref_s.size());
+
+  if (!ref_s.empty()) {
+    spline_kernel->AddReferenceLineKernelMatrix(
+        filtered_evaluate_t, ref_s,
+        weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
+  }
+
+  for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
+    ADEBUG << "Yield Ref S: " << ref_s[i]
            << " Relative time: " << filtered_evaluate_t[i] << std::endl;
   }
   return Status::OK();
