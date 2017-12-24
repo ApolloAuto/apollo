@@ -26,8 +26,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "gtest/gtest_prod.h"
-
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
@@ -123,19 +121,17 @@ class PathObstacle {
 
   void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
 
- private:
+  /**
+   * @brief check if a ObjectDecisionType is a longitudinal decision.
+   **/
+  static bool IsLongitudinalDecision(const ObjectDecisionType& decision);
+
   /**
    * @brief check if a ObjectDecisionType is a lateral decision.
    **/
-  FRIEND_TEST(IsLateralDecision, AllDecisions);
   static bool IsLateralDecision(const ObjectDecisionType& decision);
 
-  /**
-   * @brief check if a ObjectDecisionType is longitudinal decision.
-   **/
-  FRIEND_TEST(IsLongitudinalDecision, AllDecisions);
-  static bool IsLongitudinalDecision(const ObjectDecisionType& decision);
-
+ private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
   static ObjectDecisionType MergeLongitudinalDecision(
       const ObjectDecisionType& lhs, const ObjectDecisionType& rhs);
