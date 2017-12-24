@@ -74,7 +74,6 @@ Obstacle::Obstacle(const std::string& id,
   double cumulative_s = 0.0;
   if (trajectory_points.size() > 0) {
     trajectory_points[0].mutable_path_point()->set_s(0.0);
-    has_trajectory_ = true;
   }
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& prev = trajectory_points[i - 1];
@@ -97,6 +96,14 @@ double Obstacle::Speed() const { return speed_; }
 bool Obstacle::IsStatic() const { return is_static_; }
 
 bool Obstacle::IsVirtual() const { return is_virtual_; }
+
+bool Obstacle::HasTrajectory() const {
+  return trajectory_.trajectory_point_size() > 0;
+}
+
+common::TrajectoryPoint* Obstacle::AddTrajectoryPoint() {
+  return trajectory_.add_trajectory_point();
+}
 
 bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {

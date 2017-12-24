@@ -45,15 +45,14 @@ class ChangeLane : public TrafficRule {
    **/
   const Obstacle* FindGuardObstacle(ReferenceLineInfo* reference_line_info);
   /**
-   * @brief This function will create virutal dynamic vehicles to guard lane
-   *change action. Due to the ST path may drive on the forward lane first, then
-   *slowly move to the target lane when making lane change, we need to make sure
-   *the vehicle is aware that it actually occupies the target lane, even when it
-   *is not on the target lane yet.
+   * @brief This function will extend the prediction of the guard obstacle to
+   *guard lane change action. Due to the ST path may drive on the forward lane
+   *first, then slowly move to the target lane when making lane change, we need
+   *to make sure the vehicle is aware that it actually occupies the target lane,
+   *even when it is not on the target lane yet.
    **/
-  const Obstacle* CreateGuardObstacle(Frame* frame,
-                                      ReferenceLineInfo* reference_line_info,
-                                      const Obstacle* obstacle);
+  bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info,
+                           Obstacle* obstacle);
 };
 
 }  // namespace planning
