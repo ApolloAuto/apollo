@@ -26,6 +26,13 @@ function start() {
     echo "Start roscore..."
     ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
     nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
+    if [ "$HOSTNAME" == "in_release_docker" ]; then
+        supervisord -c /apollo/modules/tools/supervisord/release.conf >& /tmp/supervisord.start.log
+        echo "Started supervisord with release conf"
+    else
+        supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
+        echo "Started supervisord with dev conf"
+    fi
 
     # Start Dreamview
     bash scripts/dreamview.sh
