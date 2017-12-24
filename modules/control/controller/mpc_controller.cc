@@ -344,10 +344,11 @@ Status MPCController::ComputeControlCommand(
          << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
-  double steer_angle = control[0](0, 0) * 180 / M_PI *
-                           steer_transmission_ratio_ /
-                           steer_single_direction_max_degree_ * 100 +
-                       steer_angle_feedforwardterm_updated_;
+  double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
+                                steer_transmission_ratio_ /
+                                steer_single_direction_max_degree_ * 100;
+  double steer_angle =
+      steer_angle_feedback + steer_angle_feedforwardterm_updated_;
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
@@ -409,6 +410,10 @@ Status MPCController::ComputeControlCommand(
 
   debug->set_heading(VehicleStateProvider::instance()->heading());
   debug->set_steer_angle(steer_angle);
+  debug->set_steering_position(chassis->steering_percentage());
+
+  debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
+  debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
   if (std::abs(VehicleStateProvider::instance()->linear_velocity()) <=
