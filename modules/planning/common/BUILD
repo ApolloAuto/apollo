@@ -253,6 +253,7 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
     ],
@@ -270,6 +271,7 @@ cc_test(
     deps = [
         ":frame",
         "//modules/common/util",
+        "//modules/planning/proto:planning_config_proto",
         "@gtest//:main",
     ],
 )
