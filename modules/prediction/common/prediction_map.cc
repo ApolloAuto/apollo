@@ -140,9 +140,8 @@ bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
   return junctions.size() > 0;
 }
 
-std::vector<std::shared_ptr<const JunctionInfo>>
-PredictionMap::GetJunctions(const Eigen::Vector2d& point,
-                            const double radius) {
+std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
+    const Eigen::Vector2d& point, const double radius) {
   common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
