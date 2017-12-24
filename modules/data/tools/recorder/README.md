@@ -24,7 +24,7 @@ output_path: /media/apollo/data_storage
 ```modules/data/conf/debug.global.yaml```</br>
 If you want to record rosbag group by ros topic, please refer to the following configuration:
 ``` 
-   # group_name: should be different if there are mutil-groups.
+   # group_name: should be different if there are multi-groups.
    # group_topic_match_re: match topics using regular expressions.
    # group_topic_exclude_re: exclude topics matching the given regular expression.
    rosbag_topic_group:
