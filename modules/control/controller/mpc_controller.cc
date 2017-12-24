@@ -303,7 +303,7 @@ Status MPCController::ComputeControlCommand(
         feedforwardterm_interpolation_->Interpolate(
             VehicleStateProvider::instance()->linear_velocity());
     matrix_r_updated_(0, 0) =
-        matrix_r_(2, 2) *
+        matrix_r_(0, 0) *
         steer_weight_interpolation_->Interpolate(
             VehicleStateProvider::instance()->linear_velocity());
   } else {
