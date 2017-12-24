@@ -36,6 +36,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
     ],
 )
