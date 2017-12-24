@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/traffic_decider/change_lane.h"
 
+#include <algorithm>
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -28,6 +30,11 @@ namespace planning {
 using apollo::common::SLPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+
+namespace {
+constexpr double kMinGuardVehicleSpeed = 1.0;
+constexpr double kGuardDistance = 100.0;
+}
 
 ChangeLane::ChangeLane(const RuleConfig& config) : TrafficRule(config) {}
 
@@ -50,6 +57,9 @@ const Obstacle* ChangeLane::FindGuardObstacle(
     }
     const auto& last_point =
         *(obstacle->Trajectory().trajectory_point().rbegin());
+    if (last_point.v() < kMinGuardVehicleSpeed) {
+      continue;
+    }
     if (!reference_line.IsOnRoad(last_point.path_point())) {
       continue;
     }
@@ -69,46 +79,41 @@ const Obstacle* ChangeLane::FindGuardObstacle(
   return first_guard_vehicle;
 }
 
-const Obstacle* ChangeLane::CreateGuardObstacle(
-    Frame* frame, ReferenceLineInfo* reference_line_info,
-    const Obstacle* obstacle) {
+bool ChangeLane::CreateGuardObstacle(
+    const ReferenceLineInfo* reference_line_info, Obstacle* obstacle) {
   if (!obstacle || !obstacle->HasTrajectory()) {
-    return nullptr;
+    return false;
   }
   const auto& last_point =
       *(obstacle->Trajectory().trajectory_point().rbegin());
-  std::string id = obstacle->Id() + "_guard";
-  auto perception = obstacle->Perception();
-  perception.set_id(-(std::hash<std::string>{}(id) >> 1));
-  prediction::Trajectory trajectory = obstacle->Trajectory();
-  constexpr double kPredictionTimeDelta = 0.1;                 // seconds
-  const double kGuardTime = 5.0 + last_point.relative_time();  // seconds
-  // trajectory.add_trajectory_point()->CopyFrom(last_point);
+
+  const double kStepDistance = obstacle->PerceptionBoundingBox().length();
+  double extend_v = std::max(last_point.v(), kMinGuardVehicleSpeed);
+  const double time_delta = kStepDistance / extend_v;
   const auto& reference_line = reference_line_info->reference_line();
+  const double end_s =
+      std::min(reference_line.Length(),
+               reference_line_info->AdcSlBoundary().end_s() + kGuardDistance);
   SLPoint sl_point;
   if (!reference_line.XYToSL(last_point.path_point(), &sl_point)) {
-    return nullptr;
+    return false;
   }
-  const double delta_s = kPredictionTimeDelta * last_point.v();
-  double s = sl_point.s() + delta_s;
-  for (double t = last_point.relative_time() + kPredictionTimeDelta;
-       t < kGuardTime && s < reference_line.Length();
-       s += delta_s, t += kPredictionTimeDelta) {
+  double s = last_point.path_point().s() + kStepDistance;
+  double ref_s = sl_point.s() + kStepDistance;
+  for (double t = last_point.relative_time() + time_delta; ref_s < end_s;
+       ref_s += kStepDistance, s += kStepDistance, t += time_delta) {
     auto ref_point = reference_line.GetNearestReferencepoint(s);
-    auto* tp = trajectory.add_trajectory_point();
+    auto* tp = obstacle->AddTrajectoryPoint();
     tp->set_a(0.0);
-    tp->set_v(last_point.v());
+    tp->set_v(extend_v);
     tp->set_relative_time(t);
     tp->mutable_path_point()->set_x(ref_point.x());
     tp->mutable_path_point()->set_y(ref_point.y());
     tp->mutable_path_point()->set_theta(ref_point.heading());
-    tp->mutable_path_point()->set_s(s - sl_point.s());
+    tp->mutable_path_point()->set_s(s);
     tp->mutable_path_point()->set_kappa(ref_point.kappa());
   }
-  frame->AddObstacle(Obstacle(id, perception, trajectory));
-  auto* stored_obstacle = frame->Find(id);
-  reference_line_info->AddObstacle(stored_obstacle);
-  return stored_obstacle;
+  return true;
 }
 
 bool ChangeLane::ApplyRule(Frame* frame,
@@ -121,9 +126,9 @@ bool ChangeLane::ApplyRule(Frame* frame,
   if (!obstacle) {
     return true;
   } else {
-    auto* guard_obstacle =
-        CreateGuardObstacle(frame, reference_line_info, obstacle);
-    if (guard_obstacle) {
+    auto* guard_obstacle = frame->Find(obstacle->Id());
+    if (guard_obstacle &&
+        CreateGuardObstacle(reference_line_info, guard_obstacle)) {
       AINFO << "Created guard obstacle: " << guard_obstacle->Id();
     }
   }
