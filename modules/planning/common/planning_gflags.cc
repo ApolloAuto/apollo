@@ -178,6 +178,8 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
+DEFINE_bool(try_history_decision, false, "try history decision first");
+
 DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
 DEFINE_double(longitudinal_ignore_buffer, 10.0,
               "If an obstacle's longitudinal distance is further away "
