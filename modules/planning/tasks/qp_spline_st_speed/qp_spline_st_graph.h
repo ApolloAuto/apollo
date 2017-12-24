@@ -77,12 +77,16 @@ class QpSplineStGraph {
       const double total_path_s, double* const s_upper_bound,
       double* const s_lower_bound) const;
 
-  // generate reference speed profile
-  // common::Status ApplyReferenceSpeedProfile();
+  // reference line kernel is a constant s line at s = 250m
   common::Status AddCruiseReferenceLineKernel(const SpeedLimit& speed_limit,
                                               const double weight);
 
+  // follow line kernel
   common::Status AddFollowReferenceLineKernel(
+      const std::vector<const StBoundary*>& boundaries, const double weight);
+
+  // yield line kernel
+  common::Status AddYieldReferenceLineKernel(
       const std::vector<const StBoundary*>& boundaries, const double weight);
 
   const SpeedData GetHistorySpeed() const;
