@@ -23,6 +23,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
+#include "modules/planning/tasks/traffic_decider/change_lane.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
 #include "modules/planning/tasks/traffic_decider/destination.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
@@ -65,6 +66,10 @@ void TrafficDecider::RegisterRules() {
   rule_factory_.Register(RuleConfig::STOP_SIGN,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new StopSign(config);
+                         });
+  rule_factory_.Register(RuleConfig::CHANGE_LANE,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new ChangeLane(config);
                          });
 }
 

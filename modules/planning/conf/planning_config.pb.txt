@@ -168,3 +168,6 @@ rule_config : {
 rule_config : {
     rule_id: DESTINATION
 }
+rule_config : {
+    rule_id: CHANGE_LANE
+}
