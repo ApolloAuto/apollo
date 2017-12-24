@@ -55,13 +55,13 @@ em_planner_config {
         low_speed_penalty: 2.5
 
         accel_penalty: 2.0
-        decel_penalty: 2.0
+        decel_penalty: 4.0
 
         positive_jerk_coeff: 1.0
         negative_jerk_coeff: 300.0
 
-        max_acceleration: 4.5
-        max_deceleration: -4.5
+        max_acceleration: 1.5
+        max_deceleration: -2.2
 
         st_boundary_config {
             boundary_buffer: 0.1
