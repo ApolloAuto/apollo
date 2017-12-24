@@ -330,9 +330,12 @@ bool DPRoadGraph::IsSafeForLaneChange() {
       continue;
     }
 
-    constexpr double kSafeDistance = 5.0;
-    if (sl_boundary.end_s() > adc_sl_boundary.start_s() - kSafeDistance &&
-        sl_boundary.start_s() < adc_sl_boundary.end_s() + kSafeDistance) {
+    constexpr double kForwardSafeDistance = 5.0;
+    constexpr double kBackwardSafeDistance = 15.0;
+    if (sl_boundary.end_s() >
+            adc_sl_boundary.start_s() - kBackwardSafeDistance &&
+        sl_boundary.start_s() <
+            adc_sl_boundary.end_s() + kForwardSafeDistance) {
       return false;
     }
   }

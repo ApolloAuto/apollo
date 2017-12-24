@@ -554,9 +554,9 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   }
 
   if (is_change_lane_) {
-    constexpr double kLaneChangeSpeedBoost = 1.05;
     for (uint32_t k = 0; k < t_evaluated_.size(); ++k) {
-      speed_upper_bound->at(k) *= kLaneChangeSpeedBoost;
+      speed_upper_bound->at(k) *=
+          (1.0 + FLAGS_change_lane_speed_relax_percentage);
     }
   }
 
