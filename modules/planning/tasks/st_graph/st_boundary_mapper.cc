@@ -106,7 +106,7 @@ Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
     }
     const auto& decision = path_obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
-      const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
+      const double stop_s = path_obstacle->PerceptionSLBoundary().start_s() +
                             decision.stop().distance_s();
       // this is a rough estimation based on reference line s, so that a large
       // buffer is used.
@@ -156,12 +156,12 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
   const auto& stop_decision = stop_obstacle->LongitudinalDecision();
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  if (stop_obstacle->perception_sl_boundary().start_s() > planning_distance_) {
+  if (stop_obstacle->PerceptionSLBoundary().start_s() > planning_distance_) {
     return true;
   }
 
   double st_stop_s = 0.0;
-  const double stop_ref_s = stop_obstacle->perception_sl_boundary().start_s() +
+  const double stop_ref_s = stop_obstacle->PerceptionSLBoundary().start_s() +
                             stop_decision.stop().distance_s() -
                             vehicle_param_.front_edge_to_center();
 
@@ -175,7 +175,7 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
       AERROR << "Fail to get path point from reference s. The sl boundary of "
                 "stop obstacle "
              << stop_obstacle->Id() << " is: "
-             << stop_obstacle->perception_sl_boundary().DebugString();
+             << stop_obstacle->PerceptionSLBoundary().DebugString();
       return false;
     }
 
@@ -509,18 +509,18 @@ Status StBoundaryMapper::GetSpeedLimits(
       if (!const_path_obstacle->LateralDecision().has_nudge()) {
         continue;
       }
-      if (path_s < const_path_obstacle->perception_sl_boundary().start_s() ||
-          path_s > const_path_obstacle->perception_sl_boundary().end_s()) {
+      if (path_s < const_path_obstacle->PerceptionSLBoundary().start_s() ||
+          path_s > const_path_obstacle->PerceptionSLBoundary().end_s()) {
         continue;
       }
       constexpr double kRange = 1.0;  // meters
       const auto& nudge = const_path_obstacle->LateralDecision().nudge();
       bool is_close_on_left =
           (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
-          (const_path_obstacle->perception_sl_boundary().end_l() > -kRange);
+          (const_path_obstacle->PerceptionSLBoundary().end_l() > -kRange);
       bool is_close_on_right =
           (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
-          (const_path_obstacle->perception_sl_boundary().start_l() < kRange);
+          (const_path_obstacle->PerceptionSLBoundary().start_l() < kRange);
       if (is_close_on_left || is_close_on_right) {
         double nudge_speed_ratio = 1.0;
         if (const_path_obstacle->obstacle()->IsStatic()) {

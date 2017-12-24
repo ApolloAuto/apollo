@@ -44,7 +44,7 @@ bool Destination::ApplyRule(Frame*,
   }
 
   auto stop_point = reference_line_info->reference_line().GetReferencePoint(
-      destination->perception_sl_boundary().start_s() -
+      destination->PerceptionSLBoundary().start_s() -
       FLAGS_stop_distance_destination);
   ObjectDecisionType stop;
   stop.mutable_stop();

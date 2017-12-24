@@ -430,7 +430,7 @@ const std::string PathObstacle::DebugString() const {
 
 void PathObstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
 
-const SLBoundary& PathObstacle::perception_sl_boundary() const {
+const SLBoundary& PathObstacle::PerceptionSLBoundary() const {
   return perception_sl_boundary_;
 }
 
