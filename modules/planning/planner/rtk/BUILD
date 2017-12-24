@@ -20,6 +20,7 @@ cc_library(
         "//modules/planning/common:planning_common",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/planner",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
     ],

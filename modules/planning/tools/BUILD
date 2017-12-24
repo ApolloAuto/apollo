@@ -6,8 +6,9 @@ cc_binary(
     name = "planning_stats",
     srcs = ["planning_stats.cc"],
     deps = [
-        "//modules/planning:planning_lib",
         "//modules/common",
+        "//modules/planning:planning_lib",
+        "//modules/planning/proto:planning_stats_proto",
         "@ros//:ros_common",
     ],
 )
