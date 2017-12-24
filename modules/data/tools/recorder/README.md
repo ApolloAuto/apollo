@@ -78,7 +78,7 @@ If you want to copy something from system to record data in portable hard disk, 
  * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "data_sync_on".
  * Also user can write a rosnode to publish ros message to control data-recorder.
 
-#### Subscribe  data-recorder status topic and get data-recorder running infomation. This feature depends on data-recorder has been started.
+#### Subscribe  data-recorder status topic and get data-recorder running information. This feature depends on data-recorder has been started.
  * rostopic list  # List all the ros topics.
  * rostopic echo  /apollo/data_recorder/status # Read data from /apollo/data_recorder/status.
 Try to use the following code to subscribe topic and get deserialized message.
