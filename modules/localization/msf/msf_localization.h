@@ -19,9 +19,10 @@
  * @brief The class of MSFLocalization
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_H_
+#ifndef MODULES_LOCALIZATION_MSF_MSF_LOCALIZATION_H_
+#define MODULES_LOCALIZATION_MSF_MSF_LOCALIZATION_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -60,7 +61,6 @@ namespace localization {
 class MSFLocalization : public LocalizationBase {
  public:
   MSFLocalization();
-  virtual ~MSFLocalization();
 
   /**
    * @brief module start function
@@ -86,17 +86,16 @@ class MSFLocalization : public LocalizationBase {
   void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
 
  private:
-  bool load_gnss_antenna_extrinsic(const std::string &file_path,
-                                   double *offset_x, double *offset_y,
-                                   double *offset_z, double *uncertainty_x,
-                                   double *uncertainty_y,
-                                   double *uncertainty_z);
+  bool LoadGnssAntennaExtrinsic(const std::string &file_path,
+                                double *offset_x, double *offset_y,
+                                double *offset_z, double *uncertainty_x,
+                                double *uncertainty_y, double *uncertainty_z);
 
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
   LocalizationInteg localization_integ_;
   LocalizationIntegParam localizaiton_param_;
-  tf2_ros::TransformBroadcaster *tf2_broadcaster_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster_;
   LocalizationMeasureState localization_state_;
   uint64_t pcd_msg_index_;
 
@@ -106,4 +105,4 @@ class MSFLocalization : public LocalizationBase {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_H_
+#endif  // MODULES_LOCALIZATION_MSF_MSF_LOCALIZATION_H_
