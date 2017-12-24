@@ -43,7 +43,7 @@ class StBoundaryMapper {
                    const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
-                   const double planning_time);
+                   const double planning_time, const bool is_change_lane);
 
   virtual ~StBoundaryMapper() = default;
 
@@ -90,6 +90,7 @@ class StBoundaryMapper {
   const apollo::common::VehicleParam& vehicle_param_;
   const double planning_distance_;
   const double planning_time_;
+  bool is_change_lane_ = false;
 };
 
 }  // namespace planning

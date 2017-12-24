@@ -61,14 +61,16 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
-                                   const double planning_time)
+                                   const double planning_time,
+                                   bool is_change_lane)
     : adc_sl_boundary_(adc_sl_boundary),
       st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
-      planning_time_(planning_time) {}
+      planning_time_(planning_time),
+      is_change_lane_(is_change_lane) {}
 
 Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
   const auto& path_obstacles = path_decision->path_obstacles();
@@ -168,8 +170,8 @@ bool StBoundaryMapper::MapStopDecision(PathObstacle* stop_obstacle) const {
     if (!path_data_.GetPathPointWithRefS(stop_ref_s, &stop_point)) {
       AERROR << "Fail to get path point from reference s. The sl boundary of "
                 "stop obstacle "
-             << stop_obstacle->Id() << " is: "
-             << stop_obstacle->PerceptionSLBoundary().DebugString();
+             << stop_obstacle->Id()
+             << " is: " << stop_obstacle->PerceptionSLBoundary().DebugString();
       return false;
     }
 
@@ -407,13 +409,25 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
-  Vec2d vec_to_center = Vec2d((vehicle_param_.front_edge_to_center() -
-                               vehicle_param_.back_edge_to_center()) /
-                                  2.0,
-                              (vehicle_param_.left_edge_to_center() -
-                               vehicle_param_.right_edge_to_center()) /
-                                  2.0)
-                            .rotate(path_point.theta());
+  double left_delta_l = 0.0;
+  double right_delta_l = 0.0;
+  if (is_change_lane_) {
+    if ((adc_sl_boundary_.start_l() + adc_sl_boundary_.end_l()) / 2.0 > 0.0) {
+      // change to right
+      left_delta_l = 1.0;
+    } else {
+      // change to left
+      right_delta_l = 1.0;
+    }
+  }
+  Vec2d vec_to_center =
+      Vec2d((vehicle_param_.front_edge_to_center() -
+             vehicle_param_.back_edge_to_center()) /
+                2.0,
+            (vehicle_param_.left_edge_to_center() + left_delta_l -
+             vehicle_param_.right_edge_to_center() + right_delta_l) /
+                2.0)
+          .rotate(path_point.theta());
   Vec2d center = Vec2d(path_point.x(), path_point.y()) + vec_to_center;
 
   const Box2d adc_box =
