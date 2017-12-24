@@ -52,6 +52,8 @@ class Obstacle {
 
   std::int32_t PerceptionId() const;
 
+  double Speed() const;
+
   bool IsStatic() const;
   bool IsVirtual() const;
 
@@ -102,6 +104,7 @@ class Obstacle {
   bool is_static_ = false;
   bool is_virtual_ = false;
   bool has_trajectory_ = false;
+  double speed_ = 0.0;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   common::math::Box2d perception_bounding_box_;

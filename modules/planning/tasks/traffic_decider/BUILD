@@ -6,6 +6,7 @@ cc_library(
     name = "traffic_rules",
     srcs = [
         "backside_vehicle.cc",
+        "change_lane.cc",
         "clear_zone.cc",
         "crosswalk.cc",
         "destination.cc",
@@ -17,6 +18,7 @@ cc_library(
     ],
     hdrs = [
         "backside_vehicle.h",
+        "change_lane.h",
         "clear_zone.h",
         "crosswalk.h",
         "destination.h",
