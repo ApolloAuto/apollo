@@ -49,6 +49,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleParam;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::util::StrCat;
 
 namespace {
 constexpr double boundary_t_buffer = 0.1;
@@ -65,8 +66,7 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
       st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
-      vehicle_param_(
-          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
+      vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
       planning_time_(planning_time) {}
 
@@ -95,10 +95,9 @@ Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
     StBoundary boundary;
     boundary.SetId(path_obstacle->Id());
     if (!path_obstacle->HasLongitudinalDecision()) {
-      const auto ret = MapWithoutDecision(path_obstacle);
-      if (!ret.ok()) {
-        std::string msg = common::util::StrCat(
-            "Fail to map obstacle ", path_obstacle->Id(), " without decision.");
+      if (!MapWithoutDecision(path_obstacle).ok()) {
+        std::string msg = StrCat("Fail to map obstacle ", path_obstacle->Id(),
+                                 " without decision.");
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
@@ -118,26 +117,21 @@ Status StBoundaryMapper::GetGraphBoundary(PathDecision* path_decision) const {
                << adc_sl_boundary_.end_s();
         return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
       }
-      if (!stop_obstacle) {
-        stop_obstacle = path_obstacle;
-        stop_decision = decision;
-        min_stop_s = stop_s;
-      } else if (stop_s < min_stop_s) {
+      if (stop_s < min_stop_s) {
         stop_obstacle = path_obstacle;
         min_stop_s = stop_s;
         stop_decision = decision;
       }
     } else if (decision.has_follow() || decision.has_overtake() ||
                decision.has_yield()) {
-      const auto ret = MapWithPredictionTrajectory(path_obstacle);
-      if (!ret.ok()) {
+      if (!MapWithPredictionTrajectory(path_obstacle).ok()) {
         AERROR << "Fail to map obstacle " << path_obstacle->Id()
                << " with decision: " << decision.DebugString();
         return Status(ErrorCode::PLANNING_ERROR,
                       "Fail to map overtake/yield decision");
       }
     } else {
-      ADEBUG << "No mapping for decision: " << decision.DebugString();
+      AWARN << "No mapping for decision: " << decision.DebugString();
     }
   }
 
@@ -276,20 +270,10 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
     }
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
-      if (i > 0) {
-        const auto& pre_point = trajectory.trajectory_point(i - 1);
-        if (trajectory_point.relative_time() <= pre_point.relative_time()) {
-          AERROR << "Fail to map because prediction time is not increasing."
-                 << "current point: " << trajectory_point.ShortDebugString()
-                 << "previous point: " << pre_point.ShortDebugString();
-          return false;
-        }
-      }
-
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
       double trajectory_point_time = trajectory_point.relative_time();
-      const double kNegtiveTimeThreshold = -1.0;
+      constexpr double kNegtiveTimeThreshold = -1.0;
       if (trajectory_point_time < kNegtiveTimeThreshold) {
         continue;
       }

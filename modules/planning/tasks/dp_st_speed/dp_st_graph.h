@@ -83,7 +83,7 @@ class DpStGraph {
   const StGraphData& st_graph_data_;
 
   // vehicle configuration parameter
-  common::VehicleParam vehicle_param_;
+  const common::VehicleParam& vehicle_param_;
 
   const SLBoundary& adc_sl_boundary_;
 
