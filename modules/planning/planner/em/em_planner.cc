@@ -103,7 +103,7 @@ void EMPlanner::RecordObstacleDebugInfo(
     auto obstacle_debug = ptr_debug->mutable_planning_data()->add_obstacle();
     obstacle_debug->set_id(path_obstacle->Id());
     obstacle_debug->mutable_sl_boundary()->CopyFrom(
-        path_obstacle->perception_sl_boundary());
+        path_obstacle->PerceptionSLBoundary());
     const auto& decider_tags = path_obstacle->decider_tags();
     const auto& decisions = path_obstacle->decisions();
     if (decider_tags.size() != decisions.size()) {

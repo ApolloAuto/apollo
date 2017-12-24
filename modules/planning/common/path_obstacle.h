@@ -83,7 +83,7 @@ class PathObstacle {
 
   const std::string DebugString() const;
 
-  const SLBoundary& perception_sl_boundary() const;
+  const SLBoundary& PerceptionSLBoundary() const;
 
   const StBoundary& st_boundary() const;
 
