@@ -64,7 +64,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":data_extraction",
-        "//modules/localization/msf/local_tool/local_visualization:offline_local_visualizer_lib",
+        "//modules/localization/msf/local_tool/local_visualization/offline_visual:offline_local_visualizer_lib",
         "//modules/common:log",
         "@eigen//:eigen",
     ],
