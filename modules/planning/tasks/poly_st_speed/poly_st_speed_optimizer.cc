@@ -110,7 +110,8 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   // step 2 perform graph search
   // make a poly_st_graph and perform search here.
-  PolyStGraph poly_st_graph(poly_st_speed_config_, reference_line_info_);
+  PolyStGraph poly_st_graph(poly_st_speed_config_, reference_line_info_,
+                            speed_limits);
   auto ret = poly_st_graph.FindStTunnel(
       init_point,
       reference_line_info_->path_decision()->path_obstacles().Items(),
