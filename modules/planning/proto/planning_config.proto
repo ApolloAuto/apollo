@@ -17,6 +17,7 @@ enum TaskType {
   TRAFFIC_DECIDER = 4;
   PATH_DECIDER = 5;
   SPEED_DECIDER = 6;
+  POLY_ST_SPEED_OPTIMIZER = 7;
 };
 
 message RuleConfig {
