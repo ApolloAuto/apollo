@@ -104,7 +104,6 @@ DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
 DECLARE_bool(try_history_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
-DECLARE_double(longitudinal_ignore_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
@@ -128,7 +127,6 @@ DECLARE_bool(enable_lag_prediction);
 DECLARE_int32(lag_prediction_min_appear_num);
 DECLARE_double(lag_prediction_max_disappear_num);
 DECLARE_int32(trajectory_point_num_for_debug);
-DECLARE_double(decision_valid_stop_range);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
@@ -169,7 +167,6 @@ DECLARE_double(crosswalk_loose_l_distance);
 DECLARE_bool(enable_stop_sign);
 DECLARE_string(stop_sign_virtual_object_id_prefix);
 DECLARE_double(stop_duration_for_stop_sign);
-DECLARE_double(max_distance_stop_sign_waiting_area);
 
 DECLARE_bool(enable_sqp_solver);
 
