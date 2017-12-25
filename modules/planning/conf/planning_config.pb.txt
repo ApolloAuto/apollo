@@ -147,6 +147,16 @@ em_planner_config {
     poly_st_speed_config {
         total_path_length: 250.0
         total_time: 8.0
+
+        preferred_accel: 1.5
+        preferred_decel: -2.2
+        max_accel: 2.5
+        min_decel: -4.5
+
+        speed_limit_buffer: 0.05
+        speed_weight: 1.0
+        jerk_weight: 10.0
+
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 1.2

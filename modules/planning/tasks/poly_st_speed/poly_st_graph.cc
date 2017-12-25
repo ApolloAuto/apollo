@@ -34,6 +34,9 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+constexpr double kEpsilon = 1e-6;
+}
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -67,6 +70,7 @@ bool PolyStGraph::FindStTunnel(
     AERROR << "Fail to search min cost speed profile.";
     return false;
   }
+  speed_data->Clear();
   constexpr double delta_t = 0.1;  // output resolution, in seconds
   const auto curve = min_cost_node.speed_profile;
   for (double t = 0.0; t < planning_time_; t += delta_t) {
@@ -90,10 +94,12 @@ bool PolyStGraph::GenerateMinCostSpeedProfile(
   double min_cost = std::numeric_limits<double>::max();
   for (const auto &level : points) {
     for (const auto &st_point : level) {
+      AERROR << st_point.DebugString();
       const double speed_limit = speed_limit_.GetSpeedLimitByS(st_point.s());
       constexpr int num_speed = 5;
-      for (double v = 0; v < speed_limit;
-           v = std::fmin(speed_limit, v + speed_limit / num_speed)) {
+      for (double v = 0; v < speed_limit + kEpsilon;
+           v += speed_limit / num_speed) {
+        AERROR << "v = " << v;
         PolyStGraphNode node = {st_point, v, 0.0};
         node.speed_profile = QuinticPolynomialCurve1d(
             0.0, start_node.speed, start_node.accel, node.st_point.s(),
@@ -116,7 +122,7 @@ bool PolyStGraph::SampleStPoints(
   constexpr double start_s = 0.0;
   for (double t = start_t; t < planning_time_; t += unit_t_) {
     std::vector<STPoint> level_points;
-    for (double s = start_s; s < planning_distance_; s += unit_s_) {
+    for (double s = start_s; s < planning_distance_ + kEpsilon; s += unit_s_) {
       level_points.emplace_back(s, t);
     }
     points->push_back(std::move(level_points));
