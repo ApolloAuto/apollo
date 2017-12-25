@@ -1,0 +1,27 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "poly_st_speed_optimizer",
+    srcs = [
+        "poly_st_speed_optimizer.cc",
+    ],
+    hdrs = [
+        "poly_st_speed_optimizer.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/localization/proto:pose_proto",
+        "//modules/map/hdmap",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:poly_st_speed_config_proto",
+        "//modules/planning/tasks:speed_optimizer",
+        "//modules/planning/tasks/st_graph:st_boundary_mapper",
+    ],
+)
+
+cpplint()

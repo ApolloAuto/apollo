@@ -159,8 +159,6 @@ class BaseMapNode {
   virtual unsigned int CreateBinary(FILE* file) const;
   /**@brief Get the binary size of the object. */
   virtual unsigned int GetBinarySize() const;
-  /**@brief Try to create the map directory. */
-  bool CreateMapDirectory(const std::string& path) const;
   /**@brief Load the map node header from a binary chunk.
    * @param <return> The size read (the real size of header).
    */

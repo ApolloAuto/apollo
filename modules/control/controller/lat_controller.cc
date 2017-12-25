@@ -164,11 +164,6 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
   LpfCoefficients(ts_, control_conf->lat_controller_conf().cutoff_freq(), &den,
                   &num);
   digital_filter_.set_coefficients(den, num);
-  // Mean filters
-  /**
-  heading_rate_filter_ = MeanFilter(
-      control_conf->lat_controller_conf().mean_filter_window_size());
-  **/
   lateral_error_filter_ =
       MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
   heading_error_filter_ =

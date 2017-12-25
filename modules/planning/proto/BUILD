@@ -97,6 +97,7 @@ proto_library(
     deps = [
         ":dp_poly_path_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
+        ":poly_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
         ":qp_spline_reference_line_smoother_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
@@ -166,6 +167,23 @@ proto_library(
     name = "qp_st_speed_config_proto_lib",
     srcs = [
         "qp_st_speed_config.proto",
+    ],
+    deps = [
+        ":st_boundary_config_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "poly_st_speed_config_proto",
+    deps = [
+        ":poly_st_speed_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "poly_st_speed_config_proto_lib",
+    srcs = [
+        "poly_st_speed_config.proto",
     ],
     deps = [
         ":st_boundary_config_proto_lib",
