@@ -173,7 +173,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
 
   matrix_state_ = Matrix::Zero(basic_state_size_, 1);
   matrix_k_ = Matrix::Zero(1, basic_state_size_);
-  // TODO(QiL): Change it to configs
+
   matrix_r_ = Matrix::Identity(controls_, controls_);
 
   matrix_q_ = Matrix::Zero(basic_state_size_, basic_state_size_);
@@ -231,7 +231,7 @@ void MPCController::LoadMPCGainScheduler(
       mpc_controller_conf.feedforwardterm_gain_scheduler();
   const auto &steer_weight_gain_scheduler =
       mpc_controller_conf.steer_weight_gain_scheduler();
-  AINFO << "Lateral control gain scheduler loaded";
+  AINFO << "MPC control gain scheduler loaded";
   Interpolation1D::DataType xy1, xy2, xy3, xy4;
   for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
     xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
@@ -248,19 +248,19 @@ void MPCController::LoadMPCGainScheduler(
 
   lat_err_interpolation_.reset(new Interpolation1D);
   CHECK(lat_err_interpolation_->Init(xy1))
-      << "Fail to load lateral error gain scheduler";
+      << "Fail to load lateral error gain scheduler for MPC controller";
 
   heading_err_interpolation_.reset(new Interpolation1D);
   CHECK(heading_err_interpolation_->Init(xy2))
-      << "Fail to load heading error gain scheduler";
+      << "Fail to load heading error gain scheduler for MPC controller";
 
   feedforwardterm_interpolation_.reset(new Interpolation1D);
   CHECK(feedforwardterm_interpolation_->Init(xy2))
-      << "Fail to load feedforwardterm gain scheduler";
+      << "Fail to load feedforwardterm gain scheduler for MPC controller";
 
   steer_weight_interpolation_.reset(new Interpolation1D);
   CHECK(steer_weight_interpolation_->Init(xy2))
-      << "Fail to load steer weight gain scheduler";
+      << "Fail to load steer weight gain scheduler for MPC controller";
 }
 
 Status MPCController::ComputeControlCommand(
@@ -335,12 +335,12 @@ Status MPCController::ComputeControlCommand(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
           mpc_eps_, mpc_max_iteration_, &control) != true) {
-    AERROR << "MPC failed";
+    AERROR << "MPC solver failed";
   }
 
   double mpc_end_timestamp = Clock::NowInSeconds();
 
-  ADEBUG << "MPC core: calculation time is: "
+  ADEBUG << "MPC core algorithm: calculation time is: "
          << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
@@ -349,6 +349,7 @@ Status MPCController::ComputeControlCommand(
                                 steer_single_direction_max_degree_ * 100;
   double steer_angle =
       steer_angle_feedback + steer_angle_feedforwardterm_updated_;
+
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
