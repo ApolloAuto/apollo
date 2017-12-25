@@ -143,12 +143,24 @@ class SimulationWorldService {
 
   Object &CreateWorldObjectIfAbsent(
       const apollo::perception::PerceptionObstacle &obstacle);
+  void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
+                       Object *world_object);
+  void SetObstaclePolygon(
+      const apollo::perception::PerceptionObstacle &obstacle,
+      Object *world_object);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
+  bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
+                    Decision *world_decision);
+  void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
+                       const Object &world_obj, Decision *world_decision);
   void UpdateDecision(const apollo::planning::DecisionResult &decision_res,
                       double header_time);
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
                           double update_timestamp_sec, Object *world_main_stop);
+  void CreatePredictionTrajectory(
+      Object *world_object,
+      const apollo::prediction::PredictionObstacle &obstacle);
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   /**
