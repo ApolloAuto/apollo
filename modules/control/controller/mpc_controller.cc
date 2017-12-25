@@ -255,8 +255,8 @@ void MPCController::LoadMPCGainScheduler(
       << "Fail to load heading error gain scheduler";
 
   feedforwardterm_interpolation_.reset(new Interpolation1D);
-  CHECK(heading_err_interpolation_->Init(xy2))
-      << "Fail to load heading error gain scheduler";
+  CHECK(feedforwardterm_interpolation_->Init(xy2))
+      << "Fail to load feedforwardterm gain scheduler";
 
   steer_weight_interpolation_.reset(new Interpolation1D);
   CHECK(steer_weight_interpolation_->Init(xy2))
@@ -409,8 +409,8 @@ Status MPCController::ComputeControlCommand(
   cmd->set_brake(brake_cmd);
 
   debug->set_heading(VehicleStateProvider::instance()->heading());
-  debug->set_steer_angle(steer_angle);
   debug->set_steering_position(chassis->steering_percentage());
+  debug->set_steer_angle(steer_angle);
 
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
   debug->set_steer_angle_feedback(steer_angle_feedback);
