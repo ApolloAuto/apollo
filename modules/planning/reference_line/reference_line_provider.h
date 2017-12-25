@@ -133,6 +133,9 @@ class ReferenceLineProvider {
                            hdmap::RouteSegments* segments,
                            ReferenceLine* reference_line);
 
+  AnchorPoint GetAnchorPoint(const ReferenceLine& reference_line,
+                             double s) const;
+
  private:
   DECLARE_SINGLETON(ReferenceLineProvider);
 
