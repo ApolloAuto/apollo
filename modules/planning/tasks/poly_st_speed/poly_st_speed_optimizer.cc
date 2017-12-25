@@ -31,6 +31,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/poly_st_speed/poly_st_graph.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 
 namespace apollo {
@@ -109,7 +110,15 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   // step 2 perform graph search
   // make a poly_st_graph and perform search here.
-
+  PolyStGraph poly_st_graph(poly_st_speed_config_, reference_line_info_);
+  auto ret = poly_st_graph.FindStTunnel(
+      init_point,
+      reference_line_info_->path_decision()->path_obstacles().Items(),
+      speed_data);
+  if (!ret) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Fail to find st tunnel in PolyStGraph.");
+  }
   return Status::OK();
 }
 
