@@ -33,6 +33,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace hdmap {
@@ -52,6 +53,28 @@ struct LaneWaypoint {
 
   std::string DebugString() const;
 };
+
+/**
+ * @brief get left boundary type at a waypoint.
+ */
+LaneBoundaryType::Type LeftBoundaryType(const LaneWaypoint& waypoint);
+
+/**
+ * @brief get left boundary type at a waypoint.
+ */
+LaneBoundaryType::Type RightBoundaryType(const LaneWaypoint& waypoint);
+
+/**
+ * @brief get left neighbor lane waypoint. If not exist, the Waypoint.lane will
+ * be null.
+ */
+LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint);
+
+/**
+ * @brief get left neighbor lane waypoint. If not exist, the Waypoint.lane will
+ * be null.
+ */
+LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint);
 
 struct LaneSegment {
   LaneSegment() = default;
