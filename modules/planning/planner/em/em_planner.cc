@@ -36,6 +36,7 @@
 #include "modules/planning/tasks/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/path_decider/path_decider.h"
+#include "modules/planning/tasks/poly_st_speed/poly_st_speed_optimizer.h"
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/tasks/speed_decider/speed_decider.h"
@@ -64,11 +65,11 @@ void EMPlanner::RegisterTasks() {
                          []() -> Task* { return new DpStSpeedOptimizer(); });
   task_factory_.Register(SPEED_DECIDER,
                          []() -> Task* { return new SpeedDecider(); });
-  task_factory_.Register(QP_SPLINE_PATH_OPTIMIZER,
-                         []() -> Task* { return new QpSplinePathOptimizer(); });
   task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
     return new QpSplineStSpeedOptimizer();
   });
+  task_factory_.Register(POLY_ST_SPEED_OPTIMIZER,
+                         []() -> Task* { return new PolyStSpeedOptimizer(); });
 }
 
 Status EMPlanner::Init(const PlanningConfig& config) {

@@ -26,6 +26,7 @@ namespace apollo {
 namespace planning {
 namespace {
 constexpr auto kInfCost = std::numeric_limits<double>::infinity();
+constexpr double kEpsilon = 1e-6;
 }
 
 using apollo::common::TrajectoryPoint;
@@ -40,8 +41,7 @@ double SpeedProfileCost::Calculate(const QuinticPolynomialCurve1d &curve,
                                    const double end_time) const {
   double cost = 0.0;
   constexpr double kDeltaT = 0.5;
-  for (double t = kDeltaT; t <= end_time;
-       t = std::fmin(end_time, t + end_time)) {
+  for (double t = kDeltaT; t < end_time + kEpsilon; t += kDeltaT) {
     cost += CalculatePointCost(curve, t);
   }
   return cost;
@@ -54,11 +54,15 @@ double SpeedProfileCost::CalculatePointCost(
   const double a = curve.Evaluate(2, t);
   const double da = curve.Evaluate(3, t);
 
-  const double speed_limit = speed_limit_.GetSpeedLimitByS(s);
-  if (v > speed_limit * 1.05) {
+  if (s < 0.0) {
     return kInfCost;
   }
-  if (a > 1.5 || a < -4.5) {
+
+  const double speed_limit = speed_limit_.GetSpeedLimitByS(s);
+  if (v < 0.0 || v > speed_limit * (1.0 + config_.speed_limit_buffer())) {
+    return kInfCost;
+  }
+  if (a > config_.preferred_accel() || a < config_.preferred_decel()) {
     return kInfCost;
   }
   for (const auto *obstacle : obstacles_) {
@@ -68,10 +72,8 @@ double SpeedProfileCost::CalculatePointCost(
     }
   }
   double cost = 0.0;
-  constexpr double kSpeedCost = 1.0;
-  cost += kSpeedCost * std::pow((v - speed_limit), 2);
-  constexpr double kJerkCost = 1.0;
-  cost += kJerkCost * std::pow(da, 2);
+  cost += config_.speed_weight() * std::pow((v - speed_limit), 2);
+  cost += config_.jerk_weight() * std::pow(da, 2);
   return cost;
 }
 
