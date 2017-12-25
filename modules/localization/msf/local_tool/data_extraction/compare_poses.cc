@@ -118,11 +118,12 @@ int main(int argc, char **argv) {
         double x_diff = fabs(transd_a.x() - transd_b.x());
         double y_diff = fabs(transd_a.y() - transd_b.y());
         double z_diff = fabs(transd_a.z() - transd_b.z());
-        double roll_diff = fabs(roll_a - roll_b) * 180.0 / 3.1415926;
-        double pitch_diff = fabs(pitch_a - pitch_b) * 180.0 / 3.1415926;
-        double yaw_diff = fabs(yaw_a - yaw_b) * 180.0 / 3.1415926;
+        double roll_diff = fabs(roll_a - roll_b) * 180.0 / M_PI;
+        double pitch_diff = fabs(pitch_a - pitch_b) * 180.0 / M_PI;
+        double yaw_diff = fabs(yaw_a - yaw_b);
+        yaw_diff = std::min(yaw_diff, 2.0 * M_PI - yaw_diff)  * 180.0 / M_PI;
 
-        file << idx << " " << timestamps_a[idx] << " "
+        file << idx << " " << std::setprecision(13) << timestamps_a[idx] << " "
           << x_diff << " " << y_diff << " " << z_diff << " "
           << roll_diff << " " << pitch_diff << " " << yaw_diff << std::endl;
       }

@@ -24,7 +24,6 @@ cc_library(
         "//modules/drivers/gnss/proto:config_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_proto",
         "//modules/drivers/gnss/proto:imu_proto",
-        "@local_integ//:local_integ",
         "//modules/localization:localization_base",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/util:localization_msf_common_util",
@@ -37,6 +36,7 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "@glog//:glog",
         "@gtest//:gtest",
+        "@local_integ//:local_integ",
         "@ros//:ros_common",
         "@yaml_cpp//:yaml",
     ],
@@ -50,10 +50,10 @@ cc_test(
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
+        ":msf_localization",
         "//modules/common:log",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/localization/msf:msf_localization",
         "@gtest//:main",
     ],
 )

@@ -234,6 +234,9 @@ bool DPRoadGraph::SamplePathWaypoints(
   double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     accumulated_s += level_distance;
+    if (accumulated_s + level_distance / 2.0 > total_length) {
+      accumulated_s = total_length;
+    }
     const double s = std::fmin(accumulated_s, total_length);
     constexpr double kMinAllowedSampleStep = 1.0;
     if (std::fabs(s - prev_s) < kMinAllowedSampleStep) {
@@ -254,7 +257,7 @@ bool DPRoadGraph::SamplePathWaypoints(
 
     double kDeafultUnitL = 0.30;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      kDeafultUnitL = 0.7;
+      kDeafultUnitL = 1.0;
     }
     const double sample_l_range =
         kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
@@ -275,7 +278,11 @@ bool DPRoadGraph::SamplePathWaypoints(
 
     std::vector<double> sample_l;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      sample_l.push_back(init_sl_point_.l());
+      if (i == 0) {
+        sample_l.push_back(init_sl_point_.l());
+      } else {
+        sample_l.push_back(std::copysign(1.0, init_sl_point_.l()));
+      }
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                   config_.sample_points_num_each_level() - 1,
@@ -285,11 +292,12 @@ bool DPRoadGraph::SamplePathWaypoints(
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
+      constexpr double kResonateDistance = 2.0;
       common::SLPoint sl;
-      if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
+      if (j % 2 == 0 ||
+          total_length - accumulated_s < 2.0 * kResonateDistance) {
         sl = common::util::MakeSLPoint(s, l);
       } else {
-        constexpr double kResonateDistance = 2.0;
         sl = common::util::MakeSLPoint(
             std::fmin(total_length, s + kResonateDistance), l);
       }
@@ -319,9 +327,15 @@ bool DPRoadGraph::IsSafeForLaneChange() {
     return false;
   }
 
-  for (const auto &path_obstacle :
+  constexpr double kForwardSafeTime = 1.2;
+  constexpr double kForwardMinSafeDistance = 6.0;
+  constexpr double kBackwardSafeTime = 1.2;
+  constexpr double kBackwardMinSafeDistance = 8.0;
+  const double kForwardSafeDistance =
+      std::max(kForwardMinSafeDistance, init_point_.v() * kForwardSafeTime);
+  for (const auto *path_obstacle :
        reference_line_info_.path_decision().path_obstacles().Items()) {
-    const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+    const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
     const auto &adc_sl_boundary = reference_line_info_.AdcSlBoundary();
 
     constexpr double kLateralShift = 2.5;
@@ -330,8 +344,9 @@ bool DPRoadGraph::IsSafeForLaneChange() {
       continue;
     }
 
-    constexpr double kForwardSafeDistance = 5.0;
-    constexpr double kBackwardSafeDistance = 15.0;
+    const double kBackwardSafeDistance =
+        std::max(kBackwardMinSafeDistance,
+                 path_obstacle->obstacle()->Speed() * kBackwardSafeTime);
     if (sl_boundary.end_s() >
             adc_sl_boundary.start_s() - kBackwardSafeDistance &&
         sl_boundary.start_s() <

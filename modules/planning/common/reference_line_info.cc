@@ -195,14 +195,14 @@ bool ReferenceLineInfo::AddObstacles(
 
 bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   // if adc is on the road, and obstacle behind adc, ignore
-  if (path_obstacle->perception_sl_boundary().end_s() >
+  if (path_obstacle->PerceptionSLBoundary().end_s() >
       reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ &&
-      path_obstacle->perception_sl_boundary().end_s() <
+      path_obstacle->PerceptionSLBoundary().end_s() <
           adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->perception_sl_boundary())) {
+      reference_line_.IsOnRoad(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -382,7 +382,7 @@ bool ReferenceLineInfo::ReachedDestination() const {
           dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
-  const double stop_s = dest_ptr->perception_sl_boundary().start_s() +
+  const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
                         dest_ptr->LongitudinalDecision().stop().distance_s();
   return adc_sl_boundary_.end_s() + kDestinationDeltaS > stop_s;
 }

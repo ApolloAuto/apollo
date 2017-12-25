@@ -13,6 +13,7 @@ cc_library(
         "-lopencv_imgproc",
     ],
     deps = [
+        "//modules/common/util",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "@eigen//:eigen",
     ],

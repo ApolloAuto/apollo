@@ -6,6 +6,7 @@ import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
+import "modules/planning/proto/poly_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_reference_line_smoother_config.proto";
 
 enum TaskType {
@@ -28,6 +29,7 @@ message RuleConfig {
     REFERENCE_LINE_END = 6;
     DESTINATION = 7;
     STOP_SIGN = 8;
+    CHANGE_LANE = 9;
   }
   optional RuleId rule_id = 1;
 }
@@ -38,6 +40,7 @@ message EMPlannerConfig {
   optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
   optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
   optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
+  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
 }
 
 message PlanningConfig {

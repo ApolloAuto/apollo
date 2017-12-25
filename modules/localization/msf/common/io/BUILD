@@ -7,9 +7,10 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
+        "//modules/common:log",
         "@eigen//:eigen",
-        "@yaml_cpp//:yaml",
         "@pcl//:pcl",
+        "@yaml_cpp//:yaml",
     ],
 )
 

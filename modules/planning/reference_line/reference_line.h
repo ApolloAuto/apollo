@@ -91,11 +91,19 @@ class ReferenceLine {
               common::math::Vec2d* const xy_point) const;
   bool XYToSL(const common::math::Vec2d& xy_point,
               common::SLPoint* const sl_point) const;
+  template <class XYPoint>
+  bool XYToSL(const XYPoint& xy, common::SLPoint* const sl_point) const {
+    return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);
+  }
 
   bool GetLaneWidth(const double s, double* const left_width,
                     double* const right_width) const;
   bool IsOnRoad(const common::SLPoint& sl_point) const;
   bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
+  template <class XYPoint>
+  bool IsOnRoad(const XYPoint& xy) const {
+    return IsOnRoad(common::math::Vec2d(xy.x(), xy.y()));
+  }
   bool IsOnRoad(const SLBoundary& sl_boundary) const;
 
   /**
