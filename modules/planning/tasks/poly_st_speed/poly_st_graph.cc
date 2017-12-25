@@ -21,9 +21,7 @@
 #include "modules/planning/tasks/poly_st_speed/poly_st_graph.h"
 
 #include <algorithm>
-#include <unordered_map>
 
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
@@ -54,20 +52,23 @@ bool PolyStGraph::FindStTunnel(
     SpeedData *const speed_data) {
   CHECK_NOTNULL(speed_data);
 
+  // set init point
   init_point_ = init_point;
-  std::vector<PolyStGraphNode> min_cost_path;
-  if (!GenerateMinCostSpeedProfile(obstacles, &min_cost_path)) {
-    AERROR << "Fail to generate graph!";
+
+  // sample end points
+  std::vector<std::vector<STPoint>> points;
+  if (!SampleStPoints(&points)) {
+    AERROR << "Fail to sample st points.";
     return false;
   }
 
-  std::vector<PolyStGraphNode> min_cost_speed_profile;
-  if (!GenerateMinCostSpeedProfile(obstacles, &min_cost_speed_profile)) {
+  PolyStGraphNode min_cost_node;
+  if (!GenerateMinCostSpeedProfile(points, obstacles, &min_cost_node)) {
     AERROR << "Fail to search min cost speed profile.";
     return false;
   }
   constexpr double delta_t = 0.1;  // output resolution, in seconds
-  const auto curve = min_cost_speed_profile.back().speed_profile;
+  const auto curve = min_cost_node.speed_profile;
   for (double t = 0.0; t < planning_time_; t += delta_t) {
     const double s = curve.Evaluate(0, t);
     const double v = curve.Evaluate(1, t);
@@ -79,19 +80,13 @@ bool PolyStGraph::FindStTunnel(
 }
 
 bool PolyStGraph::GenerateMinCostSpeedProfile(
+    const std::vector<std::vector<STPoint>> &points,
     const std::vector<const PathObstacle *> &obstacles,
-    std::vector<PolyStGraphNode> *min_cost_speed_profile) {
-  CHECK(min_cost_speed_profile != nullptr);
-  std::vector<std::vector<STPoint>> points;
-  if (!SampleStPoints(&points)) {
-    AERROR << "Fail to sample st points.";
-    return false;
-  }
+    PolyStGraphNode *const min_cost_node) {
+  CHECK_NOTNULL(min_cost_node);
   PolyStGraphNode start_node = {STPoint(0.0, 0.0), init_point_.v(),
                                 init_point_.a()};
-  min_cost_speed_profile->resize(2);
-  min_cost_speed_profile->front() = start_node;
-  SpeedProfileCost cost(config_, obstacles);
+  SpeedProfileCost cost(config_, obstacles, speed_limit_);
   double min_cost = std::numeric_limits<double>::max();
   for (const auto &level : points) {
     for (const auto &st_point : level) {
@@ -103,9 +98,9 @@ bool PolyStGraph::GenerateMinCostSpeedProfile(
         node.speed_profile = QuinticPolynomialCurve1d(
             0.0, start_node.speed, start_node.accel, node.st_point.s(),
             node.speed, node.accel, node.st_point.t());
-        const double c = cost.Calculate(node.speed_profile);
+        const double c = cost.Calculate(node.speed_profile, st_point.t());
         if (c < min_cost) {
-          min_cost_speed_profile->back() = node;
+          *min_cost_node = node;
           min_cost = c;
         }
       }
