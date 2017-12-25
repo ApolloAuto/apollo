@@ -66,7 +66,6 @@ DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
               "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
-DEFINE_double(pedestrian_min_speed, 0.1, "min speed for still pedestrian");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_max_acc, 2.0, "maximum pedestrian acceleration");
 DEFINE_double(prediction_pedestrian_total_time, 10.0,
