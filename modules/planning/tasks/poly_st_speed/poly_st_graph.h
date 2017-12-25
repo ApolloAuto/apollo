@@ -35,6 +35,7 @@
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/common/speed_limit.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -45,7 +46,8 @@ namespace planning {
 class PolyStGraph {
  public:
   explicit PolyStGraph(const PolyStSpeedConfig &config,
-                       const ReferenceLineInfo *reference_line_info);
+                       const ReferenceLineInfo *reference_line_info,
+                       const SpeedLimit &speed_limit);
 
   ~PolyStGraph() = default;
 
@@ -54,9 +56,6 @@ class PolyStGraph {
                     SpeedData *const speed_data);
 
  private:
-  /**
-   * an private inner struct for the poly st graph
-   */
   struct PolyStGraphNode {
    public:
     PolyStGraphNode() = default;
@@ -82,7 +81,7 @@ class PolyStGraph {
   common::TrajectoryPoint init_point_;
   const ReferenceLineInfo *reference_line_info_ = nullptr;
   const ReferenceLine &reference_line_;
-  SpeedData speed_data_;
+  const SpeedLimit &speed_limit_;
 
   double unit_t_ = 1.0;
   double unit_s_ = 5.0;
