@@ -82,7 +82,7 @@
 # ros TF2 quary frame id. tf2_buffer.lookupTransform.
 # type: string
 # default: world
---lidar_tf2_frame_id=world
+--lidar_tf2_frame_id=novatel
 
 # ros TF2 quary child frame id. tf2_buffer.lookupTransform.
 # type: string

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #include "modules/perception/obstacle/onboard/obstacle_perception.h"
+
+#include <string>
+
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -24,20 +26,31 @@
 #include "modules/perception/obstacle/fusion/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
-DEFINE_bool(show_lidar_obstacles, false, "whether show lidar obstacles or not");
-DEFINE_bool(show_radar_obstacles, false, "whether show radar obstacles or not");
-DEFINE_bool(show_fused_obstacles, false, "whether show fused obstacles or not");
+DEFINE_string(obstacle_show_type, "fused",
+              "show obstacle from lidar/radar/fused");
 
 namespace apollo {
 namespace perception {
 
-ObstaclePerception::ObstaclePerception() : initialized_(false) {}
+ObstacleShowType GetObstacleShowType(const std::string& show_type_string) {
+  if (show_type_string == "lidar") {
+    return SHOW_LIDAR;
+  } else if (show_type_string == "radar") {
+    return SHOW_RADAR;
+  } else if (show_type_string == "fused") {
+    return SHOW_FUSED;
+  } else {
+    return MAX_SHOW_TYPE;
+  }
+}
+
+ObstaclePerception::ObstaclePerception() {}
 
 ObstaclePerception::~ObstaclePerception() {}
 
 bool ObstaclePerception::Init() {
   RegistAllAlgorithm();
-  // initialize lidar detector
+  /// initialize lidar detector
   lidar_perception_.reset(new LidarProcess);
   if (lidar_perception_ == nullptr) {
     AERROR << "Failed to get LidarProcess instance";
@@ -47,7 +60,7 @@ bool ObstaclePerception::Init() {
     AERROR << "Failed to initialize lidar perception";
     return false;
   }
-  // initialize radar detector
+  /// initialize radar detector
   radar_detector_.reset(BaseRadarDetectorRegisterer::GetInstanceByName(
       FLAGS_onboard_radar_detector));
   if (radar_detector_ == nullptr) {
@@ -59,7 +72,7 @@ bool ObstaclePerception::Init() {
     AERROR << "Failed to initialize RadarDetector : "
            << FLAGS_onboard_radar_detector;
   }
-  // initialize fusion
+  /// initialize fusion
   fusion_.reset(BaseFusionRegisterer::GetInstanceByName(FLAGS_onboard_fusion));
   if (fusion_ == nullptr) {
     AERROR << "Failed to get fusion instance: " << FLAGS_onboard_fusion;
@@ -69,7 +82,7 @@ bool ObstaclePerception::Init() {
     AERROR << "Failed to init fusion:" << FLAGS_onboard_fusion;
     return false;
   }
-  // initialize visualizer
+  /// initialize visualizer
   if (FLAGS_enable_visualization) {
     frame_visualizer_.reset(new OpenglVisualizer());
     if (frame_visualizer_ == nullptr) {
@@ -80,14 +93,14 @@ bool ObstaclePerception::Init() {
       AERROR << "Failed to init visualizer.";
       return false;
     }
-    initialized_ = true;
+    obstacle_show_type_ = GetObstacleShowType(FLAGS_obstacle_show_type);
+    if (obstacle_show_type_ == MAX_SHOW_TYPE) {
+      AERROR << "Failed to get ObstacleShowType";
+      return false;
+    }
   }
 
   return true;
-}
-
-void ObstaclePerception::SetGlobalOffset(const Eigen::Vector3d& global_offset) {
-  global_offset_ = global_offset;
 }
 
 void ObstaclePerception::RegistAllAlgorithm() {
@@ -107,7 +120,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
 
   std::shared_ptr<SensorObjects> sensor_objects(new SensorObjects());
   if (frame->sensor_type_ == VELODYNE_64) {
-    // lidar obstacle detection
+    /// lidar obstacle detection
     VelodyneRawFrame* velodyne_frame = dynamic_cast<VelodyneRawFrame*>(frame);
     std::shared_ptr<Eigen::Matrix4d> velodyne_pose(new Eigen::Matrix4d);
     *(velodyne_pose.get()) = velodyne_frame->pose_;
@@ -118,17 +131,18 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
       return false;
     }
     sensor_objects->objects = lidar_perception_->GetObjects();
+    AINFO << "lidar objects size: " << sensor_objects->objects.size();
     PERF_BLOCK_END("lidar_perception");
-    // set frame content
+    /// set frame content
     if (FLAGS_enable_visualization) {
       frame_content_.SetLidarPose(velodyne_frame->pose_);
       frame_content_.SetLidarCloud(velodyne_frame->cloud_);
-      if (FLAGS_show_lidar_obstacles) {
+      if (obstacle_show_type_ == SHOW_LIDAR) {
         frame_content_.SetTrackedObjects(sensor_objects->objects);
       }
     }
   } else if (frame->sensor_type_ == RADAR) {
-    // radar obstacle detection
+    /// radar obstacle detection
     RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame);
     RadarDetectorOptions options;
     options.radar2world_pose = &(radar_frame->pose_);
@@ -144,8 +158,8 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
     sensor_objects->objects = objects;
     AINFO << "radar objects size: " << objects.size();
     PERF_BLOCK_END("radar_detection");
-    // set frame content
-    if (FLAGS_enable_visualization && FLAGS_show_radar_obstacles) {
+    /// set frame content
+    if (FLAGS_enable_visualization && obstacle_show_type_ == SHOW_RADAR) {
       frame_content_.SetTrackedObjects(sensor_objects->objects);
     }
   } else {
@@ -157,7 +171,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
   sensor_objects->timestamp = frame->timestamp_;
   sensor_objects->sensor2world_pose = frame->pose_;
 
-  // fusion
+  /// fusion
   std::vector<SensorObjects> multi_sensor_objs;
   multi_sensor_objs.push_back(*sensor_objects);
   std::vector<ObjectPtr> fused_objects;
@@ -165,11 +179,12 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
     AERROR << "Failed to fusion";
     return false;
   }
+  *out_objects = fused_objects;
+  AINFO << "fused objects size: " << fused_objects.size();
   PERF_BLOCK_END("sensor_fusion");
-
-  // // set frame content
+  /// set frame content
   if (FLAGS_enable_visualization) {
-    if (FLAGS_show_fused_obstacles) {
+    if (obstacle_show_type_ == SHOW_FUSED) {
       frame_content_.SetTrackedObjects(fused_objects);
       if (frame->sensor_type_ != VELODYNE_64) {
         return true;
@@ -179,7 +194,6 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
     frame_visualizer_->Render(frame_content_);
   }
 
-  *out_objects = fused_objects;
   return true;
 }
 

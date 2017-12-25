@@ -27,12 +27,12 @@ bool OpenglVisualizer::Init() {
   opengl_vs_ = boost::shared_ptr<GLFWViewer>(new GLFWViewer());
 
   if (opengl_vs_ == nullptr) {
-    AINFO << "Failed to create opengl viewer";
+    AERROR << "Failed to create opengl viewer";
     return false;
   }
 
   if (opengl_vs_->Initialize() == false) {
-    AINFO << "Failed to initialize opengl viewer";
+    AERROR << "Failed to initialize opengl viewer";
     return false;
   }
 
@@ -61,7 +61,6 @@ void OpenglVisualizer::Render(const FrameContent &content) {
       Eigen::Vector3d(forward_world_.x, forward_world_.y, forward_world_.z));
   opengl_vs_->SetFrameContent(content);
   opengl_vs_->SpinOnce();
-  AINFO << "OpenglVisualizer spin_once";
 }
 
 void OpenglVisualizer::SetSize(int w, int h) {
