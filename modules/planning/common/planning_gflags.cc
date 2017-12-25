@@ -184,9 +184,6 @@ DEFINE_bool(enable_nudge_slowdown, true,
 DEFINE_bool(try_history_decision, false, "try history decision first");
 
 DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
-DEFINE_double(longitudinal_ignore_buffer, 10.0,
-              "If an obstacle's longitudinal distance is further away "
-              "than this distance, ignore it");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -279,9 +276,6 @@ DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
 DEFINE_double(stop_duration_for_stop_sign, 3,
               "min time(second) to stop at stop sign");
-DEFINE_double(max_distance_stop_sign_waiting_area, 3,
-              "max distance(meter) to be considered as "
-              "having arrived stop sign waiting area");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
@@ -300,8 +294,6 @@ DEFINE_string(planning_config_file,
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
-DEFINE_double(decision_valid_stop_range, 0.5,
-              "The valid stop range in decision.");
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");

@@ -55,7 +55,7 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
 
   a_matrix_.setIdentity();
   a_matrix_(0, 2) = FLAGS_a_matrix_covariance_coeffcient_1;
-  a_matrix_(1, 3) = FLAGS_a_matrix_covariance_coeffcient_1;
+  a_matrix_(1, 3) = FLAGS_a_matrix_covariance_coeffcient_2;
   // initialize states to the states of the detected obstacle
   posteriori_state_(0) = belief_anchor_point_(0);
   posteriori_state_(1) = belief_anchor_point_(1);
