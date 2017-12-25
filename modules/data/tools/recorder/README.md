@@ -2,7 +2,7 @@ Data-Recorder is responsiable for helping Apollo partners to record data.
 
 ## v1.0.0.1
 
-## How to `Use.`
+## How to `Use`
 
 #### Data-Recorder configuration.
 Modify modules/data/conf/recorder.global.yaml and modules/data/conf/recorder.debug.yaml as following examples:
@@ -22,8 +22,11 @@ output_path: /media/apollo/data_storage
 ```
 
 ```modules/data/conf/debug.global.yaml```</br>
-If you want to record rosbag group be topics, please refer to the following confituration:
+If you want to record rosbag group by ros topic, please refer to the following configuration:
 ``` 
+   # group_name: should be different if there are multi-groups.
+   # group_topic_match_re: match topics using regular expressions.
+   # group_topic_exclude_re: exclude topics matching the given regular expression.
    rosbag_topic_group:
    - group_id: '1'
      group_name: 'default'
@@ -36,7 +39,7 @@ If you want to record rosbag group be topics, please refer to the following conf
 
 ```
 
-If you want to copy something from system to record data in portable hard disk, please refer to the following confituration:
+If you want to copy something from system to record data in portable hard disk, please refer to the following configuration:
 ```
     carversion:                       # date type.
       if_record: true                 # if record.
@@ -75,7 +78,7 @@ If you want to copy something from system to record data in portable hard disk, 
  * rostopic pub /apollo/data_recorder/cmd --once std_msgs/String "data_sync_on".
  * Also user can write a rosnode to publish ros message to control data-recorder.
 
-#### Subscribe  data-recorder status topic and get data-recorder running infomations.This feature depends on data-recorder has been started.
+#### Subscribe  data-recorder status topic and get data-recorder running information. This feature depends on data-recorder has been started.
  * rostopic list  # List all the ros topics.
  * rostopic echo  /apollo/data_recorder/status # Read data from /apollo/data_recorder/status.
 Try to use the following code to subscribe topic and get deserialized message.
