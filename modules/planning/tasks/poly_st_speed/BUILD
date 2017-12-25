@@ -3,6 +3,22 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "speed_profile_cost",
+    srcs = [
+        "speed_profile_cost.cc",
+    ],
+    hdrs = [
+        "speed_profile_cost.h",
+    ],
+    deps = [
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:poly_st_speed_config_proto",
+        "//modules/planning/tasks:speed_optimizer",
+        "//modules/planning/tasks/st_graph:st_boundary_mapper",
+    ],
+)
+
+cc_library(
     name = "poly_st_graph",
     srcs = [
         "poly_st_graph.cc",
@@ -11,6 +27,7 @@ cc_library(
         "poly_st_graph.h",
     ],
     deps = [
+        ":speed_profile_cost",
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
