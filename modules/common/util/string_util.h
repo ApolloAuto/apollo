@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_UTIL_STRING_UTIL_H_
 #define MODULES_COMMON_UTIL_STRING_UTIL_H_
 
+#include <functional>
 #include <sstream>
 #include <string>
 
@@ -81,6 +82,32 @@ std::string PrintIter(const Iter& begin, const Iter& end,
   std::string result;
   Join(begin, end, delimiter.c_str(), &result);
   return result;
+}
+
+template <typename Iter>
+std::string PrintIter(const Iter& begin, const Iter& end,
+                      const std::function<std::string(Iter)> transformer,
+                      const std::string& delimiter = " ") {
+  std::string result;
+  if (transformer) {
+    for (auto iter = begin; iter != end; ++iter) {
+      if (iter == begin) {
+        StrAppend(&result, transformer(*iter));
+      } else {
+        StrAppend(&result, delimiter, transformer(*iter));
+      }
+    }
+  } else {
+    PrintIter(begin, end, delimiter);
+  }
+  return result;
+}
+
+template <typename Container, typename Iter>
+std::string PrintIter(const Container& container,
+                      const std::function<std::string(Iter)> transformer,
+                      const std::string& delimiter = " ") {
+  return PrintIter(container.begin(), container.end(), transformer, delimiter);
 }
 
 template <typename Container>
