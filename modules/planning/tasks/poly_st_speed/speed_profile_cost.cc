@@ -20,19 +20,59 @@
 
 #include "modules/planning/tasks/poly_st_speed/speed_profile_cost.h"
 
+#include <limits>
+
 namespace apollo {
 namespace planning {
+namespace {
+constexpr auto kInfCost = std::numeric_limits<double>::infinity();
+}
 
 using apollo::common::TrajectoryPoint;
 
 SpeedProfileCost::SpeedProfileCost(
     const PolyStSpeedConfig &config,
-    const std::vector<const PathObstacle *> &obstacles)
-    : config_(config), obstacles_(obstacles) {}
+    const std::vector<const PathObstacle *> &obstacles,
+    const SpeedLimit &speed_limit)
+    : config_(config), obstacles_(obstacles), speed_limit_(speed_limit) {}
 
-double SpeedProfileCost::Calculate(
-    const QuinticPolynomialCurve1d &curve) const {
-  return 0.0;
+double SpeedProfileCost::Calculate(const QuinticPolynomialCurve1d &curve,
+                                   const double end_time) const {
+  double cost = 0.0;
+  constexpr double kDeltaT = 0.5;
+  for (double t = kDeltaT; t <= end_time;
+       t = std::fmin(end_time, t + end_time)) {
+    cost += CalculatePointCost(curve, t);
+  }
+  return cost;
+}
+
+double SpeedProfileCost::CalculatePointCost(
+    const QuinticPolynomialCurve1d &curve, const double t) const {
+  const double s = curve.Evaluate(0, t);
+  const double v = curve.Evaluate(1, t);
+  const double a = curve.Evaluate(2, t);
+  const double da = curve.Evaluate(3, t);
+
+  const double speed_limit = speed_limit_.GetSpeedLimitByS(s);
+  if (v > speed_limit * 1.05) {
+    return kInfCost;
+  }
+  if (a > 1.5 || a < -4.5) {
+    return kInfCost;
+  }
+  for (const auto *obstacle : obstacles_) {
+    auto boundary = obstacle->st_boundary();
+    if (boundary.IsPointInBoundary(STPoint(s, t))) {
+      return kInfCost;
+    }
+  }
+  double cost = 0.0;
+  constexpr double kSpeedCost = 1.0;
+  cost += kSpeedCost * std::pow((v - speed_limit), 2);
+  constexpr double kJerkCost = 1.0;
+  cost += kJerkCost * std::pow(da, 2);
+  return cost;
 }
 
 }  // namespace planning

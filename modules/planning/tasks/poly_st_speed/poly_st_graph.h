@@ -71,8 +71,9 @@ class PolyStGraph {
   };
 
   bool GenerateMinCostSpeedProfile(
+      const std::vector<std::vector<STPoint>> &points,
       const std::vector<const PathObstacle *> &obstacles,
-      std::vector<PolyStGraphNode> *min_cost_path);
+      PolyStGraphNode *const min_cost_node);
 
   bool SampleStPoints(std::vector<std::vector<STPoint>> *const points);
 

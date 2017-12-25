@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file path_optimizer.cpp
+ * @file
  **/
 
 #include "modules/planning/tasks/path_optimizer.h"
