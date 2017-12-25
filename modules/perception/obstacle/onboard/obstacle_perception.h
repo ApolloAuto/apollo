@@ -32,26 +32,33 @@
 namespace apollo {
 namespace perception {
 
+enum ObstacleShowType {
+  SHOW_LIDAR = 0,
+  SHOW_RADAR = 1,
+  SHOW_FUSED = 2,
+  MAX_SHOW_TYPE
+};
+
 class ObstaclePerception {
  public:
   ObstaclePerception();
   ~ObstaclePerception();
-
   bool Init();
-
   bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>* out_objects);
-
-  void SetGlobalOffset(const Eigen::Vector3d& global_offset);
 
  private:
   void RegistAllAlgorithm();
+
+  /// obstacle detector
   std::unique_ptr<LidarProcess> lidar_perception_;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
   std::unique_ptr<BaseFusion> fusion_;
+
+  /// visualization
   std::unique_ptr<OpenglVisualizer> frame_visualizer_ = nullptr;
+  ObstacleShowType obstacle_show_type_;
   FrameContent frame_content_;
-  bool initialized_;
-  Eigen::Vector3d global_offset_;
+
   DISALLOW_COPY_AND_ASSIGN(ObstaclePerception);
 };  // class ObstaclePerception
 
