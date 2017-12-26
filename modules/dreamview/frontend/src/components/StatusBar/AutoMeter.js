@@ -1,6 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 
+import Speedometer from "components/StatusBar/Speedometer";
+
 class Meter extends React.Component {
     render () {
         const { label, percentage, meterColor, background } = this.props;
@@ -45,8 +47,7 @@ export default class AutoMeter extends React.Component {
 
         return (
             <div className="auto-meter">
-                <span className="speed-read">{speed}</span>
-                <span className="speed-unit">km/h</span>
+                <Speedometer meterPerSecond={speed} />
                 <div className="brake-panel">
                     <Meter label={this.setting.brake.label}
                            percentage={brakePercent}
