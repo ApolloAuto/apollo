@@ -43,9 +43,9 @@ namespace apollo {
 namespace drivers {
 namespace canbus {
 
-using Clock = ::apollo::common::time::Clock;
+using apollo::common::ErrorCode;
+using apollo::common::time::Clock;
 using micros = std::chrono::microseconds;
-using ::apollo::common::ErrorCode;
 
 /**
  * @struct CheckIdArg
