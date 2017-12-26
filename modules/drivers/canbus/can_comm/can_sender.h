@@ -202,10 +202,6 @@ class CanSender {
   DISALLOW_COPY_AND_ASSIGN(CanSender);
 };
 
-using common::time::Clock;
-using common::ErrorCode;
-using micros = common::time::micros;
-
 const uint32_t kSenderInterval = 6000;
 
 template <typename SensorType>
@@ -288,7 +284,8 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    tm_start = common::time::AsInt64<micros>(Clock::Now());
+    tm_start = common::time::AsInt64<common::time::micros>(
+        common::time::Clock::Now());
     new_delta_period = INIT_PERIOD;
 
     for (auto &message : send_messages_) {
@@ -302,7 +299,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       std::vector<CanFrame> can_frames;
       CanFrame can_frame = message.CanFrame();
       can_frames.push_back(can_frame);
-      if (can_client_->SendSingleFrame(can_frames) != ErrorCode::OK) {
+      if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK) {
         AERROR << "Send msg failed:" << can_frame.CanFrameString();
       }
       if (enable_log()) {
@@ -310,7 +307,8 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       }
     }
     delta_period = new_delta_period;
-    tm_end = common::time::AsInt64<micros>(Clock::Now());
+    tm_end = common::time::AsInt64<common::time::micros>(
+        common::time::Clock::Now());
     sleep_interval = delta_period - (tm_end - tm_start);
 
     if (sleep_interval > 0) {
@@ -325,19 +323,20 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
 }
 
 template <typename SensorType>
-ErrorCode CanSender<SensorType>::Init(CanClient *can_client, bool enable_log) {
+common::ErrorCode CanSender<SensorType>::Init(CanClient *can_client,
+                                              bool enable_log) {
   if (is_init_) {
     AERROR << "Duplicated Init request.";
-    return ErrorCode::CANBUS_ERROR;
+    return common::ErrorCode::CANBUS_ERROR;
   }
   if (can_client == nullptr) {
     AERROR << "Invalid can client.";
-    return ErrorCode::CANBUS_ERROR;
+    return common::ErrorCode::CANBUS_ERROR;
   }
   is_init_ = true;
   can_client_ = can_client;
   enable_log_ = enable_log;
-  return ErrorCode::OK;
+  return common::ErrorCode::OK;
 }
 
 template <typename SensorType>
@@ -354,15 +353,15 @@ void CanSender<SensorType>::AddMessage(uint32_t message_id,
 }
 
 template <typename SensorType>
-ErrorCode CanSender<SensorType>::Start() {
+common::ErrorCode CanSender<SensorType>::Start() {
   if (is_running_) {
     AERROR << "Cansender has already started.";
-    return ErrorCode::CANBUS_ERROR;
+    return common::ErrorCode::CANBUS_ERROR;
   }
   is_running_ = true;
   thread_.reset(new std::thread([this] { PowerSendThreadFunc(); }));
 
-  return ErrorCode::OK;
+  return common::ErrorCode::OK;
 }
 
 template <typename SensorType>
