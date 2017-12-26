@@ -131,6 +131,9 @@ class PathObstacle {
    **/
   static bool IsLateralDecision(const ObjectDecisionType& decision);
 
+  void SetBlockingObstacle(bool blocking) { is_blocking_obstacle_ = blocking; }
+  bool IsBlockingObstacle() const { return is_blocking_obstacle_; }
+
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
   static ObjectDecisionType MergeLongitudinalDecision(
@@ -154,6 +157,8 @@ class PathObstacle {
 
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;
+
+  bool is_blocking_obstacle_ = false;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(
