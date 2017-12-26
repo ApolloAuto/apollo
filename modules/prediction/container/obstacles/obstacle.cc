@@ -292,8 +292,8 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         double prev_y = mutable_feature(0)->position().y();
         double diff_x = feature->position().x() - prev_x;
         double diff_y = feature->position().y() - prev_y;
-        if (diff_x > FLAGS_valid_position_diff_thred &&
-            diff_y > FLAGS_valid_position_diff_thred) {
+        if (std::abs(diff_x) > FLAGS_valid_position_diff_thred &&
+            std::abs(diff_y) > FLAGS_valid_position_diff_thred) {
           velocity_heading = std::atan2(diff_y, diff_x);
           velocity_x = speed * std::cos(velocity_heading);
           velocity_y = speed * std::sin(velocity_heading);
