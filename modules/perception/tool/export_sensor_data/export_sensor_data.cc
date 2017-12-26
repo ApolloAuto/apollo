@@ -101,7 +101,7 @@ void ExportSensorData::WriteVelocityInfo(const std::string &file_pre,
     AINFO << "Failed to write velocity.";
   }
   fout << std::setprecision(16) << seq_num << " " << timestamp << " "
-       << velocity(0) << " " << velocity(1) << " " << velocity(2);
+       << velocity(0) << " " << velocity(1) << " " << velocity(2) << std::endl;
   fout.close();
 }
 

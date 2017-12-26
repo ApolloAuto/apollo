@@ -44,7 +44,7 @@ ObstacleShowType GetObstacleShowType(const std::string& show_type_string) {
   }
 }
 
-ObstaclePerception::ObstaclePerception() {}
+ObstaclePerception::ObstaclePerception() : lidar_pose_inited_(false) {}
 
 ObstaclePerception::~ObstaclePerception() {}
 
@@ -140,6 +140,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
       if (obstacle_show_type_ == SHOW_LIDAR) {
         frame_content_.SetTrackedObjects(sensor_objects->objects);
       }
+      lidar_pose_inited_ = true;
     }
   } else if (frame->sensor_type_ == RADAR) {
     /// radar obstacle detection
@@ -190,8 +191,10 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
         return true;
       }
     }
-    frame_visualizer_->UpdateCameraSystem(&frame_content_);
-    frame_visualizer_->Render(frame_content_);
+    if (lidar_pose_inited_) {
+      frame_visualizer_->UpdateCameraSystem(&frame_content_);
+      frame_visualizer_->Render(frame_content_);
+    }
   }
 
   return true;
