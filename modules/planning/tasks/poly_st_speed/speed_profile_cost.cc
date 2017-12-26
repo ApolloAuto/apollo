@@ -85,7 +85,8 @@ double SpeedProfileCost::CalculatePointCost(
     if (t < boundary.min_t() || t > boundary.max_t()) {
       continue;
     }
-    if (boundary.IsPointInBoundary(STPoint(s, t))) {
+    if (obstacle->IsBlockingObstacle() &&
+        boundary.IsPointInBoundary(STPoint(s, t))) {
       return kInfCost;
     }
     double s_upper = 0.0;
@@ -105,6 +106,10 @@ double SpeedProfileCost::CalculatePointCost(
       } else {
         cost += config_.obstacle_weight() *
                 std::pow((kSafeDistance + s_upper - s), 2);
+      }
+    } else {
+      if (!obstacle->IsBlockingObstacle()) {
+        cost += config_.unblocking_obstacle_cost();
       }
     }
   }

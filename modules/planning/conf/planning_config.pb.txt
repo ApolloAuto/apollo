@@ -158,6 +158,8 @@ em_planner_config {
         jerk_weight: 1.0
         obstacle_weight: 10.0
 
+        unblocking_obstacle_cost: 1e3
+
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 1.2

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file trajectory_cost.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_POLY_ST_SPEED_SPEED_PROFILE_COST_H_
