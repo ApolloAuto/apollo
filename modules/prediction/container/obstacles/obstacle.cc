@@ -165,8 +165,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetVelocity(perception_obstacle, &feature);
   SetAcceleration(&feature);
   SetTheta(perception_obstacle, &feature);
-  if (!kf_motion_tracker_enabled_) {
-    InitKFMotionTracker(&feature);
+  if (!kf_motion_tracker_.IsInitialized()) {
+    InitKFMotionTracker(feature);
   }
   UpdateKFMotionTracker(&feature);
   SetCurrentLanes(&feature);
@@ -174,8 +174,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetLaneGraphFeature(&feature);
   UpdateKFLaneTrackers(&feature);
   if (type_ == PerceptionObstacle::PEDESTRIAN) {
-    if (!kf_pedestrian_tracker_enabled_) {
-      InitKFPedestrianTracker(&feature);
+    if (!kf_pedestrian_tracker_.IsInitialized()) {
+      InitKFPedestrianTracker(feature);
     }
     UpdateKFPedestrianTracker(&feature);
   }
@@ -420,7 +420,7 @@ void Obstacle::SetLengthWidthHeight(
          << std::setprecision(6) << height << "].";
 }
 
-void Obstacle::InitKFMotionTracker(Feature* feature) {
+void Obstacle::InitKFMotionTracker(const Feature& feature) {
   double t = FLAGS_prediction_freq;
   // Set transition matrix F
   // constant acceleration dynamic model
@@ -475,16 +475,14 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
 
   // Set initial state
   Eigen::Matrix<double, 6, 1> x;
-  x(0, 0) = feature->position().x();
-  x(1, 0) = feature->position().y();
-  x(2, 0) = feature->velocity().x();
-  x(3, 0) = feature->velocity().y();
-  x(4, 0) = feature->acceleration().x();
-  x(5, 0) = feature->acceleration().y();
+  x(0, 0) = feature.position().x();
+  x(1, 0) = feature.position().y();
+  x(2, 0) = feature.velocity().x();
+  x(3, 0) = feature.velocity().y();
+  x(4, 0) = feature.acceleration().x();
+  x(5, 0) = feature.acceleration().y();
 
   kf_motion_tracker_.SetStateEstimate(x, P);
-
-  kf_motion_tracker_enabled_ = true;
 }
 
 void Obstacle::UpdateKFMotionTracker(Feature* feature) {
@@ -704,7 +702,7 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
          << std::fixed << std::setprecision(6) << lane_acc << "]";
 }
 
-void Obstacle::InitKFPedestrianTracker(Feature* feature) {
+void Obstacle::InitKFPedestrianTracker(const Feature& feature) {
   // Set transition matrix F
   Eigen::Matrix<double, 2, 2> F;
   F.setIdentity();
@@ -740,12 +738,10 @@ void Obstacle::InitKFPedestrianTracker(Feature* feature) {
   // Set initial state
   Eigen::Matrix<double, 2, 1> x;
   x.setZero();
-  x(0, 0) = feature->position().x();
-  x(1, 0) = feature->position().y();
+  x(0, 0) = feature.position().x();
+  x(1, 0) = feature.position().y();
 
   kf_pedestrian_tracker_.SetStateEstimate(x, P);
-
-  kf_pedestrian_tracker_enabled_ = true;
 }
 
 void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
