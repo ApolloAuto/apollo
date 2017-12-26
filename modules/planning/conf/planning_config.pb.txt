@@ -154,8 +154,9 @@ em_planner_config {
         min_decel: -4.5
 
         speed_limit_buffer: 0.05
-        speed_weight: 1.0
-        jerk_weight: 10.0
+        speed_weight: 1.0e2
+        jerk_weight: 1.0
+        obstacle_weight: 10.0
 
         st_boundary_config {
             boundary_buffer: 0.1
