@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
@@ -42,7 +43,7 @@ ConditionFilter::ConditionFilter(
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   //std::set<double> critical_timestamps = CriticalTimeStamps();
-  std::vector<double> uniform_timestamps = UniformTimeStamps();
+  std::vector<double> uniform_timestamps = UniformTimeStamps(8);
   std::vector<SampleBound> sample_bounds;
   // TODO (kechxu): change the hard-coded 0.001 to some variable
   // TODO (zhangyajia): why is this not zero?
@@ -197,15 +198,22 @@ std::set<double> ConditionFilter::CriticalTimeStamps() const {
   return critical_timestamps;
 }
 
-std::vector<double> ConditionFilter::UniformTimeStamps() const {
-  std::vector<double> uniform_timestamps;
-  int num_slices = 10; // per slice length is 0.8 seconds
-  double starting_timestamp = 1.0;
-  common::util::uniform_slice(starting_timestamp,
-                              planned_trajectory_time,
-                              num_slices,
-                              &uniform_timestamps);
-  return uniform_timestamps;
+std::vector<double> ConditionFilter::UniformTimeStamps(
+    const std::size_t num_of_time_segments) const {
+  CHECK(num_of_time_segments > 0);
+
+  double finish_trajectory_length = 0.01;
+  CHECK(finish_trajectory_length < (1.0 / (double)FLAGS_planning_loop_rate));
+
+  std::vector<double> timestamps;
+  timestamps.push_back(finish_trajectory_length);
+
+  double time_interval = planned_trajectory_time / (double) num_of_time_segments;
+  for (std::size_t i = 1; i <= num_of_time_segments; ++i) {
+    timestamps.push_back(i * time_interval);
+  }
+
+  return timestamps;
 }
 
 
