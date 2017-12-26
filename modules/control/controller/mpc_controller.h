@@ -107,6 +107,8 @@ class MPCController : public Controller {
 
   void UpdateMatrix();
 
+  void FeedforwardUpdate(SimpleMPCDebug *debug);
+
   double GetLateralError(
       const common::math::Vec2d &point,
       apollo::common::TrajectoryPoint *trajectory_point) const;
@@ -135,6 +137,8 @@ class MPCController : public Controller {
 
   void LoadControlCalibrationTable(
       const MPCControllerConf &mpc_controller_conf);
+
+  void LoadMPCGainScheduler(const MPCControllerConf &mpc_controller_conf);
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
 
@@ -190,6 +194,8 @@ class MPCController : public Controller {
   Eigen::MatrixXd matrix_k_;
   // control authority weighting matrix
   Eigen::MatrixXd matrix_r_;
+  // updated control authority weighting matrix
+  Eigen::MatrixXd matrix_r_updated_;
   // state weighting matrix
   Eigen::MatrixXd matrix_q_;
   // updated state weighting matrix
@@ -230,8 +236,9 @@ class MPCController : public Controller {
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
-  // MeanFilter heading_rate_filter_;
-  MeanFilter lateral_error_filter_;
+  std::unique_ptr<Interpolation1D> feedforwardterm_interpolation_;
+
+  std::unique_ptr<Interpolation1D> steer_weight_interpolation_;
 
   // for logging purpose
   std::ofstream steer_log_file_;
@@ -245,6 +252,10 @@ class MPCController : public Controller {
   double brake_deadzone_ = 0.0;
 
   double heading_error_rate_ = 0.0;
+
+  double steer_angle_feedforwardterm_ = 0.0;
+
+  double steer_angle_feedforwardterm_updated_ = 0.0;
 };
 
 }  // namespace control

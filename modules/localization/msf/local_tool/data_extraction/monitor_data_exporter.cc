@@ -47,7 +47,11 @@ int main(int argc, char **argv) {
       "fusion_loc_topic",
       boost::program_options::value<std::string>()->default_value(
           "/apollo/localization/pose"),
-      "provide fusion localization topic");
+      "provide fusion localization topic")(
+      "odometry_loc_topic",
+      boost::program_options::value<std::string>()->default_value(
+          "/apollo/sensor/gnss/odometry"),
+      "provide odometry localization topic");
 
   boost::program_options::variables_map boost_args;
   boost::program_options::store(
@@ -75,6 +79,8 @@ int main(int argc, char **argv) {
       boost_args["lidar_loc_topic"].as<std::string>();
   const std::string fusion_loc_topic =
       boost_args["fusion_loc_topic"].as<std::string>();
+  const std::string odometry_loc_topic =
+      boost_args["odometry_loc_topic"].as<std::string>();
 
   PCDExporter::Ptr pcd_exporter(new PCDExporter(pcd_folder));
   LocationExporter::Ptr loc_exporter(new LocationExporter(pcd_folder));
@@ -94,6 +100,10 @@ int main(int argc, char **argv) {
   reader.Subscribe(
       fusion_loc_topic,
       (BaseExporter::OnRosmsgCallback)&LocationExporter::FusionLocCallback,
+      loc_exporter);
+  reader.Subscribe(
+      odometry_loc_topic,
+      (BaseExporter::OnRosmsgCallback)&LocationExporter::OdometryLocCallback,
       loc_exporter);
 
   reader.Read(bag_file);

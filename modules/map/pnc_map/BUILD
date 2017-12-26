@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common/math",
         "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/proto:map_proto",
         "//modules/routing/proto:routing_proto",
     ],
@@ -47,6 +48,7 @@ cc_library(
         ":route_segments",
         "//modules/common/proto:vehicle_state_proto",
         "//modules/map/hdmap",
+        "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",
     ],
 )

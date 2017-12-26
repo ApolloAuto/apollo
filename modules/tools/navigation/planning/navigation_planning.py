@@ -41,6 +41,10 @@ gflags.DEFINE_integer('max_cruise_speed', 20,
                       'max speed for cruising in meter per second')
 gflags.DEFINE_boolean('enable_follow', False,
                       'enable follow function.')
+gflags.DEFINE_boolean('enable_nudge', False,
+                      'enable nudge function.')
+gflags.DEFINE_boolean('enable_change_lane', False,
+                      'enable change lane function.')
 gflags.DEFINE_boolean('enable_routing_aid', True,
                       'enable planning leveraging routing information.')
 gflags.DEFINE_string('navigation_planning_node_name', 'navigation_planning',
@@ -79,22 +83,16 @@ def mobileye_callback(mobileye_pb):
         return
 
     mobileye_provider.update(mobileye_pb)
+    mobileye_provider.process_obstacles()
 
-    if FLAGS.enable_routing_aid:
-        path_x, path_y, path_length = path_decider.get_path_by_lmr(
-            mobileye_provider, routing_provider,
-            localization_provider, chassis_provider)
-    else:
-        path_x, path_y, path_length = path_decider.get_path_by_lm(
-            mobileye_provider, chassis_provider)
+    path_x, path_y, path_length = path_decider.get(mobileye_provider,
+                                                   routing_provider,
+                                                   localization_provider,
+                                                   chassis_provider)
 
-    final_path_length = path_length
-    speed = FLAGS.max_cruise_speed
-
-    if FLAGS.enable_follow:
-        mobileye_provider.process_obstacles()
-        speed, final_path_length = speed_decider.get_target_speed_and_path_length(
-            mobileye_provider, chassis_provider, path_length)
+    speed, final_path_length = speed_decider.get(mobileye_provider,
+                                                 chassis_provider,
+                                                 path_length)
 
     adc_trajectory = traj_generator.generate(path_x, path_y, final_path_length,
                                              speed,
@@ -109,8 +107,11 @@ def init():
     global mobileye_provider, chassis_provider
     global localization_provider, routing_provider
 
-    path_decider = PathDecider()
-    speed_decider = SpeedDecider(FLAGS.max_cruise_speed)
+    path_decider = PathDecider(FLAGS.enable_routing_aid,
+                               FLAGS.enable_nudge,
+                               FLAGS.enable_change_lane)
+    speed_decider = SpeedDecider(FLAGS.max_cruise_speed,
+                                 FLAGS.enable_follow)
     traj_generator = TrajectoryGenerator()
     mobileye_provider = MobileyeProvider()
     chassis_provider = ChassisProvider()

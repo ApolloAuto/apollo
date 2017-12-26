@@ -28,6 +28,7 @@
 
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
@@ -56,6 +57,7 @@ bool DPRoadGraph::FindPathTunnel(
     const std::vector<const PathObstacle *> &obstacles,
     PathData *const path_data) {
   CHECK_NOTNULL(path_data);
+
   init_point_ = init_point;
   if (!reference_line_.XYToSL(
           {init_point_.path_point().x(), init_point_.path_point().y()},
@@ -173,7 +175,8 @@ bool DPRoadGraph::GenerateMinCostPath(
 
         // try to connect the current point with the first point directly
         // only do this at lane change
-        if (reference_line_info_.IsChangeLanePath() && level >= 2) {
+        if (reference_line_info_.IsChangeLanePath() && IsSafeForLaneChange() &&
+            level >= 2) {
           init_dl = init_frenet_frame_point_.dl();
           init_ddl = init_frenet_frame_point_.ddl();
           QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
@@ -205,6 +208,10 @@ bool DPRoadGraph::GenerateMinCostPath(
 
   for (const auto &node : *min_cost_path) {
     ADEBUG << "min_cost_path: " << node.sl_point.ShortDebugString();
+    planning_debug_->mutable_planning_data()
+        ->mutable_dp_poly_graph()
+        ->add_min_cost_point()
+        ->CopyFrom(node.sl_point);
   }
   return true;
 }
@@ -226,8 +233,10 @@ bool DPRoadGraph::SamplePathWaypoints(
   double accumulated_s = init_sl_point_.s();
   double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
-    std::vector<common::SLPoint> level_points;
     accumulated_s += level_distance;
+    if (accumulated_s + level_distance / 2.0 > total_length) {
+      accumulated_s = total_length;
+    }
     const double s = std::fmin(accumulated_s, total_length);
     constexpr double kMinAllowedSampleStep = 1.0;
     if (std::fabs(s - prev_s) < kMinAllowedSampleStep) {
@@ -246,7 +255,10 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    const double kDeafultUnitL = 0.30;
+    double kDeafultUnitL = 0.30;
+    if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
+      kDeafultUnitL = 1.0;
+    }
     const double sample_l_range =
         kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
     double sample_right_boundary =
@@ -265,27 +277,81 @@ bool DPRoadGraph::SamplePathWaypoints(
     }
 
     std::vector<double> sample_l;
-    common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
-                                config_.sample_points_num_each_level() - 1,
-                                &sample_l);
+    if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
+      if (i == 0) {
+        sample_l.push_back(init_sl_point_.l());
+      } else {
+        sample_l.push_back(std::copysign(1.0, init_sl_point_.l()));
+      }
+    } else {
+      common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
+                                  config_.sample_points_num_each_level() - 1,
+                                  &sample_l);
+    }
+    std::vector<common::SLPoint> level_points;
+    planning_internal::SampleLayerDebug sample_layer_debug;
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
+      constexpr double kResonateDistance = 2.0;
       common::SLPoint sl;
-      if (j % 2 == 0 || total_length - accumulated_s < level_distance) {
+      if (j % 2 == 0 ||
+          total_length - accumulated_s < 2.0 * kResonateDistance) {
         sl = common::util::MakeSLPoint(s, l);
       } else {
-        constexpr double kResonateDistance = 2.0;
         sl = common::util::MakeSLPoint(
             std::fmin(total_length, s + kResonateDistance), l);
       }
+      sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
     if (!reference_line_info_.IsChangeLanePath()) {
-      level_points.push_back(common::util::MakeSLPoint(s, 0.0));
+      auto sl_zero = common::util::MakeSLPoint(s, 0.0);
+      sample_layer_debug.add_sl_point()->CopyFrom(sl_zero);
+      level_points.push_back(sl_zero);
     }
 
     if (!level_points.empty()) {
+      planning_debug_->mutable_planning_data()
+          ->mutable_dp_poly_graph()
+          ->add_sample_layer()
+          ->CopyFrom(sample_layer_debug);
       points->emplace_back(level_points);
+    }
+  }
+  return true;
+}
+
+bool DPRoadGraph::IsSafeForLaneChange() {
+  if (!reference_line_info_.IsChangeLanePath()) {
+    AERROR << "Not a change lane path.";
+    return false;
+  }
+
+  constexpr double kForwardSafeTime = 1.2;
+  constexpr double kForwardMinSafeDistance = 6.0;
+  constexpr double kBackwardSafeTime = 1.2;
+  constexpr double kBackwardMinSafeDistance = 8.0;
+  const double kForwardSafeDistance =
+      std::max(kForwardMinSafeDistance, init_point_.v() * kForwardSafeTime);
+  for (const auto *path_obstacle :
+       reference_line_info_.path_decision().path_obstacles().Items()) {
+    const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
+    const auto &adc_sl_boundary = reference_line_info_.AdcSlBoundary();
+
+    constexpr double kLateralShift = 2.5;
+    if (sl_boundary.start_l() < -kLateralShift ||
+        sl_boundary.end_l() > kLateralShift) {
+      continue;
+    }
+
+    const double kBackwardSafeDistance =
+        std::max(kBackwardMinSafeDistance,
+                 path_obstacle->obstacle()->Speed() * kBackwardSafeTime);
+    if (sl_boundary.end_s() >
+            adc_sl_boundary.start_s() - kBackwardSafeDistance &&
+        sl_boundary.start_s() <
+            adc_sl_boundary.end_s() + kForwardSafeDistance) {
+      return false;
     }
   }
   return true;

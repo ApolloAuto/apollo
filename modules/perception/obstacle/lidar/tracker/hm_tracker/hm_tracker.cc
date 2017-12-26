@@ -603,7 +603,7 @@ void HmObjectTracker::CollectTrackedResults(
     obj->width = result_obj->size[1];
     obj->height = result_obj->size[2];
     obj->velocity = result_obj->velocity.cast<double>();
-    obj->velocity_uncertainty = result_obj->velocity_uncertainty;
+    obj->velocity_uncertainty = result_obj->velocity_uncertainty.cast<double>();
     obj->track_id = tracks[i]->idx_;
     obj->tracking_time = tracks[i]->period_;
     obj->type = result_obj->type;

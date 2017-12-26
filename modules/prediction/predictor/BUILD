@@ -48,7 +48,9 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/container/adc_trajectory:adc_trajectory_container"
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
+        "@eigen//:eigen",
     ],
 )
 

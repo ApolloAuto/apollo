@@ -61,6 +61,13 @@ bool RouteSegments::WithinLaneSegment(const routing::LaneSegment &lane_segment,
          lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s;
 }
 
+bool RouteSegments::WithinLaneSegment(const routing::LaneSegment &lane_segment,
+                                      const routing::LaneWaypoint &waypoint) {
+  return lane_segment.id() == waypoint.id() &&
+         lane_segment.start_s() - kSegmentationEpsilon <= waypoint.s() &&
+         lane_segment.end_s() + kSegmentationEpsilon >= waypoint.s();
+}
+
 bool RouteSegments::Stitch(const RouteSegments &other) {
   auto first_waypoint = FirstWaypoint();
   bool has_overlap = IsWaypointOnSegment(other.FirstWaypoint());
@@ -281,6 +288,11 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
     AERROR << "No projection from waypoint: " << waypoint.DebugString();
     return false;
   }
+  constexpr double kMaxLaneWidth = 10.0;
+  if (std::fabs(route_sl.l()) > 2 * kMaxLaneWidth) {
+    return false;
+  }
+
   // 2. heading should be the same.
   double waypoint_heading = waypoint.lane->Heading(waypoint.s);
   double segment_heading = segment_waypoint.lane->Heading(segment_waypoint.s);

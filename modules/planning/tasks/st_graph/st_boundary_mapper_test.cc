@@ -85,7 +85,7 @@ TEST_F(StBoundaryMapperTest, check_overlap_test) {
   double planning_time = 10.0;
   SLBoundary adc_sl_boundary;
   StBoundaryMapper mapper(adc_sl_boundary, config, *reference_line_, path_data_,
-                          planning_distance, planning_time);
+                          planning_distance, planning_time, false);
   common::PathPoint path_point;
   path_point.set_x(1.0);
   path_point.set_y(1.0);
@@ -93,5 +93,30 @@ TEST_F(StBoundaryMapperTest, check_overlap_test) {
   EXPECT_TRUE(mapper.CheckOverlap(path_point, box, 0.0));
 }
 
+TEST_F(StBoundaryMapperTest, get_centric_acc_limit) {
+  StBoundaryConfig config;
+  double planning_distance = 250.0;
+  double planning_time = 8.0;
+  SLBoundary adc_sl_boundary;
+  StBoundaryMapper mapper(adc_sl_boundary, config, *reference_line_, path_data_,
+                          planning_distance, planning_time, false);
+
+  double kappa = 0.0001;
+  while (kappa < 0.2) {
+    const double acc_limit = mapper.GetCentricAccLimit(kappa);
+    const double v = std::sqrt(acc_limit / kappa);
+    if (v > config.high_speed_threshold()) {
+      EXPECT_DOUBLE_EQ(acc_limit,
+                       config.high_speed_centric_acceleration_limit());
+    } else if (v < config.low_speed_threshold()) {
+      EXPECT_DOUBLE_EQ(acc_limit,
+                       config.low_speed_centric_acceleration_limit());
+    } else {
+      EXPECT_LE(acc_limit, config.low_speed_centric_acceleration_limit());
+      EXPECT_GE(acc_limit, config.high_speed_centric_acceleration_limit());
+    }
+    kappa += 0.0001;
+  }
+}
 }  // namespace planning
 }  // namespace apollo

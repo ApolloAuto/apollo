@@ -44,6 +44,8 @@ message PathPoint {
   optional double dkappa = 7;
   // derivative of derivative of kappa w.r.t s.
   optional double ddkappa = 8;
+  // The lane ID where the path point is on
+  optional string lane_id = 9;
 }
 
 message Path {

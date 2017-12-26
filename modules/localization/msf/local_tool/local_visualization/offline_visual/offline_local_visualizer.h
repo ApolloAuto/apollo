@@ -62,7 +62,8 @@ class OfflineLocalVisualizer {
   //       const std::vector<double> &in_timestamps,
   //       const std::vector<double> &ref_timestamps,
   //       std::map<unsigned int, Eigen::Affine3d> &out_poses);
-  void PoseAndStdInterpolationByTime(
+ public:
+  static void PoseAndStdInterpolationByTime(
       const std::vector<Eigen::Affine3d> &in_poses,
       const std::vector<Eigen::Vector3d> &in_stds,
       const std::vector<double> &in_timestamps,

@@ -95,7 +95,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     this.requestTimer = null;
                 }
             }
-        }, msPerFrame);
+        }, msPerFrame/2);
 
         clearInterval(this.processTimer);
         this.processTimer = setInterval(() => {

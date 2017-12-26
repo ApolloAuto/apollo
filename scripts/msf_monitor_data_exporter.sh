@@ -11,7 +11,8 @@ source "${DIR}/apollo_base.sh"
 
 GNSS_LOC_TOPIC="/apollo/localization/msf_gnss"
 LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar" 
-FUSION_LOC_TOPIC="/apollo/localization/pose" 
+FUSION_LOC_TOPIC="/apollo/localization/pose"
+ODOMETRY_LOC_TOPIC="/apollo/sensor/gnss/odometry"
 CLOUD_TOPIC="/apollo/sensor/velodyne64/compensator/PointCloud2"  
 
 $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/monitor_data_exporter \
@@ -20,4 +21,5 @@ $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/monitor_d
     --cloud_topic $CLOUD_TOPIC \
     --gnss_loc_topic $GNSS_LOC_TOPIC \
     --lidar_loc_topic $LIDAR_LOC_TOPIC \
-    --fusion_loc_topic $FUSION_LOC_TOPIC
+    --fusion_loc_topic $FUSION_LOC_TOPIC \
+    --odometry_loc_topic $ODOMETRY_LOC_TOPIC

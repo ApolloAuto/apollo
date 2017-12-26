@@ -53,10 +53,12 @@ def update():
     r = requests.post(url, json=car_info)
     if r.status_code == 200:
         print "Update successfully."
+        sys.exit(0)
     elif r.status_code == 400:
         print "Invalid Request."
     else:
         print "Cannot connect to server."
+    sys.exit(1)
 
 if __name__ == "__main__":
     update()

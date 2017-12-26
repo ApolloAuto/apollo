@@ -16,16 +16,21 @@
 
 #include "modules/prediction/predictor/predictor.h"
 
+#include <algorithm>
+#include <cmath>
+#include <string>
 #include <vector>
 
+#include "Eigen/Dense"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::planning::ADCTrajectory;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Vec2d;
+using apollo::planning::ADCTrajectory;
 
 const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;
@@ -53,33 +58,43 @@ void Predictor::SetEqualProbability(double probability, int start_index) {
 void Predictor::Clear() { trajectories_.clear(); }
 
 void Predictor::TrimTrajectories(
+    const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container) {
-  std::vector<LineSegment2d> adc_segments =
-      adc_trajectory_container->ADCTrajectorySegments(FLAGS_adc_time_step);
   for (size_t i = 0; i < trajectories_.size(); ++i) {
-    TrimTrajectory(adc_segments, &trajectories_[i]);
+    TrimTrajectory(obstacle, adc_trajectory_container, &trajectories_[i]);
   }
 }
 
 bool Predictor::TrimTrajectory(
-    const std::vector<LineSegment2d>& adc_segments,
+    const Obstacle* obstacle,
+    const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
+  if (obstacle == nullptr || obstacle->history_size() == 0) {
+    AERROR << "Invalid obstacle.";
+    return false;
+  }
   int num_point = trajectory->trajectory_point_size();
-  // Get the index at intersect
+  if (num_point == 0) {
+    return false;
+  }
+  const Feature& feature = obstacle->latest_feature();
+  double length = feature.length();
+  double heading = feature.theta();
+  double forward_length =
+      std::max(length / 2.0 - FLAGS_distance_beyond_junction, 0.0);
+
+  double start_x = trajectory->trajectory_point(0).path_point().x() +
+                   forward_length * std::cos(heading);
+  double start_y = trajectory->trajectory_point(0).path_point().y() +
+                   forward_length * std::sin(heading);
+  if (adc_trajectory_container->IsPointInJunction({start_x, start_y})) {
+    return false;
+  }
   int index = 0;
   while (index < num_point) {
-    Vec2d curr_point(
-        trajectory->trajectory_point(index).path_point().x(),
-        trajectory->trajectory_point(index).path_point().y());
-    bool has_intersect = false;
-    for (const LineSegment2d& adc_segment : adc_segments) {
-      double distance = adc_segment.DistanceTo(curr_point);
-      if (distance < FLAGS_distance_to_adc_trajectory_thred) {
-        has_intersect = true;
-        break;
-      }
-    }
-    if (has_intersect) {
+    double x = trajectory->trajectory_point(index).path_point().x();
+    double y = trajectory->trajectory_point(index).path_point().y();
+    if (adc_trajectory_container->IsPointInJunction({x, y})) {
       break;
     }
     ++index;
@@ -87,12 +102,6 @@ bool Predictor::TrimTrajectory(
 
   // if no intersect
   if (index == num_point) {
-    return false;
-  }
-
-  double index_time = trajectory->trajectory_point(index).relative_time();
-  // if early intersect occurs
-  if (index_time < FLAGS_time_to_adc_trajectory_thred) {
     return false;
   }
 

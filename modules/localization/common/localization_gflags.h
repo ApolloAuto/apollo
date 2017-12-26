@@ -66,7 +66,6 @@ DECLARE_int32(point_cloud_step);
 // integ module
 DECLARE_bool(integ_ins_can_self_align);
 DECLARE_bool(integ_sins_align_with_vel);
-DECLARE_bool(using_raw_gnsspos);
 DECLARE_double(vel_threshold_get_yaw);
 DECLARE_bool(integ_debug_log_flag);
 

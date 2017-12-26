@@ -60,7 +60,7 @@ TrajectoryCost::TrajectoryCost(
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
     }
-    auto sl_boundary = ptr_path_obstacle->perception_sl_boundary();
+    auto sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
     const auto &vehicle_param =
         common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
@@ -95,6 +95,12 @@ TrajectoryCost::TrajectoryCost(
         // lane blocking obstacle
         continue;
       }
+
+      if (sl_boundary.start_l() < 0.0 && sl_boundary.end_l() > 0.0) {
+        // if obstacle stays at the center of the lane, do not pass
+        continue;
+      }
+
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;
@@ -208,7 +214,7 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
           GetCostBetweenObsBoxes(ego_box, obstacle_trajectory.at(index));
     }
   }
-  constexpr double kDynamicObsWeight = 1e-3;
+  constexpr double kDynamicObsWeight = 1e-6;
   obstacle_cost.safety_cost *=
       (config_.eval_time_interval() * kDynamicObsWeight);
   return obstacle_cost;

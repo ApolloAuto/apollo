@@ -33,7 +33,8 @@ DECLARE_double(min_prediction_length);
 DECLARE_double(replay_timestamp_gap);
 
 // Map
-DECLARE_double(search_radius);
+DECLARE_double(lane_search_radius);
+DECLARE_double(junction_search_radius);
 
 // Obstacle features
 DECLARE_bool(enable_kf_tracking);
@@ -53,7 +54,6 @@ DECLARE_double(target_lane_gap);
 DECLARE_double(max_lane_angle_diff);
 DECLARE_bool(enable_pedestrian_acc);
 DECLARE_double(coeff_mul_sigma);
-DECLARE_double(pedestrian_min_speed);
 DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_max_acc);
 DECLARE_double(prediction_pedestrian_total_time);
@@ -63,19 +63,20 @@ DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_int32(max_num_obstacles);
 DECLARE_bool(enable_adjust_velocity_heading);
 DECLARE_double(heading_diff_thred);
+DECLARE_double(valid_position_diff_thred);
 
 // evaluator
 DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_double(perception_confidence_threshold);
+DECLARE_bool(enable_rnn_acc);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
-DECLARE_double(adc_time_step);
-DECLARE_double(distance_to_adc_trajectory_thred);
-DECLARE_double(time_to_adc_trajectory_thred);
+DECLARE_double(distance_beyond_junction);
+DECLARE_double(adc_trajectory_search_length);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);

@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/canbus/proto/chassis.proto";
+import "modules/map/proto/map_id.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
@@ -70,7 +71,7 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
-// next id: 18
+// next id: 19
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -109,4 +110,7 @@ message ADCTrajectory {
         PROTECTED = 1;
   }
   optional RightOfWayStatus right_of_way_status = 17;
+
+  // lane id along reference line
+  repeated apollo.hdmap.Id lane_id = 18;
 }

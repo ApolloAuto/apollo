@@ -85,7 +85,9 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
   AINFO << "Using " << name_;
 }
 
-LatController::~LatController() { CloseLogFile(); }
+LatController::~LatController() {
+  CloseLogFile();
+}
 
 bool LatController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -162,11 +164,6 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
   LpfCoefficients(ts_, control_conf->lat_controller_conf().cutoff_freq(), &den,
                   &num);
   digital_filter_.set_coefficients(den, num);
-  // Mean filters
-  /**
-  heading_rate_filter_ = MeanFilter(
-      control_conf->lat_controller_conf().mean_filter_window_size());
-  **/
   lateral_error_filter_ =
       MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
   heading_error_filter_ =
@@ -258,9 +255,13 @@ void LatController::LoadLatGainScheduler(
       << "Fail to load heading error gain scheduler";
 }
 
-void LatController::Stop() { CloseLogFile(); }
+void LatController::Stop() {
+  CloseLogFile();
+}
 
-std::string LatController::Name() const { return name_; }
+std::string LatController::Name() const {
+  return name_;
+}
 
 Status LatController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
@@ -542,8 +543,8 @@ void LatController::ComputeLateralErrors(
 
   // theta_error_dot = angular_v - target_point.path_point().kappa() *
   // target_point.v();
-  debug->set_heading_error_rate(
-      angular_v - target_point.path_point().kappa() * target_point.v());
+  debug->set_heading_error_rate(angular_v - target_point.path_point().kappa() *
+                                                target_point.v());
 
   // matched_theta = 3.path_point().theta();
   debug->set_ref_heading(target_point.path_point().theta());

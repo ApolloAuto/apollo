@@ -116,11 +116,15 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   is_static_hypothesis_ = false;
   belief_anchor_point_ = initial_anchor_point;
   belief_velocity_ = initial_velocity;
+  const double uncertainty_factor = 5.0;
+  belief_velocity_uncertainty_ =
+    Eigen::Matrix3f::Identity() * uncertainty_factor;
   belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!!
   obj->velocity = belief_velocity_;
+  obj->velocity_uncertainty = belief_velocity_uncertainty_;
 
   // Initialize object direction with its lane direction
   obj->direction = obj->lane_direction;
@@ -149,20 +153,23 @@ Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
 
 void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
                                    const double& time_diff) {
+  ACHECK(new_object != nullptr) << "Update object with nullptr object";
   // A. update object track
   // A.1 update filter
   filter_->UpdateWithObject((*new_object), current_object_, time_diff);
   filter_->GetState(&belief_anchor_point_, &belief_velocity_);
+  filter_->GetOnlineCovariance(&belief_velocity_uncertainty_);
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!!
   (*new_object)->anchor_point = belief_anchor_point_;
   (*new_object)->velocity = belief_velocity_;
+  (*new_object)->velocity_uncertainty = belief_velocity_uncertainty_;
 
   belief_velocity_accelaration_ =
       ((*new_object)->velocity - current_object_->velocity) / time_diff;
   // A.2 update track info
-  age_++;
+  ++age_;
   total_visible_count_++;
   consecutive_invisible_count_ = 0;
   period_ += time_diff;
@@ -213,9 +220,10 @@ void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!
   new_obj->velocity = belief_velocity_;
+  new_obj->velocity_uncertainty = belief_velocity_uncertainty_;
 
   // E. update track info
-  age_++;
+  ++age_;
   consecutive_invisible_count_++;
   period_ += time_diff;
 
@@ -261,9 +269,10 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!
   new_obj->velocity = belief_velocity_;
+  new_obj->velocity_uncertainty = belief_velocity_uncertainty_;
 
   // E. update track info
-  age_++;
+  ++age_;
   consecutive_invisible_count_++;
   period_ += time_diff;
 

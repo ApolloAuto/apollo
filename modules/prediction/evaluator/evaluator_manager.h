@@ -89,6 +89,12 @@ class EvaluatorManager {
   ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;
 
+  ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
+      ObstacleConf::MLP_EVALUATOR;
+
+  ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
+      ObstacleConf::MLP_EVALUATOR;
+
   DECLARE_SINGLETON(EvaluatorManager)
 };
 

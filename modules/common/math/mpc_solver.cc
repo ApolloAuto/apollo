@@ -107,14 +107,22 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   Matrix matrix_m1 = matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr;
   Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
 
+  // Format in qp_solver
+  /**
+   * *           min_x  : q(x) = 0.5 * x^T * Q * x  + x^T c
+   * *           with respect to:  A * x = b (equality constraint)
+   * *                             C * x >= d (inequality constraint)
+   * **/
+
+  // TODO(QiL) : change qp solver to box constraint or substitute QPOASES
   // Method 1: QPOASES
   Matrix matrix_inequality_constrain_ll =
-      -Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
+      Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
   Matrix matrix_inequality_constrain_uu =
       Matrix::Identity(matrix_uu.rows(), matrix_uu.rows());
   Matrix matrix_inequality_constrain =
       Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
-  matrix_inequality_constrain << -matrix_inequality_constrain_ll,
+  matrix_inequality_constrain << matrix_inequality_constrain_ll,
       -matrix_inequality_constrain_uu;
   Matrix matrix_inequality_boundary =
       Matrix::Zero(matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());

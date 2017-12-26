@@ -25,6 +25,10 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ * @class GaussianSelect
+ * @brief use gaussian score to select light
+ */
 class GaussianSelect : public ISelectLight {
  public:
   GaussianSelect() = default;

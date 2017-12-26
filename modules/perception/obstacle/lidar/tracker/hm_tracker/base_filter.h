@@ -86,7 +86,7 @@ class BaseFilter {
   // @brief get online covariance of filter
   // @params[OUT] online_covariance: online covariance
   // @return noting
-  virtual void GetOnlineCovariance(Eigen::Matrix3d* online_covariance) = 0;
+  virtual void GetOnlineCovariance(Eigen::Matrix3f* online_covariance) = 0;
 
   // @brief get name of filter
   // @return name of filter

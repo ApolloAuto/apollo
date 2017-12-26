@@ -376,6 +376,8 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   }
 }
 
+Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
+
 void Frame::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
 }

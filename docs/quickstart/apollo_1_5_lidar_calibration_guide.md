@@ -1,8 +1,8 @@
 ## Apollo Sensor Calibration Service
 
-Welcome to the Apollo sensor calibration service. This document describes the process of the extrinsic calibration service between 64-beam Light Detection And Ranging (LiDAR) and Inertial Navigation System (INS). 
+Welcome to the Apollo sensor calibration service. This document describes the process of the extrinsic calibration service between 64-beam Light Detection And Ranging (LiDAR) and Inertial Navigation System (INS).
 
-## Apollo Sensor Calibration Catalog 
+## Apollo Sensor Calibration Catalog
 
 - Service overview
 - Preparation
@@ -17,7 +17,7 @@ Welcome to the Apollo sensor calibration service. This document describes the pr
 
 The Apollo vehicle sensor calibration function provides the extrinsic calibration between Velodyne HDL-64ES3 and IMU. The calibration results can be used to transfer the obstacle location detected by LiDAR to the IMU coordinate system, and then to the world coordinate system. The results are provided by `.yaml` format files.
 
-### Preparation 
+### Preparation
 
 To calibrate the sensors it is important to prepare using the following steps:
 
@@ -25,20 +25,20 @@ To calibrate the sensors it is important to prepare using the following steps:
 
 2.Start up the 64-beams LiDAR and INS. The INS must be aligned when it is powered on. At this point, the car should be driven straight, then turned left and turned right in an open area, until the initialization is completed.
 
-3.Confirm that all sensor topics required by this service have output. See: [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/FAQ0.md)
+3.Confirm that all sensor topics required by this service have output. See: [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
 
 The topics required by the calibration service are shown in the following Table 1:
-	
+
 Table 1. Sensor topics.
 
-Sensor | Topic Name | Topic Feq. (Hz)
---- | ------- | --- |
-HDL-64ES3	| /apollo/sensor/velodyne64/VelodyneScanUnified | 10
-INS |	/apollo/sensor/gnss/odometry | 100
-INS | /apollo/sensor/gnss/ins_stat	| 1
+| Sensor    | Topic Name                               | Topic Feq. (Hz) |
+| --------- | ---------------------------------------- | --------------- |
+| HDL-64ES3 | /apollo/sensor/velodyne64/VelodyneScanUnified | 10              |
+| INS       | /apollo/sensor/gnss/odometry             | 100             |
+| INS       | /apollo/sensor/gnss/ins_stat             | 1               |
 
 
-4.Confirm that the INS status is 56 when recording data. See: [How to Check INS Status?](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/FAQ1.md)
+4.Confirm that the INS status is 56 when recording data. See: [How to Check INS Status?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
 
 5.Choose an appropriate calibration field.
 
@@ -52,7 +52,7 @@ An ideal calibration field requires no tall buildings around the calibration are
 
 <p align="center">Figure 2. Calibration field.</p>
 
-### Recording Calibration Data 
+### Recording Calibration Data
 
 After the preparation steps are completed, drive the vehicle to the calibration field to record the calibration data.
 
@@ -65,48 +65,48 @@ bash lidar_calibration.sh start_record
 ```
 
 The recorded bag is under the directory `apollo/data/bag`.
-	
+
 3.Drive the car following a ∞ symbol path, using a controlled speed of 20-40km/h, and make the turning radius as small as possible.
     The total time length should within 3 minutes, but please make sure that your calibration drive contains at least one full ∞ symbol path.
-    
+
 4.After recording, run the following command to stop the data recording.
 
 ```bash
 bash lidar_calibration.sh stop_record
 ```
-	
+
 5.Then, the program will detect whether or not the recorded bag contains all the required topics. After passing the test, the bag will be packaged into file `lidar_calib_data.tar.gz`, including the recorded rosbag and the corresponding MD5 checksum file.
 
 ### Uploading Calibration Data and Creating a Calibration Service Task
 
-After recording the calibration data, please login to the [calibration service page](https://console.bce.baidu.com/apollo/calibrator/index/list) to complete the calibration. 
+After recording the calibration data, please login to the [calibration service page](https://console.bce.baidu.com/apollo/calibrator/index/list) to complete the calibration.
 
 1.Enter the calibration service page and click the **New Task** button which in **Task Management** list to create a new calibration task.
 
-2.After entering the creating new task page, you need to fill in a simple description of this task.Then click the **Upload and create a task** button and select the upload calibration file to start uploading the calibration data. 
+2.After entering the creating new task page, you need to fill in a simple description of this task.Then click the **Upload and create a task** button and select the upload calibration file to start uploading the calibration data.
 
 3.After start uploading the data, the page will jump to the task process view. The process figure is the upload progress page. The task will start to calibrate when the upload progress reaches 100%. Please keep the network unblocked during uploading.
 
 4.When the data is uploaded, the Data Verification Process will begin, as shown in Figure 3. The validation process ensures data integrity and suitability. The validation items are:
 
   * Decompress test
-  * MD5 checksum 
-  * Data format validation  
+  * MD5 checksum
+  * Data format validation
   * ∞ symbol path validation
   * INS status validation
-  
+
 If validation fails, the corresponding error message is prompted. See the Error Description section below for details.
 
 ![](lidar_calibration/images/calib_valid_en.png)
 <p align="center">Figure 3. Calibration data verification.</p>
-	
+
 6.After data validation, the calibration process begins, as shown in Figure 4.  A detailed calibration progress page is displayed to users. Depending on the size and quality of the data, the overall calibration time lasts about 10-30 minutes. You can enter the page at any time to see the progress of the current task.
 ![](lidar_calibration/images/calib_progress_en.png)
 <p align="center">Figure 4. Calibration progress page.</p>
-	
-7.When calibration succeeds, click the **View detail** button to display a stitched point cloud. You can confirm the quality verification by checking the sharpness of the point cloud. If you are satisfied with the calibration quality, you can click **Confirm** to keep the result and download the calibration results by clicking **Download**. This fulfills the completion of the calibration process. 
 
-For additional information, see: [How to Check Point Cloud Quality?](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/FAQ2.md)
+7.When calibration succeeds, click the **View detail** button to display a stitched point cloud. You can confirm the quality verification by checking the sharpness of the point cloud. If you are satisfied with the calibration quality, you can click **Confirm** to keep the result and download the calibration results by clicking **Download**. This fulfills the completion of the calibration process.
+
+For additional information, see: [How to Check Point Cloud Quality?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
 
 ### Obtaining Calibration Results
 
@@ -139,17 +139,17 @@ transform:
 ```
 
 Table 2. Definition of the keys in the yaml file.
-	
-Field | Meaning
------- | ----- 
-`header` | Header information, including timestamps. 
-`child_frame_id` | Source sensor ID in calibration. Will be HDL-64ES3 here. 
-`frame_id` | Target sensor ID in calibration. Will be Novatel here.
-`rotation`| Rotation part of the extrinsic parameters. Represented by a quaternion. 
-`translation`| Translation part of the extrinsic parameters. 
 
-4.How to use extrinsic parameters? 
-	
+| Field            | Meaning                                  |
+| ---------------- | ---------------------------------------- |
+| `header`         | Header information, including timestamps. |
+| `child_frame_id` | Source sensor ID in calibration. Will be HDL-64ES3 here. |
+| `frame_id`       | Target sensor ID in calibration. Will be Novatel here. |
+| `rotation`       | Rotation part of the extrinsic parameters. Represented by a quaternion. |
+| `translation`    | Translation part of the extrinsic parameters. |
+
+4.How to use extrinsic parameters?
+
 Enter the following command to create the calibration file directory in the apollo directory:
 
 ```bash

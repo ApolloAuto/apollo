@@ -108,12 +108,15 @@ class ReferenceLineInfo {
   bool IsDrivable() const;
 
   const hdmap::RouteSegments& Lanes() const;
+  const std::list<hdmap::Id> TargetLaneId() const;
 
   void ExportDecision(DecisionResult* decision_result) const;
 
   void SetJunctionRightOfWay(double junction_s, bool is_protected);
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
+
+  bool IsRightTurnPath() const;
 
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;

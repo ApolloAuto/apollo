@@ -4,8 +4,8 @@ package apollo.planning;
 
 message StBoundaryConfig {
   optional double boundary_buffer = 1 [ default = 0.1 ];
-  optional double high_speed_centric_acceleration_limit = 2 [ default = 1.0 ];
-  optional double low_speed_centric_acceleration_limit = 3 [ default = 1.3 ];
+  optional double high_speed_centric_acceleration_limit = 2 [ default = 1.2 ];
+  optional double low_speed_centric_acceleration_limit = 3 [ default = 1.4 ];
   optional double high_speed_threshold = 4 [ default =  20.0 ];
   optional double low_speed_threshold = 5 [ default = 7.0 ];
   optional double minimal_kappa = 6 [ default = 0.00001 ];

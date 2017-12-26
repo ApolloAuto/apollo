@@ -47,6 +47,12 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesId;
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
 
+    @observable hideOptions = {
+        'planningQpOptimizer': true,
+        'planingDpOptimizer': true,
+        'planningReference': true,
+    };
+
 
     @computed get showTools() {
         return this.showTasks ||
@@ -72,6 +78,12 @@ export default class Options {
                     this[other] = false;
                 }
             }
+        }
+
+        if (option === "showPNCMonitor") {
+            this.hideOptions['planningQpOptimizer'] = !this[option];
+            this.hideOptions['planingDpOptimizer'] = !this[option];
+            this.hideOptions['planningReference'] = !this[option];
         }
     }
 

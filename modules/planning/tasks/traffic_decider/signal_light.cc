@@ -83,7 +83,7 @@ bool SignalLight::FindValidSignalLight(
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
     if (signal_light.start_s + FLAGS_stop_max_distance_buffer >
         reference_line_info->AdcSlBoundary().end_s()) {
-      signal_lights_from_path_.push_back(&signal_light);
+      signal_lights_from_path_.push_back(signal_light);
     }
   }
   return signal_lights_from_path_.size() > 0;
@@ -101,17 +101,17 @@ void SignalLight::MakeDecisions(Frame* frame,
       common::VehicleStateProvider::instance()->linear_velocity());
 
   bool has_stop = false;
-  for (const hdmap::PathOverlap* signal_light : signal_lights_from_path_) {
-    const TrafficLight signal = GetSignal(signal_light->object_id);
+  for (auto& signal_light : signal_lights_from_path_) {
+    const TrafficLight signal = GetSignal(signal_light.object_id);
     double stop_deceleration =
-        GetStopDeceleration(reference_line_info, signal_light);
+        GetStopDeceleration(reference_line_info, &signal_light);
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();
     signal_debug->set_adc_stop_deacceleration(stop_deceleration);
     signal_debug->set_color(signal.color());
-    signal_debug->set_light_id(signal_light->object_id);
-    signal_debug->set_light_stop_s(signal_light->start_s);
+    signal_debug->set_light_id(signal_light.object_id);
+    signal_debug->set_light_stop_s(signal_light.start_s);
 
     if ((signal.color() == TrafficLight::RED &&
          stop_deceleration < FLAGS_stop_max_deceleration) ||
@@ -119,19 +119,51 @@ void SignalLight::MakeDecisions(Frame* frame,
          stop_deceleration < FLAGS_stop_max_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
-      if (CreateStopObstacle(frame, reference_line_info, signal_light)) {
-        has_stop = true;
+      if (FLAGS_right_turn_creep_forward &&
+          reference_line_info->IsRightTurnPath()) {
+        SetCreepForwardSignalDecision(reference_line_info, &signal_light);
       }
-      signal_debug->set_is_stop_wall_created(true);
+      if (CreateStopObstacle(frame, reference_line_info, &signal_light)) {
+        has_stop = true;
+        signal_debug->set_is_stop_wall_created(true);
+      }
     }
     if (has_stop) {
-      reference_line_info->SetJunctionRightOfWay(signal_light->start_s,
+      reference_line_info->SetJunctionRightOfWay(signal_light.start_s,
                                                  false);  // not protected
     } else {
-      reference_line_info->SetJunctionRightOfWay(signal_light->start_s, true);
+      reference_line_info->SetJunctionRightOfWay(signal_light.start_s, true);
       // is protected
     }
   }
+}
+
+void SignalLight::SetCreepForwardSignalDecision(
+    const ReferenceLineInfo* reference_line_info,
+    hdmap::PathOverlap* const signal_light) const {
+  CHECK_NOTNULL(signal_light);
+
+  constexpr double kMaxCreepSpeed = 1.0;
+  if (reference_line_info->AdcPlanningPoint().v() > kMaxCreepSpeed) {
+    ADEBUG << "Do not creep forward due to large speed.";
+    return;
+  }
+
+  constexpr double kCreepBuff = 3.0;
+  const auto& path_decision = reference_line_info->path_decision();
+  for (const auto& path_obstacle : path_decision.path_obstacles().Items()) {
+    const auto& st_boundary = path_obstacle->st_boundary();
+    const double stop_s =
+        signal_light->start_s - FLAGS_stop_distance_traffic_light;
+    if (reference_line_info->AdcSlBoundary().end_s() + st_boundary.min_s() <
+        stop_s + kCreepBuff) {
+      AERROR << "Do not creep forward because obstacles are close.";
+      return;
+    }
+  }
+  signal_light->start_s = reference_line_info->AdcSlBoundary().end_s() +
+                          FLAGS_stop_distance_traffic_light + kCreepBuff;
+  ADEBUG << "Creep forward s = " << signal_light->start_s;
 }
 
 TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
@@ -209,6 +241,14 @@ bool SignalLight::CreateStopObstacle(
   stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
   stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
   stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
+
+  if (!path_decision->MergeWithMainStop(stop.stop(), stop_wall->Id(),
+                                        reference_line_info->reference_line(),
+                                        reference_line_info->AdcSlBoundary())) {
+    ADEBUG << "signal " << signal_light->object_id
+           << " is not the cloest stop.";
+    return false;
+  }
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
   return true;

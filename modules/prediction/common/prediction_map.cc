@@ -140,6 +140,16 @@ bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
   return junctions.size() > 0;
 }
 
+std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
+    const Eigen::Vector2d& point, const double radius) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  std::vector<std::shared_ptr<const JunctionInfo>> junctions;
+  HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
+  return junctions;
+}
+
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
                                   const common::PointENU& point) {
   common::math::Vec2d vec_point = {point.x(), point.y()};
@@ -208,6 +218,20 @@ void PredictionMap::NearbyLanesByCurrentLanes(
       }
     }
   }
+}
+
+std::vector<std::string> PredictionMap::NearbyLaneIds(
+    const Eigen::Vector2d& point, const double radius) {
+  std::vector<std::string> lane_ids;
+  std::vector<std::shared_ptr<const LaneInfo>> lanes;
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  HDMapUtil::BaseMap().GetLanes(hdmap_point, radius, &lanes);
+  for (const auto& lane : lanes) {
+    lane_ids.push_back(lane->id().id());
+  }
+  return lane_ids;
 }
 
 bool PredictionMap::IsLeftNeighborLane(

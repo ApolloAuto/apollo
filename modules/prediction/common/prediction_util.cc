@@ -201,6 +201,7 @@ void GenerateLaneSequenceTrajectoryPoints(
     path_point.set_y(point.y());
     path_point.set_z(0.0);
     path_point.set_theta(theta);
+    path_point.set_lane_id(lane_id);
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(lane_speed);
     trajectory_point.set_a(lane_acc);

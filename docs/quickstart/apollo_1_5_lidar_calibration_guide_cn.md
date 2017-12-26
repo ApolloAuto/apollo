@@ -1,12 +1,12 @@
 欢迎使用Apollo传感器标定服务。本文档提供64线激光雷达与组合惯导之间的外参标定服务使用流程。
 
-### 文档概览 
+### 文档概览
 
-1. 服务概述 
-2. 准备工作 
-3. 标定数据录制 
-4. 标定数据上传以及任务创建 
-5. 标定结果获取 
+1. 服务概述
+2. 准备工作
+3. 标定数据录制
+4. 标定数据上传以及任务创建
+5. 标定结果获取
 6. 错误说明
 
 ### 服务概述
@@ -14,27 +14,27 @@
 本服务作为Apollo整车传感器标定功能中的一部分，提供Velodyne 64线激光雷达HDL-64ES3与IMU之间的外参标定功能。标定结果可用于将激光雷达检测的障碍物转换至IMU坐标系，进而转到世界坐标系下。标定结果以 `.yaml` 文件形式返回。
 
 
-### 准备工作 
+### 准备工作
 
 为了更好地使用本服务，请按以下顺序进行准备工作：
- 
+
 1.安装Apollo所支持的64线激光雷达和组合惯性导航系统，下载镜像安装docker环境。
 
 2.开机并启动64线激光雷达以及组合惯导系统。Novatel组合惯导初次上电时需要校准。此时应将车在开阔地带进行直行、左右转弯等操作，直至惯导初始化完成。
 
-3.确认本服务所需传感器数据的topic均有输出。[如何查看传感器有数据输出？](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/FAQ0_cn.md)
+3.确认本服务所需传感器数据的topic均有输出。[如何查看传感器有数据输出？](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs_cn.md)
 
-本服务所需的topics如下表1所示： 
+本服务所需的topics如下表1所示：
 
 表1. 传感器topic名称
 
-传感器 | Topic名称 | Topic发送频率（Hz）
---- | ------- | --- |
-HDL-64ES3	| /apollo/sensor/velodyne64/VelodyneScanUnified | 10
-INS |	/apollo/sensor/gnss/odometry | 100
-INS | /apollo/sensor/gnss/ins_stat	| 1
+| 传感器       | Topic名称                                  | Topic发送频率（Hz） |
+| --------- | ---------------------------------------- | ------------- |
+| HDL-64ES3 | /apollo/sensor/velodyne64/VelodyneScanUnified | 10            |
+| INS       | /apollo/sensor/gnss/odometry             | 100           |
+| INS       | /apollo/sensor/gnss/ins_stat             | 1             |
 
-4.确认车辆采集标定数据时的定位状态为56。[如何查看车辆定位状态？](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/FAQ1_cn.md)
+4.确认车辆采集标定数据时的定位状态为56。[如何查看车辆定位状态？](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs_cn.md)
 
 5.选择合适的标定场地。
 
@@ -46,7 +46,7 @@ INS | /apollo/sensor/gnss/ins_stat	| 1
 ![](lidar_calibration/images/field.png)
 <p align="center">图2 标定场地。</p>
 
-### 标定数据录制 
+### 标定数据录制
 
 准备工作完成后，将车辆驶入标定场地进行标定数据的录制。
 
@@ -70,7 +70,7 @@ bash lidar_calibration.sh stop_record
 
 5.随后，程序会检测所录制的bag中是否含有所需的所有topics。检测通过后，会将bag打包成 `lidar_calib_data.tar.gz` 文件，内容包括录制的rosbag以及对应的MD5校验和文件。
 
-### 标定数据上传以及任务创建 
+### 标定数据上传以及任务创建
 
 录制好标定数据后，登录至[标定服务页面](https://console.bce.baidu.com/apollo/calibrator/index/list)以完成标定。
 
@@ -83,11 +83,11 @@ bash lidar_calibration.sh stop_record
 4.数据上传完毕后，将开始数据校验流程，如图3所示。校验流程可以保证数据完整以及适合标定，校验项目有：
 
 * 数据包解压校验
-* MD5校验 
-* 数据格式校验  
-* 8字路径与GPS质量校验 
+* MD5校验
+* 数据格式校验
+* 8字路径与GPS质量校验
 * 初始外参评估合格
-	
+
 若数据校验失败，则会提示相应错误。错误的原因请参照错误说明。
 
 ![](lidar_calibration/images/calib_valid_cn.png)
@@ -98,9 +98,9 @@ bash lidar_calibration.sh stop_record
 ![](lidar_calibration/images/calib_progress_cn.png)
 <p align="center">图4 标定进度页面。</p>
 
-7.标定完成后，进入人工质检环节。点击[查看]按钮会弹出用于质检的拼接点云，此时可以开始人工质检。若质检通过，则可以点击**确认入库**按钮以保存标定结果。最后，点击**下载数据**按钮来下载标定结果，至此标定流程完成。[如何进行质检？](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/FAQ2_cn.md)
+7.标定完成后，进入人工质检环节。点击[查看]按钮会弹出用于质检的拼接点云，此时可以开始人工质检。若质检通过，则可以点击**确认入库**按钮以保存标定结果。最后，点击**下载数据**按钮来下载标定结果，至此标定流程完成。[如何进行质检？](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs_cn.md)
 
-### 标定结果获取 
+### 标定结果获取
 
 1.获取标定结果前，本服务需要用户根据可视化效果确认标定结果的质量。
 
@@ -131,13 +131,13 @@ transform:
 
 表2. 外参YAML文件字段含义
 
-字段 | 含义
----- | ----
-header	| 头信息，主要包含标定时间
-child_frame_id | 所标定的源传感器ID，此时为HDL-64ES3
-frame_id | 所标定的目标传感器ID，此时为Novatel
-rotation | 以四元数表示的外参旋转部分
-translation | 外参的平移部分
+| 字段             | 含义                      |
+| -------------- | ----------------------- |
+| header         | 头信息，主要包含标定时间            |
+| child_frame_id | 所标定的源传感器ID，此时为HDL-64ES3 |
+| frame_id       | 所标定的目标传感器ID，此时为Novatel  |
+| rotation       | 以四元数表示的外参旋转部分           |
+| translation    | 外参的平移部分                 |
 
 4.外参使用方式
 

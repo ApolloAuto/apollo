@@ -16,12 +16,58 @@
 # limitations under the License.
 ###############################################################################
 
+INCHINA="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171219_2028"
+VERSION_X86_64="dev-x86_64-20171223_1501"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
-if [[ $# == 1 ]]; then
-    VERSION=$1
+VERSION_OPT=""
+
+function show_usage()
+{
+cat <<EOF
+Usage: $(basename $0) [options] ...
+OPTIONS:
+    -C  pull docker image from China mirror
+    -h, --help   display this help and exit
+    -image <version>    specify which version of a docker image to pull
+EOF
+exit 0
+}
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+    -C|--docker-cn-mirror)
+        INCHINA="yes"
+        ;;
+    -image)
+        VAR=$1
+        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option -image with $VERSION_OPT, only the last one will take effect.\n "
+        shift
+        VERSION_OPT=$1
+        [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
+        [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
+        ;;
+    dev-*) # keep backward compatibility, should be removed from further version.
+        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $1 with -image, only the last one will take effect.\n "
+        VERSION_OPT=$1
+        echo -e "\033[93mWarning\033[0m: You are using an old style command line option which may be removed from"
+        echo -e "further versoin, please use -image <version> instead.\n"
+        ;;
+    -h|--help)
+        show_usage
+        ;;
+    *)
+        echo -e "\033[93mWarning\033[0m: Unknown option: $1"
+        exit 2
+        ;;
+    esac
+    shift
+done
+
+if [ ! -z "$VERSION_OPT" ]; then
+    VERSION=$VERSION_OPT
 elif [ ${ARCH} == "x86_64" ]; then
     VERSION=${VERSION_X86_64}
 elif [ ${ARCH} == "aarch64" ]; then
@@ -47,9 +93,8 @@ echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
-    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
-    read -t 10 -n 1 INCHINA
-    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
+
+    if [ "$INCHINA" == "yes" ]; then
         docker pull "registry.docker-cn.com/${IMG}"
     else
         docker pull $IMG

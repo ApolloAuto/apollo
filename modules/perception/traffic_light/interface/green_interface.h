@@ -26,29 +26,71 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-// class-wrapper
+/**
+ * @class ISelectLight
+ * @brief base class for selecting light
+ *        given detection boxes and hdmap boxes
+ */
 class ISelectLight {
  public:
+  /**
+   * @brief: select lights corresponding to hdmap
+   * @param  input image, maybe useless
+   * @param  light boxes from hdmap
+   * @param  light boxes detected
+   * @param  selected boxes
+   */
   virtual void Select(const cv::Mat &ros_image,
                       const std::vector<LightPtr> &hdmap_bboxes,
                       const std::vector<LightPtr> &refined_bboxes,
                       std::vector<LightPtr> *selected_bboxes) = 0;
 };
 
+/**
+ * @class IRefine
+ * @brief base class for refining light
+ *        this class will add some accuracy information
+ *        to input lights
+ */
 class IRefine {
  public:
+  /**
+   * @brief: main process function
+   * @param  input image
+   * @param  light boxes from last precudure,
+   *         when perform finished, lights will
+   *         contain more information
+   */
   virtual void Perform(const cv::Mat &ros_image,
                        std::vector<LightPtr> *lights) = 0;
+  /**
+   * @brief: support ROI
+   * @param  input roi
+   */
   virtual void SetCropBox(const cv::Rect &box) = 0;
 };
 
+/**
+ * @class IGetBox
+ * @brief base class for getting ROI
+ */
 class IGetBox {
  public:
+  /**
+   * @brief: get ROI
+   * @param  input image size
+   * @param  lights from projection
+   * @param  final roi
+   */
   virtual void GetCropBox(const cv::Size &size,
                           const std::vector<LightPtr> &lights,
                           cv::Rect *cropbox) = 0;
 };
 
+/**
+ * @class DummyRefine
+ * @brief a dummy class
+ */
 class DummyRefine : public IRefine {
  public:
   void Perform(const cv::Mat &ros_image,

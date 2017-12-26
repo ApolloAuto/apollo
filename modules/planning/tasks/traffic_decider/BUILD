@@ -6,6 +6,7 @@ cc_library(
     name = "traffic_rules",
     srcs = [
         "backside_vehicle.cc",
+        "change_lane.cc",
         "clear_zone.cc",
         "crosswalk.cc",
         "destination.cc",
@@ -13,9 +14,11 @@ cc_library(
         "reference_line_end.cc",
         "rerouting.cc",
         "signal_light.cc",
+        "stop_sign.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
+        "change_lane.h",
         "clear_zone.h",
         "crosswalk.h",
         "destination.h",
@@ -23,6 +26,7 @@ cc_library(
         "reference_line_end.h",
         "rerouting.h",
         "signal_light.h",
+        "stop_sign.h",
         "traffic_rule.h",
     ],
     deps = [
@@ -34,6 +38,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
     ],
 )

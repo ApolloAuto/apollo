@@ -116,8 +116,7 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  ASSERT_TRUE(pnc_map_->UpdateVehicleState(state));
-  ASSERT_TRUE(pnc_map_->GetRouteSegments(10, 30, &segments));
+  ASSERT_TRUE(pnc_map_->GetRouteSegments(state, 10, 30, &segments));
   // first time on this passage, should not immediately change lane
   ASSERT_EQ(2, segments.size());
   EXPECT_NEAR(40, RouteLength(segments.front()), 1e-4);
@@ -126,6 +125,38 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   EXPECT_TRUE(segments.front().IsOnSegment());
   EXPECT_EQ(routing::RIGHT, segments.back().NextAction());
   EXPECT_FALSE(segments.back().IsOnSegment());
+}
+
+TEST_F(PncMapTest, UpdateNextRoutingWaypointIndex) {
+  pnc_map_->next_routing_waypoint_index_ = 0;
+  pnc_map_->adc_waypoint_.s = 0;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 0, 0});
+  EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 50;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 0, 0});
+  EXPECT_EQ(1, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 63.6,
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 3, 0});
+  EXPECT_EQ(3, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 63.8,
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 3, 0});
+  EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
+
+  // overshoot, rollback to 0
+  pnc_map_->adc_waypoint_.s = 50;
+  pnc_map_->UpdateNextRoutingWaypointIndex({4, 0, 0});
+  EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 100;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 2, 0});
+  EXPECT_EQ(3, pnc_map_->next_routing_waypoint_index_);
+
+  pnc_map_->adc_waypoint_.s = 60;
+  pnc_map_->UpdateNextRoutingWaypointIndex({0, 2, 0});
+  EXPECT_EQ(2, pnc_map_->next_routing_waypoint_index_);
 }
 
 TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
@@ -138,8 +169,7 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  ASSERT_TRUE(pnc_map_->UpdateVehicleState(state));
-  bool result = pnc_map_->GetRouteSegments(10, 30, &segments);
+  bool result = pnc_map_->GetRouteSegments(state, 10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
   const auto& first = segments.front();
@@ -150,6 +180,42 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   EXPECT_NEAR(40, RouteLength(second), 1e-4);
   EXPECT_EQ(routing::RIGHT, second.NextAction());
   EXPECT_FALSE(second.IsOnSegment());
+}
+
+TEST_F(PncMapTest, NextWaypointIndex) {
+  EXPECT_TRUE(std::vector<int>({0, 0, 0}) ==
+              pnc_map_->NextWaypointIndex({-1, -1, -1}));
+  EXPECT_TRUE(std::vector<int>({0, 1, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 0, 0}));
+  EXPECT_TRUE(std::vector<int>({0, 1, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 0, 1}));
+  EXPECT_TRUE(std::vector<int>({0, 1, 3}) ==
+              pnc_map_->NextWaypointIndex({0, 1, 2}));
+  EXPECT_TRUE(std::vector<int>({0, 3, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 3, 0}));
+  EXPECT_TRUE(std::vector<int>({0, 3, 0}) ==
+              pnc_map_->NextWaypointIndex({0, 3, 1}));
+}
+
+TEST_F(PncMapTest, SearchForwardIndex_SearchBackwardIndex) {
+  auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
+  LaneWaypoint waypoint(lane, 3.0);
+  auto result = pnc_map_->SearchForwardWaypointIndex({0, 0, 0}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 0, 0}, waypoint);
+  EXPECT_TRUE(result.empty());
+  result = pnc_map_->SearchForwardWaypointIndex({0, 1, 10}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 1, 10}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchForwardWaypointIndex({0, 1, 11}, waypoint);
+  EXPECT_TRUE(result.empty());
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 1, 11}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchForwardWaypointIndex({0, 1, 9}, waypoint);
+  EXPECT_TRUE(std::vector<int>({0, 1, 10}) == result);
+  result = pnc_map_->SearchBackwardWaypointIndex({0, 1, 9}, waypoint);
+  EXPECT_TRUE(result.empty());
 }
 
 TEST_F(PncMapTest, GetNeighborPassages) {

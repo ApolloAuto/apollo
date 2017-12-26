@@ -20,11 +20,6 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-uint64_t TimestampDouble2Int64(double ts) {
-  uint64_t result = (uint64_t)(ts * 1e6);
-  return result * 1000;
-}
-
 void ClearBox(cv::Rect *rect) {
   rect->x = 0;
   rect->y = 0;

@@ -35,6 +35,7 @@ DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
+DECLARE_double(reference_line_lateral_extension);
 DECLARE_double(prepare_rerouting_time);
 DECLARE_double(rerouting_cooldown_time);
 
@@ -52,6 +53,7 @@ DECLARE_double(change_lane_fail_freeze_time);
 DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
 DECLARE_bool(enable_change_lane_decider);
+DECLARE_double(change_lane_speed_relax_percentage);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
@@ -102,8 +104,8 @@ DECLARE_double(st_max_t);
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
+DECLARE_bool(try_history_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
-DECLARE_double(longitudinal_ignore_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
@@ -112,6 +114,7 @@ DECLARE_double(stop_distance_traffic_light);
 DECLARE_double(destination_check_distance);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
+DECLARE_double(yield_min_distance);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
 
@@ -126,13 +129,13 @@ DECLARE_bool(enable_lag_prediction);
 DECLARE_int32(lag_prediction_min_appear_num);
 DECLARE_double(lag_prediction_max_disappear_num);
 DECLARE_int32(trajectory_point_num_for_debug);
-DECLARE_double(decision_valid_stop_range);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
 DECLARE_bool(enable_traffic_light);
 
 DECLARE_double(turn_signal_distance);
+DECLARE_bool(right_turn_creep_forward);
 
 // speed decider
 DECLARE_double(low_speed_obstacle_threshold);
@@ -158,6 +161,7 @@ DECLARE_double(stop_max_distance_buffer);
 DECLARE_double(stop_min_speed);
 DECLARE_double(stop_max_deceleration);
 DECLARE_double(signal_expire_time_sec);
+DECLARE_double(max_valid_stop_distance);
 
 /// Clear Zone
 DECLARE_string(clear_zone_virtual_object_id_prefix);
@@ -170,6 +174,10 @@ DECLARE_string(crosswalk_virtual_object_id_prefix);
 DECLARE_double(crosswalk_expand_distance);
 DECLARE_double(crosswalk_strick_l_distance);
 DECLARE_double(crosswalk_loose_l_distance);
+/// stop_sign
+DECLARE_bool(enable_stop_sign);
+DECLARE_string(stop_sign_virtual_object_id_prefix);
+DECLARE_double(stop_duration_for_stop_sign);
 
 DECLARE_bool(enable_sqp_solver);
 

@@ -75,17 +75,17 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
-                                   reference_line, path_data,
-                                   qp_st_speed_config_.total_path_length(),
-                                   qp_st_speed_config_.total_time());
+  StBoundaryMapper boundary_mapper(
+      adc_sl_boundary, st_boundary_config_, reference_line, path_data,
+      qp_st_speed_config_.total_path_length(), qp_st_speed_config_.total_time(),
+      reference_line_info_->IsChangeLanePath());
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.GetGraphBoundary(path_decision).code() ==
+  if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for qp st speed optimizer failed!");
@@ -109,7 +109,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   QpSplineStGraph st_graph(spline_generator_.get(), qp_st_speed_config_,
-                           veh_param);
+                           veh_param, reference_line_info_->IsChangeLanePath());
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.discretized_path().Length());

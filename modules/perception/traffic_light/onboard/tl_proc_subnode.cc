@@ -393,8 +393,7 @@ bool TLProcSubnode::PublishMessage(
   common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   header->set_sequence_num(seq_num_++);
-  uint64_t timestamp = TimestampDouble2Int64(image_lights->image->ts());
-  timestamp += kCameraIndicator[image_lights->image->camera_id()];
+  uint64_t timestamp = static_cast<uint64_t>(image_lights->image->ts()*1e9);
 
   header->set_camera_timestamp(timestamp);
   // add traffic light result

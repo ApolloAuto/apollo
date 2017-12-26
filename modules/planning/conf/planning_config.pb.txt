@@ -55,13 +55,13 @@ em_planner_config {
         low_speed_penalty: 2.5
 
         accel_penalty: 2.0
-        decel_penalty: 2.0
+        decel_penalty: 4.0
 
         positive_jerk_coeff: 1.0
         negative_jerk_coeff: 300.0
 
-        max_acceleration: 4.5
-        max_deceleration: -4.5
+        max_acceleration: 1.5
+        max_deceleration: -2.2
 
         st_boundary_config {
             boundary_buffer: 0.1
@@ -99,8 +99,8 @@ em_planner_config {
     qp_st_speed_config {
         total_path_length: 250.0
         total_time: 8.0
-        preferred_max_acceleration: 1.2
-        preferred_min_deceleration: -2.0
+        preferred_max_acceleration: 1.5
+        preferred_min_deceleration: -2.2
         max_acceleration: 2.0
         min_deceleration: -4.5
 
@@ -117,6 +117,8 @@ em_planner_config {
             follow_drag_distance: 17.0
             dp_st_reference_weight: 0.0
             init_jerk_kernel_weight: 5e4
+            yield_weight: 1e2
+            yield_drag_distance: 20.0
         }
         qp_piecewise_config {
             number_of_evaluated_graph_t: 40
@@ -132,8 +134,36 @@ em_planner_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 1.2
             low_speed_centric_acceleration_limit: 1.4
-            high_speed_threshold: 20
-            low_speed_threshold: 7
+            high_speed_threshold: 11.18
+            low_speed_threshold: 4.5
+            minimal_kappa: 0.00001
+            point_extension: 1.0
+            lowest_speed: 2.5
+            num_points_to_avg_kappa: 2
+            static_obs_nudge_speed_ratio: 0.6
+            dynamic_obs_nudge_speed_ratio: 0.8
+        }
+    }
+    poly_st_speed_config {
+        total_path_length: 250.0
+        total_time: 8.0
+
+        preferred_accel: 1.5
+        preferred_decel: -2.2
+        max_accel: 2.5
+        min_decel: -4.5
+
+        speed_limit_buffer: 0.05
+        speed_weight: 1.0e2
+        jerk_weight: 1.0
+        obstacle_weight: 10.0
+
+        st_boundary_config {
+            boundary_buffer: 0.1
+            high_speed_centric_acceleration_limit: 1.2
+            low_speed_centric_acceleration_limit: 1.4
+            high_speed_threshold: 11.18
+            low_speed_threshold: 4.5
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
@@ -167,4 +197,7 @@ rule_config : {
 }
 rule_config : {
     rule_id: DESTINATION
+}
+rule_config : {
+    rule_id: CHANGE_LANE
 }

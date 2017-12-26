@@ -125,9 +125,13 @@ void SummaryMonitor::SummarizeModules() {
   for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
     ModuleStatus *status = &(module.second);
 
-    if (status->has_process_status() && !status->process_status().running()) {
-      UpdateStatusSummary(Summary::FATAL, "No process", status);
-      continue;
+    if (status->has_process_status()) {
+      if (status->process_status().running()) {
+        UpdateStatusSummary(Summary::OK, "", status);
+      } else {
+        UpdateStatusSummary(Summary::FATAL, "No process", status);
+        continue;
+      }
     }
 
     if (status->has_topic_status()) {

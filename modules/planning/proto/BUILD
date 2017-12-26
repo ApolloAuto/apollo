@@ -12,19 +12,11 @@ cc_proto_library(
 proto_library(
     name = "planning_proto_lib",
     srcs = [
-        "decision.proto",
         "planning.proto",
-        "planning_config.proto",
-        "planning_internal.proto",
-        "planning_stats.proto",
-        "qp_st_speed_config.proto",
-        "sl_boundary.proto",
     ],
     deps = [
-        ":dp_poly_path_config_proto_lib",
-        ":dp_st_speed_config_proto_lib",
-        ":qp_spline_path_config_proto_lib",
-        ":qp_spline_reference_line_smoother_config_proto_lib",
+        ":decision_proto_lib",
+        ":planning_internal_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
@@ -76,16 +68,21 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "spiral_curve_config_proto",
+    name = "decision_proto",
     deps = [
-        ":spiral_curve_config_proto_lib",
+        ":decision_proto_lib",
     ],
 )
 
 proto_library(
-    name = "spiral_curve_config_proto_lib",
+    name = "decision_proto_lib",
     srcs = [
-        "spiral_curve_config.proto",
+        "decision.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:vehicle_signal_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 
@@ -114,14 +111,63 @@ proto_library(
     name = "dp_st_speed_config_proto_lib",
     srcs = [
         "dp_st_speed_config.proto",
-        "st_boundary_config.proto",
+    ],
+    deps = [
+        ":st_boundary_config_proto_lib",
     ],
 )
 
 cc_proto_library(
-    name = "qp_spline_path_config_proto",
+    name = "planning_config_proto",
     deps = [
+        ":planning_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_config_proto_lib",
+    srcs = [
+        "planning_config.proto",
+    ],
+    deps = [
+        ":dp_poly_path_config_proto_lib",
+        ":dp_st_speed_config_proto_lib",
+        ":poly_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
+        ":qp_spline_reference_line_smoother_config_proto_lib",
+        ":qp_st_speed_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_internal_proto_lib",
+    srcs = [
+        "planning_internal.proto",
+    ],
+    deps = [
+        ":decision_proto_lib",
+        ":sl_boundary_proto_lib",
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/localization/proto:localization_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:prediction_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "planning_stats_proto",
+    deps = [
+        ":planning_stats_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_stats_proto_lib",
+    srcs = [
+        "planning_stats.proto",
     ],
 )
 
@@ -129,13 +175,6 @@ proto_library(
     name = "qp_spline_path_config_proto_lib",
     srcs = [
         "qp_spline_path_config.proto",
-    ],
-)
-
-proto_library(
-    name = "st_boundary_config_proto_lib",
-    srcs = [
-        "st_boundary_config.proto",
     ],
 )
 
@@ -150,6 +189,75 @@ proto_library(
     name = "qp_spline_reference_line_smoother_config_proto_lib",
     srcs = [
         "qp_spline_reference_line_smoother_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "qp_st_speed_config_proto",
+    deps = [
+        ":qp_st_speed_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "qp_st_speed_config_proto_lib",
+    srcs = [
+        "qp_st_speed_config.proto",
+    ],
+    deps = [
+        ":st_boundary_config_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "poly_st_speed_config_proto",
+    deps = [
+        ":poly_st_speed_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "poly_st_speed_config_proto_lib",
+    srcs = [
+        "poly_st_speed_config.proto",
+    ],
+    deps = [
+        ":st_boundary_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "sl_boundary_proto_lib",
+    srcs = [
+        "sl_boundary.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "spiral_curve_config_proto",
+    deps = [
+        ":spiral_curve_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "spiral_curve_config_proto_lib",
+    srcs = [
+        "spiral_curve_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "st_boundary_config_proto",
+    deps = [
+        ":st_boundary_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "st_boundary_config_proto_lib",
+    srcs = [
+        "st_boundary_config.proto",
     ],
 )
 

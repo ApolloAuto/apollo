@@ -52,6 +52,8 @@ class Obstacle {
 
   std::int32_t PerceptionId() const;
 
+  double Speed() const;
+
   bool IsStatic() const;
   bool IsVirtual() const;
 
@@ -71,7 +73,8 @@ class Obstacle {
   const common::math::Polygon2d &PerceptionPolygon() const;
 
   const prediction::Trajectory &Trajectory() const;
-  bool HasTrajectory() const { return has_trajectory_; }
+  common::TrajectoryPoint *AddTrajectoryPoint();
+  bool HasTrajectory() const;
 
   const perception::PerceptionObstacle &Perception() const;
 
@@ -101,7 +104,7 @@ class Obstacle {
   std::int32_t perception_id_ = 0;
   bool is_static_ = false;
   bool is_virtual_ = false;
-  bool has_trajectory_ = false;
+  double speed_ = 0.0;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   common::math::Box2d perception_bounding_box_;

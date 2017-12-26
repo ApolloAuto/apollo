@@ -40,15 +40,18 @@ class LocationExporter : public BaseExporter {
   void GnssLocCallback(const rosbag::MessageInstance &msg);
   void LidarLocCallback(const rosbag::MessageInstance &msg);
   void FusionLocCallback(const rosbag::MessageInstance &msg);
+  void OdometryLocCallback(const rosbag::MessageInstance &msg);
 
  private:
   std::string gnss_loc_file_;
   std::string lidar_loc_file_;
   std::string fusion_loc_file_;
+  std::string odometry_loc_file_;
 
   FILE *gnss_loc_file_handle_;
   FILE *lidar_loc_file_handle_;
   FILE *fusion_loc_file_handle_;
+  FILE *odometry_loc_file_handle_;
 };
 
 }  // namespace msf

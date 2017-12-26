@@ -64,6 +64,95 @@ std::string LaneWaypoint::DebugString() const {
   return common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
 }
 
+LaneBoundaryType::Type LeftBoundaryType(const LaneWaypoint& waypoint) {
+  if (!waypoint.lane) {
+    return LaneBoundaryType::UNKNOWN;
+  }
+  for (const auto& type :
+       waypoint.lane->lane().left_boundary().boundary_type()) {
+    if (type.s() <= waypoint.s) {
+      if (type.types_size() > 0) {
+        return type.types(0);
+      } else {
+        return LaneBoundaryType::UNKNOWN;
+      }
+    }
+  }
+  return LaneBoundaryType::UNKNOWN;
+}
+
+LaneBoundaryType::Type RightBoundaryType(const LaneWaypoint& waypoint) {
+  if (!waypoint.lane) {
+    return LaneBoundaryType::UNKNOWN;
+  }
+  for (const auto& type :
+       waypoint.lane->lane().right_boundary().boundary_type()) {
+    if (type.s() <= waypoint.s) {
+      if (type.types_size() > 0) {
+        return type.types(0);
+      } else {
+        return LaneBoundaryType::UNKNOWN;
+      }
+    }
+  }
+  return LaneBoundaryType::UNKNOWN;
+}
+
+LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
+  LaneWaypoint neighbor;
+  if (!waypoint.lane) {
+    return neighbor;
+  }
+  auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
+  auto map_ptr = HDMapUtil::BaseMapPtr();
+  for (const auto& lane_id :
+       waypoint.lane->lane().left_neighbor_forward_lane_id()) {
+    auto lane = map_ptr->GetLaneById(lane_id);
+    if (!lane) {
+      return neighbor;
+    }
+    double s = 0.0;
+    double l = 0.0;
+    if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+      continue;
+    }
+
+    if (s < -kSampleDistance || s > lane->total_length() + kSampleDistance) {
+      continue;
+    } else {
+      return LaneWaypoint(lane, s);
+    }
+  }
+  return neighbor;
+}
+
+LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
+  LaneWaypoint neighbor;
+  if (!waypoint.lane) {
+    return neighbor;
+  }
+  auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
+  auto map_ptr = HDMapUtil::BaseMapPtr();
+  for (const auto& lane_id :
+       waypoint.lane->lane().right_neighbor_forward_lane_id()) {
+    auto lane = map_ptr->GetLaneById(lane_id);
+    if (!lane) {
+      return neighbor;
+    }
+    double s = 0.0;
+    double l = 0.0;
+    if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+      continue;
+    }
+    if (s < -kSampleDistance || s > lane->total_length() + kSampleDistance) {
+      continue;
+    } else {
+      return LaneWaypoint(lane, s);
+    }
+  }
+  return neighbor;
+}
+
 std::string LaneSegment::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
@@ -327,12 +416,19 @@ MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
     const Vec2d delta = unit_directions_[index.id] * index.offset;
     MapPathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
                        ref_point.heading());
-    if (index.id < num_segments_) {
+    if (index.id < num_segments_ && !ref_point.lane_waypoints().empty()) {
       const LaneSegment& lane_segment = lane_segments_to_next_point_[index.id];
+      auto ref_lane_waypoint = ref_point.lane_waypoints()[0];
       if (lane_segment.lane != nullptr) {
+        for (const auto& lane_waypoint : ref_point.lane_waypoints()) {
+          if (lane_waypoint.lane->id().id() == lane_segment.lane->id().id()) {
+            ref_lane_waypoint = lane_waypoint;
+            break;
+          }
+        }
         point.add_lane_waypoint(
             LaneWaypoint(lane_segment.lane, lane_segment.start_s + index.offset,
-                         ref_point.lane_waypoints()[0].l));
+                         ref_lane_waypoint.l));
       }
     }
     if (point.lane_waypoints().empty() && !ref_point.lane_waypoints().empty()) {

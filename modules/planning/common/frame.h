@@ -69,7 +69,10 @@ class Frame {
 
   void AddObstacle(const Obstacle &obstacle);
 
+  Obstacle *Find(const std::string &id);
+
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
+
   const ReferenceLineInfo *DriveReferenceLineInfo() const;
 
   const std::vector<const Obstacle *> obstacles() const;
@@ -86,6 +89,10 @@ class Frame {
   static void AlignPredictionTime(
       const double planning_start_time,
       prediction::PredictionObstacles *prediction_obstacles);
+
+  ADCTrajectory *mutable_trajectory() { return &trajectory_; }
+
+  const ADCTrajectory &trajectory() const { return trajectory_; }
 
  private:
   bool InitReferenceLineInfo();
@@ -126,6 +133,8 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
 
   ChangeLaneDecider change_lane_decider_;
+
+  ADCTrajectory trajectory_;  // last published trajectory
 
   std::unique_ptr<LagPrediction> lag_predictor_;
 };

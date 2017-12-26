@@ -32,26 +32,35 @@ struct ReviseOption {
   double ts;  // timestamp for lights
 };
 
-// @brief Reviser is the class is to revise the perception result.
-//       It may use history info(Tracker) or some else info.
+/**
+ * @class BaseReviser
+ * @brief Reviser is the class is to revise the perception result.
+ *        It may use history info or some else info.
+ */
 class BaseReviser {
  public:
   BaseReviser() = default;
 
   virtual ~BaseReviser() = default;
 
-  // @brief init the reviser.
+  /**
+   * @brief init the reviser.
+   */
   virtual bool Init() = 0;
 
-  // @brief reviser revise  the perception result
-  //       ASSERT(rectifed_result.size == perception_result.size)
-  // @param [in] option
-  // @param [in/out] rectifed_result
-  // @return true/false
+  /**
+   * @brief reviser revise  the perception result
+   *       ASSERT(rectifed_result.size == perception_result.size)
+   * @param option
+   * @param rectifed_result
+   * @return true/false
+   */
   virtual bool Revise(const ReviseOption &option,
                       std::vector<LightPtr> *lights) = 0;
 
-  // @brief Revise's name
+  /**
+   * @brief Revise's name
+   */
   virtual std::string name() const = 0;
 };
 

@@ -28,17 +28,23 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ * @class UnityRecognize
+ * @brief classify the light color.
+ */
 class UnityRecognize : public BaseRecognizer {
  public:
   UnityRecognize() = default;
 
   bool Init() override;
 
-  // @brief: recognize light status
-  // @param [in] const Recognize&: recognize options
-  // @param [in] const Image&: input image
-  // @param [in/out] std::vector<Light>*: recognized light status
-  // @return  bool
+  /**
+   * @brief: recognize light status
+   * @param  const Recognize&: recognize options
+   * @param  const Image&: input image
+   * @param  std::vector<Light>*: recognized light status
+   * @return  bool
+   */
   bool RecognizeStatus(const Image &image, const RecognizeOption &option,
                        std::vector<LightPtr> *lights) override;
 

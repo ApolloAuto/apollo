@@ -25,6 +25,10 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+/**
+ * @class CropBox
+ * @brief get roi from input lights
+ */
 class CropBox : public IGetBox {
  public:
   CropBox(float crop_scale, float min_crop_size);
@@ -40,6 +44,10 @@ class CropBox : public IGetBox {
   float min_crop_size_ = 0.0;
 };
 
+/**
+ * @class CropBox
+ * @brief use whole image as roi
+ */
 class CropBoxWholeImage : public IGetBox {
  public:
   virtual void GetCropBox(const cv::Size &size,

@@ -142,6 +142,7 @@ class ObjectTrack {
   bool is_static_hypothesis_;
   Eigen::Vector3f belief_anchor_point_;
   Eigen::Vector3f belief_velocity_;
+  Eigen::Matrix3f belief_velocity_uncertainty_;
   Eigen::Vector3f belief_velocity_accelaration_;
 
  private:

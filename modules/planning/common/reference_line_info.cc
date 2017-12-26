@@ -127,27 +127,13 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
 
-//bool ReferenceLineInfo::HasReachedDestination() {
-//  auto* dest_obstacle = path_decision_.Find(FLAGS_destination_obstacle_id);
-//  if (!dest_obstacle) {
-//    return false;
-//  }
-//  if (dest_obstacle->perception_sl_boundary().start_s() >
-//      reference_line_.Length()) {
-//    return false;
-//  }
-//  if (!reference_line_.HasOverlap(
-//          dest_obstacle->obstacle()->PerceptionBoundingBox())) {
-//    return false;
-//  }
-//  const double kDistanceDelta = 0.5;
-//  if (dest_obstacle->perception_sl_boundary().start_s() <
-//      adc_sl_boundary_.end_s() + FLAGS_stop_distance_destination +
-//          kDistanceDelta) {
-//    return true;
-//  }
-//  return false;
-//}
+const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
+  std::list<hdmap::Id> lane_ids;
+  for (const auto& lane_seg : lanes_) {
+    lane_ids.push_back(lane_seg.lane->id());
+  }
+  return lane_ids;
+}
 
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;
@@ -209,14 +195,14 @@ bool ReferenceLineInfo::AddObstacles(
 
 bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   // if adc is on the road, and obstacle behind adc, ignore
-  if (path_obstacle->perception_sl_boundary().end_s() >
+  if (path_obstacle->PerceptionSLBoundary().end_s() >
       reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ &&
-      path_obstacle->perception_sl_boundary().end_s() <
+      path_obstacle->PerceptionSLBoundary().end_s() <
           adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->perception_sl_boundary())) {
+      reference_line_.IsOnRoad(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -363,6 +349,26 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
 }
 
+bool ReferenceLineInfo::IsRightTurnPath() const {
+  double route_s = 0.0;
+  const double adc_s = adc_sl_boundary_.end_s();
+  constexpr double kRightTurnStartBuff = 1.0;
+  for (const auto& seg : Lanes()) {
+    if (route_s > adc_s + kRightTurnStartBuff) {
+      break;
+    }
+    route_s += seg.end_s - seg.start_s;
+    if (route_s < adc_s) {
+      continue;
+    }
+    const auto& turn = seg.lane->lane().turn();
+    if (turn == hdmap::Lane::RIGHT_TURN) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool ReferenceLineInfo::ReachedDestination() const {
   constexpr double kDestinationDeltaS = 0.05;
   const auto* dest_ptr = path_decision_.Find(FLAGS_destination_obstacle_id);
@@ -376,7 +382,7 @@ bool ReferenceLineInfo::ReachedDestination() const {
           dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
-  const double stop_s = dest_ptr->perception_sl_boundary().start_s() +
+  const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
                         dest_ptr->LongitudinalDecision().stop().distance_s();
   return adc_sl_boundary_.end_s() + kDestinationDeltaS > stop_s;
 }

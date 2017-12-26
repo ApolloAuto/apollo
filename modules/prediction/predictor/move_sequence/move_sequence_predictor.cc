@@ -134,7 +134,6 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
            << "] will draw a lane sequence trajectory [" << ToString(sequence)
            << "] with probability [" << sequence.probability() << "].";
 
-    std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
     DrawMoveSequenceTrajectoryPoints(*obstacle, sequence,
                                      FLAGS_prediction_duration,
@@ -274,6 +273,7 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     path_point.set_y(point.y());
     path_point.set_z(0.0);
     path_point.set_theta(theta);
+    path_point.set_lane_id(lane_id);
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(lane_speed);
     trajectory_point.set_a(lane_acc);
@@ -299,6 +299,9 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double theta = feature.velocity_heading();
   double v = feature.speed();
   double a = feature.acc();
+  if (FLAGS_enable_rnn_acc && lane_sequence.has_acceleration()) {
+    a = lane_sequence.acceleration();
+  }
   if (FLAGS_enable_kf_tracking) {
     v = feature.t_speed();
     a = feature.t_acc();

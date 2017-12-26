@@ -111,7 +111,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     ObjectDecisionType object_decision;
     object_decision.mutable_ignore();
 
-    const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+    const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
 
     if (sl_boundary.start_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
@@ -134,8 +134,19 @@ bool PathDecider::MakeStaticObstacleDecision(
       // stop
       *object_decision.mutable_stop() =
           GenerateObjectStopDecision(*path_obstacle);
-      path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
-                                             object_decision);
+
+      if (path_decision->MergeWithMainStop(
+              object_decision.stop(), obstacle.Id(),
+              reference_line_info_->reference_line(),
+              reference_line_info_->AdcSlBoundary())) {
+        path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
+                                               object_decision);
+      } else {
+        ObjectDecisionType object_decision;
+        object_decision.mutable_ignore();
+        path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
+                                               object_decision);
+      }
     } else if (FLAGS_enable_nudge_decision) {
       // nudge
       if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {
@@ -165,9 +176,9 @@ double PathDecider::MinimumRadiusStopDistance(
   const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   const double min_turn_radius = VehicleConfigHelper::MinSafeTurnRadius();
   double lateral_diff =
-      std::max(std::fabs(path_obstacle.perception_sl_boundary().start_l() -
+      std::max(std::fabs(path_obstacle.PerceptionSLBoundary().start_l() -
                          reference_line_info_->AdcSlBoundary().end_l()),
-               std::fabs(path_obstacle.perception_sl_boundary().end_l() -
+               std::fabs(path_obstacle.PerceptionSLBoundary().end_l() -
                          reference_line_info_->AdcSlBoundary().start_l()));
   lateral_diff = std::max(lateral_diff, vehicle_param.width());
   const double kEpison = 1e-5;
@@ -192,7 +203,7 @@ ObjectStop PathDecider::GenerateObjectStopDecision(
   object_stop.set_distance_s(-stop_distance);
 
   const double stop_ref_s =
-      path_obstacle.perception_sl_boundary().start_s() - stop_distance;
+      path_obstacle.PerceptionSLBoundary().start_s() - stop_distance;
   const auto stop_ref_point =
       reference_line_info_->reference_line().GetReferencePoint(stop_ref_s);
   object_stop.mutable_stop_point()->set_x(stop_ref_point.x());
