@@ -93,7 +93,6 @@ DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_diff_thred, M_PI / 6.0,
               "Threshold for adjusting on-lane obstacle heading");
-DEFINE_bool(enable_rnn_acc, false, "If use acceleration from RNN model.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

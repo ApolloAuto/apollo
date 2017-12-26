@@ -123,7 +123,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
       state(3, 0) = feature.acc();
     }
   }
-  if (FLAGS_enable_rnn_acc && sequence.has_acceleration()) {
+  if (FLAGS_enable_lane_sequence_acc && sequence.has_acceleration()) {
     state(3, 0) = sequence.acceleration();
   }
   Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
