@@ -330,6 +330,7 @@ void Obstacle::SetAcceleration(Feature* feature) {
   double acc_x = 0.0;
   double acc_y = 0.0;
   double acc_z = 0.0;
+  double acc = 0.0;
 
   if (feature_history_.size() > 0) {
     double curr_ts = feature->timestamp();
@@ -347,19 +348,30 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_y = (curr_velocity.y() - prev_velocity.y()) / (curr_ts - prev_ts);
       acc_z = (curr_velocity.z() - prev_velocity.z()) / (curr_ts - prev_ts);
 
-      acc_x =
-          common::math::Clamp(acc_x * damping_x, FLAGS_min_acc, FLAGS_max_acc);
-      acc_y =
-          common::math::Clamp(acc_y * damping_y, FLAGS_min_acc, FLAGS_max_acc);
-      acc_z =
-          common::math::Clamp(acc_z * damping_z, FLAGS_min_acc, FLAGS_max_acc);
+      acc_x *= damping_x;
+      acc_y *= damping_y;
+      acc_z *= damping_z;
+
+      double heading = feature->velocity_heading();
+      acc = acc_x * std::cos(heading) + acc_y * std::sin(heading);
+
+      if (acc > 0.0 && acc > FLAGS_max_acc) {
+        double factor = std::abs(FLAGS_max_acc / acc);
+        acc = FLAGS_max_acc;
+        acc_x *= factor;
+        acc_y *= factor;
+      } else if (acc < 0.0 && acc < FLAGS_min_acc) {
+        double factor = std::abs(FLAGS_min_acc / acc);
+        acc = FLAGS_min_acc;
+        acc_x *= factor;
+        acc_y *= factor;
+      }
     }
   }
 
   feature->mutable_acceleration()->set_x(acc_x);
   feature->mutable_acceleration()->set_y(acc_y);
   feature->mutable_acceleration()->set_z(acc_z);
-  double acc = std::hypot(std::hypot(acc_x, acc_y), acc_z);
   feature->set_acc(acc);
 
   ADEBUG << "Obstacle [" << id_ << "] has acceleration [" << std::fixed
@@ -409,8 +421,7 @@ void Obstacle::SetLengthWidthHeight(
 }
 
 void Obstacle::InitKFMotionTracker(Feature* feature) {
-  double cycle_time = 0.1;
-  double t = cycle_time;
+  double t = FLAGS_prediction_freq;
   // Set transition matrix F
   // constant acceleration dynamic model
   Eigen::Matrix<double, 6, 6> F;

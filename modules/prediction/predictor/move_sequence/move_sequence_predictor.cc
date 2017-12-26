@@ -266,6 +266,9 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     }
     double lane_speed = std::hypot(vs, vl);
     double lane_acc = std::hypot(as, al);
+    if (as < 0.0) {
+      lane_acc = -lane_acc;
+    }
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -299,14 +302,11 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double theta = feature.velocity_heading();
   double v = feature.speed();
   double a = feature.acc();
-  if (FLAGS_enable_rnn_acc && lane_sequence.has_acceleration()) {
-    a = lane_sequence.acceleration();
-  }
   if (FLAGS_enable_kf_tracking) {
     v = feature.t_speed();
     a = feature.t_acc();
   }
-  if (FLAGS_enable_lane_sequence_acc) {
+  if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
     a = lane_sequence.acceleration();
   }
   double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
