@@ -87,6 +87,7 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
+  auto path_decision_copy = *path_decision;
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
@@ -94,10 +95,15 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                   "Mapping obstacle for qp st speed optimizer failed!");
   }
 
-  std::vector<const StBoundary*> boundaries;
   for (const auto* obstacle : path_decision->path_obstacles().Items()) {
+    auto id = obstacle->Id();
+    auto* mutable_obstacle = path_decision->Find(id);
+
     if (!obstacle->st_boundary().IsEmpty()) {
-      boundaries.push_back(&obstacle->st_boundary());
+      mutable_obstacle->SetBlockingObstacle(true);
+    } else {
+      path_decision->SetStBoundary(id,
+                                   path_decision_copy.Find(id)->st_boundary());
     }
   }
 
