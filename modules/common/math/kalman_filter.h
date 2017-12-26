@@ -22,13 +22,13 @@
 #ifndef MODULES_COMMON_MATH_KALMAN_FILTER_H_
 #define MODULES_COMMON_MATH_KALMAN_FILTER_H_
 
+#include <sstream>
 #include <string>
 
 #include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/math/matrix_operations.h"
-#include "modules/common/util/string_util.h"
 
 /**
  * @namespace apollo::common::math
@@ -205,6 +205,12 @@ class KalmanFilter {
    */
   std::string DebugString() const;
 
+  /**
+   * @brief Get initialization state of the filter
+   * @return True if the filter is initialized
+   */
+  bool IsInitialized() { return is_initialized_; }
+
  private:
   // Mean of current state belief distribution
   Eigen::Matrix<T, XN, 1> x_;
@@ -266,14 +272,15 @@ inline void KalmanFilter<T, XN, ZN, UN>::Correct(
 template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline std::string KalmanFilter<T, XN, ZN, UN>::DebugString() const {
   Eigen::IOFormat clean_fmt(4, 0, ", ", " ", "[", "]");
-  return util::StrCat(
-      "F = ", F_.format(clean_fmt), "\n"
-      "B = ", B_.format(clean_fmt), "\n"
-      "H = ", H_.format(clean_fmt), "\n"
-      "Q = ", Q_.format(clean_fmt), "\n"
-      "R = ", R_.format(clean_fmt), "\n"
-      "x = ", x_.format(clean_fmt), "\n"
-      "P = ", P_.format(clean_fmt), "\n");
+  std::stringstream ss;
+  ss << "F = " << F_.format(clean_fmt) << "\n"
+     << "B = " << B_.format(clean_fmt) << "\n"
+     << "H = " << H_.format(clean_fmt) << "\n"
+     << "Q = " << Q_.format(clean_fmt) << "\n"
+     << "R = " << R_.format(clean_fmt) << "\n"
+     << "x = " << x_.format(clean_fmt) << "\n"
+     << "P = " << P_.format(clean_fmt) << "\n";
+  return ss.str();
 }
 
 }  // namespace math
