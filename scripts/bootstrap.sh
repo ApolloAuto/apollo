@@ -29,18 +29,23 @@ function start() {
     if [ "$HOSTNAME" == "in_release_docker" ]; then
         supervisord -c /apollo/modules/tools/supervisord/release.conf >& /tmp/supervisord.start.log
         echo "Started supervisord with release conf"
+        supervisorctl start monitor > /dev/null
+        supervisorctl start dreamview > /dev/null
     else
         supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
         echo "Started supervisord with dev conf"
+        bash scripts/dreamview.sh
     fi
-    supervisorctl start monitor > /dev/null  2>&1 &
-    supervisorctl start dreamview > /dev/null 2>&1 &
     echo "Dreamview is running at http://localhost:8888"
 }
 
 function stop() {
-    supervisorctl stop monitor > /dev/null  2>&1 &
-    supervisorctl stop dreamview > /dev/null 2>&1 &
+    if [ "$HOSTNAME" == "in_release_docker" ]; then
+        supervisorctl stop monitor > /dev/null  2>&1 &
+        supervisorctl stop dreamview > /dev/null 2>&1 &
+    else
+        bash scripts/dreamview.sh stop
+    fi
     pkill -f roscore
 }
 
