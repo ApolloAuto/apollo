@@ -29,10 +29,8 @@
 #include "pcl/io/pcd_io.h"
 
 DECLARE_string(flagfile);
-DEFINE_string(lidar_path, "./modules/perception/tool/export_sensor_data/lidar/",
-              "lidar path");
-DEFINE_string(radar_path, "./modules/perception/tool/export_sensor_data/radar/",
-              "radar path");
+DEFINE_string(lidar_path, "/apollo/data/lidar/", "lidar path");
+DEFINE_string(radar_path, "/apollo/data/radar/", "radar path");
 
 namespace apollo {
 namespace perception {
@@ -185,6 +183,7 @@ class SequentialPerceptionTest {
              << "Pass file: " << file_path;
       return false;
     }
+    AINFO << "Process radar";
 
     /// read pose and timestamp
     Eigen::Matrix4d pose;

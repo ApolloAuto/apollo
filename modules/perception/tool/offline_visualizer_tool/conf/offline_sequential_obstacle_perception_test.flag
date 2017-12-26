@@ -7,13 +7,13 @@
 # /offline_sequential_obstacle_perception_test.cc
 # lidar data path
 # type: string
-# default: ./modules/perception/tool/export_sensor_data/lidar/
---lidar_path=./modules/perception/tool/export_sensor_data/lidar/
+# default: /apollo/data/lidar/
+--lidar_path=/apollo/data/lidar/
 
 # radar data path
 # type: string
-# default: ./modules/perception/tool/export_sensor_data/radar/
---radar_path=./modules/perception/tool/export_sensor_data/radar/
+# default: /apollo/data/radar/
+--radar_path=/apollo/data/radar/
 
 # the radar detector for onboard
 # type: string
