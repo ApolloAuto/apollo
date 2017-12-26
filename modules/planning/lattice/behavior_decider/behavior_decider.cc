@@ -54,12 +54,10 @@ PlanningTarget BehaviorDecider::Analyze(
 
   PlanningTarget ret;
 
-  if (0 !=
-      ScenarioManager::instance()->ComputeWorldDecision(
-          frame, reference_line_info,
-          init_planning_point, lon_init_state,
-          discretized_reference_line, &ret)) {
-    AERROR << "ComputeWorldDecision error!";
+  if (ScenarioManager::instance()->ComputeWorldDecision(frame,
+      reference_line_info, init_planning_point, lon_init_state,
+      discretized_reference_line, &ret) != 0) {
+    AERROR<< "ComputeWorldDecision error!";
   }
 
   for (const auto& reference_point : discretized_reference_line) {
@@ -90,6 +88,7 @@ PlanningTarget BehaviorDecider::Analyze(
   return ret;
 }
 
+/**
 // To Be Deprecated
 bool BehaviorDecider::StopDecisionNearDestination(
     Frame* frame, const std::array<double, 3>& lon_init_state,
@@ -132,6 +131,8 @@ void BehaviorDecider::GetNearbyObstacles(
     std::array<double, 3>* backward_state) {
   // TODO(kechxu) implement
 }
+
+**/
 
 }  // namespace planning
 }  // namespace apollo
