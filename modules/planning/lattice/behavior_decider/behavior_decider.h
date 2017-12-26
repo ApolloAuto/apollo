@@ -47,22 +47,26 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
+  /**
   bool StopDecisionNearDestination(
       Frame* frame, const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
       PlanningTarget* planning_target);
+      **/
 
   // Given a reference line, compute the nearest forward state and
   // backward state. Here state includes obstacles and necessary
   // traffic signals.
+  /**
   void GetNearbyObstacles(
       const common::TrajectoryPoint& init_planning_point, const Frame* frame,
       const std::vector<common::PathPoint>& discretized_reference_line,
       std::array<double, 3>* forward_state,
       std::array<double, 3>* backward_state);
+      **/
 
  private:
-  PlanningTarget previous_planning_target;
+//  PlanningTarget previous_planning_target;
 };
 
 }  // namespace planning
