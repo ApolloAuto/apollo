@@ -182,7 +182,7 @@ class Obstacle {
       const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
-  void InitKFMotionTracker(Feature* feature);
+  void InitKFMotionTracker(const Feature& feature);
 
   void UpdateKFMotionTracker(Feature* feature);
 
@@ -207,7 +207,7 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
-  void InitKFPedestrianTracker(Feature* feature);
+  void InitKFPedestrianTracker(const Feature& feature);
 
   void UpdateKFPedestrianTracker(Feature* feature);
 
@@ -224,8 +224,6 @@ class Obstacle {
   std::deque<Feature> feature_history_;
   common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
-  bool kf_motion_tracker_enabled_ = false;
-  bool kf_pedestrian_tracker_enabled_ = false;
   std::unordered_map<std::string, common::math::KalmanFilter<double, 4, 2, 0>>
       kf_lane_trackers_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
