@@ -92,22 +92,27 @@ void GenerateFreeMoveTrajectoryPoints(
 
   for (size_t i = 0; i < num; ++i) {
     double speed = std::hypot(v_x, v_y);
+    double acc = 0.0;
     if (speed <= std::numeric_limits<double>::epsilon()) {
       speed = 0.0;
       v_x = 0.0;
       v_y = 0.0;
       acc_x = 0.0;
       acc_y = 0.0;
+      acc = 0.0;
     } else if (speed > FLAGS_max_speed) {
       speed = FLAGS_max_speed;
     }
 
-    // update theta
+    // update theta and acc
     if (speed > std::numeric_limits<double>::epsilon()) {
       if (points->size() > 0) {
-        PathPoint* prev_point = points->back().mutable_path_point();
-        theta = std::atan2(y - prev_point->y(), x - prev_point->x());
-        prev_point->set_theta(theta);
+        TrajectoryPoint& prev_trajectory_point = points->back();
+        PathPoint* prev_path_point = prev_trajectory_point.mutable_path_point();
+        theta = std::atan2(y - prev_path_point->y(), x - prev_path_point->x());
+        prev_path_point->set_theta(theta);
+        acc = (speed - prev_trajectory_point.v()) / freq;
+        prev_trajectory_point.set_a(acc);
       }
     } else {
       if (points->size() > 0) {
@@ -134,7 +139,7 @@ void GenerateFreeMoveTrajectoryPoints(
     path_point.set_theta(theta);
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
-    trajectory_point.set_a(std::hypot(acc_x, acc_y));
+    trajectory_point.set_a(acc);
     trajectory_point.set_relative_time(static_cast<double>(i) * freq);
     points->emplace_back(std::move(trajectory_point));
 
