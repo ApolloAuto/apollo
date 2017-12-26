@@ -119,7 +119,8 @@ bool Obstacle::IsOnLane() {
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&
-        feature_history_.front().lane().has_lane_feature()) {
+        (feature_history_.front().lane().current_lane_feature_size() > 0 ||
+         feature_history_.front().lane().nearby_lane_feature_size() > 0)) {
       ADEBUG << "Obstacle [" << id_ << "] is on lane.";
       return true;
     }
