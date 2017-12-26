@@ -95,16 +95,16 @@ class LatControllerTest : public ::testing::Test, LatController {
 
 TEST_F(LatControllerTest, ComputeLateralErrors) {
   auto localization_pb = LoadLocalizaionPb(
-      "modules/control/testdata/longitudinal_controller_test/"
+      "modules/control/testdata/lateral_controller_test/"
       "1_localization.pb.txt");
   auto chassis_pb = LoadChassisPb(
-      "modules/control/testdata/longitudinal_controller_test/1_chassis.pb.txt");
+      "modules/control/testdata/lateral_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
   auto *vehicle_state = VehicleStateProvider::instance();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
-      "modules/control/testdata/longitudinal_controller_test/"
+      "modules/control/testdata/lateral_controller_test/"
       "1_planning.pb.txt");
   TrajectoryAnalyzer trajectory_analyzer(&planning_trajectory_pb);
 
