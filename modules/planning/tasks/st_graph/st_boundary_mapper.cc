@@ -189,14 +189,16 @@ Status StBoundaryMapper::CreateStBoundaryWithHistory(
     } else {
       decision = iter->second;
     }
-    if (!path_obstacle->HasLongitudinalDecision() && decision.has_ignore()) {
+    if (!path_obstacle->HasLongitudinalDecision()) {
       if (!MapWithoutDecision(path_obstacle).ok()) {
         std::string msg = StrCat("Fail to map obstacle ", path_obstacle->Id(),
                                  " without decision.");
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
-      continue;
+      if (path_obstacle->st_boundary().IsEmpty() || decision.has_ignore()) {
+        continue;
+      }
     }
     if (path_obstacle->HasLongitudinalDecision()) {
       decision = path_obstacle->LongitudinalDecision();
