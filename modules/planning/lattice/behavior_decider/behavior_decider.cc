@@ -54,11 +54,13 @@ PlanningTarget BehaviorDecider::Analyze(
 
   PlanningTarget ret;
 
+  /**
   if (ScenarioManager::instance()->ComputeWorldDecision(frame,
       reference_line_info, init_planning_point, lon_init_state,
       discretized_reference_line, &ret) != 0) {
     AERROR<< "ComputeWorldDecision error!";
   }
+  **/
 
   for (const auto& reference_point : discretized_reference_line) {
     ret.mutable_discretized_reference_line()
