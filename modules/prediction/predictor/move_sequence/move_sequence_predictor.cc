@@ -314,8 +314,8 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double s0 = 0.0;
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
-  double ds1 = v;
-  double dds1 = a;
+  double ds1 = std::max(0.0, ds0 + dds0 * time_to_lane_center);
+  double dds1 = 0.0;
   double p = time_to_lane_center;
 
   coefficients->operator[](0) = s0;
@@ -542,6 +542,7 @@ double MoveSequencePredictor::Cost(
 
 void MoveSequencePredictor::GenerateCandidateTimes(
     std::vector<double>* candidate_times) {
+  candidate_times->clear();
   double t = FLAGS_time_lower_bound_to_lane_center;
   double time_gap = FLAGS_sample_time_gap;
   while (t <= FLAGS_time_upper_bound_to_lane_center) {
