@@ -23,12 +23,13 @@
 
 #include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/poly_st_speed_config.pb.h"
 
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -37,18 +38,20 @@ class SpeedProfileCost {
  public:
   explicit SpeedProfileCost(const PolyStSpeedConfig &config,
                             const std::vector<const PathObstacle *> &obstacles,
-                            const SpeedLimit &speed_limit);
+                            const SpeedLimit &speed_limit,
+                            const common::TrajectoryPoint &init_point);
 
-  double Calculate(const QuinticPolynomialCurve1d &curve,
-                   const double end_time) const;
+  double Calculate(const QuarticPolynomialCurve1d &curve, const double end_time,
+                   const double curr_min_cost) const;
 
  private:
-  double CalculatePointCost(const QuinticPolynomialCurve1d &curve,
+  double CalculatePointCost(const QuarticPolynomialCurve1d &curve,
                             const double t) const;
 
   const PolyStSpeedConfig config_;
   const std::vector<const PathObstacle *> &obstacles_;
   const SpeedLimit &speed_limit_;
+  const common::TrajectoryPoint &init_point_;
 };
 
 }  // namespace planning

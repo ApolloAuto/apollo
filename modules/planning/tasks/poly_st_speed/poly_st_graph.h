@@ -37,7 +37,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed_limit.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
@@ -67,7 +67,7 @@ class PolyStGraph {
     STPoint st_point;
     double speed = 0.0;
     double accel = 0.0;
-    QuinticPolynomialCurve1d speed_profile;
+    QuarticPolynomialCurve1d speed_profile;
   };
 
   bool GenerateMinCostSpeedProfile(
