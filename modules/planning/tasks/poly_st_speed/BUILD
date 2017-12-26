@@ -11,6 +11,7 @@ cc_library(
         "speed_profile_cost.h",
     ],
     deps = [
+        "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:poly_st_speed_config_proto",
         "//modules/planning/tasks:speed_optimizer",
@@ -34,6 +35,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/localization/proto:pose_proto",
         "//modules/map/hdmap",
+        "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:poly_st_speed_config_proto",
         "//modules/planning/tasks:speed_optimizer",
