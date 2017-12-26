@@ -54,7 +54,7 @@ export default class Meters {
 
             if (world.autoDrivingCar.speed !== undefined) {
                 // Convert the unit from m/s to mph.
-                this.speed = meterPerSecondToKmPerHour(world.autoDrivingCar.speed);
+                this.speed = world.autoDrivingCar.speed;
             }
 
             if (world.autoDrivingCar.steeringAngle !== undefined) {
