@@ -58,6 +58,7 @@ class ObstaclePerception {
   std::unique_ptr<OpenglVisualizer> frame_visualizer_ = nullptr;
   ObstacleShowType obstacle_show_type_;
   FrameContent frame_content_;
+  bool lidar_pose_inited_;
 
   DISALLOW_COPY_AND_ASSIGN(ObstaclePerception);
 };  // class ObstaclePerception

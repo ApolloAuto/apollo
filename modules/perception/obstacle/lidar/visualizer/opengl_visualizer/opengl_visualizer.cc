@@ -46,11 +46,6 @@ bool OpenglVisualizer::Init() {
 }
 
 void OpenglVisualizer::Render(const FrameContent &content) {
-  Eigen::Vector3d camera_world_pos(
-      camera_center_world_.x, camera_center_world_.y, camera_center_world_.z);
-  Eigen::Vector3d camera_scene_center(view_point_world_.x, view_point_world_.y,
-                                      view_point_world_.z);
-  Eigen::Vector3d camera_up_vector(up_world_.x, up_world_.y, up_world_.z);
   opengl_vs_->SetCameraPara(
       Eigen::Vector3d(camera_center_world_.x, camera_center_world_.y,
                       camera_center_world_.z),
