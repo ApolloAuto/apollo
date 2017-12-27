@@ -39,24 +39,66 @@ typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, VALID_OBJECT_TYPE> Matrixd;
 
 namespace sequence_type_fuser {
 
+/**
+ * @brief Convert probability format from std to eigen vector
+ * @param src_prob Input probability stored in std vector
+ * @param dst_prob Output probability stored in eigen vector
+ */
 void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob);
 
+/**
+ * @brief Convert probability format from eigen to std vector
+ * @param src_prob Input probability stored in eigen vector
+ * @param dst_prob Output probability stored in std vector
+ */
 void FromEigenVector(const Vectord& src_prob, std::vector<float>* dst_prob);
 
+/**
+ * @brief Transform probability into that in log space
+ * @param In and out probability
+ */
 void ToLog(Vectord* prob);
 
+/**
+ * @brief Transform probability into that in exp space
+ * @param In and out probability
+ */
 void ToExp(Vectord* prob);
 
+/**
+ * @brief Normalize the probability
+ * @param In and out probability
+ */
 void Normalize(Vectord* prob);
 
+/**
+ * @brief Normalize the probability stored as a row vector in eigen matrix
+ * @param In and out probability
+ */
 void NormalizeRow(Matrixd* prob);
 
-void PrintProbability(const std::vector<float>& prob, const std::string& name);
-
+/**
+ * @brief Load a matrix from input file stream
+ * @param fin The input file stream
+ * @param matrix The loaded Matrix
+ * @return True if load successfully, false otherwise
+ */
 bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix);
 
+/**
+ * @brief Load a matrix from file
+ * @param filename The file name
+ * @param matrix The loaded Matrix
+ * @return True if load successfully, false otherwise
+ */
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 
+/**
+ * @brief Load multiple matrices from file
+ * @param filename The file name
+ * @param matrices The loaded Matrices
+ * @return True if load successfully, false otherwise
+ */
 bool LoadMultipleMatricesFile(const std::string& filename,
                               std::map<std::string, Matrixd>* matrices);
 
