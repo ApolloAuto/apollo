@@ -85,6 +85,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(const double ref_cruise_s
   return end_s_conditions;
 }
 
+/**
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForFollowing(const double obstacle_position,
     const double obstacle_velocity) const {
@@ -138,6 +139,7 @@ EndConditionSampler::SampleLonEndConditionsForStopping(const double ref_stop_pos
   }
   return end_s_conditions;
 }
+**/
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
