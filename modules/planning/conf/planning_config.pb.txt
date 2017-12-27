@@ -50,7 +50,7 @@ em_planner_config {
         default_obstacle_cost: 1e10
         obstacle_cost_factor: -300
 
-        default_speed_cost: 1.0
+        default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
         low_speed_penalty: 2.5
 
