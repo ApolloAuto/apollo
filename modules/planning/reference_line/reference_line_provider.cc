@@ -536,22 +536,24 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     double left_extend = 0.0;
     if (left_boundary_type == hdmap::LaneBoundaryType::DOTTED_WHITE) {
       auto neighbor = LeftNeighborWaypoint(waypoint);
-      if (neighbor.lane &&
-          (neighbor.lane->lane().type() == hdmap::Lane::BIKING ||
-           neighbor.lane->lane().type() == hdmap::Lane::CITY_DRIVING ||
-           neighbor.lane->lane().type() == hdmap::Lane::PARKING)) {
-        left_extend = FLAGS_reference_line_lateral_extension;
+      if (neighbor.lane) {
+        if (neighbor.lane->lane().type() == hdmap::Lane::BIKING ||
+            neighbor.lane->lane().type() == hdmap::Lane::PARKING) {
+          left_extend = FLAGS_reference_line_lateral_extension;
+        }
       }
     }
     auto right_boundary_type = RightBoundaryType(waypoint);
     double right_extend = 0.0;
     if (right_boundary_type == hdmap::LaneBoundaryType::DOTTED_WHITE) {
       auto neighbor = RightNeighborWaypoint(waypoint);
-      if (neighbor.lane &&
-          (neighbor.lane->lane().type() == hdmap::Lane::BIKING ||
-           neighbor.lane->lane().type() == hdmap::Lane::CITY_DRIVING ||
-           neighbor.lane->lane().type() == hdmap::Lane::PARKING)) {
-        right_extend = FLAGS_reference_line_lateral_extension;
+      if (neighbor.lane) {
+        if (neighbor.lane) {
+          if (neighbor.lane->lane().type() == hdmap::Lane::BIKING ||
+              neighbor.lane->lane().type() == hdmap::Lane::PARKING) {
+            left_extend = FLAGS_reference_line_lateral_extension;
+          }
+        }
       }
     }
     double left_width = 0.0;

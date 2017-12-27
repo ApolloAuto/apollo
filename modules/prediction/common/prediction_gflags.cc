@@ -62,7 +62,7 @@ DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
-DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
+DEFINE_double(max_lane_angle_diff, M_PI / 4.0,
               "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
@@ -93,7 +93,6 @@ DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_diff_thred, M_PI / 6.0,
               "Threshold for adjusting on-lane obstacle heading");
-DEFINE_bool(enable_rnn_acc, false, "If use acceleration from RNN model.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
