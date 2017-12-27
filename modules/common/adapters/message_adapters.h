@@ -95,6 +95,8 @@ using LocalizationMsfLidarAdapter =
     Adapter<apollo::localization::LocalizationEstimate>;
 using LocalizationMsfSinsPvaAdapter =
     Adapter<apollo::localization::IntegSinsPva>;
+using LocalizationMsfStatusAdapter =
+    Adapter<apollo::localization::LocalizationStatus>;
 
 }  // namespace adapter
 }  // namespace common
