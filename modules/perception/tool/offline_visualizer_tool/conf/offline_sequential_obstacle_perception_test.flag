@@ -22,7 +22,7 @@
 
 # the fusion method for onboard
 # type: string
-# candidate: DummyFusion, ProbabilisticFusion
+# candidate: only ProbabilisticFusion
 --onboard_fusion=ProbabilisticFusion
 
 # enable visualization
