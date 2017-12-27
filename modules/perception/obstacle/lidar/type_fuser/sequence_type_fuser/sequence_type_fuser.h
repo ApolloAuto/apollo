@@ -31,54 +31,87 @@ class SequenceTypeFuser : public BaseTypeFuser {
  public:
   typedef ObjectSequence::TrackedObjects TrackedObjects;
 
+  /**
+   * @brief Constructor
+   */
   SequenceTypeFuser() {}
 
+  /**
+   * @ brief Destructor
+   */
   virtual ~SequenceTypeFuser() {}
 
-  // @brief initialize fuser's configs
-  // @return true if initialize successfully, otherwise return false
+  /**
+   * @brief Initialize configuration
+   * @return True if initialize successfully, false otherwise
+   */
   bool Init() override;
 
+  /**
+   * @brief Fuse type over the sequence for each object
+   * @param options Some algorithm options declared in BaseTypeFuser
+   * @param objects The objects with initial object type
+   * @return True if fuse type successfully, false otherwise
+   */
   bool FuseType(const TypeFuserOptions& options,
                 std::vector<ObjectPtr>* objects) override;
 
-  std::string name() const override {
-    return "SequenceTypeFuser";
-  }
+  /**
+   * @brief Get module name
+   * @return Name of module
+   */
+  std::string name() const override { return "SequenceTypeFuser"; }
 
  protected:
-  // The fusion problem is modeled as inferring the discrete state in a chain
-  // CRFs.
-  // Note, log(P({X}|O)) = sigma_i{E_unary(X_i,O)} +
-  // sigma_ij{E_pairwise(X_i,X_j)} - logZ;
-  // E_unary(X_i,O) = sigma{logP(classifier)}, E_pairwise(X_i,X_j) =
-  // logTransition(X_i,X_j)
-  // Maximize the sequence probability P(X_t|{X}^opt,O) based on optimal state
-  // inference.
+
+  /**
+   * @brief Fuse type over object sequence by a linear-chain CRF.
+   * The fusion problem is modeled as inferring the discrete state 
+   * in a chain CRF. Note, log(P({X}|O)) = sigma_i{E_unary(X_i,O)} +
+   * sigma_ij{E_pairwise(X_i,X_j)} - logZ,
+   * E_unary(X_i,O) = sigma{logP(classifier)},
+   * E_pairwise(X_i,X_j) = log{Transition(X_i,X_j)}.
+   * Maximize the sequence probability P(X_t|{X}^opt,O) based on the
+   * Viterbi algorithm.
+   * @param tracked_objects The tracked objects as a sequence
+   * @return True if fuse successfully, false otherwise
+   */
   bool FuseWithCCRF(TrackedObjects* tracked_objects);
 
+  /**
+   * @brief Rectify the initial object type based on smooth matrices
+   * @param object The object with initial type probabilities
+   * @param log_prob The output rectified type probabilities
+   * @return True if rectify successfully, false otherwise
+   */
   bool RectifyObjectType(const ObjectPtr& object, Vectord* log_prob);
 
+  /**
+   * @brief Recover type probabilities and object type from the input
+   * log probabilities
+   * @param prob The input type probabilities in the log space
+   * @param dst The output normalized type probabilities
+   * @param type The output object type with the max probability
+   * @return True if recover successfully, false otherwise
+   */
   bool RecoverFromLogProb(Vectord* prob, std::vector<float>* dst,
                           ObjectType* type);
 
  protected:
-  ObjectSequence _sequence;
+  ObjectSequence sequence_;
 
-  double _temporal_window;
+  double temporal_window_;
+
+  Matrixd transition_matrix_;
+  Matrixd confidence_smooth_matrix_;
+  std::map<std::string, Matrixd> smooth_matrices_;
 
   // Note all probabilities are in the log space
-  Matrixd _transition_matrix;
-  std::vector<Vectord> _fused_oneshot_probs;
-  std::vector<Vectord> _fused_sequence_probs;
-  std::vector<Vectori> _state_back_trace;
+  std::vector<Vectord> fused_oneshot_probs_;
+  std::vector<Vectord> fused_sequence_probs_;
+  std::vector<Vectori> state_back_trace_;
 
-  std::map<std::string, Matrixd> _smooth_matrices;
-  Matrixd _confidence_smooth_matrix;
-
-  double _ccrf_debug = true;
-
-  static constexpr double _s_alpha = 1.8;
+  static constexpr double s_alpha_ = 1.8;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SequenceTypeFuser);

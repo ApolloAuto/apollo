@@ -31,7 +31,7 @@ bool SequenceTypeFuser::Init() {
     return false;
   }
 
-  if (!model_config->GetValue("temporal_window", &_temporal_window)) {
+  if (!model_config->GetValue("temporal_window", &temporal_window_)) {
     AERROR << "Failed to find temporal_window in config. ";
     return false;
   }
@@ -48,21 +48,21 @@ bool SequenceTypeFuser::Init() {
       GetAbsolutePath(work_root, transition_property_file_path);
 
   if (!sequence_type_fuser::LoadSingleMatrixFile(transition_property_file_path,
-                                                 &_transition_matrix)) {
+                                                 &transition_matrix_)) {
     return false;
   }
-  _transition_matrix += Matrixd::Ones() * 1e-6;
+  transition_matrix_ += Matrixd::Ones() * 1e-6;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
-    sequence_type_fuser::NormalizeRow(&_transition_matrix);
+    sequence_type_fuser::NormalizeRow(&transition_matrix_);
   }
   AINFO << "transition matrix";
-  AINFO << std::endl << _transition_matrix;
+  AINFO << std::endl << transition_matrix_;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     for (std::size_t j = 0; j < VALID_OBJECT_TYPE; ++j) {
-      _transition_matrix(i, j) = log(_transition_matrix(i, j));
+      transition_matrix_(i, j) = log(transition_matrix_(i, j));
     }
   }
-  AINFO << std::endl << _transition_matrix;
+  AINFO << std::endl << transition_matrix_;
 
   // get classifier property
   std::string classifiers_property_file_path;
@@ -75,26 +75,25 @@ bool SequenceTypeFuser::Init() {
       GetAbsolutePath(work_root, classifiers_property_file_path);
 
   if (!sequence_type_fuser::LoadMultipleMatricesFile(
-          classifiers_property_file_path, &_smooth_matrices)) {
+          classifiers_property_file_path, &smooth_matrices_)) {
     return false;
   }
-  for (auto& pair : _smooth_matrices) {
+  for (auto& pair : smooth_matrices_) {
     sequence_type_fuser::NormalizeRow(&pair.second);
     pair.second.transposeInPlace();
     AINFO << "Source: " << pair.first;
     AINFO << std::endl << pair.second;
   }
 
-  _confidence_smooth_matrix = Matrixd::Identity();
-  auto iter = _smooth_matrices.find("Confidence");
-  if (iter != _smooth_matrices.end()) {
-    _confidence_smooth_matrix = iter->second;
-    _smooth_matrices.erase(iter);
+  confidence_smooth_matrix_ = Matrixd::Identity();
+  auto iter = smooth_matrices_.find("Confidence");
+  if (iter != smooth_matrices_.end()) {
+    confidence_smooth_matrix_ = iter->second;
+    smooth_matrices_.erase(iter);
   }
   AINFO << "Confidence: ";
-  AINFO << std::endl << _confidence_smooth_matrix;
+  AINFO << std::endl << confidence_smooth_matrix_;
 
-  _ccrf_debug = true;
   return true;
 }
 
@@ -104,9 +103,7 @@ bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
     return false;
   }
   if (options.timestamp > 0.0) {
-    AINFO << "Combined classifier, temporal fusion";
-    // sequence fusion
-    _sequence.AddTrackedFrameObjects(*objects, options.timestamp);
+    sequence_.AddTrackedFrameObjects(*objects, options.timestamp);
     ObjectSequence::TrackedObjects tracked_objects;
     for (auto& object : *objects) {
       if (object->is_background) {
@@ -115,11 +112,8 @@ bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
         continue;
       }
       const int& track_id = object->track_id;
-      _sequence.GetTrackInTemporalWindow(track_id, &tracked_objects,
-                                         _temporal_window);
-      // CHECK(tracked_objects.size() > 0) << "Empty track found";
-      // CHECK(object == tracked_objects.rbegin()->second) << "Inconsist objects
-      // found";
+      sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
+                                         temporal_window_);
       if (tracked_objects.size() == 0) {
         AERROR << "Find zero-length track, so skip.";
         continue;
@@ -142,67 +136,44 @@ bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
     return false;
   }
 
-  // _current_timestamp = option.timestamp;
-
-  // LOG_INFO << "Enter fuse with conditional probability inference";
-  _fused_oneshot_probs.resize(tracked_objects->size());
-
+  /// rectify object type with smooth matrices
+  fused_oneshot_probs_.resize(tracked_objects->size());
   std::size_t i = 0;
   for (auto& pair : *tracked_objects) {
     ObjectPtr& object = pair.second;
-    if (!RectifyObjectType(object, &_fused_oneshot_probs[i++])) {
-      AERROR << "Failed to fuse one short probs in sequence.";
+    if (!RectifyObjectType(object, &fused_oneshot_probs_[i++])) {
+      AERROR << "Failed to fuse one shot probs in sequence.";
       return false;
     }
   }
 
-  // Use viterbi algorithm to infer the state
+  /// use Viterbi algorithm to infer the state
   std::size_t length = tracked_objects->size();
-  _fused_sequence_probs.resize(length);
-  _state_back_trace.resize(length);
-
-  _fused_sequence_probs[0] = _fused_oneshot_probs[0];
-  // Add prior knowledge to suppress the sudden-appeared object types.
-  _fused_sequence_probs[0] += _transition_matrix.row(0).transpose();
-
+  fused_sequence_probs_.resize(length);
+  state_back_trace_.resize(length);
+  fused_sequence_probs_[0] = fused_oneshot_probs_[0];
+  /// add prior knowledge to suppress the sudden-appeared object types.
+  fused_sequence_probs_[0] += transition_matrix_.row(0).transpose();
   for (std::size_t i = 1; i < length; ++i) {
     for (std::size_t right = 0; right < VALID_OBJECT_TYPE; ++right) {
       double max_prob = -DBL_MAX;
       std::size_t id = 0;
       for (std::size_t left = 0; left < VALID_OBJECT_TYPE; ++left) {
-        const double prob = _fused_sequence_probs[i - 1](left) +
-                            _transition_matrix(left, right) * _s_alpha +
-                            _fused_oneshot_probs[i](right);
+        const double prob = fused_sequence_probs_[i - 1](left) +
+                            transition_matrix_(left, right) * s_alpha_ +
+                            fused_oneshot_probs_[i](right);
         if (prob > max_prob) {
           max_prob = prob;
           id = left;
         }
       }
-      _fused_sequence_probs[i](right) = max_prob;
-      _state_back_trace[i](right) = id;
+      fused_sequence_probs_[i](right) = max_prob;
+      state_back_trace_[i](right) = id;
     }
   }
   ObjectPtr object = tracked_objects->rbegin()->second;
-  RecoverFromLogProb(&_fused_sequence_probs.back(), &object->type_probs,
+  RecoverFromLogProb(&fused_sequence_probs_.back(), &object->type_probs,
                      &object->type);
-
-  if (_ccrf_debug) {
-    ObjectPtr object = tracked_objects->rbegin()->second;
-    std::cout << "Track id: " << object->track_id
-              << " length: " << tracked_objects->size() << std::endl;
-    // for (std::size_t i = 0; i < object->lidar_supplement->raw_probs.size();
-    // ++i) {
-    //     sequence_type_fuser::PrintProbability(object->lidar_supplement->raw_probs[i],
-    //             object->lidar_supplement->raw_classification_methods[i]);
-    // }
-    std::vector<float> prob_t;
-    sequence_type_fuser::ToExp(&_fused_oneshot_probs.back());
-    sequence_type_fuser::Normalize(&_fused_oneshot_probs.back());
-    sequence_type_fuser::FromEigenVector(_fused_oneshot_probs.back(), &prob_t);
-    sequence_type_fuser::PrintProbability(prob_t, "Oneshot");
-    sequence_type_fuser::PrintProbability(object->type_probs, "Sequence");
-    std::cout << "@@@@@@@@@@@@@@@@@" << std::endl;
-  }
 
   return true;
 }
@@ -217,8 +188,8 @@ bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
 
   Vectord single_prob;
   sequence_type_fuser::FromStdVector(object->type_probs, &single_prob);
-  auto iter = _smooth_matrices.find("CNNSegClassifier");
-  if (iter == _smooth_matrices.end()) {
+  auto iter = smooth_matrices_.find("CNNSegClassifier");
+  if (iter == smooth_matrices_.end()) {
     AERROR << "Failed to find CNNSegmentation classifier property.";
     return false;
   }
@@ -228,7 +199,7 @@ bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
 
   double conf = object->score;
   single_prob = conf * single_prob +
-                (1.0 - conf) * _confidence_smooth_matrix * single_prob;
+                (1.0 - conf) * confidence_smooth_matrix_ * single_prob;
   sequence_type_fuser::ToLog(&single_prob);
   *log_prob += single_prob;
   return true;
@@ -244,9 +215,6 @@ bool SequenceTypeFuser::RecoverFromLogProb(Vectord* prob,
       std::distance(dst->begin(), std::max_element(dst->begin(), dst->end())));
   return true;
 }
-
-// REGISTER_ONESHOTTYPEFUSION(CCRFOneShotTypeFusion);
-// REGISTER_SEQUENCETYPEFUSION(CCRFSequenceTypeFusion);
 
 }  // namespace perception
 }  // namespace apollo

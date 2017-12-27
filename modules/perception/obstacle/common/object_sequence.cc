@@ -22,12 +22,12 @@ namespace perception {
 
 bool ObjectSequence::AddTrackedFrameObjects(
     const std::vector<ObjectPtr>& objects, double timestamp) {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   for (const auto& obj : objects) {
     int& track_id = obj->track_id;
-    auto iter = _sequence.find(track_id);
-    if (iter == _sequence.end()) {
-      auto res = _sequence.insert(std::make_pair(track_id, TrackedObjects()));
+    auto iter = sequence_.find(track_id);
+    if (iter == sequence_.end()) {
+      auto res = sequence_.insert(std::make_pair(track_id, TrackedObjects()));
       if (!res.second) {
         AERROR << "Fail to insert track.";
         return false;
@@ -41,7 +41,7 @@ bool ObjectSequence::AddTrackedFrameObjects(
     }
   }
   RemoveStaleTracks(timestamp);
-  _current = timestamp;
+  current_ = timestamp;
   return true;
 }
 
@@ -52,10 +52,10 @@ bool ObjectSequence::GetTrackInTemporalWindow(int track_id,
     return false;
   }
   track->clear();
-  std::lock_guard<std::mutex> lock(_mutex);
-  double start_time = _current - window_time;
-  auto iter = _sequence.find(track_id);
-  if (iter == _sequence.end()) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  double start_time = current_ - window_time;
+  auto iter = sequence_.find(track_id);
+  if (iter == sequence_.end()) {
     return false;
   }
   for (auto& tobj : iter->second) {
@@ -66,37 +66,16 @@ bool ObjectSequence::GetTrackInTemporalWindow(int track_id,
   return true;
 }
 
-// bool ObjectSequence::get_objects_in_spatial_area(
-//         LastSightingObjects* objects,
-//         const Eigen::Vector3d& center,
-//         double radius) {
-//     if (objects == nullptr) {
-//         return false;
-//     }
-//     objects->clear();
-//     std::lock_guard<std::mutex> lock(_mutex);
-//     for (auto& track : _sequence) {
-//         auto iter = track.second.rbegin();
-//         auto obj_ptr = iter->second;
-//         auto timestamp = iter->first;
-//         if ((obj_ptr->center.head<2>() - center.head<2>()).norm() <= radius)
-//         {
-//             objects->insert(std::make_pair(timestamp, obj_ptr));
-//         }
-//     }
-//     return true;
-// }
-
 void ObjectSequence::RemoveStaleTracks(double current_stamp) {
-  for (auto outer_iter = _sequence.begin(); outer_iter != _sequence.end();) {
+  for (auto outer_iter = sequence_.begin(); outer_iter != sequence_.end();) {
     CHECK(outer_iter->second.size() > 0) << "Find empty tracks.";
     auto& track = outer_iter->second;
-    if (current_stamp - track.rbegin()->first > _s_max_time_out) {
-      _sequence.erase(outer_iter++);
+    if (current_stamp - track.rbegin()->first > s_max_time_out_) {
+      sequence_.erase(outer_iter++);
       continue;
     }
     for (auto inner_iter = track.begin(); inner_iter != track.end();) {
-      if (current_stamp - inner_iter->first > _s_max_time_out) {
+      if (current_stamp - inner_iter->first > s_max_time_out_) {
         track.erase(inner_iter++);
         continue;
       } else {
@@ -104,7 +83,7 @@ void ObjectSequence::RemoveStaleTracks(double current_stamp) {
       }
     }
     if (track.size() == 0) {  // all element removed
-      _sequence.erase(outer_iter++);
+      sequence_.erase(outer_iter++);
     } else {
       ++outer_iter;
     }
