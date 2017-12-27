@@ -90,6 +90,21 @@ class PredictionMap {
       hdmap::MapPathPoint* path_point);
 
   /**
+   * @brief Determine if a lane is a virtual lane.
+   * @param The lane ID of the lane.
+   * @return If the lane is a virtual lane.
+   */
+  static bool IsVirtualLane(const std::string& lane_id);
+
+  /**
+   * @brief Determine if a point is on a virtual lane.
+   * @param The point coordinate.
+   * @return If the point is on a virtual lane.
+   */
+  static bool OnVirtualLane(const Eigen::Vector2d& position,
+                            const double radius);
+
+  /**
    * @brief Get the connected lanes from some specified lanes.
    * @param prev_lanes The lanes from which to search their connected lanes.
    * @param heading The specified heading.

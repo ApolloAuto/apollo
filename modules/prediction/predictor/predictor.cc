@@ -87,7 +87,9 @@ bool Predictor::TrimTrajectory(
                    forward_length * std::cos(heading);
   double start_y = trajectory->trajectory_point(0).path_point().y() +
                    forward_length * std::sin(heading);
-  if (adc_trajectory_container->IsPointInJunction({start_x, start_y})) {
+  if (adc_trajectory_container->IsPointInJunction({start_x, start_y}) &&
+      PredictionMap::instance()->OnVirtualLane({start_x, start_y},
+                                               FLAGS_virtual_lane_radius)) {
     return false;
   }
   int index = 0;
@@ -95,6 +97,14 @@ bool Predictor::TrimTrajectory(
     double x = trajectory->trajectory_point(index).path_point().x();
     double y = trajectory->trajectory_point(index).path_point().y();
     if (adc_trajectory_container->IsPointInJunction({x, y})) {
+      break;
+    }
+    if (!trajectory->trajectory_point(index).path_point().has_lane_id()) {
+      continue;
+    }
+    const std::string& lane_id =
+        trajectory->trajectory_point(index).path_point().lane_id();
+    if (PredictionMap::instance()->IsVirtualLane(lane_id)) {
       break;
     }
     ++index;
