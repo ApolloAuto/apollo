@@ -19,6 +19,7 @@
 import requests
 import os
 import sys
+import urllib3
 from ConfigParser import ConfigParser
 from modules.data.proto.task_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
@@ -30,7 +31,7 @@ def update():
     config.read(CONFIG_FILE)
     ip = config.get('Host', 'ip')
     port = config.get('Host', 'port')
-    url = 'http://' + ip + ':' + port + '/update'
+    url = 'https://' + ip + ':' + port + '/update'
     
     # setup car info
     vehicle_info = VehicleInfo()
@@ -50,7 +51,9 @@ def update():
         "vin" : vin,
     }
 
-    r = requests.post(url, json=car_info)
+    urllib3.disable_warnings()
+    CERT_FILE = os.path.join(os.path.dirname(__file__), 'ota.cert')
+    r = requests.post(url, json=car_info, verify=CERT_FILE)
     if r.status_code == 200:
         print "Update successfully."
         sys.exit(0)
