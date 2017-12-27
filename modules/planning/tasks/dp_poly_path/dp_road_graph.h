@@ -94,8 +94,10 @@ class DPRoadGraph {
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
-  bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
-                           std::vector<DPRoadGraphNode> *min_cost_path);
+  bool GenerateMinCostPath(
+      const std::vector<const PathObstacle *> &obstacles,
+      const std::vector<std::vector<common::SLPoint>> &path_waypoints,
+      std::vector<DPRoadGraphNode> *min_cost_path);
 
   bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,

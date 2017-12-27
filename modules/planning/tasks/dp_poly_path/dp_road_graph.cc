@@ -73,8 +73,20 @@ bool DPRoadGraph::FindPathTunnel(
     return false;
   }
 
+  // sample path
+  std::vector<std::vector<common::SLPoint>> path_waypoints;
+  if (!SamplePathWaypoints(init_point_, &path_waypoints) ||
+      path_waypoints.size() < 1) {
+    AERROR << "Fail to sample path waypoints! reference_line_length = "
+           << reference_line_.Length();
+    return false;
+  }
+  path_waypoints.insert(path_waypoints.begin(),
+                        std::vector<common::SLPoint>{init_sl_point_});
+
+  // find min cost path
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
+  if (!GenerateMinCostPath(obstacles, path_waypoints, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
   }
@@ -115,26 +127,9 @@ bool DPRoadGraph::FindPathTunnel(
 
 bool DPRoadGraph::GenerateMinCostPath(
     const std::vector<const PathObstacle *> &obstacles,
+    const std::vector<std::vector<common::SLPoint>> &path_waypoints,
     std::vector<DPRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
-
-  std::vector<std::vector<common::SLPoint>> path_waypoints;
-  if (!SamplePathWaypoints(init_point_, &path_waypoints) ||
-      path_waypoints.size() < 1) {
-    AERROR << "Fail to sample path waypoints! reference_line_length = "
-           << reference_line_.Length();
-    return false;
-  }
-  path_waypoints.insert(path_waypoints.begin(),
-                        std::vector<common::SLPoint>{init_sl_point_});
-
-  for (uint32_t i = 0; i < path_waypoints.size(); ++i) {
-    const auto &level_waypoints = path_waypoints.at(i);
-    for (uint32_t j = 0; j < level_waypoints.size(); ++j) {
-      ADEBUG << "level[" << i << "], "
-             << level_waypoints.at(j).ShortDebugString();
-    }
-  }
 
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
@@ -233,8 +228,10 @@ bool DPRoadGraph::SamplePathWaypoints(
   double accumulated_s = init_sl_point_.s();
   double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
-    accumulated_s += level_distance;
-    if (accumulated_s + level_distance / 2.0 > total_length) {
+    double step_distance =
+        (i == 0 ? config_.first_step_length() : level_distance);
+    accumulated_s += step_distance;
+    if (accumulated_s + step_distance / 2.0 > total_length) {
       accumulated_s = total_length;
     }
     const double s = std::fmin(accumulated_s, total_length);

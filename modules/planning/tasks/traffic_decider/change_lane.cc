@@ -38,14 +38,11 @@ constexpr double kGuardDistance = 100.0;
 
 ChangeLane::ChangeLane(const RuleConfig& config) : TrafficRule(config) {}
 
-const Obstacle* ChangeLane::FindGuardObstacle(
-    ReferenceLineInfo* reference_line_info) {
-  const auto& reference_line = reference_line_info->reference_line();
-  const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
-  const auto& path_decision = reference_line_info->path_decision();
-  const Obstacle* first_guard_vehicle = nullptr;
+void ChangeLane::CreateGuardObstacles() {
+  const auto& reference_line = reference_line_info_->reference_line();
+  const auto& adc_sl_boundary = reference_line_info_->AdcSlBoundary();
+  const auto& path_decision = reference_line_info_->path_decision();
   constexpr double kGuardForwardDistance = 60;
-  double max_s = 0.0;
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     const auto* obstacle = path_obstacle->obstacle();
     if (!obstacle->HasTrajectory()) {
@@ -71,18 +68,14 @@ const Obstacle* ChangeLane::FindGuardObstacle(
         last_sl.s() > adc_sl_boundary.end_s() + kGuardForwardDistance) {
       continue;
     }
-    if (last_sl.s() > max_s) {
-      max_s = last_sl.s();
-      first_guard_vehicle = obstacle;
-    }
+    auto* mutable_obstacle = frame_->Find(obstacle->Id());
+    CreateGuardObstacle(mutable_obstacle);
   }
-  return first_guard_vehicle;
 }
 
-bool ChangeLane::CreateGuardObstacle(
-    const ReferenceLineInfo* reference_line_info, Obstacle* obstacle) {
+void ChangeLane::CreateGuardObstacle(Obstacle* obstacle) {
   if (!obstacle || !obstacle->HasTrajectory()) {
-    return false;
+    return;
   }
   const auto& last_point =
       *(obstacle->Trajectory().trajectory_point().rbegin());
@@ -90,13 +83,13 @@ bool ChangeLane::CreateGuardObstacle(
   const double kStepDistance = obstacle->PerceptionBoundingBox().length();
   double extend_v = std::max(last_point.v(), kMinGuardVehicleSpeed);
   const double time_delta = kStepDistance / extend_v;
-  const auto& reference_line = reference_line_info->reference_line();
+  const auto& reference_line = reference_line_info_->reference_line();
   const double end_s =
       std::min(reference_line.Length(),
-               reference_line_info->AdcSlBoundary().end_s() + kGuardDistance);
+               reference_line_info_->AdcSlBoundary().end_s() + kGuardDistance);
   SLPoint sl_point;
   if (!reference_line.XYToSL(last_point.path_point(), &sl_point)) {
-    return false;
+    return;
   }
   double s = last_point.path_point().s() + kStepDistance;
   double ref_s = sl_point.s() + kStepDistance;
@@ -113,7 +106,6 @@ bool ChangeLane::CreateGuardObstacle(
     tp->mutable_path_point()->set_s(s);
     tp->mutable_path_point()->set_kappa(ref_point.kappa());
   }
-  return true;
 }
 
 bool ChangeLane::ApplyRule(Frame* frame,
@@ -122,16 +114,9 @@ bool ChangeLane::ApplyRule(Frame* frame,
   if (reference_line_info->Lanes().IsOnSegment()) {
     return true;
   }
-  const auto* obstacle = FindGuardObstacle(reference_line_info);
-  if (!obstacle) {
-    return true;
-  } else {
-    auto* guard_obstacle = frame->Find(obstacle->Id());
-    if (guard_obstacle &&
-        CreateGuardObstacle(reference_line_info, guard_obstacle)) {
-      AINFO << "Created guard obstacle: " << guard_obstacle->Id();
-    }
-  }
+  reference_line_info_ = reference_line_info;
+  frame_ = frame;
+  CreateGuardObstacles();
   return true;
 }
 
