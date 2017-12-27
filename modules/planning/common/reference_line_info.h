@@ -48,7 +48,9 @@ class ReferenceLineInfo {
                              const ReferenceLine& reference_line,
                              const hdmap::RouteSegments& segments);
 
-  bool Init();
+  bool Init(const std::vector<const Obstacle*>& obstacles);
+
+  bool IsInited() const;
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
@@ -137,6 +139,8 @@ class ReferenceLineInfo {
    * line. The lower the better.
    */
   double cost_ = 0.0;
+
+  bool is_inited_ = false;
 
   bool is_drivable_ = false;
 
