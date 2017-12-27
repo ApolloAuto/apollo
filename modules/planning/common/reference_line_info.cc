@@ -60,7 +60,7 @@ std::string junction_dropbox_id(const std::string& junction_id) {
 }
 }
 
-bool ReferenceLineInfo::Init() {
+bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
@@ -86,8 +86,15 @@ bool ReferenceLineInfo::Init() {
     return false;
   }
   is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  if (!AddObstacles(obstacles)) {
+    AERROR << "Failed to add obstacles to reference line";
+    return false;
+  }
+  is_inited_ = true;
   return true;
 }
+
+bool ReferenceLineInfo::IsInited() const { return is_inited_; }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
