@@ -422,7 +422,7 @@ void Obstacle::SetLengthWidthHeight(
 }
 
 void Obstacle::InitKFMotionTracker(const Feature& feature) {
-  double t = FLAGS_prediction_freq;
+  double t = FLAGS_prediction_period;
   // Set transition matrix F
   // constant acceleration dynamic model
   Eigen::Matrix<double, 6, 6> F;
