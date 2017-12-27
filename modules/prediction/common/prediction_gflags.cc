@@ -120,7 +120,7 @@ DEFINE_double(sample_time_gap, 0.2,
 DEFINE_double(motion_weight_a, 1.2, "A parameter of motion weight function");
 DEFINE_double(motion_weight_b, 5.0, "A parameter of motion weight function");
 DEFINE_double(motion_weight_c, 1.2, "A parameter of motion weight function");
-DEFINE_double(cost_alpha, 0.1,
-              "The coefficient of time to lane center in cost function");
+DEFINE_double(cost_alpha, 100.0,
+              "The coefficient of lateral acceleration in cost function");
 DEFINE_double(default_time_to_lane_center, 2.0,
               "The default time to lane center");
