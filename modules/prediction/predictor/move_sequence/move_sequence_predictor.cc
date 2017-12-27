@@ -234,7 +234,7 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
                         ? EvaluateLongitudinalPolynomial(
                               longitudinal_coeffs, relative_time - period, 0)
                         : 0.0;
-    lane_s += (curr_s - prev_s);
+    lane_s += std::max(0.0, (curr_s - prev_s));
 
     if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
