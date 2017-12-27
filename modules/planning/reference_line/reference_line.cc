@@ -426,8 +426,8 @@ bool ReferenceLine::GetApproximateSLBoundary(
   double s = 0.0;
   double l = 0.0;
   double distance = 0.0;
-  if (!map_path_.GetProjectionWithHueristicParams(box.center(), start_s, end_s,
-                                                  &s, &l, &distance)) {
+  if (!map_path_.GetProjectionWithHueristicParams(box.center(), 0, 200, &s, &l,
+                                                  &distance)) {
     AERROR << "Can't get projection point from path.";
     return false;
   }
