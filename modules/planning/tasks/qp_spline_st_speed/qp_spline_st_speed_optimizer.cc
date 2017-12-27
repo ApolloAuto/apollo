@@ -84,6 +84,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
+  auto path_decision_copy = *path_decision;
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
@@ -92,9 +93,22 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
 
   std::vector<const StBoundary*> boundaries;
-  for (const auto* obstacle : path_decision->path_obstacles().Items()) {
+  for (auto* obstacle : path_decision->path_obstacles().Items()) {
+    auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
+      path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
+    } else {
+      if (path_decision_copy.Find(id)->st_boundary().IsEmpty()) {
+        continue;
+      }
+      auto st_boundary =
+          path_decision_copy.Find(id)->st_boundary().CutOffByT(5.0).ExpandByS(
+              5.0);
+      if (!st_boundary.IsEmpty()) {
+        path_decision->SetStBoundary(id, st_boundary);
+        boundaries.push_back(&obstacle->st_boundary());
+      }
     }
   }
 

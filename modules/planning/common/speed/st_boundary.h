@@ -100,6 +100,8 @@ class StBoundary : public common::math::Polygon2d {
       const std::vector<STPoint>& lower_points,
       const std::vector<STPoint>& upper_points);
 
+  StBoundary CutOffByT(const double t) const;
+
  private:
   bool IsValid(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;

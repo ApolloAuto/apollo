@@ -180,7 +180,6 @@ STPoint StBoundary::BottomRightPoint() const {
 
 StBoundary StBoundary::ExpandByS(const double s) const {
   if (lower_points_.empty()) {
-    AERROR << "The current st_boundary has NO points.";
     return StBoundary();
   }
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
@@ -377,7 +376,6 @@ StBoundary StBoundary::GenerateStBoundary(
     const std::vector<STPoint>& lower_points,
     const std::vector<STPoint>& upper_points) {
   if (lower_points.size() != upper_points.size() || lower_points.size() < 2) {
-    AERROR << "Fail to generate StBoundary because input points are not valid.";
     return StBoundary();
   }
 
@@ -388,6 +386,19 @@ StBoundary StBoundary::GenerateStBoundary(
         STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
   }
   return StBoundary(point_pairs);
+}
+
+StBoundary StBoundary::CutOffByT(const double t) const {
+  std::vector<STPoint> lower_points;
+  std::vector<STPoint> upper_points;
+  for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
+    if (lower_points_[i].t() < t) {
+      continue;
+    }
+    lower_points.push_back(lower_points_[i]);
+    upper_points.push_back(upper_points_[i]);
+  }
+  return GenerateStBoundary(lower_points, upper_points);
 }
 
 }  // namespace planning
