@@ -78,6 +78,13 @@ void Normalize(Vectord* prob);
 void NormalizeRow(Matrixd* prob);
 
 /**
+ * @brief Print probability
+ * @param prob Probability to be printed
+ * @param name Name of probability to be printed
+*/
+void PrintProbability(const std::vector<float>& prob, const std::string& name);
+
+/**
  * @brief Load a matrix from input file stream
  * @param fin The input file stream
  * @param matrix The loaded Matrix
