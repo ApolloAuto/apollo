@@ -68,6 +68,20 @@ void NormalizeRow(Matrixd* prob) {
   }
 }
 
+void PrintProbability(const std::vector<float>& prob, const std::string& name) {
+  std::cout << name << ": ";
+  float max_prob = -DBL_MAX;
+  std::size_t max_id = 0;
+  for (std::size_t i = 0; i < prob.size(); ++i) {
+    std::cout << std::setprecision(3) << prob[i] << " ";
+    if (prob[i] > max_prob) {
+      max_prob = prob[i];
+      max_id = i;
+    }
+  }
+  std::cout << " max_type: " << max_id << std::endl;
+}
+
 bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix) {
   for (std::size_t row = 0; row < VALID_OBJECT_TYPE; ++row) {
     for (std::size_t col = 0; col < VALID_OBJECT_TYPE; ++col) {
