@@ -154,6 +154,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForFollowing(
 }
 **/
 
+/**
 void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
     const double stop_position,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
@@ -177,6 +178,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
     ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
   }
 }
+**/
 
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     const PlanningTarget& planning_target,
