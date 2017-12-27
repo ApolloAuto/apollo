@@ -56,6 +56,7 @@ DECLARE_string(lidar_extrinsics_file);
 DECLARE_string(lidar_height_file);
 DECLARE_double(lidar_height_default);
 DECLARE_int32(lidar_localization_mode);
+DECLARE_int32(lidar_yaw_align_mode);
 DECLARE_int32(lidar_filter_size);
 DECLARE_int32(lidar_thread_num);
 DECLARE_double(lidar_imu_max_delay_time);
@@ -66,6 +67,10 @@ DECLARE_int32(point_cloud_step);
 // integ module
 DECLARE_bool(integ_ins_can_self_align);
 DECLARE_bool(integ_sins_align_with_vel);
+DECLARE_bool(integ_sins_state_check);
+DECLARE_double(integ_sins_state_span_time);
+DECLARE_double(integ_sins_state_pos_std);
+DECLARE_bool(using_raw_gnsspos);
 DECLARE_double(vel_threshold_get_yaw);
 DECLARE_bool(integ_debug_log_flag);
 
