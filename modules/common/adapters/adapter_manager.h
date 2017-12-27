@@ -268,6 +268,7 @@ class AdapterManager {
   REGISTER_ADAPTER(LocalizationMsfGnss);
   REGISTER_ADAPTER(LocalizationMsfLidar);
   REGISTER_ADAPTER(LocalizationMsfSinsPva);
+  REGISTER_ADAPTER(LocalizationMsfStatus);
 
   DECLARE_SINGLETON(AdapterManager);
 };
