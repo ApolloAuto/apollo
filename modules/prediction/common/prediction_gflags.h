@@ -25,7 +25,7 @@ DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
 
 DECLARE_double(prediction_duration);
-DECLARE_double(prediction_freq);
+DECLARE_double(prediction_period);
 DECLARE_double(double_precision);
 DECLARE_double(min_prediction_length);
 
