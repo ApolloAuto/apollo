@@ -27,7 +27,7 @@
 namespace apollo {
 namespace planning {
 
-using CriticalPointPair = std::pair<PathTimePoint, PathTimePoint>;
+using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
     const Frame* frame,
@@ -45,14 +45,10 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   //std::set<double> critical_timestamps = CriticalTimeStamps();
   std::vector<double> uniform_timestamps = UniformTimeStamps(8);
   std::vector<SampleBound> sample_bounds;
-  // TODO (kechxu): change the hard-coded 0.001 to some variable
-  // TODO (zhangyajia): why is this not zero?
   for (const double t : uniform_timestamps) {
-    if (t > 0.001) {
-      std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
-      sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
-          sample_bounds_at_t.end());
-    }
+    std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
+    sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
+        sample_bounds_at_t.end());
   }
   return sample_bounds;
 }
@@ -67,17 +63,20 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
   CHECK(feasible_s_lower <= feasible_s_upper
       && feasible_v_lower <= feasible_v_upper);
 
-  std::vector<CriticalPointPair> path_intervals =
+  std::vector<PathTimePointPair> path_intervals =
       QueryPathTimeObstacleIntervals(t);
+
   double s_max_reached = feasible_s_lower;
   const PathTimePoint* point_prev_ptr = nullptr;
 
   std::vector<SampleBound> sample_bounds;
   for (const auto& path_interval : path_intervals) {
+    // skip inclusive intervals
     if (path_interval.second.s() < s_max_reached) {
       continue;
     }
 
+    // reached the top
     if (s_max_reached > feasible_s_upper) {
       break;
     }
@@ -112,11 +111,9 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         sample_bound.set_v_upper(feasible_v_upper);
 
         double v_lower = feasible_v_upper;
-        /**
         if (point_prev_ptr) {
           v_lower = point_prev_ptr->v();
         }
-        **/
         sample_bound.set_v_lower(v_lower);
         sample_bounds.push_back(std::move(sample_bound));
         break;
@@ -130,11 +127,11 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
   return sample_bounds;
 }
 
-CriticalPointPair ConditionFilter::QueryPathTimeObstacleIntervals(
+PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
     const double t,
     const PathTimeObstacle& path_time_obstacle) const {
 
-  CriticalPointPair block_interval;
+  PathTimePointPair block_interval;
   double s_upper = apollo::common::math::lerp(
       path_time_obstacle.upper_left().s(),
       path_time_obstacle.upper_left().t(),
@@ -154,6 +151,7 @@ CriticalPointPair ConditionFilter::QueryPathTimeObstacleIntervals(
   block_interval.first.set_s(s_lower);
   block_interval.first.set_v(v);
   block_interval.first.set_obstacle_id(path_time_obstacle.obstacle_id());
+
   block_interval.second.set_t(t);
   block_interval.second.set_s(s_upper);
   block_interval.second.set_v(v);
@@ -162,21 +160,21 @@ CriticalPointPair ConditionFilter::QueryPathTimeObstacleIntervals(
   return block_interval;
 }
 
-std::vector<CriticalPointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
+std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
     const double t) const {
-  std::vector<CriticalPointPair> path_intervals;
+  std::vector<PathTimePointPair> path_intervals;
   for (const auto& path_time_obstacle : path_time_obstacles_) {
     if (path_time_obstacle.time_lower() > t ||
         path_time_obstacle.time_upper() < t) {
       continue;
     }
-    CriticalPointPair path_interval =
+    PathTimePointPair path_interval =
         QueryPathTimeObstacleIntervals(t, path_time_obstacle);
 
     path_intervals.push_back(std::move(path_interval));
   }
   std::sort(path_intervals.begin(), path_intervals.end(),
-      [](const CriticalPointPair& pair_1, const CriticalPointPair& pair_2) {
+      [](const PathTimePointPair& pair_1, const PathTimePointPair& pair_2) {
         return pair_1.first.s() < pair_2.first.s();
       });
 
