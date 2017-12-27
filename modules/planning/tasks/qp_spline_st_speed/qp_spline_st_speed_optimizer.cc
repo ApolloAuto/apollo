@@ -99,6 +99,9 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
     } else {
+      if (path_decision_copy.Find(id)->st_boundary().IsEmpty()) {
+        continue;
+      }
       auto st_boundary =
           path_decision_copy.Find(id)->st_boundary().CutOffByT(5.0).ExpandByS(
               5.0);

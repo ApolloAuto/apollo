@@ -39,7 +39,7 @@ using apollo::common::VehicleConfigHelper;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;        // meters
-const double kStBoundarySparseDeltaS = 0.2;  // meters
+const double kStBoundarySparseDeltaS = 1.0;  // meters
 const double kStBoundaryDeltaT = 0.05;       // seconds
 }
 
@@ -92,10 +92,9 @@ void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
     st_boundary_ = StBoundary(point_pairs);
   } else {
     if (BuildTrajectoryStBoundary(reference_line, adc_start_s, &st_boundary_)) {
-      AERROR << "Found st_boundary for obstacle " << id_;
-      AERROR << "is empty? " << std::boolalpha << st_boundary_.IsEmpty();
+      ADEBUG << "Found st_boundary for obstacle " << id_;
     } else {
-      AERROR << "No st_boundary for obstacle " << id_;
+      ADEBUG << "No st_boundary for obstacle " << id_;
     }
   }
 }
@@ -202,11 +201,10 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     }
     const double delta_t =
         second_traj_point.relative_time() - first_traj_point.relative_time();
-    double low_s =
-        0.0;  // std::max(object_boundary.start_s() - adc_half_length, 0.0);
+    double low_s = std::max(object_boundary.start_s() - adc_half_length, 0.0);
     bool has_low = false;
-    double high_s = std::fmin(200, reference_line.Length());
-    // std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
+    double high_s =
+        std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
     bool has_high = false;
     while (low_s + st_boundary_delta_s < high_s && !(has_low && has_high)) {
       if (!has_low) {
