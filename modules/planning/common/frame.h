@@ -93,7 +93,7 @@ class Frame {
   const ADCTrajectory &trajectory() const { return trajectory_; }
 
  private:
-  bool InitReferenceLineInfo();
+  bool CreateReferenceLineInfo();
 
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if
