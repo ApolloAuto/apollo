@@ -40,10 +40,11 @@ class ChangeLane : public TrafficRule {
 
  private:
   /**
-   * @brief This function will find a vehicle that may be in change lane blind
+   * @brief This function will find vehicles that may be in change lane blind
    *zone.
    **/
-  const Obstacle* FindGuardObstacle(ReferenceLineInfo* reference_line_info);
+  void CreateGuardObstacles();
+
   /**
    * @brief This function will extend the prediction of the guard obstacle to
    *guard lane change action. Due to the ST path may drive on the forward lane
@@ -51,8 +52,10 @@ class ChangeLane : public TrafficRule {
    *to make sure the vehicle is aware that it actually occupies the target lane,
    *even when it is not on the target lane yet.
    **/
-  bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info,
-                           Obstacle* obstacle);
+  void CreateGuardObstacle(Obstacle* obstacle);
+
+  Frame* frame_ = nullptr;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
 };
 
 }  // namespace planning

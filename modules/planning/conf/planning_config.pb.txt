@@ -14,6 +14,7 @@ em_planner_config {
 
     dp_poly_path_config {
         sample_points_num_each_level: 5
+        first_step_length: 50.0;
         step_length_max: 40.0
         step_length_min: 20.0
         lateral_sample_offset: 0.5
