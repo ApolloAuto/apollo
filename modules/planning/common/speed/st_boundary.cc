@@ -390,5 +390,18 @@ StBoundary StBoundary::GenerateStBoundary(
   return StBoundary(point_pairs);
 }
 
+StBoundary StBoundary::CutOffByT(const double t) const {
+  std::vector<STPoint> lower_points;
+  std::vector<STPoint> upper_points;
+  for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
+    if (lower_points_[i].t() < t) {
+      continue;
+    }
+    lower_points.push_back(lower_points_[i]);
+    upper_points.push_back(upper_points_[i]);
+  }
+  return GenerateStBoundary(lower_points, upper_points);
+}
+
 }  // namespace planning
 }  // namespace apollo
