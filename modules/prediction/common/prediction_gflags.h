@@ -76,6 +76,7 @@ DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(adc_trajectory_search_length);
+DECLARE_double(virtual_lane_radius);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);
