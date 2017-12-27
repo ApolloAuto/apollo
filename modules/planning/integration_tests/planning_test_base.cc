@@ -186,11 +186,6 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
 }
 
 bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
-  if (trajectory.trajectory_point().empty()) {
-    AERROR << "trajectory has NO point.";
-    return false;
-  }
-
   for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
     const auto& point = trajectory.trajectory_point(i);
 
