@@ -19,6 +19,7 @@
 import requests
 import sys
 import os
+import urllib3
 from ConfigParser import ConfigParser
 from modules.data.proto.task_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
@@ -47,7 +48,7 @@ def query():
     config.read(CONFIG_FILE)
     ip = config.get('Host', 'ip')
     port = config.get('Host', 'port')
-    url = 'http://' + ip + ':' + port + '/query'
+    url = 'https://' + ip + ':' + port + '/query'
 
     # generat device token
     returnCode = sec_api.sec_upgrade_get_device_token()
@@ -60,14 +61,18 @@ def query():
     brand = VehicleInfo.Brand.Name(vehicle_info.brand)
     model = VehicleInfo.Model.Name(vehicle_info.model)
     vin = vehicle_info.license.vin
+    META_FILE = '/apollo/meta.ini'
+    config.read(META_FILE)
     car_info = {
         "car_type" : brand + "." + model,
-        "tag" : os.environ['DOCKER_IMG'],
+        "tag" : config.get('Release', 'tag'),
         "vin" : vin,
         "token" : dev_token
     }
 
-    r = requests.post(url, json=car_info)
+    urllib3.disable_warnings()
+    CERT_FILE = os.path.join(os.path.dirname(__file__), 'ota.cert')
+    r = requests.post(url, json=car_info, verify=CERT_FILE)
     if r.status_code == 200:
         auth_token = r.json().get("auth_token")
         if auth_token == "":
