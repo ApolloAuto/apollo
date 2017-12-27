@@ -216,6 +216,7 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     AERROR << "Failed in getting lane s and lane l";
     return;
   }
+  double prev_lane_l = lane_l;
 
   size_t total_num = static_cast<size_t>(total_time / period);
   size_t num_to_center = static_cast<size_t>(time_to_lane_center / period);
@@ -235,12 +236,16 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
                               longitudinal_coeffs, relative_time - period, 0)
                         : 0.0;
     lane_s += std::max(0.0, (curr_s - prev_s));
-
+    if (curr_s + FLAGS_double_precision < prev_s) {
+      lane_l = prev_lane_l;
+    }
     if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
     }
+
+    prev_lane_l = lane_l;
 
     if (points->size() > 0) {
       PathPoint* prev_point = points->back().mutable_path_point();
@@ -260,16 +265,11 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     double as =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 2);
     double vl = 0.0;
-    double al = 0.0;
     if (i < num_to_center) {
       vl = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 1);
-      al = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 2);
     }
     double lane_speed = std::hypot(vs, vl);
-    double lane_acc = std::hypot(as, al);
-    if (as < 0.0) {
-      lane_acc = -lane_acc;
-    }
+    double lane_acc = as;
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -315,7 +315,8 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double s0 = 0.0;
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
-  double ds1 = std::max(0.0, ds0 + dds0 * time_to_lane_center);
+  double ds1 = std::max(FLAGS_still_obstacle_speed_threshold,
+                        ds0 + dds0 * time_to_lane_center);
   double dds1 = 0.0;
   double p = time_to_lane_center;
 
@@ -531,7 +532,7 @@ double MoveSequencePredictor::Cost(
        6.0 * lateral_coeffs[3]},
       &mid_t_pair);
   if (solved != 0) {
-    return normal_min_acc + alpha * t;
+    return alpha * normal_min_acc + t;
   }
   double mid_0 =
       std::fabs(EvaluateLateralPolynomial(lateral_coeffs, mid_t_pair.first, 2));
