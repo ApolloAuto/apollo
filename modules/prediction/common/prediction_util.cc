@@ -33,9 +33,13 @@ double Normalize(const double value, const double mean, const double std) {
   return (value - mean) / (std + eps);
 }
 
-double Sigmoid(const double value) { return 1 / (1 + std::exp(-1.0 * value)); }
+double Sigmoid(const double value) {
+  return 1 / (1 + std::exp(-1.0 * value));
+}
 
-double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
+double Relu(const double value) {
+  return (value > 0.0) ? value : 0.0;
+}
 
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots) {
@@ -81,7 +85,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
     const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
-    const double freq, std::vector<TrajectoryPoint>* points) {
+    const double period, std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
@@ -111,7 +115,7 @@ void GenerateFreeMoveTrajectoryPoints(
         PathPoint* prev_path_point = prev_trajectory_point.mutable_path_point();
         theta = std::atan2(y - prev_path_point->y(), x - prev_path_point->x());
         prev_path_point->set_theta(theta);
-        acc = (speed - prev_trajectory_point.v()) / freq;
+        acc = (speed - prev_trajectory_point.v()) / period;
         prev_trajectory_point.set_a(acc);
       }
     } else {
@@ -140,7 +144,7 @@ void GenerateFreeMoveTrajectoryPoints(
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
     trajectory_point.set_a(acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    trajectory_point.set_relative_time(static_cast<double>(i) * period);
     points->emplace_back(std::move(trajectory_point));
 
     // Update position, velocity and acceleration
@@ -156,7 +160,7 @@ void GenerateFreeMoveTrajectoryPoints(
 
 void GenerateLaneSequenceTrajectoryPoints(
     Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
-    const LaneSequence& sequence, const size_t num, const double freq,
+    const LaneSequence& sequence, const size_t num, const double period,
     std::vector<TrajectoryPoint>* points) {
   PredictionMap* map = PredictionMap::instance();
   double lane_s = (*state)(0, 0);
@@ -210,7 +214,7 @@ void GenerateLaneSequenceTrajectoryPoints(
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(lane_speed);
     trajectory_point.set_a(lane_acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    trajectory_point.set_relative_time(static_cast<double>(i) * period);
     points->emplace_back(std::move(trajectory_point));
 
     (*state)(2, 0) = lane_speed;
@@ -242,11 +246,11 @@ void GenerateLaneSequenceTrajectoryPoints(
 
 void GenerateStillSequenceTrajectoryPoints(
     const double position_x, const double position_y, const double theta,
-    const double total_time, const double freq,
+    const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
-  size_t total_num = static_cast<size_t>(total_time / freq);
+  size_t total_num = static_cast<size_t>(total_time / period);
   for (size_t i = 0; i < total_num; ++i) {
-    double relative_time = static_cast<double>(i) * freq;
+    double relative_time = static_cast<double>(i) * period;
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
     path_point.set_x(position_x);

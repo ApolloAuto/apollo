@@ -9,11 +9,10 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ *implied. See the License for the specific language governing
+ *permissions and limitations under the License.
  *****************************************************************************/
-
 /**
  * @file
  * @brief Define lane sequence predictor
@@ -57,13 +56,13 @@ class LaneSequencePredictor : public SequencePredictor {
    * @param Kalman filter
    * @param Lane sequence
    * @param Total prediction time
-   * @param Prediction frequency
+   * @param Prediction period
    * @param A vector of generated trajectory points
    */
   void DrawLaneSequenceTrajectoryPoints(
       const Feature& feature, const std::string& lane_id,
       const common::math::KalmanFilter<double, 4, 2, 0>& kf,
-      const LaneSequence& sequence, double total_time, double freq,
+      const LaneSequence& sequence, double total_time, double period,
       std::vector<common::TrajectoryPoint>* points);
 };
 

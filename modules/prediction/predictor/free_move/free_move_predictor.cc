@@ -63,7 +63,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   std::vector<TrajectoryPoint> points(0);
   DrawFreeMoveTrajectoryPoints(
       position, velocity, acc, obstacle->kf_motion_tracker(),
-      FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
+      FLAGS_prediction_duration, FLAGS_prediction_period, &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
   int start_index = 0;
@@ -76,7 +76,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
     const Eigen::Vector2d& acc, const KalmanFilter<double, 6, 2, 0>& kf,
-    double total_time, double freq, std::vector<TrajectoryPoint>* points) {
+    double total_time, double period, std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
   state(0, 0) = 0.0;
   state(1, 0) = 0.0;
@@ -86,16 +86,16 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   state(5, 0) = common::math::Clamp(acc(1), FLAGS_min_acc, FLAGS_max_acc);
 
   Eigen::Matrix<double, 6, 6> transition(kf.GetTransitionMatrix());
-  transition(0, 2) = freq;
-  transition(0, 4) = 0.5 * freq * freq;
-  transition(1, 3) = freq;
-  transition(1, 5) = 0.5 * freq * freq;
-  transition(2, 4) = freq;
-  transition(3, 5) = freq;
+  transition(0, 2) = period;
+  transition(0, 4) = 0.5 * period * period;
+  transition(1, 3) = period;
+  transition(1, 5) = 0.5 * period * period;
+  transition(2, 4) = period;
+  transition(3, 5) = period;
 
-  size_t num = static_cast<size_t>(total_time / freq);
+  size_t num = static_cast<size_t>(total_time / period);
   ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, num, freq, points);
+      &state, transition, num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     ::apollo::prediction::predictor_util::TranslatePoint(
