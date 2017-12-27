@@ -71,9 +71,6 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
       if (path_decision_.Find(id)->st_boundary().IsEmpty()) {
         continue;
       }
-      AERROR << "non-blocking id = " << id;
-      AERROR << "min_t: " << path_decision_.Find(id)->st_boundary().min_t()
-             << ", max_t: " << path_decision_.Find(id)->st_boundary().max_t();
       auto st_boundary =
           path_decision_.Find(id)->st_boundary().CutOffByT(5.0).ExpandByS(5.0);
       if (!st_boundary.IsEmpty()) {

@@ -426,15 +426,15 @@ bool ReferenceLine::GetApproximateSLBoundary(
   double s = 0.0;
   double l = 0.0;
   double distance = 0.0;
-  if (!map_path_.GetProjectionWithHueristicParams(box.center(), 0, 200, &s, &l,
-                                                  &distance)) {
+  if (!map_path_.GetProjectionWithHueristicParams(box.center(), start_s, end_s,
+                                                  &s, &l, &distance)) {
     AERROR << "Can't get projection point from path.";
     return false;
   }
 
   auto projected_point = map_path_.GetSmoothPoint(s);
   auto rotated_box = box;
-  rotated_box.RotateFromCenter(projected_point.heading());
+  rotated_box.RotateFromCenter(-projected_point.heading());
 
   std::vector<common::math::Vec2d> corners;
   rotated_box.GetAllCorners(&corners);
@@ -447,10 +447,10 @@ bool ReferenceLine::GetApproximateSLBoundary(
   for (const auto& point : corners) {
     // x <--> s, y <--> l
     // because the box is rotated to align the reference line
-    min_s = std::fmin(min_s, point.x());
-    max_s = std::fmax(max_s, point.x());
-    min_l = std::fmin(min_l, point.y());
-    max_l = std::fmax(max_l, point.y());
+    min_s = std::fmin(min_s, point.x() - rotated_box.center().x() + s);
+    max_s = std::fmax(max_s, point.x() - rotated_box.center().x() + s);
+    min_l = std::fmin(min_l, point.y() - rotated_box.center().y() + l);
+    max_l = std::fmax(max_l, point.y() - rotated_box.center().y() + l);
   }
   sl_boundary->set_start_s(min_s);
   sl_boundary->set_end_s(max_s);
