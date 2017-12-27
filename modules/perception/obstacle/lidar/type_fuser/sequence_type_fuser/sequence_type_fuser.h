@@ -63,7 +63,6 @@ class SequenceTypeFuser : public BaseTypeFuser {
   std::string name() const override { return "SequenceTypeFuser"; }
 
  protected:
-
   /**
    * @brief Fuse type over object sequence by a linear-chain CRF.
    * The fusion problem is modeled as inferring the discrete state 
