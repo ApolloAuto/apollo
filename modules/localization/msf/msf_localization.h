@@ -99,6 +99,9 @@ class MSFLocalization : public LocalizationBase {
   LocalizationMeasureState localization_state_;
   uint64_t pcd_msg_index_;
 
+  uint32_t latest_lidar_localization_status_;
+  uint32_t latest_gnss_localization_status_;
+
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
 };
 

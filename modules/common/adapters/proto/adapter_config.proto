@@ -42,6 +42,7 @@ message AdapterConfig {
     LOCALIZATION_MSF_LIDAR = 35;
     LOCALIZATION_MSF_SINS_PVA = 36;
     RAW_IMU = 37;
+    LOCALIZATION_MSF_STATUS = 38;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
