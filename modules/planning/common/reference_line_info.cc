@@ -176,8 +176,14 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
                                       ignore);
     path_decision_.AddLongitudinalDecision("reference_line_filter",
                                            obstacle->Id(), ignore);
+    ADEBUG << "NO build sl boundary. id:" << obstacle->Id();
   } else {
+    ADEBUG << "build sl boundary. id:" << obstacle->Id();
     path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
+    ADEBUG << "st boundary: " << path_obstacle->st_boundary().min_t() << ", "
+           << path_obstacle->st_boundary().max_t()
+           << ", s_max: " << path_obstacle->st_boundary().max_s()
+           << ", s_min: " << path_obstacle->st_boundary().min_s();
   }
   return path_obstacle;
 }

@@ -39,7 +39,7 @@ using apollo::common::VehicleConfigHelper;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;        // meters
-const double kStBoundarySparseDeltaS = 1.0;  // meters
+const double kStBoundarySparseDeltaS = 0.2;  // meters
 const double kStBoundaryDeltaT = 0.05;       // seconds
 }
 
@@ -92,9 +92,10 @@ void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
     st_boundary_ = StBoundary(point_pairs);
   } else {
     if (BuildTrajectoryStBoundary(reference_line, adc_start_s, &st_boundary_)) {
-      ADEBUG << "Found st_boundary for obstacle " << id_;
+      AERROR << "Found st_boundary for obstacle " << id_;
+      AERROR << "is empty? " << std::boolalpha << st_boundary_.IsEmpty();
     } else {
-      ADEBUG << "No st_boundary for obstacle " << id_;
+      AERROR << "No st_boundary for obstacle " << id_;
     }
   }
 }
@@ -128,21 +129,25 @@ bool PathObstacle::BuildTrajectoryStBoundary(
 
   SLBoundary last_sl_boundary;
   int last_index = 0;
+
   for (int i = 1; i < trajectory_points.size(); ++i) {
+    ADEBUG << "last_sl_boundary: " << last_sl_boundary.ShortDebugString();
+
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
+
     double total_length =
         object_length + common::util::DistanceXY(first_point, second_point);
+
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
     common::math::Box2d object_moving_box(center, first_point.theta(),
                                           total_length, object_width);
     SLBoundary object_boundary;
     // NOTICE: this method will have errors when the reference line is not
-    // straight.
-    // Need double loop to cover all corner cases.
+    // straight. Need double loop to cover all corner cases.
     const double distance_xy =
         common::util::DistanceXY(trajectory_points[last_index].path_point(),
                                  trajectory_points[i].path_point());
@@ -163,6 +168,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
       AERROR << "failed to calculate boundary";
       return false;
     }
+
     // update history record
     last_sl_boundary = object_boundary;
     last_index = i;
@@ -173,6 +179,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
         (object_boundary.end_s() - object_boundary.start_s()) *
             kSkipLDistanceFactor +
         adc_width / 2.0;
+
     if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
             skip_l_distance ||
         std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
@@ -195,10 +202,11 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     }
     const double delta_t =
         second_traj_point.relative_time() - first_traj_point.relative_time();
-    double low_s = std::max(object_boundary.start_s() - adc_half_length, 0.0);
+    double low_s =
+        0.0;  // std::max(object_boundary.start_s() - adc_half_length, 0.0);
     bool has_low = false;
-    double high_s =
-        std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
+    double high_s = std::fmin(200, reference_line.Length());
+    // std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
     bool has_high = false;
     while (low_s + st_boundary_delta_s < high_s && !(has_low && has_high)) {
       if (!has_low) {
@@ -251,6 +259,8 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     if (polygon_points.size() > 2) {
       *st_boundary = StBoundary(polygon_points);
     }
+  } else {
+    return false;
   }
   return true;
 }
