@@ -96,7 +96,7 @@ Status Planning::Init() {
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
-    std::string error_msg("Enabled prediction, but no prediction not enabled");
+    std::string error_msg("Enabled prediction, but no prediction is observed.");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
