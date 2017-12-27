@@ -90,6 +90,37 @@ bool PredictionMap::ProjectionFromLane(
   return true;
 }
 
+bool PredictionMap::IsVirtualLane(const std::string& lane_id) {
+  std::shared_ptr<const LaneInfo> lane_info =
+      HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id));
+  if (lane_info == nullptr) {
+    return false;
+  }
+  const apollo::hdmap::Lane& lane = lane_info->lane();
+  bool left_virtual = lane.has_left_boundary() &&
+                      lane.left_boundary().has_virtual_() &&
+                      lane.left_boundary().virtual_();
+  bool right_virtual = lane.has_right_boundary() &&
+                       lane.right_boundary().has_virtual_() &&
+                       lane.right_boundary().virtual_();
+  return left_virtual && right_virtual;
+}
+
+bool PredictionMap::OnVirtualLane(const Eigen::Vector2d& point,
+                                  const double radius) {
+  std::vector<std::shared_ptr<const LaneInfo>> lanes;
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  HDMapUtil::BaseMap().GetLanes(hdmap_point, radius, &lanes);
+  for (const auto& lane : lanes) {
+    if (IsVirtualLane(lane->id().id())) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void PredictionMap::OnLane(
     const std::vector<std::shared_ptr<const LaneInfo>>& prev_lanes,
     const Eigen::Vector2d& point, const double heading, const double radius,
