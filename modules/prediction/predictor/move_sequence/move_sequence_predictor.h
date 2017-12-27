@@ -56,16 +56,16 @@ class MoveSequencePredictor : public SequencePredictor {
  private:
   void DrawMoveSequenceTrajectoryPoints(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double freq,
+      const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void DrawManeuverTrajectoryPoints(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double freq,
+      const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void DrawMotionTrajectoryPoints(
-      const Obstacle& obstacle, const double total_time, const double freq,
+      const Obstacle& obstacle, const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   void GetLongitudinalPolynomial(const Obstacle& obstacle,

@@ -29,7 +29,7 @@ DEFINE_string(prediction_adapter_config_filename,
               "Default conf file for prediction");
 
 DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
-DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
+DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 50.0,
               "Minimal length of prediction trajectory");
