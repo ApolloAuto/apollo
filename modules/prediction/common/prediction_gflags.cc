@@ -109,6 +109,8 @@ DEFINE_double(distance_beyond_junction, 0.5,
 DEFINE_double(adc_trajectory_search_length, 10.0,
               "How far to search junction along adc planning trajectory");
 DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");
+DEFINE_double(default_lateral_approach_speed, 0.5,
+              "Default lateral speed approaching to center of lane");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,
