@@ -192,7 +192,8 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
 
       if (predictor != nullptr) {
         predictor->Predict(obstacle);
-        if (FLAGS_enable_trim_prediction_trajectory) {
+        if (FLAGS_enable_trim_prediction_trajectory &&
+            obstacle->type() == PerceptionObstacle::VEHICLE) {
           predictor->TrimTrajectories(obstacle, adc_trajectory_container);
         }
         for (const auto& trajectory : predictor->trajectories()) {
