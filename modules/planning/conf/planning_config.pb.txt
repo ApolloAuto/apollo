@@ -60,8 +60,8 @@ em_planner_config {
         positive_jerk_coeff: 1.0
         negative_jerk_coeff: 300.0
 
-        max_acceleration: 1.5
-        max_deceleration: -2.2
+        max_acceleration: 2.5
+        max_deceleration: -3.3
 
         st_boundary_config {
             boundary_buffer: 0.1
@@ -99,9 +99,9 @@ em_planner_config {
     qp_st_speed_config {
         total_path_length: 250.0
         total_time: 8.0
-        preferred_max_acceleration: 1.5
-        preferred_min_deceleration: -2.2
-        max_acceleration: 2.0
+        preferred_max_acceleration: 2.5
+        preferred_min_deceleration: -3.3
+        max_acceleration: 3.0
         min_deceleration: -4.5
 
         qp_spline_config {
