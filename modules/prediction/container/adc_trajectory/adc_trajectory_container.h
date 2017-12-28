@@ -56,20 +56,6 @@ class ADCTrajectoryContainer : public Container {
   void Insert(const ::google::protobuf::Message& message) override;
 
   /**
-   * @brief Get adc trajectory
-   * @return Adc trajectory
-   */
-  const apollo::planning::ADCTrajectory* GetADCTrajectory();
-
-  /**
-   * @brief Get the line segments of ADC planning trajectory
-   * @param Time step to search trajectory points
-   * @return The line segments of ADC planning trajectory
-   */
-  std::vector<apollo::common::math::LineSegment2d> ADCTrajectorySegments(
-      const double time_step) const;
-
-  /**
    * @brief Get the right-of-way status of ADC
    * @return The right-of-way status of ADC
    */
@@ -80,13 +66,7 @@ class ADCTrajectoryContainer : public Container {
    * @param Point
    * @return True if the point is in the first junction of the adc trajectory
    */
-  bool IsPointInJunction(const apollo::common::math::Vec2d& point) const;
-
-  /**
-   * @brief Check if a lane id is contained in the adc trajectory
-   * @return True if the lane id is contained in the adc trajectory
-   */
-  bool ContainsLaneId(const std::string& lane_id) const;
+  bool IsPointInJunction(const apollo::common::PathPoint& point) const;
 
  private:
   apollo::common::math::Polygon2d GetJunctionPolygon();
