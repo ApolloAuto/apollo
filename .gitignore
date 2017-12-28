@@ -64,6 +64,7 @@ data/log
 data/core
 data/bag
 data/cov
+data/kv_db
 data/pcd
 data/nfs
 modules/data/conf/task_info_template.pb.txt
