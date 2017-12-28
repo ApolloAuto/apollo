@@ -69,12 +69,18 @@ class Planning : public PlanningInterface {
 
   /**
    * @brief module stop function
-   * @return stop status
    */
   void Stop() override;
 
+  /**
+   * @brief main logic of the planning module, runs periodically triggered by
+   * timer.
+   */
   void RunOnce() override;
 
+  /**
+   * @brief record last planning trajectory
+   */
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 
  private:
@@ -87,7 +93,6 @@ class Planning : public PlanningInterface {
 
   /**
    * @brief Plan the trajectory given current vehicle state
-   * @param is_on_auto_mode whether the current system is on auto-driving mode
    */
   common::Status Plan(
       const double current_time_stamp,

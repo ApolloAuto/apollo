@@ -41,6 +41,10 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class ReferenceLineInfo
+ * @brief ReferenceLineInfo holds all data for one reference line.
+ */
 class ReferenceLineInfo {
  public:
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
