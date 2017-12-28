@@ -31,6 +31,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace planning {
@@ -39,6 +40,7 @@ using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
 
 LatticePlanner::LatticePlanner() {}
 
@@ -56,6 +58,9 @@ Status LatticePlanner::Plan(
 
   AINFO << "";
   AINFO << "[BEGIN]-------------------------------------------------";
+  const double start_timestamp = Clock::NowInSeconds();
+  double current_time = start_timestamp;
+
   AINFO << "Number of planning cycles:\t" << num_planning_cycles
       << "\t" << num_planning_succeeded_cycles;
   ++num_planning_cycles;
@@ -76,7 +81,11 @@ Status LatticePlanner::Plan(
 
   ComputeInitFrenetState(matched_point, planning_init_point, &init_s,
       &init_d);
-  AINFO << "Step 1,2,3 Succeeded";
+
+  AINFO << "Step 1,2,3 Succeeded " <<
+    "ReferenceLine and Frenet Conversion Time = " <<
+    (Clock::NowInSeconds() - start_timestamp) * 1000;
+  current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
   PlanningTarget planning_target = decider_.Analyze(frame,
@@ -85,7 +94,9 @@ Status LatticePlanner::Plan(
     init_s,
     discretized_reference_line);
 
-  AINFO << "    [---planning_target---]: " << planning_target.decision_type();
+  AINFO << "Decision_Time = " <<
+    (Clock::NowInSeconds() - start_timestamp) * 1000;
+  current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
   Trajectory1dGenerator trajectory1d_generator(init_s, init_d);
@@ -95,6 +106,10 @@ Status LatticePlanner::Plan(
       planning_target, &lon_trajectory1d_bundle,
       &lat_trajectory1d_bundle);
 
+  AINFO << "Trajectory_Generation_Time="
+    << (Clock::NowInSeconds() - start_timestamp) * 1000;
+  current_time = Clock::NowInSeconds();
+
   // 6. first, evaluate the feasibility of the 1d trajectories according to
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
@@ -102,8 +117,14 @@ Status LatticePlanner::Plan(
   TrajectoryEvaluator trajectory_evaluator(
       planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
 
+  AINFO << "Trajectory_Generation_Time="
+    << (Clock::NowInSeconds() - start_timestamp) * 1000;
+  current_time = Clock::NowInSeconds();
+
   AINFO << "number of trajectory pairs = "
-        << trajectory_evaluator.num_of_trajectory_pairs();
+        << trajectory_evaluator.num_of_trajectory_pairs()
+        << "  number_lon_traj=" << lon_trajectory1d_bundle.size()
+        << "  number_lat_traj=" << lat_trajectory1d_bundle.size();
   AINFO << "";
 
   AINFO << "Step 4,5,6 Succeeded";
@@ -166,10 +187,12 @@ Status LatticePlanner::Plan(
     }
 
     // put combine trajectory into debug data
-    ++num_lattice_traj;
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
         combined_trajectory.trajectory_points();
 
+    num_lattice_traj += 1;
+    reference_line_info->SetTrajectory(combined_trajectory);
+    break;
     /*
     auto combined_trajectory_path =
         ptr_debug->mutable_planning_data()->add_trajectory_path();
@@ -185,15 +208,11 @@ Status LatticePlanner::Plan(
     //          << constraint_failure_count << "] times";
     // AINFO << "trajectory not valid for collision ["
     //          << collision_failure_count << "] times";
-
-    if (num_lattice_traj == 1) {
-      reference_line_info->SetTrajectory(combined_trajectory);
-    }
-
-    if (num_lattice_traj == FLAGS_num_lattice_traj_to_plot) {
-      break;
-    }
   }
+
+  AINFO << "Trajectory_Evaluation_Time="
+    << (Clock::NowInSeconds() - start_timestamp) * 1000;
+  current_time = Clock::NowInSeconds();
 
   AINFO << "Step CombineTrajectory Succeeded";
 
@@ -203,6 +222,10 @@ Status LatticePlanner::Plan(
             << combined_constraint_failure_count << "] times";
   AINFO << "trajectory not valid for collision ["
             << collision_failure_count << "] times";
+  current_time = Clock::NowInSeconds();
+  AINFO << "Trajectory_Generation_Time="
+    << (current_time - start_timestamp) * 1000;
+
   if (num_lattice_traj > 0) {
     AINFO << "Planning succeeded";
     num_planning_succeeded_cycles += 1;
