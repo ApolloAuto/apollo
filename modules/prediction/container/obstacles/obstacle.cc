@@ -22,7 +22,6 @@
 #include <limits>
 #include <unordered_set>
 #include <utility>
-#include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -43,8 +42,6 @@ using apollo::common::util::FindOrNull;
 using apollo::hdmap::LaneInfo;
 using apollo::perception::PerceptionObstacle;
 
-std::mutex Obstacle::mutex_;
-
 namespace {
 
 double Damp(const double x, const double sigma) {
@@ -55,13 +52,9 @@ double Damp(const double x, const double sigma) {
 
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
-int Obstacle::id() const {
-  std::lock_guard<std::mutex> lock(mutex_);
-  return id_;
-}
+int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
     return feature_history_.front().timestamp();
   } else {
@@ -70,53 +63,41 @@ double Obstacle::timestamp() const {
 }
 
 const Feature& Obstacle::feature(size_t i) const {
-  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(i < feature_history_.size());
   return feature_history_[i];
 }
 
 Feature* Obstacle::mutable_feature(size_t i) {
-  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(i < feature_history_.size());
   return &feature_history_[i];
 }
 
 const Feature& Obstacle::latest_feature() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   CHECK_GT(feature_history_.size(), 0);
   return feature_history_.front();
 }
 
 Feature* Obstacle::mutable_latest_feature() {
-  std::lock_guard<std::mutex> lock(mutex_);
-
   CHECK_GT(feature_history_.size(), 0);
   return &(feature_history_.front());
 }
 
-size_t Obstacle::history_size() const {
-  std::lock_guard<std::mutex> lock(mutex_);
-  return feature_history_.size();
-}
+size_t Obstacle::history_size() const { return feature_history_.size(); }
 
 const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
     const std::string& lane_id) {
-  std::lock_guard<std::mutex> lock(mutex_);
   return FindOrDie(kf_lane_trackers_, lane_id);
 }
 
 const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   return kf_motion_tracker_;
 }
 
 const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   return kf_pedestrian_tracker_;
 }
 
 bool Obstacle::IsOnLane() {
-  std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&
         (feature_history_.front().lane().current_lane_feature_size() > 0 ||
@@ -1109,7 +1090,6 @@ void Obstacle::SetMotionStatus() {
 }
 
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
-  std::lock_guard<std::mutex> lock(mutex_);
   feature_history_.push_front(std::move(*feature));
   ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
 }
