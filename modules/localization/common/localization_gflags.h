@@ -100,4 +100,7 @@ DECLARE_bool(enable_lidar_localization);
 // Debug
 DECLARE_bool(use_visualize);
 
+// visualization
+DECLARE_string(map_visual_dir);
+
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

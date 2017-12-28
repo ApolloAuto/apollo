@@ -292,6 +292,7 @@ VisualizationManager::~VisualizationManager() {
 }
 
 bool VisualizationManager::Init(const std::string &map_folder,
+                                const std::string &map_visual_folder,
                                 const Eigen::Affine3d &velodyne_extrinsic,
                                 const VisualMapParam &map_param) {
   AINFO << "Get zone id.";
@@ -306,8 +307,9 @@ bool VisualizationManager::Init(const std::string &map_folder,
   AINFO << "Get zone id succeed.";
 
   AINFO << "Init visualization engine.";
-  success = visual_engine_.Init(map_folder, map_param, resolution_id, zone_id,
-                                velodyne_extrinsic, LOC_INFO_NUM);
+  success = visual_engine_.Init(map_folder, map_visual_folder, map_param,
+                                resolution_id, zone_id, velodyne_extrinsic,
+                                LOC_INFO_NUM);
   if (!success) {
     AERROR << "Visualization engine init failed.";
     return false;
@@ -325,7 +327,8 @@ bool VisualizationManager::Init(const VisualizationManagerParams &params) {
   lidar_loc_info_buffer_.SetCapacity(params.lidar_loc_info_buffer_capacity);
   fusion_loc_info_buffer_.SetCapacity(params.fusion_loc_info_buffer_capacity);
 
-  return Init(params.map_folder, params.velodyne_extrinsic, params.map_param);
+  return Init(params.map_folder, params.map_visual_folder,
+              params.velodyne_extrinsic, params.map_param);
 }
 
 void VisualizationManager::AddLidarFrame(const LidarVisFrame &lidar_frame) {

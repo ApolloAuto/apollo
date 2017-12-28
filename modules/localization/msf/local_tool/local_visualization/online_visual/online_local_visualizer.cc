@@ -134,7 +134,7 @@ Status OnlineLocalVisualizer::Init() {
                 map_config.map_range_.GetMaxX(),
                 map_config.map_range_.GetMaxY());
   success = VisualizationManager::GetInstance().Init(
-      map_folder_, velodyne_extrinsic, map_param);
+      map_folder_, map_visual_folder_, velodyne_extrinsic, map_param);
   if (!success) {
     return Status(common::LOCALIZATION_ERROR, "visualization init failed");
   }
@@ -144,6 +144,7 @@ Status OnlineLocalVisualizer::Init() {
 
 void OnlineLocalVisualizer::InitParams() {
   map_folder_ = FLAGS_map_dir + "/" + FLAGS_local_map_name;
+  map_visual_folder_ = FLAGS_map_visual_dir;
   lidar_extrinsic_file_ = FLAGS_lidar_extrinsics_file;
 }
 
