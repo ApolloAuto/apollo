@@ -39,7 +39,7 @@ fi
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171211_1820"
+VERSION_X86_64="dev-x86_64-20171228_1319"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]]; then
     VERSION=$1
