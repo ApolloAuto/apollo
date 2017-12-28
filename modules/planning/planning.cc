@@ -392,8 +392,7 @@ Status Planning::Plan(const double current_time_stamp,
   if (!best_reference_line) {
     std::string msg(
         "planner failed to make a driving plan because NO valid reference "
-        "line "
-        "info.");
+        "line info.");
     AERROR << msg;
     if (last_publishable_trajectory_) {
       last_publishable_trajectory_->Clear();
