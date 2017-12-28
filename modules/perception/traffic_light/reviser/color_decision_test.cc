@@ -38,7 +38,7 @@ void do_test(BaseReviser *_reviser,
              const std::vector<int> &color_list,
              TLColor color) {
   ReviseOption option(100);
-  for (int i = 0; i < color_list.size(); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
@@ -73,7 +73,7 @@ TEST_F(DecisionTest, mix) {
       {3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3,
        3, 3, 3, 3};
   ReviseOption option(100);
-  for (int i = 0; i < color_list.size(); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
@@ -91,7 +91,7 @@ TEST_F(DecisionTest, mix_yellow) {
       {3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
        3, 3, 3, 3};
   ReviseOption option(100);
-  for (int i = 0; i < color_list.size(); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
@@ -140,7 +140,7 @@ TEST_F(DecisionTest, mix_yellow_red_flash) {
                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
   ReviseOption option(100);
-  for (int i = 0; i < color_list.size(); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
