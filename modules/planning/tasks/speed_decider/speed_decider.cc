@@ -110,6 +110,23 @@ bool SpeedDecider::IsLowSpeedDecelerating(
          trajectory.begin()->a() < FLAGS_decelerating_obstacle_threshold;
 }
 
+// "too close" is determined by whether ego vehicle will hit the front obstacle
+// if the obstacle drive at current speed and ego vehicle use some reasonable
+// deceleration
+bool SpeedDecider::IsTooClose(const PathObstacle& path_obstacle) const {
+  if (path_obstacle.st_boundary().min_t() > 0.0) {
+    return false;
+  }
+  const double obs_speed = path_obstacle.obstacle()->Speed();
+  const double ego_speed = init_point_.v();
+  if (obs_speed > ego_speed) {
+    return false;
+  }
+  const double distance = path_obstacle.st_boundary().min_s();
+  constexpr double decel = 1.0;
+  return distance < std::pow((ego_speed - obs_speed), 2) * 0.5 / decel;
+}
+
 Status SpeedDecider::MakeObjectDecision(
     const SpeedData& speed_profile, PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
@@ -143,7 +160,8 @@ Status SpeedDecider::MakeObjectDecision(
                    (boundary.max_t() - boundary.min_t() >
                     FLAGS_follow_min_time_sec)) {
           // stop for low_speed decelerating
-          if (IsLowSpeedDecelerating(*path_obstacle)) {
+          if (IsLowSpeedDecelerating(*path_obstacle) ||
+              IsTooClose(*path_obstacle)) {
             ObjectDecisionType stop_decision;
             if (CreateStopDecision(*path_obstacle, &stop_decision)) {
               path_obstacle->AddLongitudinalDecision("dp_st_graph",
