@@ -117,6 +117,11 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
           st_boundary.SetBoundaryType(StBoundary::BoundaryType::FOLLOW);
         } else if (decision.has_stop()) {
           st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
+        } else if (decision.has_ignore()) {
+          continue;
+        } else {
+          AWARN << "Obstacle " << id << " has unhandled decision type: "
+                << decision.ShortDebugString();
         }
         st_boundary.SetId(st_boundary_copy.id());
         st_boundary.SetCharacteristicLength(
