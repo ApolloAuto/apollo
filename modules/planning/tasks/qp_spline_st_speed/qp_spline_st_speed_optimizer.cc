@@ -103,9 +103,19 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
         continue;
       }
       auto st_boundary =
-          path_decision_copy.Find(id)->st_boundary().CutOffByT(5.0).ExpandByS(
+          path_decision_copy.Find(id)->st_boundary().CutOffByT(3.0).ExpandByS(
               5.0);
       if (!st_boundary.IsEmpty()) {
+        auto decision = obstacle->LongitudinalDecision();
+        if (decision.has_yield()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
+        } else if (decision.has_overtake()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::OVERTAKE);
+        } else if (decision.has_follow()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::FOLLOW);
+        } else if (decision.has_stop()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
+        }
         path_decision->SetStBoundary(id, st_boundary);
         boundaries.push_back(&obstacle->st_boundary());
       }

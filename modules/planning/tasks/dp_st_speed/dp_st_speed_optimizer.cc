@@ -64,6 +64,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
     if (!obstacle->st_boundary().IsEmpty()) {
       path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
+      ADEBUG << "obstacle " << id << " is blocking.";
     } else {
       if (obstacle->obstacle()->IsVirtual()) {
         continue;
@@ -71,12 +72,17 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
       if (path_decision_.Find(id)->st_boundary().IsEmpty()) {
         continue;
       }
-      auto st_boundary =
-          path_decision_.Find(id)->st_boundary().CutOffByT(5.0).ExpandByS(5.0);
+      ADEBUG << "obstacle " << id << " is NOT blocking.";
+      auto st_boundary_aaa = path_decision_.Find(id)->st_boundary();
+      auto st_boundary = st_boundary_aaa.CutOffByT(3.0).ExpandByS(5.0);
       if (!st_boundary.IsEmpty()) {
         path_decision->SetStBoundary(id, st_boundary);
         boundaries.push_back(&obstacle->st_boundary());
       }
+      ADEBUG << "dp_st st_boundary_aaa: min_t = " << st_boundary_aaa.min_t()
+             << ", max_t = " << st_boundary_aaa.max_t()
+             << ", min_s = " << st_boundary_aaa.min_s()
+             << ", st_boundary_aaa.max_s() = " << st_boundary_aaa.max_s();
     }
   }
 
