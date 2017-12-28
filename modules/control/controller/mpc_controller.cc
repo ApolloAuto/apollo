@@ -583,6 +583,10 @@ void MPCController::ComputeLongitudinalErrors(
   debug->set_station_reference(reference_point.path_point().s());
   debug->set_speed_reference(reference_point.v());
   debug->set_acceleration_reference(reference_point.a());
+
+  debug->set_station_feedback(s_matched);
+  debug->set_speed_feedback(
+      VehicleStateProvider::instance()->linear_velocity());
 }
 
 }  // namespace control
