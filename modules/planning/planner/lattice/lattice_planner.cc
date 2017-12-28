@@ -58,8 +58,8 @@ Status LatticePlanner::Plan(
 
   AINFO << "";
   AINFO << "[BEGIN]-------------------------------------------------";
-  const double start_timestamp = Clock::NowInSeconds();
-  double current_time = start_timestamp;
+  double start_time = Clock::NowInSeconds();
+  double current_time = start_time;
 
   AINFO << "Number of planning cycles:\t" << num_planning_cycles
       << "\t" << num_planning_succeeded_cycles;
@@ -84,7 +84,7 @@ Status LatticePlanner::Plan(
 
   AINFO << "Step 1,2,3 Succeeded " <<
     "ReferenceLine and Frenet Conversion Time = " <<
-    (Clock::NowInSeconds() - start_timestamp) * 1000;
+    (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
@@ -95,7 +95,7 @@ Status LatticePlanner::Plan(
     discretized_reference_line);
 
   AINFO << "Decision_Time = " <<
-    (Clock::NowInSeconds() - start_timestamp) * 1000;
+    (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
@@ -107,7 +107,7 @@ Status LatticePlanner::Plan(
       &lat_trajectory1d_bundle);
 
   AINFO << "Trajectory_Generation_Time="
-    << (Clock::NowInSeconds() - start_timestamp) * 1000;
+    << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 6. first, evaluate the feasibility of the 1d trajectories according to
@@ -117,8 +117,8 @@ Status LatticePlanner::Plan(
   TrajectoryEvaluator trajectory_evaluator(
       planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
 
-  AINFO << "Trajectory_Generation_Time="
-    << (Clock::NowInSeconds() - start_timestamp) * 1000;
+  AINFO << "Trajectory_Evaluator_Construction_Time="
+    << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   AINFO << "number of trajectory pairs = "
@@ -211,7 +211,7 @@ Status LatticePlanner::Plan(
   }
 
   AINFO << "Trajectory_Evaluation_Time="
-    << (Clock::NowInSeconds() - start_timestamp) * 1000;
+    << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   AINFO << "Step CombineTrajectory Succeeded";
@@ -222,9 +222,8 @@ Status LatticePlanner::Plan(
             << combined_constraint_failure_count << "] times";
   AINFO << "trajectory not valid for collision ["
             << collision_failure_count << "] times";
-  current_time = Clock::NowInSeconds();
-  AINFO << "Trajectory_Generation_Time="
-    << (current_time - start_timestamp) * 1000;
+  AINFO << "Total_Lattice_Planning_Frame_Time="
+    << (Clock::NowInSeconds() - start_time) * 1000;
 
   if (num_lattice_traj > 0) {
     AINFO << "Planning succeeded";
