@@ -32,7 +32,7 @@
 | --------- | ---------------------------------------- | ------------- |
 | HDL-64ES3 | /apollo/sensor/velodyne64/VelodyneScanUnified | 10            |
 | INS       | /apollo/sensor/gnss/odometry             | 100           |
-| INS       | /apollo/sensor/gnss/ins_stat             | 1             |
+| INS       | /apollo/sensor/gnss/ins_stat             | 2             |
 
 4.确认车辆采集标定数据时的定位状态为56。[如何查看车辆定位状态？](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs_cn.md)
 
@@ -40,10 +40,10 @@
 
 标定的地点需要选择无高楼遮挡、地面平坦、四周有平整的建筑物并且可以进行如图1所示8字轨迹行驶的地方。一个合适的标定场地如图2所示。
 
-![](lidar_calibration/images/trajectory.png)
+![](images/calibration/lidar_calibration/trajectory.png)
 <p align="center">图1 标定所需车辆行驶的轨迹。</p>
 
-![](lidar_calibration/images/field.png)
+![](images/calibration/lidar_calibration/field.png)
 <p align="center">图2 标定场地。</p>
 
 ### 标定数据录制
@@ -90,12 +90,12 @@ bash lidar_calibration.sh stop_record
 
 若数据校验失败，则会提示相应错误。错误的原因请参照错误说明。
 
-![](lidar_calibration/images/calib_valid_cn.png)
+![](images/calibration/lidar_calibration/calib_valid_cn.png)
 <p align="center">图3 标定数据校验流程。</p>
 
 6.校验通过后将开始标定流程，一个标定进度页面会展示给用户，如图4所示。视数据大小和质量的影响，整体标定时间大约持续10-30分钟，用户可以随时进入该页面查看当前任务的标定进度。
 
-![](lidar_calibration/images/calib_progress_cn.png)
+![](images/calibration/lidar_calibration/calib_progress_cn.png)
 <p align="center">图4 标定进度页面。</p>
 
 7.标定完成后，进入人工质检环节。点击[查看]按钮会弹出用于质检的拼接点云，此时可以开始人工质检。若质检通过，则可以点击**确认入库**按钮以保存标定结果。最后，点击**下载数据**按钮来下载标定结果，至此标定流程完成。[如何进行质检？](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs_cn.md)

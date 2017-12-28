@@ -35,7 +35,7 @@ Table 1. Sensor topics.
 | --------- | ---------------------------------------- | --------------- |
 | HDL-64ES3 | /apollo/sensor/velodyne64/VelodyneScanUnified | 10              |
 | INS       | /apollo/sensor/gnss/odometry             | 100             |
-| INS       | /apollo/sensor/gnss/ins_stat             | 1               |
+| INS       | /apollo/sensor/gnss/ins_stat             | 2               |
 
 
 4.Confirm that the INS status is 56 when recording data. See: [How to Check INS Status?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
@@ -44,11 +44,11 @@ Table 1. Sensor topics.
 
 An ideal calibration field requires no tall buildings around the calibration area. If buildings are near, low-rising building facades are preferred. Finally, the ground should be smooth, not rough, and it should be easy to drive the car following the trajectory that looks like the  ∞ symbol as illustrated in Figure 1. An example of a good calibration field is shown in Figure 2.
 
-![](lidar_calibration/images/trajectory.png)
+![](images/calibration/lidar_calibration/trajectory.png)
 
 <p align="center">Figure 1. The trajectory  for calibration.</p>
 
-![](lidar_calibration/images/field.png)
+![](images/calibration/lidar_calibration/field.png)
 
 <p align="center">Figure 2. Calibration field.</p>
 
@@ -97,11 +97,11 @@ After recording the calibration data, please login to the [calibration service p
 
 If validation fails, the corresponding error message is prompted. See the Error Description section below for details.
 
-![](lidar_calibration/images/calib_valid_en.png)
+![](images/calibration/lidar_calibration/calib_valid_en.png)
 <p align="center">Figure 3. Calibration data verification.</p>
 
 6.After data validation, the calibration process begins, as shown in Figure 4.  A detailed calibration progress page is displayed to users. Depending on the size and quality of the data, the overall calibration time lasts about 10-30 minutes. You can enter the page at any time to see the progress of the current task.
-![](lidar_calibration/images/calib_progress_en.png)
+![](images/calibration/lidar_calibration/calib_progress_en.png)
 <p align="center">Figure 4. Calibration progress page.</p>
 
 7.When calibration succeeds, click the **View detail** button to display a stitched point cloud. You can confirm the quality verification by checking the sharpness of the point cloud. If you are satisfied with the calibration quality, you can click **Confirm** to keep the result and download the calibration results by clicking **Download**. This fulfills the completion of the calibration process.
