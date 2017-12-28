@@ -35,57 +35,35 @@ using apollo::planning::ADCTrajectory;
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
-  adc_trajectory_ = dynamic_cast<const ADCTrajectory&>(message);
-  reference_line_lane_ids_.clear();
-  for (const auto& lane_id : adc_trajectory_.lane_id()) {
-    reference_line_lane_ids_.insert(lane_id.id());
+  adc_trajectory_.CopyFrom(dynamic_cast<const ADCTrajectory&>(message));
+  if (!IsProtected()) {
+    junction_polygon_ = Polygon2d{};
+    return;
   }
   junction_polygon_ = GetJunctionPolygon();
 }
 
-const ADCTrajectory* ADCTrajectoryContainer::GetADCTrajectory() {
-  return &adc_trajectory_;
-}
-
-bool ADCTrajectoryContainer::IsPointInJunction(const Vec2d& point) const {
+bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
   if (junction_polygon_.num_points() < 3) {
     return false;
   }
-  return junction_polygon_.IsPointIn(point);
-}
+  bool in_polygon = junction_polygon_.IsPointIn({point.x(), point.y()});
 
-std::vector<LineSegment2d> ADCTrajectoryContainer::ADCTrajectorySegments(
-    const double time_step) const {
-  std::vector<LineSegment2d> segments;
-  size_t num_point = adc_trajectory_.trajectory_point_size();
-  if (num_point == 0) {
-    return segments;
+  PredictionMap* map = PredictionMap::instance();
+  bool on_virtual_lane = false;
+  if (point.has_lane_id()) {
+    on_virtual_lane = map->IsVirtualLane(point.lane_id());
   }
-  TrajectoryPoint prev_point = adc_trajectory_.trajectory_point(0);
-  double prev_time = prev_point.relative_time();
-  for (size_t i = 1; i < num_point; ++i) {
-    TrajectoryPoint curr_point = adc_trajectory_.trajectory_point(i);
-    double curr_time = curr_point.relative_time();
-    if (i != num_point - 1 && curr_time - prev_time < time_step) {
-      continue;
-    }
-    Vec2d prev_vec(prev_point.path_point().x(), prev_point.path_point().y());
-    Vec2d curr_vec(curr_point.path_point().x(), curr_point.path_point().y());
-    segments.emplace_back(prev_vec, curr_vec);
-
-    prev_point = curr_point;
+  if (!on_virtual_lane) {
+    on_virtual_lane = map->OnVirtualLane({point.x(), point.y()},
+                                         FLAGS_virtual_lane_radius);
   }
-  return segments;
+  return in_polygon && on_virtual_lane;
 }
 
 bool ADCTrajectoryContainer::IsProtected() const {
   return adc_trajectory_.has_right_of_way_status() &&
          adc_trajectory_.right_of_way_status() == ADCTrajectory::PROTECTED;
-}
-
-bool ADCTrajectoryContainer::ContainsLaneId(const std::string& lane_id) const {
-  return reference_line_lane_ids_.find(lane_id) !=
-         reference_line_lane_ids_.end();
 }
 
 Polygon2d ADCTrajectoryContainer::GetJunctionPolygon() {

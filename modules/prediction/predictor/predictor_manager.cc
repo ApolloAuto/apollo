@@ -182,8 +182,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
 
       if (predictor != nullptr) {
         predictor->Predict(obstacle);
-        if (FLAGS_enable_trim_prediction_trajectory &&
-            adc_trajectory_container->IsProtected()) {
+        if (FLAGS_enable_trim_prediction_trajectory) {
           predictor->TrimTrajectories(obstacle, adc_trajectory_container);
         }
         for (const auto& trajectory : predictor->trajectories()) {
