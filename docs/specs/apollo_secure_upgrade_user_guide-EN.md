@@ -7,7 +7,9 @@ Nowadays software upgrade is not securely protected. Therefore, devices are expo
 1. Packages are encrypted and signature protected in storing and transmitting phases.
 2. Server and device can authenticate each other.
 3. Cryptographic resources are protected properly.
-4. Multiple platforms (Ubuntu 14, Centos 6, Centos 7 and Andorid) are supported.
+4. Server provides customized authorizations to different devices.
+5. Prevent attackers utilizing the server’s response to replay attack devices.
+6. Multiple platforms (Ubuntu 14, Centos 6, Centos 7 and Andorid) are supported.
 
 ## Upgrade procedure
 A typical upgrade procedure is shown below:
@@ -27,13 +29,13 @@ After integrating secure upgrade SDK, the upgrade procedure is modified as follo
 
 ![](images/apollo_secure_upgrade_procedure.JPG)
 
-1. Upgrade server generates the secure package and package token based on the original upgrade package.
-2. Upgrade server uploads the secure package and package token to the storage server.
+1. Upgrade server generates the secure package and package token.
+2. Secure packages and package token are uploaded to the storage server..
 3. Storage server sends secure package and package token URLs to the upgrade server.
-4. Device generates the device token, and sends it to the upgrade server with the upgrade request.
-5. Upgrade server generates authorization token based on device token and package token, and sends it to the device with the secure package URL.
+4. Device generates device token and sends to the upgrade server with the upgrade request.
+5. Upgrade server generates authorization token and send to device with replied secure package URL.
 6. Device requests secure package from the storage sever.
-7. The secure package is sent to device.
+7. secure packages are downloaded to device.
 8. Device verifies the secure package with the authorization token, and generates the original package. Device installs the package.
 
 ## User Guide
@@ -103,8 +105,8 @@ output para:
 ```
 ### 3. Notice
 1. SDK uses standard PEM certificates.
-2. Before using this SDK, users need to generate a root certificate, and use the same root certificate to sign the server and device certificates.
-3. Root and server certificates are deployed to server and make sure the server certificate cannot sign other certificates.
-4. Root and device certificates are deployed to device and make sure the device certificate cannot sign other certificates.
+2. Before using SDK, users need to generate two seperate chain of certificate for server and device.
+3. Certificates from the server certificate chain are deployed to server and make sure they cannot sign other certificates.
+4. Certificates from the device certificate chain are deployed to device and make sure they cannot sign other certificates.
 5. Root private key should not be deployed to server or devices.
 6. Users need to be assigned the read and write permissions of `config` directory and the read permission of `certificate` directory.
