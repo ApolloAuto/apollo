@@ -84,8 +84,11 @@ class MoveSequencePredictor : public SequencePredictor {
   double EvaluateLongitudinalPolynomial(const std::array<double, 5>& coeffs,
                                         const double t, const uint32_t order);
 
-  double ComputeTimeToLaneCenter(const Obstacle& obstacle,
-                                 const LaneSequence& lane_sequence);
+  double ComputeTimeToLaneCenterBySampling(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence);
+
+  double ComputeTimeToLaneCenterByVelocity(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
   double Cost(const double t, const std::array<double, 6>& lateral_coeffs,
               const std::array<double, 5>& longitudinal_coeffs);
