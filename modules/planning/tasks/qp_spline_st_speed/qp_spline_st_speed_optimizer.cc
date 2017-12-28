@@ -98,7 +98,9 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     if (!obstacle->st_boundary().IsEmpty()) {
       path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
-    } else if (FLAGS_enable_side_vehicle_st_boundary) {
+    } else if (FLAGS_enable_side_vehicle_st_boundary &&
+               (adc_sl_boundary.start_l() > 2.0 ||
+                adc_sl_boundary.end_l() < -2.0)) {
       if (obstacle->obstacle()->IsVirtual()) {
         continue;
       }

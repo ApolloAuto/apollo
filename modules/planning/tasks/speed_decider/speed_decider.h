@@ -87,6 +87,7 @@ class SpeedDecider : public Task {
 
   // check if obstacle is low speed and decelerating
   bool IsLowSpeedDecelerating(const PathObstacle& path_obstacle) const;
+  bool IsTooClose(const PathObstacle& path_obstacle) const;
 
  private:
   DpStSpeedConfig dp_st_speed_config_;
