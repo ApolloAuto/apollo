@@ -76,7 +76,7 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
   Because our calibration method is based on nature sence, an ideal calibration place can significantly improve the precision. We recommend selecting a textured site contains some land marks, such as trees, poles, street lights, traffic signs, stationary objects and clear traffic lines. A good calibraiton environment is shown below: 
 
-  ![](images/apollo_2.0_sensor_calibration/calibration_place.png)
+  ![](images/calibration/sensor_calibration/calibration_place.png)
   <p align="center"> Figure 1. A good calibraiton place </p>
 
 4. Required Topics
@@ -290,10 +290,10 @@ When the calibration is completed, the corresponding calibration result verifica
 * Result Examples: As shown in the following figures, figure 6 shows a good calibration result which meet the precision requirements, and figure 7 is a phenomenon that does not meet the requirements of precision.
 
 ![](images/calibration/sensor_calibration/radar_cam_good.png)
-<p align="center"> Figure 2. The good Camera-to-Radar calibration validation result </p>
+<p align="center"> Figure 6. The good Camera-to-Radar calibration validation result </p>
 
 ![](images/calibration/sensor_calibration/radar_cam_error.png)
-<p align="center"> Figure 3. The bad Camera-to-Radar calibration validation result </p>
+<p align="center"> Figure 7. The bad Camera-to-Radar calibration validation result </p>
 
 * Attentions: 
 
