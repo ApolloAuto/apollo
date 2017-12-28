@@ -1,5 +1,5 @@
 camera:
-  viewAngle: 0.5
+  viewAngle: 0.65
   Default:
     fov: 60
     near: 1

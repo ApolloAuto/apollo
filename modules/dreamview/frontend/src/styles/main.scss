@@ -918,7 +918,7 @@ body {
         border: 0px;
         min-width: 75px;
         min-height: 40px;
-        max-height: 80px;
+        max-height: 60px;
 
         color: #999999;
 
@@ -1176,6 +1176,7 @@ body {
 
     .offline-loader {
         width: 60%;
+        max-width: 650px;
 
         .status-message {
             position: relative;
