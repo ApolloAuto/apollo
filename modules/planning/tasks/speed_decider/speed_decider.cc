@@ -112,7 +112,8 @@ bool SpeedDecider::IsFollowTooClose(const PathObstacle& path_obstacle) const {
   if (obs_speed > ego_speed) {
     return false;
   }
-  const double distance = path_obstacle.st_boundary().min_s();
+  const double distance =
+      path_obstacle.st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
   constexpr double decel = 1.0;
   return distance < std::pow((ego_speed - obs_speed), 2) * 0.5 / decel;
 }
