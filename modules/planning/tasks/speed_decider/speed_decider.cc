@@ -99,21 +99,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
   return st_position;
 }
 
-bool SpeedDecider::IsLowSpeedDecelerating(
-    const PathObstacle& path_obstacle) const {
-  const auto& trajectory =
-      path_obstacle.obstacle()->Trajectory().trajectory_point();
-  if (trajectory.empty()) {
-    return false;
-  }
-  return trajectory.begin()->v() < FLAGS_low_speed_obstacle_threshold &&
-         trajectory.begin()->a() < FLAGS_decelerating_obstacle_threshold;
-}
-
-// "too close" is determined by whether ego vehicle will hit the front obstacle
-// if the obstacle drive at current speed and ego vehicle use some reasonable
-// deceleration
-bool SpeedDecider::IsTooClose(const PathObstacle& path_obstacle) const {
+bool SpeedDecider::IsFollowTooClose(const PathObstacle& path_obstacle) const {
   if (path_obstacle.st_boundary().min_t() > 0.0) {
     return false;
   }
@@ -152,19 +138,20 @@ Status SpeedDecider::MakeObjectDecision(
       case BELOW:
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
-          if (CreateStopDecision(*path_obstacle, &stop_decision)) {
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+          if (CreateStopDecision(*path_obstacle, &stop_decision,
+                                 FLAGS_stop_distance_traffic_light)) {
+            path_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                    stop_decision);
           }
         } else if (CheckIsFollowByT(boundary) &&
                    (boundary.max_t() - boundary.min_t() >
                     FLAGS_follow_min_time_sec)) {
           // stop for low_speed decelerating
-          if (IsLowSpeedDecelerating(*path_obstacle) ||
-              IsTooClose(*path_obstacle)) {
+          if (IsFollowTooClose(*path_obstacle)) {
             ObjectDecisionType stop_decision;
-            if (CreateStopDecision(*path_obstacle, &stop_decision)) {
-              path_obstacle->AddLongitudinalDecision("dp_st_graph",
+            if (CreateStopDecision(*path_obstacle, &stop_decision,
+                                   FLAGS_min_stop_distance_obstacle)) {
+              path_obstacle->AddLongitudinalDecision("dp_st_graph/too_close",
                                                      stop_decision);
             }
           } else {  // high speed or low speed accelerating
@@ -201,7 +188,8 @@ Status SpeedDecider::MakeObjectDecision(
         break;
       case CROSS: {
         ObjectDecisionType stop_decision;
-        if (CreateStopDecision(*path_obstacle, &stop_decision)) {
+        if (CreateStopDecision(*path_obstacle, &stop_decision,
+                               FLAGS_min_stop_distance_obstacle)) {
           path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
         }
       } break;
@@ -224,15 +212,14 @@ void SpeedDecider::AppendIgnoreDecision(PathObstacle* path_obstacle) const {
   }
 }
 
-bool SpeedDecider::CreateStopDecision(
-    const PathObstacle& path_obstacle,
-    ObjectDecisionType* const stop_decision) const {
+bool SpeedDecider::CreateStopDecision(const PathObstacle& path_obstacle,
+                                      ObjectDecisionType* const stop_decision,
+                                      double stop_distance) const {
   const auto& boundary = path_obstacle.st_boundary();
   auto* stop = stop_decision->mutable_stop();
-  const double kStopDistance = 0.0;
-  stop->set_distance_s(kStopDistance);
+  stop->set_distance_s(stop_distance);
   const double fence_s =
-      adc_sl_boundary_.end_s() + boundary.min_s() + kStopDistance;
+      adc_sl_boundary_.end_s() + boundary.min_s() + stop_distance;
 
   const double main_stop_s =
       reference_line_info_->path_decision()->stop_reference_line_s();
