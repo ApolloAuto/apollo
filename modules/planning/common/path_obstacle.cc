@@ -93,6 +93,10 @@ void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
   } else {
     if (BuildTrajectoryStBoundary(reference_line, adc_start_s, &st_boundary_)) {
       ADEBUG << "Found st_boundary for obstacle " << id_;
+      ADEBUG << "st_boundary: min_t = " << st_boundary_.min_t()
+             << ", max_t = " << st_boundary_.max_t()
+             << ", min_s = " << st_boundary_.min_s()
+             << ", max_s = " << st_boundary_.max_s();
     } else {
       ADEBUG << "No st_boundary for obstacle " << id_;
     }

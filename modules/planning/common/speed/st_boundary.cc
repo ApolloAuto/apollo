@@ -391,7 +391,8 @@ StBoundary StBoundary::GenerateStBoundary(
 StBoundary StBoundary::CutOffByT(const double t) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
-  for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
+  for (size_t i = 0; i < lower_points_.size() && i < upper_points_.size();
+       ++i) {
     if (lower_points_[i].t() < t) {
       continue;
     }
