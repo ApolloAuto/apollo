@@ -47,6 +47,12 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class Frame
+ *
+ * @brief Frame holds all data for one planning cycle.
+ */
+
 class Frame {
  public:
   explicit Frame(uint32_t sequence_num,
