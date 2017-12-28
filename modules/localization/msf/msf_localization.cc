@@ -282,9 +282,12 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
     apollo::common::Header *status_headerpb = status.mutable_header();
     status_headerpb->set_timestamp_sec(
         itr->localization().header().timestamp_sec());
-    status.set_fusion_status(static_cast<uint32_t>(itr->state()));
-    status.set_lidar_status(latest_lidar_localization_status_);
-    status.set_gnss_status(latest_gnss_localization_status_);
+    status.set_fusion_status(static_cast<MeasureState>
+        (itr->state()));
+    status.set_lidar_status(static_cast<MeasureState>
+        (latest_lidar_localization_status_));
+    status.set_gnss_status(static_cast<MeasureState>
+        (latest_gnss_localization_status_));
     status.set_measurement_time(itr->localization().measurement_time());
     AdapterManager::PublishLocalizationMsfStatus(status);
 
