@@ -250,7 +250,9 @@ template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline void KalmanFilter<T, XN, ZN, UN>::Predict(
     const Eigen::Matrix<T, UN, 1> &u) {
   CHECK(is_initialized_);
+
   x_ = F_ * x_ + B_ * u;
+
   P_ = F_ * P_ * F_.transpose() + Q_;
 }
 
