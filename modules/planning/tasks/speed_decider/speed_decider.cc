@@ -100,6 +100,10 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
 }
 
 bool SpeedDecider::IsFollowTooClose(const PathObstacle& path_obstacle) const {
+  if (!path_obstacle.IsBlockingObstacle()) {
+    return false;
+  }
+
   if (path_obstacle.st_boundary().min_t() > 0.0) {
     return false;
   }
