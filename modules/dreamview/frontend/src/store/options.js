@@ -5,13 +5,11 @@ import PARAMETERS from "store/config/parameters.yml";
 export default class Options {
     // Side Bar options
     @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
+    @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
     @observable showVideo = PARAMETERS.options.defaults.showVideo;
-
-    @observable showMenu =
-        OFFLINE_PLAYBACK ? true : PARAMETERS.options.defaults.showMenu;
     @observable showTasks =
         OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showTasks;
 
