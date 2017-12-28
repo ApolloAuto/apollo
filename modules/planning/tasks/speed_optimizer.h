@@ -49,6 +49,9 @@ class SpeedOptimizer : public Task {
 
   SpeedData GenerateStopProfile(const double init_speed,
                                 const double init_acc) const;
+  SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
+                                              const double init_acc) const;
+  bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
 
   void RecordSTGraphDebug(const StGraphData& st_graph_data,
                           planning_internal::STGraphDebug* stGraphDebug) const;
