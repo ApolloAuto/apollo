@@ -30,12 +30,12 @@ When the calibration is completed, the point cloud stitched during the calibrati
 
 Figure 1 shows the comparison between the stitched point clouds with good (a) and insufficient(b) calibration quality.
 
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/images/good_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/calibration/lidar_calibration/good_calib.png)
 <p align="center">
 (a)
 </p>
 
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/images/poor_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/calibration/lidar_calibration/poor_calib.png)
 <p align="center">
 (b)
 </p>
