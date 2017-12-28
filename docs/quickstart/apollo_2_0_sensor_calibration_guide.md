@@ -77,7 +77,7 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
   Because our calibration method is based on nature sence, an ideal calibration place can significantly improve the precision. We recommend selecting a textured site contains some land marks, such as trees, poles, street lights, traffic signs, stationary objects and clear traffic lines. A good calibraiton environment is shown below: 
 
   ![](images/apollo_2.0_sensor_calibration/calibration_place.png)
-  <a align="center"> Figure 1. A good calibraiton place </a>
+  <p align="center"> Figure 1. A good calibraiton place </p>
 
 4. Required Topics
 	
@@ -266,10 +266,10 @@ When the calibration is completed, the corresponding calibration result verifica
 * Result Examples: As shown in the following figures, Figure 2 shows a good calibration result which meet the precision requirements, and Figure 3 is a phenomenon that does not meet the requirements of precision.
  
 ![](images/calibration/sensor_calibration/cam_cam_good.png)
-<a align="center"> Figure 2. The good camera-to-camera calibration validation result </a>
+<p align="center"> Figure 2. The good camera-to-camera calibration validation result </p>
 	
 ![](images/calibration/sensor_calibration/cam_cam_error.png)
-<a align="center"> Figure 3. The bad camera-to-camera calibration validation result </a>
+<p align="center"> Figure 3. The bad camera-to-camera calibration validation result </p>
 
 ### Camera-to-LiDAR Calibration
 
@@ -278,10 +278,10 @@ When the calibration is completed, the corresponding calibration result verifica
 * Result Examples: As shown in the following figures, Figure 4 shows a good calibration result which meet the precision requirements, and Figure 5 is a phenomenon that does not meet the requirements of precision.
  
 ![](images/calibration/sensor_calibration/cam_lidar_good.png)
-<a align="center"> Figure 4. The good Camera-to-LiDAR calibration validation result </a>
+<p align="center"> Figure 4. The good Camera-to-LiDAR calibration validation result </p>
 	
 ![](images/calibration/sensor_calibration/cam_lidar_error.png)
-<a align="center"> Figure 5. The bad Camera-to-LiDAR calibration validation result </a>
+<p align="center"> Figure 5. The bad Camera-to-LiDAR calibration validation result </p>
 
 ### Radar-to-Camera Calibration
 	
@@ -290,10 +290,10 @@ When the calibration is completed, the corresponding calibration result verifica
 * Result Examples: As shown in the following figures, figure 6 shows a good calibration result which meet the precision requirements, and figure 7 is a phenomenon that does not meet the requirements of precision.
 
 ![](images/calibration/sensor_calibration/radar_cam_good.png)
-<a align="center"> Figure 2. The good Camera-to-Radar calibration validation result </a>
+<p align="center"> Figure 2. The good Camera-to-Radar calibration validation result </p>
 
 ![](images/calibration/sensor_calibration/radar_cam_error.png)
-<a align="center"> Figure 3. The bad Camera-to-Radar calibration validation result </a>
+<p align="center"> Figure 3. The bad Camera-to-Radar calibration validation result </p>
 
 * Attentions: 
 
