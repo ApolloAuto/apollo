@@ -28,7 +28,7 @@ TEST(LightTest, test_light) {
     std::ostringstream oss;
     oss << "Status: [color:"
         << "unknown color"
-        << " confidence:" << 0.0 << " tracking_time:" << 0.0 << "]";
+        << " confidence:" << 0.0 << "]";
     EXPECT_EQ(oss.str(), light_status.to_string());
   }
 
@@ -37,7 +37,7 @@ TEST(LightTest, test_light) {
     std::ostringstream oss;
     oss << "Status: [color:"
         << "red"
-        << " confidence:" << 0.0 << " tracking_time:" << 0.0 << "]";
+        << " confidence:" << 0.0 << "]";
     EXPECT_EQ(oss.str(), light_status.to_string());
   }
 
@@ -46,7 +46,7 @@ TEST(LightTest, test_light) {
     std::ostringstream oss;
     oss << "Status: [color:"
         << "green"
-        << " confidence:" << 0.0 << " tracking_time:" << 0.0 << "]";
+        << " confidence:" << 0.0  << "]";
     EXPECT_EQ(oss.str(), light_status.to_string());
   }
 
@@ -55,7 +55,7 @@ TEST(LightTest, test_light) {
     std::ostringstream oss;
     oss << "Status: [color:"
         << "yellow"
-        << " confidence:" << 0.0 << " tracking_time:" << 0.0 << "]";
+        << " confidence:" << 0.0 << "]";
     EXPECT_EQ(oss.str(), light_status.to_string());
   }
 
@@ -64,7 +64,7 @@ TEST(LightTest, test_light) {
     std::ostringstream oss;
     oss << "Status: [color:"
         << "black"
-        << " confidence:" << 0.0 << " tracking_time:" << 0.0 << "]";
+        << " confidence:" << 0.0 << "]";
     EXPECT_EQ(oss.str(), light_status.to_string());
   }
 }

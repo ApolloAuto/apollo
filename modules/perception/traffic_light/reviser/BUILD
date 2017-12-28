@@ -21,5 +21,25 @@ cc_library(
         "//modules/perception/traffic_light/interface:perception_traffic_light_interface",
     ],
 )
-
+cc_test(
+    name = "perception_traffic_light_reviser_test",
+    size = "small",
+    srcs = [
+        "color_decision_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        "perception_traffic_light_reviser",
+        "//modules/common:log",
+        "//modules/perception/common:perception_common",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "@caffe//:lib",
+        "@gtest//:main",
+        "@opencv2//:core",
+    ],
+)
 cpplint()

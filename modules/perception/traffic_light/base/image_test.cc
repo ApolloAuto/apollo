@@ -58,11 +58,11 @@ TEST_F(ImageTest, test_all) {
 
   EXPECT_EQ(CameraId::LONG_FOCUS, _image->camera_id());
   EXPECT_DOUBLE_EQ(0.0, _image->ts());
-  EXPECT_EQ("long_focus_camera(25mm)", _image->camera_id_str());
+  EXPECT_EQ("long_focus_camera_25mm", _image->camera_id_str());
 
   cam_id = CameraId::UNKNOWN;
   ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
-  EXPECT_EQ("unkown device(camera)", _image->camera_id_str());
+  EXPECT_EQ("unkown camera", _image->camera_id_str());
 }
 }  // namespace traffic_light
 }  // namespace perception
