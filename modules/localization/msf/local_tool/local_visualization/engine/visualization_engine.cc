@@ -94,12 +94,14 @@ VisualizationEngine::VisualizationEngine()
 }
 
 bool VisualizationEngine::Init(const std::string &map_folder,
+                               const std::string &map_visual_folder,
                                const VisualMapParam &map_param,
                                const unsigned int resolution_id,
                                const int zone_id,
                                const Eigen::Affine3d &extrinsic,
                                const unsigned int loc_info_num) {
   map_folder_ = map_folder;
+  map_visual_folder_ = map_visual_folder;
   map_param_ = map_param;
   velodyne_extrinsic_ = extrinsic;
   loc_info_num_ = loc_info_num;
@@ -131,7 +133,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
       cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
               CV_8UC1);
 
-  Preprocess(map_folder);
+  Preprocess(map_folder, map_visual_folder);
 
   std::string params_file = image_visual_resolution_path_ + "/param.txt";
   bool success = InitOtherParams(params_file);
@@ -183,9 +185,10 @@ void VisualizationEngine::SetAutoPlay(bool auto_play) {
   auto_play_ = auto_play;
 }
 
-void VisualizationEngine::Preprocess(const std::string &map_folder) {
+void VisualizationEngine::Preprocess(const std::string &map_folder,
+                                     const std::string &map_visual_folder) {
   std::string image_path = map_folder_ + "/image";
-  std::string image_visual_path = map_folder_ + "/map_visual";
+  std::string image_visual_path = map_visual_folder;
   char buf[256];
   snprintf(buf, sizeof(buf), "/%03u", resolution_id_);
   image_visual_resolution_path_ = image_visual_path + buf;
@@ -739,12 +742,13 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     const Eigen::Vector3d &pt = cloud[i];
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
-    uint32_t col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-                   map_param_.map_resolutions[resolution_id_];
-    uint32_t row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-                   map_param_.map_resolutions[resolution_id_];
-    if (col < 0 || row < 0 || col >= map_param_.map_node_size_x ||
-        row >= map_param_.map_node_size_y) {
+    int col = static_cast<int>((pt_global[0] - cloud_img_lt_coord_[0]) /
+                   map_param_.map_resolutions[resolution_id_]);
+    int row = static_cast<int>((pt_global[1] - cloud_img_lt_coord_[1]) /
+                   map_param_.map_resolutions[resolution_id_]);
+    if (col < 0 || row < 0 ||
+        col >= static_cast<int>(map_param_.map_node_size_x) ||
+        row >= static_cast<int>(map_param_.map_node_size_y)) {
       continue;
     }
 

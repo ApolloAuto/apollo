@@ -130,3 +130,7 @@ DEFINE_bool(enable_lidar_localization, true,
 
 // debug
 DEFINE_bool(use_visualize, false, "");
+
+// visualization
+DEFINE_string(map_visual_dir, "/apollo/data/map_visual",
+              "The path of map_visual folder.");
