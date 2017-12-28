@@ -323,12 +323,6 @@ bool DPRoadGraph::IsSafeForLaneChange() {
     return false;
   }
 
-  constexpr double kForwardSafeTime = 1.2;
-  constexpr double kForwardMinSafeDistance = 6.0;
-  constexpr double kBackwardSafeTime = 1.2;
-  constexpr double kBackwardMinSafeDistance = 8.0;
-  const double kForwardSafeDistance =
-      std::max(kForwardMinSafeDistance, init_point_.v() * kForwardSafeTime);
   for (const auto *path_obstacle :
        reference_line_info_.path_decision().path_obstacles().Items()) {
     const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
@@ -340,9 +334,16 @@ bool DPRoadGraph::IsSafeForLaneChange() {
       continue;
     }
 
-    const double kBackwardSafeDistance =
-        std::max(kBackwardMinSafeDistance,
-                 path_obstacle->obstacle()->Speed() * kBackwardSafeTime);
+    constexpr double kSafeTime = 3.0;
+    constexpr double kForwardMinSafeDistance = 6.0;
+    constexpr double kBackwardMinSafeDistance = 8.0;
+
+    const double kForwardSafeDistance = std::max(
+        kForwardMinSafeDistance,
+        (init_point_.v() - path_obstacle->obstacle()->Speed()) * kSafeTime);
+    const double kBackwardSafeDistance = std::max(
+        kBackwardMinSafeDistance,
+        (path_obstacle->obstacle()->Speed() - init_point_.v()) * kSafeTime);
     if (sl_boundary.end_s() >
             adc_sl_boundary.start_s() - kBackwardSafeDistance &&
         sl_boundary.start_s() <
