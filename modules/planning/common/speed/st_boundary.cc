@@ -71,6 +71,25 @@ bool StBoundary::IsPointNear(const common::math::LineSegment2d& seg,
   return seg.DistanceSquareTo(point) < max_dist * max_dist;
 }
 
+std::string StBoundary::TypeName(BoundaryType type) {
+  if (type == BoundaryType::FOLLOW) {
+    return "FOLLOW";
+  } else if (type == BoundaryType::KEEP_CLEAR) {
+    return "KEEP_CLEAR";
+  } else if (type == BoundaryType::OVERTAKE) {
+    return "OVERTAKE";
+  } else if (type == BoundaryType::STOP) {
+    return "STOP";
+  } else if (type == BoundaryType::YIELD) {
+    return "YIELD";
+  } else if (type == BoundaryType::UNKNOWN) {
+    return "UNKNOWN";
+  }
+  AWARN << "Unkown boundary type " << static_cast<int>(type)
+        << ", treated as UNKNOWN";
+  return "UNKNOWN";
+}
+
 void StBoundary::RemoveRedundantPoints(
     std::vector<std::pair<STPoint, STPoint>>* point_pairs) {
   if (!point_pairs || point_pairs->size() <= 2) {
