@@ -12,13 +12,13 @@ Welcome to use the Apollo sensor calibration service. This document describes th
 
 ## Overview
 
-In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibration, Camera-to-LiDAR calibration, and Radar-to-Camera calibration. Unlike the LiDAR-to-IMU calibration in Apollo 1.5, all the new calibration methods are provided by the onboard executable program. The user only needs to start the corresponding calibration program, so the calibration work can be completed in real time and verify the results. The results are provided by `.yaml` format files.
+In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibration, Camera-to-LiDAR calibration, and Radar-to-Camera calibration. Unlike the LiDAR-to-IMU calibration in Apollo 1.5, all the new calibration methods are provided by the onboard executable program. Users only need to start the corresponding calibration program, then the calibration work can be completed in real time and results could be verified with visualized images. All results are provided by `.yaml` format files.
 
 ## Preparation
 
 1. Well Calibrated Intrinsics of Camera
 
-  Intrinsic contains focus length, principal point, distortion coefficients and other information. They can be obtained from some other camera calibration tools, for example, [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) and [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/). After the calibration is completed, the results need to be converted to a `.yaml` format file. Here is is an example of a camera intrinsic file:
+  Camera intrinsic contains focus length, principal point, distortion coefficients and other information. They can be obtained from some other camera calibration tools, for example, [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) and [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/). After the calibration is completed, the results need to be converted to a `.yaml` format file. Here is is an example of a camera intrinsic file:
 
 ```bash
     header: 
@@ -48,7 +48,7 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
 2. Initial Extrinsic File
 
-  The tools require the user to provide an initial extrinsic value as a reference. Here is an example of the initial extrinsic file of Camera-to-LiDAR, where translation is is the shift distance between camera and LiDAR. Rotation is the quaternion expression form of the rotation matrix.
+  The tools require user to provide an initial extrinsic value as a reference. Here is an example of initial extrinsic file of Camera-to-LiDAR, where translation is the shift distance between camera and LiDAR. Rotation is the quaternion expression form of the rotation matrix.
 
 ```bash
     header:
@@ -70,20 +70,20 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
         z: 2.0
 ```
 	
-  Attention: the calibration method of the Camera-to-LiDAR is more dependent on the initial extrinsics. A large deviation can lead to the failure of calibration. Therefore, please provide an accurate initial extrinsc as far as possible when the conditions are allowed.
+  Attention: the calibration method of the Camera-to-LiDAR is more dependent on the initial extrinsics. A large deviation can lead to the extrisic calibration failed. Therefore, please provide an accurate initial extrinsc as far as possible when the conditions are allowed.
 
 3. Calibration Place
 
-  Because our calibration method is based on nature sence, an ideal calibration place can significantly improve the precision. We recommend selecting a textured site such as trees, poles, street lights, traffic signs, stationary objects and clear traffic lines. A good calibraiton environment is shown below: 
+  Because our calibration method is based on nature sence, an ideal calibration place can significantly improve the precision. We recommend selecting a textured site contains some land marks, such as trees, poles, street lights, traffic signs, stationary objects and clear traffic lines. A good calibraiton environment is shown below: 
 
   ![](images/apollo_2.0_sensor_calibration/calibration_place.png)
   <a align="center"> Figure 1. A good calibraiton place </a>
 
 4. Required Topics
 	
-  Confirm that all sensor topics required by program have output. See: [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
+  Please confirm that all sensor topics required by program have output. See: [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
 
-  The topics required by the program are shown in the following Table 1 to Table 3:
+  The topics which are required by each program are shown in the following Table 1 to Table 3:
 	
   Table 1. The required topics of Camera-to-Camera calibration
 
@@ -113,7 +113,7 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
 ## Calibration Progress
 
-Please confirm the localization status is 56, otherwise the calibration program will not collect data. Type the following command to check localization status:
+Please confirm the localization status has already meet 56, otherwise the calibration program will not collect data. Type the following command to check localization status:
 
 	rostopic echo /apollo/sensor/gnss/ins_stat
 
@@ -158,7 +158,7 @@ Please confirm the localization status is 56, otherwise the calibration program 
 4. Output
 
   * The calibrated extrinsic file, provided as `.yaml` format.
-  * Validation images: It includes an image captured by the telephoto camera, an image captured by the wide-angle camera and a warp image blended with un-distortion wide-angle camera image and un-distortion telephoto camera image.
+  * Validation images: It includes an image captured by the telephoto camera, an image captured by the wide-angle camera and a warped image blended with un-distortion wide-angle camera image and un-distortion telephoto camera image.
 
 ### Camera-to-LiDAR Calibration
 
@@ -241,7 +241,7 @@ Please confirm the localization status is 56, otherwise the calibration program 
 4. Output
 	
   * The calibrated extrinsic file, provided as `.yaml` format.
-  * Validation images：the projection result from Radar to LiDAR, need to run `radar_lidar_visualizer` tool to generate image. See `Result Validation` for details。
+  * Validation image: the projection result from Radar to LiDAR, need to run `radar_lidar_visualizer` tool to generate validation image. See `Result Validation` for details。
 
 ## Obtaining Calibration Results
 
@@ -261,43 +261,43 @@ When the calibration is completed, the corresponding calibration result verifica
 
 ### Camera-to-Camera Calibration
 
-* Methods: In the warp image, the green channel is from the wide-angle camera image, the red and blue channel is from the telephoto camera image. Users can compare the alignment result of warp image to validate the precision of calibrated extrinsic. In the fusion area of the warp image, judge the alignment of the scene 50 meters away from the vehicle. If the images are complete coincided, extrinsic is satisfied. While appear pink or green ghost (displacement), there is an error for the extrinsic. When the error is greater than a certain range (determined by the actual usage), we need to re-calibrate extrinsic (Under the general circumstances, due to the parallax, some dislocations may occur in the horizontal with close objects, but the vertical direction is not affected. This is a normal phenomenon.).
+* Methods: In the warped image, the green channel comes from the wide-angle camera image, the red and blue channel comes from the telephoto camera image. Users can compare the alignment result of warped image to validate the precision of calibrated extrinsic. In the fusion area of the warped image, judge the alignment of the scene 50 meters away from the vehicle. If the images are complete coincided, the extrinsic is satisfied. While appear pink or green ghost (displacement), there is an error for the extrinsic. When the error is greater than a certain range (determined by the actual usage), we need to re-calibrate extrinsic (Under the general circumstances, due to the parallax, some dislocations may occur in the horizontal with close objects, but the vertical direction will not be affected. It is a normal phenomenon.).
 
-* Result Examples：As shown in the following figures, Figure 2 meets the precision requirements of the extrinsic, and Figure 3 is a phenomenon that does not meet the requirements of precision.
+* Result Examples: As shown in the following figures, Figure 2 shows a good calibration result which meet the precision requirements, and Figure 3 is a phenomenon that does not meet the requirements of precision.
  
-![](images/apollo_2.0_sensor_calibration/cam_cam_good.png)
+![](images/calibration/sensor_calibration/cam_cam_good.png)
 <a align="center"> Figure 2. The good camera-to-camera calibration validation result </a>
 	
-![](images/apollo_2.0_sensor_calibration/cam_cam_error.png)
+![](images/calibration/sensor_calibration/cam_cam_error.png)
 <a align="center"> Figure 3. The bad camera-to-camera calibration validation result </a>
 
 ### Camera-to-LiDAR Calibration
 
 * Methods: In the point cloud projection images, users can objects and signs with obvious edges and compare the alignment. If the targets within 50 meters, its edge of point cloud can coincide with the edge of the image, the accuracy of the calibration results can be proved to be very high. On the other hand, if there is a misplacement, the calibration results have error. The extrinsic is not available when the error is greater than a certain range (depending on the actual usage).
 
-* Result Examples: As shown in the following figures, Figure 4 meets the precision requirements of the extrinsic, and Figure 5 is a phenomenon that does not meet the requirements of precision.
+* Result Examples: As shown in the following figures, Figure 4 shows a good calibration result which meet the precision requirements, and Figure 5 is a phenomenon that does not meet the requirements of precision.
  
-![](images/apollo_2.0_sensor_calibration/cam_lidar_good.png)
+![](images/calibration/sensor_calibration/cam_lidar_good.png)
 <a align="center"> Figure 4. The good Camera-to-LiDAR calibration validation result </a>
 	
-![](images/apollo_2.0_sensor_calibration/cam_lidar_error.png)
+![](images/calibration/sensor_calibration/cam_lidar_error.png)
 <a align="center"> Figure 5. The bad Camera-to-LiDAR calibration validation result </a>
 
 ### Radar-to-Camera Calibration
 	
 * Methods: In order to verify the output extrinsic, we use the LiDAR in the system to be a medium. So we can get the extrinsic of the Radar relative to the LiDAR through the extrinsic of the Radar relative to the camera and the extrinsic of the camera relative to the LiDAR. Then we can draw a bird-view fusion image, which fuse the Radar data and the LiDAR date in the LiDAR coordinate system. Then we can use the alignment of the Radar date and the LiDAR date in the bird-view fusion image to judge the accuracy of the extrinsic. In the fusion image, the white point means the LiDAR point cloud, while the green solid circle means Radar objects. The alignment of the Radar object and the LiDAR date in the bird-view fusion image shows the accuracy of the extrinsic. If most of the targets can be coincident it is satisfied, otherwise, it is not satisfied and need to re-calibrate
 
-* Result Examples: As shown in the following figures, figure 6 is to meet the precision requirements of the extrinsic, and figure 7 is a phenomenon that does not meet the requirements of precision.
+* Result Examples: As shown in the following figures, figure 6 shows a good calibration result which meet the precision requirements, and figure 7 is a phenomenon that does not meet the requirements of precision.
 
-![](images/apollo_2.0_sensor_calibration/radar_cam_good.png)
+![](images/calibration/sensor_calibration/radar_cam_good.png)
 <a align="center"> Figure 2. The good Camera-to-Radar calibration validation result </a>
 
-![](images/apollo_2.0_sensor_calibration/radar_cam_error.png)
+![](images/calibration/sensor_calibration/radar_cam_error.png)
 <a align="center"> Figure 3. The bad Camera-to-Radar calibration validation result </a>
 
-* Attentions：
+* Attentions: 
 
-  * In order to get the fusion image of the Radar date and the LiDAR point cloud, the calibration process will automatically or manually call another projection tool (`radar_lidar_visualizer`). The projection tool loads the extrinsic file of  the Radar-to-Camera and Camera-to-LiDAR. Therefore, before tool starts, we need to make sure these two extirnsics are well calibrated and exsist in the specific path.
+  * In order to get the fusion image of the Radar date and the LiDAR point cloud, the calibration process will automatically or manually call another projection tool (`radar_lidar_visualizer`). The projection tool loads the extrinsic file of the Radar-to-Camera and Camera-to-LiDAR. Therefore, before tool starts, we need to make sure these two extirnsics are well calibrated and exsist in the specific path.
 
   * Type the following command to start the `radar_lidar_visualizer` program: 
 	
