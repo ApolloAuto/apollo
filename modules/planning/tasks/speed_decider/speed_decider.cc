@@ -143,7 +143,7 @@ Status SpeedDecider::MakeObjectDecision(
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
           if (CreateStopDecision(*path_obstacle, &stop_decision,
-                                 FLAGS_stop_distance_traffic_light)) {
+                                 -FLAGS_stop_distance_traffic_light)) {
             path_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                    stop_decision);
           }
@@ -154,7 +154,7 @@ Status SpeedDecider::MakeObjectDecision(
           if (IsFollowTooClose(*path_obstacle)) {
             ObjectDecisionType stop_decision;
             if (CreateStopDecision(*path_obstacle, &stop_decision,
-                                   FLAGS_min_stop_distance_obstacle)) {
+                                   -FLAGS_min_stop_distance_obstacle)) {
               path_obstacle->AddLongitudinalDecision("dp_st_graph/too_close",
                                                      stop_decision);
             }
@@ -193,7 +193,7 @@ Status SpeedDecider::MakeObjectDecision(
       case CROSS: {
         ObjectDecisionType stop_decision;
         if (CreateStopDecision(*path_obstacle, &stop_decision,
-                               FLAGS_min_stop_distance_obstacle)) {
+                               -FLAGS_min_stop_distance_obstacle)) {
           path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
         }
       } break;
