@@ -100,6 +100,7 @@ bool Predictor::TrimTrajectory(
       break;
     }
     if (!trajectory->trajectory_point(index).path_point().has_lane_id()) {
+      ++index;
       continue;
     }
     const std::string& lane_id =
