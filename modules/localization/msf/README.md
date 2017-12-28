@@ -41,4 +41,7 @@
 ## Visualization Tool
   We provide a simple online visulazation tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localizaiton.conf is used to enable the online visulazation tool.
 
-  We also provide an advanced online visualization tool which can show localization map, point cloud, horizontal position and variance circle of LiDAR-localization, Gnss-localization, and fused localization results. This tool is simplely launched by `./scripts/localization_online_visualizer.sh`. 
+  We also provide an advanced online visualization tool which can show localization map, point cloud, horizontal position and variance circle of LiDAR-localization, Gnss-localization, and fused localization results. This tool is simplely launched by `./scripts/localization_online_visualizer.sh`.
+
+## Check MSF Localization Status
+  We provide a simple way to check lidar localization, gnss localization and fusion localization status. There are four states {NOT_VALID, NOT_STABLE, OK, VALID} for localization status. You can simply use `rostopic echo /apollo/localization/msf_status` to check localization status. If fusion_status is VALID or OK, the output of msf localization is reliable.
