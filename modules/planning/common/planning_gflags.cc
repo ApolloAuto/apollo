@@ -104,6 +104,8 @@ DEFINE_bool(enable_change_lane_decider, false,
             "True to use change lane state machine decider.");
 DEFINE_double(change_lane_speed_relax_percentage, 0.05,
               "The percentage of change lane speed relaxation.");
+DEFINE_bool(enable_side_vehicle_st_boundary, false,
+            "Add st boundary of side vehicle in st graph.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 

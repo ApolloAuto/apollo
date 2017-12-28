@@ -98,13 +98,15 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     if (!obstacle->st_boundary().IsEmpty()) {
       path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
-    } else {
+    } else if (FLAGS_enable_side_vehicle_st_boundary) {
+      if (obstacle->obstacle()->IsVirtual()) {
+        continue;
+      }
       if (path_decision_copy.Find(id)->st_boundary().IsEmpty()) {
         continue;
       }
-      auto st_boundary =
-          path_decision_copy.Find(id)->st_boundary().CutOffByT(3.0).ExpandByS(
-              5.0);
+      auto st_boundary_copy = path_decision_copy.Find(id)->st_boundary();
+      auto st_boundary = st_boundary_copy.CutOffByT(3.5);
       if (!st_boundary.IsEmpty()) {
         auto decision = obstacle->LongitudinalDecision();
         if (decision.has_yield()) {
@@ -116,6 +118,10 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
         } else if (decision.has_stop()) {
           st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
         }
+        st_boundary.SetId(st_boundary_copy.id());
+        st_boundary.SetCharacteristicLength(
+            st_boundary_copy.characteristic_length());
+
         path_decision->SetStBoundary(id, st_boundary);
         boundaries.push_back(&obstacle->st_boundary());
       }
