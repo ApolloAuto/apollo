@@ -42,10 +42,10 @@ ConditionFilter::ConditionFilter(
 }
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
-  //std::set<double> critical_timestamps = CriticalTimeStamps();
-  std::vector<double> uniform_timestamps = UniformTimeStamps(8);
+  //std::set<double> timestamps = CriticalTimeStamps();
+  std::vector<double> timestamps = UniformTimeStamps(8);
   std::vector<SampleBound> sample_bounds;
-  for (const double t : uniform_timestamps) {
+  for (const double t : timestamps) {
     std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
     sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
         sample_bounds_at_t.end());
@@ -82,6 +82,9 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
     }
 
     // a new interval
+    //@TODO(liyun): implement reference_v to be
+    // (1) front obstacle speed if front obstacle exists
+    // (2) rear obstacle speed if no front obstacle exists and only rear obstacle exists
     if (s_max_reached < path_interval.first.s()) {
       if (path_interval.first.s() <= feasible_s_upper) {
         SampleBound sample_bound;
@@ -101,6 +104,7 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         }
         sample_bound.set_v_upper(v_upper);
         sample_bound.set_v_lower(v_lower);
+        sample_bound.set_v_reference(v_upper);
 
         sample_bounds.push_back(std::move(sample_bound));
       } else {
@@ -109,6 +113,7 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
         sample_bound.set_s_upper(feasible_s_upper);
         sample_bound.set_s_lower(s_max_reached);
         sample_bound.set_v_upper(feasible_v_upper);
+        sample_bound.set_v_reference(feasible_v_upper);
 
         double v_lower = feasible_v_upper;
         if (point_prev_ptr) {

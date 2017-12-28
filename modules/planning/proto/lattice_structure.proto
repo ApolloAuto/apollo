@@ -34,6 +34,7 @@ message SampleBound {
   optional double s_lower = 3;
   optional double v_upper = 4;
   optional double v_lower = 5;
+  optional double v_reference = 7;
   optional LatticeSamplingConfig sample_config = 6;
 }
 
