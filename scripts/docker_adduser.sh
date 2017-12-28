@@ -55,6 +55,11 @@ if [ "$RELEASE_DOCKER" != "1" ];then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
+
+  if [ -e /mnt/nfs/map/data ]; then
+    rsync -rLvzh --progress --update /mnt/nfs/map/data /apollo/modules/map
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/map/data"
+  fi
   # setup ros package
   # this is a temporary solution to avoid ros package downloading.
   ROS="/home/tmp/ros"
