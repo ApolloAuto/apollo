@@ -292,7 +292,7 @@ Status QpSplineStGraph::AddKernel(
   }
 
   if (!AddCruiseReferenceLineKernel(
-           speed_limit, qp_st_speed_config_.qp_spline_config().cruise_weight())
+           qp_st_speed_config_.qp_spline_config().cruise_weight())
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::AddKernel");
   }
@@ -334,14 +334,8 @@ Status QpSplineStGraph::Solve() {
              : Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
 }
 
-Status QpSplineStGraph::AddCruiseReferenceLineKernel(
-    const SpeedLimit& speed_limit, const double weight) {
+Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
-  if (speed_limit.speed_limit_points().size() == 0) {
-    std::string msg = "Fail to apply_kernel due to empty speed limits.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
   double dist_ref = qp_st_speed_config_.total_path_length();
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     cruise_.push_back(dist_ref);
