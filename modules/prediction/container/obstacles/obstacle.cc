@@ -768,7 +768,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
-  double heading = feature->theta();
+  double heading = feature->velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
     point[1] = feature->t_position().y();
@@ -836,7 +836,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
-  double theta = feature->theta();
+  double theta = feature->velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
     point[1] = feature->t_position().y();

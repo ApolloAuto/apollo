@@ -195,7 +195,8 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     position[0] = feature.t_position().x();
     position[1] = feature.t_position().y();
   }
-  double time_to_lane_center = ComputeTimeToLaneCenter(obstacle, lane_sequence);
+  double time_to_lane_center =
+      ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence);
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
@@ -494,7 +495,7 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
   }
 }
 
-double MoveSequencePredictor::ComputeTimeToLaneCenter(
+double MoveSequencePredictor::ComputeTimeToLaneCenterBySampling(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
   std::vector<double> candidate_times;
   GenerateCandidateTimes(&candidate_times);
@@ -516,6 +517,27 @@ double MoveSequencePredictor::ComputeTimeToLaneCenter(
     }
   }
   return t_best;
+}
+
+double MoveSequencePredictor::ComputeTimeToLaneCenterByVelocity(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence) {
+  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+  const Feature& feature = obstacle.latest_feature();
+  const LanePoint& first_lane_point =
+      lane_sequence.lane_segment(0).lane_point(0);
+  double v_x = feature.velocity().x();
+  double v_y = feature.velocity().y();
+
+  double lane_heading = first_lane_point.heading();
+  double lane_l = first_lane_point.relative_l();
+  double v_l = v_y * std::cos(lane_heading) - v_x * std::sin(lane_heading);
+  if (std::abs(v_l) < FLAGS_default_lateral_approach_speed ||
+      lane_l * v_l < 0.0) {
+    return std::abs(lane_l / FLAGS_default_lateral_approach_speed);
+  }
+  return std::abs(lane_l / v_l);
 }
 
 double MoveSequencePredictor::Cost(
