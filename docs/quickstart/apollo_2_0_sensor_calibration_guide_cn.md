@@ -77,7 +77,7 @@
 	我们的标定方法是基于自然场景的，所以一个理想的标定场地可以显著地提高标定结果的准确度。我们建议选取一个纹理丰富的场地，如有树木，电线杆，路灯，交通标志牌，静止的物体和清晰车道线。图1是一个较好的标定环境示例：
 
 	![](images/calibration/sensor_calibration/calibration_place.png)
-	<a align="center"> 图1 一个良好的标定场地 </a>
+	<p align="center"> 图1 一个良好的标定场地 </p>
 
 4. 所需Topics
 	
@@ -267,10 +267,10 @@
 * 结果示例：如下图所示，图2为满足精度要求外参效果，图3为不满足精度要求的现象，请重新进行标定过程。
 
 ![](images/calibration/sensor_calibration/cam_cam_good.png)
-<a align="center"> 图2 良好的相机到相机标定结果 </a>
+<p align="center"> 图2 良好的相机到相机标定结果 </p>
 
 ![](images/calibration/sensor_calibration/cam_cam_error.png)
-<a align="center"> 图3 错误的相机到相机标定结果 </a>
+<p align="center"> 图3 错误的相机到相机标定结果 </p>
 
 ### 相机到64线激光雷达标定
 
@@ -279,10 +279,10 @@
 * 结果示例：如下图所示，图4为准确外参的点云投影效果，图5为有偏差外参的点云投影效果
 
 ![](images/calibration/sensor_calibration/cam_lidar_good.png)
-<a align="center"> 图4 良好的相机到64线激光雷达标定结果 </a>
+<p align="center"> 图4 良好的相机到64线激光雷达标定结果 </p>
 
 ![](images/calibration/sensor_calibration/cam_lidar_error.png)
-<a align="center"> 图5 错误的相机到64线激光雷达标定结果 </a>
+<p align="center"> 图5 错误的相机到64线激光雷达标定结果 </p>
 
 ### 毫米波雷达到相机
 	
@@ -291,10 +291,10 @@
 * 结果示例：如下图所示，图6为满足精度要求外参效果，图7为不满足精度要求外参效果。
 
 ![](images/calibration/sensor_calibration/radar_cam_good.png)
-<a align="center"> 图6 良好的毫米波雷达到激光雷达投影结果 </a>
+<p align="center"> 图6 良好的毫米波雷达到激光雷达投影结果 </p>
 
 ![](images/calibration/sensor_calibration/radar_cam_error.png)
-<a align="center"> 图7 错误的毫米波雷达到激光雷达投影结果 </a>
+<p align="center"> 图7 错误的毫米波雷达到激光雷达投影结果 </p>
 
 * 注意事项：
 	* 为了得到毫米波雷达目标和激光雷达点云融合的验证图像，系统会自动或手动调用毫米波雷达到激光雷达的投影工具（`radar_lidar_visualizer`）进行图像绘制和生成过程。该投影工具在启动时会自动载入毫米波雷达与相机的外参文件及相机与激光雷达的外参文件，因此在启动之前，需要先进行相应的标定工具或将两文件以特定的文件名放在相应路径中，以备工具调用。
