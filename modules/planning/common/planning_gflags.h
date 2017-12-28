@@ -35,7 +35,6 @@ DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
-DECLARE_double(reference_line_lateral_extension);
 DECLARE_double(prepare_rerouting_time);
 DECLARE_double(rerouting_cooldown_time);
 
