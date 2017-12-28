@@ -33,11 +33,8 @@ using apollo::common::math::Vec2d;
 using apollo::hdmap::JunctionInfo;
 using apollo::planning::ADCTrajectory;
 
-std::mutex ADCTrajectoryContainer::g_mutex_;
-
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
-  std::lock_guard<std::mutex> lock(g_mutex_);
   adc_trajectory_ = dynamic_cast<const ADCTrajectory&>(message);
   reference_line_lane_ids_.clear();
   for (const auto& lane_id : adc_trajectory_.lane_id()) {
@@ -47,7 +44,6 @@ void ADCTrajectoryContainer::Insert(
 }
 
 const ADCTrajectory* ADCTrajectoryContainer::GetADCTrajectory() {
-  std::lock_guard<std::mutex> lock(g_mutex_);
   return &adc_trajectory_;
 }
 

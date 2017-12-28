@@ -23,7 +23,6 @@
 #define MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
 
 #include <memory>
-#include <mutex>
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -76,7 +75,6 @@ class PoseContainer : public Container {
 
  private:
   std::unique_ptr<apollo::perception::PerceptionObstacle> obstacle_ptr_;
-  static std::mutex g_mutex_;
 };
 
 }  // namespace prediction
