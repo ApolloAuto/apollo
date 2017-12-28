@@ -23,7 +23,8 @@ from numpy.polynomial.polynomial import polyval
 
 
 class Obstacle:
-    def __init__(self, x, y):
+    def __init__(self, obstacle_id, x, y):
+        self.obstacle_id = obstacle_id
         self.x = x
         self.y = y
         self.lane = 0
@@ -66,11 +67,21 @@ class MobileyeProvider:
         self.last_speed = None
         self.last_heading = None
 
+        self.lane_marker_processed = False
+        self.history_processed = False
+        self.obstacles_processed = False
+
     def update(self, mobileye_pb):
+        self.lane_marker_processed = False
+        self.history_processed = False
+        self.obstacles_processed = False
+
         self.mobileye_pb = mobileye_pb
         self.process_lane_markers()
 
     def process_lane_markers(self):
+        if self.lane_marker_processed:
+            return
         rc0 = self.mobileye_pb.lka_768.position
         rc1 = self.mobileye_pb.lka_769.heading_angle
         rc2 = self.mobileye_pb.lka_768.curvature
@@ -88,7 +99,11 @@ class MobileyeProvider:
         self.left_lm_quality = self.mobileye_pb.lka_766.quality / 3.0
         self.right_lm_quality = self.mobileye_pb.lka_768.quality / 3.0
 
+        self.lane_marker_processed = True
+
     def process_history(self, heading, speed):
+        if self.history_processed:
+            return
         history_len = len(self.history_left_lines)
         if self.last_speed is None:
             self.history_left_lines = []
@@ -139,14 +154,20 @@ class MobileyeProvider:
         self.last_speed = speed
         self.last_heading = heading
 
+        self.history_processed = True
+
     def process_obstacles(self):
+        if self.obstacles_processed:
+            return
+
         if self.mobileye_pb is None:
             return
         self.obstacles = []
         for i in range(len(self.mobileye_pb.details_739)):
+            obstacle_id = self.mobileye_pb.details_739[i].obstacle_id
             x = self.mobileye_pb.details_739[i].obstacle_pos_x
             y = self.mobileye_pb.details_739[i].obstacle_pos_y
-            obstacle = Obstacle(x, y)
+            obstacle = Obstacle(obstacle_id, x, y)
             obstacle.rel_speed = self.mobileye_pb.details_739[
                 i].obstacle_rel_vel_x
             if i < len(self.mobileye_pb.details_73a):
@@ -155,6 +176,8 @@ class MobileyeProvider:
                     i].obstacle_length
                 obstacle.width = self.mobileye_pb.details_73a[i].obstacle_width
             self.obstacles.append(obstacle)
+
+        self.obstacles_processed = True
 
     def routing_correct(self, routing_provider, localization_provider):
         routing_segment = routing_provider.get_segment()
