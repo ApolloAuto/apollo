@@ -501,10 +501,12 @@ Status QpSplineStGraph::GetSConstraintByTime(
         boundary->boundary_type() == StBoundary::BoundaryType::FOLLOW ||
         boundary->boundary_type() == StBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
-    } else {
-      DCHECK(boundary->boundary_type() == StBoundary::BoundaryType::OVERTAKE)
-          << "id = " << boundary->id();
+    } else if (boundary->boundary_type() ==
+               StBoundary::BoundaryType::OVERTAKE) {
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
+    } else {
+      AWARN << "Unhandled boundary type: "
+            << StBoundary::TypeName(boundary->boundary_type());
     }
   }
 

@@ -71,6 +71,8 @@ class StBoundary : public common::math::Polygon2d {
     KEEP_CLEAR,
   };
 
+  static std::string TypeName(BoundaryType type);
+
   BoundaryType boundary_type() const;
   const std::string& id() const;
   double characteristic_length() const;
