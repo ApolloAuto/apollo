@@ -37,6 +37,11 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class Obstacle
+ *
+ * @brief Obstacle represents one perception obstacle.
+ */
 class Obstacle {
  public:
   Obstacle() = default;
