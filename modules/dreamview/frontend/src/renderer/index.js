@@ -27,7 +27,7 @@ class Renderer {
             antialias: useAntialias
         });
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x14171A);
+        this.scene.background = new THREE.Color(0x000C17);
 
         // The dimension of the scene
         this.dimension = {
