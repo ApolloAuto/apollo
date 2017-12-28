@@ -12,7 +12,7 @@ output of HDL-64ES3:
 
 If the topic data is displayed on the terminal, the LiDAR works normally.
 
-### How to Check INS Status?
+## How to Check INS Status?
 
 Using Novatel INS as an example, type the following command to check the INS status:
 
@@ -22,7 +22,7 @@ rostopic echo /apollo/sensor/gnss/ins_stat
 
 Find the `pos_type` field:  If the value is 56, it has entered a good positioning status (RTK_FIXED) and can be used for calibration. If it is not 56, reliable calibration results cannot be obtained.
 
-### How to Complete a Quality Inspection?
+## How to Complete a Quality Inspection?
 
 At present, you complete the quality verification manually with a visual inspection of the results.
 
@@ -30,12 +30,12 @@ When the calibration is completed, the point cloud stitched during the calibrati
 
 Figure 1 shows the comparison between the stitched point clouds with good (a) and insufficient(b) calibration quality.
 
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/images/good_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/calibration/lidar_calibration/good_calib.png)
 <p align="center">
 (a)
 </p>
 
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/lidar_calibration/images/poor_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/calibration/lidar_calibration/poor_calib.png)
 <p align="center">
 (b)
 </p>
