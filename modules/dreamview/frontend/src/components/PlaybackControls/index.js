@@ -14,7 +14,7 @@ export default class PlaybackControls extends React.Component {
         this.state = {
             rate: 1.0,
             isPlaying: false,
-            nextScreenMode: 'fullscreen',
+            nextScreenMode: 'normalscreen',
         };
 
         this.nextAction = 'play';
