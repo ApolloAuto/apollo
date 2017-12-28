@@ -65,7 +65,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
       path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
       ADEBUG << "obstacle " << id << " is blocking.";
-    } else {
+    } else if (FLAGS_enable_side_vehicle_st_boundary) {
       if (obstacle->obstacle()->IsVirtual()) {
         continue;
       }
@@ -73,16 +73,26 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
         continue;
       }
       ADEBUG << "obstacle " << id << " is NOT blocking.";
-      auto st_boundary_aaa = path_decision_.Find(id)->st_boundary();
-      auto st_boundary = st_boundary_aaa.CutOffByT(3.0).ExpandByS(5.0);
+      auto st_boundary_copy = path_decision_.Find(id)->st_boundary();
+      auto st_boundary = st_boundary_copy.CutOffByT(3.5);
       if (!st_boundary.IsEmpty()) {
+        auto decision = obstacle->LongitudinalDecision();
+        if (decision.has_yield()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
+        } else if (decision.has_overtake()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::OVERTAKE);
+        } else if (decision.has_follow()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::FOLLOW);
+        } else if (decision.has_stop()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
+        }
+        st_boundary.SetId(st_boundary_copy.id());
+        st_boundary.SetCharacteristicLength(
+            st_boundary_copy.characteristic_length());
+
         path_decision->SetStBoundary(id, st_boundary);
         boundaries.push_back(&obstacle->st_boundary());
       }
-      ADEBUG << "dp_st st_boundary_aaa: min_t = " << st_boundary_aaa.min_t()
-             << ", max_t = " << st_boundary_aaa.max_t()
-             << ", min_s = " << st_boundary_aaa.min_s()
-             << ", st_boundary_aaa.max_s() = " << st_boundary_aaa.max_s();
     }
   }
 
