@@ -43,8 +43,8 @@ MSFLocalization::MSFLocalization()
     : monitor_logger_(MonitorMessageItem::LOCALIZATION),
       localization_state_(LocalizationMeasureState::OK),
       pcd_msg_index_(-1),
-      latest_lidar_localization_status_(0),
-      latest_gnss_localization_status_(0) {}
+      latest_lidar_localization_status_(MeasureState::NOT_VALID),
+      latest_gnss_localization_status_(MeasureState::NOT_VALID) {}
 
 Status MSFLocalization::Start() {
   AdapterManager::Init(FLAGS_msf_adapter_config_file);
@@ -252,7 +252,8 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
     auto itr = lidar_localization_list.begin();
     auto itr_end = lidar_localization_list.end();
     for (; itr != itr_end; ++itr) {
-      latest_lidar_localization_status_ = static_cast<uint32_t>(itr->state());
+      latest_lidar_localization_status_
+          = static_cast<MeasureState>(itr->state());
       if (itr->state() == LocalizationMeasureState::OK
           || itr->state() == LocalizationMeasureState::VALID) {
         // publish lidar message to debug
@@ -282,7 +283,7 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
     apollo::common::Header *status_headerpb = status.mutable_header();
     status_headerpb->set_timestamp_sec(
         itr->localization().header().timestamp_sec());
-    status.set_fusion_status(static_cast<uint32_t>(itr->state()));
+    status.set_fusion_status(static_cast<MeasureState>(itr->state()));
     status.set_lidar_status(latest_lidar_localization_status_);
     status.set_gnss_status(latest_gnss_localization_status_);
     status.set_measurement_time(itr->localization().measurement_time());
@@ -326,7 +327,8 @@ void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
     auto itr = gnss_localization_list.begin();
     auto itr_end = gnss_localization_list.end();
     for (; itr != itr_end; ++itr) {
-      latest_gnss_localization_status_ = static_cast<uint32_t>(itr->state());
+      latest_gnss_localization_status_
+          = static_cast<MeasureState>(itr->state());
       if (itr->state() == LocalizationMeasureState::OK
           || itr->state() == LocalizationMeasureState::VALID) {
         AdapterManager::PublishLocalizationMsfGnss(itr->localization());
@@ -353,7 +355,8 @@ void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
     auto itr = gnss_localization_list.begin();
     auto itr_end = gnss_localization_list.end();
     for (; itr != itr_end; ++itr) {
-      latest_gnss_localization_status_ = static_cast<uint32_t>(itr->state());
+      latest_gnss_localization_status_
+          = static_cast<MeasureState>(itr->state());
       if (itr->state() == LocalizationMeasureState::OK
           || itr->state() == LocalizationMeasureState::VALID) {
         AdapterManager::PublishLocalizationMsfGnss(itr->localization());
