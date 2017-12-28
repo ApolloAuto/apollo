@@ -162,16 +162,17 @@ class VisualizationEngine {
   ~VisualizationEngine() = default;
 
  public:
-  bool Init(const std::string &map_folder, const VisualMapParam &map_param,
-            const unsigned int resolution_id, const int zone_id,
-            const Eigen::Affine3d &extrinsic,
+  bool Init(const std::string &map_folder, const std::string &map_visual_folder,
+            const VisualMapParam &map_param, const unsigned int resolution_id,
+            const int zone_id, const Eigen::Affine3d &extrinsic,
             const unsigned int loc_info_num = 1);
   void Visualize(const std::vector<LocalizatonInfo> &loc_infos,
                  const std::vector<Eigen::Vector3d> &cloud);
   void SetAutoPlay(bool auto_play);
 
  private:
-  void Preprocess(const std::string &map_folder);
+  void Preprocess(const std::string &map_folder,
+                  const std::string &map_visual_folder);
   void Draw();
   void DrawLoc(const cv::Point &bias);
   void DrawStd(const cv::Point &bias);
@@ -240,6 +241,7 @@ class VisualizationEngine {
 
  private:
   std::string map_folder_;
+  std::string map_visual_folder_;
   VisualMapParam map_param_;
   unsigned int zone_id_ = 50;
   unsigned int resolution_id_ = 0;

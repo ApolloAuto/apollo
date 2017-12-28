@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
 
   const std::string basedir = boost_args["basedir"].as<std::string>();
   std::string map_folder = basedir + "/local_map";
+  std::string map_visual_folder = basedir + "/local_map/map_visual";
   std::string pcd_folder = basedir + "/pcd";
   std::string pcd_timestamp_file = pcd_folder + "/pcd_timestamp.txt";
   std::string gnss_loc_file = pcd_folder + "/gnss_loc.txt";
@@ -46,8 +47,8 @@ int main(int argc, char **argv) {
 
   apollo::localization::msf::OfflineLocalVisualizer local_visualizer;
   bool success = local_visualizer.Init(
-      map_folder, pcd_folder, pcd_timestamp_file, gnss_loc_file, lidar_loc_file,
-      fusion_loc_file, extrinsic_file);
+      map_folder, map_visual_folder, pcd_folder, pcd_timestamp_file,
+      gnss_loc_file, lidar_loc_file, fusion_loc_file, extrinsic_file);
   if (!success) {
     return -1;
   }
