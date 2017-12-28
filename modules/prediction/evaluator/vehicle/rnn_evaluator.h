@@ -18,7 +18,6 @@
 #define MODULES_PREDICTION_EVALUATOR_VEHICLE_RNN_EVALUATOR_H_
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
