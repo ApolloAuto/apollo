@@ -24,7 +24,6 @@
 
 #include <deque>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -229,7 +228,6 @@ class Obstacle {
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
   std::vector<Eigen::MatrixXf> rnn_states_;
   bool rnn_enabled_ = false;
-  static std::mutex mutex_;
 };
 
 }  // namespace prediction

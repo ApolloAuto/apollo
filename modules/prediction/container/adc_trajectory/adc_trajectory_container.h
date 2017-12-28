@@ -23,7 +23,6 @@
 #define MODULES_PREDICTION_CONTAINER_ADC_TRAJECTORY_OBSTACLES_H_
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -96,7 +95,6 @@ class ADCTrajectoryContainer : public Container {
   apollo::planning::ADCTrajectory adc_trajectory_;
   apollo::common::math::Polygon2d junction_polygon_;
   std::unordered_set<std::string> reference_line_lane_ids_;
-  static std::mutex g_mutex_;
 };
 
 }  // namespace prediction
