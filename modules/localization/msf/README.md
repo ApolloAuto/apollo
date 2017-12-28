@@ -9,6 +9,7 @@
   * Gnss best pose from Gnss sensor (ROS topic is `/apollo/sensor/gnss/best_pose`)
   * Imu data from IMU sensor (ROS topic `/apollo/sensor/gnss/imu`)
   * Localization map (FLAGS_map_dir + "/" + FLAGS_local_map_name)
+  * Parameter config files (velodyne64_novatel_extrinsics_example.yaml, velodyne64_height.yaml, and ant_imu_leverarm.yaml, located in `modules/localization/msf/params/`)
 
 ## Output
   * Localization result defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`. (ROS topic `/apollo/localization/pose`)
