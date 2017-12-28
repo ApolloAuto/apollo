@@ -78,8 +78,7 @@ class QpSplineStGraph {
       double* const s_lower_bound) const;
 
   // reference line kernel is a constant s line at s = 250m
-  common::Status AddCruiseReferenceLineKernel(const SpeedLimit& speed_limit,
-                                              const double weight);
+  common::Status AddCruiseReferenceLineKernel(const double weight);
 
   // follow line kernel
   common::Status AddFollowReferenceLineKernel(
