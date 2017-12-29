@@ -37,6 +37,7 @@ class SequencePredictor : public Predictor {
     LEFT,
     RIGHT,
     STRAIGHT,
+    ONTO_LANE,
     INVALID,
   };
 
