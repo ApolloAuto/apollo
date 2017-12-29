@@ -39,8 +39,10 @@ EndConditionSampler::~EndConditionSampler() {
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
   std::vector<std::pair<std::array<double, 3>, double>> end_d_conditions;
-  std::array<double, 5> end_d_candidates = {0.0, -0.25, -0.5, 0.25, 0.5};
-  std::array<double, 5> end_s_candidates = {20.0, 30.0, 40.0, 50.0, 60.0};
+  //std::array<double, 5> end_d_candidates = {0.0, -0.25, -0.5, 0.25, 0.5};
+  //std::array<double, 5> end_s_candidates = {20.0, 30.0, 40.0, 50.0, 60.0};
+  std::array<double, 3> end_d_candidates = {0.0, -0.25, 0.25};
+  std::array<double, 3> end_s_candidates = {20.0, 35.0, 50.0};
 
   for (const auto& s : end_s_candidates) {
     for (const auto& d : end_d_candidates) {
@@ -63,7 +65,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(const double ref_cruise_s
 
   // velocity samples consists of 10 equally distributed samples plus ego's
   // current velocity
-  constexpr std::size_t num_velocity_section = 11;
+  constexpr std::size_t num_velocity_section = 6;
 
   double velocity_upper = std::max(ref_cruise_speed, init_s_[1]);
   double velocity_lower = 0.0;

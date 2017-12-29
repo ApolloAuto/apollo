@@ -122,16 +122,16 @@ bool LatticeConstraintChecker::IsValidTrajectory(
     double lon_a = points[i].a();
     if (lon_a < FLAGS_longitudinal_acceleration_lower_bound ||
         lon_a > FLAGS_longitudinal_acceleration_upper_bound) {
-      AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
-      AINFO << "\tlon acc. exceeds boundary; lon_a = " << lon_a;
+      ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
+      ADEBUG << "\tlon acc. exceeds boundary; lon_a = " << lon_a;
       return false;
     }
 
     double lat_a = std::abs(
         points[i].v() * points[i].v() * points[i].path_point().kappa());
     if (lat_a > FLAGS_lateral_acceleration_bound) {
-      AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
-      AINFO << "\tlat acc. exceeds boundary; lat_a = " << lat_a;
+      ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
+      ADEBUG << "\tlat acc. exceeds boundary; lat_a = " << lat_a;
       return false;
     }
 
@@ -144,8 +144,8 @@ bool LatticeConstraintChecker::IsValidTrajectory(
       double j = (lon_a - last_lon_a) / dt;
       if (j < FLAGS_longitudinal_jerk_lower_bound ||
           j > FLAGS_longitudinal_jerk_upper_bound) {
-        AINFO << "LatticeConstraintChecker::IsValidTrajectory:\t";
-        AINFO << "\tjerk exceeds boundary; j = " << j;
+        ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
+        ADEBUG << "\tjerk exceeds boundary; j = " << j;
         return false;
       }
     }

@@ -23,6 +23,7 @@
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
