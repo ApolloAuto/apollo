@@ -28,7 +28,7 @@ LatticeTrajectory1d::LatticeTrajectory1d(std::shared_ptr<Curve1d> ptr_trajectory
 double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
     const double param) const {
   double param_length = ptr_trajectory1d_->ParamLength();
-  if (param_length < param) {
+  if (param < param_length) {
     return ptr_trajectory1d_->Evaluate(order, param);
   }
 
