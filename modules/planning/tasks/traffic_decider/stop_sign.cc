@@ -483,7 +483,8 @@ int StopSign::RemoveWatchVehicle(
     for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
         it != watch_vehicles->end(); ++it) {
       std::vector<std::string> vehicles = it->second;
-      std::remove(vehicles.begin(), vehicles.end(), obstacle_id);
+      vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
+                                 obstacle_id));
     }
   }
 
