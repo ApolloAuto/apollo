@@ -117,7 +117,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
       reference_line_info_->path_decision()->path_obstacles().Items(),
       adc_sl_boundary_);
 
-  if (!st_graph.Search(path_decision, speed_data).ok()) {
+  if (!st_graph.Search(speed_data).ok()) {
     const std::string msg(
         "With history decision: failed to search graph with dynamic "
         "programming.");

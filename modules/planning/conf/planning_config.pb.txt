@@ -48,7 +48,6 @@ em_planner_config {
         go_up_buffer: 5.0
 
         default_obstacle_cost: 1e3
-        obstacle_cost_factor: -300
 
         default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
