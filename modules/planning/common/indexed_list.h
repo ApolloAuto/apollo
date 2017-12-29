@@ -28,6 +28,8 @@
 
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
+
+#include "modules/common/log.h"
 #include "modules/common/util/map_util.h"
 
 namespace apollo {
@@ -37,19 +39,25 @@ template <typename I, typename T>
 class IndexedList {
  public:
   /**
-   * @brief copy object into the container
+   * @brief copy object into the container. If the id is already exist,
+   * overwrite the object in the container.
    * @param id the id of the object
    * @param object the const reference of the objected to be copied to the
    * container.
    * @return The pointer to the object in the container.
    */
   T* Add(const I id, const T& object) {
-    if (!apollo::common::util::InsertIfNotPresent(&object_dict_, id, object)) {
-      return nullptr;
+    auto obs = Find(id);
+    if (obs) {
+      AWARN << "object " << id << " is already in container";
+      *obs = object;
+      return obs;
+    } else {
+      object_dict_.insert({id, object});
+      auto* ptr = &object_dict_.at(id);
+      object_list_.push_back(ptr);
+      return ptr;
     }
-    T* ret = &object_dict_.at(id);
-    object_list_.push_back(ret);
-    return ret;
   }
 
   /**
