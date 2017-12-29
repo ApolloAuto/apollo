@@ -195,8 +195,9 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     position[0] = feature.t_position().x();
     position[1] = feature.t_position().y();
   }
-  double time_to_lane_center =
-      ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence);
+  double time_to_lane_center = std::max(
+      FLAGS_default_time_to_lane_center,
+      ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence));
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
