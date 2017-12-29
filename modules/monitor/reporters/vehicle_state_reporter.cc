@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/monitor/online_report/vehicle_state_reporter.h"
+#include "modules/monitor/reporters/vehicle_state_reporter.h"
 
 #include "gflags/gflags.h"
 #include "modules/common/log.h"

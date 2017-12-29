@@ -1,8 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "recorder_conf",
+    name = "static_info_conf",
     srcs = [
-        "recorder_conf.pb.txt",
+        "static_info_conf.pb.txt",
     ],
 )
