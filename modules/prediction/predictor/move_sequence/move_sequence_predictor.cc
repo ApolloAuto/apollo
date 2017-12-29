@@ -222,7 +222,6 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
 
   size_t total_num = static_cast<size_t>(total_time / period);
   size_t num_to_center = static_cast<size_t>(time_to_lane_center / period);
-  AERROR << "Obstacle: " << obstacle.id();
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
@@ -447,6 +446,7 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
+  double theta = feature.velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     position(0) = feature.t_position().x();
     position(1) = feature.t_position().y();
@@ -475,7 +475,7 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
 
   size_t num = static_cast<size_t>(total_time / period);
   apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, num, period, points);
+      &state, transition, theta, num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
