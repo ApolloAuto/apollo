@@ -49,6 +49,12 @@ class LatticeTrajectory1d : public Curve1d {
 
   double target_time() const;
 
+  void set_target_position(double target_position);
+
+  void set_target_velocity(double target_velocity);
+
+  void set_target_time(double target_time);
+
  private:
   std::shared_ptr<Curve1d> ptr_trajectory1d_;
 

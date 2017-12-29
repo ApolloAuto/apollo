@@ -192,6 +192,12 @@ Status LatticePlanner::Plan(
 
     num_lattice_traj += 1;
     reference_line_info->SetTrajectory(combined_trajectory);
+    // Print the chosen end condition and start condition
+    //AINFO << "   --- Starting Pose: s=" << init_s[0] <<
+    //         " ds=" << init_s[1] << " dds=" << init_s[2];
+    //AINFO << "   --- Ending Pose:   s=" <<  *trajectory_pair.first->target_position()
+    //      << " ds=" << *trajectory_pair.first->target_velocity()
+    //      << " t=" << *trajectory_pair.first->target_time();
     break;
     /*
     auto combined_trajectory_path =
