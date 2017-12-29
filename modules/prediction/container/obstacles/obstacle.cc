@@ -1054,6 +1054,10 @@ void Obstacle::SetMotionStatus() {
   double speed = (FLAGS_enable_kf_tracking ? feature_history_.front().t_speed()
                                            : feature_history_.front().speed());
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
+  if (type_ == PerceptionObstacle::PEDESTRIAN ||
+      type_ == PerceptionObstacle::BICYCLE) {
+    speed_threshold = FLAGS_still_pedestrian_speed_threshold;
+  }
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_
            << "] has a small speed [" << speed
