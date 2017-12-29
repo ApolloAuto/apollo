@@ -36,15 +36,15 @@ if [ ! -e "$APOLLO_ROOT/.git" ];then
     exit 1
 fi
 
-type curl > /dev/null 2&>1 || { echo >&2 "command curl not found, please install it with: sudo apt-get install curl" ; exit 1}
-type perl > /dev/null 2&>1 || { echo >&2 "command perl not found, please install it with: sudo apt-get install perl-base" ; exit 1}
+type curl >/dev/null 2>&1 || { error >&2 "command curl not found, please install it with: sudo apt-get install curl" ; exit 1; }
+type perl >/dev/null 2>&1 || { error >&2 "command perl not found, please install it with: sudo apt-get install perl-base" ; exit 1; }
 
 function uninstall()
 {
     if [ -L "$APOLLO_ROOT/.git/hooks/post-commit" ];then
-        pushd $APOLLO_ROOT/.git/hooks > /dev/null
+        pushd $APOLLO_ROOT/.git/hooks >/dev/null
         rm post-commit
-        popd > /dev/null
+        popd >/dev/null
         ok "sanity check was removed."
     fi
 }
@@ -66,7 +66,7 @@ if [ ! -e $HOOKS_DIR ];then
     mkdir -p $HOOKS_DIR
 fi
 
-pushd $HOOKS_DIR > /dev/null || error "Enter $HOOKS_DIR failed."
+pushd $HOOKS_DIR >/dev/null || error "Enter $HOOKS_DIR failed."
 
 for i in $HOOK_SCRITPS
 do
@@ -80,10 +80,10 @@ do
     fi
 done
 
-popd > /dev/null
+popd >/dev/null
 
 if [ ! -e "$APOLLO_ROOT/.git/hooks/post-commit" ];then
-    pushd $APOLLO_ROOT/.git/hooks > /dev/null || error "Enter target dir failed. "
+    pushd $APOLLO_ROOT/.git/hooks >/dev/null || error "Enter target dir failed. "
     #info "deploy hooks..."
     ln -s $HOOKS_DIR/git_post_commit_hook post-commit
     if [ $? -eq 0 ];then
@@ -91,7 +91,9 @@ if [ ! -e "$APOLLO_ROOT/.git/hooks/post-commit" ];then
     else
         error "Failed to deploy sannity check."
     fi
-    popd > /dev/null
+    popd >/dev/null
 elif [ -L "$APOLLO_ROOT/.git/hooks/post-commit" ];then
     info "Sanity check seems already deployed."
+elif [ -f "$APOLLO_ROOT/.git/hooks/post-commit" ];then
+    info "$APOLLO_ROOT/.git/hooks/post-commit hook seems already exists, please backup it and run this script again."
 fi
