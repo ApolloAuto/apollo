@@ -25,7 +25,7 @@ source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-VERSION="release-${MACHINE_ARCH}-latest"
+VERSION="release-${MACHINE_ARCH}-v2.0.0"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
