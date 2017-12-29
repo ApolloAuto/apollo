@@ -62,7 +62,6 @@ DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_int32(max_num_obstacles);
 DECLARE_bool(enable_adjust_velocity_heading);
-DECLARE_double(heading_diff_thred);
 DECLARE_double(valid_position_diff_thred);
 
 // evaluator
