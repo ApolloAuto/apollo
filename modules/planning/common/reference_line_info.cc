@@ -164,9 +164,15 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
 }
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
-  auto path_obstacle_ptr =
-      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  auto* path_obstacle = path_decision_.AddPathObstacle(*path_obstacle_ptr);
+  if (!obstacle) {
+    AERROR << "The provided obstacle is empty";
+    return nullptr;
+  }
+  auto* path_obstacle = path_decision_.AddPathObstacle(PathObstacle(obstacle));
+  if (!path_obstacle) {
+    AERROR << "failed to add obstacle " << obstacle->Id();
+    return nullptr;
+  }
 
   SLBoundary perception_sl;
   if (!reference_line_.GetSLBoundary(obstacle->PerceptionBoundingBox(),
