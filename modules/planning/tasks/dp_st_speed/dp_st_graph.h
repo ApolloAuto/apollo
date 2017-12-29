@@ -47,8 +47,7 @@ class DpStGraph {
             const std::vector<const PathObstacle*>& obstacles,
             const SLBoundary& adc_sl_boundary);
 
-  apollo::common::Status Search(PathDecision* const path_decision,
-                                SpeedData* const speed_data);
+  apollo::common::Status Search(SpeedData* const speed_data);
 
  private:
   apollo::common::Status InitCostTable();

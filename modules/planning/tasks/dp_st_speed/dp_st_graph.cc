@@ -73,8 +73,7 @@ DpStGraph::DpStGraph(const ReferenceLine& reference_line,
                 st_graph_data_.path_data_length()));
 }
 
-Status DpStGraph::Search(PathDecision* const path_decision,
-                         SpeedData* const speed_data) {
+Status DpStGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
