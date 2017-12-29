@@ -58,15 +58,16 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
 DpStGraph::DpStGraph(const ReferenceLine& reference_line,
                      const StGraphData& st_graph_data,
                      const DpStSpeedConfig& dp_config,
-                     const PathData& path_data,
+                     const std::vector<const PathObstacle*>& obstacles,
                      const SLBoundary& adc_sl_boundary)
     : reference_line_(reference_line),
-      dp_st_speed_config_(dp_config),
       st_graph_data_(st_graph_data),
+      dp_st_speed_config_(dp_config),
+      obstacles_(obstacles),
       vehicle_param_(VehicleConfigHelper::GetConfig().vehicle_param()),
-      adc_sl_boundary_(adc_sl_boundary),
-      dp_st_cost_(dp_config),
-      init_point_(st_graph_data.init_point()) {
+      init_point_(st_graph_data.init_point()),
+      dp_st_cost_(dp_config, obstacles, init_point_),
+      adc_sl_boundary_(adc_sl_boundary) {
   dp_st_speed_config_.set_total_path_length(
       std::fmin(dp_st_speed_config_.total_path_length(),
                 st_graph_data_.path_data_length()));
@@ -152,7 +153,7 @@ void DpStGraph::CalculatePointwiseCost(
     for (auto& st_graph_point : cost_table_[i]) {
       double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
                                                      reference_points[i]);
-      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point, boundaries);
+      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point);
       st_graph_point.SetReferenceCost(ref_cost);
       st_graph_point.SetObstacleCost(obs_cost);
       st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());
