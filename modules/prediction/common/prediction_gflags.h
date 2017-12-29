@@ -48,6 +48,7 @@ DECLARE_double(go_approach_rate);
 DECLARE_double(cutin_approach_rate);
 DECLARE_int32(still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
+DECLARE_double(still_pedestrian_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
