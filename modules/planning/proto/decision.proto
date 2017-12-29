@@ -18,6 +18,7 @@ message ObjectIgnore {
 }
 
 enum StopReasonCode {
+  STOP_REASON_UNKNOWN = 0;
   STOP_REASON_HEAD_VEHICLE = 1;
   STOP_REASON_DESTINATION = 2;
   STOP_REASON_PEDESTRIAN = 3;
