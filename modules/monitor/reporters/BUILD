@@ -3,6 +3,17 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "static_info_reporter",
+    srcs = ["static_info_reporter.cc"],
+    hdrs = ["static_info_reporter.h"],
+    deps = [
+        "//modules/common/adapters:adapter_manager",
+        "//modules/data/util:info_collector",
+        "//modules/monitor/common:recurrent_runner",
+    ],
+)
+
+cc_library(
     name = "vehicle_state_reporter",
     srcs = ["vehicle_state_reporter.cc"],
     hdrs = ["vehicle_state_reporter.h"],
