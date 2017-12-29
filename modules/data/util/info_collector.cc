@@ -33,7 +33,6 @@ namespace {
 using apollo::common::KVDB;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::SetProtoToASCIIFile;
-using apollo::common::util::TranslatePath;
 using google::protobuf::Map;
 using google::protobuf::RepeatedPtrField;
 
@@ -43,7 +42,7 @@ Map<std::string, std::string> LoadFiles(
   Map<std::string, std::string> result;
   std::string content;
   for (const auto &file : files) {
-    if (apollo::common::util::GetContent(TranslatePath(file), &content)) {
+    if (apollo::common::util::GetContent(file, &content)) {
       result.insert({file, content});
     } else {
       AERROR << "Cannot load file " << file;
