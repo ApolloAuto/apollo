@@ -232,7 +232,7 @@ function release() {
   MODULES_DIR="${APOLLO_DIR}/modules"
   mkdir -p $MODULES_DIR
   for m in common control canbus localization decision perception dreamview map \
-       prediction planning routing calibration third_party_perception monitor \
+       prediction planning routing calibration third_party_perception monitor data \
        drivers/delphi_esr \
        drivers/gnss \
        drivers/conti_radar
