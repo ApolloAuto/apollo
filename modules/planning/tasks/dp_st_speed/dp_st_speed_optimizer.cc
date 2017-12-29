@@ -112,8 +112,10 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
   const double path_length = path_data.discretized_path().Length();
   StGraphData st_graph_data(boundaries, init_point_, speed_limit, path_length);
 
-  DpStGraph st_graph(*reference_line_, st_graph_data, dp_st_speed_config_,
-                     path_data, adc_sl_boundary_);
+  DpStGraph st_graph(
+      *reference_line_, st_graph_data, dp_st_speed_config_,
+      reference_line_info_->path_decision()->path_obstacles().Items(),
+      adc_sl_boundary_);
 
   if (!st_graph.Search(path_decision, speed_data).ok()) {
     const std::string msg(

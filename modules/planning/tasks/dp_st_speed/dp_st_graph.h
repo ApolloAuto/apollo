@@ -30,6 +30,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_cost.h"
@@ -43,7 +44,8 @@ class DpStGraph {
  public:
   DpStGraph(const ReferenceLine& reference_line,
             const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
-            const PathData& path_data, const SLBoundary& adc_sl_boundary);
+            const std::vector<const PathObstacle*>& obstacles,
+            const SLBoundary& adc_sl_boundary);
 
   apollo::common::Status Search(PathDecision* const path_decision,
                                 SpeedData* const speed_data);
@@ -77,21 +79,25 @@ class DpStGraph {
 
  private:
   const ReferenceLine& reference_line_;
+
+  const StGraphData& st_graph_data_;
+
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
 
-  const StGraphData& st_graph_data_;
+  // obstacles based on the current reference line
+  const std::vector<const PathObstacle*>& obstacles_;
 
   // vehicle configuration parameter
   const common::VehicleParam& vehicle_param_;
 
-  const SLBoundary& adc_sl_boundary_;
+  // initial status
+  common::TrajectoryPoint init_point_;
 
   // cost utility with configuration;
   DpStCost dp_st_cost_;
 
-  // initial status
-  common::TrajectoryPoint init_point_;
+  const SLBoundary& adc_sl_boundary_;
 
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;
