@@ -503,62 +503,21 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     const ReferenceLine &reference_line, double s) const {
   AnchorPoint anchor;
   anchor.longitudinal_bound = smoother_config_.longitudinal_boundary_bound();
-  const auto half_width =
+  const auto adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   auto ref_point = reference_line.GetReferencePoint(s);
-  if (FLAGS_reference_line_lateral_extension > 1e-6 &&
-      ref_point.lane_waypoints().empty()) {
-    double left_width = 0.0;
-    double right_width = 0.0;
-    reference_line.GetLaneWidth(s, &left_width, &right_width);
-    auto shift = (left_width - right_width) / 2.0 *
-                 Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
-    ref_point += shift;
-    anchor.path_point = ref_point.ToPathPoint(s);
-    double effective_width = (left_width + right_width) / 2.0;
-    anchor.lateral_bound = std::max(
-        smoother_config_.lateral_boundary_bound(),
-        effective_width - half_width - FLAGS_reference_line_lateral_buffer);
-  } else {
-    const auto &waypoint = ref_point.lane_waypoints().front();
-    auto left_boundary_type = LeftBoundaryType(waypoint);
-    double left_extend = 0.0;
-    if (left_boundary_type == hdmap::LaneBoundaryType::DOTTED_WHITE) {
-      auto neighbor = LeftNeighborWaypoint(waypoint);
-      if (neighbor.lane) {
-        if (neighbor.lane->lane().type() == hdmap::Lane::BIKING ||
-            neighbor.lane->lane().type() == hdmap::Lane::PARKING) {
-          left_extend = FLAGS_reference_line_lateral_extension;
-        }
-      }
-    }
-    auto right_boundary_type = RightBoundaryType(waypoint);
-    double right_extend = 0.0;
-    if (right_boundary_type == hdmap::LaneBoundaryType::DOTTED_WHITE) {
-      auto neighbor = RightNeighborWaypoint(waypoint);
-      if (neighbor.lane) {
-        if (neighbor.lane) {
-          if (neighbor.lane->lane().type() == hdmap::Lane::BIKING ||
-              neighbor.lane->lane().type() == hdmap::Lane::PARKING) {
-            left_extend = FLAGS_reference_line_lateral_extension;
-          }
-        }
-      }
-    }
-    double left_width = 0.0;
-    double right_width = 0.0;
-    reference_line.GetLaneWidth(s, &left_width, &right_width);
-    left_width += left_extend;
-    right_width += right_extend;
-    auto shift = (left_width - right_width) / 2.0 *
-                 Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
-    ref_point += shift;
-    anchor.path_point = ref_point.ToPathPoint(s);
-    double effective_width = (left_width + right_width) / 2.0;
-    anchor.lateral_bound = std::max(
-        smoother_config_.lateral_boundary_bound(),
-        effective_width - half_width - FLAGS_reference_line_lateral_buffer);
-  }
+  double left_width = 0.0;
+  double right_width = 0.0;
+  reference_line.GetLaneWidth(s, &left_width, &right_width);
+  auto shift = (left_width - right_width) / 2.0 *
+               Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
+  ref_point += shift;
+  anchor.path_point = ref_point.ToPathPoint(s);
+  double effective_width = (left_width + right_width) / 2.0 - adc_half_width -
+                           FLAGS_reference_line_lateral_buffer;
+  anchor.lateral_bound =
+      std::max(smoother_config_.lateral_boundary_bound(), effective_width);
+  anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
   return anchor;
 }
 
