@@ -26,6 +26,7 @@
 #include "modules/common/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
+#include "modules/data/proto/static_info.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
@@ -82,6 +83,7 @@ using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
 using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
 using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
+using StaticInfoAdapter = Adapter<apollo::data::StaticInfo>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using ContiRadarAdapter = Adapter<drivers::ContiRadar>;

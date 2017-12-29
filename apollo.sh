@@ -125,7 +125,8 @@ function build() {
   # Build python proto
   build_py_proto
 
-  # Update commit_id on compiling.
+  # Clear KV DB and update commit_id after compiling.
+  rm -fr data/kv_db
   python modules/tools/common/kv_db.py put \
       "apollo:data:commit_id" "$(git rev-parse HEAD)"
 
