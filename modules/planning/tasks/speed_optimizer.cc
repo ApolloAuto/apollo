@@ -20,7 +20,6 @@
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/tasks/speed_optimizer.h"
 
 namespace apollo {
@@ -109,8 +108,9 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed,
 
 SpeedData SpeedOptimizer::GenerateStopProfileFromPolynomial(
     const double init_speed, const double init_acc) const {
-  constexpr double kMaxT = 3.0;
-  for (double t = 2.0; t < kMaxT; t += 0.5) {
+  AERROR << "Slowing down the car with polynomial.";
+  constexpr double kMaxT = 4.0;
+  for (double t = 2.0; t <= kMaxT; t += 0.5) {
     for (double s = 0.0; s < 50.0; s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {
@@ -134,13 +134,12 @@ SpeedData SpeedOptimizer::GenerateStopProfileFromPolynomial(
 
 bool SpeedOptimizer::IsValidProfile(
     const QuinticPolynomialCurve1d& curve) const {
-  for (double evaluate_t = 0.1; evaluate_t <= t; evaluate_t += 0.2) {
-    const double v = curve.Evaluate(1, t);
-    const double a = curve.Evaluate(2, t);
-    if (v < 0) {
-      return false;
-    }
-    if (a < -5.0) {
+  for (double evaluate_t = 0.1; evaluate_t <= curve.ParamLength();
+       evaluate_t += 0.2) {
+    const double v = curve.Evaluate(1, evaluate_t);
+    const double a = curve.Evaluate(2, evaluate_t);
+    constexpr double kEpsilon = 1e-3;
+    if (v < -kEpsilon || a < -5.0) {
       return false;
     }
   }

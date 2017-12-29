@@ -22,6 +22,7 @@
 
 #include <algorithm>
 
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -112,14 +113,23 @@ bool ChangeLane::CreateGuardObstacle(
   double ref_s = sl_point.s() + kStepDistance;
   for (double t = last_point.relative_time() + time_delta; ref_s < end_s;
        ref_s += kStepDistance, s += kStepDistance, t += time_delta) {
-    auto ref_point = reference_line.GetNearestReferencepoint(s);
+    auto ref_point = reference_line.GetNearestReferencepoint(ref_s);
+
+    Vec2d xy_point;
+    if (!reference_line.SLToXY(common::util::MakeSLPoint(ref_s, sl_point.l()),
+                               &xy_point)) {
+      return false;
+    }
+
     auto* tp = obstacle->AddTrajectoryPoint();
     tp->set_a(0.0);
     tp->set_v(extend_v);
     tp->set_relative_time(t);
-    tp->mutable_path_point()->set_x(ref_point.x());
-    tp->mutable_path_point()->set_y(ref_point.y());
+    tp->mutable_path_point()->set_x(xy_point.x());
+    tp->mutable_path_point()->set_y(xy_point.y());
     tp->mutable_path_point()->set_theta(ref_point.heading());
+
+    // this is an approximate estimate since we do not use it.
     tp->mutable_path_point()->set_s(s);
     tp->mutable_path_point()->set_kappa(ref_point.kappa());
   }
