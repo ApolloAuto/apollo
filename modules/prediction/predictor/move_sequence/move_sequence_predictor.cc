@@ -82,28 +82,13 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
-  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
-    AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
+  if (feature.is_still()) {
+    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
     return;
   }
 
-  if (feature.is_still()) {
-    std::vector<TrajectoryPoint> points;
-    double position_x = feature.position().x();
-    double position_y = feature.position().y();
-    if (FLAGS_enable_kf_tracking) {
-      position_x = feature.t_position().x();
-      position_y = feature.t_position().y();
-    }
-    double theta = feature.theta();
-    ::apollo::prediction::predictor_util::GenerateStillSequenceTrajectoryPoints(
-        position_x, position_y, theta, FLAGS_prediction_duration,
-        FLAGS_prediction_period, &points);
-    Trajectory trajectory = GenerateTrajectory(points);
-    trajectory.set_probability(1.0);
-    trajectories_.push_back(std::move(trajectory));
-
-    ADEBUG << "Obstacle [" << obstacle->id() << "] has a still trajectory.";
+  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+    AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return;
   }
 
@@ -119,7 +104,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
     if (sequence.lane_segment_size() <= 0 ||
         sequence.lane_segment(0).lane_point_size() <= 0) {
-      AERROR << "Empty lane segments.";
+      ADEBUG << "Empty lane segments.";
       continue;
     }
 

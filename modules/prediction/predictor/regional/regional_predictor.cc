@@ -73,8 +73,13 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
-  double speed = 0.0;
   const Feature& feature = obstacle->latest_feature();
+  if (feature.is_still()) {
+    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
+    return;
+  }
+
+  double speed = 0.0;
   if (feature.has_speed()) {
     speed = feature.speed();
   }
