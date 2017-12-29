@@ -22,6 +22,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/http_client.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
@@ -29,7 +30,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/data/proto/task.pb.h"
+#include "modules/data/proto/static_info.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -348,6 +349,8 @@ void HMI::ChangeMapTo(const std::string &map_name) {
     AERROR << "Unknown map " << map_name;
     return;
   }
+  status_.set_current_map(map_name);
+  apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
   FLAGS_map_dir = *map_dir;
   // Append new map_dir flag to global flagfile.
@@ -357,9 +360,7 @@ void HMI::ChangeMapTo(const std::string &map_name) {
   // Also reload simulation map.
   CHECK(map_service_->ReloadMap(true)) << "Failed to load map from "
                                        << *map_dir;
-
   RunModeCommand("stop");
-  status_.set_current_map(map_name);
   BroadcastHMIStatus();
 }
 
@@ -373,6 +374,7 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
     return;
   }
   status_.set_current_vehicle(vehicle_name);
+  apollo::common::KVDB::Put("apollo:dreamview:vehicle", vehicle_name);
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
   RunModeCommand("stop");
@@ -391,6 +393,7 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
   }
   const std::string previous_mode = status_.current_mode();
   status_.set_current_mode(mode_name);
+  apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
 
   RunModeCommand(previous_mode, "stop");
   BroadcastHMIStatus();

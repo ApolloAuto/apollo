@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_ONLINE_REPORT_VEHICLE_STATE_REPORTER_H_
-#define MODULES_MONITOR_ONLINE_REPORT_VEHICLE_STATE_REPORTER_H_
+#ifndef MODULES_MONITOR_REPORTERS_VEHICLE_STATE_REPORTER_H_
+#define MODULES_MONITOR_REPORTERS_VEHICLE_STATE_REPORTER_H_
 
 #include "modules/monitor/common/recurrent_runner.h"
 
@@ -30,4 +30,4 @@ class VehicleStateReporter : public RecurrentRunner {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_ONLINE_REPORT_VEHICLE_STATE_REPORTER_H_
+#endif  // MODULES_MONITOR_REPORTERS_VEHICLE_STATE_REPORTER_H_

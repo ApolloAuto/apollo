@@ -125,6 +125,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::SYSTEM_STATUS:
         EnableSystemStatus(FLAGS_system_status_topic, config);
         break;
+      case AdapterConfig::STATIC_INFO:
+        EnableStaticInfo(FLAGS_static_info_topic, config);
+        break;
       case AdapterConfig::MOBILEYE:
         EnableMobileye(FLAGS_mobileye_topic, config);
         break;

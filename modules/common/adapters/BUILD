@@ -83,6 +83,7 @@ cc_library(
         "//modules/common/proto:drive_event_proto",
         "//modules/common/proto:gnss_status_proto",
         "//modules/control/proto:control_proto",
+        "//modules/data/proto:static_info_proto",
         "//modules/drivers/gnss/proto:ins_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:gps_proto",
