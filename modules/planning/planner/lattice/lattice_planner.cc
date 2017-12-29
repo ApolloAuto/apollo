@@ -205,6 +205,18 @@ Status LatticePlanner::Plan(
     AINFO << "   --- Ending Pose:   s=" <<  lattice_traj_ptr->target_position()
           << " ds=" << lattice_traj_ptr->target_velocity()
           << " t=" << lattice_traj_ptr->target_time();
+
+    AINFO << "Begin : DEBUGING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+    AINFO << "   --- InputPose";
+    AINFO << "          XY: " << planning_init_point.ShortDebugString();
+    AINFO << "           S: (" << init_s[0] << " " << init_s[1] << "," << init_s[2]<<")";
+    AINFO << "           L: (" << init_d[0] << " " << init_d[1] << "," << init_d[2]<<")";
+    AINFO << "   --- OutputTrajectory";
+    for (uint i = 0; i < 10; ++i) {
+      AINFO <<combined_trajectory_points[i].ShortDebugString();
+    }
+    AINFO << "End : DEBUGING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+
     break;
     /*
     auto combined_trajectory_path =
