@@ -268,7 +268,12 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
                     feature_history_.front().position().y();
     if (std::abs(diff_x) > FLAGS_valid_position_diff_thred &&
         std::abs(diff_y) > FLAGS_valid_position_diff_thred) {
-      velocity_heading = std::atan2(diff_y, diff_x);
+      double shift_heading = std::atan2(diff_y, diff_x);
+      double angle_diff = apollo::common::math::NormalizeAngle(
+          shift_heading - velocity_heading);
+      if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
+        velocity_heading = shift_heading;
+      }
     }
     velocity_x = speed * std::cos(velocity_heading);
     velocity_y = speed * std::sin(velocity_heading);
@@ -1051,11 +1056,11 @@ void Obstacle::SetMotionStatus() {
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_
-           << "] has a small speed and is considered stationary.";
+           << "] has a small speed [" << speed
+           << "] and is considered stationary.";
     feature_history_.front().set_is_still(true);
   } else if (speed_sensibility < speed_threshold) {
-    ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
-           << history_size
+    ADEBUG << "Obstacle [" << id_ << "]"
            << "] considered moving [sensibility = " << speed_sensibility << "]";
     feature_history_.front().set_is_still(false);
   } else {
