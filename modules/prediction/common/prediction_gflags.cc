@@ -58,6 +58,8 @@ DEFINE_int32(still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
 DEFINE_double(still_obstacle_speed_threshold, 2.0,
               "Speed threshold for still obstacles");
+DEFINE_double(still_pedestrian_speed_threshold, 0.5,
+              "Speed threshold for still pedestrians");
 DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
