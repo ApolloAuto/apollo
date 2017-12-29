@@ -26,6 +26,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 #include "modules/planning/tasks/task.h"
 
@@ -49,6 +50,9 @@ class SpeedOptimizer : public Task {
 
   SpeedData GenerateStopProfile(const double init_speed,
                                 const double init_acc) const;
+  SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
+                                              const double init_acc) const;
+  bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
 
   void RecordSTGraphDebug(const StGraphData& st_graph_data,
                           planning_internal::STGraphDebug* stGraphDebug) const;

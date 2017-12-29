@@ -22,7 +22,6 @@
 #include <limits>
 #include <unordered_set>
 #include <utility>
-#include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -43,8 +42,6 @@ using apollo::common::util::FindOrNull;
 using apollo::hdmap::LaneInfo;
 using apollo::perception::PerceptionObstacle;
 
-std::mutex Obstacle::mutex_;
-
 namespace {
 
 double Damp(const double x, const double sigma) {
@@ -55,13 +52,9 @@ double Damp(const double x, const double sigma) {
 
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
-int Obstacle::id() const {
-  std::lock_guard<std::mutex> lock(mutex_);
-  return id_;
-}
+int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
     return feature_history_.front().timestamp();
   } else {
@@ -70,56 +63,45 @@ double Obstacle::timestamp() const {
 }
 
 const Feature& Obstacle::feature(size_t i) const {
-  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(i < feature_history_.size());
   return feature_history_[i];
 }
 
 Feature* Obstacle::mutable_feature(size_t i) {
-  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(i < feature_history_.size());
   return &feature_history_[i];
 }
 
 const Feature& Obstacle::latest_feature() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   CHECK_GT(feature_history_.size(), 0);
   return feature_history_.front();
 }
 
 Feature* Obstacle::mutable_latest_feature() {
-  std::lock_guard<std::mutex> lock(mutex_);
-
   CHECK_GT(feature_history_.size(), 0);
   return &(feature_history_.front());
 }
 
-size_t Obstacle::history_size() const {
-  std::lock_guard<std::mutex> lock(mutex_);
-  return feature_history_.size();
-}
+size_t Obstacle::history_size() const { return feature_history_.size(); }
 
 const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
     const std::string& lane_id) {
-  std::lock_guard<std::mutex> lock(mutex_);
   return FindOrDie(kf_lane_trackers_, lane_id);
 }
 
 const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   return kf_motion_tracker_;
 }
 
 const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
-  std::lock_guard<std::mutex> lock(mutex_);
   return kf_pedestrian_tracker_;
 }
 
 bool Obstacle::IsOnLane() {
-  std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&
-        feature_history_.front().lane().has_lane_feature()) {
+        (feature_history_.front().lane().current_lane_feature_size() > 0 ||
+         feature_history_.front().lane().nearby_lane_feature_size() > 0)) {
       ADEBUG << "Obstacle [" << id_ << "] is on lane.";
       return true;
     }
@@ -165,8 +147,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetVelocity(perception_obstacle, &feature);
   SetAcceleration(&feature);
   SetTheta(perception_obstacle, &feature);
-  if (!kf_motion_tracker_enabled_) {
-    InitKFMotionTracker(&feature);
+  if (!kf_motion_tracker_.IsInitialized()) {
+    InitKFMotionTracker(feature);
   }
   UpdateKFMotionTracker(&feature);
   SetCurrentLanes(&feature);
@@ -174,8 +156,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetLaneGraphFeature(&feature);
   UpdateKFLaneTrackers(&feature);
   if (type_ == PerceptionObstacle::PEDESTRIAN) {
-    if (!kf_pedestrian_tracker_enabled_) {
-      InitKFPedestrianTracker(&feature);
+    if (!kf_pedestrian_tracker_.IsInitialized()) {
+      InitKFPedestrianTracker(feature);
     }
     UpdateKFPedestrianTracker(&feature);
   }
@@ -291,8 +273,8 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         double prev_y = mutable_feature(0)->position().y();
         double diff_x = feature->position().x() - prev_x;
         double diff_y = feature->position().y() - prev_y;
-        if (diff_x > FLAGS_valid_position_diff_thred &&
-            diff_y > FLAGS_valid_position_diff_thred) {
+        if (std::abs(diff_x) > FLAGS_valid_position_diff_thred &&
+            std::abs(diff_y) > FLAGS_valid_position_diff_thred) {
           velocity_heading = std::atan2(diff_y, diff_x);
           velocity_x = speed * std::cos(velocity_heading);
           velocity_y = speed * std::sin(velocity_heading);
@@ -330,6 +312,7 @@ void Obstacle::SetAcceleration(Feature* feature) {
   double acc_x = 0.0;
   double acc_y = 0.0;
   double acc_z = 0.0;
+  double acc = 0.0;
 
   if (feature_history_.size() > 0) {
     double curr_ts = feature->timestamp();
@@ -347,19 +330,30 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_y = (curr_velocity.y() - prev_velocity.y()) / (curr_ts - prev_ts);
       acc_z = (curr_velocity.z() - prev_velocity.z()) / (curr_ts - prev_ts);
 
-      acc_x =
-          common::math::Clamp(acc_x * damping_x, FLAGS_min_acc, FLAGS_max_acc);
-      acc_y =
-          common::math::Clamp(acc_y * damping_y, FLAGS_min_acc, FLAGS_max_acc);
-      acc_z =
-          common::math::Clamp(acc_z * damping_z, FLAGS_min_acc, FLAGS_max_acc);
+      acc_x *= damping_x;
+      acc_y *= damping_y;
+      acc_z *= damping_z;
+
+      double heading = feature->velocity_heading();
+      acc = acc_x * std::cos(heading) + acc_y * std::sin(heading);
+
+      if (acc > 0.0 && acc > FLAGS_max_acc) {
+        double factor = std::abs(FLAGS_max_acc / acc);
+        acc = FLAGS_max_acc;
+        acc_x *= factor;
+        acc_y *= factor;
+      } else if (acc < 0.0 && acc < FLAGS_min_acc) {
+        double factor = std::abs(FLAGS_min_acc / acc);
+        acc = FLAGS_min_acc;
+        acc_x *= factor;
+        acc_y *= factor;
+      }
     }
   }
 
   feature->mutable_acceleration()->set_x(acc_x);
   feature->mutable_acceleration()->set_y(acc_y);
   feature->mutable_acceleration()->set_z(acc_z);
-  double acc = std::hypot(std::hypot(acc_x, acc_y), acc_z);
   feature->set_acc(acc);
 
   ADEBUG << "Obstacle [" << id_ << "] has acceleration [" << std::fixed
@@ -408,9 +402,8 @@ void Obstacle::SetLengthWidthHeight(
          << std::setprecision(6) << height << "].";
 }
 
-void Obstacle::InitKFMotionTracker(Feature* feature) {
-  double cycle_time = 0.1;
-  double t = cycle_time;
+void Obstacle::InitKFMotionTracker(const Feature& feature) {
+  double t = FLAGS_prediction_period;
   // Set transition matrix F
   // constant acceleration dynamic model
   Eigen::Matrix<double, 6, 6> F;
@@ -464,16 +457,14 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
 
   // Set initial state
   Eigen::Matrix<double, 6, 1> x;
-  x(0, 0) = feature->position().x();
-  x(1, 0) = feature->position().y();
-  x(2, 0) = feature->velocity().x();
-  x(3, 0) = feature->velocity().y();
-  x(4, 0) = feature->acceleration().x();
-  x(5, 0) = feature->acceleration().y();
+  x(0, 0) = feature.position().x();
+  x(1, 0) = feature.position().y();
+  x(2, 0) = feature.velocity().x();
+  x(3, 0) = feature.velocity().y();
+  x(4, 0) = feature.acceleration().x();
+  x(5, 0) = feature.acceleration().y();
 
   kf_motion_tracker_.SetStateEstimate(x, P);
-
-  kf_motion_tracker_enabled_ = true;
 }
 
 void Obstacle::UpdateKFMotionTracker(Feature* feature) {
@@ -693,7 +684,7 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
          << std::fixed << std::setprecision(6) << lane_acc << "]";
 }
 
-void Obstacle::InitKFPedestrianTracker(Feature* feature) {
+void Obstacle::InitKFPedestrianTracker(const Feature& feature) {
   // Set transition matrix F
   Eigen::Matrix<double, 2, 2> F;
   F.setIdentity();
@@ -729,12 +720,10 @@ void Obstacle::InitKFPedestrianTracker(Feature* feature) {
   // Set initial state
   Eigen::Matrix<double, 2, 1> x;
   x.setZero();
-  x(0, 0) = feature->position().x();
-  x(1, 0) = feature->position().y();
+  x(0, 0) = feature.position().x();
+  x(1, 0) = feature.position().y();
 
   kf_pedestrian_tracker_.SetStateEstimate(x, P);
-
-  kf_pedestrian_tracker_enabled_ = true;
 }
 
 void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
@@ -779,7 +768,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
-  double heading = feature->theta();
+  double heading = feature->velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
     point[1] = feature->t_position().y();
@@ -847,7 +836,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
-  double theta = feature->theta();
+  double theta = feature->velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
     point[1] = feature->t_position().y();
@@ -1101,7 +1090,6 @@ void Obstacle::SetMotionStatus() {
 }
 
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
-  std::lock_guard<std::mutex> lock(mutex_);
   feature_history_.push_front(std::move(*feature));
   ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
 }

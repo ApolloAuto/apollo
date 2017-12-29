@@ -98,7 +98,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
     double theta = feature.theta();
     ::apollo::prediction::predictor_util::GenerateStillSequenceTrajectoryPoints(
         position_x, position_y, theta, FLAGS_prediction_duration,
-        FLAGS_prediction_freq, &points);
+        FLAGS_prediction_period, &points);
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(1.0);
     trajectories_.push_back(std::move(trajectory));
@@ -137,7 +137,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
     std::vector<TrajectoryPoint> points;
     DrawMoveSequenceTrajectoryPoints(*obstacle, sequence,
                                      FLAGS_prediction_duration,
-                                     FLAGS_prediction_freq, &points);
+                                     FLAGS_prediction_period, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
@@ -149,14 +149,14 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
 
 void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double freq,
+    const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
   points->clear();
   std::vector<TrajectoryPoint> maneuver_trajectory_points;
   std::vector<TrajectoryPoint> motion_trajectory_points;
-  DrawManeuverTrajectoryPoints(obstacle, lane_sequence, total_time, freq,
+  DrawManeuverTrajectoryPoints(obstacle, lane_sequence, total_time, period,
                                &maneuver_trajectory_points);
-  DrawMotionTrajectoryPoints(obstacle, total_time, freq,
+  DrawMotionTrajectoryPoints(obstacle, total_time, period,
                              &motion_trajectory_points);
   CHECK_EQ(maneuver_trajectory_points.size(), motion_trajectory_points.size());
   double t = 0.0;
@@ -174,13 +174,13 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     }
 
     points->push_back(trajectory_point);
-    t += freq;
+    t += period;
   }
 }
 
 void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double freq,
+    const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
   const Feature& feature = obstacle.latest_feature();
   if (!feature.has_position() || !feature.has_velocity() ||
@@ -195,7 +195,9 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     position[0] = feature.t_position().x();
     position[1] = feature.t_position().y();
   }
-  double time_to_lane_center = ComputeTimeToLaneCenter(obstacle, lane_sequence);
+  double time_to_lane_center =
+      std::max(FLAGS_default_time_to_lane_center,
+               ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence));
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
@@ -216,11 +218,13 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     AERROR << "Failed in getting lane s and lane l";
     return;
   }
+  double prev_lane_l = lane_l;
 
-  size_t total_num = static_cast<size_t>(total_time / freq);
-  size_t num_to_center = static_cast<size_t>(time_to_lane_center / freq);
+  size_t total_num = static_cast<size_t>(total_time / period);
+  size_t num_to_center = static_cast<size_t>(time_to_lane_center / period);
+  AERROR << "Obstacle: " << obstacle.id();
   for (size_t i = 0; i < total_num; ++i) {
-    double relative_time = static_cast<double>(i) * freq;
+    double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
     double theta = M_PI;
     if (i < num_to_center) {
@@ -230,42 +234,31 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     }
     double curr_s =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 0);
-    double prev_s = (i > 0) ? EvaluateLongitudinalPolynomial(
-                                  longitudinal_coeffs, relative_time - freq, 0)
-                            : 0.0;
-    lane_s += (curr_s - prev_s);
-
+    double prev_s = (i > 0)
+                        ? EvaluateLongitudinalPolynomial(
+                              longitudinal_coeffs, relative_time - period, 0)
+                        : 0.0;
+    lane_s += std::max(0.0, (curr_s - prev_s));
+    if (curr_s + FLAGS_double_precision < prev_s) {
+      lane_l = prev_lane_l;
+    }
     if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
     }
 
-    if (points->size() > 0) {
-      PathPoint* prev_point = points->back().mutable_path_point();
-      double x_diff = point.x() - prev_point->x();
-      double y_diff = point.y() - prev_point->y();
-      if (std::fabs(x_diff) > std::numeric_limits<double>::epsilon() ||
-          std::fabs(y_diff) > std::numeric_limits<double>::epsilon()) {
-        theta = std::atan2(y_diff, x_diff);
-        prev_point->set_theta(theta);
-      } else {
-        theta = prev_point->theta();
-      }
-    }
-
+    prev_lane_l = lane_l;
     double vs =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 1);
     double as =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 2);
     double vl = 0.0;
-    double al = 0.0;
     if (i < num_to_center) {
       vl = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 1);
-      al = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 2);
     }
     double lane_speed = std::hypot(vs, vl);
-    double lane_acc = std::hypot(as, al);
+    double lane_acc = as;
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -299,14 +292,11 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double theta = feature.velocity_heading();
   double v = feature.speed();
   double a = feature.acc();
-  if (FLAGS_enable_rnn_acc && lane_sequence.has_acceleration()) {
-    a = lane_sequence.acceleration();
-  }
   if (FLAGS_enable_kf_tracking) {
     v = feature.t_speed();
     a = feature.t_acc();
   }
-  if (FLAGS_enable_lane_sequence_acc) {
+  if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
     a = lane_sequence.acceleration();
   }
   double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
@@ -314,8 +304,9 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double s0 = 0.0;
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
-  double ds1 = v;
-  double dds1 = a;
+  double ds1 = std::max(FLAGS_still_obstacle_speed_threshold,
+                        ds0 + dds0 * time_to_lane_center);
+  double dds1 = 0.0;
   double p = time_to_lane_center;
 
   coefficients->operator[](0) = s0;
@@ -442,7 +433,7 @@ double MoveSequencePredictor::EvaluateLongitudinalPolynomial(
 }
 
 void MoveSequencePredictor::DrawMotionTrajectoryPoints(
-    const Obstacle& obstacle, const double total_time, const double freq,
+    const Obstacle& obstacle, const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
   // Apply free_move here
   const Feature& feature = obstacle.latest_feature();
@@ -475,16 +466,16 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
   state(5, 0) = common::math::Clamp(acc(1), FLAGS_min_acc, FLAGS_max_acc);
 
   Eigen::Matrix<double, 6, 6> transition(kf.GetTransitionMatrix());
-  transition(0, 2) = freq;
-  transition(0, 4) = 0.5 * freq * freq;
-  transition(1, 3) = freq;
-  transition(1, 5) = 0.5 * freq * freq;
-  transition(2, 4) = freq;
-  transition(3, 5) = freq;
+  transition(0, 2) = period;
+  transition(0, 4) = 0.5 * period * period;
+  transition(1, 3) = period;
+  transition(1, 5) = 0.5 * period * period;
+  transition(2, 4) = period;
+  transition(3, 5) = period;
 
-  size_t num = static_cast<size_t>(total_time / freq);
+  size_t num = static_cast<size_t>(total_time / period);
   apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, num, freq, points);
+      &state, transition, num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
@@ -492,7 +483,7 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
   }
 }
 
-double MoveSequencePredictor::ComputeTimeToLaneCenter(
+double MoveSequencePredictor::ComputeTimeToLaneCenterBySampling(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
   std::vector<double> candidate_times;
   GenerateCandidateTimes(&candidate_times);
@@ -516,6 +507,27 @@ double MoveSequencePredictor::ComputeTimeToLaneCenter(
   return t_best;
 }
 
+double MoveSequencePredictor::ComputeTimeToLaneCenterByVelocity(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence) {
+  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+  const Feature& feature = obstacle.latest_feature();
+  const LanePoint& first_lane_point =
+      lane_sequence.lane_segment(0).lane_point(0);
+  double v_x = feature.velocity().x();
+  double v_y = feature.velocity().y();
+
+  double lane_heading = first_lane_point.heading();
+  double lane_l = first_lane_point.relative_l();
+  double v_l = v_y * std::cos(lane_heading) - v_x * std::sin(lane_heading);
+  if (std::abs(v_l) < FLAGS_default_lateral_approach_speed ||
+      lane_l * v_l < 0.0) {
+    return std::abs(lane_l / FLAGS_default_lateral_approach_speed);
+  }
+  return std::abs(lane_l / v_l);
+}
+
 double MoveSequencePredictor::Cost(
     const double t, const std::array<double, 6>& lateral_coeffs,
     const std::array<double, 5>& longitudinal_coeffs) {
@@ -530,7 +542,7 @@ double MoveSequencePredictor::Cost(
        6.0 * lateral_coeffs[3]},
       &mid_t_pair);
   if (solved != 0) {
-    return normal_min_acc + alpha * t;
+    return alpha * normal_min_acc + t;
   }
   double mid_0 =
       std::fabs(EvaluateLateralPolynomial(lateral_coeffs, mid_t_pair.first, 2));
@@ -542,6 +554,7 @@ double MoveSequencePredictor::Cost(
 
 void MoveSequencePredictor::GenerateCandidateTimes(
     std::vector<double>* candidate_times) {
+  candidate_times->clear();
   double t = FLAGS_time_lower_bound_to_lane_center;
   double time_gap = FLAGS_sample_time_gap;
   while (t <= FLAGS_time_upper_bound_to_lane_center) {

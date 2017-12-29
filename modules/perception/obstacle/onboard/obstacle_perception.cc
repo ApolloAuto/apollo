@@ -23,7 +23,6 @@
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
-#include "modules/perception/obstacle/fusion/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
 DEFINE_string(obstacle_show_type, "fused",
@@ -44,7 +43,7 @@ ObstacleShowType GetObstacleShowType(const std::string& show_type_string) {
   }
 }
 
-ObstaclePerception::ObstaclePerception() {}
+ObstaclePerception::ObstaclePerception() : lidar_pose_inited_(false) {}
 
 ObstaclePerception::~ObstaclePerception() {}
 
@@ -105,7 +104,6 @@ bool ObstaclePerception::Init() {
 
 void ObstaclePerception::RegistAllAlgorithm() {
   RegisterFactoryDummyRadarDetector();
-  RegisterFactoryDummyFusion();
 
   RegisterFactoryModestRadarDetector();
   RegisterFactoryProbabilisticFusion();
@@ -140,6 +138,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
       if (obstacle_show_type_ == SHOW_LIDAR) {
         frame_content_.SetTrackedObjects(sensor_objects->objects);
       }
+      lidar_pose_inited_ = true;
     }
   } else if (frame->sensor_type_ == RADAR) {
     /// radar obstacle detection
@@ -190,8 +189,10 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
         return true;
       }
     }
-    frame_visualizer_->UpdateCameraSystem(&frame_content_);
-    frame_visualizer_->Render(frame_content_);
+    if (lidar_pose_inited_) {
+      frame_visualizer_->UpdateCameraSystem(&frame_content_);
+      frame_visualizer_->Render(frame_content_);
+    }
   }
 
   return true;

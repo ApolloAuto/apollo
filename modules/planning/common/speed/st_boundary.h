@@ -51,6 +51,15 @@ class StBoundary : public common::math::Polygon2d {
 
   ~StBoundary() = default;
 
+  bool IsEmpty() const { return lower_points_.empty(); }
+  bool IsPointInBoundary(const STPoint& st_point) const;
+
+  STPoint BottomLeftPoint() const;
+  STPoint BottomRightPoint() const;
+
+  StBoundary ExpandByS(const double s) const;
+  StBoundary ExpandByT(const double t) const;
+
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
   enum class BoundaryType {
@@ -62,14 +71,7 @@ class StBoundary : public common::math::Polygon2d {
     KEEP_CLEAR,
   };
 
-  bool IsEmpty() const { return lower_points_.empty(); }
-  bool IsPointInBoundary(const STPoint& st_point) const;
-
-  STPoint BottomLeftPoint() const;
-  STPoint BottomRightPoint() const;
-
-  StBoundary ExpandByS(const double s) const;
-  StBoundary ExpandByT(const double t) const;
+  static std::string TypeName(BoundaryType type);
 
   BoundaryType boundary_type() const;
   const std::string& id() const;
@@ -99,6 +101,8 @@ class StBoundary : public common::math::Polygon2d {
   static StBoundary GenerateStBoundary(
       const std::vector<STPoint>& lower_points,
       const std::vector<STPoint>& upper_points);
+
+  StBoundary CutOffByT(const double t) const;
 
  private:
   bool IsValid(

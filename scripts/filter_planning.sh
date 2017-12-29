@@ -31,9 +31,10 @@ routing_topic="topic == '/apollo/routing_response'"
 perception_topic="topic == '/apollo/perception/obstacles' \
    or topic == '/apollo/perception/traffic_light'"
 
-perfect_control_topic="$perception_topic 
+perfect_control_topic="$perception_topic  \
    or $routing_topic \
    or topic == '/apollo/perception/obstacles' \
+   or topic == '/apollo/prediction' \
    or topic == '/apollo/perception/traffic_light'"
 
 planning_deps="$perfect_control_topic \
@@ -143,4 +144,3 @@ for bag in $@; do
    fi
    filter $bag $folder
 done
-

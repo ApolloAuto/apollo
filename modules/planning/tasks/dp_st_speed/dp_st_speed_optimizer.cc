@@ -59,9 +59,42 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
                                        PathDecision* path_decision,
                                        STGraphDebug* st_graph_debug) const {
   std::vector<const StBoundary*> boundaries;
-  for (const auto* obstacle : path_decision->path_obstacles().Items()) {
+  for (auto* obstacle : path_decision->path_obstacles().Items()) {
+    auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
+      path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
+      ADEBUG << "obstacle " << id << " is blocking.";
+    } else if (FLAGS_enable_side_vehicle_st_boundary &&
+               (adc_sl_boundary_.start_l() > 2.0 ||
+                adc_sl_boundary_.end_l() < -2.0)) {
+      if (obstacle->obstacle()->IsVirtual()) {
+        continue;
+      }
+      if (path_decision_.Find(id)->st_boundary().IsEmpty()) {
+        continue;
+      }
+      ADEBUG << "obstacle " << id << " is NOT blocking.";
+      auto st_boundary_copy = path_decision_.Find(id)->st_boundary();
+      auto st_boundary = st_boundary_copy.CutOffByT(3.5);
+      if (!st_boundary.IsEmpty()) {
+        auto decision = obstacle->LongitudinalDecision();
+        if (decision.has_yield()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
+        } else if (decision.has_overtake()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::OVERTAKE);
+        } else if (decision.has_follow()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::FOLLOW);
+        } else if (decision.has_stop()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
+        }
+        st_boundary.SetId(st_boundary_copy.id());
+        st_boundary.SetCharacteristicLength(
+            st_boundary_copy.characteristic_length());
+
+        path_decision->SetStBoundary(id, st_boundary);
+        boundaries.push_back(&obstacle->st_boundary());
+      }
     }
   }
 
@@ -134,6 +167,7 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   init_point_ = init_point;
   adc_sl_boundary_ = adc_sl_boundary;
   reference_line_ = &reference_line;
+  path_decision_ = *path_decision;
 
   if (path_data.discretized_path().NumOfPoints() == 0) {
     std::string msg("Empty path data");

@@ -43,7 +43,8 @@ class OfflineLocalVisualizer {
   ~OfflineLocalVisualizer();
 
  public:
-  bool Init(const std::string &map_folder, const std::string &pcd_folder,
+  bool Init(const std::string &map_folder, const std::string &map_visual_folder,
+            const std::string &pcd_folder,
             const std::string &pcd_timestamp_file,
             const std::string &gnss_loc_file, const std::string &lidar_loc_file,
             const std::string &fusion_loc_file,
@@ -76,6 +77,7 @@ class OfflineLocalVisualizer {
 
  private:
   std::string map_folder_;
+  std::string map_visual_folder_;
   std::string pcd_folder_;
   std::string pcd_timestamp_file_;
   std::string gnss_loc_file_;

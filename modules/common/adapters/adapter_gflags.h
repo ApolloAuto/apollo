@@ -43,6 +43,7 @@ DECLARE_string(ins_stat_topic);
 DECLARE_string(ins_status_topic);
 DECLARE_string(gnss_status_topic);
 DECLARE_string(system_status_topic);
+DECLARE_string(static_info_topic);
 DECLARE_string(mobileye_topic);
 DECLARE_string(delphi_esr_topic);
 DECLARE_string(conti_radar_topic);
@@ -55,5 +56,6 @@ DECLARE_string(gnss_best_pose_topic);
 DECLARE_string(localization_gnss_topic);
 DECLARE_string(localization_lidar_topic);
 DECLARE_string(localization_sins_pva_topic);
+DECLARE_string(localization_msf_status);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

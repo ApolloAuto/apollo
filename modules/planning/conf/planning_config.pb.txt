@@ -34,7 +34,7 @@ em_planner_config {
         path_end_l_cost: 1.0e4
     }
     dp_st_speed_config {
-        total_path_length: 80
+        total_path_length: 200
         total_time: 8.0
         matrix_dimension_s: 200
         matrix_dimension_t: 20
@@ -50,28 +50,29 @@ em_planner_config {
         default_obstacle_cost: 1e10
         obstacle_cost_factor: -300
 
-        default_speed_cost: 1.0
+        default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
-        low_speed_penalty: 2.5
+        low_speed_penalty: 10.0
 
-        accel_penalty: 2.0
-        decel_penalty: 4.0
+        accel_penalty: 1.0
+        decel_penalty: 1.0
 
         positive_jerk_coeff: 1.0
-        negative_jerk_coeff: 300.0
+        negative_jerk_coeff: 1.0
 
-        max_acceleration: 1.5
-        max_deceleration: -2.2
+        max_acceleration: 2.5
+        max_deceleration: -3.3
 
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.8
-            low_speed_centric_acceleration_limit: 1.35
-            high_speed_threshold: 20
-            low_speed_threshold: 7
+            high_speed_centric_acceleration_limit: 0.8
+            low_speed_centric_acceleration_limit: 1.5
+            high_speed_threshold: 12.58
+            low_speed_threshold: 7.5
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
+            num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
         }
@@ -99,9 +100,9 @@ em_planner_config {
     qp_st_speed_config {
         total_path_length: 250.0
         total_time: 8.0
-        preferred_max_acceleration: 1.5
-        preferred_min_deceleration: -2.2
-        max_acceleration: 2.0
+        preferred_max_acceleration: 2.5
+        preferred_min_deceleration: -3.3
+        max_acceleration: 3.0
         min_deceleration: -4.5
 
         qp_spline_config {
@@ -112,7 +113,7 @@ em_planner_config {
             jerk_kernel_weight: 1000.0
             follow_weight: 8.0
             stop_weight: 0.2
-            cruise_weight: 0.5
+            cruise_weight: 0.3
             regularization_weight: 0.1
             follow_drag_distance: 17.0
             dp_st_reference_weight: 0.0
@@ -132,10 +133,10 @@ em_planner_config {
         }
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.2
-            low_speed_centric_acceleration_limit: 1.4
-            high_speed_threshold: 11.18
-            low_speed_threshold: 4.5
+            high_speed_centric_acceleration_limit: 0.8
+            low_speed_centric_acceleration_limit: 1.5
+            high_speed_threshold: 12.58
+            low_speed_threshold: 7.5
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
@@ -148,14 +149,17 @@ em_planner_config {
         total_path_length: 250.0
         total_time: 8.0
 
-        preferred_accel: 1.5
-        preferred_decel: -2.2
+        preferred_accel: 2.5
+        preferred_decel: -3.3
         max_accel: 2.5
         min_decel: -4.5
 
         speed_limit_buffer: 0.05
-        speed_weight: 1.0
-        jerk_weight: 10.0
+        speed_weight: 1.0e2
+        jerk_weight: 1.0
+        obstacle_weight: 10.0
+
+        unblocking_obstacle_cost: 1e3
 
         st_boundary_config {
             boundary_buffer: 0.1
@@ -179,8 +183,8 @@ qp_spline_reference_line_smoother_config {
     max_constraint_interval : 5.0
     longitudinal_boundary_bound: 2.0
     lateral_boundary_bound: 0.25
-    second_derivative_weight: 200.0
-    third_derivative_weight: 1000.0
+    second_derivative_weight: 1000.0
+    third_derivative_weight: 0.0
     num_of_total_points: 500
     regularization_weight: 1.0e-5
 }

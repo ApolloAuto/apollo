@@ -29,7 +29,7 @@ DEFINE_string(prediction_adapter_config_filename,
               "Default conf file for prediction");
 
 DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
-DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
+DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 50.0,
               "Minimal length of prediction trajectory");
@@ -62,7 +62,7 @@ DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
-DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
+DEFINE_double(max_lane_angle_diff, M_PI / 4.0,
               "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
@@ -93,7 +93,6 @@ DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_diff_thred, M_PI / 6.0,
               "Threshold for adjusting on-lane obstacle heading");
-DEFINE_bool(enable_rnn_acc, false, "If use acceleration from RNN model.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
@@ -109,6 +108,9 @@ DEFINE_double(distance_beyond_junction, 0.5,
               "consider it in junction.");
 DEFINE_double(adc_trajectory_search_length, 10.0,
               "How far to search junction along adc planning trajectory");
+DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");
+DEFINE_double(default_lateral_approach_speed, 0.5,
+              "Default lateral speed approaching to center of lane");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,
@@ -120,7 +122,7 @@ DEFINE_double(sample_time_gap, 0.2,
 DEFINE_double(motion_weight_a, 1.2, "A parameter of motion weight function");
 DEFINE_double(motion_weight_b, 5.0, "A parameter of motion weight function");
 DEFINE_double(motion_weight_c, 1.2, "A parameter of motion weight function");
-DEFINE_double(cost_alpha, 0.1,
-              "The coefficient of time to lane center in cost function");
-DEFINE_double(default_time_to_lane_center, 2.0,
+DEFINE_double(cost_alpha, 100.0,
+              "The coefficient of lateral acceleration in cost function");
+DEFINE_double(default_time_to_lane_center, 5.0,
               "The default time to lane center");

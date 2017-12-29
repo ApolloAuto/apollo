@@ -45,7 +45,7 @@ proto_library(
     srcs = ["online_report.proto"],
     deps = [
         "//modules/common/proto:vehicle_state_proto_lib",
-        "//modules/data/proto:task_proto_lib",
+        "//modules/data/proto:static_info_proto_lib",
     ],
 )
 

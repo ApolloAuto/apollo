@@ -125,14 +125,16 @@ function build() {
   # Build python proto
   build_py_proto
 
-  # Update task info template on compiling.
-  bazel-bin/modules/data/util/update_task_info --commit_id=$(git rev-parse HEAD)
+  # Clear KV DB and update commit_id after compiling.
+  rm -fr data/kv_db
+  python modules/tools/common/kv_db.py put \
+      "apollo:data:commit_id" "$(git rev-parse HEAD)"
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
-      cd /apollo-simulator && bash build.sh build
-      if [ $? -ne 0 ]; then
-        fail 'Build failed!'
-      fi
+    cd /apollo-simulator && bash build.sh build
+    if [ $? -ne 0 ]; then
+      fail 'Build failed!'
+    fi
   fi
   if [ $? -eq 0 ]; then
     success 'Build passed!'

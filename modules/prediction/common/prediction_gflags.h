@@ -25,7 +25,7 @@ DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
 
 DECLARE_double(prediction_duration);
-DECLARE_double(prediction_freq);
+DECLARE_double(prediction_period);
 DECLARE_double(double_precision);
 DECLARE_double(min_prediction_length);
 
@@ -68,7 +68,6 @@ DECLARE_double(valid_position_diff_thred);
 // evaluator
 DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_double(perception_confidence_threshold);
-DECLARE_bool(enable_rnn_acc);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
@@ -77,6 +76,8 @@ DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(adc_trajectory_search_length);
+DECLARE_double(virtual_lane_radius);
+DECLARE_double(default_lateral_approach_speed);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);

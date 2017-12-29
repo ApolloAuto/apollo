@@ -36,6 +36,11 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class PathDecision
+ *
+ * @brief PathDecision represents all obstacle decisions on one path.
+ */
 class PathDecision {
  public:
   PathDecision() = default;

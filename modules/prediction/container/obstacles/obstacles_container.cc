@@ -27,8 +27,6 @@ namespace prediction {
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-std::mutex ObstaclesContainer::g_mutex_;
-
 ObstaclesContainer::ObstaclesContainer()
     : obstacles_(FLAGS_max_num_obstacles) {}
 
@@ -73,7 +71,6 @@ void ObstaclesContainer::Clear() {
 
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
-  std::lock_guard<std::mutex> lock(g_mutex_);
   const int id = perception_obstacle.id();
   if (id < -1) {
     AERROR << "Invalid ID [" << id << "]";

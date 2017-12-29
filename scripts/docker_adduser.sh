@@ -23,6 +23,7 @@ adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
 usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
+echo "export PATH=/apollo/scripts:$PATH" >> /home/${DOCKER_USER}/.bashrc
 echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
 echo "ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
 
@@ -53,6 +54,11 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   if [ -e /home/tmp/modules_data ]; then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
+  fi
+
+  if [ -e /mnt/nfs/map/data ]; then
+    rsync -rLvzh --progress --update /mnt/nfs/map/data /apollo/modules/map
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/map/data"
   fi
   # setup ros package
   # this is a temporary solution to avoid ros package downloading.

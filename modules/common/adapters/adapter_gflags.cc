@@ -58,6 +58,8 @@ DEFINE_string(gnss_status_topic, "/apollo/sensor/gnss/gnss_status",
               "gnss status topic name");
 DEFINE_string(system_status_topic, "/apollo/monitor/system_status",
               "System status topic name");
+DEFINE_string(static_info_topic, "/apollo/monitor/static_info",
+              "Static info topic name");
 DEFINE_string(mobileye_topic, "/apollo/sensor/mobileye", "mobileye topic name");
 DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");
@@ -84,3 +86,5 @@ DEFINE_string(localization_lidar_topic,
               "Lidar localization measurement topic name");
 DEFINE_string(localization_sins_pva_topic, "/apollo/localization/msf_sins_pva",
               "Localization sins pva topic name");
+DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",
+              "msf localization status");

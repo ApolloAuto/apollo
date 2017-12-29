@@ -35,7 +35,6 @@ DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
-DECLARE_double(reference_line_lateral_extension);
 DECLARE_double(prepare_rerouting_time);
 DECLARE_double(rerouting_cooldown_time);
 
@@ -53,6 +52,7 @@ DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
 DECLARE_bool(enable_change_lane_decider);
 DECLARE_double(change_lane_speed_relax_percentage);
+DECLARE_bool(enable_side_vehicle_st_boundary);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);

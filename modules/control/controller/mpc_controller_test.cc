@@ -42,12 +42,13 @@ using apollo::common::VehicleStateProvider;
 
 class MPCControllerTest : public ::testing::Test, MPCController {
  public:
-  virtual void SetUp() {
+  virtual void SetupTestCase() {
     FLAGS_v = 4;
-    std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
+    FLAGS_use_mpc = true;
+    FLAGS_control_conf_file =
+        "modules/control/testdata/mpc_controller_test/lincoln.pb.txt ";
     ControlConf control_conf;
-    CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
+    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
                                                  &control_conf));
     mpc_conf_ = control_conf.mpc_controller_conf();
 
@@ -116,7 +117,19 @@ TEST_F(MPCControllerTest, ComputeLateralErrors) {
       vehicle_state->linear_velocity(), vehicle_state->angular_velocity(),
       trajectory_analyzer, debug);
 
-  // TODO(QiL) : finalize test data once parameter tuning done.
+  double theta_error_expected = -0.03549;
+  double theta_error_dot_expected = 0.0044552856731;
+  double d_error_expected = 1.30917375441;
+  double d_error_dot_expected = 0.0;
+  double matched_theta_expected = -1.81266;
+  double matched_kappa_expected = -0.00237307;
+
+  EXPECT_NEAR(debug->heading_error(), theta_error_expected, 0.001);
+  EXPECT_NEAR(debug->heading_error_rate(), theta_error_dot_expected, 0.001);
+  EXPECT_NEAR(debug->lateral_error(), d_error_expected, 0.001);
+  EXPECT_NEAR(debug->lateral_error_rate(), d_error_dot_expected, 0.001);
+  EXPECT_NEAR(debug->ref_heading(), matched_theta_expected, 0.001);
+  EXPECT_NEAR(debug->curvature(), matched_kappa_expected, 0.001);
 }
 
 }  // namespace control

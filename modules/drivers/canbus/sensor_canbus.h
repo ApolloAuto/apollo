@@ -21,13 +21,13 @@
 #ifndef MODULES_DRIVERS_CANBUS_SENSOR_CANBUS_H_
 #define MODULES_DRIVERS_CANBUS_SENSOR_CANBUS_H_
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
-#include <mutex>
-#include <thread>
-#include <condition_variable>
 
 #include "ros/include/ros/ros.h"
 
@@ -152,8 +152,7 @@ Status SensorCanbus<SensorType>::Init() {
   }
   AINFO << "Can client is successfully created.";
 
-  sensor_message_manager_ = std::unique_ptr<canbus::MessageManager<SensorType>>(
-      new canbus::MessageManager<SensorType>());
+  sensor_message_manager_.reset(new canbus::MessageManager<SensorType>());
   if (sensor_message_manager_ == nullptr) {
     return OnError("Failed to create message manager.");
   }

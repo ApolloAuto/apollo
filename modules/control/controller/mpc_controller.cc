@@ -268,10 +268,9 @@ Status MPCController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  constexpr double kMinSpeedProtection = 0.1;
+  constexpr float kMinSpeedProtection = 0.1f;
   VehicleStateProvider::instance()->set_linear_velocity(
-      std::max(VehicleStateProvider::instance()->linear_velocity(),
-               kMinSpeedProtection));
+      std::max(chassis->speed_mps(), kMinSpeedProtection));
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -584,6 +583,10 @@ void MPCController::ComputeLongitudinalErrors(
   debug->set_station_reference(reference_point.path_point().s());
   debug->set_speed_reference(reference_point.v());
   debug->set_acceleration_reference(reference_point.a());
+
+  debug->set_station_feedback(s_matched);
+  debug->set_speed_feedback(
+      VehicleStateProvider::instance()->linear_velocity());
 }
 
 }  // namespace control

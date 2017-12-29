@@ -47,6 +47,12 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class Frame
+ *
+ * @brief Frame holds all data for one planning cycle.
+ */
+
 class Frame {
  public:
   explicit Frame(uint32_t sequence_num,
@@ -93,7 +99,7 @@ class Frame {
   const ADCTrajectory &trajectory() const { return trajectory_; }
 
  private:
-  bool InitReferenceLineInfo();
+  bool CreateReferenceLineInfo();
 
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if

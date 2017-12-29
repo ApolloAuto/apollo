@@ -41,12 +41,35 @@ enum ObstacleShowType {
 
 class ObstaclePerception {
  public:
+  /**
+   * @brief Construct
+   */
   ObstaclePerception();
+
+  /**
+   * @brief Destruct
+   */
   ~ObstaclePerception();
+
+  /**
+   * @brief Initialize configuration
+   * @return True if initialize successfully, false otherwise
+   */
   bool Init();
+
+  /**
+   * @brief The main process to detect, recognize and track objects
+   * based on different kinds of sensor data.
+   * @param frame Sensor data of one single frame
+   * @param out_objects The obstacle perception results
+   * @return True if process successfully, false otherwise
+   */
   bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>* out_objects);
 
  private:
+  /**
+   * @brief Regist all algorithms for each module
+   */
   void RegistAllAlgorithm();
 
   /// obstacle detector
@@ -58,6 +81,7 @@ class ObstaclePerception {
   std::unique_ptr<OpenglVisualizer> frame_visualizer_ = nullptr;
   ObstacleShowType obstacle_show_type_;
   FrameContent frame_content_;
+  bool lidar_pose_inited_;
 
   DISALLOW_COPY_AND_ASSIGN(ObstaclePerception);
 };  // class ObstaclePerception

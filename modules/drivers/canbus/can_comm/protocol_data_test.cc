@@ -28,9 +28,8 @@ using ::apollo::canbus::ChassisDetail;
 
 TEST(ProtocolDataTest, CheckSum) {
   const uint8_t INPUT[] = {0x00, 0x12, 0x00, 0x13, 0x00, 0xF3, 0x00, 0x00};
-  uint8_t result =
-      ProtocolData<::apollo::canbus::ChassisDetail>::CalculateCheckSum(INPUT,
-                                                                       8);
+  const uint8_t result =
+      ProtocolData<apollo::canbus::ChassisDetail>::CalculateCheckSum(INPUT, 8);
   EXPECT_EQ(0xE7, result);
 }
 

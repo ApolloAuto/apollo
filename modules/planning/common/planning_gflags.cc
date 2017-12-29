@@ -58,10 +58,7 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(reference_line_lateral_buffer, 0.5,
-              "When creating reference line, the minimum distance with road "
-              "curb for a vehicle driving on this line.");
-DEFINE_double(reference_line_lateral_extension, 0.5,
+DEFINE_double(reference_line_lateral_buffer, 0.4,
               "When creating reference line, the minimum distance with road "
               "curb for a vehicle driving on this line.");
 DEFINE_double(prepare_rerouting_time, 2.0,
@@ -104,6 +101,8 @@ DEFINE_bool(enable_change_lane_decider, false,
             "True to use change lane state machine decider.");
 DEFINE_double(change_lane_speed_relax_percentage, 0.05,
               "The percentage of change lane speed relaxation.");
+DEFINE_bool(enable_side_vehicle_st_boundary, false,
+            "Add st boundary of side vehicle in st graph.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
@@ -174,7 +173,7 @@ DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_double(static_obstacle_speed_threshold, 1.0,
+DEFINE_double(static_obstacle_speed_threshold, 2.0,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
@@ -205,7 +204,7 @@ DEFINE_double(follow_min_distance, 3.0,
 DEFINE_double(yield_min_distance, 3.0,
               "min yield distance for vehicles/bicycles/moving objects");
 DEFINE_double(
-    follow_time_buffer, 2.0,
+    follow_time_buffer, 2.5,
     "follow time buffer (in second) to calculate the following distance.");
 DEFINE_double(
     follow_min_time_sec, 0.1,

@@ -71,6 +71,25 @@ bool StBoundary::IsPointNear(const common::math::LineSegment2d& seg,
   return seg.DistanceSquareTo(point) < max_dist * max_dist;
 }
 
+std::string StBoundary::TypeName(BoundaryType type) {
+  if (type == BoundaryType::FOLLOW) {
+    return "FOLLOW";
+  } else if (type == BoundaryType::KEEP_CLEAR) {
+    return "KEEP_CLEAR";
+  } else if (type == BoundaryType::OVERTAKE) {
+    return "OVERTAKE";
+  } else if (type == BoundaryType::STOP) {
+    return "STOP";
+  } else if (type == BoundaryType::YIELD) {
+    return "YIELD";
+  } else if (type == BoundaryType::UNKNOWN) {
+    return "UNKNOWN";
+  }
+  AWARN << "Unkown boundary type " << static_cast<int>(type)
+        << ", treated as UNKNOWN";
+  return "UNKNOWN";
+}
+
 void StBoundary::RemoveRedundantPoints(
     std::vector<std::pair<STPoint, STPoint>>* point_pairs) {
   if (!point_pairs || point_pairs->size() <= 2) {
@@ -180,7 +199,6 @@ STPoint StBoundary::BottomRightPoint() const {
 
 StBoundary StBoundary::ExpandByS(const double s) const {
   if (lower_points_.empty()) {
-    AERROR << "The current st_boundary has NO points.";
     return StBoundary();
   }
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
@@ -377,7 +395,6 @@ StBoundary StBoundary::GenerateStBoundary(
     const std::vector<STPoint>& lower_points,
     const std::vector<STPoint>& upper_points) {
   if (lower_points.size() != upper_points.size() || lower_points.size() < 2) {
-    AERROR << "Fail to generate StBoundary because input points are not valid.";
     return StBoundary();
   }
 
@@ -388,6 +405,20 @@ StBoundary StBoundary::GenerateStBoundary(
         STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
   }
   return StBoundary(point_pairs);
+}
+
+StBoundary StBoundary::CutOffByT(const double t) const {
+  std::vector<STPoint> lower_points;
+  std::vector<STPoint> upper_points;
+  for (size_t i = 0; i < lower_points_.size() && i < upper_points_.size();
+       ++i) {
+    if (lower_points_[i].t() < t) {
+      continue;
+    }
+    lower_points.push_back(lower_points_[i]);
+    upper_points.push_back(upper_points_[i]);
+  }
+  return GenerateStBoundary(lower_points, upper_points);
 }
 
 }  // namespace planning

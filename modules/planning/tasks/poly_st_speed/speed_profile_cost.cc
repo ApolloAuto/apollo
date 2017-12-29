@@ -22,6 +22,8 @@
 
 #include <limits>
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 namespace {
@@ -34,21 +36,28 @@ using apollo::common::TrajectoryPoint;
 SpeedProfileCost::SpeedProfileCost(
     const PolyStSpeedConfig &config,
     const std::vector<const PathObstacle *> &obstacles,
-    const SpeedLimit &speed_limit)
-    : config_(config), obstacles_(obstacles), speed_limit_(speed_limit) {}
+    const SpeedLimit &speed_limit, const common::TrajectoryPoint &init_point)
+    : config_(config),
+      obstacles_(obstacles),
+      speed_limit_(speed_limit),
+      init_point_(init_point) {}
 
-double SpeedProfileCost::Calculate(const QuinticPolynomialCurve1d &curve,
-                                   const double end_time) const {
+double SpeedProfileCost::Calculate(const QuarticPolynomialCurve1d &curve,
+                                   const double end_time,
+                                   const double curr_min_cost) const {
   double cost = 0.0;
   constexpr double kDeltaT = 0.5;
   for (double t = kDeltaT; t < end_time + kEpsilon; t += kDeltaT) {
+    if (cost > curr_min_cost) {
+      return cost;
+    }
     cost += CalculatePointCost(curve, t);
   }
   return cost;
 }
 
 double SpeedProfileCost::CalculatePointCost(
-    const QuinticPolynomialCurve1d &curve, const double t) const {
+    const QuarticPolynomialCurve1d &curve, const double t) const {
   const double s = curve.Evaluate(0, t);
   const double v = curve.Evaluate(1, t);
   const double a = curve.Evaluate(2, t);
@@ -65,15 +74,50 @@ double SpeedProfileCost::CalculatePointCost(
   if (a > config_.preferred_accel() || a < config_.preferred_decel()) {
     return kInfCost;
   }
+
+  double cost = 0.0;
   for (const auto *obstacle : obstacles_) {
     auto boundary = obstacle->st_boundary();
-    if (boundary.IsPointInBoundary(STPoint(s, t))) {
+    const double kIgnoreDistance = 100.0;
+    if (boundary.min_s() > kIgnoreDistance) {
+      continue;
+    }
+    if (t < boundary.min_t() || t > boundary.max_t()) {
+      continue;
+    }
+    if (obstacle->IsBlockingObstacle() &&
+        boundary.IsPointInBoundary(STPoint(s, t))) {
       return kInfCost;
     }
+    double s_upper = 0.0;
+    double s_lower = 0.0;
+    boundary.GetBoundarySRange(t, &s_upper, &s_lower);
+    if (s < s_lower) {
+      const double len = v * FLAGS_follow_time_buffer;
+      if (s + len < s_lower) {
+        continue;
+      } else {
+        cost += config_.obstacle_weight() * std::pow((len - s_lower + s), 2);
+      }
+    } else if (s > s_upper) {
+      const double kSafeDistance = 15.0;  // or calculated from velocity
+      if (s > s_upper + kSafeDistance) {
+        continue;
+      } else {
+        cost += config_.obstacle_weight() *
+                std::pow((kSafeDistance + s_upper - s), 2);
+      }
+    } else {
+      if (!obstacle->IsBlockingObstacle()) {
+        cost += config_.unblocking_obstacle_cost();
+      }
+    }
   }
-  double cost = 0.0;
   cost += config_.speed_weight() * std::pow((v - speed_limit), 2);
   cost += config_.jerk_weight() * std::pow(da, 2);
+  ADEBUG << "t = " << t << ", s = " << s << ", v = " << v << ", a = " << a
+         << ", da = " << da << ", cost = " << cost;
+
   return cost;
 }
 

@@ -60,7 +60,7 @@ std::string junction_dropbox_id(const std::string& junction_id) {
 }
 }
 
-bool ReferenceLineInfo::Init() {
+bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
@@ -86,8 +86,15 @@ bool ReferenceLineInfo::Init() {
     return false;
   }
   is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  if (!AddObstacles(obstacles)) {
+    AERROR << "Failed to add obstacles to reference line";
+    return false;
+  }
+  is_inited_ = true;
   return true;
 }
+
+bool ReferenceLineInfo::IsInited() const { return is_inited_; }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
@@ -157,9 +164,15 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
 }
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
-  auto path_obstacle_ptr =
-      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  auto* path_obstacle = path_decision_.AddPathObstacle(*path_obstacle_ptr);
+  if (!obstacle) {
+    AERROR << "The provided obstacle is empty";
+    return nullptr;
+  }
+  auto* path_obstacle = path_decision_.AddPathObstacle(PathObstacle(obstacle));
+  if (!path_obstacle) {
+    AERROR << "failed to add obstacle " << obstacle->Id();
+    return nullptr;
+  }
 
   SLBoundary perception_sl;
   if (!reference_line_.GetSLBoundary(obstacle->PerceptionBoundingBox(),
@@ -176,8 +189,14 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
                                       ignore);
     path_decision_.AddLongitudinalDecision("reference_line_filter",
                                            obstacle->Id(), ignore);
+    ADEBUG << "NO build sl boundary. id:" << obstacle->Id();
   } else {
+    ADEBUG << "build sl boundary. id:" << obstacle->Id();
     path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
+    ADEBUG << "st boundary: " << path_obstacle->st_boundary().min_t() << ", "
+           << path_obstacle->st_boundary().max_t()
+           << ", s_max: " << path_obstacle->st_boundary().max_s()
+           << ", s_min: " << path_obstacle->st_boundary().min_s();
   }
   return path_obstacle;
 }
