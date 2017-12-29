@@ -44,17 +44,17 @@ The data dependency such as chassis, localization, traffic light, prediction, et
 ![Planning](images/planning_2.png)
 
 ## Control
-As we discussed in the planning module, control takes the planned trajectory as input, and generates the control command to pass to CanBus.  It has three main data interfaces: OnPad, OnMonitor, and OnTimer.
-![Planning](images/control_1.png)
+Control takes the planned trajectory as input, and generates the control command to pass to CanBus.  It has main data interfaces like: OnPad, OnMonitor, OnTimer, localization and CanBus messages.
+![Control](images/control_1.png)
 
-The “OnPad” and “OnMonitor” are routine interaction with the PAD based human interface and simulations. The main data interface is the “OnTimer” interface which periodically produces the actual control commands.
-![Planning](images/control_2.png)
+The “OnPad” and “OnMonitor” are control interaction with the PAD based human interface and simulations. The main data interface is the “OnTimer” interface which periodically produces the actual control commands.
+![Control](images/control_2.png)
 
 ## CanBus
 The CanBus has two data interfaces as shown below:
-![Planning](images/canbus_1.png)
+![Canbus](images/canbus_1.png)
 
 The first data interface is a timer based publisher with callback function “OnTimer”. This data interface will periodically publish the chassis information as well as chassis details if enabled.
-![Planning](images/canbus_2.png)
+![Cansbus](images/canbus_2.png)
 
 The second data interface is an event based published with callback function “OnControlCommand”, which is triggered when the CanBus module receives control commands.
