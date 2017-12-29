@@ -183,8 +183,8 @@ qp_spline_reference_line_smoother_config {
     max_constraint_interval : 5.0
     longitudinal_boundary_bound: 2.0
     lateral_boundary_bound: 0.25
-    second_derivative_weight: 200.0
-    third_derivative_weight: 1000.0
+    second_derivative_weight: 1000.0
+    third_derivative_weight: 0.0
     num_of_total_points: 500
     regularization_weight: 1.0e-5
 }
