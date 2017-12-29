@@ -70,7 +70,8 @@ function start() {
         /apollo/drive_event \
         /tf \
         /tf_static \
-        /apollo/monitor </dev/null >"${LOG}" 2>&1 &
+        /apollo/monitor \
+        /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
     fi
 }
 
