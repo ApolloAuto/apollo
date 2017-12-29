@@ -248,16 +248,10 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     }
 
     prev_lane_l = lane_l;
-    double vs =
+    double lane_speed =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 1);
-    double as =
+    double lane_acc =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 2);
-    double vl = 0.0;
-    if (i < num_to_center) {
-      vl = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 1);
-    }
-    double lane_speed = std::hypot(vs, vl);
-    double lane_acc = as;
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -303,8 +297,8 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double s0 = 0.0;
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
-  double ds1 = std::max(FLAGS_still_obstacle_speed_threshold,
-                        ds0 + dds0 * time_to_lane_center);
+  double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
+  double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_lane_center);
   double dds1 = 0.0;
   double p = time_to_lane_center;
 
