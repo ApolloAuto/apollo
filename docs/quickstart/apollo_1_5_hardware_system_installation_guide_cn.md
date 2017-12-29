@@ -320,7 +320,7 @@ sudo bash install_kernel.sh
 如果你有修改内核，或者预编译内核不是你的最佳平台，你可以按照如下步骤构建自己的：
 1. 从代码仓库克隆代码
 ```
-git clone https://github.com/ApolloAuto/apollo-kernel.git
+git clone --depth=1 https://github.com/ApolloAuto/apollo-kernel.git
 cd apollo-kernel
 ```
 2. 根据 [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)添加 ESD CAN 驱动源代码

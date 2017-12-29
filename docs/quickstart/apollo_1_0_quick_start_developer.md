@@ -64,7 +64,7 @@ If have modified the kernel, or the pre-built kernel is not the best for your pl
 
 1. Clone the code from repository
 ```
-git clone https://github.com/ApolloAuto/apollo-kernel.git
+git clone --depth=1 https://github.com/ApolloAuto/apollo-kernel.git
 cd apollo-kernel
 ```
 2. Build the ESD CAN driver source code according to [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
@@ -99,7 +99,7 @@ In the container, the default directory lives in `/apollo` , which contains the 
 Check out Apollo ROS from [github source](https://github.com/ApolloAuto/apollo-platform):
 
 ```bash
-git clone https://github.com/ApolloAuto/apollo-platform.git apollo-platform
+git clone --depth=1 https://github.com/ApolloAuto/apollo-platform.git apollo-platform
 cd apollo-platform/ros
 bash build.sh build
 ```

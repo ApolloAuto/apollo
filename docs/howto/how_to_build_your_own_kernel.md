@@ -5,7 +5,7 @@ If you have modified the kernel, or the pre-built kernel is not the best for you
 
 ## Installing your own kernel.
 1.  Clone the code from repository.
-```git clone https://github.com/ApolloAuto/apollo-kernel.git```
+```git clone --depth=1 https://github.com/ApolloAuto/apollo-kernel.git```
 ```cd apollo-kernel```
 2.  Add the ESD CAN driver source code according to [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md).
 3.  Build the kernel with the following command.
