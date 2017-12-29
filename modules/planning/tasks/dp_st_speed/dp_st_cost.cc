@@ -26,51 +26,67 @@
 
 namespace apollo {
 namespace planning {
-
-DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
-    : dp_st_speed_config_(dp_st_speed_config),
-      unit_s_(dp_st_speed_config_.total_path_length() /
-              dp_st_speed_config_.matrix_dimension_s()),
-      unit_t_(dp_st_speed_config_.total_time() /
-              dp_st_speed_config_.matrix_dimension_t()) {
-  unit_v_ = unit_s_ / unit_t_;
+namespace {
+constexpr double kInf = std::numeric_limits<double>::infinity();
 }
 
-// TODO(all): normalize cost with time
-double DpStCost::GetObstacleCost(
-    const StGraphPoint& st_graph_point,
-    const std::vector<const StBoundary*>& st_boundaries) const {
-  double total_cost = 0.0;
-  constexpr double inf = std::numeric_limits<double>::infinity();
-  const double unit_v = unit_s_ / unit_t_;
-  const auto& st_point = st_graph_point.point();
-  if (st_point.s() < 0) {
-    return inf;
-  }
-  for (const StBoundary* boundary : st_boundaries) {
-    if (boundary->IsPointInBoundary(st_point)) {
-      if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
-        total_cost += unit_v * ((st_graph_point.index_s() + 1.0) /
-                                (st_graph_point.index_t() + 1.0)) *
-                      dp_st_speed_config_.keep_clear_cost_factor();
+DpStCost::DpStCost(const DpStSpeedConfig& config,
+                   const std::vector<const PathObstacle*>& obstacles,
+                   const common::TrajectoryPoint& init_point)
+    : config_(config),
+      obstacles_(obstacles),
+      init_point_(init_point),
+      unit_s_(config_.total_path_length() / config_.matrix_dimension_s()),
+      unit_t_(config_.total_time() / config_.matrix_dimension_t()),
+      unit_v_(unit_s_ / unit_t_) {}
+
+double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) const {
+  const double s = st_graph_point.point().s();
+  const double t = st_graph_point.point().t();
+
+  double cost = 0.0;
+  for (const auto* obstacle : obstacles_) {
+    auto boundary = obstacle->st_boundary();
+    const double kIgnoreDistance = 200.0;
+    if (boundary.min_s() > kIgnoreDistance) {
+      continue;
+    }
+    if (t < boundary.min_t() || t > boundary.max_t()) {
+      continue;
+    }
+    if (obstacle->IsBlockingObstacle() &&
+        boundary.IsPointInBoundary(STPoint(s, t))) {
+      return kInf;
+    }
+    double s_upper = 0.0;
+    double s_lower = 0.0;
+    boundary.GetBoundarySRange(t, &s_upper, &s_lower);
+    if (s < s_lower) {
+      constexpr double kSafeTimeBuffer = 3.0;
+      const double len = obstacle->obstacle()->Speed() * kSafeTimeBuffer;
+      if (s + len < s_lower) {
+        continue;
       } else {
-        return inf;
+        cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
+                std::pow((len - s_lower + s), 2);
       }
-    } else {
-      const double distance = boundary->DistanceS(st_point);
-      total_cost += dp_st_speed_config_.default_obstacle_cost() *
-                    std::exp(dp_st_speed_config_.obstacle_cost_factor() /
-                             boundary->characteristic_length() * distance);
+    } else if (s > s_upper) {
+      const double kSafeDistance = 20.0;  // or calculated from velocity
+      if (s > s_upper + kSafeDistance) {
+        continue;
+      } else {
+        cost += config_.obstacle_weight() *
+                std::pow((kSafeDistance + s_upper - s), 2);
+      }
     }
   }
-  return total_cost * unit_t_;
+  return cost * unit_t_;
 }
 
 double DpStCost::GetReferenceCost(const STPoint& point,
                                   const STPoint& reference_point) const {
-  return dp_st_speed_config_.reference_weight() *
-         (point.s() - reference_point.s()) * (point.s() - reference_point.s()) *
-         unit_t_;
+  return config_.reference_weight() * (point.s() - reference_point.s()) *
+         (point.s() - reference_point.s()) * unit_t_;
 }
 
 double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
@@ -78,16 +94,15 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   double cost = 0.0;
   const double speed = (second.s() - first.s()) / unit_t_;
   if (speed < 0) {
-    return std::numeric_limits<double>::infinity();
+    return kInf;
   }
   double det_speed = (speed - speed_limit) / speed_limit;
   if (det_speed > 0) {
-    cost = dp_st_speed_config_.exceed_speed_penalty() *
-           dp_st_speed_config_.default_speed_cost() * fabs(speed * speed) *
-           unit_t_;
+    cost = config_.exceed_speed_penalty() * config_.default_speed_cost() *
+           fabs(speed * speed) * unit_t_;
   } else if (det_speed < 0) {
-    cost = dp_st_speed_config_.low_speed_penalty() *
-           dp_st_speed_config_.default_speed_cost() * -det_speed * unit_t_;
+    cost = config_.low_speed_penalty() * config_.default_speed_cost() *
+           -det_speed * unit_t_;
   } else {
     cost = 0.0;
   }
@@ -96,10 +111,10 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
 
 double DpStCost::GetAccelCost(const double accel) const {
   const double accel_sq = accel * accel;
-  double max_acc = dp_st_speed_config_.max_acceleration();
-  double max_dec = dp_st_speed_config_.max_deceleration();
-  double accel_penalty = dp_st_speed_config_.accel_penalty();
-  double decel_penalty = dp_st_speed_config_.decel_penalty();
+  double max_acc = config_.max_acceleration();
+  double max_dec = config_.max_deceleration();
+  double accel_penalty = config_.accel_penalty();
+  double decel_penalty = config_.decel_penalty();
   double cost = 0.0;
   if (accel > 0.0) {
     cost = accel_penalty * accel_sq;
@@ -132,9 +147,9 @@ double DpStCost::JerkCost(const double jerk) const {
   double jerk_sq = jerk * jerk;
   double cost = 0.0;
   if (jerk > 0) {
-    cost = dp_st_speed_config_.positive_jerk_coeff() * jerk_sq * unit_t_;
+    cost = config_.positive_jerk_coeff() * jerk_sq * unit_t_;
   } else {
-    cost = dp_st_speed_config_.negative_jerk_coeff() * jerk_sq * unit_t_;
+    cost = config_.negative_jerk_coeff() * jerk_sq * unit_t_;
   }
   return cost;
 }

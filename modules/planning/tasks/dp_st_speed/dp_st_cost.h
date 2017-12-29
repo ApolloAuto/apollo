@@ -26,6 +26,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/tasks/dp_st_speed/st_graph_point.h"
@@ -35,11 +36,11 @@ namespace planning {
 
 class DpStCost {
  public:
-  explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config);
+  explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config,
+                    const std::vector<const PathObstacle*>& obstacles,
+                    const common::TrajectoryPoint& init_point);
 
-  double GetObstacleCost(
-      const StGraphPoint& point,
-      const std::vector<const StBoundary*>& st_boundaries) const;
+  double GetObstacleCost(const StGraphPoint& point) const;
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
@@ -68,7 +69,9 @@ class DpStCost {
   double GetAccelCost(const double accel) const;
   double JerkCost(const double jerk) const;
 
-  const DpStSpeedConfig& dp_st_speed_config_;
+  const DpStSpeedConfig& config_;
+  const std::vector<const PathObstacle*>& obstacles_;
+  const common::TrajectoryPoint& init_point_;
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;
   double unit_v_ = 0.0;
