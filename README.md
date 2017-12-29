@@ -57,9 +57,6 @@ rosbag play -l ./docs/demo_guide/demo_2.0.bag
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_1.5.png)
 
-Advanced users who wish to build outside this Docker container can refer
-to the corresponding Docker specification file (`./docker/dev.dockerfile`).
-
 ## Documents
 Apollo documents can be found under the [docs](https://github.com/ApolloAuto/apollo/blob/master/docs/) repository.
    * [quickstart](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/): the quickstart tutorial.
