@@ -77,7 +77,7 @@ Before getting started, please make sure you have installed the Ubuntu Linux 14.
 1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/):
 
 ```
-git clone git@github.com:ApolloAuto/apollo.git
+git clone --depth=1 git@github.com:ApolloAuto/apollo.git
 cd apollo
 
 ```

@@ -77,7 +77,7 @@ The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍
 1. 从[github source](https://github.com/ApolloAuto/apollo/)下载Apollo的源代码：
 
 ```
-git clone git@github.com:ApolloAuto/apollo.git
+git clone --depth=1 git@github.com:ApolloAuto/apollo.git
 cd apollo
 
 ```
