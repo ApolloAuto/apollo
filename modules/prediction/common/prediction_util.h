@@ -74,15 +74,16 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @brief Generate a set of free move trajectory points
  * @param state matrix
  * @param transition matrix
+ * @param heading
  * @param total number of generated trajectory points required
  * @param trajectory point interval period
  * @param generated trajectory points
  */
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
-    const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
-    const double period,
-    std::vector<::apollo::common::TrajectoryPoint>* points);
+    const Eigen::Matrix<double, 6, 6>& transition, double theta,
+    const size_t num, const double period,
+    std::vector<apollo::common::TrajectoryPoint>* points);
 
 /**
  * @brief Generate a set of lane sequence trajectory points
