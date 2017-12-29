@@ -25,6 +25,7 @@
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -295,6 +296,14 @@ Chassis LincolnController::chassis() {
         chassis_detail.basic().gps_speed());
   } else {
     chassis_.mutable_chassis_gps()->set_gps_valid(false);
+  }
+
+  // last vin number will be written into KVDB once.
+  if (chassis_detail.has_license() && chassis_detail.license().has_vin() &&
+      !received_vin_) {
+    apollo::common::KVDB::Put("apollo:canbus:vin",
+                              chassis_detail.license().vin());
+    received_vin_ = true;
   }
 
   return chassis_;
