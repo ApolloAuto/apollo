@@ -50,10 +50,8 @@ Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://loc
 
 ### Replay demo rosbag
 ```
-# in a different terminal, in the apollo directory
-bash docker/scripts/dev_into.sh # jump into the docker container
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
+rosbag play -l ./docs/demo_guide/demo_2.0.bag
 ```
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
