@@ -99,19 +99,6 @@ void GenerateLaneSequenceTrajectoryPoints(
     const LaneSequence& sequence, const size_t num, const double period,
     std::vector<::apollo::common::TrajectoryPoint>* points);
 
-/**
- * @brief Draw trajectory points for still obstacle
- * @param obstacle obstacle
- * @param lane_sequence the specified lane sequence
- * @param total_time total time of prediction
- * @param period time step between prediction trajectory points
- * @param points the output trajectory points
- */
-void GenerateStillSequenceTrajectoryPoints(
-    const double position_x, const double position_y, const double theta,
-    const double total_time, const double period,
-    std::vector<apollo::common::TrajectoryPoint>* points);
-
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
