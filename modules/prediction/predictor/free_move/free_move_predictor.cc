@@ -51,6 +51,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
+  double theta = feature.velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     position(0) = feature.t_position().x();
     position(1) = feature.t_position().y();
@@ -62,7 +63,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
   std::vector<TrajectoryPoint> points(0);
   DrawFreeMoveTrajectoryPoints(
-      position, velocity, acc, obstacle->kf_motion_tracker(),
+      position, velocity, acc, theta, obstacle->kf_motion_tracker(),
       FLAGS_prediction_duration, FLAGS_prediction_period, &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
@@ -75,7 +76,8 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acc, const KalmanFilter<double, 6, 2, 0>& kf,
+    const Eigen::Vector2d& acc, double theta,
+    const KalmanFilter<double, 6, 2, 0>& kf,
     double total_time, double period, std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
   state(0, 0) = 0.0;
@@ -95,7 +97,7 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
 
   size_t num = static_cast<size_t>(total_time / period);
   ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, num, period, points);
+      &state, transition, theta, num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     ::apollo::prediction::predictor_util::TranslatePoint(

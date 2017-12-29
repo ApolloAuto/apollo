@@ -80,15 +80,15 @@ void TranslatePoint(const double translate_x, const double translate_y,
 
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
-    const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
-    const double period, std::vector<TrajectoryPoint>* points) {
+    const Eigen::Matrix<double, 6, 6>& transition, double theta,
+    const size_t num, const double period,
+    std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
   double v_y = (*state)(3, 0);
   double acc_x = (*state)(4, 0);
   double acc_y = (*state)(5, 0);
-  double theta = std::atan2(v_y, v_x);
 
   for (size_t i = 0; i < num; ++i) {
     double speed = std::hypot(v_x, v_y);
