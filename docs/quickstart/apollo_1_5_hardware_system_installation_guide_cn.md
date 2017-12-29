@@ -212,7 +212,7 @@ c. 通过从其默认位置移除红色跳线帽（以黄色圆圈显示）并�
 
 d. 将CAN卡插入IPC的插槽:
 
-![installed CAN](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/After installing the CAN Card.png)
+![installed CAN](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/After_installing_the_CAN_Card.png)
 
 e. 安装IPC盖子：
 
