@@ -186,18 +186,22 @@ Status SpeedDecider::MakeObjectDecision(
           // OVERTAKE decision
           ObjectDecisionType overtake_decision;
           if (CreateOvertakeDecision(*path_obstacle, &overtake_decision)) {
-            path_obstacle->AddLongitudinalDecision("dp_st_graph",
+            path_obstacle->AddLongitudinalDecision("dp_st_graph/overtake",
                                                    overtake_decision);
           }
         }
         break;
       case CROSS: {
-        ObjectDecisionType stop_decision;
-        if (CreateStopDecision(*path_obstacle, &stop_decision,
-                               -FLAGS_min_stop_distance_obstacle)) {
-          path_obstacle->AddLongitudinalDecision("dp_st_graph", stop_decision);
+        if (obstacle->IsBlockingObstacle()) {
+          ObjectDecisionType stop_decision;
+          if (CreateStopDecision(*path_obstacle, &stop_decision,
+                                 -FLAGS_min_stop_distance_obstacle)) {
+            path_obstacle->AddLongitudinalDecision("dp_st_graph/cross",
+                                                   stop_decision);
+          }
         }
-      } break;
+        break;
+      }
       default:
         AERROR << "Unknown position:" << position;
     }
