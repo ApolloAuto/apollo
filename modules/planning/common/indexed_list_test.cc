@@ -36,7 +36,7 @@ TEST(IndexedList, Add_ConstRef) {
   {
     ASSERT_NE(nullptr, object.Add(1, "one"));
     ASSERT_NE(nullptr, object.Find(1));
-    ASSERT_EQ(nullptr, object.Add(1, "one"));
+    ASSERT_NE(nullptr, object.Add(1, "one"));
     const auto& items = object.Items();
     ASSERT_EQ(nullptr, object.Find(2));
     ASSERT_EQ(1, items.size());
@@ -44,7 +44,7 @@ TEST(IndexedList, Add_ConstRef) {
   }
   {
     ASSERT_NE(nullptr, object.Add(2, "two"));
-    ASSERT_EQ(nullptr, object.Add(2, "two"));
+    ASSERT_NE(nullptr, object.Add(2, "two"));
     ASSERT_NE(nullptr, object.Find(1));
     ASSERT_NE(nullptr, object.Find(2));
     const auto& items = object.Items();
