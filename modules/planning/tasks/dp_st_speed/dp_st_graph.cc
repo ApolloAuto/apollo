@@ -236,8 +236,10 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
     return;
   }
 
-  const uint32_t max_s_diff = static_cast<uint32_t>(
-      FLAGS_planning_upper_speed_limit * unit_t_ / unit_s_);
+  constexpr double kSpeedRangeBuffer = 0.20;
+  const uint32_t max_s_diff =
+      static_cast<uint32_t>(FLAGS_planning_upper_speed_limit *
+                            (1 + kSpeedRangeBuffer) * unit_t_ / unit_s_);
   const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
 
   const auto& pre_col = cost_table_[c - 1];

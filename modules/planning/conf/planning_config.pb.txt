@@ -34,10 +34,10 @@ em_planner_config {
         path_end_l_cost: 1.0e4
     }
     dp_st_speed_config {
-        total_path_length: 200
+        total_path_length: 150
         total_time: 8.0
-        matrix_dimension_s: 200
-        matrix_dimension_t: 20
+        matrix_dimension_s: 400
+        matrix_dimension_t: 8
 
         speed_weight: 0.0
         accel_weight: 10.0
@@ -60,8 +60,8 @@ em_planner_config {
         positive_jerk_coeff: 1.0
         negative_jerk_coeff: 1.0
 
-        max_acceleration: 2.5
-        max_deceleration: -3.3
+        max_acceleration: 3.0
+        max_deceleration: -4.0
 
         st_boundary_config {
             boundary_buffer: 0.1
