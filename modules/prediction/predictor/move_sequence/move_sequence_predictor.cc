@@ -195,9 +195,9 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     position[0] = feature.t_position().x();
     position[1] = feature.t_position().y();
   }
-  double time_to_lane_center = std::max(
-      FLAGS_default_time_to_lane_center,
-      ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence));
+  double time_to_lane_center =
+      std::max(FLAGS_default_time_to_lane_center,
+               ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence));
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
@@ -222,6 +222,7 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
 
   size_t total_num = static_cast<size_t>(total_time / period);
   size_t num_to_center = static_cast<size_t>(time_to_lane_center / period);
+  AERROR << "Obstacle: " << obstacle.id();
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
@@ -248,20 +249,6 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     }
 
     prev_lane_l = lane_l;
-
-    if (points->size() > 0) {
-      PathPoint* prev_point = points->back().mutable_path_point();
-      double x_diff = point.x() - prev_point->x();
-      double y_diff = point.y() - prev_point->y();
-      if (std::fabs(x_diff) > std::numeric_limits<double>::epsilon() ||
-          std::fabs(y_diff) > std::numeric_limits<double>::epsilon()) {
-        theta = std::atan2(y_diff, x_diff);
-        prev_point->set_theta(theta);
-      } else {
-        theta = prev_point->theta();
-      }
-    }
-
     double vs =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 1);
     double as =

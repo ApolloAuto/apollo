@@ -65,7 +65,10 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
-  std::string lane_id = feature.lane().lane_feature().lane_id();
+  std::string lane_id = "";
+  if (feature.lane().has_lane_feature()) {
+    lane_id = feature.lane().lane_feature().lane_id();
+  }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
   FilterLaneSequences(feature.lane().lane_graph(), lane_id,
