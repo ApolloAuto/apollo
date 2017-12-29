@@ -152,6 +152,8 @@ class LincolnController final : public VehicleController {
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
+
+  bool received_vin_ = false;
 };
 
 }  // namespace lincoln
