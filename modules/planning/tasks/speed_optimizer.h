@@ -26,6 +26,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 #include "modules/planning/tasks/task.h"
 
