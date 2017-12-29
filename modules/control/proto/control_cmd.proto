@@ -129,6 +129,8 @@ message SimpleMPCDebug {
   optional double speed_error = 21;
   optional double acceleration_reference = 22;
   optional bool is_full_stop = 23;
+  optional double station_feedback = 24;
+  optional double speed_feedback = 25;
 }
 
 message InputDebug {
