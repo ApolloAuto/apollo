@@ -14,35 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/monitor/reporters/static_info_reporter.h"
+
 #include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/data/util/info_collector.h"
 
-DEFINE_string(commit_id, "", "Current commit ID.");
+DEFINE_string(static_info_reporter_name, "StaticInfoReporter",
+              "Static info reporter name.");
+
+DEFINE_double(static_info_report_interval, 40,
+              "Static info reporting interval (s).");
 
 namespace apollo {
-namespace data {
+namespace monitor {
 
-void UpdateTaskInfo() {
-  Task task = InfoCollector::LoadTaskInfoTemplate();
-
-  // Update software information.
-  auto *software = task.mutable_software();
-  if (!FLAGS_commit_id.empty()) {
-    software->set_commit_id(FLAGS_commit_id);
-  }
-
-  CHECK(InfoCollector::SaveTaskInfoTemplate(task));
+StaticInfoReporter::StaticInfoReporter()
+    : RecurrentRunner(FLAGS_static_info_reporter_name,
+                      FLAGS_static_info_report_interval) {
 }
 
-}  // namespace data
+void StaticInfoReporter::RunOnce(const double current_time) {
+  AINFO << "Reported static info.";
+  apollo::common::adapter::AdapterManager::PublishStaticInfo(
+      apollo::data::InfoCollector::GetStaticInfo());
+}
+
+}  // namespace monitor
 }  // namespace apollo
-
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  google::ParseCommandLineFlags(&argc, &argv, true);
-
-  apollo::data::UpdateTaskInfo();
-
-  return 0;
-}

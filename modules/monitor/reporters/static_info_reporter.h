@@ -13,41 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_MONITOR_REPORTERS_STATIC_INFO_REPORTER_H_
+#define MODULES_MONITOR_REPORTERS_STATIC_INFO_REPORTER_H_
 
-#ifndef MODULES_DATA_UTIL_INFO_COLLECTOR_H_
-#define MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+#include "modules/monitor/common/recurrent_runner.h"
 
-#include "modules/common/macro.h"
-#include "modules/data/proto/static_info.pb.h"
-
-/**
- * @namespace apollo::data
- * @brief apollo::data
- */
 namespace apollo {
-namespace data {
+namespace monitor {
 
-class InfoCollector {
+class StaticInfoReporter : public RecurrentRunner {
  public:
-  // Get task information.
-  static const StaticInfo &GetStaticInfo();
-
-  // Get specific information.
-  // Listening topics: ChassisDetail.
-  static const VehicleInfo &GetVehicleInfo();
-  static const EnvironmentInfo &GetEnvironmentInfo();
-  static const HardwareInfo &GetHardwareInfo();
-  static const SoftwareInfo &GetSoftwareInfo();
-  static const UserInfo &GetUserInfo();
-
- private:
-  StaticInfo static_info_;
-  StaticInfoConf config_;
-
-  DECLARE_SINGLETON(InfoCollector);
+  StaticInfoReporter();
+  void RunOnce(const double current_time) override;
 };
 
-}  // namespace data
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+#endif  // MODULES_MONITOR_REPORTERS_STATIC_INFO_REPORTER_H_
