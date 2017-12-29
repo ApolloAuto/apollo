@@ -75,7 +75,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) const {
       if (s > s_upper + kSafeDistance) {
         continue;
       } else {
-        cost += config_.obstacle_weight() *
+        cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
                 std::pow((kSafeDistance + s_upper - s), 2);
       }
     }
