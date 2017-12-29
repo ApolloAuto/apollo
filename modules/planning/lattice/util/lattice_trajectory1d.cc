@@ -86,5 +86,20 @@ double LatticeTrajectory1d::target_time() const {
   return target_time_;
 }
 
+void LatticeTrajectory1d::set_target_position(double target_position) {
+  target_position_ = target_position;
+  has_target_position_ = true;
+}
+
+void LatticeTrajectory1d::set_target_velocity(double target_velocity) {
+  target_velocity_ = target_velocity;
+  has_target_velocity_ = true;
+}
+
+void LatticeTrajectory1d::set_target_time(double target_time) {
+  target_time_ = target_time;
+  has_target_time_ = true;
+}
+
 }
 }

@@ -124,11 +124,14 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     end_state[0] = end_condition.first[1];
     end_state[1] = end_condition.first[2];
 
-    std::shared_ptr<Curve1d> ptr_lon_trajectory(new LatticeTrajectory1d(
-        std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
-                    init_lon_state_, end_state, end_condition.second))));
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(new LatticeTrajectory1d(
+      std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
+      init_lon_state_, end_state, end_condition.second))));
 
-    ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
+    lattice_traj_ptr->set_target_position(end_condition.first[0]);
+    lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
+    lattice_traj_ptr->set_target_time(end_condition.second);
+    ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
   }
 }
 
@@ -193,10 +196,14 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
                                   planning_target);
 
   for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<Curve1d> ptr_lon_trajectory(new LatticeTrajectory1d(
-        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(init_lon_state_, end_condition.first, end_condition.second))
-    ));
-    ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(new LatticeTrajectory1d(
+      std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+        init_lon_state_, end_condition.first, end_condition.second))));
+
+    lattice_traj_ptr->set_target_position(end_condition.first[0]);
+    lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
+    lattice_traj_ptr->set_target_time(end_condition.second);
+    ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
   }
 }
 
@@ -206,11 +213,15 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
       end_condition_sampler_->SampleLatEndConditions();
 
   for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<Curve1d> ptr_lat_trajectory = std::shared_ptr<Curve1d>(
-        new LatticeTrajectory1d(std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-            init_lat_state_, end_condition.first, end_condition.second))));
 
-    ptr_lat_trajectory_bundle->push_back(ptr_lat_trajectory);
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(new LatticeTrajectory1d(
+      std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+        init_lat_state_, end_condition.first, end_condition.second))));
+
+    lattice_traj_ptr->set_target_position(end_condition.first[0]);
+    lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
+    lattice_traj_ptr->set_target_time(end_condition.second);
+    ptr_lat_trajectory_bundle->push_back(lattice_traj_ptr);
   }
 }
 
