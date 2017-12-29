@@ -47,7 +47,4 @@
     <arg name="topic_compensated_pointcloud" value="/apollo/sensor/velodyne64/compensator/PointCloud2"/>
   </include>
 
-  <node pkg="velodyne_pointcloud" type="extrinsics_broadcaster.py"
-    args="$(arg extrinsics_velodyne64)" name="static_transform_velodyne64" />
-
 </launch>
