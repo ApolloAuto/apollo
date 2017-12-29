@@ -21,7 +21,7 @@ import os
 import sys
 import urllib3
 from ConfigParser import ConfigParser
-from modules.data.proto.task_pb2 import VehicleInfo
+from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
 
 def update():
