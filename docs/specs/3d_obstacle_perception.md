@@ -1,18 +1,23 @@
 3D Obstacle Perception
 ===================
 
-The following sections describe the perception pipeline of obstacles
-that are resolved by Apollo:
+There are three main components of 3D obstacle perception:
 
--   HDMap Region of Interest (ROI) Filter
--   Convolutional Neural Networks (CNN) Segmentation
--   MinBox Builder
--   HM Object Tracker
--   Sequential Type Fusion
--   Sensor Fusion
+-   LiDAR Obstacle Perception
+-   RADAR Obstacle Perception
+-   Obstacle Results Fusion
 
-HDMap Region of Interest (ROI) Filter
--------------------------------------
+## LiDAR Obstacle Perception
+
+The details of LiDAR obstacle perception pipeline are provided in the following sections, including: 
+
+- HDMap Region of Interest (ROI) Filter
+- Convolutional Neural Networks (CNN) Segmentation
+- MinBox Builder
+- HM Object Tracker
+- Sequential Type Fusion
+
+### HDMap Region of Interest (ROI) Filter
 
 The Region of Interest (ROI) specifies the drivable area that includes
 road surfaces and junctions are retrieved from the HD
@@ -42,7 +47,7 @@ steps:
 
 3.  Point inquiry with ROI LUT
 
-### Coordinate Transformation
+#### Coordinate Transformation
 
 For the HDMap ROI filter, the data interface for HD map is defined in
 terms of a set of polygons, each of which is actually an ordered set of
@@ -53,7 +58,7 @@ transforms the points of input point cloud and the HDMap polygons into a
 local coordinate system that originates from the LiDAR sensor’s
 location.
 
-### ROI LUT Construction
+#### ROI LUT Construction
 
 To determine an input point whether inside or outside the ROI, Apollo
 adopts a grid-wise LUT that quantifies the ROI into a birds-eye view 2D
@@ -73,7 +78,7 @@ system corresponding to the LiDAR sensor’s location. The 2D grid is composed
 of 8×8 cells that are shown as green squares. The cells inside the ROI are 
 blue-filled squares while the ones outside the ROI are yellow-filled squares.
 
-### Point Inquiry with ROI LUT
+#### Point Inquiry with ROI LUT
 
 Based on the ROI LUT, the affiliation of each input point is queried
 using two-step verification. Then, Apollo conducts data compilation and
@@ -98,8 +103,7 @@ table below on the usage of parameters for HDMap ROI Filter.
 | cell_size      | The size of cells for quantizing the 2D grid. | 0.25 meter  |
 | extend_dist    | The distance of extending the ROI from the polygon boundary. | 0.0 meter   |
 
-Convolutional Neural Networks (CNN) Segmentation
-------------------------------------------------
+### Convolutional Neural Networks (CNN) Segmentation
 
 After the HDMap ROI filter, Apollo obtains the filtered point cloud that
 includes *only* the points inside ROI (i.e., the drivable road and
@@ -128,7 +132,7 @@ The Apollo CNN segmentation consists of four successive steps:
 
 The following sections describe the deep CNN in detail.
 
-### Channel Feature Extraction
+#### Channel Feature Extraction
 
 Given a frame of point cloud, Apollo build a birds-eye view (i.e.,
 projected to the X-Y plane) 2D grid in the local coordinate system. Each
@@ -155,7 +159,7 @@ statistical measurements computed are the:
 
 8.  Binary value indicating whether the cell is empty or occupied
 
-### CNN-Based Obstacle Predication
+#### CNN-Based Obstacle Predication
 
 Based on the channel features described above, Apollo uses a deep fully
 convolutional neural network (FCNN) to predict the cell-wise obstacle
@@ -191,7 +195,7 @@ layers with non-linear activation (i.e., ReLu) layers.
 
 <div align=center>Figure 2 The FCNN for cell-wise obstacle prediction</div>
 
-### Obstacle Clustering
+#### Obstacle Clustering
 
 After the CNN-based prediction step, Apollo obtains prediction
 information for individual cells. Apollo utilizes five cell object
@@ -234,7 +238,7 @@ components whose root nodes are adjacent to each other.
 
 The class probabilities are summed up over the nodes (cells) within the object cluster for each candidate obstacle type, including vehicle, pedestrian, bicyclist and unknown. The obstacle type corresponding to the maximum averaged probability is the final classification result of the object cluster.
 
-### Post-processing
+#### Post-processing
 
 After clustering, Apollo obtains a set of candidate object clusters each
 of which includes several cells. In the post-processing step, Apollo
@@ -264,10 +268,7 @@ explains the parameter usage and default values for CNN Segmentation.
 | feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 512        |
 | feature_param {range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 60 meters  |
 
-
-
-MinBox Builder
---------------
+### MinBox Builder
 
 The object builder component establishes a bounding box for the detected
 obstacles. Due to occlusions or distance to the LiDAR sensor, the point
@@ -292,8 +293,7 @@ minimum area as the final bounding box.
 
 <div align=center>Figure 4 Illustration of MinBox Object Builder</div>
 
-HM Object Tracker
------------------
+### HM Object Tracker
 
 The HM object tracker is designed to track obstacles detected by the
 segmentation step. In general, it forms and updates track lists by
@@ -303,7 +303,7 @@ lists will be estimated after association. In HM object tracker, the
 Hungarian algorithm is used for detection-to-track association, and a
 Robust Kalman Filter is adopted for motion estimation.
 
-### Detection-to-Track Association
+#### Detection-to-Track Association
 
 When associating detection to existing track lists, Apollo constructs a
 bipartite graph and then uses the Hungarian algorithm to find the best
@@ -343,7 +343,7 @@ with distance greater than a reasonable maximum distance threshold.
 
 <div align=center>Figure 5 Illustration of Bipartite Graph Matching</div>
 
-### Track Motion Estimation
+#### Track Motion Estimation
 
 After the detection-to-track association, HM object tracker uses a
 Robust Kalman Filter to estimate the motion states of current track
@@ -393,31 +393,29 @@ A high-level workflow of HM object tracker is given in figure 6.
 
 3)  Update the motion state of updated track lists and collect the
     tracking results.
-## Sequential Type Fusion
+### Sequential Type Fusion
 
-To smooth the obstacle type and reduce the type switch over the whole trajectory, Apollo utilizes a sequential type fusion algorithm based on a linear-chain Conditional Random Field (CRF), which can be formulated as below:
+To smooth the obstacle type over the whole trajectory and reduce the type switch between adjacent frames, Apollo utilizes a sequential type fusion algorithm based on a linear-chain Conditional Random Field (CRF), which can be formulated as below:
 
-![CRF_eq1](images/3d_obstacle_perception/CRF_eq1.png)
+<div align=center>![CRF_eq1](images\3d_obstacle_perception\CRF_eq1.png)</div>
 
-![CRF_eq2](images/3d_obstacle_perception/CRF_eq2.png)
+<div align=center>![CRF_eq2](images\3d_obstacle_perception\CRF_eq2.png)</div>
 
 where the unary term acts on each single node, while the binary one acts on each edge. 
 
-The probability in the unary term is the class probability output by the CNN-based prediction, and the state transition probability in the binary term is modeled by the obstacle type transition from time t-1 to time t, which is statistically learned from large amounts of obstacle trajectories. Specifically, Apollo also uses a learned confusion matrix to indicate the probability of changing from the predicted type to ground truth type to optimize the original class probability. 
+The probability in the unary term is the class probability output by the CNN-based prediction, and the state transition probability in the binary term is modeled by the obstacle type transition from time t-1 to time t, which is statistically learned from large amounts of obstacle trajectories. Specifically, Apollo also uses a learned confusion matrix indicating the probability of changing from the predicted type to ground truth type to rectify the original CNN-based class probability. 
 
-The sequential obstacle type is optimized by solving the following problem: 
+The sequential obstacle type is finally optimized by using Viterbi algorithm to solve the following problem:
 
-![CRF_eq3](images/3d_obstacle_perception/CRF_eq3.png)
+<div align=center>![CRF_eq3](images\3d_obstacle_perception\CRF_eq3.png)</div>
 
-using Viterbi algorithm.
-
-## Sensor Fusion
-
-The sensor fusion module is designed to fuse LIDAR tracking results and RADAR detection results. In general, fusion items is kept, Apollo first matches the sensor results with the fusion items by tracking id, then computes association matrix for unmatched sensor results and unmatched fusion items to get an optimal matching result. For the matched sensor result, update the corresponding fusion item by Adaptive Kalman Filter. For the unmatched sensor result, create a new fusion item. For the unmatched fusion item, removed from the fusion items if it is too stale. 
-
-### RADAR Detector
+## RADAR Obstacle Perception
 
 Given the radar data from the sensor, some basic process would be done. First of all, the track id needs to be extended, because Apollo needs a global track id for id association. Original radar sensor only provides id with 8 bits, so it is hard to determine if two objects with same id in two adjacent frames are denotes one object in tracking history, especially there exits frame dropping problem. Apollo uses meas state provided by radar sensor to handle this problem. Meanwhile, Apollo assigns new track id to the object which far away from the object with same track id in last frame. Secondly, false positive filter is used to remove noise. Apollo set some threshold via RADAR data to filter results that would be noise. And then, objects is built according the RADAR data as an unified object format. Apollo translates objects into world coordinate via calibration results. Original RADAR sensor provides the relative velocity of the object, so Apollo uses host car velocity from localization. Apollo adds these two velocity to denote the absolute velocity of the detected object. Finally, HDMap roi filter is used to get interested objects. Only objects inside the roi is used by sensor fusion algorithm.
+
+## Obstacle Results Fusion
+
+The sensor fusion module is designed to fuse LIDAR tracking results and RADAR detection results. In general, fusion items is kept, Apollo first matches the sensor results with the fusion items by tracking id, then computes association matrix for unmatched sensor results and unmatched fusion items to get an optimal matching result. For the matched sensor result, update the corresponding fusion item by Adaptive Kalman Filter. For the unmatched sensor result, create a new fusion item. For the unmatched fusion item, removed from the fusion items if it is too stale. 
 
 ### Fusion Items Management
 
