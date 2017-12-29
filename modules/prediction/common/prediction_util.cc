@@ -33,13 +33,9 @@ double Normalize(const double value, const double mean, const double std) {
   return (value - mean) / (std + eps);
 }
 
-double Sigmoid(const double value) {
-  return 1 / (1 + std::exp(-1.0 * value));
-}
+double Sigmoid(const double value) { return 1 / (1 + std::exp(-1.0 * value)); }
 
-double Relu(const double value) {
-  return (value > 0.0) ? value : 0.0;
-}
+double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
 
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots) {
@@ -177,19 +173,6 @@ void GenerateLaneSequenceTrajectoryPoints(
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
-    }
-
-    if (points->size() > 0) {
-      PathPoint* prev_point = points->back().mutable_path_point();
-      double x_diff = point.x() - prev_point->x();
-      double y_diff = point.y() - prev_point->y();
-      if (std::fabs(x_diff) > std::numeric_limits<double>::epsilon() ||
-          std::fabs(y_diff) > std::numeric_limits<double>::epsilon()) {
-        theta = std::atan2(y_diff, x_diff);
-        prev_point->set_theta(theta);
-      } else {
-        theta = prev_point->theta();
-      }
     }
 
     // update state

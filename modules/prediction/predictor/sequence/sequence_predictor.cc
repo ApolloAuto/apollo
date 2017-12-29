@@ -88,7 +88,8 @@ void SequencePredictor::FilterLaneSequences(
     // The obstacle has interference with ADC within a small distance
     if (distance < FLAGS_lane_change_dist &&
         (lane_change_type[i] == LaneChangeType::LEFT ||
-         lane_change_type[i] == LaneChangeType::RIGHT)) {
+         lane_change_type[i] == LaneChangeType::RIGHT ||
+         lane_change_type[i] == LaneChangeType::ONTO_LANE)) {
       (*enable_lane_sequence)[i] = false;
       ADEBUG << "Filter trajectory [" << ToString(sequence)
              << "] due to small distance " << distance << ".";
@@ -162,6 +163,10 @@ void SequencePredictor::GetADC() {
 SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
     const std::string& lane_id, const LaneSequence& lane_sequence) {
   PredictionMap* map = PredictionMap::instance();
+
+  if (lane_id.empty()) {
+    return LaneChangeType::ONTO_LANE;
+  }
 
   std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
   if (lane_id == lane_change_id) {
