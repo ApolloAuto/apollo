@@ -43,9 +43,9 @@ function start() {
   fi
 
   # Create and enter into bag dir.
-  if [ ! -e "${BAG_DIR}" ]; then
-    mkdir -p "${BAG_DIR}"
-  fi
+  TASK_ID=$(date +%Y-%m-%d-%H-%M-%S)
+  BAG_DIR="${BAG_DIR}/${TASK_ID}"
+  mkdir -p "${BAG_DIR}"
   cd "${BAG_DIR}"
   echo "Recording bag to: $(pwd)"
 
