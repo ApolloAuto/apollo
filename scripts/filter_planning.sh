@@ -24,6 +24,7 @@ function print_help() {
    echo "  -po filter only for perception topic, produces *.po.bag"
    echo "  -np filter for planning dependencies, produces *.np.bag"
    echo "  -wp filter for planning and its dependencies, produces *.wp.bag"
+   echo "  -npp filter out planning and prediction, produces *.npp.bag"
 }
 
 routing_topic="topic == '/apollo/routing_response'"
@@ -41,6 +42,9 @@ planning_deps="$perfect_control_topic \
     or topic == '/apollo/canbus/chassis' \
     or topic == '/apollo/localization/pose'"
 
+planning_topic="topic == '/apollo/planning'"
+prediction_topic="topic == '/apollo/prediction'"
+
 planning_all="topic == '/apollo/planning' \
     or topic == '/apollo/drive_event' \
     or $planning_deps"
@@ -56,6 +60,10 @@ is_no_planning=false
 
 #only perception topic
 is_perception=false;
+
+#no prediction and no planning
+is_noprediction_planning=false;
+
 work_mode_num=0
 
 
@@ -80,7 +88,12 @@ case $key in
     work_mode_num=$((work_mode_num+1))
     shift # past argument
     ;;
-    -wp|--lib)
+    -npp|--nopredictionplanning)
+    is_no_prediction_planning=true
+    work_mode_num=$((work_mode_num+1))
+    shift # past argument
+    ;;
+    -wp|--withplanning)
     is_with_planning=true
     work_mode_num=$((work_mode_num+1))
     shift # past value
@@ -117,6 +130,12 @@ function filter() {
         rosbag filter $1 "$target" "$perfect_control_topic"
 
     fi
+
+    if $is_no_prediction_planning; then
+        target="$2/${name%.*}.npp.bag"
+        rosbag filter $1 "$target" "not ($prediction_topic) and not ($planning_topic)"
+    fi
+
 
     if $is_perception; then
         target="$2/${name%.*}.po.bag"

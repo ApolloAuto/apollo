@@ -90,9 +90,6 @@ DEFINE_double(valid_position_diff_thred, 0.5,
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
 
-DEFINE_double(perception_confidence_threshold, 0.4,
-              "Skip the perception obstacle if its confiderence is lower than "
-              "this threshold.");
 DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
 
