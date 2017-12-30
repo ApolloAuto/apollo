@@ -36,8 +36,7 @@ using apollo::perception::PerceptionObstacle;
 
 namespace {
 
-int LastIndexBefore(const prediction::Trajectory& trajectory,
-                    const double t) {
+int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
   int num_traj_point = trajectory.trajectory_point_size();
   if (num_traj_point == 0) {
     return -1;
@@ -64,18 +63,15 @@ int LastIndexBefore(const prediction::Trajectory& trajectory,
 }  // namespace
 
 PathTimeNeighborhood::PathTimeNeighborhood(
-    const Frame* frame,
-    const std::array<double, 3>& init_s,
+    const Frame* frame, const std::array<double, 3>& init_s,
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
-
   init_s_ = init_s;
   SetupObstacles(frame, reference_line, discretized_ref_points);
 }
 
 void PathTimeNeighborhood::SetupObstacles(
-    const Frame* frame,
-    const ReferenceLine& reference_line,
+    const Frame* frame, const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
   const auto& obstacles = frame->obstacles();
 
@@ -95,13 +91,13 @@ void PathTimeNeighborhood::SetupObstacles(
       SLBoundary sl_boundary;
       reference_line.GetSLBoundary(box, &sl_boundary);
 
-      //the obstacle is not shown on the region to be considered.
-      if (sl_boundary.end_s() < 0.0
-          || sl_boundary.start_s() > init_s_[0] + planned_trajectory_horizon
-          || (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred
-              && std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred)) {
-        if (path_time_obstacle_map_.find(obstacle->Id())
-            != path_time_obstacle_map_.end()) {
+      // the obstacle is not shown on the region to be considered.
+      if (sl_boundary.end_s() < 0.0 ||
+          sl_boundary.start_s() > init_s_[0] + planned_trajectory_horizon ||
+          (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred &&
+           std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred)) {
+        if (path_time_obstacle_map_.find(obstacle->Id()) !=
+            path_time_obstacle_map_.end()) {
           break;
         } else {
           relative_time += trajectory_time_resolution;
@@ -109,11 +105,11 @@ void PathTimeNeighborhood::SetupObstacles(
         }
       }
 
-      double v = SpeedOnReferenceLine(discretized_ref_points, obstacle,
-          sl_boundary);
+      double v =
+          SpeedOnReferenceLine(discretized_ref_points, obstacle, sl_boundary);
 
-      if (path_time_obstacle_map_.find(obstacle->Id())
-          == path_time_obstacle_map_.end()) {
+      if (path_time_obstacle_map_.find(obstacle->Id()) ==
+          path_time_obstacle_map_.end()) {
         path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
 
         *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left() =
@@ -130,29 +126,28 @@ void PathTimeNeighborhood::SetupObstacles(
                            relative_time);
 
       *path_time_obstacle_map_[obstacle->Id()].mutable_upper_right() =
-          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
-                           relative_time);
-    
+          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
+
       relative_time += trajectory_time_resolution;
     }
   }
 
   for (auto& path_time_obstacle : path_time_obstacle_map_) {
     double s_upper = std::max(path_time_obstacle.second.bottom_right().s(),
-        path_time_obstacle.second.upper_right().s());
+                              path_time_obstacle.second.upper_right().s());
 
     double s_lower = std::min(path_time_obstacle.second.bottom_left().s(),
-        path_time_obstacle.second.upper_left().s());
+                              path_time_obstacle.second.upper_left().s());
 
     path_time_obstacle.second.set_path_lower(s_lower);
 
     path_time_obstacle.second.set_path_upper(s_upper);
 
     double t_upper = std::max(path_time_obstacle.second.bottom_right().t(),
-        path_time_obstacle.second.upper_right().t());
+                              path_time_obstacle.second.upper_right().t());
 
     double t_lower = std::min(path_time_obstacle.second.bottom_left().t(),
-        path_time_obstacle.second.upper_left().t());
+                              path_time_obstacle.second.upper_left().t());
 
     path_time_obstacle.second.set_time_lower(t_lower);
 
@@ -160,14 +155,13 @@ void PathTimeNeighborhood::SetupObstacles(
   }
 }
 
-double PathTimeNeighborhood::SpeedAtT(
-    const std::string& obstacle_id, const double t) const {
-  bool found = prediction_traj_map_.find(obstacle_id) !=
-               prediction_traj_map_.end();
+double PathTimeNeighborhood::SpeedAtT(const std::string& obstacle_id,
+                                      const double t) const {
+  bool found =
+      prediction_traj_map_.find(obstacle_id) != prediction_traj_map_.end();
   CHECK(found);
   CHECK_GE(t, 0.0);
-  prediction::Trajectory trajectory =
-      prediction_traj_map_.at(obstacle_id);
+  prediction::Trajectory trajectory = prediction_traj_map_.at(obstacle_id);
   int num_traj_point = trajectory.trajectory_point_size();
   if (num_traj_point == 0) {
     return 0.0;
@@ -185,13 +179,12 @@ double PathTimeNeighborhood::SpeedAtT(
   double t_before = trajectory.trajectory_point(index).relative_time();
   double v_after = trajectory.trajectory_point(index + 1).v();
   double t_after = trajectory.trajectory_point(index + 1).relative_time();
-  
+
   return apollo::common::math::lerp(v_before, t_before, v_after, t_after, t);
 }
 
 PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
-    const std::string& obstacle_id,
-    const double s, const double t) const {
+    const std::string& obstacle_id, const double s, const double t) const {
   PathTimePoint path_time_point;
   path_time_point.set_s(s);
   path_time_point.set_t(t);
@@ -204,17 +197,17 @@ double PathTimeNeighborhood::SpeedOnReferenceLine(
     const Obstacle* obstacle, const SLBoundary& sl_boundary) {
   PathPoint obstacle_point_on_ref_line =
       ReferenceLineMatcher::MatchToReferenceLine(discretized_ref_points,
-          sl_boundary.start_s());
+                                                 sl_boundary.start_s());
   const PerceptionObstacle& perception_obstacle = obstacle->Perception();
   double ref_theta = obstacle_point_on_ref_line.theta();
   auto velocity = perception_obstacle.velocity();
-  double v = std::cos(ref_theta) * velocity.x()
-      + std::sin(ref_theta) * velocity.y();
+  double v =
+      std::cos(ref_theta) * velocity.x() + std::sin(ref_theta) * velocity.y();
   return v;
 }
 
-std::vector<PathTimeObstacle>
-PathTimeNeighborhood::GetPathTimeObstacles() const {
+std::vector<PathTimeObstacle> PathTimeNeighborhood::GetPathTimeObstacles()
+    const {
   std::vector<PathTimeObstacle> path_time_obstacles;
   for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
     path_time_obstacles.push_back(path_time_obstacle_element.second);
@@ -222,8 +215,8 @@ PathTimeNeighborhood::GetPathTimeObstacles() const {
   return path_time_obstacles;
 }
 
-bool PathTimeNeighborhood::GetPathTimeObstacle(const std::string& obstacle_id,
-    PathTimeObstacle* path_time_obstacle) {
+bool PathTimeNeighborhood::GetPathTimeObstacle(
+    const std::string& obstacle_id, PathTimeObstacle* path_time_obstacle) {
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
     return false;

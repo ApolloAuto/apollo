@@ -34,15 +34,15 @@ namespace planning {
 
 class PathTimeNeighborhood {
  public:
-    PathTimeNeighborhood(const Frame* frame,
-      const std::array<double, 3>& init_s,
+  PathTimeNeighborhood(
+      const Frame* frame, const std::array<double, 3>& init_s,
       const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   std::vector<PathTimeObstacle> GetPathTimeObstacles() const;
 
   bool GetPathTimeObstacle(const std::string& obstacle_id,
-      PathTimeObstacle* path_time_obstacle);
+                           PathTimeObstacle* path_time_obstacle);
 
   double SpeedAtT(const std::string& obstacle_id, const double t) const;
 
@@ -63,16 +63,16 @@ class PathTimeNeighborhood {
   **/
 
  private:
-  void SetupObstacles(const Frame* frame,
-      const ReferenceLine& reference_line,
+  void SetupObstacles(
+      const Frame* frame, const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   double SpeedOnReferenceLine(
       const std::vector<common::PathPoint>& discretized_ref_points,
       const Obstacle* obstacle, const SLBoundary& sl_boundary);
 
-  PathTimePoint SetPathTimePoint(const std::string& obstacle_id,
-      const double s, const double t) const;
+  PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
+                                 const double t) const;
 
  private:
   std::array<double, 3> init_s_;

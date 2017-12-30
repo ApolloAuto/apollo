@@ -128,7 +128,6 @@ PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
 
   double delta_s = dot / v1_norm;
   return InterpolateUsingLinearApproximation(p0, p1, p0.s() + delta_s);
-
 }
 
 }  // namespace planning

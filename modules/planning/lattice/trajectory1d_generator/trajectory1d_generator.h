@@ -34,7 +34,7 @@ namespace planning {
 class Trajectory1dGenerator {
  public:
   Trajectory1dGenerator(const std::array<double, 3>& lon_init_state,
-      const std::array<double, 3>& lat_init_state);
+                        const std::array<double, 3>& lat_init_state);
 
   virtual ~Trajectory1dGenerator();
 

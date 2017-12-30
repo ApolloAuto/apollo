@@ -127,8 +127,8 @@ bool LatticeConstraintChecker::IsValidTrajectory(
       return false;
     }
 
-    double lat_a = std::abs(
-        points[i].v() * points[i].v() * points[i].path_point().kappa());
+    double lat_a = std::abs(points[i].v() * points[i].v() *
+                            points[i].path_point().kappa());
     if (lat_a > FLAGS_lateral_acceleration_bound) {
       ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
       ADEBUG << "\tlat acc. exceeds boundary; lat_a = " << lat_a;
@@ -155,4 +155,3 @@ bool LatticeConstraintChecker::IsValidTrajectory(
 
 }  // namespace planning
 }  // namespace apollo
-

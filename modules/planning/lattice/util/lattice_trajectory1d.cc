@@ -21,18 +21,20 @@
 namespace apollo {
 namespace planning {
 
-LatticeTrajectory1d::LatticeTrajectory1d(std::shared_ptr<Curve1d> ptr_trajectory1d) {
+LatticeTrajectory1d::LatticeTrajectory1d(
+    std::shared_ptr<Curve1d> ptr_trajectory1d) {
   ptr_trajectory1d_ = ptr_trajectory1d;
 }
 
 double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
-    const double param) const {
+                                     const double param) const {
   double param_length = ptr_trajectory1d_->ParamLength();
   if (param < param_length) {
     return ptr_trajectory1d_->Evaluate(order, param);
   }
 
-  // do constant acceleration extrapolation; to align all the trajectories with time.
+  // do constant acceleration extrapolation; to align all the trajectories with
+  // time.
   double p = ptr_trajectory1d_->Evaluate(0, param_length);
   double v = ptr_trajectory1d_->Evaluate(1, param_length);
   double a = ptr_trajectory1d_->Evaluate(2, param_length);
@@ -40,14 +42,14 @@ double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
   double t = param - param_length;
 
   switch (order) {
-  case 0:
-    return p + v * t + 0.5 * a * t * t;
-  case 1:
-    return v + a * t;
-  case 2:
-    return a;
-  default:
-    return 0;
+    case 0:
+      return p + v * t + 0.5 * a * t * t;
+    case 1:
+      return v + a * t;
+    case 2:
+      return a;
+    default:
+      return 0;
   }
 }
 
@@ -67,9 +69,7 @@ bool LatticeTrajectory1d::has_target_velocity() const {
   return has_target_velocity_;
 }
 
-bool LatticeTrajectory1d::has_target_time() const {
-  return has_target_time_;
-}
+bool LatticeTrajectory1d::has_target_time() const { return has_target_time_; }
 
 double LatticeTrajectory1d::target_position() const {
   CHECK(has_target_position_);
@@ -100,6 +100,5 @@ void LatticeTrajectory1d::set_target_time(double target_time) {
   target_time_ = target_time;
   has_target_time_ = true;
 }
-
 }
 }

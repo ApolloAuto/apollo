@@ -16,10 +16,10 @@
 
 #include "modules/planning/lattice/trajectory1d_generator/trajectory1d_generator.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <utility>
-#include <algorithm>
 
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
@@ -35,10 +35,10 @@ namespace planning {
 
 Trajectory1dGenerator::Trajectory1dGenerator(
     const std::array<double, 3>& lon_init_state,
-    const std::array<double, 3>& lat_init_state) : init_lon_state_(lon_init_state),
-        init_lat_state_(lat_init_state) {
-  end_condition_sampler_ = new EndConditionSampler(
-      lon_init_state, lat_init_state, speed_limit);
+    const std::array<double, 3>& lat_init_state)
+    : init_lon_state_(lon_init_state), init_lat_state_(lat_init_state) {
+  end_condition_sampler_ =
+      new EndConditionSampler(lon_init_state, lat_init_state, speed_limit);
 }
 
 Trajectory1dGenerator::~Trajectory1dGenerator() {
@@ -49,7 +49,6 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) {
-
   /**
   if (planning_target.decision_type() == PlanningTarget::STOP) {
     double stop_position = planning_target.stop_point();
@@ -73,7 +72,8 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
 
     // if the stop point is close enough and vehicle speed is slow, e.g., < 0.5
     // m/s.
-    if ((distance < stop_margin && s_dot < low_speed_threshold) || distance < 0.0) {
+    if ((distance < stop_margin && s_dot < low_speed_threshold) || distance <
+  0.0) {
       AINFO << "Lattice planner stop handling: "
                 "use constant deceleration trajectory";
 
@@ -102,12 +102,10 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
   }
   **/
 
-  GenerateLongitudinalTrajectoryBundle(
-    planning_target,
-    ptr_lon_trajectory_bundle);
+  GenerateLongitudinalTrajectoryBundle(planning_target,
+                                       ptr_lon_trajectory_bundle);
 
-  GenerateLateralTrajectoryBundle(
-    ptr_lat_trajectory_bundle);
+  GenerateLateralTrajectoryBundle(ptr_lat_trajectory_bundle);
   return;
 }
 
@@ -124,9 +122,10 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     end_state[0] = end_condition.first[1];
     end_state[1] = end_condition.first[2];
 
-    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(new LatticeTrajectory1d(
-      std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
-      init_lon_state_, end_state, end_condition.second))));
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
+        new LatticeTrajectory1d(
+            std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
+                init_lon_state_, end_state, end_condition.second))));
 
     lattice_traj_ptr->set_target_position(end_condition.first[0]);
     lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
@@ -138,19 +137,19 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-
   // cruising trajectories are planned regardlessly.
   GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
-    ptr_lon_trajectory_bundle);
+                                   ptr_lon_trajectory_bundle);
 
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(
-                                  planning_target);
+          planning_target);
 
   for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(new LatticeTrajectory1d(
-      std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-        init_lon_state_, end_condition.first, end_condition.second))));
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
+        new LatticeTrajectory1d(
+            std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+                init_lon_state_, end_condition.first, end_condition.second))));
 
     lattice_traj_ptr->set_target_position(end_condition.first[0]);
     lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
@@ -165,10 +164,10 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
       end_condition_sampler_->SampleLatEndConditions();
 
   for (const auto& end_condition : end_conditions) {
-
-    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(new LatticeTrajectory1d(
-      std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-        init_lat_state_, end_condition.first, end_condition.second))));
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
+        new LatticeTrajectory1d(
+            std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+                init_lat_state_, end_condition.first, end_condition.second))));
 
     lattice_traj_ptr->set_target_position(end_condition.first[0]);
     lattice_traj_ptr->set_target_velocity(end_condition.first[1]);

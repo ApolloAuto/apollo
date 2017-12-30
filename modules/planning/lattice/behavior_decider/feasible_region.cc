@@ -26,7 +26,7 @@ namespace apollo {
 namespace planning {
 
 FeasibleRegion::FeasibleRegion(const std::array<double, 3>& init_s,
-    const double speed_limit) {
+                               const double speed_limit) {
   Setup(init_s, speed_limit);
 }
 
@@ -76,7 +76,7 @@ double FeasibleRegion::SLower(const double t) const {
 
 double FeasibleRegion::VUpper(const double t) const {
   return std::max(init_s_[1],
-      std::min(init_s_[1] + max_acceleration * t, speed_limit_));
+                  std::min(init_s_[1] + max_acceleration * t, speed_limit_));
 }
 
 double FeasibleRegion::VLower(const double t) const {
@@ -88,8 +88,8 @@ double FeasibleRegion::TLower(const double s) const {
 
   if (init_s_[1] < speed_limit_) {
     if (s < s_at_speed_limit_) {
-      double delta = init_s_[1] * init_s_[1]
-          - 2.0 * max_acceleration * (init_s_[0] - s);
+      double delta =
+          init_s_[1] * init_s_[1] - 2.0 * max_acceleration * (init_s_[0] - s);
       return (std::sqrt(delta) - init_s_[1]) / max_acceleration;
     } else {
       return t_at_speed_limit_ + (s - s_at_speed_limit_) / speed_limit_;
