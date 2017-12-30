@@ -62,7 +62,7 @@ Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/doc
    * [![Apollo Offline Demo](https://img.youtube.com/vi/Q4BawiLWl8c/0.jpg)](https://www.youtube.com/watch?v=Q4BawiLWl8c)
    * [how to contribute code](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md): 贡献代码必读
    * [howto](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/): 编译、运行、修改代码教程
-   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Apollo 1.0 技术文档
+   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Apollo 技术文档
 
 ## 咨询
 
