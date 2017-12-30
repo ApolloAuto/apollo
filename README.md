@@ -24,7 +24,7 @@ See the following instructions on how to set up the docker environment and build
 
 ```
 bash docker/scripts/install_docker.sh
-# logout and login the computer to make sure to run docker command without sudo
+# logout and login back in the system to make sure to run docker command without sudo
 docker ps  # to verify docker works without sudo
 # in case you forgot to logout and login back, do so, remove ~/.docker/config.json
 # and check again with `docker ps`
