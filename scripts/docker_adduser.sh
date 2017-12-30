@@ -27,7 +27,7 @@ echo "export PATH=/apollo/scripts:$PATH" >> /home/${DOCKER_USER}/.bashrc
 echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
 echo "ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
 
-SYNC_MAP='rsync -rLvzh --progress --update /mnt/nfs/map/data /apollo/modules/map'
+SYNC_MAP='rsync -rLvzht --progress --update /mnt/nfs/map/data /apollo/modules/map'
 echo "alias sync_map='${SYNC_MAP}'" >> /home/${DOCKER_USER}/.bashrc
 
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
