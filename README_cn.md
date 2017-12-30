@@ -14,7 +14,6 @@ not because they are easy, but because they are hard.
 
 [Apollo](http://apollo.auto)(阿波罗)是一个开放的、完整的、安全的自动驾驶平台，以灵活和高性能的技术架构，为全自动驾驶提供支持。
 
-
 ## 安装
 
 我们强烈建议您在我们预定义的Docker环境中搭建Apollo。
@@ -49,16 +48,12 @@ bash scripts/bootstrap.sh
 
 ### 播放演示rosbag
 ```
-# 启动一个终端窗口，进入apollo目录
-bash docker/scripts/dev_into.sh # 进入docker环境
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
+rosbag play -l ./docs/demo_guide/demo_2.0.bag
 ```
 
 这时，Dreamview会播放一辆带着预测轨迹的行驶中的汽车。
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
-
-想在Docker环境外搭建Apollo的高级用户，可以参考相应的Docker文档(./docker/dev.dockerfile)。
 
 ## 文档
 Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/docs/)目录下找到。
