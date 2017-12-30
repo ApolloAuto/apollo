@@ -15,12 +15,15 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_cost.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_COST_H_
 #define MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_COST_H_
 
+#include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -40,7 +43,7 @@ class DpStCost {
                     const std::vector<const PathObstacle*>& obstacles,
                     const common::TrajectoryPoint& init_point);
 
-  double GetObstacleCost(const StGraphPoint& point) const;
+  double GetObstacleCost(const StGraphPoint& point);
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
@@ -75,6 +78,9 @@ class DpStCost {
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;
   double unit_v_ = 0.0;
+
+  std::unordered_map<std::string, std::pair<double, double>>
+      boundary_range_map_;
 };
 
 }  // namespace planning
