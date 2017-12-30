@@ -21,7 +21,7 @@ Besides the trajectory itself, the planning module also outputs rich annotating 
 * DecisionResult
 * Debug information
 
-Estop is a command which indicates errors and exceptions. For example, when the autonomous vehicle finds that it collides into other obstacles or could not obey traffice rules, estop signals will be sent. The “DecisionResult” data is mainly for simulation to display such that developers could have a better understanding of the planning results. More detailed numerical intermediate results are stored in the debug information and sent out for debugging purpose.
+Estop is a command which indicates errors and exceptions. For example, when the autonomous vehicle finds that it collides into other obstacles or could not obey traffic rules, estop signals will be sent. The “DecisionResult” data is mainly for simulation to display such that developers could have a better understanding of the planning results. More detailed numerical intermediate results are stored in the debug information and sent out for debugging purpose.
 
 
 ### Input Data
@@ -41,17 +41,17 @@ The messages regarding “what are surrounding me” is mostly defined in “per
 
 ![](images/class_architecture_planning/image005.png)
 
-Each of the predicted trajectory has a probability associated with it, and one obstacle might have multiple predicted trajectories. 
+Each of the predicted trajectory has a probability associated with it, and one obstacle might have multiple predicted trajectories.
 
-Besides “where I want to go” and “what is surrounding me”, another important aspect of information is “where I am”. Such information are obstained from the HD-map and Localization modules. Both localization and vehicle chasis information are incorporated in the messages of “**VehicleState**” defined in the “`vehicle_state.proto`”, as shown below.
+Besides “where I want to go” and “what is surrounding me”, another important aspect of information is “where I am”. Such information are obstained from the HD-map and Localization modules. Both localization and vehicle chassis information are incorporated in the messages of “**VehicleState**” defined in the “`vehicle_state.proto`”, as shown below.
 
-## Code Structure and Class Hierachy
+## Code Structure and Class Hierarchy
 
 The code is organized as follows:The planning code entrance is the planning.cc. Inside the planner, the important class members are shown in the following picture.
 
 ![](images/class_architecture_planning/image006.png)
 
-The “**ReferenceLineInfo**” is a wrapper of the “**ReferenceLine**” class which repesents a smoothed guildeline for planning. **Frame** contains all the data dependencies including the peceived obstacles with their predicted trajectories, and status regarding the autonomous vehicle itself. **HD-Map** is leveraged as a library inside the planning module for ad-hoc fashioned map queries. The actual planning work is done by the “**EM-Planner**”, which is derived from the “**Planner**” class. While “**Em-Planner**” is the one actually used in our Apollo 2.0 release, the previously released “**RTK-Planner**” is also a derivative from the “**Planner**” class.
+The “**ReferenceLineInfo**” is a wrapper of the “**ReferenceLine**” class which represents a smoothed guideline for planning. **Frame** contains all the data dependencies including the peceived obstacles with their predicted trajectories, and status regarding the autonomous vehicle itself. **HD-Map** is leveraged as a library inside the planning module for ad-hoc fashioned map queries. The actual planning work is done by the “**EM-Planner**”, which is derived from the “**Planner**” class. While “**Em-Planner**” is the one actually used in our Apollo 2.0 release, the previously released “**RTK-Planner**” is also a derivative from the “**Planner**” class.
 
 ![](images/class_architecture_planning/image007.png)
 
@@ -63,4 +63,4 @@ Inside an planning cycle performed by the EM-Planner, we take an “iterative”
 * Path Optimizers: DP/QP path optimizer
 * Speed Optimizers: DP/QP speed optimizer
 
-Here DP means dynamic programming while QP means quadratic programming. After the computation, the final spatio-temporal trajectory will then be discretized and published such that the downstream control module will be able to execute it.
+Here DP means dynamic programming while QP means quadratic programming. After the computation, the trajectory will then be discretized and published such that the downstream control module will be able to execute it.
