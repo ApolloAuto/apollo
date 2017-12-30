@@ -41,6 +41,23 @@ cc_library(
 )
 
 cc_library(
+    name = "ctpl_stl",
+    hdrs = ["ctpl_stl.h"],
+)
+
+cc_test(
+    name = "ctpl_stl_test",
+    size = "small",
+    srcs = [
+        "ctpl_stl_test.cc",
+    ],
+    deps = [
+        "//modules/common/util:ctpl_stl",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "color",
     hdrs = ["color.h"],
 )
@@ -209,7 +226,7 @@ cc_test(
     ],
     deps = [
         ":json_util",
-         "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:error_code_proto",
         "@gtest//:main",
     ],
 )
