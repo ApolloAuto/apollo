@@ -258,43 +258,30 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
       velocity_z = perception_obstacle.velocity().z();
     }
   }
-  double velocity_heading = std::atan2(velocity_y, velocity_x);
+  double speed = std::hypot(velocity_x, velocity_y);
 
-  if (FLAGS_enable_adjust_velocity_heading && IsOnLane()) {
-    double speed = std::hypot(velocity_x, velocity_y);
-    double theta = 0.0;
-    if (perception_obstacle.has_theta()) {
-      theta = perception_obstacle.theta();
-    }
-    double heading_diff = std::abs(velocity_heading - theta);
-    if (heading_diff > FLAGS_heading_diff_thred) {
-      if (history_size() > 0) {
-        double prev_x = mutable_feature(0)->position().x();
-        double prev_y = mutable_feature(0)->position().y();
-        double diff_x = feature->position().x() - prev_x;
-        double diff_y = feature->position().y() - prev_y;
-        if (std::abs(diff_x) > FLAGS_valid_position_diff_thred &&
-            std::abs(diff_y) > FLAGS_valid_position_diff_thred) {
-          velocity_heading = std::atan2(diff_y, diff_x);
-          velocity_x = speed * std::cos(velocity_heading);
-          velocity_y = speed * std::sin(velocity_heading);
-        } else {
-          velocity_x = speed * std::cos(theta);
-          velocity_y = speed * std::sin(theta);
-        }
-      } else {
-        velocity_x = speed * std::cos(theta);
-        velocity_y = speed * std::sin(theta);
+  double velocity_heading = perception_obstacle.theta();
+  if (FLAGS_enable_adjust_velocity_heading && history_size() > 0) {
+    double diff_x = feature->position().x() -
+                    feature_history_.front().position().x();
+    double diff_y = feature->position().y() -
+                    feature_history_.front().position().y();
+    if (std::abs(diff_x) > FLAGS_valid_position_diff_thred &&
+        std::abs(diff_y) > FLAGS_valid_position_diff_thred) {
+      double shift_heading = std::atan2(diff_y, diff_x);
+      double angle_diff = apollo::common::math::NormalizeAngle(
+          shift_heading - velocity_heading);
+      if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
+        velocity_heading = shift_heading;
       }
     }
+    velocity_x = speed * std::cos(velocity_heading);
+    velocity_y = speed * std::sin(velocity_heading);
   }
 
   feature->mutable_velocity()->set_x(velocity_x);
   feature->mutable_velocity()->set_y(velocity_y);
   feature->mutable_velocity()->set_z(velocity_z);
-
-  double speed = std::hypot(std::hypot(velocity_x, velocity_y), velocity_z);
-  velocity_heading = std::atan2(velocity_y, velocity_x);
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
@@ -844,7 +831,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
-  map->NearbyLanesByCurrentLanes(point, theta, FLAGS_lane_search_radius * 2.0,
+  map->NearbyLanesByCurrentLanes(point, theta, FLAGS_lane_search_radius,
                                  current_lanes_, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
@@ -1067,13 +1054,17 @@ void Obstacle::SetMotionStatus() {
   double speed = (FLAGS_enable_kf_tracking ? feature_history_.front().t_speed()
                                            : feature_history_.front().speed());
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
+  if (type_ == PerceptionObstacle::PEDESTRIAN ||
+      type_ == PerceptionObstacle::BICYCLE) {
+    speed_threshold = FLAGS_still_pedestrian_speed_threshold;
+  }
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_
-           << "] has a small speed and is considered stationary.";
+           << "] has a small speed [" << speed
+           << "] and is considered stationary.";
     feature_history_.front().set_is_still(true);
   } else if (speed_sensibility < speed_threshold) {
-    ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
-           << history_size
+    ADEBUG << "Obstacle [" << id_ << "]"
            << "] considered moving [sensibility = " << speed_sensibility << "]";
     feature_history_.front().set_is_still(false);
   } else {

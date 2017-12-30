@@ -306,7 +306,7 @@ Follow these steps:
 
   d. Insert the CAN card into the slot in the IPC:
 
-  ![installed CAN](images/After%20installing%20the%20CAN%20Card.png)
+  ![installed CAN](images/After_installing_the_CAN_Card.png)
 
    e. Reinstall the cover for the IPC
 

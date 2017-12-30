@@ -26,7 +26,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -38,7 +37,6 @@ using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::math::Vec2d;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleParam;
 
 namespace {
@@ -55,25 +53,23 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
 }
 }  // namespace
 
-DpStGraph::DpStGraph(const ReferenceLine& reference_line,
-                     const StGraphData& st_graph_data,
+DpStGraph::DpStGraph(const StGraphData& st_graph_data,
                      const DpStSpeedConfig& dp_config,
-                     const PathData& path_data,
+                     const std::vector<const PathObstacle*>& obstacles,
+                     const common::TrajectoryPoint& init_point,
                      const SLBoundary& adc_sl_boundary)
-    : reference_line_(reference_line),
+    : st_graph_data_(st_graph_data),
       dp_st_speed_config_(dp_config),
-      st_graph_data_(st_graph_data),
-      vehicle_param_(VehicleConfigHelper::GetConfig().vehicle_param()),
-      adc_sl_boundary_(adc_sl_boundary),
-      dp_st_cost_(dp_config),
-      init_point_(st_graph_data.init_point()) {
+      obstacles_(obstacles),
+      init_point_(init_point),
+      dp_st_cost_(dp_config, obstacles, init_point_),
+      adc_sl_boundary_(adc_sl_boundary) {
   dp_st_speed_config_.set_total_path_length(
       std::fmin(dp_st_speed_config_.total_path_length(),
                 st_graph_data_.path_data_length()));
 }
 
-Status DpStGraph::Search(PathDecision* const path_decision,
-                         SpeedData* const speed_data) {
+Status DpStGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
@@ -152,7 +148,7 @@ void DpStGraph::CalculatePointwiseCost(
     for (auto& st_graph_point : cost_table_[i]) {
       double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
                                                      reference_points[i]);
-      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point, boundaries);
+      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point);
       st_graph_point.SetReferenceCost(ref_cost);
       st_graph_point.SetObstacleCost(obs_cost);
       st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());
@@ -236,8 +232,10 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
     return;
   }
 
-  const uint32_t max_s_diff = static_cast<uint32_t>(
-      FLAGS_planning_upper_speed_limit * unit_t_ / unit_s_);
+  constexpr double kSpeedRangeBuffer = 0.20;
+  const uint32_t max_s_diff =
+      static_cast<uint32_t>(FLAGS_planning_upper_speed_limit *
+                            (1 + kSpeedRangeBuffer) * unit_t_ / unit_s_);
   const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
 
   const auto& pre_col = cost_table_[c - 1];
@@ -317,7 +315,7 @@ bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
                                             const double r_cur,
                                             uint32_t* const lower_bound,
                                             uint32_t* const upper_bound) const {
-  double tcoef = unit_t_ * unit_t_ / unit_s_;
+  const double tcoef = unit_t_ * unit_t_ / unit_s_;
   double lval = std::max(
       2 * r_pre - r_cur + dp_st_speed_config_.max_deceleration() * tcoef, 0.0);
   double rval = std::min(
@@ -332,7 +330,7 @@ bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
   return true;
 }
 
-Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
+Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   double min_cost = std::numeric_limits<double>::infinity();
   const StGraphPoint* best_end_point = nullptr;
   for (const StGraphPoint& cur_point : cost_table_.back()) {
@@ -382,14 +380,14 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
 
 double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
                                     const STPoint& third, const STPoint& forth,
-                                    const double speed_limit) const {
+                                    const double speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
-double DpStGraph::CalculateEdgeCostForSecondCol(
-    const uint32_t row, const double speed_limit) const {
+double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
+                                                const double speed_limit) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
@@ -403,7 +401,7 @@ double DpStGraph::CalculateEdgeCostForSecondCol(
 
 double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
                                                const uint32_t pre_row,
-                                               const double speed_limit) const {
+                                               const double speed_limit) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();

@@ -34,10 +34,10 @@ em_planner_config {
         path_end_l_cost: 1.0e4
     }
     dp_st_speed_config {
-        total_path_length: 200
+        total_path_length: 150
         total_time: 8.0
-        matrix_dimension_s: 200
-        matrix_dimension_t: 20
+        matrix_dimension_s: 150
+        matrix_dimension_t: 8
 
         speed_weight: 0.0
         accel_weight: 10.0
@@ -47,8 +47,7 @@ em_planner_config {
         go_down_buffer: 5.0
         go_up_buffer: 5.0
 
-        default_obstacle_cost: 1e10
-        obstacle_cost_factor: -300
+        default_obstacle_cost: 1e3
 
         default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
@@ -60,8 +59,8 @@ em_planner_config {
         positive_jerk_coeff: 1.0
         negative_jerk_coeff: 1.0
 
-        max_acceleration: 2.5
-        max_deceleration: -3.3
+        max_acceleration: 3.0
+        max_deceleration: -4.0
 
         st_boundary_config {
             boundary_buffer: 0.1
@@ -183,8 +182,8 @@ qp_spline_reference_line_smoother_config {
     max_constraint_interval : 5.0
     longitudinal_boundary_bound: 2.0
     lateral_boundary_bound: 0.25
-    second_derivative_weight: 1000.0
-    third_derivative_weight: 0.0
+    second_derivative_weight: 200.0
+    third_derivative_weight: 1000.0
     num_of_total_points: 500
     regularization_weight: 1.0e-5
 }

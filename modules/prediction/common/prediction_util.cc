@@ -80,15 +80,15 @@ void TranslatePoint(const double translate_x, const double translate_y,
 
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
-    const Eigen::Matrix<double, 6, 6>& transition, const size_t num,
-    const double period, std::vector<TrajectoryPoint>* points) {
+    const Eigen::Matrix<double, 6, 6>& transition, double theta,
+    const size_t num, const double period,
+    std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
   double v_y = (*state)(3, 0);
   double acc_x = (*state)(4, 0);
   double acc_y = (*state)(5, 0);
-  double theta = std::atan2(v_y, v_x);
 
   for (size_t i = 0; i < num; ++i) {
     double speed = std::hypot(v_x, v_y);
@@ -224,27 +224,6 @@ void GenerateLaneSequenceTrajectoryPoints(
       (*state)(0, 0) = lane_s;
       lane_id = sequence.lane_segment(lane_segment_index).lane_id();
     }
-  }
-}
-
-void GenerateStillSequenceTrajectoryPoints(
-    const double position_x, const double position_y, const double theta,
-    const double total_time, const double period,
-    std::vector<TrajectoryPoint>* points) {
-  size_t total_num = static_cast<size_t>(total_time / period);
-  for (size_t i = 0; i < total_num; ++i) {
-    double relative_time = static_cast<double>(i) * period;
-    TrajectoryPoint trajectory_point;
-    PathPoint path_point;
-    path_point.set_x(position_x);
-    path_point.set_y(position_y);
-    path_point.set_z(0.0);
-    path_point.set_theta(theta);
-    trajectory_point.mutable_path_point()->CopyFrom(path_point);
-    trajectory_point.set_v(0.0);
-    trajectory_point.set_a(0.0);
-    trajectory_point.set_relative_time(relative_time);
-    points->emplace_back(std::move(trajectory_point));
   }
 }
 

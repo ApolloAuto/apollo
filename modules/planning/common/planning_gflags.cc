@@ -18,6 +18,10 @@
 
 DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
 
+DEFINE_double(test_duration, -1.0,
+              "The runtime duration in test mode. There is no runtime limit if "
+              "the value is not positive");
+
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_string(planning_adapter_config_filename,
@@ -58,7 +62,7 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(reference_line_lateral_buffer, 0.4,
+DEFINE_double(reference_line_lateral_buffer, 0.5,
               "When creating reference line, the minimum distance with road "
               "curb for a vehicle driving on this line.");
 DEFINE_double(prepare_rerouting_time, 2.0,

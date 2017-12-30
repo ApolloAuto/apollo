@@ -47,9 +47,6 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::drivers::canbus::CanClient;
-using ::apollo::drivers::canbus::CanReceiver;
-
 /**
 * @class Canbus
 *
@@ -93,9 +90,9 @@ class Canbus : public apollo::common::ApolloApp {
   void RegisterCanClients();
 
   CanbusConf canbus_conf_;
-  std::unique_ptr<CanClient> can_client_;
-  CanSender<::apollo::canbus::ChassisDetail> can_sender_;
-  CanReceiver<::apollo::canbus::ChassisDetail> can_receiver_;
+  std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
+  CanSender<ChassisDetail> can_sender_;
+  apollo::drivers::canbus::CanReceiver<ChassisDetail> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
       message_manager_;
   std::unique_ptr<VehicleController> vehicle_controller_;

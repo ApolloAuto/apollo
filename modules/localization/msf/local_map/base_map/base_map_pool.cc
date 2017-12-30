@@ -15,7 +15,8 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/base_map/base_map_pool.h"
-#include <set>
+
+#include "modules/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
@@ -28,9 +29,7 @@ BaseMapNodePool::BaseMapNodePool(unsigned int pool_size,
                                  unsigned int thread_size)
     : pool_size_(pool_size), node_reset_workers_(thread_size) {}
 
-BaseMapNodePool::~BaseMapNodePool() {
-  Release();
-}
+BaseMapNodePool::~BaseMapNodePool() { Release(); }
 
 void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
                               bool is_fixed_size) {
@@ -95,7 +94,7 @@ void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
   {
     boost::unique_lock<boost::mutex> lock(mutex_);
     typename std::set<BaseMapNode*>::iterator f = busy_nodes_.find(map_node);
-    assert(f != busy_nodes_.end());
+    DCHECK(f != busy_nodes_.end());
     free_list_.push_back(*f);
     busy_nodes_.erase(f);
   }
@@ -106,17 +105,11 @@ void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
   return;
 }
 
-void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) {
-  node->Finalize();
-}
+void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) { node->Finalize(); }
 
-void BaseMapNodePool::DellocMapNode(BaseMapNode* node) {
-  delete node;
-}
+void BaseMapNodePool::DellocMapNode(BaseMapNode* node) { delete node; }
 
-void BaseMapNodePool::ResetMapNode(BaseMapNode* node) {
-  node->ResetMapNode();
-}
+void BaseMapNodePool::ResetMapNode(BaseMapNode* node) { node->ResetMapNode(); }
 
 }  // namespace msf
 }  // namespace localization

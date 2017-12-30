@@ -1,3 +1,6 @@
+### Download
+
+You can download the elo (aka Ego Localization) module here [elo-1.5.zip](https://github.com/ApolloAuto/apollo/releases/download/v1.5.0/elo-1.5.zip)
 
 ### 1. Introduction
 
@@ -5,7 +8,7 @@ Baidu ego localization system is an accurate ego localization solution for self-
 
 GNSS positioning observes range measurements from orbiting GNSS satellites, while GNSS in general has some restrictions that it may not be available for high accuracy requirements of self-driving. Baidu ego localization system combines sensor information with HD Map and GNSS solution to provide high-accuracy localization solution. System extracts features from sensors and Baidu HD Map for feature matching. After feature matching, system is able to locate current vehicle in HD Map. Motion compensation is proposed to compensate current localization solution. 
 
-![components of Baidu ego localization system](docs/pictures/flowchart.jpg)
+![components of Baidu ego localization system](flowchart.jpg)
 
 The main components of Baidu ego localization system is introduced as follow:
 * Sensors: inlcude vision sensors (in-vehicle cameras, industrial camera CCDs and other image collecting sensors) and position sensors (include GPS, GLONASS, Beidou and other GNSS).

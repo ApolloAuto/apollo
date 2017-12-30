@@ -82,28 +82,13 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
-  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
-    AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
+  if (feature.is_still()) {
+    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
     return;
   }
 
-  if (feature.is_still()) {
-    std::vector<TrajectoryPoint> points;
-    double position_x = feature.position().x();
-    double position_y = feature.position().y();
-    if (FLAGS_enable_kf_tracking) {
-      position_x = feature.t_position().x();
-      position_y = feature.t_position().y();
-    }
-    double theta = feature.theta();
-    ::apollo::prediction::predictor_util::GenerateStillSequenceTrajectoryPoints(
-        position_x, position_y, theta, FLAGS_prediction_duration,
-        FLAGS_prediction_period, &points);
-    Trajectory trajectory = GenerateTrajectory(points);
-    trajectory.set_probability(1.0);
-    trajectories_.push_back(std::move(trajectory));
-
-    ADEBUG << "Obstacle [" << obstacle->id() << "] has a still trajectory.";
+  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+    AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return;
   }
 
@@ -119,7 +104,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
     if (sequence.lane_segment_size() <= 0 ||
         sequence.lane_segment(0).lane_point_size() <= 0) {
-      AERROR << "Empty lane segments.";
+      ADEBUG << "Empty lane segments.";
       continue;
     }
 
@@ -222,7 +207,6 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
 
   size_t total_num = static_cast<size_t>(total_time / period);
   size_t num_to_center = static_cast<size_t>(time_to_lane_center / period);
-  AERROR << "Obstacle: " << obstacle.id();
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
@@ -249,16 +233,10 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     }
 
     prev_lane_l = lane_l;
-    double vs =
+    double lane_speed =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 1);
-    double as =
+    double lane_acc =
         EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 2);
-    double vl = 0.0;
-    if (i < num_to_center) {
-      vl = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 1);
-    }
-    double lane_speed = std::hypot(vs, vl);
-    double lane_acc = as;
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -304,8 +282,8 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double s0 = 0.0;
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
-  double ds1 = std::max(FLAGS_still_obstacle_speed_threshold,
-                        ds0 + dds0 * time_to_lane_center);
+  double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
+  double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_lane_center);
   double dds1 = 0.0;
   double p = time_to_lane_center;
 
@@ -447,6 +425,7 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
+  double theta = feature.velocity_heading();
   if (FLAGS_enable_kf_tracking) {
     position(0) = feature.t_position().x();
     position(1) = feature.t_position().y();
@@ -475,7 +454,7 @@ void MoveSequencePredictor::DrawMotionTrajectoryPoints(
 
   size_t num = static_cast<size_t>(total_time / period);
   apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, num, period, points);
+      &state, transition, theta, num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(

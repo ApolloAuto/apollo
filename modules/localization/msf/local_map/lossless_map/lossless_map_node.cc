@@ -17,6 +17,8 @@
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_node.h"
 
 #include <vector>
+
+#include "modules/common/log.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 
 namespace apollo {
@@ -33,7 +35,7 @@ void LosslessMapNode::SetValue(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.SetValue(coordinate[2], intensity);
@@ -69,7 +71,7 @@ void LosslessMapNode::SetValueLayer(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.SetValueLayer(
@@ -84,7 +86,7 @@ void LosslessMapNode::GetValue(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.GetValue(values);
@@ -96,7 +98,7 @@ void LosslessMapNode::GetVar(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.GetVar(vars);
@@ -108,7 +110,7 @@ void LosslessMapNode::GetAlt(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.GetAlt(alts);
@@ -120,7 +122,7 @@ void LosslessMapNode::GetAltVar(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.GetAltVar(alt_vars);
@@ -132,7 +134,7 @@ void LosslessMapNode::GetCount(const Eigen::Vector3d& coordinate,
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.GetCount(counts);
@@ -144,7 +146,7 @@ unsigned char LosslessMapNode::GetValue(
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   return map_cell.GetValue();
@@ -155,7 +157,7 @@ float LosslessMapNode::GetVar(const Eigen::Vector3d& coordinate) const {
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   return map_cell.GetVar();
@@ -166,7 +168,7 @@ float LosslessMapNode::GetAlt(const Eigen::Vector3d& coordinate) const {
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   return map_cell.GetAlt();
@@ -177,7 +179,7 @@ float LosslessMapNode::GetAltVar(const Eigen::Vector3d& coordinate) const {
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   return map_cell.GetAltVar();
@@ -189,7 +191,7 @@ unsigned int LosslessMapNode::GetCount(
   unsigned int x = 0;
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, &x, &y);
-  assert(is_success);
+  DCHECK(is_success);
   LosslessMapCell& map_cell =
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   return map_cell.GetCount();

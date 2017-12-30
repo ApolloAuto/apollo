@@ -51,14 +51,14 @@ SDK contains four directories:
 This function should be called before using secure upgrade APIs.
 ```
 init_secure_upgrade(root_config_path)
-input para: 
+input para:
   root_config_path  root configuration file path
 ```
 #### b) Device token generation
 This function is used to generate the device token.
 ```
 sec_upgrade_get_device_token()
-Ouput para:
+Output para:
   return code: true    generating device token successfully
                false    generating device token failed
   Device_token: device token (string format)
@@ -69,12 +69,12 @@ This function is used to generate secure upgrade package and package token.
 sec_upgrade_get_package(original_package_path,
                         secure_package_path,
                         package_token_path)
-input para: 
-    original_package_path    original upgrade package file path 
+input para:
+    original_package_path    original upgrade package file path
     secure_package_path    secure upgrade package file path
     package_token_path    secure package token file     
-ouput para: 
-    return code: 
+output para:
+    return code:
         true    generating secure upgrade package successfully
         false    generating secure upgrade package failed
 ```
@@ -83,11 +83,11 @@ This function is used to generate a device’s authorization token based on devi
 ```
 sec_upgrade_get_authorization_token(package_token_path,
                                     device_token_path)
-input para: 
+input para:
     package_token_path    secure package token file path
 	device_token_path    device token file path
-ouput_para:
-    return code: 
+output_para:
+    return code:
         true    generating authorization token successfully
         false    generating authorization token failed
         authorization_token authorization token buffer(string formate)
@@ -97,7 +97,7 @@ This function is used to verify the downloaded secure package with the authoriza
 ```
 sec_upgrade_verify_package(authorization_token_buffer,
                            secure_package_path)
-input para: 
+input para:
     authorization_token_buffer    authorization token buffer(string format)
     secure_package_path    secure upgrade package file path
 output para:

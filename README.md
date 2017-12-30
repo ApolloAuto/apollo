@@ -13,6 +13,7 @@ Welcome to the Apollo GitHub.
 [Apollo](http://apollo.auto) is an open autonomous driving platform. It is a high performance flexible architecture which supports fully autonomous driving capabilities.
 For business contact, please visit http://apollo.auto
 
+**Apollo Team now proudly presents to you the latest [version 2.0](https://github.com/ApolloAuto/apollo/releases/tag/v2.0.0).**
 
 ## Installation
 
@@ -50,17 +51,12 @@ Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://loc
 
 ### Replay demo rosbag
 ```
-# in a different terminal, in the apollo directory
-bash docker/scripts/dev_into.sh # jump into the docker container
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
+rosbag play -l ./docs/demo_guide/demo_2.0.bag
 ```
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
-![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_1.5.png)
-
-Advanced users who wish to build outside this Docker container can refer
-to the corresponding Docker specification file (`./docker/dev.dockerfile`).
+![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
 
 ## Documents
 Apollo documents can be found under the [docs](https://github.com/ApolloAuto/apollo/blob/master/docs/) repository.
@@ -69,7 +65,7 @@ Apollo documents can be found under the [docs](https://github.com/ApolloAuto/apo
    * [![Apollo Offline Demo](https://img.youtube.com/vi/Q4BawiLWl8c/0.jpg)](https://www.youtube.com/watch?v=Q4BawiLWl8c)
    * [how to contribute code](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md): the guide for contributing code to Apollo.
    * [howto](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/): tutorials on how to build, run and modify codes.
-   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Specification documents of Apollo 1.5.
+   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Specification documents of Apollo.
    * [Doxygen APIs](https://apolloauto.github.io/doxygen/apollo/): Apollo Doxygen pages
 
 ## Ask Questions

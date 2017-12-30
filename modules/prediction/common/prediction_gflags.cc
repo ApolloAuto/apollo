@@ -56,8 +56,10 @@ DEFINE_double(cutin_approach_rate, 0.9,
               "The rate to approach to the reference line of lane change");
 DEFINE_int32(still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
-DEFINE_double(still_obstacle_speed_threshold, 1.0,
+DEFINE_double(still_obstacle_speed_threshold, 2.0,
               "Speed threshold for still obstacles");
+DEFINE_double(still_pedestrian_speed_threshold, 0.5,
+              "Speed threshold for still pedestrians");
 DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
@@ -91,8 +93,6 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "this threshold.");
 DEFINE_bool(enable_adjust_velocity_heading, true,
             "adjust velocity heading to lane heading");
-DEFINE_double(heading_diff_thred, M_PI / 6.0,
-              "Threshold for adjusting on-lane obstacle heading");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
