@@ -26,7 +26,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -38,7 +37,6 @@ using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::math::Vec2d;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleParam;
 
 namespace {
@@ -55,17 +53,15 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
 }
 }  // namespace
 
-DpStGraph::DpStGraph(const ReferenceLine& reference_line,
-                     const StGraphData& st_graph_data,
+DpStGraph::DpStGraph(const StGraphData& st_graph_data,
                      const DpStSpeedConfig& dp_config,
                      const std::vector<const PathObstacle*>& obstacles,
+                     const common::TrajectoryPoint& init_point,
                      const SLBoundary& adc_sl_boundary)
-    : reference_line_(reference_line),
-      st_graph_data_(st_graph_data),
+    : st_graph_data_(st_graph_data),
       dp_st_speed_config_(dp_config),
       obstacles_(obstacles),
-      vehicle_param_(VehicleConfigHelper::GetConfig().vehicle_param()),
-      init_point_(st_graph_data.init_point()),
+      init_point_(init_point),
       dp_st_cost_(dp_config, obstacles, init_point_),
       adc_sl_boundary_(adc_sl_boundary) {
   dp_st_speed_config_.set_total_path_length(

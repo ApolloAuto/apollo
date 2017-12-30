@@ -50,17 +50,12 @@ Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://loc
 
 ### Replay demo rosbag
 ```
-# in a different terminal, in the apollo directory
-bash docker/scripts/dev_into.sh # jump into the docker container
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
+rosbag play -l ./docs/demo_guide/demo_2.0.bag
 ```
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_1.5.png)
-
-Advanced users who wish to build outside this Docker container can refer
-to the corresponding Docker specification file (`./docker/dev.dockerfile`).
 
 ## Documents
 Apollo documents can be found under the [docs](https://github.com/ApolloAuto/apollo/blob/master/docs/) repository.
