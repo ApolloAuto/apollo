@@ -890,11 +890,15 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
       speed * FLAGS_prediction_duration +
       0.5 * acc * FLAGS_prediction_duration * FLAGS_prediction_duration +
       FLAGS_min_prediction_length;
+  int curr_lane_count = 0;
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
     RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
+    if (lane_graph.lane_sequence_size() > 0) {
+      ++curr_lane_count;
+    }
     int seq_id =
         feature->mutable_lane()->mutable_lane_graph()->lane_sequence_size();
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
@@ -910,12 +914,20 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
+    if (curr_lane_count >= FLAGS_max_num_current_lane) {
+      break;
+    }
   }
+
+  int nearby_lane_count = 0;
   for (auto& lane : feature->lane().nearby_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
     RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
+    if (lane_graph.lane_sequence_size() > 0) {
+      ++nearby_lane_count;
+    }
     int seq_id =
         feature->mutable_lane()->mutable_lane_graph()->lane_sequence_size();
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
@@ -929,6 +941,9 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
           ->set_lane_sequence_id(seq_id);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
+    }
+    if (nearby_lane_count >= FLAGS_max_num_nearby_lane) {
+      break;
     }
   }
 
