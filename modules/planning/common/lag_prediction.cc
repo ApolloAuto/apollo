@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -50,13 +51,36 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
       AdapterManager::GetPrediction()->Empty()) {
     return;
   }
-  const auto& prediction = *AdapterManager::GetPrediction();
+  const auto& prediction = *(AdapterManager::GetPrediction());
+  if (!AdapterManager::GetLocalization() ||
+      AdapterManager::GetLocalization()->Empty()) {  // no localization
+    obstacles->CopyFrom(prediction.GetLatestObserved());
+    return;
+  }
+  const auto adc_position =
+      AdapterManager::GetLocalization()->GetLatestObserved().pose().position();
+  const auto latest_prediction = (*prediction.begin());
+  const double timestamp = latest_prediction->header().timestamp_sec();
+
+  std::unordered_set<int> protected_obstacles;
+  for (const auto& obstacle : latest_prediction->prediction_obstacle()) {
+    double distance = common::util::DistanceXY(
+        obstacle.perception_obstacle().position(), adc_position);
+    if (distance < FLAGS_lag_prediction_protection_distance) {
+      protected_obstacles.insert(obstacle.perception_obstacle().id());
+      // add protected obstacle
+      AddObstacleToPrediction(0.0, obstacle, obstacles);
+    }
+  }
 
   std::unordered_map<int, LagInfo> obstacle_lag_info;
   int index = 0;  // data in begin() is the most recent data
   for (auto it = prediction.begin(); it != prediction.end(); ++it, ++index) {
     for (const auto& obstacle : (*it)->prediction_obstacle()) {
       auto id = obstacle.perception_obstacle().id();
+      if (protected_obstacles.count(id) > 0) {
+        continue;  // don't need to count the already added protected obstacle
+      }
       auto& info = obstacle_lag_info[id];
       ++info.count;
       if ((*it)->header().timestamp_sec() > info.last_observed_time) {
@@ -67,7 +91,6 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
     }
   }
 
-  const auto latest_prediction = (*prediction.begin());
   obstacles->mutable_header()->CopyFrom(latest_prediction->header());
   obstacles->mutable_header()->set_module_name("lag_prediction");
   obstacles->mutable_prediction_obstacle()->Clear();
@@ -75,40 +98,41 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
       latest_prediction->perception_error_code());
   obstacles->set_start_timestamp(latest_prediction->start_timestamp());
   obstacles->set_end_timestamp(latest_prediction->end_timestamp());
-  bool apply_lag = std::distance(prediction.begin(), prediction.end()) >=
-                   static_cast<int32_t>(min_appear_num_);
+  bool enough_msg_in_queue =
+      std::distance(prediction.begin(), prediction.end()) >=
+      static_cast<int32_t>(min_appear_num_);
   for (const auto& iter : obstacle_lag_info) {
-    if (apply_lag && iter.second.count < min_appear_num_) {
+    if (enough_msg_in_queue && iter.second.count < min_appear_num_) {
       continue;
     }
-    if (apply_lag && iter.second.last_observed_seq > max_disappear_num_) {
+    if (enough_msg_in_queue &&
+        iter.second.last_observed_seq > max_disappear_num_) {
       continue;
     }
-    AddObstacleToPrediction(latest_prediction->header().timestamp_sec(),
-                            iter.second, obstacles);
+    AddObstacleToPrediction(timestamp - iter.second.last_observed_time,
+                            *iter.second.obstacle_ptr, obstacles);
   }
 }
 
 void LagPrediction::AddObstacleToPrediction(
-    double start_time, const LagInfo& lag_info,
+    double delay_sec, const PredictionObstacle& history_obstacle,
     prediction::PredictionObstacles* obstacles) const {
-  double time_diff = start_time - lag_info.last_observed_time;
   auto* obstacle = obstacles->add_prediction_obstacle();
-  if (time_diff <= 1e-6) {
-    obstacle->CopyFrom(*lag_info.obstacle_ptr);
+  if (delay_sec <= 1e-6) {
+    obstacle->CopyFrom(history_obstacle);
     return;
   }
   obstacle->mutable_perception_obstacle()->CopyFrom(
-      lag_info.obstacle_ptr->perception_obstacle());
-  for (const auto& hist_trajectory : lag_info.obstacle_ptr->trajectory()) {
+      history_obstacle.perception_obstacle());
+  for (const auto& hist_trajectory : history_obstacle.trajectory()) {
     auto* traj = obstacle->add_trajectory();
     for (const auto& hist_point : hist_trajectory.trajectory_point()) {
-      if (hist_point.relative_time() < time_diff) {
+      if (hist_point.relative_time() < delay_sec) {
         continue;
       }
       auto* point = traj->add_trajectory_point();
       point->CopyFrom(hist_point);
-      point->set_relative_time(hist_point.relative_time() - time_diff);
+      point->set_relative_time(hist_point.relative_time() - delay_sec);
     }
     if (traj->trajectory_point_size() <= 0) {
       obstacle->mutable_trajectory()->RemoveLast();
@@ -120,8 +144,9 @@ void LagPrediction::AddObstacleToPrediction(
     obstacles->mutable_prediction_obstacle()->RemoveLast();
     return;
   }
-  obstacle->set_timestamp(lag_info.obstacle_ptr->timestamp());
-  obstacle->set_predicted_period(lag_info.obstacle_ptr->predicted_period());
+  obstacle->set_timestamp(history_obstacle.timestamp());
+  obstacle->set_predicted_period(history_obstacle.predicted_period() -
+                                 delay_sec);
 }
 
 }  // namespace planning
