@@ -79,6 +79,7 @@ Before getting started, please make sure you have installed the Ubuntu Linux 14.
 ```
 git clone git@github.com:ApolloAuto/apollo.git
 cd apollo
+git checkout [release_branch_name]
 
 ```
 
