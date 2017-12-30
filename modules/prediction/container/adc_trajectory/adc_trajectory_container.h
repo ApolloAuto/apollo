@@ -24,7 +24,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -68,13 +67,19 @@ class ADCTrajectoryContainer : public Container {
    */
   bool IsPointInJunction(const apollo::common::PathPoint& point) const;
 
+  /**
+   * @brief Get reference line lane ids
+   * @return A vector of lane ids
+   */
+  const std::vector<std::string>& get_reference_line_lane_ids();
+
  private:
   apollo::common::math::Polygon2d GetJunctionPolygon();
 
  private:
   apollo::planning::ADCTrajectory adc_trajectory_;
   apollo::common::math::Polygon2d junction_polygon_;
-  std::unordered_set<std::string> reference_line_lane_ids_;
+  std::vector<std::string> reference_line_lane_ids_;
 };
 
 }  // namespace prediction
