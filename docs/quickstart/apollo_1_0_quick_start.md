@@ -141,7 +141,7 @@ Please refer to the
 [Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number.
 For example, if you are in Beijing, China, you have to set `+zone=50`.
 
-5. Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+4. Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
    Refer to the following example for a typical RTK setup:
 
@@ -170,12 +170,12 @@ The `rtk_from` is  used for RTK base station information.
 
 The `rtk_to` is used to send the RTK differential data to the receiver.
 
-6. Add ESD CAN Support
+5. Add ESD CAN Support
 
    Please refer to [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)
    to setup the ESD CAN library.
 
-7. Follow these steps to persist your local changes:
+6. Follow these steps to persist your local changes:
 
 ```
 # RUN OUT OF DOCKER ENV
