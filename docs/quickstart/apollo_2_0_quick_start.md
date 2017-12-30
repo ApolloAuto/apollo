@@ -2,48 +2,38 @@
 
 This quick start focuses on Apollo 2.0 new features. For general Apollo
 concepts, please refer to
-[Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md).
+[Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md) and [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md).
 
-Before doing the following steps, make sure you have calibrated the extrinsic
-parameters between the LiDAR and the GNSS/INS. For sensor calibration, please
-refer to
-[Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md).
+# Onboard Test
 
+1. For vehicle onboard test make sure you have calibrated the all sensors. For sensor calibration, please refer to [Apollo 2.0 Sensor Calibration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide.md) before you proceed.
 
-## Launch release env Docker Image
+2. Launch Docker Release Container
 
-Run the following commands:
+3. Launch DreamView
 
-```bash
-cd $APOLLO_HOME
-bash docker/scripts/release_start.sh
-```
+    Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8888
 
-When Docker starts, it creates a port mapping, which maps the Docker internal
-port 8888 to the host port 8888. You can then visit the Dreamview web service in
-your host machine browser:
+    ![](images/dreamview.png)
 
-Open the Chrome browser and start the Apollo Dreamview by going to
-**localhost:8888**.
- ![](images/dreamview.png)
+4. Select Vehicle and Map
+    
+    You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
 
-You'll be required to setup profile before doing anything else. Click the
-dropdown menu on top right to select your HDMap and vehicle in use. The list are
-defined in
-[HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
+    *Note: It's also possible to change profile on the right panel of HMI, but just remember to click "Reset All" on the top-right corner to restart the system.*
 
-## (*New!*) Start Auto
+5. Start Modules
 
-In Apollo 2.0, we released the new feature, auto driving on simple urban road.
+    Click the "Setup" button.
 
-1. To make it work,  you need setup the system by clicking the "Setup" button.
-   ![](images/dreamview_setup.png)
+    ![](images/dreamview_setup.png)
 
-2. Go to **Module Controller** tab, check if all modules and hardware are ready.
-   (Note that in virtual environment, like on your personal PC, the hardwares as
-   well as some corresponding modules cannot be brought up.)
-   ![](images/dreamview_module_controller.png)
+    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline envionrment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.)
 
-3. Go back to **Tasks** tab. Make sure the vehicle is in a good state which is
-   safe to enter auto mode. Click the "Start Auto" button, then it will drive you there!
-   ![](images/dreamview_start_auto.png)
+    ![](images/dreamview_module_controller.png)
+
+6. Be Cautious When Starting Autonomous Driving
+
+    Go back to **Tasks** tab. Make sure the vehicle is in a good state which is safe to enter auto mode. Click the "Start Auto" button, then it will drive you there!
+
+    ![](images/dreamview_start_auto.png)
