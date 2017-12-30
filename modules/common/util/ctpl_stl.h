@@ -21,8 +21,8 @@
 // This file is a modification of
 // https://github.com/vit-vit/CTPL/blob/master/ctpl_stl.h
 
-#ifndef __ctpl_stl_thread_pool_H__
-#define __ctpl_stl_thread_pool_H__
+#ifndef MODULES_COMMON_UTIL_CTPL_STL_H_
+#define MODULES_COMMON_UTIL_CTPL_STL_H_
 
 #include <atomic>
 #include <exception>
@@ -32,6 +32,7 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <utility>
 #include <vector>
 
 // thread pool to run user's functors with signature
@@ -53,7 +54,7 @@ class Queue {
     return true;
   }
   // deletes the retrieved element, do not use for non integral types
-  bool pop(T &v) {
+  bool pop(T &v) {  // NOLINT
     std::unique_lock<std::mutex> lock(this->mutex);
     if (this->q.empty()) return false;
     v = this->q.front();
@@ -69,18 +70,18 @@ class Queue {
   std::queue<T> q;
   std::mutex mutex;
 };
-}
+}  // namespace detail
 
-class thread_pool {
+class ThreadPool {
  public:
-  thread_pool() { this->init(); }
-  thread_pool(int nThreads) {
+  ThreadPool() { this->init(); }
+  explicit ThreadPool(int nThreads) {
     this->init();
     this->resize(nThreads);
   }
 
   // the destructor waits for all the functions in the queue to be finished
-  ~thread_pool() { this->stop(true); }
+  ~ThreadPool() { this->stop(true); }
 
   // get the number of running threads in the pool
   int size() { return static_cast<int>(this->threads.size()); }
@@ -202,10 +203,10 @@ class thread_pool {
 
  private:
   // deleted
-  thread_pool(const thread_pool &);             // = delete;
-  thread_pool(thread_pool &&);                  // = delete;
-  thread_pool &operator=(const thread_pool &);  // = delete;
-  thread_pool &operator=(thread_pool &&);       // = delete;
+  ThreadPool(const ThreadPool &);             // = delete;
+  ThreadPool(ThreadPool &&);                  // = delete;
+  ThreadPool &operator=(const ThreadPool &);  // = delete;
+  ThreadPool &operator=(ThreadPool &&);       // = delete;
 
   void set_thread(int i) {
     std::shared_ptr<std::atomic<bool>> flag(
@@ -264,4 +265,4 @@ class thread_pool {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // __ctpl_stl_thread_pool_H__
+#endif  // MODULES_COMMON_UTIL_CTPL_STL_H_
