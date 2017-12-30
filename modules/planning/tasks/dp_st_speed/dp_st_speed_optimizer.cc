@@ -113,9 +113,9 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
   StGraphData st_graph_data(boundaries, init_point_, speed_limit, path_length);
 
   DpStGraph st_graph(
-      *reference_line_, st_graph_data, dp_st_speed_config_,
+      st_graph_data, dp_st_speed_config_,
       reference_line_info_->path_decision()->path_obstacles().Items(),
-      adc_sl_boundary_);
+      init_point_, adc_sl_boundary_);
 
   if (!st_graph.Search(speed_data).ok()) {
     const std::string msg(
