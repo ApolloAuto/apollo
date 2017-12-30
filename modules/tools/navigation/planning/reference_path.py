@@ -85,7 +85,7 @@ class ReferencePath:
         quality = perception.right_lm_quality + perception.left_lm_quality
         quality = quality / 2.0
 
-        if len(rpath_x) >= path_length and routing.human and rpath_y[0] <= 2:
+        if len(rpath_x) >= path_length and routing.human and rpath_y[0] <= 3:
             init_y_routing = rpath_y[0]
             init_y = self.get_ref_path_init_y(init_y_routing)
             if quality > 0.1:
@@ -105,9 +105,27 @@ class ReferencePath:
         path_x = []
         path_y = []
         for i in range(int(path_length)):
+            #TODO(yifei): more accurate shift is needed.
             y = (lmpath_y[i] * quality + rpath_y[i] - routing_shift) / (
                 1 + quality)
             path_x.append(i)
             path_y.append(y)
 
         return path_x, path_y, path_length
+
+    def shift_point(self, p, p2, distance):
+        delta_y = p2.y - p.y
+        delta_x = p2.x - p.x
+        angle = 0
+        if distance >= 0:
+            angle = math.atan2(delta_y, delta_x) + math.pi / 2.0
+        else:
+            angle = math.atan2(delta_y, delta_x) - math.pi / 2.0
+        p1n = []
+        p1n.append(p.x + (math.cos(angle) * distance))
+        p1n.append(p.y + (math.sin(angle) * distance))
+
+        p2n = []
+        p2n.append(p2.x + (math.cos(angle) * distance))
+        p2n.append(p2.y + (math.sin(angle) * distance))
+        return p1n, p2n
