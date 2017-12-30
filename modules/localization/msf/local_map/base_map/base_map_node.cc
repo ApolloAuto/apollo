@@ -32,16 +32,15 @@ using apollo::common::util::DirectoryExists;
 using apollo::common::util::EnsureDirectory;
 
 BaseMapNode::BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy)
-    : map_matrix_(matrix), compression_strategy_(strategy) {
-  is_changed_ = false;
-  data_is_ready_ = false;
-  is_reserved_ = false;
-  min_altitude_ = 1e6;
-}
+    : map_matrix_(matrix), compression_strategy_(strategy) {}
 
 BaseMapNode::~BaseMapNode() {
-  delete map_matrix_;
-  delete compression_strategy_;
+  if (map_matrix_ != nullptr) {
+    delete map_matrix_;
+  }
+  if (compression_strategy_ != nullptr) {
+    delete compression_strategy_;
+  }
 }
 
 void BaseMapNode::Init(const BaseMapConfig* map_config,
@@ -298,7 +297,7 @@ unsigned int BaseMapNode::GetHeaderBinarySize() const {
 // }
 
 unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
-  if (compression_strategy_ == NULL) {
+  if (compression_strategy_ == nullptr) {
     return map_matrix_->LoadBinary(&((*buf)[0]));
   }
   std::vector<unsigned char> buf_uncompressed;
@@ -310,7 +309,7 @@ unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
 
 unsigned int BaseMapNode::CreateBodyBinary(
     std::vector<unsigned char>* buf) const {
-  if (compression_strategy_ == NULL) {
+  if (compression_strategy_ == nullptr) {
     unsigned int body_size = GetBodyBinarySize();
     buf->resize(body_size);
     map_matrix_->CreateBinary(&((*buf)[0]), body_size);
@@ -421,8 +420,8 @@ Eigen::Vector2d BaseMapNode::GetLeftTopCorner(const BaseMapConfig& config,
   coord[1] = config.map_range_.GetMinY() +
              config.map_node_size_y_ *
                  config.map_resolutions_[index.resolution_id_] * index.m_;
-  assert(coord[0] < config.map_range_.GetMaxX());
-  assert(coord[1] < config.map_range_.GetMaxY());
+  DCHECK_LT(coord[0], config.map_range_.GetMaxX());
+  DCHECK_LT(coord[1], config.map_range_.GetMaxY());
   return coord;
 }
 

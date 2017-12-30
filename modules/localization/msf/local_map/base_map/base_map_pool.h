@@ -17,9 +17,11 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_POOL_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_POOL_H
 
-#include <boost/thread.hpp>
 #include <list>
 #include <set>
+
+#include "boost/thread.hpp"
+
 #include "modules/localization/msf/common/util/threadpool.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
@@ -53,9 +55,7 @@ class BaseMapNodePool {
    * */
   void FreeMapNode(BaseMapNode* map_node);
   /**@brief Get the size of pool. */
-  unsigned int GetPoolSize() {
-    return pool_size_;
-  }
+  unsigned int GetPoolSize() { return pool_size_; }
 
  private:
   /**@brief The task function of the thread pool for release node.

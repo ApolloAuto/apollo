@@ -24,6 +24,8 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+
+#include "modules/common/log.h"
 #include "modules/common/macro.h"
 
 /// The namespace threadpool contains a thread pool and related utility classes.
@@ -38,17 +40,11 @@ class LockingPtr {
     mutex_.lock();
   }
 
-  ~LockingPtr() {
-    mutex_.unlock();
-  }
+  ~LockingPtr() { mutex_.unlock(); }
 
-  T& operator*() const {
-    return *obj_;
-  }
+  T& operator*() const { return *obj_; }
 
-  T* operator->() const {
-    return obj_;
-  }
+  T* operator->() const { return obj_; }
 
  private:
   T* obj_;
@@ -67,9 +63,7 @@ class ScopeGuard {
     }
   }
 
-  void Disable() {
-    is_active_ = false;
-  }
+  void Disable() { is_active_ = false; }
 
  private:
   std::function<void()> const function_;
@@ -88,25 +82,15 @@ class FifoScheduler {
     return true;
   }
 
-  void Pop() {
-    task_queue_.pop_front();
-  }
+  void Pop() { task_queue_.pop_front(); }
 
-  TaskType const& Top() const {
-    return task_queue_.front();
-  }
+  TaskType const& Top() const { return task_queue_.front(); }
 
-  size_t Size() const {
-    return task_queue_.size();
-  }
+  size_t Size() const { return task_queue_.size(); }
 
-  bool Empty() const {
-    return task_queue_.empty();
-  }
+  bool Empty() const { return task_queue_.empty(); }
 
-  void Clear() {
-    task_queue_.clear();
-  }
+  void Clear() { task_queue_.clear(); }
 
  protected:
   std::deque<TaskType> task_queue_;
@@ -117,7 +101,7 @@ class WorkerThread
     : public std::enable_shared_from_this<WorkerThread<ThreadPool>> {
  public:
   explicit WorkerThread(std::shared_ptr<ThreadPool> const& pool) : pool_(pool) {
-    assert(pool);
+    DCHECK(pool);
   }
 
   void DiedUnexpectedly() {
@@ -135,9 +119,7 @@ class WorkerThread
     pool_->worker_destructed(this->shared_from_this());
   }
 
-  void join() {
-    thread_->join();
-  }
+  void join() { thread_->join(); }
 
   static void create_and_attach(std::shared_ptr<ThreadPool> const& pool) {
     std::shared_ptr<WorkerThread> worker(new WorkerThread(pool));
@@ -182,9 +164,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
   /*! Gets the number of threads in the pool.
    * \return The number of threads.
    */
-  size_t Size() const volatile {
-    return worker_count_;
-  }
+  size_t Size() const volatile { return worker_count_; }
 
   // is only called once
   void shutdown() {
@@ -212,9 +192,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
   /*! Returns the number of tasks which are currently executed.
    * \return The number of active tasks.
    */
-  size_t active() const volatile {
-    return active_worker_count_;
-  }
+  size_t active() const volatile { return active_worker_count_; }
 
   /*! Returns the number of tasks which are ready for execution.
    * \return The number of pending tasks.
@@ -431,13 +409,9 @@ class ThreadPool {
     }
   }
 
-  ~ThreadPool() {
-    Shutdown();
-  }
+  ~ThreadPool() { Shutdown(); }
 
-  size_t Size() const {
-    return threadpool_impl_->Size();
-  }
+  size_t Size() const { return threadpool_impl_->Size(); }
 
   void Shutdown() {
     threadpool_impl_->shutdown();
@@ -448,21 +422,13 @@ class ThreadPool {
     return threadpool_impl_->schedule(task);
   }
 
-  size_t active() const {
-    return threadpool_impl_->active();
-  }
+  size_t active() const { return threadpool_impl_->active(); }
 
-  size_t pending() const {
-    return threadpool_impl_->pending();
-  }
+  size_t pending() const { return threadpool_impl_->pending(); }
 
-  void Clear() {
-    return threadpool_impl_->Clear();
-  }
+  void Clear() { return threadpool_impl_->Clear(); }
 
-  bool Empty() const {
-    return threadpool_impl_->Empty();
-  }
+  bool Empty() const { return threadpool_impl_->Empty(); }
 
   void wait(size_t const task_threshold = 0) const {
     threadpool_impl_->wait(task_threshold);
