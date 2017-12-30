@@ -107,6 +107,8 @@ class Planning : public PlanningInterface {
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
 
+  double start_time_ = 0.0;
+
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
 
