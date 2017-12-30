@@ -64,7 +64,9 @@ DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
-DEFINE_double(max_lane_angle_diff, M_PI / 4.0,
+DEFINE_int32(max_num_current_lane, 1, "Max number to search current lanes");
+DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
+DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
               "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
