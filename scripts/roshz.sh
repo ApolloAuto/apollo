@@ -21,4 +21,21 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${DIR}/apollo_base.sh"
 
-python ${DIR}/../modules/tools/control_info/control_info.py $@
+topics=($(cat "${DIR}/topics.txt"))
+
+
+while true; do
+    i=0
+    for msg in "${topics[@]}"; do
+        echo "$i ===> $msg"
+        i=$((i+1))
+    done
+    num="-1"
+    while (( "$num" < 0 )) || (( "$num" >= "$i" )) ; do
+        echo "Please Enter your topics [0 - $i ]"
+        read num
+    done
+    echo "rostopic hz ${topics[$num]}"
+    rostopic hz ${topics[$num]}
+done
+
