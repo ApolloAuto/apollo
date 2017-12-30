@@ -44,6 +44,6 @@ In Apollo 2.0, we released the new feature, auto driving on simple urban road.
    well as some corresponding modules cannot be brought up.)
    ![](images/dreamview_module_controller.png)
 
-3. Make sure the vehicle is in a good state which is safe to enter auto mode.
-   Click the "Start Auto" button, then it will drive you there!
+3. Go back to **Tasks** tab. Make sure the vehicle is in a good state which is
+   safe to enter auto mode. Click the "Start Auto" button, then it will drive you there!
    ![](images/dreamview_start_auto.png)
