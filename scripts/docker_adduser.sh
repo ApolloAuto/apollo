@@ -61,6 +61,9 @@ if [ "$RELEASE_DOCKER" != "1" ];then
 
   if [ -e /mnt/nfs/map/data ]; then
     ${SYNC_MAP}
+    echo "=== Map Versions ==="
+    cat /apollo/modules/map/data/versions.txt
+
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/map/data"
   fi
   # setup ros package
