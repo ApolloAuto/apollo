@@ -135,11 +135,18 @@ Status Planning::Start() {
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
   ReferenceLineProvider::instance()->Start();
+  start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
+void Planning::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+  if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
+      Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
+    ros::shutdown();
+  }
+}
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
