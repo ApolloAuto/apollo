@@ -27,6 +27,7 @@
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/path_decision.h"
@@ -42,9 +43,9 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const ReferenceLine& reference_line,
-            const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
+  DpStGraph(const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
             const std::vector<const PathObstacle*>& obstacles,
+            const common::TrajectoryPoint& init_point,
             const SLBoundary& adc_sl_boundary);
 
   apollo::common::Status Search(SpeedData* const speed_data);
@@ -77,8 +78,6 @@ class DpStGraph {
                    uint32_t* lowest_row);
 
  private:
-  const ReferenceLine& reference_line_;
-
   const StGraphData& st_graph_data_;
 
   // dp st configuration
@@ -88,7 +87,8 @@ class DpStGraph {
   const std::vector<const PathObstacle*>& obstacles_;
 
   // vehicle configuration parameter
-  const common::VehicleParam& vehicle_param_;
+  const common::VehicleParam& vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
 
   // initial status
   common::TrajectoryPoint init_point_;
