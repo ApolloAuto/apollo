@@ -135,54 +135,6 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
   }
 }
 
-/**
-void Trajectory1dGenerator::GenerateSpeedProfilesForFollowing(
-    const std::array<double, 3>& init_state,
-    const LonSampleConfig& lon_sample_config,
-    std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  double target_position = lon_sample_config.lon_end_condition().s();
-  double target_velocity = lon_sample_config.lon_end_condition().ds();
-
-  std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_.SampleLonEndConditionsForFollowing(
-          init_state, target_position, target_velocity);
-
-  for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<Curve1d> ptr_lon_trajectory =
-        std::shared_ptr<Curve1d>(new LatticeQuinticPolynomialCurve1d(
-            init_state, end_condition.first, end_condition.second));
-
-    ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
-  }
-}
-**/
-
-/**
-void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
-    const double stop_position,
-    std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  AINFO << "stop position s = " << stop_position;
-  AINFO << "init_state s = " << init_lon_state_[0]
-    << " init_state ds = " << init_lon_state_[1]
-    << " init_state dds = " << init_lon_state_[2];
-
-  std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForStopping(stop_position);
-  AINFO << "end condition size = " << end_conditions.size();
-  for (const auto& end_condition : end_conditions) {
-    AINFO << " --- end_conditiion " << end_condition.first[0]
-      << " " << end_condition.first[1] << " " << end_condition.first[2]
-      << " t="<< end_condition.second;
-
-    std::shared_ptr<Curve1d> ptr_lon_trajectory(new LatticeTrajectory1d(
-           std::shared_ptr<QuinticPolynomialCurve1d>(
-               new QuinticPolynomialCurve1d(init_lon_state_, end_condition.first, end_condition.second))));
-
-    ptr_lon_trajectory_bundle->push_back(ptr_lon_trajectory);
-  }
-}
-**/
-
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {

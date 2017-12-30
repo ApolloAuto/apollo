@@ -87,62 +87,6 @@ EndConditionSampler::SampleLonEndConditionsForCruising(const double ref_cruise_s
   return end_s_conditions;
 }
 
-/**
-std::vector<std::pair<std::array<double, 3>, double>>
-EndConditionSampler::SampleLonEndConditionsForFollowing(const double obstacle_position,
-    const double obstacle_velocity) const {
-  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
-  constexpr std::size_t num_time_section = 9;
-  std::array<double, num_time_section> time_sections;
-  for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
-    time_sections[i] = planned_trajectory_time - i;
-  }
-  time_sections[num_time_section - 1] = 0.01;
-
-  // following three-second rule
-  // TODO(yajia, kecheng, liyun): fix the case when s on reference line is
-  // small enough to be close to init_s[0]
-  double ref_position = obstacle_position - obstacle_velocity * 3.0;
-  constexpr std::size_t num_position_section = 5;
-  std::array<double, num_position_section> s_offsets = {-10.0, -7.5, -5.0, -2.5,
-                                                        0.0};
-
-  for (const auto& s_offset : s_offsets) {
-    std::array<double, 3> end_s;
-    end_s[0] = std::max(ref_position + s_offset, init_s_[0]);
-    end_s[1] = obstacle_velocity;
-    end_s[2] = 0.0;
-
-    for (const auto& t : time_sections) {
-      end_s_conditions.emplace_back(end_s, t);
-    }
-  }
-  return end_s_conditions;
-}
-
-std::vector<std::pair<std::array<double, 3>, double>>
-EndConditionSampler::SampleLonEndConditionsForStopping(const double ref_stop_position) const {
-  constexpr size_t num_time_section = 9;
-  std::array<double, num_time_section> time_sections;
-  for (size_t i = 0; i + 1 < num_time_section; ++i) {
-    time_sections[i] = planned_trajectory_time - i;
-  }
-  time_sections[num_time_section - 1] = 0.01;
-
-  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
-  std::array<double, 4> s_offsets = {-1.5, -1.0, -0.5, 0.0};
-  for (const auto& s_offset : s_offsets) {
-    std::array<double, 3> s = {
-        std::max(s_offset + ref_stop_position, init_s_[0]), 0.0, 0.0};
-
-    for (const auto& t : time_sections) {
-      end_s_conditions.push_back({s, t});
-    }
-  }
-  return end_s_conditions;
-}
-**/
-
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
     const PlanningTarget& planning_target) const {

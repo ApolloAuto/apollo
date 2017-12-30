@@ -46,15 +46,6 @@ class EndConditionSampler {
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForCruising(const double ref_cruise_speed) const;
 
-  /**
-  std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForFollowing(const double ref_target_position,
-                                     const double ref_target_speed) const;
-
-  std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForStopping(const double ref_stop_position) const;
-  **/
-
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForPathTimeBounds(
       const PlanningTarget& planning_target) const;
