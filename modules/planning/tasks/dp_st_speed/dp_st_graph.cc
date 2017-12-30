@@ -315,7 +315,7 @@ bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
                                             const double r_cur,
                                             uint32_t* const lower_bound,
                                             uint32_t* const upper_bound) const {
-  double tcoef = unit_t_ * unit_t_ / unit_s_;
+  const double tcoef = unit_t_ * unit_t_ / unit_s_;
   double lval = std::max(
       2 * r_pre - r_cur + dp_st_speed_config_.max_deceleration() * tcoef, 0.0);
   double rval = std::min(
@@ -330,7 +330,7 @@ bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
   return true;
 }
 
-Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
+Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   double min_cost = std::numeric_limits<double>::infinity();
   const StGraphPoint* best_end_point = nullptr;
   for (const StGraphPoint& cur_point : cost_table_.back()) {
@@ -380,14 +380,14 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
 
 double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
                                     const STPoint& third, const STPoint& forth,
-                                    const double speed_limit) const {
+                                    const double speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
-double DpStGraph::CalculateEdgeCostForSecondCol(
-    const uint32_t row, const double speed_limit) const {
+double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
+                                                const double speed_limit) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
@@ -401,7 +401,7 @@ double DpStGraph::CalculateEdgeCostForSecondCol(
 
 double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
                                                const uint32_t pre_row,
-                                               const double speed_limit) const {
+                                               const double speed_limit) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
