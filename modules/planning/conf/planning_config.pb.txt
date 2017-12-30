@@ -36,7 +36,7 @@ em_planner_config {
     dp_st_speed_config {
         total_path_length: 150
         total_time: 8.0
-        matrix_dimension_s: 400
+        matrix_dimension_s: 150
         matrix_dimension_t: 8
 
         speed_weight: 0.0
