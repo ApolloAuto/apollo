@@ -37,12 +37,14 @@ function start() {
         supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
         echo "Started supervisord with dev conf"
     fi
+    supervisorctl start monitor > /dev/null
     supervisorctl start sim_control > /dev/null
     echo "Dreamview is running at http://localhost:8888"
 }
 
 function stop() {
     supervisorctl stop sim_control > /dev/null 2>&1 &
+    supervisorctl stop monitor > /dev/null 2>&1 &
     pkill -f roscore
 }
 
