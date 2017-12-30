@@ -30,8 +30,7 @@ class LatticeTrajectory1d : public Curve1d {
 
   virtual ~LatticeTrajectory1d() = default;
 
-  virtual double Evaluate(const std::uint32_t order,
-                          const double param) const;
+  virtual double Evaluate(const std::uint32_t order, const double param) const;
 
   virtual double ParamLength() const;
 
@@ -71,7 +70,7 @@ class LatticeTrajectory1d : public Curve1d {
   bool has_target_time_ = false;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_LATTICE_UTIL_LATTICE_TRAJECTORY1D_H_ */

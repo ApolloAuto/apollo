@@ -31,12 +31,9 @@ namespace planning {
 
 class ConditionFilter {
  public:
-  ConditionFilter(
-      const Frame* frame,
-      const std::array<double, 3>& init_s,
-      const double speed_limit,
-      const ReferenceLine& reference_line,
-      const std::vector<common::PathPoint>& discretized_ref_points);
+  ConditionFilter(const Frame* frame, const std::array<double, 3>& init_s,
+                  const double speed_limit, const ReferenceLine& reference_line,
+                  const std::vector<common::PathPoint>& discretized_ref_points);
 
   std::vector<SampleBound> QuerySampleBounds(const double t) const;
 
@@ -50,11 +47,12 @@ class ConditionFilter {
 
   // Return true only if t is within the range of time slot,
   // but will output block interval anyway(maybe be extension)
-  std::pair<PathTimePoint, PathTimePoint> QueryPathTimeObstacleIntervals(const double t,
-      const PathTimeObstacle& critical_condition) const;
+  std::pair<PathTimePoint, PathTimePoint> QueryPathTimeObstacleIntervals(
+      const double t, const PathTimeObstacle& critical_condition) const;
 
   std::set<double> CriticalTimeStamps() const;
-  std::vector<double> UniformTimeStamps(const std::size_t num_of_time_segments) const;
+  std::vector<double> UniformTimeStamps(
+      const std::size_t num_of_time_segments) const;
 
  private:
   FeasibleRegion feasible_region_;

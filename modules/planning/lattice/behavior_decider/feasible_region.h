@@ -27,8 +27,7 @@ namespace planning {
 
 class FeasibleRegion {
  public:
-  FeasibleRegion(const std::array<double, 3>& init_s,
-      const double speed_limit);
+  FeasibleRegion(const std::array<double, 3>& init_s, const double speed_limit);
 
   double SUpper(const double t) const;
 

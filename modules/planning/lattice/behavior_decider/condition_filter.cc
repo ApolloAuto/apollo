@@ -31,25 +31,23 @@ namespace planning {
 using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
-    const Frame* frame,
-    const std::array<double, 3>& init_s,
-    const double speed_limit,
-    const ReferenceLine& reference_line,
-    const std::vector<common::PathPoint>& discretized_ref_points) :
-    feasible_region_(init_s, speed_limit),
-    path_time_neighborhood_(frame, init_s,
-      reference_line, discretized_ref_points) {
+    const Frame* frame, const std::array<double, 3>& init_s,
+    const double speed_limit, const ReferenceLine& reference_line,
+    const std::vector<common::PathPoint>& discretized_ref_points)
+    : feasible_region_(init_s, speed_limit),
+      path_time_neighborhood_(frame, init_s, reference_line,
+                              discretized_ref_points) {
   Init();
 }
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
-  //std::set<double> timestamps = CriticalTimeStamps();
+  // std::set<double> timestamps = CriticalTimeStamps();
   std::vector<double> timestamps = UniformTimeStamps(8);
   std::vector<SampleBound> sample_bounds;
   for (const double t : timestamps) {
     std::vector<SampleBound> sample_bounds_at_t = QuerySampleBounds(t);
     sample_bounds.insert(sample_bounds.end(), sample_bounds_at_t.begin(),
-        sample_bounds_at_t.end());
+                         sample_bounds_at_t.end());
   }
   return sample_bounds;
 }
@@ -61,8 +59,8 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
   double feasible_v_lower = feasible_region_.VLower(t);
   double feasible_v_upper = feasible_region_.VUpper(t);
 
-  CHECK(feasible_s_lower <= feasible_s_upper
-      && feasible_v_lower <= feasible_v_upper);
+  CHECK(feasible_s_lower <= feasible_s_upper &&
+        feasible_v_lower <= feasible_v_upper);
 
   std::vector<PathTimePointPair> path_intervals =
       QueryPathTimeObstacleIntervals(t);
@@ -85,7 +83,8 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
     // a new interval
     //@TODO(liyun): implement reference_v to be
     // (1) front obstacle speed if front obstacle exists
-    // (2) rear obstacle speed if no front obstacle exists and only rear obstacle exists
+    // (2) rear obstacle speed if no front obstacle exists and only rear
+    // obstacle exists
     if (s_max_reached < path_interval.first.s()) {
       if (path_interval.first.s() <= feasible_s_upper) {
         SampleBound sample_bound;
@@ -134,21 +133,18 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
 }
 
 PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
-    const double t,
-    const PathTimeObstacle& path_time_obstacle) const {
-
+    const double t, const PathTimeObstacle& path_time_obstacle) const {
   PathTimePointPair block_interval;
   double s_upper = apollo::common::math::lerp(
-      path_time_obstacle.upper_left().s(),
-      path_time_obstacle.upper_left().t(),
+      path_time_obstacle.upper_left().s(), path_time_obstacle.upper_left().t(),
       path_time_obstacle.upper_right().s(),
       path_time_obstacle.upper_right().t(), t);
 
-  double s_lower = apollo::common::math::lerp(
-      path_time_obstacle.bottom_left().s(),
-      path_time_obstacle.bottom_left().t(),
-      path_time_obstacle.bottom_right().s(),
-      path_time_obstacle.bottom_right().t(), t);
+  double s_lower =
+      apollo::common::math::lerp(path_time_obstacle.bottom_left().s(),
+                                 path_time_obstacle.bottom_left().t(),
+                                 path_time_obstacle.bottom_right().s(),
+                                 path_time_obstacle.bottom_right().t(), t);
 
   const std::string& obstacle_id = path_time_obstacle.obstacle_id();
   double v = path_time_neighborhood_.SpeedAtT(obstacle_id, t);
@@ -179,7 +175,8 @@ std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
 
     path_intervals.push_back(std::move(path_interval));
   }
-  std::sort(path_intervals.begin(), path_intervals.end(),
+  std::sort(
+      path_intervals.begin(), path_intervals.end(),
       [](const PathTimePointPair& pair_1, const PathTimePointPair& pair_2) {
         return pair_1.first.s() < pair_2.first.s();
       });
@@ -212,15 +209,13 @@ std::vector<double> ConditionFilter::UniformTimeStamps(
   std::vector<double> timestamps;
   timestamps.push_back(finish_trajectory_length);
 
-  double time_interval = planned_trajectory_time / (double) num_of_time_segments;
+  double time_interval = planned_trajectory_time / (double)num_of_time_segments;
   for (std::size_t i = 1; i <= num_of_time_segments; ++i) {
     timestamps.push_back(i * time_interval);
   }
 
   return timestamps;
 }
-
-
 
 }  // namespace planning
 }  // namespace apollo

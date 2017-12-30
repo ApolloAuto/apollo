@@ -34,8 +34,7 @@ bool SignalLightScenario::Init() {
 }
 
 int SignalLightScenario::ComputeScenarioDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
+    Frame* frame, ReferenceLineInfo* const reference_line_info,
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,
@@ -58,7 +57,8 @@ int SignalLightScenario::ComputeScenarioDecision(
   ReadSignals();
   double stop_s = std::numeric_limits<double>::max();
 
-  for (const hdmap::PathOverlap* signal_light : signal_lights_along_reference_line_) {
+  for (const hdmap::PathOverlap* signal_light :
+       signal_lights_along_reference_line_) {
     const TrafficLight signal = GetSignal(signal_light->object_id);
     double stop_deceleration =
         GetStopDeceleration(reference_line_info, signal_light);
@@ -105,7 +105,7 @@ void SignalLightScenario::ReadSignals() {
   if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
       FLAGS_signal_expire_time_sec) {
     AWARN << "traffic signals msg is expired: "
-           << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
+          << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
     return;
   }
   const TrafficLightDetection& detection =
@@ -184,6 +184,5 @@ void SignalLightScenario::CreateStopObstacle(
           FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
           stop_box));
 }
-
 }
 }

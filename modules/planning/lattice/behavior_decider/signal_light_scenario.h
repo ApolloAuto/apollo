@@ -25,8 +25,7 @@ class SignalLightScenario : public Scenario {
   virtual bool ScenarioExist() const override { return exist_; }
 
   virtual int ComputeScenarioDecision(
-      Frame* frame,
-      ReferenceLineInfo* const reference_line_info,
+      Frame* frame, ReferenceLineInfo* const reference_line_info,
       const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line,
@@ -39,12 +38,11 @@ class SignalLightScenario : public Scenario {
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
 
   apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
-  double GetStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light);
-  void CreateStopObstacle(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light);
+  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
+                             const hdmap::PathOverlap* signal_light);
+  void CreateStopObstacle(Frame* frame,
+                          ReferenceLineInfo* const reference_line_info,
+                          const hdmap::PathOverlap* signal_light);
 
   std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>

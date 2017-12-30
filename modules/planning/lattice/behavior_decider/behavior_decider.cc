@@ -43,21 +43,19 @@ using apollo::common::PathPoint;
 BehaviorDecider::BehaviorDecider() {}
 
 PlanningTarget BehaviorDecider::Analyze(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
+    Frame* frame, ReferenceLineInfo* const reference_line_info,
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line) {
-
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
   PlanningTarget ret;
 
-  if (ScenarioManager::instance()->ComputeWorldDecision(frame,
-      reference_line_info, init_planning_point, lon_init_state,
-      discretized_reference_line, &ret) != 0) {
-    AERROR<< "ComputeWorldDecision error!";
+  if (ScenarioManager::instance()->ComputeWorldDecision(
+          frame, reference_line_info, init_planning_point, lon_init_state,
+          discretized_reference_line, &ret) != 0) {
+    AERROR << "ComputeWorldDecision error!";
   }
 
   for (const auto& reference_point : discretized_reference_line) {
@@ -67,10 +65,10 @@ PlanningTarget BehaviorDecider::Analyze(
   }
 
   ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
-      reference_line_info->reference_line(), discretized_reference_line);
+                                   reference_line_info->reference_line(),
+                                   discretized_reference_line);
 
-  std::vector<SampleBound> sample_bounds =
-      condition_filter.QuerySampleBounds();
+  std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
 
   // Debug SampleBound
   AINFO << "[Printing SampleBound]";
@@ -115,7 +113,8 @@ bool BehaviorDecider::StopDecisionNearDestination(
     double required_stop_deceleration = (v * v) / (2.0 * res_s);
 
     if (required_stop_deceleration > stop_acc_thred) {
-      AINFO << "Setting PlanningTarget into STOP as required_stop_deceleration > stop_acc_thred";
+      AINFO << "Setting PlanningTarget into STOP as required_stop_deceleration >
+stop_acc_thred";
       return true;
     } else {
       AINFO << "required_stop_deceleration requirement not satisfied";

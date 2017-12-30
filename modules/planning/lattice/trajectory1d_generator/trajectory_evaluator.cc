@@ -35,19 +35,18 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories) {
-
   for (const auto lon_trajectory : lon_trajectories) {
     if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(
-        *lon_trajectory)) {
+            *lon_trajectory)) {
       continue;
     }
     for (const auto lat_trajectory : lat_trajectories) {
-      if (!LatticeConstraintChecker::IsValidLateralTrajectory(*lat_trajectory,
-          *lon_trajectory)) {
+      if (!LatticeConstraintChecker::IsValidLateralTrajectory(
+              *lat_trajectory, *lon_trajectory)) {
         continue;
       }
       double cost = evaluate(planning_target, lon_trajectory, lat_trajectory);
-      cost_queue_.push(PairCost( { lon_trajectory, lat_trajectory }, cost));
+      cost_queue_.push(PairCost({lon_trajectory, lat_trajectory}, cost));
     }
   }
 }
@@ -103,17 +102,16 @@ double TrajectoryEvaluator::evaluate(
     t += trajectory_time_resolution;
   }
 
-  double lon_travel_cost = compute_lon_trajectory_objective_cost(
-    lon_trajectory, planning_target);
+  double lon_travel_cost =
+      compute_lon_trajectory_objective_cost(lon_trajectory, planning_target);
 
   double lon_jerk_cost = compute_lon_trajectory_comfort_cost(lon_trajectory);
 
   double lat_offset_cost =
       compute_lat_trajectory_offset_cost(lat_trajectory, s_values);
 
-  return lon_travel_cost * weight_lon_travel +
-    lon_jerk_cost * weight_lon_jerk +
-    lat_offset_cost * weight_lat_offset;
+  return lon_travel_cost * weight_lon_travel + lon_jerk_cost * weight_lon_jerk +
+         lat_offset_cost * weight_lat_offset;
 }
 
 double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
@@ -224,38 +222,37 @@ double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
 double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const PlanningTarget& planning_target) const {
-
-    // zero s target means cruise
-//    if (s <= std::numeric_limits<double>::epsilon()) {
-//      double target_speed = ds;
-//      double end_speed =
-//          lon_trajectory->Evaluate(1, lon_trajectory->ParamLength());
-//
-//      double t_max = lon_trajectory->ParamLength();
-//      double t = 0.0;
-//      double cost = 0.0;
-//
-//      while (t < planned_trajectory_time) {
-//        double c = 0.0;
-//        if (t < t_max) {
-//          c = target_speed - lon_trajectory->Evaluate(1, t);
-//        } else {
-//          c = target_speed - end_speed;
-//        }
-//        cost += std::fabs(c);
-//        t += trajectory_time_resolution;
-//      }
-//      return cost;
-//    } else {
-//      // Follow
-//      // apply the following 3 second rule.
-//      double target_s = s - 3.0 * ds;
-//      double end_s =
-//          lon_trajectory->Evaluate(0, lon_trajectory->ParamLength());
-//
-//      double weight = 10.0;
-//      return (target_s - end_s) * weight;
-//    }
+  // zero s target means cruise
+  //    if (s <= std::numeric_limits<double>::epsilon()) {
+  //      double target_speed = ds;
+  //      double end_speed =
+  //          lon_trajectory->Evaluate(1, lon_trajectory->ParamLength());
+  //
+  //      double t_max = lon_trajectory->ParamLength();
+  //      double t = 0.0;
+  //      double cost = 0.0;
+  //
+  //      while (t < planned_trajectory_time) {
+  //        double c = 0.0;
+  //        if (t < t_max) {
+  //          c = target_speed - lon_trajectory->Evaluate(1, t);
+  //        } else {
+  //          c = target_speed - end_speed;
+  //        }
+  //        cost += std::fabs(c);
+  //        t += trajectory_time_resolution;
+  //      }
+  //      return cost;
+  //    } else {
+  //      // Follow
+  //      // apply the following 3 second rule.
+  //      double target_s = s - 3.0 * ds;
+  //      double end_s =
+  //          lon_trajectory->Evaluate(0, lon_trajectory->ParamLength());
+  //
+  //      double weight = 10.0;
+  //      return (target_s - end_s) * weight;
+  //    }
   double weight_dist_travelled = 10.0;
   double weight_on_reference_speed = 1.0;
   double target_speed = planning_target.cruise_speed();
@@ -265,7 +262,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   double t = 0.0;
   double s_max = lon_trajectory->Evaluate(0, t_max);
   double s_min = lon_trajectory->Evaluate(0, 0.0);
-  double dist_s = s_max -s_min;
+  double dist_s = s_max - s_min;
   double cost = 0.0;
 
   while (t < planned_trajectory_time) {
@@ -281,9 +278,7 @@ double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
   cost *= weight_on_reference_speed;
   cost += weight_dist_travelled * 1.0 / (1.0 + dist_s);
   return cost;
-
 }
-
 
 }  // namespace planning
 }  // namespace apollo

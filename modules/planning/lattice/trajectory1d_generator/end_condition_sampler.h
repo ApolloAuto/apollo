@@ -37,12 +37,13 @@ namespace planning {
 class EndConditionSampler {
  public:
   EndConditionSampler(const std::array<double, 3>& init_s,
-      const std::array<double, 3>& init_d, const double s_dot_limit);
+                      const std::array<double, 3>& init_d,
+                      const double s_dot_limit);
 
   virtual ~EndConditionSampler();
 
-  std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLatEndConditions() const;
+  std::vector<std::pair<std::array<double, 3>, double>> SampleLatEndConditions()
+      const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForCruising(const double ref_cruise_speed) const;
@@ -59,7 +60,6 @@ class EndConditionSampler {
   double s_dot_limit_;
 
   FeasibleRegion* ptr_feasible_region_;
-
 };
 
 }  // namespace planning

@@ -27,20 +27,19 @@ namespace apollo {
 namespace planning {
 
 EndConditionSampler::EndConditionSampler(const std::array<double, 3>& init_s,
-    const std::array<double, 3>& init_d, const double s_dot_limit) :
-    init_s_(init_s), init_d_(init_d), s_dot_limit_(s_dot_limit) {
+                                         const std::array<double, 3>& init_d,
+                                         const double s_dot_limit)
+    : init_s_(init_s), init_d_(init_d), s_dot_limit_(s_dot_limit) {
   ptr_feasible_region_ = new FeasibleRegion(init_s, s_dot_limit);
 }
 
-EndConditionSampler::~EndConditionSampler() {
-  delete ptr_feasible_region_;
-}
+EndConditionSampler::~EndConditionSampler() { delete ptr_feasible_region_; }
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
   std::vector<std::pair<std::array<double, 3>, double>> end_d_conditions;
-  //std::array<double, 5> end_d_candidates = {0.0, -0.25, -0.5, 0.25, 0.5};
-  //std::array<double, 5> end_s_candidates = {20.0, 30.0, 40.0, 50.0, 60.0};
+  // std::array<double, 5> end_d_candidates = {0.0, -0.25, -0.5, 0.25, 0.5};
+  // std::array<double, 5> end_s_candidates = {20.0, 30.0, 40.0, 50.0, 60.0};
   std::array<double, 3> end_d_candidates = {0.0, -0.25, 0.25};
   std::array<double, 3> end_s_candidates = {20.0, 35.0, 50.0};
 
@@ -54,7 +53,8 @@ EndConditionSampler::SampleLatEndConditions() const {
 }
 
 std::vector<std::pair<std::array<double, 3>, double>>
-EndConditionSampler::SampleLonEndConditionsForCruising(const double ref_cruise_speed) const {
+EndConditionSampler::SampleLonEndConditionsForCruising(
+    const double ref_cruise_speed) const {
   // time interval is one second plus the last one 0.01
   constexpr std::size_t num_time_section = 9;
   std::array<double, num_time_section> time_sections;
@@ -90,7 +90,6 @@ EndConditionSampler::SampleLonEndConditionsForCruising(const double ref_cruise_s
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
     const PlanningTarget& planning_target) const {
-
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
 
   /**
@@ -124,13 +123,13 @@ EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
 
     std::vector<double> s_samples;
     for (const auto& s_offset : s_offsets) {
-      s_samples.push_back(
-          std::max(init_s_[0], sample_bound.s_upper() - s_dot * 3.0 + s_offset));
+      s_samples.push_back(std::max(
+          init_s_[0], sample_bound.s_upper() - s_dot * 3.0 + s_offset));
     }
 
     for (const auto s : s_samples) {
-        std::array<double, 3> end_state = { s, s_dot, 0.0 };
-        end_s_conditions.push_back( { end_state, sample_bound.t() });
+      std::array<double, 3> end_state = {s, s_dot, 0.0};
+      end_s_conditions.push_back({end_state, sample_bound.t()});
     }
   }
 
