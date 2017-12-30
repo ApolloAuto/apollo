@@ -43,7 +43,7 @@ class LagPrediction {
 
  private:
   void AddObstacleToPrediction(
-      double start_time, const LagInfo& lag_info,
+      double delay_sec, const prediction::PredictionObstacle& obstacle,
       prediction::PredictionObstacles* obstacles) const;
 
   uint32_t min_appear_num_ = 0;

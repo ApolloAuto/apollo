@@ -108,8 +108,8 @@ void PredictorManager::Init(const PredictionConf& config) {
         << cyclist_on_lane_predictor_ << "].";
   AINFO << "Defined bicycle off lane obstacle predictor ["
         << cyclist_off_lane_predictor_ << "].";
-  AINFO << "Defined pedestrian obstacle predictor ["
-        << pedestrian_predictor_ << "].";
+  AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
+        << "].";
   AINFO << "Defined default on lane obstacle predictor ["
         << default_on_lane_predictor_ << "].";
   AINFO << "Defined default off lane obstacle predictor ["
@@ -146,12 +146,6 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     int id = perception_obstacle.id();
     if (id < 0) {
       AERROR << "A perception obstacle has invalid id [" << id << "].";
-      continue;
-    }
-    if (perception_obstacle.confidence() <
-        FLAGS_perception_confidence_threshold) {
-      AWARN << "Skip low confidence obstacle:"
-            << perception_obstacle.ShortDebugString();
       continue;
     }
 
