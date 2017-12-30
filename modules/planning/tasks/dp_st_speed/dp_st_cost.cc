@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_cost.cc
+ * @file
  **/
 
 #include "modules/planning/tasks/dp_st_speed/dp_st_cost.h"
@@ -40,7 +40,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
       unit_t_(config_.total_time() / config_.matrix_dimension_t()),
       unit_v_(unit_s_ / unit_t_) {}
 
-double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) const {
+double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
   const double s = st_graph_point.point().s();
   const double t = st_graph_point.point().t();
 
@@ -60,7 +60,15 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) const {
     }
     double s_upper = 0.0;
     double s_lower = 0.0;
-    boundary.GetBoundarySRange(t, &s_upper, &s_lower);
+
+    const auto key = boundary.id() + std::to_string(st_graph_point.index_t());
+    if (boundary_range_map_.find(key) == boundary_range_map_.end()) {
+      boundary.GetBoundarySRange(t, &s_upper, &s_lower);
+      boundary_range_map_[key] = std::make_pair(s_upper, s_lower);
+    } else {
+      s_upper = boundary_range_map_[key].first;
+      s_lower = boundary_range_map_[key].second;
+    }
     if (s < s_lower) {
       constexpr double kSafeTimeBuffer = 3.0;
       const double len = obstacle->obstacle()->Speed() * kSafeTimeBuffer;
