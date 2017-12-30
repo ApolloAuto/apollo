@@ -35,6 +35,7 @@ using apollo::planning::ADCTrajectory;
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
+  reference_line_lane_ids_.clear();
   adc_trajectory_.CopyFrom(dynamic_cast<const ADCTrajectory&>(message));
   if (!IsProtected()) {
     junction_polygon_ = Polygon2d{};
@@ -55,8 +56,8 @@ bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
     on_virtual_lane = map->IsVirtualLane(point.lane_id());
   }
   if (!on_virtual_lane) {
-    on_virtual_lane = map->OnVirtualLane({point.x(), point.y()},
-                                         FLAGS_virtual_lane_radius);
+    on_virtual_lane =
+        map->OnVirtualLane({point.x(), point.y()}, FLAGS_virtual_lane_radius);
   }
   return in_polygon && on_virtual_lane;
 }
@@ -67,44 +68,46 @@ bool ADCTrajectoryContainer::IsProtected() const {
 }
 
 Polygon2d ADCTrajectoryContainer::GetJunctionPolygon() {
-  int num_point = adc_trajectory_.trajectory_point_size();
-  if (num_point == 0) {
-    return Polygon2d{};
-  }
   std::shared_ptr<const JunctionInfo> junction_info(nullptr);
-  double prev_s = 0.0;
-  for (int i = 0; i < num_point; ++i) {
+  for (int i = 0; i < adc_trajectory_.trajectory_point_size(); ++i) {
     double s = adc_trajectory_.trajectory_point(i).path_point().s();
-    if (i > 0 && std::abs(s - prev_s) < FLAGS_junction_search_radius) {
-      continue;
+    std::string lane_id =
+        adc_trajectory_.trajectory_point(i).path_point().lane_id();
+
+    // Find junctions
+    if (junction_info == nullptr && s < FLAGS_adc_trajectory_search_length) {
+      double x = adc_trajectory_.trajectory_point(i).path_point().x();
+      double y = adc_trajectory_.trajectory_point(i).path_point().y();
+      std::vector<std::shared_ptr<const JunctionInfo>> junctions =
+          PredictionMap::instance()->GetJunctions({x, y},
+                                                  FLAGS_junction_search_radius);
+      if (!junctions.empty() && junctions.front() != nullptr) {
+        junction_info = junctions.front();
+      }
     }
-    if (s > FLAGS_adc_trajectory_search_length) {
-      break;
+
+    // Insert reference lane ids
+    if (reference_line_lane_ids_.empty() ||
+        lane_id != reference_line_lane_ids_.back()) {
+      reference_line_lane_ids_.emplace_back(lane_id);
     }
-    prev_s = s;
-    double x = adc_trajectory_.trajectory_point(i).path_point().x();
-    double y = adc_trajectory_.trajectory_point(i).path_point().y();
-    std::vector<std::shared_ptr<const JunctionInfo>> junctions =
-        PredictionMap::instance()->GetJunctions({x, y},
-                                                FLAGS_junction_search_radius);
-    if (junctions.empty()) {
-      continue;
-    } else {
-      junction_info = junctions.front();
-      break;
-    }
-  }
-  if (junction_info == nullptr) {
-    return Polygon2d{};
   }
 
-  const apollo::hdmap::Polygon& junction_polygon =
-      junction_info->junction().polygon();
-  std::vector<Vec2d> vertices;
-  for (const auto& point : junction_polygon.point()) {
-    vertices.emplace_back(point.x(), point.y());
+  if (junction_info != nullptr) {
+    std::vector<Vec2d> vertices;
+    for (const auto& point : junction_info->junction().polygon().point()) {
+      vertices.emplace_back(point.x(), point.y());
+    }
+    if (vertices.size() >= 3) {
+      return Polygon2d{vertices};
+    }
   }
-  return Polygon2d{vertices};
+  return Polygon2d{};
+}
+
+const std::vector<std::string>&
+ADCTrajectoryContainer::get_reference_line_lane_ids() {
+  return reference_line_lane_ids_;
 }
 
 }  // namespace prediction
