@@ -40,6 +40,8 @@ In Apollo 2.0, we released the new feature, auto driving on simple urban road.
    ![](images/dreamview_setup.png)
 
 2. Go to **Module Controller** tab, check if all modules and hardware are ready.
+   (Note that in virtual environment, like on your personal PC, the hardwares as
+   well as some corresponding modules cannot be brought up.)
    ![](images/dreamview_module_controller.png)
 
 3. Make sure the vehicle is in a good state which is safe to enter auto mode.
