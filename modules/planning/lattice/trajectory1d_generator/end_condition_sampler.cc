@@ -93,6 +93,7 @@ EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
 
+  /**
   constexpr std::size_t num_s_section = 5;
   for (const SampleBound& sample_bound : planning_target.sample_bound()) {
     double s_interval = (sample_bound.s_upper() - sample_bound.s_lower())
@@ -111,6 +112,28 @@ EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
         end_s_conditions.push_back( { end_state, sample_bound.t() });
     }
   }
+  **/
+
+  constexpr std::size_t num_s_section = 4;
+  std::array<double, num_s_section> s_offsets = {0.0, -1.0, -2.0, -3.0};
+
+  for (const SampleBound& sample_bound : planning_target.sample_bound()) {
+    // no longer using sample s_dot
+    // get the computed s_dot from sample bound
+    double s_dot = sample_bound.v_reference();
+
+    std::vector<double> s_samples;
+    for (const auto& s_offset : s_offsets) {
+      s_samples.push_back(
+          std::max(init_s_[0], sample_bound.s_upper() - s_dot * 3.0 + s_offset));
+    }
+
+    for (const auto s : s_samples) {
+        std::array<double, 3> end_state = { s, s_dot, 0.0 };
+        end_s_conditions.push_back( { end_state, sample_bound.t() });
+    }
+  }
+
   return end_s_conditions;
 }
 
