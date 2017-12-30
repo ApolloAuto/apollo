@@ -158,21 +158,26 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     double trajectory_pair_cost = 0.0;
     trajectory_pair_cost = trajectory_evaluator.top_trajectory_pair_cost();
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
+
+    // check the validity of 1d trajectories
     if (!LatticeConstraintChecker::IsValidTrajectoryPair(
             *trajectory_pair.second, *trajectory_pair.first)) {
       ++constraint_failure_count;
       continue;
     }
 
+    // combine two 1d trajectories to one 2d trajectory
     auto combined_trajectory = CombineTrajectory(
         discretized_reference_line, *trajectory_pair.first,
         *trajectory_pair.second, planning_init_point.relative_time());
 
+    // check longitudinal and lateral acceleration considering trajectory curvatures
     if (!LatticeConstraintChecker::IsValidTrajectory(combined_trajectory)) {
       ++combined_constraint_failure_count;
       continue;
     }
 
+    // check collision with other obstacles
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
       continue;
@@ -270,10 +275,11 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
   double t_param = 0.0;
   while (t_param < planned_trajectory_time) {
+    // linear extrapolation is handled internally in LatticeTrajectory1d
+    /**
     double s = 0.0;
     double s_dot = 0.0;
     double s_ddot = 0.0;
-
     if (t_param < t_param_max) {
       s = lon_trajectory.Evaluate(0, t_param);
       s_dot = lon_trajectory.Evaluate(1, t_param);
@@ -284,12 +290,18 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
           (t_param - t_param_max) * s_dot;
       s_ddot = 0.0;
     }
+    **/
 
+    double s = lon_trajectory.Evaluate(0, t_param);
+    double s_dot = lon_trajectory.Evaluate(1, t_param);
+    double s_ddot = lon_trajectory.Evaluate(2, t_param);
     if (s > s_ref_max) {
       break;
     }
 
     double s_param = s - s0;
+    // linear extrapolation is handled internally in LatticeTrajectory1d
+    /**
     double d = 0.0;
     double d_prime = 0.0;
     double d_pprime = 0.0;
@@ -303,6 +315,11 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
       d_prime = 0.0;
       d_pprime = 0.0;
     }
+    **/
+
+    double d = lat_trajectory.Evaluate(0, s_param);
+    double d_prime = lat_trajectory.Evaluate(1, s_param);
+    double d_pprime = lat_trajectory.Evaluate(2, s_param);
 
     PathPoint matched_ref_point =
         ReferenceLineMatcher::MatchToReferenceLine(reference_line, s);
