@@ -127,7 +127,6 @@ DECLARE_bool(align_prediction_time);
 DECLARE_bool(enable_lag_prediction);
 DECLARE_int32(lag_prediction_min_appear_num);
 DECLARE_double(lag_prediction_max_disappear_num);
-DECLARE_double(lag_prediction_protection_distance);
 DECLARE_int32(trajectory_point_num_for_debug);
 
 DECLARE_bool(enable_record_debug);
