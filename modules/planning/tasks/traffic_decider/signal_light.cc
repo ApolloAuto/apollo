@@ -235,12 +235,13 @@ bool SignalLight::CreateStopObstacle(
   auto* path_decision = reference_line_info->path_decision();
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   ObjectDecisionType stop;
-  stop.mutable_stop();
-  stop.mutable_stop()->set_distance_s(-FLAGS_stop_distance_traffic_light);
-  stop.mutable_stop()->set_stop_heading(heading);
-  stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
-  stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
-  stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
+  auto stop_decision = stop.mutable_stop();
+  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_SIGNAL);
+  stop_decision->set_distance_s(-FLAGS_stop_distance_traffic_light);
+  stop_decision->set_stop_heading(heading);
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
 
   if (!path_decision->MergeWithMainStop(stop.stop(), stop_wall->Id(),
                                         reference_line_info->reference_line(),
