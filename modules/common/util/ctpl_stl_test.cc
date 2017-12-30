@@ -16,6 +16,8 @@
 
 #include "modules/common/util/ctpl_stl.h"
 
+#include <atomic>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -23,17 +25,30 @@ namespace common {
 namespace util {
 
 namespace {
-void simple_print(int id) {
-  std::cout << "hello from " << id << ", function\n";
-}
+
+std::atomic<int> n(0);
+
+void simple_add() { n++; }
+void simple_minus() { n--; }
 }
 
 TEST(ThreadPool, simple) {
-  thread_pool p(5);
-  for (int i = 0; i < 10; ++i) {
-    auto f1 = std::bind(simple_print, i);
+  ThreadPool p(5);
+  for (int i = 0; i < 1000; ++i) {
+    auto f1 = std::bind(simple_add);
     p.push(f1);
   }
+  p.stop(true);
+  EXPECT_EQ(n.load(), 1000);
+
+  for (int i = 0; i < 500; ++i) {
+    auto f1 = std::bind(simple_add);
+    auto f2 = std::bind(simple_minus);
+    p.push(f1);
+    p.push(f2);
+  }
+  p.stop(true);
+  EXPECT_EQ(n.load(), 1000);
 }
 
 }  // namespace util
