@@ -212,6 +212,10 @@ void DpStGraph::GetRowRange(const StGraphPoint& point,
 
 void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   auto& cost_cr = cost_table_[c][r];
+  if (cost_cr.obstacle_cost() > std::numeric_limits<double>::max()) {
+    return;
+  }
+
   const auto& cost_init = cost_table_[0][0];
   if (c == 0) {
     DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
@@ -244,7 +248,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
       if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                   pre_col[r_pre])) {
-        return;
+        continue;
       }
 
       const double cost = cost_cr.obstacle_cost() +
@@ -283,7 +287,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
 
     if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                 pre_col[r_pre])) {
-      return;
+      continue;
     }
 
     for (uint32_t r_prepre = lower_bound; r_prepre <= upper_bound; ++r_prepre) {
