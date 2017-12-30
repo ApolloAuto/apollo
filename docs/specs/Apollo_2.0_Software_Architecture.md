@@ -7,13 +7,13 @@ Core software modules running on the Apollo 2.0 powered autonomous vehicle inclu
 * Planning: the planning module plans the spatio-temporal trajectory for the autonomous vehicle to take
 * Control: the control module executes the planned spatio-temporal trajectory by generating control commands such as throttle, brake and steering
 * Canbus: the interface where control commands are passed to the vehicle hardware. It is also where chasiss information gets passed through to the software system
-* HD-Map: this module is more like a library. Instead of publishing/subscribing messages, it is frequently used as a query fashion engine to provide add-hoc structured information regarding the roads
+* HD-Map: this module is more like a library. Instead of publishing/subscribing messages, it is frequently used as a query fashion engine to provide ad-hoc structured information regarding the roads
 * Localization: the localization module leverages various information sources such as GPS, Lidar and IMU to estimate where the autonomous vehicle is located.
 
 The interactions of these modules are illustrated in the following picture.
 ![Software Architecture](images/Apollo_2_0_Software_Arch.png)
 
-Every module is running as a separate baidu CarOS based ROS node. Each module node publishes and subcribes certain topics. The subscribed topics serve as data input while the published topics serve as data output. The detailed interactions are as follows.
+Every module is running as a separate baidu CarOS based ROS node. Each module node publishes and subscribes certain topics. The subscribed topics serve as data input while the published topics serve as data output. The detailed interactions are as follows.
 ## Perception
 Obviously perception strictly depends on the raw sensor data such as Lidar point cloud data and camera data. However, besides these raw sensor data inputs, traffic light detection also needs to depend on the localization data as well as the HD-Map. Since real-time ad-hoc fashioned traffic light detection is computationally infeasible, the traffic light detection will need localization to determine when and where to start detecting traffic lights through the camera captured pictures.
 
@@ -21,7 +21,7 @@ Obviously perception strictly depends on the raw sensor data such as Lidar point
 Prediction module predicts the future motion trajectories for all the perceived obstacles. And the output prediction message also wraps the perception information. Prediction subscribes both localization and perception obstacle messages as shown below.
 ![Prediction](images/prediction.png)
 
-When localization update is received, the prediction module updates its internal status. And the actual prediction is trigged when perception sends out its published perception obstacle message.
+When localization update is received, the prediction module updates its internal status. And the actual prediction is triggered when perception sends out its published perception obstacle message.
 
 ## Localization
 The localization module fuses various information to locate where the autonomous vehicle is at. There are two types of localization modes. The first localization method is an RTK based one, with a timer based callback function  “OnTimer”.
@@ -31,7 +31,7 @@ The other localization method is the “Multiple Sensor Fusion” (MSF) method, 
 ![Localization](images/localization_2.png)
 
 ## Routing
-The routing module also needs to know where the autonomous vehicle location is, as well as the destination, in order to compute the passage lanes and roads towards the destination. The important data interface is an event trigged function called “OnRoutingRequest”, in which “RoutingResponse” will be computed and published.
+The routing module also needs to know where the autonomous vehicle location is, as well as the destination, in order to compute the passage lanes and roads towards the destination. The important data interface is an event triggered function called “OnRoutingRequest”, in which “RoutingResponse” will be computed and published.
 ![Routing](images/routing.png)
 
 ## Planning
