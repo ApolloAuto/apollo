@@ -49,7 +49,7 @@ double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
     case 2:
       return a;
     default:
-      return 0;
+      return 0.0;
   }
 }
 
@@ -100,5 +100,6 @@ void LatticeTrajectory1d::set_target_time(double target_time) {
   target_time_ = target_time;
   has_target_time_ = true;
 }
-}
-}
+
+} // namespace planning
+} // namespace apollo
