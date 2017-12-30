@@ -20,8 +20,10 @@
 #include <iomanip>
 #include <memory>
 #include <string>
+#include <utility>
 #include <unordered_set>
 #include <vector>
+#include <algorithm>
 
 #include "modules/map/proto/map_id.pb.h"
 
@@ -136,6 +138,7 @@ void PredictionMap::OnLane(
   }
 
   const common::math::Vec2d vec_point(point[0], point[1]);
+  std::vector<std::pair<std::shared_ptr<const LaneInfo>, double>> lane_pairs;
   for (const auto& candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
@@ -156,8 +159,19 @@ void PredictionMap::OnLane(
     double diff =
         std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
     if (diff <= FLAGS_max_lane_angle_diff) {
-      lanes->push_back(candidate_lane);
+      lane_pairs.emplace_back(candidate_lane, diff);
     }
+  }
+  if (lane_pairs.empty()) {
+    return;
+  }
+  std::sort(lane_pairs.begin(), lane_pairs.end(),
+      [](const std::pair<std::shared_ptr<const LaneInfo>, double>& p1,
+         const std::pair<std::shared_ptr<const LaneInfo>, double>& p2) {
+        return p1.second < p2.second;
+      });
+  for (const auto& lane_pair : lane_pairs) {
+    lanes->push_back(lane_pair.first);
   }
 }
 
