@@ -52,25 +52,24 @@ class DpStCost {
                       const double speed_limit) const;
 
   double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
-                                 const STPoint& second) const;
+                                 const STPoint& second);
   double GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
-                                   const STPoint& third) const;
+                                   const STPoint& third);
 
   double GetJerkCostByTwoPoints(const double pre_speed, const double pre_acc,
                                 const STPoint& pre_point,
-                                const STPoint& curr_point) const;
+                                const STPoint& curr_point);
   double GetJerkCostByThreePoints(const double first_speed,
                                   const STPoint& first_point,
                                   const STPoint& second_point,
-                                  const STPoint& third_point) const;
+                                  const STPoint& third_point);
 
   double GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
-                                 const STPoint& third,
-                                 const STPoint& fourth) const;
+                                 const STPoint& third, const STPoint& fourth);
 
  private:
-  double GetAccelCost(const double accel) const;
-  double JerkCost(const double jerk) const;
+  double GetAccelCost(const double accel);
+  double JerkCost(const double jerk);
 
   const DpStSpeedConfig& config_;
   const std::vector<const PathObstacle*>& obstacles_;
@@ -81,6 +80,8 @@ class DpStCost {
 
   std::unordered_map<std::string, std::pair<double, double>>
       boundary_range_map_;
+  std::unordered_map<int, double> accel_cost_map_;
+  std::unordered_map<int, double> jerk_cost_map_;
 };
 
 }  // namespace planning
