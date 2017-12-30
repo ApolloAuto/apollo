@@ -61,7 +61,8 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
-    const auto key = boundary.id() + std::to_string(st_graph_point.index_t());
+    const auto key =
+        boundary.id() + "#" + std::to_string(st_graph_point.index_t());
     if (boundary_range_map_.find(key) == boundary_range_map_.end()) {
       boundary.GetBoundarySRange(t, &s_upper, &s_lower);
       boundary_range_map_[key] = std::make_pair(s_upper, s_lower);
