@@ -7,7 +7,8 @@
 ## Input
   * Planning trajectory
   * Car status
-  * HMI AUTO mode change request
+  * Localization
+  * Dreamview AUTO mode change request
 
 ## Output
   * control command (steering, throttle, brake) to canbus.
