@@ -309,6 +309,8 @@ DEFINE_int32(lag_prediction_min_appear_num, 5,
 DEFINE_double(lag_prediction_max_disappear_num, 3,
               "In lagged prediction, ingnore obstacle disappeared for more "
               "than this value");
+DEFINE_double(lag_prediction_protection_distance, 30,
+              "Within this distance, we do not use lagged prediction");
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer
