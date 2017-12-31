@@ -5,14 +5,15 @@
 ```
 We choose to go to the moon in this decade and do the other things,
 not because they are easy, but because they are hard.
-我们决定在这十年间登上月球并实现更多梦想，
-并非它们轻而易举，而是因为它们困难重重。
+我们决定在这十年间登上月球并实现更多梦想，并非它们轻而易举，而是因为它们困难重重。
 -- John F. Kennedy (约翰 F. 肯尼迪), 1962
 ```
 
 欢迎来到Apollo GitHub。
 
 [Apollo](http://apollo.auto)(阿波罗)是一个开放的、完整的、安全的自动驾驶平台，以灵活和高性能的技术架构，为全自动驾驶提供支持。
+
+**我们非常骄傲地宣布，[Apollo 2.0](https://github.com/ApolloAuto/apollo/releases/tag/v2.0.0)如约而至。**
 
 ## 安装
 

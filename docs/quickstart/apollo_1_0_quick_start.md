@@ -6,10 +6,6 @@
 * [Description of the Vehicle Environment](#description-of-the-vehicle-environment)
 * [Hardware Installation](#hardware-installation)
 * [Apollo Software Installation](#apollo-software-installation)
-    * [Download Apollo Source](#download-apollo-source)
-    * [Set up Docker Support](#set-up-docker-support)
-    * [Set up Apollo Release Docker Image](#set-up-apollo-release-docker)
-    * [Customize Your Release Container](#customize-your-release-container)
 * [Run the Demo on Vehicle](#run-the-demo-on-vehicle)
     * [Launch the Local Release Docker Image](#launch-the-local-release-env-docker-image)
     * [Record the Driving Trajectory](#record-driving-trajectory)
@@ -35,9 +31,7 @@ The following table lists the conventions that are used in this document:
 | ![online](images/online_icon.png)   | **Online**. Provides a link to a particular web site where you can get more information. |
 | ![warning](images/warning_icon.png) | **Warning**. Contains information that must **not** be ignored or you risk failure when you perform a certain task or step. |
 
-# Overview of Apollo
-
-Apollo has been initiated to provide an open, comprehensive, and reliable software platform for its partners in the automotive and autonomous-driving industries. Partners can use the Apollo software platform and the reference hardware that Apollo has certified as a template to customize in the development of their own autonomous vehicles.
+# About Apollo 1.0
 
 Apollo 1.0, also referred to as the _Automatic GPS Waypoint Following_, works in an enclosed venue such as a test track or parking lot. It accurately replays a trajectory and the speed of that trajectory that a human driver has traveled in an enclosed, flat area on solid ground.
 
@@ -63,128 +57,7 @@ for the steps to install the hardware components and the system software.
 
 # Apollo Software Installation
 
-This section includes:
-
-- Download the Apollo Release Package
-- Set up Docker Support
-- Customize Your Release Container
-
-Before getting started, please make sure you have installed the Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the
-[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md).
-
-## Download Apollo Source
-
-1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/):
-
-```
-git clone git@github.com:ApolloAuto/apollo.git
-cd apollo
-git checkout [release_branch_name]
-
-```
-
-2. Set up environment variable `APOLLO_HOME` by the following command:
-
-```
-echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
-```
-
-3. Open a new terminal or run `source ~/.bashrc` in an existing terminal.
-
-
-![tip](images/tip_icon.png) In the following sections, it is assumed that the Apollo directory is located in  `$APOLLO_HOME`.
-
-## Set up Docker Support
-
-The Docker container is the simplest way to set up the build environment for Apollo.
-
-For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
-
-1. Run the following command to install Docker:
-
-
-```
-cd $APOLLO_HOME
-bash docker/scripts/install_docker.sh
-```
-
-2. After the script completes, log out and then log back into the system to enable Docker.
-
-
-3. (Optional) If you already have Docker installed (before you installed the Apollo Kernel), add the following line in `/etc/default/docker`:
-
-```
-DOCKER_OPTS = "-s overlay"
-```
-
-## Customize Your Release Container
-
-1. Download and start the Apollo Release docker image by running the following commands:
-
-```
-cd $APOLLO_HOME
-bash docker/scripts/release_start.sh
-```
-
-2. Login into the Apollo Release docker image by running the following commands:
-
-```
-bash docker/scripts/release_into.sh
-```
-
-3. Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./ros/share/gnss_driver/launch/gnss_driver.launch`.
-
-```
-<arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
-```
-You only have to modify the value `+zone=10` in the above line.
-Please refer to the
-[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number.
-For example, if you are in Beijing, China, you have to set `+zone=50`.
-
-4. Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
-
-   Refer to the following example for a typical RTK setup:
-
-```
-rtk_from {
-	format: RTCM_V3
-		ntrip {
-		address: <provide your own value>
-		port: <provide your own value>
-		mount_point: <provide your own value>
-		user: <provide your own username>
-		password: <provide your own password>
-		timeout_s: <provide your own value, e.g., 5>
-	}
-}
-rtk_to {
-	format: RTCM_V3
-	serial {
-		device: <provide your own value, e.g., "/dev/ttyUSB1">
-		baud_rate: <provide your own value, e.g., 115200>
-	}
-}
-```
-
-The `rtk_from` is  used for RTK base station information.
-
-The `rtk_to` is used to send the RTK differential data to the receiver.
-
-5. Add ESD CAN Support
-
-   Please refer to [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)
-   to setup the ESD CAN library.
-
-6. Follow these steps to persist your local changes:
-
-```
-# RUN OUT OF DOCKER ENV
-# commit your docker local changes to local docker image.
-exit # exit from docker environment
-cd $APOLLO_HOME
-bash docker/scripts/release_commit.sh
-```
+Please refer to [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md).
 
 # Run Demo on Vehicle
 
@@ -244,7 +117,7 @@ Follow these steps to perform autonomous driving:
 3. After arriving at your destination,  click the **Stop** button to stop replaying the recorded trajectory.
    ![](images/hmi_play_stop.png)
 
-## Shut Down
+## Shutdown
 
 1. Shut down the system from a terminal:
     ```sudo shutdown now```
@@ -255,5 +128,3 @@ Follow these steps to perform autonomous driving:
 
 4. Turn off the car.
 
-# Run Offline Demo
-Refer to [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
