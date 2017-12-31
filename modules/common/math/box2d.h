@@ -50,6 +50,7 @@ namespace math {
  */
 class Box2d {
  public:
+  Box2d() = default;
   /**
    * @brief Constructor which takes the center, heading, length and width.
    * @param center The center of the rectangular bounding box.
