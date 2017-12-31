@@ -94,7 +94,6 @@ class StBoundary : public common::math::Polygon2d {
 
   double Area() const;
 
-  double DistanceS(const STPoint& st_point) const;
   std::vector<STPoint> upper_points() const { return upper_points_; }
   std::vector<STPoint> lower_points() const { return lower_points_; }
 
@@ -114,7 +113,6 @@ class StBoundary : public common::math::Polygon2d {
   FRIEND_TEST(StBoundaryTest, remove_redundant_points);
   void RemoveRedundantPoints(
       std::vector<std::pair<STPoint, STPoint>>* point_pairs);
-  void CalculateArea();
 
   FRIEND_TEST(StBoundaryTest, get_index_range);
   bool GetIndexRange(const std::vector<STPoint>& points, const double t,
