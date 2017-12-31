@@ -271,8 +271,31 @@ bool ConditionFilter::GenerateLatticeStPixels(
   return true;
 }
 
-// @TODO: implement
 bool ConditionFilter::WithinObstacleSt(double s, double t) {
+  std::vector<PathTimeObstacle> path_time_obstacles =
+    path_time_neighborhood_.GetPathTimeObstacles();
+
+  for (const PathTimeObstacle& path_time_obstacle : path_time_obstacles) {
+     if (t < path_time_obstacle.upper_left().t() ||
+         t > path_time_obstacle.upper_right().t()) {
+      continue;
+     }
+
+    double s_upper = apollo::common::math::lerp(
+      path_time_obstacle.upper_left().s(),
+      path_time_obstacle.upper_left().t(),
+      path_time_obstacle.upper_right().s(),
+      path_time_obstacle.upper_right().t(), t);
+    double s_lower = apollo::common::math::lerp(
+      path_time_obstacle.bottom_left().s(),
+      path_time_obstacle.bottom_left().t(),
+      path_time_obstacle.bottom_right().s(),
+      path_time_obstacle.bottom_right().t(), t);
+
+    if (s <= s_upper && s >= s_lower) {
+      return true;
+    }
+  }
   return false;
 }
 
