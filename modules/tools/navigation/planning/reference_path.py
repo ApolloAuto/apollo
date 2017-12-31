@@ -73,13 +73,13 @@ class ReferencePath:
             path_y.append(y)
         return path_x, path_y
 
-    def get_ref_path_by_lmr(self, perception, routing, localization, chassis):
+    def get_ref_path_by_lmr(self, perception, routing, adv):
 
-        path_length = self.get_path_length(chassis.get_speed_mps())
+        path_length = self.get_path_length(adv.speed_mps)
 
-        rpath_x, rpath_y = routing.get_local_segment_spline(localization.x,
-                                                            localization.y,
-                                                            localization.heading)
+        rpath_x, rpath_y = routing.get_local_segment_spline(adv.x,
+                                                            adv.y,
+                                                            adv.heading)
         init_y_perception = (perception.right_lm_coef[0] +
                              perception.left_lm_coef[0]) / -2.0
         quality = perception.right_lm_quality + perception.left_lm_quality
@@ -105,7 +105,7 @@ class ReferencePath:
         path_x = []
         path_y = []
         for i in range(int(path_length)):
-            #TODO(yifei): more accurate shift is needed.
+            # TODO(yifei): more accurate shift is needed.
             y = (lmpath_y[i] * quality + rpath_y[i] - routing_shift) / (
                 1 + quality)
             path_x.append(i)
