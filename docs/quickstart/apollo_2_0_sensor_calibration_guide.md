@@ -285,7 +285,7 @@ When the calibration is completed, the corresponding calibration result verifica
 
 ### Radar-to-Camera Calibration
 	
-* Methods: In order to verify the output extrinsic, we use the LiDAR in the system to be a medium. So we can get the extrinsic of the Radar relative to the LiDAR through the extrinsic of the Radar relative to the camera and the extrinsic of the camera relative to the LiDAR. Then we can draw a bird-view fusion image, which fuse the Radar data and the LiDAR date in the LiDAR coordinate system. Then we can use the alignment of the Radar date and the LiDAR date in the bird-view fusion image to judge the accuracy of the extrinsic. In the fusion image, the white point means the LiDAR point cloud, while the green solid circle means Radar objects. The alignment of the Radar object and the LiDAR date in the bird-view fusion image shows the accuracy of the extrinsic. If most of the targets can be coincident it is satisfied, otherwise, it is not satisfied and need to re-calibrate
+* Methods: In order to verify the output extrinsic, we use the LiDAR in the system to be a medium. So we can get the extrinsic of the Radar relative to the LiDAR through the extrinsic of the Radar relative to the camera and the extrinsic of the camera relative to the LiDAR. Then we can draw a bird-view fusion image, which fuse the Radar data and the LiDAR data in the LiDAR coordinate system. Then we can use the alignment of the Radar data and the LiDAR data in the bird-view fusion image to judge the accuracy of the extrinsic. In the fusion image, the white point means the LiDAR point cloud, while the green solid circle means Radar objects. The alignment of the Radar object and the LiDAR data in the bird-view fusion image shows the accuracy of the extrinsic. If most of the targets can be coincident it is satisfied, otherwise, it is not satisfied and need to re-calibrate
 
 * Result Examples: As shown in the following figures, figure 6 shows a good calibration result which meet the precision requirements, and figure 7 is a phenomenon that does not meet the requirements of precision.
 
@@ -297,7 +297,7 @@ When the calibration is completed, the corresponding calibration result verifica
 
 * Attentions: 
 
-  * In order to get the fusion image of the Radar date and the LiDAR point cloud, the calibration process will automatically or manually call another projection tool (`radar_lidar_visualizer`). The projection tool loads the extrinsic file of the Radar-to-Camera and Camera-to-LiDAR. Therefore, before tool starts, we need to make sure these two extirnsics are well calibrated and exsist in the specific path.
+  * In order to get the fusion image of the Radar data and the LiDAR point cloud, the calibration process will automatically or manually call another projection tool (`radar_lidar_visualizer`). The projection tool loads the extrinsic file of the Radar-to-Camera and Camera-to-LiDAR. Therefore, before tool starts, we need to make sure these two extirnsics are well calibrated and exsist in the specific path.
 
   * Type the following command to start the `radar_lidar_visualizer` program: 
 	
