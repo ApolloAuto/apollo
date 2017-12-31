@@ -125,7 +125,7 @@ double DpStCost::GetAccelCost(const double accel) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
   constexpr int kShift = 100;
-  const int accel_key = static_cast<int>(accel / kEpsilon + 0.5) + kShift;
+  const size_t accel_key = static_cast<size_t>(accel / kEpsilon + 0.5) + kShift;
   DCHECK_LT(accel_key, accel_cost_.size());
   if (accel_key < 0 || accel_key >= accel_cost_.size()) {
     return kInf;
@@ -173,7 +173,7 @@ double DpStCost::JerkCost(const double jerk) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
   constexpr int kShift = 200;
-  const int jerk_key = static_cast<int>(jerk / kEpsilon + 0.5) + kShift;
+  const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5) + kShift;
   DCHECK_LT(jerk_key, jerk_cost_.size());
   if (jerk_key < 0 || jerk_key >= jerk_cost_.size()) {
     return kInf;
