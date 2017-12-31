@@ -82,4 +82,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "dp_st_graph_test",
+    size = "small",
+    srcs = [
+        "dp_st_graph_test.cc",
+    ],
+    deps = [
+        ":dp_st_graph",
+        "//modules/planning/proto:planning_config_proto",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
