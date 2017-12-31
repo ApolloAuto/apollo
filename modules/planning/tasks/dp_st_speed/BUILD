@@ -88,6 +88,9 @@ cc_test(
     srcs = [
         "dp_st_graph_test.cc",
     ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
     deps = [
         ":dp_st_graph",
         "//modules/planning/proto:planning_config_proto",

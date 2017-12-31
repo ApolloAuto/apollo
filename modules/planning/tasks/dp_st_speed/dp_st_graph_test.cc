@@ -37,6 +37,7 @@ class DpStGraphTest : public ::testing::Test {
   virtual void SetUp() {
     // dp_config_
     PlanningConfig config;
+    FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                  &config));
     dp_config_ = config.em_planner_config().dp_st_speed_config();
