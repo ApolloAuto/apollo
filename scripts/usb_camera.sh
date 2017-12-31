@@ -34,6 +34,7 @@ function start() {
 
 function stop() {
     pkill -f start_leopard
+    pkill -f camera_nodelet_manager
 }
 
 # run command_name module_name
