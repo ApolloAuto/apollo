@@ -26,12 +26,12 @@ cc_library(
 )
 
 cc_library(
-    name = "warm_up_problem_interface",
+    name = "warm_up_ipopt_interface",
     srcs = [
-        "warm_up_problem_interface.cc",
+        "warm_up_ipopt_interface.cc",
     ],
     hdrs = [
-        "warm_up_problem_interface.h",
+        "warm_up_ipopt_interface.h",
     ],
     deps = [
         "//modules/common/math",
