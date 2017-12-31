@@ -26,15 +26,22 @@ class ObstacleDecider:
         self.obstacle_lon_ttc = {}
         self.obstacle_lat_dist = {}
         self.obstacle_lon_dist = {}
-        self.MASTER_WIDTH = 3.4
-        self.MASTER_LENGTH = 5.5
+        self.front_edge_to_center = 3.89
+        self.back_edge_to_center = 1.043
+        self.left_edge_to_center = 1.055
+        self.right_edge_to_center = 1.055
         self.LAT_DIST = 1.0
         self.mobileye = None
+        self.path_obstacle_processed = False
 
     def update(self, mobileye):
         self.mobileye = mobileye
+        self.path_obstacle_processed = False
 
     def process_path_obstacle(self, path_x, path_y):
+        if self.path_obstacle_processed:
+            return
+
         self.obstacle_lat_dist = {}
 
         path = []
@@ -46,7 +53,7 @@ class ObstacleDecider:
         for obstacle in self.mobileye.obstacles:
             point = Point(obstacle.x, obstacle.y)
             dist = line.distance(point)
-            if dist < self.MASTER_WIDTH / 2.0 + self.LAT_DIST:
+            if dist < self.left_edge_to_center + self.LAT_DIST:
                 proj_len = line.project(point)
                 if proj_len == 0 or proj_len >= line.length:
                     continue
@@ -60,3 +67,5 @@ class ObstacleDecider:
                 if d < 0:
                     dist *= -1
                 self.obstacle_lat_dist[obstacle.obstacle_id] = dist
+
+        self.path_obstacle_processed = True
