@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * warm_up_ipopt_interface.h
+ * warm_start_ipopt_interface.h
  */
 
 #ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_

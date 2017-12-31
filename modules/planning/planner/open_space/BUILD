@@ -11,7 +11,7 @@ cc_library(
         "open_space_planner.h",
     ],
     deps = [
-        "warm_up_problem",
+        "warm_start_problem",
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
@@ -26,26 +26,26 @@ cc_library(
 )
 
 cc_library(
-    name = "warm_up_problem",
+    name = "warm_start_problem",
     srcs = [
-        "warm_up_problem.cc",
+        "warm_start_problem.cc",
     ],
     hdrs = [
-        "warm_up_problem.h",
+        "warm_start_problem.h",
     ],
     deps = [
         "//modules/common/util",
-        "warm_up_ipopt_interface",
+        "warm_start_ipopt_interface",
     ],
 )
 
 cc_library(
-    name = "warm_up_ipopt_interface",
+    name = "warm_start_ipopt_interface",
     srcs = [
-        "warm_up_ipopt_interface.cc",
+        "warm_start_ipopt_interface.cc",
     ],
     hdrs = [
-        "warm_up_ipopt_interface.h",
+        "warm_start_ipopt_interface.h",
     ],
     deps = [
         "//modules/common/math",

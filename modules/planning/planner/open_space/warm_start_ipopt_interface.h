@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /*
- * warm_up_ipopt_interface.h
+ * warm_start_ipopt_interface.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_UP_IPOPT_INTERFACE_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_UP_IPOPT_INTERFACE_H_
+#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_
+#define MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_
 
 #include <vector>
 
@@ -32,7 +32,7 @@ namespace planning {
 
 class WarmUpIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit WarmUpIPOPTInterface(std::vector<Eigen::Vector2d> points);
+  explicit WarmUpIPOPTInterface();
 
   virtual ~WarmUpIPOPTInterface() = default;
 
@@ -94,4 +94,4 @@ class WarmUpIPOPTInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_UP_IPOPT_INTERFACE_H_
+#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_
