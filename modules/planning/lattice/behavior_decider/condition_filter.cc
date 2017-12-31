@@ -217,5 +217,64 @@ std::vector<double> ConditionFilter::UniformTimeStamps(
   return timestamps;
 }
 
+// Compute pixel img for lattice st
+bool ConditionFilter::GenerateLatticeStPixels(
+  apollo::planning_internal::LatticeStTraining* st_data,
+  double timestamp,
+  std::string st_img_name) {
+  int num_rows = 500;
+  int num_cols = 80;
+  double s_step = 100.0 / (double) num_rows;
+  double t_step = 8.0 / (double) num_cols;
+  std::vector<PathTimeObstacle> path_time_obstacles =
+    path_time_neighborhood_.GetPathTimeObstacles();
+  if (0 == path_time_obstacles.size()) {
+    AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
+    return false;
+  }
+  for (int j = 0; j < num_cols; ++j) {
+    double t = t_step * (j + 1);
+    double feasible_s_upper = feasible_region_.SUpper(t);
+    double feasible_s_lower = feasible_region_.SLower(t);
+    for (int i = 0; i < num_rows; ++i) {
+      double s = s_step * (i + 1);
+      if (s <= feasible_s_lower || s >= feasible_s_upper) {
+        // Dye gray
+        apollo::planning_internal::LatticeStPixel* pixel =
+          st_data->add_pixel();
+        pixel->set_s(i);
+        pixel->set_t(j);
+        pixel->set_r(128);
+        pixel->set_g(128);
+        pixel->set_b(128);
+        continue;
+      }
+      if (WithinObstacleSt(s,t)) {
+        // Dye blue
+        apollo::planning_internal::LatticeStPixel* pixel =
+          st_data->add_pixel();
+        pixel->set_s(i);
+        pixel->set_t(j);
+        pixel->set_r(0);
+        pixel->set_g(0);
+        pixel->set_b(128);
+        continue;
+      }
+    }
+  }
+  st_data->set_annotation(st_img_name);
+  st_data->set_timestamp(timestamp);
+  st_data->set_num_s_grids(num_rows);
+  st_data->set_num_t_grids(num_cols);
+  st_data->set_s_resolution(s_step);
+  st_data->set_t_resolution(t_step);
+  return true;
+}
+
+// @TODO: implement
+bool ConditionFilter::WithinObstacleSt(double s, double t) {
+  return false;
+}
+
 }  // namespace planning
 }  // namespace apollo

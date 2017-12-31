@@ -29,6 +29,7 @@
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
