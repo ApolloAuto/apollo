@@ -19,9 +19,11 @@
 #include <cmath>
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -37,14 +39,13 @@ using ::apollo::common::Status;
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::adapter::AdapterManager;
+using ::apollo::common::math::Vec2d;
 using ::apollo::common::time::Clock;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::perception::PerceptionObstacle;
 using ::apollo::perception::PerceptionObstacles;
 
-std::string Prediction::Name() const {
-  return FLAGS_prediction_module_name;
-}
+std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
   // Load prediction conf
@@ -84,12 +85,14 @@ Status Prediction::Init() {
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
+  if (!PredictionMap::instance()->Ready()) {
+    return OnError("Map cannot be loaded.");
+  }
+
   return Status::OK();
 }
 
-Status Prediction::Start() {
-  return Status::OK();
-}
+Status Prediction::Start() { return Status::OK(); }
 
 void Prediction::Stop() {}
 
@@ -129,12 +132,33 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
+  // Insert obstacle
   double start_timestamp = Clock::NowInSeconds();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
+
+  // Update ADC status
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
+  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::PLANNING_TRAJECTORY));
+  CHECK_NOTNULL(pose_container);
+  CHECK_NOTNULL(adc_container);
+
+  if (pose_container->ToPerceptionObstacle() != nullptr) {
+    double x = pose_container->ToPerceptionObstacle()->position().x();
+    double y = pose_container->ToPerceptionObstacle()->position().y();
+    ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
+           << ", " << std::fixed << std::setprecision(6) << y << "].";
+    Vec2d adc_position(x, y);
+    adc_container->SetPosition(adc_position);
+  }
+
+  // Make predictions
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
 
