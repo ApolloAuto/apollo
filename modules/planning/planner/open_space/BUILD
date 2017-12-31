@@ -11,17 +11,31 @@ cc_library(
         "open_space_planner.h",
     ],
     deps = [
+        "warm_up_problem",
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
-        "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",
-        "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
+
+    ],
+)
+
+cc_library(
+    name = "warm_up_problem",
+    srcs = [
+        "warm_up_problem.cc",
+    ],
+    hdrs = [
+        "warm_up_problem.h",
+    ],
+    deps = [
+        "//modules/common/util",
+        "warm_up_ipopt_interface",
     ],
 )
 
