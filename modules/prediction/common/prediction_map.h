@@ -34,6 +34,12 @@ namespace prediction {
 class PredictionMap {
  public:
   /**
+   * @brief Check if map is ready
+   * @return True if map is ready
+   */
+  bool Ready();
+
+  /**
    * @brief Get the position of a point on a specific distance along a lane.
    * @param lane_info The lane to get a position.
    * @param s The distance along the lane.
