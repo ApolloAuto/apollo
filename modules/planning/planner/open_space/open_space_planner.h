@@ -54,7 +54,7 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**
-   * @brief Overrode function Plan in parent class Planner.
+   * @brief override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.
    * @param frame Current planning frame.
    * @param reference_line_info The computed reference line.
@@ -63,12 +63,10 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
-  /**
-   * @brief Read the recorded trajectory file.
-   * @param filename The name of the trajectory file.
-   */
 
- private:
+  apollo::common::Status ObsHRep(int& nOb, Eigen::MatrixXd& vOb,
+                                 Eigen::MatrixXd lOb, Eigen::MatrixXd* A_all,
+                                 Eigen::MatrixXd* b_all);
 };
 
 }  // namespace planning
