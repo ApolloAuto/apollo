@@ -199,12 +199,13 @@ int RNNEvaluator::SetupObstacleFeature(
     dist_lb = p_lane_fea->dist_to_left_boundary();
     dist_rb = p_lane_fea->dist_to_right_boundary();
 
-    if (!fea->has_speed() || !fea->has_theta()) {
-      ADEBUG << "Fail to access speed from " << i << "-the feature";
+    if (!fea->has_speed() || !fea->velocity_heading()) {
+      ADEBUG << "Fail to access speed and velocity heading from " << i
+             << "-the feature";
       continue;
     }
     speed = fea->speed();
-    heading = fea->theta();
+    heading = fea->velocity_heading();
     success_setup = true;
     ADEBUG << "Success to setup obstacle feature!";
 
