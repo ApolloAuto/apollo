@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /*
- * warm_up_ipopt_interface.cc
+ * warm_start_ipopt_interface.cc
  */
 
-#include "modules/planning/planner/open_space/warm_up_ipopt_interface.h"
+#include "modules/planning/planner/open_space/warm_start_ipopt_interface.h"
 
 #include <math.h>
 #include <utility>
@@ -31,8 +31,7 @@ namespace planning {
 
 constexpr std::size_t N = 80;
 
-WarmUpIPOPTInterface::WarmUpIPOPTInterface(
-    std::vector<Eigen::Vector2d> points) {}
+WarmUpIPOPTInterface::WarmUpIPOPTInterface() {}
 
 void WarmUpIPOPTInterface::get_optimization_results() const {}
 
