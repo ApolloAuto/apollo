@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /*
- * warm_up_problem_interface.h
+ * warm_up_ipopt_interface.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_
+#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_UP_IPOPT_INTERFACE_H_
+#define MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_UP_IPOPT_INTERFACE_H_
 
 #include <vector>
 
@@ -30,11 +30,11 @@
 namespace apollo {
 namespace planning {
 
-class DistanceApproachProblemInterface : public Ipopt::TNLP {
+class WarmUpIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit DistanceApproachProblemInterface(std::vector<Eigen::Vector2d> points);
+  explicit WarmUpIPOPTInterface(std::vector<Eigen::Vector2d> points);
 
-  virtual ~DistanceApproachProblemInterface() = default;
+  virtual ~WarmUpIPOPTInterface() = default;
 
   void set_start_point();
 
@@ -94,4 +94,4 @@ class DistanceApproachProblemInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_
+#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_UP_IPOPT_INTERFACE_H_
