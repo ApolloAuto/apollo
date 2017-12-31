@@ -195,7 +195,7 @@ bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
   if (probability > max_prob) {
     return true;
   } else {
-    double prob_diff = std::abs(probability - max_prob);
+    double prob_diff = std::fabs(probability - max_prob);
     if (prob_diff <= std::numeric_limits<double>::epsilon() &&
         type == LaneChangeType::STRAIGHT) {
       return true;

@@ -82,6 +82,7 @@ bool ADCTrajectoryContainer::IsProtected() const {
 
 void ADCTrajectoryContainer::SetJunctionPolygon() {
   std::shared_ptr<const JunctionInfo> junction_info(nullptr);
+
   for (int i = 0; i < adc_trajectory_.trajectory_point_size(); ++i) {
     double s = adc_trajectory_.trajectory_point(i).path_point().s();
 
@@ -103,7 +104,7 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     }
   }
 
-  if (junction_info != nullptr) {
+  if (junction_info != nullptr && junction_info->junction().has_polygon()) {
     std::vector<Vec2d> vertices;
     for (const auto& point : junction_info->junction().polygon().point()) {
       vertices.emplace_back(point.x(), point.y());
