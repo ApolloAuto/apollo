@@ -56,9 +56,8 @@ bool Crosswalk::ApplyRule(Frame* frame,
   return true;
 }
 
-void Crosswalk::MakeDecisions(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info) {
+void Crosswalk::MakeDecisions(Frame* frame,
+                              ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     const PerceptionObstacle& perception_obstacle =
@@ -135,7 +134,7 @@ void Crosswalk::MakeDecisions(
         //     always STOP
         // (3) when l_distance <= strick_l_distance + not on_road(on sideway),
         //     STOP only if path crosses
-        if (is_on_road || (!is_on_road && is_path_cross)) {
+        if (is_on_road || is_path_cross) {
           stop = true;
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
                  << "]; crosswalk_id[" << crosswalk_id << "]";

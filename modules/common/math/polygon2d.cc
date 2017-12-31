@@ -341,6 +341,12 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
 
 bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
   CHECK_GE(points_.size(), 3);
+  if ((line_segment.start().x() < min_x_ && line_segment.end().x() < min_x_) ||
+      (line_segment.start().x() > max_x_ && line_segment.end().x() > max_x_) ||
+      (line_segment.start().y() < min_y_ && line_segment.end().y() < min_y_) ||
+      (line_segment.start().y() > max_y_ && line_segment.end().y() > max_y_)) {
+    return false;
+  }
   Vec2d first;
   Vec2d last;
   return GetOverlap(line_segment, &first, &last);
@@ -578,10 +584,10 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
 }
 
 std::string Polygon2d::DebugString() const {
-  return util::StrCat(
-      "polygon2d (  num_points = ", num_points_,
-      "  points = (", util::PrintDebugStringIter(points_), " )  ",
-      is_convex_ ? "convex" : "non-convex", "  area = ", area_, " )");
+  return util::StrCat("polygon2d (  num_points = ", num_points_, "  points = (",
+                      util::PrintDebugStringIter(points_), " )  ",
+                      is_convex_ ? "convex" : "non-convex", "  area = ", area_,
+                      " )");
 }
 
 }  // namespace math
