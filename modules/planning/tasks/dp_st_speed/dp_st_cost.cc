@@ -37,6 +37,14 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
       obstacles_(obstacles),
       init_point_(init_point),
       unit_t_(config_.total_time() / config_.matrix_dimension_t()) {
+  int index = 0;
+  for (auto& obstacle : obstacles) {
+    boundary_map_[obstacle->st_boundary().id()] = index++;
+  }
+  boundary_cost_.resize(obstacles_.size());
+  for (auto& vec : boundary_cost_) {
+    vec.resize(config_.matrix_dimension_t(), std::make_pair(-1.0, -1.0));
+  }
   accel_cost_.fill(-1.0);
   jerk_cost_.fill(-1.0);
 }
@@ -62,16 +70,14 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
-    const std::string key =
-        boundary.id() + "#" + std::to_string(st_graph_point.index_t());
-
-    auto p_val = boundary_range_map_.find(key);
-    if (p_val == boundary_range_map_.end()) {
+    int boundary_index = boundary_map_[boundary.id()];
+    if (boundary_cost_[boundary_index][st_graph_point.index_t()].first < 0.0) {
       boundary.GetBoundarySRange(t, &s_upper, &s_lower);
-      boundary_range_map_[key] = std::make_pair(s_upper, s_lower);
+      boundary_cost_[boundary_index][st_graph_point.index_t()] =
+          std::make_pair(s_upper, s_lower);
     } else {
-      s_upper = p_val->second.first;
-      s_lower = p_val->second.second;
+      s_upper = boundary_cost_[boundary_index][st_graph_point.index_t()].first;
+      s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
       constexpr double kSafeTimeBuffer = 3.0;
@@ -124,10 +130,10 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
 double DpStCost::GetAccelCost(const double accel) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
-  constexpr int kShift = 100;
-  const size_t accel_key = static_cast<size_t>(accel / kEpsilon + 0.5) + kShift;
+  constexpr size_t kShift = 100;
+  const size_t accel_key = static_cast<size_t>(accel / kEpsilon + 0.5 + kShift);
   DCHECK_LT(accel_key, accel_cost_.size());
-  if (accel_key < 0 || accel_key >= accel_cost_.size()) {
+  if (accel_key >= accel_cost_.size()) {
     return kInf;
   }
 
@@ -172,10 +178,10 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 double DpStCost::JerkCost(const double jerk) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
-  constexpr int kShift = 200;
-  const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5) + kShift;
+  constexpr size_t kShift = 200;
+  const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5 + kShift);
   DCHECK_LT(jerk_key, jerk_cost_.size());
-  if (jerk_key < 0 || jerk_key >= jerk_cost_.size()) {
+  if (jerk_key >= jerk_cost_.size()) {
     return kInf;
   }
 
