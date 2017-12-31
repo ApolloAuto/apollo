@@ -164,6 +164,10 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 
+  if (!adc_container->HasOverlap(lane_sequence)) {
+    return std::numeric_limits<double>::max();
+  }
+
   Eigen::Vector2d adc_position;
   if (pose_container->ToPerceptionObstacle() != nullptr) {
     adc_position[0] = pose_container->ToPerceptionObstacle()->position().x();
