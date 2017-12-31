@@ -22,13 +22,15 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_SEQUENCE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_SEQUENCE_SEQUENCE_PREDICTOR_H_
 
+#include <vector>
 #include <string>
 #include <unordered_set>
 
 #include "Eigen/Dense"
 
-#include "modules/prediction/predictor/predictor.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
+
+#include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {

@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
