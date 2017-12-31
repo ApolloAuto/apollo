@@ -255,12 +255,12 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    double kDeafultUnitL = 0.30;
+    double kDefaultUnitL = 0.30;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      kDeafultUnitL = 1.0;
+      kDefaultUnitL = 1.0;
     }
     const double sample_l_range =
-        kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
+        kDefaultUnitL * (config_.sample_points_num_each_level() - 1);
     double sample_right_boundary =
         std::fmin(-eff_right_width, init_sl_point_.l());
     double sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
@@ -278,7 +278,7 @@ bool DPRoadGraph::SamplePathWaypoints(
 
     std::vector<double> sample_l;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      sample_l.push_back(init_sl_point_.l());
+      sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                   config_.sample_points_num_each_level() - 1,
