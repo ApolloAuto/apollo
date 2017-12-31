@@ -44,14 +44,8 @@ constexpr double kInf = std::numeric_limits<double>::infinity();
 
 bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
+  const common::math::LineSegment2d seg(p1.point(), p2.point());
   for (const auto* boundary : boundaries) {
-    if (std::fmax(p1.point().s(), p2.point().s()) < boundary->min_s() ||
-        std::fmin(p1.point().s(), p2.point().s()) > boundary->max_s() ||
-        std::fmax(p1.point().t(), p2.point().t()) < boundary->min_t() ||
-        std::fmin(p1.point().t(), p2.point().t()) > boundary->max_t()) {
-      continue;
-    }
-    common::math::LineSegment2d seg(p1.point(), p2.point());
     if (boundary->HasOverlap(seg)) {
       return true;
     }
@@ -199,21 +193,24 @@ void DpStGraph::GetRowRange(const StGraphPoint& point,
   } else {
     v0 = (point.index_s() - point.pre_point()->index_s()) * unit_s_ / unit_t_;
   }
+
+  const size_t max_s_size = cost_table_.back().size() - 1;
+
   const double speed_coeff = unit_t_ * unit_t_;
 
   const double delta_s_upper_bound =
       v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
   *next_highest_row =
       point.index_s() + static_cast<uint32_t>(delta_s_upper_bound / unit_s_);
-  if (*next_highest_row >= cost_table_.back().size()) {
-    *next_highest_row = cost_table_.back().size() - 1;
+  if (*next_highest_row >= max_s_size) {
+    *next_highest_row = max_s_size;
   }
 
   const double delta_s_lower_bound = std::fmax(
       0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
   *next_lowest_row += static_cast<int32_t>(delta_s_lower_bound / unit_s_);
-  if (*next_lowest_row >= cost_table_.back().size()) {
-    *next_lowest_row = cost_table_.back().size() - 1;
+  if (*next_lowest_row > max_s_size) {
+    *next_lowest_row = max_s_size;
   }
 }
 
@@ -323,25 +320,6 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       cost_cr.SetPrePoint(pre_col[r_pre]);
     }
   }
-}
-
-bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
-                                            const double r_cur,
-                                            uint32_t* const lower_bound,
-                                            uint32_t* const upper_bound) const {
-  const double tcoef = unit_t_ * unit_t_ / unit_s_;
-  double lval = std::max(
-      2 * r_pre - r_cur + dp_st_speed_config_.max_deceleration() * tcoef, 0.0);
-  double rval = std::min(
-      2 * r_pre - r_cur + dp_st_speed_config_.max_acceleration() * tcoef,
-      r_pre);
-
-  if (rval < lval) {
-    return false;
-  }
-  *lower_bound = static_cast<uint32_t>(lval);
-  *upper_bound = static_cast<uint32_t>(rval);
-  return true;
 }
 
 Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {

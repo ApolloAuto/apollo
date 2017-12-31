@@ -98,7 +98,7 @@ class SpeedDecider : public Task {
   StBoundaryConfig st_boundary_config_;
   SLBoundary adc_sl_boundary_;
   apollo::common::TrajectoryPoint init_point_;
-  const ReferenceLine* reference_line_;
+  const ReferenceLine* reference_line_ = nullptr;
 };
 
 }  // namespace planning

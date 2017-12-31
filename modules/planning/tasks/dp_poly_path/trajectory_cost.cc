@@ -96,7 +96,7 @@ TrajectoryCost::TrajectoryCost(
         continue;
       }
 
-      if (sl_boundary.start_l() < 0.0 && sl_boundary.end_l() > 0.0) {
+      if (sl_boundary.start_l() <= 0.0 && sl_boundary.end_l() >= 0.0) {
         // if obstacle stays at the center of the lane, do not pass
         continue;
       }
@@ -323,14 +323,6 @@ ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
   // dynamic obstacle cost
   total_cost += CalculateDynamicObstacleCost(curve, start_s, end_s);
   return total_cost;
-}
-
-double TrajectoryCost::RiskDistanceCost(const double distance) const {
-  return (5.0 - distance) * ((5.0 - distance)) * 10;
-}
-
-double TrajectoryCost::RegularDistanceCost(const double distance) const {
-  return std::max(20.0 - distance, 0.0);
 }
 
 }  // namespace planning
