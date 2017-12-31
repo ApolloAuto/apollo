@@ -16,7 +16,9 @@
 
 ## 准备工作
 
-1. 相机内参文件
+1. 下载[标定工具](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz)，并解压缩到`$APOLLO_HOME`/modules/calibration`目录下。（APOLLO_HOME是apollo代码的根目录）
+
+2. 相机内参文件
 
 	内参包含相机的焦距、主点和畸变系数等信息，可以通过一些成熟的相机标定工具来获得，例如 [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) 和 [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/)。内参标定完成后，需将结果转换为 `.yaml` 格式的文件。下面是一个正确的内参文件样例：
 
@@ -46,7 +48,7 @@
 
 	我们建议每一只相机都需要单独进行内参标定，而不是使用统一的内参结果。这样可以提高外参标定的准确性。
 
-2. 初始外参文件
+3. 初始外参文件
 
 	本工具需要用户提供初始的外参值作为参考。一个良好的初始值可以帮助算法得到更精确的结果。下面是一个正确的相机到激光雷达的初始外参文件样例，其中translation为相机相对激光雷达的平移距离关系，rotation为旋转矩阵的四元数表达形式：
 
@@ -72,14 +74,14 @@
 
 	注意：相机到激光雷达的标定方法比较依赖于初始外参值的选取，一个偏差较大的外参，有可能导致标定失败。所以，请在条件允许的情况下，尽可能提供更加精准的初始外参值。
 
-3. 标定场地
+4. 标定场地
 
 	我们的标定方法是基于自然场景的，所以一个理想的标定场地可以显著地提高标定结果的准确度。我们建议选取一个纹理丰富的场地，如有树木，电线杆，路灯，交通标志牌，静止的物体和清晰车道线。图1是一个较好的标定环境示例：
 
 	![](images/calibration/sensor_calibration/calibration_place.png)
 	<p align="center"> 图1 一个良好的标定场地 </p>
 
-4. 所需Topics
+5. 所需Topics
 	
 	确认程序所需传感器数据的topics均有输出。如何查看传感器有数据输出？
 
