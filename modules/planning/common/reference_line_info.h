@@ -124,6 +124,13 @@ class ReferenceLineInfo {
 
   bool IsRightTurnPath() const;
 
+  double OffsetToOtherReferenceLine() const {
+    return offset_to_other_reference_line_;
+  }
+  void SetOffsetToOtherReferenceLine(const double offset) {
+    offset_to_other_reference_line_ = offset;
+  }
+
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
@@ -165,6 +172,8 @@ class ReferenceLineInfo {
   bool is_on_reference_line_ = false;
 
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
+
+  double offset_to_other_reference_line_ = 0.0;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
