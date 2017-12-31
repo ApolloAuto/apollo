@@ -81,6 +81,10 @@ if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/apollo
 fi
 
+if [ "$INCHINA" == "yes" ]; then
+    DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
+fi
+
 IMG=${DOCKER_REPO}:$VERSION
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
@@ -94,11 +98,7 @@ source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
 
-    if [ "$INCHINA" == "yes" ]; then
-        docker pull "registry.docker-cn.com/${IMG}"
-    else
-        docker pull $IMG
-    fi
+    docker pull $IMG
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
@@ -165,6 +165,12 @@ function main(){
         --shm-size 512M \
         $IMG \
         /bin/bash
+
+    if [ $? -ne 0 ];then
+	error "Failed to start docker container \"apollo_dev\" based on image: $IMG"
+	exit 1
+    fi
+
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
