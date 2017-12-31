@@ -144,6 +144,10 @@ bool Polygon2d::IsPointIn(const Vec2d &point) const {
 
 bool Polygon2d::HasOverlap(const Polygon2d &polygon) const {
   CHECK_GE(points_.size(), 3);
+  if (polygon.max_x() < min_x() || polygon.min_x() > max_x() ||
+      polygon.max_y() < min_y() || polygon.min_y() > max_y()) {
+    return false;
+  }
   return DistanceTo(polygon) <= kMathEpsilon;
 }
 
