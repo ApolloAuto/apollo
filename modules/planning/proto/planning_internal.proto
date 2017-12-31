@@ -147,7 +147,7 @@ message LatticeStTraining {
   optional double t_resolution = 7;
 }
 
-// next id: 21
+// next id: 22
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -167,4 +167,6 @@ message PlanningData {
   repeated ObstacleDebug obstacle = 18;
   repeated ReferenceLineDebug reference_line = 19;
   optional DpPolyGraphDebug dp_poly_graph = 20;
+
+  optional LatticeStTraining lattice_st_image = 21;
 }

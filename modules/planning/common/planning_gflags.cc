@@ -329,6 +329,8 @@ DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for downsampling reference line points");
 DEFINE_bool(enable_sample_bound_planning, true,
               "enable SampleBound based motion planning");
+DEFINE_bool(enable_lattice_st_image_dump, false,
+              "enable sending the lattice st image");
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");

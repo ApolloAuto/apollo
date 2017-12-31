@@ -43,6 +43,13 @@ class ConditionFilter {
   std::vector<std::pair<PathTimePoint, PathTimePoint>>
   QueryPathTimeObstacleIntervals(const double t) const;
 
+  bool GenerateLatticeStPixels(
+    apollo::planning_internal::LatticeStTraining* st_data,
+    double timestamp,
+    std::string st_img_name);
+
+  bool WithinObstacleSt(double s, double t);
+
  private:
   void Init();
 
@@ -54,13 +61,6 @@ class ConditionFilter {
   std::set<double> CriticalTimeStamps() const;
   std::vector<double> UniformTimeStamps(
       const std::size_t num_of_time_segments) const;
-
-  bool GenerateLatticeStPixels(
-    apollo::planning_internal::LatticeStTraining* st_data,
-    double timestamp,
-    std::string st_img_name);
-
-  bool WithinObstacleSt(double s, double t);
 
  private:
   FeasibleRegion feasible_region_;
