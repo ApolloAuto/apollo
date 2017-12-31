@@ -16,7 +16,9 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
 ## Preparation
 
-1. Well Calibrated Intrinsics of Camera
+1. Download [Calibration Tools](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz) and extract into `$APOLLO_HOME/modules/calibration` directory. (APOLLO_HOME stands for the root directory of apollo repo)
+
+2. Well Calibrated Intrinsics of Camera
 
   Camera intrinsic contains focus length, principal point, distortion coefficients and other information. They can be obtained from some other camera calibration tools, for example, [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) and [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/). After the calibration is completed, the results need to be converted to a `.yaml` format file. Here is is an example of a camera intrinsic file:
 
@@ -46,7 +48,7 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
   We recommend that do the intrinsic calibration for every single camera, instead of using a unified intrinsic. This can improve the accuracy of the extrinsics calibration results.
 
-2. Initial Extrinsic File
+3. Initial Extrinsic File
 
   The tools require user to provide an initial extrinsic value as a reference. Here is an example of initial extrinsic file of Camera-to-LiDAR, where translation is the shift distance between camera and LiDAR. Rotation is the quaternion expression form of the rotation matrix.
 
@@ -72,14 +74,14 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 	
   Attention: the calibration method of the Camera-to-LiDAR is more dependent on the initial extrinsics. A large deviation can lead to the extrisic calibration failed. Therefore, please provide an accurate initial extrinsc as far as possible when the conditions are allowed.
 
-3. Calibration Place
+4. Calibration Place
 
   Because our calibration method is based on nature sence, an ideal calibration place can significantly improve the precision. We recommend selecting a textured site contains some land marks, such as trees, poles, street lights, traffic signs, stationary objects and clear traffic lines. A good calibraiton environment is shown below: 
 
   ![](images/calibration/sensor_calibration/calibration_place.png)
   <p align="center"> Figure 1. A good calibraiton place </p>
 
-4. Required Topics
+5. Required Topics
 	
   Please confirm that all sensor topics required by program have output. See: [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
 
