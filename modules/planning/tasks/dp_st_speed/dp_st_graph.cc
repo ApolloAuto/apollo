@@ -44,6 +44,12 @@ namespace {
 bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   for (const auto* boundary : boundaries) {
+    if (std::fmax(p1.point().s(), p2.point().s()) < boundary->min_s() ||
+        std::fmin(p1.point().s(), p2.point().s()) > boundary->max_s() ||
+        std::fmax(p1.point().t(), p2.point().t()) < boundary->min_t() ||
+        std::fmin(p1.point().t(), p2.point().t()) > boundary->max_t()) {
+      continue;
+    }
     common::math::LineSegment2d seg(p1.point(), p2.point());
     if (boundary->HasOverlap(seg)) {
       return true;
@@ -157,8 +163,8 @@ void DpStGraph::CalculatePointwiseCost(
 }
 
 Status DpStGraph::CalculateTotalCost() {
+  // t corresponding to col
   // s corresponding to row
-  // time corresponding to col
   uint32_t next_highest_row = 0;
   uint32_t next_lowest_row = 0;
 
