@@ -69,10 +69,6 @@ class DpStGraph {
                                       const uint32_t pre_r,
                                       const double speed_limit);
 
-  bool CalculateFeasibleAccelRange(const double r_pre, const double r_cur,
-                                   uint32_t* const lower_bound,
-                                   uint32_t* const upper_bound) const;
-
   void GetRowRange(const StGraphPoint& point, uint32_t* highest_row,
                    uint32_t* lowest_row);
 

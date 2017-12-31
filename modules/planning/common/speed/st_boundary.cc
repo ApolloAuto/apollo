@@ -54,7 +54,6 @@ StBoundary::StBoundary(
   }
 
   BuildFromPoints();
-  CalculateArea();
 
   for (const auto& point : lower_points_) {
     min_s_ = std::fmin(min_s_, point.s());
@@ -156,17 +155,6 @@ bool StBoundary::IsValid(
     }
   }
   return true;
-}
-
-double StBoundary::Area() const { return area_; }
-
-void StBoundary::CalculateArea() {
-  area_ = 0.0;
-  for (size_t i = 0; i + 1 < lower_points_.size(); ++i) {
-    area_ += (upper_points_[i].y() - lower_points_[i].y()) *
-             (lower_points_[i + 1].x() - lower_points_[i].x());
-  }
-  area_ *= 0.5;
 }
 
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
@@ -345,22 +333,6 @@ bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   *s_upper = std::fmin(*s_upper, s_high_limit_);
   *s_lower = std::fmax(*s_lower, 0.0);
   return true;
-}
-
-double StBoundary::DistanceS(const STPoint& st_point) const {
-  double s_upper;
-  double s_lower;
-  if (GetBoundarySRange(st_point.t(), &s_upper, &s_lower)) {
-    constexpr double kMaxDistance = 1.0e10;
-    return kMaxDistance;
-  }
-  if (st_point.s() < s_lower) {
-    return s_lower - st_point.s();
-  } else if (st_point.s() > s_upper) {
-    return st_point.s() - s_upper;
-  } else {
-    return 0.0;
-  }
 }
 
 double StBoundary::min_s() const { return min_s_; }
