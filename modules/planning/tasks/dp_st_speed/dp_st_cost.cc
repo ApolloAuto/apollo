@@ -63,12 +63,14 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
 
     const std::string key =
         boundary.id() + "#" + std::to_string(st_graph_point.index_t());
-    if (boundary_range_map_.find(key) == boundary_range_map_.end()) {
+
+    auto p_val = boundary_range_map_.find(key);
+    if (p_val == boundary_range_map_.end()) {
       boundary.GetBoundarySRange(t, &s_upper, &s_lower);
       boundary_range_map_[key] = std::make_pair(s_upper, s_lower);
     } else {
-      s_upper = boundary_range_map_[key].first;
-      s_lower = boundary_range_map_[key].second;
+      s_upper = p_val->second.first;
+      s_lower = p_val->second.second;
     }
     if (s < s_lower) {
       constexpr double kSafeTimeBuffer = 3.0;
@@ -122,7 +124,8 @@ double DpStCost::GetAccelCost(const double accel) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
   const int accel_key = static_cast<int>(accel / kEpsilon + 0.5);
-  if (accel_cost_map_.find(accel_key) == accel_cost_map_.end()) {
+  auto p_val = accel_cost_map_.find(accel_key);
+  if (p_val == accel_cost_map_.end()) {
     const double accel_sq = accel * accel;
     double max_acc = config_.max_acceleration();
     double max_dec = config_.max_deceleration();
@@ -140,7 +143,7 @@ double DpStCost::GetAccelCost(const double accel) {
                 (1 + std::exp(-1.0 * (accel - max_acc)));
     accel_cost_map_[accel_key] = cost;
   } else {
-    cost = accel_cost_map_[accel_key];
+    cost = p_val->second;
   }
   return cost * unit_t_;
 }
@@ -164,7 +167,8 @@ double DpStCost::JerkCost(const double jerk) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
   const int jerk_key = static_cast<int>(jerk / kEpsilon + 0.5);
-  if (jerk_cost_map_.find(jerk_key) == jerk_cost_map_.end()) {
+  auto p_val = jerk_cost_map_.find(jerk_key);
+  if (p_val == jerk_cost_map_.end()) {
     double jerk_sq = jerk * jerk;
     if (jerk > 0) {
       cost = config_.positive_jerk_coeff() * jerk_sq * unit_t_;
@@ -173,7 +177,7 @@ double DpStCost::JerkCost(const double jerk) {
     }
     jerk_cost_map_[jerk_key] = cost;
   } else {
-    cost = jerk_cost_map_[jerk_key];
+    cost = p_val->second;
   }
 
   // TODO(All): normalize to unit_t_
