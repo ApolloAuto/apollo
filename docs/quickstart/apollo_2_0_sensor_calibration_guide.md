@@ -125,7 +125,7 @@ Please confirm the localization status has already meet 56, otherwise the calibr
 	
 ```bash
     cd /apollo/scripts
-    bash sensor_calibration.sh lidar_camera
+    bash sensor_calibration.sh camera_camera
 ```
 
 2. Data Collection
@@ -181,7 +181,7 @@ Please confirm the localization status has already meet 56, otherwise the calibr
 
   The configuration file is saved in the path below. See Table 5 for details.
 ```bash
-    /apollo/modules/calibration/lidar_camera_calibrator/camera_camera_calibrtor.conf
+    /apollo/modules/calibration/lidar_camera_calibrator/lidar_camera_calibrtor.conf
 ```
 
   Table 5. Camera-to-LiDAR Calibration Configuration Description
