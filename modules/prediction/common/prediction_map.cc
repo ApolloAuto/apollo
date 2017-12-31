@@ -16,21 +16,20 @@
 
 #include "modules/prediction/common/prediction_map.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <memory>
 #include <string>
-#include <utility>
 #include <unordered_set>
+#include <utility>
 #include <vector>
-#include <algorithm>
-
-#include "modules/map/proto/map_id.pb.h"
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -43,6 +42,8 @@ using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
 
 PredictionMap::PredictionMap() {}
+
+bool PredictionMap::Ready() { return HDMapUtil::BaseMapPtr() != nullptr; }
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
     std::shared_ptr<const LaneInfo> lane_info, const double s) {
@@ -166,10 +167,10 @@ void PredictionMap::OnLane(
     return;
   }
   std::sort(lane_pairs.begin(), lane_pairs.end(),
-      [](const std::pair<std::shared_ptr<const LaneInfo>, double>& p1,
-         const std::pair<std::shared_ptr<const LaneInfo>, double>& p2) {
-        return p1.second < p2.second;
-      });
+            [](const std::pair<std::shared_ptr<const LaneInfo>, double>& p1,
+               const std::pair<std::shared_ptr<const LaneInfo>, double>& p2) {
+              return p1.second < p2.second;
+            });
   for (const auto& lane_pair : lane_pairs) {
     lanes->push_back(lane_pair.first);
   }

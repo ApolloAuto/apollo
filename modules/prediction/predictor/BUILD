@@ -10,6 +10,7 @@ cc_library(
         "//modules/common:macro",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",

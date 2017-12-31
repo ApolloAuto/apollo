@@ -24,14 +24,17 @@
 
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "Eigen/Dense"
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/container/container.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -68,18 +71,30 @@ class ADCTrajectoryContainer : public Container {
   bool IsPointInJunction(const apollo::common::PathPoint& point) const;
 
   /**
-   * @brief Get reference line lane ids
-   * @return A vector of lane ids
+   * @brief Has overlap with ADC trajectory
+   * @return True if a target lane sequence has overlap with ADC trajectory
    */
-  const std::vector<std::string>& get_reference_line_lane_ids();
+  bool HasOverlap(const LaneSequence& lane_sequence);
+
+  /**
+   * @brief Set ADC position
+   */
+  void SetPosition(const ::apollo::common::math::Vec2d& position);
 
  private:
-  apollo::common::math::Polygon2d GetJunctionPolygon();
+  void SetJunctionPolygon();
+
+  void SetLaneSequence();
+
+  std::string ToString(const std::unordered_set<std::string>& lane_ids);
+
+  std::string ToString(const std::vector<std::string>& lane_ids);
 
  private:
-  apollo::planning::ADCTrajectory adc_trajectory_;
-  apollo::common::math::Polygon2d junction_polygon_;
-  std::vector<std::string> reference_line_lane_ids_;
+  ::apollo::planning::ADCTrajectory adc_trajectory_;
+  ::apollo::common::math::Polygon2d adc_junction_polygon_;
+  std::unordered_set<std::string> adc_lane_ids_;
+  std::vector<std::string> adc_lane_seq_;
 };
 
 }  // namespace prediction
