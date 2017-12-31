@@ -36,6 +36,7 @@ from provider_mobileye import MobileyeProvider
 from provider_chassis import ChassisProvider
 from provider_localization import LocalizationProvider
 from provider_routing import RoutingProvider
+from ad_vehicle import ADVehicle
 
 gflags.DEFINE_integer('max_cruise_speed', 20,
                       'max speed for cruising in meter per second')
@@ -58,9 +59,8 @@ path_decider = None
 speed_decider = None
 traj_generator = None
 mobileye_provider = None
-chassis_provider = None
-localization_provider = None
 routing_provider = None
+adv = None
 
 
 def routing_callback(routing_str):
@@ -68,33 +68,51 @@ def routing_callback(routing_str):
 
 
 def localization_callback(localization_pb):
-    localization_provider.update(localization_pb)
+    adv.update_localization(localization_pb)
 
 
 def chassis_callback(chassis_pb):
-    chassis_provider.update(chassis_pb)
+    adv.update_chassis(chassis_pb)
 
 
-def mobileye_callback(mobileye_pb):
+def mobileye_callback2(mobileye_pb):
+    if not adv.is_ready():
+        return
+
     start_timestamp = time.time()
-    if localization_provider.localization_pb is None:
-        return
-    if chassis_provider.chassis_pb is None:
-        return
-
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
 
     path_x, path_y, path_length = path_decider.get(mobileye_provider,
                                                    routing_provider,
-                                                   localization_provider,
-                                                   chassis_provider)
+                                                   adv)
 
     speed, final_path_length = speed_decider.get(mobileye_provider,
-                                                 chassis_provider,
+                                                 adv,
                                                  path_length)
 
     adc_trajectory = traj_generator.generate(path_x, path_y, final_path_length,
+                                             speed,
+                                             start_timestamp=start_timestamp)
+    planning_pub.publish(adc_trajectory)
+    log_file.write("duration: " + str(time.time() - start_timestamp) + "\n")
+
+
+def mobileye_callback(mobileye_pb):
+    if not adv.is_ready():
+        return
+
+    start_timestamp = time.time()
+    mobileye_provider.update(mobileye_pb)
+    mobileye_provider.process_obstacles()
+
+    path = path_decider.get_path(mobileye_provider, routing_provider, adv)
+
+    speed, final_path_length = speed_decider.get(mobileye_provider,
+                                                 adv,
+                                                 path.range())
+
+    adc_trajectory = traj_generator.generate(path, final_path_length,
                                              speed,
                                              start_timestamp=start_timestamp)
     planning_pub.publish(adc_trajectory)
@@ -106,6 +124,7 @@ def init():
     global path_decider, speed_decider, traj_generator
     global mobileye_provider, chassis_provider
     global localization_provider, routing_provider
+    global adv
 
     path_decider = PathDecider(FLAGS.enable_routing_aid,
                                FLAGS.enable_nudge,
@@ -114,9 +133,8 @@ def init():
                                  FLAGS.enable_follow)
     traj_generator = TrajectoryGenerator()
     mobileye_provider = MobileyeProvider()
-    chassis_provider = ChassisProvider()
-    localization_provider = LocalizationProvider()
     routing_provider = RoutingProvider()
+    adv = ADVehicle()
 
     pgm_path = os.path.dirname(os.path.realpath(__file__))
     log_path = pgm_path + "/logs/"
