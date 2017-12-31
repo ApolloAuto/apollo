@@ -25,6 +25,7 @@
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -53,6 +54,13 @@ class ConditionFilter {
   std::set<double> CriticalTimeStamps() const;
   std::vector<double> UniformTimeStamps(
       const std::size_t num_of_time_segments) const;
+
+  bool GenerateLatticeStPixels(
+    apollo::planning_internal::LatticeStTraining* st_data,
+    double timestamp,
+    std::string st_img_name);
+
+  bool WithinObstacleSt(double s, double t);
 
  private:
   FeasibleRegion feasible_region_;
