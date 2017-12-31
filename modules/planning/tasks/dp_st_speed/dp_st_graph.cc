@@ -40,6 +40,7 @@ using apollo::common::math::Vec2d;
 using apollo::common::VehicleParam;
 
 namespace {
+constexpr double kInf = std::numeric_limits<double>::infinity();
 
 bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
@@ -232,6 +233,12 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
+    const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
+    if (acc < dp_st_speed_config_.max_deceleration() ||
+        acc > dp_st_speed_config_.max_acceleration()) {
+      return;
+    }
+
     if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                 cost_init)) {
       return;
@@ -252,6 +259,13 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
 
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
+      const double acc =
+          (static_cast<int>(r - 2 * r_pre)) * unit_s_ / (unit_t_ * unit_t_);
+      if (acc < dp_st_speed_config_.max_deceleration() ||
+          acc > dp_st_speed_config_.max_acceleration()) {
+        continue;
+      }
+
       if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                   pre_col[r_pre])) {
         continue;
@@ -282,41 +296,31 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
     }
-
-    uint32_t lower_bound = 0;
-    uint32_t upper_bound = 0;
-    if (!CalculateFeasibleAccelRange(static_cast<double>(r_pre),
-                                     static_cast<double>(r), &lower_bound,
-                                     &upper_bound)) {
-      continue;
-    }
-
     if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                 pre_col[r_pre])) {
       continue;
     }
 
-    for (uint32_t r_prepre = lower_bound; r_prepre <= upper_bound; ++r_prepre) {
-      const StGraphPoint& prepre_graph_point = cost_table_[c - 2][r_prepre];
-      if (std::isinf(prepre_graph_point.total_cost())) {
-        continue;
-      }
+    uint32_t r_prepre = pre_col[r_pre].pre_point()->index_s();
+    const StGraphPoint& prepre_graph_point = cost_table_[c - 2][r_prepre];
+    if (std::isinf(prepre_graph_point.total_cost())) {
+      continue;
+    }
 
-      if (!prepre_graph_point.pre_point()) {
-        continue;
-      }
-      const STPoint& triple_pre_point = prepre_graph_point.pre_point()->point();
-      const STPoint& prepre_point = prepre_graph_point.point();
-      const STPoint& pre_point = pre_col[r_pre].point();
-      const STPoint& curr_point = cost_cr.point();
-      double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-                    CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
-                                      curr_point, speed_limit);
+    if (!prepre_graph_point.pre_point()) {
+      continue;
+    }
+    const STPoint& triple_pre_point = prepre_graph_point.pre_point()->point();
+    const STPoint& prepre_point = prepre_graph_point.point();
+    const STPoint& pre_point = pre_col[r_pre].point();
+    const STPoint& curr_point = cost_cr.point();
+    double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+                  CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
+                                    curr_point, speed_limit);
 
-      if (cost < cost_cr.total_cost()) {
-        cost_cr.SetTotalCost(cost);
-        cost_cr.SetPrePoint(pre_col[r_pre]);
-      }
+    if (cost < cost_cr.total_cost()) {
+      cost_cr.SetTotalCost(cost);
+      cost_cr.SetPrePoint(pre_col[r_pre]);
     }
   }
 }
