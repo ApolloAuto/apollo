@@ -98,18 +98,17 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
     double total_time, double period, std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
-  if (!FLAGS_enable_kf_tracking) {
-    Eigen::Vector2d position(feature.position().x(), feature.position().y());
-    PredictionMap* map = PredictionMap::instance();
-    std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
-    double lane_s = 0.0;
-    double lane_l = 0.0;
-    if (map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
-      state(0, 0) = lane_s;
-      state(1, 0) = lane_l;
-      state(2, 0) = feature.speed();
-      state(3, 0) = feature.acc();
-    }
+
+  Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  PredictionMap* map = PredictionMap::instance();
+  std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  if (map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
+    state(0, 0) = lane_s;
+    state(1, 0) = lane_l;
+    state(2, 0) = feature.speed();
+    state(3, 0) = feature.acc();
   }
   if (FLAGS_enable_lane_sequence_acc && sequence.has_acceleration()) {
     state(3, 0) = sequence.acceleration();
