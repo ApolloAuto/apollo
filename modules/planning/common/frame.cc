@@ -183,7 +183,6 @@ bool Frame::CreateReferenceLineInfo() {
     const double offset = first_sl.l() - second_sl.l();
     reference_line_info_.front().SetOffsetToOtherReferenceLine(offset);
     reference_line_info_.back().SetOffsetToOtherReferenceLine(-offset);
-    AERROR << "set offset = " << offset;
   }
 
   // delay the time-consumping reference_line_info init() step to planner.

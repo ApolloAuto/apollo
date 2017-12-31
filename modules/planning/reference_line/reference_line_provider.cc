@@ -517,7 +517,6 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
                            FLAGS_reference_line_lateral_buffer;
   anchor.lateral_bound =
       std::max(smoother_config_.lateral_boundary_bound(), effective_width);
-  anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
   return anchor;
 }
 
