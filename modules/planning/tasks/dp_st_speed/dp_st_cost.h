@@ -74,14 +74,13 @@ class DpStCost {
   const DpStSpeedConfig& config_;
   const std::vector<const PathObstacle*>& obstacles_;
   const common::TrajectoryPoint& init_point_;
-  double unit_s_ = 0.0;
+
   double unit_t_ = 0.0;
-  double unit_v_ = 0.0;
 
   std::unordered_map<std::string, std::pair<double, double>>
       boundary_range_map_;
-  std::unordered_map<int, double> accel_cost_map_;
-  std::unordered_map<int, double> jerk_cost_map_;
+  std::array<double, 200> accel_cost_;
+  std::array<double, 400> jerk_cost_;
 };
 
 }  // namespace planning
