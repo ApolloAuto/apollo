@@ -57,14 +57,6 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
   double theta = feature.velocity_heading();
-  if (FLAGS_enable_kf_tracking) {
-    position(0) = feature.t_position().x();
-    position(1) = feature.t_position().y();
-    velocity(0) = feature.t_velocity().x();
-    velocity(1) = feature.t_velocity().y();
-    acc(0) = feature.t_acceleration().x();
-    acc(1) = feature.t_acceleration().y();
-  }
 
   std::vector<TrajectoryPoint> points(0);
   DrawFreeMoveTrajectoryPoints(
@@ -82,8 +74,8 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
     const Eigen::Vector2d& acc, double theta,
-    const KalmanFilter<double, 6, 2, 0>& kf,
-    double total_time, double period, std::vector<TrajectoryPoint>* points) {
+    const KalmanFilter<double, 6, 2, 0>& kf, double total_time, double period,
+    std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
   state(0, 0) = 0.0;
   state(1, 0) = 0.0;

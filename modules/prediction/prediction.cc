@@ -128,6 +128,9 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
               AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(adc_trajectory_container);
   adc_trajectory_container->Insert(adc_trajectory);
+
+  ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
+         << "].";
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
@@ -136,11 +139,13 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();
   }
+
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
-  // Insert obstacle
   double start_timestamp = Clock::NowInSeconds();
+
+  // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
@@ -174,14 +179,16 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
 
-  for (auto const& prediction_obstacle :
-       prediction_obstacles.prediction_obstacle()) {
-    for (auto const& trajectory : prediction_obstacle.trajectory()) {
-      for (auto const& trajectory_point : trajectory.trajectory_point()) {
-        if (!IsValidTrajectoryPoint(trajectory_point)) {
-          AERROR << "Invalid trajectory point ["
-                 << trajectory_point.ShortDebugString() << "]";
-          return;
+  if (FLAGS_prediction_test_mode) {
+    for (auto const& prediction_obstacle :
+         prediction_obstacles.prediction_obstacle()) {
+      for (auto const& trajectory : prediction_obstacle.trajectory()) {
+        for (auto const& trajectory_point : trajectory.trajectory_point()) {
+          if (!IsValidTrajectoryPoint(trajectory_point)) {
+            AERROR << "Invalid trajectory point ["
+                   << trajectory_point.ShortDebugString() << "]";
+            return;
+          }
         }
       }
     }
