@@ -17,6 +17,7 @@
 #include "modules/common/apollo_app.h"
 
 #include <csignal>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -44,7 +45,7 @@ void ApolloApp::ExportFlags() const {
 
   std::vector<gflags::CommandLineFlagInfo> flags;
   gflags::GetAllFlags(&flags);
-  for (const auto &flag : flags) {
+  for (const auto& flag : flags) {
     fout << "# " << flag.type << ", default=" << flag.default_value << "\n"
          << "# " << flag.description << "\n"
          << "--" << flag.name << "=" << flag.current_value << "\n"
@@ -53,7 +54,11 @@ void ApolloApp::ExportFlags() const {
 }
 
 int ApolloApp::Spin() {
-  ros::AsyncSpinner spinner(callback_thread_num_);
+  std::unique_ptr<ros::AsyncSpinner> spinner;
+  if (callback_thread_num_ > 1) {
+    spinner = std::unique_ptr<ros::AsyncSpinner>(
+        new ros::AsyncSpinner(callback_thread_num_));
+  }
   auto status = Init();
   if (!status.ok()) {
     AERROR << Name() << " Init failed: " << status;
@@ -65,7 +70,11 @@ int ApolloApp::Spin() {
     return -2;
   }
   ExportFlags();
-  spinner.start();
+  if (spinner) {
+    spinner->start();
+  } else {
+    ros::spin();
+  }
   ros::waitForShutdown();
   Stop();
   AINFO << Name() << " exited.";
