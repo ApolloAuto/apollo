@@ -18,8 +18,8 @@
  * warm_start_ipopt_interface.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_
+#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
+#define MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
 
 #include <vector>
 
@@ -30,16 +30,15 @@
 namespace apollo {
 namespace planning {
 
-class DistanceApproachProblemInterface : public Ipopt::TNLP {
+class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit DistanceApproachProblemInterface(
-      std::vector<Eigen::Vector2d> points);
+  explicit DistanceApproachIPOPTInterface(int horizon, float ts,
+                                          float wheelbase_length,
+                                          Eigen::MatrixXd x0,
+                                          Eigen::MatrixXd xF,
+                                          Eigen::MatrixXd XYbounds);
 
-  virtual ~DistanceApproachProblemInterface() = default;
-
-  void set_start_point();
-
-  void set_end_point();
+  virtual ~DistanceApproachIPOPTInterface() = default;
 
   void get_optimization_results() const;
 
@@ -95,4 +94,4 @@ class DistanceApproachProblemInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_INTERFACE_H_
+#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_

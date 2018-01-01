@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "warm_start_problem",
+        "distance_approach_problem",
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
@@ -57,12 +58,26 @@ cc_library(
 )
 
 cc_library(
-    name = "distance_approach_problem_interface",
+    name = "distance_approach_problem",
     srcs = [
-        "distance_approach_problem_interface.cc",
+        "distance_approach_problem.cc",
     ],
     hdrs = [
-        "distance_approach_problem_interface.h",
+        "distance_approach_problem.h",
+    ],
+    deps = [
+        "//modules/common/util",
+        "distance_approach_ipopt_interface",
+    ],
+)
+
+cc_library(
+    name = "distance_approach_ipopt_interface",
+    srcs = [
+        "distance_approach_ipopt_interface.cc",
+    ],
+    hdrs = [
+        "distance_approach_ipopt_interface.h",
     ],
     deps = [
         "//modules/common/math",
