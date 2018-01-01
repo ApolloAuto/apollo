@@ -49,16 +49,6 @@ function start() {
   cd "${BAG_DIR}"
   echo "Recording bag to: $(pwd)"
 
-  # record some meta info into bag
-  if [ -e /apollo/meta.ini ]; then
-      META_STR=`cat /apollo/meta.ini | tr '[]:\n' ' '`
-      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
-  else
-      META_STR=`git rev-parse HEAD`
-      META_STR="git commit $META_STR"
-      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
-  fi
-
   # Start recording.
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
@@ -79,7 +69,6 @@ function start() {
         /apollo/canbus/chassis_detail \
         /apollo/control \
         /apollo/control/pad \
-        /apollo/meta \
         /apollo/perception/obstacles \
         /apollo/perception/traffic_light \
         /apollo/planning \
@@ -100,7 +89,6 @@ function start() {
 
 function stop() {
   pkill -SIGINT -f record
-  pkill -SIGINT -f "rostopic pub"
 }
 
 function help() {
