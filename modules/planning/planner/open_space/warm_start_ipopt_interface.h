@@ -32,7 +32,7 @@ namespace planning {
 
 class WarmUpIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit WarmUpIPOPTInterface();
+  explicit WarmUpIPOPTInterface(int num_of_variables, int num_of_constraints);
 
   virtual ~WarmUpIPOPTInterface() = default;
 
@@ -89,6 +89,8 @@ class WarmUpIPOPTInterface : public Ipopt::TNLP {
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
  private:
+  int num_of_variables_;
+  int num_of_constraints_;
 };
 
 }  // namespace planning

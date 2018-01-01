@@ -35,10 +35,31 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-WarmStartProblem::WarmStartProblem() {}
+WarmStartProblem::WarmStartProblem(int horizon) : horizon_(horizon) {}
 
 bool WarmStartProblem::Solve() const {
-  WarmUpIPOPTInterface* ptop = new WarmUpIPOPTInterface();
+  // TODO(QiL) : set up number of variables and number of constaints, and rego
+  // so constants do not get set repeatedly
+
+  // n1 : states variables
+  int n1 = 4 * (horizon_ + 1);
+  // n2 : sampling time variables
+  int n2 = horizon_ + 1;
+  // n3 : control inputs variables
+  int n3 = 2 * horizon_;
+
+  // m1 : state equality constatins
+  int m1 = 4 * horizon_;
+
+  // m2 : sampling time equality constraints
+  int m2 = horizon_;
+
+  int num_of_variables = n1 + n2 + n3;
+  int num_of_constraints = m1 + m2;
+
+  // TODO(QiL) : evaluate whether need to new it everytime
+  WarmUpIPOPTInterface* ptop =
+      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints);
 
   ptop->set_start_point();
 
@@ -47,22 +68,18 @@ bool WarmStartProblem::Solve() const {
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  //  app->Options()->SetStringValue("jacobian_approximation",
-  //  "finite-difference-values");
-  app->Options()->SetStringValue("hessian_approximation", "limited-memory");
-  //  app->Options()->SetStringValue("derivative_test", "first-order");
-  //  app->Options()->SetNumericValue("derivative_test_perturbation", 1.0e-7);
-  //  app->Options()->SetStringValue("derivative_test", "second-order");
-  app->Options()->SetIntegerValue("print_level", 0);
+  app->Options()->SetStringValue("hessian_approximation", "exact");
+  //  TODO(QiL) : Change IPOPT settings to flag or configs
+  int print_level = 0;
+  app->Options()->SetIntegerValue("print_level", print_level);
   int num_iterations = 0;
   app->Options()->SetIntegerValue("max_iter", num_iterations);
-
-  //  app->Options()->SetNumericValue("acceptable_tol", 0.5);
-  //  app->Options()->SetNumericValue("acceptable_obj_change_tol", 0.5);
-  //  app->Options()->SetNumericValue("constr_viol_tol", 0.01);
-  //  app->Options()->SetIntegerValue("acceptable_iter", 10);
-  //  app->Options()->SetIntegerValue("print_level", 0);
-  //  app->Options()->SetStringValue("fast_step_computation", "yes");
+  int mumps_mem_percent = 6000;
+  app->Options()->SetIntegerValue("mumps_mem_percent", mumps_mem_percent);
+  int max_iter = 750;
+  app->Options()->SetIntegerValue("max_iter", max_iter);
+  double tol = 1e-5;
+  app->Options()->SetNumericValue("tol", tol);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {

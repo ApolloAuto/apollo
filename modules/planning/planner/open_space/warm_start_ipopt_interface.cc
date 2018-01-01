@@ -31,7 +31,10 @@ namespace planning {
 
 constexpr std::size_t N = 80;
 
-WarmUpIPOPTInterface::WarmUpIPOPTInterface() {}
+WarmUpIPOPTInterface::WarmUpIPOPTInterface(int num_of_variables,
+                                           int num_of_constraints)
+    : num_of_variables_(num_of_variables),
+      num_of_constraints_(num_of_constraints) {}
 
 void WarmUpIPOPTInterface::get_optimization_results() const {}
 
@@ -39,11 +42,11 @@ bool WarmUpIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
                                         int& nnz_h_lag,
                                         IndexStyleEnum& index_style) {
   // number of variables
-  n = 0;
+  n = num_of_variables_;
 
   // number of constraints
 
-  m = 0;
+  m = num_of_constraints_;
 
   // number of nonzero hessian and lagrangian.
   nnz_jac_g = 0;

@@ -43,7 +43,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   // TODO(QiL) : cleaning up : load control configs from VehicleParam at
   // initialization
   // horizon
-  int N = 80;
+  int horizon = 80;
   // nominal sampling time
   float Ts = 0.3;
   // wheelbase
@@ -73,6 +73,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   Eigen::MatrixXd vOb(3, 1);
   vOb << 4, 4, 4;
 
+  // TODO(QiL) : Clean up, represent lOb with better format
   // vetices cw presentation
   /*
   lOb =
@@ -100,6 +101,8 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, N + 1);
   Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, N);
   Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, N + 1);
+
+  warm_start_.reset(new WarmStartProblem(horizon));
 
   // TODO(QiL) : Step 7 : Formualte H representation of obstacles
 
