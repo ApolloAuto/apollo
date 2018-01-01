@@ -165,6 +165,8 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
   CHECK_NOTNULL(adc_container);
 
   if (!adc_container->HasOverlap(lane_sequence)) {
+    ADEBUG << "The sequence [" << ToString(lane_sequence)
+           << "] has no overlap with ADC.";
     return std::numeric_limits<double>::max();
   }
 
@@ -178,14 +180,14 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
     double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
     double lane_s = 0.0;
     double lane_l = 0.0;
-    ADEBUG << "Obstacle lane " << obstacle_lane_id << " and s "
-           << obstacle_lane_s;
     if (map->GetProjection(adc_position, map->LaneById(obstacle_lane_id),
                            &lane_s, &lane_l)) {
-      ADEBUG << "ADC on lane s " << lane_s;
+      ADEBUG << "Distance with ADC is " << std::fabs(lane_s - obstacle_lane_s);
       return std::fabs(lane_s - obstacle_lane_s);
     }
   }
+
+  ADEBUG << "Invalid ADC pose.";
   return std::numeric_limits<double>::max();
 }
 
