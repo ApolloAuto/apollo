@@ -27,7 +27,9 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
 
 void PoseContainer::Insert(const ::google::protobuf::Message& message) {
-  Update(dynamic_cast<const LocalizationEstimate&>(message));
+  localization::LocalizationEstimate localization;
+  localization.CopyFrom(dynamic_cast<const LocalizationEstimate&>(message));
+  Update(localization);
 }
 
 void PoseContainer::Update(
