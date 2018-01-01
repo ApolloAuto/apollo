@@ -28,6 +28,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -112,6 +113,8 @@ class ReferenceLineInfo {
    */
   void SetDrivable(bool drivable);
   bool IsDrivable() const;
+
+  void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
   const hdmap::RouteSegments& Lanes() const;
   const std::list<hdmap::Id> TargetLaneId() const;
