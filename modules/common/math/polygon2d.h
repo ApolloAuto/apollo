@@ -289,6 +289,11 @@ class Polygon2d {
    */
   std::string DebugString() const;
 
+  double min_x() const { return min_x_; }
+  double max_x() const { return max_x_; }
+  double min_y() const { return min_y_; }
+  double max_y() const { return max_y_; }
+
  protected:
   void BuildFromPoints();
   int Next(int at) const;
