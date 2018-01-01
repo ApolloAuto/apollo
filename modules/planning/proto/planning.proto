@@ -4,6 +4,7 @@ package apollo.planning;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
+import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/map/proto/map_id.proto";
@@ -71,7 +72,7 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
-// next id: 19
+// next id: 20
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -113,4 +114,8 @@ message ADCTrajectory {
 
   // lane id along reference line
   repeated apollo.hdmap.Id lane_id = 18;
+
+  // set the engage advice for based on current planning result.
+  optional apollo.common.EngageAdvice engage_advice = 19;
+
 }
