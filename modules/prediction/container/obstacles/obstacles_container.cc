@@ -31,15 +31,16 @@ ObstaclesContainer::ObstaclesContainer()
     : obstacles_(FLAGS_max_num_obstacles) {}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
-  ADEBUG << "message: " << message.ShortDebugString();
-  const PerceptionObstacles& perception_obstacles =
-      dynamic_cast<const PerceptionObstacles&>(message);
+  PerceptionObstacles perception_obstacles;
+  perception_obstacles.CopyFrom(
+      dynamic_cast<const PerceptionObstacles&>(message));
+
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
-  if (timestamp <= timestamp_ - FLAGS_replay_timestamp_gap) {
+  if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap) {
     obstacles_.Clear();
     ADEBUG << "Replay mode is enabled.";
   } else if (timestamp <= timestamp_) {
