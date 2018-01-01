@@ -7,7 +7,6 @@
 /apollo/localization/msf_lidar
 /apollo/localization/msf_status
 /apollo/localization/pose
-/apollo/meta
 /apollo/monitor
 /apollo/monitor/static_info
 /apollo/perception/obstacles
