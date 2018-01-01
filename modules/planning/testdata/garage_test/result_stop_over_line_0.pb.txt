@@ -906,3 +906,6 @@ right_of_way_status: UNPROTECTED
 lane_id {
   id: "1_-1"
 }
+engage_advice {
+  advice: KEEP_ENGAGED
+}

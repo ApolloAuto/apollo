@@ -1592,3 +1592,6 @@ lane_id {
 lane_id {
   id: "22_1_-1"
 }
+engage_advice {
+  advice: KEEP_ENGAGED
+}
