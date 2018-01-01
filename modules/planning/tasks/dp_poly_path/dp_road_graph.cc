@@ -248,7 +248,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
 
-    constexpr double kBoundaryBuff = 0.10;
+    constexpr double kBoundaryBuff = 0.20;
     const auto &vehicle_config =
         common::VehicleConfigHelper::instance()->GetConfig();
     const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
@@ -261,9 +261,8 @@ bool DPRoadGraph::SamplePathWaypoints(
     }
     const double sample_l_range =
         kDefaultUnitL * (config_.sample_points_num_each_level() - 1);
-    double sample_right_boundary =
-        std::fmin(-eff_right_width, init_sl_point_.l());
-    double sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+    double sample_right_boundary = -eff_right_width;
+    double sample_left_boundary = eff_left_width;
 
     if (reference_line_info_.IsChangeLanePath() &&
         init_sl_point_.l() > eff_left_width) {
