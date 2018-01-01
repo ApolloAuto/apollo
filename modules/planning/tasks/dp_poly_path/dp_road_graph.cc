@@ -264,15 +264,18 @@ bool DPRoadGraph::SamplePathWaypoints(
     double sample_right_boundary = -eff_right_width;
     double sample_left_boundary = eff_left_width;
 
-    if (reference_line_info_.IsChangeLanePath() &&
-        init_sl_point_.l() > eff_left_width) {
-      sample_right_boundary =
-          std::fmax(sample_right_boundary, init_sl_point_.l() - sample_l_range);
-    }
-    if (reference_line_info_.IsChangeLanePath() &&
-        init_sl_point_.l() < eff_right_width) {
-      sample_left_boundary =
-          std::fmin(sample_left_boundary, init_sl_point_.l() + sample_l_range);
+    if (reference_line_info_.IsChangeLanePath()) {
+      sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
+      sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+
+      if (init_sl_point_.l() > eff_left_width) {
+        sample_right_boundary = std::fmax(sample_right_boundary,
+                                          init_sl_point_.l() - sample_l_range);
+      }
+      if (init_sl_point_.l() < eff_right_width) {
+        sample_left_boundary = std::fmin(sample_left_boundary,
+                                         init_sl_point_.l() + sample_l_range);
+      }
     }
 
     std::vector<double> sample_l;
