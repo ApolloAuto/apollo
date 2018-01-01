@@ -23,8 +23,10 @@
 #ifndef MODULES_COMMON_MATH_BOX2D_H_
 #define MODULES_COMMON_MATH_BOX2D_H_
 
+#include <limits>
 #include <string>
 #include <vector>
+
 #include "modules/common/math/aabox2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -236,6 +238,13 @@ class Box2d {
    */
   std::string DebugString() const;
 
+  void InitCorners();
+
+  double max_x() const { return max_x_; }
+  double min_x() const { return min_x_; }
+  double max_y() const { return max_y_; }
+  double min_y() const { return min_y_; }
+
  private:
   Vec2d center_;
   double length_ = 0.0;
@@ -245,6 +254,13 @@ class Box2d {
   double heading_ = 0.0;
   double cos_heading_ = 1.0;
   double sin_heading_ = 0.0;
+
+  std::vector<Vec2d> corners_;
+
+  double max_x_ = std::numeric_limits<double>::min();
+  double min_x_ = std::numeric_limits<double>::max();
+  double max_y_ = std::numeric_limits<double>::min();
+  double min_y_ = std::numeric_limits<double>::max();
 };
 
 }  // namespace math
