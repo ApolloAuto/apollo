@@ -32,7 +32,8 @@ namespace planning {
 
 class WarmUpIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit WarmUpIPOPTInterface(int num_of_variables, int num_of_constraints);
+  explicit WarmUpIPOPTInterface(int num_of_variables, int num_of_constraints,
+                                int horizon);
 
   virtual ~WarmUpIPOPTInterface() = default;
 
@@ -91,6 +92,7 @@ class WarmUpIPOPTInterface : public Ipopt::TNLP {
  private:
   int num_of_variables_;
   int num_of_constraints_;
+  int horizon_;
 };
 
 }  // namespace planning
