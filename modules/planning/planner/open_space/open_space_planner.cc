@@ -45,9 +45,9 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   // horizon
   int horizon = 80;
   // nominal sampling time
-  float Ts = 0.3;
+  float ts = 0.3;
   // wheelbase
-  float L = 2.7;
+  float wheelbase_length = 2.7;
 
   // TODO(QiL): cleaning up : load ego car matrix from VehicleParam at
   // initialization
@@ -102,7 +102,8 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, N);
   Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, N + 1);
 
-  warm_start_.reset(new WarmStartProblem(horizon));
+  warm_start_.reset(
+      new WarmStartProblem(horizon, ts, wheelbase_length, x0, xF, XYbounds));
 
   // TODO(QiL) : Step 7 : Formualte H representation of obstacles
 

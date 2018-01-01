@@ -35,7 +35,10 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-WarmStartProblem::WarmStartProblem(int horizon) : horizon_(horizon) {}
+WarmStartProblem::WarmStartProblem(int horizon, float ts,
+                                   float wheelbase_length, Eigen::MatrixXd x0,
+                                   Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds)
+    : horizon_(horizon), ts_(ts), x0_(x0), xF_(xF), XYbounds_(XYbounds) {}
 
 bool WarmStartProblem::Solve() const {
   // TODO(QiL) : set up number of variables and number of constaints, and rego
@@ -43,10 +46,10 @@ bool WarmStartProblem::Solve() const {
 
   // n1 : states variables
   int n1 = 4 * (horizon_ + 1);
-  // n2 : sampling time variables
-  int n2 = horizon_ + 1;
-  // n3 : control inputs variables
-  int n3 = 2 * horizon_;
+  // n2 : control inputs variables
+  int n2 = 2 * horizon_;
+  // n3 : sampling time variables
+  int n3 = horizon_ + 1;
 
   // m1 : state equality constatins
   int m1 = 4 * horizon_;
@@ -54,12 +57,21 @@ bool WarmStartProblem::Solve() const {
   // m2 : sampling time equality constraints
   int m2 = horizon_;
 
+  // m3 : state inequality constraints
+  int m3 = 4 * horizon_;
+
+  // m4 : control inequality constraints
+  int m4 = 2 * horizon_;
+
+  // m5 : sampling time inequality constraints
+  int m5 = horizon_;
+
   int num_of_variables = n1 + n2 + n3;
-  int num_of_constraints = m1 + m2;
+  int num_of_constraints = m1 + m2 + m3 + m4 + m5;
 
   // TODO(QiL) : evaluate whether need to new it everytime
   WarmUpIPOPTInterface* ptop =
-      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints);
+      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints, horizon_);
 
   ptop->set_start_point();
 
