@@ -452,6 +452,10 @@ Status Planning::Plan(const double current_time_stamp,
   }
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+
+  best_reference_line->ExportEngageAdvice(
+      trajectory_pb->mutable_engage_advice());
+
   return status;
 }
 

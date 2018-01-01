@@ -1580,3 +1580,7 @@ right_of_way_status: UNPROTECTED
 lane_id {
   id: "40_1_-2"
 }
+engage_advice {
+  advice: PREPARE_DISENGAGE
+  reason: "Not on reference line"
+}

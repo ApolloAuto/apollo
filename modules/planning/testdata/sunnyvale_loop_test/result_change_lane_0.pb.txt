@@ -1721,3 +1721,7 @@ right_of_way_status: UNPROTECTED
 lane_id {
   id: "57_1_-1"
 }
+engage_advice {
+  advice: PREPARE_DISENGAGE
+  reason: "Not on reference line"
+}
