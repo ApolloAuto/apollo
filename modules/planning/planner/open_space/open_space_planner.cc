@@ -98,9 +98,9 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   // TODO(QiL): Step 6 ： Fromulate warmstart matrix
 
   // warm start variables
-  Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, N + 1);
-  Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, N);
-  Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, N + 1);
+  Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon + 1);
+  Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon);
+  Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, horizon + 1);
 
   warm_start_.reset(
       new WarmStartProblem(horizon, ts, wheelbase_length, x0, xF, XYbounds));
@@ -114,9 +114,9 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
 
   // TODO(QiL): Step 8 : Formulate distance approach problem
   // solution from distance approach
-  Eigen::MatrixXd xp1 = Eigen::MatrixXd::Zero(4, N + 1);
-  Eigen::MatrixXd up1 = Eigen::MatrixXd::Zero(2, N);
-  Eigen::MatrixXd scaleTime1 = Eigen::MatrixXd::Zero(1, N + 1);
+  Eigen::MatrixXd xp1 = Eigen::MatrixXd::Zero(4, horizon + 1);
+  Eigen::MatrixXd up1 = Eigen::MatrixXd::Zero(2, horizon);
+  Eigen::MatrixXd scaleTime1 = Eigen::MatrixXd::Zero(1, horizon + 1);
   bool exitflag1 = 0;
   float time1 = 0;
 
