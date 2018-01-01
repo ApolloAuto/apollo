@@ -92,13 +92,18 @@ if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
 fi
 
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
 
+    info "Start pulling docker image $IMG ..."
     docker pull $IMG
+    if [ $? -ne 0 ];then
+        error "Failed to pull docker image."
+        exit 1
+    fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
@@ -138,6 +143,8 @@ function main(){
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
+
+    info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
         --privileged \
@@ -167,13 +174,16 @@ function main(){
         /bin/bash
 
     if [ $? -ne 0 ];then
-	error "Failed to start docker container \"apollo_dev\" based on image: $IMG"
-	exit 1
+        error "Failed to start docker container \"apollo_dev\" based on image: $IMG"
+        exit 1
     fi
 
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
+
+    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
+    ok "Enjoy!"
 }
 
 main
