@@ -22,6 +22,7 @@
 
 #include "Eigen/Eigen"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -67,6 +68,9 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status ObsHRep(int& nOb, Eigen::MatrixXd& vOb,
                                  Eigen::MatrixXd lOb, Eigen::MatrixXd* A_all,
                                  Eigen::MatrixXd* b_all);
+
+ private:
+  std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;
 };
 
 }  // namespace planning
