@@ -110,7 +110,7 @@ class ReferenceLineInfo {
    * Set if the vehicle can drive following this reference line
    * A planner need to set this value to true if the reference line is OK
    */
-  void SetDriable(bool drivable);
+  void SetDrivable(bool drivable);
   bool IsDrivable() const;
 
   const hdmap::RouteSegments& Lanes() const;
