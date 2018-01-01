@@ -43,6 +43,8 @@ using apollo::planning::ADCTrajectory;
 std::string Control::Name() const { return FLAGS_control_node_name; }
 
 Status Control::Init() {
+  init_time_ = Clock::NowInSeconds();
+
   AINFO << "Control init, starting ...";
   CHECK(common::util::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
@@ -192,6 +194,12 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
 
 void Control::OnTimer(const ros::TimerEvent &) {
   double start_timestamp = Clock::NowInSeconds();
+
+  if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
+      (start_timestamp - init_time_) > FLAGS_control_test_duration) {
+    AERROR << "Control finished testing. exit";
+    ros::shutdown();
+  }
 
   ControlCommand control_command;
 
