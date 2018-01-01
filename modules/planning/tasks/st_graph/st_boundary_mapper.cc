@@ -585,17 +585,31 @@ Status StBoundaryMapper::GetSpeedLimits(
       break;
     }
 
-    // speed limit from map
+    // (1) speed limit from map
     double speed_limit_on_reference_line =
         reference_line_.GetSpeedLimitFromS(frenet_point_s);
 
-    // speed limit from path curvature
-    const double centric_acc_speed_limit =
+    // (2) speed limit from path curvature
+    //  -- 2.1: limit by centripetal force (acceleration)
+    const double centri_acc_speed_limit =
         std::sqrt(GetCentricAccLimit(std::fabs(avg_kappa[i])) /
                   std::fmax(std::fabs(avg_kappa[i]),
                             st_boundary_config_.minimal_kappa()));
 
-    // speed limit from nudge obstacles
+    // -- 2.2: limit by centripetal jerk
+    double centri_jerk_speed_limit = std::numeric_limits<double>::max();
+    if (i + 1 < discretized_path_points.size()) {
+      const double ds = discretized_path_points.at(i + 1).s() -
+                        discretized_path_points.at(i).s();
+      DCHECK_GE(ds, 0.0);
+      const double kEpsilon = 1e-9;
+      const double centri_jerk =
+          std::fabs(avg_kappa[i + 1] - avg_kappa[i]) / (ds + kEpsilon);
+      centri_jerk_speed_limit = std::fmax(
+          10.0, st_boundary_config_.centri_jerk_speed_coeff() / centri_jerk);
+    }
+
+    // (3) speed limit from nudge obstacles
     double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
     for (const auto* const_path_obstacle : path_obstacles.Items()) {
       if (const_path_obstacle->obstacle()->IsVirtual()) {
@@ -636,13 +650,14 @@ Status StBoundaryMapper::GetSpeedLimits(
       curr_speed_limit =
           std::fmax(st_boundary_config_.lowest_speed(),
                     common::util::MinElement(std::vector<double>{
-                        centric_acc_speed_limit, speed_limit_on_reference_line,
-                        nudge_obstacle_speed_limit}));
+                        speed_limit_on_reference_line, centri_acc_speed_limit,
+                        centri_jerk_speed_limit, nudge_obstacle_speed_limit}));
     } else {
-      curr_speed_limit = std::fmax(
-          st_boundary_config_.lowest_speed(),
-          common::util::MinElement(std::vector<double>{
-              centric_acc_speed_limit, speed_limit_on_reference_line}));
+      curr_speed_limit =
+          std::fmax(st_boundary_config_.lowest_speed(),
+                    common::util::MinElement(std::vector<double>{
+                        speed_limit_on_reference_line, centri_acc_speed_limit,
+                        centri_jerk_speed_limit}));
     }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
