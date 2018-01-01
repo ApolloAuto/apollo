@@ -152,11 +152,7 @@ void MLPEvaluator::SetObstacleFeatureValues(
           feature.lane().lane_feature().dist_to_right_boundary());
       lane_types.push_back(feature.lane().lane_feature().lane_turn_type());
       timestamps.push_back(feature.timestamp());
-      if (FLAGS_enable_kf_tracking) {
-        speeds.push_back(feature.t_speed());
-      } else {
-        speeds.push_back(feature.speed());
-      }
+      speeds.push_back(feature.speed());
       ++count;
     }
   }
@@ -271,8 +267,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
     return;
   }
 
-  double heading =
-      FLAGS_enable_kf_tracking ? feature.t_velocity_heading() : feature.theta();
+  double heading = feature.velocity_heading();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= LANE_FEATURE_SIZE) {
       break;

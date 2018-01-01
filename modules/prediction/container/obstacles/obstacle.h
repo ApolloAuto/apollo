@@ -145,17 +145,41 @@ class Obstacle {
    */
   bool IsOnLane();
 
+  /**
+   * @brief Check if the obstacle is near a junction.
+   * @return If the obstacle is near a junction.
+   */
   bool IsNearJunction();
 
+  /**
+   * @brief Set RNN state
+   * @param RNN state matrix
+   */
   void SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states);
 
+  /**
+   * @brief Get RNN state
+   * @param A pointer to RNN state matrix
+   */
   void GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states);
 
+  /**
+   * @brief Initialize RNN state
+   */
   void InitRNNStates();
 
+  /**
+   * @brief Check if RNN is enabled
+   * @return True if RNN is enabled
+   */
   bool RNNEnabled() const;
 
  private:
+  void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
+                 double timestamp, Feature* feature);
+
+  void UpdateStatus(Feature* feature);
+
   common::ErrorCode SetId(
       const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
@@ -172,6 +196,10 @@ class Obstacle {
   void SetVelocity(const perception::PerceptionObstacle& perception_obstacle,
                    Feature* feature);
 
+  void UpdateVelocity(const double theta, double* velocity_x,
+                      double* velocity_y, double* velocity_heading,
+                      double* speed);
+
   void SetAcceleration(Feature* feature);
 
   void SetTheta(const perception::PerceptionObstacle& perception_obstacle,
@@ -183,9 +211,7 @@ class Obstacle {
 
   void InitKFMotionTracker(const Feature& feature);
 
-  void UpdateKFMotionTracker(Feature* feature);
-
-  void UpdateMotionBelief(Feature* feature);
+  void UpdateKFMotionTracker(const Feature& feature);
 
   void InitKFLaneTracker(const std::string& lane_id, const double beta);
 
@@ -208,11 +234,11 @@ class Obstacle {
 
   void InitKFPedestrianTracker(const Feature& feature);
 
-  void UpdateKFPedestrianTracker(Feature* feature);
+  void UpdateKFPedestrianTracker(const Feature& feature);
 
   void SetMotionStatus();
 
-  void InsertFeatureToHistory(Feature* feature);
+  void InsertFeatureToHistory(const Feature& feature);
 
   void Trim();
 
