@@ -147,3 +147,17 @@ proto_library(
         "//modules/localization/proto:pose_proto_lib",
     ],
 )
+
+proto_library(
+    name = "drive_state_proto_lib",
+    srcs = [
+        "drive_state.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "drive_state_proto",
+    deps = [
+        ":drive_state_proto_lib",
+    ],
+)
