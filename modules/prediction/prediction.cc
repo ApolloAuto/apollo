@@ -48,6 +48,8 @@ using ::apollo::perception::PerceptionObstacles;
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
+  start_time_ = Clock::NowInSeconds();
+
   // Load prediction conf
   prediction_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
@@ -129,6 +131,11 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
+  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
+      (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
+    AINFO << "Prediction finished running in test mode";
+    ros::shutdown();
+  }
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 

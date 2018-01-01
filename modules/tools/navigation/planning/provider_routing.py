@@ -21,6 +21,7 @@ import threading
 import math
 from shapely.geometry import LineString, Point
 from numpy.polynomial import polynomial as P
+from local_path import LocalPath
 
 # sudo apt-get install libgeos-dev
 # sudo pip install shapely
@@ -198,3 +199,109 @@ class RoutingProvider:
         X = np.linspace(int(mono_seg_x[0]), int(mono_seg_x[-1]),
                         int(mono_seg_x[-1]))
         return X, sp(X)
+
+    def get_local_path(self, adv, path_range):
+        utm_x = adv.x
+        utm_y = adv.y
+        heading = adv.heading
+        local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        if len(local_seg_x) <= 10:
+            return LocalPath([])
+        if self.human:
+            x, y = self.get_local_ref(local_seg_x, local_seg_y)
+            points = []
+            for i in range(path_range):
+                if i < len(x):
+                    points.append([x[i], y[i]])
+            return LocalPath(points)
+
+        mono_seg_x, mono_seg_y = self.to_monotonic_segment(
+            local_seg_x, local_seg_y)
+
+        if len(mono_seg_x) <= 10:
+            return LocalPath([])
+        k = 3
+        n = len(mono_seg_x)
+        std = 0.5
+        sp = optimized_spline(mono_seg_x, mono_seg_y, k, s=n * std)
+        X = np.linspace(0, int(local_seg_x[-1]), int(local_seg_x[-1]))
+        y = sp(X)
+        points = []
+        for i in range(path_range):
+            if i < len(X):
+                points.append([X[i], y[i]])
+        return LocalPath(points)
+
+
+if __name__ == "__main__":
+    import rospy
+    from std_msgs.msg import String
+    import matplotlib.pyplot as plt
+    from modules.localization.proto import localization_pb2
+    from modules.canbus.proto import chassis_pb2
+    from ad_vehicle import ADVehicle
+    import matplotlib.animation as animation
+
+
+    def localization_callback(localization_pb):
+        ad_vehicle.update_localization(localization_pb)
+
+
+    def routing_callback(routing_str):
+        routing.update(routing_str)
+
+
+    def chassis_callback(chassis_pb):
+        ad_vehicle.update_chassis(chassis_pb)
+
+
+    def update(frame):
+        routing_line_x = []
+        routing_line_y = []
+        for point in routing.routing_points:
+            routing_line_x.append(point[0])
+            routing_line_y.append(point[1])
+        routing_line.set_xdata(routing_line_x)
+        routing_line.set_ydata(routing_line_y)
+
+        vehicle_point.set_xdata([ad_vehicle.x])
+        vehicle_point.set_ydata([ad_vehicle.y])
+
+        if ad_vehicle.is_ready():
+            path = routing.get_local_path(ad_vehicle.x, ad_vehicle.y,
+                                          ad_vehicle.heading)
+            path_x, path_y = path.get_xy()
+            local_line.set_xdata(path_x)
+            local_line.set_ydata(path_y)
+
+        ax.autoscale_view()
+        ax.relim()
+        # ax2.autoscale_view()
+        # ax2.relim()
+
+
+    ad_vehicle = ADVehicle()
+    routing = RoutingProvider()
+
+    rospy.init_node("routing_debug", anonymous=True)
+    rospy.Subscriber('/apollo/localization/pose',
+                     localization_pb2.LocalizationEstimate,
+                     localization_callback)
+    rospy.Subscriber('/apollo/navigation/routing',
+                     String, routing_callback)
+    rospy.Subscriber('/apollo/canbus/chassis',
+                     chassis_pb2.Chassis,
+                     chassis_callback)
+
+    fig = plt.figure()
+    ax = plt.subplot2grid((3, 1), (0, 0), rowspan=2, colspan=1)
+    ax2 = plt.subplot2grid((3, 1), (2, 0), rowspan=1, colspan=1)
+    routing_line, = ax.plot([], [], 'r-')
+    vehicle_point, = ax.plot([], [], 'ko')
+    local_line, = ax2.plot([], [], 'b-')
+
+    ani = animation.FuncAnimation(fig, update, interval=100)
+    ax2.set_xlim([-2, 200])
+    ax2.set_ylim([-50, 50])
+    # ax2.axis('equal')
+    plt.show()

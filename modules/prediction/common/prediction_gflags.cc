@@ -27,6 +27,11 @@ DEFINE_string(prediction_conf_file,
 DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
+DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
+DEFINE_double(
+    prediction_test_duration, -1.0,
+    "The runtime duration in test mode (in seconds). Negative value will not "
+    "restrict the runtime duration.");
 
 DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
