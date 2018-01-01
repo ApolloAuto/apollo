@@ -251,7 +251,7 @@ class Box2d {
   double width_ = 0.0;
   double half_length_ = 0.0;
   double half_width_ = 0.0;
-  double heading_ = 1.0;
+  double heading_ = 0.0;
   double cos_heading_ = 1.0;
   double sin_heading_ = 0.0;
 
