@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /*
- * warm_start_problem.cc
+ * distance_approach_problem.cc
  */
 
-#include "modules/planning/planner/open_space/warm_start_problem.h"
+#include "modules/planning/planner/open_space/distance_approach_problem.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -35,12 +35,14 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-WarmStartProblem::WarmStartProblem(int horizon, float ts,
-                                   float wheelbase_length, Eigen::MatrixXd x0,
-                                   Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds)
+DistanceApproachProblem::DistanceApproachProblem(int horizon, float ts,
+                                                 float wheelbase_length,
+                                                 Eigen::MatrixXd x0,
+                                                 Eigen::MatrixXd xF,
+                                                 Eigen::MatrixXd XYbounds)
     : horizon_(horizon), ts_(ts), x0_(x0), xF_(xF), XYbounds_(XYbounds) {}
 
-bool WarmStartProblem::Solve() const {
+bool DistanceApproachProblem::Solve() const {
   // TODO(QiL) : set up number of variables and number of constaints, and rego
   // so constants do not get set repeatedly
 
@@ -70,10 +72,8 @@ bool WarmStartProblem::Solve() const {
   int num_of_constraints = m1 + m2 + m3 + m4 + m5;
 
   // TODO(QiL) : evaluate whether need to new it everytime
-  WarmUpIPOPTInterface* ptop =
-      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints, horizon_);
-
-  ptop->set_start_point();
+  DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
+      num_of_variables, num_of_constraints, horizon_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

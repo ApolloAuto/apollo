@@ -18,7 +18,7 @@
  * distance_approach_problem_interface.cc
  */
 
-#include "modules/planning/planner/open_space/distance_approach_problem_interface.h"
+#include "modules/planning/planner/open_space/distance_approach_ipopt_interface.h"
 
 #include <math.h>
 #include <utility>
@@ -31,14 +31,16 @@ namespace planning {
 
 constexpr std::size_t N = 80;
 
-DistanceApproachProblemInterface::DistanceApproachProblemInterface(
-    std::vector<Eigen::Vector2d> points) {}
+DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
+    int horizon, float ts, float wheelbase_length, Eigen::MatrixXd x0,
+    Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds) {}
 
-void DistanceApproachProblemInterface::get_optimization_results() const {}
+void DistanceApproachIPOPTInterface::get_optimization_results() const {}
 
-bool DistanceApproachProblemInterface::get_nlp_info(
-    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
-    IndexStyleEnum& index_style) {
+bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
+                                                  int& nnz_jac_g,
+                                                  int& nnz_h_lag,
+                                                  IndexStyleEnum& index_style) {
   // number of variables
   n = 0;
 
@@ -55,35 +57,32 @@ bool DistanceApproachProblemInterface::get_nlp_info(
   return true;
 }
 
-bool DistanceApproachProblemInterface::get_bounds_info(int n, double* x_l,
-                                                       double* x_u, int m,
-                                                       double* g_l,
-                                                       double* g_u) {
+bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
+                                                     double* x_u, int m,
+                                                     double* g_l, double* g_u) {
   return true;
 }
 
-bool DistanceApproachProblemInterface::eval_g(int n, const double* x,
-                                              bool new_x, int m, double* g) {
+bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
+                                            int m, double* g) {
   return true;
 }
 
-bool DistanceApproachProblemInterface::eval_jac_g(int n, const double* x,
-                                                  bool new_x, int m,
-                                                  int nele_jac, int* iRow,
-                                                  int* jCol, double* values) {
+bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
+                                                bool new_x, int m, int nele_jac,
+                                                int* iRow, int* jCol,
+                                                double* values) {
   return true;
 }
 
-bool DistanceApproachProblemInterface::eval_h(int n, const double* x,
-                                              bool new_x, double obj_factor,
-                                              int m, const double* lambda,
-                                              bool new_lambda, int nele_hess,
-                                              int* iRow, int* jCol,
-                                              double* values) {}
-
-void DistanceApproachProblemInterface::set_start_point() {}
-
-void DistanceApproachProblemInterface::set_end_point() {}
+bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
+                                            double obj_factor, int m,
+                                            const double* lambda,
+                                            bool new_lambda, int nele_hess,
+                                            int* iRow, int* jCol,
+                                            double* values) {
+  return true;
+}
 
 }  // namespace planning
 }  // namespace apollo
