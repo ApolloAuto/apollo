@@ -33,13 +33,14 @@ namespace planning {
 
 class WarmStartProblem {
  public:
-  explicit WarmStartProblem();
+  explicit WarmStartProblem(int horizon);
 
   virtual ~WarmStartProblem() = default;
 
   bool Solve() const;
 
  private:
+  int horizon_;
 };
 
 }  // namespace planning
