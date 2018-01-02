@@ -50,6 +50,9 @@ TrajectoryCost::TrajectoryCost(
       vehicle_param_(vehicle_param),
       heuristic_speed_data_(heuristic_speed_data),
       init_sl_point_(init_sl_point) {
+  path_l_cost_.fill(-1.0);
+  obstacle_safety_cost_.fill(-1.0);
+
   const double total_time =
       std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
 
@@ -122,8 +125,7 @@ TrajectoryCost::TrajectoryCost(
 
 ComparableCost TrajectoryCost::CalculatePathCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
-    const double end_s, const uint32_t curr_level,
-    const uint32_t total_level) const {
+    const double end_s, const uint32_t curr_level, const uint32_t total_level) {
   ComparableCost cost;
   double path_cost = 0.0;
   for (double path_s = 0.0; path_s < (end_s - start_s);
@@ -137,7 +139,17 @@ ComparableCost TrajectoryCost::CalculatePathCost(
       return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
     };
 
-    path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
+    constexpr double kResolution = 0.1;
+    constexpr size_t kShift = 100;
+    const size_t index = static_cast<size_t>(l / kResolution + 0.5 + kShift);
+    if (path_l_cost_[index] < 0.0) {
+      const double l_cost =
+          l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
+      path_cost += l_cost;
+      path_l_cost_[index] = l_cost;
+    } else {
+      path_cost += path_l_cost_[index];
+    }
 
     double left_width = 0.0;
     double right_width = 0.0;
@@ -172,7 +184,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
 
 ComparableCost TrajectoryCost::CalculateStaticObstacleCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
-    const double end_s) const {
+    const double end_s) {
   ComparableCost obstacle_cost;
   for (double curr_s = start_s; curr_s <= end_s;
        curr_s += config_.path_resolution()) {
@@ -221,8 +233,7 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
 }
 
 ComparableCost TrajectoryCost::GetCostFromObsSL(
-    const double adc_s, const double adc_l,
-    const SLBoundary &obs_sl_boundary) const {
+    const double adc_s, const double adc_l, const SLBoundary &obs_sl_boundary) {
   const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
@@ -256,9 +267,20 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   const double delta_l = std::fabs(
       adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
-  obstacle_cost.safety_cost +=
-      config_.obstacle_collision_cost() *
-      softmax(delta_l, config_.obstacle_collision_distance());
+
+  constexpr double kResolution = 0.1;
+  constexpr size_t kShift = 100;
+  const size_t index =
+      static_cast<size_t>(delta_l / kResolution + 0.5 + kShift);
+  if (obstacle_safety_cost_[index] < 0.0) {
+    const double safety_cost =
+        config_.obstacle_collision_cost() *
+        softmax(delta_l, config_.obstacle_collision_distance());
+    obstacle_cost.safety_cost += safety_cost;
+    obstacle_safety_cost_[index] = safety_cost;
+  } else {
+    obstacle_cost.safety_cost += obstacle_safety_cost_[index];
+  }
 
   const double delta_s = std::fabs(
       adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);
@@ -311,7 +333,7 @@ ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
                                          const double start_s,
                                          const double end_s,
                                          const uint32_t curr_level,
-                                         const uint32_t total_level) const {
+                                         const uint32_t total_level) {
   ComparableCost total_cost;
   // path cost
   total_cost +=
