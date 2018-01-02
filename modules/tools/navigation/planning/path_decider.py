@@ -95,7 +95,7 @@ class PathDecider:
                 nudge_dist = obstacle_decider.get_nudge_distance(left_nudgable,
                                                                  right_nudgable)
                 smoothed_nudge_dist = self._smooth_init_y(nudge_dist)
-                if smoothed_nudge_dist > 0:
+                if smoothed_nudge_dist != 0:
                     print smoothed_nudge_dist
                 routing_path.shift(smoothed_nudge_dist)
             return routing_path
