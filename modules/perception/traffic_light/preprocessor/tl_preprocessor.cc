@@ -268,6 +268,7 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
       *should_pub = true;
       (*image_lights).reset(new ImageLights);
       (*image_lights)->image = image;
+      (*image_lights)->camera_id = image->camera_id();
       (*image_lights)->timestamp = image_ts;
       (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
       (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
