@@ -114,18 +114,7 @@ function main(){
 
     setup_device
 
-    local devices=""
-    devices="${devices} $(find_device ttyUSB*)"
-    devices="${devices} $(find_device ttyS*)"
-    devices="${devices} $(find_device can*)"
-    devices="${devices} $(find_device ram*)"
-    devices="${devices} $(find_device loop*)"
-    devices="${devices} $(find_device nvidia*)"
-    devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
-    devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
-    devices="${devices} -v /dev/novatel0:/dev/novatel0"
-    devices="${devices} -v /dev/novatel1:/dev/novatel1"
-    devices="${devices} -v /dev/novatel2:/dev/novatel2"
+    local devices=" -v /dev:/dev"
 
     USER_ID=$(id -u)
     GRP=$(id -g -n)
