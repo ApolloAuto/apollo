@@ -869,9 +869,10 @@ body {
         flex-flow: row nowrap;
         justify-content: flex-start;
 
-        flex: 1 1 auto;
+        flex: 1 1 0;
+
         min-height: 45px;
-        max-height: 85px;
+        min-width: 130px;
 
         .name {
             width: 40px;
@@ -879,8 +880,17 @@ body {
         }
     }
 
+    .start-auto-command {
+        flex: 2 2 0;
+
+        .start-auto-button {
+            max-height: unset;
+        }
+    }
+
     .others {
         min-width: 165px;
+        max-width: 260px;
     }
 
     .delay {
@@ -912,10 +922,11 @@ body {
     }
 
     button {
-        flex: 1 1 auto;
+        flex: 1 1 0;
 
         margin: 5px;
         border: 0px;
+
         min-width: 75px;
         min-height: 40px;
         max-height: 60px;
@@ -935,7 +946,7 @@ body {
     }
 
     button:active {
-        background: rgba(21, 30, 27, 0.6);
+        background: rgba(35, 51, 45, 0.6);
     }
 
     button:disabled {
