@@ -298,13 +298,26 @@ Chassis LincolnController::chassis() {
     chassis_.mutable_chassis_gps()->set_gps_valid(false);
   }
 
-  // last vin number will be written into KVDB once.
+  // vin number will be written into KVDB once.
   if (chassis_detail.license().has_vin() && !received_vin_) {
     apollo::common::KVDB::Put("apollo:canbus:vin",
                               chassis_detail.license().vin());
     received_vin_ = true;
   }
 
+  // give engage_advice based on error_code and canbus feedback
+  if (!chassis_error_mask_ && !chassis_.parking_brake() &&
+      (chassis_.steering_percentage() != 0.0) &&
+      (chassis_.throttle_percentage() != 0.0) &&
+      (chassis_.brake_percentage() != 0.0)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  } else {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "CANBUS not ready, firmware error or emergency button pressed!");
+  }
   return chassis_;
 }
 
