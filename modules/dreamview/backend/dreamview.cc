@@ -94,6 +94,8 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addHandler("/image", *image_);
 
+  ApolloApp::SetCallbackThreadNumber(FLAGS_dreamview_worker_num);
+
   return Status::OK();
 }
 
