@@ -9,8 +9,6 @@ message EngageAdvice {
         UNKNOWN = 0;
         DISALLOW_ENGAGE = 1;
         READY_TO_ENGAGE = 2;
-        KEEP_ENGAGED = 3;
-        PREPARE_DISENGAGE = 4;
     }
 
     optional Advice advice = 1 [default = DISALLOW_ENGAGE];
