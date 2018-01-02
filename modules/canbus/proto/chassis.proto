@@ -4,8 +4,9 @@ package apollo.canbus;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
+import "modules/common/proto/drive_state.proto";
 
-// next id :28
+// next id :30
 message Chassis {
   enum DrivingMode {
     COMPLETE_MANUAL = 0;  // human drive
@@ -91,6 +92,8 @@ message Chassis {
 
   // Only available for Lincoln now
   optional ChassisGPS chassis_gps = 28;
+
+  optional apollo.common.EngageAdvice engage_advice = 29;
 }
 
 message ChassisGPS {
