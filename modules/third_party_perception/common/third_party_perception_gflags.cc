@@ -20,7 +20,7 @@ DEFINE_string(node_namespace, "/apollo/third_party_perception",
               "Global node namespace");
 DEFINE_string(node_name, "third_party_perception",
               "The chassis module name in proto");
-DEFINE_string(hmi_name, "third_party_perception", "Module name in HMI");
+DEFINE_string(module_name, "third_party_perception", "Module name");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 

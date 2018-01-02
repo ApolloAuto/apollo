@@ -19,10 +19,67 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <fstream>
+
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
 namespace util {
+namespace {
+
+std::string GetRosHome() {
+  // Note that ROS_ROOT env points to <ROS_HOME>/share/ros.
+  const std::string known_tail = "/share/ros";
+  const std::string ros_root = CHECK_NOTNULL(std::getenv("ROS_ROOT"));
+  CHECK(EndWith(ros_root, known_tail));
+  return ros_root.substr(0, ros_root.length() - known_tail.length());
+}
+
+}  // namespace
+
+bool GetContent(const std::string &file_name, std::string *content) {
+  std::ifstream fin(file_name);
+  if (!fin) {
+    return false;
+  }
+
+  std::stringstream str_stream;
+  str_stream << fin.rdbuf();
+  *content = str_stream.str();
+  return true;
+}
+
+std::string TranslatePath(const std::string &src_path) {
+  static const std::string kRosHomePlaceHolder = "<ros>";
+  static const std::string kRosHome = GetRosHome();
+
+  std::string result(src_path);
+
+  // Replace ROS home place holder.
+  const auto pos = src_path.find(kRosHomePlaceHolder);
+  if (pos != std::string::npos) {
+    result.replace(pos, kRosHomePlaceHolder.length(), kRosHome);
+  }
+
+  return result;
+}
+
+std::string GetAbsolutePath(const std::string &prefix,
+                            const std::string &relative_path) {
+  if (relative_path.empty()) {
+    return prefix;
+  }
+  // If prefix is empty or relative_path is already absolute.
+  if (prefix.empty() || relative_path[0] == '/') {
+    return relative_path;
+  }
+
+  if (prefix.back() == '/') {
+    return StrCat(prefix, relative_path);
+  }
+  return StrCat(prefix, "/", relative_path);
+}
 
 bool PathExists(const std::string &path) {
   struct stat info;
@@ -40,6 +97,58 @@ bool DirectoryExists(const std::string &directory_path) {
   }
 
   return false;
+}
+
+bool CopyFile(const std::string &from, const std::string &to) {
+  std::ifstream src(from, std::ios::binary);
+  if (!src) {
+    AERROR << "Source path doesn't exist: " << from;
+    return false;
+  }
+
+  std::ofstream dst(to, std::ios::binary);
+  if (!dst) {
+    AERROR << "Target path is not writable: " << to;
+    return false;
+  }
+
+  dst << src.rdbuf();
+  return true;
+}
+
+bool CopyDir(const std::string &from, const std::string &to) {
+  DIR *directory = opendir(from.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << from;
+    return false;
+  }
+
+  bool ret = true;
+  if (EnsureDirectory(to)) {
+    struct dirent *entry;
+    while ((entry = readdir(directory)) != nullptr) {
+      // skip directory_path/. and directory_path/..
+      if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+        continue;
+      }
+      const std::string sub_path_from = StrCat(from, "/", entry->d_name);
+      const std::string sub_path_to = StrCat(to, "/", entry->d_name);
+      if (entry->d_type == DT_DIR) {
+        ret &= CopyDir(sub_path_from, sub_path_to);
+      } else {
+        ret &= CopyFile(sub_path_from, sub_path_to);
+      }
+    }
+  } else {
+    AERROR << "Cannot create target directory " << to;
+    ret = false;
+  }
+  closedir(directory);
+  return ret;
+}
+
+bool Copy(const std::string &from, const std::string &to) {
+  return DirectoryExists(from) ? CopyDir(from, to) : CopyFile(from, to);
 }
 
 bool EnsureDirectory(const std::string &directory_path) {
@@ -73,6 +182,11 @@ bool EnsureDirectory(const std::string &directory_path) {
 
 bool RemoveAllFiles(const std::string &directory_path) {
   DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << directory_path;
+    return false;
+  }
+
   struct dirent *file;
   while ((file = readdir(directory)) != nullptr) {
     // skip directory_path/. and directory_path/..
@@ -94,6 +208,11 @@ bool RemoveAllFiles(const std::string &directory_path) {
 std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
   std::vector<std::string> result;
   DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open directory " << directory_path;
+    return result;
+  }
+
   struct dirent *entry;
   while ((entry = readdir(directory)) != nullptr) {
     // skip directory_path/. and directory_path/..

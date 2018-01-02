@@ -13,11 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include "sensor_msgs/Image.h"
+#include "sensor_msgs/CompressedImage.h"
+
 #include "modules/dreamview/backend/handlers/image.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/perception/traffic_light/util/color_space.h"
 
 #include "opencv2/opencv.hpp"
 
@@ -26,8 +30,48 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 
+constexpr double ImageHandler::kImageScale;
+
+template <>
+void ImageHandler::OnImage(const sensor_msgs::Image &image) {
+  if (image.encoding != "yuyv") {
+    AERROR_EVERY(100) << "Image format not support: " << image.encoding;
+    return;
+  }
+
+  unsigned char *yuv = (unsigned char *)&(image.data[0]);
+  auto mat = cv::Mat(image.height, image.width, CV_8UC3);
+  apollo::perception::traffic_light::Yuyv2rgbAvx(yuv, mat.data,
+                                                 image.height * image.width);
+  cv::cvtColor(mat, mat, CV_RGB2BGR);
+
+  cv::resize(mat, mat,
+             cv::Size(image.width * ImageHandler::kImageScale,
+                      image.height * ImageHandler::kImageScale),
+             0, 0, CV_INTER_LINEAR);
+
+  std::unique_lock<std::mutex> lock(mutex_);
+  cv::imencode(".jpg", mat, send_buffer_, std::vector<int>() /* params */);
+  cvar_.notify_all();
+}
+
+template <>
+void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
+  try {
+    std::unique_lock<std::mutex> lock(mutex_);
+    auto current_image = cv_bridge::toCvCopy(image);
+    cv::imencode(".jpg", current_image->image, send_buffer_,
+                 std::vector<int>() /* params */);
+    cvar_.notify_all();
+  } catch (cv_bridge::Exception &e) {
+    AERROR << "Error when converting ROS image to CV image: " << e.what();
+    return;
+  }
+}
+
 ImageHandler::ImageHandler() {
   AdapterManager::AddCompressedImageCallback(&ImageHandler::OnImage, this);
+  AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
@@ -68,19 +112,6 @@ bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
     cvar_.wait(lock);
   }
   return true;
-}
-
-void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
-  try {
-    std::unique_lock<std::mutex> lock(mutex_);
-    auto current_image = cv_bridge::toCvCopy(image);
-    cv::imencode(".jpg", current_image->image, send_buffer_,
-                 std::vector<int>() /* params */);
-    cvar_.notify_all();
-  } catch (cv_bridge::Exception &e) {
-    AERROR << "Error when converting ROS image to CV image: " << e.what();
-    return;
-  }
 }
 
 }  // namespace dreamview

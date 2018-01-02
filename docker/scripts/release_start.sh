@@ -25,7 +25,7 @@ source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-VERSION="release-${MACHINE_ARCH}-latest"
+VERSION="release-${MACHINE_ARCH}-v2.0.0"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -64,13 +64,8 @@ function main() {
 
     setup_device
 
-    local devices=""
-    devices="${devices} $(find_device ttyUSB*)"
-    devices="${devices} $(find_device ttyS*)"
-    devices="${devices} $(find_device can*)"
-    devices="${devices} $(find_device ram*)"
-    devices="${devices} $(find_device loop*)"
-    devices="${devices} $(find_device nvidia*)"
+    local devices=" -v /dev:/dev"
+
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
@@ -105,6 +100,7 @@ function main() {
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
+        -e DOCKER_IMG=$IMG \
         -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \
@@ -113,15 +109,28 @@ function main() {
         --shm-size 512M \
         $IMG
     if [ "${USER}" != "root" ]; then
-        docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
-        docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne_pointcloud"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/common/data"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/gnss_driver"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
-        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/control/conf"
+      docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
+      docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
+      docker exec apollo_release bash -c "chmod a+w /apollo"
+
+      DATA_DIRS=("/apollo/modules/common/data"
+                 "/apollo/modules/control/conf"
+                 "/apollo/modules/localization/msf/params/gnss_params"
+                 "/apollo/modules/localization/msf/params/velodyne_params"
+                 "/apollo/modules/perception/data/params"
+                 "/apollo/modules/tools/ota"
+                 "/apollo/ros/share/gnss_driver/conf"
+                 "/apollo/ros/share/gnss_driver/launch"
+                 "/apollo/ros/share/velodyne/launch"
+                 "/apollo/ros/share/velodyne_driver/launch"
+                 "/apollo/ros/share/velodyne_pointcloud/launch"
+                 "/apollo/ros/share/velodyne_pointcloud/params")
+      for DATA_DIR in "${DATA_DIRS[@]}"; do
+        docker exec apollo_release bash -c \
+            "mkdir -p '${DATA_DIR}'; chmod a+rw -R '${DATA_DIR}'"
+      done
     fi
-    docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 
 main

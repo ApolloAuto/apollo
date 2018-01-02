@@ -42,12 +42,18 @@ apollo::common::Status SpeedOptimizer::Execute(
   auto ret = Process(
       reference_line_info->AdcSlBoundary(), reference_line_info->path_data(),
       frame->PlanningStartPoint(), reference_line_info->reference_line(),
+      *reference_line_info->mutable_speed_data(),
       reference_line_info->path_decision(),
       reference_line_info->mutable_speed_data());
 
   if (!ret.ok() && FLAGS_enable_slowdown_profile_generator) {
-    *reference_line_info->mutable_speed_data() = GenerateStopProfile(
+    SpeedData speed_data = GenerateStopProfileFromPolynomial(
         frame->PlanningStartPoint().v(), frame->PlanningStartPoint().a());
+    if (speed_data.Empty()) {
+      speed_data = GenerateStopProfile(frame->PlanningStartPoint().v(),
+                                       frame->PlanningStartPoint().a());
+    }
+    *reference_line_info->mutable_speed_data() = speed_data;
     reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
     ret = Status::OK();
   }
@@ -63,7 +69,7 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed,
   const double kFixedJerk = -1.0;
   const double first_point_acc = std::fmin(0.0, init_acc);
 
-  const size_t max_t = 3.0;
+  const double max_t = 3.0;
   const double unit_t = 0.02;
 
   double pre_s = 0.0;
@@ -100,6 +106,46 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed,
   return speed_data;
 }
 
+SpeedData SpeedOptimizer::GenerateStopProfileFromPolynomial(
+    const double init_speed, const double init_acc) const {
+  AERROR << "Slowing down the car with polynomial.";
+  constexpr double kMaxT = 4.0;
+  for (double t = 2.0; t <= kMaxT; t += 0.5) {
+    for (double s = 0.0; s < 50.0; s += 1.0) {
+      QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
+      if (!IsValidProfile(curve)) {
+        continue;
+      }
+      constexpr double kUnitT = 0.02;
+      SpeedData speed_data;
+      for (double curve_t = 0.0; curve_t <= t; curve_t += kUnitT) {
+        const double curve_s = curve.Evaluate(0, curve_t);
+        const double curve_v = curve.Evaluate(1, curve_t);
+        const double curve_a = curve.Evaluate(2, curve_t);
+        const double curve_da = curve.Evaluate(3, curve_t);
+        speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
+                                    curve_da);
+      }
+      return speed_data;
+    }
+  }
+  return SpeedData();
+}
+
+bool SpeedOptimizer::IsValidProfile(
+    const QuinticPolynomialCurve1d& curve) const {
+  for (double evaluate_t = 0.1; evaluate_t <= curve.ParamLength();
+       evaluate_t += 0.2) {
+    const double v = curve.Evaluate(1, evaluate_t);
+    const double a = curve.Evaluate(2, evaluate_t);
+    constexpr double kEpsilon = 1e-3;
+    if (v < -kEpsilon || a < -5.0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
   auto* debug = reference_line_info_->mutable_debug();
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
@@ -109,8 +155,8 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
-                                        STGraphDebug* st_graph_debug) {
-  if (!FLAGS_enable_record_debug) {
+                                        STGraphDebug* st_graph_debug) const {
+  if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }

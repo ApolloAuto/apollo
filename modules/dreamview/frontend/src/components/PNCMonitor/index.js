@@ -50,13 +50,15 @@ export default class PNCMonitor extends React.Component {
 
         return (
             <div className='pnc-monitor'>
-                {this.generateScatterGraph('slGraph', data.slGraph)}
+                {this.generateScatterGraph('speedGraph', data.speedGraph)}
+                {this.generateScatterGraph('accelerationGraph', data.accelerationGraph)}
+                {this.generateScatterGraph('kappaGraph', data.kappaGraph)}
+                {this.generateScatterGraph('dpPolyGraph', data.dpPolyGraph)}
+                {this.generateStGraph(data.stGraph)}
                 {this.generateScatterGraph('stSpeedGraph',
                         data.stSpeedGraph.QpSplineStSpeedOptimizer)}
-                {this.generateScatterGraph('speedGraph', data.speedGraph)}
-                {this.generateScatterGraph('kappaGraph', data.kappaGraph)}
-                {this.generateStGraph(data.stGraph)}
                 {this.generateScatterGraph('latencyGraph', latencyGraph)}
+                {this.generateScatterGraph('dkappaGraph', data.dkappaGraph)}
             </div>
         );
     }

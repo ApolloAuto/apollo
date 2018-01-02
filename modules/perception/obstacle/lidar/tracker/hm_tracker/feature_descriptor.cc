@@ -19,9 +19,8 @@
 namespace apollo {
 namespace perception {
 
-void FeatureDescriptor::ComputeHistogram(
-  const int bin_size,
-  std::vector<float>* feature) {
+void FeatureDescriptor::ComputeHistogram(const int bin_size,
+                                         std::vector<float>* feature) {
   GetMinMaxCenter();
 
   int xstep = bin_size;
@@ -43,8 +42,8 @@ void FeatureDescriptor::ComputeHistogram(
   // update feature
   (*feature).resize(stat_len);
   for (size_t i = 0; i < stat_feat.size(); ++i) {
-    (*feature)[i] = static_cast<float>(stat_feat[i]) /
-      static_cast<float>(pt_num);
+    (*feature)[i] =
+        static_cast<float>(stat_feat[i]) / static_cast<float>(pt_num);
   }
 }
 

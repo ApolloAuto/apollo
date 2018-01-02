@@ -61,8 +61,9 @@ class EMPlanner : public Planner {
 
   /**
    * @brief Overrode function Plan in parent class Planner.
-   * @param start_point The trajectory point where planning starts
-   * @param trajectory_pb The computed trajectory
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
   common::Status Plan(const common::TrajectoryPoint& planning_init_point,
@@ -82,8 +83,10 @@ class EMPlanner : public Planner {
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point);
 
-  void RecordDebugInfo(const std::string& name, const double time_diff_ms,
-                       planning::LatencyStats* ptr_latency_stats);
+  void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
+
+  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                       const std::string& name, const double time_diff_ms);
 
   apollo::common::util::Factory<TaskType, Task> task_factory_;
   std::vector<std::unique_ptr<Task>> tasks_;

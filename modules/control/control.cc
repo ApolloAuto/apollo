@@ -25,7 +25,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -40,20 +40,20 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const {
-  return FLAGS_node_name;
-}
+std::string Control::Name() const { return FLAGS_control_node_name; }
 
 Status Control::Init() {
+  init_time_ = Clock::NowInSeconds();
+
   AINFO << "Control init, starting ...";
   CHECK(common::util::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
-  AdapterManager::Init(FLAGS_adapter_config_filename);
+  AdapterManager::Init(FLAGS_control_adapter_config_filename);
 
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // set controller
   if (!controller_agent_.Init(&control_conf_).ok()) {
@@ -101,7 +101,7 @@ Status Control::Start() {
 
   AINFO << "Control init done!";
 
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("control started");
 
   return Status::OK();
@@ -121,7 +121,7 @@ void Control::OnPad(const PadMessage &pad) {
 }
 
 void Control::OnMonitor(
-    const apollo::common::monitor::MonitorMessage &monitor_message) {
+    const common::monitor::MonitorMessage &monitor_message) {
   for (const auto &item : monitor_message.item()) {
     if (item.log_level() == MonitorMessageItem::FATAL) {
       estop_ = true;
@@ -185,14 +185,21 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
-  if (trajectory_.has_signal()) {
-    control_command->mutable_signal()->CopyFrom(trajectory_.signal());
+  if (trajectory_.decision().has_vehicle_signal()) {
+    control_command->mutable_signal()->CopyFrom(
+        trajectory_.decision().vehicle_signal());
   }
   return status;
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
-  double start_timestamp = Clock::NowInSecond();
+  double start_timestamp = Clock::NowInSeconds();
+
+  if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
+      (start_timestamp - init_time_) > FLAGS_control_test_duration) {
+    AERROR << "Control finished testing. exit";
+    ros::shutdown();
+  }
 
   ControlCommand control_command;
 
@@ -200,7 +207,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
 
-  double end_timestamp = Clock::NowInSecond();
+  double end_timestamp = Clock::NowInSeconds();
 
   if (pad_received_) {
     control_command.mutable_pad_msg()->CopyFrom(pad_msg_);
@@ -259,7 +266,7 @@ Status Control::CheckInput() {
     localization_.mutable_pose()->mutable_position()->set_y(0.0);
     localization_.mutable_pose()->set_heading(0.0);
   }
-  common::VehicleState::instance()->Update(localization_, chassis_);
+  common::VehicleStateProvider::instance()->Update(localization_, chassis_);
 
   return Status::OK();
 }
@@ -269,14 +276,14 @@ Status Control::CheckTimestamp() {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
-  double current_timestamp = Clock::NowInSecond();
+  double current_timestamp = Clock::NowInSeconds();
   double localization_diff =
       current_timestamp - localization_.header().timestamp_sec();
   if (localization_diff >
       (FLAGS_max_localization_miss_num * control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
            << localization_diff << "s";
-    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
@@ -286,7 +293,7 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_chassis_miss_num * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
            << "s";
-    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
@@ -297,7 +304,7 @@ Status Control::CheckTimestamp() {
       (FLAGS_max_planning_miss_num * control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
            << trajectory_diff << "s";
-    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }

@@ -23,6 +23,4 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-set -x
-
 python modules/tools/configurator/configurator.py

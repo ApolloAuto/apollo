@@ -38,4 +38,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "vehicle_config_helper_test",
+    size = "small",
+    srcs = [
+        "vehicle_config_helper_test.cc",
+    ],
+    deps = [
+        "vehicle_config_helper",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

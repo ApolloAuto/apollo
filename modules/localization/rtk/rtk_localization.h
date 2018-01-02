@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "ros/include/ros/ros.h"
+#include "tf2_ros/transform_broadcaster.h"
 
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -35,7 +36,8 @@
 
 #include "glog/logging.h"
 #include "gtest/gtest_prod.h"
-#include "modules/common/monitor/monitor.h"
+
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
 
@@ -54,7 +56,7 @@ namespace localization {
 class RTKLocalization : public LocalizationBase {
  public:
   RTKLocalization();
-  virtual ~RTKLocalization() = default;
+  virtual ~RTKLocalization();
 
   /**
    * @brief module start function
@@ -71,6 +73,7 @@ class RTKLocalization : public LocalizationBase {
  private:
   void OnTimer(const ros::TimerEvent &event);
   void PublishLocalization();
+  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
   void RunWatchDog();
 
   void PrepareLocalizationMsg(LocalizationEstimate *localization);
@@ -85,7 +88,8 @@ class RTKLocalization : public LocalizationBase {
 
  private:
   ros::Timer timer_;
-  apollo::common::monitor::Monitor monitor_;
+  tf2_ros::TransformBroadcaster *tf2_broadcaster_ = nullptr;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
   const std::vector<double> map_offset_;
   double last_received_timestamp_sec_ = 0.0;
   double last_reported_timestamp_sec_ = 0.0;

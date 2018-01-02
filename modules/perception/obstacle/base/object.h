@@ -23,9 +23,12 @@
 
 #include "Eigen/Core"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -36,8 +39,8 @@ struct alignas(16) Object {
   void clone(const Object& rhs);
   std::string ToString() const;
 
-  bool Serialize(PerceptionObstacle* pb_obj) const;
-  bool Deserialize(const PerceptionObstacle& pb_obs);
+  void Serialize(PerceptionObstacle* pb_obj) const;
+  void Deserialize(const PerceptionObstacle& pb_obs);
 
   // object id per frame
   int id = 0;
@@ -62,6 +65,8 @@ struct alignas(16) Object {
 
   // foreground score/probability
   float score = 0.0;
+  // foreground score/probability type
+  ScoreType score_type = SCORE_CNN;
 
   // Object classification type.
   ObjectType type;
@@ -80,10 +85,36 @@ struct alignas(16) Object {
 
   // stable anchor_point during time, e.g., barycenter
   Eigen::Vector3d anchor_point;
+
+  // noise covariance matrix for uncertainty of position and velocity
+  Eigen::Matrix3d position_uncertainty;
+  Eigen::Matrix3d velocity_uncertainty;
+
+  // sensor particular suplplements, default nullptr
+  RadarSupplementPtr radar_supplement = nullptr;
 };
 
 typedef std::shared_ptr<Object> ObjectPtr;
 typedef std::shared_ptr<const Object> ObjectConstPtr;
+
+// Sensor single frame objects.
+struct SensorObjects {
+  SensorObjects() {
+    sensor2world_pose = Eigen::Matrix4d::Zero();
+  }
+
+  std::string ToString() const;
+
+  // Transmit error_code to next subnode.
+  common::ErrorCode error_code = common::ErrorCode::OK;
+
+  SensorType sensor_type = UNKNOWN_SENSOR_TYPE;
+  std::string sensor_id;
+  double timestamp = 0.0;
+  SeqId seq_num = 0;
+  std::vector<ObjectPtr> objects;
+  Eigen::Matrix4d sensor2world_pose;
+};
 
 }  // namespace perception
 }  // namespace apollo

@@ -37,6 +37,7 @@ cc_library(
     deps = [
         ":routing_topo_node",
         ":routing_topo_range",
+        "//modules/common/util:map_util",
     ],
 )
 
@@ -76,6 +77,7 @@ cc_library(
         ":routing_topo_range",
         "//modules/common:log",
         "//modules/common/proto:common_proto",
+        "//modules/common/util:map_util",
         "//modules/map/proto:map_proto",
         "//modules/routing/proto:routing_proto",
     ],

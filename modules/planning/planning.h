@@ -26,13 +26,13 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
-#include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/planning_interface.h"
 
 /**
  * @namespace apollo::planning
@@ -47,7 +47,7 @@ namespace planning {
  * @brief Planning module main class. It processes GPS and IMU as input,
  * to generate planning info.
  */
-class Planning : public apollo::common::ApolloApp {
+class Planning : public PlanningInterface {
  public:
   /**
    * @brief module name
@@ -69,26 +69,18 @@ class Planning : public apollo::common::ApolloApp {
 
   /**
    * @brief module stop function
-   * @return stop status
    */
   void Stop() override;
 
   /**
-   * @brief Plan the trajectory given current vehicle state
-   * @param is_on_auto_mode whether the current system is on auto-driving mode
+   * @brief main logic of the planning module, runs periodically triggered by
+   * timer.
    */
-  common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory);
+  void RunOnce() override;
 
-  void RunOnce();
-
-  common::Status InitFrame(const uint32_t sequence_num, const double time_stamp,
-                           const common::TrajectoryPoint& init_adc_point);
-
-  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
-
+  /**
+   * @brief record last planning trajectory
+   */
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 
  private:
@@ -99,7 +91,23 @@ class Planning : public apollo::common::ApolloApp {
 
   void RegisterPlanners();
 
-  bool HasSignalLight(const PlanningConfig& config);
+  /**
+   * @brief Plan the trajectory given current vehicle state
+   */
+  common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory);
+
+  common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& planning_start_point,
+                           const double start_time,
+                           const common::VehicleState& vehicle_state);
+
+  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
+  void ExportReferenceLineDebug(planning_internal::Debug* debug);
+
+  double start_time_ = 0.0;
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;

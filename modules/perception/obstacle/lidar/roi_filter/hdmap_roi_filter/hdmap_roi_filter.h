@@ -16,18 +16,18 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_
 
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 #include "Eigen/Core"
 #include "gflags/gflags.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
+#include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_mask.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_converter.h"
@@ -68,6 +68,12 @@ class HdmapROIFilter : public BaseROIFilter {
               const ROIFilterOptions& roi_filter_options,
               pcl_util::PointIndices* roi_indices) override;
 
+  /**
+   * @brief: Merge junction polygons and road boundaries in a vector.
+   */
+  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
+                                  std::vector<PolygonDType>* polygons);
+
  protected:
   /**
    * @brief: Draw polygons into grids in bitmap and check each point whether
@@ -101,12 +107,6 @@ class HdmapROIFilter : public BaseROIFilter {
   void MergeRoadBoundariesToPolygons(
       const std::vector<RoadBoundary>& road_boundaries,
       std::vector<PolygonDType>* polygons);
-
-  /**
-   * @brief: Merge junction polygons and road boundaries in a vector.
-   */
-  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
-                                  std::vector<PolygonDType>* polygons);
 
   /**
    * @brief: After drawing polygons into grids in bitmap. We check each point

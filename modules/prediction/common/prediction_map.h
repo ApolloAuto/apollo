@@ -34,6 +34,12 @@ namespace prediction {
 class PredictionMap {
  public:
   /**
+   * @brief Check if map is ready
+   * @return True if map is ready
+   */
+  bool Ready();
+
+  /**
    * @brief Get the position of a point on a specific distance along a lane.
    * @param lane_info The lane to get a position.
    * @param s The distance along the lane.
@@ -90,6 +96,21 @@ class PredictionMap {
       hdmap::MapPathPoint* path_point);
 
   /**
+   * @brief Determine if a lane is a virtual lane.
+   * @param The lane ID of the lane.
+   * @return If the lane is a virtual lane.
+   */
+  static bool IsVirtualLane(const std::string& lane_id);
+
+  /**
+   * @brief Determine if a point is on a virtual lane.
+   * @param The point coordinate.
+   * @return If the point is on a virtual lane.
+   */
+  static bool OnVirtualLane(const Eigen::Vector2d& position,
+                            const double radius);
+
+  /**
    * @brief Get the connected lanes from some specified lanes.
    * @param prev_lanes The lanes from which to search their connected lanes.
    * @param heading The specified heading.
@@ -102,6 +123,24 @@ class PredictionMap {
       const Eigen::Vector2d& point, const double heading, const double radius,
       const bool on_lane,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
+
+  /**
+   * @brief Check if there are any junctions within the range centered at
+   *        a certain point with a radius.
+   * @param point The position.
+   * @param radius The radius to search junctions.
+   * @return If any junctions exist.
+   */
+  static bool NearJunction(const Eigen::Vector2d& point, const double radius);
+
+  /**
+   * @brief Get a list of junctions given a point and a search radius
+   * @param Point
+   * @param Search radius
+   * @return A list of junctions
+   */
+  std::vector<std::shared_ptr<const apollo::hdmap::JunctionInfo>> GetJunctions(
+      const Eigen::Vector2d& point, const double radius);
 
   /**
    * @brief Get the lane heading on a point.
@@ -128,7 +167,7 @@ class PredictionMap {
   /**
    * @brief Get nearby lanes by a position and current lanes.
    * @param point The position to search its nearby lanes.
-   * @param heading The heading.
+   * @param heading The heading of an obstacle.
    * @param radius The searching radius.
    * @param lanes The current lanes.
    * @param nearby_lanes The searched nearby lanes.
@@ -137,6 +176,15 @@ class PredictionMap {
       const Eigen::Vector2d& point, const double heading, const double radius,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
+
+  /**
+   * @brief Get nearby lanes by a position.
+   * @param point The position to search its nearby lanes.
+   * @param radius The searching radius.
+   * @return A vector of nearby lane IDs.
+   */
+  std::vector<std::string> NearbyLaneIds(const Eigen::Vector2d& point,
+                                         const double radius);
 
   /**
    * @brief Check if a lane is a left neighbor of another lane.

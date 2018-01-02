@@ -23,6 +23,7 @@
 #define MODULES_DRIVERS_CANBUS_CAN_COMM_PROTOCOL_DATA_H_
 
 #include <cmath>
+#include <numeric>
 
 #include "modules/common/log.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
@@ -121,11 +122,7 @@ T ProtocolData<SensorType>::BoundedValue(T lower, T upper, T val) {
 template <typename SensorType>
 uint8_t ProtocolData<SensorType>::CalculateCheckSum(const uint8_t *input,
                                                     const uint32_t length) {
-  uint8_t sum = 0;
-  for (size_t i = 0; i < length; ++i) {
-    sum += input[i];
-  }
-  return sum ^ 0xFF;
+  return std::accumulate(input, input + length, 0) ^ 0xFF;
 }
 
 template <typename SensorType>
@@ -141,8 +138,7 @@ int32_t ProtocolData<SensorType>::GetLength() const {
 
 template <typename SensorType>
 void ProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
-                                     SensorType *sensor_data) const {
-}
+                                     SensorType *sensor_data) const {}
 
 template <typename SensorType>
 void ProtocolData<SensorType>::UpdateData(uint8_t * /*data*/) {}

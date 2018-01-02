@@ -27,7 +27,7 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor",
+        "//modules/common/monitor_log",
         "//modules/hmi/utils:hmi_status_helper",
     ],
 )
@@ -51,7 +51,7 @@ cc_binary(
         "//modules/canbus/can_client",
         "//modules/canbus/common:canbus_common",
         "//modules/common:log",
-        "//modules/common/monitor",
+        "//modules/common/monitor_log",
         "//third_party/ros:ros_common",
     ],
 )

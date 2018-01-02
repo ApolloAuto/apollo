@@ -140,7 +140,7 @@ Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
     WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
     pt->set_x(output_x);
     pt->set_y(output_y);
-    // pt->set_z(output_z);
+    pt->set_z(output_z);
 
     sub_node = sub_node->NextSiblingElement("cornerGlobal");
   }

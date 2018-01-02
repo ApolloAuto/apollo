@@ -64,6 +64,95 @@ std::string LaneWaypoint::DebugString() const {
   return common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
 }
 
+LaneBoundaryType::Type LeftBoundaryType(const LaneWaypoint& waypoint) {
+  if (!waypoint.lane) {
+    return LaneBoundaryType::UNKNOWN;
+  }
+  for (const auto& type :
+       waypoint.lane->lane().left_boundary().boundary_type()) {
+    if (type.s() <= waypoint.s) {
+      if (type.types_size() > 0) {
+        return type.types(0);
+      } else {
+        return LaneBoundaryType::UNKNOWN;
+      }
+    }
+  }
+  return LaneBoundaryType::UNKNOWN;
+}
+
+LaneBoundaryType::Type RightBoundaryType(const LaneWaypoint& waypoint) {
+  if (!waypoint.lane) {
+    return LaneBoundaryType::UNKNOWN;
+  }
+  for (const auto& type :
+       waypoint.lane->lane().right_boundary().boundary_type()) {
+    if (type.s() <= waypoint.s) {
+      if (type.types_size() > 0) {
+        return type.types(0);
+      } else {
+        return LaneBoundaryType::UNKNOWN;
+      }
+    }
+  }
+  return LaneBoundaryType::UNKNOWN;
+}
+
+LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
+  LaneWaypoint neighbor;
+  if (!waypoint.lane) {
+    return neighbor;
+  }
+  auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
+  auto map_ptr = HDMapUtil::BaseMapPtr();
+  for (const auto& lane_id :
+       waypoint.lane->lane().left_neighbor_forward_lane_id()) {
+    auto lane = map_ptr->GetLaneById(lane_id);
+    if (!lane) {
+      return neighbor;
+    }
+    double s = 0.0;
+    double l = 0.0;
+    if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+      continue;
+    }
+
+    if (s < -kSampleDistance || s > lane->total_length() + kSampleDistance) {
+      continue;
+    } else {
+      return LaneWaypoint(lane, s);
+    }
+  }
+  return neighbor;
+}
+
+LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
+  LaneWaypoint neighbor;
+  if (!waypoint.lane) {
+    return neighbor;
+  }
+  auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
+  auto map_ptr = HDMapUtil::BaseMapPtr();
+  for (const auto& lane_id :
+       waypoint.lane->lane().right_neighbor_forward_lane_id()) {
+    auto lane = map_ptr->GetLaneById(lane_id);
+    if (!lane) {
+      return neighbor;
+    }
+    double s = 0.0;
+    double l = 0.0;
+    if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+      continue;
+    }
+    if (s < -kSampleDistance || s > lane->total_length() + kSampleDistance) {
+      continue;
+    } else {
+      return LaneWaypoint(lane, s);
+    }
+  }
+  return neighbor;
+}
+
 std::string LaneSegment::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
@@ -216,8 +305,8 @@ void Path::InitWidth() {
       double left_width = 0.0;
       double right_width = 0.0;
       waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
-      left_width_.push_back(left_width);
-      right_width_.push_back(right_width);
+      left_width_.push_back(left_width - waypoint.l);
+      right_width_.push_back(right_width + waypoint.l);
     }
     s += kSampleDistance;
   }
@@ -327,11 +416,19 @@ MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
     const Vec2d delta = unit_directions_[index.id] * index.offset;
     MapPathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
                        ref_point.heading());
-    if (index.id < num_segments_) {
+    if (index.id < num_segments_ && !ref_point.lane_waypoints().empty()) {
       const LaneSegment& lane_segment = lane_segments_to_next_point_[index.id];
+      auto ref_lane_waypoint = ref_point.lane_waypoints()[0];
       if (lane_segment.lane != nullptr) {
-        point.add_lane_waypoint(LaneWaypoint(
-            lane_segment.lane, lane_segment.start_s + index.offset));
+        for (const auto& lane_waypoint : ref_point.lane_waypoints()) {
+          if (lane_waypoint.lane->id().id() == lane_segment.lane->id().id()) {
+            ref_lane_waypoint = lane_waypoint;
+            break;
+          }
+        }
+        point.add_lane_waypoint(
+            LaneWaypoint(lane_segment.lane, lane_segment.start_s + index.offset,
+                         ref_lane_waypoint.l));
       }
     }
     if (point.lane_waypoints().empty() && !ref_point.lane_waypoints().empty()) {
@@ -410,6 +507,58 @@ bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                          double* lateral) const {
   double distance = 0.0;
   return GetProjection(point, accumulate_s, lateral, &distance);
+}
+
+bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
+                                            const double hueristic_start_s,
+                                            const double hueristic_end_s,
+                                            double* accumulate_s,
+                                            double* lateral,
+                                            double* min_distance) const {
+  if (segments_.empty()) {
+    return false;
+  }
+  if (accumulate_s == nullptr || lateral == nullptr ||
+      min_distance == nullptr) {
+    return false;
+  }
+  CHECK_GE(num_points_, 2);
+  *min_distance = std::numeric_limits<double>::infinity();
+
+  int start_interpolation_index = GetIndexFromS(hueristic_start_s).id;
+  int end_interpolation_index =
+      std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1);
+  for (int i = start_interpolation_index; i < end_interpolation_index; ++i) {
+    const auto& segment = segments_[i];
+    const double distance = segment.DistanceTo(point);
+    if (distance < *min_distance) {
+      const double proj = segment.ProjectOntoUnit(point);
+      if (proj < 0.0 && i > 0) {
+        continue;
+      }
+      if (proj > segment.length() && i + 1 < end_interpolation_index) {
+        const auto& next_segment = segments_[i + 1];
+        if ((point - next_segment.start())
+                .InnerProd(next_segment.unit_direction()) >= 0.0) {
+          continue;
+        }
+      }
+      *min_distance = distance;
+      if (i + 1 >= end_interpolation_index) {
+        *accumulate_s = accumulated_s_[i] + proj;
+      } else {
+        *accumulate_s = accumulated_s_[i] + std::min(proj, segment.length());
+      }
+      const double prod = segment.ProductOntoUnit(point);
+      if ((i == 0 && proj < 0.0) ||
+          (i + 1 == end_interpolation_index && proj > segment.length())) {
+        *lateral = prod;
+      } else {
+        *lateral = (prod > 0.0 ? distance : -distance);
+      }
+    }
+  }
+  return true;
 }
 
 bool Path::GetProjection(const Vec2d& point, double* accumulate_s,

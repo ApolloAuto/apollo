@@ -1,0 +1,68 @@
+data_files {
+  source_path: "vehicle_param.pb.txt"
+  dest_path: "modules/common/data/mkz_config.pb.txt"
+}
+data_files {
+  source_path: "calibration_table.pb.txt"
+  dest_path: "modules/control/conf/lincoln.pb.txt"
+}
+data_files {
+  source_path: "start_velodyne.launch"
+  dest_path: "<ros>/share/velodyne/launch/start_velodyne.launch"
+}
+data_files {
+  source_path: "velodyne_check.launch"
+  dest_path: "<ros>/share/velodyne/launch/velodyne_check.launch"
+}
+data_files {
+  source_path: "export_pcd_offline.launch"
+  dest_path: "<ros>/share/velodyne/launch/export_pcd_offline.launch"
+}
+data_files {
+  source_path: "replay_velodyne.launch"
+  dest_path: "<ros>/share/velodyne/launch/replay_velodyne.launch"
+}
+data_files {
+  source_path: "start_velodyne_driver.launch"
+  dest_path: "<ros>/share/velodyne_driver/launch/start_velodyne_driver.launch"
+}
+data_files {
+  source_path: "driver_nodelet.launch"
+  dest_path: "<ros>/share/velodyne_driver/launch/driver_nodelet.launch"
+}
+data_files {
+  source_path: "convert_nodelet.launch"
+  dest_path: "<ros>/share/velodyne_pointcloud/launch/convert_nodelet.launch"
+}
+data_files {
+  source_path: "velodyne_params"
+  dest_path: "<ros>/share/velodyne_pointcloud/params"
+}
+data_files {
+  source_path: "velodyne_params"
+  dest_path: "modules/localization/msf/params/velodyne_params"
+}
+data_files {
+  source_path: "camera_params"
+  dest_path: "modules/perception/data/params"
+}
+data_files {
+  source_path: "radar_params"
+  dest_path: "modules/perception/data/params"
+}
+data_files {
+  source_path: "gnss_params/gnss_driver.launch"
+  dest_path: "<ros>/share/gnss_driver/launch/gnss_driver.launch"
+}
+data_files {
+  source_path: "gnss_params/gnss_conf_mkz.txt"
+  dest_path: "<ros>/share/gnss_driver/conf/gnss_conf_mkz.txt"
+}
+data_files {
+  source_path: "gnss_params/ant_imu_leverarm.yaml"
+  dest_path: "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
+}
+data_files {
+  source_path: "vehicle_info.pb.txt"
+  dest_path: "modules/tools/ota/vehicle_info.pb.txt"
+}

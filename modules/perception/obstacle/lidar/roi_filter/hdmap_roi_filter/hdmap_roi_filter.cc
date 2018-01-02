@@ -17,10 +17,10 @@ namespace apollo {
 namespace perception {
 
 bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
-                            const ROIFilterOptions &roi_filter_options,
+                            const ROIFilterOptions& roi_filter_options,
                             pcl_util::PointIndices* roi_indices) {
-  if (roi_filter_options.hdmap == nullptr
-      || roi_filter_options.velodyne_trans == nullptr) {
+  if (roi_filter_options.hdmap == nullptr ||
+      roi_filter_options.velodyne_trans == nullptr) {
     return false;
   }
 
@@ -42,10 +42,9 @@ bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
 }
 
 bool HdmapROIFilter::FilterWithPolygonMask(
-    const pcl_util::PointCloudPtr &cloud,
-    const std::vector<PolygonType> &map_polygons,
+    const pcl_util::PointCloudPtr& cloud,
+    const std::vector<PolygonType>& map_polygons,
     pcl_util::PointIndices* roi_indices) {
-
   // 2. Get Major Direction as X direction and convert map_polygons to raw
   // polygons
   std::vector<PolygonScanConverter::Polygon> raw_polygons(map_polygons.size());
@@ -69,7 +68,7 @@ MajorDirection HdmapROIFilter::GetMajorDirection(
     std::vector<PolygonScanConverter::Polygon>* polygons) {
   double min_x = range_, min_y = range_;
   double max_x = -range_, max_y = -range_;
-  auto &raw_polygons = *polygons;
+  auto& raw_polygons = *polygons;
 
   // Get available x_range and y_range, then set the direction with small range
   // as major direction.
@@ -92,18 +91,16 @@ MajorDirection HdmapROIFilter::GetMajorDirection(
   min_y = std::max(min_y, -range_);
   max_y = std::min(max_y, range_);
 
-  return (max_x - min_x) < (max_y - min_y) ?
-      MajorDirection::XMAJOR : MajorDirection::YMAJOR;
+  return (max_x - min_x) < (max_y - min_y) ? MajorDirection::XMAJOR
+                                           : MajorDirection::YMAJOR;
 }
 
 bool HdmapROIFilter::Bitmap2dFilter(
     const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
-    const Bitmap2D &bitmap,
-    pcl_util::PointIndices* roi_indices_ptr) {
-
+    const Bitmap2D& bitmap, pcl_util::PointIndices* roi_indices_ptr) {
   roi_indices_ptr->indices.reserve(in_cloud_ptr->size());
   for (size_t i = 0; i < in_cloud_ptr->size(); ++i) {
-    const auto &pt = in_cloud_ptr->points[i];
+    const auto& pt = in_cloud_ptr->points[i];
     Eigen::Vector2d p(pt.x, pt.y);
     if (bitmap.IsExist(p) && bitmap.Check(p)) {
       roi_indices_ptr->indices.push_back(i);
@@ -115,7 +112,6 @@ bool HdmapROIFilter::Bitmap2dFilter(
 void HdmapROIFilter::MergeRoadBoundariesToPolygons(
     const std::vector<RoadBoundary>& road_boundaries,
     std::vector<PolygonDType>* polygons) {
-
   polygons->resize(road_boundaries.size());
   for (size_t i = 0; i < road_boundaries.size(); ++i) {
     // Assume the points of left boundary are [L1, L2, L3, ..., Ln],
@@ -138,7 +134,6 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
 void HdmapROIFilter::MergeHdmapStructToPolygons(
     const HdmapStructConstPtr& hdmap_struct_ptr,
     std::vector<PolygonDType>* polygons) {
-
   std::vector<PolygonDType> road_polygons;
   MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary,
                                 &road_polygons);
@@ -147,8 +142,7 @@ void HdmapROIFilter::MergeHdmapStructToPolygons(
       hdmap_struct_ptr->junction;
 
   polygons->reserve(road_polygons.size() + junction_polygons.size());
-  polygons->insert(polygons->end(), road_polygons.begin(),
-                   road_polygons.end());
+  polygons->insert(polygons->end(), road_polygons.begin(), road_polygons.end());
   polygons->insert(polygons->end(), junction_polygons.begin(),
                    junction_polygons.end());
 }
@@ -178,9 +172,8 @@ bool HdmapROIFilter::Init() {
 }
 
 void HdmapROIFilter::TransformFrame(
-    const pcl_util::PointCloudConstPtr &cloud,
-    const Eigen::Affine3d &vel_pose,
-    const std::vector<PolygonDType> &polygons_world,
+    const pcl_util::PointCloudConstPtr& cloud, const Eigen::Affine3d& vel_pose,
+    const std::vector<PolygonDType>& polygons_world,
     std::vector<PolygonType>* polygons_local,
     pcl_util::PointCloudPtr cloud_local) {
   cloud_local->header = cloud->header;
@@ -195,8 +188,8 @@ void HdmapROIFilter::TransformFrame(
     auto& polygon_local = polygons_local->at(i);
     polygon_local.resize(polygon_world.size());
     for (size_t j = 0; j < polygon_local.size(); ++j) {
-        polygon_local[j].x = polygon_world[j].x - vel_location.x();
-        polygon_local[j].y = polygon_world[j].y - vel_location.y();
+      polygon_local[j].x = polygon_world[j].x - vel_location.x();
+      polygon_local[j].y = polygon_world[j].y - vel_location.y();
     }
   }
 

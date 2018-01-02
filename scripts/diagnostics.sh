@@ -23,4 +23,5 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
+export COLUMNS=200
 python modules/tools/diagnostics/diagnostics.py

@@ -40,7 +40,8 @@ function print_usage() {
   ${BLUE}test${NONE}: run all unit tests
   ${BLUE}version${NONE}: display current commit and date
   ${BLUE}push${NONE}: pushes the images to Docker hub
-  ${BLUE}gen${NONE}: release a docker release image
+  ${BLUE}gen${NONE}: generate a docker release image
+  ${BLUE}ota_gen${NONE}: generate a ota docker release image
   "
 }
 
@@ -52,11 +53,20 @@ function start_build_docker() {
 }
 
 function gen_docker() {
-  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20171025_1428"
-  RELEASE_DIR=${HOME}/.cache/release
+  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-v2.0.0"
+  RELEASE_DIR=${HOME}/.cache/apollo_release
+  APOLLO_DIR="${RELEASE_DIR}/apollo"
+
+  if [ ! -d "${APOLLO_DIR}" ]; then
+    echo "Release directory does not exist!"
+    exit 1
+  fi
+
   RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
   DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
   docker pull $IMG
+  echo "time : ${TIME}" >> ${APOLLO_DIR}/meta.ini
+  echo "tag: ${RELEASE_NAME}" >> ${APOLLO_DIR}/meta.ini
 
   docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
   if [ $? == 0 ];then
@@ -67,21 +77,40 @@ function gen_docker() {
       -d \
       --name apollo_release \
       --net host \
-      -v "$RELEASE_DIR:/root/mnt" \
+      -v $HOME/.cache:/root/mnt \
       -w /apollo \
       "$IMG"
 
-  docker exec apollo_release bash -c "cp -Lr /root/mnt/* ."
+  if [ "$OTA_RELEASE" != "1" ]; then
+    docker exec apollo_release bash -c 'cp -Lr /root/mnt/apollo_release/apollo /'
+  else
+    RELEASE_TGZ="apollo_release.tar.gz"
+    SEC_RELEASE_TGZ="sec_apollo_release.tar.gz"
+
+    if [ -e "$HOME/.cache/$RELEASE_TGZ" ]; then
+      rm $HOME/.cache/$RELEASE_TGZ
+    fi
+
+    if [ -e "$HOME/.cache/$SEC_RELEASE_TGZ" ]; then
+      rm $HOME/.cache/$SEC_RELEASE_TGZ
+    fi
+
+    # generate security release package
+    tar czf $HOME/.cache/$RELEASE_TGZ -C $HOME/.cache apollo_release
+    python modules/tools/ota/create_sec_package.py
+    docker exec apollo_release cp /root/mnt/${SEC_RELEASE_TGZ} /root
+  fi
+
   CONTAINER_ID=$(docker ps | grep apollo_release | awk '{print $1}')
-  docker commit "$CONTAINER_ID" "$RELEASE_NAME"
   docker commit "$CONTAINER_ID" "$DEFAULT_NAME"
+  docker tag "$DEFAULT_NAME" "$RELEASE_NAME"
   docker stop "$CONTAINER_ID"
 }
 
 function push() {
-  local DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
-  local RELEASE_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-${TIME}"
-  docker tag "$DEFAULT_NAME" "$RELEASE_NAME"
+  DEFAULT_NAME="${DOCKER_REPO}:release-${MACHINE_ARCH}-latest"
+  LATEST_IMAG_ID=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "${DEFAULT_NAME}" | cut -d " " -f 2)
+  RELEASE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep ${LATEST_IMAG_ID}| grep -v "${DEFAULT_NAME}" | cut -d " " -f 1)
   docker push "$DEFAULT_NAME"
   docker push "$RELEASE_NAME"
 }
@@ -101,6 +130,10 @@ case $1 in
     push
     ;;
   gen)
+    gen_docker
+    ;;
+  ota_gen)
+    OTA_RELEASE=1
     gen_docker
     ;;
   *)

@@ -25,9 +25,11 @@ using std::string;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-void Timer::start() { start_time_ = std::chrono::system_clock::now(); }
+void Timer::Start() {
+  start_time_ = std::chrono::system_clock::now();
+}
 
-uint64_t Timer::end(const string& msg) {
+uint64_t Timer::End(const string &msg) {
   end_time_ = std::chrono::system_clock::now();
   uint64_t elapsed_time =
       duration_cast<milliseconds>(end_time_ - start_time_).count();

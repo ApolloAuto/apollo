@@ -144,10 +144,14 @@ bool Polygon2d::IsPointIn(const Vec2d &point) const {
 
 bool Polygon2d::HasOverlap(const Polygon2d &polygon) const {
   CHECK_GE(points_.size(), 3);
+  if (polygon.max_x() < min_x() || polygon.min_x() > max_x() ||
+      polygon.max_y() < min_y() || polygon.min_y() > max_y()) {
+    return false;
+  }
   return DistanceTo(polygon) <= kMathEpsilon;
 }
 
-bool Polygon2d::IsContain(const LineSegment2d &line_segment) const {
+bool Polygon2d::Contains(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return IsPointIn(line_segment.start());
   }
@@ -169,7 +173,7 @@ bool Polygon2d::IsContain(const LineSegment2d &line_segment) const {
   return true;
 }
 
-bool Polygon2d::IsContain(const Polygon2d &polygon) const {
+bool Polygon2d::Contains(const Polygon2d &polygon) const {
   CHECK_GE(points_.size(), 3);
   if (area_ < polygon.area() - kMathEpsilon) {
     return false;
@@ -180,7 +184,7 @@ bool Polygon2d::IsContain(const Polygon2d &polygon) const {
   const auto &line_segments = polygon.line_segments();
   return std::all_of(line_segments.begin(), line_segments.end(),
                      [&](const LineSegment2d &line_segment) {
-                       return IsContain(line_segment);
+                       return Contains(line_segment);
                      });
 }
 
@@ -341,6 +345,12 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
 
 bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
   CHECK_GE(points_.size(), 3);
+  if ((line_segment.start().x() < min_x_ && line_segment.end().x() < min_x_) ||
+      (line_segment.start().x() > max_x_ && line_segment.end().x() > max_x_) ||
+      (line_segment.start().y() < min_y_ && line_segment.end().y() < min_y_) ||
+      (line_segment.start().y() > max_y_ && line_segment.end().y() > max_y_)) {
+    return false;
+  }
   Vec2d first;
   Vec2d last;
   return GetOverlap(line_segment, &first, &last);
@@ -578,10 +588,10 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
 }
 
 std::string Polygon2d::DebugString() const {
-  return util::StrCat(
-      "polygon2d (  num_points = ", num_points_,
-      "  points = (", util::PrintDebugStringIter(points_), " )  ",
-      is_convex_ ? "convex" : "non-convex", "  area = ", area_, " )");
+  return util::StrCat("polygon2d (  num_points = ", num_points_, "  points = (",
+                      util::PrintDebugStringIter(points_), " )  ",
+                      is_convex_ ? "convex" : "non-convex", "  area = ", area_,
+                      " )");
 }
 
 }  // namespace math

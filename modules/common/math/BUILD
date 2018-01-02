@@ -10,6 +10,7 @@ cc_library(
         ":angle",
         ":box2d",
         ":euler_angles_zxy",
+        ":factorial",
         ":integral",
         ":kalman_filter",
         ":line_segment2d",
@@ -22,7 +23,6 @@ cc_library(
         ":search",
         ":sin_table",
         ":vec2d",
-        ":factorial",
     ],
 )
 
@@ -167,7 +167,6 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/math:matrix_operations",
-        "//modules/common/util:string_util",
         "@eigen//:eigen",
     ],
 )

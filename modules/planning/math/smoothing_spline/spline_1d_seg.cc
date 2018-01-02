@@ -21,30 +21,26 @@
 
 #include "modules/planning/math/smoothing_spline/spline_1d_seg.h"
 
-#include <sstream>
-
 namespace apollo {
 namespace planning {
 
 Spline1dSeg::Spline1dSeg(const uint32_t order) {
-  spline_func_ = PolynomialXd(order);
-  derivative_.DerivedFrom(spline_func_);
-  second_order_derivative_.DerivedFrom(derivative_);
-  third_order_derivative_.DerivedFrom(second_order_derivative_);
+  SetSplineFunc(PolynomialXd(order));
 }
 
 Spline1dSeg::Spline1dSeg(const std::vector<double>& params) {
-  spline_func_ = PolynomialXd(params);
-  derivative_.DerivedFrom(spline_func_);
-  second_order_derivative_.DerivedFrom(derivative_);
-  third_order_derivative_.DerivedFrom(second_order_derivative_);
+  SetSplineFunc(PolynomialXd(params));
 }
 
 void Spline1dSeg::SetParams(const std::vector<double>& params) {
-  spline_func_ = PolynomialXd(params);
-  derivative_.DerivedFrom(spline_func_);
-  second_order_derivative_.DerivedFrom(derivative_);
-  third_order_derivative_.DerivedFrom(second_order_derivative_);
+  SetSplineFunc(PolynomialXd(params));
+}
+
+void Spline1dSeg::SetSplineFunc(const PolynomialXd& spline_func) {
+  spline_func_ = spline_func;
+  derivative_ = PolynomialXd::DerivedFrom(spline_func_);
+  second_order_derivative_ = PolynomialXd::DerivedFrom(derivative_);
+  third_order_derivative_ = PolynomialXd::DerivedFrom(second_order_derivative_);
 }
 
 double Spline1dSeg::operator()(const double x) const { return spline_func_(x); }

@@ -5,10 +5,10 @@ package apollo.prediction;
 import "modules/prediction/proto/fnn_model_base.proto";
 
 message FnnVehicleModel {
-    optional int32 dim_input = 1;
-    optional Vector samples_mean = 2;
-    optional Vector samples_std = 3;
-    optional int32 num_layer = 4;
-    repeated Layer layer = 5;           // num_layer must equal to first layer layer_input_dim
-    optional int32 dim_output = 6;      // dim_ouput must equal to last layer layer_output_dim
+  optional int32 dim_input = 1;
+  optional Vector samples_mean = 2;
+  optional Vector samples_std = 3;
+  optional int32 num_layer = 4;
+  repeated Layer layer = 5;           // num_layer must equal to first layer layer_input_dim
+  optional int32 dim_output = 6;      // dim_ouput must equal to last layer layer_output_dim
 }

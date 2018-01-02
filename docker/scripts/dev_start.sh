@@ -16,12 +16,58 @@
 # limitations under the License.
 ###############################################################################
 
+INCHINA="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171025_1428"
+VERSION_X86_64="dev-x86_64-v2.0.0"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
-if [[ $# == 1 ]];then
-    VERSION=$1
+VERSION_OPT=""
+
+function show_usage()
+{
+cat <<EOF
+Usage: $(basename $0) [options] ...
+OPTIONS:
+    -C  pull docker image from China mirror
+    -h, --help   display this help and exit
+    -image <version>    specify which version of a docker image to pull
+EOF
+exit 0
+}
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+    -C|--docker-cn-mirror)
+        INCHINA="yes"
+        ;;
+    -image)
+        VAR=$1
+        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option -image with $VERSION_OPT, only the last one will take effect.\n "
+        shift
+        VERSION_OPT=$1
+        [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
+        [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
+        ;;
+    dev-*) # keep backward compatibility, should be removed from further version.
+        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $1 with -image, only the last one will take effect.\n "
+        VERSION_OPT=$1
+        echo -e "\033[93mWarning\033[0m: You are using an old style command line option which may be removed from"
+        echo -e "further versoin, please use -image <version> instead.\n"
+        ;;
+    -h|--help)
+        show_usage
+        ;;
+    *)
+        echo -e "\033[93mWarning\033[0m: Unknown option: $1"
+        exit 2
+        ;;
+    esac
+    shift
+done
+
+if [ ! -z "$VERSION_OPT" ]; then
+    VERSION=$VERSION_OPT
 elif [ ${ARCH} == "x86_64" ]; then
     VERSION=${VERSION_X86_64}
 elif [ ${ARCH} == "aarch64" ]; then
@@ -35,6 +81,10 @@ if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/apollo
 fi
 
+if [ "$INCHINA" == "yes" ]; then
+    DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
+fi
+
 IMG=${DOCKER_REPO}:$VERSION
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
@@ -42,17 +92,17 @@ if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
 fi
 
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
-    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
-    read -t 10 -n 1 INCHINA
-    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
-        docker pull "registry.docker-cn.com/${IMG}"
-    else
-        docker pull $IMG
+
+    info "Start pulling docker image $IMG ..."
+    docker pull $IMG
+    if [ $? -ne 0 ];then
+        error "Failed to pull docker image."
+        exit 1
     fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
@@ -69,13 +119,8 @@ function main(){
 
     setup_device
 
-    local devices=""
-    devices="${devices} $(find_device ttyUSB*)"
-    devices="${devices} $(find_device ttyS*)"
-    devices="${devices} $(find_device can*)"
-    devices="${devices} $(find_device ram*)"
-    devices="${devices} $(find_device loop*)"
-    devices="${devices} $(find_device nvidia*)"
+    local devices=" -v /dev:/dev"
+
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
@@ -87,6 +132,8 @@ function main(){
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
+
+    info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
         --privileged \
@@ -97,11 +144,14 @@ function main(){
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
+        -e DOCKER_IMG=$IMG \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $APOLLO_ROOT_DIR:/apollo \
         -v /media:/media \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
+        -v /usr/src:/usr/src \
+        -v /lib/modules:/lib/modules \
         --net host \
         -w /apollo \
         ${devices} \
@@ -112,9 +162,17 @@ function main(){
         $IMG \
         /bin/bash
 
+    if [ $? -ne 0 ];then
+        error "Failed to start docker container \"apollo_dev\" based on image: $IMG"
+        exit 1
+    fi
+
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
+
+    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
+    ok "Enjoy!"
 }
 
 main

@@ -21,10 +21,6 @@
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
@@ -44,8 +40,8 @@ class ClearZone : public TrafficRule {
 
  private:
   bool BuildClearZoneObstacle(const hdmap::PathOverlap& clear_zone_overlap);
-  ReferenceLineInfo* reference_line_info_;
-  Frame* frame_;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
+  Frame* frame_ = nullptr;
 };
 
 }  // namespace planning

@@ -13,4 +13,14 @@ message StopSign {
   repeated Curve stop_line = 2;
 
   repeated Id overlap_id = 3;
+
+  enum StopType {
+    UNKNOWN = 0;
+    ONE_WAY = 1;
+    TWO_WAY = 2;
+    THREE_WAY = 3;
+    FOUR_WAY = 4;
+    ALL_WAY = 5;
+  };
+  optional StopType type = 4;
 }

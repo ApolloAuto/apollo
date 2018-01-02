@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/time",
+        "//modules/common/util:map_util",
         "//modules/common/util:string_util",
         "//third_party/json",
         "@civetweb//:civetweb++",
@@ -29,6 +30,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
+        "//modules/perception/traffic_light/util:perception_traffic_light_util",
         "@civetweb//:civetweb++",
         "@opencv2//:highgui",
     ],

@@ -31,27 +31,21 @@ TEST(StringUtilTest, EndWith) {
   EXPECT_FALSE(EndWith("abc.def", "de"));
 }
 
-TEST(StringUtilTest, StrCat) {
-  EXPECT_EQ("string32", StrCat("string", "32"));  // string, string
-  EXPECT_EQ("string323.2", StrCat("string", 32, 3.2f));  // string, int, float
-  EXPECT_EQ("3.2 1", StrCat(3.2, ' ', true));  // double, char, bool
-}
-
 TEST(StringUtilTest, IterPrinter) {
   // Container.
   std::vector<std::string> vec;
-  EXPECT_EQ("", StrCat(PrintIter(vec)));  // Empty string
+  EXPECT_EQ("", PrintIter(vec));  // Empty string
   vec.assign({"0", "1", "2"});
-  EXPECT_EQ("0 1 2", StrCat(PrintIter(vec)));
-  EXPECT_EQ("0|1|2", StrCat(PrintIter(vec, "|")));
-  EXPECT_EQ("0, 1, 2", StrCat(PrintIter(vec.begin(), vec.end(), ", ")));
-  EXPECT_EQ("1", StrCat(PrintIter(vec.begin() + 1, vec.end() - 1, " ")));
+  EXPECT_EQ("0 1 2", PrintIter(vec));
+  EXPECT_EQ("0|1|2", PrintIter(vec, "|"));
+  EXPECT_EQ("0, 1, 2", PrintIter(vec.begin(), vec.end(), ", "));
+  EXPECT_EQ("1", PrintIter(vec.begin() + 1, vec.end() - 1, " "));
 
   // Array.
   int data[] = {0, 1, 2};
-  EXPECT_EQ("0 1 2", StrCat(PrintIter(data)));
-  EXPECT_EQ("0, 1", StrCat(PrintIter(data, data + 2, ", ")));
-  EXPECT_EQ("1", StrCat(PrintIter(data + 1, data + 2, ", ")));
+  EXPECT_EQ("0 1 2", PrintIter(data));
+  EXPECT_EQ("0, 1", PrintIter(data, data + 2, ", "));
+  EXPECT_EQ("1", PrintIter(data + 1, data + 2, ", "));
 }
 
 }  // namespace util

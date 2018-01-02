@@ -23,8 +23,10 @@
 #ifndef MODULES_COMMON_MATH_BOX2D_H_
 #define MODULES_COMMON_MATH_BOX2D_H_
 
+#include <limits>
 #include <string>
 #include <vector>
+
 #include "modules/common/math/aabox2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -44,12 +46,13 @@ namespace math {
  * This class is referential-agnostic, although our convention on the use of
  * the word "heading" in this project (permanently set to be 0 at East)
  * forces us to assume that the X/Y frame here is East/North.
- * For disambiguation, we call the axis of the rectangle parellel to the
+ * For disambiguation, we call the axis of the rectangle parallel to the
  * heading direction the "heading-axis". The size of the heading-axis is
- * called "length", and the size of the axis perpenticular to it "width".
+ * called "length", and the size of the axis perpendicular to it "width".
  */
 class Box2d {
  public:
+  Box2d() = default;
   /**
    * @brief Constructor which takes the center, heading, length and width.
    * @param center The center of the rectangular bounding box.
@@ -133,8 +136,8 @@ class Box2d {
   double heading() const { return heading_; }
 
   /**
-   * @brief Getter of the co-sine of the heading
-   * @return The co-sine of the heading
+   * @brief Getter of the cosine of the heading
+   * @return The cosine of the heading
    */
   double cos_heading() const { return cos_heading_; }
 
@@ -172,7 +175,7 @@ class Box2d {
   /**
    * @brief Tests points for membership in the boundary of the box
    * @param point A point that we wish to test for membership in the boundary
-   * @return Truee iff the point is a boundary point of the box
+   * @return True iff the point is a boundary point of the box
    */
   bool IsPointOnBoundary(const Vec2d &point) const;
 
@@ -218,9 +221,8 @@ class Box2d {
   AABox2d GetAABox() const;
 
   /**
-   * @brief ...
-   * @param ...
-   * @return ...
+   * @brief Rotate from center.
+   * @param rotate_angle Angle to rotate.
    */
   void RotateFromCenter(const double rotate_angle);
 
@@ -236,6 +238,13 @@ class Box2d {
    */
   std::string DebugString() const;
 
+  void InitCorners();
+
+  double max_x() const { return max_x_; }
+  double min_x() const { return min_x_; }
+  double max_y() const { return max_y_; }
+  double min_y() const { return min_y_; }
+
  private:
   Vec2d center_;
   double length_ = 0.0;
@@ -245,6 +254,13 @@ class Box2d {
   double heading_ = 0.0;
   double cos_heading_ = 1.0;
   double sin_heading_ = 0.0;
+
+  std::vector<Vec2d> corners_;
+
+  double max_x_ = std::numeric_limits<double>::min();
+  double min_x_ = std::numeric_limits<double>::max();
+  double max_y_ = std::numeric_limits<double>::min();
+  double min_y_ = std::numeric_limits<double>::max();
 };
 
 }  // namespace math

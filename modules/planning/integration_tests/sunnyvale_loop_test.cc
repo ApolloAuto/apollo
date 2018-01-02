@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/configs/config_gflags.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
@@ -37,6 +38,7 @@ class SunnyvaleLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
+    FLAGS_test_base_map_filename = "base_map_test.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
   }
@@ -150,6 +152,23 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_enable_traffic_light = false;
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test right turn, but stop before trafic light
+ * A right turn test case
+ * A traffic light test case
+ */
+TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
+  std::string seq_num = "8";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
@@ -191,6 +210,46 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test qp path failure
+ */
+TEST_F(SunnyvaleLoopTest, qp_path_failure) {
+  std::string seq_num = "12";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_enable_prediction = false;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test change lane faillback
+ * ADC position passed the change lane zone, failed to change to the new lane
+ * and reroute is triggered but new rerouting result is not received yet.
+ * Expect to keep going on the current lane.
+ */
+TEST_F(SunnyvaleLoopTest, change_lane_failback) {
+  //// temporarly disable this test case, because a lane in routing cannot be
+  //// found on test map.
+  auto target_lane = hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(
+      hdmap::MakeMapId("2020_1_-2"));
+  if (target_lane == nullptr) {
+    AERROR << "Could not find lane 2020_1_-2 on map " << hdmap::BaseMapFile();
+    return;
+  }
+  std::string seq_num = "13";
+  FLAGS_reckless_change_lane = true;
+  FLAGS_enable_prediction = true;
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }

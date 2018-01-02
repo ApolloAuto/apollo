@@ -1,7 +1,0 @@
-can_card_parameter {
-  brand: FAKE_CAN
-  type: PCI_CARD
-  channel_id: CHANNEL_ID_ZERO
-}
-
-enable_debug_mode: false

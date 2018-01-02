@@ -25,4 +25,37 @@ source "${DIR}/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run dreamview "$@" --enable_sim_control=true
+
+function start() {
+    echo "Start roscore..."
+    ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
+    nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
+    if [ "$HOSTNAME" == "in_release_docker" ]; then
+        supervisord -c /apollo/modules/tools/supervisord/release.conf >& /tmp/supervisord.start.log
+        echo "Started supervisord with release conf"
+    else
+        supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
+        echo "Started supervisord with dev conf"
+    fi
+    supervisorctl start monitor > /dev/null
+    supervisorctl start sim_control > /dev/null
+    echo "Dreamview is running at http://localhost:8888"
+}
+
+function stop() {
+    supervisorctl stop sim_control > /dev/null 2>&1 &
+    supervisorctl stop monitor > /dev/null 2>&1 &
+    pkill -f roscore
+}
+
+case $1 in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    start
+    ;;
+esac

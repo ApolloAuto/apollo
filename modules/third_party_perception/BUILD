@@ -24,7 +24,6 @@ cc_library(
 cc_binary(
     name = "third_party_perception",
     srcs = ["main.cc"],
-    linkstatic = 0,
     deps = [
         ":third_party_perception_lib",
         "//external:gflags",

@@ -31,12 +31,12 @@ The names of the generated Pose files correspond to their frame numbers as the P
 We use Bazel to build the offline perception visualizer.
 ```
 cd /apollo
-bazel build -c opt //modules/perception/tool/offline_visualizer_tool:offline_visualizer_tool
+bazel build -c opt //modules/perception/tool/offline_visualizer_tool:offline_lidar_visualizer_tool
 ```
 The option `-c opt` is used for building the program with optimized performance, which is important for the offline simulation and visualization of the perception module in real time.
 If you'd like to run the perception module with GPU, please use the command below:
 ```
-bazel build -c opt --cxxopt=-DUSE_CAFFE_GPU //modules/perception/tool/offline_visualizer_tool:offline_visualizer_tool
+bazel build -c opt --cxxopt=-DUSE_CAFFE_GPU //modules/perception/tool/offline_visualizer_tool:offline_lidar_visualizer_tool
 ```
 
 ### 3. Run The Visualizer With Offline Perception Simulation

@@ -73,7 +73,7 @@ struct TrackerOptions {
 
   std::shared_ptr<Eigen::Matrix4d> velodyne_trans;
   HdmapStructPtr hdmap = nullptr;
-  HDMapInput* hdmap_input = NULL;
+  HDMapInput *hdmap_input = NULL;
 };
 
 class BaseTracker {

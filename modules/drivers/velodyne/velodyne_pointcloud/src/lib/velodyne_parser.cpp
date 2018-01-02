@@ -132,6 +132,7 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
 void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
                                     const LaserCorrection &corrections,
                                     const uint16_t &rotation, VPoint &point) {
+  ROS_ASSERT_MSG(rotation < 36000, "rotation must between 0 and 35999");
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;

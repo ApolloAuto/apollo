@@ -1,0 +1,94 @@
+---
+task:
+  task_purpose: debug
+  task_meta_args:
+    if_record: true
+    meta_dst: "."
+    meta_format: ini
+  task_data_args:
+    rosbag:
+      if_record: true
+      record_method: "rosbag record"
+      data_property:
+        src: UNKNOWN
+        dst: rosbag
+      action_args:
+        rosbag_split: true
+        rosbag_split_type: "duration"
+        rosbag_split_size: 256
+        rosbag_split_duration: '60'
+        rosbag_compress_type: 'NoneCompress'
+        rosbag_buffer_size: 4000
+        rosbag_chunk_size: 10240
+        rosbag_topic_group:
+        - group_id: '1'
+          group_name: 'default'
+          group_topic_match_re: ''
+          group_topic_exclude_re: '(.*(rosout|image_long|image_short|image_narrow|image_wide|PointCloud2)$)'
+    syslog:
+      if_record: true
+      record_method: rsync
+      data_property:
+        src: "/var/log"
+        dst: "syslog/log/"
+      action_args:
+        trigger_interval: 900
+        sync_bwlimit: 102400
+        with_remove: true
+    roslog:
+      if_record: true
+      record_method: rsync
+      data_property:
+        src: "/home/apollo/.ros/log"
+        dst: "roslog/log/"
+      action_args:
+        trigger_interval: 900
+        sync_bwlimit: 102400
+        with_remove: true
+    otherlog:
+      if_record: true
+      record_method: rsync
+      data_property:
+        src: "/apollo/data/log"
+        dst: "otherlog/log/"
+      action_args:
+        trigger_interval: 900
+        sync_bwlimit: 102400
+        with_remove: true
+    carprm:
+      if_record: true
+      record_method: rsync
+      data_property:
+        src: "/home/apollo/ros/share/params/"
+        dst: "carprm/"
+      action_args:
+        trigger_interval: 900
+        sync_bwlimit: 102400
+        with_remove: false
+    carversion:
+      if_record: true
+      record_method: rsync
+      data_property:
+        src: "/home/apollo/version/"
+        dst: "carversion/"
+      action_args:
+        trigger_interval: 900
+        sync_bwlimit: 102400
+        with_remove: false
+    carcorefile:
+      if_record: true
+      record_method: rsync
+      data_property:
+        src: "/corefiles"
+        dst: "carcorefile/"
+      action_args:
+        trigger_interval: 900
+        sync_bwlimit: 102400
+        with_remove: true
+    userdata:
+      if_record: false
+      record_method: manual
+      data_property:
+        src: ''
+        dst: userdata
+      action_args: {}

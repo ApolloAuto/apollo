@@ -25,6 +25,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -33,11 +34,13 @@
 namespace apollo {
 namespace planning {
 
-using common::VehicleConfigHelper;
+using apollo::common::util::FindOrDie;
+using apollo::common::VehicleConfigHelper;
 
 namespace {
-const double kStBoundaryDeltaS = 0.2;
-const double kStBoundaryDeltaT = 0.05;
+const double kStBoundaryDeltaS = 0.2;        // meters
+const double kStBoundarySparseDeltaS = 1.0;  // meters
+const double kStBoundaryDeltaT = 0.05;       // seconds
 }
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
@@ -61,37 +64,39 @@ PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
   id_ = obstacle_->Id();
 }
 
-bool PathObstacle::Init(const ReferenceLine& reference_line,
-                        double adc_start_s) {
-  if (!reference_line.GetSLBoundary(obstacle_->PerceptionBoundingBox(),
-                                    &perception_sl_boundary_)) {
-    AERROR << "Failed to get sl boundary for obstacle: " << id_;
-    return false;
-  }
-  BuildStBoundary(reference_line, adc_start_s);
-  return true;
+void PathObstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
+  perception_sl_boundary_ = sl_boundary;
 }
 
 void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
                                    const double adc_start_s) {
+  const auto& adc_param =
+      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const double adc_width = adc_param.width();
   if (obstacle_->IsStatic() ||
       obstacle_->Trajectory().trajectory_point().empty()) {
     std::vector<std::pair<STPoint, STPoint>> point_pairs;
-    if (perception_sl_boundary_.end_s() - perception_sl_boundary_.start_s() <
-        kStBoundaryDeltaS) {
+    double start_s = perception_sl_boundary_.start_s();
+    double end_s = perception_sl_boundary_.end_s();
+    if (end_s - start_s < kStBoundaryDeltaS) {
+      end_s = start_s + kStBoundaryDeltaS;
+    }
+    if (!reference_line.IsBlockRoad(obstacle_->PerceptionBoundingBox(),
+                                    adc_width)) {
       return;
     }
-    point_pairs.emplace_back(
-        STPoint(perception_sl_boundary_.start_s() - adc_start_s, 0.0),
-        STPoint(perception_sl_boundary_.end_s() - adc_start_s, 0.0));
-    point_pairs.emplace_back(
-        STPoint(perception_sl_boundary_.start_s() - adc_start_s,
-                FLAGS_st_max_t),
-        STPoint(perception_sl_boundary_.end_s() - adc_start_s, FLAGS_st_max_t));
+    point_pairs.emplace_back(STPoint(start_s - adc_start_s, 0.0),
+                             STPoint(end_s - adc_start_s, 0.0));
+    point_pairs.emplace_back(STPoint(start_s - adc_start_s, FLAGS_st_max_t),
+                             STPoint(end_s - adc_start_s, FLAGS_st_max_t));
     st_boundary_ = StBoundary(point_pairs);
   } else {
     if (BuildTrajectoryStBoundary(reference_line, adc_start_s, &st_boundary_)) {
       ADEBUG << "Found st_boundary for obstacle " << id_;
+      ADEBUG << "st_boundary: min_t = " << st_boundary_.min_t()
+             << ", max_t = " << st_boundary_.max_t()
+             << ", min_s = " << st_boundary_.min_s()
+             << ", max_s = " << st_boundary_.max_s();
     } else {
       ADEBUG << "No st_boundary for obstacle " << id_;
     }
@@ -125,31 +130,77 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
 
+  SLBoundary last_sl_boundary;
+  int last_index = 0;
+
   for (int i = 1; i < trajectory_points.size(); ++i) {
+    ADEBUG << "last_sl_boundary: " << last_sl_boundary.ShortDebugString();
+
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
+
     double total_length =
         object_length + common::util::DistanceXY(first_point, second_point);
+
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
     common::math::Box2d object_moving_box(center, first_point.theta(),
                                           total_length, object_width);
     SLBoundary object_boundary;
     // NOTICE: this method will have errors when the reference line is not
-    // straight.
-    // Need double loop to cover all corner cases.
-    if (!reference_line.GetSLBoundary(object_moving_box, &object_boundary)) {
+    // straight. Need double loop to cover all corner cases.
+    const double distance_xy =
+        common::util::DistanceXY(trajectory_points[last_index].path_point(),
+                                 trajectory_points[i].path_point());
+    if (last_sl_boundary.start_l() > distance_xy ||
+        last_sl_boundary.end_l() < -distance_xy) {
+      continue;
+    }
+
+    const double mid_s =
+        (last_sl_boundary.start_s() + last_sl_boundary.end_s()) / 2.0;
+    const double start_s = std::fmax(0.0, mid_s - 2.0 * distance_xy);
+    const double end_s = (i == 1) ? reference_line.Length()
+                                  : std::fmin(reference_line.Length(),
+                                              mid_s + 2.0 * distance_xy);
+
+    if (!reference_line.GetApproximateSLBoundary(object_moving_box, start_s,
+                                                 end_s, &object_boundary)) {
       AERROR << "failed to calculate boundary";
       return false;
     }
-    const double object_s_diff =
-        object_boundary.end_s() - object_boundary.start_s();
+
+    // update history record
+    last_sl_boundary = object_boundary;
+    last_index = i;
+
+    // skip if object is entirely on one side of reference line.
+    constexpr double kSkipLDistanceFactor = 0.4;
+    const double skip_l_distance =
+        (object_boundary.end_s() - object_boundary.start_s()) *
+            kSkipLDistanceFactor +
+        adc_width / 2.0;
+
+    if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
+            skip_l_distance ||
+        std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
+            -skip_l_distance) {
+      continue;
+    }
+
     if (object_boundary.end_s() < 0) {  // skip if behind reference line
       continue;
     }
-    if (object_s_diff < kStBoundaryDeltaS) {
+    constexpr double kSparseMappingS = 20.0;
+    const double st_boundary_delta_s =
+        (std::fabs(object_boundary.start_s() - adc_start_s) > kSparseMappingS)
+            ? kStBoundarySparseDeltaS
+            : kStBoundaryDeltaS;
+    const double object_s_diff =
+        object_boundary.end_s() - object_boundary.start_s();
+    if (object_s_diff < st_boundary_delta_s) {
       continue;
     }
     const double delta_t =
@@ -159,23 +210,23 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     double high_s =
         std::min(object_boundary.end_s() + adc_half_length, FLAGS_st_max_s);
     bool has_high = false;
-    while (low_s + kStBoundaryDeltaS < high_s && !(has_low && has_high)) {
+    while (low_s + st_boundary_delta_s < high_s && !(has_low && has_high)) {
       if (!has_low) {
         auto low_ref = reference_line.GetReferencePoint(low_s);
         has_low = object_moving_box.HasOverlap(
             {low_ref, low_ref.heading(), adc_length, adc_width});
-        low_s += kStBoundaryDeltaS;
+        low_s += st_boundary_delta_s;
       }
       if (!has_high) {
         auto high_ref = reference_line.GetReferencePoint(high_s);
         has_high = object_moving_box.HasOverlap(
             {high_ref, high_ref.heading(), adc_length, adc_width});
-        high_s -= kStBoundaryDeltaS;
+        high_s -= st_boundary_delta_s;
       }
     }
     if (has_low && has_high) {
-      low_s -= kStBoundaryDeltaS;
-      high_s += kStBoundaryDeltaS;
+      low_s -= st_boundary_delta_s;
+      high_s += st_boundary_delta_s;
       double low_t =
           (first_traj_point.relative_time() +
            std::fabs((low_s - object_boundary.start_s()) / object_s_diff) *
@@ -210,11 +261,21 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     if (polygon_points.size() > 2) {
       *st_boundary = StBoundary(polygon_points);
     }
+  } else {
+    return false;
   }
   return true;
 }
 
 const StBoundary& PathObstacle::st_boundary() const { return st_boundary_; }
+
+const std::vector<std::string>& PathObstacle::decider_tags() const {
+  return decider_tags_;
+}
+
+const std::vector<ObjectDecisionType>& PathObstacle::decisions() const {
+  return decisions_;
+}
 
 bool PathObstacle::IsLateralDecision(const ObjectDecisionType& decision) {
   return decision.has_ignore() || decision.has_nudge();
@@ -233,19 +294,13 @@ ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  auto lhs_iter =
-      s_longitudinal_decision_safety_sorter_.find(lhs.object_tag_case());
-  DCHECK(lhs_iter != s_longitudinal_decision_safety_sorter_.end())
-      << "decision : " << lhs.ShortDebugString()
-      << " not found in safety sorter";
-  auto rhs_iter =
-      s_longitudinal_decision_safety_sorter_.find(rhs.object_tag_case());
-  DCHECK(rhs_iter != s_longitudinal_decision_safety_sorter_.end())
-      << "decision : " << rhs.ShortDebugString()
-      << " not found in safety sorter";
-  if (lhs_iter->second < rhs_iter->second) {
+  const auto lhs_val =
+      FindOrDie(s_longitudinal_decision_safety_sorter_, lhs.object_tag_case());
+  const auto rhs_val =
+      FindOrDie(s_longitudinal_decision_safety_sorter_, rhs.object_tag_case());
+  if (lhs_val < rhs_val) {
     return rhs;
-  } else if (lhs_iter->second > rhs_iter->second) {
+  } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
     if (lhs.has_ignore()) {
@@ -294,17 +349,13 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
-  auto lhs_iter = s_lateral_decision_safety_sorter_.find(lhs.object_tag_case());
-  DCHECK(lhs_iter != s_lateral_decision_safety_sorter_.end())
-      << "decision : " << lhs.ShortDebugString()
-      << " not found in safety sorter";
-  auto rhs_iter = s_lateral_decision_safety_sorter_.find(rhs.object_tag_case());
-  DCHECK(rhs_iter != s_lateral_decision_safety_sorter_.end())
-      << "decision : " << rhs.ShortDebugString()
-      << " not found in safety sorter";
-  if (lhs_iter->second < rhs_iter->second) {
+  const auto lhs_val =
+      FindOrDie(s_lateral_decision_safety_sorter_, lhs.object_tag_case());
+  const auto rhs_val =
+      FindOrDie(s_lateral_decision_safety_sorter_, rhs.object_tag_case());
+  if (lhs_val < rhs_val) {
     return rhs;
-  } else if (lhs_iter->second > rhs_iter->second) {
+  } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
     if (lhs.has_ignore()) {
@@ -321,6 +372,7 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   DCHECK(false) << "Does not have rule to merge decision: "
                 << lhs.ShortDebugString()
                 << " and decision: " << rhs.ShortDebugString();
+  return lhs;
 }
 
 bool PathObstacle::HasLateralDecision() const {
@@ -390,7 +442,7 @@ const std::string PathObstacle::DebugString() const {
 
 void PathObstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
 
-const SLBoundary& PathObstacle::perception_sl_boundary() const {
+const SLBoundary& PathObstacle::PerceptionSLBoundary() const {
   return perception_sl_boundary_;
 }
 

@@ -24,12 +24,15 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/common/define.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::math::Vec2d;
+using apollo::common::math::Polygon2d;
 using apollo::hdmap::LineSegment;
 using apollo::hdmap::BoundaryEdge;
 using apollo::hdmap::RoadROIBoundaryPtr;
@@ -38,13 +41,13 @@ using apollo::hdmap::JunctionBoundaryPtr;
 using apollo::hdmap::BoundaryEdge_Type_LEFT_BOUNDARY;
 using apollo::hdmap::BoundaryEdge_Type_RIGHT_BOUNDARY;
 using apollo::hdmap::HDMapUtil;
-using apollo::common::math::Vec2d;
-using apollo::common::math::Polygon2d;
 using pcl_util::PointD;
 using pcl_util::PointDCloud;
 using pcl_util::PointDCloudPtr;
 using std::string;
 using std::vector;
+
+constexpr double kRadianToDegree = 180.0 / M_PI;
 
 // HDMapInput
 HDMapInput::HDMapInput() {}
@@ -53,7 +56,8 @@ bool HDMapInput::Init() {
   return HDMapUtil::ReloadMaps();
 }
 
-bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
+bool HDMapInput::GetROI(const PointD& pointd, const double& map_radius,
+                        HdmapStructPtr* mapptr) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
     return false;
@@ -69,16 +73,16 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::vector<RoadROIBoundaryPtr> boundary_vec;
   std::vector<JunctionBoundaryPtr> junctions_vec;
 
-  int status = hdmap->GetRoadBoundaries(point, FLAGS_map_radius, &boundary_vec,
+  int status = hdmap->GetRoadBoundaries(point, map_radius, &boundary_vec,
                                         &junctions_vec);
-  if (status != SUCC) {
+  if (status != 0) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();
     return false;
   }
   ADEBUG << "Get road boundaries : num_boundary = " << boundary_vec.size()
          << " num_junction = " << junctions_vec.size();
 
-  if (MergeBoundaryJunction(boundary_vec, junctions_vec, mapptr) != SUCC) {
+  if (!MergeBoundaryJunction(boundary_vec, junctions_vec, mapptr).ok()) {
     AERROR << "merge boundary and junction to hdmap struct failed.";
     return false;
   }
@@ -101,7 +105,7 @@ bool HDMapInput::GetNearestLaneDirection(const pcl_util::PointD& pointd,
 
   int status =
       hdmap->GetNearestLane(point, &nearest_lane, &nearest_s, &nearest_l);
-  if (status != SUCC) {
+  if (status != 0) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
     return false;
   }
@@ -110,12 +114,13 @@ bool HDMapInput::GetNearestLaneDirection(const pcl_util::PointD& pointd,
   return true;
 }
 
-int HDMapInput::MergeBoundaryJunction(
+Status HDMapInput::MergeBoundaryJunction(
     const std::vector<RoadROIBoundaryPtr>& boundaries,
     const std::vector<JunctionBoundaryPtr>& junctions, HdmapStructPtr* mapptr) {
   if (*mapptr == nullptr) {
     AERROR << "the HdmapStructPtr mapptr is null";
-    return FAIL;
+    return Status(ErrorCode::PERCEPTION_ERROR,
+                  "HdmapStructPtr mapptr is null.");
   }
   (*mapptr)->road_boundary.resize(boundaries.size());
   (*mapptr)->junction.resize(junctions.size());
@@ -155,7 +160,7 @@ int HDMapInput::MergeBoundaryJunction(
     }
   }
 
-  return SUCC;
+  return Status::OK();
 }
 
 void HDMapInput::DownSampleBoundary(const hdmap::LineSegment& line,

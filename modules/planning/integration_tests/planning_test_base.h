@@ -42,17 +42,19 @@ using common::adapter::AdapterManager;
     EXPECT_TRUE(run_planning_success);                             \
   }
 
-  #define TMAIN \
-  int main(int argc, char **argv) {  \
-      ::testing::InitGoogleTest(&argc, argv); \
-      ::google::ParseCommandLineFlags(&argc, &argv, true); \
-      return RUN_ALL_TESTS(); \
+#define TMAIN                                            \
+  int main(int argc, char** argv) {                      \
+    ::testing::InitGoogleTest(&argc, argv);              \
+    ::google::ParseCommandLineFlags(&argc, &argv, true); \
+    return RUN_ALL_TESTS();                              \
   }
+
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
 DECLARE_string(test_data_dir);
 DECLARE_string(test_prediction_file);
+DECLARE_string(test_traffic_light_file);
 DECLARE_string(test_previous_planning_file);
 
 class PlanningTestBase : public ::testing::Test {

@@ -48,13 +48,12 @@ class BaseMatcher {
   // @params[OUT] unassigned_tracks: unmatched tracks
   // @params[OUT] unassigned_objects: unmatched objects
   // @return nothing
-  virtual void Match(
-    std::vector<TrackedObjectPtr>* objects,
-    const std::vector<ObjectTrackPtr>& tracks,
-    const std::vector<Eigen::VectorXf>& tracks_predict,
-    std::vector<TrackObjectPair>* assignments,
-    std::vector<int>* unassigned_tracks,
-    std::vector<int>* unassigned_objects) = 0;
+  virtual void Match(std::vector<TrackedObjectPtr>* objects,
+                     const std::vector<ObjectTrackPtr>& tracks,
+                     const std::vector<Eigen::VectorXf>& tracks_predict,
+                     std::vector<TrackObjectPair>* assignments,
+                     std::vector<int>* unassigned_tracks,
+                     std::vector<int>* unassigned_objects) = 0;
 
   // @brief get name of matcher
   // @return name of matcher

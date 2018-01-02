@@ -117,8 +117,8 @@ Eigen::Vector3d Camera::PointOnScreen(Eigen::Vector3d point) {
       proj_mat_(0, 2), proj_mat_(1, 2), proj_mat_(2, 2), proj_mat_(3, 2),
       proj_mat_(0, 3), proj_mat_(1, 3), proj_mat_(2, 3), proj_mat_(3, 3)};
   // here the view_mat should be view_mode_mat acutally
-  gluProject(point(0), point(1), point(2), view_mat,
-             proj_mat, viewport, &x, &y, &z);
+  gluProject(point(0), point(1), point(2), view_mat, proj_mat, viewport, &x, &y,
+             &z);
 
   return Eigen::Vector3d(x, y, z);
 }

@@ -42,7 +42,9 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:st_boundary_config_proto",
         "//modules/planning/reference_line",
     ],
 )

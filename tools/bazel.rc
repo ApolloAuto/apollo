@@ -55,6 +55,9 @@ build --spawn_strategy=standalone
 # Specify protobuf cc toolchain
 build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
+# build with profiling
+build:cpu_prof --linkopt=-lprofiler
+
 # Enable C++14
 # build --cxxopt="-std=c++14"
 # Enable colorful output of GCC

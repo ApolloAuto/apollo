@@ -26,10 +26,9 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
+#include "modules/perception/onboard/dag_streaming.h"
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
-
 /**
  * @namespace apollo::perception
  * @brief apollo::perception
@@ -45,10 +44,8 @@ class Perception : public common::ApolloApp {
   void Stop() override;
 
  private:
-  // Upon receiving point cloud data
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
-
-  std::unique_ptr<LidarProcess> lidar_process_;
+  DAGStreaming dag_streaming_;
+  void RegistAllOnboardClass();
 };
 
 }  // namespace perception

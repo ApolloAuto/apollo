@@ -22,9 +22,13 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -36,13 +40,16 @@ using apollo::common::TrajectoryPoint;
 
 TrajectoryCost::TrajectoryCost(
     const DpPolyPathConfig &config, const ReferenceLine &reference_line,
+    const bool is_change_lane_path,
     const std::vector<const PathObstacle *> &obstacles,
     const common::VehicleParam &vehicle_param,
-    const SpeedData &heuristic_speed_data)
+    const SpeedData &heuristic_speed_data, const common::SLPoint &init_sl_point)
     : config_(config),
       reference_line_(&reference_line),
+      is_change_lane_path_(is_change_lane_path),
       vehicle_param_(vehicle_param),
-      heuristic_speed_data_(heuristic_speed_data) {
+      heuristic_speed_data_(heuristic_speed_data),
+      init_sl_point_(init_sl_point) {
   const double total_time =
       std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
 
@@ -53,103 +60,269 @@ TrajectoryCost::TrajectoryCost(
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
     }
-    const auto ptr_obstacle = ptr_path_obstacle->obstacle();
-    if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
-      // Virtual obsatcle
+    auto sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
+    const auto &vehicle_param =
+        common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+
+    const double adc_left_l =
+        init_sl_point_.l() + vehicle_param.left_edge_to_center();
+    const double adc_right_l =
+        init_sl_point_.l() - vehicle_param.right_edge_to_center();
+
+    if (adc_left_l + FLAGS_lateral_ignore_buffer < sl_boundary.start_l() ||
+        adc_right_l - FLAGS_lateral_ignore_buffer > sl_boundary.end_l()) {
       continue;
     }
-    std::vector<Box2d> box_by_time;
-    for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
-      TrajectoryPoint trajectory_point =
-          ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
-      Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-      box_by_time.push_back(obstacle_box);
+
+    const auto ptr_obstacle = ptr_path_obstacle->obstacle();
+    if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
+      // Virtual obstacle
+      continue;
+    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
+      double left_width = 0.0;
+      double right_width = 0.0;
+      reference_line_->GetLaneWidth(sl_boundary.start_s(), &left_width,
+                                    &right_width);
+
+      const double adc_width = vehicle_param.width();
+
+      double left_driving_width = left_width - sl_boundary.end_l() -
+                                  FLAGS_static_decision_nudge_l_buffer;
+      double right_driving_width = right_width + sl_boundary.start_l() -
+                                   FLAGS_static_decision_nudge_l_buffer;
+
+      if (left_driving_width < adc_width && right_driving_width < adc_width) {
+        // lane blocking obstacle
+        continue;
+      }
+
+      if (sl_boundary.start_l() <= 0.0 && sl_boundary.end_l() >= 0.0) {
+        // if obstacle stays at the center of the lane, do not pass
+        continue;
+      }
+
+      static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
+    } else {
+      std::vector<Box2d> box_by_time;
+      for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
+        TrajectoryPoint trajectory_point =
+            ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
+
+        Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
+        constexpr double kBuff = 0.5;
+        Box2d expanded_obstacle_box =
+            Box2d(obstacle_box.center(), obstacle_box.heading(),
+                  obstacle_box.length() + kBuff, obstacle_box.width() + kBuff);
+        box_by_time.push_back(expanded_obstacle_box);
+      }
+      dynamic_obstacle_boxes_.push_back(std::move(box_by_time));
     }
-    obstacle_boxes_.push_back(box_by_time);
   }
 }
 
-double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
-                                 const double start_s,
-                                 const double end_s) const {
-  double total_cost = 0.0;
-  // Path_cost
-  double path_s = 0.0;
-  while (path_s < (end_s - start_s)) {
-    const double l = std::fabs(curve.Evaluate(0, path_s));
-    total_cost += l;
+ComparableCost TrajectoryCost::CalculatePathCost(
+    const QuinticPolynomialCurve1d &curve, const double start_s,
+    const double end_s, const uint32_t curr_level,
+    const uint32_t total_level) const {
+  ComparableCost cost;
+  double path_cost = 0.0;
+  for (double path_s = 0.0; path_s < (end_s - start_s);
+       path_s += config_.path_resolution()) {
+    const double l = curve.Evaluate(0, path_s);
+
+    std::function<double(const double)> quasi_softmax = [this](const double x) {
+      const double l0 = this->config_.path_l_cost_param_l0();
+      const double b = this->config_.path_l_cost_param_b();
+      const double k = this->config_.path_l_cost_param_k();
+      return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
+    };
+
+    path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
+
+    double left_width = 0.0;
+    double right_width = 0.0;
+    reference_line_->GetLaneWidth(path_s, &left_width, &right_width);
+
+    const auto &vehicle_config =
+        common::VehicleConfigHelper::instance()->GetConfig();
+    const double width = vehicle_config.vehicle_param().width();
+
+    constexpr double kBuff = 0.2;
+    if (!is_change_lane_path_ && (l + width / 2.0 + kBuff > left_width ||
+                                  l - width / 2.0 - kBuff < -right_width)) {
+      cost.out_of_boundary = true;
+    }
 
     const double dl = std::fabs(curve.Evaluate(1, path_s));
-    total_cost += dl;
+    path_cost += dl * dl * config_.path_dl_cost();
 
-    path_s += config_.path_resolution();
+    const double ddl = std::fabs(curve.Evaluate(2, path_s));
+    path_cost += ddl * ddl * config_.path_ddl_cost();
   }
+  path_cost *= config_.path_resolution();
 
-  // Obstacle cost
-  uint32_t start_index = 0;
-  bool is_found_start_index = false;
-  uint32_t end_index = 0;
-  uint32_t index = 0;
+  if (curr_level == total_level) {
+    const double end_l = curve.Evaluate(0, end_s - start_s);
+    path_cost +=
+        std::sqrt(end_l - init_sl_point_.l() / 2.0) * config_.path_end_l_cost();
+  }
+  cost.smoothness_cost = path_cost;
+  return cost;
+}
+
+ComparableCost TrajectoryCost::CalculateStaticObstacleCost(
+    const QuinticPolynomialCurve1d &curve, const double start_s,
+    const double end_s) const {
+  ComparableCost obstacle_cost;
+  for (double curr_s = start_s; curr_s <= end_s;
+       curr_s += config_.path_resolution()) {
+    const double curr_l = curve.Evaluate(0, curr_s - start_s);
+    for (const auto &obs_sl_boundary : static_obstacle_sl_boundaries_) {
+      obstacle_cost += GetCostFromObsSL(curr_s, curr_l, obs_sl_boundary);
+    }
+  }
+  obstacle_cost.safety_cost *= config_.path_resolution();
+  return obstacle_cost;
+}
+
+ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
+    const QuinticPolynomialCurve1d &curve, const double start_s,
+    const double end_s) const {
+  ComparableCost obstacle_cost;
   double time_stamp = 0.0;
-  while (end_index != 0) {
+  for (size_t index = 0; index < num_of_time_stamps_;
+       ++index, time_stamp += config_.eval_time_interval()) {
     common::SpeedPoint speed_point;
     heuristic_speed_data_.EvaluateByTime(time_stamp, &speed_point);
-    if (speed_point.s() >= start_s && !is_found_start_index) {
-      start_index = index;
-      is_found_start_index = true;
+    if (speed_point.s() < start_s - init_sl_point_.s()) {
+      continue;
     }
-    if (speed_point.s() > end_s) {
-      end_index = index;
+    if (speed_point.s() > end_s - init_sl_point_.s()) {
+      break;
     }
-    time_stamp += config_.eval_time_interval();
-    ++index;
-  }
 
-  for (; start_index < end_index; ++start_index) {
-    common::SpeedPoint speed_point;
-    heuristic_speed_data_.EvaluateByTime(
-        start_index * config_.eval_time_interval(), &speed_point);
-    const double s = speed_point.s() - start_s;
+    const double s =
+        init_sl_point_.s() + speed_point.s() - start_s;  // s on spline curve
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
-    Vec2d ego_xy_point;
-    common::SLPoint sl;
-    sl.set_s(speed_point.s());
-    sl.set_l(l);
-    reference_line_->SLToXY(sl, &ego_xy_point);
-    ReferencePoint reference_point =
-        reference_line_->GetReferencePoint(speed_point.s());
 
-    double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
-    double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
-    double theta =
-        common::math::NormalizeAngle(delta_theta + reference_point.heading());
-    Box2d ego_box = {ego_xy_point, theta, vehicle_param_.length(),
-                     vehicle_param_.width()};
-    for (const auto &obstacle_trajectory : obstacle_boxes_) {
-      auto &obstacle_box = obstacle_trajectory[start_index];
-      // Simple version: calculate obstacle cost by distance
-      double distance = obstacle_box.DistanceTo(ego_box);
-      if (distance > config_.obstacle_ignore_distance()) {
-        continue;
-      } else if (distance <= config_.obstacle_collision_distance()) {
-        total_cost += config_.obstacle_collision_cost();
-      } else if (distance <= config_.obstacle_risk_distance()) {
-        total_cost += RiskDistanceCost(distance);
-      } else {
-        total_cost += RegularDistanceCost(distance);
-      }
+    const common::SLPoint sl =
+        common::util::MakeSLPoint(init_sl_point_.s() + speed_point.s(), l);
+    const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
+    for (const auto &obstacle_trajectory : dynamic_obstacle_boxes_) {
+      obstacle_cost +=
+          GetCostBetweenObsBoxes(ego_box, obstacle_trajectory.at(index));
     }
   }
+  constexpr double kDynamicObsWeight = 1e-6;
+  obstacle_cost.safety_cost *=
+      (config_.eval_time_interval() * kDynamicObsWeight);
+  return obstacle_cost;
+}
+
+ComparableCost TrajectoryCost::GetCostFromObsSL(
+    const double adc_s, const double adc_l,
+    const SLBoundary &obs_sl_boundary) const {
+  const auto &vehicle_param =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+
+  ComparableCost obstacle_cost;
+
+  const double adc_front_s = adc_s + vehicle_param.front_edge_to_center();
+  const double adc_end_s = adc_s - vehicle_param.back_edge_to_center();
+  const double adc_left_l = adc_l + vehicle_param.left_edge_to_center();
+  const double adc_right_l = adc_l - vehicle_param.right_edge_to_center();
+
+  if (adc_left_l + FLAGS_lateral_ignore_buffer < obs_sl_boundary.start_l() ||
+      adc_right_l - FLAGS_lateral_ignore_buffer > obs_sl_boundary.end_l()) {
+    return obstacle_cost;
+  }
+
+  std::function<double(const double, const double)> softmax = [](
+      const double x, const double x0) {
+    return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
+  };
+
+  bool no_overlap = ((adc_front_s < obs_sl_boundary.start_s() ||
+                      adc_end_s > obs_sl_boundary.end_s()) ||  // longitudinal
+                     (adc_left_l + FLAGS_static_decision_nudge_l_buffer <
+                          obs_sl_boundary.start_l() ||
+                      adc_right_l - FLAGS_static_decision_nudge_l_buffer >
+                          obs_sl_boundary.end_l()));  // lateral
+
+  if (!no_overlap) {
+    obstacle_cost.has_collision = true;
+  }
+
+  const double delta_l = std::fabs(
+      adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
+  obstacle_cost.safety_cost +=
+      config_.obstacle_collision_cost() *
+      softmax(delta_l, config_.obstacle_collision_distance());
+
+  const double delta_s = std::fabs(
+      adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);
+  obstacle_cost.safety_cost +=
+      config_.obstacle_collision_cost() *
+      softmax(delta_s, config_.obstacle_collision_distance());
+  return obstacle_cost;
+}
+
+// Simple version: calculate obstacle cost by distance
+ComparableCost TrajectoryCost::GetCostBetweenObsBoxes(
+    const Box2d &ego_box, const Box2d &obstacle_box) const {
+  ComparableCost obstacle_cost;
+
+  const double distance = obstacle_box.DistanceTo(ego_box);
+  if (distance > config_.obstacle_ignore_distance()) {
+    return obstacle_cost;
+  }
+
+  std::function<double(const double, const double)> softmax = [](
+      const double x, const double x0) {
+    return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
+  };
+
+  obstacle_cost.safety_cost +=
+      config_.obstacle_collision_cost() *
+      softmax(distance, config_.obstacle_collision_distance());
+  obstacle_cost.safety_cost +=
+      20.0 * softmax(distance, config_.obstacle_risk_distance());
+  return obstacle_cost;
+}
+
+Box2d TrajectoryCost::GetBoxFromSLPoint(const common::SLPoint &sl,
+                                        const double dl) const {
+  Vec2d xy_point;
+  reference_line_->SLToXY(sl, &xy_point);
+
+  ReferencePoint reference_point = reference_line_->GetReferencePoint(sl.s());
+
+  const double one_minus_kappa_r_d = 1 - reference_point.kappa() * sl.l();
+  const double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
+  const double theta =
+      common::math::NormalizeAngle(delta_theta + reference_point.heading());
+  return Box2d(xy_point, theta, vehicle_param_.length(),
+               vehicle_param_.width());
+}
+
+// TODO(All): optimize obstacle cost calculation time
+ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
+                                         const double start_s,
+                                         const double end_s,
+                                         const uint32_t curr_level,
+                                         const uint32_t total_level) const {
+  ComparableCost total_cost;
+  // path cost
+  total_cost +=
+      CalculatePathCost(curve, start_s, end_s, curr_level, total_level);
+
+  // static obstacle cost
+  total_cost += CalculateStaticObstacleCost(curve, start_s, end_s);
+
+  // dynamic obstacle cost
+  total_cost += CalculateDynamicObstacleCost(curve, start_s, end_s);
   return total_cost;
-}
-
-double TrajectoryCost::RiskDistanceCost(const double distance) const {
-  return (5.0 - distance) * ((5.0 - distance)) * 10;
-}
-
-double TrajectoryCost::RegularDistanceCost(const double distance) const {
-  return std::max(20.0 - distance, 0.0);
 }
 
 }  // namespace planning

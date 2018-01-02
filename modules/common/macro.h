@@ -22,6 +22,7 @@
 #define MODULES_COMMON_MACRO_H_
 
 #include <iostream>
+#include <iomanip>
 
 #define DISALLOW_COPY_AND_ASSIGN(classname) \
  private:                                   \

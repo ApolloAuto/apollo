@@ -10,7 +10,11 @@ cc_library(
     hdrs = [
         "map_service.h",
     ],
+    linkopts = [
+        "-lboost_thread",
+    ],
     deps = [
+        "//modules/common/util:json_util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//third_party/json",

@@ -21,20 +21,19 @@ namespace perception {
 static const uint64_t all_ones = static_cast<uint64_t>(-1);
 
 void Bitmap2D::Set(const double x, const double min_y, const double max_y) {
-  size_t x_id = static_cast<size_t>(
-      (x - min_p_[dir_major_]) / grid_size_[dir_major_]);
+  size_t x_id =
+      static_cast<size_t>((x - min_p_[dir_major_]) / grid_size_[dir_major_]);
 
-  size_t min_y_id = static_cast<size_t>(
-      (min_y - min_p_[op_dir_major_]) / grid_size_[op_dir_major_]);
+  size_t min_y_id = static_cast<size_t>((min_y - min_p_[op_dir_major_]) /
+                                        grid_size_[op_dir_major_]);
 
-  size_t max_y_id = static_cast<size_t>(
-      (max_y - min_p_[op_dir_major_]) / grid_size_[op_dir_major_]);
+  size_t max_y_id = static_cast<size_t>((max_y - min_p_[op_dir_major_]) /
+                                        grid_size_[op_dir_major_]);
 
   Set(x_id, min_y_id, max_y_id);
 }
 
-void Bitmap2D::Set(const size_t& x_id,
-                   const size_t& min_y_id,
+void Bitmap2D::Set(const size_t& x_id, const size_t& min_y_id,
                    const size_t& max_y_id) {
   size_t left_block_id = min_y_id >> 6;  // min_y_id / 64
   size_t left_bit_id = min_y_id & 63;    // min_y_id % 64
@@ -42,7 +41,7 @@ void Bitmap2D::Set(const size_t& x_id,
   size_t right_block_id = max_y_id >> 6;  // max_y_id / 64
   size_t right_bit_id = max_y_id & 63;    // max_y_id % 64
 
-  auto &blocks = bitmap_[x_id];
+  auto& blocks = bitmap_[x_id];
   if (left_block_id == right_block_id) {
     SetUint64RangeBits(left_bit_id, right_bit_id, &blocks[left_block_id]);
   } else {
@@ -55,8 +54,7 @@ void Bitmap2D::Set(const size_t& x_id,
   }
 }
 
-inline void Bitmap2D::SetUint64RangeBits(const size_t& head,
-                                         const size_t& tail,
+inline void Bitmap2D::SetUint64RangeBits(const size_t& head, const size_t& tail,
                                          uint64_t* block) {
   *block |= (all_ones >> head) & (~(all_ones >> tail));
 }
@@ -71,10 +69,10 @@ inline void Bitmap2D::SetUint64TailBits(const size_t& tail, uint64_t* block) {
 
 bool Bitmap2D::IsExist(const Eigen::Vector2d& p) const {
   if (p.x() < min_p_.x() || p.x() >= max_p_.x()) {
-      return false;
+    return false;
   }
   if (p.y() < min_p_.y() || p.y() >= max_p_.y()) {
-      return false;
+    return false;
   }
   return true;
 }
@@ -88,16 +86,14 @@ bool Bitmap2D::Check(const Eigen::Vector2d& p) const {
   size_t block_id = major_grid_pt.y() >> 6;  // major_grid_pt.y() / 64
   size_t bit_id = major_grid_pt.y() & 63;    // major_grid_pt.y() % 64
 
-  const uint64_t &block = bitmap_[x_id][block_id];
+  const uint64_t& block = bitmap_[x_id][block_id];
 
-  const uint64_t first_one = static_cast<uint64_t> (1) << 63;
+  const uint64_t first_one = static_cast<uint64_t>(1) << 63;
   return block & (first_one >> bit_id);
 }
 
-Bitmap2D::Bitmap2D(const Eigen::Vector2d& min_p,
-                   const Eigen::Vector2d& max_p,
-                   const Eigen::Vector2d& grid_size,
-                   DirectionMajor dir_major) {
+Bitmap2D::Bitmap2D(const Eigen::Vector2d& min_p, const Eigen::Vector2d& max_p,
+                   const Eigen::Vector2d& grid_size, DirectionMajor dir_major) {
   dir_major_ = dir_major;
   op_dir_major_ = opposite_direction(dir_major);
 
@@ -107,14 +103,12 @@ Bitmap2D::Bitmap2D(const Eigen::Vector2d& min_p,
 }
 
 void Bitmap2D::BuildMap() {
-    Vec2ui dims =
-        ((max_p_ - min_p_).array() / grid_size_.array()).cast<size_t>();
-    size_t rows = dims[dir_major_];
-    size_t cols = (dims[op_dir_major_] >> 6) + 1;
+  Vec2ui dims = ((max_p_ - min_p_).array() / grid_size_.array()).cast<size_t>();
+  size_t rows = dims[dir_major_];
+  size_t cols = (dims[op_dir_major_] >> 6) + 1;
 
-    bitmap_ =
-        std::vector<std::vector<uint64_t>>(rows,
-                                           std::vector<uint64_t>(cols, 0));
+  bitmap_ =
+      std::vector<std::vector<uint64_t>>(rows, std::vector<uint64_t>(cols, 0));
 }
 
 }  // namespace perception

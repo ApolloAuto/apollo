@@ -6,6 +6,8 @@ import MTLLoader from "three/examples/js/loaders/MTLLoader.js";
 const mtlLoader = new THREE.MTLLoader();
 const textureLoader = new THREE.TextureLoader();
 
+THREE.TextureLoader.prototype.crossOrigin = '';
+
 const loadedMaterialAndObject = {};
 
 export function loadObject(materialFile, objectFile, scale, callback) {

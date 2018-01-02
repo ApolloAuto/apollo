@@ -6,6 +6,7 @@ import PARAMETERS from "store/config/parameters.yml";
 
 export default class Ground {
     constructor() {
+        this.type = "default";
         this.mesh = null;
         this.geometry = null;
         this.initialized = false;
@@ -33,5 +34,9 @@ export default class Ground {
 
         this.initialized = true;
         return true;
+    }
+
+    update(world, coordinates, scene) {
+        // Do nothing in the default ground
     }
 }

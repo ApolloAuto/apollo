@@ -21,14 +21,18 @@
 #include <memory>
 #include <utility>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/integral.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/hermite_spline.h"
 
 namespace apollo {
 namespace planning {
 namespace util {
 
+using common::adapter::AdapterManager;
 using common::PathPoint;
 using common::SpeedPoint;
 using common::TrajectoryPoint;
@@ -39,15 +43,18 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   double s1 = p1.s();
   CHECK(s0 <= s && s <= s1);
 
-  std::array<double, 2> gx0{{p0.theta(), p0.kappa()}};
-  std::array<double, 2> gx1{{p1.theta(), p1.kappa()}};
-  HermiteSpline<double, 3> geometry_spline(gx0, gx1, s0, s1);
-  auto func_cos_theta = [&geometry_spline](const double s) {
-    auto theta = geometry_spline.Evaluate(0, s);
+  double theta_diff = common::math::NormalizeAngle(p1.theta() - p0.theta());
+
+  std::array<double, 3> gx0{{0.0, p0.kappa(), p0.dkappa()}};
+  std::array<double, 3> gx1{{theta_diff, p1.kappa(), p1.dkappa()}};
+
+  HermiteSpline<double, 5> geometry_spline(gx0, gx1, s0, s1);
+  auto func_cos_theta = [&geometry_spline, &p0](const double s) {
+    auto theta = geometry_spline.Evaluate(0, s) + p0.theta();
     return std::cos(theta);
   };
-  auto func_sin_theta = [&geometry_spline](const double s) {
-    auto theta = geometry_spline.Evaluate(0, s);
+  auto func_sin_theta = [&geometry_spline, &p0](const double s) {
+    auto theta = geometry_spline.Evaluate(0, s) + p0.theta();
     return std::sin(theta);
   };
 
@@ -55,7 +62,8 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
       p0.x() + common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
   double y =
       p0.y() + common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
-  double theta = geometry_spline.Evaluate(0, s);
+  double theta =
+      common::math::NormalizeAngle(geometry_spline.Evaluate(0, s) + p0.theta());
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
   double d2kappa = geometry_spline.Evaluate(3, s);
@@ -142,9 +150,9 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   };
 
   double x = pp0.x() +
-      common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
+             common::math::IntegrateByGaussLegendre<5>(func_cos_theta, s0, s);
   double y = pp0.y() +
-      common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
+             common::math::IntegrateByGaussLegendre<5>(func_sin_theta, s0, s);
   double theta = geometry_spline.Evaluate(0, s);
   double kappa = geometry_spline.Evaluate(1, s);
   double dkappa = geometry_spline.Evaluate(2, s);
@@ -170,8 +178,13 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
 TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
                                                     const TrajectoryPoint &tp1,
                                                     const double t) {
-  const PathPoint &pp0 = tp0.path_point();
-  const PathPoint &pp1 = tp1.path_point();
+  if (!tp0.has_path_point() || !tp1.has_path_point()) {
+    TrajectoryPoint p;
+    p.mutable_path_point()->CopyFrom(PathPoint());
+    return p;
+  }
+  const PathPoint pp0 = tp0.path_point();
+  const PathPoint pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
   double t1 = tp1.relative_time();
 
@@ -204,6 +217,15 @@ common::SLPoint interpolate(const common::SLPoint &start,
   point.set_s(s);
   point.set_l(l);
   return point;
+}
+
+void DumpPlanningContext() {
+  AdapterManager::GetLocalization()->DumpLatestMessage();
+  AdapterManager::GetChassis()->DumpLatestMessage();
+  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
+  if (FLAGS_enable_prediction) {
+    AdapterManager::GetPrediction()->DumpLatestMessage();
+  }
 }
 
 }  // namespace util

@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_TASKS_PATH_DECIDER_PATH_DECIDER_H_
 #define MODULES_PLANNING_TASKS_PATH_DECIDER_PATH_DECIDER_H_
 
+#include <limits>
 #include <string>
 
 #include "modules/planning/tasks/task.h"
@@ -48,6 +49,12 @@ class PathDecider : public Task {
 
   ObjectStop GenerateObjectStopDecision(
       const PathObstacle &path_obstacle) const;
+
+  /**
+   * @brief Calculate stop distance with the obstacle using the ADC's minimum
+   * turning radius
+   */
+  double MinimumRadiusStopDistance(const PathObstacle &path_obstacle) const;
 };
 
 }  // namespace planning

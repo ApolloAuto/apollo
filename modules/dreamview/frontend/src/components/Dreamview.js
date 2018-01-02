@@ -1,16 +1,14 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import SplitPane from 'react-split-pane';
 
-import DashCamPlayer from "components/DashCamPlayer";
-import SideBar from "components/SideBar";
-import StatusBar from "components/StatusBar";
-import Scene from "components/Scene";
-import RouteEditingBar from "components/RouteEditingBar";
-import Loader from "components/common/Loader";
+import SplitPane from 'react-split-pane';
+import Header from "components/Header";
+import MainView from "components/Layouts/MainView";
+import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
-import Geolocation from "components/common/Geolocation";
+import SideBar from "components/SideBar";
 import WS from "store/websocket";
+
 
 @inject("store") @observer
 export default class Dreamview extends React.Component {
@@ -27,6 +25,10 @@ export default class Dreamview extends React.Component {
         }
     }
 
+    componentWillMount() {
+        this.props.store.updateDimension();
+    }
+
     componentDidMount() {
         WS.initialize();
         window.addEventListener("resize", () => {
@@ -35,40 +37,29 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { isInitialized, dimension, meters, options,
-                video, routeEditingManager } = this.props.store;
-
-        if (!isInitialized) {
-            return (<Loader />);
-        }
-
-        const showBars = !routeEditingManager.inEditingView;
-        const showRoutingBar = routeEditingManager.inEditingView;
-        const showVideo = (video.path !== undefined && video.path.length !== 0);
-        const showGeo = (showRoutingBar ||
-                options.cameraAngle === 'Map' ||
-                options.cameraAngle === 'Overhead' ||
-                options.cameraAngle === 'Monitor');
+        const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
 
         return (
-            <SplitPane split="vertical"
-                       size={dimension.width}
-                       onChange={this.handleDrag}
-                       allowResize={options.showPNCMonitor}>
-                <div>
-                    {showBars ? <SideBar /> : null}
-                    {showBars ? <StatusBar meters={meters} /> : null}
-                    {showRoutingBar ? <RouteEditingBar /> : null}
-                    <Scene
-                        width={dimension.width}
-                        height={dimension.height}
-                        options={options}
-                        invisible={false}/>
-                    {showGeo ? <Geolocation /> : null}
-                    {showVideo  ? <DashCamPlayer /> : null}
+            <div>
+                <Header />
+                <div className="pane-container">
+                    <SplitPane split="vertical"
+                           size={dimension.width}
+                           onChange={this.handleDrag}
+                           allowResize={options.showPNCMonitor}>
+                        <div className="left-pane">
+                            <SideBar />
+                            <div className="dreamview-body">
+                                <MainView />
+                                <ToolView />
+                            </div>
+                        </div>
+                        <div className="right-pane">
+                            {options.showPNCMonitor && <PNCMonitor />}
+                        </div>
+                    </SplitPane>
                 </div>
-                {options.showPNCMonitor ? <PNCMonitor /> : <div></div>}
-            </SplitPane>
+            </div>
         );
     }
 }

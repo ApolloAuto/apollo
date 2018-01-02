@@ -23,6 +23,7 @@ message NetworkParam {
     optional string confidence_pt_blob = 3 [default = "confidence_score"];
     optional string height_pt_blob = 4 [default = "height_pt"];
     optional string feature_blob = 5 [default = "data"];
+    optional string class_pt_blob = 6 [default = "class_score"];
 }
 
 message FeatureParam {

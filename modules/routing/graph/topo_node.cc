@@ -21,6 +21,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/util/map_util.h"
 #include "modules/routing/graph/range_utils.h"
 
 namespace apollo {
@@ -32,6 +33,7 @@ const double MIN_INTERNAL_FOR_NODE = 0.01;  // in meter
 const double kLenghtEpsilon = 1e-6;         // in meter
 
 using ::google::protobuf::RepeatedPtrField;
+using apollo::common::util::FindPtrOrNull;
 
 void ConvertOutRange(const RepeatedPtrField<CurveRange>& range_vec,
                      double start_s, double end_s,
@@ -218,19 +220,11 @@ const std::unordered_set<const TopoEdge*>& TopoNode::OutToSucEdge() const {
 }
 
 const TopoEdge* TopoNode::GetInEdgeFrom(const TopoNode* from_node) const {
-  const auto& iter = in_edge_map_.find(from_node);
-  if (iter == in_edge_map_.end()) {
-    return nullptr;
-  }
-  return iter->second;
+  return FindPtrOrNull(in_edge_map_, from_node);
 }
 
 const TopoEdge* TopoNode::GetOutEdgeTo(const TopoNode* to_node) const {
-  const auto& iter = out_edge_map_.find(to_node);
-  if (iter == out_edge_map_.end()) {
-    return nullptr;
-  }
-  return iter->second;
+  return FindPtrOrNull(out_edge_map_, to_node);
 }
 
 const TopoNode* TopoNode::OriginNode() const { return origin_node_; }

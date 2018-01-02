@@ -24,4 +24,9 @@ source "${DIR}/apollo_base.sh"
 # run function from apollo_base.sh
 # run command_name module_name
 
-run monitor "$@"
+if [[ $1 == "start_fe" ]]; then
+    # Monitor always runs in background.
+    run monitor start
+else
+    run monitor "$@"
+fi

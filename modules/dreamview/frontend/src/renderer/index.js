@@ -2,11 +2,11 @@ import * as THREE from "three";
 import OrbitControls from "three/examples/js/controls/OrbitControls.js";
 import Stats from "stats.js";
 
-import STORE from "store";
 import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
 import Ground from "renderer/ground";
+import TileGround from "renderer/tileground";
 import Map from "renderer/map";
 import PlanningTrajectory from "renderer/trajectory.js";
 import PerceptionObstacles from "renderer/obstacles.js";
@@ -27,10 +27,17 @@ class Renderer {
             antialias: useAntialias
         });
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x031C31);
+        this.scene.background = new THREE.Color(0x000C17);
 
-        // The ground. (grid for now)
-        this.ground = new Ground();
+        // The dimension of the scene
+        this.dimension = {
+            width: 0,
+            height: 0,
+        };
+
+        // The ground.
+        this.ground = (PARAMETERS.ground.type === 'tile' || OFFLINE_PLAYBACK)
+                      ? new TileGround() : new Ground();
 
         // The map.
         this.map = new Map();
@@ -128,6 +135,9 @@ class Renderer {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+
+        this.dimension.width = width;
+        this.dimension.height = height;
     }
 
     enableOrbitControls() {
@@ -242,8 +252,10 @@ class Renderer {
                                                                    false);
     }
 
-    addDefaultEndPoint(point) {
-        this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
+    addDefaultEndPoint(points) {
+        for (let i = 0; i < points.length; i++) {
+            this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene);
+        }
     }
 
     removeAllRoutingPoints() {
@@ -296,7 +308,7 @@ class Renderer {
 
         // Upon the first time in render() it sees ground mesh loaded,
         // added it to the scene.
-        if (!this.ground.initialized) {
+        if (this.ground.type === "default" && !this.ground.initialized) {
             this.ground.initialize(this.coordinates);
             this.ground.mesh.name = "ground";
             this.scene.add(this.ground.mesh);
@@ -317,13 +329,18 @@ class Renderer {
         this.render();
     }
 
-    updateWorld(world) {
+    updateWorld(world, planningData) {
         this.adc.update(world, this.coordinates);
-        this.planningTrajectory.update(world, this.coordinates, this.scene);
+        this.ground.update(world, this.coordinates, this.scene);
+        this.planningTrajectory.update(world, planningData, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
         this.routing.update(world, this.coordinates, this.scene);
+    }
+
+    updateGroundMetadata(serverUrl, mapInfo) {
+        this.ground.initialize(serverUrl, mapInfo);
     }
 
     updateMap(newData) {
@@ -345,16 +362,18 @@ class Renderer {
             || navigator.userAgent.match(/iPod/i);
     }
 
-    updateGeolocation(event) {
-        const geo = this.getGeolocation(event);
-        STORE.setGeolocation(geo);
-    }
-
     getGeolocation(event) {
+        if (!this.coordinates.isInitialized()) {
+            return;
+        }
+
+        const canvasPosition = event.currentTarget.getBoundingClientRect();
+
         const vector = new THREE.Vector3(
-            (event.clientX / STORE.dimension.width) * 2 - 1,
-            -(event.clientY / STORE.dimension.height) * 2 + 1,
+            ((event.clientX - canvasPosition.left) / this.dimension.width) * 2 - 1,
+            -((event.clientY - canvasPosition.top) / this.dimension.height) * 2 + 1,
             0);
+
         vector.unproject(this.camera);
 
         const direction = vector.sub(this.camera.position).normalize();

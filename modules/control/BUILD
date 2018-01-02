@@ -22,7 +22,7 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor",
+        "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/control/common",

@@ -25,10 +25,10 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::hdmap::LaneInfo;
-using apollo::hdmap::Id;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::hdmap::Id;
+using apollo::hdmap::LaneInfo;
 
 RoadGraph::RoadGraph(const double start_s, const double length,
                      std::shared_ptr<const LaneInfo> lane_info_ptr)

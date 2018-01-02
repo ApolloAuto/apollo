@@ -1,0 +1,63 @@
+syntax = "proto2";
+
+package apollo.data;
+
+import "modules/canbus/proto/canbus_conf.proto";
+import "modules/canbus/proto/chassis_detail.proto";
+import "modules/common/configs/proto/vehicle_config.proto";
+import "modules/control/proto/control_conf.proto";
+
+message VehicleInfo {
+  optional string name = 1;
+  enum Brand {
+    LINCOLN = 1;
+  }
+  optional Brand brand = 2;
+  enum Model {
+    // Lincoln model
+    MKZ = 1;
+  }
+  optional Model model = 3;
+  optional apollo.canbus.License license = 4;
+  optional apollo.canbus.CanbusConf canbus_conf = 5;
+  optional apollo.common.VehicleConfig vehicle_config = 6;
+  optional apollo.control.ControlConf control_config = 7;
+}
+
+message EnvironmentInfo {
+  optional string map_name = 1;
+  optional float temperature = 2;  // Temperature in degrees Celsius.
+  // TODO(xiaoxq): weather, rare condition, etc.
+}
+
+message HardwareInfo {
+  // Entries of hardware config file path and its content.
+  map<string, string> configs = 1;
+}
+
+message SoftwareInfo {
+  optional string docker_image = 1;
+  optional string commit_id = 2;
+  optional string mode = 3;
+  // Entries of software config file path and its content.
+  map<string, string> configs = 4;
+}
+
+message UserInfo {
+  optional string entity = 1;  // Company, university, organization, etc.
+  optional string driver = 2;
+  optional string co_driver = 3;
+}
+
+message StaticInfo {
+  optional VehicleInfo vehicle = 1;
+  optional EnvironmentInfo environment = 2;
+  optional HardwareInfo hardware = 3;
+  optional SoftwareInfo software = 4;
+  optional UserInfo user = 5;
+}
+
+message StaticInfoConf {
+  repeated string hardware_configs = 1;
+  repeated string software_configs = 2;
+}

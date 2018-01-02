@@ -25,7 +25,7 @@ namespace common {
 namespace math {
 
 TEST(QuaternionTest, QuaternionToHeading) {
-  constexpr double v = sqrt(0.5);  // = cos(pi / 4) = sin(pi / 4)
+  const double v = sqrt(0.5);  // = cos(pi / 4) = sin(pi / 4)
   EXPECT_DOUBLE_EQ(0,
                    QuaternionToHeading(v, 0.0, 0.0, -v));  // Pointing to east.
   EXPECT_DOUBLE_EQ(

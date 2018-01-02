@@ -16,7 +16,7 @@
 
 /**
  * @file : spline_1d_kernel.h
- * @brief: wrapp up solver constraint interface with direct methods and preset
+ * @brief: wrap up solver constraint interface with direct methods and preset
  *methods
  **/
 
@@ -34,8 +34,8 @@ namespace planning {
 class Spline1dKernel {
  public:
   explicit Spline1dKernel(const Spline1d& spline1d);
-  explicit Spline1dKernel(const std::vector<double>& x_knots,
-                          const uint32_t spline_order);
+  Spline1dKernel(const std::vector<double>& x_knots,
+                 const uint32_t spline_order);
 
   // customized input / output method
   void AddRegularization(const double regularized_param);

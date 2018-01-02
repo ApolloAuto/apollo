@@ -27,12 +27,12 @@ bool OpenglVisualizer::Init() {
   opengl_vs_ = boost::shared_ptr<GLFWViewer>(new GLFWViewer());
 
   if (opengl_vs_ == nullptr) {
-    AINFO << "Failed to create opengl viewer";
+    AERROR << "Failed to create opengl viewer";
     return false;
   }
 
   if (opengl_vs_->Initialize() == false) {
-    AINFO << "Failed to initialize opengl viewer";
+    AERROR << "Failed to initialize opengl viewer";
     return false;
   }
 
@@ -46,11 +46,6 @@ bool OpenglVisualizer::Init() {
 }
 
 void OpenglVisualizer::Render(const FrameContent &content) {
-  Eigen::Vector3d camera_world_pos(
-      camera_center_world_.x, camera_center_world_.y, camera_center_world_.z);
-  Eigen::Vector3d camera_scene_center(view_point_world_.x, view_point_world_.y,
-                                      view_point_world_.z);
-  Eigen::Vector3d camera_up_vector(up_world_.x, up_world_.y, up_world_.z);
   opengl_vs_->SetCameraPara(
       Eigen::Vector3d(camera_center_world_.x, camera_center_world_.y,
                       camera_center_world_.z),
@@ -61,16 +56,19 @@ void OpenglVisualizer::Render(const FrameContent &content) {
       Eigen::Vector3d(forward_world_.x, forward_world_.y, forward_world_.z));
   opengl_vs_->SetFrameContent(content);
   opengl_vs_->SpinOnce();
-  AINFO << "OpenglVisualizer spin_once";
 }
 
-void OpenglVisualizer::SetSize(int w, int h) { opengl_vs_->SetSize(w, h); }
+void OpenglVisualizer::SetSize(int w, int h) {
+  opengl_vs_->SetSize(w, h);
+}
 
 void OpenglVisualizer::SetBackgroundColor(float r, float g, float b, float a) {
   opengl_vs_->SetBackgroundColor(Eigen::Vector3d(r, g, b));
 }
 
-void OpenglVisualizer::SetVelodyneHeight(float h) { velodyne_height_ = h; }
+void OpenglVisualizer::SetVelodyneHeight(float h) {
+  velodyne_height_ = h;
+}
 
 void OpenglVisualizer::SetCameraPosition() {
   up_velodyne_.x = 0;
@@ -127,8 +125,8 @@ void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
   TransformPoint<pcl_util::Point>(camera_center_velodyne_,
                                   &camera_center_world_, pose_v2w);
 
-  TransformPoint<pcl_util::Point>(view_point_velodyne_,
-                                  &view_point_world_, pose_v2w);
+  TransformPoint<pcl_util::Point>(view_point_velodyne_, &view_point_world_,
+                                  pose_v2w);
 
   TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_,
                                        &main_car_points_world_, pose_v2w);

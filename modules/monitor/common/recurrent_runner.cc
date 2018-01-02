@@ -62,7 +62,7 @@ void RecurrentRunnerThread::Start() {
       }
 
       // Tick runners.
-      const double current_time = Clock::NowInSecond();
+      const double current_time = Clock::NowInSeconds();
       for (auto &runner : runners_) {
         runner->Tick(current_time);
       }

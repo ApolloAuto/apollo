@@ -6,7 +6,7 @@ import "modules/routing/proto/routing.proto";
 
 message Landmark {
   optional string name = 1;
-  optional LaneWaypoint waypoint = 2;
+  repeated LaneWaypoint waypoint = 2;
 }
 
 message POI {

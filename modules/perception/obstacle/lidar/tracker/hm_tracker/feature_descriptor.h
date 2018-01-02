@@ -31,7 +31,7 @@ class FeatureDescriptor {
   // @params[IN] cloud: given cloud for feature extraction
   // @return nothing
   explicit FeatureDescriptor(
-    apollo::perception::pcl_util::PointCloudPtr cloud) {
+      apollo::perception::pcl_util::PointCloudPtr cloud) {
     cloud_ = cloud;
   }
   ~FeatureDescriptor() {}
@@ -40,16 +40,14 @@ class FeatureDescriptor {
   // @params[IN] bin_size: bin size of histogram
   // @params[OUT] feature: histogram feature of given cloud
   // @return nothing
-  void ComputeHistogram(
-    const int bin_size,
-    std::vector<float>* feature);
+  void ComputeHistogram(const int bin_size, std::vector<float>* feature);
 
  private:
   void GetMinMaxCenter();
-  apollo::perception::pcl_util::PointCloudPtr   cloud_;
-  pcl_util::Point                               min_pt_;
-  pcl_util::Point                               max_pt_;
-  pcl_util::Point                               center_pt_;
+  apollo::perception::pcl_util::PointCloudPtr cloud_;
+  pcl_util::Point min_pt_;
+  pcl_util::Point max_pt_;
+  pcl_util::Point center_pt_;
 };  // class FeatureDescriptor
 
 }  // namespace perception

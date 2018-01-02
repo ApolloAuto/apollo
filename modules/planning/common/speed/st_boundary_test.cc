@@ -27,8 +27,8 @@
 namespace apollo {
 namespace planning {
 
-using Vec2d = apollo::common::math::Vec2d;
-using Box2d = apollo::common::math::Box2d;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
 
 TEST(StBoundaryTest, basic_test) {
   std::vector<STPoint> upper_points;

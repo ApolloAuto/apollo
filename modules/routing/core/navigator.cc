@@ -81,7 +81,7 @@ void SetErrorCode(const common::ErrorCode& error_code_id,
   error_code->set_error_code(error_code_id);
   error_code->set_msg(error_string);
   if (error_code_id == common::ErrorCode::OK) {
-    AINFO << error_string.c_str();
+    ADEBUG << error_string.c_str();
   } else {
     AERROR << error_string.c_str();
   }
@@ -233,6 +233,11 @@ bool Navigator::SearchRoute(const RoutingRequest& request,
   if (!SearchRouteByStrategy(graph_.get(), way_nodes, way_s, &result_nodes)) {
     SetErrorCode(ErrorCode::ROUTING_ERROR_RESPONSE,
                  "Failed to find route with request!",
+                 response->mutable_status());
+    return false;
+  }
+  if (result_nodes.empty()) {
+    SetErrorCode(ErrorCode::ROUTING_ERROR_RESPONSE, "Failed to result nodes!",
                  response->mutable_status());
     return false;
   }

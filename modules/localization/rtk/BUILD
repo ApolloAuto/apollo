@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor",
+        "//modules/common/monitor_log",
         "//modules/common/proto:common_proto",
         "//modules/common/status",
         "//modules/common/time",

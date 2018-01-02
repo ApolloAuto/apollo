@@ -56,7 +56,7 @@ class HungarianOptimizer {
   // be square (i.e. we can have different numbers of agents and tasks), but it
   // must be regular (i.e. there must be the same number of entries in each row
   // of the matrix).
-  explicit HungarianOptimizer(const std::vector<std::vector<double> >& costs);
+  explicit HungarianOptimizer(const std::vector<std::vector<double>>& costs);
 
   // Find an assignment which maximizes the total cost.
   // Returns the assignment in the two vectors passed as argument.
@@ -79,7 +79,9 @@ class HungarianOptimizer {
   void find_assignments(std::vector<int>* agent, std::vector<int>* task);
 
   // Is the cell (row, col) starred?
-  bool is_starred(int row, int col) const { return marks_[row][col] == STAR; }
+  bool is_starred(int row, int col) const {
+    return marks_[row][col] == STAR;
+  }
 
   // Mark cell (row, col) with a star
   void star(int row, int col) {
@@ -102,10 +104,14 @@ class HungarianOptimizer {
   int find_star_in_col(int col) const;
 
   // Is cell (row, col) marked with a prime?
-  bool is_primed(int row, int col) const { return marks_[row][col] == PRIME; }
+  bool is_primed(int row, int col) const {
+    return marks_[row][col] == PRIME;
+  }
 
   // Mark cell (row, col) with a prime.
-  void prime(int row, int col) { marks_[row][col] = PRIME; }
+  void prime(int row, int col) {
+    marks_[row][col] = PRIME;
+  }
 
   // Find a column in row containing a prime, or return
   // kHungarianOptimizerColNotFound if no such column exists.
@@ -115,25 +121,39 @@ class HungarianOptimizer {
   void clear_primes();
 
   // Does column col contain a star?
-  bool col_contains_star(int col) const { return stars_in_col_[col] > 0; }
+  bool col_contains_star(int col) const {
+    return stars_in_col_[col] > 0;
+  }
 
   // Is row 'row' covered?
-  bool row_covered(int row) const { return rows_covered_[row]; }
+  bool row_covered(int row) const {
+    return rows_covered_[row];
+  }
 
   // Cover row 'row'.
-  void cover_row(int row) { rows_covered_[row] = true; }
+  void cover_row(int row) {
+    rows_covered_[row] = true;
+  }
 
   // Uncover row 'row'.
-  void uncover_row(int row) { rows_covered_[row] = false; }
+  void uncover_row(int row) {
+    rows_covered_[row] = false;
+  }
 
   // Is column col covered?
-  bool col_covered(int col) const { return cols_covered_[col]; }
+  bool col_covered(int col) const {
+    return cols_covered_[col];
+  }
 
   // Cover column col.
-  void cover_col(int col) { cols_covered_[col] = true; }
+  void cover_col(int col) {
+    cols_covered_[col] = true;
+  }
 
   // Uncover column col.
-  void uncover_col(int col) { cols_covered_[col] = false; }
+  void uncover_col(int col) {
+    cols_covered_[col] = false;
+  }
 
   // Uncover ever row and column in the matrix.
   void clear_covers();
@@ -199,7 +219,7 @@ class HungarianOptimizer {
   int matrix_size_;
 
   // The expanded cost matrix.
-  std::vector<std::vector<double> > costs_;
+  std::vector<std::vector<double>> costs_;
 
   // The greatest cost in the initial cost matrix.
   double max_cost_;
@@ -209,7 +229,7 @@ class HungarianOptimizer {
   std::vector<bool> cols_covered_;
 
   // The marks_ (star/prime/none) on each element of the cost matrix.
-  std::vector<std::vector<Mark> > marks_;
+  std::vector<std::vector<Mark>> marks_;
 
   // The number of stars in each column - used to speed up coverStarredZeroes.
   std::vector<int> stars_in_col_;

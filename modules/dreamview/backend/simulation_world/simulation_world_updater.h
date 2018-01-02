@@ -67,6 +67,10 @@ class SimulationWorldUpdater {
    */
   void Start();
 
+  // Time interval, in milliseconds, between pushing SimulationWorld to
+  // frontend.
+  static constexpr double kSimWorldTimeIntervalMs = 100;
+
  private:
   /**
    * @brief The callback function to get updates from SimulationWorldService,
@@ -84,6 +88,8 @@ class SimulationWorldUpdater {
   bool ConstructRoutingRequest(
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
+
+  bool ValidateCoordinate(const nlohmann::json &json);
 
   /**
    * @brief Tries to load the points of interest from the file if it has
@@ -113,9 +119,6 @@ class SimulationWorldUpdater {
     }
   }
 
-  // Time interval, in seconds, between pushing SimulationWorld to frontend.
-  static constexpr double kSimWorldTimeInterval = 0.1;
-
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
   const MapService *map_service_;
@@ -127,6 +130,7 @@ class SimulationWorldUpdater {
 
   // The json string to be pushed to frontend, which is updated by timer.
   std::string simulation_world_json_;
+  std::string simulation_world_with_planning_json_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.

@@ -18,35 +18,60 @@
 
 
 addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
-adduser --disabled-password --gecos '' "$DOCKER_USER" \
+adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
     --uid "$DOCKER_USER_ID" --gid "$DOCKER_GRP_ID" 2>/dev/null
 usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
+echo "export PATH=/apollo/scripts:$PATH" >> /home/${DOCKER_USER}/.bashrc
 echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
 echo "ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
 
+SYNC_MAP='rsync -rLvzht --progress --update /mnt/nfs/map/data /apollo/modules/map'
+echo "alias sync_map='${SYNC_MAP}'" >> /home/${DOCKER_USER}/.bashrc
+
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
 
-# grant caros user to access GPS device
-if [ -e /dev/ttyUSB0 ]; then
-    sudo chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
+# setup GPS device
+if [ -e /dev/novatel0 ]; then
+  chmod a+rw /dev/novatel0
+fi
+if [ -e /dev/novatel1 ]; then
+  chmod a+rw /dev/novatel1
+fi
+if [ -e /dev/novatel2 ]; then
+  chmod a+rw /dev/novatel2
 fi
 
-MACHINE_ARCH=$(uname -m)
-ROS_TAR="ros-indigo-apollo-1.5.1-${MACHINE_ARCH}.tar.gz"
+# setup camera device
+if [ -e /dev/camera/obstacle ]; then
+  chmod a+rw /dev/camera/obstacle
+fi
+if [ -e /dev/camera/trafficlights ]; then
+  chmod a+rw /dev/camera/trafficlights
+fi
+
+
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
     cp -r /home/tmp/modules_data/* /apollo/modules/
     chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
   fi
-# setup ros package
-# this is a tempary solution to avoid ros package downloading.
-ROS="/home/tmp/ros"
-if [ -e "$ROS" ]; then
-  rm -rf $ROS
+
+  if [ -e /mnt/nfs/map/data ]; then
+    ${SYNC_MAP}
+    echo "=== Map Versions ==="
+    cat /apollo/modules/map/data/versions.txt
+
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/map/data"
+  fi
+  # setup ros package
+  # this is a temporary solution to avoid ros package downloading.
+  ROS="/home/tmp/ros"
+  chmod a+w "${ROS}/share/velodyne/launch/start_velodyne.launch"
+  chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
+  chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
+  chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 fi
-tar xzf "/home/tmp/${ROS_TAR}" -C "/home/tmp"
-chown -R ${DOCKER_USER}:${DOCKER_GRP} "${ROS}"
-fi
+

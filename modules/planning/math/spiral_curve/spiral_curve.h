@@ -40,19 +40,19 @@ class SpiralCurve {
   virtual ~SpiralCurve() = default;
 
   /**
-  *   @brief: set configuration if desired (default setting was defined in
-  *constructor)
-  **/
+   * @brief Set configuration if desired (default setting was defined in
+   * constructor)
+   **/
   void SetSpiralConfig(const SpiralCurveConfig& spiral_config);
   /**
-  *   @brief : default process of calculating path without lookup table
-  *   @return: errors of final state: fitted value vs true end point
-  **/
+   * @brief Default process of calculating path without lookup table
+   * @return errors of final state: fitted value vs true end point
+   **/
   virtual bool CalculatePath() = 0;
 
   /**
-  *   @brief: output methods
-  **/
+   * @brief Output methods
+   **/
   const std::vector<double>& p_params() const;
   const SpiralCurveConfig& spiral_config() const;
   const common::PathPoint& start_point() const;
@@ -61,17 +61,16 @@ class SpiralCurve {
   double error() const;
 
   /**
-  *   @brief : get path vector with sampling size n
-  *   @return: sequence of sampling points
-  **/
+   * @brief Get path vector with sampling size n
+   * @return sequence of sampling points
+   **/
   virtual common::Status GetPathVec(
       const std::uint32_t n,
       std::vector<common::PathPoint>* path_points) const = 0;
   /**
-  *   @brief: calcualate quintic path point at s locations
-  *   along the whole path.
-  *   @return: vector of path points
-  **/
+   * @brief Calculate quintic path point at s locations along the whole path.
+   * @return vector of path points
+   **/
   virtual common::Status GetPathVecWithS(
       const std::vector<double>& vec_s,
       std::vector<common::PathPoint>* path_points) const = 0;

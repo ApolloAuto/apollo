@@ -223,7 +223,9 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
     return;
   }
 
-  std::string getClassName() const { return ("ConvexHull2DXY"); }
+  std::string getClassName() const {
+    return ("ConvexHull2DXY");
+  }
 
  protected:
   using pcl::PCLBase<PointInT>::input_;

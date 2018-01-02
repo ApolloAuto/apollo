@@ -19,15 +19,15 @@
 #include <string>
 #include <vector>
 
-#include "modules/monitor/common/monitor_interface.h"
+#include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
 namespace monitor {
 
 // AdapterManager is required to listen to ins_status and gnss_status.
-class GpsMonitor : public HardwareMonitor {
+class GpsMonitor : public RecurrentRunner {
  public:
-  explicit GpsMonitor(SystemStatus *system_status);
+  GpsMonitor();
   void RunOnce(const double current_time) override;
 };
 

@@ -7,17 +7,21 @@ cc_library(
     srcs = [
         "object.cc",
         "types.cc",
+        "object_supplement.cc"
     ],
     hdrs = [
         "hdmap_struct.h",
         "object.h",
         "types.h",
+        "object_supplement.h",
     ],
     deps = [
         "//modules/common",
         "//modules/common/util:string_util",
+        "//modules/common/proto:error_code_proto",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/pcl_util",
+        "//modules/perception/lib/base",
         "//modules/perception/proto:perception_proto",
         "@eigen//:eigen",
     ],

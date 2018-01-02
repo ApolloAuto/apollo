@@ -71,6 +71,7 @@ cc_test(
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
+        "@caffe//:lib",
         "@gtest//:main",
         "@opencv2//:core",
         "@pcl//:pcl",

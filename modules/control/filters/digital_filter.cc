@@ -31,8 +31,6 @@ namespace control {
 
 DigitalFilter::DigitalFilter(const std::vector<double> &denominators,
                              const std::vector<double> &numerators) {
-  dead_zone_ = 0.0;
-  last_ = 0.0;
   set_coefficients(denominators, numerators);
 }
 
@@ -65,10 +63,12 @@ double DigitalFilter::Filter(const double x_insert) {
 
   x_values_.pop_back();
   x_values_.push_front(x_insert);
-  double xside = Compute(x_values_, numerators_, 0, numerators_.size() - 1);
+  const double xside =
+      Compute(x_values_, numerators_, 0, numerators_.size() - 1);
 
   y_values_.pop_back();
-  double yside = Compute(y_values_, denominators_, 1, denominators_.size() - 1);
+  const double yside =
+      Compute(y_values_, denominators_, 1, denominators_.size() - 1);
 
   double y_insert = 0.0;
   if (std::abs(denominators_.front()) > kDoubleEpsilon) {
@@ -80,7 +80,7 @@ double DigitalFilter::Filter(const double x_insert) {
 }
 
 double DigitalFilter::UpdateLast(const double input) {
-  double diff = std::abs(input - last_);
+  const double diff = std::abs(input - last_);
   if (diff < dead_zone_) {
     return last_;
   } else {

@@ -99,10 +99,19 @@ class PredictorManager {
   ObstacleConf::PredictorType vehicle_off_lane_predictor_ =
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
+  ObstacleConf::PredictorType cyclist_on_lane_predictor_ =
+      ObstacleConf::LANE_SEQUENCE_PREDICTOR;
+
+  ObstacleConf::PredictorType cyclist_off_lane_predictor_ =
+      ObstacleConf::FREE_MOVE_PREDICTOR;
+
   ObstacleConf::PredictorType pedestrian_predictor_ =
       ObstacleConf::REGIONAL_PREDICTOR;
 
-  ObstacleConf::PredictorType default_predictor_ =
+  ObstacleConf::PredictorType default_on_lane_predictor_ =
+      ObstacleConf::LANE_SEQUENCE_PREDICTOR;
+
+  ObstacleConf::PredictorType default_off_lane_predictor_ =
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
   PredictionObstacles prediction_obstacles_;

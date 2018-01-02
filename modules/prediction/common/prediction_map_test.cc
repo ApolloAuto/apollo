@@ -187,8 +187,8 @@ TEST_F(PredictionMapTest, get_nearby_lanes_by_current_lanes) {
   map_->NearbyLanesByCurrentLanes(point, theta, radius, curr_lanes,
                                   &nearby_lanes);
   EXPECT_EQ(2, nearby_lanes.size());
-  EXPECT_EQ("l21", nearby_lanes[0]->id().id());
-  EXPECT_EQ("l20", nearby_lanes[1]->id().id());
+  EXPECT_EQ("l20", nearby_lanes[0]->id().id());
+  EXPECT_EQ("l21", nearby_lanes[1]->id().id());
 }
 
 TEST_F(PredictionMapTest, neighbor_lane_detection) {

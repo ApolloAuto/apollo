@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::math::Vec2d;
 
 void CartesianFrenetConverter::cartesian_to_frenet(
     const double rs, const double rx, const double ry, const double rtheta,
@@ -82,8 +82,8 @@ void CartesianFrenetConverter::frenet_to_cartesian(
     const std::array<double, 3>& d_condition, double* const ptr_x,
     double* const ptr_y, double* const ptr_theta, double* const ptr_kappa,
     double* const ptr_v, double* const ptr_a) {
-  CHECK(std::abs(rs - s_condition[0]) < 1.0e-6 &&
-        "The reference point s and s_condition[0] don't match");
+  CHECK(std::abs(rs - s_condition[0]) < 1.0e-6)
+      << "The reference point s and s_condition[0] don't match";
 
   const double cos_theta_r = std::cos(rtheta);
   const double sin_theta_r = std::sin(rtheta);

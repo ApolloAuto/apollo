@@ -1,0 +1,83 @@
+
+--work_root=modules/perception
+--config_manager_path=conf/config_manager.config
+
+####################################################################
+# Flags from modules/perception/tool/offline_visualizer_tool/
+# /offline_sequential_obstacle_perception_test.cc
+# lidar data path
+# type: string
+# default: /apollo/data/lidar/
+--lidar_path=/apollo/data/lidar/
+
+# radar data path
+# type: string
+# default: /apollo/data/radar/
+--radar_path=/apollo/data/radar/
+
+# the radar detector for onboard
+# type: string
+# candidate: DummyRadarDetector, ModestRadarDetector
+--onboard_radar_detector=ModestRadarDetector
+
+# the fusion method for onboard
+# type: string
+# candidate: only ProbabilisticFusion
+--onboard_fusion=ProbabilisticFusion
+
+# enable visualization
+# type: bool
+# default: false
+--enable_visualization=true
+
+# enable showing obstacles from lidar/radar/fused
+# type: string
+# default: fused
+--obstacle_show_type=fused
+
+####################################################################
+# Flags from obstacle/onboard/hdmap_input.cc
+
+# roi distance of car center
+# type: double
+# default: 60.0
+--map_radius=60.0
+
+# step for sample road boundary points
+# type: int32
+# default: 1
+--map_sample_step=1
+
+--flagfile=modules/common/data/global_flagfile.txt
+
+####################################################################
+# Flags from obstacle/onboard/lidar_process.cc
+# enable hdmap input for roi filter
+# type: bool
+# default: false
+--enable_hdmap_input=true
+
+# roi filter before GroundDetector.
+# type: string
+# candidate: DummyROIFilter, HdmapROIFilter
+--onboard_roi_filter=HdmapROIFilter
+
+# the segmentation algorithm for onboard
+# type: string
+# candidate: DummySegmentation, CNNSegmentation
+--onboard_segmentor=CNNSegmentation
+
+# the object build algorithm for onboard
+# type: string
+# candidate: DummyObjectBuilder, MinBoxObjectBuilder
+--onboard_object_builder=MinBoxObjectBuilder
+
+# the tracking algorithm for onboard
+# type: string
+# candidate: DummyTracker, HmObjectTracker
+--onboard_tracker=HmObjectTracker
+
+# the type fusing algorithm for onboard
+# type: string
+# candidate: DummyTypeFuser, SequenceTypeFuser
+--onboard_type_fuser=DummyTypeFuser

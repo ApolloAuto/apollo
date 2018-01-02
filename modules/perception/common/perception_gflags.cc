@@ -16,8 +16,6 @@
 
 #include "modules/perception/common/perception_gflags.h"
 
-DEFINE_string(node_name, "perception", "The perception module name in proto");
-
 DEFINE_string(perception_adapter_config_filename,
               "modules/perception/conf/adapter.conf",
               "The adapter config filename");
@@ -42,11 +40,51 @@ DEFINE_string(onboard_segmentor, "DummySegmentation", "onboard segmentation");
 DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
               "onboard object builder");
 DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
+DEFINE_string(onboard_type_fuser, "DummyTypeFuser", "onboard type fuser");
 
 DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
-DEFINE_string(lidar_tf2_frame_id, "world", "the tf2 transform frame id");
+DEFINE_int32(localization_buffer_size, 40, "localization buffer size");
+DEFINE_string(lidar_tf2_frame_id, "novatel", "the tf2 transform frame id");
 DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");
 DEFINE_string(obstacle_module_name, "perception_obstacle",
               "perception obstacle module name");
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
+
+/// obstacle/perception.cc
+DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
+              "Onboard DAG Streaming config.");
+
+/// obstacle/onboard/radar_process_subnode.cc
+DEFINE_string(onboard_radar_detector, "DummyRadarDetector",
+              "onboard radar detector");
+DEFINE_string(radar_tf2_frame_id, "novatel", "the tf2 transform frame id");
+DEFINE_string(radar_tf2_child_frame_id, "radar",
+              "the tf2 transform child frame id");
+DEFINE_double(front_radar_forward_distance, 120.0,
+              "get front radar forward distancer");
+DEFINE_string(radar_extrinsic_file,
+              "modules/perception/data/params/radar_extrinsics.yaml",
+              "radar extrinsic file");
+DEFINE_string(short_camera_extrinsic_file,
+              "modules/perception/data/params/short_camera_extrinsics.yaml",
+              "short_camera extrinsic file");
+
+/// obstacle/onboard/fusion_subnode.cc
+DEFINE_string(onboard_fusion, "ProbabilisticFusion",
+              "fusion name which enabled onboard");
+
+DEFINE_double(query_signal_range, 100.0, "max distance to front signals");
+DEFINE_bool(output_raw_img, false, "write raw image to disk");
+DEFINE_bool(output_debug_img, false, "write debug image to disk");
+
+/// Temporarily change Kalman motion fusion to config here.
+DEFINE_double(q_matrix_coefficient_amplifier, 0.5,
+              "Kalman fitler matrix Q coeffcients");
+DEFINE_double(r_matrix_amplifier, 1, "Kalman fitler matrix r coeffcients");
+DEFINE_double(p_matrix_amplifier, 1, "Kalman fitler matrix p coeffcients");
+
+DEFINE_double(a_matrix_covariance_coeffcient_1, 0.05,
+              "Kalman fitler matrix a coeffcients, a_matrix_(0, 2)");
+DEFINE_double(a_matrix_covariance_coeffcient_2, 0.05,
+              "Kalman fitler matrix a coeffcients, a_matrix_(1, 3)");

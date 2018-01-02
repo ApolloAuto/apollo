@@ -72,6 +72,16 @@ const DiscretizedPath &PathData::discretized_path() const {
   return discretized_path_;
 }
 
+bool PathData::IsEmpty() const {
+  return discretized_path_.NumOfPoints() == 0 &&
+         frenet_path_.NumOfPoints() == 0;
+}
+
+std::list<std::pair<DiscretizedPath, FrenetFramePath>>
+    &PathData::path_data_history() {
+  return path_data_history_;
+}
+
 const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }
@@ -175,11 +185,14 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
 
     if (path_points.empty()) {
       path_point.set_s(0.0);
+      path_point.set_dkappa(0.0);
     } else {
       common::math::Vec2d last(path_points.back().x(), path_points.back().y());
       common::math::Vec2d current(path_point.x(), path_point.y());
       double distance = (last - current).Length();
       path_point.set_s(path_points.back().s() + distance);
+      path_point.set_dkappa((path_point.kappa() - path_points.back().kappa()) /
+                            distance);
     }
     path_points.push_back(std::move(path_point));
   }
@@ -190,9 +203,10 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
 
 bool PathData::XYToSL(const DiscretizedPath &discretized_path,
                       FrenetFramePath *const frenet_path) {
-  DCHECK_NOTNULL(frenet_path);
+  CHECK_NOTNULL(frenet_path);
+  CHECK_NOTNULL(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
-
+  const double max_len = reference_line_->Length();
   for (const auto &path_point : discretized_path.path_points()) {
     SLPoint sl_point;
     if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &sl_point)) {
@@ -201,7 +215,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
     }
     common::FrenetFramePoint frenet_point;
     // NOTICE: does not set dl and ddl here. Add if needed.
-    frenet_point.set_s(sl_point.s());
+    frenet_point.set_s(std::max(0.0, std::min(sl_point.s(), max_len)));
     frenet_point.set_l(sl_point.l());
     frenet_frame_points.push_back(std::move(frenet_point));
   }

@@ -2,106 +2,58 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-@observer
+import TasksIcon from "assets/images/sidebar/tasks.png";
+import ModuleControllerIcon from "assets/images/sidebar/module_controller.png";
+import LayerMenuIcon from "assets/images/sidebar/layer_menu.png";
+import RouteEditingIcon from "assets/images/sidebar/route_editing.png";
+
 class SideBarButton extends React.Component {
     render() {
-        const { onClick, active, label, extraClasses } = this.props;
+        const { disabled, onClick, active, label, extraClasses, iconSrc } = this.props;
         return (
             <button onClick={onClick}
+                    disabled={disabled}
                     className={classNames({
                             "button": true,
-                            "active": active,
+                            "button-active": active,
                         }, extraClasses)}>
-                {label}
+                <img src={iconSrc} className="icon" />
+                <div className="label">{label}</div>
             </button>
         );
     }
 }
 
-class DashCamButton extends React.Component {
-    constructor(props) {
-      super(props);
-      this.onClickHandler = this.onClickHandler.bind(this);
-    }
-
-    onClickHandler() {
-      this.fileInput.value = null;
-      this.fileInput.click();
-    }
-
-    render() {
-        const { onClick, video } = this.props;
-
-        return (
-          <div>
-            <input  style={{display: "none"}}
-                    ref={(input) => {
-                        this.fileInput = input;
-                    }}
-                    type="file"
-                    accept="video/*"
-                    onChange={onClick}/>
-            <button onClick={this.onClickHandler}
-                    className="button">
-                DashCam Video
-            </button>
-          </div>
-        );
-    }
-}
-
-@observer
 export default class ButtonPanel extends React.Component {
-    openHMI() {
-        const server = window.location.origin;
-        const link = document.createElement("a");
-        link.href = server;
-        window.open(
-            `http://${link.hostname}:8887`, "_self");
-    }
-
     render() {
-        const { onPOI, showPOI, showRouteEditingBar,
-                onVideo,
-                onPNCMonitor, showPNCMonitor,
-                onConsole, showConsole,
-                onMenu, showMenu, resetBackend, dumpMessages} = this.props;
+        const { enableHMIButtonsOnly,
+                onTasks, showTasks,
+                onModuleController, showModuleController,
+                onMenu, showMenu,
+                onRouteEditingBar, showRouteEditingBar } = this.props;
 
         return (
-            <div>
-                <SideBarButton label="HMI Setup" active={false}
-                               onClick={this.openHMI.bind(this)}
-                               extraClasses={["button-corner"]} />
-                <div className="separator" />
-                <SideBarButton label="Reset Backend Data"
-                               onClick={resetBackend}
-                               active={false} />
-                <div className="separator" />
-                <SideBarButton label="Dump Messages"
-                               onClick={dumpMessages}
-                               active={false} />
-                <div className="separator" />
-                <SideBarButton label="Default Routing"
-                               onClick={onPOI}
-                               active={showPOI} />
-                <div className="separator" />
-                <SideBarButton label="Route Editing"
-                               onClick={showRouteEditingBar}
-                               active={false} />
-                <div className="separator" />
-                <DashCamButton onClick={onVideo}/>
-                <div className="separator" />
-                <SideBarButton label="PNC Monitor"
-                               onClick={onPNCMonitor}
-                               active={showPNCMonitor} />
-                <div className="separator" />
-                <SideBarButton label="Notifications"
-                               onClick={onConsole}
-                               active={showConsole} />
-                <div className="separator" />
+            <div className="main-panel">
+                <SideBarButton label="Tasks"
+                               disabled={false}
+                               iconSrc={TasksIcon}
+                               onClick={onTasks}
+                               active={showTasks}/>
+                <SideBarButton label="Module Controller"
+                               disabled={false}
+                               iconSrc={ModuleControllerIcon}
+                               onClick={onModuleController}
+                               active={showModuleController}/>
                 <SideBarButton label="Layer Menu"
+                               disabled={enableHMIButtonsOnly}
+                               iconSrc={LayerMenuIcon}
                                onClick={onMenu}
                                active={showMenu} />
+                <SideBarButton label="Route Editing"
+                               disabled={enableHMIButtonsOnly}
+                               iconSrc={RouteEditingIcon}
+                               onClick={onRouteEditingBar}
+                               active={showRouteEditingBar} />
             </div>
         );
     }

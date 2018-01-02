@@ -28,7 +28,6 @@
 namespace apollo {
 namespace perception {
 
-using pcl_util::Point;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 using pcl_util::PointDCloud;
@@ -74,6 +73,7 @@ class GeometryUtilTest : public testing::Test {
     TransAffineToMatrix4(translation, rotation, &_trans_matrix);
   }
   void TearDown() {}
+
  protected:
   std::vector<pcl_util::PointCloudPtr> _clouds;
   Eigen::Matrix4d _trans_matrix;
@@ -100,7 +100,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
 
   pcl_util::PointCloudPtr in_out_cloud(new pcl_util::PointCloud);
   pcl::copyPointCloud(*_clouds[0], *in_out_cloud);
-  TransformPointCloud<Point>(_trans_matrix, in_out_cloud);
+  TransformPointCloud<pcl_util::Point>(_trans_matrix, in_out_cloud);
   EXPECT_NEAR(64.184380, in_out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, in_out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
@@ -115,7 +115,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
 TEST_F(GeometryUtilTest, TransformPointCloud3) {
   pcl_util::PointCloudPtr in_cloud(new pcl_util::PointCloud);
   for (int i = 0; i < 10; ++i) {
-    Point pt;
+    pcl_util::Point pt;
     pt.x = static_cast<float>(i);
     pt.y = static_cast<float>(i);
     pt.z = static_cast<float>(i);
@@ -142,12 +142,11 @@ TEST_F(GeometryUtilTest, TransformPointCloud) {
   EXPECT_NEAR(1.715922, trans_cloud->at(0).z, EPSILON);
 }
 
-
 TEST_F(GeometryUtilTest, GetCloudMinMax3D) {
   pcl_util::PointCloudPtr in_cloud(new pcl_util::PointCloud);
   in_cloud->is_dense = true;
   for (int i = 0; i < 10; ++i) {
-    Point pt;
+    pcl_util::Point pt;
     pt.x = static_cast<float>(i);
     pt.y = static_cast<float>(i);
     pt.z = static_cast<float>(i);
@@ -156,7 +155,7 @@ TEST_F(GeometryUtilTest, GetCloudMinMax3D) {
   }
   Eigen::Vector4f min_point;
   Eigen::Vector4f max_point;
-  GetCloudMinMax3D<Point>(in_cloud, &min_point, &max_point);
+  GetCloudMinMax3D<pcl_util::Point>(in_cloud, &min_point, &max_point);
   EXPECT_NEAR(min_point.x(), 0.0, EPSILON);
   EXPECT_NEAR(min_point.y(), 0.0, EPSILON);
   EXPECT_NEAR(min_point.z(), 0.0, EPSILON);
@@ -165,12 +164,12 @@ TEST_F(GeometryUtilTest, GetCloudMinMax3D) {
   EXPECT_NEAR(max_point.z(), 9.0, EPSILON);
 
   in_cloud->is_dense = false;
-  Point pt;
+  pcl_util::Point pt;
   pt.x = NAN;
   pt.y = NAN;
   pt.z = NAN;
   in_cloud->push_back(pt);
-  GetCloudMinMax3D<Point>(in_cloud, &min_point, &max_point);
+  GetCloudMinMax3D<pcl_util::Point>(in_cloud, &min_point, &max_point);
   EXPECT_NEAR(min_point.x(), 0.0, EPSILON);
   EXPECT_NEAR(min_point.y(), 0.0, EPSILON);
   EXPECT_NEAR(min_point.z(), 0.0, EPSILON);
@@ -192,14 +191,12 @@ TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
   EXPECT_TRUE(min_box_object_builder.Build(options, &objects));
   Eigen::Vector3d old_dir = objects[0]->direction;
   Eigen::Vector3d old_size = Eigen::Vector3d(
-      objects[0]->length,
-      objects[0]->width,
-      objects[0]->height);
+      objects[0]->length, objects[0]->width, objects[0]->height);
   Eigen::Vector3d old_center = objects[0]->center;
   Eigen::Vector3d new_size = old_size;
   Eigen::Vector3d new_center = old_center;
-  ComputeBboxSizeCenter<pcl_util::Point>(objects[0]->cloud,
-    old_dir, &new_size, &new_center);
+  ComputeBboxSizeCenter<pcl_util::Point>(objects[0]->cloud, old_dir, &new_size,
+                                         &new_center);
   EXPECT_NEAR(0.149998, new_size[0], EPSILON);
   EXPECT_NEAR(0.056100, new_size[1], EPSILON);
   EXPECT_NEAR(0.732072, new_size[2], EPSILON);
@@ -211,24 +208,29 @@ TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
 TEST_F(GeometryUtilTest, GetCloudBarycenter) {
   Eigen::Vector3f barycenter;
   // case 1
-  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
-      _clouds[0]).cast<float>();
+  barycenter =
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[0])
+          .cast<float>();
   EXPECT_NEAR(14.188400, barycenter[0], EPSILON);
   // case 2
-  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
-      _clouds[1]).cast<float>();
+  barycenter =
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[1])
+          .cast<float>();
   EXPECT_NEAR(15.661365, barycenter[0], EPSILON);
   // case 3
-  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
-      _clouds[2]).cast<float>();
+  barycenter =
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[2])
+          .cast<float>();
   EXPECT_NEAR(29.376224, barycenter[0], EPSILON);
   // case 4
-  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
-      _clouds[3]).cast<float>();
+  barycenter =
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[3])
+          .cast<float>();
   EXPECT_NEAR(13.144600, barycenter[0], EPSILON);
   // case 5
-  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
-      _clouds[4]).cast<float>();
+  barycenter =
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[4])
+          .cast<float>();
   EXPECT_NEAR(14.668054, barycenter[0], EPSILON);
 }
 
@@ -255,22 +257,20 @@ TEST_F(GeometryUtilTest, VectorCosTheta2dXy) {
   Eigen::Vector3f anchor_point_shift_dir(1.0, 1.0, 0.0);
   track_motion_dir.normalize();
   anchor_point_shift_dir.normalize();
-  double cos_theta = VectorCosTheta2dXy(track_motion_dir,
-    anchor_point_shift_dir);
+  double cos_theta =
+      VectorCosTheta2dXy(track_motion_dir, anchor_point_shift_dir);
   EXPECT_NEAR(1.0, cos_theta, EPSILON);
   // case 2
   track_motion_dir << 2.0, 2.2, 3.1;
   anchor_point_shift_dir << 1.1, 2.0, 3.5;
-  cos_theta = VectorCosTheta2dXy(track_motion_dir,
-    anchor_point_shift_dir);
+  cos_theta = VectorCosTheta2dXy(track_motion_dir, anchor_point_shift_dir);
   track_motion_dir.normalize();
   anchor_point_shift_dir.normalize();
   EXPECT_NEAR(0.972521, cos_theta, EPSILON);
   // case 3
   track_motion_dir << 25.0, 72.2, 3.24;
   anchor_point_shift_dir << 31.1, 98.0, 24.5;
-  cos_theta = VectorCosTheta2dXy(track_motion_dir,
-    anchor_point_shift_dir);
+  cos_theta = VectorCosTheta2dXy(track_motion_dir, anchor_point_shift_dir);
   track_motion_dir.normalize();
   anchor_point_shift_dir.normalize();
   EXPECT_NEAR(0.999661, cos_theta, EPSILON);

@@ -20,11 +20,14 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/util/map_util.h"
 
 namespace apollo {
 namespace routing {
-
 namespace {
+
+using apollo::common::util::ContainsKey;
+using apollo::common::util::FindOrDieNoPrint;
 
 void merge_block_range(const TopoNode* topo_node,
                        const std::vector<NodeSRange>& origin_range,
@@ -60,30 +63,17 @@ TopoRangeManager::RangeMap() const {
 }
 
 bool TopoRangeManager::Find(const TopoNode* node) const {
-  if (range_map_.find(node) == range_map_.end()) {
-    return false;
-  }
-  return true;
+  return ContainsKey(range_map_, node);
 }
 
 double TopoRangeManager::RangeStart(const TopoNode* node) const {
-  const auto iter = range_map_.find(node);
-  if (iter == range_map_.end()) {
-    AERROR << "Error occured when getting range "
-           << "start of non-existent node in map.";
-    exit(-1);
-  }
-  return iter->second.front().StartS();
+  const auto& range = FindOrDieNoPrint(range_map_, node);
+  return range.front().StartS();
 }
 
 double TopoRangeManager::RangeEnd(const TopoNode* node) const {
-  const auto iter = range_map_.find(node);
-  if (iter == range_map_.end()) {
-    AERROR << "Error occured when getting range "
-           << "end of non-existent node in map.";
-    exit(-1);
-  }
-  return iter->second.back().EndS();
+  const auto& range = FindOrDieNoPrint(range_map_, node);
+  return range.back().EndS();
 }
 
 void TopoRangeManager::PrintDebugInfo() const {

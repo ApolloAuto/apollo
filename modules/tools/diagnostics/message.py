@@ -25,7 +25,8 @@ import rospy
 from modules.canbus.proto import chassis_detail_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.common.configs.proto import vehicle_config_pb2
-from modules.common.monitor.proto import monitor_pb2
+from modules.common.monitor_log.proto import monitor_log_pb2
+from modules.common.proto import drive_event_pb2
 from modules.common.proto import geometry_pb2
 from modules.common.proto import header_pb2
 from modules.control.proto import control_cmd_pb2
@@ -41,6 +42,7 @@ from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
 from modules.drivers.proto import mobileye_pb2
 from modules.drivers.proto import delphi_esr_pb2
+from modules.drivers.proto import conti_radar_pb2
 
 Refreshrate = 16
 
@@ -130,7 +132,8 @@ class Message(object):
         while item.show is False:
             item = item.repeatedlist[item.selection][3]
         if item.selection is not None:
-            item.selection = min(item.selection + 1, len(item.repeatedlist) - 1)
+            item.selection = min(item.selection + 1,
+                                 len(item.repeatedlist) - 1)
         item.display_on_screen()
 
     def key_right(self):

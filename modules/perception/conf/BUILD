@@ -11,6 +11,7 @@ filegroup(
     name = "perception_config",
     srcs = [
         "config_manager.config",
+        "dag_streaming.config",
         "perception.conf",
     ],
 )

@@ -20,9 +20,9 @@
 #include <limits>
 #include <string>
 
+#include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
@@ -70,6 +70,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
                     TrajectoryPoint* point) {
   if (point == nullptr || !point->has_path_point()) {
     AERROR << "Point is nullptr or has NO path_point.";
+    return;
   }
   const double original_x = point->path_point().x();
   const double original_y = point->path_point().y();
@@ -78,37 +79,40 @@ void TranslatePoint(const double translate_x, const double translate_y,
 }
 
 void GenerateFreeMoveTrajectoryPoints(
-    Eigen::Matrix<double, 6, 1> *state,
-    const Eigen::Matrix<double, 6, 6>& transition,
-    const size_t num,
-    const double freq,
-    std::vector<TrajectoryPoint> *points) {
+    Eigen::Matrix<double, 6, 1>* state,
+    const Eigen::Matrix<double, 6, 6>& transition, double theta,
+    const size_t num, const double period,
+    std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
   double v_x = (*state)(2, 0);
   double v_y = (*state)(3, 0);
   double acc_x = (*state)(4, 0);
   double acc_y = (*state)(5, 0);
-  double theta = std::atan2(v_y, v_x);
 
   for (size_t i = 0; i < num; ++i) {
     double speed = std::hypot(v_x, v_y);
+    double acc = 0.0;
     if (speed <= std::numeric_limits<double>::epsilon()) {
       speed = 0.0;
       v_x = 0.0;
       v_y = 0.0;
       acc_x = 0.0;
       acc_y = 0.0;
+      acc = 0.0;
     } else if (speed > FLAGS_max_speed) {
       speed = FLAGS_max_speed;
     }
 
-    // update theta
+    // update theta and acc
     if (speed > std::numeric_limits<double>::epsilon()) {
       if (points->size() > 0) {
-        PathPoint* prev_point = points->back().mutable_path_point();
-        theta = std::atan2(y - prev_point->y(), x - prev_point->x());
-        prev_point->set_theta(theta);
+        TrajectoryPoint& prev_trajectory_point = points->back();
+        PathPoint* prev_path_point = prev_trajectory_point.mutable_path_point();
+        theta = std::atan2(y - prev_path_point->y(), x - prev_path_point->x());
+        prev_path_point->set_theta(theta);
+        acc = (speed - prev_trajectory_point.v()) / period;
+        prev_trajectory_point.set_a(acc);
       }
     } else {
       if (points->size() > 0) {
@@ -135,8 +139,8 @@ void GenerateFreeMoveTrajectoryPoints(
     path_point.set_theta(theta);
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
-    trajectory_point.set_a(std::hypot(acc_x, acc_y));
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    trajectory_point.set_a(acc);
+    trajectory_point.set_relative_time(static_cast<double>(i) * period);
     points->emplace_back(std::move(trajectory_point));
 
     // Update position, velocity and acceleration
@@ -151,12 +155,9 @@ void GenerateFreeMoveTrajectoryPoints(
 }
 
 void GenerateLaneSequenceTrajectoryPoints(
-    Eigen::Matrix<double, 4, 1> *state,
-    Eigen::Matrix<double, 4, 4> *transition,
-    const LaneSequence& sequence,
-    const size_t num,
-    const double freq,
-    std::vector<TrajectoryPoint> *points) {
+    Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
+    const LaneSequence& sequence, const size_t num, const double period,
+    std::vector<TrajectoryPoint>* points) {
   PredictionMap* map = PredictionMap::instance();
   double lane_s = (*state)(0, 0);
   double lane_l = (*state)(1, 0);
@@ -172,19 +173,6 @@ void GenerateLaneSequenceTrajectoryPoints(
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
-    }
-
-    if (points->size() > 0) {
-      PathPoint* prev_point = points->back().mutable_path_point();
-      double x_diff = point.x() - prev_point->x();
-      double y_diff = point.y() - prev_point->y();
-      if (std::fabs(x_diff) > std::numeric_limits<double>::epsilon() ||
-          std::fabs(y_diff) > std::numeric_limits<double>::epsilon()) {
-        theta = std::atan2(y_diff, x_diff);
-        prev_point->set_theta(theta);
-      } else {
-        theta = prev_point->theta();
-      }
     }
 
     // update state
@@ -205,10 +193,11 @@ void GenerateLaneSequenceTrajectoryPoints(
     path_point.set_y(point.y());
     path_point.set_z(0.0);
     path_point.set_theta(theta);
+    path_point.set_lane_id(lane_id);
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(lane_speed);
     trajectory_point.set_a(lane_acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    trajectory_point.set_relative_time(static_cast<double>(i) * period);
     points->emplace_back(std::move(trajectory_point));
 
     (*state)(2, 0) = lane_speed;

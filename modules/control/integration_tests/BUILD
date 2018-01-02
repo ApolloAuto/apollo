@@ -35,4 +35,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "relative_position_test",
+    size = "small",
+    srcs = [
+        "relative_position_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_test_base",
+        "@gtest//:gtest",
+    ],
+)
+
 cpplint()

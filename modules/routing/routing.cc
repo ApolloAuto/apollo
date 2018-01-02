@@ -28,10 +28,12 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::ErrorCode;
 
-std::string Routing::Name() const { return FLAGS_node_name; }
+std::string Routing::Name() const {
+  return FLAGS_routing_node_name;
+}
 
 Routing::Routing()
-    : monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
+    : monitor_logger_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
 
 apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
@@ -41,6 +43,9 @@ apollo::common::Status Routing::Init() {
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
+
+  hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+  CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
 
   AdapterManager::Init(FLAGS_routing_adapter_config_filename);
   AdapterManager::AddRoutingRequestCallback(&Routing::OnRoutingRequest, this);
@@ -55,17 +60,48 @@ apollo::common::Status Routing::Start() {
   }
   AINFO << "Routing service is ready.";
 
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("Routing started");
   return apollo::common::Status::OK();
 }
 
+RoutingRequest Routing::FillLaneInfoIfMissing(
+    const RoutingRequest &routing_request) {
+  RoutingRequest fixed_request(routing_request);
+  for (int i = 0; i < routing_request.waypoint_size(); ++i) {
+    const auto& lane_waypoint = routing_request.waypoint(i);
+    if (lane_waypoint.has_id()) {
+      continue;
+    }
+    auto point = common::util::MakePointENU(lane_waypoint.pose().x(),
+                                            lane_waypoint.pose().y(),
+                                            lane_waypoint.pose().z());
+
+    double s = 0.0;
+    double l = 0.0;
+    hdmap::LaneInfoConstPtr lane;
+    // FIXME(all): select one reasonable lane candidate for point=>lane
+    // is one to many relationship.
+    if (hdmap_->GetNearestLane(point, &lane, &s, &l) != 0) {
+      AERROR << "Failed to find nearest lane from map at position: "
+             << point.DebugString();
+      return routing_request;
+    }
+    auto waypoint_info = fixed_request.mutable_waypoint(i);
+    waypoint_info->set_id(lane->id().id());
+    waypoint_info->set_s(s);
+  }
+  AINFO << "Fixed routing request:" << fixed_request.DebugString();
+  return fixed_request;
+}
+
 void Routing::OnRoutingRequest(
-    const apollo::routing::RoutingRequest &routing_request) {
-  AINFO << "Get new routing request!!!";
-  routing::RoutingResponse routing_response;
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
-  if (!navigator_ptr_->SearchRoute(routing_request, &routing_response)) {
+    const RoutingRequest &routing_request) {
+  AINFO << "Get new routing request:" << routing_request.DebugString();
+  RoutingResponse routing_response;
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  const auto& fixed_request = FillLaneInfoIfMissing(routing_request);
+  if (!navigator_ptr_->SearchRoute(fixed_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
 
     buffer.WARN("Routing failed! " + routing_response.status().msg());

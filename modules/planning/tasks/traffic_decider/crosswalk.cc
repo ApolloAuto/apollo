@@ -25,7 +25,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
@@ -52,6 +52,12 @@ bool Crosswalk::ApplyRule(Frame* frame,
     return true;
   }
 
+  MakeDecisions(frame, reference_line_info);
+  return true;
+}
+
+void Crosswalk::MakeDecisions(Frame* frame,
+                              ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     const PerceptionObstacle& perception_obstacle =
@@ -128,7 +134,7 @@ bool Crosswalk::ApplyRule(Frame* frame,
         //     always STOP
         // (3) when l_distance <= strick_l_distance + not on_road(on sideway),
         //     STOP only if path crosses
-        if (is_on_road || (!is_on_road && is_path_cross)) {
+        if (is_on_road || is_path_cross) {
           stop = true;
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
                  << "]; crosswalk_id[" << crosswalk_id << "]";
@@ -165,8 +171,6 @@ bool Crosswalk::ApplyRule(Frame* frame,
       }
     }
   }
-
-  return true;
 }
 
 bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
@@ -182,7 +186,8 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
 double Crosswalk::GetStopDeceleration(
     ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* crosswalk_overlap) {
-  double adc_speed = common::VehicleState::instance()->linear_velocity();
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed < FLAGS_stop_min_speed) {
     return 0.0;
   }
@@ -208,15 +213,18 @@ void Crosswalk::CreateStopObstacle(
   sl_point.set_s(crosswalk_overlap->start_s);
   sl_point.set_l(0);
   Vec2d vec2d;
-  reference_line_info->reference_line().SLToXY(sl_point, &vec2d);
+  if (reference_line_info->reference_line().SLToXY(sl_point, &vec2d)) {
+    AERROR << "Fail to create stop obstacle because SL to XY failed.";
+    return;
+  }
+
   double heading = reference_line_info->reference_line()
                        .GetReferencePoint(crosswalk_overlap->start_s)
                        .heading();
-  double left_width;
-  double right_width;
+  double left_width = 0.0;
+  double right_width = 0.0;
   reference_line_info->reference_line().GetLaneWidth(crosswalk_overlap->start_s,
                                                      &left_width, &right_width);
-
   Box2d stop_wall_box{{vec2d.x(), vec2d.y()},
                       heading,
                       FLAGS_virtual_stop_wall_length,

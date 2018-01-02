@@ -7,7 +7,6 @@ cc_library(
     deps = [
         ":log",
         ":macro",
-        "@glog//:glog",
         "@ros//:ros_common",
     ],
 )
@@ -38,9 +37,9 @@ cc_library(
         "apollo_app.h",
     ],
     deps = [
+        ":log",
         "//modules/common/status",
-        "//modules/hmi/utils:hmi_status_helper",
-        "@glog//:glog",
+        "//modules/common/util:string_util",
         "@ros//:ros_common",
     ],
 )

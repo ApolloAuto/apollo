@@ -16,19 +16,20 @@
 
 #include "modules/prediction/common/prediction_map.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <utility>
 #include <vector>
-
-#include "modules/map/proto/map_id.pb.h"
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -36,10 +37,13 @@ namespace prediction {
 
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::Id;
+using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
 
 PredictionMap::PredictionMap() {}
+
+bool PredictionMap::Ready() { return HDMapUtil::BaseMapPtr() != nullptr; }
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
     std::shared_ptr<const LaneInfo> lane_info, const double s) {
@@ -89,6 +93,37 @@ bool PredictionMap::ProjectionFromLane(
   return true;
 }
 
+bool PredictionMap::IsVirtualLane(const std::string& lane_id) {
+  std::shared_ptr<const LaneInfo> lane_info =
+      HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id));
+  if (lane_info == nullptr) {
+    return false;
+  }
+  const apollo::hdmap::Lane& lane = lane_info->lane();
+  bool left_virtual = lane.has_left_boundary() &&
+                      lane.left_boundary().has_virtual_() &&
+                      lane.left_boundary().virtual_();
+  bool right_virtual = lane.has_right_boundary() &&
+                       lane.right_boundary().has_virtual_() &&
+                       lane.right_boundary().virtual_();
+  return left_virtual && right_virtual;
+}
+
+bool PredictionMap::OnVirtualLane(const Eigen::Vector2d& point,
+                                  const double radius) {
+  std::vector<std::shared_ptr<const LaneInfo>> lanes;
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  HDMapUtil::BaseMap().GetLanes(hdmap_point, radius, &lanes);
+  for (const auto& lane : lanes) {
+    if (IsVirtualLane(lane->id().id())) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void PredictionMap::OnLane(
     const std::vector<std::shared_ptr<const LaneInfo>>& prev_lanes,
     const Eigen::Vector2d& point, const double heading, const double radius,
@@ -104,6 +139,7 @@ void PredictionMap::OnLane(
   }
 
   const common::math::Vec2d vec_point(point[0], point[1]);
+  std::vector<std::pair<std::shared_ptr<const LaneInfo>, double>> lane_pairs;
   for (const auto& candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
@@ -124,9 +160,40 @@ void PredictionMap::OnLane(
     double diff =
         std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
     if (diff <= FLAGS_max_lane_angle_diff) {
-      lanes->push_back(candidate_lane);
+      lane_pairs.emplace_back(candidate_lane, diff);
     }
   }
+  if (lane_pairs.empty()) {
+    return;
+  }
+  std::sort(lane_pairs.begin(), lane_pairs.end(),
+            [](const std::pair<std::shared_ptr<const LaneInfo>, double>& p1,
+               const std::pair<std::shared_ptr<const LaneInfo>, double>& p2) {
+              return p1.second < p2.second;
+            });
+  for (const auto& lane_pair : lane_pairs) {
+    lanes->push_back(lane_pair.first);
+  }
+}
+
+bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
+                                 const double radius) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  std::vector<std::shared_ptr<const JunctionInfo>> junctions;
+  HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
+  return junctions.size() > 0;
+}
+
+std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
+    const Eigen::Vector2d& point, const double radius) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  std::vector<std::shared_ptr<const JunctionInfo>> junctions;
+  HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
+  return junctions;
 }
 
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
@@ -197,6 +264,20 @@ void PredictionMap::NearbyLanesByCurrentLanes(
       }
     }
   }
+}
+
+std::vector<std::string> PredictionMap::NearbyLaneIds(
+    const Eigen::Vector2d& point, const double radius) {
+  std::vector<std::string> lane_ids;
+  std::vector<std::shared_ptr<const LaneInfo>> lanes;
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  HDMapUtil::BaseMap().GetLanes(hdmap_point, radius, &lanes);
+  for (const auto& lane : lanes) {
+    lane_ids.push_back(lane->id().id());
+  }
+  return lane_ids;
 }
 
 bool PredictionMap::IsLeftNeighborLane(

@@ -29,16 +29,8 @@ Apollo演示的安装步骤：
 
     选项 `--loop` 用于设置循环回放模式.
 
-4. 打开Chrome浏览器，在地址栏输入**localhost:8887**即可访问Apollo HMI。 HMI主页如下图所示。
-    ![](images/start_hmi.png)
-
-5. 点击中间控制面板的 'Dreamview' 开关.
-    ![](images/dreamview_enable.png)
-
-6. 点击右上角的"Dreamview" 按钮打开Dreamview.
-    ![](images/dreamview_launch.png)
-
-7. Dreamview会以默认网址**localhost:8888**打开.
-    ![](images/dv_trajectory.png)现在你能看到有一辆汽车在模拟器里移动!
+4. 打开Chrome浏览器，在地址栏输入**localhost:8888**即可访问Apollo Dreamview，如下图所示：
+    ![](images/dv_trajectory.png)
+   现在你能看到有一辆汽车在模拟器里移动!
 
 恭喜你完成了Apollo的演示步骤！

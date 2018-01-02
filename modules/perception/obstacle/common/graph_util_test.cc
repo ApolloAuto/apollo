@@ -39,7 +39,7 @@ TEST_F(GraphUtilTest, ConnectedComponentAnalysis) {
   // Compute connected components within given threshold
   int no_track = association_mat.rows();
   int no_obj = association_mat.cols();
-  std::vector<std::vector<int> > nb_graph;
+  std::vector<std::vector<int>> nb_graph;
   nb_graph.resize(no_track + no_obj);
   for (int i = 0; i < no_track; i++) {
     for (int j = 0; j < no_obj; j++) {
@@ -50,7 +50,7 @@ TEST_F(GraphUtilTest, ConnectedComponentAnalysis) {
     }
   }
 
-  std::vector<std::vector<int> > components;
+  std::vector<std::vector<int>> components;
   ConnectedComponentAnalysis(nb_graph, &components);
   EXPECT_EQ(2, components.size());
   EXPECT_EQ(4, components[0].size());

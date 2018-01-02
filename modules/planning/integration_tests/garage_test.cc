@@ -44,6 +44,7 @@ class GarageTest : public PlanningTestBase {
     FLAGS_base_map_filename = "base_map.txt";
     FLAGS_test_data_dir = "modules/planning/testdata/garage_test";
     FLAGS_planning_upper_speed_limit = 12.5;
+    FLAGS_enable_lag_prediction = false;
   }
 };
 

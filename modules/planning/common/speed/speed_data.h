@@ -48,6 +48,8 @@ class SpeedData {
 
   double TotalTime() const;
 
+  bool Empty() const { return speed_vector_.empty(); }
+
   void Clear();
 
   virtual std::string DebugString() const;

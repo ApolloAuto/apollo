@@ -114,15 +114,15 @@ TEST_F(ObstacleTest, GetPointAtTime) {
   EXPECT_FLOAT_EQ(350.481852505, first_point.path_point().y());
 
   // last
-  const auto last_point = obstacle->GetPointAtTime(10044.15320);
-  EXPECT_FLOAT_EQ(10044.1531943, last_point.relative_time());
+  const auto last_point = obstacle->GetPointAtTime(10.04415320);
+  EXPECT_FLOAT_EQ(10.0441531943, last_point.relative_time());
   EXPECT_FLOAT_EQ(186.259371951, last_point.path_point().x());
   EXPECT_FLOAT_EQ(341.853799387, last_point.path_point().y());
 
   // middle
-  const auto middle_point = obstacle->GetPointAtTime(3730.0);
-  EXPECT_LE(3689.68892853, middle_point.relative_time());
-  EXPECT_GE(3894.67164678, middle_point.relative_time());
+  const auto middle_point = obstacle->GetPointAtTime(3.7300);
+  EXPECT_LE(3.68968892853, middle_point.relative_time());
+  EXPECT_GE(3.89467164678, middle_point.relative_time());
   EXPECT_GE(139.091700103, middle_point.path_point().x());
   EXPECT_LE(135.817210975, middle_point.path_point().x());
   EXPECT_GE(349.875902219, middle_point.path_point().y());

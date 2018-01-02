@@ -32,9 +32,9 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "modules/common/transform_listener/transform_listener.h"
 
 #include "ros/include/ros/ros.h"
-#include "tf/transform_listener.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -53,14 +53,16 @@ namespace adapter {
 #define REGISTER_ADAPTER(name)                                                 \
  public:                                                                       \
   static void Enable##name(const std::string &topic_name,                      \
-                           AdapterConfig::Mode mode,                           \
-                           int message_history_limit) {                        \
-    CHECK(message_history_limit > 0)                                           \
+                           const AdapterConfig &config) {                      \
+    CHECK(config.message_history_limit() > 0)                                  \
         << "Message history limit must be greater than 0";                     \
-    instance()->InternalEnable##name(topic_name, mode, message_history_limit); \
+    instance()->InternalEnable##name(topic_name, config);                      \
   }                                                                            \
   static name##Adapter *Get##name() {                                          \
     return instance()->InternalGet##name();                                    \
+  }                                                                            \
+  static AdapterConfig &Get##name##Config() {                                  \
+    return instance()->name##config_;                                          \
   }                                                                            \
   static bool Feed##name##File(const std::string &proto_file) {                \
     if (!instance()->name##_) {                                                \
@@ -88,6 +90,11 @@ namespace adapter {
       void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
     Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
+  template <class T>                                                           \
+  static void Add##name##Callback(                                             \
+      void (T::*fp)(const name##Adapter::DataType &data)) {                    \
+    Add##name##Callback(fp);                                                   \
+  }                                                                            \
   /* Returns false if there's no callback to pop out, true otherwise. */       \
   static bool Pop##name##Callback() {                                          \
     return instance()->name##_->PopCallback();                                 \
@@ -97,23 +104,24 @@ namespace adapter {
   std::unique_ptr<name##Adapter> name##_;                                      \
   ros::Publisher name##publisher_;                                             \
   ros::Subscriber name##subscriber_;                                           \
+  AdapterConfig name##config_;                                                 \
                                                                                \
   void InternalEnable##name(const std::string &topic_name,                     \
-                            AdapterConfig::Mode mode,                          \
-                            int message_history_limit) {                       \
+                            const AdapterConfig &config) {                     \
     name##_.reset(                                                             \
-        new name##Adapter(#name, topic_name, message_history_limit));          \
-    if (mode != AdapterConfig::PUBLISH_ONLY && IsRos()) {                      \
+        new name##Adapter(#name, topic_name, config.message_history_limit())); \
+    if (config.mode() != AdapterConfig::PUBLISH_ONLY && IsRos()) {             \
       name##subscriber_ =                                                      \
-          node_handle_->subscribe(topic_name, message_history_limit,           \
+          node_handle_->subscribe(topic_name, config.message_history_limit(),  \
                                   &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
-    if (mode != AdapterConfig::RECEIVE_ONLY && IsRos()) {                      \
+    if (config.mode() != AdapterConfig::RECEIVE_ONLY && IsRos()) {             \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
-          topic_name, message_history_limit);                                  \
+          topic_name, config.message_history_limit(), config.latch());         \
     }                                                                          \
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
+    name##config_ = config;                                                    \
   }                                                                            \
   name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
@@ -190,7 +198,8 @@ class AdapterManager {
    */
   static tf2_ros::Buffer &Tf2Buffer() {
     static tf2_ros::Buffer tf2_buffer;
-    static tf2_ros::TransformListener tf2Listener(tf2_buffer);
+    static TransformListener tf2Listener(&tf2_buffer,
+                                         instance()->node_handle_.get());
     return tf2_buffer;
   }
 
@@ -231,12 +240,15 @@ class AdapterManager {
   REGISTER_ADAPTER(ControlCommand);
   REGISTER_ADAPTER(Gps);
   REGISTER_ADAPTER(Imu);
+  REGISTER_ADAPTER(RawImu);
   REGISTER_ADAPTER(Localization);
   REGISTER_ADAPTER(Monitor);
   REGISTER_ADAPTER(Pad);
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(ImageShort);
+  REGISTER_ADAPTER(ImageLong);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);
@@ -246,11 +258,18 @@ class AdapterManager {
   REGISTER_ADAPTER(InsStatus);
   REGISTER_ADAPTER(GnssStatus);
   REGISTER_ADAPTER(SystemStatus);
-  // TODO(xiaoxq): Retire HMICommand adapter after integration with dreamview.
-  REGISTER_ADAPTER(HMICommand);
+  REGISTER_ADAPTER(StaticInfo);
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
+  REGISTER_ADAPTER(ContiRadar);
   REGISTER_ADAPTER(CompressedImage);
+  REGISTER_ADAPTER(GnssRtkObs);
+  REGISTER_ADAPTER(GnssRtkEph);
+  REGISTER_ADAPTER(GnssBestPose);
+  REGISTER_ADAPTER(LocalizationMsfGnss);
+  REGISTER_ADAPTER(LocalizationMsfLidar);
+  REGISTER_ADAPTER(LocalizationMsfSinsPva);
+  REGISTER_ADAPTER(LocalizationMsfStatus);
 
   DECLARE_SINGLETON(AdapterManager);
 };

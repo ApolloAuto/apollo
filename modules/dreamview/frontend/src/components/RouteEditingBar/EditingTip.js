@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from 'react-dom';
+import classNames from "classnames";
 
 import helpIcon from "assets/images/icons/help.png";
 
@@ -53,19 +54,18 @@ For Mobile device:
             display: this.state.active ? 'block' : 'none'
         };
 
-        const tipStyle = {
-            backgroundColor: (this.state.active || this.state.hover) ? "#09182C" : "#102244"
-
-        };
-
         return (
-            <div className="editing-tip" style={tipStyle}
+            <button className={classNames({
+                        "editing-tip" : true,
+                        "button" : true,
+                        "active": (this.state.active || this.state.hover),
+                    })}
                  onClick={this.toggle}
                  onMouseOver={this.handleMouseIn}
                  onMouseOut={this.handleMouseOut}>
                 <img src={helpIcon} />
                 <p style={textStyle}>{this.text}</p>
-            </div>
+            </button>
         );
     }
 }

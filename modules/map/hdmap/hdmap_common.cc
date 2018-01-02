@@ -37,8 +37,11 @@ const double kSegmentationEpsilon = 0.2;
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
 
+// margin for comparation
+const double kEpsilon = 0.1;
+
 void RemoveDuplicates(std::vector<Vec2d> *points) {
-  CHECK_NOTNULL(points);
+  RETURN_IF_NULL(points);
 
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
@@ -51,7 +54,8 @@ void RemoveDuplicates(std::vector<Vec2d> *points) {
 }
 
 void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
-  CHECK_NOTNULL(points)->clear();
+  RETURN_IF_NULL(points);
+  points->clear();
 
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
@@ -59,7 +63,7 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
         points->emplace_back(point.x(), point.y());
       }
     } else {
-      LOG(FATAL) << "Can not handle curve type.";
+      AERROR << "Can not handle curve type.";
     }
   }
   RemoveDuplicates(points);
@@ -83,7 +87,7 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
 void SegmentsFromCurve(
     const Curve &curve,
     std::vector<apollo::common::math::LineSegment2d> *segments) {
-  CHECK_NOTNULL(segments);
+  RETURN_IF_NULL(segments);
 
   std::vector<Vec2d> points;
   PointsFromCurve(curve, &points);
@@ -185,10 +189,15 @@ void LaneInfo::GetWidth(const double s, double *left_width,
 
 double LaneInfo::Heading(const double s) const {
   const double kEpsilon = 0.001;
-  CHECK(s + kEpsilon >= accumulated_s_.front())
-      << "s:" << s << " should be >= " << accumulated_s_.front();
-  CHECK(s - kEpsilon <= accumulated_s_.back())
-      << "s:" << s << " should be <= " << accumulated_s_.back();
+  if (s + kEpsilon < accumulated_s_.front()) {
+    AERROR << "s:" << s << " should be >= " << accumulated_s_.front();
+    return 0.0;
+  }
+  if (s - kEpsilon > accumulated_s_.back()) {
+    AERROR << "s:" << s << " should be <= " << accumulated_s_.back();
+    return 0.0;
+  }
+
   auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
   int index = std::distance(accumulated_s_.begin(), iter);
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
@@ -196,7 +205,6 @@ double LaneInfo::Heading(const double s) const {
   } else {
     return common::math::slerp(headings_[index - 1], accumulated_s_[index - 1],
                                headings_[index], accumulated_s_[index], s);
-    // return headings_[index - 1];
   }
 }
 
@@ -248,7 +256,8 @@ bool LaneInfo::IsOnLane(const Vec2d &point) const {
     return false;
   }
 
-  if (accumulate_s > total_length() || accumulate_s < 0.0) {
+  if (accumulate_s > (total_length() + kEpsilon) ||
+              (accumulate_s + kEpsilon) < 0.0) {
     return false;
   }
 
@@ -273,7 +282,8 @@ bool LaneInfo::IsOnLane(const apollo::common::math::Box2d &box) const {
 }
 
 PointENU LaneInfo::GetSmoothPoint(double s) const {
-  CHECK_GE(points_.size(), 2);
+  PointENU point;
+  RETURN_VAL_IF(points_.size() < 2, point);
   if (s <= 0.0) {
     return PointFromVec2d(points_[0]);
   }
@@ -284,7 +294,7 @@ PointENU LaneInfo::GetSmoothPoint(double s) const {
 
   const auto low_itr =
       std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
-  CHECK(low_itr != accumulated_s_.end());
+  RETURN_VAL_IF(low_itr == accumulated_s_.end(), point);
   size_t index = low_itr - accumulated_s_.begin();
   double delta_s = *low_itr - s;
   if (delta_s < apollo::common::math::kMathEpsilon) {
@@ -298,18 +308,18 @@ PointENU LaneInfo::GetSmoothPoint(double s) const {
 
 double LaneInfo::DistanceTo(const Vec2d &point) const {
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
-  CHECK(segment_box != nullptr);
+  RETURN_VAL_IF_NULL(segment_box, 0.0);
   return segment_box->DistanceTo(point);
 }
 
 double LaneInfo::DistanceTo(const Vec2d &point, Vec2d *map_point,
                             double *s_offset, int *s_offset_index) const {
-  CHECK_NOTNULL(map_point);
-  CHECK_NOTNULL(s_offset);
-  CHECK_NOTNULL(s_offset_index);
+  RETURN_VAL_IF_NULL(map_point, 0.0);
+  RETURN_VAL_IF_NULL(s_offset, 0.0);
+  RETURN_VAL_IF_NULL(s_offset_index, 0.0);
 
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
-  CHECK(segment_box != nullptr);
+  RETURN_VAL_IF_NULL(segment_box, 0.0);
   int index = segment_box->id();
   double distance = segments_[index].DistanceTo(point, map_point);
   *s_offset_index = index;
@@ -319,10 +329,11 @@ double LaneInfo::DistanceTo(const Vec2d &point, Vec2d *map_point,
 }
 
 PointENU LaneInfo::GetNearestPoint(const Vec2d &point, double *distance) const {
-  CHECK_NOTNULL(distance);
+  PointENU empty_point;
+  RETURN_VAL_IF_NULL(distance, empty_point);
 
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
-  CHECK(segment_box != nullptr);
+  RETURN_VAL_IF_NULL(segment_box, empty_point);
   int index = segment_box->id();
   Vec2d nearest_point;
   *distance = segments_[index].DistanceTo(point, &nearest_point);
@@ -332,8 +343,8 @@ PointENU LaneInfo::GetNearestPoint(const Vec2d &point, double *distance) const {
 
 bool LaneInfo::GetProjection(const Vec2d &point, double *accumulate_s,
                              double *lateral) const {
-  CHECK_NOTNULL(accumulate_s);
-  CHECK_NOTNULL(lateral);
+  RETURN_VAL_IF_NULL(accumulate_s, false);
+  RETURN_VAL_IF_NULL(lateral, false);
 
   if (segments_.empty()) {
     return false;

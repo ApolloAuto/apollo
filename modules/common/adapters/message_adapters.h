@@ -21,17 +21,23 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
-#include "modules/common/monitor/proto/monitor.pb.h"
+#include "modules/common/monitor_log/proto/monitor_log.pb.h"
+#include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
+#include "modules/data/proto/static_info.pb.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
-#include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/localization/proto/sins_pva.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
@@ -39,6 +45,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 #include "sensor_msgs/CompressedImage.h"
+#include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -56,13 +63,17 @@ using ChassisDetailAdapter = Adapter<::apollo::canbus::ChassisDetail>;
 using ControlCommandAdapter = Adapter<control::ControlCommand>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
 using ImuAdapter = Adapter<localization::Imu>;
+using RawImuAdapter = Adapter<apollo::drivers::gnss::Imu>;
 using LocalizationAdapter = Adapter<apollo::localization::LocalizationEstimate>;
 using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
 using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
+using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
+using DriveEventAdapter = Adapter<DriveEvent>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
@@ -72,11 +83,22 @@ using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
 using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
 using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
-// TODO(xiaoxq): Retire HMICommandAdapter after integration with dreamview.
-using HMICommandAdapter = Adapter<hmi::HMICommand>;
+using StaticInfoAdapter = Adapter<apollo::data::StaticInfo>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
+using ContiRadarAdapter = Adapter<drivers::ContiRadar>;
 using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
+using GnssRtkObsAdapter = Adapter<apollo::drivers::gnss::EpochObservation>;
+using GnssRtkEphAdapter = Adapter<apollo::drivers::gnss::GnssEphemeris>;
+using GnssBestPoseAdapter = Adapter<apollo::drivers::gnss::GnssBestPose>;
+using LocalizationMsfGnssAdapter =
+    Adapter<apollo::localization::LocalizationEstimate>;
+using LocalizationMsfLidarAdapter =
+    Adapter<apollo::localization::LocalizationEstimate>;
+using LocalizationMsfSinsPvaAdapter =
+    Adapter<apollo::localization::IntegSinsPva>;
+using LocalizationMsfStatusAdapter =
+    Adapter<apollo::localization::LocalizationStatus>;
 
 }  // namespace adapter
 }  // namespace common

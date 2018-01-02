@@ -28,13 +28,13 @@
 namespace apollo {
 namespace control {
 
-using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
-using apollo::common::VehicleState;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleStateProvider;
+using apollo::common::time::Clock;
 
-const double GRA_ACC = 9.8;
+constexpr double GRA_ACC = 9.8;
 
 LonController::LonController()
     : name_(ControlConf_ControllerType_Name(ControlConf::LON_CONTROLLER)) {
@@ -85,9 +85,13 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() { CloseLogFile(); }
+void LonController::Stop() {
+  CloseLogFile();
+}
 
-LonController::~LonController() { CloseLogFile(); }
+LonController::~LonController() {
+  CloseLogFile();
+}
 
 Status LonController::Init(const ControlConf *control_conf) {
   control_conf_ = control_conf;
@@ -168,7 +172,7 @@ Status LonController::ComputeControlCommand(
   double preview_time = lon_controller_conf.preview_window() * ts;
 
   if (preview_time < 0.0) {
-    const auto error_msg = apollo::common::util::StrCat(
+    const auto error_msg = common::util::StrCat(
         "Preview time set as: ", preview_time, " less than 0");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
@@ -179,10 +183,10 @@ Status LonController::ComputeControlCommand(
   double station_error_limited = 0.0;
   if (FLAGS_enable_speed_station_preview) {
     station_error_limited =
-        apollo::common::math::Clamp(debug->preview_station_error(),
-                                    -station_error_limit, station_error_limit);
+        common::math::Clamp(debug->preview_station_error(),
+                            -station_error_limit, station_error_limit);
   } else {
-    station_error_limited = apollo::common::math::Clamp(
+    station_error_limited = common::math::Clamp(
         debug->station_error(), -station_error_limit, station_error_limit);
   }
   double speed_offset =
@@ -197,12 +201,12 @@ Status LonController::ComputeControlCommand(
   } else {
     speed_controller_input = speed_offset + debug->speed_error();
   }
-  speed_controller_input_limited = apollo::common::math::Clamp(
-      speed_controller_input, -speed_controller_input_limit,
-      speed_controller_input_limit);
+  speed_controller_input_limited =
+      common::math::Clamp(speed_controller_input, -speed_controller_input_limit,
+                          speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (VehicleState::instance()->linear_velocity() <=
+  if (VehicleStateProvider::instance()->linear_velocity() <=
       lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
     acceleration_cmd_closeloop =
@@ -213,10 +217,14 @@ Status LonController::ComputeControlCommand(
         speed_pid_controller_.Control(speed_controller_input_limited, ts);
   }
 
+  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
+      GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
+
+  debug->set_slope_offset_compensation(slope_offset_compenstaion);
+
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
-      digital_filter_pitch_angle_.Filter(
-          GRA_ACC * std::sin(VehicleState::instance()->pitch()));
+      FLAGS_enable_slope_offset * debug->slope_offset_compensation();
   debug->set_is_full_stop(false);
   if (std::abs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
@@ -276,7 +284,7 @@ Status LonController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  if (std::abs(VehicleState::instance()->linear_velocity()) <=
+  if (std::abs(VehicleStateProvider::instance()->linear_velocity()) <=
           FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
@@ -294,7 +302,9 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const { return name_; }
+std::string LonController::Name() const {
+  return name_;
+}
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
@@ -310,15 +320,17 @@ void LonController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      VehicleState::instance()->x(), VehicleState::instance()->y());
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      VehicleState::instance()->x(), VehicleState::instance()->y(),
-      VehicleState::instance()->heading(),
-      VehicleState::instance()->linear_velocity(), matched_point, &s_matched,
-      &s_dot_matched, &d_matched, &d_dot_matched);
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y(),
+      VehicleStateProvider::instance()->heading(),
+      VehicleStateProvider::instance()->linear_velocity(), matched_point,
+      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Clock::NowInSecond();
+  double current_control_time = Clock::NowInSeconds();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =

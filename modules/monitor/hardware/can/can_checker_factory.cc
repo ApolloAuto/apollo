@@ -43,10 +43,10 @@ void CanCheckerFactory::RegisterCanCheckers() {
 
 std::unique_ptr<HwCheckerInterface> CanCheckerFactory::CreateCanChecker(
     const CANCardParameter& parameter) {
-  auto factory = CreateObject(parameter.brand());
+  auto factory = CreateObjectOrNull(parameter.brand());
   if (!factory) {
-    AERROR << "Failed to create CAN checker with parameter: "
-           << parameter.DebugString();
+    AERROR_EVERY(10) << "Failed to create CAN checker with parameter: "
+                     << parameter.DebugString();
   }
   return factory;
 }

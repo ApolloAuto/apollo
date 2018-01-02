@@ -15,8 +15,10 @@ proto_library(
         "control_conf.proto",
         "lat_controller_conf.proto",
         "lon_controller_conf.proto",
+        "mpc_controller_conf.proto",
         "pad_msg.proto",
         "pid_conf.proto",
+        "gain_scheduler_conf.proto"
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",

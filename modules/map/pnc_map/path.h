@@ -33,6 +33,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace hdmap {
@@ -44,11 +45,36 @@ struct LaneWaypoint {
   LaneWaypoint() = default;
   LaneWaypoint(LaneInfoConstPtr lane, const double s)
       : lane(CHECK_NOTNULL(lane)), s(s) {}
+  LaneWaypoint(LaneInfoConstPtr lane, const double s, const double l)
+      : lane(CHECK_NOTNULL(lane)), s(s), l(l) {}
   LaneInfoConstPtr lane = nullptr;
   double s = 0.0;
+  double l = 0.0;
 
   std::string DebugString() const;
 };
+
+/**
+ * @brief get left boundary type at a waypoint.
+ */
+LaneBoundaryType::Type LeftBoundaryType(const LaneWaypoint& waypoint);
+
+/**
+ * @brief get left boundary type at a waypoint.
+ */
+LaneBoundaryType::Type RightBoundaryType(const LaneWaypoint& waypoint);
+
+/**
+ * @brief get left neighbor lane waypoint. If not exist, the Waypoint.lane will
+ * be null.
+ */
+LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint);
+
+/**
+ * @brief get left neighbor lane waypoint. If not exist, the Waypoint.lane will
+ * be null.
+ */
+LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint);
 
 struct LaneSegment {
   LaneSegment() = default;
@@ -57,6 +83,7 @@ struct LaneSegment {
   LaneInfoConstPtr lane = nullptr;
   double start_s = 0.0;
   double end_s = 0.0;
+  double Length() const { return end_s - start_s; }
 
   std::string DebugString() const;
 };
@@ -200,6 +227,11 @@ class Path {
                        double* lateral) const;
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
                        double* lateral, double* distance) const;
+  bool GetProjectionWithHueristicParams(const common::math::Vec2d& point,
+                                        const double hueristic_start_s,
+                                        const double hueristic_end_s,
+                                        double* accumulate_s, double* lateral,
+                                        double* min_distance) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,

@@ -4,12 +4,35 @@ package apollo.dreamview;
 
 message Component {
   optional string display_name = 1;
-  map<string, string> supported_commands = 2;
+  // If the path is given, HMI will check if it's available.
+  optional string path = 2;
+  map<string, string> supported_commands = 3;
+}
+
+message Mode {
+  repeated string live_modules = 1;
+  repeated string live_hardware = 2;
 }
 
 message HMIConfig {
   map<string, Component> modules = 1;          // {module_name: module}
   map<string, Component> hardware = 2;         // {hardware_name: hardware}
-  map<string, string> available_maps = 3;      // {map_name: map_dir}
-  map<string, string> available_vehicles = 4;  // {vehicle_name: vehicle_dir}
+  map<string, Component> tools = 3;            // {tool_name: tool}
+  map<string, string> available_maps = 4;      // {map_name: map_dir}
+  map<string, string> available_vehicles = 5;  // {vehicle_name: vehicle_dir}
+  map<string, Mode> modes = 6;                 // {mode_name: mode_config}
+}
+
+message VehicleData {
+  // Upon switching vehicle, we need to copy source data to the dest path to
+  // make it in effect.
+  message DataFile {
+  	// Source path is a path relative to the vehicle data directory.
+  	optional string source_path = 1;
+  	// Dest path is where the data file could become in effect. It is allowed to
+  	// contain patterns such as "<ros>" which are able to finalize by
+  	// apollo::common::util::TranslatePath().
+  	optional string dest_path = 2;
+  }
+  repeated DataFile data_files = 1;
 }

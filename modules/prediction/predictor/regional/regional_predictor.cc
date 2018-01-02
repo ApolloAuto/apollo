@@ -27,8 +27,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 
 namespace {
@@ -73,13 +73,15 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
-  double speed = 0.0;
   const Feature& feature = obstacle->latest_feature();
+  if (feature.is_still()) {
+    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
+    return;
+  }
+
+  double speed = 0.0;
   if (feature.has_speed()) {
     speed = feature.speed();
-  }
-  if (FLAGS_enable_kf_tracking && feature.has_t_speed()) {
-    speed = feature.t_speed();
   }
   if (speed > FLAGS_still_speed) {
     GenerateMovingTrajectory(obstacle, 1.0);
@@ -102,20 +104,14 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double heading = 0.0 - M_PI;
-  const int num_traj = FLAGS_num_trajectory_still_pedestrian;
-  const double delta_heading = 2.0 * M_PI / num_traj;
-  const double speed = FLAGS_pedestrian_min_speed;
+  double heading = feature.velocity_heading();
   const double total_time = FLAGS_prediction_pedestrian_total_time;
   const int start_index = NumOfTrajectories();
 
-  for (int i = 0; i < num_traj; ++i) {
-    std::vector<TrajectoryPoint> points;
-    DrawStillTrajectory(position, heading, speed, total_time, &points);
-    Trajectory trajectory = GenerateTrajectory(points);
-    trajectories_.push_back(std::move(trajectory));
-    heading += delta_heading;
-  }
+  std::vector<TrajectoryPoint> points;
+  DrawStillTrajectory(position, heading, 0.0, total_time, &points);
+  Trajectory trajectory = GenerateTrajectory(points);
+  trajectories_.push_back(std::move(trajectory));
   SetEqualProbability(probability, start_index);
 }
 
@@ -135,15 +131,8 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(0.0, 0.0);
-  if (FLAGS_enable_kf_tracking) {
-    velocity[0] = feature.t_velocity().x();
-    velocity[1] = feature.t_velocity().y();
-  }
   if (FLAGS_enable_pedestrian_acc) {
     acc = {feature.acceleration().x(), feature.acceleration().y()};
-    if (FLAGS_enable_kf_tracking) {
-      acc = {feature.t_acceleration().x(), feature.t_acceleration().y()};
-    }
   }
 
   const double total_time = FLAGS_prediction_pedestrian_total_time;
@@ -165,7 +154,7 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
 void RegionalPredictor::DrawStillTrajectory(
     const Eigen::Vector2d& position, const double heading, const double speed,
     const double total_time, std::vector<TrajectoryPoint>* points) {
-  double delta_ts = FLAGS_prediction_freq;
+  double delta_ts = FLAGS_prediction_period;
   double x = position[0];
   double y = position[1];
   double direction_x = std::cos(heading);
@@ -189,7 +178,7 @@ void RegionalPredictor::DrawMovingTrajectory(
     const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
     const double total_time, std::vector<TrajectoryPoint>* left_points,
     std::vector<TrajectoryPoint>* right_points) {
-  double delta_ts = FLAGS_prediction_freq;
+  double delta_ts = FLAGS_prediction_period;
   Eigen::Vector2d vel = velocity;
   CompressVector2d(FLAGS_pedestrian_max_speed, &vel);
   Eigen::Vector2d acc = acceleration;
@@ -219,6 +208,8 @@ void RegionalPredictor::DrawMovingTrajectory(
   for (size_t i = 0; i < left_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(left_points->operator[](i)));
+  }
+  for (size_t i = 0; i < right_points->size(); ++i) {
     apollo::prediction::predictor_util::TranslatePoint(
         position[0], position[1], &(right_points->operator[](i)));
   }
@@ -230,7 +221,7 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
     const KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker,
     const double total_time, std::vector<TrajectoryPoint>* middle_points,
     std::vector<TrajectoryPoint>* boundary_points) {
-  double delta_ts = FLAGS_prediction_freq;
+  double delta_ts = FLAGS_prediction_period;
   KalmanFilter<double, 2, 2, 4> kf = kf_pedestrian_tracker;
   // set the control matrix and control vector
   Eigen::Matrix<double, 2, 2> P = kf.GetStateCovariance();
@@ -239,6 +230,7 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
   kf.SetStateEstimate(x, P);
 
   Eigen::Matrix<double, 2, 4> B;
+  B.setZero();
   B(0, 0) = delta_ts;
   B(0, 2) = 0.5 * delta_ts * delta_ts;
   B(1, 1) = delta_ts;

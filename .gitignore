@@ -64,7 +64,12 @@ data/log
 data/core
 data/bag
 data/cov
+data/kv_db
 data/pcd
+data/nfs
+modules/data/conf/task_info_template.pb.txt
+modules/tools/ota/update.ini
+modules/tools/ota/vehicle_info.pb.txt
 
 # Doxygen
 docs/doxygen

@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  const auto map_filename = apollo::hdmap::BaseMapFile();
+  const auto map_filename = FLAGS_map_dir + "/base_map.xml";;
   apollo::hdmap::Map pb_map;
   CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(
       map_filename, &pb_map)) << "fail to load data";

@@ -6,8 +6,10 @@
     "author": "adusim",
     "license": "MIT",
     "scripts": {
-        "build": "node_modules/.bin/webpack -p",
-        "start": "node_modules/.bin/webpack-dev-server --watch-poll"
+        "build": "node_modules/.bin/webpack -p --progress",
+        "start": "node_modules/.bin/webpack-dev-server --watch-poll",
+        "build_offline": "node_modules/.bin/webpack -p --progress --config webpack.offline.config.js",
+        "start_offline": "node_modules/.bin/webpack-dev-server --watch-poll --config webpack.offline.config.js"
     },
     "dependencies": {
         "chart.js": "^2.7.0",
@@ -20,6 +22,7 @@
         "mobx-react": "^4.1.8",
         "react": "^16.0.0",
         "react-dom": "^16.0.0",
+        "react-rangeslider": "^2.2.0",
         "react-split-pane": "^0.1.66",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
@@ -35,6 +38,7 @@
         "babel-preset-es2017": "^6.24.1",
         "babel-preset-react": "^6.24.1",
         "babel-preset-stage-0": "^6.24.1",
+        "copy-webpack-plugin": "^4.2.0",
         "css-loader": "^0.28.2",
         "eslint": "^3.19.0",
         "eslint-loader": "^1.7.1",

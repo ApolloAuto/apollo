@@ -77,6 +77,10 @@ TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
 
   if (it_lower == trajectory_points_.begin()) {
     return trajectory_points_.front();
+  } else if (it_lower == trajectory_points_.end()) {
+    AWARN << "When evaluate trajectory, relative_time(" << relative_time
+          << ") is too large";
+    return trajectory_points_.back();
   }
   return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
                                                    relative_time);

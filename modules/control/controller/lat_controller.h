@@ -29,6 +29,7 @@
 #include "Eigen/Core"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
@@ -101,8 +102,6 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleLateralDebug *debug);
-
   void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
@@ -118,7 +117,7 @@ class LatController : public Controller {
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug) const;
+                            SimpleLateralDebug *debug);
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LoadLatGainScheduler(const LatControllerConf &lat_controller_conf);
@@ -222,6 +221,7 @@ class LatController : public Controller {
 
   // MeanFilter heading_rate_filter_;
   MeanFilter lateral_error_filter_;
+  MeanFilter heading_error_filter_;
 
   // for logging purpose
   std::ofstream steer_log_file_;

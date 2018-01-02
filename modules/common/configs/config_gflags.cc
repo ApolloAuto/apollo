@@ -19,7 +19,10 @@
 DEFINE_string(map_dir, "modules/map/data/demo",
               "Directory which contains a group of related maps.");
 
-DEFINE_string(base_map_filename, "base_map.xml|base_map.bin|base_map.txt",
+DEFINE_string(test_base_map_filename, "",
+              "If not empty, use this test base map files.");
+
+DEFINE_string(base_map_filename, "base_map.bin|base_map.xml|base_map.txt",
               "Base map files in the map_dir, search in order.");
 DEFINE_string(sim_map_filename, "sim_map.bin|sim_map.txt",
               "Simulation map files in the map_dir, search in order.");
@@ -34,3 +37,7 @@ DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
 DEFINE_bool(use_ros_time, false,
             "Whether Clock::Now() gets time from system_clock::now() or from "
             "ros::Time::now().");
+
+DEFINE_string(localization_tf2_frame_id, "world", "the tf2 transform frame id");
+DEFINE_string(localization_tf2_child_frame_id, "localization",
+              "the tf2 transform child frame id");

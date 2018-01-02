@@ -15,4 +15,12 @@ message DpPolyPathConfig {
   optional double obstacle_collision_distance = 9 [default = 0.2];
   optional double obstacle_risk_distance = 10 [default = 2.0];
   optional double obstacle_collision_cost = 11 [default = 1e3];
+  optional double path_l_cost = 12;
+  optional double path_dl_cost = 13;
+  optional double path_ddl_cost = 14;
+  optional double path_l_cost_param_l0 = 15;
+  optional double path_l_cost_param_b = 16;
+  optional double path_l_cost_param_k = 17;
+  optional double path_out_lane_cost = 18;
+  optional double path_end_l_cost = 19;
 }

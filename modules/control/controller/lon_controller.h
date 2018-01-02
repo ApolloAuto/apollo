@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/pid_controller.h"
 #include "modules/control/common/trajectory_analyzer.h"
@@ -77,8 +77,7 @@ class LonController : public Controller {
    */
   common::Status ComputeControlCommand(
       const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis,
-      const planning::ADCTrajectory *trajectory,
+      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
       control::ControlCommand *cmd) override;
 
   /**

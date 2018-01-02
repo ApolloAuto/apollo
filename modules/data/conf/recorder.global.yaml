@@ -1,0 +1,33 @@
+---
+organization:              # organization info, including company name, site and descriptions.
+  required:                # 
+    name: Apollo           # company name.
+    website: apollo.auto   # company website.
+  optional:                # 
+    description: UNKONWN   # company descriptions.
+vehicle:                   #
+  required:                #
+    vehicle_id: VIN001     # vehicle_id is the UID of vehicle, VIN(Vehicle Identification Number) is recommended.
+    vehicle_tag: Apollo    # vehicle_tag could tell us that the data come from Apollo partners. DO NOT MODIFY.
+    vehicle_type: auto_car # sensor_car or auto_sensor.
+  optional:                #
+    description: UNKNOWN   # vehicle descriptions.
+data:
+  output_path: /media/apollo/data_storage              # data recorder output path.
+  output_link_path: /apollo/data/record_data           # the symlink of latest data recorder output.
+  recorder_cmd_topic: /apollo/data_recorder/cmd        # the name of data recorder commands topic.
+  recorder_status_topic: /apollo/data_recorder/status  # the name of data recorder status topic.
+  backup_path: /apollo/data/backup                     # move files to backup_path after copying log file to portable hard disk.
+  backup_keep_days: 3          # backup keep days. 
+  backup_max_size: 102400      # unit MB.
+  meta_extension: ini          # global meta format: ini or json.
+  disk_min_size: 1024          # min availbale disk size, unit MB.
+  data_type:
+  - rosbag 
+  - roslog
+  - syslog
+  - carcorefile
+  - carversion
+  - carprm
+  - userdata
+  - meta

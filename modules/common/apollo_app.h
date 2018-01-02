@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_APOLLO_APP_H_
-#define MODULES_APOLLO_APP_H_
+#ifndef MODULES_COMMON_APOLLO_APP_H_
+#define MODULES_COMMON_APOLLO_APP_H_
 
 #include <csignal>
 #include <string>
@@ -27,7 +27,6 @@
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/status/status.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
 
 #include "ros/include/ros/ros.h"
 
@@ -98,18 +97,15 @@ class ApolloApp {
    */
   virtual void Stop() = 0;
 
-  /**
-   * @brief report module status to HMI
-   * @param status HMI status
-   */
-  virtual void ReportModuleStatus(
-      const apollo::hmi::ModuleStatus::Status status);
-
-  apollo::hmi::ModuleStatus status_;
-
   /** The callback thread number
    */
   uint32_t callback_thread_num_ = 1;
+
+ private:
+  /**
+   * @brief Export flag values to <FLAGS_log_dir>/<name>.flags.
+   */
+  void ExportFlags() const;
 };
 
 void apollo_app_sigint_handler(int signal_num);
@@ -128,4 +124,4 @@ void apollo_app_sigint_handler(int signal_num);
     return 0;                                                  \
   }
 
-#endif  // MODULES_APOLLO_APP_H_
+#endif  // MODULES_COMMON_APOLLO_APP_H_

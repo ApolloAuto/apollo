@@ -171,7 +171,7 @@ class LRUCache {
 
   void Clear() {
     map_.clear();
-    size_ = 0;
+    Init();
   }
 
  private:

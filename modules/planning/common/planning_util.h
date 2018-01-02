@@ -51,6 +51,8 @@ common::TrajectoryPoint InterpolateUsingLinearApproximation(
     const common::TrajectoryPoint &tp0, const common::TrajectoryPoint &tp1,
     const double t);
 
+void DumpPlanningContext();
+
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo

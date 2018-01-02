@@ -31,7 +31,7 @@ using Eigen::MatrixXd;
 
 TEST(constraint_test, test_suit_one) {
   std::vector<double> t_knots{0, 1, 2, 3, 4, 5};
-  std::size_t order = 6;
+  std::size_t order = 5;
   Spline2dSolver spline_solver(t_knots, order);
 
   Spline2dConstraint* constraint = spline_solver.mutable_constraint();
@@ -131,18 +131,18 @@ TEST(constraint_test, test_suit_one) {
   double t = 0;
   for (int i = 0; i < 51; ++i) {
     auto xy = spline_solver.spline()(t);
-    const double heading = std::atan2(spline_solver.spline().derivative_y(t),
+    const double heading = std::atan2(spline_solver.spline().DerivativeY(t),
                                       spline_solver.spline().DerivativeX(t));
     const double kappa = CurveMath::ComputeCurvature(
         spline_solver.spline().DerivativeX(t),
         spline_solver.spline().SecondDerivativeX(t),
-        spline_solver.spline().derivative_y(t),
-        spline_solver.spline().second_derivative_y(t));
+        spline_solver.spline().DerivativeY(t),
+        spline_solver.spline().SecondDerivativeY(t));
     EXPECT_NEAR(heading, gold_res(i, 0), 1e-6);
     EXPECT_NEAR(xy.first, gold_res(i, 1), 1e-6);
     EXPECT_NEAR(xy.second, gold_res(i, 2), 1e-6);
     EXPECT_NEAR(spline_solver.spline().DerivativeX(t), gold_res(i, 3), 1e-6);
-    EXPECT_NEAR(spline_solver.spline().derivative_y(t), gold_res(i, 4), 1e-6);
+    EXPECT_NEAR(spline_solver.spline().DerivativeY(t), gold_res(i, 4), 1e-6);
     EXPECT_NEAR(kappa, gold_res(i, 5), 1e-6);
     t += 0.1;
   }

@@ -61,7 +61,9 @@ class Stream {
 
   static constexpr size_t NUM_STATUS =
       static_cast<int>(Stream::Status::ERROR) + 1;
-  Status get_status() const { return _status; }
+  Status get_status() const {
+    return _status;
+  }
 
   // Returns whether it was successful to connect.
   virtual bool connect() = 0;
@@ -78,7 +80,7 @@ class Stream {
       write(_login_data[i]);
       ROS_INFO_STREAM("Login: " << _login_data[i]);
       // sleep a little to avoid overun of the slow serial interface.
-      ros::Duration(0.2).sleep();
+      ros::Duration(0.5).sleep();
     }
   }
 

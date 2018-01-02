@@ -107,8 +107,8 @@ std::vector<int> DownsampleByAngle(const Points &points,
     sampled_indices.push_back(end);
   }
 
-  AINFO << "Point Vector is downsampled from " << points.size() << " to "
-        << sampled_indices.size();
+  ADEBUG << "Point Vector is downsampled from " << points.size() << " to "
+         << sampled_indices.size();
 
   return sampled_indices;
 }

@@ -27,7 +27,7 @@ namespace planning {
 
 TEST(Spline1dConstraint, add_boundary) {
   std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 6;
+  int32_t spline_order = 5;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> x_coord = {0.0, 0.5, 1.0};
@@ -66,7 +66,7 @@ TEST(Spline1dConstraint, add_boundary) {
 
 TEST(Spline1dConstraint, add_derivative_boundary) {
   std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 6;
+  int32_t spline_order = 5;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> x_coord = {0.0, 0.5, 1.0};
@@ -105,7 +105,7 @@ TEST(Spline1dConstraint, add_derivative_boundary) {
 
 TEST(Spline1dConstraint, add_second_derivative_boundary) {
   std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 6;
+  int32_t spline_order = 5;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> x_coord = {0.0, 0.5, 1.0};
@@ -144,7 +144,7 @@ TEST(Spline1dConstraint, add_second_derivative_boundary) {
 
 TEST(Spline1dConstraint, add_smooth_constraint_01) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0};
-  int32_t spline_order = 6;
+  int32_t spline_order = 5;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddSmoothConstraint();
@@ -169,7 +169,7 @@ TEST(Spline1dConstraint, add_smooth_constraint_01) {
 
 TEST(Spline1dConstraint, add_smooth_constraint_02) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 6;
+  int32_t spline_order = 5;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddSmoothConstraint();
@@ -196,7 +196,7 @@ TEST(Spline1dConstraint, add_smooth_constraint_02) {
 
 TEST(Spline1dConstraint, add_derivative_smooth_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
+  int32_t spline_order = 3;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddDerivativeSmoothConstraint();
@@ -225,7 +225,7 @@ TEST(Spline1dConstraint, add_derivative_smooth_constraint) {
 
 TEST(Spline1dConstraint, add_second_derivative_smooth_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
+  int32_t spline_order = 3;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddSecondDerivativeSmoothConstraint();
@@ -256,7 +256,7 @@ TEST(Spline1dConstraint, add_second_derivative_smooth_constraint) {
 
 TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddThirdDerivativeSmoothConstraint();
@@ -289,7 +289,7 @@ TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
 
 TEST(Spline1dConstraint, add_monotone_inequality_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   std::vector<double> x_coord = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
@@ -322,7 +322,7 @@ TEST(Spline1dConstraint, add_monotone_inequality_constraint) {
 
 TEST(Spline1dConstraint, add_monotone_inequality_constraint_at_knots) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddMonotoneInequalityConstraintAtKnots();
@@ -351,7 +351,7 @@ TEST(Spline1dConstraint, add_monotone_inequality_constraint_at_knots) {
 
 TEST(Spline1dConstraint, add_point_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddPointConstraint(2.5, 12.3);
@@ -373,7 +373,7 @@ TEST(Spline1dConstraint, add_point_constraint) {
 
 TEST(Spline1dConstraint, add_point_derivative_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddPointDerivativeConstraint(2.5, 1.23);
@@ -395,7 +395,7 @@ TEST(Spline1dConstraint, add_point_derivative_constraint) {
 
 TEST(Spline1dConstraint, add_point_second_derivative_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddPointSecondDerivativeConstraint(2.5, 1.23);
@@ -417,7 +417,7 @@ TEST(Spline1dConstraint, add_point_second_derivative_constraint) {
 
 TEST(Spline1dConstraint, add_point_third_derivative_constraint) {
   std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
+  int32_t spline_order = 4;
   Spline1dConstraint constraint(x_knots, spline_order);
 
   constraint.AddPointThirdDerivativeConstraint(2.5, 1.23);

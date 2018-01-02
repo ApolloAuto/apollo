@@ -44,7 +44,19 @@ NewPredictor::Predict(Obstacle* obstacle)() {
 }  // namespace apollo
 
 ```
-### Step 3: Update prediction conf
+
+### Step 3: Add a new predictor type in proto `prediction_conf.proto`
+```
+  enum PredictorType {
+    LANE_SEQUENCE_PREDICTOR = 0;
+    FREE_MOVE_PREDICTOR = 1;
+    REGIONAL_PREDICTOR = 2;
+    MOVE_SEQUENCE_PREDICTOR = 3;
+    NEW_PREDICTOR = 4;
+  }
+```
+
+### Step 4: Update prediction conf
 In the file `modules/prediction/conf/prediction_conf.pb.txt`, update the field `predictor_type` like this:
 ```
 obstacle_conf {
@@ -55,11 +67,16 @@ obstacle_conf {
 }
 ```
 
-### Step 4: Upate predictor manager
-Update `vehicle_on_lane_predictor_` in `modlues/prediction/predictor/predictor_manager.h` like this:
+### Step 5: Upate predictor manager
+Update `CreateEvluator( ... )` like this:
 ```cpp
-ObstacleConf::PredictorType vehicle_on_lane_predictor_ =
-    ObstacleConf::NEW_PREDICTOR;
+  case ObstacleConf::NEW_PREDICTOR: {
+      predictor_ptr.reset(new NewPredictor());
+      break;
+    }
 ```
-
+Update `RegisterPredictors()` like this:
+```cpp
+  RegisterPredictor(ObstacleConf::NEW_PREDICTOR);
+```
 After this procedure, the new predictor will be created.

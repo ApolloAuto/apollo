@@ -18,8 +18,8 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
 
 #include <boost/shared_ptr.hpp>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -35,7 +35,9 @@ class OpenglVisualizer {
 
   virtual bool Init();
 
-  virtual std::string Name() const { return name_; }
+  virtual std::string Name() const {
+    return name_;
+  }
 
   void UpdateCameraSystem(FrameContent *content);
 

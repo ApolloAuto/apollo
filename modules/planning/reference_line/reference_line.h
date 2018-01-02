@@ -39,15 +39,51 @@ namespace planning {
 class ReferenceLine {
  public:
   ReferenceLine() = default;
+  explicit ReferenceLine(const ReferenceLine& reference_line) = default;
+  template <typename Iterator>
+  explicit ReferenceLine(const Iterator begin, const Iterator end)
+      : reference_points_(begin, end),
+        map_path_(hdmap::Path(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
+
+  /** Stitch current reference line with the other reference line
+   * The stitching strategy is to use current reference points as much as
+   * possible. The following two examples show two successful stitch cases.
+   *
+   * Example 1
+   * this:   |--------A-----x-----B------|
+   * other:                 |-----C------x--------D-------|
+   * Result: |------A-----x-----B------x--------D-------|
+   * In the above example, A-B is current reference line, and C-D is the other
+   * reference line. If part B and part C matches, we update current reference
+   * line to A-B-D.
+   *
+   * Example 2
+   * this:                  |-----A------x--------B-------|
+   * other:  |--------C-----x-----D------|
+   * Result: |--------C-----x-----A------x--------B-------|
+   * In the above example, A-B is current reference line, and C-D is the other
+   * reference line. If part A and part D matches, we update current reference
+   * line to C-A-B.
+   *
+   * @return false if these two reference line cannot be stitched
+   */
+  bool Stitch(const ReferenceLine& other);
+
+  bool Shrink(const common::math::Vec2d& point, double look_backward,
+              double look_forward);
 
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint GetReferencePoint(const double s) const;
+  ReferencePoint GetNearestReferencepoint(const double s) const;
   ReferencePoint GetReferencePoint(const double x, const double y) const;
 
+  bool GetApproximateSLBoundary(const common::math::Box2d& box,
+                                const double start_s, const double end_s,
+                                SLBoundary* const sl_boundary) const;
   bool GetSLBoundary(const common::math::Box2d& box,
                      SLBoundary* const sl_boundary) const;
 
@@ -55,10 +91,30 @@ class ReferenceLine {
               common::math::Vec2d* const xy_point) const;
   bool XYToSL(const common::math::Vec2d& xy_point,
               common::SLPoint* const sl_point) const;
+  template <class XYPoint>
+  bool XYToSL(const XYPoint& xy, common::SLPoint* const sl_point) const {
+    return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);
+  }
 
   bool GetLaneWidth(const double s, double* const left_width,
                     double* const right_width) const;
   bool IsOnRoad(const common::SLPoint& sl_point) const;
+  bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
+  template <class XYPoint>
+  bool IsOnRoad(const XYPoint& xy) const {
+    return IsOnRoad(common::math::Vec2d(xy.x(), xy.y()));
+  }
+  bool IsOnRoad(const SLBoundary& sl_boundary) const;
+
+  /**
+   * @brief Check if a box is blocking the road surface. The crieria is to check
+   * whether the remaining space on the road surface is larger than the provided
+   * gap space.
+   * @param boxed the provided box
+   * @param gap check the gap of the space
+   * @return true if the box blocks the road.
+   */
+  bool IsBlockRoad(const common::math::Box2d& box2d, double gap) const;
 
   /**
    * @brief check if any part of the box has overlap with the road.
@@ -93,6 +149,9 @@ class ReferenceLine {
   static ReferencePoint Interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,
                                     const double s);
+  ReferencePoint InterpolateWithMatchedIndex(
+      const ReferencePoint& p0, const double s0, const ReferencePoint& p1,
+      const double s1, const hdmap::InterpolatedIndex& index) const;
 
   static double FindMinDistancePoint(const ReferencePoint& p0, const double s0,
                                      const ReferencePoint& p1, const double s1,

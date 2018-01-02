@@ -58,25 +58,26 @@ class SpeedDecider : public Task {
    **/
   bool CheckIsFollowByT(const StBoundary& boundary) const;
 
-  void CreateStopDecision(const PathObstacle& path_obstacle,
-                          ObjectDecisionType* const stop_decision) const;
+  bool CreateStopDecision(const PathObstacle& path_obstacle,
+                          ObjectDecisionType* const stop_decision,
+                          double stop_distance) const;
 
   /**
    * @brief create follow decision based on the boundary
    **/
-  void CreateFollowDecision(const PathObstacle& path_obstacle,
+  bool CreateFollowDecision(const PathObstacle& path_obstacle,
                             ObjectDecisionType* const follow_decision) const;
 
   /**
    * @brief create yield decision based on the boundary
    **/
-  void CreateYieldDecision(const StBoundary& boundary,
+  bool CreateYieldDecision(const StBoundary& boundary,
                            ObjectDecisionType* const yield_decision) const;
 
   /**
    * @brief create overtake decision based on the boundary
    **/
-  void CreateOvertakeDecision(
+  bool CreateOvertakeDecision(
       const PathObstacle& path_obstacle,
       ObjectDecisionType* const overtake_decision) const;
 
@@ -85,12 +86,19 @@ class SpeedDecider : public Task {
 
   void AppendIgnoreDecision(PathObstacle* path_obstacle) const;
 
+  /**
+   * @brief "too close" is determined by whether ego vehicle will hit the front
+   * obstacle if the obstacle drive at current speed and ego vehicle use some
+   * reasonable deceleration
+   **/
+  bool IsFollowTooClose(const PathObstacle& path_obstacle) const;
+
  private:
   DpStSpeedConfig dp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
   SLBoundary adc_sl_boundary_;
   apollo::common::TrajectoryPoint init_point_;
-  const ReferenceLine* reference_line_;
+  const ReferenceLine* reference_line_ = nullptr;
 };
 
 }  // namespace planning

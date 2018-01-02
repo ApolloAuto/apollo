@@ -43,6 +43,7 @@
 
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/Image.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -55,6 +56,50 @@ namespace adapter {
 // Borrowed from C++ 14.
 template <bool B, class T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
+
+/**
+ * @class AdapterBase
+ * @brief Base interface of all concrete adapters.
+ */
+class AdapterBase {
+ public:
+  virtual ~AdapterBase() = default;
+
+  /**
+   * @brief returns the topic name that this adapter listens to.
+   */
+  virtual const std::string& topic_name() const = 0;
+
+  /**
+   * @brief Create a view of data up to the call time for the user.
+   */
+  virtual void Observe() = 0;
+
+  /**
+   * @brief returns TRUE if the observing queue is empty.
+   */
+  virtual bool Empty() const = 0;
+
+  /**
+   * @brief returns TRUE if the adapter has received any message.
+   */
+  virtual bool HasReceived() const = 0;
+
+  /**
+   * @brief Gets message delay.
+   */
+  virtual double GetDelaySec() const = 0;
+
+  /**
+   * @brief Clear the data received so far.
+   */
+  virtual void ClearData() = 0;
+
+  /**
+   * @brief Dumps the latest received data to file.
+   */
+  virtual bool DumpLatestMessage() = 0;
+};
 
 /**
  * @class Adapter
@@ -79,7 +124,7 @@ using enable_if_t = typename std::enable_if<B, T>::type;
  * thread-safe w.r.t. data access and update.
  */
 template <typename D>
-class Adapter {
+class Adapter : public AdapterBase {
  public:
   /// The user can use Adapter::DataType to get the type of the
   /// underlying data.
@@ -124,9 +169,7 @@ class Adapter {
   /**
    * @brief returns the topic name that this adapter listens to.
    */
-  const std::string& topic_name() const {
-    return topic_name_;
-  }
+  const std::string& topic_name() const override { return topic_name_; }
 
   /**
    * @brief reads the proto message from the file, and push it into
@@ -144,9 +187,7 @@ class Adapter {
    * the adapter.
    * @param data the input data.
    */
-  void FeedData(const D& data) {
-    EnqueueData(data);
-  }
+  void FeedData(const D& data) { EnqueueData(data); }
 
   /**
    * @brief the callback that will be invoked whenever a new
@@ -154,7 +195,7 @@ class Adapter {
    * @param message the newly received message.
    */
   void OnReceive(const D& message) {
-    UpdateDelay(message);
+    last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
     EnqueueData(message);
     FireCallbacks(message);
   }
@@ -163,7 +204,7 @@ class Adapter {
    * @brief copy the data_queue_ into the observing queue to create a
    * view of data up to the call time for the user.
    */
-  void Observe() {
+  void Observe() override {
     std::lock_guard<std::mutex> lock(mutex_);
     observed_queue_ = data_queue_;
   }
@@ -171,7 +212,7 @@ class Adapter {
   /**
    * @brief returns TRUE if the observing queue is empty.
    */
-  bool Empty() const {
+  bool Empty() const override {
     std::lock_guard<std::mutex> lock(mutex_);
     return observed_queue_.empty();
   }
@@ -179,7 +220,7 @@ class Adapter {
   /**
    * @brief returns TRUE if the adapter has received any message.
    */
-  bool HasReceived() const {
+  bool HasReceived() const override {
     std::lock_guard<std::mutex> lock(mutex_);
     return !data_queue_.empty();
   }
@@ -199,7 +240,21 @@ class Adapter {
         << ":" << topic_name_;
     return *observed_queue_.front();
   }
-
+  /**
+   * @brief returns the most recent message pointer in the observing queue.
+   *
+   * /note
+   * Please call Empty() to make sure that there is data in the
+   * queue before calling GetLatestObservedPtr().
+   */
+  std::shared_ptr<const D> GetLatestObservedPtr() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    DCHECK(!observed_queue_.empty())
+    << "The view of data queue is empty. No data is received yet or you "
+        "forgot to call Observe()"
+    << ":" << topic_name_;
+    return observed_queue_.front();
+  }
   /**
    * @brief returns the oldest message in the observing queue.
    *
@@ -220,18 +275,14 @@ class Adapter {
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator begin() const {
-    return observed_queue_.begin();
-  }
+  Iterator begin() const { return observed_queue_.begin(); }
 
   /**
    * @brief returns an iterator representing the tail of the observing
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator end() const {
-    return observed_queue_.end();
-  }
+  Iterator end() const { return observed_queue_.end(); }
 
   /**
    * @brief registers the provided callback function to the adapter,
@@ -256,42 +307,42 @@ class Adapter {
   }
 
   /**
-   * @brief fills the fields module_name, timestamp_sec and
+   * @brief fills the fields module_name, current timestamp and
    * sequence_num in the header.
    */
   void FillHeader(const std::string& module_name, D* data) {
     static_assert(std::is_base_of<google::protobuf::Message, D>::value,
                   "Can only fill header to proto messages!");
     auto* header = data->mutable_header();
-    double timestamp = apollo::common::time::Clock::NowInSecond();
+    double timestamp = apollo::common::time::Clock::NowInSeconds();
     header->set_module_name(module_name);
     header->set_timestamp_sec(timestamp);
     header->set_sequence_num(++seq_num_);
   }
 
-  uint32_t GetSeqNum() const {
-    return seq_num_;
-  }
+  uint32_t GetSeqNum() const { return seq_num_; }
 
   void SetLatestPublished(const D& data) {
     latest_published_data_.reset(new D(data));
   }
 
-  const D* GetLatestPublished() {
-    return latest_published_data_.get();
-  }
+  const D* GetLatestPublished() { return latest_published_data_.get(); }
 
   /**
-   * @brief Gets message delay in milliseconds.
+   * @brief Gets message delay.
    */
-  double GetDelayInMs() {
-    return delay_ms_;
+  double GetDelaySec() const override {
+    if (last_receive_time_ == 0) {
+      return -1;
+    } else {
+      return apollo::common::time::Clock::NowInSeconds() - last_receive_time_;
+    }
   }
 
   /**
    * @brief Clear the data received so far.
    */
-  void ClearData() {
+  void ClearData() override {
     // Lock the queue.
     std::lock_guard<std::mutex> lock(mutex_);
     data_queue_.clear();
@@ -301,7 +352,7 @@ class Adapter {
   /**
    * @brief Dumps the latest received data to file.
    */
-  bool DumpLatestMessage() {
+  bool DumpLatestMessage() override {
     if (!Empty()) {
       D msg = GetLatestObserved();
       return DumpMessage<D>(msg);
@@ -334,7 +385,10 @@ class Adapter {
                 IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
-
+  bool FeedFile(const std::string &message_file,
+                IdentifierType<::sensor_msgs::Image>) {
+    return false;
+  }
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
@@ -435,77 +489,6 @@ class Adapter {
     data_queue_.push_front(std::make_shared<D>(data));
   }
 
-  /**
-   * @brief Calculates message delay based on message type.
-   */
-  double CalculateDelayInMs(const D& new_msg, const D& last_msg) {
-    return MessageDelay<D>::Get(new_msg, last_msg);
-  }
-
-  /**
-   * @brief Updates the message delay upon receiving a new message.
-   */
-  void UpdateDelay(const D& new_msg) {
-    if (!data_queue_.empty()) {
-      std::lock_guard<std::mutex> lock(mutex_);
-      delay_ms_ = CalculateDelayInMs(new_msg, *data_queue_.front());
-    }
-  }
-
-  /// A few partial template specialzations to get message delays for different
-  /// message types.
-  template <class T, class Enable = void>
-  struct MessageDelay {
-    static double Get(const T& new_msg, const T& last_msg) {
-      return 0.0;
-    }
-  };
-
-  template <class T>
-  struct MessageDelay<
-      T, enable_if_t<std::is_base_of<google::protobuf::Message, T>::value>> {
-    static double Get(const T& new_msg, const T& last_msg) {
-      using google::protobuf::Message;
-
-      return (ExtractTimeStampFromMsg(static_cast<const Message&>(new_msg)) -
-              ExtractTimeStampFromMsg(static_cast<const Message&>(last_msg))) *
-             1000.0;
-    }
-
-    static double ExtractTimeStampFromMsg(
-        const google::protobuf::Message& message) {
-      using gpf = google::protobuf::FieldDescriptor;
-
-      auto descriptor = message.GetDescriptor();
-      auto header_descriptor = descriptor->FindFieldByName("header");
-
-      if (header_descriptor == nullptr ||
-          header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
-        return 0.0;
-      }
-
-      auto timestamp_sec_descriptor =
-          header_descriptor->message_type()->FindFieldByName("timestamp_sec");
-      if (timestamp_sec_descriptor == nullptr ||
-          timestamp_sec_descriptor->cpp_type() != gpf::CPPTYPE_DOUBLE) {
-        return 0.0;
-      }
-
-      const auto& header =
-          message.GetReflection()->GetMessage(message, header_descriptor);
-      return header.GetReflection()->GetDouble(header,
-                                               timestamp_sec_descriptor);
-    }
-  };
-
-  template <class Enable>
-  struct MessageDelay<sensor_msgs::PointCloud2, Enable> {
-    static double Get(const sensor_msgs::PointCloud2& new_msg,
-                      const sensor_msgs::PointCloud2& last_msg) {
-      return (new_msg.header.stamp - last_msg.header.stamp).sec * 1000.0;
-    }
-  };
-
   /// The topic name that the adapter listens to.
   std::string topic_name_;
 
@@ -535,11 +518,10 @@ class Adapter {
   /// be published.
   uint32_t seq_num_ = 0;
 
-  /// The most recenct published data.
+  /// The most recent published data.
   std::unique_ptr<D> latest_published_data_;
 
-  /// The interval between receiving two consecutive messages.
-  double delay_ms_ = std::numeric_limits<double>::quiet_NaN();
+  double last_receive_time_ = 0;
 };
 
 }  // namespace adapter

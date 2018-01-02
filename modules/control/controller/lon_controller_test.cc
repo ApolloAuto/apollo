@@ -30,7 +30,7 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
-using VehicleState = common::VehicleState;
+using VehicleStateProvider = common::VehicleStateProvider;
 
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";
@@ -59,7 +59,7 @@ class LonControllerTest : public ::testing::Test, LonController {
                                                  &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
-    timestamp_ = Clock::NowInSecond();
+    timestamp_ = Clock::NowInSeconds();
 
     controller_.reset(new LonController());
   }
@@ -114,10 +114,10 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   auto trajectory_pb =
       LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
-  double time_now = Clock::NowInSecond();
+  double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  auto *vehicle_state = VehicleState::instance();
+  auto *vehicle_state = VehicleStateProvider::instance();
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 

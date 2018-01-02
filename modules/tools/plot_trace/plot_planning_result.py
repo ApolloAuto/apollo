@@ -106,6 +106,12 @@ if __name__ == '__main__':
         action='store',
         nargs="+",
         help="The planning results")
+    parser.add_argument(
+        "--figure",
+        action='store',
+        type=str,
+        help="Save the planning results to picture, if not set, show on screen"
+    )
     g_args = parser.parse_args()
 
     matplotlib.rcParams['legend.fontsize'] = 10
@@ -119,4 +125,8 @@ if __name__ == '__main__':
     for planning_file in g_args.planning_files:
         plot_planning(ax, planning_file)
 
-    plt.show()
+    if g_args.figure:
+        plt.savefig(g_args.figure)
+        print("picture saved to %s" % g_args.figure)
+    else:
+        plt.show()

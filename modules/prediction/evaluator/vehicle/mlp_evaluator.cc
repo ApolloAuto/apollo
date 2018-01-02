@@ -20,10 +20,9 @@
 #include <limits>
 #include <numeric>
 
-#include "modules/map/proto/map_lane.pb.h"
-
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
@@ -46,7 +45,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 }  // namespace
 
-MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
+MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_evaluator_vehicle_mlp_file); }
 
 void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
 
@@ -153,11 +152,7 @@ void MLPEvaluator::SetObstacleFeatureValues(
           feature.lane().lane_feature().dist_to_right_boundary());
       lane_types.push_back(feature.lane().lane_feature().lane_turn_type());
       timestamps.push_back(feature.timestamp());
-      if (FLAGS_enable_kf_tracking) {
-        speeds.push_back(feature.t_speed());
-      } else {
-        speeds.push_back(feature.speed());
-      }
+      speeds.push_back(feature.speed());
       ++count;
     }
   }
@@ -272,8 +267,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
     return;
   }
 
-  double heading =
-      FLAGS_enable_kf_tracking ? feature.t_velocity_heading() : feature.theta();
+  double heading = feature.velocity_heading();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= LANE_FEATURE_SIZE) {
       break;

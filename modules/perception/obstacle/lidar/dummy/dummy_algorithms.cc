@@ -14,21 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
+
 #include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
 
-using std::vector;
 using pcl_util::Point;
-using pcl_util::PointD;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
+using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 
 static void extract_pointcloud_indices(const PointCloudPtr &cloud,
-                                       PointIndices* out_indices) {
+                                       PointIndices *out_indices) {
   const size_t vec_size = cloud->size();
   auto &indices = out_indices->indices;
   indices.resize(vec_size);
@@ -36,9 +36,9 @@ static void extract_pointcloud_indices(const PointCloudPtr &cloud,
   std::iota(indices.begin(), indices.end(), 0);
 }
 
-bool DummyROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
+bool DummyROIFilter::Filter(const pcl_util::PointCloudPtr &cloud,
                             const ROIFilterOptions &roi_filter_options,
-                            pcl_util::PointIndices* roi_indices) {
+                            pcl_util::PointIndices *roi_indices) {
   extract_pointcloud_indices(cloud, roi_indices);
   return true;
 }
@@ -53,7 +53,7 @@ bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,
 bool DummySegmentation::Segment(const PointCloudPtr &cloud,
                                 const PointIndices &non_ground_indices,
                                 const SegmentationOptions &options,
-                                vector<ObjectPtr> *objects) {
+                                std::vector<ObjectPtr> *objects) {
   return result_segment_;
 }
 
@@ -86,7 +86,7 @@ void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
 }
 
 bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
-                               vector<ObjectPtr> *objects) {
+                               std::vector<ObjectPtr> *objects) {
   if (objects == NULL) {
     return false;
   }
@@ -106,9 +106,9 @@ bool DummyObjectFilter::Filter(const ObjectFilterOptions &obj_filter_options,
   return result_object_filter_;
 }
 
-bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
-                         const TrackerOptions &options,
-                         vector<ObjectPtr> *tracked_objects) {
+bool DummyTracker::Track(const std::vector<ObjectPtr> &objects,
+                         double timestamp, const TrackerOptions &options,
+                         std::vector<ObjectPtr> *tracked_objects) {
   if (tracked_objects == nullptr || options.velodyne_trans == nullptr) {
     return result_track_;
   }
@@ -127,8 +127,8 @@ bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
         (pose * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
     // obj->anchor_point = obj->center;
 
-    TransformPointCloud<Point>(pose, obj->cloud);
-    TransformPointCloud<PointD>(pose, obj->polygon.makeShared());
+    TransformPointCloud<pcl_util::Point>(pose, obj->cloud);
+    TransformPointCloud<pcl_util::PointD>(pose, obj->polygon.makeShared());
     if (fabs(obj->direction[0]) < DBL_MIN) {
       if (obj->direction[1] > 0) {
         obj->theta = M_PI / 2;
@@ -142,6 +142,11 @@ bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
   }
 
   return result_track_;
+}
+
+bool DummyTypeFuser::FuseType(const TypeFuserOptions &options,
+                              std::vector<ObjectPtr> *objects) {
+  return result_type_fuser_;
 }
 
 }  // namespace perception

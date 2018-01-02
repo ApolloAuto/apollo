@@ -1,12 +1,13 @@
-import { observable, computed, action, runInAction } from "mobx";
-import * as THREE from "three";
+import { observable, computed, action, autorun } from "mobx";
 
+import HMI from "store/hmi";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
 import Planning from "store/planning";
+import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
-import Video from "store/video";
+import TrafficSignal from "store/traffic_signal";
 import PARAMETERS from "store/config/parameters.yml";
 
 class DreamviewStore {
@@ -15,7 +16,11 @@ class DreamviewStore {
 
     @observable worldTimestamp = 0;
 
-    @observable widthInPercentage = 1.0;
+    @observable sceneDimension = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        widthRatio: 1,
+    }
 
     @observable dimension = {
         width: window.innerWidth,
@@ -24,7 +29,13 @@ class DreamviewStore {
 
     @observable isInitialized = false;
 
+    @observable hmi = new HMI();
+
     @observable planning = new Planning();
+
+    @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
+
+    @observable trafficSignal = new TrafficSignal();
 
     @observable meters = new Meters();
 
@@ -32,11 +43,15 @@ class DreamviewStore {
 
     @observable options = new Options();
 
-    @observable video = new Video();
-
     @observable routeEditingManager = new RouteEditingManager();
 
     @observable geolocation = {};
+
+    @observable moduleDelay = observable.map();
+
+    @computed get enableHMIButtonsOnly() {
+        return !this.isInitialized || this.hmi.showNavigationMap;
+    }
 
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;
@@ -46,16 +61,8 @@ class DreamviewStore {
         this.worldTimestamp = newTimestamp;
     }
 
-    @action updateWidthInPercentage(newWidth) {
-        this.widthInPercentage = newWidth;
-        this.updateDimension();
-    }
-
-    @action updateDimension() {
-        this.dimension = {
-            width: window.innerWidth * this.widthInPercentage,
-            height: window.innerHeight,
-        };
+    @action updateWidthInPercentage(newRatio) {
+        this.sceneDimension.widthRatio = newRatio;
     }
 
     @action setInitializationStatus(status){
@@ -70,25 +77,91 @@ class DreamviewStore {
         this.geolocation = newGeolocation;
     }
 
-    @action setPNCMonitor() {
-        this.options.toggle('showPNCMonitor');
-        if(this.options.showPNCMonitor) {
-            this.updateWidthInPercentage(0.7);
-            this.options.selectCamera('Monitor');
-            this.options.showPlanningReference = true;
-            this.options.showPlaningDpOptimizer = true;
-            this.options.showPlanningQpOptimizer = true;
-        } else {
-            this.updateWidthInPercentage(1.0);
-            this.options.selectCamera('Default');
-            this.options.showPlanningReference = false;
-            this.options.showPlaningDpOptimizer = false;
-            this.options.showPlanningQpOptimizer = false;
+    @action enablePNCMonitor() {
+        this.updateWidthInPercentage(0.7);
+        this.options.showPlanningReference = true;
+        this.options.showPlaningDpOptimizer = true;
+        this.options.showPlanningQpOptimizer = true;
+    }
+
+    @action disablePNCMonitor() {
+        this.updateWidthInPercentage(1.0);
+        this.options.showPlanningReference = false;
+        this.options.showPlaningDpOptimizer = false;
+        this.options.showPlanningQpOptimizer = false;
+    }
+
+    @action updateModuleDelay(world) {
+        if(world && world.delay) {
+            for(module in world.delay) {
+                const hasNotUpdated = (world.delay[module] < 0);
+                const delay = hasNotUpdated ? '-' : world.delay[module].toFixed(2);
+                if (this.moduleDelay.has(module)){
+                    this.moduleDelay.get(module).delay = delay;
+                } else {
+                    this.moduleDelay.set(module, {
+                        delay: delay,
+                        name: module[0].toUpperCase() + module.slice(1),
+                    });
+                }
+            }
         }
+    }
+
+    handleSideBarClick(option) {
+        const oldShowPNCMonitor = this.options.showPNCMonitor;
+        const oldShowRouteEditingBar = this.options.showRouteEditingBar;
+
+        this.options.toggleSideBar(option);
+
+        // disable tools turned off after toggling
+        if (oldShowPNCMonitor && !this.options.showPNCMonitor) {
+            this.disablePNCMonitor();
+        }
+        if (oldShowRouteEditingBar && !this.options.showRouteEditingBar) {
+            this.routeEditingManager.disableRouteEditing();
+        }
+
+        // enable selected tool
+        if (this.options[option]) {
+            switch(option) {
+                case "showPNCMonitor":
+                    this.enablePNCMonitor();
+                    break;
+                case 'showRouteEditingBar':
+                    this.options.showPOI = false;
+                    this.routeEditingManager.enableRouteEditing();
+                    break;
+            }
+        }
+    }
+
+    // This function is triggerred automatically whenever a observable changes
+    updateDimension() {
+        let offsetX = 0;
+        let offsetY = 0;
+        let mainViewHeightRatio = 0.65;
+        if (!OFFLINE_PLAYBACK) {
+            const smallScreen = window.innerHeight < 800.0;
+            offsetX = smallScreen ? 80 : 90; // width of side-bar
+            offsetY = smallScreen ? 55 : 60; // height of header
+            mainViewHeightRatio = 0.60;
+        }
+
+        this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;
+        this.dimension.height = window.innerHeight - offsetY;
+
+        this.sceneDimension.width = this.dimension.width - offsetX;
+        this.sceneDimension.height = this.options.showTools
+                ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 }
 
 const STORE = new DreamviewStore();
+
+autorun(() => {
+    STORE.updateDimension();
+});
 
 // For debugging purpose only. When turned on, it will insert a random
 // monitor message into monitor every 10 seconds.

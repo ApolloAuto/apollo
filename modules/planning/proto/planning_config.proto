@@ -6,6 +6,7 @@ import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
+import "modules/planning/proto/poly_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_reference_line_smoother_config.proto";
 
 enum TaskType {
@@ -16,17 +17,22 @@ enum TaskType {
   TRAFFIC_DECIDER = 4;
   PATH_DECIDER = 5;
   SPEED_DECIDER = 6;
+  POLY_ST_SPEED_OPTIMIZER = 7;
 };
 
 message RuleConfig {
-    enum RuleId {
-        BACKSIDE_VEHICLE = 1;
-        SIGNAL_LIGHT = 2;
-        CROSSWALK = 3;
-        CLEAR_ZONE = 4;
-        REROUTING = 5;
-    }
-    optional RuleId rule_id = 1;
+  enum RuleId {
+    BACKSIDE_VEHICLE = 1;
+    SIGNAL_LIGHT = 2;
+    CROSSWALK = 3;
+    CLEAR_ZONE = 4;
+    REROUTING = 5;
+    REFERENCE_LINE_END = 6;
+    DESTINATION = 7;
+    STOP_SIGN = 8;
+    CHANGE_LANE = 9;
+  }
+  optional RuleId rule_id = 1;
 }
 
 message EMPlannerConfig {
@@ -35,6 +41,7 @@ message EMPlannerConfig {
   optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
   optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
   optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
+  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
 }
 
 message PlanningConfig {

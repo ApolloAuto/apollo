@@ -41,7 +41,7 @@ using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
 
-std::string ThirdPartyPerception::Name() const { return FLAGS_hmi_name; }
+std::string ThirdPartyPerception::Name() const { return FLAGS_module_name; }
 
 Status ThirdPartyPerception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);

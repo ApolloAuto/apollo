@@ -27,9 +27,11 @@
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_cost.h"
@@ -41,60 +43,55 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const ReferenceLine& reference_line,
-            const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
-            const PathData& path_data, const SLBoundary& adc_sl_boundary);
+  DpStGraph(const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
+            const std::vector<const PathObstacle*>& obstacles,
+            const common::TrajectoryPoint& init_point,
+            const SLBoundary& adc_sl_boundary);
 
-  apollo::common::Status Search(PathDecision* const path_decision,
-                                SpeedData* const speed_data);
+  apollo::common::Status Search(SpeedData* const speed_data);
 
  private:
   apollo::common::Status InitCostTable();
 
   void CalculatePointwiseCost(const std::vector<const StBoundary*>& boundaries);
 
-  apollo::common::Status RetrieveSpeedProfile(
-      SpeedData* const speed_data) const;
+  apollo::common::Status RetrieveSpeedProfile(SpeedData* const speed_data);
 
   apollo::common::Status CalculateTotalCost();
   void CalculateCostAt(const uint32_t r, const uint32_t c);
 
   double CalculateEdgeCost(const STPoint& first, const STPoint& second,
                            const STPoint& third, const STPoint& forth,
-                           const double speed_limit) const;
+                           const double speed_limit);
   double CalculateEdgeCostForSecondCol(const uint32_t row,
-                                       const double speed_limit) const;
+                                       const double speed_limit);
   double CalculateEdgeCostForThirdCol(const uint32_t curr_r,
                                       const uint32_t pre_r,
-                                      const double speed_limit) const;
-
-  bool CalculateFeasibleAccelRange(const double r_pre, const double r_cur,
-                                   uint32_t* const lower_bound,
-                                   uint32_t* const upper_bound) const;
+                                      const double speed_limit);
 
   void GetRowRange(const StGraphPoint& point, uint32_t* highest_row,
                    uint32_t* lowest_row);
 
  private:
-  const ReferenceLine& reference_line_;
+  const StGraphData& st_graph_data_;
+
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
 
-  const StGraphData& st_graph_data_;
+  // obstacles based on the current reference line
+  const std::vector<const PathObstacle*>& obstacles_;
 
   // vehicle configuration parameter
-  common::VehicleParam vehicle_param_;
-
-  const SLBoundary& adc_sl_boundary_;
-
-  // cost utility with configuration;
-  DpStCost dp_st_cost_;
+  const common::VehicleParam& vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
 
   // initial status
   common::TrajectoryPoint init_point_;
 
-  // mappign obstacle to st graph
-  // std::unique_ptr<StBoundaryMapper> st_mapper_ = nullptr;
+  // cost utility with configuration;
+  DpStCost dp_st_cost_;
+
+  const SLBoundary& adc_sl_boundary_;
 
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;

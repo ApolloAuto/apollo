@@ -106,3 +106,18 @@ proto_library(
         "//modules/prediction/proto:fnn_model_base_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "network_model_proto",
+    deps = [
+        ":network_model_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "network_model_proto_lib",
+    srcs = [
+        "network_layers.proto",
+        "network_model.proto",
+    ],
+)

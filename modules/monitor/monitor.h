@@ -42,7 +42,6 @@ class Monitor : public apollo::common::ApolloApp {
 
  private:
   RecurrentRunnerThread monitor_thread_;
-  SystemStatus system_status_;
 };
 
 }  // namespace monitor

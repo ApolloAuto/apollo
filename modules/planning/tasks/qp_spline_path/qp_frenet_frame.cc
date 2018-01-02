@@ -235,24 +235,26 @@ bool QpFrenetFrame::MapNudgePolygon(
     std::vector<std::pair<double, double>>* const bound_map) {
   std::vector<common::SLPoint> sl_corners;
   for (const auto& corner_xy : polygon.points()) {
-    common::SLPoint cur_point;
-    if (!reference_line_.XYToSL(corner_xy, &cur_point)) {
+    common::SLPoint corner_sl;
+    if (!reference_line_.XYToSL(corner_xy, &corner_sl)) {
       AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
-             << cur_point.DebugString();
+             << corner_sl.DebugString();
       return false;
     }
     // shift box based on buffer
-    cur_point.set_l(cur_point.l() + nudge.distance_l());
-    sl_corners.push_back(std::move(cur_point));
+    // nudge decision buffer:
+    // --- position for left nudge
+    // --- negative for right nudge
+    corner_sl.set_l(corner_sl.l() + nudge.distance_l());
+    sl_corners.push_back(std::move(corner_sl));
   }
 
   const auto corner_size = sl_corners.size();
   for (uint32_t i = 0; i < corner_size; ++i) {
-    if (!MapNudgeLine(sl_corners[i % corner_size],
-                      sl_corners[(i + 1) % corner_size], nudge.type(),
-                      bound_map)) {
+    if (!MapNudgeLine(sl_corners[i], sl_corners[(i + 1) % corner_size],
+                      nudge.type(), bound_map)) {
       AERROR << "Map box line (sl) " << sl_corners[i].DebugString() << "->"
-             << sl_corners[i + 1].DebugString();
+             << sl_corners[(i + 1) % corner_size].DebugString();
       return false;
     }
   }
@@ -263,6 +265,8 @@ bool QpFrenetFrame::MapNudgeLine(
     const common::SLPoint& start, const common::SLPoint& end,
     const ObjectNudge::Type nudge_type,
     std::vector<std::pair<double, double>>* const constraint) {
+  DCHECK_NOTNULL(constraint);
+
   const common::SLPoint& near_point = (start.s() < end.s() ? start : end);
   const common::SLPoint& further_point = (start.s() < end.s() ? end : start);
   std::pair<uint32_t, uint32_t> impact_index =
@@ -276,6 +280,8 @@ bool QpFrenetFrame::MapNudgeLine(
   const double distance =
       std::max(further_point.s() - near_point.s(), common::math::kMathEpsilon);
   const double adc_half_width = vehicle_param_.width() / 2;
+
+  DCHECK_GT(constraint->size(), impact_index.second);
   for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
     double weight = std::abs((evaluated_s_[i] - near_point.s())) / distance;
     weight = std::min(1.0, std::max(weight, 0.0));

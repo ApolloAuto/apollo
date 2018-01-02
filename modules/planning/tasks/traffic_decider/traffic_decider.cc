@@ -23,9 +23,13 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
+#include "modules/planning/tasks/traffic_decider/change_lane.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
+#include "modules/planning/tasks/traffic_decider/destination.h"
+#include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
+#include "modules/planning/tasks/traffic_decider/stop_sign.h"
 
 namespace apollo {
 namespace planning {
@@ -39,20 +43,33 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new BacksideVehicle(config);
                          });
-
   rule_factory_.Register(RuleConfig::SIGNAL_LIGHT,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new SignalLight(config);
                          });
-
   rule_factory_.Register(RuleConfig::CROSSWALK,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Crosswalk(config);
                          });
-
   rule_factory_.Register(RuleConfig::REROUTING,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Rerouting(config);
+                         });
+  rule_factory_.Register(RuleConfig::REFERENCE_LINE_END,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new ReferenceLineEnd(config);
+                         });
+  rule_factory_.Register(RuleConfig::DESTINATION,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new Destination(config);
+                         });
+  rule_factory_.Register(RuleConfig::STOP_SIGN,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new StopSign(config);
+                         });
+  rule_factory_.Register(RuleConfig::CHANGE_LANE,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new ChangeLane(config);
                          });
 }
 
@@ -68,6 +85,11 @@ Status TrafficDecider::Execute(Frame *frame,
   Task::Execute(frame, reference_line_info);
 
   for (const auto &rule_config : rule_configs_) {
+    if (!FLAGS_enable_traffic_light &&
+        rule_config.rule_id() == RuleConfig::SIGNAL_LIGHT) {
+      AWARN << "Traffic light is disabled, enable by --enable_traffic_light";
+      continue;
+    }
     auto rule = rule_factory_.CreateObject(rule_config.rule_id(), rule_config);
     if (!rule) {
       AERROR << "Could not find rule " << rule_config.DebugString();

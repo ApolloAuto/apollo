@@ -23,6 +23,7 @@ import os
 import random
 import threading
 import traceback
+import signal
 
 import rospy
 from std_msgs.msg import String
@@ -106,6 +107,7 @@ def main(stdscr):
     """
     Main function
     """
+    signal.signal(signal.SIGWINCH, signal.SIG_DFL)
     rospy.init_node('adu_diagnostics_' + str(random.random()), anonymous=True)
 
     diag = Diagnostics(stdscr)

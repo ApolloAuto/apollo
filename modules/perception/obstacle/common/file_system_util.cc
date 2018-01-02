@@ -23,9 +23,20 @@
 namespace apollo {
 namespace perception {
 
+std::string GetFileName(const std::string& path) {
+  std::string filename;
+  std::string::size_type loc = path.rfind('/');
+  if (loc == std::string::npos) {
+    filename = path;
+  } else {
+    filename = path.substr(loc + 1);
+  }
+  return filename;
+}
+
 void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
                               std::vector<std::string>* ret) {
-  std::vector<int> ret_id;
+  std::vector<double> ret_id;
   ret->clear();
   namespace fs = boost::filesystem;
   if (!fs::exists(folder) || !fs::is_directory(folder)) {
@@ -42,7 +53,7 @@ void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
       std::string temp_id_str =
           temp_path.substr(temp_path.rfind('_') + 1,
                            temp_path.rfind('.') - temp_path.rfind('_') - 1);
-      int temp_id = std::atoi(temp_id_str.c_str());
+      double temp_id = std::atof(temp_id_str.c_str());
       ret_id.push_back(temp_id);
     }
     ++it;
@@ -52,7 +63,7 @@ void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
   for (int i = 0; i < ret_size; ++i) {
     for (int j = i; j < ret_size; ++j) {
       if (ret_id[i] > ret_id[j]) {
-        int temp_id = ret_id[i];
+        double temp_id = ret_id[i];
         ret_id[i] = ret_id[j];
         ret_id[j] = temp_id;
         std::string temp_path = (*ret)[i];

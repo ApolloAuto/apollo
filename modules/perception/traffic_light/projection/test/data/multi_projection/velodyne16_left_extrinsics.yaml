@@ -1,0 +1,17 @@
+header:
+  stamp:
+    secs: 0
+    nsecs: 0
+  seq: 0
+  frame_id: velodyne64
+child_frame_id: velodyne16_left
+transform:
+  rotation:
+    y: 0.248584696691036
+    x: -0.2572997976783399
+    z: 0.6627110021871879
+    w: 0.6578879769883046
+  translation:
+    x: 0.01764391949333886
+    y: 0.5116437849506265
+    z: -0.05656716996707087

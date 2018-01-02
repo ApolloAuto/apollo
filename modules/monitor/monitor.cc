@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/monitor/monitor.h"
+
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/can/can_monitor.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
-#include "modules/monitor/monitor.h"
+#include "modules/monitor/reporters/static_info_reporter.h"
+#include "modules/monitor/reporters/vehicle_state_reporter.h"
+#include "modules/monitor/software/process_monitor.h"
+#include "modules/monitor/software/summary_monitor.h"
+#include "modules/monitor/software/topic_monitor.h"
 
 DEFINE_string(monitor_adapter_config_filename,
               "modules/monitor/conf/adapter.conf",
@@ -26,62 +33,51 @@ DEFINE_double(monitor_running_interval, 0.5, "Monitor running interval.");
 
 namespace apollo {
 namespace monitor {
-namespace {
 
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::make_unique;
 
-// A runner which monitors if the system status has changed.
-class StatusChangeMonitor : public RecurrentRunner {
- public:
-  // Set internal to 0, so it runs every time when ticking.
-  explicit StatusChangeMonitor(SystemStatus *system_status)
-      : RecurrentRunner("SystemStatusMonitor", 0)
-      , system_status_(system_status) {
-  }
-
-  // Publish the new system status if it changed.
-  void RunOnce(const double current_time) override {
-    static std::hash<std::string> hash_fn;
-    const size_t new_fp = hash_fn(system_status_->ShortDebugString());
-    if (system_status_fp_ != new_fp) {
-      AdapterManager::FillSystemStatusHeader(name_, system_status_);
-      AdapterManager::PublishSystemStatus(*system_status_);
-      system_status_fp_ = new_fp;
-      ADEBUG << "Published system status: " << system_status_->DebugString();
-    }
-  }
-
- private:
-  SystemStatus *system_status_;
-  size_t system_status_fp_ = 0;
-};
-
-}  // namespace
-
-Monitor::Monitor()
-    : monitor_thread_(FLAGS_monitor_running_interval) {
+Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {
 }
 
 Status Monitor::Init() {
   AdapterManager::Init(FLAGS_monitor_adapter_config_filename);
 
-  // Check the expected adapters are initialized.
-  CHECK(AdapterManager::GetGnssStatus()) <<
-      "GnssStatusAdapter is not initialized.";
-  CHECK(AdapterManager::GetInsStatus()) <<
-      "InsStatusAdapter is not initialized.";
-  CHECK(AdapterManager::GetSystemStatus()) <<
-      "SystemStatusAdapter is not initialized.";
+  // Run SummaryCleaner at the beginning of each round to get a refreshed
+  // result.
+  monitor_thread_.RegisterRunner(make_unique<SummaryCleaner>());
 
-  monitor_thread_.RegisterRunner(make_unique<CanMonitor>(&system_status_));
-  monitor_thread_.RegisterRunner(make_unique<GpsMonitor>(&system_status_));
+  monitor_thread_.RegisterRunner(make_unique<CanMonitor>());
+  monitor_thread_.RegisterRunner(make_unique<GpsMonitor>());
+  monitor_thread_.RegisterRunner(make_unique<ProcessMonitor>());
 
-  // Register the StatusChangeMonitor as last runner, so it will monitor all
-  // changes made by the previous runners.
-  monitor_thread_.RegisterRunner(
-      make_unique<StatusChangeMonitor>(&system_status_));
+  const auto &config = MonitorManager::GetConfig();
+  for (const auto &module : config.modules()) {
+    if (module.has_topic_conf()) {
+      auto *module_status = MonitorManager::GetModuleStatus(module.name());
+      monitor_thread_.RegisterRunner(make_unique<TopicMonitor>(
+          module.topic_conf(), module_status->mutable_topic_status()));
+    }
+  }
+  for (const auto &hardware : config.hardware()) {
+    if (hardware.has_topic_conf()) {
+      auto *hw_status = MonitorManager::GetHardwareStatus(hardware.name());
+      monitor_thread_.RegisterRunner(make_unique<TopicMonitor>(
+          hardware.topic_conf(), hw_status->mutable_topic_status()));
+    }
+  }
+
+  // Register online reporters.
+  if (MonitorManager::GetConfig().has_online_report_endpoint()) {
+    monitor_thread_.RegisterRunner(make_unique<VehicleStateReporter>());
+  }
+  // Register StaticInfo reporter.
+  monitor_thread_.RegisterRunner(make_unique<StaticInfoReporter>());
+
+  // Register the SummaryMonitor as last runner, so it will monitor all changes
+  // made by the previous runners.
+  monitor_thread_.RegisterRunner(make_unique<SummaryMonitor>());
   return Status::OK();
 }
 

@@ -20,9 +20,11 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/can/can_checker_factory.h"
 
-DEFINE_string(can_monitor_name, "CAN", "Name of the CAN monitor.");
+DEFINE_string(can_hardware_name, "CAN", "Name of the CAN hardware.");
+DEFINE_string(can_monitor_name, "CanMonitor", "Name of the CAN monitor.");
 DEFINE_double(can_monitor_interval, 3, "CAN status checking interval (s).");
 
 namespace apollo {
@@ -30,14 +32,15 @@ namespace monitor {
 
 using apollo::canbus::CanbusConf;
 
-CanMonitor::CanMonitor(SystemStatus *system_status)
-    : HardwareMonitor(FLAGS_can_monitor_name, FLAGS_can_monitor_interval,
-                      system_status) {
+CanMonitor::CanMonitor() : RecurrentRunner(FLAGS_can_monitor_name,
+                                           FLAGS_can_monitor_interval) {
 }
 
 void CanMonitor::RunOnce(const double current_time) {
-  CanbusConf canbus_conf;
+  static auto *status = MonitorManager::GetHardwareStatus(
+      FLAGS_can_hardware_name);
 
+  CanbusConf canbus_conf;
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
                                                &canbus_conf));
 
@@ -45,16 +48,19 @@ void CanMonitor::RunOnce(const double current_time) {
   can_chk_factory->RegisterCanCheckers();
   auto can_chk =
       can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());
-  CHECK(can_chk);
+
+  if (can_chk == nullptr) {
+    return;
+  }
 
   std::vector<HwCheckResult> can_rslt;
   can_chk->run_check(&can_rslt);
   CHECK_EQ(can_rslt.size(), 1);
 
-  status_->set_status(static_cast<HardwareStatus::Status>(can_rslt[0].status));
-  status_->set_msg(can_rslt[0].mssg);
-
-  ADEBUG << "Done checking " << name_ << ", status=" << status_->status();
+  status->set_status(static_cast<HardwareStatus::Status>(can_rslt[0].status));
+  status->set_msg(can_rslt[0].mssg);
+  ADEBUG << "Done checking " << FLAGS_can_hardware_name
+         << ", status=" << status->status();
 }
 
 }  // namespace monitor

@@ -33,7 +33,8 @@ Spline2dKernel::Spline2dKernel(const std::vector<double>& t_knots,
                                const uint32_t spline_order)
     : t_knots_(t_knots), spline_order_(spline_order) {
   total_params_ =
-      (t_knots_.size() > 1 ? 2 * (t_knots_.size() - 1) * spline_order_ : 0);
+      (t_knots_.size() > 1 ? 2 * (t_knots_.size() - 1) * (1 + spline_order_)
+                           : 0);
   kernel_matrix_ = Eigen::MatrixXd::Zero(total_params_, total_params_);
   offset_ = Eigen::MatrixXd::Zero(total_params_, 1);
 }
@@ -81,15 +82,15 @@ const Eigen::MatrixXd Spline2dKernel::offset() const { return offset_; }
 void Spline2dKernel::AddNthDerivativeKernelMatrix(const uint32_t n,
                                                   const double weight) {
   for (uint32_t i = 0; i + 1 < t_knots_.size(); ++i) {
+    const uint32_t num_params = spline_order_ + 1;
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->NthDerivativeKernel(
-            n, spline_order_, t_knots_[i + 1] - t_knots_[i]) *
+            n, num_params, t_knots_[i + 1] - t_knots_[i]) *
         weight;
-    kernel_matrix_.block(2 * i * spline_order_, 2 * i * spline_order_,
-                         spline_order_, spline_order_) += cur_kernel;
-    kernel_matrix_.block((2 * i + 1) * spline_order_,
-                         (2 * i + 1) * spline_order_, spline_order_,
-                         spline_order_) += cur_kernel;
+    kernel_matrix_.block(2 * i * num_params, 2 * i * num_params, num_params,
+                         num_params) += cur_kernel;
+    kernel_matrix_.block((2 * i + 1) * num_params, (2 * i + 1) * num_params,
+                         num_params, num_params) += cur_kernel;
   }
 }
 
@@ -120,34 +121,35 @@ bool Spline2dKernel::AddReferenceLineKernelMatrix(
     // update offset
     double offset_coef_x = -ref_points[i].x() * weight;
     double offset_coef_y = -ref_points[i].y() * weight;
-    for (uint32_t j = 0; j < spline_order_; ++j) {
-      offset_(j + (2 * cur_index) * spline_order_, 0) = offset_coef_x;
-      offset_(j + (2 * cur_index + 1) * spline_order_, 0) = offset_coef_y;
+    const uint32_t num_params = spline_order_ + 1;
+    for (uint32_t j = 0; j < num_params; ++j) {
+      offset_(j + (2 * cur_index) * num_params, 0) = offset_coef_x;
+      offset_(j + (2 * cur_index + 1) * num_params, 0) = offset_coef_y;
       offset_coef_x *= cur_rel_t;
       offset_coef_y *= cur_rel_t;
     }
 
     // update kernel matrix
-    Eigen::MatrixXd ref_kernel(spline_order_, spline_order_);
+    Eigen::MatrixXd ref_kernel(num_params, num_params);
 
     double cur_t = 1.0;
     std::vector<double> power_t;
-    for (uint32_t n = 0; n + 1 < 2 * spline_order_; ++n) {
+    for (uint32_t n = 0; n + 1 < 2 * num_params; ++n) {
       power_t.emplace_back(cur_t);
       cur_t *= cur_rel_t;
     }
 
-    for (uint32_t r = 0; r < spline_order_; ++r) {
-      for (uint32_t c = 0; c < spline_order_; ++c) {
+    for (uint32_t r = 0; r < num_params; ++r) {
+      for (uint32_t c = 0; c < num_params; ++c) {
         ref_kernel(r, c) = power_t[r + c];
       }
     }
-    kernel_matrix_.block((2 * cur_index) * spline_order_,
-                         (2 * cur_index) * spline_order_, spline_order_,
-                         spline_order_) += weight * ref_kernel;
-    kernel_matrix_.block((2 * cur_index + 1) * spline_order_,
-                         (2 * cur_index + 1) * spline_order_, spline_order_,
-                         spline_order_) += weight * ref_kernel;
+    kernel_matrix_.block((2 * cur_index) * num_params,
+                         (2 * cur_index) * num_params, num_params,
+                         num_params) += weight * ref_kernel;
+    kernel_matrix_.block((2 * cur_index + 1) * num_params,
+                         (2 * cur_index + 1) * num_params, num_params,
+                         num_params) += weight * ref_kernel;
   }
   return true;
 }

@@ -43,6 +43,7 @@ class FreeMovePredictorTest : public KMLMapBasedTest {
     FLAGS_q_var = 0.01;
     FLAGS_r_var = 0.25;
   }
+
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
@@ -61,10 +62,10 @@ TEST_F(FreeMovePredictorTest, General) {
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 1);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(9).path_point().x(), -432.459, 0.001);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(9).path_point().y(), -156.451, 0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -432.459,
+              0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -156.451,
+              0.001);
 }
 
 }  // namespace prediction

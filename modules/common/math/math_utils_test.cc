@@ -53,6 +53,7 @@ TEST(MathUtilsTest, WrapAngle) {
 
 TEST(MathUtilsTest, NormalizeAngle) {
   EXPECT_DOUBLE_EQ(1.5, NormalizeAngle(1.5));
+  EXPECT_DOUBLE_EQ(1.5 - M_PI, NormalizeAngle(1.5 + M_PI));
   EXPECT_DOUBLE_EQ(1.5, NormalizeAngle(1.5 + M_PI * 2));
   EXPECT_DOUBLE_EQ(1.5, NormalizeAngle(1.5 - M_PI * 2));
   EXPECT_DOUBLE_EQ(-1.5, NormalizeAngle(-1.5));

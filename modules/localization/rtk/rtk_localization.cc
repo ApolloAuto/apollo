@@ -32,9 +32,15 @@ using apollo::common::Status;
 using apollo::common::time::Clock;
 
 RTKLocalization::RTKLocalization()
-    : monitor_(MonitorMessageItem::LOCALIZATION),
+    : monitor_logger_(MonitorMessageItem::LOCALIZATION),
       map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z} {}
 
+RTKLocalization::~RTKLocalization() {
+  if (tf2_broadcaster_) {
+    delete tf2_broadcaster_;
+    tf2_broadcaster_ = nullptr;
+  }
+}
 Status RTKLocalization::Start() {
   AdapterManager::Init(FLAGS_rtk_adapter_config_file);
 
@@ -42,7 +48,7 @@ Status RTKLocalization::Start() {
   const double duration = 1.0 / FLAGS_localization_publish_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &RTKLocalization::OnTimer, this);
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   if (!AdapterManager::GetGps()) {
     buffer.ERROR() << "GPS input not initialized. Check file "
                    << FLAGS_rtk_adapter_config_file;
@@ -54,6 +60,9 @@ Status RTKLocalization::Start() {
     buffer.PrintLog();
     return Status(common::LOCALIZATION_ERROR, "no IMU adapter");
   }
+
+  tf2_broadcaster_ = new tf2_ros::TransformBroadcaster;
+
   return Status::OK();
 }
 
@@ -65,7 +74,7 @@ Status RTKLocalization::Stop() {
 void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
   double time_delay =
       common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   if (FLAGS_enable_gps_timestamp &&
       time_delay > FLAGS_gps_time_delay_tolerance) {
     buffer.ERROR() << "GPS message time delay: " << time_delay;
@@ -268,6 +277,8 @@ void RTKLocalization::ComposeLocalizationMsg(
         gps_msg.header().timestamp_sec());
   }
 
+  localization->set_measurement_time(gps_msg.header().timestamp_sec());
+
   // combine gps and imu
   auto mutable_pose = localization->mutable_pose();
   if (gps_msg.has_localization()) {
@@ -369,7 +380,29 @@ void RTKLocalization::PublishLocalization() {
 
   // publish localization messages
   AdapterManager::PublishLocalization(localization);
+  PublishPoseBroadcastTF(localization);
   ADEBUG << "[OnTimer]: Localization message publish success!";
+}
+
+void RTKLocalization::PublishPoseBroadcastTF(
+    const LocalizationEstimate &localization) {
+  // broadcast tf message
+  geometry_msgs::TransformStamped tf2_msg;
+  tf2_msg.header.stamp = ros::Time(localization.measurement_time());
+  tf2_msg.header.frame_id = FLAGS_localization_tf2_frame_id;
+  tf2_msg.child_frame_id = FLAGS_localization_tf2_child_frame_id;
+
+  tf2_msg.transform.translation.x = localization.pose().position().x();
+  tf2_msg.transform.translation.y = localization.pose().position().y();
+  tf2_msg.transform.translation.z = localization.pose().position().z();
+
+  tf2_msg.transform.rotation.x = localization.pose().orientation().qx();
+  tf2_msg.transform.rotation.y = localization.pose().orientation().qy();
+  tf2_msg.transform.rotation.z = localization.pose().orientation().qz();
+  tf2_msg.transform.rotation.w = localization.pose().orientation().qw();
+
+  tf2_broadcaster_->sendTransform(tf2_msg);
+  return;
 }
 
 void RTKLocalization::RunWatchDog() {
@@ -377,7 +410,7 @@ void RTKLocalization::RunWatchDog() {
     return;
   }
 
-  common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // check GPS time stamp against ROS timer
   double gps_delay_sec =

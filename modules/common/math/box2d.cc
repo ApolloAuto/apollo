@@ -62,6 +62,7 @@ Box2d::Box2d(const Vec2d &center, const double heading, const double length,
       sin_heading_(sin(heading)) {
   CHECK_GT(length_, -kMathEpsilon);
   CHECK_GT(width_, -kMathEpsilon);
+  InitCorners();
 }
 
 Box2d::Box2d(const LineSegment2d &axis, const double width)
@@ -75,6 +76,26 @@ Box2d::Box2d(const LineSegment2d &axis, const double width)
       sin_heading_(axis.sin_heading()) {
   CHECK_GT(length_, -kMathEpsilon);
   CHECK_GT(width_, -kMathEpsilon);
+  InitCorners();
+}
+
+void Box2d::InitCorners() {
+  const double dx1 = cos_heading_ * half_length_;
+  const double dy1 = sin_heading_ * half_length_;
+  const double dx2 = sin_heading_ * half_width_;
+  const double dy2 = -cos_heading_ * half_width_;
+  corners_.clear();
+  corners_.emplace_back(center_.x() + dx1 + dx2, center_.y() + dy1 + dy2);
+  corners_.emplace_back(center_.x() + dx1 - dx2, center_.y() + dy1 - dy2);
+  corners_.emplace_back(center_.x() - dx1 - dx2, center_.y() - dy1 - dy2);
+  corners_.emplace_back(center_.x() - dx1 + dx2, center_.y() - dy1 + dy2);
+
+  for (auto &corner : corners_) {
+    max_x_ = std::fmax(corner.x(), max_x_);
+    min_x_ = std::fmin(corner.x(), min_x_);
+    max_y_ = std::fmax(corner.y(), max_y_);
+    min_y_ = std::fmin(corner.y(), min_y_);
+  }
 }
 
 Box2d::Box2d(const AABox2d &aabox)
@@ -103,16 +124,7 @@ void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   if (corners == nullptr) {
     return;
   }
-  const double dx1 = cos_heading_ * half_length_;
-  const double dy1 = sin_heading_ * half_length_;
-  const double dx2 = sin_heading_ * half_width_;
-  const double dy2 = -cos_heading_ * half_width_;
-  corners->clear();
-  corners->reserve(4);
-  corners->emplace_back(center_.x() + dx1 + dx2, center_.y() + dy1 + dy2);
-  corners->emplace_back(center_.x() + dx1 - dx2, center_.y() + dy1 - dy2);
-  corners->emplace_back(center_.x() - dx1 - dx2, center_.y() - dy1 - dy2);
-  corners->emplace_back(center_.x() - dx1 + dx2, center_.y() - dy1 + dy2);
+  *corners = corners_;
 }
 
 bool Box2d::IsPointIn(const Vec2d &point) const {
@@ -153,6 +165,12 @@ double Box2d::DistanceTo(const Vec2d &point) const {
 bool Box2d::HasOverlap(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return IsPointIn(line_segment.start());
+  }
+  if (std::fmax(line_segment.start().x(), line_segment.end().x()) < min_x() ||
+      std::fmin(line_segment.start().x(), line_segment.end().x()) > max_x() ||
+      std::fmax(line_segment.start().y(), line_segment.end().y()) < min_x() ||
+      std::fmin(line_segment.start().y(), line_segment.end().y()) > max_x()) {
+    return false;
   }
   return DistanceTo(line_segment) <= kMathEpsilon;
 }
@@ -256,6 +274,11 @@ double Box2d::DistanceTo(const Box2d &box) const {
 }
 
 bool Box2d::HasOverlap(const Box2d &box) const {
+  if (box.max_x() < min_x() || box.min_x() > max_x() || box.max_y() < min_y() ||
+      box.min_y() > max_y()) {
+    return false;
+  }
+
   const double shift_x = box.center_x() - center_.x();
   const double shift_y = box.center_y() - center_.y();
 
@@ -298,15 +321,18 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
   heading_ = NormalizeAngle(heading_ + rotate_angle);
   cos_heading_ = std::cos(heading_);
   sin_heading_ = std::sin(heading_);
+  InitCorners();
 }
 
-void Box2d::Shift(const Vec2d &shift_vec) { center_ += shift_vec; }
+void Box2d::Shift(const Vec2d &shift_vec) {
+  center_ += shift_vec;
+  InitCorners();
+}
 
 std::string Box2d::DebugString() const {
-  return util::StrCat(
-      "box2d ( center = ", center_.DebugString(),
-      "  heading = ", heading_, "  length = ", length_,
-      "  width = ", width_, " )");
+  return util::StrCat("box2d ( center = ", center_.DebugString(),
+                      "  heading = ", heading_, "  length = ", length_,
+                      "  width = ", width_, " )");
 }
 
 }  // namespace math

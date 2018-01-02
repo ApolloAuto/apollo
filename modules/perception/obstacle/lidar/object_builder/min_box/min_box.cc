@@ -26,7 +26,6 @@
 namespace apollo {
 namespace perception {
 
-using pcl_util::Point;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 
@@ -318,7 +317,7 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
   if (cloud->points.size() < 4u) {
     return;
   }
-  GetCloudMinMax3D<Point>(cloud, &min_pt, &max_pt);
+  GetCloudMinMax3D<pcl_util::Point>(cloud, &min_pt, &max_pt);
   obj->height = static_cast<double>(max_pt[2]) - static_cast<double>(min_pt[2]);
   const double min_eps = 10 * std::numeric_limits<double>::epsilon();
   // double min_eps = 0.1;
@@ -346,7 +345,7 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
 
   PointCloudPtr pcd_xy(new PointCloud);
   for (size_t i = 0; i < cloud->points.size(); ++i) {
-    Point p = cloud->points[i];
+    pcl_util::Point p = cloud->points[i];
     p.z = min_pt[2];
     pcd_xy->push_back(p);
   }

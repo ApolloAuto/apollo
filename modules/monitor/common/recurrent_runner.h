@@ -23,8 +23,6 @@
 #include <thread>
 #include <vector>
 
-#include "modules/monitor/proto/system_status.pb.h"
-
 /**
  * @namespace apollo::monitor
  * @brief apollo::monitor

@@ -16,11 +16,13 @@
 
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 
-#include <utility>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
@@ -29,6 +31,7 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
+using apollo::hdmap::LaneInfo;
 
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -37,12 +40,20 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
+  if (feature.is_still()) {
+    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
+    return;
+  }
+
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
     return;
   }
 
-  std::string lane_id = feature.lane().lane_feature().lane_id();
+  std::string lane_id = "";
+  if (feature.lane().has_lane_feature()) {
+    lane_id = feature.lane().lane_feature().lane_id();
+  }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
   FilterLaneSequences(feature.lane().lane_graph(), lane_id,
@@ -68,9 +79,10 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(obstacle->kf_lane_tracker(curr_lane_id),
-                                     sequence, FLAGS_prediction_duration,
-                                     FLAGS_prediction_freq, &points);
+    double prediction_total_time = FLAGS_prediction_pedestrian_total_time;
+    DrawLaneSequenceTrajectoryPoints(
+        feature, curr_lane_id, obstacle->kf_lane_tracker(curr_lane_id),
+        sequence, prediction_total_time, FLAGS_prediction_period, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
@@ -82,19 +94,33 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
+    const Feature& feature, const std::string& lane_id,
     const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
-    double total_time, double freq, std::vector<TrajectoryPoint>* points) {
-  // PredictionMap* map = PredictionMap::instance();
-
+    double total_time, double period, std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
-  Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
-  transition(0, 2) = freq;
-  transition(0, 3) = 0.5 * freq * freq;
-  transition(2, 3) = freq;
 
-  size_t num = static_cast<size_t>(total_time / freq);
+  Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  PredictionMap* map = PredictionMap::instance();
+  std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  if (map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
+    state(0, 0) = lane_s;
+    state(1, 0) = lane_l;
+    state(2, 0) = feature.speed();
+    state(3, 0) = feature.acc();
+  }
+  if (FLAGS_enable_lane_sequence_acc && sequence.has_acceleration()) {
+    state(3, 0) = sequence.acceleration();
+  }
+  Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
+  transition(0, 2) = period;
+  transition(0, 3) = 0.5 * period * period;
+  transition(2, 3) = period;
+
+  size_t num = static_cast<size_t>(total_time / period);
   ::apollo::prediction::predictor_util::GenerateLaneSequenceTrajectoryPoints(
-      &state, &transition, sequence, num, freq, points);
+      &state, &transition, sequence, num, period, points);
 }
 
 }  // namespace prediction

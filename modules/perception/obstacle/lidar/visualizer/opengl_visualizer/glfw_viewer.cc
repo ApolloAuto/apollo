@@ -34,8 +34,8 @@ namespace perception {
 
 GLFWViewer::GLFWViewer() {
   init_ = false;
-  window_ = NULL;
-  pers_camera_ = NULL;
+  window_ = nullptr;
+  pers_camera_ = nullptr;
   forward_dir_ = Eigen::Vector3d::Zero();
   scn_center_ = Eigen::Vector3d::Zero();
   bg_color_ = Eigen::Vector3d::Zero();
@@ -573,7 +573,7 @@ void GLFWViewer::GetClassColor(int cls, float rgb[3]) {
 void GLFWViewer::FramebufferSizeCallback(GLFWwindow *window, int width,
                                          int height) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) return;
+  if (user_data == nullptr) return;
 
   GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
   vis->ResizeFramebuffer(width, height);
@@ -582,7 +582,7 @@ void GLFWViewer::FramebufferSizeCallback(GLFWwindow *window, int width,
 void GLFWViewer::KeyCallback(GLFWwindow *window, int key, int scancode,
                              int action, int mods) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) return;
+  if (user_data == nullptr) return;
   if (action == GLFW_PRESS) {
     GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
     AINFO << "key_value: " << key;
@@ -596,7 +596,7 @@ void GLFWViewer::MouseButtonCallback(GLFWwindow *window, int button, int action,
 void GLFWViewer::MouseCursorPositionCallback(GLFWwindow *window, double xpos,
                                              double ypos) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) return;
+  if (user_data == nullptr) return;
 
   GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
   vis->MouseMove(xpos, ypos);
@@ -605,7 +605,7 @@ void GLFWViewer::MouseCursorPositionCallback(GLFWwindow *window, double xpos,
 void GLFWViewer::MouseScrollCallback(GLFWwindow *window, double xoffset,
                                      double yoffset) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) return;
+  if (user_data == nullptr) return;
 
   GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
   vis->MouseWheel(yoffset);

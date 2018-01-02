@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "modules/common/util/map_util.h"
+
 namespace apollo {
 namespace planning {
 
@@ -36,12 +38,8 @@ class IndexedQueue {
   explicit IndexedQueue(std::size_t capacity) : capacity_(capacity) {}
 
   const T *Find(const I id) const {
-    auto iter = map_.find(id);
-    if (iter == map_.end()) {
-      return nullptr;
-    } else {
-      return iter->second.get();
-    }
+    auto *result = apollo::common::util::FindOrNull(map_, id);
+    return result ? result->get() : nullptr;
   }
 
   const T *Latest() const {

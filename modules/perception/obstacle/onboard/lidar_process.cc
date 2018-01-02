@@ -18,11 +18,9 @@
 
 #include <string>
 
-#include "Eigen/Core"
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
@@ -34,6 +32,7 @@
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
+#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 
 namespace apollo {
 namespace perception {
@@ -47,7 +46,6 @@ using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 using Eigen::Matrix4d;
 using Eigen::Affine3d;
-using std::string;
 
 bool LidarProcess::Init() {
   if (inited_) {
@@ -57,12 +55,12 @@ bool LidarProcess::Init() {
   RegistAllAlgorithm();
 
   if (!InitFrameDependence()) {
-    AERROR << "failed to init frame dependence.";
+    AERROR << "failed to Init frame dependence.";
     return false;
   }
 
   if (!InitAlgorithmPlugin()) {
-    AERROR << "failed to init algorithm plugin.";
+    AERROR << "failed to Init algorithm plugin.";
     return false;
   }
 
@@ -111,7 +109,7 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
     Affine3d temp_trans(*velodyne_trans);
     PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
     hdmap.reset(new HdmapStruct);
-    hdmap_input_->GetROI(velodyne_pose_world, &hdmap);
+    hdmap_input_->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap);
     PERF_BLOCK_END("lidar_get_roi_from_hdmap");
   }
 
@@ -181,10 +179,23 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-
-  PERF_BLOCK_END("lidar_tracker");
-  ADEBUG << "lidar process succ, there are " << objects_.size()
+  ADEBUG << "call tracker succ, there are " << objects_.size()
          << " tracked objects.";
+  PERF_BLOCK_END("lidar_tracker");
+
+  /// call type fuser
+  if (type_fuser_ != nullptr) {
+    TypeFuserOptions type_fuser_options;
+    type_fuser_options.timestamp = timestamp;
+    if (!type_fuser_->FuseType(type_fuser_options, &objects_)) {
+      AERROR << "failed to call type fuser";
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
+      return false;
+    }
+  }
+  ADEBUG << "lidar process succ.";
+  PERF_BLOCK_END("lidar_type_fuser");
+
   return true;
 }
 
@@ -193,18 +204,20 @@ void LidarProcess::RegistAllAlgorithm() {
   RegisterFactoryDummySegmentation();
   RegisterFactoryDummyObjectBuilder();
   RegisterFactoryDummyTracker();
+  RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
   RegisterFactoryHmObjectTracker();
+  RegisterFactorySequenceTypeFuser();
 }
 
 bool LidarProcess::InitFrameDependence() {
   /// init config manager
   ConfigManager* config_manager = ConfigManager::instance();
   if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager";
+    AERROR << "failed to Init ConfigManager";
     return false;
   }
   AINFO << "Init config manager successfully, work_root: "
@@ -218,11 +231,14 @@ bool LidarProcess::InitFrameDependence() {
       return false;
     }
     if (!hdmap_input_->Init()) {
-      AERROR << "failed to init HDMapInput";
+      AERROR << "failed to Init HDMapInput";
       return false;
     }
-    AINFO << "get and init hdmap_input succ.";
+    AINFO << "get and Init hdmap_input succ.";
   }
+
+  /// init roi indices
+  roi_indices_ = pcl_util::PointIndicesPtr(new pcl_util::PointIndices);
 
   return true;
 }
@@ -236,7 +252,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!roi_filter_->Init()) {
-    AERROR << "Failed to init roi filter: " << roi_filter_->name();
+    AERROR << "Failed to Init roi filter: " << roi_filter_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, roi_filter_: "
@@ -250,7 +266,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!segmentor_->Init()) {
-    AERROR << "Failed to init segmentor: " << segmentor_->name();
+    AERROR << "Failed to Init segmentor: " << segmentor_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, segmentor: "
@@ -264,7 +280,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!object_builder_->Init()) {
-    AERROR << "Failed to init object builder: " << object_builder_->name();
+    AERROR << "Failed to Init object builder: " << object_builder_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
@@ -278,10 +294,24 @@ bool LidarProcess::InitAlgorithmPlugin() {
     return false;
   }
   if (!tracker_->Init()) {
-    AERROR << "Failed to init tracker: " << tracker_->name();
+    AERROR << "Failed to Init tracker: " << tracker_->name();
     return false;
   }
   AINFO << "Init algorithm plugin successfully, tracker: " << tracker_->name();
+
+  /// init type fuser
+  type_fuser_.reset(
+      BaseTypeFuserRegisterer::GetInstanceByName(FLAGS_onboard_type_fuser));
+  if (!type_fuser_) {
+    AERROR << "Failed to get instance: " << FLAGS_onboard_type_fuser;
+    return false;
+  }
+  if (!type_fuser_->Init()) {
+    AERROR << "Failed to Init type_fuser: " << type_fuser_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, type_fuser: "
+        << type_fuser_->name();
 
   return true;
 }
@@ -316,7 +346,7 @@ void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
 
 bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   if (!trans) {
-    AERROR << "failed to get trans, the trans ptr can not be NULL";
+    AERROR << "failed to get trans, the trans ptr can not be nullptr";
     return false;
   }
 
@@ -324,7 +354,7 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   const auto& tf2_buffer = AdapterManager::Tf2Buffer();
 
   const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
-  string err_msg;
+  std::string err_msg;
   if (!tf2_buffer.canTransform(FLAGS_lidar_tf2_frame_id,
                                FLAGS_lidar_tf2_child_frame_id, query_stamp,
                                ros::Duration(kTf2BuffSize), &err_msg)) {
@@ -352,9 +382,7 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   return true;
 }
 
-bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
-  AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
-                                                obstacles);
+void LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
   common::Header* header = obstacles->mutable_header();
   header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
   header->set_camera_timestamp(0);
@@ -364,15 +392,11 @@ bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
 
   for (const auto& obj : objects_) {
     PerceptionObstacle* obstacle = obstacles->add_perception_obstacle();
-    if (!obj->Serialize(obstacle)) {
-      AERROR << "Failed gen PerceptionObstacle. Object:" << obj->ToString();
-      return false;
-    }
+    obj->Serialize(obstacle);
     obstacle->set_timestamp(obstacle->timestamp() * 1000);
   }
 
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
-  return true;
 }
 
 }  // namespace perception

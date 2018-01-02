@@ -2,53 +2,40 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 
 import ButtonPanel from "components/SideBar/ButtonPanel";
-import POI from "components/SideBar/POI";
-import Menu from "components/SideBar/Menu";
-import Console from "components/SideBar/Console";
-import Notification from "components/SideBar/Notification";
+import SubButtonPanel from "components/SideBar/SubButtonPanel";
 import WS from "store/websocket";
 
 @inject("store") @observer
 export default class SideBar extends React.Component {
     render() {
-        const { monitor, options, routeEditingManager, video } = this.props.store;
+        const { options, enableHMIButtonsOnly } = this.props.store;
 
         return (
-            <div className="sidebar">
-                <ButtonPanel resetBackend={() => {
-                                     WS.resetBackend();
-                                 }}
-                             dumpMessages={() => {
-                                     WS.dumpMessages();
-                                 }}
-                             onPOI={() => {
-                                 options.toggleShowPOI();
+            <div className="side-bar">
+                <ButtonPanel enableHMIButtonsOnly={enableHMIButtonsOnly}
+                             onTasks={() => {
+                                this.props.store.handleSideBarClick('showTasks');
                              }}
-                             showPOI={options.showPOI}
-                             showRouteEditingBar={() => {
-                                     options.showPOI = false;
-                                     routeEditingManager.enableRouteEditing();
-                                 }}
-                             onVideo={(event) => {
-                                     video.setVideo(event.target.files[0]);
-                                 }}
-                             onPNCMonitor={() => {
-                                     this.props.store.setPNCMonitor();
-                                 }}
-                             showPNCMonitor={options.showPNCMonitor}
-                             onConsole={() => {
-                                     options.toggleShowConsole();
-                                 }}
-                             showConsole={options.showConsole}
+                             showTasks={options.showTasks}
+                             onModuleController={() => {
+                                this.props.store.handleSideBarClick('showModuleController');
+                             }}
+                             showModuleController={options.showModuleController}
                              onMenu={() => {
-                                     options.toggleShowMenu();
+                                    this.props.store.handleSideBarClick('showMenu');
                                  }}
-                             showMenu={options.showMenu} />
-                {options.showPOI ? <POI routeEditingManager={routeEditingManager}
-                    options={options} /> : <div/>}
-                {options.showMenu ? <Menu options={options} /> : <div/>}
-                {options.showConsole ? <Console monitor={monitor} /> :
-                 <Notification monitor={monitor} />}
+                             showMenu={options.showMenu}
+                             onRouteEditingBar={() => {
+                                    this.props.store.handleSideBarClick('showRouteEditingBar');
+                                 }}
+                             showRouteEditingBar={options.showRouteEditingBar} />
+                <SubButtonPanel enablePOI={
+                                    !enableHMIButtonsOnly && !options.showRouteEditingBar
+                                }
+                                onPOI={() => {
+                                    this.props.store.handleSideBarClick('showPOI');
+                                }}
+                                showPOI={!options.showRouteEditingBar && options.showPOI} />
             </div>
         );
     }

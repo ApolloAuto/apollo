@@ -3,7 +3,7 @@
          type="apollo::drivers::gnss::StreamNodelet"
          base_class_type="nodelet::Nodelet">
     <description>
-    Publish gnss raw data
+    Publish gnss raw data.
     </description>
   </class>
 </library>
@@ -14,6 +14,16 @@
          base_class_type="nodelet::Nodelet">
     <description>
     Receive gnss raw data, and parse raw data, publish gnss message.
+    </description>
+  </class>
+</library>
+
+<library path="lib/librtcm_parser_nodelet">
+  <class name="gnss_driver/RtcmParserNodelet"
+         type="apollo::drivers::gnss::RtcmParserNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+    Receive rtcm data, then parse rtcm data and publish gnss ephemeris and observation message.
     </description>
   </class>
 </library>

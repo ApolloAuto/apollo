@@ -33,10 +33,35 @@
 // LOG_IF
 #define AINFO_IF(cond) LOG_IF(INFO, cond)
 #define AERROR_IF(cond) LOG_IF(ERROR, cond)
+#define ACHECK(cond) CHECK(cond)
 
 // LOG_EVERY_N
 #define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
 #define AWARN_EVERY(freq) LOG_EVERY_N(WARNING, freq)
 #define AERROR_EVERY(freq) LOG_EVERY_N(ERROR, freq)
+
+#define RETURN_IF_NULL(ptr)               \
+    if (ptr == nullptr) {                 \
+        AWARN << #ptr << " is nullptr.";  \
+        return;                           \
+    }
+
+#define RETURN_VAL_IF_NULL(ptr, val)      \
+    if (ptr == nullptr) {                 \
+        AWARN << #ptr << " is nullptr.";  \
+        return val;                       \
+    }
+
+#define RETURN_IF(condition)                   \
+    if (condition) {                           \
+        AWARN << #condition << " is not met."; \
+        return;                                \
+    }
+
+#define RETURN_VAL_IF(condition, val)          \
+    if (condition) {                           \
+        AWARN << #condition << " is not met."; \
+        return val;                            \
+    }
 
 #endif  // MODULES_COMMON_LOG_H_

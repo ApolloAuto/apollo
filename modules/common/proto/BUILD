@@ -96,6 +96,24 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "vehicle_state_proto",
+    deps = [
+        ":vehicle_state_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "vehicle_state_proto_lib",
+    srcs = [
+        "vehicle_state.proto",
+    ],
+    deps = [
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/localization/proto:pose_proto_lib",
+    ],
+)
+
+cc_proto_library(
     name = "car_sound_proto",
     deps = [
         ":car_sound_proto_lib",
@@ -109,5 +127,37 @@ proto_library(
     ],
     deps = [
         ":header_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "drive_event_proto",
+    deps = [
+        ":drive_event_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "drive_event_proto_lib",
+    srcs = [
+        "drive_event.proto",
+    ],
+    deps = [
+        ":header_proto_lib",
+        "//modules/localization/proto:pose_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "drive_state_proto_lib",
+    srcs = [
+        "drive_state.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "drive_state_proto",
+    deps = [
+        ":drive_state_proto_lib",
     ],
 )

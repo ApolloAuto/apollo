@@ -31,7 +31,7 @@ double TrackObjectDistance::s_point_num_distance_weight_ = 0.1;
 double TrackObjectDistance::s_histogram_distance_weight_ = 0.5;
 
 bool TrackObjectDistance::SetLocationDistanceWeight(
-  const float& location_distance_weight) {
+    const float& location_distance_weight) {
   if (location_distance_weight >= 0) {
     s_location_distance_weight_ = location_distance_weight;
     AINFO << "location distance weight of TrackObjectDistance is "
@@ -43,7 +43,7 @@ bool TrackObjectDistance::SetLocationDistanceWeight(
 }
 
 bool TrackObjectDistance::SetDirectionDistanceWeight(
-  const float& direction_distance_weight) {
+    const float& direction_distance_weight) {
   if (direction_distance_weight >= 0) {
     s_direction_distance_weight_ = direction_distance_weight;
     AINFO << "direction distance weight of TrackObjectDistance is "
@@ -55,7 +55,7 @@ bool TrackObjectDistance::SetDirectionDistanceWeight(
 }
 
 bool TrackObjectDistance::SetBboxSizeDistanceWeight(
-  const float& bbox_size_distance_weight) {
+    const float& bbox_size_distance_weight) {
   if (bbox_size_distance_weight >= 0) {
     s_bbox_size_distance_weight_ = bbox_size_distance_weight;
     AINFO << "bbox size distance weight of TrackObjectDistance is "
@@ -67,7 +67,7 @@ bool TrackObjectDistance::SetBboxSizeDistanceWeight(
 }
 
 bool TrackObjectDistance::SetPointNumDistanceWeight(
-  const float& point_num_distance_weight) {
+    const float& point_num_distance_weight) {
   if (point_num_distance_weight >= 0) {
     s_point_num_distance_weight_ = point_num_distance_weight;
     AINFO << "point num distance weight of TrackObjectDistance is "
@@ -79,7 +79,7 @@ bool TrackObjectDistance::SetPointNumDistanceWeight(
 }
 
 bool TrackObjectDistance::SetHistogramDistanceWeight(
-  const float& histogram_distance_weight) {
+    const float& histogram_distance_weight) {
   if (histogram_distance_weight >= 0) {
     s_histogram_distance_weight_ = histogram_distance_weight;
     AINFO << "histogram distance weight of TrackObjectDistance is "
@@ -91,13 +91,13 @@ bool TrackObjectDistance::SetHistogramDistanceWeight(
 }
 
 float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
-  const Eigen::VectorXf& track_predict,
-  const TrackedObjectPtr& new_object) {
+                                           const Eigen::VectorXf& track_predict,
+                                           const TrackedObjectPtr& new_object) {
   // Compute distance for given trakc & object
-  float location_distance = ComputeLocationDistance(
-    track, track_predict, new_object);
-  float direction_distance = ComputeDirectionDistance(
-    track, track_predict, new_object);
+  float location_distance =
+      ComputeLocationDistance(track, track_predict, new_object);
+  float direction_distance =
+      ComputeDirectionDistance(track, track_predict, new_object);
   float bbox_size_distance = ComputeBboxSizeDistance(track, new_object);
   float point_num_distance = ComputePointNumDistance(track, new_object);
   float histogram_distance = ComputeHistogramDistance(track, new_object);
@@ -110,16 +110,16 @@ float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
   return result_distance;
 }
 
-float TrackObjectDistance::ComputeLocationDistance(const ObjectTrackPtr& track,
-  const Eigen::VectorXf& track_predict,
-  const TrackedObjectPtr& new_object) {
+float TrackObjectDistance::ComputeLocationDistance(
+    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    const TrackedObjectPtr& new_object) {
   // Compute locatin distance for given track & object
   // range from 0 to positive infinity
   const TrackedObjectPtr& last_object = track->current_object_;
   Eigen::Vector2f measured_anchor_point = new_object->anchor_point.head(2);
   Eigen::Vector2f predicted_anchor_point = track_predict.head(2);
-  Eigen::Vector2f measurement_predict_diff = measured_anchor_point -
-                                             predicted_anchor_point;
+  Eigen::Vector2f measurement_predict_diff =
+      measured_anchor_point - predicted_anchor_point;
   float location_distance = measurement_predict_diff.norm();
 
   Eigen::Vector2f track_motion_dir = last_object->velocity.head(2);
@@ -129,30 +129,30 @@ float TrackObjectDistance::ComputeLocationDistance(const ObjectTrackPtr& track,
    * symmetric variance. Modify its variance when track speed greater than
    * a threshold. Penalize variance in the orthogonal direction of motion. */
   if (track_speed > 2) {
-    Eigen::Vector2f track_motion_orthogonal_dir = Eigen::Vector2f(
-      track_motion_dir(1), -track_motion_dir(0));
+    Eigen::Vector2f track_motion_orthogonal_dir =
+        Eigen::Vector2f(track_motion_dir(1), -track_motion_dir(0));
     float motion_dir_distance =
-      track_motion_dir(0) * measurement_predict_diff(0) +
-      track_motion_dir(1) * measurement_predict_diff(1);
+        track_motion_dir(0) * measurement_predict_diff(0) +
+        track_motion_dir(1) * measurement_predict_diff(1);
     float motion_orthogonal_dir_distance =
-      track_motion_orthogonal_dir(0) * measurement_predict_diff(0) +
-      track_motion_orthogonal_dir(1) * measurement_predict_diff(1);
-    location_distance = sqrt(
-      motion_dir_distance * motion_dir_distance * 0.25 +
-      motion_orthogonal_dir_distance * motion_orthogonal_dir_distance * 4);
+        track_motion_orthogonal_dir(0) * measurement_predict_diff(0) +
+        track_motion_orthogonal_dir(1) * measurement_predict_diff(1);
+    location_distance = sqrt(motion_dir_distance * motion_dir_distance * 0.25 +
+                             motion_orthogonal_dir_distance *
+                                 motion_orthogonal_dir_distance * 4);
   }
   return location_distance;
 }
 
-float TrackObjectDistance::ComputeDirectionDistance(const ObjectTrackPtr& track,
-  const Eigen::VectorXf& track_predict,
-  const TrackedObjectPtr& new_object) {
+float TrackObjectDistance::ComputeDirectionDistance(
+    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    const TrackedObjectPtr& new_object) {
   // Compute direction distance for given track & object
   // range from 0 to 2
   const TrackedObjectPtr& last_object = track->current_object_;
   Eigen::Vector3f old_anchor_point = last_object->anchor_point;
   Eigen::Vector3f new_anchor_point = new_object->anchor_point;
-  Eigen::Vector3f anchor_point_shift = new_anchor_point  - old_anchor_point;
+  Eigen::Vector3f anchor_point_shift = new_anchor_point - old_anchor_point;
   anchor_point_shift(2) = 0;
   Eigen::Vector3f predicted_track_motion = track_predict.head(6).tail(3);
   predicted_track_motion(2) = 0;
@@ -160,15 +160,14 @@ float TrackObjectDistance::ComputeDirectionDistance(const ObjectTrackPtr& track,
   double cos_theta = 0.994;  // average cos
   if (!anchor_point_shift.head(2).isZero() &&
       !predicted_track_motion.head(2).isZero()) {
-    cos_theta = VectorCosTheta2dXy(predicted_track_motion,
-                                   anchor_point_shift);
+    cos_theta = VectorCosTheta2dXy(predicted_track_motion, anchor_point_shift);
   }
   float direction_distance = -cos_theta + 1.0;
   return direction_distance;
 }
 
-float TrackObjectDistance::ComputeBboxSizeDistance(const ObjectTrackPtr& track,
-  const TrackedObjectPtr& new_object) {
+float TrackObjectDistance::ComputeBboxSizeDistance(
+    const ObjectTrackPtr& track, const TrackedObjectPtr& new_object) {
   // Compute bbox size distance for given track & object
   // range from 0 to 1
   const TrackedObjectPtr& last_object = track->current_object_;
@@ -200,8 +199,8 @@ float TrackObjectDistance::ComputeBboxSizeDistance(const ObjectTrackPtr& track,
   return size_distance;
 }
 
-float TrackObjectDistance::ComputePointNumDistance(const ObjectTrackPtr& track,
-  const TrackedObjectPtr& new_object) {
+float TrackObjectDistance::ComputePointNumDistance(
+    const ObjectTrackPtr& track, const TrackedObjectPtr& new_object) {
   // Compute point num distance for given track & object
   // range from 0 and 1
   const TrackedObjectPtr& last_object = track->current_object_;
@@ -212,15 +211,15 @@ float TrackObjectDistance::ComputePointNumDistance(const ObjectTrackPtr& track,
   return point_num_distance;
 }
 
-float TrackObjectDistance::ComputeHistogramDistance(const ObjectTrackPtr& track,
-  const TrackedObjectPtr& new_object) {
+float TrackObjectDistance::ComputeHistogramDistance(
+    const ObjectTrackPtr& track, const TrackedObjectPtr& new_object) {
   // Compute histogram distance for given track & object
   // range from 0 to 3
   const TrackedObjectPtr& last_object = track->current_object_;
   std::vector<float>& old_object_shape_features =
-    last_object->object_ptr->shape_features;
+      last_object->object_ptr->shape_features;
   std::vector<float>& new_object_shape_features =
-    new_object->object_ptr->shape_features;
+      new_object->object_ptr->shape_features;
   if (old_object_shape_features.size() != new_object_shape_features.size()) {
     AERROR << "sizes of compared features not matched. TrackObjectDistance";
     return FLT_MAX;
@@ -228,8 +227,8 @@ float TrackObjectDistance::ComputeHistogramDistance(const ObjectTrackPtr& track,
 
   float histogram_distance = 0.0;
   for (size_t i = 0; i < old_object_shape_features.size(); ++i) {
-    histogram_distance += std::fabs(old_object_shape_features[i] -
-      new_object_shape_features[i]);
+    histogram_distance +=
+        std::fabs(old_object_shape_features[i] - new_object_shape_features[i]);
   }
   return histogram_distance;
 }

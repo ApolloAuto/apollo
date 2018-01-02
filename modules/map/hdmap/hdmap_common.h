@@ -26,6 +26,7 @@ limitations under the License.
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/map/proto/map_clear_area.pb.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/map/proto/map_junction.pb.h"
@@ -33,10 +34,9 @@ limitations under the License.
 #include "modules/map/proto/map_overlap.pb.h"
 #include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
+#include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_clear_area.pb.h"
-#include "modules/map/proto/map_speed_bump.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -162,8 +162,8 @@ class LaneInfo {
   void Init();
   void PostProcess(const HDMapImpl &map_instance);
   void UpdateOverlaps(const HDMapImpl &map_instance);
-  double GetWidthFromSample(
-      const std::vector<LaneInfo::SampledWidth> &samples, const double s) const;
+  double GetWidthFromSample(const std::vector<LaneInfo::SampledWidth> &samples,
+                            const double s) const;
   void CreateKDTree();
   void set_road_id(const Id &road_id) { road_id_ = road_id; }
   void set_section_id(const Id &section_id) { section_id_ = section_id; }
@@ -332,6 +332,7 @@ class SpeedBumpInfo {
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
     return segments_;
   }
+
  private:
   void Init();
 

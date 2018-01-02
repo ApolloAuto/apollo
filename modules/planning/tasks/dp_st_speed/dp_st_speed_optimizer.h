@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/tasks/speed_optimizer.h"
@@ -32,6 +33,11 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class DpStSpeedOptimizer
+ * @brief DpStSpeedOptimizer does ST graph speed planning with dynamic
+ * programming algorithm.
+ */
 class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
   DpStSpeedOptimizer();
@@ -43,10 +49,27 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
                                  const PathData& path_data,
                                  const common::TrajectoryPoint& init_point,
                                  const ReferenceLine& reference_line,
+                                 const SpeedData& reference_speed_data,
                                  PathDecision* const path_decision,
                                  SpeedData* const speed_data) override;
+
+  bool CreateStBoundaryWithHistoryDecision(
+      const StBoundaryMapper& boundary_mapper, const PathData& path_data,
+      SpeedData* speed_data, PathDecision* path_decision);
+
+  bool SearchStGraph(const StBoundaryMapper& boundary_mapper,
+                     const PathData& path_data, SpeedData* speed_data,
+                     PathDecision* path_decision,
+                     planning_internal::STGraphDebug* debug) const;
+
+ private:
+  common::TrajectoryPoint init_point_;
+  const ReferenceLine* reference_line_ = nullptr;
+  SLBoundary adc_sl_boundary_;
   DpStSpeedConfig dp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
+
+  PathDecision path_decision_;
 };
 
 }  // namespace planning

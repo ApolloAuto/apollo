@@ -68,39 +68,41 @@ void RefreshDefaultEndPoint() {
 
   apollo::routing::POI new_poi;
   for (const auto& old_landmark : old_poi.landmark()) {
-    // Read xyz from old point.
-    apollo::routing::LaneWaypoint old_end_point = old_landmark.waypoint();
-    apollo::common::PointENU old_xyz;
-    old_xyz.set_x(old_end_point.pose().x());
-    old_xyz.set_y(old_end_point.pose().y());
-    old_xyz.set_z(old_end_point.pose().z());
-
-    // Get new lane info from xyz.
-    std::string new_lane;
-    double new_s;
-    double new_l;
-    XYZToSL(old_xyz, &new_lane, &new_s, &new_l);
-
-    // Get new xyz from lane info.
-    const auto new_xyz = SLToXYZ(new_lane, new_s, new_l);
-
-    // Update default end way point.
-    apollo::routing::LaneWaypoint new_end_point;
-    new_end_point.set_id(new_lane);
-    new_end_point.set_s(new_s);
-    auto* pose = new_end_point.mutable_pose();
-    pose->set_x(new_xyz.x());
-    pose->set_y(new_xyz.y());
-    pose->set_z(new_xyz.z());
     apollo::routing::Landmark *new_landmark = new_poi.add_landmark();
     new_landmark->set_name(old_landmark.name());
-    *new_landmark->mutable_waypoint() = new_end_point;
+    AINFO << "Refreshed point of interest: " << old_landmark.name();
+    // Read xyz from old point.
+    for (const auto& old_end_point : old_landmark.waypoint()) {
+      apollo::common::PointENU old_xyz;
+      old_xyz.set_x(old_end_point.pose().x());
+      old_xyz.set_y(old_end_point.pose().y());
+      old_xyz.set_z(old_end_point.pose().z());
 
-    AINFO << "Refreshed point of interest: " << old_landmark.name()
-          << "\n ============ from ============ \n"
-          << old_end_point.DebugString() << "\n ============ to ============ \n"
-          << new_end_point.DebugString() << "XYZ distance is "
-          << XYZDistance(old_xyz, new_xyz);
+      // Get new lane info from xyz.
+      std::string new_lane;
+      double new_s;
+      double new_l;
+      XYZToSL(old_xyz, &new_lane, &new_s, &new_l);
+
+      // Get new xyz from lane info.
+      const auto new_xyz = SLToXYZ(new_lane, new_s, new_l);
+
+      // Update default end way point.
+      apollo::routing::LaneWaypoint new_end_point;
+      new_end_point.set_id(new_lane);
+      new_end_point.set_s(new_s);
+      auto* pose = new_end_point.mutable_pose();
+      pose->set_x(new_xyz.x());
+      pose->set_y(new_xyz.y());
+      pose->set_z(new_xyz.z());
+      *new_landmark->add_waypoint() = new_end_point;
+
+      AINFO << "\n ============ from ============ \n"
+      << old_end_point.DebugString()
+      << "\n ============ to ============ \n"
+      << new_end_point.DebugString()
+      << "XYZ distance is " << XYZDistance(old_xyz, new_xyz);
+    }
   }
   CHECK(apollo::common::util::SetProtoToASCIIFile(new_poi,
                                                   EndWayPointFile()));

@@ -26,9 +26,9 @@ namespace perception {
 
 TEST(TimeTest, test_timer) {
   Timer timer;
-  timer.start();
+  timer.Start();
   usleep(100000);
-  uint64_t elapsed_time = timer.end("TimerTest");
+  uint64_t elapsed_time = timer.End("TimerTest");
   EXPECT_TRUE(elapsed_time >= 99 && elapsed_time <= 101);
 }
 

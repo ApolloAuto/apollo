@@ -66,7 +66,7 @@ namespace perception {
 
 struct ObjectFilterOptions {
   ObjectFilterOptions() = default;
-  explicit ObjectFilterOptions(Eigen::Matrix4d* pose)
+  explicit ObjectFilterOptions(Eigen::Matrix4d *pose)
       : velodyne2world_pose(pose) {}
 
   std::shared_ptr<const Eigen::Matrix4d> velodyne2world_pose = nullptr;

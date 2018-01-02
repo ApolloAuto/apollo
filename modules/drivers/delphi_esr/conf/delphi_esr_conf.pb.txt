@@ -1,8 +1,0 @@
-can_card_parameter {
-  brand:ESD_CAN
-  type: PCI_CARD
-  channel_id: CHANNEL_ID_TWO
-}
-
-enable_debug_mode: false
-enable_receiver_log: false

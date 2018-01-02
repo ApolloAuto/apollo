@@ -22,6 +22,7 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -45,6 +46,10 @@ DEFINE_double(s, 0.0, "s");
 DEFINE_double(l, 0.0, "l");
 
 using apollo::common::PointENU;
+using apollo::hdmap::LaneBoundary;
+using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::LaneBoundaryType;
+using apollo::common::util::PrintIter;
 
 namespace apollo {
 namespace hdmap {
@@ -59,26 +64,26 @@ namespace hdmap {
 
 class MapUtil {
  public:
-  const OverlapInfo *get_overlap(const std::string &overlap_id) {
+  const OverlapInfo *get_overlap(const std::string &overlap_id) const {
     auto ret = HDMapUtil::BaseMap().GetOverlapById(MakeMapId(overlap_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << overlap_id << "]";
     return ret.get();
   }
 
-  const SignalInfo *get_signal(const std::string &signal_id) {
+  const SignalInfo *get_signal(const std::string &signal_id) const {
     auto ret = HDMapUtil::BaseMap().GetSignalById(MakeMapId(signal_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << signal_id << "]";
     return ret.get();
   }
 
-  const LaneInfo *get_lane(const std::string &lane_id) {
+  const LaneInfoConstPtr get_lane(const std::string &lane_id) const {
     auto ret = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     AERROR_IF(ret == nullptr) << "failed to find lane[" << lane_id << "]";
-    return ret.get();
+    return ret;
   }
 
   int point_to_sl(const PointENU &point, std::string *lane_id, double *s,
-                  double *l) {
+                  double *l, double *heading) const {
     QUIT_IF(lane_id == nullptr, -1, ERROR, "arg lane id is null");
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
     QUIT_IF(l == nullptr, -3, ERROR, "arg l is null");
@@ -87,22 +92,30 @@ class MapUtil {
     QUIT_IF(ret != 0, -4, ERROR, "get_nearest_lane failed with ret[%d]", ret);
     QUIT_IF(lane == nullptr, -5, ERROR, "lane is null");
     *lane_id = lane->id().id();
+    *heading = lane->Heading(*s);
     return 0;
   }
 
   int sl_to_point(const std::string &lane_id, const double s, const double l,
-                  PointENU *point, double *heading) {
+                  PointENU *point, double *heading) const {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -3, ERROR, "get_smooth_point_from_lane[%s] failed",
             lane_id.c_str());
     *point = lane->GetSmoothPoint(s);
+    *heading = lane->Heading(s);
+    auto normal_vec =
+        common::math::Vec2d::CreateUnitVec2d(*heading + M_PI / 2.0) * l;
+    point->set_x(point->x() + normal_vec.x());
+    point->set_y(point->y() + normal_vec.y());
+
     return 0;
   }
 
   int lane_projection(const apollo::common::math::Vec2d &vec2d,
-                      const std::string &lane_id, double *s, double *l) {
+                      const std::string &lane_id, double *s, double *l,
+                      double *heading) const {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
@@ -110,6 +123,7 @@ class MapUtil {
     bool ret = lane->GetProjection(vec2d, s, l);
     QUIT_IF(!ret, -3, ERROR, "lane[%s] get projection for point[%f, %f] failed",
             lane_id.c_str(), vec2d.x(), vec2d.y());
+    *heading = lane->Heading(*s);
     return 0;
   }
 };
@@ -129,6 +143,84 @@ std::ostream &operator<<(
   return os;
 }
 
+void PrintLane(const apollo::hdmap::MapUtil &map_util,
+               LaneInfoConstPtr lane_ptr) {
+  const auto &lane = lane_ptr->lane();
+  PointENU start_point;
+  double start_heading = 0.0;
+  map_util.sl_to_point(FLAGS_lane, 0, 0, &start_point, &start_heading);
+
+  PointENU end_point;
+  double end_heading = 0.0;
+  map_util.sl_to_point(FLAGS_lane, lane_ptr->total_length(), 0, &end_point,
+                       &end_heading);
+
+  double left_width = 0.0;
+  double right_width = 0.0;
+  lane_ptr->GetWidth(FLAGS_s, &left_width, &right_width);
+
+  std::cout << "lane[" << FLAGS_lane << std::fixed << "] length["
+            << lane_ptr->total_length() << "] type["
+            << Lane_LaneType_Name(lane.type()) << "] turn["
+            << Lane_LaneTurn_Name(lane.turn()) << "] speed_limit["
+            << lane.speed_limit() << "] predecessor[" << lane.predecessor_id()
+            << "] successor[" << lane.successor_id() << "] left_forward["
+            << lane.left_neighbor_forward_lane_id() << "] right_forward["
+            << lane.right_neighbor_forward_lane_id() << "] left_reverse["
+            << lane.left_neighbor_reverse_lane_id() << "] right_reverse["
+            << lane.right_neighbor_reverse_lane_id() << "]"
+            << "Left Boundary: [ virtual?:"
+            << (lane.left_boundary().virtual_() ? "Y," : "N,") << "Type: ";
+  for (const auto &boundary_type : lane.left_boundary().boundary_type()) {
+    std::cout << boundary_type.s() << ": ";
+    for (const auto t : boundary_type.types()) {
+      std::cout << t << ", ";
+    }
+  }
+
+  std::cout << "Right Boundary: [ virtual?:"
+            << (lane.right_boundary().virtual_() ? "Y," : "N,") << "Type: ";
+  for (const auto &boundary_type : lane.left_boundary().boundary_type()) {
+    std::cout << boundary_type.s() << ": ";
+    for (const auto t : boundary_type.types()) {
+      std::cout << t << ", ";
+    }
+  }
+  std::cout << "] overlap[" << lane.overlap_id() << "] stop_sign num:["
+            << lane_ptr->stop_signs().size() << "]"
+            << " start point(x,y,heading):" << start_point.x() << ","
+            << start_point.y() << "," << start_heading
+            << " end point(x,y,heading):" << end_point.x() << ","
+            << end_point.y() << "," << end_heading
+            << " left_width:" << left_width << " right_width:" << right_width
+            << std::endl;
+  std::cout.unsetf(std::ios_base::fixed);
+
+  if (FLAGS_dump_lane_width) {
+    const auto sample_left_widthes = lane_ptr->sampled_left_width();
+    std::cout << "left width num: " << sample_left_widthes.size() << std::endl;
+    int num = 0;
+    for (auto w : sample_left_widthes) {
+      std::cout << " " << w.second;
+      if (++num % 10 == 0) {
+        std::cout << std::endl;
+      }
+    }
+    std::cout << std::endl;
+    num = 0;
+    const auto sample_right_widthes = lane_ptr->sampled_right_width();
+    std::cout << "right width num: " << sample_right_widthes.size()
+              << std::endl;
+    for (auto w : sample_right_widthes) {
+      std::cout << " " << w.second;
+      if (++num % 10 == 0) {
+        std::cout << std::endl;
+      }
+    }
+    std::cout << std::endl;
+  }
+}
+
 int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -145,9 +237,8 @@ int main(int argc, char *argv[]) {
     std::string lane_id;
     double s = 0.0;
     double l = 0.0;
-    map_util.point_to_sl(point, &lane_id, &s, &l);
     double heading = 0.0;
-    map_util.sl_to_point(lane_id, s, l, &point, &heading);
+    map_util.point_to_sl(point, &lane_id, &s, &l, &heading);
     printf("lane_id[%s], s[%f], l[%f], heading[%f]\n", lane_id.c_str(), s, l,
            heading);
   }
@@ -160,91 +251,42 @@ int main(int argc, char *argv[]) {
   if (FLAGS_xy_to_lane) {
     double s = 0.0;
     double l = 0.0;
-    int ret = map_util.lane_projection({FLAGS_x, FLAGS_y}, FLAGS_lane, &s, &l);
+    double heading = 0.0;
+    int ret = map_util.lane_projection({FLAGS_x, FLAGS_y}, FLAGS_lane, &s, &l,
+                                       &heading);
     if (ret != 0) {
       printf("lane_projection for x[%f], y[%f], lane_id[%s] failed\n", FLAGS_x,
              FLAGS_y, FLAGS_lane.c_str());
       return -1;
     }
-    printf("lane[%s] s[%f], l[%f]\n", FLAGS_lane.c_str(), s, l);
+    printf("lane[%s] s[%f], l[%f], heading[%f]\n", FLAGS_lane.c_str(), s, l,
+           heading);
   }
   if (FLAGS_lane_to_lane) {
     PointENU point;
-    double heading = 0.0;
-    map_util.sl_to_point(FLAGS_from_lane, FLAGS_s, 0.0, &point, &heading);
+    double src_heading = 0.0;
+    map_util.sl_to_point(FLAGS_from_lane, FLAGS_s, 0.0, &point, &src_heading);
     double target_s = 0.0;
     double target_l = 0.0;
+    double target_heading = 0.0;
     int ret = map_util.lane_projection({point.x(), point.y()}, FLAGS_to_lane,
-                                       &target_s, &target_l);
+                                       &target_s, &target_l, &target_heading);
     if (ret != 0) {
       printf("lane_projection for lane[%s], s[%f] to lane_id[%s] failed\n",
              FLAGS_from_lane.c_str(), FLAGS_s, FLAGS_to_lane.c_str());
       return -1;
     }
-    printf("lane[%s] s[%f], l[%f]\n", FLAGS_to_lane.c_str(), target_s,
-           target_l);
+    printf("lane[%s] s[%f], l[%f], heading[%f]\n", FLAGS_to_lane.c_str(),
+           target_s, target_l, target_heading);
   }
   if (!FLAGS_lane.empty()) {
-    const auto *lane_ptr = map_util.get_lane(FLAGS_lane);
-    const auto &lane = lane_ptr->lane();
-
-    PointENU start_point;
-    double start_heading = 0.0;
-    map_util.sl_to_point(FLAGS_lane, 0, 0, &start_point, &start_heading);
-
-    PointENU end_point;
-    double end_heading = 0.0;
-    map_util.sl_to_point(FLAGS_lane, lane_ptr->total_length(), 0, &end_point,
-                         &end_heading);
-
-    double left_width = 0.0;
-    double right_width = 0.0;
-    lane_ptr->GetWidth(FLAGS_s, &left_width, &right_width);
-
-    std::cout << "lane[" << FLAGS_lane << std::fixed << "] length["
-              << lane_ptr->total_length() << "] type["
-              << Lane_LaneType_Name(lane.type()) << "] turn["
-              << Lane_LaneTurn_Name(lane.turn()) << "] speed_limit["
-              << lane.speed_limit() << "] predecessor[" << lane.predecessor_id()
-              << "] successor[" << lane.successor_id() << "] left_forward["
-              << lane.left_neighbor_forward_lane_id() << "] right_forward["
-              << lane.right_neighbor_forward_lane_id() << "] left_reverse["
-              << lane.left_neighbor_reverse_lane_id() << "] right_reverse["
-              << lane.right_neighbor_reverse_lane_id() << "] overlap["
-              << lane.overlap_id() << "] stop_sign num:["
-              << lane_ptr->stop_signs().size() << "]"
-              << " start point(x,y,heading):" << start_point.x() << ","
-              << start_point.y() << "," << start_heading
-              << " end point(x,y,heading):" << end_point.x() << ","
-              << end_point.y() << "," << end_heading
-              << " left_width:" << left_width << " right_width:" << right_width
-              << std::endl;
-    std::cout.unsetf(std::ios_base::fixed);
-
-    if (FLAGS_dump_lane_width) {
-      const auto sample_left_widthes = lane_ptr->sampled_left_width();
-      std::cout << "left width num: " << sample_left_widthes.size()
-                << std::endl;
-      int num = 0;
-      for (auto w : sample_left_widthes) {
-        std::cout << " " << w.second;
-        if (++num % 10 == 0) {
-          std::cout << std::endl;
-        }
-      }
-      std::cout << std::endl;
-      num = 0;
-      const auto sample_right_widthes = lane_ptr->sampled_right_width();
-      std::cout << "right width num: " << sample_right_widthes.size()
-                << std::endl;
-      for (auto w : sample_right_widthes) {
-        std::cout << " " << w.second;
-        if (++num % 10 == 0) {
-          std::cout << std::endl;
-        }
-      }
-      std::cout << std::endl;
+    const auto lane_ptr = map_util.get_lane(FLAGS_lane);
+    if (!lane_ptr) {
+      std::cout << "Could not find lane " << FLAGS_lane << " on map "
+                << map_file;
+      return 0;
     }
+    PrintLane(map_util, lane_ptr);
   }
   if (!FLAGS_overlap.empty()) {
     const auto *overlap_ptr = map_util.get_overlap(FLAGS_overlap);

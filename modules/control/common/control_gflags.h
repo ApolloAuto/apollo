@@ -22,14 +22,16 @@
 // data file
 DECLARE_string(control_conf_file);
 
-DECLARE_string(adapter_config_filename);
+DECLARE_double(control_test_duration);
+
+DECLARE_string(control_adapter_config_filename);
 
 DECLARE_bool(enable_csv_debug);
 
 // temporary gflag for test purpose
 DECLARE_bool(enable_speed_station_preview);
 
-DECLARE_string(node_name);
+DECLARE_string(control_node_name);
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
 
@@ -46,5 +48,8 @@ DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);
 DECLARE_bool(set_steer_limit);
 DECLARE_bool(use_relative_position);
+DECLARE_double(query_relative_time);
+DECLARE_bool(use_mpc);
+DECLARE_bool(enable_slope_offset);
 
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_

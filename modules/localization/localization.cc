@@ -19,13 +19,14 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/localization/msf/msf_localization.h"
 #include "modules/localization/rtk/rtk_localization.h"
 
 namespace apollo {
 namespace localization {
 
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 std::string Localization::Name() const {
   return FLAGS_localization_module_name;
@@ -35,6 +36,10 @@ void Localization::RegisterLocalizationMethods() {
   localization_factory_.Register(
       LocalizationConfig::RTK,
       []() -> LocalizationBase* { return new RTKLocalization(); });
+
+  localization_factory_.Register(
+      LocalizationConfig::MSF,
+      []() -> LocalizationBase* { return new MSFLocalization(); });
 }
 
 Status Localization::Init() {
@@ -64,7 +69,9 @@ Status Localization::Start() {
   return Status::OK();
 }
 
-void Localization::Stop() {}
+void Localization::Stop() {
+  localization_->Stop();
+}
 
 }  // namespace localization
 }  // namespace apollo

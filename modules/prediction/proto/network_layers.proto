@@ -1,0 +1,87 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+message TensorParameter {
+  repeated float data = 1 [packed = true];
+  repeated int32 shape = 2;
+}
+
+message InputParameter {
+  repeated int32 input_shape = 1;
+  optional string dtype = 2;      //data type of the input
+  optional bool sparse = 3;
+}
+
+message DenseParameter {
+  optional int32 units = 1;
+  optional string activation = 2;
+  optional bool use_bias = 3;
+  optional TensorParameter weights = 4;
+  optional TensorParameter bias = 5;
+}
+
+message BatchNormalizationParameter {
+  optional double epsilon = 1 [default = 1e-5];
+  optional int32 axis = 2;
+  optional bool center = 3;
+  optional bool scale = 4;
+  optional float momentum = 5;
+  optional TensorParameter mu = 6;
+  optional TensorParameter sigma = 7;
+  optional TensorParameter gamma = 8;
+  optional TensorParameter beta = 9;
+}
+
+message LSTMParameter {
+  optional int32 units = 1;
+  optional bool return_sequences = 2;
+  optional bool stateful = 3;
+  optional string activation = 4;
+  optional string recurrent_activation = 5;
+  optional bool use_bias = 6;
+  optional bool unit_forget_bias = 7 [default = true];
+  optional bool go_backwards = 8 [default = false];
+  optional bool unroll = 9 [default = false];
+  optional int32 implementation = 10 [default = 0];
+
+  optional TensorParameter weights_input = 15;
+  optional TensorParameter weights_forget = 16;
+  optional TensorParameter weights_cell = 17;
+  optional TensorParameter weights_output = 18;
+  optional TensorParameter bias_input = 19;
+  optional TensorParameter bias_forget = 20;
+  optional TensorParameter bias_cell = 21;
+  optional TensorParameter bias_output = 22;
+
+  optional TensorParameter recurrent_weights_input = 25;
+  optional TensorParameter recurrent_weights_forget = 26;
+  optional TensorParameter recurrent_weights_cell = 27;
+  optional TensorParameter recurrent_weights_output = 28;
+}
+
+message ActivationParameter {
+  optional string activation = 1;
+}
+
+message FlattenParameter {
+}
+
+message ConcatenateParameter {
+  optional int32 axis = 1;
+}
+
+message LayerParameter {
+  optional string type = 1;
+  optional string name = 2;
+  optional int32 order_number = 3;
+  oneof oneof_layers {
+    InputParameter input = 4;
+    ActivationParameter activation = 5;
+    DenseParameter dense = 6;
+    BatchNormalizationParameter batch_normalization = 7;
+    LSTMParameter lstm = 8;
+    FlattenParameter flatten = 9;
+    ConcatenateParameter concatenate = 10;
+  }
+}

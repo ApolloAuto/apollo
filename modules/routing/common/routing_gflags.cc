@@ -19,7 +19,7 @@
 DEFINE_string(routing_conf_file, "modules/routing/conf/routing_config.pb.txt",
               "default routing conf data file");
 
-DEFINE_string(node_name, "routing", "the name for this node");
+DEFINE_string(routing_node_name, "routing", "the name for this node");
 
 DEFINE_string(routing_adapter_config_filename,
               "modules/routing/conf/adapter.conf",

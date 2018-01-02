@@ -2,8 +2,11 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import classNames from "classnames";
 
+import Geolocation from "components/Scene/Geolocation";
 import RENDERER from "renderer";
+import STORE from "store";
 
+@inject("store") @observer
 export default class Scene extends React.Component {
     componentDidMount() {
         RENDERER.initialize("canvas", this.props.width, this.props.height,
@@ -17,8 +20,7 @@ export default class Scene extends React.Component {
     }
 
     render() {
-        // TODO The position of the canvas should not be absolute, maybe.
-        const {invisible} = this.props;
+        const {invisible, options} = this.props;
 
         return (
             <div id = "canvas"
@@ -26,9 +28,11 @@ export default class Scene extends React.Component {
                             "dreamview-canvas" : true,
                              "hidden" : invisible})}
                  onMouseMove={(event) => {
-                    RENDERER.updateGeolocation(event);
-                 }}/>
-
+                    const geo = RENDERER.getGeolocation(event);
+                    STORE.setGeolocation(geo);
+                 }}>
+                {options.showGeo && <Geolocation />}
+            </div>
         );
     }
 }

@@ -14,23 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
-#define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 
 #include <memory>
 #include <vector>
 
 #include "Eigen/Core"
-#include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
+#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
@@ -50,7 +51,7 @@ class LidarProcess {
   bool Process(const double timestamp, pcl_util::PointCloudPtr cloud,
                std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
 
-  bool GeneratePbMsg(PerceptionObstacles* obstacles);
+  void GeneratePbMsg(PerceptionObstacles* obstacles);
 
   std::vector<ObjectPtr> GetObjects() { return objects_; }
 
@@ -66,17 +67,18 @@ class LidarProcess {
   bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
 
   bool inited_ = false;
-  double timestamp_;
+  double timestamp_ = 0.0;
   common::ErrorCode error_code_ = common::OK;
   std::vector<ObjectPtr> objects_;
-  HDMapInput* hdmap_input_ = NULL;
+  HDMapInput* hdmap_input_ = nullptr;
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
+  std::unique_ptr<BaseTypeFuser> type_fuser_;
   pcl_util::PointIndicesPtr roi_indices_;
 
-  std::unique_ptr<OpenglVisualizer> visualizer_ = nullptr;
+  std::unique_ptr<OpenglVisualizer> visualizer_;
 
   FRIEND_TEST(LidarProcessTest, test_Init);
   FRIEND_TEST(LidarProcessTest, test_Process);
@@ -86,4 +88,4 @@ class LidarProcess {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_

@@ -32,7 +32,7 @@ namespace planning {
 
 class Spline1dSeg {
  public:
-  // order represent the number of parameters (not the highest order);
+  // order represents the highest order.
   explicit Spline1dSeg(const uint32_t order);
   explicit Spline1dSeg(const std::vector<double>& params);
   ~Spline1dSeg() = default;
@@ -49,6 +49,8 @@ class Spline1dSeg {
   const PolynomialXd& ThirdOrderDerivative() const;
 
  private:
+  inline void SetSplineFunc(const PolynomialXd& spline_func);
+
   PolynomialXd spline_func_;
   PolynomialXd derivative_;
   PolynomialXd second_order_derivative_;
