@@ -93,7 +93,7 @@ void PathTimeNeighborhood::SetupObstacles(
 
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < 0.0 ||
-          sl_boundary.start_s() > init_s_[0] + planned_trajectory_horizon ||
+          sl_boundary.start_s() > init_s_[0] +  decision_horizon ||
           (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred &&
            std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=

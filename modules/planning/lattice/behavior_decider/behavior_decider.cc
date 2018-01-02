@@ -87,7 +87,7 @@ PlanningTarget BehaviorDecider::Analyze(
 }
 
 /**
-// To Be Deprecated
+// Deprecated
 bool BehaviorDecider::StopDecisionNearDestination(
     Frame* frame, const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line,

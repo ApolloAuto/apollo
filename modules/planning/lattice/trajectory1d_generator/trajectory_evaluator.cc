@@ -49,6 +49,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       cost_queue_.push(PairCost({lon_trajectory, lat_trajectory}, cost));
     }
   }
+  AINFO << "Number of valid 1d trajectory pairs:\t" << cost_queue_.size();
 }
 
 bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
@@ -89,24 +90,18 @@ double TrajectoryEvaluator::evaluate(
   double s_max = lon_trajectory->Evaluate(0, t_max);
   double v_end = lon_trajectory->Evaluate(1, t_max);
 
-  std::vector<double> s_values;
-  while (t < planned_trajectory_time) {
-    double s = 0.0;
-    if (t < t_max) {
-      s = lon_trajectory->Evaluate(0, t);
-    } else {
-      // extend by constant speed movement
-      s = s_max + v_end * (t - t_max);
-    }
-    s_values.push_back(s);
-    t += trajectory_time_resolution;
-  }
-
   double lon_travel_cost =
       compute_lon_trajectory_objective_cost(lon_trajectory, planning_target);
 
   double lon_jerk_cost = compute_lon_trajectory_comfort_cost(lon_trajectory);
 
+  // for evaluating lateral trajectories
+  std::vector<double> s_values;
+  double s = 0.0;
+  while (s < decision_horizon) {
+    s_values.push_back(s);
+    s += trajectory_space_resolution;
+  }
   double lat_offset_cost =
       compute_lat_trajectory_offset_cost(lat_trajectory, s_values);
 
@@ -126,15 +121,7 @@ double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
 
   double cost = 0.0;
   for (const auto& s : s_values) {
-    double c = 0.0;
-    if (s > lat_s_max) {
-      // extend by same lateral offset
-      c = lat_offset_end;
-    } else {
-      // get lateral offset by s
-      c = lat_trajectory->Evaluate(0, s);
-    }
-    // Question(kechxu) what < 0.0 mean
+    double c = lat_trajectory->Evaluate(0, s);
     if (c * lat_offset_start < 0.0) {
       c = c * c * weight_opposite_side_offset;
     } else {
@@ -149,129 +136,29 @@ double TrajectoryEvaluator::compute_lon_trajectory_comfort_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
   double cost = 0.0;
   double t = 0.0;
-  double lon_t_max = lon_trajectory->ParamLength();
 
   while (t < planned_trajectory_time) {
-    double c = 0.0;
-    if (t < lon_t_max) {
-      c = lon_trajectory->Evaluate(3, t);
-    } else {
-      // when the time beyond the lon_trajectory parameter length,
-      // the jerk is 0.0
-    }
+    double c = lon_trajectory->Evaluate(3, t);
     cost += c * c;
     t = t + trajectory_time_resolution;
   }
   return cost;
 }
-
-/**
-
-double TrajectoryEvaluator::compute_lat_trajectory_offset_cost(
-    const std::shared_ptr<Trajectory1d>& lat_trajectory,
-    const std::vector<double>& s_values) const {
-  double lat_s_max = lat_trajectory->ParamLength();
-  double lat_offset_end = lat_trajectory->Evaluate(0, lat_s_max);
-  double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
-
-  double weight_same_side_offset = 1.0;
-  double weight_opposite_side_offset = 10.0;
-
-  double cost = 0.0;
-  for (const auto& s : s_values) {
-    double c = 0.0;
-    if (s > lat_s_max) {
-      // extend by same lateral offset
-      c = lat_offset_end;
-    } else {
-      // get lateral offset by s
-      c = lat_trajectory->Evaluate(0, s);
-    }
-    // Question(kechxu) what < 0.0 mean
-    if (c * lat_offset_start < 0.0) {
-      c = c * c * weight_opposite_side_offset;
-    } else {
-      c = c * c * weight_same_side_offset;
-    }
-    cost += c;
-  }
-  return cost;
-}
-
-double TrajectoryEvaluator::compute_lon_trajectory_jerk_cost(
-    const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
-  double cost = 0.0;
-  double t = 0.0;
-  double lon_t_max = lon_trajectory->ParamLength();
-
-  while (t < planned_trajectory_time) {
-    double c = 0.0;
-    if (t < lon_t_max) {
-      c = lon_trajectory->Evaluate(3, t);
-    } else {
-      // when the time beyond the lon_trajectory parameter length,
-      // the jerk is 0.0
-    }
-    cost += c * c;
-    t = t + trajectory_time_resolution;
-  }
-  return cost;
-}
-**/
 
 double TrajectoryEvaluator::compute_lon_trajectory_objective_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const PlanningTarget& planning_target) const {
-  // zero s target means cruise
-  //    if (s <= std::numeric_limits<double>::epsilon()) {
-  //      double target_speed = ds;
-  //      double end_speed =
-  //          lon_trajectory->Evaluate(1, lon_trajectory->ParamLength());
-  //
-  //      double t_max = lon_trajectory->ParamLength();
-  //      double t = 0.0;
-  //      double cost = 0.0;
-  //
-  //      while (t < planned_trajectory_time) {
-  //        double c = 0.0;
-  //        if (t < t_max) {
-  //          c = target_speed - lon_trajectory->Evaluate(1, t);
-  //        } else {
-  //          c = target_speed - end_speed;
-  //        }
-  //        cost += std::fabs(c);
-  //        t += trajectory_time_resolution;
-  //      }
-  //      return cost;
-  //    } else {
-  //      // Follow
-  //      // apply the following 3 second rule.
-  //      double target_s = s - 3.0 * ds;
-  //      double end_s =
-  //          lon_trajectory->Evaluate(0, lon_trajectory->ParamLength());
-  //
-  //      double weight = 10.0;
-  //      return (target_s - end_s) * weight;
-  //    }
+
   double weight_dist_travelled = 10.0;
   double weight_on_reference_speed = 1.0;
-  double target_speed = planning_target.cruise_speed();
   double t_max = lon_trajectory->ParamLength();
 
-  double end_speed = lon_trajectory->Evaluate(1, t_max);
-  double t = 0.0;
-  double s_max = lon_trajectory->Evaluate(0, t_max);
-  double s_min = lon_trajectory->Evaluate(0, 0.0);
-  double dist_s = s_max - s_min;
-  double cost = 0.0;
+  double dist_s = lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
 
+  double cost = 0.0;
+  double t = 0.0;
   while (t < planned_trajectory_time) {
-    double c = 0.0;
-    if (t < t_max) {
-      c = target_speed - lon_trajectory->Evaluate(1, t);
-    } else {
-      c = target_speed - end_speed;
-    }
+    double c = planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
     cost += std::fabs(c);
     t += trajectory_time_resolution;
   }
