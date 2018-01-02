@@ -113,8 +113,6 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  CalculatePointwiseCost(st_graph_data_.st_boundaries());
-
   if (!CalculateTotalCost().ok()) {
     const std::string msg = "Calculate total cost failed.";
     AERROR << msg;
@@ -149,29 +147,6 @@ Status DpStGraph::InitCostTable() {
     }
   }
   return Status::OK();
-}
-
-void DpStGraph::CalculatePointwiseCost(
-    const std::vector<const StBoundary*>& boundaries) {
-  // TODO(all): extract reference line from decision first
-  std::vector<STPoint> reference_points;
-  double curr_t = 0.0;
-  for (uint32_t i = 0; i < cost_table_.size(); ++i) {
-    reference_points.emplace_back(curr_t * FLAGS_planning_upper_speed_limit,
-                                  curr_t);
-    curr_t += unit_t_;
-  }
-
-  for (uint32_t i = 0; i < cost_table_.size(); ++i) {
-    for (auto& st_graph_point : cost_table_[i]) {
-      double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
-                                                     reference_points[i]);
-      double obs_cost = dp_st_cost_.GetObstacleCost(st_graph_point);
-      st_graph_point.SetReferenceCost(ref_cost);
-      st_graph_point.SetObstacleCost(obs_cost);
-      st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());
-    }
-  }
 }
 
 Status DpStGraph::CalculateTotalCost() {
@@ -233,6 +208,7 @@ void DpStGraph::GetRowRange(const StGraphPoint& point,
 
 void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   auto& cost_cr = cost_table_[c][r];
+  cost_cr.SetObstacleCost(dp_st_cost_.GetObstacleCost(cost_cr));
   if (cost_cr.obstacle_cost() > std::numeric_limits<double>::max()) {
     return;
   }
