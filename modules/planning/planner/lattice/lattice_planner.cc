@@ -77,7 +77,6 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   // 3. according to the matched point, compute the init state in Frenet frame.
   std::array<double, 3> init_s;
   std::array<double, 3> init_d;
-
   ComputeInitFrenetState(matched_point, planning_init_point, &init_s, &init_d);
 
   AINFO << "Step 1,2,3 Succeeded "
@@ -275,23 +274,9 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
   double t_param = 0.0;
   while (t_param < planned_trajectory_time) {
-    // linear extrapolation is handled internally in LatticeTrajectory1d
-    /**
-    double s = 0.0;
-    double s_dot = 0.0;
-    double s_ddot = 0.0;
-    if (t_param < t_param_max) {
-      s = lon_trajectory.Evaluate(0, t_param);
-      s_dot = lon_trajectory.Evaluate(1, t_param);
-      s_ddot = lon_trajectory.Evaluate(2, t_param);
-    } else {
-      s_dot = lon_trajectory.Evaluate(1, t_param_max);
-      s = lon_trajectory.Evaluate(0, t_param_max) +
-          (t_param - t_param_max) * s_dot;
-      s_ddot = 0.0;
-    }
-    **/
 
+    // linear extrapolation is handled internally in LatticeTrajectory1d;
+    // do not need to worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
     double s_dot = lon_trajectory.Evaluate(1, t_param);
     double s_ddot = lon_trajectory.Evaluate(2, t_param);
@@ -300,23 +285,8 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
     }
 
     double s_param = s - s0;
-    // linear extrapolation is handled internally in LatticeTrajectory1d
-    /**
-    double d = 0.0;
-    double d_prime = 0.0;
-    double d_pprime = 0.0;
-
-    if (s_param < s_param_max) {
-      d = lat_trajectory.Evaluate(0, s_param);
-      d_prime = lat_trajectory.Evaluate(1, s_param);
-      d_pprime = lat_trajectory.Evaluate(2, s_param);
-    } else {
-      d = lat_trajectory.Evaluate(0, s_param_max);
-      d_prime = 0.0;
-      d_pprime = 0.0;
-    }
-    **/
-
+    // linear extrapolation is handled internally in LatticeTrajectory1d;
+    // do not need to worry about s_param > lat_trajectory.ParamLength() situation
     double d = lat_trajectory.Evaluate(0, s_param);
     double d_prime = lat_trajectory.Evaluate(1, s_param);
     double d_pprime = lat_trajectory.Evaluate(2, s_param);
