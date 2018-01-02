@@ -45,8 +45,8 @@ class PathDecider:
                                                           path_len)
         return path_x, path_y, path_len
 
-    def nudge_process(self, path_x, path_y, path_len, obstacle_decider):
-        obstacle_decider.process_path_obstacle(path_x, path_y)
+    def nudge_process(self, final_path, obstacle_decider):
+        obstacle_decider.process_path_obstacle(final_path)
         left_dist = 999
         right_dist = 999
         for obs_id, lat_dist in obstacle_decider.obstacle_lat_dist.items():
@@ -54,7 +54,8 @@ class PathDecider:
                 left_dist = lat_dist
             else:
                 right_dist = lat_dist
-        return path_x, path_y, path_len
+        print left_dist, right_dist
+        return final_path
 
     def get(self, perception, routing, adv):
         if self.enable_routing_aid:
@@ -62,14 +63,15 @@ class PathDecider:
         else:
             return self.get_path_by_lm(perception, adv)
 
-    def get_path(self, perception, routing, adv):
+    def get_path(self, perception, routing, adv, obstacle_decider):
         self.path_range = self._get_path_range(adv.speed_mps)
         if self.enable_routing_aid and adv.is_ready():
-            return self.get_routing_path(perception, routing, adv)
+            return self.get_routing_path(perception, routing, adv,
+                                         obstacle_decider)
         else:
             return self.get_lane_marker_path(perception)
 
-    def get_routing_path(self, perception, routing, adv):
+    def get_routing_path(self, perception, routing, adv, obstacle_decider):
 
         routing_path = routing.get_local_path(adv, self.path_range + 1)
         perception_path = perception.get_lane_marker_middle_path(
@@ -85,6 +87,17 @@ class PathDecider:
             init_y_routing = routing_path.init_y()
             init_y = self._smooth_init_y(init_y_routing)
             routing_path.shift(init_y - routing_path.init_y())
+            if self.enable_nudge:
+                obstacle_decider.process_path_obstacle(routing_path)
+                left_nudgable, right_nudgable = \
+                    obstacle_decider.get_adv_left_right_nudgable_dist(
+                        routing_path)
+                nudge_dist = obstacle_decider.get_nudge_distance(left_nudgable,
+                                                                 right_nudgable)
+                smoothed_nudge_dist = self._smooth_init_y(nudge_dist)
+                if smoothed_nudge_dist > 0:
+                    print smoothed_nudge_dist
+                routing_path.shift(smoothed_nudge_dist)
             return routing_path
 
         init_y = self._smooth_init_y(perception_path.init_y())

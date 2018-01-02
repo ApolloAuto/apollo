@@ -36,13 +36,14 @@ from provider_mobileye import MobileyeProvider
 from provider_chassis import ChassisProvider
 from provider_localization import LocalizationProvider
 from provider_routing import RoutingProvider
+from obstacle_decider import ObstacleDecider
 from ad_vehicle import ADVehicle
 
 gflags.DEFINE_integer('max_cruise_speed', 20,
                       'max speed for cruising in meter per second')
 gflags.DEFINE_boolean('enable_follow', False,
                       'enable follow function.')
-gflags.DEFINE_boolean('enable_nudge', False,
+gflags.DEFINE_boolean('enable_nudge', True,
                       'enable nudge function.')
 gflags.DEFINE_boolean('enable_change_lane', False,
                       'enable change lane function.')
@@ -60,6 +61,7 @@ speed_decider = None
 traj_generator = None
 mobileye_provider = None
 routing_provider = None
+obs_decider = None
 adv = None
 
 
@@ -105,8 +107,10 @@ def mobileye_callback(mobileye_pb):
     start_timestamp = time.time()
     mobileye_provider.update(mobileye_pb)
     mobileye_provider.process_obstacles()
+    obs_decider.update(mobileye_provider)
 
-    path = path_decider.get_path(mobileye_provider, routing_provider, adv)
+    path = path_decider.get_path(mobileye_provider, routing_provider, adv,
+                                 obs_decider)
 
     speed, final_path_length = speed_decider.get(mobileye_provider,
                                                  adv,
@@ -121,7 +125,7 @@ def mobileye_callback(mobileye_pb):
 
 def init():
     global planning_pub, log_file
-    global path_decider, speed_decider, traj_generator
+    global path_decider, speed_decider, traj_generator, obs_decider
     global mobileye_provider, chassis_provider
     global localization_provider, routing_provider
     global adv
@@ -135,6 +139,7 @@ def init():
     mobileye_provider = MobileyeProvider()
     routing_provider = RoutingProvider()
     adv = ADVehicle()
+    obs_decider = ObstacleDecider()
 
     pgm_path = os.path.dirname(os.path.realpath(__file__))
     log_path = pgm_path + "/logs/"
