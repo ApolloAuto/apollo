@@ -43,7 +43,7 @@ Output：
   - traffic light bounding box projected from world coordinates to image coordinates
 
 ### 2.2 camera selection
- The boundary points are projected to the image coordinates of each camera while driving. In the same position, the longger focal length, the larger projected area and the better for detecting. Hence the camera with the longest focal length that could see all the lights is selected. If lights fail to projected to all cameras, we simply selected the telephoto camera just to go through all pipelines. The selected camera id with timestamp is cached in queue, as described below:
+ The boundary points are projected to the image coordinates of each camera while driving. In the same position, the longer focal length, the larger projected area and the better for detecting. Hence the camera with the longest focal length that could see all the lights is selected. If lights fail to projected to all cameras, we simply selected the telephoto camera just to go through all pipelines. The selected camera id with timestamp is cached in queue, as described below:
  ``` C++
 struct ImageLights {
   CarPose pose;
@@ -60,7 +60,7 @@ So far, all the information we need is localization, calibration results and hd-
 Images arrive with its timestamp and camera id. The pair of timestamp and camera id is used to find appropriate cached information. If the image can find a cached record with same camera id and small difference between timestamps, the image can be published to process. All inappropriate images are abandoned.
  
 ## 3. Process
-We devide the process task into the following three steps.
+We divide the process task into the following three steps.
 ### 3.1 Input/Output
 Input：
 - image from selected camera
