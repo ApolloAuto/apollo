@@ -60,7 +60,7 @@ class MobileyeProvider:
         self.left_lm_coef = [1, 0, 0, 0]
         self.right_lane_marker_range = 0
         self.left_lane_marker_range = 0
-        self.obstacles = []
+        self.obstacles = {}
         self.right_lm_quality = 0.0
         self.left_lm_quality = 0.0
 
@@ -163,7 +163,7 @@ class MobileyeProvider:
 
         if self.mobileye_pb is None:
             return
-        self.obstacles = []
+        self.obstacles = {}
         for i in range(len(self.mobileye_pb.details_739)):
             obstacle_id = self.mobileye_pb.details_739[i].obstacle_id
             x = self.mobileye_pb.details_739[i].obstacle_pos_x
@@ -176,7 +176,7 @@ class MobileyeProvider:
                 obstacle.length = self.mobileye_pb.details_73a[
                     i].obstacle_length
                 obstacle.width = self.mobileye_pb.details_73a[i].obstacle_width
-            self.obstacles.append(obstacle)
+            self.obstacles[obstacle.obstacle_id] = obstacle
 
         self.obstacles_processed = True
 
