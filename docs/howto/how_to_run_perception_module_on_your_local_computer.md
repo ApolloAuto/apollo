@@ -16,7 +16,7 @@ We provide a step-by-step instruction on running perception module with Nvidia G
 docker exec -it apollo_dev /bin/bash
 ```
 
-3. Download the official Nvidia driver installation file which should be the exactly same version as the one installed in your host machine. We recommand the version of 375.39:
+3. Download the official Nvidia driver installation file which should be the exactly same version as the one installed in your host machine. We recommend the version of 375.39:
 ```
 wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
 ```
