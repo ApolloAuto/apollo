@@ -113,16 +113,16 @@ class TrajectoryCost {
   ComparableCost Calculate(const QuinticPolynomialCurve1d &curve,
                            const double start_s, const double end_s,
                            const uint32_t curr_level,
-                           const uint32_t total_level) const;
+                           const uint32_t total_level);
 
  private:
   ComparableCost CalculatePathCost(const QuinticPolynomialCurve1d &curve,
                                    const double start_s, const double end_s,
                                    const uint32_t curr_level,
-                                   const uint32_t total_level) const;
+                                   const uint32_t total_level);
   ComparableCost CalculateStaticObstacleCost(
       const QuinticPolynomialCurve1d &curve, const double start_s,
-      const double end_s) const;
+      const double end_s);
   ComparableCost CalculateDynamicObstacleCost(
       const QuinticPolynomialCurve1d &curve, const double start_s,
       const double end_s) const;
@@ -131,7 +131,7 @@ class TrajectoryCost {
       const common::math::Box2d &obstacle_box) const;
 
   ComparableCost GetCostFromObsSL(const double adc_s, const double adc_l,
-                                  const SLBoundary &obs_sl_boundary) const;
+                                  const SLBoundary &obs_sl_boundary);
 
   common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
                                         const double dl) const;
@@ -147,6 +147,9 @@ class TrajectoryCost {
   std::vector<double> obstacle_probabilities_;
 
   std::vector<SLBoundary> static_obstacle_sl_boundaries_;
+
+  std::array<double, 200> path_l_cost_;
+  std::array<double, 200> obstacle_safety_cost_;
 };
 
 }  // namespace planning
