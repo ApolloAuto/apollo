@@ -222,8 +222,8 @@ bool ConditionFilter::GenerateLatticeStPixels(
   apollo::planning_internal::LatticeStTraining* st_data,
   double timestamp,
   std::string st_img_name) {
-  int num_rows = 500;
-  int num_cols = 80;
+  int num_rows = 250;
+  int num_cols = 160;
   double s_step = 100.0 / (double) num_rows;
   double t_step = 8.0 / (double) num_cols;
   std::vector<PathTimeObstacle> path_time_obstacles =
@@ -237,7 +237,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
     double feasible_s_upper = feasible_region_.SUpper(t);
     double feasible_s_lower = feasible_region_.SLower(t);
     for (int i = 0; i < num_rows; ++i) {
-      double s = s_step * (i + 1);
+      double s = s_step * (num_rows - i + 1);
       if (s <= feasible_s_lower || s >= feasible_s_upper) {
         // Dye gray
         apollo::planning_internal::LatticeStPixel* pixel =

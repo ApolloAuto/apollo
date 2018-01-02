@@ -77,7 +77,8 @@ PlanningTarget BehaviorDecider::Analyze(
     if (condition_filter.GenerateLatticeStPixels(&st_data,
       timestamp, st_img_name)) {
       AINFO << "  Created_lattice_st_image_named=" << st_img_name <<
-               "_for_timestamp=" << timestamp;
+               "_for_timestamp=" << timestamp <<
+               " num_colored_pixels=" << st_data.pixel_size();
       planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
       ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(st_data);
     }
