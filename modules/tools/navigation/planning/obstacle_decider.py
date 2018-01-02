@@ -92,7 +92,7 @@ class ObstacleDecider:
                              - abs(routing_y) \
                              - self.right_edge_to_center
 
-        return left_nudgable, right_nudgable
+        return left_nudgable, -1 * right_nudgable
 
     def get_nudge_distance(self, left_nudgable, right_nudgable):
         left_nudge = None
@@ -103,13 +103,19 @@ class ObstacleDecider:
                               - self.mobileye.obstacles[obs_id].width / 2.0 \
                               - self.left_edge_to_center
                 if self.LAT_DIST > actual_dist > 0.2:
-                    right_nudge = -1 * (self.LAT_DIST - actual_dist)
+                    if right_nudge is None:
+                        right_nudge = -1 * (self.LAT_DIST - actual_dist)
+                    elif right_nudge > -1 * (self.LAT_DIST - actual_dist):
+                        right_nudge = -1 * (self.LAT_DIST - actual_dist)
             else:
                 actual_dist = abs(lat_dist) \
                               - self.mobileye.obstacles[obs_id].width / 2.0 \
                               - self.left_edge_to_center
                 if self.LAT_DIST > actual_dist > 0.2:
-                    left_nudge = self.LAT_DIST - actual_dist
+                    if left_nudge is None:
+                        left_nudge = self.LAT_DIST - actual_dist
+                    elif left_nudge < self.LAT_DIST - actual_dist:
+                        left_nudge = self.LAT_DIST - actual_dist
         if left_nudge is None and right_nudge is None:
             return 0
         if left_nudge is not None and right_nudge is not None:
