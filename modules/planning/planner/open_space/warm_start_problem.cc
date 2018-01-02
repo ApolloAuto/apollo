@@ -53,16 +53,12 @@ bool WarmStartProblem::Solve() const {
 
   // m1 : state equality constatins
   int m1 = 4 * horizon_;
-
   // m2 : sampling time equality constraints
   int m2 = horizon_;
-
   // m3 : state inequality constraints
   int m3 = 4 * horizon_;
-
   // m4 : control inequality constraints
   int m4 = 2 * horizon_;
-
   // m5 : sampling time inequality constraints
   int m5 = horizon_;
 
@@ -70,10 +66,8 @@ bool WarmStartProblem::Solve() const {
   int num_of_constraints = m1 + m2 + m3 + m4 + m5;
 
   // TODO(QiL) : evaluate whether need to new it everytime
-  WarmUpIPOPTInterface* ptop =
-      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints, horizon_);
-
-  ptop->set_start_point();
+  WarmUpIPOPTInterface* ptop = new WarmUpIPOPTInterface(
+      num_of_variables, num_of_constraints, horizon_, ts_, x0_, xf_, XYbounds_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

@@ -33,10 +33,19 @@ namespace planning {
 constexpr std::size_t N = 80;
 
 WarmUpIPOPTInterface::WarmUpIPOPTInterface(int num_of_variables,
-                                           int num_of_constraints, int horizon)
+                                           int num_of_constraints, int horizon,
+                                           float ts, float wheelbase_length,
+                                           Eigen::MatrixXd x0,
+                                           Eigen::MatrixXd xf,
+                                           Eigen::MatrixXd XYbounds)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
-      horizon_(horizon) {}
+      horizon_(horizon),
+      ts_(ts),
+      wheelbase_length_(wheelbase_length),
+      x0_(x0),
+      xf_(xf),
+      XYbounds_(XYbounds) {}
 
 void WarmUpIPOPTInterface::get_optimization_results() const {}
 
@@ -72,36 +81,91 @@ bool WarmUpIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
       << "num_of_constraints_ mismatch, n: " << n
       << ", num_of_constraints_: " << num_of_constraints_;
 
+  // Variables: includes u and sample time
+
+  std::size variable_index = 0;
   for (std::size_t i = 0; i < horizon_; ++i) {
-    std::size_t index = i * n;
+    variable_index = i * 3;
 
-    //
-    /*
-        // theta
-        x_l[index] = theta_lower;
-        x_u[index] = theta_upper;
+    // steer command
+    x_l[variable_index] = -0.6;
+    x_u[variable_index] = 0.6;
 
-        // kappa
-        x_l[index + 1] = kappa_lower;
-        x_u[index + 1] = kappa_upper;
+    // acceleration
+    x_l[variable_index + 1] = -1;
+    x_u[variable_index + 1] = 1;
 
-        // dkappa
-        x_l[index + 2] = dkappa_lower;
-        x_u[index + 2] = dkappa_upper;
-
-        // x
-        x_l[index + 3] = x_lower;
-        x_u[index + 3] = x_upper;
-
-        // y
-        x_l[index + 4] = y_lower;
-        x_u[index + 4] = y_upper;
-        */
+    // sampling time;
+    x_l[variable_index + 2] = 0.5;
+    x_u[variable_index + 2] = 2.5;
   }
 
-  // we have one equality constraint, so we set the bounds on this constraint
-  // to be equal (and zero).
-  g_l[0] = g_u[0] = 0.0;
+  ADEBUG << "variable_index : " << variable_index;
+  // Constraints
+
+  // 1. state constraints
+  // start point pose
+  std::size_t constraint_index = 0;
+  for (std::size_t i = 0; i < 4; ++i) {
+    g_l[i] = g_u[i] = x0_[i];
+  }
+  constraint_index += 4;
+
+  // During horizons
+  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+    // x
+    g_l[constraint_index] = XYbounds_[0];
+    g_u[constraint_index] = XYbounds_[1];
+
+    // y
+    g_l[constraint_index + 1] = XYbounds_[2];
+    g_u[constraint_index + 1] = XYbounds_[3];
+
+    // phi
+    // TODO(QiL): Change this to configs
+    g_l[constraint_index + 2] = -7;
+    g_u[constraint_index + 2] = 7;
+
+    // v
+    // TODO(QiL) : Change this to configs
+    g_l[constraint_index + 3] = -1;
+    g_u[constraint_index + 3] = 2;
+
+    constraint_index += 4;
+  }
+
+  // end point pose
+  for (std::size_t i = 0; i < 4; ++i) {
+    g_l[constraint_index + i] = g_u[constraint_index + i] = xf_[i];
+  }
+  constraint_index += 4;
+  ADEBUG << "constraint_index after adding state constraints : "
+         << constraint_index;
+
+  // 2. input constraints
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    // u1
+    g_l[constraint_index] = -0.6;
+    g_u[constraint_index] = 0.6;
+
+    // u2
+    g_l[constraint_index + 1] = -1;
+    g_u[constraint_index + 1] = 1;
+
+    constraint_index += 2;
+  }
+  ADEBUG << "constraint_index after adding input constraints : "
+         << constraint_index;
+
+  // 3. sampling time constraints
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    g_l[constraint_index] = -0.6;
+    g_u[constraint_index] = 0.6;
+
+    ++constraint_index;
+  }
+  ADEBUG << "constraint_index after adding sampling time constraints : "
+         << constraint_index;
 
   return true;
 }
