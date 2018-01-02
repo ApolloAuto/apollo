@@ -3,7 +3,7 @@
 Core software modules running on the Apollo 2.0 powered autonomous vehicle include:
 * Perception: the perception module perceives the world surrounding the autonomous vehicle. There are two important submodules inside perception. The first one is obstacle detection and the other one is traffic light detection.
 * Prediction: the prediction module predicts the future motion trajectories of the perceived obstacles
-* Routing: the routing module is to tell the autonomous vehicle how to reach its destination via a serie of lanes or roads
+* Routing: the routing module is to tell the autonomous vehicle how to reach its destination via a series of lanes or roads
 * Planning: the planning module plans the spatio-temporal trajectory for the autonomous vehicle to take
 * Control: the control module executes the planned spatio-temporal trajectory by generating control commands such as throttle, brake and steering
 * Canbus: the interface where control commands are passed to the vehicle hardware. It is also where chasiss information gets passed through to the software system
