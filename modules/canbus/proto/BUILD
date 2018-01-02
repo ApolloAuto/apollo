@@ -18,6 +18,7 @@ proto_library(
     deps = [
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:header_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:vehicle_signal_proto_lib",
         "//modules/drivers/canbus/proto:canbus_proto_lib",
     ],
