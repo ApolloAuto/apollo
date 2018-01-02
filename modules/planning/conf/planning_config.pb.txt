@@ -64,8 +64,8 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 2.4
-            low_speed_centric_acceleration_limit: 2.6
+            high_speed_centric_acceleration_limit: 0.8
+            low_speed_centric_acceleration_limit: 1.2
             high_speed_threshold: 12.58
             low_speed_threshold: 7.5
             minimal_kappa: 0.00001
@@ -74,7 +74,7 @@ em_planner_config {
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
-            centri_jerk_speed_coeff: 0.006
+            centri_jerk_speed_coeff: 1.0
         }
     }
     qp_spline_path_config {
@@ -133,8 +133,8 @@ em_planner_config {
         }
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 2.4
-            low_speed_centric_acceleration_limit: 2.6
+            high_speed_centric_acceleration_limit: 0.8
+            low_speed_centric_acceleration_limit: 1.2
             high_speed_threshold: 12.58
             low_speed_threshold: 7.5
             minimal_kappa: 0.00001
@@ -143,7 +143,7 @@ em_planner_config {
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
-            centri_jerk_speed_coeff: 0.006
+            centri_jerk_speed_coeff: 1.0
         }
     }
     poly_st_speed_config {
