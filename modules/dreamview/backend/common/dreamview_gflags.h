@@ -41,4 +41,6 @@ DECLARE_string(ssl_certificate);
 
 DECLARE_double(sim_map_radius);
 
+DECLARE_int32(dreamview_worker_num);
+
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
