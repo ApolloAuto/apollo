@@ -173,4 +173,6 @@ DECLARE_double(stop_duration_for_stop_sign);
 
 DECLARE_bool(enable_sqp_solver);
 
+DECLARE_bool(enable_multi_thread_in_dp_poly_path);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
