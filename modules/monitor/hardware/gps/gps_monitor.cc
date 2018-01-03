@@ -31,7 +31,7 @@ DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
               "longitude and height.");
 
 DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 5,
-              "Acceptable Gnss BestPose unstable duration.");
+              "Acceptable Gnss BestPose unstable duration in seconds.");
 
 namespace apollo {
 namespace monitor {
