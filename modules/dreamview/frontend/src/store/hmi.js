@@ -68,7 +68,7 @@ export default class HMI {
     }
 
     @action update(world) {
-        this.enableStartAuto = (world.engageAdvice.advice === "READY_TO_ENGAGE");
+        this.enableStartAuto = world.engageAdvice === "READY_TO_ENGAGE";
     }
 
     @action toggleModule(id) {

@@ -106,7 +106,7 @@ message Object {
   // ADC decision results
   optional .apollo.planning.DecisionResult adc_decision_result = 29;
   // ADC planning trajectory
-  optional .apollo.planning.ADCTrajectory adc_trajectory = 31;
+  optional .apollo.planning.ADCTrajectory adc_trajectory = 31 [deprecated = true];
 
   // Chassis Info
   // For ADC
@@ -197,6 +197,6 @@ message SimulationWorld {
   // Module latency
   optional Latency latency = 15;
 
-  // Engage advice from planning result
-  optional apollo.common.EngageAdvice engage_advice = 16;
+  // Engage advice from planning
+  optional string engage_advice = 16;
 }
