@@ -316,15 +316,17 @@ int main(int argc, char *argv[]) {
       !FLAGS_lane_to_lane && FLAGS_lane.empty() && FLAGS_dump_txt_map.empty() &&
       FLAGS_dump_bin_map.empty() && FLAGS_signal_info.empty() &&
       FLAGS_overlap.empty()) {
-    std::cout << "usage: --dump_txt_map" << std::endl;
-    std::cout << "usage: --dump_bin_map" << std::endl;
-    std::cout << "usage: --xy_to_sl --x --y" << std::endl;
-    std::cout << "usage: --sl_to_xy --lane --s --l" << std::endl;
+    std::cout << "usage: --dump_txt_map text_map_file" << std::endl;
+    std::cout << "usage: --dump_bin_map bin_map_file" << std::endl;
+    std::cout << "usage: --xy_to_sl --x x --y y" << std::endl;
+    std::cout << "usage: --sl_to_xy --lane lane_id --s s --l l" << std::endl;
     std::cout << "usage: --xy_to_lane --x --y --lane" << std::endl;
-    std::cout << "usage: --lane_to_lane --from_lane --s --to_lane" << std::endl;
-    std::cout << "usage: --lane" << std::endl;
-    std::cout << "usage: --signal_info" << std::endl;
-    std::cout << "usage: --overlap" << std::endl;
+    std::cout
+        << "usage: --lane_to_lane --from_lane lane_id --s s --to_lane lane_id"
+        << std::endl;
+    std::cout << "usage: --lane lane_id" << std::endl;
+    std::cout << "usage: --signal_info signal_id" << std::endl;
+    std::cout << "usage: --overlap overlap_id" << std::endl;
   }
   return 0;
 }
