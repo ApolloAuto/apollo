@@ -25,6 +25,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -81,7 +82,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // Variables: includes u and sample time
 
-  std::size_t variable_index = 0;
+  /*
   for (std::size_t i = 0; i < horizon_; ++i) {
     variable_index = i * 3;
 
@@ -97,8 +98,73 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
     x_l[variable_index + 2] = 0.5;
     x_u[variable_index + 2] = 2.5;
   }
+*/
+  // 1. state variables
+  // start point pose
+  std::size_t variable_index = 0;
+  for (std::size_t i = 0; i < 4; ++i) {
+    x_l[i] = x0_(i, 0);
+    x_u[i] = x0_(i, 0);
+  }
+  variable_index += 4;
+
+  // During horizons
+  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+    // x
+    x_l[variable_index] = XYbounds_(0, 0);
+    x_u[variable_index] = XYbounds_(1, 0);
+
+    // y
+    x_l[variable_index + 1] = XYbounds_(2, 0);
+    x_u[variable_index + 1] = XYbounds_(3, 0);
+
+    // phi
+    // TODO(QiL): Change this to configs
+    x_l[variable_index + 2] = -7;
+    x_u[variable_index + 2] = 7;
+
+    // v
+    // TODO(QiL) : Change this to configs
+    x_l[variable_index + 3] = -1;
+    x_u[variable_index + 3] = 2;
+
+    variable_index += 4;
+  }
+
+  // end point pose
+  for (std::size_t i = 0; i < 4; ++i) {
+    x_l[variable_index + i] = xf_(i, 0);
+    x_u[variable_index + i] = xf_(i, 0);
+  }
+  variable_index += 4;
+  ADEBUG << "variable_index after adding state constraints : "
+         << variable_index;
+
+  // 2. input constraints
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    // u1
+    x_l[variable_index] = -0.6;
+    x_u[variable_index] = 0.6;
+
+    // u2
+    x_l[variable_index + 1] = -1;
+    x_u[variable_index + 1] = 1;
+
+    variable_index += 2;
+  }
+  ADEBUG << "variable_index after adding input constraints : "
+         << variable_index;
+
+  // 3. sampling time constraints
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    x_l[variable_index] = -0.6;
+    x_u[variable_index] = 0.6;
+
+    ++variable_index;
+  }
 
   ADEBUG << "variable_index : " << variable_index;
+
   // Constraints
 
   // 1. state constraints
@@ -194,9 +260,36 @@ bool WarmStartIPOPTInterface::get_starting_point(int n, bool init_x, double* x,
                                                  double* z_U, int m,
                                                  bool init_lambda,
                                                  double* lambda) {
+  CHECK(n == num_of_variables_) << "No. of variables wrong. n : " << n;
   CHECK(init_x == true) << "Warm start init_x setting failed";
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+
+  // 1. state variables linspace initialization
+
+  std::vector<std::vector<double>> x_guess(4, std::vector<double>(horizon_));
+
+  for (std::size_t i = 0; i < 4; ++i) {
+    ::apollo::common::util::uniform_slice(x0_(i, 0), xf_(i, 0), horizon_,
+                                          &x_guess[i]);
+  }
+
+  for (std::size_t i = 0; i <= horizon_; ++i) {
+    for (std::size_t j = 0; j < 4; ++j) {
+      x[i * 4 + j] = x_guess[j][i];
+    }
+  }
+
+  // 2. input initialization
+  for (std::size_t i = 0; i <= 2 * horizon_; ++i) {
+    x[i] = 0.6;
+  }
+
+  // 3. sampling time constraints
+  for (std::size_t i = 0; i <= horizon_; ++i) {
+    x[i] = 0.5;
+  }
+
   return true;
 }
 
