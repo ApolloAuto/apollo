@@ -32,7 +32,7 @@ namespace planning {
 
 constexpr std::size_t N = 80;
 
-WarmUpIPOPTInterface::WarmUpIPOPTInterface(
+WarmStartIPOPTInterface::WarmStartIPOPTInterface(
     int num_of_variables, int num_of_constraints, std::size_t horizon, float ts,
     float wheelbase_length, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
     Eigen::MatrixXd XYbounds)
@@ -45,11 +45,11 @@ WarmUpIPOPTInterface::WarmUpIPOPTInterface(
       xf_(xf),
       XYbounds_(XYbounds) {}
 
-void WarmUpIPOPTInterface::get_optimization_results() const {}
+void WarmStartIPOPTInterface::get_optimization_results() const {}
 
-bool WarmUpIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
-                                        int& nnz_h_lag,
-                                        IndexStyleEnum& index_style) {
+bool WarmStartIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
+                                           int& nnz_h_lag,
+                                           IndexStyleEnum& index_style) {
   // number of variables
   n = num_of_variables_;
 
@@ -69,8 +69,8 @@ bool WarmUpIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   return true;
 }
 
-bool WarmUpIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
-                                           int m, double* g_l, double* g_u) {
+bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
+                                              int m, double* g_l, double* g_u) {
   // here, the n and m we gave IPOPT in get_nlp_info are passed back to us.
   // If desired, we could assert to make sure they are what we think they are.
   CHECK(n == num_of_variables_) << "num_of_variables_ mismatch, n: " << n
@@ -170,28 +170,35 @@ bool WarmUpIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   return true;
 }
 
-bool WarmUpIPOPTInterface::eval_g(int n, const double* x, bool new_x, int m,
-                                  double* g) {
+bool WarmStartIPOPTInterface::eval_g(int n, const double* x, bool new_x, int m,
+                                     double* g) {
   return true;
 }
 
-bool WarmUpIPOPTInterface::eval_jac_g(int n, const double* x, bool new_x, int m,
-                                      int nele_jac, int* iRow, int* jCol,
-                                      double* values) {
+bool WarmStartIPOPTInterface::eval_jac_g(int n, const double* x, bool new_x,
+                                         int m, int nele_jac, int* iRow,
+                                         int* jCol, double* values) {
   return true;
 }
 
-bool WarmUpIPOPTInterface::eval_h(int n, const double* x, bool new_x,
-                                  double obj_factor, int m,
-                                  const double* lambda, bool new_lambda,
-                                  int nele_hess, int* iRow, int* jCol,
-                                  double* values) {
+bool WarmStartIPOPTInterface::eval_h(int n, const double* x, bool new_x,
+                                     double obj_factor, int m,
+                                     const double* lambda, bool new_lambda,
+                                     int nele_hess, int* iRow, int* jCol,
+                                     double* values) {
   return true;
 }
 
-void WarmUpIPOPTInterface::set_start_point() {}
-
-void WarmUpIPOPTInterface::set_end_point() {}
+bool WarmStartIPOPTInterface::get_starting_point(int n, bool init_x, double* x,
+                                                 bool init_z, double* z_L,
+                                                 double* z_U, int m,
+                                                 bool init_lambda,
+                                                 double* lambda) {
+  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_z == false) << "Warm start init_z setting failed";
+  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+  return true;
+}
 
 }  // namespace planning
 }  // namespace apollo
