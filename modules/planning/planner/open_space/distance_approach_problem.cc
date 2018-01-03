@@ -81,7 +81,7 @@ bool DistanceApproachProblem::Solve() const {
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
   app->Options()->SetStringValue("hessian_approximation", "exact");
-  //  TODO(QiL) : Change IPOPT settings to flag or configs
+  // TODO(QiL) : Change IPOPT settings to flag or configs
   int print_level = 0;
   app->Options()->SetIntegerValue("print_level", print_level);
   int num_iterations = 0;

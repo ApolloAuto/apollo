@@ -94,4 +94,5 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
+#endif
+// MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
