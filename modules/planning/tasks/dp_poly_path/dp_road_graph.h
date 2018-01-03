@@ -97,6 +97,10 @@ class DPRoadGraph {
   bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
                            std::vector<DPRoadGraphNode> *min_cost_path);
 
+  bool GenerateMinCostPathWithMultiThread(
+      const std::vector<const PathObstacle *> &obstacles,
+      std::vector<DPRoadGraphNode> *min_cost_path);
+
   bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
@@ -106,6 +110,11 @@ class DPRoadGraph {
   bool IsSafeForLaneChange();
 
   bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;
+
+  void GetCurveCost(TrajectoryCost trajectory_cost,
+                    const QuinticPolynomialCurve1d &curve, const double start_s,
+                    const double end_s, const uint32_t curr_level,
+                    const uint32_t total_level, ComparableCost *cost);
 
  private:
   DpPolyPathConfig config_;
