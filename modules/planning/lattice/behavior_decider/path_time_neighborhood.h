@@ -71,8 +71,12 @@ class PathTimeNeighborhood {
       const std::vector<common::PathPoint>& discretized_ref_points,
       const Obstacle* obstacle, const SLBoundary& sl_boundary);
 
-  PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
+  PathTimePoint SetPathTimePoint(const std::string& obstacle_id,
+                                 const double s,
                                  const double t) const;
+
+  void SetStaticPathTimeObstacle(const Obstacle* obstacle,
+                                 const ReferenceLine& reference_line);
 
  private:
   std::array<double, 3> init_s_;

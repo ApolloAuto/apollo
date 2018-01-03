@@ -32,6 +32,7 @@ namespace planning {
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
 
 namespace {
@@ -70,6 +71,27 @@ PathTimeNeighborhood::PathTimeNeighborhood(
   SetupObstacles(frame, reference_line, discretized_ref_points);
 }
 
+void PathTimeNeighborhood::SetStaticPathTimeObstacle(
+    const Obstacle* obstacle,
+    const ReferenceLine& reference_line) {
+  TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
+  Box2d box = obstacle->GetBoundingBox(start_point);
+  std::string obstacle_id = obstacle->Id();
+  SLBoundary sl_boundary;
+  reference_line.GetSLBoundary(box, &sl_boundary);
+  path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
+  path_time_obstacle_map_[obstacle_id].mutable_bottom_left()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
+  path_time_obstacle_map_[obstacle_id].mutable_bottom_right()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
+                                  planned_trajectory_time));
+  path_time_obstacle_map_[obstacle_id].mutable_upper_left()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
+  path_time_obstacle_map_[obstacle_id].mutable_upper_right()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
+                                  planned_trajectory_time));
+}
+
 void PathTimeNeighborhood::SetupObstacles(
     const Frame* frame, const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
@@ -83,10 +105,15 @@ void PathTimeNeighborhood::SetupObstacles(
       AWARN << "Duplicated obstacle found [" << obstacle->Id() << "]";
     }
 
+    if (!obstacle->HasTrajectory()) {
+       SetStaticPathTimeObstacle(obstacle, reference_line);
+       continue;
+    }
+
     double relative_time = 0.0;
     while (relative_time < planned_trajectory_time) {
-      common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
-      common::math::Box2d box = obstacle->GetBoundingBox(point);
+      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+      Box2d box = obstacle->GetBoundingBox(point);
 
       SLBoundary sl_boundary;
       reference_line.GetSLBoundary(box, &sl_boundary);
@@ -112,21 +139,22 @@ void PathTimeNeighborhood::SetupObstacles(
           path_time_obstacle_map_.end()) {
         path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
 
-        *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left() =
-            SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
-                             relative_time);
+        path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left()
+            ->CopyFrom(SetPathTimePoint(obstacle->Id(),
+                           sl_boundary.start_s(), relative_time));
 
-        *path_time_obstacle_map_[obstacle->Id()].mutable_upper_left() =
-            SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
-                             relative_time);
+        path_time_obstacle_map_[obstacle->Id()].mutable_upper_left()
+            ->CopyFrom(SetPathTimePoint(obstacle->Id(),
+                           sl_boundary.end_s(), relative_time));
       }
 
-      *path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right() =
-          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
-                           relative_time);
+      path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right()
+          ->CopyFrom(SetPathTimePoint(obstacle->Id(),
+                         sl_boundary.start_s(), relative_time));
 
-      *path_time_obstacle_map_[obstacle->Id()].mutable_upper_right() =
-          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time);
+      path_time_obstacle_map_[obstacle->Id()].mutable_upper_right()
+          ->CopyFrom(SetPathTimePoint(obstacle->Id(),
+                         sl_boundary.end_s(), relative_time));
 
       relative_time += trajectory_time_resolution;
     }
@@ -188,6 +216,7 @@ PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
   PathTimePoint path_time_point;
   path_time_point.set_s(s);
   path_time_point.set_t(t);
+  path_time_point.set_v(0.0);
   path_time_point.set_obstacle_id(obstacle_id);
   return path_time_point;
 }
