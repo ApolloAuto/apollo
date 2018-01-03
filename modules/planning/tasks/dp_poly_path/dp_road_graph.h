@@ -105,6 +105,8 @@ class DPRoadGraph {
                             common::FrenetFramePoint *const frenet_frame_point);
   bool IsSafeForLaneChange();
 
+  bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;
+
  private:
   DpPolyPathConfig config_;
   common::TrajectoryPoint init_point_;
