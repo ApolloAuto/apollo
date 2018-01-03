@@ -38,12 +38,15 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Vec2d;
-using apollo::common::math::Box2d;
+using apollo::common::EngageAdvice;
 using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
+using apollo::canbus::Chassis;
+using apollo::common::util::Dropbox;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -303,7 +306,7 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   return true;
 }
 
-void ReferenceLineInfo::SetDriable(bool drivable) { is_drivable_ = drivable; }
+void ReferenceLineInfo::SetDrivable(bool drivable) { is_drivable_ = drivable; }
 
 bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
 
@@ -533,6 +536,53 @@ void ReferenceLineInfo::SetObjectDecisions(
           path_obstacle->LongitudinalDecision());
     }
   }
+}
+
+void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
+  constexpr char kPrevAdvice[] = "PlanningPreviousAdvice";
+  constexpr double kMaxAngleDiff = M_PI / 6.0;
+  auto* prev_advice = Dropbox<EngageAdvice>::Open()->Get(kPrevAdvice);
+  if (!prev_advice) {
+    EngageAdvice advice;
+    Dropbox<EngageAdvice>::Open()->Set(kPrevAdvice, advice);
+    prev_advice = Dropbox<EngageAdvice>::Open()->Get(kPrevAdvice);
+  }
+  if (!IsDrivable()) {
+    if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
+      engage_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+    } else {
+      engage_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+    }
+    engage_advice->set_reason("Reference line not drivable");
+  } else if (!is_on_reference_line_) {
+    if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
+      engage_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+    } else {
+      engage_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+    }
+    engage_advice->set_reason("Not on reference line");
+  } else {
+    // check heading
+    auto ref_point =
+        reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
+    if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
+        kMaxAngleDiff) {
+      if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
+        engage_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+      } else {
+        engage_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+      }
+      engage_advice->set_reason("Vehicle heading is not aligned");
+    } else {
+        if (vehicle_state_.driving_mode() !=
+            Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
+          engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
+        } else {
+          engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
+        }
+      }
+  }
+  *prev_advice = *engage_advice;
 }
 
 void ReferenceLineInfo::MakeEStopDecision(

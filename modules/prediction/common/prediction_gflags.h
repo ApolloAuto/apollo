@@ -24,6 +24,9 @@ DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
 
+DECLARE_bool(prediction_test_mode);
+DECLARE_double(prediction_test_duration);
+
 DECLARE_double(prediction_duration);
 DECLARE_double(prediction_period);
 DECLARE_double(double_precision);
@@ -64,11 +67,9 @@ DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_int32(max_num_obstacles);
-DECLARE_bool(enable_adjust_velocity_heading);
-DECLARE_double(valid_position_diff_thred);
-
-// evaluator
+DECLARE_double(valid_position_diff_threshold);
 DECLARE_double(rnn_min_lane_relatice_s);
+DECLARE_bool(enable_adjust_velocity_heading);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);

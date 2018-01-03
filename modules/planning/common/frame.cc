@@ -167,6 +167,24 @@ bool Frame::CreateReferenceLineInfo() {
     AERROR << "Failed to apply change lane decider";
     return false;
   }
+
+  if (reference_line_info_.size() == 2) {
+    common::math::Vec2d xy_point(vehicle_state_.x(), vehicle_state_.y());
+    common::SLPoint first_sl;
+    if (!reference_line_info_.front().reference_line().XYToSL(xy_point,
+                                                              &first_sl)) {
+      return false;
+    }
+    common::SLPoint second_sl;
+    if (!reference_line_info_.back().reference_line().XYToSL(xy_point,
+                                                             &second_sl)) {
+      return false;
+    }
+    const double offset = first_sl.l() - second_sl.l();
+    reference_line_info_.front().SetOffsetToOtherReferenceLine(offset);
+    reference_line_info_.back().SetOffsetToOtherReferenceLine(-offset);
+  }
+
   // delay the time-consumping reference_line_info init() step to planner.
   return true;
 }

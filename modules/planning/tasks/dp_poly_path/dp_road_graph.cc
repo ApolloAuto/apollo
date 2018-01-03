@@ -248,37 +248,39 @@ bool DPRoadGraph::SamplePathWaypoints(
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
 
-    constexpr double kBoundaryBuff = 0.10;
+    constexpr double kBoundaryBuff = 0.20;
     const auto &vehicle_config =
         common::VehicleConfigHelper::instance()->GetConfig();
     const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    double kDeafultUnitL = 0.30;
+    double kDefaultUnitL = 0.30;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      kDeafultUnitL = 1.0;
+      kDefaultUnitL = 1.0;
     }
     const double sample_l_range =
-        kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
-    double sample_right_boundary =
-        std::fmin(-eff_right_width, init_sl_point_.l());
-    double sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+        kDefaultUnitL * (config_.sample_points_num_each_level() - 1);
+    double sample_right_boundary = -eff_right_width;
+    double sample_left_boundary = eff_left_width;
 
-    if (reference_line_info_.IsChangeLanePath() &&
-        init_sl_point_.l() > eff_left_width) {
-      sample_right_boundary =
-          std::fmax(sample_right_boundary, init_sl_point_.l() - sample_l_range);
-    }
-    if (reference_line_info_.IsChangeLanePath() &&
-        init_sl_point_.l() < eff_right_width) {
-      sample_left_boundary =
-          std::fmin(sample_left_boundary, init_sl_point_.l() + sample_l_range);
+    if (reference_line_info_.IsChangeLanePath()) {
+      sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
+      sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+
+      if (init_sl_point_.l() > eff_left_width) {
+        sample_right_boundary = std::fmax(sample_right_boundary,
+                                          init_sl_point_.l() - sample_l_range);
+      }
+      if (init_sl_point_.l() < eff_right_width) {
+        sample_left_boundary = std::fmin(sample_left_boundary,
+                                         init_sl_point_.l() + sample_l_range);
+      }
     }
 
     std::vector<double> sample_l;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      sample_l.push_back(init_sl_point_.l());
+      sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                   config_.sample_points_num_each_level() - 1,

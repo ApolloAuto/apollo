@@ -16,7 +16,9 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
 ## Preparation
 
-1. Well Calibrated Intrinsics of Camera
+1. Download [Calibration Tools](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz) and extract into `$APOLLO_HOME/modules/calibration` directory. (APOLLO_HOME stands for the root directory of apollo repo)
+
+2. Well Calibrated Intrinsics of Camera
 
   Camera intrinsic contains focus length, principal point, distortion coefficients and other information. They can be obtained from some other camera calibration tools, for example, [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) and [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/). After the calibration is completed, the results need to be converted to a `.yaml` format file. Here is is an example of a camera intrinsic file:
 
@@ -46,7 +48,7 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 
   We recommend that do the intrinsic calibration for every single camera, instead of using a unified intrinsic. This can improve the accuracy of the extrinsics calibration results.
 
-2. Initial Extrinsic File
+3. Initial Extrinsic File
 
   The tools require user to provide an initial extrinsic value as a reference. Here is an example of initial extrinsic file of Camera-to-LiDAR, where translation is the shift distance between camera and LiDAR. Rotation is the quaternion expression form of the rotation matrix.
 
@@ -72,14 +74,14 @@ In Apollo 2.0, we add three new calibration functions: Camera-to-Camera calibrat
 	
   Attention: the calibration method of the Camera-to-LiDAR is more dependent on the initial extrinsics. A large deviation can lead to the extrisic calibration failed. Therefore, please provide an accurate initial extrinsc as far as possible when the conditions are allowed.
 
-3. Calibration Place
+4. Calibration Place
 
   Because our calibration method is based on nature sence, an ideal calibration place can significantly improve the precision. We recommend selecting a textured site contains some land marks, such as trees, poles, street lights, traffic signs, stationary objects and clear traffic lines. A good calibraiton environment is shown below: 
 
   ![](images/calibration/sensor_calibration/calibration_place.png)
   <p align="center"> Figure 1. A good calibraiton place </p>
 
-4. Required Topics
+5. Required Topics
 	
   Please confirm that all sensor topics required by program have output. See: [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
 
@@ -125,7 +127,7 @@ Please confirm the localization status has already meet 56, otherwise the calibr
 	
 ```bash
     cd /apollo/scripts
-    bash sensor_calibration.sh lidar_camera
+    bash sensor_calibration.sh camera_camera
 ```
 
 2. Data Collection
@@ -181,7 +183,7 @@ Please confirm the localization status has already meet 56, otherwise the calibr
 
   The configuration file is saved in the path below. See Table 5 for details.
 ```bash
-    /apollo/modules/calibration/lidar_camera_calibrator/camera_camera_calibrtor.conf
+    /apollo/modules/calibration/lidar_camera_calibrator/lidar_camera_calibrtor.conf
 ```
 
   Table 5. Camera-to-LiDAR Calibration Configuration Description
@@ -285,7 +287,7 @@ When the calibration is completed, the corresponding calibration result verifica
 
 ### Radar-to-Camera Calibration
 	
-* Methods: In order to verify the output extrinsic, we use the LiDAR in the system to be a medium. So we can get the extrinsic of the Radar relative to the LiDAR through the extrinsic of the Radar relative to the camera and the extrinsic of the camera relative to the LiDAR. Then we can draw a bird-view fusion image, which fuse the Radar data and the LiDAR date in the LiDAR coordinate system. Then we can use the alignment of the Radar date and the LiDAR date in the bird-view fusion image to judge the accuracy of the extrinsic. In the fusion image, the white point means the LiDAR point cloud, while the green solid circle means Radar objects. The alignment of the Radar object and the LiDAR date in the bird-view fusion image shows the accuracy of the extrinsic. If most of the targets can be coincident it is satisfied, otherwise, it is not satisfied and need to re-calibrate
+* Methods: In order to verify the output extrinsic, we use the LiDAR in the system to be a medium. So we can get the extrinsic of the Radar relative to the LiDAR through the extrinsic of the Radar relative to the camera and the extrinsic of the camera relative to the LiDAR. Then we can draw a bird-view fusion image, which fuse the Radar data and the LiDAR data in the LiDAR coordinate system. Then we can use the alignment of the Radar data and the LiDAR data in the bird-view fusion image to judge the accuracy of the extrinsic. In the fusion image, the white point means the LiDAR point cloud, while the green solid circle means Radar objects. The alignment of the Radar object and the LiDAR data in the bird-view fusion image shows the accuracy of the extrinsic. If most of the targets can be coincident it is satisfied, otherwise, it is not satisfied and need to re-calibrate
 
 * Result Examples: As shown in the following figures, figure 6 shows a good calibration result which meet the precision requirements, and figure 7 is a phenomenon that does not meet the requirements of precision.
 
@@ -297,7 +299,7 @@ When the calibration is completed, the corresponding calibration result verifica
 
 * Attentions: 
 
-  * In order to get the fusion image of the Radar date and the LiDAR point cloud, the calibration process will automatically or manually call another projection tool (`radar_lidar_visualizer`). The projection tool loads the extrinsic file of the Radar-to-Camera and Camera-to-LiDAR. Therefore, before tool starts, we need to make sure these two extirnsics are well calibrated and exsist in the specific path.
+  * In order to get the fusion image of the Radar data and the LiDAR point cloud, the calibration process will automatically or manually call another projection tool (`radar_lidar_visualizer`). The projection tool loads the extrinsic file of the Radar-to-Camera and Camera-to-LiDAR. Therefore, before tool starts, we need to make sure these two extirnsics are well calibrated and exsist in the specific path.
 
   * Type the following command to start the `radar_lidar_visualizer` program: 
 	

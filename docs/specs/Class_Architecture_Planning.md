@@ -37,7 +37,7 @@ Routing defines “where I want to go” for the autonomous vehicle, and the mes
 
 ![](images/class_architecture_planning/image004.png)
 
-The messages regarding “what are surrounding me” is mostly defined in “perception_obstacles.proto” and “`traffic_light_detection.proto`”. “`perception_obstacles.proto`” defines the obstacles perceived by the perception module around the autonomous vehicle, while “**traffic_light_detection**” defines the perceived traffic light statuses (if any). In addition to the perceived obstacles, what important for the planning module are the predicted trajectories for each perceived dynamic obstacle. Therefore, the “prediction.proto” wrapps the perception_obstacle message with a predicted trajectory, as shown below:
+The messages regarding “what are surrounding me” is mostly defined in “perception_obstacles.proto” and “`traffic_light_detection.proto`”. “`perception_obstacles.proto`” defines the obstacles perceived by the perception module around the autonomous vehicle, while “**traffic_light_detection**” defines the perceived traffic light statuses (if any). In addition to the perceived obstacles, what important for the planning module are the predicted trajectories for each perceived dynamic obstacle. Therefore, the “prediction.proto” wraps the perception_obstacle message with a predicted trajectory, as shown below:
 
 ![](images/class_architecture_planning/image005.png)
 
@@ -51,7 +51,7 @@ The code is organized as follows:The planning code entrance is the planning.cc. 
 
 ![](images/class_architecture_planning/image006.png)
 
-The “**ReferenceLineInfo**” is a wrapper of the “**ReferenceLine**” class which represents a smoothed guideline for planning. **Frame** contains all the data dependencies including the peceived obstacles with their predicted trajectories, and status regarding the autonomous vehicle itself. **HD-Map** is leveraged as a library inside the planning module for ad-hoc fashioned map queries. The actual planning work is done by the “**EM-Planner**”, which is derived from the “**Planner**” class. While “**Em-Planner**” is the one actually used in our Apollo 2.0 release, the previously released “**RTK-Planner**” is also a derivative from the “**Planner**” class.
+The “**ReferenceLineInfo**” is a wrapper of the “**ReferenceLine**” class which represents a smoothed guideline for planning. **Frame** contains all the data dependencies including the perceived obstacles with their predicted trajectories, and status regarding the autonomous vehicle itself. **HD-Map** is leveraged as a library inside the planning module for ad-hoc fashioned map queries. The actual planning work is done by the “**EM-Planner**”, which is derived from the “**Planner**” class. While “**Em-Planner**” is the one actually used in our Apollo 2.0 release, the previously released “**RTK-Planner**” is also a derivative from the “**Planner**” class.
 
 ![](images/class_architecture_planning/image007.png)
 
@@ -59,7 +59,7 @@ Inside an planning cycle performed by the EM-Planner, we take an “iterative”
 
 ![](images/class_architecture_planning/image008.png)
 
-* Deciders: traffice decider, path decider and speed decider
+* Deciders: traffic decider, path decider and speed decider
 * Path Optimizers: DP/QP path optimizer
 * Speed Optimizers: DP/QP speed optimizer
 

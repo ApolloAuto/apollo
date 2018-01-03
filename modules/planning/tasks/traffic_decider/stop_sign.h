@@ -80,8 +80,8 @@ class StopSign : public TrafficRule {
   constexpr static char const* const db_key_stop_sign_watch_vehicle_prefix_ =
       "kStopSignWatchVehicle_";
 
-  PathOverlap* next_stop_sign_overlap_;
-  StopSignInfo* next_stop_sign_;
+  PathOverlap* next_stop_sign_overlap_ = nullptr;
+  StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
   std::vector<const LaneInfo*> associate_lanes_;
 };

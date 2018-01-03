@@ -28,6 +28,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -110,8 +111,10 @@ class ReferenceLineInfo {
    * Set if the vehicle can drive following this reference line
    * A planner need to set this value to true if the reference line is OK
    */
-  void SetDriable(bool drivable);
+  void SetDrivable(bool drivable);
   bool IsDrivable() const;
+
+  void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
   const hdmap::RouteSegments& Lanes() const;
   const std::list<hdmap::Id> TargetLaneId() const;
@@ -123,6 +126,13 @@ class ReferenceLineInfo {
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
   bool IsRightTurnPath() const;
+
+  double OffsetToOtherReferenceLine() const {
+    return offset_to_other_reference_line_;
+  }
+  void SetOffsetToOtherReferenceLine(const double offset) {
+    offset_to_other_reference_line_ = offset;
+  }
 
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
@@ -165,6 +175,8 @@ class ReferenceLineInfo {
   bool is_on_reference_line_ = false;
 
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
+
+  double offset_to_other_reference_line_ = 0.0;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

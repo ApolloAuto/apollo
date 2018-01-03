@@ -24,12 +24,12 @@
 
 #include "modules/common/apollo_app.h"
 
-#include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/handlers/image.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
+#include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
 /**
  * @namespace apollo::dreamview

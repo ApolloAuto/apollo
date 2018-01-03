@@ -283,7 +283,7 @@ DEFINE_double(stop_duration_for_stop_sign, 3,
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
 DEFINE_double(
-    turn_signal_distance, 60.96,
+    turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
 DEFINE_bool(right_turn_creep_forward, false,
             "Creep forward at right turn when the signal is red and traffic "

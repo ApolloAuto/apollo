@@ -40,8 +40,8 @@ class ClearZone : public TrafficRule {
 
  private:
   bool BuildClearZoneObstacle(const hdmap::PathOverlap& clear_zone_overlap);
-  ReferenceLineInfo* reference_line_info_;
-  Frame* frame_;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
+  Frame* frame_ = nullptr;
 };
 
 }  // namespace planning

@@ -36,9 +36,18 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
     : config_(config),
       obstacles_(obstacles),
       init_point_(init_point),
-      unit_s_(config_.total_path_length() / config_.matrix_dimension_s()),
-      unit_t_(config_.total_time() / config_.matrix_dimension_t()),
-      unit_v_(unit_s_ / unit_t_) {}
+      unit_t_(config_.total_time() / config_.matrix_dimension_t()) {
+  int index = 0;
+  for (auto& obstacle : obstacles) {
+    boundary_map_[obstacle->st_boundary().id()] = index++;
+  }
+  boundary_cost_.resize(obstacles_.size());
+  for (auto& vec : boundary_cost_) {
+    vec.resize(config_.matrix_dimension_t(), std::make_pair(-1.0, -1.0));
+  }
+  accel_cost_.fill(-1.0);
+  jerk_cost_.fill(-1.0);
+}
 
 double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
   const double s = st_graph_point.point().s();
@@ -61,14 +70,14 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
-    const std::string key =
-        boundary.id() + "#" + std::to_string(st_graph_point.index_t());
-    if (boundary_range_map_.find(key) == boundary_range_map_.end()) {
+    int boundary_index = boundary_map_[boundary.id()];
+    if (boundary_cost_[boundary_index][st_graph_point.index_t()].first < 0.0) {
       boundary.GetBoundarySRange(t, &s_upper, &s_lower);
-      boundary_range_map_[key] = std::make_pair(s_upper, s_lower);
+      boundary_cost_[boundary_index][st_graph_point.index_t()] =
+          std::make_pair(s_upper, s_lower);
     } else {
-      s_upper = boundary_range_map_[key].first;
-      s_lower = boundary_range_map_[key].second;
+      s_upper = boundary_cost_[boundary_index][st_graph_point.index_t()].first;
+      s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
       constexpr double kSafeTimeBuffer = 3.0;
@@ -121,8 +130,14 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
 double DpStCost::GetAccelCost(const double accel) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
-  const int accel_key = static_cast<int>(accel / kEpsilon + 0.5);
-  if (accel_cost_map_.find(accel_key) == accel_cost_map_.end()) {
+  constexpr size_t kShift = 100;
+  const size_t accel_key = static_cast<size_t>(accel / kEpsilon + 0.5 + kShift);
+  DCHECK_LT(accel_key, accel_cost_.size());
+  if (accel_key >= accel_cost_.size()) {
+    return kInf;
+  }
+
+  if (accel_cost_.at(accel_key) < 0.0) {
     const double accel_sq = accel * accel;
     double max_acc = config_.max_acceleration();
     double max_dec = config_.max_deceleration();
@@ -138,9 +153,9 @@ double DpStCost::GetAccelCost(const double accel) {
                 (1 + std::exp(1.0 * (accel - max_dec))) +
             accel_sq * accel_penalty * accel_penalty /
                 (1 + std::exp(-1.0 * (accel - max_acc)));
-    accel_cost_map_[accel_key] = cost;
+    accel_cost_.at(accel_key) = cost;
   } else {
-    cost = accel_cost_map_[accel_key];
+    cost = accel_cost_.at(accel_key);
   }
   return cost * unit_t_;
 }
@@ -163,17 +178,23 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 double DpStCost::JerkCost(const double jerk) {
   double cost = 0.0;
   constexpr double kEpsilon = 0.1;
-  const int jerk_key = static_cast<int>(jerk / kEpsilon + 0.5);
-  if (jerk_cost_map_.find(jerk_key) == jerk_cost_map_.end()) {
+  constexpr size_t kShift = 200;
+  const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5 + kShift);
+  DCHECK_LT(jerk_key, jerk_cost_.size());
+  if (jerk_key >= jerk_cost_.size()) {
+    return kInf;
+  }
+
+  if (jerk_cost_.at(jerk_key) < 0.0) {
     double jerk_sq = jerk * jerk;
     if (jerk > 0) {
       cost = config_.positive_jerk_coeff() * jerk_sq * unit_t_;
     } else {
       cost = config_.negative_jerk_coeff() * jerk_sq * unit_t_;
     }
-    jerk_cost_map_[jerk_key] = cost;
+    jerk_cost_.at(jerk_key) = cost;
   } else {
-    cost = jerk_cost_map_[jerk_key];
+    cost = jerk_cost_.at(jerk_key);
   }
 
   // TODO(All): normalize to unit_t_

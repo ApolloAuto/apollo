@@ -27,6 +27,11 @@ DEFINE_string(prediction_conf_file,
 DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
+DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
+DEFINE_double(
+    prediction_test_duration, -1.0,
+    "The runtime duration in test mode (in seconds). Negative value will not "
+    "restrict the runtime duration.");
 
 DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
@@ -83,14 +88,11 @@ DEFINE_string(evaluator_vehicle_rnn_file,
               "rnn model file for vehicle evaluator");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
-DEFINE_double(valid_position_diff_thred, 0.5,
+DEFINE_double(valid_position_diff_threshold, 0.5,
               "threshold of valid position difference");
-
-// evaluator
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
-
-DEFINE_bool(enable_adjust_velocity_heading, true,
+DEFINE_bool(enable_adjust_velocity_heading, false,
             "adjust velocity heading to lane heading");
 
 // Obstacle trajectory
@@ -118,9 +120,6 @@ DEFINE_double(time_lower_bound_to_lane_center, 1.0,
               "Lower bound of time to get to the lane center");
 DEFINE_double(sample_time_gap, 0.2,
               "Gap of time to sample time to get to the lane center");
-DEFINE_double(motion_weight_a, 1.2, "A parameter of motion weight function");
-DEFINE_double(motion_weight_b, 5.0, "A parameter of motion weight function");
-DEFINE_double(motion_weight_c, 1.2, "A parameter of motion weight function");
 DEFINE_double(cost_alpha, 100.0,
               "The coefficient of lateral acceleration in cost function");
 DEFINE_double(default_time_to_lane_center, 5.0,

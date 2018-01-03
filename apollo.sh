@@ -235,7 +235,9 @@ function release() {
        prediction planning routing calibration third_party_perception monitor data \
        drivers/delphi_esr \
        drivers/gnss \
-       drivers/conti_radar
+       drivers/conti_radar \
+       calibration/republish_msg \
+       calibration/lidar_ex_checker
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
