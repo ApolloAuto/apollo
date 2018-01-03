@@ -89,7 +89,7 @@ export default class Decision {
             this.mainDecision.rotation.set(Math.PI / 2,
                     mainStop.heading - Math.PI / 2, 0);
             const mainStopReason = _.attempt(() => mainStop.decision[0].stopReason);
-            if (!_.isError(mainStopReason)) {
+            if (!_.isError(mainStopReason) && mainStopReason) {
                 let reason = null;
                 for (reason in StopReasonMarkerMapping) {
                     this.mainDecision[reason].visible = false;
