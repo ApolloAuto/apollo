@@ -82,23 +82,6 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // Variables: includes u and sample time
 
-  /*
-  for (std::size_t i = 0; i < horizon_; ++i) {
-    variable_index = i * 3;
-
-    // steer command
-    x_l[variable_index] = -0.6;
-    x_u[variable_index] = 0.6;
-
-    // acceleration
-    x_l[variable_index + 1] = -1;
-    x_u[variable_index + 1] = 1;
-
-    // sampling time;
-    x_l[variable_index + 2] = 0.5;
-    x_u[variable_index + 2] = 2.5;
-  }
-*/
   // 1. state variables
   // start point pose
   std::size_t variable_index = 0;
@@ -290,6 +273,23 @@ bool WarmStartIPOPTInterface::get_starting_point(int n, bool init_x, double* x,
     x[i] = 0.5;
   }
 
+  return true;
+}
+
+bool WarmStartIPOPTInterface::eval_f(int n, const double* x, bool new_x,
+                                     double& obj_value) {
+  // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control input,
+  // then last horizon_ + 1 is sampling time
+  std::size_t start_index = (horizon_ + 1) * 4;
+  std::size_t time_start_index = start_index + horizon_ * 2;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    obj_value += 0.1 * x[start_index + i] * x[start_index + i] +
+                 x[start_index + i] * x[start_index + i + 1] +
+                 0.5 * x[time_start_index + i] +
+                 x[time_start_index + i] * x[time_start_index + i];
+  }
+  obj_value += 0.5 * x[time_start_index + horizon_] +
+               x[time_start_index + horizon_] * x[time_start_index + horizon_];
   return true;
 }
 
