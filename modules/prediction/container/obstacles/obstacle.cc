@@ -34,13 +34,13 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::ErrorCode;
-using apollo::common::Point3D;
-using apollo::common::math::KalmanFilter;
-using apollo::common::util::FindOrDie;
-using apollo::common::util::FindOrNull;
-using apollo::hdmap::LaneInfo;
-using apollo::perception::PerceptionObstacle;
+using ::apollo::common::ErrorCode;
+using ::apollo::common::Point3D;
+using ::apollo::common::math::KalmanFilter;
+using ::apollo::common::util::FindOrDie;
+using ::apollo::common::util::FindOrNull;
+using ::apollo::hdmap::LaneInfo;
+using ::apollo::perception::PerceptionObstacle;
 
 namespace {
 
@@ -358,11 +358,11 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         feature->position().x() - feature_history_.front().position().x();
     double diff_y =
         feature->position().y() - feature_history_.front().position().y();
-    double obstacle_size = std::max(perception_obstacle.length(),
-                                    perception_obstacle.width());
-    double shift_thred = std::max(
-        obstacle_size * FLAGS_valid_position_diff_rate_threshold,
-        FLAGS_valid_position_diff_threshold);
+    double obstacle_size =
+        std::max(perception_obstacle.length(), perception_obstacle.width());
+    double shift_thred =
+        std::max(obstacle_size * FLAGS_valid_position_diff_rate_threshold,
+                 FLAGS_valid_position_diff_threshold);
     if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred) {
       double shift_heading = std::atan2(diff_y, diff_x);
       double angle_diff = ::apollo::common::math::NormalizeAngle(
@@ -878,6 +878,16 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     if (nearby_lane == nullptr) {
       continue;
     }
+
+    // Ignore bike and sidewalk lanes for vehicles
+    if (type_ == PerceptionObstacle::VEHICLE &&
+        nearby_lane->lane().has_type() &&
+        (nearby_lane->lane().type() == ::apollo::hdmap::Lane::BIKING ||
+         nearby_lane->lane().type() == ::apollo::hdmap::Lane::SIDEWALK)) {
+      ADEBUG << "Obstacle [" << id_ << "] ignores disqualified lanes.";
+      continue;
+    }
+
     double s = -1.0;
     double l = 0.0;
     map->GetProjection(point, nearby_lane, &s, &l);
