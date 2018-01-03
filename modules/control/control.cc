@@ -40,7 +40,9 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const { return FLAGS_control_node_name; }
+std::string Control::Name() const {
+  return FLAGS_control_node_name;
+}
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();
@@ -141,8 +143,19 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     Status status_ts = CheckTimestamp();
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
-      estop_ = true;
+      // estop_ = true;
       status = status_ts;
+      if (chassis_.driving_mode() !=
+          apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+        // give engage_advice based on error_code and canbus feedback
+        control_command->mutable_engage_advice()->set_advice(
+            apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+        control_command->mutable_engage_advice()->set_reason(
+            "Control input message timeout!");
+      } else {
+        control_command->mutable_engage_advice()->set_advice(
+            apollo::common::EngageAdvice::READY_TO_ENGAGE);
+      }
     }
   }
 
