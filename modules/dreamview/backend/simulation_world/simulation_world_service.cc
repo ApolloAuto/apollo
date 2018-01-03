@@ -492,8 +492,12 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     traj_pt->set_position_y(traj_pt->position_y() + map_service_->GetYOffset());
   }
 
-  // Update engage advice
-  world_.mutable_engage_advice()->CopyFrom(trajectory.engage_advice());
+  // Update engage advice.
+  // This is a temporary solution, the advice will come from monitor later
+  if (trajectory.has_engage_advice()) {
+    world_.set_engage_advice(
+        EngageAdvice_Advice_Name(trajectory.engage_advice().advice()));
+  }
 }
 
 void SimulationWorldService::UpdateMainDecision(
