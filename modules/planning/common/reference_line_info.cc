@@ -574,27 +574,13 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
       }
       engage_advice->set_reason("Vehicle heading is not aligned");
     } else {
-      if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE ||
-          prev_advice->advice() == EngageAdvice::UNKNOWN) {
-        engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
-      } else if (prev_advice->advice() == EngageAdvice::READY_TO_ENGAGE) {
         if (vehicle_state_.driving_mode() !=
             Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
           engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
         } else {
           engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
         }
-      } else if (prev_advice->advice() == EngageAdvice::PREPARE_DISENGAGE) {
-        if (vehicle_state_.driving_mode() !=
-            Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
-          engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
-        } else {
-          engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
-        }
-      } else if (prev_advice->advice() == EngageAdvice::KEEP_ENGAGED) {
-        engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
       }
-    }
   }
   *prev_advice = *engage_advice;
 }
