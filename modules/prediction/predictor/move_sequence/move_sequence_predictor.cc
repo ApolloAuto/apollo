@@ -39,12 +39,12 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
-using apollo::common::Point3D;
-using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::KalmanFilter;
-using apollo::hdmap::LaneInfo;
+using ::apollo::common::PathPoint;
+using ::apollo::common::Point3D;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::adapter::AdapterConfig;
+using ::apollo::common::math::KalmanFilter;
+using ::apollo::hdmap::LaneInfo;
 
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
