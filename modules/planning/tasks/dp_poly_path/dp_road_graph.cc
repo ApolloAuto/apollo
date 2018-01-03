@@ -167,6 +167,11 @@ bool DPRoadGraph::GenerateMinCostPath(
         QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
+
+        if (!IsValidCurve(curve)) {
+          continue;
+        }
+
         const auto cost =
             trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s(),
                                       level, path_waypoints.size()) +
@@ -182,6 +187,9 @@ bool DPRoadGraph::GenerateMinCostPath(
           QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
                                          cur_point.l(), 0.0, 0.0,
                                          cur_point.s() - init_sl_point_.s());
+          if (!IsValidCurve(curve)) {
+            continue;
+          }
           const auto cost = trajectory_cost.Calculate(curve, init_sl_point_.s(),
                                                       cur_point.s(), level,
                                                       path_waypoints.size());
@@ -204,6 +212,10 @@ bool DPRoadGraph::GenerateMinCostPath(
     min_cost_node = min_cost_node->min_cost_prev_node;
     min_cost_path->push_back(*min_cost_node);
   }
+  if (min_cost_node != &graph_nodes.front().front()) {
+    return false;
+  }
+
   std::reverse(min_cost_path->begin(), min_cost_path->end());
 
   for (const auto &node : *min_cost_path) {
@@ -386,6 +398,17 @@ bool DPRoadGraph::CalculateFrenetPoint(
           theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
   frenet_frame_point->set_dl(dl);
   frenet_frame_point->set_ddl(ddl);
+  return true;
+}
+
+bool DPRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
+  constexpr double kMaxLateralDistance = 20.0;
+  for (double s = 0.0; s < curve.ParamLength(); s += 2.0) {
+    const double l = curve.Evaluate(0, s);
+    if (std::fabs(l) > kMaxLateralDistance) {
+      return false;
+    }
+  }
   return true;
 }
 
