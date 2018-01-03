@@ -35,7 +35,7 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-WarmStartProblem::WarmStartProblem(int horizon, float ts,
+WarmStartProblem::WarmStartProblem(std::size_t horizon, float ts,
                                    float wheelbase_length, Eigen::MatrixXd x0,
                                    Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds)
     : horizon_(horizon), ts_(ts), x0_(x0), xF_(xF), XYbounds_(XYbounds) {}
@@ -66,8 +66,9 @@ bool WarmStartProblem::Solve() const {
   int num_of_constraints = m1 + m2 + m3 + m4 + m5;
 
   // TODO(QiL) : evaluate whether need to new it everytime
-  WarmUpIPOPTInterface* ptop = new WarmUpIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon_, ts_, x0_, xf_, XYbounds_);
+  WarmUpIPOPTInterface* ptop =
+      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints, horizon_,
+                               ts_, wheelbase_length_, x0_, xF_, XYbounds_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

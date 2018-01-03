@@ -33,9 +33,9 @@ namespace planning {
 
 class WarmStartProblem {
  public:
-  explicit WarmStartProblem(int horizon, float ts, float wheelbase_length,
-                            Eigen::MatrixXd x0, Eigen::MatrixXd xF,
-                            Eigen::MatrixXd XYbounds);
+  explicit WarmStartProblem(std::size_t horizon, float ts,
+                            float wheelbase_length, Eigen::MatrixXd x0,
+                            Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds);
 
   virtual ~WarmStartProblem() = default;
 
@@ -43,7 +43,7 @@ class WarmStartProblem {
 
  private:
   // time horizon
-  int horizon_;
+  std::size_t horizon_;
 
   // time interval
   float ts_;

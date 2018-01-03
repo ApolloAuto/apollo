@@ -35,7 +35,7 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-DistanceApproachProblem::DistanceApproachProblem(int horizon, float ts,
+DistanceApproachProblem::DistanceApproachProblem(std::size_t horizon, float ts,
                                                  float wheelbase_length,
                                                  Eigen::MatrixXd x0,
                                                  Eigen::MatrixXd xF,
@@ -73,7 +73,7 @@ bool DistanceApproachProblem::Solve() const {
 
   // TODO(QiL) : evaluate whether need to new it everytime
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon_);
+      num_of_variables, num_of_constraints, horizon_, x0_, xF_, XYbounds_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
