@@ -32,12 +32,16 @@ message HardwareStatus {
     NOT_PRESENT = 2;
     // HW error, can't be used.
     ERR = 3;
+    // GPS positioning is unstable.
+    GPS_UNSTABLE_WARNING = 4;
+    GPS_UNSTABLE_ERROR = 5;
 
     UNDEF = -1;
   }
   optional Status status = 3 [default = UNDEF];
+  optional double gps_unstable_start_time = 4;
 
-  optional TopicStatus topic_status = 4;
+  optional TopicStatus topic_status = 5;
 }
 
 message ModuleStatus {
