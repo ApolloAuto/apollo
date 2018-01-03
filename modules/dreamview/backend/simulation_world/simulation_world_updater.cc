@@ -119,6 +119,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           to_send = requestPlanning ? simulation_world_with_planning_json_
                                     : simulation_world_json_;
         }
+        if (FLAGS_enable_update_size_check && !requestPlanning &&
+            to_send.size() > FLAGS_max_update_size) {
+          AWARN << "update size is too big:" << to_send.size();
+          return;
+        }
         websocket_->SendData(conn, to_send, true);
       });
 
