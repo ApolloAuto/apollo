@@ -16,6 +16,8 @@
 
 #include "modules/monitor/hardware/gps/gps_monitor.h"
 
+#include <algorithm>
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/monitor/common/monitor_manager.h"
@@ -23,6 +25,13 @@
 DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
 DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
+
+DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
+              "Acceptable Gnss BestPose standard deviation on latitude, "
+              "longitude and height.");
+
+DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 5,
+              "Acceptable Gnss BestPose unstable duration.");
 
 namespace apollo {
 namespace monitor {
@@ -67,17 +76,50 @@ void GpsMonitor::RunOnce(const double current_time) {
     case InsStatus::CONVERGING:
       status->set_status(HardwareStatus::NOT_READY);
       status->set_msg("INS ALIGNING");
-      break;
+      return;
     case InsStatus::GOOD:
-      status->set_status(HardwareStatus::OK);
-      status->set_msg("OK");
       break;
     case InsStatus::INVALID:
     default:
       status->set_status(HardwareStatus::ERR);
       status->set_msg("INS status invalid.");
-      break;
+      return;
   }
+
+  // Check Gnss BestPose.
+  auto *best_pose_adapter = AdapterManager::GetGnssBestPose();
+  best_pose_adapter->Observe();
+  if (best_pose_adapter->Empty()) {
+    status->set_status(HardwareStatus::ERR);
+    status->set_msg("No Gnss BestPose message.");
+    return;
+  }
+  const auto &best_pose = best_pose_adapter->GetLatestObserved();
+  const double largest_std_dev = std::max({best_pose.latitude_std_dev(),
+                                           best_pose.longitude_std_dev(),
+                                           best_pose.height_std_dev()});
+  if (largest_std_dev > FLAGS_acceptable_gnss_best_pose_std_dev) {
+    status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
+    status->set_msg("GPS BestPose is unstable.");
+    if (status->has_gps_unstable_start_time()) {
+      const double duration = current_time - status->gps_unstable_start_time();
+      if (duration > FLAGS_acceptable_gnss_best_pose_unstable_duration) {
+        status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
+        MonitorManager::LogBuffer().ERROR("GPS is very unstable!");
+      }
+    } else {
+      status->set_gps_unstable_start_time(current_time);
+      MonitorManager::LogBuffer().WARN("GPS becomes unstable!");
+    }
+    return;
+  } else if (status->has_gps_unstable_start_time()) {
+    status->clear_gps_unstable_start_time();
+    MonitorManager::LogBuffer().INFO("GPS stability recovered.");
+  }
+
+  // All check passed.
+  status->set_status(HardwareStatus::OK);
+  status->set_msg("OK");
 }
 
 }  // namespace monitor
