@@ -472,6 +472,7 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
 
+  // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
 
   bool collecting_started = false;
@@ -490,6 +491,9 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     traj_pt->set_position_x(traj_pt->position_x() + map_service_->GetXOffset());
     traj_pt->set_position_y(traj_pt->position_y() + map_service_->GetYOffset());
   }
+
+  // Update engage advice
+  world_.mutable_engage_advice()->CopyFrom(trajectory.engage_advice());
 }
 
 void SimulationWorldService::UpdateMainDecision(

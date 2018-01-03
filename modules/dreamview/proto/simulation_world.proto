@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common/monitor_log/proto/monitor_log.proto";
+import "modules/common/proto/drive_state.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
 
@@ -195,4 +196,7 @@ message SimulationWorld {
 
   // Module latency
   optional Latency latency = 15;
+
+  // Engage advice from planning result
+  optional apollo.common.EngageAdvice engage_advice = 16;
 }
