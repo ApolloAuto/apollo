@@ -33,9 +33,9 @@ namespace planning {
 class WarmUpIPOPTInterface : public Ipopt::TNLP {
  public:
   explicit WarmUpIPOPTInterface(int num_of_variables, int num_of_constraints,
-                                int horizon, float ts, float wheelbase_length,
-                                Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-                                Eigen::MatrixXd XYbounds);
+                                std::size_t horizon, float ts,
+                                float wheelbase_length, Eigen::MatrixXd x0,
+                                Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds);
 
   virtual ~WarmUpIPOPTInterface() = default;
 
@@ -94,7 +94,7 @@ class WarmUpIPOPTInterface : public Ipopt::TNLP {
  private:
   int num_of_variables_;
   int num_of_constraints_;
-  int horizon_;
+  std::size_t horizon_;
   float ts_;
   float wheelbase_length_;
   Eigen::MatrixXd x0_;

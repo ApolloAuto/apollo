@@ -32,12 +32,10 @@ namespace planning {
 
 constexpr std::size_t N = 80;
 
-WarmUpIPOPTInterface::WarmUpIPOPTInterface(int num_of_variables,
-                                           int num_of_constraints, int horizon,
-                                           float ts, float wheelbase_length,
-                                           Eigen::MatrixXd x0,
-                                           Eigen::MatrixXd xf,
-                                           Eigen::MatrixXd XYbounds)
+WarmUpIPOPTInterface::WarmUpIPOPTInterface(
+    int num_of_variables, int num_of_constraints, std::size_t horizon, float ts,
+    float wheelbase_length, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
+    Eigen::MatrixXd XYbounds)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -83,7 +81,7 @@ bool WarmUpIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // Variables: includes u and sample time
 
-  std::size variable_index = 0;
+  std::size_t variable_index = 0;
   for (std::size_t i = 0; i < horizon_; ++i) {
     variable_index = i * 3;
 
@@ -107,19 +105,20 @@ bool WarmUpIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   // start point pose
   std::size_t constraint_index = 0;
   for (std::size_t i = 0; i < 4; ++i) {
-    g_l[i] = g_u[i] = x0_[i];
+    g_l[i] = x0_(i, 0);
+    g_u[i] = x0_(i, 0);
   }
   constraint_index += 4;
 
   // During horizons
   for (std::size_t i = 1; i < horizon_ - 1; ++i) {
     // x
-    g_l[constraint_index] = XYbounds_[0];
-    g_u[constraint_index] = XYbounds_[1];
+    g_l[constraint_index] = XYbounds_(0, 0);
+    g_u[constraint_index] = XYbounds_(1, 0);
 
     // y
-    g_l[constraint_index + 1] = XYbounds_[2];
-    g_u[constraint_index + 1] = XYbounds_[3];
+    g_l[constraint_index + 1] = XYbounds_(2, 0);
+    g_u[constraint_index + 1] = XYbounds_(3, 0);
 
     // phi
     // TODO(QiL): Change this to configs
@@ -136,7 +135,8 @@ bool WarmUpIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // end point pose
   for (std::size_t i = 0; i < 4; ++i) {
-    g_l[constraint_index + i] = g_u[constraint_index + i] = xf_[i];
+    g_l[constraint_index + i] = xf_(i, 0);
+    g_u[constraint_index + i] = xf_(i, 0);
   }
   constraint_index += 4;
   ADEBUG << "constraint_index after adding state constraints : "
