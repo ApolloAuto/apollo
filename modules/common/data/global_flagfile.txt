@@ -5,6 +5,6 @@
 # 3. To override the flag values, you must set it after this file, as all Flags
 #    are evaluated strictly in order.
 
---vehicle_config_path=modules/common/data/mkz_config.pb.txt
+--vehicle_config_path=/apollo/modules/common/data/mkz_config.pb.txt
 
---map_dir=modules/map/data/sunnyvale_loop
+--map_dir=/apollo/modules/map/data/sunnyvale_big_loop
