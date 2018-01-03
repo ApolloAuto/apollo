@@ -51,9 +51,6 @@ TrajectoryCost::TrajectoryCost(
       vehicle_param_(vehicle_param),
       heuristic_speed_data_(heuristic_speed_data),
       init_sl_point_(init_sl_point) {
-  path_l_cost_.fill(-1.0);
-  obstacle_safety_cost_.fill(-1.0);
-
   const double total_time =
       std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
 
@@ -140,21 +137,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
       return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
     };
 
-    constexpr double kResolution = 0.1;
-    constexpr size_t kShift = 100;
-    const size_t index = static_cast<size_t>(l / kResolution + 0.5 + kShift);
-    if (index >= path_l_cost_.size()) {
-      return ComparableCost(false, false, 0.0,
-                            std::numeric_limits<double>::infinity());
-    }
-    if (path_l_cost_[index] < 0.0) {
-      const double l_cost =
-          l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
-      path_cost += l_cost;
-      path_l_cost_[index] = l_cost;
-    } else {
-      path_cost += path_l_cost_[index];
-    }
+    path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
 
     double left_width = 0.0;
     double right_width = 0.0;
@@ -273,23 +256,9 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
   const double delta_l = std::fabs(
       adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
 
-  constexpr double kResolution = 0.1;
-  constexpr size_t kShift = 100;
-  const size_t index =
-      static_cast<size_t>(delta_l / kResolution + 0.5 + kShift);
-  if (index >= obstacle_safety_cost_.size()) {
-    return ComparableCost(false, false, std::numeric_limits<double>::infinity(),
-                          0.0);
-  }
-  if (obstacle_safety_cost_[index] < 0.0) {
-    const double safety_cost =
-        config_.obstacle_collision_cost() *
-        softmax(delta_l, config_.obstacle_collision_distance());
-    obstacle_cost.safety_cost += safety_cost;
-    obstacle_safety_cost_[index] = safety_cost;
-  } else {
-    obstacle_cost.safety_cost += obstacle_safety_cost_[index];
-  }
+  obstacle_cost.safety_cost +=
+      config_.obstacle_collision_cost() *
+      softmax(delta_l, config_.obstacle_collision_distance());
 
   const double delta_s = std::fabs(
       adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);

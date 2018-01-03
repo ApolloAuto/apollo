@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "boost/thread/thread.hpp"
+
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -74,7 +76,14 @@ bool DPRoadGraph::FindPathTunnel(
   }
 
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
+  bool found_min_path = false;
+  if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+    found_min_path =
+        GenerateMinCostPathWithMultiThread(obstacles, &min_cost_path);
+  } else {
+    found_min_path = GenerateMinCostPath(obstacles, &min_cost_path);
+  }
+  if (!found_min_path) {
     AERROR << "Fail to generate graph!";
     return false;
   }
@@ -156,6 +165,7 @@ bool DPRoadGraph::GenerateMinCostPath(
     for (const auto &cur_point : level_points) {
       graph_nodes[level].emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes[level].back();
+
       for (const auto &prev_dp_node : prev_dp_nodes) {
         const auto &prev_sl_point = prev_dp_node.sl_point;
         double init_dl = 0.0;
@@ -410,6 +420,137 @@ bool DPRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
     }
   }
   return true;
+}
+
+bool DPRoadGraph::GenerateMinCostPathWithMultiThread(
+    const std::vector<const PathObstacle *> &obstacles,
+    std::vector<DPRoadGraphNode> *min_cost_path) {
+  CHECK(min_cost_path != nullptr);
+
+  std::vector<std::vector<common::SLPoint>> path_waypoints;
+  if (!SamplePathWaypoints(init_point_, &path_waypoints) ||
+      path_waypoints.size() < 1) {
+    AERROR << "Fail to sample path waypoints! reference_line_length = "
+           << reference_line_.Length();
+    return false;
+  }
+  path_waypoints.insert(path_waypoints.begin(),
+                        std::vector<common::SLPoint>{init_sl_point_});
+
+  for (uint32_t i = 0; i < path_waypoints.size(); ++i) {
+    const auto &level_waypoints = path_waypoints.at(i);
+    for (uint32_t j = 0; j < level_waypoints.size(); ++j) {
+      ADEBUG << "level[" << i << "], "
+             << level_waypoints.at(j).ShortDebugString();
+    }
+  }
+
+  const auto &vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+
+  TrajectoryCost trajectory_cost(
+      config_, reference_line_, reference_line_info_.IsChangeLanePath(),
+      obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
+
+  std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
+  if (graph_nodes.size() < 2) {
+    AERROR << "Too few graph_nodes.";
+    return false;
+  }
+
+  std::unordered_map<std::string, ComparableCost> curve_cost_map;
+  std::unordered_map<std::string, QuinticPolynomialCurve1d> curve_map;
+
+  graph_nodes[0].emplace_back(init_sl_point_, nullptr, ComparableCost());
+
+  for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
+    const auto &prev_dp_nodes = graph_nodes[level - 1];
+    const auto &level_points = path_waypoints[level];
+    for (size_t i = 0; i < level_points.size(); ++i) {
+      const auto &cur_point = level_points[i];
+      graph_nodes[level].emplace_back(cur_point, nullptr);
+
+      boost::thread_group thread_group;
+      for (size_t j = 0; j < prev_dp_nodes.size(); ++j) {
+        const auto &prev_dp_node = prev_dp_nodes[j];
+        const auto &prev_sl_point = prev_dp_node.sl_point;
+        double init_dl = 0.0;
+        double init_ddl = 0.0;
+        if (level == 1) {
+          init_dl = init_frenet_frame_point_.dl();
+          init_ddl = init_frenet_frame_point_.ddl();
+        }
+        QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
+                                       cur_point.l(), 0.0, 0.0,
+                                       cur_point.s() - prev_sl_point.s());
+        auto key = std::to_string(level) + "#" + std::to_string(i) + "#" +
+                   std::to_string(j);
+        curve_map[key] = curve;
+
+        curve_cost_map[key] = ComparableCost();
+        thread_group.create_thread(
+            boost::bind(&DPRoadGraph::GetCurveCost, this, trajectory_cost,
+                        curve, prev_sl_point.s(), cur_point.s(), level,
+                        path_waypoints.size(), &curve_cost_map[key]));
+      }
+      thread_group.join_all();
+    }
+  }
+
+  for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
+    const auto &prev_dp_nodes = graph_nodes[level - 1];
+
+    const auto &level_points = path_waypoints[level];
+    for (size_t i = 0; i < level_points.size(); ++i) {
+      auto &cur_node = graph_nodes[level][i];
+
+      for (size_t j = 0; j < prev_dp_nodes.size(); ++j) {
+        const auto &prev_dp_node = prev_dp_nodes[j];
+        auto key = std::to_string(level) + "#" + std::to_string(i) + "#" +
+                   std::to_string(j);
+
+        const auto cost = curve_cost_map[key] + prev_dp_node.min_cost;
+        cur_node.UpdateCost(&prev_dp_node, curve_map[key], cost);
+      }
+    }
+  }
+
+  // find best path
+  DPRoadGraphNode fake_head;
+  for (const auto &cur_dp_node : graph_nodes.back()) {
+    fake_head.UpdateCost(&cur_dp_node, cur_dp_node.min_cost_curve,
+                         cur_dp_node.min_cost);
+  }
+
+  const auto *min_cost_node = &fake_head;
+  while (min_cost_node->min_cost_prev_node) {
+    min_cost_node = min_cost_node->min_cost_prev_node;
+    min_cost_path->push_back(*min_cost_node);
+  }
+  if (min_cost_node != &graph_nodes.front().front()) {
+    return false;
+  }
+
+  std::reverse(min_cost_path->begin(), min_cost_path->end());
+
+  for (const auto &node : *min_cost_path) {
+    ADEBUG << "min_cost_path: " << node.sl_point.ShortDebugString();
+    planning_debug_->mutable_planning_data()
+        ->mutable_dp_poly_graph()
+        ->add_min_cost_point()
+        ->CopyFrom(node.sl_point);
+  }
+  return true;
+}
+
+void DPRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
+                               const QuinticPolynomialCurve1d &curve,
+                               const double start_s, const double end_s,
+                               const uint32_t curr_level,
+                               const uint32_t total_level,
+                               ComparableCost *cost) {
+  *cost =
+      trajectory_cost.Calculate(curve, start_s, end_s, curr_level, total_level);
 }
 
 }  // namespace planning
