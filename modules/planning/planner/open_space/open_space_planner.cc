@@ -97,7 +97,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
 
   // TODO(QiL): Step 5 : Add absolute constraints (States and Controls) from
   // perception/map
-  //[x_lower, x_upper, - y_lower, y_upper]
+  // [x_lower, x_upper, - y_lower, y_upper]
   Eigen::MatrixXd XYbounds(4, 1);
   XYbounds << -15, 15, 1, 10;
 
@@ -130,8 +130,9 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   return Status::OK();
 }
 
-Status ObsHRep(int& nOb, Eigen::MatrixXd& vOb, Eigen::MatrixXd& lOb,
-               Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
+Status ObsHRep(const int& nOb, const Eigen::MatrixXd& vOb,
+               const Eigen::MatrixXd& lOb, Eigen::MatrixXd* A_all,
+               Eigen::MatrixXd* b_all) {
   // TODO(QiL) : Code replacement : find alternative ways for H presentation
   // caculation
   CHECK(nOb == lOb.rows()) << "No. of obstacles size mismatch, nOb : " << nOb
