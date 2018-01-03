@@ -358,12 +358,18 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         feature->position().x() - feature_history_.front().position().x();
     double diff_y =
         feature->position().y() - feature_history_.front().position().y();
+    double prev_obstacle_size = std::max(feature_history_.front().length(),
+                                         feature_history_.front().width());
     double obstacle_size =
         std::max(perception_obstacle.length(), perception_obstacle.width());
+    double size_diff = std::abs(obstacle_size - prev_obstacle_size);
     double shift_thred =
         std::max(obstacle_size * FLAGS_valid_position_diff_rate_threshold,
                  FLAGS_valid_position_diff_threshold);
-    if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred) {
+    double size_diff_thred =
+        FLAGS_split_rate * std::min(obstacle_size, prev_obstacle_size);
+    if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred &&
+        size_diff < size_diff_thred) {
       double shift_heading = std::atan2(diff_y, diff_x);
       double angle_diff = ::apollo::common::math::NormalizeAngle(
           shift_heading - velocity_heading);
