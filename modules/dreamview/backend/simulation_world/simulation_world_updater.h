@@ -135,6 +135,8 @@ class SimulationWorldUpdater {
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
+
+  bool enable_pnc_monitor_ = false;
 };
 
 }  // namespace dreamview
