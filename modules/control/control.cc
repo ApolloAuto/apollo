@@ -135,9 +135,17 @@ void Control::OnMonitor(
 Status Control::ProduceControlCommand(ControlCommand *control_command) {
   Status status = CheckInput();
   // check data
-  if (!status.ok()) {
+
+  if (status.ok()) {
+    control_command->mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  } else if (!status.ok()) {
     AERROR_EVERY(100) << "Control input data failed: "
                       << status.error_message();
+    control_command->mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    control_command->mutable_engage_advice()->set_reason(
+        status.error_message());
     estop_ = true;
   } else {
     Status status_ts = CheckTimestamp();
@@ -147,14 +155,10 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
       status = status_ts;
       if (chassis_.driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
-        // give engage_advice based on error_code and canbus feedback
         control_command->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
         control_command->mutable_engage_advice()->set_reason(
-            "Control input message timeout!");
-      } else {
-        control_command->mutable_engage_advice()->set_advice(
-            apollo::common::EngageAdvice::READY_TO_ENGAGE);
+            status.error_message());
       }
     }
   }
