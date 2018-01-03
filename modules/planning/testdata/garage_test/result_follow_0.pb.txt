@@ -1745,5 +1745,5 @@ lane_id {
   id: "1_-1"
 }
 engage_advice {
-  advice: READY_TO_ENGAGE
+  advice: KEEP_ENGAGED
 }
