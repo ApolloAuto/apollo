@@ -147,9 +147,6 @@ class TrajectoryCost {
   std::vector<double> obstacle_probabilities_;
 
   std::vector<SLBoundary> static_obstacle_sl_boundaries_;
-
-  std::array<double, 200> path_l_cost_;
-  std::array<double, 200> obstacle_safety_cost_;
 };
 
 }  // namespace planning

@@ -328,3 +328,7 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
+
+DEFINE_bool(
+    enable_multi_thread_in_dp_poly_path, false,
+    "Enable multiple thread to calculation curve cost in dp_poly_graph.");
