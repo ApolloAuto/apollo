@@ -30,18 +30,15 @@
 namespace apollo {
 namespace planning {
 
-class WarmUpIPOPTInterface : public Ipopt::TNLP {
+class WarmStartIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit WarmUpIPOPTInterface(int num_of_variables, int num_of_constraints,
-                                std::size_t horizon, float ts,
-                                float wheelbase_length, Eigen::MatrixXd x0,
-                                Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds);
+  explicit WarmStartIPOPTInterface(int num_of_variables, int num_of_constraints,
+                                   std::size_t horizon, float ts,
+                                   float wheelbase_length, Eigen::MatrixXd x0,
+                                   Eigen::MatrixXd xf,
+                                   Eigen::MatrixXd XYbounds);
 
-  virtual ~WarmUpIPOPTInterface() = default;
-
-  void set_start_point();
-
-  void set_end_point();
+  virtual ~WarmStartIPOPTInterface() = default;
 
   void get_optimization_results() const;
 
