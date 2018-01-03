@@ -46,6 +46,7 @@ export default class RosWebSocketEndpoint {
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
                     STORE.trafficSignal.update(message.world);
+                    STORE.hmi.update(message.world);
                     if (STORE.options.showPNCMonitor) {
                         STORE.planning.update(message.world, message.planningData);
                     }
