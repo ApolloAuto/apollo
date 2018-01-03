@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -142,6 +143,10 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     constexpr double kResolution = 0.1;
     constexpr size_t kShift = 100;
     const size_t index = static_cast<size_t>(l / kResolution + 0.5 + kShift);
+    if (index >= path_l_cost_.size()) {
+      return ComparableCost(false, false, 0.0,
+                            std::numeric_limits<double>::infinity());
+    }
     if (path_l_cost_[index] < 0.0) {
       const double l_cost =
           l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
@@ -272,6 +277,10 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
   constexpr size_t kShift = 100;
   const size_t index =
       static_cast<size_t>(delta_l / kResolution + 0.5 + kShift);
+  if (index >= obstacle_safety_cost_.size()) {
+    return ComparableCost(false, false, std::numeric_limits<double>::infinity(),
+                          0.0);
+  }
   if (obstacle_safety_cost_[index] < 0.0) {
     const double safety_cost =
         config_.obstacle_collision_cost() *
