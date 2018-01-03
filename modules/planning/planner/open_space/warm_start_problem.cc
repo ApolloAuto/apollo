@@ -66,9 +66,9 @@ bool WarmStartProblem::Solve() const {
   int num_of_constraints = m1 + m2 + m3 + m4 + m5;
 
   // TODO(QiL) : evaluate whether need to new it everytime
-  WarmUpIPOPTInterface* ptop =
-      new WarmUpIPOPTInterface(num_of_variables, num_of_constraints, horizon_,
-                               ts_, wheelbase_length_, x0_, xF_, XYbounds_);
+  WarmStartIPOPTInterface* ptop = new WarmStartIPOPTInterface(
+      num_of_variables, num_of_constraints, horizon_, ts_, wheelbase_length_,
+      x0_, xF_, XYbounds_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
