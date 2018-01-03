@@ -23,4 +23,22 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-rosparam set use_sim_time true
+function set() {
+   rosparam set use_sim_time true
+}
+
+function unset() {
+   rosparam set use_sim_time false
+}
+
+case $1 in 
+    true)
+        set
+        ;;
+    false)
+        unset
+        ;;
+    *)
+        set
+        ;;
+esac
