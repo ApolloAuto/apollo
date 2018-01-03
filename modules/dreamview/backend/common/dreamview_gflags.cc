@@ -18,6 +18,12 @@
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
+DEFINE_bool(dreamview_test_mode, false, "Run dreamview in test mode");
+
+DEFINE_double(dreamview_test_duration, -1.0,
+              "Dreamview test duration. Negative value will not restrict the "
+              "testing time");
+
 DEFINE_string(dreamview_adapter_config_filename,
               "modules/dreamview/conf/adapter.conf", "The adapter config file");
 
