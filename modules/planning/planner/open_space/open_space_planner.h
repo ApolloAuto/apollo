@@ -17,6 +17,7 @@
 #ifndef MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -65,8 +66,9 @@ class OpenSpacePlanner : public Planner {
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
 
-  apollo::common::Status ObsHRep(int& nOb, Eigen::MatrixXd& vOb,
-                                 Eigen::MatrixXd lOb, Eigen::MatrixXd* A_all,
+  apollo::common::Status ObsHRep(const int& nOb, const Eigen::MatrixXd& vOb,
+                                 const Eigen::MatrixXd& lOb,
+                                 Eigen::MatrixXd* A_all,
                                  Eigen::MatrixXd* b_all);
 
  private:
