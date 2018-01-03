@@ -5,6 +5,7 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/control/proto/pad_msg.proto";
+import "modules/common/proto/drive_state.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
@@ -17,6 +18,7 @@ message LatencyStats {
   repeated double controller_time_ms = 2;
 }
 
+// next id : 27
 message ControlCommand {
   optional apollo.common.Header header = 1;
   // target throttle in percentage [0, 100]
@@ -53,6 +55,7 @@ message ControlCommand {
   optional apollo.common.VehicleSignal signal = 23;
   optional LatencyStats latency_stats = 24;
   optional PadMessage pad_msg = 25;
+  optional apollo.common.EngageAdvice engage_advice = 26;
 
   // deprecated fields
   optional bool left_turn = 13 [deprecated = true];
