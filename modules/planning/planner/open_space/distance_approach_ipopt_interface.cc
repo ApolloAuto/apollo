@@ -32,7 +32,7 @@ namespace planning {
 constexpr std::size_t N = 80;
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
-    int horizon, float ts, float wheelbase_length, Eigen::MatrixXd x0,
+    std::size_t horizon, float ts, float wheelbase_length, Eigen::MatrixXd x0,
     Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds) {}
 
 void DistanceApproachIPOPTInterface::get_optimization_results() const {}

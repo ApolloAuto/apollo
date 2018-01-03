@@ -33,7 +33,7 @@ namespace planning {
 
 class DistanceApproachProblem {
  public:
-  explicit DistanceApproachProblem(int horizon, float ts,
+  explicit DistanceApproachProblem(std::size_t horizon, float ts,
                                    float wheelbase_length, Eigen::MatrixXd x0,
                                    Eigen::MatrixXd xF,
                                    Eigen::MatrixXd XYbounds);
@@ -44,7 +44,7 @@ class DistanceApproachProblem {
 
  private:
   // time horizon
-  int horizon_;
+  std::size_t horizon_;
 
   // time interval
   float ts_;
