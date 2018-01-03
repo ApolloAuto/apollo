@@ -32,7 +32,7 @@ namespace planning {
 
 class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit DistanceApproachIPOPTInterface(int horizon, float ts,
+  explicit DistanceApproachIPOPTInterface(std::size_t horizon, float ts,
                                           float wheelbase_length,
                                           Eigen::MatrixXd x0,
                                           Eigen::MatrixXd xF,

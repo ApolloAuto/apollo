@@ -43,7 +43,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   // TODO(QiL) : cleaning up : load control configs from VehicleParam at
   // initialization
   // horizon
-  int horizon = 80;
+  std::size_t horizon = 80;
   // nominal sampling time
   float ts = 0.3;
   // wheelbase
@@ -57,15 +57,21 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   // initial state
 
   // TODO(QiL): Step 1 : Get initial state from VehicleState when enabled.
+
   Eigen::MatrixXd x0(4, 1);
   x0 << -12, 11, 0, 0;
+
+  // std::vector<double> x0({-12, 11, 0, 0});
 
   // final state
 
   // TODO(QiL): Step 2 ： Take final state from decision / or em planner when
   // enabled.
+
   Eigen::MatrixXd xF(4, 1);
   xF << 0, 1.2, M_PI / 2, 0;
+
+  // std::vector<double> xf({0, 1.2, M_PI / 2, 0});
 
   // TODO(QiL): Step 3 : Get obstacles from map/perception convex sets from
   // vetices using H-represetntation
