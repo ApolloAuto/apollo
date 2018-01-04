@@ -19,17 +19,17 @@
  * @brief Functions to generate coefficients for digital filter.
  */
 
-#ifndef MODULES_CONTROL_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
-#define MODULES_CONTROL_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
+#ifndef MODULES_COMMON_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
+#define MODULES_COMMON_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
 
 #include <vector>
 
 /**
- * @namespace apollo::control
- * @brief apollo::control
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
-namespace control {
+namespace common {
 
 /**
  * @brief Get low-pass coefficients for digital filter.
@@ -42,7 +42,7 @@ void LpfCoefficients(const double ts, const double cutoff_freq,
                      std::vector<double> *denominators,
                      std::vector<double> *numerators);
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
+#endif  // MODULES_COMMON_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_

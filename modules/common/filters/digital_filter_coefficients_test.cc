@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/filters/digital_filter_coefficients.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
-namespace control {
+namespace common {
 
 class DigitalFilterCoefficientsTest : public ::testing::Test {
  public:
@@ -41,5 +41,5 @@ TEST_F(DigitalFilterCoefficientsTest, LpfCoefficients) {
   EXPECT_NEAR(den[2], 0.2217, 0.01);
 }
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo
