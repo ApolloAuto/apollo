@@ -28,7 +28,7 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 In Apollo 2.0, we have released auto driving on simple urban roads. The following guide serves as a user manual for launching the Apollo 2.0 software and hardware stack on vehicle.
 
 1. Plug-in the hard drive to any available USB port. 
-![](https://github.com/tc87/apollo/blob/master/docs/quickstart/images/Plug%20in%20Harddrive%20.pdf).
+
 2. Turn on the vehicle, and then the IPC.
 
 3. Launch Docker Release Container
