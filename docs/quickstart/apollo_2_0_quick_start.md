@@ -58,7 +58,7 @@ In Apollo 2.0, we have released auto driving on simple urban roads. The followin
 8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous driving, you should now be in autonomous mode)
 ![](images/dreamview_start_auto.png)
 9. After autonomous testing is complete, under Tasks click Reset All, close all windows and shutdown the machine. 
-10. Step 13: Remove the hard drive.
+10. Remove the hard drive.
 
 
 
