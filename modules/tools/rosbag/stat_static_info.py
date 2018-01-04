@@ -22,8 +22,6 @@ Usage:
     ./stat_static_info.py <task_dir>  # <task_dir> contains a list of bags.
 """
 
-import collections
-import glob
 import os
 import sys
 
@@ -31,6 +29,9 @@ from modules.data.proto.static_info_pb2 import StaticInfo
 from rosbag.bag import Bag
 
 kStaticInfoTopic = '/apollo/monitor/static_info'
+kTopics = [
+    kStaticInfoTopic,
+]
 
 
 class StaticInfoCalculator(object):
@@ -45,11 +46,9 @@ class StaticInfoCalculator(object):
         Extract information from bag file.
         Return True if we are done collecting all information.
         """
-        if not os.path.isfile(bag_file):
-            return False
         try:
             with Bag(bag_file, 'r') as bag:
-                for _, msg, _ in bag.read_messages(topics=[kStaticInfoTopic]):
+                for _, msg, _ in bag.read_messages(topics=kTopics):
                     if msg.vehicle.name:
                         self.vehicle_name = msg.vehicle.name.lower()
                     if msg.vehicle.license.vin:
@@ -83,13 +82,17 @@ class StaticInfoCalculator(object):
 
     def done(self):
         """Check if all info are collected."""
-        return self.vehicle_name and self.vehicle_vin
+        # Currently we only care about vehicle name.
+        return bool(self.vehicle_name)
 
 
 def main(path):
     """Process a path."""
     calc = StaticInfoCalculator()
-    calc.process_file(path) if os.path.isfile(path) else calc.process_dir(path)
+    if os.path.isfile(path):
+        calc.process_file(path)
+    else:
+        calc.process_dir(path)
 
     # Output result, which might be None
     print 'vehicle_name:', calc.vehicle_name
