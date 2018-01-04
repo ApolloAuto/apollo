@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/filters/digital_filter_coefficients.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
 
 #include <cmath>
 #include <vector>
 
 namespace apollo {
-namespace control {
+namespace common {
 
 void LpfCoefficients(const double ts, const double cutoff_freq,
                      std::vector<double> *denominators,
@@ -48,5 +48,5 @@ void LpfCoefficients(const double ts, const double cutoff_freq,
   return;
 }
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo

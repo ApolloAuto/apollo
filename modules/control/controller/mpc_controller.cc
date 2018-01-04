@@ -130,8 +130,8 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
   // Low pass filter
   std::vector<double> den(3, 0.0);
   std::vector<double> num(3, 0.0);
-  LpfCoefficients(ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den,
-                  &num);
+  common::LpfCoefficients(
+      ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
   digital_filter_.set_coefficients(den, num);
 }
 
