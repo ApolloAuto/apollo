@@ -276,8 +276,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
                  FLAGS_valid_position_diff_threshold);
     double size_diff_thred =
         FLAGS_split_rate * std::min(obstacle_size, prev_obstacle_size);
-    if (std::fabs(diff_x) > shift_thred &&
-        std::fabs(diff_y) > shift_thred &&
+    if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred &&
         size_diff < size_diff_thred) {
       double shift_heading = std::atan2(diff_y, diff_x);
       double angle_diff = apollo::common::math::NormalizeAngle(
@@ -787,6 +786,18 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   }
   double min_heading_diff = std::numeric_limits<double>::infinity();
   for (std::shared_ptr<const LaneInfo> current_lane : current_lanes) {
+    if (current_lane == nullptr) {
+      continue;
+    }
+    if (type_ == perception_obstacle::BICYCLE &&
+        FLAGS_cyclist_on_bike_lane_only) {
+      if (current_lane->has_type() &&
+          current_lane->lane().type() != apollo::hdmap::Lane::BIKE) {
+        ADEBUG << "Obstacle [" << id_
+               << "] ignores lanes other than bike lane.";
+        continue;
+      }
+    }
     int turn_type = map->LaneTurnType(current_lane->id().id());
     std::string lane_id = current_lane->id().id();
     double s = 0.0;
@@ -852,6 +863,24 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   for (std::shared_ptr<const LaneInfo> nearby_lane : nearby_lanes) {
     if (nearby_lane == nullptr) {
       continue;
+    }
+
+    // Ignore bike and sidewalk lanes for vehicles and other lanes for bikes
+    if (type_ == PerceptionObstacle::VEHICLE) {
+      if (nearby_lane->has_type() &&
+          (nearby_lane->lane().type() == apollo::hdmap::Lane::BIKE ||
+           nearby_lane->lane().type() == apollo::hdmap::Lane::SIDEWALK)) {
+        ADEBUG << "Obstacle [" << id_ << "] ignores non-vehicle lanes.";
+        cotinue;
+      }
+    } else if (type_ == perception_obstacle::BICYCLE &&
+               FLAGS_cyclist_on_bike_lane_only) {
+      if (nearby_lane->has_type() &&
+          nearby_lane->lane().type() != apollo::hdmap::Lane::BIKE) {
+        ADEBUG << "Obstacle [" << id_
+               << "] ignores lanes other than bike lane.";
+        continue;
+      }
     }
     double s = -1.0;
     double l = 0.0;
@@ -1085,8 +1114,7 @@ void Obstacle::SetMotionStatus() {
     speed_threshold = FLAGS_still_pedestrian_speed_threshold;
   }
   if (speed < speed_threshold) {
-    ADEBUG << "Obstacle [" << id_
-           << "] has a small speed [" << speed
+    ADEBUG << "Obstacle [" << id_ << "] has a small speed [" << speed
            << "] and is considered stationary.";
     feature_history_.front().set_is_still(true);
   } else if (speed_sensibility < speed_threshold) {
