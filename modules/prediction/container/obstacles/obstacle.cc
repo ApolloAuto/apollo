@@ -789,10 +789,10 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     if (current_lane == nullptr) {
       continue;
     }
-    if (type_ == perception_obstacle::BICYCLE &&
+    if (type_ == PerceptionObstacle::BICYCLE &&
         FLAGS_cyclist_on_bike_lane_only) {
-      if (current_lane->has_type() &&
-          current_lane->lane().type() != apollo::hdmap::Lane::BIKE) {
+      if (current_lane->lane().has_type() &&
+          current_lane->lane().type() != apollo::hdmap::Lane::BIKING) {
         ADEBUG << "Obstacle [" << id_
                << "] ignores lanes other than bike lane.";
         continue;
@@ -867,16 +867,16 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
     // Ignore bike and sidewalk lanes for vehicles and other lanes for bikes
     if (type_ == PerceptionObstacle::VEHICLE) {
-      if (nearby_lane->has_type() &&
-          (nearby_lane->lane().type() == apollo::hdmap::Lane::BIKE ||
+      if (nearby_lane->lane().has_type() &&
+          (nearby_lane->lane().type() == apollo::hdmap::Lane::BIKING ||
            nearby_lane->lane().type() == apollo::hdmap::Lane::SIDEWALK)) {
         ADEBUG << "Obstacle [" << id_ << "] ignores non-vehicle lanes.";
-        cotinue;
+        continue;
       }
-    } else if (type_ == perception_obstacle::BICYCLE &&
+    } else if (type_ == PerceptionObstacle::BICYCLE &&
                FLAGS_cyclist_on_bike_lane_only) {
-      if (nearby_lane->has_type() &&
-          nearby_lane->lane().type() != apollo::hdmap::Lane::BIKE) {
+      if (nearby_lane->lane().has_type() &&
+          nearby_lane->lane().type() != apollo::hdmap::Lane::BIKING) {
         ADEBUG << "Obstacle [" << id_
                << "] ignores lanes other than bike lane.";
         continue;
