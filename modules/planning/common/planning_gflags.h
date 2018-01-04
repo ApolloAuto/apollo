@@ -116,6 +116,7 @@ DECLARE_double(follow_min_distance);
 DECLARE_double(yield_min_distance);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
+DECLARE_double(within_lane_bound);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);
