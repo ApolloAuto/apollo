@@ -46,8 +46,6 @@ WarmStartIPOPTInterface::WarmStartIPOPTInterface(
       xf_(xf),
       XYbounds_(XYbounds) {}
 
-void WarmStartIPOPTInterface::get_optimization_results() const {}
-
 bool WarmStartIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
                                            int& nnz_h_lag,
                                            IndexStyleEnum& index_style) {
@@ -221,6 +219,44 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
 bool WarmStartIPOPTInterface::eval_g(int n, const double* x, bool new_x, int m,
                                      double* g) {
+  // state start index.
+  std::size_t state_start_index = 0;
+
+  // control start index.
+  std::size_t control_start_index = 4 * (horizon_ + 1);
+
+  // sampling time start index.
+  std::size_t time_start_index = 4 * (horizon_ + 1) + 2 * horizon_;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    // x1
+    // TODO(QiL) : change to sin table
+    g[state_start_index + 4] =
+        g[state_start_index] + g[time_start_index] * ts_ *
+                                   g[state_start_index + 3] *
+                                   std::cos(g[state_start_index + 2]);
+    // x2
+    g[state_start_index + 5] =
+        g[state_start_index + 1] + g[time_start_index] * ts_ *
+                                       g[state_start_index + 3] *
+                                       std::sin(g[state_start_index + 2]);
+    // x3
+    g[state_start_index + 6] =
+        g[state_start_index + 2] +
+        g[time_start_index] * ts_ * g[state_start_index + 3] *
+            std::tan(g[control_start_index] / wheelbase_length_);
+
+    // x4
+    g[state_start_index + 7] =
+        g[state_start_index + 3] +
+        g[time_start_index] * ts_ * g[control_start_index + 1];
+
+    // sampling time
+    g[time_start_index + 1] = g[time_start_index];
+
+    state_start_index += 4;
+    control_start_index += 2;
+    ++time_start_index;
+  }
   return true;
 }
 
@@ -293,5 +329,49 @@ bool WarmStartIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   return true;
 }
 
+void WarmStartIPOPTInterface::finalize_solution(
+    Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
+    const double* z_U, int m, const double* g, const double* lambda,
+    double obj_value, const Ipopt::IpoptData* ip_data,
+    Ipopt::IpoptCalculatedQuantities* ip_cq) {
+  x1_result_.reserve(horizon_ + 1);
+  x2_result_.reserve(horizon_ + 1);
+  x3_result_.reserve(horizon_ + 1);
+  x4_result_.reserve(horizon_ + 1);
+
+  u1_result_.reserve(horizon_);
+  u2_result_.reserve(horizon_);
+
+  t_result_.reserve(horizon_);
+
+  std::size_t state_start_index = 0;
+  std::size_t input_start_index = (horizon_ + 1) * 4;
+  std::size_t time_start_index = input_start_index + horizon_ * 2;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    x1_result_.push_back(state_start_index);
+    x2_result_.push_back(state_start_index + 1);
+    x3_result_.push_back(state_start_index + 2);
+    x4_result_.push_back(state_start_index + 3);
+
+    u1_result_.push_back(input_start_index);
+    u2_result_.push_back(input_start_index + 1);
+
+    t_result_.push_back(time_start_index);
+  }
+}
+
+void WarmStartIPOPTInterface::get_optimization_results(
+    std::vector<double>* x1_result, std::vector<double>* x2_result,
+    std::vector<double>* x3_result, std::vector<double>* x4_result,
+    std::vector<double>* u1_result, std::vector<double>* u2_result,
+    std::vector<double>* t_result) const {
+  *x1_result = x1_result_;
+  *x2_result = x2_result_;
+  *x3_result = x3_result_;
+  *x4_result = x4_result_;
+  *u1_result = u1_result_;
+  *u2_result = u2_result_;
+  *t_result = t_result_;
+}
 }  // namespace planning
 }  // namespace apollo
