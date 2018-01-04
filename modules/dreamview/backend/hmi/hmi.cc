@@ -38,9 +38,9 @@
 DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
               "Global flagfile shared by all modules.");
 
-DEFINE_string(map_data_path, "modules/map/data", "Path to map data.");
+DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 
-DEFINE_string(vehicle_data_path, "modules/calibration/data",
+DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
 DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
