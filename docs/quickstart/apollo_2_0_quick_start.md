@@ -11,7 +11,7 @@ concepts, please refer to
 * [Launch release env Docker Image](Launch-release-env-Docker-Image)
 * [Start Auto](Start-Auto)
 
-## Calibration Guide
+###Calibration Guide
 
 Before doing the following steps, make sure you have calibrated the extrinsic
 parameters between the LiDAR and the GNSS/INS. For sensor calibrations, please
