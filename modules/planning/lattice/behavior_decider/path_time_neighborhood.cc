@@ -76,6 +76,7 @@ void PathTimeNeighborhood::SetStaticPathTimeObstacle(
     const ReferenceLine& reference_line) {
   TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
   Box2d box = obstacle->GetBoundingBox(start_point);
+
   std::string obstacle_id = obstacle->Id();
   SLBoundary sl_boundary;
   reference_line.GetSLBoundary(box, &sl_boundary);
@@ -185,11 +186,12 @@ void PathTimeNeighborhood::SetupObstacles(
 
 double PathTimeNeighborhood::SpeedAtT(const std::string& obstacle_id,
                                       const double t) const {
-  bool found =
-      prediction_traj_map_.find(obstacle_id) != prediction_traj_map_.end();
-  CHECK(found);
+
   CHECK_GE(t, 0.0);
-  prediction::Trajectory trajectory = prediction_traj_map_.at(obstacle_id);
+  auto it_trajectory = prediction_traj_map_.find(obstacle_id);
+  CHECK(it_trajectory != prediction_traj_map_.end());
+
+  const prediction::Trajectory& trajectory = it_trajectory->second;
   int num_traj_point = trajectory.trajectory_point_size();
   if (num_traj_point == 0) {
     return 0.0;
