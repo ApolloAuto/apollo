@@ -110,7 +110,7 @@ DEFINE_bool(enable_side_vehicle_st_boundary, false,
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
-DEFINE_double(max_collision_distance, 0.1,
+DEFINE_double(max_collision_distance, 0.0,
               "considered as collision if distance (meters) is smaller than or "
               "equal to this (meters)");
 
