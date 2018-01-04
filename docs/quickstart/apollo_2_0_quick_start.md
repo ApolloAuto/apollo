@@ -1,14 +1,31 @@
 # Apollo 2.0 Quick Start Guide
 
-This quick start focuses on Apollo 2.0 new features. For general Apollo
+## Contents
+* [Calibration Guide](Calibration-Guide)
+* [Hardware and Software Installation](Hardware-and-Software-Installation)
+* [Dreamview Usage Table](Dreamview-Usage-Table)
+* [Launch release env Docker Image](Launch-release-env-Docker-Image)
+* [Start Auto](Start-Auto)
+
+The Apollo 2.0 Quick Start Guide focuses on Apollo 2.0 new features. For general Apollo
 concepts, please refer to
 [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md).
 
-Before doing the following steps, make sure you have calibrated the extrinsic
-parameters between the LiDAR and the GNSS/INS. For sensor calibration, please
-refer to
-[Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md).
+## Calibration Guide
 
+Before doing the following steps, make sure you have calibrated the extrinsic
+parameters between the LiDAR and the GNSS/INS. For sensor calibrations, please
+refer to
+[Apollo 2.0 Sensor Calibration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide.md).
+
+## Hardware and Software Installation
+
+Please refer to [Apollo 2.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide%20v1.md)
+for the steps to install the hardware components and the system software.
+
+## Dreamview Usage Table
+
+For questions regarding Dreaview Icons refer to the [Dreamview Usage Table]( https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
 
 ## Launch release env Docker Image
 
@@ -32,16 +49,23 @@ dropdown menu on top right to select your HDMap and vehicle in use. The list are
 defined in
 [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
 
-## (*New!*) Start Auto
+## Start Auto
 
-In Apollo 2.0, we released the new feature, auto driving on simple urban road.
+In Apollo 2.0, we have released auto driving on simple urban roads. The following guide serves as a user manual for launching the Apollo 2.0 software and hardware stack on vehicle.
 
-1. To make it work,  you need setup the system by clicking the "Setup" button.
-   ![](images/dreamview_setup.png)
 
-2. Go to **Module Controller** tab, check if all modules and hardware are ready.
-   ![](images/dreamview_module_controller.png)
+- Step 1: Plug-in the hard drive to any available USB port.
+- Step 2: Turn on the vehicle, and then the PC.
+- Step 3: Once the PC has fully booted, log-in to the machine .
+- Step 4: Open a terminal.
+- Step 5: Within a terminal window, type: rstart
+- Step 6: Open up Dreamview in a web browser.
+- Step 7: Select vehicle, and map from among the drop down options in the top right corner of Dreamview.
+- Step 8: Under Tasks click Setup.
+- Step 9: Under Module Controller confirm all modules are “green”. You may need to drive around a bit to get a good GPS signal.
+- Step 10: Under Default Routing select your desired route.
+- Step 11: Under Tasks click Start Auto. [The vehicle should now be in autonomous mode]
+- Step 12: After autonomous testing is complete, under Tasks click Reset All, close all windows and shutdown the machine. 
+- Step 13: Remove the hard drive.
 
-3. Make sure the vehicle is in a good state which is safe to enter auto mode.
-   Click the "Start Auto" button, then it will drive you there!
-   ![](images/dreamview_start_auto.png)
+
