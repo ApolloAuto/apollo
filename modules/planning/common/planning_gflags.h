@@ -176,4 +176,7 @@ DECLARE_bool(enable_sqp_solver);
 DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_int32(num_thread_dp_poly_path);
 
+DECLARE_bool(enable_multi_thread_in_dp_st_graph);
+DECLARE_int32(num_thread_dp_st_graph);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
