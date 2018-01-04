@@ -88,7 +88,13 @@ bool PathDecider::MakeStaticObstacleDecision(
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto &obstacle = *path_obstacle->obstacle();
-    if (!obstacle.IsStatic()) {
+    bool is_bycycle_or_pedestrain =
+        (obstacle.Perception().type() ==
+             perception::PerceptionObstacle::BICYCLE ||
+         obstacle.Perception().type() ==
+             perception::PerceptionObstacle::PEDESTRIAN);
+
+    if (!is_bycycle_or_pedestrain && !obstacle.IsStatic()) {
       continue;
     }
     if (path_obstacle->HasLongitudinalDecision() &&
