@@ -122,13 +122,19 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
     } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
       auto* is_protected =
           junction_store->Get(junction_dropbox_id(overlap.object_id));
-      if (!is_protected) {
-        continue;
-      }
-      if (*is_protected) {
+      if (is_protected != nullptr && *is_protected) {
         return ADCTrajectory::PROTECTED;
       } else {
-        return ADCTrajectory::UNPROTECTED;
+        double junction_s = (overlap.end_s + overlap.start_s) / 2.0;
+        auto ref_point = reference_line_.GetReferencePoint(junction_s);
+        if (ref_point.lane_waypoints().empty()) {
+          return ADCTrajectory::PROTECTED;
+        }
+        for (const auto& waypoint : ref_point.lane_waypoints()) {
+          if (waypoint.lane->lane().turn() == hdmap::Lane::NO_TURN) {
+            return ADCTrajectory::PROTECTED;
+          }
+        }
       }
     }
   }
@@ -574,13 +580,13 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
       }
       engage_advice->set_reason("Vehicle heading is not aligned");
     } else {
-        if (vehicle_state_.driving_mode() !=
-            Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
-          engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
-        } else {
-          engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
-        }
+      if (vehicle_state_.driving_mode() !=
+          Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
+        engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
+      } else {
+        engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
       }
+    }
   }
   *prev_advice = *engage_advice;
 }
