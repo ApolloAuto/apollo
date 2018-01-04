@@ -11,7 +11,7 @@ concepts, please refer to
 * [Launch release env Docker Image](Launch-release-env-Docker-Image)
 * [Start Auto](Start-Auto)
 
-###Calibration Guide
+## Calibration Guide
 
 Before doing the following steps, make sure you have calibrated the extrinsic
 parameters between the LiDAR and the GNSS/INS. For sensor calibrations, please
@@ -54,9 +54,9 @@ defined in
 In Apollo 2.0, we have released auto driving on simple urban roads. The following guide serves as a user manual for launching the Apollo 2.0 software and hardware stack on vehicle.
 
 
-- Step 1: Plug-in the hard drive to any available USB port.
-- Step 2: Turn on the vehicle, and then the PC.
-- Step 3: Once the PC has fully booted, log-in to the machine .
+- Step 1: Plug-in the hard drive to any available USB port. .
+- Step 2: Turn on the vehicle, and then the IPC.
+- Step 3: Once the IPC has fully booted, log-in to the machine .
 - Step 4: Open a terminal.
 - Step 5: Within a terminal window, type: rstart
 - Step 6: Open up Dreamview in a web browser.
