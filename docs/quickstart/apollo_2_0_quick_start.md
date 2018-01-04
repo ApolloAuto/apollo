@@ -1,5 +1,7 @@
 # Apollo 2.0 Quick Start Guide
 
+In Apollo 2.0, we have released auto driving on simple urban roads. The following guide serves as a user manual for launching the Apollo 2.0 software and hardware stack on vehicle.
+
 The Apollo 2.0 Quick Start Guide focuses on Apollo 2.0 new features. For general Apollo
 concepts, please refer to
 [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md).
@@ -25,7 +27,6 @@ for the steps to install the hardware components and the system software.
 For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
 
 ## Onboard Test
-In Apollo 2.0, we have released auto driving on simple urban roads. The following guide serves as a user manual for launching the Apollo 2.0 software and hardware stack on vehicle.
 
 1. Plug-in the hard drive to any available USB port. 
 
@@ -51,9 +52,8 @@ In Apollo 2.0, we have released auto driving on simple urban roads. The followin
 
     ![](images/dreamview_setup.png)
 
-    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal)
-    
-        ![](images/dreamview_module_controller.png) 
+    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal)![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/dreamview_module_controller.png?raw=true) 
+
 7. Under Default Routing select your desired route.
 8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous driving, you should now be in autonomous mode)
 ![](images/dreamview_start_auto.png)
