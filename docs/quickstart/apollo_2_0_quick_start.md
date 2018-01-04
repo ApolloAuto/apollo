@@ -28,7 +28,7 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 
 ## Onboard Test
 
-1. Plug-in the hard drive to any available USB port. 
+1. Plug-in an external hard-drive to any available USB port in the IPC. 
 
 2. Turn on the vehicle, and then the IPC.
 
