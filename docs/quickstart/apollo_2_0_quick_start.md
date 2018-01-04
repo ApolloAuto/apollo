@@ -5,11 +5,11 @@ concepts, please refer to
 [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md).
 
 ## Contents
-* [Calibration Guide](Calibration-Guide)
-* [Hardware and Software Installation](Hardware-and-Software-Installation)
-* [Dreamview Usage Table](Dreamview-Usage-Table)
-* [Launch release env Docker Image](Launch-release-env-Docker-Image)
-* [Start Auto](Start-Auto)
+* [Calibration Guide](#Calibration-Guide)
+* [Hardware and Software Installation](#Hardware-and-Software-Installation)
+* [Dreamview Usage Table](#Dreamview-Usage-Table)
+* [Launch release env Docker Image](#Launch-release-env-Docker-Image)
+* [Start Auto](#Start-Auto)
 
 ## Calibration Guide
 
