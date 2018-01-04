@@ -76,10 +76,17 @@ TrajectoryCost::TrajectoryCost(
     }
 
     const auto ptr_obstacle = ptr_path_obstacle->obstacle();
+    bool is_bycycle_or_pedestrain =
+        (ptr_obstacle->Perception().type() ==
+             perception::PerceptionObstacle::BICYCLE ||
+         ptr_obstacle->Perception().type() ==
+             perception::PerceptionObstacle::PEDESTRIAN);
+
     if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle
       continue;
-    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
+    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
+               is_bycycle_or_pedestrain) {
       double left_width = 0.0;
       double right_width = 0.0;
       reference_line_->GetLaneWidth(sl_boundary.start_s(), &left_width,
