@@ -194,6 +194,8 @@ The table below explains the parameter usage and default values for CNN Segmenta
 | feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 512        |
 | feature_param {range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 60 meters  |
 
+**Note: the provided model is a sample for experiment purpose only.**
+
 ### MinBox Builder
 
 The object builder component establishes a bounding box for the detected obstacles. Due to occlusions or the distance to the LiDAR sensor, the point cloud forming an obstacle can be sparse and cover only a portion of the surfaces. Thus, the box builder works to recover the full bounding box given the polygon point. The main purpose of the bounding box is to estimate the heading of the obstacle (e.g., vehicle) even if the point cloud is sparse. Equally, the bounding box is used to visualize the obstacles.
