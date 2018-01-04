@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/filters/mean_filter.h"
+#include "modules/common/filters/mean_filter.h"
 
 #include <limits>
 
 #include "modules/common/log.h"
 
 namespace apollo {
-namespace control {
+namespace common {
 
 using MF = MeanFilter;
 using uint8 = std::uint_fast8_t;
@@ -107,5 +107,5 @@ void MF::Insert(const double value) {
   max_candidates_.push_back(std::make_pair(time_, value));
 }
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo
