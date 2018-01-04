@@ -74,6 +74,7 @@ using apollo::prediction::PredictionObstacles;
 using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
+using ::google::protobuf::util::MessageToJsonString;
 
 namespace {
 
@@ -271,21 +272,20 @@ void SimulationWorldService::UpdateDelays() {
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
-  std::string sim_world_json;
-  ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
+  std::string sim_world_json_string;
+  MessageToJsonString(world_, &sim_world_json_string);
 
   Json update = GetMapElements(radius);
   update["type"] = "SimWorldUpdate";
   update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
-  update["world"] = Json::parse(sim_world_json);
+  update["world"] = sim_world_json_string;
 
   return update;
 }
 
 Json SimulationWorldService::GetPlanningData() const {
   std::string planning_data_json;
-  ::google::protobuf::util::MessageToJsonString(planning_data_,
-                                                &planning_data_json);
+  MessageToJsonString(planning_data_, &planning_data_json);
 
   return Json::parse(planning_data_json);
 }
