@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 
 #include <limits>
+#include <list>
 #include <string>
 #include <utility>
 #include <vector>
@@ -97,10 +98,6 @@ class DPRoadGraph {
   bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
                            std::vector<DPRoadGraphNode> *min_cost_path);
 
-  bool GenerateMinCostPathWithMultiThread(
-      const std::vector<const PathObstacle *> &obstacles,
-      std::vector<DPRoadGraphNode> *min_cost_path);
-
   bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
@@ -115,6 +112,11 @@ class DPRoadGraph {
                     const QuinticPolynomialCurve1d &curve, const double start_s,
                     const double end_s, const uint32_t curr_level,
                     const uint32_t total_level, ComparableCost *cost);
+
+  void UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
+                  const uint32_t level, const uint32_t total_level,
+                  TrajectoryCost *trajectory_cost, DPRoadGraphNode *front,
+                  DPRoadGraphNode *cur_node);
 
  private:
   DpPolyPathConfig config_;
