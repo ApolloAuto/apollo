@@ -838,6 +838,10 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   }
   double min_heading_diff = std::numeric_limits<double>::infinity();
   for (std::shared_ptr<const LaneInfo> current_lane : current_lanes) {
+    if (current_lane == nullptr) {
+      continue;
+    }
+
     int turn_type = map->LaneTurnType(current_lane->id().id());
     std::string lane_id = current_lane->id().id();
     double s = 0.0;
