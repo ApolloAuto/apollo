@@ -36,7 +36,7 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 
 4. Launch DreamView
 
-    Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8888
+    Note: Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8888
 
     ![](images/dreamview.png)
 
@@ -44,7 +44,7 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
     
     You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
 
-    *Note: It's also possible to change profile on the right panel of HMI, but just remember to click "Reset All" on the top-right corner to restart the system.*
+    Note: It's also possible to change profile on the right panel of HMI, but just remember to click "Reset All" on the top-right corner to restart the system.*
 
 6. Start Modules
 
@@ -52,7 +52,8 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 
     ![](images/dreamview_setup.png)
 
-    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal)![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/dreamview_module_controller.png?raw=true) 
+    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal)
+    ![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/dreamview_module_controller.png?raw=true) 
 
 7. Under Default Routing select your desired route.
 8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous driving, you should now be in autonomous mode)
