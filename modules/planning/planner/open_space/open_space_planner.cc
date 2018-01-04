@@ -111,6 +111,17 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   warm_start_.reset(
       new WarmStartProblem(horizon, ts, wheelbase_length, x0, xF, XYbounds));
 
+  std::vector<double> x1_result, x2_result, x3_result, x4_result, u1_result,
+      u2_result, t_result;
+
+  bool ret_status =
+      warm_start_->Solve(&x1_result, &x2_result, &x3_result, &x4_result,
+                         &u1_result, &u2_result, &t_result);
+  if (ret_status) {
+    ADEBUG << "Warm start problem solved successfully!";
+  } else {
+    AERROR << "Warm start problem failed to solve";
+  }
   // TODO(QiL) : Step 7 : Formualte H representation of obstacles
 
   Eigen::MatrixXd A_all = Eigen::MatrixXd::Zero(vOb.sum(), 2);
