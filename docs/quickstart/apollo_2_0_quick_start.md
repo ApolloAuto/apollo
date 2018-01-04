@@ -58,13 +58,13 @@ In Apollo 2.0, we have released auto driving on simple urban roads. The followin
 - Step 2: Turn on the vehicle, and then the IPC.
 - Step 3: Once the IPC has fully booted, log-in to the machine .
 - Step 4: Open a terminal.
-- Step 5: Within a terminal window, type: rstart
+- Step 5: Within a terminal window, type: ```rstart```
 - Step 6: Open up Dreamview in a web browser. **[localhost:8888]**
 - Step 7: Select vehicle, and map from among the drop down options in the top right corner of Dreamview.
 - Step 8: Under Tasks click Setup.
-- Step 9: Under Module Controller confirm all modules are “green”. You may need to drive around a bit to get a good GPS signal.
+- Step 9: Under Module Controller confirm all modules are “green”. **[You may need to drive around a bit to get a good GPS signal.]]**
 - Step 10: Under Default Routing select your desired route.
-- Step 11: Under Tasks click Start Auto. [The vehicle should now be in autonomous mode]
+- Step 11: Under Tasks click Start Auto. **[The vehicle should now be in autonomous mode]**
 - Step 12: After autonomous testing is complete, under Tasks click Reset All, close all windows and shutdown the machine. 
 - Step 13: Remove the hard drive.
 
