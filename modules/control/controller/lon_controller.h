@@ -27,13 +27,13 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/pid_controller.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
-#include "modules/control/filters/digital_filter.h"
-#include "modules/control/filters/digital_filter_coefficients.h"
 
 /**
  * @namespace apollo::control
@@ -109,7 +109,7 @@ class LonController : public Controller {
       const LonControllerConf &lon_controller_conf);
 
   void SetDigitalFilter(double ts, double cutoff_freq,
-                        DigitalFilter *digital_filter);
+                        common::DigitalFilter *digital_filter);
 
   void CloseLogFile();
 
@@ -128,7 +128,7 @@ class LonController : public Controller {
 
   FILE *speed_log_file_ = nullptr;
 
-  DigitalFilter digital_filter_pitch_angle_;
+  common::DigitalFilter digital_filter_pitch_angle_;
 
   const ControlConf *control_conf_ = nullptr;
 };

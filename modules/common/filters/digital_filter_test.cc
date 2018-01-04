@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter.h"
 
 #include <vector>
 
 #include "gtest/gtest.h"
 
 namespace apollo {
-namespace control {
+namespace common {
 
 class DigitalFilterTest : public ::testing::Test {
  public:
@@ -104,5 +104,5 @@ TEST_F(DigitalFilterTest, MovingAverage) {
   }
 }
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo
