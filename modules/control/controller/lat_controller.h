@@ -30,12 +30,12 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
+#include "modules/common/filters/mean_filter.h"
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
-#include "modules/control/filters/digital_filter.h"
-#include "modules/control/filters/digital_filter_coefficients.h"
-#include "modules/control/filters/mean_filter.h"
 
 /**
  * @namespace apollo::control
@@ -213,15 +213,15 @@ class LatController : public Controller {
   // parameters for lqr solver; threshold for computation
   double lqr_eps_ = 0.0;
 
-  DigitalFilter digital_filter_;
+  common::DigitalFilter digital_filter_;
 
   std::unique_ptr<Interpolation1D> lat_err_interpolation_;
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
   // MeanFilter heading_rate_filter_;
-  MeanFilter lateral_error_filter_;
-  MeanFilter heading_error_filter_;
+  common::MeanFilter lateral_error_filter_;
+  common::MeanFilter heading_error_filter_;
 
   // for logging purpose
   std::ofstream steer_log_file_;

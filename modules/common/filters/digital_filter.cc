@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter.h"
 
 #include <cmath>
 
@@ -27,7 +27,7 @@ const double kDoubleEpsilon = 1.0e-6;
 }  // namespace
 
 namespace apollo {
-namespace control {
+namespace common {
 
 DigitalFilter::DigitalFilter(const std::vector<double> &denominators,
                              const std::vector<double> &numerators) {
@@ -120,5 +120,5 @@ const std::vector<double> &DigitalFilter::numerators() const {
 
 double DigitalFilter::dead_zone() const { return dead_zone_; }
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo

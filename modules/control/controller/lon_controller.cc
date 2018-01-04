@@ -355,10 +355,10 @@ void LonController::ComputeLongitudinalErrors(
 }
 
 void LonController::SetDigitalFilter(double ts, double cutoff_freq,
-                                     DigitalFilter *digital_filter) {
+                                     common::DigitalFilter *digital_filter) {
   std::vector<double> denominators;
   std::vector<double> numerators;
-  LpfCoefficients(ts, cutoff_freq, &denominators, &numerators);
+  common::LpfCoefficients(ts, cutoff_freq, &denominators, &numerators);
   digital_filter->set_coefficients(denominators, numerators);
 }
 
