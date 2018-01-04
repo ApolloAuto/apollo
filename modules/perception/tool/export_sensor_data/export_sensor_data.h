@@ -22,6 +22,7 @@
 #include <string>
 #include <utility>
 
+#include "Eigen/Core"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/perception/onboard/dag_streaming.h"
@@ -68,6 +69,7 @@ class ExportSensorData{
   boost::circular_buffer<LocalizationPair> localization_buffer_;
   ContiRadarIDExpansion _conti_id_expansion;
   Mutex mutex_;
+  Eigen::Matrix4d radar2velodyne_extrinsic_;
 };
 
 }  // namespace perception
