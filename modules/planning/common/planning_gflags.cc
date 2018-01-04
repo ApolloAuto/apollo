@@ -186,7 +186,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(try_history_decision, false, "try history decision first");
 
-DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -201,7 +201,7 @@ DEFINE_double(stop_distance_traffic_light, 3.0,
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
-DEFINE_double(nudge_distance_obstacle, 0.3,
+DEFINE_double(nudge_distance_obstacle, 0.5,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
