@@ -87,8 +87,9 @@ DEFINE_double(valid_position_diff_threshold, 0.5,
               "threshold of valid position difference");
 DEFINE_double(valid_position_diff_rate_threshold, 0.075,
               "threshold of valid position difference rate");
-DEFINE_double(split_rate, 0.5,
-              "obstacle split rate for adjusting velocity");
+DEFINE_double(split_rate, 0.5, "obstacle split rate for adjusting velocity");
+DEFINE_bool(cyclist_on_bike_lane_only, false,
+            "Enable cyclist on bike lane only.");
 
 // evaluator
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
