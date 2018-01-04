@@ -240,8 +240,7 @@ void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
 
     // try to connect the current point with the first point directly
     // only do this at lane change
-    if (reference_line_info_.IsChangeLanePath() && IsSafeForLaneChange() &&
-        level >= 2) {
+    if (level >= 2) {
       init_dl = init_frenet_frame_point_.dl();
       init_ddl = init_frenet_frame_point_.ddl();
       QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
@@ -296,7 +295,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    double kDefaultUnitL = 0.30;
+    double kDefaultUnitL = 1.2 / (config_.sample_points_num_each_level() - 1);
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
       kDefaultUnitL = 1.0;
     }
@@ -331,7 +330,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
-      constexpr double kResonateDistance = 2.0;
+      constexpr double kResonateDistance = 1e-3;
       common::SLPoint sl;
       if (j % 2 == 0 ||
           total_length - accumulated_s < 2.0 * kResonateDistance) {
