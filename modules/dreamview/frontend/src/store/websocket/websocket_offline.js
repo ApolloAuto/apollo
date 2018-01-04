@@ -128,16 +128,17 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     processSimWorld(message) {
-        if (STORE.playback.shouldProcessFrame(message.world)) {
+        const world = JSON.parse(message.world);
+        if (STORE.playback.shouldProcessFrame(world)) {
             STORE.updateTimestamp(message.timestamp);
-            STORE.updateWorldTimestamp(message.world.timestampSec);
+            STORE.updateWorldTimestamp(world.timestampSec);
             RENDERER.maybeInitializeOffest(
-                message.world.autoDrivingCar.positionX,
-                message.world.autoDrivingCar.positionY);
-            RENDERER.updateWorld(message.world, message.planningData);
-            STORE.meters.update(message.world);
-            STORE.monitor.update(message.world);
-            STORE.trafficSignal.update(message.world);
+                world.autoDrivingCar.positionX,
+                world.autoDrivingCar.positionY);
+            RENDERER.updateWorld(world, message.planningData);
+            STORE.meters.update(world);
+            STORE.monitor.update(world);
+            STORE.trafficSignal.update(world);
         }
     }
     requstFrameCount(jobId) {
