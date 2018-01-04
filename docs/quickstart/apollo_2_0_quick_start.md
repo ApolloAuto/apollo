@@ -28,9 +28,9 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 
 ## Onboard Test
 
-1. Plug-in an external hard-drive to any available USB port in the IPC. 
+1. Plug-in an external hard-drive to any available USB port in the host machine. 
 
-2. Turn on the vehicle, and then the IPC.
+2. Turn on the vehicle, and then the host machine.
 
 3. Launch Docker Release Container
 
