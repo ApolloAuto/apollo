@@ -232,9 +232,9 @@ Additionally, there are some important parameters of distance weights that are u
 
 Given the association distance matrix, as shown in Figure 5, Apollo constructs a bipartite graph and uses the Hungarian algorithm to find the best detection-to-track matching via minimizing the distance cost. It solves the assignment problem within O(n\^3) time complexity. To boost its computing performance, the Hungarian algorithm is implemented after cutting the original bipartite graph into subgraphs, by deleting vertices with a distance greater than a reasonable maximum distance threshold.
 
-<<p align="center"><img src="images/3d_obstacle_perception/bipartite_graph_matching.png"></p>
+<p align="center"><img src="https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/bipartite_graph_matching.png?raw=true"></p>
 
-<<p align="center">>Figure 5 Illustration of Bipartite Graph Matching</p>
+<p align="center">Figure 5 Illustration of Bipartite Graph Matching</p>
 
 #### Track Motion Estimation
 
