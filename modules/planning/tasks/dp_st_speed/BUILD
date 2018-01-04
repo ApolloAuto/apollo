@@ -50,6 +50,7 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
+        "//modules/common/util:ctpl_stl",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:path_obstacle",
         "//modules/planning/common/speed:speed_data",
