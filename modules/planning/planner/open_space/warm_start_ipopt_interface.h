@@ -40,7 +40,13 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
 
   virtual ~WarmStartIPOPTInterface() = default;
 
-  void get_optimization_results() const;
+  void get_optimization_results(std::vector<double>* x1_result,
+                                std::vector<double>* x2_result,
+                                std::vector<double>* x3_result,
+                                std::vector<double>* x4_result,
+                                std::vector<double>* u1_result,
+                                std::vector<double>* u2_result,
+                                std::vector<double>* t_result) const;
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
@@ -97,6 +103,14 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd x0_;
   Eigen::MatrixXd xf_;
   Eigen::MatrixXd XYbounds_;
+
+  std::vector<double> x1_result_;
+  std::vector<double> x2_result_;
+  std::vector<double> x3_result_;
+  std::vector<double> x4_result_;
+  std::vector<double> u1_result_;
+  std::vector<double> u2_result_;
+  std::vector<double> t_result_;
 };
 
 }  // namespace planning
