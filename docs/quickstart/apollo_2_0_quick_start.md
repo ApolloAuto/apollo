@@ -25,7 +25,7 @@ for the steps to install the hardware components and the system software.
 
 ## Dreamview Usage Table
 
-For questions regarding Dreaview Icons refer to the [Dreamview Usage Table]( https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
+For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
 
 ## Launch release env Docker Image
 
