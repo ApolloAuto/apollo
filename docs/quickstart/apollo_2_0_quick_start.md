@@ -32,31 +32,31 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 
 2. Turn on the vehicle, and then the host machine.
 
-3. Launch Docker Release Container
+3. Launch Docker Release Container.
 
-4. Launch DreamView
+4. Launch DreamView.
 
-    Note: Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8888
+    Note: Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8888.
 
     ![](images/dreamview.png)
 
-5. Select Vehicle and Map
+5. Select Vehicle and Map.
     
-    You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
+    Note: You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
 
     Note: It's also possible to change profile on the right panel of HMI, but just remember to click "Reset All" on the top-right corner to restart the system.*
 
-6. Start Modules
+6. Start Modules.
 
     Click the "Setup" button.
 
     ![](images/dreamview_setup.png)
 
-    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal)
+    Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: in your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal.)
     ![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/dreamview_module_controller.png?raw=true) 
 
 7. Under Default Routing select your desired route.
-8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous driving, you should now be in autonomous mode)
+8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous driving, you should now be in autonomous mode.)
 ![](images/dreamview_start_auto.png)
 9. After autonomous testing is complete, under Tasks click Reset All, close all windows and shutdown the machine. 
 10. Remove the hard drive.
