@@ -72,6 +72,7 @@ DECLARE_double(valid_position_diff_rate_threshold);
 DECLARE_double(split_rate);
 DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(enable_adjust_velocity_heading);
+DECLARE_double(heading_filter_param);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);

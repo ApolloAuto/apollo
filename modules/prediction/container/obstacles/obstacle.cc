@@ -50,6 +50,15 @@ double Damp(const double x, const double sigma) {
 
 }  // namespace
 
+Obstacle::Obstacle() {
+  double heading_filter_param = FLAGS_heading_filter_param;
+  if (FLAGS_heading_filter_param < 0.0 || FLAGS_heading_filter_param > 1.0) {
+    heading_filter_param = 0.98;
+  }
+  heading_filter_ = common::DigitalFilter{{1.0, 1.0 - heading_filter_param},
+                                          {heading_filter_param}};
+}
+
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
 int Obstacle::id() const { return id_; }
@@ -376,6 +385,11 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
       if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
         velocity_heading = shift_heading;
       }
+    }
+    double filtered_heading = heading_filter_.Filter(velocity_heading);
+    if (type_ == PerceptionObstacle::BICYCLE ||
+        type_ == PerceptionObstacle::PEDESTRIAN) {
+      velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
     velocity_y = speed * std::sin(velocity_heading);
