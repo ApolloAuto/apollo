@@ -53,6 +53,8 @@ void PoseContainer::Update(
   if (obstacle_ptr_.get() == nullptr) {
     obstacle_ptr_.reset(new PerceptionObstacle());
   }
+  obstacle_ptr_->Clear();
+
   obstacle_ptr_->set_id(ID);
   Point position;
   position.set_x(localization.pose().position().x());
