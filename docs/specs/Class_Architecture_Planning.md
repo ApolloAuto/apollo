@@ -1,66 +1,81 @@
-# Class Architecture and Overview
+# Class Architecture and Overview -- Planning Module
 
-------*Planning Module*
+##Data Output and Input
 
-## Planning Module Data Output and Input
+###Output Data
 
-### Output Data
+The planning output data is defined in `planning.proto`, as shown below.
 
-The planning output data is defined in **planning.proto**, as shown in the following picture.
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image001.png)
 
-![](images/class_architecture_planning/image001.png)
+#### *planning.proto*
 
-Inside the proto data definition, the planning output includes the total planned time and length, as well as the actual trajectory for control to execute, defined in “**`repeated apollo.common.TrajectoryPoint trajectory_point`**”. Each of these “**`trajectory_point`**”, as defined in “**`pnc_point.proto`**”, contains detailed attributes of the trajectory. A trajectory point is derived from a “**`path_point`**”, where speed, acceleration and timing attributes are added.
+Inside the proto data definition, the planning output includes the total planned time and length, as well as the actual trajectory for control to execute, and is defined in `repeated apollo.common.TrajectoryPointtrajectory_point`.  
 
-![](images/class_architecture_planning/image002.png)
-![](images/class_architecture_planning/image003.png)
+A trajectory point is derived from a `path_point`, where speed, acceleration and timing attributes are added. Each `trajectory_point` as defined in `pnc_point.proto`, and contains detailed attributes of the trajectory.
 
-Besides the trajectory itself, the planning module also outputs rich annotating information. The important data fields are:
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image002.png)
 
-* Estop
-* DecisionResult
-* Debug information
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image003.png)
 
-Estop is a command which indicates errors and exceptions. For example, when the autonomous vehicle finds that it collides into other obstacles or could not obey traffic rules, estop signals will be sent. The “DecisionResult” data is mainly for simulation to display such that developers could have a better understanding of the planning results. More detailed numerical intermediate results are stored in the debug information and sent out for debugging purpose.
+In addition to the trajectory, the planning module also outputs rich annotation information. The important data fields are:
 
+- Estop
+- DecisionResult
+- Debug information
 
-### Input Data
+`Estop` is a command that indicates errors and exceptions. For example, when the autonomous vehicle collides with an obstacle or cannot obey traffic rules, estop signals are sent. The `DecisionResult` data is used mainly for simulation display so that developers have a better understanding of the planning results. More detailed numerical intermediate results are stored in the debug information and sent out for debugging purposes.
 
-To compute the finally published trajectory, the planning module leverages various input data sources.The input of planning consists of:
+## Input Data
 
-1. Routing
-2. Perception and Prediction
-3. Vehicle Status and Localization
-4. HD-Map
+To compute the final published trajectory, the planning module leverages various input data sources. The planning input data sources are:
 
-Routing defines “where I want to go” for the autonomous vehicle, and the message is defined in “`routing.proto`”. The “**RoutingResponse**” contains the “**RoadSegment**” which identifies the road or lanes to follow through in order to reach the destination.
+- Routing
+- Perception and Prediction
+- Vehicle Status and Localization
+- HD-Map
 
-![](images/class_architecture_planning/image004.png)
+Routing defines the query concept “where I want to go” for the autonomous vehicle, and the message is defined in `routing.proto`. The `RoutingResponse` contains the `RoadSegment`, which identifies the road to follow or the lanes to use to reach the destination as shown below.
 
-The messages regarding “what are surrounding me” is mostly defined in “perception_obstacles.proto” and “`traffic_light_detection.proto`”. “`perception_obstacles.proto`” defines the obstacles perceived by the perception module around the autonomous vehicle, while “**traffic_light_detection**” defines the perceived traffic light statuses (if any). In addition to the perceived obstacles, what important for the planning module are the predicted trajectories for each perceived dynamic obstacle. Therefore, the “prediction.proto” wraps the perception_obstacle message with a predicted trajectory, as shown below:
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image004.png)
 
-![](images/class_architecture_planning/image005.png)
+The messages regarding the query concept  “what is surrounding me” are defined mainly in `perception_obstacles.proto` and `traffic_light_detection.proto`. The `perception_obstacles.proto` defines the obstacles perceived by the perception module around the autonomous vehicle, while `traffic_light_detection` defines the perceived traffic light statuses (if any). In addition to the perceived obstacles, what is important for the planning module are the predicted trajectories for each perceived dynamic obstacle. Therefore, the `prediction.proto` wraps the `perception_obstacle` message with a predicted trajectory, as shown below.
 
-Each of the predicted trajectory has a probability associated with it, and one obstacle might have multiple predicted trajectories.
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image005.png)
 
-Besides “where I want to go” and “what is surrounding me”, another important aspect of information is “where I am”. Such information are obstained from the HD-map and Localization modules. Both localization and vehicle chassis information are incorporated in the messages of “**VehicleState**” defined in the “`vehicle_state.proto`”, as shown below.
+Each predicted trajectory has a probability associated with it, and one obstacle might have multiple predicted trajectories. 
+
+In addition to the query concepts “where I want to go” and “what is surrounding me”, another important query concept is “where am I”. Such information is obtained from the HD-Map and Localization modules. Both localization and vehicle chassis information are incorporated in the messages of `VehicleState` that is defined in the `vehicle_state.proto`, as shown below.
+
+![img](file://localhost/private/var/folders/1n/hnpps_ps0gl_pw_g_69ds93m0000gp/T/TemporaryItems/msoclip/0/clip_image012.png)
 
 ## Code Structure and Class Hierarchy
 
-The code is organized as follows:The planning code entrance is the planning.cc. Inside the planner, the important class members are shown in the following picture.
+The code is organized as follows: The planning code entrance is the `planning.cc`. Inside the planner, the important class members are shown in the illustration below.
 
-![](images/class_architecture_planning/image006.png)
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image006.png)
 
-The “**ReferenceLineInfo**” is a wrapper of the “**ReferenceLine**” class which represents a smoothed guideline for planning. **Frame** contains all the data dependencies including the perceived obstacles with their predicted trajectories, and status regarding the autonomous vehicle itself. **HD-Map** is leveraged as a library inside the planning module for ad-hoc fashioned map queries. The actual planning work is done by the “**EM-Planner**”, which is derived from the “**Planner**” class. While “**Em-Planner**” is the one actually used in our Apollo 2.0 release, the previously released “**RTK-Planner**” is also a derivative from the “**Planner**” class.
+The `ReferenceLineInfo` is a wrapper of the `ReferenceLine` class, which represents a smoothed guideline for planning. 
 
-![](images/class_architecture_planning/image007.png)
+**Frame** contains all the data dependencies including the perceived obstacles with their predicted trajectories, and the current status of the autonomous vehicle. 
 
-Inside an planning cycle performed by the EM-Planner, we take an “iterative” approach (as shown in the figure below) where three categories of “tasks” interweave. The relationships of these “**decider/optimizer**” classes are shown as below.
+**HD-Map** is leveraged as a library inside the planning module for ad-hoc fashioned map queries. 
 
-![](images/class_architecture_planning/image008.png)
+**EM Planner** does the actual planning and derives from the **Planner** class. Both the Em Planner that is used in the Apollo 2.0 release, and the previously released **RTK Planner** derive from the Planner class.
 
-* Deciders: traffic decider, path decider and speed decider
-* Path Optimizers: DP/QP path optimizer
-* Speed Optimizers: DP/QP speed optimizer
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image007.png)
 
-Here DP means dynamic programming while QP means quadratic programming. After the computation, the trajectory will then be discretized and published such that the downstream control module will be able to execute it.
+For example, inside a planning cycle performed by the EM Planner, take an iterative approach where three categories of tasks interweave. The relationships of these “**decider/optimizer**” classes are illustrated below.
+
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image008.png)
+
+- **Deciders** include traffic decider, path decider and speed decider.
+
+- **Path Optimizers** are the DP/QP path optimizers.
+
+- **Speed Optimizers** are the DP/QP speed optimizers.
+
+
+| **NOTE:**                                |
+| ---------------------------------------- |
+| DP means dynamic programming while QP means quadratic programming. After the computation, the final spatio-temporal trajectory is then discretized and published so that the downstream control module is able to execute it. |
