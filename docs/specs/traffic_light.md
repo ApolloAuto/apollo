@@ -1,21 +1,92 @@
 # Traffic Light Perception
-This document describes the details of traffic light perception in Baidu Apollo program.
- 
-## 1. Introduction
-The traffic light perception module is designed to provide accurate and robust traffic light state using cameras. Typically, the traffic light has three states, including red, yellow and green. Sometimes traffic light may keep black if not work or flashing. Occasionally, traffic light cannot be found in camera field of vision and our module failed to recognize its state. Hence, the traffic light perception module outputs five states in total, which are red, yellow, green, black and unknown.
- 
-Our module query hd-map repeatedly to know whether there are lights in front. The traffic light is represented by the four points on its boundary, which can be obtained by querying hd-map given the car's localization. The light in front will be projected from world coordinates to image coordinates.
- 
-Considering that the height of lights or the breadth of crossing varies widely, single camera with a constant field of vision, can't see traffic light in perception range which should be above 100 meters. We adopt multi cameras to enlarge perception range. In apollo 2.0, a telephoto camera whose focal length is 25 mm, is installed to observe forward far traffic light. Traffic lights captured in the telephoto camera are very large and easy to be detected. However, the field of vision of telephoto camera is quite limited so that the lights are often out of the image if the lane is not straight enough or the car is near the light. Thus, a wide angle camera whose focal length is 6 mm, is equipped to provide supplementary field of vision. The module will decide which camera to be used adaptively based on the coordinate projection. Although there are only two cameras on Apollo car, our algorithm is able to handle multi-cameras.
- 
- ![telephoto camera](images/traffic_light/long.jpg) 
+This document provides the details about how traffic light perception functions in Apollo 2.0.
 
- ![wide angle camera](images/traffic_light/short.jpg)
+## Introduction
+The Traffic Light Perception Module is designed to provide accurate and comprehensive traffic light status using cameras. 
 
-The pipeline consists of two main parts which are pre-process and process.
-## 2. Pre-process
- There is no need to detect lights in every frame of image since the state of traffic light changes in low frequency and the computing resource are limited. Normally, images from different cameras would arrive nearly simultaneously and only one of them is fed to process part. Therefore, the camera selection is necessary.The traffic light is represented by the four points on its boundary, which is stored in hd-map. A typical signal info is like below:
-``` protobuf
+Typically, the traffic light has three states:
+
+- Red
+- Yellow
+- Green
+
+However, if the traffic light is not working, it might display the color black or show a flashing red or yellow light. Sometimes the traffic light cannot be found in the camera's field of vision and the module fails to recognize its status. 
+
+To account for all situations, the Traffic Light Perception Module provides output for five states:
+
+- Red
+- Yellow
+- Green
+- Black
+- Unknown
+
+The module's HD-Map queries repeatedly to know whether there are lights present in front of the vehicle. The traffic light is represented by the four points on its boundary, which can be obtained by querying the HD-Map, given the car's location. The traffic light is projected from world coordinates to image coordinates if there is a light in front of the vehicle.
+
+Apollo has determined that using a single camera, which has a constant field of vision, cannot see traffic lights everywhere. This limitation is due to the following factors:
+
+- The perception range should be above 100 meters 
+- The height of the traffic lights or the width of crossing varies widely
+
+Consequently, Apollo 2.0 uses two cameras to enlarge its perception range:
+
+-  A **telephoto** **camera**, whose focus length is 25 mm, is installed to observe forward, distant traffic lights. Traffic lights that are captured in a telephoto camera are very large and easy to detect. However, the field of vision of a telephoto camera is quite limited. The lights are often outside of the image if the lane is not straight enough, or if the car is in very close proximity to the light. 
+
+
+- A **wide-angle camera**, whose focus length is 6 mm, is equipped to provide a supplementary field of vision. 
+
+The module decides which camera to use adaptively based on the light projection. Althrough there are only two cameras on the Apollo car, the algorithm can handle multiple cameras.
+
+ The following photos show the detection of traffic lights using a telephoto camera (for the first photo) and a wide-angle camera (for the second photo).
+
+![telephoto camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/long.jpg) 
+
+
+![wide angle camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/short.jpg)
+
+# Pipeline
+
+The Pipeline has two main parts and is described in following sections:
+- Pre-process
+  - Traffic light projection
+  - Camera selection
+  - Image and cached lights sync
+- Process
+  - Rectify — Provide the accurate traffic light bounding boxes
+  - Recognize — Provide the color of each bounding box
+  - Revise — Correct the color based on the time sequence
+
+## Pre-process
+There is no need to detect lights in every frame of an image. The status of a traffic light changes in low frequency and the computing resources are limited. Normally, images from different cameras would arrive almost simultaneously, and only one is fed to the Process part of the Pipeline. Therefore, the selection and the matching of images are necessary. 
+
+### Input/Output
+
+This section describes the input and the output of the Pre-process module. The input is obtained by subscribing to topic names from Apollo or directly reading them from locally stored files, and the output is fed to the successive Process module.
+
+#### Input
+
+- Images from different cameras, acquired by subscribing to the topic name:
+
+    - `/apollo/sensor/camera/traffic/image_long`
+    - `/apollo/sensor/camera/traffic/image_short`
+
+- Localization, acquired by querying the topic:
+    - `/tf`
+
+- HD Map
+
+- Calibration results
+
+#### Output
+
+  - Image from the selected camera
+  - Traffic light bounding box projected from world coordinates to image coordinates
+
+### Camera Selection
+The traffic light is represented by a unique ID and four points on its boundary, each of which is described as a 3D point in the world coordinate system.
+
+The following example shows a typical entry for traffic light `signal info`. The four boundary points can be obtained by querying the HD Map, given the car's location. 
+
+```protobuf
 signal info:
 id {
   id: "xxx"
@@ -28,22 +99,10 @@ boundary {
 }
 ```
 
-### 2.1 Input/Output
-Input：
-- images from different cameras, acquired by subscribing:
-    - **/apollo/sensor/camera/traffic/image_long**
-    - **/apollo/sensor/camera/traffic/image_short**
-- localization, acquired by subscribing 
-    - **/tf**
-- hd-map
-- calibration results
- 
-Output：
-  - image from the selected camera.
-  - traffic light bounding box projected from world coordinates to image coordinates
+The boundary points in the 3D world coordinates are then projected to the 2D image coordinates of each camera. For one traffic light, the bounding box described by the four projected points in the telephoto camera image has a larger area. It is better for detection than that in the wide-range image. Consequently,  the image from the camera with the longest focal length that can see all the lights will be selected as the output image. The traffic light bounding box projected on this image will be the output bounding box. 
 
-### 2.2 camera selection
- The boundary points are projected to the image coordinates of each camera while driving. In the same position, the longer focal length, the larger projected area and the better for detecting. Hence the camera with the longest focal length that could see all the lights is selected. If lights fail to projected to all cameras, we simply selected the telephoto camera just to go through all pipelines. The selected camera id with timestamp is cached in queue, as described below:
+The selected camera ID with timestamp is cached in queue, as shown below:
+
  ``` C++
 struct ImageLights {
   CarPose pose;
@@ -53,32 +112,51 @@ struct ImageLights {
   ... other ...
 };
  ```
-##### Attention
-So far, all the information we need is localization, calibration results and hd-map. The selection can be perform at any time since projection is independent of image content. We perform the selection when images arrive is just for simplicity. Besides, the selection don't need to be done at every image's arrival and a interval for selection is set.
+Thus far, all the information that we need includes the localization, the calibration results, and the HD Map. The selection can be performed at any time as the projection is independent of the image content. The task of  performing the selection when images arrive is just for simplicity. Moreover, image selection does not need to be performed upon the arrival of every image, and a time interval for the selection is set. 
 
-### 2.3 image sync
-Images arrive with its timestamp and camera id. The pair of timestamp and camera id is used to find appropriate cached information. If the image can find a cached record with same camera id and small difference between timestamps, the image can be published to process. All inappropriate images are abandoned.
- 
-## 3. Process
-We divide the process task into the following three steps.
-### 3.1 Input/Output
-Input：
-- image from selected camera
-- a set of bounding boxes
- 
-Output：
-  - a set of bounding boxes with color labels.
+### Image Sync
+Images arrive with a timestamp and a camera ID. The pairing of a timestamp and a camera ID is used to find the appropriate cached information. If the image can find a cached record with same camera ID and a small difference between timestamps, the image can be published to the Process module. All inappropriate images are abandoned.
 
-### 3.2 rectifier
-The projected position, which is affected by the calibration, localization and hd-map label, is not completely reliable. A larger region of interest (ROI) calculated using projected light's position is used to find the accurate bounding box of traffic light. As is shown below, the blue rectangle means the projected light bounding box, which has large offset to real light. The big yellow rectangle is the ROI. 
+## Process 
+The Process module is divided into three steps, with each step focusing on one task:
 
-![example](images/traffic_light/example.jpg)
+- Rectifier — Detects a traffic light bounding box in a ROI.
+- Recognizer— Classifies the bounding box's color.
+- Reviser — Correct color using sequential information.
 
-The traffic light detection is implemented as a regular CNN detection task, which receive a image with ROI as input and output a serial bounding boxes. There may be more lights in ROI than that in input and we need to select the proper lights according to the detection score, input lights' position and shape. If the CNN network couldn't find any light in ROI, all input lights' state will be marked as unknown and the remain steps will be skipped.
- 
-### 3.3 recogniser
-The traffic light recognization is implemented as a typical CNN classification task. The network receive a image with ROI and a list of bounding boxes as input. The output of network is a $4\times n$ vector, representing four probabilities for each box to be black,red,yellow and green. The class with max probability will be regard as the light's state if and only if the probability is large enough. Otherwise, the light's state will be set to black, means the state is not sure.
- 
-### 3.4 reviser
-Since the light can be flashing or shaded and the recognizer is hard to be perfect, the current state may fail to represent real state. A reviser that could correct state is necessary. If receive a sure state,such as red or green, reviser will save and output the state directly. If received state is black or unknown , reviser will look up the saved map. When there are sure state for this light in some time, reviser output this saved state. Otherwise the black or unknown is outputed. Because of the time sequence, yellow only exists after green and before red. Any yellow after red will be reset to red for the sake of safety until green comes.
+### Input/Output
+This section describes the data input and output of the Process. The input is obtained from the Pre-process module and the output is published as a traffic light topic.
+
+#### Input
+
+- Image from a selected camera
+- A set of bounding boxes
+
+#### Output
+
+  - A set of bounding boxes with color labels.
+
+### Rectifier
+The projected position, which is affected by the calibration, localization, and the HD-Map label, is ***not completely reliable***. A larger region of interest (ROI), calculated using the projected light's position, is used to find the accurate boundingbox for the traffic light. 
+
+In the photo below, the blue rectangle indicates the projected light bounding box, which has a large offset to the actual light. The big, yellow rectangle is the ROI. 
+
+![example](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/example.jpg)
+
+The traffic light detection is implemented as a regular convolutional neural network (CNN) detection task. It receives an image with an ROI as input, and serial bounding boxes as output. There might be more lights in the ROI than those in input. 
+
+Apollo needs to select the proper lights according to the detection score, and the input lights' position and shape. If the CNN network cannot find any lights in the ROI, the status from the input lights is marked as unknown and the two remaining steps (Recognizer and Reviser) are skipped.
+
+### Recognizer
+The traffic light recognition is implemented as a typical CNN classification task. The network receives an image with a ROI and a list of bounding boxes as input. The output of network is a `$4\times n$ vector`, representing four probabilities for each box to be black, red, yellow, and green. 
+
+The class with maximum probability will be regarded as the light's status, if and only if the probability is large enough. Otherwise, the light's status will be set to black, which means that the status is not certain.
+
+### Reviser
+Because a traffic light can be flashing or shaded, and the Recognizer is ***not*** perfect, the current status may fail to represent the real status. A Reviser that could correct the status is necessary. 
+
+If the Reviser receives a definitive status such as red or green, the Reviser saves and outputs the status directly. If the received status is black or unknown, the Reviser looks up the saved map. When the status of this light is certain for a period of time, the Reviser outputs this saved status. Otherwise, the status of black or unknown is sent as output. 
+
+Because of the time sequence, yellow only exists ***after*** green and ***before*** red. Any yellow ***after red*** is reset to red for the sake of safety until green displays.
+
  
