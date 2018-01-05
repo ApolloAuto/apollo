@@ -68,6 +68,7 @@ PathTimeNeighborhood::PathTimeNeighborhood(
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
   init_s_ = init_s;
+  discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(frame, reference_line, discretized_ref_points);
 }
 
@@ -133,9 +134,6 @@ void PathTimeNeighborhood::SetupObstacles(
         }
       }
 
-      double v =
-          SpeedOnReferenceLine(discretized_ref_points, obstacle, sl_boundary);
-
       if (path_time_obstacle_map_.find(obstacle->Id()) ==
           path_time_obstacle_map_.end()) {
         path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
@@ -184,33 +182,49 @@ void PathTimeNeighborhood::SetupObstacles(
   }
 }
 
-double PathTimeNeighborhood::SpeedAtT(const std::string& obstacle_id,
-                                      const double t) const {
-
+double PathTimeNeighborhood::SpeedAtT(
+    const std::string& obstacle_id, const double s, const double t) const {
+  bool found =
+      prediction_traj_map_.find(obstacle_id) != prediction_traj_map_.end();
+  CHECK(found);
   CHECK_GE(t, 0.0);
   auto it_trajectory = prediction_traj_map_.find(obstacle_id);
   CHECK(it_trajectory != prediction_traj_map_.end());
 
   const prediction::Trajectory& trajectory = it_trajectory->second;
   int num_traj_point = trajectory.trajectory_point_size();
-  if (num_traj_point == 0) {
+  if (num_traj_point < 2) {
     return 0.0;
   }
 
-  int index = LastIndexBefore(trajectory, t);
-  if (index == -1) {
-    return trajectory.trajectory_point(0).v();
-  }
-  if (index == num_traj_point - 1) {
-    return trajectory.trajectory_point(index).v();
+  int curr_index = LastIndexBefore(trajectory, t);
+  int next_index = curr_index + 1;
+  double heading = trajectory.trajectory_point(curr_index).path_point().theta();
+  
+  if (curr_index == num_traj_point - 1) {
+    curr_index = num_traj_point - 2;
+    next_index = num_traj_point - 1;
   }
 
-  double v_before = trajectory.trajectory_point(index).v();
-  double t_before = trajectory.trajectory_point(index).relative_time();
-  double v_after = trajectory.trajectory_point(index + 1).v();
-  double t_after = trajectory.trajectory_point(index + 1).relative_time();
+  double v_curr = trajectory.trajectory_point(curr_index).v();
+  double t_curr = trajectory.trajectory_point(curr_index).relative_time();
+  double x_curr = trajectory.trajectory_point(curr_index).path_point().x();
+  double y_curr = trajectory.trajectory_point(curr_index).path_point().y();
+  double v_next = trajectory.trajectory_point(next_index).v();
+  double t_next = trajectory.trajectory_point(next_index).relative_time();
+  double x_next = trajectory.trajectory_point(next_index).path_point().x();
+  double y_next = trajectory.trajectory_point(next_index).path_point().y();
+  double v = apollo::common::math::lerp(v_curr, t_curr, v_next, t_next, t);
+  if (std::abs(x_next - x_curr) > 0.1 && std::abs(y_next - y_curr) > 0.1) {
+    heading = std::atan2(y_next - y_curr, x_next - x_curr);
+  }
+  double v_x = v * std::cos(heading);
+  double v_y = v * std::sin(heading);
+  PathPoint obstacle_point_on_ref_line =
+      ReferenceLineMatcher::MatchToReferenceLine(discretized_ref_points_, s);
+  double ref_theta = obstacle_point_on_ref_line.theta();
 
-  return apollo::common::math::lerp(v_before, t_before, v_after, t_after, t);
+  return std::cos(ref_theta) * v_x + std::sin(ref_theta) * v_y;
 }
 
 PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
@@ -221,20 +235,6 @@ PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
   path_time_point.set_v(0.0);
   path_time_point.set_obstacle_id(obstacle_id);
   return path_time_point;
-}
-
-double PathTimeNeighborhood::SpeedOnReferenceLine(
-    const std::vector<PathPoint>& discretized_ref_points,
-    const Obstacle* obstacle, const SLBoundary& sl_boundary) {
-  PathPoint obstacle_point_on_ref_line =
-      ReferenceLineMatcher::MatchToReferenceLine(discretized_ref_points,
-                                                 sl_boundary.start_s());
-  const PerceptionObstacle& perception_obstacle = obstacle->Perception();
-  double ref_theta = obstacle_point_on_ref_line.theta();
-  auto velocity = perception_obstacle.velocity();
-  double v =
-      std::cos(ref_theta) * velocity.x() + std::sin(ref_theta) * velocity.y();
-  return v;
 }
 
 std::vector<PathTimeObstacle> PathTimeNeighborhood::GetPathTimeObstacles()
