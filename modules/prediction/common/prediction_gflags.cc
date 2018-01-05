@@ -98,6 +98,7 @@ DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
 DEFINE_bool(enable_adjust_velocity_heading, false,
             "adjust velocity heading to lane heading");
+DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
