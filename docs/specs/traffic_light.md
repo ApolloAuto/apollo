@@ -141,7 +141,7 @@ The projected position, which is affected by the calibration, localization, and 
 
 In the photo below, the blue rectangle indicates the projected light bounding box, which has a large offset to the actual light. The big, yellow rectangle is the ROI. 
 
-![example](images/example.jpg)
+![example](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/example.jpg)
 
 The traffic light detection is implemented as a regular convolutional neural network (CNN) detection task. It receives an image with an ROI as input, and serial bounding boxes as output. There might be more lights in the ROI than those in input. 
 
