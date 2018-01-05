@@ -35,8 +35,9 @@ for fn in sys.argv[1:]:
         xs.append(x)
         ys.append(y)
     f.close()
-    ax.plot(xs, ys, styles[i], lw=3, alpha=0.8)
-    i = i % len(styles) + 1
+    si = i % len(styles)
+    ax.plot(xs, ys, styles[si], lw=3, alpha=0.8)
+    i += 1
 
 ax.axis('equal')
 plt.show()

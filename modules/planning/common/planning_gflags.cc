@@ -18,6 +18,10 @@
 
 DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
 
+DEFINE_double(test_duration, -1.0,
+              "The runtime duration in test mode. There is no runtime limit if "
+              "the value is not positive");
+
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_string(planning_adapter_config_filename,
@@ -61,9 +65,6 @@ DEFINE_double(reference_line_stitch_overlap_distance, 20,
 DEFINE_double(reference_line_lateral_buffer, 0.5,
               "When creating reference line, the minimum distance with road "
               "curb for a vehicle driving on this line.");
-DEFINE_double(reference_line_lateral_extension, 0.5,
-              "When creating reference line, the minimum distance with road "
-              "curb for a vehicle driving on this line.");
 DEFINE_double(prepare_rerouting_time, 2.0,
               "If there are this amount of seconds left to finish driving on "
               "current route, and there is no routing, do rerouting");
@@ -105,10 +106,12 @@ DEFINE_bool(enable_change_lane_decider, false,
             "True to use change lane state machine decider.");
 DEFINE_double(change_lane_speed_relax_percentage, 0.05,
               "The percentage of change lane speed relaxation.");
+DEFINE_bool(enable_side_vehicle_st_boundary, false,
+            "Add st boundary of side vehicle in st graph.");
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
-DEFINE_double(max_collision_distance, 0.1,
+DEFINE_double(max_collision_distance, 0.0,
               "considered as collision if distance (meters) is smaller than or "
               "equal to this (meters)");
 
@@ -178,7 +181,7 @@ DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_double(static_obstacle_speed_threshold, 1.0,
+DEFINE_double(static_obstacle_speed_threshold, 2.0,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
@@ -187,7 +190,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(try_history_decision, false, "try history decision first");
 
-DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -202,18 +205,20 @@ DEFINE_double(stop_distance_traffic_light, 3.0,
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
-DEFINE_double(nudge_distance_obstacle, 0.3,
+DEFINE_double(nudge_distance_obstacle, 0.5,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(yield_min_distance, 3.0,
               "min yield distance for vehicles/bicycles/moving objects");
 DEFINE_double(
-    follow_time_buffer, 2.0,
+    follow_time_buffer, 2.5,
     "follow time buffer (in second) to calculate the following distance.");
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
+DEFINE_double(within_lane_bound, 4.0,
+              "distance to be considered within current lane");
 
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
@@ -284,7 +289,7 @@ DEFINE_double(stop_duration_for_stop_sign, 3,
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
 DEFINE_double(
-    turn_signal_distance, 60.96,
+    turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
 DEFINE_bool(right_turn_creep_forward, false,
             "Creep forward at right turn when the signal is red and traffic "
@@ -310,6 +315,13 @@ DEFINE_int32(lag_prediction_min_appear_num, 5,
 DEFINE_double(lag_prediction_max_disappear_num, 3,
               "In lagged prediction, ingnore obstacle disappeared for more "
               "than this value");
+DEFINE_double(lag_prediction_protection_distance, 30,
+              "Within this distance, we do not use lagged prediction");
+
+DEFINE_double(perception_confidence_threshold, 0.4,
+              "Skip the obstacle if its confiderence is lower than "
+              "this threshold.");
+
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer
@@ -337,3 +349,11 @@ DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
+DEFINE_bool(
+    enable_multi_thread_in_dp_poly_path, false,
+    "Enable multiple thread to calculation curve cost in dp_poly_path.");
+DEFINE_int32(num_thread_dp_poly_path, 3, "num of thread used in dp_poly_path.");
+
+DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
+            "Enable multiple thread to calculation curve cost in dp_st_graph.");
+DEFINE_int32(num_thread_dp_st_graph, 3, "num of thread used in dp_st_graph.");

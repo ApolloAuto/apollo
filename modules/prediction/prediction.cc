@@ -19,9 +19,11 @@
 #include <cmath>
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -37,16 +39,17 @@ using ::apollo::common::Status;
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::adapter::AdapterManager;
+using ::apollo::common::math::Vec2d;
 using ::apollo::common::time::Clock;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::perception::PerceptionObstacle;
 using ::apollo::perception::PerceptionObstacles;
 
-std::string Prediction::Name() const {
-  return FLAGS_prediction_module_name;
-}
+std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
+  start_time_ = Clock::NowInSeconds();
+
   // Load prediction conf
   prediction_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
@@ -84,12 +87,14 @@ Status Prediction::Init() {
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
+  if (!PredictionMap::instance()->Ready()) {
+    return OnError("Map cannot be loaded.");
+  }
+
   return Status::OK();
 }
 
-Status Prediction::Start() {
-  return Status::OK();
-}
+Status Prediction::Start() { return Status::OK(); }
 
 void Prediction::Stop() {}
 
@@ -123,18 +128,49 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
               AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(adc_trajectory_container);
   adc_trajectory_container->Insert(adc_trajectory);
+
+  ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
+         << "].";
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
+  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
+      (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
+    AINFO << "Prediction finished running in test mode";
+    ros::shutdown();
+  }
+
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
   double start_timestamp = Clock::NowInSeconds();
+
+  // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
+
+  // Update ADC status
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
+  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::PLANNING_TRAJECTORY));
+  CHECK_NOTNULL(pose_container);
+  CHECK_NOTNULL(adc_container);
+
+  if (pose_container->ToPerceptionObstacle() != nullptr) {
+    double x = pose_container->ToPerceptionObstacle()->position().x();
+    double y = pose_container->ToPerceptionObstacle()->position().y();
+    ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
+           << ", " << std::fixed << std::setprecision(6) << y << "].";
+    Vec2d adc_position(x, y);
+    adc_container->SetPosition(adc_position);
+  }
+
+  // Make predictions
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
 
@@ -143,14 +179,16 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
 
-  for (auto const& prediction_obstacle :
-       prediction_obstacles.prediction_obstacle()) {
-    for (auto const& trajectory : prediction_obstacle.trajectory()) {
-      for (auto const& trajectory_point : trajectory.trajectory_point()) {
-        if (!IsValidTrajectoryPoint(trajectory_point)) {
-          AERROR << "Invalid trajectory point ["
-                 << trajectory_point.ShortDebugString() << "]";
-          return;
+  if (FLAGS_prediction_test_mode) {
+    for (auto const& prediction_obstacle :
+         prediction_obstacles.prediction_obstacle()) {
+      for (auto const& trajectory : prediction_obstacle.trajectory()) {
+        for (auto const& trajectory_point : trajectory.trajectory_point()) {
+          if (!IsValidTrajectoryPoint(trajectory_point)) {
+            AERROR << "Invalid trajectory point ["
+                   << trajectory_point.ShortDebugString() << "]";
+            return;
+          }
         }
       }
     }

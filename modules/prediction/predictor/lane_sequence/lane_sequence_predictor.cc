@@ -40,32 +40,20 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
+  if (feature.is_still()) {
+    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
+    return;
+  }
+
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
     return;
   }
 
-  if (feature.is_still()) {
-    std::vector<TrajectoryPoint> points;
-    double position_x = feature.position().x();
-    double position_y = feature.position().y();
-    if (FLAGS_enable_kf_tracking) {
-      position_x = feature.t_position().x();
-      position_y = feature.t_position().y();
-    }
-    double theta = feature.theta();
-    ::apollo::prediction::predictor_util::GenerateStillSequenceTrajectoryPoints(
-        position_x, position_y, theta, FLAGS_prediction_duration,
-        FLAGS_prediction_freq, &points);
-    Trajectory trajectory = GenerateTrajectory(points);
-    trajectory.set_probability(1.0);
-    trajectories_.push_back(std::move(trajectory));
-
-    ADEBUG << "Obstacle [" << obstacle->id() << "] has a still trajectory.";
-    return;
+  std::string lane_id = "";
+  if (feature.lane().has_lane_feature()) {
+    lane_id = feature.lane().lane_feature().lane_id();
   }
-
-  std::string lane_id = feature.lane().lane_feature().lane_id();
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
   FilterLaneSequences(feature.lane().lane_graph(), lane_id,
@@ -94,7 +82,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     double prediction_total_time = FLAGS_prediction_pedestrian_total_time;
     DrawLaneSequenceTrajectoryPoints(
         feature, curr_lane_id, obstacle->kf_lane_tracker(curr_lane_id),
-        sequence, prediction_total_time, FLAGS_prediction_freq, &points);
+        sequence, prediction_total_time, FLAGS_prediction_period, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
@@ -108,32 +96,32 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     const Feature& feature, const std::string& lane_id,
     const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
-    double total_time, double freq, std::vector<TrajectoryPoint>* points) {
+    double total_time, double period, std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
-  if (!FLAGS_enable_kf_tracking) {
-    Eigen::Vector2d position(feature.position().x(), feature.position().y());
-    PredictionMap* map = PredictionMap::instance();
-    std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
-    double lane_s = 0.0;
-    double lane_l = 0.0;
-    if (map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
-      state(0, 0) = lane_s;
-      state(1, 0) = lane_l;
-      state(2, 0) = feature.speed();
-      state(3, 0) = feature.acc();
-    }
+
+  Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  std::shared_ptr<const LaneInfo> lane_info =
+      PredictionMap::instance()->LaneById(lane_id);
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  if (PredictionMap::instance()->GetProjection(position, lane_info, &lane_s,
+                                               &lane_l)) {
+    state(0, 0) = lane_s;
+    state(1, 0) = lane_l;
+    state(2, 0) = feature.speed();
+    state(3, 0) = feature.acc();
   }
   if (FLAGS_enable_lane_sequence_acc && sequence.has_acceleration()) {
     state(3, 0) = sequence.acceleration();
   }
   Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
-  transition(0, 2) = freq;
-  transition(0, 3) = 0.5 * freq * freq;
-  transition(2, 3) = freq;
+  transition(0, 2) = period;
+  transition(0, 3) = 0.5 * period * period;
+  transition(2, 3) = period;
 
-  size_t num = static_cast<size_t>(total_time / freq);
+  size_t num = static_cast<size_t>(total_time / period);
   ::apollo::prediction::predictor_util::GenerateLaneSequenceTrajectoryPoints(
-      &state, &transition, sequence, num, freq, points);
+      &state, &transition, sequence, num, period, points);
 }
 
 }  // namespace prediction

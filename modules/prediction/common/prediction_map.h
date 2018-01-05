@@ -34,6 +34,12 @@ namespace prediction {
 class PredictionMap {
  public:
   /**
+   * @brief Check if map is ready
+   * @return True if map is ready
+   */
+  bool Ready();
+
+  /**
    * @brief Get the position of a point on a specific distance along a lane.
    * @param lane_info The lane to get a position.
    * @param s The distance along the lane.
@@ -88,6 +94,21 @@ class PredictionMap {
   static bool ProjectionFromLane(
       std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s,
       hdmap::MapPathPoint* path_point);
+
+  /**
+   * @brief Determine if a lane is a virtual lane.
+   * @param The lane ID of the lane.
+   * @return If the lane is a virtual lane.
+   */
+  static bool IsVirtualLane(const std::string& lane_id);
+
+  /**
+   * @brief Determine if a point is on a virtual lane.
+   * @param The point coordinate.
+   * @return If the point is on a virtual lane.
+   */
+  static bool OnVirtualLane(const Eigen::Vector2d& position,
+                            const double radius);
 
   /**
    * @brief Get the connected lanes from some specified lanes.

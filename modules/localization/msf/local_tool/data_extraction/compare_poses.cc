@@ -68,12 +68,18 @@ int main(int argc, char **argv) {
   std::vector<double> timestamps_a;
   apollo::localization::msf::velodyne::
       LoadPosesAndStds(loc_file_a, &poses_a, &stds_a, &timestamps_a);
+  if (poses_a.size() == 0) {
+    return 0;
+  }
 
   std::vector<Eigen::Affine3d> poses_b;
   std::vector<Eigen::Vector3d> stds_b;
   std::vector<double> timestamps_b;
   apollo::localization::msf::velodyne::
       LoadPosesAndStds(loc_file_b, &poses_b, &stds_b, &timestamps_b);
+  if (poses_b.size() == 0) {
+    return 0;
+  }
 
   std::map<unsigned int, Eigen::Affine3d> out_poses_a;
   std::map<unsigned int, Eigen::Vector3d> out_stds_a;
@@ -87,7 +93,18 @@ int main(int argc, char **argv) {
       PoseAndStdInterpolationByTime(poses_a, stds_a,
         timestamps_a, timestamps_a, &out_poses_a, &out_stds_a);
 
-  std::ofstream file(compare_file.c_str());
+  if (out_poses_a.size() == 0 ||out_poses_b.size() == 0) {
+    return 0;
+  }
+
+  std::vector<unsigned int> vec_idx;
+  std::vector<double> vec_timestamp;
+  std::vector<double> vec_x_diff;
+  std::vector<double> vec_y_diff;
+  std::vector<double> vec_z_diff;
+  std::vector<double> vec_roll_diff;
+  std::vector<double> vec_pitch_diff;
+  std::vector<double> vec_yaw_diff;
 
   for (unsigned int idx = 0; idx < timestamps_a.size(); idx++) {
     auto pose_a_found_iter = out_poses_a.find(idx);
@@ -123,12 +140,29 @@ int main(int argc, char **argv) {
         double yaw_diff = fabs(yaw_a - yaw_b);
         yaw_diff = std::min(yaw_diff, 2.0 * M_PI - yaw_diff)  * 180.0 / M_PI;
 
-        file << idx << " " << std::setprecision(13) << timestamps_a[idx] << " "
-          << x_diff << " " << y_diff << " " << z_diff << " "
-          << roll_diff << " " << pitch_diff << " " << yaw_diff << std::endl;
+        vec_idx.push_back(idx);
+        vec_timestamp.push_back(timestamps_a[idx]);
+        vec_x_diff.push_back(x_diff);
+        vec_y_diff.push_back(y_diff);
+        vec_z_diff.push_back(z_diff);
+        vec_roll_diff.push_back(roll_diff);
+        vec_pitch_diff.push_back(pitch_diff);
+        vec_yaw_diff.push_back(yaw_diff);
       }
     }
   }
 
+  if (vec_idx.size() == 0) {
+    return 0;
+  }
+
+  std::ofstream file(compare_file.c_str());
+  for (unsigned int i = 0; i < vec_idx.size(); ++i) {
+    file << vec_idx[i] << " " << std::setprecision(13)
+      << vec_timestamp[i] << " "
+      << vec_x_diff[i] << " " << vec_y_diff[i] << " " << vec_z_diff[i] << " "
+      << vec_roll_diff[i] << " " << vec_pitch_diff[i] << " " << vec_yaw_diff[i]
+      << std::endl;
+  }
   file.close();
 }

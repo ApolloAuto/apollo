@@ -22,8 +22,6 @@
 #ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
 
-#include <mutex>
-
 #include "modules/common/util/lru_cache.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -82,7 +80,6 @@ class ObstaclesContainer : public Container {
  private:
   double timestamp_ = -1.0;
   common::util::LRUCache<int, Obstacle> obstacles_;
-  static std::mutex g_mutex_;
 };
 
 }  // namespace prediction

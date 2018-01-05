@@ -44,7 +44,6 @@ cc_library(
         "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser:perception_obstacle_lidar_type_fuser_sequence_type_fuser",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
-        "//modules/perception/obstacle/fusion/dummy:perception_obstacle_fusion_dummy",
         "@eigen//:eigen",
         "@gtest//:gtest",
         "@ros//:ros_common",

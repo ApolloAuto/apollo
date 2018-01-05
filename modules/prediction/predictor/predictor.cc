@@ -28,6 +28,7 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::PathPoint;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Vec2d;
 using apollo::planning::ADCTrajectory;
@@ -79,22 +80,32 @@ bool Predictor::TrimTrajectory(
   }
   const Feature& feature = obstacle->latest_feature();
   double length = feature.length();
-  double heading = feature.theta();
+  double heading = feature.velocity_heading();
   double forward_length =
       std::max(length / 2.0 - FLAGS_distance_beyond_junction, 0.0);
 
-  double start_x = trajectory->trajectory_point(0).path_point().x() +
+  double front_x = trajectory->trajectory_point(0).path_point().x() +
                    forward_length * std::cos(heading);
-  double start_y = trajectory->trajectory_point(0).path_point().y() +
+  double front_y = trajectory->trajectory_point(0).path_point().y() +
                    forward_length * std::sin(heading);
-  if (adc_trajectory_container->IsPointInJunction({start_x, start_y})) {
+  PathPoint front_point;
+  front_point.set_x(front_x);
+  front_point.set_y(front_y);
+  bool front_in_junction =
+      adc_trajectory_container->IsPointInJunction(front_point);
+
+  const PathPoint& start_point = trajectory->trajectory_point(0).path_point();
+  bool start_in_junction =
+      adc_trajectory_container->IsPointInJunction(start_point);
+
+  if (front_in_junction || start_in_junction) {
     return false;
   }
+
   int index = 0;
   while (index < num_point) {
-    double x = trajectory->trajectory_point(index).path_point().x();
-    double y = trajectory->trajectory_point(index).path_point().y();
-    if (adc_trajectory_container->IsPointInJunction({x, y})) {
+    const PathPoint& point = trajectory->trajectory_point(index).path_point();
+    if (adc_trajectory_container->IsPointInJunction(point)) {
       break;
     }
     ++index;

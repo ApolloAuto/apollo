@@ -49,7 +49,4 @@
     <arg name="queue_size" default="10"/>
   </include>
 
-  <node pkg="velodyne_pointcloud" type="extrinsics_broadcaster.py"
-    args="$(arg extrinsics_velodyne16)" name="static_transform_velodyne16" />
-
 </launch>

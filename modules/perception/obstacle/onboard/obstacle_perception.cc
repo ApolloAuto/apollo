@@ -23,7 +23,6 @@
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
-#include "modules/perception/obstacle/fusion/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
 DEFINE_string(obstacle_show_type, "fused",
@@ -105,7 +104,6 @@ bool ObstaclePerception::Init() {
 
 void ObstaclePerception::RegistAllAlgorithm() {
   RegisterFactoryDummyRadarDetector();
-  RegisterFactoryDummyFusion();
 
   RegisterFactoryModestRadarDetector();
   RegisterFactoryProbabilisticFusion();

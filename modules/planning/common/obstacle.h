@@ -37,6 +37,11 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class Obstacle
+ *
+ * @brief Obstacle represents one perception obstacle.
+ */
 class Obstacle {
  public:
   Obstacle() = default;
@@ -49,6 +54,7 @@ class Obstacle {
            const prediction::Trajectory &trajectory);
 
   const std::string &Id() const;
+  void SetId(const std::string &id) { id_ = id; }
 
   std::int32_t PerceptionId() const;
 

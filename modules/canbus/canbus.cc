@@ -29,13 +29,10 @@ namespace canbus {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::monitor::MonitorMessageItem;
-using apollo::drivers::canbus::CanClientFactory;
-
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
+using apollo::drivers::canbus::CanClientFactory;
 
 std::string Canbus::Name() const {
   return FLAGS_canbus_module_name;

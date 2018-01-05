@@ -7,19 +7,9 @@ cc_library(
     srcs = ["info_collector.cc"],
     hdrs = ["info_collector.h"],
     deps = [
-        "//modules/canbus/common:canbus_common",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/control/common:control_gflags",
-        "//modules/data/proto:recorder_conf_proto",
-        "//modules/data/proto:task_proto",
-    ],
-)
-
-cc_binary(
-    name = "update_task_info",
-    srcs = ["update_task_info.cc"],
-    deps = [
-        ":info_collector",
+        "//modules/common/kv_db",
+        "//modules/common/util",
+        "//modules/data/proto:static_info_proto",
     ],
 )
 

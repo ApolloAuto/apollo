@@ -85,9 +85,13 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() { CloseLogFile(); }
+void LonController::Stop() {
+  CloseLogFile();
+}
 
-LonController::~LonController() { CloseLogFile(); }
+LonController::~LonController() {
+  CloseLogFile();
+}
 
 Status LonController::Init(const ControlConf *control_conf) {
   control_conf_ = control_conf;
@@ -168,8 +172,8 @@ Status LonController::ComputeControlCommand(
   double preview_time = lon_controller_conf.preview_window() * ts;
 
   if (preview_time < 0.0) {
-    const auto error_msg = common::util::StrCat("Preview time set as: ",
-                                                preview_time, " less than 0");
+    const auto error_msg = common::util::StrCat(
+        "Preview time set as: ", preview_time, " less than 0");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -298,7 +302,9 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const { return name_; }
+std::string LonController::Name() const {
+  return name_;
+}
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
@@ -349,10 +355,10 @@ void LonController::ComputeLongitudinalErrors(
 }
 
 void LonController::SetDigitalFilter(double ts, double cutoff_freq,
-                                     DigitalFilter *digital_filter) {
+                                     common::DigitalFilter *digital_filter) {
   std::vector<double> denominators;
   std::vector<double> numerators;
-  LpfCoefficients(ts, cutoff_freq, &denominators, &numerators);
+  common::LpfCoefficients(ts, cutoff_freq, &denominators, &numerators);
   digital_filter->set_coefficients(denominators, numerators);
 }
 

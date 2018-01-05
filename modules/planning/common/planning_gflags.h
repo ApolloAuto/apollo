@@ -20,6 +20,7 @@
 #include "gflags/gflags.h"
 
 DECLARE_bool(planning_test_mode);
+DECLARE_double(test_duration);
 
 DECLARE_string(planning_config_file);
 DECLARE_string(planning_adapter_config_filename);
@@ -35,7 +36,6 @@ DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
-DECLARE_double(reference_line_lateral_extension);
 DECLARE_double(prepare_rerouting_time);
 DECLARE_double(rerouting_cooldown_time);
 
@@ -54,6 +54,7 @@ DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
 DECLARE_bool(enable_change_lane_decider);
 DECLARE_double(change_lane_speed_relax_percentage);
+DECLARE_bool(enable_side_vehicle_st_boundary);
 
 DECLARE_double(max_collision_distance);
 DECLARE_bool(publish_estop);
@@ -117,6 +118,7 @@ DECLARE_double(follow_min_distance);
 DECLARE_double(yield_min_distance);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
+DECLARE_double(within_lane_bound);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);
@@ -129,6 +131,8 @@ DECLARE_bool(enable_lag_prediction);
 DECLARE_int32(lag_prediction_min_appear_num);
 DECLARE_double(lag_prediction_max_disappear_num);
 DECLARE_int32(trajectory_point_num_for_debug);
+DECLARE_double(lag_prediction_protection_distance);
+DECLARE_double(perception_confidence_threshold);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
@@ -195,4 +199,10 @@ DECLARE_bool(enable_lattice_st_image_dump);
 
 DECLARE_double(trajectory_time_resolution);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+DECLARE_bool(enable_multi_thread_in_dp_poly_path);
+DECLARE_int32(num_thread_dp_poly_path);
+
+DECLARE_bool(enable_multi_thread_in_dp_st_graph);
+DECLARE_int32(num_thread_dp_st_graph);
+
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

@@ -22,6 +22,7 @@
 
 #include <algorithm>
 
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,16 +35,17 @@ using apollo::common::math::Vec2d;
 namespace {
 constexpr double kMinGuardVehicleSpeed = 1.0;
 constexpr double kGuardDistance = 100.0;
+constexpr double kMinOvertakeDistance = 10.0;
+constexpr double kOvertakeTimeBuffer = 2.0;
 }
 
 ChangeLane::ChangeLane(const RuleConfig& config) : TrafficRule(config) {}
 
-const Obstacle* ChangeLane::FindGuardObstacle(
-    ReferenceLineInfo* reference_line_info) {
+bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
   const auto& reference_line = reference_line_info->reference_line();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const auto& path_decision = reference_line_info->path_decision();
-  const Obstacle* first_guard_vehicle = nullptr;
+  const PathObstacle* first_guard_vehicle = nullptr;
   constexpr double kGuardForwardDistance = 60;
   double max_s = 0.0;
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
@@ -54,6 +56,12 @@ const Obstacle* ChangeLane::FindGuardObstacle(
     if (path_obstacle->PerceptionSLBoundary().start_s() >
         adc_sl_boundary.end_s()) {
       continue;
+    }
+    if (path_obstacle->PerceptionSLBoundary().end_s() <
+        adc_sl_boundary.start_s() -
+            std::max(kMinOvertakeDistance,
+                     obstacle->Speed() * kOvertakeTimeBuffer)) {
+      overtake_obstacles_.push_back(path_obstacle);
     }
     const auto& last_point =
         *(obstacle->Trajectory().trajectory_point().rbegin());
@@ -73,10 +81,13 @@ const Obstacle* ChangeLane::FindGuardObstacle(
     }
     if (last_sl.s() > max_s) {
       max_s = last_sl.s();
-      first_guard_vehicle = obstacle;
+      first_guard_vehicle = path_obstacle;
     }
   }
-  return first_guard_vehicle;
+  if (first_guard_vehicle) {
+    guard_obstacles_.push_back(first_guard_vehicle);
+  }
+  return true;
 }
 
 bool ChangeLane::CreateGuardObstacle(
@@ -102,14 +113,23 @@ bool ChangeLane::CreateGuardObstacle(
   double ref_s = sl_point.s() + kStepDistance;
   for (double t = last_point.relative_time() + time_delta; ref_s < end_s;
        ref_s += kStepDistance, s += kStepDistance, t += time_delta) {
-    auto ref_point = reference_line.GetNearestReferencepoint(s);
+    auto ref_point = reference_line.GetNearestReferencepoint(ref_s);
+
+    Vec2d xy_point;
+    if (!reference_line.SLToXY(common::util::MakeSLPoint(ref_s, sl_point.l()),
+                               &xy_point)) {
+      return false;
+    }
+
     auto* tp = obstacle->AddTrajectoryPoint();
     tp->set_a(0.0);
     tp->set_v(extend_v);
     tp->set_relative_time(t);
-    tp->mutable_path_point()->set_x(ref_point.x());
-    tp->mutable_path_point()->set_y(ref_point.y());
+    tp->mutable_path_point()->set_x(xy_point.x());
+    tp->mutable_path_point()->set_y(xy_point.y());
     tp->mutable_path_point()->set_theta(ref_point.heading());
+
+    // this is an approximate estimate since we do not use it.
     tp->mutable_path_point()->set_s(s);
     tp->mutable_path_point()->set_kappa(ref_point.kappa());
   }
@@ -122,17 +142,51 @@ bool ChangeLane::ApplyRule(Frame* frame,
   if (reference_line_info->Lanes().IsOnSegment()) {
     return true;
   }
-  const auto* obstacle = FindGuardObstacle(reference_line_info);
-  if (!obstacle) {
-    return true;
-  } else {
-    auto* guard_obstacle = frame->Find(obstacle->Id());
-    if (guard_obstacle &&
-        CreateGuardObstacle(reference_line_info, guard_obstacle)) {
-      AINFO << "Created guard obstacle: " << guard_obstacle->Id();
+  guard_obstacles_.clear();
+  overtake_obstacles_.clear();
+  if (!FilterObstacles(reference_line_info)) {
+    AERROR << "Failed to filter obstacles";
+    return false;
+  }
+  if (!guard_obstacles_.empty()) {
+    for (const auto path_obstacle : guard_obstacles_) {
+      auto* guard_obstacle = frame->Find(path_obstacle->Id());
+      if (guard_obstacle &&
+          CreateGuardObstacle(reference_line_info, guard_obstacle)) {
+        AINFO << "Created guard obstacle: " << guard_obstacle->Id();
+      }
+    }
+  }
+
+  if (!overtake_obstacles_.empty()) {
+    auto* path_decision = reference_line_info->path_decision();
+    const auto& reference_line = reference_line_info->reference_line();
+    for (const auto* path_obstacle : overtake_obstacles_) {
+      auto overtake = CreateOvertakeDecision(reference_line, path_obstacle);
+      path_decision->AddLongitudinalDecision(RuleConfig::RuleId_Name(Id()),
+                                             path_obstacle->Id(), overtake);
     }
   }
   return true;
+}
+
+ObjectDecisionType ChangeLane::CreateOvertakeDecision(
+    const ReferenceLine& reference_line,
+    const PathObstacle* path_obstacle) const {
+  ObjectDecisionType overtake;
+  overtake.mutable_overtake();
+  const double speed = path_obstacle->obstacle()->Speed();
+  double distance = std::max(speed * kOvertakeTimeBuffer, kMinOvertakeDistance);
+  overtake.mutable_overtake()->set_distance_s(distance);
+  double fence_s = path_obstacle->PerceptionSLBoundary().end_s() + distance;
+  auto point = reference_line.GetReferencePoint(fence_s);
+  overtake.mutable_overtake()->set_time_buffer(kOvertakeTimeBuffer);
+  overtake.mutable_overtake()->set_distance_s(distance);
+  overtake.mutable_overtake()->set_fence_heading(point.heading());
+  overtake.mutable_overtake()->mutable_fence_point()->set_x(point.x());
+  overtake.mutable_overtake()->mutable_fence_point()->set_y(point.y());
+  overtake.mutable_overtake()->mutable_fence_point()->set_z(0.0);
+  return overtake;
 }
 
 }  // namespace planning

@@ -22,6 +22,8 @@
 // data file
 DECLARE_string(control_conf_file);
 
+DECLARE_double(control_test_duration);
+
 DECLARE_string(control_adapter_config_filename);
 
 DECLARE_bool(enable_csv_debug);

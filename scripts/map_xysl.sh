@@ -15,5 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/apollo_base.sh"
 
-./bazel-bin/modules/map/tools/map_xysl --flagfile=modules/common/data/global_flagfile.txt $@
+${DIR}/../bazel-bin/modules/map/tools/map_xysl --flagfile=${DIR}/../modules/common/data/global_flagfile.txt $@

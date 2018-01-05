@@ -9,5 +9,5 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-$APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/local_visualization/offline_local_visualizer \
+$APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer \
     --basedir $1 \

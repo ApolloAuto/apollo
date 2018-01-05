@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include <vector>
+
+#include "boost/filesystem.hpp"
+#include "boost/program_options.hpp"
+
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/system_utility.h"
@@ -47,11 +49,10 @@ bool ParseCommandLine(int argc, char* argv[],
       // ("use_plane_fitting_ransac",
       // boost::program_options::value<bool>()->required(),
       //  "use plane fitting ransac")
-      ("pcd_folders",
-       boost::program_options::value<std::vector<std::string>>()
-           ->multitoken()
-           ->composing()
-           ->required(),
+      ("pcd_folders", boost::program_options::value<std::vector<std::string>>()
+                          ->multitoken()
+                          ->composing()
+                          ->required(),
        "pcd folders(repeated)")(
           "pose_files",
           boost::program_options::value<std::vector<std::string>>()
@@ -327,7 +328,7 @@ int main(int argc, char** argv) {
           std::cerr << "[FATAL ERROR] Map node should at least have one layer."
                     << std::endl;
         }
-        assert(layer_counts.size() > 0);
+        DCHECK_GT(layer_counts.size(), 0);
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
           map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
@@ -336,7 +337,7 @@ int main(int argc, char** argv) {
                 << "[FATAL ERROR] Map node should at least have one layer."
                 << std::endl;
           }
-          assert(layer_alts.size() > 0);
+          DCHECK_GT(layer_alts.size(), 0);
           float alt = layer_alts[layer_id];
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,

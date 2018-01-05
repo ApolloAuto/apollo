@@ -99,7 +99,7 @@ Status Planning::Init() {
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
-    std::string error_msg("Enabled prediction, but no prediction not enabled");
+    std::string error_msg("Enabled prediction, but no prediction is observed.");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
@@ -138,11 +138,18 @@ Status Planning::Start() {
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
   ReferenceLineProvider::instance()->Start();
+  start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
 }
 
-void Planning::OnTimer(const ros::TimerEvent&) { RunOnce(); }
+void Planning::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+  if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
+      Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
+    ros::shutdown();
+  }
+}
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
@@ -222,8 +229,9 @@ void Planning::RunOnce() {
   }
 
   if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
-    AERROR << "Update VehicleStateProvider failed.";
-    not_ready->set_reason("Update VehicleStateProvider failed.");
+    std::string msg("Update VehicleStateProvider failed");
+    AERROR << msg;
+    not_ready->set_reason(msg);
     status.Save(not_ready_pb.mutable_header()->mutable_status());
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
@@ -231,7 +239,11 @@ void Planning::RunOnce() {
 
   if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
           AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
-    AERROR << "Failed to update routing in reference line provider";
+    std::string msg("Failed to update routing in reference line provider");
+    AERROR << msg;
+    not_ready->set_reason(msg);
+    status.Save(not_ready_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
 
@@ -253,7 +265,11 @@ void Planning::RunOnce() {
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state);
   if (!frame_) {
-    AERROR << "Failed to init frame";
+    std::string msg("Failed to init frame");
+    AERROR << msg;
+    not_ready->set_reason(msg);
+    status.Save(not_ready_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
   auto* trajectory_pb = frame_->mutable_trajectory();
@@ -263,15 +279,22 @@ void Planning::RunOnce() {
   trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
   if (!status.ok()) {
-    AERROR << "Init frame failed";
+    std::string msg("Failed to init frame");
+    AERROR << msg;
     if (FLAGS_publish_estop) {
       ADCTrajectory estop;
       estop.mutable_estop();
       status.Save(estop.mutable_header()->mutable_status());
       PublishPlanningPb(&estop, start_timestamp);
+    } else {
+      not_ready->set_reason(msg);
+      status.Save(not_ready_pb.mutable_header()->mutable_status());
+      PublishPlanningPb(&not_ready_pb, start_timestamp);
     }
+
     auto seq_num = frame_->SequenceNum();
     FrameHistory::instance()->Add(seq_num, std::move(frame_));
+
     return;
   }
 
@@ -379,8 +402,7 @@ Status Planning::Plan(const double current_time_stamp,
   if (!best_reference_line) {
     std::string msg(
         "planner failed to make a driving plan because NO valid reference "
-        "line "
-        "info.");
+        "line info.");
     AERROR << msg;
     if (last_publishable_trajectory_) {
       last_publishable_trajectory_->Clear();
@@ -433,6 +455,10 @@ Status Planning::Plan(const double current_time_stamp,
   }
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+
+  best_reference_line->ExportEngageAdvice(
+      trajectory_pb->mutable_engage_advice());
+
   return status;
 }
 

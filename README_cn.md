@@ -5,8 +5,7 @@
 ```
 We choose to go to the moon in this decade and do the other things,
 not because they are easy, but because they are hard.
-我们决定在这十年间登上月球并实现更多梦想，
-并非它们轻而易举，而是因为它们困难重重。
+我们决定在这十年间登上月球并实现更多梦想，并非它们轻而易举，而是因为它们困难重重。
 -- John F. Kennedy (约翰 F. 肯尼迪), 1962
 ```
 
@@ -14,6 +13,7 @@ not because they are easy, but because they are hard.
 
 [Apollo](http://apollo.auto)(阿波罗)是一个开放的、完整的、安全的自动驾驶平台，以灵活和高性能的技术架构，为全自动驾驶提供支持。
 
+**我们非常骄傲地宣布，[Apollo 2.0](https://github.com/ApolloAuto/apollo/releases/tag/v2.0.0)如约而至。**
 
 ## 安装
 
@@ -49,16 +49,12 @@ bash scripts/bootstrap.sh
 
 ### 播放演示rosbag
 ```
-# 启动一个终端窗口，进入apollo目录
-bash docker/scripts/dev_into.sh # 进入docker环境
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_1.5.np.bag
+rosbag play -l ./docs/demo_guide/demo_2.0.bag
 ```
 
 这时，Dreamview会播放一辆带着预测轨迹的行驶中的汽车。
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
-
-想在Docker环境外搭建Apollo的高级用户，可以参考相应的Docker文档(./docker/dev.dockerfile)。
 
 ## 文档
 Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/docs/)目录下找到。
@@ -67,7 +63,7 @@ Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/doc
    * [![Apollo Offline Demo](https://img.youtube.com/vi/Q4BawiLWl8c/0.jpg)](https://www.youtube.com/watch?v=Q4BawiLWl8c)
    * [how to contribute code](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md): 贡献代码必读
    * [howto](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/): 编译、运行、修改代码教程
-   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Apollo 1.0 技术文档
+   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Apollo 技术文档
 
 ## 咨询
 

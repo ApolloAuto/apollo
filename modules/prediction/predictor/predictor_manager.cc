@@ -86,7 +86,14 @@ void PredictorManager::Init(const PredictionConf& config) {
         break;
       }
       case PerceptionObstacle::UNKNOWN: {
-        default_predictor_ = obstacle_conf.predictor_type();
+        if (obstacle_conf.has_obstacle_status()) {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+            default_on_lane_predictor_ = obstacle_conf.predictor_type();
+          } else if (obstacle_conf.obstacle_status() ==
+                     ObstacleConf::OFF_LANE) {
+            default_off_lane_predictor_ = obstacle_conf.predictor_type();
+          }
+        }
         break;
       }
       default: { break; }
@@ -103,7 +110,10 @@ void PredictorManager::Init(const PredictionConf& config) {
         << cyclist_off_lane_predictor_ << "].";
   AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
         << "].";
-  AINFO << "Defined default obstacle predictor [" << default_predictor_ << "].";
+  AINFO << "Defined default on lane obstacle predictor ["
+        << default_on_lane_predictor_ << "].";
+  AINFO << "Defined default off lane obstacle predictor ["
+        << default_off_lane_predictor_ << "].";
 }
 
 Predictor* PredictorManager::GetPredictor(
@@ -138,12 +148,6 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       AERROR << "A perception obstacle has invalid id [" << id << "].";
       continue;
     }
-    if (perception_obstacle.confidence() <
-        FLAGS_perception_confidence_threshold) {
-      AWARN << "Skip low confidence obstacle:"
-            << perception_obstacle.ShortDebugString();
-      continue;
-    }
 
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
@@ -172,9 +176,9 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         }
         default: {
           if (obstacle->IsOnLane()) {
-            predictor = GetPredictor(vehicle_on_lane_predictor_);
+            predictor = GetPredictor(default_on_lane_predictor_);
           } else {
-            predictor = GetPredictor(vehicle_off_lane_predictor_);
+            predictor = GetPredictor(default_off_lane_predictor_);
           }
           break;
         }
@@ -183,7 +187,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       if (predictor != nullptr) {
         predictor->Predict(obstacle);
         if (FLAGS_enable_trim_prediction_trajectory &&
-            adc_trajectory_container->IsProtected()) {
+            obstacle->type() == PerceptionObstacle::VEHICLE) {
           predictor->TrimTrajectories(obstacle, adc_trajectory_container);
         }
         for (const auto& trajectory : predictor->trajectories()) {

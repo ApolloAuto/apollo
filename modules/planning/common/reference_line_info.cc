@@ -38,12 +38,15 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Vec2d;
-using apollo::common::math::Box2d;
+using apollo::common::EngageAdvice;
 using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
+using apollo::canbus::Chassis;
+using apollo::common::util::Dropbox;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -60,7 +63,7 @@ std::string junction_dropbox_id(const std::string& junction_id) {
 }
 }
 
-bool ReferenceLineInfo::Init() {
+bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
@@ -86,8 +89,15 @@ bool ReferenceLineInfo::Init() {
     return false;
   }
   is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  if (!AddObstacles(obstacles)) {
+    AERROR << "Failed to add obstacles to reference line";
+    return false;
+  }
+  is_inited_ = true;
   return true;
 }
+
+bool ReferenceLineInfo::IsInited() const { return is_inited_; }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
@@ -112,13 +122,19 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
     } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
       auto* is_protected =
           junction_store->Get(junction_dropbox_id(overlap.object_id));
-      if (!is_protected) {
-        continue;
-      }
-      if (*is_protected) {
+      if (is_protected != nullptr && *is_protected) {
         return ADCTrajectory::PROTECTED;
       } else {
-        return ADCTrajectory::UNPROTECTED;
+        double junction_s = (overlap.end_s + overlap.start_s) / 2.0;
+        auto ref_point = reference_line_.GetReferencePoint(junction_s);
+        if (ref_point.lane_waypoints().empty()) {
+          return ADCTrajectory::PROTECTED;
+        }
+        for (const auto& waypoint : ref_point.lane_waypoints()) {
+          if (waypoint.lane->lane().turn() == hdmap::Lane::NO_TURN) {
+            return ADCTrajectory::PROTECTED;
+          }
+        }
       }
     }
   }
@@ -157,9 +173,15 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
 }
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
-  auto path_obstacle_ptr =
-      std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  auto* path_obstacle = path_decision_.AddPathObstacle(*path_obstacle_ptr);
+  if (!obstacle) {
+    AERROR << "The provided obstacle is empty";
+    return nullptr;
+  }
+  auto* path_obstacle = path_decision_.AddPathObstacle(PathObstacle(obstacle));
+  if (!path_obstacle) {
+    AERROR << "failed to add obstacle " << obstacle->Id();
+    return nullptr;
+  }
 
   SLBoundary perception_sl;
   if (!reference_line_.GetSLBoundary(obstacle->PerceptionBoundingBox(),
@@ -176,8 +198,14 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
                                       ignore);
     path_decision_.AddLongitudinalDecision("reference_line_filter",
                                            obstacle->Id(), ignore);
+    ADEBUG << "NO build sl boundary. id:" << obstacle->Id();
   } else {
+    ADEBUG << "build sl boundary. id:" << obstacle->Id();
     path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
+    ADEBUG << "st boundary: " << path_obstacle->st_boundary().min_t() << ", "
+           << path_obstacle->st_boundary().max_t()
+           << ", s_max: " << path_obstacle->st_boundary().max_s()
+           << ", s_min: " << path_obstacle->st_boundary().min_s();
   }
   return path_obstacle;
 }
@@ -284,7 +312,7 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   return true;
 }
 
-void ReferenceLineInfo::SetDriable(bool drivable) { is_drivable_ = drivable; }
+void ReferenceLineInfo::SetDrivable(bool drivable) { is_drivable_ = drivable; }
 
 bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
 
@@ -514,6 +542,53 @@ void ReferenceLineInfo::SetObjectDecisions(
           path_obstacle->LongitudinalDecision());
     }
   }
+}
+
+void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
+  constexpr char kPrevAdvice[] = "PlanningPreviousAdvice";
+  constexpr double kMaxAngleDiff = M_PI / 6.0;
+  auto* prev_advice = Dropbox<EngageAdvice>::Open()->Get(kPrevAdvice);
+  if (!prev_advice) {
+    EngageAdvice advice;
+    Dropbox<EngageAdvice>::Open()->Set(kPrevAdvice, advice);
+    prev_advice = Dropbox<EngageAdvice>::Open()->Get(kPrevAdvice);
+  }
+  if (!IsDrivable()) {
+    if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
+      engage_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+    } else {
+      engage_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+    }
+    engage_advice->set_reason("Reference line not drivable");
+  } else if (!is_on_reference_line_) {
+    if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
+      engage_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+    } else {
+      engage_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+    }
+    engage_advice->set_reason("Not on reference line");
+  } else {
+    // check heading
+    auto ref_point =
+        reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
+    if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
+        kMaxAngleDiff) {
+      if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
+        engage_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+      } else {
+        engage_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+      }
+      engage_advice->set_reason("Vehicle heading is not aligned");
+    } else {
+      if (vehicle_state_.driving_mode() !=
+          Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
+        engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
+      } else {
+        engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
+      }
+    }
+  }
+  *prev_advice = *engage_advice;
 }
 
 void ReferenceLineInfo::MakeEStopDecision(

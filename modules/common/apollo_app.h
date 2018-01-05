@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_APOLLO_APP_H_
-#define MODULES_APOLLO_APP_H_
+#ifndef MODULES_COMMON_APOLLO_APP_H_
+#define MODULES_COMMON_APOLLO_APP_H_
 
 #include <csignal>
 #include <string>
@@ -124,4 +124,4 @@ void apollo_app_sigint_handler(int signal_num);
     return 0;                                                  \
   }
 
-#endif  // MODULES_APOLLO_APP_H_
+#endif  // MODULES_COMMON_APOLLO_APP_H_

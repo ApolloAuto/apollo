@@ -16,6 +16,39 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
 
+// SAMPLE CODE:
+//
+// class MyTypeFuser : public BaseTypeFuser {
+// public:
+//     MyTypeFuser() : BaseTypeFuser() {}
+//     virtual ~MyTypeFuser() {}
+//
+//     virtual bool Init() override {
+//         // Do something.
+//         return true;
+//     }
+//
+//     virtual bool FuseType(const TypeFuserOptions& options,
+//                           std::vector<ObjectPtr>* objects) override {
+//          // Do something.
+//          return true;
+//     }
+//
+//     virtual std::string name() const override {
+//          return "MyTypeFuser";
+//     }
+//
+// };
+//
+// // Register plugin.
+// REGISTER_TYPEFUSER(MyTypeFuser);
+////////////////////////////////////////////////////////
+// USING CODE:
+//
+// BaseTypeFuser* type_fuser =
+//          BaseTypeFuserRegisterer::GetInstanceByName("MyTypeFuser");
+// using type_fuser to do something.
+
 #include <string>
 #include <vector>
 
@@ -32,14 +65,35 @@ struct TypeFuserOptions {
 
 class BaseTypeFuser {
  public:
+  /**
+   * @brief Constructor
+   */
   BaseTypeFuser() {}
+
+  /**
+   * @ brief Destructor
+   */
   virtual ~BaseTypeFuser() {}
 
+  /**
+   * @brief Initialize configuration
+   * @return True if initialize successfully, false otherwise
+   */
   virtual bool Init() = 0;
 
+  /**
+   * @brief Fuse type for each object
+   * @param options Some algorithm options
+   * @param objects The objects with initial object type
+   * @return True if fuse type successfully, false otherwise
+   */
   virtual bool FuseType(const TypeFuserOptions& options,
                         std::vector<ObjectPtr>* objects) = 0;
 
+  /**
+   * @brief Get module name
+   * @return Name of module
+   */
   virtual std::string name() const = 0;
 
  private:

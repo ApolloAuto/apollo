@@ -1854,6 +1854,7 @@ decision {
       perception_id: -855654299
       object_decision {
         stop {
+          reason_code: STOP_REASON_SIGNAL
           distance_s: -3
           stop_point {
             x: 587049.89961283
@@ -1885,4 +1886,7 @@ lane_id {
 }
 lane_id {
   id: "160_1_-3"
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
 }

@@ -15,9 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
+
 #include <map>
 #include <vector>
+
 #include "boost/filesystem.hpp"
+
 #include "modules/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
@@ -25,25 +28,17 @@ namespace apollo {
 namespace localization {
 namespace msf {
 OfflineLocalVisualizer::OfflineLocalVisualizer()
-    : map_config_(), resolution_id_(0), zone_id_(0), visual_engine_() {
-  map_folder_ = "";
-  pcd_folder_ = "";
-  gnss_loc_file_ = "";
-  lidar_loc_file_ = "";
-  fusion_loc_file_ = "";
-  extrinsic_file_ = "";
-}
+    : map_config_(), resolution_id_(0), zone_id_(0), visual_engine_() {}
 
 OfflineLocalVisualizer::~OfflineLocalVisualizer() {}
 
-bool OfflineLocalVisualizer::Init(const std::string &map_folder,
-                                  const std::string &pcd_folder,
-                                  const std::string &pcd_timestamp_file,
-                                  const std::string &gnss_loc_file,
-                                  const std::string &lidar_loc_file,
-                                  const std::string &fusion_loc_file,
-                                  const std::string &extrinsic_file) {
+bool OfflineLocalVisualizer::Init(
+    const std::string &map_folder, const std::string &map_visual_folder,
+    const std::string &pcd_folder, const std::string &pcd_timestamp_file,
+    const std::string &gnss_loc_file, const std::string &lidar_loc_file,
+    const std::string &fusion_loc_file, const std::string &extrinsic_file) {
   map_folder_ = map_folder;
+  map_visual_folder_ = map_visual_folder;
   pcd_folder_ = pcd_folder;
   pcd_timestamp_file_ = pcd_timestamp_file;
   gnss_loc_file_ = gnss_loc_file;
@@ -117,8 +112,9 @@ bool OfflineLocalVisualizer::Init(const std::string &map_folder,
                 map_config_.map_range_.GetMinY(),
                 map_config_.map_range_.GetMaxX(),
                 map_config_.map_range_.GetMaxY());
-  success = visual_engine_.Init(map_folder_, map_param, resolution_id_,
-                                zone_id_, velodyne_extrinsic_, LOC_INFO_NUM);
+  success = visual_engine_.Init(map_folder_, map_visual_folder_, map_param,
+                                resolution_id_, zone_id_, velodyne_extrinsic_,
+                                LOC_INFO_NUM);
   if (!success) {
     AERROR << "Visualization engine init failed.";
     return false;
@@ -331,12 +327,12 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
       if (index >= 1) {
         double cur_timestamp = in_timestamps[index];
         double pre_timestamp = in_timestamps[index - 1];
-        assert(cur_timestamp != pre_timestamp);
+        DCHECK_NE(cur_timestamp, pre_timestamp);
 
         double t =
             (cur_timestamp - ref_timestamp) / (cur_timestamp - pre_timestamp);
-        assert(t >= 0.0);
-        assert(t <= 1.0);
+        DCHECK_GE(t, 0.0);
+        DCHECK_LE(t, 1.0);
 
         Eigen::Affine3d pre_pose = in_poses[index - 1];
         Eigen::Affine3d cur_pose = in_poses[index];

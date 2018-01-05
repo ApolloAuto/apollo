@@ -54,7 +54,6 @@ StBoundary::StBoundary(
   }
 
   BuildFromPoints();
-  CalculateArea();
 
   for (const auto& point : lower_points_) {
     min_s_ = std::fmin(min_s_, point.s());
@@ -69,6 +68,25 @@ StBoundary::StBoundary(
 bool StBoundary::IsPointNear(const common::math::LineSegment2d& seg,
                              const Vec2d& point, const double max_dist) {
   return seg.DistanceSquareTo(point) < max_dist * max_dist;
+}
+
+std::string StBoundary::TypeName(BoundaryType type) {
+  if (type == BoundaryType::FOLLOW) {
+    return "FOLLOW";
+  } else if (type == BoundaryType::KEEP_CLEAR) {
+    return "KEEP_CLEAR";
+  } else if (type == BoundaryType::OVERTAKE) {
+    return "OVERTAKE";
+  } else if (type == BoundaryType::STOP) {
+    return "STOP";
+  } else if (type == BoundaryType::YIELD) {
+    return "YIELD";
+  } else if (type == BoundaryType::UNKNOWN) {
+    return "UNKNOWN";
+  }
+  AWARN << "Unkown boundary type " << static_cast<int>(type)
+        << ", treated as UNKNOWN";
+  return "UNKNOWN";
 }
 
 void StBoundary::RemoveRedundantPoints(
@@ -139,17 +157,6 @@ bool StBoundary::IsValid(
   return true;
 }
 
-double StBoundary::Area() const { return area_; }
-
-void StBoundary::CalculateArea() {
-  area_ = 0.0;
-  for (size_t i = 0; i + 1 < lower_points_.size(); ++i) {
-    area_ += (upper_points_[i].y() - lower_points_[i].y()) *
-             (lower_points_[i + 1].x() - lower_points_[i].x());
-  }
-  area_ *= 0.5;
-}
-
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
   if (st_point.t() <= min_t_ || st_point.t() >= max_t_) {
     return false;
@@ -180,7 +187,6 @@ STPoint StBoundary::BottomRightPoint() const {
 
 StBoundary StBoundary::ExpandByS(const double s) const {
   if (lower_points_.empty()) {
-    AERROR << "The current st_boundary has NO points.";
     return StBoundary();
   }
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
@@ -329,22 +335,6 @@ bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   return true;
 }
 
-double StBoundary::DistanceS(const STPoint& st_point) const {
-  double s_upper;
-  double s_lower;
-  if (GetBoundarySRange(st_point.t(), &s_upper, &s_lower)) {
-    constexpr double kMaxDistance = 1.0e10;
-    return kMaxDistance;
-  }
-  if (st_point.s() < s_lower) {
-    return s_lower - st_point.s();
-  } else if (st_point.s() > s_upper) {
-    return st_point.s() - s_upper;
-  } else {
-    return 0.0;
-  }
-}
-
 double StBoundary::min_s() const { return min_s_; }
 double StBoundary::min_t() const { return min_t_; }
 double StBoundary::max_s() const { return max_s_; }
@@ -377,7 +367,6 @@ StBoundary StBoundary::GenerateStBoundary(
     const std::vector<STPoint>& lower_points,
     const std::vector<STPoint>& upper_points) {
   if (lower_points.size() != upper_points.size() || lower_points.size() < 2) {
-    AERROR << "Fail to generate StBoundary because input points are not valid.";
     return StBoundary();
   }
 
@@ -388,6 +377,20 @@ StBoundary StBoundary::GenerateStBoundary(
         STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
   }
   return StBoundary(point_pairs);
+}
+
+StBoundary StBoundary::CutOffByT(const double t) const {
+  std::vector<STPoint> lower_points;
+  std::vector<STPoint> upper_points;
+  for (size_t i = 0; i < lower_points_.size() && i < upper_points_.size();
+       ++i) {
+    if (lower_points_[i].t() < t) {
+      continue;
+    }
+    lower_points.push_back(lower_points_[i]);
+    upper_points.push_back(upper_points_[i]);
+  }
+  return GenerateStBoundary(lower_points, upper_points);
 }
 
 }  // namespace planning

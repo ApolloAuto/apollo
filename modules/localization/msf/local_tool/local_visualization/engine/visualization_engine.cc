@@ -16,9 +16,10 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
-#include <stdio.h>
-#include <boost/filesystem.hpp>
+#include <cstdio>
 #include <fstream>
+
+#include "boost/filesystem.hpp"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
@@ -35,10 +36,9 @@ using apollo::common::util::EnsureDirectory;
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
 const char car_img_path[3][1024] = {
-  "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
-  "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
-  "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"
-};
+    "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
+    "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
+    "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
@@ -90,16 +90,17 @@ VisualizationEngine::VisualizationEngine()
     : map_image_cache_(20),
       image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
       big_window_(3072, 3072, CV_8UC3),
-      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {
-}
+      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {}
 
 bool VisualizationEngine::Init(const std::string &map_folder,
+                               const std::string &map_visual_folder,
                                const VisualMapParam &map_param,
                                const unsigned int resolution_id,
                                const int zone_id,
                                const Eigen::Affine3d &extrinsic,
                                const unsigned int loc_info_num) {
   map_folder_ = map_folder;
+  map_visual_folder_ = map_visual_folder;
   map_param_ = map_param;
   velodyne_extrinsic_ = extrinsic;
   loc_info_num_ = loc_info_num;
@@ -131,7 +132,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
       cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
               CV_8UC1);
 
-  Preprocess(map_folder);
+  Preprocess(map_folder, map_visual_folder);
 
   std::string params_file = image_visual_resolution_path_ + "/param.txt";
   bool success = InitOtherParams(params_file);
@@ -183,9 +184,10 @@ void VisualizationEngine::SetAutoPlay(bool auto_play) {
   auto_play_ = auto_play;
 }
 
-void VisualizationEngine::Preprocess(const std::string &map_folder) {
+void VisualizationEngine::Preprocess(const std::string &map_folder,
+                                     const std::string &map_visual_folder) {
   std::string image_path = map_folder_ + "/image";
-  std::string image_visual_path = map_folder_ + "/map_visual";
+  std::string image_visual_path = map_visual_folder;
   char buf[256];
   snprintf(buf, sizeof(buf), "/%03u", resolution_id_);
   image_visual_resolution_path_ = image_visual_path + buf;
@@ -254,8 +256,8 @@ void VisualizationEngine::Draw() {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i][j].copyTo(
-          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i]
+             [j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
@@ -489,10 +491,9 @@ void VisualizationEngine::DrawLegend() {
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(
-        image_window_,
-        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
-        8, cv::Scalar(b, g, r), 3);
+    cv::circle(image_window_, cv::Point(755, (15 + textSize.height) * (i + 1) -
+                                                 textSize.height / 2),
+               8, cv::Scalar(b, g, r), 3);
   }
 }
 
@@ -739,12 +740,13 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     const Eigen::Vector3d &pt = cloud[i];
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
-    uint32_t col = (pt_global[0] - cloud_img_lt_coord_[0]) /
-                   map_param_.map_resolutions[resolution_id_];
-    uint32_t row = (pt_global[1] - cloud_img_lt_coord_[1]) /
-                   map_param_.map_resolutions[resolution_id_];
-    if (col < 0 || row < 0 || col >= map_param_.map_node_size_x ||
-        row >= map_param_.map_node_size_y) {
+    int col = static_cast<int>((pt_global[0] - cloud_img_lt_coord_[0]) /
+                               map_param_.map_resolutions[resolution_id_]);
+    int row = static_cast<int>((pt_global[1] - cloud_img_lt_coord_[1]) /
+                               map_param_.map_resolutions[resolution_id_]);
+    if (col < 0 || row < 0 ||
+        col >= static_cast<int>(map_param_.map_node_size_x) ||
+        row >= static_cast<int>(map_param_.map_node_size_y)) {
       continue;
     }
 
@@ -760,7 +762,7 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
                                           MapImageKey *key) {
   key->level = cur_level_;
 
-  assert(resolution_id_ < map_param_.map_resolutions.size());
+  DCHECK_LT(resolution_id_, map_param_.map_resolutions.size());
   key->zone_id = zone_id_;
   int n = static_cast<int>((coord[0] - map_param_.map_min_x) /
                            (map_param_.map_node_size_x *
@@ -780,7 +782,7 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
     key->node_north_id = m;
     key->node_east_id = n;
   } else {
-    assert(0 == 1);  // should never reach here
+    DCHECK(false);  // should never reach here
   }
 
   m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
@@ -866,9 +868,7 @@ void VisualizationEngine::UpdateViewCenter(const double move_x,
   _view_center[1] += move_y;
 }
 
-void VisualizationEngine::SetScale(const double scale) {
-  cur_scale_ = scale;
-}
+void VisualizationEngine::SetScale(const double scale) { cur_scale_ = scale; }
 
 void VisualizationEngine::UpdateScale(const double factor) {
   cur_scale_ *= factor;

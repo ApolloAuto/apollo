@@ -105,19 +105,22 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           return;
         }
 
-        bool requestPlanning = false;
         auto planning = json.find("planning");
         if (planning != json.end() && planning->is_boolean()) {
-          requestPlanning = json["planning"];
+          enable_pnc_monitor_ = json["planning"];
         }
-
         std::string to_send;
         {
           // Pay the price to copy the data instead of sending data over the
           // wire while holding the lock.
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          to_send = requestPlanning ? simulation_world_with_planning_json_
-                                    : simulation_world_json_;
+          to_send = enable_pnc_monitor_ ? simulation_world_with_planning_json_
+                                        : simulation_world_json_;
+        }
+        if (FLAGS_enable_update_size_check && !enable_pnc_monitor_ &&
+            to_send.size() > FLAGS_max_update_size) {
+          AWARN << "update size is too big:" << to_send.size();
+          return;
         }
         websocket_->SendData(conn, to_send, true);
       });
@@ -259,8 +262,10 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
         sim_world_service_.GetUpdateAsJson(FLAGS_sim_map_radius);
     simulation_world_json_ = simulation_world.dump();
 
-    simulation_world["planningData"] = sim_world_service_.GetPlanningData();
-    simulation_world_with_planning_json_ = simulation_world.dump();
+    if (enable_pnc_monitor_) {
+      simulation_world["planningData"] = sim_world_service_.GetPlanningData();
+      simulation_world_with_planning_json_ = simulation_world.dump();
+    }
   }
 }
 

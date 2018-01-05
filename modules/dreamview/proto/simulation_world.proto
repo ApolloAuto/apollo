@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common/monitor_log/proto/monitor_log.proto";
+import "modules/common/proto/drive_state.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
 
@@ -105,7 +106,7 @@ message Object {
   // ADC decision results
   optional .apollo.planning.DecisionResult adc_decision_result = 29;
   // ADC planning trajectory
-  optional .apollo.planning.ADCTrajectory adc_trajectory = 31;
+  optional .apollo.planning.ADCTrajectory adc_trajectory = 31 [deprecated = true];
 
   // Chassis Info
   // For ADC
@@ -195,4 +196,7 @@ message SimulationWorld {
 
   // Module latency
   optional Latency latency = 15;
+
+  // Engage advice from planning
+  optional string engage_advice = 16;
 }

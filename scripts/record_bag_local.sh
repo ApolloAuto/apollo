@@ -43,9 +43,9 @@ function start() {
   fi
 
   # Create and enter into bag dir.
-  if [ ! -e "${BAG_DIR}" ]; then
-    mkdir -p "${BAG_DIR}"
-  fi
+  TASK_ID=$(date +%Y-%m-%d-%H-%M-%S)
+  BAG_DIR="${BAG_DIR}/${TASK_ID}"
+  mkdir -p "${BAG_DIR}"
   cd "${BAG_DIR}"
   echo "Recording bag to: $(pwd)"
 
@@ -66,10 +66,12 @@ function start() {
         /apollo/localization/pose \
         /apollo/localization/msf_gnss \
         /apollo/localization/msf_lidar \
+        /apollo/localization/msf_status \
         /apollo/drive_event \
         /tf \
         /tf_static \
-        /apollo/monitor </dev/null >"${LOG}" 2>&1 &
+        /apollo/monitor \
+        /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
     fi
 }
 

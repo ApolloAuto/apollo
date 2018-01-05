@@ -34,20 +34,22 @@ export default class RosWebSocketEndpoint {
                     STORE.hmi.updateStatus(message.data);
                     break;
                 case "SimWorldUpdate":
-                    this.checkMessage(message);
+                    const world = JSON.parse(message.world);
+                    this.checkMessage(message, world);
 
                     STORE.updateTimestamp(message.timestamp);
-                    STORE.updateWorldTimestamp(message.world.timestampSec);
-                    STORE.updateModuleDelay(message.world);
+                    STORE.updateWorldTimestamp(world.timestampSec);
+                    STORE.updateModuleDelay(world);
                     RENDERER.maybeInitializeOffest(
-                        message.world.autoDrivingCar.positionX,
-                        message.world.autoDrivingCar.positionY);
-                    RENDERER.updateWorld(message.world, message.planningData);
-                    STORE.meters.update(message.world);
-                    STORE.monitor.update(message.world);
-                    STORE.trafficSignal.update(message.world);
+                        world.autoDrivingCar.positionX,
+                        world.autoDrivingCar.positionY);
+                    RENDERER.updateWorld(world, message.planningData);
+                    STORE.meters.update(world);
+                    STORE.monitor.update(world);
+                    STORE.trafficSignal.update(world);
+                    STORE.hmi.update(world);
                     if (STORE.options.showPNCMonitor) {
-                        STORE.planning.update(message.world, message.planningData);
+                        STORE.planning.update(world, message.planningData);
                     }
                     if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.
@@ -95,7 +97,7 @@ export default class RosWebSocketEndpoint {
         }, 100);
     }
 
-    checkMessage(message) {
+    checkMessage(message, world) {
         if (this.lastUpdateTimestamp !== 0
             && message.timestamp - this.lastUpdateTimestamp > 150) {
             console.log("Last sim_world_update took " +
@@ -103,11 +105,11 @@ export default class RosWebSocketEndpoint {
         }
         this.lastUpdateTimestamp = message.timestamp;
         if (this.lastSeqNum !== -1
-            && message.world.sequenceNum > this.lastSeqNum + 1) {
+            && world.sequenceNum > this.lastSeqNum + 1) {
             console.debug("Last seq: " + this.lastSeqNum +
-                ". New seq: " + message.world.sequenceNum + ".");
+                ". New seq: " + world.sequenceNum + ".");
         }
-        this.lastSeqNum = message.world.sequenceNum;
+        this.lastSeqNum = world.sequenceNum;
     }
 
     requestMapData(elements) {
