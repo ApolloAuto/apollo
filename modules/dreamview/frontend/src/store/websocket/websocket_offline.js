@@ -15,13 +15,16 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     initialize(params) {
-        if (params && params.url && params.id && params.map) {
-            this.serverUrl = `${location.protocol}//${params.url}`;
+        if (params && params.id && params.map) {
             STORE.playback.setJobId(params.id);
             STORE.playback.setMapId(params.map);
         } else {
             console.error("ERROR: missing required parameter(s)");
             return;
+        }
+
+        if (params.url) {
+            this.serverUrl = `${location.protocol}//${params.url}`;
         }
 
         try {
