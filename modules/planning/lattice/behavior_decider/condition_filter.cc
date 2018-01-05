@@ -147,7 +147,7 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
                                  path_time_obstacle.bottom_right().t(), t);
 
   const std::string& obstacle_id = path_time_obstacle.obstacle_id();
-  double v = path_time_neighborhood_.SpeedAtT(obstacle_id, t);
+  double v = path_time_neighborhood_.SpeedAtT(obstacle_id, s_lower, t);
 
   block_interval.first.set_t(t);
   block_interval.first.set_s(s_lower);

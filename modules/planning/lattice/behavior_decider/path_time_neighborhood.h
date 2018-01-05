@@ -44,32 +44,13 @@ class PathTimeNeighborhood {
   bool GetPathTimeObstacle(const std::string& obstacle_id,
                            PathTimeObstacle* path_time_obstacle);
 
-  double SpeedAtT(const std::string& obstacle_id, const double t) const;
-
-  /**
-  bool ForwardNearestObstacle(
-      std::array<double, 3>* forward_nearest_obstacle_state,
-      double* enter_time);
-
-  bool BackwardNearestObstacle(
-      std::array<double, 3>* backward_nearest_obstacle_state,
-      double* enter_time);
-
-  bool IsInNeighborhood(const Obstacle* obstacle) const;
-
-  bool IsForward(const Obstacle* obstacle) const;
-
-  bool IsBackward(const Obstacle* obstacle) const;
-  **/
+  double SpeedAtT(
+      const std::string& obstacle_id, const double s, const double t) const;
 
  private:
   void SetupObstacles(
       const Frame* frame, const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
-
-  double SpeedOnReferenceLine(
-      const std::vector<common::PathPoint>& discretized_ref_points,
-      const Obstacle* obstacle, const SLBoundary& sl_boundary);
 
   PathTimePoint SetPathTimePoint(const std::string& obstacle_id,
                                  const double s,
@@ -86,15 +67,7 @@ class PathTimeNeighborhood {
 
   std::unordered_map<std::string, prediction::Trajectory> prediction_traj_map_;
 
-  /**
-  // array of [t, start_s, end_s, s_dot, s_dotdot]
-  std::vector<std::array<double, 5>> forward_neighborhood_;
-  // array of [t, start_s, end_s, s_dot, s_dotdot]
-  std::vector<std::array<double, 5>> backward_neighborhood_;
-
-  std::unordered_set<std::string> forward_obstacle_id_set_;
-  std::unordered_set<std::string> backward_obstacle_id_set_;
-  **/
+  std::vector<apollo::common::PathPoint> discretized_ref_points_;
 };
 
 }  // namespace planning
