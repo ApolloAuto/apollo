@@ -70,10 +70,12 @@ PlanningTarget BehaviorDecider::Analyze(
 
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
 
+  static int decision_cycles = 0;
   if (FLAGS_enable_lattice_st_image_dump) {
     apollo::planning_internal::LatticeStTraining st_data;
     double timestamp = init_planning_point.relative_time();
-    std::string st_img_name = std::to_string(timestamp);
+    std::string st_img_name =
+      "DecisionCycle_" + std::to_string(decision_cycles) + "_" + std::to_string(timestamp);
     if (condition_filter.GenerateLatticeStPixels(&st_data,
       timestamp, st_img_name)) {
       AINFO << "  Created_lattice_st_image_named=" << st_img_name <<
@@ -83,7 +85,7 @@ PlanningTarget BehaviorDecider::Analyze(
       ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(st_data);
     }
   }
-
+  decision_cycles += 1;
 
   // Debug SampleBound
   AINFO << "[Printing SampleBound]";
