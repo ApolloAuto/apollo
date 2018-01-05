@@ -38,10 +38,10 @@ The module decides which camera to use adaptively based on the light projection.
 
  The following photos show the detection of traffic lights using a telephoto camera (for the first photo) and a wide-angle camera (for the second photo).
 
-![telephoto camera](images/long.jpg) 
+![telephoto camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/long.jpg) 
 
 
-![wide angle camera](images/short.jpg)
+![wide angle camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/short.jpg)
 
 # Pipeline
 
