@@ -1,8 +1,8 @@
 # Class Architecture and Overview -- Planning Module
 
-##Data Output and Input
+## Data Output and Input
 
-###Output Data
+### Output Data
 
 The planning output data is defined in `planning.proto`, as shown below.
 
