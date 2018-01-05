@@ -272,9 +272,9 @@ The main points in an HM object tracker workflow are:
 
 To smooth the obstacle type and reduce the type switch over the entire trajectory, Apollo utilizes a sequential type fusion algorithm based on a linear-chain Conditional Random Field (CRF), which can be formulated as follows:
 
-![CRF_eq1](images\3d_obstacle_perception\CRF_eq1.png)
+![CRF_eq1](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq1.png)
 
-![CRF_eq2](images\3d_obstacle_perception\CRF_eq2.png)
+![CRF_eq2](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq2.png)
 
 where the unary term acts on each single node, while the binary one acts on each edge. 
 
@@ -282,7 +282,7 @@ The probability in the unary term is the class probability output by the CNN-bas
 
 Using the Viterbi algorithm, the sequential obstacle type is optimized by solving the following problem: 
 
-![CRF_eq3](images\3d_obstacle_perception\CRF_eq3.png)
+![CRF_eq3](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq3.png)
 
 ## Radar Detector
 
