@@ -31,7 +31,8 @@ function calibrate_camera_camera() {
     echo "Start to calibrate Camera-Camera extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
-      | tee ${LOG}"
+      2>&1 | tee ${LOG}"
+
   fi
 }
 
@@ -46,7 +47,7 @@ function calibrate_lidar_camera() {
     echo "Start to calibrate LiDAR-Camera extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
-      | tee ${LOG}"
+      2>&1 | tee ${LOG}"
   fi
 }
 
@@ -61,7 +62,7 @@ function calibrate_radar_camera() {
     echo "Start to calibrate Radar-Camera extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
-      | tee ${LOG}"
+      2>&1 | tee ${LOG}"
   fi
 }
 
@@ -76,7 +77,7 @@ function visualize_radar_lidar() {
     echo "Visualize Radar and LiDAR data, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
-      |tee ${LOG}"
+      2>&1 |tee ${LOG}"
   fi
 }
 
