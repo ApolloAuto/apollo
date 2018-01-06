@@ -17,9 +17,9 @@
 #include "modules/planning/lattice/trajectory1d_generator/trajectory_evaluator.h"
 
 #include <cmath>
+#include <functional>
 #include <limits>
 #include <utility>
-#include <functional>
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -56,7 +56,7 @@ bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
   return !cost_queue_.empty();
 }
 
-size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
+std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
   return cost_queue_.size();
 }
 
