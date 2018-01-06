@@ -64,10 +64,10 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 }  // namespace
 
 PathTimeNeighborhood::PathTimeNeighborhood(
-    const Frame* frame, const std::array<double, 3>& init_s,
+    const Frame* frame, const double ego_s,
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
-  init_s_ = init_s;
+  ego_s_ = ego_s;
   discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(frame, reference_line, discretized_ref_points);
 }
@@ -122,7 +122,7 @@ void PathTimeNeighborhood::SetupObstacles(
 
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < 0.0 ||
-          sl_boundary.start_s() > init_s_[0] +  decision_horizon ||
+          sl_boundary.start_s() > ego_s_ +  decision_horizon ||
           (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred &&
            std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=

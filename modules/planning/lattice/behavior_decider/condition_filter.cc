@@ -35,7 +35,7 @@ ConditionFilter::ConditionFilter(
     const double speed_limit, const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points)
     : feasible_region_(init_s, speed_limit),
-      path_time_neighborhood_(frame, init_s, reference_line,
+      path_time_neighborhood_(frame, init_s[0], reference_line,
                               discretized_ref_points) {
   Init();
 }
