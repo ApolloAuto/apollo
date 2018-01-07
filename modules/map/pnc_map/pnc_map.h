@@ -64,6 +64,8 @@ class PncMap {
    * Check if the routing is the same as existing one in PncMap
    */
   bool IsNewRouting(const routing::RoutingResponse &routing_response) const;
+  static bool IsNewRouting(const routing::RoutingResponse &prev,
+                           const routing::RoutingResponse &routing_response);
 
   bool ExtendSegments(const RouteSegments &segments,
                       const common::PointENU &point, double look_forward,
