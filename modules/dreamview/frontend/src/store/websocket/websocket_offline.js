@@ -131,7 +131,8 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     processSimWorld(message) {
-        const world = JSON.parse(message.world);
+        const world = (typeof message.world) === "string"
+                        ? JSON.parse(message.world): message.world;
         if (STORE.playback.shouldProcessFrame(world)) {
             STORE.updateTimestamp(message.timestamp);
             STORE.updateWorldTimestamp(world.timestampSec);
