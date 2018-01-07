@@ -18,6 +18,7 @@ node_modules
 # generated files
 generatedViews
 generatedScripts
+generated_data_warehouse.conf
 modules/common/data/ssl_keys
 # database/log files
 *.sqlite
