@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.data;
+
+import "modules/data/proto/task.proto";
+
+
+message SearchRequest {
+  // Search criteria.
+  optional string vehicle_name = 1;
+  optional string map_name = 2;
+  optional Task.LoopType loop_type = 3;
+  repeated string topics = 4;
+
+  // What fields are included in the tasks of SearchResponse, such as 'id',
+  // 'info.vehicle.name'.
+  repeated string fields = 5;
+  // How many items are wanted.
+  optional int32 count = 6 [default = 20];
+  // Start point of the returned list.
+  optional int32 offset = 7;
+}
+
+message SearchResponse {
+  // Note that
+  repeated Task tasks = 1;
+  // Total result count according to the search request. E.g.:
+  // We have 200 items' in $result, then $tasks = $result[$offset:$count].
+  optional int32 total_count = 2;
+}
