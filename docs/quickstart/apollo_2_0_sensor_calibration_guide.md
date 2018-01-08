@@ -146,7 +146,7 @@ Before you begin to use the tools, you must verify that the localization status 
 Type the following command to check localization status:
 
 ```bash
-	rostopic echo /apollo/sensor/gnss/ins_stat
+rostopic echo /apollo/sensor/gnss/ins_stat
 ```
 
 ### Camera-to-Camera Calibration Tool
@@ -154,8 +154,8 @@ Type the following command to check localization status:
 1. Run the Camera-to-Camera Calibration Tool using these commands:
 
 ```bash
-    cd /apollo/scripts
-    bash sensor_calibration.sh lidar_camera
+cd /apollo/scripts
+bash sensor_calibration.sh lidar_camera
 ```
 
 2. Run the Camera-to-Camera Calibration Tool using these commands:
@@ -168,7 +168,7 @@ Type the following command to check localization status:
 
 
 ```bash
-	/apollo/modules/calibration/camera_camera_calibrator/camera_camera_calibrtor.conf
+/apollo/modules/calibration/camera_camera_calibrator/camera_camera_calibrtor.conf
 ```
   Table 4 identifies and describes each element in the configuration file.
 
@@ -199,8 +199,8 @@ Type the following command to check localization status:
 1. Run the Camera-to-LiDAR Calibration Tool using these commands:
 
 ```bash
-    cd /apollo/scripts
-    bash sensor_calibration.sh lidar_camera
+cd /apollo/scripts
+bash sensor_calibration.sh lidar_camera
 ```
 
 2. Follow these guidelines to collect data:
@@ -244,8 +244,8 @@ Type the following command to check localization status:
 1. Run the Radar-to-Camera Calibration Tool using these commands:
 
 ```bash
-    cd /apollo/scripts
-    bash sensor_calibration.sh radar_camera
+cd /apollo/scripts
+bash sensor_calibration.sh radar_camera
 ```
 
 2. Follow this guideline to collect data:
@@ -318,12 +318,12 @@ This section provides the background information and the corresponding validatio
 
   When the error is greater than a certain range (for example, 20 pixels, determined by the actual usage), you need to re-calibrate the extrinsic parameter. Under general circumstances, due to the parallax, some dislocations may occur in the horizontal with close objects, but the vertical direction is not affected. This is a normal phenomenon.
 
-* **Examples：**As shown in the following examples, Figure 2 meets the precision requirements of the extrinsic parameter, and Figure 3 does not.
+* **Examples: **As shown in the following examples, Figure 2 meets the precision requirements of the extrinsic parameter, and Figure 3 does not.
 
-![](images/cam_cam_good.png)
+![](images/calibration/sensor_calibration/cam_cam_good.png)
 <a align="center"> Figure 2. Good Calibration Result for Camera-to-Camera Calibration </p>
-​	
-![](images/cam_cam_error.png)
+	
+![](images/calibration/sensor_calibration/cam_cam_error.png)
 <a align="center"> Figure 3. Bad Calibration Result for Camera-to-Camera Calibration</p>
 
 
