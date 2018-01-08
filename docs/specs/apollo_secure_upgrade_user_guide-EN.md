@@ -29,11 +29,11 @@ After integrating secure upgrade SDK, the upgrade procedure is modified as follo
 
 ![](images/apollo_secure_upgrade_procedure.JPG)
 
-1. Upgrade server generates the secure package and package token.
-2. Secure packages and package token are uploaded to the storage server..
+1. The upgrade server generates the secure package and package token.
+2. Secure packages and the package token are uploaded to the storage server.
 3. The storage server sends secure package and package token URLs to the upgrade server.
-4. Device generates device token and sends to the upgrade server with the upgrade request.
-5. Upgrade server generates authorization token and sends the token to the device with a replied secure package URL.
+4. The device generates the device token and sends to the upgrade server with the upgrade request.
+5. The upgrade server generates authorization token and sends the token to the device with a replied secure package URL.
 6. Device requests secure package from the storage server.
 7. Secure packages are downloaded to device.
 8. Device verifies the secure package with the authorization token, and generates the original package. 
