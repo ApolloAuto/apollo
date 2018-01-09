@@ -176,7 +176,6 @@ bool DPRoadGraph::GenerateMinCostPath(
       }
     }
     PlanningThreadPool::instance()->mutable_thread_pool()->join_all();
-    std::cout << "all joined." << std::endl;
   }
 
   // find best path
