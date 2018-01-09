@@ -187,17 +187,22 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
 }
 
 bool PncMap::IsNewRouting(const routing::RoutingResponse &routing) const {
+  return IsNewRouting(routing_, routing);
+}
+
+bool PncMap::IsNewRouting(const routing::RoutingResponse &prev,
+                          const routing::RoutingResponse &routing) {
   if (!ValidateRouting(routing)) {
     AERROR << "The provided routing is invalid";
     return false;
   }
-  if (!routing_.has_header()) {
+  if (!prev.has_header()) {
     AERROR << "Current routing is empty, use new routing";
     return true;
   }
-  if (routing_.has_header() && routing.has_header() &&
-      routing_.header().sequence_num() == routing.header().sequence_num() &&
-      (std::fabs(routing_.header().timestamp_sec() -
+  if (prev.has_header() && routing.has_header() &&
+      prev.header().sequence_num() == routing.header().sequence_num() &&
+      (std::fabs(prev.header().timestamp_sec() -
                  routing.header().timestamp_sec()) < 0.1)) {
     ADEBUG << "Same routing, skip update routing";
     return false;

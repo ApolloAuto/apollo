@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CHANGE_LANE_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
@@ -40,10 +41,9 @@ class ChangeLane : public TrafficRule {
 
  private:
   /**
-   * @brief This function will find a vehicle that may be in change lane blind
-   *zone.
+   * @brief This function will filter obstacles based on change lane strategy.
    **/
-  const Obstacle* FindGuardObstacle(ReferenceLineInfo* reference_line_info);
+  bool FilterObstacles(ReferenceLineInfo* reference_line_info);
   /**
    * @brief This function will extend the prediction of the guard obstacle to
    *guard lane change action. Due to the ST path may drive on the forward lane
@@ -53,6 +53,16 @@ class ChangeLane : public TrafficRule {
    **/
   bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info,
                            Obstacle* obstacle);
+
+  /**
+   * @brief create overtake decision for the give path obstacle
+   */
+  ObjectDecisionType CreateOvertakeDecision(
+      const ReferenceLine& reference_line,
+      const PathObstacle* path_obstacle) const;
+
+  std::vector<const PathObstacle*> guard_obstacles_;
+  std::vector<const PathObstacle*> overtake_obstacles_;
 };
 
 }  // namespace planning

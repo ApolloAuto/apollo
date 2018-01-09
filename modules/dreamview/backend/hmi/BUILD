@@ -28,10 +28,11 @@ cc_library(
     deps = [
         ":vehicle_manager",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/kv_db",
         "//modules/common/util:http_client",
         "//modules/common/util:json_util",
         "//modules/common/util:map_util",
-        "//modules/data/proto:task_proto",
+        "//modules/data/proto:static_info_proto",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket",
         "//modules/dreamview/backend/map:map_service",

@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -75,10 +76,17 @@ TrajectoryCost::TrajectoryCost(
     }
 
     const auto ptr_obstacle = ptr_path_obstacle->obstacle();
+    bool is_bycycle_or_pedestrain =
+        (ptr_obstacle->Perception().type() ==
+             perception::PerceptionObstacle::BICYCLE ||
+         ptr_obstacle->Perception().type() ==
+             perception::PerceptionObstacle::PEDESTRIAN);
+
     if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle
       continue;
-    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception())) {
+    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
+               is_bycycle_or_pedestrain) {
       double left_width = 0.0;
       double right_width = 0.0;
       reference_line_->GetLaneWidth(sl_boundary.start_s(), &left_width,
@@ -96,7 +104,7 @@ TrajectoryCost::TrajectoryCost(
         continue;
       }
 
-      if (sl_boundary.start_l() < 0.0 && sl_boundary.end_l() > 0.0) {
+      if (sl_boundary.start_l() <= 0.0 && sl_boundary.end_l() >= 0.0) {
         // if obstacle stays at the center of the lane, do not pass
         continue;
       }
@@ -122,8 +130,7 @@ TrajectoryCost::TrajectoryCost(
 
 ComparableCost TrajectoryCost::CalculatePathCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
-    const double end_s, const uint32_t curr_level,
-    const uint32_t total_level) const {
+    const double end_s, const uint32_t curr_level, const uint32_t total_level) {
   ComparableCost cost;
   double path_cost = 0.0;
   for (double path_s = 0.0; path_s < (end_s - start_s);
@@ -172,7 +179,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
 
 ComparableCost TrajectoryCost::CalculateStaticObstacleCost(
     const QuinticPolynomialCurve1d &curve, const double start_s,
-    const double end_s) const {
+    const double end_s) {
   ComparableCost obstacle_cost;
   for (double curr_s = start_s; curr_s <= end_s;
        curr_s += config_.path_resolution()) {
@@ -221,8 +228,7 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
 }
 
 ComparableCost TrajectoryCost::GetCostFromObsSL(
-    const double adc_s, const double adc_l,
-    const SLBoundary &obs_sl_boundary) const {
+    const double adc_s, const double adc_l, const SLBoundary &obs_sl_boundary) {
   const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
@@ -256,6 +262,7 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   const double delta_l = std::fabs(
       adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
+
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
       softmax(delta_l, config_.obstacle_collision_distance());
@@ -311,7 +318,7 @@ ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
                                          const double start_s,
                                          const double end_s,
                                          const uint32_t curr_level,
-                                         const uint32_t total_level) const {
+                                         const uint32_t total_level) {
   ComparableCost total_cost;
   // path cost
   total_cost +=
@@ -323,14 +330,6 @@ ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
   // dynamic obstacle cost
   total_cost += CalculateDynamicObstacleCost(curve, start_s, end_s);
   return total_cost;
-}
-
-double TrajectoryCost::RiskDistanceCost(const double distance) const {
-  return (5.0 - distance) * ((5.0 - distance)) * 10;
-}
-
-double TrajectoryCost::RegularDistanceCost(const double distance) const {
-  return std::max(20.0 - distance, 0.0);
 }
 
 }  // namespace planning

@@ -42,8 +42,8 @@ using apollo::common::VehicleConfigHelper;
 PathDecider::PathDecider() : Task("PathDecider") {}
 
 apollo::common::Status PathDecider::Execute(
-    Frame *, ReferenceLineInfo *reference_line_info) {
-  Task::Execute(nullptr, reference_line_info);
+    Frame *frame, ReferenceLineInfo *reference_line_info) {
+  Task::Execute(frame, reference_line_info);
   return Process(reference_line_info->path_data(),
                  reference_line_info->path_decision());
 }
@@ -88,7 +88,13 @@ bool PathDecider::MakeStaticObstacleDecision(
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto &obstacle = *path_obstacle->obstacle();
-    if (!obstacle.IsStatic()) {
+    bool is_bycycle_or_pedestrain =
+        (obstacle.Perception().type() ==
+             perception::PerceptionObstacle::BICYCLE ||
+         obstacle.Perception().type() ==
+             perception::PerceptionObstacle::PEDESTRIAN);
+
+    if (!is_bycycle_or_pedestrain && !obstacle.IsStatic()) {
       continue;
     }
     if (path_obstacle->HasLongitudinalDecision() &&
@@ -115,9 +121,9 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     if (sl_boundary.start_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
-      path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
-                                             object_decision);
-      path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
+      path_decision->AddLongitudinalDecision("PathDecider/not-in-s",
+                                             obstacle.Id(), object_decision);
+      path_decision->AddLateralDecision("PathDecider/not-in-s", obstacle.Id(),
                                         object_decision);
       continue;
     }
@@ -127,7 +133,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
       // ignore
-      path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
+      path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle.Id(),
                                         object_decision);
     } else if (curr_l - lateral_stop_radius < sl_boundary.end_l() &&
                curr_l + lateral_stop_radius > sl_boundary.start_l()) {
@@ -139,13 +145,13 @@ bool PathDecider::MakeStaticObstacleDecision(
               object_decision.stop(), obstacle.Id(),
               reference_line_info_->reference_line(),
               reference_line_info_->AdcSlBoundary())) {
-        path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
-                                               object_decision);
+        path_decision->AddLongitudinalDecision("PathDecider/nearest-stop",
+                                               obstacle.Id(), object_decision);
       } else {
         ObjectDecisionType object_decision;
         object_decision.mutable_ignore();
-        path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
-                                               object_decision);
+        path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",
+                                               obstacle.Id(), object_decision);
       }
     } else if (FLAGS_enable_nudge_decision) {
       // nudge
@@ -154,15 +160,15 @@ bool PathDecider::MakeStaticObstacleDecision(
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
         object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-        path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
-                                          object_decision);
+        path_decision->AddLateralDecision("PathDecider/left-nudge",
+                                          obstacle.Id(), object_decision);
       } else {
         // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
         object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
-        path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
-                                          object_decision);
+        path_decision->AddLateralDecision("PathDecider/right-nudge",
+                                          obstacle.Id(), object_decision);
       }
     }
   }

@@ -26,7 +26,6 @@ cc_binary(
     data = [
         "//modules/calibration/lidar_ex_checker/conf:lidar_ex_checker_adapter_manager_config",
     ],
-    linkstatic = 0,
     deps = [
         ":lidar_ex_checker_lib",
         "//external:gflags",

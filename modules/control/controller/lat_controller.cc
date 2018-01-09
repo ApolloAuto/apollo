@@ -161,13 +161,13 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
   // Low pass filter
   std::vector<double> den(3, 0.0);
   std::vector<double> num(3, 0.0);
-  LpfCoefficients(ts_, control_conf->lat_controller_conf().cutoff_freq(), &den,
-                  &num);
+  common::LpfCoefficients(
+      ts_, control_conf->lat_controller_conf().cutoff_freq(), &den, &num);
   digital_filter_.set_coefficients(den, num);
-  lateral_error_filter_ =
-      MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
-  heading_error_filter_ =
-      MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
+  lateral_error_filter_ = common::MeanFilter(
+      control_conf->lat_controller_conf().mean_filter_window_size());
+  heading_error_filter_ = common::MeanFilter(
+      control_conf->lat_controller_conf().mean_filter_window_size());
 }
 
 Status LatController::Init(const ControlConf *control_conf) {

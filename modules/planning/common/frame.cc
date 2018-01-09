@@ -117,7 +117,7 @@ std::list<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
 
-bool Frame::InitReferenceLineInfo() {
+bool Frame::CreateReferenceLineInfo() {
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
   if (!ReferenceLineProvider::instance()->GetReferenceLines(&reference_lines,
@@ -146,20 +146,21 @@ bool Frame::InitReferenceLineInfo() {
   }
 
   reference_line_info_.clear();
+  bool near_destination = false;
   auto ref_line_iter = reference_lines.begin();
   auto segments_iter = segments.begin();
   while (ref_line_iter != reference_lines.end()) {
+    if (segments_iter->StopForDestination()) {
+      near_destination = true;
+    }
     reference_line_info_.emplace_back(vehicle_state_, planning_start_point_,
                                       *ref_line_iter, *segments_iter);
     ++ref_line_iter;
     ++segments_iter;
   }
-
-  for (auto &info : reference_line_info_) {
-    if (!info.Init()) {
-      AERROR << "Failed to init reference line";
-      return false;
-    }
+  if (near_destination && CreateDestinationObstacle() < 0) {
+    AERROR << "Failed to create the destination obstacle";
+    return false;
   }
   if (FLAGS_enable_change_lane_decider &&
       !change_lane_decider_.Apply(&reference_line_info_)) {
@@ -167,12 +168,24 @@ bool Frame::InitReferenceLineInfo() {
     return false;
   }
 
-  for (auto &info : reference_line_info_) {
-    if (!info.AddObstacles(obstacles_.Items())) {
-      AERROR << "Failed to add obstacles to reference line";
+  if (reference_line_info_.size() == 2) {
+    common::math::Vec2d xy_point(vehicle_state_.x(), vehicle_state_.y());
+    common::SLPoint first_sl;
+    if (!reference_line_info_.front().reference_line().XYToSL(xy_point,
+                                                              &first_sl)) {
       return false;
     }
+    common::SLPoint second_sl;
+    if (!reference_line_info_.back().reference_line().XYToSL(xy_point,
+                                                             &second_sl)) {
+      return false;
+    }
+    const double offset = first_sl.l() - second_sl.l();
+    reference_line_info_.front().SetOffsetToOtherReferenceLine(offset);
+    reference_line_info_.back().SetOffsetToOtherReferenceLine(-offset);
   }
+
+  // delay the time-consumping reference_line_info init() step to planner.
   return true;
 }
 
@@ -192,16 +205,6 @@ const Obstacle *Frame::AddStaticVirtualObstacle(const std::string &id,
 }
 
 int Frame::CreateDestinationObstacle() {
-  bool near_destination = false;
-  for (const auto &info : reference_line_info_) {
-    if (info.Lanes().StopForDestination()) {
-      near_destination = true;
-      break;
-    }
-  }
-  if (!near_destination) {
-    return 1;
-  }
   const auto &routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
@@ -229,11 +232,7 @@ int Frame::CreateDestinationObstacle() {
                         FLAGS_virtual_stop_wall_length,
                         left_width + right_width};
   // add destination's projection to each reference line info
-  auto *ptr =
-      AddStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
-  for (auto &info : reference_line_info_) {
-    info.AddObstacle(ptr);
-  }
+  AddStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
   return 0;
 }
 
@@ -271,15 +270,10 @@ Status Frame::Init() {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Collision found with " + collision_obstacle->Id());
   }
-  if (!InitReferenceLineInfo()) {
+  if (!CreateReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";
     return Status(ErrorCode::PLANNING_ERROR,
                   "failed to init reference line info");
-  }
-
-  if (CreateDestinationObstacle() < 0) {
-    AERROR << "Failed to create the destination obstacle";
-    return Status(ErrorCode::PLANNING_ERROR, "failed to find destination");
   }
 
   return Status::OK();

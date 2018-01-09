@@ -22,6 +22,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/http_client.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
@@ -29,7 +30,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/data/proto/task.pb.h"
+#include "modules/data/proto/static_info.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -37,9 +38,9 @@
 DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
               "Global flagfile shared by all modules.");
 
-DEFINE_string(map_data_path, "modules/map/data", "Path to map data.");
+DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 
-DEFINE_string(vehicle_data_path, "modules/calibration/data",
+DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
 DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
@@ -307,7 +308,7 @@ int HMI::RunComponentCommand(const Map<std::string, Component> &components,
     AERROR << "Cannot find command " << component_name << "." << command_name;
     return -1;
   }
-  ADEBUG << "Execute system command: " << *cmd;
+  AINFO << "Execute system command: " << *cmd;
   const int ret = std::system(cmd->c_str());
 
   AERROR_IF(ret != 0) << "Command returns " << ret << ": " << *cmd;
@@ -315,10 +316,15 @@ int HMI::RunComponentCommand(const Map<std::string, Component> &components,
 }
 
 void HMI::RunModeCommand(const std::string &command_name) {
-  const Mode &current_mode = config_.modes().at(status_.current_mode());
+  RunModeCommand(status_.current_mode(), command_name);
+}
+
+void HMI::RunModeCommand(const std::string &mode,
+                         const std::string &command_name) {
+  const Mode &mode_conf = config_.modes().at(mode);
   if (command_name == "start" || command_name == "stop") {
     // Run the command on all live modules.
-    for (const auto &module : current_mode.live_modules()) {
+    for (const auto &module : mode_conf.live_modules()) {
       RunComponentCommand(config_.modules(), module, command_name);
     }
   }
@@ -343,6 +349,8 @@ void HMI::ChangeMapTo(const std::string &map_name) {
     AERROR << "Unknown map " << map_name;
     return;
   }
+  status_.set_current_map(map_name);
+  apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
   FLAGS_map_dir = *map_dir;
   // Append new map_dir flag to global flagfile.
@@ -352,9 +360,7 @@ void HMI::ChangeMapTo(const std::string &map_name) {
   // Also reload simulation map.
   CHECK(map_service_->ReloadMap(true)) << "Failed to load map from "
                                        << *map_dir;
-
   RunModeCommand("stop");
-  status_.set_current_map(map_name);
   BroadcastHMIStatus();
 }
 
@@ -367,11 +373,11 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
     AERROR << "Unknown vehicle " << vehicle_name;
     return;
   }
+  status_.set_current_vehicle(vehicle_name);
+  apollo::common::KVDB::Put("apollo:dreamview:vehicle", vehicle_name);
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
-
   RunModeCommand("stop");
-  status_.set_current_vehicle(vehicle_name);
   // Check available updates for current vehicle.
   // CheckOTAUpdates();
   BroadcastHMIStatus();
@@ -385,9 +391,11 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
     AERROR << "Unknown mode " << mode_name;
     return;
   }
-
-  RunModeCommand("stop");
+  const std::string previous_mode = status_.current_mode();
   status_.set_current_mode(mode_name);
+  apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
+
+  RunModeCommand(previous_mode, "stop");
   BroadcastHMIStatus();
 }
 

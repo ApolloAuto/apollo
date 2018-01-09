@@ -23,17 +23,18 @@
 #define MODULES_PREDICTION_CONTAINER_ADC_TRAJECTORY_OBSTACLES_H_
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "Eigen/Dense"
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/container/container.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -57,20 +58,6 @@ class ADCTrajectoryContainer : public Container {
   void Insert(const ::google::protobuf::Message& message) override;
 
   /**
-   * @brief Get adc trajectory
-   * @return Adc trajectory
-   */
-  const apollo::planning::ADCTrajectory* GetADCTrajectory();
-
-  /**
-   * @brief Get the line segments of ADC planning trajectory
-   * @param Time step to search trajectory points
-   * @return The line segments of ADC planning trajectory
-   */
-  std::vector<apollo::common::math::LineSegment2d> ADCTrajectorySegments(
-      const double time_step) const;
-
-  /**
    * @brief Get the right-of-way status of ADC
    * @return The right-of-way status of ADC
    */
@@ -81,22 +68,33 @@ class ADCTrajectoryContainer : public Container {
    * @param Point
    * @return True if the point is in the first junction of the adc trajectory
    */
-  bool IsPointInJunction(const apollo::common::math::Vec2d& point) const;
+  bool IsPointInJunction(const apollo::common::PathPoint& point) const;
 
   /**
-   * @brief Check if a lane id is contained in the adc trajectory
-   * @return True if the lane id is contained in the adc trajectory
+   * @brief Has overlap with ADC trajectory
+   * @return True if a target lane sequence has overlap with ADC trajectory
    */
-  bool ContainsLaneId(const std::string& lane_id) const;
+  bool HasOverlap(const LaneSequence& lane_sequence);
+
+  /**
+   * @brief Set ADC position
+   */
+  void SetPosition(const ::apollo::common::math::Vec2d& position);
 
  private:
-  apollo::common::math::Polygon2d GetJunctionPolygon();
+  void SetJunctionPolygon();
+
+  void SetLaneSequence();
+
+  std::string ToString(const std::unordered_set<std::string>& lane_ids);
+
+  std::string ToString(const std::vector<std::string>& lane_ids);
 
  private:
-  apollo::planning::ADCTrajectory adc_trajectory_;
-  apollo::common::math::Polygon2d junction_polygon_;
-  std::unordered_set<std::string> reference_line_lane_ids_;
-  static std::mutex g_mutex_;
+  ::apollo::planning::ADCTrajectory adc_trajectory_;
+  ::apollo::common::math::Polygon2d adc_junction_polygon_;
+  std::unordered_set<std::string> adc_lane_ids_;
+  std::vector<std::string> adc_lane_seq_;
 };
 
 }  // namespace prediction

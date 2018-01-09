@@ -140,6 +140,12 @@ void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
+  if (!reference_line_info->IsInited()) {
+    if (!reference_line_info->Init(frame->obstacles())) {
+      AERROR << "Failed to init reference line";
+      return Status(ErrorCode::PLANNING_ERROR, "Init reference line failed");
+    }
+  }
   if (!reference_line_info->IsChangeLanePath()) {
     const double kStraightForwardLineCost = 10.0;
     reference_line_info->AddCost(kStraightForwardLineCost);
@@ -204,7 +210,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 
   reference_line_info->SetTrajectory(trajectory);
   if (ret == Status::OK()) {  // vehicle can drive on this reference line.
-    reference_line_info->SetDriable(true);
+    reference_line_info->SetDrivable(true);
   }
   return ret;
 }

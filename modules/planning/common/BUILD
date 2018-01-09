@@ -315,4 +315,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "planning_thread_pool",
+    srcs = [
+        "planning_thread_pool.cc",
+    ],
+    hdrs = [
+        "planning_thread_pool.h",
+    ],
+    deps = [
+        ":planning_gflags",
+        "//modules/common:macro",
+        "//modules/common/util:ctpl_stl",
+    ],
+)
+
 cpplint()

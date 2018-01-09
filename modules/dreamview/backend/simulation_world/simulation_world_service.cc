@@ -74,6 +74,7 @@ using apollo::prediction::PredictionObstacles;
 using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
+using ::google::protobuf::util::MessageToJsonString;
 
 namespace {
 
@@ -271,21 +272,20 @@ void SimulationWorldService::UpdateDelays() {
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
-  std::string sim_world_json;
-  ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
+  std::string sim_world_json_string;
+  MessageToJsonString(world_, &sim_world_json_string);
 
   Json update = GetMapElements(radius);
   update["type"] = "SimWorldUpdate";
   update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
-  update["world"] = Json::parse(sim_world_json);
+  update["world"] = sim_world_json_string;
 
   return update;
 }
 
 Json SimulationWorldService::GetPlanningData() const {
   std::string planning_data_json;
-  ::google::protobuf::util::MessageToJsonString(planning_data_,
-                                                &planning_data_json);
+  MessageToJsonString(planning_data_, &planning_data_json);
 
   return Json::parse(planning_data_json);
 }
@@ -472,6 +472,7 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
 
+  // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
 
   bool collecting_started = false;
@@ -489,6 +490,13 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     auto traj_pt = world_.mutable_planning_trajectory(i);
     traj_pt->set_position_x(traj_pt->position_x() + map_service_->GetXOffset());
     traj_pt->set_position_y(traj_pt->position_y() + map_service_->GetYOffset());
+  }
+
+  // Update engage advice.
+  // This is a temporary solution, the advice will come from monitor later
+  if (trajectory.has_engage_advice()) {
+    world_.set_engage_advice(
+        EngageAdvice_Advice_Name(trajectory.engage_advice().advice()));
   }
 }
 

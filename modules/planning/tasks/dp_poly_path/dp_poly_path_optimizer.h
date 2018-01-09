@@ -31,6 +31,11 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class DpPolyPathOptimizer
+ * @brief DpPolyPathOptimizer does path planning with dynamic programming
+ * algorithm.
+ */
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
   DpPolyPathOptimizer();

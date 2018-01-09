@@ -22,20 +22,23 @@
 #include <utility>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
+#include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::hdmap::LaneInfo;
+using ::apollo::common::PathPoint;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::adapter::AdapterConfig;
+using ::apollo::common::math::Vec2d;
+using ::apollo::hdmap::LaneInfo;
 
 void SequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -44,11 +47,7 @@ void SequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 }
 
-void SequencePredictor::Clear() {
-  Predictor::Clear();
-  adc_lane_id_.clear();
-  adc_lane_s_ = 0.0;
-}
+void SequencePredictor::Clear() { Predictor::Clear(); }
 
 std::string SequencePredictor::ToString(const LaneSequence& sequence) {
   std::string str_lane_sequence = "";
@@ -70,25 +69,22 @@ void SequencePredictor::FilterLaneSequences(
   std::pair<int, double> change(-1, -1.0);
   std::pair<int, double> all(-1, -1.0);
 
-  // Get ADC status
-  GetADC();
-
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
-
     lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
-    if (lane_change_type[i] == LaneChangeType::INVALID) {
-      ADEBUG "Invalid lane change type for lane sequence ["
-          << ToString(sequence) << "].";
+
+    if (lane_change_type[i] != LaneChangeType::LEFT &&
+        lane_change_type[i] != LaneChangeType::RIGHT &&
+        lane_change_type[i] != LaneChangeType::ONTO_LANE) {
+      ADEBUG "Ignore lane sequence [" << ToString(sequence) << "].";
       continue;
     }
 
-    double distance = GetLaneChangeDistanceWithADC(sequence);
-    ADEBUG << "Distance to ADC: " << distance << " " << ToString(sequence);
     // The obstacle has interference with ADC within a small distance
-    if (distance < FLAGS_lane_change_dist &&
-        (lane_change_type[i] == LaneChangeType::LEFT ||
-         lane_change_type[i] == LaneChangeType::RIGHT)) {
+    double distance = GetLaneChangeDistanceWithADC(sequence);
+    ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
+           << distance;
+    if (distance < FLAGS_lane_change_dist) {
       (*enable_lane_sequence)[i] = false;
       ADEBUG << "Filter trajectory [" << ToString(sequence)
              << "] due to small distance " << distance << ".";
@@ -135,33 +131,13 @@ void SequencePredictor::FilterLaneSequences(
   }
 }
 
-void SequencePredictor::GetADC() {
-  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
-  if (container == nullptr) {
-    AERROR << "Unavailable obstacle container";
-    return;
-  }
-
-  Obstacle* adc = container->GetObstacle(PoseContainer::ID);
-  if (adc != nullptr) {
-    const Feature& feature = adc->latest_feature();
-    if (feature.has_lane() && feature.lane().has_lane_feature()) {
-      adc_lane_id_ = feature.lane().lane_feature().lane_id();
-      adc_lane_s_ = feature.lane().lane_feature().lane_s();
-      ADEBUG << "ADC: lane_id: " << adc_lane_id_ << ", s: " << adc_lane_s_;
-    }
-    if (feature.has_position()) {
-      adc_position_[0] = feature.position().x();
-      adc_position_[1] = feature.position().y();
-    }
-  }
-}
-
 SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
     const std::string& lane_id, const LaneSequence& lane_sequence) {
   PredictionMap* map = PredictionMap::instance();
+
+  if (lane_id.empty()) {
+    return LaneChangeType::ONTO_LANE;
+  }
 
   std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
   if (lane_id == lane_change_id) {
@@ -180,49 +156,39 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
 
 double SequencePredictor::GetLaneChangeDistanceWithADC(
     const LaneSequence& lane_sequence) {
-  if (adc_lane_id_.empty() || lane_sequence.lane_segment_size() <= 0) {
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
+  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::PLANNING_TRAJECTORY));
+  CHECK_NOTNULL(pose_container);
+  CHECK_NOTNULL(adc_container);
+
+  if (!adc_container->HasOverlap(lane_sequence)) {
+    ADEBUG << "The sequence [" << ToString(lane_sequence)
+           << "] has no overlap with ADC.";
     return std::numeric_limits<double>::max();
   }
 
-  PredictionMap* map = PredictionMap::instance();
-  std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
-  double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
+  Eigen::Vector2d adc_position;
+  if (pose_container->ToPerceptionObstacle() != nullptr) {
+    adc_position[0] = pose_container->ToPerceptionObstacle()->position().x();
+    adc_position[1] = pose_container->ToPerceptionObstacle()->position().y();
 
-  if (!SameLaneSequence(obstacle_lane_id, obstacle_lane_s)) {
-    return std::numeric_limits<double>::max();
+    PredictionMap* map = PredictionMap::instance();
+    std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
+    double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
+    double lane_s = 0.0;
+    double lane_l = 0.0;
+    if (map->GetProjection(adc_position, map->LaneById(obstacle_lane_id),
+                           &lane_s, &lane_l)) {
+      ADEBUG << "Distance with ADC is " << std::fabs(lane_s - obstacle_lane_s);
+      return std::fabs(lane_s - obstacle_lane_s);
+    }
   }
 
-  double lane_s = 0.0;
-  double lane_l = 0.0;
-  if (map->GetProjection(adc_position_, map->LaneById(obstacle_lane_id),
-                         &lane_s, &lane_l)) {
-    return std::fabs(lane_s - obstacle_lane_s);
-  }
+  ADEBUG << "Invalid ADC pose.";
   return std::numeric_limits<double>::max();
-}
-
-bool SequencePredictor::SameLaneSequence(const std::string& lane_id,
-                                         double lane_s) {
-  PredictionMap* map = PredictionMap::instance();
-
-  std::shared_ptr<const LaneInfo> obstacle_lane = map->LaneById(lane_id);
-  std::shared_ptr<const LaneInfo> adc_lane = map->LaneById(adc_lane_id_);
-
-  if (obstacle_lane != nullptr && adc_lane != nullptr) {
-    RoadGraph obstacle_road_graph(lane_s, FLAGS_lane_change_dist,
-                                  obstacle_lane);
-    LaneGraph obstacle_lane_graph;
-    obstacle_road_graph.BuildLaneGraph(&obstacle_lane_graph);
-
-    RoadGraph adc_road_graph(adc_lane_s_, FLAGS_lane_change_dist, adc_lane);
-    LaneGraph adc_lane_graph;
-    adc_road_graph.BuildLaneGraph(&adc_lane_graph);
-
-    return obstacle_road_graph.IsOnLaneGraph(adc_lane, obstacle_lane_graph) ||
-           adc_road_graph.IsOnLaneGraph(obstacle_lane, adc_lane_graph);
-  }
-
-  return false;
 }
 
 bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
@@ -231,7 +197,7 @@ bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
   if (probability > max_prob) {
     return true;
   } else {
-    double prob_diff = std::abs(probability - max_prob);
+    double prob_diff = std::fabs(probability - max_prob);
     if (prob_diff <= std::numeric_limits<double>::epsilon() &&
         type == LaneChangeType::STRAIGHT) {
       return true;

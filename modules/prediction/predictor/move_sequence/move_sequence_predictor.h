@@ -64,10 +64,6 @@ class MoveSequencePredictor : public SequencePredictor {
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
-  void DrawMotionTrajectoryPoints(
-      const Obstacle& obstacle, const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
-
   void GetLongitudinalPolynomial(const Obstacle& obstacle,
                                  const LaneSequence& lane_sequence,
                                  const double time_to_lane_center,
@@ -84,15 +80,16 @@ class MoveSequencePredictor : public SequencePredictor {
   double EvaluateLongitudinalPolynomial(const std::array<double, 5>& coeffs,
                                         const double t, const uint32_t order);
 
-  double ComputeTimeToLaneCenter(const Obstacle& obstacle,
-                                 const LaneSequence& lane_sequence);
+  double ComputeTimeToLaneCenterBySampling(const Obstacle& obstacle,
+                                           const LaneSequence& lane_sequence);
+
+  double ComputeTimeToLaneCenterByVelocity(const Obstacle& obstacle,
+                                           const LaneSequence& lane_sequence);
 
   double Cost(const double t, const std::array<double, 6>& lateral_coeffs,
               const std::array<double, 5>& longitudinal_coeffs);
 
   void GenerateCandidateTimes(std::vector<double>* candidate_times);
-
-  double MotionWeight(const double t);
 };
 
 }  // namespace prediction

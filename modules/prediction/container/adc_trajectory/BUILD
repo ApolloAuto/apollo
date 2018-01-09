@@ -11,9 +11,10 @@ cc_library(
         "//modules/common/math:line_segment2d",
         "//modules/common/math:polygon2d",
         "//modules/planning/proto:planning_proto",
-        "//modules/prediction/container",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/proto:lane_graph_proto",
+        "//modules/prediction/container:container",
     ],
 )
 

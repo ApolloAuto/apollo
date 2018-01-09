@@ -42,8 +42,8 @@ class Rerouting : public TrafficRule {
  private:
   bool ChangeLaneFailRerouting();
 
-  ReferenceLineInfo* reference_line_info_;
-  Frame* frame_;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
+  Frame* frame_ = nullptr;
 };
 
 }  // namespace planning

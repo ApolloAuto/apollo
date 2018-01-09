@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/map/proto:map_proto",
+        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",

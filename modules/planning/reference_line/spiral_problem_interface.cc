@@ -32,8 +32,8 @@ namespace planning {
 constexpr std::size_t N = 10;
 
 SpiralProblemInterface::SpiralProblemInterface(
-    std::vector<Eigen::Vector2d> points) {
-  init_points_ = std::move(points);
+    std::vector<Eigen::Vector2d> points)
+    : init_points_(std::move(points)) {
   num_of_points_ = init_points_.size();
   CHECK_GT(num_of_points_, 1);
 

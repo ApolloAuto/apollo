@@ -39,8 +39,9 @@ class TrajectoryGenerator:
     def __init__(self):
         self.mobileye_pb = None
 
-    def generate(self, path_x, path_y, final_path_length, speed,
+    def generate(self, path, final_path_length, speed,
                  start_timestamp):
+        path_x, path_y = path.get_xy()
         adc_trajectory = planning_pb2.ADCTrajectory()
         adc_trajectory.header.timestamp_sec = rospy.Time.now().to_sec()
         adc_trajectory.header.module_name = "planning"

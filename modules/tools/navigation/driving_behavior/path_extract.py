@@ -21,15 +21,18 @@ import datetime
 import rosbag
 
 if __name__ == '__main__':
-    fbag = sys.argv[1]
+    fbags = sys.argv[1:]
 
+    fbag = fbags[0]
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     f = open("path_" + fbag.split('/')[-1] + ".txt", 'w')
 
-    bag = rosbag.Bag(fbag)
-    for topic, localization_pb, t in bag.read_messages(
-            topics=['/apollo/localization/pose']):
-        x = localization_pb.pose.position.x
-        y = localization_pb.pose.position.y
-        f.write(str(x) + "," + str(y) + "\n")
-    bag.close()
+    for fbag in fbags:
+        bag = rosbag.Bag(fbag)
+        for topic, localization_pb, t in bag.read_messages(
+                topics=['/apollo/localization/pose']):
+            x = localization_pb.pose.position.x
+            y = localization_pb.pose.position.y
+            f.write(str(x) + "," + str(y) + "\n")
+        bag.close()
+    f.close()

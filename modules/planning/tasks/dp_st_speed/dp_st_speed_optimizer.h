@@ -33,6 +33,11 @@
 namespace apollo {
 namespace planning {
 
+/**
+ * @class DpStSpeedOptimizer
+ * @brief DpStSpeedOptimizer does ST graph speed planning with dynamic
+ * programming algorithm.
+ */
 class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
   DpStSpeedOptimizer();
@@ -63,6 +68,8 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
   SLBoundary adc_sl_boundary_;
   DpStSpeedConfig dp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
+
+  PathDecision path_decision_;
 };
 
 }  // namespace planning

@@ -136,6 +136,7 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
 
 struct VisualizationManagerParams {
   std::string map_folder;
+  std::string map_visual_folder;
   Eigen::Affine3d velodyne_extrinsic;
   VisualMapParam map_param;
   unsigned int lidar_frame_buffer_capacity;
@@ -157,6 +158,7 @@ class VisualizationManager {
   }
 
   bool Init(const std::string &map_folder,
+            const std::string &map_visual_folder,
             const Eigen::Affine3d &velodyne_extrinsic,
             const VisualMapParam &map_param);
   bool Init(const VisualizationManagerParams &params);

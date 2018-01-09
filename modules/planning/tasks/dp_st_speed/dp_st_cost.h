@@ -15,17 +15,21 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_cost.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_COST_H_
 #define MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_COST_H_
 
+#include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/tasks/dp_st_speed/st_graph_point.h"
@@ -35,11 +39,11 @@ namespace planning {
 
 class DpStCost {
  public:
-  explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config);
+  explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config,
+                    const std::vector<const PathObstacle*>& obstacles,
+                    const common::TrajectoryPoint& init_point);
 
-  double GetObstacleCost(
-      const StGraphPoint& point,
-      const std::vector<const StBoundary*>& st_boundaries) const;
+  double GetObstacleCost(const StGraphPoint& point);
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
@@ -48,30 +52,36 @@ class DpStCost {
                       const double speed_limit) const;
 
   double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
-                                 const STPoint& second) const;
+                                 const STPoint& second);
   double GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
-                                   const STPoint& third) const;
+                                   const STPoint& third);
 
   double GetJerkCostByTwoPoints(const double pre_speed, const double pre_acc,
                                 const STPoint& pre_point,
-                                const STPoint& curr_point) const;
+                                const STPoint& curr_point);
   double GetJerkCostByThreePoints(const double first_speed,
                                   const STPoint& first_point,
                                   const STPoint& second_point,
-                                  const STPoint& third_point) const;
+                                  const STPoint& third_point);
 
   double GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
-                                 const STPoint& third,
-                                 const STPoint& fourth) const;
+                                 const STPoint& third, const STPoint& fourth);
 
  private:
-  double GetAccelCost(const double accel) const;
-  double JerkCost(const double jerk) const;
+  double GetAccelCost(const double accel);
+  double JerkCost(const double jerk);
 
-  const DpStSpeedConfig& dp_st_speed_config_;
-  double unit_s_ = 0.0;
+  const DpStSpeedConfig& config_;
+  const std::vector<const PathObstacle*>& obstacles_;
+  const common::TrajectoryPoint& init_point_;
+
   double unit_t_ = 0.0;
-  double unit_v_ = 0.0;
+
+  std::unordered_map<std::string, int> boundary_map_;
+  std::vector<std::vector<std::pair<double, double>>> boundary_cost_;
+
+  std::array<double, 200> accel_cost_;
+  std::array<double, 400> jerk_cost_;
 };
 
 }  // namespace planning

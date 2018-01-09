@@ -30,13 +30,13 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
+#include "modules/common/filters/mean_filter.h"
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
-#include "modules/control/filters/digital_filter.h"
-#include "modules/control/filters/digital_filter_coefficients.h"
-#include "modules/control/filters/mean_filter.h"
 
 /**
  * @namespace apollo::control
@@ -230,7 +230,7 @@ class MPCController : public Controller {
   // parameters for mpc solver; threshold for computation
   double mpc_eps_ = 0.0;
 
-  DigitalFilter digital_filter_;
+  common::DigitalFilter digital_filter_;
 
   std::unique_ptr<Interpolation1D> lat_err_interpolation_;
 

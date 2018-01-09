@@ -15,6 +15,7 @@ export default class HMI {
 
     @observable moduleStatus = observable.map();
     @observable hardwareStatus = observable.map();
+    @observable enableStartAuto = false;
 
     displayName = {};
 
@@ -64,6 +65,10 @@ export default class HMI {
                 }
             }
         }
+    }
+
+    @action update(world) {
+        this.enableStartAuto = world.engageAdvice === "READY_TO_ENGAGE";
     }
 
     @action toggleModule(id) {

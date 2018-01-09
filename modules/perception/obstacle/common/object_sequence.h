@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H
-#define MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
+#define MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
 #include <map>
 #include <mutex>
 #include <vector>
@@ -26,36 +26,52 @@ namespace perception {
 
 class ObjectSequence {
  public:
-  // typedef int TrackIdKey;
-  // typedef double TimeStampKey;
   typedef std::map<double, ObjectPtr> TrackedObjects;
-  // typedef std::map<TimeStampKey, ObjectPtr> LastSightingObjects;
- public:
+
+  /**
+   * @brief Construct
+   */
   ObjectSequence() = default;
+
+  /**
+   * @brief Destruct
+   */
   ~ObjectSequence() = default;
 
+  /**
+   * @brief Add objects of one single frame to the current sequence
+   * @param objects The frame objects to be added to the storaged sequence
+   * @param timestamp The frame timestamp
+   * @return True if add successfully, false otherwise
+   */
   bool AddTrackedFrameObjects(const std::vector<ObjectPtr>& objects,
                               double timestamp);
 
+  /**
+   * @brief Get tracked objects in a time window
+   * @param track_id The track id of object sequence
+   * @param track The output tracked objects
+   * @param window_time The time interval
+   * @return True if get track successfully, false otherwise
+   */
   bool GetTrackInTemporalWindow(int track_id, TrackedObjects* track,
                                 double window_time);
 
-  // bool get_objects_in_spatial_area(
-  //         LastSightingObjects* objects,
-  //         const Eigen::Vector3d& center,
-  //         double radius);
-
  protected:
+  /**
+   * @brief Remove too old tracks
+   * @param current_stamp Current timestamp
+   */
   void RemoveStaleTracks(double current_stamp);
 
- protected:
-  double _current;
-  std::map<int, TrackedObjects> _sequence;
-  std::mutex _mutex;
-  static constexpr double _s_max_time_out = 5;  // 5 second
+ private:
+  double current_;
+  std::map<int, TrackedObjects> sequence_;
+  std::mutex mutex_;
+  static constexpr double s_max_time_out_ = 5;  // 5 seconds
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_

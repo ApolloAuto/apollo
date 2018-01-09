@@ -1,7 +1,0 @@
-Header header
-int32 id=5
-int8 SteeringWheelSpeedSign
-float32 SteeringWheelAngle
-int8 SteeringWheelAngleSign
-float32 SteeringWheelSpeed
-int8 SAS_Status

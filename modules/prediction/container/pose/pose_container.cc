@@ -26,10 +26,10 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
 
-std::mutex PoseContainer::g_mutex_;
-
 void PoseContainer::Insert(const ::google::protobuf::Message& message) {
-  Update(dynamic_cast<const LocalizationEstimate&>(message));
+  localization::LocalizationEstimate localization;
+  localization.CopyFrom(dynamic_cast<const LocalizationEstimate&>(message));
+  Update(localization);
 }
 
 void PoseContainer::Update(
@@ -50,10 +50,11 @@ void PoseContainer::Update(
     return;
   }
 
-  std::lock_guard<std::mutex> lock(g_mutex_);
   if (obstacle_ptr_.get() == nullptr) {
     obstacle_ptr_.reset(new PerceptionObstacle());
   }
+  obstacle_ptr_->Clear();
+
   obstacle_ptr_->set_id(ID);
   Point position;
   position.set_x(localization.pose().position().x());
@@ -96,7 +97,6 @@ double PoseContainer::GetTimestamp() {
 }
 
 PerceptionObstacle* PoseContainer::ToPerceptionObstacle() {
-  std::lock_guard<std::mutex> lock(g_mutex_);
   return obstacle_ptr_.get();
 }
 

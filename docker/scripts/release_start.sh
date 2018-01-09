@@ -25,7 +25,7 @@ source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-VERSION="release-${MACHINE_ARCH}-latest"
+VERSION="release-${MACHINE_ARCH}-v2.0.0"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -64,19 +64,7 @@ function main() {
 
     setup_device
 
-    local devices=""
-    devices="${devices} $(find_device ttyUSB*)"
-    devices="${devices} $(find_device ttyS*)"
-    devices="${devices} $(find_device can*)"
-    devices="${devices} $(find_device ram*)"
-    devices="${devices} $(find_device loop*)"
-    devices="${devices} $(find_device nvidia*)"
-    devices="${devices} $(find_device camera*)"
-    devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
-    devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
-    devices="${devices} -v /dev/novatel0:/dev/novatel0"
-    devices="${devices} -v /dev/novatel1:/dev/novatel1"
-    devices="${devices} -v /dev/novatel2:/dev/novatel2"
+    local devices=" -v /dev:/dev"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -118,7 +106,7 @@ function main() {
         --add-host in_release_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_release_docker \
-        --shm-size 512M \
+        --shm-size 2G \
         $IMG
     if [ "${USER}" != "root" ]; then
       docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"

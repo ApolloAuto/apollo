@@ -35,6 +35,7 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
@@ -127,6 +128,10 @@ bool DPRoadGraph::GenerateMinCostPath(
   }
   path_waypoints.insert(path_waypoints.begin(),
                         std::vector<common::SLPoint>{init_sl_point_});
+  if (path_waypoints.size() < 2) {
+    AERROR << "Too few path_waypoints.";
+    return false;
+  }
 
   for (uint32_t i = 0; i < path_waypoints.size(); ++i) {
     const auto &level_waypoints = path_waypoints.at(i);
@@ -143,52 +148,35 @@ bool DPRoadGraph::GenerateMinCostPath(
       config_, reference_line_, reference_line_info_.IsChangeLanePath(),
       obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
 
-  std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
-  if (graph_nodes.size() < 2) {
-    AERROR << "Too few graph_nodes.";
-    return false;
-  }
-  graph_nodes[0].emplace_back(init_sl_point_, nullptr, ComparableCost());
+  std::list<std::list<DPRoadGraphNode>> graph_nodes;
+  graph_nodes.emplace_back();
+  graph_nodes.back().emplace_back(init_sl_point_, nullptr, ComparableCost());
+  auto &front = graph_nodes.front().front();
+  size_t total_level = path_waypoints.size();
 
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
-    const auto &prev_dp_nodes = graph_nodes[level - 1];
+    const auto &prev_dp_nodes = graph_nodes.back();
     const auto &level_points = path_waypoints[level];
-    for (const auto &cur_point : level_points) {
-      graph_nodes[level].emplace_back(cur_point, nullptr);
-      auto &cur_node = graph_nodes[level].back();
-      for (const auto &prev_dp_node : prev_dp_nodes) {
-        const auto &prev_sl_point = prev_dp_node.sl_point;
-        double init_dl = 0.0;
-        double init_ddl = 0.0;
-        if (level == 1) {
-          init_dl = init_frenet_frame_point_.dl();
-          init_ddl = init_frenet_frame_point_.ddl();
-        }
-        QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
-                                       cur_point.l(), 0.0, 0.0,
-                                       cur_point.s() - prev_sl_point.s());
-        const auto cost =
-            trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s(),
-                                      level, path_waypoints.size()) +
-            prev_dp_node.min_cost;
-        cur_node.UpdateCost(&prev_dp_node, curve, cost);
 
-        // try to connect the current point with the first point directly
-        // only do this at lane change
-        if (reference_line_info_.IsChangeLanePath() && IsSafeForLaneChange() &&
-            level >= 2) {
-          init_dl = init_frenet_frame_point_.dl();
-          init_ddl = init_frenet_frame_point_.ddl();
-          QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
-                                         cur_point.l(), 0.0, 0.0,
-                                         cur_point.s() - init_sl_point_.s());
-          const auto cost = trajectory_cost.Calculate(curve, init_sl_point_.s(),
-                                                      cur_point.s(), level,
-                                                      path_waypoints.size());
+    graph_nodes.emplace_back();
 
-          cur_node.UpdateCost(&(graph_nodes.front().front()), curve, cost);
-        }
+    for (size_t i = 0; i < level_points.size(); ++i) {
+      const auto &cur_point = level_points[i];
+
+      graph_nodes.back().emplace_back(cur_point, nullptr);
+      auto &cur_node = graph_nodes.back().back();
+      if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+        PlanningThreadPool::instance()->mutable_thread_pool()->Push(std::bind(
+            &DPRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
+            total_level, &trajectory_cost, &(front), &(cur_node)));
+
+      } else {
+        UpdateNode(prev_dp_nodes, level, total_level, &trajectory_cost, &front,
+                   &cur_node);
       }
+    }
+    if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+      PlanningThreadPool::instance()->mutable_thread_pool()->JoinAll();
     }
   }
 
@@ -204,6 +192,10 @@ bool DPRoadGraph::GenerateMinCostPath(
     min_cost_node = min_cost_node->min_cost_prev_node;
     min_cost_path->push_back(*min_cost_node);
   }
+  if (min_cost_node != &graph_nodes.front().front()) {
+    return false;
+  }
+
   std::reverse(min_cost_path->begin(), min_cost_path->end());
 
   for (const auto &node : *min_cost_path) {
@@ -214,6 +206,55 @@ bool DPRoadGraph::GenerateMinCostPath(
         ->CopyFrom(node.sl_point);
   }
   return true;
+}
+
+void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
+                             const uint32_t level, const uint32_t total_level,
+                             TrajectoryCost *trajectory_cost,
+                             DPRoadGraphNode *front,
+                             DPRoadGraphNode *cur_node) {
+  DCHECK_NOTNULL(trajectory_cost);
+  DCHECK_NOTNULL(front);
+  DCHECK_NOTNULL(cur_node);
+  for (const auto &prev_dp_node : prev_nodes) {
+    const auto &prev_sl_point = prev_dp_node.sl_point;
+    const auto &cur_point = cur_node->sl_point;
+    double init_dl = 0.0;
+    double init_ddl = 0.0;
+    if (level == 1) {
+      init_dl = init_frenet_frame_point_.dl();
+      init_ddl = init_frenet_frame_point_.ddl();
+    }
+    QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl,
+                                   cur_point.l(), 0.0, 0.0,
+                                   cur_point.s() - prev_sl_point.s());
+
+    if (!IsValidCurve(curve)) {
+      continue;
+    }
+    const auto cost =
+        trajectory_cost->Calculate(curve, prev_sl_point.s(), cur_point.s(),
+                                   level, total_level) +
+        prev_dp_node.min_cost;
+
+    cur_node->UpdateCost(&prev_dp_node, curve, cost);
+
+    // try to connect the current point with the first point directly
+    // only do this at lane change
+    if (level >= 2) {
+      init_dl = init_frenet_frame_point_.dl();
+      init_ddl = init_frenet_frame_point_.ddl();
+      QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
+                                     cur_point.l(), 0.0, 0.0,
+                                     cur_point.s() - init_sl_point_.s());
+      if (!IsValidCurve(curve)) {
+        continue;
+      }
+      const auto cost = trajectory_cost->Calculate(
+          curve, init_sl_point_.s(), cur_point.s(), level, total_level);
+      cur_node->UpdateCost(front, curve, cost);
+    }
+  }
 }
 
 bool DPRoadGraph::SamplePathWaypoints(
@@ -248,41 +289,39 @@ bool DPRoadGraph::SamplePathWaypoints(
     double right_width = 0.0;
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
 
-    constexpr double kBoundaryBuff = 0.10;
+    constexpr double kBoundaryBuff = 0.20;
     const auto &vehicle_config =
         common::VehicleConfigHelper::instance()->GetConfig();
     const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    double kDeafultUnitL = 0.30;
+    double kDefaultUnitL = 1.2 / (config_.sample_points_num_each_level() - 1);
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      kDeafultUnitL = 1.0;
+      kDefaultUnitL = 1.0;
     }
     const double sample_l_range =
-        kDeafultUnitL * (config_.sample_points_num_each_level() - 1);
-    double sample_right_boundary =
-        std::fmin(-eff_right_width, init_sl_point_.l());
-    double sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+        kDefaultUnitL * (config_.sample_points_num_each_level() - 1);
+    double sample_right_boundary = -eff_right_width;
+    double sample_left_boundary = eff_left_width;
 
-    if (reference_line_info_.IsChangeLanePath() &&
-        init_sl_point_.l() > eff_left_width) {
-      sample_right_boundary =
-          std::fmax(sample_right_boundary, init_sl_point_.l() - sample_l_range);
-    }
-    if (reference_line_info_.IsChangeLanePath() &&
-        init_sl_point_.l() < eff_right_width) {
-      sample_left_boundary =
-          std::fmin(sample_left_boundary, init_sl_point_.l() + sample_l_range);
+    if (reference_line_info_.IsChangeLanePath()) {
+      sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
+      sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+
+      if (init_sl_point_.l() > eff_left_width) {
+        sample_right_boundary = std::fmax(sample_right_boundary,
+                                          init_sl_point_.l() - sample_l_range);
+      }
+      if (init_sl_point_.l() < eff_right_width) {
+        sample_left_boundary = std::fmin(sample_left_boundary,
+                                         init_sl_point_.l() + sample_l_range);
+      }
     }
 
     std::vector<double> sample_l;
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
-      if (i == 0) {
-        sample_l.push_back(init_sl_point_.l());
-      } else {
-        sample_l.push_back(std::copysign(1.0, init_sl_point_.l()));
-      }
+      sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                   config_.sample_points_num_each_level() - 1,
@@ -292,7 +331,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (uint8_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
-      constexpr double kResonateDistance = 2.0;
+      constexpr double kResonateDistance = 1e-3;
       common::SLPoint sl;
       if (j % 2 == 0 ||
           total_length - accumulated_s < 2.0 * kResonateDistance) {
@@ -327,12 +366,6 @@ bool DPRoadGraph::IsSafeForLaneChange() {
     return false;
   }
 
-  constexpr double kForwardSafeTime = 1.2;
-  constexpr double kForwardMinSafeDistance = 6.0;
-  constexpr double kBackwardSafeTime = 1.2;
-  constexpr double kBackwardMinSafeDistance = 8.0;
-  const double kForwardSafeDistance =
-      std::max(kForwardMinSafeDistance, init_point_.v() * kForwardSafeTime);
   for (const auto *path_obstacle :
        reference_line_info_.path_decision().path_obstacles().Items()) {
     const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
@@ -344,9 +377,16 @@ bool DPRoadGraph::IsSafeForLaneChange() {
       continue;
     }
 
-    const double kBackwardSafeDistance =
-        std::max(kBackwardMinSafeDistance,
-                 path_obstacle->obstacle()->Speed() * kBackwardSafeTime);
+    constexpr double kSafeTime = 3.0;
+    constexpr double kForwardMinSafeDistance = 6.0;
+    constexpr double kBackwardMinSafeDistance = 8.0;
+
+    const double kForwardSafeDistance = std::max(
+        kForwardMinSafeDistance,
+        (init_point_.v() - path_obstacle->obstacle()->Speed()) * kSafeTime);
+    const double kBackwardSafeDistance = std::max(
+        kBackwardMinSafeDistance,
+        (path_obstacle->obstacle()->Speed() - init_point_.v()) * kSafeTime);
     if (sl_boundary.end_s() >
             adc_sl_boundary.start_s() - kBackwardSafeDistance &&
         sl_boundary.start_s() <
@@ -388,6 +428,27 @@ bool DPRoadGraph::CalculateFrenetPoint(
   frenet_frame_point->set_dl(dl);
   frenet_frame_point->set_ddl(ddl);
   return true;
+}
+
+bool DPRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
+  constexpr double kMaxLateralDistance = 20.0;
+  for (double s = 0.0; s < curve.ParamLength(); s += 2.0) {
+    const double l = curve.Evaluate(0, s);
+    if (std::fabs(l) > kMaxLateralDistance) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void DPRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
+                               const QuinticPolynomialCurve1d &curve,
+                               const double start_s, const double end_s,
+                               const uint32_t curr_level,
+                               const uint32_t total_level,
+                               ComparableCost *cost) {
+  *cost =
+      trajectory_cost.Calculate(curve, start_s, end_s, curr_level, total_level);
 }
 
 }  // namespace planning

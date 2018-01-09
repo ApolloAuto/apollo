@@ -85,6 +85,7 @@ class IGetBox {
   virtual void GetCropBox(const cv::Size &size,
                           const std::vector<LightPtr> &lights,
                           cv::Rect *cropbox) = 0;
+  virtual ~IGetBox() = default;
 };
 
 /**
