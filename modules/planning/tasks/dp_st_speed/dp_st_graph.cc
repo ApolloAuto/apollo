@@ -28,8 +28,8 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/util/ctpl_stl.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_thread_pool.h"
 
 namespace apollo {
 namespace planning {
@@ -160,15 +160,15 @@ Status DpStGraph::CalculateTotalCost() {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
 
-    common::util::ThreadPool pool(FLAGS_num_thread_dp_st_graph);
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        pool.push(std::bind(&DpStGraph::CalculateCostAt, this, c, r));
+        PlanningThreadPool::instance()->mutable_thread_pool()->push(
+            std::bind(&DpStGraph::CalculateCostAt, this, c, r));
       } else {
         CalculateCostAt(c, r);
       }
     }
-    pool.stop(true);
+    PlanningThreadPool::instance()->mutable_thread_pool()->join_all();
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
