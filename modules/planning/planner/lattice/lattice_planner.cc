@@ -108,7 +108,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
-      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle);
+      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle, false);
 
   AINFO << "Trajectory_Evaluator_Construction_Time="
         << (Clock::NowInSeconds() - current_time) * 1000;
@@ -156,6 +156,10 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost = 0.0;
     trajectory_pair_cost = trajectory_evaluator.top_trajectory_pair_cost();
+    // For auto tuning
+    //std::vector<double> trajectory_pair_cost_components =
+    //  trajectory_evaluator.top_trajectory_pair_component_cost();
+
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
 
     // check the validity of 1d trajectories
@@ -176,6 +180,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
       continue;
     }
 
+
     // check collision with other obstacles
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
@@ -185,9 +190,20 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     // put combine trajectory into debug data
     const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
         combined_trajectory.trajectory_points();
-
     num_lattice_traj += 1;
     reference_line_info->SetTrajectory(combined_trajectory);
+
+
+    // Auto Tuning
+    // 1. Get future trajectory from localization
+
+    // 2. Map future trajectory to lon-lat trajectory pair
+
+    // 3. evalutate cost
+
+    // 4. emit
+    ///////////////////////
+
     // Print the chosen end condition and start condition
     AINFO << "   --- Starting Pose: s=" << init_s[0] << " ds=" << init_s[1]
           << " dds=" << init_s[2];
@@ -224,12 +240,6 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     }
     combined_trajectory_path->set_lattice_trajectory_cost(trajectory_pair_cost);
     */
-
-    // AINFO << "------(2)set lattice trajectory";
-    // AINFO << "trajectory not valid for constraint ["
-    //          << constraint_failure_count << "] times";
-    // AINFO << "trajectory not valid for collision ["
-    //          << collision_failure_count << "] times";
   }
 
   AINFO << "Trajectory_Evaluation_Time="

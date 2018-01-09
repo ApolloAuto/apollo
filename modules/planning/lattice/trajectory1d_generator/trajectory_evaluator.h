@@ -35,15 +35,23 @@ namespace apollo {
 namespace planning {
 
 class TrajectoryEvaluator {
+  // normal use
   typedef std::pair<
       std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>, double>
       PairCost;
+
+  // auto tuning
+  typedef std::pair<
+      std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>,
+      std::pair<std::vector<double>,double>>
+      PairCostWithComponents;
 
  public:
   explicit TrajectoryEvaluator(
       const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
-      const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories);
+      const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories,
+      bool is_auto_tuning);
 
   virtual ~TrajectoryEvaluator() = default;
 
@@ -56,19 +64,25 @@ class TrajectoryEvaluator {
 
   double top_trajectory_pair_cost() const;
 
+  std::vector<double> top_trajectory_pair_component_cost() const;
+
  private:
   double evaluate(const PlanningTarget& planning_target,
                   const std::shared_ptr<Curve1d>& lon_trajectory,
-                  const std::shared_ptr<Curve1d>& lat_trajectory) const;
+                  const std::shared_ptr<Curve1d>& lat_trajectory,
+                  std::vector<double>* cost_components) const;
 
-  double compute_lat_trajectory_offset_cost(
+  double compute_lat_offset_cost(
       const std::shared_ptr<Curve1d>& lat_trajectory,
       const std::vector<double>& s_values) const;
 
-  double compute_lon_trajectory_comfort_cost(
+  double compute_lon_comfort_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
-  double compute_lon_trajectory_objective_cost(
+  double compute_lon_obstacle_cost(
+      const std::shared_ptr<Curve1d>& lon_trajectory) const;
+
+  double compute_lon_objective_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory,
       const PlanningTarget& planning_target) const;
 
@@ -79,8 +93,21 @@ class TrajectoryEvaluator {
     }
   };
 
+  struct CostComponentComparator
+      : public std::binary_function<const PairCostWithComponents&, const PairCostWithComponents&, bool> {
+    bool operator()(const PairCostWithComponents& left, const PairCostWithComponents& right) const {
+      return left.second.second > right.second.second;
+    }
+  };
+
   std::priority_queue<PairCost, std::vector<PairCost>, CostComparator>
       cost_queue_;
+
+  std::priority_queue<PairCostWithComponents, std::vector<PairCostWithComponents>,
+    CostComponentComparator>
+      cost_queue_with_components_;
+
+  bool is_auto_tuning_ = false;
 };
 
 }  // namespace planning
