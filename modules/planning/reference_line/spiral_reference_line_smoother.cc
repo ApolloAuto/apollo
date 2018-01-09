@@ -214,8 +214,8 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   int num_iterations = FLAGS_spiral_smoother_num_iteration;
   app->Options()->SetIntegerValue("max_iter", num_iterations);
   app->Options()->SetIntegerValue("acceptable_iter", 5);
-  app->Options()->SetNumericValue("tol", 1.0e-3);
-  app->Options()->SetNumericValue("acceptable_tol", 1.0e-3);
+  app->Options()->SetNumericValue("tol", 1.0e-4);
+  app->Options()->SetNumericValue("acceptable_tol", 1.0e-5);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
