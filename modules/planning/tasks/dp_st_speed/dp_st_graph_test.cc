@@ -28,6 +28,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_thread_pool.h"
 
 namespace apollo {
 namespace planning {
@@ -35,6 +36,8 @@ namespace planning {
 class DpStGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    PlanningThreadPool::instance()->Init();
+
     // dp_config_
     PlanningConfig config;
     FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";

@@ -35,10 +35,12 @@
 #include <utility>
 #include <vector>
 
-// thread pool to run user's functors with signature
-//      ret func(int id, other_params)
-// where id is the index of the thread that runs the functor
-// ret is some return type
+/*
+ * thread pool to run user's functions with signature
+ *      ret func(int id, other_params)
+ * where id is the index of the thread that runs the functions
+ * ret is some return type
+ */
 
 namespace apollo {
 namespace common {
@@ -56,7 +58,9 @@ class Queue {
   // deletes the retrieved element, do not use for non integral types
   bool pop(T &v) {  // NOLINT
     std::unique_lock<std::mutex> lock(this->mutex);
-    if (this->q.empty()) return false;
+    if (this->q.empty()) {
+      return false;
+    }
     v = this->q.front();
     this->q.pop();
     return true;
@@ -74,21 +78,31 @@ class Queue {
 
 class ThreadPool {
  public:
-  ThreadPool() { this->init(); }
+  ThreadPool() {
+    this->init();
+  }
   explicit ThreadPool(int nThreads) {
     this->init();
     this->resize(nThreads);
   }
 
   // the destructor waits for all the functions in the queue to be finished
-  ~ThreadPool() { this->stop(true); }
+  ~ThreadPool() {
+    this->stop(true);
+  }
 
   // get the number of running threads in the pool
-  int size() { return static_cast<int>(this->threads.size()); }
+  int size() {
+    return static_cast<int>(this->threads.size());
+  }
 
   // number of idle threads
-  int n_idle() { return this->nWaiting; }
-  std::thread &get_thread(int i) { return *this->threads[i]; }
+  int n_idle() {
+    return this->nWaiting;
+  }
+  std::thread &get_thread(int i) {
+    return *this->threads[i];
+  }
 
   // change the number of threads in the pool
   // should be called from one thread, otherwise be careful to not interleave,
@@ -97,6 +111,7 @@ class ThreadPool {
   void resize(int nThreads) {
     if (!this->isStop && !this->isDone) {
       int oldNThreads = static_cast<int>(this->threads.size());
+
       if (oldNThreads <= nThreads) {  // if the number of threads is increased
         this->threads.resize(nThreads);
         this->flags.resize(nThreads);
@@ -141,6 +156,13 @@ class ThreadPool {
     return f;
   }
 
+  // wait for all computing threads to finish and join all threads
+  void join_all() {
+    while (this->nJobsToDo != 0) {
+      continue;
+    }
+  }
+
   // wait for all computing threads to finish and stop all threads
   // may be called asynchronously to not pause the calling thread while waiting
   // if isWait == true, all the functions in the queue are run, otherwise the
@@ -165,8 +187,8 @@ class ThreadPool {
          ++i) {  // wait for the computing threads to finish
       if (this->threads[i]->joinable()) this->threads[i]->join();
     }
-    // if there were no threads in the pool but some functors in the queue, the
-    // functors are not deleted by the threads
+    // if there were no threads in the pool but some functions in the queue, the
+    // functions are not deleted by the threads
     // therefore delete them here
     this->clear_queue();
     this->threads.clear();
@@ -181,6 +203,7 @@ class ThreadPool {
                       std::forward<Rest>(rest)...));
     auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
     this->q.push(_f);
+    ++this->nJobsToDo;
     std::unique_lock<std::mutex> lock(this->mutex);
     this->cv.notify_one();
     return pck->get_future();
@@ -196,6 +219,7 @@ class ThreadPool {
         std::forward<F>(f));
     auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
     this->q.push(_f);
+    ++this->nJobsToDo;
     std::unique_lock<std::mutex> lock(this->mutex);
     this->cv.notify_one();
     return pck->get_future();
@@ -221,11 +245,14 @@ class ThreadPool {
               _f);  // at return, delete the function even if an exception
                     // occurred
           (*_f)(i);
-          if (_flag)
-            return;  // the thread is wanted to stop, return even if the queue
-                     // is not empty yet
-          else
+          --this->nJobsToDo;
+          if (_flag) {
+            // the thread is wanted to stop, return even if the queue is not
+            // empty yet
+            return;
+          } else {
             isPop = this->q.pop(_f);
+          }
         }
         // the queue is empty here, wait for the next command
         std::unique_lock<std::mutex> lock(this->mutex);
@@ -245,9 +272,10 @@ class ThreadPool {
   }
 
   void init() {
-    this->nWaiting = 0;
     this->isStop = false;
     this->isDone = false;
+    this->nWaiting = 0;
+    this->nJobsToDo = 0;
   }
 
   std::vector<std::unique_ptr<std::thread>> threads;
@@ -255,7 +283,8 @@ class ThreadPool {
   detail::Queue<std::function<void(int id)> *> q;
   std::atomic<bool> isDone;
   std::atomic<bool> isStop;
-  std::atomic<int> nWaiting;  // how many threads are waiting
+  std::atomic<int> nWaiting;   // how many threads are waiting
+  std::atomic<int> nJobsToDo;  // how many jobs are NOT finished.
 
   std::mutex mutex;
   std::condition_variable cv;
