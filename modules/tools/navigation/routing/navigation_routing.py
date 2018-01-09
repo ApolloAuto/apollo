@@ -255,7 +255,7 @@ def match_drive_data(p_start, p_end):
         de = line_revloop.distance(pe)
         ss = line_revloop.project(ps)
         se = line_revloop.project(pe)
-        if ds < 4 and de < 50:
+        if ds < 6 and de < 50:
             if ss < se:
                 return line_revloop
 

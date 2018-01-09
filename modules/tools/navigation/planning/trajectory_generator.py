@@ -21,6 +21,7 @@ import rospy
 from numpy.polynomial.polynomial import polyval
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.common.proto import drive_state_pb2
 
 
 def euclidean_distance(point1, point2):
@@ -50,6 +51,8 @@ class TrajectoryGenerator:
             (time.time() - start_timestamp) * 1000
         s = 0
         relative_time = 0
+        adc_trajectory.engage_advice.advice \
+            = drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
 
         for x in range(int(final_path_length - 1)):
             y = path_y[x]
