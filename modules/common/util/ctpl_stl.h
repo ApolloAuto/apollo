@@ -25,6 +25,7 @@
 #define MODULES_COMMON_UTIL_CTPL_STL_H_
 
 #include <atomic>
+#include <chrono>
 #include <exception>
 #include <functional>
 #include <future>
@@ -158,8 +159,9 @@ class ThreadPool {
 
   // wait for all computing threads to finish and join all threads
   void join_all() {
+    std::unique_lock<std::mutex> lock(this->job_mutex);
     while (this->nJobsToDo != 0) {
-      continue;
+      this->job_cv.wait(lock);
     }
   }
 
@@ -246,6 +248,7 @@ class ThreadPool {
                     // occurred
           (*_f)(i);
           --this->nJobsToDo;
+          job_cv.notify_one();
           if (_flag) {
             // the thread is wanted to stop, return even if the queue is not
             // empty yet
@@ -283,7 +286,10 @@ class ThreadPool {
   detail::Queue<std::function<void(int id)> *> q;
   std::atomic<bool> isDone;
   std::atomic<bool> isStop;
-  std::atomic<int> nWaiting;   // how many threads are waiting
+  std::atomic<int> nWaiting;  // how many threads are waiting
+
+  std::mutex job_mutex;
+  std::condition_variable job_cv;
   std::atomic<int> nJobsToDo;  // how many jobs are NOT finished.
 
   std::mutex mutex;
