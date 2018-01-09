@@ -14,47 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/util/ctpl_stl.h"
+/**
+ * @file planning_thread_pool.cc
+ **/
 
-#include <atomic>
+#include "modules/planning/common/planning_thread_pool.h"
 
-#include "gtest/gtest.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
-namespace common {
-namespace util {
+namespace planning {
 
-namespace {
+PlanningThreadPool::PlanningThreadPool() {}
 
-std::atomic<int> n(0);
-
-void simple_add() {
-  n++;
-}
-void simple_minus() {
-  n--;
-}
-}  // namespace
-
-TEST(ThreadPool, simple) {
-  ThreadPool p(5);
-  for (int i = 0; i < 1000; ++i) {
-    auto f1 = std::bind(simple_add);
-    p.push(f1);
+void PlanningThreadPool::Init() {
+  if (is_initialized) {
+    return;
   }
-  p.join_all();
-  EXPECT_EQ(n.load(), 1000);
-
-  for (int i = 0; i < 500; ++i) {
-    auto f1 = std::bind(simple_add);
-    auto f2 = std::bind(simple_minus);
-    p.push(f1);
-    p.push(f2);
-  }
-  p.join_all();
-  EXPECT_EQ(n.load(), 1000);
+  thread_pool_.reset(
+      new common::util::ThreadPool(FLAGS_num_thread_planning_thread_pool));
+  is_initialized = true;
 }
 
-}  // namespace util
-}  // namespace common
+}  // namespace planning
 }  // namespace apollo
