@@ -32,10 +32,10 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
-#include "modules/common/util/ctpl_stl.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
@@ -160,23 +160,23 @@ bool DPRoadGraph::GenerateMinCostPath(
 
     graph_nodes.emplace_back();
 
-    common::util::ThreadPool pool(FLAGS_num_thread_dp_poly_path);
     for (size_t i = 0; i < level_points.size(); ++i) {
       const auto &cur_point = level_points[i];
 
       graph_nodes.back().emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes.back().back();
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        pool.push(std::bind(&DPRoadGraph::UpdateNode, this,
-                            std::ref(prev_dp_nodes), level, total_level,
-                            &trajectory_cost, &(front), &(cur_node)));
+        PlanningThreadPool::instance()->mutable_thread_pool()->push(std::bind(
+            &DPRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
+            total_level, &trajectory_cost, &(front), &(cur_node)));
 
       } else {
         UpdateNode(prev_dp_nodes, level, total_level, &trajectory_cost, &front,
                    &cur_node);
       }
     }
-    pool.stop(true);
+    PlanningThreadPool::instance()->mutable_thread_pool()->join_all();
+    std::cout << "all joined." << std::endl;
   }
 
   // find best path
