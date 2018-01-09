@@ -166,7 +166,7 @@ bool DPRoadGraph::GenerateMinCostPath(
       graph_nodes.back().emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes.back().back();
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        PlanningThreadPool::instance()->mutable_thread_pool()->push(std::bind(
+        PlanningThreadPool::instance()->mutable_thread_pool()->Push(std::bind(
             &DPRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
             total_level, &trajectory_cost, &(front), &(cur_node)));
 
@@ -175,7 +175,9 @@ bool DPRoadGraph::GenerateMinCostPath(
                    &cur_node);
       }
     }
-    PlanningThreadPool::instance()->mutable_thread_pool()->join_all();
+    if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+      PlanningThreadPool::instance()->mutable_thread_pool()->JoinAll();
+    }
   }
 
   // find best path
