@@ -21,6 +21,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",
+        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/trajectory:trajectory_stitcher",
         "//modules/planning/planner/em:em_planner",
         "//modules/planning/planner/lattice:lattice_planner",

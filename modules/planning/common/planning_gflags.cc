@@ -349,11 +349,12 @@ DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
+/// thread pool
+
+DEFINE_int32(num_thread_planning_thread_pool, 5,
+             "num of thread used in planning thread pool.");
 DEFINE_bool(
     enable_multi_thread_in_dp_poly_path, false,
     "Enable multiple thread to calculation curve cost in dp_poly_path.");
-DEFINE_int32(num_thread_dp_poly_path, 3, "num of thread used in dp_poly_path.");
-
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
             "Enable multiple thread to calculation curve cost in dp_st_graph.");
-DEFINE_int32(num_thread_dp_st_graph, 3, "num of thread used in dp_st_graph.");

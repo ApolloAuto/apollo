@@ -199,10 +199,9 @@ DECLARE_bool(enable_lattice_st_image_dump);
 
 DECLARE_double(trajectory_time_resolution);
 
+/// thread pool
+DECLARE_int32(num_thread_planning_thread_pool);
 DECLARE_bool(enable_multi_thread_in_dp_poly_path);
-DECLARE_int32(num_thread_dp_poly_path);
-
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
-DECLARE_int32(num_thread_dp_st_graph);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

@@ -14,47 +14,42 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file
+ **/
+
+#ifndef MODULES_PLANNING_COMMON_PLANNING_THREAD_POOL_H_
+#define MODULES_PLANNING_COMMON_PLANNING_THREAD_POOL_H_
+
+#include <memory>
+
+#include "modules/common/macro.h"
 #include "modules/common/util/ctpl_stl.h"
 
-#include <atomic>
-
-#include "gtest/gtest.h"
-
 namespace apollo {
-namespace common {
-namespace util {
+namespace planning {
 
-namespace {
+/**
+ * @class PlanningThreadPool
+ *
+ * @brief A singleton class that contains thread pool for planning
+ */
 
-std::atomic<int> n(0);
-
-void simple_add() {
-  n++;
-}
-void simple_minus() {
-  n--;
-}
-}  // namespace
-
-TEST(ThreadPool, simple) {
-  ThreadPool p(5);
-  for (int i = 0; i < 1000; ++i) {
-    auto f1 = std::bind(simple_add);
-    p.push(f1);
+class PlanningThreadPool {
+ public:
+  void Init();
+  common::util::ThreadPool* mutable_thread_pool() {
+    return thread_pool_.get();
   }
-  p.join_all();
-  EXPECT_EQ(n.load(), 1000);
 
-  for (int i = 0; i < 500; ++i) {
-    auto f1 = std::bind(simple_add);
-    auto f2 = std::bind(simple_minus);
-    p.push(f1);
-    p.push(f2);
-  }
-  p.join_all();
-  EXPECT_EQ(n.load(), 1000);
-}
+ private:
+  std::unique_ptr<common::util::ThreadPool> thread_pool_;
+  bool is_initialized = false;
 
-}  // namespace util
-}  // namespace common
+  DECLARE_SINGLETON(PlanningThreadPool);
+};
+
+}  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_COMMON_PLANNING_THREAD_POOL_H_
