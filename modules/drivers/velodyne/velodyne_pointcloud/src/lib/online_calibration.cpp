@@ -102,11 +102,14 @@ int OnlineCalibration::decode(
 
 void OnlineCalibration::get_unit_index() {
   int size = status_values_.size();
-  // simple check only for value, maybe need more check fro status tyep
+  // simple check only for value, maybe need more check fro status type
+  // TODO(velodyne driver developers): fix the following code logic
+  /*
   int start_index = 0;
   if (unit_indexs_.size() > 0) {
     start_index = unit_indexs_.back() + 5;
   }
+  */
   for (int start_index = 0; start_index < size - 5; ++start_index) {
     if (status_values_[start_index] == 85            // "U"
         && status_values_[start_index + 1] == 78     // "N"

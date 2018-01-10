@@ -25,11 +25,11 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne64Driver::Velodyne64Driver(Config config) {
+Velodyne64Driver::Velodyne64Driver(const Config& config) {
   config_ = config;
 }
 
-void Velodyne64Driver::init(ros::NodeHandle &node) {
+void Velodyne64Driver::init(ros::NodeHandle& node) {
   double packet_rate = 0;  // packet frequency (Hz)
   if (config_.model == "64E_S2" || config_.model == "64E_S3S") {
     packet_rate = 3472.17;  // 1333312 / 384
