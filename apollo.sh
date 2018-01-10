@@ -236,6 +236,7 @@ function release() {
        drivers/delphi_esr \
        drivers/gnss \
        drivers/conti_radar \
+       drivers/mobileye \
        calibration/republish_msg \
        calibration/lidar_ex_checker
   do
