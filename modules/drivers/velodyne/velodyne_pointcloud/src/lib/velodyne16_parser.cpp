@@ -66,7 +66,6 @@ double Velodyne16Parser::get_timestamp(double base_time, float time_offset,
  */
 void Velodyne16Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
                               VPointCloud& pc) {
-  float azimuth = 0.0;
   float azimuth_diff = 0.0;
   float last_azimuth_diff = 0.0;
   float azimuth_corrected_f = 0.0;
@@ -76,7 +75,7 @@ void Velodyne16Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
   double basetime = raw->gps_timestamp;  // usec
 
   for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
-    azimuth = (float)(raw->blocks[block].rotation);
+    float azimuth = static_cast<float>(raw->blocks[block].rotation);
     if (block < (BLOCKS_PER_PACKET - 1)) {
       azimuth_diff = (float)((36000 + raw->blocks[block + 1].rotation -
                               raw->blocks[block].rotation) %
