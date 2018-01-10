@@ -80,10 +80,10 @@ bool SpiralProblemInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   num_of_variables_ = n;
 
   // number of constraints
-  // b. positional equality constraints;
+  // a. positional equality constraints;
   // totally 2 * (num_of_points - 1) considering x and y separately
   m = (num_of_points_ - 1) * 2;
-  // a. positional movements; totally num_of_points
+  // b. positional movements; totally num_of_points
   m += num_of_points_;
   num_of_constraints_ = m;
 
