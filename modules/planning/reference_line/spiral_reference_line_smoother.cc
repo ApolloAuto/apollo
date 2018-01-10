@@ -115,13 +115,14 @@ bool SpiralReferenceLineSmoother::Smooth(
         }
       }
 
+      const auto& start_anchor_point = anchor_points_[start_index - 1];
       fixed_start_point_ = true;
-      fixed_start_x_ = anchor_points_[start_index - 1].path_point.x();
-      fixed_start_y_ = anchor_points_[start_index - 1].path_point.y();
+      fixed_start_x_ = start_anchor_point.path_point.x();
+      fixed_start_y_ = start_anchor_point.path_point.y();
       fixed_start_theta_ = common::math::NormalizeAngle(
-          anchor_points_[start_index - 1].path_point.theta());
-      fixed_start_kappa_ = anchor_points_[start_index - 1].path_point.kappa();
-      fixed_start_dkappa_ = anchor_points_[start_index - 1].path_point.dkappa();
+          start_anchor_point.path_point.theta());
+      fixed_start_kappa_ = start_anchor_point.path_point.kappa();
+      fixed_start_dkappa_ = start_anchor_point.path_point.dkappa();
 
       Smooth(raw_point2d, &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x,
              &opt_y);
@@ -278,6 +279,7 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
     const double theta0, const double kappa0, const double dkappa0,
     const double theta1, const double kappa1, const double dkappa1,
     const double delta_s, const double resolution) const {
+
   std::vector<common::PathPoint> path_points;
 
   QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta1, kappa1,
