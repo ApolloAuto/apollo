@@ -757,17 +757,19 @@ bool NovatelParser::handle_raw_imu(const novatel::RawImu* imu) {
   float imu_measurement_span = 1.0 / 200.0;
 
   if (is_zero(_gyro_scale)) {
-    novatel::ImuParameter param = novatel::get_imu_parameter(
-                                    novatel::ImuType::ADIS16488);
-    //ROS_INFO_STREAM("IMU type: " << static_cast<unsigned>(imu->imu_type) << "; "
+    novatel::ImuParameter param =
+        novatel::get_imu_parameter(novatel::ImuType::ADIS16488);
+    // ROS_INFO_STREAM("IMU type: " << static_cast<unsigned>(imu->imu_type) <<
+    // "; "
     //                             << "Gyro scale: " << param.gyro_scale << "; "
-    //                             << "Accel scale: " << param.accel_scale << "; "
-    //                             << "Sampling rate: " << param.sampling_rate_hz
+    //                             << "Accel scale: " << param.accel_scale << ";
+    //                             "
+    //                             << "Sampling rate: " <<
+    //                             param.sampling_rate_hz
     //                             << ".");
 
     if (is_zero(param.sampling_rate_hz)) {
-      ROS_ERROR_STREAM_THROTTLE(
-          5, "Unsupported IMU type ADUS16488.");
+      ROS_ERROR_STREAM_THROTTLE(5, "Unsupported IMU type ADUS16488.");
       return false;
     }
     gyro_scale = param.gyro_scale * param.sampling_rate_hz;
@@ -938,9 +940,7 @@ bool NovatelParser::handle_glo_eph(const novatel::GLO_Ephemeris* glo_emph) {
 
 void NovatelParser::set_observation_time() {
   int week = 0;
-  double second = 0.0;
-
-  second = time2gpst(_raw.time, &week);
+  double second = time2gpst(_raw.time, &week);
   _gnss_observation.set_gnss_time_type(apollo::drivers::gnss::GPS_TIME);
   _gnss_observation.set_gnss_week(week);
   _gnss_observation.set_gnss_second_s(second);
@@ -948,9 +948,8 @@ void NovatelParser::set_observation_time() {
 
 bool NovatelParser::decode_gnss_observation(const uint8_t* obs_data,
                                             const uint8_t* obs_data_end) {
-  int status = 0;
   while (obs_data < obs_data_end) {
-    status = input_oem4(&_raw, *obs_data++);
+    const int status = input_oem4(&_raw, *obs_data++);
     switch (status) {
       case 1:  // observation data
         if (_raw.obs.n == 0) {
