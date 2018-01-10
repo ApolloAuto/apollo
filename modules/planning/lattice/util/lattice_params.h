@@ -40,11 +40,16 @@ static const double max_acceleration = 4.0;
 static const double min_acceleration = -4.0;
 static const double max_deceleration = -min_acceleration;
 <<<<<<< HEAD
+<<<<<<< HEAD
 static const double adc_collision_buffer = 0.1;
 =======
 static const double adc_collision_buffer_width = 0.2;
 static const double adc_collision_buffer_length = 0.3;
 >>>>>>> Adc buffer extend two length and width dimension and increase lateral sample
+=======
+static const double adc_collision_buffer_width = 0.3;
+static const double adc_collision_buffer_length = 0.15;
+>>>>>>> Scenario Adjustment
 
 }  // namespace planning
 }  // namespace apollo
