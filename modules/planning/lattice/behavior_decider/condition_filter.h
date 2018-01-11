@@ -32,9 +32,11 @@ namespace planning {
 
 class ConditionFilter {
  public:
-  ConditionFilter(const Frame* frame, const std::array<double, 3>& init_s,
-                  const double speed_limit, const ReferenceLine& reference_line,
-                  const std::vector<common::PathPoint>& discretized_ref_points);
+  ConditionFilter(
+    const Frame* frame, const std::array<double, 3>& init_s,
+    const double speed_limit, const ReferenceLine& reference_line,
+    const std::vector<common::PathPoint>& discretized_ref_points,
+    std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood);
 
   std::vector<SampleBound> QuerySampleBounds(const double t) const;
 
@@ -65,7 +67,7 @@ class ConditionFilter {
  private:
   FeasibleRegion feasible_region_;
   std::vector<PathTimeObstacle> path_time_obstacles_;
-  PathTimeNeighborhood path_time_neighborhood_;
+  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
 };
 
 }  // namespace planning

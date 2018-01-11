@@ -22,7 +22,9 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
 
 #include <vector>
+#include <memory>
 
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/frame.h"
@@ -37,6 +39,9 @@ namespace planning {
 class BehaviorDecider {
  public:
   BehaviorDecider();
+  BehaviorDecider(
+    std::shared_ptr<PathTimeNeighborhood> p);
+  void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeNeighborhood> p);
 
   virtual ~BehaviorDecider() = default;
 
@@ -66,7 +71,7 @@ class BehaviorDecider {
       **/
 
  private:
-  //  PlanningTarget previous_planning_target;
+  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
 };
 
 }  // namespace planning

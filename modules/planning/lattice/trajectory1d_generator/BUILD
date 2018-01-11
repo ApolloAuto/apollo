@@ -54,6 +54,7 @@ cc_library(
         "//modules/planning/math/curve1d:curve1d",
         "//modules/planning/lattice/util:lattice_util",
         "//modules/planning/proto:lattice_sampling_config_proto",
+        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
     ],
 )
 

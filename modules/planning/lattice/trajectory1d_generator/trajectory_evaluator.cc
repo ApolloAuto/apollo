@@ -35,8 +35,10 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
-    bool is_auto_tuning) {
+    bool is_auto_tuning,
+    std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood) {
   is_auto_tuning_ = is_auto_tuning;
+  pathtime_neighorhood_ = pathtime_neighborhood;
   for (const auto lon_trajectory : lon_trajectories) {
     if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(
             *lon_trajectory)) {
