@@ -375,31 +375,42 @@ Status Planning::Plan(const double current_time_stamp,
         stitching_trajectory.back());
   }
   auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame_->reference_line_info().begin(),
-      frame_->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame_->reference_line_info().end()) {
-    status = planner_->Plan(stitching_trajectory.back(), frame_.get(), &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
+  if (not FLAGS_enable_lattice_change_lane_decider) {
+    bool has_plan = false;
+    auto it = std::find_if(
+        frame_->reference_line_info().begin(),
+        frame_->reference_line_info().end(),
+        [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
+    if (it != frame_->reference_line_info().end()) {
+      status = planner_->Plan(stitching_trajectory.back(), frame_.get(), &(*it));
+      has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
+                  it->TrajectoryLength() > FLAGS_change_lane_min_length);
+      if (!has_plan) {
+        AERROR << "Fail to plan for lane change.";
+      }
     }
-  }
 
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame_->reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
+    if (!has_plan || !FLAGS_prioritize_change_lane) {
+      for (auto& reference_line_info : frame_->reference_line_info()) {
+        if (reference_line_info.IsChangeLanePath()) {
+          continue;
+        }
+        status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
+                                &reference_line_info);
+        if (status != Status::OK()) {
+          AERROR << "planner failed to make a driving plan for: "
+                 << reference_line_info.Lanes().Id();
+        }
       }
-      status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
-                              &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
-      }
+    }
+  } else {
+    double position_cost = 0.0;
+    for (auto it = frame_->reference_line_info().begin();
+      it != frame_->reference_line_info().end(); ++it) {
+      it->SetPriorityCost(position_cost);
+      position_cost += 5.0;
+      auto status_per_line = planner_->Plan(stitching_trajectory.back(),
+        frame_.get(), &(*it)); // Set Cost in Lattice Planner
     }
   }
 

@@ -343,6 +343,8 @@ DEFINE_bool(enable_sample_bound_planning, true,
               "enable SampleBound based motion planning");
 DEFINE_bool(enable_lattice_st_image_dump, false,
               "enable sending the lattice st image");
+DEFINE_bool(enable_lattice_change_lane_decider, false,
+              "enable reference line decider in lattice planner");
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
