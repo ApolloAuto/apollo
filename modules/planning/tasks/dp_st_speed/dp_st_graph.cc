@@ -263,7 +263,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
       const double acc =
-          (static_cast<int>(r - 2 * r_pre)) * unit_s_ / (unit_t_ * unit_t_);
+          (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < dp_st_speed_config_.max_deceleration() ||
           acc > dp_st_speed_config_.max_acceleration()) {
         continue;
@@ -291,10 +291,10 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       continue;
     }
 
-    const double curr_a =
-        (cost_cr.index_s() + pre_col[r_pre].pre_point()->index_s() -
-         2 * pre_col[r_pre].index_s()) *
-        unit_s_ / (unit_t_ * unit_t_);
+    const double curr_a = (cost_cr.index_s() * unit_s_ +
+                           pre_col[r_pre].pre_point()->index_s() * unit_s_ -
+                           2 * pre_col[r_pre].index_s() * unit_s_) /
+                          (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
