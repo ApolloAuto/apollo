@@ -52,10 +52,7 @@ class Scenario {
    */
   virtual int ComputeScenarioDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info,
-      const common::TrajectoryPoint& init_planning_point,
-      const std::array<double, 3>& lon_init_state,
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      PlanningTarget* const decision) = 0;
+      PlanningTarget* planning_target) = 0;
 
   virtual const std::string& Name() const { return name_; }
   /**

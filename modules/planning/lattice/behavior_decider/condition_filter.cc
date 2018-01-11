@@ -39,6 +39,13 @@ ConditionFilter::ConditionFilter(
       path_time_neighborhood_(path_time_neighborhood) {
   Init();
 }
+//=======
+//    const std::array<double, 3>& init_s,
+//    const double speed_limit,
+//    std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood)
+//    : feasible_region_(init_s, speed_limit),
+//      ptr_path_time_neighborhood_(ptr_path_time_neighborhood) {}
+//>>>>>>> planning: changed module interfaces for lattice planner
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   // std::set<double> timestamps = CriticalTimeStamps();
@@ -147,7 +154,7 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
                                  path_time_obstacle.bottom_right().t(), t);
 
   const std::string& obstacle_id = path_time_obstacle.obstacle_id();
-  double v = path_time_neighborhood_->SpeedAtT(obstacle_id, s_lower, t);
+  double v = ptr_path_time_neighborhood_->SpeedAtT(obstacle_id, s_lower, t);
 
   block_interval.first.set_t(t);
   block_interval.first.set_s(s_lower);
@@ -165,7 +172,7 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
 std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
     const double t) const {
   std::vector<PathTimePointPair> path_intervals;
-  for (const auto& path_time_obstacle : path_time_obstacles_) {
+  for (const auto& path_time_obstacle : ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
     if (path_time_obstacle.time_lower() > t ||
         path_time_obstacle.time_upper() < t) {
       continue;
@@ -184,13 +191,9 @@ std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
   return path_intervals;
 }
 
-void ConditionFilter::Init() {
-  path_time_obstacles_ = path_time_neighborhood_->GetPathTimeObstacles();
-}
-
 std::set<double> ConditionFilter::CriticalTimeStamps() const {
   std::set<double> critical_timestamps;
-  for (const auto& path_time_obstacle : path_time_obstacles_) {
+  for (const auto& path_time_obstacle : ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
     double t_start = path_time_obstacle.bottom_left().t();
     double t_end = path_time_obstacle.upper_right().t();
     critical_timestamps.insert(t_start);
@@ -226,9 +229,13 @@ bool ConditionFilter::GenerateLatticeStPixels(
   int num_cols = 160;
   double s_step = 100.0 / (double) num_rows;
   double t_step = 8.0 / (double) num_cols;
-  std::vector<PathTimeObstacle> path_time_obstacles =
-    path_time_neighborhood_->GetPathTimeObstacles();
-  if (0 == path_time_obstacles.size()) {
+//<<<<<<< HEAD
+//  std::vector<PathTimeObstacle> path_time_obstacles =
+//    path_time_neighborhood_->GetPathTimeObstacles();
+//  if (0 == path_time_obstacles.size()) {
+//=======
+  if (ptr_path_time_neighborhood_->GetPathTimeObstacles().empty()) {
+//>>>>>>> planning: changed module interfaces for lattice planner
     AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
     return false;
   }
@@ -272,7 +279,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
 }
 
 bool ConditionFilter::WithinObstacleSt(double s, double t) {
-  std::vector<PathTimeObstacle> path_time_obstacles =
+  const auto& path_time_obstacles =
     path_time_neighborhood_->GetPathTimeObstacles();
 
   for (const PathTimeObstacle& path_time_obstacle : path_time_obstacles) {

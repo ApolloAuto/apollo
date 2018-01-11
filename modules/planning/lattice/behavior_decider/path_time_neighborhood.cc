@@ -70,28 +70,10 @@ PathTimeNeighborhood::PathTimeNeighborhood(
   ego_s_ = ego_s;
   discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(frame, reference_line, discretized_ref_points);
-}
 
-void PathTimeNeighborhood::SetStaticPathTimeObstacle(
-    const Obstacle* obstacle,
-    const ReferenceLine& reference_line) {
-  TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
-  Box2d box = obstacle->GetBoundingBox(start_point);
-
-  std::string obstacle_id = obstacle->Id();
-  SLBoundary sl_boundary;
-  reference_line.GetSLBoundary(box, &sl_boundary);
-  path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
-  path_time_obstacle_map_[obstacle_id].mutable_bottom_left()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].mutable_bottom_right()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
-                                  planned_trajectory_time));
-  path_time_obstacle_map_[obstacle_id].mutable_upper_left()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].mutable_upper_right()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
-                                  planned_trajectory_time));
+  for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
+    path_time_obstacles_.push_back(path_time_obstacle_element.second);
+  }
 }
 
 void PathTimeNeighborhood::SetupObstacles(
@@ -182,6 +164,29 @@ void PathTimeNeighborhood::SetupObstacles(
   }
 }
 
+void PathTimeNeighborhood::SetStaticPathTimeObstacle(
+    const Obstacle* obstacle,
+    const ReferenceLine& reference_line) {
+  TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
+  Box2d box = obstacle->GetBoundingBox(start_point);
+
+  std::string obstacle_id = obstacle->Id();
+  SLBoundary sl_boundary;
+  reference_line.GetSLBoundary(box, &sl_boundary);
+  path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
+  path_time_obstacle_map_[obstacle_id].mutable_bottom_left()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
+  path_time_obstacle_map_[obstacle_id].mutable_bottom_right()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
+                                  planned_trajectory_time));
+  path_time_obstacle_map_[obstacle_id].mutable_upper_left()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
+  path_time_obstacle_map_[obstacle_id].mutable_upper_right()
+      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
+                                  planned_trajectory_time));
+}
+
+
 double PathTimeNeighborhood::SpeedAtT(
     const std::string& obstacle_id, const double s, const double t) const {
   bool found =
@@ -237,13 +242,16 @@ PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
   return path_time_point;
 }
 
-std::vector<PathTimeObstacle> PathTimeNeighborhood::GetPathTimeObstacles()
+const std::vector<PathTimeObstacle>& PathTimeNeighborhood::GetPathTimeObstacles()
     const {
+  /**
   std::vector<PathTimeObstacle> path_time_obstacles;
   for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
     path_time_obstacles.push_back(path_time_obstacle_element.second);
   }
   return path_time_obstacles;
+  **/
+  return path_time_obstacles_;
 }
 
 bool PathTimeNeighborhood::GetPathTimeObstacle(

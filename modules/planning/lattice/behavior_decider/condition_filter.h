@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_CONDITION_FILTER_H_
 
 #include <array>
+#include <memory>
 #include <set>
 #include <utility>
 #include <vector>
@@ -61,13 +62,19 @@ class ConditionFilter {
       const double t, const PathTimeObstacle& critical_condition) const;
 
   std::set<double> CriticalTimeStamps() const;
+
   std::vector<double> UniformTimeStamps(
       const std::size_t num_of_time_segments) const;
 
  private:
   FeasibleRegion feasible_region_;
+<<<<<<< HEAD
   std::vector<PathTimeObstacle> path_time_obstacles_;
   std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
+=======
+
+  std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood_;
+>>>>>>> planning: changed module interfaces for lattice planner
 };
 
 }  // namespace planning

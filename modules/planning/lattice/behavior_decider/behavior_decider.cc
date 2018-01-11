@@ -60,10 +60,8 @@ PlanningTarget BehaviorDecider::Analyze(
   CHECK_GT(discretized_reference_line.size(), 0);
 
   PlanningTarget ret;
-
   if (ScenarioManager::instance()->ComputeWorldDecision(
-          frame, reference_line_info, init_planning_point, lon_init_state,
-          discretized_reference_line, &ret) != 0) {
+          frame, reference_line_info, &ret) != 0) {
     AERROR << "ComputeWorldDecision error!";
   }
 
@@ -73,10 +71,20 @@ PlanningTarget BehaviorDecider::Analyze(
         ->CopyFrom(reference_point);
   }
 
-  ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
-                                   reference_line_info->reference_line(),
-                                   discretized_reference_line,
-                                   path_time_neighborhood_);
+//<<<<<<< HEAD
+//  ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
+//                                   reference_line_info->reference_line(),
+//                                   discretized_reference_line,
+//                                   path_time_neighborhood_);
+//=======
+  std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood(
+      new PathTimeNeighborhood(frame, lon_init_state[0], reference_line_info->reference_line(),
+                               discretized_reference_line));
+
+  CHECK(FLAGS_default_cruise_speed <= speed_limit);
+  ConditionFilter condition_filter(lon_init_state, speed_limit,
+                                   ptr_path_time_neighborhood);
+//>>>>>>> planning: changed module interfaces for lattice planner
 
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
 
@@ -113,6 +121,13 @@ PlanningTarget BehaviorDecider::Analyze(
   return ret;
 }
 
+//<<<<<<< HEAD
+//=======
+//std::shared_ptr<PathTimeNeighborhood> BehaviorDecider::get_ptr_path_time_neighborhood() const {
+//  return ptr_path_time_neighborhood_;
+//}
+//
+//>>>>>>> planning: changed module interfaces for lattice planner
 }  // namespace planning
 }  // namespace apollo
 

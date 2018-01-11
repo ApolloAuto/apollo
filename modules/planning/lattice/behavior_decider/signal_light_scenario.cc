@@ -33,22 +33,53 @@ bool SignalLightScenario::Init() {
   return exist_;
 }
 
+//int SignalLightScenario::ComputeScenarioDecision(
+//    Frame* frame, ReferenceLineInfo* const reference_line_info,
+//    const common::TrajectoryPoint& init_planning_point,
+//    const std::array<double, 3>& lon_init_state,
+//    const std::vector<common::PathPoint>& discretized_reference_line,
+//    PlanningTarget* const decision) {
+//  CHECK(frame != nullptr);
+//
+//  // Only handles one reference line
+//  CHECK_GT(discretized_reference_line.size(), 0);
+//
+//  for (const auto& reference_point : discretized_reference_line) {
+//    decision->mutable_discretized_reference_line()
+//        ->add_discretized_reference_line_point()
+//        ->CopyFrom(reference_point);
+//  }
+//
+//  if (!FindValidSignalLight(reference_line_info)) {
+//    AINFO << "No valid signal light along reference line";
+//    return 0;
+//  }
+//  ReadSignals();
+//  double stop_s = std::numeric_limits<double>::max();
+//
+//  for (const hdmap::PathOverlap* signal_light :
+//       signal_lights_along_reference_line_) {
+//    const TrafficLight signal = GetSignal(signal_light->object_id);
+//    double stop_deceleration =
+//        GetStopDeceleration(reference_line_info, signal_light);
+//
+//    if ((signal.color() == TrafficLight::RED &&
+//         stop_deceleration < FLAGS_stop_max_deceleration) ||
+//        (signal.color() == TrafficLight::UNKNOWN &&
+//         stop_deceleration < FLAGS_stop_max_deceleration) ||
+//        (signal.color() == TrafficLight::YELLOW &&
+//         stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
+//      CreateStopObstacle(frame, reference_line_info, signal_light);
+//    }
+//  }
+//
+//  return 0;
+//}
+
 int SignalLightScenario::ComputeScenarioDecision(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line,
-    PlanningTarget* const decision) {
+    PlanningTarget* planning_target) {
   CHECK(frame != nullptr);
-
-  // Only handles one reference line
-  CHECK_GT(discretized_reference_line.size(), 0);
-
-  for (const auto& reference_point : discretized_reference_line) {
-    decision->mutable_discretized_reference_line()
-        ->add_discretized_reference_line_point()
-        ->CopyFrom(reference_point);
-  }
 
   if (!FindValidSignalLight(reference_line_info)) {
     AINFO << "No valid signal light along reference line";

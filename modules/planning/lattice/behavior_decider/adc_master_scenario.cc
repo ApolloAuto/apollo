@@ -25,12 +25,10 @@ bool AdcMasterScenario::Init() {
 
 int AdcMasterScenario::ComputeScenarioDecision(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const common::TrajectoryPoint& init_planning_point,
-    const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line,
     PlanningTarget* const decision) {
   CHECK(frame != nullptr);
 
+  /**
   // Only handles one reference line
   CHECK_GT(discretized_reference_line.size(), 0);
 
@@ -39,6 +37,7 @@ int AdcMasterScenario::ComputeScenarioDecision(
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
+  **/
   decision->set_cruise_speed(FLAGS_default_cruise_speed);
 
   return 0;
