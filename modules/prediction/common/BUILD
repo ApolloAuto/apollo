@@ -41,7 +41,6 @@ cc_library(
     hdrs = ["prediction_map.h"],
     deps = [
         ":prediction_gflags",
-        "//modules/common:macro",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",

@@ -288,12 +288,11 @@ int RNNEvaluator::SetupLaneFeature(const Feature& feature,
 
 bool RNNEvaluator::IsCutinInHistory(const std::string& curr_lane_id,
                                     const std::string& prev_lane_id) {
-  PredictionMap* p_map = PredictionMap::instance();
   std::shared_ptr<const LaneInfo> curr_lane_info =
-      p_map->LaneById(curr_lane_id);
+      PredictionMap::LaneById(curr_lane_id);
   std::shared_ptr<const LaneInfo> prev_lane_info =
-      p_map->LaneById(prev_lane_id);
-  if (!p_map->IsSuccessorLane(curr_lane_info, prev_lane_info)) {
+      PredictionMap::LaneById(prev_lane_id);
+  if (!PredictionMap::IsSuccessorLane(curr_lane_info, prev_lane_info)) {
     return true;
   }
   return false;

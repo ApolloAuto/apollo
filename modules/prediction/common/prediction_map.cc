@@ -41,8 +41,6 @@ using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() {}
-
 bool PredictionMap::Ready() { return HDMapUtil::BaseMapPtr() != nullptr; }
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
